@@ -154,13 +154,19 @@ namespace
 }
 
 QnNxStylePrivate::QnNxStylePrivate() :
-    QCommonStylePrivate()
+    QCommonStylePrivate(),
+    palette(),
+    idleAnimator(nullptr)
 {
+    Q_Q(QnNxStyle);
+
+    idleAnimator = new QnNoptixStyleAnimator(q);
 }
 
 QnNxStyle::QnNxStyle() :
     base_type(*(new QnNxStylePrivate()))
-{}
+{
+}
 
 void QnNxStyle::setGenericPalette(const QnGenericPalette &palette)
 {
@@ -1043,12 +1049,16 @@ void QnNxStyle::drawControl(
         if (const QStyleOptionProgressBar *progressBar =
                 qstyleoption_cast<const QStyleOptionProgressBar *>(option))
         {
+            Q_D(const QnNxStyle);
+
             QRect rect = progressBar->rect;
             QnPaletteColor mainColor = findColor(progressBar->palette.color(QPalette::Highlight));
-            bool determined = progressBar->minimum < progressBar->maximum;
+            bool determined = false;//progressBar->minimum < progressBar->maximum;
 
             if (determined)
             {
+                d->idleAnimator->stop(widget);
+
                 int pos = sliderPositionFromValue(
                             progressBar->minimum,
                             progressBar->maximum,
@@ -1076,6 +1086,64 @@ void QnNxStyle::drawControl(
             else
             {
                 painter->fillRect(rect, mainColor.darker(4));
+
+                const qreal kMaxProgress = M_PI;
+                const qreal kSpeed = 0.4;
+                const int kTickCount = 7;
+                QColor color = mainColor.darker(1);
+
+                qreal animationProgress = d->idleAnimator->value(widget);
+                if (animationProgress >= kMaxProgress)
+                {
+                    animationProgress = std::fmod(animationProgress, kMaxProgress);
+                    d->idleAnimator->setValue(widget, animationProgress);
+                }
+
+                if (!d->idleAnimator->isRunning(widget))
+                    d->idleAnimator->start(widget, kSpeed, animationProgress);
+
+                const qreal tickStep = M_PI / kTickCount;
+                const qreal tickWidth = tickStep / 2;
+
+                auto modify = [](qreal x) -> qreal
+                {
+                    const qreal kBound = 0.4;
+                    const qreal kTargetBound = 0.15;
+                    const qreal kFactor = 4.0;
+
+                    if (x < kBound)
+                    {
+                        return std::pow(x / kBound, kFactor) * kTargetBound;
+                    }
+                    else if (x > 1.0 - kBound)
+                    {
+                        qreal nx = (x - (1.0 - kBound)) / kBound;
+                        return 1.0 - kTargetBound + (1.0 - std::pow(1.0 - nx, kFactor)) * kTargetBound;
+                    }
+                    else
+                    {
+                        return kTargetBound + (x - kBound) / (1.0 - kBound * 2) * (1.0 - kTargetBound * 2);
+                    }
+                };
+
+                QRect calcRect = rect.adjusted(-1, 0, 1, 0);
+
+                for (qreal angle = fmod(animationProgress, tickStep) - tickStep; angle < M_PI; angle += tickStep)
+                {
+                    qreal x1 = (1.0 - std::cos(qMax(0.0, angle))) / 2.0;
+                    qreal x2 = (1.0 - std::cos(qMin(M_PI, angle + tickWidth))) / 2.0;
+
+                    qreal mx1 = modify(x1);
+                    qreal mx2 = modify(x2);
+
+                    int rx1 = calcRect.left() + calcRect.width() * mx1;
+                    int rx2 = calcRect.left() + calcRect.width() * mx2;
+
+                    if (rx2 <= rect.left() || rx1 >= rect.right())
+                        continue;
+
+                    painter->fillRect(qMax(rx1, rect.left()), rect.top(), rx2 - rx1, rect.height(), color);
+                }
             }
 
             return;
