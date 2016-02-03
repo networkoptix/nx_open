@@ -370,6 +370,9 @@ void QnNxStyle::drawPrimitive(
 
             QnScopedPainterPenRollback penRollback(painter, QPen(mainColor.darker(1)));
             painter->drawLine(rect.topLeft(), rect.topRight());
+
+            painter->setPen(mainColor.darker(3));
+            painter->drawLine(rect.bottomLeft(), rect.bottomRight());
         }
         return;
 
@@ -847,7 +850,7 @@ void QnNxStyle::drawControl(
 
                     QnPaletteColor mainColor = findColor(option->palette.color(QPalette::Window)).lighter(3);
 
-                    painter->fillRect(tab->rect, mainColor);
+                    painter->fillRect(tab->rect.adjusted(0, 0, 0, -1), mainColor);
 
                     painter->setPen(mainColor.lighter(2));
                     painter->drawLine(tab->rect.topLeft(), tab->rect.topRight());
