@@ -15,6 +15,8 @@
 #include <camera/camera_bookmarks_query.h>
 #include <core/resource_management/resource_pool.h>
 
+#include <utils/common/scoped_timer.h>
+
 namespace
 {
     enum
@@ -177,6 +179,8 @@ void QnTimelineBookmarksWatcher::onBookmarkRemoved(const QnUuid &id)
 
 void QnTimelineBookmarksWatcher::tryUpdateTimelineBookmarks(const QnVirtualCameraResourcePtr &camera)
 {
+    QN_LOG_TIME(Q_FUNC_INFO);
+
     if (m_currentCamera != camera)
         return;
 
@@ -230,6 +234,8 @@ void QnTimelineBookmarksWatcher::onTimelineWindowChanged(qint64 startTimeMs
 
 void QnTimelineBookmarksWatcher::setCurrentCamera(const QnVirtualCameraResourcePtr &camera)
 {
+    QN_LOG_TIME(Q_FUNC_INFO);
+
     if (m_currentCamera == camera)
         return;
 
