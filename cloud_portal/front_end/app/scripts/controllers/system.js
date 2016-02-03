@@ -98,7 +98,7 @@ angular.module('cloudApp')
                 dialogs.confirm("You are going to completely disconnect your system from the cloud. Are you sure?").
                     then(function(){
                         $scope.deletingSystem = process.init(function(){
-                            return cloudApi.delete(systemId);
+                            return cloudApi.disconnect(systemId);
                         }).then(reloadSystems);
                         $scope.deletingSystem.run();
                     });

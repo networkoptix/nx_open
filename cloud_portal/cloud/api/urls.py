@@ -13,7 +13,7 @@ urlpatterns = [
     url(r'^account',                    account.index),
 
 
-    url(r'^systems/delete',                         systems.delete),
+    url(r'^systems/disconnect',                     systems.disconnect),
     url(r'^systems/connect',                        systems.connect),
     url(r'^systems/(?P<system_id>.+?)/accessRoles', systems.access_roles),
     url(r'^systems/(?P<system_id>.+?)/users',       systems.sharing),

@@ -49,7 +49,7 @@ angular.module('cloudApp')
 
 
         $scope.disconnecting = process.init(function(){
-            return cloudApi.delete($scope.systemId);
+            return cloudApi.disconnect($scope.systemId);
         }).then(function(result){
             webadmin.postMessage({
                 message: 'disconnected'

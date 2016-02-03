@@ -162,7 +162,7 @@ angular.module('cloudApp')
                     role: Config.accessRoles.unshare
                 });
             },
-            delete:function(systemId){
+            disconnect:function(systemId){
                 return $http.post(apiBase + '/systems/delete', {
                     system_id: systemId
                 });
