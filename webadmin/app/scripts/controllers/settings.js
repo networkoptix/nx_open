@@ -180,9 +180,13 @@ angular.module('webadminApp')
         });
 
         mediaserver.getSystemSettings().then(function(data){
-            $scope.cloudSystemID = data.data.cloudSystemID;
-            $scope.cloudAccountName = data.data.cloudAccountName;
-            //cloudAccountName, cloudSystemID
+
+            var allSettings = data.data;
+            var cloudId = _.find(allSettings, function(setting){ return setting.name == 'cloudSystemID'; });
+            $scope.cloudSystemID = cloudId?cloudId.value:null;
+
+            var cloudAccount = _.find(allSettings, function(setting){ return setting.name == 'cloudAccountName'; });
+            $scope.cloudAccountName = cloudAccount?cloudAccount.value:null;
         });
 
 
@@ -204,6 +208,8 @@ angular.module('webadminApp')
                         return $scope.cloudSystemID;
                     }
                 }
+            }).finally(function(){
+                window.location.reload();
             });
         }
         $scope.disconnectFromCloud = function() { // Disconnect from Cloud

@@ -239,6 +239,9 @@ angular.module('webadminApp')
                     cloudAuthKey:cloudAuthKey
                 }));
             },
+            clearCloudSystemCredentials: function(){
+                return wrapPost(proxy + '/api/saveCloudSystemCredentials?unbind');
+            },
             getRecords:function(serverUrl, physicalId, startTime, endTime, detail, limit, label, periodsType){
 
                 //console.log('getRecords',serverUrl,physicalId,startTime,endTime,detail,periodsType);

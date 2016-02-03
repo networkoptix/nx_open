@@ -46,7 +46,7 @@ angular.module('webadminApp')
                         then(successHandler,errorHandler);
                     break;
                 case 'disconnected':
-                    mediaserver.saveCloudSystemCredentials(null,null).then(successHandler,errorHandler);
+                    mediaserver.clearCloudSystemCredentials().then(successHandler,errorHandler);
                     break;
                 default:
                     // WTF?
