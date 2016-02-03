@@ -1053,7 +1053,7 @@ void QnNxStyle::drawControl(
 
             QRect rect = progressBar->rect;
             QnPaletteColor mainColor = findColor(progressBar->palette.color(QPalette::Highlight));
-            bool determined = false;//progressBar->minimum < progressBar->maximum;
+            bool determined = progressBar->minimum < progressBar->maximum;
 
             if (determined)
             {
@@ -1087,60 +1087,36 @@ void QnNxStyle::drawControl(
             {
                 painter->fillRect(rect, mainColor.darker(4));
 
-                const qreal kMaxProgress = M_PI;
-                const qreal kSpeed = 0.4;
-                const int kTickCount = 7;
-                QColor color = mainColor.darker(1);
+                const qreal kTickWidth = M_PI / 2;
+                const qreal kTickSpace = kTickWidth / 2;
+                const qreal kMaxAngle = M_PI + kTickWidth + kTickSpace;
+                const qreal kSpeed = kMaxAngle * 0.3;
 
-                qreal animationProgress = d->idleAnimator->value(widget);
-                if (animationProgress >= kMaxProgress)
+                const QColor color = mainColor.darker(1);
+
+                qreal angle = d->idleAnimator->value(widget);
+                if (angle >= kMaxAngle)
                 {
-                    animationProgress = std::fmod(animationProgress, kMaxProgress);
-                    d->idleAnimator->setValue(widget, animationProgress);
+                    angle = std::fmod(angle, kMaxAngle);
+                    d->idleAnimator->setValue(widget, angle);
                 }
 
                 if (!d->idleAnimator->isRunning(widget))
-                    d->idleAnimator->start(widget, kSpeed, animationProgress);
+                    d->idleAnimator->start(widget, kSpeed, angle);
 
-                const qreal tickStep = M_PI / kTickCount;
-                const qreal tickWidth = tickStep / 2;
-
-                auto modify = [](qreal x) -> qreal
+                if (angle < M_PI + kTickWidth)
                 {
-                    const qreal kBound = 0.4;
-                    const qreal kTargetBound = 0.15;
-                    const qreal kFactor = 4.0;
-
-                    if (x < kBound)
+                    auto f = [](qreal cos) -> qreal
                     {
-                        return std::pow(x / kBound, kFactor) * kTargetBound;
-                    }
-                    else if (x > 1.0 - kBound)
-                    {
-                        qreal nx = (x - (1.0 - kBound)) / kBound;
-                        return 1.0 - kTargetBound + (1.0 - std::pow(1.0 - nx, kFactor)) * kTargetBound;
-                    }
-                    else
-                    {
-                        return kTargetBound + (x - kBound) / (1.0 - kBound * 2) * (1.0 - kTargetBound * 2);
-                    }
-                };
+                        const qreal kFactor = 1.0 / 1.4;
+                        return std::copysign(std::pow(std::abs(cos), kFactor), cos);
+                    };
 
-                QRect calcRect = rect.adjusted(-1, 0, 1, 0);
+                    qreal x1 = (1.0 - f(std::cos(qMax(0.0, angle - kTickWidth)))) / 2.0;
+                    qreal x2 = (1.0 - f(std::cos(qMin(M_PI, angle)))) / 2.0;
 
-                for (qreal angle = fmod(animationProgress, tickStep) - tickStep; angle < M_PI; angle += tickStep)
-                {
-                    qreal x1 = (1.0 - std::cos(qMax(0.0, angle))) / 2.0;
-                    qreal x2 = (1.0 - std::cos(qMin(M_PI, angle + tickWidth))) / 2.0;
-
-                    qreal mx1 = modify(x1);
-                    qreal mx2 = modify(x2);
-
-                    int rx1 = calcRect.left() + calcRect.width() * mx1;
-                    int rx2 = calcRect.left() + calcRect.width() * mx2;
-
-                    if (rx2 <= rect.left() || rx1 >= rect.right())
-                        continue;
+                    int rx1 = rect.left() + rect.width() * x1;
+                    int rx2 = rect.left() + rect.width() * x2;
 
                     painter->fillRect(qMax(rx1, rect.left()), rect.top(), rx2 - rx1, rect.height(), color);
                 }
