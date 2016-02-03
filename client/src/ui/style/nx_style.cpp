@@ -691,13 +691,38 @@ void QnNxStyle::drawComplexControl(
             if (option->subControls & SC_SpinBoxFrame)
                 proxy()->drawPrimitive(PE_PanelLineEdit, option, painter, widget);
 
-            if (option->subControls & SC_SpinBoxUp && option->subControls & SC_SpinBoxDown)
+            auto drawArrowButton = [&](QStyle::SubControl subControl)
             {
-                drawArrow(Up, painter, subControlRect(control, option, SC_SpinBoxUp, widget)
-                          .translated(0, dp(2)), option->palette.color(QPalette::Text));
-                drawArrow(Down, painter, subControlRect(control, option, SC_SpinBoxDown, widget)
-                          .translated(0, -dp(2)), option->palette.color(QPalette::Text));
-            }
+                QRect buttonRect = subControlRect(control, spinBox, subControl, widget);
+
+                QnPaletteColor mainColor = findColor(spinBox->palette.color(QPalette::Button));
+                QColor buttonColor;
+
+                if (spinBox->activeSubControls.testFlag(subControl))
+                {
+                    if (spinBox->state.testFlag(State_Sunken))
+                        buttonColor = mainColor.darker(1);
+                    else
+                        buttonColor = mainColor;
+                }
+
+                if (buttonColor.isValid())
+                    painter->fillRect(buttonRect, buttonColor);
+
+                bool up = subControl == SC_SpinBoxUp;
+
+                drawArrow(up ? Up : Down,
+                          painter,
+                          subControlRect(control, option, subControl, widget),
+                          option->palette.color(QPalette::Text));
+            };
+
+            if (option->subControls.testFlag(SC_SpinBoxUp))
+                drawArrowButton(SC_SpinBoxUp);
+
+            if (option->subControls.testFlag(SC_SpinBoxDown))
+                drawArrowButton(SC_SpinBoxDown);
+
             return;
         }
         break;
@@ -1320,6 +1345,11 @@ QRect QnNxStyle::subControlRect(
                     rect.setRight(rect.right() - buttonWidth);
                     rect.adjust(frameWidth, frameWidth, 0, -frameWidth);
                 }
+                break;
+
+            case SC_SpinBoxDown:
+            case SC_SpinBoxUp:
+                rect.adjust(0, 0, 0, 1);
                 break;
 
             default:
