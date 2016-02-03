@@ -57,6 +57,29 @@ class QnTransactionTransport
     Q_OBJECT
 
 public:
+    class Locker
+    {
+    public:
+        Locker(QnTransactionTransport* objectToLock)
+        :
+            m_objectToLock(objectToLock)
+        {
+            m_objectToLock->lock();
+        }
+        ~Locker()
+        {
+            m_objectToLock->unlock();
+        }
+
+        void waitForNewTransactionsReady()
+        {
+            m_objectToLock->waitForNewTransactionsReady();
+        }
+
+    private:
+        QnTransactionTransport* m_objectToLock;
+    };
+
     static const char* TUNNEL_MULTIPART_BOUNDARY;
     static const char* TUNNEL_CONTENT_TYPE;
 
@@ -214,13 +237,6 @@ public:
         QSharedPointer<AbstractStreamSocket> socket,
         const nx_http::Request& request,
         const QByteArray& requestBuf );
-    //!Blocks till connection is ready to accept new transactions
-    /*!
-        \param invokeBeforeWait This handler is invoked if wait is required. Invoked with internal mutex locked
-        \note After \a invokeBeforeWait has been called this object cannot be destroyed (will block in destructor)
-            until \a QnTransactionTransport::waitForNewTransactionsReady has returned
-    */
-    void waitForNewTransactionsReady( std::function<void()> invokeBeforeWait );
     //!Transport level logic should use this method to report connection problem
     void connectionFailure();
 
@@ -336,6 +352,12 @@ private:
     void monitorConnectionForClosure( SystemError::ErrorCode errorCode, size_t bytesRead );
     QUrl generatePostTranUrl();
     void aggregateOutgoingTransactionsNonSafe();
+
+    /** Destructor will block until unlock is called */
+    void lock();
+    void unlock();
+    //!Blocks till connection is ready to accept new transactions
+    void waitForNewTransactionsReady();
 
 private slots:
     void at_responseReceived( const nx_http::AsyncHttpClientPtr& );
