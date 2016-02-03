@@ -141,19 +141,40 @@ namespace ec2
     {
         using namespace std::placeholders;
 
-        //AbstractResourceManager::getResourceTypes
+        /**%apidoc GET /ec2/getResourceTypes
+         * Read all resource types. Resource type contain object type such as
+         * 'Server', 'Camera' e.t.c. Also, resource types contain additional information
+         * for cameras such as maximum fps, resolution, e.t.c
+         * %param[default] format
+         * %return Return object in requested format
+         * %// AbstractResourceManager::getResourceTypes
+         */
         registerGetFuncHandler<std::nullptr_t, ApiResourceTypeDataList>(p, ApiCommand::getResourceTypes);
         //AbstractResourceManager::getResource
         //registerGetFuncHandler<std::nullptr_t, ApiResourceData>(p, ApiCommand::getResource);
         //AbstractResourceManager::setResourceStatus
         registerUpdateFuncHandler<ApiResourceStatusData>(p, ApiCommand::setResourceStatus);
-        //AbstractResourceManager::getKvPairs
+
+        /**%apidoc GET /ec2/getResourceParams
+         * Read resource (camera, user or server) additional parameters (camera firmware version, e.t.c).
+         * List of parameters depends of resource type.
+         * %param[default] format
+         * %param id Resource unique ID
+         * %return Return object in requested format
+         * %// AbstractResourceManager::getKvPairs
+         */
         registerGetFuncHandler<QnUuid, ApiResourceParamWithRefDataList>(p, ApiCommand::getResourceParams);
         //AbstractResourceManager::save
         registerUpdateFuncHandler<ApiResourceParamWithRefDataList>(p, ApiCommand::setResourceParams);
         //AbstractResourceManager::remove
         registerUpdateFuncHandler<ApiIdData>(p, ApiCommand::removeResource);
 
+        /**%apidoc GET /ec2/getStatusList
+         * Read current status values for camers, servers and storages.
+         * %param[default] format
+         * %param[opt] id Object unique ID
+         * %return Returns objects status list data formatted in a requested format. If id parameter is specified, the list contais only one object with that id or nothing, if there is no such object found.
+         */
         registerGetFuncHandler<QnUuid, ApiResourceStatusDataList>(p, ApiCommand::getStatusList);
 
         //AbstractMediaServerManager::getServers
@@ -167,7 +188,12 @@ namespace ec2
         //AbstractMediaServerManager::remove
         registerUpdateFuncHandler<ApiIdData>(p, ApiCommand::removeMediaServer);
 
-        //AbstractMediaServerManager::getServersEx
+        /**%apidoc GET /ec2/getMediaServersEx
+         * Return server list
+         * %param[default] format
+         * %return Return object in requested format
+         * %// AbstractMediaServerManager::getServersEx
+         */
         registerGetFuncHandler<QnUuid, ApiMediaServerDataExList>(p, ApiCommand::getMediaServersEx);
 
         registerUpdateFuncHandler<ApiStorageDataList>(p, ApiCommand::saveStorages);
@@ -188,11 +214,60 @@ namespace ec2
         registerGetFuncHandler<QnUuid, ApiCameraAttributesDataList>(p, ApiCommand::getCameraUserAttributes);
         //AbstractCameraManager::addCameraHistoryItem
         registerUpdateFuncHandler<ApiServerFootageData>(p, ApiCommand::addCameraHistoryItem);
-        //AbstractCameraManager::getCameraHistoryItems
+
+        /**%apidoc GET /ec2/getCameraHistoryItems
+         * Read information about which server hold camera in some time
+         * period. This information is used for archive play if camera was moved from
+         * one server to another.
+         * %param[default] format
+         * %return Return object in requested format
+         * %// AbstractCameraManager::getCameraHistoryItems
+         */
         registerGetFuncHandler<std::nullptr_t, ApiServerFootageDataList>(p, ApiCommand::getCameraHistoryItems);
-        //AbstractCameraManager::getCamerasEx
+
+        /**%apidoc GET /ec2/getCamerasEx
+         * Read camera list
+         * %param[default] format
+         * %param[opt] id Server unique ID
+         * %return Returns camera list data formatted in a requested format
+         *     %attribute addParams List of additional parameters for camera. This list can contain such information as full ONVIF url, camera maximum fps e.t.c
+         *     %attribute audioEnabled Server will push audio stream from a camera if parameter is true
+         *     %attribute controlEnabled Server will manage camera (change resolution, fps, create profiles e.t.c) if parameter if true
+         *     %attribute dewarpingParams Json string with dewarping parameters
+         *     %attribute groupId Internal group identifier. It is used for grouping channels for multi-channels cameras together.
+         *     %attribute groupName Group name. This name can be changed by user
+         *     %attribute id Object ID. All ID for all objects in a system is GUIDs
+         *     %attribute login Login for camera authentication
+         *     %attribute mac camera MAC address
+         *     %attribute manuallyAdded True if user added camera manually
+         *     %attribute maxArchiveDays Maximum archive duration in days for this camera. If value less or equal to zero, it is not used
+         *     %attribute minArchiveDays Minimum archive duration in days for this camera. If value less or equal to zero, it is not used
+         *     %attribute model Camera model
+         *     %attribute motionMask Camera's motion mask. This string defines several rectangles via ':' delimiter. Each rectangle is described by 5 digits: sensitivity, x,y(for left top corner), width, height
+         *     %attribute motionType If value is 'MT_SoftwareGrid' then server determine motion, otherwise camera built-in motion will be used
+         *     %attribute name Camera name
+         *     %attribute parentId Camera's server ID
+         *     %attribute physicalId Camera unique identifier. This identifier is used in all requests related to a camera. For instance, in RTSP requests
+         *     %attribute password Password for camera authentication
+         *     %attribute scheduleEnabled Do record camera archive if true
+         *     %attribute scheduleTasks List of 'scheduleTask' objects with camera recording schedule.
+         *     %attribute secondaryStreamQuality Secondary stream quality. Possible values:'SSQualityLow', 'SSQualityMedium', 'SSQualityHigh', 'SSQualityDontUse'
+         *     %attribute status Camera status. Possible values are: 'Offline', 'Online', 'Recording'
+         *     %attribute statusFlags Usually this field is zero. Non zero value is used to mark that a lot of network issues was occurred with this camera
+         *     %attribute typeId Unique ID with camera's type. Camera's type can describe predefined information such as camera maximum resolution, fps e.t.c.
+         *         Detailed type information can be obtained via 'getResourceTypes' request.
+         *     %attribute url Camera plain IP address or full http url if camera was added manually. Also, for multichannel encoders full url is used
+         *     %attribute vendor Camera manufacturer
+         * %// AbstractCameraManager::getCamerasEx
+         */
         registerGetFuncHandler<QnUuid, ApiCameraDataExList>(p, ApiCommand::getCamerasEx);
 
+        /**%apidoc GET /ec2/getStorages
+         * Read current storages list
+         * %param[default] format
+         * %param[opt] id Server unique ID
+         * %return Returns storages list data formatted in a requested format. If id parameter is specified, the list contais only that server storages.
+         */
         registerGetFuncHandler<QnUuid, ApiStorageDataList>(p, ApiCommand::getStorages);
 
         //AbstractLicenseManager::addLicenses
@@ -201,7 +276,12 @@ namespace ec2
         registerUpdateFuncHandler<ApiLicenseData>(p, ApiCommand::removeLicense);
 
 
-        //AbstractBusinessEventManager::getBusinessRules
+        /**%apidoc GET /ec2/getBusinessRules
+         * Return business rules
+         * %param[default] format
+         * %return Return object in requested format
+         * %// AbstractBusinessEventManager::getBusinessRules
+         */
         registerGetFuncHandler<std::nullptr_t, ApiBusinessRuleDataList>(p, ApiCommand::getBusinessRules);
 
         registerGetFuncHandler<std::nullptr_t, ApiTransactionDataList>(p, ApiCommand::getTransactionLog);
@@ -216,14 +296,25 @@ namespace ec2
         registerUpdateFuncHandler<ApiBusinessActionData>(p, ApiCommand::execBusinessAction);
 
 
-        //AbstractUserManager::getUsers
+        /**%apidoc GET /ec2/getUsers
+         * Return users registered in the system. User's password contain MD5
+         * hash data with salt
+         * %param[default] format
+         * %return Return object in requested format
+         * %// AbstractUserManager::getUsers
+         */
         registerGetFuncHandler<std::nullptr_t, ApiUserDataList>(p, ApiCommand::getUsers);
         //AbstractUserManager::save
         registerUpdateFuncHandler<ApiUserData>(p, ApiCommand::saveUser);
         //AbstractUserManager::remove
         registerUpdateFuncHandler<ApiIdData>(p, ApiCommand::removeUser);
 
-        //AbstractVideowallManager::getVideowalls
+        /**%apidoc GET /ec2/getVideowalls
+         * Return list of video walls
+         * %param[default] format
+         * %return Return object in requested format
+         * %// AbstractVideowallManager::getVideowalls
+         */
         registerGetFuncHandler<std::nullptr_t, ApiVideowallDataList>(p, ApiCommand::getVideowalls);
         //AbstractVideowallManager::save
         registerUpdateFuncHandler<ApiVideowallData>(p, ApiCommand::saveVideowall);
@@ -231,16 +322,36 @@ namespace ec2
         registerUpdateFuncHandler<ApiIdData>(p, ApiCommand::removeVideowall);
         registerUpdateFuncHandler<ApiVideowallControlMessageData>(p, ApiCommand::videowallControl);
 
-        //AbstractLayoutManager::getLayouts
+        /**%apidoc GET /ec2/getLayouts
+         * Return list of user layout
+         * %param[default] format
+         * %return Return object in requested format
+         * %// AbstractLayoutManager::getLayouts
+         */
         registerGetFuncHandler<std::nullptr_t, ApiLayoutDataList>(p, ApiCommand::getLayouts);
         //AbstractLayoutManager::save
         registerUpdateFuncHandler<ApiLayoutDataList>(p, ApiCommand::saveLayouts);
         //AbstractLayoutManager::remove
         registerUpdateFuncHandler<ApiIdData>(p, ApiCommand::removeLayout);
 
-        //AbstractStoredFileManager::listDirectory
+        /**%apidoc GET /ec2/listDirectory
+         * Return list of folders and files in a virtual FS stored inside
+         * database. This function is used to add files (such audio for notifications)
+         * to database.
+         * %param[default] format
+         * %param[opt] folder Folder name in a virtual FS
+         * %return Return object in requested format
+         * %// AbstractStoredFileManager::listDirectory
+         */
         registerGetFuncHandler<ApiStoredFilePath, ApiStoredDirContents>(p, ApiCommand::listDirectory);
-        //AbstractStoredFileManager::getStoredFile
+
+        /**%apidoc GET /ec2/getStoredFile
+         * Read file data from a virtual FS
+         * %param[default] format
+         * %param[opt] folder File name
+         * %return Return object in requested format
+         * %// AbstractStoredFileManager::getStoredFile
+         */
         registerGetFuncHandler<ApiStoredFilePath, ApiStoredFileData>(p, ApiCommand::getStoredFile);
         //AbstractStoredFileManager::addStoredFile
         registerUpdateFuncHandler<ApiStoredFileData>(p, ApiCommand::addStoredFile);
@@ -275,7 +386,13 @@ namespace ec2
        //AbstractECConnection
         registerUpdateFuncHandler<ApiDatabaseDumpData>(p, ApiCommand::restoreDatabase);
 
-        //AbstractTimeManager::getCurrentTimeImpl
+        /**%apidoc GET /ec2/getCurrentTime
+         * Read current time
+         * %param[default] format
+         * %param[opt] folder File name
+         * %return Return object in requested format
+         * %// AbstractTimeManager::getCurrentTimeImpl
+         */
         registerGetFuncHandler<std::nullptr_t, ApiTimeData>(p, ApiCommand::getCurrentTime);
         //AbstractTimeManager::forcePrimaryTimeServer
         registerUpdateFuncHandler<ApiIdData>(p, ApiCommand::forcePrimaryTimeServer,
@@ -286,7 +403,21 @@ namespace ec2
         registerUpdateFuncHandler<ApiClientInfoData>(p, ApiCommand::saveClientInfo);
         registerGetFuncHandler<std::nullptr_t, ApiClientInfoDataList>(p, ApiCommand::getClientInfos);
 
+        /**%apidoc GET /ec2/getFullInfo
+         * Read all data such as all servers, cameras, users
+         * e.t.c
+         * %param[default] format
+         * %param[opt] folder File name
+         * %return Return object in requested format
+         */
         registerGetFuncHandler<std::nullptr_t, ApiFullInfoData>(p, ApiCommand::getFullInfo);
+
+        /**%apidoc GET /ec2/getLicenses
+         * Read license list
+         * %param[default] format
+         * %param[opt] folder File name
+         * %return Return object in requested format
+         */
         registerGetFuncHandler<std::nullptr_t, ApiLicenseDataList>(p, ApiCommand::getLicenses);
 
         registerGetFuncHandler<std::nullptr_t, ApiDatabaseDumpData>(p, ApiCommand::dumpDatabase);
@@ -298,6 +429,13 @@ namespace ec2
         registerFunctorHandler<ApiLoginData, QnConnectionInfo>(p, ApiCommand::testConnection,
             std::bind(&Ec2DirectConnectionFactory::fillConnectionInfo, this, _1, _2));
 
+        /**%apidoc GET /ec2/getSettings
+         * Read general system settings such as email address
+         * e.t.c
+         * %param[default] format
+         * %param[opt] folder File name
+         * %return Return object in requested format
+         */
         registerFunctorHandler<std::nullptr_t, ApiResourceParamDataList>(p, ApiCommand::getSettings,
             std::bind(&Ec2DirectConnectionFactory::getSettings, this, _1, _2));
 
