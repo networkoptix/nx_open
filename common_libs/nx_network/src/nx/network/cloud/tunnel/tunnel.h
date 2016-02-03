@@ -115,6 +115,8 @@ public:
     /** Implementation of QnStoppableAsync::pleaseStop */
     void pleaseStop(std::function<void()> handler) override;
 
+    // TODO: replace with actual accept message
+    static const QByteArray ACCEPT_INDICATION;
 
 protected:
     void startConnectors(QnMutexLockerBase* lock);

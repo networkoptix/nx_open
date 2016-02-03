@@ -15,6 +15,7 @@
 namespace nx {
 namespace network {
 
+/** Socket configuration attributes ready to apply to any \class AbstractSocket */
 class SocketAttributes
 {
 public:
@@ -26,26 +27,32 @@ public:
     boost::optional<unsigned int> sendTimeout;
     boost::optional<aio::AbstractAioThread*> aioThread;
 
-    void applyTo(AbstractSocket* const targetSocket)
+    bool applyTo(AbstractSocket* const socket) const
     {
         if (aioThread)
-            targetSocket->bindToAioThread(*aioThread);
-        if (reuseAddrFlag)
-            targetSocket->setReuseAddrFlag(*reuseAddrFlag);
-        if (nonBlockingMode)
-            targetSocket->setNonBlockingMode(*nonBlockingMode);
-        if (sendBufferSize)
-            targetSocket->setSendBufferSize(*sendBufferSize);
-        if (recvBufferSize)
-            targetSocket->setRecvBufferSize(*recvBufferSize);
-        if (recvTimeout)
-            targetSocket->setRecvTimeout(*recvTimeout);
-        if (sendTimeout)
-            targetSocket->setSendTimeout(*sendTimeout);
+            socket->bindToAioThread(*aioThread); //< success or assert
+
+        return
+            apply(socket, &AbstractSocket::setReuseAddrFlag, reuseAddrFlag) &&
+            apply(socket, &AbstractSocket::setNonBlockingMode, nonBlockingMode) &&
+            apply(socket, &AbstractSocket::setSendBufferSize, sendBufferSize) &&
+            apply(socket, &AbstractSocket::setRecvBufferSize, recvBufferSize) &&
+            apply(socket, &AbstractSocket::setRecvTimeout, recvTimeout) &&
+            apply(socket, &AbstractSocket::setSendTimeout, sendTimeout);
+    }
+
+protected:
+    template<typename Socket, typename Attribute>
+    bool apply(
+        Socket* const socket,
+        bool (Socket::*function)(Attribute value),
+        const boost::optional<Attribute>& value) const
+    {
+        return value ? (socket->*function)(*value) : true;
     }
 };
 
-/** saves socket attributes and applies them to a given socket */
+/** Saves socket attributes and applies them to a given socket */
 template<class ParentType, class SocketAttributesHolderType>
 class AbstractSocketAttributesCache
 :
@@ -232,27 +239,25 @@ protected:
     }
 };
 
-
+/** Socket configuration attributes ready to apply to any \class AbstractStreamSocket */
 class StreamSocketAttributes
 :
     public SocketAttributes
 {
 public:
     boost::optional<bool> noDelay;
-    boost::optional<boost::optional< KeepAliveOptions >> keepAlive;
+    boost::optional<boost::optional<KeepAliveOptions>> keepAlive;
 
-    void applyTo(AbstractStreamSocket* const streamSocket)
+    bool applyTo(AbstractStreamSocket* const socket) const
     {
-        SocketAttributes::applyTo(streamSocket);
-
-        if (noDelay)
-            streamSocket->setNoDelay(*noDelay);
-        if (keepAlive)
-            streamSocket->setKeepAlive(*keepAlive);
+        return
+            SocketAttributes::applyTo(socket) &&
+            apply(socket, &AbstractStreamSocket::setNoDelay, noDelay) &&
+            apply(socket, &AbstractStreamSocket::setKeepAlive, keepAlive);
     }
 };
 
-/** saves socket attributes and applies them to a given socket */
+/** Saves socket attributes and applies them to a given socket */
 template<class ParentType>
 class AbstractStreamSocketAttributesCache
 :

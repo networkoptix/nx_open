@@ -14,12 +14,12 @@ CloudServerSocket::CloudServerSocket(
     : m_mediatorConnection(mediatorConnection)
     , m_tunnelPool(tunnelPool)
     , m_isAcceptingTunnelPool(false)
-    , m_socketOptions(new StreamSocketOptions())
+    , m_socketAttributes(new StreamSocketAttributes())
     , m_ioThreadSocket(SocketFactory::createStreamSocket())
 {
-    // TODO: #mu default values for m_socketOptions shall match default
+    // TODO: #mu default values for m_socketAttributes shall match default
     //           system vales: think how to implement this...
-    m_socketOptions->recvTimeout = 0;
+    m_socketAttributes->recvTimeout = 0;
 }
 
 #ifdef CloudServerSocket_setSocketOption
@@ -29,7 +29,7 @@ CloudServerSocket::CloudServerSocket(
 #define CloudServerSocket_setSocketOption(SETTER, TYPE, NAME)   \
     bool CloudServerSocket::SETTER(TYPE NAME)                   \
     {                                                           \
-        m_socketOptions->NAME = NAME;                           \
+        m_socketAttributes->NAME = NAME;                           \
         return true;                                            \
     }
 
@@ -40,21 +40,24 @@ CloudServerSocket::CloudServerSocket(
 #define CloudServerSocket_getSocketOption(GETTER, TYPE, NAME)   \
     bool CloudServerSocket::GETTER(TYPE* NAME) const            \
     {                                                           \
-        if (!m_socketOptions->NAME)                             \
+        if (!m_socketAttributes->NAME)                             \
             return false;                                       \
                                                                 \
-        *NAME = *m_socketOptions->NAME;                         \
+        *NAME = *m_socketAttributes->NAME;                         \
         return true;                                            \
     }
 
-CloudServerSocket_setSocketOption(bind, const SocketAddress&, boundAddress)
+bool CloudServerSocket::bind(const SocketAddress& localAddress)
+{
+    // Does not make any sense in cloud socket context
+    static_cast<void>(localAddress);
+    return true;
+}
 
 SocketAddress CloudServerSocket::getLocalAddress() const
 {
-    if (!m_socketOptions->boundAddress)
-        return SocketAddress();
-
-    return *m_socketOptions->boundAddress;
+    // TODO: #mux Figure out if it causes any problems
+    return SocketAddress();
 }
 
 void CloudServerSocket::close()
@@ -193,8 +196,10 @@ void CloudServerSocket::acceptAsync(
     Q_ASSERT_X(!m_acceptHandler, Q_FUNC_INFO, "concurent accept call");
     m_acceptHandler = std::move(handler);
 
+    // TODO: #mux setup timeout timer
+
     auto sharedGuard = m_asyncGuard.sharedGuard();
-    m_tunnelPool->accept(m_socketOptions, [this, sharedGuard]
+    m_tunnelPool->acceptNewSocket([this, sharedGuard]
         (SystemError::ErrorCode code, std::unique_ptr<AbstractStreamSocket> socket)
     {
         if (auto lock = sharedGuard->lock())
@@ -202,11 +207,14 @@ void CloudServerSocket::acceptAsync(
             Q_ASSERT_X(!m_acceptedSocket, Q_FUNC_INFO, "concurently accepted socket");
             m_lastError = code;
             m_acceptedSocket = std::move(socket);
-            post([this, code]()
+            post([this]()
             {
-                const auto acceptHandler = std::move(m_acceptHandler);
-                m_acceptHandler = nullptr;
-                acceptHandler(m_lastError, m_acceptedSocket.release());
+                if (const auto acceptHandler = std::move(m_acceptHandler))
+                {
+                    // TODO: #mux wrap m_acceptedSocket to allow further configuration
+                    m_acceptHandler = nullptr;
+                    acceptHandler(m_lastError, m_acceptedSocket.release());
+                }
             });
         }
     });

@@ -40,114 +40,100 @@ void IncomingTunnel::accept(SocketHandler handler)
     });
 }
 
-
-
 void IncomingTunnelPool::addNewTunnel(std::unique_ptr<AbstractTunnelConnection> connection)
 {
-    auto tunnel = std::make_unique<IncomingTunnel>(std::move(connection));
-    // TODO: #mux tunnel->onDie([](){ remove from map });
-
-    QnMutexLocker lk(&m_mutex);
-    const auto insert = m_pool.emplace(tunnel->getRemotePeerId(), std::move(tunnel));
-    Q_ASSERT(insert.second);
+    auto tunnel = std::make_shared<IncomingTunnel>(std::move(connection));
+    {
+        QnMutexLocker lk(&m_mutex);
+        m_pool.emplace(tunnel);
+    }
+    acceptTunnel(std::move(tunnel));
 }
 
-void IncomingTunnelPool::accept(
-        std::shared_ptr<StreamSocketOptions> options,
-        Tunnel::SocketHandler handler)
+void IncomingTunnelPool::acceptNewSocket(Tunnel::SocketHandler handler)
 {
     QnMutexLocker lock(&m_mutex);
     Q_ASSERT_X(!m_acceptRequest, Q_FUNC_INFO, "Multiple accepts are not supported");
 
-    SocketRequest request = { std::move(options), std::move(handler) };
-    if (m_acceptedSockets.empty())
-    {
-        if (options->nonBlockingMode && *options->nonBlockingMode)
-        {
-            lock.unlock();
-            return handler(SystemError::wouldBlock, nullptr);
-        }
-
-        if (const auto timeout = options->recvTimeout)
-        {
-            // TODO: #mux The timeout timer shall be set
-            static_cast<void>(*timeout);
-        }
-
-        m_acceptRequest = std::move(request);
-        return;
-    }
-
-    auto socket = std::move(m_acceptedSockets.front());
-    m_acceptedSockets.pop();
-
-    lock.unlock();
-    return indicateAcceptedSocket(std::move(socket), std::move(request));
+    m_acceptRequest = std::move(handler);
+    indicateFirstSocket(&lock);
 }
 
 void IncomingTunnelPool::pleaseStop(std::function<void()> handler)
 {
-    BarrierHandler barrier(std::move(handler));
+    BarrierHandler barrier([this, handler]()
+    {
+        QnMutexLocker lock(&m_mutex);
+        if (const auto socket = std::move(m_indicatingSocket))
+        {
+            m_indicatingSocket = nullptr;
+            lock.unlock();
+            return socket->pleaseStop(std::move(handler));
+        }
+
+        lock.unlock();
+        handler();
+    });
 
     QnMutexLocker lock(&m_mutex);
     for (const auto& tunnel : m_pool)
-        tunnel.second->pleaseStop(barrier.fork());
+        tunnel->pleaseStop(barrier.fork());
 }
 
-void IncomingTunnelPool::acceptTunnel(const String& peerId)
+void IncomingTunnelPool::acceptTunnel(std::shared_ptr<IncomingTunnel> tunnel)
 {
-    QnMutexLocker lock(&m_mutex);
-    const auto it = m_pool.find(peerId);
-    if (it == m_pool.end())
-        return;
-
-    it->second->accept([this, peerId]
+    tunnel->accept([this, tunnel]
         (SystemError::ErrorCode code, std::unique_ptr<AbstractStreamSocket> socket)
     {
-        acceptTunnel(peerId);
         if (code != SystemError::noError)
+        {
+            QnMutexLocker lock(&m_mutex);
+            m_pool.erase(tunnel);
             return;
+        }
+
+        acceptTunnel(std::move(tunnel));
 
         QnMutexLocker lock(&m_mutex);
-        if (!m_acceptRequest)
-            return m_acceptedSockets.push(std::move(socket));
-
-        auto request = std::move(*m_acceptRequest);
-        m_acceptRequest = boost::none;
-
-        lock.unlock();
-        indicateAcceptedSocket(std::move(socket), std::move(request));
+        m_acceptedSockets.push(std::move(socket));
+        indicateFirstSocket(&lock);
     });
 }
 
-void IncomingTunnelPool::removeTunnel(const String& peerId)
+void IncomingTunnelPool::indicateFirstSocket(QnMutexLockerBase* lock)
 {
-    QnMutexLocker lock(&m_mutex);
-    Q_ASSERT_X(m_pool.erase(peerId), Q_FUNC_INFO, "Too late signal delivery??");
-}
+    if (m_indicatingSocket)
+        return; // indication is in progress
 
-void IncomingTunnelPool::waitConnectingSocket(
-        std::unique_ptr<AbstractStreamSocket> socket,
-        SocketRequest request)
-{
-    // TODO: #mux Here socket shall wait for indication and call handler
-    //            only after it's recieved (apply result shall also be checked)
+    if (!m_acceptRequest || m_acceptedSockets.empty())
+        return; // nothing to indicate
 
-    // TODO: #mux Replace assert with error handling
-    Q_ASSERT(request.options->apply(socket.get()));
-    request.handler(SystemError::noError, std::move(socket));
-}
+    m_indicatingSocket = std::move(m_acceptedSockets.front());
+    m_acceptedSockets.pop();
+    lock->unlock();
 
-void IncomingTunnelPool::indicateAcceptedSocket(
-        std::unique_ptr<AbstractStreamSocket> socket,
-        SocketRequest request)
-{
-    // TODO: #mux Here socket shall write indication and call handler
-    //            only after it's recieved (apply result shall also be checked)
+    m_indicatingSocket->sendAsync(
+        Tunnel::ACCEPT_INDICATION,
+        [&](SystemError::ErrorCode code, size_t size)
+        {
+            QnMutexLocker lock(&m_mutex);
+            if (code != SystemError::noError ||
+                size != Tunnel::ACCEPT_INDICATION.size())
+            {
+                // TODO: #mux NX_LOG
 
-    // TODO: #mux Replace assert with error handling
-    Q_ASSERT(request.options->apply(socket.get()));
-    request.handler(SystemError::noError, std::move(socket));
+                return indicateFirstSocket(&lock);
+            }
+
+            auto request = std::move(*m_acceptRequest);
+            m_acceptRequest = nullptr;
+
+            auto socket = std::move(m_indicatingSocket);
+            m_indicatingSocket = nullptr;
+
+            lock.unlock();
+            request(SystemError::noError, std::move(socket));
+        });
 }
 
 } // namespace cloud

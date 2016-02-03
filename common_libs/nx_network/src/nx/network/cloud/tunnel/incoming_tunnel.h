@@ -22,7 +22,7 @@ public:
     void accept(SocketHandler handler);
 };
 
-//!Stores cloud tunnels
+/** Stores incoming cloud tunnels and accepts new sockets from them */
 class IncomingTunnelPool
     : public QnStoppableAsync
 {
@@ -30,33 +30,22 @@ public:
     /** Creates new tunnel with connected \param connection */
     void addNewTunnel(std::unique_ptr<AbstractTunnelConnection> connection);
 
-    void accept(std::shared_ptr<StreamSocketOptions> options,
-                Tunnel::SocketHandler handler);
+    /** Accepts new client socket as soon as some avaliable from on tunnel
+     *  in this pool */
+    void acceptNewSocket(Tunnel::SocketHandler handler);
 
-    //! QnStoppableAsync::pleaseStop
+    /** Cancels all operations in progress */
     void pleaseStop(std::function<void()> handler) override;
 
 private:
-    void acceptTunnel(const String& peerId);
-    void removeTunnel(const String& peerId);
-
-    struct SocketRequest
-    {
-        std::shared_ptr<StreamSocketOptions> options;
-        Tunnel::SocketHandler handler;
-    };
-
-    void waitConnectingSocket(std::unique_ptr<AbstractStreamSocket> socket,
-                              SocketRequest request);
-
-    void indicateAcceptedSocket(std::unique_ptr<AbstractStreamSocket> socket,
-                                SocketRequest request);
+    void acceptTunnel(std::shared_ptr<IncomingTunnel> tunnel);
+    void indicateFirstSocket(QnMutexLockerBase* lock);
 
     QnMutex m_mutex;
-    std::map<String, std::shared_ptr<IncomingTunnel>> m_pool;
-    std::vector<std::unique_ptr<AbstractTunnelAcceptor>> m_acceptors;
-    boost::optional<SocketRequest> m_acceptRequest;
+    std::set<std::shared_ptr<IncomingTunnel>> m_pool;
+    boost::optional<Tunnel::SocketHandler> m_acceptRequest;
     std::queue<std::unique_ptr<AbstractStreamSocket>> m_acceptedSockets;
+    std::unique_ptr<AbstractStreamSocket> m_indicatingSocket;
 };
 
 } // namespace cloud

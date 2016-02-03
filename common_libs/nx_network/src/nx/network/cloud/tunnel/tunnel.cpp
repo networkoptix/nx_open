@@ -72,6 +72,8 @@ void Tunnel::setStateHandler(std::function<void(State)> handler)
     m_stateHandler = std::move(handler);
 }
 
+const QByteArray Tunnel::ACCEPT_INDICATION("a");
+
 void Tunnel::changeState(State state, QnMutexLockerBase* lock)
 {
     Q_ASSERT_X(m_state <= state, Q_FUNC_INFO,

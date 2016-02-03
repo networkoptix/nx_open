@@ -75,7 +75,7 @@ private:
 
     bool m_isAcceptingTunnelPool;
     mutable SystemError::ErrorCode m_lastError;
-    std::shared_ptr<StreamSocketOptions> m_socketOptions;
+    std::shared_ptr<StreamSocketAttributes> m_socketAttributes;
     std::unique_ptr<AbstractCommunicatingSocket> m_ioThreadSocket;
     std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)> m_acceptHandler;
     std::unique_ptr<AbstractStreamSocket> m_acceptedSocket;
