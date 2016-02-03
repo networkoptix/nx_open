@@ -49,7 +49,7 @@ namespace ec2
         m_runningRequests( 0 ),
         m_sslEnabled( false )
     {
-        m_timeSynchronizationManager->start();  //unfortunately cannot do it in TimeSynchronizationManager 
+        m_timeSynchronizationManager->start();  //unfortunately cannot do it in TimeSynchronizationManager
             //constructor to keep valid object destruction order
 
         srand( ::time(NULL) );
@@ -67,7 +67,7 @@ namespace ec2
         pleaseStop();
         join();
 
-        m_timeSynchronizationManager->pleaseStop(); //have to do it before m_transactionMessageBus destruction 
+        m_timeSynchronizationManager->pleaseStop(); //have to do it before m_transactionMessageBus destruction
             //since TimeSynchronizationManager uses QnTransactionMessageBus
 
         ec2::QnDistributedMutexManager::initStaticInstance(0);
@@ -110,7 +110,7 @@ namespace ec2
     }
 
     //!Implementation of AbstractECConnectionFactory::connectAsync
-    int Ec2DirectConnectionFactory::connectAsync( const QUrl& addr, const ApiClientInfoData& clientInfo, 
+    int Ec2DirectConnectionFactory::connectAsync( const QUrl& addr, const ApiClientInfoData& clientInfo,
                                                   impl::ConnectHandlerPtr handler )
     {
         QUrl url = addr;
@@ -137,191 +137,189 @@ namespace ec2
         m_sslEnabled = httpConnectionListener->isSslEnabled();
     }
 
-    void Ec2DirectConnectionFactory::registerRestHandlers( QnRestProcessorPool* const restProcessorPool )
+    void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     {
         using namespace std::placeholders;
 
         //AbstractResourceManager::getResourceTypes
-        registerGetFuncHandler<std::nullptr_t, ApiResourceTypeDataList>( restProcessorPool, ApiCommand::getResourceTypes );
+        registerGetFuncHandler<std::nullptr_t, ApiResourceTypeDataList>(p, ApiCommand::getResourceTypes);
         //AbstractResourceManager::getResource
-        //registerGetFuncHandler<std::nullptr_t, ApiResourceData>( restProcessorPool, ApiCommand::getResource );
+        //registerGetFuncHandler<std::nullptr_t, ApiResourceData>(p, ApiCommand::getResource);
         //AbstractResourceManager::setResourceStatus
-        registerUpdateFuncHandler<ApiResourceStatusData>( restProcessorPool, ApiCommand::setResourceStatus );
+        registerUpdateFuncHandler<ApiResourceStatusData>(p, ApiCommand::setResourceStatus);
         //AbstractResourceManager::getKvPairs
-        registerGetFuncHandler<QnUuid, ApiResourceParamWithRefDataList>( restProcessorPool, ApiCommand::getResourceParams );
+        registerGetFuncHandler<QnUuid, ApiResourceParamWithRefDataList>(p, ApiCommand::getResourceParams);
         //AbstractResourceManager::save
-        registerUpdateFuncHandler<ApiResourceParamWithRefDataList>( restProcessorPool, ApiCommand::setResourceParams );
+        registerUpdateFuncHandler<ApiResourceParamWithRefDataList>(p, ApiCommand::setResourceParams);
         //AbstractResourceManager::remove
-        registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeResource );
+        registerUpdateFuncHandler<ApiIdData>(p, ApiCommand::removeResource);
 
-        registerGetFuncHandler<QnUuid, ApiResourceStatusDataList>( restProcessorPool, ApiCommand::getStatusList );
+        registerGetFuncHandler<QnUuid, ApiResourceStatusDataList>(p, ApiCommand::getStatusList);
 
         //AbstractMediaServerManager::getServers
-        registerGetFuncHandler<QnUuid, ApiMediaServerDataList>( restProcessorPool, ApiCommand::getMediaServers );
+        registerGetFuncHandler<QnUuid, ApiMediaServerDataList>(p, ApiCommand::getMediaServers);
         //AbstractMediaServerManager::save
-        registerUpdateFuncHandler<ApiMediaServerData>( restProcessorPool, ApiCommand::saveMediaServer );
+        registerUpdateFuncHandler<ApiMediaServerData>(p, ApiCommand::saveMediaServer);
         //AbstractCameraManager::saveUserAttributes
-        registerUpdateFuncHandler<ApiMediaServerUserAttributesDataList>( restProcessorPool, ApiCommand::saveServerUserAttributesList );
+        registerUpdateFuncHandler<ApiMediaServerUserAttributesDataList>(p, ApiCommand::saveServerUserAttributesList);
         //AbstractCameraManager::getUserAttributes
-        registerGetFuncHandler<QnUuid, ApiMediaServerUserAttributesDataList>( restProcessorPool, ApiCommand::getServerUserAttributes );
+        registerGetFuncHandler<QnUuid, ApiMediaServerUserAttributesDataList>(p, ApiCommand::getServerUserAttributes);
         //AbstractMediaServerManager::remove
-        registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeMediaServer );
+        registerUpdateFuncHandler<ApiIdData>(p, ApiCommand::removeMediaServer);
 
         //AbstractMediaServerManager::getServersEx
-        registerGetFuncHandler<QnUuid, ApiMediaServerDataExList>( restProcessorPool, ApiCommand::getMediaServersEx );
+        registerGetFuncHandler<QnUuid, ApiMediaServerDataExList>(p, ApiCommand::getMediaServersEx);
 
-        registerUpdateFuncHandler<ApiStorageDataList>( restProcessorPool, ApiCommand::saveStorages);
-        registerUpdateFuncHandler<ApiStorageData>( restProcessorPool, ApiCommand::saveStorage);
-        registerUpdateFuncHandler<ApiIdDataList>( restProcessorPool, ApiCommand::removeStorages);
-        registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeStorage);
-        registerUpdateFuncHandler<ApiIdDataList>( restProcessorPool, ApiCommand::removeResources);
+        registerUpdateFuncHandler<ApiStorageDataList>(p, ApiCommand::saveStorages);
+        registerUpdateFuncHandler<ApiStorageData>(p, ApiCommand::saveStorage);
+        registerUpdateFuncHandler<ApiIdDataList>(p, ApiCommand::removeStorages);
+        registerUpdateFuncHandler<ApiIdData>(p, ApiCommand::removeStorage);
+        registerUpdateFuncHandler<ApiIdDataList>(p, ApiCommand::removeResources);
 
         //AbstractCameraManager::addCamera
-        registerUpdateFuncHandler<ApiCameraData>( restProcessorPool, ApiCommand::saveCamera );
+        registerUpdateFuncHandler<ApiCameraData>(p, ApiCommand::saveCamera);
         //AbstractCameraManager::save
-        registerUpdateFuncHandler<ApiCameraDataList>( restProcessorPool, ApiCommand::saveCameras );
+        registerUpdateFuncHandler<ApiCameraDataList>(p, ApiCommand::saveCameras);
         //AbstractCameraManager::getCameras
-        registerGetFuncHandler<QnUuid, ApiCameraDataList>( restProcessorPool, ApiCommand::getCameras );
+        registerGetFuncHandler<QnUuid, ApiCameraDataList>(p, ApiCommand::getCameras);
         //AbstractCameraManager::saveUserAttributes
-        registerUpdateFuncHandler<ApiCameraAttributesDataList>( restProcessorPool, ApiCommand::saveCameraUserAttributesList );
+        registerUpdateFuncHandler<ApiCameraAttributesDataList>(p, ApiCommand::saveCameraUserAttributesList);
         //AbstractCameraManager::getUserAttributes
-        registerGetFuncHandler<QnUuid, ApiCameraAttributesDataList>( restProcessorPool, ApiCommand::getCameraUserAttributes );
+        registerGetFuncHandler<QnUuid, ApiCameraAttributesDataList>(p, ApiCommand::getCameraUserAttributes);
         //AbstractCameraManager::addCameraHistoryItem
-        registerUpdateFuncHandler<ApiServerFootageData>( restProcessorPool, ApiCommand::addCameraHistoryItem );
+        registerUpdateFuncHandler<ApiServerFootageData>(p, ApiCommand::addCameraHistoryItem);
         //AbstractCameraManager::getCameraHistoryItems
-        registerGetFuncHandler<std::nullptr_t, ApiServerFootageDataList>( restProcessorPool, ApiCommand::getCameraHistoryItems );
+        registerGetFuncHandler<std::nullptr_t, ApiServerFootageDataList>(p, ApiCommand::getCameraHistoryItems);
         //AbstractCameraManager::getCamerasEx
-        registerGetFuncHandler<QnUuid, ApiCameraDataExList>( restProcessorPool, ApiCommand::getCamerasEx );
+        registerGetFuncHandler<QnUuid, ApiCameraDataExList>(p, ApiCommand::getCamerasEx);
 
-        registerGetFuncHandler<QnUuid, ApiStorageDataList>( restProcessorPool, ApiCommand::getStorages );
+        registerGetFuncHandler<QnUuid, ApiStorageDataList>(p, ApiCommand::getStorages);
 
         //AbstractLicenseManager::addLicenses
-        registerUpdateFuncHandler<ApiLicenseDataList>( restProcessorPool, ApiCommand::addLicenses );
+        registerUpdateFuncHandler<ApiLicenseDataList>(p, ApiCommand::addLicenses);
         //AbstractLicenseManager::removeLicense
-        registerUpdateFuncHandler<ApiLicenseData>( restProcessorPool, ApiCommand::removeLicense );
+        registerUpdateFuncHandler<ApiLicenseData>(p, ApiCommand::removeLicense);
 
 
         //AbstractBusinessEventManager::getBusinessRules
-        registerGetFuncHandler<std::nullptr_t, ApiBusinessRuleDataList>( restProcessorPool, ApiCommand::getBusinessRules );
+        registerGetFuncHandler<std::nullptr_t, ApiBusinessRuleDataList>(p, ApiCommand::getBusinessRules);
 
-        registerGetFuncHandler<std::nullptr_t, ApiTransactionDataList>( restProcessorPool, ApiCommand::getTransactionLog );
+        registerGetFuncHandler<std::nullptr_t, ApiTransactionDataList>(p, ApiCommand::getTransactionLog);
 
         //AbstractBusinessEventManager::save
-        registerUpdateFuncHandler<ApiBusinessRuleData>( restProcessorPool, ApiCommand::saveBusinessRule );
+        registerUpdateFuncHandler<ApiBusinessRuleData>(p, ApiCommand::saveBusinessRule);
         //AbstractBusinessEventManager::deleteRule
-        registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeBusinessRule );
+        registerUpdateFuncHandler<ApiIdData>(p, ApiCommand::removeBusinessRule);
 
-        registerUpdateFuncHandler<ApiResetBusinessRuleData>( restProcessorPool, ApiCommand::resetBusinessRules );
-        registerUpdateFuncHandler<ApiBusinessActionData>( restProcessorPool, ApiCommand::broadcastBusinessAction );
-        registerUpdateFuncHandler<ApiBusinessActionData>( restProcessorPool, ApiCommand::execBusinessAction );
+        registerUpdateFuncHandler<ApiResetBusinessRuleData>(p, ApiCommand::resetBusinessRules);
+        registerUpdateFuncHandler<ApiBusinessActionData>(p, ApiCommand::broadcastBusinessAction);
+        registerUpdateFuncHandler<ApiBusinessActionData>(p, ApiCommand::execBusinessAction);
 
 
         //AbstractUserManager::getUsers
-        registerGetFuncHandler<std::nullptr_t, ApiUserDataList>( restProcessorPool, ApiCommand::getUsers );
+        registerGetFuncHandler<std::nullptr_t, ApiUserDataList>(p, ApiCommand::getUsers);
         //AbstractUserManager::save
-        registerUpdateFuncHandler<ApiUserData>( restProcessorPool, ApiCommand::saveUser );
+        registerUpdateFuncHandler<ApiUserData>(p, ApiCommand::saveUser);
         //AbstractUserManager::remove
-        registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeUser );
+        registerUpdateFuncHandler<ApiIdData>(p, ApiCommand::removeUser);
 
         //AbstractVideowallManager::getVideowalls
-        registerGetFuncHandler<std::nullptr_t, ApiVideowallDataList>( restProcessorPool, ApiCommand::getVideowalls );
+        registerGetFuncHandler<std::nullptr_t, ApiVideowallDataList>(p, ApiCommand::getVideowalls);
         //AbstractVideowallManager::save
-        registerUpdateFuncHandler<ApiVideowallData>( restProcessorPool, ApiCommand::saveVideowall );
+        registerUpdateFuncHandler<ApiVideowallData>(p, ApiCommand::saveVideowall);
         //AbstractVideowallManager::remove
-        registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeVideowall );
-        registerUpdateFuncHandler<ApiVideowallControlMessageData>( restProcessorPool, ApiCommand::videowallControl );
+        registerUpdateFuncHandler<ApiIdData>(p, ApiCommand::removeVideowall);
+        registerUpdateFuncHandler<ApiVideowallControlMessageData>(p, ApiCommand::videowallControl);
 
         //AbstractLayoutManager::getLayouts
-        registerGetFuncHandler<std::nullptr_t, ApiLayoutDataList>( restProcessorPool, ApiCommand::getLayouts );
+        registerGetFuncHandler<std::nullptr_t, ApiLayoutDataList>(p, ApiCommand::getLayouts);
         //AbstractLayoutManager::save
-        registerUpdateFuncHandler<ApiLayoutDataList>( restProcessorPool, ApiCommand::saveLayouts );
+        registerUpdateFuncHandler<ApiLayoutDataList>(p, ApiCommand::saveLayouts);
         //AbstractLayoutManager::remove
-        registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeLayout );
+        registerUpdateFuncHandler<ApiIdData>(p, ApiCommand::removeLayout);
 
         //AbstractStoredFileManager::listDirectory
-        registerGetFuncHandler<ApiStoredFilePath, ApiStoredDirContents>( restProcessorPool, ApiCommand::listDirectory );
+        registerGetFuncHandler<ApiStoredFilePath, ApiStoredDirContents>(p, ApiCommand::listDirectory);
         //AbstractStoredFileManager::getStoredFile
-        registerGetFuncHandler<ApiStoredFilePath, ApiStoredFileData>( restProcessorPool, ApiCommand::getStoredFile );
+        registerGetFuncHandler<ApiStoredFilePath, ApiStoredFileData>(p, ApiCommand::getStoredFile);
         //AbstractStoredFileManager::addStoredFile
-        registerUpdateFuncHandler<ApiStoredFileData>( restProcessorPool, ApiCommand::addStoredFile );
+        registerUpdateFuncHandler<ApiStoredFileData>(p, ApiCommand::addStoredFile);
         //AbstractStoredFileManager::updateStoredFile
-        registerUpdateFuncHandler<ApiStoredFileData>( restProcessorPool, ApiCommand::updateStoredFile );
+        registerUpdateFuncHandler<ApiStoredFileData>(p, ApiCommand::updateStoredFile);
         //AbstractStoredFileManager::deleteStoredFile
-        registerUpdateFuncHandler<ApiStoredFilePath>( restProcessorPool, ApiCommand::removeStoredFile );
+        registerUpdateFuncHandler<ApiStoredFilePath>(p, ApiCommand::removeStoredFile);
 
         //AbstractUpdatesManager::uploadUpdate
-        registerUpdateFuncHandler<ApiUpdateUploadData>( restProcessorPool, ApiCommand::uploadUpdate );
+        registerUpdateFuncHandler<ApiUpdateUploadData>(p, ApiCommand::uploadUpdate);
         //AbstractUpdatesManager::uploadUpdateResponce
-        registerUpdateFuncHandler<ApiUpdateUploadResponceData>( restProcessorPool, ApiCommand::uploadUpdateResponce );
+        registerUpdateFuncHandler<ApiUpdateUploadResponceData>(p, ApiCommand::uploadUpdateResponce);
         //AbstractUpdatesManager::installUpdate
-        registerUpdateFuncHandler<ApiUpdateInstallData>( restProcessorPool, ApiCommand::installUpdate );
+        registerUpdateFuncHandler<ApiUpdateInstallData>(p, ApiCommand::installUpdate);
 
         //AbstractDiscoveryManager::discoveredServerChanged
-        registerUpdateFuncHandler<ApiDiscoveredServerData>(restProcessorPool, ApiCommand::discoveredServerChanged);
+        registerUpdateFuncHandler<ApiDiscoveredServerData>(p, ApiCommand::discoveredServerChanged);
         //AbstractDiscoveryManager::discoveredServersList
-        registerUpdateFuncHandler<ApiDiscoveredServerDataList>(restProcessorPool, ApiCommand::discoveredServersList);
+        registerUpdateFuncHandler<ApiDiscoveredServerDataList>(p, ApiCommand::discoveredServersList);
 
         //AbstractDiscoveryManager::discoverPeer
-        registerUpdateFuncHandler<ApiDiscoverPeerData>(restProcessorPool, ApiCommand::discoverPeer);
+        registerUpdateFuncHandler<ApiDiscoverPeerData>(p, ApiCommand::discoverPeer);
         //AbstractDiscoveryManager::addDiscoveryInformation
-        registerUpdateFuncHandler<ApiDiscoveryData>(restProcessorPool, ApiCommand::addDiscoveryInformation);
+        registerUpdateFuncHandler<ApiDiscoveryData>(p, ApiCommand::addDiscoveryInformation);
         //AbstractDiscoveryManager::removeDiscoveryInformation
-        registerUpdateFuncHandler<ApiDiscoveryData>(restProcessorPool, ApiCommand::removeDiscoveryInformation);
+        registerUpdateFuncHandler<ApiDiscoveryData>(p, ApiCommand::removeDiscoveryInformation);
         //AbstractDiscoveryManager::getDiscoveryData
-        registerGetFuncHandler<std::nullptr_t, ApiDiscoveryDataList>(restProcessorPool, ApiCommand::getDiscoveryData);
+        registerGetFuncHandler<std::nullptr_t, ApiDiscoveryDataList>(p, ApiCommand::getDiscoveryData);
         //AbstractMiscManager::changeSystemName
-        registerUpdateFuncHandler<ApiSystemNameData>(restProcessorPool, ApiCommand::changeSystemName);
+        registerUpdateFuncHandler<ApiSystemNameData>(p, ApiCommand::changeSystemName);
 
        //AbstractECConnection
-        registerUpdateFuncHandler<ApiDatabaseDumpData>( restProcessorPool, ApiCommand::restoreDatabase );
+        registerUpdateFuncHandler<ApiDatabaseDumpData>(p, ApiCommand::restoreDatabase);
 
         //AbstractTimeManager::getCurrentTimeImpl
-        registerGetFuncHandler<std::nullptr_t, ApiTimeData>( restProcessorPool, ApiCommand::getCurrentTime );
+        registerGetFuncHandler<std::nullptr_t, ApiTimeData>(p, ApiCommand::getCurrentTime);
         //AbstractTimeManager::forcePrimaryTimeServer
-        registerUpdateFuncHandler<ApiIdData>(
-            restProcessorPool,
-            ApiCommand::forcePrimaryTimeServer,
-            std::bind( &TimeSynchronizationManager::primaryTimeServerChanged, m_timeSynchronizationManager.get(), _1 ) );
+        registerUpdateFuncHandler<ApiIdData>(p, ApiCommand::forcePrimaryTimeServer,
+            std::bind(&TimeSynchronizationManager::primaryTimeServerChanged, m_timeSynchronizationManager.get(), _1));
         //TODO #ak register AbstractTimeManager::getPeerTimeInfoList
 
         //ApiClientInfoData
-        registerUpdateFuncHandler<ApiClientInfoData>(restProcessorPool, ApiCommand::saveClientInfo);
-        registerGetFuncHandler<std::nullptr_t, ApiClientInfoDataList>(restProcessorPool, ApiCommand::getClientInfos);
+        registerUpdateFuncHandler<ApiClientInfoData>(p, ApiCommand::saveClientInfo);
+        registerGetFuncHandler<std::nullptr_t, ApiClientInfoDataList>(p, ApiCommand::getClientInfos);
 
-        registerGetFuncHandler<std::nullptr_t, ApiFullInfoData>( restProcessorPool, ApiCommand::getFullInfo );
-        registerGetFuncHandler<std::nullptr_t, ApiLicenseDataList>( restProcessorPool, ApiCommand::getLicenses );
+        registerGetFuncHandler<std::nullptr_t, ApiFullInfoData>(p, ApiCommand::getFullInfo);
+        registerGetFuncHandler<std::nullptr_t, ApiLicenseDataList>(p, ApiCommand::getLicenses);
 
-        registerGetFuncHandler<std::nullptr_t, ApiDatabaseDumpData>( restProcessorPool, ApiCommand::dumpDatabase );
-        registerGetFuncHandler<ApiStoredFilePath, qint64>( restProcessorPool, ApiCommand::dumpDatabaseToFile );
+        registerGetFuncHandler<std::nullptr_t, ApiDatabaseDumpData>(p, ApiCommand::dumpDatabase);
+        registerGetFuncHandler<ApiStoredFilePath, qint64>(p, ApiCommand::dumpDatabaseToFile);
 
         //AbstractECConnectionFactory
-        registerFunctorHandler<ApiLoginData, QnConnectionInfo>( restProcessorPool, ApiCommand::connect,
-            std::bind( &Ec2DirectConnectionFactory::fillConnectionInfo, this, _1, _2 ) );
-        registerFunctorHandler<ApiLoginData, QnConnectionInfo>( restProcessorPool, ApiCommand::testConnection,
-            std::bind( &Ec2DirectConnectionFactory::fillConnectionInfo, this, _1, _2 ) );
+        registerFunctorHandler<ApiLoginData, QnConnectionInfo>(p, ApiCommand::connect,
+            std::bind(&Ec2DirectConnectionFactory::fillConnectionInfo, this, _1, _2));
+        registerFunctorHandler<ApiLoginData, QnConnectionInfo>(p, ApiCommand::testConnection,
+            std::bind(&Ec2DirectConnectionFactory::fillConnectionInfo, this, _1, _2));
 
-        registerFunctorHandler<std::nullptr_t, ApiResourceParamDataList>( restProcessorPool, ApiCommand::getSettings,
-            std::bind( &Ec2DirectConnectionFactory::getSettings, this, _1, _2 ) );
+        registerFunctorHandler<std::nullptr_t, ApiResourceParamDataList>(p, ApiCommand::getSettings,
+            std::bind(&Ec2DirectConnectionFactory::getSettings, this, _1, _2));
 
         //Ec2StaticticsReporter
-        registerFunctorHandler<std::nullptr_t, ApiSystemStatistics>( restProcessorPool, ApiCommand::getStatisticsReport,
-            [ this ]( std::nullptr_t, ApiSystemStatistics* const out ) {
-                if( !m_directConnection ) return ErrorCode::failure;
+        registerFunctorHandler<std::nullptr_t, ApiSystemStatistics>(p, ApiCommand::getStatisticsReport,
+            [ this ](std::nullptr_t, ApiSystemStatistics* const out) {
+                if(!m_directConnection) return ErrorCode::failure;
                 return m_directConnection->getStaticticsReporter()->collectReportData(nullptr, out);
-            } );
-        registerFunctorHandler<std::nullptr_t, ApiStatisticsServerInfo>( restProcessorPool, ApiCommand::triggerStatisticsReport,
-            [ this ]( std::nullptr_t, ApiStatisticsServerInfo* const out ) {
-                if( !m_directConnection ) return ErrorCode::failure;
+            });
+        registerFunctorHandler<std::nullptr_t, ApiStatisticsServerInfo>(p, ApiCommand::triggerStatisticsReport,
+            [ this ](std::nullptr_t, ApiStatisticsServerInfo* const out) {
+                if(!m_directConnection) return ErrorCode::failure;
                 return m_directConnection->getStaticticsReporter()->triggerStatisticsReport(nullptr, out);
-            } );
+            });
 
-        restProcessorPool->registerHandler("ec2/activeConnections", new QnActiveConnectionsRestHandler());
-        restProcessorPool->registerHandler(QnTimeSyncRestHandler::PATH, new QnTimeSyncRestHandler());
+        p->registerHandler("ec2/activeConnections", new QnActiveConnectionsRestHandler());
+        p->registerHandler(QnTimeSyncRestHandler::PATH, new QnTimeSyncRestHandler());
 
         //using HTTP processor since HTTP REST does not support HTTP interleaving
-        //restProcessorPool->registerHandler(
+        //p->registerHandler(
         //    QLatin1String(INCOMING_TRANSACTIONS_PATH),
-        //    new QnRestTransactionReceiver() );
+        //    new QnRestTransactionReceiver());
     }
 
     void Ec2DirectConnectionFactory::setContext( const ResourceContext& resCtx )
@@ -564,7 +562,7 @@ namespace ec2
         connectionInfo->allowSslConnections = m_sslEnabled;
         connectionInfo->nxClusterProtoVersion = nx_ec::EC2_PROTO_VERSION;
         connectionInfo->ecDbReadOnly = Settings::instance()->dbReadOnly();
-        
+
 		if (!loginInfo.clientInfo.id.isNull())
         {
 			auto clientInfo = loginInfo.clientInfo;
