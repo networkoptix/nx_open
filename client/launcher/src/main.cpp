@@ -258,6 +258,9 @@ int launchFile(const wstring& executePath)
             wchar_t* arch = sizeof(char*) == 4 ? L"x86" : L"x64";
             wsprintf(buffer, L"\"%s\\vcredist_%s.exe\" /q", toNativeSeparator(dstDir).c_str(), arch);
             int result = _wsystem(buffer);
+
+            // give ms antivirus enough time to have installed redist checked
+            Sleep(5000);
         }
 
         // start client
@@ -267,7 +270,7 @@ int launchFile(const wstring& executePath)
         if (!startProcessAsync(buffer, dstDir))
         {
             // todo: refactor it. Current version have different 'exe' name for installer and debug mode. So, try both names
-            wsprintf(buffer, L"\"%s\" \"%s\"", getFullFileName(dstDir, L"client.exe").c_str(), executePath.c_str());
+            wsprintf(buffer, L"\"%s\" \"%s\"", getFullFileName(dstDir, L"client.bin.exe").c_str(), executePath.c_str());
             startProcessAsync(buffer, dstDir);
         }
 

@@ -6,6 +6,10 @@
 
 #include <utils/common/id.h>
 
+/**
+ * Extension of the simple bookmark list.
+ * Maintains the bookmark list in sorted order (by start time).
+ */
 class QnCameraBookmarkAggregation {
 public:
     QnCameraBookmarkAggregation(const QnCameraBookmarkList &bookmarkList = QnCameraBookmarkList());
