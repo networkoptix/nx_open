@@ -354,26 +354,23 @@ void QnNxStyle::drawPrimitive(
         return;
 
     case PE_FrameTabBarBase:
-        if (const QStyleOptionTabBarBase *tabBar =
-                qstyleoption_cast<const QStyleOptionTabBarBase*>(option))
+        return;
+
+    case PE_FrameTabWidget:
+        if (const QStyleOptionTabWidgetFrame *tabWidget =
+                qstyleoption_cast<const QStyleOptionTabWidgetFrame *>(option))
         {
             QnPaletteColor mainColor = findColor(option->palette.color(QPalette::Window)).lighter(2);
 
-            QRect rect = tabBar->tabBarRect;
-            rect.setLeft(tabBar->rect.left());
-            rect.setRight(tabBar->rect.right());
+            QRect rect = tabWidget->tabBarRect;
+            rect.setLeft(tabWidget->rect.left());
+            rect.setRight(tabWidget->rect.right());
+
             painter->fillRect(rect, mainColor);
 
-            painter->save();
-            painter->setPen(mainColor.darker(1));
+            QnScopedPainterPenRollback penRollback(painter, QPen(mainColor.darker(1)));
             painter->drawLine(rect.topLeft(), rect.topRight());
-            painter->restore();
-
-            return;
         }
-        break;
-
-    case PE_FrameTabWidget:
         return;
 
     case PE_PanelMenu:
@@ -1489,6 +1486,18 @@ QRect QnNxStyle::subElementRect(
             else
                 return progressBar->rect.adjusted(dp(8), 0, 0, 0);
         }
+        break;
+
+    case SE_TabWidgetTabBar:
+        if (qobject_cast<const QTabWidget *>(widget))
+        {
+            int hspace = pixelMetric(PM_TabBarTabHSpace, option, widget);
+            QRect rect = base_type::subElementRect(subElement, option, widget).adjusted(hspace, 0, hspace, 0);
+            if (rect.right() > option->rect.right())
+                rect.setRight(option->rect.right());
+            return rect;
+        }
+        break;
 
     default:
         break;
