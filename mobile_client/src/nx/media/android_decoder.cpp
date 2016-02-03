@@ -24,22 +24,21 @@ namespace media {
 
 namespace {
     static const int kFrameQueueMaxSize = 32; //< max java decoder internal queue size
+
+    static const GLfloat g_vertex_data[] = {
+        -1.f, 1.f,
+        1.f, 1.f,
+        1.f, -1.f,
+        -1.f, -1.f
+    };
+
+    static const GLfloat g_texture_data[] = {
+        0.f, 0.f,
+        1.f, 0.f,
+        1.f, 1.f,
+        0.f, 1.f
+    };
 }
-
-static const GLfloat g_vertex_data[] = {
-    -1.f, 1.f,
-    1.f, 1.f,
-    1.f, -1.f,
-    -1.f, -1.f
-};
-
-static const GLfloat g_texture_data[] = {
-    0.f, 0.f,
-    1.f, 0.f,
-    1.f, 1.f,
-    0.f, 1.f
-};
-
 
 // --------------------------------------------------------------------------------------------------
 
@@ -59,7 +58,7 @@ public:
         for(const auto& fbo: m_data)
         {
             if (fbo.use_count() == 1)
-                return fbo; // this object is free
+                return fbo; //< this object is free
         }
         FboPtr newFbo(new QOpenGLFramebufferObject(m_frameSize));
         m_data.push_back(newFbo);
