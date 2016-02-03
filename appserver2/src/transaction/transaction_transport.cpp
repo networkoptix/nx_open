@@ -35,7 +35,7 @@
 
 //#define USE_SINGLE_TWO_WAY_CONNECTION
 //!if not defined, ubjson is used
-#define USE_JSON
+//#define USE_JSON
 #ifndef USE_JSON
 #define ENCODE_TO_BASE64
 #endif
@@ -961,10 +961,10 @@ void QnTransactionTransport::monitorConnectionForClosure(
 
 QUrl QnTransactionTransport::generatePostTranUrl()
 {
-    return m_postTranBaseUrl;
-    //QUrl postTranUrl = m_postTranBaseUrl;
-    //postTranUrl.setPath( lit("%1/%2").arg(postTranUrl.path()).arg(++m_sentTranSequence) );
-    //return postTranUrl;
+    //return m_postTranBaseUrl;
+    QUrl postTranUrl = m_postTranBaseUrl;
+    postTranUrl.setPath( lit("%1/%2").arg(postTranUrl.path()).arg(++m_sentTranSequence) );
+    return postTranUrl;
 }
 
 void QnTransactionTransport::aggregateOutgoingTransactionsNonSafe()
