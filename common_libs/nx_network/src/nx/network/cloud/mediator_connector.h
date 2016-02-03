@@ -47,6 +47,8 @@ private:
     boost::optional< SystemCredentials > m_credentials;
 
     boost::optional< std::promise< bool > > m_promise;
+    boost::optional< std::future< bool > > m_future;
+
     std::shared_ptr< stun::AsyncClient > m_stunClient;
     nx::network::cloud::CloudModuleEndPointFetcher m_endpointFetcher;
     std::unique_ptr< AbstractStreamSocket > m_timerSocket;

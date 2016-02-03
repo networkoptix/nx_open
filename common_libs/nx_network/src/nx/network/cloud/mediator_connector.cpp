@@ -30,6 +30,7 @@ void MediatorConnector::enable( bool waitComplete )
         {
             needToFetch = true;
             m_promise = std::promise< bool >();
+            m_future = m_promise->get_future();
         }
     }
 
@@ -37,7 +38,7 @@ void MediatorConnector::enable( bool waitComplete )
         fetchEndpoint();
 
     if( waitComplete )
-        m_promise->get_future().wait();
+        m_future->wait();
 }
 
 std::shared_ptr<MediatorClientTcpConnection> MediatorConnector::clientConnection()
@@ -102,6 +103,11 @@ void MediatorConnector::pleaseStop( std::function<void()> handler )
     m_timerSocket->pleaseStop(std::move(handler));
 }
 
+static bool isReady(std::future<bool> const& f)
+{
+    return f.wait_for(std::chrono::seconds(0)) == std::future_status::ready;
+}
+
 void MediatorConnector::fetchEndpoint()
 {
     m_endpointFetcher.get(
@@ -112,7 +118,8 @@ void MediatorConnector::fetchEndpoint()
             NX_LOGX( lit( "Can not fetch mediator address: HTTP %1" )
                      .arg( status ), cl_logERROR );
 
-            m_promise->set_value( false );
+            if (!isReady(*m_future))
+                m_promise->set_value( false );
 
             // retry after some delay
             if( !m_isTerminating )
@@ -124,9 +131,9 @@ void MediatorConnector::fetchEndpoint()
             NX_LOGX( lit( "Fetched mediator address: %1" )
                      .arg( address.toString() ), cl_logALWAYS );
 
-
             m_stunClient->connect( address );
-            m_promise->set_value( true );
+            if (!isReady(*m_future))
+                m_promise->set_value( true );
         }
     });
 }
