@@ -21,6 +21,12 @@ public:
         const QnRequestParams &params,
         QnJsonRestResult &result,
         const QnRestConnectionProcessor*);
+    virtual int executePost(
+        const QString& path,
+        const QnRequestParams& params,
+        const QByteArray& body,
+        QnJsonRestResult& result,
+        const QnRestConnectionProcessor*);
 };
 
 #endif  //SAVE_CLOUD_SYSTEM_CREDENTIALS_H

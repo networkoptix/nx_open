@@ -16,7 +16,7 @@ class QnResourcePropertyDictionary: public QObject,
 public:
     QnResourcePropertyDictionary(QObject *parent = NULL);
 
-    void saveParams(const QnUuid& resourceId);
+    bool saveParams(const QnUuid& resourceId);
     int saveParamsAsync(const QnUuid& resourceId);
     int saveParamsAsync(const QList<QnUuid>& resourceId);
     
