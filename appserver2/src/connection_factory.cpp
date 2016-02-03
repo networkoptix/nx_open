@@ -159,21 +159,28 @@ namespace ec2
          * Read resource (camera, user or server) additional parameters (camera firmware version, e.t.c).
          * List of parameters depends of resource type.
          * %param[default] format
-         * %param id Resource unique ID
+         * %param id Resource unique Id
          * %return Return object in requested format
          * %// AbstractResourceManager::getKvPairs
          */
         registerGetFuncHandler<QnUuid, ApiResourceParamWithRefDataList>(p, ApiCommand::getResourceParams);
         //AbstractResourceManager::save
         registerUpdateFuncHandler<ApiResourceParamWithRefDataList>(p, ApiCommand::setResourceParams);
-        //AbstractResourceManager::remove
+
+        /**%apidoc POST /ec2/removeResource
+         * Delete the resource.
+         * %param id Unique id of the resource.
+         * %// AbstractResourceManager::remove
+         */
         registerUpdateFuncHandler<ApiIdData>(p, ApiCommand::removeResource);
 
         /**%apidoc GET /ec2/getStatusList
-         * Read current status values for camers, servers and storages.
+         * Read current status values for cameras, servers and storages.
          * %param[default] format
-         * %param[opt] id Object unique ID
-         * %return Returns objects status list data formatted in a requested format. If id parameter is specified, the list contais only one object with that id or nothing, if there is no such object found.
+         * %param[opt] id Object unique Id
+         * %return Returns objects status list data formatted in a requested
+         * format. If id parameter is specified, the list contains only one
+         * object with that id or nothing, if there is no such object found.
          */
         registerGetFuncHandler<QnUuid, ApiResourceStatusDataList>(p, ApiCommand::getStatusList);
 
@@ -181,6 +188,38 @@ namespace ec2
         registerGetFuncHandler<QnUuid, ApiMediaServerDataList>(p, ApiCommand::getMediaServers);
         //AbstractMediaServerManager::save
         registerUpdateFuncHandler<ApiMediaServerData>(p, ApiCommand::saveMediaServer);
+
+        /**%apidoc POST saveServerUserAttributes
+         * Save user attributes of a server.
+         * %param serverId Server unique id.
+         * %param serverName Server name.
+         * %param maxCameras Maximum number of cameras on the server.
+         * %param allowAutoRedundancy Whether the server can take cameras from
+         *     an offline server automatically.
+         *     %value false
+         *     %value true
+         * %param backupType Settings for storage redundancy.
+         *     %value Backup_Manual Backup is performed only at user's request.
+         *     %value Backup_RealTime Backup is performed during recording.
+         *     %value Backup_Schedule Backup is performed on schedule.
+         * %param backupDaysOfTheWeek Combination (via "|") of day of week
+         *     names, for which the backup is active.
+         *     %value Monday
+         *     %value Tuesday
+         *     %value Wednesday
+         *     %value Thursday
+         *     %value Friday
+         *     %value Saturday
+         *     %value Sunday
+         * %param backupStart Start time of the backup, in seconds passed from 00:00:00.
+         * %param backupDuration Duration of the synchronization period in seconds.
+         *     -1 if not set.
+         * %param backupBitrate Maximum backup bitrate in bytes per second. Negative
+         *     value if not limited.
+         * %// AbstractCameraManager::saveUserAttributes
+         */
+        registerUpdateFuncHandler<ApiMediaServerUserAttributesData>(p, ApiCommand::saveServerUserAttributes);
+
         //AbstractCameraManager::saveUserAttributes
         registerUpdateFuncHandler<ApiMediaServerUserAttributesDataList>(p, ApiCommand::saveServerUserAttributesList);
         //AbstractCameraManager::getUserAttributes
@@ -197,7 +236,30 @@ namespace ec2
         registerGetFuncHandler<QnUuid, ApiMediaServerDataExList>(p, ApiCommand::getMediaServersEx);
 
         registerUpdateFuncHandler<ApiStorageDataList>(p, ApiCommand::saveStorages);
+
+        /**%apidoc POST /ec2/saveStorage
+         * Save the storage.
+         * %param id Storage unique id.
+         * %param parentId Should be empty.
+         * %param name Storage name.
+         * %param url Should be empty.
+         * %param spaceLimit Storage space to leave free on the storage,
+         *     in bytes. Recommended space is 5 gigabytes.
+         * %param usedForWriting Whether writing to the storage is
+         *         allowed.
+         *     %value false
+         *     %value true
+         * %param storageType Type of the method to access the storage.
+         *     %value "local"
+         *     %value "smb"
+         * %param addParams List of storage additional parameters. Intended for
+         *     internal use; leave empty when creating a new storage.
+         * %param isBackup Whether the storage is used for backup.
+         *     %value false
+         *     %value true
+         */
         registerUpdateFuncHandler<ApiStorageData>(p, ApiCommand::saveStorage);
+
         registerUpdateFuncHandler<ApiIdDataList>(p, ApiCommand::removeStorages);
         registerUpdateFuncHandler<ApiIdData>(p, ApiCommand::removeStorage);
         registerUpdateFuncHandler<ApiIdDataList>(p, ApiCommand::removeResources);
@@ -208,8 +270,101 @@ namespace ec2
         registerUpdateFuncHandler<ApiCameraDataList>(p, ApiCommand::saveCameras);
         //AbstractCameraManager::getCameras
         registerGetFuncHandler<QnUuid, ApiCameraDataList>(p, ApiCommand::getCameras);
+
         //AbstractCameraManager::saveUserAttributes
         registerUpdateFuncHandler<ApiCameraAttributesDataList>(p, ApiCommand::saveCameraUserAttributesList);
+
+        /**%apidoc POST /ec2/saveCameraUserAttributes
+         * Save additional camera attributes.
+         * %param cameraId Camera unique id.
+         * %param cameraName Camera name.
+         * %param userDefinedGroupName Name of the user-defined camera group.
+         * %param scheduleEnabled Whether the schedule is enabled for the camera.
+         *     %value false
+         *     %value true
+         * %param licenseUsed Whether the license is used for the camera.
+         *     %value false
+         *     %value true
+         * %param motionType Type of motion detection method.
+         *     %value MT_Default Use default method.
+         *     %value MT_HardwareGrid Use hardware grid.
+         *     %value MT_SoftwareGrid Use software grid.
+         *     %value MT_MotionWindow Use motion window.
+         *     %value MT_NoMotion Do not perform motion detection.
+         * %param motionMask List of motion detection areas and their
+         *     sensitivity. The format is proprietary and is likely to change in
+         *     future API versions.
+         * %param scheduleTasks List of scheduled recording tasks.
+         *     %param scheduleTask.startTime Time of day to start backup as
+         *         seconds passed from the day's 00:00:00.
+         *     %param scheduleTask.endTime: Time of day to end backup as
+         *         seconds passed from the day's 00:00:00.
+         *     %param scheduleTask.recordAudio Whether to record the sound.
+         *         %value false
+         *         %value true
+         *     %param scheduleTask.recordingType
+         *         %value RT_Always Record always.
+         *         %value RT_MotionOnly Record only when the motion is detected.
+         *         %value RT_Never Never record.
+         *         %value RT_MotionAndLowQuality Always record low quality
+         *             stream, and record high quality stream on motion.
+         * %param dayOfWeek Day of week for the recording task.
+         *     %value 1 Monday
+         *     %value 2 Tuesday
+         *     %value 3 Wednesday
+         *     %value 4 Thursday
+         *     %value 5 Friday
+         *     %value 6 Saturday
+         *     %value 7 Sunday
+         * %param beforeThreshold The number of seconds before a motion event to
+         *     record the video for.
+         * %param afterThreshold The number of seconds after a motion event to
+         *     record the video for.
+         * %param streamQuality Quality of the recording.
+         *     %value QualityLowest
+         *     %value QualityLow
+         *     %value QualityNormal
+         *     %value QualityHigh
+         *     %value QualityHighest
+         *     %value QualityPreSet
+         *     %value QualityNotDefined
+         * %param fps Frames per second (integer).
+         * %param audioEnabled Whether the audio is enabled on the camera.
+         *     %value false
+         *     %value true
+         * %param secondaryStreamQuality
+         *     %value SSQualityLow Low quality second stream.
+         *     %value SSQualityMedium Medium quality second stream.
+         *     %value SSQualityHigh High quality second stream.
+         *     %value SSQualityNotDefined Second stream quality is not defined.
+         *     %value SSQualityDontUse Second stream is not used for the camera.
+         * %param controlEnabled Whether camera control is enabled.
+         *     %value false
+         *     %value true
+         * %param dewarpingParams Image dewarping parameters.
+         *     The format is proprietary and is likely to change in future API
+         *     versions.
+         * %param minArchiveDays Minimum number of days to keep the archive for.
+         * %param maxArchiveDays Maximum number of days to keep the archive for.
+         * %param preferedServerId Unique id of a server which is preferred for
+         *     the camera for failover.
+         *     %// TODO: Typo in parameter name: "prefered" -> "preferred".
+         * %param failoverPriority Priority for the camera for being transferred
+         *     to another server for failover.
+         *     %value FP_Never Will never be transferred to another server.
+         *     %value FP_Low Low priority against other cameras.
+         *     %value FP_Medium Medium priority against other cameras.
+         *     %value FP_High High priority against other cameras.
+         * %param backupType Combination (via "|") of flags defining backup options.
+         *     %value CameraBackup_Disabled Backup is disabled.
+         *     %value CameraBackup_HighQuality Backup is in high quality.
+         *     %value CameraBackup_LowQuality Backup is in low quality.
+         *     %value CameraBackup_Both Equivalent of "CameraBackup_HighQuality|CameraBackup_LowQuality".
+         *     %value CameraBackup_Default A default value is used for backup options.
+         * %// AbstractCameraManager::saveUserAttributes
+         */
+        registerUpdateFuncHandler<ApiCameraAttributesData>(p, ApiCommand::saveCameraUserAttributes);
+
         //AbstractCameraManager::getUserAttributes
         registerGetFuncHandler<QnUuid, ApiCameraAttributesDataList>(p, ApiCommand::getCameraUserAttributes);
         //AbstractCameraManager::addCameraHistoryItem
@@ -228,7 +383,7 @@ namespace ec2
         /**%apidoc GET /ec2/getCamerasEx
          * Read camera list
          * %param[default] format
-         * %param[opt] id Server unique ID
+         * %param[opt] id Server unique Id
          * %return Returns camera list data formatted in a requested format
          *     %attribute addParams List of additional parameters for camera. This list can contain such information as full ONVIF url, camera maximum fps e.t.c
          *     %attribute audioEnabled Server will push audio stream from a camera if parameter is true
@@ -236,7 +391,7 @@ namespace ec2
          *     %attribute dewarpingParams Json string with dewarping parameters
          *     %attribute groupId Internal group identifier. It is used for grouping channels for multi-channels cameras together.
          *     %attribute groupName Group name. This name can be changed by user
-         *     %attribute id Object ID. All ID for all objects in a system is GUIDs
+         *     %attribute id Object Id. All Id for all objects in a system is GUIDs
          *     %attribute login Login for camera authentication
          *     %attribute mac camera MAC address
          *     %attribute manuallyAdded True if user added camera manually
@@ -246,7 +401,7 @@ namespace ec2
          *     %attribute motionMask Camera's motion mask. This string defines several rectangles via ':' delimiter. Each rectangle is described by 5 digits: sensitivity, x,y(for left top corner), width, height
          *     %attribute motionType If value is 'MT_SoftwareGrid' then server determine motion, otherwise camera built-in motion will be used
          *     %attribute name Camera name
-         *     %attribute parentId Camera's server ID
+         *     %attribute parentId Camera's server Id
          *     %attribute physicalId Camera unique identifier. This identifier is used in all requests related to a camera. For instance, in RTSP requests
          *     %attribute password Password for camera authentication
          *     %attribute scheduleEnabled Do record camera archive if true
@@ -254,7 +409,7 @@ namespace ec2
          *     %attribute secondaryStreamQuality Secondary stream quality. Possible values:'SSQualityLow', 'SSQualityMedium', 'SSQualityHigh', 'SSQualityDontUse'
          *     %attribute status Camera status. Possible values are: 'Offline', 'Online', 'Recording'
          *     %attribute statusFlags Usually this field is zero. Non zero value is used to mark that a lot of network issues was occurred with this camera
-         *     %attribute typeId Unique ID with camera's type. Camera's type can describe predefined information such as camera maximum resolution, fps e.t.c.
+         *     %attribute typeId Unique Id with camera's type. Camera's type can describe predefined information such as camera maximum resolution, fps e.t.c.
          *         Detailed type information can be obtained via 'getResourceTypes' request.
          *     %attribute url Camera plain IP address or full http url if camera was added manually. Also, for multichannel encoders full url is used
          *     %attribute vendor Camera manufacturer
@@ -263,10 +418,25 @@ namespace ec2
         registerGetFuncHandler<QnUuid, ApiCameraDataExList>(p, ApiCommand::getCamerasEx);
 
         /**%apidoc GET /ec2/getStorages
-         * Read current storages list
+         * Read the list of current storages.
          * %param[default] format
-         * %param[opt] id Server unique ID
-         * %return Returns storages list data formatted in a requested format. If id parameter is specified, the list contais only that server storages.
+         * %param[opt] id Server unique id. If omitted, return storages for all
+         *     servers.
+         * %return List of storages.
+         *     %attribute id Storage unique id.
+         *     %attribute parentId Is empty.
+         *     %attribute name Storage name.
+         *     %attribute url Is empty.
+         *     %attribute spaceLimit Storage space to leave free on the storage,
+         *         in bytes.
+         *     %attribute usedForWriting Whether writing to the storage is
+         *         allowed: false or true.
+         *     %attribute storageType Type of the method to access the storage:
+         *         "local"or "smb".
+         *     %attribute addParams List of storage additional parameters.
+         *         Intended for internal use; leave empty when creating a new
+         *         storage.
+         *     %attribute isBackup Whether the storage is used for backup: false or true.
          */
         registerGetFuncHandler<QnUuid, ApiStorageDataList>(p, ApiCommand::getStorages);
 
@@ -274,7 +444,6 @@ namespace ec2
         registerUpdateFuncHandler<ApiLicenseDataList>(p, ApiCommand::addLicenses);
         //AbstractLicenseManager::removeLicense
         registerUpdateFuncHandler<ApiLicenseData>(p, ApiCommand::removeLicense);
-
 
         /**%apidoc GET /ec2/getBusinessRules
          * Return business rules
@@ -304,9 +473,53 @@ namespace ec2
          * %// AbstractUserManager::getUsers
          */
         registerGetFuncHandler<std::nullptr_t, ApiUserDataList>(p, ApiCommand::getUsers);
-        //AbstractUserManager::save
+
+        /**%apidoc POST /ec2/saveUser
+         * %param id User unique id. Should be generated when creating a new user.
+         * %param parentId Should be empty.
+         * %param name Layout name.
+         * %param url Should be empty.
+         * %param typeId Should have fixed value.
+         *     %value {774e6ecd-ffc6-ae88-0165-8f4a6d0eafa7}
+         * %param isAdmin Indended for internal use; keep the value when saving
+         *     a previously received object, use false when creating a new one.
+         *     %value false
+         *     %value true
+         * %param permissions Combination (via "|") of the following flags:
+         *     %value GlobalEditProtectedUserPermission Root, can edit admins.
+         *     %value GlobalProtectedPermission Admin, can edit other non-admins.
+         *     %value GlobalEditLayoutsPermission Can create and edit layouts.
+         *     %value GlobalEditUsersPermission Can create and edit users.
+         *     %value GlobalEditServersPermissions Can edit server settings.
+         *     %value GlobalViewLivePermission Can view live stream of available cameras.
+         *     %value GlobalViewArchivePermission Can view archives of available cameras.
+         *     %value GlobalExportPermission Can export archives of available cameras.
+         *     %value GlobalEditCamerasPermission Can edit camera settings.
+         *     %value GlobalPtzControlPermission Can change camera's PTZ state.
+         *     %value GlobalEditVideoWallPermission Can create and edit videowalls.
+         * %param email User's email.
+         * %param digest Digest hash. Supply empty string when creating, keep
+         *     the value when modifying.
+         * %param hash User hash. Supply empty string when creating, keep
+         *     the value when modifying.
+         * %param cryptSha512Hash Cryptography key hash. Supply empty string
+         *     when creating, keep the value when modifying.
+         * %param realm Should have fixed value which can be obtained via gettime call.
+         * %param isLdap Whether the user was imported from LDAP.
+         *     %value false
+         *     %value true
+         * %param isEnabled Whether the user is enabled.
+         *     %value false
+         *     %value true
+         * %// AbstractUserManager::save
+         */
         registerUpdateFuncHandler<ApiUserData>(p, ApiCommand::saveUser);
-        //AbstractUserManager::remove
+
+        /**%apidoc POST /ec2/removeUser
+         * Delete the specified user.
+         * %param id User unique id.
+         * %// AbstractUserManager::remove
+         */
         registerUpdateFuncHandler<ApiIdData>(p, ApiCommand::removeUser);
 
         /**%apidoc GET /ec2/getVideowalls
@@ -329,9 +542,138 @@ namespace ec2
          * %// AbstractLayoutManager::getLayouts
          */
         registerGetFuncHandler<std::nullptr_t, ApiLayoutDataList>(p, ApiCommand::getLayouts);
-        //AbstractLayoutManager::save
+
+        /**%apidoc POST /ec2/saveLayout
+         * Save layout.
+         * %param[opt] id Layout unique id. If omitted, will be generated by the server.
+         * %param parentId Unique id of the user owning the layout.
+         * %param name Layout name.
+         * %param url Should be empty string.
+         * %param typeId Should have fixed value.
+         *     %value {e02fdf56-e399-2d8f-731d-7a457333af7f}
+         * %param cellAspectRatio Aspect ratio of a cell for layout items
+         *     (floating-point).
+         * %param horizontalSpacing Horizontal spacing between layout items
+         *     (floating-point).
+         * %param verticalSpacing Vertical spacing between layout items
+         *     (floating-point).
+         * %param items List of the layout items.
+         * %param item.id Item unique id. If omitted, will be generated by the
+         *     server.
+         * %param item.flags Should have fixed value.
+         *     %value 0
+         * %param item.left Left coordinate of the layout item (floating-point).
+         * %param item.right Right coordinate of the layout item (floating-point).
+         * %param item.bottom Bottom coordinate of the layout item (floating-point).
+         * %param item.rotation Degree of image tilt; a positive value rotates
+         *     counter-clockwise (floating-point, 0..360).
+         * %param item.resourceId Camera's unique id.
+         * %param item.resourcePath If the item represents a local file - URL of
+         *     the file, otherwise is empty.
+         * %param item.zoomLeft Left coordinate of the displayed window inside
+         *     the camera image, as a fraction of the image width
+         *     (floating-point, 0..1).
+         * %param item.zoomTop Top coordinate of the displayed window inside
+         *     the camera image, as a fraction of the image height
+         *     (floating-point, 0..1).
+         * %param item.zoomRight Right coordinate of the displayed window inside
+         *     the camera image, as a fraction of the image width
+         *     (floating-point, 0..1).
+         * %param item.zoomBottom Bottom coordinate of the displayed window inside
+         *     the camera image, as a fraction of the image width
+         *     (floating-point, 0..1).
+         * %param item.zoomTargetId Unique id of the original layout item for
+         *     which the zoom window was created.
+         * %param item.contrastParams Image enhancement parameters. The format
+         *     is proprietary and is likely to change in future API versions.
+         * %param item.dewarpingParams Image dewarping parameters.
+         *     The format is proprietary and is likely to change in future API
+         *     versions.
+         * %param item.displayInfo Whether to display info for the layout item.
+         *     %value false
+         *     %value true
+         * %param editable Whether to display info for the layout item.
+         *     %value false
+         *     %value true
+         * %param locked Whether the layout item is locked.
+         *     %value false
+         *     %value true
+         * %param backgroundImageFilename
+         * %param backgroundWidth Width of the background image in pixels (integer).
+         * %param backgroundHeight Height of the background image in pixels (integer).
+         * %param backgroundOpacity Level of opacity of the background image in pixels (floating-point 0..1).
+         * %// AbstractLayoutManager::save
+         */
+        registerUpdateFuncHandler<ApiLayoutData>(p, ApiCommand::saveLayout);
+
+        /**%apidoc POST /ec2/saveLayouts
+         * Save the list of layouts.
+         * %param[opt] id Layout unique id. If omitted, will be generated by the server.
+         * %param parentId Unique id of the user owning the layout.
+         * %param name Layout name.
+         * %param url Should be empty string.
+         * %param typeId Should have fixed value.
+         *     %value {e02fdf56-e399-2d8f-731d-7a457333af7f}
+         * %param cellAspectRatio Aspect ratio of a cell for layout items
+         *     (floating-point).
+         * %param horizontalSpacing Horizontal spacing between layout items
+         *     (floating-point).
+         * %param verticalSpacing Vertical spacing between layout items
+         *     (floating-point).
+         * %param items List of the layout items.
+         * %param item.id Item unique id. If omitted, will be generated by the
+         *     server.
+         * %param item.flags Should have fixed value.
+         *     %value 0
+         * %param item.left Left coordinate of the layout item (floating-point).
+         * %param item.right Right coordinate of the layout item (floating-point).
+         * %param item.bottom Bottom coordinate of the layout item (floating-point).
+         * %param item.rotation Degree of image tilt; a positive value rotates
+         *     counter-clockwise (floating-point, 0..360).
+         * %param item.resourceId Camera's unique id.
+         * %param item.resourcePath If the item represents a local file - URL of
+         *     the file, otherwise is empty.
+         * %param item.zoomLeft Left coordinate of the displayed window inside
+         *     the camera image, as a fraction of the image width
+         *     (floating-point, 0..1).
+         * %param item.zoomTop Top coordinate of the displayed window inside
+         *     the camera image, as a fraction of the image height
+         *     (floating-point, 0..1).
+         * %param item.zoomRight Right coordinate of the displayed window inside
+         *     the camera image, as a fraction of the image width
+         *     (floating-point, 0..1).
+         * %param item.zoomBottom Bottom coordinate of the displayed window inside
+         *     the camera image, as a fraction of the image width
+         *     (floating-point, 0..1).
+         * %param item.zoomTargetId Unique id of the original layout item for
+         *     which the zoom window was created.
+         * %param item.contrastParams Image enhancement parameters. The format
+         *     is proprietary and is likely to change in future API versions.
+         * %param item.dewarpingParams Image dewarping parameters.
+         *     The format is proprietary and is likely to change in future API
+         *     versions.
+         * %param item.displayInfo Whether to display info for the layout item.
+         *     %value false
+         *     %value true
+         * %param editable Whether to display info for the layout item.
+         *     %value false
+         *     %value true
+         * %param locked Whether the layout item is locked.
+         *     %value false
+         *     %value true
+         * %param backgroundImageFilename
+         * %param backgroundWidth Width of the background image in pixels (integer).
+         * %param backgroundHeight Height of the background image in pixels (integer).
+         * %param backgroundOpacity Level of opacity of the background image in pixels (floating-point 0..1).
+         * %// AbstractLayoutManager::save
+         */
         registerUpdateFuncHandler<ApiLayoutDataList>(p, ApiCommand::saveLayouts);
-        //AbstractLayoutManager::remove
+
+        /**%apidoc POST /ec2/removeLayout
+         * Delete the specified layout.
+         * %param id Unique Id of the layout to be deleted.
+         * %// AbstractLayoutManager::remove
+         */
         registerUpdateFuncHandler<ApiIdData>(p, ApiCommand::removeLayout);
 
         /**%apidoc GET /ec2/listDirectory
@@ -394,6 +736,7 @@ namespace ec2
          * %// AbstractTimeManager::getCurrentTimeImpl
          */
         registerGetFuncHandler<std::nullptr_t, ApiTimeData>(p, ApiCommand::getCurrentTime);
+
         //AbstractTimeManager::forcePrimaryTimeServer
         registerUpdateFuncHandler<ApiIdData>(p, ApiCommand::forcePrimaryTimeServer,
             std::bind(&TimeSynchronizationManager::primaryTimeServerChanged, m_timeSynchronizationManager.get(), _1));

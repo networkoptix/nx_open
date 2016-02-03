@@ -643,7 +643,7 @@
                 </function>
                 <function>
                     <name>manualCamera/add</name>
-                    <description>Manual add camera(s). If several cameras are added, parameters
+                    <description>Manually add camera(s). If several cameras are added, parameters
                         'url' and 'manufacturer' must be defined several times.</description>
                     <method>POST</method>
                     <params>
@@ -1080,7 +1080,7 @@
                         </caption>
                     </result>
                 </function>
-                <function proprietary="true">
+                <function>
                     <name>mergeSystems</name>
                     <description>Merge two systems.</description>
                     <method>GET</method>
@@ -1284,13 +1284,13 @@
                                          Current version uses field 'cameraRefs', any other fields could be added for future purpose.
                                          'cameraRefs' field sould contains list if camera's 'id' field. This value could be obtained
                                          via '/ec2/getCamerasEx' call.
-                             <tt>
+                                <tt>
                                     <br/>Json string example:
-                             <pre>
+                                    <pre>
 {
   "cameraRefs": ["3A4AD4EA-9269-4B1F-A7AA-2CEC537D0248", "3A4AD4EA-9269-4B1F-A7AA-2CEC537D0240"]
 }
-                             </pre>
+                                    </pre>
                                 </tt>
                             </description>
                             <optional>true</optional>
@@ -1560,7 +1560,7 @@
                 <function>
                     <name>Cookie-based Authentication</name>
                     <description>
-                        Cookie authorisation scheme allows to avoid standard login/password dialog in web-applications.<br/>
+                        Cookie authorization scheme allows to avoid standard login/password dialog in web-applications.<br/>
                         It provides you a way to replace it with your own. <br/>
                         It works mostly like sessions, but a bit more secure because it doesn't send user's password over HTTP.<br/>
                         <ul>
@@ -1596,8 +1596,8 @@
                 <function>
                     <name>Calculating authentification hash</name>
                     <description>
-                            For url-based authentification and cookie-based authentification you need to calculate hash manually, using the following algorythm:
-                            <ul>
+                        For url-based authentification and cookie-based authentification you need to calculate hash manually, using the following algorythm:
+                        <ul>
                             <li>Get <i>nonce</i> and <i>realm</i> from server</li>
                             <li>Translate user's <i>username</i> to lower case</li>
                             <li>Check required <i>method</i> ('GET' for http-requests, 'PLAY' for rtsp)</li>
