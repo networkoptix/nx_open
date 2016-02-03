@@ -61,6 +61,17 @@ class System(object):
         }
         return requests.post(request, json=params, auth=HTTPDigestAuth(email, password))
 
+    @staticmethod
+    @validate_response
+    def bind(email, password, name):
+        request = settings.CLOUD_CONNECT['url'] + "/system/bind"
+        customization = settings.CLOUD_CONNECT['customization']
+        params = {
+            'name': name,
+            'customization': customization
+        }
+        return requests.post(request, json=params, auth=HTTPDigestAuth(email, password))
+
 
 class Account(object):
 

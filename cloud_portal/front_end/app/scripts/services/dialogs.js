@@ -4,10 +4,17 @@ angular.module('cloudApp')
     .factory('dialogs', function ($http, $modal, $q, $location) {
         function openDialog(title, template, url, content, hasFooter, cancellable, params, closable){
 
+            //scope.inline = typeof($location.search().inline) != 'undefined';
+
+            function isInline(){
+                return typeof($location.search().inline) != 'undefined';
+            }
+
             // Check 401 against offline
             var modalInstance = $modal.open({
                 controller: 'DialogCtrl',
                 templateUrl: 'views/components/dialog.html',
+                animation: !isInline(),
                 keyboard:false,
                 backdrop:cancellable?true:'static',
                 resolve: {
@@ -66,7 +73,7 @@ angular.module('cloudApp')
                 return openDialog(title, null, null, message, true, false).result;
             },
             login:function(force){
-                return openDialog('Login', 'views/login.html', 'login', null, false, !force, null, true).result;
+                return openDialog('Login to Nx Cloud', 'views/login.html', 'login', null, false, !force, null, true).result;
             },
             share:function(systemId, isOwner, share){
 

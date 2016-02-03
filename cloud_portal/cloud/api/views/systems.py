@@ -55,3 +55,12 @@ def delete(request):
     require_params(request, ('system_id',))
     cloud_api.System.unbind(request.user.email, request.session['password'], request.data['system_id'])
     return api_success()
+
+
+@api_view(['POST'])
+@permission_classes((IsAuthenticated, ))
+@handle_exceptions
+def connect(request):
+    require_params(request, ('name',))
+    data = cloud_api.System.bind(request.user.email, request.session['password'], request.data['name'])
+    return api_success(data)

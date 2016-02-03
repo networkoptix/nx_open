@@ -167,6 +167,11 @@ angular.module('cloudApp')
                     system_id: systemId
                 });
             },
+            connect:function(name){
+                return $http.post(apiBase + '/systems/connect', {
+                    name: name
+                });
+            },
             accessRoles: function(systemId){
                 return $http.get(apiBase + '/systems/' + systemId + '/accessRoles');
             }

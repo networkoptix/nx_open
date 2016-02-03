@@ -35,6 +35,8 @@ angular.module('cloudApp', [
                 test: ['$route',function ($route) { $route.current.params.accountMode = true; }]
             }
         })
+
+
         .when('/systems', {
             templateUrl: 'views/systems.html',
             controller: 'SystemsCtrl'
@@ -57,6 +59,25 @@ angular.module('cloudApp', [
                 test: ['$route',function ($route) { $route.current.params.callShare = true; }]
             }
         })
+
+
+        .when('/systems/:systemId/disconnect', {
+            templateUrl: 'views/connectDisconnectSystem.html',
+            controller: 'ConnectDisconnectCtrl',
+            resolve: {
+                test: ['$route',function ($route) { $route.current.params.connect = false; }]
+            }
+        })
+        .when('/systems/connect/:systemName', {
+            templateUrl: 'views/connectDisconnectSystem.html',
+            controller: 'ConnectDisconnectCtrl',
+            resolve: {
+                test: ['$route',function ($route) { $route.current.params.connect = true; }]
+            }
+        })
+
+
+
         .when('/activate', {
             templateUrl: 'views/activate_restore.html',
             controller: 'ActivateRestoreCtrl',
