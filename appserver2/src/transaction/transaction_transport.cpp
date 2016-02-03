@@ -39,6 +39,7 @@
 #ifndef USE_JSON
 #define ENCODE_TO_BASE64
 #endif
+//#define AGGREGATE_TRANSACTIONS_BEFORE_SEND
 //#define PIPELINE_POST_REQUESTS
 
 
@@ -1005,9 +1006,11 @@ bool QnTransactionTransport::isHttpKeepAliveTimeout() const
 void QnTransactionTransport::serializeAndSendNextDataBuffer()
 {
     assert( !m_dataToSend.empty() );
-    
+
+#ifdef AGGREGATE_TRANSACTIONS_BEFORE_SEND
     if( m_base64EncodeOutgoingTransactions )
         aggregateOutgoingTransactionsNonSafe();
+#endif  //AGGREGATE_TRANSACTIONS_BEFORE_SEND
 
     DataToSend& dataCtx = m_dataToSend.front();
 
