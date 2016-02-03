@@ -698,7 +698,10 @@ void QnNxStyle::drawComplexControl(
                 QnPaletteColor mainColor = findColor(spinBox->palette.color(QPalette::Button));
                 QColor buttonColor;
 
-                if (spinBox->activeSubControls.testFlag(subControl))
+                bool up = (subControl == SC_SpinBoxUp);
+                bool enabled = spinBox->stepEnabled.testFlag(up ? QSpinBox::StepUpEnabled : QSpinBox::StepDownEnabled);
+
+                if (enabled && spinBox->activeSubControls.testFlag(subControl))
                 {
                     if (spinBox->state.testFlag(State_Sunken))
                         buttonColor = mainColor.darker(1);
@@ -709,12 +712,10 @@ void QnNxStyle::drawComplexControl(
                 if (buttonColor.isValid())
                     painter->fillRect(buttonRect, buttonColor);
 
-                bool up = subControl == SC_SpinBoxUp;
-
                 drawArrow(up ? Up : Down,
                           painter,
                           subControlRect(control, option, subControl, widget),
-                          option->palette.color(QPalette::Text));
+                          option->palette.color(enabled ? QPalette::Active : QPalette::Disabled, QPalette::Text));
             };
 
             if (option->subControls.testFlag(SC_SpinBoxUp))
