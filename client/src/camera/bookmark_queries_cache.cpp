@@ -4,6 +4,8 @@
 #include <camera/camera_bookmarks_query.h>
 #include <camera/camera_bookmarks_manager.h>
 
+#include <utils/common/scoped_timer.h>
+
 QnBookmarkQueriesCache::QnBookmarkQueriesCache(qint64 timeWindowMinChange
     , QObject *parent)
     : QObject(parent)
@@ -21,6 +23,8 @@ bool QnBookmarkQueriesCache::hasQuery(const QnVirtualCameraResourcePtr &camera) 
 
 QnCameraBookmarksQueryPtr QnBookmarkQueriesCache::getOrCreateQuery(const QnVirtualCameraResourcePtr &camera)
 {
+    QN_LOG_TIME(Q_FUNC_INFO);
+
     if (!camera)
         return QnCameraBookmarksQueryPtr();
 

@@ -259,10 +259,12 @@ bool QnSearchBookmarksDialogPrivate::fillActionParameters(QnActionParameters &pa
 
         bookmarks << bookmark;
     }
-    if (!bookmarks.isEmpty())
+    if (bookmarks.isEmpty())
+        return false;
+    else
         params.setArgument(Qn::CameraBookmarkListRole, bookmarks);
 
-    if (bookmarks.size() > 1)
+    if (bookmarks.size() != 1)
         return true;
 
     QnCameraBookmark currentBookmark = bookmarks.first();
