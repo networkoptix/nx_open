@@ -326,10 +326,22 @@ namespace
         , const QColor &commonTextColor
         , QGraphicsLinearLayout *layout)
     {
-        if (tags.empty())
+        enum { kMaxTags = 16 };
+
+        QnCameraBookmarkTags validTags;
+        for (const QString &tag: tags)
+        {
+            if (tag.isEmpty())
+                continue;
+            validTags << tag;
+            if (validTags.size() >= kMaxTags)
+                break;
+        }
+
+        if (validTags.empty())
             return insertionIndex;
 
-        const auto tagsControl = new QnBookmarkTagsControl(tags, this);
+        const auto tagsControl = new QnBookmarkTagsControl(validTags, this);
 
         QObject::connect(tagsControl, &QnBookmarkTagsControl::tagClicked
             , this, [this](const QString &tag)
@@ -401,14 +413,8 @@ namespace
         position = createLabel(position, elideString(bookmark.description, kMaxBodyLength)
             , colors.text, this, bookmarkItemsLayout, kDescriptionLabelIndex);
 
-        if (!bookmark.tags.empty())
-        {
-            enum { kMaxTags = 16 };
-            const auto &trimmedTags = (bookmark.tags.size() <= kMaxTags ? bookmark.tags
-                : QnCameraBookmarkTags::fromList(bookmark.tags.toList().mid(0, kMaxTags)));
 
-            position = createTagsControl(position, trimmedTags, colors.text, bookmarkItemsLayout);
-        }
+        position = createTagsControl(position, bookmark.tags, colors.text, bookmarkItemsLayout);
 
         if (position)
             insertButtonsSeparator(colors.buttonsSeparator, position, this, bookmarkItemsLayout);
