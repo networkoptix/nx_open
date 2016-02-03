@@ -66,7 +66,7 @@ namespace
             for (auto it = mergeDataIt + 1; it != mergeData.end(); ++it)
             {
                 const QnCameraBookmark *currentBookmark= it->first;
-                if (!pred(*minBookmark, *currentBookmark))
+                if (!pred(*currentBookmark, *minBookmark))
                     continue;
 
                 mergeDataIt = it;
@@ -335,7 +335,7 @@ QnCameraBookmarkTagList QnCameraBookmarkTag::mergeCameraBookmarkTags(const QnMul
 
 
 bool QnCameraBookmark::isValid() const {
-    return !isNull() && !cameraId.isEmpty();
+    return !isNull() && !cameraId.isEmpty() && durationMs > 0;
 }
 
 bool operator<(const QnCameraBookmark &first, const QnCameraBookmark &other) {

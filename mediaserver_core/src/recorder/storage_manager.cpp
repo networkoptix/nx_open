@@ -294,6 +294,12 @@ public:
                   -> std::function<void(int, int)>
                 {
                     return [this, url, totalProgressValue, totalProgressStep, offset](int current, int total) {
+                        if (total <= 0)
+                        {   /* Lets think we have already done this =) */
+                            total = 1;
+                            current = 1;
+                        }
+
                         /* Dividing storage progress by two as there are two catalogs rebuilding. */
                         const qreal storageProgress = offset + (0.5 * current / (qreal) total);
                         const qreal totalProgress = totalProgressValue + storageProgress * totalProgressStep;
@@ -321,7 +327,7 @@ public:
                     // not data to process left
                     m_owner->updateCameraHistory();
                     m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_None, QString(), 0.0, 0.0));
-                    if (fullscanProcessed) 
+                    if (fullscanProcessed)
                     {
                         if (!QnResource::isStopping())
                             ArchiveScanPosition::reset(m_owner->m_role); // do not reset position if server is going to restart
@@ -462,8 +468,8 @@ void QnStorageManager::partialMediaScan(const DeviceFileCatalogPtr &fileCatalog,
         bool stillHaveThisStorage = hasStorageUnsafe(storage);
         if (!stillHaveThisStorage)
             return;
-        fileCatalog->addChunks(newChunks);
     }
+    fileCatalog->addChunks(newChunks);
 }
 
 void QnStorageManager::initDone()
@@ -608,6 +614,7 @@ void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &
     int currentTask = 0;
     if (progressCallback)
         progressCallback(currentTask, totalTasks);
+
     for(const QnAbstractStorageResource::FileInfo& fi: list)
     {
         if (m_rebuildCancelled)
@@ -625,12 +632,13 @@ void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &
             QnTimePeriod rebuildPeriod = QnTimePeriod(0, rebuildEndTime);
             newCatalog->doRebuildArchive(storage, rebuildPeriod);
 
+            bool stillHaveThisStorage;
             {
                 QnMutexLocker lk(&m_mutexStorages);
-                bool stillHaveThisStorage = hasStorageUnsafe(storage);
+                stillHaveThisStorage = hasStorageUnsafe(storage);
+            }
                 if (!m_rebuildCancelled && stillHaveThisStorage)
                     replaceChunks(rebuildPeriod, storage, newCatalog, cameraUniqueId, catalog);
-            }
         }
         currentTask++;
         if (progressCallback && !m_rebuildCancelled)
@@ -1803,7 +1811,7 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(
             if (m_role == QnServer::StoragePool::Normal)
             {   // 'noStorageAvailbale' signal results in client notification.
                 // For backup storages No Available Storage error is translated to
-                // specific backup error by the calling code and this error 
+                // specific backup error by the calling code and this error
                 // is reported to the client (and also logged).
                 // Hence these below seem redundant for Backup storage manager.
                 emit noStoragesAvailable();

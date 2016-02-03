@@ -6,7 +6,6 @@
 #include <QtCore/QMetaType>
 #include <QtCore/QSet>
 #include <QtCore/QStringList>
-#include <QtCore/QReadWriteLock>
 #include <QtCore/QThreadPool>
 
 #include <api/model/kvpair.h>

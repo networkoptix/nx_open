@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="cr" sourcelanguage="en">
+<TS version="2.1" language="hr" sourcelanguage="en">
 <context>
     <name>Language</name>
     <message>
@@ -11,7 +11,7 @@
     <message>
         <source>Locale Code</source>
         <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
-        <translation>cr</translation>
+        <translation>hr</translation>
     </message>
 </context>
 <context>

@@ -424,18 +424,62 @@ void QnNavigationItem::updateBookButtonEnabled()
     modeAction->setChecked(bookmarkMode);
 }
 
-void QnNavigationItem::updatePlaybackButtonsEnabled() {
+void QnNavigationItem::updatePlaybackButtonsEnabled()
+{
+    /*
+     * Method logic: enable the following buttons if current widget is:
+     * - local image: no buttons
+     * - local audio file or exported audio: play/pause, jump forward and backward
+     * - local video file or exported video: all buttons
+     * - camera: play button and:
+     * - - if has footage: jump backward, step backward
+     * - - if NOT on the live (has footage by default): jump forward, step forward
+     * - I/O module: play button and:
+     * - - if has footage: jump backward
+     * - - if NOT on the live (has footage by default): jump forward
+     */
+
+
+    /* If not playable, it is a local image, all buttons must be disabled. */
     bool playable = navigator()->isPlayingSupported();
+
+    /* Makes sense only for cameras. Local files are never live. */
     bool forwardable = !navigator()->isLive();
-    bool hasArchive = navigator()->hasArchive();
-    bool hasVideo = navigator()->hasVideo();
 
-    m_jumpBackwardButton->setEnabled(playable && hasArchive);
-    m_stepBackwardButton->setEnabled(playable && hasVideo && hasArchive); /*< We cannot step by audio. */
+    /* Side effects are Evil! */
+    bool isLocalFile = !navigator()->isLiveSupported();
+
+    /* Will return true if there is at least one camera with archive on the scene, even is local file is selected. */
+    bool hasCameraFootage = navigator()->hasArchive();
+
+    /* Check if current widget has real video (not image, not audio file, not I/O module). */
+    bool hasVideo = navigator()->currentWidgetHasVideo();
+
+    /* All options except local image. */
     m_playButton->setEnabled(playable);
-    m_stepForwardButton->setEnabled(playable && forwardable && hasVideo && hasArchive); /*< We cannot step by audio. */
-    m_jumpForwardButton->setEnabled(playable && forwardable && hasArchive);
 
+    /* Local/exported video, camera with footage. */
+    bool canStepBackwardOrSpeedDown = playable && (hasCameraFootage || isLocalFile ) && hasVideo;
+    m_stepBackwardButton->setEnabled(canStepBackwardOrSpeedDown);
+
+    /* Local/exported video, camera with footage but not on live. */
+    bool canStepForwardOrSpeedUp = playable && ((hasCameraFootage && forwardable) || isLocalFile) && hasVideo;
+    m_stepForwardButton->setEnabled(canStepForwardOrSpeedUp);
+
+    /* Local/exported file (not image), camera or I/O module with footage. */
+    bool canJumpBackward = playable && (hasCameraFootage || isLocalFile);
+    m_jumpBackwardButton->setEnabled(canJumpBackward);
+
+    /* Local/exported file (not image), camera or I/O module with footage but not on live. */
+    bool canJumpForward = playable && ((hasCameraFootage && forwardable) || isLocalFile);
+    m_jumpForwardButton->setEnabled(canJumpForward);
+
+    /*
+     * For now, there is a bug when I/O module is placed on the scene together with camera (synced).
+     * If we select camera, we can change speed to -16x, but when we select I/O module,
+     * client will be in strange state: speed slider allows only 0x and 1x, but current speed is -16x.
+     * So we making the slider enabled for I/O module to do not make the situation even stranger.
+     */
     m_speedSlider->setEnabled(playable);
 }
 
