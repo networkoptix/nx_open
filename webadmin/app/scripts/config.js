@@ -5,8 +5,32 @@ var Config = {
     globalViewArchivePermission:0x00000100,
     globalViewLivePermission:0x00000080,
 
+    cloud:{
+        portalWhiteList:'http://cloud-demo.hdw.mx/**',
+        portalUrl: 'http://cloud-demo.hdw.mx',
+        portalRegisterUrl: 'http://cloud-demo.hdw.mx/static/index.html#/register',
+
+        portalSystemUrl: 'http://cloud-demo.hdw.mx/static/index.html#/systems/{systemId}?inline',
+        portalConnectUrl: 'http://cloud-demo.hdw.mx/static/index.html#/systems/connect/{systemName}?inline',
+        portalDisconnectUrl: 'http://cloud-demo.hdw.mx/static/index.html#/systems/{systemId}/disconnect?inline'
+    },
+
+    cloudLocalhost:{
+        portalWhiteList:'http://localhost:8000/**',
+        portalUrl: 'http://localhost:8000',
+        portalRegisterUrl: 'http://localhost:8000/static/index.html#/register',
+
+        portalSystemUrl: 'http://localhost:8000/static/index.html#/systems/{systemId}?inline',
+        portalConnectUrl: 'http://localhost:8000/static/index.html#/systems/connect/{systemName}?inline',
+        portalDisconnectUrl: 'http://localhost:8000/static/index.html#/systems/{systemId}/disconnect?inline'
+    },
+
+
+
+
     demo:"/~ebalashov/webclient/api",
     demoMedia:"//10.0.2.186:7001",
+
     webclientEnabled: true, // set to false to disable webclient from top menu and show placeholder instead
     allowDebugMode: false, // Allow debugging at all. Set to false in production
     debug: {

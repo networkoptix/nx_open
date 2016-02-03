@@ -169,7 +169,6 @@ angular.module('webadminApp')
                 });
             },
 
-
             changeSystem:function(systemName,pasword){
                 return wrapPost(proxy + '/api/configure?systemName=' + systemName + '&password=' + password);
             },
@@ -230,6 +229,15 @@ angular.module('webadminApp')
 
                     return wrapGet(proxy + '/api/systemSettings?' + requestParams.join('&'));
                 }
+            },
+            getSystemSettings:function(){
+                return wrapGet(proxy + '/ec2/getSettings');
+            },
+            saveCloudSystemCredentials: function( cloudSystemId, cloudAuthKey){
+                return wrapPost(proxy + '/api/saveCloudSystemCredentials?' + $.param({
+                    cloudSystemID:cloudSystemId,
+                    cloudAuthKey:cloudAuthKey
+                }));
             },
             getRecords:function(serverUrl, physicalId, startTime, endTime, detail, limit, label, periodsType){
 

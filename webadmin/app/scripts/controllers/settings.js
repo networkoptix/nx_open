@@ -24,6 +24,7 @@ angular.module('webadminApp')
             $scope.oldPort = r.data.reply.port;
         });
 
+        $scope.Config = Config;
         $scope.password = '';
         $scope.oldPassword = '';
         $scope.confirmPassword = '';
@@ -177,4 +178,43 @@ angular.module('webadminApp')
                 });
             },1000);
         });
+
+        mediaserver.getSystemSettings().then(function(data){
+            $scope.cloudSystemID = data.data.cloudSystemID;
+            $scope.cloudAccountName = data.data.cloudAccountName;
+            //cloudAccountName, cloudSystemID
+        });
+
+
+        function openCloudDialog(connect){
+            $modal.open({
+                templateUrl: 'views/cloudDialog.html',
+                controller: 'CloudDialogCtrl',
+                backdrop:'static',
+                size:'lg',
+                keyboard:false,
+                resolve:{
+                    connect:function(){
+                        return connect;
+                    },
+                    systemName:function(){
+                        return $scope.settings.systemName;
+                    },
+                    cloudSystemID:function(){
+                        return $scope.cloudSystemID;
+                    }
+                }
+            });
+        }
+        $scope.disconnectFromCloud = function() { // Disconnect from Cloud
+            //Open Disconnect Dialog
+            openCloudDialog(false);
+        };
+
+        $scope.connectToCloud = function() { // Connect to Cloud
+            //Open Connect Dialog
+            openCloudDialog(true);
+        };
+
+
     });

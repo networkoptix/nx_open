@@ -3,10 +3,24 @@
 
     <alert type="warning" ng-if="settings.ecDbReadOnly">The system is running in safe mode. Changes are impossible.</alert>
 
+    <div class="row">
+        <h2>Cloud Connect</h2>
+
+        <div class="col-md-offset-3 col-md-9" ng-if="cloudSystemID">
+            <alert type="info">This system is linked to cloud account {{cloudAccountName}} </alert>
+            <button class="btn btn-default" ng-click="disconnectFromCloud()">Disconnect from Cloud</button>
+            <a class="btn btn-default" ng-href="{{Config.cloud.portalSystemUrl.replace('{systemId}',cloudSystemID)}}" target="_blank">Go to Cloud Portal</a>
+        </div>
+
+        <div class="col-md-offset-3 col-md-9" ng-if="!cloudSystemID">
+            <alert type="warning">This system is not linked to cloud <a ng-href="{{Config.cloud.portalUrl}}" target="_blank">Learn more about Nx Cloud</a></alert>
+            <button class="btn btn-default" ng-click="connectToCloud()">Connect to Cloud</button>
+            <a class="btn btn-default" ng-href="{{Config.cloud.portalRegisterUrl}}" target="_blank">Create Cloud Account</a>
+        </div>
+    </div>
     <div class="row" ng-hide="settings.ecDbReadOnly">
         <form class="form-horizontal" >
             <h2>System Settings</h2>
-
             <div class="form-group" >
                 <label for="port" class="col-md-3 control-label">System name</label>
 
@@ -28,7 +42,6 @@
     <div class="row" ng-hide="settings.ecDbReadOnly">
         <form novalidate name="settingsForm" class="form-horizontal" role="form" >
             <h2>Server Settings</h2>
-
             <div class="form-group" ng-class="{'has-error':!settingsForm.port.$valid}">
                 <label for="port" class="col-md-3 control-label">Port</label>
 
@@ -38,8 +51,6 @@
                            pattern ="^\d*$" required>
                 </div>
             </div>
-
-
             <div class="form-group">
                 <div class="col-md-9 col-md-offset-3">
                     <button type="button" class="btn btn-primary" ng-disabled="!settingsForm.$valid" ng-click="save()">Save</button>
@@ -48,7 +59,6 @@
                 </div>
             </div>
         </form>
-
         <hr />
     </div>
 
