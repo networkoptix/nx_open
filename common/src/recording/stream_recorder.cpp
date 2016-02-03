@@ -146,7 +146,7 @@ void QnStreamRecorder::close()
             av_write_trailer(m_recordingContextVector[i].formatCtx);
 
 
-        auto fileSize = 0;
+        qint64 fileSize = 0;
         if (m_recordingContextVector[i].formatCtx)
         {
             if (m_startDateTime != qint64(AV_NOPTS_VALUE))
