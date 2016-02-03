@@ -91,17 +91,17 @@ void Tunnel::changeState(State state, QnMutexLockerBase* lock)
         handler(state);
 }
 
-void Tunnel::pleaseStop(std::function<void()> handler)
-{
-    BarrierHandler barrier(std::move(handler));
-
-    QnMutexLocker lock(&m_mutex);
-    for (const auto& connector : m_connectors)
-        connector.second->pleaseStop(barrier.fork());
-
-    if (m_connection)
-        m_connection->pleaseStop(barrier.fork());
-}
+//void Tunnel::pleaseStop(std::function<void()> handler)
+//{
+//    BarrierHandler barrier(std::move(handler));
+//
+//    QnMutexLocker lock(&m_mutex);
+//    for (const auto& connector : m_connectors)
+//        connector.second->pleaseStop(barrier.fork());
+//
+//    if (m_connection)
+//        m_connection->pleaseStop(barrier.fork());
+//}
 
 } // namespace cloud
 } // namespace network

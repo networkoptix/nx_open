@@ -1,12 +1,13 @@
 #ifndef NX_CC_DNS_TABLE_H
 #define NX_CC_DNS_TABLE_H
 
-#include <utils/common/guard.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/network/dns_resolver.h>
+#include <utils/common/guard.h>
 
 #include "cdb_endpoint_fetcher.h"
 #include "mediator_connections.h"
+
 
 //!Types used in resolving peer names
 /*!

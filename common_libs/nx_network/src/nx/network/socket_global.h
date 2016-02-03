@@ -9,7 +9,7 @@
 #include "cloud/mediator_address_publisher.h"
 #include "cloud/mediator_connector.h"
 #include "cloud/tunnel/incoming_tunnel.h"
-#include "cloud/tunnel/outgoing_tunnel.h"
+#include "cloud/tunnel/outgoing_tunnel_pool.h"
 
 
 namespace nx {

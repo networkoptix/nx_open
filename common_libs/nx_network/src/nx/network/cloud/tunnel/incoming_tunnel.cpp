@@ -15,6 +15,11 @@ IncomingTunnel::IncomingTunnel(std::unique_ptr<AbstractTunnelConnection> connect
 {
 }
 
+void IncomingTunnel::pleaseStop(std::function<void()> completionHandler)
+{
+    //TODO #ak
+}
+
 void IncomingTunnel::accept(SocketHandler handler)
 {
     {
@@ -126,7 +131,7 @@ void IncomingTunnelPool::indicateFirstSocket(QnMutexLockerBase* lock)
             }
 
             auto request = std::move(*m_acceptRequest);
-            m_acceptRequest = nullptr;
+            m_acceptRequest = boost::none;
 
             auto socket = std::move(m_indicatingSocket);
             m_indicatingSocket = nullptr;

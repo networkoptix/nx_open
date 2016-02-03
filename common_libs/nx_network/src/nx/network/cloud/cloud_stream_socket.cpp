@@ -1,3 +1,8 @@
+/**********************************************************
+* Jan 27, 2016
+* akolesnikov
+***********************************************************/
+
 #include "cloud_stream_socket.h"
 
 #include <future>
@@ -353,15 +358,14 @@ bool CloudStreamSocket::startAsyncConnect(
                 return false;
 
             //establishing cloud connect
-            auto tunnel = SocketGlobals::outgoingTunnelPool().getTunnel(
-                dnsEntry.host.toString().toLatin1());
+            auto tunnel = SocketGlobals::outgoingTunnelPool().getTunnel(dnsEntry);
             assert(tunnel);
 
             unsigned int sendTimeoutMillis = 0;
             if (!getSendTimeout(&sendTimeoutMillis))
                 return false;
             auto sharedOperationGuard = m_asyncConnectGuard.sharedGuard();
-            tunnel->connect(
+            tunnel->establishNewConnection(
                 std::chrono::milliseconds(sendTimeoutMillis),
                 getSocketAttributes(),
                 [this, sharedOperationGuard](

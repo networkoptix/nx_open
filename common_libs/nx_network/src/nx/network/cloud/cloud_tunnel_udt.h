@@ -7,33 +7,6 @@ namespace nx {
 namespace network {
 namespace cloud {
 
-class UdtTunnelConnector
-        : public AbstractTunnelConnector
-{
-public:
-    UdtTunnelConnector(String targetId)
-    {
-        // TODO: save ids and run UdtTunnelConnection
-    }
-
-    uint32_t getPriority() override
-    {
-        return 0; // maximum priority
-    }
-
-    void connect(
-        std::function<void(std::unique_ptr<AbstractTunnelConnection>)> handler) override
-    {
-        // TODO: initiate UDP hole punching to resolve SocketAddress by peerId_
-        //       and create UdtTunnelConnection
-    }
-
-    void pleaseStop(std::function<void()> handler) override
-    {
-        // TODO: cancel all async operations
-    }
-};
-
 class UdtTunnelAcceptor
         : public AbstractTunnelAcceptor
 {
@@ -75,8 +48,8 @@ public:
         // TODO: create m_tunnelSocket and open randevous connection
     }
 
-    void connect(
-        std::chrono::milliseconds timeout,
+    void establishNewConnection(
+        boost::optional<std::chrono::milliseconds> timeout,
         SocketAttributes socketAttributes,
         SocketHandler handler) override
     {

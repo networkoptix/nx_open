@@ -32,14 +32,15 @@ public:
 
     const String& getRemotePeerId() const { return m_remotePeerId; }
 
-    typedef std::function<void(SystemError::ErrorCode,
+    typedef std::function<void(
+        SystemError::ErrorCode,
         std::unique_ptr<AbstractStreamSocket>,
-        bool /*stillValid*/)> SocketHandler;
+        bool /*tunnelStillValid*/)> SocketHandler;
 
     /** Creates new connection to peer or returns current with false in case if real
     *  tunneling is notsupported by used method */
-    virtual void connect(
-        std::chrono::milliseconds timeout,
+    virtual void establishNewConnection(
+        boost::optional<std::chrono::milliseconds> timeout,
         SocketAttributes socketAttributes,
         SocketHandler handler) = 0;
 
@@ -49,20 +50,6 @@ public:
 
 private:
     const String m_remotePeerId;
-};
-
-/** Creates outgoing specialized AbstractTunnelConnections */
-class AbstractTunnelConnector
-:
-    public QnStoppableAsync
-{
-public:
-    /** Helps to decide which method shall be used first */
-    virtual uint32_t getPriority() = 0;
-
-    /** Creates connected AbstractTunnelConnection */
-    virtual void connect(
-        std::function<void(std::unique_ptr<AbstractTunnelConnection>)> handler) = 0;
 };
 
 /** Creates incoming specialized AbstractTunnelConnections */
@@ -85,10 +72,6 @@ public:
     \note Implements logic of existing tunnel:\n
         - keep-alive messages
         - setting up (connecting and accepting) more connections via existing tunnel
-        - reconnecting (with help of \a CloudTunnelConnector or \a CloudTunnelAcceptor) in case of connection problems
-    \note can create connection without mediator if tunnel is:\n
-        - direct or backward tcp connection (no hole punching used)
-        - udt tunnel (no matter hole punching is used or not)
     \note Methods are thread-safe. I.e., different threads can use this tunnel to establish connection
 */
 class Tunnel
@@ -96,24 +79,31 @@ class Tunnel
     public QnStoppableAsync
 {
 public:
+    typedef std::function<void(SystemError::ErrorCode,
+        std::unique_ptr<AbstractStreamSocket>)> SocketHandler;
+
+    enum class State
+    {
+        kInit,
+        kConnecting,
+        kConnected,
+        kClosed
+    };
+    static QString stateToString(State state);
+
     Tunnel(String remotePeerId);
     Tunnel(std::unique_ptr<AbstractTunnelConnection> connection);
 
     const String& getRemotePeerId() const { return m_remotePeerId; }
 
-    enum class State { kInit, kConnecting, kConnected, kClosed };
-    static QString stateToString(State state);
-
-    /** Creates resposable \class AbstractTunnelConnector if not connected yet */
-    //void addConnectionTypes(std::vector<CloudConnectType> type);
-
-    /** Indicates tonnel state */
+    /** Indicates tunnel state.
+        \note It is allowed to free \a Tunnel in \a State::kClosed handler
+     */
     void setStateHandler(std::function<void(State)> handler);
 
-    typedef std::function<void(SystemError::ErrorCode,
-                               std::unique_ptr<AbstractStreamSocket>)> SocketHandler;
     /** Implementation of QnStoppableAsync::pleaseStop */
-    void pleaseStop(std::function<void()> handler) override;
+    //void pleaseStop(std::function<void()> handler) override;
+
 
     // TODO: replace with actual accept message
     static const QByteArray ACCEPT_INDICATION;
@@ -128,8 +118,6 @@ protected:
     State m_state;
     std::function<void(State)> m_stateHandler;
     std::unique_ptr<AbstractTunnelConnection> m_connection;
-    std::map<CloudConnectType, std::unique_ptr<AbstractTunnelConnector>> m_connectors;
-    std::multimap<Clock::time_point, SocketHandler> m_connectHandlers;
     const String m_remotePeerId;
 };
 

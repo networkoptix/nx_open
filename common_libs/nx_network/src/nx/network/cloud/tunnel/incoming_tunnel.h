@@ -18,6 +18,8 @@ class IncomingTunnel
 public:
     IncomingTunnel(std::unique_ptr<AbstractTunnelConnection> connection);
 
+    virtual void pleaseStop(std::function<void()> completionHandler) override;
+
     /** Accept new incoming connection on the tunnel */
     void accept(SocketHandler handler);
 };

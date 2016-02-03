@@ -1,5 +1,9 @@
-#ifndef NX_CC_CLOUD_STREAM_SOCKET_H
-#define NX_CC_CLOUD_STREAM_SOCKET_H
+/**********************************************************
+* Jan 27, 2016
+* akolesnikov
+***********************************************************/
+
+#pragma once
 
 #include <nx/utils/async_operation_guard.h>
 #include <utils/common/cpp14.h>
@@ -103,5 +107,3 @@ private:
 } // namespace cloud
 } // namespace network
 } // namespace nx
-
-#endif  //NX_CC_CLOUD_STREAM_SOCKET_H
