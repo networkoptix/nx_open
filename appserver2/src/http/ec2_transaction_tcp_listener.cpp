@@ -261,7 +261,7 @@ void QnTransactionTcpProcessor::run()
         sendResponse( nx_http::StatusCode::ok, QnTransactionTransport::TUNNEL_CONTENT_TYPE, contentEncoding );
 
         if (!QnTransactionMessageBus::instance()->moveConnectionToReadyForStreaming( connectionGuid ))
-            QnTransactionTransport::connectDone(connectionGuid); //< session killed. Cleanup Guid from a connected list manually
+            QnTransactionTransport::connectDone(remoteGuid); //< session killed. Cleanup Guid from a connected list manually
 
         d->socket.clear();
     }
