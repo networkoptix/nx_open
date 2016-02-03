@@ -15,11 +15,6 @@ IncomingTunnel::IncomingTunnel(std::unique_ptr<AbstractTunnelConnection> connect
 {
 }
 
-void IncomingTunnel::pleaseStop(std::function<void()> completionHandler)
-{
-    //TODO #ak
-}
-
 void IncomingTunnel::accept(SocketHandler handler)
 {
     {
@@ -59,6 +54,7 @@ void IncomingTunnelPool::acceptNewSocket(Tunnel::SocketHandler handler)
 {
     QnMutexLocker lock(&m_mutex);
     Q_ASSERT_X(!m_acceptRequest, Q_FUNC_INFO, "Multiple accepts are not supported");
+    NX_LOGX(lm("accept new socket"), cl_logDEBUG2);
 
     m_acceptRequest = std::move(handler);
     indicateFirstSocket(&lock);
@@ -87,12 +83,16 @@ void IncomingTunnelPool::pleaseStop(std::function<void()> handler)
 
 void IncomingTunnelPool::acceptTunnel(std::shared_ptr<IncomingTunnel> tunnel)
 {
+    NX_LOGX(lm("accept tunnel %1").arg(tunnel), cl_logDEBUG1);
     tunnel->accept([this, tunnel]
         (SystemError::ErrorCode code, std::unique_ptr<AbstractStreamSocket> socket)
     {
         if (code != SystemError::noError)
         {
             QnMutexLocker lock(&m_mutex);
+            NX_LOGX(lm("tunnel %1 is brocken: %2")
+                    .arg(tunnel).arg(SystemError::toString(code)), cl_logDEBUG1);
+
             m_pool.erase(tunnel);
             return;
         }
@@ -117,6 +117,7 @@ void IncomingTunnelPool::indicateFirstSocket(QnMutexLockerBase* lock)
     m_acceptedSockets.pop();
     lock->unlock();
 
+    NX_LOGX(lm("indicating socket %1").arg(m_indicatingSocket), cl_logDEBUG2);
     m_indicatingSocket->sendAsync(
         Tunnel::ACCEPT_INDICATION,
         [&](SystemError::ErrorCode code, size_t size)
@@ -125,18 +126,22 @@ void IncomingTunnelPool::indicateFirstSocket(QnMutexLockerBase* lock)
             if (code != SystemError::noError ||
                 size != Tunnel::ACCEPT_INDICATION.size())
             {
-                // TODO: #mux NX_LOG
+                NX_LOGX(lm("indication %1 failed: %2")
+                        .arg(m_indicatingSocket.get())
+                        .arg(SystemError::toString(code)), cl_logDEBUG2);
 
+                m_indicatingSocket = nullptr;
                 return indicateFirstSocket(&lock);
             }
 
-            auto request = std::move(*m_acceptRequest);
-            m_acceptRequest = boost::none;
+            auto request = std::move(m_acceptRequest);
+            m_acceptRequest = nullptr;
 
             auto socket = std::move(m_indicatingSocket);
             m_indicatingSocket = nullptr;
 
             lock.unlock();
+            NX_LOGX(lm("return indicatied socket %1").arg(socket), cl_logDEBUG2);
             request(SystemError::noError, std::move(socket));
         });
 }

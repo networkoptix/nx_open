@@ -96,17 +96,23 @@ int StreamSocketWrapper::recv(void* buffer, unsigned int bufferLen, int flags)
     Buffer recvBuffer;
     recvBuffer.reserve(static_cast<int>(bufferLen));
 
-    std::promise<size_t> result;
-    readSomeAsync(&recvBuffer, [this, &result](
+    std::promise<std::pair<SystemError::ErrorCode, size_t>> promise;
+    readSomeAsync(&recvBuffer, [this, &promise](
         SystemError::ErrorCode code, size_t size)
     {
         // need to post here to be sure IO thread is done with this socket
-        post([this, &result, size]() { result.set_value(size); });
+        post([this, &promise, code, size]()
+        {
+            promise.set_value(std::make_pair(code, size));
+        });
     });
 
-    size_t size = result.get_future().get();
-    std::memcpy(buffer, recvBuffer.data(), size);
-    return static_cast<int>(size);
+    const auto result = promise.get_future().get();
+    if (result.first != SystemError::noError)
+        return -1;
+
+    std::memcpy(buffer, recvBuffer.data(), result.second);
+    return static_cast<int>(result.second);
 }
 
 int StreamSocketWrapper::send(const void* buffer, unsigned int bufferLen)
@@ -115,15 +121,22 @@ int StreamSocketWrapper::send(const void* buffer, unsigned int bufferLen)
         return m_socket->send(buffer, bufferLen);
 
     Buffer sendBuffer(static_cast<const char*>(buffer), bufferLen);
-    std::promise<size_t> result;
-    sendAsync(sendBuffer, [this, &result](
+    std::promise<std::pair<SystemError::ErrorCode, size_t>> promise;
+    sendAsync(sendBuffer, [this, &promise](
         SystemError::ErrorCode code, size_t size)
     {
         // need to post here to be sure IO thread is done with this socket
-        post([this, &result, size]() { result.set_value(size); });
+        post([this, &promise, code, size]()
+        {
+            promise.set_value(std::make_pair(code, size));
+        });
     });
 
-    return static_cast<int>(result.get_future().get());
+    const auto result = promise.get_future().get();
+    if (result.first != SystemError::noError)
+        return -1;
+
+    return static_cast<int>(result.second);
 }
 
 SocketAddress StreamSocketWrapper::getForeignAddress() const

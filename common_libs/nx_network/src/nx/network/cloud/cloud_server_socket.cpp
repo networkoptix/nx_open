@@ -1,6 +1,7 @@
 #include "cloud_server_socket.h"
 
 #include <nx/network/socket_global.h>
+#include <nx/network/stream_socket_wrapper.h>
 
 #include "cloud_tunnel_udt.h"
 
@@ -69,6 +70,11 @@ bool CloudServerSocket::isClosed() const
 {
     Q_ASSERT_X(false, Q_FUNC_INFO, "Not implemented...");
     return false;
+}
+
+void CloudServerSocket::shutdown()
+{
+    Q_ASSERT_X(false, Q_FUNC_INFO, "Not implemented...");
 }
 
 CloudServerSocket_setSocketOption(setReuseAddrFlag, bool, reuseAddrFlag)
@@ -189,12 +195,23 @@ void CloudServerSocket::dispatch(std::function<void()> handler)
     m_ioThreadSocket->dispatch(std::move(handler));
 }
 
+aio::AbstractAioThread* CloudServerSocket::getAioThread()
+{
+    return m_ioThreadSocket->getAioThread();
+}
+
+void CloudServerSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
+{
+    m_ioThreadSocket->bindToAioThread(aioThread);
+}
+
 void CloudServerSocket::acceptAsync(
     std::function<void(SystemError::ErrorCode code,
                        AbstractStreamSocket*)> handler )
 {
     Q_ASSERT_X(!m_acceptHandler, Q_FUNC_INFO, "concurent accept call");
     m_acceptHandler = std::move(handler);
+    NX_LOGX(lm("accept async"), cl_logDEBUG2);
 
     // TODO: #mux setup timeout timer
 
@@ -205,15 +222,21 @@ void CloudServerSocket::acceptAsync(
         if (auto lock = sharedGuard->lock())
         {
             Q_ASSERT_X(!m_acceptedSocket, Q_FUNC_INFO, "concurently accepted socket");
+            NX_LOGX(lm("accepted socket %1").arg(socket), cl_logDEBUG2);
+
             m_lastError = code;
             m_acceptedSocket = std::move(socket);
             post([this]()
             {
                 if (const auto acceptHandler = std::move(m_acceptHandler))
                 {
-                    // TODO: #mux wrap m_acceptedSocket to allow further configuration
+                    auto socket = new StreamSocketWrapper(std::move(m_acceptedSocket));
+
                     m_acceptHandler = nullptr;
-                    acceptHandler(m_lastError, m_acceptedSocket.release());
+                    m_acceptedSocket = nullptr;
+
+                    NX_LOGX(lm("return socket %1").arg(socket), cl_logDEBUG2);
+                    acceptHandler(m_lastError, std::move(socket));
                 }
             });
         }
@@ -231,7 +254,7 @@ void CloudServerSocket::startAcceptor(
         Q_ASSERT(insert.second);
     }
 
-    acceptor->accept([this, acceptorPtr, sharedGuard](
+    acceptorPtr->accept([this, acceptorPtr, sharedGuard](
         std::unique_ptr<AbstractTunnelConnection> connection)
     {
         if (connection)

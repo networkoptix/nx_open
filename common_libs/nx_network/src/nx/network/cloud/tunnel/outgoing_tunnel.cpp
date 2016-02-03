@@ -21,7 +21,8 @@ OutgoingTunnel::OutgoingTunnel(AddressEntry targetPeerAddress)
 
 void OutgoingTunnel::pleaseStop(std::function<void()> handler)
 {
-    //TODO #ak
+    //TODO #ak real implementation
+    Tunnel::pleaseStop(std::move(handler));
 }
 
 void OutgoingTunnel::establishNewConnection(

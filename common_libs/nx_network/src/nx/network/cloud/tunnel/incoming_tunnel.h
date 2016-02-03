@@ -18,8 +18,6 @@ class IncomingTunnel
 public:
     IncomingTunnel(std::unique_ptr<AbstractTunnelConnection> connection);
 
-    virtual void pleaseStop(std::function<void()> completionHandler) override;
-
     /** Accept new incoming connection on the tunnel */
     void accept(SocketHandler handler);
 };
@@ -45,7 +43,7 @@ private:
 
     QnMutex m_mutex;
     std::set<std::shared_ptr<IncomingTunnel>> m_pool;
-    boost::optional<Tunnel::SocketHandler> m_acceptRequest;
+    Tunnel::SocketHandler m_acceptRequest;
     std::queue<std::unique_ptr<AbstractStreamSocket>> m_acceptedSockets;
     std::unique_ptr<AbstractStreamSocket> m_indicatingSocket;
 };

@@ -15,7 +15,6 @@
 
 namespace nx {
 namespace network {
-namespace test {
 
 namespace /* anonimous */ {
 
@@ -302,7 +301,7 @@ void socketSimpleAcceptMixed(
 
     auto client = clientMaker();
     ASSERT_TRUE(client->setNonBlockingMode(true));
-    client->connectAsync(kServerAddress, [&](SystemError::ErrorCode code){});
+    client->connectAsync(kServerAddress, [&](SystemError::ErrorCode /*code*/){});
 
     // let the client get in the server listen queue
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -390,8 +389,8 @@ void socketAcceptTimeoutAsync(
 
     nx::SyncQueue< SystemError::ErrorCode > serverResults;
     const auto start = std::chrono::system_clock::now();
-    server->acceptAsync([&](SystemError::ErrorCode code,
-                            AbstractStreamSocket* socket)
+    server->acceptAsync([&](SystemError::ErrorCode /*code*/,
+                            AbstractStreamSocket* /*socket*/)
     {
         serverResults.push(SystemError::timedOut);
     });
@@ -401,18 +400,23 @@ void socketAcceptTimeoutAsync(
     pleaseStopSync(std::move(server));
 }
 
-#define NX_SIMPLE_SOCKET_TESTS(test, mkServer, mkClient)                            \
-    TEST(test, SimpleSync)          { socketSimpleSync(mkServer, mkClient); }       \
-    TEST(test, SimpleAsync)         { socketSimpleAsync(mkServer, mkClient); }      \
-    TEST(test, SimpleTrueAsync)     { socketSimpleTrueAsync(mkServer, mkClient); }  \
-    TEST(test, SingleAioThread)     { socketSingleAioThread(mkClient); }            \
-    TEST(test, SimpleAcceptMixed)   { socketSimpleAcceptMixed(mkServer, mkClient); }\
-    TEST(test, AcceptTimeoutSync)   { socketAcceptTimeoutSync(mkServer); }          \
-    TEST(test, AcceptTimeoutAsync)  { socketAcceptTimeoutAsync(mkServer); }         \
+#define NX_SIMPLE_SOCKET_TESTS_BASE(type, test, mkServer, mkClient)                 \
+    type(test, SimpleSync)          { socketSimpleSync(mkServer, mkClient); }       \
+    type(test, SimpleAsync)         { socketSimpleAsync(mkServer, mkClient); }      \
+    type(test, SimpleTrueAsync)     { socketSimpleTrueAsync(mkServer, mkClient); }  \
+    type(test, SingleAioThread)     { socketSingleAioThread(mkClient); }            \
+    type(test, SimpleAcceptMixed)   { socketSimpleAcceptMixed(mkServer, mkClient); }\
+    type(test, AcceptTimeoutSync)   { socketAcceptTimeoutSync(mkServer); }          \
+    type(test, AcceptTimeoutAsync)  { socketAcceptTimeoutAsync(mkServer); }         \
 
+#define NX_SIMPLE_SOCKET_TESTS(test, mkServer, mkClient) \
+    NX_SIMPLE_SOCKET_TESTS_BASE(TEST, test, mkServer, mkClient)
 
-}   //test
+#define NX_SIMPLE_SOCKET_TESTS_F(test, mkServer, mkClient) \
+    NX_SIMPLE_SOCKET_TESTS_BASE(TEST_F, test, mkServer, mkClient)
+
 }   //network
 }   //nx
+
 
 #endif  //SIMPLE_SOCKET_TEST_HELPER_H

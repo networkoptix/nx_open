@@ -29,6 +29,7 @@ public:
     SocketAddress getLocalAddress() const override;
     void close() override;
     bool isClosed() const override;
+    void shutdown() override;
     bool setReuseAddrFlag(bool reuseAddr) override;
     bool getReuseAddrFlag(bool* val) const override;
     bool setNonBlockingMode(bool val) override;
@@ -55,6 +56,8 @@ public:
     //!Implementation of AbstractSocket::*
     void post(std::function<void()> handler) override;
     void dispatch(std::function<void()> handler) override;
+    aio::AbstractAioThread* getAioThread() override;
+    void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
     //!Implementation of AbstractStreamServerSocket::acceptAsync
     void acceptAsync(
@@ -66,7 +69,6 @@ protected:
         std::unique_ptr<AbstractTunnelAcceptor> connector,
         std::shared_ptr<utils::AsyncOperationGuard::SharedGuard> sharedGuard);
 
-private:
     const std::shared_ptr<hpm::api::MediatorServerTcpConnection> m_mediatorConnection;
     IncomingTunnelPool* const m_tunnelPool;
 

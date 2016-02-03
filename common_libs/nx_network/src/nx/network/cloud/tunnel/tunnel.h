@@ -35,7 +35,7 @@ public:
     typedef std::function<void(
         SystemError::ErrorCode,
         std::unique_ptr<AbstractStreamSocket>,
-        bool /*tunnelStillValid*/)> SocketHandler;
+        bool /*stillValid*/)> SocketHandler;
 
     /** Creates new connection to peer or returns current with false in case if real
     *  tunneling is notsupported by used method */
@@ -102,8 +102,7 @@ public:
     void setStateHandler(std::function<void(State)> handler);
 
     /** Implementation of QnStoppableAsync::pleaseStop */
-    //void pleaseStop(std::function<void()> handler) override;
-
+    void pleaseStop(std::function<void()> handler) override;
 
     // TODO: replace with actual accept message
     static const QByteArray ACCEPT_INDICATION;
