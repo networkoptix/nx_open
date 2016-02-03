@@ -2,6 +2,7 @@
 #pragma once
 
 #include <core/resource/resource_fwd.h>
+#include <core/resource/camera_bookmark.h>
 
 class QnSearchBookmarksModel : public QAbstractItemModel
 {
@@ -10,7 +11,7 @@ class QnSearchBookmarksModel : public QAbstractItemModel
 public:
     enum Column
     {
-        kName
+          kName
         , kStartTime
         , kLength
         , kTags
@@ -20,8 +21,11 @@ public:
 
 public:
     QnSearchBookmarksModel(QObject *parent = nullptr);
-
     virtual ~QnSearchBookmarksModel();
+
+
+    static QnBookmarkSortOrder defaultSortOrder();
+    static int sortFieldToColumn(Qn::BookmarkSortField field);
 
     void applyFilter();
 
