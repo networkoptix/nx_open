@@ -182,11 +182,20 @@ angular.module('webadminApp')
         mediaserver.getSystemSettings().then(function(data){
 
             var allSettings = data.data;
-            var cloudId = _.find(allSettings, function(setting){ return setting.name == 'cloudSystemID'; });
-            $scope.cloudSystemID = cloudId?cloudId.value:null;
+            var cloudId = _.find(allSettings, function (setting) {
+                return setting.name == 'cloudSystemID';
+            });
+            $scope.cloudSystemID = cloudId ? cloudId.value : '';
 
-            var cloudAccount = _.find(allSettings, function(setting){ return setting.name == 'cloudAccountName'; });
-            $scope.cloudAccountName = cloudAccount?cloudAccount.value:null;
+            if ($scope.cloudSystemID.trim() == '') {
+                $scope.cloudSystemID = null;
+            }
+
+            var cloudAccount = _.find(allSettings, function (setting) {
+                return setting.name == 'cloudAccountName';
+            });
+            $scope.cloudAccountName = cloudAccount ? cloudAccount.value : null;
+
         });
 
 
