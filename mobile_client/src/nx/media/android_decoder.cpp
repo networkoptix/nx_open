@@ -13,6 +13,7 @@
 #include <QtGui/QOffscreenSurface>
 #include <QtGui/qopengl.h>
 #include <QCache>
+#include <QMap>
 
 #if defined(Q_OS_ANDROID)
 
@@ -38,6 +39,25 @@ namespace {
         1.f, 1.f,
         0.f, 1.f
     };
+
+    QString codecToString(CodecID codecId)
+    {
+        switch(codecId)
+        {
+            case CODEC_ID_H264:
+                return lit("video/avc");
+            case CODEC_ID_H263:
+                return lit("video/3gpp");
+            case CODEC_ID_MPEG4:
+                return lit("video/mp4v-es");
+            case CODEC_ID_MPEG2VIDEO:
+                return lit("video/mpeg2");
+            case CODEC_ID_VP8:
+                return lit("video/x-vnd.on2.vp8");
+            default:
+                return QString();
+        }
+    }
 }
 
 // --------------------------------------------------------------------------------------------------
@@ -331,18 +351,27 @@ void AndroidDecoder::setAllocator(AbstractResourceAllocator* allocator)
 
 bool AndroidDecoder::isCompatible(const QnConstCompressedVideoDataPtr& frame)
 {
-    return frame->compressionType == CODEC_ID_H264;
-}
+    static QMap<CodecID, QSize> maxDecoderSize;
+    static QMutex mutex;
 
-QString codecToString(CodecID codecId)
-{
-    switch(codecId)
+    QMutexLocker lock(&mutex);
+
+    const QString codecMimeType = codecToString(frame->compressionType);
+    if (codecMimeType.isEmpty())
+        return false;
+
+    if (!maxDecoderSize.contains(frame->compressionType))
     {
-        case CODEC_ID_H264:
-            return lit("video/avc");
-        default:
-            return QString();
+        QAndroidJniObject jCodecName = QAndroidJniObject::fromString(codecMimeType);
+        QAndroidJniObject javaDecoder("com/networkoptix/nxwitness/media/QnMediaDecoder");
+        jint maxWidth = javaDecoder.callMethod<jint>("maxDecoderWidth", "(Ljava/lang/String;)I", jCodecName.object<jstring>());
+        jint maxHeight = javaDecoder.callMethod<jint>("maxDecoderHeight", "(Ljava/lang/String;)I", jCodecName.object<jstring>());
+        QSize size(maxWidth, maxHeight);
+        maxDecoderSize[frame->compressionType] = size;
+        qDebug() << "Maximum hardware decoder resolution:" << size << "for codec" << codecMimeType;
     }
+    const QSize maxSize = maxDecoderSize[frame->compressionType];
+    return frame->width <= maxSize.width() && frame->height <= maxSize.height();
 }
 
 int AndroidDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QnVideoFramePtr* result)

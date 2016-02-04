@@ -18,6 +18,10 @@ import android.view.Surface;
 import java.nio.ByteBuffer;
 import org.qtproject.qt5.android.QtNative;
 import android.graphics.SurfaceTexture;
+import android.media.MediaCodecInfo;
+import android.media.MediaCodecInfo.CodecCapabilities;
+import android.media.MediaCodecInfo.VideoCapabilities;
+import android.media.MediaCodecList;
 
 public class QnMediaDecoder {
 
@@ -64,6 +68,67 @@ public class QnMediaDecoder {
             return false;
         }
     }
+
+    private static MediaCodecInfo selectCodec(String mimeType)
+    {
+         int numCodecs = MediaCodecList.getCodecCount();
+         for (int i = 0; i < numCodecs; i++) {
+             MediaCodecInfo codecInfo = MediaCodecList.getCodecInfoAt(i);
+
+             if (codecInfo.isEncoder()) {
+                 continue;
+             }
+
+             String[] types = codecInfo.getSupportedTypes();
+             for (int j = 0; j < types.length; j++) {
+                 if (types[j].equalsIgnoreCase(mimeType)) {
+                     return codecInfo;
+                 }
+             }
+         }
+         return null;
+    }
+
+    /** It requires API level 21 */
+    public int maxDecoderWidth(String mimeType)
+    {
+        int currentapiVersion = android.os.Build.VERSION.SDK_INT;
+        if (currentapiVersion < android.os.Build.VERSION_CODES.LOLLIPOP)
+            return 1920;
+
+        try
+        {
+            MediaCodecInfo codecInfo = selectCodec(mimeType);
+            CodecCapabilities caps = codecInfo.getCapabilitiesForType(mimeType);
+            VideoCapabilities vcaps = caps.getVideoCapabilities();
+            return vcaps.getSupportedWidths().getUpper();
+        }
+        catch(Exception e)
+        {
+            return -1;
+        }
+    }
+
+    /** It requires API level 21 */
+    public int maxDecoderHeight(String mimeType)
+    {
+        int currentapiVersion = android.os.Build.VERSION.SDK_INT;
+        if (currentapiVersion < android.os.Build.VERSION_CODES.LOLLIPOP)
+            return 1080;
+
+        try
+        {
+            MediaCodecInfo codecInfo = selectCodec(mimeType);
+            CodecCapabilities caps = codecInfo.getCapabilitiesForType(mimeType);
+            VideoCapabilities vcaps = caps.getVideoCapabilities();
+            return vcaps.getSupportedHeights().getUpper();
+        }
+        catch(Exception e)
+        {
+            return -1;
+        }
+    }
+
 
     public long decodeFrame(long srcDataPtr, int frameSize, long frameNum)
     {
