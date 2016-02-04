@@ -15,6 +15,7 @@
 
 namespace nx {
 namespace network {
+namespace test {
 
 namespace /* anonimous */ {
 
@@ -415,8 +416,8 @@ void socketAcceptTimeoutAsync(
 #define NX_SIMPLE_SOCKET_TESTS_F(test, mkServer, mkClient) \
     NX_SIMPLE_SOCKET_TESTS_BASE(TEST_F, test, mkServer, mkClient)
 
+}   //test
 }   //network
 }   //nx
-
 
 #endif  //SIMPLE_SOCKET_TEST_HELPER_H

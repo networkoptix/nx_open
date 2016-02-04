@@ -19,7 +19,33 @@ namespace nx {
 namespace network {
 namespace cloud {
 
-TEST(CloudStreamSocket, simple)
+class CloudStreamSocketTest
+:
+    public ::testing::Test
+{
+public:
+    ~CloudStreamSocketTest()
+    {
+        if (m_oldCreateStreamSocketFunc)
+            SocketFactory::setCreateStreamSocketFunc(
+                std::move(*m_oldCreateStreamSocketFunc));
+    }
+
+    void setCreateStreamSocketFunc(
+        SocketFactory::CreateStreamSocketFuncType newFactoryFunc)
+    {
+        auto oldFunc = 
+            SocketFactory::setCreateStreamSocketFunc(std::move(newFactoryFunc));
+        if (!m_oldCreateStreamSocketFunc)
+            m_oldCreateStreamSocketFunc = std::move(oldFunc);
+    }
+
+private:
+    boost::optional<SocketFactory::CreateStreamSocketFuncType> 
+        m_oldCreateStreamSocketFunc;
+};
+
+TEST_F(CloudStreamSocketTest, simple)
 {
     const char* tempHostName = "bla.bla";
     const size_t bytesToSendThroughConnection = 128*1024;
@@ -52,14 +78,14 @@ TEST(CloudStreamSocket, simple)
         serverAddress);
 }
 
-TEST(CloudStreamSocket, multiple_connections_random_data)
+TEST_F(CloudStreamSocketTest, multiple_connections_random_data)
 {
     const char* tempHostName = "bla.bla";
     const size_t bytesToSendThroughConnection = 128 * 1024;
     const size_t maxSimultaneousConnections = 1000;
     const std::chrono::seconds testDuration(3);
 
-    SocketFactory::setCreateStreamSocketFunc(
+    setCreateStreamSocketFunc(
         []( bool /*sslRequired*/,
             SocketFactory::NatTraversalType /*natTraversalRequired*/) ->
                 std::unique_ptr< AbstractStreamSocket >
@@ -97,7 +123,7 @@ TEST(CloudStreamSocket, multiple_connections_random_data)
         serverAddress);
 }
 
-TEST(CloudStreamSocket, simple_socket_test)
+TEST_F(CloudStreamSocketTest, simple_socket_test)
 {
     const char* tempHostName = "bla.bla";
     SocketAddress serverAddress(HostAddress::localhost, 20000 + (rand()%32000));
@@ -140,7 +166,7 @@ TEST(CloudStreamSocket, simple_socket_test)
         serverAddress);
 }
 
-TEST(CloudStreamSocket, cancellation)
+TEST_F(CloudStreamSocketTest, cancellation)
 {
     const char* tempHostName = "bla.bla";
     const size_t bytesToSendThroughConnection = 128 * 1024;
