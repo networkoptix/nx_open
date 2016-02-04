@@ -30,6 +30,8 @@
 #include <ui/style/resource_icon_cache.h>
 #include <ui/widgets/storage_space_slider.h>
 #include <ui/workaround/widgets_signals_workaround.h>
+#include <ui/help/help_topics.h>
+#include <ui/help/help_topic_accessor.h>
 
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/event_processors.h>
@@ -138,6 +140,10 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent)
 
     setWarningStyle(ui->backupStoragesAbsentLabel);
     ui->backupStoragesAbsentLabel->hide();
+
+    setHelpTopic(this, Qn::ServerSettings_Storages_Help);
+    setHelpTopic(ui->backupStoragesGroupBox, Qn::ServerSettings_StoragesBackup_Help);
+    setHelpTopic(ui->backupControls, Qn::ServerSettings_StoragesBackup_Help);
 
     setupGrid(ui->mainStoragesTable, true);
     setupGrid(ui->backupStoragesTable, false);

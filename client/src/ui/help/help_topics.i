@@ -102,6 +102,7 @@ QN_HELP_TOPIC(Administration_TimeSynchronization_Help,          "configuring_tim
 QN_HELP_TOPIC(ServerSettings_General_Help,                      "configuring_media_servers_additional_settings_(ad.htm")
 QN_HELP_TOPIC(ServerSettings_Panic_Help,                        "panic_recording.htm")
 QN_HELP_TOPIC(ServerSettings_Storages_Help,                     "configuring_media_server_storages_(admin_only).htm")
+QN_HELP_TOPIC(ServerSettings_StoragesBackup_Help,               "configuring_redundant_storage_.htm")
 QN_HELP_TOPIC(ServerSettings_ArchiveRestoring_Help,             "restoring_broken_archive.htm")
 QN_HELP_TOPIC(ServerSettings_WebClient_Help,                    "using_media_servers_web_interf.htm")
 QN_HELP_TOPIC(ServerSettings_Failover_Help,                     "configuring_failover.htm")
@@ -149,6 +150,10 @@ QN_HELP_TOPIC(EventsActions_PlaySound_Help,                     "play_sound.htm"
 QN_HELP_TOPIC(EventsActions_PlaySoundRepeated_Help,             "repeat_sound.htm")
 QN_HELP_TOPIC(EventsActions_Speech_Help,                        "say_text.htm")
 QN_HELP_TOPIC(EventsActions_Diagnostics_Help,                   "write_to_log.htm")
+QN_HELP_TOPIC(EventsActions_ShowOnAlarmLayout_Help,             "showing_cameras_on_alarm_layou.htm")
+QN_HELP_TOPIC(EventsActions_Bookmark_Help,                      "create_bookmark.htm")
+QN_HELP_TOPIC(EventsActions_ExecutePtzPreset_Help,              "execute_ptz_preset.htm")
+QN_HELP_TOPIC(EventsActions_ShowTextOverlay_Help,               "display_text_on_cameras.htm")
 
 QN_HELP_TOPIC(EventsActions_EcConnectionLost_Help,				"ec_connection_lost.htm")
 QN_HELP_TOPIC(EventsActions_NoLicenses_Help,					"licenses_are_not_configured.htm")
@@ -168,6 +173,8 @@ QN_HELP_TOPIC(EventsActions_MediaServerFailure_Help,			"media_server_failure.htm
 QN_HELP_TOPIC(EventsActions_MediaServerConflict_Help,			"media_servers_conflict.htm")
 QN_HELP_TOPIC(EventsActions_MediaServerStarted_Help,			"media_server_started.htm")
 QN_HELP_TOPIC(EventsActions_LicenseIssue_Help,			        "license_issue.htm")
+QN_HELP_TOPIC(EventsActions_BackupFinished_Help,                "archive_backup_finished.htm")
+QN_HELP_TOPIC(EventsActions_Generic_Help,                       "generic_event.htm")
 
 QN_HELP_TOPIC(LayoutSettings_Locking_Help,						"locking_layouts.htm")
 QN_HELP_TOPIC(LayoutSettings_Look_Help,                         "adjusting_the_layout_look_and_feel.htm")
@@ -176,6 +183,10 @@ QN_HELP_TOPIC(LayoutSettings_EMapping_Help,						"e-mapping.htm")
 QN_HELP_TOPIC(PtzPresets_Help,                                  "saving_and_restoring_ptz_posit.htm")
 QN_HELP_TOPIC(PtzManagement_Tour_Help,                          "setting_up_ptz_tours.htm")
 QN_HELP_TOPIC(PtzManagement_HomePosition_Help,                  "home_positions_and_tours_for_p.htm")
+
+QN_HELP_TOPIC(Bookmarks_Editing_Help,                           "creating_and_setting_up_bookma.htm")
+QN_HELP_TOPIC(Bookmarks_Search_Help,                            "search_using_bookmarks.htm")
+QN_HELP_TOPIC(Bookmarks_Usage_Help,                             "using_bookmarks.htm")
 
 QN_HELP_TOPIC(EventLog_Help,									"viewing_events_log.htm")
 
