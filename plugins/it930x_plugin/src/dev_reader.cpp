@@ -5,6 +5,8 @@
 #include "dev_reader.h"
 #include "dev_read_thread.h"
 
+extern Logger logger;
+
 namespace ite
 {
     // DeviceBuffer
@@ -63,7 +65,10 @@ namespace ite
         if (ret < 0)
             return ret;
         if (ret == 0)
+        {
+            ITE_LOG() << FMT("[reader] readDevice() returned 0");
             return hasRead;
+        }
 
         return hasRead + read(buf, bufSize);
     }
@@ -74,13 +79,16 @@ namespace ite
 
         if (! m_device || ! m_device->hasStream())
         {
+            ITE_LOG() << FMT("[reader] readDevice() - no stream");
             clear();
             return -1;
         }
 
         m_buf.resize(m_size);
         int ret = m_device->read( &(*m_buf.begin()), m_buf.size() );
-        if (ret < 0) {
+        if (ret < 0)
+        {
+            ITE_LOG() << FMT("[reader] readDevice() m_device->read() returned %d", ret);
             m_buf.clear();
             m_pos = 0;
             return ret;
@@ -308,7 +316,7 @@ namespace ite
         }
         catch (std::system_error& )
         {
-            debug_printf("[reader] Failed to create reader thread\n");
+            ITE_LOG() << FMT("[reader] Failed to create reader thread");
         }
     }
 
@@ -326,9 +334,9 @@ namespace ite
                 if (m_threadObject)
                     m_threadObject->stop();
 
-                debug_printf("[reader] Wait for reader thread stopped\n");
+                ITE_LOG() << FMT("[reader] Wait for reader thread stopped");
                 m_readThread.join();
-                debug_printf("[reader] Reader thread stopped\n");
+                ITE_LOG() << FMT("[reader] Reader thread stopped");
 
                 m_hasThread = false;
             }
@@ -351,8 +359,6 @@ namespace ite
         {
             debug_printf("[reader] Wait for reader thread stopped\n");
             m_readThread.join();
-            debug_printf("[reader] Reader thread stopped\n");
-
             m_hasThread = false;
         }
     }
@@ -361,7 +367,10 @@ namespace ite
     {
         TsBuffer ts = m_demux.tsFromPool();
         if (! m_buf.readTSPacket(ts))
+        {
+            ITE_LOG() << FMT("[reader] readTSPacket failed");
             return false;
+        }
 
         MpegTsPacket pkt = ts.packet();
         if (pkt.syncOK())

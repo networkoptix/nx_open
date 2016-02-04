@@ -35,7 +35,7 @@ namespace ite
             NOT_A_CHANNEL = 16 // TxDevice::CHANNELS_NUM
         };
 
-        static constexpr unsigned MIN_STRENGTH() { return 90; }
+        static constexpr unsigned MIN_STRENGTH() { return 70; }
         static constexpr unsigned MIN_QUALITY() { return 60; }
 
         static constexpr unsigned RC_DELAY_MS() { return 250; }
@@ -72,6 +72,7 @@ namespace ite
         //
 
         RxDevice(unsigned id);
+        ~RxDevice();
 
         unsigned short rxID() const { return m_rxID; }
 
@@ -150,6 +151,11 @@ namespace ite
         }
         bool isLocked() const;
 
+        void pleaseStop()
+        {
+            m_needStop = true;
+        }
+
     private:
         std::atomic_bool 	m_deviceReady;
         // </refactor>
@@ -159,6 +165,8 @@ namespace ite
         mutable std::mutex m_mutex;
         mutable std::mutex m_cvMutex;
         std::condition_variable m_cvConfig;
+        std::atomic<bool> m_needStop;
+        std::thread m_watchDogThread;
         bool m_configuring;
 
         std::unique_ptr<It930x> m_it930x;
@@ -180,6 +188,7 @@ namespace ite
         bool wantedByCamera() const;
         void resetFrozen();
         bool open();
+        void close();
         bool lockAndStart(int chan, int txId);
 
         bool sendRC(RcCommand * cmd);

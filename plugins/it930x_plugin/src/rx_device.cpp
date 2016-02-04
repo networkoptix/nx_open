@@ -8,12 +8,13 @@
 #include "camera_manager.h"
 #include "discovery_manager.h"
 
+Logger logger;
+
 namespace ite
 {
+//	std::mutex It930x::m_rcMutex;
     RxSyncManager rxSyncManager;
     RxHintManager rxHintManager;
-
-    std::mutex It930x::m_rcMutex;
 
     unsigned str2num(std::string& s)
     {
@@ -32,9 +33,20 @@ namespace ite
     }
 
     //
+    RxDevice::~RxDevice()
+    {
+        ITE_LOG() << FMT("Stopping Rx %d", m_rxID);
+        pleaseStop();
+        if (m_watchDogThread.joinable()) {
+            m_watchDogThread.join();
+        }
+        close();
+        ITE_LOG() << FMT("Stopping Rx %d Done", m_rxID);
+    }
 
     RxDevice::RxDevice(unsigned id)
       : m_deviceReady(false),
+        m_needStop(false),
         m_configuring(false),
         m_devReader(new DevReader),
         m_rxID(id),
@@ -44,7 +56,6 @@ namespace ite
         m_signalPresent(false),
         m_cam(nullptr)
     {
-        resetFrozen();
     }
 
     // <refactor>
@@ -62,10 +73,11 @@ namespace ite
             m_cam->rxDeviceRef().reset();
             m_cam = nullptr;
         }
-        stopReader();
-        m_txDev.reset();
-        open();
-        fprintf(stderr, "[shutdown] reopen %d done!\n", m_rxID);
+//        stopReader();
+//        m_txDev.reset();
+//        open();
+        m_it930x->unlockFrequency();
+        ITE_LOG() << FMT("Rx %d shutdown done", m_rxID);
         m_deviceReady = false;
     }
 
@@ -73,21 +85,25 @@ namespace ite
     {
         // starting watchdog thread
         static const int WATCHDOG_GOOD_TIMEOUT = 3000;      // ms
-        static const int WATCHDOG_BAD_TIMEOUT = 60 * 1000;  // ms
+        static const int WATCHDOG_BAD_TIMEOUT = 3 * 1000;  // ms
 
-        debug_printf("[Rx watchdog] Rx %d, starting watch dog.\n", m_rxID);
-        std::thread(
+        if(open())
+            ITE_LOG() << FMT("Open rx %d successfull", m_rxID);
+        else
+            ITE_LOG() << FMT("Open rx %d failed", m_rxID);
+
+        m_watchDogThread = std::thread(
             [this]
             {
                 int timeout = WATCHDOG_GOOD_TIMEOUT;
                 while (true)
                 {
+                    if (m_needStop)
+                        return;
+
                     stats();
-                    debug_printf("[Rx watchdog] Rx %d getting stats DONE; stats: %d; m_deviceReady: %d\n",
-                        m_rxID,
-                        (int)good(),
-                        (int)m_deviceReady.load()
-                    );
+//                    ITE_LOG() << FMT("[Rx watchdog] Rx %d getting stats DONE; stats: %d; m_deviceReady: %d",
+//                                     m_rxID, (int)good(), (int)m_deviceReady.load());
 
                     if (!good() || !m_deviceReady)
                     {
@@ -185,86 +201,82 @@ namespace ite
                         }
                     }
 
-                    std::this_thread::sleep_for(
-                        std::chrono::milliseconds(timeout)
-                    );
+                    std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
                 }
             }
-        ).detach();
+        );
     }
 
 
-    bool RxDevice::testChannel(
-        int chan,
-        int &bestChan,
-        int &bestStrength,
-        int &txID
-    )
+    bool RxDevice::testChannel(int chan, int &bestChan, int &bestStrength, int &txID)
     {
         // We need to read from channel for some time
         static const int SEARCH_READ_TIME = 4000; // ms
 
-        debug_printf(stderr, "[search] Rx: %d; trying channel %d ...\n", m_rxID, chan);
-
         m_it930x->unlockFrequency();
         if (m_it930x->lockFrequency(TxDevice::freq4chan(chan)))
         {
+            ITE_LOG() << FMT("[search] Rx: %d; lock channel %d succeded getting stats", m_rxID, chan);
             stats();
+
             if (good())
             {
-                debug_printf(
-                    "[search] Rx: %d; Trying to read something from channel %d\n",
-                    m_rxID,
-                    chan
-                );
+                ITE_LOG() << FMT("[search] Rx: %d; get stats %d succeded, starting reading", m_rxID, chan);
 
+                m_devReader.reset(new DevReader);
                 m_devReader->subscribe(It930x::PID_RETURN_CHANNEL);
                 m_devReader->start(m_it930x.get(), SEARCH_READ_TIME);
+
+                ITE_LOG() << FMT("[search] Rx: %d; channel %d waiting for the reader", m_rxID, chan);
+
                 m_devReader->wait();
+                ITE_LOG() << FMT("[search] Rx: %d; channel %d wait for read is over", m_rxID, chan);
 
                 bool first = true;
                 for (;;)
                 {
+                    if (m_needStop)
+                        return false;
+
+                    ITE_LOG() << FMT("[search] Rx: %d, channel: %d, reading RC channel", m_rxID, chan);
+
                     RcPacketBuffer pktBuf;
                     if (! m_devReader->getRcPacket(pktBuf))
                     {
-                        debug_printf("[search] Rx %d. NO RC packet\n", m_rxID);
+                        ITE_LOG() << FMT("[search] Rx %d. NO RC packet", m_rxID);
                         break;
                     }
 
                     if (pktBuf.pid() != It930x::PID_RETURN_CHANNEL)
                     {
-                        debug_printf("[RC] packet error: wrong PID\n");
-                        continue;
+                        ITE_LOG() << FMT("[RC] packet error: wrong PID");
+                        break;
                     }
 
                     if (pktBuf.checkbit())
                     {
-                        debug_printf("[RC] packet error: TS error bit\n");
-                        continue;
+                        ITE_LOG() << FMT("[RC] packet error: TS error bit");
+                        break;
                     }
 
                     RcPacket pkt = pktBuf.packet();
                     if (! pkt.isOK())
                     {
                         pkt.print();
-                        continue;
+                        break;
                     }
 
                     if (pkt.txID() == 0 || pkt.txID() == 0xffff)
                     {
-                        debug_printf("[RC] wrong txID: %d\n", pkt.txID());
-                        continue;
+                        ITE_LOG() << FMT("[RC] wrong txID: %d\n", pkt.txID());
+                        break;
                     }
 
                     if (first)
                     {
                         first = false;
-                        debug_printf(
-                            "[search] Rx %d; Found camera %d\n",
-                            m_rxID,
-                            pkt.txID()
-                        );
+                        debug_printf("[search] Rx %d; Found camera %d\n", m_rxID, pkt.txID());
+
                         if (strength() > bestStrength)
                         {
                             bestChan = chan;
@@ -273,11 +285,12 @@ namespace ite
                             txID = pkt.txID();
                         }
                         m_devReader->unsubscribe(It930x::PID_RETURN_CHANNEL);
+                        m_it930x->unlockFrequency();
                         return true;
                     }
                     std::this_thread::sleep_for(std::chrono::milliseconds(100));
                 }
-                debug_printf("[search] No Tx for this Rx\n");
+                ITE_LOG() << FMT("[search] No Tx for this Rx\n");
                 m_devReader->unsubscribe(It930x::PID_RETURN_CHANNEL);
             }
         }
@@ -287,6 +300,7 @@ namespace ite
 
     bool RxDevice::lockAndStart(int chan, int txId)
     {
+        m_it930x->lockFrequency(TxDevice::freq4chan(chan));
         m_txDev.reset(new TxDevice(txId, TxDevice::freq4chan(chan)));
         printf("[search] Rx %d; Found camera %d FINAL\n", m_rxID, txId);
         for (int i = 0; i < 2; ++i) {
@@ -308,6 +322,9 @@ namespace ite
 
         for (const auto &hint: hints)
         {
+            if (m_needStop)
+                return false;
+
             if (rxHintManager.useHint(m_rxID, hint.txId, hint.chan))
             {
                 if (testChannel(hint.chan, bestChan, bestStrength, txID) &&
@@ -329,21 +346,24 @@ namespace ite
         // hints didn't help, starting normal discovery routine
         for (int i = 0; i < TxDevice::CHANNELS_NUM; ++i)
         {
+            if (m_needStop)
+                return false;
+
             if (testChannel(i, bestChan, bestStrength, txID))
             {
-                debug_printf("[search] Rx: %d. Test channel %d succeeded. \
-                              Strength is %d, camera is %d\n",
-                             m_rxID, i, bestStrength, txID);
+                ITE_LOG() << FMT("[search] Rx: %d. Test channel %d succeeded. Strength is %d, camera is %d\n",
+                                 m_rxID, i, bestStrength, txID);
 
                 if (rxSyncManager.lock(m_rxID, txID))
                     return lockAndStart(bestChan, txID);
                 else
                 {
-                    debug_printf("[search] Rx: %d. This channel (%d) seems already locked. \
-                                  Need to continue.\n", m_rxID, i);
+                    ITE_LOG() << FMT("[search] Rx: %d. This channel (%d) seems already locked. Need to continue.\n", m_rxID, i);
                 }
 
             }
+//            else
+//                ITE_LOG() << FMT("[search] Rx: %d. testChannel() failed for channel %d", m_rxID, i);
         }
 
         m_it930x->unlockFrequency();
@@ -393,19 +413,23 @@ namespace ite
     {
         try
         {
-            m_it930x.reset(); // dtor first
             m_it930x.reset(new It930x(m_rxID));
-            m_it930x->info(m_rxInfo);
+//            m_it930x->info(m_rxInfo);
             return true;
         }
         catch (DtvException& ex)
         {
             debug_printf("[it930x] %s %d\n", ex.what(), ex.code());
-
             m_it930x.reset();
         }
 
         return false;
+    }
+
+    void RxDevice::close()
+    {
+        stopReader();
+        m_it930x.reset();
     }
 
     void RxDevice::resetFrozen()

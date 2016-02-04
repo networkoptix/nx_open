@@ -4,6 +4,7 @@
 #include <memory>
 #include <mutex>
 #include <stdexcept>
+#include "object_counter.h"
 
 extern "C"
 {
@@ -15,6 +16,8 @@ extern "C"
 }
 
 #include "rc_command.h"
+
+extern Logger logger;
 
 namespace ite
 {
@@ -274,7 +277,7 @@ namespace ite
         bool hasStream() const { return m_devStream.get(); }
 
     private:
-        static std::mutex m_rcMutex;
+        mutable std::mutex m_rcMutex;
         int m_handle;
         uint16_t m_rxID;
         std::unique_ptr<It930Stream> m_devStream;

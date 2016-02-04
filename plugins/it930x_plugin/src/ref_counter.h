@@ -1,7 +1,11 @@
 #ifndef DEFAULT_REF_COUNTER_H
 #define DEFAULT_REF_COUNTER_H
 
+#include <typeinfo>
+#include "object_counter.h"
 #include <plugins/plugin_tools.h>
+
+extern Logger logger;
 
 namespace ite
 {
@@ -20,7 +24,11 @@ namespace ite
     {
     public:
         virtual unsigned int addRef() override { return m_refManager.addRef(); }
-        virtual unsigned int releaseRef() override { return m_refManager.releaseRef(); }
+        virtual unsigned int releaseRef() override
+        {
+            int refCount = m_refManager.releaseRef();
+            return refCount;
+        }
 
     protected:
         nxpt::CommonRefManager m_refManager;

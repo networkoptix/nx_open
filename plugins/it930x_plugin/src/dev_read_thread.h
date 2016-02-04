@@ -4,6 +4,7 @@
 #include <atomic>
 
 #include "dev_reader.h"
+#include "object_counter.h"
 
 namespace ite
 {
@@ -30,7 +31,8 @@ namespace ite
             if (m_devReader)
                 m_devReader->setThreadObj(this);
 
-            m_devReader->sync();
+            int ret = m_devReader->sync();
+//            ITE_LOG() << FMT("[reader] sync returned %d", ret);
 
             bool err = false;
             if (m_timeMS)
@@ -39,12 +41,14 @@ namespace ite
 
                 while (!m_stopMe && t.elapsedMS() < m_timeMS)
                 {
+//                    ITE_LOG() << FMT("[reader] reading Rx %d", m_devReader);
                     if (! m_devReader->readStep(true)) // blocking
                     {
                         err = true;
                         break;
                     }
                 }
+                ITE_LOG() << FMT("[reader] stopMe: %d, timer: %lld m_timeMS: %lld, err: %d", (int)m_stopMe, t.elapsedMS(), m_timeMS, (int)err);
             }
             else
             {
@@ -73,7 +77,7 @@ namespace ite
     private:
         std::atomic_bool m_stopMe;
         DevReader * m_devReader;
-        unsigned m_timeMS;
+        int64_t m_timeMS;
 
         DevReadThread(const DevReadThread&);
         DevReadThread& operator = (const DevReadThread&);

@@ -133,6 +133,12 @@ namespace ite
 
     DiscoveryManager::~DiscoveryManager()
     {
+        {
+            std::lock_guard<std::mutex> lk(m_mutex);
+            for (auto it = m_rxDevices.begin(); it != m_rxDevices.end(); ++it) {
+                it->second->pleaseStop();
+            }
+        }
         // release CameraManagers before DeviceMapper
         for (auto it = m_cameras.begin(); it != m_cameras.end(); ++it)
             (*it)->releaseRef();
@@ -149,12 +155,12 @@ namespace ite
 //        }
         if (interfaceID == nxcip::IID_CameraDiscoveryManager)
         {
-            addRef();
+//            addRef();
             return this;
         }
-        if (interfaceID == nxpl::IID_PluginInterface)
+        else if (interfaceID == nxpl::IID_PluginInterface)
         {
-            addRef();
+//            addRef();
             return static_cast<nxpl::PluginInterface*>(this);
         }
 
@@ -222,7 +228,9 @@ namespace ite
                 cameras[cameraCount++] = info;
             }
             else
+            {
                 debug_printf("[DiscoveryManager::findCameras] cam %d is not good!\n", (*it)->rxID());
+            }
         }
         return cameraCount;
         // <refactor
@@ -441,8 +449,7 @@ namespace ite
         std::vector<std::string> names;
         getRxDevNames(names);
 
-        for (size_t i = 0; i < names.size(); ++i)
-        {
+        for (size_t i = 0; i < names.size(); ++i) {
             unsigned rxID = RxDevice::dev2id(names[i]);
             std::lock_guard<std::mutex> lk(m_mutex);
 
@@ -450,7 +457,11 @@ namespace ite
             if (rxIt == m_rxDevices.end())
             {
                 RxDevicePtr newRxDevice(new RxDevice(rxID));
+                ITE_LOG() << FMT("Rx %d starting watchdog", rxID);
+
                 newRxDevice->startWatchDog();
+
+                ITE_LOG() << FMT("Rx %d watchdog started", rxID);
                 m_rxDevices.emplace(rxID, newRxDevice);
             }
         }
