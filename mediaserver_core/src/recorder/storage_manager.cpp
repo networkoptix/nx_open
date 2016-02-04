@@ -1477,6 +1477,9 @@ bool QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
 
     while (toDelete > 0)
     {
+        if (QnResource::isStopping())
+            break;
+
         qint64 minTime = 0x7fffffffffffffffll;
         DeviceFileCatalogPtr catalog;
         {
