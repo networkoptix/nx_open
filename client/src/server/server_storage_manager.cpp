@@ -410,7 +410,7 @@ void QnServerStorageManager::at_storageSpaceReply( int status, const QnStorageSp
         if (existingStorages.contains(spaceInfo.url))
             continue;
 
-        Q_ASSERT_X(spaceInfo.storageId.isNull(), Q_FUNC_INFO, "We should process only non-pool storages here");
+        /* If we have just deleted a storage, we can receive it's space info from the previous request. Just skip it. */
         if (!spaceInfo.storageId.isNull())
             continue;
 
