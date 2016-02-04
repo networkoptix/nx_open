@@ -86,6 +86,7 @@ void StreamSocketWrapper::bindToAioThread(aio::AbstractAioThread* aioThread)
 bool StreamSocketWrapper::connect(const SocketAddress& sa, unsigned int ms)
 {
     Q_ASSERT_X(false, Q_FUNC_INFO, "Not supported");
+    return false;
 }
 
 int StreamSocketWrapper::recv(void* buffer, unsigned int bufferLen, int flags)

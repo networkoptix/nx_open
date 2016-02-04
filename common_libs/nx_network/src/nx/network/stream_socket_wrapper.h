@@ -1,6 +1,8 @@
 #ifndef NX_NETWORK_STREAM_SOCKET_WRAPPER_H
 #define NX_NETWORK_STREAM_SOCKET_WRAPPER_H
 
+#include <atomic>
+
 #include "abstract_socket.h"
 
 namespace nx {
@@ -8,7 +10,7 @@ namespace network {
 
 /** Provides a bocking mode @class AbstractStreamSocket on top of any nonblocking
  *  mode @class AbstractStreamSocket */
-class StreamSocketWrapper
+class NX_NETWORK_API StreamSocketWrapper
     : public AbstractStreamSocket
 {
 public:
