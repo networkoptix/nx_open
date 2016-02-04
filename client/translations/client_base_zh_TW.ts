@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="zh_TW" sourcelanguage="en_US">
+<TS version="2.1" language="zh_TW" sourcelanguage="en_US">
 <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
@@ -1957,9 +1957,11 @@ to view more bookmarks</source>
         <source>Source camera</source>
         <translation>來源攝影機</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Source and %n more cameras</source>
-        <translation>來源與 %n 個攝影機</translation>
+        <translation type="unfinished">
+            <numerusform>來源與 %n 個攝影機</numerusform>
+        </translation>
     </message>
     <message>
         <source>N/A</source>
@@ -5035,17 +5037,23 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>&lt;All My I/O Modules&gt;</source>
         <translation>&lt;任何 我的 I/O 模組&gt;</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n device(s)&gt;</source>
-        <translation>&lt;%n 個裝置&gt;</translation>
+        <translation type="unfinished">
+            <numerusform>&lt;%n 個裝置&gt;</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n camera(s)&gt;</source>
-        <translation>&lt;%n 支攝影機&gt;</translation>
+        <translation type="unfinished">
+            <numerusform>&lt;%n 支攝影機&gt;</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n I/O module(s)&gt;</source>
-        <translation>&lt;%n 個 I/O 模組&gt;</translation>
+        <translation type="unfinished">
+            <numerusform>&lt;%n 個 I/O 模組&gt;</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -5800,13 +5808,17 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Notice: Only further recording will be backed up. Backup process will ignore existing footage.</source>
         <translation>注意: 只有在這之後的錄影會被備份. 備份程序將忽略已存在之錄影資料.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n Camera(s)</source>
-        <translation>%n 支攝影機</translation>
+        <translation type="unfinished">
+            <numerusform>%n 支攝影機</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n Device(s)</source>
-        <translation>%n 個裝置</translation>
+        <translation type="unfinished">
+            <numerusform>%n 個裝置</numerusform>
+        </translation>
     </message>
     <message>
         <source>Backup is finished</source>
@@ -6844,9 +6856,11 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Press %1 to search bookmarks</source>
         <translation>按下 %1 以搜尋書籤</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Are you sure you want to delete these %n bookmarks?</source>
-        <translation>是否確定要刪除這 %n 個書籤?</translation>
+        <translation type="unfinished">
+            <numerusform>是否確定要刪除這 %n 個書籤?</numerusform>
+        </translation>
     </message>
 </context>
 <context>
