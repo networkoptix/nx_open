@@ -1637,22 +1637,32 @@ void QnTransactionMessageBus::sendDelayedAliveTran()
     void QnTransactionMessageBus::waitForNewTransactionsReady( const QnUuid& connectionGuid )
     {
         QnMutexLocker lock( &m_mutex );
-        for( QnTransactionTransport* transport: m_connections )
+
+        auto waitForNewTransactionsReadyFunc =
+            [&lock](QnTransactionTransport* transport)
+            {
+                QnTransactionTransport::Locker transactionTransportLocker(transport);
+                //QnTransactionTransport destructor will block until transactionTransportLocker is alive
+                lock.unlock();
+                transactionTransportLocker.waitForNewTransactionsReady();
+                lock.relock();
+            };
+
+        for (QnTransactionTransport* transport : m_connections)
         {
-            if( transport->connectionGuid() != connectionGuid )
+            if (transport->connectionGuid() != connectionGuid)
                 continue;
-            //lock.unlock();
-            //mutex is unlocked if we go to wait
-            transport->waitForNewTransactionsReady( [&lock](){ lock.unlock(); } );
+
+            waitForNewTransactionsReadyFunc(transport);
             return;
         }
 
-        for( QnTransactionTransport* transport: m_connectingConnections )
+        for (QnTransactionTransport* transport : m_connectingConnections)
         {
-            if( transport->connectionGuid() != connectionGuid )
+            if (transport->connectionGuid() != connectionGuid)
                 continue;
-            //mutex is unlocked if we go to wait
-            transport->waitForNewTransactionsReady( [&lock](){ lock.unlock(); } );
+
+            waitForNewTransactionsReadyFunc(transport);
             return;
         }
     }

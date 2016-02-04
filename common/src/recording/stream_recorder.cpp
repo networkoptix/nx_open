@@ -146,14 +146,12 @@ void QnStreamRecorder::close()
             av_write_trailer(m_recordingContextVector[i].formatCtx);
 
 
-        auto fileSize = 
-            m_startDateTime != qint64(AV_NOPTS_VALUE) ? 
-                QnFfmpegHelper::getFileSizeByIOContext(
-                    m_recordingContextVector[i].formatCtx->pb
-                ) : 0;
-
+        qint64 fileSize = 0;
         if (m_recordingContextVector[i].formatCtx)
         {
+            if (m_startDateTime != qint64(AV_NOPTS_VALUE))
+                fileSize = QnFfmpegHelper::getFileSizeByIOContext(m_recordingContextVector[i].formatCtx->pb);
+
             QnFfmpegHelper::closeFfmpegIOContext(m_recordingContextVector[i].formatCtx->pb);
 #ifndef SIGN_FRAME_ENABLED
             if (m_needCalcSignature)

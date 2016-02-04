@@ -856,7 +856,20 @@ void QnTransactionTransport::setIncomingTransactionChannelSocket(
     startListeningNonSafe();
 }
 
-void QnTransactionTransport::waitForNewTransactionsReady( std::function<void()> invokeBeforeWait )
+void QnTransactionTransport::lock()
+{
+    QnMutexLocker lk(&m_mutex);
+    ++m_waiterCount;
+}
+
+void QnTransactionTransport::unlock()
+{
+    QnMutexLocker lk(&m_mutex);
+    --m_waiterCount;
+    m_cond.wakeAll();    //signalling that we are not waiting anymore
+}
+
+void QnTransactionTransport::waitForNewTransactionsReady()
 {
     QnMutexLocker lk( &m_mutex );
 
@@ -864,16 +877,11 @@ void QnTransactionTransport::waitForNewTransactionsReady( std::function<void()> 
         return;
 
     //waiting for some transactions to be processed
-    ++m_waiterCount;
-    if( invokeBeforeWait )
-        invokeBeforeWait();
     while( (m_postedTranCount >= MAX_TRANS_TO_POST_AT_A_TIME && m_state != Closed) ||
             m_state < ReadyForStreaming)
     {
         m_cond.wait( lk.mutex() );
     }
-    --m_waiterCount;
-    m_cond.wakeAll();    //signalling that we are not waiting anymore
 }
 
 void QnTransactionTransport::connectionFailure()
