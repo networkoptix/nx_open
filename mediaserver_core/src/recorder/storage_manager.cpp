@@ -1478,7 +1478,11 @@ bool QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
     while (toDelete > 0)
     {
         if (QnResource::isStopping())
-            break;
+        {   // Return true to mark this storage as succesfully cleaned since 
+            // we don't want this storage to be added in clear-again list when
+            // server is going to stop.
+            return true;
+        }
 
         qint64 minTime = 0x7fffffffffffffffll;
         DeviceFileCatalogPtr catalog;
