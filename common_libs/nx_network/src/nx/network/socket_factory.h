@@ -54,7 +54,9 @@ public:
     static void enforceStreamSocketType( SocketType type );
     static bool isStreamSocketTypeEnforced();
 
-    static void setCreateStreamSocketFunc(CreateStreamSocketFuncType);
+    /** Sets new factory. Returns old one */
+    static CreateStreamSocketFuncType 
+        setCreateStreamSocketFunc(CreateStreamSocketFuncType newFactoryFunc);
 
 private:
     SocketFactory();

@@ -139,9 +139,12 @@ bool SocketFactory::isStreamSocketTypeEnforced()
     return s_enforcedStreamSocketType != SocketType::Default;
 }
 
-void SocketFactory::setCreateStreamSocketFunc(CreateStreamSocketFuncType func)
+SocketFactory::CreateStreamSocketFuncType 
+    SocketFactory::setCreateStreamSocketFunc(CreateStreamSocketFuncType func)
 {
+    auto bak = std::move(createStreamSocketFunc);
     createStreamSocketFunc = std::move(func);
+    return bak;
 }
 
 std::atomic< SocketFactory::SocketType >
