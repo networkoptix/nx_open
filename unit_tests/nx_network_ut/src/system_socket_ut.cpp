@@ -55,9 +55,10 @@ TEST(TcpSocket, DISABLED_KeepAliveOptionsDefaults)
     ASSERT_FALSE( static_cast< bool >( result ) );
 }
 
-NX_SIMPLE_SOCKET_TESTS(TcpSocket,
-                       &std::make_unique<TCPServerSocket>,
-                       &std::make_unique<TCPSocket>)
+NX_NETWORK_SOCKET_TESTS(
+    TcpSocket,
+    &std::make_unique<TCPServerSocket>,
+    &std::make_unique<TCPSocket>)
 
 }   //test
 }   //network

@@ -73,9 +73,10 @@ private:
     SocketAddress m_address;
 };
 
-NX_SIMPLE_SOCKET_TESTS(MultipleServerSocket,
-                       &std::make_unique<MultipleServerSocketTester>,
-                       &std::make_unique<MultipleClientSocketTester>)
+NX_NETWORK_SOCKET_TESTS(
+    MultipleServerSocket,
+    &std::make_unique<MultipleServerSocketTester>,
+    &std::make_unique<MultipleClientSocketTester>)
 
 } // namespace test
 } // namespace network

@@ -120,9 +120,10 @@ TEST(SocketUdt_UdtPollSet, general)
     ASSERT_EQ(0, result);
 }
 
-NX_SIMPLE_SOCKET_TESTS(SocketUdt,
-                       &std::make_unique<UdtStreamServerSocket>,
-                       &std::make_unique<UdtStreamSocket>)
+NX_NETWORK_SOCKET_TESTS(
+    SocketUdt,
+    &std::make_unique<UdtStreamServerSocket>,
+    &std::make_unique<UdtStreamSocket>)
 
 }   //test
 }   //network

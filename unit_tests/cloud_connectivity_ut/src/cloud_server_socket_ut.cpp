@@ -7,7 +7,6 @@
 namespace nx {
 namespace network {
 namespace cloud {
-namespace test {
 
 const String kFakeRemotePeerId(QnUuid::createUuid().toSimpleString().toUtf8());
 
@@ -88,7 +87,7 @@ struct CloudServerSocketTestCase : CloudServerSocket
     {
         // TODO: #mux use multiple acceptors
         std::vector<SocketAddress> addresses;
-        addresses.push_back(kServerAddress);
+        addresses.push_back(nx::network::test::kServerAddress);
 
         startAcceptor(
             std::make_unique<FakeTcpTunnelAcceptor>(std::move(addresses)),
@@ -111,12 +110,11 @@ protected:
 };
 
 // NOTE: sync tests are not working yet
-NX_SIMPLE_SOCKET_TESTS_F(
+NX_NETWORK_SOCKET_TESTS_F(
     CloudServerSocketTest,
     [this](){ return std::make_unique<CloudServerSocketTestCase>(&m_tunnelPool); },
     &std::make_unique<TCPSocket>);
 
-} // namespace test
 } // namespace cloud
 } // namespace network
 } // namespace nx

@@ -296,7 +296,7 @@ public:
 
     void cancelIOSync(aio::EventType eventType)
     {
-        if (m_socket->impl()->aioThread.load() == QThread::currentThread())
+        if (this->m_socket->impl()->aioThread.load() == QThread::currentThread())
         {
             cancelAsyncIOWhileInAioThread(eventType);
         }

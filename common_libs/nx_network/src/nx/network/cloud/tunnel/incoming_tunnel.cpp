@@ -65,11 +65,11 @@ void IncomingTunnelPool::pleaseStop(std::function<void()> handler)
     BarrierHandler barrier([this, handler]()
     {
         QnMutexLocker lock(&m_mutex);
-        if (const auto socket = std::move(m_indicatingSocket))
+        if (auto socket = std::shared_ptr<AbstractStreamSocket>(
+                m_indicatingSocket.release()))
         {
-            m_indicatingSocket = nullptr;
             lock.unlock();
-            return socket->pleaseStop(std::move(handler));
+            return socket->pleaseStop([socket, handler](){ handler(); });
         }
 
         lock.unlock();
