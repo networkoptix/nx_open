@@ -110,8 +110,8 @@ protected:
 };
 
 // NOTE: sync tests are not working yet
-NX_NETWORK_SOCKET_TESTS_F(
-    CloudServerSocketTest,
+NX_NETWORK_SERVER_SOCKET_TEST_CASE(
+    TEST_F, CloudServerSocketTest,
     [this](){ return std::make_unique<CloudServerSocketTestCase>(&m_tunnelPool); },
     &std::make_unique<TCPSocket>);
 

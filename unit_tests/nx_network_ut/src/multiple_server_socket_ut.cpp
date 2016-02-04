@@ -73,8 +73,8 @@ private:
     SocketAddress m_address;
 };
 
-NX_NETWORK_SOCKET_TESTS(
-    MultipleServerSocket,
+NX_NETWORK_SERVER_SOCKET_TEST_CASE(
+    TEST, MultipleServerSocket,
     &std::make_unique<MultipleServerSocketTester>,
     &std::make_unique<MultipleClientSocketTester>)
 

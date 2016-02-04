@@ -405,26 +405,39 @@ void socketAcceptTimeoutAsync(
 } // namespace network
 } // namespace nx
 
-#define NX_NETWORK_SOCKET_TESTS_BASE(Type, Name, mkServer, mkClient)        \
-    Type(Name, SimpleSync)                                                  \
-        { nx::network::test::socketSimpleSync(mkServer, mkClient); }        \
-    Type(Name, SimpleAsync)                                                 \
-        { nx::network::test::socketSimpleAsync(mkServer, mkClient); }       \
-    Type(Name, SimpleTrueAsync)                                             \
-        { nx::network::test::socketSimpleTrueAsync(mkServer, mkClient); }   \
-    Type(Name, SingleAioThread)                                             \
-        { nx::network::test::socketSingleAioThread(mkClient); }             \
-    Type(Name, SimpleAcceptMixed)                                           \
-        { nx::network::test::socketSimpleAcceptMixed(mkServer, mkClient); } \
-    Type(Name, AcceptTimeoutSync)                                           \
-        { nx::network::test::socketAcceptTimeoutSync(mkServer); }           \
-    Type(Name, AcceptTimeoutAsync)                                          \
-        { nx::network::test::socketAcceptTimeoutAsync(mkServer); }          \
+#define NX_NETWORK_CLIENT_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient)     \
+    Type(Name, SingleAioThread)                                                 \
+        { nx::network::test::socketSingleAioThread(mkClient); }                 \
+    Type(Name, Shutdown)                                                        \
+        { nx::network::test::shutdownSocket(mkServer, mkClient); }              \
 
-#define NX_NETWORK_SOCKET_TESTS(Name, mkServer, mkClient) \
-    NX_NETWORK_SOCKET_TESTS_BASE(TEST, Name, mkServer, mkClient)
+#define NX_NETWORK_SERVER_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient)     \
+    Type(Name, SimpleAcceptMixed)                                               \
+        { nx::network::test::socketSimpleAcceptMixed(mkServer, mkClient); }     \
+    Type(Name, AcceptTimeoutSync)                                               \
+        { nx::network::test::socketAcceptTimeoutSync(mkServer); }               \
+    Type(Name, AcceptTimeoutAsync)                                              \
+        { nx::network::test::socketAcceptTimeoutAsync(mkServer); }              \
 
-#define NX_NETWORK_SOCKET_TESTS_F(Name, mkServer, mkClient) \
-    NX_NETWORK_SOCKET_TESTS_BASE(TEST_F, Name, mkServer, mkClient)
+#define NX_NETWORK_TRANSMIT_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient)  \
+    Type(Name, SimpleSync)                                                      \
+        { nx::network::test::socketSimpleSync(mkServer, mkClient); }            \
+    Type(Name, SimpleAsync)                                                     \
+        { nx::network::test::socketSimpleAsync(mkServer, mkClient); }           \
+    Type(Name, SimpleTrueAsync)                                                 \
+        { nx::network::test::socketSimpleTrueAsync(mkServer, mkClient); }       \
+
+#define NX_NETWORK_CLIENT_SOCKET_TEST_CASE(Type, Name, mkServer, mkClient)  \
+    NX_NETWORK_CLIENT_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient)     \
+    NX_NETWORK_TRANSMIT_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient)  \
+
+#define NX_NETWORK_SERVER_SOCKET_TEST_CASE(Type, Name, mkServer, mkClient)  \
+    NX_NETWORK_SERVER_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient)     \
+    NX_NETWORK_TRANSMIT_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient)  \
+
+#define NX_NETWORK_BOTH_SOCKETS_TEST_CASE(Type, Name, mkServer, mkClient)   \
+    NX_NETWORK_SERVER_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient)     \
+    NX_NETWORK_CLIENT_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient)     \
+    NX_NETWORK_TRANSMIT_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient)  \
 
 #endif  //SIMPLE_SOCKET_TEST_HELPER_H
