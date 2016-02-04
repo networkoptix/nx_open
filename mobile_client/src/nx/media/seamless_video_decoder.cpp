@@ -12,7 +12,7 @@
 
 namespace
 {
-    static const int kMetadataMaxSize = 16;
+    static const int kMetadataMaxSize = 32;
     
 
     QSize mediaSizeFromRawData(const QnConstCompressedVideoDataPtr& frame)
