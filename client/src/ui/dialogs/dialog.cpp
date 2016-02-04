@@ -24,3 +24,9 @@ void QnDialog::show()
 {
     show(this); /// Calls static member of QnDialog
 }
+
+int QnDialog::exec()
+{
+    cancelDrag(parentWidget());
+    return base_type::exec();
+}
