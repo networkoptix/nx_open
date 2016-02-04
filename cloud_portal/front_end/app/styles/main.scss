@@ -159,3 +159,12 @@ body {
 .inline-portal .modal-header .close{
     display: none;
 }
+
+.system-button .label {
+  line-height: 18px;
+  font-size: 85%;
+  display: inline-block;
+  vertical-align: bottom;
+  margin-top: 10px;
+  height: 24px;
+}

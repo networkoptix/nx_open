@@ -17,7 +17,7 @@
     url('Roboto-Medium-webfont.woff') format('woff'),
     url('Roboto-Medium-webfont.ttf') format('truetype'),
     url('Roboto-Medium-webfont.svg#robotomedium') format('svg');
-    font-weight: 500;
+    font-weight: bold;
     font-style: normal;
 
 }

@@ -12,7 +12,7 @@
 
         <div ng-repeat="system in systems" class="col-xs-12	col-sm-6 col-lg-4 ">
             <div class="panel panel-default hoverable">
-                <div class="panel-body" ng-click="openSystem(system)">
+                <div class="panel-body system-button" ng-click="openSystem(system)">
                     <h2>{{system.name}}</h2>
                     <small><b>{{getSystemOwnerName(system)}}</b></small><br/>
 
