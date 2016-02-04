@@ -2,32 +2,49 @@
 #pragma once
 
 #include <QtCore/QObject>
+#include <QtCore/QPointer>
 
-#include <ui/workbench/workbench_context_aware.h>
+#include <ui/statistics/types.h>
 
-namespace statistics
+class QnBaseStatisticsModule;
+class QnBaseStatisticsStorage;
+class QnStatisticsSettingsWatcher;
+
+class QnStatisticsManager : public QObject
 {
-    namespace details
-    {
-        class ActionsStatisticHandler;
-    };
+    Q_OBJECT
 
-    class QnStatisticsManager
-        : public QObject
-        , public QnWorkbenchContextAware
-    {
-        Q_OBJECT
+    typedef QObject base_type;
 
-    public:
-        QnStatisticsManager(QObject *parent);
+public:
+    QnStatisticsManager(QObject *parent = nullptr);
 
-        virtual ~QnStatisticsManager();
+    virtual ~QnStatisticsManager();
 
-    public:
+    bool registerStatisticsModule(const QString &alias
+        ,  QnBaseStatisticsModule *module);
 
-    private:
-        typedef QScopedPointer<details::ActionsStatisticHandler> ActionsStatisticHandlerPtr;
+    void setStorage(QnBaseStatisticsStorage *storage);
 
-        const ActionsStatisticHandlerPtr m_actionsHandler;
-    };
-}
+public:
+    void sendStatistics();
+
+private:
+    void unregisterModule(const QString &alias);
+
+    QnMetricsHash getMetrics() const;
+
+    QnStringsSet getLastFilters() const;
+
+    qint64 getLastSentTime() const;
+
+private:
+    typedef QScopedPointer<QnStatisticsSettingsWatcher> QnStatisticsSettingsWatcherPtr;
+    typedef QPointer<QnBaseStatisticsStorage> StoragePtr;
+    typedef QPointer<QnBaseStatisticsModule> ModulePtr;
+    typedef QHash<QString, ModulePtr> ModulesMap;
+
+    const QnStatisticsSettingsWatcherPtr m_settings;
+    ModulesMap m_modules;
+    StoragePtr m_storage;
+};

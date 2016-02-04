@@ -38,6 +38,8 @@
 #include <ui/help/help_topics.h>
 
 #include <ui/statistics/statistics_manager.h>
+#include <ui/statistics/storage/local_statistics_storage.h>
+#include <ui/statistics/modules/actions_statistics_module.h>
 
 #include <ui/dialogs/ptz_manage_dialog.h>
 
@@ -414,7 +416,12 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     QnPtzManageDialog *manageDialog = new QnPtzManageDialog(this); //initializing instance of a singleton
     Q_UNUSED(manageDialog)
 
-    context->instance<statistics::QnStatisticsManager>();
+    const auto statManager = context->instance<QnStatisticsManager>();
+    const auto statStorage = context->instance<QnStatisticsFileStorage>();
+    statManager->setStorage(statStorage);
+
+    const auto actionsStatModule = context->instance<QnActionsStatisticsModule>();
+    statManager->registerStatisticsModule(lit("actions"), actionsStatModule);
 }
 
 QnMainWindow::~QnMainWindow() {

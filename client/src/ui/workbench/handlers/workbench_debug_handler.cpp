@@ -1,3 +1,4 @@
+
 #include "workbench_debug_handler.h"
 
 #include <client/client_settings.h>
@@ -113,7 +114,14 @@ qint64 move() {
     return random(100000, 300000);
 }
 
-void QnWorkbenchDebugHandler::at_debugDecrementCounterAction_triggered() {
+#include <ui/workbench/workbench_context.h>
+#include <ui/statistics/statistics_manager.h>
+
+void QnWorkbenchDebugHandler::at_debugDecrementCounterAction_triggered()
+{
+    const auto manager = context()->instance<QnStatisticsManager>();
+    manager->sendStatistics();
+    return;
     qnRuntime->setDebugCounter(qnRuntime->debugCounter() - 1);
     qDebug() << qnRuntime->debugCounter();
 
@@ -127,7 +135,7 @@ void QnWorkbenchDebugHandler::at_debugDecrementCounterAction_triggered() {
     while (!stream.atEnd()) {
         dict << stream.readLine();
     }
- 
+
     int skip = 8000;
     int limit = 16000;
     int counter = 0;

@@ -1901,6 +1901,8 @@ void QnActionManager::registerAction(QnAction *action) {
 
     m_actionById[action->id()] = action;
     m_idByAction[action] = action->id();
+
+    emit actionRegistered(action->id());
 }
 
 void QnActionManager::registerAlias(Qn::ActionId id, Qn::ActionId targetId) {
