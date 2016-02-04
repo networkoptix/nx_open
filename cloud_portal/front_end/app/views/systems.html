@@ -4,14 +4,14 @@
     <process-alert process="gettingSystems"
                    success-message="false"
                    error-prefix="'Systems list is unavailable:'"></process-alert>
-    <div process-loading="gettingSystems">
+    <div process-loading="gettingSystems" class="row">
         <div ng-if="!systems.length">
             Please, connect any systems to your cloud account first.
             <button class="btn btn-default" ng-click="openClient(null)">Open Nx Witness</button>
         </div>
 
         <div ng-repeat="system in systems" class="col-xs-12	col-sm-6 col-lg-4 ">
-            <div class="panel panel-default system-button">
+            <div class="panel panel-default hoverable">
                 <div class="panel-body" ng-click="openSystem(system)">
                     <h2>{{system.name}}</h2>
                     <small><b>{{getSystemOwnerName(system)}}</b></small><br/>

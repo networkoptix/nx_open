@@ -1,0 +1,15 @@
+/* Palette spec is here: http://4yppjt.axshare.com/#p=colors */
+
+$dark_core:    #53707F;
+$dark_offset:  #050708;
+
+@function dark($index) {
+  @return $dark_core + (17 - $index) * $dark_offset;
+}
+
+$light_core:    #FFF;
+$light_offset:  #0A0807;
+
+@function light($index) {
+  @return $light_core - ($index - 1) * $light_offset;
+}
