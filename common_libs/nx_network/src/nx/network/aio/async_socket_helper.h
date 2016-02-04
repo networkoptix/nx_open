@@ -294,6 +294,20 @@ public:
             cancelImpl();
     }
 
+    void cancelIOSync(aio::EventType eventType)
+    {
+        if (m_socket->impl()->aioThread.load() == QThread::currentThread())
+        {
+            cancelAsyncIOWhileInAioThread(eventType);
+        }
+        else
+        {
+            std::promise< bool > promise;
+            cancelIOAsync(eventType, [&]() { promise.set_value(true); });
+            promise.get_future().wait();
+        }
+    }
+
     void cancelAsyncIOWhileInAioThread(const aio::EventType eventType)
     {
         stopPollingSocket(eventType);
