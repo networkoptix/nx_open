@@ -157,7 +157,7 @@ boost::optional<ListeningPeerPool::ConstDataLocker>
 
     //auto-server resolve by system name is forbidden for now to avoid auto-reconnection to another server
 
-    const auto peerIter = m_peers.find(MediaserverData(ids[1], ids[0]));  //serverID.systemID
+    auto peerIter = m_peers.find(MediaserverData(ids[1], ids[0]));  //serverID.systemID
     if (peerIter == m_peers.end())
         return boost::none;
 
