@@ -146,6 +146,11 @@ QnServerStorageManager::~QnServerStorageManager()
 
 }
 
+void QnServerStorageManager::invalidateRequests()
+{
+    m_requests.clear();
+}
+
 bool QnServerStorageManager::isServerValid( const QnMediaServerResourcePtr &server ) const
 {
     /* Server is invalid. */
@@ -231,6 +236,7 @@ void QnServerStorageManager::saveStorages(const QnStorageResourceList &storages 
             if (const QnClientStorageResourcePtr& clientStorage = storage.dynamicCast<QnClientStorageResource>())
                 clientStorage->setActive(true);
     });
+    invalidateRequests();
 }
 
 //TODO: #GDM SafeMode
@@ -241,6 +247,7 @@ void QnServerStorageManager::deleteStorages(const ec2::ApiIdDataList &ids )
         return;
 
     conn->getMediaServerManager()->removeStorages(ids, this, [] {});
+    invalidateRequests();
 }
 
 bool QnServerStorageManager::sendArchiveRebuildRequest( const QnMediaServerResourcePtr &server, QnServerStoragesPool pool, Qn::RebuildAction action )
@@ -255,6 +262,9 @@ bool QnServerStorageManager::sendArchiveRebuildRequest( const QnMediaServerResou
         SLOT(at_archiveRebuildReply(int, const QnStorageScanData &, int)));
     if (handle <= 0)
         return false;
+
+    if (action != Qn::RebuildAction_ShowProgress)
+        invalidateRequests();
 
     m_requests.insert(handle, RequestKey(server, pool));
     return true;
@@ -307,6 +317,9 @@ bool QnServerStorageManager::sendBackupRequest( const QnMediaServerResourcePtr &
         SLOT(at_backupStatusReply(int, const QnBackupStatusData &, int)));
     if (handle <= 0)
         return false;
+
+    if (action != Qn::BackupAction_ShowProgress)
+        invalidateRequests();
 
     m_requests.insert(handle, RequestKey(server, QnServerStoragesPool::Main));
     return true;
