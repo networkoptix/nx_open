@@ -14,10 +14,12 @@ CloudServerSocket::CloudServerSocket(
         IncomingTunnelPool* tunnelPool)
     : m_mediatorConnection(mediatorConnection)
     , m_tunnelPool(tunnelPool)
-    , m_isAcceptingTunnelPool(false)
     , m_socketAttributes(new StreamSocketAttributes())
     , m_ioThreadSocket(SocketFactory::createStreamSocket())
+    , m_timerThreadSocket(SocketFactory::createStreamSocket())
 {
+    m_timerThreadSocket->bindToAioThread(m_ioThreadSocket->getAioThread());
+
     // TODO: #mu default values for m_socketAttributes shall match default
     //           system vales: think how to implement this...
     m_socketAttributes->recvTimeout = 0;
@@ -158,6 +160,15 @@ bool CloudServerSocket::listen(int queueLen)
 
 AbstractStreamSocket* CloudServerSocket::accept()
 {
+    if (m_socketAttributes->nonBlockingMode && *m_socketAttributes->nonBlockingMode)
+    {
+        if (auto socket = m_tunnelPool->getNextSocketIfAny())
+            return new StreamSocketWrapper(std::move(socket));
+
+        SystemError::setLastErrorCode(SystemError::wouldBlock);
+        return nullptr;
+    }
+
     std::promise<std::pair<SystemError::ErrorCode, AbstractStreamSocket*>> promise;
     acceptAsync([&](SystemError::ErrorCode code, AbstractStreamSocket* socket)
     {
@@ -165,12 +176,7 @@ AbstractStreamSocket* CloudServerSocket::accept()
     });
 
     const auto result = promise.get_future().get();
-    if (result.first != SystemError::noError)
-    {
-        m_lastError = result.first;
-        SystemError::setLastErrorCode(result.first);
-    }
-
+    SystemError::setLastErrorCode(result.first);
     return result.second;
 }
 
@@ -181,6 +187,8 @@ void CloudServerSocket::pleaseStop(std::function<void()> handler)
 
     BarrierHandler barrier(std::move(handler));
     m_ioThreadSocket->pleaseStop(barrier.fork());
+    m_timerThreadSocket->pleaseStop(barrier.fork());
+
     for (auto& connector : m_acceptors)
         connector.second->pleaseStop(barrier.fork());
 }
@@ -213,32 +221,22 @@ void CloudServerSocket::acceptAsync(
     m_acceptHandler = std::move(handler);
     NX_LOGX(lm("accept async"), cl_logDEBUG2);
 
-    // TODO: #mux setup timeout timer
+    unsigned int timeout;
+    if (getRecvTimeout(&timeout) && timeout != 0)
+        m_timerThreadSocket->registerTimer(
+            timeout, [this](){ callAcceptHandler(); });
 
     auto sharedGuard = m_asyncGuard.sharedGuard();
-    m_tunnelPool->acceptNewSocket([this, sharedGuard]
-        (SystemError::ErrorCode code, std::unique_ptr<AbstractStreamSocket> socket)
+    m_tunnelPool->getNextSocketAsync([this, sharedGuard]
+        (std::unique_ptr<AbstractStreamSocket> socket)
     {
         if (auto lock = sharedGuard->lock())
         {
             Q_ASSERT_X(!m_acceptedSocket, Q_FUNC_INFO, "concurently accepted socket");
             NX_LOGX(lm("accepted socket %1").arg(socket), cl_logDEBUG2);
 
-            m_lastError = code;
             m_acceptedSocket = std::move(socket);
-            post([this]()
-            {
-                if (const auto acceptHandler = std::move(m_acceptHandler))
-                {
-                    auto socket = new StreamSocketWrapper(std::move(m_acceptedSocket));
-
-                    m_acceptHandler = nullptr;
-                    m_acceptedSocket = nullptr;
-
-                    NX_LOGX(lm("return socket %1").arg(socket), cl_logDEBUG2);
-                    acceptHandler(m_lastError, std::move(socket));
-                }
-            });
+            m_timerThreadSocket->post([this](){ callAcceptHandler(); });
         }
     });
 }
@@ -263,6 +261,29 @@ void CloudServerSocket::startAcceptor(
         if (auto lock = sharedGuard->lock())
             m_acceptors.erase(acceptorPtr);
     });
+}
+
+void CloudServerSocket::callAcceptHandler()
+{
+    m_timerThreadSocket->pleaseStopSync();
+
+    auto handler = std::move(m_acceptHandler);
+    m_acceptHandler = nullptr;
+
+    auto socket = std::move(m_acceptedSocket);
+    m_acceptedSocket = nullptr;
+
+    if (socket)
+    {
+        NX_LOGX(lm("return socket %1").arg(socket), cl_logDEBUG2);
+        handler(SystemError::noError, socket.release());
+    }
+    else
+    {
+        NX_LOGX(lm("accept timed out").arg(socket), cl_logDEBUG2);
+        handler(SystemError::timedOut, nullptr);
+    }
+
 }
 
 } // namespace cloud

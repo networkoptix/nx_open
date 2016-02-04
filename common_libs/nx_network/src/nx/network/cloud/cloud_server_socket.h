@@ -69,16 +69,18 @@ protected:
         std::unique_ptr<AbstractTunnelAcceptor> connector,
         std::shared_ptr<utils::AsyncOperationGuard::SharedGuard> sharedGuard);
 
+    void callAcceptHandler();
+
     const std::shared_ptr<hpm::api::MediatorServerTcpConnection> m_mediatorConnection;
     IncomingTunnelPool* const m_tunnelPool;
 
     typedef AbstractTunnelAcceptor Acceptor;
     std::map<Acceptor*, std::unique_ptr<Acceptor>> m_acceptors;
 
-    bool m_isAcceptingTunnelPool;
     mutable SystemError::ErrorCode m_lastError;
     std::shared_ptr<StreamSocketAttributes> m_socketAttributes;
     std::unique_ptr<AbstractCommunicatingSocket> m_ioThreadSocket;
+    std::unique_ptr<AbstractCommunicatingSocket> m_timerThreadSocket;
     std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)> m_acceptHandler;
     std::unique_ptr<AbstractStreamSocket> m_acceptedSocket;
     utils::AsyncOperationGuard m_asyncGuard;

@@ -2,7 +2,7 @@
 #define NX_CC_CLOUD_TUNNEL_H
 
 #include <memory>
-#include <queue>
+#include <deque>
 
 #include "nx/network/cloud/tunnel/tunnel.h"
 
@@ -27,25 +27,33 @@ class IncomingTunnelPool
     : public QnStoppableAsync
 {
 public:
+    IncomingTunnelPool();
+
+    /** Accept queue limit (shell be called before anything else) */
+    void setAcceptLimit(size_t limit) { m_acceptLimit = limit; }
+
     /** Creates new tunnel with connected \param connection */
     void addNewTunnel(std::unique_ptr<AbstractTunnelConnection> connection);
 
-    /** Accepts new client socket as soon as some avaliable from on tunnel
-     *  in this pool */
-    void acceptNewSocket(Tunnel::SocketHandler handler);
+    /** Returns queued socket if avaliable, returns nullptr otherwise */
+    std::unique_ptr<AbstractStreamSocket> getNextSocketIfAny();
+
+    /** Calls @param handler as soon as any socket is avaliable */
+    void getNextSocketAsync(
+        std::function<void(std::unique_ptr<AbstractStreamSocket>)> handler);
 
     /** Cancels all operations in progress */
     void pleaseStop(std::function<void()> handler) override;
 
 private:
     void acceptTunnel(std::shared_ptr<IncomingTunnel> tunnel);
-    void indicateFirstSocket(QnMutexLockerBase* lock);
+    void returnSocketIfAny(QnMutexLockerBase* lock);
 
     QnMutex m_mutex;
     std::set<std::shared_ptr<IncomingTunnel>> m_pool;
-    Tunnel::SocketHandler m_acceptRequest;
-    std::queue<std::unique_ptr<AbstractStreamSocket>> m_acceptedSockets;
-    std::unique_ptr<AbstractStreamSocket> m_indicatingSocket;
+    std::function<void(std::unique_ptr<AbstractStreamSocket>)> m_acceptRequest;
+    std::deque<std::unique_ptr<AbstractStreamSocket>> m_acceptedSockets;
+    size_t m_acceptLimit;
 };
 
 } // namespace cloud

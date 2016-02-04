@@ -40,7 +40,14 @@ void IncomingTunnel::accept(SocketHandler handler)
     });
 }
 
-void IncomingTunnelPool::addNewTunnel(std::unique_ptr<AbstractTunnelConnection> connection)
+
+IncomingTunnelPool::IncomingTunnelPool()
+    : m_acceptLimit(0)
+{
+}
+
+void IncomingTunnelPool::addNewTunnel(
+    std::unique_ptr<AbstractTunnelConnection> connection)
 {
     auto tunnel = std::make_shared<IncomingTunnel>(std::move(connection));
     {
@@ -50,30 +57,36 @@ void IncomingTunnelPool::addNewTunnel(std::unique_ptr<AbstractTunnelConnection> 
     acceptTunnel(std::move(tunnel));
 }
 
-void IncomingTunnelPool::acceptNewSocket(Tunnel::SocketHandler handler)
+std::unique_ptr<AbstractStreamSocket> IncomingTunnelPool::getNextSocketIfAny()
+{
+    QnMutexLocker lock(&m_mutex);
+    if (m_acceptedSockets.empty())
+        return nullptr;
+
+    auto socket = std::move(m_acceptedSockets.front());
+    m_acceptedSockets.pop_front();
+    return std::move(socket);
+}
+
+void IncomingTunnelPool::getNextSocketAsync(
+    std::function<void(std::unique_ptr<AbstractStreamSocket>)> handler)
 {
     QnMutexLocker lock(&m_mutex);
     Q_ASSERT_X(!m_acceptRequest, Q_FUNC_INFO, "Multiple accepts are not supported");
-    NX_LOGX(lm("accept new socket"), cl_logDEBUG2);
 
     m_acceptRequest = std::move(handler);
-    indicateFirstSocket(&lock);
+    returnSocketIfAny(&lock);
 }
 
 void IncomingTunnelPool::pleaseStop(std::function<void()> handler)
 {
     BarrierHandler barrier([this, handler]()
     {
-        QnMutexLocker lock(&m_mutex);
-        if (auto socket = std::shared_ptr<AbstractStreamSocket>(
-                m_indicatingSocket.release()))
-        {
-            lock.unlock();
-            return socket->pleaseStop([socket, handler](){ handler(); });
-        }
+        BarrierHandler barrier(std::move(handler));
 
-        lock.unlock();
-        handler();
+        QnMutexLocker lock(&m_mutex);
+        for (const auto& socket : m_acceptedSockets)
+            socket->pleaseStop(barrier.fork());
     });
 
     QnMutexLocker lock(&m_mutex);
@@ -100,50 +113,27 @@ void IncomingTunnelPool::acceptTunnel(std::shared_ptr<IncomingTunnel> tunnel)
         acceptTunnel(std::move(tunnel));
 
         QnMutexLocker lock(&m_mutex);
-        m_acceptedSockets.push(std::move(socket));
-        indicateFirstSocket(&lock);
+        if (m_acceptedSockets.size() >= m_acceptLimit)
+            return; //< TODO: #mux Stop accepting tunnel?
+
+        m_acceptedSockets.push_back(std::move(socket));
+        returnSocketIfAny(&lock);
     });
 }
 
-void IncomingTunnelPool::indicateFirstSocket(QnMutexLockerBase* lock)
+void IncomingTunnelPool::returnSocketIfAny(QnMutexLockerBase* lock)
 {
-    if (m_indicatingSocket)
-        return; // indication is in progress
-
     if (!m_acceptRequest || m_acceptedSockets.empty())
         return; // nothing to indicate
 
-    m_indicatingSocket = std::move(m_acceptedSockets.front());
-    m_acceptedSockets.pop();
+    auto request = std::move(m_acceptRequest);
+    m_acceptRequest = nullptr;
+
+    auto socket = std::move(m_acceptedSockets.front());
+    m_acceptedSockets.pop_front();
+
     lock->unlock();
-
-    NX_LOGX(lm("indicating socket %1").arg(m_indicatingSocket), cl_logDEBUG2);
-    m_indicatingSocket->sendAsync(
-        Tunnel::ACCEPT_INDICATION,
-        [&](SystemError::ErrorCode code, size_t size)
-        {
-            QnMutexLocker lock(&m_mutex);
-            if (code != SystemError::noError ||
-                size != Tunnel::ACCEPT_INDICATION.size())
-            {
-                NX_LOGX(lm("indication %1 failed: %2")
-                        .arg(m_indicatingSocket.get())
-                        .arg(SystemError::toString(code)), cl_logDEBUG2);
-
-                m_indicatingSocket = nullptr;
-                return indicateFirstSocket(&lock);
-            }
-
-            auto request = std::move(m_acceptRequest);
-            m_acceptRequest = nullptr;
-
-            auto socket = std::move(m_indicatingSocket);
-            m_indicatingSocket = nullptr;
-
-            lock.unlock();
-            NX_LOGX(lm("return indicatied socket %1").arg(socket), cl_logDEBUG2);
-            request(SystemError::noError, std::move(socket));
-        });
+    request(std::move(socket));
 }
 
 } // namespace cloud
