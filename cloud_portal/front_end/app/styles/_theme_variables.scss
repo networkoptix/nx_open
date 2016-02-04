@@ -1,8 +1,21 @@
 $font-family-base:        "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
 
+// Brand colors
+// -------------------------
+
+$brand-primary:         $blue10;
+$brand-info:            $blue8;
+
+
 $body-bg:                 light(2);
-$navbar-default-bg:       light(0);
+$navbar-default-bg:       light(1);
 $navbar-margin-bottom:    10px;
+
+$jumbotron-bg:            light(2);
+
+
+
+
 
 $font-size-base:          14px;
 $font-size-large:         ceil($font-size-base * 1.15); // ~16px

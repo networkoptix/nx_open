@@ -109,7 +109,7 @@ body {
     height:100%;
     min-height: 64px;
     z-index:100;
-    background-color:#dddddd;
+    background-color:light(3);
 
     line-height: 100%;
     text-align: center;
@@ -167,4 +167,10 @@ body {
   vertical-align: bottom;
   margin-top: 10px;
   height: 24px;
+}
+
+.btn-wrapper {
+  display: inline-block;
+  padding-top: 10px;
+  padding-left: 10px;
 }
