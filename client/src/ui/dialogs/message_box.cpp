@@ -33,8 +33,8 @@ static QMessageBox::StandardButton showNewMessageBox(QWidget *parent, QMessageBo
 }
 
 
-QnMessageBox::QnMessageBox(QWidget *parent): 
-    base_type(parent) 
+QnMessageBox::QnMessageBox(QWidget *parent):
+    base_type(parent)
 {}
 
 QnMessageBox::QnMessageBox(Icon icon, int helpTopicId, const QString &title, const QString &text, StandardButtons buttons, QWidget *parent, Qt::WindowFlags flags):
@@ -80,11 +80,11 @@ QPushButton* QnMessageBox::addCustomButton(const QString &text, QMessageBox::But
             if (m_customButtons.contains(clicked))
                 return;
             emit defaultButtonClicked(clicked);
-        }); 
+        });
     }
-    
+
     m_customButtons << button;
-    
+
     return button;
 }
 
