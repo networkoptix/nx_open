@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="en_US" sourcelanguage="en">
+<TS version="2.0" language="en_US" sourcelanguage="en">
 <context>
     <name>AboutDialog</name>
     <message>
@@ -600,7 +600,7 @@
     <message>
         <location/>
         <source>&quot;Allow system to optimize camera settings&quot; is disabled in System Administration.</source>
-        <translation type="unfinished"></translation>
+        <translation>&quot;Allow system to optimise camera settings&quot; is disabled in System Administration.</translation>
     </message>
     <message>
         <location/>
