@@ -12,6 +12,7 @@
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/controls/bookmark_tags_control.h>
 #include <ui/actions/action_parameters.h>
+#include <ui/help/help_topics.h>
 
 #include <utils/common/string.h>
 #include <utils/common/delayed.h>
@@ -851,6 +852,12 @@ bool QnBookmarksViewer::readOnly() const
 void QnBookmarksViewer::setReadOnly(bool readonly)
 {
     m_impl->setReadOnly(readonly);
+}
+
+int QnBookmarksViewer::helpTopicAt(const QPointF &pos) const
+{
+    Q_UNUSED(pos);
+    return Qn::Bookmarks_Usage_Help;
 }
 
 void QnBookmarksViewer::setTargetTimestamp(qint64 timestamp)
