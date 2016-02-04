@@ -16,7 +16,6 @@ public:
     void setScrollBar(QScrollBar *scrollBar);
 
     QSize sizeHint() const override;
-    QSize minimumSizeHint() const override;
 
     bool event(QEvent *event) override;
 

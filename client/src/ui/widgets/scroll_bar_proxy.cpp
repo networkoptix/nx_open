@@ -9,6 +9,7 @@ QnScrollBarProxy::QnScrollBarProxy(QWidget *parent)
     , m_visible(true)
 {
     setAttribute(Qt::WA_OpaquePaintEvent, false);
+    setMinimumSize(1, 1);
 }
 
 QnScrollBarProxy::QnScrollBarProxy(QScrollBar *scrollBar, QWidget *parent)
@@ -52,12 +53,7 @@ void QnScrollBarProxy::setScrollBar(QScrollBar *scrollBar)
 
 QSize QnScrollBarProxy::sizeHint() const
 {
-    return QSize(1, 1);
-}
-
-QSize QnScrollBarProxy::minimumSizeHint() const
-{
-    return QSize(1, 1);
+    return QSize(qMax(minimumWidth(), 1), qMax(minimumHeight(), 1));
 }
 
 bool QnScrollBarProxy::event(QEvent *event)
