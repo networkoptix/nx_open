@@ -11,6 +11,7 @@ class QnSnappedScrollBar : public QScrollBar
     typedef QScrollBar base_type;
 
 public:
+    explicit QnSnappedScrollBar(QWidget *parent = nullptr);
     explicit QnSnappedScrollBar(Qt::Orientation orientation, QWidget *parent = nullptr);
     ~QnSnappedScrollBar();
 

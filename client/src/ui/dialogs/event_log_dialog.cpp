@@ -29,7 +29,7 @@
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/skin.h>
 #include <ui/style/warning_style.h>
-#include <ui/widgets/scroll_bar_proxy.h>
+#include <ui/widgets/snapped_scrollbar.h>
 
 #include <ui/workbench/workbench_context.h>
 #include <ui/workaround/widgets_signals_workaround.h>
@@ -132,7 +132,8 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
     ui->eventRulesButton->setIcon(qnSkin->icon("tree/layout.png"));
     ui->loadingProgressBar->hide();
 
-    QnScrollBarProxy::makeProxy(ui->verticalScrollBar, ui->gridEvents);
+    QnSnappedScrollBar *scrollBar = new QnSnappedScrollBar(this);
+    ui->gridEvents->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
     connect(m_filterAction,         &QAction::triggered,                this,   &QnEventLogDialog::at_filterAction_triggered);
     connect(m_resetFilterAction,    &QAction::triggered,                this,   &QnEventLogDialog::at_resetFilterAction_triggered);

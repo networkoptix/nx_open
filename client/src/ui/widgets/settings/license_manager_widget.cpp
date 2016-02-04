@@ -40,9 +40,8 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    QnSnappedScrollBar *tableScrollBar = new QnSnappedScrollBar(Qt::Vertical, this);
+    QnSnappedScrollBar *tableScrollBar = new QnSnappedScrollBar(this);
     ui->gridLicenses->setVerticalScrollBar(tableScrollBar->proxyScrollBar());
-    tableScrollBar->setUseItemViewPaddingWhenVisible(false);
 
     QList<QnLicenseListModel::Column> columns;
     columns 

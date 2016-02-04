@@ -3,7 +3,7 @@
 
 #include <ui/models/license_list_model.h>
 #include "utils/common/synctime.h"
-#include <ui/widgets/scroll_bar_proxy.h>
+#include <ui/widgets/snapped_scrollbar.h>
 
 
 QnLicenseNotificationDialog::QnLicenseNotificationDialog(QWidget *parent, Qt::WindowFlags windowFlags):
@@ -12,14 +12,15 @@ QnLicenseNotificationDialog::QnLicenseNotificationDialog(QWidget *parent, Qt::Wi
 {
     ui->setupUi(this);
 
+    QnSnappedScrollBar *scrollBar = new QnSnappedScrollBar(this);
+    ui->treeView->setVerticalScrollBar(scrollBar->proxyScrollBar());
+
     QList<QnLicenseListModel::Column> columns;
     columns << QnLicenseListModel::TypeColumn << QnLicenseListModel::CameraCountColumn << QnLicenseListModel::LicenseKeyColumn  << QnLicenseListModel::LicenseStatusColumn;
 
     m_model = new QnLicenseListModel(this);
     m_model->setColumns(columns);
     ui->treeView->setModel(m_model);
-
-    QnScrollBarProxy::makeProxy(ui->verticalScrollBar, ui->treeView);
 }
 
 QnLicenseNotificationDialog::~QnLicenseNotificationDialog() {

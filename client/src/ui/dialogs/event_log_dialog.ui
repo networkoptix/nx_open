@@ -231,10 +231,10 @@
        </property>
        <item>
         <layout class="QHBoxLayout" name="tableLayout">
-         <property name="spacing">
-          <number>8</number>
-         </property>
          <property name="leftMargin">
+          <number>16</number>
+         </property>
+         <property name="rightMargin">
           <number>16</number>
          </property>
          <item>
@@ -273,33 +273,6 @@
             <bool>false</bool>
            </attribute>
           </widget>
-         </item>
-         <item>
-          <layout class="QVBoxLayout" name="scrollBarLayout" stretch="0,1">
-           <property name="spacing">
-            <number>0</number>
-           </property>
-           <property name="leftMargin">
-            <number>0</number>
-           </property>
-           <item>
-            <widget class="QWidget" name="scrollBarPlaceholder" native="true">
-             <property name="minimumSize">
-              <size>
-               <width>8</width>
-               <height>24</height>
-              </size>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QScrollBar" name="verticalScrollBar">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-            </widget>
-           </item>
-          </layout>
          </item>
         </layout>
        </item>

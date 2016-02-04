@@ -36,19 +36,16 @@ namespace
     }
 }
 
+QnSnappedScrollBar::QnSnappedScrollBar(QWidget *parent)
+    : base_type(Qt::Vertical, parent),
+      d_ptr(new QnSnappedScrollBarPrivate(this))
+{
+}
+
 QnSnappedScrollBar::QnSnappedScrollBar(Qt::Orientation orientation, QWidget *parent)
     : base_type(orientation, parent),
       d_ptr(new QnSnappedScrollBarPrivate(this))
 {
-    Q_D(QnSnappedScrollBar);
-
-    d->proxyScrollbar = new QnScrollBarProxy(this, this);
-
-    if (parent)
-        parent->installEventFilter(d);
-
-    d->proxyScrollbar->installEventFilter(d);
-    installEventFilter(d);
 }
 
 QnSnappedScrollBar::~QnSnappedScrollBar()
@@ -116,8 +113,17 @@ QnSnappedScrollBarPrivate::QnSnappedScrollBarPrivate(QnSnappedScrollBar *parent)
       proxyScrollbar(nullptr),
       alignment(Qt::AlignRight | Qt::AlignBottom),
       useHeaderShift(true),
-      useItemViewPaddingWhenVisible(true)
+      useItemViewPaddingWhenVisible(false)
 {
+    Q_Q(QnSnappedScrollBar);
+
+    proxyScrollbar = new QnScrollBarProxy(q, q);
+
+    if (q->parentWidget())
+        q->parentWidget()->installEventFilter(this);
+
+    proxyScrollbar->installEventFilter(this);
+    q->installEventFilter(this);
 }
 
 void QnSnappedScrollBarPrivate::updateGeometry()
