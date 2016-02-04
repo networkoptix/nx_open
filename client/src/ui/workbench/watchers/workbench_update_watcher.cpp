@@ -104,8 +104,8 @@ void QnWorkbenchUpdateWatcher::at_checker_updateAvailable(const QnUpdateInfo &in
         return;
 
     /* Do not show notifications near the end of the week or on our holidays. */
-    if (QDateTime::currentDateTime().date().dayOfWeek() >= kTooLateDayOfWeek)
-        return;
+     if (QDateTime::currentDateTime().date().dayOfWeek() >= kTooLateDayOfWeek)
+         return;
 
     QnUpdateInfo oldUpdateInfo = qnSettings->latestUpdateInfo();
     if (oldUpdateInfo.currentRelease != info.currentRelease
@@ -156,7 +156,7 @@ void QnWorkbenchUpdateWatcher::showUpdateNotification(const QnUpdateInfo &info)
         message += lit("</span><br/>");
     }
 
-    QnCheckableMessageBox messageBox(0);
+    QnCheckableMessageBox messageBox(mainWindow());
 
     messageBox.setStandardButtons(buttons);
     messageBox.setIconPixmap(QMessageBox::standardIcon(QMessageBox::Question));
