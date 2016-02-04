@@ -130,8 +130,8 @@ namespace ec2
             installUpdate               = 1202, /*< ApiUpdateInstallData  */
 
             /* Module information */
-            moduleInfo                  = 1301, /*< ApiModuleData */
-            moduleInfoList              = 1302, /*< ApiModuleDataList */
+            discoveredServerChanged     = 1301, /*< ApiDiscoveredServerData */
+            discoveredServersList       = 1302, /*< ApiDiscoveredServerDataList */
 
             /* Discovery */
             discoverPeer                = 1401, /*< ApiDiscoveryData */

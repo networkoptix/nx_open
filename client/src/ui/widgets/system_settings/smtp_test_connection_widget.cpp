@@ -23,7 +23,7 @@ QnSmtpTestConnectionWidget::QnSmtpTestConnectionWidget( QWidget* parent /*= null
 
     m_timeoutTimer->setSingleShot(false);
 
-    connect(ui->cancelTestButton,           &QPushButton::clicked,              this,   [this] { 
+    connect(ui->cancelTestButton,           &QPushButton::clicked,              this,   [this] {
         stopTesting();
         emit finished();
     });
@@ -63,15 +63,14 @@ bool QnSmtpTestConnectionWidget::testSettings( const QnEmailSettings &value ) {
     result.timeout = testSmtpTimeoutMSec / 1000;
 
     if (!result.isValid()) {
-        QMessageBox::warning(this, tr("Invalid data"), tr("Provided parameters not valid. Could not perform test."));
+        QMessageBox::warning(this, tr("Invalid data"), tr("The provided parameters are not valid. Could not perform a test."));
         return false;
     }
 
     QnMediaServerConnectionPtr serverConnection;
-    for(const QnMediaServerResourcePtr &server: qnResPool->getAllServers()) {
-        if (server->getStatus() != Qn::Online)
-            continue;
-
+    const auto onlineServers = qnResPool->getAllServers(Qn::Online);
+    for(const QnMediaServerResourcePtr &server: onlineServers)
+    {
         if (!server->getServerFlags().testFlag(Qn::SF_HasPublicIP))
             continue;
 
@@ -80,7 +79,7 @@ bool QnSmtpTestConnectionWidget::testSettings( const QnEmailSettings &value ) {
     }
 
     if (!serverConnection) {
-        QMessageBox::warning(this, tr("Network Error"), tr("Could not perform a test. None of your servers is connected to the Internet."));
+        QMessageBox::warning(this, tr("Network Error"), tr("Could not perform a test. None of your servers are connected to the Internet."));
         return false;
     }
 
@@ -105,7 +104,7 @@ bool QnSmtpTestConnectionWidget::testSettings( const QnEmailSettings &value ) {
     m_timeoutTimer->setInterval(testSmtpTimeoutMSec / ui->testProgressBar->maximum());
     m_timeoutTimer->start();
 
-    m_testHandle = serverConnection->testEmailSettingsAsync(result, this, SLOT(at_testEmailSettingsFinished(int, const QnTestEmailSettingsReply& , int)));   
+    m_testHandle = serverConnection->testEmailSettingsAsync(result, this, SLOT(at_testEmailSettingsFinished(int, const QnTestEmailSettingsReply& , int)));
     return m_testHandle > 0;
 }
 

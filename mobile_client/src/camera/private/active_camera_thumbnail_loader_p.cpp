@@ -3,6 +3,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <api/server_rest_connection.h>
+#include <utils/jpeg.h>
 
 namespace
 {
@@ -30,8 +31,10 @@ QnActiveCameraThumbnailLoaderPrivate::QnActiveCameraThumbnailLoaderPrivate(
     , imageProvider(nullptr)
     , requestId(invalidRequest)
     , requestNextAfterReply(false)
+    , decompressThread(new QThread(this))
 {
     request.roundMethod = QnThumbnailRequestData::KeyFrameAfterMethod;
+    request.rotation = 0;
 
     screenshotQualityList.append(128);
     screenshotQualityList.append(240);
@@ -40,6 +43,15 @@ QnActiveCameraThumbnailLoaderPrivate::QnActiveCameraThumbnailLoaderPrivate(
     screenshotQualityList.append(560);
     screenshotQualityList.append(720);
     screenshotQualityList.append(1080);
+
+    decompressThread->setObjectName(lit("QnActiveCameraThumbnailLoader_decompressThread"));
+    decompressThread->start();
+}
+
+QnActiveCameraThumbnailLoaderPrivate::~QnActiveCameraThumbnailLoaderPrivate()
+{
+    decompressThread->quit();
+    decompressThread->wait();
 }
 
 QPixmap QnActiveCameraThumbnailLoaderPrivate::thumbnail() const
@@ -98,7 +110,10 @@ void QnActiveCameraThumbnailLoaderPrivate::refresh(bool force)
         if (!success || imageData.isEmpty())
             return;
 
-        thumbnailPixmap = QPixmap::fromImage(QImage::fromData(imageData, "JPG"));
+        {
+            QMutexLocker lk(&thumbnailMutex);
+            thumbnailPixmap = QPixmap::fromImage(decompressJpegImage(imageData));
+        }
 
         Q_Q(QnActiveCameraThumbnailLoader);
         if (camera)
@@ -108,7 +123,7 @@ void QnActiveCameraThumbnailLoaderPrivate::refresh(bool force)
         }
     };
 
-    requestId = server->restConnection()->cameraThumbnailAsync(request, handleReply, QThread::currentThread());
+    requestId = server->restConnection()->cameraThumbnailAsync(request, handleReply, decompressThread);
     fetchTimer.start();
 }
 

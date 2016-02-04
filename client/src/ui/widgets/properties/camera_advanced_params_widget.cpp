@@ -48,13 +48,11 @@ QnCameraAdvancedParamsWidget::QnCameraAdvancedParamsWidget(QWidget* parent /*= N
     m_state(State::Init)
 {
     ui->setupUi(this);
-    
 
     m_advancedParamWidgetsManager.reset(new QnCameraAdvancedParamWidgetsManager(ui->groupsWidget, ui->contentsWidget));
     connect(m_advancedParamWidgetsManager, &QnCameraAdvancedParamWidgetsManager::paramValueChanged, this, &QnCameraAdvancedParamsWidget::at_advancedParamChanged);
 
     connect(ui->loadButton, &QPushButton::clicked, this, &QnCameraAdvancedParamsWidget::loadValues);
-    connect(ui->saveButton, &QPushButton::clicked, this, &QnCameraAdvancedParamsWidget::saveValues);
 }
 
 QnCameraAdvancedParamsWidget::~QnCameraAdvancedParamsWidget()
@@ -195,6 +193,11 @@ void QnCameraAdvancedParamsWidget::saveValues() {
     setState(State::Applying);
 }
 
+bool QnCameraAdvancedParamsWidget::hasChanges() const
+{
+    return m_currentValues.differsFrom(m_loadedValues);
+}
+
 void QnCameraAdvancedParamsWidget::updateCameraAvailability() {
     bool cameraAvailable = isCameraAvailable();
     if (m_cameraAvailable == cameraAvailable)
@@ -207,7 +210,6 @@ void QnCameraAdvancedParamsWidget::updateCameraAvailability() {
 
 void QnCameraAdvancedParamsWidget::updateButtonsState() {
     ui->loadButton->setEnabled(m_cameraAvailable && m_state == State::Init);
-    ui->saveButton->setEnabled(m_cameraAvailable && m_state == State::Init);
 }
 
 
@@ -249,8 +251,7 @@ void QnCameraAdvancedParamsWidget::at_advancedParamChanged(const QString &id, co
         /* Queue modified parameter. */
         m_currentValues[id] = value;
 
-        /* Enable or disable 'Save' button. */
-        //TODO: #GDM
+        emit hasChangesChanged();
     }
 }
 
@@ -283,6 +284,8 @@ void QnCameraAdvancedParamsWidget::at_advancedSettingsLoaded(int status, const Q
 
     /* Update state. */
     setState(State::Init);
+
+    emit hasChangesChanged();
 }
 
 void QnCameraAdvancedParamsWidget::at_advancedParam_saved(int status, const QnCameraAdvancedParamValueList &params, int handle) {
@@ -308,6 +311,8 @@ void QnCameraAdvancedParamsWidget::at_advancedParam_saved(int status, const QnCa
 
     /* Update state. */
     setState(State::Init);
+
+    emit hasChangesChanged();
 }
 
 QnCameraAdvancedParamsWidget::State QnCameraAdvancedParamsWidget::state() const {

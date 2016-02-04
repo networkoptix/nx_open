@@ -30,6 +30,7 @@ public:
 protected:
     int getBitrateMbps() const;
     bool isH264() const;
+    bool isCameraControlRequired() const override;
 
 protected:
     // in av cameras you do not know the size of the frame in advance; 

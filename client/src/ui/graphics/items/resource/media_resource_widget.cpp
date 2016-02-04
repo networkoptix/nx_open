@@ -74,6 +74,8 @@
 
 namespace
 {
+    enum { kMicroInMilliSeconds = 1000 };
+
     bool isSpecialDateTimeValueUsec(qint64 dateTimeUsec)
     {
         return ((dateTimeUsec == DATETIME_NOW)
@@ -140,7 +142,9 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
         , [this](){ return getUtcCurrentTimeMs(); }, this))
     , m_ioModuleOverlayWidget(nullptr)
     , m_ioCouldBeShown(false)
-    , m_ioLicenceStatusHelper() /// Will be created only for IO modules
+    , m_ioLicenceStatusHelper() /// Will be created only for I/O modules
+
+    , m_posUtcMs(DATETIME_INVALID)
 {
     if(!m_resource)
         qnCritical("Media resource widget was created with a non-media resource.");
@@ -222,7 +226,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
 
 
     m_compositeTextOverlay->setMaxFillCoeff(QSizeF(0.7, 0.8));
-    addOverlayWidget(m_compositeTextOverlay, Visible, true, true);
+    addOverlayWidget(m_compositeTextOverlay, UserVisible, true, true);
 
     /* Set up overlays */
     if (m_camera && m_camera->hasFlags(Qn::io_module))
@@ -283,6 +287,9 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     updateCursor();
     updateFisheye();
     setImageEnhancement(item->imageEnhancement());
+
+    connect(this, &QnMediaResourceWidget::updateInfoTextLater
+        , this, &QnMediaResourceWidget::updateCurrentUtcPosMs);
 }
 
 QnMediaResourceWidget::~QnMediaResourceWidget() {
@@ -373,7 +380,7 @@ void QnMediaResourceWidget::createButtons() {
         ioModuleButton->setCheckable(true);
         ioModuleButton->setChecked(false);
         ioModuleButton->setProperty(Qn::NoBlockMotionSelection, true);
-        ioModuleButton->setToolTip(tr("IO Module"));
+        ioModuleButton->setToolTip(tr("I/O Module"));
         connect(ioModuleButton, &QnImageButtonWidget::toggled, this, &QnMediaResourceWidget::at_ioModuleButton_toggled);
         buttonBar()->addButton(IoModuleButton, ioModuleButton);
     }
@@ -395,6 +402,13 @@ void QnMediaResourceWidget::createButtons() {
 const QnMediaResourcePtr &QnMediaResourceWidget::resource() const {
     return m_resource;
 }
+
+bool QnMediaResourceWidget::hasVideo() const
+{
+    return m_resource
+        && m_resource->hasVideo(m_display ? m_display->mediaProvider() : nullptr);
+}
+
 
 QPoint QnMediaResourceWidget::mapToMotionGrid(const QPointF &itemPos) {
     QPointF gridPosF(cwiseDiv(itemPos, cwiseDiv(size(), motionGridSize())));
@@ -418,6 +432,16 @@ QPoint QnMediaResourceWidget::channelGridOffset(int channel) const {
 void QnMediaResourceWidget::suspendHomePtzController() {
     if (m_homePtzController)
         m_homePtzController->suspend();
+}
+
+void QnMediaResourceWidget::updateHud(bool animate)
+{
+    const auto compositeOverlayCouldBeVisible
+        = !options().testFlag(QnResourceWidget::InfoOverlaysForbidden);
+
+    setOverlayWidgetVisible(m_compositeTextOverlay, compositeOverlayCouldBeVisible, animate);
+
+    QnResourceWidget::updateHud(animate);
 }
 
 void QnMediaResourceWidget::resumeHomePtzController() {
@@ -633,8 +657,7 @@ void QnMediaResourceWidget::setDisplay(const QnResourceDisplayPtr &display) {
         m_renderer->setChannelCount(0);
     }
 
-    bool hasVideo = m_resource->hasVideo(m_display ? m_display->mediaProvider() : nullptr);
-    setOption(QnResourceWidget::WindowRotationForbidden, !hasVideo);
+    setOption(QnResourceWidget::WindowRotationForbidden, !hasVideo());
 
     emit displayChanged();
 }
@@ -1038,7 +1061,7 @@ QString QnMediaResourceWidget::calculateDetailsText() const {
         codecString = codecContext->codecName();
 
     QString hqLqString;
-    if (m_resource->hasVideo(m_display->mediaProvider()) && !m_resource->toResource()->hasFlags(Qn::local))
+    if (hasVideo() && !m_resource->toResource()->hasFlags(Qn::local))
         hqLqString = (m_renderer->isLowQualityImage(0)) ? tr("Low-Res") : tr("Hi-Res");
 
     enum {
@@ -1046,7 +1069,7 @@ QString QnMediaResourceWidget::calculateDetailsText() const {
     };
 
     QString result;
-    if (m_resource->hasVideo(m_display->mediaProvider())) {
+    if (hasVideo()) {
         result.append(htmlFormattedParagraph(lit("%1x%2").arg(size.width()).arg(size.height()), kDetailsTextPixelSize, true));
         result.append(htmlFormattedParagraph(lit("%1fps").arg(fps, 0, 'f', 2), kDetailsTextPixelSize, true));
     }
@@ -1055,6 +1078,20 @@ QString QnMediaResourceWidget::calculateDetailsText() const {
     result.append(htmlFormattedParagraph(hqLqString, kDetailsTextPixelSize, true));
 
     return result;
+}
+
+void QnMediaResourceWidget::updateCurrentUtcPosMs()
+{
+    const qint64 usec = getUtcCurrentTimeUsec();
+    qint64 newPos = DATETIME_INVALID;
+    if (!isSpecialDateTimeValueUsec(usec))
+        newPos = usec / kMicroInMilliSeconds;
+
+    if (newPos == m_posUtcMs)
+        return;
+
+    m_posUtcMs = newPos;
+    emit positionChanged(m_posUtcMs);
 }
 
 QString QnMediaResourceWidget::calculatePositionText() const
@@ -1068,7 +1105,6 @@ QString QnMediaResourceWidget::calculatePositionText() const
         if (isSpecialDateTimeValueUsec(dateTimeUsec))
             return QString();
 
-        enum { kMicroInMilliSeconds = 1000 };
         static const auto kOutputFormat = lit("yyyy-MM-dd hh:mm:ss");
 
         const auto dateTimeMs = dateTimeUsec / kMicroInMilliSeconds;
@@ -1098,12 +1134,11 @@ QString QnMediaResourceWidget::calculateTitleText() const {
 
 QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() const {
     Buttons result = base_type::calculateButtonsVisibility();
-    bool hasVideo = m_resource->hasVideo(m_display->mediaProvider());
 
     if (qnRuntime->isDevMode())
         result |= DbgScreenshotButton;
 
-    if(hasVideo && !(resource()->toResource()->flags() & Qn::still_image))
+    if(hasVideo() && !(resource()->toResource()->flags() & Qn::still_image))
         result |= ScreenshotButton;
 
     bool rgbImage = false;
@@ -1114,13 +1149,13 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
     // and not on file extension checks!
     if(((resource()->toResource()->flags() & Qn::still_image)) && !url.endsWith(lit(".jpg")) && !url.endsWith(lit(".jpeg")))
         rgbImage = true;
-    if (!rgbImage && hasVideo)
+    if (!rgbImage && hasVideo())
         result |= EnhancementButton;
 
     if (!zoomRect().isNull())
         return result;
 
-    if (hasVideo && resource()->toResource()->hasFlags(Qn::motion))
+    if (hasVideo() && resource()->toResource()->hasFlags(Qn::motion))
         result |= MotionSearchButton;
 
     bool isExportedLayout = item()
@@ -1148,11 +1183,11 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
 
     if ((resource()->toResource()->hasFlags(Qn::io_module)))
     {
-        if (hasVideo)
+        if (hasVideo())
             result |= IoModuleButton;
     }
 
-    if (!(qnSettings->lightMode() & Qn::LightModeNoZoomWindows) && hasVideo) {
+    if (!(qnSettings->lightMode() & Qn::LightModeNoZoomWindows) && hasVideo()) {
         if(item()
                 && item()->layout()
                 && accessController()->hasPermissions(item()->layout()->resource(), Qn::WritePermission | Qn::AddRemoveItemsPermission)
@@ -1451,21 +1486,21 @@ QnMediaResourceWidget::ResourceStates QnMediaResourceWidget::getResourceStates()
     result.isRealTimeSource = (camDisplay ? camDisplay->isRealTimeSource() : false);
     result.isOffline = (result.isRealTimeSource && (!resource || (resource->getStatus() == Qn::Offline)));
     result.isUnauthorized = (result.isRealTimeSource && (resource && (resource->getStatus() == Qn::Unauthorized)));
-    result.hasVideo = (m_resource && m_resource->hasVideo(m_display->mediaProvider()));
+    result.hasVideo = hasVideo();
 
     return result;
 }
 
 void QnMediaResourceWidget::updateIoModuleVisibility(bool animate) {
     Q_ASSERT_X(m_camera && m_camera->hasFlags(Qn::io_module) && m_ioLicenceStatusHelper
-        , Q_FUNC_INFO, "updateIoModuleVisibility should be called only for io modules");
+        , Q_FUNC_INFO, "updateIoModuleVisibility should be called only for I/O modules");
 
     if (!m_camera || !m_camera->hasFlags(Qn::io_module) || !m_ioLicenceStatusHelper)
         return;
 
     const QnImageButtonWidget * const button = buttonBar()->button(IoModuleButton);
     const bool ioBtnChecked = (button && button->isChecked());
-    const bool onlyIoData = (!m_camera->hasVideo(m_display->mediaProvider()));
+    const bool onlyIoData = !hasVideo();
     const bool correctLicenceStatus = (m_ioLicenceStatusHelper->status() == QnSingleCamLicenceStatusHelper::LicenseUsed);
 
     const auto resource = m_display->resource();
@@ -1495,7 +1530,7 @@ void QnMediaResourceWidget::updateOverlayButton() {
             }
         } else if (overlay == Qn::IoModuleDisabledOverlay) {
 
-            Q_ASSERT_X(m_ioLicenceStatusHelper, Q_FUNC_INFO, "Query IO status overlay for resource widget which is not containing IO module");
+            Q_ASSERT_X(m_ioLicenceStatusHelper, Q_FUNC_INFO, "Query I/O status overlay for resource widget which is not containing I/O module");
 
             if (!m_ioLicenceStatusHelper)
                 return;
@@ -1523,7 +1558,7 @@ void QnMediaResourceWidget::at_statusOverlayWidget_diagnosticsRequested() {
 
 void QnMediaResourceWidget::at_statusOverlayWidget_ioEnableRequested() {
     Q_ASSERT_X(m_ioLicenceStatusHelper, Q_FUNC_INFO
-        , "at_statusOverlayWidget_ioEnableRequested could not be processed for non-io modules");
+        , "at_statusOverlayWidget_ioEnableRequested could not be processed for non-I/O modules");
 
     if (!m_ioLicenceStatusHelper)
         return;
@@ -1565,7 +1600,7 @@ qint64 QnMediaResourceWidget::getUtcCurrentTimeUsec() const {
     if (channel >= channelCount())
         channel = 0;
 
-    qint64 timestampUsec = (m_resource->hasVideo(m_display->mediaProvider()))
+    qint64 timestampUsec = hasVideo()
         ? m_renderer->getTimestampOfNextFrameToRender(channel)
         : display()->camDisplay()->getCurrentTime();
 
@@ -1589,5 +1624,10 @@ qint64 QnMediaResourceWidget::getDisplayTimeUsec() const
     if (!isSpecialDateTimeValueUsec(result))
         result += context()->instance<QnWorkbenchServerTimeWatcher>()->displayOffset(m_resource) * 1000ll;
     return result;
+}
+
+QnCompositeTextOverlay *QnMediaResourceWidget::compositeTextOverlay()
+{
+    return m_compositeTextOverlay;
 }
 

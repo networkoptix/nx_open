@@ -21,7 +21,6 @@ struct QnModuleInformation {
     int port;
     QnUuid id;
     bool sslAllowed;
-    QByteArray authHash;
     int protoVersion;
     QnUuid runtimeId;
     Qn::ServerFlags serverFlags;
@@ -49,7 +48,7 @@ struct QnModuleInformationWithAddresses : QnModuleInformation {
     {}
 };
 
-#define QnModuleInformation_Fields (type)(customization)(version)(systemInformation)(systemName)(name)(port)(id)(sslAllowed)(authHash)(protoVersion)(runtimeId)(serverFlags)(realm)(ecDbReadOnly)
+#define QnModuleInformation_Fields (type)(customization)(version)(systemInformation)(systemName)(name)(port)(id)(sslAllowed)(protoVersion)(runtimeId)(serverFlags)(realm)(ecDbReadOnly)
 #define QnModuleInformationWithAddresses_Fields QnModuleInformation_Fields(remoteAddresses)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnModuleInformation, (ubjson)(xml)(json)(metatype)(eq))

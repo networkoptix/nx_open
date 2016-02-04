@@ -10,6 +10,7 @@
 #include <utils/thread/mutex.h>
 
 #include <deque>
+#include <set>
 #include <QtCore/QFileInfo>
 
 #include <server/server_globals.h>
@@ -88,6 +89,26 @@ public:
         void truncate(qint64 timeMs);
     };
 
+    struct UniqueChunk
+    {
+        TruncableChunk              chunk;
+        QString                     cameraId;
+        QnServer::ChunksCatalog     quality;
+
+        UniqueChunk(
+            const TruncableChunk        &chunk, 
+            const QString               &cameraId,
+            QnServer::ChunksCatalog     quality
+        ) 
+          : chunk(chunk),
+            cameraId(cameraId),
+            quality(quality)
+        {}
+    };
+
+
+    typedef std::set<UniqueChunk> UniqueChunkCont;
+
     struct EmptyFileInfo
     {
         EmptyFileInfo(): startTimeMs(0) {}
@@ -150,6 +171,9 @@ public:
     void setLastSyncTime(int64_t);
     int64_t getLastSyncTime() const;
 
+    // This should be called without m_mutex locked
+    int64_t getLastSyncTimeFromDBNoLock() const;
+
     static QString prefixByCatalog(QnServer::ChunksCatalog catalog);
     static QnServer::ChunksCatalog catalogByPrefix(const QString &prefix);
 
@@ -183,7 +207,6 @@ public:
     QnRecordingStatsData getStatistics(qint64 bitrateAnalizePeriodMs) const;
 
     QnServer::StoragePool getStoragePool() const;
-    void setStoragePool(QnServer::StoragePool value);
 private:
 
     bool csvMigrationCheckFile(const Chunk& chunk, QnStorageResourcePtr storage);
@@ -226,7 +249,7 @@ private:
     const QnServer::ChunksCatalog m_catalog;
     qint64 m_recordingChunkTime;
     QnMutex m_IOMutex;
-    QnServer::StoragePool m_storagePool;
+    const QnServer::StoragePool m_storagePool;
     mutable int64_t m_lastSyncTime;
 };
 
@@ -236,4 +259,24 @@ bool operator < (const DeviceFileCatalog::Chunk& first, const DeviceFileCatalog:
 bool operator < (qint64 first, const DeviceFileCatalog::Chunk& other);
 bool operator < (const DeviceFileCatalog::Chunk& other, qint64 first);
 
+inline bool operator == (const DeviceFileCatalog::UniqueChunk    &lhs, 
+                         const DeviceFileCatalog::UniqueChunk    &rhs)
+{
+    return lhs.chunk.toBaseChunk().startTimeMs == rhs.chunk.toBaseChunk().startTimeMs &&
+           lhs.chunk.toBaseChunk().durationMs == rhs.chunk.toBaseChunk().durationMs &&
+           lhs.cameraId == rhs.cameraId &&
+           lhs.quality == rhs.quality;
+}
+
+inline bool operator < (const DeviceFileCatalog::UniqueChunk    &lhs, 
+                        const DeviceFileCatalog::UniqueChunk    &rhs)
+{
+    if (lhs.cameraId != rhs.cameraId || lhs.quality != rhs.quality) {
+        return lhs.cameraId < rhs.cameraId ?
+               true : lhs.cameraId > rhs.cameraId ?
+                      false : lhs.quality < rhs.quality;
+    } else {
+        return lhs.chunk.startTimeMs < rhs.chunk.startTimeMs;
+    }
+}
 #endif // _DEVICE_FILE_CATALOG_H__

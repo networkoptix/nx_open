@@ -124,12 +124,18 @@ public:
     virtual float visualAspectRatio() const;
     virtual float defaultVisualAspectRatio() const override;
 
+    /** Check if the widget has video. It can be absent in I/O Module, for example. */
+    bool hasVideo() const;
+
+    QnCompositeTextOverlay *compositeTextOverlay();
+
 signals:
     void motionSelectionChanged();
     void displayChanged();
     void fisheyeChanged();
     void dewarpingParamsChanged();
     void colorsChanged();
+    void positionChanged(qint64 positionUtcMs);
 
 protected:
     virtual int helpTopicAt(const QPointF &pos) const override;
@@ -169,6 +175,9 @@ protected:
 
     void suspendHomePtzController();
     void resumeHomePtzController();
+
+    virtual void updateHud(bool animate);
+
 private slots:
     void at_resource_resourceChanged();
     void at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key);
@@ -208,6 +217,8 @@ private:
     qint64 getDisplayTimeUsec() const;
     qint64 getUtcCurrentTimeUsec() const;
     qint64 getUtcCurrentTimeMs() const;
+
+    void updateCurrentUtcPosMs();
 
 private:
     struct ResourceStates
@@ -271,6 +282,8 @@ private:
 
     typedef QScopedPointer<QnSingleCamLicenceStatusHelper> QnSingleCamLicenceStatusHelperPtr;
     QnSingleCamLicenceStatusHelperPtr m_ioLicenceStatusHelper;
+
+    qint64 m_posUtcMs;
 };
 
 Q_DECLARE_METATYPE(QnMediaResourceWidget *)

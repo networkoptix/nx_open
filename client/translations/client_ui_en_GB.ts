@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="en_US" sourcelanguage="en">
+<TS version="2.0" language="en_US" sourcelanguage="en">
 <context>
     <name>AboutDialog</name>
     <message>
@@ -99,11 +99,6 @@
     </message>
     <message>
         <location/>
-        <source>till</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Refresh</source>
         <translation type="unfinished"></translation>
     </message>
@@ -169,12 +164,17 @@
     </message>
     <message>
         <location/>
-        <source>All Servers are offline.  Audit data are not available.</source>
+        <source>Audit Trail</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Audit Trail</source>
+        <source>To</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>All Servers are offline. Audit data is not available.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -226,6 +226,16 @@
     <message>
         <location/>
         <source>Tags:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Pre-recording:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Post-recording:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -473,17 +483,12 @@
     <name>CameraAdvancedParamsWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_params_widget.ui"/>
-        <source>Reload</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Save</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Category</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Refresh</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -595,7 +600,7 @@
     <message>
         <location/>
         <source>&quot;Allow system to optimize camera settings&quot; is disabled in System Administration.</source>
-        <translation type="unfinished"></translation>
+        <translation>&quot;Allow system to optimise camera settings&quot; is disabled in System Administration.</translation>
     </message>
     <message>
         <location/>
@@ -999,17 +1004,7 @@
     </message>
     <message>
         <location/>
-        <source>&amp;Alarm/Event Rules</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
         <source>Ctrl+E</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Event Log</source>
         <translation></translation>
     </message>
     <message>
@@ -1024,17 +1019,7 @@
     </message>
     <message>
         <location/>
-        <source>&amp;Health Monitoring</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
         <source>System Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Open audit trail log</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1049,22 +1034,42 @@
     </message>
     <message>
         <location/>
-        <source>Audit Trail</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Bookmarks</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Ctrl+B</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Bookmarks(&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+B&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <source>&amp;Alarm/Event Rules...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&amp;Event Log...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&amp;Health Monitoring...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Audit Trail...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Open Audit Trail Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&amp;Bookmarks...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Bookmarks List (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+B&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1082,12 +1087,12 @@
     </message>
     <message>
         <location/>
-        <source>Default rotation:</source>
-        <translation type="unfinished">Default Rotation:</translation>
+        <source>This is a fish-eye lens camera</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>This is a fish-eye lens camera</source>
+        <source>Default Rotation:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1297,7 +1302,7 @@
     </message>
     <message>
         <location/>
-        <source>This license type requires higher software version.</source>
+        <source>This license type requires a higher software version.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1859,6 +1864,11 @@
         <source>Check</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location/>
+        <source>You will be reconnected.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnNotificationSoundManagerDialog</name>
@@ -1978,11 +1988,6 @@
     </message>
     <message>
         <location/>
-        <source>Unable to check updates via internet.</source>
-        <translation type="unfinished">Unable to check updates via internet.</translation>
-    </message>
-    <message>
-        <location/>
         <source>Available Update:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1990,6 +1995,11 @@
         <location/>
         <source>To update manually, download and use the archive file on the following link:</source>
         <translation type="unfinished">To update manually, download and use the archive file on the following link:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Unable to check updates on the Internet.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2111,8 +2121,8 @@
     </message>
     <message>
         <location/>
-        <source>Please wait while the connection is restored...</source>
-        <translation type="unfinished">Please wait while the connection is restored...</translation>
+        <source>Please wait while the connection is being restored...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2484,6 +2494,16 @@
         <source>Use custom text:</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location/>
+        <source>Rule will work only for prolonged events</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Also show on source camera</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SignDialog</name>
@@ -2607,11 +2627,6 @@
     </message>
     <message>
         <location/>
-        <source>IO ports</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Enable Audio</source>
         <translation type="unfinished">Enable Audio</translation>
     </message>
@@ -2658,6 +2673,11 @@
     <message>
         <location/>
         <source>Fisheye</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>I/O ports</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2848,11 +2868,6 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <location/>
-        <source>Storage backup is available if there are 2 or more valid storages in the system.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Main Storage Locations</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2869,6 +2884,46 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <location/>
         <source>Set Schedule...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>You haven&apos;t configured any backup storage. Backup won&apos;t be performed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Storage backup is available if there are 2 or more valid storage drives in the system.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Global Backup Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Backup Archive From:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Backup Quality:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;Select at least one camera&gt; </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Server Backup Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Backup Time Label</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2912,11 +2967,6 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <name>SystemSettingsWidget</name>
     <message>
         <location filename="../src/ui/widgets/settings/system_settings_widget.ui"/>
-        <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
-        <translation type="unfinished">Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</translation>
-    </message>
-    <message>
-        <location/>
         <source>(recommended)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2928,6 +2978,11 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <location/>
         <source>Send anonymous usage and crash statistics to software developers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

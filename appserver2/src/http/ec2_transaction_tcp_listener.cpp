@@ -2,6 +2,7 @@
 
 #include <QtCore/QUrlQuery>
 
+#include <api/global_settings.h>
 #include <nx_ec/ec_proto_version.h>
 
 #include "network/tcp_connection_priv.h"
@@ -83,6 +84,10 @@ void QnTransactionTcpProcessor::run()
         return;
     }
 
+    d->response.headers.emplace(
+        "Keep-Alive",
+        nx_http::header::KeepAlive(
+            QnGlobalSettings::instance()->connectionKeepAliveTimeout()).toString());
 
     if( d->request.requestLine.method == nx_http::Method::POST ||
         d->request.requestLine.method == nx_http::Method::PUT )
@@ -181,6 +186,11 @@ void QnTransactionTcpProcessor::run()
             sendResponse(nx_http::StatusCode::forbidden, nx_http::StringType());
             return;
         }
+
+        d->response.headers.emplace(
+            "Keep-Alive",
+            nx_http::header::KeepAlive(
+                QnGlobalSettings::instance()->connectionKeepAliveTimeout()).toString());
     }
 
     QnUuid connectionGuid;
@@ -250,7 +260,8 @@ void QnTransactionTcpProcessor::run()
             );
         sendResponse( nx_http::StatusCode::ok, QnTransactionTransport::TUNNEL_CONTENT_TYPE, contentEncoding );
 
-        QnTransactionMessageBus::instance()->moveConnectionToReadyForStreaming( connectionGuid );
+        if (!QnTransactionMessageBus::instance()->moveConnectionToReadyForStreaming( connectionGuid ))
+            QnTransactionTransport::connectDone(remoteGuid); //< session killed. Cleanup Guid from a connected list manually
 
         d->socket.clear();
     }

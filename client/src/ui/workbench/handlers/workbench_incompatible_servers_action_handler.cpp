@@ -127,10 +127,10 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectTool_finished(int er
     switch (errorCode)
     {
     case QnConnectToCurrentSystemTool::NoError:
-        QMessageBox::information(mainWindow(), tr("Information"), tr("Rejoice! Selected servers have been successfully connected to your system!"));
+        QnMessageBox::information(mainWindow(), tr("Information"), tr("Rejoice! Selected servers have been successfully connected to your system!"));
         break;
     case QnConnectToCurrentSystemTool::AuthentificationFailed: {
-        QMessageBox::critical(mainWindow(), tr("Error"), tr("Authentication failed.") + L'\n' + tr("Please, check the password you have entered."));
+        QnMessageBox::critical(mainWindow(), tr("Error"), tr("Authentication failed.") + L'\n' + tr("Please, check the password you have entered."));
         QSet<QnUuid> targets = m_connectTool->targets();
         QString password = m_connectTool->adminPassword();
         delete m_connectTool;
@@ -138,10 +138,10 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectTool_finished(int er
         break;
     }
     case QnConnectToCurrentSystemTool::ConfigurationFailed:
-        QMessageBox::critical(mainWindow(), tr("Error"), tr("Could not configure the selected servers."));
+        QnMessageBox::critical(mainWindow(), tr("Error"), tr("Could not configure the selected servers."));
         break;
     case QnConnectToCurrentSystemTool::UpdateFailed:
-        QMessageBox::critical(mainWindow(), tr("Error"), tr("Could not update the selected servers.") + L'\n' + tr("You can try to update the servers again in the System Administration."));
+        QnMessageBox::critical(mainWindow(), tr("Error"), tr("Could not update the selected servers.") + L'\n' + tr("You can try to update the servers again in the System Administration dialog."));
         break;
     default:
         break;
@@ -185,7 +185,7 @@ bool QnWorkbenchIncompatibleServersActionHandler::validateStartLicenses(
         "As only 1 START license is allowed per System after your merge you will only have 1 START license remaining.\n"\
         "If you understand this and would like to proceed please click Merge to continue.\n");
 
-    QnMessageBox messageBox(QnMessageBox::Warning, 0, tr("Warning"), message, QnMessageBox::Cancel);
+    QnMessageBox messageBox(QnMessageBox::Warning, 0, tr("Warning!"), message, QnMessageBox::Cancel);
     messageBox.addButton(tr("Merge"), QnMessageBox::AcceptRole);
 
     return messageBox.exec() != QnMessageBox::Cancel;

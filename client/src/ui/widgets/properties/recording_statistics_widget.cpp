@@ -142,7 +142,7 @@ namespace {
             m_comboBox->addItem(tr("Day"),   3600 * 24);
             m_comboBox->addItem(tr("Week"),  3600 * 24 * 7);
             m_comboBox->addItem(tr("Month"), 3600 * 24 * 30);
-            m_comboBox->addItem(tr("All data"), 0);
+            m_comboBox->addItem(tr("All Data"), 0);
             m_comboBox->setCurrentIndex(m_comboBox->count()-1);
 
             connect(this, &QHeaderView::sectionResized, this, [this]() { updateComboBox();}, Qt::DirectConnection);
@@ -168,7 +168,7 @@ namespace {
                 int width = m_comboBox->minimumSizeHint().width();
                 QRect r(rect);
                 r.adjust(0, 0, -(width + SPACE_INTERVAL), 0);
-                painter->drawText(r, Qt::AlignRight | Qt::AlignVCenter, tr("Bitrate for the last recorded:"));
+                painter->drawText(r, Qt::AlignRight | Qt::AlignVCenter, tr("Bitrate for the Last Recorded"));
             }
         }
 
@@ -341,7 +341,7 @@ void QnRecordingStatisticsWidget::query(qint64 bitrateAnalizePeriodMs)
             bitrateAnalizePeriodMs,
             this, SLOT(at_gotStatiscits(int, const QnRecordingStatsReply&, int)));
         m_requests.insert(handle, m_server->getId());
-        handle = m_server->apiConnection()->getStorageSpaceAsync(this, SLOT(at_gotStorageSpace(int, const QnStorageSpaceReply&, int)));
+        handle = m_server->apiConnection()->getStorageSpaceAsync(false, this, SLOT(at_gotStorageSpace(int, const QnStorageSpaceReply&, int)));
         m_requests.insert(handle, m_server->getId());
     }
 }
@@ -551,12 +551,19 @@ QnRecordingStatsReply QnRecordingStatisticsWidget::getForecastData(qint64 extraS
         forecastData.cameras.push_back(std::move(cameraForecast));
         //forecastData.totalSpace += cameraStats.recordedBytes; // 2.1 add current archive space
 
-        for (auto itr = cameraStats.recordedBytesPerStorage.begin(); itr != cameraStats.recordedBytesPerStorage.end(); ++itr)
+        if (cameraStats.uniqueId == QnSortedRecordingStatsModel::kForeignCameras)
         {
-            for (const auto& storageSpaceData: m_availStorages)
+            forecastData.totalSpace += cameraStats.recordedBytes; //<< there are no storages for virtual camera called 'foreign cameras'
+        }
+        else 
+        {
+            for (auto itr = cameraStats.recordedBytesPerStorage.begin(); itr != cameraStats.recordedBytesPerStorage.end(); ++itr)
             {
-                if (storageSpaceData.storageId == itr.key() && storageSpaceData.isUsedForWriting && storageSpaceData.isWritable)
-                    forecastData.totalSpace += itr.value();
+                for (const auto& storageSpaceData: m_availStorages)
+                {
+                    if (storageSpaceData.storageId == itr.key() && storageSpaceData.isUsedForWriting && storageSpaceData.isWritable)
+                        forecastData.totalSpace += itr.value();
+                }
             }
         }
     }

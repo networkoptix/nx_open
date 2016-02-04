@@ -1,7 +1,9 @@
-#ifndef QNDESKTOPCLIENTMESSAGEPROCESSOR_H
-#define QNDESKTOPCLIENTMESSAGEPROCESSOR_H
+#pragma once
 
 #include <client/client_message_processor.h>
+#include <nx_ec/data/api_discovery_data.h>
+
+class QnIncompatibleServerWatcher;
 
 class QnDesktopClientMessageProcessor : public QnClientMessageProcessor
 {
@@ -19,12 +21,11 @@ protected:
     virtual void disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection) override;
 
 private slots:
-    void at_gotInitialModules(const QList<QnModuleInformationWithAddresses> &modules);
+    void at_gotInitialDiscoveredServers(const ec2::ApiDiscoveredServerDataList &discoveredServers);
 
 private:
     QnIncompatibleServerWatcher *m_incompatibleServerWatcher;
 };
 
-#define qnDesktopClientMessageProcessor static_cast<QnDesktopClientMessageProcessor*>(QnDesktopClientMessageProcessor::instance())
-
-#endif // QNDESKTOPCLIENTMESSAGEPROCESSOR_H
+#define qnDesktopClientMessageProcessor \
+    static_cast<QnDesktopClientMessageProcessor*>(QnDesktopClientMessageProcessor::instance())

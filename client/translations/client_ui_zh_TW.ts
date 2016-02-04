@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="zh_TW" sourcelanguage="en_US">
+<TS version="2.0" language="zh_TW" sourcelanguage="en_US">
 <context>
     <name>AboutDialog</name>
     <message>
@@ -99,11 +99,6 @@
     </message>
     <message>
         <location/>
-        <source>till</source>
-        <translation>直至</translation>
-    </message>
-    <message>
-        <location/>
         <source>Refresh</source>
         <translation>重新整理</translation>
     </message>
@@ -125,7 +120,7 @@
     <message>
         <location/>
         <source>Watching live</source>
-        <translation>看LIVE</translation>
+        <translation>瀏覽即時影像</translation>
     </message>
     <message>
         <location/>
@@ -160,7 +155,7 @@
     <message>
         <location/>
         <source>Sessions</source>
-        <translation>Seesions</translation>
+        <translation>工作階段</translation>
     </message>
     <message>
         <location/>
@@ -169,13 +164,18 @@
     </message>
     <message>
         <location/>
-        <source>All Servers are offline.  Audit data are not available.</source>
-        <translation>所有伺服器皆離線. 無法取得審查資料.</translation>
+        <source>Audit Trail</source>
+        <translation>使用者行為記錄</translation>
     </message>
     <message>
         <location/>
-        <source>Audit Trail</source>
-        <translation>追蹤審查</translation>
+        <source>To</source>
+        <translation>至</translation>
+    </message>
+    <message>
+        <location/>
+        <source>All Servers are offline. Audit data is not available.</source>
+        <translation>所有伺服器離線. 無法取得記錄資料.</translation>
     </message>
 </context>
 <context>
@@ -183,32 +183,32 @@
     <message>
         <location filename="../src/ui/dialogs/backup_schedule_dialog.ui"/>
         <source>Backup Schedule...</source>
-        <translation type="unfinished"></translation>
+        <translation>備份排程...</translation>
     </message>
     <message>
         <location/>
         <source>Execute backup on the following days:</source>
-        <translation type="unfinished"></translation>
+        <translation>執行備份於以下日子:</translation>
     </message>
     <message>
         <location/>
         <source>Finish:</source>
-        <translation type="unfinished"></translation>
+        <translation>結束:</translation>
     </message>
     <message>
         <location/>
         <source>Start:</source>
-        <translation type="unfinished"></translation>
+        <translation>開始:</translation>
     </message>
     <message>
         <location/>
         <source>Limit Bandwidth to:</source>
-        <translation type="unfinished"></translation>
+        <translation>限制頻寬:</translation>
     </message>
     <message>
         <location/>
         <source>Mbit/s</source>
-        <translation type="unfinished"></translation>
+        <translation>Mbit/s</translation>
     </message>
 </context>
 <context>
@@ -216,17 +216,27 @@
     <message>
         <location filename="../src/ui/widgets/business/bookmark_business_action_widget.ui"/>
         <source>Fixed duration:</source>
-        <translation type="unfinished"></translation>
+        <translation>固定長度:</translation>
     </message>
     <message>
         <location/>
         <source>seconds</source>
-        <translation type="unfinished"></translation>
+        <translation>秒</translation>
     </message>
     <message>
         <location/>
         <source>Tags:</source>
-        <translation type="unfinished"></translation>
+        <translation>標籤:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Pre-recording:</source>
+        <translation>事前錄影:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Post-recording:</source>
+        <translation>事後錄影:</translation>
     </message>
 </context>
 <context>
@@ -234,32 +244,32 @@
     <message>
         <location filename="../src/ui/widgets/bookmark_widget.ui"/>
         <source>&amp;Name</source>
-        <translation type="unfinished">&amp;名稱</translation>
+        <translation>&amp;名稱</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Timeout</source>
-        <translation type="unfinished">&amp;逾時</translation>
+        <translation>&amp;逾時</translation>
     </message>
     <message>
         <location/>
         <source>T&amp;ags</source>
-        <translation type="unfinished">&amp;標記</translation>
+        <translation>&amp;標籤</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Description</source>
-        <translation type="unfinished">&amp;敘述</translation>
+        <translation>&amp;敘述</translation>
     </message>
     <message>
         <location/>
         <source>List of tags divided by commas or spaces</source>
-        <translation type="unfinished"></translation>
+        <translation>標籤之間以逗號或空白鍵隔開</translation>
     </message>
     <message>
         <location/>
         <source>Popular tags</source>
-        <translation type="unfinished"></translation>
+        <translation>熱門標籤</translation>
     </message>
 </context>
 <context>
@@ -267,27 +277,27 @@
     <message>
         <location filename="../src/ui/dialogs/search_bookmarks_dialog.ui"/>
         <source>-</source>
-        <translation type="unfinished">-</translation>
+        <translation>-</translation>
     </message>
     <message>
         <location/>
         <source>Refresh</source>
-        <translation type="unfinished">重新整理</translation>
+        <translation>重新整理</translation>
     </message>
     <message>
         <location/>
         <source>&lt; Any camera &gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>所有攝影機</translation>
     </message>
     <message>
         <location/>
         <source>All Servers are offline. Logs are not available.</source>
-        <translation type="unfinished">所有攝影機皆已離線. 無法記錄.</translation>
+        <translation>所有攝影機皆已離線. 無法記錄.</translation>
     </message>
     <message>
         <location/>
         <source>Bookmark Log</source>
-        <translation type="unfinished"></translation>
+        <translation>書籤記錄</translation>
     </message>
 </context>
 <context>
@@ -478,18 +488,13 @@
     <name>CameraAdvancedParamsWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_params_widget.ui"/>
-        <source>Reload</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Save</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Category</source>
-        <translation type="unfinished">類別</translation>
+        <translation>類別</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Refresh</source>
+        <translation>重新整理</translation>
     </message>
 </context>
 <context>
@@ -502,7 +507,7 @@
     <message>
         <location/>
         <source>This camera has no advanced settings</source>
-        <translation type="unfinished"></translation>
+        <translation>此攝影機無進階設定</translation>
     </message>
 </context>
 <context>
@@ -605,7 +610,7 @@
     <message>
         <location/>
         <source>Calculate bitrate per GOP instead of bitrate per second (It&apos;ll increase bitrate for camera)</source>
-        <translation>算GOP流量而非每秒流量(這會增加攝影機的流量)</translation>
+        <translation>計算GOP流量而非每秒流量(這會增加攝影機的流量)</translation>
     </message>
     <message>
         <location/>
@@ -679,7 +684,7 @@
     <message>
         <location/>
         <source>Note: Recording Schedule is based on Server Time</source>
-        <translation>注意：錄影排程依伺服器時間</translation>
+        <translation>注意：錄影排程時間依伺服器時間而定</translation>
     </message>
     <message>
         <location/>
@@ -870,7 +875,7 @@
     <message>
         <location/>
         <source>All Servers are offline. Logs are not available.</source>
-        <translation>所有攝影機皆已離線. 無法記錄.</translation>
+        <translation>所有攝影機皆已離線. 無法取得記錄.</translation>
     </message>
     <message>
         <location/>
@@ -888,7 +893,7 @@
     <message>
         <location filename="../src/ui/widgets/business/ptz_preset_business_action_widget.ui"/>
         <source>&amp;PTZ preset:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;PTZ預設點:</translation>
     </message>
 </context>
 <context>
@@ -1006,18 +1011,8 @@
     </message>
     <message>
         <location/>
-        <source>&amp;Alarm/Event Rules</source>
-        <translation>&amp;警報/事件規則</translation>
-    </message>
-    <message>
-        <location/>
         <source>Ctrl+E</source>
         <translation>Ctrl+E</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Event Log</source>
-        <translation>&amp;事件記錄</translation>
     </message>
     <message>
         <location/>
@@ -1031,18 +1026,8 @@
     </message>
     <message>
         <location/>
-        <source>&amp;Health Monitoring</source>
-        <translation>&amp;系統資源監視器</translation>
-    </message>
-    <message>
-        <location/>
         <source>System Settings</source>
         <translation>系統設定</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Open audit trail log</source>
-        <translation>開啟審查追蹤記錄</translation>
     </message>
     <message>
         <location/>
@@ -1056,23 +1041,43 @@
     </message>
     <message>
         <location/>
-        <source>Audit Trail</source>
-        <translation>審查追蹤</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Bookmarks</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Ctrl+B</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl+B</translation>
     </message>
     <message>
         <location/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Bookmarks(&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+B&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <source>&amp;Alarm/Event Rules...</source>
+        <translation>&amp;警報/事件規則...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&amp;Event Log...</source>
+        <translation>&amp;事件記錄...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&amp;Health Monitoring...</source>
+        <translation>&amp;系統監視器...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Audit Trail...</source>
+        <translation>使用者行為記錄...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Open Audit Trail Log</source>
+        <translation>開啟使用者行為記錄</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&amp;Bookmarks...</source>
+        <translation>&amp;書籤...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Bookmarks List (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+B&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;開啟書籤列表 (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+B&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -1089,13 +1094,13 @@
     </message>
     <message>
         <location/>
-        <source>Default rotation:</source>
-        <translation>預設轉向為:</translation>
+        <source>This is a fish-eye lens camera</source>
+        <translation>這是魚眼 (360度) 攝影機</translation>
     </message>
     <message>
         <location/>
-        <source>This is a fish-eye lens camera</source>
-        <translation>這是魚眼 (360度) 攝影機</translation>
+        <source>Default Rotation:</source>
+        <translation>預設翻轉:</translation>
     </message>
 </context>
 <context>
@@ -1304,8 +1309,8 @@
     </message>
     <message>
         <location/>
-        <source>This license type requires higher software version.</source>
-        <translation>此授權類型需要更高階的軟體.</translation>
+        <source>This license type requires a higher software version.</source>
+        <translation>此授權類型適用於更高階版本.</translation>
     </message>
 </context>
 <context>
@@ -1394,7 +1399,7 @@
     <message>
         <location/>
         <source>Activate License</source>
-        <translation>啟動授權 </translation>
+        <translation>啟動授權</translation>
     </message>
     <message>
         <location/>
@@ -1574,7 +1579,7 @@
     <message>
         <location/>
         <source>Time Mode:</source>
-        <translation type="unfinished"></translation>
+        <translation>時間模式:</translation>
     </message>
 </context>
 <context>
@@ -1607,7 +1612,7 @@
     <message>
         <location/>
         <source>Expert</source>
-        <translation>匯出</translation>
+        <translation>專家模式</translation>
     </message>
     <message>
         <location/>
@@ -1866,6 +1871,11 @@
         <source>Check</source>
         <translation>檢查</translation>
     </message>
+    <message>
+        <location/>
+        <source>You will be reconnected.</source>
+        <translation>您將會重新連線.</translation>
+    </message>
 </context>
 <context>
     <name>QnNotificationSoundManagerDialog</name>
@@ -1933,7 +1943,7 @@
     <message>
         <location/>
         <source>Removing this connection option could lead to system malfunction.</source>
-        <translation>移除此連線可能導致系統故障.</translation>
+        <translation>移除此連線可能導致系統異常.</translation>
     </message>
 </context>
 <context>
@@ -1985,11 +1995,6 @@
     </message>
     <message>
         <location/>
-        <source>Unable to check updates via internet.</source>
-        <translation>無法從網際網路取得更新.</translation>
-    </message>
-    <message>
-        <location/>
         <source>Available Update:</source>
         <translation>可用更新:</translation>
     </message>
@@ -1997,6 +2002,11 @@
         <location/>
         <source>To update manually, download and use the archive file on the following link:</source>
         <translation>請至以下連結下載更新檔以手動更新:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Unable to check updates on the Internet.</source>
+        <translation>無法於網際網路上檢查更新.</translation>
     </message>
 </context>
 <context>
@@ -2118,8 +2128,8 @@
     </message>
     <message>
         <location/>
-        <source>Please wait while the connection is restored...</source>
-        <translation>重新連線中, 請稍候...</translation>
+        <source>Please wait while the connection is being restored...</source>
+        <translation>連線還原中, 請稍候...</translation>
     </message>
 </context>
 <context>
@@ -2461,17 +2471,17 @@
     <message>
         <location filename="../src/ui/widgets/business/show_on_alarm_layout_action_widget.ui"/>
         <source>for</source>
-        <translation type="unfinished"></translation>
+        <translation>給</translation>
     </message>
     <message>
         <location/>
         <source>Force Alarm Layout opening</source>
-        <translation type="unfinished"></translation>
+        <translation>強制彈跳影像</translation>
     </message>
     <message>
         <location/>
         <source>Also show source camera</source>
-        <translation type="unfinished"></translation>
+        <translation>也顯示來源攝影機</translation>
     </message>
 </context>
 <context>
@@ -2479,17 +2489,27 @@
     <message>
         <location filename="../src/ui/widgets/business/show_text_overlay_action_widget.ui"/>
         <source>seconds</source>
-        <translation type="unfinished"></translation>
+        <translation>秒</translation>
     </message>
     <message>
         <location/>
         <source>Display text for:</source>
-        <translation type="unfinished"></translation>
+        <translation>顯示字幕:</translation>
     </message>
     <message>
         <location/>
         <source>Use custom text:</source>
-        <translation type="unfinished"></translation>
+        <translation>使用客制字幕:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Rule will work only for prolonged events</source>
+        <translation>規則只運作於延長事件</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Also show on source camera</source>
+        <translation>也顯示來源攝影機</translation>
     </message>
 </context>
 <context>
@@ -2565,7 +2585,7 @@
     <message>
         <location/>
         <source>Authentication</source>
-        <translation>認證</translation>
+        <translation>驗證</translation>
     </message>
     <message>
         <location/>
@@ -2611,11 +2631,6 @@
         <location/>
         <source>Expert</source>
         <translation>專家模式</translation>
-    </message>
-    <message>
-        <location/>
-        <source>IO ports</source>
-        <translation>IO 埠</translation>
     </message>
     <message>
         <location/>
@@ -2667,68 +2682,73 @@
         <source>Fisheye</source>
         <translation>魚眼</translation>
     </message>
+    <message>
+        <location/>
+        <source>I/O ports</source>
+        <translation>I/O模組</translation>
+    </message>
 </context>
 <context>
     <name>SmtpAdvancedSettingsWidget</name>
     <message>
         <location filename="../src/ui/widgets/system_settings/smtp_advanced_settings_widget.ui"/>
         <source>SMTP &amp;Server:</source>
-        <translation type="unfinished">SMTP&amp;伺服器:</translation>
+        <translation>SMTP&amp;伺服器:</translation>
     </message>
     <message>
         <location/>
         <source>&amp;User:</source>
-        <translation type="unfinished">&amp;使用者:</translation>
+        <translation>&amp;使用者:</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Password:</source>
-        <translation type="unfinished">&amp;密碼:</translation>
+        <translation>&amp;密碼:</translation>
     </message>
     <message>
         <location/>
         <source>Email:</source>
-        <translation type="unfinished">Email:</translation>
+        <translation>Email:</translation>
     </message>
     <message>
         <location/>
         <source>P&amp;ort:</source>
-        <translation type="unfinished">&amp;通訊埠:</translation>
+        <translation>&amp;通訊埠:</translation>
     </message>
     <message>
         <location/>
         <source>Unsecure Connection</source>
-        <translation type="unfinished">不安全的連線</translation>
+        <translation>不安全的連線</translation>
     </message>
     <message>
         <location/>
         <source>(recommended)</source>
-        <translation type="unfinished">(建議)</translation>
+        <translation>(建議)</translation>
     </message>
     <message>
         <location/>
         <source>Secure connection using TLS.</source>
-        <translation type="unfinished">使用 TLS 安全連線.</translation>
+        <translation>使用 TLS 安全連線.</translation>
     </message>
     <message>
         <location/>
         <source>Secure connection using SSL.</source>
-        <translation type="unfinished">使用 SSL 安全連線.</translation>
+        <translation>使用 SSL 安全連線.</translation>
     </message>
     <message>
         <location/>
         <source>&amp;System Signature:</source>
-        <translation type="unfinished">&amp;系統簽章:</translation>
+        <translation>&amp;系統簽章:</translation>
     </message>
     <message>
         <location/>
         <source>Enter a short system description here.</source>
-        <translation type="unfinished">在此輸入簡短的系統描述.</translation>
+        <translation>在此輸入簡短的系統描述.</translation>
     </message>
     <message>
         <location/>
         <source>Support Signature:</source>
-        <translation type="unfinished">支援簽章:</translation>
+        <translation>支援簽章:</translation>
     </message>
 </context>
 <context>
@@ -2754,27 +2774,27 @@
     <message>
         <location filename="../src/ui/widgets/system_settings/smtp_simple_settings_widget.ui"/>
         <source>&amp;Email:</source>
-        <translation type="unfinished">&amp;Email:</translation>
+        <translation>&amp;Email:</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Password:</source>
-        <translation type="unfinished">&amp;密碼:</translation>
+        <translation>&amp;密碼:</translation>
     </message>
     <message>
         <location/>
         <source>&amp;System Signature:</source>
-        <translation type="unfinished">&amp;系統簽章:</translation>
+        <translation>&amp;系統簽章:</translation>
     </message>
     <message>
         <location/>
         <source>Enter a short system description here.</source>
-        <translation type="unfinished">在此輸入簡短的系統描述.</translation>
+        <translation>在此輸入簡短的系統描述.</translation>
     </message>
     <message>
         <location/>
         <source>Support Signature:</source>
-        <translation type="unfinished">支援簽章:</translation>
+        <translation>支援簽章:</translation>
     </message>
 </context>
 <context>
@@ -2782,42 +2802,42 @@
     <message>
         <location filename="../src/ui/widgets/system_settings/smtp_test_connection_widget.ui"/>
         <source>Server:</source>
-        <translation type="unfinished">伺服器:</translation>
+        <translation>伺服器:</translation>
     </message>
     <message>
         <location/>
         <source>Port:</source>
-        <translation type="unfinished">通訊埠:</translation>
+        <translation>通訊埠:</translation>
     </message>
     <message>
         <location/>
         <source>User:</source>
-        <translation type="unfinished">使用者:</translation>
+        <translation>使用者:</translation>
     </message>
     <message>
         <location/>
         <source>Security:</source>
-        <translation type="unfinished">安全性:</translation>
+        <translation>安全性:</translation>
     </message>
     <message>
         <location/>
         <source>Progress:</source>
-        <translation type="unfinished">處理:</translation>
+        <translation>處理:</translation>
     </message>
     <message>
         <location/>
         <source>Result:</source>
-        <translation type="unfinished">結果:</translation>
+        <translation>結果:</translation>
     </message>
     <message>
         <location/>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location/>
         <source>Cancel</source>
-        <translation type="unfinished">取消</translation>
+        <translation>取消</translation>
     </message>
 </context>
 <context>
@@ -2825,59 +2845,94 @@
     <message>
         <location filename="../src/ui/widgets/properties/storage_config_widget.ui"/>
         <source>Rebuild Archive Index</source>
-        <translation type="unfinished"></translation>
+        <translation>重建錄影索引檔</translation>
     </message>
     <message>
         <location/>
         <source>Backup progress</source>
-        <translation type="unfinished"></translation>
+        <translation>備份進度</translation>
     </message>
     <message>
         <location/>
         <source>Cancel</source>
-        <translation type="unfinished">取消</translation>
+        <translation>取消</translation>
     </message>
     <message>
         <location/>
         <source>Start Backup Now</source>
-        <translation type="unfinished"></translation>
+        <translation>開始備份</translation>
     </message>
     <message>
         <location/>
         <source>Unchecking the storage will cause nothing but writing stop.
 It won&apos;t deny oldest footage removing from the drive.</source>
-        <translation type="unfinished">取消勾選會導致寫入中斷.
+        <translation>取消勾選會導致寫入中斷.
 硬碟中最舊的資料仍會被刪除.</translation>
     </message>
     <message>
         <location/>
         <source>Add External Storage...</source>
-        <translation type="unfinished">新增外部儲存...</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Storage backup is available if there are 2 or more valid storages in the system.</source>
-        <translation type="unfinished"></translation>
+        <translation>新增外部儲存...</translation>
     </message>
     <message>
         <location/>
         <source>Main Storage Locations</source>
-        <translation type="unfinished"></translation>
+        <translation>主要儲存位置</translation>
     </message>
     <message>
         <location/>
         <source>Backup Storage Locations</source>
-        <translation type="unfinished"></translation>
+        <translation>備份儲存位置</translation>
     </message>
     <message>
         <location/>
         <source>Execute Backup</source>
-        <translation type="unfinished"></translation>
+        <translation>進行備份</translation>
     </message>
     <message>
         <location/>
         <source>Set Schedule...</source>
-        <translation type="unfinished"></translation>
+        <translation>設定排程...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>You haven&apos;t configured any backup storage. Backup won&apos;t be performed.</source>
+        <translation>您尚未設定任何備份儲存裝置. 備份將不會進行.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Storage backup is available if there are 2 or more valid storage drives in the system.</source>
+        <translation>影像備份需要兩個或以上的儲存空間方可運作.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Global Backup Settings</source>
+        <translation>全域備份設定</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Backup Archive From:</source>
+        <translation>影像備份來源:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Backup Quality:</source>
+        <translation>備份品質:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;Select at least one camera&gt; </source>
+        <translation>&lt;選擇至少一支攝影機&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Server Backup Settings</source>
+        <translation>伺服器備份設定</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Backup Time Label</source>
+        <translation>備份時間標籤</translation>
     </message>
 </context>
 <context>
@@ -2885,7 +2940,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <location filename="../src/ui/widgets/properties/storage_rebuild_widget.ui"/>
         <source>Cancel</source>
-        <translation type="unfinished">取消</translation>
+        <translation>取消</translation>
     </message>
 </context>
 <context>
@@ -2920,11 +2975,6 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <name>SystemSettingsWidget</name>
     <message>
         <location filename="../src/ui/widgets/settings/system_settings_widget.ui"/>
-        <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
-        <translation>警告! 錄影排程的 FPS 及 畫質設定將無作用!</translation>
-    </message>
-    <message>
-        <location/>
         <source>(recommended)</source>
         <translation>(建議)</translation>
     </message>
@@ -2937,6 +2987,11 @@ It won&apos;t deny oldest footage removing from the drive.</source>
         <location/>
         <source>Send anonymous usage and crash statistics to software developers</source>
         <translation>匿名寄送使用與故障統計報告給軟體開發人員</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
+        <translation>警告! 這將導致錄影排程中的畫質與FPS設定失去關聯.</translation>
     </message>
 </context>
 <context>

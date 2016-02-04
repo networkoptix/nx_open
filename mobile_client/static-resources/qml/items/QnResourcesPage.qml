@@ -10,7 +10,7 @@ import ".."
 QnPage {
     id: resourcesPage
 
-    title: connectionManager.systemName
+    title: mainWindow.currentSystemName
 
     property alias searchActive: searchItem.opened
 
@@ -196,7 +196,7 @@ QnPage {
     focus: true
 
     Keys.onReleased: {
-        if (event.key === Qt.Key_Back) {
+        if (Main.keyIsBack(event.key)) {
             if (searchItem.opened) {
                 searchItem.close()
                 event.accepted = true

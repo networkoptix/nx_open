@@ -85,7 +85,6 @@ private:
     mutable QnMutex m_syncMutex;
     QVector<DelayedData> m_delayedData;
     QVector<DeleteRecordInfo> m_recordsToDelete;
-    QnMutex m_delMutex;
     QnDbTransaction m_tran;
     bool m_needReopenDB;
 };

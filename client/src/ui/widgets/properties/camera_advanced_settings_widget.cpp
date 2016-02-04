@@ -32,6 +32,8 @@ QnCameraAdvancedSettingsWidget::QnCameraAdvancedSettingsWidget(QWidget* parent /
 {
     ui->setupUi(this);
     initWebView();
+
+    connect(ui->cameraAdvancedParamsWidget, &QnCameraAdvancedParamsWidget::hasChangesChanged, this, &QnCameraAdvancedSettingsWidget::hasChangesChanged);
 }
 
 QnCameraAdvancedSettingsWidget::~QnCameraAdvancedSettingsWidget() {
@@ -122,6 +124,22 @@ void QnCameraAdvancedSettingsWidget::reloadData() {
     } else if (m_page == Page::Manual) {
         ui->cameraAdvancedParamsWidget->loadValues();
     }
+}
+
+bool QnCameraAdvancedSettingsWidget::hasChanges() const
+{
+    if (ui->stackedWidget->currentWidget() != ui->manualPage)
+        return false;
+
+    return ui->cameraAdvancedParamsWidget->hasChanges();
+}
+
+void QnCameraAdvancedSettingsWidget::submitToResource()
+{
+    if (!hasChanges())
+        return;
+
+    ui->cameraAdvancedParamsWidget->saveValues();
 }
 
 void QnCameraAdvancedSettingsWidget::initWebView() {

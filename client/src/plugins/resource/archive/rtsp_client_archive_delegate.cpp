@@ -179,7 +179,7 @@ void QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(const QnVirtualCam
     QnMediaServerResourceList mediaServerList = qnCameraHistoryPool->getCameraFootageData(camera, true);
 
     /* Check if no archive available on any server. */
-    if (mediaServerList.isEmpty()) {
+    if (mediaServerList.size() <= 1) {
         m_globalMinArchiveTime = qint64(AV_NOPTS_VALUE);
         return;
     }
@@ -242,6 +242,7 @@ bool QnRtspClientArchiveDelegate::openInternal() {
     m_closing = false;
 
     m_customVideoLayout.reset();
+    m_globalMinArchiveTime = startTime(); // force current value to avoid flicker effect while current server is being changed
    
     if (!m_fixedServer) {
         m_server = getServerOnTime(m_position); // try to update server
@@ -254,12 +255,11 @@ bool QnRtspClientArchiveDelegate::openInternal() {
     }
 
     setupRtspSession(m_camera, m_server, &m_rtspSession, m_playNowModeAllowed);
-    m_rtpData = 0;
+    setRtpData(0);
 
     const bool isOpened = m_rtspSession.open(getUrl(m_camera, m_server), m_lastSeekTime).errorCode == CameraDiagnostics::ErrorCode::noError;
     if (isOpened)
     {
-        m_globalMinArchiveTime = startTime(); // force current value to avoid flicker effect while current server is being changed
         if (m_isMultiserverAllowed)
             checkMinTimeFromOtherServer(m_camera);
 
@@ -270,7 +270,7 @@ bool QnRtspClientArchiveDelegate::openInternal() {
         m_rtspSession.play(m_position, endTime, m_rtspSession.getScale());
         RTPSession::TrackMap trackInfo =  m_rtspSession.getTrackInfo();
         if (!trackInfo.isEmpty())
-            m_rtpData = trackInfo[0]->ioDevice;
+            setRtpData(trackInfo[0]->ioDevice);
         if (!m_rtpData)
             m_rtspSession.stop();
     }
@@ -314,10 +314,17 @@ void QnRtspClientArchiveDelegate::parseAudioSDP(const QList<QByteArray>& audioSD
     }
 }
 
+void QnRtspClientArchiveDelegate::setRtpData(RTPIODevice* value)
+{
+    QnMutexLocker lock(&m_rtpDataMutex);
+    m_rtpData = value;
+}
+
 void QnRtspClientArchiveDelegate::beforeClose()
 {
     //m_waitBOF = false;
     m_closing = true;
+    QnMutexLocker lock(&m_rtpDataMutex);
     if (m_rtpData)
         m_rtpData->getMediaSocket()->close();
 }

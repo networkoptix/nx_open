@@ -3,8 +3,11 @@
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
 
-#include <utils/common/app_info.h>
 #include <common/common_module.h>
+
+#include <update/update_info.h>
+
+#include <utils/common/app_info.h>
 
 QnUpdateChecker::QnUpdateChecker(const QUrl &url, QObject *parent) :
     QObject(parent),
@@ -40,10 +43,13 @@ void QnUpdateChecker::at_networkReply_finished() {
     if (currentRelease.isEmpty())
         return;
 
-    QUrl releaseNotesUrl = map.value(lit("release_notes")).toUrl();
+    QnUpdateInfo info;
+    info.releaseNotesUrl = map.value(lit("release_notes")).toUrl();
+    info.releaseDateMs =  map.value(lit("release_date")).toLongLong();
+    info.releaseDeliveryDays = map.value(lit("release_delivery")).toInt();
 
-    map = map.value(lit("releases")).toMap();
-    QnSoftwareVersion version(map.value(currentRelease).toString());
-    if (!version.isNull())
-        emit updateAvailable(version, releaseNotesUrl);
+    QVariantMap releases = map.value(lit("releases")).toMap();
+    info.currentRelease = QnSoftwareVersion(releases.value(currentRelease).toString());
+    if (!info.currentRelease.isNull())
+        emit updateAvailable(info);
 }

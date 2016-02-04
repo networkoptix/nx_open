@@ -6,6 +6,7 @@ import com.networkoptix.qml 1.0
 import "../main.js" as Main
 
 import "../controls"
+import ".."
 
 Item {
     id: cameraFlow
@@ -14,19 +15,41 @@ Item {
 
     clip: true
 
-    QtObject {
+    QnObject
+    {
         id: d
 
-        property var pendingHiddenItems: []
+        property var hiddenItems: []
         property real maxItemWidth: dp(192)
         property int thumbnailsInRow: Math.max(2, Math.floor(cameraGrid.width / maxItemWidth))
 
-        function hidePendingItems() {
-            if (pendingHiddenItems.length == 0)
+        function showHiddenItems()
+        {
+            if (hiddenItems.length == 0)
                 return
 
-            settings.hiddenCameras = settings.hiddenCameras.concat(settings.hiddenCameras, pendingHiddenItems)
-            pendingHiddenItems = []
+            // use temporary object to update QML property correctly
+            var items = settings.hiddenCameras.slice()
+
+            for (var i = 0; i < hiddenItems.length; ++i)
+            {
+                var index = items.indexOf(hiddenItems[i])
+                    if (index != -1)
+                        items.splice(index, 1)
+            }
+
+            hiddenItems = []
+
+            settings.hiddenCameras = items
+        }
+
+        Connections {
+            target: resourcesPage
+            onPageStatusChanged:
+            {
+                if (pageStatus != Stack.Active && pageStatus != Stack.Activating)
+                    d.hiddenItems = []
+            }
         }
     }
 
@@ -67,45 +90,52 @@ Item {
                 }
                 onHiddenChanged: {
                     // use temporary object to update QML property correctly
-                    var items = d.pendingHiddenItems
+                    var items = d.hiddenItems
 
-                    if (hidden) {
+                    if (hidden)
                         items.push(model.uuid)
-                    } else {
-                        var index = items.indexOf(model.uuid)
-                        if (index != -1)
-                            items.splice(index, 1)
-                    }
+                    d.hiddenItems = items
 
-                    d.pendingHiddenItems = items
+                    settings.hiddenCameras.push(model.uuid)
+                    hiddenCamerasPopup.restartTimer()
                 }
             }
 
             Timer {
                 id: refreshTimer
 
-                interval: 60 * 1000
+                readonly property int initialLoadDelay: 400
+                readonly property int reloadDelay: 60 * 1000
+
+                interval: initialLoadDelay
                 repeat: true
                 running: connectionManager.connectionState == QnConnectionManager.Connected
-                triggeredOnStart: true
 
-                onTriggered: camerasModel.refreshThumbnail(index)
+                onTriggered: {
+                    interval = reloadDelay
+                    camerasModel.refreshThumbnail(index)
+                }
+
+                onRunningChanged: {
+                    if (!running)
+                        interval = initialLoadDelay
+                }
             }
         }
 
         move: Transition {
-            NumberAnimation { properties: "x,y"; duration: 500; easing.type: Easing.OutCubic }
+            NumberAnimation { properties: "x,y"; duration: 250; easing.type: Easing.OutCubic }
         }
         displaced: Transition {
-            NumberAnimation { properties: "x,y"; duration: 500; easing.type: Easing.OutCubic }
+            NumberAnimation { properties: "x,y"; duration: 250; easing.type: Easing.OutCubic }
         }
         add: Transition {
             id: addTransition
-            NumberAnimation { property: "y"; from: addTransition.ViewTransition.destination.y + dp(56); duration: 500; easing.type: Easing.OutCubic }
+            NumberAnimation { property: "y"; from: addTransition.ViewTransition.destination.y + dp(56); duration: 250; easing.type: Easing.OutCubic }
         }
         populate: Transition {
             id: populateTransition
-            NumberAnimation { property: "y"; from: populateTransition.ViewTransition.destination.y + dp(56); duration: 500; easing.type: Easing.OutCubic }
+            NumberAnimation { property: "y"; from: populateTransition.ViewTransition.destination.y + dp(56); duration: 250; easing.type: Easing.OutCubic }
         }
         remove: Transition {
             NumberAnimation { property: "opacity"; to: 0.0; duration: 250; easing.type: Easing.OutCubic }
@@ -122,16 +152,18 @@ Item {
         id: hiddenCamerasComponent
 
         Item {
+            id: hiddenCameras
+
+            property bool collapsed: true
+            readonly property int collapseDuration: 250
+
             width: cameraFlow.width
-            height: hiddenCamerasContent.height
+            height: (hiddenCamerasList.count > 0) ? hiddenCamerasContent.height : 0
 
             Column {
                 id: hiddenCamerasContent
 
-                property bool collapsed: true
-
-                width: parent.width - cameraGrid.spacing * 2
-                x: cameraGrid.spacing
+                width: parent.width
                 visible: hiddenCamerasList.count > 0
 
                 Item {
@@ -140,7 +172,6 @@ Item {
 
                     Rectangle {
                         anchors.verticalCenter: parent.bottom
-                        anchors.verticalCenterOffset: -dp(8)
                         width: parent.width
                         height: dp(1)
                         color: QnTheme.listSeparator
@@ -155,14 +186,14 @@ Item {
                         source: "image://icon/section_open.png"
                         anchors.verticalCenter: parent.verticalCenter
                         x: dp(16)
-                        rotation: hiddenCamerasContent.collapsed ? 180 : 0
-                        Behavior on rotation { NumberAnimation { duration: 500; easing.type: Easing.OutCubic } }
+                        rotation: hiddenCameras.collapsed ? 180 : 0
+                        Behavior on rotation { NumberAnimation { duration: hiddenCameras.collapseDuration; easing.type: Easing.OutCubic } }
                         scale: iconScale()
                     }
 
                     Text {
                         anchors.verticalCenter: parent.verticalCenter
-                        x: dp(72)
+                        x: dp(56)
                         text: qsTr("Hidden cameras")
                         font.pixelSize: sp(16)
                         font.weight: Font.DemiBold
@@ -171,8 +202,8 @@ Item {
 
                     QnMaterialSurface {
                         onClicked: {
-                            hiddenCamerasContent.collapsed = !hiddenCamerasContent.collapsed
-                            if (hiddenCamerasContent.collapsed) {
+                            hiddenCameras.collapsed = !hiddenCameras.collapsed
+                            if (hiddenCameras.collapsed) {
                                 expandAnimation.stop()
                                 collapseAnimation.start()
                             } else {
@@ -189,39 +220,59 @@ Item {
                     height: 0
                     clip: true
 
-                    ParallelAnimation {
+                    SequentialAnimation {
                         id: expandAnimation
-                        NumberAnimation {
-                            target: hiddenList
-                            property: "height"
-                            to: hiddenCamerasColumn.height
-                            duration: 500
-                            easing.type: Easing.OutCubic
+
+                        ParallelAnimation {
+                            NumberAnimation {
+                                target: hiddenList
+                                property: "height"
+                                to: hiddenCamerasColumn.height
+                                duration: hiddenCameras.collapseDuration
+                                easing.type: Easing.OutCubic
+                            }
+                            NumberAnimation {
+                                target: cameraGrid
+                                property: "contentY"
+                                to: cameraGrid.contentY + Math.min(hiddenCamerasColumn.height, cameraGrid.height - dp(56))
+                                duration: hiddenCameras.collapseDuration
+                                easing.type: Easing.OutCubic
+                            }
                         }
-                        NumberAnimation {
-                            target: cameraGrid
-                            property: "contentY"
-                            to: cameraGrid.contentY + Math.min(hiddenCamerasColumn.height, cameraGrid.height - dp(56))
-                            duration: 500
-                            easing.type: Easing.OutCubic
+
+                        ScriptAction {
+                            script: {
+                                hiddenList.height = Qt.binding(function() { return hiddenCamerasColumn.height })
+                                hiddenList.clip = false
+                            }
                         }
                     }
 
-                    ParallelAnimation {
+                    SequentialAnimation {
                         id: collapseAnimation
-                        NumberAnimation {
-                            target: hiddenList
-                            property: "height"
-                            to: 0
-                            duration: 500
-                            easing.type: Easing.OutCubic
+
+                        ScriptAction {
+                            script: {
+                                hiddenList.height = hiddenList.height // kill the binding
+                                hiddenList.clip = true
+                            }
+                        }
+
+                        ParallelAnimation {
+                            NumberAnimation {
+                                target: hiddenList
+                                property: "height"
+                                to: 0
+                                duration: hiddenCameras.collapseDuration
+                                easing.type: Easing.OutCubic
+                            }
                         }
                     }
 
                     Column {
                         id: hiddenCamerasColumn
-                        width: parent.width - cameraGrid.leftMargin - cameraGrid.rightMargin
-                        x: cameraGrid.leftMargin
+
+                        width: parent.width
 
                         Repeater {
                             id: hiddenCamerasList
@@ -241,26 +292,26 @@ Item {
                                     Main.openMediaResource(model.uuid, Math.max(0, point.x), Math.max(0, point.y), model.thumbnail)
                                 }
                                 onShowClicked: {
-                                    var originalList = settings.hiddenCameras
+                                    d.hiddenItems = []
 
-                                    var hiddenCameras = d.pendingHiddenItems
-                                    d.pendingHiddenItems = []
+                                    var items = settings.hiddenCameras.slice()
 
-                                    for (var i = 0; i < originalList.length; i++) {
-                                        if (originalList[i] !== model.uuid)
-                                            hiddenCameras.push(originalList[i])
-                                    }
+                                    var index = items.indexOf(model.uuid)
+                                    if (index != -1)
+                                        items.splice(index, 1)
 
-                                    settings.hiddenCameras = hiddenCameras
+                                    settings.hiddenCameras = items
                                 }
                             }
                         }
-                        move: Transition {
-                            NumberAnimation { properties: "y"; duration: 500; easing.type: Easing.OutCubic }
+
+                        move: Transition
+                        {
+                            NumberAnimation { properties: "y"; duration: 250; easing.type: Easing.OutCubic }
                         }
-                        add: Transition {
-                            id: hiddenIntemAddTransition
-                            NumberAnimation { property: "y"; from: hiddenIntemAddTransition.ViewTransition.destination.y + dp(56); duration: 500; easing.type: Easing.OutCubic }
+                        add: Transition
+                        {
+                            NumberAnimation { property: "opacity"; from: 0; to: 1; duration: 250; easing.type: Easing.OutCubic }
                         }
                     }
                 }
@@ -271,33 +322,34 @@ Item {
     QnToast {
         id: hiddenCamerasPopup
 
-        property bool isShown: d.pendingHiddenItems.length > 0
+        property int prevCount: 0
+        property int count: d.hiddenItems.length
+        property bool isShown: count > 0
 
-        text: qsTr("%n cameras hidden", "", d.pendingHiddenItems.length)
+        timeout: 5000
+
+        onCountChanged: {
+            if (count > prevCount)
+                text = qsTr("%n cameras are hidden", "", count)
+        }
+
         mainButton {
-            icon: "image://icon/done.png"
+            icon: "image://icon/undo.png"
             color: "transparent"
-            onClicked: d.hidePendingItems()
+            onClicked: d.showHiddenItems()
         }
 
         onIsShownChanged: {
-            if (isShown)
+            if (isShown) {
                 show()
-            else
+            } else {
                 hide()
-        }
-
-        Connections {
-            target: resourcesPage
-            onPageStatusChanged: {
-                if (pageStatus != Stack.Active && pageStatus != Stack.Activating)
-                    hiddenCamerasPopup.hide()
+                prevCount = 0
             }
         }
-    }
 
-    onVisibleChanged: {
-        if (!visible)
-            d.hidePendingItems()
+        onHidden: {
+            d.hiddenItems = []
+        }
     }
 }

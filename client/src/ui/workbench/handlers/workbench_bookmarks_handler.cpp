@@ -21,6 +21,7 @@
 #include <ui/actions/action_parameters.h>
 #include <ui/actions/action_target_provider.h>
 #include <ui/dialogs/camera_bookmark_dialog.h>
+#include <ui/dialogs/message_box.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/generic/graphics_message_box.h>
 
@@ -46,6 +47,7 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = NU
     connect(action(Qn::AddCameraBookmarkAction),    &QAction::triggered,    this,   &QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered);
     connect(action(Qn::EditCameraBookmarkAction),   &QAction::triggered,    this,   &QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered);
     connect(action(Qn::RemoveCameraBookmarkAction), &QAction::triggered,    this,   &QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered);
+    connect(action(Qn::RemoveBookmarksAction),      &QAction::triggered,    this,   &QnWorkbenchBookmarksHandler::at_removeBookmarksAction_triggered);
     connect(action(Qn::BookmarksModeAction),        &QAction::toggled,      this,   &QnWorkbenchBookmarksHandler::at_bookmarksModeAction_triggered);
 
     /* Reset hint flag for each user. */
@@ -73,7 +75,7 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered() {
     if (QnAppInfo::beta()) {
         QnMediaServerResourcePtr server = qnCameraHistoryPool->getMediaServerOnTime(camera, period.startTimeMs);
         if (!server || server->getStatus() != Qn::Online) {
-            QMessageBox::warning(mainWindow(),
+            QnMessageBox::warning(mainWindow(),
                 tr("Error"),
                 tr("Bookmarks can only be added to an online server.")); //TODO: #Elric ec2 update text if needed
             return;
@@ -110,7 +112,7 @@ void QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered() {
 
     QnMediaServerResourcePtr server = qnCameraHistoryPool->getMediaServerOnTime(camera, bookmark.startTimeMs);
     if (!server || server->getStatus() != Qn::Online) {
-        QMessageBox::warning(mainWindow(),
+        QnMessageBox::warning(mainWindow(),
             tr("Error"),
             tr("Bookmarks can only be edited on an online server.")); //TODO: #Elric ec2 update text if needed
         return;
@@ -139,13 +141,33 @@ void QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered() {
         ? tr("Are you sure you want to delete this bookmark?")
         : tr("Are you sure you want to delete bookmark \"%1\"?").arg(bookmark.name));
 
-    if (QMessageBox::information(mainWindow(),
+    if (QnMessageBox::information(mainWindow(),
             tr("Confirm Deletion"), message,
-            QMessageBox::Ok | QMessageBox::Cancel,
-            QMessageBox::Cancel) != QMessageBox::Ok)
+            QnMessageBox::Ok | QnMessageBox::Cancel,
+            QnMessageBox::Cancel) != QnMessageBox::Ok)
         return;
 
     qnCameraBookmarksManager->deleteCameraBookmark(bookmark.guid);
+}
+
+void QnWorkbenchBookmarksHandler::at_removeBookmarksAction_triggered()
+{
+    QnActionParameters parameters = menu()->currentParameters(sender());
+
+    QnCameraBookmarkList bookmarks = parameters.argument<QnCameraBookmarkList>(Qn::CameraBookmarkListRole);
+    if (bookmarks.isEmpty())
+        return;
+
+    const auto message = tr("Are you sure you want to delete these %n bookmarks?", nullptr, bookmarks.size());
+
+    if (QnMessageBox::information(mainWindow(),
+        tr("Confirm Deletion"), message,
+        QnMessageBox::Ok | QnMessageBox::Cancel,
+        QnMessageBox::Cancel) != QnMessageBox::Ok)
+        return;
+
+    for (const auto bookmark: bookmarks)
+        qnCameraBookmarksManager->deleteCameraBookmark(bookmark.guid);
 }
 
 void QnWorkbenchBookmarksHandler::at_bookmarksModeAction_triggered()

@@ -33,6 +33,7 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
     setHelpTopic(ui->auditLogButton,        Qn::AuditTrail_Help);
     setHelpTopic(ui->eventLogButton,        Qn::EventLog_Help);
     setHelpTopic(ui->healthMonitorButton,   Qn::Administration_General_HealthMonitoring_Help);
+    setHelpTopic(ui->bookmarksButton,       Qn::Bookmarks_Usage_Help);
 
     connect(ui->businessRulesButton,    &QPushButton::clicked,  this, [this] { menu()->trigger(Qn::OpenBusinessRulesAction); } );
     connect(ui->cameraListButton,       &QPushButton::clicked, this, [this] { menu()->trigger(Qn::CameraListAction); } );
@@ -67,14 +68,14 @@ void QnGeneralSystemAdministrationWidget::retranslateUi() {
             .arg(shortcut.toString(QKeySequence::NativeText));
     };
 
-    ui->eventRulesLabel->setText(shortcutString(Qn::BusinessEventsAction, tr("Open Alarm/Event Rules Management...")));
-    ui->eventLogLabel->setText(shortcutString(Qn::OpenBusinessLogAction, tr("Open Event Log...")));
-
+    ui->eventRulesLabel->setText(shortcutString(Qn::BusinessEventsAction, tr("Open Alarm/Event Rules Management")));
+    ui->eventLogLabel->setText(shortcutString(Qn::OpenBusinessLogAction, tr("Open Event Log")));
+    ui->bookmarksLabel->setText(shortcutString(Qn::OpenBookmarksSearchAction, tr("Open Bookmarks List")));
     ui->cameraListLabel->setText(shortcutString(Qn::CameraListAction, QnDeviceDependentStrings::getDefaultNameFromSet(
-        tr("Open Devices List..."),
-        tr("Open Cameras List...")
+        tr("Open Devices List"),
+        tr("Open Cameras List")
         )));
-        
+
 
     ui->cameraListButton->setText(QnDeviceDependentStrings::getDefaultNameFromSet(
         tr("Devices List..."),

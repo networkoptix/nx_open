@@ -29,7 +29,12 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(const QnAbstractBusiness
     case QnBusiness::BackupFinishedEvent:
         {
             QnBusiness::EventReason reason = static_cast<QnBusiness::EventReason>(params.reasonCode);
-            if (reason == QnBusiness::BackupFailed)
+            bool isCriticalNotification = reason == QnBusiness::BackupFailedChunkError || 
+                                          reason == QnBusiness::BackupFailedNoBackupStorageError ||
+                                          reason == QnBusiness::BackupFailedSourceFileError ||
+                                          reason == QnBusiness::BackupFailedSourceStorageError ||
+                                          reason == QnBusiness::BackupFailedTargetFileError;
+            if (isCriticalNotification)
                 return Value::CriticalNotification;
             return Value::CommonNotification;
         }

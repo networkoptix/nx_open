@@ -7,7 +7,6 @@
 #include <QtOpenGL/qgl.h>
 
 #include "api/app_server_connection.h"
-#include "api/network_proxy_factory.h"
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/media_server_resource.h"
 #include "core/resource/user_resource.h"
@@ -21,6 +20,7 @@
 #include "utils/network/http/httptypes.h"
 #include "watchers/user_watcher.h"
 #include <mobile_client/mobile_client_settings.h>
+#include <camera/camera_chunk_provider.h>
 #include <ui/texture_size_helper.h>
 
 namespace
@@ -107,6 +107,7 @@ QnMediaResourceHelper::QnMediaResourceHelper(QObject *parent)
     , m_nativeProtocol(nativeStreamProtocol)
     , m_maxTextureSize(QnTextureSizeHelper::instance()->maxTextureSize())
     , m_maxNativeResolution(0)
+    , m_chunkProvider(new QnCameraChunkProvider(this))
 {
     updateStardardResolutions();
     connect(this, &QnMediaResourceHelper::aspectRatioChanged, this, &QnMediaResourceHelper::rotatedAspectRatioChanged);
@@ -140,7 +141,10 @@ void QnMediaResourceHelper::setResourceId(const QString &id)
         return;
 
     if (m_camera)
+    {
         disconnect(m_camera, nullptr, this, nullptr);
+        m_chunkProvider->setResourceId(QString());
+    }
 
     m_camera = camera;
 
@@ -181,6 +185,8 @@ void QnMediaResourceHelper::setResourceId(const QString &id)
     emit resolutionChanged();
     emit rotationChanged();
     emit resourceStatusChanged();
+
+    m_chunkProvider->setResourceId(id);
 }
 
 Qn::ResourceStatus QnMediaResourceHelper::resourceStatus() const
@@ -214,8 +220,7 @@ void QnMediaResourceHelper::updateUrl()
         return;
     }
 
-    QnTimePeriod period;
-    QnMediaServerResourcePtr server = qnCameraHistoryPool->getMediaServerOnTime(m_camera, m_position, &period);
+    QnMediaServerResourcePtr server = serverAtCurrentPosition();
     if (!server)
     {
         setUrl(QUrl());
@@ -229,7 +234,8 @@ void QnMediaResourceHelper::updateUrl()
         return;
     }
 
-    QUrl url(server->getUrl());
+
+    QUrl url(qnCommon->currentServer()->getUrl());
 
     QUrlQuery query;
 
@@ -246,9 +252,6 @@ void QnMediaResourceHelper::updateUrl()
 
         if (m_position >= 0)
             query.addQueryItem(lit("startTimestamp"), QString::number(convertPosition(m_position, protocol)));
-
-        url.setUserName(QnAppServerConnectionFactory::url().userName());
-        url.setPassword(QnAppServerConnectionFactory::url().password());
     }
     else
     {
@@ -257,6 +260,7 @@ void QnMediaResourceHelper::updateUrl()
             url.setPath(lit("/media/%1.%2").arg(m_camera->getUniqueId()).arg(protocolName(protocol)));
             query.addQueryItem(lit("resolution"), currentResolutionString());
             query.addQueryItem(lit("rt"), lit("true"));
+            query.addQueryItem(lit("rotation"), lit("0"));
         }
         else if (protocol == Mjpeg)
         {
@@ -271,10 +275,10 @@ void QnMediaResourceHelper::updateUrl()
 
         if (m_position >= 0)
             query.addQueryItem(lit("pos"), QString::number(convertPosition(m_position, protocol)));
-
-        if (user)
-            query.addQueryItem(lit("auth"), getAuth(user, protocol));
     }
+
+    if (user)
+        query.addQueryItem(lit("auth"), getAuth(user, protocol));
 
     if (protocol == Mjpeg)
     {
@@ -285,11 +289,10 @@ void QnMediaResourceHelper::updateUrl()
     query.addQueryItem(QLatin1String(Qn::EC2_RUNTIME_GUID_HEADER_NAME), qnCommon->runningInstanceGUID().toString());
     query.addQueryItem(QLatin1String(Qn::CUSTOM_USERNAME_HEADER_NAME), QnAppServerConnectionFactory::url().userName());
     query.addQueryItem(QLatin1String(Qn::USER_AGENT_HEADER_NAME), QLatin1String(nx_http::userAgentString()));
-    query.addQueryItem(lit("rotation"), lit("0"));
 
     url.setQuery(query);
 
-    setUrl(QnNetworkProxyFactory::instance()->urlToResource(url, server));
+    setUrl(url);
 }
 
 int QnMediaResourceHelper::nativeStreamIndex(const QString &resolution) const
@@ -321,6 +324,11 @@ QString QnMediaResourceHelper::resourceName() const
         return QString();
 
     return m_camera->getName();
+}
+
+QnCameraChunkProvider *QnMediaResourceHelper::chunkProvider() const
+{
+    return m_chunkProvider;
 }
 
 qint64 QnMediaResourceHelper::position() const
@@ -487,6 +495,15 @@ void QnMediaResourceHelper::setFinalTimestamp(qint64 finalTimestamp)
 
     m_finalTimestamp = finalTimestamp;
     emit finalTimestampChanged();
+}
+
+QnMediaServerResourcePtr QnMediaResourceHelper::serverAtCurrentPosition() const
+{
+    qint64 position = m_position;
+    if (position != -1)
+        position = m_chunkProvider->closestChunkStartMs(position, true);
+
+    return qnCameraHistoryPool->getMediaServerOnTime(m_camera, position);
 }
 
 QnMediaResourceHelper::Protocol QnMediaResourceHelper::protocol() const

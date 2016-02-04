@@ -8,7 +8,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <source>%n cameras hidden</source>
+        <source>%n cameras are hidden</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
@@ -25,15 +25,6 @@ required</source>
     </message>
     <message>
         <source>Offline</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Camera
-hidden</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Undo</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

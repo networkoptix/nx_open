@@ -63,7 +63,10 @@
 #include <ui/workbench/watchers/workbench_server_safemode_watcher.h>
 #include <ui/workbench/watchers/workbench_bookmark_tags_watcher.h>
 #include <ui/workbench/watchers/workbench_bookmarks_watcher.h>
+#include <ui/workbench/watchers/workbench_items_watcher.h>
+#include <ui/workbench/watchers/timeline_bookmarks_watcher.h>
 #include <ui/workbench/watchers/current_user_available_cameras_watcher.h>
+#include <ui/workbench/watchers/workbench_item_bookmarks_watcher.h>
 
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_controller.h>
@@ -267,7 +270,10 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     context->instance<QnWorkbenchResourcesChangesWatcher>();
     context->instance<QnWorkbenchServerSafemodeWatcher>();
     context->instance<QnWorkbenchBookmarkTagsWatcher>();
+    context->instance<QnWorkbenchItemsWatcher>();
+    context->instance<QnWorkbenchItemBookmarksWatcher>();
     context->instance<QnWorkbenchBookmarksWatcher>();
+    context->instance<QnTimelineBookmarksWatcher>();
     context->instance<QnWorkbenchServerPortWatcher>();
     context->instance<QnCurrentUserAvailableCamerasWatcher>();
 

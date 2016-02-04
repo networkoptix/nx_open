@@ -72,7 +72,7 @@ void QnNotificationToolTipWidget::ensureThumbnail(QnImageProvider* provider) {
     m_thumbnailLabel->setAlignment(Qt::AlignCenter);
     m_thumbnailLabel->setClickableButtons(Qt::LeftButton | Qt::RightButton);
     setPaletteColor(m_thumbnailLabel, QPalette::Window, Qt::transparent);
-    m_layout->insertItem(0, m_thumbnailLabel);
+    m_layout->addItem(m_thumbnailLabel);
     connect(m_thumbnailLabel, SIGNAL(clicked(Qt::MouseButton)), this, SLOT(at_thumbnailLabel_clicked(Qt::MouseButton)));
 
     if (!provider->image().isNull()) {
