@@ -123,7 +123,7 @@ void DummySocket::cancelIOAsync(
     cancellationDoneHandler();
 }
 
-void DummySocket::cancelIOSync(aio::EventType eventType)
+void DummySocket::cancelIOSync(aio::EventType /*eventType*/)
 {
 }
 
