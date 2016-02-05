@@ -10,24 +10,6 @@ body {
     padding-bottom: 20px;
 }
 
-/* Main marketing message and sign up button */
-.jumbotron {
-    text-align: center;
-    border-bottom: 1px solid #e5e5e5;
-}
-.jumbotron .btn {
-    padding: 14px 24px;
-    font-size: 21px;
-}
-
-/* Responsive: Portrait tablets and up */
-@media screen and (min-width: 768px) {
-
-    /* Remove the bottom border on the jumbotron for visual effect */
-    .jumbotron {
-        border-bottom: 0;
-    }
-}
 
 .process-button{
     display:inline-block;
@@ -43,7 +25,6 @@ body {
     height:100%;
     position:absolute;
 }
-
 
 .process-button .progress-bar{
     font-size: 14px;
@@ -75,7 +56,6 @@ body {
 .panel.hoverable:hover{
     box-shadow: 0px 2px 2px 0px transparentize(dark(15),0.8);
 }
-
 
 .hoverable .hover-visible{
     visibility: hidden;
@@ -127,7 +107,6 @@ body {
     display: none;
 }
 
-
 .inline-portal>.container{
     padding:0;
 }
@@ -154,6 +133,8 @@ body {
 .inline-portal .modal-header .close{
     display: none;
 }
+
+
 
 .system-button .label {
   line-height: 18px;
