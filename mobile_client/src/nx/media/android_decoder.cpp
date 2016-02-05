@@ -359,17 +359,17 @@ bool AndroidDecoder::isCompatible(const CodecID codec, const QSize& resolution)
     if (codecMimeType.isEmpty())
         return false;
 
-    if (!maxDecoderSize.contains(frame->compressionType))
+    if (!maxDecoderSize.contains(codec))
     {
         QAndroidJniObject jCodecName = QAndroidJniObject::fromString(codecMimeType);
         QAndroidJniObject javaDecoder("com/networkoptix/nxwitness/media/QnMediaDecoder");
         jint maxWidth = javaDecoder.callMethod<jint>("maxDecoderWidth", "(Ljava/lang/String;)I", jCodecName.object<jstring>());
         jint maxHeight = javaDecoder.callMethod<jint>("maxDecoderHeight", "(Ljava/lang/String;)I", jCodecName.object<jstring>());
         QSize size(maxWidth, maxHeight);
-        maxDecoderSize[frame->compressionType] = size;
+        maxDecoderSize[codec] = size;
         qDebug() << "Maximum hardware decoder resolution:" << size << "for codec" << codecMimeType;
     }
-    const QSize maxSize = maxDecoderSize[frame->compressionType];
+    const QSize maxSize = maxDecoderSize[codec];
     return resolution.width() <= maxSize.width() && resolution.height() <= maxSize.height();
 }
 
