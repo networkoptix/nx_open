@@ -1565,19 +1565,22 @@ QRect QnNxStyle::subElementRect(
         if (const QTabWidget *tabWidget = qobject_cast<const QTabWidget *>(widget))
         {
             int hspace = pixelMetric(PM_TabBarTabHSpace, option, widget);
-            int ladjust = hspace;
-            int radjust = hspace;
+
+            QRect rect = base_type::subElementRect(subElement, option, widget);
 
             if (tabWidget->tabShape() == QTabWidget::Triangular)
             {
                 const int kMagicShift = 2;
-                ladjust = -hspace + kMagicShift;
-                radjust = 0;
+                rect.adjust(-hspace + kMagicShift, 0, hspace, 0);
+            }
+            else
+            {
+                rect.adjust(hspace, 0, hspace, 0);
             }
 
-            QRect rect = base_type::subElementRect(subElement, option, widget).adjusted(ladjust, 0, radjust, 0);
             if (rect.right() > option->rect.right())
                 rect.setRight(option->rect.right());
+
             return rect;
         }
         break;
@@ -1619,11 +1622,8 @@ int QnNxStyle::pixelMetric(
     case PM_ExclusiveIndicatorHeight:
         return dp(16);
     case PM_TabBarTabHSpace:
+    case PM_TabBarTabVSpace:
         return 9;
-    case PM_TabBarBaseOverlap:
-        return 2;
-    case PM_TabBarBaseHeight:
-        return 36;
     case PM_ScrollBarExtent:
         return 8;
     case PM_ScrollBarSliderMin:
@@ -1654,12 +1654,36 @@ QSize QnNxStyle::sizeFromContents(
     case CT_ComboBox:
         return QSize(qMax(kMinimumButtonWidth, size.width() + 2 * pixelMetric(PM_ButtonMargin, option, widget)), qMax(size.height(), kButtonHeight));
     case CT_TabBarTab:
+        if (const QStyleOptionTab *tab =
+                qstyleoption_cast<const QStyleOptionTab *>(option))
         {
-            int height = qMax(size.height(), pixelMetric(PM_TabBarBaseHeight, option, widget));
-            if (qobject_cast<const QTabBar*>(widget))
-                height = qMin(height, widget->maximumHeight());
-            return QSize(size.width(), height);
+            const int kRoundedSize = dp(36);
+            const int kTriangularSize = dp(32);
+
+            const QTabBar *tabBar = qobject_cast<const QTabBar*>(widget);
+            QSize result = size;
+
+            switch (tab->shape)
+            {
+            case QTabBar::RoundedNorth:
+            case QTabBar::RoundedSouth:
+            case QTabBar::TriangularNorth:
+            case QTabBar::TriangularSouth:
+                {
+                    int height = qMax(size.height(), isTabRounded(tab->shape) ? kRoundedSize : kTriangularSize);
+
+                    if (tabBar)
+                        height = qMin(height, widget->maximumHeight());
+
+                    result.setHeight(height);
+                }
+                return result;
+
+            default:
+                break;
+            }
         }
+        break;
     case CT_MenuItem:
         return QSize(size.width() + dp(24) + 2 * kMenuItemHPadding, size.height() + 2 * kMenuItemVPadding);
     default:
