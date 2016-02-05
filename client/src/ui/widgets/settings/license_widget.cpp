@@ -48,9 +48,9 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent):
     setWarningStyle(ui->licenseKeyWarningLabel);
     ui->licenseKeyWarningLabel->setVisible(false);
 
-    connect(ui->onlineKeyEdit,              SIGNAL(textChanged(QString)),       this,   SLOT(updateControls()));
-    connect(ui->activationTypeComboBox,     SIGNAL(currentIndexChanged(int)),   this,   SLOT(at_activationTypeComboBox_currentIndexChanged()));
-    connect(ui->browseLicenseFileButton,    SIGNAL(clicked()),                  this,   SLOT(at_browseLicenseFileButton_clicked()));
+    connect(ui->onlineKeyEdit,              &QLineEdit::textChanged,        this,   &QnLicenseWidget::updateControls);
+    connect(ui->tabWidget,                  &QTabWidget::currentChanged,    this,   &QnLicenseWidget::at_tabWidget_currentChanged);
+    connect(ui->browseLicenseFileButton,    &QPushButton::clicked,          this,   &QnLicenseWidget::at_browseLicenseFileButton_clicked);
 
     connect(ui->activateLicenseButton,      &QPushButton::clicked,              this,   [this] {
         setState(Waiting);
@@ -99,11 +99,11 @@ void QnLicenseWidget::setState(State state) {
 }
 
 bool QnLicenseWidget::isOnline() const {
-    return ui->activationTypeComboBox->currentIndex() == 0;
+    return ui->tabWidget->currentWidget() == ui->onlinePage;
 }
 
 void QnLicenseWidget::setOnline(bool online) {
-    ui->activationTypeComboBox->setCurrentIndex(online ? 0 : 1);
+    ui->tabWidget->setCurrentWidget(online ? ui->onlinePage : ui->manualPage);
 }
 
 bool QnLicenseWidget::isFreeLicenseAvailable() const {
@@ -155,10 +155,10 @@ void QnLicenseWidget::changeEvent(QEvent *event) {
         ui->retranslateUi(this);
 }
 
-void QnLicenseWidget::at_activationTypeComboBox_currentIndexChanged() {
+void QnLicenseWidget::at_tabWidget_currentChanged() {
     bool isOnline = this->isOnline();
 
-    ui->stackedWidget->setCurrentWidget(isOnline ? ui->onlinePage : ui->manualPage);
+    ui->tabWidget->setCurrentWidget(isOnline ? ui->onlinePage : ui->manualPage);
     ui->activateFreeLicenseButton->setVisible(m_freeLicenseAvailable && isOnline);
 
     updateControls();
