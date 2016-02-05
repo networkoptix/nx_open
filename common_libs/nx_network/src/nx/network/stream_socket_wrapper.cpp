@@ -26,12 +26,6 @@ void StreamSocketWrapper::shutdown()
 bool StreamSocketWrapper::isClosed() const
 { return m_socket->isClosed(); }
 
-bool StreamSocketWrapper::setReuseAddrFlag(bool reuseAddr)
-{ return m_socket->setReuseAddrFlag(reuseAddr); }
-
-bool StreamSocketWrapper::getReuseAddrFlag(bool* val) const
-{ return m_socket->getReuseAddrFlag(val); }
-
 bool StreamSocketWrapper::setNonBlockingMode(bool val)
 {
     m_nonBlockingMode = val;
@@ -43,45 +37,6 @@ bool StreamSocketWrapper::getNonBlockingMode(bool* val) const
     *val = m_nonBlockingMode;
     return true;
 }
-
-bool StreamSocketWrapper::getMtu(unsigned int* mtuValue) const
-{ return m_socket->getMtu(mtuValue); }
-
-bool StreamSocketWrapper::setSendBufferSize(unsigned int buffSize)
-{ return m_socket->setSendBufferSize(buffSize); }
-
-bool StreamSocketWrapper::getSendBufferSize(unsigned int* buffSize) const
-{ return m_socket->getSendBufferSize(buffSize); }
-
-bool StreamSocketWrapper::setRecvBufferSize(unsigned int buffSize)
-{ return m_socket->setRecvBufferSize(buffSize); }
-
-bool StreamSocketWrapper::getRecvBufferSize(unsigned int* buffSize) const
-{ return m_socket->getRecvBufferSize(buffSize); }
-
-bool StreamSocketWrapper::setRecvTimeout(unsigned int millis)
-{ return m_socket->setRecvTimeout(millis); }
-
-bool StreamSocketWrapper::getRecvTimeout(unsigned int* millis) const
-{ return m_socket->getRecvTimeout(millis); }
-
-bool StreamSocketWrapper::setSendTimeout(unsigned int ms)
-{ return m_socket->setSendTimeout(ms); }
-
-bool StreamSocketWrapper::getSendTimeout(unsigned int* millis) const
-{ return m_socket->getSendTimeout(millis); }
-
-bool StreamSocketWrapper::getLastError(SystemError::ErrorCode* errorCode) const
-{ return m_socket->getLastError(errorCode); }
-
-AbstractSocket::SOCKET_HANDLE StreamSocketWrapper::handle() const
-{ return m_socket->handle(); }
-
-aio::AbstractAioThread* StreamSocketWrapper::getAioThread()
-{ return m_socket->getAioThread(); }
-
-void StreamSocketWrapper::bindToAioThread(aio::AbstractAioThread* aioThread)
-{ return m_socket->bindToAioThread(aioThread); }
 
 bool StreamSocketWrapper::connect(const SocketAddress& sa, unsigned int ms)
 {
@@ -176,24 +131,6 @@ void StreamSocketWrapper::cancelIOSync(aio::EventType eventType)
 
 bool StreamSocketWrapper::reopen()
 { return m_socket->reopen(); }
-
-bool StreamSocketWrapper::setNoDelay(bool value)
-{ return m_socket->setNoDelay(value); }
-
-bool StreamSocketWrapper::getNoDelay(bool* value) const
-{ return m_socket->getNoDelay(value); }
-
-bool StreamSocketWrapper::toggleStatisticsCollection(bool val)
-{ return m_socket->toggleStatisticsCollection(val); }
-
-bool StreamSocketWrapper::getConnectionStatistics(StreamSocketInfo* info)
-{ return m_socket->getConnectionStatistics(info); }
-
-bool StreamSocketWrapper::setKeepAlive(boost::optional<KeepAliveOptions> info)
-{ return m_socket->setKeepAlive(info); }
-
-bool StreamSocketWrapper::getKeepAlive(boost::optional<KeepAliveOptions>* result) const
-{ return m_socket->getKeepAlive(result); }
 
 void StreamSocketWrapper::pleaseStop(std::function<void()> handler)
 { return m_socket->pleaseStop(std::move(handler)); }

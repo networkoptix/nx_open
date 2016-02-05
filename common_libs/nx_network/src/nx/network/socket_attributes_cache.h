@@ -59,16 +59,13 @@ class AbstractSocketAttributesCache
     public ParentType
 {
 public:
-    AbstractSocketAttributesCache()
-    :
-        m_delegate(nullptr)
+    AbstractSocketAttributesCache(ParentType* delegate = nullptr):
+        m_delegate(delegate)
     {
     }
-
     virtual ~AbstractSocketAttributesCache()
     {
     }
-
     virtual bool setReuseAddrFlag(bool val) override
     {
         return setAttributeValue(
@@ -177,6 +174,40 @@ public:
         }
         return m_delegate->getLastError(errorCode);
     }
+    virtual AbstractSocket::SOCKET_HANDLE handle() const override
+    {
+        if (!m_delegate)
+        {
+            Q_ASSERT_X(false, Q_FUNC_INFO, "Not supported");
+            return -1;
+        }
+
+        return m_delegate->handle();
+    }
+    virtual aio::AbstractAioThread* getAioThread() override
+    {
+        if (!m_delegate)
+        {
+            if (m_socketAttributes.aioThread)
+                return *m_socketAttributes.aioThread;
+
+            Q_ASSERT_X(false, Q_FUNC_INFO,
+                       "Notfully supported while delegate is not set");
+        }
+
+        return m_delegate->getAioThread();
+    }
+    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override
+    {
+        if (!m_delegate)
+            m_socketAttributes.aioThread = aioThread;
+        else
+            m_delegate->bindToAioThread(aioThread);
+    }
+
+protected:
+    ParentType* m_delegate;
+    SocketAttributesHolderType m_socketAttributes;
 
     void setDelegate(ParentType* _delegate)
     {
@@ -188,11 +219,6 @@ public:
     {
         return m_socketAttributes;
     }
-
-protected:
-    ParentType* m_delegate;
-
-    SocketAttributesHolderType m_socketAttributes;
 
     template<typename AttributeType, typename SocketClassType>
     bool setAttributeValue(
@@ -264,6 +290,10 @@ class AbstractStreamSocketAttributesCache
     public AbstractSocketAttributesCache<ParentType, StreamSocketAttributes>
 {
 public:
+    AbstractStreamSocketAttributesCache(ParentType* delegate = nullptr):
+        AbstractSocketAttributesCache<ParentType, StreamSocketAttributes>(delegate)
+    {
+    }
     virtual bool setNoDelay(bool val) override
     {
         return this->setAttributeValue(
