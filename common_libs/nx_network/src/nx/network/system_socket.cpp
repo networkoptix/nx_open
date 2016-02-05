@@ -559,7 +559,7 @@ CommunicatingSocket<InterfaceToImplement>::CommunicatingSocket(
     int protocol,
     PollableSystemSocketImpl* sockImpl)
 :
-    Socket(
+    Socket<InterfaceToImplement>(
         std::unique_ptr<BaseAsyncSocketImplHelper<Pollable>>(
             new AsyncSocketImplHelper<Pollable>(
                 this,
@@ -580,7 +580,7 @@ CommunicatingSocket<InterfaceToImplement>::CommunicatingSocket(
     int newConnSD,
     PollableSystemSocketImpl* sockImpl)
 :
-    Socket(
+    Socket<InterfaceToImplement>(
         std::unique_ptr<BaseAsyncSocketImplHelper<Pollable>>(
             new AsyncSocketImplHelper<Pollable>(
                 this,
@@ -612,17 +612,17 @@ bool CommunicatingSocket<InterfaceToImplement>::connect( const SocketAddress& re
             return false;
 
     sockaddr_in destAddr;
-    if (!fillAddr(remoteAddress, destAddr))
+    if (!this->fillAddr(remoteAddress, destAddr))
         return false;
 
     //switching to non-blocking mode to connect with timeout
     bool isNonBlockingModeBak = false;
-    if( !getNonBlockingMode( &isNonBlockingModeBak ) )
+    if( !this->getNonBlockingMode( &isNonBlockingModeBak ) )
         return false;
-    if( !isNonBlockingModeBak && !setNonBlockingMode( true ) )
+    if( !isNonBlockingModeBak && !this->setNonBlockingMode( true ) )
         return false;
 
-    int connectResult = ::connect(m_fd, (sockaddr *) &destAddr, sizeof(destAddr));// Try to connect to the given port
+    int connectResult = ::connect(this->m_fd, (sockaddr *) &destAddr, sizeof(destAddr));// Try to connect to the given port
 
     if( connectResult != 0 )
     {
@@ -664,7 +664,7 @@ bool CommunicatingSocket<InterfaceToImplement>::connect( const SocketAddress& re
     {
         struct pollfd sockPollfd;
         memset( &sockPollfd, 0, sizeof(sockPollfd) );
-        sockPollfd.fd = m_fd;
+        sockPollfd.fd = this->m_fd;
         sockPollfd.events = POLLOUT;
 #ifdef _GNU_SOURCE
         sockPollfd.events |= POLLRDHUP;
@@ -707,7 +707,7 @@ bool CommunicatingSocket<InterfaceToImplement>::connect( const SocketAddress& re
     m_connected = iSelRet > 0;
 
     //restoring original mode
-    setNonBlockingMode( isNonBlockingModeBak );
+    this->setNonBlockingMode( isNonBlockingModeBak );
     return m_connected;
 }
 
@@ -718,11 +718,11 @@ int CommunicatingSocket<InterfaceToImplement>::recv( void* buffer, unsigned int 
     int bytesRead = ::recv(m_fd, (raw_type *) buffer, bufferLen, flags);
 #else
     unsigned int recvTimeout = 0;
-    if( !getRecvTimeout( &recvTimeout ) )
+    if( !this->getRecvTimeout( &recvTimeout ) )
         return -1;
 
     int bytesRead = doInterruptableSystemCallWithTimeout<>(
-        std::bind(&::recv, m_fd, (void*)buffer, (size_t)bufferLen, flags),
+        std::bind(&::recv, this->m_fd, (void*)buffer, (size_t)bufferLen, flags),
         recvTimeout );
 #endif
     if (bytesRead < 0)
@@ -743,11 +743,11 @@ int CommunicatingSocket<InterfaceToImplement>::send( const void* buffer, unsigne
     int sended = ::send(m_fd, (raw_type*) buffer, bufferLen, 0);
 #else
     unsigned int sendTimeout = 0;
-    if( !getSendTimeout( &sendTimeout ) )
+    if( !this->getSendTimeout( &sendTimeout ) )
         return -1;
 
     int sended = doInterruptableSystemCallWithTimeout<>(
-        std::bind(&::send, m_fd, (const void*)buffer, (size_t)bufferLen,
+        std::bind(&::send, this->m_fd, (const void*)buffer, (size_t)bufferLen,
 #ifdef __linux
             MSG_NOSIGNAL
 #else
@@ -773,7 +773,7 @@ SocketAddress CommunicatingSocket<InterfaceToImplement>::getForeignAddress() con
     sockaddr_in addr;
     unsigned int addr_len = sizeof(addr);
 
-    const auto ret = getpeername(m_fd, (sockaddr *) &addr,(socklen_t *) &addr_len);
+    const auto ret = getpeername(this->m_fd, (sockaddr *) &addr,(socklen_t *) &addr_len);
     if (ret < 0) {
         qnWarning("Fetch of foreign address failed (getpeername() = %1).", ret);
         return SocketAddress();
