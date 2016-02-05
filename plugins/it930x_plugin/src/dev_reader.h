@@ -408,6 +408,7 @@ namespace ite
         friend class DevReadThread;
     public:
         DevReader(It930x * dev = nullptr);
+        ~DevReader() { stop(); }
 
         bool subscribe(uint16_t pid);
         void unsubscribe(uint16_t pid);
