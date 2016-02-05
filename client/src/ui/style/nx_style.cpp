@@ -19,8 +19,6 @@
 
 #include <utils/common/scoped_painter_rollback.h>
 
-#include "helper.h"
-
 using namespace style;
 
 namespace
@@ -104,11 +102,13 @@ namespace
 QnNxStylePrivate::QnNxStylePrivate() :
     QCommonStylePrivate(),
     palette(),
-    idleAnimator(nullptr)
+    idleAnimator(nullptr),
+    stateAnimator(nullptr)
 {
     Q_Q(QnNxStyle);
 
     idleAnimator = new QnNoptixStyleAnimator(q);
+    stateAnimator = new QnNoptixStyleAnimator(q);
 }
 
 QnNxStyle::QnNxStyle() :
@@ -125,7 +125,7 @@ void QnNxStyle::setGenericPalette(const QnGenericPalette &palette)
 QnPaletteColor QnNxStyle::findColor(const QColor &color) const
 {
     Q_D(const QnNxStyle);
-    return d->palette.color(color);
+    return d->findColor(color);
 }
 
 void QnNxStyle::drawPrimitive(
@@ -377,6 +377,8 @@ void QnNxStyle::drawComplexControl(
         QPainter *painter,
         const QWidget *widget) const
 {
+    Q_D(const QnNxStyle);
+
     switch (control)
     {
     case CC_ComboBox:
@@ -589,7 +591,6 @@ void QnNxStyle::drawComplexControl(
             painter->save();
 
             const bool flat = groupBox->features.testFlag(QStyleOptionFrame::Flat);
-            QStyleOptionGroupBox opt = *groupBox;
 
             if (flat)
             {
@@ -597,10 +598,9 @@ void QnNxStyle::drawComplexControl(
                 font.setPixelSize(font.pixelSize() + 2);
                 font.setWeight(QFont::DemiBold);
                 painter->setFont(font);
-                opt.fontMetrics = QFontMetrics(font);
             }
 
-            QRect labelRect = subControlRect(CC_GroupBox, &opt, SC_GroupBoxLabel, widget);
+            QRect labelRect = subControlRect(CC_GroupBox, groupBox, SC_GroupBoxLabel, widget);
 
             if (groupBox->subControls.testFlag(SC_GroupBoxFrame))
             {
@@ -645,6 +645,15 @@ void QnNxStyle::drawComplexControl(
                 drawItemText(painter, labelRect, Qt::AlignCenter | Qt::TextHideMnemonic,
                              groupBox->palette, groupBox->state.testFlag(QStyle::State_Enabled),
                              groupBox->text, flat ? QPalette::Text : QPalette::WindowText);
+            }
+
+            if (groupBox->subControls.testFlag(SC_GroupBoxCheckBox))
+            {
+                QStyleOption opt = *option;
+                opt.rect = subControlRect(CC_GroupBox, groupBox, SC_GroupBoxCheckBox, widget);
+                opt.state |= State_Item;
+
+                d->drawSwitch(painter, &opt, widget);
             }
 
             painter->restore();
@@ -1358,9 +1367,34 @@ QRect QnNxStyle::subControlRect(
 
             case SC_GroupBoxLabel:
                 if (groupBox->features.testFlag(QStyleOptionFrame::Flat))
+                {
+                    if (widget)
+                    {
+                        QStyleOptionGroupBox opt = *groupBox;
+                        QFont font = widget->font();
+                        font.setPixelSize(font.pixelSize() + 2);
+                        font.setWeight(QFont::DemiBold);
+                        opt.fontMetrics = QFontMetrics(font);
+                        rect = base_type::subControlRect(control, &opt, subControl, widget);
+                    }
+
+                    rect.moveLeft(0);
                     rect.setHeight(dp(18));
+                }
                 else
+                {
                     rect.moveLeft(dp(16));
+                }
+                break;
+
+            case SC_GroupBoxCheckBox:
+                if (groupBox->features.testFlag(QStyleOptionFrame::Flat))
+                {
+                    QRect boundRect = subControlRect(CC_GroupBox, option, SC_GroupBoxLabel, widget);
+                    boundRect.setRight(option->rect.right());
+                    rect = alignedRect(Qt::LeftToRight, Qt::AlignRight | Qt::AlignVCenter,
+                                       Metrics::kSwitchSize, boundRect);
+                }
                 break;
 
             case SC_GroupBoxContents:
@@ -1694,6 +1728,7 @@ void QnNxStyle::polish(QWidget *widget)
         qobject_cast<QComboBox*>(widget) ||
         qobject_cast<QSpinBox*>(widget) ||
         qobject_cast<QCheckBox*>(widget) ||
+        qobject_cast<QGroupBox*>(widget) ||
         qobject_cast<QRadioButton*>(widget) ||
         qobject_cast<QTabBar*>(widget) ||
         qobject_cast<QSlider*>(widget) ||

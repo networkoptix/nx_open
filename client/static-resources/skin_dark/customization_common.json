@@ -44,6 +44,15 @@
         "blue13":       "#117297",
         "blue14":       "#076281",
 
+        "green_l4":     "#66ef52",
+        "green_l3":     "#59dc2e",
+        "green_l2":     "#4fc527",
+        "green_l1":     "#41aa22",
+        "green_core":   "#3a911e",
+        "green_d1":     "#32731e",
+        "green_d2":     "#2a551e",
+        "green_d3":     "#22391e",
+
         "brand_l2":     "#43c2ff",
         "brand_l1":     "#39b2ef",
         "brand_core":   "#2fa2db",

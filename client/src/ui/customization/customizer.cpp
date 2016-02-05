@@ -558,6 +558,8 @@ void QnCustomizer::setCustomization(const QnCustomization &customization) {
             d->genericPalette.setColors(lit("dark"), extractColors(lit("dark"), *d->colorSerializer));
             d->genericPalette.setColors(lit("light"), extractColors(lit("light"), *d->colorSerializer));
             d->genericPalette.setColors(lit("blue"), extractColors(lit("blue"), *d->colorSerializer));
+            d->genericPalette.setColors(lit("green"), extractColors(lit("green"), *d->colorSerializer));
+            d->genericPalette.setColors(lit("brand"), extractColors(lit("brand"), *d->colorSerializer));
         }
     }
 

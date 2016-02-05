@@ -11,6 +11,7 @@ namespace style
     const int Metrics::kMenuCheckSize = dp(16);
     const int Metrics::kMinimumButtonWidth = dp(80);
     const int Metrics::kButtonHeight = dp(28);
+    const QSize Metrics::kSwitchSize(dp(30), dp(15));
 
     qreal dpr(qreal value)
     {
@@ -56,4 +57,22 @@ namespace style
             return 0;
         return rect.top() + rect.height() * y;
     }
+
+    QString Colors::paletteName(Colors::Palette palette)
+    {
+        switch (palette)
+        {
+        case kBase:
+            return lit("dark");
+        case kContrast:
+            return lit("light");
+        case kBlue:
+            return lit("blue");
+        case kGreen:
+            return lit("green");
+        case kBrang:
+            return lit("brand");
+        }
+    }
+
 }

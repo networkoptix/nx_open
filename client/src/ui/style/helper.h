@@ -14,6 +14,22 @@ namespace style
         static const int kMenuCheckSize;
         static const int kMinimumButtonWidth;
         static const int kButtonHeight;
+        static const QSize kSwitchSize;
+    };
+
+    class Colors
+    {
+    public:
+        enum Palette
+        {
+            kBase,
+            kContrast,
+            kBlue,
+            kGreen,
+            kBrang
+        };
+
+        static QString paletteName(Palette palette);
     };
 
     qreal dpr(qreal value);
