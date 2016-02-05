@@ -1,0 +1,42 @@
+#pragma once
+
+#include <QtWidgets/QTabBar>
+
+namespace style
+{
+    class Metrics
+    {
+    public:
+        static const int kMenuItemHPadding;
+        static const int kMenuItemVPadding;
+        static const int kMenuItemTextLeftPadding;
+        static const int kArrowSize;
+        static const int kMenuCheckSize;
+        static const int kMinimumButtonWidth;
+        static const int kButtonHeight;
+    };
+
+    qreal dpr(qreal value);
+    int dp(qreal value);
+
+    bool isDark(const QColor &color);
+    bool isTabRounded(QTabBar::Shape shape);
+
+    class RectCoordinates
+    {
+        QRectF rect;
+
+    public:
+        RectCoordinates(const QRectF &rect);
+        qreal x(qreal x);
+        qreal y(qreal y);
+    };
+
+    enum Direction
+    {
+        Up,
+        Down,
+        Left,
+        Right
+    };
+}

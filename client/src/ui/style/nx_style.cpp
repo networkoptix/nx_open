@@ -19,77 +19,19 @@
 
 #include <utils/common/scoped_painter_rollback.h>
 
+#include "helper.h"
+
+using namespace style;
+
 namespace
 {
-    qreal dpr(qreal value)
-    {
-    #ifdef Q_OS_MAC
-        // On mac the DPI is always 72 so we should not scale it
-        return value;
-    #else
-        static const qreal scale = qreal(qt_defaultDpiX()) / 96.0;
-        return value * scale;
-    #endif
-    }
-
-    int dp(qreal value)
-    {
-        return dpr(value);
-    }
-
-//    bool isDark(const QColor &color)
-//    {
-//        return color.toHsl().lightness() < 128;
-//    }
-
-    bool isTabRounded(QTabBar::Shape shape)
-    {
-        return shape <= QTabBar::RoundedEast;
-    }
-
-    const int kMenuItemHPadding = dp(12);
-    const int kMenuItemVPadding = dp(5);
-    const int kMenuItemTextLeftPadding = dp(28);
-    const int kArrowSize = dp(8);
-    const int kMenuCheckSize = dp(16);
-    const int kMinimumButtonWidth = dp(80);
-    const int kButtonHeight = dp(28);
-
-    enum Direction
-    {
-        Up,
-        Down,
-        Left,
-        Right
-    };
-
-    class RectCoordinates
-    {
-        QRectF rect;
-    public:
-        RectCoordinates(const QRectF &rect) : rect(rect) {}
-
-        qreal x(qreal x)
-        {
-            if (rect.isEmpty())
-                return 0;
-            return rect.left() + rect.width() * x;
-        }
-
-        qreal y(qreal y)
-        {
-            if (rect.isEmpty())
-                return 0;
-            return rect.top() + rect.height() * y;
-        }
-    };
-
     void drawArrow(Direction direction, QPainter *painter, const QRectF &rect, const QColor &color)
     {
         QPainterPath path;
 
-        QRectF arrowRect(QPointF(), QSizeF(kArrowSize, kArrowSize));
-        arrowRect.moveTo(rect.left() + (rect.width() - kArrowSize) / 2, rect.top() + (rect.height() - kArrowSize) / 2);
+        QRectF arrowRect(QPointF(), QSizeF(Metrics::kArrowSize, Metrics::kArrowSize));
+        arrowRect.moveTo(rect.left() + (rect.width() - Metrics::kArrowSize) / 2,
+                         rect.top() + (rect.height() - Metrics::kArrowSize) / 2);
 
         RectCoordinates rc(arrowRect);
 
@@ -134,8 +76,9 @@ namespace
 
     void drawMenuCheckMark(QPainter *painter, const QRect &rect, const QColor &color)
     {
-        QRect checkRect(QPoint(), QSize(kMenuCheckSize, kMenuCheckSize));
-        checkRect.moveTo(rect.left() + (rect.width() - kMenuCheckSize) / 2, rect.top() + (rect.height() - kMenuCheckSize) / 2);
+        QRect checkRect(QPoint(), QSize(Metrics::kMenuCheckSize, Metrics::kMenuCheckSize));
+        checkRect.moveTo(rect.left() + (rect.width() - Metrics::kMenuCheckSize) / 2,
+                         rect.top() + (rect.height() - Metrics::kMenuCheckSize) / 2);
 
         RectCoordinates rc(checkRect);
 
@@ -1011,7 +954,8 @@ void QnNxStyle::drawControl(
 
                 int y = menuItem->rect.top() + menuItem->rect.height() / 2;
                 painter->setPen(findColor(menuItem->palette.color(QPalette::Window)).darker(2));
-                painter->drawLine(kMenuItemHPadding, y, menuItem->rect.right() - kMenuItemHPadding, y);
+                painter->drawLine(Metrics::kMenuItemHPadding, y,
+                                  menuItem->rect.right() - Metrics::kMenuItemHPadding, y);
 
                 painter->restore();
                 break;
@@ -1036,7 +980,7 @@ void QnNxStyle::drawControl(
             if (selected)
                 painter->fillRect(menuItem->rect, backgroundColor);
 
-            int xPos = kMenuItemTextLeftPadding;
+            int xPos = Metrics::kMenuItemTextLeftPadding;
             int y = menuItem->rect.y();
 
             int textFlags = Qt::AlignVCenter | Qt::TextShowMnemonic | Qt::TextDontClip | Qt::TextSingleLine;
@@ -1044,9 +988,9 @@ void QnNxStyle::drawControl(
                 textFlags |= Qt::TextHideMnemonic;
 
             QRect textRect(xPos,
-                           y + kMenuItemVPadding,
-                           menuItem->rect.width() - xPos - kMenuItemHPadding,
-                           menuItem->rect.height() - 2 * kMenuItemVPadding);
+                           y + Metrics::kMenuItemVPadding,
+                           menuItem->rect.width() - xPos - Metrics::kMenuItemHPadding,
+                           menuItem->rect.height() - 2 * Metrics::kMenuItemVPadding);
 
             if (!menuItem->text.isEmpty())
             {
@@ -1070,7 +1014,7 @@ void QnNxStyle::drawControl(
             {
                 drawMenuCheckMark(
                         painter,
-                        QRect(kMenuItemHPadding, menuItem->rect.y(), dp(16), menuItem->rect.height()),
+                        QRect(Metrics::kMenuItemHPadding, menuItem->rect.y(), dp(16), menuItem->rect.height()),
                         textColor);
             }
 
@@ -1078,8 +1022,8 @@ void QnNxStyle::drawControl(
             {
                 drawArrow(Right,
                           painter,
-                          QRect(menuItem->rect.right() - kMenuItemVPadding - kArrowSize, menuItem->rect.top(),
-                                kArrowSize, menuItem->rect.height()),
+                          QRect(menuItem->rect.right() - Metrics::kMenuItemVPadding - Metrics::kArrowSize, menuItem->rect.top(),
+                                Metrics::kArrowSize, menuItem->rect.height()),
                           textColor);
             }
 
@@ -1648,11 +1592,13 @@ QSize QnNxStyle::sizeFromContents(
     switch (type)
     {
     case CT_PushButton:
-        return QSize(qMax(kMinimumButtonWidth, size.width() + 2 * pixelMetric(PM_ButtonMargin, option, widget)), qMax(size.height(), kButtonHeight));
+        return QSize(qMax(Metrics::kMinimumButtonWidth, size.width() + 2 * pixelMetric(PM_ButtonMargin, option, widget)),
+                     qMax(size.height(), Metrics::kButtonHeight));
     case CT_LineEdit:
-        return QSize(size.width(), qMax(size.height(), kButtonHeight));
+        return QSize(size.width(), qMax(size.height(), Metrics::kButtonHeight));
     case CT_ComboBox:
-        return QSize(qMax(kMinimumButtonWidth, size.width() + 2 * pixelMetric(PM_ButtonMargin, option, widget)), qMax(size.height(), kButtonHeight));
+        return QSize(qMax(Metrics::kMinimumButtonWidth, size.width() + 2 * pixelMetric(PM_ButtonMargin, option, widget)),
+                     qMax(size.height(), Metrics::kButtonHeight));
     case CT_TabBarTab:
         if (const QStyleOptionTab *tab =
                 qstyleoption_cast<const QStyleOptionTab *>(option))
@@ -1685,7 +1631,8 @@ QSize QnNxStyle::sizeFromContents(
         }
         break;
     case CT_MenuItem:
-        return QSize(size.width() + dp(24) + 2 * kMenuItemHPadding, size.height() + 2 * kMenuItemVPadding);
+        return QSize(size.width() + dp(24) + 2 * Metrics::kMenuItemHPadding,
+                     size.height() + 2 * Metrics::kMenuItemVPadding);
     default:
         break;
     }
