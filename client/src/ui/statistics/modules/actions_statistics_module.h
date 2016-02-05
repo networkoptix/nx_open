@@ -2,7 +2,7 @@
 #pragma once
 
 #include <ui/workbench/workbench_context_aware.h>
-#include <ui/statistics/base_statistics_module.h>
+#include <statistics/base_statistics_module.h>
 
 class QnStatisticsMetric;
 

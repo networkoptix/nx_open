@@ -37,8 +37,9 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
-#include <ui/statistics/statistics_manager.h>
-#include <ui/statistics/storage/local_statistics_storage.h>
+#include <statistics/statistics_manager.h>
+#include <statistics/storage/statistics_file_storage.h>
+#include <ui/statistics/statistics_settings_watcher.h>
 #include <ui/statistics/modules/actions_statistics_module.h>
 
 #include <ui/dialogs/ptz_manage_dialog.h>
@@ -418,8 +419,10 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
     const auto statManager = context->instance<QnStatisticsManager>();
     const auto statStorage = context->instance<QnStatisticsFileStorage>();
-    statManager->setStorage(statStorage);
+    const auto statSettings = context->instance<QnStatisticsSettingsWatcher>();
 
+    statManager->setStorage(statStorage);
+    statManager->setSettings(statSettings);
     const auto actionsStatModule = context->instance<QnActionsStatisticsModule>();
     statManager->registerStatisticsModule(lit("actions"), actionsStatModule);
 }
