@@ -228,7 +228,7 @@ void QnTransactionTcpProcessor::run()
         fail = true; // accept only allowed peers
 
     d->chunkedMode = false;
-    d->response.headers.emplace( "Connection", "close" );
+    //d->response.headers.emplace( "Connection", "close" );
     if( fail )
     {
         QnTransactionTransport::connectingCanceled(remoteGuid, false);
