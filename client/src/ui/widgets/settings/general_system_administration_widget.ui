@@ -18,13 +18,13 @@
     <number>16</number>
    </property>
    <property name="topMargin">
-    <number>24</number>
+    <number>16</number>
    </property>
    <property name="rightMargin">
     <number>16</number>
    </property>
    <property name="bottomMargin">
-    <number>24</number>
+    <number>16</number>
    </property>
    <item>
     <widget class="QGroupBox" name="commonGroupBox">
@@ -41,11 +41,14 @@
       <property name="horizontalSpacing">
        <number>8</number>
       </property>
+      <property name="verticalSpacing">
+       <number>8</number>
+      </property>
       <property name="leftMargin">
        <number>0</number>
       </property>
       <property name="topMargin">
-       <number>0</number>
+       <number>8</number>
       </property>
       <property name="rightMargin">
        <number>0</number>
@@ -179,11 +182,14 @@
       <bool>true</bool>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
+      <property name="spacing">
+       <number>8</number>
+      </property>
       <property name="leftMargin">
        <number>0</number>
       </property>
       <property name="topMargin">
-       <number>0</number>
+       <number>8</number>
       </property>
       <property name="rightMargin">
        <number>0</number>
@@ -206,11 +212,14 @@
       <bool>true</bool>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_3">
+      <property name="spacing">
+       <number>8</number>
+      </property>
       <property name="leftMargin">
        <number>0</number>
       </property>
       <property name="topMargin">
-       <number>0</number>
+       <number>8</number>
       </property>
       <property name="rightMargin">
        <number>0</number>
