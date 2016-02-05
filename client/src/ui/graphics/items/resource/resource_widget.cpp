@@ -277,19 +277,18 @@ void QnResourceWidget::createButtons() {
     connect(rotateButton, &QnImageButtonWidget::released, this, &QnResourceWidget::rotationStopRequested);
 
     auto buttonsBar = buttonsOverlay()->rightButtonsBar();
-    m_buttonBar->setUniformButtonSize(QSizeF(kButtonsSize, kButtonsSize));
+    buttonsBar->setUniformButtonSize(QSizeF(kButtonsSize, kButtonsSize));
     buttonsBar->addButton(Qn::CloseButton, closeButton);
     buttonsBar->addButton(Qn::InfoButton, infoButton);
     buttonsBar->addButton(Qn::RotateButton, rotateButton);
 
     connect(buttonsBar, SIGNAL(checkedButtonsChanged()), this, SLOT(at_buttonBar_checkedButtonsChanged()));
 
-    auto icontButton = new QnImageButtonWidget();
-    icontButton->setParent(this);
-    m_iconButton->setPreferredSize(kButtonsSize, kButtonsSize);
-    icontButton->setVisible(false);
-    buttonsOverlay()->leftButtonsBar()->addButton(
-        Qn::RecordingStatusIconButton, icontButton);
+    auto iconButton = new QnImageButtonWidget();
+    iconButton->setParent(this);
+    iconButton->setPreferredSize(kButtonsSize, kButtonsSize);
+    iconButton->setVisible(false);
+    buttonsOverlay()->leftButtonsBar()->addButton(Qn::RecordingStatusIconButton, iconButton);
 }
 
 const QnResourcePtr &QnResourceWidget::resource() const {
