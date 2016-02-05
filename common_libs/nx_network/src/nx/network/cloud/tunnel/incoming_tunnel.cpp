@@ -72,9 +72,9 @@ void IncomingTunnelPool::getNextSocketAsync(
     std::function<void(std::unique_ptr<AbstractStreamSocket>)> handler)
 {
     QnMutexLocker lock(&m_mutex);
-    Q_ASSERT_X(!m_acceptRequest, Q_FUNC_INFO, "Multiple accepts are not supported");
+    Q_ASSERT_X(!m_acceptHandler, Q_FUNC_INFO, "Multiple accepts are not supported");
 
-    m_acceptRequest = std::move(handler);
+    m_acceptHandler = std::move(handler);
     returnSocketIfAny(&lock);
 }
 
@@ -114,7 +114,11 @@ void IncomingTunnelPool::acceptTunnel(std::shared_ptr<IncomingTunnel> tunnel)
 
         QnMutexLocker lock(&m_mutex);
         if (m_acceptedSockets.size() >= m_acceptLimit)
-            return; //< TODO: #mux Stop accepting tunnel?
+        {
+            // TODO: #mux Stop accepting tunnel?
+            NX_LOGX(lm("sockets queue overflow: %1").arg(m_acceptLimit), cl_logDEBUG1);
+            return;
+        }
 
         m_acceptedSockets.push_back(std::move(socket));
         returnSocketIfAny(&lock);
@@ -123,11 +127,11 @@ void IncomingTunnelPool::acceptTunnel(std::shared_ptr<IncomingTunnel> tunnel)
 
 void IncomingTunnelPool::returnSocketIfAny(QnMutexLockerBase* lock)
 {
-    if (!m_acceptRequest || m_acceptedSockets.empty())
+    if (!m_acceptHandler || m_acceptedSockets.empty())
         return; // nothing to indicate
 
-    auto request = std::move(m_acceptRequest);
-    m_acceptRequest = nullptr;
+    auto request = std::move(m_acceptHandler);
+    m_acceptHandler = nullptr;
 
     auto socket = std::move(m_acceptedSockets.front());
     m_acceptedSockets.pop_front();

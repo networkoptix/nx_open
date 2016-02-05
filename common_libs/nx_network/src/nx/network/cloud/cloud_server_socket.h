@@ -15,9 +15,9 @@ namespace cloud {
     Listening hostname is reported to the mediator to listen on.
     \todo #ak what listening port should mean in this case?
 */
-class NX_NETWORK_API CloudServerSocket
-:
-    public AbstractStreamServerSocket
+class NX_NETWORK_API CloudServerSocket:
+    public AbstractSocketAttributesCache<
+        AbstractStreamServerSocket, StreamSocketAttributes>
 {
 public:
     CloudServerSocket(
@@ -30,19 +30,6 @@ public:
     void close() override;
     bool isClosed() const override;
     void shutdown() override;
-    bool setReuseAddrFlag(bool reuseAddr) override;
-    bool getReuseAddrFlag(bool* val) const override;
-    bool setNonBlockingMode(bool val) override;
-    bool getNonBlockingMode(bool* val) const override;
-    bool getMtu(unsigned int* mtuValue) const override;
-    bool setSendBufferSize(unsigned int buffSize) override;
-    bool getSendBufferSize(unsigned int* buffSize) const override;
-    bool setRecvBufferSize(unsigned int buffSize) override;
-    bool getRecvBufferSize(unsigned int* buffSize) const override;
-    bool setRecvTimeout(unsigned int millis) override;
-    bool getRecvTimeout(unsigned int* millis) const override;
-    bool setSendTimeout(unsigned int ms) override;
-    bool getSendTimeout(unsigned int* millis) const override;
     bool getLastError(SystemError::ErrorCode* errorCode) const override;
     AbstractSocket::SOCKET_HANDLE handle() const override;
 
@@ -78,7 +65,6 @@ protected:
     std::map<Acceptor*, std::unique_ptr<Acceptor>> m_acceptors;
 
     mutable SystemError::ErrorCode m_lastError;
-    std::shared_ptr<StreamSocketAttributes> m_socketAttributes;
     std::unique_ptr<AbstractCommunicatingSocket> m_ioThreadSocket;
     std::unique_ptr<AbstractCommunicatingSocket> m_timerThreadSocket;
     std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)> m_acceptHandler;

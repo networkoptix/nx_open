@@ -14,41 +14,19 @@ CloudServerSocket::CloudServerSocket(
         IncomingTunnelPool* tunnelPool)
     : m_mediatorConnection(mediatorConnection)
     , m_tunnelPool(tunnelPool)
-    , m_socketAttributes(new StreamSocketAttributes())
-    , m_ioThreadSocket(SocketFactory::createStreamSocket())
-    , m_timerThreadSocket(SocketFactory::createStreamSocket())
+    , m_ioThreadSocket(new TCPSocket())
+    , m_timerThreadSocket(new TCPSocket())
 {
     m_timerThreadSocket->bindToAioThread(m_ioThreadSocket->getAioThread());
 
     // TODO: #mu default values for m_socketAttributes shall match default
     //           system vales: think how to implement this...
-    m_socketAttributes->recvTimeout = 0;
+    m_socketAttributes.recvTimeout = 0;
 }
 
 #ifdef CloudServerSocket_setSocketOption
     #error CloudStreamSocket_setSocketOption macro is already defined.
 #endif
-
-#define CloudServerSocket_setSocketOption(SETTER, TYPE, NAME)   \
-    bool CloudServerSocket::SETTER(TYPE NAME)                   \
-    {                                                           \
-        m_socketAttributes->NAME = NAME;                           \
-        return true;                                            \
-    }
-
-#ifdef CloudServerSocket_getSocketOption
-    #error CloudStreamSocket_getSocketOption macro is already defined.
-#endif
-
-#define CloudServerSocket_getSocketOption(GETTER, TYPE, NAME)   \
-    bool CloudServerSocket::GETTER(TYPE* NAME) const            \
-    {                                                           \
-        if (!m_socketAttributes->NAME)                             \
-            return false;                                       \
-                                                                \
-        *NAME = *m_socketAttributes->NAME;                         \
-        return true;                                            \
-    }
 
 bool CloudServerSocket::bind(const SocketAddress& localAddress)
 {
@@ -79,33 +57,6 @@ void CloudServerSocket::shutdown()
     Q_ASSERT_X(false, Q_FUNC_INFO, "Not implemented...");
 }
 
-CloudServerSocket_setSocketOption(setReuseAddrFlag, bool, reuseAddrFlag)
-CloudServerSocket_getSocketOption(getReuseAddrFlag, bool, reuseAddrFlag)
-
-CloudServerSocket_setSocketOption(setSendBufferSize, unsigned int, sendBufferSize)
-CloudServerSocket_getSocketOption(getSendBufferSize, unsigned int, sendBufferSize)
-
-CloudServerSocket_setSocketOption(setRecvBufferSize, unsigned int, recvBufferSize)
-CloudServerSocket_getSocketOption(getRecvBufferSize, unsigned int, recvBufferSize)
-
-CloudServerSocket_setSocketOption(setRecvTimeout, unsigned int, recvTimeout)
-CloudServerSocket_getSocketOption(getRecvTimeout, unsigned int, recvTimeout)
-
-CloudServerSocket_setSocketOption(setSendTimeout, unsigned int, sendTimeout)
-CloudServerSocket_getSocketOption(getSendTimeout, unsigned int, sendTimeout)
-
-CloudServerSocket_setSocketOption(setNonBlockingMode, bool, nonBlockingMode)
-CloudServerSocket_getSocketOption(getNonBlockingMode, bool, nonBlockingMode)
-
-bool CloudServerSocket::getMtu(unsigned int* mtuValue) const
-{
-    Q_ASSERT_X(false, Q_FUNC_INFO, "Not implemented...");
-    return false;
-}
-
-#undef CloudServerSocket_setSocketOption
-#undef CloudServerSocket_getSocketOption
-
 bool CloudServerSocket::getLastError(SystemError::ErrorCode* errorCode) const
 {
     if (m_lastError == SystemError::noError)
@@ -133,6 +84,8 @@ static std::unique_ptr<T> makeAcceptor(hpm::api::ConnectionRequestedEvent& event
 
 bool CloudServerSocket::listen(int queueLen)
 {
+    m_tunnelPool->setAcceptLimit(queueLen);
+
     auto sharedGuard = m_asyncGuard.sharedGuard();
     m_mediatorConnection->setOnConnectionRequestedHandler([this, sharedGuard](
         hpm::api::ConnectionRequestedEvent event)
@@ -153,14 +106,12 @@ bool CloudServerSocket::listen(int queueLen)
                 .arg(event.connectionMethods), cl_logWARNING);
     });
 
-    // TODO: #mux should queueLen imply any effect on TunnelPool?
-    static_cast<void>(queueLen);
     return true;
 }
 
 AbstractStreamSocket* CloudServerSocket::accept()
 {
-    if (m_socketAttributes->nonBlockingMode && *m_socketAttributes->nonBlockingMode)
+    if (m_socketAttributes.nonBlockingMode && *m_socketAttributes.nonBlockingMode)
     {
         if (auto socket = m_tunnelPool->getNextSocketIfAny())
             return new StreamSocketWrapper(std::move(socket));
@@ -217,7 +168,7 @@ void CloudServerSocket::acceptAsync(
     std::function<void(SystemError::ErrorCode code,
                        AbstractStreamSocket*)> handler )
 {
-    Q_ASSERT_X(!m_acceptHandler, Q_FUNC_INFO, "concurent accept call");
+    Q_ASSERT_X(!m_acceptHandler, Q_FUNC_INFO, "concurrent accept call");
     m_acceptHandler = std::move(handler);
     NX_LOGX(lm("accept async"), cl_logDEBUG2);
 
@@ -232,7 +183,7 @@ void CloudServerSocket::acceptAsync(
     {
         if (auto lock = sharedGuard->lock())
         {
-            Q_ASSERT_X(!m_acceptedSocket, Q_FUNC_INFO, "concurently accepted socket");
+            Q_ASSERT_X(!m_acceptedSocket, Q_FUNC_INFO, "concurrently accepted socket");
             NX_LOGX(lm("accepted socket %1").arg(socket), cl_logDEBUG2);
 
             m_acceptedSocket = std::move(socket);
@@ -280,10 +231,9 @@ void CloudServerSocket::callAcceptHandler()
     }
     else
     {
-        NX_LOGX(lm("accept timed out").arg(socket), cl_logDEBUG2);
+        NX_LOGX(lm("accept timed out"), cl_logDEBUG2);
         handler(SystemError::timedOut, nullptr);
     }
-
 }
 
 } // namespace cloud

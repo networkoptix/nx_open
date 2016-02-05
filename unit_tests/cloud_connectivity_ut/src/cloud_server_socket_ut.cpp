@@ -83,8 +83,10 @@ struct CloudServerSocketTestCase : CloudServerSocket
     CloudServerSocketTestCase(IncomingTunnelPool* tunnelPool)
         : CloudServerSocket(nullptr, tunnelPool) {}
 
-    bool listen(int) override
+    bool listen(int queueLen) override
     {
+        m_tunnelPool->setAcceptLimit(queueLen);
+
         // TODO: #mux use multiple acceptors
         std::vector<SocketAddress> addresses;
         addresses.push_back(nx::network::test::kServerAddress);

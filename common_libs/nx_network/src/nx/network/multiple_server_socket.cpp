@@ -213,7 +213,7 @@ void MultipleServerSocket::acceptAsync(
 {
     dispatch([this, handler]()
     {
-        Q_ASSERT_X(!m_acceptHandler, Q_FUNC_INFO, "concurent accept call");
+        Q_ASSERT_X(!m_acceptHandler, Q_FUNC_INFO, "concurrent accept call");
         m_acceptHandler = std::move(handler);
 
         if (m_recvTmeout)

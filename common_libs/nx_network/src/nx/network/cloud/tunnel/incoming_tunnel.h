@@ -51,7 +51,7 @@ private:
 
     QnMutex m_mutex;
     std::set<std::shared_ptr<IncomingTunnel>> m_pool;
-    std::function<void(std::unique_ptr<AbstractStreamSocket>)> m_acceptRequest;
+    std::function<void(std::unique_ptr<AbstractStreamSocket>)> m_acceptHandler;
     std::deque<std::unique_ptr<AbstractStreamSocket>> m_acceptedSockets;
     size_t m_acceptLimit;
 };
