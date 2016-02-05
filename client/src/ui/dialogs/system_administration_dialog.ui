@@ -30,11 +30,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QTabWidget" name="tabWidget">
-     <property name="tabShape">
-      <enum>QTabWidget::Triangular</enum>
-     </property>
-    </widget>
+    <widget class="QTabWidget" name="tabWidget"/>
    </item>
    <item>
     <widget class="Line" name="line">
