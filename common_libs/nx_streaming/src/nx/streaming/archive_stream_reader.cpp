@@ -246,8 +246,6 @@ bool QnArchiveStreamReader::init()
             if (m_requiredJumpTime == requiredJumpTime) {
                 if (requiredJumpTime != qint64(AV_NOPTS_VALUE))
                     m_requiredJumpTime = AV_NOPTS_VALUE;
-                m_oldQuality = quality;
-                m_oldQualityFastSwitch = true;
                 m_jumpMtx.unlock();
                 if (requiredJumpTime != qint64(AV_NOPTS_VALUE))
                     emit jumpOccured(requiredJumpTime);
@@ -259,6 +257,7 @@ bool QnArchiveStreamReader::init()
         }
     }
 
+    m_delegate->setQuality(quality, true);
     if (!m_delegate->open(m_resource)) {
         if (requiredJumpTime != qint64(AV_NOPTS_VALUE)) {
             emit jumpOccured(requiredJumpTime);
@@ -270,6 +269,11 @@ bool QnArchiveStreamReader::init()
         return false;
     }
     m_delegate->setAudioChannel(m_selectedAudioChannel);
+
+    m_jumpMtx.lock();
+    m_oldQuality = quality;
+    m_oldQualityFastSwitch = true;
+    m_jumpMtx.unlock();
 
     // Alloc common resources
 
