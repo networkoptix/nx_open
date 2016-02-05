@@ -44,3 +44,28 @@ h1>.label{
   font-size:60%;
   vertical-align: 33%;
 }
+
+.modal-body{
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.modal-footer{
+  margin-top: 0;
+  text-align: left;
+}
+
+.modal-dialog {
+  width: 400px;
+}
+
+
+.modal .help-block{ /* Do not jump modal size when help block changes (help-block is below the input)*/
+  min-height:40px;
+}
+
+@media (min-width: 768px) {
+  .form-horizontal .help-block { /* Do not jump form when help block changes (help-block is to the right from the input) */
+    position: absolute;
+  }
+}
