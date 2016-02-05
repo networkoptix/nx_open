@@ -164,7 +164,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
             return;
         }
 
-        connect(m_exportReader, &QnAbstractArchiveReader::finished, this, [this]()
+        connect(m_exportReader, &QnAbstractArchiveStreamReader::finished, this, [this]()
         {
             {
                 QnMutexLocker lock(&m_exportMutex);
