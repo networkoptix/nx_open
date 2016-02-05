@@ -1405,25 +1405,25 @@ QRect QnNxStyle::subControlRect(
             switch (subControl)
             {
             case SC_GroupBoxFrame:
-                if (groupBox->features & QStyleOptionFrame::Flat)
+                if (groupBox->features.testFlag(QStyleOptionFrame::Flat))
                 {
                     QRect labelRect = subControlRect(CC_GroupBox, option, SC_GroupBoxLabel, widget);
-                    rect.setTop(labelRect.bottom() + dp(8));
+                    rect.setTop(labelRect.bottom() + dp(6));
                 }
                 break;
 
             case SC_GroupBoxLabel:
-                if (!(groupBox->features & QStyleOptionFrame::Flat))
-                {
+                if (groupBox->features.testFlag(QStyleOptionFrame::Flat))
+                    rect.setHeight(dp(18));
+                else
                     rect.moveLeft(dp(16));
-                }
                 break;
 
             case SC_GroupBoxContents:
-                if (groupBox->features & QStyleOptionFrame::Flat)
+                if (groupBox->features.testFlag(QStyleOptionFrame::Flat))
                 {
                     QRect labelRect = subControlRect(CC_GroupBox, option, SC_GroupBoxLabel, widget);
-                    rect.setTop(labelRect.bottom() + dp(24));
+                    rect.setTop(labelRect.bottom() + dp(10));
                 }
                 break;
 
