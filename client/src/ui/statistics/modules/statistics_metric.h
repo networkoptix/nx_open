@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include <ui/statistics/types.h>
+#include <statistics/types.h>
 
 class QnStatisticsMetric
 {

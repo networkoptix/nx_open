@@ -1,5 +1,5 @@
 
-#include "statistics_settings.h"
+#include "statistics_settings_watcher.h"
 
 #include <QtCore/QTimer>
 

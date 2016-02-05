@@ -3,7 +3,7 @@
 
 #include <QtCore/QObject>
 
-#include <ui/statistics/types.h>
+#include <statistics/types.h>
 
 class QnBaseStatisticsModule : public QObject
 {

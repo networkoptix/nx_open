@@ -6,9 +6,9 @@
 #include <api/media_server_connection.h>
 #include <core/resource/media_server_resource.h>
 
-#include <ui/statistics/base_statistics_module.h>
-#include <ui/statistics/base_statistics_storage.h>
-#include <ui/statistics/private/statistics_settings.h>
+#include <statistics/base_statistics_module.h>
+#include <statistics/base_statistics_storage.h>
+#include <statistics/base_statistics_settings_loader.h>
 
 namespace
 {
@@ -38,7 +38,7 @@ namespace
 
 QnStatisticsManager::QnStatisticsManager(QObject *parent)
     : base_type(parent)
-    , m_settings(new QnStatisticsSettingsWatcher())
+    , m_settings()
     , m_modules()
     , m_storage()
 {}
@@ -78,6 +78,11 @@ void QnStatisticsManager::setStorage(QnBaseStatisticsStorage *storage)
     m_storage = storage;
 }
 
+void QnStatisticsManager::setSettings(QnBaseStatisticsSettingsLoader *settings)
+{
+    m_settings = settings;
+}
+
 QnMetricsHash QnStatisticsManager::getMetrics() const
 {
     QnMetricsHash result;
@@ -109,15 +114,10 @@ void QnStatisticsManager::sendStatistics()
 //    if (!qnGlobalSettings->isStatisticsAllowed()) // TODO: uncomment me!
 //        return;
 
-    // Stores current metrics
-    const auto metrics = getMetrics();
-    m_storage->storeMetrics(metrics);
-
     //
     static const qint64 kMsInDay = 24 * 60 * 60 * 1000;
     auto settings = m_settings->settings();
     settings.filters.insert(lit(".*"));    // TODO: remove me, add const to settings
-    debugOutput(filteredMetrics(metrics, settings.filters)); // TODO: remove me
     const qint64 minTimeStampMs = (getLastFilters() == settings.filters
         ? QDateTime::currentMSecsSinceEpoch() - kMsInDay * settings.storeDays
         : getLastSentTime());
@@ -134,6 +134,17 @@ void QnStatisticsManager::sendStatistics()
     const auto server = qnCommon->currentServer();
     const auto connection = server->apiConnection();
 
+}
+
+void QnStatisticsManager::saveCurrentStatistics()
+{
+    // Stores current metrics
+    const auto metrics = getMetrics();
+    m_storage->storeMetrics(metrics);
+
+    // TODO: remove me
+    const auto settings = m_settings->settings();
+    debugOutput(filteredMetrics(metrics, settings.filters));
 }
 
 QnStringsSet QnStatisticsManager::getLastFilters() const

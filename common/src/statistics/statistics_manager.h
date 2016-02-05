@@ -4,11 +4,12 @@
 #include <QtCore/QObject>
 #include <QtCore/QPointer>
 
-#include <ui/statistics/types.h>
+#include <statistics/types.h>
 
 class QnBaseStatisticsModule;
 class QnBaseStatisticsStorage;
 class QnStatisticsSettingsWatcher;
+class QnBaseStatisticsSettingsLoader;
 
 class QnStatisticsManager : public QObject
 {
@@ -26,8 +27,12 @@ public:
 
     void setStorage(QnBaseStatisticsStorage *storage);
 
+    void setSettings(QnBaseStatisticsSettingsLoader *settings);
+
 public:
     void sendStatistics();
+
+    void saveCurrentStatistics();
 
 private:
     void unregisterModule(const QString &alias);
@@ -39,12 +44,13 @@ private:
     qint64 getLastSentTime() const;
 
 private:
-    typedef QScopedPointer<QnStatisticsSettingsWatcher> QnStatisticsSettingsWatcherPtr;
+    typedef QPointer<QnBaseStatisticsSettingsLoader> SettingsPtr;
     typedef QPointer<QnBaseStatisticsStorage> StoragePtr;
     typedef QPointer<QnBaseStatisticsModule> ModulePtr;
     typedef QHash<QString, ModulePtr> ModulesMap;
 
-    const QnStatisticsSettingsWatcherPtr m_settings;
-    ModulesMap m_modules;
+    SettingsPtr m_settings;
     StoragePtr m_storage;
+
+    ModulesMap m_modules;
 };

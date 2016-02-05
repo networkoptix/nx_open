@@ -2,7 +2,7 @@
 #pragma once
 
 #include <ui/actions/actions.h>
-#include <ui/statistics/private/statistics_metric.h>
+#include <ui/statistics/modules/statistics_metric.h>
 
 class QnActionManager;
 

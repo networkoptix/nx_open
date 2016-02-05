@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include <ui/statistics/base_statistics_storage.h>
+#include <statistics/base_statistics_storage.h>
 
 class QnStatisticsFileStorage : public QnBaseStatisticsStorage
 {
