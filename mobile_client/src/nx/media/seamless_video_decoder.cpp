@@ -99,8 +99,12 @@ const FrameMetadata SeamlessVideoDecoderPrivate::findMetadata(int frameNum)
 {
     while (!metadataQueue.empty() && metadataQueue.front().frameNum < frameNum)
         metadataQueue.pop_front(); //< In case of decoder skipped some input frames
-    FrameMetadata result(std::move(metadataQueue.front()));
-    metadataQueue.pop_front();
+    FrameMetadata result;
+    if (!metadataQueue.empty() && metadataQueue.front().frameNum == frameNum)
+    {
+        result = (std::move(metadataQueue.front()));
+        metadataQueue.pop_front();
+    }
     return result;
 }
 

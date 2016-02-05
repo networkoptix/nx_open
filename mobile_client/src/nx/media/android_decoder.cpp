@@ -1,5 +1,7 @@
 #include "android_decoder.h"
 
+#include <deque>
+
 #include <utils/thread/mutex.h>
 #include "abstract_resource_allocator.h"
 #include <utils/media/h264_utils.h>
@@ -24,8 +26,6 @@ namespace nx {
 namespace media {
 
 namespace {
-    static const int kFrameQueueMaxSize = 32; //< max java decoder internal queue size
-
     static const GLfloat g_vertex_data[] = {
         -1.f, 1.f,
         1.f, 1.f,
@@ -130,9 +130,7 @@ public:
         frameNumber(0),
         initialized(false),
         javaDecoder("com/networkoptix/nxwitness/media/QnMediaDecoder"),
-        program(nullptr),
-        frameNumToPtsCache(kFrameQueueMaxSize)
-
+        program(nullptr)
 	{
         registerNativeMethods();
 	}
@@ -191,7 +189,8 @@ private:
     FboPtr currentFbo;
     QOpenGLShaderProgram *program;
 
-    QCache<int, qint64> frameNumToPtsCache;
+    typedef std::pair<int, qint64> PtsData;
+    std::deque<PtsData> frameNumToPtsCache;
 };
 
 void renderFrameToFbo(void* opaque)
@@ -400,7 +399,7 @@ int AndroidDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QnVideoFr
     jlong outFrameNum;
     if (frame)
     {
-        d->frameNumToPtsCache.insert(d->frameNumber, new qint64(frame->timestamp));
+        d->frameNumToPtsCache.push_back(AndroidDecoderPrivate::PtsData(d->frameNumber, frame->timestamp));
         outFrameNum = d->javaDecoder.callMethod<jlong>(
             "decodeFrame", "(JIJ)J",
             (jlong) frame->data(),
@@ -422,10 +421,14 @@ int AndroidDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QnVideoFr
 
     QAbstractVideoBuffer* buffer = new TextureBuffer (std::move(d->currentFbo));
     QVideoFrame* videoFrame = new QVideoFrame(buffer, d->frameSize, QVideoFrame::Format_BGR32);
-    qint64* pts = d->frameNumToPtsCache.object(outFrameNum);
-    if (pts)
-        videoFrame->setStartTime(*pts / 1000); //< usec to msec
-    d->frameNumToPtsCache.remove(outFrameNum);
+    while (!d->frameNumToPtsCache.empty() && d->frameNumToPtsCache.front().first < outFrameNum)
+        d->frameNumToPtsCache.pop_front(); //< In case of decoder skipped some input frames
+    if (!d->frameNumToPtsCache.empty() && d->frameNumToPtsCache.front().first == outFrameNum)
+    {
+        qint64 pts = d->frameNumToPtsCache.front().second;
+        videoFrame->setStartTime(pts / 1000); //< usec to msec
+        d->frameNumToPtsCache.pop_front();
+    }
 
     result->reset(videoFrame);
     return (int)outFrameNum - 1; //< convert range [1..N] to [0..N]
