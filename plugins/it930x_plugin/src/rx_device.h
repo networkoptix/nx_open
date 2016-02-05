@@ -119,12 +119,7 @@ namespace ite
         // <refactor>
         bool findBestTx();
 
-        bool testChannel(
-            int chan,
-            int &bestChan,
-            int &bestStrength,
-            int &txID
-        );
+        bool testChannel(int chan, int &bestChan, int &bestStrength, int &txID);
 
         bool deviceReady() const {return m_deviceReady;}
         nxcip::CameraInfo getCameraInfo() const;

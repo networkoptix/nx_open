@@ -73,10 +73,11 @@ namespace ite
             m_cam->rxDeviceRef().reset();
             m_cam = nullptr;
         }
-//        stopReader();
-//        m_txDev.reset();
-//        open();
+
+        stopReader();
+        m_txDev.reset();
         m_it930x->unlockFrequency();
+
         ITE_LOG() << FMT("Rx %d shutdown done", m_rxID);
         m_deviceReady = false;
     }
@@ -211,7 +212,7 @@ namespace ite
     bool RxDevice::testChannel(int chan, int &bestChan, int &bestStrength, int &txID)
     {
         // We need to read from channel for some time
-        static const int SEARCH_READ_TIME = 4000; // ms
+        static const int SEARCH_READ_TIME = 2000; // ms
 
         m_it930x->unlockFrequency();
         if (m_it930x->lockFrequency(TxDevice::freq4chan(chan)))
@@ -223,7 +224,9 @@ namespace ite
             {
                 ITE_LOG() << FMT("[search] Rx: %d; get stats %d succeded, starting reading", m_rxID, chan);
 
-                m_devReader.reset(new DevReader);
+                if (m_devReader)
+                    m_devReader->stop();
+
                 m_devReader->subscribe(It930x::PID_RETURN_CHANNEL);
                 m_devReader->start(m_it930x.get(), SEARCH_READ_TIME);
 
@@ -272,25 +275,20 @@ namespace ite
                         break;
                     }
 
+                    ITE_LOG() << FMT("[RC] Rx %d pkt.txID: %d", m_rxID, pkt.txID());
+
                     if (first)
                     {
-                        first = false;
-                        debug_printf("[search] Rx %d; Found camera %d\n", m_rxID, pkt.txID());
+                        bestChan = chan;
+                        bestStrength = strength();
+                        m_channel = chan;
+                        txID = pkt.txID();
 
-                        if (strength() > bestStrength)
-                        {
-                            bestChan = chan;
-                            bestStrength = strength();
-                            m_channel = chan;
-                            txID = pkt.txID();
-                        }
                         m_devReader->unsubscribe(It930x::PID_RETURN_CHANNEL);
                         m_it930x->unlockFrequency();
                         return true;
                     }
-                    std::this_thread::sleep_for(std::chrono::milliseconds(100));
                 }
-                ITE_LOG() << FMT("[search] No Tx for this Rx\n");
                 m_devReader->unsubscribe(It930x::PID_RETURN_CHANNEL);
             }
         }
@@ -331,14 +329,12 @@ namespace ite
                     txID == hint.txId &&
                     rxSyncManager.lock(m_rxID, hint.txId))
                 {
-                    return lockAndStart(hint.chan, hint.txId);
+                    ITE_LOG() << FMT("[search] Hint (rxID: %d, chan: %d, txID: %d) helped", m_rxID, hint.chan, hint.txId);
+                    return lockAndStart(bestChan, txID);
                 }
                 else
                 {
-                    debug_printf("[search] Hint testChannel failed; \
-                                  txID: %d, hint.txID: %d, hint.chan: %d\n",
-                                 txID, hint.txId, hint.chan);
-//                    return false;
+                    ITE_LOG() << FMT("[search] Hint (rxID: %d, hint.chan: %d, hint.txID: %d) failed; actual TxID: %d", m_rxID, hint.chan, hint.txId, txID);
                 }
             }
         }
@@ -351,8 +347,7 @@ namespace ite
 
             if (testChannel(i, bestChan, bestStrength, txID))
             {
-                ITE_LOG() << FMT("[search] Rx: %d. Test channel %d succeeded. Strength is %d, camera is %d\n",
-                                 m_rxID, i, bestStrength, txID);
+                ITE_LOG() << FMT("[search] Rx: %d. Test channel %d succeeded. Strength is %d, camera is %d\n", m_rxID, i, bestStrength, txID);
 
                 if (rxSyncManager.lock(m_rxID, txID))
                     return lockAndStart(bestChan, txID);
@@ -376,10 +371,8 @@ namespace ite
     // otherwise - return actual info.
     nxcip::CameraInfo RxDevice::getCameraInfo() const
     {
-        debug_printf(
-            "[RxDevice::getCameraInfo] Rx %d; Asked for camera info\n",
-            m_rxID
-        );
+        debug_printf("[RxDevice::getCameraInfo] Rx %d; Asked for camera info\n", m_rxID);
+
         nxcip::CameraInfo info;
         memset(&info, 0, sizeof(nxcip::CameraInfo));
         if (!m_deviceReady || !m_txDev)

@@ -180,7 +180,6 @@ namespace ite
         void unlockFrequency()
         {
             std::lock_guard<std::mutex> lock(m_rcMutex); // LOCK
-
             m_devStream.reset();
         }
 #if 0
