@@ -27,7 +27,7 @@ public:
 	virtual ~PlayerDataConsumer();
 
     QnVideoFramePtr dequeueVideoFrame();
-    qint64 lastMediaTimeUsec() const;
+    qint64 queueVideoDurationUsec() const;
 signals:
     /** Hint to render to display current data with no delay due to seek operation in progress */
     void hurryUp();

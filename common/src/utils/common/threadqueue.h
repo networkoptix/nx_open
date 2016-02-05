@@ -138,12 +138,12 @@ public:
         m_bufferLen -= count;
     }
 
-    void lock()
+    void lock() const
     {
         m_cs.lock();
     }
 
-    void unlock()
+    void unlock() const
     {
         m_cs.unlock();
     }

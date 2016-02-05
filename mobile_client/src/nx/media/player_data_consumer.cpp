@@ -7,7 +7,7 @@
 namespace 
 {
     static const int kMaxMediaQueueLen = 90;        //< max queue length for compressed data (about 3 second)
-    static const int kMaxDecodedVideoQueueSize = 2; //< max queue length for decoded video which is awaiting to be rendered
+    static const int kMaxDecodedVideoQueueSize = 1; //< max queue length for decoded video which is awaiting to be rendered
 }
 
 namespace nx {
@@ -20,7 +20,6 @@ PlayerDataConsumer::PlayerDataConsumer(const std::unique_ptr<QnArchiveStreamRead
     m_awaitJumpCounter(0),
     m_buffering(0),
     m_hurryUpToFrame(0),
-    m_lastMediaTimeUsec(AV_NOPTS_VALUE),
     m_noDelayState(NoDelayState::Disabled)
 {
     connect(archiveReader.get(), &QnArchiveStreamReader::beforeJump,   this, &PlayerDataConsumer::onBeforeJump,   Qt::DirectConnection);
@@ -54,14 +53,25 @@ int PlayerDataConsumer::getBufferingMask() const
 
 void PlayerDataConsumer::putData(const QnAbstractDataPacketPtr& data)
 {
-    if (data->timestamp != AV_NOPTS_VALUE && data->timestamp != DATETIME_NOW)
-        m_lastMediaTimeUsec = data->timestamp;
     base_type::putData(data);
 }
 
-qint64 PlayerDataConsumer::lastMediaTimeUsec() const
+qint64 PlayerDataConsumer::queueVideoDurationUsec() const
 {
-    return m_lastMediaTimeUsec;
+    qint64 minTime = std::numeric_limits<qint64>::max();
+    qint64 maxTime = 0;
+    m_dataQueue.lock();
+    for (int i = 0; i < m_dataQueue.size(); ++i)
+    {
+        auto video = std::dynamic_pointer_cast<const QnCompressedVideoData>(m_dataQueue.atUnsafe(i));
+        if (video)
+        {
+            minTime = std::min(minTime, video->timestamp);
+            maxTime = std::max(maxTime, video->timestamp);
+        }
+    }
+    m_dataQueue.unlock();
+    return std::max(0ll, maxTime - minTime);
 }
 
 bool PlayerDataConsumer::processData(const QnAbstractDataPacketPtr& data)

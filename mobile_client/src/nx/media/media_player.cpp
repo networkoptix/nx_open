@@ -280,7 +280,7 @@ qint64 PlayerPrivate::getNextTimeToRender(const QnVideoFramePtr& frame)
         FrameMetadata metadata = FrameMetadata::deserialize(frame);
         
         // Calculate time to present next frame
-        qint64 mediaQueueLen = usecToMsec(dataConsumer->lastMediaTimeUsec()) - pts;
+        qint64 mediaQueueLen = usecToMsec(dataConsumer->queueVideoDurationUsec());
         const int frameDelayMs = pts - ptsTimerBase - ptsTimer.elapsed();
         bool liveBufferUnderflow = liveMode && lastVideoPts.is_initialized() && mediaQueueLen == 0 && frameDelayMs < 0;
         bool liveBufferOverflow = liveMode && mediaQueueLen > liveBufferMs;
@@ -306,6 +306,9 @@ qint64 PlayerPrivate::getNextTimeToRender(const QnVideoFramePtr& frame)
             liveBufferOverflow                                                   //< live buffer overflow
             )
 		{
+            if (liveBufferOverflow)
+                qDebug() << "reset because live overflow. len" << mediaQueueLen;
+
 			// Reset timer
 			lastVideoPts = ptsTimerBase = pts;
 			ptsTimer.restart();
