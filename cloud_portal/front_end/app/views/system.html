@@ -33,12 +33,10 @@
     <div class="row"  ng-if="gettingSystem.success">
         <div class="col-md-8">
 
-            <div class="panel panel-default" ng-if="!system.info.sharingPermissions.length" >
-                <div class="panel-body" >
-                    <div class="alert alert-info">
-                        You have no access to view system information
-                    </div>
-                </div>
+            <div class="no-access-panel" ng-if="!system.info.sharingPermissions.length" >
+                <span class="no-access-panel-body">
+                    You have no access to view system information
+                </span>
             </div>
             <div class="panel panel-default"
                  process-loading="gettingSystemUsers">
