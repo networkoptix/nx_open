@@ -33,6 +33,13 @@
     <div class="row"  ng-if="gettingSystem.success">
         <div class="col-md-8">
 
+            <div class="panel panel-default" ng-if="!system.info.sharingPermissions.length" >
+                <div class="panel-body" >
+                    <div class="alert alert-info">
+                        You have no access to view system information
+                    </div>
+                </div>
+            </div>
             <div class="panel panel-default"
                  process-loading="gettingSystemUsers">
                 <div class="panel-body" ng-if="system.info.sharingPermissions.length">
@@ -48,11 +55,6 @@
                                    success-message="unsharingMessage"
                                    error-prefix="'Sharing failed:'"></process-alert>
 
-                </div>
-                <div class="panel-body" ng-if="!system.info.sharingPermissions.length" >
-                    <div class="alert alert-info">
-                        You have no access to view system information
-                    </div>
                 </div>
                 <table class="table table-hover" ng-if="system.users.length">
                     <thead>

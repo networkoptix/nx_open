@@ -59,20 +59,27 @@ angular.module('cloudApp').directive('processAlert', function () {
             },
             link:function(scope, element, attrs){
                 function checkVisibility(){
-                    if(scope.processLoading && scope.processLoading.finished){
-                        element.removeClass("process-loading");
-                        element.children(".preloader").remove();
-                    }else{
-
-                        element.addClass("process-loading");
-
-                        if(!element.children(".preloader").get(0)) {
-                            element.prepend("<div class='preloader'><img src='images/loader.gif'></div></div>");
+                    if(scope.processLoading){
+                        if(scope.processLoading.finished) {
+                            element.removeClass("hidden");
+                            element.removeClass("process-loading");
+                            element.children(".preloader").remove();
+                            return;
+                        }
+                        else if(scope.processLoading.processing){
+                            element.removeClass("hidden");
+                            element.addClass("process-loading");
+                            if(!element.children(".preloader").get(0)) {
+                                element.prepend("<div class='preloader'><img src='images/loader.gif'></div></div>");
+                            }
+                            return;
                         }
                     }
+                    element.addClass("hidden");
                 }
 
                 scope.$watch("processLoading.finished",checkVisibility);
+                scope.$watch("processLoading.processing",checkVisibility);
                 checkVisibility();
             }
         }
