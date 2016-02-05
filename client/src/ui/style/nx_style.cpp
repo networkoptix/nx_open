@@ -699,7 +699,7 @@ void QnNxStyle::drawComplexControl(
 
             if (groupBox->subControls.testFlag(SC_GroupBoxLabel))
             {
-                drawItemText(painter, labelRect, Qt::AlignCenter,
+                drawItemText(painter, labelRect, Qt::AlignCenter | Qt::TextHideMnemonic,
                              groupBox->palette, groupBox->state.testFlag(QStyle::State_Enabled),
                              groupBox->text, flat ? QPalette::Text : QPalette::WindowText);
             }
