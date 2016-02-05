@@ -221,7 +221,7 @@ void shutdownSocket(
         {
             nx::Buffer readBuffer;
             readBuffer.resize(4096);
-            client->recv(readBuffer.data(), readBuffer.size());
+            client->recv(readBuffer.data(), readBuffer.size(), 0);
             recvExited = true;
         });
 

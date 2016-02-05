@@ -56,7 +56,7 @@ TEST(aio, socketPolledNotification)
     aioThread.start();
 
     aioThread.watchSocket(
-        socket.implementationDelegate(),
+        &socket,
         aio::etRead,
         &evHandler,
         0,
@@ -105,7 +105,7 @@ TEST(aio, pollsetError)
     aioThread.start();
 
     aioThread.watchSocket(
-        socket.implementationDelegate(),
+        &socket,
         aio::etRead,
         &evHandler,
         0,

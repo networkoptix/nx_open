@@ -19,9 +19,9 @@
 #include "aio/pollable.h"
 #include "nettools.h"
 #include "socket_factory.h"
-#include "socket_impl_helper.h"
 #include "utils/common/byte_array.h"
 #include "utils/common/systemerror.h"
+
 
 typedef PollableImpl PollableSystemSocketImpl;
 template<class SocketType> class BaseAsyncSocketImplHelper;
@@ -29,8 +29,10 @@ template<class SocketType> class BaseAsyncSocketImplHelper;
 /**
  *   Base class representing basic communication endpoint
  */
-class NX_NETWORK_API Socket
+template<typename InterfaceToImplement>
+class Socket
 :
+    public InterfaceToImplement,
     public Pollable
 {
 public:
@@ -57,48 +59,52 @@ public:
      */
     virtual ~Socket();
 
+    //!Implementation of Pollable::getLastError
+    virtual bool getLastError(SystemError::ErrorCode* errorCode) const override;
+
+    virtual AbstractSocket::SOCKET_HANDLE handle() const override;
+    virtual bool getRecvTimeout(unsigned int* millis) const override;
+    virtual bool getSendTimeout(unsigned int* millis) const override;
+    virtual aio::AbstractAioThread* getAioThread() override;
+    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
     //!Implementation of AbstractSocket::bind
-    bool bind( const SocketAddress& localAddress );
-    //!Implementation of AbstractSocket::bindToInterface
-    //bool bindToInterface( const QnInterfaceAndAddr& iface );
+    virtual bool bind( const SocketAddress& localAddress ) override;
     //!Implementation of AbstractSocket::getLocalAddress
-    SocketAddress getLocalAddress() const;
+    virtual SocketAddress getLocalAddress() const override;
     //!Implementation of AbstractSocket::close
-    virtual void close();
+    virtual void close() override;
     //!Implementation of AbstractSocket::shutdown
-    virtual void shutdown();
+    virtual void shutdown() override;
 
     //!Implementation of AbstractSocket::isClosed
-    bool isClosed() const;
+    virtual bool isClosed() const override;
     //!Implementation of AbstractSocket::setReuseAddrFlag
-    bool setReuseAddrFlag( bool reuseAddr );
+    virtual bool setReuseAddrFlag( bool reuseAddr ) override;
     //!Implementation of AbstractSocket::reuseAddrFlag
-    bool getReuseAddrFlag( bool* val ) const;
+    virtual bool getReuseAddrFlag( bool* val ) const override;
     //!Implementation of AbstractSocket::setNonBlockingMode
-    bool setNonBlockingMode( bool val );
+    virtual bool setNonBlockingMode( bool val ) override;
     //!Implementation of AbstractSocket::getNonBlockingMode
-    bool getNonBlockingMode( bool* val ) const;
+    virtual bool getNonBlockingMode( bool* val ) const override;
     //!Implementation of AbstractSocket::getMtu
-    bool getMtu( unsigned int* mtuValue ) const;
+    virtual bool getMtu( unsigned int* mtuValue ) const override;
     //!Implementation of AbstractSocket::setSendBufferSize
-    bool setSendBufferSize( unsigned int buffSize );
+    virtual bool setSendBufferSize( unsigned int buffSize ) override;
     //!Implementation of AbstractSocket::getSendBufferSize
-    bool getSendBufferSize( unsigned int* buffSize ) const;
+    virtual bool getSendBufferSize( unsigned int* buffSize ) const override;
     //!Implementation of AbstractSocket::setRecvBufferSize
-    bool setRecvBufferSize( unsigned int buffSize );
+    virtual bool setRecvBufferSize( unsigned int buffSize ) override;
     //!Implementation of AbstractSocket::getRecvBufferSize
-    bool getRecvBufferSize( unsigned int* buffSize ) const;
+    virtual bool getRecvBufferSize( unsigned int* buffSize ) const override;
     //!Implementation of AbstractSocket::setRecvTimeout
-    bool setRecvTimeout( unsigned int ms );
+    virtual bool setRecvTimeout( unsigned int ms ) override;
     //!Implementation of AbstractSocket::setSendTimeout
-    bool setSendTimeout( unsigned int ms );
-    //!Implementation of Pollable::getLastError
-    virtual bool getLastError( SystemError::ErrorCode* errorCode ) const override;
+    virtual bool setSendTimeout( unsigned int ms ) override;
     //!Implementation of AbstractSocket::post
-    void post( std::function<void()> handler );
+    virtual void post( std::function<void()> handler ) override;
     //!Implementation of AbstractSocket::dispatch
-    void dispatch( std::function<void()> handler );
+    virtual void dispatch( std::function<void()> handler ) override;
 
     /**
      *   Get the local port
@@ -112,9 +118,6 @@ public:
      *   @param localPort local port
      */
     bool setLocalPort(unsigned short localPort) ;
-
-    //!Returns socket write/connect timeout in millis
-    unsigned int getWriteTimeOut() const;
 
     /**
      *   If WinSock, unload the WinSock DLLs; otherwise do nothing.  We ignore
@@ -136,10 +139,9 @@ public:
      *   @param service service to resolve (e.g., "http")
      *   @param protocol protocol of service to resolve.  Default is "tcp".
      */
-    static unsigned short resolveService(const QString &service,
-                                         const QString &protocol = QLatin1String("tcp"));
-
-    bool failed() const;
+    static unsigned short resolveService(
+        const QString &service,
+        const QString &protocol = QLatin1String("tcp"));
 
     bool fillAddr( const SocketAddress& socketAddress, sockaddr_in &addr );
     bool createSocket( int type, int protocol );
@@ -160,53 +162,57 @@ template<class SocketType> class AsyncSocketImplHelper;
 /**
  *   Socket which is able to connect, send, and receive
  */
-class NX_NETWORK_API CommunicatingSocket
+template<class InterfaceToImplement>
+class CommunicatingSocket
 :
-    public Socket
+    public Socket<InterfaceToImplement>
 {
 public:
-    CommunicatingSocket( AbstractCommunicatingSocket* abstractSocketPtr,
-                         bool natTraversal, int type, int protocol,
-                         PollableSystemSocketImpl* sockImpl = nullptr );
-    CommunicatingSocket( AbstractCommunicatingSocket* abstractSocketPtr,
-                         bool natTraversal, int newConnSD,
-                         PollableSystemSocketImpl* sockImpl = nullptr );
+    CommunicatingSocket(
+        bool natTraversal,
+        int type,
+        int protocol,
+        PollableSystemSocketImpl* sockImpl = nullptr );
+    CommunicatingSocket(
+        bool natTraversal,
+        int newConnSD,
+        PollableSystemSocketImpl* sockImpl = nullptr );
 
     virtual ~CommunicatingSocket();
 
     //!Implementation of AbstractCommunicatingSocket::connect
-    bool connect(
+    virtual bool connect(
         const SocketAddress& remoteAddress,
-        unsigned int timeoutMillis );
+        unsigned int timeoutMillis ) override;
     //!Implementation of AbstractCommunicatingSocket::recv
-    int recv( void* buffer, unsigned int bufferLen, int flags );
+    virtual int recv( void* buffer, unsigned int bufferLen, int flags ) override;
     //!Implementation of AbstractCommunicatingSocket::send
-    int send( const void* buffer, unsigned int bufferLen );
+    virtual int send( const void* buffer, unsigned int bufferLen ) override;
     //!Implementation of AbstractCommunicatingSocket::getForeignAddress
-    virtual SocketAddress getForeignAddress() const;
+    virtual SocketAddress getForeignAddress() const override;
     //!Implementation of AbstractCommunicatingSocket::isConnected
-    bool isConnected() const;
+    virtual bool isConnected() const override;
     //!Implementation of AbstractCommunicatingSocket::connectAsync
-    void connectAsync(
+    virtual void connectAsync(
         const SocketAddress& addr,
-        std::function<void( SystemError::ErrorCode )> handler );
+        std::function<void( SystemError::ErrorCode )> handler ) override;
     //!Implementation of AbstractCommunicatingSocket::readSomeAsync
-    void readSomeAsync(
+    virtual void readSomeAsync(
         nx::Buffer* const buf,
-        std::function<void( SystemError::ErrorCode, size_t )> handler );
+        std::function<void( SystemError::ErrorCode, size_t )> handler ) override;
     //!Implementation of AbstractCommunicatingSocket::sendAsync
-    void sendAsync(
+    virtual void sendAsync(
         const nx::Buffer& buf,
-        std::function<void( SystemError::ErrorCode, size_t )> handler );
+        std::function<void( SystemError::ErrorCode, size_t )> handler ) override;
     //!Implementation of AbstractCommunicatingSocket::registerTimer
-    void registerTimer(
+    virtual void registerTimer(
         unsigned int timeoutMs,
-        std::function<void()> handler );
+        std::function<void()> handler ) override;
     //!Implementation of AbstractCommunicatingSocket::cancelAsyncIO
-    void cancelIOAsync(
+    virtual void cancelIOAsync(
         aio::EventType eventType,
-        std::function<void()> cancellationDoneHandler);
-    void cancelIOSync(aio::EventType eventType);
+        std::function<void()> cancellationDoneHandler) override;
+    virtual void cancelIOSync(aio::EventType eventType) override;
 
     virtual void close() override;
     virtual void shutdown() override;
@@ -225,9 +231,9 @@ private:
  */
 class NX_NETWORK_API TCPSocket
 :
-    public AbstractCommunicatingSocketImplementationDelegate<AbstractStreamSocket, CommunicatingSocket>
+    public CommunicatingSocket<AbstractStreamSocket>
 {
-    typedef AbstractCommunicatingSocketImplementationDelegate<AbstractStreamSocket, CommunicatingSocket> base_type;
+    typedef CommunicatingSocket<AbstractStreamSocket> base_type;
 
 public:
     /**
@@ -273,9 +279,9 @@ private:
  */
 class NX_NETWORK_API TCPServerSocket
 :
-    public AbstractSocketImplementationEmbeddingDelegate<AbstractStreamServerSocket, Socket>
+    public Socket<AbstractStreamServerSocket>
 {
-    typedef AbstractSocketImplementationEmbeddingDelegate<AbstractStreamServerSocket, Socket> base_type;
+    typedef Socket<AbstractStreamServerSocket> base_type;
 
 public:
     TCPServerSocket();
@@ -309,9 +315,9 @@ private:
   */
 class NX_NETWORK_API UDPSocket
 :
-    public AbstractCommunicatingSocketImplementationDelegate<AbstractDatagramSocket, CommunicatingSocket>
+    public CommunicatingSocket<AbstractDatagramSocket>
 {
-    typedef AbstractCommunicatingSocketImplementationDelegate<AbstractDatagramSocket, CommunicatingSocket> base_type;
+    typedef CommunicatingSocket<AbstractDatagramSocket> base_type;
 
 public:
     static const unsigned int MAX_PACKET_SIZE = 64*1024 - 24 - 8;   //maximum ip datagram size - ip header length - udp header length
