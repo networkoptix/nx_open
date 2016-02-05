@@ -24,7 +24,7 @@ public:
     };
 
 private:
-    Q_OBJECT 
+    Q_OBJECT
 
     Q_PROPERTY(QnCompositeTextOverlayColors colors READ colors WRITE setColors NOTIFY colorsChanged)
     Q_PROPERTY(Mode mode READ mode WRITE setMode NOTIFY modeChanged)
@@ -50,12 +50,14 @@ public:
 
     void setColors(const QnCompositeTextOverlayColors &colors);
 
+    void addModeData(Mode mode
+        , const QnOverlayTextItemData &data);
+
+    void resetModeData(Mode mode);
+
 private:
     typedef QPair<qint64, QnOverlayTextItemData> InternalData;
     typedef QHash<QnUuid, InternalData> InternalDataHash;
-
-    void addModeData(Mode mode
-        , const QnOverlayTextItemData &data);
 
     void removeModeData(Mode mode
         , const QnUuid &id);
@@ -63,25 +65,12 @@ private:
     void setModeData(Mode mode
         , const InternalDataHash &data);
 
-    void resetModeData(Mode mode);
-
     InternalDataHash::Iterator findModeData(Mode mode
         , const QnUuid &id);
 
     void initTextMode();
 
-    void initBookmarksMode();
-
-    void at_modeChanged();
-
-    void updateBookmarks();
-    
-    void updateBookmarksFilter();
-
     QnOverlayTextItemDataList removeOutdatedItems(Mode mode);
-
-    InternalDataHash makeTextItemData(const QnCameraBookmarkList &bookmarks
-        , const QnBookmarkColors &colors);
 
 signals:
     void colorsChanged();
@@ -100,11 +89,6 @@ private:
 
     Mode m_currentMode;
     ModeInternalDataHash m_data;
-
-    QnCameraBookmarksQueryPtr m_bookmarksQuery;
-
-    TimerPtr m_updateQueryFilterTimer;
-    TimerPtr m_updateBookmarksTimer;
 
     QnCompositeTextOverlayColors m_colors;
 };

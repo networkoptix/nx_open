@@ -5,8 +5,10 @@ import com.networkoptix.qml 1.0
 Item {
     id: preloader
 
-    width: content.width
-    height: content.height
+    implicitWidth: content.width
+    implicitHeight: content.height
+
+    property color color: QnTheme.preloaderDot
 
     Row {
         id: content
@@ -29,7 +31,7 @@ Item {
             width: dp(12)
             height: width
             radius: width / 2
-            color: QnTheme.preloaderDot
+            color: preloader.color
 
             SequentialAnimation {
                 id: animation

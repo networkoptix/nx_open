@@ -126,7 +126,7 @@ namespace ec2
         ErrorCode doQuery(const T1& t1, T2& t2)
         {
             QN_UNUSED(t1, t2);
-            QWriteLocker lock(&m_mutex);
+            QnWriteLocker lock(&m_mutex);
             return doQueryNoLock(t1, t2);
         }
 
@@ -142,7 +142,7 @@ namespace ec2
 
         ApiOjectType getObjectType(const QnUuid& objectId)
         {
-            QWriteLocker lock( &m_mutex );
+            QnWriteLocker lock( &m_mutex );
             return getObjectTypeNoLock( objectId );
         }
         /*!
@@ -183,7 +183,7 @@ namespace ec2
 
         friend class QnTransactionLog;
         QSqlDatabase& getDB() { return m_sdb; }
-        QReadWriteLock& getMutex() { return m_mutex; }
+        QnReadWriteLock& getMutex() { return m_mutex; }
 
         // ------------ data retrieval --------------------------------------
 
@@ -361,12 +361,12 @@ namespace ec2
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiModuleData> &) {
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiDiscoveredServerData> &) {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiModuleDataList> &) {
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiDiscoveredServerDataList> &) {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
         }
@@ -520,7 +520,7 @@ namespace ec2
         class QnDbTransactionExt: public QnDbTransaction
         {
         public:
-            QnDbTransactionExt(QSqlDatabase& database, QReadWriteLock& mutex): QnDbTransaction(database, mutex) {}
+            QnDbTransactionExt(QSqlDatabase& database, QnReadWriteLock& mutex): QnDbTransaction(database, mutex) {}
 
             virtual bool beginTran() override;
             virtual void rollback() override;
@@ -577,7 +577,7 @@ namespace ec2
         QSqlDatabase m_sdbStatic;
         QnDbTransactionExt m_tran;
         QnDbTransaction m_tranStatic;
-        mutable QReadWriteLock m_mutexStatic;
+        mutable QnReadWriteLock m_mutexStatic;
         bool m_needResyncLog;
         bool m_needResyncLicenses;
         bool m_needResyncFiles;

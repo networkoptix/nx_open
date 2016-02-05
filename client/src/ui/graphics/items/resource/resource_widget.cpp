@@ -52,7 +52,9 @@
 #include <utils/license_usage_helper.h>
 #include <utils/common/string.h>
 
-namespace {
+namespace
+{
+    const auto kButtonsSize = 24.0;
 
     /** Frame extension multiplier determines the width of frame extension relative
      * to frame width.
@@ -202,7 +204,7 @@ QnResourceWidget::~QnResourceWidget() {
     ensureAboutToBeDestroyedEmitted();
 }
 
-
+//TODO: #ynikitenkov #high emplace back "titleLayout->setContentsMargins(0, 0, 0, 1);" fix
 void QnResourceWidget::addInfoOverlay()
 {
     {
@@ -240,6 +242,7 @@ void QnResourceWidget::addInfoOverlay()
     }
 }
 
+//TODO: #ynikitenkov headerLayout->setContentsMargins(0, 0, 0, 1);
 void QnResourceWidget::addMainOverlay()
 {
     m_overlayWidgets->buttonsOverlay = new QnButtonsOverlay(this);
@@ -274,6 +277,7 @@ void QnResourceWidget::createButtons() {
     connect(rotateButton, &QnImageButtonWidget::released, this, &QnResourceWidget::rotationStopRequested);
 
     auto buttonsBar = buttonsOverlay()->rightButtonsBar();
+    m_buttonBar->setUniformButtonSize(QSizeF(kButtonsSize, kButtonsSize));
     buttonsBar->addButton(Qn::CloseButton, closeButton);
     buttonsBar->addButton(Qn::InfoButton, infoButton);
     buttonsBar->addButton(Qn::RotateButton, rotateButton);
@@ -282,7 +286,7 @@ void QnResourceWidget::createButtons() {
 
     auto icontButton = new QnImageButtonWidget();
     icontButton->setParent(this);
-    icontButton->setPreferredSize(24.0, 24.0);
+    m_iconButton->setPreferredSize(kButtonsSize, kButtonsSize);
     icontButton->setVisible(false);
     buttonsOverlay()->leftButtonsBar()->addButton(
         Qn::RecordingStatusIconButton, icontButton);

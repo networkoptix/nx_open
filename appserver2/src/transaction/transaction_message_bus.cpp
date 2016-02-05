@@ -24,7 +24,7 @@
 #include "nx_ec/data/api_resource_type_data.h"
 #include "nx_ec/data/api_reverse_connection_data.h"
 #include "nx_ec/data/api_server_alive_data.h"
-#include "nx_ec/data/api_server_alive_data.h"
+#include "nx_ec/data/api_discovery_data.h"
 
 #include "transaction/runtime_transaction_log.h"
 #include <transaction/transaction_transport.h>
@@ -34,7 +34,7 @@
 #include "utils/common/synctime.h"
 #include "utils/common/systemerror.h"
 #include "utils/common/warnings.h"
-
+#include <utils/common/waiting_for_qthread_to_empty_event_queue.h>
 
 
 namespace ec2
@@ -176,8 +176,8 @@ namespace ec2
         case ApiCommand::uploadUpdateResponce:  return handleTransactionParams<ApiUpdateUploadResponceData>(serializedTransaction, serializationSupport, transaction, function, fastFunction);
         case ApiCommand::installUpdate:         return handleTransactionParams<ApiUpdateInstallData>    (serializedTransaction, serializationSupport, transaction, function, fastFunction);
 
-        case ApiCommand::moduleInfo:            return handleTransactionParams<ApiModuleData>           (serializedTransaction, serializationSupport, transaction, function, fastFunction);
-        case ApiCommand::moduleInfoList:        return handleTransactionParams<ApiModuleDataList>       (serializedTransaction, serializationSupport, transaction, function, fastFunction);
+        case ApiCommand::discoveredServerChanged:      return handleTransactionParams<ApiDiscoveredServerData>          (serializedTransaction, serializationSupport, transaction, function, fastFunction);
+        case ApiCommand::discoveredServersList:        return handleTransactionParams<ApiDiscoveredServerDataList>      (serializedTransaction, serializationSupport, transaction, function, fastFunction);
 
         case ApiCommand::discoverPeer:          return handleTransactionParams<ApiDiscoverPeerData>     (serializedTransaction, serializationSupport, transaction, function, fastFunction);
         case ApiCommand::addDiscoveryInformation:
@@ -299,11 +299,17 @@ namespace ec2
         assert( m_globalInstance == nullptr );
         m_globalInstance = this;
         connect(m_runtimeTransactionLog.get(), &QnRuntimeTransactionLog::runtimeDataUpdated, this, &QnTransactionMessageBus::at_runtimeDataUpdated);
-    m_relativeTimer.restart();
+        m_relativeTimer.restart();
 
-    connect(
-        QnGlobalSettings::instance(), &QnGlobalSettings::ec2ConnectionSettingsChanged,
-        this, static_cast<void (QnTransactionMessageBus::*)()>(&QnTransactionMessageBus::reconnectAllPeers));
+        connect(
+            QnGlobalSettings::instance(), &QnGlobalSettings::ec2ConnectionSettingsChanged,
+            this, static_cast<void (QnTransactionMessageBus::*)()>(&QnTransactionMessageBus::reconnectAllPeers));
+
+        /* Client updates running instance guid on each connect to server */
+        connect(qnCommon, &QnCommonModule::runningInstanceGUIDChanged, this, [this]()
+        {
+            m_localPeer.instanceId = qnCommon->runningInstanceGUID();
+        }, Qt::QueuedConnection);
     }
 
     void QnTransactionMessageBus::start()
@@ -317,6 +323,10 @@ namespace ec2
     {
         Q_ASSERT(m_thread->isRunning());
         dropConnections();
+
+        /* Connections in the 'Error' state will be closed via queued connection and after that removed via deleteLater() */
+        WaitingForQThreadToEmptyEventQueue waitingForObjectsToBeFreed( m_thread, 7 );
+        waitingForObjectsToBeFreed.join();
 
         m_thread->exit();
         m_thread->wait();
@@ -1160,18 +1170,28 @@ void QnTransactionMessageBus::sendDelayedAliveTran()
             emit peerLost(aliveData);
     }
 
-    QnTransaction<ApiModuleDataList> QnTransactionMessageBus::prepareModulesDataTransaction() const {
-        QnTransaction<ApiModuleDataList> transaction(ApiCommand::moduleInfoList);
+    QnTransaction<ApiDiscoveredServerDataList> QnTransactionMessageBus::prepareModulesDataTransaction() const {
+        QnTransaction<ApiDiscoveredServerDataList> transaction(ApiCommand::discoveredServersList);
 
         QnModuleFinder *moduleFinder = QnModuleFinder::instance();
         for (const QnModuleInformation &moduleInformation: moduleFinder->foundModules()) {
-            QnModuleInformationWithAddresses moduleInformationWithAddress(moduleInformation);
+            ApiDiscoveredServerData serverData(moduleInformation);
+
             SocketAddress primaryAddress = moduleFinder->primaryAddress(moduleInformation.id);
         	if (primaryAddress.isNull())
             	continue;
-            moduleInformationWithAddress.remoteAddresses.insert(primaryAddress.address.toString());
-            moduleInformationWithAddress.port = primaryAddress.port;
-            transaction.params.push_back(ApiModuleData(std::move(moduleInformationWithAddress), true));
+
+            serverData.status = moduleFinder->moduleStaus(moduleInformation.id);
+            if (serverData.status != Qn::Online &&
+                serverData.status != Qn::Unauthorized &&
+                serverData.status != Qn::Incompatible)
+            {
+                continue;
+            }
+
+            serverData.remoteAddresses.insert(primaryAddress.address.toString());
+            serverData.port = primaryAddress.port;
+            transaction.params.push_back(std::move(serverData));
         }
         transaction.peerID = m_localPeer.id;
         transaction.isLocal = true;
@@ -1330,7 +1350,7 @@ void QnTransactionMessageBus::sendDelayedAliveTran()
             {
                 if (!connectInfo.discoveredPeer.isNull() )
                 {
-                    if (connectInfo.discoveredTimeout.elapsed() > 
+                    if (connectInfo.discoveredTimeout.elapsed() >
                             std::chrono::milliseconds(
                                 PEER_DISCOVERY_BY_ALIVE_UPDATE_INTERVAL_FACTOR *
                                 QnGlobalSettings::instance()->aliveUpdateInterval()).count())
@@ -1380,8 +1400,8 @@ void QnTransactionMessageBus::sendDelayedAliveTran()
             AlivePeerInfo& peerInfo = itr.value();
             for (auto itr = peerInfo.routingInfo.begin(); itr != peerInfo.routingInfo.end();) {
                 const RoutingRecord& routingRecord = itr.value();
-                if ((routingRecord.distance > 0) && 
-                    (m_currentTimeTimer.elapsed() - routingRecord.lastRecvTime > 
+                if ((routingRecord.distance > 0) &&
+                    (m_currentTimeTimer.elapsed() - routingRecord.lastRecvTime >
                         std::chrono::milliseconds(QnGlobalSettings::instance()->aliveUpdateInterval()*ALIVE_UPDATE_PROBE_COUNT + ALIVE_UPDATE_INTERVAL_OVERHEAD).count()))
                 {
                     itr = peerInfo.routingInfo.erase(itr);
@@ -1619,22 +1639,32 @@ void QnTransactionMessageBus::sendDelayedAliveTran()
     void QnTransactionMessageBus::waitForNewTransactionsReady( const QnUuid& connectionGuid )
     {
         QnMutexLocker lock( &m_mutex );
-        for( QnTransactionTransport* transport: m_connections )
+
+        auto waitForNewTransactionsReadyFunc =
+            [&lock](QnTransactionTransport* transport)
+            {
+                QnTransactionTransport::Locker transactionTransportLocker(transport);
+                //QnTransactionTransport destructor will block until transactionTransportLocker is alive
+                lock.unlock();
+                transactionTransportLocker.waitForNewTransactionsReady();
+                lock.relock();
+            };
+
+        for (QnTransactionTransport* transport : m_connections)
         {
-            if( transport->connectionGuid() != connectionGuid )
+            if (transport->connectionGuid() != connectionGuid)
                 continue;
-            //lock.unlock();
-            //mutex is unlocked if we go to wait
-            transport->waitForNewTransactionsReady( [&lock](){ lock.unlock(); } );
+
+            waitForNewTransactionsReadyFunc(transport);
             return;
         }
 
-        for( QnTransactionTransport* transport: m_connectingConnections )
+        for (QnTransactionTransport* transport : m_connectingConnections)
         {
-            if( transport->connectionGuid() != connectionGuid )
+            if (transport->connectionGuid() != connectionGuid)
                 continue;
-            //mutex is unlocked if we go to wait
-            transport->waitForNewTransactionsReady( [&lock](){ lock.unlock(); } );
+
+            waitForNewTransactionsReadyFunc(transport);
             return;
         }
     }

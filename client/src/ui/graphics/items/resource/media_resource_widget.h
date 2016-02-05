@@ -115,12 +115,18 @@ public:
     virtual float visualAspectRatio() const;
     virtual float defaultVisualAspectRatio() const override;
 
+    /** Check if the widget has video. It can be absent in I/O Module, for example. */
+    bool hasVideo() const;
+
+    QnCompositeTextOverlay *compositeTextOverlay();
+
 signals:
     void motionSelectionChanged();
     void displayChanged();
     void fisheyeChanged();
     void dewarpingParamsChanged();
     void colorsChanged();
+    void positionChanged(qint64 positionUtcMs);
 
 protected:
     virtual int helpTopicAt(const QPointF &pos) const override;
@@ -203,6 +209,8 @@ private:
     qint64 getUtcCurrentTimeUsec() const;
     qint64 getUtcCurrentTimeMs() const;
 
+    void updateCurrentUtcPosMs();
+
 private:
     struct ResourceStates
     {
@@ -265,6 +273,8 @@ private:
 
     typedef QScopedPointer<QnSingleCamLicenceStatusHelper> QnSingleCamLicenceStatusHelperPtr;
     QnSingleCamLicenceStatusHelperPtr m_ioLicenceStatusHelper;
+
+    qint64 m_posUtcMs;
 };
 
 Q_DECLARE_METATYPE(QnMediaResourceWidget *)

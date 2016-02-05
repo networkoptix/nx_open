@@ -54,7 +54,7 @@ QnPopup {
         property: "opacity"
         from: 0.0
         to: 1.0
-        duration: 300
+        duration: 100
     }
 
     hideAnimation: ParallelAnimation {
@@ -65,7 +65,7 @@ QnPopup {
             target: menu
             property: "opacity"
             to: 0.0
-            duration: 300
+            duration: 100
         }
     }
 

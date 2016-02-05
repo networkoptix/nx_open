@@ -62,7 +62,7 @@ QnShowTextOverlayActionWidget::QnShowTextOverlayActionWidget(QWidget *parent)
     {
         // Prolonged type of event has changed. In case of instant
         // action event state should be updated
-        if (checked)
+        if (checked && (model()->eventType() == QnBusiness::UserDefinedEvent))
             model()->setEventState(QnBusiness::UndefinedState);
     });
 }

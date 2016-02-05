@@ -7,7 +7,10 @@
 
 class QNetworkAccessManager;
 
-class QnUpdateChecker : public QObject {
+struct QnUpdateInfo;
+
+class QnUpdateChecker : public QObject
+{
     Q_OBJECT
 public:
     /**
@@ -20,7 +23,7 @@ public slots:
     void checkForUpdates();
 
 signals:
-    void updateAvailable(const QnSoftwareVersion &version, const QUrl &releaseNotesUrl);
+    void updateAvailable(const QnUpdateInfo &info);
 
 private slots:
     void at_networkReply_finished();

@@ -1,7 +1,9 @@
 #include "client_message_processor.h"
 
+#include <api/app_server_connection.h>
+#include <api/global_settings.h>
+
 #include "core/resource_management/resource_pool.h"
-#include "api/app_server_connection.h"
 #include "core/resource/media_server_resource.h"
 #include "core/resource/user_resource.h"
 #include "core/resource/layout_resource.h"
@@ -18,9 +20,32 @@
 QnClientMessageProcessor::QnClientMessageProcessor():
     base_type(),
     m_connected(false),
-    m_holdConnection(false)
+    m_holdConnection(false),
+    m_waitingForPeerReconnect(false)
 {
     m_status.setState(QnConnectionState::Disconnected);
+
+    /*
+     * On changing ec2 settings qnTransactionMessageBus reconnects all peers, therefore
+     * disconnecting us from server. After that 'Reconnect' dialog appears and reconnects us.
+     * This leads to unnecessary connectionClosed/connectionOpened sequence and closing
+     * all state-dependent dialogs and notifications.
+     * This workaround depends on fact that qnTransactionMessageBus works in own thread and
+     * connects to ec2ConnectionSettingsChanged via queued connection.
+     */
+    connect(qnGlobalSettings, &QnGlobalSettings::ec2ConnectionSettingsChanged, this, [this]()
+    {
+        //TODO: #gdm #3.0 improve dependency logic
+        if (!m_connected)
+            return;
+
+        if (m_waitingForPeerReconnect)
+            return;
+
+        m_waitingForPeerReconnect = true;
+    });
+
+
 }
 
 void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr &connection) {
@@ -122,7 +147,11 @@ void QnClientMessageProcessor::handleRemotePeerFound(const ec2::ApiPeerAliveData
 
     m_status.setState(QnConnectionState::Connected);
     m_connected = true;
-    emit connectionOpened();
+
+    if (m_waitingForPeerReconnect)
+        m_waitingForPeerReconnect = false;
+    else
+        emit connectionOpened();
 }
 
 void QnClientMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData &data) {
@@ -153,7 +182,7 @@ void QnClientMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData 
 
     m_connected = false;
 
-    if (!m_holdConnection)
+    if (!m_holdConnection && !m_waitingForPeerReconnect)
         emit connectionClosed();
 }
 

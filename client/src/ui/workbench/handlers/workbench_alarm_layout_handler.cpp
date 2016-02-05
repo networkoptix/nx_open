@@ -1,13 +1,16 @@
 #include "workbench_alarm_layout_handler.h"
 
-#include <utils/aspect_ratio.h>
+#include <api/runtime_info_manager.h>
 
 #include <business/actions/abstract_business_action.h>
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
 
+#include <common/common_module.h>
+
 #include <client/client_message_processor.h>
+#include <client/client_instance_manager.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
@@ -18,6 +21,8 @@
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameters.h>
 
+#include <ui/graphics/items/resource/resource_widget.h>
+
 #include <ui/style/skin.h>
 
 #include <ui/workbench/workbench.h>
@@ -27,9 +32,9 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 
-#include <ui/graphics/items/resource/resource_widget.h>
-
 #include <plugins/resource/archive/archive_stream_reader.h>
+
+#include <utils/aspect_ratio.h>
 
 namespace {
     class QnAlarmLayoutResource: public QnLayoutResource {
@@ -87,7 +92,10 @@ QnWorkbenchAlarmLayoutHandler::QnWorkbenchAlarmLayoutHandler(QObject *parent)
 
         /* If forced, open layout instantly */
         if (businessAction->getParams().forced)
-            openCamerasInAlarmLayout(targetCameras, true);
+        {
+            if (currentInstanceIsMain())
+                openCamerasInAlarmLayout(targetCameras, true);
+        }
         else if (alarmLayoutExists())
             openCamerasInAlarmLayout(targetCameras, false);
     });
@@ -208,8 +216,11 @@ void QnWorkbenchAlarmLayoutHandler::jumpToLive(QnWorkbenchLayout *layout, QnWork
     if (!layout || workbench()->currentLayout() != layout)
         return;
 
-    if (auto resourceDisplay = display()->display(item)) {
-        if (resourceDisplay->archiveReader()) {
+    if (auto resourceDisplay = display()->display(item))
+    {
+        if (resourceDisplay->archiveReader())
+        {
+            resourceDisplay->archiveReader()->pauseMedia();
             resourceDisplay->archiveReader()->setSpeed(1.0);
             resourceDisplay->archiveReader()->jumpTo(DATETIME_NOW, 0);
             resourceDisplay->archiveReader()->resumeMedia();
@@ -217,4 +228,48 @@ void QnWorkbenchAlarmLayoutHandler::jumpToLive(QnWorkbenchLayout *layout, QnWork
         resourceDisplay->start();
     }
 
+}
+
+bool QnWorkbenchAlarmLayoutHandler::currentInstanceIsMain() const
+{
+    auto clientInstanceManager = qnCommon->instance<QnClientInstanceManager>();
+    Q_ASSERT_X(clientInstanceManager, Q_FUNC_INFO, "Instance Manager must exist here");
+    if (!clientInstanceManager)
+        return true;
+
+    auto runningInstances = clientInstanceManager->runningInstancesIndices();
+
+    /* Check if we have no access to other instances. */
+    if (runningInstances.isEmpty())
+        return true;
+
+    return runningInstances.first() == clientInstanceManager->instanceIndex();
+
+    // Currently client only knows about instances that were connected to server only after than itself.
+    // This leads to undefined behavior and alarm layout duplicating.
+
+//     QnUuid localUserId = qnRuntimeInfoManager->localInfo().data.userId;
+//
+//     QSet<QnUuid> connectedInstances;
+//     for (const QnPeerRuntimeInfo &info: qnRuntimeInfoManager->items()->getItems())
+//     {
+//         if (info.data.userId != localUserId)
+//             continue;
+//         connectedInstances.insert(info.uuid);
+//     }
+//
+//     /* Main instance is the one that has the smallest index between all instances
+//        connected to current server with the same credentials. */
+//     for (int index: runningInstances)
+//     {
+//         if (index == clientInstanceManager->instanceIndex())
+//             return true;
+//
+//         /* Check if other instance connected to the same server. */
+//         QnUuid otherInstanceUuid = clientInstanceManager->instanceGuidForIndex(index);
+//         if (connectedInstances.contains(otherInstanceUuid))
+//             return false;
+//     }
+//
+//     return true;
 }

@@ -15,6 +15,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/camera_bookmark.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
@@ -561,6 +562,17 @@ Qn::ActionVisibility QnAddBookmarkActionCondition::check(const QnActionParameter
 Qn::ActionVisibility QnModifyBookmarkActionCondition::check(const QnActionParameters &parameters) {
     if(!parameters.hasArgument(Qn::CameraBookmarkRole))
         return Qn::InvisibleAction;
+    return Qn::EnabledAction;
+}
+
+Qn::ActionVisibility QnRemoveBookmarksActionCondition::check(const QnActionParameters &parameters)
+{
+    if (!parameters.hasArgument(Qn::CameraBookmarkListRole))
+        return Qn::InvisibleAction;
+
+    if (parameters.argument(Qn::CameraBookmarkListRole).value<QnCameraBookmarkList>().isEmpty())
+        return Qn::InvisibleAction;
+
     return Qn::EnabledAction;
 }
 
@@ -1134,7 +1146,8 @@ Qn::ActionVisibility QnMergeToCurrentSystemActionCondition::check(const QnResour
         if (!server)
             return Qn::InvisibleAction;
 
-        if (!QnMediaServerResource::isFakeServer(resource))
+        Qn::ResourceStatus status = server->getStatus();
+        if (status != Qn::Incompatible && status != Qn::Unauthorized)
             return Qn::InvisibleAction;
 
         if (server->getModuleInformation().ecDbReadOnly)

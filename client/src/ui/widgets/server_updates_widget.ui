@@ -57,7 +57,7 @@
      <item>
       <widget class="QLabel" name="connectionProblemLabel">
        <property name="text">
-        <string>Unable to check updates via internet.</string>
+        <string>Unable to check updates on the Internet.</string>
        </property>
       </widget>
      </item>

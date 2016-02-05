@@ -78,7 +78,7 @@ QnServerSettingsWidget::QnServerSettingsWidget(QWidget* parent /* = 0*/):
     setHelpTopic(ui->failoverGroupBox,                                        Qn::ServerSettings_Failover_Help);
 
     connect(ui->pingButton,             &QPushButton::clicked,      this,   &QnServerSettingsWidget::at_pingButton_clicked);
-    
+
     connect(ui->nameLineEdit,           &QLineEdit::textChanged,    this,   &QnAbstractPreferencesWidget::hasChangesChanged);
 
     connect(ui->failoverCheckBox,       &QCheckBox::stateChanged,       this,   [this] {
@@ -87,7 +87,7 @@ QnServerSettingsWidget::QnServerSettingsWidget(QWidget* parent /* = 0*/):
         emit hasChangesChanged();
     });
 
-    
+
     connect(ui->maxCamerasSpinBox,      QnSpinboxIntValueChanged,       this,   [this] {
         m_maxCamerasAdjusted = true;
         updateFailoverLabel();
@@ -125,6 +125,11 @@ void QnServerSettingsWidget::setServer(const QnMediaServerResourcePtr &server) {
             m_initServerName = resource->getName();
             ui->nameLineEdit->setText(m_initServerName);
         });
+
+        connect(m_server, &QnResource::urlChanged, this, [this](const QnResourcePtr &resource)
+        {
+            updateUrl();
+        });
     }
 
     updateReadOnly();
@@ -160,7 +165,7 @@ bool QnServerSettingsWidget::hasChanges() const {
     if (m_server->isRedundancy() != ui->failoverCheckBox->isChecked())
         return true;
 
-    if (m_server->isRedundancy() && 
+    if (m_server->isRedundancy() &&
         (m_server->getMaxCameras() != ui->maxCamerasSpinBox->value()))
         return true;
 
@@ -172,12 +177,12 @@ void QnServerSettingsWidget::retranslateUi() {
         tr("Enable failover (server will take devices automatically from offline servers)"),
         tr("Enable failover (server will take cameras automatically from offline servers)")
         ));
-        
+
     ui->maxCamerasLabel->setText(QnDeviceDependentStrings::getDefaultNameFromSet(
         tr("Max devices on this server:"),
         tr("Max cameras on this server:")
         ));
-        
+
     updateFailoverLabel();
 }
 
@@ -202,25 +207,32 @@ void QnServerSettingsWidget::loadDataToUi() {
 
     ui->maxCamerasSpinBox->setValue(currentMaxCamerasValue);
     ui->failoverCheckBox->setChecked(m_server->isRedundancy());
-    ui->maxCamerasWidget->setEnabled(m_server->isRedundancy());   
-
-    ui->ipAddressLineEdit->setText(QUrl(m_server->getUrl()).host());
-    ui->portLineEdit->setText(QString::number(QUrl(m_server->getUrl()).port()));
+    ui->maxCamerasWidget->setEnabled(m_server->isRedundancy());
 
     m_maxCamerasAdjusted = false;
 
     updateFailoverLabel();
+    updateUrl();
 }
 
 void QnServerSettingsWidget::applyChanges() {
     if (isReadOnly())
         return;
-    
+
     qnResourcesChangesManager->saveServer(m_server, [this](const QnMediaServerResourcePtr &server) {
         server->setName(ui->nameLineEdit->text());
         server->setMaxCameras(ui->maxCamerasSpinBox->value());
         server->setRedundancy(ui->failoverCheckBox->isChecked());
     });
+}
+
+void QnServerSettingsWidget::updateUrl()
+{
+    if (!m_server)
+        return;
+
+    ui->ipAddressLineEdit->setText(QUrl(m_server->getUrl()).host());
+    ui->portLineEdit->setText(QString::number(QUrl(m_server->getUrl()).port()));
 }
 
 // -------------------------------------------------------------------------- //
@@ -241,8 +253,8 @@ void QnServerSettingsWidget::updateFailoverLabel() {
 
         if (!m_server->isRedundancy() && !m_maxCamerasAdjusted)
             return QnDeviceDependentStrings::getDefaultNameFromSet(
-                tr("To avoid malfunction adjust max number of devices"),
-                tr("To avoid malfunction adjust max number of cameras")
+                tr("To avoid issues adjust max number of devices"),
+                tr("To avoid issues adjust max number of cameras")
             );
 
         return QString();
@@ -259,4 +271,3 @@ void QnServerSettingsWidget::updateFailoverLabel() {
 void QnServerSettingsWidget::at_pingButton_clicked() {
     menu()->trigger(Qn::PingAction, QnActionParameters(m_server));
 }
-

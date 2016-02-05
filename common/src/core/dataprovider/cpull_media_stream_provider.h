@@ -20,6 +20,7 @@ public:
 protected:
     bool canChangeStatus() const;
     virtual void beforeRun() override;
+    virtual bool isCameraControlRequired() const = 0;
 
     virtual QnAbstractMediaDataPtr getNextData() = 0;
 private:

@@ -133,7 +133,14 @@ angular.module('webadminApp')
                 }
                 this.getCurrentUser().then(function(result){
                     var isAdmin = result.data.reply.isAdmin || (result.data.reply.permissions & Config.globalEditServersPermissions);
-                    deferred.resolve({isAdmin:isAdmin,name:result.data.reply.name});
+
+                    var isOwner = result.data.reply.isAdmin ;
+
+                    deferred.resolve({
+                        isAdmin:isAdmin,
+                        isOwner:isOwner,
+                        name:result.data.reply.name
+                    });
                 });
                 return deferred.promise;
             },
@@ -253,6 +260,19 @@ angular.module('webadminApp')
                     '&periodsType=' + periodsType +
                     (limit?'&limit=' + limit:'') +
                     '&flat&keepSmallChunks');
+            },
+            debugFunctionUrl:function(url,getParams){
+                var delimeter = url.indexOf('?')>=0? '&':'?';
+                return proxy + url + delimeter + $.param(getParams)
+            },
+            debugFunction:function(method,url,getParams,postParams){
+                switch(method){
+                    case "GET":
+                        return $http.get(this.debugFunctionUrl(url,getParams));
+                    case "POST":
+                        return $http.post(this.debugFunctionUrl(url,getParams), postParams);
+
+                }
             }
         };
     });

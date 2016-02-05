@@ -84,10 +84,8 @@ public:
         m_connectSendHandlerTerminatedFlag( nullptr ),
         m_recvHandlerTerminatedFlag( nullptr ),
         m_timerHandlerTerminatedFlag( nullptr ),
-        m_threadHandlerIsRunningIn( NULL )
-#ifdef _DEBUG
-        , m_asyncSendIssued( false )
-#endif
+        m_threadHandlerIsRunningIn( NULL ),
+        m_asyncSendIssued( false )
     {
         assert( this->m_socket );
         assert( m_abstractSocketPtr );
@@ -202,13 +200,9 @@ public:
 
         assert( buf.size() > 0 );
 
-#ifdef _DEBUG
         //assert does not stop all threads immediately, so performing segmentation fault
-        if( m_asyncSendIssued )
+        if( m_asyncSendIssued.exchange(true) )
             *((int*)nullptr) = 12;
-        assert( !m_asyncSendIssued );
-        m_asyncSendIssued = true;
-#endif
 
         m_sendBuffer = &buf;
         m_sendHandler = std::move( handler );
@@ -311,10 +305,7 @@ private:
     bool* m_timerHandlerTerminatedFlag;
 
     std::atomic<Qt::HANDLE> m_threadHandlerIsRunningIn;
-
-#ifdef _DEBUG
-    bool m_asyncSendIssued;
-#endif
+    std::atomic<bool> m_asyncSendIssued;
 
     virtual void eventTriggered( SocketType* sock, aio::EventType eventType ) throw() override
     {
@@ -340,9 +331,7 @@ private:
         auto connectHandlerLocal = [this, connectSendAsyncCallCounterBak, sock, &terminated]( SystemError::ErrorCode errorCode )
         {
             auto connectHandlerBak = std::move( m_connectHandler );
-#ifdef _DEBUG
             m_asyncSendIssued = false;
-#endif
             connectHandlerBak( errorCode );
 
             if( terminated )
@@ -385,9 +374,7 @@ private:
             m_sendBuffer = nullptr;
             m_sendBufPos = 0;
             auto sendHandlerBak = std::move( m_sendHandler );
-#ifdef _DEBUG
             m_asyncSendIssued = false;
-#endif
             sendHandlerBak( errorCode, bytesSent );
 
             if( terminated )
@@ -586,10 +573,7 @@ private:
         if( !m_abstractSocketPtr->connect( resolvedAddress, sendTimeout ) )
             return false;
 
-#ifdef _DEBUG
-        assert( !m_asyncSendIssued );
-        m_asyncSendIssued = true;
-#endif
+        assert( !m_asyncSendIssued.exchange( true ) );
 
         QnMutexLocker lk( aio::AIOService::instance()->mutex() );
         ++m_connectSendAsyncCallCounter;

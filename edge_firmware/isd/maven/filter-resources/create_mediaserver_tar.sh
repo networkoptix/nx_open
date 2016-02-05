@@ -37,7 +37,7 @@ PACKAGE=$CUSTOMIZATION-$MODULE_NAME-$BOX_NAME-$VERSION
 PACKAGE_NAME=$PACKAGE$BETA.tar.gz
 UPDATE_NAME=server-update-$BOX_NAME-${arch}-$VERSION
 
-BUILD_DIR=/tmp/hdw_$BOX_NAME_build.tmp
+BUILD_DIR="`mktemp -d`"
 PREFIX_DIR=/usr/local/apps/$CUSTOMIZATION
 
 BUILD_OUTPUT_DIR=${libdir}
@@ -161,6 +161,10 @@ mv $PACKAGE_NAME ./zip
 mv update.* ./zip
 mv install.sh ./zip
 cd zip
+if [ ! -f $PACKAGE_NAME ]; then
+  echo "Distribution is not created! Exiting"
+  exit 1
+fi
 zip ./$UPDATE_NAME.zip ./*
 mv ./* ../
 cd ..

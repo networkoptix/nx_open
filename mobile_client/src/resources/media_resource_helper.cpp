@@ -7,7 +7,6 @@
 #include <QtOpenGL/qgl.h>
 
 #include "api/app_server_connection.h"
-#include "api/network_proxy_factory.h"
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/media_server_resource.h"
 #include "core/resource/user_resource.h"
@@ -235,7 +234,8 @@ void QnMediaResourceHelper::updateUrl()
         return;
     }
 
-    QUrl url(server->getUrl());
+
+    QUrl url(qnCommon->currentServer()->getUrl());
 
     QUrlQuery query;
 
@@ -252,9 +252,6 @@ void QnMediaResourceHelper::updateUrl()
 
         if (m_position >= 0)
             query.addQueryItem(lit("startTimestamp"), QString::number(convertPosition(m_position, protocol)));
-
-        url.setUserName(QnAppServerConnectionFactory::url().userName());
-        url.setPassword(QnAppServerConnectionFactory::url().password());
     }
     else
     {
@@ -263,6 +260,7 @@ void QnMediaResourceHelper::updateUrl()
             url.setPath(lit("/media/%1.%2").arg(m_camera->getUniqueId()).arg(protocolName(protocol)));
             query.addQueryItem(lit("resolution"), currentResolutionString());
             query.addQueryItem(lit("rt"), lit("true"));
+            query.addQueryItem(lit("rotation"), lit("0"));
         }
         else if (protocol == Mjpeg)
         {
@@ -277,10 +275,10 @@ void QnMediaResourceHelper::updateUrl()
 
         if (m_position >= 0)
             query.addQueryItem(lit("pos"), QString::number(convertPosition(m_position, protocol)));
-
-        if (user)
-            query.addQueryItem(lit("auth"), getAuth(user, protocol));
     }
+
+    if (user)
+        query.addQueryItem(lit("auth"), getAuth(user, protocol));
 
     if (protocol == Mjpeg)
     {
@@ -291,11 +289,10 @@ void QnMediaResourceHelper::updateUrl()
     query.addQueryItem(QLatin1String(Qn::EC2_RUNTIME_GUID_HEADER_NAME), qnCommon->runningInstanceGUID().toString());
     query.addQueryItem(QLatin1String(Qn::CUSTOM_USERNAME_HEADER_NAME), QnAppServerConnectionFactory::url().userName());
     query.addQueryItem(QLatin1String(Qn::USER_AGENT_HEADER_NAME), QLatin1String(nx_http::userAgentString()));
-    query.addQueryItem(lit("rotation"), lit("0"));
 
     url.setQuery(query);
 
-    setUrl(QnNetworkProxyFactory::instance()->urlToResource(url, server));
+    setUrl(url);
 }
 
 int QnMediaResourceHelper::nativeStreamIndex(const QString &resolution) const

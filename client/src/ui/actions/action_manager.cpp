@@ -515,7 +515,7 @@ QnActionManager::QnActionManager(QObject *parent):
             QnCameraDeviceStringSet(
                 tr("Device Diagnostics..."),
                 tr("Camera Diagnostics..."),
-                tr("IO Module Diagnostics...")
+                tr("I/O Module Diagnostics...")
             ), this)).
         condition(new QnResourceActionCondition(hasFlags(Qn::live_cam), Qn::Any, this));
 
@@ -916,7 +916,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::OpenBookmarksSearchAction).
         flags(Qn::Main | Qn::GlobalHotkey).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalViewArchivePermission).
-        text(tr("Bookmarks Search...")).
+        text(tr("Bookmark Search...")).
         shortcut(tr("Ctrl+B")).
         autoRepeat(false);
 
@@ -1019,7 +1019,7 @@ QnActionManager::QnActionManager(QObject *parent):
         mode(QnActionTypes::DesktopMode).
         flags(Qn::Tree | Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
         text(tr("Open in New Tab")).
-        conditionalText(tr("Monitor in a New Tab"), hasFlags(Qn::server), Qn::All).
+        conditionalText(tr("Monitor in New Tab"), hasFlags(Qn::server), Qn::All).
         condition(new QnConjunctionActionCondition(
                       new QnOpenInNewEntityActionCondition(this),
                       new QnNegativeActionCondition(new QnFakeServerActionCondition(true, this), this),
@@ -1028,13 +1028,13 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::OpenInAlarmLayoutAction).
         mode(QnActionTypes::DesktopMode).
         flags(Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget).
-        text(tr("Open in the Alarm Layout"));
+        text(tr("Open in Alarm Layout"));
 
     factory(Qn::OpenInNewWindowAction).
         mode(QnActionTypes::DesktopMode).
         flags(Qn::Tree | Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
         text(tr("Open in New Window")).
-        conditionalText(tr("Monitor in a New Window"), hasFlags(Qn::server), Qn::All).
+        conditionalText(tr("Monitor in New Window"), hasFlags(Qn::server), Qn::All).
         condition(new QnConjunctionActionCondition(
                       new QnOpenInNewEntityActionCondition(this),
                       new QnLightModeCondition(Qn::LightModeNoNewWindow, this),
@@ -1043,7 +1043,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::OpenSingleLayoutAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
-        text(tr("Open Layout in a New Tab")).
+        text(tr("Open Layout in New Tab")).
         condition(hasFlags(Qn::layout));
 
     factory(Qn::OpenMultipleLayoutsAction).
@@ -1053,7 +1053,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::OpenLayoutsInNewWindowAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget).
-        text(tr("Open Layout(s) in a New Window")). // TODO: #Elric split into sinle- & multi- action
+        text(tr("Open Layout(s) in New Window")). // TODO: #Elric split into sinle- & multi- action
         condition(new QnConjunctionActionCondition(
                       new QnResourceActionCondition(hasFlags(Qn::layout), Qn::All, this),
                       new QnLightModeCondition(Qn::LightModeNoNewWindow, this),
@@ -1061,7 +1061,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::OpenCurrentLayoutInNewWindowAction).
         flags(Qn::NoTarget).
-        text(tr("Open Current Layout in a New Window")).
+        text(tr("Open Current Layout in New Window")).
         condition(new QnLightModeCondition(Qn::LightModeNoNewWindow, this));
 
     factory(Qn::OpenAnyNumberOfLayoutsAction).
@@ -1447,7 +1447,7 @@ QnActionManager::QnActionManager(QObject *parent):
             QnCameraDeviceStringSet(
                 tr("Check Device Issues..."),       tr("Check Devices Issues..."),
                 tr("Check Camera Issues..."),       tr("Check Cameras Issues..."),
-                tr("Check IO Module Issues..."),    tr("Check IO Modules Issues...")
+                tr("Check I/O Module Issues..."),    tr("Check I/O Modules Issues...")
             ), this)).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         condition(new QnConjunctionActionCondition(
@@ -1462,7 +1462,7 @@ QnActionManager::QnActionManager(QObject *parent):
             QnCameraDeviceStringSet(
                 tr("Device Rules..."),          tr("Devices Rules..."),
                 tr("Camera Rules..."),          tr("Cameras Rules..."),
-                tr("IO Module Rules..."),       tr("IO Modules Rules...")
+                tr("I/O Module Rules..."),       tr("I/O Modules Rules...")
             ), this)).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         condition(new QnConjunctionActionCondition(
@@ -1477,7 +1477,7 @@ QnActionManager::QnActionManager(QObject *parent):
             QnCameraDeviceStringSet(
                 tr("Device Settings..."),       tr("Devices Settings..."),
                 tr("Camera Settings..."),       tr("Cameras Settings..."),
-                tr("IO Module Settings..."),    tr("IO Modules Settings...")
+                tr("I/O Module Settings..."),    tr("I/O Modules Settings...")
             ), this)).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditCamerasPermission).
         condition(new QnConjunctionActionCondition(
@@ -1685,7 +1685,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::AddCameraBookmarkAction).
         flags(Qn::Slider | Qn::SingleTarget).
-        text(tr("Add a Bookmark...")).
+        text(tr("Add Bookmark...")).
         condition(new QnConjunctionActionCondition(
             new QnForbiddenInSafeModeCondition(this),
             new QnAddBookmarkActionCondition(this),
@@ -1707,6 +1707,15 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnConjunctionActionCondition(
             new QnForbiddenInSafeModeCondition(this),
             new QnModifyBookmarkActionCondition(this),
+            this));
+
+    factory(Qn::RemoveBookmarksAction).
+        flags(Qn::NoTarget | Qn::SingleTarget | Qn::ResourceTarget).
+        text(tr("Remove Bookmarks...")).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditCamerasPermission).
+        condition(new QnConjunctionActionCondition(
+            new QnForbiddenInSafeModeCondition(this),
+            new QnRemoveBookmarksActionCondition(this),
             this));
 
     factory().
@@ -1950,7 +1959,7 @@ bool QnActionManager::canTrigger(Qn::ActionId id, const QnActionParameters &para
     if(!action)
         return false;
 
-    return action->checkCondition(action->scope(), parameters);
+    return action->checkCondition(action->scope(), parameters) == Qn::EnabledAction;
 }
 
 void QnActionManager::trigger(Qn::ActionId id, const QnActionParameters &parameters) {

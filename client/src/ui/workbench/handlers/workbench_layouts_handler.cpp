@@ -20,6 +20,7 @@
 #include <ui/common/ui_resource_name.h>
 #include <ui/dialogs/layout_name_dialog.h>
 #include <ui/dialogs/resource_list_dialog.h>
+#include <ui/dialogs/message_box.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
@@ -67,7 +68,7 @@ void QnWorkbenchLayoutsHandler::renameLayout(const QnLayoutResourcePtr &layout, 
 
     QnLayoutResourceList existing = alreadyExistingLayouts(newName, user, layout);
     if (!canRemoveLayouts(existing)) {
-        QMessageBox::warning(
+        QnMessageBox::warning(
             mainWindow(),
             tr("Layout already exists."),
             tr("A layout with the same name already exists. You do not have the rights to overwrite it.")
@@ -107,7 +108,7 @@ void QnWorkbenchLayoutsHandler::saveLayout(const QnLayoutResourcePtr &layout) {
         //TODO: #GDM #VW #LOW refactor common code to common place
         if (context()->instance<QnWorkbenchVideoWallHandler>()->saveReviewLayout(layout, [this, layout](int reqId, ec2::ErrorCode errorCode) {
             snapshotManager()->setFlags(layout, snapshotManager()->flags(layout) & ~Qn::ResourceIsBeingSaved);
-            at_layouts_saved(static_cast<int>(errorCode), QnResourceList() << layout, reqId);           
+            at_layouts_saved(static_cast<int>(errorCode), QnResourceList() << layout, reqId);
             if (errorCode != ec2::ErrorCode::ok)
                 return;
             snapshotManager()->setFlags(layout, snapshotManager()->flags(layout) & ~Qn::ResourceIsChanged);
@@ -186,7 +187,7 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
             QnLayoutResourcePtr excludingSelfLayout = hasSavePermission ? layout : QnLayoutResourcePtr();
             QnLayoutResourceList existing = alreadyExistingLayouts(name, user, excludingSelfLayout);
             if (!canRemoveLayouts(existing)) {
-                QMessageBox::warning(
+                QnMessageBox::warning(
                     mainWindow(),
                     tr("Layout already exists."),
                     tr("A layout with the same name already exists. You do not have the rights to overwrite it.")
@@ -208,7 +209,7 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
     } else {
         QnLayoutResourceList existing = alreadyExistingLayouts(name, user, layout);
         if (!canRemoveLayouts(existing)) {
-            QMessageBox::warning(
+            QnMessageBox::warning(
                 mainWindow(),
                 tr("Layout already exists."),
                 tr("A layout with the same name already exists. You do not have the rights to overwrite it.")
@@ -289,7 +290,7 @@ QnLayoutResourceList QnWorkbenchLayoutsHandler::alreadyExistingLayouts(const QSt
 
 QMessageBox::StandardButton QnWorkbenchLayoutsHandler::askOverrideLayout(QMessageBox::StandardButtons buttons,
                                                                         QMessageBox::StandardButton defaultButton) {
-    return QMessageBox::warning(
+    return QnMessageBox::warning(
         mainWindow(),
         tr("Layout already exists."),
         tr("A layout with the same name already exists. Would you like to overwrite it?"),
@@ -517,7 +518,7 @@ void QnWorkbenchLayoutsHandler::at_newUserLayoutAction_triggered() {
         QnLayoutResourceList existing = alreadyExistingLayouts(dialog->name(), user);
 
         if (!canRemoveLayouts(existing)) {
-            QMessageBox::warning(
+            QnMessageBox::warning(
                 mainWindow(),
                 tr("Layout already exists."),
                 tr("A layout with the same name already exists. You do not have the rights to overwrite it.")

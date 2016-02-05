@@ -19,7 +19,6 @@
 # }
 TOOLCHAIN_PREFIX=/usr/local/raspberrypi-tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian/bin/arm-linux-gnueabihf-
 
-
 CUSTOMIZATION=${deb.customization.company.name}
 PRODUCT_NAME=${product.name.short}
 MODULE_NAME=mediaserver
@@ -37,12 +36,14 @@ PACKAGE=$CUSTOMIZATION-$MODULE_NAME-$BOX_NAME-$VERSION
 PACKAGE_NAME=$PACKAGE$BETA.tar.gz
 UPDATE_NAME=server-update-$BOX_NAME-${arch}-$VERSION
 
-BUILD_DIR="/tmp/hdw_"$BOX_NAME"_build.tmp"
-DEBUG_DIR="/tmp/hdw_"$BOX_NAME"_build_debug.tmp"
+TEMP_DIR="`mktemp -d`"
+BUILD_DIR="$TEMP_DIR/hdw_"$BOX_NAME"_build_app.tmp"
+DEBUG_DIR="$TEMP_DIR/hdw_"$BOX_NAME"_build_debug.tmp"
 PREFIX_DIR=/opt/$CUSTOMIZATION
 
 BUILD_OUTPUT_DIR=${libdir}
-LIBS_DIR=$BUILD_OUTPUT_DIR/lib/release
+BINS_DIR=$BUILD_OUTPUT_DIR/bin/${build.configuration}
+LIBS_DIR=$BUILD_OUTPUT_DIR/lib/${build.configuration}
 
 STRIP=
 
@@ -121,7 +122,7 @@ popd
 #copying bin
 mkdir -p $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/
 mkdir -p $DEBUG_DIR/$PREFIX_DIR/$MODULE_NAME/bin/
-cp $BUILD_OUTPUT_DIR/bin/release/mediaserver $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/
+cp $BINS_DIR/mediaserver $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/
 if [ ! -z "$STRIP" ]; then
   $TOOLCHAIN_PREFIX"objcopy" --only-keep-debug $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/mediaserver $DEBUG_DIR/$PREFIX_DIR/$MODULE_NAME/bin/mediaserver.debug
   $TOOLCHAIN_PREFIX"objcopy" --add-gnu-debuglink=$DEBUG_DIR/$PREFIX_DIR/$MODULE_NAME/bin/mediaserver.debug $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/mediaserver
@@ -130,10 +131,10 @@ fi
 
 
 #copying plugins
-if [ -e "$BUILD_OUTPUT_DIR/bin/release/plugins" ]; then
+if [ -e "$BINS_DIR/plugins" ]; then
   mkdir -p $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/plugins
   mkdir -p $DEBUG_DIR/$PREFIX_DIR/$MODULE_NAME/bin/plugins
-  cp $BUILD_OUTPUT_DIR/bin/release/plugins/*.* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/plugins/
+  cp $BINS_DIR/plugins/*.* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/plugins/
   for f in `ls $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/plugins/`
     do
       if [ ! -z "$STRIP" ]; then
@@ -188,9 +189,12 @@ mv $PACKAGE_NAME ./zip
 mv update.* ./zip
 mv install.sh ./zip
 cd zip
+if [ ! -f $PACKAGE_NAME ]; then
+  echo "Distribution is not created! Exiting"
+  exit 1
+fi
 zip ./$UPDATE_NAME.zip ./*
 mv ./* ../
 cd ..
 rm -Rf zip
-rm -Rf $BUILD_DIR
-rm -Rf $DEBUG_DIR
+rm -Rf $TEMP_DIR

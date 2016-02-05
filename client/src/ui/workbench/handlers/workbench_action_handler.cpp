@@ -536,17 +536,16 @@ void QnWorkbenchActionHandler::submitInstantDrop() {
 // -------------------------------------------------------------------------- //
 
 void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &user) {
-	if (!qnRuntime->isActiveXMode()) {
-		if (!user) {
-	        context()->instance<QnWorkbenchUpdateWatcher>()->stop();
-			return;
-		}
-
-		if (user->isAdmin())
+	if (qnRuntime->isDesktopMode())
+    {
+		if (user && user->isAdmin())
 	        context()->instance<QnWorkbenchUpdateWatcher>()->start();
-	    else
-			context()->instance<QnWorkbenchUpdateWatcher>()->stop();
+        else
+            context()->instance<QnWorkbenchUpdateWatcher>()->stop();
 	}
+
+    if (!user)
+        return;
 
     // we should not change state when using "Open in New Window"
     if (m_delayedDrops.isEmpty() && !qnRuntime->isVideoWallMode() && !qnRuntime->isActiveXMode()) {
@@ -811,7 +810,7 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
                 QnCameraDeviceStringSet(
                     tr("Cannot move these %n devices to server %1. Server is unresponsive.", "", modifiedResources.size()),
                     tr("Cannot move these %n cameras to server %1. Server is unresponsive.", "", modifiedResources.size()),
-                    tr("Cannot move these %n IO modules to server %1. Server is unresponsive.", "", modifiedResources.size())
+                    tr("Cannot move these %n I/O modules to server %1. Server is unresponsive.", "", modifiedResources.size())
                 ),
                 modifiedResources
             ).arg(server->getName()),
@@ -841,7 +840,7 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
                 QnCameraDeviceStringSet(
                         tr("Server %1 is unable to find and access these %n devices. Are you sure you would like to move them?", "", errorResources.size()),
                         tr("Server %1 is unable to find and access these %n cameras. Are you sure you would like to move them?", "", errorResources.size()),
-                        tr("Server %1 is unable to find and access these %n IO modules. Are you sure you would like to move them?", "", errorResources.size())
+                        tr("Server %1 is unable to find and access these %n I/O modules. Are you sure you would like to move them?", "", errorResources.size())
                     ),
                     modifiedResources
                 ).arg(server->getName()),
@@ -924,7 +923,7 @@ void QnWorkbenchActionHandler::at_dropResourcesAction_triggered() {
                 }
                 if (hasLocal)
                 {
-                    QMessageBox::warning(mainWindow(),
+                    QnMessageBox::warning(mainWindow(),
                                          tr("Cannot add item"),
                                          tr("Cannot add a local file to Multi-Video"));
                     return;
@@ -1154,14 +1153,12 @@ qint64 QnWorkbenchActionHandler::getFirstBookmarkTimeMs()
     const auto nowMs = qnSyncTime->currentMSecsSinceEpoch();
     const auto bookmarksWatcher = context()->instance<QnWorkbenchBookmarksWatcher>();
     const auto firstBookmarkUtcTimeMs = bookmarksWatcher->firstBookmarkUtcTimeMs();
-    const bool firstTimeIsNotKnown = (firstBookmarkUtcTimeMs == bookmarksWatcher->kUndefinedTime);
+    const bool firstTimeIsNotKnown = (firstBookmarkUtcTimeMs == QnWorkbenchBookmarksWatcher::kUndefinedTime);
     return (firstTimeIsNotKnown ? nowMs - kOneYearOffsetMs : firstBookmarkUtcTimeMs);
 }
 
 void QnWorkbenchActionHandler::at_openBookmarksSearchAction_triggered()
 {
-    QnNonModalDialogConstructor<QnSearchBookmarksDialog> dialogConstructor(m_searchBookmarksDialog, mainWindow());
-
     const auto parameters = menu()->currentParameters(sender());
 
     // If time window is specified then set it
@@ -1177,7 +1174,16 @@ void QnWorkbenchActionHandler::at_openBookmarksSearchAction_triggered()
     const auto startTimeMs(timelineWindow.isValid()
         ? timelineWindow.startTimeMs : getFirstBookmarkTimeMs());
 
-    m_searchBookmarksDialog->setParameters(startTimeMs, endTimeMs, filterText);
+    const auto dialogCreationFunction = [this, startTimeMs, endTimeMs, filterText]()
+    {
+        return new QnSearchBookmarksDialog(filterText, startTimeMs, endTimeMs, mainWindow());
+    };
+
+    const bool firstTime = m_searchBookmarksDialog.isNull();
+    const QnNonModalDialogConstructor<QnSearchBookmarksDialog> creator(m_searchBookmarksDialog, dialogCreationFunction);
+
+    if (!firstTime)
+        m_searchBookmarksDialog->setParameters(startTimeMs, endTimeMs, filterText);
 }
 
 void QnWorkbenchActionHandler::at_openBusinessLogAction_triggered() {
@@ -1291,7 +1297,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     const qint64 maxItems = qnSettings->maxPreviewSearchItems();
 
     if(period.durationMs < steps[1]) {
-        QMessageBox::warning(mainWindow(), tr("Unable to perform preview search."), tr("Selected time period is too short to perform preview search. Please select a longer period."), QMessageBox::Ok);
+        QnMessageBox::warning(mainWindow(), tr("Unable to perform preview search."), tr("Selected time period is too short to perform preview search. Please select a longer period."), QMessageBox::Ok);
         return;
     }
 
@@ -1475,10 +1481,10 @@ void QnWorkbenchActionHandler::at_serverAddCameraManuallyAction_triggered(){
         if (dialog->state() == QnCameraAdditionDialog::Searching
                 || dialog->state() == QnCameraAdditionDialog::Adding) {
 
-            int result = QMessageBox::warning(
+            int result = QnMessageBox::warning(
                         mainWindow(),
                         tr("Process in progress..."),
-                        tr("Device addition is already in progress."\
+                        tr("Device addition is already in progress. "
                            "Are you sure you want to cancel current process?"), //TODO: #GDM #Common show current process details
                         QMessageBox::Ok | QMessageBox::Cancel,
                         QMessageBox::Cancel
@@ -1638,7 +1644,7 @@ bool QnWorkbenchActionHandler::validateResourceName(const QnResourcePtr &resourc
             ? tr("User with the same name already exists")
             : tr("Video Wall with the same name already exists.");
 
-        QMessageBox::warning(
+        QnMessageBox::warning(
             mainWindow(),
             title,
             message
@@ -1814,11 +1820,11 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
             QnDeviceDependentStrings::getNameFromSet(
                 QnCameraDeviceStringSet(
                     tr("These %n devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?",
-                        nullptr, onlineAutoDiscoveredCameras.size()),
+                        "", onlineAutoDiscoveredCameras.size()),
                     tr("These %n cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?",
-                        nullptr, onlineAutoDiscoveredCameras.size()),
-                    tr("These %n IO modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?",
-                        nullptr, onlineAutoDiscoveredCameras.size())
+                        "", onlineAutoDiscoveredCameras.size()),
+                    tr("These %n I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?",
+                        "", onlineAutoDiscoveredCameras.size())
                 ),
                 onlineAutoDiscoveredCameras
             );
@@ -1830,11 +1836,11 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
             QnDeviceDependentStrings::getNameFromSet(
                 QnCameraDeviceStringSet(
                     tr("%n of these devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?",
-                        nullptr, onlineAutoDiscoveredCameras.size()),
+                        "", onlineAutoDiscoveredCameras.size()),
                     tr("%n of these cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?",
-                        nullptr, onlineAutoDiscoveredCameras.size()),
-                    tr("%n of these IO modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?",
-                        nullptr, onlineAutoDiscoveredCameras.size())
+                        "", onlineAutoDiscoveredCameras.size()),
+                    tr("%n of these I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?",
+                        "", onlineAutoDiscoveredCameras.size())
                 ),
                 cameras
             );
@@ -1846,11 +1852,11 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
             QnDeviceDependentStrings::getNameFromSet(
                 QnCameraDeviceStringSet(
                     tr("Do you really want to delete the following %n devices?",
-                        nullptr, cameras.size()),
+                        "", cameras.size()),
                     tr("Do you really want to delete the following %n cameras?",
-                        nullptr, cameras.size()),
-                    tr("Do you really want to delete the following %n IO modules?",
-                        nullptr, cameras.size())
+                        "", cameras.size()),
+                    tr("Do you really want to delete the following %n I/O modules?",
+                        "", cameras.size())
                 ),
                 cameras
             );
@@ -2139,13 +2145,13 @@ void QnWorkbenchActionHandler::at_setAsBackgroundAction_triggered() {
             return;
 
         if (status == QnAppServerFileCache::OperationResult::sizeLimitExceeded) {
-            QMessageBox::warning(mainWindow(), tr("Error"), tr("Picture is too big. Maximum size is %1 Mb").arg(QnAppServerFileCache::maximumFileSize() / (1024*1024))
+            QnMessageBox::warning(mainWindow(), tr("Error"), tr("Picture is too big. Maximum size is %1 Mb").arg(QnAppServerFileCache::maximumFileSize() / (1024*1024))
                 );
             return;
         }
 
         if (status != QnAppServerFileCache::OperationResult::ok) {
-            QMessageBox::warning(mainWindow(), tr("Error"), tr("Error while uploading picture."));
+            QnMessageBox::warning(mainWindow(), tr("Error"), tr("Error while uploading picture."));
             return;
         }
 
@@ -2312,7 +2318,7 @@ void QnWorkbenchActionHandler::at_messageBoxAction_triggered() {
     if (text.isEmpty())
         text = title;
 
-    QMessageBox::information(mainWindow(), title, text);
+    QnMessageBox::information(mainWindow(), title, text);
 }
 
 void QnWorkbenchActionHandler::at_browseUrlAction_triggered() {
@@ -2392,7 +2398,7 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_betaVersionMessageAction_triggered() {
-    QMessageBox::warning(mainWindow(),
+    QnMessageBox::warning(mainWindow(),
                          tr("Beta version %1").arg(QnAppInfo::applicationVersion()),
                          tr("This is a beta version of %1.")
                          .arg(qApp->applicationDisplayName()));
@@ -2421,7 +2427,7 @@ void QnWorkbenchActionHandler::checkIfStatisticsReportAllowed() {
     if (!atLeastOneServerHasInternetAccess)
         return;
 
-    QMessageBox::information(
+    QnMessageBox::information(
         mainWindow(),
         tr("Anonymous Usage Statistics"),
         tr("System sends anonymous usage and crash statistics to the software development team to help us improve your user experience.\n"

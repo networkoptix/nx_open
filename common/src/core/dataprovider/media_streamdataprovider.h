@@ -23,9 +23,11 @@ public:
     explicit QnAbstractMediaStreamDataProvider( const QnResourcePtr& res );
     virtual ~QnAbstractMediaStreamDataProvider();
 
-
     const QnStatistics* getStatistics(int channel) const;
+    int getNumberOfChannels() const;
     float getBitrateMbps() const;
+    float getFrameRate() const;
+    float getAverageGopSize() const;
 
     virtual void setNeedKeyData();
     virtual bool needKeyData(int channel) const;
@@ -41,8 +43,8 @@ public:
     virtual CameraDiagnostics::Result diagnoseMediaStreamConnection();
 
     virtual bool hasThread() const { return true; }
-protected:
 
+protected:
     virtual void sleepIfNeeded() {}
 
     virtual void beforeRun();

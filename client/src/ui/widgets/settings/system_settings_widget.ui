@@ -17,7 +17,7 @@
    <item row="4" column="0">
     <widget class="QLabel" name="settingsWarningLabel">
      <property name="text">
-      <string>Warning! FPS and quality settings in Recording Schedule will not work!</string>
+      <string>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</string>
      </property>
     </widget>
    </item>

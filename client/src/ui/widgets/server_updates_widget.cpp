@@ -348,14 +348,14 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult &result) {
                     }
                 }
 
-                QMessageBox::information(this, tr("Update Succeeded."), message);
+                QMessageBox::information(this, tr("Update Succeeded"), message);
 
                 bool unholdConnection = !clientUpdated || result.clientInstallerRequired || result.protocolChanged;
                 if (clientUpdated && !result.clientInstallerRequired) {
                     if (applauncher::restartClient(result.targetVersion) != applauncher::api::ResultType::ok) {
                         unholdConnection = true;
                         QMessageBox::critical(this,
-                            tr("Launcher process not found."),
+                            tr("Launcher process was not found."),
                             tr("Cannot restart the client.") + L'\n'
                           + tr("Please close the application and start it again using the shortcut in the start menu."));
                     } else {
@@ -372,10 +372,13 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult &result) {
             }
             break;
         case QnUpdateResult::Cancelled:
-            QMessageBox::information(this, tr("Update Cancelled"), tr("Update has been cancelled."));
+            QMessageBox::information(this, tr("Update cancelled"), tr("Update has been cancelled."));
             break;
         case QnUpdateResult::LockFailed:
             QMessageBox::critical(this, tr("Update unsuccessful."), tr("Another user has already started an update."));
+            break;
+        case QnUpdateResult::AlreadyUpdated:
+            QMessageBox::information(this, tr("Update is not needed."), tr("All servers are already updated."));
             break;
         case QnUpdateResult::DownloadingFailed:
             QMessageBox::critical(this, tr("Update unsuccessful."), tr("Could not download updates."));
@@ -436,7 +439,9 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult &result) {
         }
     }
 
-    bool canUpdate = result.result != QnUpdateResult::Successful;
+    bool canUpdate = (result.result != QnUpdateResult::Successful) &&
+                     (result.result != QnUpdateResult::AlreadyUpdated);
+
     if (m_updateSourceActions[LocalSource]->isChecked())
         ui->localUpdateButton->setEnabled(canUpdate);
     else
@@ -496,23 +501,23 @@ void QnServerUpdatesWidget::checkForUpdatesInternet(bool autoSwitch, bool autoSt
             break;
         case QnCheckForUpdateResult::NoSuchBuild:
             status = displayVersion.toString();
-            detail = tr("No such build available on update server.");
+            detail = tr("No such build is available on update server.");
             setWarningStyle(&statusPalette);
             setWarningStyle(&detailPalette);
             break;
         case QnCheckForUpdateResult::ServerUpdateImpossible:
             status = displayVersion.toString();
-            detail = tr("Unable to begin update. An update for one or more servers not found.");
+            detail = tr("Unable to begin update. Updates for one or more servers were not found.");
             setWarningStyle(&detailPalette);
             break;
         case QnCheckForUpdateResult::ClientUpdateImpossible:
             status = displayVersion.toString();
-            detail = tr("Unable to begin update. An update for the client was not found.");
+            detail = tr("Unable to begin update. Client update was not found.");
             setWarningStyle(&detailPalette);
             break;
         case QnCheckForUpdateResult::DowngradeIsProhibited:
             status = displayVersion.toString();
-            detail = tr("Unable to begin update. Downgrade to the previous release is prohibited.");
+            detail = tr("Unable to begin update. Downgrade to any previous release is prohibited.");
             setWarningStyle(&statusPalette);
             setWarningStyle(&detailPalette);
             break;
@@ -583,15 +588,15 @@ void QnServerUpdatesWidget::checkForUpdatesLocal() {
             detail = tr("All components in your system are up to date.");
             break;
         case QnCheckForUpdateResult::NoSuchBuild:
-            detail = tr("No such build available on update server.");
+            detail = tr("No such build is available on update server.");
             setWarningStyle(&detailPalette);
             break;
         case QnCheckForUpdateResult::ServerUpdateImpossible:
-            detail = tr("Unable to begin update. An update for one or more servers not found.");
+            detail = tr("Unable to begin update. Updates for one or more servers were not found.");
             setWarningStyle(&detailPalette);
             break;
         case QnCheckForUpdateResult::ClientUpdateImpossible:
-            detail = tr("Unable to begin update. An update for the client was not found.");
+            detail = tr("Unable to begin update. Client update was not found.");
             setWarningStyle(&detailPalette);
             break;
         case QnCheckForUpdateResult::BadUpdateFile:

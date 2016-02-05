@@ -8,6 +8,7 @@
 #include <ui/graphics/items/standard/graphics_widget.h>
 #include <ui/graphics/items/generic/framed_widget.h>
 #include <ui/animation/animated.h>
+#include <ui/customization/customized.h>
 
 class GraphicsLabel;
 
@@ -33,12 +34,12 @@ private:
 };
 
 
-class QnGraphicsMessageBox : public Animated<QnFramedWidget> {
+class QnGraphicsMessageBox : public Customized<Animated<QnFramedWidget>> {
     Q_OBJECT
     Q_PROPERTY(QString text READ text WRITE setText)
     Q_PROPERTY(QnGraphicsMessageBoxColors colors READ colors WRITE setColors)
 
-    typedef Animated<QnFramedWidget> base_type;
+    typedef Customized<Animated<QnFramedWidget>> base_type;
 
 public:
     explicit QnGraphicsMessageBox(QGraphicsItem *parent = NULL, const QString &text = QString(), int timeoutMsec = 0, int fontSize = 0);

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="en_US" sourcelanguage="en">
+<TS version="2.0" language="en_US" sourcelanguage="en">
 <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
@@ -20,7 +20,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>What to backup:</source>
+        <source>Cannot add new devices because they store archive on external storage.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot add new cameras because they store archive on external storage.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -87,12 +91,12 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>All data</source>
-        <translation>All Data</translation>
+        <source>All Data</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Bitrate for the last recorded:</source>
-        <translation>Bitrate for the Last Recorded</translation>
+        <source>Bitrate for the Last Recorded</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -151,53 +155,6 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
-    <name>Impl</name>
-    <message>
-        <source>Open in New Tab</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Export bookmark...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;%n device(s)&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;%n camera(s)&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;%n IO module(s)&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;Any Device&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;Any Camera&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;Any IO Module&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;All My Devices&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;All My Cameras&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;All My IO Modules&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>PtzOverlayWidget</name>
     <message>
         <source>Zoom In</source>
@@ -234,10 +191,6 @@ to view more bookmarks</source>
         <source>None</source>
         <translation></translation>
     </message>
-    <message>
-        <source>Close</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>QTimeSpanPrivate</name>
@@ -245,13 +198,11 @@ to view more bookmarks</source>
         <source>%n millisecond(s)</source>
         <translation>
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n second(s)</source>
         <translation>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -259,13 +210,11 @@ to view more bookmarks</source>
         <source>%n minute(s)</source>
         <translation>
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n hour(s)</source>
         <translation>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -273,13 +222,11 @@ to view more bookmarks</source>
         <source>%n day(s)</source>
         <translation>
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n week(s)</source>
         <translation>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -287,13 +234,11 @@ to view more bookmarks</source>
         <source>%n month(s)</source>
         <translation>
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n year(s)</source>
         <translation>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -754,31 +699,11 @@ to view more bookmarks</source>
         <translation></translation>
     </message>
     <message>
-        <source>Monitor in a New Tab</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Open in New Window</source>
         <translation></translation>
     </message>
     <message>
-        <source>Monitor in a New Window</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Open Layout in a New Tab</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Open Layouts</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Open Layout(s) in a New Window</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Open Current Layout in a New Window</source>
         <translation></translation>
     </message>
     <message>
@@ -1386,10 +1311,6 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>IO Module Diagnostics...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Devices List</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1414,14 +1335,6 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Check IO Module Issues...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Check IO Modules Issues...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Device Rules...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1435,14 +1348,6 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Cameras Rules...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>IO Module Rules...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>IO Modules Rules...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1462,14 +1367,6 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>IO Module Settings...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>IO Modules Settings...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Devices List by Server...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1483,10 +1380,6 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Ctrl+B</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Open in the Alarm Layout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1506,11 +1399,71 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Bookmarks Search...</source>
+        <source>I/O Module Diagnostics...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Add a Bookmark...</source>
+        <source>Web Client...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bookmark Search...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open in Alarm Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check I/O Module Issues...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check I/O Modules Issues...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module Rules...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Modules Rules...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Modules Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove Bookmarks...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Monitor in New Tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Monitor in New Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Layout in New Tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Layout(s) in New Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Current Layout in New Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add Bookmark...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1582,10 +1535,6 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This resources already removed from the system</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Export selected records to a file</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1607,6 +1556,10 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Camera actions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This resources are already removed from the system</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1708,7 +1661,6 @@ to view more bookmarks</source>
         <source>%n action(s)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -1756,10 +1708,6 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Red mark means that an archive is still available</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>E-mail settings changed</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1795,6 +1743,10 @@ to view more bookmarks</source>
         <source>Camera name</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Red mark means that the archive is still available</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnBackupCamerasDialog</name>
@@ -1804,21 +1756,6 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Select Cameras to Backup...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Low-Res Streams</source>
-        <comment>Cameras Backup</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Hi-Res Streams</source>
-        <comment>Cameras Backup</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>All streams</source>
-        <comment>Cameras Backup</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1879,17 +1816,17 @@ to view more bookmarks</source>
 </context>
 <context>
     <name>QnBusinessResourceValidationStrings</name>
-    <message>
+    <message numerus="yes">
         <source>%1 of %n devices</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%1 of %n cameras</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 of %n IO modules</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>&lt;Any Device&gt;</source>
@@ -1906,6 +1843,12 @@ to view more bookmarks</source>
     <message>
         <source>Select at least one camera</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 of %n I/O modules</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2231,10 +2174,6 @@ to view more bookmarks</source>
         <translation type="unfinished">The specified IP address range has more than 255 addresses.</translation>
     </message>
     <message>
-        <source>Finished searching...</source>
-        <translation type="unfinished">Finished searching...</translation>
-    </message>
-    <message>
         <source>Server went offline - search aborted.</source>
         <translation type="unfinished">Server went offline - search aborted.</translation>
     </message>
@@ -2262,13 +2201,11 @@ to view more bookmarks</source>
         <source>%n devices added successfully.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Error while adding %n devices.</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -2287,7 +2224,6 @@ to view more bookmarks</source>
     <message numerus="yes">
         <source>%n devices found</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -2310,6 +2246,10 @@ to view more bookmarks</source>
     <message>
         <source>Scanning host... (%1)</source>
         <extracomment>Scanning host... (0 devices found)</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Finishing searching...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2359,19 +2299,11 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Diagnostics for IO module %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Device Diagnostics</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Camera Diagnostics</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>IO Module Diagnostics</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2383,10 +2315,6 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Confirming IO module is accessible.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Confirming target device provides media stream.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2395,7 +2323,19 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Confirming target IO module provides media stream.</source>
+        <source>Diagnostics for I/O module %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module Diagnostics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Confirming I/O module is accessible.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Confirming target I/O module provides media stream.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2448,17 +2388,17 @@ to view more bookmarks</source>
         <source>Cameras List</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n devices found</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n cameras found</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%n IO modules found</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Export selected devices to a file.</source>
@@ -2467,6 +2407,12 @@ to view more bookmarks</source>
     <message>
         <source>Export selected cameras to a file.</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n I/O modules found</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2529,7 +2475,6 @@ to view more bookmarks</source>
         <source>Recording or motion detection is disabled for %1</source>
         <translation>
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
 </context>
@@ -2583,19 +2528,19 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Motion Recording is disabled or not supported by some of the selected cameras. Please go to the motion setup page to ensure it is supported and enabled.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Dual-Streaming is not supported by this camera.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Dual-Streaming and Motion Detection are not available for this camera.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Motion Recording is disabled. Please go to the motion setup page to setup the cameras&apos;s motion area and sensitivity.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Motion Recording is disabled or not supported on some of the selected cameras. Please go to the motion setup page to ensure it is supported and enabled.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dual-Streaming is not supported on this camera.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dual-Streaming and Motion Detection are not available on this camera.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2642,14 +2587,6 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>IO Module Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>IO Modules Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Device Diagnostics</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2663,14 +2600,6 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Cameras Diagnostics</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>IO Module Diagnostics</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>IO Modules Diagnostics</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2689,29 +2618,51 @@ to view more bookmarks</source>
         <source>Cameras Rules</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>IO Module Rules</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>IO Modules Rules</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
+    <message numerus="yes">
         <source>Apply changes to the following %n devices?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Apply changes to the following %n cameras?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Apply changes to the following %n IO modules?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Changes are not saved</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Modules Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module Diagnostics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Modules Diagnostics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module Rules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Modules Rules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Apply changes to the following %n I/O modules?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2910,15 +2861,7 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Actions will only work for Generic Events that pass all filters.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Empty fields do not affect results.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Each filter will pass if any keyword in a field is matched.</source>
+        <source>Event will trigger only if Generic Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Generic Event contains any keyword.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2997,8 +2940,8 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>You need to connect to a server prior to performing a backup.</source>
-        <translation type="unfinished">You need to connect to a server prior to performing a backup.</translation>
+        <source>You need to connect to a server prior to backup start.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3109,13 +3052,11 @@ to view more bookmarks</source>
         <source>Event log for period from %1 to %2 - %n event(s) found</source>
         <translation>
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Event log for %1 - %n event(s) found</source>
         <translation>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -3190,7 +3131,6 @@ to view more bookmarks</source>
         <source>%1 (%n times)</source>
         <comment>%1 is description of event. Will be replaced in runtime</comment>
         <translation type="unfinished">
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -3320,27 +3260,31 @@ to view more bookmarks</source>
 <context>
     <name>QnGeneralSystemAdministrationWidget</name>
     <message>
-        <source>Open Alarm/Event Rules Management...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Open Event Log...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Open Devices List...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Open Cameras List...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Devices List...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Cameras List...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Alarm/Event Rules Management</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Event Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Bookmarks List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Devices List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Cameras List</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3359,7 +3303,7 @@ to view more bookmarks</source>
         <translation></translation>
     </message>
     <message>
-        <source>This could lead to client software malfunction including crash.</source>
+        <source>This may result in client software issues (including unexpected crash).</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3439,7 +3383,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Name</source>
-        <translation type="unfinished">Model</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Pulse time(ms)</source>
@@ -3531,10 +3475,6 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Could not create output file %1.</source>
-        <translation type="unfinished">Could not create output file %1..</translation>
-    </message>
-    <message>
         <source>Could not export device %1.</source>
         <extracomment>&quot;Could not export camera AXIS1334&quot;</extracomment>
         <translation type="unfinished"></translation>
@@ -3544,11 +3484,15 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Could not export IO module %1.</source>
+        <source>Unknown error has occurred.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Unknown error has occurred.</source>
+        <source>Could not export I/O module %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not create output file %1...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3601,7 +3545,6 @@ to view more bookmarks</source>
         <source>Test completed successfully: %n users found.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
 </context>
@@ -3616,11 +3559,11 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>None of your servers is connected to the Internet.</source>
+        <source>None of your servers are connected to the Internet.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Timed out</source>
+        <source>Timed Out</source>
         <translation type="unfinished">Timed Out</translation>
     </message>
 </context>
@@ -3654,10 +3597,6 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>None of your servers is connected to the Internet.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Could not load users.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3666,16 +3605,20 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Timed out</source>
-        <translation type="unfinished">Timed Out</translation>
-    </message>
-    <message>
         <source>Error while loading users.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>No new users found.</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>None of your servers are connected to the Internet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Timed Out</source>
+        <translation type="unfinished">Timed Out</translation>
     </message>
 </context>
 <context>
@@ -3809,13 +3752,11 @@ to view more bookmarks</source>
         <source>At least %n %2 are required</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n %2 are currently in use</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -3936,20 +3877,25 @@ to view more bookmarks</source>
         <source>Use analog licenses to view these %n cameras</source>
         <translation type="unfinished">
             <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Use licenses for selected %n devices</source>
+        <translation type="unfinished">
             <numerusform></numerusform>
         </translation>
     </message>
-    <message>
-        <source>Use licenses for selected %n devices</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
+    <message numerus="yes">
         <source>Use licenses for selected %n cameras</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
-        <source>Use licenses for selected %n IO modules</source>
-        <translation type="unfinished"></translation>
+    <message numerus="yes">
+        <source>Use licenses for selected %n I/O modules</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -4129,16 +4075,16 @@ to view more bookmarks</source>
         <translation></translation>
     </message>
     <message>
-        <source>IO Module</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Zoom Window</source>
         <translation type="unfinished">Zoom Window</translation>
     </message>
     <message>
         <source>Low-Res</source>
         <translation type="unfinished">Low-Res</translation>
+    </message>
+    <message>
+        <source>I/O Module</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4448,19 +4394,11 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Open IO Module</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Device Settings...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Camera Settings...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>IO Module Settings...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4472,15 +4410,23 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Open IO Module Web Page...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Alarm: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Open in the Alarm Layout</source>
+        <source>Open in Alarm Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open I/O Module</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open I/O Module Web Page...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4495,7 +4441,7 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Warning</source>
+        <source>Warning!</source>
         <translation type="unfinished">Warning!</translation>
     </message>
 </context>
@@ -4560,15 +4506,7 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>An error has occurred while trying to get current position from camera %1.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Please wait for the camera to go online.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>An error has occurred while trying to set current position for camera %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4584,16 +4522,24 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished">Remove Preset</translation>
     </message>
     <message>
-        <source>Manage PTZ for %1.</source>
-        <translation type="unfinished">Manage PTZ for %1..</translation>
-    </message>
-    <message>
         <source>PTZ configuration has not been saved.</source>
         <translation type="unfinished">PTZ configuration has not been saved.</translation>
     </message>
     <message>
         <source>Changes have not been saved. Would you like to save them?</source>
         <translation type="unfinished">Changes have not been saved. Would you like to save them?</translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to set the current position for camera %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manage PTZ for %1...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to get the current position from camera %1.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4633,7 +4579,6 @@ If you understand this and would like to proceed please click Merge to continue.
     <message numerus="yes">
         <source>This preset will be activated after %n minutes of inactivity</source>
         <translation>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -4753,7 +4698,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>%n seconds</source>
         <translation>
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -4820,13 +4764,11 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>%n years</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n months</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -4834,19 +4776,13 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>%n days</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n hours</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
-    </message>
-    <message>
-        <source>Archived duration in calendar days between the first record and the current moment</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Average bitrate for the recorded period</source>
@@ -4880,17 +4816,17 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>empty</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Total %n devices</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Total %n cameras</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Total %n IO modules</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Devices with non-empty archive</source>
@@ -4918,6 +4854,16 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>&lt;Cameras from other servers and removed cameras&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Total %n I/O modules</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Archived duration in calendar days since the first recording</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5067,10 +5013,57 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
 </context>
 <context>
+    <name>QnSearchBookmarksDialogPrivate</name>
+    <message>
+        <source>Export bookmark...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search bookmarks by name, tag or description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;Any Device&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;Any Camera&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;Any I/O Module&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;All My Devices&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;All My Cameras&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;All My I/O Modules&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;%n device(s)&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;%n camera(s)&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;%n I/O module(s)&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnSearchBookmarksModel</name>
     <message>
         <source>Name</source>
-        <translation type="unfinished">Model</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Start time</source>
@@ -5153,11 +5146,11 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Apply changes to the server %1?</source>
+        <source>Storage Management</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Storage Management</source>
+        <source>Apply changes to server %1?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5192,11 +5185,11 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>To avoid malfunction adjust max number of devices</source>
+        <source>To avoid issues adjust max number of devices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>To avoid malfunction adjust max number of cameras</source>
+        <source>To avoid issues adjust max number of cameras</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5418,18 +5411,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Update Succeeded.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Launcher process not found.</source>
-        <translation type="unfinished">Launcher process not found.</translation>
-    </message>
-    <message>
-        <source>Update Cancelled</source>
-        <translation type="unfinished">Update Cancelled</translation>
-    </message>
-    <message>
         <source>Update unsuccessful.</source>
         <translation type="unfinished">Update Succeeded.</translation>
     </message>
@@ -5442,31 +5423,50 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished">Internet Connectivity Problem</translation>
     </message>
     <message>
-        <source>No such build available on update server.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unable to begin update. An update for one or more servers not found.</source>
-        <translation type="unfinished">Unable to begin update. An update for one or more servers not found.</translation>
-    </message>
-    <message>
-        <source>Unable to begin update. An update for the client was not found.</source>
-        <translation type="unfinished">Unable to begin update. An update for the client was not found.</translation>
-    </message>
-    <message>
         <source>Unable to extract update file.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unable to begin update. Downgrade to the previous release is prohibited.</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
         <source>Authentication failed for %n servers:</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Update Succeeded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to begin update. Downgrade to any previous release is prohibited.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Launcher process was not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No such build is available on update server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to begin update. Updates for one or more servers were not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to begin update. Client update was not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update cancelled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update is not needed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All servers are already updated.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5479,8 +5479,17 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>%n User(s)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
+    </message>
+</context>
+<context>
+    <name>QnShowTextOverlayActionWidget</name>
+    <message>
+        <source>Html tags could be used within custom text:
+&lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color=&quot;red&quot;&gt;colors&lt;/font&gt; and &lt;font size=&quot;18&quot;&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</source>
+        <comment>Do not translate tags (text between &apos;&lt;&apos; and &apos;&gt;&apos; symbols. Do not remove &apos;
+&apos; sequence</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5517,14 +5526,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Invalid schedule</source>
-        <translation type="unfinished">Invalid Schedule</translation>
-    </message>
-    <message>
-        <source>Second stream is disabled on this camera. Motion + LQ option has no effect.Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation type="unfinished">Second stream is disabled on this camera. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</translation>
-    </message>
-    <message>
         <source>Confirm motion regions reset</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5553,7 +5554,15 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>IO Module Settings</source>
+        <source>I/O Module Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid Schedule</source>
+        <translation type="unfinished">Invalid Schedule</translation>
+    </message>
+    <message>
+        <source>Second stream is disabled on this camera. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5590,15 +5599,7 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Provided parameters not valid. Could not perform test.</source>
-        <translation type="unfinished">Provided parameters not valid. Could not perform test.</translation>
-    </message>
-    <message>
         <source>Network Error</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Could not perform a test. None of your servers is connected to the Internet.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5623,6 +5624,14 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Success</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not perform a test. None of your servers are connected to the Internet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The provided parameters are not valid. Could not perform a test.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5696,34 +5705,18 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Please check authentication information in IO module settings</source>
+        <source>Please check authentication information in I/O module settings</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnStorageConfigWidget</name>
     <message>
-        <source>Devices to Backup...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cameras to Backup...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Warning</source>
-        <translation type="unfinished">Warning!</translation>
-    </message>
-    <message>
         <source>You are about to launch the archive re-synchronization routine.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>ATTENTION! Your hard disk usage will be increased during re-synchronization process! Depending on the total size of archive it can take several hours.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without loosing data.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5771,33 +5764,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Couldn&apos;t start backup while rebuilding archive index is being processed.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>%n of %1 are selected</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>In Real-Time</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>In Real-Time mode all data is backed up continuously.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Notice: Only data from this point forward will be backed up. Existing archives will be ignored.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Archive has been successfully backup until: %1.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>No devices selected</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5806,7 +5772,66 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Your archive has been successfully backed up.</source>
+        <source>Real-Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Low-Res Streams</source>
+        <comment>Cameras Backup</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hi-Res Streams</source>
+        <comment>Cameras Backup</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All streams</source>
+        <comment>Cameras Backup</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning!</source>
+        <translation type="unfinished">Warning!</translation>
+    </message>
+    <message>
+        <source>This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without data loss.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select at least one device to start backup.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select at least one camera to start backup.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot start backup while archive index rebuild is in progress.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Notice: Only further recording will be backed up. Backup process will ignore existing footage.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%n Camera(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%n Device(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backup is finished</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In Real-Time mode all data is backed up continuously.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup is completed up to: %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5846,6 +5871,10 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>%1 (Rebuilding... %2%)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Loading...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5888,16 +5917,16 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Warning</source>
-        <translation type="unfinished">Warning!</translation>
-    </message>
-    <message>
         <source>Add storage</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Provided storage path does not point to a valid external storage location.</source>
         <translation type="unfinished">Provided storage path does not point to a valid external storage location.</translation>
+    </message>
+    <message>
+        <source>Warning!</source>
+        <translation type="unfinished">Warning!</translation>
     </message>
 </context>
 <context>
@@ -5955,7 +5984,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Select server for others to synchronize time with</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Select server for others to synchronise time with</translation>
     </message>
     <message>
         <source>System is in safe mode</source>
@@ -6007,7 +6036,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Server times are not synchronized and a common time could not be detected automatically.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Server times are not synchronised and a common time could not be detected automatically.</translation>
     </message>
     <message>
         <source>The system is running in safe mode.</source>
@@ -6015,14 +6044,6 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Any configuration changes except license activation are impossible.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Storages are full on the following Server:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Storages are not configured on the following Server:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6041,6 +6062,14 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Rebuilding archive index is canceled by user on the following Server:</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Storage is full on the following Server:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storage is not configured on the following Server:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnSystemSettingsWidget</name>
@@ -6054,11 +6083,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Allow system to optimize devices settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Allow system to optimise devices settings</translation>
     </message>
     <message>
         <source>Allow system to optimize cameras settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Allow system to optimise devices settings</translation>
     </message>
 </context>
 <context>
@@ -6249,7 +6278,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>%n of %1 additional email addresses are invalid</source>
         <translation>
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -6260,13 +6288,11 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>%n User(s)</source>
         <translation>
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%1, %n additional</source>
         <translation>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -6295,7 +6321,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Name</source>
-        <translation type="unfinished">Model</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Permissions</source>
@@ -6686,14 +6712,9 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Launcher process not found.</source>
         <translation type="unfinished">Launcher process not found.</translation>
     </message>
-    <message>
-        <source>Device addition is already in progress.Are you sure you want to cancel current process?</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message numerus="yes">
         <source>Cannot move these %n devices to server %1. Server is unresponsive.</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -6701,20 +6722,11 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Cannot move these %n cameras to server %1. Server is unresponsive.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Cannot move these %n IO modules to server %1. Server is unresponsive.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Server %1 is unable to find and access these %n devices. Are you sure you would like to move them?</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -6722,20 +6734,11 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Server %1 is unable to find and access these %n cameras. Are you sure you would like to move them?</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Server %1 is unable to find and access these %n IO modules. Are you sure you would like to move them?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Are you sure you want to permanently delete these %n files?</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -6743,51 +6746,83 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Are you sure you want to remove these %n items from layout?</source>
         <translation type="unfinished">
             <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>These %n devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
+        <translation type="unfinished">
             <numerusform></numerusform>
         </translation>
     </message>
-    <message>
-        <source>These %n devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
+    <message numerus="yes">
         <source>These %n cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
-        <source>These %n IO modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
+    <message numerus="yes">
         <source>%n of these devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n of these cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
-        <source>%n of these IO modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
+    <message numerus="yes">
         <source>Do you really want to delete the following %n devices?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Do you really want to delete the following %n cameras?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Do you really want to delete the following %n IO modules?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Do you really want to delete the following %n items?</source>
         <translation type="unfinished">
             <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Cannot move these %n I/O modules to server %1. Server is unresponsive.</source>
+        <translation type="unfinished">
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message numerus="yes">
+        <source>Server %1 is unable to find and access these %n I/O modules. Are you sure you would like to move them?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>These %n I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n of these I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Do you really want to delete the following %n I/O modules?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Device addition is already in progress. Are you sure you want to cancel current process?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6822,6 +6857,10 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Press %1 to search bookmarks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete these %n bookmarks?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6973,19 +7012,11 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation></translation>
     </message>
     <message>
-        <source>You are about to export a video sequence that is longer than 30 minutes.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Do you want to continue?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>You are about to export several video sequences with a total length exceeding 30 minutes.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7072,6 +7103,14 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Selected format is not recommended for this camera due to video downscaling. We recommend to export selected video either to the &apos;.nov&apos; or &apos;.exe&apos; format. Do you want to continue?</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>You are about to export a video that is longer than 30 minutes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are about to export several videos with a total length exceeding 30 minutes.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
@@ -7116,19 +7155,11 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>You can try to update the servers again in the System Administration.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Warning: You are about to merge Systems with START licenses.
 As only 1 START license is allowed per System after your merge you will only have 1 START license remaining.
 If you understand this and would like to proceed please click Merge to continue.
 </source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Warning</source>
-        <translation type="unfinished">Warning!</translation>
     </message>
     <message>
         <source>Merge</source>
@@ -7141,6 +7172,14 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Rejoice! Selected servers have been successfully connected to your system!</source>
         <translation type="unfinished">Rejoice! Selected servers have been successfully connected to your system!</translation>
+    </message>
+    <message>
+        <source>You can try to update the servers again in the System Administration dialog.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning!</source>
+        <translation type="unfinished">Warning!</translation>
     </message>
 </context>
 <context>
@@ -7190,7 +7229,6 @@ If you understand this and would like to proceed please click Merge to continue.
     <message numerus="yes">
         <source>Could not save the following %n layout(s) to Server.</source>
         <translation>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -7253,7 +7291,7 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>All IO Modules</source>
+        <source>All I/O Modules</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7264,15 +7302,7 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation></translation>
     </message>
     <message>
-        <source>An error has occurred while trying to get current position from camera %1.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Please wait for the camera to go online.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>An error has occurred while trying to set current position for camera %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7280,11 +7310,15 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished">Unable to get position from camera.</translation>
     </message>
     <message>
-        <source>Unable to set position for camera.</source>
-        <translation type="unfinished">Unable to set position for camera.</translation>
+        <source>Unable to set position on camera.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Unable to set position of camera.</source>
+        <source>An error has occurred while trying to set the current position for camera %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to get the current position from camera %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7298,9 +7332,11 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>It is not allowed to make any changes except license activation.</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>The following %n items are not saved.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Could not save the following %n items to Server.</source>
@@ -7313,14 +7349,15 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>The following %n items are not deleted.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Could not delete the following %n items from Server.</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -7503,7 +7540,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Are you sure you want to permanently delete these %n item(s)?</source>
         <translation>
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -7534,7 +7570,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Are you sure you want to permanently delete these %n matrices?</source>
         <translation>
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -7546,14 +7581,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Are you sure you want to stop the Video Wall?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>You&apos;ll have to start it manually.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>%1&apos;s Screen</source>
         <comment>%1 means user&apos;s name</comment>
         <translation type="unfinished"></translation>
@@ -7561,10 +7588,6 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>A control session is already running.</source>
         <translation type="unfinished">A control session is already running.</translation>
-    </message>
-    <message>
-        <source>An unexpected error has occured. Changes cannot be applied.</source>
-        <translation type="unfinished">An unexpected error has occured. Changes cannot be applied.</translation>
     </message>
     <message>
         <source>There are no offline video wall items attached to this computer.</source>
@@ -7594,8 +7617,22 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>A Video Wall with the same name already exists.</source>
         <translation type="unfinished">A Video Wall with the same name already exists.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n items</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Are you sure you want to stop Video Wall?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You will have to start it manually.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The changes cannot be applied. Unexpected error occurred.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

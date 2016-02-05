@@ -116,8 +116,7 @@ SocketAddress Socket::getLocalAddress() const
     return SocketAddress( addr.sin_addr, ntohs(addr.sin_port) );
 }
 
-//!Implementation of AbstractSocket::close
-void Socket::close()
+void Socket::shutdown()
 {
     if( m_fd == -1 )
         return;
@@ -127,6 +126,16 @@ void Socket::close()
 #else
     ::shutdown(m_fd, SHUT_RDWR);
 #endif
+}
+
+
+//!Implementation of AbstractSocket::close
+void Socket::close()
+{
+    shutdown();
+
+    if( m_fd == -1 )
+        return;
 
 #ifdef WIN32
     ::closesocket(m_fd);
@@ -746,11 +755,8 @@ void CommunicatingSocket::close()
 
 void CommunicatingSocket::shutdown()
 {
-#ifdef Q_OS_WIN
-    ::shutdown(m_fd, SD_BOTH);
-#else
-    ::shutdown(m_fd, SHUT_RDWR);
-#endif
+    m_connected = false;
+    Socket::shutdown();
 }
 
 void CommunicatingSocket::cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion )

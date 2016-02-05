@@ -4,9 +4,6 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QGraphicsLinearLayout>
 
-#include <utils/common/delete_later.h>
-#include <utils/common/util.h> /* For random. */
-
 #include <business/business_strings_helper.h>
 
 #include <camera/single_thumbnail_loader.h>
@@ -42,6 +39,9 @@
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
 #include <health/system_health_helper.h>
 
+#include <utils/common/log.h>
+#include <utils/common/delete_later.h>
+#include <utils/common/util.h> /* For random. */
 #include <utils/math/color_transformations.h>
 #include <utils/app_server_notification_cache.h>
 #include <utils/multi_image_provider.h>
@@ -250,6 +250,9 @@ void QnNotificationsCollectionWidget::loadThumbnailForItem(QnNotificationWidget 
                                                            const QnVirtualCameraResourcePtr &camera,
                                                            qint64 msecSinceEpoch)
 {
+    if (!camera)
+        return;
+
     QnSingleThumbnailLoader *loader = new QnSingleThumbnailLoader(
           camera
         , msecSinceEpoch
@@ -266,6 +269,9 @@ void QnNotificationsCollectionWidget::loadThumbnailForItem(QnNotificationWidget 
                                                            const QnVirtualCameraResourceList &cameraList,
                                                            qint64 msecSinceEpoch)
 {
+    if (cameraList.isEmpty())
+        return;
+
     QnMultiImageProvider::Providers providers;
     for (const auto& camera: cameraList) {
         std::unique_ptr<QnImageProvider> provider(new QnSingleThumbnailLoader(
@@ -301,11 +307,22 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     }
 
     QnResourcePtr resource = qnResPool->getResourceById(params.eventResourceId);
-    if (!resource && QnBusiness::isResourceRequired(eventType))
-        return;
 
     QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
-    QnMediaServerResourcePtr source = qnResPool->getResourceById<QnMediaServerResource>(params.sourceServerId);
+    if (!camera && QnBusiness::isSourceCameraRequired(eventType))
+    {
+        Q_ASSERT_X(false, Q_FUNC_INFO, "Event has occurred without its camera");
+        NX_LOG(lit("Event %1 has occurred without its camera").arg(eventType), cl_logWARNING);
+        return;
+    }
+
+    QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
+    if (!server && QnBusiness::isSourceServerRequired(eventType))
+    {
+        Q_ASSERT_X(false, Q_FUNC_INFO, "Event has occurred without its server");
+        NX_LOG(lit("Event %1 has occurred without its server").arg(eventType), cl_logWARNING);
+        return;
+    }
 
     if (businessAction->actionType() == QnBusiness::ShowOnAlarmLayoutAction) {
         if (alarmCameras.isEmpty())
@@ -337,130 +354,136 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
 
     QIcon icon = iconForAction(businessAction);
 
+    enum { kMaxThumbnailCount = 5 };
     if (businessAction->actionType() == QnBusiness::ShowOnAlarmLayoutAction) {
         item->addActionButton(
             icon,
-            tr("Open in the Alarm Layout"),
+            tr("Open in Alarm Layout"),
             Qn::OpenInAlarmLayoutAction,
             QnActionParameters(alarmCameras)
             );
-        loadThumbnailForItem(item, alarmCameras);
+        loadThumbnailForItem(item, alarmCameras.mid(0, kMaxThumbnailCount));
     }
-
     else
-    switch (eventType) {
-    case QnBusiness::CameraMotionEvent: {
-        item->addActionButton(
-            icon,
-            tr("Browse Archive"),
-            Qn::OpenInNewLayoutAction,
-            QnActionParameters(resource).withArgument(Qn::ItemTimeRole, timestampMs)
-        );
-        loadThumbnailForItem(item, camera, timestampMs);
-        break;
-    }
-
-    case QnBusiness::CameraInputEvent: {
-        item->addActionButton(
-            icon,
-            QnDeviceDependentStrings::getNameFromSet(
-                QnCameraDeviceStringSet(
-                    tr("Open Device"),
-                    tr("Open Camera"),
-                    tr("Open IO Module")
-                ), camera
-            ),
-            Qn::OpenInNewLayoutAction,
-            QnActionParameters(resource)
-        );
-        loadThumbnailForItem(item, camera);
-        break;
-    }
-
-    case QnBusiness::CameraDisconnectEvent:
-    case QnBusiness::NetworkIssueEvent:
     {
-        item->addActionButton(
-            icon,
-            QnDeviceDependentStrings::getNameFromSet(
-                QnCameraDeviceStringSet(
-                    tr("Device Settings..."),
-                    tr("Camera Settings..."),
-                    tr("IO Module Settings...")
-                ), camera
-            ),
-            Qn::CameraSettingsAction,
-            QnActionParameters(resource)
-        );
-        loadThumbnailForItem(item, camera);
-        break;
-    }
-
-    case QnBusiness::StorageFailureEvent:
-    case QnBusiness::BackupFinishedEvent:
-    case QnBusiness::ServerStartEvent:
-    case QnBusiness::ServerFailureEvent:
-    {
-        item->addActionButton(
-            icon,
-            tr("Server Settings..."),
-            Qn::ServerSettingsAction,
-            QnActionParameters(resource)
-        );
-        break;
-    }
-
-    case QnBusiness::CameraIpConflictEvent: {
-        QString webPageAddress = params.caption;
-
-        item->addActionButton(
-            icon,
-            QnDeviceDependentStrings::getNameFromSet(
-                QnCameraDeviceStringSet(
-                    tr("Open Device Web Page..."),
-                    tr("Open Camera Web Page..."),
-                    tr("Open IO Module Web Page...")
-                ), camera
-            ),
-            Qn::BrowseUrlAction,
-            QnActionParameters().withArgument(Qn::UrlRole, webPageAddress)
-        );
-        break;
-    }
-
-    case QnBusiness::ServerConflictEvent: {
-        item->addActionButton(icon);
-        break;
-    }
-
-    case QnBusiness::LicenseIssueEvent: {
-        item->addActionButton(
-            icon,
-            tr("Licenses..."),
-            Qn::PreferencesLicensesTabAction
-            );
-        break;
-    }
-
-    case QnBusiness::UserDefinedEvent:
-    {
-        QnVirtualCameraResourceList sourceCameras = qnResPool->getResources<QnVirtualCameraResource>(params.metadata.cameraRefs);
-        if (!sourceCameras.isEmpty()) {
+        switch (eventType)
+        {
+        case QnBusiness::CameraMotionEvent:
+        {
             item->addActionButton(
                 icon,
                 tr("Browse Archive"),
                 Qn::OpenInNewLayoutAction,
-                QnActionParameters(sourceCameras).withArgument(Qn::ItemTimeRole, timestampMs)
+                QnActionParameters(camera).withArgument(Qn::ItemTimeRole, timestampMs)
                 );
-            loadThumbnailForItem(item, sourceCameras, timestampMs);
+            loadThumbnailForItem(item, camera, timestampMs);
+            break;
         }
-        break;
-    }
+        case QnBusiness::CameraInputEvent:
+        {
+            item->addActionButton(
+                icon,
+                QnDeviceDependentStrings::getNameFromSet(
+                    QnCameraDeviceStringSet(
+                        tr("Open Device"),
+                        tr("Open Camera"),
+                        tr("Open I/O Module")
+                    ), camera
+                ),
+                Qn::OpenInNewLayoutAction,
+                QnActionParameters(camera)
+            );
+            loadThumbnailForItem(item, camera);
+            break;
+        }
 
-    default:
-        break;
-    }
+        case QnBusiness::CameraDisconnectEvent:
+        case QnBusiness::NetworkIssueEvent:
+        {
+            item->addActionButton(
+                icon,
+                QnDeviceDependentStrings::getNameFromSet(
+                    QnCameraDeviceStringSet(
+                        tr("Device Settings..."),
+                        tr("Camera Settings..."),
+                        tr("I/O Module Settings...")
+                    ), camera
+                ),
+                Qn::CameraSettingsAction,
+                QnActionParameters(camera)
+            );
+            loadThumbnailForItem(item, camera);
+            break;
+        }
 
+        case QnBusiness::StorageFailureEvent:
+        case QnBusiness::BackupFinishedEvent:
+        case QnBusiness::ServerStartEvent:
+        case QnBusiness::ServerFailureEvent:
+        {
+            item->addActionButton(
+                icon,
+                tr("Server Settings..."),
+                Qn::ServerSettingsAction,
+                QnActionParameters(server)
+            );
+            break;
+        }
+
+        case QnBusiness::CameraIpConflictEvent:
+        {
+            QString webPageAddress = params.caption;
+
+            item->addActionButton(
+                icon,
+                QnDeviceDependentStrings::getNameFromSet(
+                    QnCameraDeviceStringSet(
+                        tr("Open Device Web Page..."),
+                        tr("Open Camera Web Page..."),
+                        tr("Open I/O Module Web Page...")
+                    ), camera
+                ),
+                Qn::BrowseUrlAction,
+                QnActionParameters().withArgument(Qn::UrlRole, webPageAddress)
+            );
+            break;
+        }
+
+        case QnBusiness::ServerConflictEvent:
+        {
+            item->addActionButton(icon);
+            break;
+        }
+
+        case QnBusiness::LicenseIssueEvent:
+        {
+            item->addActionButton(
+                icon,
+                tr("Licenses..."),
+                Qn::PreferencesLicensesTabAction
+                );
+            break;
+        }
+
+        case QnBusiness::UserDefinedEvent:
+        {
+            QnVirtualCameraResourceList sourceCameras = qnResPool->getResources<QnVirtualCameraResource>(params.metadata.cameraRefs);
+            if (!sourceCameras.isEmpty()) {
+                item->addActionButton(
+                    icon,
+                    tr("Browse Archive"),
+                    Qn::OpenInNewLayoutAction,
+                    QnActionParameters(sourceCameras).withArgument(Qn::ItemTimeRole, timestampMs)
+                    );
+                loadThumbnailForItem(item, sourceCameras.mid(0, kMaxThumbnailCount), timestampMs);
+            }
+            break;
+        }
+
+        default:
+            break;
+        }
+    }
 
 
     m_itemsByBusinessRuleId.insert(ruleId, item);
@@ -538,7 +561,7 @@ QIcon QnNotificationsCollectionWidget::iconForAction( const QnAbstractBusinessAc
     case QnBusiness::CameraDisconnectEvent:
     case QnBusiness::CameraIpConflictEvent:
     case QnBusiness::NetworkIssueEvent:
-        //TODO: #GDM #design #3.0 change icon if the device was IO Module
+        //TODO: #GDM #design #3.0 change icon if the device was I/O Module
         return qnSkin->icon("events/camera.png");
 
     case QnBusiness::StorageFailureEvent:

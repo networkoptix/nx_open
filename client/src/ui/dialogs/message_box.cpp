@@ -8,6 +8,8 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
+#include <ui/workaround/cancel_drag.h>
+
 static QMessageBox::StandardButton showNewMessageBox(QWidget *parent, QMessageBox::Icon icon, int helpTopicId, const QString& title, const QString& text, QMessageBox::StandardButtons buttons, QMessageBox::StandardButton defaultButton) {
     QnMessageBox msgBox(icon, helpTopicId, title, text, QMessageBox::NoButton, parent);
     QDialogButtonBox *buttonBox = msgBox.findChild<QDialogButtonBox *>();
@@ -33,8 +35,8 @@ static QMessageBox::StandardButton showNewMessageBox(QWidget *parent, QMessageBo
 }
 
 
-QnMessageBox::QnMessageBox(QWidget *parent): 
-    base_type(parent) 
+QnMessageBox::QnMessageBox(QWidget *parent):
+    base_type(parent)
 {}
 
 QnMessageBox::QnMessageBox(Icon icon, int helpTopicId, const QString &title, const QString &text, StandardButtons buttons, QWidget *parent, Qt::WindowFlags flags):
@@ -47,16 +49,36 @@ QnMessageBox::StandardButton QnMessageBox::information(QWidget *parent, int help
     return showNewMessageBox(parent, Information, helpTopicId, title, text, buttons, defaultButton);
 }
 
+QnMessageBox::StandardButton QnMessageBox::information(QWidget *parent, const QString &title, const QString &text, StandardButtons buttons /*= Ok*/, StandardButton defaultButton /*= NoButton*/)
+{
+    return showNewMessageBox(parent, Information, Qn::Empty_Help, title, text, buttons, defaultButton);
+}
+
 QMessageBox::StandardButton QnMessageBox::question(QWidget *parent, int helpTopicId, const QString &title, const QString& text, StandardButtons buttons, StandardButton defaultButton) {
     return showNewMessageBox(parent, Question, helpTopicId, title, text, buttons, defaultButton);
+}
+
+QnMessageBox::StandardButton QnMessageBox::question(QWidget *parent, const QString &title, const QString &text, StandardButtons buttons /*= Ok*/, StandardButton defaultButton /*= NoButton*/)
+{
+    return showNewMessageBox(parent, Question, Qn::Empty_Help, title, text, buttons, defaultButton);
 }
 
 QMessageBox::StandardButton QnMessageBox::warning(QWidget *parent, int helpTopicId, const QString &title, const QString& text, StandardButtons buttons, StandardButton defaultButton) {
     return showNewMessageBox(parent, Warning, helpTopicId, title, text, buttons, defaultButton);
 }
 
+QnMessageBox::StandardButton QnMessageBox::warning(QWidget *parent, const QString &title, const QString &text, StandardButtons buttons /*= Ok*/, StandardButton defaultButton /*= NoButton*/)
+{
+    return showNewMessageBox(parent, Warning, Qn::Empty_Help, title, text, buttons, defaultButton);
+}
+
 QMessageBox::StandardButton QnMessageBox::critical(QWidget *parent, int helpTopicId, const QString &title, const QString& text, StandardButtons buttons, StandardButton defaultButton) {
     return showNewMessageBox(parent, Critical, helpTopicId, title, text, buttons, defaultButton);
+}
+
+QnMessageBox::StandardButton QnMessageBox::critical(QWidget *parent, const QString &title, const QString &text, StandardButtons buttons /*= Ok*/, StandardButton defaultButton /*= NoButton*/)
+{
+    return showNewMessageBox(parent, Critical, Qn::Empty_Help, title, text, buttons, defaultButton);
 }
 
 QPushButton* QnMessageBox::addCustomButton(const QString &text, QMessageBox::ButtonRole role) {
@@ -80,21 +102,25 @@ QPushButton* QnMessageBox::addCustomButton(const QString &text, QMessageBox::But
             if (m_customButtons.contains(clicked))
                 return;
             emit defaultButtonClicked(clicked);
-        }); 
+        });
     }
-    
+
     m_customButtons << button;
-    
+
     return button;
 }
 
-int QnMessageBox::exec() {
+int QnMessageBox::exec()
+{
     Qt::WindowFlags flags = windowFlags();
     if (helpTopic(this) != Qn::Empty_Help)
         flags |= Qt::WindowContextHelpButtonHint;
     else
         flags &= ~Qt::WindowContextHelpButtonHint;
     setWindowFlags(flags);
+
+    /* We cannot cancel drag via modal dialog, let parent process it. */
+    cancelDrag(parentWidget());
 
     return base_type::exec();
 }

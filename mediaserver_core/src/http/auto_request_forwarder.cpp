@@ -26,6 +26,11 @@ static const qint64 USEC_PER_MS = 1000;
 
 void QnAutoRequestForwarder::processRequest( nx_http::Request* const request )
 {
+    //TODO #ak give up authentication-related types here in 2.6
+    const auto allowedMethods = m_restrictionList.getAllowedAuthMethods(*request);
+    if (!(allowedMethods & AuthMethod::videowall))
+        return; //not processing url
+
     const QUrlQuery urlQuery( request->requestLine.url.query() );
 
     if( urlQuery.hasQueryItem( Qn::SERVER_GUID_HEADER_NAME ) ||
@@ -84,6 +89,11 @@ void QnAutoRequestForwarder::processRequest( nx_http::Request* const request )
             Qn::SERVER_GUID_HEADER_NAME,
             serverRes->getId().toByteArray() );
     }
+}
+
+void QnAutoRequestForwarder::addPathToIgnore(const QString& pathWildcardMask)
+{
+    m_restrictionList.deny(pathWildcardMask, AuthMethod::videowall);
 }
 
 bool QnAutoRequestForwarder::findCameraGuid(

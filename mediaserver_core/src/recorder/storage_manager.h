@@ -144,7 +144,7 @@ signals:
     void noStoragesAvailable();
     void storageFailure(const QnResourcePtr &storageRes, QnBusiness::EventReason reason);
     void rebuildFinished(QnSystemHealth::MessageType msgType);
-    void backupFinished(qint64 backupedToMs, QnServer::BackupResultCode);
+    void backupFinished(qint64 backedUpToMs, QnBusiness::EventReason);
 public slots:
     void at_archiveRangeChanged(const QnStorageResourcePtr &resource, qint64 newStartTimeMs, qint64 newEndTimeMs);
     void onNewResource(const QnResourcePtr &resource);
@@ -241,13 +241,13 @@ private:
     bool m_initInProgress;
     QMap<QString, QSet<int>> m_oldStorageIndexes;
     mutable QnMutex m_csvMigrationMutex;
-    bool m_firstStorageTestDone;
     QElapsedTimer m_clearMotionTimer;
     QElapsedTimer m_clearBookmarksTimer;
     QElapsedTimer m_removeEmtyDirTimer;
     QMap<QString, qint64> m_lastCatalogTimes;
     QSharedPointer <QnStorageDbPool> m_storageDbPoolRef;
     std::unique_ptr<QnScheduleSync> m_scheduleSync;
+    std::atomic<bool> m_firstStoragesTestDone;
 };
 
 #define qnNormalStorageMan QnStorageManager::normalInstance()
