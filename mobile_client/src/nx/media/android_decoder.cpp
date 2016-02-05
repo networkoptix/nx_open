@@ -348,14 +348,14 @@ void AndroidDecoder::setAllocator(AbstractResourceAllocator* allocator)
     d->allocator = allocator;
 }
 
-bool AndroidDecoder::isCompatible(const QnConstCompressedVideoDataPtr& frame)
+bool AndroidDecoder::isCompatible(const CodecID codec, const QSize& resolution)
 {
     static QMap<CodecID, QSize> maxDecoderSize;
     static QMutex mutex;
 
     QMutexLocker lock(&mutex);
 
-    const QString codecMimeType = codecToString(frame->compressionType);
+    const QString codecMimeType = codecToString(codec);
     if (codecMimeType.isEmpty())
         return false;
 
@@ -370,7 +370,7 @@ bool AndroidDecoder::isCompatible(const QnConstCompressedVideoDataPtr& frame)
         qDebug() << "Maximum hardware decoder resolution:" << size << "for codec" << codecMimeType;
     }
     const QSize maxSize = maxDecoderSize[frame->compressionType];
-    return frame->width <= maxSize.width() && frame->height <= maxSize.height();
+    return resolution.width() <= maxSize.width() && resolution.height() <= maxSize.height();
 }
 
 int AndroidDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QnVideoFramePtr* result)

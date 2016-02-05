@@ -22,7 +22,7 @@ public:
 	FfmpegDecoder();
 	virtual ~FfmpegDecoder();
 
-	static bool isCompatible(const QnConstCompressedVideoDataPtr& frame);
+    static bool isCompatible(const CodecID codec, const QSize& resolution);
     virtual int decode(const QnConstCompressedVideoDataPtr& frame, QnVideoFramePtr* result = nullptr) override;
 private:
     void ffmpegToQtVideoFrame(QnVideoFramePtr* result);

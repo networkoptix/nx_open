@@ -124,10 +124,10 @@ FfmpegDecoder::~FfmpegDecoder()
 {
 }
 
-bool FfmpegDecoder::isCompatible(const QnConstCompressedVideoDataPtr& frame)
+bool FfmpegDecoder::isCompatible(const CodecID codec, const QSize& resolution)
 {
-	// todo: implement me
-    Q_UNUSED(frame);
+    Q_UNUSED(codec);
+    Q_UNUSED(resolution)
 	return true;
 }
 

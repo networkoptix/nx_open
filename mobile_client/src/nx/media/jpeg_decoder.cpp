@@ -22,9 +22,9 @@ JpegDecoder::JpegDecoder():
 {
 }
 
-bool JpegDecoder::isCompatible(const QnConstCompressedVideoDataPtr& frame)
+bool JpegDecoder::isCompatible(const CodecID codec, const QSize& resolution)
 {
-    return frame->compressionType == CODEC_ID_MJPEG;
+    return codec == CODEC_ID_MJPEG;
 }
 
 int JpegDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QnVideoFramePtr* result)

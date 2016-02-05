@@ -7,6 +7,7 @@
 
 #include <utils/common/delayed.h>
 #include "core/resource_management/resource_pool.h"
+#include <core/resource/camera_resource.h>
 #include <ui/texture_size_helper.h>
 
 #include "nx/streaming/archive_stream_reader.h"
@@ -14,6 +15,7 @@
 
 #include "player_data_consumer.h"
 #include "frame_metadata.h"
+#include "video_decoder_registry.h"
 
 namespace nx {
 namespace media {
@@ -322,14 +324,14 @@ qint64 PlayerPrivate::getNextTimeToRender(const QnVideoFramePtr& frame)
 bool PlayerPrivate::initDataProvider()
 {
     QnUuid id(url.path().mid(1));
-    QnResourcePtr camera = qnResPool->getResourceById(id);
-    if (!camera) 
+    QnResourcePtr resource = qnResPool->getResourceById(id);
+    if (!resource)
     {
         setMediaStatus(Player::MediaStatus::NoMedia);
         return false;
     }
-
-    archiveReader.reset(new QnArchiveStreamReader(camera));
+    
+    archiveReader.reset(new QnArchiveStreamReader(resource));
     dataConsumer.reset(new PlayerDataConsumer(archiveReader));
 
     archiveReader->setArchiveDelegate(new QnRtspClientArchiveDelegate(archiveReader.get()));
@@ -337,6 +339,19 @@ bool PlayerPrivate::initDataProvider()
     connect(dataConsumer.get(), &PlayerDataConsumer::gotVideoFrame, this, &PlayerPrivate::at_gotVideoFrame);
     connect(dataConsumer.get(), &PlayerDataConsumer::hurryUp, this, &PlayerPrivate::at_hurryUp);
     connect(dataConsumer.get(), &PlayerDataConsumer::onEOF, this, [this]() { setPosition(kLivePosition);  });
+    
+    QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
+    if (camera)
+    {
+        for (const auto& stream : camera->mediaStreams().streams)
+        {
+            if (stream.encoderIndex != CameraMediaStreamInfo::PRIMARY_STREAM_INDEX)
+                continue;
+            CodecID codec = (CodecID)stream.codec;
+            if (!VideoDecoderRegistry::instance()->hasCompatibleDecoder(codec, stream.getResolution()))
+                archiveReader->setQuality(MEDIA_Quality_Low, true); //< no compatible decoder for High quality. Force low quality
+        }
+    }
 
     if (position != kLivePosition)
         archiveReader->jumpTo(msecToUsec(position), msecToUsec(position)); //< second arg means precise seek

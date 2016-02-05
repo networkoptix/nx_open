@@ -24,7 +24,12 @@ public:
 	/*
 	* \returns optimal video decoder (in case of any) compatible with such frame. Returns null pointer if no compatible decoder found.
 	*/
-	VideoDecoderPtr createCompatibleDecoder(const QnConstCompressedVideoDataPtr& frame);
+    VideoDecoderPtr createCompatibleDecoder(const CodecID codec, const QSize& resolution);
+
+    /*
+    * \returns true if compatible video decoder found
+    */
+    bool hasCompatibleDecoder(const CodecID codec, const QSize& resolution);
 
 	/** Register video decoder plugin */
 	template <class Decoder>
@@ -39,7 +44,7 @@ private:
         Metadata() {}
 
 		std::function<AbstractVideoDecoder* ()> instance;
-		std::function<bool(const QnConstCompressedVideoDataPtr& frame)> isCompatible;
+		std::function<bool(const CodecID codec, const QSize& resolution)> isCompatible;
         std::shared_ptr<AbstractResourceAllocator> allocator;
 	};
 

@@ -27,7 +27,7 @@ public:
 	* \returns true if decoder is compatible with provided context.
 	* This function should be overridden despite static keyword. Otherwise it'll be compile error.
 	*/
-	static bool isCompatible(const QnConstCompressedVideoDataPtr& /* frame*/ ) { return false; }
+    static bool isCompatible(const CodecID /*codec */, const QSize& /*resolution*/) { return false; }
 
 	/*
 	* Decode a video frame. This is a sync function and it could take a lot of CPU.

@@ -161,7 +161,7 @@ bool SeamlessVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, Qn
 			}
 		}
         d->videoDecoder.reset(); //< release previous decoder in case if hardware decoder can handle single instance only
-		d->videoDecoder = VideoDecoderRegistry::instance()->createCompatibleDecoder(frame);
+		d->videoDecoder = VideoDecoderRegistry::instance()->createCompatibleDecoder(frame->compressionType, QSize(frame->width, frame->height));
         d->decoderFrameOffset = d->frameNumber;
 		d->prevFrameInfo = frameInfo;
 		d->clearMetadata();
