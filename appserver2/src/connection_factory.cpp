@@ -755,11 +755,11 @@ namespace ec2
         registerUpdateFuncHandler<ApiUpdateInstallData>(p, ApiCommand::installUpdate);
 
         //AbstractWebPageManager::getWebPages
-        registerGetFuncHandler<std::nullptr_t, ApiWebPageDataList>( restProcessorPool, ApiCommand::getWebPages );
+        registerGetFuncHandler<std::nullptr_t, ApiWebPageDataList>( p, ApiCommand::getWebPages );
         //AbstractWebPageManager::save
-        registerUpdateFuncHandler<ApiWebPageData>( restProcessorPool, ApiCommand::saveWebPage );
+        registerUpdateFuncHandler<ApiWebPageData>( p, ApiCommand::saveWebPage );
         //AbstractWebPageManager::remove
-        registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeWebPage );
+        registerUpdateFuncHandler<ApiIdData>( p, ApiCommand::removeWebPage );
 
         //AbstractDiscoveryManager::discoveredServerChanged
         registerUpdateFuncHandler<ApiDiscoveredServerData>(p, ApiCommand::discoveredServerChanged);
