@@ -1,7 +1,5 @@
 #include <deque>
 
-#include <QCache>
-
 #include "seamless_video_decoder.h"
 #include "abstract_video_decoder.h"
 #include "video_decoder_registry.h"
@@ -12,9 +10,6 @@
 
 namespace
 {
-    static const int kMetadataMaxSize = 32;
-    
-
     QSize mediaSizeFromRawData(const QnConstCompressedVideoDataPtr& frame)
     {
         const auto& context = frame->context;
@@ -72,7 +67,7 @@ public:
 	SeamlessVideoDecoderPrivate(SeamlessVideoDecoder *parent);
 
 	void addMetadata(const QnConstCompressedVideoDataPtr& frame);
-	const FrameMetadata* findMetadata(int frameNum) const;
+	const FrameMetadata findMetadata(int frameNum);
 	void clearMetadata();
     int decoderFrameNumToLocalNum(int value) const;
 public:
@@ -81,34 +76,37 @@ public:
 	FrameBasicInfo prevFrameInfo;
 	int frameNumber;         //< absolute frame number
     int decoderFrameOffset;  //< relate frame number (frameNumber value when decoder was created)
-	QCache<int, FrameMetadata> metadataCache;
+	std::deque<FrameMetadata> metadataQueue; //< Associate extra information for output frames which corresponding input frames
 };
 
 SeamlessVideoDecoderPrivate::SeamlessVideoDecoderPrivate(SeamlessVideoDecoder *parent):
 	QObject(parent),
 	q_ptr(parent),
 	frameNumber(0),
-    decoderFrameOffset(0),
-	metadataCache(kMetadataMaxSize)
+    decoderFrameOffset(0)
 {
 	
 }
 
 void SeamlessVideoDecoderPrivate::addMetadata(const QnConstCompressedVideoDataPtr& frame)
 {
-    auto metadata = new FrameMetadata(frame);
-    metadata->frameNum = frameNumber++;
-    metadataCache.insert(metadata->frameNum, metadata);
+    FrameMetadata metadata(frame);
+    metadata.frameNum = frameNumber++;
+    metadataQueue.push_back(std::move(metadata));
 }
 
-const FrameMetadata* SeamlessVideoDecoderPrivate::findMetadata(int frameNum) const
+const FrameMetadata SeamlessVideoDecoderPrivate::findMetadata(int frameNum)
 {
-	return metadataCache.object(frameNum);
+    while (!metadataQueue.empty() && metadataQueue.front().frameNum < frameNum)
+        metadataQueue.pop_front(); //< In case of decoder skipped some input frames
+    FrameMetadata result(std::move(metadataQueue.front()));
+    metadataQueue.pop_front();
+    return result;
 }
 
 void SeamlessVideoDecoderPrivate::clearMetadata()
 {
-	metadataCache.clear();
+    metadataQueue.clear();
 }
 
 int SeamlessVideoDecoderPrivate::decoderFrameNumToLocalNum(int value) const
@@ -153,9 +151,8 @@ bool SeamlessVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, Qn
 				int decodedFrameNum = d->videoDecoder->decode(QnConstCompressedVideoDataPtr(), &decodedFrame);
                 if (!decodedFrame)
 					break; //< decoder's buffer is flushed
-                const FrameMetadata* metadata = d->findMetadata(d->decoderFrameNumToLocalNum(decodedFrameNum));
-                if (metadata)
-                    metadata->serialize(decodedFrame);
+                const FrameMetadata metadata = d->findMetadata(d->decoderFrameNumToLocalNum(decodedFrameNum));
+                metadata.serialize(decodedFrame);
 				d->queue.push_back(std::move(decodedFrame));
 			}
 		}
@@ -174,9 +171,8 @@ bool SeamlessVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, Qn
 		decodedFrameNum = d->videoDecoder->decode(frame, &decodedFrame);
 		if (decodedFrame) 
 		{
-            const FrameMetadata* metadata = d->findMetadata(d->decoderFrameNumToLocalNum(decodedFrameNum));
-            if (metadata)
-                metadata->serialize(decodedFrame);
+            const FrameMetadata metadata = d->findMetadata(d->decoderFrameNumToLocalNum(decodedFrameNum));
+            metadata.serialize(decodedFrame);
 			d->queue.push_back(std::move(decodedFrame));
 		}
 	}

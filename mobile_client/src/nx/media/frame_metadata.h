@@ -17,6 +17,8 @@ struct FrameMetadata
 {
     FrameMetadata();
     FrameMetadata(const QnConstCompressedVideoDataPtr& frame);
+
+    bool isNull() const;
     void serialize(const QnVideoFramePtr& frame) const;
     static FrameMetadata deserialize(const QnConstVideoFramePtr& frame);
             
