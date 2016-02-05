@@ -17,7 +17,7 @@ namespace cloud {
 */
 class NX_NETWORK_API CloudServerSocket:
     public AbstractSocketAttributesCache<
-        AbstractStreamServerSocket, StreamSocketAttributes>
+        AbstractStreamServerSocket, SocketAttributes>
 {
 public:
     CloudServerSocket(
