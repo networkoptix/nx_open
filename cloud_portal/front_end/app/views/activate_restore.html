@@ -13,8 +13,8 @@
                        error-prefix="'Couldn\'t send confirmation email:'"></process-alert>
         <form name="reactivateAccount" class="form-horizontal" ng-if="!reactivate.success" novalidate>
             <div class="form-group" validate-field>
-                <label for="emailReactivate"  class="col-sm-3 control-label">Email address</label>
-                <div class="col-sm-5">
+                <label for="emailReactivate"  class="col-sm-4 control-label">Email address</label>
+                <div class="col-sm-4">
                     <input type="email" class="form-control"  ng-pattern="Config.emailRegex"
                            ng-model="data.email"
                            id="emailReactivate"
@@ -27,7 +27,7 @@
                 </div>
             </div>
             <div class="form-group">
-                <div class="col-sm-offset-3 col-sm-9">
+                <div class="col-sm-offset-4 col-sm-8">
                     <process-button process="reactivate"
                                     form="reactivateAccount"
                                     button-text="'Send'"></process-button>
@@ -43,8 +43,8 @@
                        error-prefix="'Couldn\'t send confirmation email:'"></process-alert>
         <form name="restorePassword" class="form-horizontal" ng-if="!restore.success" novalidate>
             <div class="form-group" validate-field>
-                <label for="email"  class="col-sm-3 control-label">Email address</label>
-                <div class="col-sm-5">
+                <label for="email"  class="col-sm-4 control-label">Email address</label>
+                <div class="col-sm-4">
                     <input type="email" class="form-control"  ng-pattern="Config.emailRegex"
                            ng-model="data.email"
                            id="email"
@@ -57,7 +57,7 @@
                 </div>
             </div>
             <div class="form-group">
-                <div class="col-sm-offset-3 col-sm-9">
+                <div class="col-sm-offset-4 col-sm-8">
                     <process-button process="restore"
                                     form="restorePassword"
                                     button-text="'Restore password'"></process-button>
@@ -76,7 +76,7 @@
             <password-input ng-model="data.newPassword" id="'newPassword'" label="'New password'"></password-input>
 
             <div class="form-group">
-                <div class="col-sm-offset-3 col-sm-9">
+                <div class="col-sm-offset-4 col-sm-8">
                     <process-button process="change"
                                     form="restorePasswordWithCode"
                                     button-text="'Save password'"></process-button>
