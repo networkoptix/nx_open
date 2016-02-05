@@ -306,9 +306,6 @@ qint64 PlayerPrivate::getNextTimeToRender(const QnVideoFramePtr& frame)
             liveBufferOverflow                                                   //< live buffer overflow
             )
 		{
-            if (liveBufferOverflow)
-                qDebug() << "reset because live overflow. len" << mediaQueueLen;
-
 			// Reset timer
 			lastVideoPts = ptsTimerBase = pts;
 			ptsTimer.restart();
