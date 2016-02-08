@@ -16,9 +16,15 @@
 int main( int argc, char **argv )
 {
     SocketGlobalsHolder socketGlobalsInstance;
-    //QnLog::initLog("DEBUG2");
-
     ::testing::InitGoogleTest(&argc, argv);
+
+    for (int i = 0; i < argc; ++i)
+    {
+        std::string arg(argv[i]);
+        if (arg.find("--log=") == 0)
+            QnLog::initLog(QString::fromStdString(arg.substr(6)));
+    }
+
     const int result = RUN_ALL_TESTS();
     return result;
 }

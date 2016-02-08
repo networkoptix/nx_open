@@ -9,15 +9,34 @@ namespace stun {
 
 const AsyncClient::Timeouts AsyncClient::DEFAULT_TIMEOUTS = { 3000, 3000, 60000 };
 
-AsyncClient::AsyncClient( Timeouts timeouts )
-    : m_timeouts( timeouts )
-    , m_useSsl( false )
-    , m_state( State::disconnected )
-    , m_timerSocket( SocketFactory::createStreamSocket() )
+boost::optional< QString >
+    AsyncClient::hasError(SystemError::ErrorCode code, const Message& message)
+{
+    if( code != SystemError::noError )
+        return lit( "System error %1: %2" )
+            .arg( code ).arg( SystemError::toString( code ) );
+
+    if( message.header.messageClass != MessageClass::successResponse )
+    {
+        if( const auto err = message.getAttribute< attrs::ErrorDescription >() )
+            return lit( "STUN error %1: %2" )
+                .arg( err->getCode() ).arg( QString::fromUtf8( err->getString() ) );
+        else
+            return lit( "STUN error without ErrorDescription" );
+    }
+
+    return boost::none;
+}
+
+AsyncClientImpl::AsyncClientImpl(Timeouts timeouts):
+    m_timeouts(timeouts),
+    m_useSsl(false),
+    m_state(State::disconnected),
+    m_timerSocket(SocketFactory::createStreamSocket())
 {
 }
 
-AsyncClient::~AsyncClient()
+AsyncClientImpl::~AsyncClientImpl()
 {
     std::unique_ptr< AbstractStreamSocket > connectingSocket;
     std::unique_ptr< BaseConnectionType > baseConnection;
@@ -39,7 +58,7 @@ AsyncClient::~AsyncClient()
     timerSocket->pleaseStopSync();
 }
 
-void AsyncClient::connect( SocketAddress endpoint, bool useSsl )
+void AsyncClientImpl::connect(SocketAddress endpoint, bool useSsl)
 {
     QnMutexLocker lock( &m_mutex );
     m_endpoint = std::move( endpoint );
@@ -47,19 +66,19 @@ void AsyncClient::connect( SocketAddress endpoint, bool useSsl )
     openConnectionImpl( &lock );
 }
 
-bool AsyncClient::setIndicationHandler( int method, IndicationHandler handler )
+bool AsyncClientImpl::setIndicationHandler(int method, IndicationHandler handler)
 {
-    QnMutexLocker lock( &m_mutex );
-    return m_indicationHandlers.emplace( method, std::move(handler) ).second;
+    QnMutexLocker lock(&m_mutex);
+    return m_indicationHandlers.emplace(method, std::move(handler)).second;
 }
 
-bool AsyncClient::ignoreIndications( int method )
+bool AsyncClientImpl::ignoreIndications(int method)
 {
-    QnMutexLocker lock( &m_mutex );
-    return m_indicationHandlers.erase( method );
+    QnMutexLocker lock(&m_mutex);
+    return m_indicationHandlers.erase(method);
 }
 
-void AsyncClient::sendRequest( Message request, RequestHandler handler )
+void AsyncClientImpl::sendRequest(Message request, RequestHandler handler)
 {
     QnMutexLocker lock( &m_mutex );
     m_requestQueue.push_back( std::make_pair(
@@ -86,7 +105,7 @@ void AsyncClient::sendRequest( Message request, RequestHandler handler )
     };
 }
 
-SocketAddress AsyncClient::localAddress() const
+SocketAddress AsyncClientImpl::localAddress() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_baseConnection
@@ -94,9 +113,14 @@ SocketAddress AsyncClient::localAddress() const
         : SocketAddress();
 }
 
-void AsyncClient::closeConnection(
+void AsyncClientImpl::closeConnection(SystemError::ErrorCode errorCode)
+{
+    closeConnection(errorCode, nullptr);
+}
+
+void AsyncClientImpl::closeConnection(
     SystemError::ErrorCode errorCode,
-    BaseConnectionType* connection )
+    BaseConnectionType* connection)
 {
 	std::unique_ptr< BaseConnectionType > baseConnection;
     {
@@ -113,26 +137,7 @@ void AsyncClient::closeConnection(
         baseConnection->pleaseStop();
 }
 
-boost::optional< QString >
-    AsyncClient::hasError( SystemError::ErrorCode code, const Message& message )
-{
-    if( code != SystemError::noError )
-        return lit( "System error %1: %2" )
-            .arg( code ).arg( SystemError::toString( code ) );
-
-    if( message.header.messageClass != MessageClass::successResponse )
-    {
-        if( const auto err = message.getAttribute< attrs::ErrorDescription >() )
-            return lit( "STUN error %1: %2" )
-                .arg( err->getCode() ).arg( QString::fromUtf8( err->getString() ) );
-        else
-            return lit( "STUN error without ErrorDescription" );
-    }
-
-    return boost::none;
-}
-
-void AsyncClient::openConnectionImpl( QnMutexLockerBase* lock )
+void AsyncClientImpl::openConnectionImpl(QnMutexLockerBase* lock)
 {
     if( !m_endpoint )
     {
@@ -179,8 +184,8 @@ void AsyncClient::openConnectionImpl( QnMutexLockerBase* lock )
     }
 }
 
-void AsyncClient::closeConnectionImpl( QnMutexLockerBase* lock,
-                                       SystemError::ErrorCode code )
+void AsyncClientImpl::closeConnectionImpl(
+        QnMutexLockerBase* lock, SystemError::ErrorCode code)
 {
     auto connectingSocket = std::move( m_connectingSocket );
     auto requestQueue = std::move( m_requestQueue );
@@ -207,7 +212,7 @@ void AsyncClient::closeConnectionImpl( QnMutexLockerBase* lock,
         });
 }
 
-void AsyncClient::dispatchRequestsInQueue( QnMutexLockerBase* lock )
+void AsyncClientImpl::dispatchRequestsInQueue(QnMutexLockerBase* lock)
 {
     static_cast< void >( lock );
     while( !m_requestQueue.empty() )
@@ -241,7 +246,7 @@ void AsyncClient::dispatchRequestsInQueue( QnMutexLockerBase* lock )
     }
 }
 
-void AsyncClient::onConnectionComplete( SystemError::ErrorCode code)
+void AsyncClientImpl::onConnectionComplete(SystemError::ErrorCode code)
 {
     QnMutexLocker lock( &m_mutex );
     if( m_state == State::terminated )
@@ -262,7 +267,7 @@ void AsyncClient::onConnectionComplete( SystemError::ErrorCode code)
     dispatchRequestsInQueue( &lock );
 }
 
-void AsyncClient::processMessage( Message message )
+void AsyncClientImpl::processMessage(Message message)
 {
     QnMutexLocker lock( &m_mutex );
     if( m_state == State::terminated )
