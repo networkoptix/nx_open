@@ -42,10 +42,12 @@
 #include <ui/graphics/items/generic/proxy_label.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/image_button_bar.h>
+#include <ui/graphics/items/resource/button_ids.h>
 #include <ui/graphics/items/resource/resource_widget_renderer.h>
 #include <ui/graphics/items/overlays/io_module_overlay_widget.h>
 #include <ui/graphics/items/overlays/resource_status_overlay_widget.h>
 #include <ui/graphics/items/overlays/composite_text_overlay.h>
+#include <ui/graphics/items/overlays/buttons_overlay.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/style/globals.h>
@@ -227,7 +229,8 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
 
 
     m_compositeTextOverlay->setMaxFillCoeff(QSizeF(0.7, 0.8));
-    addOverlayWidget(m_compositeTextOverlay, UserVisible, true, true);
+    addOverlayWidget(m_compositeTextOverlay
+        , detail::OverlayParams(UserVisible, true, true));
 
     /* Set up overlays */
     if (m_camera && m_camera->hasFlags(Qn::io_module))
@@ -236,7 +239,8 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
         m_ioModuleOverlayWidget = new QnIoModuleOverlayWidget();
         m_ioModuleOverlayWidget->setCamera(m_camera);
         m_ioModuleOverlayWidget->setAcceptedMouseButtons(0);
-        addOverlayWidget(m_ioModuleOverlayWidget, Visible, true, true);
+        addOverlayWidget(m_ioModuleOverlayWidget
+            , detail::OverlayParams(Visible, true, true));
 
         connect(m_ioLicenceStatusHelper, &QnSingleCamLicenceStatusHelper::licenceStatusChanged, this
             , [this]() { updateIoModuleVisibility(true); });
@@ -315,7 +319,7 @@ void QnMediaResourceWidget::createButtons() {
         screenshotButton->setToolTip(tr("Screenshot"));
         setHelpTopic(screenshotButton, Qn::MainWindow_MediaItem_Screenshot_Help);
         connect(screenshotButton, &QnImageButtonWidget::clicked, this, &QnMediaResourceWidget::at_screenshotButton_clicked);
-        buttonBar()->addButton(ScreenshotButton, screenshotButton);
+        buttonsOverlay()->rightButtonsBar()->addButton(Qn::ScreenshotButton, screenshotButton);
     }
 
     {
@@ -326,7 +330,7 @@ void QnMediaResourceWidget::createButtons() {
         searchButton->setToolTip(tr("Smart Search"));
         setHelpTopic(searchButton, Qn::MainWindow_MediaItem_SmartSearch_Help);
         connect(searchButton, &QnImageButtonWidget::toggled, this, &QnMediaResourceWidget::at_searchButton_toggled);
-        buttonBar()->addButton(MotionSearchButton, searchButton);
+        buttonsOverlay()->rightButtonsBar()->addButton(Qn::MotionSearchButton, searchButton);
     }
 
     {
@@ -337,7 +341,7 @@ void QnMediaResourceWidget::createButtons() {
         ptzButton->setToolTip(tr("PTZ"));
         setHelpTopic(ptzButton, Qn::MainWindow_MediaItem_Ptz_Help);
         connect(ptzButton, &QnImageButtonWidget::toggled, this, &QnMediaResourceWidget::at_ptzButton_toggled);
-        buttonBar()->addButton(PtzButton, ptzButton);
+        buttonsOverlay()->rightButtonsBar()->addButton(Qn::PtzButton, ptzButton);
     }
 
     {
@@ -349,7 +353,7 @@ void QnMediaResourceWidget::createButtons() {
         fishEyeButton->setChecked(item()->dewarpingParams().enabled);
         setHelpTopic(fishEyeButton, Qn::MainWindow_MediaItem_Dewarping_Help);
         connect(fishEyeButton, &QnImageButtonWidget::toggled, this, &QnMediaResourceWidget::at_fishEyeButton_toggled);
-        buttonBar()->addButton(FishEyeButton, fishEyeButton);
+        buttonsOverlay()->rightButtonsBar()->addButton(Qn::FishEyeButton, fishEyeButton);
     }
 
     {
@@ -360,7 +364,7 @@ void QnMediaResourceWidget::createButtons() {
         zoomWindowButton->setToolTip(tr("Create Zoom Window"));
         setHelpTopic(zoomWindowButton, Qn::MainWindow_MediaItem_ZoomWindows_Help);
         connect(zoomWindowButton, &QnImageButtonWidget::toggled, this, &QnMediaResourceWidget::at_zoomWindowButton_toggled);
-        buttonBar()->addButton(ZoomWindowButton, zoomWindowButton);
+        buttonsOverlay()->rightButtonsBar()->addButton(Qn::ZoomWindowButton, zoomWindowButton);
     }
 
     {
@@ -372,7 +376,7 @@ void QnMediaResourceWidget::createButtons() {
         enhancementButton->setChecked(item()->imageEnhancement().enabled);
         setHelpTopic(enhancementButton, Qn::MainWindow_MediaItem_ImageEnhancement_Help);
         connect(enhancementButton, &QnImageButtonWidget::toggled, this, &QnMediaResourceWidget::at_histogramButton_toggled);
-        buttonBar()->addButton(EnhancementButton, enhancementButton);
+        buttonsOverlay()->rightButtonsBar()->addButton(Qn::EnhancementButton, enhancementButton);
     }
 
     {
@@ -383,7 +387,7 @@ void QnMediaResourceWidget::createButtons() {
         ioModuleButton->setProperty(Qn::NoBlockMotionSelection, true);
         ioModuleButton->setToolTip(tr("I/O Module"));
         connect(ioModuleButton, &QnImageButtonWidget::toggled, this, &QnMediaResourceWidget::at_ioModuleButton_toggled);
-        buttonBar()->addButton(IoModuleButton, ioModuleButton);
+        buttonsOverlay()->rightButtonsBar()->addButton(Qn::IoModuleButton, ioModuleButton);
     }
 
     if (qnRuntime->isDevMode()) {
@@ -395,7 +399,7 @@ void QnMediaResourceWidget::createButtons() {
         connect(debugScreenshotButton, &QnImageButtonWidget::clicked, this, [this] {
             menu()->trigger(Qn::TakeScreenshotAction, QnActionParameters(this).withArgument<QString>(Qn::FileNameRole, lit("_DEBUG_SCREENSHOT_KEY_")));
         });
-        buttonBar()->addButton(DbgScreenshotButton, debugScreenshotButton);
+        buttonsOverlay()->rightButtonsBar()->addButton(Qn::DbgScreenshotButton, debugScreenshotButton);
     }
 
 }
@@ -681,24 +685,33 @@ void QnMediaResourceWidget::updateDisplay() {
     setDisplay(display);
 }
 
-void QnMediaResourceWidget::updateIconButton() {
-    if (!zoomRect().isNull()) {
-        iconButton()->setVisible(true);
-        iconButton()->setIcon(qnSkin->icon("item/zoom_window_hovered.png"));
-        iconButton()->setToolTip(tr("Zoom Window"));
+void QnMediaResourceWidget::updateIconButton()
+{
+    auto buttonsBar = buttonsOverlay()->leftButtonsBar();
+    if (!zoomRect().isNull())
+    {
+        auto iconButton = buttonsBar->button(Qn::RecordingStatusIconButton);
+        iconButton->setIcon(qnSkin->icon("item/zoom_window_hovered.png"));
+        iconButton->setToolTip(tr("Zoom Window"));
+
+        buttonsBar->setButtonsVisible(Qn::RecordingStatusIconButton, true);
         return;
     }
 
-    if(!m_camera) {
-        iconButton()->setVisible(false);
+    if(!m_camera)
+    {
+        buttonsBar->setButtonsVisible(Qn::RecordingStatusIconButton, false);
         return;
     }
 
     int recordingMode = QnRecordingStatusHelper::currentRecordingMode(m_camera);
     QIcon recIcon = QnRecordingStatusHelper::icon(recordingMode);
-    iconButton()->setVisible(!recIcon.isNull());
-    iconButton()->setIcon(recIcon);
-    iconButton()->setToolTip(QnRecordingStatusHelper::tooltip(recordingMode));
+
+    buttonsBar->setButtonsVisible(Qn::RecordingStatusIconButton, !recIcon.isNull());
+
+    auto iconButton = buttonsBar->button(Qn::RecordingStatusIconButton);
+    iconButton->setIcon(recIcon);
+    iconButton->setToolTip(QnRecordingStatusHelper::tooltip(recordingMode));
 }
 
 void QnMediaResourceWidget::updateRendererEnabled() {
@@ -714,7 +727,7 @@ ImageCorrectionParams QnMediaResourceWidget::imageEnhancement() const {
 }
 
 void QnMediaResourceWidget::setImageEnhancement(const ImageCorrectionParams &imageEnhancement) {
-    buttonBar()->button(EnhancementButton)->setChecked(imageEnhancement.enabled);
+    buttonsOverlay()->rightButtonsBar()->button(Qn::EnhancementButton)->setChecked(imageEnhancement.enabled);
     item()->setImageEnhancement(imageEnhancement);
     m_renderer->setImageCorrection(imageEnhancement);
 }
@@ -1027,7 +1040,7 @@ void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags) {
         if (QnAbstractArchiveStreamReader *reader = m_display->archiveReader())
             reader->setSendMotion(options() & DisplayMotion);
 
-        buttonBar()->setButtonsChecked(MotionSearchButton, options() & DisplayMotion);
+        buttonsOverlay()->rightButtonsBar()->setButtonsChecked(Qn::MotionSearchButton, options() & DisplayMotion);
 
         if(options() & DisplayMotion) {
             setProperty(Qn::MotionSelectionModifiers, 0);
@@ -1134,14 +1147,16 @@ QString QnMediaResourceWidget::calculateTitleText() const {
     }
 }
 
-QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() const {
-    Buttons result = base_type::calculateButtonsVisibility();
+int QnMediaResourceWidget::calculateButtonsVisibility() const
+{
+    int result = base_type::calculateButtonsVisibility();
+    bool hasVideo = this->hasVideo(); //m_resource->hasVideo(m_display->mediaProvider()); //TODO: #GDM #high check merge correctness
 
     if (qnRuntime->isDevMode())
-        result |= DbgScreenshotButton;
+        result |= Qn::DbgScreenshotButton;
 
-    if(hasVideo() && !(resource()->toResource()->flags() & Qn::still_image))
-        result |= ScreenshotButton;
+    if(hasVideo && !(resource()->toResource()->flags() & Qn::still_image))
+        result |= Qn::ScreenshotButton;
 
     bool rgbImage = false;
     QString url = resource()->toResource()->getUrl().toLower();
@@ -1151,14 +1166,14 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
     // and not on file extension checks!
     if(((resource()->toResource()->flags() & Qn::still_image)) && !url.endsWith(lit(".jpg")) && !url.endsWith(lit(".jpeg")))
         rgbImage = true;
-    if (!rgbImage && hasVideo())
-        result |= EnhancementButton;
+    if (!rgbImage && hasVideo)
+        result |= Qn::EnhancementButton;
 
     if (!zoomRect().isNull())
         return result;
 
-    if (hasVideo() && resource()->toResource()->hasFlags(Qn::motion))
-        result |= MotionSearchButton;
+    if (hasVideo && resource()->toResource()->hasFlags(Qn::motion))
+        result |= Qn::MotionSearchButton;
 
     bool isExportedLayout = item()
         && item()->layout()
@@ -1175,26 +1190,26 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
         && !isExportedLayout
         && !isPreviewSearchLayout
     ) {
-        result |= PtzButton;
+        result |= Qn::PtzButton;
     }
 
     if (m_dewarpingParams.enabled) {
-        result |= FishEyeButton;
-        result &= ~PtzButton;
+        result |= Qn::FishEyeButton;
+        result &= ~Qn::PtzButton;
     }
 
     if ((resource()->toResource()->hasFlags(Qn::io_module)))
     {
-        if (hasVideo())
-            result |= IoModuleButton;
+        if (hasVideo)
+            result |= Qn::IoModuleButton;
     }
 
-    if (!(qnSettings->lightMode() & Qn::LightModeNoZoomWindows) && hasVideo()) {
+    if (!(qnSettings->lightMode() & Qn::LightModeNoZoomWindows) && hasVideo) {
         if(item()
                 && item()->layout()
                 && accessController()->hasPermissions(item()->layout()->resource(), Qn::WritePermission | Qn::AddRemoveItemsPermission)
                 )
-            result |= ZoomWindowButton;
+            result |= Qn::ZoomWindowButton;
     }
 
     return result;
@@ -1232,8 +1247,8 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const 
             return Qn::EmptyOverlay;
 
 
-        const bool buttonIsVisible = (buttonBar()->visibleButtons() & IoModuleButton);
-        const QnImageButtonWidget * const button = buttonBar()->button(IoModuleButton);
+        const bool buttonIsVisible = (buttonsOverlay()->rightButtonsBar()->visibleButtons() & Qn::IoModuleButton);
+        const QnImageButtonWidget * const button = buttonsOverlay()->rightButtonsBar()->button(Qn::IoModuleButton);
         const bool licenceError = (!button || button->isChecked() || !buttonIsVisible); /// Io is invisble in this case if licence error
         const bool isNotZoomWindow = zoomRect().isNull();
 
@@ -1336,7 +1351,7 @@ void QnMediaResourceWidget::at_camDisplay_liveChanged() {
     bool isLive = m_display->camDisplay()->isRealTimeSource();
 
     if (!isLive) {
-        buttonBar()->setButtonsChecked(PtzButton, false);
+        buttonsOverlay()->rightButtonsBar()->setButtonsChecked(Qn::PtzButton, false);
         suspendHomePtzController();
     } else {
         resumeHomePtzController();
@@ -1353,7 +1368,7 @@ void QnMediaResourceWidget::at_searchButton_toggled(bool checked) {
     setOption(DisplayMotion, checked);
 
     if(checked)
-        buttonBar()->setButtonsChecked(PtzButton | FishEyeButton | ZoomWindowButton, false);
+        buttonsOverlay()->rightButtonsBar()->setButtonsChecked(Qn::PtzButton | Qn::FishEyeButton | Qn::ZoomWindowButton, false);
 }
 
 void QnMediaResourceWidget::at_ptzButton_toggled(bool checked) {
@@ -1363,7 +1378,7 @@ void QnMediaResourceWidget::at_ptzButton_toggled(bool checked) {
     setOption(ControlPtz, ptzEnabled);
     setOption(DisplayCrosshair, ptzEnabled);
     if(checked) {
-        buttonBar()->setButtonsChecked(MotionSearchButton | ZoomWindowButton, false);
+        buttonsOverlay()->rightButtonsBar()->setButtonsChecked(Qn::MotionSearchButton | Qn::ZoomWindowButton, false);
         action(Qn::JumpToLiveAction)->trigger(); // TODO: #Elric evil hack! Won't work if SYNC is off and this item is not selected?
     }
 }
@@ -1390,7 +1405,10 @@ void QnMediaResourceWidget::at_zoomWindowButton_toggled(bool checked) {
     setOption(ControlZoomWindow, checked);
 
     if(checked)
-        buttonBar()->setButtonsChecked(PtzButton | FishEyeButton | MotionSearchButton, false);
+    {
+        buttonsOverlay()->rightButtonsBar()->setButtonsChecked(
+        Qn::PtzButton | Qn::FishEyeButton | Qn::MotionSearchButton, false);
+    }
 }
 
 void QnMediaResourceWidget::at_histogramButton_toggled(bool checked) {
@@ -1447,10 +1465,10 @@ void QnMediaResourceWidget::updateFisheye() {
     setOption(ControlPtz, fisheyeEnabled && zoomRect().isEmpty());
     setOption(DisplayCrosshair, fisheyeEnabled && zoomRect().isEmpty());
     setOption(DisplayDewarped, fisheyeEnabled);
-    if (fisheyeEnabled && buttonBar()->button(FishEyeButton))
-        buttonBar()->button(FishEyeButton)->setChecked(fisheyeEnabled);
+    if (fisheyeEnabled && buttonsOverlay()->rightButtonsBar()->button(Qn::FishEyeButton))
+        buttonsOverlay()->rightButtonsBar()->button(Qn::FishEyeButton)->setChecked(fisheyeEnabled);
     if(enabled)
-        buttonBar()->setButtonsChecked(MotionSearchButton | ZoomWindowButton, false);
+        buttonsOverlay()->rightButtonsBar()->setButtonsChecked(Qn::MotionSearchButton | Qn::ZoomWindowButton, false);
 
     bool flip = fisheyeEnabled
             && m_dewarpingParams.viewMode == QnMediaDewarpingParams::VerticalDown;
@@ -1468,8 +1486,8 @@ void QnMediaResourceWidget::updateFisheye() {
 
     emit fisheyeChanged();
 
-    if(buttonBar()->visibleButtons() & PtzButton)
-        at_ptzButton_toggled(buttonBar()->checkedButtons() & PtzButton); // TODO: #Elric doesn't belong here, hack
+    if(buttonsOverlay()->rightButtonsBar()->visibleButtons() & Qn::PtzButton)
+        at_ptzButton_toggled(buttonsOverlay()->rightButtonsBar()->checkedButtons() & Qn::PtzButton); // TODO: #Elric doesn't belong here, hack
 }
 
 void QnMediaResourceWidget::updateCustomAspectRatio() {
@@ -1500,7 +1518,7 @@ void QnMediaResourceWidget::updateIoModuleVisibility(bool animate) {
     if (!m_camera || !m_camera->hasFlags(Qn::io_module) || !m_ioLicenceStatusHelper)
         return;
 
-    const QnImageButtonWidget * const button = buttonBar()->button(IoModuleButton);
+    const QnImageButtonWidget * const button = buttonsOverlay()->rightButtonsBar()->button(Qn::IoModuleButton);
     const bool ioBtnChecked = (button && button->isChecked());
     const bool onlyIoData = !hasVideo();
     const bool correctLicenceStatus = (m_ioLicenceStatusHelper->status() == QnSingleCamLicenceStatusHelper::LicenseUsed);

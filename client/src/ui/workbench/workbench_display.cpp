@@ -54,6 +54,7 @@
 #include <ui/graphics/instruments/tool_tip_instrument.h>
 #include <ui/graphics/instruments/widget_layout_instrument.h>
 
+#include <ui/graphics/items/resource/button_ids.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/server_resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -1767,7 +1768,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
 
         int checkedButtons = resourceWidget->item()->data<int>(Qn::ItemCheckedButtonsRole, -1);
         if(checkedButtons != -1)
-            resourceWidget->setCheckedButtons(static_cast<QnResourceWidget::Buttons>(checkedButtons));
+            resourceWidget->setCheckedButtons(checkedButtons);
 
         QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(widgets[i]);
         if(!widget)
@@ -1810,7 +1811,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
         }
 
         if(thumbnailed)
-            widget->item()->setData(Qn::ItemDisabledButtonsRole, static_cast<int>(QnMediaResourceWidget::PtzButton));
+            widget->item()->setData(Qn::ItemDisabledButtonsRole, static_cast<int>(Qn::PtzButton));
     }
 
     QVector<QnUuid> selectedUuids = layout->data(Qn::LayoutSelectionRole).value<QVector<QnUuid> >();

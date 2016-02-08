@@ -74,7 +74,14 @@ QnResourcePoolModel::QnResourcePoolModel(Scope scope, QObject *parent):
     m_urlsShown(true),
     m_scope(scope)
 {
-    m_rootNodeTypes << Qn::LocalNode << Qn::UsersNode << Qn::ServersNode << Qn::OtherSystemsNode << Qn::RootNode << Qn::BastardNode;
+    m_rootNodeTypes
+        << Qn::LocalNode
+        << Qn::UsersNode
+        << Qn::ServersNode
+        << Qn::WebPagesNode
+        << Qn::OtherSystemsNode
+        << Qn::RootNode
+        << Qn::BastardNode;
 
     /* Create top-level nodes. */
     foreach(Qn::NodeType t, m_rootNodeTypes) {
@@ -305,6 +312,13 @@ QnResourcePoolModelNode *QnResourcePoolModel::expectedParent(QnResourcePoolModel
             return m_rootNodes[Qn::BastardNode];
         else
             return m_rootNodes[Qn::RootNode];
+    }
+
+    if (node->resourceFlags().testFlag(Qn::web_page))
+    {
+        if (m_scope == FullScope)
+            return m_rootNodes[Qn::WebPagesNode];
+        return m_rootNodes[Qn::BastardNode];
     }
 
     QnResourcePtr parentResource = resourcePool()->getResourceById(node->resource()->getParentId());
@@ -640,7 +654,6 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
         updateParent(camera);
     }
 
-
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
     if (server) {
         connect(server,     &QnMediaServerResource::redundancyChanged,  this,   &QnResourcePoolModel::at_server_redundancyChanged);
@@ -678,6 +691,11 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
         foreach(const QnVideoWallMatrix &matrix, videoWall->matrices()->getItems())
             at_videoWall_matrixAddedOrChanged(videoWall, matrix);
     }
+
+    if (QnWebPageResourcePtr webPage = resource.dynamicCast<QnWebPageResource>())
+        m_rootNodes[Qn::WebPagesNode]->update();
+
+
 }
 
 void QnResourcePoolModel::at_resPool_resourceRemoved(const QnResourcePtr &resource) {
@@ -701,6 +719,9 @@ void QnResourcePoolModel::at_resPool_resourceRemoved(const QnResourcePtr &resour
     m_itemNodesByResource.remove(resource);
     m_recorderHashByResource.remove(resource);
     Q_ASSERT(!m_resourceNodeByResource.contains(resource));
+
+    if (QnWebPageResourcePtr webPage = resource.dynamicCast<QnWebPageResource>())
+        m_rootNodes[Qn::WebPagesNode]->update();
 }
 
 
@@ -708,6 +729,7 @@ void QnResourcePoolModel::rebuildTree() {
     m_rootNodes[Qn::LocalNode]->update();
     m_rootNodes[Qn::ServersNode]->update();
     m_rootNodes[Qn::UsersNode]->update();
+    m_rootNodes[Qn::WebPagesNode]->update();
     m_rootNodes[Qn::OtherSystemsNode]->update();
 
     foreach(QnResourcePoolModelNode *node, m_resourceNodeByResource)

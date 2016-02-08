@@ -694,6 +694,18 @@ QnActionManager::QnActionManager(QObject *parent):
             condition(new QnForbiddenInSafeModeCondition(this)).
             autoRepeat(false);
 
+        factory(Qn::NewWebPageAction).
+            flags(Qn::Main | Qn::Tree).
+            requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
+            text(tr("Web Page...")).
+            pulledText(tr("New Web Page...")).
+            condition(new QnConjunctionActionCondition(
+                new QnTreeNodeTypeCondition(Qn::WebPagesNode, this),
+                new QnForbiddenInSafeModeCondition(this),
+                this)
+                ).
+            autoRepeat(false);
+
     } factory.endSubMenu();
 
     factory(Qn::OpenCurrentUserLayoutMenu).
