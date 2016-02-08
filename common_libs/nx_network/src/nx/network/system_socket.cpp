@@ -850,7 +850,11 @@ void CommunicatingSocket<InterfaceToImplement>::registerTimer(
     unsigned int timeoutMs,
     std::function<void()> handler )
 {
-    return m_aioHelper->registerTimer( timeoutMs, std::move( handler ) );
+    //currently, aio considers 0 timeout as no timeout and will NOT call handler
+    Q_ASSERT(timeoutMs > 0);
+    if (timeoutMs == 0)
+        timeoutMs = 1;  //handler of zero timer will NOT be called
+    return m_aioHelper->registerTimer(timeoutMs, std::move(handler));
 }
 
 

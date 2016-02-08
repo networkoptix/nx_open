@@ -631,7 +631,8 @@ private:
     void stopPollingSocket(const aio::EventType eventType)
     {
         //TODO #ak move this method to aioservice?
-        nx::network::SocketGlobals::aioService().cancelPostedCalls(this->m_socket, true);
+        if (eventType == aio::etNone)
+            nx::network::SocketGlobals::aioService().cancelPostedCalls(this->m_socket, true);
         if (eventType == aio::etNone || eventType == aio::etRead)
             nx::network::SocketGlobals::aioService().removeFromWatch(this->m_socket, aio::etRead, true);
         if (eventType == aio::etNone || eventType == aio::etWrite)
