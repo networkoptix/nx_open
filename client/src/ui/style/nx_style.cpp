@@ -1652,7 +1652,11 @@ QSize QnNxStyle::sizeFromContents(
             const int kTriangularSize = dp(32);
 
             const QTabBar *tabBar = qobject_cast<const QTabBar*>(widget);
-            QSize result = size;
+
+            int width = size.width();
+            int height = size.height();
+
+            width += tab->leftButtonSize.width() + tab->rightButtonSize.width();
 
             switch (tab->shape)
             {
@@ -1661,14 +1665,11 @@ QSize QnNxStyle::sizeFromContents(
             case QTabBar::TriangularNorth:
             case QTabBar::TriangularSouth:
                 {
-                    int height = qMax(size.height(), isTabRounded(tab->shape) ? kRoundedSize : kTriangularSize);
-
+                    height = qMax(height, isTabRounded(tab->shape) ? kRoundedSize : kTriangularSize);
                     if (tabBar)
                         height = qMin(height, widget->maximumHeight());
-
-                    result.setHeight(height);
                 }
-                return result;
+                return QSize(width, height);
 
             default:
                 break;
