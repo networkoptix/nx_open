@@ -4,49 +4,46 @@
 ***********************************************************/
 
 #include "camera_advanced_settings_web_page.h"
-#include <QNetworkAccessManager>
-#include <QNetworkCookieJar>
-#include <QNetworkCookie>
+#include <QtNetwork/QNetworkAccessManager>
+#include <QtNetwork/QNetworkCookieJar>
+#include <QtNetwork/QNetworkCookie>
 #include "core/resource/resource.h"
 #include "http/custom_headers.h"
 
-class QnCustomCookieJar: public QNetworkCookieJar
-{
-public:
-    QnCustomCookieJar(QObject* parent = 0): QNetworkCookieJar(parent) {}
-
-    void setCamera(QnResourcePtr camRes)
+namespace {
+    class CustomCookieJar : public QNetworkCookieJar
     {
-        m_camRes = camRes;
-    }
+    public:
+        CustomCookieJar(QObject* parent = 0) : QNetworkCookieJar(parent) {}
 
-    virtual QList<QNetworkCookie> cookiesForUrl ( const QUrl & url ) const override 
-    {
-        QN_UNUSED(url);
-        QList<QNetworkCookie> result;
-        if (m_camRes)
-            result << QNetworkCookie(Qn::CAMERA_GUID_HEADER_NAME, m_camRes->getId().toByteArray());
-        return result;
-    }
-private:
-    QnResourcePtr m_camRes;
-};
+        void setCamera(QnResourcePtr camRes)
+        {
+            m_camRes = camRes;
+        }
 
-CameraAdvancedSettingsWebPage::CameraAdvancedSettingsWebPage( QObject* parent )
-:
-    QWebPage( parent )
-{
-    m_cookieJar = new QnCustomCookieJar(this);
-    networkAccessManager()->setCookieJar(m_cookieJar);
+        virtual QList<QNetworkCookie> cookiesForUrl(const QUrl & url) const override
+        {
+            QN_UNUSED(url);
+            QList<QNetworkCookie> result;
+            if (m_camRes)
+                result << QNetworkCookie(Qn::CAMERA_GUID_HEADER_NAME, m_camRes->getId().toByteArray());
+            return result;
+        }
+    private:
+        QnResourcePtr m_camRes;
+    };
 }
 
-QString	CameraAdvancedSettingsWebPage::userAgentForUrl( const QUrl& /*url*/ ) const
+CameraAdvancedSettingsWebPage::CameraAdvancedSettingsWebPage(QWebEngineProfile *profile, QObject* parent )
+    : QWebEnginePage(profile, parent )
+    , m_cookieJar(new CustomCookieJar(this))
 {
-    //this User-Agent is required for vista camera to use html/js page, not java applet
-    return lit("Mozilla/5.0 (Windows; U; Windows NT based; en-US) AppleWebKit/534.34 (KHTML, like Gecko)  QtWeb Internet Browser/3.8.5 http://www.QtWeb.net");
+    //TODO: #GDM fix 5.6 webengine
+    // networkAccessManager()->setCookieJar(m_cookieJar);
 }
 
-void CameraAdvancedSettingsWebPage::setCamera(QnResourcePtr camRes)
+void CameraAdvancedSettingsWebPage::setCamera(const QnResourcePtr & camera)
 {
-    m_cookieJar->setCamera(camRes);
+    if (CustomCookieJar* jar = dynamic_cast<CustomCookieJar *>(m_cookieJar))
+        jar->setCamera(camera);
 }

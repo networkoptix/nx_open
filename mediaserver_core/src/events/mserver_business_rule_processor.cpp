@@ -27,7 +27,7 @@
 #include "camera/get_image_helper.h"
 #include "core/resource_management/resource_properties.h"
 
-#include <QtConcurrent>
+#include <QtConcurrent/QtConcurrent>
 #include <utils/email/email.h>
 #include <nx/email/email_manager_impl.h>
 #include "nx_ec/data/api_email_data.h"

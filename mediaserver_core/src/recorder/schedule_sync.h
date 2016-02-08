@@ -1,7 +1,7 @@
 #ifndef __SHEDULE_SYNC_H__
 #define __SHEDULE_SYNC_H__
 
-#include <QtConcurrent>
+#include <QtConcurrent/QtConcurrent>
 #include <atomic>
 #include <vector>
 #include <map>

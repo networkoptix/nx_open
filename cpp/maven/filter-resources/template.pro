@@ -121,7 +121,7 @@ INCLUDEPATH +=  ${environment.dir}/boost_1_56_0 \
                 ${root.dir}/common_libs/nx_streaming/src \
                 ${libdir}/include \
                 $$ADDITIONAL_QT_INCLUDES \
-                ${qt.dir}/include/QtCore/$$QT_VERSION/ \
+                ${qt.dir}/include/QtCore/ \
                 ${qt.dir}/include/QtCore/$$QT_VERSION/QtCore/ \
 
 win* {

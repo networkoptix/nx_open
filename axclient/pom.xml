@@ -26,12 +26,13 @@
         <assembly-skip>true</assembly-skip>
         <rename-skip>true</rename-skip>
         <template>lib</template>
-        <qt.libs>core gui network opengl xml xmlpatterns sql multimedia concurrent webkit webkitwidgets</qt.libs>
+        <qt.libs>core gui network opengl xml xmlpatterns sql multimedia concurrent</qt.libs>
         <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc</ffmpeg.libs>
         <!--Global libs-->
-        <global.libs>-lcommon -lnx_streaming -lappserver2 -lclient.core -lclient -lFestival -lestools -leststring -lestbase -lquazip</global.libs>
+        <!-- Disabled msvs 2015 libs> -lFestival -lestools -leststring -lestbase/!-->
+        <global.libs>-lcommon -lappserver2 -lclient.core -lclient -lquazip</global.libs>
         <!--Specific os libs used-->
-        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lOle32 -lwinmm -lDxErr -ld3d9 -lopenal32 -lssleay32 -llibeay32 -lsigar</windows.oslibs>
+        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lOle32 -lwinmm -ld3d9 -lopenal32 -lssleay32 -llibeay32 -lsigar</windows.oslibs>
         <windows.oslibs.release/>
         <windows.oslibs.debug/>
 

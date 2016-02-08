@@ -1,7 +1,7 @@
 #include "update_process.h"
 
 #include <QtCore/QFutureWatcher>
-#include <QtConcurrent>
+#include <QtConcurrent/QtConcurrent>
 
 #include <client/client_settings.h>
 #include <common/common_module.h>

@@ -26,19 +26,20 @@
         <!--Specify the project to test-->      
         <master.project.directory>client</master.project.directory>
         <!--Global libs-->
-        <qt.libs>core gui network opengl xml sql multimedia concurrent webkit webkitwidgets</qt.libs>       
-        <global.libs>-lcommon -lnx_network -lnx_streaming -lappserver2 -lclient -lFestival -lestools -leststring -lestbase -lquazip</global.libs>
+        <qt.libs>core gui network opengl xml sql multimedia concurrent</qt.libs>       
+        <!-- Disabled msvs 2015 libs> -lFestival -lestools -leststring -lestbase</!-->
+        <global.libs>-lcommon -lnx_network -lnx_streaming -lappserver2 -lclient -lquazip</global.libs>
         <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc</ffmpeg.libs>
         <!--Specific os libs used-->
-        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -lDxErr -ld3d9 -lopenal32 -lssleay32 -llibeay32 -lsigar Wldap32.lib</windows.oslibs>
+        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -ld3d9 -lopenal32 -lssleay32 -llibeay32 -lsigar Wldap32.lib</windows.oslibs>
         <linux.oslibs>-lmp3lame -lssl -lcrypto -lz -lopenal -lX11 -lXfixes -lGL -lGLU -ltermcap -lsigar -lfaac -lXss</linux.oslibs>
-        <mac.oslibs>-lbz2 -lz -framework IOKit -framework CoreServices -framework OpenAL -ltermcap -lsigar-universal64-macosx -lFestival -lestools -leststring -lestbase</mac.oslibs>
+        <mac.oslibs>-lbz2 -lz -framework IOKit -framework CoreServices -framework OpenAL -ltermcap -lsigar-universal64-macosx</mac.oslibs>
         <windows.oslibs.release></windows.oslibs.release>
         <windows.oslibs.debug></windows.oslibs.debug>
         <!--Global defines-->
         <global.defines>CL_FORCE_LOGO</global.defines>
         <!--Specific os defines-->
-        <windows.defines>EC2_LIB_API=__declspec(dllimport) _VARIADIC_MAX=10</windows.defines>
+        <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
         <linux.defines/>
         <mac.defines/>
         <path>${env.PATH}</path>

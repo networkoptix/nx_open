@@ -5,7 +5,7 @@
 #include <QtCore/QJsonDocument>
 #include <QtCore/QUrlQuery>
 
-#include <QtConcurrent>
+#include <QtConcurrent/QtConcurrent>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>

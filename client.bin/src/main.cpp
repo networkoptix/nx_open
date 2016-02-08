@@ -109,7 +109,10 @@ extern "C"
 
 #include "utils/common/long_runnable.h"
 
+#ifdef ENABLE_TEXT_TO_SPEECH
 #include "text_to_wav.h"
+#endif
+
 #include "common/common_module.h"
 #include "ui/style/noptix_style.h"
 #include "ui/customization/customizer.h"
@@ -391,8 +394,10 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     application->setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 #endif
 
+#ifdef ENABLE_TEXT_TO_SPEECH
     QScopedPointer<TextToWaveServer> textToWaveServer(new TextToWaveServer());
     textToWaveServer->start();
+#endif
 
 #ifdef Q_WS_X11
     //   QnX11LauncherWorkaround x11LauncherWorkaround;
