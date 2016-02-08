@@ -77,14 +77,30 @@ private:
 #define CCAT(s1, s2) CONCATENATE_DIRECT(s1, s2)
 #define QnMutexLocker struct CCAT(QnMutexLocker, __LINE__) : public QnMutexLockerBase { CCAT(QnMutexLocker, __LINE__)(QnMutex* mtx) : QnMutexLockerBase( mtx, __FILE__, __LINE__) {} }
 
+class QnReadWriteLock
+    : public QnMutex
+{
+public:
+    void lockForWrite() { lock(); }
+    void lockForRead() { lock(); }
+};
+
+#define QnReadLocker QnMutexLocker
+#define QnWriteLocker QnMutexLocker
+
 #else   //USE_OWN_MUTEX
 
 #include <QtCore/QMutex>
 #include <QtCore/QMutexLocker>
+#include <QtCore/QReadWriteLock>
 
 typedef QMutex QnMutex;
 typedef QMutexLocker QnMutexLocker;
 typedef QMutexLocker QnMutexLockerBase;
+
+typedef QReadWriteLock QnReadWriteLock;
+typedef QReadLocker QnReadLocker;
+typedef QWriteLocker QnWriteLocker;
 
 #endif  //USE_OWN_MUTEX
 

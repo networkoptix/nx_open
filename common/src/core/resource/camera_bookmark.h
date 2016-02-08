@@ -125,7 +125,7 @@ struct QnCameraBookmarkSearchFilter
 
     static const int kNoLimit;
 };
-#define QnCameraBookmarkSearchFilter_Fields (startTimeMs)(endTimeMs)(text)(limit)(orderBy)
+#define QnCameraBookmarkSearchFilter_Fields (startTimeMs)(endTimeMs)(text)(limit)(orderBy)(sparsing)
 
 struct QnCameraBookmarkTag
 {
@@ -141,6 +141,11 @@ struct QnCameraBookmarkTag
         name(initName),
         count(initCount)
     {}
+
+    bool isValid() const
+    {
+        return !name.isEmpty();
+    }
 
     static QnCameraBookmarkTagList mergeCameraBookmarkTags(const QnMultiServerCameraBookmarkTagList &source, int limit = std::numeric_limits<int>().max());
 };

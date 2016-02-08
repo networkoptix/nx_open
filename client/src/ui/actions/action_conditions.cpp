@@ -1141,7 +1141,8 @@ Qn::ActionVisibility QnMergeToCurrentSystemActionCondition::check(const QnResour
         if (!server)
             return Qn::InvisibleAction;
 
-        if (!QnMediaServerResource::isFakeServer(resource))
+        Qn::ResourceStatus status = server->getStatus();
+        if (status != Qn::Incompatible && status != Qn::Unauthorized)
             return Qn::InvisibleAction;
 
         if (server->getModuleInformation().ecDbReadOnly)

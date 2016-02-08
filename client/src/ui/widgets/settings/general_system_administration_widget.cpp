@@ -33,6 +33,7 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
     setHelpTopic(ui->auditLogButton,        Qn::AuditTrail_Help);
     setHelpTopic(ui->eventLogButton,        Qn::EventLog_Help);
     setHelpTopic(ui->healthMonitorButton,   Qn::Administration_General_HealthMonitoring_Help);
+    setHelpTopic(ui->bookmarksButton,       Qn::Bookmarks_Usage_Help);
 
     connect(ui->businessRulesButton,    &QPushButton::clicked,  this, [this] { menu()->trigger(Qn::OpenBusinessRulesAction); } );
     connect(ui->cameraListButton,       &QPushButton::clicked, this, [this] { menu()->trigger(Qn::CameraListAction); } );

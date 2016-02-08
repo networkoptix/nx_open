@@ -65,6 +65,7 @@ signals:
     void dataDropped(QnArchiveStreamReader* reader);
 
 private:
+    void setRtpData(RTPIODevice* value);
     QnAbstractDataPacketPtr processFFmpegRtpPayload(quint8* data, int dataSize, int channelNum, qint64* parserPosition);
     void processMetadata(const quint8* data, int dataSize);
     bool openInternal();
@@ -123,6 +124,7 @@ private:
     } m_auth;
     
     std::atomic_flag m_footageUpToDate;
+    mutable QnMutex m_rtpDataMutex;
 };
 
 typedef QSharedPointer<QnRtspClientArchiveDelegate> QnRtspClientArchiveDelegatePtr;

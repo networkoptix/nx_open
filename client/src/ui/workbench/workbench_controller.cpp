@@ -47,6 +47,7 @@
 #include "ui/dialogs/sign_dialog.h" // TODO: move out.
 #include <ui/dialogs/custom_file_dialog.h>  //for QnCustomFileDialog::fileDialogOptions() constant
 #include <ui/dialogs/file_dialog.h>
+#include <ui/dialogs/message_box.h>
 
 #include <ui/animation/viewport_animator.h>
 #include <ui/animation/animator_group.h>
@@ -643,7 +644,7 @@ void QnWorkbenchController::at_screenRecorder_error(const QString &errorMessage)
     if (QnScreenRecorder::isSupported())
         action(Qn::ToggleScreenRecordingAction)->setChecked(false);
 
-    QMessageBox::warning(display()->view(), tr("Warning"), tr("Unable to start recording due to the following error: %1").arg(errorMessage));
+    QnMessageBox::warning(display()->view(), tr("Warning"), tr("Unable to start recording due to the following error: %1").arg(errorMessage));
 }
 
 void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &recordedFileName) {
@@ -671,7 +672,7 @@ void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &r
             if (!QFile::rename(recordedFileName, filePath)) {
                 QString message = tr("Could not overwrite file '%1'. Please try a different name.").arg(filePath);
                 CL_LOG(cl_logWARNING) cl_log.log(message, cl_logWARNING);
-                QMessageBox::warning(display()->view(), tr("Warning"), message, QMessageBox::Ok, QMessageBox::NoButton);
+                QnMessageBox::warning(display()->view(), tr("Warning"), message, QMessageBox::Ok, QMessageBox::NoButton);
                 continue;
             }
 
@@ -742,14 +743,14 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
     case Qt::Key_PageDown:
         break; /* Don't let the view handle these and scroll. */
     case Qt::Key_Menu: {
-        QGraphicsView *view = display()->view();        
+        QGraphicsView *view = display()->view();
         QList<QGraphicsItem *> items = display()->scene()->selectedItems();
         QPoint offset = view->mapToGlobal(QPoint(0, 0));
         if (items.count() == 0) {
             showContextMenuAt(offset);
         } else {
             QRectF rect = items[0]->mapToScene(items[0]->boundingRect()).boundingRect();
-            QRect testRect = QnSceneTransformations::mapRectFromScene(view, rect); /* Where is the static analogue? */ 
+            QRect testRect = QnSceneTransformations::mapRectFromScene(view, rect); /* Where is the static analogue? */
             showContextMenuAt(offset + testRect.bottomRight());
         }
         break;
@@ -823,7 +824,7 @@ void QnWorkbenchController::at_resizing(QGraphicsView *, QGraphicsWidget *item, 
         return;
 
     QRectF widgetGeometry = rotated(m_resizedWidget->geometry(), m_resizedWidget->rotation());
-    
+
     /* Calculate integer size. */
     QSize gridSize = mapper()->mapToGrid(widgetGeometry).size();
     if (gridSize.isEmpty())
@@ -1216,7 +1217,7 @@ void QnWorkbenchController::at_item_middleClicked(QGraphicsView *, QGraphicsItem
 
     int rotation = 0;
     if (widget->resource() && widget->resource()->hasProperty(QnMediaResource::rotationKey())) {
-        rotation = widget->resource()->getProperty(QnMediaResource::rotationKey()).toInt();        
+        rotation = widget->resource()->getProperty(QnMediaResource::rotationKey()).toInt();
     }
 
     widget->item()->setRotation(rotation);
@@ -1379,7 +1380,7 @@ void QnWorkbenchController::at_startSmartSearchAction_triggered() {
     displayMotionGrid(menu()->currentParameters(sender()).widgets(), true);
 }
 
-void QnWorkbenchController::at_checkFileSignatureAction_triggered() 
+void QnWorkbenchController::at_checkFileSignatureAction_triggered()
 {
     QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
     if (widgets.isEmpty())

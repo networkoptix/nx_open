@@ -66,7 +66,7 @@ namespace
             for (auto it = mergeDataIt + 1; it != mergeData.end(); ++it)
             {
                 const QnCameraBookmark *currentBookmark= it->first;
-                if (!pred(*minBookmark, *currentBookmark))
+                if (!pred(*currentBookmark, *minBookmark))
                     continue;
 
                 mergeDataIt = it;
@@ -246,9 +246,16 @@ bool QnCameraBookmark::isNull() const
     return guid.isNull();
 }
 
-QString QnCameraBookmark::tagsToString(const QnCameraBookmarkTags &bokmarkTags, const QString &delimiter)
+QString QnCameraBookmark::tagsToString(const QnCameraBookmarkTags &tags, const QString &delimiter)
 {
-    return QStringList(bokmarkTags.toList()).join(delimiter);
+    QStringList validTags;
+    for (const QString &tag: tags)
+    {
+        QString trimmed = tag.trimmed();
+        if (!trimmed.isEmpty())
+            validTags << trimmed;
+    }
+    return validTags.join(delimiter);
 }
 
 //TODO: #GDM #Bookmarks UNIT TESTS! and future optimization
@@ -335,7 +342,7 @@ QnCameraBookmarkTagList QnCameraBookmarkTag::mergeCameraBookmarkTags(const QnMul
 
 
 bool QnCameraBookmark::isValid() const {
-    return !isNull() && !cameraId.isEmpty();
+    return !isNull() && !cameraId.isEmpty() && durationMs > 0;
 }
 
 bool operator<(const QnCameraBookmark &first, const QnCameraBookmark &other) {

@@ -1,7 +1,16 @@
 #include "scoped_timer.h"
 
-QnScopedTimer::QnScopedTimer(const QString &description)
+QnScopedTimer::QnScopedTimer(const QString &description, qint64 detailMs)
     : m_description(description)
+    , m_detailMs(detailMs)
+{
+    logMessage(">", -1);
+    m_timer.start();
+}
+
+QnScopedTimer::QnScopedTimer(const char *description, qint64 detailMs)
+    : m_description(QString::fromUtf8(description))
+    , m_detailMs(detailMs)
 {
     logMessage(">", -1);
     m_timer.start();
@@ -24,6 +33,9 @@ void QnScopedTimer::logCurrentElapsedTime()
 
 void QnScopedTimer::logMessage(const char *tag, qint64 time)
 {
+    if (time < m_detailMs)
+        return;
+
     if (time >= 0)
         qDebug() << "[" << tag << m_description << "]:" << time << "ms";
     else

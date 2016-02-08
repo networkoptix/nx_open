@@ -344,75 +344,75 @@
     </message>
     <message>
         <source>Execute PTZ preset</source>
-        <translation type="unfinished"></translation>
+        <translation>Thực PTZ cài sẵn</translation>
     </message>
     <message>
         <source>Show text overlay</source>
-        <translation type="unfinished"></translation>
+        <translation>Hiện lớp phủ văn bản</translation>
     </message>
     <message>
         <source>Show on Alarm Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Hiển thị trên diện cảnh báo</translation>
     </message>
     <message>
         <source>Archive backup finished</source>
-        <translation type="unfinished"></translation>
+        <translation>Lưu trữ bản sao lưu đã hoàn thành</translation>
     </message>
     <message>
         <source>Server &apos;%1&apos; has finished an archive backup</source>
-        <translation type="unfinished"></translation>
+        <translation>Server &apos;%1&apos; đã hoàn thành một bản sao lưu kho lưu trữ</translation>
     </message>
     <message>
         <source>Generic Event at %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Sự kiện Generic %1</translation>
     </message>
     <message>
         <source>Input Port: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>cổng đầu vào: %1</translation>
     </message>
     <message>
         <source>Archive backup is successfully completed</source>
-        <translation type="unfinished"></translation>
+        <translation>Lưu trữ bản sao lưu hoàn tất thành công</translation>
     </message>
     <message>
         <source>I/O Module %1 was disconnected</source>
-        <translation type="unfinished"></translation>
+        <translation>I / O Module %1 đã bị ngắt kết nối</translation>
     </message>
     <message>
         <source>Conflicting Address: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Mâu thuẫn Địa chỉ: %1</translation>
     </message>
     <message>
         <source>Archive backup failed: No available backup storages with sufficient free space</source>
-        <translation type="unfinished"></translation>
+        <translation>Lưu trữ bản sao lưu không: Không có kho sao lưu có sẵn với dung lượng trống đủ</translation>
     </message>
     <message>
         <source>Archive backup failed: Target storage failure</source>
-        <translation type="unfinished"></translation>
+        <translation>Lưu trữ bản sao lưu không: mục tiêu Lỗi lưu trữ</translation>
     </message>
     <message>
         <source>Archive backup failed: Source file open/read error</source>
-        <translation type="unfinished"></translation>
+        <translation>Lưu trữ bản sao lưu không: tập tin nguồn mở / đọc lỗi</translation>
     </message>
     <message>
         <source>Archive backup failed: Target file create/write error</source>
-        <translation type="unfinished"></translation>
+        <translation>Lưu trữ bản sao lưu không: tập tin mục tiêu tạo / ghi lỗi</translation>
     </message>
     <message>
         <source>Archive backup failed: File catalog error</source>
-        <translation type="unfinished"></translation>
+        <translation>Lưu trữ bản sao lưu không: Danh mục tập tin lỗi</translation>
     </message>
     <message>
         <source>Archive backup finished, but isn&apos;t fully completed because backup time is over. Data is backed up to %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Lưu trữ bản sao lưu hoàn tất, nhưng không hoàn thành đầy đủ vì thời gian dự phòng là hơn. Dữ liệu được sao lưu vào %1</translation>
     </message>
     <message>
         <source>Archive backup is canceled by user. Data is backed up to %1</source>
-        <translation type="unfinished"></translation>
+        <translation>sao lưu kho lưu trữ được hủy bỏ bởi người dùng. Dữ liệu được sao lưu vào %1</translation>
     </message>
     <message>
         <source>Recording on I/O modules is disabled:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ghi trên I / O module là người khuyết tật:</translation>
     </message>
 </context>
 <context>
@@ -575,55 +575,55 @@
     </message>
     <message>
         <source>Camera plugin error. %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Máy ảnh Plugin lỗi. %1</translation>
     </message>
     <message>
         <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hãy cố gắng để khởi động lại các  I / O module, sau đó khôi phục mặc định nhà máy trên các trang web.</translation>
     </message>
     <message>
         <source>Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hãy chắc chắn rằng các I / O module được cắm vào mạng. Hãy thử khởi động lại các I / O module.</translation>
     </message>
     <message>
         <source>Could not parse I/O module response. Url %1, request name %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể phân tích tôi phản ứng I / Omodule. Url %1, yêu cầu tên %2.</translation>
     </message>
     <message>
         <source>First, try to turn on recording (if it&apos;s off) and decrease fps in I/O module settings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Đầu tiên, hãy thử bật ghi âm (nếu mình off) và giảm fps trong cài đặt I / O module tôi.</translation>
     </message>
     <message>
         <source>If it doesn&apos;t help, restore factory defaults on the I/O module web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>Đầu tiên, hãy thử bật ghi âm (nếu nó tắt) và giảm fps trong cài đặt I / O module tôi.</translation>
     </message>
     <message>
         <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>I / O Module yêu cầu &quot;%1&quot; thất bại với lỗi &quot;%2&quot;.</translation>
     </message>
     <message>
         <source>Unknown I/O module issue.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không biết I / O module vấn đề.</translation>
     </message>
     <message>
         <source>Invalid data was received from the I/O module %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>dữ liệu không hợp lệ đã nhận được từ các I / O module %1.</translation>
     </message>
     <message>
         <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
-        <translation type="unfinished"></translation>
+        <translation>Quá nhiều lỗi phương tiện truyền thông. Hãy mở tôi vấn đề I / O module thoại để biết thêm chi tiết.</translation>
     </message>
     <message>
         <source>Device initialization process is in progress.</source>
-        <translation type="unfinished"></translation>
+        <translation>quá trình khởi tạo thiết bị được tiến hành.</translation>
     </message>
     <message>
         <source>Camera initialization process is in progress.</source>
-        <translation type="unfinished"></translation>
+        <translation>quá trình khởi tạo máy ảnh được tiến hành.</translation>
     </message>
     <message>
         <source>I/O Module initialization process is in progress.</source>
-        <translation type="unfinished"></translation>
+        <translation>I / O Module khởi tạo quá trình được tiến hành.</translation>
     </message>
 </context>
 <context>
@@ -645,7 +645,7 @@
     </message>
     <message>
         <source>File explorer failed to open.</source>
-        <translation type="unfinished"></translation>
+        <translation>Thám hiểm tập tin không mở.</translation>
     </message>
 </context>
 <context>
@@ -660,11 +660,11 @@
     </message>
     <message>
         <source>Could not initialize audio encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể khởi tạo bộ mã hóa âm thanh.</translation>
     </message>
     <message>
         <source>Could not initialize audio decoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể khởi tạo bộ giải mã âm thanh.</translation>
     </message>
 </context>
 <context>
@@ -702,7 +702,7 @@
     </message>
     <message>
         <source>Could not initialize video encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể khởi tạo bộ mã hóa video.</translation>
     </message>
 </context>
 <context>
@@ -860,11 +860,11 @@
     </message>
     <message>
         <source>There was a problem activating your license key. A database error occurred.</source>
-        <translation type="unfinished"></translation>
+        <translation>Có một vấn đề kích hoạt key bản quyền của bạn. xảy ra một lỗi cơ sở dữ liệu.</translation>
     </message>
     <message>
         <source>There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.</source>
-        <translation type="unfinished"></translation>
+        <translation>Có một vấn đề kích hoạt key bản quyền của bạn. dữ liệu không hợp lệ nhận được. Hãy liên hệ với nhóm hỗ trợ để báo cáo vấn đề.</translation>
     </message>
 </context>
 <context>
@@ -941,31 +941,31 @@
     </message>
     <message numerus="yes">
         <source>%n I/O Module(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n I/O Module(s)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n I/O module(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n I/O module(s)</numerusform>
         </translation>
     </message>
     <message>
         <source>I/O Modules</source>
-        <translation type="unfinished"></translation>
+        <translation>I/O Modules</translation>
     </message>
     <message>
         <source>I/O modules</source>
-        <translation type="unfinished"></translation>
+        <translation>I/O modules</translation>
     </message>
     <message>
         <source>I/O Module</source>
-        <translation type="unfinished">I/O Module</translation>
+        <translation>I/O Module</translation>
     </message>
     <message>
         <source>I/O module</source>
-        <translation type="unfinished"></translation>
+        <translation>I/O module</translation>
     </message>
 </context>
 <context>
@@ -1093,7 +1093,7 @@
     </message>
     <message>
         <source>File write error. Not enough free space.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nộp ghi lỗi. Không đủ không gian trống.</translation>
     </message>
 </context>
 <context>
@@ -1157,7 +1157,7 @@
     <name>utils::QnCameraNamesWatcher</name>
     <message>
         <source>Removed camera</source>
-        <translation type="unfinished"></translation>
+        <translation>Di chuyển máy ảnh</translation>
     </message>
 </context>
 </TS>

@@ -25,6 +25,7 @@ Window {
     property string currentPasswrod
     property string currentSessionId
     property bool customConnection: false
+    property bool connectedToSystem: false
 
     readonly property bool isPhone: getDeviceIsPhone()
 
@@ -178,22 +179,34 @@ Window {
     Connections {
         target: connectionManager
 
-        onConnectionStateChanged: {
+        onConnectionStateChanged:
+        {
             var connectionState = connectionManager.connectionState
-            if (connectionState == QnConnectionManager.Connected) {
+            if (connectionState == QnConnectionManager.Connected)
+            {
                 LoginFunctions.saveCurrentSession()
                 loginSessionManager.lastUsedSessionId = currentSessionId
                 settings.sessionId = currentSessionId
                 currentSystemName = connectionManager.systemName
-                if (stackView.currentItem.objectName == "newConnectionPage" || stackView.currentItem.objectName == "loginPage") {
+
+                if (stackView.currentItem.objectName == "newConnectionPage" ||
+                    stackView.currentItem.objectName == "loginPage")
+                {
                     stackView.setFadeTransition()
                     Main.gotoResources()
                 }
-            } else if (connectionState == QnConnectionManager.Disconnected && currentSessionId == "") {
+
+                connectedToSystem = true
+            }
+            else if (connectionState == QnConnectionManager.Disconnected && currentSessionId == "")
+            {
                 loginSessionManager.lastUsedSessionId = ""
                 settings.sessionId = ""
-                if (stackView.currentItem.objectName != "newConnectionPage")
+
+                if (connectedToSystem || stackView.currentItem.objectName != "loginPage")
                     Main.gotoNewSession()
+
+                connectedToSystem = false
             }
         }
 
@@ -224,6 +237,11 @@ Window {
         } else {
             stackView.push([resourcesPageComponent, loginPageComponent])
         }
+    }
+
+    Component.onDestruction:
+    {
+        connectionManager.disconnectFromServer(true)
     }
 
     function updateNavigationBarPlaceholderSize() {
