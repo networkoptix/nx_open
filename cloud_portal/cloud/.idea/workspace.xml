@@ -2,21 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="95873933-5438-4b5b-9be0-62681759d3ec" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/notifications/static/templates/src/activate_account.mustache.body" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/notifications/static/templates/src/container.mustache.template" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/notifications/static/templates/src/preprocess.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/notifications/static/templates/src/restore_password.mustache.body" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/notifications/static/templates/src/styles.css" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/notifications/static/templates/src/system_invite.mustache.body" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/notifications/static/templates/src/system_shared.mustache.body" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/notifications/static/templates/src/unknown.mustache.body" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/notifications/static/templates/activate_account.mustache" afterPath="$PROJECT_DIR$/notifications/static/templates/activate_account.mustache" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/notifications/engines/email.py" afterPath="$PROJECT_DIR$/notifications/engines/email.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/notifications/static/templates/src/preprocess.py" afterPath="$PROJECT_DIR$/notifications/static/templates/src/preprocess.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/notifications/static/templates/restore_password.mustache" afterPath="$PROJECT_DIR$/notifications/static/templates/restore_password.mustache" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/notifications/static/templates/system_invite.mustache" afterPath="$PROJECT_DIR$/notifications/static/templates/system_invite.mustache" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/notifications/static/templates/system_shared.mustache" afterPath="$PROJECT_DIR$/notifications/static/templates/system_shared.mustache" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/notifications/static/templates/unknown.mustache" afterPath="$PROJECT_DIR$/notifications/static/templates/unknown.mustache" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="cloud.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -37,21 +28,31 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="email.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="email.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/notifications/engines/email.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.4617225">
+            <state vertical-scroll-proportion="-7.148148">
               <caret line="26" column="21" selection-start-line="26" selection-start-column="21" selection-end-line="26" selection-end-column="21" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="preprocess.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="email_body.mustache" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/notifications/static/templates/email_body.mustache">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="-17.777779">
+              <caret line="32" column="22" selection-start-line="32" selection-start-column="22" selection-end-line="32" selection-end-column="22" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="preprocess.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/notifications/static/templates/src/preprocess.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-8.814815">
-              <caret line="17" column="0" selection-start-line="17" selection-start-column="0" selection-end-line="23" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.6100478">
+              <caret line="17" column="133" selection-start-line="17" selection-start-column="133" selection-end-line="17" selection-end-column="133" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
               </folding>
@@ -62,8 +63,8 @@
       <file leaf-file-name="system_invite.mustache" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/notifications/static/templates/system_invite.mustache">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="14.518518">
-              <caret line="13" column="42" selection-start-line="13" selection-start-column="42" selection-end-line="13" selection-end-column="42" />
+            <state vertical-scroll-proportion="4.3333335">
+              <caret line="1" column="0" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -102,18 +103,8 @@
       <file leaf-file-name="activate_account.mustache" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/notifications/static/templates/activate_account.mustache">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-15.0">
-              <caret line="27" column="0" selection-start-line="27" selection-start-column="0" selection-end-line="27" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="system_invite.mustache.body" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/notifications/static/templates/src/system_invite.mustache.body">
-          <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="-0.0">
-              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
+              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -200,8 +191,8 @@
         <option value="$PROJECT_DIR$/notifications/static/templates/templates_src/system_shared.mustache.body" />
         <option value="$PROJECT_DIR$/notifications/static/templates/templates_src/unknown.mustache.body" />
         <option value="$PROJECT_DIR$/notifications/static/templates/templates_src/preprocess.py" />
-        <option value="$PROJECT_DIR$/notifications/static/templates/src/preprocess.py" />
         <option value="$PROJECT_DIR$/notifications/engines/email.py" />
+        <option value="$PROJECT_DIR$/notifications/static/templates/src/preprocess.py" />
       </list>
     </option>
   </component>
@@ -940,14 +931,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/notifications/static/templates/email_body.mustache">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-9.37037">
-          <caret line="30" column="50" selection-start-line="30" selection-start-column="32" selection-end-line="30" selection-end-column="50" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/notifications/static/templates/src/container.mustache.template">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-8.75">
@@ -1016,8 +999,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/notifications/static/templates/activate_account.mustache">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-15.0">
-          <caret line="27" column="0" selection-start-line="27" selection-start-column="0" selection-end-line="27" selection-end-column="0" />
+        <state vertical-scroll-proportion="-0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
         </state>
       </provider>
@@ -1038,20 +1021,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/notifications/static/templates/src/preprocess.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-8.814815">
-          <caret line="17" column="0" selection-start-line="17" selection-start-column="0" selection-end-line="23" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#15#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/notifications/static/templates/system_invite.mustache">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="14.518518">
-          <caret line="13" column="42" selection-start-line="13" selection-start-column="42" selection-end-line="13" selection-end-column="42" />
+        <state vertical-scroll-proportion="4.3333335">
+          <caret line="1" column="0" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
           <folding />
         </state>
       </provider>
@@ -1066,9 +1039,27 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/notifications/engines/email.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.4617225">
+        <state vertical-scroll-proportion="-7.148148">
           <caret line="26" column="21" selection-start-line="26" selection-start-column="21" selection-end-line="26" selection-end-column="21" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/notifications/static/templates/email_body.mustache">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-17.777779">
+          <caret line="32" column="22" selection-start-line="32" selection-start-column="22" selection-end-line="32" selection-end-column="22" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/notifications/static/templates/src/preprocess.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.6100478">
+          <caret line="17" column="133" selection-start-line="17" selection-start-column="133" selection-end-line="17" selection-end-column="133" />
+          <folding>
+            <element signature="e#0#15#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
