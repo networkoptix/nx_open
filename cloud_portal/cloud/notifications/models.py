@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils import timezone
-from engines import email
+from engines import email_engine
 from jsonfield import JSONField
 
 
@@ -17,5 +17,5 @@ class Message(models.Model):
         self.send_date = timezone.now()
 
         # TODO: initiate business-logic here
-        email.send(self.user_email, self.type, self.message)
+        email_engine.send(self.user_email, self.type, self.message)
         self.save()

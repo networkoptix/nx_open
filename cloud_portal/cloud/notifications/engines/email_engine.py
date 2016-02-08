@@ -1,6 +1,7 @@
 import codecs
 import pystache
-from django.core.mail import EmailMessage
+from django.core.mail import EmailMultiAlternatives
+from email.MIMEImage import MIMEImage
 from notifications.config import notifications_config, notifications_module_config
 import json
 
@@ -21,9 +22,20 @@ def send(email, msg_type, message):
 
     message_template = read_template(msg_type)
     email_body = pystache.render(message_template, {"message": message, "config": notifications_module_config})
+    email_text = ''
 
-    msg = EmailMessage(subject, email_body, to=(email,))
+    msg = EmailMultiAlternatives(subject, email_body, to=(email,))
+    msg.attach_alternative(email_body, "text/html")
+    msg.mixed_subtype = 'related'
+
     msg.content_subtype = "html"  # Main content is now text/html
+
+    logo_filename = 'notifications/static/templates/logo.png'
+    fp = open(logo_filename, 'rb')
+    msg_img = MIMEImage(fp.read())
+    fp.close()
+    msg_img.add_header('Content-ID', '<logo>')
+    msg.attach(msg_img)
     return msg.send()
 
 

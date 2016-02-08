@@ -6,4 +6,5 @@ MySQL-python
 pystache
 jsonfield
 enum34
+email
 py2-ipaddress
