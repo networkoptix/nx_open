@@ -306,6 +306,8 @@ public:
 
     //!Implementation of QnStoppable::pleaseStop
     virtual void pleaseStop( std::function< void() > handler ) override;
+    //!Implementation of QnStoppable::pleaseStopSync
+    virtual void pleaseStopSync() override;
 };
 
 struct NX_NETWORK_API StreamSocketInfo

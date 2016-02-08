@@ -12,14 +12,11 @@ namespace nx {
 namespace network {
 namespace cloud {
 
-//TODO #ak there can be AbstractAbstractTunnelConnection of different types:
-//    - direct or backward tcp connection (no hole punching used)
-//    - udt tunnel (no matter hole punching is used or not)
-//    - tcp with hole punching
-//Last type of tunnel does not allow us to have multiple connections per tunnel (really?)
-
-/** Implements one of cloud connection logics, multiplie certain implementations
-*  will be used by \class CloudTonel to use several connection methods simultiously */
+/** Represents connection established using a nat traversal method (UDP hole punching, tcp hole punching, reverse connection).
+    \note Calling party MUST guarantee that no methods of this class are used after 
+        \a QnStoppableAsync::pleaseStop call. 
+    \note It is allowed to free object right in \a QnStoppableAsync::pleaseStop completion handler
+ */
 class AbstractTunnelConnection
 :
     public QnStoppableAsync
@@ -37,8 +34,12 @@ public:
         std::unique_ptr<AbstractStreamSocket>,
         bool /*stillValid*/)> SocketHandler;
 
-    /** Creates new connection to peer or returns current with false in case if real
-    *  tunneling is notsupported by used method */
+    /** Creates new connection to the target peer.
+        \note Can return the only connection reporting \a stillValid as \a false 
+            in case if real tunneling is not supported by implementation
+        \note Implementation MUST guarantee that all handlers are invoked before 
+            \a QnStoppableAsync::pleaseStop completion
+     */
     virtual void establishNewConnection(
         boost::optional<std::chrono::milliseconds> timeout,
         SocketAttributes socketAttributes,
@@ -97,7 +98,6 @@ public:
     const String& getRemotePeerId() const { return m_remotePeerId; }
 
     /** Indicates tunnel state.
-        \note It is allowed to free \a Tunnel in \a State::kClosed handler
      */
     void setStateHandler(std::function<void(State)> handler);
 
@@ -113,7 +113,7 @@ protected:
     QnMutex m_mutex;
     State m_state;
     std::function<void(State)> m_stateHandler;
-    std::unique_ptr<AbstractTunnelConnection> m_connection;
+    std::shared_ptr<AbstractTunnelConnection> m_connection;
     const String m_remotePeerId;
 };
 

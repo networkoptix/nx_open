@@ -20,24 +20,37 @@ namespace nx {
 namespace network {
 namespace cloud {
 
-class OutgoingTunnelPool
+class NX_NETWORK_API OutgoingTunnelPool
 :
     public QnStoppableAsync
 {
 public:
+    OutgoingTunnelPool();
     virtual ~OutgoingTunnelPool();
 
     virtual void pleaseStop(std::function<void()> completionHandler) override;
 
-    std::shared_ptr<OutgoingTunnel> getTunnel(const AddressEntry& targetHostAddress);
+    /** Establish new connection.
+    * \param socketAttributes attribute values to apply to a newly-created socket
+    * \note This method is re-enterable. So, it can be called in
+    *        different threads simultaneously */
+    void establishNewConnection(
+        const AddressEntry& targetHostAddress,
+        boost::optional<std::chrono::milliseconds> timeout,
+        SocketAttributes socketAttributes,
+        OutgoingTunnel::NewConnectionHandler handler);
 
 private:
-    typedef std::map<QString, std::shared_ptr<OutgoingTunnel>> TunnelDictionary;
+    typedef std::map<QString, std::unique_ptr<OutgoingTunnel>> TunnelDictionary;
 
     QnMutex m_mutex;
     TunnelDictionary m_pool;
+    bool m_terminated;
 
+    const std::unique_ptr<OutgoingTunnel>& 
+        getTunnel(const AddressEntry& targetHostAddress);
     void removeTunnel(TunnelDictionary::iterator tunnelIter);
+    void tunnelsStopped(std::function<void()> completionHandler);
 };
 
 } // namespace cloud

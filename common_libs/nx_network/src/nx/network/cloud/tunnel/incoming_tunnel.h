@@ -11,7 +11,7 @@ namespace nx {
 namespace network {
 namespace cloud {
 
-class IncomingTunnel
+class NX_NETWORK_API IncomingTunnel
 :
     public Tunnel
 {
@@ -23,7 +23,7 @@ public:
 };
 
 /** Stores incoming cloud tunnels and accepts new sockets from them */
-class IncomingTunnelPool
+class NX_NETWORK_API IncomingTunnelPool
     : public QnStoppableAsync
 {
 public:
