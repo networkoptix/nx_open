@@ -3,6 +3,8 @@
 * a.kolesnikov
 ***********************************************************/
 
+#ifdef GDM_TODO
+
 #include "camera_advanced_settings_web_page.h"
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkCookieJar>
@@ -47,3 +49,5 @@ void CameraAdvancedSettingsWebPage::setCamera(const QnResourcePtr & camera)
     if (CustomCookieJar* jar = dynamic_cast<CustomCookieJar *>(m_cookieJar))
         jar->setCamera(camera);
 }
+
+#endif

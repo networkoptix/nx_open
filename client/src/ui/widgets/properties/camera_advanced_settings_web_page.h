@@ -6,6 +6,7 @@
 #ifndef CAMERA_ADVANCED_SETTINGS_WEB_PAGE_H
 #define CAMERA_ADVANCED_SETTINGS_WEB_PAGE_H
 
+#ifdef GDM_TODO
 #include <QtWebEngineWidgets/QWebEnginePage>
 #include <QtWebEngineWidgets/QWebEngineProfile>
 
@@ -21,5 +22,6 @@ public:
 private:
     QNetworkCookieJar* m_cookieJar;
 };
+#endif
 
 #endif  //CAMERA_ADVANCED_SETTINGS_WEB_PAGE_H

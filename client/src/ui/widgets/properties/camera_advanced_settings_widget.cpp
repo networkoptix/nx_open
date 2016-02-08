@@ -3,8 +3,10 @@
 
 #include <QtNetwork/QNetworkReply>
 
+#ifdef GDM_TODO
 #include <QtWebEngineWidgets/QWebEnginePage>
 #include <QtWebEngineWidgets/QWebEngineProfile>
+#endif
 
 #include <api/app_server_connection.h>
 
@@ -31,7 +33,9 @@ namespace {
 QnCameraAdvancedSettingsWidget::QnCameraAdvancedSettingsWidget(QWidget* parent /* = 0*/):
     base_type(parent),
     ui(new Ui::CameraAdvancedSettingsWidget),
+#ifdef GDM_TODO
     m_webView(nullptr),
+#endif
     m_page(Page::Empty)
 {
     ui->setupUi(this);
@@ -53,7 +57,9 @@ void QnCameraAdvancedSettingsWidget::setCamera(const QnVirtualCameraResourcePtr 
 
     QnMutexLocker locker( &m_cameraMutex );
     m_camera = camera;
+#ifdef GDM_TODO
     m_cameraAdvancedSettingsWebPage->setCamera(m_camera);
+#endif
     ui->cameraAdvancedParamsWidget->setCamera(m_camera);
 }
 
@@ -122,10 +128,11 @@ void QnCameraAdvancedSettingsWidget::reloadData() {
         targetUrl.setPassword( m_camera->getAuth().password() );
         //TODO: #GDM fix 5.6 webengine
         //m_cameraAdvancedSettingsWebPage->networkAccessManager()->setProxy(QnNetworkProxyFactory::instance()->proxyToResource(m_camera));
-
+#ifdef GDM_TODO
         m_webView->reload();
         m_webView->load(targetUrl);
         m_webView->show();
+#endif
     } else if (m_page == Page::Manual) {
         ui->cameraAdvancedParamsWidget->loadValues();
     }
@@ -148,7 +155,7 @@ void QnCameraAdvancedSettingsWidget::submitToResource()
 }
 
 void QnCameraAdvancedSettingsWidget::initWebView() {
-
+#ifdef GDM_TODO
     m_webView = new QWebEngineView(ui->webPage);
     ui->webPageLayout->addWidget(m_webView);
 
@@ -212,6 +219,7 @@ void QnCameraAdvancedSettingsWidget::initWebView() {
     connect(m_webView->page()->networkAccessManager(), &QNetworkAccessManager::proxyAuthenticationRequired,
         this, &QnCameraAdvancedSettingsWidget::at_proxyAuthenticationRequired, Qt::DirectConnection);
 */
+#endif
 }
 
 void QnCameraAdvancedSettingsWidget::at_authenticationRequired(QNetworkReply* /*reply*/, QAuthenticator * authenticator) {

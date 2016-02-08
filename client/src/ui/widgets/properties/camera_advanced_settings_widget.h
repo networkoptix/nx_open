@@ -2,7 +2,10 @@
 #define QN_CAMERA_ADVANCED_SETTINGS_WIDGET_H
 
 #include <QtWidgets/QWidget>
+
+#ifdef GDM_TODO
 #include <QtWebEngineWidgets/QWebEngineView>
+#endif
 
 #include <core/resource/resource_fwd.h>
 
@@ -53,11 +56,15 @@ private:
     void setPage(Page page);
 
     QScopedPointer<Ui::CameraAdvancedSettingsWidget> ui;
+#ifdef GDM_TODO
     QWebEngineView *m_webView;
+#endif
     Page m_page;
     QnVirtualCameraResourcePtr m_camera;
     QnMutex m_cameraMutex;
+#ifdef GDM_TODO
     CameraAdvancedSettingsWebPage* m_cameraAdvancedSettingsWebPage;
+#endif
 };
 
 #endif // QN_CAMERA_ADVANCED_SETTINGS_WIDGET_H
