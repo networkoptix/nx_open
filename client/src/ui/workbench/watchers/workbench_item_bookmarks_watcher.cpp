@@ -14,6 +14,8 @@
 #include <ui/graphics/items/overlays/composite_text_overlay.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 
+#include <utils/common/scoped_timer.h>
+
 namespace
 {
     enum
@@ -174,6 +176,8 @@ void QnWorkbenchItemBookmarksWatcher::WidgetData::updatePos(qint64 posMs)
 
 void QnWorkbenchItemBookmarksWatcher::WidgetData::updateQueryFilter()
 {
+    QN_LOG_TIME(Q_FUNC_INFO);
+
     const auto newWindow = (m_posMs == DATETIME_INVALID
         ? QnTimePeriod::fromInterval(DATETIME_INVALID, DATETIME_INVALID)
         : helpers::extendTimeWindow(m_posMs, m_posMs, kLeftOffset, kRightOffset));
@@ -191,9 +195,16 @@ void QnWorkbenchItemBookmarksWatcher::WidgetData::updateQueryFilter()
 
 void QnWorkbenchItemBookmarksWatcher::WidgetData::updateBookmarksAtPosition()
 {
+    QN_LOG_TIME(Q_FUNC_INFO);
+
     QnCameraBookmarkList bookmarks;
-    const auto range = std::equal_range(m_bookmarks.begin(), m_bookmarks.end(), m_posMs);
-    std::copy(range.first, range.second, std::back_inserter(bookmarks));
+
+    const auto endTimeGreaterThanPos = [this](const QnCameraBookmark &bookmark)
+        { return (bookmark.endTimeMs() > m_posMs); };
+
+    const auto itEnd = std::upper_bound(m_bookmarks.begin(), m_bookmarks.end(), m_posMs);
+    std::copy_if(m_bookmarks.begin(), itEnd, std::back_inserter(bookmarks), endTimeGreaterThanPos);
+
 
     m_bookmarksAtPos.setBookmarkList(bookmarks);
     if (m_timelineWatcher)
@@ -210,6 +221,8 @@ void QnWorkbenchItemBookmarksWatcher::WidgetData::updateBookmarks(const QnCamera
 
 void QnWorkbenchItemBookmarksWatcher::WidgetData::sendBookmarksToCompositeOverlay()
 {
+    QN_LOG_TIME(Q_FUNC_INFO);
+
     const auto compositeTextOverlay = m_mediaWidget->compositeTextOverlay();
     if (!compositeTextOverlay)
         return;

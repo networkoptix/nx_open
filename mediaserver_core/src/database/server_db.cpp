@@ -945,7 +945,7 @@ bool QnServerDb::getBookmarks(const QnVirtualCameraResourceList &cameras
         {
             QnCameraBookmark bookmark;
             QnSql::fetch(mapping, query.record(), &bookmark);
-            bookmark.tags = query.value(tagsFiledIdx).toString().split(lit(",")).toSet();
+            bookmark.tags = query.value(tagsFiledIdx).toString().split(lit(","), QString::SkipEmptyParts).toSet();
             result.push_back(std::move(bookmark));
 
             if (result.size() > limit)
@@ -1007,8 +1007,10 @@ QnCameraBookmarkTagList QnServerDb::getBookmarkTags(int limit) {
     QnSqlIndexMapping mapping = QnSql::mapping<QnCameraBookmarkTag>(query);
 
     while (query.next()) {
-        result.append(QnCameraBookmarkTag());
-        QnSql::fetch(mapping, query.record(), &result.last());
+        QnCameraBookmarkTag tag;
+        QnSql::fetch(mapping, query.record(), &tag);
+        if (tag.isValid())
+            result.append(tag);
     }
 
     return result;
@@ -1050,8 +1052,12 @@ bool QnServerDb::addOrUpdateBookmark( const QnCameraBookmark &bookmark) {
     const auto trimTags = [](const QnCameraBookmark &bookmark) -> QnCameraBookmarkTags
     {
         QnCameraBookmarkTags result;
-        for(const auto tag: bookmark.tags)
-            result.insert(tag.trimmed());
+        for (const auto tag: bookmark.tags)
+        {
+            QString trimmed = tag.trimmed();
+            if (!trimmed.isEmpty())
+                result.insert(tag.trimmed());
+        }
 
         return result;
     };

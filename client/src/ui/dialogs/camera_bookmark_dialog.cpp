@@ -1,11 +1,15 @@
 #include "camera_bookmark_dialog.h"
 #include "ui_camera_bookmark_dialog.h"
 
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
+
 QnCameraBookmarkDialog::QnCameraBookmarkDialog(QWidget *parent) :
     base_type(parent),
     ui(new Ui::QnCameraBookmarkDialog)
 {
     ui->setupUi(this);
+    setHelpTopic(this, Qn::Bookmarks_Editing_Help);
 }
 
 QnCameraBookmarkDialog::~QnCameraBookmarkDialog() {}
