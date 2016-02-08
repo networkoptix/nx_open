@@ -1716,6 +1716,12 @@ int QnNxStyle::styleHint(
         return Qt::LeftButton;
     case SH_Slider_StopMouseOverSlider:
         return true;
+    case SH_FormLayoutLabelAlignment:
+        return Qt::AlignRight | Qt::AlignVCenter;
+    case SH_FormLayoutFormAlignment:
+        return Qt::AlignLeft | Qt::AlignVCenter;
+    case SH_FormLayoutFieldGrowthPolicy:
+        return QFormLayout::AllNonFixedFieldsGrow;
     default:
         break;
     }

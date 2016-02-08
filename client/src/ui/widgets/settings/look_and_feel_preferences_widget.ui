@@ -38,9 +38,6 @@
       <bool>true</bool>
      </property>
      <layout class="QFormLayout" name="formLayout">
-      <property name="labelAlignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-      </property>
       <property name="horizontalSpacing">
        <number>8</number>
       </property>
@@ -210,9 +207,6 @@
       <bool>true</bool>
      </property>
      <layout class="QFormLayout" name="formLayout_2">
-      <property name="labelAlignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-      </property>
       <property name="horizontalSpacing">
        <number>8</number>
       </property>
@@ -323,9 +317,6 @@
       <bool>false</bool>
      </property>
      <layout class="QFormLayout" name="formLayout_3">
-      <property name="labelAlignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-      </property>
       <property name="horizontalSpacing">
        <number>8</number>
       </property>
