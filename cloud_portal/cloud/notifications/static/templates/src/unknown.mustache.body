@@ -1,0 +1,6 @@
+<h2>New message</h2>
+
+<p><b>Type:</b>{{message.type}} <br>
+<b>Data:</b> <pre>{{{message.data}}}</pre></p>
+
+<p class='disclaimer'>There is no template for this type of message</p>

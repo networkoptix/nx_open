@@ -1,0 +1,7 @@
+<h2>Welcome to Nx Cloud</h2>
+
+<p><a href="mailto:{{message.sharer_email}}">{{message.sharer_name}}</a> is inviting you to join <a href="{{config.portal_url}}">Nx Cloud</a>
+and shared his system system {{message.system_name}} with you.</p>
+
+<a class="btn" href="{{config.portal_url}}/register/{{user_email}}">Register and view the system</a>
+

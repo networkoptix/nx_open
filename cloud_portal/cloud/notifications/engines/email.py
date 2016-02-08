@@ -20,10 +20,7 @@ def send(email, msg_type, message):
         msg_type = 'unknown'
 
     message_template = read_template(msg_type)
-    message_body = pystache.render(message_template, {"message": message, "config": notifications_module_config})
-
-    email_template = read_template('email_body')
-    email_body = pystache.render(email_template, {"message_body": message_body})
+    email_body = pystache.render(message_template, {"message": message, "config": notifications_module_config})
 
     msg = EmailMessage(subject, email_body, to=(email,))
     msg.content_subtype = "html"  # Main content is now text/html

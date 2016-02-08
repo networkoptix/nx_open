@@ -1,0 +1,10 @@
+<h2>Welcome to Nx Cloud</h2>
+
+<p>Thank you for registering in Nx Cloud. Please, click the button below to confirm you e-mail address.</p>
+
+<a class="btn" href="{{config.portal_url}}/activate/{{message.code}}">Activate account</a>
+
+<p class='disclaimer'>
+If you haven't registered in nx Cloud, just ignore this letter.<br>
+Do not send this letter or link to account activation to anyone.
+</p>

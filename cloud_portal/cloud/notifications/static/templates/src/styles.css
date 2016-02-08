@@ -1,0 +1,38 @@
+.right-border{
+  border-right: 1px solid #E1E7EA;
+  padding-right:20px;
+}
+.left-border{
+  padding-left:20px;
+}
+.footer,.header{
+  padding-top:20px;
+  padding-bottom:20px;
+}
+.content{
+  padding:20px;
+  border: 1px solid #E1E7EA;
+}
+
+.btn{
+  border-radius:3px;
+  background-color:#2FA2DB;
+  display:inline-block;
+  padding:10px;
+  text-decoration:none;
+  text-align: center;
+  color: white;
+  font-weight: bold;
+    
+}
+
+.disclaimer{
+  margin-top:20px;
+  padding-top:20px;
+  border-top:1px solid #E1E7EA;
+}
+
+.disclaimer,.footer,.header{
+  color:#53707F;
+  font-size:90%;
+}
