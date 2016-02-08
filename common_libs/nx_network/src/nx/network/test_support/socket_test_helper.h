@@ -15,6 +15,7 @@
 #include <utils/common/joinable.h>
 #include <utils/common/stoppable.h>
 #include <nx/network/socket.h>
+#include <nx/network/system_socket.h>
 #include <nx/utils/thread/mutex.h>
 
 
@@ -153,6 +154,41 @@ private:
     int m_errorEmulationPercent;
 
     void onConnectionFinished( int id, ConnectionsContainer::iterator connectionIter );
+};
+
+/** \class TCPSocket modification which randomly connects to different ports
+ *  according to @param kShift */
+template<quint16 kShift>
+class MultipleClientSocketTester
+    : public TCPSocket
+{
+public:
+    MultipleClientSocketTester()
+        : TCPSocket() {}
+
+    bool connect(const SocketAddress& address, unsigned int timeout ) override
+    {
+        return TCPSocket::connect(modifyAddress(address), timeout);
+    }
+
+    void connectAsync(const SocketAddress& address,
+                      std::function<void(SystemError::ErrorCode)> handler) override
+    {
+        TCPSocket::connectAsync(modifyAddress(address), std::move(handler));
+    }
+
+private:
+    SocketAddress modifyAddress(const SocketAddress& address)
+    {
+        static quint16 modifier = 0;
+        if (m_address == SocketAddress())
+            m_address = SocketAddress(
+                address.address, address.port + (modifier++ % kShift));
+
+        return m_address;
+    }
+
+    SocketAddress m_address;
 };
 
 }   //test

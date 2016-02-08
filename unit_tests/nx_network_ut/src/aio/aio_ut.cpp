@@ -51,8 +51,7 @@ TEST(aio, socketPolledNotification)
         });
     std::atomic<bool> socketAddedFlag(false);
 
-    QnMutex mtx;
-    aio::AIOThread<Pollable> aioThread(&mtx);
+    aio::AIOThread<Pollable> aioThread;
     aioThread.start();
 
     aioThread.watchSocket(
@@ -100,8 +99,7 @@ TEST(aio, pollsetError)
             handlerCalledPromise.set_value();
         });
 
-    QnMutex mtx;
-    aio::detail::AIOThread<Pollable, TestPollSet> aioThread(&mtx);
+    aio::detail::AIOThread<Pollable, TestPollSet> aioThread;
     aioThread.start();
 
     aioThread.watchSocket(

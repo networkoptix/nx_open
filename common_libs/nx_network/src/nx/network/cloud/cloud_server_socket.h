@@ -20,9 +20,16 @@ class NX_NETWORK_API CloudServerSocket:
         AbstractStreamServerSocket, SocketAttributes>
 {
 public:
+    typedef std::function<std::unique_ptr<AbstractTunnelAcceptor>(
+            const String&  /*selfPeerId*/,
+            hpm::api::ConnectionRequestedEvent& /*event*/)> AcceptorMaker;
+
+    static const std::vector<AcceptorMaker> kDefaultAcceptorMakers;
+
     CloudServerSocket(
         std::shared_ptr<hpm::api::MediatorServerTcpConnection> mediatorConnection,
-        IncomingTunnelPool* tunnelPool);
+        IncomingTunnelPool* tunnelPool = nullptr /* SocketGlobals */,
+        std::vector<AcceptorMaker> acceptorMakers = kDefaultAcceptorMakers);
 
     //!Implementation of AbstractSocket::*
     bool bind(const SocketAddress& localAddress) override;
@@ -52,18 +59,14 @@ public:
                            AbstractStreamSocket*)> handler) override;
 
 protected:
-    void startAcceptor(
-        std::unique_ptr<AbstractTunnelAcceptor> connector,
-        std::shared_ptr<utils::AsyncOperationGuard::SharedGuard> sharedGuard);
-
+    void startAcceptor(std::unique_ptr<AbstractTunnelAcceptor> acceptor);
     void callAcceptHandler();
 
     const std::shared_ptr<hpm::api::MediatorServerTcpConnection> m_mediatorConnection;
+    const std::vector<AcceptorMaker> m_acceptorMakers;
     IncomingTunnelPool* const m_tunnelPool;
 
-    typedef AbstractTunnelAcceptor Acceptor;
-    std::map<Acceptor*, std::unique_ptr<Acceptor>> m_acceptors;
-
+    std::vector<std::unique_ptr<AbstractTunnelAcceptor>> m_acceptors;
     mutable SystemError::ErrorCode m_lastError;
     std::unique_ptr<AbstractCommunicatingSocket> m_ioThreadSocket;
     std::unique_ptr<AbstractCommunicatingSocket> m_timerThreadSocket;

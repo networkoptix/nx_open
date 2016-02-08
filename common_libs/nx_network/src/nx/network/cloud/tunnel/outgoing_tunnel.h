@@ -16,7 +16,14 @@ namespace nx {
 namespace network {
 namespace cloud {
 
-class OutgoingTunnel
+/**
+    \note \a OutgoingTunnel instance can be safely freed only after 
+        \a OutgoingTunnel::pleaseStop completion. It is allowed 
+        to free object in completion handler itself.
+        It is needed to guarantee that all clients receive response.
+    \note Calling party MUST not use object after \a OutgoingTunnel::pleaseStop call
+*/
+class NX_NETWORK_API OutgoingTunnel
 :
     public Tunnel
 {
@@ -26,15 +33,23 @@ public:
         std::unique_ptr<AbstractStreamSocket>)> NewConnectionHandler;
 
     OutgoingTunnel(AddressEntry targetPeerAddress);
+    virtual ~OutgoingTunnel();
 
+    /**
+       \note Calling party MUST not use object after \a OutgoingTunnel::pleaseStop call
+     */
     virtual void pleaseStop(std::function<void()> handler) override;
 
-    /** Establish new connection
+    /** Establish new connection.
     * \param socketAttributes attribute values to apply to a newly-created socket
     * \note This method is re-enterable. So, it can be called in
     *        different threads simultaneously */
     void establishNewConnection(
         boost::optional<std::chrono::milliseconds> timeout,
+        SocketAttributes socketAttributes,
+        NewConnectionHandler handler);
+    /** same as above, but no timeout */
+    void establishNewConnection(
         SocketAttributes socketAttributes,
         NewConnectionHandler handler);
 
@@ -54,7 +69,15 @@ private:
     std::map<CloudConnectType, std::unique_ptr<AbstractTunnelConnector>> m_connectors;
     //TODO #ak replace with aio timer when it is available
     UDPSocket m_aioThreadBinder;
+    bool m_terminated;
+    boost::optional<std::chrono::steady_clock::time_point> m_timerTargetClock;
+    int m_counter;
 
+    void updateTimerIfNeeded();
+    void updateTimerIfNeededNonSafe(
+        QnMutexLockerBase* const /*lock*/,
+        const std::chrono::steady_clock::time_point curTime);
+    void onTimer();
     void onConnectFinished(
         NewConnectionHandler handler,
         SystemError::ErrorCode code,
@@ -65,10 +88,15 @@ private:
     void onConnectorFinished(
         CloudConnectType connectorType,
         SystemError::ErrorCode errorCode,
-        std::unique_ptr<AbstractTunnelConnection> connection);
+        std::shared_ptr<AbstractTunnelConnection> connection);
 
-    static std::map<CloudConnectType, std::unique_ptr<AbstractTunnelConnector>>
-        createAllCloudConnectors(const AddressEntry& address);
+    void connectorsTerminated(
+        std::function<void()> pleaseStopCompletionHandler);
+    void connectorsTerminatedNonSafe(
+        QnMutexLockerBase* const /*lock*/,
+        std::function<void()> pleaseStopCompletionHandler);
+    void connectionTerminated(
+        std::function<void()> pleaseStopCompletionHandler);
 };
 
 } // namespace cloud

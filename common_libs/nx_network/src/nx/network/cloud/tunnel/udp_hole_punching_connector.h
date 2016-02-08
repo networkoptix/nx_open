@@ -23,6 +23,7 @@ public:
 
     virtual int getPriority() const override;
     virtual void connect(
+        std::chrono::milliseconds timeout,
         std::function<void(
             SystemError::ErrorCode errorCode,
             std::unique_ptr<AbstractTunnelConnection>)> handler) override;

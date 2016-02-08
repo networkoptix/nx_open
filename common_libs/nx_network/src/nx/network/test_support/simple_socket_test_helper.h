@@ -21,7 +21,7 @@ namespace /* anonimous */ {
 
 const SocketAddress kServerAddress("127.0.0.1:12345");
 const QByteArray kTestMessage("Ping");
-const int kClientCount(3);
+const int kClientCount(10);
 const std::chrono::milliseconds kTestTimeout(500);
 
 }
@@ -294,7 +294,7 @@ void socketSimpleAcceptMixed(
     ASSERT_TRUE(server->setNonBlockingMode(true));
     ASSERT_TRUE(server->setReuseAddrFlag(true));
     ASSERT_TRUE(server->bind(serverAddress));
-    ASSERT_TRUE(server->listen(5));
+    ASSERT_TRUE(server->listen(kClientCount));
 
     // no clients yet
     ASSERT_EQ(server->accept(), nullptr);

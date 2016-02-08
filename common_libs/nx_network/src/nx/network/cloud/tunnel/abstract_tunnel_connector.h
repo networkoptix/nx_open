@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <chrono>
 #include <functional>
 #include <memory>
 
@@ -33,6 +34,7 @@ public:
         \param handler \a AbstractTunnelConnector can be safely freed within this handler
      */
     virtual void connect(
+        std::chrono::milliseconds timeout,
         std::function<void(
             SystemError::ErrorCode errorCode,
             std::unique_ptr<AbstractTunnelConnection>)> handler) = 0;

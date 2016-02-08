@@ -358,14 +358,12 @@ bool CloudStreamSocket::startAsyncConnect(
                 return false;
 
             //establishing cloud connect
-            auto tunnel = SocketGlobals::outgoingTunnelPool().getTunnel(dnsEntry);
-            assert(tunnel);
-
             unsigned int sendTimeoutMillis = 0;
             if (!getSendTimeout(&sendTimeoutMillis))
                 return false;
             auto sharedOperationGuard = m_asyncConnectGuard.sharedGuard();
-            tunnel->establishNewConnection(
+            SocketGlobals::outgoingTunnelPool().establishNewConnection(
+                dnsEntry,
                 std::chrono::milliseconds(sendTimeoutMillis),
                 getSocketAttributes(),
                 [this, sharedOperationGuard](

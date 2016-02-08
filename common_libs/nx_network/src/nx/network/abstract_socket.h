@@ -281,6 +281,7 @@ public:
     //!Register timer on this socket
     /*!
         \param handler functor with no parameters
+        \note \a timeoutMs MUST be greater then zero!
     */
     virtual void registerTimer(
         unsigned int timeoutMs,
@@ -306,6 +307,8 @@ public:
 
     //!Implementation of QnStoppable::pleaseStop
     virtual void pleaseStop( std::function< void() > handler ) override;
+    //!Implementation of QnStoppable::pleaseStopSync
+    virtual void pleaseStopSync() override;
 };
 
 struct NX_NETWORK_API StreamSocketInfo

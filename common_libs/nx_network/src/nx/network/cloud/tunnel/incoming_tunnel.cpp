@@ -116,7 +116,9 @@ void IncomingTunnelPool::acceptTunnel(std::shared_ptr<IncomingTunnel> tunnel)
         if (m_acceptedSockets.size() >= m_acceptLimit)
         {
             // TODO: #mux Stop accepting tunnel?
-            NX_LOGX(lm("sockets queue overflow: %1").arg(m_acceptLimit), cl_logDEBUG1);
+            //  wouldn't really help while we acceptiong other tunnels
+            //  better to implement epoll like system with tunnels and their connections
+            NX_LOGX(lm("sockets queue overflow: %1").arg(m_acceptLimit), cl_logWARNING);
             return;
         }
 

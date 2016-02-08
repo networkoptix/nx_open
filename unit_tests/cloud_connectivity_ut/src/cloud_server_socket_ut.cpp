@@ -3,6 +3,7 @@
 #include <nx/network/system_socket.h>
 #include <nx/network/cloud/cloud_server_socket.h>
 #include <nx/network/test_support/simple_socket_test_helper.h>
+#include <nx/network/test_support/socket_test_helper.h>
 
 namespace nx {
 namespace network {
@@ -52,11 +53,13 @@ struct FakeTcpTunnelConnection : AbstractTunnelConnection
     std::unique_ptr<AbstractStreamServerSocket> m_server;
 };
 
-/** Creates \class FakeTcpTunnelConnection for each address */
+/** Creates several \class FakeTcpTunnelConnection */
 struct FakeTcpTunnelAcceptor : AbstractTunnelAcceptor
 {
-    FakeTcpTunnelAcceptor(std::vector<SocketAddress> addresses)
-        : m_addresses(std::move(addresses)) {}
+    FakeTcpTunnelAcceptor(SocketAddress address)
+    {
+        m_addresses.push_back(std::move(address));
+    }
 
     void accept(
         std::function<void(std::unique_ptr<AbstractTunnelConnection>)> handler) override
@@ -77,32 +80,37 @@ struct FakeTcpTunnelAcceptor : AbstractTunnelAcceptor
     std::vector<SocketAddress> m_addresses;
 };
 
-/** Creates FakeTcpTunnelAcceptor instead of real ones */
-struct CloudServerSocketTestCase : CloudServerSocket
+/** Creates @param kShift @class FakeTcpTunnelAcceptor(s) instead of real ones */
+template<quint16 nAcceptors>
+struct CloudServerSocketTcpTester : CloudServerSocket
 {
-    CloudServerSocketTestCase(IncomingTunnelPool* tunnelPool)
+    CloudServerSocketTcpTester(IncomingTunnelPool* tunnelPool)
         : CloudServerSocket(nullptr, tunnelPool) {}
 
     bool listen(int queueLen) override
     {
         m_tunnelPool->setAcceptLimit(queueLen);
-
-        // TODO: #mux use multiple acceptors
-        std::vector<SocketAddress> addresses;
-        addresses.push_back(nx::network::test::kServerAddress);
-
-        startAcceptor(
-            std::make_unique<FakeTcpTunnelAcceptor>(std::move(addresses)),
-            m_asyncGuard.sharedGuard());
+        for (quint16 i = 0; i < nAcceptors; i++)
+        {
+            auto addr = nx::network::test::kServerAddress;
+            startAcceptor(std::make_unique<FakeTcpTunnelAcceptor>(
+                SocketAddress(addr.address, addr.port + i)));
+        }
 
         return true;
     }
 };
 
-struct CloudServerSocketTest
+template<typename ServerSocket>
+struct CloudServerSocketTcpTest
     : public ::testing::Test
 {
 protected:
+    std::unique_ptr<ServerSocket> makeServerSocket()
+    {
+        return std::make_unique<ServerSocket>(&m_tunnelPool);
+    }
+
     void TearDown() override
     {
         m_tunnelPool.pleaseStopSync();
@@ -111,11 +119,21 @@ protected:
     IncomingTunnelPool m_tunnelPool;
 };
 
-// NOTE: sync tests are not working yet
+struct CloudServerSocketSingleTcpTest
+    : CloudServerSocketTcpTest<CloudServerSocketTcpTester<1>> {};
+
 NX_NETWORK_SERVER_SOCKET_TEST_CASE(
-    TEST_F, CloudServerSocketTest,
-    [this](){ return std::make_unique<CloudServerSocketTestCase>(&m_tunnelPool); },
+    TEST_F, CloudServerSocketSingleTcpTest,
+    [this](){ return makeServerSocket(); },
     &std::make_unique<TCPSocket>);
+
+struct CloudServerSocketMultiTcpAcceptorTest
+    : CloudServerSocketTcpTest<CloudServerSocketTcpTester<4>> {};
+
+NX_NETWORK_SERVER_SOCKET_TEST_CASE(
+    TEST_F, CloudServerSocketMultiTcpAcceptorTest,
+    [this](){ return makeServerSocket(); },
+    &std::make_unique<network::test::MultipleClientSocketTester<3>>);
 
 } // namespace cloud
 } // namespace network

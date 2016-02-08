@@ -9,11 +9,39 @@ namespace nx {
 namespace network {
 namespace cloud {
 
+static const std::vector<CloudServerSocket::AcceptorMaker> defaultAcceptorMakers()
+{
+    std::vector<CloudServerSocket::AcceptorMaker> makers;
+
+    makers.push_back([](
+        const String& selfPeerId, hpm::api::ConnectionRequestedEvent& event)
+    {
+        using namespace hpm::api::ConnectionMethod;
+        if (event.connectionMethods & udpHolePunching == 0)
+            return std::unique_ptr<AbstractTunnelAcceptor>();
+
+        event.connectionMethods ^= udpHolePunching; //< used
+        auto acceptor = std::make_unique<UdtTunnelAcceptor>(
+                std::move(selfPeerId), event.connectSessionID, event.originatingPeerID);
+
+        acceptor->setTargetAddresses(std::move(event.udpEndpointList));
+        return std::unique_ptr<AbstractTunnelAcceptor>(std::move(acceptor));
+    });
+
+    // TODO: #mux add other connectors when supported
+    return makers;
+}
+
+const std::vector<CloudServerSocket::AcceptorMaker>
+    CloudServerSocket::kDefaultAcceptorMakers = defaultAcceptorMakers();
+
 CloudServerSocket::CloudServerSocket(
         std::shared_ptr<hpm::api::MediatorServerTcpConnection> mediatorConnection,
-        IncomingTunnelPool* tunnelPool)
+        IncomingTunnelPool* tunnelPool,
+        std::vector<AcceptorMaker> acceptorMakers)
     : m_mediatorConnection(mediatorConnection)
-    , m_tunnelPool(tunnelPool)
+    , m_acceptorMakers(acceptorMakers)
+    , m_tunnelPool(tunnelPool ? tunnelPool : &SocketGlobals::incomingTunnelPool())
     , m_ioThreadSocket(new TCPSocket())
     , m_timerThreadSocket(new TCPSocket())
 {
@@ -23,10 +51,6 @@ CloudServerSocket::CloudServerSocket(
     //           system vales: think how to implement this...
     m_socketAttributes.recvTimeout = 0;
 }
-
-#ifdef CloudServerSocket_setSocketOption
-    #error CloudStreamSocket_setSocketOption macro is already defined.
-#endif
 
 bool CloudServerSocket::bind(const SocketAddress& localAddress)
 {
@@ -73,15 +97,6 @@ AbstractSocket::SOCKET_HANDLE CloudServerSocket::handle() const
     return (AbstractSocket::SOCKET_HANDLE)(-1);
 }
 
-template<typename T>
-static std::unique_ptr<T> makeAcceptor(hpm::api::ConnectionRequestedEvent& event)
-{
-    return std::make_unique<T>(
-        String(), //< TODO: #mux get selfId from m_mediatorConnection?
-        std::move(event.connectSessionID),
-        std::move(event.originatingPeerID));
-}
-
 bool CloudServerSocket::listen(int queueLen)
 {
     m_tunnelPool->setAcceptLimit(queueLen);
@@ -90,16 +105,13 @@ bool CloudServerSocket::listen(int queueLen)
     m_mediatorConnection->setOnConnectionRequestedHandler([this, sharedGuard](
         hpm::api::ConnectionRequestedEvent event)
     {
-        using namespace hpm::api::ConnectionMethod;
-        if (event.connectionMethods & udpHolePunching)
+        if (const auto lock = sharedGuard->lock())
         {
-            event.connectionMethods ^= udpHolePunching;
-            auto acceptor = makeAcceptor<UdtTunnelAcceptor>(event);
-            acceptor->setTargetAddresses(std::move(event.udpEndpointList));
-            startAcceptor(std::move(acceptor), std::move(sharedGuard));
+            const auto selfPeerId = m_mediatorConnection->selfPeerId();
+            for (const auto& maker: m_acceptorMakers)
+                if (auto acceptor = maker(selfPeerId, event))
+                    startAcceptor(std::move(acceptor));
         }
-
-        // TODO: #mux add other connectors when supported
 
         if (event.connectionMethods)
             NX_LOG(lm("Unsupported ConnectionMethods: %1")
@@ -120,15 +132,16 @@ AbstractStreamSocket* CloudServerSocket::accept()
         return nullptr;
     }
 
-    std::promise<std::pair<SystemError::ErrorCode, AbstractStreamSocket*>> promise;
+    std::promise<SystemError::ErrorCode> promise;
+    std::unique_ptr<AbstractStreamSocket> acceptedSocket;
     acceptAsync([&](SystemError::ErrorCode code, AbstractStreamSocket* socket)
     {
-        promise.set_value(std::make_pair(code, socket));
+        acceptedSocket.reset(socket);
+        post([&promise, code](){ promise.set_value(code); } );
     });
 
-    const auto result = promise.get_future().get();
-    SystemError::setLastErrorCode(result.first);
-    return result.second;
+    SystemError::setLastErrorCode(promise.get_future().get());
+    return acceptedSocket.release();
 }
 
 void CloudServerSocket::pleaseStop(std::function<void()> handler)
@@ -136,12 +149,17 @@ void CloudServerSocket::pleaseStop(std::function<void()> handler)
     // prevent any further locks on given sharedLocks
     m_asyncGuard.reset();
 
-    BarrierHandler barrier(std::move(handler));
+    BarrierHandler barrier([this, handler]()
+    {
+        m_acceptors.clear();
+        handler();
+    });
+
     m_ioThreadSocket->pleaseStop(barrier.fork());
     m_timerThreadSocket->pleaseStop(barrier.fork());
 
     for (auto& connector : m_acceptors)
-        connector.second->pleaseStop(barrier.fork());
+        connector->pleaseStop(barrier.fork());
 }
 
 void CloudServerSocket::post(std::function<void()> handler)
@@ -172,11 +190,6 @@ void CloudServerSocket::acceptAsync(
     m_acceptHandler = std::move(handler);
     NX_LOGX(lm("accept async"), cl_logDEBUG2);
 
-    unsigned int timeout;
-    if (getRecvTimeout(&timeout) && timeout != 0)
-        m_timerThreadSocket->registerTimer(
-            timeout, [this](){ callAcceptHandler(); });
-
     auto sharedGuard = m_asyncGuard.sharedGuard();
     m_tunnelPool->getNextSocketAsync([this, sharedGuard]
         (std::unique_ptr<AbstractStreamSocket> socket)
@@ -190,19 +203,20 @@ void CloudServerSocket::acceptAsync(
             m_timerThreadSocket->post([this](){ callAcceptHandler(); });
         }
     });
+
+    unsigned int timeout;
+    if (getRecvTimeout(&timeout) && timeout != 0)
+        m_timerThreadSocket->registerTimer(
+            timeout, [this](){ callAcceptHandler(); });
 }
 
 void CloudServerSocket::startAcceptor(
-        std::unique_ptr<Acceptor> acceptor,
-        std::shared_ptr<utils::AsyncOperationGuard::SharedGuard> sharedGuard)
+        std::unique_ptr<AbstractTunnelAcceptor> acceptor)
 {
     auto acceptorPtr = acceptor.get();
-    if (auto lock = sharedGuard->lock())
-    {
-        const auto insert = m_acceptors.emplace(acceptorPtr, std::move(acceptor));
-        Q_ASSERT(insert.second);
-    }
+    m_acceptors.push_back(std::move(acceptor));
 
+    auto sharedGuard = m_asyncGuard.sharedGuard();
     acceptorPtr->accept([this, acceptorPtr, sharedGuard](
         std::unique_ptr<AbstractTunnelConnection> connection)
     {
@@ -210,7 +224,17 @@ void CloudServerSocket::startAcceptor(
             m_tunnelPool->addNewTunnel(std::move(connection));
 
         if (auto lock = sharedGuard->lock())
-            m_acceptors.erase(acceptorPtr);
+        {
+            const auto it = std::find_if(
+                m_acceptors.begin(), m_acceptors.end(),
+                [&](const std::unique_ptr<AbstractTunnelAcceptor>& a)
+                { return a.get() == acceptorPtr; });
+
+            Q_ASSERT_X(it != m_acceptors.end(), Q_FUNC_INFO,
+                       "Is acceptor already dead?");
+
+            m_acceptors.erase(it);
+        }
     });
 }
 
