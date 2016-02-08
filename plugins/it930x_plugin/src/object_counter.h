@@ -53,6 +53,9 @@ public:
 
     Logger & operator << (const std::string &s)
     {
+        if (m_needStop)
+            return *this;
+
         std::stringstream ss;
         auto timeNow = std::chrono::system_clock::now();
         ss << "(" << std::hex << std::this_thread::get_id() << ") ["
@@ -78,7 +81,7 @@ private:
 
 extern Logger logger;
 
-#define NO_LOG 0
+#define NO_LOG 1
 #define ITE_LOG() if (NO_LOG) {} else logger
 
 #define FMT(...) [&] \

@@ -29,9 +29,6 @@ namespace ite
         m_info = m_rxDevice->getCameraInfo();
     }
 
-    CameraManager::~CameraManager()
-    {}
-
     void * CameraManager::queryInterface( const nxpl::NX_GUID& interfaceID )
     {
         if (interfaceID == nxcip::IID_BaseCameraManager3)
@@ -119,26 +116,14 @@ namespace ite
         std::lock_guard<std::mutex> lock(m_mutex);
         if (!m_rxDevice || !rxDeviceRef()->deviceReady())
         {
-            m_encoders.clear();
+            ITE_LOG() << FMT("[getEnCoder] No rxDevice");
             return nxcip::NX_NO_DATA;
         }
 
-        if (m_encoders.empty())
-        {
-            initEncoders();
-        }
-
-        if (static_cast<unsigned>(encoderIndex) >= m_encoders.size())
+        if (static_cast<unsigned>(encoderIndex) >= RxDevice::streamsCountPassive())
             return nxcip::NX_INVALID_ENCODER_NUMBER;
 
-        m_encoders[encoderIndex]->addRef();
-        *encoderPtr = m_encoders[encoderIndex].get();
-
-        debug_printf(
-            "[CameraManager::getEncoder] asked for encoder from Rx %d DONE!\n",
-            m_rxDevice->rxID()
-        );
-
+        *encoderPtr = new MediaEncoder(this, encoderIndex);
         return nxcip::NX_NO_ERROR;
     }
 
@@ -207,28 +192,7 @@ namespace ite
 
     // internals
 
-    void CameraManager::initEncoders()
-    {
-        if (!m_rxDevice || !m_rxDevice->isLocked())
-            return;
-
-        unsigned streamsCount = m_rxDevice->streamsCount();
-        if (! streamsCount)
-            streamsCount = 2; // HACK
-
-        m_encoders.reserve(streamsCount);
-        for (unsigned i = 0; i < streamsCount; ++i)
-        {
-            if (i >= m_encoders.size())
-            {
-                auto enc = std::shared_ptr<MediaEncoder>( new MediaEncoder(this, i), refDeleter );
-                m_encoders.push_back(enc);
-            }
-        }
-    }
-
     // from StreamReader thread
-
     void CameraManager::openStream(unsigned encNo)
     {
         m_stopTimer.stop();

@@ -110,7 +110,8 @@ namespace ite
     class DiscoveryManager : public DefaultRefCounter<nxcip::CameraDiscoveryManager>
     {
     public:
-        typedef std::shared_ptr<CameraManager> CameraPtr;
+//        typedef std::shared_ptr<CameraManager> CameraPtr;
+        typedef CameraManager *CameraPtr;
 
         DiscoveryManager();
         virtual ~DiscoveryManager();

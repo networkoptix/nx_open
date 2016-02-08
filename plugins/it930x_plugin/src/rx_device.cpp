@@ -103,8 +103,8 @@ namespace ite
                         return;
 
                     stats();
-//                    ITE_LOG() << FMT("[Rx watchdog] Rx %d getting stats DONE; stats: %d; m_deviceReady: %d",
-//                                     m_rxID, (int)good(), (int)m_deviceReady.load());
+                    ITE_LOG() << FMT("[Rx watchdog] Rx %d getting stats DONE; stats: %d; m_deviceReady: %d; m_needStop: %d",
+                                     m_rxID, (int)good(), (int)m_deviceReady.load(), (int)m_needStop);
 
                     if (!good() || !m_deviceReady)
                     {
@@ -133,10 +133,7 @@ namespace ite
                         bool first = true;
                         bool wrongCamera = false;
 
-                        debug_printf(
-                            "[Rx watchdog] Rx %d. Device seems good. Starting testing camera ID\n",
-                            m_rxID
-                        );
+                        debug_printf("[Rx watchdog] Rx %d. Device seems good. Starting testing camera ID\n", m_rxID);
 
                         m_devReader->subscribe(It930x::PID_RETURN_CHANNEL);
 
@@ -407,7 +404,7 @@ namespace ite
         try
         {
             m_it930x.reset(new It930x(m_rxID));
-//            m_it930x->info(m_rxInfo);
+            m_it930x->info(m_rxInfo);
             return true;
         }
         catch (DtvException& ex)

@@ -188,7 +188,7 @@ bool PluginManager::loadNxPlugin(
     QLibrary lib( fullFilePath );
     if( !lib.load() )
         return false;
-    
+
     nxpl::CreateNXPluginInstanceProc entryProc = (nxpl::CreateNXPluginInstanceProc)lib.resolve( "createNXPluginInstance" );
     if( entryProc == NULL )
     {

@@ -34,7 +34,7 @@ namespace ite
         nxpt::CommonRefManager m_refManager;
 
         DefaultRefCounter()
-        :   m_refManager(this)
+        :   m_refManager(static_cast<T*>(this))
         {}
 
         DefaultRefCounter(nxpt::CommonRefManager * refManager)

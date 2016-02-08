@@ -26,7 +26,6 @@ namespace ite
     {
     public:
         CameraManager(const RxDevicePtr &rxDev);
-        virtual ~CameraManager();
 
         // nxcip::PluginInterface
 
@@ -99,10 +98,10 @@ namespace ite
         RxDevicePtr &rxDeviceRef() { return m_rxDevice; }
 
     private:
+        typedef MediaEncoder *MediaEncoderPtr;
         mutable std::mutex m_mutex;
 
         RxDevicePtr m_rxDevice;
-        std::vector<std::shared_ptr<MediaEncoder>> m_encoders;
 
         std::set<unsigned> m_openedStreams;
         Timer m_stopTimer;
@@ -113,7 +112,6 @@ namespace ite
         mutable const char * m_errorStr;
         mutable nxcip::CameraInfo m_info;
 
-        void initEncoders();
         bool stopStreams(bool force = false);
 
         const int m_cameraID;
