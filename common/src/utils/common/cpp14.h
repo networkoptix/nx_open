@@ -16,9 +16,9 @@
 ////////////////////////////////////////////////////////////////////////////
 
 
-#if _MSC_VER <= 1700
 namespace std
 {
+#if _MSC_VER <= 1700
 template<
     typename T>
     std::unique_ptr<T> make_unique()
@@ -72,7 +72,7 @@ template<
         std::forward<Arg3>( arg3 ),
         std::forward<Arg4>( arg4 ) ) );
 }
-
+#endif
 
 template<typename T>
 class atomic_unique_ptr
@@ -150,6 +150,5 @@ private:
     std::atomic<T*> m_ptr;
 };
 }
-#endif
 
 #endif  //libcommon_cpp14_h

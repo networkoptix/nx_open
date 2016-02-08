@@ -264,7 +264,6 @@ macx {
 }
 
 INCLUDEPATH += ${environment.dir}/boost_1_56_0
-INCLUDEPATH += ${environment.dir}/include/ffmpeg-misc-headers-win32
 INCLUDEPATH += ${environment.dir}/include/glext
 
 ## ANDROID
