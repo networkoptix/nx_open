@@ -3,12 +3,15 @@
 #include <core/resource/resource.h>
 
 #include <QtNetwork/QNetworkReply>
+
+#ifdef GDM_TODO
 #include <QtWebKitWidgets/QGraphicsWebView>
+#endif
 
 QnWebResourceWidget::QnWebResourceWidget( QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent /*= NULL*/ )
     : base_type(context, item, parent)
 {
-
+#ifdef GDM_TODO
     QGraphicsWebView *webView = new QGraphicsWebView(this);
     webView->setUrl(QUrl(resource()->getUrl()));
     webView->setRenderHints(0);
@@ -25,7 +28,7 @@ QnWebResourceWidget::QnWebResourceWidget( QnWorkbenchContext *context, QnWorkben
     addOverlayWidget(webView, detail::OverlayedBase::Visible, false, true, BaseLayer);
 
     setOption(QnResourceWidget::WindowRotationForbidden, true);
-
+#endif
     updateTitleText();
     updateInfoText();
     updateDetailsText();
