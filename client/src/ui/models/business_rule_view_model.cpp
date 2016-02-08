@@ -957,7 +957,7 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
             if (targetCameras.isEmpty())
                 return tr("Source camera");
 
-            return tr("Source and %n more cameras", nullptr, targetCameras.size());
+            return tr("Source and %n more cameras", "", targetCameras.size());
         }
         break;
     }

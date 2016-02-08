@@ -853,8 +853,8 @@ void QnStorageConfigWidget::updateSelectedCamerasCaption(int selectedCamerasCoun
     const auto getNumberedCaption = [this, selectedCamerasCount]() -> QString
     {
         return QnDeviceDependentStrings::getDefaultNameFromSet(
-            tr("%n Camera(s)", nullptr, selectedCamerasCount)
-            , tr("%n Device(s)", nullptr, selectedCamerasCount));
+              tr("%n Camera(s)", "", selectedCamerasCount)
+            , tr("%n Device(s)", "", selectedCamerasCount));
     };
 
     const auto getSimpleCaption = []()

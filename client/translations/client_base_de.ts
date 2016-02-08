@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="de" sourcelanguage="en">
+<TS version="2.1" language="de" sourcelanguage="en">
 <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
@@ -1977,9 +1977,12 @@ um mehr Lesezeichen zu sehen</translation>
         <source>Source camera</source>
         <translation>Quell-Kamera</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Source and %n more cameras</source>
-        <translation>Quell-Kamera und %n weitere Kameras</translation>
+        <translation type="unfinished">
+            <numerusform>Quell-Kamera und %n weitere Kameras</numerusform>
+            <numerusform>Quell-Kamera und %n weitere Kameras</numerusform>
+        </translation>
     </message>
     <message>
         <source>N/A</source>
@@ -5095,17 +5098,26 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
         <source>&lt;All My I/O Modules&gt;</source>
         <translation>&lt;Alle meine I/O Module&gt;</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n device(s)&gt;</source>
-        <translation>&lt;%n Gerät(e)&gt;</translation>
+        <translation type="unfinished">
+            <numerusform>&lt;%n Gerät(e)&gt;</numerusform>
+            <numerusform>&lt;%n Gerät(e)&gt;</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n camera(s)&gt;</source>
-        <translation>&lt;%n Kamera(s)&gt;</translation>
+        <translation type="unfinished">
+            <numerusform>&lt;%n Kamera(s)&gt;</numerusform>
+            <numerusform>&lt;%n Kamera(s)&gt;</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n I/O module(s)&gt;</source>
-        <translation>&lt;%n I/O Modul(e)&gt;</translation>
+        <translation type="unfinished">
+            <numerusform>&lt;%n I/O Modul(e)&gt;</numerusform>
+            <numerusform>&lt;%n I/O Modul(e)&gt;</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -5867,13 +5879,19 @@ Die bereitgestellten Parameter sind nicht gültig. Ein Test konnte nicht ausgef�
         <source>Notice: Only further recording will be backed up. Backup process will ignore existing footage.</source>
         <translation>Hinweis: Nur neuere Aufnahmen werden gesichert. Der Sicherungsprozess wird vorhandene Aufnahmen ignorieren.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n Camera(s)</source>
-        <translation>%n Kamera(s)</translation>
+        <translation type="unfinished">
+            <numerusform>%n Kamera(s)</numerusform>
+            <numerusform>%n Kamera(s)</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n Device(s)</source>
-        <translation>%n Gerät(e)</translation>
+        <translation type="unfinished">
+            <numerusform>%n Gerät(e)</numerusform>
+            <numerusform>%n Gerät(e)</numerusform>
+        </translation>
     </message>
     <message>
         <source>Backup is finished</source>
@@ -6935,9 +6953,12 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
         <source>Press %1 to search bookmarks</source>
         <translation>Drücken Sie %1, um nach Lesezeichen zu suchen</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Are you sure you want to delete these %n bookmarks?</source>
-        <translation>Sind Sie sicher, dass Sie die %n Lesezeichen löschen wollen?</translation>
+        <translation type="unfinished">
+            <numerusform>Sind Sie sicher, dass Sie die %n Lesezeichen löschen wollen?</numerusform>
+            <numerusform>Sind Sie sicher, dass Sie die %n Lesezeichen löschen wollen?</numerusform>
+        </translation>
     </message>
 </context>
 <context>
