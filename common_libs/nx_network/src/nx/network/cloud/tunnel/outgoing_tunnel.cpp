@@ -21,7 +21,8 @@ OutgoingTunnel::OutgoingTunnel(AddressEntry targetPeerAddress)
 :
     Tunnel(targetPeerAddress.host.toString().toLatin1()),
     m_targetPeerAddress(std::move(targetPeerAddress)),
-    m_terminated(false)
+    m_terminated(false),
+    m_counter(0)
 {
     m_aioThreadBinder.getAioThread();   //binds to aio thread
 }
@@ -173,10 +174,12 @@ void OutgoingTunnel::establishNewConnection(
 void OutgoingTunnel::updateTimerIfNeeded()
 {
     QnMutexLocker lk(&m_mutex);
-    updateTimerIfNeededNonSafe(&lk);
+    updateTimerIfNeededNonSafe(&lk, std::chrono::steady_clock::now());
 }
 
-void OutgoingTunnel::updateTimerIfNeededNonSafe(QnMutexLockerBase* const /*lock*/)
+void OutgoingTunnel::updateTimerIfNeededNonSafe(
+    QnMutexLockerBase* const /*lock*/,
+    const std::chrono::steady_clock::time_point curTime)
 {
     if (!m_connectHandlers.empty() &&
         (!m_timerTargetClock || *m_timerTargetClock > m_connectHandlers.begin()->first))
@@ -186,11 +189,8 @@ void OutgoingTunnel::updateTimerIfNeededNonSafe(QnMutexLockerBase* const /*lock*
 
         //starting new timer
         m_timerTargetClock = m_connectHandlers.begin()->first;
-        const auto curTime = std::chrono::steady_clock::now();
-        const auto timeout = 
-            m_connectHandlers.begin()->first > curTime
-            ? (m_connectHandlers.begin()->first - curTime)
-            : std::chrono::milliseconds(0);
+        assert(m_connectHandlers.begin()->first > curTime);
+        const auto timeout = m_connectHandlers.begin()->first - curTime;
         m_aioThreadBinder.registerTimer(
             std::chrono::duration_cast<std::chrono::milliseconds>(timeout).count(),
             std::bind(&OutgoingTunnel::onTimer, this));
@@ -201,17 +201,23 @@ void OutgoingTunnel::onTimer()
 {
     const auto curTime = std::chrono::steady_clock::now();
     std::vector<ConnectionRequestData> timedoutConnectOperations;
+
     QnMutexLocker lk(&m_mutex);
     for (auto it = m_connectHandlers.begin(); it != m_connectHandlers.end();)
     {
-        if (it->first > curTime)
+        using namespace std::chrono;
+        //resolution of timer is millisecond and zero timeout is not supported
+        if ((it->first > curTime) && 
+            (duration_cast<milliseconds>(it->first - curTime) > milliseconds(0)))
+        {
             break;
+        }
         //operation timedout
         timedoutConnectOperations.emplace_back(std::move(it->second));
         m_connectHandlers.erase(it++);
     }
     m_timerTargetClock.reset();
-    updateTimerIfNeededNonSafe(&lk);
+    updateTimerIfNeededNonSafe(&lk, curTime);
 
     lk.unlock();
     //triggering timedout operations

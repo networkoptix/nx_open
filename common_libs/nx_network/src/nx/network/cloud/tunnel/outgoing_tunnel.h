@@ -71,9 +71,12 @@ private:
     UDPSocket m_aioThreadBinder;
     bool m_terminated;
     boost::optional<std::chrono::steady_clock::time_point> m_timerTargetClock;
+    int m_counter;
 
     void updateTimerIfNeeded();
-    void updateTimerIfNeededNonSafe(QnMutexLockerBase* const /*lock*/);
+    void updateTimerIfNeededNonSafe(
+        QnMutexLockerBase* const /*lock*/,
+        const std::chrono::steady_clock::time_point curTime);
     void onTimer();
     void onConnectFinished(
         NewConnectionHandler handler,
