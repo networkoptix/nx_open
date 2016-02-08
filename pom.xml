@@ -25,7 +25,7 @@
             <url>file://${root.dir}</url>
         </repository>
     </repositories>    
-    
+
     <properties>
         <!-- Project GUIDs (c++/qt only) -->
         <common.guid>{7f2f48c9-e466-45d9-a9a0-1dcfb486f6cb}</common.guid>
@@ -158,7 +158,7 @@
         <qtlib12>WebKit</qtlib12>
         <qtlib13>WebKitWidgets</qtlib13>
         <qtlib14>MultimediaWidgets</qtlib14>
-        <qtlib15>Quick</qtlib15>
+        <qtlib15</qtlib15>
         <qtlib16>Qml</qtlib16>
         <qtlib17>Positioning</qtlib17>
         <qtlib18>Sensors</qtlib18>
@@ -428,16 +428,12 @@
                 <buildenv.script>get_buildenv.bat</buildenv.script>
                 <platform>windows</platform>
                 <box>windows</box>
-                <compiler>msvc2012u3</compiler>
+                <compiler>msvc2015</compiler>
                 <arch>x64</arch>
                 <force_x86>false</force_x86>
                 <bespin.version>1.2-windows-SNAPSHOT</bespin.version>
-                <!-- Testing WinXP hacks on Win78. If doesn't work properly, then revert back -->
-                <!-- <qt.spec>win32-msvc2012</qt.spec>
-                <PlatformToolSet>v110</PlatformToolSet>
-                <modification>win78</modification> -->
-                <qt.spec>win32-msvc2013</qt.spec>
-                <PlatformToolSet>v110_xp</PlatformToolSet>
+                <qt.spec>win32-msvc2012xp</qt.spec>
+                <PlatformToolSet>v140_xp</PlatformToolSet>
                 <modification>winxp</modification>
 
                 <profile.classifier>${platform}</profile.classifier>
