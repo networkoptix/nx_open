@@ -19,7 +19,7 @@ IMPROVEMENTS
     Implemented "Advanced" Settings for DWC-BVI2IR cameras - VMS-415
     Better support of ISD Panzilla cameras - VMS-1465, VMS-936, VMS-1351
     Vista VK2-1080XVRDPTPMF camera now mapped for advanced PTZ - VISTA-76
-*   PTZ improvements for camera ACTi PTZ Dome I98 - VISTA-80
+    PTZ improvements for camera ACTi PTZ Dome I98 - VISTA-80
     Arecont RTSP camera support implemented - VMS-1166
     Digital I/O support for Arecont cameras implemented - VMS-1343
     Added "Connect" button to the "Connection Test" dialog - VMS-263
@@ -34,8 +34,9 @@ IMPROVEMENTS
     Storage Analytics improvement - storage utilized by deleted/moved out cameras is displayed separately - VMS-1569
     Improved time synchronization mechanism between Servers - VMS-1394, VMS-1149
     Improved error messages for some cases of push updates failure - VMS-1536
-*   "Free Storage Space" is increased from 5Gb to 50Gb for NAS - VMS-1707
+    "Free Storage Space" is increased from 5Gb to 50Gb for NAS - VMS-1707
     Server SSL can now be disabled
+    API documentation is improved and extended
     Continual general Server improvements based on anonymous usage and crash statistics - VMS-1529, VMS-1491, VMS-1239
 
 BUG FIXES
@@ -44,12 +45,12 @@ BUG FIXES
     Digital I/O could not be programmed for Sony cameras with latest firmware. Fixed. - VMS-1348
     AV20175DN firmware update re-ordered sensors. Fixed. - VMS-1192
     DWC-MF10M36TIR camera streams MJPEG instead of h264 by default. Fixed. - VMS-1453
-*   Arecont Vision AV3556 camera streams MJPEG instead of h264 by default. Fixed. - VMS-1813
+    Arecont Vision AV3556 camera streams MJPEG instead of h264 by default. Fixed. - VMS-1813
     MJPEG-stream instead of h264 is being requested from D-link 7110 - VMS-1365
     Focus buttons VK2-Encoder were not functional. Fixed. VISTA-77
     Triggered Event Rule with target I/O Module could disable all active output ports on device. Fixed. - VMS-1458
     Changes were not applied in the Client until Server's port was changed via Web Admin Interface. Fixed. - VMS-1160
-*   Fisheye tours were not functioning. Fixed. - VMS-1891
+    Fisheye tours were not functioning. Fixed. - VMS-1891
     Middle-click on the item with any default rotation always resulted in rotation to 0 degrees. Fixed. - VMS-490
     Video archive states (aka time chunks) on the timeline weren't loaded if system time was modified. Fixed. - VMS-1142
     Video archive states (aka time chunks) always displayed with local Server Time for cameras added as HTTP-links. Fixed. - VMS-821
