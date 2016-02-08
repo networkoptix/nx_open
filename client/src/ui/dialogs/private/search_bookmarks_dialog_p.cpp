@@ -416,9 +416,9 @@ void QnSearchBookmarksDialogPrivate::setCameras(const QnVirtualCameraResourceLis
     }
 
     const auto devicesStringSet = QnCameraDeviceStringSet(
-        tr("<%n device(s)>", nullptr, cameras.size())
-        , tr("<%n camera(s)>", nullptr, cameras.size())
-        , tr("<%n I/O module(s)>", nullptr, cameras.size()));
+          tr("<%n device(s)>",      "", cameras.size())
+        , tr("<%n camera(s)>",      "", cameras.size())
+        , tr("<%n I/O module(s)>",  "", cameras.size()));
 
     const auto caption = QnDeviceDependentStrings::getNameFromSet(
         devicesStringSet, cameras);

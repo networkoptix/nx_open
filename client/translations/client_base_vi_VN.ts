@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="vi_VN" sourcelanguage="en_US">
+<TS version="2.1" language="vi_VN" sourcelanguage="en_US">
 <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
@@ -1958,9 +1958,11 @@ to view more bookmarks</source>
         <source>Source camera</source>
         <translation>máy ảnh nguồn</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Source and %n more cameras</source>
-        <translation>Nguồn và %n máy ảnh hơn</translation>
+        <translation type="unfinished">
+            <numerusform>Nguồn và %n máy ảnh hơn</numerusform>
+        </translation>
     </message>
     <message>
         <source>N/A</source>
@@ -5036,17 +5038,23 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
         <source>&lt;All My I/O Modules&gt;</source>
         <translation>&lt;Tất cả Mỹ I / O module&gt;</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n device(s)&gt;</source>
-        <translation>&lt;%n thiết bị&gt;</translation>
+        <translation type="unfinished">
+            <numerusform>&lt;%n thiết bị&gt;</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n camera(s)&gt;</source>
-        <translation>&lt;%n camera(s)&gt;</translation>
+        <translation type="unfinished">
+            <numerusform>&lt;%n camera(s)&gt;</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n I/O module(s)&gt;</source>
-        <translation>&lt;%n I/O module(s)&gt;</translation>
+        <translation type="unfinished">
+            <numerusform>&lt;%n I/O module(s)&gt;</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -5801,13 +5809,17 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
         <source>Notice: Only further recording will be backed up. Backup process will ignore existing footage.</source>
         <translation>Chú ý: Chỉ ghi thêm sẽ được sao lưu. Quá trình sao lưu sẽ bỏ qua cảnh hiện tại.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n Camera(s)</source>
-        <translation>%n Máy ảnh</translation>
+        <translation type="unfinished">
+            <numerusform>%n Máy ảnh</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n Device(s)</source>
-        <translation>%n Thiết bị</translation>
+        <translation type="unfinished">
+            <numerusform>%n Thiết bị</numerusform>
+        </translation>
     </message>
     <message>
         <source>Backup is finished</source>
@@ -6845,9 +6857,11 @@ Nếu bạn muốn vô hiệu hóa tính năng này bạn có thể làm như v�
         <source>Press %1 to search bookmarks</source>
         <translation>Bấm %1 vào bookmark tìm kiếm</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Are you sure you want to delete these %n bookmarks?</source>
-        <translation>Bạn có chắc chắn muốn xóa những %n dấu không?</translation>
+        <translation type="unfinished">
+            <numerusform>Bạn có chắc chắn muốn xóa những %n dấu không?</numerusform>
+        </translation>
     </message>
 </context>
 <context>
