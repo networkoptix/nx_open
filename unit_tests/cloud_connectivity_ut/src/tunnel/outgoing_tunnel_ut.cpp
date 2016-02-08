@@ -498,6 +498,7 @@ TEST_F(OutgoingTunnelTest, connectTimeout)
     const bool singleShotConnection = false;
     const bool connectionWillSucceedValues[1] = { true };
     const auto connectorTimeout = std::chrono::seconds(7);
+    const int connectionsToCreate = 10;
 
     for (const bool connectionWillSucceed : connectionWillSucceedValues)
     {
@@ -520,26 +521,32 @@ TEST_F(OutgoingTunnelTest, connectTimeout)
         const std::chrono::milliseconds timeout = std::chrono::seconds(2);
         const std::chrono::milliseconds timeoutCorrection = timeout / 5;
 
-        ConnectionCompletedPromise connectedPromise;
-        tunnel.establishNewConnection(
-            timeout,
-            SocketAttributes(),
-            [&connectedPromise](
-                SystemError::ErrorCode errorCode,
-                std::unique_ptr<AbstractStreamSocket> socket)
-            {
-                connectedPromise.set_value(std::make_pair(errorCode, std::move(socket)));
-            });
+        std::vector<ConnectionCompletedPromise> connectedPromises;
+        connectedPromises.resize(connectionsToCreate);
+        for (auto& connectedPromise: connectedPromises)
+            tunnel.establishNewConnection(
+                timeout,
+                SocketAttributes(),
+                [&connectedPromise](
+                    SystemError::ErrorCode errorCode,
+                    std::unique_ptr<AbstractStreamSocket> socket)
+                {
+                    connectedPromise.set_value(std::make_pair(errorCode, std::move(socket)));
+                });
 
         const auto timeBefore = std::chrono::steady_clock::now();
-        const auto result = connectedPromise.get_future().get();
-        const auto timeAfter = std::chrono::steady_clock::now();
 
-        ASSERT_EQ(SystemError::timedOut, result.first);
-        ASSERT_EQ(nullptr, result.second);
-        ASSERT_TRUE(
-            (timeAfter - timeBefore > (timeout - timeoutCorrection)) &&
-            (timeAfter - timeBefore < (timeout + timeoutCorrection)));
+        for (auto& connectedPromise : connectedPromises)
+        {
+            const auto result = connectedPromise.get_future().get();
+            const auto timeAfter = std::chrono::steady_clock::now();
+
+            ASSERT_EQ(SystemError::timedOut, result.first);
+            ASSERT_EQ(nullptr, result.second);
+            ASSERT_TRUE(
+                (timeAfter - timeBefore > (timeout - timeoutCorrection)) &&
+                (timeAfter - timeBefore < (timeout + timeoutCorrection)));
+        }
 
         tunnel.pleaseStopSync();
     }
