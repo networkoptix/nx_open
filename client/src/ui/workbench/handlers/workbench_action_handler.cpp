@@ -923,7 +923,7 @@ void QnWorkbenchActionHandler::at_dropResourcesAction_triggered() {
                 }
                 if (hasLocal)
                 {
-                    QMessageBox::warning(mainWindow(),
+                    QnMessageBox::warning(mainWindow(),
                                          tr("Cannot add item"),
                                          tr("Cannot add a local file to Multi-Video"));
                     return;
@@ -1180,8 +1180,7 @@ void QnWorkbenchActionHandler::at_openBookmarksSearchAction_triggered()
     };
 
     const bool firstTime = m_searchBookmarksDialog.isNull();
-    const QnNonModalDialogConstructor<QnSearchBookmarksDialog> creator(m_searchBookmarksDialog
-        , mainWindow(), dialogCreationFunction);
+    const QnNonModalDialogConstructor<QnSearchBookmarksDialog> creator(m_searchBookmarksDialog, dialogCreationFunction);
 
     if (!firstTime)
         m_searchBookmarksDialog->setParameters(startTimeMs, endTimeMs, filterText);
@@ -1298,7 +1297,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     const qint64 maxItems = qnSettings->maxPreviewSearchItems();
 
     if(period.durationMs < steps[1]) {
-        QMessageBox::warning(mainWindow(), tr("Unable to perform preview search."), tr("Selected time period is too short to perform preview search. Please select a longer period."), QMessageBox::Ok);
+        QnMessageBox::warning(mainWindow(), tr("Unable to perform preview search."), tr("Selected time period is too short to perform preview search. Please select a longer period."), QMessageBox::Ok);
         return;
     }
 
@@ -1482,7 +1481,7 @@ void QnWorkbenchActionHandler::at_serverAddCameraManuallyAction_triggered(){
         if (dialog->state() == QnCameraAdditionDialog::Searching
                 || dialog->state() == QnCameraAdditionDialog::Adding) {
 
-            int result = QMessageBox::warning(
+            int result = QnMessageBox::warning(
                         mainWindow(),
                         tr("Process in progress..."),
                         tr("Device addition is already in progress. "
@@ -1645,7 +1644,7 @@ bool QnWorkbenchActionHandler::validateResourceName(const QnResourcePtr &resourc
             ? tr("User with the same name already exists")
             : tr("Video Wall with the same name already exists.");
 
-        QMessageBox::warning(
+        QnMessageBox::warning(
             mainWindow(),
             title,
             message
@@ -2146,13 +2145,13 @@ void QnWorkbenchActionHandler::at_setAsBackgroundAction_triggered() {
             return;
 
         if (status == QnAppServerFileCache::OperationResult::sizeLimitExceeded) {
-            QMessageBox::warning(mainWindow(), tr("Error"), tr("Picture is too big. Maximum size is %1 Mb").arg(QnAppServerFileCache::maximumFileSize() / (1024*1024))
+            QnMessageBox::warning(mainWindow(), tr("Error"), tr("Picture is too big. Maximum size is %1 Mb").arg(QnAppServerFileCache::maximumFileSize() / (1024*1024))
                 );
             return;
         }
 
         if (status != QnAppServerFileCache::OperationResult::ok) {
-            QMessageBox::warning(mainWindow(), tr("Error"), tr("Error while uploading picture."));
+            QnMessageBox::warning(mainWindow(), tr("Error"), tr("Error while uploading picture."));
             return;
         }
 
@@ -2319,7 +2318,7 @@ void QnWorkbenchActionHandler::at_messageBoxAction_triggered() {
     if (text.isEmpty())
         text = title;
 
-    QMessageBox::information(mainWindow(), title, text);
+    QnMessageBox::information(mainWindow(), title, text);
 }
 
 void QnWorkbenchActionHandler::at_browseUrlAction_triggered() {
@@ -2399,7 +2398,7 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_betaVersionMessageAction_triggered() {
-    QMessageBox::warning(mainWindow(),
+    QnMessageBox::warning(mainWindow(),
                          tr("Beta version %1").arg(QnAppInfo::applicationVersion()),
                          tr("This is a beta version of %1.")
                          .arg(qApp->applicationDisplayName()));
@@ -2428,7 +2427,7 @@ void QnWorkbenchActionHandler::checkIfStatisticsReportAllowed() {
     if (!atLeastOneServerHasInternetAccess)
         return;
 
-    QMessageBox::information(
+    QnMessageBox::information(
         mainWindow(),
         tr("Anonymous Usage Statistics"),
         tr("System sends anonymous usage and crash statistics to the software development team to help us improve your user experience.\n"

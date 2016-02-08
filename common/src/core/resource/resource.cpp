@@ -29,7 +29,7 @@
 #include "../resource_management/resource_properties.h"
 #include "../resource_management/status_dictionary.h"
 
-bool QnResource::m_appStopping = false;
+std::atomic<bool> QnResource::m_appStopping(false);
 // TODO: #rvasilenko move it to QnResourcePool
 Q_GLOBAL_STATIC(QnInitResPool, initResPool)
 

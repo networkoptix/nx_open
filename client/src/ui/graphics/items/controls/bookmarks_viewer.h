@@ -3,13 +3,14 @@
 
 #include <client/client_color_types.h>
 #include <core/resource/camera_bookmark_fwd.h>
+#include <ui/common/help_topic_queryable.h>
 
 class QnActionParameters;
 class HoverFocusProcessor;
 
 /// @class QnBookmarksViewer
 /// @brief Shows specified bookmarks one above another in defined position
-class QnBookmarksViewer : public QGraphicsWidget
+class QnBookmarksViewer : public QGraphicsWidget, public HelpTopicQueryable
 {
     Q_OBJECT
     Q_PROPERTY(QnBookmarkColors colors READ colors WRITE setColors)
@@ -30,6 +31,8 @@ public:
     bool readOnly() const;
 
     void setReadOnly(bool readonly);
+
+    virtual int helpTopicAt(const QPointF &pos) const override;
 
 signals:
     /// @brief Edit action callback

@@ -297,6 +297,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     setHelpTopic(m_jumpForwardButton,   Qn::MainWindow_Navigation_Help);
     setHelpTopic(m_syncButton,          Qn::MainWindow_Sync_Help);
     setHelpTopic(m_calendarButton,      Qn::MainWindow_Calendar_Help);
+    setHelpTopic(m_bookmarksModeButton, Qn::Bookmarks_Usage_Help);
 
 
     /* Run handlers */

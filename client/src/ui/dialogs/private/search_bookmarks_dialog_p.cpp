@@ -100,6 +100,9 @@ QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(const QString &fi
     m_ui->setupUi(m_owner);
     m_ui->gridBookmarks->setModel(m_model);
 
+    QnBookmarkSortOrder sortOrder = QnSearchBookmarksModel::defaultSortOrder();
+    int column = QnSearchBookmarksModel::sortFieldToColumn(sortOrder.column);
+    m_ui->gridBookmarks->horizontalHeader()->setSortIndicator(column, sortOrder.order);
 
     const auto updateFilterText = [this]()
     {
@@ -250,6 +253,8 @@ bool QnSearchBookmarksDialogPrivate::fillActionParameters(QnActionParameters &pa
     for (const QModelIndex &index: selection)
     {
         const auto bookmark = bookmarkFromIndex(index);
+
+        /* Add invalid bookmarks, user must be able to delete them. */
         if (!bookmark.isValid())
             continue;
 
@@ -268,6 +273,10 @@ bool QnSearchBookmarksDialogPrivate::fillActionParameters(QnActionParameters &pa
         return true;
 
     QnCameraBookmark currentBookmark = bookmarks.first();
+    /* User should not be able to export or open invalid bookmark. */
+    if (!currentBookmark.isValid())
+        return true;
+
     params.setArgument(Qn::CameraBookmarkRole, currentBookmark);
 
     auto camera = availableCameraByUniqueId(currentBookmark.cameraId);
@@ -407,9 +416,9 @@ void QnSearchBookmarksDialogPrivate::setCameras(const QnVirtualCameraResourceLis
     }
 
     const auto devicesStringSet = QnCameraDeviceStringSet(
-        tr("<%n device(s)>", nullptr, cameras.size())
-        , tr("<%n camera(s)>", nullptr, cameras.size())
-        , tr("<%n I/O module(s)>", nullptr, cameras.size()));
+          tr("<%n device(s)>",      "", cameras.size())
+        , tr("<%n camera(s)>",      "", cameras.size())
+        , tr("<%n I/O module(s)>",  "", cameras.size()));
 
     const auto caption = QnDeviceDependentStrings::getNameFromSet(
         devicesStringSet, cameras);

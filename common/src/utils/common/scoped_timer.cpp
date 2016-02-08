@@ -8,7 +8,7 @@ QnScopedTimer::QnScopedTimer(const QString &description, qint64 detailMs)
     m_timer.start();
 }
 
-QnScopedTimer::QnScopedTimer(char* description, qint64 detailMs)
+QnScopedTimer::QnScopedTimer(const char *description, qint64 detailMs)
     : m_description(QString::fromUtf8(description))
     , m_detailMs(detailMs)
 {

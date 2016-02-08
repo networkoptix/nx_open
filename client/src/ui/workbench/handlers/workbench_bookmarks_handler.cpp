@@ -21,6 +21,7 @@
 #include <ui/actions/action_parameters.h>
 #include <ui/actions/action_target_provider.h>
 #include <ui/dialogs/camera_bookmark_dialog.h>
+#include <ui/dialogs/message_box.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/generic/graphics_message_box.h>
 
@@ -74,7 +75,7 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered() {
     if (QnAppInfo::beta()) {
         QnMediaServerResourcePtr server = qnCameraHistoryPool->getMediaServerOnTime(camera, period.startTimeMs);
         if (!server || server->getStatus() != Qn::Online) {
-            QMessageBox::warning(mainWindow(),
+            QnMessageBox::warning(mainWindow(),
                 tr("Error"),
                 tr("Bookmarks can only be added to an online server.")); //TODO: #Elric ec2 update text if needed
             return;
@@ -111,7 +112,7 @@ void QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered() {
 
     QnMediaServerResourcePtr server = qnCameraHistoryPool->getMediaServerOnTime(camera, bookmark.startTimeMs);
     if (!server || server->getStatus() != Qn::Online) {
-        QMessageBox::warning(mainWindow(),
+        QnMessageBox::warning(mainWindow(),
             tr("Error"),
             tr("Bookmarks can only be edited on an online server.")); //TODO: #Elric ec2 update text if needed
         return;
@@ -140,10 +141,10 @@ void QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered() {
         ? tr("Are you sure you want to delete this bookmark?")
         : tr("Are you sure you want to delete bookmark \"%1\"?").arg(bookmark.name));
 
-    if (QMessageBox::information(mainWindow(),
+    if (QnMessageBox::information(mainWindow(),
             tr("Confirm Deletion"), message,
-            QMessageBox::Ok | QMessageBox::Cancel,
-            QMessageBox::Cancel) != QMessageBox::Ok)
+            QnMessageBox::Ok | QnMessageBox::Cancel,
+            QnMessageBox::Cancel) != QnMessageBox::Ok)
         return;
 
     qnCameraBookmarksManager->deleteCameraBookmark(bookmark.guid);
@@ -157,12 +158,12 @@ void QnWorkbenchBookmarksHandler::at_removeBookmarksAction_triggered()
     if (bookmarks.isEmpty())
         return;
 
-    const auto message = tr("Are you sure you want to delete these %n bookmarks?", nullptr, bookmarks.size());
+    const auto message = tr("Are you sure you want to delete these %n bookmarks?", "", bookmarks.size());
 
-    if (QMessageBox::information(mainWindow(),
+    if (QnMessageBox::information(mainWindow(),
         tr("Confirm Deletion"), message,
-        QMessageBox::Ok | QMessageBox::Cancel,
-        QMessageBox::Cancel) != QMessageBox::Ok)
+        QnMessageBox::Ok | QnMessageBox::Cancel,
+        QnMessageBox::Cancel) != QnMessageBox::Ok)
         return;
 
     for (const auto bookmark: bookmarks)

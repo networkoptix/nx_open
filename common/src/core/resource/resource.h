@@ -1,6 +1,7 @@
 #ifndef QN_RESOURCE_H
 #define QN_RESOURCE_H
 
+#include <atomic>
 #include <QtCore/QDateTime>
 #include <QtCore/QMap>
 #include <QtCore/QMetaType>
@@ -321,7 +322,7 @@ protected:
     mutable QnMutex m_mutex;
     QnMutex m_initMutex;
 
-    static bool m_appStopping;
+    static std::atomic<bool> m_appStopping;
 
     /** Identifier of the parent resource. Use resource pool to retrieve the actual parent resource. */
     QnUuid m_parentId;
