@@ -1,9 +1,9 @@
 
 #include "statistics_manager.h"
 
-#include <common/common_module.h>
 #include <utils/common/model_functions.h>
-#include <api/media_server_connection.h>
+#include <common/common_module.h>
+#include <api/server_rest_connection.h>
 #include <core/resource/media_server_resource.h>
 
 #include <statistics/base_statistics_module.h>
@@ -41,6 +41,7 @@ QnStatisticsManager::QnStatisticsManager(QObject *parent)
     , m_settings()
     , m_modules()
     , m_storage()
+    , m_statisticsSent(false)
 {}
 
 QnStatisticsManager::~QnStatisticsManager()
@@ -80,7 +81,16 @@ void QnStatisticsManager::setStorage(QnBaseStatisticsStorage *storage)
 
 void QnStatisticsManager::setSettings(QnBaseStatisticsSettingsLoader *settings)
 {
+    if (m_settings)
+        disconnect(m_settings, nullptr, this, nullptr);
+
     m_settings = settings;
+
+    if (m_settings->settingsAvailable())
+        sendStatistics();
+
+    connect(m_settings, &QnBaseStatisticsSettingsLoader::settingsAvailableChanged
+        , this, &QnStatisticsManager::sendStatistics);
 }
 
 QnMetricsHash QnStatisticsManager::getMetrics() const
@@ -102,22 +112,33 @@ QnMetricsHash QnStatisticsManager::getMetrics() const
 
 void debugOutput(const QnMetricsHash &metrics)
 {
+    qDebug() << "Stat:";
     for(auto it = metrics.begin(); it != metrics.end(); ++it)
     {
         qDebug() << it.key() << " : " << it.value();
     }
-
 }
 
 void QnStatisticsManager::sendStatistics()
 {
+    if (!m_settings)
+        return;
+
 //    if (!qnGlobalSettings->isStatisticsAllowed()) // TODO: uncomment me!
 //        return;
 
-    //
+    if (!m_settings->settingsAvailable())
+    {
+        m_statisticsSent = false;
+        return;
+    }
+
+    QnStatisticsSettings settings = m_settings->settings();
+
+    settings.filters.insert(lit(".*"));     // TODO: remove me, add const to settings
+    settings.limit = 3;                     // TODO: remove me
+
     static const qint64 kMsInDay = 24 * 60 * 60 * 1000;
-    auto settings = m_settings->settings();
-    settings.filters.insert(lit(".*"));    // TODO: remove me, add const to settings
     const qint64 minTimeStampMs = (getLastFilters() == settings.filters
         ? QDateTime::currentMSecsSinceEpoch() - kMsInDay * settings.storeDays
         : getLastSentTime());
@@ -127,13 +148,18 @@ void QnStatisticsManager::sendStatistics()
     QnMetricHashesList totalFiltered;
     for (const auto metrics: totalMetricsList)
     {
-        totalFiltered.push_back(filteredMetrics(
-            metrics, m_settings->settings().filters));
+        const auto filtered = filteredMetrics(metrics, settings.filters);
+        if (!filtered.isEmpty())
+            totalFiltered.push_back(filtered);
     }
 
-    const auto server = qnCommon->currentServer();
-    const auto connection = server->apiConnection();
+    for (auto m: totalFiltered) // remove!
+        debugOutput(m);
 
+    const auto server = qnCommon->currentServer();
+    const auto connection = server->restConnection();
+
+    m_statisticsSent = true; // TODO: implement async sending of data. move this to appropriate place
 }
 
 void QnStatisticsManager::saveCurrentStatistics()

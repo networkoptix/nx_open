@@ -53,4 +53,5 @@ private:
     StoragePtr m_storage;
 
     ModulesMap m_modules;
+    bool m_statisticsSent;
 };

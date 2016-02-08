@@ -115,7 +115,7 @@ qint64 move() {
 }
 
 #include <ui/workbench/workbench_context.h>
-#include <ui/statistics/statistics_manager.h>
+#include <statistics/statistics_manager.h>
 
 void QnWorkbenchDebugHandler::at_debugDecrementCounterAction_triggered()
 {

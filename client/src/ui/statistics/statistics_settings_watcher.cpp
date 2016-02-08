@@ -4,32 +4,17 @@
 #include <QtCore/QTimer>
 
 #include <utils/common/model_functions.h>
-
 #include <utils/network/http/asynchttpclient.h>
-
-//QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnStatisticsSettings, (json)(eq), QnStatisticsSettings_Fields)
-
-namespace
-{
-    enum
-    {
-        kDefaultLimit = 1
-        , kDefaultStoreDays = 30
-    };
-}
-
-QnStatisticsSettings::QnStatisticsSettings()
-    : limit(kDefaultLimit)
-    , storeDays(kDefaultStoreDays)
-    , filters()
-{}
-
-//
+#include <common/common_module.h>
+#include <api/server_rest_connection.h>
+#include <core/resource/media_server_resource.h>
 
 QnStatisticsSettingsWatcher::QnStatisticsSettingsWatcher(QObject *parent)
     : base_type(parent)
     , m_settings()
     , m_updateTimer(new QTimer())
+    , m_connection()
+    , m_restHandle(0)
 {
     enum { kUpdatePeriodMs = 30 * 60 * 1000 };    // 30 minutes update period
     m_updateTimer->setSingleShot(false);
@@ -45,15 +30,47 @@ QnStatisticsSettingsWatcher::QnStatisticsSettingsWatcher(QObject *parent)
 QnStatisticsSettingsWatcher::~QnStatisticsSettingsWatcher()
 {}
 
-QnStatisticsSettings QnStatisticsSettingsWatcher::settings() const
+bool QnStatisticsSettingsWatcher::settingsAvailable()
 {
-    return m_settings;
+    if (!m_settings)
+        updateSettings();
+
+    return !!m_settings;
+}
+
+QnStatisticsSettings QnStatisticsSettingsWatcher::settings()
+{
+    return (m_settings ? *m_settings : QnStatisticsSettings());
 }
 
 void QnStatisticsSettingsWatcher::updateSettings()
 {
-//    bool deserialized = false;
-//    m_settings = QJson::deserialized(
-//        , QnStatisticsSettings(), &deserialized);
+    if (m_connection)
+        return;
+
+    const auto server = qnCommon->currentServer();
+    if (!server)
+        return;
+
+    m_connection = server->restConnection();
+
+    // TODO: implement me!
+    const auto callback = [this](bool success, rest::Handle handle, const QByteArray &data)
+    {
+        m_connection.reset();
+        if (!success)
+            return;
+
+        bool deserialized = false;
+        const auto settings = QJson::deserialized(data, QnStatisticsSettings(), &deserialized);
+        if (!deserialized)
+            return;
+
+        m_settings.reset(new QnStatisticsSettings(settings));
+        emit settingsAvailableChanged();
+    };
+
+    qDebug() << "----------------";
+    m_connection->getStatisticsSettingsAsync(callback);
 }
 

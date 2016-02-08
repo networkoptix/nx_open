@@ -42,6 +42,9 @@ namespace rest
 
         Handle cameraThumbnailAsync(const QnThumbnailRequestData &request, Result<QByteArray>::type callback, QThread* targetThread = 0);
 
+        Handle getStatisticsSettingsAsync(Result<QByteArray>::type callback
+            , QThread *targetThread = nullptr);
+
         /*
         * Cancel running request by known requestID. If request is canceled, callback isn't called.
         * If target thread has been used then callback may be called after 'cancelRequest' in case of data already received and queued to a target thread.

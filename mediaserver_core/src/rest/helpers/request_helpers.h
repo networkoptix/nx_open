@@ -9,7 +9,7 @@
 #include <core/resource_management/resource_pool.h>
 
 template<typename Context, typename CompletionFunc>
-void runMultiserverDownloadRequest(QUrl &url
+void runMultiserverDownloadRequest(QUrl url
     , const QnMediaServerResourcePtr &server
     , const CompletionFunc &requestCompletionFunc
     , Context *context)

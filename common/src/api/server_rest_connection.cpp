@@ -2,6 +2,7 @@
 #include "server_rest_connection.h"
 
 #include <api/app_server_connection.h>
+#include <api/helpers/empty_request_data.h>
 #include <api/helpers/chunks_request_data.h>
 #include <api/helpers/thumbnail_request_data.h>
 
@@ -52,6 +53,14 @@ rest::Handle ServerConnection::cameraThumbnailAsync( const QnThumbnailRequestDat
 {
     return executeGet(lit("/ec2/cameraThumbnail"), request.toParams(), callback, targetThread);
 }
+
+Handle ServerConnection::getStatisticsSettingsAsync(Result<QByteArray>::type callback
+    , QThread *targetThread)
+{
+    static const QnEmptyRequestData kEmptyParams;
+    return executeGet(lit("/ec2/statistics/settings"), kEmptyParams.toParams(), callback, targetThread);
+}
+
 
 // --------------------------- private implementation -------------------------------------
 

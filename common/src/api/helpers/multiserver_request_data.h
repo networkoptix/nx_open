@@ -4,7 +4,10 @@
 
 #include <utils/common/request_param.h>
 
-struct QnMultiserverRequestData {
+struct QnMultiserverRequestData
+{
+    static QnMultiserverRequestData&& create();
+
     template <typename T>
     static T fromParams(const QnRequestParamList& params) {
         T request;

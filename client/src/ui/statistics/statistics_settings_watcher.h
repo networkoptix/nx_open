@@ -4,6 +4,7 @@
 #include <QtCore/QObject>
 
 #include <utils/common/connective.h>
+#include <api/server_rest_connection_fwd.h>
 #include <statistics/base_statistics_settings_loader.h>
 
 class QnStatisticsSettingsWatcher : public Connective<QnBaseStatisticsSettingsLoader>
@@ -17,15 +18,22 @@ public:
 
     virtual ~QnStatisticsSettingsWatcher();
 
-    QnStatisticsSettings settings() const override;
+    //
+
+    bool settingsAvailable() override;
+
+    QnStatisticsSettings settings() override;
 
 private:
     void updateSettings();
 
 private:
     typedef QScopedPointer<QTimer> TimerPtr;
+    typedef QScopedPointer<QnStatisticsSettings> SettingsPtr;
 
-    QnStatisticsSettings m_settings;
+    SettingsPtr m_settings;
     TimerPtr m_updateTimer;
 
+    rest::QnConnectionPtr m_connection;
+    rest::Handle m_restHandle;
 };
