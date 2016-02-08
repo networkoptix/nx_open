@@ -4,7 +4,8 @@
 
 namespace
 {
-    enum { kDefaultFixedDurationMs = 5000 };
+    const int kDefaultFixedDurationMs = 5000;
+    const int kDefaultRecordBeforeMs = 1000;
 }
 
 QnBusinessActionParameters::QnBusinessActionParameters()
@@ -27,6 +28,7 @@ QnBusinessActionParameters::QnBusinessActionParameters()
     , forced(true)
     , presetId()
     , useSource(false)
+    , recordBeforeMs(kDefaultRecordBeforeMs)
 {}
 
 

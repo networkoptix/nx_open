@@ -192,6 +192,7 @@ public:
     float actualFps;
     float averageGopSize;
     QString resolution;
+    int numberOfChannels;
 
     CameraBitrateInfo(int index = -1, QString time = QString())
         : encoderIndex(index)
@@ -203,13 +204,14 @@ public:
         , bitrateFactor(1)
         , fps(-1)
         , actualFps(-1)
+        , numberOfChannels(-1)
     {
     }
 };
 #define CameraBitrateInfo_Fields (encoderIndex)(timestamp) \
     (rawSuggestedBitrate)(suggestedBitrate)(actualBitrate) \
     (bitratePerGop)(bitrateFactor) \
-    (fps)(actualFps)(averageGopSize)(resolution)
+    (fps)(actualFps)(averageGopSize)(resolution)(numberOfChannels)
 
 class CameraBitrates
 {

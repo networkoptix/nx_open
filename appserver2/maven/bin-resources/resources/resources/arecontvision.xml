@@ -81,5 +81,8 @@
         </resource>
         <resource name = "2556" public = "2555"/>
         <resource name = "5555" public = "5115"/>
+        <resource name = "20275" public = "20185"/>
+        <resource name = "12275" public = "12186"/>
+        <resource name = "12276" public = "12176"/>
     </oem>
 </resources>

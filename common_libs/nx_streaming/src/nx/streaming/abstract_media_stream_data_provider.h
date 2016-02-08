@@ -25,6 +25,7 @@ public:
     virtual ~QnAbstractMediaStreamDataProvider();
 
     const QnMediaStreamStatistics* getStatistics(int channel) const;
+    int getNumberOfChannels() const;
     float getBitrateMbps() const;
     float getFrameRate() const;
     float getAverageGopSize() const;

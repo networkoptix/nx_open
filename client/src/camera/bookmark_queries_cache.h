@@ -43,6 +43,8 @@ public:
     bool updateQueryFilterText(const QnVirtualCameraResourcePtr &camera
         , const QString &text);
 
+    void refreshQueries();
+
 private:
     bool updateFilterTimeWindow(QnCameraBookmarkSearchFilter &filter
         , qint64 startTimeMs

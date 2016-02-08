@@ -124,18 +124,18 @@ Item {
         }
 
         move: Transition {
-            NumberAnimation { properties: "x,y"; duration: 500; easing.type: Easing.OutCubic }
+            NumberAnimation { properties: "x,y"; duration: 250; easing.type: Easing.OutCubic }
         }
         displaced: Transition {
-            NumberAnimation { properties: "x,y"; duration: 500; easing.type: Easing.OutCubic }
+            NumberAnimation { properties: "x,y"; duration: 250; easing.type: Easing.OutCubic }
         }
         add: Transition {
             id: addTransition
-            NumberAnimation { property: "y"; from: addTransition.ViewTransition.destination.y + dp(56); duration: 500; easing.type: Easing.OutCubic }
+            NumberAnimation { property: "y"; from: addTransition.ViewTransition.destination.y + dp(56); duration: 250; easing.type: Easing.OutCubic }
         }
         populate: Transition {
             id: populateTransition
-            NumberAnimation { property: "y"; from: populateTransition.ViewTransition.destination.y + dp(56); duration: 500; easing.type: Easing.OutCubic }
+            NumberAnimation { property: "y"; from: populateTransition.ViewTransition.destination.y + dp(56); duration: 250; easing.type: Easing.OutCubic }
         }
         remove: Transition {
             NumberAnimation { property: "opacity"; to: 0.0; duration: 250; easing.type: Easing.OutCubic }
@@ -152,16 +152,18 @@ Item {
         id: hiddenCamerasComponent
 
         Item {
+            id: hiddenCameras
+
+            property bool collapsed: true
+            readonly property int collapseDuration: 250
+
             width: cameraFlow.width
-            height: hiddenCamerasContent.height
+            height: (hiddenCamerasList.count > 0) ? hiddenCamerasContent.height : 0
 
             Column {
                 id: hiddenCamerasContent
 
-                property bool collapsed: true
-
-                width: parent.width - cameraGrid.spacing * 2
-                x: cameraGrid.spacing
+                width: parent.width
                 visible: hiddenCamerasList.count > 0
 
                 Item {
@@ -170,7 +172,6 @@ Item {
 
                     Rectangle {
                         anchors.verticalCenter: parent.bottom
-                        anchors.verticalCenterOffset: -dp(8)
                         width: parent.width
                         height: dp(1)
                         color: QnTheme.listSeparator
@@ -185,14 +186,14 @@ Item {
                         source: "image://icon/section_open.png"
                         anchors.verticalCenter: parent.verticalCenter
                         x: dp(16)
-                        rotation: hiddenCamerasContent.collapsed ? 180 : 0
-                        Behavior on rotation { NumberAnimation { duration: 500; easing.type: Easing.OutCubic } }
+                        rotation: hiddenCameras.collapsed ? 180 : 0
+                        Behavior on rotation { NumberAnimation { duration: hiddenCameras.collapseDuration; easing.type: Easing.OutCubic } }
                         scale: iconScale()
                     }
 
                     Text {
                         anchors.verticalCenter: parent.verticalCenter
-                        x: dp(72)
+                        x: dp(56)
                         text: qsTr("Hidden cameras")
                         font.pixelSize: sp(16)
                         font.weight: Font.DemiBold
@@ -201,8 +202,8 @@ Item {
 
                     QnMaterialSurface {
                         onClicked: {
-                            hiddenCamerasContent.collapsed = !hiddenCamerasContent.collapsed
-                            if (hiddenCamerasContent.collapsed) {
+                            hiddenCameras.collapsed = !hiddenCameras.collapsed
+                            if (hiddenCameras.collapsed) {
                                 expandAnimation.stop()
                                 collapseAnimation.start()
                             } else {
@@ -227,14 +228,14 @@ Item {
                                 target: hiddenList
                                 property: "height"
                                 to: hiddenCamerasColumn.height
-                                duration: 500
+                                duration: hiddenCameras.collapseDuration
                                 easing.type: Easing.OutCubic
                             }
                             NumberAnimation {
                                 target: cameraGrid
                                 property: "contentY"
                                 to: cameraGrid.contentY + Math.min(hiddenCamerasColumn.height, cameraGrid.height - dp(56))
-                                duration: 500
+                                duration: hiddenCameras.collapseDuration
                                 easing.type: Easing.OutCubic
                             }
                         }
@@ -242,6 +243,7 @@ Item {
                         ScriptAction {
                             script: {
                                 hiddenList.height = Qt.binding(function() { return hiddenCamerasColumn.height })
+                                hiddenList.clip = false
                             }
                         }
                     }
@@ -252,6 +254,7 @@ Item {
                         ScriptAction {
                             script: {
                                 hiddenList.height = hiddenList.height // kill the binding
+                                hiddenList.clip = true
                             }
                         }
 
@@ -260,7 +263,7 @@ Item {
                                 target: hiddenList
                                 property: "height"
                                 to: 0
-                                duration: 500
+                                duration: hiddenCameras.collapseDuration
                                 easing.type: Easing.OutCubic
                             }
                         }
@@ -268,8 +271,8 @@ Item {
 
                     Column {
                         id: hiddenCamerasColumn
-                        width: parent.width - cameraGrid.leftMargin - cameraGrid.rightMargin
-                        x: cameraGrid.leftMargin
+
+                        width: parent.width
 
                         Repeater {
                             id: hiddenCamerasList
@@ -301,12 +304,14 @@ Item {
                                 }
                             }
                         }
-                        move: Transition {
-                            NumberAnimation { properties: "y"; duration: 500; easing.type: Easing.OutCubic }
+
+                        move: Transition
+                        {
+                            NumberAnimation { properties: "y"; duration: 250; easing.type: Easing.OutCubic }
                         }
-                        add: Transition {
-                            id: hiddenIntemAddTransition
-                            NumberAnimation { property: "y"; from: hiddenIntemAddTransition.ViewTransition.destination.y + dp(56); duration: 500; easing.type: Easing.OutCubic }
+                        add: Transition
+                        {
+                            NumberAnimation { property: "opacity"; from: 0; to: 1; duration: 250; easing.type: Easing.OutCubic }
                         }
                     }
                 }

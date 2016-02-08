@@ -9,10 +9,13 @@
 
 class QnTimePeriod;
 
-class QN_EXPORT QnTimePeriod {
+class QN_EXPORT QnTimePeriod
+{
 public:
 
     static const qint64 UnlimitedPeriod = -1;
+    static const qint64 kMaxTimeValue;
+    static const qint64 kMinTimeValue;
 
     /**
      * Constructs a null time period.
@@ -30,7 +33,7 @@ public:
     static QnTimePeriod fromInterval(qint64 startTimeMs
         , qint64 endTimeMs);
 
-    bool operator==(const QnTimePeriod &other) const;
+    QnTimePeriod& operator = (const QnTimePeriod &other);
 
     bool contains(qint64 timeMs) const;
     bool contains(const QnTimePeriod &timePeriod) const;
@@ -93,6 +96,7 @@ public:
     qint64 durationMs;
 };
 
+bool operator==(const QnTimePeriod &first, const QnTimePeriod &other);
 bool operator<(const QnTimePeriod &first, const QnTimePeriod &other);
 bool operator<(qint64 first, const QnTimePeriod &other);
 bool operator<(const QnTimePeriod &other, qint64 first);
