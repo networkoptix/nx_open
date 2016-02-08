@@ -4,6 +4,7 @@
 #include <utils/common/model_functions.h>
 #include <common/common_module.h>
 #include <api/server_rest_connection.h>
+#include <api/helpers/send_statistics_request_data.h>
 #include <core/resource/media_server_resource.h>
 
 #include <statistics/base_statistics_module.h>
@@ -127,16 +128,11 @@ void QnStatisticsManager::sendStatistics()
 //    if (!qnGlobalSettings->isStatisticsAllowed()) // TODO: uncomment me!
 //        return;
 
+    m_statisticsSent = false;
     if (!m_settings->settingsAvailable())
-    {
-        m_statisticsSent = false;
         return;
-    }
 
-    QnStatisticsSettings settings = m_settings->settings();
-
-    settings.filters.insert(lit(".*"));     // TODO: remove me, add const to settings
-    settings.limit = 3;                     // TODO: remove me
+    const QnStatisticsSettings settings = m_settings->settings();
 
     static const qint64 kMsInDay = 24 * 60 * 60 * 1000;
     const qint64 minTimeStampMs = (getLastFilters() == settings.filters
@@ -157,9 +153,21 @@ void QnStatisticsManager::sendStatistics()
         debugOutput(m);
 
     const auto server = qnCommon->currentServer();
+    if (!server)
+        return;
+
     const auto connection = server->restConnection();
 
-    m_statisticsSent = true; // TODO: implement async sending of data. move this to appropriate place
+    QnSendStatisticsRequestData request;
+    request.metricsList = totalFiltered;
+
+    const auto callback = [this](bool success, rest::Handle /* handle */
+        , rest::ServerConnection::EmptyResponseType /*response */)
+    {
+        m_statisticsSent = true; // TODO: move this to appropriate place
+    };
+
+    connection->sendStatisticsAsync(request, callback);
 }
 
 void QnStatisticsManager::saveCurrentStatistics()

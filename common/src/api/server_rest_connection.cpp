@@ -5,6 +5,7 @@
 #include <api/helpers/empty_request_data.h>
 #include <api/helpers/chunks_request_data.h>
 #include <api/helpers/thumbnail_request_data.h>
+#include <api/helpers/send_statistics_request_data.h>
 
 #include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
@@ -15,8 +16,8 @@
 #include <utils/common/model_functions.h>
 #include <network/router.h>
 #include <http/custom_headers.h>
-#include "utils/network/http/httptypes.h"
-#include "utils/common/delayed.h"
+#include <utils/network/http/httptypes.h>
+#include <utils/common/delayed.h>
 
 namespace {
     static const size_t ResponseReadTimeoutMs = 15 * 1000;
@@ -59,6 +60,20 @@ Handle ServerConnection::getStatisticsSettingsAsync(Result<QByteArray>::type cal
 {
     static const QnEmptyRequestData kEmptyParams;
     return executeGet(lit("/ec2/statistics/settings"), kEmptyParams.toParams(), callback, targetThread);
+}
+
+Handle ServerConnection::sendStatisticsAsync(const QnSendStatisticsRequestData &request
+    , PostCallback callback
+    , QThread *targetThread)
+{
+    static const nx_http::StringType kJsonContentType = "application/json";
+
+    const nx_http::BufferType data = QJson::serialized(request.metricsList);
+    if (data.isEmpty())
+        return Handle();
+
+    return executePost(lit("/ec2/statistics/send"), request.toParams()
+        , kJsonContentType, data, callback, targetThread);
 }
 
 

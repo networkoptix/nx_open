@@ -15,7 +15,12 @@
 
 namespace
 {
-    const auto kFullUrlTemplate = lit("/%1/%2");
+    QString makeFullPath(const QString &basePath
+        , const QString &postfix)
+    {
+        const auto kFullUrlTemplate = lit("/%1/%2");
+        return kFullUrlTemplate.arg(basePath, postfix);
+    }
 
     template<typename HandlerType>
     StatisticsActionHandlerPtr createHandler(const QString &basePath)
@@ -23,13 +28,13 @@ namespace
         return StatisticsActionHandlerPtr(new HandlerType(basePath));
     }
 
-    template<typename HandlerType, typename ContextType>
-    QUrl getServerApiUrl(const QString &basePath
+    template<typename ContextType>
+    QUrl getServerApiUrl(const QString &path
         , const QnMediaServerResourcePtr &server
         , const ContextType &context)
     {
         QUrl result(server->getApiUrl());
-        result.setPath(kFullUrlTemplate.arg(basePath, HandlerType::kHandlerPath));
+        result.setPath(path);
 
         auto modifiedRequest = context.request();
         modifiedRequest.makeLocal();
@@ -48,30 +53,50 @@ namespace
 class StatisticsActionHandler
 {
 public:
-    StatisticsActionHandler(const QString &baseUrl);
+    StatisticsActionHandler(const QString &path);
 
     virtual ~StatisticsActionHandler();
 
-    const QString &basePath() const;
+    const QString &path() const;
 
     virtual int executeGet(const QnRequestParamList& params
         , QByteArray& result, QByteArray& contentType
-        , int port) = 0;
+        , int port);
+
+    virtual int executePost(const QnRequestParamList& params
+        , const QByteArray& body, const QByteArray& srcBodyContentType
+        , QByteArray& result, QByteArray& resultContentType
+        , const QnRestConnectionProcessor *processor);
+
 
 private:
-    const QString m_baseUrl;
+    const QString m_path;
 };
 
-StatisticsActionHandler::StatisticsActionHandler(const QString &baseUrl)
-    : m_baseUrl(baseUrl)
+StatisticsActionHandler::StatisticsActionHandler(const QString &path)
+    : m_path(path)
 {}
 
 StatisticsActionHandler::~StatisticsActionHandler()
 {}
 
-const QString &StatisticsActionHandler::basePath() const
+const QString &StatisticsActionHandler::path() const
 {
-    return m_baseUrl;
+    return m_path;
+}
+
+int StatisticsActionHandler::executeGet(const QnRequestParamList& params
+    , QByteArray& result, QByteArray& contentType, int port)
+{
+    return nx_http::StatusCode::internalServerError;
+}
+
+int StatisticsActionHandler::executePost(const QnRequestParamList& params
+    , const QByteArray& body, const QByteArray& srcBodyContentType
+    , QByteArray& result, QByteArray& resultContentType
+    , const QnRestConnectionProcessor *processor)
+{
+    return nx_http::StatusCode::internalServerError;
 }
 
 //
@@ -81,8 +106,6 @@ class SettingsActionHandler : public StatisticsActionHandler
     typedef StatisticsActionHandler base_type;
 
 public:
-    static const QString kHandlerPath;
-
     SettingsActionHandler(const QString &baseUrl);
 
     virtual ~SettingsActionHandler();
@@ -92,17 +115,16 @@ public:
         , int port) override;
 
 private:
+    typedef QnMultiserverRequestContext<QnEmptyRequestData> Context;
+
     nx_http::StatusCode::Value loadSettingsLocally(QnStatisticsSettings &outputSettings);
 
-    typedef QnMultiserverRequestContext<QnEmptyRequestData> Context;
     nx_http::StatusCode::Value loadSettingsRemotely(QnStatisticsSettings &outputSettings
         , const QnMediaServerResourcePtr &server
         , Context *context);
 
 private:
 };
-
-const QString SettingsActionHandler::kHandlerPath = lit("settings");
 
 SettingsActionHandler::SettingsActionHandler(const QString &baseUrl)
     : base_type(baseUrl)
@@ -156,7 +178,16 @@ nx_http::StatusCode::Value SettingsActionHandler::loadSettingsLocally(QnStatisti
     if (!server || !hasInternetConnection(server))
         return nx_http::StatusCode::noContent;
 
-    // TODO: implement me!
+    static const QUrl kSettingsUrl = "http://10.0.2.240:8080/Upload/statistics.json"; //TODO: change me to correct
+
+    nx_http::BufferType buffer;
+    int statusCode = nx_http::StatusCode::noContent;
+    if (nx_http::downloadFileSync(kSettingsUrl, &statusCode, &buffer) != SystemError::noError)
+        return nx_http::StatusCode::noContent;
+
+    if (!QJson::deserialize(buffer, &outputSettings))
+        return nx_http::StatusCode::internalServerError;
+
     return nx_http::StatusCode::ok;
 }
 
@@ -197,7 +228,7 @@ nx_http::StatusCode::Value SettingsActionHandler::loadSettingsRemotely(
         context->executeGuarded(updateOutputDataCallback);
     };
 
-    const QUrl apiUrl = getServerApiUrl<SettingsActionHandler>(basePath(), server, *context);
+    const QUrl apiUrl = getServerApiUrl(path(), server, *context);
     runMultiserverDownloadRequest(apiUrl, server, completionFunc, context);
     context->waitForDone();
     return result;
@@ -205,11 +236,54 @@ nx_http::StatusCode::Value SettingsActionHandler::loadSettingsRemotely(
 
 //
 
+class SendStatisticsActionHandler : public StatisticsActionHandler
+{
+    typedef StatisticsActionHandler base_type;
+
+public:
+    SendStatisticsActionHandler(const QString &basePath);
+
+    virtual ~SendStatisticsActionHandler();
+
+    int executePost(const QnRequestParamList& params
+        , const QByteArray& body, const QByteArray& srcBodyContentType
+        , QByteArray& result, QByteArray& resultContentType
+        , const QnRestConnectionProcessor *processor);
+};
+
+SendStatisticsActionHandler::SendStatisticsActionHandler(const QString &basePath)
+    : base_type(basePath)
+{}
+
+SendStatisticsActionHandler::~SendStatisticsActionHandler()
+{}
+
+int SendStatisticsActionHandler::executePost(const QnRequestParamList& params
+    , const QByteArray& body, const QByteArray& srcBodyContentType
+    , QByteArray& result, QByteArray& resultContentType
+    , const QnRestConnectionProcessor *processor)
+{
+    // TODO: implement me!
+    return nx_http::StatusCode::ok;
+}
+
+//
+
+uint qHash(const StatisticsActionHandlerPtr &statisticsAction)
+{
+    return qHash(statisticsAction->path());
+}
+
+//
+
 QnMultiserverStatisticsRestHandler::QnMultiserverStatisticsRestHandler(const QString &basePath)
     : QnFusionRestHandler()
 {
-    m_handlers.insert(kFullUrlTemplate.arg(basePath, SettingsActionHandler::kHandlerPath)
-        , createHandler<SettingsActionHandler>(basePath));
+    const auto settingsPath = makeFullPath(basePath, lit("settings"));
+    m_handlers.insert(settingsPath, createHandler<SettingsActionHandler>(settingsPath));
+
+    const auto sendPath = makeFullPath(basePath, lit("send"));
+    m_handlers.insert(sendPath, createHandler<SendStatisticsActionHandler>(sendPath));
 }
 
 QnMultiserverStatisticsRestHandler::~QnMultiserverStatisticsRestHandler()
@@ -221,11 +295,46 @@ int QnMultiserverStatisticsRestHandler::executeGet(const QString& path
     , QByteArray& contentType
     , const QnRestConnectionProcessor *processor)
 {
-    const auto handlerIt = m_handlers.find(path);
+    const auto executeGetRequest = [params, processor, &result, &contentType]
+        (const StatisticsActionHandlerPtr &handler)
+    {
+        return handler->executeGet(params, result, contentType
+            , processor->owner()->getPort());
+    };
+
+    return processRequest(path, executeGetRequest);
+}
+
+int QnMultiserverStatisticsRestHandler::executePost(const QString& path
+    , const QnRequestParamList& params
+    , const QByteArray& body
+    , const QByteArray& srcBodyContentType
+    , QByteArray& result
+    , QByteArray& resultContentType
+    , const QnRestConnectionProcessor *processor)
+{
+    const auto executePostRequest = [params, body, srcBodyContentType
+        , processor, &result, &resultContentType]
+        (const StatisticsActionHandlerPtr &handler)
+    {
+        return handler->executePost(params, body, srcBodyContentType
+            , result, resultContentType, processor);
+    };
+
+    return processRequest(path, executePostRequest);
+}
+
+int QnMultiserverStatisticsRestHandler::processRequest(const QString &fullPath
+    , const RunHandlerFunc &runHandler)
+{
+    if (!runHandler)
+        return nx_http::StatusCode::badRequest;
+
+    const auto handlerIt = m_handlers.find(fullPath);
     if (handlerIt == m_handlers.end())
         return nx_http::StatusCode::notFound;
 
     const auto handler = handlerIt.value();
-    return handler->executeGet(params, result, contentType
-        , processor->owner()->getPort());
+    return runHandler(handler);
 }
+

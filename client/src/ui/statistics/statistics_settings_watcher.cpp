@@ -54,10 +54,11 @@ void QnStatisticsSettingsWatcher::updateSettings()
 
     m_connection = server->restConnection();
 
-    // TODO: implement me!
     const auto callback = [this](bool success, rest::Handle handle, const QByteArray &data)
     {
+        const auto connectionLifeHolder = m_connection;
         m_connection.reset();
+
         if (!success)
             return;
 
@@ -70,7 +71,6 @@ void QnStatisticsSettingsWatcher::updateSettings()
         emit settingsAvailableChanged();
     };
 
-    qDebug() << "----------------";
     m_connection->getStatisticsSettingsAsync(callback);
 }
 

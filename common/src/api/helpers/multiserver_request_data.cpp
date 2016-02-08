@@ -18,11 +18,6 @@ namespace
     }
 }
 
-QnMultiserverRequestData&& QnMultiserverRequestData::create()
-{
-    return std::move(QnMultiserverRequestData());
-}
-
 QnMultiserverRequestData::QnMultiserverRequestData()
     : isLocal(false)
     , format(defaultFormat())
