@@ -1631,8 +1631,19 @@ QSize QnNxStyle::sizeFromContents(
     case CT_LineEdit:
         return QSize(size.width(), qMax(size.height(), Metrics::kButtonHeight));
     case CT_ComboBox:
-        return QSize(qMax(Metrics::kMinimumButtonWidth, size.width() + 2 * pixelMetric(PM_ButtonMargin, option, widget)),
-                     qMax(size.height(), Metrics::kButtonHeight));
+    {
+        bool hasArrow = false;
+        if (const QStyleOptionComboBox *comboBox = qstyleoption_cast<const QStyleOptionComboBox *>(option))
+            hasArrow = comboBox->subControls.testFlag(SC_ComboBoxArrow);
+
+        int height = qMax(size.height(), Metrics::kButtonHeight);
+
+        int hMargin = pixelMetric(PM_ButtonMargin, option, widget);
+        int width = qMax(Metrics::kMinimumButtonWidth,
+                         size.width() + hMargin + (hasArrow ? height : hMargin));
+
+        return QSize(width, height);
+    }
     case CT_TabBarTab:
         if (const QStyleOptionTab *tab =
                 qstyleoption_cast<const QStyleOptionTab *>(option))
