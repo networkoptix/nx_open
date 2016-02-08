@@ -26,7 +26,7 @@
         <product.display.title>${client.display.name}</product.display.title>
         <template>app</template>
         <!--Global libs-->
-        <qt.libs>core gui network opengl xml sql multimedia concurrent webenginecore webenginewidgets</qt.libs>
+        <qt.libs>core gui network opengl xml sql multimedia concurrent</qt.libs>
         <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc</ffmpeg.libs>
         <!-- ATTENTION!!! -lestbase should be the LATEST in the list!!! Required for Linux -->
         <!-- Disabled msvs 2015 libs> -lFestival -lestools -leststring -lestbase -lDxErr</!-->
