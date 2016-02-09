@@ -10,12 +10,11 @@ QT -= gui
 # This one handles dllimport/dllexport directives.
 DEFINES += QUAZIP_BUILD
 
-LIBS += ../../zlib/lib/zdll.lib 
 LIBS += -Lc:/develop/buildenv/artifacts/qt/5.6.0/windows/x64/lib
 
-INCLUDEPATH += ../../zlib/include
 INCLUDEPATH += c:/develop/buildenv/artifacts/qt/5.6.0/windows/x64/include 
 INCLUDEPATH += c:/develop/buildenv/artifacts/qt/5.6.0/windows/x64/include/QtCore 
+INCLUDEPATH += c:/develop/buildenv/artifacts/qt/5.6.0/windows/x64/include/QtZlib
 
 CONFIG += x64
 
