@@ -13,6 +13,63 @@
 
 namespace
 {
+    const auto kFiltersSettings = lit("filters");
+    const auto kLastSentTime = lit("lastSentTime");
+
+    template<typename ValueType>
+    void saveToStorage(const QString &name
+        , const ValueType &value
+        , QnBaseStatisticsStorage *storage)
+    {
+        Q_ASSERT_X(!name.isEmpty(), Q_FUNC_INFO, "Name could not be empty!");
+        Q_ASSERT_X(storage, Q_FUNC_INFO, "Storage has not set!");
+
+        if (!storage || name.isEmpty())
+            return;
+
+        const auto json = QJson::serialized(value);
+        storage->saveCustomSettings(name, json);
+    }
+
+    void saveLastFilters(const QnStringsSet &filters
+        , QnBaseStatisticsStorage *storage)
+    {
+        saveToStorage(kFiltersSettings, filters, storage);
+    }
+
+    void saveLastSentTime(qint64 lastSentTime
+        , QnBaseStatisticsStorage *storage)
+    {
+        saveToStorage(kLastSentTime, lastSentTime, storage);
+    }
+
+    QnStringsSet getLastFilters(const QnBaseStatisticsStorage *storage)
+    {
+        Q_ASSERT_X(storage, Q_FUNC_INFO, "Storage has not set!");
+
+        if (!storage)
+            return QnStringsSet();
+
+        const auto jsonValue = storage->getCustomSettings(kFiltersSettings);
+        return QJson::deserialized<QnStringsSet>(jsonValue);
+    }
+
+
+    qint64 getLastSentTime(const QnBaseStatisticsStorage *storage)
+    {
+        Q_ASSERT_X(storage, Q_FUNC_INFO, "Storage has not set!");
+
+        enum { kMinLastTimeMs = 0 };
+        if (!storage)
+            return kMinLastTimeMs;
+
+        const auto lastSentTimeStr = storage->getCustomSettings(kFiltersSettings);
+        return QnLexical::deserialized<qint64>(
+            QString::fromLatin1(lastSentTimeStr, kMinLastTimeMs));
+    }
+
+    //
+
     bool isMatchFilters(const QString &fullAlias
         , const QnStringsSet &filters)
     {
@@ -35,10 +92,28 @@ namespace
         }
         return result;
     }
+
+    const auto kSessionIdMetricTag = lit("id");
+    const auto kClientMachineIdMetricTag = lit("clientId");
+    const auto kSystemNameMetricTag = lit("systemName");
+
+    void appendMandatoryFilters(QnStringsSet *filters)
+    {
+        if (!filters)
+            return;
+
+        static const QString kKeyfilters[] = { kSessionIdMetricTag
+            , kClientMachineIdMetricTag, kSystemNameMetricTag };
+
+        for (auto keyFilter: kKeyfilters)
+            filters->insert(keyFilter);
+    }
 }
 
 QnStatisticsManager::QnStatisticsManager(QObject *parent)
     : base_type(parent)
+    , m_clientId()
+    , m_connection()
     , m_settings()
     , m_modules()
     , m_storage()
@@ -73,6 +148,11 @@ bool QnStatisticsManager::registerStatisticsModule(const QString &alias
 void QnStatisticsManager::unregisterModule(const QString &alias)
 {
     m_modules.remove(alias);
+}
+
+void QnStatisticsManager::setClientId(const QnUuid &clientID)
+{
+    m_clientId = clientID;
 }
 
 void QnStatisticsManager::setStorage(QnBaseStatisticsStorage *storage)
@@ -122,7 +202,7 @@ void debugOutput(const QnMetricsHash &metrics)
 
 void QnStatisticsManager::sendStatistics()
 {
-    if (!m_settings)
+    if (!m_settings || m_connection)
         return;
 
 //    if (!qnGlobalSettings->isStatisticsAllowed()) // TODO: uncomment me!
@@ -132,12 +212,13 @@ void QnStatisticsManager::sendStatistics()
     if (!m_settings->settingsAvailable())
         return;
 
-    const QnStatisticsSettings settings = m_settings->settings();
+    QnStatisticsSettings settings = m_settings->settings();
+    appendMandatoryFilters(&settings.filters);
 
     static const qint64 kMsInDay = 24 * 60 * 60 * 1000;
-    const qint64 minTimeStampMs = (getLastFilters() == settings.filters
+    const qint64 minTimeStampMs = (getLastFilters(m_storage) == settings.filters
         ? QDateTime::currentMSecsSinceEpoch() - kMsInDay * settings.storeDays
-        : getLastSentTime());
+        : getLastSentTime(m_storage));
 
     const auto totalMetricsList = m_storage->getMetricsList(minTimeStampMs, settings.limit);
 
@@ -149,54 +230,50 @@ void QnStatisticsManager::sendStatistics()
             totalFiltered.push_back(filtered);
     }
 
-    for (auto m: totalFiltered) // remove!
-        debugOutput(m);
-
     const auto server = qnCommon->currentServer();
     if (!server)
         return;
 
-    const auto connection = server->restConnection();
+    m_connection = server->restConnection();
 
     QnSendStatisticsRequestData request;
     request.metricsList = totalFiltered;
 
-    const auto callback = [this](bool success, rest::Handle /* handle */
+    const auto timeStamp = QDateTime::currentMSecsSinceEpoch();
+    const auto callback = [this, timeStamp, settings]
+        (bool success, rest::Handle /* handle */
         , rest::ServerConnection::EmptyResponseType /*response */)
     {
-        m_statisticsSent = true; // TODO: move this to appropriate place
+        const auto connectionLifeHolder = m_connection;
+        m_connection.reset();
+
+        if (!success)
+            return;
+
+        saveLastSentTime(timeStamp, m_storage);
+        saveLastFilters(settings.filters, m_storage);
+        m_statisticsSent = true;
     };
 
-    connection->sendStatisticsAsync(request, callback);
+    m_connection->sendStatisticsAsync(request, callback);
 }
 
 void QnStatisticsManager::saveCurrentStatistics()
 {
+    Q_ASSERT_X(!m_clientId.isNull(), Q_FUNC_INFO
+        , "Can't save client statistics without client identifier!");
+    if (m_clientId.isNull())
+        return;
+
     // Stores current metrics
-    const auto metrics = getMetrics();
+    auto metrics = getMetrics();
+
+    const auto sessionId = qnCommon->runningInstanceGUID().toString();
+    const auto systemName = qnCommon->localSystemName();
+    metrics.insert(kSessionIdMetricTag, sessionId);
+    metrics.insert(kClientMachineIdMetricTag, m_clientId.toString());
+    metrics.insert(kSystemNameMetricTag, systemName);
     m_storage->storeMetrics(metrics);
-
-    // TODO: remove me
-    const auto settings = m_settings->settings();
-    debugOutput(filteredMetrics(metrics, settings.filters));
-}
-
-QnStringsSet QnStatisticsManager::getLastFilters() const
-{
-    static const auto kFiltersSettings = lit("filters");
-
-    const auto filterJsonSettings = m_storage->getCustomSettings(kFiltersSettings);
-    return QJson::deserialized<QnStringsSet>(filterJsonSettings);
-}
-
-qint64 QnStatisticsManager::getLastSentTime() const
-{
-    enum { kMinLastSentTime = 0 };
-    static const auto kLastSentTime = lit("lastSentTime");
-
-    const auto lastSentTimeStr = m_storage->getCustomSettings(kLastSentTime);
-    return QnLexical::deserialized<qint64>(QString::fromLatin1(lastSentTimeStr)
-        , kMinLastSentTime);
 }
 
 

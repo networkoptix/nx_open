@@ -5,6 +5,7 @@
 #include <QtCore/QPointer>
 
 #include <statistics/types.h>
+#include <api/server_rest_connection_fwd.h>
 
 class QnBaseStatisticsModule;
 class QnBaseStatisticsStorage;
@@ -25,6 +26,8 @@ public:
     bool registerStatisticsModule(const QString &alias
         ,  QnBaseStatisticsModule *module);
 
+    void setClientId(const QnUuid &clientID);
+
     void setStorage(QnBaseStatisticsStorage *storage);
 
     void setSettings(QnBaseStatisticsSettingsLoader *settings);
@@ -39,15 +42,15 @@ private:
 
     QnMetricsHash getMetrics() const;
 
-    QnStringsSet getLastFilters() const;
-
-    qint64 getLastSentTime() const;
-
 private:
     typedef QPointer<QnBaseStatisticsSettingsLoader> SettingsPtr;
     typedef QPointer<QnBaseStatisticsStorage> StoragePtr;
     typedef QPointer<QnBaseStatisticsModule> ModulePtr;
     typedef QHash<QString, ModulePtr> ModulesMap;
+
+    QnUuid m_clientId;
+
+    rest::QnConnectionPtr m_connection;
 
     SettingsPtr m_settings;
     StoragePtr m_storage;

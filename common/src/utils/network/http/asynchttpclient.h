@@ -408,6 +408,20 @@ namespace nx_http
         const QUrl& url,
         std::function<void(SystemError::ErrorCode, int, nx_http::StringType, nx_http::BufferType)> completionHandler,
         nx_http::AsyncHttpClientPtr httpClientCaptured);
+
+    typedef std::function<void (SystemError::ErrorCode, int httpStatus)> UploadCompletionHandler;
+
+    // Uploads specified data using POST
+    bool uploadDataAsync(const QUrl &url
+        , const QByteArray &data
+        , const QByteArray &contentType
+        , const nx_http::HttpHeaders &extraHeaders
+        , const UploadCompletionHandler &callback);
+
+    SystemError::ErrorCode uploadDataSync(const QUrl &url
+        , const QByteArray &data
+        , const QByteArray &contentType
+        , nx_http::StatusCode::Value *httpCode = nullptr);
 }
 
 #endif  //ASYNCHTTPCLIENT_H

@@ -66,7 +66,7 @@ Handle ServerConnection::sendStatisticsAsync(const QnSendStatisticsRequestData &
     , PostCallback callback
     , QThread *targetThread)
 {
-    static const nx_http::StringType kJsonContentType = "application/json";
+    static const nx_http::StringType kJsonContentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
 
     const nx_http::BufferType data = QJson::serialized(request.metricsList);
     if (data.isEmpty())
@@ -75,7 +75,6 @@ Handle ServerConnection::sendStatisticsAsync(const QnSendStatisticsRequestData &
     return executePost(lit("/ec2/statistics/send"), request.toParams()
         , kJsonContentType, data, callback, targetThread);
 }
-
 
 // --------------------------- private implementation -------------------------------------
 

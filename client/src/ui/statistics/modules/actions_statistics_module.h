@@ -15,7 +15,6 @@ public:
 
     virtual ~QnActionsStatisticsModule();
 
-private:
     QnMetricsHash metrics() const override;
 
     void resetMetrics() override;

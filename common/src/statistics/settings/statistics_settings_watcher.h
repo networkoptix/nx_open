@@ -35,5 +35,4 @@ private:
     TimerPtr m_updateTimer;
 
     rest::QnConnectionPtr m_connection;
-    rest::Handle m_restHandle;
 };

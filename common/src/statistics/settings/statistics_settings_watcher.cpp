@@ -14,7 +14,6 @@ QnStatisticsSettingsWatcher::QnStatisticsSettingsWatcher(QObject *parent)
     , m_settings()
     , m_updateTimer(new QTimer())
     , m_connection()
-    , m_restHandle(0)
 {
     enum { kUpdatePeriodMs = 30 * 60 * 1000 };    // 30 minutes update period
     m_updateTimer->setSingleShot(false);

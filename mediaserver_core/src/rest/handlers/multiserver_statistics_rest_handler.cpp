@@ -4,17 +4,20 @@
 #include <network/tcp_listener.h>
 #include <common/common_module.h>
 #include <utils/common/model_functions.h>
+#include <utils/network/http/asynchttpclient.h>
 #include <api/helpers/empty_request_data.h>
+#include <api/helpers/send_statistics_request_data.h>
 #include <rest/helpers/request_context.h>
 #include <rest/helpers/request_helpers.h>
 #include <rest/server/rest_connection_processor.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
-
 #include <statistics/base_statistics_settings_loader.h>
 
 namespace
 {
+    const nx_http::StringType kJsonContentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
+
     QString makeFullPath(const QString &basePath
         , const QString &postfix)
     {
@@ -48,6 +51,13 @@ namespace
         const auto flags = server->getServerFlags();
         return flags.testFlag(Qn::SF_HasPublicIP);
     }
+
+    bool isCorrectMetricsListJson(const QByteArray &body)
+    {
+        bool success = false;
+        QJson::deserialized(body, QnMetricHashesList(), &success);
+        return success;
+    };
 }
 
 class StatisticsActionHandler
@@ -59,14 +69,14 @@ public:
 
     const QString &path() const;
 
-    virtual int executeGet(const QnRequestParamList& params
-        , QByteArray& result, QByteArray& contentType
+    virtual int executeGet(const QnRequestParamList &params
+        , QByteArray &result, QByteArray &contentType
         , int port);
 
-    virtual int executePost(const QnRequestParamList& params
-        , const QByteArray& body, const QByteArray& srcBodyContentType
-        , QByteArray& result, QByteArray& resultContentType
-        , const QnRestConnectionProcessor *processor);
+    virtual int executePost(const QnRequestParamList &params
+        , const QByteArray &body, const QByteArray &srcBodyContentType
+        , QByteArray &result, QByteArray &resultContentType
+        , int port);
 
 
 private:
@@ -85,16 +95,16 @@ const QString &StatisticsActionHandler::path() const
     return m_path;
 }
 
-int StatisticsActionHandler::executeGet(const QnRequestParamList& params
-    , QByteArray& result, QByteArray& contentType, int port)
+int StatisticsActionHandler::executeGet(const QnRequestParamList &params
+    , QByteArray &result, QByteArray &contentType, int port)
 {
     return nx_http::StatusCode::internalServerError;
 }
 
-int StatisticsActionHandler::executePost(const QnRequestParamList& params
-    , const QByteArray& body, const QByteArray& srcBodyContentType
-    , QByteArray& result, QByteArray& resultContentType
-    , const QnRestConnectionProcessor *processor)
+int StatisticsActionHandler::executePost(const QnRequestParamList &params
+    , const QByteArray &body, const QByteArray &srcBodyContentType
+    , QByteArray &result, QByteArray &resultContentType
+    , int port)
 {
     return nx_http::StatusCode::internalServerError;
 }
@@ -110,8 +120,8 @@ public:
 
     virtual ~SettingsActionHandler();
 
-    int executeGet(const QnRequestParamList& params
-        , QByteArray& result, QByteArray& contentType
+    int executeGet(const QnRequestParamList &params
+        , QByteArray &result, QByteArray &contentType
         , int port) override;
 
 private:
@@ -133,8 +143,8 @@ SettingsActionHandler::SettingsActionHandler(const QString &baseUrl)
 SettingsActionHandler::~SettingsActionHandler()
 {}
 
-int SettingsActionHandler::executeGet(const QnRequestParamList& params
-    , QByteArray& result, QByteArray& contentType
+int SettingsActionHandler::executeGet(const QnRequestParamList &params
+    , QByteArray &result, QByteArray &contentType
     , int port)
 {
     Context context(QnEmptyRequestData(), port);
@@ -149,7 +159,6 @@ int SettingsActionHandler::executeGet(const QnRequestParamList& params
     }
     else
     {
-        // Otherwise we load settings from other available servers
         const auto moduleGuid = qnCommon->moduleGUID();
         for (const auto server: qnResPool->getAllServers(Qn::Online))
         {
@@ -172,7 +181,6 @@ int SettingsActionHandler::executeGet(const QnRequestParamList& params
 
 nx_http::StatusCode::Value SettingsActionHandler::loadSettingsLocally(QnStatisticsSettings &outputSettings)
 {
-    // At first we try to load settings through the current server
     const auto moduleGuid = qnCommon->moduleGUID();
     const auto server = qnResPool->getResourceById<QnMediaServerResource>(moduleGuid);
     if (!server || !hasInternetConnection(server))
@@ -193,7 +201,7 @@ nx_http::StatusCode::Value SettingsActionHandler::loadSettingsLocally(QnStatisti
 
 nx_http::StatusCode::Value SettingsActionHandler::loadSettingsRemotely(
     QnStatisticsSettings &outputSettings
-    , const QnMediaServerResourcePtr& server
+    , const QnMediaServerResourcePtr &server
     , Context *context)
 {
     auto result = nx_http::StatusCode::noContent;
@@ -245,10 +253,19 @@ public:
 
     virtual ~SendStatisticsActionHandler();
 
-    int executePost(const QnRequestParamList& params
-        , const QByteArray& body, const QByteArray& srcBodyContentType
-        , QByteArray& result, QByteArray& resultContentType
-        , const QnRestConnectionProcessor *processor);
+    int executePost(const QnRequestParamList &params
+        , const QByteArray &body, const QByteArray &srcBodyContentType
+        , QByteArray &result, QByteArray &resultContentType
+        , int port);
+
+private:
+    typedef QnMultiserverRequestContext<QnSendStatisticsRequestData> Context;
+
+    nx_http::StatusCode::Value sendStatisticsLocally(const QByteArray &metricsList);
+
+    nx_http::StatusCode::Value sendStatisticsRemotely(const QByteArray &metricsList
+        , const QnMediaServerResourcePtr &server
+        , Context *context);
 };
 
 SendStatisticsActionHandler::SendStatisticsActionHandler(const QString &basePath)
@@ -259,21 +276,93 @@ SendStatisticsActionHandler::~SendStatisticsActionHandler()
 {}
 
 int SendStatisticsActionHandler::executePost(const QnRequestParamList& params
-    , const QByteArray& body, const QByteArray& srcBodyContentType
-    , QByteArray& result, QByteArray& resultContentType
-    , const QnRestConnectionProcessor *processor)
+    , const QByteArray &body, const QByteArray &srcBodyContentType
+    , QByteArray &/* result */, QByteArray &/*resultContentType*/
+    , int port)
 {
-    // TODO: implement me!
-    return nx_http::StatusCode::ok;
+    // TODO: add support of specified in parameters format, not only json!
+    QnSendStatisticsRequestData requestData;
+    const bool correctJson = QJson::deserialize<QnMetricHashesList>(
+        body, &requestData.metricsList);
+
+    Q_ASSERT_X(correctJson, Q_FUNC_INFO, "Incorect json with mertics received!");
+    if (!correctJson)
+        return nx_http::StatusCode::invalidParameter;
+
+    Context context(requestData, port);    // todo add context initialization
+    const auto request = context.request();
+
+    nx_http::StatusCode::Value resultCode = nx_http::StatusCode::notAcceptable;
+    if (request.isLocal)
+    {
+        sendStatisticsLocally(body);
+    }
+    else
+    {
+        const auto moduleGuid = qnCommon->moduleGUID();
+        for (const auto server: qnResPool->getAllServers(Qn::Online))
+        {
+            resultCode = (server->getId() == moduleGuid
+                ? sendStatisticsLocally(body)
+                : sendStatisticsRemotely(body, server, &context));
+
+            if (resultCode == nx_http::StatusCode::ok)
+                break;
+        }
+    }
+
+    return resultCode;
 }
 
-//
-
-uint qHash(const StatisticsActionHandlerPtr &statisticsAction)
+nx_http::StatusCode::Value SendStatisticsActionHandler::sendStatisticsLocally(
+    const QByteArray &metricsList)
 {
-    return qHash(statisticsAction->path());
+    const auto moduleGuid = qnCommon->moduleGUID();
+    const auto server = qnResPool->getResourceById<QnMediaServerResource>(moduleGuid);
+    if (!server || !hasInternetConnection(server))
+        return nx_http::StatusCode::notAcceptable;
+
+    static const QUrl kStatisticsUrl = "http://10.0.2.129/statserver/api/save/clientSessions";
+
+    auto httpCode = nx_http::StatusCode::notAcceptable;
+    const auto error = nx_http::uploadDataSync(
+        kStatisticsUrl, metricsList, kJsonContentType, &httpCode);
+
+    qDebug() << "Statistics sent: " << error << ":" << httpCode;
+    return (error == SystemError::noError
+        ? httpCode : nx_http::StatusCode::internalServerError);
 }
 
+nx_http::StatusCode::Value SendStatisticsActionHandler::sendStatisticsRemotely(
+    const QByteArray &metricsList
+    , const QnMediaServerResourcePtr &server
+    , Context *context)
+{
+    auto result = nx_http::StatusCode::notAcceptable;
+
+    if (!hasInternetConnection(server))
+        return result;
+
+    const auto completionFunc = [&result, context]
+        (SystemError::ErrorCode errorCode, int statusCode)
+    {
+        const auto httpCode = static_cast<nx_http::StatusCode::Value>(statusCode);
+        const auto updateOutputDataCallback =[&result, errorCode, httpCode, context]()
+        {
+            result = (errorCode == SystemError::noError
+                ? httpCode : nx_http::StatusCode::internalServerError);
+            context->requestProcessed();
+        };
+
+        context->executeGuarded(updateOutputDataCallback);
+    };
+
+    const QUrl apiUrl = getServerApiUrl(path(), server, *context);
+    runMultiserverUploadRequest(apiUrl
+        , metricsList, kJsonContentType, server, completionFunc, context);
+    context->waitForDone();
+    return result;
+}
 //
 
 QnMultiserverStatisticsRestHandler::QnMultiserverStatisticsRestHandler(const QString &basePath)
@@ -318,7 +407,7 @@ int QnMultiserverStatisticsRestHandler::executePost(const QString& path
         (const StatisticsActionHandlerPtr &handler)
     {
         return handler->executePost(params, body, srcBodyContentType
-            , result, resultContentType, processor);
+            , result, resultContentType, processor->owner()->getPort());
     };
 
     return processRequest(path, executePostRequest);
