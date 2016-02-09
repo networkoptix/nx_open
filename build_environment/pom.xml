@@ -173,7 +173,7 @@
                     <artifactId>quazip</artifactId>
                     <version>${quazip.version}</version>
                     <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${compiler}</classifier>
+                    <classifier>${profile.classifier}-${arch}-${compiler}</classifier>
                 </dependency>
             </dependencies>
         </profile>
