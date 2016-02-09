@@ -1,0 +1,1 @@
+In this directory one can find third-party libraries that are used by the project. All these libraries are pre-built and packages by maven and can be found in ../build_environment
