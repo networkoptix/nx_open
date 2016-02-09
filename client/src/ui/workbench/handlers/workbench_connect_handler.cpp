@@ -193,6 +193,9 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered() {
     if (connected() && !disconnectFromServer(force))
         return;
 
+    qnCommon->updateRunningInstanceGuid();
+    qDebug() << "=-================== updaaate!!!!!";
+
     QnActionParameters parameters = menu()->currentParameters(sender());
     QUrl url = parameters.argument(Qn::UrlRole, QUrl());
 
@@ -270,8 +273,6 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
         if (connected())
             return ec2::ErrorCode::ok;
     }
-
-    qnCommon->updateRunningInstanceGuid();
 
     /* Hiding message box from previous connect. */
     hideMessageBox();
