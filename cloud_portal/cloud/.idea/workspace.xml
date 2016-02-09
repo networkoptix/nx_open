@@ -2,9 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="95873933-5438-4b5b-9be0-62681759d3ec" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build_scripts/parse_text_from_js.py" afterPath="" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/build_scripts/localize.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build_scripts/cloud_portal.ts" afterPath="$PROJECT_DIR$/build_scripts/cloud_portal.ts" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build_scripts/generate_ts.py" afterPath="$PROJECT_DIR$/build_scripts/generate_ts.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/build_scripts/parse_text_from_html.py" afterPath="$PROJECT_DIR$/build_scripts/generate_ts.py" />
     </list>
     <ignored path="cloud.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -38,8 +39,8 @@
       <file leaf-file-name="generate_ts.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/build_scripts/generate_ts.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-2.3493977">
-              <caret line="13" column="0" selection-start-line="13" selection-start-column="0" selection-end-line="13" selection-end-column="0" />
+            <state vertical-scroll-proportion="-1.4698795">
+              <caret line="141" column="67" selection-start-line="141" selection-start-column="39" selection-end-line="141" selection-end-column="67" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -47,11 +48,33 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="cloud_portal.ts" pinned="false" current-in-tab="true">
+      <file leaf-file-name="localize.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/build_scripts/localize.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.96411484">
+              <caret line="36" column="0" selection-start-line="36" selection-start-column="0" selection-end-line="36" selection-end-column="0" />
+              <folding>
+                <element signature="e#0#9#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="cloud_portal.ts" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/build_scripts/cloud_portal.ts">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.6138107">
-              <caret line="16" column="32" selection-start-line="16" selection-start-column="32" selection-end-line="16" selection-end-column="32" />
+            <state vertical-scroll-proportion="-1.2962962">
+              <caret line="7" column="35" selection-start-line="7" selection-start-column="35" selection-end-line="7" selection-end-column="35" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="42ba3df3.language.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/static/scripts/42ba3df3.language.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="17" column="26" selection-start-line="17" selection-start-column="26" selection-end-line="17" selection-end-column="26" />
               <folding />
             </state>
           </provider>
@@ -81,7 +104,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/api/methods/account_serializers.py" />
         <option value="$PROJECT_DIR$/api/methods/account.py" />
         <option value="$PROJECT_DIR$/api/static/api.xml" />
         <option value="$PROJECT_DIR$/notifications/controllers/send.py" />
@@ -129,9 +151,10 @@
         <option value="$PROJECT_DIR$/build_scripts/extract_html.py" />
         <option value="$PROJECT_DIR$/build_scripts/parse_attributes_from_html.py" />
         <option value="$PROJECT_DIR$/build_scripts/parse_text_from_js.py" />
-        <option value="$PROJECT_DIR$/build_scripts/cloud_portal.ts" />
         <option value="$PROJECT_DIR$/build_scripts/parse_text_from_html.py" />
         <option value="$PROJECT_DIR$/build_scripts/generate_ts.py" />
+        <option value="$PROJECT_DIR$/build_scripts/cloud_portal.ts" />
+        <option value="$PROJECT_DIR$/build_scripts/localize.py" />
       </list>
     </option>
   </component>
@@ -520,13 +543,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/api/helpers/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/notifications/engines/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -889,8 +905,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/build_scripts/generate_ts.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-2.3493977">
-          <caret line="13" column="0" selection-start-line="13" selection-start-column="0" selection-end-line="13" selection-end-column="0" />
+        <state vertical-scroll-proportion="-1.4698795">
+          <caret line="141" column="67" selection-start-line="141" selection-start-column="39" selection-end-line="141" selection-end-column="67" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
           </folding>
@@ -899,9 +915,27 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/build_scripts/cloud_portal.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.6138107">
-          <caret line="16" column="32" selection-start-line="16" selection-start-column="32" selection-end-line="16" selection-end-column="32" />
+        <state vertical-scroll-proportion="-1.2962962">
+          <caret line="7" column="35" selection-start-line="7" selection-start-column="35" selection-end-line="7" selection-end-column="35" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/static/scripts/42ba3df3.language.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="17" column="26" selection-start-line="17" selection-start-column="26" selection-end-line="17" selection-end-column="26" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build_scripts/localize.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.96411484">
+          <caret line="36" column="0" selection-start-line="36" selection-start-column="0" selection-end-line="36" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

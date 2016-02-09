@@ -1,6 +1,6 @@
 import os
 import re
-import xml.etree.cElementTree as cElementTree
+import xml.etree.ElementTree as eTree
 from xml.dom import minidom
 
 
@@ -84,38 +84,38 @@ def process_attributes(data):
 
 
 def generate_ts(data):
-    root_element = cElementTree.Element("TS", version="2.1", language="en_US", sourcelanguage="en")
+    root_element = eTree.Element("TS", version="2.1", language="en_US", sourcelanguage="en")
 
     for record in data:
-        context = cElementTree.SubElement(root_element, "context")
+        context = eTree.SubElement(root_element, "context")
         file_name = record['filename']
-        cElementTree.SubElement(context, "name").text = file_name
+        eTree.SubElement(context, "name").text = file_name
 
         first = True
         for string in record['inline']:
             # print(string)
-            message = cElementTree.SubElement(context, "message")
-            location = cElementTree.SubElement(message, "location")
+            message = eTree.SubElement(context, "message")
+            location = eTree.SubElement(message, "location")
             if first:
                 location.set("filename", file_name)
                 first = False
 
-            cElementTree.SubElement(message, "source").text = string.strip()
-            cElementTree.SubElement(message, "translation").text = ' '
+            eTree.SubElement(message, "source").text = string.strip()
+            eTree.SubElement(message, "translation").text = ' '
 
         for string in record['attributes']:
-            message = cElementTree.SubElement(context, "message")
-            location = cElementTree.SubElement(message, "location")
+            message = eTree.SubElement(context, "message")
+            location = eTree.SubElement(message, "location")
             if first:
                 location.set("filename", file_name)
                 first = False
 
-            cElementTree.SubElement(message, "source").text = string.strip()
-            cElementTree.SubElement(message, "translation").text = ' '
+            eTree.SubElement(message, "source").text = string.strip()
+            eTree.SubElement(message, "translation").text = ' '
 
         pass
 
-    rough_string = cElementTree.tostring(root_element, 'utf-8')
+    rough_string = eTree.tostring(root_element, 'utf-8')
     parsed = minidom.parseString(rough_string)
     return parsed.toprettyxml(indent="  ", encoding='UTF-8')
 
