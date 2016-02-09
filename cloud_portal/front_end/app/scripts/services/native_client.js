@@ -10,7 +10,7 @@ angular.module('cloudApp')
                 var system   = systemId?systemId:'localhost:7000';
                 var protocol = Config.clientProtocol;
                 system = system.replace('{','').replace('}','');
-                var url = protocol + username + ":" + password + "@" + system + "/";
+                var url = protocol + username + ':' + password + '@' + system + '/';
                 window.open(url);
             }
         }

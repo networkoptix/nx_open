@@ -11,7 +11,7 @@ angular.module('cloudApp')
                 scope.inline = typeof($location.search().inline) != 'undefined';
 
                 if(scope.inline){
-                    $("body").addClass("inline-portal");
+                    $('body').addClass('inline-portal');
                 }
 
                 scope.login = function(){
@@ -26,11 +26,11 @@ angular.module('cloudApp')
 
                 account.get().then(function(account){
                     scope.account = account;
-                    $("body").removeClass("loading");
-                    $("body").addClass("authorized");
+                    $('body').removeClass('loading');
+                    $('body').addClass('authorized');
                 },function(){
-                    $("body").removeClass("loading");
-                    $("body").addClass("anonymous");
+                    $('body').removeClass('loading');
+                    $('body').addClass('anonymous');
                 });
             }
         };

@@ -10,15 +10,15 @@ angular.module('cloudApp')
                     return;
                 }
 
-                var formName = element.attr("ng-form") || element.closest('form').attr('name');
+                var formName = element.attr('ng-form') || element.closest('form').attr('name');
                 var fieldName = input.attr('name');
 
                 var scopeName = formName + '.' + fieldName;
 
-                scope.$watch(scopeName + ".$valid",updateValidity);
-                scope.$watch(scopeName + ".$touched",updateValidity);
+                scope.$watch(scopeName + '.$valid',updateValidity);
+                scope.$watch(scopeName + '.$touched',updateValidity);
 
-                input.on("focus",function(){
+                input.on('focus',function(){
                     scope[formName][fieldName].$setUntouched();
                     scope.$apply();
                 });
