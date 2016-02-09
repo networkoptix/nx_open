@@ -3,7 +3,7 @@
 
 #include <QtSql/QSqlDatabase>
 
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 class QSqlDatabase;
 
