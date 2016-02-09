@@ -5,6 +5,7 @@ angular.module('cloudApp')
 
 
         $scope.Config = Config;
+        $scope.L = L;
         var systemId = $routeParams.systemId;
 
         $scope.system = {
@@ -25,8 +26,8 @@ angular.module('cloudApp')
         $scope.gettingSystem = process.init(function(){
             return cloudApi.system(systemId);
         },{
-            forbidden: Config.errorCodes.systemForbidden,
-            notFound: Config.errorCodes.systemNotFound
+            forbidden: L.errorCodes.systemForbidden,
+            notFound: L.errorCodes.systemNotFound
         }).then(function(result){
             $scope.system.info = result.data[0];
             $scope.isOwner = $scope.system.info.ownerAccountEmail == $scope.account.email;
@@ -36,7 +37,6 @@ angular.module('cloudApp')
         $scope.gettingSystem.run();
 
         function cleanUrl(){
-            console.log("clean url");
             $location.path('/systems/' + systemId, false);
         }
 
@@ -49,8 +49,6 @@ angular.module('cloudApp')
             $scope.system.users = _.sortBy(users,function(user){
                 return - Config.accessRoles.order.indexOf(user.accessRole);
             });
-
-            console.log("callShare", $routeParams.callShare);
 
             if($routeParams.callShare){
 
@@ -83,7 +81,7 @@ angular.module('cloudApp')
 
         function reloadSystems(){
             cloudApi.systems('clearCache').then(function(){
-               $location.path("/systems");
+               $location.path('/systems');
             });
         }
 
@@ -91,11 +89,10 @@ angular.module('cloudApp')
         $scope.delete = function(){
             //1. Determine, if I am the owner
 
-
             if($scope.isOwner ){
 
                 // User is the owner. Deleting system means unbinding it and disconnecting all accounts
-                dialogs.confirm("You are going to completely disconnect your system from the cloud. Are you sure?").
+                dialogs.confirm(L.system.confirmDisconnect).
                     then(function(){
                         $scope.deletingSystem = process.init(function(){
                             return cloudApi.disconnect(systemId);
@@ -105,7 +102,7 @@ angular.module('cloudApp')
 
             }else{
                 // User is not owner. Deleting means he'll lose access to it
-                dialogs.confirm("You are going to disconnect this system from your account. You will lose an access for this system. Are you sure?").
+                dialogs.confirm(L.system.confirmUnshareFromMe).
                     then(function(){
                         $scope.deletingSystem = process.init(function(){
                             return cloudApi.unshare(systemId, $scope.account.email);
@@ -131,7 +128,7 @@ angular.module('cloudApp')
                 return $scope.delete();
             }
             // Run a process of sharing
-            $scope.unsharingMessage = "Permissions were removed from " + user.accountEmail;
+            $scope.unsharingMessage = L.system.permissionsRemoved.replace('{accountEmail}',user.accountEmail);
             $scope.unsharing = process.init(function(){
                 return cloudApi.unshare(systemId, user.accountEmail);
             }).then(function(){

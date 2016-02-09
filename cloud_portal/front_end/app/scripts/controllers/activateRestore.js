@@ -24,8 +24,8 @@ angular.module('cloudApp')
         $scope.change = process.init(function(){
             return cloudApi.restorePassword($scope.data.restoreCode, $scope.data.newPassword);
         },{
-            notFound: Config.errorCodes.wrongCode,
-            notAuthorized: Config.errorCodes.wrongCode
+            notFound: L.errorCodes.wrongCode,
+            notAuthorized: L.errorCodes.wrongCode
         });
 
         $scope.directChange = function(){
@@ -35,22 +35,22 @@ angular.module('cloudApp')
         $scope.restore = process.init(function(){
             return cloudApi.restorePasswordRequest($scope.data.email);
         },{
-            notFound: Config.errorCodes.emailNotFound
+            notFound: L.errorCodes.emailNotFound
         });
 
         $scope.activate = process.init(function(){
             return cloudApi.activate($scope.data.activateCode);
         },{
-            notFound: Config.errorCodes.wrongCode,
-            notAuthorized: Config.errorCodes.wrongCode
+            notFound: L.errorCodes.wrongCode,
+            notAuthorized: L.errorCodes.wrongCode
         });
 
 
         $scope.reactivate = process.init(function(){
             return cloudApi.reactivate($scope.data.email);
         },{
-            forbidden: Config.errorCodes.accountAlreadyActivated,
-            notFound: Config.errorCodes.emailNotFound
+            forbidden: L.errorCodes.accountAlreadyActivated,
+            notFound: L.errorCodes.emailNotFound
         });
 
         if($scope.data.activateCode){

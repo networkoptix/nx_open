@@ -23,7 +23,7 @@ angular.module('cloudApp')
         $scope.changePassword = process.init(function() {
             return cloudApi.changePassword($scope.pass.newPassword,$scope.pass.password);
         },{
-            notAuthorized: Config.errorCodes.oldPasswordMistmatch
+            notAuthorized: L.errorCodes.oldPasswordMistmatch
         }).then(function(){
             $scope.session.password = $scope.newPassword;
         });

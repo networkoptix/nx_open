@@ -15,7 +15,7 @@ angular.module('cloudApp')
                     return errorCodes[error.resultCode];
                 }
             }
-            return Config.errorCodes[error.resultCode] || Config.errorCodes.unknownError;
+            return L.errorCodes[error.resultCode] || L.errorCodes.unknownError;
         }
 
         return {
@@ -50,7 +50,7 @@ angular.module('cloudApp')
                         return caller().then(function(data){
                             self.processing = false;
                             self.finished = true;
-                            if(data.data.resultCode && data.data.resultCode != Config.errorCodes.ok){
+                            if(data.data.resultCode && data.data.resultCode != L.errorCodes.ok){
                                 self.error = true;
                                 self.errorData = data;
                                 self.errorMessage = formatError(data.data, errorCodes);

@@ -14,23 +14,23 @@ var Config = {
             style: 'label-default'
         },
         notActivated: {
-            label: 'not activated',
+            label: L.systemStatuses.notActivated,
             style: 'label-danger'
         },
         activated:{
-            label: 'activated',
+            label: L.systemStatuses.activated,
             style: 'label-info'
         },
         online:{
-            label: 'online',
+            label: L.systemStatuses.online,
             style: 'label-success'
         },
         offline:{
-            label: 'offline',
+            label: L.systemStatuses.offline,
             style: 'label-default'
         },
         unavailable:{
-            label: 'unavailable',
+            label: L.systemStatuses.unavailable,
             style: 'label-default'
         }
     },
@@ -38,50 +38,28 @@ var Config = {
         unshare: 'none',
         default: 'viewer',
         owner:   'owner',
-        settings:{
-            "owner": {
-                label: "owner",
-                description: "Can do pretty much everything with his system"
-            },
-            "viewer": {
-                label: "viewer",
-                description: "Can view live video from cameras and archive"
-            },
-            "liveViewer": {
-                label: "live viewer",
-                description: "Can view only live video from cameras"
-            },
-            "advancedViewer": {
-                label: "advanced viewer",
-                description: "Can view live video from cameras and archive, configure cameras"
-            },
-            "cloudAdmin": {
-                label: "admin",
-                description: "Can configure system and share it"
-            }
-        },
         order:[
-            "liveViewer",
-            "viewer",
-            "advancedViewer",
-            "cloudAdmin",
-            "owner"
+            'liveViewer',
+            'viewer',
+            'advancedViewer',
+            'cloudAdmin',
+            'owner'
         ],
         options:[
             {
-                "accessRole": "owner"
+                accessRole: 'owner'
             },
             {
-                "accessRole": "viewer"
+                accessRole: 'viewer'
             },
             {
-                "accessRole": "liveViewer"
+                accessRole: 'liveViewer'
             },
             {
-                "accessRole": "advancedViewer"
+                accessRole: 'advancedViewer'
             },
             {
-                "accessRole": "cloudAdmin"
+                accessRole: 'cloudAdmin'
             }
         ]
     },
@@ -90,10 +68,10 @@ var Config = {
     passwordRequirements:
     {
         minLength: 6,
-        minLengthMessage:'Password must contain at least 6 characters',
+        minLengthMessage:L.passwordRequirements.minLengthMessage,
         maxLength: 255,
         requiredRegex: '[\x21-\x7E]+',
-        requiredMessage: 'Use only latin letters, numbers and keyboard symbols',
+        requiredMessage: L.passwordRequirements.requiredMessage,
         strongPasswordCheck: function(password){
 
             var classes = [
@@ -113,36 +91,9 @@ var Config = {
             }
             return classesCount >= 3;
         },
-        weakMessage: 'Use numbers, symbols in different case and special symbols to make your password stronger',
-        strongMessage: 'Strong password!',
-        commonMessage: 'This password is in top most popular passwords in the world'
-    },
-
-    errorCodes:{
-        ok: 'ok',
-
-        cloudInvalidResponse: 'Cloud DB returned an unexpected response',
-        notAuthorized: 'Login or password are incorrect',
-        wrongParameters: 'Some parameters on the form are incorrect',
-        wrongCode: 'Wrong confirmation code',
-
-        forbidden: 'You are not authorised for this action',
-        accountNotActivated: 'Your account wasn\'t confirmed yet. <a href="#/activate">Send confirmation link again</a>',
-        accountBlocked: 'Your account was blocked',
-
-        notFound: 'Not found', // Account not found, activation code not found and so on,
-        alreadyExists: 'Already Exists', // Account already exists
-
-        unknownError: 'Some unexpected error has happened',
-
-        // Internal error code for interface
-        accountAlreadyActivated: 'Your account was already activated',
-        emailNotFound: 'Email isn\'t registered in portal',
-        emailAlreadyExists: 'Email is already registered in portal',
-        oldPasswordMistmatch: 'Current password doesn\'t match',
-
-        systemForbidden: 'You have no access to this system',
-        systemNotFound: 'This system wasn\'t found'
-
+        weakMessage: L.passwordRequirements.weakMessage,
+        strongMessage: L.passwordRequirements.strongMessage,
+        commonMessage: L.passwordRequirements.commonMessage
     }
+
 };

@@ -12,6 +12,7 @@ angular.module('cloudApp')
         }
 
         $scope.Config = Config;
+        $scope.L = L;
 
         var dialogSettings = findSettings($scope);
 
@@ -26,15 +27,14 @@ angular.module('cloudApp')
         if($scope.lockEmail) {
             account.get().then(function (account) {
                 if(account.email == $scope.share.accountEmail) {
-                    $scope.$parent.cancel('Can\'t edit yourself');
+                    $scope.$parent.cancel(L.share.cantEditYourself);
                 }
             });
         }
 
         function processAccessRoles(roles){
             var filteredRoles = _.filter(roles,function(role){
-                role.label = Config.accessRoles.settings[role.accessRole]?
-                    Config.accessRoles.settings[role.accessRole].label : role.accessRole;
+                role.label = L.accessRoles[role.accessRole]? L.accessRoles[role.accessRole].label : role.accessRole;
                 return  (Config.accessRoles.order.indexOf(role.accessRole)>=0) &&   // 1. Access role must be registered
                         role.accessRole != Config.accessRoles.unshare;            // 2. Remove unsharing role from interface
             });
@@ -59,7 +59,7 @@ angular.module('cloudApp')
                 return share.accountEmail;
             }
 
-            return share.fullName + '(' + share.accountEmail +')';
+            return share.fullName + ' (' + share.accountEmail +')';
         };
 
         function doShare(){
@@ -69,7 +69,7 @@ angular.module('cloudApp')
             if($scope.share.accessRole == Config.accessRoles.owner) {
                 var defered = $q.defer();
 
-                dialogs.confirm("You are going to change the owner of your system. You will not be able to return this power back!").then(
+                dialogs.confirm(L.sharing.confirmOwner).then(
                     function () {
                         doShare().then(function (data) {
                             defered.resolve(data);
