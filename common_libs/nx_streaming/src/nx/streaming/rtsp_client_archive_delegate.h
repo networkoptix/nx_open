@@ -42,7 +42,7 @@ public:
     virtual bool isRealTimeSource() const override;
     virtual void beforeClose() override;
     virtual void setSingleshotMode(bool value) override;
-    
+
     // filter input data by motion region
     virtual void setMotionRegion(const QRegion& region);
 
@@ -64,7 +64,7 @@ signals:
     void dataDropped(QnArchiveStreamReader* reader);
 
 private:
-    void setRtpData(RTPIODevice* value);
+    void setRtpData(QnRtspIoDevice* value);
     QnAbstractDataPacketPtr processFFmpegRtpPayload(quint8* data, int dataSize, int channelNum, qint64* parserPosition);
     void processMetadata(const quint8* data, int dataSize);
     bool openInternal();
@@ -113,15 +113,15 @@ private:
     QnArchiveStreamReader* m_reader;
     int m_frameCnt;
     QnCustomResourceVideoLayoutPtr m_customVideoLayout;
-    
+
 	QMap<int, QSharedPointer<QnNxRtpParser>> m_parsers;
-    
+
     struct {
         QString username;
         QString password;
         QnUuid videowall;
     } m_auth;
-    
+
     std::atomic_flag m_footageUpToDate;
     mutable QnMutex m_rtpDataMutex;
 };
