@@ -32,6 +32,26 @@ namespace {
     class SortedServersProxyModel : public QSortFilterProxyModel {
     public:
         SortedServersProxyModel(QObject *parent = 0) : QSortFilterProxyModel(parent) {}
+
+        QVariant headerData(int section, Qt::Orientation orientation, int role) const
+        {
+            Q_UNUSED(orientation)
+
+            switch (role)
+            {
+            case Qt::DisplayRole:
+            case Qt::ToolTipRole:
+                if (section == 0)
+                    return tr("Servers");
+                break;
+
+            default:
+                break;
+            }
+
+            return QVariant();
+        }
+
     protected:
         bool lessThan(const QModelIndex &left, const QModelIndex &right) const override {
             QString leftString = left.data(sortRole()).toString();
@@ -166,6 +186,8 @@ QnRoutingManagementWidget::QnRoutingManagementWidget(QWidget *parent) :
     m_changes(new RoutingManagementChanges)
 {
     ui->setupUi(this);
+    ui->splitter->setStretchFactor(0, 1);
+    ui->splitter->setStretchFactor(1, 2);
     setWarningStyle(ui->warningLabel);
     setHelpTopic(this, Qn::Administration_RoutingManagement_Help);
 

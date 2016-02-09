@@ -146,6 +146,14 @@
         }
     },
 
+    "QAbstractItemView": {
+        "palette": {
+            "default": {
+                "base":             "#00000000"
+            }
+        }
+    },
+
     "QnPanel": {
         "palette": {
             "default": {

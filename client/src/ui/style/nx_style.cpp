@@ -364,7 +364,10 @@ void QnNxStyle::drawPrimitive(
     case PE_FrameMenu:
         return;
 
-    default:
+    case PE_Frame:
+        return;
+
+    default: return;
         break;
     }
 
@@ -1206,6 +1209,12 @@ void QnNxStyle::drawControl(
         }
         break;
 
+    case CE_Splitter:
+        {
+            painter->fillRect(option->rect, option->palette.shadow());
+        }
+        break;
+
     default:
         break;
     }
@@ -1587,7 +1596,7 @@ int QnNxStyle::pixelMetric(
     case PM_DefaultFrameWidth:
         if (qobject_cast<const QMenu *>(widget))
             return 0;
-        return 1;
+        return 0;
     case PM_SliderThickness:
         return dp(18);
     case PM_SliderControlThickness:
@@ -1610,6 +1619,8 @@ int QnNxStyle::pixelMetric(
         return 0;
     case PM_MenuVMargin:
         return dp(2);
+    case PM_SplitterWidth:
+        return dp(1);
     default:
         break;
     }
