@@ -32,8 +32,6 @@ public:
 
     virtual bool isRtpHeaderExists() const override { return false; }
 private:
-    QnMediaContextPtr getGeneratedContext(CodecID compressionType);
-private:
     bool m_gotLivePacket;
     QnConstMediaContextPtr m_contextSent;
     QMap<CodecID, QnConstMediaContextPtr> m_generatedContexts;
