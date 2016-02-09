@@ -16,11 +16,6 @@ class QnSaveCloudSystemCredentialsHandler
     Q_OBJECT
 
 public:
-    virtual int executeGet(
-        const QString &path,
-        const QnRequestParams &params,
-        QnJsonRestResult &result,
-        const QnRestConnectionProcessor*);
     virtual int executePost(
         const QString& path,
         const QnRequestParams& params,
