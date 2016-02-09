@@ -15,7 +15,7 @@
         </repository>
     </distributionManagement>
     <properties>
-        <classifier>windows-msvc2015</classifier>
+        <classifier>windows-msvc2015u1</classifier>
     </properties>
 
     <build>
