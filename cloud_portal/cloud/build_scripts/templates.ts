@@ -4,67 +4,12 @@
     <name>../notifications/static/templates/activate_account.mustache</name>
     <message>
       <location filename="../notifications/static/templates/activate_account.mustache"/>
-      <source>notification</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Welcome to</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Nx Cloud</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Thank you for registering in</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Nx Cloud</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>. Please, click the button below to confirm you e-mail address.</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Activate account</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>If you haven't registered in</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Nx Cloud</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>, just ignore this letter.</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Do not send this letter or link to account activation to anyone.</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
       <source>Website</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>networkoptix.com</source>
+      <source>notification</source>
       <translation> </translation>
     </message>
     <message>
@@ -74,7 +19,52 @@
     </message>
     <message>
       <location/>
+      <source>Do not send this letter or link to account activation to anyone.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Thank you for registering in</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>, just ignore this letter.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Activate account</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Nx Cloud</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>If you haven't registered in</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>. Please, click the button below to confirm you e-mail address.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>networkoptix.com</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
       <source>support.networkoptix.com</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Welcome to</source>
       <translation> </translation>
     </message>
   </context>
@@ -82,7 +72,17 @@
     <name>../notifications/static/templates/restore_password.mustache</name>
     <message>
       <location filename="../notifications/static/templates/restore_password.mustache"/>
+      <source>Website</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
       <source>notification</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Support</source>
       <translation> </translation>
     </message>
     <message>
@@ -92,12 +92,22 @@
     </message>
     <message>
       <location/>
+      <source>Do not send this letter or link to password restoring to anyone.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>networkoptix.com</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
       <source>You have received this letter because you or somebody else tried to restore password to account  on NxCloud portal.</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>To restore password, please, click button below and follow further instructions</source>
+      <source>support.networkoptix.com</source>
       <translation> </translation>
     </message>
     <message>
@@ -112,17 +122,20 @@
     </message>
     <message>
       <location/>
-      <source>Do not send this letter or link to password restoring to anyone.</source>
+      <source>To restore password, please, click button below and follow further instructions</source>
+      <translation> </translation>
+    </message>
+  </context>
+  <context>
+    <name>../notifications/static/templates/system_invite.mustache</name>
+    <message>
+      <location filename="../notifications/static/templates/system_invite.mustache"/>
+      <source>Register and view the system</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Website</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>networkoptix.com</source>
+      <source>notification</source>
       <translation> </translation>
     </message>
     <message>
@@ -132,20 +145,12 @@
     </message>
     <message>
       <location/>
-      <source>support.networkoptix.com</source>
-      <translation> </translation>
-    </message>
-  </context>
-  <context>
-    <name>../notifications/static/templates/system_invite.mustache</name>
-    <message>
-      <location filename="../notifications/static/templates/system_invite.mustache"/>
-      <source>notification</source>
+      <source>and shared his system system  with you.</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Welcome to</source>
+      <source>networkoptix.com</source>
       <translation> </translation>
     </message>
     <message>
@@ -160,17 +165,12 @@
     </message>
     <message>
       <location/>
-      <source>Nx Cloud</source>
+      <source>support.networkoptix.com</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>and shared his system system  with you.</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Register and view the system</source>
+      <source>Welcome to</source>
       <translation> </translation>
     </message>
     <message>
@@ -178,26 +178,16 @@
       <source>Website</source>
       <translation> </translation>
     </message>
-    <message>
-      <location/>
-      <source>networkoptix.com</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Support</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>support.networkoptix.com</source>
-      <translation> </translation>
-    </message>
   </context>
   <context>
     <name>../notifications/static/templates/system_shared.mustache</name>
     <message>
       <location filename="../notifications/static/templates/system_shared.mustache"/>
+      <source>Website</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
       <source>notification</source>
       <translation> </translation>
     </message>
@@ -213,17 +203,40 @@
     </message>
     <message>
       <location/>
+      <source>networkoptix.com</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>support.networkoptix.com</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
       <source>Open the system</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
+      <source>Support</source>
+      <translation> </translation>
+    </message>
+  </context>
+  <context>
+    <name>../notifications/static/templates/unknown.mustache</name>
+    <message>
+      <location filename="../notifications/static/templates/unknown.mustache"/>
       <source>Website</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>networkoptix.com</source>
+      <source>notification</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>There is no template for this type of message</source>
       <translation> </translation>
     </message>
     <message>
@@ -233,15 +246,12 @@
     </message>
     <message>
       <location/>
-      <source>support.networkoptix.com</source>
+      <source>Data:</source>
       <translation> </translation>
     </message>
-  </context>
-  <context>
-    <name>../notifications/static/templates/unknown.mustache</name>
     <message>
-      <location filename="../notifications/static/templates/unknown.mustache"/>
-      <source>notification</source>
+      <location/>
+      <source>networkoptix.com</source>
       <translation> </translation>
     </message>
     <message>
@@ -256,32 +266,7 @@
     </message>
     <message>
       <location/>
-      <source>Data:</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
       <source>}</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>There is no template for this type of message</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Website</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>networkoptix.com</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Support</source>
       <translation> </translation>
     </message>
     <message>

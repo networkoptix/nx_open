@@ -212,12 +212,17 @@
     <name>../static/views/account.html</name>
     <message>
       <location filename="../static/views/account.html"/>
+      <source>Current password</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
       <source>Email address</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>First name</source>
+      <source>Current password is required.</source>
       <translation> </translation>
     </message>
     <message>
@@ -232,12 +237,7 @@
     </message>
     <message>
       <location/>
-      <source>Current password</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Current password is required.</source>
+      <source>First name</source>
       <translation> </translation>
     </message>
     <message>
@@ -250,16 +250,6 @@
     <name>../static/views/activate_restore.html</name>
     <message>
       <location filename="../static/views/activate_restore.html"/>
-      <source>Email address</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Email is required.</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
       <source>Please, enter a valid email.</source>
       <translation> </translation>
     </message>
@@ -271,16 +261,6 @@
     <message>
       <location/>
       <source>Email is required.</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Please, enter a valid email.</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Activating account ...</source>
       <translation> </translation>
     </message>
     <message>
@@ -290,17 +270,32 @@
     </message>
     <message>
       <location/>
-      <source>Couldn\'t activate your account:</source>
+      <source>Confirmation link was send to your email. Check it to continue.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Please, enter new password for your account.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Activating account ...</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Password successfully saved</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Couldn\'t save new password:&quot;</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
       <source>You are going to confirm your account. Please, enter your account email.</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Confirmation link was send to your email. Check it to continue.</source>
       <translation> </translation>
     </message>
     <message>
@@ -315,27 +310,12 @@
     </message>
     <message>
       <location/>
+      <source>Couldn\'t activate your account:</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
       <source>Confirmation link was send to your email. Check it for creating a new password</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Couldn\'t send confirmation email:</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Please, enter new password for your account.</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Password successfully saved</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Couldn\'t save new password:&quot;</source>
       <translation> </translation>
     </message>
   </context>
@@ -343,16 +323,6 @@
     <name>../static/views/connectDisconnectSystem.html</name>
     <message>
       <location filename="../static/views/connectDisconnectSystem.html"/>
-      <source>Connect to</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Nx Cloud</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
       <source>You are going to connect system &quot;&quot; to your cloud account (</source>
       <translation> </translation>
     </message>
@@ -363,7 +333,12 @@
     </message>
     <message>
       <location/>
-      <source>Disconnect from</source>
+      <source>Connect to</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>You are going to disconnect system &quot;&quot; from cloud.</source>
       <translation> </translation>
     </message>
     <message>
@@ -373,7 +348,7 @@
     </message>
     <message>
       <location/>
-      <source>You are going to disconnect system &quot;&quot; from cloud.</source>
+      <source>Disconnect from</source>
       <translation> </translation>
     </message>
   </context>
@@ -381,7 +356,12 @@
     <name>../static/views/debug.html</name>
     <message>
       <location filename="../static/views/debug.html"/>
-      <source>Email</source>
+      <source>Message (json)</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Send Notification</source>
       <translation> </translation>
     </message>
     <message>
@@ -391,12 +371,7 @@
     </message>
     <message>
       <location/>
-      <source>Message (json)</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Send Notification</source>
+      <source>Email</source>
       <translation> </translation>
     </message>
   </context>
@@ -404,7 +379,7 @@
     <name>../static/views/login.html</name>
     <message>
       <location filename="../static/views/login.html"/>
-      <source>Email address</source>
+      <source>Remember me</source>
       <translation> </translation>
     </message>
     <message>
@@ -414,7 +389,7 @@
     </message>
     <message>
       <location/>
-      <source>Remember me</source>
+      <source>Email address</source>
       <translation> </translation>
     </message>
     <message>
@@ -432,22 +407,7 @@
     <name>../static/views/register.html</name>
     <message>
       <location filename="../static/views/register.html"/>
-      <source>Nx Cloud</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Register to be happy!</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>First name</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Last name</source>
+      <source>Terms and Conditions</source>
       <translation> </translation>
     </message>
     <message>
@@ -457,17 +417,12 @@
     </message>
     <message>
       <location/>
-      <source>Email is required.</source>
+      <source>Last name</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Please, enter a valid email.</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Email is already registered in portal</source>
+      <source>You must comply.</source>
       <translation> </translation>
     </message>
     <message>
@@ -477,17 +432,37 @@
     </message>
     <message>
       <location/>
+      <source>Register to be happy!</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
       <source>I agree with</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Terms and Conditions</source>
+      <source>First name</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>You must comply.</source>
+      <source>Please, enter a valid email.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Nx Cloud</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Email is already registered in portal</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Email is required.</source>
       <translation> </translation>
     </message>
   </context>
@@ -513,12 +488,7 @@
     <name>../static/views/startPage.html</name>
     <message>
       <location filename="../static/views/startPage.html"/>
-      <source>Nx Cloud</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Incredible revolution in ways of connecting to video surveilance systems</source>
+      <source>* Just because we make a world a better place</source>
       <translation> </translation>
     </message>
     <message>
@@ -528,22 +498,12 @@
     </message>
     <message>
       <location/>
-      <source>Be Mobile</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>unbelievable opportunity to connect to your system from any place in the world</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Be Social</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
       <source>share your system with your buddies</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Incredible revolution in ways of connecting to video surveilance systems</source>
       <translation> </translation>
     </message>
     <message>
@@ -553,25 +513,53 @@
     </message>
     <message>
       <location/>
+      <source>unbelievable opportunity to connect to your system from any place in the world</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Nx Cloud</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Be Mobile</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
       <source>use amazing single account for all you systems</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>* Just because we make a world a better place</source>
+      <source>Be Social</source>
       <translation> </translation>
     </message>
+  </context>
+  <context>
+    <name>../static/views/static.html</name>
   </context>
   <context>
     <name>../static/views/system.html</name>
     <message>
       <location filename="../static/views/system.html"/>
-      <source>Systems</source>
+      <source>Account</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>&gt; Remove</source>
+      <source>Users</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>You have no access to view system information</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Your system</source>
       <translation> </translation>
     </message>
     <message>
@@ -586,32 +574,12 @@
     </message>
     <message>
       <location/>
-      <source>You have no access to view system information</source>
+      <source>Systems</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Users</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Name</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Account</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Permissions</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Your system</source>
+      <source>&gt; Remove</source>
       <translation> </translation>
     </message>
     <message>
@@ -621,12 +589,17 @@
     </message>
     <message>
       <location/>
+      <source>Permissions</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
       <source>Your permissions:</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>gettingSystem</source>
+      <source>Name</source>
       <translation> </translation>
     </message>
     <message>
@@ -639,17 +612,17 @@
       <source>gettingSystemUsers&quot;</source>
       <translation> </translation>
     </message>
+    <message>
+      <location/>
+      <source>gettingSystem</source>
+      <translation> </translation>
+    </message>
   </context>
   <context>
     <name>../static/views/systems.html</name>
     <message>
       <location filename="../static/views/systems.html"/>
-      <source>Systems</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Please, connect any systems to your cloud account first.</source>
+      <source>Open in Nx Witness</source>
       <translation> </translation>
     </message>
     <message>
@@ -659,7 +632,12 @@
     </message>
     <message>
       <location/>
-      <source>Open in Nx Witness</source>
+      <source>Systems</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Please, connect any systems to your cloud account first.</source>
       <translation> </translation>
     </message>
   </context>
@@ -667,12 +645,12 @@
     <name>../static/views/components/dialog.html</name>
     <message>
       <location filename="../static/views/components/dialog.html"/>
-      <source>&amp;times;</source>
+      <source>Cancel</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Cancel</source>
+      <source>&amp;times;</source>
       <translation> </translation>
     </message>
     <message>
@@ -690,7 +668,17 @@
     <name>../static/views/components/header.html</name>
     <message>
       <location filename="../static/views/components/header.html"/>
-      <source>&amp;nbsp;</source>
+      <source>Account Settings</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Change Password</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Logout</source>
       <translation> </translation>
     </message>
     <message>
@@ -700,12 +688,22 @@
     </message>
     <message>
       <location/>
-      <source>About</source>
+      <source>Register</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>About Networkoptix</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
       <source>About</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>&amp;nbsp;</source>
       <translation> </translation>
     </message>
     <message>
@@ -720,32 +718,7 @@
     </message>
     <message>
       <location/>
-      <source>About Networkoptix</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
       <source>Login</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Register</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Account Settings</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Change Password</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Logout</source>
       <translation> </translation>
     </message>
   </context>
@@ -753,6 +726,11 @@
     <name>../static/views/components/password-input.html</name>
     <message>
       <location filename="../static/views/components/password-input.html"/>
+      <source>incorrect</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
       <source>good</source>
       <translation> </translation>
     </message>
@@ -763,12 +741,7 @@
     </message>
     <message>
       <location/>
-      <source>too short</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>incorrect</source>
+      <source>Password is required.</source>
       <translation> </translation>
     </message>
     <message>
@@ -778,8 +751,14 @@
     </message>
     <message>
       <location/>
-      <source>Password is required.</source>
+      <source>too short</source>
       <translation> </translation>
     </message>
+  </context>
+  <context>
+    <name>../static/views/components/process-alert.html</name>
+  </context>
+  <context>
+    <name>../static/views/components/process-button.html</name>
   </context>
 </TS>

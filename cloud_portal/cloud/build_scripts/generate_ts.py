@@ -37,7 +37,7 @@ def process_inline_text(data):
     data = re.sub(r'>\s*<', '', data)
     data = re.sub(r'><', '', data)
     strings = re.split('<>', data)
-    return filter(None, strings)
+    return list(set(strings))
 
 ignore_attributes = ('id', 'name', 'class', 'style',
                      'src', 'href',
@@ -71,7 +71,7 @@ def process_attributes(data):
     data = re.sub(r'"\'', '"', data)
     data = re.sub(r'\'"', '"', data)
     strings = re.split('"?\s*\S+?="?', data)
-    return filter(None, strings)
+    return list(set(strings))
 
 
 def generate_ts(data):
