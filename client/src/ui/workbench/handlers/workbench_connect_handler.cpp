@@ -194,7 +194,6 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered() {
         return;
 
     qnCommon->updateRunningInstanceGuid();
-    qDebug() << "=-================== updaaate!!!!!";
 
     QnActionParameters parameters = menu()->currentParameters(sender());
     QUrl url = parameters.argument(Qn::UrlRole, QUrl());
