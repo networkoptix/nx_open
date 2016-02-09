@@ -1,5 +1,6 @@
-
 #pragma once
+
+#ifdef GDM_TODO
 
 #include <QtWebKitWidgets/QGraphicsWebView>
 
@@ -42,3 +43,5 @@ private:
     WebViewPageStatus m_status;
     bool m_canGoBack;
 };
+
+#endif

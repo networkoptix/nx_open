@@ -922,10 +922,12 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     {
         widget = new QnMediaResourceWidget(context(), item);
     }
+#ifdef GDM_TODO
     else if (resource->hasFlags(Qn::web_page))
     {
         widget = new QnWebResourceWidget(context(), item);
     }
+#endif
     else
     {
         // TODO: #Elric unsupported for now
