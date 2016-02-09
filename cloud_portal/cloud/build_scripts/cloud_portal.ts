@@ -781,10 +781,5 @@
       <source>Password is required.</source>
       <translation> </translation>
     </message>
-    <message>
-      <location/>
-      <source/>
-      <translation> </translation>
-    </message>
   </context>
 </TS>
