@@ -7,7 +7,7 @@
 #define NX_AUTO_REQUEST_FORWARDER_H
 
 #include <core/resource/resource_fwd.h>
-#include <utils/network/auth_restriction_list.h>
+#include <nx/network/auth_restriction_list.h>
 #include <nx/network/http/httptypes.h>
 
 
