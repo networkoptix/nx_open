@@ -179,10 +179,13 @@ angular.module('webadminApp')
 
 
             mergeSystems: function(url,password,currentPassword,keepMySystem){
-                return wrapPost(proxy + '/api/mergeSystems?password=' + password
-                    + '&currentPassword=' + currentPassword
-                    + '&url=' + encodeURIComponent(url)
-                    + '&takeRemoteSettings=' + (!keepMySystem)); },
+                return wrapPost(proxy + '/api/mergeSystems?' + $.param({
+                    password: password,
+                    currentPassword: currentPassword,
+                    url: url,
+                    takeRemoteSettings: !keepMySystem
+                }));
+            },
             pingSystem: function(url,password){return wrapPost(proxy + '/api/pingSystem?password=' + password  + '&url=' + encodeURIComponent(url)); },
             restart: function() { return wrapPost(proxy + '/api/restart'); },
             getStorages: function(){ return wrapGet(proxy + '/api/storageSpace'); },
@@ -234,13 +237,15 @@ angular.module('webadminApp')
                 return wrapGet(proxy + '/ec2/getSettings');
             },
             saveCloudSystemCredentials: function( cloudSystemId, cloudAuthKey){
-                return wrapPost(proxy + '/api/saveCloudSystemCredentials?' + $.param({
+                return wrapPost(proxy + '/api/saveCloudSystemCredentials',{
                     cloudSystemID:cloudSystemId,
                     cloudAuthKey:cloudAuthKey
-                }));
+                });
             },
             clearCloudSystemCredentials: function(){
-                return wrapPost(proxy + '/api/saveCloudSystemCredentials?unbind');
+                return wrapPost(proxy + '/api/saveCloudSystemCredentials',{
+                    reset: true
+                });
             },
             getRecords:function(serverUrl, physicalId, startTime, endTime, detail, limit, label, periodsType){
 
