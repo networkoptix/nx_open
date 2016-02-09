@@ -170,11 +170,16 @@ angular.module('webadminApp')
             },
 
             changeSystem:function(systemName,pasword){
-                return wrapPost(proxy + '/api/configure?systemName=' + systemName + '&password=' + password);
+                return wrapPost(proxy + '/api/configure?' + $.param({
+                    systemName:systemName,
+                    password:password
+                }));
             },
 
             changePort: function(port) {
-                return wrapPost(proxy + '/api/configure?port=' + port);
+                return wrapPost(proxy + '/api/configure?' + $.param({
+                    port:port
+                }));
             },
 
 
@@ -186,7 +191,12 @@ angular.module('webadminApp')
                     takeRemoteSettings: !keepMySystem
                 }));
             },
-            pingSystem: function(url,password){return wrapPost(proxy + '/api/pingSystem?password=' + password  + '&url=' + encodeURIComponent(url)); },
+            pingSystem: function(url,password){
+                return wrapPost(proxy + '/api/pingSystem?' + $.param({
+                    password:password,
+                    url:url
+                }));
+            },
             restart: function() { return wrapPost(proxy + '/api/restart'); },
             getStorages: function(){ return wrapGet(proxy + '/api/storageSpace'); },
             saveStorages:function(info){return wrapPost(proxy + '/ec2/saveStorages',info); },
