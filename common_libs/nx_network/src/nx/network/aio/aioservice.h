@@ -153,7 +153,11 @@ namespace aio
         void post(Handler handler)
         {
             QnMutexLocker lk(&m_mutex);
-            postNonSafe(&lk, std::move(handler));
+            //if sock is not still bound to aio thread, binding it
+            auto& threadToUse = m_systemSocketAIO.aioThreadPool[rand() % m_systemSocketAIO.aioThreadPool.size()];
+            assert(threadToUse);
+            lk.unlock();
+            threadToUse->post(nullptr, std::move(handler));
         }
 
         //!Call \a handler from within aio thread \a sock is bound to
@@ -163,8 +167,8 @@ namespace aio
         template<class SocketType, class Handler>
         void dispatch( SocketType* sock, Handler handler )
         {
-            QnMutexLocker lk( &m_mutex );
-            dispatchNonSafe(&lk, sock, std::move(handler));
+            auto* aioThread = getSocketAioThread(sock);
+            aioThread->dispatch(sock, std::move(handler));
         }
 
         //TODO #ak better remove this method, violates encapsulation
@@ -429,26 +433,6 @@ namespace aio
             auto* aioThread = getSocketAioThread(lock, sock);
             lock->unlock();
             aioThread->post(sock, std::move(handler));
-            lock->relock();
-        }
-
-        template<class Handler>
-        void postNonSafe(QnMutexLockerBase* const lock, Handler handler)
-        {
-            //if sock is not still bound to aio thread, binding it
-            auto& threadToUse = m_systemSocketAIO.aioThreadPool[rand() % m_systemSocketAIO.aioThreadPool.size()];
-            assert(threadToUse);
-            lock->unlock();
-            threadToUse->post(nullptr, std::move(handler));
-            lock->relock();
-        }
-
-        template<class SocketType, class Handler>
-        void dispatchNonSafe(QnMutexLockerBase* const lock, SocketType* sock, Handler handler)
-        {
-            auto* aioThread = getSocketAioThread(lock, sock);
-            lock->unlock();
-            aioThread->dispatch(sock, std::move(handler));
             lock->relock();
         }
     };
