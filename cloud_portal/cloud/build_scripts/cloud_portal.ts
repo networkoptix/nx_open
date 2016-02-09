@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TS language="en_US" sourcelanguage="en" version="2.1">
   <context>
-    <name>../static/scripts/42ba3df3.language.js</name>
+    <name>../static/scripts/language.js</name>
     <message>
-      <location filename="../static/scripts/42ba3df3.language.js"/>
+      <location filename="../static/scripts/language.js"/>
       <source>use strict</source>
       <translation> </translation>
     </message>
