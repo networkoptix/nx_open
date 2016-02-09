@@ -1,0 +1,64 @@
+ ######################################################################
+ #                                                                    #
+ # Make rules for MicroCruft Visual C++                               #
+ #                                                                    #
+ ######################################################################
+
+!include $(TOP)\config\vc_config_make_rules
+
+.SUFFIXES: .cc .obj
+CPP=cl /nologo /DSYSTEM_IS_WIN32=1 /DINSTANTIATE_TEMPLATES=1 $(MODULEFLAGS) $(AUDIOFLAGS)
+CC=cl /nologo /DSYSTEM_IS_WIN32=1  $(MODULEFLAGS)
+
+default_target: all $(DIRS)
+	@echo done $(DIRNAME)
+
+all: $(ALL)
+
+$(DIRS) x1 : FORCE
+	@echo building in $(DIRNAME)\$@
+	@cd $@
+	@nmake /nologo /fVCMakefile
+	@cd ..
+
+FORCE: 
+
+.vcbuildlibs: .vcbuildlib
+
+.vcbuildlib: $(OBJS)
+	@echo add to $(INLIB) $(OBJS)
+	@if EXIST $(INLIB) lib/nologo $(INLIB) $(OBJS)
+	@if NOT EXIST $(INLIB) lib/nologo /out:$(INLIB) $(OBJS)
+	echo built > .vcbuildlib
+
+.vc_add_to_lib: $(TOADD)
+	@if EXIST $(ADDLIB) lib/nologo $(ADDLIB) $(TOADD)
+	@if NOT EXIST $(ADDLIB) lib/nologo /out:$(ADDLIB) $(TOADD)
+	@echo built > .vc_add_to_lib
+
+.libraries:
+	@echo Libraries not touched for VC++
+
+relink: 
+	@echo Links not made for Visual C++
+
+.config_error::
+	@echo Config not checked for VC
+
+.sub_directories: $(BUILD_DIRS)
+
+.remove_links:
+	@echo Links not made for Visual C++
+.process_scripts:
+	@echo Scripts not created for VC
+.link_main:
+	@echo Links not made for Visual C++
+
+.cc.obj:
+	$(CPP) $(CFLAGS) /c /Tp$*.cc /Fo$*.obj
+.c.obj:
+	$(CC) $(CFLAGS) /c $*.c /Fo$*.obj
+
+# this dummy rule stops the comment in make.depend getting
+# interpreted as a command... YEUCH
+hack_dummy_target:

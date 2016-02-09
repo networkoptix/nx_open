@@ -1,0 +1,36 @@
+   > document 1
+       > text 2
+         [pcdata[
+	]] 2
+           > sentence 3
+             [pcdata[
+	]] 3
+               > phrase 4
+                 [pcdata[This]] 4
+               < phrase 4
+             [pcdata[
+	]] 3
+               > phrase 4
+                 [pcdata[is]] 4
+               < phrase 4
+             [pcdata[
+	]] 3
+               > phrase 4
+                 [pcdata[an example ]] 4
+                   > phrase 5
+                     [pcdata[of ]] 5
+                       > phrase 6
+                         [pcdata[an XML file]] 6
+                       < phrase 6
+                   < phrase 5
+               < phrase 4
+             [pcdata[
+	]] 3
+           : punct 3
+             [pcdata[
+	]] 3
+           < sentence 3
+         [pcdata[
+]] 2
+       < text 2
+   > <document 1

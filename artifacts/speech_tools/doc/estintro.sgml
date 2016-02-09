@@ -1,0 +1,876 @@
+
+<chapter>
+	<title>Introduction to the Edinburgh Speech Tools</title>
+
+<toc depth=1></toc>
+
+<!-- 
+<IndexTerm><primary>Introduction</primary></IndexTerm>
+-->
+
+<para>
+&TheEST; is library of general speech software, written at the Centre
+for Speech Technology Research at the University of Edinburgh.
+</para>
+
+<para>
+&TheEST; is written is C++ and provide a range of
+for common tasks found in speech processing.  The library provides a
+set of stand alone executable programs and a set of library calls
+which can be linked into user programs.
+</para>
+
+<para>
+Updates and news about the speech tools include releases and bug fixes
+may be found at
+<screen>
+<ulink url='http://www.cstr.ed.ac.uk/projects/speech_tools.html'>http://www.cstr.ed.ac.uk/projects/speech_tools.html</ulink>
+</screen>
+</para>
+
+<para>
+Most speech researchers spend a considerable amount of time writing,
+developing and debugging code. In fact, many researchers spend most of
+their time doing this. The sad fact is that most of this time is spent
+on unnecessary tasks - time which could be better spent doing "real"
+research.  The library is intended to provide software that
+programmers use day-to-day, and provide this in an easy to use fashion.
+</para>
+
+<sect1><title>The Library</title>
+
+<para>
+The Edinburgh Speech Tools Library has two main parts: a software
+library and a set of programs which use the library.
+</para>
+
+<para>
+A library is a single central place where useful software is kept.  A
+UNIX library is a single file (in this case called <filename>libestools.a</filename>)
+which can be linked to an individual program. When writing a program,
+you can call any of the functions in the library, and they will
+automatically be linked into your program when you compile. The key
+point is that you never need look at the library itself or copy the
+code in it. That way you can write small programs, concentrate on the
+algorithms and not have to worry about any infrastructure issues.
+</para>
+
+<para>
+The speech tools also provide a number of utility programs for things
+like playback, sampling rate conversion file format conversion
+etc. Usually these programs are just wrap-around executables based on
+standard speech tools library functions.
+</para>
+
+<sect2><title>What does the library contain?</title>
+
+
+<formalpara><title>Speech class</title><para> Includes tracks for
+	storing sets of time aligned coefficients, and waves for
+	digitally sampled speech waveforms.
+</para>
+</formalpara>
+
+<formalpara><title>Linguistic class</title><para> A comprenhensive
+	system for storing different kinds of linguistic information
+	is given. This is based on the Hetrogeneous Relation Graph
+	formalism ***CITE***. Feature structures, tress, lists, graphs
+	ect can all be represented with the linguistic classes.
+</para>
+</formalpara>
+
+<formalpara><title>Audio playback</title><para> Easy to use routines
+	to record and play audio data without any fuss.
+</para>
+</formalpara>
+
+<formalpara><title>Signal processing</title><para>
+	Commonly used signal processing algorithms such as including
+	pitch tracking, cepstra and LPC, filtering, fourier analysis etc.
+</para>
+</formalpara>
+
+<formalpara><title>Statistical functions</title><para>
+</para>
+</formalpara>
+
+<formalpara><title>Grammars</title><para>
+</para>
+</formalpara>
+
+<formalpara><title>Intonation</title><para>
+Software spport for the Tilt intonation model</para>
+</formalpara>
+
+<formalpara><title>Speech Recognition</title><para>
+</para>
+</formalpara>
+
+<formalpara><title>Utility Functions and Classes</title><para> Useful
+classes such as lists, vectors, matrices, strings and functions for
+reading files, parsing command lines etc.
+</para>
+</formalpara>
+
+
+</sect2><sect2><title>Using the speechtools</title>
+<para>
+Once installed, speech tools can be used either by running the
+exectuable programs or by building your own C++ programs and linking
+to the library.
+</para>
+
+<para>
+Documentation on executable programs is found in <xref
+linkend="chap-programs">.
+
+</para>
+
+<para>
+
+Instructions on how to build your own programs which use the library
+are found in <xref linkend="chap-building">.
+
+</para>
+
+</sect2>
+
+</sect1>
+</chapter>
+<chapter><title>Licence, Installation and Acknowledgements</title>
+<sect1><title>Licence</title>
+
+<para>
+Since version 1.2.0 we are distributing the Edinburgh Speech Tools
+under a free software lince similar to the X11 one.  Basically the
+system is free for anyone to use commerically or otherwise
+without further permission.
+</para>
+
+<para>
+Hence the current copy policy is
+</para>
+
+<screen width=80>
+                Centre for Speech Technology Research                  
+                     University of Edinburgh, UK                       
+                       Copyright (c) 1994-1999                            
+                        All Rights Reserved.                           
+                                                                       
+  Permission is hereby granted, free of charge, to use and distribute  
+  this software and its documentation without restriction, including   
+  without limitation the rights to use, copy, modify, merge, publish,  
+  distribute, sublicense, and/or sell copies of this work, and to      
+  permit persons to whom this work is furnished to do so, subject to   
+  the following conditions:                                            
+   1. The code must retain the above copyright notice, this list of    
+      conditions and the following disclaimer.                         
+   2. Any modifications must be clearly marked as such.                
+   3. Original authors' names are not deleted.                         
+   4. The authors' names are not used to endorse or promote products   
+      derived from this software without specific prior written        
+      permission.                                                      
+                                                                       
+  THE UNIVERSITY OF EDINBURGH AND THE CONTRIBUTORS TO THIS WORK        
+  DISCLAIM ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING      
+  ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO EVENT   
+  SHALL THE UNIVERSITY OF EDINBURGH NOR THE CONTRIBUTORS BE LIABLE     
+  FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES    
+  WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN   
+  AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,          
+  ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF       
+  THIS SOFTWARE.                                                       
+</screen>
+
+
+</sect1>
+<sect1><title>Acknowledgments</title>
+
+<para>
+The library was written by <ulink
+url="http://www.cstr.ed.ac.uk/~pault">Paul Taylor</ulink>, <ulink
+url="http://www.cstr.ed.ac.uk/~rjc">Richard Caley</ulink>, <ulink
+url="http://www.cstr.ed.ac.uk/~awb">Alan W Black</ulink> and <ulink
+url="http://www.cstr.ed.ac.uk/~simonk">Simon King</ulink>, during the
+periond 1994-1999.
+</para>
+
+<para>
+During this period, the above people were supported by the UK Physical
+Science and Engineering Research Council though grants GR/J55106,
+GR/K54229, GR/L53250, by Sun microsystems, AT and T and Reuters.
+
+</para>
+
+<sect2><title>Other contributors</title>
+
+<para>
+We are extremely grateful to the following people who have made their
+code available for general use. We should make it clear that these
+people did not directly participate in the development of the library
+and hence cannot be held responsible for any problems we have introduced
+in the use of their code.
+</para>
+
+<formalpara><title>Markus Mummer</title><para>
+Waveform re-sampling routine (rateconv)
+</para>
+</formalpara>
+
+<formalpara><title>Tony Robinson</title><para>
+Provided cepstral and LPC routines
+</para>
+</formalpara>
+
+<formalpara><title>Richard Tobin and LTG</title><para>
+RXP, an XML parser.
+</para>
+</formalpara>
+
+<formalpara><title>Paul Bagshaw</title><para>
+the pitch tracker
+</para>
+</formalpara>
+
+<formalpara><title>Craig Reese and John Campbell</title><para>
+ulaw conversion routines
+</para>
+</formalpara>
+
+<formalpara><title>Paradigm Associates and George Carrett</title><para>
+for Scheme in one defun.
+</para>
+</formalpara>
+
+<formalpara><title>Theo Veenker (Utrecht University)</title><para>
+IRIX audio support.
+</para>
+</formalpara>
+
+<formalpara><title>Rick Woudenberg</title><para>
+Inspiration for the design of the wave class
+</para>
+</formalpara>
+
+<formalpara><title>Borja Etxebarria</title><para>
+LPC reflection coefficients
+</para>
+</formalpara>
+
+<formalpara><title>Simmule Turner and Rich Salz</title><para>
+editline command line editing library
+</para>
+</formalpara>
+
+<formalpara><title>Henry Spencer</title><para>
+for his regex code taken from the FreeBSD 2.1.5 distribution.
+</para>
+</formalpara>
+
+<formalpara><title>The Regents of the University of California.</title><para>
+for some string comparison code.
+</para>
+</formalpara>
+
+</sect2>
+</sect1><sect1><title>What is new</title>
+
+
+<para>
+Since the last public release, 1.1.1, January 1999, there have been
+a number of enhancements to the library system
+</para>
+
+<formalPara><title>Free licence</title>
+<para>
+
+To make the system more useful for more people and place
+it properly in the free software community the system is now free
+for both commercial and non-commercial use alike.
+
+</para>
+</formalPara>
+
+<formalPara><title>Utterance consolidation</title>
+<para>
+
+A number of tidy ups have been performed on the
+<function>EST_Utterance</function> and related classes.  This makes
+the interface cleaner and should have littel affect on existsing code.
+
+</para>
+</formalPara>
+
+<formalPara><title>Generalization of Features</title>
+<para>
+
+Any new object can become a feature value after simple registration
+of the object through a provided macro.  We also make much
+more use of this.
+
+</para>
+</formalPara>
+
+<formalPara><title>SIOD tidy up</title>
+<para>
+
+Scheme is no longer "in one defun" but "in one directory".  The
+system was split out into separate files.  New objects are now
+held as <function>EST_Val</function> and it is easier to add new
+objects to the system.</para>
+      </formalpara>
+
+<formalPara><title>C++ class documentation</title>
+<para>
+
+We now include documentation on a per class basis using the
+<function>DOC++</function> system and docbook for more general
+descriptions and examples.  This has improved the coverage and quality
+of low level documentation for all classes in the system.
+</para>
+</formalPara>
+
+
+<formalPara><title>Tilt Analysis/Resynthesis</title>
+<para>
+
+For  intonation analysis the tilt code has been completely rewritten.
+</para>
+</formalPara>
+
+</sect1>
+
+<sect1>
+
+      <title>Installation</title>
+
+<toc depth=1></toc>
+
+<sect2>
+	<title>Release notes</title>
+
+<para>
+This documentation covers version &VERSION; of &theEST;.  While
+previous versions of the speech tools were primarily released solely
+to support the Festival Speech Synthesis System, the Edinburgh Speech
+Tools Library now contains sufficiently useful tools that it is of use
+in its own right.
+</para>
+
+<para>
+Although hope that the speech tools has stabilised to a certain extent
+and less structural changes will occur in future versions we don't
+guaranteed future compatibility, although every effort will be made to
+make upgrading as easy as possible.  In addition, we warn that while
+several programs and routines are quite mature, others are young and
+have not be rigorously tested. Please do not assume these programs work.
+</para>
+
+</sect2>
+
+<sect2><title>Requirements</title>
+
+<para>
+In order to compile and install the Edinburgh Speech Tools you 
+need the following
+</para>
+
+<simplesect>
+ <title>&gnumake;</title>
+
+ <para>
+
+ Any recent version, the various <command>make</command>
+ programs that come with different UNIX systems are wildly
+ varying and hence it makes it too difficult to write
+ <filename>Makefile</filename>s which are portable, so we
+ depend on a version of <command>make</command> which is
+ available for all of the platforms we are aiming at.
+ </para>
+</simplesect>
+
+<simplesect><title>A C++ compiler</title>
+<para>
+The system was developed primarily with GNU C++ version 2.7.2, but
+we also have compiled it successfully with a number of
+other versions of gcc, Sun CC and &visualc;.
+</para>
+
+<para>
+Hopefully we have now sanitized the code sufficiently to to make it
+possible for ports to other C++ compilers without too much difficulty.
+But please note C++ is not a fully standardized language and each
+compiler follows the incomplete standard to various degrees.  Often
+there are many but simple problems when porting to new C++ compilers.
+We are trying to deal with this by increasing our support.  However, it
+is likely that small changes will be required for C++ compilers we have
+not yet tested the system under.
+</para>
+
+<para>
+However we feel this is stable enough to make it worthwhile attempting
+ports to other C++ compilers that we haven't tried yet.
+</para>
+
+<para>
+Before installing the speech tools it is worth ensuring you have a fully
+installed and working version of your C++ compiler.  Most of the
+problems people have had in installing the speech tools have been due to
+incomplete or bad compiler installation.  It might be worth checking if
+the following program works, if you don't know if anyone has used your
+C++ installation before.
+<programlisting arch='c'>
+#include &lt;iostream.h&gt;
+int main (int argc, char **argv)
+{
+   cout << "Hello world\n";
+}
+</programlisting>
+</para>
+
+</simplesect>
+
+<simplesect>
+	  <title>Supported Systems</title>
+
+<para>
+We have successfully compiled and tested the speech tools on the
+following systems, except where specified we include support for
+both shared and static versions of the libraries:
+</para>
+
+<formalPara><title>Sun Sparc Solaris 2.5.1/2.6/2.7</title>
+<para>
+GCC 2.7.2, GCC 2.8.1, SunCC 4.1, egcs 1.1.1, egcs 1.1.2
+</para>
+</formalPara>
+
+<formalPara><title>Sun Sparc SunOS 4.1.3</title>
+<para>
+GCC 2.7.2 (static only)
+</para>
+</formalPara>
+
+<formalPara><title>Intel Solaris 2.5.1</title>
+<para>
+GCC 2.7.2
+</para>
+</formalPara>
+
+<formalPara><title>FreeBSD for Intel 2.1.7, 2.2.1, 2.2.6 (aout),
+2.2.8 (aout), 3.x (elf)</title>
+<para>
+GCC 2.7.2.1 (static only)
+</para>
+</formalPara>
+
+<formalPara><title>Linux (2.0.30) for Intel (RedHat 4.[012]/5.[01]/6.0)</title>
+<para>
+GCC 2.7.2, GCC 2.7.2/egcs-1.0.2, egcs-1.1.2
+</para>
+</formalPara>
+
+<formalPara><title>Windows NT 4.0, Windows95, Windows 98</title>
+<para>
+GCC with egcs (from &cygwin; b20.1), &visualc; 5.0. (static only)
+</para>
+</formalPara>
+
+<para>
+As stated before C++ compilers are not standard and it is non-trivial to
+find the correct dialect which compiles under all.  We recommend the
+use of GCC 2.7.2 if you can use it, it is the most likely one to
+work. Some of the compilers listed above produce a large number of
+warnings when compileing the code.
+</para>
+
+<para>
+Previous versions of the system have successfully compiled under SGI
+IRIX 5.3, OSF (Alphas) and HPUX but at time of writing this we have not
+yet rechecked this version.
+</para>
+
+</simplesect>
+
+<sect3>
+	  <title>Java Support</title>
+<para>
+The <filename>java</filename> directory contains optional &java;
+classes which give some access to &est; facilities from &java;
+programs. This has been created to support the &fringe; graphical
+interface. There are two levels of support enabled by the
+<literal>JAVA</literal> and <literal>JAVA_CPP</literal> options in the
+<filename>config</filename> file. <literal>JAVA</literal> compiles some
+very basic classes intended to allow very simple simulation of &est;
+facilities in pure &java; programs.  <literal>JAVA_CPP</literal>
+compiles classes which use the &java; native interface to provide
+access to the actual &est; &cpp; classes.
+</para>
+
+<para>
+You may (for instance on Solaris using gcc) need to make shared
+libraries for some compiler support libraries in order to comple the
+full <literal>JAVA_CPP</literal> support. See <xref
+linkend=javaappendix> for details.
+</para>
+
+</sect3>
+
+<sect3>
+	  <title>Windows 95/98/NT Port</title>
+
+<para>
+We have done two ports of this code to Windows machines, one uses the
+&cygwin; package, which provides a Unix like environment under on
+Win32 systems, the other is a native port using &visualc;.
+</para>
+
+<para> 
+For our full Windows NT and Windows 95/98 ports we use the Cygnus
+&cygwin; environment (version b20.1) available from <ulink
+url='http://sourceware.cygnus.com/cygwin/'>http://sourceware.cygnus.com/cygwin/</ulink>.
+Windows 98 is significantly more stable than Windows 95, especially
+when many processes are started and stopped as is the case when
+compiling with &cygwin;. We <emphasis>strongly</emphasis> reccoment 98
+rather than 95 be used if at all possible. However with both 95 and 98
+you can expect Windows to occasionally lock up or complain it is
+unable to start new processes or otherwise missbehave. You will be
+restarting windows regularly. A Windows NT system should not have
+these problems.
+</para>
+
+<para> 
+The port using &visualc; does not
+provide all of the features of the Unix and &cygwin; versions. You
+will need access to a Unix or &cygwin; system to create the makefiles
+used for the &visualc; compilation.
+</para>
+
+<para>
+Both &cygwin; and &visualc; ports have a number of limitations. 
+
+<formalPara><title>Shared library creation is not supported.</title>
+	    <para>
+	      Creation of Windows <literal>DLL</literal>s is different
+	      enough from creation of Unix shared libraries that the
+	      support does not carry directly accross, and we haven't
+	      yet had time to work on it.
+	    </para>
+</formalpara>
+
+<formalPara><title>Java not supported</title>
+	    <para>
+	      Because the &java; support is related to the creation of
+	      shared libraries, this is also not yet implemented for
+	      Windows. 
+	    </para>
+</formalpara>
+
+<formalPara><title>Command line editing limited</title>
+	    <para>
+	      Because of the limiots of the Windows DOS console
+	      window, the command line editing in
+	      <command>siod</command> is less reliable (for instance
+	      on very long lines). 
+	    </para>
+</formalpara>
+
+<formalPara><title>(&visualc;) Networking not supported</title>
+	    <para>
+	      Networking under Win32 is different from Unix in a
+	      number of fairly fundamental ways, we haven't tackled
+	      this at all.
+	    </para>
+</formalpara>
+
+<para>
+There are no doubt other differences we hve not noticed. We don't use
+Windows for any of our work and so the Windows builds of our systems
+don't get the extensive use the unix builds do.
+</para>
+
+</sect3>
+
+</sect2>
+
+<sect2><title>Building It</title>
+
+<toc depth=1></toc>
+
+<sect3><title>Configuration</title>
+
+<para>
+All compile-time configuration for the system is done through the user
+definable file <filename>config/config</filename>.  You must create this
+file before you can compile the library.  An example is given in
+<filename>config/config-dist</filename>, copy it and change its permissions
+to give write access
+<screen width=40>
+&shellprompt; <userinput>cd config</userinput>
+&shellprompt; <userinput>cp config-dist config</userinput>
+&shellprompt; <userinput>chmod +w config</userinput>
+</screen>
+In many cases no further changes will be required, but it might
+be worth checking the contents of this file just in case.   Where
+possible the system will automatically config itself.
+</para>
+
+<para>
+Type
+<screen width=40>
+&shellprompt; <userinput>gnumake info</userinput>
+</screen>
+This will create the local config files and display what it
+thinks your system is.  
+</para>
+
+<para>
+If this is not suitable for your machine then
+edit your <filename>config/config</filename>.  In most cases
+the default will be the best option.  If you are unsure about
+what you should change you probabaly shouldn't change anything.
+</para>
+
+<para>
+As of 1.3.1 due to conflicts in copyright we have dropped GNU Readline
+support and replaced it with a differently licenced alternative which
+does not imposes the restrictions of the GPL.  editline is a free
+command line editor library.  We have added substantially to it,
+including support for long lines, incremental search and completion.
+However as it has not yet been testsed on many systems it is still
+optional, though is on by default.
+</para>
+
+<para>
+For Linux we now fully supported shared libraries and even recommend
+them.  However if you are going to do alot of development and
+don't understand the consequences of shared libraries and getting
+<command>LD_LIBRARY_PATH</command> correct (or what that is) we
+recommend you compile unshared, the default.  If you are going to
+simply run the speech tools (and festival) then shared is a reasonable
+option.  Uncomment the line in the config file
+<programlisting arch='make'>
+# SHARED = 1
+</programlisting>
+</para>
+
+<para>
+Shared support under Solaris is complete for all the speech tools.
+If you need to exec festival scripts using a version of
+festival built with shared libaries, you must either execute
+them from a featureful shell (e.g. <filename>bash</filename>), 
+install the shared libraries in a standard place or explicitly
+set <command>LD_LIBRARY_PATH</command>.  Solaris's standard
+shell doesn't support script excutaiton of shells within shells.
+</para>
+
+<para>
+Simple choices for common set ups are given near the top of this
+file.  But for some sub-systems you will also need to change pathnames for
+external library support.
+</para>
+
+<para>
+At present read <filename>config/ReadMe</filename> for details of changing 
+basic configuration.
+</para>
+
+<para>
+On systems (and versions of systems) we have not yet encountered
+you may need to create <filename>config/systems/&lt;PROCESSOR&gt;_&lt;OS&gt;&lt;OSVERSION&gt;.mak</filename>
+files.  Often you need only copy an existing one (other version or
+similar system) to get it to work.  Typically the only real differences
+are when there are major differences in the default C++ compiler
+(e.g. RedHat 5.0 to RedHat 5.1).  If you do need to add a new
+systems configuration file please let as know so we can include it
+in the standard distribution.
+</para>
+
+</sect3>
+
+<sect3>
+	  <title>Compilation</title>
+
+
+<para>
+Once you have configured <filename>config/config</filename> you
+can compile the system.
+<screen width=40>
+&shellprompt; <userinput>gnumake</userinput>
+</screen>
+Note this must be <emphasis>&gnumake;</emphasis>, which may be called <command>make</command> on
+your system, or <command>gmake</command> or <command>gnumake</command>.  This will compile all
+library functions and all the executables.  If you wish to only compile
+the library itself then use
+<screen width=40>
+&shellprompt; <userinput>gnumake make_library</userinput>
+</screen>
+</para>
+
+<para>
+Note that if you compile with <function>-g</function> (uncommenting <function>DEBUG = 1</function>
+is <filename>config/config</filename> the library and the corresponding binaries will
+be large.  Particulary the executables, you will need in order of 150
+megabytes to compile the system, if your C++ libraries are not compiled
+as shared libraries.  If you compile without <function>-g</function> the whole library
+directory is about 12 megabytes on Linux (which has shared libraries for
+<function>libstdc++</function> or about 26 megabytes of Sparc Solaris (which does not
+have a shared library <function>libstdc++</function> by default).  This is almost
+entirely due to the size of the executables.  C++ does not make small
+binaries.
+</para>
+
+<para>
+In general we have made the system compile with no warnings.  However
+for some compilers this has proved to be near impossible.  SunOS include
+files have a number of system declarations missing, so many system functions
+(e.g. <function>fprintf</function>) will appear to be undeclared.  Sun's CC compiler
+also likes to complain about missing source for some code even though
+the code exists within our system and is deliberately in separate files
+ro make it modular.
+</para>
+
+<para>
+To test the system after compilation 
+<screen width=40>
+&shellprompt; <userinput>gnumake test</userinput>
+</screen>
+</para>
+
+</sect3>
+
+<sect3><title>Installing the system</title>
+
+
+<para>
+All executables are linked to from <filename>speech_tools/bin</filename> and you
+should add that to your <function>PATH</function> in order to use them.
+</para>
+
+<para>
+Include files are <filename>speech_tools/include/</filename> and the three
+generated libraries are <filename>speech_tools/lib/libestools.a</filename>,
+<filename>speech_tools/lib/libestbase.a</filename> and
+<filename>speech_tools/lib/libestring.a</filename>.  For most cases a three 
+will be required.
+</para>
+
+<para>
+If space is a preminium, compiled with the shared option (binaries
+will be then be substantially smaller) and you can delete all 
+<filename>.o</filename> files</para>
+
+<para>
+Some aspects of the system have further dependencies which depend
+of the option selected at compile time.  Specifically the readline
+libraries and Netaudio libraries.
+</para>
+
+</sect3>
+
+<sect3>
+	  <title>Building on Windows 95/98/NT</title>
+<para>
+There are two ways to build the system under Windows. The
+&cygwin; system provides a unix-like
+environment in which you can perform a compilation as described in the
+previous sections. &cygwin; is probably the
+best choice if you can use that route.
+</para>
+
+<para>
+&visualc; provides an environment much further from the Unix systems
+our code is developed on, this places some limits on the &visualc; port,
+especially in areas relating to networking. The remainder of this
+section describes how to compile with &visualc;. 
+</para>
+
+<sect4>
+	    <title>Creating <filename>VCMakefile</filename>s</title>
+
+<para>
+We compile using the <command>nmake</command> program which comes with
+&visualc;. This is a fairly standard <command>make</command>
+implementation, but is not as flexible as the <productname>GNU
+make</productname> we use for our normal builds. So, in order to
+compile with <command>nmake</command> new <filename>Makefile</filename>s
+are needed. These can be created from the Unix makefiles using 
+&gnumake;:
+<screen width='40'>
+&shellprompt; <userinput>gnumake VCMakefile</userinput>
+Creating VCMakefile for .
+Creating VCMakefile for include
+Creating VCMakefile for include/unix
+[...]
+</screen>
+Obviously you will need either a unix machine or the
+&cygwin; system to do this. Sharing the
+compilation directory between unix and Windows machines, for instance
+using &samba;
+</para>
+</sect4>
+
+<sect4>
+	    <title>Configuration</title>
+<para>
+As for unix compilations, the &visualc; compilation process is
+controlled by a configuration file. In this case it is called
+<filename>vc_config_make_rules</filename>. A version is included in
+the distribution, as <filename>vc_config_make_rules-dist</filename>,
+copy this into place as follows:
+
+<screen width=40>
+&shellprompt; <userinput>cd config</userinput>
+&shellprompt; <userinput>cp vc_config_make_rules-dist vc_config_make_rules</userinput>
+&shellprompt; <userinput>chmod +w vc_config_make_rules</userinput>
+</screen>
+You probably don't need to change this default configuration.
+</para>
+
+</sect4>
+
+<sect4>
+	    <title>Building</title>
+
+<para>
+To build the system:
+<screen width=40>
+&shellprompt; <userinput>nmake /nologo /fVCMakefile</userinput>
+</screen>
+</para>
+
+<para>
+This should build the libraries and executables, and also the test
+programs in <filename>testsuite</filename>. However there is currently
+no way to automatically test the system, Indeed some of the test
+programs will fail under &visualc; due to differences in file nameing
+conventions. 
+</para>
+</sect4>
+
+
+</sect3>
+
+</sect2>
+</sect1>
+</chapter>
+
+
+
+<!--
+Local Variables:
+mode: sgml
+sgml-doctype:"speechtools.sgml"
+sgml-parent-document:("speechtools.sgml" "chapter" "book")
+sgml-omittag:nil
+sgml-shorttag:t
+sgml-minimize-attributes:nil
+sgml-always-quote-attributes:t
+sgml-indent-step:2
+sgml-indent-data:t
+sgml-exposed-tags:nil
+sgml-local-catalogs:nil
+sgml-local-ecat-files:nil
+End:
+-->
+
