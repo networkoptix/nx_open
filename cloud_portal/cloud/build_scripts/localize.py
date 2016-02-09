@@ -1,4 +1,5 @@
 import os
+import re
 import xml.etree.ElementTree as eTree
 
 # 1. read ts into xml
@@ -33,5 +34,9 @@ for xml_file in xml_files:
             if translation and translation.strip():
                 # 3. replace string in file
 
-                print("replacing:", active_filename, source, translation)
-                active_content = active_content.replace(source, translation)
+                if ' ' not in source:
+                    print("! replacing single word:", source, active_filename)
+                    active_content = re.sub('(?<=\W)' + re.escape(source) + '(?=\W)', translation, active_content)
+                else:
+                    print("replacing:", active_filename, source, translation)
+                    active_content = active_content.replace(source, translation)

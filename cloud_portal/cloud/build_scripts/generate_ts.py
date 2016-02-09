@@ -84,7 +84,7 @@ def generate_ts(data):
         first = True
         for string in record['inline'] + record['attributes']:
             # print(string)
-            if not string.strip():
+            if not string.strip() or re.match('\W+', string):
                 continue
             message = eTree.SubElement(context, "message")
             location = eTree.SubElement(message, "location")

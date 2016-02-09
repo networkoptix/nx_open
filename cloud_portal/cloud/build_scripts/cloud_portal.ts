@@ -232,11 +232,6 @@
     </message>
     <message>
       <location/>
-      <source>Subscribe to email newsletters</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
       <source>First name</source>
       <translation> </translation>
     </message>
@@ -328,11 +323,6 @@
     </message>
     <message>
       <location/>
-      <source>)</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
       <source>Connect to</source>
       <translation> </translation>
     </message>
@@ -379,11 +369,6 @@
     <name>../static/views/login.html</name>
     <message>
       <location filename="../static/views/login.html"/>
-      <source>Remember me</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
       <source>Password</source>
       <translation> </translation>
     </message>
@@ -427,17 +412,7 @@
     </message>
     <message>
       <location/>
-      <source>Subscribe to email newsletters</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
       <source>Register to be happy!</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>I agree with</source>
       <translation> </translation>
     </message>
     <message>
@@ -488,11 +463,6 @@
     <name>../static/views/startPage.html</name>
     <message>
       <location filename="../static/views/startPage.html"/>
-      <source>* Just because we make a world a better place</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
       <source>Register today</source>
       <translation> </translation>
     </message>
@@ -564,22 +534,12 @@
     </message>
     <message>
       <location/>
-      <source>Share</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
       <source>Open in Nx Witness</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
       <source>Systems</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>&gt; Remove</source>
       <translation> </translation>
     </message>
     <message>
@@ -650,11 +610,6 @@
     </message>
     <message>
       <location/>
-      <source>&amp;times;</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
       <source>Ok</source>
       <translation> </translation>
     </message>
@@ -699,11 +654,6 @@
     <message>
       <location/>
       <source>About</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>&amp;nbsp;</source>
       <translation> </translation>
     </message>
     <message>

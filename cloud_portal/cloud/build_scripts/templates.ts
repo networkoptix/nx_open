@@ -9,27 +9,12 @@
     </message>
     <message>
       <location/>
-      <source>notification</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
       <source>Support</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Do not send this letter or link to account activation to anyone.</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
       <source>Thank you for registering in</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>, just ignore this letter.</source>
       <translation> </translation>
     </message>
     <message>
@@ -40,16 +25,6 @@
     <message>
       <location/>
       <source>Nx Cloud</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>If you haven't registered in</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>. Please, click the button below to confirm you e-mail address.</source>
       <translation> </translation>
     </message>
     <message>
@@ -77,22 +52,12 @@
     </message>
     <message>
       <location/>
-      <source>notification</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
       <source>Support</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
       <source>Hello,</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Do not send this letter or link to password restoring to anyone.</source>
       <translation> </translation>
     </message>
     <message>
@@ -117,11 +82,6 @@
     </message>
     <message>
       <location/>
-      <source>If you didn't try to restore your password - just ignore this letter. Link to password restoring will be working for the nearest 24 hours.</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
       <source>To restore password, please, click button below and follow further instructions</source>
       <translation> </translation>
     </message>
@@ -135,17 +95,7 @@
     </message>
     <message>
       <location/>
-      <source>notification</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
       <source>Support</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>and shared his system system  with you.</source>
       <translation> </translation>
     </message>
     <message>
@@ -156,11 +106,6 @@
     <message>
       <location/>
       <source>Nx Cloud</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>is inviting you to join</source>
       <translation> </translation>
     </message>
     <message>
@@ -188,17 +133,7 @@
     </message>
     <message>
       <location/>
-      <source>notification</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
       <source>System was shared with you</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>shared system  with you.</source>
       <translation> </translation>
     </message>
     <message>
@@ -231,11 +166,6 @@
     </message>
     <message>
       <location/>
-      <source>notification</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
       <source>There is no template for this type of message</source>
       <translation> </translation>
     </message>
@@ -262,11 +192,6 @@
     <message>
       <location/>
       <source>Type:</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>}</source>
       <translation> </translation>
     </message>
     <message>
