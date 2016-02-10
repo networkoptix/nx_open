@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QThread>
+
 #include "../active_camera_thumbnail_loader.h"
 
 #include <core/resource/resource_fwd.h>

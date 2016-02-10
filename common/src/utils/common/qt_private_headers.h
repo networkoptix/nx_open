@@ -12,6 +12,8 @@
 #define QT_VERSION_NUM 5.5.0
 #elif QT_VERSION == 0x050501
 #define QT_VERSION_NUM 5.5.1
+#elif QT_VERSION == 0x050600
+#define QT_VERSION_NUM 5.6.0
 #else
 #error "Define proper version here!"
 #endif

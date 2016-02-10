@@ -6,10 +6,10 @@
 #include "abstract_resource_allocator.h"
 #include <utils/media/h264_utils.h>
 #include <QtGui/QOpenGLContext>
-#include <QOpenGLContext>
-#include <qopenglfunctions.h>
-#include <qopenglshaderprogram.h>
-#include <qopenglframebufferobject.h>
+#include <QtGui/QOpenGLContext>
+#include <QtGui/qopenglfunctions.h>
+#include <QtGui/qopenglshaderprogram.h>
+#include <QtGui/qopenglframebufferobject.h>
 
 #include <QtGui/QOpenGLFunctions>
 #include <QtGui/QOffscreenSurface>

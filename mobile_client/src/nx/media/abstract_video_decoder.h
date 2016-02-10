@@ -2,7 +2,7 @@
 
 #include <QtCore/QObject>
 #include <QtMultimedia/QVideoFrame>
-#include <QOpenGLContext>
+#include <QtGui/QOpenGLContext>
 
 #include <nx/streaming/video_data_packet.h>
 
