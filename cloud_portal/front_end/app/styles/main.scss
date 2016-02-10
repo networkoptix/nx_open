@@ -183,3 +183,10 @@ body {
     float: right;
   }
 }
+
+
+.vertical-bar{
+  border-right: 1px solid $common-border-color;
+  height: 26px;
+  margin: 15px 0;
+}
