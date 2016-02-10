@@ -26,8 +26,10 @@ static const qint64 USEC_PER_MS = 1000;
 
 void QnAutoRequestForwarder::processRequest( nx_http::Request* const request )
 {
-    //TODO #ak give up authentication-related types here in 2.6
     const auto allowedMethods = m_restrictionList.getAllowedAuthMethods(*request);
+    //TODO #ak AuthMethod::videowall is used here to imply existing class 
+        //QnAuthMethodRestrictionList with no change, since release 2.5 is coming.
+        //Proper types will be introduced in 2.6
     if (!(allowedMethods & AuthMethod::videowall))
         return; //not processing url
 

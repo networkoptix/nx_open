@@ -8,6 +8,11 @@ QnRuntimeTransactionLog::QnRuntimeTransactionLog(QObject* parent):
 { 
     connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoAdded, this, &QnRuntimeTransactionLog::at_runtimeInfoChanged, Qt::DirectConnection);
     connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoChanged, this, &QnRuntimeTransactionLog::at_runtimeInfoChanged, Qt::DirectConnection);
+
+    connect(qnCommon, &QnCommonModule::runningInstanceGUIDChanged, this, [this]()
+    {
+        clearOldRuntimeData(QnTranStateKey(qnCommon->moduleGUID(), qnCommon->runningInstanceGUID()));
+    }, Qt::DirectConnection);
 }
 
 QnRuntimeTransactionLog::~QnRuntimeTransactionLog()
@@ -46,6 +51,7 @@ void QnRuntimeTransactionLog::clearOldRuntimeData(const QnTranStateKey& key)
     if (newPeerFound && oldPeerFound) {
         QnTransaction<ApiRuntimeData> tran(ApiCommand::runtimeInfoChanged);
         tran.params = m_data[key];
+        lock.unlock();
         emit runtimeDataUpdated(tran);
     }
 }
