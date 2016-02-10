@@ -33,6 +33,12 @@ $font-size-a-bit-large:   ceil($font-size-base * 1.15); //~16px - we just need 1
   font-weight: lighter;
 }
 
+.nav .dropdown-menu > li > a{
+  padding: 5px 15px;
+  font-size: $font-size-large;
+  font-weight: lighter;
+}
+
 .nav > li > a:hover {
   background-color: light(2) !important;
 }
@@ -99,4 +105,9 @@ h1>.label{
 hr {
   margin-top:    15px;
   margin-bottom: 15px;
+}
+
+
+.navbar-nav > li > .dropdown-menu {
+  width:100%;
 }
