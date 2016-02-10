@@ -241,9 +241,14 @@ void CloudServerSocket::startAcceptor(
     }
 
     acceptorPtr->accept([this, acceptorPtr](
+        SystemError::ErrorCode code,
         std::unique_ptr<AbstractTunnelConnection> connection)
     {
-        if (connection)
+        NX_LOGX(lm("acceptor %1 returned %2: %3")
+                .arg(acceptorPtr).arg(connection)
+                .arg(SystemError::toString(code)), cl_logDEBUG2);
+
+        if (code == SystemError::noError)
             m_tunnelPool->addNewTunnel(std::move(connection));
 
         QnMutexLocker lock(&m_mutex);

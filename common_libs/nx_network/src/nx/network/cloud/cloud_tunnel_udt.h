@@ -22,8 +22,9 @@ public:
         static_cast<void>(addresses);
     }
 
-    void accept(
-        std::function<void(std::unique_ptr<AbstractTunnelConnection>)> handler) override
+    void accept(std::function<void(
+        SystemError::ErrorCode,
+        std::unique_ptr<AbstractTunnelConnection>)> handler) override
     {
         // TODO: listen for mediator indcations and initiate UdtTunnelConnection
     }

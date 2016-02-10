@@ -58,31 +58,37 @@ struct FakeTcpTunnelConnection : AbstractTunnelConnection
 /** Creates several \class FakeTcpTunnelConnection */
 struct FakeTcpTunnelAcceptor : AbstractTunnelAcceptor
 {
-    FakeTcpTunnelAcceptor(SocketAddress address)
+    FakeTcpTunnelAcceptor(boost::optional<SocketAddress> address):
+        m_address(std::move(address)),
+        m_ioThreadSocket(new TCPSocket)
     {
-        m_addresses.push_back(std::move(address));
     }
 
-    void accept(
-        std::function<void(std::unique_ptr<AbstractTunnelConnection>)> handler) override
+    void accept(std::function<void(
+        SystemError::ErrorCode,
+        std::unique_ptr<AbstractTunnelConnection>)> handler) override
     {
-        if (!m_addresses.empty())
-        {
-            auto address = m_addresses.back();
-            m_addresses.pop_back();
-            handler(std::make_unique<FakeTcpTunnelConnection>(std::move(address)));
-        }
+        if (!m_address)
+            return m_ioThreadSocket->registerTimer(
+                100, [handler](){ handler(SystemError::timedOut, nullptr); });
+
+        auto address = std::move(*m_address);
+        m_address = boost::none;
+
+        auto conn = std::make_unique<FakeTcpTunnelConnection>(std::move(address));
+        handler(SystemError::noError, std::move(conn));
     }
 
     void pleaseStop(std::function<void()> handler) override
     {
-        handler();
+        m_ioThreadSocket->pleaseStop(std::move(handler));
     }
 
-    std::vector<SocketAddress> m_addresses;
+    boost::optional<SocketAddress> m_address;
+    std::unique_ptr<AbstractCommunicatingSocket> m_ioThreadSocket;
 };
 
-/** Creates @param kShift @class FakeTcpTunnelAcceptor(s) instead of real ones */
+/** Creates @param nAcceptors @class FakeTcpTunnelAcceptor(s) instead of real ones */
 template<quint16 nAcceptors>
 struct CloudServerSocketTcpTester : CloudServerSocket
 {
@@ -96,6 +102,9 @@ struct CloudServerSocketTcpTester : CloudServerSocket
             auto addr = nx::network::test::kServerAddress;
             startAcceptor(std::make_unique<FakeTcpTunnelAcceptor>(
                 SocketAddress(addr.address, addr.port + i)));
+
+            // also start useless acceptors
+            startAcceptor(std::make_unique<FakeTcpTunnelAcceptor>(boost::none));
         }
 
         return true;
@@ -122,7 +131,7 @@ NX_NETWORK_SERVER_SOCKET_TEST_CASE(
     &std::make_unique<TCPSocket>);
 
 struct CloudServerSocketMultiTcpAcceptorTest
-    : CloudServerSocketTcpTest<CloudServerSocketTcpTester<4>> {};
+    : CloudServerSocketTcpTest<CloudServerSocketTcpTester<5>> {};
 
 NX_NETWORK_SERVER_SOCKET_TEST_CASE(
     TEST_F, CloudServerSocketMultiTcpAcceptorTest,

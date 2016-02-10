@@ -86,7 +86,7 @@ void IncomingTunnelPool::getNextSocketAsync(
     }
 
     m_acceptHandler = std::move(handler);
-    if (timeout)
+    if (timeout && *timeout != 0)
         m_ioThreadSocket->registerTimer(
             *timeout, [this](){ callAcceptHandler(true); });
 }
@@ -141,9 +141,12 @@ void IncomingTunnelPool::acceptTunnel(std::shared_ptr<IncomingTunnel> tunnel)
 void IncomingTunnelPool::callAcceptHandler(bool timeout)
 {
     // Cancel all possible posts (we are in corresponding IO thread)
-    m_ioThreadSocket->cancelIOSync(aio::etNone);
+    m_ioThreadSocket->cancelIOSync(aio::etTimedOut);
 
     QnMutexLocker lock(&m_mutex);
+    if (!m_acceptHandler)
+        return;
+
     const auto handler = std::move(m_acceptHandler);
     m_acceptHandler = nullptr;
 
