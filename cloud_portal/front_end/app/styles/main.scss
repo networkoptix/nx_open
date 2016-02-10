@@ -1,7 +1,7 @@
 
 @import '_theme_palette';
 @import '_theme_variables';
-@import '../bower_components/sass-bootstrap/lib/bootstrap';
+@import '../bower_components/bootstrap-sass/assets/stylesheets/bootstrap';
 @import '_theme_override';
 
 
@@ -175,4 +175,11 @@ body {
   display: inline-block;
   padding-top: 10px;
   padding-left: 10px;
+}
+
+@media (min-width: $screen-sm-min) {
+  .pull-right-sm {
+    padding: 15px 0;
+    float: right;
+  }
 }

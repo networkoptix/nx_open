@@ -1,7 +1,7 @@
 
 <div class="auth-visible" process-loading="gettingSystem">
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-sm-6">
             <h1 ng-if="gettingSystem.success">
                 <a href="#/systems">Systems</a> > {{system.info.name}}
                 <span ng-if="system.info.status!=Config.systemStatuses.onlineStatus" class="label"
@@ -11,19 +11,16 @@
             <process-alert process="gettingSystem"
                            error-prefix="'System info is unavailable:'"></process-alert>
         </div>
-        <div class="col-md-6">
-            <div class="pull-right">
-
+        <div class="col-sm-6">
+            <div class="pull-right-sm">
                 <div class="btn-group">
                     <button class="btn btn-default" ng-click="delete()">
                         <span class="glyphicon glyphicon-trash"></span> Remove</button>
                     <button class="btn btn-default" ng-click="share()" ng-if="system.info.sharingPermissions.length">
                         <span class="glyphicon glyphicon-share"></span> Share</button>
                 </div>
-
                 <button class="btn btn-default" ng-click="open(null)"
                         ng-disabled="system.info.status!=Config.systemStatuses.onlineStatus">Open in Nx Witness</button>
-
             </div>
         </div>
 
