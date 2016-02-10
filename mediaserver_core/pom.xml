@@ -139,7 +139,7 @@
                             <arguments>
                                 <argument>-jar</argument>
                                 <argument>${environment.dir}/bin/apidoctool.jar</argument>
-                                <argument>-code-to-xml</argument>
+                                <argument>code-to-xml</argument>
                                 <argument>-vms-path</argument>
                                 <argument>${root.dir}</argument>
                                 <argument>-template-xml</argument>
