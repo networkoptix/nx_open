@@ -1,19 +1,19 @@
 <nav class="navbar navbar-default">
     <div class="container">
         <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
-                    data-target="#header-collapse" aria-expanded="false">
+            <button type="button" class="navbar-toggle"
+                    ng-click="isMenuExpanded = !isMenuExpanded">
                 <span class="glyphicon glyphicon-menu-hamburger"></span>
             </button>
             <a class="navbar-brand" href="#/"><img src="images/logo.png"></a>&nbsp;
         </div>
 
-        <div class="collapse navbar-collapse" id="header-collapse">
+        <div class="navbar-collapse" uib-collapse="!isMenuExpanded">
             <ul class="nav navbar-nav">
                 <li><a href="#/support">Support</a></li>
-                <li class="dropdown">
-                    <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">About <span class="caret"></span></a>
-                    <ul class="dropdown-menu">
+                <li uib-dropdown>
+                    <a uib-dropdown-toggle href="#">About <span class="caret"></span></a>
+                    <ul uib-dropdown-menu>
                         <li><a href="#/about/cloud">About <span>Nx Cloud</span></a></li>
                         <li><a href="#/about/connect_system">How to connect your system</a></li>
                         <li><a href="#/about/nx">About Networkoptix</a></li>
@@ -25,10 +25,9 @@
                 <li><span class="btn-wrapper"><a href="#/register" class="btn btn-primary" >Register</a></span></li>
             </ul>
             <ul class="nav navbar-nav navbar-right auth-visible">
-                <li class="dropdown">
-                    <a class="dropdown-toggle" href="#" role="button" aria-haspopup="true"
-                       aria-expanded="false">{{account.email}} <span class="caret"></span></a>
-                    <ul class="dropdown-menu">
+                <li uib-dropdown>
+                    <a uib-dropdown-toggle href="#">{{account.email}} <span class="caret"></span></a>
+                    <ul uib-dropdown-menu>
                         <li><a href="#/account/">Account Settings</a></li>
                         <li><a href="#/account/password/">Change Password</a></li>
                         <li><a href="" ng-click="logout()">Logout</a></li>

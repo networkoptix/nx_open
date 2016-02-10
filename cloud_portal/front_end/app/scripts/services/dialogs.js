@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudApp')
-    .factory('dialogs', function ($http, $modal, $q, $location) {
+    .factory('dialogs', function ($http, $uibModal, $q, $location) {
         function openDialog(title, template, url, content, hasFooter, cancellable, params, closable){
 
             //scope.inline = typeof($location.search().inline) != 'undefined';
@@ -11,7 +11,7 @@ angular.module('cloudApp')
             }
 
             // Check 401 against offline
-            var modalInstance = $modal.open({
+            var modalInstance = $uibModal.open({
                 controller: 'DialogCtrl',
                 templateUrl: 'views/components/dialog.html',
                 animation: !isInline(),
@@ -88,22 +88,22 @@ angular.module('cloudApp')
                 }).result;
             }
         };
-    }).controller("DialogCtrl",function($scope, $modalInstance,settings){
+    }).controller("DialogCtrl",function($scope, $uibModalInstance,settings){
         $scope.settings = settings;
 
         $scope.close = function(){
-            $modalInstance.dismiss('close');
+            $uibModalInstance.dismiss('close');
         };
 
         $scope.ok = function(){
-            $modalInstance.close('ok');
+            $uibModalInstance.close('ok');
         };
 
         $scope.cancel = function(){
-            $modalInstance.dismiss('cancel');
+            $uibModalInstance.dismiss('cancel');
         };
 
         $scope.$on('$routeChangeStart', function(){
-            $modalInstance.close();
+            $uibModalInstance.close();
         });
     });
