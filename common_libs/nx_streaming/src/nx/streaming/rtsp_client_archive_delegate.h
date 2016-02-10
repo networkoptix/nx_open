@@ -57,6 +57,7 @@ public:
 
     void setAdditionalAttribute(const QByteArray& name, const QByteArray& value);
     virtual void setRange(qint64 startTime, qint64 endTime, qint64 frameStep) override;
+    virtual bool hasVideo() const override;
 
     void setMultiserverAllowed(bool value);
 
@@ -114,6 +115,8 @@ private:
     QnArchiveStreamReader* m_reader;
     int m_frameCnt;
     QnCustomResourceVideoLayoutPtr m_customVideoLayout;
+
+    QnUuid m_runtimeId;
 
 	QMap<int, QSharedPointer<QnNxRtpParser>> m_parsers;
 
