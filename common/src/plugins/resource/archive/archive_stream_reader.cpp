@@ -362,10 +362,16 @@ void QnArchiveStreamReader::startPaused(qint64 startTime)
 
 bool QnArchiveStreamReader::isCompatiblePacketForMask(const QnAbstractMediaDataPtr& mediaData) const
 {
-    if (hasVideo() && mediaData->dataType != QnAbstractMediaData::VIDEO)
-        return false;
-    else if (mediaData->dataType != QnAbstractMediaData::AUDIO)
-        return false;
+    if (hasVideo())
+    {
+        if (mediaData->dataType != QnAbstractMediaData::VIDEO)
+            return false;
+    }
+    else 
+    {
+        if (mediaData->dataType != QnAbstractMediaData::AUDIO)
+            return false;
+    }
     return !(mediaData->flags & QnAbstractMediaData::MediaFlags_LIVE);
 }
 
