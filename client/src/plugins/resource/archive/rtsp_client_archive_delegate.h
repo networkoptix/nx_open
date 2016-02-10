@@ -113,6 +113,8 @@ private:
     QnArchiveStreamReader* m_reader;
     int m_frameCnt;
     QnCustomResourceVideoLayoutPtr m_customVideoLayout;
+
+    QnUuid m_runtimeId;
     
     QMap<int, QnFfmpegRtpParserPtr> m_parsers;
     
