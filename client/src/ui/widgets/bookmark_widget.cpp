@@ -31,6 +31,8 @@ QnBookmarkWidget::QnBookmarkWidget(QWidget *parent):
         updateTagsList();
     });
 
+    connect(ui->nameLineEdit, &QLineEdit::textEdited, this, &QnBookmarkWidget::validChanged);
+
     // TODO: #3.0 #rvasilenko Remove when bookmark timeout will be implemented.
     // Then change defaultTimeoutIdx constant value to '3'.
     ui->timeoutComboBox->hide();
@@ -70,10 +72,15 @@ void QnBookmarkWidget::loadData(const QnCameraBookmark &bookmark) {
 }
 
 void QnBookmarkWidget::submitData(QnCameraBookmark &bookmark) const {
-    bookmark.name = ui->nameLineEdit->text();
-    bookmark.description = ui->descriptionTextEdit->toPlainText();
+    bookmark.name = ui->nameLineEdit->text().trimmed();
+    bookmark.description = ui->descriptionTextEdit->toPlainText().trimmed();
     bookmark.timeout = ui->timeoutComboBox->currentData().toLongLong();
     bookmark.tags = m_selectedTags;
+}
+
+bool QnBookmarkWidget::isValid() const
+{
+    return !ui->nameLineEdit->text().trimmed().isEmpty();
 }
 
 void QnBookmarkWidget::updateTagsList() {
