@@ -20,6 +20,7 @@
 #include "ui/models/resource_list_model.h"
 #include "ui/models/server_addresses_model.h"
 #include "ui/style/warning_style.h"
+#include <ui/delegates/switch_item_delegate.h>
 
 #include "utils/common/string.h"
 #include "utils/common/util.h"
@@ -186,9 +187,14 @@ QnRoutingManagementWidget::QnRoutingManagementWidget(QWidget *parent) :
     m_changes(new RoutingManagementChanges)
 {
     ui->setupUi(this);
+
     ui->splitter->setStretchFactor(0, 1);
     ui->splitter->setStretchFactor(1, 2);
+
+    ui->addressesView->setItemDelegateForColumn(QnServerAddressesModel::InUseColumn, new QnSwitchItemDelegate(this));
+
     setWarningStyle(ui->warningLabel);
+
     setHelpTopic(this, Qn::Administration_RoutingManagement_Help);
 
     m_serverListModel = new QnResourceListModel(this);

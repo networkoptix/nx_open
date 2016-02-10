@@ -16,6 +16,7 @@
 #include <QAbstractItemView>
 #include <private/qfont_p.h>
 #include <QtMath>
+#include <QtWidgets/QProxyStyle>
 
 #include <utils/common/scoped_painter_rollback.h>
 
@@ -126,6 +127,12 @@ QnPaletteColor QnNxStyle::findColor(const QColor &color) const
 {
     Q_D(const QnNxStyle);
     return d->findColor(color);
+}
+
+void QnNxStyle::drawSwitch(QPainter *painter, const QStyleOption *option, const QWidget *widget) const
+{
+    Q_D(const QnNxStyle);
+    d->drawSwitch(painter, option, widget);
 }
 
 void QnNxStyle::drawPrimitive(
@@ -1572,6 +1579,14 @@ QRect QnNxStyle::subElementRect(
         }
         break;
 
+    case SE_ItemViewItemCheckIndicator:
+        if (const QStyleOptionViewItem *item = qstyleoption_cast<const QStyleOptionViewItem *>(option))
+        {
+            if (item->state.testFlag(State_On) || item->state.testFlag(State_Off))
+                return alignedRect(Qt::LeftToRight, Qt::AlignCenter, Metrics::kSwitchSize, option->rect);
+        }
+        break;
+
     default:
         break;
     } // switch
@@ -1733,6 +1748,8 @@ int QnNxStyle::styleHint(
         return Qt::AlignLeft | Qt::AlignVCenter;
     case SH_FormLayoutFieldGrowthPolicy:
         return QFormLayout::AllNonFixedFieldsGrow;
+    case SH_ItemView_ShowDecorationSelected:
+        return 1;
     default:
         break;
     }
@@ -1766,6 +1783,11 @@ void QnNxStyle::polish(QWidget *widget)
         widget->setAttribute(Qt::WA_Hover);
     }
 
+    if (QAbstractItemView *view = qobject_cast<QAbstractItemView *>(widget))
+    {
+        view->viewport()->setAttribute(Qt::WA_Hover);
+    }
+
     if (qobject_cast<QMenu*>(widget))
     {
         widget->setAttribute(Qt::WA_TranslucentBackground);
@@ -1784,4 +1806,13 @@ void QnNxStyle::unpolish(QWidget *widget)
     }
 
     base_type::unpolish(widget);
+}
+
+QnNxStyle *QnNxStyle::instance()
+{
+    QStyle *style = qApp->style();
+    if (QProxyStyle *proxyStyle = qobject_cast<QProxyStyle *>(style))
+        style = proxyStyle->baseStyle();
+
+    return qobject_cast<QnNxStyle *>(style);
 }

@@ -74,7 +74,8 @@ void QnNxStylePrivate::drawSwitch(
     QnScopedPainterPenRollback penRollback(painter);
     QnScopedPainterBrushRollback brushRollback(painter);
 
-    QRectF rect = QnGeometry::eroded(QRectF(option->rect), 0.5);
+    QRectF rect = QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, Metrics::kSwitchSize, option->rect);
+    rect = QnGeometry::eroded(rect, 0.5);
 
     QRectF indicatorsRect = QnGeometry::eroded(rect, dp(3));
 
