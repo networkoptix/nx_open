@@ -28,7 +28,28 @@
 
     </div>
     <div class="row"  ng-if="gettingSystem.success">
-        <div class="col-md-8">
+
+        <div class="col-md-4 col-md-push-8">
+
+            <div class="panel panel-default" ng-if="isOwner">
+                <div class="panel-body">
+                    <h2>Your system</h2>
+                </div>
+            </div>
+
+            <div class="panel panel-default" ng-if="!isOwner">
+                <div class="panel-body">
+                    <h2>Owner</h2>
+                    <h3>{{system.info.ownerFullName}}</h3>
+                    <a ng-href="mailto:{{system.info.ownerAccountEmail}}">{{system.info.ownerAccountEmail}}</a>
+                    <hr>
+                    Your permissions:<br>
+                    <b>{{L.accessRoles[system.info.accessRole].label || system.info.accessRole}}</b>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8 col-md-pull-4">
 
             <div class="no-access-panel" ng-if="!system.info.sharingPermissions.length" >
                 <span class="no-access-panel-body">
@@ -51,49 +72,32 @@
                                    error-prefix="'Sharing failed:'"></process-alert>
 
                 </div>
-                <table class="table table-hover" ng-if="system.users.length">
-                    <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Account</th>
-                        <th>Permissions</th>
-                        <th></th>
-                        <th></th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr ng-repeat="user in system.users" class="hoverable">
-                        <td>{{user.fullName}}</td>
-                        <td>{{user.accountEmail}}</td>
-                        <td>{{L.accessRoles[user.accessRole].label || user.accessRole}}</td>
-                        <td><a href='' class="hover-visible" ng-if="user.accountEmail != account.email && user.accessRole!=Config.accessRoles.owner"
-                               ng-click="editShare(user)"><span class="glyphicon glyphicon-pencil"></span></a></td>
-                        <td><a href='' class="hover-visible" ng-if="user.accessRole!=Config.accessRoles.owner"
-                               ng-click="unshare(user)"><span class="glyphicon glyphicon-remove"></span></a></td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-
-        </div>
-        <div class="col-md-4">
-
-            <div class="panel panel-default" ng-if="isOwner">
-                <div class="panel-body">
-                    <h2>Your system</h2>
+                <div class="table-responsive">
+                    <table class="table table-hover" ng-if="system.users.length">
+                        <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Account</th>
+                            <th>Permissions</th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="user in system.users" class="hoverable">
+                            <td>{{user.fullName}}</td>
+                            <td>{{user.accountEmail}}</td>
+                            <td>{{L.accessRoles[user.accessRole].label || user.accessRole}}</td>
+                            <td><a href='' class="hover-visible" ng-if="user.accountEmail != account.email && user.accessRole!=Config.accessRoles.owner"
+                                   ng-click="editShare(user)"><span class="glyphicon glyphicon-pencil"></span></a></td>
+                            <td><a href='' class="hover-visible" ng-if="user.accessRole!=Config.accessRoles.owner"
+                                   ng-click="unshare(user)"><span class="glyphicon glyphicon-remove"></span></a></td>
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
-            <div class="panel panel-default" ng-if="!isOwner">
-                <div class="panel-body">
-                    <h2>Owner</h2>
-                    <h3>{{system.info.ownerFullName}}</h3>
-                    <a ng-href="mailto:{{system.info.ownerAccountEmail}}">{{system.info.ownerAccountEmail}}</a>
-                    <hr>
-                    Your permissions:<br>
-                    <b>{{L.accessRoles[system.info.accessRole].label || system.info.accessRole}}</b>
-                </div>
-            </div>
         </div>
     </div>
 
