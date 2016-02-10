@@ -18,6 +18,7 @@ $gray-lighter:           light(3);    //~#EEE
 
 $body-bg:                 light(2);
 $navbar-default-bg:       light(1);
+$navbar-default-link-color: $gray-dark;
 $navbar-margin-bottom:    10px;
 
 
@@ -45,3 +46,5 @@ $btn-default-bg:            transparent;
 $jumbotron-bg:              transparent;
 $modal-footer-border-color: transparent;
 $modal-header-border-color: transparent;
+
+$grid-gutter-width:       16px;

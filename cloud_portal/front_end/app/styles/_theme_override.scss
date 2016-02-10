@@ -3,6 +3,7 @@
 
 @import '_theme_variables';
 
+
 $font-size-a-bit-large:   ceil($font-size-base * 1.15); //~16px - we just need 16px sometimes :-)
 
 .panel{
@@ -41,16 +42,18 @@ h1{
 }
 
 h2, h3{
-  margin-top: 0;
-  margin-bottom: ( $line-height-computed / 2 );
-
   max-width: 100%;
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
 }
+h2{
+  margin:0;
+}
 
 h3{
+  margin-top: ( $line-height-computed / 2 );
+  margin-bottom: ( $line-height-computed / 4 );
   font-weight: normal;
 }
 
@@ -90,4 +93,10 @@ h1>.label{
 
 .jumbotron {
   text-align: center;
+}
+
+
+hr {
+  margin-top:    15px;
+  margin-bottom: 15px;
 }
