@@ -36,26 +36,41 @@ namespace
 
 QnActionsStatisticsModule::QnActionsStatisticsModule(QObject *parent)
     : base_type(parent)
-    , QnWorkbenchContextAware(parent)
+    , m_actionManager(nullptr)
 {
+}
+
+QnActionsStatisticsModule::~QnActionsStatisticsModule()
+{
+}
+
+void QnActionsStatisticsModule::setActionManager(QnActionManager *manager)
+{
+    if (m_actionManager == manager)
+        return;
+
+    if (m_actionManager)
+    {
+        disconnect(m_actionManager, nullptr, this, nullptr);
+        m_metrics.clear();
+    }
+
+    m_actionManager = manager;
+
     const auto createActionMetrics = [this](Qn::ActionId id)
     {
         const auto &alias = aliasByActionId(id);
 
         const auto triggeredAlias = makeAlias(alias, ActionTriggeredCountMetric::kPostfix);
-        m_metrics[triggeredAlias] = MetricsPtr(new ActionTriggeredCountMetric(menu(), id));
+        m_metrics[triggeredAlias] = MetricsPtr(new ActionTriggeredCountMetric(m_actionManager, id));
 
         // TODO: Add metrics handler
     };
 
-    connect(menu(), &QnActionManager::actionRegistered, this, createActionMetrics);
+    connect(m_actionManager, &QnActionManager::actionRegistered, this, createActionMetrics);
 
-    for (const auto action: menu()->actions())
+    for (const auto action: m_actionManager->actions())
         createActionMetrics(action->id());
-}
-
-QnActionsStatisticsModule::~QnActionsStatisticsModule()
-{
 }
 
 QnMetricsHash QnActionsStatisticsModule::metrics() const

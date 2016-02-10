@@ -75,12 +75,10 @@ namespace
     void initializeStatisticsManager(QnCommonModule *commonModule)
     {
         const auto statManager = commonModule->instance<QnStatisticsManager>();
-        const auto statStorage = commonModule->instance<QnStatisticsFileStorage>();
-        const auto statSettings = commonModule->instance<QnStatisticsSettingsWatcher>();
 
         statManager->setClientId(qnSettings->pcUuid());
-        statManager->setStorage(statStorage);
-        statManager->setSettings(statSettings);
+        statManager->setStorage(new QnStatisticsFileStorage());
+        statManager->setSettings(new QnStatisticsSettingsWatcher());
 
         QObject::connect(QnClientMessageProcessor::instance(), &QnClientMessageProcessor::connectionClosed
             , statManager, &QnStatisticsManager::saveCurrentStatistics);

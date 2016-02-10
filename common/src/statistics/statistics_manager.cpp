@@ -20,7 +20,7 @@ namespace
     template<typename ValueType>
     void saveToStorage(const QString &name
         , const ValueType &value
-        , QnAbstractStatisticsStorage *storage)
+        , const QnStatisticsStoragePtr &storage)
     {
         Q_ASSERT_X(!name.isEmpty(), Q_FUNC_INFO, "Name could not be empty!");
         Q_ASSERT_X(storage, Q_FUNC_INFO, "Storage has not set!");
@@ -33,18 +33,18 @@ namespace
     }
 
     void saveLastFilters(const QnStringsSet &filters
-        , QnAbstractStatisticsStorage *storage)
+        , const QnStatisticsStoragePtr &storage)
     {
         saveToStorage(kFiltersSettings, filters, storage);
     }
 
     void saveLastSentTime(qint64 lastSentTime
-        , QnAbstractStatisticsStorage *storage)
+        , const QnStatisticsStoragePtr &storage)
     {
         saveToStorage(kLastSentTime, lastSentTime, storage);
     }
 
-    QnStringsSet getLastFilters(const QnAbstractStatisticsStorage *storage)
+    QnStringsSet getLastFilters(const QnStatisticsStoragePtr &storage)
     {
         Q_ASSERT_X(storage, Q_FUNC_INFO, "Storage has not set!");
 
@@ -56,7 +56,7 @@ namespace
     }
 
 
-    qint64 getLastSentTime(const QnAbstractStatisticsStorage *storage)
+    qint64 getLastSentTime(const QnStatisticsStoragePtr &storage)
     {
         Q_ASSERT_X(storage, Q_FUNC_INFO, "Storage has not set!");
 
@@ -158,7 +158,7 @@ void QnStatisticsManager::setClientId(const QnUuid &clientID)
 
 void QnStatisticsManager::setStorage(QnAbstractStatisticsStorage *storage)
 {
-    m_storage = storage;
+    m_storage.reset(storage);
 }
 
 void QnStatisticsManager::setSettings(QnAbstractStatisticsSettingsLoader *settings)
@@ -166,7 +166,7 @@ void QnStatisticsManager::setSettings(QnAbstractStatisticsSettingsLoader *settin
     if (m_settings)
         disconnect(m_settings, nullptr, this, nullptr);
 
-    m_settings = settings;
+    m_settings.reset(settings);
 
     if (m_settings->settingsAvailable())
         sendStatistics();
@@ -247,10 +247,14 @@ void QnStatisticsManager::sendStatistics()
     if (!connection)
         return;
 
-    const auto callback = [this, timeStamp, settings]
+    const QPointer<QnStatisticsManager> thisGuard(this);
+    const auto callback = [this, timeStamp, settings, thisGuard]
         (bool success, rest::Handle handle
         , rest::ServerConnection::EmptyResponseType /*response */)
     {
+        if (!thisGuard)
+            return;
+
         if (m_handle != handle)
             return;
 

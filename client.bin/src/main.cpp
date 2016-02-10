@@ -127,9 +127,6 @@ extern "C"
 #include "api/runtime_info_manager.h"
 #include <utils/common/timermanager.h>
 
-#include <statistics/statistics_manager.h>
-#include <ui/statistics/modules/actions_statistics_module.h>
-
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
     //USES_CONVERSION;
@@ -468,10 +465,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     /* Create workbench context. */
     QScopedPointer<QnWorkbenchContext> context(new QnWorkbenchContext(qnResPool));
-
-    // Adds statistics modules
-    const auto actionsStatModule = context->instance<QnActionsStatisticsModule>();
-    qnStatisticsManager->registerStatisticsModule(lit("actions"), actionsStatModule);
 
     context->instance<QnFglrxFullScreen>(); /* Init fglrx workaround. */
 

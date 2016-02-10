@@ -9,6 +9,9 @@ class QnAbstractStatisticsModule;
 class QnAbstractStatisticsStorage;
 class QnAbstractStatisticsSettingsLoader;
 
+typedef QScopedPointer<QnAbstractStatisticsSettingsLoader> QnStatisticsSettingsPtr;
+typedef QScopedPointer<QnAbstractStatisticsStorage> QnStatisticsStoragePtr;
+
 typedef QString QnMetricAlias;
 typedef QString QnMetricValue;
 typedef QHash<QnMetricAlias, QnMetricValue> QnMetricsHash;

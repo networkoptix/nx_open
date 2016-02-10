@@ -5,16 +5,16 @@
 #include <QtCore/QPointer>
 
 #include <utils/common/singleton.h>
+#include <utils/common/connective.h>
 #include <statistics/statistics_fwd.h>
 #include <api/server_rest_connection_fwd.h>
 
-
-class QnStatisticsManager : public QObject
+class QnStatisticsManager : public Connective<QObject>
     , public Singleton<QnStatisticsManager>
 {
     Q_OBJECT
 
-    typedef QObject base_type;
+    typedef Connective<QObject> base_type;
 
 public:
     QnStatisticsManager(QObject *parent = nullptr);
@@ -27,8 +27,10 @@ public:
 
     void setClientId(const QnUuid &clientID);
 
+    // Takes ownership under storage object
     void setStorage(QnAbstractStatisticsStorage *storage);
 
+    // Takes ownership under settings object
     void setSettings(QnAbstractStatisticsSettingsLoader *settings);
 
 public:
@@ -42,8 +44,6 @@ private:
     QnMetricsHash getMetrics() const;
 
 private:
-    typedef QPointer<QnAbstractStatisticsSettingsLoader> SettingsPtr;
-    typedef QPointer<QnAbstractStatisticsStorage> StoragePtr;
     typedef QPointer<QnAbstractStatisticsModule> ModulePtr;
     typedef QHash<QString, ModulePtr> ModulesMap;
 
@@ -51,8 +51,8 @@ private:
 
     rest::Handle m_handle;
 
-    SettingsPtr m_settings;
-    StoragePtr m_storage;
+    QnStatisticsSettingsPtr m_settings;
+    QnStatisticsStoragePtr m_storage;
 
     ModulesMap m_modules;
 };
