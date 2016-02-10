@@ -865,3 +865,8 @@ void QnRtspClientArchiveDelegate::setPlayNowModeAllowed(bool value)
     if (!value)
         m_rtspSession.setUsePredefinedTracks(0);
 }
+
+bool QnRtspClientArchiveDelegate::hasVideo() const
+{
+    return m_camera && m_camera->hasVideo(nullptr);
+}
