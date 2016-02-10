@@ -1,6 +1,7 @@
 #include <atomic>
 #include "server_rest_connection.h"
 
+#include <api/model/cloud_credentials_data.h>
 #include <api/app_server_connection.h>
 #include <api/helpers/chunks_request_data.h>
 #include <api/helpers/thumbnail_request_data.h>
@@ -53,13 +54,23 @@ rest::Handle ServerConnection::cameraThumbnailAsync( const QnThumbnailRequestDat
     return executeGet(lit("/ec2/cameraThumbnail"), request.toParams(), callback, targetThread);
 }
 
-Handle ServerConnection::saveCloudSystemCredentials(const QString &cloudSystemID, const QString &cloudAuthKey, Result<EmptyResponseType>::type callback, QThread *targetThread)
+Handle ServerConnection::saveCloudSystemCredentials(
+    const QString& cloudSystemId,
+    const QString& cloudAuthKey,
+    Result<EmptyResponseType>::type callback,
+    QThread* targetThread)
 {
-    QnRequestParamList params;
-    params << QnRequestParam("cloudSystemID", cloudSystemID);
-    params << QnRequestParam("cloudAuthKey", cloudAuthKey);
+    CloudCredentialsData data;
+    data.cloudSystemId = cloudSystemId;
+    data.cloudAuthenticationKey = cloudAuthKey;
 
-    return executeGet(lit("/api/saveCloudSystemCredentials"), params, callback, targetThread);
+    return executePost(
+        lit("/api/saveCloudSystemCredentials"),
+        QnRequestParamList(),
+        Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+        QJson::serialized(std::move(data)),
+        callback,
+        targetThread);
 }
 
 // --------------------------- private implementation -------------------------------------
