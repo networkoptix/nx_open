@@ -10,7 +10,7 @@ namespace
 {
     enum
     {
-        kDefaultLimit = 15   // TODO: changed to 128
+        kDefaultLimit = 128
         , kDefaultStoreDaysCount = 32
     };
 
@@ -33,7 +33,7 @@ namespace
 
     QDir getStatisticsDirectory()
     {
-        static const auto kStatisticsDirectoryName = lit("statistics");
+        static const auto kStatisticsDirectoryName = lit("nx_statistics");
         static const auto kResult =
             getCustomDirectory(kStatisticsDirectoryName);
 
@@ -42,7 +42,7 @@ namespace
 
     QDir getCustomDataDirectory()
     {
-        static const auto kCustomDirectoryName = lit("custom");
+        static const auto kCustomDirectoryName = lit("nx_custom");
         static const auto kResult =
             getCustomDirectory(kCustomDirectoryName);
 
@@ -113,6 +113,9 @@ QnStatisticsFileStorage::~QnStatisticsFileStorage()
 
 void QnStatisticsFileStorage::storeMetrics(const QnMetricsHash &metrics)
 {
+    if (!m_statisticsDirectory.exists())
+        return;
+
     const qint64 timeStampMs = QDateTime::currentMSecsSinceEpoch();
 
     const auto fileName = QString::number(timeStampMs);
@@ -127,6 +130,10 @@ void QnStatisticsFileStorage::storeMetrics(const QnMetricsHash &metrics)
 
 QnMetricHashesList QnStatisticsFileStorage::getMetricsList(qint64 startTimeUtcMs, int limit) const
 {
+    if (!m_statisticsDirectory.exists())
+        return QnMetricHashesList();
+
+    // Entries are sorted by name (timestamp in our case) in descending order
     auto entries = m_statisticsDirectory.entryList(QDir::Files, QDir::Name).toStdList();
     entries.reverse();
 
@@ -157,20 +164,29 @@ QnMetricHashesList QnStatisticsFileStorage::getMetricsList(qint64 startTimeUtcMs
 bool QnStatisticsFileStorage::saveCustomSettings(const QString &name
     , const QByteArray &settings)
 {
+    if (!m_customSettingsDirectory.exists())
+        return false;
+
     const auto fullFileName = m_customSettingsDirectory.absoluteFilePath(name);
     return writeToFile(fullFileName, settings);
 }
 
 QByteArray QnStatisticsFileStorage::getCustomSettings(const QString &name) const
 {
+    if (!m_customSettingsDirectory.exists())
+        return false;
+
     const auto fullFileName = m_customSettingsDirectory.absoluteFilePath(name);
     return readAllFromFile(fullFileName);
 }
 
 void QnStatisticsFileStorage::removeCustomSettings(const QString &name)
 {
-    if (m_customSettingsDirectory.exists(name))
+    if (m_customSettingsDirectory.exists()
+        && m_customSettingsDirectory.exists(name))
+    {
         m_customSettingsDirectory.remove(name);
+    }
 }
 
 void QnStatisticsFileStorage::removeOutdatedFiles()
@@ -182,7 +198,7 @@ void QnStatisticsFileStorage::removeOutdatedFiles()
         return;
     }
 
-    // Entries are files and sorted by name, ascending
+    // Entries are sorted by name in ascending order
     auto entries = m_statisticsDirectory.entryList(QDir::Files, QDir::Name);
 
     QStringList forRemoveFilesList;
