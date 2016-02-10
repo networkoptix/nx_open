@@ -10,7 +10,7 @@ namespace
 {
     enum
     {
-        kDefaultLimit = 5   // TODO: changed to 128
+        kDefaultLimit = 15   // TODO: changed to 128
         , kDefaultStoreDaysCount = 32
     };
 

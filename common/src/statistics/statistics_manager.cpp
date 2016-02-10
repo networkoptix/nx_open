@@ -3,6 +3,7 @@
 
 #include <utils/common/model_functions.h>
 #include <common/common_module.h>
+#include <api/global_settings.h>
 #include <api/server_rest_connection.h>
 #include <api/helpers/send_statistics_request_data.h>
 #include <core/resource/media_server_resource.h>
@@ -63,9 +64,8 @@ namespace
         if (!storage)
             return kMinLastTimeMs;
 
-        const auto lastSentTimeStr = storage->getCustomSettings(kFiltersSettings);
-        return QnLexical::deserialized<qint64>(
-            QString::fromLatin1(lastSentTimeStr, kMinLastTimeMs));
+        const auto lastSentTimeStr = storage->getCustomSettings(kLastSentTime);
+        return QJson::deserialized<qint64>(lastSentTimeStr, kMinLastTimeMs);
     }
 
     //
@@ -87,8 +87,10 @@ namespace
         QnMetricsHash result;
         for (auto it = source.cbegin(); it != source.cend(); ++it)
         {
-            if (isMatchFilters(it.key(), filters))
-                result.insert(it.key(), it.value());
+            const auto metricAlias = it.key();
+            const auto metricValue = it.value();
+            if (isMatchFilters(metricAlias, filters))
+                result.insert(metricAlias, metricValue);
         }
         return result;
     }
@@ -117,7 +119,6 @@ QnStatisticsManager::QnStatisticsManager(QObject *parent)
     , m_settings()
     , m_modules()
     , m_storage()
-    , m_statisticsSent(false)
 {}
 
 QnStatisticsManager::~QnStatisticsManager()
@@ -128,7 +129,7 @@ bool QnStatisticsManager::registerStatisticsModule(const QString &alias
 {
     if (m_modules.contains(alias))
     {
-        Q_ASSERT_X(false, Q_FUNC_INFO, "Module has been registered already");
+        Q_ASSERT_X(false, Q_FUNC_INFO, "Module has been registered already!");
         return false;
     }
 
@@ -180,7 +181,11 @@ QnMetricsHash QnStatisticsManager::getMetrics() const
     for (auto it = m_modules.cbegin(); it != m_modules.cend(); ++it)
     {
         const auto moduleAlias = it.key();
-        const auto data = it.value()->metrics();
+        const auto module = it.value();
+        if (!module)
+            continue;
+
+        const auto data = module->metrics();
         for (auto itData = data.cbegin(); itData != data.cend(); ++itData)
         {
             const auto subAlias = itData.key();
@@ -191,36 +196,37 @@ QnMetricsHash QnStatisticsManager::getMetrics() const
     return result;
 }
 
-void debugOutput(const QnMetricsHash &metrics)
-{
-    qDebug() << "Stat:";
-    for(auto it = metrics.begin(); it != metrics.end(); ++it)
-    {
-        qDebug() << it.key() << " : " << it.value();
-    }
-}
-
 void QnStatisticsManager::sendStatistics()
 {
-    if (!m_settings || m_connection)
+    if (!m_settings || !m_storage || m_connection
+        || !m_settings->settingsAvailable()
+        || !qnGlobalSettings->isStatisticsAllowed())
+    {
         return;
-
-//    if (!qnGlobalSettings->isStatisticsAllowed()) // TODO: uncomment me!
-//        return;
-
-    m_statisticsSent = false;
-    if (!m_settings->settingsAvailable())
-        return;
+    }
 
     QnStatisticsSettings settings = m_settings->settings();
+    if (settings.storeDays < 0)
+        settings.storeDays = 0;
+
     appendMandatoryFilters(&settings.filters);
 
     static const qint64 kMsInDay = 24 * 60 * 60 * 1000;
-    const qint64 minTimeStampMs = (getLastFilters(m_storage) == settings.filters
-        ? QDateTime::currentMSecsSinceEpoch() - kMsInDay * settings.storeDays
+    const auto timeStamp = QDateTime::currentMSecsSinceEpoch();
+    const bool filtersChanged = (getLastFilters(m_storage) != settings.filters);
+    const qint64 minTimeStampMs = (filtersChanged
+        ? timeStamp - kMsInDay * settings.storeDays
         : getLastSentTime(m_storage));
 
-    const auto totalMetricsList = m_storage->getMetricsList(minTimeStampMs, settings.limit);
+    enum { kMinSendPeriodMs = 1 * 1000};   // TODO: change to appropriate value
+    const auto msSinceSent = (timeStamp > minTimeStampMs
+        ? timeStamp - minTimeStampMs : 0);
+
+    if (!filtersChanged && (msSinceSent < kMinSendPeriodMs))
+        return;
+
+    const auto totalMetricsList = m_storage->getMetricsList(
+        minTimeStampMs, settings.limit);
 
     QnMetricHashesList totalFiltered;
     for (const auto metrics: totalMetricsList)
@@ -230,16 +236,17 @@ void QnStatisticsManager::sendStatistics()
             totalFiltered.push_back(filtered);
     }
 
+    if (totalFiltered.empty())
+        return;
+
     const auto server = qnCommon->currentServer();
     if (!server)
         return;
 
     m_connection = server->restConnection();
+    if (!m_connection)
+        return;
 
-    QnSendStatisticsRequestData request;
-    request.metricsList = totalFiltered;
-
-    const auto timeStamp = QDateTime::currentMSecsSinceEpoch();
     const auto callback = [this, timeStamp, settings]
         (bool success, rest::Handle /* handle */
         , rest::ServerConnection::EmptyResponseType /*response */)
@@ -247,32 +254,45 @@ void QnStatisticsManager::sendStatistics()
         const auto connectionLifeHolder = m_connection;
         m_connection.reset();
 
-        if (!success)
+        if (!success || !m_storage)
             return;
 
         saveLastSentTime(timeStamp, m_storage);
         saveLastFilters(settings.filters, m_storage);
-        m_statisticsSent = true;
     };
 
-    m_connection->sendStatisticsAsync(request, callback);
+    QnSendStatisticsRequestData request;
+    request.metricsList = totalFiltered;
+    m_connection->sendStatisticsAsync(request, callback, QThread::currentThread());
 }
 
 void QnStatisticsManager::saveCurrentStatistics()
 {
     Q_ASSERT_X(!m_clientId.isNull(), Q_FUNC_INFO
         , "Can't save client statistics without client identifier!");
+
     if (m_clientId.isNull())
         return;
 
-    // Stores current metrics
     auto metrics = getMetrics();
 
-    const auto sessionId = qnCommon->runningInstanceGUID().toString();
+    for(const auto module: m_modules)
+    {
+        if (module)
+            module->resetMetrics();
+    }
+
+    if (metrics.empty())
+        return;
+
+    // Appends mandatory metrics
+
+    const auto sessionId = QnUuid::createUuid();
     const auto systemName = qnCommon->localSystemName();
-    metrics.insert(kSessionIdMetricTag, sessionId);
+    metrics.insert(kSessionIdMetricTag, sessionId.toString());
     metrics.insert(kClientMachineIdMetricTag, m_clientId.toString());
     metrics.insert(kSystemNameMetricTag, systemName);
+
     m_storage->storeMetrics(metrics);
 }
 

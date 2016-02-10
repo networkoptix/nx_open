@@ -27,6 +27,8 @@ public:
 private:
     void updateSettings();
 
+    void updateSettingsImpl(int delayMs);
+
 private:
     typedef QScopedPointer<QTimer> TimerPtr;
     typedef QScopedPointer<QnStatisticsSettings> SettingsPtr;

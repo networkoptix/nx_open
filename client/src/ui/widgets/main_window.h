@@ -93,6 +93,8 @@ protected slots:
     void at_tabBar_closeRequested(QnWorkbenchLayout *layout);
 
 private:
+    void initializeStatisticsManager(QnWorkbenchContext *context);
+
     void showFullScreen();
     void showNormal();
 

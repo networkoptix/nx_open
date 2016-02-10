@@ -9,7 +9,6 @@
 
 class QnBaseStatisticsModule;
 class QnBaseStatisticsStorage;
-class QnStatisticsSettingsWatcher;
 class QnBaseStatisticsSettingsLoader;
 
 class QnStatisticsManager : public QObject
@@ -23,6 +22,7 @@ public:
 
     virtual ~QnStatisticsManager();
 
+public:
     bool registerStatisticsModule(const QString &alias
         ,  QnBaseStatisticsModule *module);
 
@@ -56,5 +56,4 @@ private:
     StoragePtr m_storage;
 
     ModulesMap m_modules;
-    bool m_statisticsSent;
 };

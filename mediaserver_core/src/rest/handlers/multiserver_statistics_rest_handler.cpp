@@ -186,7 +186,7 @@ nx_http::StatusCode::Value SettingsActionHandler::loadSettingsLocally(QnStatisti
     if (!server || !hasInternetConnection(server))
         return nx_http::StatusCode::noContent;
 
-    static const QUrl kSettingsUrl = "http://10.0.2.240:8080/Upload/statistics.json"; //TODO: change me to correct
+    static const QUrl kSettingsUrl = "http://127.0.01:8080/stat/statistics.json"; //TODO: change me to correct
 
     nx_http::BufferType buffer;
     int statusCode = nx_http::StatusCode::noContent;
@@ -322,7 +322,7 @@ nx_http::StatusCode::Value SendStatisticsActionHandler::sendStatisticsLocally(
     if (!server || !hasInternetConnection(server))
         return nx_http::StatusCode::notAcceptable;
 
-    static const QUrl kStatisticsUrl = "http://10.0.2.129/statserver/api/save/clientSessions";
+    static const QUrl kStatisticsUrl = "http://10.0.3.163/statserver/api/save/clientSessions";
 
     auto httpCode = nx_http::StatusCode::notAcceptable;
     const auto error = nx_http::uploadDataSync(

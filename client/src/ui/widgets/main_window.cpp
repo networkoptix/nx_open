@@ -100,8 +100,8 @@
 #include "layout_tab_bar.h"
 #include "dwm.h"
 
-namespace {
-
+namespace
+{
     QToolButton *newActionButton(QAction *action, bool popup = false, qreal sizeMultiplier = 1.0, int helpTopicId = Qn::Empty_Help) {
         QToolButton *button = new QToolButton();
         button->setDefaultAction(action);
@@ -417,8 +417,15 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     QnPtzManageDialog *manageDialog = new QnPtzManageDialog(this); //initializing instance of a singleton
     Q_UNUSED(manageDialog)
 
-    //
-    // Setups base properties
+    initializeStatisticsManager(context);
+}
+
+QnMainWindow::~QnMainWindow() {
+    m_dwm = NULL;
+}
+
+void QnMainWindow::initializeStatisticsManager(QnWorkbenchContext *context)
+{
     const auto statManager = context->instance<QnStatisticsManager>();
     const auto statStorage = context->instance<QnStatisticsFileStorage>();
     const auto statSettings = context->instance<QnStatisticsSettingsWatcher>();
@@ -435,10 +442,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     // Registers statistics modules
     const auto actionsStatModule = context->instance<QnActionsStatisticsModule>();
     statManager->registerStatisticsModule(lit("actions"), actionsStatModule);
-}
-
-QnMainWindow::~QnMainWindow() {
-    m_dwm = NULL;
 }
 
 QWidget *QnMainWindow::viewport() const {

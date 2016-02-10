@@ -1230,15 +1230,15 @@ namespace nx_http
             if( httpClient->failed() )
                 return callback(SystemError::connectionReset, nx_http::StatusCode::ok);
 
-            if( (httpClient->response()->statusLine.statusCode != nx_http::StatusCode::ok)
-                && (httpClient->response()->statusLine.statusCode != nx_http::StatusCode::partialContent))
+            const auto response = httpClient->response();
+            const auto statusLine = response->statusLine;
+            if((statusLine.statusCode != nx_http::StatusCode::ok)
+                && (statusLine.statusCode != nx_http::StatusCode::partialContent))
             {
-                return callback(
-                    SystemError::noError,
-                    httpClient->response()->statusLine.statusCode);
+                return callback(SystemError::noError, statusLine.statusCode);
             }
 
-            callback(SystemError::noError, httpClient->response()->statusLine.statusCode);
+            callback(SystemError::noError, statusLine.statusCode);
         };
 
         QObject::connect(httpClientHolder.get(), &nx_http::AsyncHttpClient::done,
@@ -1267,9 +1267,13 @@ namespace nx_http
         const auto callback = [&result, &mutex, &waiter, &done, httpCode]
             (SystemError::ErrorCode errorCode, int statusCode)
         {
-            errorCode = errorCode;
+            result = errorCode;
             if (httpCode)
-                *httpCode= static_cast<nx_http::StatusCode::Value>(statusCode);
+            {
+                *httpCode = (errorCode == SystemError::noError
+                    ? static_cast<nx_http::StatusCode::Value>(statusCode)
+                    : nx_http::StatusCode::internalServerError);
+            }
 
             std::unique_lock<std::mutex> lk(mutex);
             done = true;
