@@ -4,11 +4,13 @@
 #include <nx/network/cloud/cloud_server_socket.h>
 #include <nx/network/test_support/simple_socket_test_helper.h>
 #include <nx/network/test_support/socket_test_helper.h>
+#include <nx/network/test_support/stun_async_client_mock.h>
 
 namespace nx {
 namespace network {
 namespace cloud {
 
+const String kFakeLocalPeerId(QnUuid::createUuid().toSimpleString().toUtf8());
 const String kFakeRemotePeerId(QnUuid::createUuid().toSimpleString().toUtf8());
 
 /** Accepts usual TCP connections */
@@ -84,12 +86,11 @@ struct FakeTcpTunnelAcceptor : AbstractTunnelAcceptor
 template<quint16 nAcceptors>
 struct CloudServerSocketTcpTester : CloudServerSocket
 {
-    CloudServerSocketTcpTester(IncomingTunnelPool* tunnelPool)
-        : CloudServerSocket(nullptr, tunnelPool) {}
+    CloudServerSocketTcpTester(): CloudServerSocket(nullptr) {}
 
     bool listen(int queueLen) override
     {
-        m_tunnelPool->setAcceptLimit(queueLen);
+        initTunnelPool(queueLen);
         for (quint16 i = 0; i < nAcceptors; i++)
         {
             auto addr = nx::network::test::kServerAddress;
@@ -108,15 +109,8 @@ struct CloudServerSocketTcpTest
 protected:
     std::unique_ptr<ServerSocket> makeServerSocket()
     {
-        return std::make_unique<ServerSocket>(&m_tunnelPool);
+        return std::make_unique<ServerSocket>();
     }
-
-    void TearDown() override
-    {
-        m_tunnelPool.pleaseStopSync();
-    }
-
-    IncomingTunnelPool m_tunnelPool;
 };
 
 struct CloudServerSocketSingleTcpTest
@@ -134,6 +128,55 @@ NX_NETWORK_SERVER_SOCKET_TEST_CASE(
     TEST_F, CloudServerSocketMultiTcpAcceptorTest,
     [this](){ return makeServerSocket(); },
     &std::make_unique<network::test::MultipleClientSocketTester<3>>);
+
+void testTunnelConnect(SystemError::ErrorCode expectedResult)
+{
+    auto client = std::make_unique<TCPSocket>(false);
+    ASSERT_TRUE(client->setNonBlockingMode(true));
+    ASSERT_TRUE(client->setSendTimeout(500));
+
+    std::promise<SystemError::ErrorCode> result;
+    client->connectAsync(
+        network::test::kServerAddress,
+        [&](SystemError::ErrorCode c){ result.set_value(c); });
+
+    EXPECT_EQ(result.get_future().get(), expectedResult);
+    client->pleaseStopSync();
+}
+
+TEST(CloudServerSocketBaseTcpTest, OpenTunnelOnIndication)
+{
+    auto stunAsyncClient = std::make_shared<network::test::StunAsyncClientMock>();
+    EXPECT_CALL(*stunAsyncClient, setIndicationHandler(
+        stun::cc::indications::connectionRequested, ::testing::_)).Times(1);
+
+    std::vector<CloudServerSocket::AcceptorMaker> acceptorMakers;
+    acceptorMakers.push_back([](
+        const String&, hpm::api::ConnectionRequestedEvent&)
+    {
+        return std::make_unique<FakeTcpTunnelAcceptor>(network::test::kServerAddress);
+    });
+
+    auto server = std::make_unique<CloudServerSocket>(
+        std::make_shared<hpm::api::MediatorServerTcpConnection>(
+            stunAsyncClient, nullptr),
+        std::move(acceptorMakers));
+    ASSERT_TRUE(server->listen(1));
+
+    // there is not tunnel yet
+    testTunnelConnect(SystemError::connectionRefused);
+
+    stun::Message message(stun::Header(
+        stun::MessageClass::indication, stun::cc::indications::connectionRequested));
+    hpm::api::ConnectionRequestedEvent event;
+    event.connectSessionID = String("someSessionId");
+    event.originatingPeerID = String("somePeerId");
+    event.serialize(&message);
+    stunAsyncClient->emulateIndication(message);
+
+    // now we can use estabilished tunnel
+    testTunnelConnect(SystemError::noError);
+}
 
 } // namespace cloud
 } // namespace network

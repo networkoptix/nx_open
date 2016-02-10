@@ -27,10 +27,7 @@ class NX_NETWORK_API IncomingTunnelPool
     : public QnStoppableAsync
 {
 public:
-    IncomingTunnelPool();
-
-    /** Accept queue limit (shell be called before anything else) */
-    void setAcceptLimit(size_t limit) { m_acceptLimit = limit; }
+    IncomingTunnelPool(size_t acceptLimit);
 
     /** Creates new tunnel with connected \param connection */
     void addNewTunnel(std::unique_ptr<AbstractTunnelConnection> connection);
@@ -40,20 +37,23 @@ public:
 
     /** Calls @param handler as soon as any socket is avaliable */
     void getNextSocketAsync(
-        std::function<void(std::unique_ptr<AbstractStreamSocket>)> handler);
+        std::function<void(std::unique_ptr<AbstractStreamSocket>)> handler,
+        boost::optional<unsigned int> timeout);
 
     /** Cancels all operations in progress */
     void pleaseStop(std::function<void()> handler) override;
 
 private:
     void acceptTunnel(std::shared_ptr<IncomingTunnel> tunnel);
-    void returnSocketIfAny(QnMutexLockerBase* lock);
+    void callAcceptHandler(bool timeout);
 
-    QnMutex m_mutex;
+    const size_t m_acceptLimit;
+    mutable QnMutex m_mutex;
+
     std::set<std::shared_ptr<IncomingTunnel>> m_pool;
+    std::unique_ptr<AbstractCommunicatingSocket> m_ioThreadSocket;
     std::function<void(std::unique_ptr<AbstractStreamSocket>)> m_acceptHandler;
     std::deque<std::unique_ptr<AbstractStreamSocket>> m_acceptedSockets;
-    size_t m_acceptLimit;
 };
 
 } // namespace cloud

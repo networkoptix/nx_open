@@ -146,8 +146,9 @@ public:
 
     String selfPeerId() const
     {
-        if (auto credentials = m_connector->getSystemCredentials())
-            return credentials->systemId + String(".") + credentials->serverId;
+        if (m_connector)
+            if (auto credentials = m_connector->getSystemCredentials())
+                return credentials->systemId + String(".") + credentials->serverId;
 
         return String();
     }
@@ -190,7 +191,7 @@ class MediatorServerTcpConnection
 {
 public:
     MediatorServerTcpConnection(
-        std::shared_ptr<nx::stun::AsyncClient> stunClient,
+        std::shared_ptr<nx::stun::AbstractAsyncClient> stunClient,
         AbstractCloudSystemCredentialsProvider* connector)
     :
         MediatorServerConnection<stun::AsyncClientUser>(

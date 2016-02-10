@@ -28,8 +28,9 @@ public:
 
     CloudServerSocket(
         std::shared_ptr<hpm::api::MediatorServerTcpConnection> mediatorConnection,
-        IncomingTunnelPool* tunnelPool = nullptr /* SocketGlobals */,
         std::vector<AcceptorMaker> acceptorMakers = kDefaultAcceptorMakers);
+
+    ~CloudServerSocket();
 
     //!Implementation of AbstractSocket::*
     bool bind(const SocketAddress& localAddress) override;
@@ -59,20 +60,18 @@ public:
                            AbstractStreamSocket*)> handler) override;
 
 protected:
+    void initTunnelPool(int queueLen);
     void startAcceptor(std::unique_ptr<AbstractTunnelAcceptor> acceptor);
-    void callAcceptHandler();
 
-    const std::shared_ptr<hpm::api::MediatorServerTcpConnection> m_mediatorConnection;
+    std::shared_ptr<hpm::api::MediatorServerTcpConnection> m_mediatorConnection;
     const std::vector<AcceptorMaker> m_acceptorMakers;
-    IncomingTunnelPool* const m_tunnelPool;
 
+    QnMutex m_mutex;
     std::vector<std::unique_ptr<AbstractTunnelAcceptor>> m_acceptors;
+    std::unique_ptr<IncomingTunnelPool> m_tunnelPool;
     mutable SystemError::ErrorCode m_lastError;
     std::unique_ptr<AbstractCommunicatingSocket> m_ioThreadSocket;
-    std::unique_ptr<AbstractCommunicatingSocket> m_timerThreadSocket;
-    std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)> m_acceptHandler;
     std::unique_ptr<AbstractStreamSocket> m_acceptedSocket;
-    utils::AsyncOperationGuard m_asyncGuard;
 };
 
 } // namespace cloud
