@@ -29,10 +29,6 @@ public:
     size_t internetSyncTimePeriodSec(size_t defaultValue) const;
     size_t maxInternetTimeSyncRetryPeriodSec(size_t defaultValue) const;
 
-    //transaction connection
-    std::chrono::milliseconds connectionKeepAliveTimeout() const;
-    int keepAliveProbeCount() const;
-
     void loadParams( std::map<QString, QVariant> confParams );
 
 private:
