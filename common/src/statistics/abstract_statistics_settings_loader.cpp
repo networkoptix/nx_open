@@ -1,5 +1,5 @@
 
-#include "base_statistics_settings_loader.h"
+#include "abstract_statistics_settings_loader.h"
 #include <utils/common/model_functions.h>
 
 namespace
@@ -19,23 +19,23 @@ QnStatisticsSettings::QnStatisticsSettings()
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnStatisticsSettings, (json)(ubjson)(xml)(csv_record)(eq), QnStatisticsSettings_Fields)
 
-QnBaseStatisticsSettingsLoader::QnBaseStatisticsSettingsLoader(QObject *parent)
+QnAbstractStatisticsSettingsLoader::QnAbstractStatisticsSettingsLoader(QObject *parent)
     : base_type(parent)
 {
 
 }
 
-QnBaseStatisticsSettingsLoader::~QnBaseStatisticsSettingsLoader()
+QnAbstractStatisticsSettingsLoader::~QnAbstractStatisticsSettingsLoader()
 {
 }
 
-QnStatisticsSettings QnBaseStatisticsSettingsLoader::settings()
+QnStatisticsSettings QnAbstractStatisticsSettingsLoader::settings()
 {
     Q_ASSERT_X(false, Q_FUNC_INFO, "Pure virtual method called!");
     return QnStatisticsSettings();
 }
 
-bool QnBaseStatisticsSettingsLoader::settingsAvailable()
+bool QnAbstractStatisticsSettingsLoader::settingsAvailable()
 {
     Q_ASSERT_X(false, Q_FUNC_INFO, "Pure virtual method called!");
     return false;

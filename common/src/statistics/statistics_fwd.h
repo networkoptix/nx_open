@@ -5,6 +5,10 @@
 #include <QtCore/QString>
 #include <QtCore/QPointer>
 
+class QnAbstractStatisticsModule;
+class QnAbstractStatisticsStorage;
+class QnAbstractStatisticsSettingsLoader;
+
 typedef QString QnMetricAlias;
 typedef QString QnMetricValue;
 typedef QHash<QnMetricAlias, QnMetricValue> QnMetricsHash;

@@ -119,9 +119,6 @@ qint64 move() {
 
 void QnWorkbenchDebugHandler::at_debugDecrementCounterAction_triggered()
 {
-    const auto manager = context()->instance<QnStatisticsManager>();
-    manager->sendStatistics();
-    return;
     qnRuntime->setDebugCounter(qnRuntime->debugCounter() - 1);
     qDebug() << qnRuntime->debugCounter();
 

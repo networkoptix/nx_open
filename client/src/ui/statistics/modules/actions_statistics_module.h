@@ -2,14 +2,14 @@
 #pragma once
 
 #include <ui/workbench/workbench_context_aware.h>
-#include <statistics/base_statistics_module.h>
+#include <statistics/abstract_statistics_module.h>
 
-class QnStatisticsMetric;
+class AbstractActionMetric;
 
-class QnActionsStatisticsModule : public QnBaseStatisticsModule
+class QnActionsStatisticsModule : public QnAbstractStatisticsModule
     , public QnWorkbenchContextAware
 {
-    typedef QnBaseStatisticsModule base_type;
+    typedef QnAbstractStatisticsModule base_type;
 public:
     QnActionsStatisticsModule(QObject *parent);
 
@@ -20,7 +20,7 @@ public:
     void resetMetrics() override;
 
 private:
-    typedef QSharedPointer<QnStatisticsMetric> MetricsPtr;
+    typedef QSharedPointer<AbstractActionMetric> MetricsPtr;
     typedef QHash<QString, MetricsPtr> MetricsHash;
 
     MetricsHash m_metrics;

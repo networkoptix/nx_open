@@ -36,10 +36,6 @@
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-#include <statistics/statistics_manager.h>
-#include <statistics/storage/statistics_file_storage.h>
-#include <statistics/settings/statistics_settings_watcher.h>
-#include <ui/statistics/modules/actions_statistics_module.h>
 
 #include <ui/dialogs/ptz_manage_dialog.h>
 
@@ -416,32 +412,10 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
     QnPtzManageDialog *manageDialog = new QnPtzManageDialog(this); //initializing instance of a singleton
     Q_UNUSED(manageDialog)
-
-    initializeStatisticsManager(context);
 }
 
 QnMainWindow::~QnMainWindow() {
     m_dwm = NULL;
-}
-
-void QnMainWindow::initializeStatisticsManager(QnWorkbenchContext *context)
-{
-    const auto statManager = context->instance<QnStatisticsManager>();
-    const auto statStorage = context->instance<QnStatisticsFileStorage>();
-    const auto statSettings = context->instance<QnStatisticsSettingsWatcher>();
-
-    statManager->setClientId(qnSettings->pcUuid());
-    statManager->setStorage(statStorage);
-    statManager->setSettings(statSettings);
-
-    connect(QnClientMessageProcessor::instance(), &QnClientMessageProcessor::connectionClosed
-        , statManager, &QnStatisticsManager::saveCurrentStatistics);
-    connect(QnClientMessageProcessor::instance(), &QnClientMessageProcessor::initialResourcesReceived
-        , statManager, &QnStatisticsManager::sendStatistics);
-
-    // Registers statistics modules
-    const auto actionsStatModule = context->instance<QnActionsStatisticsModule>();
-    statManager->registerStatisticsModule(lit("actions"), actionsStatModule);
 }
 
 QWidget *QnMainWindow::viewport() const {

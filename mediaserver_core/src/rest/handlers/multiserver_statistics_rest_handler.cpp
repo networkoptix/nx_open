@@ -12,7 +12,7 @@
 #include <rest/server/rest_connection_processor.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <statistics/base_statistics_settings_loader.h>
+#include <statistics/abstract_statistics_settings_loader.h>
 
 namespace
 {
@@ -54,9 +54,8 @@ namespace
 
     bool isCorrectMetricsListJson(const QByteArray &body)
     {
-        bool success = false;
-        QJson::deserialized(body, QnMetricHashesList(), &success);
-        return success;
+        QnMetricHashesList dummy;
+        return QJson::deserialize(body, &dummy);
     };
 }
 
@@ -328,7 +327,6 @@ nx_http::StatusCode::Value SendStatisticsActionHandler::sendStatisticsLocally(
     const auto error = nx_http::uploadDataSync(
         kStatisticsUrl, metricsList, kJsonContentType, &httpCode);
 
-    qDebug() << "Statistics sent: " << error << ":" << httpCode;
     return (error == SystemError::noError
         ? httpCode : nx_http::StatusCode::internalServerError);
 }

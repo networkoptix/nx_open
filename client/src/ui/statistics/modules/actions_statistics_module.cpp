@@ -3,7 +3,7 @@
 
 #include <ui/actions/action.h>
 #include <ui/actions/action_manager.h>
-#include <ui/statistics/modules/action_metrics.h>
+#include <ui/statistics/modules/actions_module_private/action_metrics.h>
 
 namespace
 {
@@ -23,8 +23,7 @@ namespace
         if (it == aliases.end())
         {
             //Q_ASSERT_X(false, Q_FUNC_INFO, "Unregistered action couldn't be used for statistics extraction");
-            static int unregisterdCounter = 0;
-            return lit("unregisterd_action_%1").arg(++unregisterdCounter);
+            return lit("unregistered_action_%1").arg(id);
         }
         return *it;
     }

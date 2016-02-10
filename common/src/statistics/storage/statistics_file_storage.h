@@ -1,11 +1,11 @@
 
 #pragma once
 
-#include <statistics/base_statistics_storage.h>
+#include <statistics/abstract_statistics_storage.h>
 
-class QnStatisticsFileStorage : public QnBaseStatisticsStorage
+class QnStatisticsFileStorage : public QnAbstractStatisticsStorage
 {
-    typedef QnBaseStatisticsStorage base_type;
+    typedef QnAbstractStatisticsStorage base_type;
 public:
     explicit QnStatisticsFileStorage(QObject *parent = nullptr);
 

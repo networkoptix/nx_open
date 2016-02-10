@@ -4,14 +4,13 @@
 #include <QtCore/QObject>
 #include <QtCore/QPointer>
 
-#include <statistics/types.h>
+#include <utils/common/singleton.h>
+#include <statistics/statistics_fwd.h>
 #include <api/server_rest_connection_fwd.h>
 
-class QnBaseStatisticsModule;
-class QnBaseStatisticsStorage;
-class QnBaseStatisticsSettingsLoader;
 
 class QnStatisticsManager : public QObject
+    , public Singleton<QnStatisticsManager>
 {
     Q_OBJECT
 
@@ -24,13 +23,13 @@ public:
 
 public:
     bool registerStatisticsModule(const QString &alias
-        ,  QnBaseStatisticsModule *module);
+        ,  QnAbstractStatisticsModule *module);
 
     void setClientId(const QnUuid &clientID);
 
-    void setStorage(QnBaseStatisticsStorage *storage);
+    void setStorage(QnAbstractStatisticsStorage *storage);
 
-    void setSettings(QnBaseStatisticsSettingsLoader *settings);
+    void setSettings(QnAbstractStatisticsSettingsLoader *settings);
 
 public:
     void sendStatistics();
@@ -43,17 +42,19 @@ private:
     QnMetricsHash getMetrics() const;
 
 private:
-    typedef QPointer<QnBaseStatisticsSettingsLoader> SettingsPtr;
-    typedef QPointer<QnBaseStatisticsStorage> StoragePtr;
-    typedef QPointer<QnBaseStatisticsModule> ModulePtr;
+    typedef QPointer<QnAbstractStatisticsSettingsLoader> SettingsPtr;
+    typedef QPointer<QnAbstractStatisticsStorage> StoragePtr;
+    typedef QPointer<QnAbstractStatisticsModule> ModulePtr;
     typedef QHash<QString, ModulePtr> ModulesMap;
 
     QnUuid m_clientId;
 
-    rest::QnConnectionPtr m_connection;
+    rest::Handle m_handle;
 
     SettingsPtr m_settings;
     StoragePtr m_storage;
 
     ModulesMap m_modules;
 };
+
+#define qnStatisticsManager QnStatisticsManager::instance()

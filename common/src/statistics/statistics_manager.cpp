@@ -8,9 +8,9 @@
 #include <api/helpers/send_statistics_request_data.h>
 #include <core/resource/media_server_resource.h>
 
-#include <statistics/base_statistics_module.h>
-#include <statistics/base_statistics_storage.h>
-#include <statistics/base_statistics_settings_loader.h>
+#include <statistics/abstract_statistics_module.h>
+#include <statistics/abstract_statistics_storage.h>
+#include <statistics/abstract_statistics_settings_loader.h>
 
 namespace
 {
@@ -20,7 +20,7 @@ namespace
     template<typename ValueType>
     void saveToStorage(const QString &name
         , const ValueType &value
-        , QnBaseStatisticsStorage *storage)
+        , QnAbstractStatisticsStorage *storage)
     {
         Q_ASSERT_X(!name.isEmpty(), Q_FUNC_INFO, "Name could not be empty!");
         Q_ASSERT_X(storage, Q_FUNC_INFO, "Storage has not set!");
@@ -33,18 +33,18 @@ namespace
     }
 
     void saveLastFilters(const QnStringsSet &filters
-        , QnBaseStatisticsStorage *storage)
+        , QnAbstractStatisticsStorage *storage)
     {
         saveToStorage(kFiltersSettings, filters, storage);
     }
 
     void saveLastSentTime(qint64 lastSentTime
-        , QnBaseStatisticsStorage *storage)
+        , QnAbstractStatisticsStorage *storage)
     {
         saveToStorage(kLastSentTime, lastSentTime, storage);
     }
 
-    QnStringsSet getLastFilters(const QnBaseStatisticsStorage *storage)
+    QnStringsSet getLastFilters(const QnAbstractStatisticsStorage *storage)
     {
         Q_ASSERT_X(storage, Q_FUNC_INFO, "Storage has not set!");
 
@@ -56,7 +56,7 @@ namespace
     }
 
 
-    qint64 getLastSentTime(const QnBaseStatisticsStorage *storage)
+    qint64 getLastSentTime(const QnAbstractStatisticsStorage *storage)
     {
         Q_ASSERT_X(storage, Q_FUNC_INFO, "Storage has not set!");
 
@@ -115,7 +115,7 @@ namespace
 QnStatisticsManager::QnStatisticsManager(QObject *parent)
     : base_type(parent)
     , m_clientId()
-    , m_connection()
+    , m_handle()
     , m_settings()
     , m_modules()
     , m_storage()
@@ -125,7 +125,7 @@ QnStatisticsManager::~QnStatisticsManager()
 {}
 
 bool QnStatisticsManager::registerStatisticsModule(const QString &alias
-    ,  QnBaseStatisticsModule *module)
+    ,  QnAbstractStatisticsModule *module)
 {
     if (m_modules.contains(alias))
     {
@@ -156,12 +156,12 @@ void QnStatisticsManager::setClientId(const QnUuid &clientID)
     m_clientId = clientID;
 }
 
-void QnStatisticsManager::setStorage(QnBaseStatisticsStorage *storage)
+void QnStatisticsManager::setStorage(QnAbstractStatisticsStorage *storage)
 {
     m_storage = storage;
 }
 
-void QnStatisticsManager::setSettings(QnBaseStatisticsSettingsLoader *settings)
+void QnStatisticsManager::setSettings(QnAbstractStatisticsSettingsLoader *settings)
 {
     if (m_settings)
         disconnect(m_settings, nullptr, this, nullptr);
@@ -171,7 +171,7 @@ void QnStatisticsManager::setSettings(QnBaseStatisticsSettingsLoader *settings)
     if (m_settings->settingsAvailable())
         sendStatistics();
 
-    connect(m_settings, &QnBaseStatisticsSettingsLoader::settingsAvailableChanged
+    connect(m_settings, &QnAbstractStatisticsSettingsLoader::settingsAvailableChanged
         , this, &QnStatisticsManager::sendStatistics);
 }
 
@@ -198,7 +198,7 @@ QnMetricsHash QnStatisticsManager::getMetrics() const
 
 void QnStatisticsManager::sendStatistics()
 {
-    if (!m_settings || !m_storage || m_connection
+    if (!m_settings || !m_storage || m_handle
         || !m_settings->settingsAvailable()
         || !qnGlobalSettings->isStatisticsAllowed())
     {
@@ -218,7 +218,7 @@ void QnStatisticsManager::sendStatistics()
         ? timeStamp - kMsInDay * settings.storeDays
         : getLastSentTime(m_storage));
 
-    enum { kMinSendPeriodMs = 1 * 1000};   // TODO: change to appropriate value
+    enum { kMinSendPeriodMs = 1 * 1000};   // TODO: change to appropriate value _ don't forget
     const auto msSinceSent = (timeStamp > minTimeStampMs
         ? timeStamp - minTimeStampMs : 0);
 
@@ -243,16 +243,18 @@ void QnStatisticsManager::sendStatistics()
     if (!server)
         return;
 
-    m_connection = server->restConnection();
-    if (!m_connection)
+    const auto connection = server->restConnection();
+    if (!connection)
         return;
 
     const auto callback = [this, timeStamp, settings]
-        (bool success, rest::Handle /* handle */
+        (bool success, rest::Handle handle
         , rest::ServerConnection::EmptyResponseType /*response */)
     {
-        const auto connectionLifeHolder = m_connection;
-        m_connection.reset();
+        if (m_handle != handle)
+            return;
+
+        m_handle = rest::Handle();
 
         if (!success || !m_storage)
             return;
@@ -263,7 +265,7 @@ void QnStatisticsManager::sendStatistics()
 
     QnSendStatisticsRequestData request;
     request.metricsList = totalFiltered;
-    m_connection->sendStatisticsAsync(request, callback, QThread::currentThread());
+    m_handle = connection->sendStatisticsAsync(request, callback, QThread::currentThread());
 }
 
 void QnStatisticsManager::saveCurrentStatistics()

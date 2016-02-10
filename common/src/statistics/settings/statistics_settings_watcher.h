@@ -5,13 +5,13 @@
 
 #include <utils/common/connective.h>
 #include <api/server_rest_connection_fwd.h>
-#include <statistics/base_statistics_settings_loader.h>
+#include <statistics/abstract_statistics_settings_loader.h>
 
-class QnStatisticsSettingsWatcher : public Connective<QnBaseStatisticsSettingsLoader>
+class QnStatisticsSettingsWatcher : public Connective<QnAbstractStatisticsSettingsLoader>
 {
     Q_OBJECT
 
-    typedef Connective<QnBaseStatisticsSettingsLoader> base_type;
+    typedef Connective<QnAbstractStatisticsSettingsLoader> base_type;
 
 public:
     QnStatisticsSettingsWatcher(QObject *parent = nullptr);
@@ -36,5 +36,5 @@ private:
     SettingsPtr m_settings;
     TimerPtr m_updateTimer;
 
-    rest::QnConnectionPtr m_connection;
+    rest::Handle m_handle;
 };

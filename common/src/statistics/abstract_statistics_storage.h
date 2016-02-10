@@ -3,19 +3,19 @@
 
 #include <QtCore/QObject>
 
-#include <statistics/types.h>
+#include <statistics/statistics_fwd.h>
 
 
-class QnBaseStatisticsStorage : public QObject
+class QnAbstractStatisticsStorage : public QObject
 {
     Q_OBJECT
 
     typedef QObject base_type;
 
 public:
-    QnBaseStatisticsStorage(QObject *parent = nullptr);
+    QnAbstractStatisticsStorage(QObject *parent = nullptr);
 
-    virtual ~QnBaseStatisticsStorage();
+    virtual ~QnAbstractStatisticsStorage();
 
 public:
     virtual void storeMetrics(const QnMetricsHash &metrics) = 0;
