@@ -1680,7 +1680,6 @@ void QnTransactionMessageBus::sendDelayedAliveTran()
         m_remoteUrls.clear();
         reconnectAllPeers(&lock);
     }
-
     void QnTransactionMessageBus::reconnectAllPeers()
     {
         QnMutexLocker lock(&m_mutex);

@@ -46,6 +46,7 @@ namespace {
     const QString nameSignature(lit("emailSignature"));
     const QString nameSupportEmail(lit("emailSupportEmail"));
     const QString nameUpdateNotificationsEnabled(lit("updateNotificationsEnabled"));
+    const QString nameTimeSynchronizationEnabled(lit("timeSynchronizationEnabled"));
     const QString nameServerAutoDiscoveryEnabled(lit("serverAutoDiscoveryEnabled"));
     const QString nameBackupQualities(lit("backupQualities"));
     const QString nameBackupNewCamerasByDefault(lit("backupNewCamerasByDefault"));
@@ -183,6 +184,11 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors() {
         kServerDiscoveryPingTimeoutDefault,
         this);
     ec2Adaptors << m_serverDiscoveryPingTimeout;
+    m_timeSynchronizationEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
+        nameTimeSynchronizationEnabled,
+        true,
+        this);
+    ec2Adaptors << m_timeSynchronizationEnabledAdaptor;
 
     for(auto adaptor: ec2Adaptors)
         connect(
@@ -427,6 +433,10 @@ void QnGlobalSettings::setServerDiscoveryPingTimeout(std::chrono::seconds newInt
 std::chrono::seconds QnGlobalSettings::serverDiscoveryAliveCheckTimeout() const
 {
     return connectionKeepAliveTimeout() * 3;   //3 is here to keep same values as before by default
+}
+
+bool QnGlobalSettings::isTimeSynchronizationEnabled() const {
+    return m_timeSynchronizationEnabledAdaptor->value();
 }
 
 bool QnGlobalSettings::arecontRtspEnabled() const
