@@ -216,8 +216,11 @@ void QnWorkbenchAlarmLayoutHandler::jumpToLive(QnWorkbenchLayout *layout, QnWork
     if (!layout || workbench()->currentLayout() != layout)
         return;
 
-    if (auto resourceDisplay = display()->display(item)) {
-        if (resourceDisplay->archiveReader()) {
+    if (auto resourceDisplay = display()->display(item))
+    {
+        if (resourceDisplay->archiveReader())
+        {
+            resourceDisplay->archiveReader()->pauseMedia();
             resourceDisplay->archiveReader()->setSpeed(1.0);
             resourceDisplay->archiveReader()->jumpTo(DATETIME_NOW, 0);
             resourceDisplay->archiveReader()->resumeMedia();

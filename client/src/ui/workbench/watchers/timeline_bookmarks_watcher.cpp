@@ -122,8 +122,12 @@ QnCameraBookmarkList QnTimelineBookmarksWatcher::rawBookmarksAtPosition(
     if (!m_queriesCache->hasQuery(camera))
         return QnCameraBookmarkList();
 
+    if (camera == m_currentCamera)
+        return helpers::bookmarksAtPosition(m_aggregation->bookmarkList(), positionMs);
+
     const auto &query = m_queriesCache->getOrCreateQuery(camera);
     const auto &bookmarks = query->cachedBookmarks();
+
     return helpers::bookmarksAtPosition(bookmarks, positionMs);
 }
 

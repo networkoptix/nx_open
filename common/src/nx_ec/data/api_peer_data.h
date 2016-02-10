@@ -26,12 +26,20 @@ namespace ec2
             return id == other.id && instanceId == other.instanceId && peerType == other.peerType && dataFormat == other.dataFormat;
         }
 
-        bool isClient() const {
+        static bool isClient(Qn::PeerType peerType) {
             return peerType != Qn::PT_Server;
         }
 
-        bool isServer() const {
+        bool isClient() const {
+            return isClient(peerType);
+        }
+
+        static bool isServer(Qn::PeerType peerType) {
             return peerType == Qn::PT_Server;
+        }
+
+        bool isServer() const {
+            return isServer(peerType);
         }
 
         bool isMobileClient() const {

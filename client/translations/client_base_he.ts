@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="he" sourcelanguage="en">
+<TS version="2.1" language="he" sourcelanguage="en">
 <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
@@ -1978,9 +1978,12 @@ to view more bookmarks</source>
         <source>Source camera</source>
         <translation>מצלמת מקור</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Source and %n more cameras</source>
-        <translation>מקור ו %n מצלמות נוספות</translation>
+        <translation type="unfinished">
+            <numerusform>מקור ו %n מצלמות נוספות</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>N/A</source>
@@ -5094,17 +5097,26 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>&lt;All My I/O Modules&gt;</source>
         <translation>&lt;כל מודולי הקלט/פלט שלי&gt;</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n device(s)&gt;</source>
-        <translation>&lt;%n התקנים&gt;</translation>
+        <translation type="unfinished">
+            <numerusform>&lt;%n התקנים&gt;</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n camera(s)&gt;</source>
-        <translation>&lt;%n מצלמות&gt;</translation>
+        <translation type="unfinished">
+            <numerusform>&lt;%n מצלמות&gt;</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n I/O module(s)&gt;</source>
-        <translation>&lt;%n מודולי קלט/פלט&gt;</translation>
+        <translation type="unfinished">
+            <numerusform>&lt;%n מודולי קלט/פלט&gt;</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -5865,13 +5877,19 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Notice: Only further recording will be backed up. Backup process will ignore existing footage.</source>
         <translation>שים לב: רק הקלטות עתידיות יגובו. תהליך הגיבוי יתעלם מהקלטות נוכחיות.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n Camera(s)</source>
-        <translation>%n מצלמות</translation>
+        <translation type="unfinished">
+            <numerusform>%n מצלמות</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n Device(s)</source>
-        <translation>%n התקנים</translation>
+        <translation type="unfinished">
+            <numerusform>%n התקנים</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Backup is finished</source>
@@ -6932,9 +6950,12 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Press %1 to search bookmarks</source>
         <translation>לחץ על %1 לחיפוש סימניות</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Are you sure you want to delete these %n bookmarks?</source>
-        <translation>האם למחוק את %n הסימניות?</translation>
+        <translation type="unfinished">
+            <numerusform>האם למחוק את %n הסימניות?</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>

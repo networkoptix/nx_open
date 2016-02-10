@@ -198,8 +198,13 @@ void QnWorkbenchItemBookmarksWatcher::WidgetData::updateBookmarksAtPosition()
     QN_LOG_TIME(Q_FUNC_INFO);
 
     QnCameraBookmarkList bookmarks;
-    const auto range = std::equal_range(m_bookmarks.begin(), m_bookmarks.end(), m_posMs);
-    std::copy(range.first, range.second, std::back_inserter(bookmarks));
+
+    const auto endTimeGreaterThanPos = [this](const QnCameraBookmark &bookmark)
+        { return (bookmark.endTimeMs() > m_posMs); };
+
+    const auto itEnd = std::upper_bound(m_bookmarks.begin(), m_bookmarks.end(), m_posMs);
+    std::copy_if(m_bookmarks.begin(), itEnd, std::back_inserter(bookmarks), endTimeGreaterThanPos);
+
 
     m_bookmarksAtPos.setBookmarkList(bookmarks);
     if (m_timelineWatcher)

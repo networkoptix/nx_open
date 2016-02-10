@@ -5,7 +5,7 @@
 class QnScopedTimer
 {
 public:
-    QnScopedTimer(char* description, qint64 detailMs = QnScopedTimer::kDefaultDetailMs);
+    QnScopedTimer(const char *description, qint64 detailMs = QnScopedTimer::kDefaultDetailMs);
     QnScopedTimer(const QString &description, qint64 detailMs = QnScopedTimer::kDefaultDetailMs);
     ~QnScopedTimer();
 

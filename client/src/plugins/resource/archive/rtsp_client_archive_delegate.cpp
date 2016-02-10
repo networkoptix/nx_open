@@ -58,7 +58,8 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* 
     m_isMultiserverAllowed(true),
     m_playNowModeAllowed(true),
     m_reader(reader),
-    m_frameCnt(0)
+    m_frameCnt(0),
+    m_runtimeId(qnCommon->runningInstanceGUID())
 {
     m_footageUpToDate.test_and_set();
     m_rtpDataBuffer = new quint8[MAX_RTP_BUFFER_SIZE];
@@ -179,7 +180,7 @@ void QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(const QnVirtualCam
     QnMediaServerResourceList mediaServerList = qnCameraHistoryPool->getCameraFootageData(camera, true);
 
     /* Check if no archive available on any server. */
-    if (mediaServerList.isEmpty()) {
+    if (mediaServerList.size() <= 1) {
         m_globalMinArchiveTime = qint64(AV_NOPTS_VALUE);
         return;
     }
@@ -845,7 +846,7 @@ void QnRtspClientArchiveDelegate::setupRtspSession(const QnVirtualCameraResource
 
     if (!m_auth.videowall.isNull())
         session->setAdditionAttribute(Qn::VIDEOWALL_GUID_HEADER_NAME, m_auth.videowall.toString().toUtf8());
-    session->setAdditionAttribute(Qn::EC2_RUNTIME_GUID_HEADER_NAME, qnCommon->runningInstanceGUID().toByteArray());
+    session->setAdditionAttribute(Qn::EC2_RUNTIME_GUID_HEADER_NAME, m_runtimeId.toByteArray());
     session->setAdditionAttribute(Qn::EC2_INTERNAL_RTP_FORMAT, "1" );
 
 
