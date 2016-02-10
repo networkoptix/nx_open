@@ -5,17 +5,17 @@
 
     <groupId>net.sourceforge</groupId>
     <artifactId>quazip</artifactId>
-    <version>0.6.2-SNAPSHOT</version>
+    <version>0.7.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <distributionManagement>
         <repository>
             <id>nexus-snapshots</id>
-            <url>https://hdw.mx/nexus/content/repositories/snapshots/</url>
+            <url>http://hdw.mx/nexus/content/repositories/snapshots/</url>
         </repository>
     </distributionManagement>
     <properties>
-        <classifier>windows-msvc2015u1</classifier>
+        <classifier>windows-x64-msvc2015u1</classifier>
     </properties>
 
     <build>
