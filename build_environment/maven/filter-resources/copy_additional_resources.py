@@ -6,8 +6,8 @@ sys.path.append(basedir + '/' + '../..')
 
 from main import get_environment_variable, cd
 
-qtlibs = ['${qtlib1}', '${qtlib2}', '${qtlib3}', '${qtlib4}', '${qtlib5}', '${qtlib6}', '${qtlib7}', '${qtlib8}', '${qtlib9}', '${qtlib10}', '${qtlib11}', '${qtlib12}', '${qtlib13}', '${qtlib14}', '${qtlib15}', '${qtlib16}', '${qtlib17}', '${qtlib18}', '${qtlib19}', '${qtlib20}']
-qtplugins = ['${qtplugin1}', '${qtplugin2}', '${qtplugin3}']
+qtlibs = [v.strip() for v in """${qtlibs}""".split(',')]
+qtplugins = [v.strip() for v in """${qtplugins}""".split(',')]
 qtbasedir = '${qt.dir}'
 
 def get_platform():
