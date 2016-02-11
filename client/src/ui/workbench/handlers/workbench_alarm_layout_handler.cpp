@@ -30,11 +30,13 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_item.h>
+#include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 
 #include <plugins/resource/archive/archive_stream_reader.h>
 
 #include <utils/aspect_ratio.h>
+#include <utils/common/delayed.h>
 
 namespace {
     class QnAlarmLayoutResource: public QnLayoutResource {
@@ -56,6 +58,9 @@ namespace {
 
     typedef QnSharedResourcePointer<QnAlarmLayoutResource> QnAlarmLayoutResourcePtr;
     typedef QnSharedResourcePointerList<QnAlarmLayoutResource> QnAlarmLayoutResourceList;
+
+    /* Processing actions are cleaned by this timeout. */
+    const qint64 kProcessingActionTimeoutMs = 5000;
 }
 
 QnWorkbenchAlarmLayoutHandler::QnWorkbenchAlarmLayoutHandler(QObject *parent)
@@ -76,22 +81,30 @@ QnWorkbenchAlarmLayoutHandler::QnWorkbenchAlarmLayoutHandler(QObject *parent)
         if (!context()->user())
             return;
 
-        QnUserResourceList users = qnResPool->getResources<QnUserResource>(businessAction->getParams().additionalResources);
+        const auto params = businessAction->getParams();
+
+        QnUserResourceList users = qnResPool->getResources<QnUserResource>(params.additionalResources);
         if (!users.isEmpty() && !users.contains(context()->user()))
             return;
 
-        //TODO: #GDM code duplication
-        QnBusinessEventParameters params = businessAction->getRuntimeParams();
-
         QnVirtualCameraResourceList targetCameras = qnResPool->getResources<QnVirtualCameraResource>(businessAction->getResources());
-        if (businessAction->getParams().useSource) {
-            if (QnVirtualCameraResourcePtr sourceCamera = qnResPool->getResourceById<QnVirtualCameraResource>(params.eventResourceId))
-                targetCameras << sourceCamera;
-            targetCameras << qnResPool->getResources<QnVirtualCameraResource>(params.metadata.cameraRefs);
-        }
+        if (businessAction->getParams().useSource)
+            targetCameras << qnResPool->getResources<QnVirtualCameraResource>(businessAction->getSourceResources());
+
+        if (targetCameras.isEmpty())
+            return;
+
+        ActionKey key(businessAction->getBusinessRuleId(), businessAction->getRuntimeParams().eventTimestampUsec);
+        if (m_processingActions.contains(key))
+            return; /* See m_processingActions comment. */
+
+        m_processingActions.append(key);
+        executeDelayedParented([this, key] {
+            m_processingActions.removeOne(key);
+        }, kProcessingActionTimeoutMs, this);
 
         /* If forced, open layout instantly */
-        if (businessAction->getParams().forced)
+        if (params.forced)
         {
             if (currentInstanceIsMain())
                 openCamerasInAlarmLayout(targetCameras, true);
@@ -216,18 +229,25 @@ void QnWorkbenchAlarmLayoutHandler::jumpToLive(QnWorkbenchLayout *layout, QnWork
     if (!layout || workbench()->currentLayout() != layout)
         return;
 
+    /* Navigator will not update values if we are changing current item's state. */
+    auto currentWidget = navigator()->currentWidget();
+    if (currentWidget && currentWidget->item() == item)
+    {
+        navigator()->setSpeed(1.0);
+        navigator()->setPosition(DATETIME_NOW);
+    }
+
     if (auto resourceDisplay = display()->display(item))
     {
         if (resourceDisplay->archiveReader())
         {
-            resourceDisplay->archiveReader()->pauseMedia();
+            //resourceDisplay->archiveReader()->pauseMedia(); //TODO: #GDM make sure this magic is required
             resourceDisplay->archiveReader()->setSpeed(1.0);
             resourceDisplay->archiveReader()->jumpTo(DATETIME_NOW, 0);
             resourceDisplay->archiveReader()->resumeMedia();
         }
         resourceDisplay->start();
     }
-
 }
 
 bool QnWorkbenchAlarmLayoutHandler::currentInstanceIsMain() const
