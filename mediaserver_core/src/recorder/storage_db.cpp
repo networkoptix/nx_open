@@ -29,7 +29,7 @@ QnStorageDb::~QnStorageDb()
 
 bool QnStorageDb::deleteRecords(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog, qint64 startTimeMs)
 {
-    QnMutexLocker lock( &m_delMutex );
+    QnMutexLocker lock( &m_syncMutex );
     m_recordsToDelete << DeleteRecordInfo(cameraUniqueId, catalog, startTimeMs);
     return true;
 }
@@ -251,7 +251,7 @@ void QnStorageDb::addCatalogFromMediaFolder(
 }
 
 QVector<DeviceFileCatalogPtr> QnStorageDb::loadChunksFileCatalog() {
-    QWriteLocker lock(&m_mutex);
+    QnWriteLocker lock(&m_mutex);
 
     QVector<DeviceFileCatalogPtr> result;
 

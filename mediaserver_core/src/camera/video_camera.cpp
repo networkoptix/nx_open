@@ -180,8 +180,12 @@ QnConstCompressedVideoDataPtr QnVideoCameraGopKeeper::GetIFrameByTime(qint64 tim
     if (queue.empty())
         return QnConstCompressedVideoDataPtr(); // no video data
     auto itr = std::lower_bound(queue.begin(), queue.end(), time, [](const QnConstCompressedVideoDataPtr& data, qint64 time) { return data->timestamp < time; } );
-    if (itr == queue.end())
-        return queue.back();
+    if (itr == queue.end()) {
+        if (m_lastKeyFrame[channel] && (m_lastKeyFrame[channel]->timestamp <= time || iFrameAfterTime))
+            return m_lastKeyFrame[channel];
+        else
+            return queue.back();
+    }
     if (itr != queue.begin() && (*itr)->timestamp > time && !iFrameAfterTime)
         --itr; // prefer frame before defined time if no exact match
     return *itr;

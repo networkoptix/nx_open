@@ -56,6 +56,7 @@ public:
 
     void setAdditionalAttribute(const QByteArray& name, const QByteArray& value);
     virtual void setRange(qint64 startTime, qint64 endTime, qint64 frameStep) override;
+    virtual bool hasVideo() const override;
 
     void setMultiserverAllowed(bool value);
 
@@ -63,6 +64,7 @@ public:
 signals:
     void dataDropped(QnArchiveStreamReader* reader);
 private:
+    void setRtpData(RTPIODevice* value);
     QnAbstractDataPacketPtr processFFmpegRtpPayload(quint8* data, int dataSize, int channelNum, qint64* parserPosition);
     void processMetadata(const quint8* data, int dataSize);
     bool openInternal();
@@ -111,6 +113,8 @@ private:
     QnArchiveStreamReader* m_reader;
     int m_frameCnt;
     QnCustomResourceVideoLayoutPtr m_customVideoLayout;
+
+    QnUuid m_runtimeId;
     
     QMap<int, QnFfmpegRtpParserPtr> m_parsers;
     
@@ -121,6 +125,7 @@ private:
     } m_auth;
     
     std::atomic_flag m_footageUpToDate;
+    mutable QnMutex m_rtpDataMutex;
 };
 
 typedef QSharedPointer<QnRtspClientArchiveDelegate> QnRtspClientArchiveDelegatePtr;

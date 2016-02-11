@@ -36,7 +36,10 @@
 //#define USE_SINGLE_TWO_WAY_CONNECTION
 //!if not defined, ubjson is used
 //#define USE_JSON
+#ifndef USE_JSON
 #define ENCODE_TO_BASE64
+#endif
+#define AGGREGATE_TRANSACTIONS_BEFORE_SEND
 //#define PIPELINE_POST_REQUESTS
 
 
@@ -150,7 +153,7 @@ QnTransactionTransport::QnTransactionTransport(
     m_base64EncodeOutgoingTransactions = nx_http::getHeaderValue(
         request.headers, Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME ) == "true";
 
-    auto keepAliveHeaderIter = request.headers.find("Keep-Alive");
+    auto keepAliveHeaderIter = request.headers.find(Qn::EC2_CONNECTION_TIMEOUT_HEADER_NAME);
     if (keepAliveHeaderIter != request.headers.end())
     {
         nx_http::header::KeepAlive keepAliveHeader;
@@ -529,7 +532,7 @@ void QnTransactionTransport::doOutgoingConnect(const QUrl& remotePeerUrl)
             Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME,
             "true" );
     m_httpClient->addAdditionalHeader(
-        "Keep-Alive",
+        Qn::EC2_CONNECTION_TIMEOUT_HEADER_NAME,
         nx_http::header::KeepAlive(
             std::chrono::duration_cast<std::chrono::seconds>(
                 m_tcpKeepAliveTimeout)).toString());
@@ -856,7 +859,20 @@ void QnTransactionTransport::setIncomingTransactionChannelSocket(
     startListeningNonSafe();
 }
 
-void QnTransactionTransport::waitForNewTransactionsReady( std::function<void()> invokeBeforeWait )
+void QnTransactionTransport::lock()
+{
+    QnMutexLocker lk(&m_mutex);
+    ++m_waiterCount;
+}
+
+void QnTransactionTransport::unlock()
+{
+    QnMutexLocker lk(&m_mutex);
+    --m_waiterCount;
+    m_cond.wakeAll();    //signalling that we are not waiting anymore
+}
+
+void QnTransactionTransport::waitForNewTransactionsReady()
 {
     QnMutexLocker lk( &m_mutex );
 
@@ -864,16 +880,11 @@ void QnTransactionTransport::waitForNewTransactionsReady( std::function<void()> 
         return;
 
     //waiting for some transactions to be processed
-    ++m_waiterCount;
-    if( invokeBeforeWait )
-        invokeBeforeWait();
     while( (m_postedTranCount >= MAX_TRANS_TO_POST_AT_A_TIME && m_state != Closed) ||
             m_state < ReadyForStreaming)
     {
         m_cond.wait( lk.mutex() );
     }
-    --m_waiterCount;
-    m_cond.wakeAll();    //signalling that we are not waiting anymore
 }
 
 void QnTransactionTransport::connectionFailure()
@@ -963,6 +974,7 @@ void QnTransactionTransport::monitorConnectionForClosure(
 
 QUrl QnTransactionTransport::generatePostTranUrl()
 {
+    //return m_postTranBaseUrl;
     QUrl postTranUrl = m_postTranBaseUrl;
     postTranUrl.setPath( lit("%1/%2").arg(postTranUrl.path()).arg(++m_sentTranSequence) );
     return postTranUrl;
@@ -1007,8 +1019,10 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
 {
     assert( !m_dataToSend.empty() );
 
+#ifdef AGGREGATE_TRANSACTIONS_BEFORE_SEND
     if( m_base64EncodeOutgoingTransactions )
         aggregateOutgoingTransactionsNonSafe();
+#endif  //AGGREGATE_TRANSACTIONS_BEFORE_SEND
 
     DataToSend& dataCtx = m_dataToSend.front();
 
@@ -1329,7 +1343,7 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
                 std::make_shared<nx_bsf::SizedDataDecodingFilter>() );
         }
 
-        auto keepAliveHeaderIter = m_httpClient->response()->headers.find("Keep-Alive");
+        auto keepAliveHeaderIter = m_httpClient->response()->headers.find(Qn::EC2_CONNECTION_TIMEOUT_HEADER_NAME);
         if (keepAliveHeaderIter != m_httpClient->response()->headers.end())
         {
             nx_http::header::KeepAlive keepAliveHeader;

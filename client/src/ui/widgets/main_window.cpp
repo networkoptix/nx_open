@@ -63,8 +63,8 @@
 #include <ui/workbench/watchers/workbench_server_safemode_watcher.h>
 #include <ui/workbench/watchers/workbench_bookmark_tags_watcher.h>
 #include <ui/workbench/watchers/workbench_bookmarks_watcher.h>
+#include <ui/workbench/watchers/workbench_items_watcher.h>
 #include <ui/workbench/watchers/timeline_bookmarks_watcher.h>
-#include <ui/workbench/watchers/current_layout_items_watcher.h>
 #include <ui/workbench/watchers/current_user_available_cameras_watcher.h>
 #include <ui/workbench/watchers/workbench_item_bookmarks_watcher.h>
 
@@ -90,6 +90,7 @@
 
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
+#include <client/client_message_processor.h>
 
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/screen_manager.h>
@@ -98,8 +99,8 @@
 #include "layout_tab_bar.h"
 #include "dwm.h"
 
-namespace {
-
+namespace
+{
     QToolButton *newActionButton(QAction *action, bool popup = false, qreal sizeMultiplier = 1.0, int helpTopicId = Qn::Empty_Help) {
         QToolButton *button = new QToolButton();
         button->setDefaultAction(action);
@@ -270,7 +271,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     context->instance<QnWorkbenchResourcesChangesWatcher>();
     context->instance<QnWorkbenchServerSafemodeWatcher>();
     context->instance<QnWorkbenchBookmarkTagsWatcher>();
-    context->instance<QnCurrentLayoutItemsWatcher>();
+    context->instance<QnWorkbenchItemsWatcher>();
     context->instance<QnWorkbenchItemBookmarksWatcher>();
     context->instance<QnWorkbenchBookmarksWatcher>();
     context->instance<QnTimelineBookmarksWatcher>();

@@ -45,6 +45,7 @@
                 <param name = "MaxSensorWidth" default_value = "1280"/>
                 <param name = "MaxSensorHeight" default_value = "960"/>
                 <param name = "MaxFPS" default_value = "12"/>
+                <param name = "VideoLayout" default_value = "width=4;height=1;sensors=3,2,1,0"/>
             </params>
         </resource>
         <resource name = "1555" public = "ArecontVision_Abstract">
@@ -81,5 +82,8 @@
         </resource>
         <resource name = "2556" public = "2555"/>
         <resource name = "5555" public = "5115"/>
+        <resource name = "20275" public = "20185"/>
+        <resource name = "12275" public = "12186"/>
+        <resource name = "12276" public = "12176"/>
     </oem>
 </resources>

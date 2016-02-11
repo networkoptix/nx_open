@@ -100,6 +100,10 @@ QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(const QString &fi
     m_ui->setupUi(m_owner);
     m_ui->gridBookmarks->setModel(m_model);
 
+    QnBookmarkSortOrder sortOrder = QnSearchBookmarksModel::defaultSortOrder();
+    int column = QnSearchBookmarksModel::sortFieldToColumn(sortOrder.column);
+    m_ui->gridBookmarks->horizontalHeader()->setSortIndicator(column, sortOrder.order);
+
     const auto updateFilterText = [this]()
     {
         m_model->setFilterText(m_ui->filterLineEdit->lineEdit()->text());
@@ -153,8 +157,7 @@ QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(const QString &fi
         if (!fillActionParameters(params, window))
             return;
 
-        if (menu()->triggerIfPossible(Qn::RemoveBookmarksAction, params))
-            refresh();
+        menu()->triggerIfPossible(Qn::RemoveBookmarksAction, params);
     });
 
     setParameters(filterText, utcStartTimeMs, utcFinishTimeMs);
@@ -250,6 +253,8 @@ bool QnSearchBookmarksDialogPrivate::fillActionParameters(QnActionParameters &pa
     for (const QModelIndex &index: selection)
     {
         const auto bookmark = bookmarkFromIndex(index);
+
+        /* Add invalid bookmarks, user must be able to delete them. */
         if (!bookmark.isValid())
             continue;
 
@@ -259,13 +264,19 @@ bool QnSearchBookmarksDialogPrivate::fillActionParameters(QnActionParameters &pa
 
         bookmarks << bookmark;
     }
-    if (!bookmarks.isEmpty())
+    if (bookmarks.isEmpty())
+        return false;
+    else
         params.setArgument(Qn::CameraBookmarkListRole, bookmarks);
 
-    if (bookmarks.size() > 1)
+    if (bookmarks.size() != 1)
         return true;
 
     QnCameraBookmark currentBookmark = bookmarks.first();
+    /* User should not be able to export or open invalid bookmark. */
+    if (!currentBookmark.isValid())
+        return true;
+
     params.setArgument(Qn::CameraBookmarkRole, currentBookmark);
 
     auto camera = availableCameraByUniqueId(currentBookmark.cameraId);
@@ -311,7 +322,6 @@ void QnSearchBookmarksDialogPrivate::openInNewLayoutHandler()
     setFirstLayoutItemPeriod(extendedWindow, Qn::ItemSliderWindowRole);
 
     menu()->trigger(Qn::BookmarksModeAction);
-    m_owner->close();
 }
 
 void QnSearchBookmarksDialogPrivate::exportBookmarkHandler()
@@ -321,8 +331,7 @@ void QnSearchBookmarksDialogPrivate::exportBookmarkHandler()
     if (!fillActionParameters(params, window))
         return;
 
-    if (menu()->canTrigger(Qn::ExportTimeSelectionAction, params))
-        menu()->trigger(Qn::ExportTimeSelectionAction, params);
+    menu()->triggerIfPossible(Qn::ExportTimeSelectionAction, params);
 }
 
 void QnSearchBookmarksDialogPrivate::updateHeadersWidth()
@@ -407,9 +416,9 @@ void QnSearchBookmarksDialogPrivate::setCameras(const QnVirtualCameraResourceLis
     }
 
     const auto devicesStringSet = QnCameraDeviceStringSet(
-        tr("<%n device(s)>", nullptr, cameras.size())
-        , tr("<%n camera(s)>", nullptr, cameras.size())
-        , tr("<%n I/O module(s)>", nullptr, cameras.size()));
+          tr("<%n device(s)>",      "", cameras.size())
+        , tr("<%n camera(s)>",      "", cameras.size())
+        , tr("<%n I/O module(s)>",  "", cameras.size()));
 
     const auto caption = QnDeviceDependentStrings::getNameFromSet(
         devicesStringSet, cameras);

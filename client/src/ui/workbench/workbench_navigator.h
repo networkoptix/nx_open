@@ -219,10 +219,6 @@ private:
     void updateHistoryForCamera(QnVirtualCameraResourcePtr camera);
     void updateSliderBookmarks();
 
-    void onItemAdded(QnWorkbenchItem *item);
-
-    void updateArchiveState(QnWorkbenchItem *item);
-
     void updateHasArchiveState();
 private:
     QnWorkbenchStreamSynchronizer *m_streamSynchronizer;

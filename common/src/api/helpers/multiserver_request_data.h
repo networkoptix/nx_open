@@ -4,7 +4,8 @@
 
 #include <utils/common/request_param.h>
 
-struct QnMultiserverRequestData {
+struct QnMultiserverRequestData
+{
     template <typename T>
     static T fromParams(const QnRequestParamList& params) {
         T request;
@@ -20,7 +21,7 @@ struct QnMultiserverRequestData {
     /* Fix fields to make local request. */
     void makeLocal(Qn::SerializationFormat localFormat = Qn::UbjsonFormat);
 
-    bool isLocal;
+    bool isLocal;   // Shows if this request is sent by redirection
     Qn::SerializationFormat format;
     bool extraFormatting;
 

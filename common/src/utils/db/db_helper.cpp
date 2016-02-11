@@ -11,7 +11,7 @@
 
 //TODO #AK QnDbTransaction is a bad name for this class since it actually lives beyond DB transaction 
     //and no concurrent transactions supported. Maybe QnDbConnection?
-QnDbHelper::QnDbTransaction::QnDbTransaction(QSqlDatabase& database, QReadWriteLock& mutex): 
+QnDbHelper::QnDbTransaction::QnDbTransaction(QSqlDatabase& database, QnReadWriteLock& mutex):
     m_database(database),
     m_mutex(mutex)
 {

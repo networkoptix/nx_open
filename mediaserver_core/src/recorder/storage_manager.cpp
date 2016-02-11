@@ -468,8 +468,8 @@ void QnStorageManager::partialMediaScan(const DeviceFileCatalogPtr &fileCatalog,
         bool stillHaveThisStorage = hasStorageUnsafe(storage);
         if (!stillHaveThisStorage)
             return;
-        fileCatalog->addChunks(newChunks);
     }
+    fileCatalog->addChunks(newChunks);
 }
 
 void QnStorageManager::initDone()
@@ -632,12 +632,13 @@ void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &
             QnTimePeriod rebuildPeriod = QnTimePeriod(0, rebuildEndTime);
             newCatalog->doRebuildArchive(storage, rebuildPeriod);
 
+            bool stillHaveThisStorage;
             {
                 QnMutexLocker lk(&m_mutexStorages);
-                bool stillHaveThisStorage = hasStorageUnsafe(storage);
+                stillHaveThisStorage = hasStorageUnsafe(storage);
+            }
                 if (!m_rebuildCancelled && stillHaveThisStorage)
                     replaceChunks(rebuildPeriod, storage, newCatalog, cameraUniqueId, catalog);
-            }
         }
         currentTask++;
         if (progressCallback && !m_rebuildCancelled)
@@ -1476,6 +1477,13 @@ bool QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
 
     while (toDelete > 0)
     {
+        if (QnResource::isStopping())
+        {   // Return true to mark this storage as succesfully cleaned since 
+            // we don't want this storage to be added in clear-again list when
+            // server is going to stop.
+            return true;
+        }
+
         qint64 minTime = 0x7fffffffffffffffll;
         DeviceFileCatalogPtr catalog;
         {

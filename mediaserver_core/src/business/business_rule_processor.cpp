@@ -144,11 +144,7 @@ void QnBusinessRuleProcessor::executeAction(const QnAbstractBusinessActionPtr& a
     case QnBusiness::ShowTextOverlayAction:
     case QnBusiness::ShowOnAlarmLayoutAction:
         if (action->getParams().useSource)
-        {
-            if (QnVirtualCameraResourcePtr sourceCamera = qnResPool->getResourceById<QnVirtualCameraResource>(action->getRuntimeParams().eventResourceId))
-                resources << sourceCamera;
-            resources << qnResPool->getResources<QnNetworkResource>(action->getRuntimeParams().metadata.cameraRefs);
-        }
+            resources << qnResPool->getResources<QnNetworkResource>(action->getSourceResources());
         break;
     default:
         break;

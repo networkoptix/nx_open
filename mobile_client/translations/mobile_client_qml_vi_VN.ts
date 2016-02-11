@@ -5,12 +5,12 @@
     <name>QnCameraFlow</name>
     <message>
         <source>Hidden cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>máy ảnh ẩn</translation>
     </message>
     <message numerus="yes">
         <source>%n cameras are hidden</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n máy ảnh đang ẩn</numerusform>
         </translation>
     </message>
 </context>
@@ -19,109 +19,110 @@
     <message>
         <source>Authentication
 required</source>
-        <translation type="unfinished"></translation>
+        <translation>Chứng thực
+cần thiết</translation>
     </message>
     <message>
         <source>Offline</source>
-        <translation type="unfinished"></translation>
+        <translation>ẩn</translation>
     </message>
 </context>
 <context>
     <name>QnCameraMenu</name>
     <message>
         <source>Quality</source>
-        <translation type="unfinished">hình ảnh</translation>
+        <translation>hình ảnh</translation>
     </message>
     <message>
         <source>Auto</source>
-        <translation type="unfinished">tự động</translation>
+        <translation>tự động</translation>
     </message>
 </context>
 <context>
     <name>QnDiscoveredSessionItem</name>
     <message>
         <source>incompatible server version</source>
-        <translation type="unfinished"></translation>
+        <translation>phiên bản máy chủ không tương thích</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Không biết</translation>
     </message>
 </context>
 <context>
     <name>QnHiddenCameraItem</name>
     <message>
         <source>Show</source>
-        <translation type="unfinished"></translation>
+        <translation>Hiển thị</translation>
     </message>
 </context>
 <context>
     <name>QnHorizontalCalendarLayout</name>
     <message>
         <source>Close</source>
-        <translation type="unfinished"></translation>
+        <translation>Chặt chẽ</translation>
     </message>
 </context>
 <context>
     <name>QnLiveVideoNavigation</name>
     <message>
         <source>LIVE</source>
-        <translation type="unfinished"></translation>
+        <translation>LIVE</translation>
     </message>
 </context>
 <context>
     <name>QnLoginPage</name>
     <message>
         <source>New Connection</source>
-        <translation type="unfinished"></translation>
+        <translation>kết nối mới</translation>
     </message>
     <message>
         <source>Host</source>
-        <translation type="unfinished"></translation>
+        <translation>chủ nhà</translation>
     </message>
     <message>
         <source>Port (optional)</source>
-        <translation type="unfinished"></translation>
+        <translation>cổng (tùy chọn)</translation>
     </message>
     <message>
         <source>Login</source>
-        <translation type="unfinished"></translation>
+        <translation>Đăng nhập</translation>
     </message>
     <message>
         <source>Password</source>
-        <translation type="unfinished"></translation>
+        <translation>mật khẩu</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Lưu giữ</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished">xóa bỏ</translation>
+        <translation>xóa bỏ</translation>
     </message>
     <message>
         <source>Connect</source>
-        <translation type="unfinished"></translation>
+        <translation>Kết nối</translation>
     </message>
     <message>
         <source>Auto-discovered systems</source>
-        <translation type="unfinished"></translation>
+        <translation>hệ thống tự động phát hiện</translation>
     </message>
     <message>
         <source>Incorrect login or password</source>
-        <translation type="unfinished"></translation>
+        <translation>Đăng nhập không chính xác hoặc mật khẩu</translation>
     </message>
     <message>
         <source>Server or network is not available</source>
-        <translation type="unfinished"></translation>
+        <translation>Máy chủ hoặc mạng không có sẵn</translation>
     </message>
     <message>
         <source>Incompatible server</source>
-        <translation type="unfinished"></translation>
+        <translation>máy chủ không tương thích</translation>
     </message>
     <message>
         <source>Incompatible server version %1</source>
-        <translation type="unfinished"></translation>
+        <translation>phiên bản máy chủ không tương thích %1</translation>
     </message>
 </context>
 <context>
@@ -129,126 +130,127 @@ required</source>
     <message>
         <source>To connect to old servers please download the legacy application from Google Play.</source>
         <comment>&quot;Google Play&quot; is the name of the main Android application store.</comment>
-        <translation type="unfinished"></translation>
+        <translation>Để kết nối đến các máy chủ cũ xin vui lòng tải về các ứng dụng kế thừa từ Google Play.</translation>
     </message>
     <message>
         <source>To connect to old servers please download the legacy application from the App Store.</source>
         <comment>&quot;App Store&quot; is the name of the main Apple application store.</comment>
-        <translation type="unfinished"></translation>
+        <translation>Để kết nối đến các máy chủ cũ xin vui lòng tải về các ứng dụng kế thừa từ App Store.</translation>
     </message>
     <message>
         <source>To connect to old servers please download the legacy application from the Internet.</source>
-        <translation type="unfinished"></translation>
+        <translation>Để kết nối đến các máy chủ cũ xin vui lòng tải về các ứng dụng kế thừa từ Internet.</translation>
     </message>
     <message>
         <source>Download</source>
-        <translation type="unfinished"></translation>
+        <translation>Tải về</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">hủy bỏ</translation>
+        <translation>hủy bỏ</translation>
     </message>
 </context>
 <context>
     <name>QnQualityDialog</name>
     <message>
         <source>Video quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Chất lượng video</translation>
     </message>
     <message>
         <source>Auto</source>
-        <translation type="unfinished">tự động</translation>
+        <translation>tự động</translation>
     </message>
 </context>
 <context>
     <name>QnResourcesPage</name>
     <message>
         <source>Server offline</source>
-        <translation type="unfinished"></translation>
+        <translation>tổ ẩn</translation>
     </message>
     <message>
         <source>Loading...</source>
-        <translation type="unfinished">Đang tải...</translation>
+        <translation>Đang tải...</translation>
     </message>
     <message>
         <source>Connecting...</source>
-        <translation type="unfinished"></translation>
+        <translation>Kết nối ...</translation>
     </message>
 </context>
 <context>
     <name>QnSearchItem</name>
     <message>
         <source>Search</source>
-        <translation type="unfinished">tìm kiếm</translation>
+        <translation>tìm kiếm</translation>
     </message>
 </context>
 <context>
     <name>QnSettingsPage</name>
     <message>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Cài đặt</translation>
     </message>
     <message>
         <source>Show offline cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>Hiện máy ảnh ẩn</translation>
     </message>
 </context>
 <context>
     <name>QnSideNavigation</name>
     <message>
         <source>Saved connections</source>
-        <translation type="unfinished"></translation>
+        <translation>kết nối lưu</translation>
     </message>
     <message>
         <source>New connection</source>
-        <translation type="unfinished"></translation>
+        <translation>kết nối mới</translation>
     </message>
     <message>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Cài đặt</translation>
     </message>
 </context>
 <context>
     <name>QnVerticalCalendarLayout</name>
     <message>
         <source>Close</source>
-        <translation type="unfinished"></translation>
+        <translation>Chặt chẽ</translation>
     </message>
 </context>
 <context>
     <name>QnVideoNavigation</name>
     <message>
         <source>No Archive</source>
-        <translation type="unfinished"></translation>
+        <translation>không Lưu Trữ</translation>
     </message>
     <message>
         <source>LIVE</source>
-        <translation type="unfinished"></translation>
+        <translation>LIVE</translation>
     </message>
     <message>
         <source>d MMMM yyyy</source>
         <comment>DO NOT TRANSLATE THIS STRING!</comment>
-        <translation type="unfinished"></translation>
+        <translation>d MMMM yyyy</translation>
     </message>
 </context>
 <context>
     <name>QnVideoPage</name>
     <message>
         <source>Server offline</source>
-        <translation type="unfinished"></translation>
+        <translation>tổ ẩn</translation>
     </message>
     <message>
         <source>Authentication
 required</source>
-        <translation type="unfinished"></translation>
+        <translation>Chứng thực
+cần thiết</translation>
     </message>
     <message>
         <source>Camera offline</source>
-        <translation type="unfinished"></translation>
+        <translation>máy quay</translation>
     </message>
     <message>
         <source>Can&apos;t load video</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể tải video</translation>
     </message>
 </context>
 </TS>

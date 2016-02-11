@@ -5,8 +5,8 @@ import com.networkoptix.qml 1.0
 Item {
     id: indicator
 
-    width: 48
-    height: 48
+    implicitWidth: dp(48)
+    implicitHeight: dp(48)
 
     property color color: "white"
     property int progress: -1
@@ -33,7 +33,11 @@ Item {
     Canvas {
         id: canvas
 
-        anchors.fill: parent
+        anchors.centerIn: parent
+        anchors.alignWhenCentered: false
+        width: parent.width / iconScale()
+        height: parent.height / iconScale()
+        scale: iconScale()
 
         renderStrategy: Canvas.Cooperative
 
