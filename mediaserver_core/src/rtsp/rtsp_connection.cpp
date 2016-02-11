@@ -50,7 +50,7 @@ extern "C"
 #include <media_server/settings.h>
 #include <streaming/streaming_params.h>
 #include <media_server/settings.h>
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 
 class QnTcpListener;
 
