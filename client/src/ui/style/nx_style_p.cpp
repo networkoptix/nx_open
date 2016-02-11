@@ -38,6 +38,27 @@ QnPaletteColor QnNxStylePrivate::mainColor(style::Colors::Palette palette) const
     return this->palette.color(Colors::paletteName(palette), index);
 }
 
+QColor QnNxStylePrivate::checkBoxColor(const QStyleOption *option, bool radio) const
+{
+    QnPaletteColor mainColor = findColor(option->palette.color(QPalette::Text));
+    QColor color = mainColor.darker(6);
+
+    if (option->state & QStyle::State_Off)
+    {
+        if (option->state & QStyle::State_MouseOver)
+            color = mainColor.darker(4);
+    }
+    else if (option->state & QStyle::State_On || option->state & QStyle::State_NoChange)
+    {
+        if (!radio && option->state & QStyle::State_MouseOver)
+            color = mainColor.lighter(3);
+        else
+            color = mainColor;
+    }
+
+    return color;
+}
+
 void QnNxStylePrivate::drawSwitch(
         QPainter *painter,
         const QStyleOption *option,
@@ -113,4 +134,85 @@ void QnNxStylePrivate::drawSwitch(
     painter->setPen(Qt::NoPen);
     painter->setBrush(gripColor.color());
     painter->drawRoundedRect(handleRect, handleRect.width() / 2, handleRect.height() / 2);
+}
+
+void QnNxStylePrivate::drawCheckBox(QPainter *painter, const QStyleOption *option, const QWidget *widget) const
+{
+    Q_UNUSED(widget)
+
+    QPen pen(checkBoxColor(option));
+    pen.setJoinStyle(Qt::MiterJoin);
+    pen.setCapStyle(Qt::FlatCap);
+    painter->setPen(pen);
+
+    QnScopedPainterPenRollback penRollback(painter, pen);
+    QnScopedPainterBrushRollback brushRollback(painter, Qt::NoBrush);
+
+    QRectF rect = option->rect.adjusted(2, 2, -3, -3);
+
+    if (option->state.testFlag(QStyle::State_On))
+    {
+        QPainterPath path;
+        path.moveTo(rect.right() - rect.width() * 0.3, rect.top());
+        path.lineTo(rect.left(), rect.top());
+        path.lineTo(rect.left(), rect.bottom());
+        path.lineTo(rect.right(), rect.bottom());
+        path.lineTo(rect.right(), rect.top() + rect.height() * 0.6);
+
+        painter->setPen(pen);
+        painter->drawPath(path);
+
+        path = QPainterPath();
+        path.moveTo(rect.left() + rect.width() * 0.2, rect.top() + rect.height() * 0.45);
+        path.lineTo(rect.left() + rect.width() * 0.5, rect.top() + rect.height() * 0.75);
+        path.lineTo(rect.right() + rect.width() * 0.05, rect.top() + rect.height() * 0.15);
+
+        pen.setWidthF(dp(2));
+        painter->setPen(pen);
+
+        QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
+
+        painter->drawPath(path);
+    }
+    else
+    {
+        painter->drawRect(rect);
+
+        if (option->state.testFlag(QStyle::State_NoChange))
+        {
+            pen.setWidth(2);
+            painter->setPen(pen);
+            painter->drawLine(QPointF(rect.left() + 2, rect.top() + rect.height() / 2.0),
+                              QPointF(rect.right() - 1, rect.top() + rect.height() / 2.0));
+        }
+    }
+}
+
+void QnNxStylePrivate::drawRadioButton(QPainter *painter, const QStyleOption *option, const QWidget *widget) const
+{
+    Q_UNUSED(widget)
+
+    QPen pen(checkBoxColor(option, true), 1.2);
+
+    QnScopedPainterPenRollback penRollback(painter, pen);
+    QnScopedPainterBrushRollback brushRollback(painter, Qt::NoBrush);
+    QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
+
+    QRect rect = option->rect.adjusted(1, 1, -2, -2);
+
+    painter->drawEllipse(rect);
+
+    if (option->state.testFlag(QStyle::State_On))
+    {
+        painter->setBrush(pen.brush());
+        painter->setPen(Qt::NoPen);
+        painter->drawEllipse(rect.adjusted(3, 3, -3, -3));
+    }
+    else if (option->state.testFlag(QStyle::State_NoChange))
+    {
+        pen.setWidth(2);
+        painter->setPen(pen);
+        painter->drawLine(QPointF(rect.left() + 4, rect.top() + rect.height() / 2.0),
+                          QPointF(rect.right() - 3, rect.top() + rect.height() / 2.0));
+    }
 }

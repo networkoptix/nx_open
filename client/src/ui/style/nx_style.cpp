@@ -141,6 +141,8 @@ void QnNxStyle::drawPrimitive(
         QPainter *painter,
         const QWidget *widget) const
 {
+    Q_D(const QnNxStyle);
+
     switch (element)
     {
     case PE_FrameFocusRect:
@@ -279,84 +281,12 @@ void QnNxStyle::drawPrimitive(
         return;
 
     case PE_IndicatorCheckBox:
-        {
-            painter->save();
-
-            QPen pen(option->palette.color(QPalette::WindowText));
-            pen.setJoinStyle(Qt::MiterJoin);
-            pen.setCapStyle(Qt::FlatCap);
-            painter->setPen(pen);
-            painter->setBrush(Qt::NoBrush);
-
-            QRectF rect = option->rect.adjusted(2, 2, -3, -3);
-
-            if (option->state.testFlag(State_On))
-            {
-                QPainterPath path;
-                path.moveTo(rect.right() - rect.width() * 0.3, rect.top());
-                path.lineTo(rect.left(), rect.top());
-                path.lineTo(rect.left(), rect.bottom());
-                path.lineTo(rect.right(), rect.bottom());
-                path.lineTo(rect.right(), rect.top() + rect.height() * 0.6);
-
-                painter->setPen(pen);
-                painter->drawPath(path);
-
-                path = QPainterPath();
-                path.moveTo(rect.left() + rect.width() * 0.2, rect.top() + rect.height() * 0.45);
-                path.lineTo(rect.left() + rect.width() * 0.5, rect.top() + rect.height() * 0.75);
-                path.lineTo(rect.right() + rect.width() * 0.05, rect.top() + rect.height() * 0.15);
-
-                pen.setWidthF(dp(2));
-                painter->setPen(pen);
-                painter->setRenderHint(QPainter::Antialiasing);
-                painter->drawPath(path);
-            }
-            else
-            {
-                painter->drawRect(rect);
-
-                if (option->state.testFlag(State_NoChange))
-                {
-                    pen.setWidth(2);
-                    painter->setPen(pen);
-                    painter->drawLine(QPointF(rect.left() + 2, rect.top() + rect.height() / 2.0),
-                                      QPointF(rect.right() - 1, rect.top() + rect.height() / 2.0));
-                }
-            }
-
-            painter->restore();
-        }
+    case PE_IndicatorViewItemCheck:
+        d->drawCheckBox(painter, option, widget);
         return;
 
     case PE_IndicatorRadioButton:
-        {
-            painter->save();
-
-            QRect rect = option->rect.adjusted(1, 1, -2, -2);
-
-            QPen pen(option->palette.color(QPalette::WindowText), 1.2);
-            painter->setPen(pen);
-            painter->setBrush(Qt::NoBrush);
-            painter->setRenderHint(QPainter::Antialiasing);
-            painter->drawEllipse(rect);
-
-            if (option->state.testFlag(State_On))
-            {
-                painter->setBrush(option->palette.windowText());
-                painter->setPen(Qt::NoPen);
-                painter->drawEllipse(rect.adjusted(3, 3, -3, -3));
-            }
-            else if (option->state.testFlag(State_NoChange))
-            {
-                pen.setWidth(2);
-                painter->setPen(pen);
-                painter->drawLine(QPointF(rect.left() + 4, rect.top() + rect.height() / 2.0),
-                                  QPointF(rect.right() - 3, rect.top() + rect.height() / 2.0));
-            }
-
-            painter->restore();
-        }
+        d->drawRadioButton(painter, option, widget);
         return;
 
     case PE_FrameTabBarBase:
@@ -814,6 +744,8 @@ void QnNxStyle::drawControl(
         QPainter *painter,
         const QWidget *widget) const
 {
+    Q_D(const QnNxStyle);
+
     switch (element)
     {
     case CE_ShapedFrame:
@@ -872,31 +804,13 @@ void QnNxStyle::drawControl(
         }
         break;
 
-    case CE_CheckBox:
-    case CE_RadioButton:
+    case CE_CheckBoxLabel:
+    case CE_RadioButtonLabel:
         if (const QStyleOptionButton *button =
                 qstyleoption_cast<const QStyleOptionButton*>(option))
         {
             QStyleOptionButton opt = *button;
-
-            QnPaletteColor mainColor = findColor(button->palette.color(QPalette::Text));
-            QColor color = mainColor.darker(6);
-
-            if (opt.state & State_Off)
-            {
-                if (opt.state & State_MouseOver)
-                    color = mainColor.darker(4);
-            }
-            else if (opt.state & State_On || opt.state & State_NoChange)
-            {
-                if (element != CE_RadioButton && opt.state & State_MouseOver)
-                    color = mainColor.lighter(3);
-                else
-                    color = mainColor;
-            }
-
-            opt.palette.setColor(QPalette::WindowText, color);
-
+            opt.palette.setColor(QPalette::WindowText, d->checkBoxColor(option, element == CE_RadioButtonLabel));
             base_type::drawControl(element, &opt, painter, widget);
             return;
         }
@@ -1817,6 +1731,8 @@ int QnNxStyle::styleHint(
         return QFormLayout::AllNonFixedFieldsGrow;
     case SH_ItemView_ShowDecorationSelected:
         return 1;
+    case SH_ItemView_ActivateItemOnSingleClick:
+        return 0;
     default:
         break;
     }

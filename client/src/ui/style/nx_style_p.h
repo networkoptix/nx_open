@@ -18,7 +18,19 @@ public:
     QnPaletteColor findColor(const QColor &color) const;
     QnPaletteColor mainColor(style::Colors::Palette palette) const;
 
+    QColor checkBoxColor(const QStyleOption *option, bool radio = false) const;
+
     void drawSwitch(
+            QPainter *painter,
+            const QStyleOption *option,
+            const QWidget *widget = nullptr) const;
+
+    void drawCheckBox(
+            QPainter *painter,
+            const QStyleOption *option,
+            const QWidget *widget = nullptr) const;
+
+    void drawRadioButton(
             QPainter *painter,
             const QStyleOption *option,
             const QWidget *widget = nullptr) const;
