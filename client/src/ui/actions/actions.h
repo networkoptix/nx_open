@@ -1051,6 +1051,26 @@ namespace Qn {
          */
         OpenAuditLogAction,
 
+        /**
+         * Opens Login to Cloud dialog.
+         */
+        LoginToCLoud,
+
+        /**
+         * Logs out the user from cloud clearing the stored password.
+         */
+        LogoutFromCloud,
+
+        /**
+         * Opens cloud portal in the browser.
+         */
+        OpenCloudMainUrl,
+
+        /**
+         * Opens cloud account management page in the browser.
+         */
+        OpenCloudManagementUrl,
+
         ActionCount,
 
         NoAction = -1

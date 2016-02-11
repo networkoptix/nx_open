@@ -176,6 +176,8 @@ QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, co
                 return qVariantFromValue(static_cast<Qn::LightModeFlags>(baseValue.toInt()));
             return baseValue;
         }
+    case CLOUD_PASSWORD:
+        return xorDecrypt(base_type::readValueFromSettings(settings, id, defaultValue).toString(), xorKey);
     default:
         return base_type::readValueFromSettings(settings, id, defaultValue);
         break;
@@ -220,6 +222,10 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
         settings->endGroup();
         break;
     }
+    case CLOUD_PASSWORD:
+        base_type::writeValueToSettings(settings, id, xorEncrypt(value.toString(), xorKey));
+        break;
+
     case UPDATE_FEED_URL:
     //case SHOWCASE_URL:
     //case SHOWCASE_ENABLED:
