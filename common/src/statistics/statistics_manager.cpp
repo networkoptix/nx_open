@@ -117,8 +117,8 @@ QnStatisticsManager::QnStatisticsManager(QObject *parent)
     , m_clientId()
     , m_handle()
     , m_settings()
-    , m_modules()
     , m_storage()
+    , m_modules()
 {}
 
 QnStatisticsManager::~QnStatisticsManager()
