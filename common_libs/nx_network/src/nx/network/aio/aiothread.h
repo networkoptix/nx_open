@@ -654,6 +654,7 @@ public:
                 case TaskType::tCallFunc:
                 {
                     assert(task.postHandler);
+                    assert(!task.taskCompletionEvent && !task.taskCompletionHandler);
                     postedCalls.push_back(std::move(task));
                     //this task differs from every else in a way that it is not processed here, 
                         //just moved to another container. TODO #ak is it really needed to move to another container?

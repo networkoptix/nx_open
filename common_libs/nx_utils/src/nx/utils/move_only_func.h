@@ -19,20 +19,18 @@ class MoveOnlyFunc
 :
     private std::function<F>
 {
-    template<class Fun>
+    template<class Func>
     class MoveOnlyFuncWrapper
     {
     public:
-        Fun f;
-
-        MoveOnlyFuncWrapper(Fun p)
+        MoveOnlyFuncWrapper(Func p)
         :
-            f(std::move(p))
+            m_func(std::move(p))
         {
         }
         MoveOnlyFuncWrapper(const MoveOnlyFuncWrapper& rhs)
         :
-            f(std::move(const_cast<MoveOnlyFuncWrapper&>(rhs).f))
+            m_func(std::move(const_cast<MoveOnlyFuncWrapper&>(rhs).m_func))
         {
             assert(false);
             throw -1;
@@ -47,19 +45,24 @@ class MoveOnlyFunc
 
         template<class... Args>
         auto operator() (Args&&... args)
-            -> decltype(f(std::forward<Args>(args)...))
+            -> decltype(m_func(std::forward<Args>(args)...))
         {
-            return f(std::forward<Args>(args)...);
+            return m_func(std::forward<Args>(args)...);
         }
+
+    private:
+        Func m_func;
     };
 
 public:
     MoveOnlyFunc() = default;
     
-    template<class Fun>
-    MoveOnlyFunc(Fun fun)
+    template<class _Func>
+    MoveOnlyFunc(_Func&& func)
     :
-        std::function<F>(MoveOnlyFuncWrapper<Fun>(std::move(fun)))
+        std::function<F>(
+            MoveOnlyFuncWrapper<std::remove_reference<_Func>::type>(
+                std::forward<_Func>(func)))
     {
     }
 
