@@ -27,7 +27,7 @@ class NX_NETWORK_API IncomingTunnelPool
     : public QnStoppableAsync
 {
 public:
-    IncomingTunnelPool(size_t acceptLimit);
+    IncomingTunnelPool(aio::AbstractAioThread* ioThread, size_t acceptLimit);
 
     /** Creates new tunnel with connected \param connection */
     void addNewTunnel(std::unique_ptr<AbstractTunnelConnection> connection);

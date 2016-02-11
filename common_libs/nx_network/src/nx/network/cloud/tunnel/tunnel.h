@@ -49,7 +49,7 @@ public:
     *  \note not all of the AbstractTunnelConnection can really accept connections */
     virtual void accept(SocketHandler handler) = 0;
 
-private:
+protected:
     const String m_remotePeerId;
 };
 

@@ -40,11 +40,13 @@ void IncomingTunnel::accept(SocketHandler handler)
     });
 }
 
-
-IncomingTunnelPool::IncomingTunnelPool(size_t acceptLimit)
-    : m_acceptLimit(acceptLimit)
-    , m_ioThreadSocket(new TCPSocket)
+IncomingTunnelPool::IncomingTunnelPool(
+    aio::AbstractAioThread* ioThread, size_t acceptLimit)
+:
+    m_acceptLimit(acceptLimit),
+    m_ioThreadSocket(new TCPSocket)
 {
+    m_ioThreadSocket->bindToAioThread(ioThread);
 }
 
 void IncomingTunnelPool::addNewTunnel(

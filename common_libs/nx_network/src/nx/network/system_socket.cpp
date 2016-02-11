@@ -490,7 +490,10 @@ bool Socket<InterfaceToImplement>::createSocket(int type, int protocol)
     // Make a new socket
     m_fd = socket(PF_INET, type, protocol);
     if( m_fd < 0 )
+    {
+        qWarning() << strerror(errno);
         return false;
+    }
 
 #ifdef SO_NOSIGPIPE
     int set = 1;

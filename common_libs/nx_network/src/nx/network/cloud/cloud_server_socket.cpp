@@ -156,14 +156,11 @@ void CloudServerSocket::pleaseStop(std::function<void()> handler)
 
         BarrierHandler barrier([this, handler]()
         {
-            // 3rd - Stop Tunnel Pool
-            m_tunnelPool->pleaseStop([this, handler]()
-            {
-                m_tunnelPool.reset();
+            // 3rd - Stop Tunnel Pool and IO thread
+            BarrierHandler barrier(std::move(handler));
+            m_tunnelPool->pleaseStop(barrier.fork());
+            m_ioThreadSocket->pleaseStop(barrier.fork());
 
-                // 4th - Stop Cancel IO thread tasks
-                m_ioThreadSocket->pleaseStop(std::move(handler));
-            });
         });
 
         // 2nd - Stop Acceptors
@@ -228,7 +225,8 @@ void CloudServerSocket::acceptAsync(
 
 void CloudServerSocket::initTunnelPool(int queueLen)
 {
-    m_tunnelPool.reset(new IncomingTunnelPool(queueLen));
+    m_tunnelPool.reset(new IncomingTunnelPool(
+        m_ioThreadSocket->getAioThread(), queueLen));
 }
 
 void CloudServerSocket::startAcceptor(
@@ -259,6 +257,7 @@ void CloudServerSocket::startAcceptor(
 
         Q_ASSERT_X(it != m_acceptors.end(), Q_FUNC_INFO,
                    "Is acceptor already dead?");
+        m_acceptors.erase(it);
     });
 }
 
