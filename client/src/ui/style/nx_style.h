@@ -3,9 +3,11 @@
 #include <QCommonStyle>
 
 #include <ui/style/generic_palette.h>
+#include <ui/common/geometry.h>
 
 class QnNxStylePrivate;
-class QnNxStyle : public QCommonStyle {
+class QnNxStyle : public QCommonStyle, public QnGeometry
+{
     Q_OBJECT
     Q_DECLARE_PRIVATE(QnNxStyle)
     typedef QCommonStyle base_type;
@@ -29,7 +31,7 @@ public:
     virtual QRect subElementRect(SubElement subElement, const QStyleOption *option, const QWidget *widget) const override;
     virtual int pixelMetric(PixelMetric metric, const QStyleOption *option, const QWidget *widget) const override;
     virtual QSize sizeFromContents(ContentsType type, const QStyleOption *option, const QSize &size, const QWidget *widget) const override;
-    virtual int styleHint(StyleHint sh, const QStyleOption *option, const QWidget *widget, QStyleHintReturn *shret) const override;
+    virtual int styleHint(StyleHint sh, const QStyleOption *option = nullptr, const QWidget *widget = nullptr, QStyleHintReturn *shret = nullptr) const override;
     virtual void polish(QWidget *widget) override;
     virtual void unpolish(QWidget *widget) override;
 

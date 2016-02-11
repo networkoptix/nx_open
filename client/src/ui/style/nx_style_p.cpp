@@ -217,3 +217,40 @@ void QnNxStylePrivate::drawRadioButton(QPainter *painter, const QStyleOption *op
                           QPointF(rect.right() - 3, rect.top() + rect.height() / 2.0));
     }
 }
+
+void QnNxStylePrivate::drawSortIndicator(QPainter *painter, const QStyleOption *option, const QWidget *widget) const
+{
+    Q_UNUSED(widget)
+
+    bool down = true;
+    if (const QStyleOptionHeader *header =
+            qstyleoption_cast<const QStyleOptionHeader *>(option))
+    {
+        if (header->sortIndicator == QStyleOptionHeader::None)
+            return;
+
+        down = header->sortIndicator == QStyleOptionHeader::SortDown;
+    }
+
+    QColor color = option->palette.brightText().color();
+
+    int w = dp(4);
+    int h = dp(2);
+    int y = option->rect.top() + dp(3);
+    int x = option->rect.x() + dp(1);
+    int wstep = dp(4);
+    int ystep = dp(4);
+
+    if (!down)
+    {
+        w += 2 * wstep;
+        wstep = -wstep;
+    }
+
+    for (int i = 0; i < 3; ++i)
+    {
+        painter->fillRect(x, y, w, h, color);
+        w += wstep;
+        y += ystep;
+    }
+}

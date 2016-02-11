@@ -7,6 +7,7 @@ namespace style
     class Metrics
     {
     public:
+        static const int kStandardPadding;
         static const int kMenuItemHPadding;
         static const int kMenuItemVPadding;
         static const int kMenuItemTextLeftPadding;
@@ -18,6 +19,7 @@ namespace style
         static const int kButtonHeight;
         static const int kHeaderSize;
         static const int kViewRowHeight;
+        static const int kSortIndicatorSize;
         static const QSize kSwitchSize;
     };
 

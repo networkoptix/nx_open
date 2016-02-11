@@ -4,6 +4,7 @@
 
 namespace style
 {
+    const int Metrics::kStandardPadding = dp(8);
     const int Metrics::kMenuItemHPadding = dp(12);
     const int Metrics::kMenuItemVPadding = dp(5);
     const int Metrics::kMenuItemTextLeftPadding = dp(28);
@@ -15,6 +16,7 @@ namespace style
     const int Metrics::kButtonHeight = dp(28);
     const int Metrics::kHeaderSize = dp(32);
     const int Metrics::kViewRowHeight = dp(24);
+    const int Metrics::kSortIndicatorSize = dp(14);
     const QSize Metrics::kSwitchSize(dp(30), dp(15));
 
     const char *Properties::kHoveredRowProperty = "_qn_hoveredRow";

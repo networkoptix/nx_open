@@ -38,6 +38,11 @@ public:
             const QStyleOption *option,
             const QWidget *widget = nullptr) const;
 
+    void drawSortIndicator(
+            QPainter *painter,
+            const QStyleOption *option,
+            const QWidget *widget = nullptr) const;
+
 public:
     QnGenericPalette palette;
     QnNoptixStyleAnimator *idleAnimator;

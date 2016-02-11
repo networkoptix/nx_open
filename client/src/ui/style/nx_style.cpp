@@ -349,6 +349,10 @@ void QnNxStyle::drawPrimitive(
         }
         return;
 
+    case PE_IndicatorHeaderArrow:
+        d->drawSortIndicator(painter, option, widget);
+        return;
+
     case PE_FrameMenu:
         return;
 
@@ -906,7 +910,12 @@ void QnNxStyle::drawControl(
         if (const QStyleOptionHeader *header =
                 qstyleoption_cast<const QStyleOptionHeader*>(option))
         {
-            painter->fillRect(header->rect.adjusted(2, 0, -2, 0), header->palette.window());
+            if (header->state.testFlag(State_MouseOver))
+            {
+                QColor color = findColor(header->palette.midlight().color()).darker(1);
+                color.setAlphaF(0.2);
+                painter->fillRect(header->rect, color);
+            }
 
             if (header->orientation == Qt::Horizontal)
             {
@@ -1550,6 +1559,44 @@ QRect QnNxStyle::subElementRect(
         }
         break;
 
+    case SE_HeaderArrow:
+        if (const QStyleOptionHeader *header = qstyleoption_cast<const QStyleOptionHeader *>(option))
+        {
+            QSize size(Metrics::kSortIndicatorSize, Metrics::kSortIndicatorSize);
+            QRect rect = header->rect.adjusted(Metrics::kStandardPadding, 0, -Metrics::kStandardPadding, 0);
+            Qt::Alignment alignment = static_cast<Qt::Alignment>(styleHint(SH_Header_ArrowAlignment, header, widget));
+
+            if (alignment.testFlag(Qt::AlignRight))
+            {
+                QRect labelRect = subElementRect(SE_HeaderLabel, option, widget);
+                int margin = pixelMetric(PM_HeaderMargin, header, widget);
+                rect.setLeft(labelRect.right() + margin);
+            }
+
+            return alignedRect(Qt::LeftToRight, Qt::AlignLeft | (alignment & Qt::AlignVertical_Mask), size, rect);
+        }
+        break;
+
+    case SE_HeaderLabel:
+        if (const QStyleOptionHeader *header = qstyleoption_cast<const QStyleOptionHeader *>(option))
+        {
+            QRect rect = header->rect.adjusted(Metrics::kStandardPadding, 0, -Metrics::kStandardPadding, 0);
+
+            Qt::Alignment arrowAlignment =
+                    static_cast<Qt::Alignment>(styleHint(SH_Header_ArrowAlignment, header, widget));
+            if (arrowAlignment.testFlag(Qt::AlignLeft))
+            {
+                int margin = pixelMetric(PM_HeaderMargin, header, widget);
+                int arrowSize = pixelMetric(PM_HeaderMarkSize, header, widget);
+                rect.setLeft(rect.left() + arrowSize + margin);
+            }
+
+            int flags = Qt::AlignLeft | Qt::AlignVCenter | Qt::TextHideMnemonic;
+            rect = option->fontMetrics.boundingRect(rect, flags, header->text);
+            return rect;
+        }
+        break;
+
     default:
         break;
     } // switch
@@ -1599,6 +1646,10 @@ int QnNxStyle::pixelMetric(
         return dp(2);
     case PM_SplitterWidth:
         return dp(1);
+    case PM_HeaderMarkSize:
+        return Metrics::kSortIndicatorSize;
+    case PM_HeaderMargin:
+        return dp(6);
     default:
         break;
     }
@@ -1674,7 +1725,23 @@ QSize QnNxStyle::sizeFromContents(
                      size.height() + 2 * Metrics::kMenuItemVPadding);
 
     case CT_HeaderSection:
-        return QSize(size.width(), qMax(size.height(), Metrics::kHeaderSize));
+        if (const QStyleOptionHeader *header = qstyleoption_cast<const QStyleOptionHeader *>(option))
+        {
+            QSize textSize = header->fontMetrics.size(Qt::TextHideMnemonic, header->text);
+
+            int width = textSize.width();
+
+            width += 2 * Metrics::kStandardPadding;
+
+            if (header->sortIndicator != QStyleOptionHeader::None)
+            {
+                width += pixelMetric(PM_HeaderMargin, header, widget);
+                width += pixelMetric(PM_HeaderMarkSize, header, widget);
+            }
+
+            return QSize(width, qMax(textSize.height(), Metrics::kHeaderSize));
+        }
+        break;
 
     case CT_ItemViewItem:
         {
@@ -1731,6 +1798,8 @@ int QnNxStyle::styleHint(
         return 1;
     case SH_ItemView_ActivateItemOnSingleClick:
         return 0;
+    case SH_Header_ArrowAlignment:
+        return Qt::AlignRight | Qt::AlignVCenter;
     default:
         break;
     }
@@ -1747,6 +1816,15 @@ void QnNxStyle::polish(QWidget *widget)
     {
         QFont font = widget->font();
         font.setWeight(QFont::DemiBold);
+        widget->setFont(font);
+        widget->setAttribute(Qt::WA_Hover);
+    }
+
+    if (qobject_cast<QHeaderView*>(widget))
+    {
+        QFont font = widget->font();
+        font.setWeight(QFont::DemiBold);
+        font.setPixelSize(dp(14));
         widget->setFont(font);
         widget->setAttribute(Qt::WA_Hover);
     }
