@@ -1,5 +1,6 @@
 <div>
     <div ng-if="data.activateCode">
+        <h1>Account activation</h1>
         <process-alert process="activate"
                        process-message="'Activating account ...'"
                        success-message="'Your account was successfully activated.'"
@@ -7,6 +8,7 @@
     </div>
 
     <div ng-if="reactivating">
+        <h1>Confirm your account</h1>
         <process-alert process="reactivate"
                        intro-message="'You are going to confirm your account. Please, enter your account email.'"
                        success-message="'Confirmation link was send to your email. Check it to continue.'"
@@ -37,6 +39,7 @@
     </div>
 
     <div ng-if="restoring">
+        <h1>Restore password</h1>
         <process-alert process="restore"
                        intro-message="'You are going to restore your password. Please, enter your account email.'"
                        success-message="'Confirmation link was send to your email. Check it for creating a new password'"
@@ -66,6 +69,7 @@
         </form>
     </div>
     <div ng-if="data.restoreCode">
+        <h1>Set new password</h1>
         <process-alert process="change"
                        intro-message="'Please, enter new password for your account.'"
                        success-message="'Password successfully saved'"
