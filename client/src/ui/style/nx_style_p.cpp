@@ -184,7 +184,7 @@ void QnNxStylePrivate::drawCheckBox(QPainter *painter, const QStyleOption *optio
         {
             pen.setWidth(2);
             painter->setPen(pen);
-            painter->drawLine(QPointF(rc.x(0.2), rc.y(0.5)), QPointF(rc.x(0.8), rc.y(0.5)));
+            painter->drawLine(QPointF(rc.x(0.2), rc.y(0.5)), QPointF(rc.x(0.9), rc.y(0.5)));
         }
     }
 }
