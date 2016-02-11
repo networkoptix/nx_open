@@ -27,10 +27,14 @@ public:
 
     void setClientId(const QnUuid &clientID);
 
-    // Takes ownership under storage object
+    /*!
+     *  Sets storage. Note: it will takes ownership under storage object
+     */
     void setStorage(QnStatisticsStoragePtr storage);
 
-    // Takes ownership under settings object
+    /*!
+     *  Sets settings source. Note: it will takes ownership under settings object
+     */
     void setSettings(QnStatisticsSettingsPtr settings);
 
 public:
