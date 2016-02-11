@@ -25,6 +25,7 @@
 
 #include <statistics/statistics_manager.h>
 #include <ui/statistics/modules/actions_statistics_module.h>
+#include <ui/statistics/modules/users_statistics_module.h>
 
 
 #ifdef Q_OS_WIN
@@ -80,6 +81,9 @@ QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *pa
     const auto actionsStatModule = instance<QnActionsStatisticsModule>();
     actionsStatModule->setActionManager(m_menu.data()); // TODO: #ynikitenkov refactor QnActionManager to singleton
     qnStatisticsManager->registerStatisticsModule(lit("actions"), actionsStatModule);
+
+    const auto userStatModule = instance<QnUsersStatisticsModule>();
+    qnStatisticsManager->registerStatisticsModule(lit("users"), userStatModule);
 }
 
 QnWorkbenchContext::~QnWorkbenchContext() {

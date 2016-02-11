@@ -1,8 +1,7 @@
 
 #include "abstract_statistics_storage.h"
 
-QnAbstractStatisticsStorage::QnAbstractStatisticsStorage(QObject *parent)
-    : base_type(parent)
+QnAbstractStatisticsStorage::QnAbstractStatisticsStorage()
 {}
 
 QnAbstractStatisticsStorage::~QnAbstractStatisticsStorage()

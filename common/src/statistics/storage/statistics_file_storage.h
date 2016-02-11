@@ -7,7 +7,7 @@ class QnStatisticsFileStorage : public QnAbstractStatisticsStorage
 {
     typedef QnAbstractStatisticsStorage base_type;
 public:
-    explicit QnStatisticsFileStorage(QObject *parent = nullptr);
+    explicit QnStatisticsFileStorage();
 
     virtual ~QnStatisticsFileStorage();
 

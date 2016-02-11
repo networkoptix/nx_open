@@ -6,14 +6,10 @@
 #include <statistics/statistics_fwd.h>
 
 
-class QnAbstractStatisticsStorage : public QObject
+class QnAbstractStatisticsStorage
 {
-    Q_OBJECT
-
-    typedef QObject base_type;
-
 public:
-    QnAbstractStatisticsStorage(QObject *parent = nullptr);
+    QnAbstractStatisticsStorage();
 
     virtual ~QnAbstractStatisticsStorage();
 

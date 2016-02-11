@@ -98,8 +98,8 @@ namespace
     }
 }
 
-QnStatisticsFileStorage::QnStatisticsFileStorage(QObject *parent)
-    : base_type(parent)
+QnStatisticsFileStorage::QnStatisticsFileStorage()
+    : base_type()
 
     , m_statisticsDirectory(getStatisticsDirectory())
     , m_customSettingsDirectory(getCustomDataDirectory())
