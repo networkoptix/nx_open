@@ -22,6 +22,9 @@ class MoveOnlyFunc
     template<class Func>
     class MoveOnlyFuncWrapper
     {
+    private:
+        Func m_func;
+
     public:
         MoveOnlyFuncWrapper(Func p)
         :
@@ -49,9 +52,6 @@ class MoveOnlyFunc
         {
             return m_func(std::forward<Args>(args)...);
         }
-
-    private:
-        Func m_func;
     };
 
 public:
