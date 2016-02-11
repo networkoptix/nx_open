@@ -22,7 +22,7 @@ static const std::vector<CloudServerSocket::AcceptorMaker> defaultAcceptorMakers
 
         event.connectionMethods ^= udpHolePunching; //< used
         auto acceptor = std::make_unique<UdtTunnelAcceptor>(
-                std::move(selfPeerId), event.connectSessionID, event.originatingPeerID);
+                std::move(selfPeerId), event.connectSessionId, event.originatingPeerID);
 
         acceptor->setTargetAddresses(std::move(event.udpEndpointList));
         return std::unique_ptr<AbstractTunnelAcceptor>(std::move(acceptor));

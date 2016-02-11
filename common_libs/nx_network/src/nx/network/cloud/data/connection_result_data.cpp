@@ -24,7 +24,7 @@ ConnectionResultRequest::ConnectionResultRequest(bool _connectionSucceeded)
 
 void ConnectionResultRequest::serialize(nx::stun::Message* const message)
 {
-    message->newAttribute<stun::cc::attrs::ConnectionId>(connectSessionID);
+    message->newAttribute<stun::cc::attrs::ConnectionId>(connectSessionId);
     message->newAttribute<stun::cc::attrs::ConnectionSucceeded>(
         connectionSucceeded ? "true" : "false");
 }
@@ -41,7 +41,7 @@ bool ConnectionResultRequest::parse(const nx::stun::Message& message)
 
     return readStringAttributeValue<stun::cc::attrs::ConnectionId>(
         message,
-        &connectSessionID);
+        &connectSessionId);
 }
 
 }   //api
