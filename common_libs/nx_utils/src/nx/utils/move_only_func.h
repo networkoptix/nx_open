@@ -61,7 +61,7 @@ public:
     MoveOnlyFunc(_Func&& func)
     :
         std::function<F>(
-            MoveOnlyFuncWrapper<std::remove_reference<_Func>::type>(
+            MoveOnlyFuncWrapper<typename std::remove_reference<_Func>::type>(
                 std::forward<_Func>(func)))
     {
     }
