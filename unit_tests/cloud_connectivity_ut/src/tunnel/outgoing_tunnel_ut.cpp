@@ -155,7 +155,7 @@ public:
         {
             m_aioThreadBinder.registerTimer(
                 m_connectTimeout->count(),
-                [this, handler{std::move(handler)}]() mutable
+                [this, handler = std::move(handler)]() mutable
                 {
                     connectInternal(std::move(handler));
                 });
@@ -185,7 +185,7 @@ private:
             std::unique_ptr<AbstractTunnelConnection>)> handler)
     {
         m_aioThreadBinder.post(
-            [this, handler{move(handler)}]()
+            [this, handler = move(handler)]()
             {
                 if (m_canSucceedEvent)
                     m_canSucceedEvent->get_future().wait();

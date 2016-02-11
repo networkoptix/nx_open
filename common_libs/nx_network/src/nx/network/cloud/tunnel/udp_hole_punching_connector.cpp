@@ -86,7 +86,7 @@ void UdpHolePunchingTunnelConnector::connect(
             arg(m_connectSessionId).arg(SystemError::getLastOSErrorText()),
             cl_logWARNING);
         m_mediatorUdpClient.socket()->post(
-            [handler{move(handler)}, errorCode]() mutable
+            [handler = move(handler), errorCode]() mutable
             {
                 handler(errorCode, nullptr);
             });
@@ -102,7 +102,7 @@ void UdpHolePunchingTunnelConnector::connect(
             arg(SystemError::getLastOSErrorText()),
             cl_logWARNING);
         m_mediatorUdpClient.socket()->post(
-            [handler{move(handler)}, errorCode]() mutable
+            [handler = move(handler), errorCode]() mutable
             {
                 handler(errorCode, nullptr);
             });

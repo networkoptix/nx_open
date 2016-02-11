@@ -268,7 +268,7 @@ void OutgoingTunnel::startAsyncTunnelConnect(QnMutexLockerBase* const /*locker*/
                 std::unique_ptr<AbstractTunnelConnection> connection)
             {
                 m_aioThreadBinder.post(
-                    [this, connectorType, errorCode, connection{move(connection)}]() mutable
+                    [this, connectorType, errorCode, connection = move(connection)]() mutable
                     {
                         onConnectorFinished(
                             connectorType,

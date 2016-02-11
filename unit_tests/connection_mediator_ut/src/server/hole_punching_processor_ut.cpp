@@ -104,7 +104,7 @@ TEST_F(MediatorFunctionalTest, HolePunchingProcessor_generic)
 
     api::ResultCode resultCode = api::ResultCode::ok;
     api::ConnectionResultRequest connectionResult;
-    connectionResult.connectSessionID = connectRequest.connectSessionID;
+    connectionResult.connectSessionId = connectRequest.connectSessionID;
     connectionResult.connectionSucceeded = true;
     std::tie(resultCode) =
         makeSyncCall<api::ResultCode>(
@@ -207,7 +207,7 @@ TEST_F(MediatorFunctionalTest, HolePunchingProcessor_server_failure)
         //testing that mediator has cleaned up session data
         api::ResultCode resultCode = api::ResultCode::ok;
         api::ConnectionResultRequest connectionResult;
-        connectionResult.connectSessionID = connectRequest.connectSessionID;
+        connectionResult.connectSessionId = connectRequest.connectSessionID;
         connectionResult.connectionSucceeded = false;
         std::tie(resultCode) =
             makeSyncCall<api::ResultCode>(
