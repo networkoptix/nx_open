@@ -1,13 +1,15 @@
 'use strict';
 
+var activatedEye = false;
 document.addEventListener("mousemove", function (event) {
     var $bb = $(".big-brother");
     var $pupil = $(".big-brother>.eye .pupil");
     var maxLength = 150;
+    var activationLegth = 60;
 
     var eyeBorder = 6;
     var eyeSize = $bb.width();
-    var pupilBasePosition = eyeSize/10 + eyeBorder/4;
+    var pupilBasePosition = 7.5;
 
     var bbOffset = $bb.offset();
     if(!bbOffset){
@@ -24,14 +26,20 @@ document.addEventListener("mousemove", function (event) {
 
     var length = Math.sqrt(direction.left*direction.left + direction.top*direction.top);
 
-    if(length> maxLength){
+    if(length < activationLegth){
+        activatedEye = true;
+    }
+    if(!activatedEye){
         return;
     }
-    var pupilFloat = 20;
-    var proportionLength = pupilFloat/Math.max(maxLength,length);
+
+    var pupilFloatX = 35;
+    var pupilFloatY = 20;
+    var proportionLengthX = pupilFloatX/Math.max(maxLength,length);
+    var proportionLengthY = pupilFloatY/Math.max(maxLength,length);
     var pupilPosition = {
-        top:pupilBasePosition + proportionLength*direction.top + "px",
-        left:pupilBasePosition + proportionLength*direction.left + "px",
-    }
+        top:  pupilBasePosition + proportionLengthY * direction.top + "px",
+        left: pupilBasePosition + proportionLengthX * direction.left + "px"
+    };
     $pupil.css(pupilPosition);
 });

@@ -4,6 +4,10 @@ import xml.etree.ElementTree as eTree
 from xml.dom import minidom
 
 
+def unique_list(iter_list):
+    return [e for i, e in enumerate(iter_list) if iter_list.index(e) == i]
+
+
 def process_js_file(file_name):
     with open(file_name, 'r') as file_descriptor:
         data = file_descriptor.read()
@@ -37,7 +41,8 @@ def process_inline_text(data):
     data = re.sub(r'>\s*<', '', data)
     data = re.sub(r'><', '', data)
     strings = re.split('<>', data)
-    return list(set(strings))
+    return unique_list(strings)
+
 
 ignore_attributes = ('id', 'name', 'class', 'style',
                      'src', 'href',
@@ -71,7 +76,7 @@ def process_attributes(data):
     data = re.sub(r'"\'', '"', data)
     data = re.sub(r'\'"', '"', data)
     strings = re.split('"?\s*\S+?="?', data)
-    return list(set(strings))
+    return unique_list(strings)
 
 
 def generate_ts(data):
@@ -84,7 +89,7 @@ def generate_ts(data):
         first = True
         for string in record['inline'] + record['attributes']:
             # print(string)
-            if not string.strip() or re.match('\W+', string):
+            if not string.strip() or re.match('^\W+$', string):
                 continue
             message = eTree.SubElement(context, "message")
             location = eTree.SubElement(message, "location")
