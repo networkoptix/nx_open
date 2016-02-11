@@ -25,6 +25,8 @@ QnTableView::QnTableView(QWidget *parent):
     verticalScrollBar()->installEventFilter(signalizer);
 
     connect(signalizer, &QnSingleEventSignalizer::activated, this, &QnTableView::resetCursor);
+
+    connect(this, &QnTableView::entered, this, &QnTableView::updateHoveredRow);
 }
 
 QnTableView::~QnTableView() {
@@ -43,7 +45,6 @@ void QnTableView::mouseMoveEvent(QMouseEvent *event) {
     // Only do something when a model is set.
     if (isEnabled() && model) {
         QModelIndex index = indexAt(event->pos());
-        markHoveredRow(index);
         if (index.isValid()) {
             // When the index is valid, compare it to the last row.
             // Only do something when the the mouse has moved to a new row.
@@ -59,6 +60,7 @@ void QnTableView::mouseMoveEvent(QMouseEvent *event) {
                 setCursor(shape);
             }
         } else {
+            updateHoveredRow(QModelIndex());
             resetCursor();
         }
     }
@@ -73,7 +75,7 @@ void QnTableView::resetCursor() {
     m_lastMouseModelIndex = QModelIndex();
 }
 
-void QnTableView::markHoveredRow(const QModelIndex &index)
+void QnTableView::updateHoveredRow(const QModelIndex &index)
 {
     int row = index.isValid() ? index.row() : -1;
     setProperty(::style::Properties::kHoveredRowProperty, row);
@@ -81,6 +83,7 @@ void QnTableView::markHoveredRow(const QModelIndex &index)
 
 void QnTableView::leaveEvent(QEvent *) {
     resetCursor();
+    updateHoveredRow(QModelIndex());
 }
 
 // ------------------------------------------------QnCheckableTableView ---------------------
