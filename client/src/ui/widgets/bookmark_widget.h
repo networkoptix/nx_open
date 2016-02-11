@@ -23,6 +23,11 @@ public:
     void loadData(const QnCameraBookmark &bookmark);
     void submitData(QnCameraBookmark &bookmark) const;
 
+    /** Check if entered data is valid. */
+    bool isValid() const;
+
+signals:
+    bool validChanged();
 private:
     void updateTagsList();
 
