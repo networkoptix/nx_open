@@ -434,7 +434,7 @@ void QnRtspConnectionProcessor::sendResponse(int httpStatusCode, const QByteArra
         arg(d->socket->getForeignAddress().toString()).
         arg(QString::fromLatin1(response)), cl_logDEBUG1);
 
-    QMutexLocker lock(&d->sockMutex);
+    QnMutexLocker lock(&d->sockMutex);
     sendData(response.constData(), response.size());
 }
 
