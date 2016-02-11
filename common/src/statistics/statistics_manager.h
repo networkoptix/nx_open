@@ -28,10 +28,10 @@ public:
     void setClientId(const QnUuid &clientID);
 
     // Takes ownership under storage object
-    void setStorage(QnAbstractStatisticsStorage *storage);
+    void setStorage(QnStatisticsStoragePtr storage);
 
     // Takes ownership under settings object
-    void setSettings(QnAbstractStatisticsSettingsLoader *settings);
+    void setSettings(QnStatisticsSettingsPtr settings);
 
 public:
     void sendStatistics();

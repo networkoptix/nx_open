@@ -77,8 +77,8 @@ namespace
         const auto statManager = commonModule->instance<QnStatisticsManager>();
 
         statManager->setClientId(qnSettings->pcUuid());
-        statManager->setStorage(new QnStatisticsFileStorage());
-        statManager->setSettings(new QnStatisticsSettingsWatcher());
+        statManager->setStorage(QnStatisticsStoragePtr(new QnStatisticsFileStorage()));
+        statManager->setSettings(QnStatisticsSettingsPtr(new QnStatisticsSettingsWatcher()));
 
         QObject::connect(QnClientMessageProcessor::instance(), &QnClientMessageProcessor::connectionClosed
             , statManager, &QnStatisticsManager::saveCurrentStatistics);

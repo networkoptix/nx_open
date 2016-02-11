@@ -5,16 +5,18 @@
 
 class QnActionManager;
 class AbstractActionMetric;
+typedef QPointer<QnActionManager> QnActionManagerPtr;
 
 class QnActionsStatisticsModule : public QnAbstractStatisticsModule
 {
     typedef QnAbstractStatisticsModule base_type;
+
 public:
     QnActionsStatisticsModule(QObject *parent);
 
     virtual ~QnActionsStatisticsModule();
 
-    void setActionManager(QnActionManager *manager);
+    void setActionManager(const QnActionManagerPtr &manager);
 
     QnMetricsHash metrics() const override;
 
@@ -24,6 +26,6 @@ private:
     typedef QSharedPointer<AbstractActionMetric> MetricsPtr;
     typedef QHash<QString, MetricsPtr> MetricsHash;
 
-    QnActionManager *m_actionManager;
+    QnActionManagerPtr m_actionManager;
     MetricsHash m_metrics;
 };

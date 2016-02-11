@@ -57,11 +57,11 @@ void QnStatisticsSettingsWatcher::updateSettingsImpl(int delayMs)
     if (!correctDelay || m_handle)
         return;
 
-    const QPointer<QnStatisticsSettingsWatcher> thisGuard(this);
-    const auto callback = [this, thisGuard]
+    const QPointer<QnStatisticsSettingsWatcher> guard(this);
+    const auto callback = [this, guard]
         (bool success, rest::Handle handle, const QByteArray &data)
     {
-        if (!thisGuard)
+        if (!guard)
             return;
 
         if (handle != m_handle)
@@ -87,9 +87,9 @@ void QnStatisticsSettingsWatcher::updateSettingsImpl(int delayMs)
         emit settingsAvailableChanged();
     };
 
-    const auto getStatSettingsHandler = [this, callback, thisGuard]()
+    const auto getStatSettingsHandler = [this, callback, guard]()
     {
-        if (!thisGuard)
+        if (!guard)
             return;
 
         const auto server = qnCommon->currentServer();

@@ -156,22 +156,22 @@ void QnStatisticsManager::setClientId(const QnUuid &clientID)
     m_clientId = clientID;
 }
 
-void QnStatisticsManager::setStorage(QnAbstractStatisticsStorage *storage)
+void QnStatisticsManager::setStorage(QnStatisticsStoragePtr storage)
 {
-    m_storage.reset(storage);
+    m_storage = std::move(storage);
 }
 
-void QnStatisticsManager::setSettings(QnAbstractStatisticsSettingsLoader *settings)
+void QnStatisticsManager::setSettings(QnStatisticsSettingsPtr settings)
 {
     if (m_settings)
-        disconnect(m_settings, nullptr, this, nullptr);
+        disconnect(m_settings.get(), nullptr, this, nullptr);
 
-    m_settings.reset(settings);
+    m_settings = std::move(settings);
 
     if (m_settings->settingsAvailable())
         sendStatistics();
 
-    connect(m_settings, &QnAbstractStatisticsSettingsLoader::settingsAvailableChanged
+    connect(m_settings.get(), &QnAbstractStatisticsSettingsLoader::settingsAvailableChanged
         , this, &QnStatisticsManager::sendStatistics);
 }
 
@@ -247,12 +247,12 @@ void QnStatisticsManager::sendStatistics()
     if (!connection)
         return;
 
-    const QPointer<QnStatisticsManager> thisGuard(this);
-    const auto callback = [this, timeStamp, settings, thisGuard]
+    const QPointer<QnStatisticsManager> guard(this);
+    const auto callback = [this, timeStamp, settings, guard]
         (bool success, rest::Handle handle
         , rest::ServerConnection::EmptyResponseType /*response */)
     {
-        if (!thisGuard)
+        if (!guard)
             return;
 
         if (m_handle != handle)

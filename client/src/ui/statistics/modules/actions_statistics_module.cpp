@@ -36,7 +36,7 @@ namespace
 
 QnActionsStatisticsModule::QnActionsStatisticsModule(QObject *parent)
     : base_type(parent)
-    , m_actionManager(nullptr)
+    , m_actionManager()
 {
 }
 
@@ -44,7 +44,7 @@ QnActionsStatisticsModule::~QnActionsStatisticsModule()
 {
 }
 
-void QnActionsStatisticsModule::setActionManager(QnActionManager *manager)
+void QnActionsStatisticsModule::setActionManager(const QnActionManagerPtr &manager)
 {
     if (m_actionManager == manager)
         return;
@@ -57,8 +57,12 @@ void QnActionsStatisticsModule::setActionManager(QnActionManager *manager)
 
     m_actionManager = manager;
 
-    const auto createActionMetrics = [this](Qn::ActionId id)
+    QPointer<QnActionsStatisticsModule> guard(this);
+    const auto createActionMetrics = [this, guard](Qn::ActionId id)
     {
+        if (!guard || !m_actionManager)
+            return;
+
         const auto &alias = aliasByActionId(id);
 
         const auto triggeredAlias = makeAlias(alias, ActionTriggeredCountMetric::kPostfix);

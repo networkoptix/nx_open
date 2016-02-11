@@ -6,11 +6,12 @@
 #include <QtCore/QPointer>
 
 class QnAbstractStatisticsModule;
-class QnAbstractStatisticsStorage;
-class QnAbstractStatisticsSettingsLoader;
 
-typedef QScopedPointer<QnAbstractStatisticsSettingsLoader> QnStatisticsSettingsPtr;
-typedef QScopedPointer<QnAbstractStatisticsStorage> QnStatisticsStoragePtr;
+class QnAbstractStatisticsStorage;
+typedef std::unique_ptr<QnAbstractStatisticsStorage> QnStatisticsStoragePtr;
+
+class QnAbstractStatisticsSettingsLoader;
+typedef std::unique_ptr<QnAbstractStatisticsSettingsLoader> QnStatisticsSettingsPtr;
 
 typedef QString QnMetricAlias;
 typedef QString QnMetricValue;
