@@ -71,7 +71,7 @@ namespace ec2
 
         dbManager_queryOrReturn(ApiMediaServerDataExList, mediaservers);
         for (auto& ms : mediaservers) outData->mediaservers.push_back(std::move(ms));
-            
+
         dbManager_queryOrReturn(ApiCameraDataExList, cameras);
         for (ApiCameraDataEx& cam : cameras)
             if (cam.typeId != m_desktopCameraTypeId)
@@ -91,7 +91,7 @@ namespace ec2
 
         dbManager_queryOrReturn(ApiBusinessRuleDataList, bRules);
         for (auto& br : bRules) outData->businessRules.push_back(std::move(br));
-        
+
         if ((res = dbManager->doQuery(nullptr, outData->layouts)) != ErrorCode::ok)
             return res;
 
@@ -179,7 +179,7 @@ namespace ec2
         {   /* Security check */
             const auto admin = qnResPool->getAdministrator();
             Q_ASSERT_X(admin, Q_FUNC_INFO, "Administrator must exist here");
-            if (!admin) 
+            if (!admin)
                 return;
         }
 
@@ -191,7 +191,7 @@ namespace ec2
             setupTimer();
             return;
         }
-        
+
         const QDateTime now = qnSyncTime->currentDateTime().toUTC();
         const QDateTime lastTime = QDateTime::fromString(m_admin->getProperty(SR_LAST_TIME), Qt::ISODate);
         if (!lastTime.isValid())
@@ -212,7 +212,7 @@ namespace ec2
             const auto minDelay = timeCycle * MIN_DELAY_RATIO / 100;
             const auto rndDelay = timeCycle * (static_cast<uint>(qrand()) % RND_DELAY_RATIO) / 100;
             m_plannedReportTime = (lastTime.isValid() ? lastTime : now).addSecs(minDelay + rndDelay);
-            
+
             NX_LOG(lit("Ec2StaticticsReporter: Last report was at %1, the next planned for %2")
                    .arg(lastTime.isValid() ? lastTime.toString(Qt::ISODate) : lit("NEWER"))
                    .arg(m_plannedReportTime->toString(Qt::ISODate)), cl_logINFO);
@@ -283,7 +283,7 @@ namespace ec2
             m_timerCycle = TIMER_CYCLE;
             NX_LOG(lit("Ec2StaticticsReporter: Statistics report successfully sent to %1")
                    .arg(httpClient->url().toString()), cl_logINFO);
-            
+
             const auto now = qnSyncTime->currentDateTime().toUTC();
             m_plannedReportTime = boost::none;
 

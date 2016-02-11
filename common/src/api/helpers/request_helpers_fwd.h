@@ -7,3 +7,4 @@ struct QnGetBookmarkTagsRequestData;
 struct QnUpdateBookmarkRequestData;
 struct QnDeleteBookmarkRequestData;
 struct QnThumbnailRequestData;
+struct QnSendStatisticsRequestData;

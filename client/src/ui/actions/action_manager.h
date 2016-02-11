@@ -150,6 +150,8 @@ signals:
     void menuAboutToShow(QMenu* menu);
     void menuAboutToHide(QMenu* menu);
 
+    void actionRegistered(Qn::ActionId id);
+
 protected:
     friend class QnAction;
 

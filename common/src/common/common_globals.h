@@ -604,6 +604,8 @@ public:
         BackupSettingsDataRole,                     /**< return BackupSettingsData, used in BackupSettings model */
         TextWidthDataRole,                          /**< used in BackupSettings model */
 
+        ActionEmitterType,                          /** */
+        ActionEmittedBy,                            /** */
         RoleCount
     };
 

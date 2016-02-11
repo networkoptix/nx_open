@@ -298,14 +298,9 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     QString title = QnBusinessStringsHelper::eventAtResource(params, qnSettings->isIpShownInTree());
     qint64 timestampMs = params.eventTimestampUsec / 1000;
 
-    //TODO: #GDM code duplication
-
     QnVirtualCameraResourceList alarmCameras = qnResPool->getResources<QnVirtualCameraResource>(businessAction->getResources());
-    if (businessAction->getParams().useSource) {
-        if (QnVirtualCameraResourcePtr sourceCamera = qnResPool->getResourceById<QnVirtualCameraResource>(params.eventResourceId))
-            alarmCameras << sourceCamera;
-        alarmCameras << qnResPool->getResources<QnVirtualCameraResource>(params.metadata.cameraRefs);
-    }
+    if (businessAction->getParams().useSource)
+        alarmCameras << qnResPool->getResources<QnVirtualCameraResource>(businessAction->getSourceResources());
 
     QnResourcePtr resource = qnResPool->getResourceById(params.eventResourceId);
 

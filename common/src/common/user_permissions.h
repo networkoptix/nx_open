@@ -10,6 +10,8 @@ namespace Qn {
         NoPermissions                           = 0x00000000,   /**< No access */
 
         /* Generic permissions. */
+        NoPermissions                           = 0x00000000,
+
         ReadPermission                          = 0x00010000,   /**< Generic read access. Having this access right doesn't necessary mean that all information is readable. */
         WritePermission                         = 0x00020000,   /**< Generic write access. Having this access right doesn't necessary mean that all information is writable. */
         SavePermission                          = 0x00040000,   /**< Generic save access. Entity can be saved to the server. */

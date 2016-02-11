@@ -66,7 +66,7 @@ namespace nx_http
     {
         return m_socket.data();
     }
-    
+
     QSharedPointer<AbstractStreamSocket> AsyncHttpClient::takeSocket()
     {
         QSharedPointer<AbstractStreamSocket> result = m_socket;
@@ -382,7 +382,7 @@ namespace nx_http
             if( reconnectIfAppropriate() )
                 return;
             NX_LOGX(lit("Error reading (state %1) http response from %2. %3").arg( m_state ).arg( m_url.toString() ).arg( SystemError::toString( errorCode ) ), cl_logDEBUG1 );
-            m_state = 
+            m_state =
                 ((m_httpStreamReader.state() == HttpStreamReader::messageDone) &&
                     m_httpStreamReader.currentMessageNumber() == m_awaitedMessageNumber)
                 ? sDone
@@ -1005,7 +1005,7 @@ namespace nx_http
                 return;
             }
 
-            completionHandler( 
+            completionHandler(
                 SystemError::noError,
                 httpClient->response()->statusLine.statusCode,
                 httpClient->contentType(),
@@ -1046,4 +1046,86 @@ namespace nx_http
 
         return resultingErrorCode;
     }
+
+    bool uploadDataAsync(const QUrl &url
+        , const QByteArray &data
+        , const QByteArray &contentType
+        , const nx_http::HttpHeaders &extraHeaders
+        , const UploadCompletionHandler &callback)
+    {
+        nx_http::AsyncHttpClientPtr httpClientHolder = nx_http::AsyncHttpClient::create();
+        httpClientHolder->setAdditionalHeaders(extraHeaders);
+
+        auto completionFunc = [callback, httpClientHolder]
+            (nx_http::AsyncHttpClientPtr httpClient) mutable
+        {
+            httpClientHolder->disconnect(nullptr, static_cast<const char *>(nullptr));
+            httpClientHolder.reset();
+
+            if( httpClient->failed() )
+                return callback(SystemError::connectionReset, nx_http::StatusCode::ok);
+
+            const auto response = httpClient->response();
+            const auto statusLine = response->statusLine;
+            if((statusLine.statusCode != nx_http::StatusCode::ok)
+                && (statusLine.statusCode != nx_http::StatusCode::partialContent))
+            {
+                return callback(SystemError::noError, statusLine.statusCode);
+            }
+
+            callback(SystemError::noError, statusLine.statusCode);
+        };
+
+        QObject::connect(httpClientHolder.get(), &nx_http::AsyncHttpClient::done,
+            httpClientHolder.get(), completionFunc, Qt::DirectConnection);
+
+        if( !httpClientHolder->doPost(url, contentType, data))
+        {
+            // To destroy http client
+            httpClientHolder->disconnect(nullptr, static_cast<const char *>(nullptr));
+            return false;
+        }
+        return true;
+    }
+
+    SystemError::ErrorCode uploadDataSync(const QUrl &url
+        , const QByteArray &data
+        , const QByteArray &contentType
+        , nx_http::StatusCode::Value *httpCode)
+    {
+        bool done = false;
+        SystemError::ErrorCode result = SystemError::noError;
+        std::mutex mutex;
+        std::condition_variable waiter;
+
+
+        const auto callback = [&result, &mutex, &waiter, &done, httpCode]
+            (SystemError::ErrorCode errorCode, int statusCode)
+        {
+            result = errorCode;
+            if (httpCode)
+            {
+                *httpCode = (errorCode == SystemError::noError
+                    ? static_cast<nx_http::StatusCode::Value>(statusCode)
+                    : nx_http::StatusCode::internalServerError);
+            }
+
+            std::unique_lock<std::mutex> lk(mutex);
+            done = true;
+            waiter.notify_all();
+        };
+
+        const bool uploadStarted = uploadDataAsync(url, data, contentType
+            , nx_http::HttpHeaders(), callback);
+
+        if(!uploadStarted)
+            return SystemError::getLastOSErrorCode();
+
+        std::unique_lock<std::mutex> guard(mutex);
+        while(!done)
+            waiter.wait(guard);
+
+        return result;
+    }
+
 }

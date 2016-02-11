@@ -25,11 +25,13 @@ namespace rest
         ServerConnection(const QnUuid& serverId);
         virtual ~ServerConnection();
 
-        // use this type for POST requests without result data
-        struct EmptyResponseType {};
 
         template <typename ResultType>
         struct Result { typedef std::function<void (bool, Handle, ResultType)> type; };
+
+
+        struct EmptyResponseType {};
+        typedef Result<EmptyResponseType>::type PostCallback;   // use this type for POST requests without result data
 
         /**
         * Load information about cross-server archive
@@ -40,6 +42,13 @@ namespace rest
         Handle cameraHistoryAsync(const QnChunksRequestData &request, Result<ec2::ApiCameraHistoryDataList>::type callback, QThread* targetThread = 0);
 
         Handle cameraThumbnailAsync(const QnThumbnailRequestData &request, Result<QByteArray>::type callback, QThread* targetThread = 0);
+
+        Handle getStatisticsSettingsAsync(Result<QByteArray>::type callback
+            , QThread *targetThread = nullptr);
+
+        Handle sendStatisticsAsync(const QnSendStatisticsRequestData &request
+            , PostCallback callback
+            , QThread *targetThread = nullptr);
 
         /**
          * Save the credentials returned by cloud to the database.
