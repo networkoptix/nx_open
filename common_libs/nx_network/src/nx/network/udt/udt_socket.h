@@ -141,12 +141,12 @@ public:
         std::function<void(SystemError::ErrorCode, size_t)> handler) override;
     virtual void registerTimer(
         unsigned int timeoutMillis,
-        std::function<void()> handler) override;
+        nx::utils::MoveOnlyFunc<void()> handler) override;
 
     //!Implementation of AbstractSocket::post
-    virtual void post( std::function<void()> handler ) override;
+    virtual void post( nx::utils::MoveOnlyFunc<void()> handler ) override;
     //!Implementation of AbstractSocket::dispatch
-    virtual void dispatch( std::function<void()> handler ) override;
+    virtual void dispatch( nx::utils::MoveOnlyFunc<void()> handler ) override;
 
 private:
     std::unique_ptr<AsyncSocketImplHelper<UdtSocket>> m_aioHelper;
@@ -193,9 +193,9 @@ public:
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
     //!Implementation of AbstractSocket::post
-    virtual void post( std::function<void()> handler ) override;
+    virtual void post( nx::utils::MoveOnlyFunc<void()> handler ) override;
     //!Implementation of AbstractSocket::dispatch
-    virtual void dispatch( std::function<void()> handler ) override;
+    virtual void dispatch( nx::utils::MoveOnlyFunc<void()> handler ) override;
     virtual void acceptAsync( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )> handler ) ;
 
 private:

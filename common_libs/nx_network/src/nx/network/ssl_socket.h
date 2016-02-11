@@ -103,7 +103,7 @@ protected:
     //!Implementation of AbstractCommunicatingSocket::registerTimer
     virtual void registerTimer(
         unsigned int timeoutMs,
-        std::function<void()> handler ) override;
+        nx::utils::MoveOnlyFunc<void()> handler ) override;
 
 private:
     // Async version
@@ -146,7 +146,7 @@ protected:
     //!Implementation of AbstractCommunicatingSocket::registerTimer
     virtual void registerTimer(
         unsigned int timeoutMs,
-        std::function<void()> handler ) override;
+        nx::utils::MoveOnlyFunc<void()> handler ) override;
 
 private:
     Q_DECLARE_PRIVATE(QnMixedSSLSocket);

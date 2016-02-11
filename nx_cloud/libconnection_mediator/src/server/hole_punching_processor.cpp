@@ -134,7 +134,7 @@ void HolePunchingProcessor::connectionResult(
     std::function<void(api::ResultCode)> completionHandler)
 {
     QnMutexLocker lk(&m_mutex);
-    auto connectionIter = m_activeConnectSessions.find(request.connectSessionID);
+    auto connectionIter = m_activeConnectSessions.find(request.connectSessionId);
     if (connectionIter == m_activeConnectSessions.end())
     {
         completionHandler(api::ResultCode::notFound);

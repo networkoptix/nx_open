@@ -44,7 +44,7 @@ public:
         const nx::Buffer& buf,
         std::function<void(SystemError::ErrorCode, size_t)> handler) override;
 
-    void registerTimer(unsigned int timeoutMs, std::function<void()> handler) override;
+    void registerTimer(unsigned int timeoutMs, nx::utils::MoveOnlyFunc<void()> handler) override;
     void cancelIOAsync(aio::EventType eventType, std::function<void()> handler) override;
     void cancelIOSync(aio::EventType eventType) override;
 
@@ -55,8 +55,8 @@ public:
     void pleaseStop(std::function<void()> handler) override;
 
     //!Implementation of AbstractSocket::*
-    void post(std::function<void()> handler) override;
-    void dispatch(std::function<void()> handler) override;
+    void post(nx::utils::MoveOnlyFunc<void()> handler) override;
+    void dispatch(nx::utils::MoveOnlyFunc<void()> handler) override;
 
 public:
     std::atomic<bool> m_nonBlockingMode;

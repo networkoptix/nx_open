@@ -162,11 +162,11 @@ bool DummySocket::getKeepAlive( boost::optional< KeepAliveOptions >* /*result*/ 
     return false;
 }
 
-void DummySocket::post( std::function<void()> /*handler*/ )
+void DummySocket::post(nx::utils::MoveOnlyFunc<void()> /*handler*/ )
 {
 }
 
-void DummySocket::dispatch( std::function<void()> /*handler*/ )
+void DummySocket::dispatch(nx::utils::MoveOnlyFunc<void()> /*handler*/ )
 {
 }
 
@@ -185,8 +185,9 @@ void DummySocket::sendAsync( const nx::Buffer& /*buf*/,
 {
 }
 
-void DummySocket::registerTimer( unsigned int /*timeoutMs*/,
-                                     std::function<void()> /*handler*/ )
+void DummySocket::registerTimer(
+    unsigned int /*timeoutMs*/,
+    nx::utils::MoveOnlyFunc<void()> /*handler*/ )
 {
 }
 

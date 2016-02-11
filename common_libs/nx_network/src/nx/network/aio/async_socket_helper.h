@@ -34,7 +34,7 @@ public:
 
     virtual ~BaseAsyncSocketImplHelper() {}
 
-    void post( std::function<void()>&& handler )
+    void post(nx::utils::MoveOnlyFunc<void()> handler)
     {
         if( m_socket->impl()->terminated.load( std::memory_order_relaxed ) > 0 )
             return;
@@ -42,7 +42,7 @@ public:
         nx::network::SocketGlobals::aioService().post( m_socket, std::move(handler) );
     }
 
-    void dispatch( std::function<void()>&& handler )
+    void dispatch(nx::utils::MoveOnlyFunc<void()> handler)
     {
         if( m_socket->impl()->terminated.load( std::memory_order_relaxed ) > 0 )
             return;
@@ -256,7 +256,7 @@ public:
         nx::network::SocketGlobals::aioService().watchSocketNonSafe( &lk, this->m_socket, aio::etWrite, this );
     }
 
-    void registerTimer( unsigned int timeoutMs, std::function<void()> handler )
+    void registerTimer( unsigned int timeoutMs, nx::utils::MoveOnlyFunc<void()> handler )
     {
         if( this->m_socket->impl()->terminated.load( std::memory_order_relaxed ) > 0 )
             return;
@@ -338,7 +338,7 @@ private:
     const nx::Buffer* m_sendBuffer;
     int m_sendBufPos;
 
-    std::function<void()> m_timerHandler;
+    nx::utils::MoveOnlyFunc<void()> m_timerHandler;
     size_t m_registerTimerCallCounter;
 
     bool* m_connectSendHandlerTerminatedFlag;

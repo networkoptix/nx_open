@@ -231,12 +231,12 @@ void CloudStreamSocket::cancelIOSync(aio::EventType eventType)
         m_socketDelegate->cancelIOSync(eventType);
 }
 
-void CloudStreamSocket::post(std::function<void()> handler)
+void CloudStreamSocket::post(nx::utils::MoveOnlyFunc<void()> handler)
 {
     m_aioThreadBinder->post(std::move(handler));
 }
 
-void CloudStreamSocket::dispatch(std::function<void()> handler)
+void CloudStreamSocket::dispatch(nx::utils::MoveOnlyFunc<void()> handler)
 {
     m_aioThreadBinder->dispatch(std::move(handler));
 }
@@ -281,7 +281,7 @@ void CloudStreamSocket::sendAsync(
 
 void CloudStreamSocket::registerTimer(
     unsigned int timeoutMs,
-    std::function<void()> handler)
+    nx::utils::MoveOnlyFunc<void()> handler)
 {
     m_aioThreadBinder->registerTimer(timeoutMs, std::move(handler));
 }

@@ -58,8 +58,8 @@ public:
     virtual void cancelIOSync(aio::EventType eventType) override;
 
     //!Implementation of AbstractSocket::*
-    virtual void post( std::function<void()> handler ) override;
-    virtual void dispatch( std::function<void()> handler ) override;
+    virtual void post(nx::utils::MoveOnlyFunc<void()> handler ) override;
+    virtual void dispatch(nx::utils::MoveOnlyFunc<void()> handler ) override;
 
     //!Implementation of AbstractCommunicatingSocket::*
     virtual void connectAsync(
@@ -73,7 +73,7 @@ public:
         std::function<void(SystemError::ErrorCode, size_t)> handler) override;
     virtual void registerTimer(
         unsigned int timeoutMs,
-        std::function<void()> handler) override;
+        nx::utils::MoveOnlyFunc<void()> handler) override;
 
     virtual aio::AbstractAioThread* getAioThread() override;
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;

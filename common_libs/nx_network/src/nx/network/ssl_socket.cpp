@@ -1411,7 +1411,7 @@ int QnSSLSocket::asyncSendInternal(
 
 void QnSSLSocket::registerTimer(
     unsigned int timeoutMs,
-    std::function<void()> handler )
+    nx::utils::MoveOnlyFunc<void()> handler )
 {
     Q_D(QnSSLSocket);
     return d->wrappedSocket->registerTimer( timeoutMs, std::move(handler) );
@@ -1590,7 +1590,7 @@ void QnMixedSSLSocket::sendAsync(
 
 void QnMixedSSLSocket::registerTimer(
     unsigned int timeoutMs,
-    std::function<void()> handler )
+    nx::utils::MoveOnlyFunc<void()> handler )
 {
     Q_D(QnMixedSSLSocket);
     return d->wrappedSocket->registerTimer( timeoutMs, std::move(handler) );

@@ -52,8 +52,8 @@ public:
     virtual bool setKeepAlive( boost::optional< KeepAliveOptions > info ) override;
     virtual bool getKeepAlive( boost::optional< KeepAliveOptions >* result ) const override;
 
-    virtual void post( std::function<void()> handler ) override;
-    virtual void dispatch( std::function<void()> handler ) override;
+    virtual void post( nx::utils::MoveOnlyFunc<void()> handler ) override;
+    virtual void dispatch(nx::utils::MoveOnlyFunc<void()> handler ) override;
 
     virtual void connectAsync( const SocketAddress& addr,
                                std::function<void( SystemError::ErrorCode )> handler ) override;
@@ -64,8 +64,9 @@ public:
     virtual void sendAsync( const nx::Buffer& buf,
                             std::function<void( SystemError::ErrorCode, size_t )> handler ) override;
 
-    virtual void registerTimer( unsigned int timeoutMs,
-                                std::function<void()> handler ) override;
+    virtual void registerTimer(
+        unsigned int timeoutMs,
+        nx::utils::MoveOnlyFunc<void()> handler ) override;
 
     virtual aio::AbstractAioThread* getAioThread() override;
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;

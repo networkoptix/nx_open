@@ -147,7 +147,7 @@ public:
     }
     virtual void connect(
         std::chrono::milliseconds timeout,
-        std::function<void(
+        nx::utils::MoveOnlyFunc<void(
             SystemError::ErrorCode errorCode,
             std::unique_ptr<AbstractTunnelConnection>)> handler) override
     {
@@ -155,7 +155,7 @@ public:
         {
             m_aioThreadBinder.registerTimer(
                 m_connectTimeout->count(),
-                [this, handler]()   //TODO #ak #msvc2015 move to lambda
+                [this, handler{std::move(handler)}]() mutable
                 {
                     connectInternal(std::move(handler));
                 });
@@ -180,12 +180,12 @@ private:
     boost::optional<std::chrono::milliseconds> m_connectTimeout;
 
     void connectInternal(
-        std::function<void(
+        nx::utils::MoveOnlyFunc<void(
             SystemError::ErrorCode errorCode,
             std::unique_ptr<AbstractTunnelConnection>)> handler)
     {
         m_aioThreadBinder.post(
-            [this, handler]()
+            [this, handler{move(handler)}]()
             {
                 if (m_canSucceedEvent)
                     m_canSucceedEvent->get_future().wait();
