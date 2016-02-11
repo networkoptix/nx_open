@@ -6,95 +6,116 @@
 
 class QAbstractVideoSurface;
 
-namespace nx
+namespace nx {
+namespace media {
+
+class PlayerPrivate;
+
+/*
+* Main facade class for media player.
+*/
+class Player : public QObject
 {
-	namespace media
+	Q_OBJECT
+
+public:
+	enum class State
 	{
+		Stopped,
+		Playing,
+		Paused
+	};
 
-		class PlayerPrivate;
-		class Player : public QObject
-		{
-			Q_OBJECT
+	enum class MediaStatus
+	{
+		Unknown,
+		NoMedia,
+		Loading,
+		Loaded,
 
-		public:
-			enum class State
-			{
-				Stopped,
-				Playing,
-				Paused
-			};
+		Stalled,
+		Buffering,
+		Buffered,
+		EndOfMedia,
+		InvalidMedia
+	};
 
-			enum class MediaStatus
-			{
-				Unknown,
-				NoMedia,
-				Loading,
-				Loaded,
-				Stalled,
-				Buffering,
-				Buffered,
-				EndOfMedia,
-				InvalidMedia
-			};
+	Q_ENUMS(State)
+	Q_ENUMS(MediaStatus)
 
-			Q_ENUMS(State)
-			Q_ENUMS(MediaStatus)
-
-			/*
-			* Source url to open.
-			* In order to support multiserver archive, media player supports non standard URL scheme 'camera'. Example to open: "camera://<camera_id>"
-			*/
-			Q_PROPERTY(QUrl source READ source WRITE setSource NOTIFY sourceChanged)
+	/*
+	* Source url to open.
+	* In order to support multiserver archive, media player supports non standard URL scheme 'camera'. Example to open: "camera://media/<camera_id>"
+	*/
+	Q_PROPERTY(QUrl source READ source WRITE setSource NOTIFY sourceChanged)
 			
-			Q_PROPERTY(QAbstractVideoSurface * videoSurface READ videoSurface WRITE setVideoSurface NOTIFY videoSurfaceChanged)
+    /*
+    * Video source to render decoded data
+    */
+    Q_PROPERTY(QAbstractVideoSurface * videoSurface READ videoSurface WRITE setVideoSurface NOTIFY videoSurfaceChanged)
 
-			Q_PROPERTY(qint64 position READ position WRITE setPosition NOTIFY positionChanged)
+    /*
+    * Current playback UTC position at msec
+    */
+    Q_PROPERTY(qint64 position READ position WRITE setPosition NOTIFY positionChanged)
 
-			Q_PROPERTY(State playbackState READ playbackState NOTIFY playbackStateChanged)
-			Q_PROPERTY(MediaStatus mediaStatus READ mediaStatus NOTIFY mediaStatusChanged)
+    /*
+    * State defined by user action
+    */
+	Q_PROPERTY(State playbackState READ playbackState NOTIFY playbackStateChanged)
 
-			// todo: rename it 
-			Q_PROPERTY(bool reconnectOnPlay READ reconnectOnPlay WRITE setReconnectOnPlay NOTIFY reconnectOnPlayChanged)
+    /*
+    * Current state defined by internal implementation. For example, if player has got 'play' command 'mediaStatus'
+    * will be changed thought 'buffering' to 'playing' state
+    */
+	Q_PROPERTY(MediaStatus mediaStatus READ mediaStatus NOTIFY mediaStatusChanged)
 
-		public:
-			Player(QObject *parent = nullptr);
-			~Player();
+    /*
+    * Either player on archive or live position
+    */
+    Q_PROPERTY(bool liveMode READ liveMode NOTIFY liveModeChanged)
 
-			State playbackState() const;
+public:
+	Player(QObject *parent = nullptr);
+	~Player();
 
-			MediaStatus mediaStatus() const;
+	State playbackState() const;
 
-			QUrl source() const;
+	MediaStatus mediaStatus() const;
 
-			QAbstractVideoSurface *videoSurface() const;
+	QUrl source() const;
 
-			qint64 position() const;
-			void setPosition(qint64 value);
+	QAbstractVideoSurface *videoSurface() const;
 
-			bool reconnectOnPlay() const;
-			void setReconnectOnPlay(bool reconnectOnPlay);
+	qint64 position() const;
+	void setPosition(qint64 value);
 
-		public slots:
-			void play();
-			void pause();
-			void stop();
+	bool reconnectOnPlay() const;
+	void setReconnectOnPlay(bool reconnectOnPlay);
 
-			void setSource(const QUrl &source);
-			void setVideoSurface(QAbstractVideoSurface *videoSurface);
+	bool liveMode() const;
 
-		signals:
-			void playbackStateChanged();
-			void sourceChanged();
-			void videoSurfaceChanged();
-			void positionChanged();
-			void playbackFinished();
-			void mediaStatusChanged();
-			void reconnectOnPlayChanged();
+public slots:
+	void play();
+	void pause();
+	void stop();
 
-		private:
-			QScopedPointer<PlayerPrivate> d_ptr;
-			Q_DECLARE_PRIVATE(Player);
-		};
+	void setSource(const QUrl &source);
+	void setVideoSurface(QAbstractVideoSurface *videoSurface);
 
-	}
+signals:
+	void playbackStateChanged();
+	void sourceChanged();
+	void videoSurfaceChanged();
+	void positionChanged();
+	void playbackFinished();
+	void mediaStatusChanged();
+	void reconnectOnPlayChanged();
+	void liveModeChanged();
+private:
+	QScopedPointer<PlayerPrivate> d_ptr;
+	Q_DECLARE_PRIVATE(Player);
+};
+
+}
 }

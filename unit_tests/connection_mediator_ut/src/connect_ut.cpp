@@ -23,7 +23,7 @@
 #include <peer_registrator.h>
 
 #include "mediator_mocks.h"
-#include "socket_globals_holder.h"
+#include <test_support/socket_globals_holder.h>
 
 
 namespace nx {

@@ -76,6 +76,7 @@ public:
     void setServerDiscoveryPingTimeout(std::chrono::seconds newInterval) const;
 
     std::chrono::seconds serverDiscoveryAliveCheckTimeout() const;
+    bool isTimeSynchronizationEnabled() const;
 
     bool arecontRtspEnabled() const;
     void setArecontRtspEnabled(bool newVal) const;
@@ -113,6 +114,7 @@ private:
     QnResourcePropertyAdaptor<QString> *m_disabledVendorsAdaptor;
     QnResourcePropertyAdaptor<bool> *m_serverAutoDiscoveryEnabledAdaptor;
     QnResourcePropertyAdaptor<bool> *m_updateNotificationsEnabledAdaptor;
+    QnResourcePropertyAdaptor<bool> *m_timeSynchronizationEnabledAdaptor;
     QnResourcePropertyAdaptor<Qn::CameraBackupQualities> *m_backupQualitiesAdaptor;
     QnResourcePropertyAdaptor<bool> *m_backupNewCamerasByDefaultAdaptor;
     QnResourcePropertyAdaptor<QnOptionalBool> *m_statisticsAllowedAdaptor;

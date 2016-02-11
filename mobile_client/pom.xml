@@ -21,10 +21,10 @@
         <!--Global libs-->
         <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc</ffmpeg.libs>
         <qt.libs>core qml quick concurrent network sql multimedia xml</qt.libs>
-        <global.libs>-lappserver2 -lcommon -lnx_streaming -lclient.core</global.libs>
+        <global.libs>-lappserver2 -lnx_streaming -lcommon -lclient.core</global.libs>
 
         <!--Specific os libs used-->
-        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -ld3d9 -lopenal32 -lssleay32 -llibeay32 -lsigar</windows.oslibs>
+        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -ld3d9 -lopenal32 -lssleay32 -llibeay32</windows.oslibs>
         <windows.oslibs.release/>
         <windows.oslibs.debug/>
         <linux.oslibs>${ffmpeg.libs} -lssl -lcrypto -lmp3lame -lz -lopenal -lX11 -lXfixes -lGL -lGLU -ltermcap -lsigar -lfaac -lquazip</linux.oslibs>

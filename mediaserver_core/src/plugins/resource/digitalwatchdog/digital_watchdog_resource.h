@@ -26,6 +26,7 @@ public:
     ~QnDigitalWatchdogResource();
 
     virtual QnAbstractPtzController *createPtzControllerInternal() override;
+    CLSimpleHTTPClient httpClient() const;
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
     virtual bool loadAdvancedParametersTemplate(QnCameraAdvancedParams &params) const override;

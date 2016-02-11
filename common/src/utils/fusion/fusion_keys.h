@@ -69,22 +69,19 @@ QN_FUSION_DEFINE_KEY(optional)
 #define QN_FUSION_PROPERTY_IS_TYPED_FOR_optional true
 #define QN_FUSION_PROPERTY_TYPE_FOR_optional bool
 
-
-
 /**
  * \internal
  *
  * Produces a <tt>QStringLiteral</tt> from the given character literals.
- * Works around a MSVC bug that prevents us to simply use <tt>QStringLiteral("a" "b")</tt>.
+ * Works around a MSVC pre-2015 bug that prevents us to simply use <tt>QStringLiteral("a" "b")</tt>.
  */
-#define QN_FUSION_LIT_CAT(A, B)                                                 \
+#define QN_FUSION_LIT_CAT(A, B) \
     QN_FUSION_LIT_CAT_I(A, B)
 
-#ifdef _MSC_VER
+#if _MSC_VER < 1900 //< MSVC pre-2015
 #   define QN_FUSION_LIT_CAT_I(A, B) QStringLiteral(A BOOST_PP_CAT(L, B))
 #else
 #   define QN_FUSION_LIT_CAT_I(A, B) QStringLiteral(A B)
 #endif
-
 
 #endif // QN_FUSION_KEYS_H

@@ -54,6 +54,7 @@ QnVideowallScreenWidget::QnVideowallScreenWidget(QnWorkbenchContext *context, Qn
     updateButtonsVisibility();
     updateTitleText();
     setInfoVisible(true, false);
+    updateInfoText();
 }
 
 QnVideowallScreenWidget::~QnVideowallScreenWidget() {
