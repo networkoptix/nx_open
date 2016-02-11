@@ -10,7 +10,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/network/socket_global.h>
 
-#include "socket_globals_holder.h"
+#include <test_support/socket_globals_holder.h>
 
 
 int main( int argc, char **argv )
