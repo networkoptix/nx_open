@@ -6,6 +6,8 @@
 
 #include <array>
 
+#include <nx/utils/uuid.h>
+
 #include <core/resource/resource_fwd.h>
 #include <core/resource/camera_bookmark_fwd.h>
 #include <camera/camera_bookmarks_manager_fwd.h>
@@ -28,7 +30,7 @@ class QnTimeSlider;
 class QnTimeScrollBar;
 class QnResourceWidget;
 class QnMediaResourceWidget;
-class QnAbstractArchiveReader;
+class QnAbstractArchiveStreamReader;
 class QnThumbnailsLoader;
 class QnCameraDataManager;
 class QnCachingCameraDataLoader;

@@ -2,7 +2,7 @@
 
 #include <QtCore/QThread>
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
@@ -38,37 +38,25 @@ QnAppserverResourceProcessor::~QnAppserverResourceProcessor()
 
 void QnAppserverResourceProcessor::processResources(const QnResourceList &resources)
 {
-    for (const QnResourcePtr& resource: resources)
-    {
-        QnVirtualCameraResource* cameraResource = dynamic_cast<QnVirtualCameraResource*>(resource.data());
-        if (cameraResource == nullptr)
-            continue;
-
-        //Q_ASSERT(qnResPool->getAllNetResourceByPhysicalId(cameraResource->getPhysicalId()).isEmpty());
-
-        cameraResource->setParentId(m_serverId);
-    }
+    for (const QnVirtualCameraResourcePtr& camera: resources.filtered<QnVirtualCameraResource>())
+        camera->setParentId(m_serverId);
 
     // we've got two loops to avoid double call of double sending addCamera
-
-    for (const QnResourcePtr& resource: resources)
+    for (const QnVirtualCameraResourcePtr& camera: resources.filtered<QnVirtualCameraResource>())
     {
-        QnVirtualCameraResourcePtr cameraResource = resource.dynamicCast<QnVirtualCameraResource>();
-        if (cameraResource.isNull())
-            continue;
-
         // previous comment: camera MUST be in the pool already;
         // but now (new version) camera NOT in resource pool!
 
-        if (cameraResource->isManuallyAdded() && !QnResourceDiscoveryManager::instance()->containManualCamera(cameraResource->getUrl()))
+        if (camera->isManuallyAdded() && !QnResourceDiscoveryManager::instance()->containManualCamera(camera->getUrl()))
             continue; //race condition. manual camera just deleted
-        if( cameraResource->hasFlags(Qn::search_upd_only) && !qnResPool->getResourceById(cameraResource->getId()))
+        if( camera->hasFlags(Qn::search_upd_only) && !qnResPool->getResourceById(camera->getId()))
             continue;   //ignoring newly discovered camera
 
-        QString uniqueId = cameraResource->getUniqueId();
-        cameraResource->setId(cameraResource->uniqueIdToId(uniqueId));
-        addNewCamera(cameraResource);
+        QString uniqueId = camera->getUniqueId();
+        camera->setId(camera->uniqueIdToId(uniqueId));
+        addNewCamera(camera);
     }
+
 }
 
 void QnAppserverResourceProcessor::addNewCamera(const QnVirtualCameraResourcePtr& cameraResource)
@@ -158,11 +146,11 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
 
     propertyDictionary->saveParams( cameraResource->getId() );
     QnResourcePtr existCamRes = qnResPool->getResourceById(cameraResource->getId());
-    if (existCamRes && existCamRes->getTypeId() != cameraResource->getTypeId()) 
+    if (existCamRes && existCamRes->getTypeId() != cameraResource->getTypeId())
         qnResPool->removeResource(existCamRes);
     QnCommonMessageProcessor::instance()->updateResource(cameraResource);
 
-    if (!existCamRes && m_defaultUserAttrs) 
+    if (!existCamRes && m_defaultUserAttrs)
     {
         QnCameraUserAttributesPtr userAttrCopy(new QnCameraUserAttributes(*m_defaultUserAttrs.data()));
         if (!userAttrCopy->scheduleDisabled) {

@@ -8,7 +8,7 @@
 
 namespace Qn {
 
-    /** 
+    /**
      * Type of a node in resource tree displayed to the user.
      */
     enum NodeType {
@@ -17,6 +17,7 @@ namespace Qn {
         ServersNode,            /**< Root node for remote resources. */
         OtherSystemsNode,       /**< Root node for remote resources which are incompatible with current system and cannot be used. */
         UsersNode,              /**< Root node for user resources. */
+        WebPagesNode,           /**> Root node for webpages. */
 
         BastardNode,            /**< Root node for hidden resources. */
 
@@ -35,10 +36,10 @@ namespace Qn {
 
 
     /**
-     * Role of an item on the scene. 
-     * 
+     * Role of an item on the scene.
+     *
      * Note that at any time there may exist no more than one item for each role.
-     * 
+     *
      * Also note that the order is important. Code in <tt>workbench.cpp</tt> relies on it.
      */
     enum ItemRole {
@@ -50,15 +51,15 @@ namespace Qn {
         CentralRole,        /**< Item is 'central' --- zoomed, raised, single selected, or focused. */
         ItemRoleCount
     };
-    
+
 
     /**
      * Item-specific flags. Are part of item's serializable state.
      */
     enum ItemFlag {
         Pinned = 0x1,                       /**< Item is pinned to the grid. Items are not pinned by default. */
-        PendingGeometryAdjustment = 0x2     /**< Geometry adjustment is pending. 
-                                             * Center of item's combined geometry defines desired position. 
+        PendingGeometryAdjustment = 0x2     /**< Geometry adjustment is pending.
+                                             * Center of item's combined geometry defines desired position.
                                              * If item's rect is invalid, but not empty (width or height are negative), then any position is OK. */
     };
     Q_DECLARE_FLAGS(ItemFlags, ItemFlag)
@@ -67,7 +68,7 @@ namespace Qn {
 
     /**
      * Layer of a graphics item on the scene.
-     * 
+     *
      * Workbench display presents convenience functions for moving items between layers
      * and guarantees that items from the layers with higher numbers are always
      * displayed on top of those from the layers with lower numbers.
@@ -95,7 +96,7 @@ namespace Qn {
      */
     enum MarginFlag {
         /** Viewport margins affect how viewport size is bounded. */
-        MarginsAffectSize = 0x1,        
+        MarginsAffectSize = 0x1,
 
         /** Viewport margins affect how viewport position is bounded. */
         MarginsAffectPosition = 0x2
@@ -121,40 +122,12 @@ namespace Qn {
     Q_DECLARE_FLAGS(ResourceSavingFlags, ResourceSavingFlag)
     Q_DECLARE_OPERATORS_FOR_FLAGS(ResourceSavingFlags)
 
-
-    Q_DECLARE_FLAGS(Permissions, Permission)
-    Q_DECLARE_OPERATORS_FOR_FLAGS(Permissions)
-
     /**
-     * \param permissions               Permission flags containing some deprecated values.
-     * \returns                         Permission flags with deprecated values replaced with new ones.
-     */
-    inline Qn::Permissions undeprecate(Qn::Permissions permissions) {
-        Qn::Permissions result = permissions;
-
-        if(result & Qn::DeprecatedEditCamerasPermission) {
-            result &= ~Qn::DeprecatedEditCamerasPermission;
-            result |= Qn::GlobalEditCamerasPermission | Qn::GlobalPtzControlPermission;
-        }
-
-        if(result & Qn::DeprecatedViewExportArchivePermission) {
-            result &= ~Qn::DeprecatedViewExportArchivePermission;
-            result |= Qn::GlobalViewArchivePermission | Qn::GlobalExportPermission;
-        }
-
-        if(result & Qn::GlobalProtectedPermission)
-            result |= Qn::GlobalPanicPermission;
-
-        return result;
-    }
-
-
-    /**
-     * Time display mode. 
+     * Time display mode.
      */
     enum TimeMode {
-        ServerTimeMode, 
-        ClientTimeMode  
+        ServerTimeMode,
+        ClientTimeMode
     };
 
     /**
@@ -188,8 +161,8 @@ namespace Qn {
     };
 
     /**
-     * Result of a frame rendering operation. 
-     * 
+     * Result of a frame rendering operation.
+     *
      * Note that the order is important here --- higher values are prioritized
      * when calculating cumulative status of several rendering operations.
      */
@@ -236,8 +209,8 @@ namespace Qn {
         LightModeNoLayoutBackground = 0x0200,           /**< Disable layout background. */
         LightModeNoZoomWindows      = 0x0400,           /**< Disable zoom windows. */
 
-        LightModeActiveX            = LightModeSmallWindow | LightModeNoSceneBackground 
-                                    | LightModeNoNotifications | LightModeNoShadows 
+        LightModeActiveX            = LightModeSmallWindow | LightModeNoSceneBackground
+                                    | LightModeNoNotifications | LightModeNoShadows
                                     | LightModeNoNewWindow | LightModeNoLayoutBackground
                                     | LightModeNoZoomWindows,
         LightModeVideoWall          = LightModeNoSceneBackground | LightModeNoNotifications | LightModeNoShadows /*| LightModeNoAnimation*/,
@@ -271,48 +244,44 @@ namespace Qn {
 } // namespace Qn
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::ItemRole)(Qn::TimeMode)(Qn::NodeType), 
+    (Qn::ItemRole)(Qn::TimeMode)(Qn::NodeType),
     (metatype)
     )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::ClientSkin)(Qn::BackgroundAnimationMode)(Qn::ImageBehaviour), 
+    (Qn::ClientSkin)(Qn::BackgroundAnimationMode)(Qn::ImageBehaviour),
     (metatype)(lexical)(datastream)
     )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::LightModeFlags), 
+    (Qn::LightModeFlags),
     (metatype)(numeric)
     )
 
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::Permission)(Qn::Permissions), 
-    (lexical)
-    )
 
 //TODO: #GDM #2.4 move back to client_module_functions.cpp. See commit a0edb9aa5abede1b5c9ab1c9ce52cc912286d090.
 //Looks like problem is in gcc-4.8.1
 
 inline QDataStream &operator<<(QDataStream &stream, const Qn::BackgroundAnimationMode &value) {
-    return stream << static_cast<int>(value);                                   
+    return stream << static_cast<int>(value);
 }
 
-inline QDataStream &operator>>(QDataStream &stream, Qn::BackgroundAnimationMode &value) {              
-    int tmp;                                                                    
-    stream >> tmp;                                                              
-    value = static_cast<Qn::BackgroundAnimationMode>(tmp);                                             
-    return stream;                                                              
+inline QDataStream &operator>>(QDataStream &stream, Qn::BackgroundAnimationMode &value) {
+    int tmp;
+    stream >> tmp;
+    value = static_cast<Qn::BackgroundAnimationMode>(tmp);
+    return stream;
 }
 
 inline QDataStream &operator<<(QDataStream &stream, const Qn::ImageBehaviour &value) {
-    return stream << static_cast<int>(value);                                   
+    return stream << static_cast<int>(value);
 }
 
-inline QDataStream &operator>>(QDataStream &stream, Qn::ImageBehaviour &value) {              
-    int tmp;                                                                    
-    stream >> tmp;                                                              
-    value = static_cast<Qn::ImageBehaviour>(tmp);                                             
-    return stream;                                                              
+inline QDataStream &operator>>(QDataStream &stream, Qn::ImageBehaviour &value) {
+    int tmp;
+    stream >> tmp;
+    value = static_cast<Qn::ImageBehaviour>(tmp);
+    return stream;
 }
 
 #endif // QN_CLIENT_GLOBALS_H

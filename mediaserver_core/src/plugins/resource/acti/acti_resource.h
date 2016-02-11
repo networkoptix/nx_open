@@ -4,16 +4,16 @@
 #ifdef ENABLE_ACTI
 
 #include <QtCore/QMap>
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include "core/resource/security_cam_resource.h"
 #include "core/resource/camera_resource.h"
-#include "core/datapacket/media_data_packet.h"
+#include "nx/streaming/media_data_packet.h"
 #include "utils/common/request_param.h"
-#include "utils/common/timermanager.h"
-#include "utils/network/http/asynchttpclient.h"
-#include "utils/network/simple_http_client.h"
-#include <utils/network/http/multipartcontentparser.h>
+#include <nx/utils/timermanager.h>
+#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/simple_http_client.h>
+#include <nx/network/http/multipartcontentparser.h>
 
 
 class QnActiPtzController;
@@ -34,7 +34,7 @@ public:
     ~QnActiResource();
 
     //!Implementation of QnNetworkResource::checkIfOnlineAsync
-    virtual bool checkIfOnlineAsync( std::function<void(bool)>&& completionHandler ) override;
+    virtual void checkIfOnlineAsync( std::function<void(bool)> completionHandler ) override;
     
     virtual QString getDriverName() const override;
 

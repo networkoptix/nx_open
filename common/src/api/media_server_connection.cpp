@@ -3,7 +3,7 @@
 #include <cstring> /* For std::strstr. */
 
 #include <QtCore/QSharedPointer>
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 #include <QtCore/QUrl>
 #include <QtCore/QUrlQuery>
 #include <QtGui/QImage>
@@ -31,7 +31,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/request_param.h>
 #include <utils/common/model_functions.h>
-#include <utils/network/http/httptypes.h>
+#include <nx/network/http/httptypes.h>
 
 #include <api/app_server_connection.h>
 #include <event_log/events_serializer.h>
@@ -463,7 +463,7 @@ int QnMediaServerConnection::searchCameraAsyncStop(const QnUuid &processUuid, QO
     return sendAsyncGetRequest(CameraSearchStopObject, params, QN_STRINGIZE_TYPE(QnManualCameraSearchReply), target, slot);
 }
 
-int QnMediaServerConnection::addCameraAsync(const QnManualCameraSearchCameraList& cameras, const QString &username, const QString &password, QObject *target, const char *slot) {
+int QnMediaServerConnection::addCameraAsync(const QnManualResourceSearchList& cameras, const QString &username, const QString &password, QObject *target, const char *slot) {
     QnRequestParamList params;
     for (int i = 0; i < cameras.size(); i++){
         params << QnRequestParam(lit("url") + QString::number(i), cameras[i].url);
@@ -883,5 +883,4 @@ int QnMediaServerConnection::getBookmarksAsync(const QnGetBookmarksRequestData &
 
 int QnMediaServerConnection::getBookmarkTagsAsync(const QnGetBookmarkTagsRequestData &request, QObject *target, const char *slot) {
     return sendAsyncGetRequest(ec2BookmarkTagsObject, request.toParams(), QN_STRINGIZE_TYPE(QnCameraBookmarkTagList), target, slot);
-
 }

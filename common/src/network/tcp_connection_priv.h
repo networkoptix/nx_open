@@ -7,8 +7,8 @@
 #include "tcp_connection_processor.h"
 
 #include "utils/common/byte_array.h"
-#include "utils/network/http/httptypes.h"
-#include "utils/network/http/httpstreamreader.h"
+#include <nx/network/http/httptypes.h>
+#include <nx/network/http/httpstreamreader.h>
 
 
 static const int TCP_READ_BUFFER_SIZE = 65536;

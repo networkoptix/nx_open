@@ -8,7 +8,9 @@
 #include <map>
 #include <limits>
 
+#ifndef Q_MOC_RUN
 #include <boost/preprocessor/tuple/enum.hpp>
+#endif
 
 #include <QtCore/QSize>
 #include <QtCore/QSizeF>
@@ -16,7 +18,7 @@
 #include <QtCore/QRectF>
 #include <QtCore/QPoint>
 #include <QtCore/QPointF>
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 #include <QtCore/QUrl>
 #include <QtCore/QtNumeric>
 #include <QtCore/QJsonArray>
@@ -36,7 +38,7 @@
 #include "json_macros.h"
 #include "lexical_functions.h"
 
-QN_FUSION_DECLARE_FUNCTIONS(qint32, (json)) /* Needed for (de)serialize_numeric_enum below. */ 
+QN_FUSION_DECLARE_FUNCTIONS(qint32, (json)) /* Needed for (de)serialize_numeric_enum below. */
 
 
 inline void serialize(QnJsonContext *, const QJsonValue &value, QJsonValue *target) {
@@ -49,7 +51,7 @@ inline bool deserialize(QnJsonContext *, const QJsonValue &value, QJsonValue *ta
 }
 
 
-/* Situation with doubles is more complicated than with other built-in types 
+/* Situation with doubles is more complicated than with other built-in types
  * as we have to take non-finite numbers into account. */
 inline void serialize(QnJsonContext *, const double &value, QJsonValue *target) {
     *target = QJsonValue(value);
@@ -60,9 +62,9 @@ inline bool deserialize(QnJsonContext *, const QJsonValue &value, double *target
         *target = value.toDouble();
         return true;
     } else if(value.type() == QJsonValue::Null) {
-        /* Strictly speaking, that's either a nan, or a +-inf, 
+        /* Strictly speaking, that's either a nan, or a +-inf,
          * but at this point we cannot say what it really was. */
-        *target = qQNaN(); 
+        *target = qQNaN();
         return true;
     } else {
         return false;
@@ -71,7 +73,7 @@ inline bool deserialize(QnJsonContext *, const QJsonValue &value, double *target
 
 
 /* Floats are (de)serialized via conversion to/from double.
- * Note that we don't do any additional boundary checks for floats as we do for 
+ * Note that we don't do any additional boundary checks for floats as we do for
  * integers as it doesn't really make much sense. */
 inline void serialize(QnJsonContext *ctx, const float &value, QJsonValue *target) {
     ::serialize(ctx, static_cast<double>(value), target); /* Note the direct call instead of invocation through QJson. */
@@ -126,7 +128,7 @@ namespace QJsonDetail {
         Element element;
         if(!QJson::deserialize(ctx, value, &element))
             return false;
-        
+
         QnCollection::insert(*target, boost::end(*target), std::move(element));
         return true;
     }
@@ -154,7 +156,7 @@ namespace QJsonDetail {
         if(value.type() != QJsonValue::Array)
             return false;
         QJsonArray array = value.toArray();
-        
+
         QnCollection::clear(*target);
         QnCollection::reserve(*target, array.size());
 
@@ -198,7 +200,7 @@ namespace QJsonDetail {
     void serialize_integer(QnJsonContext *ctx, const T &value, QJsonValue *target) {
         ::serialize(ctx, static_cast<double>(value), target); /* Note the direct call instead of invocation through QJson. */
     }
-    
+
     template<class T>
     bool deserialize_integer(QnJsonContext *ctx, const QJsonValue &value, T *target) {
         double tmp;
@@ -365,7 +367,7 @@ namespace QJsonDetail {
     bool deserialize_enum(QnJsonContext *ctx, const QJsonValue &value, T *target, typename std::enable_if<QnLexical::is_numerically_serializable<T>::value>::type * = NULL) {
         QnSerialization::check_enum_binary<T>();
 
-        /* Older version did it with lexical functions, so we have to support it. 
+        /* Older version did it with lexical functions, so we have to support it.
          * Plus there are types that are numeric, but can also be deserialized from a string. */
         if(value.type() == QJsonValue::String)
             return QnLexical::deserialize(value.toString(), target);

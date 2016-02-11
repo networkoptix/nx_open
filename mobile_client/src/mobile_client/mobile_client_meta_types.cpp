@@ -20,6 +20,7 @@
 #include "mobile_client/mobile_client_settings.h"
 #include "camera/camera_chunk_provider.h"
 #include "camera/active_camera_thumbnail_loader.h"
+#include <nx/media/media_player.h>
 
 void QnMobileClientMetaTypes::initialize() {
     registerMetaTypes();
@@ -49,6 +50,7 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterType<QnTimeline>("com.networkoptix.qml", 1, 0, "QnTimelineView");
     qmlRegisterType<QnCameraChunkProvider>("com.networkoptix.qml", 1, 0, "QnCameraChunkProvider");
     qmlRegisterType<QnMjpegPlayer>("com.networkoptix.qml", 1, 0, "QnMjpegPlayer");
+    qmlRegisterType<nx::media::Player>("com.networkoptix.qml", 1, 0, "QnPlayer");
     qmlRegisterType<QnActiveCameraThumbnailLoader>("com.networkoptix.qml", 1, 0, "QnActiveCameraThumbnailLoader");
 
     qmlRegisterSingletonType(QUrl(lit("qrc:///qml/QnTheme.qml")), "com.networkoptix.qml", 1, 0, "QnTheme");

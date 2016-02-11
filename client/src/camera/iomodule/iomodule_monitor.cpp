@@ -1,5 +1,5 @@
 #include "iomodule_monitor.h"
-#include "utils/common/log.h"
+#include <nx/utils/log/log.h>
 #include "core/resource/camera_resource.h"
 #include "core/resource/media_server_resource.h"
 #include "utils/serialization/json.h"
@@ -75,9 +75,7 @@ bool QnIOModuleMonitor::open()
     httpClient->setUserName( QnAppServerConnectionFactory::url().userName().toLower() );
     httpClient->setUserPassword( QnAppServerConnectionFactory::url().password() );
 
-
-    if (!httpClient->doGet( requestUrl ))
-        return false;
+    httpClient->doGet( requestUrl );
     m_httpClient = std::move( httpClient );
     return true;
 }

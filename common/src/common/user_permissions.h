@@ -1,15 +1,14 @@
-#ifndef QN_USER_PERMISSIONS_H
-#define QN_USER_PERMISSIONS_H
+#pragma once
 
-#ifndef QN_NO_NAMESPACES
 namespace Qn {
-#endif
 
     /**
      * Flags describing the actions permitted for the user to do with the
      * selected resource.
      */
     enum Permission {
+        NoPermissions                           = 0x00000000,   /**< No access */
+
         /* Generic permissions. */
         NoPermissions                           = 0x00000000,
 
@@ -67,8 +66,17 @@ namespace Qn {
         AllPermissions                          = 0xFFFFFFFF
     };
 
-#ifndef QN_NO_NAMESPACES
-} // namespace Qn
-#endif
+    Q_DECLARE_FLAGS(Permissions, Permission)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(Permissions)
 
-#endif //QN_USER_PERMISSIONS_H
+    /**
+     * \param permissions               Permission flags containing some deprecated values.
+     * \returns                         Permission flags with deprecated values replaced with new ones.
+     */
+    Qn::Permissions undeprecate(Qn::Permissions permissions);
+
+    Qn::Permissions operator-(Qn::Permissions minuend, Qn::Permissions subrahend);
+    Qn::Permissions operator-(Qn::Permissions minuend, Qn::Permission subrahend);
+    Qn::Permissions operator-(Qn::Permission minuend, Qn::Permission subrahend);
+
+} // namespace Qn

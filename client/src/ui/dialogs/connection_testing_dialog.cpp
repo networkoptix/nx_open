@@ -5,8 +5,6 @@
 
 #include <QtConcurrent/QtConcurrentRun>
 
-#include <QtNetwork/QTcpSocket>
-
 #include <QtWidgets/QDataWidgetMapper>
 #include <QtWidgets/QMessageBox>
 #include <QtWidgets/QPushButton>

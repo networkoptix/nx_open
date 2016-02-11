@@ -6,7 +6,6 @@
 #include <QVariant>
 
 #include <base/types.h>
-#include <base/constants.h>
 
 namespace rtu
 {

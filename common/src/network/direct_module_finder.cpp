@@ -12,11 +12,11 @@
 #include <rest/server/json_rest_result.h>
 
 #include <utils/common/app_info.h>
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 
 #include <utils/common/model_functions.h>
-#include <utils/network/http/asynchttpclient.h>
-#include <utils/network/http/async_http_client_reply.h>
+#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/http/async_http_client_reply.h>
 
 #include <utils/common/app_info.h>
 
@@ -139,8 +139,7 @@ void QnDirectModuleFinder::activateRequests() {
         std::unique_ptr<QnAsyncHttpClientReply> reply( new QnAsyncHttpClientReply(client, this) );
         connect(reply.get(), &QnAsyncHttpClientReply::finished, this, &QnDirectModuleFinder::at_reply_finished);
 
-        if (!client->doGet(url))
-            return;
+        client->doGet(url);
 
         Q_ASSERT_X(!m_activeRequests.contains(url), "Duplicate request issued", Q_FUNC_INFO);
         m_activeRequests.insert(url, reply.release());

@@ -13,12 +13,12 @@
 #include <api/global_settings.h>
 #include <common/common_module.h>
 #include <utils/common/concurrent.h>
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/synctime.h>
-#include <utils/common/timermanager.h>
-#include <utils/network/http/httpclient.h>
-#include <utils/network/nettools.h>
-#include <utils/network/ping.h>
+#include <nx/utils/timermanager.h>
+#include <nx/network/http/httpclient.h>
+#include <nx/network/nettools.h>
+#include <nx/network/ping.h>
 
 #include "core/resource/resource_command_processor.h"
 #include "core/resource/resource_command.h"
@@ -181,14 +181,15 @@ QnResourcePtr QnPlAreconVisionResource::updateResource()
 bool QnPlAreconVisionResource::ping()
 {
     QnConcurrent::QnFuture<bool> result(1);
-    if( !checkIfOnlineAsync( [&result]( bool onlineOrNot ) {
-            result.setResultAt(0, onlineOrNot); } ) )
-        return false;
+    checkIfOnlineAsync(
+        [&result]( bool onlineOrNot ) {
+            result.setResultAt(0, onlineOrNot);
+        } );
     result.waitForFinished();
     return result.resultAt(0);
 }
 
-bool QnPlAreconVisionResource::checkIfOnlineAsync( std::function<void(bool)>&& completionHandler )
+void QnPlAreconVisionResource::checkIfOnlineAsync( std::function<void(bool)> completionHandler )
 {
     //checking that camera is alive and on its place
     const QString& urlStr = getUrl();
@@ -234,12 +235,7 @@ bool QnPlAreconVisionResource::checkIfOnlineAsync( std::function<void(bool)>&& c
              this, httpReqCompletionHandler,
              Qt::DirectConnection );
 
-    if( !httpClientCaptured->doGet( url ) )
-    {
-        httpClientCaptured->disconnect( nullptr, (const char*)nullptr );
-        return false;
-    }
-    return true;
+    httpClientCaptured->doGet( url );
 }
 
 CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
@@ -384,9 +380,10 @@ bool QnPlAreconVisionResource::setRelayOutputState(
     const auto emptyOutputDoneHandler = [](SystemError::ErrorCode, int, nx_http::BufferType) {};
 
     if (activate && (autoResetTimeoutMS > 0))
-        return nx_http::downloadFileAsync(url, activateWithAutoResetDoneHandler);
+        nx_http::downloadFileAsync(url, activateWithAutoResetDoneHandler);
     else
-        return nx_http::downloadFileAsync(url, emptyOutputDoneHandler);
+        nx_http::downloadFileAsync(url, emptyOutputDoneHandler);
+    return true;
 }
 
 int QnPlAreconVisionResource::totalMdZones() const
@@ -735,7 +732,8 @@ bool QnPlAreconVisionResource::startInputPortMonitoringAsync(std::function<void(
                 inputPortStateRequestDone(std::move(client));
             },
             Qt::DirectConnection);
-    return m_relayInputClient->doGet(url);
+    m_relayInputClient->doGet(url);
+    return true;
 }
 
 void QnPlAreconVisionResource::stopInputPortMonitoringAsync()

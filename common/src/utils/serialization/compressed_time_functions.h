@@ -7,14 +7,16 @@
 #include <set>
 #include <map>
 
+#ifndef Q_MOC_RUN
 #include <boost/preprocessor/tuple/enum.hpp>
 #include <boost/preprocessor/cat.hpp>
+#endif
 
 #ifndef QN_NO_QT
 #   include <QtCore/QString>
 #   include <QtCore/QByteArray>
 #   include <QtCore/QUrl>
-#   include <utils/common/uuid.h>
+#   include <nx/utils/uuid.h>
 #endif
 
 #include <utils/common/collection.h>
@@ -82,7 +84,7 @@ namespace QnCompressedTimeDetail {
         int size = 0;
         if (!stream->readSizeFromStream(&size))
             return false;
-        
+
         QnCollection::clear(*target);
         if(size >= 0)
             QnCollection::reserve(*target, size);

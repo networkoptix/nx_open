@@ -2,7 +2,7 @@
 
 #include <ui/graphics/items/generic/viewport_bound_widget.h>
 
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 
 class QnScrollableOverlayWidgetPrivate;
 

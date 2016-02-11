@@ -5,7 +5,7 @@
 #include <QtCore/QString>
 #include <QtCore/QMap>
 #include <QtCore/QFile>
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 #include <QtCore/QTimer>
 #include <QtCore/QTime>
 
@@ -19,7 +19,7 @@
 #include "business/business_fwd.h"
 #include "utils/db/db_helper.h"
 #include "storage_db.h"
-#include "utils/common/uuid.h"
+#include <nx/utils/uuid.h>
 #include <set>
 #include "api/model/rebuild_archive_reply.h"
 #include "api/model/recording_stats_reply.h"

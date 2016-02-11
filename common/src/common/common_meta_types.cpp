@@ -2,10 +2,10 @@
 
 #include <QtCore/QMetaType>
 
-#include <utils/network/mac_address.h>
-#include <utils/network/socket_common.h>
+#include <nx/network/mac_address.h>
+#include <nx/network/socket_common.h>
 #include <utils/common/request_param.h>
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 #include <utils/common/ldap.h>
 #include <utils/common/optional.h>
 #include <utils/serialization/json_functions.h>
@@ -40,6 +40,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/media_server_user_attributes.h>
 #include <core/resource/camera_history.h>
+#include <core/resource/webpage_resource.h>
 
 #include <core/resource/camera_bookmark_fwd.h>
 #include <core/resource/camera_bookmark.h>
@@ -60,7 +61,7 @@
 #include <core/ptz/media_dewarping_params.h>
 #include <core/ptz/item_dewarping_params.h>
 
-#include <core/datapacket/abstract_data_packet.h>
+#include <nx/streaming/abstract_data_packet.h>
 
 #include <core/onvif/onvif_config_data.h>
 
@@ -126,6 +127,9 @@ void QnCommonMetaTypes::initialize() {
 
     qRegisterMetaType<QnUserResourceList>();
     qRegisterMetaType<QnVideoWallResourceList>();
+
+    qRegisterMetaType<QnWebPageResourcePtr>();
+    qRegisterMetaType<QnWebPageResourceList>();
 
     qRegisterMetaType<QnCameraUserAttributes>();
     qRegisterMetaType<QnCameraUserAttributesPtr>();
@@ -200,7 +204,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnManualCameraSearchReply>();
     qRegisterMetaType<QnServersReply>();
     qRegisterMetaType<QnStatisticsData>();
-    qRegisterMetaType<QnManualCameraSearchSingleCamera>();
+    qRegisterMetaType<QnManualResourceSearchEntry>();
 
     qRegisterMetaType<QnPtzPreset>();
     qRegisterMetaType<QnPtzPresetList>();

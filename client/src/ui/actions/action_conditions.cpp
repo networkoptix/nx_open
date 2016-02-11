@@ -32,6 +32,7 @@
 
 #include <recording/time_period.h>
 
+#include <ui/graphics/items/resource/button_ids.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/workbench/watchers/workbench_schedule_watcher.h>
@@ -209,7 +210,7 @@ Qn::ActionVisibility QnDisplayInfoActionCondition::check(const QnResourceWidgetL
         if(!widget)
             continue;
 
-        if (!(widget->visibleButtons() & QnResourceWidget::InfoButton))
+        if (!(widget->visibleButtons() & Qn::InfoButton))
             continue;
 
         if(m_hasRequiredDisplayInfoValue) {
@@ -316,7 +317,7 @@ bool QnResourceActionCondition::checkOne(QnResourceWidget *widget) {
 
 
 Qn::ActionVisibility QnResourceRemovalActionCondition::check(const QnResourceList &resources) {
-    foreach(const QnResourcePtr &resource, resources) {
+    for(const QnResourcePtr &resource: resources) {
         if(!resource)
             continue; /* OK to remove. */
 
@@ -332,6 +333,9 @@ Qn::ActionVisibility QnResourceRemovalActionCondition::check(const QnResourceLis
         if(resource->hasFlags(Qn::remote_server)) // TODO: #Elric move this to permissions.
             if(resource->getStatus() == Qn::Offline)
                 continue; /* Can remove only if offline. */
+
+        if (resource->hasFlags(Qn::web_page))
+            continue;
 
         return Qn::InvisibleAction;
     }
@@ -467,7 +471,8 @@ Qn::ActionVisibility QnAdjustVideoActionCondition::check(const QnResourceWidgetL
         return Qn::InvisibleAction;
 
     QnResourceWidget *widget = widgets[0];
-    if(widget->resource()->flags() & (Qn::server | Qn::videowall))
+    if((widget->resource()->flags() & (Qn::server | Qn::videowall))
+        || (widget->resource()->flags().testFlag(Qn::web_page)))
         return Qn::InvisibleAction;
 
     QString url = widget->resource()->getUrl().toLower();
@@ -697,17 +702,20 @@ Qn::ActionVisibility QnOpenInCurrentLayoutActionCondition::check(const QnResourc
     bool isExportedLayout = snapshotManager()->isFile(layout);
 
     foreach (const QnResourcePtr &resource, resources) {
-        //TODO: #GDM #Common refactor duplicated code
+        //TODO: #GDM #Common refactor duplicated code VMS-1725
         bool isServer = resource->hasFlags(Qn::server);
 
         if (isServer && QnMediaServerResource::isFakeServer(resource))
             continue;
 
+        bool nonVideo = isServer || resource->hasFlags(Qn::web_page);
+
         bool isMediaResource = resource->hasFlags(Qn::media);
         bool isLocalResource = resource->hasFlags(Qn::url | Qn::local | Qn::media)
             && !resource->getUrl().startsWith(QnLayoutFileStorageResource::layoutPrefix());
-        bool allowed = isServer || isMediaResource;
-        bool forbidden = isExportedLayout && (isServer || isLocalResource);
+
+        bool allowed = nonVideo || isMediaResource;
+        bool forbidden = isExportedLayout && (nonVideo || isLocalResource);
         if(allowed && !forbidden)
             return Qn::EnabledAction;
     }
@@ -715,10 +723,15 @@ Qn::ActionVisibility QnOpenInCurrentLayoutActionCondition::check(const QnResourc
 }
 
 Qn::ActionVisibility QnOpenInNewEntityActionCondition::check(const QnResourceList &resources) {
+    //TODO: #GDM #Common refactor duplicated code VMS-1725
     foreach(const QnResourcePtr &resource, resources) {
         if (resource->hasFlags(Qn::desktop_camera))
             continue;
-        if (resource->hasFlags(Qn::media) || resource->hasFlags(Qn::server))
+
+        if (resource->hasFlags(Qn::media) || resource->hasFlags(Qn::web_page))
+            return Qn::EnabledAction;
+
+        if (resource->hasFlags(Qn::server) && !QnMediaServerResource::isFakeServer(resource))
             return Qn::EnabledAction;
     }
 

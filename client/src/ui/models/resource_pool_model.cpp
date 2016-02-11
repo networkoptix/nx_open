@@ -15,6 +15,7 @@
 #include <core/resource/media_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/webpage_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/videowall_item.h>
 #include <core/resource/videowall_item_index.h>
@@ -68,12 +69,19 @@ namespace {
 // QnResourcePoolModel :: contructors, destructor and helpers.
 // -------------------------------------------------------------------------- //
 QnResourcePoolModel::QnResourcePoolModel(Scope scope, QObject *parent):
-    base_type(parent), 
+    base_type(parent),
     QnWorkbenchContextAware(parent),
     m_urlsShown(true),
     m_scope(scope)
 {
-    m_rootNodeTypes << Qn::LocalNode << Qn::UsersNode << Qn::ServersNode << Qn::OtherSystemsNode << Qn::RootNode << Qn::BastardNode;
+    m_rootNodeTypes
+        << Qn::LocalNode
+        << Qn::UsersNode
+        << Qn::ServersNode
+        << Qn::WebPagesNode
+        << Qn::OtherSystemsNode
+        << Qn::RootNode
+        << Qn::BastardNode;
 
     /* Create top-level nodes. */
     foreach(Qn::NodeType t, m_rootNodeTypes) {
@@ -81,7 +89,7 @@ QnResourcePoolModel::QnResourcePoolModel(Scope scope, QObject *parent):
         m_allNodes.append(m_rootNodes[t]);
     }
 
-    
+
     Qn::NodeType parentNodeType = scope == FullScope ? Qn::RootNode : Qn::BastardNode;
     Qn::NodeType rootNodeType = rootNodeTypeForScope(m_scope);
 
@@ -99,7 +107,7 @@ QnResourcePoolModel::QnResourcePoolModel(Scope scope, QObject *parent):
     connect(qnCommon,           &QnCommonModule::readOnlyChanged,                   this,   &QnResourcePoolModel::rebuildTree, Qt::QueuedConnection);
     connect(QnGlobalSettings::instance(),   &QnGlobalSettings::serverAutoDiscoveryChanged,  this,   &QnResourcePoolModel::at_serverAutoDiscoveryEnabledChanged);
 
-    QnResourceList resources = resourcePool()->getResources(); 
+    QnResourceList resources = resourcePool()->getResources();
 
     rebuildTree();
 
@@ -303,7 +311,14 @@ QnResourcePoolModelNode *QnResourcePoolModel::expectedParent(QnResourcePoolModel
         if (m_scope == CamerasScope)
             return m_rootNodes[Qn::BastardNode];
         else
-        return m_rootNodes[Qn::RootNode];
+            return m_rootNodes[Qn::RootNode];
+    }
+
+    if (node->resourceFlags().testFlag(Qn::web_page))
+    {
+        if (m_scope == FullScope)
+            return m_rootNodes[Qn::WebPagesNode];
+        return m_rootNodes[Qn::BastardNode];
     }
 
     QnResourcePtr parentResource = resourcePool()->getResourceById(node->resource()->getParentId());
@@ -565,7 +580,7 @@ bool QnResourcePoolModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction
                 continue; /* Can drop only layout resources on user. */
 
             menu()->trigger(
-                Qn::SaveLayoutAsAction, 
+                Qn::SaveLayoutAsAction,
                 QnActionParameters(layout).
                 withArgument(Qn::UserResourceRole, user).
                 withArgument(Qn::ResourceNameRole, layout->getName())
@@ -639,7 +654,6 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
         updateParent(camera);
     }
 
-
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
     if (server) {
         connect(server,     &QnMediaServerResource::redundancyChanged,  this,   &QnResourcePoolModel::at_server_redundancyChanged);
@@ -677,6 +691,11 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
         foreach(const QnVideoWallMatrix &matrix, videoWall->matrices()->getItems())
             at_videoWall_matrixAddedOrChanged(videoWall, matrix);
     }
+
+    if (QnWebPageResourcePtr webPage = resource.dynamicCast<QnWebPageResource>())
+        m_rootNodes[Qn::WebPagesNode]->update();
+
+
 }
 
 void QnResourcePoolModel::at_resPool_resourceRemoved(const QnResourcePtr &resource) {
@@ -700,6 +719,9 @@ void QnResourcePoolModel::at_resPool_resourceRemoved(const QnResourcePtr &resour
     m_itemNodesByResource.remove(resource);
     m_recorderHashByResource.remove(resource);
     Q_ASSERT(!m_resourceNodeByResource.contains(resource));
+
+    if (QnWebPageResourcePtr webPage = resource.dynamicCast<QnWebPageResource>())
+        m_rootNodes[Qn::WebPagesNode]->update();
 }
 
 
@@ -707,6 +729,7 @@ void QnResourcePoolModel::rebuildTree() {
     m_rootNodes[Qn::LocalNode]->update();
     m_rootNodes[Qn::ServersNode]->update();
     m_rootNodes[Qn::UsersNode]->update();
+    m_rootNodes[Qn::WebPagesNode]->update();
     m_rootNodes[Qn::OtherSystemsNode]->update();
 
     foreach(QnResourcePoolModelNode *node, m_resourceNodeByResource)
@@ -715,7 +738,7 @@ void QnResourcePoolModel::rebuildTree() {
 
 void QnResourcePoolModel::at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &resource) {
     QnVideoWallResourcePtr videowall = resource->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>();
-    QnResourcePoolModelNode *node = videowall 
+    QnResourcePoolModelNode *node = videowall
         ? this->node(videowall)
         : this->node(resource);
 

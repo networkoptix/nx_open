@@ -19,7 +19,7 @@
 
 #include <utils/common/systemerror.h>
 #include <utils/fs/file.h>
-#include <utils/network/http/asynchttpclient.h>
+#include <nx/network/http/asynchttpclient.h>
 
 #include "rdir_synchronization_operation.h"
 

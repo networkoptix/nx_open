@@ -149,7 +149,7 @@
              <string notr="true"/>
             </property>
             <property name="maxLength">
-             <number>20</number>
+             <number>50</number>
             </property>
            </widget>
           </item>

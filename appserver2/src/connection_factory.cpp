@@ -7,13 +7,13 @@
 
 #include <functional>
 
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include <network/http_connection_listener.h>
 #include <nx_ec/ec_proto_version.h>
 #include <utils/common/concurrent.h>
-#include <utils/network/http/auth_tools.h>
-#include <utils/network/simple_http_client.h>
+#include <nx/network/http/auth_tools.h>
+#include <nx/network/simple_http_client.h>
 
 #include <rest/active_connections_rest_handler.h>
 
@@ -565,6 +565,11 @@ namespace ec2
         registerUpdateFuncHandler<ApiIdData>(p, ApiCommand::removeVideowall);
         registerUpdateFuncHandler<ApiVideowallControlMessageData>(p, ApiCommand::videowallControl);
 
+		registerGetFuncHandler<std::nullptr_t, ApiWebPageDataList>( p, ApiCommand::getWebPages );
+        registerUpdateFuncHandler<ApiWebPageData>( p, ApiCommand::saveWebPage );
+        //AbstractWebPageManager::remove
+        registerUpdateFuncHandler<ApiIdData>( p, ApiCommand::removeWebPage );
+
         /**%apidoc GET /ec2/getLayouts
          * Return list of user layout
          * %param[default] format
@@ -812,10 +817,10 @@ namespace ec2
         registerGetFuncHandler<ApiStoredFilePath, qint64>(p, ApiCommand::dumpDatabaseToFile);
 
         //AbstractECConnectionFactory
-        registerFunctorHandler<ApiLoginData, QnConnectionInfo>(p, ApiCommand::connect,
-            std::bind(&Ec2DirectConnectionFactory::fillConnectionInfo, this, _1, _2));
-        registerFunctorHandler<ApiLoginData, QnConnectionInfo>(p, ApiCommand::testConnection,
-            std::bind(&Ec2DirectConnectionFactory::fillConnectionInfo, this, _1, _2));
+        registerFunctorWithResponseHandler<ApiLoginData, QnConnectionInfo>( p, ApiCommand::connect,
+            std::bind( &Ec2DirectConnectionFactory::fillConnectionInfo, this, _1, _2, _3 ) );
+        registerFunctorWithResponseHandler<ApiLoginData, QnConnectionInfo>( p, ApiCommand::testConnection,
+            std::bind( &Ec2DirectConnectionFactory::fillConnectionInfo, this, _1, _2, _3) );
 
         /**%apidoc GET /ec2/getSettings
          * Read general system settings such as email address
@@ -1076,7 +1081,8 @@ namespace ec2
 
     ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
         const ApiLoginData& loginInfo,
-        QnConnectionInfo* const connectionInfo )
+        QnConnectionInfo* const connectionInfo,
+        nx_http::Response* response)
     {
         connectionInfo->version = qnCommon->engineVersion();
         connectionInfo->brand = isCompatibilityMode() ? QString() : QnAppInfo::productNameShort();
@@ -1088,7 +1094,10 @@ namespace ec2
         connectionInfo->allowSslConnections = m_sslEnabled;
         connectionInfo->nxClusterProtoVersion = nx_ec::EC2_PROTO_VERSION;
         connectionInfo->ecDbReadOnly = Settings::instance()->dbReadOnly();
-
+        if (response)
+            connectionInfo->effectiveUserName =
+                nx_http::getHeaderValue(response->headers, Qn::EFFECTIVE_USER_NAME_HEADER_NAME);
+        
 		if (!loginInfo.clientInfo.id.isNull())
         {
 			auto clientInfo = loginInfo.clientInfo;
@@ -1185,14 +1194,30 @@ namespace ec2
             new QueryHttpHandler2<InputDataType, OutputDataType>(cmd, &m_serverQueryProcessor) );
     }
 
-    template<class InputType, class OutputType, class HandlerType>
+    template<class InputType, class OutputType>
     void Ec2DirectConnectionFactory::registerFunctorHandler(
         QnRestProcessorPool* const restProcessorPool,
         ApiCommand::Value cmd,
-        HandlerType handler )
+        std::function<ErrorCode(InputType, OutputType*)> handler )
     {
         restProcessorPool->registerHandler(
             lit("ec2/%1").arg(ApiCommand::toString(cmd)),
-            new FlexibleQueryHttpHandler<InputType, OutputType, HandlerType>(cmd, handler) );
+            new FlexibleQueryHttpHandler<InputType, OutputType>(
+                cmd,
+                std::move(handler)));
+    }
+
+    //!Registers handler which is able to modify HTTP response
+    template<class InputType, class OutputType>
+    void Ec2DirectConnectionFactory::registerFunctorWithResponseHandler(
+        QnRestProcessorPool* const restProcessorPool,
+        ApiCommand::Value cmd,
+        std::function<ErrorCode(InputType, OutputType*, nx_http::Response*)> handler)
+    {
+        restProcessorPool->registerHandler(
+            lit("ec2/%1").arg(ApiCommand::toString(cmd)),
+            new FlexibleQueryHttpHandler<InputType, OutputType>(
+                cmd,
+                std::move(handler)));
     }
 }

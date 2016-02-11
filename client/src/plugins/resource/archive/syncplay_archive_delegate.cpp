@@ -4,7 +4,7 @@
 
 #include "syncplay_wrapper.h"
 
-QnSyncPlayArchiveDelegate::QnSyncPlayArchiveDelegate(QnAbstractArchiveReader* reader, QnArchiveSyncPlayWrapper* syncWrapper, 
+QnSyncPlayArchiveDelegate::QnSyncPlayArchiveDelegate(QnAbstractArchiveStreamReader* reader, QnArchiveSyncPlayWrapper* syncWrapper, 
                                                      QnAbstractArchiveDelegate* ownerDelegate):
     m_reader(reader),
     m_syncWrapper(syncWrapper), 

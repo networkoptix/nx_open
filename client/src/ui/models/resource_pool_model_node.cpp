@@ -38,6 +38,7 @@ QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, Qn:
            type == Qn::ServersNode ||
            type == Qn::OtherSystemsNode ||
            type == Qn::UsersNode ||
+           type == Qn::WebPagesNode ||
            type == Qn::RootNode ||
            type == Qn::BastardNode ||
            type == Qn::SystemNode ||
@@ -49,7 +50,7 @@ QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, Qn:
         break;
     case Qn::LocalNode:
         m_displayName = m_name = tr("Local");
-        m_icon = qnResIconCache->icon(QnResourceIconCache::Local);
+        m_icon = qnResIconCache->icon(QnResourceIconCache::LocalServer);
         break;
     case Qn::ServersNode:
         m_displayName = m_name = tr("System");
@@ -63,6 +64,11 @@ QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, Qn:
     case Qn::UsersNode:
         m_displayName = m_name = tr("Users");
         m_icon = qnResIconCache->icon(QnResourceIconCache::Users);
+        break;
+    case Qn::WebPagesNode:
+        m_displayName = m_name = tr("Web Pages");
+        m_icon = qnResIconCache->icon(QnResourceIconCache::WebPages);
+        m_bastard = true; /* Invisible by default until has children. */
         break;
     case Qn::BastardNode:
         m_displayName = m_name = QLatin1String("_HIDDEN_"); /* This node is always hidden. */
@@ -141,8 +147,8 @@ void QnResourcePoolModelNode::clear() {
     setParent(NULL);
 
     if (m_type == Qn::ItemNode ||
-        m_type == Qn::ResourceNode || 
-        m_type == Qn::VideoWallItemNode || 
+        m_type == Qn::ResourceNode ||
+        m_type == Qn::VideoWallItemNode ||
         m_type == Qn::EdgeNode)
     {
         setResource(QnResourcePtr());
@@ -152,8 +158,8 @@ void QnResourcePoolModelNode::clear() {
 void QnResourcePoolModelNode::setResource(const QnResourcePtr &resource) {
     assert(
         m_type == Qn::ItemNode ||
-        m_type == Qn::ResourceNode || 
-        m_type == Qn::VideoWallItemNode || 
+        m_type == Qn::ResourceNode ||
+        m_type == Qn::VideoWallItemNode ||
         m_type == Qn::EdgeNode);
 
     if(m_resource == resource)
@@ -223,7 +229,7 @@ void QnResourcePoolModelNode::update() {
     } else if (m_type == Qn::VideoWallMatrixNode) {
         m_status = Qn::Online;
         m_searchString = QString();
-        m_flags = 0; 
+        m_flags = 0;
         m_icon = qnResIconCache->icon(QnResourceIconCache::VideoWallMatrix);
         foreach (const QnVideoWallResourcePtr &videowall, qnResPool->getResources<QnVideoWallResource>()) {
             if (!videowall->matrices()->hasItem(m_uuid))
@@ -302,6 +308,9 @@ bool QnResourcePoolModelNode::calculateBastard() const {
     case Qn::OtherSystemsNode:
         return !QnGlobalSettings::instance()->isServerAutoDiscoveryEnabled() || m_children.isEmpty();
 
+    case Qn::WebPagesNode:
+        return m_children.isEmpty();
+
     case Qn::RecorderNode:
     case Qn::SystemNode:
         return m_children.isEmpty();
@@ -309,14 +318,14 @@ bool QnResourcePoolModelNode::calculateBastard() const {
     case Qn::ResourceNode:
         /* Hide resource nodes without resource. */
         if (!m_resource)
-            return true; 
-        
+            return true;
+
         /* Hide non-readable resources. */
         if (!(m_model->accessController()->permissions(m_resource) & Qn::ReadPermission))
-            return true; 
+            return true;
 
         if(QnLayoutResourcePtr layout = m_resource.dynamicCast<QnLayoutResource>()) {
-            /* Hide local layouts that are not file-based. */ 
+            /* Hide local layouts that are not file-based. */
             if (m_model->snapshotManager()->isLocal(layout) && !m_model->snapshotManager()->isFile(layout))
                 return true;
 
@@ -337,10 +346,10 @@ bool QnResourcePoolModelNode::calculateBastard() const {
             if ((m_flags & Qn::local_server) == Qn::local_server)
                 return true;
 
-            //TODO: #Elric hack hack hack
+            //TODO: #Elric hack hack hack VMS-1725
             if ((m_flags & Qn::local_media) == Qn::local_media && m_resource->getUrl().startsWith(QLatin1String("layout://")))
                 return true;
-            
+
             /* Hide edge servers, camera will be displayed instead. */
             if (QnMediaServerResource::isHiddenServer(m_resource) &&
                 !qnResPool->getResourcesByParentId(m_resource->getId()).filtered<QnVirtualCameraResource>().isEmpty())
@@ -353,14 +362,14 @@ bool QnResourcePoolModelNode::calculateBastard() const {
     case Qn::EdgeNode:
         /* Hide resource nodes without resource. */
         if (!m_resource)
-            return true; 
+            return true;
 
         /* Hide non-readable resources. */
-        return !(m_model->accessController()->permissions(m_resource) & Qn::ReadPermission); 
+        return !(m_model->accessController()->permissions(m_resource) & Qn::ReadPermission);
 
     case Qn::UsersNode:
         return !m_model->accessController()->hasGlobalPermissions(Qn::GlobalEditUsersPermission);
-        
+
     case Qn::ServersNode:
         return !m_model->accessController()->hasGlobalPermissions(Qn::GlobalEditServersPermissions);
 
@@ -473,12 +482,12 @@ Qt::ItemFlags QnResourcePoolModelNode::flags(int column) const {
     case Qn::ResourceNode:
     case Qn::EdgeNode:
     case Qn::ItemNode:
-        if(m_flags & (Qn::media | Qn::layout | Qn::server | Qn::user | Qn::videowall))
+        if(m_flags & (Qn::media | Qn::layout | Qn::server | Qn::user | Qn::videowall | Qn::web_page))
             result |= Qt::ItemIsDragEnabled;
         break;
     case Qn::VideoWallItemNode: //TODO: #GDM #VW drag of empty item on scene should create new layout
     case Qn::RecorderNode:
-        result |= Qt::ItemIsDragEnabled; 
+        result |= Qt::ItemIsDragEnabled;
         break;
     default:
         break;
@@ -520,8 +529,8 @@ QVariant QnResourcePoolModelNode::data(int role, int column) const {
         break;
     case Qn::ItemUuidRole:
         if (
-            m_type == Qn::ItemNode 
-            || m_type == Qn::VideoWallItemNode 
+            m_type == Qn::ItemNode
+            || m_type == Qn::VideoWallItemNode
             || m_type == Qn::VideoWallMatrixNode
             )
             return QVariant::fromValue<QnUuid>(m_uuid);

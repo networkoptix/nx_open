@@ -6,15 +6,16 @@
 #include <QtCore/QElapsedTimer>
 #include <QCryptographicHash>
 
-#include "utils/network/nettools.h"
+#include <nx/network/nettools.h>
 #include "utils/common/sleep.h"
-#include "utils/network/ping.h"
-#include "utils/network/socket.h"
-#include "utils/network/http/httptypes.h"
-#include "utils/network/rtsp/rtsp_types.h"
+#include <nx/network/ping.h>
+#include <nx/network/socket.h>
+#include <nx/network/socket_global.h>
+#include <nx/network/http/httptypes.h>
+#include <nx/network/rtsp/rtsp_types.h>
 #include "resource_consumer.h"
 #include "utils/common/long_runnable.h"
-#include "utils/network/http/httptypes.h"
+#include <nx/network/http/httptypes.h>
 
 #include <recording/time_period_list.h>
 
@@ -241,9 +242,10 @@ bool QnNetworkResource::ping()
     return sock->connect( getHostAddress(), QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT) );
 }
 
-bool QnNetworkResource::checkIfOnlineAsync( std::function<void(bool)>&& /*completionHandler*/ )
+void QnNetworkResource::checkIfOnlineAsync( std::function<void(bool)> completionHandler )
 {
-    return false;
+    //calling completionHandler(false) in aio_thread
+    nx::network::SocketGlobals::aioService().post(std::bind(completionHandler, false));
 }
 
 QnTimePeriodList QnNetworkResource::getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel) {

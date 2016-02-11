@@ -15,8 +15,7 @@
 
 #include <database/server_db.h>
 
-#include "camera/camera_pool.h"
-#include "decoders/video/ffmpeg.h"
+#include <camera/camera_pool.h>
 
 #include <recorder/recording_manager.h>
 #include <recorder/storage_manager.h>
@@ -24,18 +23,18 @@
 #include <media_server/serverutil.h>
 
 #include <utils/math/math.h>
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include "camera/get_image_helper.h"
 #include "core/resource_management/resource_properties.h"
 
-#include <QtConcurrent>
+#include <QtConcurrent/QtConcurrent>
 #include <utils/email/email.h>
-#include <nxemail/email_manager_impl.h>
+#include <nx/email/email_manager_impl.h>
 #include "nx_ec/data/api_email_data.h"
-#include <utils/common/timermanager.h>
+#include <nx/utils/timermanager.h>
 #include <core/resource/user_resource.h>
 #include <api/global_settings.h>
-#include <nxemail/mustache/mustache_helper.h>
+#include <nx/email/mustache/mustache_helper.h>
 #include "business/business_strings_helper.h"
 #include <business/actions/system_health_business_action.h>
 #include "core/resource/resource_name.h"
@@ -438,7 +437,8 @@ void QnMServerBusinessRuleProcessor::sendEmailAsync(QnSendMailBusinessActionPtr 
     contextMap[tpDescription] = action->getRuntimeParams().description;
     contextMap[tpSource] = action->getRuntimeParams().resourceName;
 
-    QString messageBody = renderTemplateFromFile(attachmentData.templatePath, contextMap);
+    QString messageBody;
+    renderTemplateFromFile(attachmentData.templatePath, contextMap, &messageBody);
 
     ec2::ApiEmailData data(
         recipients,

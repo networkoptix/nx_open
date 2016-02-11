@@ -17,7 +17,7 @@
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 
-#include <core/dataprovider/abstract_streamdataprovider.h>
+#include <nx/streaming/abstract_stream_data_provider.h>
 
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/layout_resource.h>
@@ -70,6 +70,7 @@
 #include <ui/widgets/resource_browser_widget.h>
 #include <ui/widgets/layout_tab_bar.h>
 #include <ui/widgets/main_window.h>
+#include <ui/widgets/cloud_status_panel.h>
 #include <ui/style/skin.h>
 #include <ui/style/noptix_style.h>
 #include <ui/workaround/qtbug_workaround.h>
@@ -551,9 +552,18 @@ void QnWorkbenchUi::updateControlsVisibility(bool animate) {    // TODO
         return;
     }
 
+    const auto resourceIsWebPage = [this]()
+    {
+        if (!navigator()->currentWidget())
+            return false;
+
+        const auto resource = navigator()->currentWidget()->resource();
+        return (resource && resource->flags().testFlag(Qn::web_page));
+    };
+
     bool sliderVisible =
         navigator()->currentWidget() != NULL &&
-        !(navigator()->currentWidget()->resource()->flags() & (Qn::still_image | Qn::server | Qn::videowall)) &&
+        !(navigator()->currentWidget()->resource()->flags() & (Qn::still_image | Qn::server | Qn::videowall)) && !resourceIsWebPage() &&
         ((accessController()->globalPermissions() & Qn::GlobalViewArchivePermission) || !(navigator()->currentWidget()->resource()->flags() & Qn::live)) &&
         !action(Qn::ToggleTourModeAction)->isChecked();
 
@@ -1425,6 +1435,7 @@ void QnWorkbenchUi::createTitleWidget() {
     m_titleItem->setPos(0.0, 0.0);
     m_titleItem->setClickableButtons(Qt::LeftButton);
     m_titleItem->setProperty(Qn::NoHandScrollOver, true);
+    m_titleItem->setZValue(10.0);
 
     QnSingleEventSignalizer *titleMenuSignalizer = new QnSingleEventSignalizer(this);
     titleMenuSignalizer->setEventType(QEvent::GraphicsSceneContextMenu);
@@ -1472,6 +1483,10 @@ void QnWorkbenchUi::createTitleWidget() {
     m_windowButtonsWidget = new GraphicsWidget();
     m_windowButtonsWidget->setLayout(windowButtonsLayout);
 
+    QnCloudStatusPanel *cloudStatusPanel = new QnCloudStatusPanel(context());
+    QGraphicsProxyWidget *cloudStatusPanelProxy = new QnMaskedProxyWidget();
+    cloudStatusPanelProxy->setWidget(cloudStatusPanel);
+
     QGraphicsLinearLayout *titleLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     titleLayout->setContentsMargins(0, 0, 0, 0);
     titleLayout->setSpacing(2);
@@ -1479,6 +1494,8 @@ void QnWorkbenchUi::createTitleWidget() {
     titleLayout->addItem(tabBarWidget);
     titleLayout->setAlignment(tabBarWidget, Qt::AlignBottom);
     titleLayout->setStretchFactor(tabBarWidget, 0x1000);
+    titleLayout->addItem(cloudStatusPanelProxy);
+    titleLayout->setAlignment(cloudStatusPanelProxy, Qt::AlignVCenter);
     m_titleRightButtonsLayout = new QGraphicsLinearLayout();
     m_titleRightButtonsLayout->setContentsMargins(0, 4, 0, 0);
     if (QnScreenRecorder::isSupported())

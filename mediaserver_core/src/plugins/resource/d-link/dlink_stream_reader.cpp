@@ -4,11 +4,11 @@
 
 #include <QtCore/QTextStream>
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/synctime.h>
-#include <utils/network/http/httptypes.h>
+#include <nx/network/http/httptypes.h>
 
-#include "core/datapacket/video_data_packet.h"
+#include "nx/streaming/video_data_packet.h"
 
 extern int getIntParam(const char* pos);
 

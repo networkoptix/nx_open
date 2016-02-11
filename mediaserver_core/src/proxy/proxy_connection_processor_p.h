@@ -1,7 +1,7 @@
 #ifndef __PROXY_CONNECTION_PROCESSOR_PRIV_H_
 #define __PROXY_CONNECTION_PROCESSOR_PRIV_H_
 
-#include "utils/network/socket.h"
+#include <nx/network/socket.h>
 #include "network/tcp_connection_priv.h"
 #include "network/universal_tcp_listener.h"
 

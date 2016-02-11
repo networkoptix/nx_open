@@ -2,6 +2,7 @@
 #define QN_COMMON_GLOBALS_H
 
 #include <cassert>
+#include <limits>
 
 #define __STDC_LIMIT_MACROS //< For compatibility with pre-std C++11.
 #include <cstdint>
@@ -9,6 +10,7 @@
 #include <QtCore/QtGlobal>
 #include <QtCore/QMetaType>
 #include <QtCore/QString>
+#include <QtCore/QStringList>
 
 #include <utils/common/unused.h>
 #include <utils/common/model_functions_fwd.h>
@@ -278,6 +280,7 @@ public:
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Qn::ConnectionRole)
 
+    //TODO: #GDM split to server-only and client-only flags as they are always local
     enum ResourceFlag {
         network                     = 0x1,          /**< Has ip and mac. */
         url                         = 0x2,          /**< Has url, e.g. file name. */
@@ -327,8 +330,10 @@ public:
         local_live_cam = live_cam | local | network,
         server_live_cam = live_cam | remote,// | network,
         server_archive = remote | media | video | audio | streamprovider,
-        ARCHIVE = url | local | media | video | audio | streamprovider,     /**< Local media file. */
-        SINGLE_SHOT = url | local | media | still_image | streamprovider    /**< Local still image file. */
+        local_video = url | local | media | video | audio | streamprovider,     /**< Local media file. */
+        local_image = url | local | media | still_image | streamprovider,    /**< Local still image file. */
+
+        web_page = url | remote,   /**< Web-page resource */
     };
     Q_DECLARE_FLAGS(ResourceFlags, ResourceFlag)
     Q_DECLARE_OPERATORS_FOR_FLAGS(ResourceFlags)
@@ -693,6 +698,7 @@ public:
         CsvFormat           = 3,
         XmlFormat           = 4,
         CompressedPeriodsFormat = 5, // used for chunks data only
+        UrlQueryFormat      = 6,     //will be added in future for parsing url query (e.g., name1=val1&name2=val2)
 
         UnsupportedFormat   = -1
     };
@@ -876,6 +882,9 @@ namespace QnLitDetail { template<int N> void check_string_literal(const char (&)
 #else
 #   define lit(s) QLatin1String(s)
 #endif
+
+template<typename T>
+QString toString( const T& t ) { return t.toString(); }
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::TimePeriodContent)(Qn::Corner),

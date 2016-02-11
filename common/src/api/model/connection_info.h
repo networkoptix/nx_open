@@ -34,9 +34,10 @@ struct QnConnectionInfo {
     //!Transaction message bus protocol version (defined by \a nx_ec::EC2_PROTO_VERSION)
     int nxClusterProtoVersion;
     bool ecDbReadOnly;
+    QString effectiveUserName;
 };
 
-#define QnConnectionInfo_Fields (ecUrl)(version)(compatibilityItems)(ecsGuid)(systemName)(brand)(box)(allowSslConnections)(nxClusterProtoVersion)(ecDbReadOnly)
+#define QnConnectionInfo_Fields (ecUrl)(version)(compatibilityItems)(ecsGuid)(systemName)(brand)(box)(allowSslConnections)(nxClusterProtoVersion)(ecDbReadOnly)(effectiveUserName)
 
 #ifndef QN_NO_QT
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(

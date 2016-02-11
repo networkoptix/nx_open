@@ -4,17 +4,13 @@
 #include <typeinfo>
 
 #include <QtCore/QSet>
-#include <utils/thread/mutex.h>
-#include <utils/thread/wait_condition.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/wait_condition.h>
+#include <utils/common/warnings.h>
 
 #include <common/systemexcept_win32.h>
 #include <common/systemexcept_linux.h>
-
-#if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
-#   include <sys/types.h>
-#   include <linux/unistd.h>
-static pid_t gettid(void) { return syscall(__NR_gettid); }
-#endif
+#include <nx/utils/thread/thread_util.h>
 
 
 // -------------------------------------------------------------------------- //
@@ -113,18 +109,20 @@ static const size_t DEFAULT_THREAD_STACK_SIZE = 128*1024;
 // -------------------------------------------------------------------------- //
 // QnLongRunnable
 // -------------------------------------------------------------------------- //
-QnLongRunnable::QnLongRunnable(): 
+QnLongRunnable::QnLongRunnable( bool isTrackedByPool ):
     m_needStop(false),
     m_onPause(false),
     m_systemThreadId(0)
 {
     DEBUG_CODE(m_type = NULL);
 
-    if(QnLongRunnablePool *pool = QnLongRunnablePool::instance()) {
-        m_pool = pool->d;
-        m_pool->createdNotify(this);
-    } else {
-        qnWarning("QnLongRunnablePool instance does not exist, lifetime of this runnable will not be tracked.");
+    if(isTrackedByPool) {
+        if(QnLongRunnablePool *pool = QnLongRunnablePool::instance()) {
+            m_pool = pool->d;
+            m_pool->createdNotify(this);
+        //} else {
+        //    qnWarning("QnLongRunnablePool instance does not exist, lifetime of this runnable will not be tracked.");
+        }
     }
 
     connect(this, SIGNAL(started()),    this, SLOT(at_started()), Qt::DirectConnection);
@@ -166,7 +164,7 @@ void QnLongRunnable::pauseDelay() {
         m_semaphore.tryAcquire(1, 50);
 }
 
-std::uintptr_t QnLongRunnable::systemThreadId() const {
+uintptr_t QnLongRunnable::systemThreadId() const {
     return m_systemThreadId;
 }
 
@@ -177,16 +175,9 @@ void QnLongRunnable::initSystemThreadId() {
     m_systemThreadId = currentThreadSystemId();
 }
 
-std::uintptr_t QnLongRunnable::currentThreadSystemId()
+uintptr_t QnLongRunnable::currentThreadSystemId()
 {
-#if defined(Q_OS_LINUX)
-    /* This one is purely for debugging purposes.
-    * QThread::currentThreadId is implemented via pthread_self,
-    * which is not an identifier you see in GDB. */
-    return gettid();
-#else
-    return reinterpret_cast<std::uintptr_t>(QThread::currentThreadId());
-#endif
+    return ::currentThreadSystemId();
 }
 
 void QnLongRunnable::smartSleep(int ms) {

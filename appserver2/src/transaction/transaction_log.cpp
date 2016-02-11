@@ -7,7 +7,7 @@
 #include "common/common_module.h"
 #include "database/db_manager.h"
 #include "transaction.h"
-#include "utils/common/log.h"
+#include <nx/utils/log/log.h>
 #include "utils/common/synctime.h"
 #include "utils/common/model_functions.h"
 #include "nx_ec/data/api_discovery_data.h"

@@ -3,12 +3,12 @@
     <parent>
         <artifactId>hdwitness</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>2.5.0-SNAPSHOT</version>
+        <version>3.0.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>2.5.0-SNAPSHOT</version>
+    <version>3.0.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>build_environment</artifactId>
     <packaging>pom</packaging>
@@ -31,29 +31,6 @@
             <scope>system</scope>
             <systemPath>${root.dir}/build_variables/pom.xml</systemPath>
         </dependency>
-
-        <!-- <dependency>
-            <groupId>com.google</groupId>
-            <artifactId>protobuf</artifactId>
-            <version>${protobuf.version}</version>
-            <type>tar.gz</type>
-            <classifier>${profile.classifier}-${additional.compiler}</classifier>
-        </dependency> -->
-        <!-- <dependency>
-            <groupId>net.sourceforge</groupId>
-            <artifactId>udt</artifactId>
-            <version>4.11-SNAPSHOT</version>
-            <type>tar.gz</type>
-            <classifier>${profile.classifier}-${additional.compiler}</classifier>
-        </dependency> -->
-        <!--
-        <dependency>
-            <groupId>com.nokia.qt.addons</groupId>
-            <artifactId>qtcolorpicker</artifactId>
-            <version>2.6.1-SNAPSHOT</version>
-            <type>tar.gz</type>
-            <classifier>${platform}</classifier>
-        </dependency>                      -->
     </dependencies>
 
     <profiles>
@@ -133,6 +110,10 @@
                                         <exec dir="${environment.dir}" executable="${environment.dir}/${buildenv.script}" failifexecutionfails="true">
                                             <arg line="${arch} ${toolchain.version} noqt4 qt542"/>
                                         </exec>
+                                        <chmod file="${project.build.directory}/update_artifacts.${script.extension}" perm="755"/>
+                                        <exec dir="${environment.dir}" executable="${project.build.directory}/update_artifacts.${script.extension}" failifexecutionfails="true">
+                                            <arg line=""/>
+                                        </exec>                                        
                                     </target>
                                     <skip>${rsync.skip}</skip>
                                 </configuration>
@@ -187,13 +168,7 @@
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${compiler}</classifier>
                 </dependency>
-                <dependency>
-                    <groupId>net.sourceforge</groupId>
-                    <artifactId>quazip</artifactId>
-                    <version>${quazip.version}</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>
+
             </dependencies>
         </profile>
 
@@ -219,7 +194,7 @@
                     <type>tar.gz</type>
                     <classifier>${platform}-x64</classifier>
                 </dependency>
-                <dependency>
+                <!-- <dependency>
                     <groupId>com.digia</groupId>
                     <version>${qt.version}</version>
                     <artifactId>qt</artifactId>
@@ -232,7 +207,7 @@
                     <artifactId>qt</artifactId>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-x64${compile.options}</classifier>
-                </dependency>
+                </dependency> -->
                 <dependency>
                     <groupId>org.openssl</groupId>
                     <artifactId>openssl</artifactId>
@@ -296,6 +271,13 @@
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${compiler}</classifier>
                 </dependency>
+                <dependency>
+                    <groupId>net.sourceforge</groupId>
+                    <artifactId>quazip</artifactId>
+                    <version>${quazip.version}</version>
+                    <type>tar.gz</type>
+                    <classifier>${profile.classifier}-${arch}-${compiler}</classifier>
+                </dependency>
             </dependencies>
         </profile>
         <profile>
@@ -307,12 +289,48 @@
                 </os>
             </activation>
             <dependencies>
-                <dependency>
+                <!--<dependency>
                     <groupId>com.digia</groupId>
                     <version>${qt.version}</version>
                     <artifactId>qt</artifactId>
                     <type>tar.gz</type>
                     <classifier>${qt.classifier}${compile.options}</classifier>
+                </dependency>-->
+                <dependency>
+                    <groupId>net.sourceforge</groupId>
+                    <artifactId>quazip</artifactId>
+                    <version>${quazip.version}</version>
+                    <type>tar.gz</type>
+                    <classifier>${profile.classifier}-${compiler}</classifier>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>unix-noarm</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                </os>
+                <property>
+                    <name>arch</name>
+                    <value>!arm</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.google</groupId>
+                    <artifactId>gtest</artifactId>
+                    <version>1.7.0-SNAPSHOT</version>
+                    <type>tar.gz</type>
+                    <classifier>${profile.classifier}-${compiler}</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>com.google</groupId>
+                    <artifactId>gmock</artifactId>
+                    <version>1.7.0-SNAPSHOT</version>
+                    <type>tar.gz</type>
+                    <classifier>${profile.classifier}-${compiler}</classifier>
                 </dependency>
             </dependencies>
         </profile>
@@ -347,13 +365,6 @@
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}</classifier>
                 </dependency>
-                <dependency>
-                    <groupId>com.sourceforge.cloudcity</groupId>
-                    <artifactId>bespin</artifactId>
-                    <version>${bespin.version}</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${additional.compiler}</classifier>
-                </dependency>
             </dependencies>
         </profile>
 
@@ -370,13 +381,13 @@
                 </property>
             </activation>
             <dependencies>
-                <dependency>
+                <!-- <dependency>
                     <groupId>${project.groupId}</groupId>
                     <artifactId>appserver</artifactId>
                     <version>2.2.1-SNAPSHOT</version>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}</classifier>
-                </dependency>
+                </dependency>  -->
             </dependencies>
         </profile>
 
@@ -401,21 +412,21 @@
                     <version>${sasl2.version}</version>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>              
+                </dependency>
                 <dependency>
                     <groupId>org.openldap</groupId>
                     <artifactId>openldap</artifactId>
                     <version>${openldap.version}</version>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>              
+                </dependency>
                 <dependency>
                     <groupId>org.cyrus</groupId>
                     <artifactId>sasl2</artifactId>
                     <version>${sasl2.version}</version>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>            
+                </dependency>
                 <dependency>
                     <groupId>org.openssl</groupId>
                     <artifactId>openssl</artifactId>
@@ -467,21 +478,21 @@
                     <version>${sasl2.version}</version>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>              
+                </dependency>
                 <dependency>
                     <groupId>org.openldap</groupId>
                     <artifactId>openldap</artifactId>
                     <version>${openldap.version}</version>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>             
+                </dependency>
                 <dependency>
                     <groupId>org.cyrus</groupId>
                     <artifactId>sasl2</artifactId>
                     <version>${sasl2.version}</version>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>            
+                </dependency>
                 <dependency>
                     <groupId>org.openssl</groupId>
                     <artifactId>openssl</artifactId>
@@ -527,7 +538,7 @@
                     <version>${sasl2.version}</version>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>              
+                </dependency>
                 <dependency>
                     <groupId>org.openldap</groupId>
                     <artifactId>openldap</artifactId>
@@ -541,7 +552,7 @@
                     <version>${sasl2.version}</version>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>            
+                </dependency>
                 <dependency>
                     <groupId>org.ffmpeg</groupId>
                     <artifactId>ffmpeg</artifactId>
@@ -587,21 +598,21 @@
                     <version>${sasl2.version}</version>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>              
+                </dependency>
                 <dependency>
                     <groupId>org.openldap</groupId>
                     <artifactId>openldap</artifactId>
                     <version>${openldap.version}</version>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>            
+                </dependency>
                 <dependency>
                     <groupId>org.cyrus</groupId>
                     <artifactId>sasl2</artifactId>
                     <version>${sasl2.version}</version>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>            
+                </dependency>
                 <dependency>
                     <groupId>org.openssl</groupId>
                     <artifactId>openssl</artifactId>

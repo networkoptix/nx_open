@@ -3,15 +3,15 @@
 
 #include <memory> // for auto_ptr
 
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 #include <QtCore/QThread>
 #include <QtCore/QTimer>
 #include <QtNetwork/QAuthenticator>
 
 #include <utils/common/long_runnable.h>
-#include <utils/common/singleton.h>
-#include <utils/network/netstate.h>
-#include <utils/network/nettools.h>
+#include <nx/utils/singleton.h>
+#include <nx/network/netstate.h>
+#include <nx/network/nettools.h>
 
 #include <api/model/manual_camera_seach_reply.h>
 
@@ -39,7 +39,7 @@ class QnAbstractResourceSearcher;
 
 class QnResourceDiscoveryManager;
 /*!
-    This class instance only calls QnResourceDiscoveryManager::doResourceDiscoverIteration from QnResourceDiscoveryManager thread, 
+    This class instance only calls QnResourceDiscoveryManager::doResourceDiscoverIteration from QnResourceDiscoveryManager thread,
     since we cannot move QnResourceDiscoveryManager object to QnResourceDiscoveryManager thread (weird...)
 */
 class QnResourceDiscoveryManagerTimeoutDelegate
@@ -96,7 +96,8 @@ public:
 
     void setReady(bool ready);
 
-    bool registerManualCameras(const QnManualCameraInfoMap& cameras);
+    /** Returns number of cameras that were sucessfully added. */
+    int registerManualCameras(const QnManualCameraInfoMap& cameras);
     bool containManualCamera(const QString& url);
     void fillManualCamInfo(QnManualCameraInfoMap& cameras, const QnSecurityCamResourcePtr& camera);
 
@@ -106,7 +107,7 @@ public:
     virtual void doResourceDiscoverIteration();
 
     State state() const;
-    
+
     void setLastDiscoveredResources(const QnResourceList& resources);
     QSet<QString> lastDiscoveredIds() const;
 public slots:
@@ -159,8 +160,8 @@ private:
     State m_state;
     QSet<QString> m_recentlyDeleted;
 
-    QHash<QnUuid, QnManualCameraSearchStatus> m_searchProcessStatuses;
-    QHash<QnUuid, QnManualCameraSearchCameraList> m_searchProcessResults;
+    QHash<QnUuid, QnManualResourceSearchStatus> m_searchProcessStatuses;
+    QHash<QnUuid, QnManualResourceSearchList> m_searchProcessResults;
 
     mutable QnMutex m_resListMutex;
     QnResourceList m_lastDiscoveredResources[6];

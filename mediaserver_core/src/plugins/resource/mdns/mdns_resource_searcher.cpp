@@ -2,7 +2,7 @@
 
 #ifdef ENABLE_MDNS
 
-#include <utils/network/nettools.h>
+#include <nx/network/nettools.h>
 
 #include "mdns_listener.h"
 

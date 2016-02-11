@@ -35,7 +35,7 @@ namespace aux
 
             int ecode;
             uint32_t fsize = m_io->size(&ecode);
-            
+
             if (ecode != nx_spl::error::NoError)
                 return -1;
 

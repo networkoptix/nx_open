@@ -23,11 +23,12 @@
 #include "onvif_resource.h"
 #include "onvif_stream_reader.h"
 #include "onvif_helper.h"
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include "utils/common/synctime.h"
 #include "utils/math/math.h"
-#include "utils/network/http/httptypes.h"
-#include "utils/common/timermanager.h"
+#include <nx/network/http/httptypes.h>
+#include <nx/network/socket_global.h>
+#include <nx/utils/timermanager.h>
 #include "utils/common/systemerror.h"
 #include "api/app_server_connection.h"
 #include "soap/soapserver.h"
@@ -36,7 +37,7 @@
 #include "core/resource/resource_data.h"
 #include "core/resource_management/resource_data_pool.h"
 #include "common/common_module.h"
-#include "utils/common/timermanager.h"
+#include <nx/utils/timermanager.h>
 #include "gsoap_async_call_wrapper.h"
 #include "plugins/resource/d-link/dlink_ptz_controller.h"
 #include "core/onvif/onvif_config_data.h"
@@ -368,12 +369,16 @@ typedef GSoapAsyncCallWrapper <
     NetIfacesResp
 > GSoapDeviceGetNetworkIntfAsyncWrapper;
 
-bool QnPlOnvifResource::checkIfOnlineAsync( std::function<void(bool)>&& completionHandler )
+void QnPlOnvifResource::checkIfOnlineAsync( std::function<void(bool)> completionHandler )
 {
     const QAuthenticator auth( getAuth() );
     const QString deviceUrl = getDeviceOnvifUrl();
     if( deviceUrl.isEmpty() )
-        return false;
+    {
+        //calling completionHandler(false)
+        nx::network::SocketGlobals::aioService().post(std::bind(completionHandler, false));
+        return;
+    }
 
     std::unique_ptr<DeviceSoapWrapper> soapWrapper( new DeviceSoapWrapper(
         deviceUrl.toStdString(),
@@ -399,7 +404,7 @@ bool QnPlOnvifResource::checkIfOnlineAsync( std::function<void(bool)>&& completi
         };
 
     NetIfacesReq request;
-    return asyncWrapper->callAsync(
+    asyncWrapper->callAsync(
         request,
         onvifCallCompletionFunc );
 }
@@ -3189,21 +3194,10 @@ void QnPlOnvifResource::pullMessages(quint64 timerID)
     );
 
     using namespace std::placeholders;
-    if( asyncPullMessagesCallWrapper->callAsync(
-            request,
-            std::bind(&QnPlOnvifResource::onPullMessagesDone, this, asyncPullMessagesCallWrapper.data(), _1)) )
-    {
-        m_asyncPullMessagesCallWrapper = std::move(asyncPullMessagesCallWrapper);
-    }
-    else
-    {
-        using namespace std::placeholders;
-        //will try later
-        Q_ASSERT( m_nextPullMessagesTimerID == 0 );
-        m_nextPullMessagesTimerID = TimerManager::instance()->addTimer(
-            std::bind(&QnPlOnvifResource::pullMessages, this, _1),
-            PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC*MS_PER_SECOND);
-    }
+    asyncPullMessagesCallWrapper->callAsync(
+        request,
+        std::bind(&QnPlOnvifResource::onPullMessagesDone, this, asyncPullMessagesCallWrapper.data(), _1));
+    m_asyncPullMessagesCallWrapper = std::move(asyncPullMessagesCallWrapper);
 }
 
 void QnPlOnvifResource::onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* asyncWrapper, int resultCode)

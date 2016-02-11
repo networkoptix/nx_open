@@ -8,7 +8,7 @@
 #include "plugins/resource/avi/avi_resource.h"
 #include "core/resource_management/resource_pool.h"
 
-QnLayoutResource::QnLayoutResource(const QnResourceTypePool* resTypePool): 
+QnLayoutResource::QnLayoutResource(const QnResourceTypePool* resTypePool):
     base_type(),
     m_cellAspectRatio(-1.0),
     m_cellSpacing(-1.0, -1.0),
@@ -18,7 +18,7 @@ QnLayoutResource::QnLayoutResource(const QnResourceTypePool* resTypePool):
     m_locked(false)
 {
     addFlags(Qn::layout);
-    setTypeId(resTypePool->getFixedResourceTypeId(lit("Layout")));
+    setTypeId(resTypePool->getFixedResourceTypeId(QnResourceTypePool::kLayoutTypeId));
 }
 
 QString QnLayoutResource::getUniqueId() const {
@@ -108,7 +108,7 @@ void QnLayoutResource::setUrl(const QString& value)
     if (!oldValue.isEmpty() && oldValue != newValue)
     {
         // Local layout renamed
-        for(QnLayoutItemDataMap::iterator itr = m_itemByUuid.begin(); itr != m_itemByUuid.end(); ++itr) 
+        for(QnLayoutItemDataMap::iterator itr = m_itemByUuid.begin(); itr != m_itemByUuid.end(); ++itr)
         {
             QnLayoutItemData& item = itr.value();
             item.resource.path = QnLayoutFileStorageResource::updateNovParent(value, item.resource.path);

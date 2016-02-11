@@ -30,7 +30,7 @@
 #include <transaction/transaction_transport.h>
 
 #include <utils/common/checked_cast.h>
-#include "utils/common/log.h"
+#include <nx/utils/log/log.h>
 #include "utils/common/synctime.h"
 #include "utils/common/systemerror.h"
 #include "utils/common/warnings.h"
@@ -149,6 +149,7 @@ namespace ec2
         case ApiCommand::removeUser:
         case ApiCommand::removeLayout:
         case ApiCommand::removeVideowall:
+        case ApiCommand::removeWebPage:
         case ApiCommand::removeStorage:
         case ApiCommand::removeCamera:
         case ApiCommand::removeMediaServer:     return handleTransactionParams<ApiIdData>               (serializedTransaction, serializationSupport, transaction, function, fastFunction);
@@ -160,6 +161,7 @@ namespace ec2
         case ApiCommand::saveBusinessRule:      return handleTransactionParams<ApiBusinessRuleData>     (serializedTransaction, serializationSupport, transaction, function, fastFunction);
         case ApiCommand::saveLayouts:           return handleTransactionParams<ApiLayoutDataList>       (serializedTransaction, serializationSupport, transaction, function, fastFunction);
         case ApiCommand::saveLayout:            return handleTransactionParams<ApiLayoutData>           (serializedTransaction, serializationSupport, transaction, function, fastFunction);
+        case ApiCommand::saveWebPage:           return handleTransactionParams<ApiWebPageData>          (serializedTransaction, serializationSupport, transaction, function, fastFunction);
         case ApiCommand::saveVideowall:         return handleTransactionParams<ApiVideowallData>        (serializedTransaction, serializationSupport, transaction, function, fastFunction);
         case ApiCommand::videowallControl:      return handleTransactionParams<ApiVideowallControlMessageData>(serializedTransaction, serializationSupport, transaction, function, fastFunction);
         case ApiCommand::addStoredFile:

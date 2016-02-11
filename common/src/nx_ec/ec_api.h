@@ -85,28 +85,28 @@ namespace ec2
         /*!
             \param handler Functor with params: (ErrorCode, const QnResourceTypeList&)
         */
-        template<class TargetType, class HandlerType> 
+        template<class TargetType, class HandlerType>
         int getResourceTypes( TargetType* target, HandlerType handler ) {
             return getResourceTypes( std::static_pointer_cast<impl::GetResourceTypesHandler>(std::make_shared<impl::CustomGetResourceTypesHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
         ErrorCode getResourceTypesSync( QnResourceTypeList* const resTypeList ) {
-            return impl::doSyncCall<impl::GetResourceTypesHandler>( 
+            return impl::doSyncCall<impl::GetResourceTypesHandler>(
                 [&](const impl::GetResourceTypesHandlerPtr &handler) {
                     return getResourceTypes(handler);
                 },
-                resTypeList 
+                resTypeList
             );
         }
 
         /*!
             \param handler Functor with params: (ErrorCode)
         */
-        template<class TargetType, class HandlerType> 
+        template<class TargetType, class HandlerType>
         int setResourceStatus( const QnUuid& resourceId, Qn::ResourceStatus status, TargetType* target, HandlerType handler ) {
             return setResourceStatus(resourceId, status, std::static_pointer_cast<impl::SetResourceStatusHandler>(std::make_shared<impl::CustomSetResourceStatusHandler<TargetType, HandlerType>>(target, handler)) );
         }
-        template<class TargetType, class HandlerType> 
+        template<class TargetType, class HandlerType>
         int setResourceStatusLocal( const QnUuid& resourceId, Qn::ResourceStatus status, TargetType* target, HandlerType handler ) {
             return setResourceStatusLocal(resourceId, status, std::static_pointer_cast<impl::SetResourceStatusHandler>(std::make_shared<impl::CustomSetResourceStatusHandler<TargetType, HandlerType>>(target, handler)) );
         }
@@ -124,34 +124,34 @@ namespace ec2
         /*!
             \param handler Functor with params: (ErrorCode, const ApiResourceParamWithRefDataList&)
         */
-        template<class TargetType, class HandlerType> 
+        template<class TargetType, class HandlerType>
         int getKvPairs( const QnUuid& resourceId, TargetType* target, HandlerType handler ) {
             return getKvPairs( resourceId, std::static_pointer_cast<impl::GetKvPairsHandler>(std::make_shared<impl::CustomGetKvPairsHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
         ErrorCode getKvPairsSync(const QnUuid& resourceId, ApiResourceParamWithRefDataList* const outData) {
-            return impl::doSyncCall<impl::GetKvPairsHandler>( 
+            return impl::doSyncCall<impl::GetKvPairsHandler>(
                 [=](const impl::GetKvPairsHandlerPtr &handler) {
                     return this->getKvPairs(resourceId, handler);
                 },
-                outData 
+                outData
             );
         }
 
         /*!
             \param handler Functor with params: (ErrorCode, const ApiResourceStatusDataList&)
         */
-        template<class TargetType, class HandlerType> 
+        template<class TargetType, class HandlerType>
         int getStatusList( const QnUuid& resourceId, TargetType* target, HandlerType handler ) {
             return getStatusList( resourceId, std::static_pointer_cast<impl::GetStatusListHandler>(std::make_shared<impl::CustomGetStatusListHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
         ErrorCode getStatusListSync(const QnUuid& resourceId, ApiResourceStatusDataList* const outData) {
-            return impl::doSyncCall<impl::GetStatusListHandler>( 
+            return impl::doSyncCall<impl::GetStatusListHandler>(
                 [=](const impl::GetStatusListHandlerPtr &handler) {
                     return this->getStatusList(resourceId, handler);
                 },
-                outData 
+                outData
             );
         }
 
@@ -161,21 +161,21 @@ namespace ec2
         }
         */
 
-       
+
         /*!
             \param handler Functor with params: (ErrorCode, const ApiResourceParamWithRefDataList&)
         */
-        template<class TargetType, class HandlerType> 
+        template<class TargetType, class HandlerType>
         int save(const ec2::ApiResourceParamWithRefDataList& kvPairs, TargetType* target, HandlerType handler ) {
             return save(kvPairs, std::static_pointer_cast<impl::SaveKvPairsHandler>(std::make_shared<impl::CustomSaveKvPairsHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
         ErrorCode saveSync(const ec2::ApiResourceParamWithRefDataList& kvPairs, ApiResourceParamWithRefDataList* const outData) {
-            return impl::doSyncCall<impl::SaveKvPairsHandler>( 
+            return impl::doSyncCall<impl::SaveKvPairsHandler>(
                 [=](const impl::SaveKvPairsHandlerPtr &handler) {
                     return this->save(kvPairs, handler);
                 },
-                outData 
+                outData
             );
         }
 
@@ -184,12 +184,12 @@ namespace ec2
         /*!
             \param handler Functor with params: (ErrorCode)
         */
-        template<class TargetType, class HandlerType> 
+        template<class TargetType, class HandlerType>
         int remove( const QnUuid& id, TargetType* target, HandlerType handler ) {
             return remove( id, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
-        template<class TargetType, class HandlerType> 
+        template<class TargetType, class HandlerType>
         int remove( const QVector<QnUuid>& idList, TargetType* target, HandlerType handler ) {
             return remove( idList, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
@@ -231,13 +231,13 @@ namespace ec2
         template<class TargetType, class HandlerType> int getServers( const QnUuid& mediaServerId,  TargetType* target, HandlerType handler ) {
             return getServers(mediaServerId, std::static_pointer_cast<impl::GetServersHandler>(std::make_shared<impl::CustomGetServersHandler<TargetType, HandlerType>>(target, handler)) );
         }
-        
+
         ErrorCode getServersSync( const QnUuid& mediaServerId, QnMediaServerResourceList* const serverList ) {
-            return impl::doSyncCall<impl::GetServersHandler>( 
+            return impl::doSyncCall<impl::GetServersHandler>(
                 [=](const impl::GetServersHandlerPtr &handler) {
                     return this->getServers(mediaServerId, handler);
-                }, 
-                serverList 
+                },
+                serverList
             );
         }
 
@@ -249,11 +249,11 @@ namespace ec2
         }
 
         ErrorCode saveSync( const QnMediaServerResourcePtr& serverRes, QnMediaServerResourcePtr* const server ) {
-            return impl::doSyncCall<impl::SaveServerHandler>( 
+            return impl::doSyncCall<impl::SaveServerHandler>(
                 [=](const impl::SaveServerHandlerPtr &handler) {
                     return this->save(serverRes, handler);
                 },
-                server 
+                server
             );
         }
 
@@ -276,7 +276,7 @@ namespace ec2
         }
 
         ErrorCode saveUserAttributesSync( const QnMediaServerUserAttributesList& serverAttrs) {
-            return impl::doSyncCall<impl::SimpleHandler>( 
+            return impl::doSyncCall<impl::SimpleHandler>(
                 [=](const impl::SimpleHandlerPtr &handler) { return this->saveUserAttributes(serverAttrs, handler); });
         }
 
@@ -289,7 +289,7 @@ namespace ec2
         }
 
         ErrorCode saveStoragesSync( const QnStorageResourceList& storages) {
-            return impl::doSyncCall<impl::SimpleHandler>( 
+            return impl::doSyncCall<impl::SimpleHandler>(
                 [=](const impl::SimpleHandlerPtr &handler) {
                     return this->saveStorages(storages, handler);
                 }
@@ -304,14 +304,14 @@ namespace ec2
         }
 
         ErrorCode removeStoragesSync( const ApiIdDataList& storages) {
-            return impl::doSyncCall<impl::SimpleHandler>( 
+            return impl::doSyncCall<impl::SimpleHandler>(
                 [=](const impl::SimpleHandlerPtr &handler) { return this->removeStorages(storages, handler); });
         }
 
 
 
         /*!
-            \param mediaServerId if not NULL, returned list contains at most one element: the one, corresponding to \a mediaServerId. 
+            \param mediaServerId if not NULL, returned list contains at most one element: the one, corresponding to \a mediaServerId.
                 If NULL, returned list contains data of all known servers
             \param handler Functor with params: (ErrorCode, const QnMediaServerUserAttributesList& serverUserAttributesList)
         */
@@ -320,7 +320,7 @@ namespace ec2
         }
 
         /*!
-            \param mediaServerId if not NULL, returned list contains at most one element: the one, corresponding to \a mediaServerId. 
+            \param mediaServerId if not NULL, returned list contains at most one element: the one, corresponding to \a mediaServerId.
                 If NULL, returned list contains data of all known servers
         */
         ErrorCode getUserAttributesSync(const QnUuid& mediaServerId, QnMediaServerUserAttributesList* const serverAttrsList ) {
@@ -329,7 +329,7 @@ namespace ec2
         }
 
         /*!
-            \param mediaServerId if not NULL, returned list contains at most one element: the one, corresponding to \a mediaServerId. 
+            \param mediaServerId if not NULL, returned list contains at most one element: the one, corresponding to \a mediaServerId.
                 If NULL, returned list contains data of all known servers
             \param handler Functor with params: (ErrorCode, const QnResourceList& storages)
         */
@@ -338,7 +338,7 @@ namespace ec2
         }
 
         /*!
-            \param mediaServerId if not NULL, returned list contains at most one element: the one, corresponding to \a mediaServerId. 
+            \param mediaServerId if not NULL, returned list contains at most one element: the one, corresponding to \a mediaServerId.
                 If NULL, returned list contains data of all known servers
         */
         ErrorCode getStoragesSync(const QnUuid& mediaServerId, QnResourceList* const storages ) {
@@ -377,7 +377,7 @@ namespace ec2
         virtual ~AbstractCameraManager() {}
 
         /*!
-            Returns list of all available cameras. 
+            Returns list of all available cameras.
             \todo is it really needed?
             \param handler Functor with params: (ErrorCode, const QnVirtualCameraResourceList& cameras)
         */
@@ -445,7 +445,7 @@ namespace ec2
         template<class TargetType, class HandlerType> int saveUserAttributes( const QnCameraUserAttributesList& cameras, TargetType* target, HandlerType handler ) {
             return saveUserAttributes( cameras, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
-        
+
         ErrorCode saveUserAttributesSync( const QnCameraUserAttributesList& cameras) {
             int(AbstractCameraManager::*fn)(const QnCameraUserAttributesList&, impl::SimpleHandlerPtr) = &AbstractCameraManager::saveUserAttributes;
             return impl::doSyncCall<impl::SimpleHandler>( std::bind(fn, this, cameras, std::placeholders::_1));
@@ -502,11 +502,11 @@ namespace ec2
             return getLicenses( std::static_pointer_cast<impl::GetLicensesHandler>(std::make_shared<impl::CustomGetLicensesHandler<TargetType, HandlerType>>(target, handler)) );
         }
         ErrorCode getLicensesSync(QnLicenseList* const licenseList ) {
-            return impl::doSyncCall<impl::GetLicensesHandler>( 
+            return impl::doSyncCall<impl::GetLicensesHandler>(
                 [=](const impl::GetLicensesHandlerPtr &handler) {
                     return this->getLicenses(handler);
-                }, 
-                licenseList 
+                },
+                licenseList
             );
         }
 
@@ -728,7 +728,7 @@ namespace ec2
         virtual int save( const QnLayoutResourceList& resources, impl::SimpleHandlerPtr handler ) = 0;
         virtual int remove( const QnUuid& resource, impl::SimpleHandlerPtr handler ) = 0;
     };
-    
+
 
     /*!
         \note All methods are asynchronous if other not specified
@@ -743,7 +743,7 @@ namespace ec2
         virtual ~AbstractVideowallManager() {}
 
         /*!
-            \param handler Functor with params: (ErrorCode, const QnUserResourceList&)
+            \param handler Functor with params: (ErrorCode, const QnVideoWallResourceList&)
         */
         template<class TargetType, class HandlerType> int getVideowalls( TargetType* target, HandlerType handler ) {
             return getVideowalls( std::static_pointer_cast<impl::GetVideowallsHandler>(
@@ -790,6 +790,58 @@ namespace ec2
         virtual int remove( const QnUuid& id, impl::SimpleHandlerPtr handler ) = 0;
 
         virtual int sendControlMessage(const QnVideoWallControlMessage& message, impl::SimpleHandlerPtr handler) = 0;
+    };
+
+        /*!
+        \note All methods are asynchronous if other not specified
+    */
+    class AbstractWebPageManager
+    :
+        public QObject
+    {
+        Q_OBJECT
+
+    public:
+        virtual ~AbstractWebPageManager() {}
+
+        /*!
+            \param handler Functor with params: (ErrorCode, const QnWebPageResourceList&)
+        */
+        template<class TargetType, class HandlerType> int getWebPages( TargetType* target, HandlerType handler ) {
+            return getWebPages( std::static_pointer_cast<impl::GetWebPagesHandler>(
+                std::make_shared<impl::CustomGetWebPagesHandler<TargetType, HandlerType>>(target, handler)) );
+        }
+
+        ErrorCode getWebPagesSync(QnWebPageResourceList* const webPageList ) {
+            int(AbstractWebPageManager::*fn)(impl::GetWebPagesHandlerPtr) = &AbstractWebPageManager::getWebPages;
+            return impl::doSyncCall<impl::GetWebPagesHandler>( std::bind(fn, this, std::placeholders::_1), webPageList );
+        }
+
+
+        /*!
+            \param handler Functor with params: (ErrorCode)
+        */
+        template<class TargetType, class HandlerType> int save( const QnWebPageResourcePtr& resource, TargetType* target, HandlerType handler ) {
+            return save( resource, std::static_pointer_cast<impl::AddWebPageHandler>(
+                std::make_shared<impl::CustomAddWebPageHandler<TargetType, HandlerType>>(target, handler)) );
+        }
+        /*!
+            \param handler Functor with params: (ErrorCode)
+        */
+        template<class TargetType, class HandlerType> int remove( const QnUuid& id, TargetType* target, HandlerType handler ) {
+            return remove( id, std::static_pointer_cast<impl::SimpleHandler>(
+                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
+        }
+
+    signals:
+        void addedOrUpdated(const QnWebPageResourcePtr &videowall);
+        void removed(const QnUuid &id);
+
+    protected:
+        virtual int getWebPages( impl::GetWebPagesHandlerPtr handler ) = 0;
+        virtual int save( const QnWebPageResourcePtr& resource, impl::AddWebPageHandlerPtr handler ) = 0;
+        virtual int remove( const QnUuid& id, impl::SimpleHandlerPtr handler ) = 0;
+
     };
 
 
@@ -847,7 +899,7 @@ namespace ec2
         virtual int deleteStoredFile( const QString& filename, impl::SimpleHandlerPtr handler ) = 0;
         virtual int listDirectory( const QString& folderName, impl::ListDirectoryHandlerPtr handler ) = 0;
     };
-    
+
 
     class AbstractUpdatesManager : public QObject {
         Q_OBJECT
@@ -1057,7 +1109,7 @@ namespace ec2
         virtual void addRemotePeer(const QUrl& url) = 0;
         virtual void deleteRemotePeer(const QUrl& url) = 0;
         virtual void sendRuntimeData(const ec2::ApiRuntimeData &data) = 0;
-        
+
         virtual qint64 getTransactionLogTime() const = 0;
         virtual void setTransactionLogTime(qint64 value) = 0;
 
@@ -1074,6 +1126,8 @@ namespace ec2
         virtual AbstractMiscManagerPtr getMiscManager() = 0;
         virtual AbstractDiscoveryManagerPtr getDiscoveryManager() = 0;
         virtual AbstractTimeManagerPtr getTimeManager() = 0;
+        virtual AbstractWebPageManagerPtr getWebPageManager() = 0;
+
         virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const = 0;
 
         /*!
@@ -1111,7 +1165,7 @@ namespace ec2
     signals:
         //!Delivers all resources found in Server
         /*!
-            This signal is emitted after starting notifications delivery by call to \a AbstractECConnection::startReceivingNotifications 
+            This signal is emitted after starting notifications delivery by call to \a AbstractECConnection::startReceivingNotifications
                 if full synchronization is requested
             \param resTypes
             \param resList All resources (servers, cameras, users, layouts)
@@ -1136,7 +1190,7 @@ namespace ec2
         virtual int dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler ) = 0;
         virtual int dumpDatabaseToFileAsync( const QString& dumpFilePath, impl::SimpleHandlerPtr handler ) = 0;
         virtual int restoreDatabaseAsync( const ec2::ApiDatabaseDumpData& data, impl::SimpleHandlerPtr handler ) = 0;
-    };  
+    };
 
 
     struct ResourceContext

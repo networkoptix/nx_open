@@ -6,10 +6,10 @@ static const int MOTION_AGGREGATION_PERIOD = 300 * 1000;
 #ifdef ENABLE_SOFTWARE_MOTION_DETECTION
 
 #include <QtCore/QByteArray>
-#include <utils/thread/mutex.h>
-#include "core/datapacket/media_data_packet.h"
-#include "core/datapacket/video_data_packet.h"
-#include "decoders/video/ffmpeg.h"
+#include <nx/utils/thread/mutex.h>
+#include "nx/streaming/media_data_packet.h"
+#include "nx/streaming/video_data_packet.h"
+#include "decoders/video/ffmpeg_video_decoder.h"
 #include "core/resource/motion_window.h"
 
 static const int FRAMES_BUFFER_SIZE = 2;
@@ -47,7 +47,7 @@ private:
 
 private:
     QnMutex m_mutex;
-    CLFFmpegVideoDecoder* m_decoder;
+    QnFfmpegVideoDecoder* m_decoder;
     QSharedPointer<CLVideoDecoderOutput> m_frames[2];
     
     quint8* m_motionMask;

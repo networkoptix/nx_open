@@ -953,6 +953,33 @@
                     </result>
                 </function>
                 <function>
+                    <name>saveCloudSystemCredentials</name>
+                    <description>Sets or resets cloud credentials (systemId and authorization key) to be used by system</description>
+                    <method>POST</method>
+                    <params>
+                        <param>
+                            <name>cloudSystemId</name>
+                            <optional>true</optional>
+                            <values/>
+                        </param>
+                        <param>
+                            <name>cloudAuthenticationKey</name>
+                            <optional>true</optional>
+                            <values/>
+                        </param>
+                        <param>
+                            <name>reset</name>
+                            <optional>true</optional>
+                            <values>
+                                <value>
+                                    <name>true</name>
+                                    <description>If specified, removes cloud credentials from DB. System will not connect to cloud anymore</description>
+                                </value>
+                            </values>
+                        </param>
+                    </params>
+                </function>
+                <function>
                     <name>activateLicense</name>
                     <description>Activate new license and return license JSON data if success</description>
                     <method>GET</method>

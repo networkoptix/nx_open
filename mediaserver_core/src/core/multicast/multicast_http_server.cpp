@@ -1,10 +1,11 @@
 #include "multicast_http_server.h"
 #include <QThread>
 #include "media_server/settings.h"
-#include "utils/network/simple_http_client.h"
+#include <nx/network/simple_http_client.h>
 #include "common/common_module.h"
 #include "nx_ec/dummy_handler.h"
 #include "network/tcp_listener.h"
+
 
 namespace QnMulticast
 {
@@ -42,16 +43,19 @@ void HttpServer::at_gotRequest(const QUuid& requestId, const QUuid& clientId, co
         httpClient.reset();
     }, Qt::DirectConnection);
 
-    bool result = false;
-    if (request.method == "GET")
-        result = httpClient->doGet(url);
-    else if (request.method == "POST")
-        result = httpClient->doPost(url, request.contentType, request.messageBody);
+    if (request.method == nx_http::Method::GET)
+    {
+        httpClient->doGet(url);
+    }
+    else if (request.method == nx_http::Method::POST)
+    {
+        httpClient->doPost(url, request.contentType, request.messageBody);
+    }
     else
+    {
         qWarning() << "Got unknown HTTP method" << request.method << "over HTTP multicast transport";
-    if (!result)
-        disconnect( httpClient.get(), nullptr, this, nullptr );
+        disconnect(httpClient.get(), nullptr, this, nullptr);
+    }
 }
-
 
 }

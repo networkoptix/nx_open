@@ -9,8 +9,8 @@
 #include <QObject>
 #include <QThread>
 
-#include <utils/thread/mutex.h>
-#include <utils/thread/wait_condition.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/wait_condition.h>
 
 #include "joinable.h"
 

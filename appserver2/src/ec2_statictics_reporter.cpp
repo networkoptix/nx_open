@@ -36,28 +36,6 @@ namespace ec2
     const QString Ec2StaticticsReporter::AUTH_PASSWORD = lit(
                 "f087996adb40eaed989b73e2d5a37c951f559956c44f6f8cdfb6f127ca4136cd");
 
-    static uint secsWithPostfix(const QString& str, uint defaultValue)
-    {
-        qlonglong secs;
-        bool ok(true);
-
-        if (str.endsWith(lit("m"), Qt::CaseInsensitive))
-            secs = str.left(str.length() - 1).toLongLong(&ok) * 60; // minute
-        else
-        if (str.endsWith(lit("h"), Qt::CaseInsensitive))
-            secs = str.left(str.length() - 1).toLongLong(&ok) * 60 * 60; // hour
-        else
-        if (str.endsWith(lit("d"), Qt::CaseInsensitive))
-            secs = str.left(str.length() - 1).toLongLong(&ok) * 60 * 60 * 24; // day
-        else
-        if (str.endsWith(lit("M"), Qt::CaseInsensitive))
-            secs = str.left(str.length() - 1).toLongLong(&ok) * 60 * 60 * 24 * 30; // month
-        else
-            secs = str.toLongLong(&ok); // seconds
-
-        return (ok && secs) ? static_cast<uint>(secs) : defaultValue;
-    }
-
     Ec2StaticticsReporter::Ec2StaticticsReporter(
             const AbstractUserManagerPtr& userManager,
             const AbstractResourceManagerPtr& resourceManager,
@@ -222,7 +200,9 @@ namespace ec2
             propertyDictionary->saveParams(m_admin->getId());
         }
 
-        const uint timeCycle = secsWithPostfix(m_admin->getProperty(SR_TIME_CYCLE), DEFAULT_TIME_CYCLE);
+        const uint timeCycle = parseTimerDuration(
+                    m_admin->getProperty(SR_TIME_CYCLE),
+                    std::chrono::seconds(DEFAULT_TIME_CYCLE)).count() / 1000;
         const uint maxDelay = timeCycle * MAX_DELAY_RATIO / 100;
         if (!m_plannedReportTime || *m_plannedReportTime > now.addSecs(timeCycle + maxDelay))
         {
@@ -268,16 +248,7 @@ namespace ec2
         const QString serverApi = configApi.isEmpty() ? DEFAULT_SERVER_API : configApi;
         const QUrl url = lit("%1/%2").arg(serverApi).arg(SERVER_API_COMMAND);
         const auto format = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
-        if (!m_httpClient->doPost(url, format, QJson::serialized(data)))
-        {
-            if ((m_timerCycle *= 2) > TIMER_CYCLE_MAX)
-                m_timerCycle = TIMER_CYCLE_MAX;
-
-            NX_LOG(lit("Ec2StaticticsReporter: Could not doPost to %1, update timer cycle to %2")
-                   .arg(url.toString()).arg(m_timerCycle), cl_logWARNING);
-
-            return ErrorCode::failure;
-        }
+        m_httpClient->doPost(url, format, QJson::serialized(data));
 
         NX_LOG(lit("Ec2StaticticsReporter: Sending statistics asynchronously to %1")
                .arg(url.toString()), cl_logDEBUG1);

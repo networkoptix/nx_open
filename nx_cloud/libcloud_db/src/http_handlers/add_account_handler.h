@@ -1,0 +1,52 @@
+/**********************************************************
+* 16 may 2015
+* a.kolesnikov
+***********************************************************/
+
+#ifndef cloud_db_add_account_handler_h
+#define cloud_db_add_account_handler_h
+
+#include <memory>
+
+#include <QString>
+
+#include "access_control/auth_types.h"
+#include "base_http_handler.h"
+#include "data/account_data.h"
+#include "managers/account_manager.h"
+#include "managers/managers_types.h"
+
+
+namespace nx {
+namespace cdb {
+
+
+class AccountManager;
+
+class AddAccountHttpHandler
+:
+    public AbstractFiniteMsgBodyHttpHandler<data::AccountData, data::AccountConfirmationCode>
+{
+public:
+    static const QString kHandlerPath;
+
+    AddAccountHttpHandler(
+        AccountManager* const accountManager,
+        const AuthorizationManager& authorizationManager )
+    :
+        AbstractFiniteMsgBodyHttpHandler<data::AccountData, data::AccountConfirmationCode>(
+            EntityType::account,
+            DataActionType::insert,
+            authorizationManager,
+            std::bind(
+                &AccountManager::addAccount, accountManager,
+                std::placeholders::_1, std::placeholders::_2, std::placeholders::_3 ) )
+    {
+    }
+};
+
+
+}   //cdb
+}   //nx
+
+#endif  //cloud_db_add_account_handler_h

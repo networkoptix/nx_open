@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="api.xsl"?>
+<apidoc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="api.xsd">
+    <groups>
+        <group>
+            <groupName>Account API</groupName>
+            <urlPrefix>/account</urlPrefix>
+            <groupDescription>Account management</groupDescription>
+            <functions>
+                <function>
+                    <name>register</name>
+                    <description></description>
+                    <method>GET</method>
+                    <params>
+                        <param>
+                            <name>email</name>
+                            <description>Unique address to be associated with account</description>
+                            <optional>false</optional>
+                        </param>
+                        <param>
+                            <name>passwordHa1</name>
+                            <description>Hex representation of HA1 (see rfc2617) digest of user's password. Realm is VMS</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>fullName</name>
+                            <description></description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>customization</name>
+                            <description>Customization of portal has been used to create account</description>
+                            <optional>true</optional>
+                        </param>
+                    </params>
+                    <result>
+                        <caption>Account activation code in JSON format</caption>
+                    </result>
+                </function>
+                <function>
+                    <name>activate</name>
+                    <description></description>
+                    <method>GET</method>
+                    <params>
+                        <param>
+                            <name>code</name>
+                            <description>Activation code provided by register method</description>
+                            <optional>false</optional>
+                        </param>
+                    </params>
+                </function>
+                <function>
+                    <name>get</name>
+                    <description>Get account information. Server determines account to return by provided credentials (email/password)</description>
+                    <method>GET</method>
+                    <result>
+                        <caption>Account data JSON</caption>
+                    </result>
+                </function>
+            </functions>
+        </group>
+        <group>
+            <groupName>System API</groupName>
+            <urlPrefix>/system</urlPrefix>
+            <groupDescription>System data management</groupDescription>
+            <functions>
+                <function>
+                    <name>get</name>
+                    <description>Returns list of systems requesting entity has access to. Access is detected by credentials provided</description>
+                    <method>GET</method>
+                    <result>
+                        <caption>JSON. List of system data</caption>
+                    </result>
+                </function>
+                <function>
+                    <name>share</name>
+                    <description>Share system with another account.
+                                 owner and editorWithSharing can share system to any account with any access role (except owner).
+                                 Account with maintenance role can share system to another account while only assinging maintenance access role
+                    </description>
+                    <method>GET</method>
+                    <params>
+                        <param>
+                            <name>accountEmail</name>
+                            <description>Email of account to share system with</description>
+                            <optional>false</optional>
+                        </param>
+                        <param>
+                            <name>systemID</name>
+                            <description>Id of system to share</description>
+                            <optional>false</optional>
+                        </param>
+                        <param>
+                            <name>accessRole</name>
+                            <description>Access role to assign to account. One of following: owner, viewer, editor, editorWithSharing, maintenance</description>
+                            <optional>false</optional>
+                        </param>
+                    </params>
+                </function>
+                <function>
+                    <name>get_cloud_users</name>
+                    <description>Returns list of systems requesting entity has access to. Access is detected by credentials provided</description>
+                    <method>GET</method>
+                    <params>
+                        <param>
+                            <name>systemID</name>
+                            <description>ID of system to get sharing information. If absent, information for all systems account has access to is returned</description>
+                            <optional>true</optional>
+                        </param>
+                    </params>
+                    <result>
+                        <caption>JSON. List of account with their access roles</caption>
+                    </result>
+                </function>
+                <function>
+                    <name>update_sharing</name>
+                    <description>Update/remove existing system sharing</description>
+                    <method>GET</method>
+                    <params>
+                        <param>
+                            <name>accountEmail</name>
+                            <description>Email of account to share system with</description>
+                            <optional>false</optional>
+                        </param>
+                        <param>
+                            <name>systemID</name>
+                            <description>Id of system to share</description>
+                            <optional>false</optional>
+                        </param>
+                        <param>
+                            <name>accessRole</name>
+                            <description>If one of following: owner, viewer, editor, editorWithSharing, maintenance, 
+                                         then this is new access role. Value "none" designates sharing removal
+                            </description>
+                            <optional>false</optional>
+                        </param>
+                    </params>
+                </function>
+            </functions>
+        </group>
+    </groups>
+</apidoc>

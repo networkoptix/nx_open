@@ -4,12 +4,12 @@
 #include <algorithm>
 #include <memory>
 
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 #include <QtXml/QXmlDefaultHandler>
 
 #include <api/global_settings.h>
 #include <common/common_globals.h>
-#include <utils/network/system_socket.h>
+#include <nx/network/system_socket.h>
 
 #include <utils/common/app_info.h>
 
@@ -73,7 +73,7 @@ public:
         return true;
     }
 
-    UpnpDeviceInfo deviceInfo() const { return m_deviceInfo; }
+    const UpnpDeviceInfo& deviceInfo() const { return m_deviceInfo; }
 };
 
 
@@ -125,7 +125,7 @@ void UPNPDeviceSearcher::pleaseStop()
         it != m_socketList.end();
         ++it )
     {
-        it->second.sock->terminateAsyncIO( true );
+        it->second.sock->pleaseStopSync();
     }
     m_socketList.clear();
 
@@ -233,7 +233,7 @@ void UPNPDeviceSearcher::onSomeBytesRead(
                 }
             }
         }
-        udpSock->terminateAsyncIO( true );
+        udpSock->pleaseStopSync();
         return;
     }
 
@@ -312,16 +312,24 @@ std::shared_ptr<AbstractDatagramSocket> UPNPDeviceSearcher::getSockByIntf( const
 
     p.first->second.sock = sock;
     p.first->second.buf.reserve( READ_BUF_CAPACITY );
-    if( !sock->setReuseAddrFlag( true ) ||
+    if (!sock->setReuseAddrFlag( true ) ||
         !sock->bind( SocketAddress(localAddress, GROUP_PORT) ) ||
         !sock->joinGroup( groupAddress.toString(), iface.address.toString() ) ||
         !sock->setMulticastIF( localAddress ) ||
-        !sock->setRecvBufferSize( MAX_UPNP_RESPONSE_PACKET_SIZE ) ||
-        !sock->readSomeAsync( &p.first->second.buf, std::bind( &UPNPDeviceSearcher::onSomeBytesRead, this, sock.get(), _1, &p.first->second.buf, _2 ) ) )
+        !sock->setRecvBufferSize( MAX_UPNP_RESPONSE_PACKET_SIZE ))
     {
-        QnMutexLocker lk( &m_mutex );
-        m_socketList.erase( p.first );
-        return std::shared_ptr<AbstractDatagramSocket>();
+        sock->post(
+            std::bind(
+                &UPNPDeviceSearcher::onSomeBytesRead, this,
+                sock.get(), SystemError::getLastOSErrorCode(), nullptr, 0));
+    }
+    else
+    {
+        sock->readSomeAsync(
+            &p.first->second.buf,
+            std::bind(
+                &UPNPDeviceSearcher::onSomeBytesRead, this,
+                sock.get(), _1, &p.first->second.buf, _2));
     }
 
     return sock;
@@ -372,17 +380,7 @@ void UPNPDeviceSearcher::startFetchDeviceXml(
         httpClient.get(), &nx_http::AsyncHttpClient::done,
         this, &UPNPDeviceSearcher::onDeviceDescriptionXmlRequestDone,
         Qt::DirectConnection );
-    if( !httpClient->doGet( descriptionUrl ) )
-    {
-        QObject::disconnect(
-            httpClient.get(), &nx_http::AsyncHttpClient::done,
-            this, &UPNPDeviceSearcher::onDeviceDescriptionXmlRequestDone );
-
-        QnMutexLocker lk( &m_mutex );
-        httpClient->terminate();
-        m_httpClients.erase( httpClient );
-        return;
-    }
+    httpClient->doGet( descriptionUrl );
 }
 
 void UPNPDeviceSearcher::processDeviceXml(

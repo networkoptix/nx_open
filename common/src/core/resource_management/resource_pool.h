@@ -3,16 +3,16 @@
 
 #include <QtCore/QList>
 #include <QtCore/QHash>
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 #include <QtCore/QObject>
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 #include <QtNetwork/QHostAddress>
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource.h>
 #include <core/resource_management/resource_criterion.h>
 
-#include <utils/common/singleton.h>
+#include <nx/utils/singleton.h>
 
 class QnResource;
 class QnNetworkResource;
@@ -148,6 +148,17 @@ public:
     QnResourcePtr getIncompatibleResourceById(const QnUuid &id, bool useCompatible = false) const;
     QnResourcePtr getIncompatibleResourceByUniqueId(const QString &uid) const;
     QnResourceList getAllIncompatibleResources() const;
+
+    template<class Cond>
+    QnResourcePtr getResourceByCond(Cond cond) const
+    {
+        QnMutexLocker locker(&m_resourcesMtx);
+        for (const QnResourcePtr& resource : m_resources)
+            if (cond(resource))
+                return resource;
+
+        return QnResourcePtr();
+    }
 
     QnUserResourcePtr getAdministrator() const;
 

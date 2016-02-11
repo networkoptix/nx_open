@@ -1,6 +1,6 @@
 #include "thumbnails_stream_reader.h"
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/util.h>
 
 #include <core/resource/security_cam_resource.h>

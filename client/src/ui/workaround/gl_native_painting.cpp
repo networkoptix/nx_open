@@ -1,7 +1,9 @@
 #include "gl_native_painting.h"
+
 #include <QtGui/QOpenGLFunctions>
-#include "qopenglfunctions.h"
+
 #include "opengl_renderer.h"
+
 void QnGlNativePainting::begin(const QGLContext* context,QPainter *painter) {
     painter->beginNativePainting();
 

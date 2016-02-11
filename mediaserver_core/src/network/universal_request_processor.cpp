@@ -13,7 +13,7 @@
 #include <utils/common/model_functions.h>
 #include "utils/common/synctime.h"
 #include "utils/gzip/gzip_compressor.h"
-#include "utils/network/flash_socket/types.h"
+#include <nx/network/flash_socket/types.h>
 
 static const int AUTH_TIMEOUT = 60 * 1000;
 //static const int AUTHORIZED_TIMEOUT = 60 * 1000;
@@ -160,8 +160,6 @@ void QnUniversalRequestProcessor::run()
             auto handler = d->owner->findHandler(d->protocol, d->request);
             if (handler && !authenticate(&d->authUserId))
                 return;
-
-            d->response.headers.clear();
 
             isKeepAlive = isConnectionCanBePersistent();
 

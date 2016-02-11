@@ -4,6 +4,8 @@
 #include <QTimer>
 #include <QElapsedTimer>
 
+namespace api = nx::mediaserver::api;
+
 namespace
 {
     QElapsedTimer timeoutCounter;
@@ -66,7 +68,7 @@ void rtu::AwaitingOp::setUnknownAddedHandler(const UnknownAddedHandler &handler)
     m_unknownAdded = handler;
 }
 
-void rtu::AwaitingOp::processServerDiscovered(const BaseServerInfo &info)
+void rtu::AwaitingOp::processServerDiscovered(const api::BaseServerInfo &info)
 {
     if (!m_discovered || isTimedOut())
         return;

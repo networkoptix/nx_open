@@ -1,6 +1,6 @@
 #include "get_hardware_info_rest_handler.h"
 
-#include <utils/network/http/httptypes.h>
+#include <nx/network/http/httptypes.h>
 #include "licensing/hardware_info.h"
 #include "llutil/hardware_id.h"
 

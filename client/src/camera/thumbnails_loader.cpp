@@ -18,14 +18,14 @@ extern "C"
 #include "core/resource/camera_resource.h"
 #include "core/resource/camera_history.h"
 
-#include "decoders/video/ffmpeg.h"
+#include "decoders/video/ffmpeg_video_decoder.h"
 
 #include "ui/common/geometry.h"
 
 #include "plugins/resource/avi/thumbnails_archive_delegate.h"
-#include "plugins/resource/archive/archive_stream_reader.h"
+#include "nx/streaming/archive_stream_reader.h"
 
-#include "plugins/resource/archive/rtsp_client_archive_delegate.h"
+#include "nx/streaming/rtsp_client_archive_delegate.h"
 
 #include "utils/media/frame_info.h"
 
@@ -419,7 +419,7 @@ void QnThumbnailsLoader::process() {
         {
             if (server->getStatus() != Qn::Online)
                 continue;
-            QnRtspClientArchiveDelegatePtr rtspDelegate(new QnRtspClientArchiveDelegate(0));
+            QnRtspClientArchiveDelegatePtr rtspDelegate(new QnRtspClientArchiveDelegate(nullptr));
             rtspDelegate->setMultiserverAllowed(false);
             if (m_mode == Mode::Default)
                 rtspDelegate->setQuality(MEDIA_Quality_Low, true);
@@ -462,7 +462,7 @@ void QnThumbnailsLoader::process() {
         QnCompressedVideoDataPtr frame = std::dynamic_pointer_cast<QnCompressedVideoData>(client->getNextData());
         if (frame)
         {
-            CLFFmpegVideoDecoder decoder(frame->compressionType, frame, false);
+            QnFfmpegVideoDecoder decoder(frame->compressionType, frame, false);
             QSharedPointer<CLVideoDecoderOutput> outFrame( new CLVideoDecoderOutput() );
             outFrame->setUseExternalData(false);
 

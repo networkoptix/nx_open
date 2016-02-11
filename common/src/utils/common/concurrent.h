@@ -12,9 +12,9 @@
 #include <type_traits>
 #include <utility>
 
-#include <utils/thread/mutex.h>
-#include <utils/thread/mutex.h>
-#include <utils/thread/wait_condition.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/wait_condition.h>
 #include <QtCore/QThreadPool>
 #include <QtCore/QSharedPointer>
 

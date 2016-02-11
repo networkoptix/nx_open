@@ -8,14 +8,16 @@
 #include <set>
 #include <map>
 
+#ifndef Q_MOC_RUN
 #include <boost/preprocessor/tuple/enum.hpp>
+#endif
 
 #ifndef QN_NO_QT
 #   include <QtCore/QtEndian>
 #   include <QtCore/QString>
 #   include <QtCore/QByteArray>
 #   include <QtCore/QUrl>
-#   include <utils/common/uuid.h>
+#   include <nx/utils/uuid.h>
 #endif
 
 #include <utils/common/collection.h>
@@ -58,7 +60,7 @@ namespace QnBinaryDetail {
         Element element;
         if(!QnBinary::deserialize(stream, &element))
             return false;
-        
+
         QnCollection::insert(*target, boost::end(*target), std::move(element));
         return true;
     }
@@ -97,7 +99,7 @@ namespace QnBinaryDetail {
         for(int i = 0; i < size; i++)
             if(!deserialize_collection_element(stream, target, static_cast<const value_type *>(NULL), typename QnCollection::collection_category<Collection>::type()))
                 return false;
-        
+
         return true;
     }
 
@@ -276,7 +278,7 @@ bool deserialize(QnInputBinaryStream<T> *stream, QByteArray *target) {
         target->resize(size);
         return stream->read(target->data(), size) == size;
     } else {
-        /* Otherwise there is a high probability that the stream is corrupted, 
+        /* Otherwise there is a high probability that the stream is corrupted,
          * but we cannot be 100% sure. Read it chunk-by-chunk, then assemble. */
         QVector<QByteArray> chunks;
 
@@ -415,7 +417,7 @@ void serialize(const std::pair<T1, T2> &value, QnOutputBinaryStream<Output> *str
 
 template<class T1, class T2, class Input>
 bool deserialize(QnInputBinaryStream<Input> *stream, std::pair<T1, T2> *target) {
-    return 
+    return
         QnBinary::deserialize(stream, &target->first) &&
         QnBinary::deserialize(stream, &target->second);
 }

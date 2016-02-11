@@ -15,7 +15,7 @@
 #include "media_server/settings.h"
 #include "media_server/serverutil.h"
 #include "media_server/server_connector.h"
-#include "utils/network/simple_http_client.h"
+#include <nx/network/simple_http_client.h>
 #include "network/tcp_connection_priv.h"
 #include "network/module_finder.h"
 #include "network/direct_module_finder.h"

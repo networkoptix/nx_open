@@ -7,7 +7,7 @@
 #include <QtCore/QString>
 #include <QtCore/QHash>
 
-#include <utils/network/mac_address.h>
+#include <nx/network/mac_address.h>
 
 /**
  * Interface for monitoring performance in a platform-independent way.

@@ -1,11 +1,13 @@
 #ifndef MULTICAST_MODULE_FINDER_H
 #define MULTICAST_MODULE_FINDER_H
 
+#include <memory>
+
 #include <QCache>
 
 #include <utils/common/long_runnable.h>
-#include <utils/network/aio/pollset.h>
-#include <utils/thread/mutex.h>
+#include <nx/network/aio/pollset.h>
+#include <nx/utils/thread/mutex.h>
 
 #include "networkoptixmodulerevealcommon.h"
 
@@ -58,6 +60,9 @@ public:
 
     void setCheckInterfacesTimeout(unsigned int checkInterfacesTimeoutMs);
 
+    //! Returns \fn run (DEBUG ONLY!)
+    static bool isDisabled;
+
 public slots:
     virtual void pleaseStop() override;
 
@@ -81,7 +86,7 @@ private:
     bool m_clientMode;
     aio::PollSet m_pollSet;
     QHash<QHostAddress, UDPSocket*> m_clientSockets;
-    QScopedPointer<UDPSocket> m_serverSocket;
+    std::unique_ptr<UDPSocket> m_serverSocket;
     const unsigned int m_pingTimeoutMillis;
     const unsigned int m_keepAliveMultiply;
     quint64 m_prevPingClock;

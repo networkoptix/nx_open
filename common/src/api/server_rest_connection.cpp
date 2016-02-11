@@ -1,6 +1,7 @@
 #include <atomic>
 #include "server_rest_connection.h"
 
+#include <api/model/cloud_credentials_data.h>
 #include <api/app_server_connection.h>
 #include <api/helpers/empty_request_data.h>
 #include <api/helpers/chunks_request_data.h>
@@ -16,7 +17,7 @@
 #include <utils/common/model_functions.h>
 #include <network/router.h>
 #include <http/custom_headers.h>
-#include <utils/network/http/httptypes.h>
+#include <nx/network/http/httptypes.h>
 #include <utils/common/delayed.h>
 
 namespace {
@@ -74,6 +75,25 @@ Handle ServerConnection::sendStatisticsAsync(const QnSendStatisticsRequestData &
 
     return executePost(lit("/ec2/statistics/send"), request.toParams()
         , kJsonContentType, data, callback, targetThread);
+}
+
+Handle ServerConnection::saveCloudSystemCredentials(
+    const QString& cloudSystemId,
+    const QString& cloudAuthKey,
+    Result<EmptyResponseType>::type callback,
+    QThread* targetThread)
+{
+    CloudCredentialsData data;
+    data.cloudSystemId = cloudSystemId;
+    data.cloudAuthenticationKey = cloudAuthKey;
+
+    return executePost(
+        lit("/api/saveCloudSystemCredentials"),
+        QnRequestParamList(),
+        Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+        QJson::serialized(std::move(data)),
+        callback,
+        targetThread);
 }
 
 // --------------------------- private implementation -------------------------------------
@@ -297,22 +317,21 @@ Handle ServerConnection::sendRequest(const Request& request, HttpCompletionFunc 
     connect(httpClientCaptured.get(), &nx_http::AsyncHttpClient::done, this, requestCompletionFunc, Qt::DirectConnection);
 
     QnMutexLocker lock(&m_mutex);
-    bool result = false;
     if (request.method == HttpMethod::Get)
-        result = httpClientCaptured->doGet(request.url);
-    else if (request.method == HttpMethod::Post)
-        result = httpClientCaptured->doPost(request.url, request.contentType, request.messageBody);
-    else
-        qWarning() << Q_FUNC_INFO << __LINE__ << "Unknown HTTP request type" << (int) request.method;
-
-    if (result) {
-        m_runningRequests.insert(requestId, httpClientCaptured);
-        return requestId;
+    {
+        httpClientCaptured->doGet(request.url);
     }
-    else {
-        disconnect( httpClientCaptured.get(), nullptr, this, nullptr );
+    else if (request.method == HttpMethod::Post)
+    {
+        httpClientCaptured->doPost(request.url, request.contentType, request.messageBody);
+    }
+    else
+    {
+        disconnect(httpClientCaptured.get(), nullptr, this, nullptr);
         return Handle();
     }
+    m_runningRequests.insert(requestId, httpClientCaptured);
+    return requestId;
 }
 
 

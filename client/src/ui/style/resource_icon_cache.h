@@ -8,7 +8,7 @@
 
 /**
  * Cache for resource icons with overlaid status.
- * 
+ *
  * Note that this class is not thread-safe.
  */
 class QnResourceIconCache: public QObject {
@@ -18,7 +18,7 @@ class QnResourceIconCache: public QObject {
 public:
     enum KeyPart {
         Unknown,
-        Local,
+        LocalServer,
         Server,
         Servers,
         Layout,
@@ -34,6 +34,8 @@ public:
         OtherSystem,
         OtherSystems,
         IOModule,
+        WebPage,
+        WebPages,
         TypeMask        = 0xFF,
 
         Offline         = 1 << 8,
@@ -74,7 +76,7 @@ public:
 
     static QnResourceIconCache *instance();
 
-    
+
 private:
     QHash<Key, QIcon> m_cache;
 };

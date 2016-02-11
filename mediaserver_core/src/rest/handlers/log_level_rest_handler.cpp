@@ -2,7 +2,7 @@
 
 #include <network/tcp_connection_priv.h>
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 
 namespace {
     const QString idParam = lit("id");
@@ -15,7 +15,15 @@ int QnLogLevelRestHandler::executeGet(const QString &path, const QnRequestParams
     int logID = QnLog::MAIN_LOG_ID;
     requireParameter(params, idParam, result, &logID, true);
 
-    if (!QnLog::instanceExists(logID)) {
+    auto _nx_logs = QnLog::logs();
+    if (!_nx_logs)
+    {
+        result.setError(QnJsonRestResult::InvalidParameter,
+            lit("Logging subsystem is not initialized"));
+        return CODE_OK;
+    }
+
+    if (!_nx_logs->exists(logID)) {
         result.setError(QnJsonRestResult::InvalidParameter,
             lit("Parameter '%1' has invalid value '%2'").arg(idParam).arg(logID));
         return CODE_OK;

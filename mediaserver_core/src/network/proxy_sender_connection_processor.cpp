@@ -1,18 +1,23 @@
+
+#include "proxy_sender_connection_processor.h"
+
+#include <QtCore/QElapsedTimer>
+
 #include "common/common_globals.h"
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/user_resource.h"
-#include "proxy_sender_connection_processor.h"
-#include "network/universal_request_processor_p.h"
-#include "network/authenticate_helper.h"
 #include "network/tcp_connection_priv.h"
 #include "network/tcp_listener.h"
-#include "utils/common/log.h"
-#include "utils/network/http/asynchttpclient.h"
+#include "network/universal_request_processor_p.h"
+#include "network/universal_request_processor_p.h"
+#include "network/tcp_connection_priv.h"
+#include "network/tcp_listener.h"
+#include <nx/utils/log/log.h>
 #include "utils/common/synctime.h"
+#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/http/auth_tools.h>
 
 #include "universal_tcp_listener.h"
-
-#include <QtCore/QElapsedTimer>
 
 
 static const int SOCKET_TIMEOUT = 1000 * 5;
@@ -28,8 +33,11 @@ public:
 QnProxySenderConnection::QnProxySenderConnection(
         const SocketAddress& proxyServerUrl, const QnUuid& guid,
         QnUniversalTcpListener* owner)
-    : QnUniversalRequestProcessor(new QnProxySenderConnectionPrivate,
-        QSharedPointer<AbstractStreamSocket>(SocketFactory::createStreamSocket()), owner, false)
+    : QnUniversalRequestProcessor(
+          new QnProxySenderConnectionPrivate,
+          QSharedPointer<AbstractStreamSocket>(
+                SocketFactory::createStreamSocket().release()),
+          owner, false)
 {
     Q_D(QnProxySenderConnection);
     d->proxyServerUrl = proxyServerUrl;
@@ -102,9 +110,9 @@ static QByteArray makeProxyRequest(const QnUuid& serverUuid, const QUrl& url)
     authHeader.params["realm"] = QnAppInfo::realm().toLatin1();
 
     nx_http::header::DigestAuthorization digestHeader;
-    if (!nx_http::AsyncHttpClient::calcDigestResponse(
-                H_METHOD, admin->getName(), boost::none, admin->getDigest(),
-                url, authHeader, &digestHeader))
+    if (!nx_http::calcDigestResponse(
+                H_METHOD, admin->getName().toUtf8(), boost::none, admin->getDigest(),
+                url.path().toUtf8(), authHeader, &digestHeader))
         return QByteArray();
 
     return QString(QLatin1String(
@@ -116,7 +124,7 @@ static QByteArray makeProxyRequest(const QnUuid& serverUuid, const QUrl& url)
        "\r\n"))
             .arg(QString::fromUtf8(H_METHOD)).arg(QString::fromUtf8(H_PATH))
             .arg(url.host()).arg(url.port(nx_http::DEFAULT_HTTP_PORT))
-            .arg(QString::fromUtf8(digestHeader.toString()))
+            .arg(QString::fromUtf8(digestHeader.serialized()))
             .arg(admin->getName()).arg(serverUuid.toString())
             .toUtf8();
 }

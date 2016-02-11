@@ -1,6 +1,6 @@
 #include "motion_helper.h"
 #include "motion_archive.h"
-#include "core/dataprovider/abstract_streamdataprovider.h"
+#include <nx/streaming/abstract_stream_data_provider.h>
 #include "utils/common/util.h"
 #include <QtCore/QFileInfo>
 #include <QtCore/QDir>

@@ -14,11 +14,13 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
+#include <core/resource/webpage_resource.h>
 
 #include <nx_ec/data/api_camera_data.h>
 #include <nx_ec/data/api_user_data.h>
 #include <nx_ec/data/api_videowall_data.h>
 #include <nx_ec/data/api_layout_data.h>
+#include <nx_ec/data/api_webpage_data.h>
 #include <nx_ec/data/api_conversion_functions.h>
 
 QnResourcesChangesManager::QnResourcesChangesManager(QObject* parent /*= nullptr*/):
@@ -50,7 +52,7 @@ void QnResourcesChangesManager::deleteResources(const QnResourceList &resources)
             idToDelete << parentToDelete;
         idToDelete << resource->getId();
     }
-    
+
     connection->getResourceManager()->remove( idToDelete, this, [this, resources, sessionGuid](int reqID, ec2::ErrorCode errorCode) {
         Q_UNUSED(reqID);
 
@@ -86,15 +88,15 @@ void QnResourcesChangesManager::saveCameras(const QnVirtualCameraResourceList &c
      saveCamerasBatch(cameras, batchFunction);
 }
 
-void QnResourcesChangesManager::saveCamerasBatch(const QnVirtualCameraResourceList &cameras, 
-                                                 BatchChangesFunction applyChanges, 
+void QnResourcesChangesManager::saveCamerasBatch(const QnVirtualCameraResourceList &cameras,
+                                                 BatchChangesFunction applyChanges,
                                                  RollbackFunction rollback) {
     if (!applyChanges)
         return;
 
     auto idList = idListFromResList(cameras);
 
-    QPointer<QnCameraUserAttributePool> pool(QnCameraUserAttributePool::instance());   
+    QPointer<QnCameraUserAttributePool> pool(QnCameraUserAttributePool::instance());
 
     QList<QnCameraUserAttributes> backup;
     for(const QnCameraUserAttributesPtr& cameraAttrs: pool->getAttributesList(idList)) {
@@ -104,15 +106,15 @@ void QnResourcesChangesManager::saveCamerasBatch(const QnVirtualCameraResourceLi
 
     auto sessionGuid = qnCommon->runningInstanceGUID();
 
-    applyChanges(); 
-    auto changes = pool->getAttributesList(idList);   
+    applyChanges();
+    auto changes = pool->getAttributesList(idList);
 
     auto connection = QnAppServerConnectionFactory::getConnection2();
     if (!connection)
         return;
 
-   connection->getCameraManager()->saveUserAttributes(changes, this, 
-        [this, cameras, pool, backup, sessionGuid, rollback]( int reqID, ec2::ErrorCode errorCode ) 
+   connection->getCameraManager()->saveUserAttributes(changes, this,
+        [this, cameras, pool, backup, sessionGuid, rollback]( int reqID, ec2::ErrorCode errorCode )
     {
         Q_UNUSED(reqID);
 
@@ -130,7 +132,7 @@ void QnResourcesChangesManager::saveCamerasBatch(const QnVirtualCameraResourceLi
             {
                 QnCameraUserAttributePool::ScopedLock userAttributesLock( pool, cameraAttrs.cameraID );
                 (*userAttributesLock)->assign( cameraAttrs, &modifiedFields );
-            }            
+            }
             if( const QnResourcePtr& res = qnResPool->getResourceById(cameraAttrs.cameraID) )   //it is OK if resource is missing
                 res->emitModificationSignals( modifiedFields );
         }
@@ -142,7 +144,7 @@ void QnResourcesChangesManager::saveCamerasBatch(const QnVirtualCameraResourceLi
     });
 
     //TODO: #GDM SafeMode values are not rolled back
-    propertyDictionary->saveParamsAsync(idList);  
+    propertyDictionary->saveParamsAsync(idList);
 }
 
  void QnResourcesChangesManager::saveCamerasCore(const QnVirtualCameraResourceList &cameras, CameraChangesFunction applyChanges) {
@@ -202,14 +204,14 @@ void QnResourcesChangesManager::saveServers(const QnMediaServerResourceList &ser
 }
 
 void QnResourcesChangesManager::saveServersBatch(const QnMediaServerResourceList &servers,
-                                                 BatchChangesFunction applyChanges, 
+                                                 BatchChangesFunction applyChanges,
                                                  RollbackFunction rollback) {
     if (!applyChanges)
         return;
 
     auto idList = idListFromResList(servers);
 
-    QPointer<QnMediaServerUserAttributesPool> pool(QnMediaServerUserAttributesPool::instance());   
+    QPointer<QnMediaServerUserAttributesPool> pool(QnMediaServerUserAttributesPool::instance());
 
     QList<QnMediaServerUserAttributes> backup;
     for(const QnMediaServerUserAttributesPtr& serverAttrs: pool->getAttributesList(idList)) {
@@ -219,15 +221,15 @@ void QnResourcesChangesManager::saveServersBatch(const QnMediaServerResourceList
 
     auto sessionGuid = qnCommon->runningInstanceGUID();
 
-    applyChanges(); 
-    auto changes = pool->getAttributesList(idList);   
+    applyChanges();
+    auto changes = pool->getAttributesList(idList);
 
     auto connection = QnAppServerConnectionFactory::getConnection2();
     if (!connection)
         return;
 
-    connection->getMediaServerManager()->saveUserAttributes(changes, this, 
-        [this, servers, pool, backup, sessionGuid, rollback]( int reqID, ec2::ErrorCode errorCode ) 
+    connection->getMediaServerManager()->saveUserAttributes(changes, this,
+        [this, servers, pool, backup, sessionGuid, rollback]( int reqID, ec2::ErrorCode errorCode )
     {
         Q_UNUSED(reqID);
 
@@ -265,7 +267,7 @@ void QnResourcesChangesManager::saveServersBatch(const QnMediaServerResourceList
     });
 
     //TODO: #GDM SafeMode values are not rolled back
-    propertyDictionary->saveParamsAsync(idList);  
+    propertyDictionary->saveParamsAsync(idList);
 }
 
 /************************************************************************/
@@ -280,7 +282,7 @@ void QnResourcesChangesManager::saveUser(const QnUserResourcePtr &user, UserChan
 
     ec2::ApiUserData backup;
     ec2::fromResourceToApi(user, backup);
-    
+
     applyChanges(user);
 
     auto connection = QnAppServerConnectionFactory::getConnection2();
@@ -319,7 +321,7 @@ void QnResourcesChangesManager::saveVideoWall(const QnVideoWallResourcePtr &vide
 
     ec2::ApiVideowallData backup;
     ec2::fromResourceToApi(videoWall, backup);
-    
+
 
     applyChanges(videoWall);
 
@@ -383,6 +385,46 @@ void QnResourcesChangesManager::saveLayout(const QnLayoutResourcePtr &layout, La
             ec2::fromApiToResource(backup, existingLayout);
 
         emit saveChangesFailed(QnResourceList() << layout);
+    } );
+}
+
+/************************************************************************/
+/* WebPages block                                                       */
+/************************************************************************/
+
+void QnResourcesChangesManager::saveWebPage(const QnWebPageResourcePtr &webPage, WebPageChangesFunction applyChanges)
+{
+    if (!applyChanges)
+        return;
+
+    auto sessionGuid = qnCommon->runningInstanceGUID();
+
+    ec2::ApiWebPageData backup;
+    ec2::fromResourceToApi(webPage, backup);
+
+    applyChanges(webPage);
+
+    auto connection = QnAppServerConnectionFactory::getConnection2();
+    if (!connection)
+        return;
+
+    connection->getWebPageManager()->save(webPage, this, [this, webPage, sessionGuid, backup]( int reqID, ec2::ErrorCode errorCode ) {
+        Q_UNUSED(reqID);
+
+        /* Check if all OK */
+        if (errorCode == ec2::ErrorCode::ok)
+            return;
+
+        /* Check if we have already changed session or attributes pool was recreated. */
+        if (qnCommon->runningInstanceGUID() != sessionGuid)
+            return;
+
+        QnUuid webPageId = webPage->getId();
+        QnWebPageResourcePtr existingWebPage = qnResPool->getResourceById<QnWebPageResource>(webPageId);
+        if (existingWebPage)
+            ec2::fromApiToResource(backup, existingWebPage);
+
+        emit saveChangesFailed(QnResourceList() << webPage);
     } );
 }
 

@@ -12,7 +12,8 @@ extern "C"
 }
 
 #include <utils/media/ffmpeg_helper.h>
-#include <utils/common/log.h>
+#include <utils/media/av_codec_helper.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/util.h>
 #include <utils/common/model_functions.h>
 
@@ -21,7 +22,8 @@ extern "C"
 #include <core/resource/resource_media_layout.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource/media_resource.h>
-#include <core/datapacket/video_data_packet.h>
+#include <nx/streaming/video_data_packet.h>
+#include <nx/streaming/av_codec_media_context.h>
 #include <core/ptz/media_dewarping_params.h>
 
 #include <plugins/resource/avi/avi_resource.h>
@@ -90,7 +92,7 @@ public:
                 if (audioNum++ < index)
                     continue;
                 //result.codec = codecContext->codec_id;
-                result.codecContext =  QnMediaContextPtr(new QnMediaContext(codecContext));
+                result.codecContext = QnConstMediaContextPtr(new QnAvCodecMediaContext(codecContext));
                 result.description = QString::number(++audioNumber);
                 result.description += QLatin1String(". ");
 
@@ -102,7 +104,7 @@ public:
                     result.description += QLatin1String(" - ");
                 }
 
-                result.description = getAudioCodecDescription(codecContext);
+                result.description = result.codecContext->getAudioCodecDescription();
                 break;
             }
         }
@@ -159,18 +161,18 @@ qint64 QnAviArchiveDelegate::endTime() const
         return m_duration + m_startTime;
 }
 
-QnMediaContextPtr QnAviArchiveDelegate::getCodecContext(AVStream* stream)
+QnConstMediaContextPtr QnAviArchiveDelegate::getCodecContext(AVStream* stream)
 {
     //if (stream->codec->codec_id == CODEC_ID_MJPEG)
-    //    return QnMediaContextPtr(new QnMediaContext(stream->codec));
+    //    return QnConstMediaContextPtr(nullptr);
 
     while (m_contexts.size() <= stream->index)
-        m_contexts << QnMediaContextPtr(0);
+        m_contexts << QnConstMediaContextPtr(nullptr);
 
-    if (m_contexts[stream->index] == 0 || 
-        m_contexts[stream->index]->ctx()->codec_id != stream->codec->codec_id)
+    if (m_contexts[stream->index] == 0 ||
+        m_contexts[stream->index]->getCodecId() != stream->codec->codec_id)
     {
-	    m_contexts[stream->index] = QnMediaContextPtr(new QnMediaContext(stream->codec));
+        m_contexts[stream->index] = QnConstMediaContextPtr(new QnAvCodecMediaContext(stream->codec));
     }
 
     return m_contexts[stream->index];

@@ -51,6 +51,9 @@ namespace SystemError
         }
         return QString::fromWCharArray( msgBuf );
 #else
+        if( errorCode == dnsServerFailure )
+            return QLatin1String("DNS server falure");
+
         return QString::fromLatin1( strerror( errorCode ) );
 #endif
     }

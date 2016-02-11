@@ -8,14 +8,14 @@
 #include <core/resource_management/resource_pool.h>
 
 #include "recording/stream_recorder.h"
-#include "core/dataprovider/media_streamdataprovider.h"
+#include <nx/streaming/abstract_media_stream_data_provider.h>
 #include "camera/camera_pool.h"
 #include "plugins/resource/server_archive/server_archive_delegate.h"
-#include "plugins/resource/archive/archive_stream_reader.h"
+#include "nx/streaming/archive_stream_reader.h"
 #include "camera/video_camera.h"
 #include "core/misc/schedule_task.h"
 #include "server_stream_recorder.h"
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include "utils/common/synctime.h"
 #include "api/app_server_connection.h"
 #include "plugins/storage/dts/abstract_dts_reader_factory.h"

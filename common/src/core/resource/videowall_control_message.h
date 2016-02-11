@@ -2,7 +2,7 @@
 #define VIDEOWALL_CONTROL_MESSAGE_H
 
 #include <QtCore/QObject>
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 #include <QtCore/QHash>
 #include <QtCore/QString>
 #include <QtCore/QMetaType>

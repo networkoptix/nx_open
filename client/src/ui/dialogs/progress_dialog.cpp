@@ -41,16 +41,16 @@
 
 #include "progress_dialog.h"
 
-#include "qshortcut.h"
-#include "qpainter.h"
-#include "qdrawutil.h"
-#include "qprogressbar.h"
-#include "qapplication.h"
-#include "qstyle.h"
-#include "qpushbutton.h"
-#include "qcursor.h"
-#include "qtimer.h"
-#include "qelapsedtimer.h"
+#include <QtWidgets/QShortcut>
+#include <QtGui/QPainter>
+#include <QtWidgets/QProgressBar>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QStyle>
+#include <QtWidgets/QPushButton>
+#include <QtGui/QCursor>
+#include <QtCore/QTimer>
+#include <QtCore/QElapsedTimer>
+
 #include <limits.h>
 
 #include <QtCore/QPointer>

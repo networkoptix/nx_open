@@ -3,7 +3,7 @@
 
 #include <QtCore/QList>
 #include <QtCore/QMap>
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 #include <QtCore/QSharedPointer>
 
 #include "param.h"
@@ -67,6 +67,10 @@ public:
     typedef QMap<QnUuid, QnResourceTypePtr> QnResourceTypeMap;
 
     static const QString desktopCameraTypeName;
+    static const QString kLayoutTypeId;
+    static const QString kServerTypeId;
+    static const QString kVideoWallTypeId;
+    static const QString kWebPageTypeId;
 
     static QnResourceTypePool *instance();
 

@@ -1,13 +1,14 @@
 #include "storage_db.h"
-#include "qsqlquery.h"
-#include <QtSql>
+
+#include <QtSql/QSqlQuery>
+#include <QtSql/QSqlError>
 
 
 #include <core/resource/storage_plugin_factory.h>
 #include <plugins/storage/file_storage/file_storage_resource.h>
 
 #include <utils/serialization/sql.h>
-#include "utils/common/log.h"
+#include <nx/utils/log/log.h>
 #include "utils/common/util.h"
 
 static const int COMMIT_INTERVAL = 1000 * 60 * 1;
@@ -63,7 +64,7 @@ bool QnStorageDb::addRecord(const QString& cameraUniqueId, QnServer::ChunksCatal
         return true;
 
     m_delayedData << DelayedData(cameraUniqueId, catalog, chunk);
-    if (m_lastTranTime.elapsed() < COMMIT_INTERVAL) 
+    if (m_lastTranTime.elapsed() < COMMIT_INTERVAL)
         return true;
 
     return flushRecordsNoLock();
@@ -192,14 +193,14 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadFullFileCatalog() {
     result << loadChunksFileCatalog();
 
     addCatalogFromMediaFolder(
-        lit("hi_quality"), 
-        QnServer::HiQualityCatalog, 
+        lit("hi_quality"),
+        QnServer::HiQualityCatalog,
         result
     );
-    
+
     addCatalogFromMediaFolder(
-        lit("low_quality"), 
-        QnServer::LowQualityCatalog, 
+        lit("low_quality"),
+        QnServer::LowQualityCatalog,
         result
     );
 
@@ -208,7 +209,7 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadFullFileCatalog() {
 
 bool isCatalogExistInResult(const QVector<DeviceFileCatalogPtr>& result, QnServer::ChunksCatalog catalog, const QString& uniqueId)
 {
-    for(const DeviceFileCatalogPtr& c: result) 
+    for(const DeviceFileCatalogPtr& c: result)
     {
         if (c->getRole() == catalog && c->cameraUniqueId() == uniqueId)
             return true;
@@ -217,8 +218,8 @@ bool isCatalogExistInResult(const QVector<DeviceFileCatalogPtr>& result, QnServe
 }
 
 void QnStorageDb::addCatalogFromMediaFolder(
-    const QString&                  postfix, 
-    QnServer::ChunksCatalog         catalog, 
+    const QString&                  postfix,
+    QnServer::ChunksCatalog         catalog,
     QVector<DeviceFileCatalogPtr>&  result
 )
 {
@@ -229,7 +230,7 @@ void QnStorageDb::addCatalogFromMediaFolder(
     else
         files = QnAbstractStorageResource::FIListFromQFIList(
             QDir(root).entryInfoList(
-                QDir::Dirs | QDir::NoDotAndDotDot, 
+                QDir::Dirs | QDir::NoDotAndDotDot,
                 QDir::Name
             )
         );
@@ -238,10 +239,10 @@ void QnStorageDb::addCatalogFromMediaFolder(
     {
         QString uniqueId = fi.baseName();
         if (!isCatalogExistInResult(result, catalog, uniqueId)) {
-            result 
+            result
                 << DeviceFileCatalogPtr(
                         new DeviceFileCatalog(
-                            uniqueId, 
+                            uniqueId,
                             catalog,
                             QnServer::StoragePool::None
                         )
@@ -282,7 +283,7 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadChunksFileCatalog() {
     {
         QByteArray id = query.value(idFieldIdx).toByteArray();
         QnServer::ChunksCatalog catalog = (QnServer::ChunksCatalog) query.value(roleFieldIdx).toInt();
-        if (id != prevId || catalog != prevCatalog) 
+        if (id != prevId || catalog != prevCatalog)
         {
             if (fileCatalog) {
                 fileCatalog->addChunks(chunks);
@@ -294,7 +295,7 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadChunksFileCatalog() {
             prevId = id;
             fileCatalog = DeviceFileCatalogPtr(
                 new DeviceFileCatalog(
-                    QString::fromUtf8(id), 
+                    QString::fromUtf8(id),
                     catalog,
                     QnServer::StoragePool::None // It's not important here
                 )

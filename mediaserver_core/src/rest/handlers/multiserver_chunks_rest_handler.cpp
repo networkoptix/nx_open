@@ -16,7 +16,7 @@
 #include <core/resource/user_resource.h>
 
 #include <utils/common/model_functions.h>
-#include <utils/network/http/asynchttpclient.h>
+#include <nx/network/http/asynchttpclient.h>
 #include <utils/serialization/compressed_time.h>
 
 #include <server/server_globals.h>

@@ -6,7 +6,7 @@
 #include <nx_ec/data/api_fwd.h>
 #include <nx_ec/data/api_runtime_data.h>
 
-#include <utils/common/singleton.h>
+#include <nx/utils/singleton.h>
 #include <utils/common/threadsafe_item_storage.h>
 
 struct QnPeerRuntimeInfo {

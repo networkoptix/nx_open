@@ -11,7 +11,7 @@
 #include <QtCore/QVector>
 #include <QtCore/QString>
 #include <QtCore/QStringList>
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include "camera_plugin.h"
 

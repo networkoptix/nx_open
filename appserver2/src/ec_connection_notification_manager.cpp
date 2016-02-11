@@ -14,6 +14,7 @@
 #include "managers/resource_manager.h"
 #include "managers/user_manager.h"
 #include "managers/videowall_manager.h"
+#include "managers/webpage_manager.h"
 #include "managers/updates_manager.h"
 #include "managers/time_manager.h"
 #include "managers/misc_manager.h"
@@ -31,6 +32,7 @@ namespace ec2
         QnBusinessEventNotificationManager* businessEventManager,
         QnLayoutNotificationManager* layoutManager,
         QnVideowallNotificationManager* videowallManager,
+        QnWebPageNotificationManager *webPageManager,
         QnStoredFileNotificationManager* storedFileManager,
         QnUpdatesNotificationManager* updatesManager,
         QnMiscNotificationManager *miscManager,
@@ -46,6 +48,7 @@ namespace ec2
         m_businessEventManager( businessEventManager ),
         m_layoutManager( layoutManager ),
         m_videowallManager( videowallManager ),
+        m_webPageManager (webPageManager),
         m_storedFileManager( storedFileManager ),
         m_updatesManager( updatesManager ),
         m_miscManager( miscManager ),
@@ -89,6 +92,11 @@ namespace ec2
         m_videowallManager->triggerNotification( tran );
     }
 
+    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiWebPageData>& tran ) {
+        m_webPageManager->triggerNotification( tran );
+    }
+
+
     void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiIdDataList>& tran ) {
         switch( tran.command )
         {
@@ -119,6 +127,8 @@ namespace ec2
             return m_layoutManager->triggerNotification( tran );
         case ApiCommand::removeVideowall:
             return m_videowallManager->triggerNotification( tran );
+        case ApiCommand::removeWebPage:
+            return m_webPageManager->triggerNotification( tran );
         case ApiCommand::forcePrimaryTimeServer:
             //#ak no notification needed
             break;

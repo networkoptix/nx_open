@@ -2,7 +2,7 @@
 
 #include "dlink_resource.h"
 
-#include <utils/network/http/asynchttpclient.h>
+#include <nx/network/http/asynchttpclient.h>
 
 #include "dlink_stream_reader.h"
 #include "../onvif/dataprovider/onvif_mjpeg.h"
@@ -149,7 +149,7 @@ QnPlDlinkResource::QnPlDlinkResource()
     setDefaultAuth(QLatin1String("admin"), QLatin1String(""));
 }
 
-bool QnPlDlinkResource::checkIfOnlineAsync( std::function<void(bool)>&& completionHandler )
+void QnPlDlinkResource::checkIfOnlineAsync( std::function<void(bool)> completionHandler )
 {
     QUrl apiUrl;
     apiUrl.setScheme( lit("http") );
@@ -192,7 +192,7 @@ bool QnPlDlinkResource::checkIfOnlineAsync( std::function<void(bool)>&& completi
         completionHandler( false );
     };
 
-    return nx_http::downloadFileAsync(
+    nx_http::downloadFileAsync(
         apiUrl,
         requestCompletionFunc );
 }

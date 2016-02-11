@@ -12,11 +12,6 @@
 
 #include "security_cam_resource.h"
 
-#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
-#define CodecID int
-#define CODEC_ID_NONE 0
-#endif
-
 class QnAbstractDTSFactory;
 
 class CameraMediaStreams;

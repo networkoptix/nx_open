@@ -9,7 +9,7 @@
 #include <api/model/manual_camera_seach_reply.h>
 #include <core/resource/resource_fwd.h>
 #include <utils/common/concurrent.h>
-#include <utils/network/ip_range_checker_async.h>
+#include <nx/network/ip_range_checker_async.h>
 
 
 //!Scans different addresses simultaneously (using aio or concurrent operations)
@@ -33,10 +33,10 @@ private:
     /** Mutex that is used to synchronize access to private fields. */
     mutable QnMutex m_mutex;
 
-    QnManualCameraSearchStatus::State m_state;
+    QnManualResourceSearchStatus::State m_state;
     bool m_singleAddressCheck;
-    QnConcurrent::QnFuture<QnManualCameraSearchCameraList>* m_scanProgress;
-    QnManualCameraSearchCameraList m_results;
+    QnConcurrent::QnFuture<QnManualResourceSearchList>* m_scanProgress;
+    QnManualResourceSearchList m_results;
     bool m_cancelled;
     QnIpRangeCheckerAsync m_ipChecker;
     int m_hostRangeSize;

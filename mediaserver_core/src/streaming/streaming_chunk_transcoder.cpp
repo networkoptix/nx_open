@@ -4,16 +4,16 @@
 
 #include "streaming_chunk_transcoder.h"
 
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include <core/dataprovider/h264_mp4_to_annexb.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/security_cam_resource.h>
-#include <plugins/resource/archive/abstract_archive_stream_reader.h>
+#include <nx/streaming/abstract_archive_stream_reader.h>
 #include <recording/time_period.h>
 #include <transcoding/ffmpeg_transcoder.h>
-#include <utils/common/log.h>
-#include <utils/common/timermanager.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/timermanager.h>
 
 #include "ondemand_media_data_provider.h"
 #include "live_media_cache_reader.h"
@@ -170,7 +170,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
                 return false;
             }
 
-            QnAbstractArchiveReader* archiveReader = dynamic_cast<QnAbstractArchiveReader*>(dp.data());
+            QnAbstractArchiveStreamReader* archiveReader = dynamic_cast<QnAbstractArchiveStreamReader*>(dp.data());
             if( !archiveReader || !archiveReader->open() )
             {
                 NX_LOG( lit("StreamingChunkTranscoder::transcodeAsync. Failed (2) to create archive data provider (resource %1)").

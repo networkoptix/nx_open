@@ -38,9 +38,9 @@
 #include <utils/applauncher_utils.h>
 #include <utils/common/url.h>
 
-#include "plugins/resource/avi/avi_resource.h"
-#include "plugins/resource/archive/abstract_archive_stream_reader.h"
-#include "plugins/resource/avi/filetypesupport.h"
+#include <plugins/resource/avi/avi_resource.h>
+#include <nx/streaming/abstract_archive_stream_reader.h>
+#include <plugins/resource/avi/filetypesupport.h>
 
 #include "connection_testing_dialog.h"
 

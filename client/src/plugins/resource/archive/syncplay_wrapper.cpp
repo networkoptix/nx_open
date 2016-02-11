@@ -1,7 +1,7 @@
 #include "syncplay_wrapper.h"
 
 #include <QtCore/QElapsedTimer>
-#include <utils/thread/wait_condition.h>
+#include <nx/utils/thread/wait_condition.h>
 #include <QtCore/QCoreApplication>
 
 #include "utils/common/util.h"
@@ -18,7 +18,7 @@ static const qint64 SYNC_FOR_FRAME_EPS = 1000 * 50;
 
 struct ReaderInfo
 {
-    ReaderInfo(QnAbstractArchiveReader* _reader, QnAbstractArchiveDelegate* _oldDelegate, QnlTimeSource* _cam):
+    ReaderInfo(QnAbstractArchiveStreamReader* _reader, QnAbstractArchiveDelegate* _oldDelegate, QnlTimeSource* _cam):
         reader(_reader),
         oldDelegate(_oldDelegate),
         cam(_cam),
@@ -29,7 +29,7 @@ struct ReaderInfo
         maxTimeUsec(0)
     {
     }
-    QnAbstractArchiveReader* reader;
+    QnAbstractArchiveStreamReader* reader;
     QnAbstractArchiveDelegate* oldDelegate;
     QnlTimeSource* cam;
     bool buffering;
@@ -253,7 +253,7 @@ void QnArchiveSyncPlayWrapper::previousFrame(qint64 mksec)
 
 // -------------------------- end of navigation ----------------------------
 
-void QnArchiveSyncPlayWrapper::addArchiveReader(QnAbstractArchiveReader* reader, QnlTimeSource* cam)
+void QnArchiveSyncPlayWrapper::addArchiveReader(QnAbstractArchiveStreamReader* reader, QnlTimeSource* cam)
 {
     Q_D(QnArchiveSyncPlayWrapper);
     if (reader == 0)
@@ -474,7 +474,7 @@ qint64 QnArchiveSyncPlayWrapper::endTime() const
     return found ? result : AV_NOPTS_VALUE;
 }
 
-void QnArchiveSyncPlayWrapper::removeArchiveReader(QnAbstractArchiveReader* reader)
+void QnArchiveSyncPlayWrapper::removeArchiveReader(QnAbstractArchiveStreamReader* reader)
 {
     erase(reader->getArchiveDelegate());
     onEofReached(0, true);
@@ -580,7 +580,7 @@ void QnArchiveSyncPlayWrapper::onEofReached(QnlTimeSource* source, bool value)
 {
     Q_D(QnArchiveSyncPlayWrapper);
     QnMutexLocker lock( &d->timeMutex );
-    QnAbstractArchiveReader* reader = 0;
+    QnAbstractArchiveStreamReader* reader = 0;
     for (QList<ReaderInfo>::iterator i = d->readers.begin(); i < d->readers.end(); ++i)
     {
         if (i->cam == source)
@@ -694,7 +694,7 @@ qint64 QnArchiveSyncPlayWrapper::getCurrentTimeInternal() const
         return qMax(expectTime, displayedTime - SYNC_EPS);
 }
 
-void QnArchiveSyncPlayWrapper::onConsumerBlocksReaderInternal(QnAbstractArchiveReader* reader, bool value)
+void QnArchiveSyncPlayWrapper::onConsumerBlocksReaderInternal(QnAbstractArchiveStreamReader* reader, bool value)
 {
     Q_D(QnArchiveSyncPlayWrapper);
     for (int i = 0; i < d->readers.size(); ++i)
@@ -717,7 +717,7 @@ void QnArchiveSyncPlayWrapper::onConsumerBlocksReader(QnAbstractStreamDataProvid
 {
     Q_D(QnArchiveSyncPlayWrapper);
     QnMutexLocker lock( &d->timeMutex );
-    QnAbstractArchiveReader* reader = dynamic_cast<QnAbstractArchiveReader*> (_reader);
+    QnAbstractArchiveStreamReader* reader = dynamic_cast<QnAbstractArchiveStreamReader*> (_reader);
     if (!reader)
         return;
     bool isSyncReader = reader->getResource()->hasFlags(Qn::sync);

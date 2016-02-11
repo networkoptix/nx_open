@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include <QDialog>
+#include <QtWidgets/QDialog>
 
 /// @brief Base dialog class. Fixes dialog hang on when dragging items on show.
 /// Cancels drag event before showing dialog.

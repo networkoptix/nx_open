@@ -10,7 +10,7 @@
 #include <QElapsedTimer>
 
 #include <core/resource/resource_fwd.h>
-#include "utils/common/uuid.h"
+#include <nx/utils/uuid.h>
 
 class QnMServerFailureBusinessEvent;
 

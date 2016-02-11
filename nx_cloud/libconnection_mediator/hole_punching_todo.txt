@@ -1,0 +1,116 @@
+Notes on address resolving
+
+- connection that requires interaction with mediator will be called "cloud connection", target address of this connection is called "cloud address"
+    - distinguishing traditional/cloud addresses: if hostname is an ip-address or can be resolved locally, then using traditional sockets. 
+        Otherwise, establishing cloud connection
+    - cloud address following format: {server_id}.{system_name} or just {system_name}. In the latter case mediator is expected to select mediaserver, 
+        nearest to the client (by using some third-party ip address DB)
+    - resolving host name is done in the following way:
+        - using local dictionary of peers. Address is added to this dictionary after peer has been found by multicast or by added manually by user
+        - by gethostbyname function
+
+
+!!!! In general, hole punching implementation MUST be as close to sockets as possible. That is, it MUST be hidden behind abstract socket API 
+    so that to minimize existing code refactoring !!!!
+
+
+
+Implementation decomposition:
+
+1. add UDT support to sockets
+    (done) 1.1. implement AbstractCommunicatingSocket, AbstractServerSocket using UDT
+    (done) 1.2. add UDT support to aio
+        (done) 1.2.1. implement PollSet via UDT
+        (done) 1.2.2. AIOThread: must be able to use different Pollset (for system sockets and UDT sockets)
+        1.2.3. AIOService:
+            (done) - must be able to use different aio threads for different socket types (system sockets and UDT sockets)
+            - MUST be able to specify thread count for system sockets and for UDT sockets
+            (done) - make AIOService non-public. Socket async API must be used instead. This will allow AIOService to accept specific socket type, 
+                not AbstratSocket and select AIOThread type on compile-time
+
+2. mediator implementation
+    - some authentication shoud be implied to allow only networkoptix modules to talk to the mediator
+
+    2.1. async connection server. It will be used as a base for STUN API and (possibly) HTTP API
+        (done) - must be abstracted from protocol type
+        (done) - better use templates instead of abstract classes
+    2.2. STUN server implementation
+        2.2.1. STUN message/notification parser/serializator
+        2.2.2. implement standard STUN logic: retrieval of public IP address
+        2.2.3. implement custom STUN requests (bind, connect, connection_requested)
+        2.2.3. Re-routing requests to another mediator instance. If server is listening on another mediator, MUST re-route incoming connection request to that server
+    2.3. HTTP API
+        2.3.1. implement register/unregister requests
+        2.3.2. in the future some statistics gathering requests may be added
+    2.4. DB layer. Used to store information about registered systems
+        - selection is based on what could hosting provide
+        - although, SQL is not required at the moment, it may be required in the future, so better use cloud SQL DB
+    2.5. Cloud layer. Used to store information about currently on-line servers, listening for incoming cloud connections
+        - mediators MUST share on-line information about listening servers
+        - it would be great to use same code as used to synchronise data between EC2 peers
+    2.6. (low priority) search of mediaserver nearest to the connection peer. Should use some IP address DB
+    2.7. (low priority) load-balancing between mediators
+        - mediators, placed in same region, can re-route bind requests to each other to balance load
+
+3. host name resolving
+    - add address table to be used to resolve address
+    - all found peers MUST be placed into this table
+        - peer address looks like {peer_id}.{system_name}
+
+4. hole punching itself
+    Peers first setup UDT tunnel, than verify each other via that tunnel and than establish connection using this tunnel.
+    So, we always have n+1 cloud connection. One - for internal purposes
+
+    4.1. add hole punching server connections manager
+        4.1.1. registers in mediator(s?) and listens for incoming hole punching connections
+            - mediator may suggest another mediator for listening
+        4.1.2. after receiving connection request it sets up UDT tunnel to initiating host using rendezvous UDT connection
+
+        Sample hole punching server declaration:
+            class CloudConnectionsServer
+            {
+            public:
+                /*!
+                    \a handler has following type: ( ErrorCode, UDTConnection* )
+                */
+                bool acceptAsync( handler );
+            };
+
+    4.2. hole punching client connections manager
+        4.2.1. when user calls socket.connect implying hole punching, it 
+            - connects to the closest mediator instance and requests connection to the server
+            - mediator can re-route request to another mediator instance
+                - client should remember mediator it used to connect to peer
+            - sets up hole punching tunnel to the requested host by using rendezvous UDT connection
+        4.2.2. futher connection initiation should be done by direct interaction via existing tunnel
+            - tunnel should live some time after last connection has been closed
+
+    4.3. tunneling should be managed by same class on server and client side
+        Sample tunnel class declaration:
+            class CloudTunnel
+            {
+            public:
+                /*!
+                    \a handler has following type: ( ErrorCode, UDTConnection* )
+                    \note No address specified since tunnel created between two peers and address is per tunnel, not per connection
+                */
+                bool connectionAsync( handler );
+
+            signals:
+                void newConnectionAccepted( UDTConnection* );
+                void tunnelClosed( reason );
+            };
+
+5. get rid of QT sockets in client:
+    5.1. refactor mediaserver API in client
+        - api should be async and type safe
+        - should use code from ec2 api as much as possible
+
+6. registering system in cloud
+    6.1. 
+        - registration is initiated automatically during first mediaserver start
+        - mediaserver connects to mediator and calls "register", providing its system name
+        - if system name is unique, mediator generates some authentication key, saves system name / authentication key in DB and responses with authentication key
+        - if system name is not unique, message should be shown to the client, offering him to change system name to an unique value
+
+    6.2. (low priority) Some administration tools should be added to allow view/change/delete registrations, find unused registrations, etc..

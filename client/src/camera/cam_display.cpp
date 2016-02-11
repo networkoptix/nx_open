@@ -3,15 +3,15 @@
 #include <QtCore/QDateTime>
 #include <QtCore/QFileInfo>
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/util.h>
 #include <utils/common/synctime.h>
 
 #include "core/resource/camera_resource.h"
-#include "core/datapacket/media_data_packet.h"
+#include "nx/streaming/media_data_packet.h"
 
-#include "decoders/audio/ffmpeg_audio.h"
-#include "plugins/resource/archive/archive_stream_reader.h"
+#include "decoders/audio/ffmpeg_audio_decoder.h"
+#include "nx/streaming/archive_stream_reader.h"
 #include "redass/redass_controller.h"
 
 #include "video_stream_display.h"
@@ -1252,14 +1252,20 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
     bool flushCurrentBuffer = false;
     int expectedBufferSize = m_isRealTimeSource ? REALTIME_AUDIO_BUFFER_SIZE : DEFAULT_AUDIO_BUFF_SIZE;
     QnCodecAudioFormat currentAudioFormat;
-    bool audioParamsChanged = ad && (m_playingFormat != currentAudioFormat.fromAvStream(ad->context) || m_audioDisplay->getAudioBufferSize() != expectedBufferSize);
+    bool audioParamsChanged = false;
+    if (ad)
+    {
+        currentAudioFormat = QnCodecAudioFormat(ad->context);
+        audioParamsChanged = m_playingFormat != currentAudioFormat || m_audioDisplay->getAudioBufferSize() != expectedBufferSize;
+    }
     if (((media->flags & QnAbstractMediaData::MediaFlags_AfterEOF) || audioParamsChanged) &&
         m_videoQueue[0].size() > 0)
     {
         // skip data (play current buffer
         flushCurrentBuffer = true;
     }
-    else if (emptyData && m_videoQueue[0].size() > 0) {
+    else if (emptyData && m_videoQueue[0].size() > 0)
+    {
         flushCurrentBuffer = true;
     }
     else if (media->flags & QnAbstractMediaData::MediaFlags_AfterEOF) 

@@ -25,6 +25,7 @@
 #include "managers/resource_manager.h"
 #include "managers/user_manager.h"
 #include "managers/videowall_manager.h"
+#include "managers/webpage_manager.h"
 #include "managers/updates_manager.h"
 #include "managers/misc_manager.h"
 #include "managers/discovery_manager.h"
@@ -55,6 +56,7 @@ namespace ec2
         virtual AbstractUserManagerPtr getUserManager() override;
         virtual AbstractLayoutManagerPtr getLayoutManager() override;
         virtual AbstractVideowallManagerPtr getVideowallManager() override;
+        virtual AbstractWebPageManagerPtr getWebPageManager() override;
         virtual AbstractStoredFileManagerPtr getStoredFileManager() override;
         virtual AbstractUpdatesManagerPtr getUpdatesManager() override;
         virtual AbstractMiscManagerPtr getMiscManager() override;
@@ -91,6 +93,7 @@ namespace ec2
         std::shared_ptr<QnBusinessEventManager<QueryProcessorType>> m_businessEventManager;
         std::shared_ptr<QnLayoutManager<QueryProcessorType>> m_layoutManager;
         std::shared_ptr<QnVideowallManager<QueryProcessorType>> m_videowallManager;
+        std::shared_ptr<QnWebPageManager<QueryProcessorType>> m_webPageManager;
         std::shared_ptr<QnStoredFileManager<QueryProcessorType>> m_storedFileManager;
         std::shared_ptr<QnUpdatesManager<QueryProcessorType>> m_updatesManager;
         std::shared_ptr<QnMiscManager<QueryProcessorType>> m_miscManager;

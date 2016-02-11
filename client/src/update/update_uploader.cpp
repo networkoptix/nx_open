@@ -10,7 +10,7 @@
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/media_server_resource.h"
 #include "utils/update/update_utils.h"
-#include "utils/common/log.h"
+#include <nx/utils/log/log.h>
 
 namespace {
     const int chunkSize = 1024 * 1024;

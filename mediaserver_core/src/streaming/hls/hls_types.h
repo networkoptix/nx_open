@@ -7,7 +7,9 @@
 
 #include <vector>
 
+#ifndef Q_MOC_RUN
 #include <boost/optional.hpp>
+#endif
 
 #include <QByteArray>
 #include <QDateTime>

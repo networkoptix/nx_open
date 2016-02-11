@@ -2,9 +2,14 @@
 
 #include <QtCore/QDebug>
 
-#include "utils/common/log.h"
+#include <nx/utils/log/log.h>
 
 const QString QnResourceTypePool::desktopCameraTypeName = lit("SERVER_DESKTOP_CAMERA");
+const QString QnResourceTypePool::kLayoutTypeId(lit("Layout"));
+const QString QnResourceTypePool::kServerTypeId(lit("Server"));
+const QString QnResourceTypePool::kVideoWallTypeId(lit("Videowall"));
+const QString QnResourceTypePool::kWebPageTypeId(lit("WebPage"));
+
 
 QnResourceType::QnResourceType()
     : m_isCameraSet(false)
@@ -118,7 +123,7 @@ const ParamTypeMap& QnResourceType::paramTypeListUnsafe() const
                 continue;
             }
 
-            if (QnResourceTypePtr parent = qnResTypePool->getResourceType(parentId)) 
+            if (QnResourceTypePtr parent = qnResTypePool->getResourceType(parentId))
             {   // Note. Copy below, should be thread safe.
                 ParamTypeMap parentData = parent->paramTypeList();
                 for(auto itr = parentData.begin(); itr != parentData.end(); ++itr) {
@@ -246,7 +251,7 @@ QnResourceTypePool::QnResourceTypeMap QnResourceTypePool::getResourceTypeMap() c
 
 QnResourceTypePtr QnResourceTypePool::desktopCameraResourceType() const {
     QnMutexLocker lock( &m_mutex );
-    if (!m_desktopCamResourceType) 
+    if (!m_desktopCamResourceType)
     {
         for(auto itr = m_resourceTypeMap.begin(); itr != m_resourceTypeMap.end(); ++itr)
         {

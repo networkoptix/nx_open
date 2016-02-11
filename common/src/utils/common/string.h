@@ -109,8 +109,12 @@ QString htmlFormattedParagraph(const QString &text
     , bool isBold = false
     , bool isItalic = false);
 
+QString makeHref(const QString &text, const QUrl &url);
 
 QString elideString(const QString &source, int maxLength, const QString &tail = lit("..."));
+
+//!Generates random string containing only letters and digits
+QByteArray generateRandomName(int length);
 
 QString elideHtml(const QString &html, int maxLength, const QString &tail = lit("..."));
 

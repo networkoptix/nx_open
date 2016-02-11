@@ -15,14 +15,14 @@
 #include <core/resource/camera_advanced_param.h>
 
 #include "api/app_server_connection.h"
-#include "plugins/resource/archive/archive_stream_reader.h"
+#include "nx/streaming/archive_stream_reader.h"
 #include <plugins/resource/third_party/motion_data_picture.h>
 #include "third_party_archive_delegate.h"
 #include "third_party_ptz_controller.h"
 #include "third_party_stream_reader.h"
 #include "utils/common/synctime.h"
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/xml/camera_advanced_param_reader.h>
 
 

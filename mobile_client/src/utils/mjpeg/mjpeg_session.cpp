@@ -161,7 +161,8 @@ QnMjpegSession::FrameData QnMjpegSessionPrivate::getFrame() {
     return result;
 }
 
-bool QnMjpegSessionPrivate::connect() {
+bool QnMjpegSessionPrivate::connect() 
+{
     if (!url.isValid())
         return false;
 
@@ -188,7 +189,8 @@ bool QnMjpegSessionPrivate::connect() {
     return true;
 }
 
-void QnMjpegSessionPrivate::disconnect() {
+void QnMjpegSessionPrivate::disconnect() 
+{
     if (reply) {
         QObject::disconnect(reply, nullptr, this, nullptr);
         reply->abort();

@@ -1,52 +1,55 @@
+#include "rtsp_connection.h"
 
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QUrlQuery>
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 #include <QtCore/QSet>
 #include <QtCore/QTextStream>
 #include <QtCore/QDebug>
 #include <QtCore/QBuffer>
 
-#include "libavutil/avutil.h"
-#include "libavcodec/avcodec.h"
+extern "C"
+{
+#include <libavutil/avutil.h>
+#include <libavcodec/avcodec.h>
+};
 
-#include "rtsp_connection.h"
-#include "network/rtp_stream_parser.h"
-#include "core/dataconsumer/abstract_data_consumer.h"
-#include "utils/media/ffmpeg_helper.h"
-#include "core/dataprovider/media_streamdataprovider.h"
-#include "core/resource_management/resource_pool.h"
-#include "core/resource/resource_media_layout.h"
-#include "plugins/resource/archive/archive_stream_reader.h"
+#include <nx/streaming/rtp_stream_parser.h>
+#include <nx/streaming/abstract_data_consumer.h>
+#include <utils/media/ffmpeg_helper.h>
+#include <nx/streaming/abstract_media_stream_data_provider.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/resource_media_layout.h>
+#include <nx/streaming/archive_stream_reader.h>
 #include <utils/common/string.h>
 
-#include "network/tcp_connection_priv.h"
-#include "utils/network/rtsp/rtsp_types.h"
-#include "plugins/resource/archive/abstract_archive_delegate.h"
-#include "camera/camera_pool.h"
-#include "network/rtpsession.h"
-#include "recorder/recording_manager.h"
-#include "utils/common/util.h"
-#include "rtsp_data_consumer.h"
-#include "plugins/resource/server_archive/server_archive_delegate.h"
-#include "core/dataprovider/live_stream_provider.h"
-#include "core/resource/resource_fwd.h"
-#include "core/resource/camera_resource.h"
-#include "plugins/resource/server_archive/thumbnails_stream_reader.h"
-#include "rtsp/rtsp_encoder.h"
-#include "rtsp_h264_encoder.h"
-#include "rtsp/rtsp_ffmpeg_encoder.h"
-#include "rtp_universal_encoder.h"
-#include "utils/common/synctime.h"
-#include "network/tcp_listener.h"
-#include "network/authenticate_helper.h"
+#include <network/tcp_connection_priv.h>
+#include <nx/network/rtsp/rtsp_types.h>
+#include <nx/streaming/abstract_archive_delegate.h>
+#include <camera/camera_pool.h>
+#include <nx/streaming/rtsp_client.h>
+#include <recorder/recording_manager.h>
+#include <utils/common/util.h>
+#include <rtsp/rtsp_data_consumer.h>
+#include <plugins/resource/server_archive/server_archive_delegate.h>
+#include <core/dataprovider/live_stream_provider.h>
+#include <core/resource/resource_fwd.h>
+#include <core/resource/camera_resource.h>
+#include <plugins/resource/server_archive/thumbnails_stream_reader.h>
+#include <rtsp/rtsp_encoder.h>
+#include <rtsp/rtsp_h264_encoder.h>
+#include <rtsp/rtsp_ffmpeg_encoder.h>
+#include <rtsp/rtp_universal_encoder.h>
+#include <utils/common/synctime.h>
+#include <network/tcp_listener.h>
+#include <network/authenticate_helper.h>
 #include <media_server/settings.h>
 #include <utils/common/model_functions.h>
-#include "http/custom_headers.h"
-#include "audit/audit_manager.h"
-#include "media_server/settings.h"
-#include "streaming/streaming_params.h"
-#include "media_server/settings.h"
+#include <http/custom_headers.h>
+#include <audit/audit_manager.h>
+#include <media_server/settings.h>
+#include <streaming/streaming_params.h>
+#include <media_server/settings.h>
 #include <utils/common/log.h>
 
 class QnTcpListener;
@@ -69,7 +72,7 @@ QnMutex RtspServerTrackInfo::m_createSocketMutex;
 bool updatePort(AbstractDatagramSocket* &socket, int port)
 {
     delete socket;
-    socket = SocketFactory::createDatagramSocket();
+    socket = SocketFactory::createDatagramSocket().release();
     return socket->bind( SocketAddress( HostAddress::anyHost, port ) );
 }
 
@@ -77,8 +80,8 @@ bool RtspServerTrackInfo::openServerSocket(const QString& peerAddress)
 {
     // try to find a couple of port, even for RTP, odd for RTCP
     QnMutexLocker lock( &m_createSocketMutex );
-    mediaSocket = SocketFactory::createDatagramSocket();
-    rtcpSocket = SocketFactory::createDatagramSocket();
+    mediaSocket = SocketFactory::createDatagramSocket().release();
+    rtcpSocket = SocketFactory::createDatagramSocket().release();
 
     bool opened = mediaSocket->bind( SocketAddress( HostAddress::anyHost, 0 ) );
     if (!opened)
@@ -225,7 +228,7 @@ QnRtspConnectionProcessor::QnRtspConnectionProcessor(QSharedPointer<AbstractStre
 QnRtspConnectionProcessor::~QnRtspConnectionProcessor()
 {
     Q_D(QnRtspConnectionProcessor);
-	directDisconnectAll();
+    directDisconnectAll();
     if (d->auditRecordHandle && d->lastMediaPacketTime != AV_NOPTS_VALUE)
         qnAuditManager->notifyPlaybackInProgress(d->auditRecordHandle, d->lastMediaPacketTime);
 

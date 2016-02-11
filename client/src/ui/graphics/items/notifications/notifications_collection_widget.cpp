@@ -4,6 +4,8 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QGraphicsLinearLayout>
 
+#include <nx/utils/log/log.h>
+
 #include <business/business_strings_helper.h>
 
 #include <camera/single_thumbnail_loader.h>
@@ -39,7 +41,6 @@
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
 #include <health/system_health_helper.h>
 
-#include <utils/common/log.h>
 #include <utils/common/delete_later.h>
 #include <utils/common/util.h> /* For random. */
 #include <utils/math/color_transformations.h>

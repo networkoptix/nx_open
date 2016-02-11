@@ -164,7 +164,7 @@ MediaStreamParameterSumContainer::MediaStreamParameterSumContainer(
 {
 }
 
-bool MediaStreamParameterSumContainer::get( int resID, QVariant* const value ) const
+bool MediaStreamParameterSumContainer::getAsVariant( int resID, QVariant* const value ) const
 {
     const QVariant::Type resType = m_rns.findResourceByID( resID ).type;
     if( resType == QVariant::Invalid )

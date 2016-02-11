@@ -3,7 +3,7 @@
 #include "core/resource/camera_resource.h"
 #include "isd_resource_searcher.h"
 #include "isd_resource.h"
-#include <utils/network/http/httptypes.h>
+#include <nx/network/http/httptypes.h>
 #include "core/resource/resource_data.h"
 #include "core/resource_management/resource_data_pool.h"
 #include "common/common_module.h"

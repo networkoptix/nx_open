@@ -16,8 +16,9 @@
 
 #include <utils/common/property_storage.h>
 #include <utils/common/software_version.h>
-#include <utils/common/singleton.h>
-#include <utils/common/uuid.h>
+
+#include <nx/utils/singleton.h>
+#include <nx/utils/uuid.h>
 
 class QSettings;
 
@@ -153,6 +154,11 @@ public:
         LOG_LEVEL,
         EC2_TRAN_LOG_LEVEL,
 
+        CDB_ENDPOINT,
+
+        CLOUD_LOGIN,
+        CLOUD_PASSWORD,
+
         VARIABLE_COUNT
     };
 
@@ -248,6 +254,9 @@ private:
         QN_DECLARE_RW_PROPERTY(QList<QUrl>,                 knownServerUrls,        setKnownServerUrls,         KNOWN_SERVER_URLS,          QList<QUrl>())
         QN_DECLARE_RW_PROPERTY(QString,                     logLevel,               setLogLevel,                LOG_LEVEL,                  QLatin1String("none"))
         QN_DECLARE_RW_PROPERTY(QString,                     ec2TranLogLevel,        setEc2TranLogLevel,         EC2_TRAN_LOG_LEVEL,         QLatin1String("none"))
+        QN_DECLARE_RW_PROPERTY(QString,                     cdbEndpoint,            setCdbEndpoint,             CDB_ENDPOINT,               QString())
+        QN_DECLARE_RW_PROPERTY(QString,                     cloudLogin,             setCloudLogin,              CLOUD_LOGIN,                QString())
+        QN_DECLARE_RW_PROPERTY(QString,                     cloudPassword,          setCloudPassword,           CLOUD_PASSWORD,             QString())
     QN_END_PROPERTY_STORAGE()
 
 private:

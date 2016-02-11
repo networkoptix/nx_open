@@ -1,5 +1,6 @@
 #include <QFuture>
-#include <QtConcurrent>
+
+#include <QtConcurrent/QtConcurrent>
 
 #include "can_accept_cameras_rest_handler.h"
 
@@ -7,14 +8,14 @@
 #include <common/common_module.h>
 #include <media_server/serverutil.h>
 #include <utils/common/concurrent.h>
-#include <utils/network/http/httptypes.h>
+#include <nx/network/http/httptypes.h>
 #include "core/resource_management/resource_discovery_manager.h"
 #include "core/resource/camera_resource.h"
 #include "core/resource_management/resource_pool.h"
 
 
-static QnResourceList CheckHostAddrAsync(const QnManualCameraInfo& input) { 
-    return input.checkHostAddr(); 
+static QnResourceList CheckHostAddrAsync(const QnManualCameraInfo& input) {
+    return input.checkHostAddr();
 }
 
 int QnCanAcceptCameraRestHandler::executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor*)
@@ -49,7 +50,7 @@ int QnCanAcceptCameraRestHandler::executePost(const QString &path, const QnReque
             QnResourceDiscoveryManager::instance()->fillManualCamInfo(manualCamList, camera);
             continue;
         }
-        
+
         //camera resource exists and camera was discovered by auto discovery,
             //but camera was not found by recent auto discovery, trying to discover camera using unicast
             //E.g., some Arecont cameras do not answer discovery requests while they are being recorded
@@ -62,12 +63,10 @@ int QnCanAcceptCameraRestHandler::executePost(const QString &path, const QnReque
     QnConcurrent::QnFuture<bool> camerasToPingResults( camerasToPing.size() );
     for( size_t i = 0; i < camerasToPing.size(); ++i )
     {
-        if( !camerasToPing[i]->checkIfOnlineAsync( [&camerasToPingResults, i]( bool result ) {
-                camerasToPingResults.setResultAt( i, result ); } ) )
-        {
-            //failed to start asynchronous check
-            camerasToPingResults.setResultAt( i, false );
-        }
+        camerasToPing[i]->checkIfOnlineAsync(
+            [&camerasToPingResults, i]( bool result ) {
+                camerasToPingResults.setResultAt( i, result );
+            });
     }
 
     manualDiscoveryResults.waitForFinished();

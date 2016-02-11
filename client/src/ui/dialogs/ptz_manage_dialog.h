@@ -6,7 +6,7 @@
 
 #include <ui/dialogs/abstract_ptz_dialog.h>
 #include <ui/models/ptz_manage_model.h>
-#include <utils/common/singleton.h>
+#include <nx/utils/singleton.h>
 
 namespace Ui {
     class PtzManageDialog;

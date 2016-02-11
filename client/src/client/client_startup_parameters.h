@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 
 struct QnStartupParameters
 {
@@ -39,4 +39,6 @@ struct QnStartupParameters
 
     /** Uri when the client was launched as uri handler. */
     QString customUri;
+    QString enforceSocketType;
+    QString enforceMediatorEndpoint;
 };

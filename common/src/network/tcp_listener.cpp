@@ -3,10 +3,10 @@
 #include "tcp_connection_processor.h"
 #include "tcp_listener.h"
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/systemerror.h>
 
-#include "utils/network/socket.h"
+#include <nx/network/socket.h>
 
 // ------------------------ QnTcpListenerPrivate ---------------------------
 
@@ -70,7 +70,7 @@ QnTcpListener::QnTcpListener( const QHostAddress& address, int port, int maxConn
     Q_D(QnTcpListener);
     d->serverAddress = address;
     d->localPort = port;
-    d->serverSocket = 0;
+    d->serverSocket = nullptr;
     d->maxConnections = maxConnections;
     d->useSSL = useSSL;
 }
@@ -89,7 +89,7 @@ bool QnTcpListener::bindToLocalAddress()
 {
     Q_D(QnTcpListener);
 
-    d->serverSocket = SocketFactory::createStreamServerSocket(d->useSSL);
+    d->serverSocket = SocketFactory::createStreamServerSocket(d->useSSL).release();
     if( !d->serverSocket->setReuseAddrFlag( true ) ||
         !d->serverSocket->bind( SocketAddress( d->serverAddress.toString(), d->localPort ) ) ||
         !d->serverSocket->listen() )

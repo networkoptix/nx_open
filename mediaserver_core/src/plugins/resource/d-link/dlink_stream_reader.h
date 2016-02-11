@@ -4,7 +4,7 @@
 #ifdef ENABLE_DLINK
 
 #include "core/dataprovider/spush_media_stream_provider.h"
-#include "utils/network/simple_http_client.h"
+#include <nx/network/simple_http_client.h>
 #include "network/multicodec_rtp_reader.h"
 #include "dlink_resource.h"
 

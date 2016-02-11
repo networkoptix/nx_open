@@ -9,16 +9,16 @@
 #include <QtCore/QElapsedTimer>
 #include <QtNetwork/QHostAddress>
 #include <QtCore/QObject>
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 #include <QtCore/QString>
 
 #include <utils/common/long_runnable.h>
 #include <utils/common/stoppable.h>
-#include <utils/common/timermanager.h>
-#include <utils/network/http/httptypes.h>
-#include <utils/network/http/asynchttpclient.h>
-#include <utils/network/nettools.h>
-#include <utils/network/socket.h>
+#include <nx/utils/timermanager.h>
+#include <nx/network/http/httptypes.h>
+#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/nettools.h>
+#include <nx/network/socket.h>
 
 
 //Contains some info about discovered UPnP device

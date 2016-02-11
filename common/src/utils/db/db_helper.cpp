@@ -105,13 +105,13 @@ QList<QByteArray> quotedSplit(const QByteArray& data)
     return result;
 }
 
-bool QnDbHelper::execSQLQuery(const QString& queryStr, QSqlDatabase& database, const char* details) const {
+bool QnDbHelper::execSQLQuery(const QString& queryStr, QSqlDatabase& database, const char* details) {
     QSqlQuery query(database);
     query.prepare(queryStr);
     return execSQLQuery(&query, details);
 }
 
-bool QnDbHelper::execSQLQuery(QSqlQuery *query, const char* details) const {
+bool QnDbHelper::execSQLQuery(QSqlQuery *query, const char* details) {
     if (!query->exec()) {
         qWarning() << details << query->lastError().text();
         return false;
@@ -119,12 +119,9 @@ bool QnDbHelper::execSQLQuery(QSqlQuery *query, const char* details) const {
     return true;
 }
 
-bool QnDbHelper::execSQLFile(const QString& fileName, QSqlDatabase& database) const {
-    QFile file(fileName);
-    if (!file.open(QFile::ReadOnly))
-        return false;
-    QByteArray data = file.readAll();
-    QList<QByteArray> commands = quotedSplit(data);
+bool QnDbHelper::execSQLScript(const QByteArray& scriptData, QSqlDatabase& database)
+{
+    QList<QByteArray> commands = quotedSplit(scriptData);
 #ifdef DB_DEBUG
     int n = commands.size();
     qDebug() << "creating db" << n << "commands queued";
@@ -141,11 +138,24 @@ bool QnDbHelper::execSQLFile(const QString& fileName, QSqlDatabase& database) co
         QSqlQuery ddlQuery(database);
         ddlQuery.prepare(command);
         if (!ddlQuery.exec()) {
-            qWarning() << "Error while executing SQL file" << fileName;
-            qWarning() << "Query was:" << command;
+            qWarning() << "Error executing query:" << command;
             qWarning() << "Error:" << ddlQuery.lastError().text();
             return false;
         }
+    }
+    return true;
+}
+
+bool QnDbHelper::execSQLFile(const QString& fileName, QSqlDatabase& database)
+{
+    QFile file(fileName);
+    if (!file.open(QFile::ReadOnly))
+        return false;
+    QByteArray data = file.readAll();
+    if( !execSQLScript( data, database ) )
+    {
+        qWarning() << "Error while executing SQL file" << fileName;
+        return false;
     }
     return true;
 }

@@ -15,7 +15,7 @@ QString QnAppInfo::linuxOrganizationName() {
 }
 
 QString QnAppInfo::realm() {
-    return QStringLiteral("${deb.customization.company.name}");
+    return QStringLiteral("VMS");
 }
 
 QString QnAppInfo::applicationVersion() {
@@ -154,6 +154,14 @@ QString QnAppInfo::helpUrl() {
 
 QString QnAppInfo::updateGeneratorUrl() {
     return QStringLiteral("${update.generator.url}");
+}
+
+QString QnAppInfo::cloudPortalUrl() {
+    return QStringLiteral("${cloud.portalUrl}");
+}
+
+QString QnAppInfo::cloudName() {
+    return QStringLiteral("${cloud.name}");
 }
 
 int QnAppInfo::freeLicenseCount() {

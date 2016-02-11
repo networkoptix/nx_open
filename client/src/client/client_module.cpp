@@ -46,6 +46,8 @@
 #include <statistics/storage/statistics_file_storage.h>
 #include <statistics/settings/statistics_settings_watcher.h>
 
+#include <watchers/cloud_status_watcher.h>
+
 #include "version.h"
 
 namespace
@@ -145,6 +147,11 @@ QnClientModule::QnClientModule(const QnStartupParameters &startupParams
     common->store<QnServerStorageManager>(new QnServerStorageManager());
 
     initializeStatisticsManager(common);
+
+    QnCloudStatusWatcher *cloudStatusWatcher = new QnCloudStatusWatcher();
+    cloudStatusWatcher->setCloudEndpoint(qnSettings->cdbEndpoint());
+    cloudStatusWatcher->setCloudCredentials(qnSettings->cloudLogin(), qnSettings->cloudPassword(), true);
+    common->store<QnCloudStatusWatcher>(cloudStatusWatcher);
 
 #ifdef Q_OS_WIN
     win32_exception::setCreateFullCrashDump(qnSettings->createFullCrashDump());

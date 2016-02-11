@@ -6,9 +6,9 @@ sys.path.append(basedir + '/' + '../..')
 
 from main import get_environment_variable, cd
 
-qtlibs = ['${qtlib1}', '${qtlib2}', '${qtlib3}', '${qtlib4}', '${qtlib5}', '${qtlib6}', '${qtlib7}', '${qtlib8}', '${qtlib9}', '${qtlib10}', '${qtlib11}', '${qtlib12}', '${qtlib13}', '${qtlib14}', '${qtlib15}', '${qtlib16}', '${qtlib17}', '${qtlib18}', '${qtlib19}', '${qtlib20}']
-qtplugins = ['${qtplugin1}', '${qtplugin2}', '${qtplugin3}']
-qtbasedir = '${qt.dir}/..'
+qtlibs = [v.strip() for v in """${qtlibs}""".split(',')]
+qtplugins = [v.strip() for v in """${qtplugins}""".split(',')]
+qtbasedir = '${qt.dir}'
 
 def get_platform():
     if sys.platform == 'win32':
@@ -73,64 +73,64 @@ if __name__ == '__main__':
     print '+++++++++++++++++++++ COPYING QT LIBS +++++++++++++++++++++'
             
     if get_platform() == 'windows':        
-        for arch in ('x86', 'x64'):
-            plugin_source_dir = '%s/%s/plugins' % (qtbasedir, arch)
-            lib_source_dir = '%s/%s/bin' % (qtbasedir, arch)
-            pdb_source_dir = '%s/%s/lib' % (qtbasedir, arch)
-            target_dir = join('${project.build.directory}', arch, 'bin')
-            lib_target_dir = join('${project.build.directory}', arch, 'lib')
-            help_dir = join('${project.build.directory}', arch, 'bin/help')
-                
-            #if os.path.exists(help_dir):
-            #    shutil.rmtree(help_dir)
-            #    shutil.copytree(join(basedir, 'help'), help_dir)
+        arch = '${arch}'
+        plugin_source_dir = '%s/plugins' % qtbasedir
+        lib_source_dir = '%s/bin' % qtbasedir
+        target_dir = join('${project.build.directory}', arch, 'bin')
+        lib_target_dir = join('${project.build.directory}', arch, 'lib')
+        help_dir = join('${project.build.directory}', arch, 'bin/help')
+            
+        #if os.path.exists(help_dir):
+        #    shutil.rmtree(help_dir)
+        #    shutil.copytree(join(basedir, 'help'), help_dir)
 
-            if not os.path.exists(target_dir):
-                mkdir_p(target_dir)        
-            
-            for qtlib in qtlibs:
-                if qtlib != '':
-                    for file in os.listdir(lib_source_dir):
-                        if fnmatch.fnmatch(file, 'qt5%sd.dll' % qtlib) or fnmatch.fnmatch(file, 'qt5%sd.pdb' % qtlib):
-                            print (join(lib_source_dir, file))
-                            shutil.copy2(join(lib_source_dir, file), join(target_dir, 'debug'))
-                        elif fnmatch.fnmatch(file, 'qt5%s.dll' % qtlib) or fnmatch.fnmatch(file, 'qt5%s.pdb' % qtlib):
-                            print (join(lib_source_dir, file))
-                            shutil.copy2(join(lib_source_dir, file), join(target_dir, 'release'))    
-            
-            for qtplugin in qtplugins:
-                for config in ('debug', 'release'):
-                    if not os.path.exists(join(target_dir, config, qtplugin)):
-                        os.makedirs (join(target_dir, config, qtplugin))    
-                
-                if qtplugin != '':
-                    print join(plugin_source_dir, qtplugin)
-                    for file in os.listdir(join(plugin_source_dir, qtplugin)):
-                        if fnmatch.fnmatch(file, 'q*d.*'):
-                            shutil.copy2(join(plugin_source_dir, qtplugin, file), join(target_dir, 'debug', qtplugin))
-                        else:
-                            shutil.copy2(join(plugin_source_dir, qtplugin, file), join(target_dir, 'release', qtplugin))
-                            
-            for config in ('debug', 'release'):
-                target_vox = join(target_dir, config, 'vox')
-                if os.path.exists(target_vox):
-                    shutil.rmtree(target_vox)            
-                target_plugins = join(target_dir, config, 'plugins')
-                if not os.path.exists(target_plugins):
-                    os.makedirs(join(target_dir, config, 'plugins'))
+        if not os.path.exists(target_dir):
+            mkdir_p(target_dir)        
+        
+        for qtlib in qtlibs:
+            if qtlib != '':
                 for file in os.listdir(lib_source_dir):
-                    if fnmatch.fnmatch(file, 'icu*.dll') or fnmatch.fnmatch(file, 'lib*.dll'):
+                    if fnmatch.fnmatch(file, 'qt5%sd.dll' % qtlib) or fnmatch.fnmatch(file, 'qt5%sd.pdb' % qtlib):
                         print (join(lib_source_dir, file))
-                        shutil.copy2(join(lib_source_dir, file), join(target_dir, config))                    
-                #shutil.copytree(join('${project.build.directory}/bin', config, 'vox'), target_vox)                        z
-			
-            for file in os.listdir(lib_source_dir):
-                if fnmatch.fnmatch(file, '*.pdb') or fnmatch.fnmatch(file, '*d.dll'):
-                    print ('++++++ DELETING %s +++++++++++' % join(lib_source_dir, file))                    
-                    os.unlink(join(lib_source_dir, file))	
+                        shutil.copy2(join(lib_source_dir, file), join(target_dir, 'debug'))
+                    elif fnmatch.fnmatch(file, 'qt5%s.dll' % qtlib) or fnmatch.fnmatch(file, 'qt5%s.pdb' % qtlib):
+                        print (join(lib_source_dir, file))
+                        shutil.copy2(join(lib_source_dir, file), join(target_dir, 'release'))    
+        
+        for qtplugin in qtplugins:
+            for config in ('debug', 'release'):
+                if not os.path.exists(join(target_dir, config, qtplugin)):
+                    os.makedirs (join(target_dir, config, qtplugin))    
             
-            with cd(join('${project.build.directory}', arch)):
-                os.system('qtbinpatcher.exe')        
+            if qtplugin != '':
+                print join(plugin_source_dir, qtplugin)
+                for file in os.listdir(join(plugin_source_dir, qtplugin)):
+                    if fnmatch.fnmatch(file, 'q*d.*'):
+                        shutil.copy2(join(plugin_source_dir, qtplugin, file), join(target_dir, 'debug', qtplugin))
+                    else:
+                        shutil.copy2(join(plugin_source_dir, qtplugin, file), join(target_dir, 'release', qtplugin))
+                        
+        for config in ('debug', 'release'):
+            target_vox = join(target_dir, config, 'vox')
+            if os.path.exists(target_vox):
+                shutil.rmtree(target_vox)            
+            target_plugins = join(target_dir, config, 'plugins')
+            if not os.path.exists(target_plugins):
+                os.makedirs(join(target_dir, config, 'plugins'))
+            for file in os.listdir(lib_source_dir):
+                if fnmatch.fnmatch(file, 'icu*.dll') or fnmatch.fnmatch(file, 'lib*.dll'):
+                    print (join(lib_source_dir, file))
+                    shutil.copy2(join(lib_source_dir, file), join(target_dir, config))                    
+            print(join(target_dir, 'qml'))
+            if os.path.exists(join(target_dir, config, 'qml')):
+                shutil.rmtree(join(target_dir, config, 'qml'))
+            shutil.copytree(join(qtbasedir, 'qml'), join(target_dir, config, 'qml'))
+            
+        for root, dirs, files in os.walk(join(join(target_dir, 'release', 'qml'))):
+            for file in files:
+                if fnmatch.fnmatch(file, '*.pdb') or fnmatch.fnmatch(file, '*d.dll'):
+                    print("Deleting %s" % join(root, file))
+                    os.unlink(join(root, file))
     else:     
         lib_source_dir = '${qt.dir}/lib'
         lib_target_dir = join('${project.build.directory}', 'lib')

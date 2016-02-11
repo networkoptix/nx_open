@@ -2,7 +2,7 @@
 #define QN_PTZ_MANAGE_MODEL_H
 
 #include <QtCore/QAbstractTableModel>
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 
 #include <core/ptz/ptz_tour.h>
 #include <core/ptz/ptz_preset.h>

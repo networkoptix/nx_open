@@ -7,9 +7,9 @@
 
 #include "core/resource/security_cam_resource.h"
 #include "core/resource/camera_resource.h"
-#include "utils/network/http/asynchttpclient.h"
-#include "utils/network/simple_http_client.h"
-#include "core/datapacket/media_data_packet.h"
+#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/simple_http_client.h>
+#include "nx/streaming/media_data_packet.h"
 
 
 class QDomElement;
@@ -44,7 +44,7 @@ public:
     //!Implementation of QnNetworkResource::ping
     virtual bool ping() override;
     //!Implementation of QnNetworkResource::checkIfOnlineAsync
-    virtual bool checkIfOnlineAsync( std::function<void(bool)>&& completionHandler ) override;
+    virtual void checkIfOnlineAsync( std::function<void(bool)> completionHandler ) override;
 
     virtual QString getDriverName() const override;
 

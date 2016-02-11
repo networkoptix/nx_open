@@ -1,6 +1,6 @@
 #include "home_ptz_executor.h"
 
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include "abstract_ptz_controller.h"
 #include "ptz_object.h"

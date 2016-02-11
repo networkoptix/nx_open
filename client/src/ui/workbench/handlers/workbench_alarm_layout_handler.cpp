@@ -1,6 +1,9 @@
+
 #include "workbench_alarm_layout_handler.h"
 
 #include <api/runtime_info_manager.h>
+#include <nx/streaming/archive_stream_reader.h>
+#include <utils/aspect_ratio.h>
 
 #include <business/actions/abstract_business_action.h>
 
@@ -32,9 +35,9 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
+#include <nx/streaming/archive_stream_reader.h>
 
-#include <plugins/resource/archive/archive_stream_reader.h>
-
+#include <nx/streaming/archive_stream_reader.h>
 #include <utils/aspect_ratio.h>
 #include <utils/common/delayed.h>
 

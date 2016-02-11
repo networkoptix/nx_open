@@ -75,7 +75,7 @@ struct AnDroidDev
         android = false;
         QString request;
 
-        std::auto_ptr<AbstractStreamSocket> sock( SocketFactory::createStreamSocket() );
+        const auto sock = SocketFactory::createStreamSocket();
         sock->setRecvTimeout(500);
         sock->setSendTimeout(500);
 

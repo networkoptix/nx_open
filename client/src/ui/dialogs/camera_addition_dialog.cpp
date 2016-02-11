@@ -225,11 +225,11 @@ void QnCameraAdditionDialog::clearTable() {
     ui->camerasTable->setRowCount(0);
 }
 
-int QnCameraAdditionDialog::fillTable(const QnManualCameraSearchCameraList &cameras) {
+int QnCameraAdditionDialog::fillTable(const QnManualResourceSearchList &cameras) {
     clearTable();
 
     int newCameras = 0;
-    foreach(const QnManualCameraSearchSingleCamera &info, cameras) {
+    foreach(const QnManualResourceSearchEntry &info, cameras) {
         bool enabledRow = !info.existsInPool;
         if (enabledRow)
             newCameras++;
@@ -247,7 +247,7 @@ int QnCameraAdditionDialog::fillTable(const QnManualCameraSearchCameraList &came
             checkItem->setFlags(checkItem->flags() &~ Qt::ItemIsEnabled);
             checkItem->setCheckState(Qt::PartiallyChecked);
         }
-        checkItem->setData(Qt::UserRole, qVariantFromValue<QnManualCameraSearchSingleCamera>(info));
+        checkItem->setData(Qt::UserRole, qVariantFromValue<QnManualResourceSearchEntry>(info));
 
         QTableWidgetItem *manufItem = new QTableWidgetItem(info.vendor);
         manufItem->setFlags(manufItem->flags() &~ Qt::ItemIsEditable);
@@ -425,13 +425,10 @@ void QnCameraAdditionDialog::at_camerasTable_cellClicked(int row, int column) {
     if (column != UrlColumn)
         return;
 
-    QnManualCameraSearchSingleCamera info = ui->camerasTable->item(row, CheckBoxColumn)->data(Qt::UserRole).value<QnManualCameraSearchSingleCamera>();
-    QString urlText = info.url;
-    if (!urlText.contains(QLatin1String("://")))
-        urlText = QLatin1String("http://") + urlText;
+    QnManualResourceSearchEntry info = ui->camerasTable->item(row, CheckBoxColumn)->data(Qt::UserRole).value<QnManualResourceSearchEntry>();
 
-    QUrl url(urlText);
-    if (url.isEmpty())
+    QUrl url = QUrl::fromUserInput(info.url);
+    if (!url.isValid())
         return;
 
     url.setPath(QString());
@@ -529,13 +526,13 @@ void QnCameraAdditionDialog::at_addButton_clicked() {
     QString username(ui->loginLineEdit->text());
     QString password(ui->passwordLineEdit->text());
 
-    QnManualCameraSearchCameraList camerasToAdd;
+    QnManualResourceSearchList camerasToAdd;
     int rowCount = ui->camerasTable->rowCount();
     for (int row = 0; row < rowCount; ++row) {
         if (ui->camerasTable->item(row, CheckBoxColumn)->checkState() != Qt::Checked)
             continue;
 
-        QnManualCameraSearchSingleCamera info = ui->camerasTable->item(row, CheckBoxColumn)->data(Qt::UserRole).value<QnManualCameraSearchSingleCamera>();
+        QnManualResourceSearchEntry info = ui->camerasTable->item(row, CheckBoxColumn)->data(Qt::UserRole).value<QnManualResourceSearchEntry>();
         camerasToAdd << info;
     }
     if (camerasToAdd.empty()){
@@ -672,15 +669,15 @@ void QnCameraAdditionDialog::at_searchRequestReply(int status, const QVariant &r
     int newCameras = fillTable(result.cameras);
 
     switch (result.status.state) {
-    case QnManualCameraSearchStatus::Init:
+    case QnManualResourceSearchStatus::Init:
         if (m_state == Searching)
             ui->progressBar->setFormat(tr("Initializing scan..."));
         break;
-    case QnManualCameraSearchStatus::CheckingOnline:
+    case QnManualResourceSearchStatus::CheckingOnline:
         if (m_state == Searching)
             ui->progressBar->setFormat(tr("Scanning online hosts..."));
         break;
-    case QnManualCameraSearchStatus::CheckingHost:
+    case QnManualResourceSearchStatus::CheckingHost:
         if (m_state == Searching) {
             const QString found = tr("%n devices found", "", result.cameras.size());
             if (m_subnetMode)
@@ -691,8 +688,8 @@ void QnCameraAdditionDialog::at_searchRequestReply(int status, const QVariant &r
                 ui->progressBar->setFormat(tr("Scanning host... (%1)").arg(found));
         }
         break;
-    case QnManualCameraSearchStatus::Finished:
-    case QnManualCameraSearchStatus::Aborted:
+    case QnManualResourceSearchStatus::Finished:
+    case QnManualResourceSearchStatus::Aborted:
         if (m_state == Searching)
             m_server->apiConnection()->searchCameraAsyncStop(m_processUuid); //clear server cache
 

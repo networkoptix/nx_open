@@ -2,7 +2,7 @@
 
 #include "testcamera_resource_searcher.h"
 #include "testcamera_resource.h"
-#include "utils/network/nettools.h"
+#include <nx/network/nettools.h>
 #include "utils/common/sleep.h"
 #include "utils/common/util.h"
 #include "testcamera_const.h"
@@ -33,7 +33,7 @@ bool QnTestCameraResourceSearcher::updateSocketList()
         clearSocketList();
         for (const QnInterfaceAndAddr& iface: getAllIPv4Interfaces())
         {
-            DiscoveryInfo info(SocketFactory::createDatagramSocket(), iface.address);
+            DiscoveryInfo info(SocketFactory::createDatagramSocket().release(), iface.address);
             if (info.sock->bind(iface.address.toString(), 0))
                 m_sockList << info;
             else

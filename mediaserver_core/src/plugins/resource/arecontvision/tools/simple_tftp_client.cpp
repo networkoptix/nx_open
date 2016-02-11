@@ -2,11 +2,11 @@
 
 #ifdef ENABLE_ARECONT
 
-#include "utils/network/socket.h"
-#include "utils/common/log.h"
-#include "utils/common/byte_array.h"
-#include "utils/common/systemerror.h"
-#include "core/dataprovider/abstract_streamdataprovider.h"
+#include <nx/network/socket.h>
+#include <nx/utils/log/log.h>
+#include <utils/common/byte_array.h>
+#include <utils/common/systemerror.h>
+#include <nx/streaming/abstract_stream_data_provider.h>
 
 static const int SERVER_TFTP_PORT = 69;
 
@@ -18,7 +18,7 @@ CLSimpleTFTPClient::CLSimpleTFTPClient(const QString& host, unsigned int timeout
     m_timeout(timeout),
     m_resolvedAddress(resolveAddress(host).toString())
 {
-    m_sock.reset( SocketFactory::createDatagramSocket() );
+    m_sock.reset( SocketFactory::createDatagramSocket().release() );
 
     //m_wish_blk_size = double_blk_size;
     m_wish_blk_size  = blk_size;

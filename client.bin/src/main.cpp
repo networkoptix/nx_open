@@ -58,13 +58,13 @@ extern "C"
 
 #include "decoders/video/ipp_h264_decoder.h"
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/command_line_parser.h>
-#include <utils/network/http/http_mod_manager.h>
+#include <nx/network/http/http_mod_manager.h>
 #include "ui/workbench/workbench_context.h"
 #include "ui/actions/action_manager.h"
 #include "ui/style/skin.h"
-#include "decoders/video/abstractdecoder.h"
+#include "decoders/video/abstract_video_decoder.h"
 #ifdef Q_OS_WIN
     #include <plugins/resource/desktop_win/desktop_resource_searcher.h>
 #endif
@@ -82,7 +82,7 @@ extern "C"
 
 #include "api/session_manager.h"
 #include "ui/actions/action_manager.h"
-#include "utils/network/socket.h"
+#include <nx/network/socket.h>
 
 
 #include "plugins/storage/file_storage/qtfile_storage_resource.h"
@@ -109,7 +109,10 @@ extern "C"
 
 #include "utils/common/long_runnable.h"
 
+#ifdef ENABLE_TEXT_TO_SPEECH
 #include "text_to_wav.h"
+#endif
+
 #include "common/common_module.h"
 #include "ui/style/noptix_style.h"
 #include "ui/customization/customizer.h"
@@ -120,12 +123,13 @@ extern "C"
 #include <network/router.h>
 #include <api/network_proxy_factory.h>
 #include <utils/server_interface_watcher.h>
+#include <nx/network/socket_global.h>
 
 #ifdef Q_OS_MAC
 #include "ui/workaround/mac_utils.h"
 #endif
 #include "api/runtime_info_manager.h"
-#include <utils/common/timermanager.h>
+#include <nx/utils/timermanager.h>
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -282,6 +286,17 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     PluginManager pluginManager;
 
+    auto enforceSocketType = startupParams.enforceSocketType.toLower();
+    if( enforceSocketType == lit("tcp") )
+        SocketFactory::enforceStreamSocketType( SocketFactory::SocketType::Tcp );
+    else
+    if( enforceSocketType == lit("udt") )
+        SocketFactory::enforceStreamSocketType( SocketFactory::SocketType::Udt );
+
+    if (!startupParams.enforceMediatorEndpoint.isEmpty())
+        nx::network::SocketGlobals::mediatorConnector().mockupAddress(
+            startupParams.enforceMediatorEndpoint );
+
     /* Dev mode. */
     if(QnCryptographicHash::hash(startupParams.devModeKey.toLatin1(), QnCryptographicHash::Md5)
         == QByteArray("\x4f\xce\xdd\x9b\x93\x71\x56\x06\x75\x4b\x08\xac\xca\x2d\xbc\x7f")) { /* MD5("razrazraz") */
@@ -318,6 +333,9 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     }
 
     initLog(startupParams.logLevel, logFileNameSuffix, startupParams.ec2TranLogLevel);
+
+    // TODO: #mu ON/OFF switch in settings?
+    nx::network::SocketGlobals::mediatorConnector().enable(true);
 
 	// TODO: #Elric why QString???
     if (!startupParams.lightMode.isEmpty() && startupParams.videoWallGuid.isNull()) {
@@ -376,8 +394,10 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     application->setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 #endif
 
+#ifdef ENABLE_TEXT_TO_SPEECH
     QScopedPointer<TextToWaveServer> textToWaveServer(new TextToWaveServer());
     textToWaveServer->start();
+#endif
 
 #ifdef Q_WS_X11
     //   QnX11LauncherWorkaround x11LauncherWorkaround;
@@ -461,7 +481,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     // ===========================================================================
 
-    CLVideoDecoderFactory::setCodecManufacture( CLVideoDecoderFactory::AUTO );
+    QnVideoDecoderFactory::setCodecManufacture( QnVideoDecoderFactory::AUTO );
 
     /* Create workbench context. */
     QScopedPointer<QnWorkbenchContext> context(new QnWorkbenchContext(qnResPool));
@@ -649,6 +669,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
 int main(int argc, char **argv)
 {
+	nx::network::SocketGlobals::InitGuard sgGuard;
+
 #ifdef Q_WS_X11
     XInitThreads();
 #endif

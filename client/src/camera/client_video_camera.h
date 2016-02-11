@@ -11,9 +11,9 @@
 #include <utils/common/connective.h>
 
 class QnlTimeSource;
-class QnStatistics;
+class QnMediaStreamStatistics;
 class QnResource;
-class QnAbstractArchiveReader;
+class QnAbstractArchiveStreamReader;
 class QnTimePeriod;
 
 class QnClientVideoCamera : public Connective<QObject> {
@@ -48,7 +48,7 @@ public:
 
     QnAbstractStreamDataProvider* getStreamreader();
 
-    const QnStatistics* getStatistics(int channel = 0);
+    const QnMediaStreamStatistics* getStatistics(int channel = 0);
     QnCamDisplay* getCamDisplay();
 
     qint64 getCurrentTime() const;
@@ -93,7 +93,7 @@ private:
 
     QnlTimeSource* m_extTimeSrc;    //TODO: #GDM refactor to weak pointer
     QPointer<QnStreamRecorder> m_exportRecorder;
-    QPointer<QnAbstractArchiveReader> m_exportReader;
+    QPointer<QnAbstractArchiveStreamReader>  m_exportReader;
     QSharedPointer<QBuffer> m_motionFileList[CL_MAX_CHANNELS];
     bool m_displayStarted;
 };

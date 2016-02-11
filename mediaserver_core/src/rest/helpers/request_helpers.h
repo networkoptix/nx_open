@@ -2,7 +2,7 @@
 
 #include <network/router.h>
 #include <http/custom_headers.h>
-#include <utils/network/http/asynchttpclient.h>
+#include <nx/network/http/asynchttpclient.h>
 #include <utils/common/systemerror.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/user_resource.h>

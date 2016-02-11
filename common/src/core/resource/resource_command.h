@@ -3,7 +3,7 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-#include <core/datapacket/abstract_data_packet.h>
+#include <nx/streaming/abstract_data_packet.h>
 #include <core/resource/resource_consumer.h>
 
 class QN_EXPORT QnResourceCommand : public QnAbstractDataPacket, public QnResourceConsumer

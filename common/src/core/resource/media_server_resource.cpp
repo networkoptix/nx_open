@@ -24,7 +24,8 @@
 #include "utils/common/delete_later.h"
 #include "utils/common/sleep.h"
 #include "utils/common/util.h"
-#include "utils/network/http/asynchttpclient.h"
+#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/socket_global.h>
 #include "network/networkoptixmodulerevealcommon.h"
 #include "utils/serialization/lexical.h"
 #include "api/server_rest_connection.h"
@@ -55,7 +56,7 @@ QnMediaServerResource::QnMediaServerResource(const QnResourceTypePool* resTypePo
         std::bind(&QnMediaServerResource::calculatePanicMode, this),
         &m_mutex )
 {
-    setTypeId(resTypePool->getFixedResourceTypeId(lit("Server")));
+    setTypeId(resTypePool->getFixedResourceTypeId(QnResourceTypePool::kServerTypeId));
     addFlags(Qn::server | Qn::remote);
     removeFlags(Qn::media); // TODO: #Elric is this call needed here?
 
@@ -172,14 +173,14 @@ QString QnMediaServerResource::getApiUrl() const
     return m_apiUrl;
 }
 
-void QnMediaServerResource::setNetAddrList(const QList<QHostAddress>& netAddrList)
+void QnMediaServerResource::setNetAddrList(const QList<SocketAddress>& netAddrList)
 {
     QnMutexLocker lock( &m_mutex );
     m_netAddrList = netAddrList;
     emit auxUrlsChanged(::toSharedPointer(this));
 }
 
-QList<QHostAddress> QnMediaServerResource::getNetAddrList() const
+QList<SocketAddress> QnMediaServerResource::getNetAddrList() const
 {
     QnMutexLocker lock( &m_mutex );
     return m_netAddrList;
@@ -477,15 +478,18 @@ QnModuleInformation QnMediaServerResource::getModuleInformation() const {
     moduleInformation.id = getId();
     moduleInformation.serverFlags = getServerFlags();
 
+    if (const auto credentials = nx::network::SocketGlobals::mediatorConnector().getSystemCredentials())
+        moduleInformation.cloudSystemId = QString::fromUtf8(credentials->systemId);
+
     return moduleInformation;
 }
 
 void QnMediaServerResource::setFakeServerModuleInformation(const QnModuleInformationWithAddresses &moduleInformation) {
     Q_ASSERT_X(isFakeServer(toSharedPointer()), Q_FUNC_INFO, "Only fake servers should be set this way");
 
-    QList<QHostAddress> addressList;
+    QList<SocketAddress> addressList;
     for (const QString &address: moduleInformation.remoteAddresses)
-        addressList.append(QHostAddress(address));
+        addressList.append(SocketAddress(address));
     setNetAddrList(addressList);
 
     if (!addressList.isEmpty()) {

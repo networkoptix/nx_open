@@ -8,7 +8,7 @@
 
 #include <memory>
 
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include <utils/common/joinable.h>
 #include <utils/common/stoppable.h>
@@ -86,7 +86,8 @@ namespace ec2
         //!Called on server side to handle connection request from remote host
         ErrorCode fillConnectionInfo(
             const ApiLoginData& loginInfo,
-            QnConnectionInfo* const connectionInfo );
+            QnConnectionInfo* const connectionInfo,
+            nx_http::Response* response = nullptr);
         int testDirectConnection( const QUrl& addr, impl::TestConnectionHandlerPtr handler );
         int testRemoteConnection( const QUrl& addr, impl::TestConnectionHandlerPtr handler );
         ErrorCode getSettings( std::nullptr_t, ApiResourceParamDataList* const outData );
@@ -100,11 +101,16 @@ namespace ec2
         template<class InputDataType, class OutputDataType>
             void registerGetFuncHandler( QnRestProcessorPool* const restProcessorPool, ApiCommand::Value cmd );
 
-        template<class InputType, class OutputType, class HandlerType>
+        template<class InputType, class OutputType>
             void registerFunctorHandler(
                 QnRestProcessorPool* const restProcessorPool,
                 ApiCommand::Value cmd,
-                HandlerType handler );
+                std::function<ErrorCode(InputType, OutputType*)> handler);
+        template<class InputType, class OutputType>
+            void registerFunctorWithResponseHandler(
+                QnRestProcessorPool* const restProcessorPool,
+                ApiCommand::Value cmd,
+                std::function<ErrorCode(InputType, OutputType*, nx_http::Response*)> handler);
 
         template<class Function>
             void statisticsCall(const Function& function);

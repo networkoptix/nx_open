@@ -28,8 +28,8 @@ public:
 private:
     ec2::AbstractECConnectionPtr m_ec2Connection;
     QnUuid m_serverId;
-    
-    struct LockData 
+
+    struct LockData
     {
         LockData(): mutex(0) {}
         LockData(ec2::QnDistributedMutex* mutex, QnVirtualCameraResourcePtr cameraResource): mutex(mutex), cameraResource(cameraResource) {}
@@ -43,6 +43,7 @@ private:
 
 private:
     void addNewCamera(const QnVirtualCameraResourcePtr& cameraResource);
+
     void addNewCameraInternal(const QnVirtualCameraResourcePtr& cameraResource);
 
     //void requestFinished(const QnHTTPRawResponse& response, int handle);

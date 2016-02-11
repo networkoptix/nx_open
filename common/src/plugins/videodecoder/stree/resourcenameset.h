@@ -13,6 +13,8 @@
 
 namespace stree
 {
+    static const int INVALID_RES_ID = -1;
+
     /*!
         \note Resource id -1 is reserved for error reporting
         \note Methods of this class are not thread-safe
@@ -52,7 +54,7 @@ namespace stree
         */
         bool registerResource( int resID, const QString& resName, QVariant::Type type );
         /*!
-            \return std::pair<resource id, resource type>. If no resource found returns id -1
+            \return std::pair<resource id, resource type>. If no resource found returns \a INVALID_RES_ID
         */
         ResourceDescription findResourceByName( const QString& resName ) const;
         //!Searches resource name by id \a resID. Empty string is returned in case of error

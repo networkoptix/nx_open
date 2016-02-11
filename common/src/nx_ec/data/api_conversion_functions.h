@@ -74,7 +74,7 @@ namespace ec2 {
     void fromApiToResource(const ApiMediaServerUserAttributesData& src, QnMediaServerUserAttributesPtr& dst);
     void fromApiToResourceList(const ApiMediaServerUserAttributesDataList &src, QnMediaServerUserAttributesList& dst);
     void fromResourceListToApi(const QnMediaServerUserAttributesList& src, ApiMediaServerUserAttributesDataList& dst);
-    
+
     void fromResourceToApi(const QnResourcePtr &src, ApiResourceData &dst);
     void fromApiToResource(const ApiResourceData &src, QnResource* dst);
     void fromApiToResourceList(const ApiResourceDataList &src, QnResourceList &dst, QnResourceFactory *factory);
@@ -98,6 +98,11 @@ namespace ec2 {
 
     void fromApiToResource(const ApiVideowallControlMessageData &data, QnVideoWallControlMessage &message);
     void fromResourceToApi(const QnVideoWallControlMessage &message, ApiVideowallControlMessageData &data);
+
+    void fromApiToResource(const ApiWebPageData &src, QnWebPageResourcePtr &dst);
+    void fromResourceToApi(const QnWebPageResourcePtr &src, ApiWebPageData &dst);
+    void fromApiToResourceList(const ApiWebPageDataList &src, QnResourceList &dst);
+    void fromApiToResourceList(const ApiWebPageDataList &src, QnWebPageResourceList &dst);
 
 } // namespace ec2
 

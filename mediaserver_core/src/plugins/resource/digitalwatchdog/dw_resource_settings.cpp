@@ -3,9 +3,9 @@
 #include <core/resource/camera_advanced_param.h>
 
 #include <utils/common/model_functions.h>
-#include <utils/network/simple_http_client.h>
-#include <utils/network/http/httptypes.h>
-#include <utils/network/http/asynchttpclient.h>
+#include <nx/network/simple_http_client.h>
+#include <nx/network/http/httptypes.h>
+#include <nx/network/http/asynchttpclient.h>
 
 namespace {
     const QRegExp DW_RES_SETTINGS_FILTER(lit("[{},']"));
@@ -236,8 +236,8 @@ QnCameraAdvancedParamValueList QnPravisCameraProxy::getParamsList() const
 
         nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();
         httpClient->setResponseReadTimeoutMs(kHttpReadTimeout);
-        if (nx_http::downloadFileAsyncEx(apiUrl, requestCompletionFunc, std::move(httpClient)))
-            ++workers;
+        nx_http::downloadFileAsyncEx(apiUrl, requestCompletionFunc, std::move(httpClient));
+        ++workers;
     }
     while (workers > 0)
         waitCond.wait(&waitMutex);
@@ -324,10 +324,8 @@ bool QnPravisCameraProxy::setParams(const QVector<QPair<QnCameraAdvancedParamete
 
         nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();
         httpClient->setResponseReadTimeoutMs(kHttpReadTimeout);
-        if (nx_http::downloadFileAsyncEx(apiUrl, requestCompletionFunc, std::move(httpClient)))
-            ++workers;
-        else
-            resultOK = false;
+        nx_http::downloadFileAsyncEx(apiUrl, requestCompletionFunc, std::move(httpClient));
+        ++workers;
     }
     while (workers > 0)
         waitCond.wait(&waitMutex);

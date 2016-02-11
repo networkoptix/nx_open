@@ -35,7 +35,7 @@
 #include "utils/math/color_transformations.h"
 #include <ui/models/audit/audit_log_session_model.h>
 #include <ui/models/audit/audit_log_detail_model.h>
-#include <QMouseEvent>
+#include <QtGui/QMouseEvent>
 #include "core/resource/layout_resource.h"
 
 #include "ui/common/geometry.h"

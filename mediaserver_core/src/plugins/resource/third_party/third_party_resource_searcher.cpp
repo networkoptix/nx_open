@@ -9,7 +9,7 @@
 
 #include <algorithm>
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 
 #include "core/resource/camera_resource.h"
 #include "core/resource/media_server_resource.h"
@@ -184,8 +184,8 @@ QList<QnNetworkResourcePtr> ThirdPartyResourceSearcher::processPacket(
 
 void ThirdPartyResourceSearcher::processPacket(
     const QHostAddress& /*discoveryAddr*/,
-    const HostAddress& /*host*/,
-    const UpnpDeviceInfo& /*devInfo*/,
+    const SocketAddress& /*host*/,
+    const nx_upnp::DeviceInfo& /*devInfo*/,
     const QByteArray& xmlDevInfo,
     QnResourceList& result )
 {

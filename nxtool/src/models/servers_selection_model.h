@@ -5,7 +5,7 @@
 #include <QAbstractListModel>
 
 #include <base/types.h>
-#include <base/server_info.h>
+#include <nx/mediaserver/api/client.h>
 
 namespace rtu
 {
@@ -18,20 +18,26 @@ namespace rtu
 
     public:
         ServersSelectionModel(QObject *parent = nullptr);
-        
-        virtual ~ServersSelectionModel();
-        
-    public slots:
 
+        virtual ~ServersSelectionModel();
+
+        typedef nx::mediaserver::api::ServerInfoPtrContainer ServerInfoPtrContainer;
+        typedef nx::mediaserver::api::ServerInfo ServerInfo;
+        typedef nx::mediaserver::api::BaseServerInfo BaseServerInfo;
+        typedef nx::mediaserver::api::ExtraServerInfo ExtraServerInfo;
+        typedef nx::mediaserver::api::InterfaceInfoList InterfaceInfoList;
+        typedef nx::mediaserver::api::HttpAccessMethod HttpAccessMethod;
+
+    public slots:
         /// Sets items with specified ids selected
         void setSelectedItems(const IDsVector &ids);
 
         void changeItemSelectedState(int rowIndex);
-        
+
         void setItemSelected(int rowIndex);
 
         void setAllItemSelected(bool selected);
-        
+
         void tryLoginWith(const QString &primarySystem
             , const QString &password
             , const Callback &callback);
@@ -41,11 +47,11 @@ namespace rtu
         ///
 
         int selectedCount() const;
-        
+
         ServerInfoPtrContainer selectedServers();
 
         int serversCount() const;
-        
+
         ///
 
         void serverDiscovered(const BaseServerInfo &baseInfo);
@@ -87,31 +93,30 @@ namespace rtu
 
         void unlockItems(const IDsVector &ids);
 
-        void changeAccessMethod(const QUuid &id
-            , bool byHttp);
+        void changeAccessMethod(const QUuid& id, HttpAccessMethod newHttpAccessMethod);
 
     signals:
         void blinkAtSystem(int systemItemIndex);
 
         void layoutChanged();
 
-        void selectionChanged();    /// Signals that new items are selected or 
+        void selectionChanged();    /// Signals that new items are selected or
                                     /// selection has got empty
 
         void updateSelectionData();
 
         void serversCountChanged();
-        
+
         void serverLogged(const ServerInfo &info);
 
     private:
         int rowCount(const QModelIndex &parent = QModelIndex()) const;
-        
+
         QVariant data(const QModelIndex &index
             , int role = Qt::DisplayRole) const;
-        
+
         Roles roleNames() const;
-        
+
     private:
         class Impl;
         Impl * const m_impl;

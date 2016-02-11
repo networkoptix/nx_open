@@ -1,9 +1,9 @@
 #pragma once
 
+#include <core/resource/resource_fwd.h>
 #include <utils/common/software_version.h>
 #include <utils/common/system_information.h>
-#include <utils/common/uuid.h>
-#include <core/resource/resource_fwd.h>
+#include <nx/utils/uuid.h>
 
 
 struct QnCheckForUpdateResult {

@@ -55,7 +55,7 @@ QnActiResource::~QnActiResource()
     }
 }
 
-bool QnActiResource::checkIfOnlineAsync( std::function<void(bool)>&& completionHandler )
+void QnActiResource::checkIfOnlineAsync( std::function<void(bool)> completionHandler )
 {
     QUrl apiUrl;
     apiUrl.setScheme( lit("http") );
@@ -85,7 +85,7 @@ bool QnActiResource::checkIfOnlineAsync( std::function<void(bool)>&& completionH
         completionHandler( mac == resourceMac.toLatin1() );
     };
 
-    return nx_http::downloadFileAsync(
+    nx_http::downloadFileAsync(
         apiUrl,
         requestCompletionFunc );
 }
@@ -516,8 +516,7 @@ void QnActiResource::stopInputPortMonitoringAsync()
             httpClient.reset();
         },
         Qt::DirectConnection );
-    if( !httpClient->doGet( url ) )
-        disconnect( httpClient.get(), nullptr, ec2::DummyHandler::instance(), nullptr );
+    httpClient->doGet( url );
 }
 
 bool QnActiResource::isInputPortMonitored() const

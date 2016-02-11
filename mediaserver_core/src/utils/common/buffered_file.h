@@ -4,7 +4,7 @@
 #include <memory>
 #include <list>
 
-#include <QtCore/QWaitCondition>
+#include <nx/utils/thread/wait_condition.h>
 #include <QtCore/QString>
 #include <QtCore/QQueue>
 #include "utils/fs/file.h"

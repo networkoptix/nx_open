@@ -96,6 +96,8 @@ namespace nxpl
         public nxpl::PluginInterface
     {
     public:
+        virtual ~Plugin() {}
+    
         //!Name of plugin
         /*!
             This name is used for information purpose only

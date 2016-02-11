@@ -318,7 +318,7 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
     /* Hiding message box from current connect. */
     hideMessageBox();
 
-    QnConnectionInfo connectionInfo = result.reply<QnConnectionInfo>();
+    const QnConnectionInfo connectionInfo = result.reply<QnConnectionInfo>();
     QWidget* parentWidget = (m_loginDialog && m_loginDialog->isActiveWindow())
         ? m_loginDialog.data()
         : mainWindow();
@@ -347,7 +347,10 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
     QnSessionManager::instance()->start();
     QnResource::startCommandProc();
 
-    context()->setUserName(appServerUrl.userName());
+    context()->setUserName(
+        connectionInfo.effectiveUserName.isEmpty()
+            ? appServerUrl.userName()
+            : connectionInfo.effectiveUserName);
 
     //QnRouter::instance()->setEnforcedConnection(QnRoutePoint(connectionInfo.ecsGuid, connectionInfo.ecUrl.host(), connectionInfo.ecUrl.port()));
 

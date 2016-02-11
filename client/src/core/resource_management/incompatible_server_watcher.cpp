@@ -3,7 +3,7 @@
 #include <api/common_message_processor.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <common/common_module.h>
 
 namespace

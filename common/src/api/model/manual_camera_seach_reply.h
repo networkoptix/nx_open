@@ -1,17 +1,16 @@
-#ifndef QN_MANUAL_CAMERA_SEARCH_REPLY_H
-#define QN_MANUAL_CAMERA_SEARCH_REPLY_H
+#pragma once
 
 #include <QtCore/QMetaType>
 #include <QtCore/QString>
 #include <QtCore/QList>
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 
 #include <utils/common/model_functions_fwd.h>
 
 /**
  * State of the running manual camera search process.
  */
-struct QnManualCameraSearchStatus {
+struct QnManualResourceSearchStatus {
     enum State {
         Init,
         CheckingOnline,
@@ -22,8 +21,8 @@ struct QnManualCameraSearchStatus {
         Count
     };
 
-    QnManualCameraSearchStatus(): state(Aborted) {}
-    QnManualCameraSearchStatus(State state, quint64 current, quint64 total):
+    QnManualResourceSearchStatus(): state(Aborted) {}
+    QnManualResourceSearchStatus(State state, quint64 current, quint64 total):
         state(state), current(current), total(total){}
 
     /** Current state of the process. */
@@ -36,9 +35,9 @@ struct QnManualCameraSearchStatus {
     qint64 total;
 };
 
-#define QnManualCameraSearchStatus_Fields (state)(current)(total)
+#define QnManualResourceSearchStatus_Fields (state)(current)(total)
 
-struct QnManualCameraSearchSingleCamera {
+struct QnManualResourceSearchEntry {
     QString name;
     QString url;
     QString manufacturer;
@@ -46,27 +45,31 @@ struct QnManualCameraSearchSingleCamera {
     QString uniqueId;
     bool existsInPool;
 
-    QnManualCameraSearchSingleCamera(): existsInPool(false) {}
+    QnManualResourceSearchEntry(): existsInPool(false) {}
 
-    QnManualCameraSearchSingleCamera(const QString &name, const QString &url, const QString &manufacturer, const QString &vendor, const QString& uniqueId, bool existsInPool):
+    QnManualResourceSearchEntry(const QString &name, const QString &url, const QString &manufacturer, const QString &vendor, const QString& uniqueId, bool existsInPool):
         name(name), url(url), manufacturer(manufacturer), vendor(vendor), uniqueId(uniqueId), existsInPool(existsInPool) {}
 
     QString toString() const {
         return QString(QLatin1String("%1 (%2 - %3)")).arg(name).arg(url).arg(vendor);
     }
+
+    bool isNull() const {
+        return uniqueId.isEmpty();
+    }
 };
 
-#define QnManualCameraSearchSingleCamera_Fields (name)(url)(manufacturer)(vendor)(existsInPool)(uniqueId)
+#define QnManualResourceSearchEntry_Fields (name)(url)(manufacturer)(vendor)(existsInPool)(uniqueId)
 
-typedef QList<QnManualCameraSearchSingleCamera> QnManualCameraSearchCameraList;
+typedef QList<QnManualResourceSearchEntry> QnManualResourceSearchList;
 
 
 /**
  * Status of the manual camera search process: state and results by the time.
  */
 struct QnManualCameraSearchProcessStatus {
-    QnManualCameraSearchStatus status;
-    QnManualCameraSearchCameraList cameras;
+    QnManualResourceSearchStatus status;
+    QnManualResourceSearchList cameras;
 };
 
 /**
@@ -80,12 +83,11 @@ struct QnManualCameraSearchReply {
         processUuid(uuid), status(processStatus.status), cameras(processStatus.cameras) {}
 
     QnUuid processUuid;
-    QnManualCameraSearchStatus status;
-    QnManualCameraSearchCameraList cameras;
+    QnManualResourceSearchStatus status;
+    QnManualResourceSearchList cameras;
 };
 
 #define QnManualCameraSearchReply_Fields (status)(processUuid)(cameras)
 
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnManualCameraSearchStatus)(QnManualCameraSearchSingleCamera)(QnManualCameraSearchReply), (json)(metatype))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnManualResourceSearchStatus)(QnManualResourceSearchEntry)(QnManualCameraSearchReply), (json)(metatype))
 
-#endif // QN_MANUAL_CAMERA_SEARCH_REPLY_H

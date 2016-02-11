@@ -1,7 +1,7 @@
 #ifndef QN_OPENGL_RENDERER_H
 #define QN_OPENGL_RENDERER_H
 
-#include <utils/common/singleton.h>
+#include <nx/utils/singleton.h>
 
 #include <QtCore/QScopedPointer>
 #include <QtOpenGL/QGLShaderProgram>

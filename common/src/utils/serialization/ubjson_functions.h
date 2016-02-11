@@ -8,14 +8,16 @@
 #include <map>
 #include <array>
 
+#ifndef Q_MOC_RUN
 #include <boost/preprocessor/tuple/enum.hpp>
 #include <boost/preprocessor/cat.hpp>
+#endif
 
 #ifndef QN_NO_QT
 #   include <QtCore/QString>
 #   include <QtCore/QByteArray>
 #   include <QtCore/QUrl>
-#   include <utils/common/uuid.h>
+#   include <nx/utils/uuid.h>
 #endif
 
 #include <utils/common/collection.h>
@@ -185,6 +187,7 @@ bool deserialize(QnUbjsonReader<Input> *stream, TYPE *target) {                 
 QN_DEFINE_DIRECT_UBJSON_SERIALIZATION_FUNCTIONS(bool,          readBool,       writeBool)
 QN_DEFINE_DIRECT_UBJSON_SERIALIZATION_FUNCTIONS(quint8,        readUInt8,      writeUInt8)
 QN_DEFINE_DIRECT_UBJSON_SERIALIZATION_FUNCTIONS(qint8,         readInt8,       writeInt8)
+QN_DEFINE_DIRECT_UBJSON_SERIALIZATION_FUNCTIONS(quint16,       readUInt16,     writeUInt16)
 QN_DEFINE_DIRECT_UBJSON_SERIALIZATION_FUNCTIONS(qint16,        readInt16,      writeInt16)
 QN_DEFINE_DIRECT_UBJSON_SERIALIZATION_FUNCTIONS(qint32,        readInt32,      writeInt32)
 QN_DEFINE_DIRECT_UBJSON_SERIALIZATION_FUNCTIONS(qint64,        readInt64,      writeInt64)
@@ -265,7 +268,7 @@ void serialize(const QnUuid &value, QnUbjsonWriter<Output> *stream) {
 
 
 template <class Input>
-bool deserialize(QnUbjsonReader<Input> *stream, QnUuid *target) 
+bool deserialize(QnUbjsonReader<Input> *stream, QnUuid *target)
 {
     std::array<char, 16> tmp;
     if(!stream->template readBinaryData<>(&tmp))

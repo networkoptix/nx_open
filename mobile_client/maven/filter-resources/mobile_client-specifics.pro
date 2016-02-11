@@ -1,18 +1,18 @@
 TEMPLATE = app
 
 DEFINES += CL_FORCE_LOGO
-#TRANSLATIONS += ${basedir}/translations/client_en.ts \
-
-#				${basedir}/translations/client_ru.ts \
-#				${basedir}/translations/client_zh-CN.ts \
-#				${basedir}/translations/client_fr.ts \
-#				${basedir}/translations/client_jp.ts \
-#				${basedir}/translations/client_ko.ts \
-#				${basedir}/translations/client_pt-BR.ts \
 
 INCLUDEPATH += \
     ${root.dir}/appserver2/src/ \
-    ${root.dir}/client.core/src/
+    ${root.dir}/client.core/src/ \
+	${qt.dir}/include/QtMultimedia/ \
+    ${qt.dir}/include/QtMultimedia/$$QT_VERSION/ \
+    ${qt.dir}/include/QtMultimedia/$$QT_VERSION/QtMultimedia/ \
+	${qt.dir}/include/QtGui/ \
+    ${qt.dir}/include/QtGui/$$QT_VERSION/ \
+    ${qt.dir}/include/QtGui/$$QT_VERSION/QtGui/ \
+
+
 
 unix: !ios {
     QMAKE_LFLAGS += "-Wl,-rpath-link,${libdir}/lib/$$CONFIGURATION/"

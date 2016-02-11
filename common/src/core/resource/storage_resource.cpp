@@ -1,9 +1,9 @@
 #include "storage_resource.h"
-#include "core/dataprovider/media_streamdataprovider.h"
+#include "nx/streaming/abstract_media_stream_data_provider.h"
 
 #include <core/resource/media_server_resource.h>
 
-#include "utils/common/log.h"
+#include <nx/utils/log/log.h>
 
 const qint64 QnStorageResource::kNasStorageLimit = 50LL * 1024 * 1024 * 1024; // 50 gb
 

@@ -16,7 +16,7 @@
 #include <onvif/soapSubscriptionManagerBindingProxy.h>
 #include <onvif/soapPullPointSubscriptionBindingProxy.h>
 #include <onvif/wsseapi.h>
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <QtCore/QtGlobal>
 #include <QtCore/QDateTime>
 #include <QtCore/QDebug>

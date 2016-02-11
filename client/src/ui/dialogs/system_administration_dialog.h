@@ -21,6 +21,7 @@ public:
         RoutingManagement,
         TimeServerSelection,
         UserManagement,
+        CloudManagement,
 
         PageCount
     };

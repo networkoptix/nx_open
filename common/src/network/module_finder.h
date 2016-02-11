@@ -8,9 +8,9 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx_ec/data/api_discovery_data.h>
-#include <utils/common/singleton.h>
-#include <utils/network/socket_common.h>
-#include <utils/thread/mutex.h>
+#include <nx/utils/singleton.h>
+#include <nx/network/socket_common.h>
+#include <nx/utils/thread/mutex.h>
 
 #include "module_information.h"
 

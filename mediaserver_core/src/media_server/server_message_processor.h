@@ -6,7 +6,7 @@
 #include <core/resource/resource_fwd.h>
 #include "nx_ec/impl/ec_api_impl.h"
 #include "nx_ec/data/api_server_alive_data.h"
-#include <utils/network/http/httptypes.h>
+#include <nx/network/http/httptypes.h>
 #include "network/universal_tcp_listener.h"
 
 

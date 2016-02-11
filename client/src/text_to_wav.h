@@ -1,15 +1,16 @@
-#ifndef TEXT_TO_WAV_H
-#define TEXT_TO_WAV_H
+#pragma once
+
+#ifdef ENABLE_TEXT_TO_SPEECH
 
 #include <QtCore/QIODevice>
-#include <utils/thread/mutex.h>
 #include <QtCore/QSharedPointer>
 #include <QtCore/QString>
-#include <utils/thread/wait_condition.h>
 
 #include <utils/common/long_runnable.h>
 #include <utils/common/threadqueue.h>
-#include <utils/common/singleton.h>
+#include <nx/utils/singleton.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/wait_condition.h>
 
 // TODO: #Elric this header does not belong in the source root.
 
@@ -20,7 +21,7 @@
 */
 class TextToWaveServer
 :
-    public QnLongRunnable, 
+    public QnLongRunnable,
     public Singleton<TextToWaveServer>
 {
     Q_OBJECT
@@ -79,4 +80,4 @@ private:
     QSharedPointer<SynthetiseSpeechTask> addTaskToQueue( const QString& text, QIODevice* const dest );
 };
 
-#endif  //TEXT_TO_WAV_H
+#endif //ENABLE_TEXT_TO_SPEECH

@@ -5,12 +5,12 @@
 
 extern "C"
 {
-    #include <libavcodec/avcodec.h>
+#include <libavcodec/avcodec.h>
 }
 
 #include "transcoder.h"
 #include "utils/media/frame_info.h"
-#include "decoders/video/ffmpeg.h"
+#include "decoders/video/ffmpeg_video_decoder.h"
 
 
 class QnFfmpegTranscoder: public QnTranscoder

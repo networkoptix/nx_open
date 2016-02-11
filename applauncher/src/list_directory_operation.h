@@ -12,7 +12,7 @@
 #include <QString>
 #include <QUrl>
 
-#include <utils/network/http/asynchttpclient.h>
+#include <nx/network/http/asynchttpclient.h>
 
 #include "rdir_synchronization_operation.h"
 

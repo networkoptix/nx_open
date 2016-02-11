@@ -8,7 +8,9 @@
 #include <QtCore/QMetaType>
 #endif
 
+#ifndef Q_MOC_RUN
 #include <boost/operators.hpp>
+#endif
 
 #include <utils/common/model_functions_fwd.h>
 
@@ -28,7 +30,7 @@ public:
     /**
      * Creates a software version object from a string. Note that this function
      * also supports OpenGL style version strings like "2.0.6914 WinXP SSE/SSE2/SSE3/3DNow!".
-     * 
+     *
      * \param versionString             Version string.
      */
     explicit QnSoftwareVersion(const QString &versionString);

@@ -2,7 +2,8 @@
 
 #include "testcamera_stream_reader.h"
 
-#include "core/datapacket/video_data_packet.h"
+#include <nx/streaming/video_data_packet.h>
+#include <nx/streaming/basic_media_context.h>
 #include "testcamera_resource.h"
 #include "utils/common/synctime.h"
 
@@ -11,7 +12,7 @@ static const int TESTCAM_TIMEOUT = 5 * 1000;
 QnTestCameraStreamReader::QnTestCameraStreamReader(const QnResourcePtr& res):
     CLServerPushStreamReader(res)
 {
-    m_tcpSock.reset( SocketFactory::createStreamSocket() );
+    m_tcpSock = SocketFactory::createStreamSocket();
     m_tcpSock->setRecvTimeout(TESTCAM_TIMEOUT);
 }
 
@@ -68,7 +69,8 @@ QnAbstractMediaDataPtr QnTestCameraStreamReader::getNextData()
 
         if (readed == size)
         {
-            m_context = QnMediaContextPtr(new QnMediaContext(ctxData, size));
+            QByteArray payloadArray((const char *) ctxData, size);
+            m_context = QnConstMediaContextPtr(QnBasicMediaContext::deserialize(payloadArray));
         }    
         delete [] ctxData;
         return getNextData();

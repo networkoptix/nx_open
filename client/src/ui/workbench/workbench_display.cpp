@@ -54,10 +54,12 @@
 #include <ui/graphics/instruments/tool_tip_instrument.h>
 #include <ui/graphics/instruments/widget_layout_instrument.h>
 
+#include <ui/graphics/items/resource/button_ids.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/server_resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/resource/videowall_screen_widget.h>
+#include <ui/graphics/items/resource/web_resource_widget.h>
 #include <ui/graphics/items/resource/resource_widget_renderer.h>
 #include <ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h>
 #include <ui/graphics/items/grid/curtain_item.h>
@@ -86,8 +88,8 @@
 #include "workbench_access_controller.h"
 #include "workbench.h"
 
-#include "core/dataprovider/abstract_streamdataprovider.h"
-#include "plugins/resource/archive/abstract_archive_stream_reader.h"
+#include "nx/streaming/abstract_stream_data_provider.h"
+#include "nx/streaming/abstract_archive_stream_reader.h"
 
 #include <ui/workbench/handlers/workbench_action_handler.h> // TODO: remove
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
@@ -908,18 +910,26 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     }
 
     QnResourceWidget *widget;
-    if (resource->hasFlags(Qn::server)) {
+    if (resource->hasFlags(Qn::server))
+    {
         widget = new QnServerResourceWidget(context(), item);
     }
-    else
-    if (resource->hasFlags(Qn::videowall)) {
+    else if (resource->hasFlags(Qn::videowall))
+    {
         widget = new QnVideowallScreenWidget(context(), item);
     }
-    else
-    if (resource->hasFlags(Qn::media)) {
+    else if (resource->hasFlags(Qn::media))
+    {
         widget = new QnMediaResourceWidget(context(), item);
     }
-    else {
+#ifdef GDM_TODO
+    else if (resource->hasFlags(Qn::web_page))
+    {
+        widget = new QnWebResourceWidget(context(), item);
+    }
+#endif
+    else
+    {
         // TODO: #Elric unsupported for now
         qnDeleteLater(item);
         return false;
@@ -1760,7 +1770,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
 
         int checkedButtons = resourceWidget->item()->data<int>(Qn::ItemCheckedButtonsRole, -1);
         if(checkedButtons != -1)
-            resourceWidget->setCheckedButtons(static_cast<QnResourceWidget::Buttons>(checkedButtons));
+            resourceWidget->setCheckedButtons(checkedButtons);
 
         QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(widgets[i]);
         if(!widget)
@@ -1803,7 +1813,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
         }
 
         if(thumbnailed)
-            widget->item()->setData(Qn::ItemDisabledButtonsRole, static_cast<int>(QnMediaResourceWidget::PtzButton));
+            widget->item()->setData(Qn::ItemDisabledButtonsRole, static_cast<int>(Qn::PtzButton));
     }
 
     QVector<QnUuid> selectedUuids = layout->data(Qn::LayoutSelectionRole).value<QVector<QnUuid> >();

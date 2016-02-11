@@ -1,11 +1,11 @@
 #ifndef __DUAL_QUALITY_HELPER__
 #define __DUAL_QUALITY_HELPER__
 
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 
 #include "recorder/device_file_catalog.h"
 #include "core/resource/resource_fwd.h"
-#include "core/datapacket/media_data_packet.h"
+#include "nx/streaming/media_data_packet.h"
 #include <server/server_globals.h>
 
 #include <stack>

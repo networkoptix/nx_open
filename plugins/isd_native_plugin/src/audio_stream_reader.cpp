@@ -13,7 +13,7 @@
 
 #include <QDateTime>
 
-#include <utils/network/aio/aioservice.h>
+#include <nx/network/aio/aioservice.h>
 
 #include "stream_time_sync_data.h"
 

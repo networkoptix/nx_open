@@ -4,7 +4,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx_ec/data/api_discovery_data.h>
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 #include <network/module_information.h>
 
 class QnIncompatibleServerWatcherPrivate;

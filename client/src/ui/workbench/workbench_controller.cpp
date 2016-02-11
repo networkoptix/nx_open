@@ -21,7 +21,7 @@
 #include <utils/common/checked_cast.h>
 #include <utils/common/delete_later.h>
 #include <utils/common/toggle.h>
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/math/color_transformations.h>
 #include <utils/resource_property_adaptors.h>
 
@@ -77,6 +77,7 @@
 #include <ui/graphics/instruments/grid_adjustment_instrument.h>
 #include <ui/graphics/instruments/ptz_instrument.h>
 #include <ui/graphics/instruments/zoom_window_instrument.h>
+#include <ui/graphics/items/resource/button_ids.h>
 
 #include <ui/graphics/items/grid/grid_item.h>
 #include <ui/graphics/items/generic/graphics_message_box.h>
@@ -1089,7 +1090,7 @@ void QnWorkbenchController::at_zoomRectChanged(QnMediaResourceWidget *widget, co
 
 void QnWorkbenchController::at_zoomRectCreated(QnMediaResourceWidget *widget, const QColor &color, const QRectF &zoomRect) {
     menu()->trigger(Qn::CreateZoomWindowAction, QnActionParameters(widget).withArgument(Qn::ItemZoomRectRole, zoomRect).withArgument(Qn::ItemFrameDistinctionColorRole, color));
-    widget->setCheckedButtons(widget->checkedButtons() & ~QnMediaResourceWidget::ZoomWindowButton);
+    widget->setCheckedButtons(widget->checkedButtons() & ~Qn::ZoomWindowButton);
 }
 
 void QnWorkbenchController::at_zoomTargetChanged(QnMediaResourceWidget *widget, const QRectF &zoomRect, QnMediaResourceWidget *zoomTargetWidget) {

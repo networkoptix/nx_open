@@ -3,7 +3,7 @@
 
 #include "droid_resource_searcher.h"
 #include "droid_resource.h"
-#include "utils/network/nettools.h"
+#include <nx/network/nettools.h>
 #include "utils/common/synctime.h"
 
 const int androidRecvPort = 5559;
@@ -27,7 +27,7 @@ QnResourceList QnPlDroidResourceSearcher::findResources(void)
         QList<QnInterfaceAndAddr> ipaddrs = getAllIPv4Interfaces();
         for (int i = 0; i < ipaddrs.size();++i)
         {
-            QSharedPointer<AbstractDatagramSocket> sock(SocketFactory::createDatagramSocket());
+            QSharedPointer<AbstractDatagramSocket> sock(SocketFactory::createDatagramSocket().release());
             if (sock->bind(ipaddrs.at(i).address.toString(), androidRecvPort))
                 m_socketList << sock;
             m_lastReadSocketTime = time;

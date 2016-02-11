@@ -11,7 +11,7 @@
 #include <media_server/settings.h>
 #include <nx_ec/dummy_handler.h>
 #include <network/universal_tcp_listener.h>
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 
 #include "serverutil.h"
 #include "transaction/transaction_message_bus.h"
@@ -193,10 +193,10 @@ bool QnServerMessageProcessor::isLocalAddress(const QString& addr) const
         m_mServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
     if (m_mServer)
     {
-        QHostAddress hostAddr(addr);
-        for(const QHostAddress& serverAddr: m_mServer->getNetAddrList())
+        HostAddress hostAddr(addr);
+        for(const auto& serverAddr: m_mServer->getNetAddrList())
         {
-            if (hostAddr == serverAddr)
+            if (hostAddr == serverAddr.address)
                 return true;
         }
     }

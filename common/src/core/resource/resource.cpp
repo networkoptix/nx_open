@@ -9,12 +9,12 @@
 #include <QtCore/QMetaProperty>
 #include <QtCore/QRunnable>
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/warnings.h>
 #include <utils/common/model_functions.h>
 
 #include <core/resource/camera_advanced_param.h>
-#include "core/dataprovider/abstract_streamdataprovider.h"
+#include "nx/streaming/abstract_stream_data_provider.h"
 #include "core/resource_management/resource_pool.h"
 #include "core/ptz/abstract_ptz_controller.h"
 

@@ -6,9 +6,11 @@
 #include <map>
 #include <vector>
 
+#ifndef Q_MOC_RUN
 #include <boost/preprocessor/tuple/enum.hpp>
+#endif
 
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 #include <QtCore/QUrl>
 
 #include <utils/fusion/fusion.h>
@@ -34,15 +36,15 @@ namespace QnXmlDetail {
     template<class Element>
     void serialize_collection_element(const Element &element, QXmlStreamWriter *stream, const QnCollection::map_tag &) {
         stream->writeStartElement(lit("element"));
-        
+
         stream->writeStartElement(lit("key"));
         QnXml::serialize(element.first, stream);
         stream->writeEndElement();
-        
+
         stream->writeStartElement(lit("value"));
         QnXml::serialize(element.second, stream);
         stream->writeEndElement();
-        
+
         stream->writeEndElement();
     }
 

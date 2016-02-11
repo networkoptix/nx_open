@@ -1,5 +1,5 @@
 #ifndef QN_FUZZY_H
-#define QN_FUZZY_H 
+#define QN_FUZZY_H
 
 #include <QtCore/QPointF>
 #include <QtCore/QSizeF>
@@ -10,9 +10,10 @@
 #include <QtGui/QVector4D>
 #include <QtGui/QMatrix4x4>
 
-// TODO: #Elric #5.3 remove
+#if QT_VERSION == 0x050201
 quint32 qFloatDistance(float a, float b);
 quint64 qFloatDistance(double a, double b);
+#endif
 
 // -------------------------------------------------------------------------- //
 // qFuzzyIsNull
@@ -64,9 +65,9 @@ inline bool qFuzzyEquals(const QSizeF &l, const QSizeF &r) {
 }
 
 inline bool qFuzzyEquals(const QRectF &l, const QRectF &r) {
-    return 
-        qFuzzyEquals(l.x(), r.x()) && 
-        qFuzzyEquals(l.y(), r.y()) && 
+    return
+        qFuzzyEquals(l.x(), r.x()) &&
+        qFuzzyEquals(l.y(), r.y()) &&
         qFuzzyEquals(l.width(), r.width()) &&
         qFuzzyEquals(l.height(), r.height());
 }

@@ -8,7 +8,7 @@
 #include <common/common_globals.h>
 #include "motion/motion_helper.h"
 #include "storage_manager.h"
-#include "core/dataprovider/media_streamdataprovider.h"
+#include <nx/streaming/abstract_media_stream_data_provider.h>
 #include "core/dataprovider/live_stream_provider.h"
 #include "core/resource/resource.h"
 #include "core/resource/camera_resource.h"
@@ -22,7 +22,7 @@
 #include <business/business_event_connector.h>
 #include <business/events/reasoned_business_event.h>
 #include "plugins/storage/file_storage/file_storage_resource.h"
-#include "core/datapacket/media_data_packet.h"
+#include "nx/streaming/media_data_packet.h"
 #include <media_server/serverutil.h>
 #include <media_server/settings.h>
 #include "utils/common/util.h" /* For MAX_FRAME_DURATION, MIN_FRAME_DURATION. */

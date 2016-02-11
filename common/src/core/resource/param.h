@@ -56,9 +56,15 @@ namespace Qn
     static const QString FULL_VERSION = lit("fullVersion");
     static const QString SYSTEM_RUNTIME = lit("systemRuntime");
     static const QString BOOKMARK_COUNT = lit("bookmarkCount");
+    static const QString HDD_LIST = lit("hddList");
+    static const QString HDD_LIST_FILE = lit("/tmp/hddlist");
 
     // Storage
     static const QString SPACE = lit("space");
+    // Cloud
+    static const QString CLOUD_SYSTEM_ID = lit("cloudSystemID");
+    static const QString CLOUD_SYSTEM_AUTH_KEY = lit("cloudAuthKey");
+    static const QString CLOUD_ACCOUNT_NAME = lit("cloudAccountName");
 }
 
 #endif // QN_PARAM_H

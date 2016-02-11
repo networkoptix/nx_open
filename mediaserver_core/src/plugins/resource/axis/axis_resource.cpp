@@ -9,7 +9,7 @@
 #include <api/app_server_connection.h>
 
 #include <utils/common/synctime.h>
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 
 #include "../onvif/dataprovider/onvif_mjpeg.h"
 
@@ -92,7 +92,7 @@ QnPlAxisResource::~QnPlAxisResource()
     stopInputPortMonitoringAsync();
 }
 
-bool QnPlAxisResource::checkIfOnlineAsync( std::function<void(bool)>&& completionHandler )
+void QnPlAxisResource::checkIfOnlineAsync( std::function<void(bool)> completionHandler )
 {
     QUrl apiUrl;
     apiUrl.setScheme( lit("http") );
@@ -121,7 +121,7 @@ bool QnPlAxisResource::checkIfOnlineAsync( std::function<void(bool)>&& completio
         completionHandler( macAddress == resourceMac.toLatin1() );
     };
 
-    return nx_http::downloadFileAsync(
+    nx_http::downloadFileAsync(
         apiUrl,
         requestCompletionFunc );
 }
@@ -207,8 +207,8 @@ bool QnPlAxisResource::startIOMonitor(Qn::IOPortType portType, IOMonitor& ioMoni
     ioMonitor.contentParser = std::make_shared<nx_http::MultipartContentParser>();
     ioMonitor.contentParser->setNextFilter(std::make_shared<AxisIOMessageBodyParser>(this));
 
-    if( !httpClient->doGet( requestUrl ) )
-        return false;
+    httpClient->doGet(requestUrl);
+
     ioMonitor.httpClient = httpClient;
     return true;
 }
@@ -1288,8 +1288,7 @@ bool QnPlAxisResource::readCurrentIOStateAsync()
     httpClient->setUserName( auth.user() );
     httpClient->setUserPassword( auth.password() );
 
-    if( !httpClient->doGet( requestUrl ) )
-        return false;
+    httpClient->doGet(requestUrl);
 
     m_inputPortStateReader = std::move( httpClient );
     return true;

@@ -2,12 +2,12 @@
 
 #include "server_rest_connection_fwd.h"
 
-#include "utils/network/http/httptypes.h"
+#include <nx/network/http/httptypes.h>
 #include "utils/common/systemerror.h"
 #include "utils/common/request_param.h"
 #include "nx_ec/data/api_fwd.h"
 #include <api/helpers/request_helpers_fwd.h>
-#include "utils/network/http/asynchttpclient.h"
+#include <nx/network/http/asynchttpclient.h>
 
 /*
 * New class for HTTP requests to mediaServer. It should be used instead of deprecated class QnMediaServerConnection.
@@ -33,14 +33,13 @@ namespace rest
         struct EmptyResponseType {};
         typedef Result<EmptyResponseType>::type PostCallback;   // use this type for POST requests without result data
 
-        /*
+        /**
         * Load information about cross-server archive
-        * !Returns value > 0 on success or <= 0 if it isn't started.
+        * @return value > 0 on success or <= 0 if it isn't started.
         * @param targetThread execute callback in a target thread if specified. It convenient for UI purpose.
         * By default callback is called in IO thread.
         */
         Handle cameraHistoryAsync(const QnChunksRequestData &request, Result<ec2::ApiCameraHistoryDataList>::type callback, QThread* targetThread = 0);
-
 
         Handle cameraThumbnailAsync(const QnThumbnailRequestData &request, Result<QByteArray>::type callback, QThread* targetThread = 0);
 
@@ -51,7 +50,16 @@ namespace rest
             , PostCallback callback
             , QThread *targetThread = nullptr);
 
-        /*
+        /**
+         * Save the credentials returned by cloud to the database.
+         */
+        Handle saveCloudSystemCredentials(
+            const QString &cloudSystemID,
+            const QString &cloudAuthKey,
+            Result<EmptyResponseType>::type callback,
+            QThread *targetThread = nullptr);
+
+        /**
         * Cancel running request by known requestID. If request is canceled, callback isn't called.
         * If target thread has been used then callback may be called after 'cancelRequest' in case of data already received and queued to a target thread.
         * If QnServerRestConnection is destroyed all running requests are canceled, no callbacks called.

@@ -10,7 +10,7 @@
 #include <QtCore/QMap>
 #include <QtCore/QStringList>
 
-#include "utils/network/socket.h"
+#include <nx/network/socket.h>
 
 
 class UDPSocket;

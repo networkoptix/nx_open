@@ -2,9 +2,9 @@
 
 #include <core/resource/resource_fwd.h>
 #include <utils/common/connective.h>
-#include <utils/common/singleton.h>
+#include <nx/utils/singleton.h>
 
-/** 
+/**
  * Utility class for saving resources user attributes.
  * Supports changes rollback in case they cannot be saved on server.
  */
@@ -21,7 +21,8 @@ public:
     typedef std::function<void (const QnUserResourcePtr &)>             UserChangesFunction;
     typedef std::function<void (const QnVideoWallResourcePtr &)>        VideoWallChangesFunction;
     typedef std::function<void (const QnLayoutResourcePtr &)>           LayoutChangesFunction;
-    
+    typedef std::function<void (const QnWebPageResourcePtr &)>          WebPageChangesFunction;
+
 
     typedef std::function<void ()> BatchChangesFunction;
     typedef std::function<void ()> RollbackFunction;
@@ -62,6 +63,9 @@ public:
 
     /** Apply changes to the given layout. */
     void saveLayout(const QnLayoutResourcePtr &layout, LayoutChangesFunction applyChanges);
+
+    /** Apply changes to the given web page. */
+    void saveWebPage(const QnWebPageResourcePtr &webPage, WebPageChangesFunction applyChanges);
 
 signals:
     /** This signal is emitted every time when changes cannot be saved. */

@@ -17,7 +17,7 @@ public:
     virtual bool hasChanges() const = 0;
 
     /**
-     * @brief updateFromSettings                Read widget elements' values from model data.
+     * @brief loadDataToUi                      Read widget elements' values from model data.
      *                                          This method must be implemented in derived classes.
      */
     virtual void loadDataToUi() = 0;

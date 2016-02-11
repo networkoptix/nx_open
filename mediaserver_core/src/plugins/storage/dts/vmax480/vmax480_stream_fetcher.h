@@ -6,10 +6,10 @@
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QProcess>
 #include <QtCore/QSet>
-#include <utils/thread/wait_condition.h>
+#include <nx/utils/thread/wait_condition.h>
 
 #include "core/resource/resource_fwd.h"
-#include "core/datapacket/media_data_packet.h"
+#include "nx/streaming/media_data_packet.h"
 #include "core/resource/network_resource.h"
 #include "recording/time_period_list.h"
 #include "recording/playbackmask_helper.h"
@@ -87,7 +87,7 @@ private:
     static const int OPEN_ALL = 0xffff;
 
     QnNetworkResource* m_res;
-    typedef QMap<QnVmax480DataConsumer*, CLDataQueue*> ConsumersMap;
+    typedef QMap<QnVmax480DataConsumer*, QnDataPacketQueue*> ConsumersMap;
 
     mutable QnMutex m_mutex;
     QProcess* m_vMaxProxy;

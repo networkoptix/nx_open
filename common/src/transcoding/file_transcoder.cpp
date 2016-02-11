@@ -10,7 +10,7 @@
 #include <memory>
 
 #include <QtCore/QDir>
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
 
