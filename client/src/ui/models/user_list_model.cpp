@@ -281,7 +281,7 @@ QVariant QnUserListModel::data(const QModelIndex &index, int role) const {
         break;
     case Qt::CheckStateRole:
         if (index.column() == CheckBoxColumn)
-            return d->checkedUsers.contains(user);
+            return d->checkedUsers.contains(user) ? Qt::Checked : Qt::Unchecked;
         break;
     default:
         break;
