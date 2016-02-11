@@ -75,7 +75,7 @@ void QnNxStylePrivate::drawSwitch(
         colorShift = 1;
 
     QnPaletteColor backgroundColor = findColor(option->palette.button().color()).lighter(colorShift);
-    QnPaletteColor gripColor = findColor(option->palette.window().color()).lighter(colorShift);
+    QnPaletteColor gripColor = findColor(option->palette.window().color());
     QnPaletteColor highlightColor = mainColor(Colors::kGreen).lighter(colorShift);
 
     bool drawTop = true;
