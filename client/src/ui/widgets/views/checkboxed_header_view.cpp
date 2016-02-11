@@ -1,10 +1,13 @@
 #include "checkboxed_header_view.h"
 
+#include <utils/common/scoped_painter_rollback.h>
+
 QnCheckBoxedHeaderView::QnCheckBoxedHeaderView(int checkBoxColumn, QWidget *parent):
     base_type(Qt::Horizontal, parent),
     m_checkBoxColumn(checkBoxColumn),
     m_checkState(Qt::Unchecked)
 {
+    setDefaultAlignment(Qt::AlignLeft | Qt::AlignVCenter);
     connect(this, &QnCheckBoxedHeaderView::sectionClicked, this, &QnCheckBoxedHeaderView::at_sectionClicked);
 }
 
@@ -23,36 +26,39 @@ void QnCheckBoxedHeaderView::setCheckState(Qt::CheckState state) {
 void QnCheckBoxedHeaderView::paintSection(QPainter *painter, const QRect &rect, int logicalIndex) const {
     base_type::paintSection(painter, rect, logicalIndex);
 
-    if (logicalIndex == m_checkBoxColumn) {
-        if (!rect.isValid())
-            return;
-        QStyleOptionButton opt;
-        opt.initFrom(this);
-
-        QStyle::State state = QStyle::State_Raised;
-        if (isEnabled())
-            state |= QStyle::State_Enabled;
-        if (window()->isActiveWindow())
-            state |= QStyle::State_Active;
-
-        switch(m_checkState) {
-        case Qt::Checked:
-            state |= QStyle::State_On;
-            break;
-        case Qt::Unchecked:
-            state |= QStyle::State_Off;
-            break;
-        default:
-            state |= QStyle::State_NoChange;
-            break;
-        }
-
-        opt.rect = rect.adjusted(4, 0, 0, 0);
-        opt.state |= state;
-        opt.text = QString();
-        style()->drawControl(QStyle::CE_CheckBox, &opt, painter, this);
+    if (logicalIndex != m_checkBoxColumn)
         return;
+
+    if (!rect.isValid())
+        return;
+
+    QStyleOptionButton opt;
+    opt.initFrom(this);
+
+    QStyle::State state = QStyle::State_Raised;
+    if (isEnabled())
+        state |= QStyle::State_Enabled;
+    if (window()->isActiveWindow())
+        state |= QStyle::State_Active;
+
+    switch(m_checkState) {
+    case Qt::Checked:
+        state |= QStyle::State_On;
+        break;
+    case Qt::Unchecked:
+        state |= QStyle::State_Off;
+        break;
+    default:
+        state |= QStyle::State_NoChange;
+        break;
     }
+
+    opt.rect = rect;
+    opt.state |= state;
+    opt.text = QString();
+
+    QnScopedPainterClipRegionRollback clipRollback(painter, QRegion(rect));
+    style()->drawPrimitive(QStyle::PE_IndicatorCheckBox, &opt, painter, this);
 }
 
 QSize QnCheckBoxedHeaderView::sectionSizeFromContents(int logicalIndex) const {

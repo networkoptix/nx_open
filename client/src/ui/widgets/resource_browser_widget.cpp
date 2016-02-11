@@ -214,6 +214,8 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget *parent, QnWorkbenchCon
     ui->resourceTreeWidget->setWorkbench(workbench());
     ui->searchTreeWidget->setWorkbench(workbench());
 
+    ui->tabWidget->tabBar()->setMaximumHeight(32);
+
     connect(workbench(),        SIGNAL(currentLayoutAboutToBeChanged()),            this,   SLOT(at_workbench_currentLayoutAboutToBeChanged()));
     connect(workbench(),        SIGNAL(currentLayoutChanged()),                     this,   SLOT(at_workbench_currentLayoutChanged()));
     connect(workbench(),        SIGNAL(itemChanged(Qn::ItemRole)),                  this,   SLOT(at_workbench_itemChanged(Qn::ItemRole)));
@@ -807,5 +809,3 @@ void QnResourceBrowserWidget::setupInitialModelCriteria(QnResourceSearchProxyMod
         model->addCriterion(QnResourceCriterion(Qn::layout));
     }
 }
-
-

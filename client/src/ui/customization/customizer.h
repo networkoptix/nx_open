@@ -5,6 +5,8 @@
 
 #include <nx/utils/singleton.h>
 
+#include <ui/style/generic_palette.h>
+
 #include "customization.h"
 
 class QnJsonSerializer;
@@ -22,6 +24,8 @@ public:
     const QnCustomization &customization() const;
 
     void customize(QObject *object);
+
+    QnGenericPalette genericPalette() const;
 
 private:
     QScopedPointer<QnCustomizerPrivate> d;

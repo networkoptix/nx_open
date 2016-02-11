@@ -35,17 +35,15 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
 
     ui->doubleBufferWarningLabel->setText(tr("Disable only if the client takes too much CPU"));
 
-    if(!this->context()->instance<QnWorkbenchAutoStarter>()->isSupported()) {
+    if (!this->context()->instance<QnWorkbenchAutoStarter>()->isSupported())
         ui->autoStartCheckBox->hide();
-        ui->autoStartLabel->hide();
-    }
 
     setHelpTopic(ui->mainMediaFolderGroupBox, ui->extraMediaFoldersGroupBox,  Qn::SystemSettings_General_MediaFolders_Help);
     setHelpTopic(ui->browseLogsButton,                                        Qn::SystemSettings_General_Logs_Help);
-    setHelpTopic(ui->pauseOnInactivityLabel,  ui->pauseOnInactivityCheckBox,  Qn::SystemSettings_General_AutoPause_Help);
+    setHelpTopic(ui->pauseOnInactivityCheckBox,                               Qn::SystemSettings_General_AutoPause_Help);
     setHelpTopic(ui->idleTimeoutSpinBox,      ui->idleTimeoutWidget,          Qn::SystemSettings_General_AutoPause_Help);
-    setHelpTopic(ui->autoStartCheckBox,       ui->autoStartLabel,             Qn::SystemSettings_General_AutoStartWithSystem_Help);
-    setHelpTopic(ui->doubleBufferCheckbox,    ui->doubleBufferLabel,          Qn::SystemSettings_General_DoubleBuffering_Help);
+    setHelpTopic(ui->autoStartCheckBox,                                       Qn::SystemSettings_General_AutoStartWithSystem_Help);
+    setHelpTopic(ui->doubleBufferCheckbox,                                    Qn::SystemSettings_General_DoubleBuffering_Help);
     setHelpTopic(ui->doubleBufferWarningLabel,ui->doubleBufferRestartLabel,   Qn::SystemSettings_General_DoubleBuffering_Help);
 
     setWarningStyle(ui->downmixWarningLabel);

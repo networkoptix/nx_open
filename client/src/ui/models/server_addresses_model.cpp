@@ -230,7 +230,7 @@ QVariant QnServerAddressesModel::headerData(int section, Qt::Orientation orienta
     case AddressColumn:
         return tr("Address");
     case InUseColumn:
-        return tr("In Use");
+        return QString();
     default:
         break;
     }

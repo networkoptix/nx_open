@@ -20,6 +20,7 @@
 #include "ui/models/resource_list_model.h"
 #include "ui/models/server_addresses_model.h"
 #include "ui/style/warning_style.h"
+#include <ui/delegates/switch_item_delegate.h>
 
 #include <nx/network/socket_common.h>
 #include "utils/common/string.h"
@@ -33,6 +34,26 @@ namespace {
     class SortedServersProxyModel : public QSortFilterProxyModel {
     public:
         SortedServersProxyModel(QObject *parent = 0) : QSortFilterProxyModel(parent) {}
+
+        QVariant headerData(int section, Qt::Orientation orientation, int role) const
+        {
+            Q_UNUSED(orientation)
+
+            switch (role)
+            {
+            case Qt::DisplayRole:
+            case Qt::ToolTipRole:
+                if (section == 0)
+                    return tr("Server");
+                break;
+
+            default:
+                break;
+            }
+
+            return QVariant();
+        }
+
     protected:
         bool lessThan(const QModelIndex &left, const QModelIndex &right) const override {
             QString leftString = left.data(sortRole()).toString();
@@ -168,7 +189,14 @@ QnRoutingManagementWidget::QnRoutingManagementWidget(QWidget *parent) :
     m_changes(new RoutingManagementChanges)
 {
     ui->setupUi(this);
+
+    ui->splitter->setStretchFactor(0, 1);
+    ui->splitter->setStretchFactor(1, 2);
+
+    ui->addressesView->setItemDelegateForColumn(QnServerAddressesModel::InUseColumn, new QnSwitchItemDelegate(this));
+
     setWarningStyle(ui->warningLabel);
+
     setHelpTopic(this, Qn::Administration_RoutingManagement_Help);
 
     m_serverListModel = new QnResourceListModel(this);
@@ -188,9 +216,9 @@ QnRoutingManagementWidget::QnRoutingManagementWidget(QWidget *parent) :
     m_sortedServerAddressesModel->sort(QnServerAddressesModel::AddressColumn);
     m_sortedServerAddressesModel->setSourceModel(m_serverAddressesModel);
     ui->addressesView->setModel(m_sortedServerAddressesModel);
-    ui->addressesView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-    ui->addressesView->horizontalHeader()->setSectionResizeMode(QnServerAddressesModel::AddressColumn, QHeaderView::Stretch);
-    ui->addressesView->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->addressesView->header()->setSectionResizeMode(QnServerAddressesModel::AddressColumn, QHeaderView::Stretch);
+    ui->addressesView->header()->setSectionResizeMode(QnServerAddressesModel::InUseColumn, QHeaderView::ResizeToContents);
+    ui->addressesView->header()->setSectionsMovable(false);
 
     connect(ui->serversView->selectionModel(),  &QItemSelectionModel::currentRowChanged,        this,   &QnRoutingManagementWidget::at_serversView_currentIndexChanged);
     connect(ui->addressesView->selectionModel(),&QItemSelectionModel::currentRowChanged,        this,   &QnRoutingManagementWidget::updateUi);
