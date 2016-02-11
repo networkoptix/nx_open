@@ -1,6 +1,7 @@
 #ifndef __RTSP_CLIENT_ARCHIVE_DELEGATE_H
 #define __RTSP_CLIENT_ARCHIVE_DELEGATE_H
 
+#include <QElapsedTimer>
 #include <atomic>
 
 #include <nx/utils/uuid.h>
@@ -57,6 +58,7 @@ public:
 
     void setAdditionalAttribute(const QByteArray& name, const QByteArray& value);
     virtual void setRange(qint64 startTime, qint64 endTime, qint64 frameStep) override;
+    virtual bool hasVideo() const override;
 
     void setMultiserverAllowed(bool value);
 
@@ -115,6 +117,8 @@ private:
     int m_frameCnt;
     QnCustomResourceVideoLayoutPtr m_customVideoLayout;
 
+    QnUuid m_runtimeId;
+
 	QMap<int, QSharedPointer<QnNxRtpParser>> m_parsers;
 
     struct {
@@ -124,6 +128,7 @@ private:
     } m_auth;
 
     std::atomic_flag m_footageUpToDate;
+    QElapsedTimer m_reopenTimer;
     mutable QnMutex m_rtpDataMutex;
 };
 

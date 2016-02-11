@@ -211,7 +211,8 @@ void QnTCPConnectionProcessor::sendResponse(int httpStatusCode, const QByteArray
     d->response.statusLine.statusCode = httpStatusCode;
     d->response.statusLine.reasonPhrase = nx_http::StatusCode::toString((nx_http::StatusCode::Value)httpStatusCode);
 
-    if( isConnectionCanBePersistent() )
+    if (d->response.headers.find("Connection") == d->response.headers.end() &&  //response does not contain
+        isConnectionCanBePersistent())
     {
         d->response.headers.insert(nx_http::HttpHeader("Connection", "Keep-Alive"));
         if (d->response.headers.find("Keep-Alive") == d->response.headers.end())

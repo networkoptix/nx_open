@@ -1,5 +1,3 @@
-#ifdef ENABLE_DATA_PROVIDERS
-
 #include <memory.h>
 #include <sstream>
 
@@ -457,5 +455,3 @@ int VC1Frame::vc1_parse_frame_header_adv(const VC1SequenceHeader& sequenceHdr)
 	} 
 	return 0;
 }
-
-#endif //ENABLE_DATA_PROVIDERS

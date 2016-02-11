@@ -1,7 +1,5 @@
 #include "abstract_data_consumer.h"
 
-#ifdef ENABLE_DATA_PROVIDERS
-
 #include <utils/common/sleep.h>
 #include <nx/utils/log/log.h>
 
@@ -72,5 +70,3 @@ int QnAbstractDataConsumer::maxQueueSize() const
 {
     return m_dataQueue.maxSize();
 }
-
-#endif // ENABLE_DATA_PROVIDERS

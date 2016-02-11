@@ -6,12 +6,12 @@
 #ifndef VIDEO_DATA_PACKET_H
 #define VIDEO_DATA_PACKET_H
 
-#ifdef ENABLE_DATA_PROVIDERS
-
 #include <memory>
 
 #include "media_data_packet.h"
 
+
+const unsigned int MAX_ALLOWED_FRAME_SIZE = 1024*1024*10;
 
 //!Contains video data specific fields. Video data buffer stored in a child class
 class QnCompressedVideoData
@@ -73,7 +73,5 @@ private:
 
 typedef std::shared_ptr<QnWritableCompressedVideoData> QnWritableCompressedVideoDataPtr;
 typedef std::shared_ptr<const QnWritableCompressedVideoData> QnConstWritableCompressedVideoDataPtr;
-
-#endif // ENABLE_DATA_PROVIDERS
 
 #endif  //VIDEO_DATA_PACKET_H

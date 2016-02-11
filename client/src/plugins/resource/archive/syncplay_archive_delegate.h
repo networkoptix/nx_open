@@ -41,7 +41,7 @@ public:
     virtual void setSendMotion(bool value) override;
 
     virtual ArchiveChunkInfo getLastUsedChunkInfo() const override;
-
+    virtual bool hasVideo() const override;
 protected:
     friend class QnArchiveSyncPlayWrapper;
     //void setPrebuffering(bool value);

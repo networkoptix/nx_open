@@ -163,31 +163,31 @@
     </message>
     <message>
         <source>Config</source>
-        <translation type="unfinished">Конфигур</translation>
+        <translation>Конфигурация</translation>
     </message>
     <message>
         <source>Preference</source>
-        <translation type="unfinished">Свойств</translation>
+        <translation>Свойства</translation>
     </message>
     <message>
         <source>Options</source>
-        <translation type="unfinished">Параметры</translation>
+        <translation>Параметры</translation>
     </message>
     <message>
         <source>Setting</source>
-        <translation type="unfinished">Настройк</translation>
+        <translation>Настройка</translation>
     </message>
     <message>
         <source>Setup</source>
-        <translation type="unfinished">Настр</translation>
+        <translation>Настройки</translation>
     </message>
     <message>
         <source>Quit</source>
-        <translation type="unfinished">Заверш</translation>
+        <translation>Завершение</translation>
     </message>
     <message>
         <source>Exit</source>
-        <translation type="unfinished">Выход</translation>
+        <translation>Выход</translation>
     </message>
 </context>
 <context>
@@ -3093,7 +3093,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>internal error: previously-checked referenced subpattern not found</source>
-        <translation type="unfinished">внутренняя ошибка: ранее проверенный подшаблон не найден</translation>
+        <translation>внутренняя ошибка: ранее проверенный подшаблон не найден</translation>
     </message>
     <message>
         <source>DEFINE group contains more than one branch</source>
@@ -3624,67 +3624,67 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Launch (0)</source>
-        <translation type="unfinished">Запустить (0)</translation>
+        <translation>Запустить (0)</translation>
     </message>
     <message>
         <source>Launch (1)</source>
-        <translation type="unfinished">Запустить (1)</translation>
+        <translation>Запустить (1)</translation>
     </message>
     <message>
         <source>Launch (2)</source>
-        <translation type="unfinished">Запустить (2)</translation>
+        <translation>Запустить (2)</translation>
     </message>
     <message>
         <source>Launch (3)</source>
-        <translation type="unfinished">Запустить (3)</translation>
+        <translation>Запустить (3)</translation>
     </message>
     <message>
         <source>Launch (4)</source>
-        <translation type="unfinished">Запустить (4)</translation>
+        <translation>Запустить (4)</translation>
     </message>
     <message>
         <source>Launch (5)</source>
-        <translation type="unfinished">Запустить (5)</translation>
+        <translation>Запустить (5)</translation>
     </message>
     <message>
         <source>Launch (6)</source>
-        <translation type="unfinished">Запустить (6)</translation>
+        <translation>Запустить (6)</translation>
     </message>
     <message>
         <source>Launch (7)</source>
-        <translation type="unfinished">Запустить (7)</translation>
+        <translation>Запустить (7)</translation>
     </message>
     <message>
         <source>Launch (8)</source>
-        <translation type="unfinished">Запустить (8)</translation>
+        <translation>Запустить (8)</translation>
     </message>
     <message>
         <source>Launch (9)</source>
-        <translation type="unfinished">Запустить (9)</translation>
+        <translation>Запустить (9)</translation>
     </message>
     <message>
         <source>Launch (A)</source>
-        <translation type="unfinished">Запустить (A)</translation>
+        <translation>Запустить (A)</translation>
     </message>
     <message>
         <source>Launch (B)</source>
-        <translation type="unfinished">Запустить (B)</translation>
+        <translation>Запустить (B)</translation>
     </message>
     <message>
         <source>Launch (C)</source>
-        <translation type="unfinished">Запустить (C)</translation>
+        <translation>Запустить (C)</translation>
     </message>
     <message>
         <source>Launch (D)</source>
-        <translation type="unfinished">Запустить (D)</translation>
+        <translation>Запустить (D)</translation>
     </message>
     <message>
         <source>Launch (E)</source>
-        <translation type="unfinished">Запустить (E)</translation>
+        <translation>Запустить (E)</translation>
     </message>
     <message>
         <source>Launch (F)</source>
-        <translation type="unfinished">Запустить (F)</translation>
+        <translation>Запустить (F)</translation>
     </message>
     <message>
         <source>Monitor Brightness Up</source>
@@ -3732,23 +3732,23 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>LightBulb</source>
-        <translation type="unfinished">Лампочка</translation>
+        <translation>Лампочка</translation>
     </message>
     <message>
         <source>Shop</source>
-        <translation type="unfinished">Магазин</translation>
+        <translation>Магазин</translation>
     </message>
     <message>
         <source>History</source>
-        <translation type="unfinished">История</translation>
+        <translation>История</translation>
     </message>
     <message>
         <source>Add Favorite</source>
-        <translation type="unfinished">Добавить в избранное</translation>
+        <translation>Добавить в избранное</translation>
     </message>
     <message>
         <source>Hot Links</source>
-        <translation type="unfinished">Горячие ссылки</translation>
+        <translation>Горячие ссылки</translation>
     </message>
     <message>
         <source>Adjust Brightness</source>
@@ -3756,7 +3756,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Finance</source>
-        <translation type="unfinished">Финансы</translation>
+        <translation>Финансы</translation>
     </message>
     <message>
         <source>Community</source>
@@ -3772,11 +3772,11 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Application Left</source>
-        <translation type="unfinished"></translation>
+        <translation>Приложение слева</translation>
     </message>
     <message>
         <source>Application Right</source>
-        <translation type="unfinished"></translation>
+        <translation>Приложение справа</translation>
     </message>
     <message>
         <source>Book</source>
@@ -3784,7 +3784,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>CD</source>
-        <translation type="unfinished">CD</translation>
+        <translation>CD</translation>
     </message>
     <message>
         <source>Calculator</source>
@@ -3792,11 +3792,11 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Clear</source>
-        <translation type="unfinished">Очистить</translation>
+        <translation>Очистить</translation>
     </message>
     <message>
         <source>Clear Grab</source>
-        <translation type="unfinished"></translation>
+        <translation>Очистить выделенное</translation>
     </message>
     <message>
         <source>Close</source>
@@ -3812,11 +3812,11 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Display</source>
-        <translation type="unfinished">Display</translation>
+        <translation>Display</translation>
     </message>
     <message>
         <source>DOS</source>
-        <translation type="unfinished">DOS</translation>
+        <translation>DOS</translation>
     </message>
     <message>
         <source>Documents</source>
@@ -3824,59 +3824,59 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Spreadsheet</source>
-        <translation type="unfinished">Электронная таблицы</translation>
+        <translation>Таблица</translation>
     </message>
     <message>
         <source>Browser</source>
-        <translation type="unfinished">Обозреватель</translation>
+        <translation>Обозреватель</translation>
     </message>
     <message>
         <source>Game</source>
-        <translation type="unfinished">Игра</translation>
+        <translation>Игра</translation>
     </message>
     <message>
         <source>Go</source>
-        <translation type="unfinished">Перейти</translation>
+        <translation>Перейти</translation>
     </message>
     <message>
         <source>iTouch</source>
-        <translation type="unfinished">iTouch</translation>
+        <translation>iTouch</translation>
     </message>
     <message>
         <source>Logoff</source>
-        <translation type="unfinished">Выйти из системы</translation>
+        <translation>Выйти из системы</translation>
     </message>
     <message>
         <source>Market</source>
-        <translation type="unfinished">Рынок</translation>
+        <translation>Рынок</translation>
     </message>
     <message>
         <source>Meeting</source>
-        <translation type="unfinished">Встреча</translation>
+        <translation>Встреча</translation>
     </message>
     <message>
         <source>Keyboard Menu</source>
-        <translation type="unfinished">Клавиатурное меню</translation>
+        <translation>Клавиатурное меню</translation>
     </message>
     <message>
         <source>Menu PB</source>
-        <translation type="unfinished"></translation>
+        <translation>Меню PB</translation>
     </message>
     <message>
         <source>My Sites</source>
-        <translation type="unfinished">Мои сайты</translation>
+        <translation>Мои сайты</translation>
     </message>
     <message>
         <source>News</source>
-        <translation type="unfinished">Новости</translation>
+        <translation>Новости</translation>
     </message>
     <message>
         <source>Home Office</source>
-        <translation type="unfinished">Домашний офис</translation>
+        <translation>Домашний офис</translation>
     </message>
     <message>
         <source>Option</source>
-        <translation type="unfinished">Опция</translation>
+        <translation>Опция</translation>
     </message>
     <message>
         <source>Paste</source>
@@ -3884,11 +3884,11 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Phone</source>
-        <translation type="unfinished">Телефон</translation>
+        <translation>Телефон</translation>
     </message>
     <message>
         <source>Reply</source>
-        <translation type="unfinished">Ответить</translation>
+        <translation>Ответить</translation>
     </message>
     <message>
         <source>Reload</source>
@@ -3896,15 +3896,15 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Rotate Windows</source>
-        <translation type="unfinished">Повернуть окна</translation>
+        <translation>Повернуть окна</translation>
     </message>
     <message>
         <source>Rotation PB</source>
-        <translation type="unfinished"></translation>
+        <translation>Поворот PB</translation>
     </message>
     <message>
         <source>Rotation KB</source>
-        <translation type="unfinished"></translation>
+        <translation>Поворот KB</translation>
     </message>
     <message>
         <source>Save</source>
@@ -3912,35 +3912,35 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Send</source>
-        <translation type="unfinished">Отправить</translation>
+        <translation>Отправить</translation>
     </message>
     <message>
         <source>Spellchecker</source>
-        <translation type="unfinished">Проверка орфографии</translation>
+        <translation>Проверка орфографии</translation>
     </message>
     <message>
         <source>Split Screen</source>
-        <translation type="unfinished">Разделить экран</translation>
+        <translation>Разделить экран</translation>
     </message>
     <message>
         <source>Support</source>
-        <translation type="unfinished">Поддержка</translation>
+        <translation>Поддержка</translation>
     </message>
     <message>
         <source>Task Panel</source>
-        <translation type="unfinished">Панель задач</translation>
+        <translation>Панель задач</translation>
     </message>
     <message>
         <source>Terminal</source>
-        <translation type="unfinished">Терминал</translation>
+        <translation>Терминал</translation>
     </message>
     <message>
         <source>Tools</source>
-        <translation type="unfinished">Инструменты</translation>
+        <translation>Инструменты</translation>
     </message>
     <message>
         <source>Travel</source>
-        <translation type="unfinished">Путешествие</translation>
+        <translation>Путешествие</translation>
     </message>
     <message>
         <source>Video</source>
@@ -3948,11 +3948,11 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Word Processor</source>
-        <translation type="unfinished">Текстовый редактор</translation>
+        <translation>Текстовый редактор</translation>
     </message>
     <message>
         <source>XFer</source>
-        <translation type="unfinished"></translation>
+        <translation>XFer</translation>
     </message>
     <message>
         <source>Zoom In</source>
@@ -3968,15 +3968,15 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Messenger</source>
-        <translation type="unfinished">Клиент обмена мгновенными сообщениями</translation>
+        <translation>Клиент обмена мгновенными сообщениями</translation>
     </message>
     <message>
         <source>WebCam</source>
-        <translation type="unfinished">Вэб-камера</translation>
+        <translation>Вэб-камера</translation>
     </message>
     <message>
         <source>Mail Forward</source>
-        <translation type="unfinished">Переслать письмо</translation>
+        <translation>Переслать письмо</translation>
     </message>
     <message>
         <source>Pictures</source>
@@ -4000,27 +4000,27 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Ultra Wide Band</source>
-        <translation type="unfinished">Сверхширокополосная связь</translation>
+        <translation>Сверхширокополосная связь</translation>
     </message>
     <message>
         <source>Audio Forward</source>
-        <translation type="unfinished">Последовательное воспроизведение</translation>
+        <translation>Последовательное воспроизведение</translation>
     </message>
     <message>
         <source>Audio Repeat</source>
-        <translation type="unfinished">Воспроизведение по кругу</translation>
+        <translation>Воспроизведение по кругу</translation>
     </message>
     <message>
         <source>Audio Random Play</source>
-        <translation type="unfinished">Случайное воспроизведение</translation>
+        <translation>Случайное воспроизведение</translation>
     </message>
     <message>
         <source>Subtitle</source>
-        <translation type="unfinished">Субтитры</translation>
+        <translation>Субтитры</translation>
     </message>
     <message>
         <source>Audio Cycle Track</source>
-        <translation type="unfinished">Зацикленное воспроизведение дорожки</translation>
+        <translation>Зацикленное воспроизведение дорожки</translation>
     </message>
     <message>
         <source>Time</source>
@@ -4028,11 +4028,11 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Select</source>
-        <translation type="unfinished">Выбрать</translation>
+        <translation>Выбрать</translation>
     </message>
     <message>
         <source>View</source>
-        <translation type="unfinished">Вид</translation>
+        <translation>Вид</translation>
     </message>
     <message>
         <source>Top Menu</source>
@@ -4040,7 +4040,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Suspend</source>
-        <translation type="unfinished">Приостановить</translation>
+        <translation>Приостановить</translation>
     </message>
     <message>
         <source>Hibernate</source>
@@ -4100,19 +4100,19 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Context1</source>
-        <translation type="unfinished"></translation>
+        <translation>Контекст1</translation>
     </message>
     <message>
         <source>Context2</source>
-        <translation type="unfinished"></translation>
+        <translation>Контекст2</translation>
     </message>
     <message>
         <source>Context3</source>
-        <translation type="unfinished"></translation>
+        <translation>Контекст3</translation>
     </message>
     <message>
         <source>Context4</source>
-        <translation type="unfinished"></translation>
+        <translation>Контекст4</translation>
     </message>
     <message>
         <source>Call</source>
@@ -4219,15 +4219,15 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Code input</source>
-        <translation type="unfinished">Ввод кода</translation>
+        <translation>Ввод кода</translation>
     </message>
     <message>
         <source>Multiple Candidate</source>
-        <translation type="unfinished">Несколько вариантов</translation>
+        <translation>Несколько вариантов</translation>
     </message>
     <message>
         <source>Previous Candidate</source>
-        <translation type="unfinished">Предыдущий вариант</translation>
+        <translation>Предыдущий вариант</translation>
     </message>
     <message>
         <source>Hangul</source>

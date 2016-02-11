@@ -1,7 +1,5 @@
 #include "nx_rtp_parser.h"
 
-#ifdef ENABLE_DATA_PROVIDERS
-
 #include <nx/streaming/audio_data_packet.h>
 #include <nx/streaming/video_data_packet.h>
 #include <nx/streaming/basic_media_context.h>
@@ -177,5 +175,3 @@ bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dat
     }
     return true;
 }
-
-#endif // ENABLE_DATA_PROVIDERS

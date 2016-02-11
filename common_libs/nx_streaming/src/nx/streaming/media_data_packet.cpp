@@ -1,7 +1,5 @@
 #include "media_data_packet.h"
 
-#ifdef ENABLE_DATA_PROVIDERS
-
 #include <QtGui/QRegion>
 
 #include <utils/media/bitStream.h>
@@ -448,6 +446,3 @@ bool operator< (const quint64 timeMs, const QnMetaDataV1Light& data)
 {
     return timeMs < data.startTimeMs;
 }
-
-#endif // ENABLE_DATA_PROVIDERS
-

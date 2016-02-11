@@ -125,6 +125,7 @@ protected:
     qint64 m_tmpSkipFramesToTime;
 private:
     void setReverseMode(bool value, qint64 currentTimeHint = AV_NOPTS_VALUE);
+    bool isCompatiblePacketForMask(const QnAbstractMediaDataPtr& mediaData) const;
 private slots:
     void onDelegateChangeQuality(MediaQuality quality);
 private:

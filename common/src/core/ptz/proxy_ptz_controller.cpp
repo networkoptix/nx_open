@@ -2,8 +2,6 @@
 
 #include <cassert>
 
-#include <utils/common/event_loop.h>
-
 QnProxyPtzController::QnProxyPtzController(const QnPtzControllerPtr &baseController):
     base_type(baseController->resource()),
     m_baseController(baseController)

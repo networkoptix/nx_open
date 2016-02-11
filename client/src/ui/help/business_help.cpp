@@ -27,7 +27,7 @@ int QnBusiness::eventHelpId(QnBusiness::EventType type) {
     case BackupFinishedEvent:
         return Qn::EventsActions_BackupFinished_Help;
     default:
-        if (type > UserDefinedEvent)
+        if (type >= UserDefinedEvent)
             return Qn::EventsActions_Generic_Help;
 
         return -1;
