@@ -149,11 +149,14 @@
             PrintSupport, MultimediaWidgets, Quick, MultimediaQuick_p, Qml, Positioning, Sensors,
             XmlPatterns
         </qtlibs>
+        <additional.qtlibs/>
 
         <!--QT plugins used-->
         <qtplugins>
             imageformats, platforms
         </qtplugins>
+        <additional.qtplugins/>
+
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
