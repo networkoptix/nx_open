@@ -64,7 +64,7 @@ void HolePunchingProcessor::connect(
 {
     NX_LOGX(lm("connect request. from %1 to host %2, connection id %3").
         arg(connection->getSourceAddress().toString()).
-        arg(request.destinationHostName).arg(request.connectSessionID),
+        arg(request.destinationHostName).arg(request.connectSessionId),
         cl_logDEBUG2);
 
     api::ResultCode validationResult = api::ResultCode::ok;
@@ -79,13 +79,13 @@ void HolePunchingProcessor::connect(
     //preparing and saving connection context
     QnMutexLocker lk(&m_mutex);
     const auto connectionFsmIterAndFlag = m_activeConnectSessions.emplace(
-        request.connectSessionID,
+        request.connectSessionId,
         nullptr);
     if (!connectionFsmIterAndFlag.second)
     {
         NX_LOGX(lm("connect request retransmit: from %1, to %2, connection id %3").
             arg(connection->getSourceAddress().toString()).
-            arg(request.destinationHostName).arg(request.connectSessionID),
+            arg(request.destinationHostName).arg(request.connectSessionId),
             cl_logDEBUG1);
         //ignoring request, response will be sent by fsm
         return;
@@ -93,7 +93,7 @@ void HolePunchingProcessor::connect(
 
     connectionFsmIterAndFlag.first->second = 
         std::make_unique<UDPHolePunchingConnectionInitiationFsm>(
-            request.connectSessionID,
+            request.connectSessionId,
             targetPeerDataLocker.get(),
             std::bind(
                 &HolePunchingProcessor::connectSessionFinished,
@@ -115,7 +115,7 @@ void HolePunchingProcessor::onConnectionAckRequest(
     std::function<void(api::ResultCode)> completionHandler)
 {
     QnMutexLocker lk(&m_mutex);
-    auto connectionIter = m_activeConnectSessions.find(request.connectSessionID);
+    auto connectionIter = m_activeConnectSessions.find(request.connectSessionId);
     if (connectionIter == m_activeConnectSessions.end())
     {
         completionHandler(api::ResultCode::notFound);
@@ -134,7 +134,7 @@ void HolePunchingProcessor::connectionResult(
     std::function<void(api::ResultCode)> completionHandler)
 {
     QnMutexLocker lk(&m_mutex);
-    auto connectionIter = m_activeConnectSessions.find(request.connectSessionID);
+    auto connectionIter = m_activeConnectSessions.find(request.connectSessionId);
     if (connectionIter == m_activeConnectSessions.end())
     {
         completionHandler(api::ResultCode::notFound);

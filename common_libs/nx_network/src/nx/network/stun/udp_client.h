@@ -17,6 +17,11 @@
 namespace nx {
 namespace stun {
 
+typedef nx::network::UnreliableMessagePipeline<
+    Message,
+    MessageParser,
+    MessageSerializer> UnreliableMessagePipeline;
+
 /** STUN protocol UDP client.
     Conforms to [rfc5389, 7.2.1]
     \note Supports pipelining
@@ -68,10 +73,7 @@ public:
     void setMaxRetransmissions(int maxRetransmissions);
 
 private:
-    typedef nx::network::UnreliableMessagePipeline<
-        Message,
-        MessageParser,
-        MessageSerializer> PipelineType;
+    typedef UnreliableMessagePipeline PipelineType;
 
     class RequestContext
     {

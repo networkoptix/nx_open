@@ -7,11 +7,11 @@
 
 #include "abstract_tunnel_connector.h"
 
+#include <functional>
 #include <memory>
 
 #include <boost/optional.hpp>
 
-#include <nx/utils/move_only_func.h>
 #include "nx/network/cloud/data/connect_data.h"
 #include "nx/network/cloud/mediator_connections.h"
 #include "nx/network/stun/udp_client.h"
@@ -39,7 +39,7 @@ public:
     /** Only one connect can be running at a time. */
     virtual void connect(
         std::chrono::milliseconds timeout,
-        nx::utils::MoveOnlyFunc<void(
+        std::function<void(
             SystemError::ErrorCode errorCode,
             std::unique_ptr<AbstractTunnelConnection>)> handler) override;
     virtual const AddressEntry& targetPeerAddress() const override;
@@ -48,7 +48,7 @@ private:
     const AddressEntry m_targetHostAddress;
     const nx::String m_connectSessionId;
     nx::hpm::api::MediatorClientUdpConnection m_mediatorUdpClient;
-    nx::utils::MoveOnlyFunc<void(
+    std::function<void(
         SystemError::ErrorCode errorCode,
         std::unique_ptr<AbstractTunnelConnection>)> m_completionHandler;
     boost::optional<SocketAddress> m_targetHostUdpAddress;

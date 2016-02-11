@@ -46,6 +46,9 @@ namespace methods
         connect,
 
         connectionResult,
+
+        udpHolePunchingSyn,
+        udpHolePunchingSynAck,
     };
 
     NX_NETWORK_API nx::String toString(Value val);

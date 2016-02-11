@@ -5,6 +5,7 @@
 
 #include "udp_hole_punching_connector.h"
 
+#include <nx/network/cloud/data/udp_hole_punching_connection_initiation_data.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_message.h>
 
@@ -12,31 +13,6 @@
 
 
 namespace nx {
-
-namespace hpm {
-namespace api {
-
-class UdpHolePunchingSyn
-{
-public:
-    nx::String connectSessionId;
-
-    void serialize(nx::stun::Message* const message) {}
-    bool parse(const nx::stun::Message& message) {return false;}
-};
-
-class UdpHolePunchingSynAck
-{
-public:
-    nx::String connectSessionId;
-
-    void serialize(nx::stun::Message* const message) {}
-    bool parse(const nx::stun::Message& message) {return false;}
-};
-
-}
-}
-
 namespace network {
 namespace cloud {
 
@@ -69,7 +45,7 @@ int UdpHolePunchingTunnelConnector::getPriority() const
     
 void UdpHolePunchingTunnelConnector::connect(
     std::chrono::milliseconds timeout,
-    nx::utils::MoveOnlyFunc<void(
+    std::function<void(
         SystemError::ErrorCode errorCode,
         std::unique_ptr<AbstractTunnelConnection>)> handler)
 {
@@ -113,7 +89,7 @@ void UdpHolePunchingTunnelConnector::connect(
 
     api::ConnectRequest connectRequest;
     connectRequest.originatingPeerID = QnUuid::createUuid().toByteArray();
-    connectRequest.connectSessionID = m_connectSessionId;
+    connectRequest.connectSessionId = m_connectSessionId;
     connectRequest.connectionMethods = api::ConnectionMethod::udpHolePunching;
     connectRequest.destinationHostName = m_targetHostAddress.host.toString().toUtf8();
     using namespace std::placeholders;
