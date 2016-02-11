@@ -302,9 +302,8 @@ void QnLiveStreamProvider::onGotVideoFrame(const QnCompressedVideoDataPtr& video
     m_framesSinceLastMetaData++;
 
     saveMediaStreamParamsIfNeeded(videoData);
-    if (isCameraControlRequired && m_totalVideoFrames &&
-            (m_totalVideoFrames % SAVE_BITRATE_FRAME) == 0)
-        saveBitrateIfNeeded(videoData, currentLiveParams);
+    if (m_totalVideoFrames && (m_totalVideoFrames % SAVE_BITRATE_FRAME) == 0)
+        saveBitrateIfNeeded(videoData, currentLiveParams, isCameraControlRequired);
 
 #ifdef ENABLE_SOFTWARE_MOTION_DETECTION
 
@@ -545,7 +544,8 @@ void QnLiveStreamProvider::saveMediaStreamParamsIfNeeded( const QnCompressedVide
 }
 
 void QnLiveStreamProvider::saveBitrateIfNeeded( const QnCompressedVideoDataPtr& videoData,
-                                                const QnLiveStreamParams& liveParams )
+                                                const QnLiveStreamParams& liveParams,
+                                                bool isCameraConfigured )
 {
     QSize resoulution;
     std::map<QString, QString> customParams;
@@ -555,7 +555,7 @@ void QnLiveStreamProvider::saveBitrateIfNeeded( const QnCompressedVideoDataPtr& 
     CameraBitrateInfo info(encoderIndex(), std::move(now));
 
     info.rawSuggestedBitrate = m_cameraRes->rawSuggestBitrateKbps(
-                liveParams.quality, resoulution, liveParams.fps) / 1024;
+        liveParams.quality, resoulution, liveParams.fps) / 1024;
     info.suggestedBitrate = static_cast<float>(m_cameraRes->suggestBitrateKbps(
         liveParams.quality, resoulution, liveParams.fps)) / 1024;
     info.actualBitrate = getBitrateMbps() / getNumberOfChannels();
@@ -568,6 +568,7 @@ void QnLiveStreamProvider::saveBitrateIfNeeded( const QnCompressedVideoDataPtr& 
     info.actualFps = getFrameRate();
     info.averageGopSize = getAverageGopSize();
     info.resolution = CameraMediaStreamInfo::resolutionToString(resoulution);
+    info.isConfigured = isCameraConfigured;
 
     if (m_cameraRes->saveBitrateIfNeeded(info))
     {

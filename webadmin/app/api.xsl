@@ -38,7 +38,7 @@
 
                 <link rel="stylesheet" href="customization/styles.css"/>
             </head>
-            <body style="min-width: 450px;">
+            <body style="min-width: 450px; overflow:hidden;">
                 <header class="navbar navbar-static-top bs-docs-nav" id="top" role="banner">
                     <div class="container">
                         <div class="navbar-header">
@@ -55,9 +55,8 @@
                     </div>
                 </header>
 
-                <div class="container">
-                    <div class="row">
-                        <nav class="col-sm-3 bs-docs-sidebar hidden-xs">
+                <div class="container-fluid scroll-wrapper">
+                        <nav class="col-sm-3 bs-docs-sidebar hidden-xs scroll-container">
                             <ul class="nav nav-stacked fixed-lg" id="sidebar">
                                 <xsl:for-each select="/apidoc/groups/group">
                                     <xsl:variable name="groupName"
@@ -98,7 +97,8 @@
                                     </li>
                                 </xsl:for-each>
                             </ul>
-                        </nav> <div class="col-sm-9">
+                        </nav>
+                        <div class="col-sm-9 scroll-container">
                             <xsl:for-each select="apidoc/groups/group">
                                 <xsl:variable name="groupName"
                                     select="translate(groupName, ' ()', '___')"/>
@@ -174,8 +174,8 @@
                                                                                             <li>
                                                                                                 <xsl:value-of select="name"/>
                                                                                                 <a style="cursor: pointer;" data-toggle="tooltip"
-                                                                  data-placement="right"
-                                                                  data-trigger="hover focus click">
+                                                                                                      data-placement="right"
+                                                                                                      data-trigger="hover focus click">
                                                                                                     <xsl:attribute name="title">
                                                                                                         <xsl:copy-of select="description"/>
                                                                                                     </xsl:attribute> (?) </a>
@@ -198,7 +198,7 @@
                                         </xsl:if>
                                     </xsl:for-each> </section> </xsl:for-each>
                         </div>
-                    </div> </div>
+                </div>
             </body>
 
 
@@ -211,11 +211,6 @@
             <script>
                 $(function () {
                     //$("[data-toggle='tooltip']").tooltip();
-
-                    $('body').scrollspy({
-                        target: '.bs-docs-sidebar',
-                        offset: 40
-                    });
 
                     $(".nav .glyphicon").click(function(){
                         var $container = $(this).parent().parent();
