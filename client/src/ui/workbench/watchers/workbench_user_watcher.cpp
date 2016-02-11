@@ -33,6 +33,7 @@ void QnWorkbenchUserWatcher::setCurrentUser(const QnUserResourcePtr &user) {
     if(m_user == user)
         return;
 
+    emit userAboutToBeChanged(m_user);
     if (m_user) {
         disconnect(m_user, NULL, this, NULL);
         if (m_permissionsNotifier)
