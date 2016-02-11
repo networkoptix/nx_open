@@ -99,7 +99,7 @@
                         <configuration>
                             <executable>${init.python.dir}/${python.executable}</executable>
                             <arguments>
-                                <argument>${root.dir}/../devtools/util/validate_jsons.py</argument>
+                                <argument>${environment.dir}/dev_tools/validate_jsons.py</argument>
                             </arguments>
                             <workingDirectory>${root.dir}</workingDirectory>		
                         </configuration>
