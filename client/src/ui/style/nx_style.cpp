@@ -906,14 +906,12 @@ void QnNxStyle::drawControl(
         if (const QStyleOptionHeader *header =
                 qstyleoption_cast<const QStyleOptionHeader*>(option))
         {
-            painter->fillRect(header->rect, header->palette.window());
+            painter->fillRect(header->rect.adjusted(2, 0, -2, 0), header->palette.window());
 
             if (header->orientation == Qt::Horizontal)
             {
-                painter->save();
-                painter->setPen(header->palette.color(QPalette::Dark));
+                QnScopedPainterPenRollback penRollback(painter, header->palette.color(QPalette::Dark));
                 painter->drawLine(header->rect.bottomLeft(), header->rect.bottomRight());
-                painter->restore();
             }
             return;
         }
@@ -1584,10 +1582,10 @@ int QnNxStyle::pixelMetric(
         return dp(16);
     case PM_IndicatorWidth:
     case PM_IndicatorHeight:
-        return dp(16);
+        return Metrics::kCheckIndicatorSize;
     case PM_ExclusiveIndicatorWidth:
     case PM_ExclusiveIndicatorHeight:
-        return dp(16);
+        return Metrics::kExclusiveIndicatorSize;
     case PM_TabBarTabHSpace:
     case PM_TabBarTabVSpace:
         return 9;

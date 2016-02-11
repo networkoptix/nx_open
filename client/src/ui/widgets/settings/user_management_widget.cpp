@@ -24,6 +24,7 @@
 #include <ui/widgets/views/checkboxed_header_view.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
+#include <ui/delegates/switch_item_delegate.h>
 
 #include <utils/common/ldap.h>
 #include <utils/math/color_transformations.h>
@@ -41,7 +42,8 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget *parent)
     m_sortModel->setSourceModel(m_usersModel);
 
     ui->usersTable->setModel(m_sortModel);  
-    ui->usersTable->setHorizontalHeader(m_header);
+    ui->usersTable->setHeader(m_header);
+    ui->usersTable->setItemDelegateForColumn(QnUserListModel::EnabledColumn, new QnSwitchItemDelegate(this));
 
     m_header->setVisible(true);
     m_header->setSectionResizeMode(QHeaderView::ResizeToContents);
@@ -209,10 +211,7 @@ void QnUserManagementWidget::at_usersTable_clicked(const QModelIndex &index) {
     if (!user)
         return;
 
-    if (index.column() == QnUserListModel::EditIconColumn) {
-        at_usersTable_activated(index);
-    }
-    else if (index.column() == QnUserListModel::CheckBoxColumn) /* Invert current state */ {
+    if (index.column() == QnUserListModel::CheckBoxColumn) /* Invert current state */ {
         m_usersModel->setCheckState(index.data(Qt::CheckStateRole).toBool() ? Qt::Unchecked : Qt::Checked, user);
     }
 }

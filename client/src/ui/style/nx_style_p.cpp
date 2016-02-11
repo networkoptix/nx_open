@@ -2,7 +2,6 @@
 
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/math/fuzzy.h>
-#include <ui/common/geometry.h>
 
 using namespace style;
 
@@ -143,29 +142,32 @@ void QnNxStylePrivate::drawCheckBox(QPainter *painter, const QStyleOption *optio
     QPen pen(checkBoxColor(option));
     pen.setJoinStyle(Qt::MiterJoin);
     pen.setCapStyle(Qt::FlatCap);
-    painter->setPen(pen);
 
     QnScopedPainterPenRollback penRollback(painter, pen);
     QnScopedPainterBrushRollback brushRollback(painter, Qt::NoBrush);
 
-    QRectF rect = option->rect.adjusted(2, 2, -3, -3);
+    const int size = Metrics::kCheckIndicatorSize - dp(4);
+
+    QRectF rect = aligned(QSize(size, size), option->rect, Qt::AlignCenter);
+
+    RectCoordinates rc(rect);
 
     if (option->state.testFlag(QStyle::State_On))
     {
         QPainterPath path;
-        path.moveTo(rect.right() - rect.width() * 0.3, rect.top());
-        path.lineTo(rect.left(), rect.top());
-        path.lineTo(rect.left(), rect.bottom());
-        path.lineTo(rect.right(), rect.bottom());
-        path.lineTo(rect.right(), rect.top() + rect.height() * 0.6);
+        path.moveTo(rc.x(0.7), rc.y(0));
+        path.lineTo(rc.x(0), rc.y(0));
+        path.lineTo(rc.x(0), rc.y(1));
+        path.lineTo(rc.x(1), rc.y(1));
+        path.lineTo(rc.x(1), rc.y(0.6));
 
         painter->setPen(pen);
         painter->drawPath(path);
 
         path = QPainterPath();
-        path.moveTo(rect.left() + rect.width() * 0.2, rect.top() + rect.height() * 0.45);
-        path.lineTo(rect.left() + rect.width() * 0.5, rect.top() + rect.height() * 0.75);
-        path.lineTo(rect.right() + rect.width() * 0.05, rect.top() + rect.height() * 0.15);
+        path.moveTo(rc.x(0.2), rc.y(0.45));
+        path.lineTo(rc.x(0.5), rc.y(0.75));
+        path.lineTo(rc.x(1.05), rc.y(0.15));
 
         pen.setWidthF(dp(2));
         painter->setPen(pen);
@@ -182,8 +184,7 @@ void QnNxStylePrivate::drawCheckBox(QPainter *painter, const QStyleOption *optio
         {
             pen.setWidth(2);
             painter->setPen(pen);
-            painter->drawLine(QPointF(rect.left() + 2, rect.top() + rect.height() / 2.0),
-                              QPointF(rect.right() - 1, rect.top() + rect.height() / 2.0));
+            painter->drawLine(QPointF(rc.x(0.2), rc.y(0.5)), QPointF(rc.x(0.8), rc.y(0.5)));
         }
     }
 }
