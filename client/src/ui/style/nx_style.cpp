@@ -239,29 +239,26 @@ void QnNxStyle::drawPrimitive(
                     hoveredRow = value.toInt();
             }
 
+            bool hovered = item->state.testFlag(State_MouseOver) || item->index.row() == hoveredRow;
+
             QnPaletteColor fillColor;
 
             if (selected)
             {
                 fillColor = findColor(option->palette.highlight().color());
-                fillColor.setAlphaF(0.4);
-            }
-
-            if (item->state.testFlag(State_MouseOver) || item->index.row() == hoveredRow)
-            {
-                if (!fillColor.isValid())
-                {
-                    fillColor = findColor(option->palette.windowText().color());
-                    fillColor.setAlphaF(0.1);
-                }
-                else
-                {
+                if (hovered)
                     fillColor = fillColor.lighter(1);
-                }
+            }
+            else if (hovered)
+            {
+                fillColor = findColor(option->palette.midlight().color()).darker(1);
             }
 
             if (fillColor.isValid())
+            {
+                fillColor.setAlphaF(0.4);
                 painter->fillRect(item->rect, fillColor.color());
+            }
 
             return;
         }
