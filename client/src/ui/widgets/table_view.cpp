@@ -25,7 +25,7 @@ QnTableView::QnTableView(QWidget *parent):
     verticalScrollBar()->installEventFilter(signalizer);
 
     connect(signalizer, &QnSingleEventSignalizer::activated, this, &QnTableView::resetCursor);
-
+    connect(signalizer, &QnSingleEventSignalizer::activated, this, [this]() { updateHoveredRow(QModelIndex()); });
     connect(this, &QnTableView::entered, this, &QnTableView::updateHoveredRow);
 }
 
@@ -77,7 +77,11 @@ void QnTableView::resetCursor() {
 
 void QnTableView::updateHoveredRow(const QModelIndex &index)
 {
-    int row = index.isValid() ? index.row() : -1;
+    int row = -1;
+
+    if (selectionBehavior() == SelectRows)
+        row = index.isValid() ? index.row() : -1;
+
     setProperty(::style::Properties::kHoveredRowProperty, row);
 }
 
