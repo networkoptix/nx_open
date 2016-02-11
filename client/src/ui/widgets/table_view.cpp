@@ -9,11 +9,15 @@
 #include <client/client_globals.h>
 #include <utils/common/event_processors.h>
 
+#include <ui/style/helper.h>
+
 QnTableView::QnTableView(QWidget *parent):
     base_type(parent)
 {
     QnSingleEventSignalizer *signalizer = new QnSingleEventSignalizer(this);
     signalizer->setEventType(QEvent::Enter);
+
+    setMouseTracking(true);
 
     horizontalHeader()->installEventFilter(signalizer);
     verticalHeader()->installEventFilter(signalizer);
@@ -39,6 +43,7 @@ void QnTableView::mouseMoveEvent(QMouseEvent *event) {
     // Only do something when a model is set.
     if (isEnabled() && model) {
         QModelIndex index = indexAt(event->pos());
+        markHoveredRow(index);
         if (index.isValid()) {
             // When the index is valid, compare it to the last row.
             // Only do something when the the mouse has moved to a new row.
@@ -66,6 +71,12 @@ void QnTableView::resetCursor() {
         setCursor(Qt::ArrowCursor);
 
     m_lastMouseModelIndex = QModelIndex();
+}
+
+void QnTableView::markHoveredRow(const QModelIndex &index)
+{
+    int row = index.isValid() ? index.row() : -1;
+    setProperty(::style::Properties::kHoveredRowProperty, row);
 }
 
 void QnTableView::leaveEvent(QEvent *) {

@@ -14,6 +14,8 @@ void QnSwitchItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &
     {
         QStyleOptionViewItem opt = option;
         initStyleOption(&opt, index);
+
+        nxStyle->drawPrimitive(QStyle::PE_PanelItemViewItem, &opt, painter, opt.widget);
         nxStyle->drawSwitch(painter, &opt, opt.widget);
     }
     else

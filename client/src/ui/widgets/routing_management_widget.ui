@@ -76,7 +76,7 @@
         <height>0</height>
        </size>
       </property>
-      <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,0,0">
+      <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,0">
        <property name="spacing">
         <number>8</number>
        </property>
@@ -93,19 +93,16 @@
         <number>8</number>
        </property>
        <item>
-        <widget class="QTableView" name="addressesView">
+        <widget class="QTreeView" name="addressesView">
          <property name="frameShape">
           <enum>QFrame::NoFrame</enum>
          </property>
-         <property name="selectionBehavior">
-          <enum>QAbstractItemView::SelectRows</enum>
-         </property>
-         <property name="showGrid">
+         <property name="rootIsDecorated">
           <bool>false</bool>
          </property>
-         <property name="sortingEnabled">
-          <bool>true</bool>
-         </property>
+         <attribute name="headerStretchLastSection">
+          <bool>false</bool>
+         </attribute>
         </widget>
        </item>
        <item>

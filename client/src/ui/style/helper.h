@@ -14,6 +14,8 @@ namespace style
         static const int kMenuCheckSize;
         static const int kMinimumButtonWidth;
         static const int kButtonHeight;
+        static const int kHeaderSize;
+        static const int kViewRowHeight;
         static const QSize kSwitchSize;
     };
 
@@ -30,6 +32,12 @@ namespace style
         };
 
         static QString paletteName(Palette palette);
+    };
+
+    class Properties
+    {
+    public:
+        static const char *kHoveredRowProperty;
     };
 
     qreal dpr(qreal value);

@@ -224,6 +224,57 @@ void QnNxStyle::drawPrimitive(
         }
         return;
 
+    case PE_PanelItemViewItem:
+        if (const QStyleOptionViewItem *item = qstyleoption_cast<const QStyleOptionViewItem *>(option))
+        {
+            bool selected = item->state.testFlag(State_Selected);
+
+            int hoveredRow = -1;
+            if (widget)
+            {
+                QVariant value = widget->property(Properties::kHoveredRowProperty);
+                if (value.isValid())
+                    hoveredRow = value.toInt();
+            }
+
+            QnPaletteColor fillColor;
+
+            if (selected)
+            {
+                fillColor = findColor(option->palette.highlight().color());
+                fillColor.setAlphaF(0.4);
+            }
+
+            if (item->state.testFlag(State_MouseOver) || item->index.row() == hoveredRow)
+            {
+                if (!fillColor.isValid())
+                {
+                    fillColor = findColor(option->palette.windowText().color());
+                    fillColor.setAlphaF(0.1);
+                }
+                else
+                {
+                    fillColor = fillColor.lighter(1);
+                }
+            }
+
+            if (fillColor.isValid())
+                painter->fillRect(item->rect, fillColor.color());
+
+            return;
+        }
+        break;
+
+    case PE_PanelItemViewRow:
+        if (const QStyleOptionViewItem *item = qstyleoption_cast<const QStyleOptionViewItem *>(option))
+        {
+            if (item->features.testFlag(QStyleOptionViewItem::Alternate))
+                painter->fillRect(option->rect, option->palette.alternateBase());
+
+            return;
+        }
+        break;
+
     case PE_FrameGroupBox:
         return;
 
@@ -1654,8 +1705,10 @@ QSize QnNxStyle::sizeFromContents(
     case CT_PushButton:
         return QSize(qMax(Metrics::kMinimumButtonWidth, size.width() + 2 * pixelMetric(PM_ButtonMargin, option, widget)),
                      qMax(size.height(), Metrics::kButtonHeight));
+
     case CT_LineEdit:
         return QSize(size.width(), qMax(size.height(), Metrics::kButtonHeight));
+
     case CT_ComboBox:
     {
         bool hasArrow = false;
@@ -1670,6 +1723,7 @@ QSize QnNxStyle::sizeFromContents(
 
         return QSize(width, height);
     }
+
     case CT_TabBarTab:
         if (const QStyleOptionTab *tab =
                 qstyleoption_cast<const QStyleOptionTab *>(option))
@@ -1702,9 +1756,22 @@ QSize QnNxStyle::sizeFromContents(
             }
         }
         break;
+
     case CT_MenuItem:
         return QSize(size.width() + dp(24) + 2 * Metrics::kMenuItemHPadding,
                      size.height() + 2 * Metrics::kMenuItemVPadding);
+
+    case CT_HeaderSection:
+        return QSize(size.width(), qMax(size.height(), Metrics::kHeaderSize));
+
+    case CT_ItemViewItem:
+        {
+            QSize sz = base_type::sizeFromContents(type, option, size, widget);
+            sz.setHeight(qMax(sz.height(), Metrics::kViewRowHeight));
+            return sz;
+        }
+        break;
+
     default:
         break;
     }

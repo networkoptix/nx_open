@@ -43,7 +43,7 @@ namespace {
             case Qt::DisplayRole:
             case Qt::ToolTipRole:
                 if (section == 0)
-                    return tr("Servers");
+                    return tr("Server");
                 break;
 
             default:
@@ -214,9 +214,9 @@ QnRoutingManagementWidget::QnRoutingManagementWidget(QWidget *parent) :
     m_sortedServerAddressesModel->sort(QnServerAddressesModel::AddressColumn);
     m_sortedServerAddressesModel->setSourceModel(m_serverAddressesModel);
     ui->addressesView->setModel(m_sortedServerAddressesModel);
-    ui->addressesView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-    ui->addressesView->horizontalHeader()->setSectionResizeMode(QnServerAddressesModel::AddressColumn, QHeaderView::Stretch);
-    ui->addressesView->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->addressesView->header()->setSectionResizeMode(QnServerAddressesModel::AddressColumn, QHeaderView::Stretch);
+    ui->addressesView->header()->setSectionResizeMode(QnServerAddressesModel::InUseColumn, QHeaderView::ResizeToContents);
+    ui->addressesView->header()->setSectionsMovable(false);
 
     connect(ui->serversView->selectionModel(),  &QItemSelectionModel::currentRowChanged,        this,   &QnRoutingManagementWidget::at_serversView_currentIndexChanged);
     connect(ui->addressesView->selectionModel(),&QItemSelectionModel::currentRowChanged,        this,   &QnRoutingManagementWidget::updateUi);

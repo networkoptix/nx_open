@@ -149,7 +149,7 @@
     "QAbstractItemView": {
         "palette": {
             "default": {
-                "base":             "#00000000"
+                "base":             "transparent"
             }
         }
     },

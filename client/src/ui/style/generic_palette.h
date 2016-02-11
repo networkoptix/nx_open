@@ -25,6 +25,7 @@ public:
 
     int alpha() const;
     void setAlpha(int alpha);
+    void setAlphaF(qreal alpha);
 
     bool isValid() const;
 

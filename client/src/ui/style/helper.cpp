@@ -11,7 +11,11 @@ namespace style
     const int Metrics::kMenuCheckSize = dp(16);
     const int Metrics::kMinimumButtonWidth = dp(80);
     const int Metrics::kButtonHeight = dp(28);
+    const int Metrics::kHeaderSize = dp(32);
+    const int Metrics::kViewRowHeight = dp(24);
     const QSize Metrics::kSwitchSize(dp(30), dp(15));
+
+    const char *Properties::kHoveredRowProperty = "_qn_hoveredRow";
 
     qreal dpr(qreal value)
     {

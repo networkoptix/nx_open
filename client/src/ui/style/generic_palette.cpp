@@ -58,6 +58,11 @@ void QnPaletteColor::setAlpha(int alpha)
     m_alpha = alpha;
 }
 
+void QnPaletteColor::setAlphaF(qreal alpha)
+{
+    setAlpha(kMaxAlpha * alpha);
+}
+
 bool QnPaletteColor::isValid() const
 {
     return m_index >= 0;
