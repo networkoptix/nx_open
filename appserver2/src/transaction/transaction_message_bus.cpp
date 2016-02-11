@@ -288,6 +288,7 @@ namespace ec2
         moveToThread(m_thread);
         qRegisterMetaType<QnTransactionTransport::State>(); // TODO: #Elric #EC2 registration
         qRegisterMetaType<QnAbstractTransaction>("QnAbstractTransaction");
+        qRegisterMetaType<QnTransaction<ApiRuntimeData> >("QnTransaction<ApiRuntimeData>");
         m_timer = new QTimer();
         connect(m_timer, &QTimer::timeout, this, &QnTransactionMessageBus::at_timer);
         m_timer->start(500);

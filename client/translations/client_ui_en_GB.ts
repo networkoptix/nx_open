@@ -1636,7 +1636,7 @@
     <message>
         <location/>
         <source>Show to administrators only</source>
-        <translation type="unfinished">Show do administrators only</translation>
+        <translation></translation>
     </message>
 </context>
 <context>
