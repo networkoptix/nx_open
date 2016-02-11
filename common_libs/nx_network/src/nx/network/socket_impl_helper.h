@@ -196,7 +196,7 @@ public:
         return this->m_implDelegate.connect( remoteAddress, timeoutMillis );
     }
     //!Implementation of AbstractCommunicatingSocket::recv
-    virtual int recv( void* buffer, unsigned int bufferLen, int flags ) override { return this->m_implDelegate.recv( buffer, bufferLen, flags ); }
+    virtual int recv( void* buffer, unsigned int bufferLen, int flags = 0 ) override { return this->m_implDelegate.recv( buffer, bufferLen, flags ); }
     //!Implementation of AbstractCommunicatingSocket::send
     virtual int send( const void* buffer, unsigned int bufferLen ) override { return this->m_implDelegate.send( buffer, bufferLen ); }
     //!Implementation of AbstractCommunicatingSocket::getForeignAddress
@@ -236,6 +236,10 @@ public:
         std::function<void()> cancellationDoneHandler) override
     {
         return this->m_implDelegate.cancelIOAsync(eventType, std::move(cancellationDoneHandler));
+    }
+    virtual void cancelIOSync(aio::EventType eventType) override
+    {
+        return this->m_implDelegate.cancelIOSync(eventType);
     }
 };
 

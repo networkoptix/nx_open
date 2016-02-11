@@ -7,7 +7,6 @@
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource/webpage_resource.h>
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
@@ -56,15 +55,6 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
         QString uniqueId = camera->getUniqueId();
         camera->setId(camera->uniqueIdToId(uniqueId));
         addNewCamera(camera);
-    }
-
-    for (const QnWebPageResourcePtr& webPage: resources.filtered<QnWebPageResource>()) {
-        /* Check if this page already exists in the pool. */
-        if (qnResPool->getResourceByUrl(webPage->getUrl()).dynamicCast<QnWebPageResource>())
-            continue;
-
-        webPage->setParentId(m_serverId);
-        addNewWebPageInternal(webPage);
     }
 
 }
@@ -137,20 +127,6 @@ void QnAppserverResourceProcessor::readDefaultUserAttrs()
     m_defaultUserAttrs = QnCameraUserAttributesPtr(new QnCameraUserAttributes());
     fromApiToResource(userAttrsData, m_defaultUserAttrs);
 }
-
-
-void QnAppserverResourceProcessor::addNewWebPageInternal(const QnWebPageResourcePtr &webPage)
-{
-    Q_ASSERT(!webPage->getId().isNull());
-    ec2::AbstractECConnectionPtr connect = QnAppServerConnectionFactory::getConnection2();
-
-    connect->getWebPageManager()->save(webPage, this, [] (int handle, ec2::ErrorCode errorCode, const QnWebPageResourceList &webPages) {
-        QN_UNUSED(handle, webPages);
-        if (errorCode != ec2::ErrorCode::ok)
-            NX_LOG( QString::fromLatin1("Can't add web page to ec2 (save query error). %1").arg(ec2::toString(errorCode)), cl_logWARNING );
-    });
-}
-
 
 void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraResourcePtr& cameraResource)
 {

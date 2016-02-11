@@ -1348,6 +1348,12 @@ void QnSSLSocket::cancelIOAsync(
         });
 }
 
+void QnSSLSocket::cancelIOSync(aio::EventType eventType)
+{
+    Q_D(const QnSSLSocket);
+    d->wrappedSocket->cancelIOSync(eventType);
+}
+
 void QnSSLSocket::connectAsync(
     const SocketAddress& addr,
     std::function<void( SystemError::ErrorCode )> handler )

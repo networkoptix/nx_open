@@ -4,7 +4,7 @@
 #include <map>
 #include <tuple>
 
-#include <QAuthenticator>
+#include <QtNetwork/QAuthenticator>
 #include <QtCore/QMap>
 #include <QElapsedTimer>
 #include <QCache>
@@ -35,7 +35,7 @@ class QnAuthHelper
     public Singleton<QnAuthHelper>
 {
     Q_OBJECT
-    
+
 public:
     static const unsigned int MAX_AUTHENTICATION_KEY_LIFE_TIME_MS;
 
@@ -44,7 +44,7 @@ public:
 
     //!Authenticates request on server side
     Qn::AuthResult authenticate(const nx_http::Request& request, nx_http::Response& response, bool isProxy = false, QnUuid* authUserId = 0, AuthMethod::Value* usedAuthMethod = 0);
-    
+
     QnAuthMethodRestrictionList* restrictionList();
 
     //!Creates query item for \a path which does not require authentication
@@ -74,7 +74,7 @@ private:
         QString path;
 
         TempAuthenticationKeyCtx() {}
-        TempAuthenticationKeyCtx( TempAuthenticationKeyCtx&& right ) 
+        TempAuthenticationKeyCtx( TempAuthenticationKeyCtx&& right )
         :
             timeGuard( std::move( right.timeGuard ) ),
             path( std::move( right.path ) )

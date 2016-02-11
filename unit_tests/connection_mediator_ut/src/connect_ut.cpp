@@ -80,7 +80,7 @@ TEST_F( ConnectTest, BindConnect )
         ASSERT_TRUE( testHttpServer.bindAndListen() );
     }
 
-    stun::AsyncClient msClient;
+    stun::AsyncClientImpl msClient;
     msClient.connect( address() );
     {
         stun::Message request( stun::Header( stun::MessageClass::request,

@@ -39,11 +39,11 @@ public:
     /*!
         \note Zero timeout means infinite timeout
     */
-    bool getRecvTimeout( unsigned int* millis );
+    bool getRecvTimeout( unsigned int* millis ) const;
     /*!
         \note Zero timeout means infinite timeout
     */
-    bool getSendTimeout( unsigned int* millis );
+    bool getSendTimeout( unsigned int* millis ) const;
 
     PollableImpl* impl();
     const PollableImpl* impl() const;

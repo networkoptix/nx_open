@@ -85,10 +85,8 @@ public:
         m_recvHandlerTerminatedFlag( nullptr ),
         m_timerHandlerTerminatedFlag( nullptr ),
         m_threadHandlerIsRunningIn( NULL ),
-        m_natTraversalEnabled( _natTraversalEnabled )
-#ifdef _DEBUG
-        , m_asyncSendIssued( false )
-#endif
+        m_natTraversalEnabled( _natTraversalEnabled ),
+        m_asyncSendIssued( false )
     {
         assert( this->m_socket );
         assert( m_abstractSocketPtr );
@@ -281,29 +279,49 @@ public:
         auto cancelImpl = [=]()
         {
             // cancelIOSync will be instant from socket's IO thread
-            nx::network::SocketGlobals::aioService().dispatch( this->m_socket, [=]()
-            {
-                stopPollingSocket( this->m_socket, eventType );
-                std::atomic_thread_fence( std::memory_order_acquire );
-
-                //we are in aio thread, CommunicatingSocketImpl::eventTriggered is down the stack
-                //  avoiding unnecessary removeFromWatch calls in eventTriggered
-
-                if (eventType == aio::etRead || eventType == aio::etNone)
-                    ++m_recvAsyncCallCounter;
-                if (eventType == aio::etWrite || eventType == aio::etNone)
-                    ++m_connectSendAsyncCallCounter;
-                if (eventType == aio::etTimedOut || eventType == aio::etNone)
-                    ++m_registerTimerCallCounter;
-
-                handler();
-            });
+            nx::network::SocketGlobals::aioService().dispatch(
+                this->m_socket,
+                [=]()
+                {
+                    cancelAsyncIOWhileInAioThread(eventType);
+                    handler();
+                });
         };
 
         if (eventType == aio::etWrite || eventType == aio::etNone)
             nx::network::SocketGlobals::addressResolver().cancel(this, std::move(cancelImpl));
         else
             cancelImpl();
+    }
+
+    void cancelIOSync(aio::EventType eventType)
+    {
+        if (this->m_socket->impl()->aioThread.load() == QThread::currentThread())
+        {
+            cancelAsyncIOWhileInAioThread(eventType);
+        }
+        else
+        {
+            std::promise< bool > promise;
+            cancelIOAsync(eventType, [&]() { promise.set_value(true); });
+            promise.get_future().wait();
+        }
+    }
+
+    void cancelAsyncIOWhileInAioThread(const aio::EventType eventType)
+    {
+        stopPollingSocket(eventType);
+        std::atomic_thread_fence(std::memory_order_acquire);    //TODO #ak looks like it is not needed
+
+        //we are in aio thread, CommunicatingSocketImpl::eventTriggered is down the stack
+        //  avoiding unnecessary removeFromWatch calls in eventTriggered
+
+        if (eventType == aio::etRead || eventType == aio::etNone)
+            ++m_recvAsyncCallCounter;
+        if (eventType == aio::etWrite || eventType == aio::etNone)
+            ++m_connectSendAsyncCallCounter;
+        if (eventType == aio::etTimedOut || eventType == aio::etNone)
+            ++m_registerTimerCallCounter;
     }
 
 private:
@@ -610,18 +628,17 @@ private:
     }
 
     //!Call this from within aio thread only
-    void stopPollingSocket(
-        SocketType* sock,
-        const aio::EventType eventType)
+    void stopPollingSocket(const aio::EventType eventType)
     {
         //TODO #ak move this method to aioservice?
-        nx::network::SocketGlobals::aioService().cancelPostedCalls(sock, true);
+        if (eventType == aio::etNone)
+            nx::network::SocketGlobals::aioService().cancelPostedCalls(this->m_socket, true);
         if (eventType == aio::etNone || eventType == aio::etRead)
-            nx::network::SocketGlobals::aioService().removeFromWatch(sock, aio::etRead, true);
+            nx::network::SocketGlobals::aioService().removeFromWatch(this->m_socket, aio::etRead, true);
         if (eventType == aio::etNone || eventType == aio::etWrite)
-            nx::network::SocketGlobals::aioService().removeFromWatch(sock, aio::etWrite, true);
+            nx::network::SocketGlobals::aioService().removeFromWatch(this->m_socket, aio::etWrite, true);
         if (eventType == aio::etNone || eventType == aio::etTimedOut)
-            nx::network::SocketGlobals::aioService().removeFromWatch(sock, aio::etTimedOut, true);
+            nx::network::SocketGlobals::aioService().removeFromWatch(this->m_socket, aio::etTimedOut, true);
     }
 };
 

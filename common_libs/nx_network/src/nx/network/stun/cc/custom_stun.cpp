@@ -24,6 +24,10 @@ namespace methods {
                 return "connect";
             case connectionResult:
                 return "connectionResult";
+            case udpHolePunchingSyn:
+                return "udpHolePunchingSyn";
+            case udpHolePunchingSynAck:
+                return "udpHolePunchingSynAck";
             default:
                 return "unknown";
         };

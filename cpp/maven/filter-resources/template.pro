@@ -121,7 +121,7 @@ INCLUDEPATH +=  ${environment.dir}/boost_1_56_0 \
                 ${root.dir}/common_libs/nx_streaming/src \
                 ${libdir}/include \
                 $$ADDITIONAL_QT_INCLUDES \
-                ${qt.dir}/include/QtCore/$$QT_VERSION/ \
+                ${qt.dir}/include/QtCore/ \
                 ${qt.dir}/include/QtCore/$$QT_VERSION/QtCore/ \
 
 win* {
@@ -195,7 +195,7 @@ win* {
   DEFINES += ${global.windows.defines}
   win32-msvc* {
     # Note on /bigobj: http://stackoverflow.com/questions/15110580/penalty-of-the-msvs-linker-flag-bigobj
-    QMAKE_CXXFLAGS += -MP /Fd$$OBJECTS_DIR /bigobj /wd4290
+    QMAKE_CXXFLAGS += -MP /Fd$$OBJECTS_DIR /bigobj /wd4290 /wd4661
     # /OPT:NOREF is here for a reason, see http://stackoverflow.com/questions/6363991/visual-studio-debug-information-in-release-build.
     QMAKE_CXXFLAGS_RELEASE += /Zi /wd4250
     QMAKE_LFLAGS_RELEASE += /DEBUG /OPT:NOREF
@@ -264,7 +264,6 @@ macx {
 }
 
 INCLUDEPATH += ${environment.dir}/boost_1_56_0
-INCLUDEPATH += ${environment.dir}/include/ffmpeg-misc-headers-win32
 INCLUDEPATH += ${environment.dir}/include/glext
 
 ## ANDROID

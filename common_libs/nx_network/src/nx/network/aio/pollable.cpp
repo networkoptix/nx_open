@@ -26,13 +26,13 @@ AbstractSocket::SOCKET_HANDLE Pollable::handle() const
     return m_fd;
 }
 
-bool Pollable::getRecvTimeout( unsigned int* millis )
+bool Pollable::getRecvTimeout( unsigned int* millis ) const
 {
     *millis = m_readTimeoutMS;
     return true;
 }
 
-bool Pollable::getSendTimeout( unsigned int* millis )
+bool Pollable::getSendTimeout( unsigned int* millis ) const
 {
     *millis = m_writeTimeoutMS;
     return true;

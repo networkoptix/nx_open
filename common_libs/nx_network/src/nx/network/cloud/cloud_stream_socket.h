@@ -1,9 +1,17 @@
-#ifndef NX_CC_CLOUD_STREAM_SOCKET_H
-#define NX_CC_CLOUD_STREAM_SOCKET_H
+/**********************************************************
+* Jan 27, 2016
+* akolesnikov
+***********************************************************/
+
+#pragma once
 
 #include <nx/utils/async_operation_guard.h>
-#include <nx/network/abstract_socket.h>
-#include <nx/network/socket_global.h>
+#include <utils/common/cpp14.h>
+
+#include "nx/network/abstract_socket.h"
+#include "nx/network/socket_global.h"
+#include "nx/network/socket_attributes_cache.h"
+
 
 namespace nx {
 namespace network {
@@ -15,92 +23,87 @@ namespace cloud {
     If connection to peer requires using udp hole punching than this socket uses UDT.
     \note Actual socket is instanciated only when address is known (\a AbstractCommunicatingSocket::connect or \a AbstractCommunicatingSocket::connectAsync)
 */
-class CloudStreamSocket
+class NX_NETWORK_API CloudStreamSocket
 :
-    public AbstractStreamSocket
+    public AbstractStreamSocketAttributesCache<AbstractStreamSocket>
 {
 public:
-    CloudStreamSocket(bool natTraversal);
+    CloudStreamSocket();
+    virtual ~CloudStreamSocket();
 
     //!Implementation of AbstractSocket::*
     bool bind(const SocketAddress& localAddress) override;
     SocketAddress getLocalAddress() const override;
     void close() override;
     bool isClosed() const override;
-    bool setReuseAddrFlag(bool reuseAddr) override;
-    bool getReuseAddrFlag(bool* val) const override;
-    bool setNonBlockingMode(bool val) override;
-    bool getNonBlockingMode(bool* val) const override;
-    bool getMtu(unsigned int* mtuValue) const override;
-    bool setSendBufferSize(unsigned int buffSize) override;
-    bool getSendBufferSize(unsigned int* buffSize) const override;
-    bool setRecvBufferSize(unsigned int buffSize) override;
-    bool getRecvBufferSize(unsigned int* buffSize) const override;
-    bool setRecvTimeout(unsigned int millis) override;
-    bool getRecvTimeout(unsigned int* millis) const override;
-    bool setSendTimeout(unsigned int ms) override;
-    bool getSendTimeout(unsigned int* millis) const override;
-    bool getLastError(SystemError::ErrorCode* errorCode) const override;
+    virtual void shutdown() override;
     AbstractSocket::SOCKET_HANDLE handle() const override;
 
     //!Implementation of AbstractStreamSocket::*
     bool reopen() override;
-    bool setNoDelay(bool value) override;
-    bool getNoDelay(bool* value) const override;
-    bool toggleStatisticsCollection(bool val) override;
-    bool getConnectionStatistics(StreamSocketInfo* info) override;
-    bool setKeepAlive(boost::optional<KeepAliveOptions> info) override;
-    bool getKeepAlive(boost::optional<KeepAliveOptions>* result) const override;
 
     //!Implementation of AbstractCommunicatingSocket::*
-    bool connect(const SocketAddress& remoteAddress,
-                 unsigned int timeoutMillis = DEFAULT_TIMEOUT_MILLIS) override;
+    virtual bool connect(
+        const SocketAddress& remoteAddress,
+        unsigned int timeoutMillis) override;
 
-    int recv(void* buffer, unsigned int bufferLen, int flags = 0) override;
-    int send(const void* buffer, unsigned int bufferLen) override;
-    SocketAddress getForeignAddress() const override;
-    bool isConnected() const override;
+    virtual int recv(void* buffer, unsigned int bufferLen, int flags = 0) override;
+    virtual int send(const void* buffer, unsigned int bufferLen) override;
+    virtual SocketAddress getForeignAddress() const override;
+    virtual bool isConnected() const override;
 
-    void cancelIOAsync(aio::EventType eventType,
-                        std::function<void()> handler) override;
+    virtual void cancelIOAsync(
+        aio::EventType eventType,
+        std::function<void()> handler) override;
+    virtual void cancelIOSync(aio::EventType eventType) override;
 
     //!Implementation of AbstractSocket::*
-    void post( std::function<void()> handler ) override;
-    void dispatch( std::function<void()> handler ) override;
+    virtual void post( std::function<void()> handler ) override;
+    virtual void dispatch( std::function<void()> handler ) override;
 
     //!Implementation of AbstractCommunicatingSocket::*
-    void connectAsync(
+    virtual void connectAsync(
         const SocketAddress& address,
         std::function<void(SystemError::ErrorCode)> handler) override;
-
-    void readSomeAsync(
+    virtual void readSomeAsync(
         nx::Buffer* const buf,
         std::function<void(SystemError::ErrorCode, size_t)> handler) override;
-
-    void sendAsync(
+    virtual void sendAsync(
         const nx::Buffer& buf,
         std::function<void(SystemError::ErrorCode, size_t)> handler) override;
-
-    void registerTimer(
+    virtual void registerTimer(
         unsigned int timeoutMs,
         std::function<void()> handler) override;
 
+    virtual aio::AbstractAioThread* getAioThread() override;
+    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
+
 private:
-    bool startAsyncConnect(const SocketAddress& originalAddress,
-                           std::vector<AddressEntry> dnsEntries);
-
     int recvImpl(nx::Buffer* const buf);
-    bool tunnelConnect(String peerId, std::vector<CloudConnectType> ccTypes);
 
-    bool m_nonBlockingMode;
-    std::shared_ptr<StreamSocketOptions> m_socketOptions;
-    std::unique_ptr<AbstractStreamSocket> m_socketDelegate;
+    void onAddressResolved(
+        std::shared_ptr<nx::utils::AsyncOperationGuard::SharedGuard> sharedOperationGuard,
+        int remotePort,
+        SystemError::ErrorCode osErrorCode,
+        std::vector<AddressEntry> dnsEntries);
+    bool startAsyncConnect(
+        //const SocketAddress& originalAddress,
+        std::vector<AddressEntry> dnsEntries,
+        int port);
+    void onCloudConnectDone(
+        SystemError::ErrorCode errorCode,
+        std::unique_ptr<AbstractStreamSocket> cloudConnection);
+
+    std::atomic_unique_ptr<AbstractStreamSocket> m_socketDelegate;
     std::function<void(SystemError::ErrorCode)> m_connectHandler;
-    nx::utils::AsyncOperationGuard m_asyncGuard;
+    nx::utils::AsyncOperationGuard m_asyncConnectGuard;
+    /** Used to tie this to aio thread.
+    //TODO #ak replace with aio thread timer */
+    std::unique_ptr<AbstractDatagramSocket> m_aioThreadBinder;
+    std::atomic<std::promise<std::pair<SystemError::ErrorCode, size_t>>*> m_recvPromisePtr;
+    std::atomic<std::promise<std::pair<SystemError::ErrorCode, size_t>>*> m_sendPromisePtr;
 };
 
 } // namespace cloud
 } // namespace network
 } // namespace nx
-
-#endif  //NX_CC_CLOUD_STREAM_SOCKET_H

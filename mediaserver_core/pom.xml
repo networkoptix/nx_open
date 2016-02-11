@@ -142,30 +142,34 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>2.6</version>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.1.1</version>
                 <executions>
-                    <execution>
-                        <id>copy-mediaserver-resources</id>
-                        <phase>${resources.phase}</phase>
+                     <execution>
+                        <id>gen-api-xml</id>
+                        <phase>generate-sources</phase>
                         <goals>
-                            <goal>copy-resources</goal>
+                            <goal>exec</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/resources/static</outputDirectory>
-                            <overwrite>true</overwrite>
-                            <resources>
-                                <resource>
-                                    <directory>${root.dir}/webadmin</directory>
-                                    <filtering>true</filtering>
-                                </resource>
-                            </resources>
+                            <executable>java</executable>
+                            <arguments>
+                                <argument>-jar</argument>
+                                <argument>${environment.dir}/bin/apidoctool.jar</argument>
+                                <argument>code-to-xml</argument>
+                                <argument>-vms-path</argument>
+                                <argument>${root.dir}</argument>
+                                <argument>-template-xml</argument>
+                                <argument>${root.dir}/mediaserver_core/api/api_template.xml</argument>                                
+                                <argument>-output-xml</argument>
+                                <argument>${project.build.directory}/additional-resources/static/api.xml</argument>
+                            </arguments>
                         </configuration>
-                    </execution>
+                    </execution>                 
                 </executions>
-            </plugin> -->
+            </plugin>
         </plugins>
     </build>
 

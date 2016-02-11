@@ -8,14 +8,14 @@ QnResourcePropertyDictionary::QnResourcePropertyDictionary(QObject *parent):
 
 }
 
-void QnResourcePropertyDictionary::saveParams(const QnUuid& resourceId)
+bool QnResourcePropertyDictionary::saveParams(const QnUuid& resourceId)
 {
     ec2::ApiResourceParamWithRefDataList params;
     {
         QnMutexLocker lock( &m_mutex );
         auto itr = m_modifiedItems.find(resourceId);
         if (itr == m_modifiedItems.end())
-            return;
+            return true;
         QnResourcePropertyList& properties = itr.value();
         for (auto itrParams = properties.begin(); itrParams != properties.end(); ++itrParams)
             params.push_back(ec2::ApiResourceParamWithRefData(resourceId, itrParams.key(), itrParams.value()));
@@ -23,7 +23,7 @@ void QnResourcePropertyDictionary::saveParams(const QnUuid& resourceId)
     }
 
     if( params.empty() )
-        return;
+        return true;
 
     ec2::ApiResourceParamWithRefDataList outData;
     ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
@@ -35,7 +35,9 @@ void QnResourcePropertyDictionary::saveParams(const QnUuid& resourceId)
         qCritical() << Q_FUNC_INFO << ": can't save resource params to Server. Resource physicalId: "
             << resourceId << ". Description: " << ec2::toString(rez);
         addToUnsavedParams(params);
+        return false;
     }
+    return true;
 }
 
 void QnResourcePropertyDictionary::fromModifiedDataToSavedData(const QnUuid& resourceId, ec2::ApiResourceParamWithRefDataList& outData)

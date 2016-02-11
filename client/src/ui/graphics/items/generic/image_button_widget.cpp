@@ -109,6 +109,12 @@ QnImageButtonWidget::QnImageButtonWidget(QGraphicsItem *parent, Qt::WindowFlags 
 
     QEvent styleChange(QEvent::StyleChange);
     event(&styleChange);
+
+    connect(this, &GraphicsWidget::enabledChanged, this, [this]()
+    {
+        if (!isEnabled())
+            updateState(m_state & ~Hovered);
+    });
 }
 
 QnImageButtonWidget::~QnImageButtonWidget() {

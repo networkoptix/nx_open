@@ -7,6 +7,7 @@
 #define NX_LOG_MESSAGE_H
 
 #include <string>
+#include <memory>
 #include <type_traits>
 
 #include <QtCore/QByteArray>
@@ -51,6 +52,24 @@ public:
     QnLogMessage arg(const QnUuid& a, int fieldWidth = 0, QChar fillChar = QLatin1Char(' ')) const;
     QnLogMessage arg(const void* a, int fieldWidth = 0, QChar fillChar = QLatin1Char(' ')) const;
 
+    template<typename T>
+    QnLogMessage arg(
+        const std::unique_ptr<T>& a,
+        int fieldWidth = 0,
+        QChar fillChar = QLatin1Char(' '))
+    {
+        return arg(a.get(), fieldWidth, fillChar);
+    }
+
+    template<typename T>
+    QnLogMessage arg(
+        const std::shared_ptr<T>& a,
+        int fieldWidth = 0,
+        QChar fillChar = QLatin1Char(' '))
+    {
+        return arg(a.get(), fieldWidth, fillChar);
+    }
+
     //!Prints integer value
     template<typename T>
     QnLogMessage arg(
@@ -85,7 +104,7 @@ public:
 
     operator QString() const; 
 
-    inline std::string toStdString() { return m_str.toStdString(); }
+    std::string toStdString() { return m_str.toStdString(); }
 
 private:
     QString m_str;

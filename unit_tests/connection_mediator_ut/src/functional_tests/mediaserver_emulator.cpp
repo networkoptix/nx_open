@@ -129,7 +129,7 @@ void MediaServerEmulator::onConnectionRequested(
     using namespace std::placeholders;
 
     nx::hpm::api::ConnectionAckRequest connectionAckData;
-    connectionAckData.connectSessionID = connectionRequestedData.connectSessionID;
+    connectionAckData.connectSessionId = connectionRequestedData.connectSessionId;
     connectionAckData.connectionMethods = nx::hpm::api::ConnectionMethod::udpHolePunching;
 
     if (m_onConnectionRequestedHandler)

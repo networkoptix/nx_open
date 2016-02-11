@@ -144,6 +144,14 @@ public:
             std::move(completionHandler));
     }
 
+    String selfPeerId() const
+    {
+        if (auto credentials = m_connector->getSystemCredentials())
+            return credentials->systemId + String(".") + credentials->serverId;
+
+        return String();
+    }
+
 protected:
     template<typename RequestData, typename CompletionHandlerType>
     void doAuthRequest(

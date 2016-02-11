@@ -282,7 +282,7 @@ TEST_F(CdbFunctionalTest, account_badRegistration)
     url.setHost(endpoint().address.toString());
     url.setPort(endpoint().port);
     url.setScheme("http");
-    url.setPath("/account/register");
+    url.setPath("/cdb/account/register");
     std::promise<void> donePromise;
     auto doneFuture = donePromise.get_future();
     QObject::connect(

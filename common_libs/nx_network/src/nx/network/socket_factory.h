@@ -24,8 +24,12 @@ public:
         nttDisabled
     };
 
-    static std::unique_ptr< AbstractDatagramSocket > createDatagramSocket(
-            NatTraversalType natTraversalRequired = NatTraversalType::nttAuto );
+    typedef std::function<std::unique_ptr< AbstractStreamSocket >(
+        bool /*sslRequired*/,
+        NatTraversalType /*natTraversalRequired*/)> CreateStreamSocketFuncType;
+
+
+    static std::unique_ptr< AbstractDatagramSocket > createDatagramSocket();
 
     /*!
         \param sslRequired If \a true than it is guaranteed that returned object can be safely cast to \a AbstractEncryptedStreamSocket
@@ -49,6 +53,10 @@ public:
      *  \note DEBUG use ONLY! */
     static void enforceStreamSocketType( SocketType type );
     static bool isStreamSocketTypeEnforced();
+
+    /** Sets new factory. Returns old one */
+    static CreateStreamSocketFuncType 
+        setCreateStreamSocketFunc(CreateStreamSocketFuncType newFactoryFunc);
 
 private:
     SocketFactory();

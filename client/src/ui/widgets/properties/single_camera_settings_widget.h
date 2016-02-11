@@ -20,7 +20,9 @@ class QVBoxLayout;
 class QnCameraMotionMaskWidget;
 class QnCameraSettingsWidgetPrivate;
 class QnImageProvider;
+#ifdef GDM_TODO
 class CameraAdvancedSettingsWebPage;
+#endif
 
 class QnSingleCameraSettingsWidget : public Connective<QWidget>, public QnWorkbenchContextAware {
     Q_OBJECT
@@ -135,7 +137,7 @@ private:
     Q_DECLARE_PRIVATE(QnCameraSettingsWidget)
 
     QScopedPointer<Ui::SingleCameraSettingsWidget> ui;
-  
+
     QnVirtualCameraResourcePtr m_camera;
     bool m_cameraSupportsMotion;
 
@@ -160,7 +162,7 @@ private:
     bool m_inUpdateMaxFps;
 
     QHash<QnUuid, QnImageProvider*> m_imageProvidersByResourceId;
-    
+
 };
 
 #endif // CAMERA_SETTINGS_DIALOG_H

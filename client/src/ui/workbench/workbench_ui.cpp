@@ -552,9 +552,18 @@ void QnWorkbenchUi::updateControlsVisibility(bool animate) {    // TODO
         return;
     }
 
+    const auto resourceIsWebPage = [this]()
+    {
+        if (!navigator()->currentWidget())
+            return false;
+
+        const auto resource = navigator()->currentWidget()->resource();
+        return (resource && resource->flags().testFlag(Qn::web_page));
+    };
+
     bool sliderVisible =
         navigator()->currentWidget() != NULL &&
-        !(navigator()->currentWidget()->resource()->flags() & (Qn::still_image | Qn::server | Qn::videowall)) &&
+        !(navigator()->currentWidget()->resource()->flags() & (Qn::still_image | Qn::server | Qn::videowall)) && !resourceIsWebPage() &&
         ((accessController()->globalPermissions() & Qn::GlobalViewArchivePermission) || !(navigator()->currentWidget()->resource()->flags() & Qn::live)) &&
         !action(Qn::ToggleTourModeAction)->isChecked();
 

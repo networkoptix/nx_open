@@ -72,7 +72,7 @@ TEST_F(MediatorFunctionalTest, HolePunchingProcessor_generic)
         };
     api::ConnectRequest connectRequest;
     connectRequest.originatingPeerID = QnUuid::createUuid().toByteArray();
-    connectRequest.connectSessionID = QnUuid::createUuid().toByteArray();
+    connectRequest.connectSessionId = QnUuid::createUuid().toByteArray();
     connectRequest.connectionMethods = api::ConnectionMethod::udpHolePunching;
     connectRequest.destinationHostName = server1->serverId() + "." + system1.id;
     udpClient.connect(
@@ -104,7 +104,7 @@ TEST_F(MediatorFunctionalTest, HolePunchingProcessor_generic)
 
     api::ResultCode resultCode = api::ResultCode::ok;
     api::ConnectionResultRequest connectionResult;
-    connectionResult.connectSessionID = connectRequest.connectSessionID;
+    connectionResult.connectSessionId = connectRequest.connectSessionId;
     connectionResult.connectionSucceeded = true;
     std::tie(resultCode) =
         makeSyncCall<api::ResultCode>(
@@ -187,7 +187,7 @@ TEST_F(MediatorFunctionalTest, HolePunchingProcessor_server_failure)
         };
         api::ConnectRequest connectRequest;
         connectRequest.originatingPeerID = QnUuid::createUuid().toByteArray();
-        connectRequest.connectSessionID = QnUuid::createUuid().toByteArray();
+        connectRequest.connectSessionId = QnUuid::createUuid().toByteArray();
         connectRequest.connectionMethods = api::ConnectionMethod::udpHolePunching;
         connectRequest.destinationHostName = server1->serverId() + "." + system1.id;
         udpClient.connect(
@@ -207,7 +207,7 @@ TEST_F(MediatorFunctionalTest, HolePunchingProcessor_server_failure)
         //testing that mediator has cleaned up session data
         api::ResultCode resultCode = api::ResultCode::ok;
         api::ConnectionResultRequest connectionResult;
-        connectionResult.connectSessionID = connectRequest.connectSessionID;
+        connectionResult.connectSessionId = connectRequest.connectSessionId;
         connectionResult.connectionSucceeded = false;
         std::tie(resultCode) =
             makeSyncCall<api::ResultCode>(

@@ -105,7 +105,8 @@ function openFailedSession(_sessionId, _host, _port, _login, _password, _systemN
         item = stackView.get(stackView.depth - 1)
     } else {
         if (item.objectName != "newConnectionPage") {
-            item.title = _systemName
+            if (_systemName)
+                item.title = _systemName
             item.host = _host
             item.port = _port
             item.login = _login

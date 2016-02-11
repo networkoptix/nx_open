@@ -35,8 +35,10 @@ public:
     */
     virtual void pleaseStop( std::function<void()> completionHandler ) = 0;
 
-    //!Cals \a QnStoppableAsync::pleaseStop and waits for completion
-    void pleaseStopSync();
+    /** Stops object's asynchronous operations and waits for completion.
+        Default implementation calls \a QnStoppableAsync::pleaseStop and waits for completion
+    */
+    virtual void pleaseStopSync();
 
     typedef std::unique_ptr< QnStoppableAsync > UniquePtr;
 

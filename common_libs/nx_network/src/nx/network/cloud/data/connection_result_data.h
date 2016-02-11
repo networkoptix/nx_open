@@ -18,7 +18,7 @@ class NX_NETWORK_API ConnectionResultRequest
     public StunMessageData
 {
 public:
-    nx::String connectSessionID;
+    nx::String connectSessionId;
     //TODO #ak add some statistics useful for later analysis
     bool connectionSucceeded;
 

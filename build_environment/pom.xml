@@ -168,13 +168,6 @@
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${compiler}</classifier>
                 </dependency>
-                <dependency>
-                    <groupId>net.sourceforge</groupId>
-                    <artifactId>quazip</artifactId>
-                    <version>${quazip.version}</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>
             </dependencies>
         </profile>
 
@@ -277,25 +270,39 @@
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${compiler}</classifier>
                 </dependency>
+                <dependency>
+                    <groupId>net.sourceforge</groupId>
+                    <artifactId>quazip</artifactId>
+                    <version>${quazip.version}</version>
+                    <type>tar.gz</type>
+                    <classifier>${profile.classifier}-${arch}-${compiler}</classifier>
+                </dependency>
             </dependencies>
         </profile>
         <profile>
             <!-- Common Profile for Linux (PC / ARM), Mac -->
-            <!-- <id>unix</id>
+            <id>unix</id>
             <activation>
                 <os>
                     <family>unix</family>
                 </os>
             </activation>
             <dependencies>
-                <dependency>
+                <!--<dependency>
                     <groupId>com.digia</groupId>
                     <version>${qt.version}</version>
                     <artifactId>qt</artifactId>
                     <type>tar.gz</type>
                     <classifier>${qt.classifier}${compile.options}</classifier>
+                </dependency>-->
+                <dependency>
+                    <groupId>net.sourceforge</groupId>
+                    <artifactId>quazip</artifactId>
+                    <version>${quazip.version}</version>
+                    <type>tar.gz</type>
+                    <classifier>${profile.classifier}-${compiler}</classifier>
                 </dependency>
-            </dependencies> -->
+            </dependencies>
         </profile>
         <profile>
             <id>unix-noarm</id>
@@ -356,13 +363,6 @@
                     <version>${ffmpeg.version}</version>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}</classifier>
-                </dependency>
-                <dependency>
-                    <groupId>com.sourceforge.cloudcity</groupId>
-                    <artifactId>bespin</artifactId>
-                    <version>${bespin.version}</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${additional.compiler}</classifier>
                 </dependency>
             </dependencies>
         </profile>

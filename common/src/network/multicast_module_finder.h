@@ -1,6 +1,8 @@
 #ifndef MULTICAST_MODULE_FINDER_H
 #define MULTICAST_MODULE_FINDER_H
 
+#include <memory>
+
 #include <QCache>
 
 #include <utils/common/long_runnable.h>
@@ -84,7 +86,7 @@ private:
     bool m_clientMode;
     aio::PollSet m_pollSet;
     QHash<QHostAddress, UDPSocket*> m_clientSockets;
-    QScopedPointer<UDPSocket> m_serverSocket;
+    std::unique_ptr<UDPSocket> m_serverSocket;
     const unsigned int m_pingTimeoutMillis;
     const unsigned int m_keepAliveMultiply;
     quint64 m_prevPingClock;

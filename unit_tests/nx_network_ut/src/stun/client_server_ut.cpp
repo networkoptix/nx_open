@@ -47,7 +47,7 @@ protected:
 
     StunClientServerTest()
         : address( lit( "127.0.0.1"), newPort() )
-        , client( std::make_shared<AsyncClient>( CLIENT_TIMEOUTS ) )
+        , client( std::make_shared<AsyncClientImpl>( CLIENT_TIMEOUTS ) )
     {
     }
 

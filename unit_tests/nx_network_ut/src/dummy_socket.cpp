@@ -123,6 +123,10 @@ void DummySocket::cancelIOAsync(
     cancellationDoneHandler();
 }
 
+void DummySocket::cancelIOSync(aio::EventType /*eventType*/)
+{
+}
+
 bool DummySocket::reopen()
 {
     return connect( m_remotePeerAddress );

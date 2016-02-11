@@ -1,6 +1,6 @@
 #ifdef _WIN32
 
-#include <QGLWidget>
+#include <QtOpenGL/QGLWidget>
 
 #include "desktop_resource_searcher.h"
 #include "desktop_resource.h"

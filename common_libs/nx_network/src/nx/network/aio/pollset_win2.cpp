@@ -374,8 +374,8 @@ namespace aio
         m_impl( new PollSetImpl() )
     {
         m_impl->sockets.emplace(
-            m_impl->dummySocket->implementationDelegate()->handle(),
-            PollSetImpl::SockCtx( m_impl->dummySocket->implementationDelegate(), aio::etRead ) );
+            m_impl->dummySocket->handle(),
+            PollSetImpl::SockCtx( m_impl->dummySocket.get(), aio::etRead ) );
         m_impl->dummySocket->setNonBlockingMode( true );
         m_impl->dummySocket->bind( SocketAddress( HostAddress::localhost, 0 ) );
         

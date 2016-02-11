@@ -11,20 +11,9 @@
 
 #include "utils/common/cpp14.h"
 
-std::unique_ptr< AbstractDatagramSocket > SocketFactory::createDatagramSocket(
-    NatTraversalType natTraversalRequired )
+std::unique_ptr< AbstractDatagramSocket > SocketFactory::createDatagramSocket()
 {
-    switch( natTraversalRequired )
-    {
-        case NatTraversalType::nttAuto:
-        case NatTraversalType::nttEnabled:
-            return std::unique_ptr< AbstractDatagramSocket >( new UDPSocket( true ) );
-
-        case NatTraversalType::nttDisabled:
-            return std::unique_ptr< AbstractDatagramSocket >( new UDPSocket( false ) );
-    };
-
-    return std::unique_ptr< AbstractDatagramSocket >();
+    return std::unique_ptr< AbstractDatagramSocket >(new UDPSocket(false));
 }
 
 static std::unique_ptr< AbstractStreamSocket > streamSocket(
@@ -71,10 +60,17 @@ static std::unique_ptr< AbstractStreamSocket > streamSocket(
     };
 }
 
+namespace {
+SocketFactory::CreateStreamSocketFuncType createStreamSocketFunc;
+}
+
 std::unique_ptr< AbstractStreamSocket > SocketFactory::createStreamSocket(
     bool sslRequired,
     SocketFactory::NatTraversalType natTraversalRequired )
 {
+    if (createStreamSocketFunc)
+        return createStreamSocketFunc(sslRequired, natTraversalRequired);
+
     auto result = streamSocket( natTraversalRequired,
                                 s_enforcedStreamSocketType );
 
@@ -141,6 +137,14 @@ void SocketFactory::enforceStreamSocketType( SocketType type )
 bool SocketFactory::isStreamSocketTypeEnforced()
 {
     return s_enforcedStreamSocketType != SocketType::Default;
+}
+
+SocketFactory::CreateStreamSocketFuncType 
+    SocketFactory::setCreateStreamSocketFunc(CreateStreamSocketFuncType func)
+{
+    auto bak = std::move(createStreamSocketFunc);
+    createStreamSocketFunc = std::move(func);
+    return bak;
 }
 
 std::atomic< SocketFactory::SocketType >

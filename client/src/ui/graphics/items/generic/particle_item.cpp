@@ -1,6 +1,6 @@
 #include "particle_item.h"
 
-#include <QRadialGradient>
+#include <QtGui/QRadialGradient>
 
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/math/color_transformations.h>

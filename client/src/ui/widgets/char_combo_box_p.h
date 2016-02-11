@@ -1,7 +1,7 @@
 #ifndef QN_CHAR_COMBO_BOX_P_H
 #define QN_CHAR_COMBO_BOX_P_H
 
-#include <QComboBox>
+#include <QtWidgets/QComboBox>
 
 // -------------------------------------------------------------------------- //
 // QComboBoxListView

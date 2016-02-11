@@ -75,7 +75,7 @@ Qn::RenderStatus QnVideowallScreenWidget::paintChannelBackground(QPainter *paint
     return Qn::NewFrameRendered;
 }
 
-QnResourceWidget::Buttons QnVideowallScreenWidget::calculateButtonsVisibility() const {
+int QnVideowallScreenWidget::calculateButtonsVisibility() const {
     return 0;
 }
 
@@ -125,7 +125,7 @@ void QnVideowallScreenWidget::updateLayout(bool force) {
         m_mainOverlayWidget->setLayout(m_mainLayout);
         m_mainOverlayWidget->setAcceptedMouseButtons(Qt::NoButton);
         m_mainOverlayWidget->setOpacity(1.0);
-        addOverlayWidget(m_mainOverlayWidget, UserVisible, true);
+        addOverlayWidget(m_mainOverlayWidget, detail::OverlayParams(UserVisible, true));
     }
 
     while (m_mainLayout->count() > 0) {

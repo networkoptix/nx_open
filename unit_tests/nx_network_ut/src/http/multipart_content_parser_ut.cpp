@@ -228,7 +228,7 @@ TEST( HttpMultipartContentParser, unSizedData )
         std::vector<nx::Buffer> testFrames( FRAMES_COUNT );
         std::random_device rd;
         std::uniform_int_distribution<size_t> frameSizeDistr( FRAME_SIZE_MIN, FRAME_SIZE_MAX );
-        std::uniform_int_distribution<char> frameContentDistr;
+        std::uniform_int_distribution<int> frameContentDistr(0, std::numeric_limits<char>::max());
         for( nx::Buffer& testFrame : testFrames )
         {
             testFrame.resize( frameSizeDistr(rd) );

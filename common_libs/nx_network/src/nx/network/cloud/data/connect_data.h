@@ -28,7 +28,7 @@ public:
     //TODO #ak destinationHostName MUST be unicode string (e.g., QString)
     nx::String destinationHostName;
     nx::String originatingPeerID;
-    nx::String connectSessionID;
+    nx::String connectSessionId;
     ConnectionMethods connectionMethods;
 
     ConnectRequest();

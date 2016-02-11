@@ -798,6 +798,11 @@ namespace Qn {
         NewUserAction,
 
         /**
+         * Opens a webpage creation dialog.
+         */
+        NewWebPageAction,
+
+        /**
          * Opens a videowall creation dialog.
          */
         NewVideoWallAction,

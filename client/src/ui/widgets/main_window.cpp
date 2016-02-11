@@ -53,6 +53,7 @@
 #include <ui/workbench/handlers/workbench_resources_settings_handler.h>
 #include <ui/workbench/handlers/workbench_alarm_layout_handler.h>
 #include <ui/workbench/handlers/workbench_cloud_handler.h>
+#include <ui/workbench/handlers/workbench_webpage_handler.h>
 
 #include <ui/workbench/watchers/workbench_user_inactivity_watcher.h>
 #include <ui/workbench/watchers/workbench_layout_aspect_ratio_watcher.h>
@@ -262,6 +263,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     context->instance<QnWorkbenchPtzHandler>();
     context->instance<QnWorkbenchDebugHandler>();
     context->instance<QnWorkbenchVideoWallHandler>();
+    context->instance<QnWorkbenchWebPageHandler>();
     context->instance<QnWorkbenchIncompatibleServersActionHandler>();
     context->instance<QnWorkbenchResourcesSettingsHandler>();
     context->instance<QnWorkbenchBookmarksHandler>();

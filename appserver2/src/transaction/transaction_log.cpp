@@ -294,13 +294,13 @@ void QnTransactionLog::rollback()
 
 QnTranState QnTransactionLog::getTransactionsState()
 {
-    QReadLocker lock(&m_dbManager->getMutex());
+    QnReadLocker lock(&m_dbManager->getMutex());
     return m_state;
 }
 
 int QnTransactionLog::getLatestSequence(const QnTranStateKey& key) const
 {
-    QReadLocker lock(&m_dbManager->getMutex());
+    QnReadLocker lock(&m_dbManager->getMutex());
     return m_state.values.value(key);
 }
 
@@ -336,7 +336,7 @@ QnTransactionLog::ContainsReason QnTransactionLog::contains(const QnAbstractTran
 
 bool QnTransactionLog::contains(const QnTranState& state) const
 {
-    QReadLocker lock(&m_dbManager->getMutex());
+    QnReadLocker lock(&m_dbManager->getMutex());
     for (auto itr = state.values.begin(); itr != state.values.end(); ++itr)
     {
         if (itr.value() > m_state.values.value(itr.key()))
@@ -347,7 +347,7 @@ bool QnTransactionLog::contains(const QnTranState& state) const
 
 ErrorCode QnTransactionLog::getTransactionsAfter(const QnTranState& state, QList<QByteArray>& result)
 {
-    QReadLocker lock(&m_dbManager->getMutex());
+    QnReadLocker lock(&m_dbManager->getMutex());
     QMap <QnTranStateKey, int> tranLogSequence;
     for(auto itr = m_state.values.begin(); itr != m_state.values.end(); ++itr)
     {

@@ -1922,4 +1922,9 @@ QnRtspClient::TrackMap QnRtspClient::getTrackInfo() const
     return m_sdpTracks;
 }
 
+AbstractStreamSocket* QnRtspClient::tcpSock()
+{
+    return m_tcpSock.get();
+}
+
 #endif // ENABLE_DATA_PROVIDERS

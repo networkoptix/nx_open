@@ -47,7 +47,7 @@ QN_FUSION_DEFINE_KEY(optional)
 #define QN_FUSION_PROPERTY_IS_TYPED_FOR_name true
 #define QN_FUSION_PROPERTY_TYPE_FOR_name QString
 #define QN_FUSION_PROPERTY_IS_EXTENDED_FOR_name true
-#define QN_FUSION_PROPERTY_EXTENSION_FOR_name(KEY, VALUE) (name, QStringLiteral(VALUE))(c_name, VALUE)(sql_placeholder_name, QN_FUSION_LIT_CAT(":", VALUE))
+#define QN_FUSION_PROPERTY_EXTENSION_FOR_name(KEY, VALUE) (name, QStringLiteral(VALUE))(c_name, VALUE)(sql_placeholder_name, QStringLiteral(":" VALUE))
 
 #define QN_FUSION_PROPERTY_IS_TYPED_FOR_c_name true
 #define QN_FUSION_PROPERTY_TYPE_FOR_c_name const char *
