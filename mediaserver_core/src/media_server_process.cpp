@@ -1425,6 +1425,7 @@ bool MediaServerProcess::initTcpListener()
     m_httpModManager.reset( new nx_http::HttpModManager() );
     m_httpModManager->addUrlRewriteExact( lit( "/crossdomain.xml" ), lit( "/static/crossdomain.xml" ) );
     m_autoRequestForwarder.reset( new QnAutoRequestForwarder() );
+    m_autoRequestForwarder->addPathToIgnore(lit("/ec2/*"));
     m_httpModManager->addCustomRequestMod( std::bind(
         &QnAutoRequestForwarder::processRequest,
         m_autoRequestForwarder.get(),

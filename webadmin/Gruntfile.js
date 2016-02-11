@@ -132,7 +132,7 @@ module.exports = function (grunt) {
                 {context: '/proxy/',    host: '10.0.2.203', port: 7001}/**/
 
                 // Sasha V
-                {context: '/api/',      host: '10.0.3.43', port: 7001},
+                /*{context: '/api/',      host: '10.0.3.43', port: 7001},
                 {context: '/ec2/',      host: '10.0.3.43', port: 7001},
                 {context: '/hls/',      host: '10.0.3.43', port: 7001},
                 {context: '/media/',    host: '10.0.3.43', port: 7001},
@@ -168,7 +168,7 @@ module.exports = function (grunt) {
                 {context: '/proxy/',    host: '10.0.2.169', port: 7011}/**/
 
                 // Sasha
-                /*{context: '/api/',      host: '10.0.2.119', port: 7042},
+                {context: '/api/',      host: '10.0.2.119', port: 7042},
                 {context: '/ec2/',      host: '10.0.2.119', port: 7042},
                 {context: '/hls/',      host: '10.0.2.119', port: 7042},
                 {context: '/media/',    host: '10.0.2.119', port: 7042},

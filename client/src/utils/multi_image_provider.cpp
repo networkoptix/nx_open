@@ -11,21 +11,24 @@ QnMultiImageProvider::QnMultiImageProvider(Providers providers, Qt::Orientation 
             if (loadedImage.isNull())
                 return;
 
-            QSize newSize(loadedImage.size());
-            QRect rect(0, 0, loadedImage.width(), loadedImage.height());
+            enum { kMaxSize = 160 };
+            const auto newHeight = std::min<int>(kMaxSize, loadedImage.height());
+            const auto newWidth = std::min<int>(kMaxSize, loadedImage.width());
+            QSize newSize(newWidth, newHeight);
+            QRect rect(0, 0, newWidth, newHeight);
             std::ptrdiff_t key =  (ptrdiff_t) sender();
 
-            if (!m_image.isNull()) 
+            if (!m_image.isNull())
             {
                 auto existsOffset = m_imageRects.find(key);
                 if (existsOffset == m_imageRects.end())
                 {
                     if (orientation == Qt::Vertical) {
-                        newSize = QSize(qMax(loadedImage.width(), m_image.width()), m_image.height() + loadedImage.height() + spacing);
+                        newSize = QSize(qMax(newWidth, m_image.width()), m_image.height() + newHeight + spacing);
                         rect.translate(0, m_image.height() + spacing);
                     }
                     else {
-                        newSize = QSize(m_image.width() + loadedImage.width() + spacing, qMax(loadedImage.height(), m_image.height()));
+                        newSize = QSize(m_image.width() + newWidth + spacing, qMax(newHeight, m_image.height()));
                         rect.translate(m_image.width() + spacing, 0);
                     }
                 }

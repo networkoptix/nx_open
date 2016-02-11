@@ -9,7 +9,7 @@
 
 class QnWorkbenchItem;
 
-class QnCurrentLayoutItemsWatcher : public Connective<QObject>
+class QnWorkbenchItemsWatcher : public Connective<QObject>
     , public QnWorkbenchContextAware
 {
     Q_OBJECT
@@ -17,14 +17,17 @@ class QnCurrentLayoutItemsWatcher : public Connective<QObject>
     typedef Connective<QObject> base_type;
 
 public:
-    QnCurrentLayoutItemsWatcher(QObject *parent = nullptr);
+    QnWorkbenchItemsWatcher(QObject *parent = nullptr);
 
-    virtual ~QnCurrentLayoutItemsWatcher();
+    virtual ~QnWorkbenchItemsWatcher();
 
 signals:
     void layoutChanged();
     void layoutAboutToBeChanged();
+
     void itemAdded(QnWorkbenchItem *item);
-    void itemRemoved(QnWorkbenchItem *item);    // Emits when item is physically removed
-    void itemHidden(QnWorkbenchItem *item);     // Emits when current alyout about to be changed
+    void itemRemoved(QnWorkbenchItem *item);
+
+    void itemShown(QnWorkbenchItem *item);
+    void itemHidden(QnWorkbenchItem *item);
 };

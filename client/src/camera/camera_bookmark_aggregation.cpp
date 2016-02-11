@@ -2,16 +2,28 @@
 
 #include <core/resource/camera_bookmark.h>
 
+#include <utils/common/scoped_timer.h>
+
 QnCameraBookmarkAggregation::QnCameraBookmarkAggregation(const QnCameraBookmarkList &bookmarkList) {
     setBookmarkList(bookmarkList);
 }
 
 bool QnCameraBookmarkAggregation::addBookmark(const QnCameraBookmark &bookmark)
 {
+#ifdef _DEBUG
+    /* C++ asserts are required for unit tests to work correctly. */
+    assert(!bookmark.isNull());
+#endif
+    QN_LOG_TIME(Q_FUNC_INFO);
+
+    /* Null bookmarks must not be stored in the aggregation. */
+    if (bookmark.isNull())
+        return false;
+
     // Searches the place to insert new bookmark (by startTimeMs)
     auto it = std::lower_bound(m_bookmarkList.begin(), m_bookmarkList.end(), bookmark);
 
-    if (it->guid == bookmark.guid)
+    if (it != m_bookmarkList.cend() && it->guid == bookmark.guid)
     {
         if (*it == bookmark)
             return false;
@@ -50,6 +62,8 @@ bool QnCameraBookmarkAggregation::addBookmark(const QnCameraBookmark &bookmark)
 
 bool QnCameraBookmarkAggregation::mergeBookmarkList(const QnCameraBookmarkList &bookmarkList)
 {
+    QN_LOG_TIME(Q_FUNC_INFO);
+
     if (m_bookmarkList.isEmpty())
     {
         setBookmarkList(bookmarkList);
@@ -63,7 +77,10 @@ bool QnCameraBookmarkAggregation::mergeBookmarkList(const QnCameraBookmarkList &
     return result;
 }
 
-bool QnCameraBookmarkAggregation::removeBookmark(const QnUuid &bookmarkId) {
+bool QnCameraBookmarkAggregation::removeBookmark(const QnUuid &bookmarkId)
+{
+    QN_LOG_TIME(Q_FUNC_INFO);
+
     if (!m_bookmarkIds.remove(bookmarkId))
         return false;
 
@@ -80,7 +97,10 @@ bool QnCameraBookmarkAggregation::removeBookmark(const QnUuid &bookmarkId) {
     return true;
 }
 
-void QnCameraBookmarkAggregation::setBookmarkList(const QnCameraBookmarkList &bookmarkList) {
+void QnCameraBookmarkAggregation::setBookmarkList(const QnCameraBookmarkList &bookmarkList)
+{
+    QN_LOG_TIME(Q_FUNC_INFO);
+
     m_bookmarkList = bookmarkList;
     m_bookmarkIds.clear();
 
@@ -88,11 +108,13 @@ void QnCameraBookmarkAggregation::setBookmarkList(const QnCameraBookmarkList &bo
         m_bookmarkIds.insert(bookmark.guid);
 }
 
-const QnCameraBookmarkList &QnCameraBookmarkAggregation::bookmarkList() const {
+const QnCameraBookmarkList &QnCameraBookmarkAggregation::bookmarkList() const
+{
     return m_bookmarkList;
 }
 
-void QnCameraBookmarkAggregation::clear() {
+void QnCameraBookmarkAggregation::clear()
+{
     m_bookmarkList.clear();
     m_bookmarkIds.clear();
 }

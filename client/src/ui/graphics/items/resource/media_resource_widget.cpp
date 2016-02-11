@@ -75,6 +75,8 @@
 
 namespace
 {
+    enum { kMicroInMilliSeconds = 1000 };
+
     bool isSpecialDateTimeValueUsec(qint64 dateTimeUsec)
     {
         return ((dateTimeUsec == DATETIME_NOW)
@@ -142,6 +144,8 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     , m_ioModuleOverlayWidget(nullptr)
     , m_ioCouldBeShown(false)
     , m_ioLicenceStatusHelper() /// Will be created only for I/O modules
+
+    , m_posUtcMs(DATETIME_INVALID)
 {
     if(!m_resource)
         qnCritical("Media resource widget was created with a non-media resource.");
@@ -284,6 +288,9 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     updateCursor();
     updateFisheye();
     setImageEnhancement(item->imageEnhancement());
+
+    connect(this, &QnMediaResourceWidget::updateInfoTextLater
+        , this, &QnMediaResourceWidget::updateCurrentUtcPosMs);
 }
 
 QnMediaResourceWidget::~QnMediaResourceWidget() {
@@ -1075,6 +1082,20 @@ QString QnMediaResourceWidget::calculateDetailsText() const {
     return result;
 }
 
+void QnMediaResourceWidget::updateCurrentUtcPosMs()
+{
+    const qint64 usec = getUtcCurrentTimeUsec();
+    qint64 newPos = DATETIME_INVALID;
+    if (!isSpecialDateTimeValueUsec(usec))
+        newPos = usec / kMicroInMilliSeconds;
+
+    if (newPos == m_posUtcMs)
+        return;
+
+    m_posUtcMs = newPos;
+    emit positionChanged(m_posUtcMs);
+}
+
 QString QnMediaResourceWidget::calculatePositionText() const
 {
     /* Do not show time for regular media files. */
@@ -1086,7 +1107,6 @@ QString QnMediaResourceWidget::calculatePositionText() const
         if (isSpecialDateTimeValueUsec(dateTimeUsec))
             return QString();
 
-        enum { kMicroInMilliSeconds = 1000 };
         static const auto kOutputFormat = lit("yyyy-MM-dd hh:mm:ss");
 
         const auto dateTimeMs = dateTimeUsec / kMicroInMilliSeconds;
@@ -1612,5 +1632,4 @@ QnCompositeTextOverlay *QnMediaResourceWidget::compositeTextOverlay()
 {
     return m_compositeTextOverlay;
 }
-
 

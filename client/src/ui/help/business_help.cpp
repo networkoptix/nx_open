@@ -24,7 +24,12 @@ int QnBusiness::eventHelpId(QnBusiness::EventType type) {
         return Qn::EventsActions_MediaServerStarted_Help;
     case LicenseIssueEvent:
         return Qn::EventsActions_LicenseIssue_Help;
+    case BackupFinishedEvent:
+        return Qn::EventsActions_BackupFinished_Help;
     default:
+        if (type >= UserDefinedEvent)
+            return Qn::EventsActions_Generic_Help;
+
         return -1;
     }
 }
@@ -50,11 +55,14 @@ int QnBusiness::actionHelpId(QnBusiness::ActionType type) {
         return Qn::EventsActions_Speech_Help;
     case QnBusiness::DiagnosticsAction:
         return Qn::EventsActions_Diagnostics_Help;
-    case QnBusiness::BookmarkAction:
-    case QnBusiness::ExecutePtzPresetAction:
-    case QnBusiness::ShowTextOverlayAction:
     case QnBusiness::ShowOnAlarmLayoutAction:
-        return -1;
+        return Qn::EventsActions_ShowOnAlarmLayout_Help;
+    case QnBusiness::BookmarkAction:
+        return Qn::EventsActions_Bookmark_Help;
+    case QnBusiness::ExecutePtzPresetAction:
+        return Qn::EventsActions_ExecutePtzPreset_Help;
+    case QnBusiness::ShowTextOverlayAction:
+        return Qn::EventsActions_ShowTextOverlay_Help;
     default:
         return -1;
     }

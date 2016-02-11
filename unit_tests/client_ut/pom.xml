@@ -21,6 +21,7 @@
     <name>HD Witness Client Unit Tests</name>
 
     <properties>
+        <guid>{842d800f-9e19-4b8f-89ec-f9779a434aa1}</guid>
         <product.title>HD Witness Client Unit Tests</product.title>
         <root.dir>${basedir}/../..</root.dir>
         <!--Specify the project to test-->      

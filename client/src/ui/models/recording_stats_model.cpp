@@ -22,6 +22,8 @@ namespace {
 
     /* One additional row for footer. */
     const int footerRowsCount = 1;
+
+    const int kMaxNameLength = 30;
 }
 
 const QString QnSortedRecordingStatsModel::kForeignCameras(lit("C7139D2D-0CB2-424D-9C73-704C417B32F2"));
@@ -90,10 +92,16 @@ int QnRecordingStatsModel::columnCount(const QModelIndex &parent) const {
 QString QnRecordingStatsModel::displayData(const QModelIndex &index) const {
     const QnCamRecordingStatsData& value = m_data.at(index.row());
     bool isForeign = (value.uniqueId == QnSortedRecordingStatsModel::kForeignCameras);
-    switch(index.column()) {
+    switch(index.column())
+    {
     case CameraNameColumn:
-        return isForeign ? tr("<Cameras from other servers and removed cameras>") :
-               getResourceName(qnResPool->getResourceByUniqueId(value.uniqueId));
+        {
+            QString foreignText = tr("<Cameras from other servers and removed cameras>");
+            int maxLength = qMax(foreignText.length(), kMaxNameLength); /* There is no need to limit name to be shorter than predefined string. */
+            return isForeign
+                ? foreignText
+                : elideString(getResourceName(qnResPool->getResourceByUniqueId(value.uniqueId)), maxLength);
+        }
     case BytesColumn:
         return formatBytesString(value.recordedBytes);
     case DurationColumn:

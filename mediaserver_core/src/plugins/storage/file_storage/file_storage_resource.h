@@ -54,7 +54,7 @@ public:
     static bool isLocal(const QString &url);
     // calculate space limit judging by storage URL
     static qint64 calcSpaceLimit(const QString &url);
-    // calculate space limit judging by partition type 
+    // calculate space limit judging by partition type
     static qint64 calcSpaceLimit(QnPlatformMonitor::PartitionType ptype);
 
 private:
@@ -76,6 +76,10 @@ private:
     // returns not 0 if something went wrong, 0 otherwise
     int mountTmpDrive() const;
     bool testWriteCapInternal() const;
+
+    void setLocalPathSafe(const QString &path) const;
+    QString getLocalPathSafe() const;
+
 public:
     // Try to remove old temporary dirs if any.
     // This could happen if server crashed and ~FileStorageResource

@@ -31,9 +31,6 @@ public:
     void setAdditionFlags(quint16 value);
 
     virtual bool isRtpHeaderExists() const override { return false; }
-
-    void setCodecContext(const QnConstMediaContextPtr& context);
-
 private:
     bool m_gotLivePacket;
     QnConstMediaContextPtr m_contextSent;

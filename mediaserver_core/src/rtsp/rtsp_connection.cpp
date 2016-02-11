@@ -700,15 +700,8 @@ int QnRtspConnectionProcessor::composeDescribe()
         {
             QnRtspFfmpegEncoder* ffmpegEncoder = new QnRtspFfmpegEncoder();
             encoder = QnRtspEncoderPtr(ffmpegEncoder);
-            if (i >= numVideo) 
-            {
-                QnConstAbstractMediaDataPtr media = getCameraData(i < numVideo ? QnAbstractMediaData::VIDEO : QnAbstractMediaData::AUDIO);
-                if (media && media->context)
-                    ffmpegEncoder->setCodecContext(media->context);
-            }
         }
-        else
-        {
+        else {
             QnConstAbstractMediaDataPtr media = getCameraData(i < numVideo ? QnAbstractMediaData::VIDEO : QnAbstractMediaData::AUDIO);
             if (media) 
             {
