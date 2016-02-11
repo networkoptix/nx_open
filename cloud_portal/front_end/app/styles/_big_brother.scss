@@ -1,0 +1,46 @@
+@import 'theme_variables';
+
+$dark-color:         dark(1);
+$light-color:        $body-bg;
+
+.big-brother{
+  display: inline-block;
+  width:120px;
+  height:120px;
+  border-radius:50%;
+  position:relative;
+  border: 3px solid $dark-color;
+  background-color: $dark-color;
+}
+
+.big-brother > .eye{
+  position:relative;
+  top:15%;
+  left:15%;
+  width:70%;
+  height:70%;
+  border-radius: 70% 0;
+  transform: rotate(45deg);
+  border: 3px solid $light-color;
+  background-color:$light-color;
+  overflow:hidden;
+}
+
+
+.big-brother > .eye>.eye-straight{
+  transform: rotate(-45deg);
+  width:100%;
+  height:100%;
+}
+
+.big-brother > .eye  .pupil{
+  position:absolute;
+  top:7.5px;
+  left:7.5px;
+  width:60px;
+  height:60px;
+
+  border-radius: 50%;
+  border:25px solid $dark-color;
+  background-color: $light-color;
+}
