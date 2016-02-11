@@ -32,6 +32,6 @@ private:
     QDir m_statisticsDirectory;
     QDir m_customSettingsDirectory;
 
-    int m_limit;
+    int m_fileCountLimit;
     int m_storeDaysCount;
 };

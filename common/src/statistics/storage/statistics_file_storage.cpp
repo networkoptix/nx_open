@@ -8,11 +8,10 @@
 
 namespace
 {
-    enum
-    {
-        kDefaultLimit = 128
-        , kDefaultStoreDaysCount = 32
-    };
+    const int kDefaultFileCountLimit = 128;
+    const int kDefaultStoreDaysCount = 32;
+
+    const qint64 kNotStatisticsFileTimeStamp = 0;
 
     const auto localDataDirectory = QDir(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
 
@@ -89,7 +88,7 @@ namespace
         return input.readAll();
     }
 
-    enum { kNotStatisticsFileTimeStamp = 0 };
+
     qint64 getStatisticsFileTimeStamp(const QString &filePath)
     {
         bool ok = 0;
@@ -104,7 +103,7 @@ QnStatisticsFileStorage::QnStatisticsFileStorage()
     , m_statisticsDirectory(getStatisticsDirectory())
     , m_customSettingsDirectory(getCustomDataDirectory())
 
-    , m_limit(kDefaultLimit)
+    , m_fileCountLimit(kDefaultFileCountLimit)
     , m_storeDaysCount(kDefaultStoreDaysCount)
 {}
 
@@ -174,7 +173,7 @@ bool QnStatisticsFileStorage::saveCustomSettings(const QString &name
 QByteArray QnStatisticsFileStorage::getCustomSettings(const QString &name) const
 {
     if (!m_customSettingsDirectory.exists())
-        return false;
+        return QByteArray();
 
     const auto fullFileName = m_customSettingsDirectory.absoluteFilePath(name);
     return readAllFromFile(fullFileName);
@@ -204,9 +203,9 @@ void QnStatisticsFileStorage::removeOutdatedFiles()
     QStringList forRemoveFilesList;
 
     // Checks if limit of files count is exceeded
-    if ((m_limit > 0) && (entries.size() > m_limit))
+    if ((m_fileCountLimit > 0) && (entries.size() > m_fileCountLimit))
     {
-        const int removeCount = entries.size() - m_limit;
+        const int removeCount = entries.size() - m_fileCountLimit;
         forRemoveFilesList = entries.mid(0, removeCount);
         entries = entries.mid(removeCount);
     }
