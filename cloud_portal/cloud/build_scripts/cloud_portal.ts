@@ -461,51 +461,6 @@
   </context>
   <context>
     <name>../static/views/startPage.html</name>
-    <message>
-      <location filename="../static/views/startPage.html"/>
-      <source>Register today</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>share your system with your buddies</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Incredible revolution in ways of connecting to video surveilance systems</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Be Awesome</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>unbelievable opportunity to connect to your system from any place in the world</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Nx Cloud</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Be Mobile</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>use amazing single account for all you systems</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Be Social</source>
-      <translation> </translation>
-    </message>
   </context>
   <context>
     <name>../static/views/static.html</name>
