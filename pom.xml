@@ -627,6 +627,8 @@
             </modules>
             <properties>
                 <modification>ubuntu</modification>
+                <qt.version>5.2.1</qt.version>
+                <quazip.version>0.6.2-SNAPSHOT</quazip.version>
             </properties>
         </profile>
 
