@@ -21,7 +21,7 @@
                            ng-model="data.email"
                            id="emailReactivate"
                            name="email" maxlength="255"
-                           required>
+                           required autofocus>
                 </div>
                 <div class="col-sm-4">
                     <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required">Email is required.</span>
@@ -52,7 +52,7 @@
                            ng-model="data.email"
                            id="email"
                            name="email" maxlength="255"
-                           required>
+                           required autofocus>
                 </div>
                 <div class="col-sm-4">
                     <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.required">Email is required.</span>
