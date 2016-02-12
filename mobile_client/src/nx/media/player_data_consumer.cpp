@@ -1,6 +1,6 @@
 #include <nx/streaming/archive_stream_reader.h>
 
-#include <QAudioOutput>
+#include <QtMultimedia/QAudioOutput>
 
 #include "player_data_consumer.h"
 #include "seamless_video_decoder.h"
