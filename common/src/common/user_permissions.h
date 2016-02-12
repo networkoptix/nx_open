@@ -69,8 +69,6 @@ namespace Qn {
         AllPermissions                          = 0xFFFFFFFF
     };
 
-    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Permission)
-
     Q_DECLARE_FLAGS(Permissions, Permission)
     Q_DECLARE_OPERATORS_FOR_FLAGS(Permissions)
 

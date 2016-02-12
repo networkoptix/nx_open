@@ -8,6 +8,8 @@
 class QnUsersStatisticsModule : public QnAbstractStatisticsModule
     , public QnWorkbenchContextAware
 {
+    Q_OBJECT
+
     typedef QnAbstractStatisticsModule base_type;
 
 public:
@@ -20,5 +22,5 @@ public:
     void resetMetrics() override;
 
 private:
-    Qn::Permissions m_permissions;
+    quint64 m_permissions;
 };
