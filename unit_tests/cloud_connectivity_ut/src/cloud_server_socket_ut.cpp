@@ -15,12 +15,12 @@ namespace cloud {
  */
 struct FakeTcpTunnelConnection
 :
-    AbstractTunnelConnection
+    AbstractIncomingTunnelConnection
 {
     FakeTcpTunnelConnection(
         String remotePeerId, SocketAddress address, size_t sockets = 1000)
     :
-        AbstractTunnelConnection(std::move(remotePeerId)),
+        AbstractIncomingTunnelConnection(std::move(remotePeerId)),
         m_sockets(sockets),
         m_server(std::make_unique<TCPServerSocket>())
     {
@@ -34,21 +34,15 @@ struct FakeTcpTunnelConnection
                 .arg(m_sockets), cl_logDEBUG1);
     }
 
-    void establishNewConnection(
-        boost::optional<std::chrono::milliseconds>,
-        SocketAttributes, SocketHandler) override
-    {
-        // not supposed to be used for connect
-        assert(false);
-    }
-
-    void accept(SocketHandler handler) override
+    void accept(std::function<void(
+        SystemError::ErrorCode,
+        std::unique_ptr<AbstractStreamSocket>)> handler) override
     {
         if (m_sockets == 0)
             return m_server->post(
                 [handler]()
                 {
-                    handler(SystemError::connectionReset, nullptr, false);
+                    handler(SystemError::connectionReset, nullptr);
                 });
 
         m_server->acceptAsync(
@@ -57,7 +51,7 @@ struct FakeTcpTunnelConnection
             {
                 EXPECT_EQ(c, SystemError::noError);
                 --m_sockets;
-                handler(c, std::unique_ptr<AbstractStreamSocket>(s), m_sockets);
+                handler(c, std::unique_ptr<AbstractStreamSocket>(s));
             });
     }
 
@@ -96,7 +90,7 @@ struct FakeTcpTunnelAcceptor
 
     void accept(std::function<void(
         SystemError::ErrorCode,
-        std::unique_ptr<AbstractTunnelConnection>)> handler) override
+        std::unique_ptr<AbstractIncomingTunnelConnection>)> handler) override
     {
         if (!m_address)
             return m_ioThreadSocket->registerTimer(
@@ -232,11 +226,11 @@ TEST(CloudServerSocketBaseTcpTest, OpenTunnelOnIndication)
     server->pleaseStopSync();
 }
 
-static size_t kThreadCount = 5;
-static size_t kClientCount = 15;
-static size_t kPeerCount = 3;
-static size_t kQueueLimit = 10;
-static size_t kRetryDelay = 100;
+static const size_t kThreadCount = 5;
+static const size_t kClientCount = 15;
+static const size_t kPeerCount = 3;
+static const size_t kQueueLimit = 10;
+static const size_t kRetryDelay = 100;
 
 class CloudServerSocketStressTcpTest
 :
