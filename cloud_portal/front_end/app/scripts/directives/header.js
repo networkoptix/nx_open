@@ -20,6 +20,7 @@ angular.module('cloudApp')
                 scope.logout = function(){
                     cloudApi.logout().then(function(){
                         scope.session.password = ''; // TODO: get rid of password in session storage
+                        $location.path('/',false);
                         window.location.reload();
                     });
                 };
