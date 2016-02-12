@@ -11,15 +11,8 @@
         <div class="navbar-collapse" uib-collapse="!isMenuExpanded">
             <ul class="nav navbar-nav">
                 <li class="vertical-bar"></li>
-                <li><a href="#/support">Support</a></li>
-                <li uib-dropdown>
-                    <a uib-dropdown-toggle href="#">About <span class="caret"></span></a>
-                    <ul uib-dropdown-menu>
-                        <li><a href="#/about/cloud">About <span class="product-name">Nx Cloud</span></a></li>
-                        <li><a href="#/about/connect_system">How to connect your system</a></li>
-                        <li><a href="#/about/nx">About Networkoptix</a></li>
-                    </ul>
-                </li>
+                <li class="auth-hidden"><a href="#/static/about">About</a></li>
+                <li class="auth-visible"><a href="#/systems">Systems</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right auth-hidden">
                 <li><span class="btn-wrapper"><a href="#/login" class="btn btn-default" ng-click="login();$event.preventDefault();">Login</a></span></li>

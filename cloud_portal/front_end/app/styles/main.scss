@@ -6,11 +6,29 @@
 
 @import '_big_brother';
 
-
-/* Space out content a bit */
-body {
-    padding-bottom: 20px;
+html {
+  position: relative;
+  min-height: 100%;
 }
+body {
+  /* Margin bottom by footer height */
+  margin-bottom: 80px;
+}
+footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 54px;
+  border-top: 1px solid $common-border-color;
+  padding-bottom: 2px;
+}
+
+footer .nav > li > a{
+  font-size: $font-size-base;
+  padding:$font-size-base;
+}
+
 
 
 .process-button{
@@ -199,4 +217,9 @@ body {
   font-style: italic;
   color: $gray-light;
   font-size: 90%;
+}
+
+
+.inline-block{
+  display: inline-block;
 }
