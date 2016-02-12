@@ -202,6 +202,9 @@ PasswordHelper::PasswordHelper()
 
     setPasswordInfo("canon", "root", "camera");
 
+    setPasswordInfo("d-link corporation", "admin", "");
+    setPasswordInfo("d-link corporation", "admin", "admin");
+
     // default password list
 
     setPasswordInfo(DEFAULT_MANUFACTURER, "admin", "admin");
