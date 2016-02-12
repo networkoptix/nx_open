@@ -36,12 +36,10 @@ class MoveOnlyFunc
             m_func(std::move(const_cast<MoveOnlyFuncWrapper&>(rhs).m_func))
         {
             assert(false);
-            throw -1;
         }
         MoveOnlyFuncWrapper& operator=(const MoveOnlyFuncWrapper&)
         {
             assert(false);
-            throw -1;
         }
         MoveOnlyFuncWrapper(MoveOnlyFuncWrapper&&) = default;
         MoveOnlyFuncWrapper& operator=(MoveOnlyFuncWrapper&&) = default;
@@ -57,6 +55,11 @@ class MoveOnlyFunc
 public:
     MoveOnlyFunc() = default;
     
+    MoveOnlyFunc(std::function<F> func)
+    :
+        std::function<F>(std::move(func))
+    {
+    }
     template<class _Func>
     MoveOnlyFunc(_Func&& func)
     :
