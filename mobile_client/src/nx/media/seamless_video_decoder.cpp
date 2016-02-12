@@ -30,27 +30,27 @@ namespace
         }
     }
 
-	/** This data is used to compare current and previous frame so as to reset video decoder if needed */
-	struct FrameBasicInfo
-	{
-		FrameBasicInfo(): 
-			codec(CODEC_ID_NONE)
-		{
+    /** This data is used to compare current and previous frame so as to reset video decoder if needed */
+    struct FrameBasicInfo
+    {
+        FrameBasicInfo(): 
+            codec(CODEC_ID_NONE)
+        {
 
-		}
-		
-		FrameBasicInfo(const QnConstCompressedVideoDataPtr& frame):
-			codec(CODEC_ID_NONE)
-		{
-			codec = frame->compressionType;
+        }
+        
+        FrameBasicInfo(const QnConstCompressedVideoDataPtr& frame):
+            codec(CODEC_ID_NONE)
+        {
+            codec = frame->compressionType;
             size = QSize(frame->width, frame->height);
             if (size.isEmpty())
                 size = mediaSizeFromRawData(frame);
-		}
+        }
 
-		QSize size;
-		CodecID codec;
-	};
+        QSize size;
+        CodecID codec;
+    };
 }
 
 namespace nx {
@@ -61,31 +61,31 @@ namespace media {
 
 class SeamlessVideoDecoderPrivate : public QObject
 {
-	Q_DECLARE_PUBLIC(SeamlessVideoDecoder)
-	SeamlessVideoDecoder *q_ptr;
+    Q_DECLARE_PUBLIC(SeamlessVideoDecoder)
+    SeamlessVideoDecoder *q_ptr;
 public:
-	SeamlessVideoDecoderPrivate(SeamlessVideoDecoder *parent);
+    SeamlessVideoDecoderPrivate(SeamlessVideoDecoder *parent);
 
-	void addMetadata(const QnConstCompressedVideoDataPtr& frame);
-	const FrameMetadata findMetadata(int frameNum);
-	void clearMetadata();
+    void addMetadata(const QnConstCompressedVideoDataPtr& frame);
+    const FrameMetadata findMetadata(int frameNum);
+    void clearMetadata();
     int decoderFrameNumToLocalNum(int value) const;
 public:
     std::deque<QnVideoFramePtr> queue; //< temporary  buffer for decoded data
-	VideoDecoderPtr videoDecoder;
-	FrameBasicInfo prevFrameInfo;
-	int frameNumber;         //< absolute frame number
+    VideoDecoderPtr videoDecoder;
+    FrameBasicInfo prevFrameInfo;
+    int frameNumber;         //< absolute frame number
     int decoderFrameOffset;  //< relate frame number (frameNumber value when decoder was created)
-	std::deque<FrameMetadata> metadataQueue; //< Associate extra information for output frames which corresponding input frames
+    std::deque<FrameMetadata> metadataQueue; //< Associate extra information for output frames which corresponding input frames
 };
 
 SeamlessVideoDecoderPrivate::SeamlessVideoDecoderPrivate(SeamlessVideoDecoder *parent):
-	QObject(parent),
-	q_ptr(parent),
-	frameNumber(0),
+    QObject(parent),
+    q_ptr(parent),
+    frameNumber(0),
     decoderFrameOffset(0)
 {
-	
+    
 }
 
 void SeamlessVideoDecoderPrivate::addMetadata(const QnConstCompressedVideoDataPtr& frame)
@@ -121,8 +121,8 @@ int SeamlessVideoDecoderPrivate::decoderFrameNumToLocalNum(int value) const
 // ----------------------------------- SeamlessVideoDecoder -----------------------------------
 
 SeamlessVideoDecoder::SeamlessVideoDecoder():
-	QObject(),
-	d_ptr(new SeamlessVideoDecoderPrivate(this))
+    QObject(),
+    d_ptr(new SeamlessVideoDecoderPrivate(this))
 {
 }
 
@@ -137,56 +137,56 @@ void SeamlessVideoDecoder::pleaseStop()
 
 bool SeamlessVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QnVideoFramePtr* result)
 {
-	Q_D(SeamlessVideoDecoder);
-	if (result)
-		result->clear();
+    Q_D(SeamlessVideoDecoder);
+    if (result)
+        result->clear();
 
-	FrameBasicInfo frameInfo(frame);
+    FrameBasicInfo frameInfo(frame);
     bool isSimilarParams = frameInfo.codec == d->prevFrameInfo.codec;
     if (!frameInfo.size.isEmpty())
         isSimilarParams &= frameInfo.size == d->prevFrameInfo.size;
     if (!isSimilarParams)
-	{
+    {
         QnVideoFramePtr decodedFrame;
-		if (d->videoDecoder)
-		{
-			while (1) 
-			{
-				int decodedFrameNum = d->videoDecoder->decode(QnConstCompressedVideoDataPtr(), &decodedFrame);
+        if (d->videoDecoder)
+        {
+            while (1) 
+            {
+                int decodedFrameNum = d->videoDecoder->decode(QnConstCompressedVideoDataPtr(), &decodedFrame);
                 if (!decodedFrame)
-					break; //< decoder's buffer is flushed
+                    break; //< decoder's buffer is flushed
                 const FrameMetadata metadata = d->findMetadata(d->decoderFrameNumToLocalNum(decodedFrameNum));
                 metadata.serialize(decodedFrame);
-				d->queue.push_back(std::move(decodedFrame));
-			}
-		}
+                d->queue.push_back(std::move(decodedFrame));
+            }
+        }
         d->videoDecoder.reset(); //< release previous decoder in case if hardware decoder can handle single instance only
-		d->videoDecoder = VideoDecoderRegistry::instance()->createCompatibleDecoder(frame->compressionType, QSize(frame->width, frame->height));
+        d->videoDecoder = VideoDecoderRegistry::instance()->createCompatibleDecoder(frame->compressionType, QSize(frame->width, frame->height));
         d->decoderFrameOffset = d->frameNumber;
-		d->prevFrameInfo = frameInfo;
-		d->clearMetadata();
-	}
-	
-	d->addMetadata(frame);
-	int decodedFrameNum = 0;
-	if (d->videoDecoder) 
-	{
+        d->prevFrameInfo = frameInfo;
+        d->clearMetadata();
+    }
+    
+    d->addMetadata(frame);
+    int decodedFrameNum = 0;
+    if (d->videoDecoder) 
+    {
         QnVideoFramePtr decodedFrame;
-		decodedFrameNum = d->videoDecoder->decode(frame, &decodedFrame);
-		if (decodedFrame) 
-		{
+        decodedFrameNum = d->videoDecoder->decode(frame, &decodedFrame);
+        if (decodedFrame) 
+        {
             const FrameMetadata metadata = d->findMetadata(d->decoderFrameNumToLocalNum(decodedFrameNum));
             metadata.serialize(decodedFrame);
-			d->queue.push_back(std::move(decodedFrame));
-		}
-	}
+            d->queue.push_back(std::move(decodedFrame));
+        }
+    }
 
-	if (d->queue.empty())
-		return decodedFrameNum >= 0; //< Return false if decoding fails and no queued frames are left.
+    if (d->queue.empty())
+        return decodedFrameNum >= 0; //< Return false if decoding fails and no queued frames are left.
 
-	*result = d->queue.front();
-	d->queue.pop_front();
-	return true;
+    *result = d->queue.front();
+    d->queue.pop_front();
+    return true;
 }
 
 int SeamlessVideoDecoder::currentFrameNumber() const

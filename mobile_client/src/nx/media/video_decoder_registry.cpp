@@ -6,14 +6,14 @@ namespace media {
 
 VideoDecoderRegistry* VideoDecoderRegistry::instance()
 {
-	static VideoDecoderRegistry instance;
-	return &instance;
+    static VideoDecoderRegistry instance;
+    return &instance;
 }
 
 std::unique_ptr<AbstractVideoDecoder> VideoDecoderRegistry::createCompatibleDecoder(const CodecID codec, const QSize& resolution)
 {
-	for (const auto& plugin : m_plugins)
-	{
+    for (const auto& plugin : m_plugins)
+    {
         if (plugin.isCompatible(codec, resolution)) 
         {
             auto result = VideoDecoderPtr(plugin.instance());
@@ -21,8 +21,8 @@ std::unique_ptr<AbstractVideoDecoder> VideoDecoderRegistry::createCompatibleDeco
                 result->setAllocator(plugin.allocator.get());
             return result;
         }
-	}
-	return VideoDecoderPtr(); //< no compatible decoder found
+    }
+    return VideoDecoderPtr(); //< no compatible decoder found
 }
 
 bool VideoDecoderRegistry::hasCompatibleDecoder(const CodecID codec, const QSize& resolution)

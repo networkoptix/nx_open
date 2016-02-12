@@ -29,7 +29,9 @@
 #include "camera/camera_thumbnail_cache.h"
 
 #include <nx/media/video_decoder_registry.h>
-#include <nx/media/ffmpeg_decoder.h>
+#include <nx/media/audio_decoder_registry.h>
+#include <nx/media/ffmpeg_video_decoder.h>
+#include <nx/media/ffmpeg_audio_decoder.h>
 #include <nx/media/android_decoder.h>
 #include <nx/media/jpeg_decoder.h>
 
@@ -48,7 +50,8 @@ void initDecoders(QQuickWindow *window)
     VideoDecoderRegistry::instance()->addPlugin<AndroidDecoder>(std::move(allocator));
 #endif
 #ifndef DISABLE_FFMPEG
-    VideoDecoderRegistry::instance()->addPlugin<FfmpegDecoder>();
+    VideoDecoderRegistry::instance()->addPlugin<FfmpegVideoDecoder>();
+    AudioDecoderRegistry::instance()->addPlugin<FfmpegAudioDecoder>();
 #endif
     VideoDecoderRegistry::instance()->addPlugin<JpegDecoder>();
 }

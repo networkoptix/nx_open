@@ -10,21 +10,23 @@
 #include "media_fwd.h"
 
 class QnArchiveStreamReader;
+class QAudioOutput;
 
 namespace nx {
 namespace media {
 class SeamlessVideoDecoder;
+class SeamlessAudioDecoder;
 
 /*
 * Private class used in nx::media::Player
 */
 class PlayerDataConsumer : public QnAbstractDataConsumer
 {
-	Q_OBJECT
-	typedef QnAbstractDataConsumer base_type;
+    Q_OBJECT
+    typedef QnAbstractDataConsumer base_type;
 public:
     PlayerDataConsumer(const std::unique_ptr<QnArchiveStreamReader>& archiveReader);
-	virtual ~PlayerDataConsumer();
+    virtual ~PlayerDataConsumer();
 
     QnVideoFramePtr dequeueVideoFrame();
     qint64 queueVideoDurationUsec() const;
@@ -33,7 +35,7 @@ signals:
     void hurryUp();
 
     /** New video frame is decoded and ready for rendering */
-	void gotVideoFrame();
+    void gotVideoFrame();
 
     /** End of archive reached */
     void onEOF();
@@ -42,25 +44,28 @@ private slots:
     void onJumpCanceled(qint64 timeUsec);
     void onJumpOccurred(qint64 timeUsec);
 protected:
-	virtual bool canAcceptData() const override;
-	virtual bool processData(const QnAbstractDataPacketPtr& data) override;
+    virtual bool canAcceptData() const override;
+    virtual bool processData(const QnAbstractDataPacketPtr& data) override;
     virtual void putData(const QnAbstractDataPacketPtr& data) override;
     
     /** Ask thread to stop. It's non blocking call. Thread will be stopped latter. */
     virtual void pleaseStop() override;
 private:
     bool processEmptyFrame(const QnEmptyMediaDataPtr& data);
-	bool processVideoFrame(const QnCompressedVideoDataPtr& data);
-	bool processAudioFrame(const QnCompressedAudioDataPtr& data);
+    bool processVideoFrame(const QnCompressedVideoDataPtr& data);
+    bool processAudioFrame(const QnCompressedAudioDataPtr& data);
 
     void enqueueVideoFrame(QnVideoFramePtr decodedFrame);
     int getBufferingMask() const;
 private:
-	std::unique_ptr<SeamlessVideoDecoder> m_decoder;
-			
+    std::unique_ptr<SeamlessVideoDecoder> m_videoDecoder;
+    std::unique_ptr<SeamlessAudioDecoder> m_audioDecoder;
+    std::unique_ptr<QAudioOutput> m_audioOutput;
+    QIODevice* m_audioIoDevice; //< QAudioOutput internal IO device
+            
     std::deque<QnVideoFramePtr> m_decodedVideo;
-	QnWaitCondition m_queueWaitCond;
-	QnMutex m_queueMutex;        //< sync with player thread
+    QnWaitCondition m_queueWaitCond;
+    QnMutex m_queueMutex;        //< sync with player thread
     QnMutex m_dataProviderMutex; //< sync with dataProvider thread
 
     int m_awaitJumpCounter; //< how many jump requests are queued

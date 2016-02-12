@@ -8,6 +8,11 @@ namespace nx {
 namespace media {
 
 class AbstractResourceAllocator;
+class AudioFrame;
+
+static const int kMediaAlignment = 32;
 
 }
 }
+
+typedef QSharedPointer<nx::media::AudioFrame> QnAudioFramePtr;

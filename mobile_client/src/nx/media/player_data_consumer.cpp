@@ -1,7 +1,11 @@
 #include <nx/streaming/archive_stream_reader.h>
 
+#include <QtMultimedia/QAudioOutput>
+
 #include "player_data_consumer.h"
 #include "seamless_video_decoder.h"
+#include "seamless_audio_decoder.h"
+#include "abstract_audio_decoder.h"
 #include "frame_metadata.h"
 
 namespace 
@@ -16,7 +20,9 @@ namespace media {
 
 PlayerDataConsumer::PlayerDataConsumer(const std::unique_ptr<QnArchiveStreamReader>& archiveReader):
     QnAbstractDataConsumer(kMaxMediaQueueLen),
-    m_decoder(new SeamlessVideoDecoder()),
+    m_videoDecoder(new SeamlessVideoDecoder()),
+    m_audioDecoder(new SeamlessAudioDecoder()),
+    m_audioIoDevice(nullptr),
     m_awaitJumpCounter(0),
     m_buffering(0),
     m_hurryUpToFrame(0),
@@ -35,7 +41,8 @@ PlayerDataConsumer::~PlayerDataConsumer()
 void PlayerDataConsumer::pleaseStop()
 {
     base_type::pleaseStop();
-    m_decoder->pleaseStop();
+    m_videoDecoder->pleaseStop();
+    m_audioDecoder->pleaseStop();
     m_queueWaitCond.wakeAll();
 
 }
@@ -110,44 +117,44 @@ bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& data)
     }
     if (displayImmediately)
     {
-        m_hurryUpToFrame = m_decoder->currentFrameNumber();
+        m_hurryUpToFrame = m_videoDecoder->currentFrameNumber();
         emit hurryUp(); //< hint to a player to avoid waiting for the currently displaying frame
     }
 
     QnVideoFramePtr decodedFrame;
-	if (!m_decoder->decode(data, &decodedFrame))
-	{
+    if (!m_videoDecoder->decode(data, &decodedFrame))
+    {
         qWarning() << Q_FUNC_INFO << "Can't decode video frame. Frame is skipped.";
-		return true; // false result means we want to repeat this frame latter
-	}
+        return true; // false result means we want to repeat this frame latter
+    }
 
     if (decodedFrame)
         enqueueVideoFrame(std::move(decodedFrame));
 
-	return true;
+    return true;
 }
 
 void PlayerDataConsumer::enqueueVideoFrame(QnVideoFramePtr decodedFrame)
 {
     Q_ASSERT(decodedFrame);
-	QnMutexLocker lock(&m_queueMutex);
-	while (m_decodedVideo.size() >= kMaxDecodedVideoQueueSize && !needToStop())
-		m_queueWaitCond.wait(&m_queueMutex);
-	if (needToStop())
-		return;
-	m_decodedVideo.push_back(std::move(decodedFrame));
-	lock.unlock();
-	emit gotVideoFrame();
+    QnMutexLocker lock(&m_queueMutex);
+    while (m_decodedVideo.size() >= kMaxDecodedVideoQueueSize && !needToStop())
+        m_queueWaitCond.wait(&m_queueMutex);
+    if (needToStop())
+        return;
+    m_decodedVideo.push_back(std::move(decodedFrame));
+    lock.unlock();
+    emit gotVideoFrame();
 }
 
 QnVideoFramePtr PlayerDataConsumer::dequeueVideoFrame()
 {
-	QnMutexLocker lock(&m_queueMutex);
-	if (m_decodedVideo.empty())
+    QnMutexLocker lock(&m_queueMutex);
+    if (m_decodedVideo.empty())
         return QnVideoFramePtr(); //< no data
     QnVideoFramePtr result = std::move(m_decodedVideo.front());
-	m_decodedVideo.pop_front();
-	lock.unlock();
+    m_decodedVideo.pop_front();
+    lock.unlock();
 
     FrameMetadata metadata = FrameMetadata::deserialize(result);
     if (metadata.frameNum <= m_hurryUpToFrame)
@@ -156,14 +163,35 @@ QnVideoFramePtr PlayerDataConsumer::dequeueVideoFrame()
         metadata.serialize(result);
     }
 
-	m_queueWaitCond.wakeAll();
-	return result;
+    m_queueWaitCond.wakeAll();
+    return result;
 }
 
-bool PlayerDataConsumer::processAudioFrame(const QnCompressedAudioDataPtr& /*data */)
+bool PlayerDataConsumer::processAudioFrame(const QnCompressedAudioDataPtr& data )
 {
-	// todo: implement me
-	return true;
+    QnAudioFramePtr decodedFrame;
+    if (!m_audioDecoder->decode(data, &decodedFrame))
+    {
+        qWarning() << Q_FUNC_INFO << "Can't decode audio frame. Frame is skipped.";
+        return true; // false result means we want to repeat this frame latter
+    }
+
+    if (!decodedFrame || !decodedFrame->context)
+        return true; //< just skip frame
+    
+    QnCodecAudioFormat audioFormat(decodedFrame->context);
+    if (!m_audioOutput || m_audioOutput->format() != audioFormat)
+    {
+        audioFormat.setCodec(lit("audio/pcm"));
+        m_audioOutput.reset(new QAudioOutput(audioFormat));
+        m_audioIoDevice = m_audioOutput->start();
+    }
+
+    if (!m_audioIoDevice)
+        return true; //< just skip frame
+
+    m_audioIoDevice->write((const char *)decodedFrame->data.data(), decodedFrame->data.size());
+    return true;
 }
 
 void PlayerDataConsumer::onBeforeJump(qint64 /* timeUsec */)

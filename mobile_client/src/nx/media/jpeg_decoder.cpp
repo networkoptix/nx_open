@@ -16,7 +16,7 @@ public:
 // ---------------------- JpegDecoder ----------------------
 
 JpegDecoder::JpegDecoder():
-	AbstractVideoDecoder(),
+    AbstractVideoDecoder(),
     d_ptr(new JpegDecoderPrivate())
 
 {
