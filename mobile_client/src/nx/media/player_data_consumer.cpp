@@ -180,9 +180,9 @@ bool PlayerDataConsumer::processAudioFrame(const QnCompressedAudioDataPtr& data 
         return true; //< just skip frame
     
     QnCodecAudioFormat audioFormat(decodedFrame->context);
+    audioFormat.setCodec(lit("audio/pcm"));
     if (!m_audioOutput || m_audioOutput->format() != audioFormat)
     {
-        audioFormat.setCodec(lit("audio/pcm"));
         m_audioOutput.reset(new QAudioOutput(audioFormat));
         m_audioIoDevice = m_audioOutput->start();
     }
