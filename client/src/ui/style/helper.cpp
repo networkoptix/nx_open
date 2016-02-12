@@ -81,6 +81,8 @@ namespace style
         case kBrang:
             return lit("brand");
         }
+
+        return QString();
     }
 
 }
