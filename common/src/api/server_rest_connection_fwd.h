@@ -7,7 +7,7 @@ namespace nx_http {
     class AsyncHttpClientPtr;
 };
 
-namespace rest 
+namespace rest
 {
     typedef qint64 Handle;
 

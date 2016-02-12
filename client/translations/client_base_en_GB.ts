@@ -7428,7 +7428,7 @@ If you understand this and would like to proceed please click Merge to continue.
     <message numerus="yes">
         <source>Could not save the following %n items to Server.</source>
         <translation type="unfinished">
-            <numerusform>Could not save the follwing %n items to server.</numerusform>
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -7564,7 +7564,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Update is strongly recommended.</source>
-        <translation>Update is recommended.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Release Notes</source>
@@ -7576,19 +7576,19 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>New version %1 is available.</source>
-        <translation type="unfinished">A newer version is available.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>A newer version is available.</source>
-        <translation type="unfinished">A newer version is available.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Update is recommended.</source>
-        <translation type="unfinished">Update is recommended.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Do not notify me again about this update.</source>
-        <translation type="unfinished">Do not notify me again about this update.</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

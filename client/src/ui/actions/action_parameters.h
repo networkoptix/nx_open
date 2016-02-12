@@ -51,7 +51,7 @@ public:
 
     QnActionParameters(const QnVideoWallItemIndexList &videoWallItems, const ArgumentHash &arguments = ArgumentHash());
 
-    QnActionParameters(const QnVideoWallMatrixIndexList &videoWallMatrices, const ArgumentHash &arguments = ArgumentHash());    
+    QnActionParameters(const QnVideoWallMatrixIndexList &videoWallMatrices, const ArgumentHash &arguments = ArgumentHash());
 
     QVariant items() const {
         return argument(-1);
@@ -80,7 +80,7 @@ public:
     QnResourceWidget *widget(int key = -1) const;
 
     template<class WidgetClass>
-    WidgetClass *widget(int key = -1) const { 
+    WidgetClass *widget(int key = -1) const {
         return dynamic_cast<WidgetClass *>(widget(key));
     }
 
@@ -93,6 +93,7 @@ public:
     QVariant argument(int key, const QVariant &defaultValue = QVariant()) const {
         return m_arguments.value(key, defaultValue);
     }
+
 
     template<class T>
     T argument(int key, const T &defaultValue = T()) const {
