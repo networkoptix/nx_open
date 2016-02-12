@@ -250,7 +250,7 @@ void QnTransactionTcpProcessor::run()
 
         QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(
             connectionGuid,
-            std::move(d->socket),
+            d->socket,
             requestedConnectionType,
             remotePeer,
             remoteSystemIdentityTime,
