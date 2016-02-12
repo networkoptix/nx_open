@@ -11,7 +11,6 @@
 #include <utils/common/delayed.h>
 #include <utils/common/model_functions.h>
 
-
 QnStatisticsSettingsWatcher::QnStatisticsSettingsWatcher(QObject *parent)
     : base_type(parent)
     , m_settings()

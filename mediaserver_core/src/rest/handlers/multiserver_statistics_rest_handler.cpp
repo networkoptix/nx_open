@@ -4,7 +4,7 @@
 #include <network/tcp_listener.h>
 #include <common/common_module.h>
 #include <utils/common/model_functions.h>
-#include <utils/network/http/asynchttpclient.h>
+#include <nx/network/http/asynchttpclient.h>
 #include <api/helpers/empty_request_data.h>
 #include <api/helpers/send_statistics_request_data.h>
 #include <rest/helpers/request_context.h>
@@ -185,7 +185,7 @@ nx_http::StatusCode::Value SettingsActionHandler::loadSettingsLocally(QnStatisti
     if (!server || !hasInternetConnection(server))
         return nx_http::StatusCode::noContent;
 
-    static const QUrl kSettingsUrl = QUrl::fromUserInput(lit("http://127.0.01:8080/stat/statistics.json")); //TODO: change me to correct
+    static const QUrl kSettingsUrl(lit("http://127.0.01:8080/stat/statistics.json")); //TODO: change me to correct
 
     nx_http::BufferType buffer;
     int statusCode = nx_http::StatusCode::noContent;
@@ -321,7 +321,7 @@ nx_http::StatusCode::Value SendStatisticsActionHandler::sendStatisticsLocally(
     if (!server || !hasInternetConnection(server))
         return nx_http::StatusCode::notAcceptable;
 
-    static const QUrl kStatisticsUrl = QUrl::fromUserInput(lit("http://10.0.3.163/statserver/api/save/clientSessions"));
+    static const QUrl kStatisticsUrl(lit("http://10.0.3.163/statserver/api/save/clientSessions"));
 
     auto httpCode = nx_http::StatusCode::notAcceptable;
     const auto error = nx_http::uploadDataSync(
