@@ -396,6 +396,8 @@
             </properties>
             <modules>
                 <module>client.core</module>
+                <module>client</module>
+                <module>client.bin</module>
                 <module>nx_cloud/cloud_db</module>
                 <module>nx_cloud/connection_mediator</module>
                 <module>nx_cloud/libcloud_db</module>
@@ -450,10 +452,7 @@
                 <module>traytool</module>
                 <!-- Vmaxproxy  module is disabled because we use already built version of vmax (vs2008 + qt4). We do so because vmaxproxy doesn't work if has been built on vs2012 -->
                 <!--<module>vmaxproxy</module>  -->
-                <module>client</module>
-                <module>client.core</module>
                 <module>nxtool</module>
-                <module>client.bin</module>
                 <module>wixsetup</module>
             </modules>
         </profile>
