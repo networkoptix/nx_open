@@ -10,10 +10,12 @@
 #include "media_fwd.h"
 
 class QnArchiveStreamReader;
+class QAudioOutput;
 
 namespace nx {
 namespace media {
 class SeamlessVideoDecoder;
+class SeamlessAudioDecoder;
 
 /*
 * Private class used in nx::media::Player
@@ -56,7 +58,10 @@ private:
     void enqueueVideoFrame(QnVideoFramePtr decodedFrame);
     int getBufferingMask() const;
 private:
-	std::unique_ptr<SeamlessVideoDecoder> m_decoder;
+	std::unique_ptr<SeamlessVideoDecoder> m_videoDecoder;
+    std::unique_ptr<SeamlessAudioDecoder> m_audioDecoder;
+    std::unique_ptr<QAudioOutput> m_audioOutput;
+    QIODevice* m_audioIoDevice; //< QAudioOutput internal IO device
 			
     std::deque<QnVideoFramePtr> m_decodedVideo;
 	QnWaitCondition m_queueWaitCond;

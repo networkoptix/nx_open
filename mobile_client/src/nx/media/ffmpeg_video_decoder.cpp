@@ -1,6 +1,6 @@
 #ifndef DISABLE_FFMPEG
 
-#include "ffmpeg_decoder.h"
+#include "ffmpeg_video_decoder.h"
 
 extern "C"
 {
@@ -15,10 +15,6 @@ extern "C"
 
 namespace nx {
 namespace media {
-
-namespace {
-    int kMediaAlignment = 32;
-}
 
 class InitFfmpegLib
 {
@@ -57,12 +53,12 @@ public:
 
 // ------------------------- FfmpegDecoderPrivate -------------------------
 
-class FfmpegDecoderPrivate : public QObject
+class FfmpegVideoDecoderPrivate : public QObject
 {
-	Q_DECLARE_PUBLIC(FfmpegDecoder)
-	FfmpegDecoder *q_ptr;
+	Q_DECLARE_PUBLIC(FfmpegVideoDecoder)
+	FfmpegVideoDecoder *q_ptr;
 public:
-	FfmpegDecoderPrivate():
+	FfmpegVideoDecoderPrivate():
 		codecContext(nullptr),
 		frame(avcodec_alloc_frame()),
 		scaleContext(nullptr),
@@ -70,7 +66,7 @@ public:
 	{
 	}
 
-	~FfmpegDecoderPrivate() { 
+	~FfmpegVideoDecoderPrivate() { 
 		closeCodecContext();
 		av_free(frame);
 		sws_freeContext(scaleContext);
@@ -86,7 +82,7 @@ public:
     QSize scaleContextSize;
 };
 
-void FfmpegDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr& frame)
+void FfmpegVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr& frame)
 {
 	if (!frame)
 		return;
@@ -104,7 +100,7 @@ void FfmpegDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr& fram
 	}
 }
 
-void FfmpegDecoderPrivate::closeCodecContext()
+void FfmpegVideoDecoderPrivate::closeCodecContext()
 {
 	QnFfmpegHelper::deleteAvCodecContext(codecContext);
 	codecContext = 0;
@@ -112,28 +108,28 @@ void FfmpegDecoderPrivate::closeCodecContext()
 
 // ---------------------- FfmpegDecoder ----------------------
 
-FfmpegDecoder::FfmpegDecoder():
+FfmpegVideoDecoder::FfmpegVideoDecoder():
 	AbstractVideoDecoder(),
-	d_ptr(new FfmpegDecoderPrivate())
+	d_ptr(new FfmpegVideoDecoderPrivate())
 
 {
 	static InitFfmpegLib init;
 }
 
-FfmpegDecoder::~FfmpegDecoder()
+FfmpegVideoDecoder::~FfmpegVideoDecoder()
 {
 }
 
-bool FfmpegDecoder::isCompatible(const CodecID codec, const QSize& resolution)
+bool FfmpegVideoDecoder::isCompatible(const CodecID codec, const QSize& resolution)
 {
     Q_UNUSED(codec);
     Q_UNUSED(resolution)
 	return true;
 }
 
-int FfmpegDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QnVideoFramePtr* result)
+int FfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QnVideoFramePtr* result)
 {
-	Q_D(FfmpegDecoder);
+	Q_D(FfmpegVideoDecoder);
 
 	if (!d->codecContext) 
 	{
@@ -155,6 +151,8 @@ int FfmpegDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QnVideoFra
 		//  It's already guaranteed by QnByteArray there is an extra space reserved. We must fill padding bytes according to ffmpeg documentation
 		if (avpkt.data)
 			memset(avpkt.data + avpkt.size, 0, FF_INPUT_BUFFER_PADDING_SIZE);
+
+        d->lastPts = frame->timestamp;
 	}
 	else 
 	{
@@ -174,9 +172,9 @@ int FfmpegDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QnVideoFra
 	return d->frame->coded_picture_number;
 }
 
-void FfmpegDecoder::ffmpegToQtVideoFrame(QnVideoFramePtr* result)
+void FfmpegVideoDecoder::ffmpegToQtVideoFrame(QnVideoFramePtr* result)
 {
-    Q_D(FfmpegDecoder);
+    Q_D(FfmpegVideoDecoder);
 
     QSize size(d->frame->width, d->frame->height);
     if (size != d->scaleContextSize)
