@@ -149,11 +149,14 @@
             PrintSupport, MultimediaWidgets, Quick, MultimediaQuick_p, Qml, Positioning, Sensors,
             XmlPatterns
         </qtlibs>
+        <additional.qtlibs/>
 
         <!--QT plugins used-->
         <qtplugins>
             imageformats, platforms
         </qtplugins>
+        <additional.qtplugins/>
+
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
@@ -353,7 +356,7 @@
                 <!--<module>unit_tests/traytool_ut</module>-->
             </modules>
         </profile>
-       <profile>
+        <profile>
             <id>nomac-nomobile</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
@@ -392,7 +395,7 @@
                 </property>
             </activation>
             <properties>
-                <qtlib19>DBus</qtlib19>
+                <additional.qtlibs>DBus</additional.qtlibs>
             </properties>
             <modules>
                 <module>client.core</module>
@@ -864,6 +867,7 @@
             <properties>
                 <qt.version>5.6.0</qt.version>
                 <compile.options/>
+                <additional.qtplugins>audio</additional.qtplugins>
             </properties>
             <modules>
                 <module>client.core</module>

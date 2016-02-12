@@ -6,6 +6,7 @@
 #include <utils/common/systemerror.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/user_resource.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 
 template<typename Context, typename RequestFunc>
