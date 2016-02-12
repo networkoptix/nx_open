@@ -212,6 +212,7 @@ PasswordHelper::PasswordHelper()
     setPasswordInfo(DEFAULT_MANUFACTURER, "root", "admin");
     setPasswordInfo(DEFAULT_MANUFACTURER, "root", "pass");
     setPasswordInfo(DEFAULT_MANUFACTURER, "admin", "pass");
+    setPasswordInfo(DEFAULT_MANUFACTURER, "admin", "");
 
 }
 
