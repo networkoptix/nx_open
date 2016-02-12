@@ -381,7 +381,7 @@ namespace nx_http
     typedef std::function<void (SystemError::ErrorCode, int httpStatus)> UploadCompletionHandler;
 
     // Uploads specified data using POST
-    bool uploadDataAsync(const QUrl &url
+    void uploadDataAsync(const QUrl &url
         , const QByteArray &data
         , const QByteArray &contentType
         , const nx_http::HttpHeaders &extraHeaders

@@ -3,12 +3,14 @@
 
 #include <QtCore/QTimer>
 
+#include <nx/network/http/asynchttpclient.h>
+
+#include <api/server_rest_connection.h>
+#include <common/common_module.h>
+#include <core/resource/media_server_resource.h>
 #include <utils/common/delayed.h>
 #include <utils/common/model_functions.h>
-#include <utils/network/http/asynchttpclient.h>
-#include <common/common_module.h>
-#include <api/server_rest_connection.h>
-#include <core/resource/media_server_resource.h>
+
 
 QnStatisticsSettingsWatcher::QnStatisticsSettingsWatcher(QObject *parent)
     : base_type(parent)

@@ -4,7 +4,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QPointer>
 
-#include <utils/common/singleton.h>
+#include <nx/utils/singleton.h>
 #include <utils/common/connective.h>
 #include <statistics/statistics_fwd.h>
 #include <api/server_rest_connection_fwd.h>

@@ -1047,7 +1047,7 @@ namespace nx_http
         return resultingErrorCode;
     }
 
-    bool uploadDataAsync(const QUrl &url
+    void uploadDataAsync(const QUrl &url
         , const QByteArray &data
         , const QByteArray &contentType
         , const nx_http::HttpHeaders &extraHeaders
@@ -1079,13 +1079,7 @@ namespace nx_http
         QObject::connect(httpClientHolder.get(), &nx_http::AsyncHttpClient::done,
             httpClientHolder.get(), completionFunc, Qt::DirectConnection);
 
-        if( !httpClientHolder->doPost(url, contentType, data))
-        {
-            // To destroy http client
-            httpClientHolder->disconnect(nullptr, static_cast<const char *>(nullptr));
-            return false;
-        }
-        return true;
+        httpClientHolder->doPost(url, contentType, data);
     }
 
     SystemError::ErrorCode uploadDataSync(const QUrl &url
@@ -1115,11 +1109,7 @@ namespace nx_http
             waiter.notify_all();
         };
 
-        const bool uploadStarted = uploadDataAsync(url, data, contentType
-            , nx_http::HttpHeaders(), callback);
-
-        if(!uploadStarted)
-            return SystemError::getLastOSErrorCode();
+        uploadDataAsync(url, data, contentType, nx_http::HttpHeaders(), callback);
 
         std::unique_lock<std::mutex> guard(mutex);
         while(!done)
