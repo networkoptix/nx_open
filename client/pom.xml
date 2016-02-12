@@ -129,7 +129,7 @@
                 </property>
             </activation>
             <properties>
-                <qt.libs>core gui network opengl xml sql multimedia concurrent webkit webkitwidgets</qt.libs>
+                <qt.libs>core gui network opengl xml sql multimedia concurrent</qt.libs>
             </properties>
         </profile>
         <profile>
