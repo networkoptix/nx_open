@@ -26,6 +26,7 @@
 #include <ui/models/license_list_model.h>
 #include <ui/dialogs/license_details_dialog.h>
 #include <ui/dialogs/message_box.h>
+#include <ui/widgets/snapped_scrollbar.h>
 
 #include <utils/license_usage_helper.h>
 #include <utils/serialization/json_functions.h>
@@ -38,6 +39,9 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     m_httpClient(NULL)
 {
     ui->setupUi(this);
+
+    QnSnappedScrollBar *tableScrollBar = new QnSnappedScrollBar(this);
+    ui->gridLicenses->setVerticalScrollBar(tableScrollBar->proxyScrollBar());
 
     QList<QnLicenseListModel::Column> columns;
     columns 

@@ -7,14 +7,11 @@
 #include <core/resource/user_resource.h>
 
 #include <utils/common/app_info.h>
+#include <utils/common/string.h>
+#include <helpers/cloud_url_helper.h>
 
 #include <ui/dialogs/link_to_cloud_dialog.h>
 #include <ui/dialogs/unlink_from_cloud_dialog.h>
-
-namespace
-{
-    const QString kAboutUrlPath = lit("/static/index.html#/about/cloud");
-}
 
 class QnCloudManagementWidgetPrivate : public QObject
 {
@@ -27,13 +24,13 @@ public:
 
     void at_linkButton_clicked();
     void at_unlinkButton_clicked();
-    void at_goToCloudButton_clicked();
 
     void updateUi();
 };
 
 QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent)
     : base_type(parent)
+    , QnWorkbenchContextAware(parent)
     , ui(new Ui::CloudManagementWidget)
     , d_ptr(new QnCloudManagementWidgetPrivate(this))
 {
@@ -41,17 +38,14 @@ QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent)
 
     // TODO: #help Set help topic
 
-    ui->learnMoreLabel->setText(
-            lit("<a href=\"%2\">%1</a>")
-                .arg(tr("Learn more about %1").arg(QnAppInfo::cloudName()))
-                .arg(QnAppInfo::cloudPortalUrl() + kAboutUrlPath)
-    );
+    ui->learnMoreLabel->setText(makeHref(tr("Learn more about %1").arg(QnAppInfo::cloudName()),
+                                         QnCloudUrlHelper::aboutUrl()));
 
     Q_D(QnCloudManagementWidget);
 
     connect(ui->linkButton,         &QPushButton::clicked,  d,  &QnCloudManagementWidgetPrivate::at_linkButton_clicked);
     connect(ui->unlinkButton,       &QPushButton::clicked,  d,  &QnCloudManagementWidgetPrivate::at_unlinkButton_clicked);
-    connect(ui->goToCloudButton,    &QPushButton::clicked,  d,  &QnCloudManagementWidgetPrivate::at_goToCloudButton_clicked);
+    connect(ui->goToCloudButton,    &QPushButton::clicked,  action(Qn::OpenCloudMainUrl),   &QAction::trigger);
 
     if (QnUserResourcePtr admin = qnResPool->getAdministrator())
     {
@@ -109,11 +103,6 @@ void QnCloudManagementWidgetPrivate::at_unlinkButton_clicked()
     Q_Q(QnCloudManagementWidget);
     QScopedPointer<QnUnlinkFromCloudDialog> dialog(new QnUnlinkFromCloudDialog(q));
     dialog->exec();
-}
-
-void QnCloudManagementWidgetPrivate::at_goToCloudButton_clicked()
-{
-    QDesktopServices::openUrl(QUrl(QnAppInfo::cloudPortalUrl()));
 }
 
 void QnCloudManagementWidgetPrivate::updateUi()

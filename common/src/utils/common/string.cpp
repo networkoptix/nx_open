@@ -514,6 +514,11 @@ QString htmlFormattedParagraph( const QString &text , int pixelSize , bool isBol
     return kPTag.arg(QString::number(pixelSize), boldValue, italicValue, newFormattedText);
 }
 
+QString makeHref(const QString &text, const QUrl &url)
+{
+    return lit("<a href=\"%2\">%1</a>").arg(text, url.toString());
+}
+
 QString elideHtml(const QString &html, int maxLength, const QString &tail)
 {
     QDomDocument dom;

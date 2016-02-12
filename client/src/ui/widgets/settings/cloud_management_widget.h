@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ui/widgets/settings/abstract_preferences_widget.h>
+#include <ui/workbench/workbench_context_aware.h>
 #include <utils/common/connective.h>
 
 namespace Ui
@@ -10,7 +11,7 @@ namespace Ui
 
 class QnCloudManagementWidgetPrivate;
 
-class QnCloudManagementWidget: public Connective<QnAbstractPreferencesWidget>
+class QnCloudManagementWidget: public Connective<QnAbstractPreferencesWidget>, QnWorkbenchContextAware
 {
     Q_OBJECT
     typedef Connective<QnAbstractPreferencesWidget> base_type;

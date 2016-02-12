@@ -1,8 +1,6 @@
 #ifndef __QN_ABSTRACT_MOTION_ARCHIVE_H__
 #define __QN_ABSTRACT_MOTION_ARCHIVE_H__
 
-#ifdef ENABLE_DATA_PROVIDERS
-
 #include "nx/streaming/media_data_packet.h"
 
 class QnAbstractMotionArchiveConnection
@@ -24,7 +22,5 @@ public:
 };
 
 typedef QSharedPointer<QnAbstractMotionConnectionFactory> QnAbstractMotionConnectionFactoryPtr;
-
-#endif // ENABLE_DATA_PROVIDERS
 
 #endif // __QN_ABSTRACT_MOTION_ARCHIVE_H__

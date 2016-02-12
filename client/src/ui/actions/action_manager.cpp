@@ -32,6 +32,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/scoped_value_rollback.h>
+#include <utils/common/app_info.h>
 
 namespace {
     void copyIconPixmap(const QIcon &src, QIcon::Mode mode, QIcon::State state, QIcon *dst) {
@@ -919,6 +920,22 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Bookmark Search...")).
         shortcut(tr("Ctrl+B")).
         autoRepeat(false);
+
+    factory(Qn::LoginToCLoud).
+        flags(Qn::NoTarget).
+        text(tr("Login to Cloud..."));
+
+    factory(Qn::LogoutFromCloud).
+        flags(Qn::NoTarget).
+        text(tr("Logout"));
+
+    factory(Qn::OpenCloudMainUrl).
+        flags(Qn::NoTarget).
+        text(tr("Go to %1...").arg(QnAppInfo::cloudName()));
+
+    factory(Qn::OpenCloudManagementUrl).
+        flags(Qn::NoTarget).
+        text(tr("Manage account..."));
 
     factory().
         flags(Qn::Main).
@@ -1923,6 +1940,8 @@ void QnActionManager::registerAction(QnAction *action) {
 
     m_actionById[action->id()] = action;
     m_idByAction[action] = action->id();
+
+    emit actionRegistered(action->id());
 }
 
 void QnActionManager::registerAlias(Qn::ActionId id, Qn::ActionId targetId) {

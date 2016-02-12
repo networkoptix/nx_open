@@ -29,6 +29,7 @@
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/skin.h>
 #include <ui/style/warning_style.h>
+#include <ui/widgets/snapped_scrollbar.h>
 
 #include <ui/workbench/workbench_context.h>
 #include <ui/workaround/widgets_signals_workaround.h>
@@ -130,6 +131,9 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
     ui->refreshButton->setIcon(qnSkin->icon("refresh.png"));
     ui->eventRulesButton->setIcon(qnSkin->icon("tree/layout.png"));
     ui->loadingProgressBar->hide();
+
+    QnSnappedScrollBar *scrollBar = new QnSnappedScrollBar(this);
+    ui->gridEvents->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
     connect(m_filterAction,         &QAction::triggered,                this,   &QnEventLogDialog::at_filterAction_triggered);
     connect(m_resetFilterAction,    &QAction::triggered,                this,   &QnEventLogDialog::at_resetFilterAction_triggered);
@@ -309,7 +313,7 @@ void QnEventLogDialog::updateHeaderWidth()
     if (ui->dateEditFrom->width() == 0)
         return;
 
-    int space = ui->mainGridLayout->horizontalSpacing();
+    int space = ui->mainGridLayout->spacing();
     int offset = 0; // ui->gridEvents->verticalHeader()->sizeHint().width();
     space--; // grid line delimiter
     ui->gridEvents->horizontalHeader()->resizeSection(0, ui->dateEditFrom->width() + ui->dateEditTo->width() + ui->delimLabel->width() + space - offset);

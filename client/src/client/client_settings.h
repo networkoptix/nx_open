@@ -156,6 +156,9 @@ public:
 
         CDB_ENDPOINT,
 
+        CLOUD_LOGIN,
+        CLOUD_PASSWORD,
+
         VARIABLE_COUNT
     };
 
@@ -252,6 +255,8 @@ private:
         QN_DECLARE_RW_PROPERTY(QString,                     logLevel,               setLogLevel,                LOG_LEVEL,                  QLatin1String("none"))
         QN_DECLARE_RW_PROPERTY(QString,                     ec2TranLogLevel,        setEc2TranLogLevel,         EC2_TRAN_LOG_LEVEL,         QLatin1String("none"))
         QN_DECLARE_RW_PROPERTY(QString,                     cdbEndpoint,            setCdbEndpoint,             CDB_ENDPOINT,               QString())
+        QN_DECLARE_RW_PROPERTY(QString,                     cloudLogin,             setCloudLogin,              CLOUD_LOGIN,                QString())
+        QN_DECLARE_RW_PROPERTY(QString,                     cloudPassword,          setCloudPassword,           CLOUD_PASSWORD,             QString())
     QN_END_PROPERTY_STORAGE()
 
 private:

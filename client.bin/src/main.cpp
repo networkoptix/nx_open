@@ -389,7 +389,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QApplication::setQuitOnLastWindowClosed(true);
     QApplication::setWindowIcon(qnSkin->icon("window_icon.png"));
 
-    QApplication::setStyle(skin->newStyle()); // TODO: #Elric here three qWarning's are issued (bespin bug), qnDeleteLater with null receiver
+    QApplication::setStyle(skin->newStyle(customizer->genericPalette())); // TODO: #Elric here three qWarning's are issued (bespin bug), qnDeleteLater with null receiver
 #ifdef Q_OS_MACX
     application->setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 #endif
@@ -485,6 +485,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     /* Create workbench context. */
     QScopedPointer<QnWorkbenchContext> context(new QnWorkbenchContext(qnResPool));
+
     context->instance<QnFglrxFullScreen>(); /* Init fglrx workaround. */
 
     Qn::ActionId effectiveMaximizeActionId = Qn::FullscreenAction;

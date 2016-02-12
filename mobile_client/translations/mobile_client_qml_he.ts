@@ -10,7 +10,7 @@
     <message numerus="yes">
         <source>%n cameras are hidden</source>
         <translation>
-            <numerusform>%n מצלמות מוסתרות</numerusform>
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>

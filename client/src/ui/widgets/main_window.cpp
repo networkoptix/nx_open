@@ -52,6 +52,7 @@
 #include <ui/workbench/handlers/workbench_incompatible_servers_action_handler.h>
 #include <ui/workbench/handlers/workbench_resources_settings_handler.h>
 #include <ui/workbench/handlers/workbench_alarm_layout_handler.h>
+#include <ui/workbench/handlers/workbench_cloud_handler.h>
 #include <ui/workbench/handlers/workbench_webpage_handler.h>
 
 #include <ui/workbench/watchers/workbench_user_inactivity_watcher.h>
@@ -64,8 +65,8 @@
 #include <ui/workbench/watchers/workbench_server_safemode_watcher.h>
 #include <ui/workbench/watchers/workbench_bookmark_tags_watcher.h>
 #include <ui/workbench/watchers/workbench_bookmarks_watcher.h>
-#include <ui/workbench/watchers/workbench_items_watcher.h>
 #include <ui/workbench/watchers/timeline_bookmarks_watcher.h>
+#include <ui/workbench/watchers/current_layout_items_watcher.h>
 #include <ui/workbench/watchers/current_user_available_cameras_watcher.h>
 #include <ui/workbench/watchers/workbench_item_bookmarks_watcher.h>
 
@@ -81,6 +82,8 @@
 #include <ui/workbench/workbench_resource.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 
+#include <ui/widgets/cloud_status_panel.h>
+
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
 #include <ui/style/noptix_style.h>
@@ -91,6 +94,7 @@
 
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
+#include <client/client_message_processor.h>
 
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/screen_manager.h>
@@ -99,8 +103,8 @@
 #include "layout_tab_bar.h"
 #include "dwm.h"
 
-namespace {
-
+namespace
+{
     QToolButton *newActionButton(QAction *action, bool popup = false, qreal sizeMultiplier = 1.0, int helpTopicId = Qn::Empty_Help) {
         QToolButton *button = new QToolButton();
         button->setDefaultAction(action);
@@ -265,6 +269,8 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     context->instance<QnWorkbenchResourcesSettingsHandler>();
     context->instance<QnWorkbenchBookmarksHandler>();
     context->instance<QnWorkbenchAlarmLayoutHandler>();
+    context->instance<QnWorkbenchCloudHandler>();
+
     context->instance<QnWorkbenchLayoutAspectRatioWatcher>();
     context->instance<QnWorkbenchPtzDialogWatcher>();
     context->instance<QnWorkbenchSystemNameWatcher>();
@@ -272,7 +278,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     context->instance<QnWorkbenchResourcesChangesWatcher>();
     context->instance<QnWorkbenchServerSafemodeWatcher>();
     context->instance<QnWorkbenchBookmarkTagsWatcher>();
-    context->instance<QnWorkbenchItemsWatcher>();
+    context->instance<QnCurrentLayoutItemsWatcher>();
     context->instance<QnWorkbenchItemBookmarksWatcher>();
     context->instance<QnWorkbenchBookmarksWatcher>();
     context->instance<QnTimelineBookmarksWatcher>();
@@ -354,6 +360,8 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     tabBarLayout->addWidget(newActionButton(action(Qn::OpenCurrentUserLayoutMenu), true));
     tabBarLayout->addStretch(0x1000);
 
+    QnCloudStatusPanel *cloudPanel = new QnCloudStatusPanel(context, this);
+
     /* Layout for window buttons that can be removed from the title bar. */
     m_windowButtonsLayout = new QHBoxLayout();
     m_windowButtonsLayout->setContentsMargins(4, 0, 2, 0);
@@ -373,6 +381,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_titleLayout->setSpacing(2);
     m_titleLayout->addWidget(m_mainMenuButton);
     m_titleLayout->addWidget(tabBarWidget, 0x1000, Qt::AlignBottom);
+    m_titleLayout->addWidget(cloudPanel);
     if (QnScreenRecorder::isSupported())
         m_titleLayout->addWidget(newActionButton(action(Qn::ToggleScreenRecordingAction), false, 1.0, Qn::MainWindow_ScreenRecording_Help));
     m_titleLayout->addWidget(newActionButton(action(Qn::OpenLoginDialogAction), false, 1.0, Qn::Login_Help));

@@ -131,6 +131,8 @@ void QnWorkbenchUpdateWatcher::at_checker_updateAvailable(const QnUpdateInfo &in
 
 void QnWorkbenchUpdateWatcher::showUpdateNotification(const QnUpdateInfo &info)
 {
+    m_notifiedVersion = info.currentRelease;
+
     QnSoftwareVersion current = qnCommon->engineVersion();
     bool majorVersionChange = info.currentRelease.major() > current.major() || info.currentRelease.minor() > current.minor();
 
@@ -206,6 +208,4 @@ void QnWorkbenchUpdateWatcher::showUpdateNotification(const QnUpdateInfo &info)
         action(Qn::SystemUpdateAction)->trigger();
     else
         qnSettings->setIgnoredUpdateVersion(messageBox.isChecked() ? info.currentRelease : QnSoftwareVersion());
-
-    m_notifiedVersion = info.currentRelease;
 }

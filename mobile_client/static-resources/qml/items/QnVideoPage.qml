@@ -23,8 +23,8 @@ QnPage {
         property var videoNavigation: navigationLoader.item
         readonly property bool serverOffline: connectionManager.connectionState == QnConnectionManager.Connecting ||
                                               connectionManager.connectionState == QnConnectionManager.Disconnected
-        readonly property bool cameraOffline: player.atLive && player.resourceHelper.resourceStatus == QnMediaResourceHelper.Offline
-        readonly property bool cameraUnauthorized: player.atLive && player.resourceHelper.resourceStatus == QnMediaResourceHelper.Unauthorized
+        readonly property bool cameraOffline: player.liveMode && resourceHelper.resourceStatus == QnMediaResourceHelper.Offline
+        readonly property bool cameraUnauthorized: player.liveMode && resourceHelper.resourceStatus == QnMediaResourceHelper.Unauthorized
         readonly property bool failed: player.failed
 
         property bool showOfflineStatus: false
@@ -84,7 +84,7 @@ QnPage {
 
                 if (Qt.application.state != Qt.ApplicationActive) {
                     if (!d.videoNavigation.paused) {
-                        d.resumeAtLive = player.atLive
+                        d.resumeAtLive = player.liveMode
                         d.resumeOnActivate = true
                         d.videoNavigation.paused = true
                     }
@@ -92,7 +92,7 @@ QnPage {
                 } else if (Qt.application.state == Qt.ApplicationActive) {
                     if (d.resumeOnActivate) {
                         if (d.resumeAtLive)
-                            player.resourceHelper.updateUrl()
+                            resourceHelper.updateUrl()
                         d.videoNavigation.paused = false
                         d.resumeOnActivate = false
                         d.resumeAtLive = false
@@ -100,6 +100,11 @@ QnPage {
                 }
             }
         }
+    }
+
+    QnMediaResourceHelper {
+        id: resourceHelper
+        resourceId: player.resourceId
     }
 
     Rectangle {
@@ -118,7 +123,7 @@ QnPage {
         anchors.bottom: parent.top
         backgroundOpacity: 0.0
 
-        title: player.resourceName
+        title: resourceHelper.resourceName
 
         QnMenuBackButton {
             x: dp(10)
@@ -141,35 +146,22 @@ QnPage {
 
     QnCameraMenu {
         id: cameraMenu
-        currentQuality: player.resourceHelper.resolution
+        currentQuality: resourceHelper.resolution
         onSelectQuality: qualityDialog.show()
     }
 
     QnQualityDialog {
         id: qualityDialog
-        resolutionList: player.resourceHelper.resolutions
-        currentResolution: player.resourceHelper.resolution
+        resolutionList: resourceHelper.resolutions
+        currentResolution: resourceHelper.resolution
         onQualityPicked: {
             player.pause()
-            player.resourceHelper.resolution = resolution
+            resourceHelper.resolution = resolution
             player.seek(player.position)
             if (!d.videoNavigation.paused)
                 player.play()
         }
         onHidden: videoPlayer.forceActiveFocus()
-    }
-
-    QnActiveCameraThumbnailLoader {
-        id: thumbnailLoader
-        resourceId: videoPlayer.resourceId
-        Component.onCompleted: initialize(parent)
-    }
-
-    Binding {
-        target: thumbnailLoader
-        property: "position"
-        value: d.videoNavigation.timelinePosition
-        when: d.videoNavigation.timelineDragging && !d.videoNavigation.timelineAtLive
     }
 
     QnScalableVideo {
@@ -182,35 +174,16 @@ QnPage {
         anchors.bottomMargin: -navigationBarPlaceholder.realHeight
         anchors.rightMargin: -navigationBarPlaceholder.realWidth
 
-        source: player.mediaPlayer
+        source: player
         screenshotSource: initialResourceScreenshot
-        aspectRatio: screenshotSource == initialResourceScreenshot ? player.resourceHelper.rotatedAspectRatio : player.resourceHelper.aspectRatio
-        videoRotation: screenshotSource == initialResourceScreenshot ? 0 : player.resourceHelper.rotation
+        aspectRatio: screenshotSource == initialResourceScreenshot ? resourceHelper.rotatedAspectRatio : resourceHelper.aspectRatio
+        videoRotation: screenshotSource == initialResourceScreenshot ? 0 : resourceHelper.rotation
 
         onClicked: {
             if (navigationLoader.visible)
                 hideUi()
             else
                 showUi()
-        }
-
-        function clearScreenshotSource() {
-            screenshotDelay.stop()
-            screenshotSource = ""
-        }
-
-        function bindScreenshotSource() {
-            screenshotSource = Qt.binding(function(){ return thumbnailLoader.thumbnailUrl })
-        }
-
-        function bindScreenshotSourceDelayed() {
-            screenshotDelay.start()
-        }
-
-        Timer {
-            id: screenshotDelay
-            interval: 150
-            onTriggered: video.bindScreenshotSource()
         }
     }
 
@@ -302,25 +275,7 @@ QnPage {
 
         onPlayingChanged: {
             if (playing)
-                video.clearScreenshotSource()
-        }
-
-        onLoadingChanged: {
-            if (!loading)
-                return
-
-            video.bindScreenshotSourceDelayed()
-            thumbnailLoader.forceLoadThumbnail(player.position)
-        }
-
-        onTimelinePositionRequest: {
-            if (player.playing) {
-                video.clearScreenshotSource()
-                return
-            }
-
-            video.bindScreenshotSourceDelayed()
-            thumbnailLoader.forceLoadThumbnail(player.position)
+                video.screenshotSource = ""
         }
 
         Component.onCompleted: player.playLive()
@@ -355,13 +310,6 @@ QnPage {
         QnVideoNavigation {
             id: videoNavigation
             mediaPlayer: player
-
-            onTimelineDraggingChanged: {
-                if (timelineDragging)
-                    video.bindScreenshotSource()
-                else if (player.playing)
-                    video.clearScreenshotSource()
-            }
 
             onPausedChanged: {
                 setKeepScreenOn(!paused)

@@ -15,8 +15,6 @@
 #include <utils/media/nalUnits.h>
 #include <nx/streaming/rtsp_client.h>
 
-const unsigned int MAX_ALLOWED_FRAME_SIZE = 1024*1024*10;
-
 class CLH264RtpParser: public QnRtpVideoStreamParser
 {
 public:
