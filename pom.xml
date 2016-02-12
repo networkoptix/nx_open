@@ -419,6 +419,7 @@
                 <bespin.version>1.2-windows-SNAPSHOT</bespin.version>
                 <qt.spec>win32-msvc2015</qt.spec>
                 <PlatformToolSet>v140_xp</PlatformToolSet>
+                <VCVars>VS140COMNTOOLS</VCVars>
                 <modification>winxp</modification>
 
                 <profile.classifier>${platform}</profile.classifier>
