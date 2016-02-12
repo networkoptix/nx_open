@@ -24,6 +24,8 @@ namespace cloud {
 
 /** Establishes cross-nat connection to the specified host using UDP hole punching technique.
     \note One instance can keep only one session
+    \note Can be safely freed within connect handler. 
+        Otherwise, \a UdpHolePunchingTunnelConnector::pleaseStop is required
  */
 class NX_NETWORK_API UdpHolePunchingTunnelConnector
 :
@@ -32,6 +34,7 @@ class NX_NETWORK_API UdpHolePunchingTunnelConnector
 {
 public:
     UdpHolePunchingTunnelConnector(AddressEntry targetHostAddress);
+    virtual ~UdpHolePunchingTunnelConnector();
 
     virtual void pleaseStop(std::function<void()> handler) override;
 
@@ -47,12 +50,12 @@ public:
 private:
     const AddressEntry m_targetHostAddress;
     const nx::String m_connectSessionId;
-    nx::hpm::api::MediatorClientUdpConnection m_mediatorUdpClient;
+    std::unique_ptr<nx::hpm::api::MediatorClientUdpConnection> m_mediatorUdpClient;
     std::function<void(
         SystemError::ErrorCode errorCode,
         std::unique_ptr<AbstractTunnelConnection>)> m_completionHandler;
     boost::optional<SocketAddress> m_targetHostUdpAddress;
-    stun::UnreliableMessagePipeline m_udpPipeline;
+    std::unique_ptr<stun::UnreliableMessagePipeline> m_udpPipeline;
     std::unique_ptr<UdtStreamSocket> m_udtConnection;
 
     /** implementation of \a UnreliableMessagePipelineEventHandler::messageReceived */
