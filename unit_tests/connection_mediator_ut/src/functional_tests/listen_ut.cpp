@@ -12,7 +12,8 @@
 #include <listening_peer_pool.h>
 
 #include <test_support/mediaserver_emulator.h>
-#include <test_support/mediator_functional_test.h>
+
+#include "functional_tests/mediator_functional_test.h"
 
 
 namespace nx {

@@ -9,8 +9,6 @@
 #include <future>
 #include <vector>
 
-#include <gtest/gtest.h>
-
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 
@@ -28,8 +26,6 @@ namespace nx {
 namespace hpm {
 
 class MediatorFunctionalTest
-:
-    public ::testing::Test
 {
 public:
     //!Calls \a start
@@ -37,8 +33,8 @@ public:
     ~MediatorFunctionalTest();
 
     void start();
-    void startAndWaitUntilStarted();
-    void waitUntilStarted();
+    bool startAndWaitUntilStarted();
+    bool waitUntilStarted();
     void stop();
     //!restarts process
     void restart();

@@ -5,8 +5,6 @@
 
 #include "mediator_functional_test.h"
 
-#include <gtest/gtest.h>
-
 #include <chrono>
 #include <functional>
 #include <future>
@@ -75,29 +73,33 @@ void MediatorFunctionalTest::start()
     mediatorInstantiatedCreatedFuture.wait();
 }
 
-void MediatorFunctionalTest::startAndWaitUntilStarted()
+bool MediatorFunctionalTest::startAndWaitUntilStarted()
 {
     start();
-    waitUntilStarted();
+    return waitUntilStarted();
 }
 
-void MediatorFunctionalTest::waitUntilStarted()
+bool MediatorFunctionalTest::waitUntilStarted()
 {
     static const std::chrono::seconds INITIALIZED_MAX_WAIT_TIME(15);
 
     const auto endClock = std::chrono::steady_clock::now() + INITIALIZED_MAX_WAIT_TIME;
     for (;;)
     {
-        ASSERT_TRUE(std::chrono::steady_clock::now() < endClock);
-
-        ASSERT_NE(
-            std::future_status::ready,
-            m_mediatorProcessFuture.wait_for(std::chrono::seconds(0)));
+        if (std::chrono::steady_clock::now() >= endClock)
+            return false;
+        if (m_mediatorProcessFuture.wait_for(std::chrono::seconds(0)) ==
+            std::future_status::ready)
+        {
+            return false;
+        }
 
         auto socket = SocketFactory::createStreamSocket(false, SocketFactory::NatTraversalType::nttDisabled);
         if (socket->connect(endpoint(), INITIALIZED_MAX_WAIT_TIME/5))
             break;
     }
+
+    return true;
 }
 
 void MediatorFunctionalTest::stop()
