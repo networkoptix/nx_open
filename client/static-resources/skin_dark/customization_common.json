@@ -154,6 +154,18 @@
         }
     },
 
+    "QListView": {
+        "palette": {
+            "default": {
+                "base":             "dark4"
+            },
+            "disabled": {
+                "base":             "dark4.setAlpha(75)"
+            }
+        }
+    },
+
+
     "QnPanel": {
         "palette": {
             "default": {

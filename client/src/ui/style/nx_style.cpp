@@ -755,6 +755,14 @@ void QnNxStyle::drawControl(
         {
             switch (frame->frameShape)
             {
+            case QFrame::Box:
+                {
+                    QnPaletteColor mainColor = findColor(option->palette.color(QPalette::Shadow)).darker(1);
+                    QnScopedPainterPenRollback penRollback(painter, mainColor.color());
+                    painter->drawRect(frame->rect.adjusted(0, 0, -1, -1));
+                }
+                return;
+
             case QFrame::HLine:
                 {
                     QnPaletteColor mainColor = findColor(option->palette.color(QPalette::Dark)).darker(1);
@@ -1616,8 +1624,6 @@ int QnNxStyle::pixelMetric(
     case PM_TabBarTabShiftHorizontal:
         return 0;
     case PM_DefaultFrameWidth:
-        if (qobject_cast<const QMenu *>(widget))
-            return 0;
         return 0;
     case PM_SliderThickness:
         return dp(18);
