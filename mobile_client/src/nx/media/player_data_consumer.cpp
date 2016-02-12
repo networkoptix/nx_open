@@ -122,39 +122,39 @@ bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& data)
     }
 
     QnVideoFramePtr decodedFrame;
-	if (!m_videoDecoder->decode(data, &decodedFrame))
-	{
+    if (!m_videoDecoder->decode(data, &decodedFrame))
+    {
         qWarning() << Q_FUNC_INFO << "Can't decode video frame. Frame is skipped.";
-		return true; // false result means we want to repeat this frame latter
-	}
+        return true; // false result means we want to repeat this frame latter
+    }
 
     if (decodedFrame)
         enqueueVideoFrame(std::move(decodedFrame));
 
-	return true;
+    return true;
 }
 
 void PlayerDataConsumer::enqueueVideoFrame(QnVideoFramePtr decodedFrame)
 {
     Q_ASSERT(decodedFrame);
-	QnMutexLocker lock(&m_queueMutex);
-	while (m_decodedVideo.size() >= kMaxDecodedVideoQueueSize && !needToStop())
-		m_queueWaitCond.wait(&m_queueMutex);
-	if (needToStop())
-		return;
-	m_decodedVideo.push_back(std::move(decodedFrame));
-	lock.unlock();
-	emit gotVideoFrame();
+    QnMutexLocker lock(&m_queueMutex);
+    while (m_decodedVideo.size() >= kMaxDecodedVideoQueueSize && !needToStop())
+        m_queueWaitCond.wait(&m_queueMutex);
+    if (needToStop())
+        return;
+    m_decodedVideo.push_back(std::move(decodedFrame));
+    lock.unlock();
+    emit gotVideoFrame();
 }
 
 QnVideoFramePtr PlayerDataConsumer::dequeueVideoFrame()
 {
-	QnMutexLocker lock(&m_queueMutex);
-	if (m_decodedVideo.empty())
+    QnMutexLocker lock(&m_queueMutex);
+    if (m_decodedVideo.empty())
         return QnVideoFramePtr(); //< no data
     QnVideoFramePtr result = std::move(m_decodedVideo.front());
-	m_decodedVideo.pop_front();
-	lock.unlock();
+    m_decodedVideo.pop_front();
+    lock.unlock();
 
     FrameMetadata metadata = FrameMetadata::deserialize(result);
     if (metadata.frameNum <= m_hurryUpToFrame)
@@ -163,8 +163,8 @@ QnVideoFramePtr PlayerDataConsumer::dequeueVideoFrame()
         metadata.serialize(result);
     }
 
-	m_queueWaitCond.wakeAll();
-	return result;
+    m_queueWaitCond.wakeAll();
+    return result;
 }
 
 bool PlayerDataConsumer::processAudioFrame(const QnCompressedAudioDataPtr& data )
@@ -182,7 +182,7 @@ bool PlayerDataConsumer::processAudioFrame(const QnCompressedAudioDataPtr& data 
     QnCodecAudioFormat audioFormat(decodedFrame->context);
     if (!m_audioOutput || m_audioOutput->format() != audioFormat)
     {
-		audioFormat.setCodec(lit("audio/pcm"));
+        audioFormat.setCodec(lit("audio/pcm"));
         m_audioOutput.reset(new QAudioOutput(audioFormat));
         m_audioIoDevice = m_audioOutput->start();
     }

@@ -42,8 +42,8 @@ namespace {
 
 class PlayerPrivate: public QObject
 {
-	Q_DECLARE_PUBLIC(Player)
-	Player *q_ptr;
+    Q_DECLARE_PUBLIC(Player)
+    Player *q_ptr;
 
 public:
     Player::State state;                                  //< Holds QT property value
@@ -79,14 +79,14 @@ private:
     PlayerPrivate(Player *parent);
 
     void at_hurryUp();
-	void at_gotVideoFrame();
-	
+    void at_gotVideoFrame();
+    
     void presentNextFrame();
     qint64 getNextTimeToRender(const QnVideoFramePtr& frame);
     bool initDataProvider();
 
-	void setState(Player::State state);
-	void setMediaStatus(Player::MediaStatus status);
+    void setState(Player::State state);
+    void setMediaStatus(Player::MediaStatus status);
     void setLiveMode(bool value);
     void setPosition(qint64 value);
 
@@ -98,14 +98,14 @@ private:
 
 PlayerPrivate::PlayerPrivate(Player *parent):
     QObject(parent),
-	q_ptr(parent),
-	state(Player::State::Stopped),
+    q_ptr(parent),
+    state(Player::State::Stopped),
     mediaStatus(Player::MediaStatus::NoMedia),
     hasAudio(false),
     liveMode(true),
-	position(0),
+    position(0),
     videoSurface(0),
-	maxTextureSize(QnTextureSizeHelper::instance()->maxTextureSize()),
+    maxTextureSize(QnTextureSizeHelper::instance()->maxTextureSize()),
     ptsTimerBase(0),
     execTimer(new QTimer(this)),
     lastSeekTimeMs(AV_NOPTS_VALUE),
@@ -119,24 +119,24 @@ PlayerPrivate::PlayerPrivate(Player *parent):
 }
 
 void PlayerPrivate::setState(Player::State state) {
-	if (state == this->state)
-		return;
+    if (state == this->state)
+        return;
 
-	this->state = state;
+    this->state = state;
 
-	Q_Q(Player);
-	emit q->playbackStateChanged();
+    Q_Q(Player);
+    emit q->playbackStateChanged();
 }
 
 void PlayerPrivate::setMediaStatus(Player::MediaStatus status) 
 {
-	if (mediaStatus == status)
-		return;
+    if (mediaStatus == status)
+        return;
 
-	mediaStatus = status;
+    mediaStatus = status;
 
-	Q_Q(Player);
-	emit q->mediaStatusChanged();
+    Q_Q(Player);
+    emit q->mediaStatusChanged();
 }
 
 void PlayerPrivate::setLiveMode(bool value)
@@ -190,8 +190,8 @@ void PlayerPrivate::at_gotVideoFrame()
     qint64 nextTimeToRender = getNextTimeToRender(videoFrameToRender);
     if (nextTimeToRender > ptsTimer.elapsed())
         execTimer->start(nextTimeToRender - ptsTimer.elapsed());
-	else
-		presentNextFrame();
+    else
+        presentNextFrame();
 }
 
 QnVideoFramePtr PlayerPrivate::scaleFrame(const QnVideoFramePtr& videoFrame)
@@ -216,22 +216,22 @@ QnVideoFramePtr PlayerPrivate::scaleFrame(const QnVideoFramePtr& videoFrame)
 
 void PlayerPrivate::presentNextFrame()
 {
-	if (!videoFrameToRender)
-		return;
+    if (!videoFrameToRender)
+        return;
 
     setMediaStatus(Player::MediaStatus::Loaded);
 
     /* update video surface's pixel format if needed */
-	if (videoSurface)
-	{
-		if (videoSurface->isActive() && videoSurface->surfaceFormat().pixelFormat() != videoFrameToRender->pixelFormat())
-			videoSurface->stop();
+    if (videoSurface)
+    {
+        if (videoSurface->isActive() && videoSurface->surfaceFormat().pixelFormat() != videoFrameToRender->pixelFormat())
+            videoSurface->stop();
 
-		if (!videoSurface->isActive()) {
-			QVideoSurfaceFormat format(videoFrameToRender->size(), videoFrameToRender->pixelFormat(), videoFrameToRender->handleType());
-			videoSurface->start(format);
-		}
-	}
+        if (!videoSurface->isActive()) {
+            QVideoSurfaceFormat format(videoFrameToRender->size(), videoFrameToRender->pixelFormat(), videoFrameToRender->handleType());
+            videoSurface->start(format);
+        }
+    }
 
     if (videoSurface && videoSurface->isActive())
         videoSurface->present(*scaleFrame(videoFrameToRender));
@@ -241,7 +241,7 @@ void PlayerPrivate::presentNextFrame()
     auto metadata = FrameMetadata::deserialize(videoFrameToRender);
     setLiveMode(metadata.flags & QnAbstractMediaData::MediaFlags_LIVE);
 
-	videoFrameToRender.clear();
+    videoFrameToRender.clear();
     QTimer::singleShot(0, this, &PlayerPrivate::at_gotVideoFrame); //< calculate next time to render
 }
 
@@ -272,13 +272,13 @@ void PlayerPrivate::updateLiveBufferState(BufferState value)
 qint64 PlayerPrivate::getNextTimeToRender(const QnVideoFramePtr& frame)
 {
     const qint64 pts = frame->startTime();
-	if (hasAudio)
-	{
-		// todo: audio isn't implemented yet
-		return pts;
-	}
-	else 
-	{
+    if (hasAudio)
+    {
+        // todo: audio isn't implemented yet
+        return pts;
+    }
+    else 
+    {
         FrameMetadata metadata = FrameMetadata::deserialize(frame);
         
         // Calculate time to present next frame
@@ -307,17 +307,17 @@ qint64 PlayerPrivate::getNextTimeToRender(const QnVideoFramePtr& frame)
             liveBufferUnderflow                                              ||
             liveBufferOverflow                                                   //< live buffer overflow
             )
-		{
-			// Reset timer
-			lastVideoPts = ptsTimerBase = pts;
-			ptsTimer.restart();
-			return 0ll;
-		}
-		else 
         {
-			lastVideoPts = pts;
-			return pts - ptsTimerBase;
-		}
+            // Reset timer
+            lastVideoPts = ptsTimerBase = pts;
+            ptsTimer.restart();
+            return 0ll;
+        }
+        else 
+        {
+            lastVideoPts = pts;
+            return pts - ptsTimerBase;
+        }
     }
 }
 
@@ -366,51 +366,51 @@ bool PlayerPrivate::initDataProvider()
 // ----------------------- Player -----------------------
 
 Player::Player(QObject *parent):
-	QObject(parent),
-	d_ptr(new PlayerPrivate(this))
+    QObject(parent),
+    d_ptr(new PlayerPrivate(this))
 {
 }
 
 Player::~Player() 
 {
-	stop();
+    stop();
 }
 
 Player::State Player::playbackState() const 
 {
-	Q_D(const Player);
+    Q_D(const Player);
 
-	return d->state;
+    return d->state;
 }
 
 Player::MediaStatus Player::mediaStatus() const
 {
-	Q_D(const Player);
-	return d->mediaStatus;
+    Q_D(const Player);
+    return d->mediaStatus;
 }
 
 QUrl Player::source() const {
-	Q_D(const Player);
+    Q_D(const Player);
 
-	return d->url;
+    return d->url;
 }
 
 QAbstractVideoSurface *Player::videoSurface() const {
-	Q_D(const Player);
+    Q_D(const Player);
 
-	return d->videoSurface;
+    return d->videoSurface;
 }
 
 qint64 Player::position() const 
 {
-	Q_D(const Player);
+    Q_D(const Player);
 
-	return d->position;
+    return d->position;
 }
 
 void Player::setPosition(qint64 value)
 {
-	Q_D(Player);
+    Q_D(Player);
     d->lastSeekTimeMs = value;
 
     if (d->archiveReader)
@@ -423,10 +423,10 @@ void Player::setPosition(qint64 value)
 
 void Player::play()
 {
-	Q_D(Player);
+    Q_D(Player);
 
-	if (d->state == State::Playing)
-		return;
+    if (d->state == State::Playing)
+        return;
 
     if (!d->archiveReader && !d->initDataProvider())
         return;
@@ -446,37 +446,37 @@ void Player::pause()
 
 void Player::stop()
 {
-	Q_D(Player);
+    Q_D(Player);
 
-	if (d->archiveReader && d->dataConsumer)
-		d->archiveReader->removeDataProcessor(d->dataConsumer.get());
-	
-	d->dataConsumer.reset();
-	d->archiveReader.reset();
-	d->setState(State::Stopped);
+    if (d->archiveReader && d->dataConsumer)
+        d->archiveReader->removeDataProcessor(d->dataConsumer.get());
+    
+    d->dataConsumer.reset();
+    d->archiveReader.reset();
+    d->setState(State::Stopped);
 }
 
 void Player::setSource(const QUrl &url)
 {
-	Q_D(Player);
+    Q_D(Player);
 
-	if (url == d->url)
-		return;
+    if (url == d->url)
+        return;
 
-	stop();
-	d->url = url;
+    stop();
+    d->url = url;
 }
 
 void Player::setVideoSurface(QAbstractVideoSurface *videoSurface)
 {
-	Q_D(Player);
+    Q_D(Player);
 
-	if (d->videoSurface == videoSurface)
-		return;
+    if (d->videoSurface == videoSurface)
+        return;
 
-	d->videoSurface = videoSurface;
+    d->videoSurface = videoSurface;
 
-	emit videoSurfaceChanged();
+    emit videoSurfaceChanged();
 }
 
 bool Player::liveMode() const

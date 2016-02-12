@@ -19,8 +19,8 @@ class FfmpegVideoDecoderPrivate;
 class FfmpegVideoDecoder : public AbstractVideoDecoder
 {
 public:
-	FfmpegVideoDecoder();
-	virtual ~FfmpegVideoDecoder();
+    FfmpegVideoDecoder();
+    virtual ~FfmpegVideoDecoder();
 
     static bool isCompatible(const CodecID codec, const QSize& resolution);
     virtual int decode(const QnConstCompressedVideoDataPtr& frame, QnVideoFramePtr* result = nullptr) override;
@@ -28,7 +28,7 @@ private:
     void ffmpegToQtVideoFrame(QnVideoFramePtr* result);
 private:
     QScopedPointer<FfmpegVideoDecoderPrivate> d_ptr;
-	Q_DECLARE_PRIVATE(FfmpegVideoDecoder);
+    Q_DECLARE_PRIVATE(FfmpegVideoDecoder);
 };
 
 }

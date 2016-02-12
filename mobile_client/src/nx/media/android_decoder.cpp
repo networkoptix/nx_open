@@ -131,14 +131,14 @@ public:
         initialized(false),
         javaDecoder("com/networkoptix/nxwitness/media/QnMediaDecoder"),
         program(nullptr)
-	{
+    {
         registerNativeMethods();
-	}
+    }
 
     ~AndroidDecoderPrivate()
     {
         javaDecoder.callMethod<void>("releaseDecoder");
-	}
+    }
 
     void updateTexImage()
     {
@@ -332,7 +332,7 @@ FboPtr AndroidDecoderPrivate::createGLResources()
 // ---------------------- AndroidDecoder ----------------------
 
 AndroidDecoder::AndroidDecoder():
-	AbstractVideoDecoder(),
+    AbstractVideoDecoder(),
     d_ptr(new AndroidDecoderPrivate())
 
 {
