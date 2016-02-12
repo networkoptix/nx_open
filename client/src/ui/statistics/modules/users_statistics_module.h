@@ -8,6 +8,8 @@
 class QnUsersStatisticsModule : public QnAbstractStatisticsModule
     , public QnWorkbenchContextAware
 {
+    Q_OBJECT
+
     typedef QnAbstractStatisticsModule base_type;
 
 public:

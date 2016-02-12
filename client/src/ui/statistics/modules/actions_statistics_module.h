@@ -11,6 +11,8 @@ typedef QPointer<QnActionManager> QnActionManagerPtr;
 
 class QnActionsStatisticsModule : public Connective<QnAbstractStatisticsModule>
 {
+    Q_OBJECT
+
     typedef Connective<QnAbstractStatisticsModule> base_type;
 
 public:
