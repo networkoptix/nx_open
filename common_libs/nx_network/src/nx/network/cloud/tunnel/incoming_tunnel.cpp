@@ -40,10 +40,13 @@ void IncomingTunnel::accept(SocketHandler handler)
     });
 }
 
-
-IncomingTunnelPool::IncomingTunnelPool()
-    : m_acceptLimit(0)
+IncomingTunnelPool::IncomingTunnelPool(
+    aio::AbstractAioThread* ioThread, size_t acceptLimit)
+:
+    m_acceptLimit(acceptLimit),
+    m_ioThreadSocket(new TCPSocket)
 {
+    m_ioThreadSocket->bindToAioThread(ioThread);
 }
 
 void IncomingTunnelPool::addNewTunnel(
@@ -69,24 +72,32 @@ std::unique_ptr<AbstractStreamSocket> IncomingTunnelPool::getNextSocketIfAny()
 }
 
 void IncomingTunnelPool::getNextSocketAsync(
-    std::function<void(std::unique_ptr<AbstractStreamSocket>)> handler)
+    std::function<void(std::unique_ptr<AbstractStreamSocket>)> handler,
+    boost::optional<unsigned int> timeout)
 {
     QnMutexLocker lock(&m_mutex);
     Q_ASSERT_X(!m_acceptHandler, Q_FUNC_INFO, "Multiple accepts are not supported");
 
+    if (!m_acceptedSockets.empty())
+    {
+        auto socket = std::move(m_acceptedSockets.front());
+        m_acceptedSockets.pop_front();
+
+        lock.unlock();
+        return handler(std::move(socket));
+    }
+
     m_acceptHandler = std::move(handler);
-    returnSocketIfAny(&lock);
+    if (timeout && *timeout != 0)
+        m_ioThreadSocket->registerTimer(
+            *timeout, [this](){ callAcceptHandler(true); });
 }
 
 void IncomingTunnelPool::pleaseStop(std::function<void()> handler)
 {
     BarrierHandler barrier([this, handler]()
     {
-        BarrierHandler barrier(std::move(handler));
-
-        QnMutexLocker lock(&m_mutex);
-        for (const auto& socket : m_acceptedSockets)
-            socket->pleaseStop(barrier.fork());
+        m_ioThreadSocket->pleaseStop(std::move(handler));
     });
 
     QnMutexLocker lock(&m_mutex);
@@ -123,23 +134,35 @@ void IncomingTunnelPool::acceptTunnel(std::shared_ptr<IncomingTunnel> tunnel)
         }
 
         m_acceptedSockets.push_back(std::move(socket));
-        returnSocketIfAny(&lock);
+        if (m_acceptHandler)
+            m_ioThreadSocket->post([this](){ callAcceptHandler(false); });
     });
 }
 
-void IncomingTunnelPool::returnSocketIfAny(QnMutexLockerBase* lock)
-{
-    if (!m_acceptHandler || m_acceptedSockets.empty())
-        return; // nothing to indicate
 
-    auto request = std::move(m_acceptHandler);
+void IncomingTunnelPool::callAcceptHandler(bool timeout)
+{
+    // Cancel all possible posts (we are in corresponding IO thread)
+    m_ioThreadSocket->cancelIOSync(aio::etTimedOut);
+
+    QnMutexLocker lock(&m_mutex);
+    if (!m_acceptHandler)
+        return;
+
+    const auto handler = std::move(m_acceptHandler);
     m_acceptHandler = nullptr;
+
+    if (timeout)
+    {
+        lock.unlock();
+        return handler(nullptr);
+    }
 
     auto socket = std::move(m_acceptedSockets.front());
     m_acceptedSockets.pop_front();
 
-    lock->unlock();
-    request(std::move(socket));
+    lock.unlock();
+    return handler(std::move(socket));
 }
 
 } // namespace cloud

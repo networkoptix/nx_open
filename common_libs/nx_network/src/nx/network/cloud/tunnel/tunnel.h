@@ -49,7 +49,7 @@ public:
     *  \note not all of the AbstractTunnelConnection can really accept connections */
     virtual void accept(SocketHandler handler) = 0;
 
-private:
+protected:
     const String m_remotePeerId;
 };
 
@@ -59,8 +59,9 @@ class AbstractTunnelAcceptor
     public QnStoppableAsync
 {
 public:
-    virtual void accept(
-        std::function<void(std::unique_ptr<AbstractTunnelConnection>)> handler) = 0;
+    virtual void accept(std::function<void(
+        SystemError::ErrorCode,
+        std::unique_ptr<AbstractTunnelConnection>)> handler) = 0;
 };
 
 //!Tunnel between two peers. Tunnel can be established by backward TCP connection or by hole punching UDT connection

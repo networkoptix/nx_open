@@ -13,7 +13,7 @@ namespace api {
 
 MediatorConnector::MediatorConnector()
     : m_isTerminating( false )
-    , m_stunClient(std::make_shared<stun::AsyncClientImpl>())
+    , m_stunClient(std::make_shared<stun::AsyncClient>())
     , m_endpointFetcher(
         lit( "hpm" ),
         std::make_unique<nx::network::cloud::RandomEndpointSelector>() )

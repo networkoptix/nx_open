@@ -35,10 +35,6 @@ public:
     { return *s_instance->m_mediatorConnector; }
 
     inline static
-    cloud::IncomingTunnelPool& incomingTunnelPool()
-    { return s_instance->m_incomingTunnelPool; }
-
-    inline static
     cloud::OutgoingTunnelPool& outgoingTunnelPool()
     { return s_instance->m_outgoingTunnelPool; }
 
@@ -74,7 +70,6 @@ private:
     std::unique_ptr<hpm::api::MediatorConnector> m_mediatorConnector;
     cloud::AddressResolver m_addressResolver;
     cloud::MediatorAddressPublisher m_addressPublisher;
-    cloud::IncomingTunnelPool m_incomingTunnelPool;
     cloud::OutgoingTunnelPool m_outgoingTunnelPool;
 };
 
