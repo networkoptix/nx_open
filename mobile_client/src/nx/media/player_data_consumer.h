@@ -30,6 +30,8 @@ public:
 
     QnVideoFramePtr dequeueVideoFrame();
     qint64 queueVideoDurationUsec() const;
+    
+    const AudioOutput* audioOutput() const;
 signals:
     /** Hint to render to display current data with no delay due to seek operation in progress */
     void hurryUp();
@@ -57,6 +59,7 @@ private:
 
     void enqueueVideoFrame(QnVideoFramePtr decodedFrame);
     int getBufferingMask() const;
+    QnCompressedVideoDataPtr queueVideoFrame(const QnCompressedVideoDataPtr& videoFrame);
 private:
     std::unique_ptr<SeamlessVideoDecoder> m_videoDecoder;
     std::unique_ptr<SeamlessAudioDecoder> m_audioDecoder;
@@ -71,6 +74,8 @@ private:
     int m_buffering;        //< reserved for future use for panoramic cameras
     int m_hurryUpToFrame;   //< display all data with no delay till this number
     std::atomic<qint64> m_lastMediaTimeUsec; //< UTC usec timestamp for the very last packet
+
+    std::deque<QnCompressedVideoDataPtr> m_predecodeQueue; //< delay video decoding. Used for AV sync
             
     enum class NoDelayState
     {

@@ -79,6 +79,11 @@ qint64 PlayerDataConsumer::queueVideoDurationUsec() const
     return std::max(0ll, maxTime - minTime);
 }
 
+const AudioOutput* PlayerDataConsumer::audioOutput() const
+{
+    return m_audioOutput.get();
+}
+
 bool PlayerDataConsumer::processData(const QnAbstractDataPacketPtr& data)
 {
     auto emptyFrame = std::dynamic_pointer_cast<QnEmptyMediaData>(data);
@@ -102,8 +107,32 @@ bool PlayerDataConsumer::processEmptyFrame(const QnEmptyMediaDataPtr& /*data*/ )
     return true;
 }
 
-bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& data)
+QnCompressedVideoDataPtr PlayerDataConsumer::queueVideoFrame(const QnCompressedVideoDataPtr& videoFrame)
 {
+    if (!m_audioOutput)
+        return videoFrame; //< Pre decoding queue isn't required
+
+    m_predecodeQueue.push_back(videoFrame);
+    
+    QnCompressedVideoDataPtr result = m_predecodeQueue.front();
+    if (result->timestamp < m_audioOutput->playbackPositionUsec())
+    {
+        m_predecodeQueue.pop_front();
+        return result; //< Frame time earlier then audio buffer, no need to delay it anyway.
+    }
+
+    if (m_audioOutput->isBuffering())
+        return QnCompressedVideoDataPtr(); //< Frame time inside audio buffer, delay frame while audio is buffered
+    
+    return result;
+}
+
+bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& videoFrame)
+{
+    QnCompressedVideoDataPtr data = queueVideoFrame(videoFrame);
+    if (!data)
+        return true; //< frame processed
+
     const bool isBofData = (data->flags & QnAbstractMediaData::MediaFlags_BOF); //< first packet after a jump
     bool displayImmediately = isBofData; //< display data immediately with no delay
     {
@@ -177,6 +206,8 @@ bool PlayerDataConsumer::processAudioFrame(const QnCompressedAudioDataPtr& data 
     if (!decodedFrame || !decodedFrame->context)
         return true; //< just skip frame
     
+    if (!m_audioOutput)
+        m_audioOutput.reset(new AudioOutput(kInitialBufferMs * 1000, kMaxBufferMs * 1000));
     m_audioOutput->write(decodedFrame);
     return true;
 }

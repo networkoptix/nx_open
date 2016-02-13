@@ -16,6 +16,7 @@
 #include "player_data_consumer.h"
 #include "frame_metadata.h"
 #include "video_decoder_registry.h"
+#include "audio_output.h"
 
 namespace nx {
 namespace media {
@@ -24,9 +25,6 @@ namespace {
     static const qint64 kMaxFrameDuration = 1000 * 5; //< max allowed frame duration. If distance is higher, then frame discontinue
     static const qint64 kLivePosition = -1;
     static const int kMaxDelayForResyncMs = 500; //< resync playback timer if video frame too late
-    static const int kInitialLiveBufferMs = 200; //< initial duration for live buffer
-    static const int kMaxLiveBufferMs = 1200;    //< maximum duration for live buffer. Live buffer can be extended dynamically
-    static const qreal kLiveBufferStep = 2.0;    //< increate live buffer at N times if overflow/underflow issues
     static const int kMaxCounterForWrongLiveBuffer = 2; //< Max allowed amount of underflow/overflow issues in Live mode before extending live buffer
 
     static qint64 msecToUsec(qint64 posMs)
@@ -48,7 +46,6 @@ class PlayerPrivate: public QObject
 public:
     Player::State state;                                  //< Holds QT property value
     Player::MediaStatus mediaStatus;                      //< Holds QT property value
-    bool hasAudio;                                        //< Either media has audio stream or not. Holds QT property value
     bool liveMode;                                        //< Either media is on live or archive position. Holds QT property value
     qint64 position;                                      //< UTC Playback position at msec. Holds QT property value
     QAbstractVideoSurface* videoSurface;                  //< Video surface to render. Holds QT property value
@@ -82,7 +79,9 @@ private:
     void at_gotVideoFrame();
     
     void presentNextFrame();
-    qint64 getNextTimeToRender(const QnVideoFramePtr& frame);
+    qint64 getDelayForNextFrameMs(const QnVideoFramePtr& frame);
+    qint64 getDelayForNextFrameWithAudioMs(const QnVideoFramePtr& frame);
+    qint64 getDelayForNextFrameWithoutAudioMs(const QnVideoFramePtr& frame);
     bool initDataProvider();
 
     void setState(Player::State state);
@@ -101,7 +100,6 @@ PlayerPrivate::PlayerPrivate(Player *parent):
     q_ptr(parent),
     state(Player::State::Stopped),
     mediaStatus(Player::MediaStatus::NoMedia),
-    hasAudio(false),
     liveMode(true),
     position(0),
     videoSurface(0),
@@ -109,7 +107,7 @@ PlayerPrivate::PlayerPrivate(Player *parent):
     ptsTimerBase(0),
     execTimer(new QTimer(this)),
     lastSeekTimeMs(AV_NOPTS_VALUE),
-    liveBufferMs(kInitialLiveBufferMs),
+    liveBufferMs(kInitialBufferMs),
     liveBufferState(BufferState::NoIssue),
     underflowCounter(0),
     overflowCounter(0)
@@ -187,9 +185,9 @@ void PlayerPrivate::at_gotVideoFrame()
             return; //< display regular frames only if player is playing
     }
 
-    qint64 nextTimeToRender = getNextTimeToRender(videoFrameToRender);
-    if (nextTimeToRender > ptsTimer.elapsed())
-        execTimer->start(nextTimeToRender - ptsTimer.elapsed());
+    qint64 delayToRenderMs = getDelayForNextFrameMs(videoFrameToRender);
+    if (delayToRenderMs > 0)
+        execTimer->start(delayToRenderMs);
     else
         presentNextFrame();
 }
@@ -249,7 +247,7 @@ void PlayerPrivate::resetLiveBufferState()
 {
     overflowCounter = underflowCounter = 0;
     liveBufferState = BufferState::NoIssue;
-    liveBufferMs = kInitialLiveBufferMs;
+    liveBufferMs = kInitialBufferMs;
 }
 
 void PlayerPrivate::updateLiveBufferState(BufferState value)
@@ -266,58 +264,68 @@ void PlayerPrivate::updateLiveBufferState(BufferState value)
         return;
 
     if (underflowCounter + overflowCounter >= kMaxCounterForWrongLiveBuffer)
-        liveBufferMs = qMin(liveBufferMs * kLiveBufferStep, kMaxLiveBufferMs); //< too much underflow/overflow issues. extend live buffer
+        liveBufferMs = qMin(liveBufferMs * kBufferGrowStep, kMaxBufferMs); //< too much underflow/overflow issues. extend live buffer
 }
 
-qint64 PlayerPrivate::getNextTimeToRender(const QnVideoFramePtr& frame)
+qint64 PlayerPrivate::getDelayForNextFrameMs(const QnVideoFramePtr& frame)
+{
+    if (dataConsumer->audioOutput())
+        return getDelayForNextFrameWithAudioMs(frame);
+    else
+        return getDelayForNextFrameWithoutAudioMs(frame);
+}
+
+qint64 PlayerPrivate::getDelayForNextFrameWithAudioMs(const QnVideoFramePtr& frame)
+{
+    const AudioOutput* audioOutput = dataConsumer->audioOutput();
+    const qint64 currentPosUsec = audioOutput->playbackPositionUsec();
+    if (currentPosUsec == AudioOutput::kUnknownPosition)
+        return 0; //< Position isn't known yet. Play video without delay
+
+    return frame->startTime() - currentPosUsec/1000;
+}
+
+qint64 PlayerPrivate::getDelayForNextFrameWithoutAudioMs(const QnVideoFramePtr& frame)
 {
     const qint64 pts = frame->startTime();
-    if (hasAudio)
+    FrameMetadata metadata = FrameMetadata::deserialize(frame);
+        
+    // Calculate time to present next frame
+    qint64 mediaQueueLen = usecToMsec(dataConsumer->queueVideoDurationUsec());
+    const int frameDelayMs = pts - ptsTimerBase - ptsTimer.elapsed();
+    bool liveBufferUnderflow = liveMode && lastVideoPts.is_initialized() && mediaQueueLen == 0 && frameDelayMs < 0;
+    bool liveBufferOverflow = liveMode && mediaQueueLen > liveBufferMs;
+
+    if (liveMode)
     {
-        // todo: audio isn't implemented yet
-        return pts;
+        if (metadata.noDelay)
+        {
+            resetLiveBufferState(); //< reset live statstics because of seek or FCZ frames
+        }
+        else {
+            auto value = liveBufferUnderflow ? BufferState::Underflow : liveBufferOverflow ? BufferState::Overflow : BufferState::NoIssue;
+            updateLiveBufferState(value);
+        }
+    }
+
+    if (!lastVideoPts.is_initialized() ||                                    //< first time
+        !qBetween(*lastVideoPts, pts, *lastVideoPts + kMaxFrameDuration) ||  //< pts discontinue
+        metadata.noDelay                                                 ||  //< jump occurred
+        pts < lastSeekTimeMs                                             ||  //< 'coarse' frame. Frame time is less than required jump pos
+        frameDelayMs < -kMaxDelayForResyncMs                             ||  //< resync because of video frame is late more than threshold
+        liveBufferUnderflow                                              ||
+        liveBufferOverflow                                                   //< live buffer overflow
+        )
+    {
+        // Reset timer
+        lastVideoPts = ptsTimerBase = pts;
+        ptsTimer.restart();
+        return 0ll;
     }
     else 
     {
-        FrameMetadata metadata = FrameMetadata::deserialize(frame);
-        
-        // Calculate time to present next frame
-        qint64 mediaQueueLen = usecToMsec(dataConsumer->queueVideoDurationUsec());
-        const int frameDelayMs = pts - ptsTimerBase - ptsTimer.elapsed();
-        bool liveBufferUnderflow = liveMode && lastVideoPts.is_initialized() && mediaQueueLen == 0 && frameDelayMs < 0;
-        bool liveBufferOverflow = liveMode && mediaQueueLen > liveBufferMs;
-
-        if (liveMode)
-        {
-            if (metadata.noDelay)
-            {
-                resetLiveBufferState(); //< reset live statstics because of seek or FCZ frames
-            }
-            else {
-                auto value = liveBufferUnderflow ? BufferState::Underflow : liveBufferOverflow ? BufferState::Overflow : BufferState::NoIssue;
-                updateLiveBufferState(value);
-            }
-        }
-
-        if (!lastVideoPts.is_initialized() ||                                    //< first time
-            !qBetween(*lastVideoPts, pts, *lastVideoPts + kMaxFrameDuration) ||  //< pts discontinue
-            metadata.noDelay                                                 ||  //< jump occurred
-            pts < lastSeekTimeMs                                             ||  //< 'coarse' frame. Frame time is less than required jump pos
-            frameDelayMs < -kMaxDelayForResyncMs                             ||  //< resync because of video frame is late more than threshold
-            liveBufferUnderflow                                              ||
-            liveBufferOverflow                                                   //< live buffer overflow
-            )
-        {
-            // Reset timer
-            lastVideoPts = ptsTimerBase = pts;
-            ptsTimer.restart();
-            return 0ll;
-        }
-        else 
-        {
-            lastVideoPts = pts;
-            return pts - ptsTimerBase;
-        }
+        lastVideoPts = pts;
+        return (pts - ptsTimerBase) - ptsTimer.elapsed();
     }
 }
 
