@@ -1,12 +1,11 @@
 #include <nx/streaming/archive_stream_reader.h>
 
-#include <QtMultimedia/QAudioOutput>
-
 #include "player_data_consumer.h"
 #include "seamless_video_decoder.h"
 #include "seamless_audio_decoder.h"
 #include "abstract_audio_decoder.h"
 #include "frame_metadata.h"
+#include "audio_output.h"
 
 namespace 
 {
@@ -22,7 +21,6 @@ PlayerDataConsumer::PlayerDataConsumer(const std::unique_ptr<QnArchiveStreamRead
     QnAbstractDataConsumer(kMaxMediaQueueLen),
     m_videoDecoder(new SeamlessVideoDecoder()),
     m_audioDecoder(new SeamlessAudioDecoder()),
-    m_audioIoDevice(nullptr),
     m_awaitJumpCounter(0),
     m_buffering(0),
     m_hurryUpToFrame(0),
@@ -179,18 +177,7 @@ bool PlayerDataConsumer::processAudioFrame(const QnCompressedAudioDataPtr& data 
     if (!decodedFrame || !decodedFrame->context)
         return true; //< just skip frame
     
-    QnCodecAudioFormat audioFormat(decodedFrame->context);
-    audioFormat.setCodec(lit("audio/pcm"));
-    if (!m_audioOutput || m_audioOutput->format() != audioFormat)
-    {
-        m_audioOutput.reset(new QAudioOutput(audioFormat));
-        m_audioIoDevice = m_audioOutput->start();
-    }
-
-    if (!m_audioIoDevice)
-        return true; //< just skip frame
-
-    m_audioIoDevice->write((const char *)decodedFrame->data.data(), decodedFrame->data.size());
+    m_audioOutput->write(decodedFrame);
     return true;
 }
 

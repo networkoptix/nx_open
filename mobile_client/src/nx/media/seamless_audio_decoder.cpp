@@ -32,7 +32,7 @@ namespace media {
 
 class SeamlessAudioDecoderPrivate : public QObject
 {
-        Q_DECLARE_PUBLIC(SeamlessAudioDecoder)
+    Q_DECLARE_PUBLIC(SeamlessAudioDecoder)
     SeamlessAudioDecoder *q_ptr;
 public:
     SeamlessAudioDecoderPrivate(SeamlessAudioDecoder *parent);

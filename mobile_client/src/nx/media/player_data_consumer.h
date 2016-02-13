@@ -8,9 +8,9 @@
 #include <nx/streaming/audio_data_packet.h>
 
 #include "media_fwd.h"
+#include "audio_output.h"
 
 class QnArchiveStreamReader;
-class QAudioOutput;
 
 namespace nx {
 namespace media {
@@ -60,8 +60,7 @@ private:
 private:
     std::unique_ptr<SeamlessVideoDecoder> m_videoDecoder;
     std::unique_ptr<SeamlessAudioDecoder> m_audioDecoder;
-    std::unique_ptr<QAudioOutput> m_audioOutput;
-    QIODevice* m_audioIoDevice; //< QAudioOutput internal IO device
+    std::unique_ptr<AudioOutput> m_audioOutput;
             
     std::deque<QnVideoFramePtr> m_decodedVideo;
     QnWaitCondition m_queueWaitCond;
