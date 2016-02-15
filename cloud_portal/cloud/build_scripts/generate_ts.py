@@ -1,3 +1,8 @@
+"""
+    This file extracts string constants from html files, email templates and language scripts.
+    Output is a standard QT-translation file (.ts)
+"""
+
 import os
 import re
 import xml.etree.ElementTree as eTree
@@ -50,32 +55,36 @@ ignore_attributes = ('id', 'name', 'class', 'style',
                      'width', 'rows', 'cols', 'maxlength',
                      'autocomplete',
                      'process', 'form',
-                     'ng-.*?', 'aria-.*?',
-                     'bgcolor', 'content', 'xmlns', 'topmargin', 'leftmargin', 'marginheight', 'marginwidth')
+                     'ng\-.*?', 'aria\-.*?',
+                     'bgcolor', 'content', 'xmlns', 'topmargin', 'leftmargin', 'marginheight', 'marginwidth',
+                     'border', 'cellspacing', 'cellpadding', 'border', 'cellspacing' 'cellpadding', 'http\-equiv')
 
-ignore_single_attributes = ('required', 'autofocus', 'validate-field', 'novalidate', 'href')
+ignore_single_attributes = ('required', 'autofocus', 'validate-field', 'novalidate', 'uib\-.*?', 'href')
 
 
 def process_attributes(data):
-    data = re.sub(r'<!-.+?->', '><', data)
-    data = re.sub(r'>.+?<', '><', data)
+    data = re.sub(r'<\?.+?\?>', '', data)   # Remove <?xml ... ?> - just in case
+    data = re.sub(r'<!\-.+?\->', '', data)    # Remove all html-comments
+    data = re.sub(r'>.*?<', '><', data)     # Remove everything except tags (clear spaces and texts)
 
-    for attr in ignore_attributes:
-        data = re.sub('\s+' + attr + '=".+?"', '', data)
-        data = re.sub('\s+' + attr + '=[^\s>]+', '', data)
+    # Important: attributes in single quotes are not supported here
+    for attr in ignore_attributes:  # Here we remove all attributes which do not contain language strings.
+        data = re.sub('\s+' + attr + '=".+?"', '', data)    # remove ignore_attribute="some value" with double-quotes
+        data = re.sub('\s+' + attr + '=[^\s>]+', '', data)  # remove ignore_attribute=some_value (after minhtml)
 
-    for attr in ignore_single_attributes:
-        data = re.sub('\s+' + attr + '=".+?"', '', data)
-        data = re.sub('\s+' + attr + '=[^\s>]+', '', data)
-        data = re.sub('\s+' + attr, '', data)
+    for attr in ignore_single_attributes:   # ignore attributes which can be used without values
+        data = re.sub('\s+' + attr + '=".+?"', '', data)        # remove attribute if it has value in quotes anyway
+        data = re.sub('\s+' + attr + '=[^\s>]+', '', data)      # remove attribute if it has value without quotes anyway
+        data = re.sub('\s+' + attr + '(?=[\s>])', '', data)     # remove attribute without value
 
-    data = re.sub(r'<\S+?\s*>', '', data)
-    data = re.sub(r'<\S+', '', data)
-    data = re.sub(r'>', '', data)
-    data = re.sub(r'\S+?="?\{\{.+?\}\}"?', '', data)
-    data = re.sub(r'"\'', '"', data)
-    data = re.sub(r'\'"', '"', data)
-    strings = re.split('"?\s*\S+?="?', data)
+    data = re.sub(r'<\S+?\s*/?>', '', data)     # remove tags without attributes
+    data = re.sub(r'<\S+', '', data)            # remove tags
+    data = re.sub(r'/?>', '', data)             # remove closing brackets
+    data = re.sub(r'\S+?="?\{\{.+?\}\}"?', '', data)    # remove template constants: {{something}}
+    data = re.sub(r'"\'', '"', data)            # replace double-quotes "'something'" -> "something"
+    data = re.sub(r'\'"', '"', data)            # replace double-quotes "'something'" -> "something"
+
+    strings = re.split('"?\s*\S+?="?', data)    # split, ignoring attribute names
     return unique_list(strings)
 
 
