@@ -47,7 +47,6 @@ QnPreferencesDialog::QnPreferencesDialog(QWidget *parent):
         );
     }
 
-    resize(1, 1); // set widget size to minimal possible
     loadDataToUi();
 }
 
