@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="th" sourcelanguage="en">
+<TS version="2.1" language="th" sourcelanguage="en">
 <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
@@ -1958,9 +1958,11 @@ to view more bookmarks</source>
         <source>Source camera</source>
         <translation>กล้องที่มา</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Source and %n more cameras</source>
-        <translation>แหล่งที่มาและ%n เพิ่มกล้องมากขึ้น</translation>
+        <translation type="unfinished">
+            <numerusform>แหล่งที่มาและ%n เพิ่มกล้องมากขึ้น</numerusform>
+        </translation>
     </message>
     <message>
         <source>N/A</source>
@@ -5036,17 +5038,23 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>&lt;All My I/O Modules&gt;</source>
         <translation>&lt;ทุก ๆ โมดูล I/O&gt;</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n device(s)&gt;</source>
-        <translation>&lt;%n อุปกรณ์(s)&gt;</translation>
+        <translation type="unfinished">
+            <numerusform>&lt;%n อุปกรณ์(s)&gt;</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n camera(s)&gt;</source>
-        <translation>&lt;%n กล้อง(s)&gt;</translation>
+        <translation type="unfinished">
+            <numerusform>&lt;%n กล้อง(s)&gt;</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n I/O module(s)&gt;</source>
-        <translation>&lt;%n I/O โมดูล(s)&gt;</translation>
+        <translation type="unfinished">
+            <numerusform>&lt;%n I/O โมดูล(s)&gt;</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -5801,13 +5809,17 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Notice: Only further recording will be backed up. Backup process will ignore existing footage.</source>
         <translation>หมายเหตุ: เฉพาะการบันทึกต่อไปจะมีการสำรองข้อมูล การสำรองข้อมูลจะไม่สนใจภาพที่มีอยู่.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n Camera(s)</source>
-        <translation>%n กล้อง(s)</translation>
+        <translation type="unfinished">
+            <numerusform>%n กล้อง(s)</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n Device(s)</source>
-        <translation>%n อุปกรณ์(s)</translation>
+        <translation type="unfinished">
+            <numerusform>%n อุปกรณ์(s)</numerusform>
+        </translation>
     </message>
     <message>
         <source>Backup is finished</source>
@@ -6845,9 +6857,11 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Press %1 to search bookmarks</source>
         <translation>กด%1 ค้นหาถึงบุ๊กมาร์ค</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Are you sure you want to delete these %n bookmarks?</source>
-        <translation>คุณคุณแน่ใจหรือว่าต้องการลบบุ๊คมาร์คนี้ %n?</translation>
+        <translation type="unfinished">
+            <numerusform>คุณคุณแน่ใจหรือว่าต้องการลบบุ๊คมาร์คนี้ %n?</numerusform>
+        </translation>
     </message>
 </context>
 <context>

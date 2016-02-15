@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="es" sourcelanguage="en">
+<TS version="2.1" language="es" sourcelanguage="en">
 <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
@@ -1977,9 +1977,12 @@ para ver los marcadores</translation>
         <source>Source camera</source>
         <translation>Cámara de origen</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Source and %n more cameras</source>
-        <translation>Fuente y %n más cámaras</translation>
+        <translation type="unfinished">
+            <numerusform>Fuente y %n más cámaras</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>N/A</source>
@@ -5091,17 +5094,26 @@ Si usted entiende esto y le gustaría continuar por favor haga clic en combinar 
         <source>&lt;All My I/O Modules&gt;</source>
         <translation>&lt;Todos Mis Módulos de E/S&gt;</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n device(s)&gt;</source>
-        <translation>&lt;%n dispositivo(s)&gt;</translation>
+        <translation type="unfinished">
+            <numerusform>&lt;%n dispositivo(s)&gt;</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n camera(s)&gt;</source>
-        <translation>&lt;%n cámara(s)&gt;</translation>
+        <translation type="unfinished">
+            <numerusform>&lt;%n cámara(s)&gt;</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n I/O module(s)&gt;</source>
-        <translation>&lt;%n Módulo(s) de E/S&gt;</translation>
+        <translation type="unfinished">
+            <numerusform>&lt;%n Módulo(s) de E/S&gt;</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -5862,13 +5874,19 @@ Si usted entiende esto y le gustaría continuar por favor haga clic en combinar 
         <source>Notice: Only further recording will be backed up. Backup process will ignore existing footage.</source>
         <translation>AVISO: Solo grabación futura sera respaldada. El proceso del respaldo ignorará las secuencias existentes.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n Camera(s)</source>
-        <translation>%n Cámara(s)</translation>
+        <translation type="unfinished">
+            <numerusform>%n Cámara(s)</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n Device(s)</source>
-        <translation>%n Dispositivo(s)</translation>
+        <translation type="unfinished">
+            <numerusform>%n Dispositivo(s)</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Backup is finished</source>
@@ -6928,9 +6946,12 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Press %1 to search bookmarks</source>
         <translation>Pulse %1 buscar favoritos</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Are you sure you want to delete these %n bookmarks?</source>
-        <translation>¿Está seguro que desea eliminar estos marcadores de %n?</translation>
+        <translation type="unfinished">
+            <numerusform>¿Está seguro que desea eliminar estos marcadores de %n?</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
