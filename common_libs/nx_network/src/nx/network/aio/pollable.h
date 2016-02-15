@@ -34,12 +34,13 @@ public:
     Pollable(
         AbstractSocket::SOCKET_HANDLE fd,
         std::unique_ptr<PollableImpl> impl = std::unique_ptr<PollableImpl>() );
-    virtual ~Pollable() {}
 
     Pollable(const Pollable&) = delete;
     Pollable& operator=(const Pollable&) = delete;
-    Pollable(Pollable&&) = default;
-    Pollable& operator=(Pollable&&) = default;
+    Pollable(Pollable&&);
+    Pollable& operator=(Pollable&&);
+
+    virtual ~Pollable() {}
 
     AbstractSocket::SOCKET_HANDLE handle() const;
     /*!

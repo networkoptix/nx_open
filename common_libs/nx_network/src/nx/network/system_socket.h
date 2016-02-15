@@ -62,9 +62,9 @@ public:
         PollableSystemSocketImpl* impl = nullptr );
 
     Socket(const Socket&) = delete;
-    Socket operator=(const Socket&) = delete;
-    Socket(Socket&&) = default;
-    Socket& operator=(Socket&&) = default;
+    Socket& operator=(const Socket&) = delete;
+    Socket(Socket&&);
+    Socket& operator=(Socket&&);
 
     /**
      *   Close and deallocate this socket
@@ -190,12 +190,12 @@ public:
         int newConnSD,
         PollableSystemSocketImpl* sockImpl = nullptr );
 
-    virtual ~CommunicatingSocket();
-
     CommunicatingSocket(const CommunicatingSocket&) = delete;
-    CommunicatingSocket operator=(const CommunicatingSocket&) = delete;
-    CommunicatingSocket(CommunicatingSocket&&) = default;
-    CommunicatingSocket& operator=(CommunicatingSocket&&) = default;
+    CommunicatingSocket& operator=(const CommunicatingSocket&) = delete;
+    CommunicatingSocket(CommunicatingSocket&&);
+    CommunicatingSocket& operator=(CommunicatingSocket&&);
+
+    virtual ~CommunicatingSocket();
 
     //!Implementation of AbstractCommunicatingSocket::connect
     virtual bool connect(

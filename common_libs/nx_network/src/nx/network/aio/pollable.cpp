@@ -25,6 +25,37 @@ Pollable::Pollable(
         m_impl.reset( new PollableImpl() );
 }
 
+Pollable::Pollable(Pollable&& rhs)
+:
+    m_fd(std::move(rhs.m_fd)),
+    m_impl(std::move(rhs.m_impl)),
+    m_readTimeoutMS(std::move(rhs.m_readTimeoutMS)),
+    m_writeTimeoutMS(std::move(rhs.m_writeTimeoutMS))
+{
+    rhs.m_fd = -1;
+    rhs.m_readTimeoutMS = 0;
+    rhs.m_writeTimeoutMS = 0;
+}
+
+Pollable& Pollable::operator=(Pollable&& rhs)
+{
+    if (&rhs == this)
+        return *this;
+
+    m_fd = std::move(rhs.m_fd);
+    rhs.m_fd = -1;
+
+    m_impl = std::move(rhs.m_impl);
+
+    m_readTimeoutMS = std::move(rhs.m_readTimeoutMS);
+    rhs.m_readTimeoutMS = 0;
+
+    m_writeTimeoutMS = std::move(rhs.m_writeTimeoutMS);
+    rhs.m_readTimeoutMS = 0;
+
+    return *this;
+}
+
 AbstractSocket::SOCKET_HANDLE Pollable::handle() const
 {
     return m_fd;
