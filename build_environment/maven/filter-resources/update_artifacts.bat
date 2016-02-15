@@ -6,7 +6,7 @@ if "%NX_RSYNC_SOURCE%" == "" (
 )
 
 set CURRENTDIR=%cd%
-set RSYNC=%CURRENTDIR%\rsync-win32\rsync -rtvL
+set RSYNC=%CURRENTDIR%\rsync-win32\rsync -rtvL --chmod=ugo=rwx
 
 mkdir %CURRENTDIR%\artifacts\qt\${qt.version}\${platform}\${arch}
 cd %CURRENTDIR%\artifacts\qt\${qt.version}\${platform}
