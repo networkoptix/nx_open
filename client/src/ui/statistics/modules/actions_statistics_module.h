@@ -3,17 +3,15 @@
 
 #include <statistics/abstract_statistics_module.h>
 
-#include <utils/common/connective.h>
-
 class QnActionManager;
 class AbstractActionMetric;
 typedef QPointer<QnActionManager> QnActionManagerPtr;
 
-class QnActionsStatisticsModule : public Connective<QnAbstractStatisticsModule>
+class QnActionsStatisticsModule : public QnAbstractStatisticsModule
 {
     Q_OBJECT
 
-    typedef Connective<QnAbstractStatisticsModule> base_type;
+    typedef QnAbstractStatisticsModule base_type;
 
 public:
     QnActionsStatisticsModule(QObject *parent);

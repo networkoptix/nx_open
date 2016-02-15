@@ -25,10 +25,6 @@ public:
     void setContext(QnWorkbenchContext *context);
 
 private:
-    void updateCurrentUser(const QnUserResourcePtr &userResource);
-
-private:
     typedef QPointer<QnWorkbenchContext> ContextPtr;
     ContextPtr m_context;
-    QString m_currentUserName;
 };

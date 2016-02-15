@@ -7,6 +7,7 @@
 #include <core/resource/resource_name.h>
 #include <core/resource/user_resource.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_access_controller.h>
 #include <core/resource_management/resource_pool.h>
 
 namespace
@@ -25,7 +26,6 @@ namespace
 QnUsersStatisticsModule::QnUsersStatisticsModule(QObject *parent)
     : base_type(parent)
     , m_context()
-    , m_currentUserName()
 {
 }
 
@@ -34,22 +34,24 @@ QnUsersStatisticsModule::~QnUsersStatisticsModule()
 
 QnMetricsHash QnUsersStatisticsModule::metrics() const
 {
+    if (!m_context)
+        return QnMetricsHash();
+
+    const auto accessController = m_context->accessController();
+    if (!accessController)
+        return QnMetricsHash();
+
+    QnMetricsHash result;
+
     const auto availableUsers = qnResPool->getResources<QnUserResource>();
-
     Q_ASSERT_X(!availableUsers.isEmpty(), Q_FUNC_INFO, "Can't gather metrics for empty users list");
-    Q_ASSERT_X(!m_currentUserName.isEmpty(), Q_FUNC_INFO, "There is no current user!");
 
+    // Adds number of each permission
     typedef QHash<QString, int> PermissionCountHash;
     PermissionCountHash permissionsCount;
-
-    Qn::Permissions currentUserPermissions = Qn::NoPermissions;
     for (const auto &userResource: availableUsers)
     {
-        const auto permissions = static_cast<Qn::Permissions>(
-            userResource->getPermissions());
-
-        if (extractUserName(userResource) == m_currentUserName)
-            currentUserPermissions = permissions;
+        const auto permissions = accessController->globalPermissions(userResource);
 
         static const auto kDelimieter = L'|';
         const auto permissionsList = QnLexical::serialized(permissions)
@@ -58,16 +60,6 @@ QnMetricsHash QnUsersStatisticsModule::metrics() const
             ++permissionsCount[permissionStr];
     }
 
-    QnMetricsHash result;
-
-    // Adds current user permissions metric
-    if (!m_currentUserName.isEmpty())
-    {
-        const auto value = QnLexical::serialized(currentUserPermissions);
-        result.insert(kPermissionsTag, value);
-    }
-
-    // Adds number of each permission
     for (auto it = permissionsCount.begin(); it != permissionsCount.end(); ++it)
     {
         const auto name = it.key();
@@ -75,27 +67,26 @@ QnMetricsHash QnUsersStatisticsModule::metrics() const
         result.insert(kPermissionCountTagTemplate.arg(name), QString::number(count));
     }
 
+    // Adds current user permissions metric
+    const auto currentUser = m_context->user();
+    Q_ASSERT_X(!currentUser, Q_FUNC_INFO, "There is no current user!");
+    if (!currentUser)
+        return result;
+
+    const auto currentUserPermissions = accessController->globalPermissions();
+    const auto value = QnLexical::serialized(currentUserPermissions);
+    result.insert(kPermissionsTag, value);
+
     return result;
 }
 
 void QnUsersStatisticsModule::resetMetrics()
 {
-    m_currentUserName.clear();
-}
-
-void QnUsersStatisticsModule::updateCurrentUser(const QnUserResourcePtr &userResource)
-{
-    m_currentUserName = extractUserName(userResource);
 }
 
 void QnUsersStatisticsModule::setContext(QnWorkbenchContext *context)
 {
-    if (m_context)
-        disconnect(m_context, nullptr, this, nullptr);
-
     m_context = context;
-    connect(m_context, &QnWorkbenchContext::userChanged
-        , this, &QnUsersStatisticsModule::updateCurrentUser);
 }
 
 
