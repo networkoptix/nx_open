@@ -6,8 +6,8 @@ Cygwin part:
 3) run "make VCMakefile"
 4) ./cp config/vc_config_make_rules-dist config/vc_config_make_rules
 
-For release build (looks like does not help):
-1) vc_config_make_rules: add /Ox to OPTFLAGS variable
+For release build:
+1) vc_config_make_rules: change /MDd to /MD
 2) set OPTIMISE=4 in config/config
 
 MSVC Tools Command Prompt:

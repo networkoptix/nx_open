@@ -42,6 +42,11 @@
 #if !defined(EST_SYSTEM_H)
 #    define EST_SYSTEM_H 1
 
+/* horrible hack */
+#ifdef _MSC_VER
+#define SYSTEM_IS_WIN32 1
+#endif
+
 #if defined(SYSTEM_IS_WIN32)
 #   define _WINSOCKAPI_		/* horrible hack */
 #   define _LPCVOID_DEFINED     /* and another */
