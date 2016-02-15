@@ -24,14 +24,9 @@ namespace
 
 QnUsersStatisticsModule::QnUsersStatisticsModule(QObject *parent)
     : base_type(parent)
-    , QnWorkbenchContextAware(parent)
+    , m_context()
     , m_currentUserName()
 {
-    connect(context(), &QnWorkbenchContext::userChanged
-        , this, [this](const QnUserResourcePtr &userResource)
-    {
-        m_currentUserName = extractUserName(userResource);
-    });
 }
 
 QnUsersStatisticsModule::~QnUsersStatisticsModule()
@@ -87,4 +82,20 @@ void QnUsersStatisticsModule::resetMetrics()
 {
     m_currentUserName.clear();
 }
+
+void QnUsersStatisticsModule::updateCurrentUser(const QnUserResourcePtr &userResource)
+{
+    m_currentUserName = extractUserName(userResource);
+}
+
+void QnUsersStatisticsModule::setContext(QnWorkbenchContext *context)
+{
+    if (m_context)
+        disconnect(m_context, nullptr, this, nullptr);
+
+    m_context = context;
+    connect(m_context, &QnWorkbenchContext::userChanged
+        , this, &QnUsersStatisticsModule::updateCurrentUser);
+}
+
 
