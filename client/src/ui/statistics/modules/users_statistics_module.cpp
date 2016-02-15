@@ -69,7 +69,7 @@ QnMetricsHash QnUsersStatisticsModule::metrics() const
 
     // Adds current user permissions metric
     const auto currentUser = m_context->user();
-    Q_ASSERT_X(!currentUser, Q_FUNC_INFO, "There is no current user!");
+    Q_ASSERT_X(currentUser, Q_FUNC_INFO, "There is no current user!");
     if (!currentUser)
         return result;
 
