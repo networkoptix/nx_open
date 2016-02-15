@@ -5,7 +5,7 @@
     <name>CloseButton</name>
     <message>
         <source>Close Tab</source>
-        <translation>ปิแท็บ</translation>
+        <translation>ปิดแท็บ</translation>
     </message>
 </context>
 <context>
@@ -32,7 +32,7 @@
     </message>
     <message>
         <source>Quit %1</source>
-        <translation>เลิก %1</translation>
+        <translation>ออก %1</translation>
     </message>
     <message>
         <source>About %1</source>
