@@ -12,7 +12,14 @@
 #include "networkoptixmodulerevealcommon.h"
 
 
+namespace nx {
+namespace network {
+
 class UDPSocket;
+
+}   //network
+}   //nx
+
 struct QnModuleInformation;
 class SocketAddress;
 
@@ -75,8 +82,8 @@ protected:
     virtual void run() override;
 
 private:
-    bool processDiscoveryRequest(UDPSocket *udpSocket);
-    bool processDiscoveryResponse(UDPSocket *udpSocket);
+    bool processDiscoveryRequest(nx::network::UDPSocket *udpSocket);
+    bool processDiscoveryResponse(nx::network::UDPSocket *udpSocket);
     void updateInterfaces();
     void clearInterfaces();
     RevealResponse* getCachedValue(const quint8* buffer, const quint8* bufferEnd);
@@ -84,9 +91,9 @@ private:
 private:
     mutable QnMutex m_mutex;
     bool m_clientMode;
-    aio::PollSet m_pollSet;
-    QHash<QHostAddress, UDPSocket*> m_clientSockets;
-    std::unique_ptr<UDPSocket> m_serverSocket;
+    nx::network::aio::PollSet m_pollSet;
+    QHash<QHostAddress, nx::network::UDPSocket*> m_clientSockets;
+    std::unique_ptr<nx::network::UDPSocket> m_serverSocket;
     const unsigned int m_pingTimeoutMillis;
     const unsigned int m_keepAliveMultiply;
     quint64 m_prevPingClock;

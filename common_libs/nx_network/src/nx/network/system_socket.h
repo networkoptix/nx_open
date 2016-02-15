@@ -23,8 +23,15 @@
 #include "utils/common/systemerror.h"
 
 
-typedef PollableImpl PollableSystemSocketImpl;
+namespace nx {
+namespace network {
+
+typedef nx::network::PollableImpl PollableSystemSocketImpl;
+
+namespace aio {
 template<class SocketType> class BaseAsyncSocketImplHelper;
+template<class SocketType> class AsyncSocketImplHelper;
+}   //aio
 
 /**
  *   Base class representing basic communication endpoint
@@ -33,16 +40,16 @@ template<typename InterfaceToImplement>
 class Socket
 :
     public InterfaceToImplement,
-    public Pollable
+    public nx::network::Pollable
 {
 public:
     Socket(
-        std::unique_ptr<BaseAsyncSocketImplHelper<Pollable>> asyncHelper,
+        std::unique_ptr<aio::BaseAsyncSocketImplHelper<Pollable>> asyncHelper,
         int type,
         int protocol,
         PollableSystemSocketImpl* impl = nullptr );
     Socket(
-        std::unique_ptr<BaseAsyncSocketImplHelper<Pollable>> asyncHelper,
+        std::unique_ptr<aio::BaseAsyncSocketImplHelper<Pollable>> asyncHelper,
         int sockDesc,
         PollableSystemSocketImpl* impl = nullptr );
     //TODO #ak remove following two constructors
@@ -65,8 +72,8 @@ public:
     virtual AbstractSocket::SOCKET_HANDLE handle() const override;
     virtual bool getRecvTimeout(unsigned int* millis) const override;
     virtual bool getSendTimeout(unsigned int* millis) const override;
-    virtual aio::AbstractAioThread* getAioThread() override;
-    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
+    virtual nx::network::aio::AbstractAioThread* getAioThread() override;
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
     //!Implementation of AbstractSocket::bind
     virtual bool bind( const SocketAddress& localAddress ) override;
@@ -147,7 +154,7 @@ public:
     bool createSocket( int type, int protocol );
 
 protected:
-    std::unique_ptr<BaseAsyncSocketImplHelper<Pollable>> m_baseAsyncHelper;
+    std::unique_ptr<aio::BaseAsyncSocketImplHelper<Pollable>> m_baseAsyncHelper;
 
 private:
     bool m_nonBlockingMode;
@@ -156,8 +163,6 @@ private:
     Socket(const Socket &sock);
     void operator=(const Socket &sock);
 };
-
-template<class SocketType> class AsyncSocketImplHelper;
 
 /**
  *   Socket which is able to connect, send, and receive
@@ -210,9 +215,9 @@ public:
         std::function<void()> handler ) override;
     //!Implementation of AbstractCommunicatingSocket::cancelAsyncIO
     virtual void cancelIOAsync(
-        aio::EventType eventType,
+        nx::network::aio::EventType eventType,
         std::function<void()> cancellationDoneHandler) override;
-    virtual void cancelIOSync(aio::EventType eventType) override;
+    virtual void cancelIOSync(nx::network::aio::EventType eventType) override;
 
     virtual void close() override;
     virtual void shutdown() override;
@@ -221,7 +226,7 @@ public:
     static QList<QString> connectFilters;
 
 private:
-    AsyncSocketImplHelper<Pollable>* m_aioHelper;
+    aio::AsyncSocketImplHelper<Pollable>* m_aioHelper;
     bool m_connected;
 };
 
@@ -415,5 +420,8 @@ private:
         HostAddress* const sourceAddress,
         quint16* const sourcePort );
 };
+
+}   //network
+}   //nx
 
 #endif

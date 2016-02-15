@@ -32,6 +32,8 @@ namespace {
 
 } // anonymous namespace
 
+using namespace nx::network;
+
 QnMulticastModuleFinder::QnMulticastModuleFinder(
     bool clientOnly,
     const QHostAddress &multicastGroupAddress,
@@ -96,7 +98,7 @@ void QnMulticastModuleFinder::updateInterfaces() {
         try {
             //if( addressToUse == QHostAddress(lit("127.0.0.1")) )
             //    continue;
-            std::unique_ptr<UDPSocket> sock( new UDPSocket() );
+            auto sock = std::make_unique<nx::network::UDPSocket>();
             sock->bind(SocketAddress(address.toString(), 0));
             sock->getLocalAddress();    //requesting local address. During this call local port is assigned to socket
             sock->setDestAddr(SocketAddress(m_multicastGroupAddress.toString(), m_multicastGroupPort));

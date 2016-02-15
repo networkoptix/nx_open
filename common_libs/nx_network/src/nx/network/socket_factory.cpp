@@ -11,6 +11,9 @@
 
 #include "utils/common/cpp14.h"
 
+
+using namespace nx::network;
+
 std::unique_ptr< AbstractDatagramSocket > SocketFactory::createDatagramSocket()
 {
     return std::unique_ptr< AbstractDatagramSocket >(new UDPSocket(false));

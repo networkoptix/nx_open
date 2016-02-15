@@ -19,6 +19,10 @@
 #include "../socket_global.h"
 
 
+namespace nx {
+namespace network {
+namespace aio {
+
 //TODO #ak come up with new name for this class or remove it
 //TODO #ak also, some refactor needed to use AsyncSocketImplHelper with server socket
 //TODO #ak move timers to AbstractSocket
@@ -754,5 +758,9 @@ private:
     std::atomic<int> m_acceptAsyncCallCount;
     bool* m_terminatedFlagPtr;
 };
+
+}   //aio
+}   //network
+}   //nx
 
 #endif  //ASYNC_SOCKET_HELPER_H

@@ -9,10 +9,13 @@
 #include <cstddef>
 
 
+namespace nx {
+namespace network {
+
 class Pollable;
 
-namespace aio
-{
+namespace aio {
+
     class PollSetImpl;
     class ConstIteratorImpl;
 
@@ -135,6 +138,8 @@ namespace aio
     private:
         PollSetImpl* m_impl;
     };
-}
+}   //aio
+}   //network
+}   //nx
 
 #endif  //POLLSET_H

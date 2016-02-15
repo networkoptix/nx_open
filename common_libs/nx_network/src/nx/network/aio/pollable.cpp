@@ -8,6 +8,10 @@
 #include <utils/common/systemerror.h>
 #include <nx/network/socket_global.h>
 
+
+namespace nx {
+namespace network {
+
 Pollable::Pollable(
     AbstractSocket::SOCKET_HANDLE fd,
     std::unique_ptr<PollableImpl> impl )
@@ -54,12 +58,15 @@ bool Pollable::getLastError( SystemError::ErrorCode* /*errorCode*/ ) const
     return false;
 }
 
-aio::AbstractAioThread* Pollable::getAioThread()
+nx::network::aio::AbstractAioThread* Pollable::getAioThread()
 {
     return nx::network::SocketGlobals::aioService().getSocketAioThread(this);
 }
 
-void Pollable::bindToAioThread(aio::AbstractAioThread* aioThread)
+void Pollable::bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
 {
     nx::network::SocketGlobals::aioService().bindSocketToAioThread(this, aioThread);
 }
+
+}   //network
+}   //nx

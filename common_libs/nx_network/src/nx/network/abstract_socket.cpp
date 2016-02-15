@@ -51,12 +51,12 @@ void AbstractCommunicatingSocket::registerTimer(
 
 void AbstractCommunicatingSocket::pleaseStop(std::function< void() > handler)
 {
-    cancelIOAsync(aio::EventType::etNone, std::move(handler));
+    cancelIOAsync(nx::network::aio::EventType::etNone, std::move(handler));
 }
 
 void AbstractCommunicatingSocket::pleaseStopSync()
 {
-    cancelIOSync(aio::EventType::etNone);
+    cancelIOSync(nx::network::aio::EventType::etNone);
 }
 
 

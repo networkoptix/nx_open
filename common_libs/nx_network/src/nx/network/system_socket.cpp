@@ -69,6 +69,9 @@ int getSystemErrCode()
 #endif
 
 
+namespace nx {
+namespace network {
+
 //////////////////////////////////////////////////////////
 // Socket implementation
 //////////////////////////////////////////////////////////
@@ -384,7 +387,7 @@ unsigned short Socket<InterfaceToImplement>::resolveService(
 
 template<typename InterfaceToImplement>
 Socket<InterfaceToImplement>::Socket(
-    std::unique_ptr<BaseAsyncSocketImplHelper<Pollable>> asyncHelper,
+    std::unique_ptr<aio::BaseAsyncSocketImplHelper<Pollable>> asyncHelper,
     int type,
     int protocol,
     PollableSystemSocketImpl* impl )
@@ -400,7 +403,7 @@ Socket<InterfaceToImplement>::Socket(
 
 template<typename InterfaceToImplement>
 Socket<InterfaceToImplement>::Socket(
-    std::unique_ptr<BaseAsyncSocketImplHelper<Pollable>> asyncHelper,
+    std::unique_ptr<aio::BaseAsyncSocketImplHelper<Pollable>> asyncHelper,
     int _sockDesc,
     PollableSystemSocketImpl* impl )
 :
@@ -421,7 +424,7 @@ Socket<InterfaceToImplement>::Socket(
     Pollable(
         INVALID_SOCKET,
         std::unique_ptr<PollableSystemSocketImpl>(impl) ),
-    m_baseAsyncHelper( new BaseAsyncSocketImplHelper<Pollable>(this) ),
+    m_baseAsyncHelper( new aio::BaseAsyncSocketImplHelper<Pollable>(this) ),
     m_nonBlockingMode( false )
 {
     createSocket( type, protocol );
@@ -435,7 +438,7 @@ Socket<InterfaceToImplement>::Socket(
     Pollable(
         _sockDesc,
         std::unique_ptr<PollableSystemSocketImpl>(impl) ),
-    m_baseAsyncHelper( new BaseAsyncSocketImplHelper<Pollable>(this) ),
+    m_baseAsyncHelper( new aio::BaseAsyncSocketImplHelper<Pollable>(this) ),
     m_nonBlockingMode( false )
 {
 }
@@ -563,8 +566,8 @@ CommunicatingSocket<InterfaceToImplement>::CommunicatingSocket(
     PollableSystemSocketImpl* sockImpl)
 :
     Socket<InterfaceToImplement>(
-        std::unique_ptr<BaseAsyncSocketImplHelper<Pollable>>(
-            new AsyncSocketImplHelper<Pollable>(
+        std::unique_ptr<aio::BaseAsyncSocketImplHelper<Pollable>>(
+            new aio::AsyncSocketImplHelper<Pollable>(
                 this,
                 this,
                 natTraversal)),
@@ -574,7 +577,7 @@ CommunicatingSocket<InterfaceToImplement>::CommunicatingSocket(
     m_aioHelper(nullptr),
     m_connected(false)
 {
-    m_aioHelper = static_cast<AsyncSocketImplHelper<Pollable>*>(this->m_baseAsyncHelper.get());
+    m_aioHelper = static_cast<aio::AsyncSocketImplHelper<Pollable>*>(this->m_baseAsyncHelper.get());
 }
 
 template<typename InterfaceToImplement>
@@ -584,8 +587,8 @@ CommunicatingSocket<InterfaceToImplement>::CommunicatingSocket(
     PollableSystemSocketImpl* sockImpl)
 :
     Socket<InterfaceToImplement>(
-        std::unique_ptr<BaseAsyncSocketImplHelper<Pollable>>(
-            new AsyncSocketImplHelper<Pollable>(
+        std::unique_ptr<aio::BaseAsyncSocketImplHelper<Pollable>>(
+            new aio::AsyncSocketImplHelper<Pollable>(
                 this,
                 this,
                 natTraversal)),
@@ -594,7 +597,7 @@ CommunicatingSocket<InterfaceToImplement>::CommunicatingSocket(
     m_aioHelper(nullptr),
     m_connected(true)   //this constructor is used is server socket
 {
-    m_aioHelper = static_cast<AsyncSocketImplHelper<Pollable>*>(this->m_baseAsyncHelper.get());
+    m_aioHelper = static_cast<aio::AsyncSocketImplHelper<Pollable>*>(this->m_baseAsyncHelper.get());
 }
 
 template<typename InterfaceToImplement>
@@ -1209,7 +1212,7 @@ class TCPServerSocketPrivate
 {
 public:
     int socketHandle;
-    AsyncServerSocketHelper<Pollable> asyncServerSocketHelper;
+    aio::AsyncServerSocketHelper<Pollable> asyncServerSocketHelper;
 
     TCPServerSocketPrivate(
         Socket<AbstractStreamServerSocket>* sock,
@@ -1600,3 +1603,6 @@ int UDPSocket::recvFrom(
     }
     return rtn;
 }
+
+}   //network
+}   //nx

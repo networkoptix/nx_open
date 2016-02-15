@@ -15,6 +15,9 @@
 struct bio_st;
 typedef struct bio_st BIO; /* This one is from OpenSSL, which we don't want to include in this header. */
 
+namespace nx {
+namespace network {
+
 class QnSSLSocketPrivate;
 class QnMixedSSLSocketPrivate;
 
@@ -67,9 +70,9 @@ public:
     bool doClientHandshake();
 
     virtual void cancelIOAsync(
-        aio::EventType eventType,
+        nx::network::aio::EventType eventType,
         std::function<void()> cancellationDoneHandler) override;
-    virtual void cancelIOSync(aio::EventType eventType) override;
+    virtual void cancelIOSync(nx::network::aio::EventType eventType) override;
 
 protected:
     enum IOMode
@@ -127,7 +130,7 @@ public:
     virtual int send( const void* buffer, unsigned int bufferLen ) override;
 
     virtual void cancelIOAsync(
-        aio::EventType eventType,
+        nx::network::aio::EventType eventType,
         std::function<void()> cancellationDoneHandler) override;
 
 protected:
@@ -191,6 +194,8 @@ private:
     void connectionAccepted(SystemError::ErrorCode errorCode, AbstractStreamSocket* newSocket);
 };
 
+}   //network
+}   //nx
 
 #endif // ENABLE_SSL
 

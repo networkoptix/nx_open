@@ -78,7 +78,10 @@
 #define STUB_(c) c
 #endif
 
-namespace detail{
+
+namespace nx {
+namespace network {
+namespace detail {
 // =========================================================
 // Udt library initialization and tear down routine.
 // =========================================================
@@ -782,7 +785,7 @@ void UdtStreamSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
 
 UdtStreamSocket::UdtStreamSocket( bool natTraversal )
 :
-    m_aioHelper(new AsyncSocketImplHelper<UdtSocket>(this, this, natTraversal))
+    m_aioHelper(new aio::AsyncSocketImplHelper<UdtSocket>(this, this, natTraversal))
 {
     m_impl->Open();
 }
@@ -790,7 +793,7 @@ UdtStreamSocket::UdtStreamSocket( bool natTraversal )
 UdtStreamSocket::UdtStreamSocket( detail::UdtSocketImpl* impl )
 :
     UdtSocket(impl),
-    m_aioHelper(new AsyncSocketImplHelper<UdtSocket>(this, this, false))
+    m_aioHelper(new aio::AsyncSocketImplHelper<UdtSocket>(this, this, false))
 {
 }
 
@@ -961,7 +964,7 @@ void UdtStreamServerSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
 
 UdtStreamServerSocket::UdtStreamServerSocket()
 :
-    m_aioHelper(new AsyncServerSocketHelper<UdtSocket>( this, this ) )
+    m_aioHelper(new aio::AsyncServerSocketHelper<UdtSocket>( this, this ) )
 {
     m_impl->Open();
 }
@@ -970,3 +973,6 @@ UdtStreamServerSocket::~UdtStreamServerSocket()
 {
     m_aioHelper->cancelIOSync();
 }
+
+}   //network
+}   //nx

@@ -15,7 +15,9 @@
 
 #include <QDateTime>
 
+
 using namespace std;
+using namespace nx::network;
 
 static const QHostAddress groupAddress(QLatin1String("239.255.255.250"));
 static const int GROUP_PORT = 1900;

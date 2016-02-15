@@ -9,11 +9,17 @@
 #include "../aio/pollset.h"
 
 
+namespace nx {
+namespace network {
+
 class UdtSocket;
 
+namespace aio {
 
 template<class SocketType> class AsyncSocketImplHelper;
 template<class SocketType> class AsyncServerSocketHelper;
+
+}   //aio
 
 class UdtPollSet;
 class UdtStreamSocket;
@@ -40,8 +46,8 @@ public:
     CommonSocketImpl<UdtSocket>* impl();
     const CommonSocketImpl<UdtSocket>* impl() const;
 
-    aio::AbstractAioThread* getAioThread();
-    void bindToAioThread(aio::AbstractAioThread* aioThread);
+    nx::network::aio::AbstractAioThread* getAioThread();
+    void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread);
 
 protected:
     UdtSocket( detail::UdtSocketImpl* impl );
@@ -87,8 +93,8 @@ public:
     virtual bool getSendTimeout( unsigned int* millis ) const override;
     virtual bool getLastError( SystemError::ErrorCode* errorCode ) const override;
     virtual AbstractSocket::SOCKET_HANDLE handle() const override;
-    virtual aio::AbstractAioThread* getAioThread() override;
-    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
+    virtual nx::network::aio::AbstractAioThread* getAioThread() override;
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
     // AbstractCommunicatingSocket ------- interface
     virtual bool connect(
         const SocketAddress& remoteAddress,
@@ -100,9 +106,9 @@ public:
     virtual bool isConnected() const override;
     //!Implementation of AbstractCommunicatingSocket::cancelAsyncIO
     virtual void cancelIOAsync(
-        aio::EventType eventType,
+        nx::network::aio::EventType eventType,
         std::function<void()> cancellationDoneHandler) override;
-    virtual void cancelIOSync(aio::EventType eventType) override;
+    virtual void cancelIOSync(nx::network::aio::EventType eventType) override;
 
     // AbstractStreamSocket ------ interface
     virtual bool reopen() override;
@@ -149,7 +155,7 @@ public:
     virtual void dispatch( std::function<void()> handler ) override;
 
 private:
-    std::unique_ptr<AsyncSocketImplHelper<UdtSocket>> m_aioHelper;
+    std::unique_ptr<aio::AsyncSocketImplHelper<UdtSocket>> m_aioHelper;
 
 private:
     Q_DISABLE_COPY(UdtStreamSocket)
@@ -189,8 +195,8 @@ public:
     virtual bool getSendTimeout( unsigned int* millis ) const;
     virtual bool getLastError( SystemError::ErrorCode* errorCode ) const;
     virtual AbstractSocket::SOCKET_HANDLE handle() const;
-    virtual aio::AbstractAioThread* getAioThread() override;
-    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
+    virtual nx::network::aio::AbstractAioThread* getAioThread() override;
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
     //!Implementation of AbstractSocket::post
     virtual void post( std::function<void()> handler ) override;
@@ -199,9 +205,12 @@ public:
     virtual void acceptAsync( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )> handler ) ;
 
 private:
-    std::unique_ptr<AsyncServerSocketHelper<UdtSocket>> m_aioHelper;
+    std::unique_ptr<aio::AsyncServerSocketHelper<UdtSocket>> m_aioHelper;
 
     Q_DISABLE_COPY(UdtStreamServerSocket)
 };
+
+}   //network
+}   //nx
 
 #endif // __UDT_SOCKET_H__

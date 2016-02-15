@@ -13,6 +13,10 @@
 #include "udt_socket.h"
 #include "udt_socket_impl.h"
 
+
+namespace nx {
+namespace network {
+
 // ========================================================
 // PollSet implementation
 // ========================================================
@@ -608,3 +612,6 @@ UdtPollSet::const_iterator UdtPollSet::end() const
     Q_ASSERT(m_impl);
     return const_iterator(m_impl, true);
 }
+
+}   //network
+}   //nx

@@ -6,6 +6,9 @@
 #include "dummy_socket.h"
 
 
+namespace nx {
+namespace network {
+
 DummySocket::DummySocket()
 :
     m_localAddress( HostAddress::localhost, rand() )
@@ -257,3 +260,6 @@ bool BufferSocket::isConnected() const
 {
     return m_isOpened;
 }
+
+}   //network
+}   //nx

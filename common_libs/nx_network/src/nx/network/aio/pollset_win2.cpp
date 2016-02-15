@@ -17,8 +17,10 @@
 #include "../system_socket.h"
 
 
-namespace aio
-{
+namespace nx {
+namespace network {
+namespace aio {
+
     static const size_t INITIAL_FDSET_SIZE = 1024;
     static const size_t FDSET_INCREASE_STEP = 1024;
 
@@ -518,7 +520,10 @@ namespace aio
         _end.m_impl->fdIndex = m_impl->exceptfds->fd_count;
         return _end;
     }
-}
+
+}   //aio
+}   //network
+}   //nx
 
 #endif
 

@@ -533,7 +533,7 @@ TEST( QnMulticodecRtpReader, DISABLED_rtpParsingPerformance )
         std::unique_ptr<QnMulticodecRtpReader> rtspStreamReader(
             new QnMulticodecRtpReader(
                 resource,
-                std::unique_ptr<BufferSocket>(new BufferSocket(testData))) );
+                std::make_unique<nx::network::BufferSocket>(testData)) );
         rtspStreamReader->setRequest( rtspUrl );
         ASSERT_TRUE( rtspStreamReader->openStream() );
 

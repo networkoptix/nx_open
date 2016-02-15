@@ -28,6 +28,8 @@
 #include "../udt/udt_pollset.h"
 
 
+namespace nx {
+namespace network {
 namespace aio {
 namespace detail {
 
@@ -1089,5 +1091,7 @@ public:
 };
 
 }   //aio
+}   //network
+}   //nx
 
 #endif  //AIOTHREAD_H

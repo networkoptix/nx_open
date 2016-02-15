@@ -25,6 +25,9 @@
 #endif
 
 
+namespace nx {
+namespace network {
+
 //static const int BUFFER_SIZE = 1024;
 const unsigned char sid[] = "Network Optix SSL socket";
 
@@ -1336,7 +1339,7 @@ bool QnSSLSocket::enableClientEncryption()
 }
 
 void QnSSLSocket::cancelIOAsync(
-    aio::EventType eventType,
+    nx::network::aio::EventType eventType,
     std::function<void()> cancellationDoneHandler)
 {
     Q_D(const QnSSLSocket);
@@ -1348,7 +1351,7 @@ void QnSSLSocket::cancelIOAsync(
         });
 }
 
-void QnSSLSocket::cancelIOSync(aio::EventType eventType)
+void QnSSLSocket::cancelIOSync(nx::network::aio::EventType eventType)
 {
     Q_D(const QnSSLSocket);
     d->wrappedSocket->cancelIOSync(eventType);
@@ -1505,7 +1508,7 @@ int QnMixedSSLSocket::send( const void* buffer, unsigned int bufferLen )
 }
 
 void QnMixedSSLSocket::cancelIOAsync(
-    aio::EventType eventType,
+    nx::network::aio::EventType eventType,
     std::function<void()> cancellationDoneHandler)
 {
     Q_D(QnMixedSSLSocket);
@@ -1655,5 +1658,8 @@ void SSLServerSocket::connectionAccepted(SystemError::ErrorCode errorCode, Abstr
     auto handler = std::move(m_acceptHandler);
     handler(errorCode, newSocket);
 }
+
+}   //network
+}   //nx
 
 #endif // ENABLE_SSL

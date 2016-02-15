@@ -15,6 +15,10 @@
 #include <nx/network/udt/udt_socket.h>
 #include <nx/network/socket_factory.h>
 
+
+namespace nx {
+namespace network {
+
 namespace {
 // Configuration or client/server
 struct ServerConfig {
@@ -630,3 +634,5 @@ std::unique_ptr<UdtSocketProfile> createUdtSocketProfile( const QCoreApplication
     }
 }
 
+}   //network
+}   //nx

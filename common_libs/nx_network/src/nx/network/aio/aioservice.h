@@ -26,11 +26,7 @@ namespace network {
 
 class SocketGlobals;
 
-} // namespace network
-} // namespace nx
-
-namespace aio
-{
+namespace aio {
     //TODO #ak think about removing sockets dictionary and mutex (only in release, probably). some data from dictionary can be moved to socket
 
     //!Monitors multiple sockets for asynchronous events and triggers handler (\a AIOEventHandler) on event
@@ -436,6 +432,9 @@ namespace aio
             lock->relock();
         }
     };
-}
+
+}   //aio
+}   //network
+}   //nx
 
 #endif  //AIOSERVICE_H

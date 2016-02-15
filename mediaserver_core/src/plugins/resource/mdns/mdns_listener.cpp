@@ -20,6 +20,8 @@ static const int UPDATE_IF_LIST_INTERVAL = 1000 * 60;
 static QString groupAddress(QLatin1String("224.0.0.251"));
 
 
+using nx::network::UDPSocket;
+
 // -------------- QnMdnsListener ------------
 
 static QnMdnsListener* QnMdnsListener_instance = nullptr;

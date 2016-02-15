@@ -9,6 +9,9 @@
 #include <nx/network/abstract_socket.h>
 
 
+namespace nx {
+namespace network {
+
 //!Base class for socket, reading/writing data from/to any source (e.g., file)
 class DummySocket
 :
@@ -99,5 +102,8 @@ private:
     bool m_isOpened;
     size_t m_curPos;
 };
+
+}   //network
+}   //nx
 
 #endif  //DUMMY_SOCKET_H

@@ -9,6 +9,9 @@
 #include "abstract_socket.h"
 
 
+namespace nx {
+namespace network {
+
 /*!
     \param AbstractSocketProviderType functor with \a operator() that returns type that implements function from \a AbstractSocket abstract class
 */
@@ -73,9 +76,9 @@ public:
     //!Implementation of AbstractSocket::dispatch
     virtual void dispatch( std::function<void()> handler ) override { m_abstractSocketProvider()->dispatch( std::move(handler) ); }
     //!Implementation of AbstractSocket::getAioThread
-    virtual aio::AbstractAioThread* getAioThread() override { return m_abstractSocketProvider()->getAioThread(); }
+    virtual nx::network::aio::AbstractAioThread* getAioThread() override { return m_abstractSocketProvider()->getAioThread(); }
     //!Implementation of AbstractSocket::bindToAioThread
-    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override { m_abstractSocketProvider()->bindToAioThread( aioThread ); }
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override { m_abstractSocketProvider()->bindToAioThread( aioThread ); }
 
 private:
     AbstractSocketProviderType m_abstractSocketProvider;
@@ -232,15 +235,18 @@ public:
         return this->m_implDelegate.registerTimer( timeoutMs, std::move( handler ) );
     }
     virtual void cancelIOAsync(
-        aio::EventType eventType,
+        nx::network::aio::EventType eventType,
         std::function<void()> cancellationDoneHandler) override
     {
         return this->m_implDelegate.cancelIOAsync(eventType, std::move(cancellationDoneHandler));
     }
-    virtual void cancelIOSync(aio::EventType eventType) override
+    virtual void cancelIOSync(nx::network::aio::EventType eventType) override
     {
         return this->m_implDelegate.cancelIOSync(eventType);
     }
 };
+
+}   //network
+}   //nx
 
 #endif  //SOCKET_IMPL_HELPER_H
