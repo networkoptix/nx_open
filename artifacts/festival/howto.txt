@@ -8,3 +8,6 @@ Cygwin part:
 
 MSVC Tools Command Prompt:
 1) nmake /nologo /FVCMakefile
+
+For release build:
+1) vc_config_make_rules: change /MDd to /MD
