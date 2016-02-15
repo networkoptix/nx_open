@@ -35,7 +35,7 @@ QnServerSettingsDialog::QnServerSettingsDialog(QWidget *parent)
     connect(this, &QnGenericTabbedDialog::dialogClosed, m_statisticsPage, &QnRecordingStatisticsWidget::resetForecast);
 
     connect(m_webPageButton, &QPushButton::clicked, this, [this] {
-        menu()->trigger(Qn::WebClientAction, m_server);
+        menu()->trigger(QnActions::WebClientAction, m_server);
     });
 
 

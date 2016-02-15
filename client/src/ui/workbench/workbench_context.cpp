@@ -108,7 +108,7 @@ QnWorkbenchContext::~QnWorkbenchContext() {
     m_resourcePool = NULL;
 }
 
-QAction *QnWorkbenchContext::action(const Qn::ActionId id) const {
+QAction *QnWorkbenchContext::action(const QnActions::Type id) const {
     return m_menu->action(id);
 }
 

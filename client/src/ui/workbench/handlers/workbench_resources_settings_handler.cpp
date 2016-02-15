@@ -18,8 +18,8 @@ QnWorkbenchResourcesSettingsHandler::QnWorkbenchResourcesSettingsHandler(QObject
     , m_cameraSettingsDialog()
     , m_serverSettingsDialog()
 {
-    connect(action(Qn::CameraSettingsAction), &QAction::triggered,    this,   &QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered);
-    connect(action(Qn::ServerSettingsAction), &QAction::triggered,    this,   &QnWorkbenchResourcesSettingsHandler::at_serverSettingsAction_triggered);
+    connect(action(QnActions::CameraSettingsAction), &QAction::triggered,    this,   &QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered);
+    connect(action(QnActions::ServerSettingsAction), &QAction::triggered,    this,   &QnWorkbenchResourcesSettingsHandler::at_serverSettingsAction_triggered);
 }
 
 QnWorkbenchResourcesSettingsHandler::~QnWorkbenchResourcesSettingsHandler() {

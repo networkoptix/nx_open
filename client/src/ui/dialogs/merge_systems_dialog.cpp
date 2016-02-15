@@ -80,7 +80,7 @@ void QnMergeSystemsDialog::done(int result)
         url.setPassword(m_adminPassword);
         QnAppServerConnectionFactory::setUrl(url);
 
-        menu()->trigger(Qn::ReconnectAction);
+        menu()->trigger(QnActions::ConnectAction);
         context()->instance<QnWorkbenchUserWatcher>()->setReconnectOnPasswordChange(true);
     }
 }

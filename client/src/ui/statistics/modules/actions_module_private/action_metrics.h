@@ -13,7 +13,7 @@ public:
     static const QString kPostfix;
 
     ActionTriggeredCountMetric(QnActionManager *actionManager
-        , Qn::ActionId id);
+        , QnActions::Type id);
 
 private:
     QnMetricsHash metrics() const override;

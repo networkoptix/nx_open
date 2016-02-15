@@ -19,7 +19,7 @@ QnWorkbenchSelectionWatcher::QnWorkbenchSelectionWatcher(QObject *parent /*= nul
     , m_selectionUpdatePending(false)
     , m_lastScope(Qn::InvalidScope)
 {
-    connect(action(Qn::SelectionChangeAction),  &QAction::triggered,    this,   [this] {
+    connect(action(QnActions::SelectionChangeAction),  &QAction::triggered,    this,   [this] {
         if (m_selectionUpdatePending)
             return;
 

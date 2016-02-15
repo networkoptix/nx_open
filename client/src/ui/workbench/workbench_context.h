@@ -79,7 +79,7 @@ public:
         m_mainWindow = mainWindow;
     }
 
-    QAction *action(const Qn::ActionId id) const;
+    QAction *action(const QnActions::Type id) const;
 
     QnUserResourcePtr user() const;
 
