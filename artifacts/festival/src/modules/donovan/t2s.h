@@ -231,7 +231,7 @@ void prosody(SPROSOD_LIST *spl, SPN *ps);
 
 /* space.c  */
 void init(CONFIG *config, BUFFER *buffer, LING_LIST *ling_list, SPROSOD_LIST *spl, SPN *ps, ACOUSTIC *as);
-void terminate(CONFIG *config, BUFFER *buffer, LING_LIST *ling_list, SPROSOD_LIST *spl, SPN *ps, ACOUSTIC *as);
+//void terminate(CONFIG *config, BUFFER *buffer, LING_LIST *ling_list, SPROSOD_LIST *spl, SPN *ps, ACOUSTIC *as);
 void buffer_malloc(int num,BUFFER *buffer);
 void buffer_realloc(int num, BUFFER *buffer);
 void buffer_free(BUFFER *buffer);
