@@ -13,7 +13,7 @@
 #include <ui/common/palette.h>
 #include <ui/dialogs/custom_file_dialog.h>
 #include <ui/dialogs/file_dialog.h>
-#include <ui/style/warning_style.h>
+#include <ui/style/custom_style.h>
 
 #include <utils/common/app_info.h>
 #include <utils/common/product_features.h>

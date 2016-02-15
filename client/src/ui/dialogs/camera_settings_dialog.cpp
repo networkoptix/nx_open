@@ -19,6 +19,8 @@
 
 #include <ui/widgets/properties/camera_settings_widget.h>
 
+#include <ui/style/custom_style.h>
+
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/watchers/workbench_selection_watcher.h>
@@ -36,6 +38,8 @@ QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
     m_buttonBox->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel | QDialogButtonBox::Apply);
     m_applyButton = m_buttonBox->button(QDialogButtonBox::Apply);
     m_okButton = m_buttonBox->button(QDialogButtonBox::Ok);
+
+    setAccentStyle(m_okButton);
 
     m_openButton = new QPushButton(tr("Open in New Tab"));
     m_buttonBox->addButton(m_openButton, QDialogButtonBox::HelpRole);

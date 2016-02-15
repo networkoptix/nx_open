@@ -9,6 +9,7 @@
 #include <nx/utils/log/log.h>
 #include <utils/common/systemerror.h>
 #include <utils/common/product_features.h>
+#include <utils/common/cpp14.h>
 
 #include <nx/network/socket.h>
 #include <nx/network/system_socket.h>

@@ -22,7 +22,7 @@
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-#include <ui/style/warning_style.h>
+#include <ui/style/custom_style.h>
 #include <ui/models/license_list_model.h>
 #include <ui/dialogs/license_details_dialog.h>
 #include <ui/dialogs/message_box.h>

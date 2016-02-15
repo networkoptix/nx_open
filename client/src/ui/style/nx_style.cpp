@@ -129,6 +129,12 @@ QnPaletteColor QnNxStyle::findColor(const QColor &color) const
     return d->findColor(color);
 }
 
+QnPaletteColor QnNxStyle::mainColor(QnNxStyle::Colors::Palette palette) const
+{
+    Q_D(const QnNxStyle);
+    return d->mainColor(palette);
+}
+
 void QnNxStyle::drawSwitch(QPainter *painter, const QStyleOption *option, const QWidget *widget) const
 {
     Q_D(const QnNxStyle);
@@ -1877,4 +1883,23 @@ QnNxStyle *QnNxStyle::instance()
         style = proxyStyle->baseStyle();
 
     return qobject_cast<QnNxStyle *>(style);
+}
+
+QString QnNxStyle::Colors::paletteName(QnNxStyle::Colors::Palette palette)
+{
+    switch (palette)
+    {
+    case kBase:
+        return lit("dark");
+    case kContrast:
+        return lit("light");
+    case kBlue:
+        return lit("blue");
+    case kGreen:
+        return lit("green");
+    case kBrang:
+        return lit("brand");
+    }
+
+    return QString();
 }

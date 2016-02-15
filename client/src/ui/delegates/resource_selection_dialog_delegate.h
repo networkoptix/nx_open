@@ -6,7 +6,7 @@
 
 #include <business/business_resource_validation.h>
 #include <core/resource/resource_fwd.h>
-#include <ui/style/warning_style.h>
+#include <ui/style/custom_style.h>
 
 class QnResourcePoolModelCustomColumnDelegate;
 

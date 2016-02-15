@@ -1,7 +1,7 @@
 #include "input_dialog.h"
 #include "ui_input_dialog.h"
 
-#include <ui/style/warning_style.h>
+#include <ui/style/custom_style.h>
 
 QnInputDialog::QnInputDialog(QWidget *parent)
     : base_type(parent)

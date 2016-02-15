@@ -3,7 +3,7 @@
 
 #include <ui/common/mandatory.h>
 #include <ui/common/read_only.h>
-#include <ui/style/warning_style.h>
+#include <ui/style/custom_style.h>
 
 #include <utils/common/app_info.h>
 #include <utils/common/scoped_value_rollback.h>

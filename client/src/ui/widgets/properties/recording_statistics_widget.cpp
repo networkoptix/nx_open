@@ -20,7 +20,7 @@
 #include <ui/dialogs/custom_file_dialog.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/skin.h>
-#include <ui/style/warning_style.h>
+#include <ui/style/custom_style.h>
 
 #include <ui/workbench/workbench_context.h>
 #include <ui/workaround/widgets_signals_workaround.h>

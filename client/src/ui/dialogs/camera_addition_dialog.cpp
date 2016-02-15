@@ -11,7 +11,7 @@
 #include <core/resource_management/resource_pool.h>
 
 #include <ui/common/ui_resource_name.h>
-#include <ui/style/warning_style.h>
+#include <ui/style/custom_style.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/widgets/views/checkboxed_header_view.h>

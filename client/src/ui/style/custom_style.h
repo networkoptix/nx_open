@@ -1,11 +1,11 @@
-#ifndef WARNING_STYLE_H
-#define WARNING_STYLE_H
+#pragma once
 
 class QWidget;
 class QPalette;
+class QPushButton;
 
 void setWarningStyle(QWidget *widget);
 void setWarningStyle(QPalette *palette);
 QString setWarningStyleHtml(const QString &source);
 
-#endif // WARNING_STYLE_H
+void setAccentStyle(QPushButton *button);

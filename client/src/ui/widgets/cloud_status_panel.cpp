@@ -5,7 +5,7 @@
 
 #include <common/common_module.h>
 #include <watchers/cloud_status_watcher.h>
-#include <ui/style/warning_style.h>
+#include <ui/style/custom_style.h>
 
 class QnCloudStatusPanelPrivate : public QObject
 {

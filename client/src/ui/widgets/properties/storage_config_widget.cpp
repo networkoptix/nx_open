@@ -26,7 +26,7 @@
 #include <ui/dialogs/backup_schedule_dialog.h>
 #include <ui/dialogs/backup_cameras_dialog.h>
 #include <ui/models/storage_list_model.h>
-#include <ui/style/warning_style.h>
+#include <ui/style/custom_style.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/widgets/storage_space_slider.h>
 #include <ui/workaround/widgets_signals_workaround.h>

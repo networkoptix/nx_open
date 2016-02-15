@@ -10,23 +10,23 @@ QnPaletteColor QnNxStylePrivate::findColor(const QColor &color) const
     return palette.color(color);
 }
 
-QnPaletteColor QnNxStylePrivate::mainColor(style::Colors::Palette palette) const
+QnPaletteColor QnNxStylePrivate::mainColor(QnNxStyle::Colors::Palette palette) const
 {
     int index = -1;
 
     switch (palette)
     {
-    case Colors::kBase:
+    case QnNxStyle::Colors::kBase:
         index = 6;
         break;
-    case Colors::kContrast:
+    case QnNxStyle::Colors::kContrast:
         index = 7;
         break;
-    case Colors::kBlue:
-    case Colors::kBrang:
+    case QnNxStyle::Colors::kBlue:
+    case QnNxStyle::Colors::kBrang:
         index = 4;
         break;
-    case Colors::kGreen:
+    case QnNxStyle::Colors::kGreen:
         index = 3;
         break;
     }
@@ -34,7 +34,7 @@ QnPaletteColor QnNxStylePrivate::mainColor(style::Colors::Palette palette) const
     if (index < 0)
         return QnPaletteColor();
 
-    return this->palette.color(Colors::paletteName(palette), index);
+    return this->palette.color(QnNxStyle::Colors::paletteName(palette), index);
 }
 
 QColor QnNxStylePrivate::checkBoxColor(const QStyleOption *option, bool radio) const
@@ -76,7 +76,7 @@ void QnNxStylePrivate::drawSwitch(
 
     QnPaletteColor backgroundColor = findColor(option->palette.button().color()).lighter(colorShift);
     QnPaletteColor gripColor = findColor(option->palette.window().color());
-    QnPaletteColor highlightColor = mainColor(Colors::kGreen).lighter(colorShift);
+    QnPaletteColor highlightColor = mainColor(QnNxStyle::Colors::kGreen).lighter(colorShift);
 
     bool drawTop = true;
     bool drawBottom = true;

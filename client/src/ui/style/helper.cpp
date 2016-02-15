@@ -65,24 +65,4 @@ namespace style
             return 0;
         return rect.top() + rect.height() * y;
     }
-
-    QString Colors::paletteName(Colors::Palette palette)
-    {
-        switch (palette)
-        {
-        case kBase:
-            return lit("dark");
-        case kContrast:
-            return lit("light");
-        case kBlue:
-            return lit("blue");
-        case kGreen:
-            return lit("green");
-        case kBrang:
-            return lit("brand");
-        }
-
-        return QString();
-    }
-
 }

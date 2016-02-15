@@ -25,7 +25,7 @@
 #include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
-#include <ui/style/warning_style.h>
+#include <ui/style/custom_style.h>
 
 #include <utils/email/email.h>
 #include <utils/common/string.h>

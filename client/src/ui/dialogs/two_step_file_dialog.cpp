@@ -7,7 +7,7 @@
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
 
-#include <ui/style/warning_style.h>
+#include <ui/style/custom_style.h>
 #include <ui/dialogs/file_dialog.h>
 
 #include <utils/common/string.h>

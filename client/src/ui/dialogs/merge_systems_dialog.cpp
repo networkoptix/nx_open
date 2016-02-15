@@ -11,7 +11,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <ui/common/ui_resource_name.h>
-#include <ui/style/warning_style.h>
+#include <ui/style/custom_style.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/actions/action_manager.h>
@@ -28,6 +28,8 @@ QnMergeSystemsDialog::QnMergeSystemsDialog(QWidget *parent) :
     m_successfullyFinished(false)
 {
     ui->setupUi(this);
+
+    setAccentStyle(ui->buttonBox->button(QDialogButtonBox::Ok));
 
     QStringList successMessage;
     successMessage 
