@@ -3,12 +3,12 @@
 
 #include <QtCore/QElapsedTimer>
 
-class ActiveTimeMetric
+class TimeDurationMetric
 {
 public:
-    ActiveTimeMetric();
+    TimeDurationMetric();
 
-    virtual ~ActiveTimeMetric();
+    virtual ~TimeDurationMetric();
 
     void activateCounter(bool isActive);
 

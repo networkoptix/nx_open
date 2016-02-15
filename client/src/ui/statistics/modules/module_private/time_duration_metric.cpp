@@ -1,7 +1,7 @@
 
-#include "active_time_metric.h"
+#include "time_duration_metric.h"
 
-ActiveTimeMetric::ActiveTimeMetric()
+TimeDurationMetric::TimeDurationMetric()
     : m_counter()
     , m_isActiveState(false)
     , m_activeStateDurationMs(0)
@@ -9,10 +9,10 @@ ActiveTimeMetric::ActiveTimeMetric()
     m_counter.invalidate();
 }
 
-ActiveTimeMetric::~ActiveTimeMetric()
+TimeDurationMetric::~TimeDurationMetric()
 {}
 
-void ActiveTimeMetric::activateCounter(bool isActive)
+void TimeDurationMetric::activateCounter(bool isActive)
 {
     if (isActive == m_isActiveState)
         return;
@@ -29,18 +29,18 @@ void ActiveTimeMetric::activateCounter(bool isActive)
     }
 }
 
-QString ActiveTimeMetric::value() const
+QString TimeDurationMetric::value() const
 {
     return QString::number(duration());
 }
 
-void ActiveTimeMetric::reset()
+void TimeDurationMetric::reset()
 {
     activateCounter(false);
     m_activeStateDurationMs = 0;
 }
 
-qint64 ActiveTimeMetric::duration() const
+qint64 TimeDurationMetric::duration() const
 {
     const qint64 countedMs = (m_counter.isValid()
         ? m_counter.elapsed() : 0);

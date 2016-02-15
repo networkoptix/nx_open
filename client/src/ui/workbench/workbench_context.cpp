@@ -85,11 +85,11 @@ QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *pa
 
     const auto userStatModule = instance<QnUsersStatisticsModule>();
     userStatModule->setContext(this);
-  //  qnStatisticsManager->registerStatisticsModule(lit("users"), userStatModule);
+    qnStatisticsManager->registerStatisticsModule(lit("users"), userStatModule);
 
     const auto graphicsStatModule = instance<QnGraphicsStatisticsModule>();
     graphicsStatModule->setContext(this);
-   // qnStatisticsManager->registerStatisticsModule(lit("graphics"), graphicsStatModule);
+    qnStatisticsManager->registerStatisticsModule(lit("graphics"), graphicsStatModule);
 }
 
 QnWorkbenchContext::~QnWorkbenchContext() {

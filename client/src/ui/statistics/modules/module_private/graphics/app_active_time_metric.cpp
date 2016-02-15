@@ -4,7 +4,7 @@
 
 AppActiveTimeMetric::AppActiveTimeMetric(QObject *parent)
     : base_type(parent)
-    , ActiveTimeMetric()
+    , TimeDurationMetric()
 {
     qApp->installEventFilter(this);
 }
