@@ -14,10 +14,9 @@ public:
 
     QString value() const;
 
-    void reset();
-
-private:
     qint64 duration() const;
+
+    void reset();
 
 private:
     QElapsedTimer m_counter;

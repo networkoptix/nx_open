@@ -6,6 +6,7 @@ ActiveTimeMetric::ActiveTimeMetric()
     , m_isActiveState(false)
     , m_activeStateDurationMs(0)
 {
+    m_counter.invalidate();
 }
 
 ActiveTimeMetric::~ActiveTimeMetric()

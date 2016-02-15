@@ -88,7 +88,8 @@ QnMetricsHash QnActionsStatisticsModule::metrics() const
     {
         const auto alias = it.key();
         const auto metric = it.value();
-        result.insert(it.key(), metric->value());
+        if (metric->duration() != 0)
+            result.insert(it.key(), metric->value());
     }
 
     return result;
