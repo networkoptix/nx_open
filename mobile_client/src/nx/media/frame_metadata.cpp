@@ -1,23 +1,27 @@
 #include "frame_metadata.h"
 
-namespace
-{
-    static QString kMetadataFlagsKey(lit("metadata"));
-    static const int kNotInitialized = -1; //< metadata isn't initialized
-}
-
 namespace nx {
 namespace media {
 
+namespace {
 
-FrameMetadata::FrameMetadata():
+static const QString kMetadataFlagsKey(lit("metadata"));
+
+static const int kNotInitialized = -1; //< Metadata is not initialized.
+
+} // namespace
+
+
+FrameMetadata::FrameMetadata()
+:
     flags(QnAbstractMediaData::MediaFlags_None),
     noDelay(false),
     frameNum(kNotInitialized)
 {
 }
 
-FrameMetadata::FrameMetadata(const QnConstCompressedVideoDataPtr& frame):
+FrameMetadata::FrameMetadata(const QnConstCompressedVideoDataPtr& frame)
+:
     FrameMetadata()
 {
     flags = frame->flags;
@@ -29,7 +33,7 @@ void FrameMetadata::serialize(const QnVideoFramePtr& frame) const
         frame->setMetaData(kMetadataFlagsKey, QVariant::fromValue(*this));
 }
 
-FrameMetadata FrameMetadata::deserialize(const QSharedPointer<const QVideoFrame>& frame)
+FrameMetadata FrameMetadata::deserialize(const QnConstVideoFramePtr& frame)
 {
     if (!frame)
         return FrameMetadata();

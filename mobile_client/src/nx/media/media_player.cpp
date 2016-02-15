@@ -22,21 +22,29 @@ namespace nx {
 namespace media {
     
 namespace {
-    static const qint64 kMaxFrameDuration = 1000 * 5; //< max allowed frame duration. If distance is higher, then frame discontinue
-    static const qint64 kLivePosition = -1;
-    static const int kMaxDelayForResyncMs = 500; //< resync playback timer if video frame too late
-    static const int kMaxCounterForWrongLiveBuffer = 2; //< Max allowed amount of underflow/overflow issues in Live mode before extending live buffer
 
-    static qint64 msecToUsec(qint64 posMs)
-    {
-        return posMs == kLivePosition ? DATETIME_NOW : posMs * 1000ll;
-    }
+// Max allowed frame duration. If the distance is higher, then the discontinuity is detected.
+static const qint64 kMaxFrameDuration = 1000 * 5;
 
-    static qint64 usecToMsec(qint64 posUsec)
-    {
-        return posUsec == DATETIME_NOW ? kLivePosition : posUsec / 1000ll;
-    }
+static const qint64 kLivePosition = -1;
+
+// Resync playback timer if a video frame is too late.
+static const int kMaxDelayForResyncMs = 500;
+
+// Max allowed amount of underflow/overflow issues in Live mode before extending live buffer.
+static const int kMaxCounterForWrongLiveBuffer = 2;
+
+static qint64 msecToUsec(qint64 posMs)
+{
+    return posMs == kLivePosition ? DATETIME_NOW : posMs * 1000ll;
 }
+
+static qint64 usecToMsec(qint64 posUsec)
+{
+    return posUsec == DATETIME_NOW ? kLivePosition : posUsec / 1000ll;
+}
+
+} // namespace
 
 class PlayerPrivate: public QObject
 {
@@ -44,36 +52,37 @@ class PlayerPrivate: public QObject
     Player *q_ptr;
 
 public:
-    Player::State state;                                  //< Holds QT property value
-    Player::MediaStatus mediaStatus;                      //< Holds QT property value
-    bool liveMode;                                        //< Either media is on live or archive position. Holds QT property value
-    qint64 position;                                      //< UTC Playback position at msec. Holds QT property value
-    QAbstractVideoSurface* videoSurface;                  //< Video surface to render. Holds QT property value
-    QUrl url;                                             //< media URL to play. Holds QT property value
+    Player::State state; //< Holds QT property value. */
+    Player::MediaStatus mediaStatus; //< Holds QT property value. */
+    bool liveMode; //< Either media is on live or archive position. Holds QT property value. */
+    qint64 position; //< UTC Playback position at msec. Holds QT property value. */
+    QAbstractVideoSurface* videoSurface; //< Video surface to render. Holds QT property value. */
+    QUrl url; //< media URL to play. Holds QT property value. */
     int maxTextureSize;
 
-    QElapsedTimer ptsTimer;                               //< main AV timer for playback
-    boost::optional<qint64> lastVideoPts;                 //< last video frame PTS
-    qint64 ptsTimerBase;                                  //< timestamp when the PTS timer was started
-    QnVideoFramePtr videoFrameToRender;                   //< decoded video which is awaiting to be rendered
-    std::unique_ptr<QnArchiveStreamReader> archiveReader; //< separate thread. This class performs network IO and gets compressed AV data
-    std::unique_ptr<PlayerDataConsumer> dataConsumer;     //< separate thread. This class decodes compressed AV data
-    QTimer* execTimer;                                    //< timer for delayed call 'presentFrame'
-    qint64 lastSeekTimeMs;                                //< last seek position. UTC time in msec
-    int liveBufferMs;                                     //< current duration of live buffer in range [kInitialLiveBufferMs.. kMaxLiveBufferMs]
+    QElapsedTimer ptsTimer; //< main AV timer for playback. */
+    boost::optional<qint64> lastVideoPts; //< last video frame PTS. */
+    qint64 ptsTimerBase; //< timestamp when the PTS timer was started. */
+    QnVideoFramePtr videoFrameToRender; //< decoded video which is awaiting to be rendered. */
+    std::unique_ptr<QnArchiveStreamReader> archiveReader; //< Separate thread. Performs network IO and gets compressed AV data. */
+    std::unique_ptr<PlayerDataConsumer> dataConsumer; //< Separate thread. Decodes compressed AV data. */
+    QTimer* execTimer; //< Timer for delayed call 'presentFrame'. */
+    qint64 lastSeekTimeMs; //< Last seek position. UTC time in msec. */
+    int liveBufferMs; //< Current duration of live buffer in range [kInitialLiveBufferMs.. kMaxLiveBufferMs]. */
 
     enum class BufferState
     {
         NoIssue,
         Underflow,
-        Overflow
+        Overflow,
     };
 
-    BufferState liveBufferState;        //< live buffer state for the last frame
-    int underflowCounter;               //< live buffer underflow counter
-    int overflowCounter;                //< live buffer overflow counter
+    BufferState liveBufferState; //< live buffer state for the last frame. */
+    int underflowCounter; //< live buffer underflow counter. */
+    int overflowCounter; //< live buffer overflow counter. */
+
 private:
-    PlayerPrivate(Player *parent);
+    PlayerPrivate(Player* parent);
 
     void at_hurryUp();
     void at_gotVideoFrame();
@@ -95,7 +104,8 @@ private:
     QnVideoFramePtr scaleFrame(const QnVideoFramePtr& videoFrame);
 };
 
-PlayerPrivate::PlayerPrivate(Player *parent):
+PlayerPrivate::PlayerPrivate(Player *parent)
+:
     QObject(parent),
     q_ptr(parent),
     state(Player::State::Stopped),
@@ -116,7 +126,8 @@ PlayerPrivate::PlayerPrivate(Player *parent):
     execTimer->setSingleShot(true);
 }
 
-void PlayerPrivate::setState(Player::State state) {
+void PlayerPrivate::setState(Player::State state)
+{
     if (state == this->state)
         return;
 
@@ -172,7 +183,7 @@ void PlayerPrivate::at_gotVideoFrame()
         return;
 
     if (videoFrameToRender)
-        return; //< we already have frame to render. Ignore next frame (will be processed later)
+        return; //< We already have a frame to render. Ignore next frame (will be processed later).
 
     videoFrameToRender = dataConsumer->dequeueVideoFrame();
     if (!videoFrameToRender)
@@ -182,7 +193,7 @@ void PlayerPrivate::at_gotVideoFrame()
     {
         FrameMetadata metadata = FrameMetadata::deserialize(videoFrameToRender);
         if (!metadata.noDelay)
-            return; //< display regular frames only if player is playing
+            return; //< Display regular frames only if the player is playing.
     }
 
     qint64 delayToRenderMs = getDelayForNextFrameMs(videoFrameToRender);
@@ -195,9 +206,10 @@ void PlayerPrivate::at_gotVideoFrame()
 QnVideoFramePtr PlayerPrivate::scaleFrame(const QnVideoFramePtr& videoFrame)
 {
     if (videoFrame->width() <= maxTextureSize && videoFrame->height() <= maxTextureSize)
-        return videoFrame; //< scale isn't required
+        return videoFrame; //< Scale is not required.
 
-    QImage::Format imageFormat = QVideoFrame::imageFormatFromPixelFormat(videoFrame->pixelFormat());
+    QImage::Format imageFormat = QVideoFrame::imageFormatFromPixelFormat(
+        videoFrame->pixelFormat());
     videoFrame->map(QAbstractVideoBuffer::ReadOnly);
     QImage img(
         videoFrame->bits(),
@@ -205,7 +217,8 @@ QnVideoFramePtr PlayerPrivate::scaleFrame(const QnVideoFramePtr& videoFrame)
         videoFrame->height(),
         videoFrame->bytesPerLine(),
         imageFormat);
-    QVideoFrame* scaledFrame = new QVideoFrame(img.scaled(maxTextureSize, maxTextureSize, Qt::KeepAspectRatio));
+    QVideoFrame* scaledFrame = new QVideoFrame(
+        img.scaled(maxTextureSize, maxTextureSize, Qt::KeepAspectRatio));
     videoFrame->unmap();
 
     scaledFrame->setStartTime(videoFrame->startTime());
@@ -219,14 +232,21 @@ void PlayerPrivate::presentNextFrame()
 
     setMediaStatus(Player::MediaStatus::Loaded);
 
-    /* update video surface's pixel format if needed */
+    // Update video surface's pixel format if needed.
     if (videoSurface)
     {
-        if (videoSurface->isActive() && videoSurface->surfaceFormat().pixelFormat() != videoFrameToRender->pixelFormat())
+        if (videoSurface->isActive() &&
+            videoSurface->surfaceFormat().pixelFormat() != videoFrameToRender->pixelFormat())
+        {
             videoSurface->stop();
+        }
 
-        if (!videoSurface->isActive()) {
-            QVideoSurfaceFormat format(videoFrameToRender->size(), videoFrameToRender->pixelFormat(), videoFrameToRender->handleType());
+        if (!videoSurface->isActive())
+        {
+            QVideoSurfaceFormat format(
+                videoFrameToRender->size(),
+                videoFrameToRender->pixelFormat(),
+                videoFrameToRender->handleType());
             videoSurface->start(format);
         }
     }
@@ -240,7 +260,9 @@ void PlayerPrivate::presentNextFrame()
     setLiveMode(metadata.flags & QnAbstractMediaData::MediaFlags_LIVE);
 
     videoFrameToRender.clear();
-    QTimer::singleShot(0, this, &PlayerPrivate::at_gotVideoFrame); //< calculate next time to render
+
+    // Calculate next time to render.
+    QTimer::singleShot(0, this, &PlayerPrivate::at_gotVideoFrame);
 }
 
 void PlayerPrivate::resetLiveBufferState()
@@ -253,7 +275,7 @@ void PlayerPrivate::resetLiveBufferState()
 void PlayerPrivate::updateLiveBufferState(BufferState value)
 {
     if (liveBufferState == value)
-        return; //< do not take into account same state several times in a row
+        return; //< Do not take into account the same state several times in a row.
     liveBufferState = value;
 
     if (liveBufferState == BufferState::Overflow)
@@ -264,7 +286,10 @@ void PlayerPrivate::updateLiveBufferState(BufferState value)
         return;
 
     if (underflowCounter + overflowCounter >= kMaxCounterForWrongLiveBuffer)
-        liveBufferMs = qMin(liveBufferMs * kBufferGrowStep, kMaxBufferMs); //< too much underflow/overflow issues. extend live buffer
+    {
+        // Too much underflow/overflow issues. Extend live buffer.
+        liveBufferMs = qMin(liveBufferMs * kBufferGrowStep, kMaxBufferMs);
+    }
 }
 
 qint64 PlayerPrivate::getDelayForNextFrameMs(const QnVideoFramePtr& frame)
@@ -280,7 +305,7 @@ qint64 PlayerPrivate::getDelayForNextFrameWithAudioMs(const QnVideoFramePtr& fra
     const AudioOutput* audioOutput = dataConsumer->audioOutput();
     const qint64 currentPosUsec = audioOutput->playbackPositionUsec();
     if (currentPosUsec == AudioOutput::kUnknownPosition)
-        return 0; //< Position isn't known yet. Play video without delay
+        return 0; //< Position isn't known yet. Play video without delay.
 
     return frame->startTime() - currentPosUsec/1000;
 }
@@ -293,31 +318,36 @@ qint64 PlayerPrivate::getDelayForNextFrameWithoutAudioMs(const QnVideoFramePtr& 
     // Calculate time to present next frame
     qint64 mediaQueueLen = usecToMsec(dataConsumer->queueVideoDurationUsec());
     const int frameDelayMs = pts - ptsTimerBase - ptsTimer.elapsed();
-    bool liveBufferUnderflow = liveMode && lastVideoPts.is_initialized() && mediaQueueLen == 0 && frameDelayMs < 0;
+    bool liveBufferUnderflow =
+        liveMode && lastVideoPts.is_initialized() && mediaQueueLen == 0 && frameDelayMs < 0;
     bool liveBufferOverflow = liveMode && mediaQueueLen > liveBufferMs;
 
     if (liveMode)
     {
         if (metadata.noDelay)
         {
-            resetLiveBufferState(); //< reset live statstics because of seek or FCZ frames
+            resetLiveBufferState(); //< Reset live statistics because of seek or FCZ frames.
         }
-        else {
-            auto value = liveBufferUnderflow ? BufferState::Underflow : liveBufferOverflow ? BufferState::Overflow : BufferState::NoIssue;
+        else
+        {
+            auto value =
+                liveBufferUnderflow ? BufferState::Underflow :
+                liveBufferOverflow ? BufferState::Overflow :
+                BufferState::NoIssue;
             updateLiveBufferState(value);
         }
     }
 
-    if (!lastVideoPts.is_initialized() ||                                    //< first time
-        !qBetween(*lastVideoPts, pts, *lastVideoPts + kMaxFrameDuration) ||  //< pts discontinue
-        metadata.noDelay                                                 ||  //< jump occurred
-        pts < lastSeekTimeMs                                             ||  //< 'coarse' frame. Frame time is less than required jump pos
-        frameDelayMs < -kMaxDelayForResyncMs                             ||  //< resync because of video frame is late more than threshold
-        liveBufferUnderflow                                              ||
-        liveBufferOverflow                                                   //< live buffer overflow
+    if (!lastVideoPts.is_initialized() || //< first time
+        !qBetween(*lastVideoPts, pts, *lastVideoPts + kMaxFrameDuration) || //< pts discontinue
+        metadata.noDelay || //< jump occurred
+        pts < lastSeekTimeMs || //< 'coarse' frame. Frame time is less than required jump pos.
+        frameDelayMs < -kMaxDelayForResyncMs || //< Resync because the video frame is late for more than threshold.
+        liveBufferUnderflow ||
+        liveBufferOverflow //< live buffer overflow
         )
     {
-        // Reset timer
+        // Reset timer.
         lastVideoPts = ptsTimerBase = pts;
         ptsTimer.restart();
         return 0ll;
@@ -344,25 +374,38 @@ bool PlayerPrivate::initDataProvider()
 
     archiveReader->setArchiveDelegate(new QnRtspClientArchiveDelegate(archiveReader.get()));
     archiveReader->addDataProcessor(dataConsumer.get());
-    connect(dataConsumer.get(), &PlayerDataConsumer::gotVideoFrame, this, &PlayerPrivate::at_gotVideoFrame);
-    connect(dataConsumer.get(), &PlayerDataConsumer::hurryUp, this, &PlayerPrivate::at_hurryUp);
-    connect(dataConsumer.get(), &PlayerDataConsumer::onEOF, this, [this]() { setPosition(kLivePosition);  });
+    connect(dataConsumer.get(), &PlayerDataConsumer::gotVideoFrame,
+        this, &PlayerPrivate::at_gotVideoFrame);
+    connect(dataConsumer.get(), &PlayerDataConsumer::hurryUp,
+        this, &PlayerPrivate::at_hurryUp);
+    connect(dataConsumer.get(), &PlayerDataConsumer::onEOF, this,
+        [this]()
+        {
+            setPosition(kLivePosition);
+        });
     
     QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
     if (camera)
     {
-        for (const auto& stream : camera->mediaStreams().streams)
+        for (const auto& stream: camera->mediaStreams().streams)
         {
             if (stream.encoderIndex != CameraMediaStreamInfo::PRIMARY_STREAM_INDEX)
                 continue;
             CodecID codec = (CodecID)stream.codec;
-            if (!VideoDecoderRegistry::instance()->hasCompatibleDecoder(codec, stream.getResolution()))
-                archiveReader->setQuality(MEDIA_Quality_Low, true); //< no compatible decoder for High quality. Force low quality
+            if (!VideoDecoderRegistry::instance()->hasCompatibleDecoder(
+                codec, stream.getResolution()))
+            {
+                // No compatible decoder for High quality. Force low quality.
+                archiveReader->setQuality(MEDIA_Quality_Low, true);
+            }
         }
     }
 
     if (position != kLivePosition)
-        archiveReader->jumpTo(msecToUsec(position), msecToUsec(position)); //< second arg means precise seek
+    {
+        // Second arg means precise seek.
+        archiveReader->jumpTo(msecToUsec(position), msecToUsec(position));
+    }
 
     dataConsumer->start();
     archiveReader->start();
@@ -370,10 +413,11 @@ bool PlayerPrivate::initDataProvider()
     return true;
 }
 
+//-------------------------------------------------------------------------------------------------
+// Player
 
-// ----------------------- Player -----------------------
-
-Player::Player(QObject *parent):
+Player::Player(QObject *parent)
+:
     QObject(parent),
     d_ptr(new PlayerPrivate(this))
 {
@@ -387,7 +431,6 @@ Player::~Player()
 Player::State Player::playbackState() const 
 {
     Q_D(const Player);
-
     return d->state;
 }
 
@@ -397,22 +440,21 @@ Player::MediaStatus Player::mediaStatus() const
     return d->mediaStatus;
 }
 
-QUrl Player::source() const {
+QUrl Player::source() const
+{
     Q_D(const Player);
-
     return d->url;
 }
 
-QAbstractVideoSurface *Player::videoSurface() const {
+QAbstractVideoSurface *Player::videoSurface() const
+{
     Q_D(const Player);
-
     return d->videoSurface;
 }
 
 qint64 Player::position() const 
 {
     Q_D(const Player);
-
     return d->position;
 }
 
@@ -464,7 +506,7 @@ void Player::stop()
     d->setState(State::Stopped);
 }
 
-void Player::setSource(const QUrl &url)
+void Player::setSource(const QUrl& url)
 {
     Q_D(Player);
 
@@ -475,7 +517,7 @@ void Player::setSource(const QUrl &url)
     d->url = url;
 }
 
-void Player::setVideoSurface(QAbstractVideoSurface *videoSurface)
+void Player::setVideoSurface(QAbstractVideoSurface* videoSurface)
 {
     Q_D(Player);
 
@@ -492,7 +534,6 @@ bool Player::liveMode() const
     Q_D(const Player);
     return d->liveMode;
 }
-
 
 } // namespace media
 } // namespace nx

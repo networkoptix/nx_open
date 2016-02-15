@@ -10,9 +10,9 @@
 namespace nx {
 namespace media {
 
-/* 
-* This structure contains addition information associated with every decoded frame 
-*/
+/** 
+ * Contains addition information associated with every decoded frame.
+ */
 struct FrameMetadata
 {
     FrameMetadata();
@@ -22,12 +22,12 @@ struct FrameMetadata
     void serialize(const QnVideoFramePtr& frame) const;
     static FrameMetadata deserialize(const QnConstVideoFramePtr& frame);
             
-    QnAbstractMediaData::MediaFlags flags; //< various flags passed from compressed video data
-    bool noDelay; //< display frame immediately with no delay
-    int frameNum; //< frame number in range [0..INT_MAX]
+    QnAbstractMediaData::MediaFlags flags; /**< Various flags passed from compressed video data. */
+    bool noDelay; /**< Display frame immediately with no delay. */
+    int frameNum; /**< Frame number in range [0..INT_MAX]. */
 };
 
-}
-}
+} // namespace media
+} // namespace nx
 
 Q_DECLARE_METATYPE(nx::media::FrameMetadata);

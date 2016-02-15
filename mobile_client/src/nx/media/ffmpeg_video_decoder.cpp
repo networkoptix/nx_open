@@ -4,8 +4,8 @@
 
 extern "C"
 {
-    #include <libavformat/avformat.h>
-    #include <libswscale/swscale.h>
+#include <libavformat/avformat.h>
+#include <libswscale/swscale.h>
 }
 
 #include <utils/media/ffmpeg_helper.h>
@@ -29,36 +29,38 @@ public:
     
     static int lockmgr(void** mtx, enum AVLockOp op)
     {
-        QnMutex** qMutex = (QnMutex**)mtx;
+        QnMutex** qMutex = (QnMutex**) mtx;
         switch (op) 
         {
-        case AV_LOCK_CREATE:
-            *qMutex = new QnMutex();
-            return 0;
-        case AV_LOCK_OBTAIN:
-            (*qMutex)->lock();
-            return 0;
-        case AV_LOCK_RELEASE:
-            (*qMutex)->unlock();
-            return 0;
-        case AV_LOCK_DESTROY:
-            delete *qMutex;
-            return 0;
-        default:
-            return 1;
+            case AV_LOCK_CREATE:
+                *qMutex = new QnMutex();
+                return 0;
+            case AV_LOCK_OBTAIN:
+                (*qMutex)->lock();
+                return 0;
+            case AV_LOCK_RELEASE:
+                (*qMutex)->unlock();
+                return 0;
+            case AV_LOCK_DESTROY:
+                delete *qMutex;
+                return 0;
+            default:
+                return 1;
         }
     }
-
 };
 
-// ------------------------- FfmpegDecoderPrivate -------------------------
+//-------------------------------------------------------------------------------------------------
+// FfmpegDecoderPrivate
 
-class FfmpegVideoDecoderPrivate : public QObject
+class FfmpegVideoDecoderPrivate: public QObject
 {
     Q_DECLARE_PUBLIC(FfmpegVideoDecoder)
-    FfmpegVideoDecoder *q_ptr;
+    FfmpegVideoDecoder* q_ptr;
+
 public:
-    FfmpegVideoDecoderPrivate():
+    FfmpegVideoDecoderPrivate()
+    :
         codecContext(nullptr),
         frame(avcodec_alloc_frame()),
         scaleContext(nullptr),
@@ -66,7 +68,8 @@ public:
     {
     }
 
-    ~FfmpegVideoDecoderPrivate() { 
+    ~FfmpegVideoDecoderPrivate()
+    { 
         closeCodecContext();
         av_free(frame);
         sws_freeContext(scaleContext);
@@ -106,12 +109,13 @@ void FfmpegVideoDecoderPrivate::closeCodecContext()
     codecContext = 0;
 }
 
-// ---------------------- FfmpegDecoder ----------------------
+//-------------------------------------------------------------------------------------------------
+// FfmpegDecoder
 
-FfmpegVideoDecoder::FfmpegVideoDecoder():
+FfmpegVideoDecoder::FfmpegVideoDecoder()
+:
     AbstractVideoDecoder(),
     d_ptr(new FfmpegVideoDecoderPrivate())
-
 {
     static InitFfmpegLib init;
 }
@@ -142,13 +146,14 @@ int FfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QnVid
     av_init_packet(&avpkt);
     if (frame)
     {
-        avpkt.data = (unsigned char*)frame->data();
+        avpkt.data = (unsigned char*) frame->data();
         avpkt.size = static_cast<int>(frame->dataSize());
         avpkt.dts = avpkt.pts = frame->timestamp;
         if (frame->flags & QnAbstractMediaData::MediaFlags_AVKey)
             avpkt.flags = AV_PKT_FLAG_KEY;
 
-        //  It's already guaranteed by QnByteArray there is an extra space reserved. We must fill padding bytes according to ffmpeg documentation
+        // It's already guaranteed by QnByteArray that there is an extra space reserved. We must
+        // fill the padding bytes according to ffmpeg documentation.
         if (avpkt.data)
             memset(avpkt.data + avpkt.size, 0, FF_INPUT_BUFFER_PADDING_SIZE);
 
@@ -156,8 +161,9 @@ int FfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QnVid
     }
     else 
     {
-        // there is known a ffmpeg bug. It returns below time for the very last packet while flushing internal buffer.
-        // So, repeat this time for the empty packet in order to aviod the bug
+        // There is a known ffmpeg bug. It returns the below time for the very last packet while
+        // flushing internal buffer. So, repeat this time for the empty packet in order to avoid
+        // the bug.
         avpkt.pts = avpkt.dts = d->lastPts;
         avpkt.data = nullptr;
         avpkt.size = 0;
@@ -166,7 +172,7 @@ int FfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QnVid
     int gotData = 0;
     avcodec_decode_video2(d->codecContext, d->frame, &gotData, &avpkt);
     if (gotData <= 0)
-        return gotData; //< negative value means error. zero value is buffering
+        return gotData; //< Negative value means error. Zero value means buffering.
 
     ffmpegToQtVideoFrame(result);
     return d->frame->coded_picture_number;
@@ -191,8 +197,10 @@ void FfmpegVideoDecoder::ffmpegToQtVideoFrame(QnVideoFramePtr* result)
     const int argbLineSize = alignedWidth * 4;
 
     auto alignedBuffer = new AlignedMemVideoBuffer(numBytes, kMediaAlignment, argbLineSize);
-    auto videoFrame = new QVideoFrame(alignedBuffer, QSize(d->frame->width, d->frame->height), QVideoFrame::Format_RGB32);
-    videoFrame->setStartTime(d->frame->pkt_dts / 1000); //< ffmpeg pts/dst are mixed up here, so it's pkt_dts. Also Convert usec to msec.
+    auto videoFrame = new QVideoFrame(
+        alignedBuffer, QSize(d->frame->width, d->frame->height), QVideoFrame::Format_RGB32);
+    // Ffmpeg pts/dts are mixed up here, so it's pkt_dts. Also Convert usec to msec.
+    videoFrame->setStartTime(d->frame->pkt_dts / 1000);
 
     videoFrame->map(QAbstractVideoBuffer::WriteOnly);
     uchar* buffer = videoFrame->bits();
@@ -205,7 +213,9 @@ void FfmpegVideoDecoder::ffmpegToQtVideoFrame(QnVideoFramePtr* result)
     memset(dstLinesize, 0, sizeof(dstLinesize));
     dstLinesize[0] = argbLineSize;
 
-    sws_scale(d->scaleContext, d->frame->data, d->frame->linesize, 0, d->frame->height, dstData, dstLinesize); //< do yuv2rgb transformation here
+    // Perform yuv2rgb transformation here.
+    sws_scale(d->scaleContext, d->frame->data, d->frame->linesize, 0, d->frame->height, dstData,
+        dstLinesize);
     videoFrame->unmap();
 
     result->reset(videoFrame);

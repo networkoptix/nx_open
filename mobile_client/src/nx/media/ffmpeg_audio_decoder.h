@@ -12,11 +12,12 @@
 namespace nx {
 namespace media {
 
-/*
-* This class implements ffmpeg video decoder
-*/
 class FfmpegAudioDecoderPrivate;
-class FfmpegAudioDecoder : public AbstractAudioDecoder
+
+/**
+ * Implements ffmpeg audio decoder.
+ */
+class FfmpegAudioDecoder: public AbstractAudioDecoder
 {
 public:
     FfmpegAudioDecoder();
@@ -24,12 +25,13 @@ public:
 
     static bool isCompatible(const CodecID codec);
     virtual QnAudioFramePtr decode(const QnConstCompressedAudioDataPtr& frame) override;
+
 private:
     QScopedPointer<FfmpegAudioDecoderPrivate> d_ptr;
     Q_DECLARE_PRIVATE(FfmpegAudioDecoder);
 };
 
-}
-}
+} // namespace media
+} // namespace nx
 
 #endif // #DISABLE_FFMPEG

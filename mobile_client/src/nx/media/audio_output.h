@@ -8,22 +8,26 @@
 namespace nx {
 namespace media {
 
-/*
-* This class extends QT audio output and provides more flexible methods for time control. They are used for audio/video sync
-*/
 class AudioOutputPrivate;
+
+/* Extends QT audio output and provides more flexible methods for time control. They are used for
+ * audio/video sync.
+ */
 class AudioOutput: public QAudioOutput
 {
     Q_OBJECT
+
 public:
-    
+
     static const qint64 kUnknownPosition = -1;
     
-    /*
-    * \param initialBufferUsec initial media buffer size.
-    * \param maxBufferUsec media buffer grows automatically in range [initialBufferUsec..maxBufferUsec] if underflow occurred
-    */
+    /**
+     * @param initialBufferUsec Initial media buffer size.
+     * @param maxBufferUsec Media buffer grows automatically in range
+     * [initialBufferUsec..maxBufferUsec] if underflow occurs.
+     */
     AudioOutput(int initialBufferUsec, int maxBufferUsec);
+
     virtual ~AudioOutput();
             
     /** Start play audio */
@@ -38,28 +42,31 @@ public:
     /** Resume playing */
     void resume();
 
-    /** Add audio packet to the internal audio buffer */
+    /** Add audio packet to the internal audio buffer. */
     void write(const QnAudioFramePtr& audioFrame);
 
-    /** Current UTC playback position at microseconds (what you hear now) */
+    /**
+     * @return Current UTC playback position in microseconds (what you hear now).
+     */
     qint64 playbackPositionUsec() const;
 
-    /*
-    * Returns size for the internal buffer at microseconds. 
-    * This value could be increased automatically if AudioOutput detect buffer underflow issue.
-    */
+    /**
+     * @return Size for the internal buffer in microseconds. This value could be increased
+     * automatically if AudioOutput detects buffer underflow issue.
+     */
     qint64 maxBufferSizeUsec() const;
 
-    /** Returns used buffer size at microseconds.
-    * Free space in the buffer can be calculated as maxBufferSizeUsec - currentBufferSizeUsec.
-    */
+    /**
+     * Free space in the buffer can be calculated as maxBufferSizeUsec() - currentBufferSizeUsec().
+     * @return Used buffer size in microseconds.
+     */
     qint64 currentBufferSizeUsec() const;
 
-    /*
-    * Returns true if audio buffer is too small and need initial buffering.
-    * Initial buffering fills half of the audio buffer before start playing it.
-    * If audio buffer is underflow during playback AudioOutput starts buffering again.
-    */
+    /**
+     * Initial buffering fills half of the audio buffer before start playing it. If audio buffer is
+     * underflow during playback AudioOutput starts buffering again.
+     * @return True if audio buffer is too small and need initial buffering.
+     */
     bool isBuffering() const;
 
 signals:
@@ -70,5 +77,5 @@ private:
     Q_DECLARE_PRIVATE(AudioOutput);
 };
 
-}
-}
+} // namespace media
+} // namespace nx

@@ -11,11 +11,17 @@ class AbstractResourceAllocator;
 class AudioFrame;
 
 static const int kMediaAlignment = 32;
-static const int kInitialBufferMs = 200;   //< initial duration for media buffer
-static const int kMaxBufferMs = 1200;      //< maximum duration for media buffer. Buffer can be extended dynamically
-static const qreal kBufferGrowStep = 2.0;  //< increase buffer at N times if overflow/underflow issues
 
-}
-}
+// Initial duration for media buffer.
+static const int kInitialBufferMs = 200;
+
+// Maximum duration for media buffer. Buffer can be extended dynamically.
+static const int kMaxBufferMs = 1200;
+
+// Increase buffer at N times if overflow/underflow issues.
+static const qreal kBufferGrowStep = 2.0;
+
+} // namespace media
+} // namespace nx
 
 typedef QSharedPointer<nx::media::AudioFrame> QnAudioFramePtr;

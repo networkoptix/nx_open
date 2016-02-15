@@ -6,7 +6,11 @@
 
 class QQuickWindow;
 
-class QnTextureSizeHelper : public QObject, public Singleton<QnTextureSizeHelper> {
+class QnTextureSizeHelper
+:
+    public QObject,
+    public Singleton<QnTextureSizeHelper>
+{
     Q_OBJECT
 
 public:
