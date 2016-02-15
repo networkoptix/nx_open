@@ -10,7 +10,7 @@
 #include <ui/actions/action_parameters.h>
 
 #include <ui/screen_recording/screen_recorder.h>
-#include <ui/style/warning_style.h>
+#include <ui/style/custom_style.h>
 
 #include <ui/widgets/settings/general_preferences_widget.h>
 #include <ui/widgets/settings/look_and_feel_preferences_widget.h>
@@ -25,6 +25,8 @@ QnPreferencesDialog::QnPreferencesDialog(QWidget *parent):
     ui(new Ui::PreferencesDialog())
 {
     ui->setupUi(this);
+
+    setAccentStyle(ui->buttonBox->button(QDialogButtonBox::Ok));
 
     addPage(GeneralPage, new QnGeneralPreferencesWidget(this), tr("General"));
     addPage(LookAndFeelPage, new QnLookAndFeelPreferencesWidget(this), tr("Look and Feel"));

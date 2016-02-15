@@ -1,6 +1,6 @@
 #include "licenses_usage_widget.h"
 
-#include <ui/style/warning_style.h>
+#include <ui/style/custom_style.h>
 
 #include <utils/license_usage_helper.h>
 

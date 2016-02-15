@@ -19,7 +19,7 @@
 #include <ui/common/read_only.h>
 #include "ui/models/resource_list_model.h"
 #include "ui/models/server_addresses_model.h"
-#include "ui/style/warning_style.h"
+#include "ui/style/custom_style.h"
 #include <ui/delegates/switch_item_delegate.h>
 
 #include <nx/network/socket_common.h>

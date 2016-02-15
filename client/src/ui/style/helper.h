@@ -23,21 +23,6 @@ namespace style
         static const QSize kSwitchSize;
     };
 
-    class Colors
-    {
-    public:
-        enum Palette
-        {
-            kBase,
-            kContrast,
-            kBlue,
-            kGreen,
-            kBrang
-        };
-
-        static QString paletteName(Palette palette);
-    };
-
     class Properties
     {
     public:

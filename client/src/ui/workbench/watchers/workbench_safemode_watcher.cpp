@@ -4,7 +4,7 @@
 
 #include <ui/common/palette.h>
 #include <ui/common/read_only.h>
-#include <ui/style/warning_style.h>
+#include <ui/style/custom_style.h>
 
 QnWorkbenchSafeModeWatcher::QnWorkbenchSafeModeWatcher(QWidget *parentWidget /*= nullptr*/) : QObject(parentWidget) 
     , m_parentWidget(parentWidget)

@@ -27,6 +27,7 @@
 #include <ui/dialogs/connection_name_dialog.h>
 #include <ui/widgets/rendering_widget.h>
 #include <ui/style/skin.h>
+#include <ui/style/custom_style.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -104,6 +105,8 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
     m_renderingWidget(NULL)
 {
     ui->setupUi(this);
+
+    setAccentStyle(ui->buttonBox->button(QDialogButtonBox::Ok));
 
     setWindowTitle(tr("Connect to Server..."));
     setHelpTopic(this, Qn::Login_Help);

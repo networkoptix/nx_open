@@ -2,7 +2,7 @@
 #include "ui_license_details_dialog.h"
 
 #include <licensing/license.h>
-#include <ui/style/warning_style.h>
+#include <ui/style/custom_style.h>
 
 QnLicenseDetailsDialog::QnLicenseDetailsDialog(const QnLicensePtr &license, QWidget *parent /* = NULL*/):
     base_type(parent),

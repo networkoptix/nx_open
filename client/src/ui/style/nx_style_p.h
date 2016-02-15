@@ -19,7 +19,7 @@ public:
     QnNxStylePrivate();
 
     QnPaletteColor findColor(const QColor &color) const;
-    QnPaletteColor mainColor(style::Colors::Palette palette) const;
+    QnPaletteColor mainColor(QnNxStyle::Colors::Palette palette) const;
 
     QColor checkBoxColor(const QStyleOption *option, bool radio = false) const;
 

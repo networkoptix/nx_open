@@ -12,7 +12,7 @@
 #include <api/app_server_connection.h>
 #include <api/global_settings.h>
 
-#include <ui/style/warning_style.h>
+#include <ui/style/custom_style.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/models/ldap_user_list_model.h>

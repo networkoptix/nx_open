@@ -2,7 +2,7 @@
 #include "ui_expert_settings_widget.h"
 
 #include <ui/style/skin.h>
-#include <ui/style/warning_style.h>
+#include <ui/style/custom_style.h>
 
 #include <client/client_globals.h>
 

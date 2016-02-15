@@ -28,7 +28,7 @@
 #include <ui/models/event_log_model.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/skin.h>
-#include <ui/style/warning_style.h>
+#include <ui/style/custom_style.h>
 #include <ui/widgets/snapped_scrollbar.h>
 
 #include <ui/workbench/workbench_context.h>
@@ -59,6 +59,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
     ui->setupUi(this);
 
     setWarningStyle(ui->warningLabel);
+    setAccentStyle(ui->buttonBox->button(QDialogButtonBox::Ok));
 
     setHelpTopic(this, Qn::MainWindow_Notifications_EventLog_Help);
 
