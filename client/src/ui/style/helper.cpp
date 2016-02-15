@@ -17,6 +17,7 @@ namespace style
     const int Metrics::kHeaderSize = dp(32);
     const int Metrics::kViewRowHeight = dp(24);
     const int Metrics::kSortIndicatorSize = dp(14);
+    const int Metrics::kRounding = dp(1);
     const QSize Metrics::kSwitchSize(dp(30), dp(15));
 
     const char *Properties::kHoveredRowProperty = "_qn_hoveredRow";

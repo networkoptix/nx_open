@@ -152,7 +152,35 @@ void QnNxStyle::drawPrimitive(
     switch (element)
     {
     case PE_FrameFocusRect:
-        return;
+        {
+            QColor widgetColor = option->palette.window().color();
+            bool dotted = false;
+
+            if (qobject_cast<const QPushButton *>(widget))
+                widgetColor = option->palette.button().color();
+
+            if (qobject_cast<const QCheckBox *>(widget) ||
+                qobject_cast<const QRadioButton *>(widget) ||
+                qobject_cast<const QSlider *>(widget))
+            {
+                dotted = true;
+            }
+
+            bool dark = isDark(widgetColor);
+            QColor color = mainColor(Colors::kBlue).darker(dark ? 4 : -4);
+
+            QPen pen(color);
+            if (dotted)
+                pen.setStyle(Qt::DotLine);
+
+            QnScopedPainterPenRollback penRollback(painter, pen);
+            QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
+
+            painter->drawRoundedRect(eroded(QRectF(option->rect), 0.5), Metrics::kRounding, Metrics::kRounding);
+
+            return;
+        }
+        break;
 
     case PE_PanelButtonTool:
     case PE_PanelButtonCommand:
@@ -227,6 +255,9 @@ void QnNxStyle::drawPrimitive(
                 painter->drawLine(option->rect.left() + 1, option->rect.top() + 1,
                                   option->rect.left() + 1, option->rect.bottom() - 1);
             }
+
+            if (option->state.testFlag(State_HasFocus))
+                drawPrimitive(PE_FrameFocusRect, option, painter, widget);
 
             painter->restore();
         }
@@ -429,6 +460,9 @@ void QnNxStyle::drawComplexControl(
                 QRectF rect = subControlRect(CC_ComboBox, comboBox, SC_ComboBoxArrow, widget);
                 drawArrow(Down, painter, rect.translated(0, -1), option->palette.color(QPalette::Text));
             }
+
+            if (comboBox->state.testFlag(State_HasFocus))
+                drawPrimitive(PE_FrameFocusRect, option, painter, widget);
 
             painter->restore();
             return;
@@ -1489,6 +1523,9 @@ QRect QnNxStyle::subElementRect(
         }
         break;
 
+    case SE_PushButtonFocusRect:
+        return option->rect;
+
     case SE_ProgressBarGroove:
         if (const QStyleOptionProgressBar *progressBar =
                 qstyleoption_cast<const QStyleOptionProgressBar *>(option))
@@ -1659,6 +1696,9 @@ int QnNxStyle::pixelMetric(
         return Metrics::kSortIndicatorSize;
     case PM_HeaderMargin:
         return dp(6);
+    case PM_FocusFrameHMargin:
+    case PM_FocusFrameVMargin:
+        return dp(1);
     default:
         break;
     }
@@ -1809,6 +1849,8 @@ int QnNxStyle::styleHint(
         return 0;
     case SH_Header_ArrowAlignment:
         return Qt::AlignRight | Qt::AlignVCenter;
+    case SH_FocusFrame_AboveWidget:
+        return 1;
     default:
         break;
     }
