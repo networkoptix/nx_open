@@ -6,11 +6,12 @@
 #ifndef MEDIASERVER_EMULATOR_H
 #define MEDIASERVER_EMULATOR_H
 
-#include <cloud_data_provider.h>
 #include <nx/network/cloud/mediator_connector.h>
 #include <nx/network/http/server/http_message_dispatcher.h>
 #include <nx/network/http/server/http_stream_socket_server.h>
 #include <nx/network/socket.h>
+
+#include "../cloud_data_provider.h"
 
 
 namespace nx {

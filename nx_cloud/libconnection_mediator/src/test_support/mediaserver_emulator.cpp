@@ -159,7 +159,8 @@ void MediaServerEmulator::onConnectionRequested(
 void MediaServerEmulator::onConnectionAckResponseReceived(
     nx::hpm::api::ResultCode resultCode)
 {
-    m_connectionAckResponseHandler(resultCode);
+    if (m_connectionAckResponseHandler)
+        m_connectionAckResponseHandler(resultCode);
 }
 
 }   //hpm
