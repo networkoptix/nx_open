@@ -45,7 +45,9 @@
 /* #define size_t unsigned int */
 #undef DIFFERENCE
 /* #define M_PI (3.1415926) */
-#define isnan(N) 0
+#if (_MSC_VER < 1800 ) // older than VS 2013
+#define isnan(N) 0 
+#endif
 #define isnanf(N) 0
 
 #undef min

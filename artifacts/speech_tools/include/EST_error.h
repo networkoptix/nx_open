@@ -185,6 +185,10 @@ enum EST_error_behaviour
 /* templates. For classes we can define a function cast to EST_String,   */
 /* but we need the basic versions.                                       */
 
+#if (_MSC_VER > 1800) //if newer than VS 2013, disable warning: pointer truncation from 'const void *' to 'long'
+pragma warning (disable : 4311) 
+#endif
+
 inline const char *error_name(const EST_String val) {return val;}
 inline const char *error_name(const void *val) {return EST_String::cat("<<ptr:", EST_String::Number((long)val, 16), ">>");}
 inline const char *error_name(const EST_Regex val) {return val.tostring();}

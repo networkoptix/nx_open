@@ -1,0 +1,10 @@
+0) Install Cygwin, including gcc and make
+
+Cygwin part:
+1) ./configure
+2) Open ./config/config and fix SYSTEM_TYPE to ix86_CYGWIN32
+3) run "make VCMakefile"
+4) ./cp config/vc_config_make_rules-dist config/vc_config_make_rules
+
+MSVC Tools Command Prompt:
+1) nmake /nologo /FVCMakefile
