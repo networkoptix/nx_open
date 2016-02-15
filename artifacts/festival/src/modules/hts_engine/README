@@ -1,31 +1,31 @@
 ===============================================================================
-                      The festopt_hts_engine version 1.01
-                           release December 25, 2010
+      The HMM-Based Speech Synthesis Engine "hts_engine API" version 1.07
+                           release December 25, 2012
 
 
-The festopt_hts_engine is a HMM-based speech synthesis module. It has been
-being developed by the HTS working group (see "Who we are" below) and some
-graduate students in Nagoya Institute of Technology (see "AUTHORS" in the same
-directory).
+The hts_engine API is an API version of hts_engine which has been released
+since HTS version 1.1. It has been being developed by the HTS working group
+(see "Who we are" below) and some graduate students in Nagoya Institute of
+Technology (see "AUTHORS" in the same directory).
 
 *******************************************************************************
                                     Copying
 *******************************************************************************
 
-The festopt_hts_engine is released under the New and Simplified BSD license
-(see http://www.opensource.org/). Using and distributing this software copy, is
-free (without restriction including without limitation the rights touse, modify,
-merge, publish, distribute, sublicense, and/or sell copies of this work, and to
-permit persons to whom this work is furnished to do so) subject to the
-conditions in the following license:
+The hts_engine API is released under the Modified BSD license (see
+http://www.opensource.org/). Using and distributing this software is free
+(without restriction including without limitation the rights to use, copy,
+modify, merge, publish, distribute, sublicense, and/or sell copies of this
+work, and to permit persons to whom this work is furnished to do so) subject to
+the conditions in the following license:
 
 /* ----------------------------------------------------------------- */
-/*           The HMM-Based Speech Synthesis System (HTS)             */
-/*           festopt_hts_engine developed by HTS Working Group       */
+/*           The HMM-Based Speech Synthesis Engine "hts_engine API"  */
+/*           developed by HTS Working Group                          */
 /*           http://hts-engine.sourceforge.net/                      */
 /* ----------------------------------------------------------------- */
 /*                                                                   */
-/*  Copyright (c) 2001-2010  Nagoya Institute of Technology          */
+/*  Copyright (c) 2001-2012  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /*                2001-2008  Tokyo Institute of Technology           */
@@ -68,15 +68,15 @@ maintenance. We will continue to endeavor to fix bugs and answer queries when
 can, but are not in a position to guarantee it. We will consider consultancy if
 desired, please contacts us for details.
 
-If you are using the festopt_hts_engine in commercial environments, even though
-no license is required, we would be grateful if you let us know as it helps
+If you are using the hts_engine API in commercial environments, even though no
+license is required, we would be grateful if you let us know as it helps
 justify ourselves to our various sponsors. We also strongly encourage you to
 
- * refer to the use of festopt_hts_engine in any publications that use this
-   software  
+ * refer to the use of hts_engine API in any publications that use this
+   software
  * report bugs, where possible with bug fixes, that are found
 
-See "COPYING" in the same directory for details.
+See also "COPYING" file in the current directory for details.
 
 *******************************************************************************
                                  Installation
@@ -88,18 +88,20 @@ See "INSTALL" in the same directory for details.
                                  Documentation
 *******************************************************************************
 
-Reference manual of festopt_hts_engine is available at
+Reference manual of hts_engine API is available at
 
 http://hts-engine.sourceforge.net/
 
 *******************************************************************************
-                                  Acknowledgements
+                               Acknowledgements
 *******************************************************************************
 
 Keiichi Tokuda
+Shinji Sako
+Heiga Zen
 Keiichiro Oura
-Junichi Yamagishi
-Alan W. Black
+Kazuhiro Nakamura
+Keijiro Saino
 
 *******************************************************************************
                                   Who we are
@@ -113,6 +115,8 @@ Synthesis System. Current members are
  Keiichiro Oura      http://www.sp.nitech.ac.jp/~uratec/
  (Design and Development, Main Maintainer)
  Kei Hashimoto       http://www.sp.nitech.ac.jp/~bonanza/
+ Sayaka Shiota       http://www.sp.nitech.ac.jp/~sayaka/
+ Shinji Takaki       http://www.sp.nitech.ac.jp/~k-prr44/
  Heiga Zen
  Junichi Yamagishi   http://homepages.inf.ed.ac.uk/jyamagis/
  Tomoki Toda         http://spalab.naist.jp/~tomoki/index_e.html

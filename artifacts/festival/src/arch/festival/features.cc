@@ -71,6 +71,10 @@
 /* the lisp_) with two arguments the utterance and the stream item.      */
 /* this allows arbitrary new features without recompilation              */
 /*                                                                       */
+/* Another feature defined here is utt_* (any feature prefixed by utt_)  */
+/* It looks up the remainder of the name as a feature defined at the     */
+/* Utterance level.                                                      */
+/*                                                                       */
 /*=======================================================================*/
 #include <cstdio>
 #include <cstdlib>
@@ -413,6 +417,17 @@ static EST_Val ff_lisp_func(EST_Item *i,const EST_String &name)
     return EST_Val(get_c_string(r));
 }
 
+static EST_Val ff_utt_func(EST_Item *i, const EST_String &name) {
+  // This function is called to retrieve utterance level features for
+  // a given item. It uses the name after utt_ to be the feature
+  // name. The value of this feature is assumed to be atomic.
+
+  EST_String lfeat_name = name.after("utt_");
+  EST_Utterance *u = get_utt(i);
+
+  return EST_Val(get_c_string(lisp_val(u->f(lfeat_name, 0))));
+}
+
 void festival_features_init(void)
 {
     // declare feature specific Lisp functions 
@@ -423,6 +438,12 @@ void festival_features_init(void)
   an stream item.  It must return an atomic value.\n\
   This method may be inefficient and is primarily desgined to allow\n\
   quick prototyping of new feature functions.");
+
+    festival_def_ff_pref(
+        "utt_", "any", ff_utt_func,
+        "ANY.utt_*\n"
+        "Retrieve utterance level feature, given an item.\n"
+        "It must be an atomic value.");
 
     init_subr_2("item.feat",lisp_item_feature,
     "(item.feat ITEM FEATNAME)\n\

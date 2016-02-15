@@ -156,11 +156,11 @@ EST_read_status EST_TrackFile::load_ssff_ts(EST_TokenStream &ts, EST_Track &tr, 
 		"\": bad header unexpected eof" << endl;
 	    return misc_read_error;
 	}
-	else 
-	{
-	    cerr << "ssff load track \"" << ts.filename() << 
-		"\": unknown header value \"" << c << "\"" << endl;
-	}
+        //	else 
+        //	{
+        //	    cerr << "ssff load track \"" << ts.filename() << 
+        //		"\": unknown header value \"" << c << "\"" << endl;
+        //	}
     }
     ts.get();  // skip over end of header line
 

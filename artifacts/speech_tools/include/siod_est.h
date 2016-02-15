@@ -52,7 +52,7 @@ SIOD_REGISTER_CLASS_DCLS(track,EST_Track)
 SIOD_REGISTER_CLASS_DCLS(feats,EST_Features)
 SIOD_REGISTER_CLASS_DCLS(utterance,EST_Utterance)
 SIOD_REGISTER_CLASS_DCLS(item,EST_Item)
-SIOD_REGISTER_CLASS_DCLS(scheme,obj)
+/* SIOD_REGISTER_CLASS_DCLS(scheme,obj) */ /* removed for clang -- 14/10/13 */
 
 #define get_c_utt(x) (utterance(x))
 #define get_c_item(x) (item(x))

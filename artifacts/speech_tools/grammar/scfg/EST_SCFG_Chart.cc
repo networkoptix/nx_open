@@ -278,8 +278,8 @@ double EST_SCFG_Chart::find_best_tree_cal(int start,int end,int p)
 void EST_SCFG_Chart::parse(void)
 {
     // do the parsing, find best parse only
-
-    find_best_tree(0,n_vertices-1,grammar->distinguished_symbol());
+    if (n_vertices - 1 > 0)
+        find_best_tree(0,n_vertices-1,grammar->distinguished_symbol());
 
 }
 

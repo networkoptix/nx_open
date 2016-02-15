@@ -60,7 +60,7 @@ void Ngram_freqsmooth(EST_Ngrammar &ngram,int smooth_thresh1,
     EST_Ngrammar *backoff_ngrams;
     backoff_ngrams = new EST_Ngrammar[ngram.order()-1];
 
-    Good_Turing_smooth(ngram,smooth_thresh1);
+    Good_Turing_smooth(ngram,smooth_thresh1,0);
 
     fs_build_backoff_ngrams(backoff_ngrams,ngram);
 

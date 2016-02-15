@@ -421,41 +421,45 @@ Pretty print APML semantic structure."
    (flatten l)))
 
 
-(define (apml_print_sylstructure utt)
-"(apml_print_sylstructure utt)
-Pretty print APML syllable structure."
-  (mapcar
-   (lambda (x)
-     (format t "%s\n" (item.name x))
-     (apml_psyl x))
-   (utt.relation.items utt 'Word))
-  t)
+(define (apml_print_sylstructure utt filename)
+"(apml_print_sylstructure utt filename)
+Pretty print APML syllable structure. Filename t for stdout"
+  (let (fd)
+    (if (not (eq? filename t))
+      (set! fd (fopen filename "wb"))
+      (set! fd t))
+    (mapcar
+      (lambda (x)
+        (format fd "%s\n" (item.name x))
+      (apml_psyl fd x))
+    (utt.relation.items utt 'Word))
+    t))
 
-(define (apml_psyl word)
+(define (apml_psyl fd word)
   (mapcar
    (lambda (x)
-     (apml_psegs x)
+     (apml_psegs fd x)
      (if (eq (item.feat x 'stress) 1)
-	 (format t " (1)"))
+	 (format fd " (1)"))
      (if (item.relation.daughter1 x 'Intonation)
 	 (begin
 	   (let ((ie (item.relation.daughter1 x 'Intonation)))
-	     (format t " [")
+	     (format fd " [")
 	     (while ie
-		    (format t "%s" (item.name ie))
+		    (format fd "%s" (item.name ie))
 		    (set! ie (item.next ie))
 		    (if ie (format t " ")))
-	     (format t "]"))))
-     (format t "\n"))
+	     (format fd "]"))))
+     (format fd "\n"))
    (item.daughters (item.relation word 'SylStructure))))
 
-(define (apml_psegs syl)
+(define (apml_psegs fd syl)
   (let ((segs (item.daughters syl)))
-    (format t " ")
+    (format fd " ")
     (while segs
-	   (format t "%s" (item.name (car segs)))
+	   (format fd "%s" (item.name (car segs)))
 	   (if (cdr segs)
-	       (format t "."))
+	       (format fd "."))
 	   (set! segs (cdr segs)))))
 
 

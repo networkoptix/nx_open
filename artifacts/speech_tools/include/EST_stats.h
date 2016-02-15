@@ -37,7 +37,7 @@
 /*                                                                       */
 /*=======================================================================*/
 
-#ifndef __EST_STATS__H__
+#ifndef __EST_STATS_H__
 #define __EST_STATS_H__
 
 #include "EST_PST.h"

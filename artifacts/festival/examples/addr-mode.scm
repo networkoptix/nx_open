@@ -114,7 +114,7 @@ this is desgined to stop Mr W Smith becoming West."
    ((null tok) nil)
    ((string-matches (item.name tok) ".*[0-9].*")
     t)
-   (t (addr_preceeding_number (item.prev tok)))))
+   (t (addr_preceding_number (item.prev tok)))))
 
 (define (addr_succeeding_non_number tok)
   (cond

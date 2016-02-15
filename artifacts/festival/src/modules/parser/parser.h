@@ -42,6 +42,7 @@
 
 LISP FT_MetricalTree_Utt(LISP utt);
 LISP FT_PParse_Utt(LISP utt);
+LISP FT_PParse_Generalized_Utt(LISP args, LISP env);
 LISP FT_MultiParse_Utt(LISP utt);
 
 #endif

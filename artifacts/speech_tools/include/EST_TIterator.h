@@ -67,7 +67,7 @@
   *     }</programlisting>
   * 
   * @author Richard Caley <rjc@cstr.ed.ac.uk>
-  * @version $Id: EST_TIterator.h,v 1.6 2004/05/04 00:00:16 awb Exp $ 
+  * @version $Id: EST_TIterator.h,v 1.7 2013/04/13 14:17:11 awb Exp $ 
   */
 
 template <class Container, class IPointer, class Entry> 
@@ -209,7 +209,7 @@ public:
 
   /// Create an iterator ready to run over the given container.
   EST_TStructIterator(const Container &over)
-    { begin(over); }
+    { this->begin(over); }
 
   const Entry *operator ->() const
     {return &this->current();}
@@ -289,7 +289,7 @@ public:
 
   /// Create an iterator ready to run over the given container.
   EST_TRwStructIterator(Container &over)
-    { begin(over); }
+    { this->begin(over); }
 
   Entry *operator ->() const
     {return &this->current();}

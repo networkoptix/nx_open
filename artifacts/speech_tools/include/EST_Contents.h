@@ -63,7 +63,7 @@ class EST_Content_Data{
     int the_refs() { return refs; }
     void *contents() { return data; }
     EST_Content_Data &operator=(const EST_Content_Data &c)
-    {refs = c.refs; data = c.data; free_func = free_func; return *this;}
+    {refs = c.refs; data = c.data; free_func = c.free_func; return *this;}
 };
 
 /** More contents */

@@ -134,9 +134,10 @@ static char *v_stress(const char *ph,int &stress)
     //  is as stress value.
     char *nph;
 
-    if ((ph[strlen(ph)-1] == '1') || 
-	(ph[strlen(ph)-1] == '2') ||
-	(ph[strlen(ph)-1] == '0'))
+    if ((strlen(ph) > 1) &&
+        ((ph[strlen(ph)-1] == '1') || 
+         (ph[strlen(ph)-1] == '2') ||
+         (ph[strlen(ph)-1] == '0')))
     {
 	stress = ph[strlen(ph)-1]-'0';
 	nph = wstrdup(ph);

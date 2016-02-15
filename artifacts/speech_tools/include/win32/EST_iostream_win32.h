@@ -51,6 +51,8 @@ using namespace std;
 #undef read
 #undef write
 
+#define snprintf _snprintf
+
 #endif
 
 

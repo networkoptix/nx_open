@@ -173,7 +173,7 @@ void make_segment_single_mapping(EST_Relation &source_lab,
 // 		 fabs((next_apm_t*m)-tpm_t), fabs((apm_t*m)-tpm_t) );
 	  apm_t = next_apm_t;
 	  ++apm_i;
-	  next_apm_t = source_pm.t(apm_i+1)-apm_t_off;
+          next_apm_t = source_pm.t(apm_i+1)-apm_t_off;
 	}
 	
 // // 	printf( "tpm %d = apm %d\n", i, apm_i );
@@ -186,11 +186,13 @@ void make_segment_single_mapping(EST_Relation &source_lab,
       }
       
       // for next loop
-      s_i_start = s_i_end+1;
-      t_i_start = t_i_end+1;
-      s_start = source_pm.t(s_i_start);
-      t_start = target_pm.t(t_i_start);
-
+      if (s->next())
+      {
+          s_i_start = s_i_end+1;
+          t_i_start = t_i_end+1;
+          s_start = source_pm.t(s_i_start);
+          t_start = target_pm.t(t_i_start);
+      }
     }
   if (i == 0)
     map.resize(0);  // nothing to synthesize

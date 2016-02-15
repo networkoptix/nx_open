@@ -54,7 +54,7 @@
      (set! singing_dur_att_list nil)
      (set! singing_global_time 0.0)
      (set! singing_bpm (get-bpm ATTLIST))
-     (set! singing_bps (/ singing_bpm 60.0))
+     (set! singing_bps (/ singing_bpm 50.0)) ;; change this back to 60
      nil)
 
     (")SINGING" (ATTLIST UTT)
@@ -547,8 +547,10 @@
   ;; use our duration function
   (Parameter.set 'Duration_Method singing_duration_method)
   ;; set phoneme corrections for the current language
-  (let ((language (cadr (assoc 'language
-                               (cadr (voice.description current-voice))))))
+  (let ((language 'english
+;         (cadr (assoc 'language
+;                               (cadr (voice.description current-voice))))
+         ))
     (set! phoneme_offsets* (cdr (assoc language phoneme_offsets))))
   ;; avoid splitting to multiple utterances with insertion of unwanted pauses
   (set! singing_previous_eou_tree eou_tree)

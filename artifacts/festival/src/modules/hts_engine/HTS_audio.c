@@ -1,10 +1,10 @@
 /* ----------------------------------------------------------------- */
-/*           The HMM-Based Speech Synthesis System (HTS)             */
-/*           hts_engine API developed by HTS Working Group           */
+/*           The HMM-Based Speech Synthesis Engine "hts_engine API"  */
+/*           developed by HTS Working Group                          */
 /*           http://hts-engine.sourceforge.net/                      */
 /* ----------------------------------------------------------------- */
 /*                                                                   */
-/*  Copyright (c) 2001-2010  Nagoya Institute of Technology          */
+/*  Copyright (c) 2001-2012  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /*                2001-2008  Tokyo Institute of Technology           */
@@ -55,193 +55,441 @@
 
 HTS_AUDIO_C_START;
 
+#if !defined(AUDIO_PLAY_WIN32) && !defined(AUDIO_PLAY_PORTAUDIO) && !defined(AUDIO_PLAY_NONE)
+#if defined(__WINCE__) || defined(_WINCE) || defined(_WINCE) || defined(__WINCE) || defined(__WIN32__) || defined(__WIN32) || defined(_WIN32) || defined(WIN32) || defined(__CYGWIN__) || defined(__MINGW32__)
+#define AUDIO_PLAY_WIN32
+#else
+#define AUDIO_PLAY_NONE
+#endif                          /* __WINCE__ || _WINCE || _WINCE || __WINCE || __WIN32__ || __WIN32 || _WIN32 || WIN32 || __CYGWIN__ || __MINGW32__ */
+#endif                          /* !AUDIO_PLAY_WIN32 && !AUDIO_PLAY_PORTAUDIO && !AUDIO_PLAY_NONE */
+
 /* hts_engine libralies */
 #include "HTS_hidden.h"
 
-/* for windows & windows mobile */
-#if defined(AUDIO_PLAY_WIN32) || defined(AUDIO_PLAY_WINCE)
+#ifdef AUDIO_PLAY_WIN32
 
-#define AUDIO_WAIT_BUFF_MS 10   /* wait time (ms) */
+#include <windows.h>
+#include <mmsystem.h>
+#define AUDIO_WAIT_BUFF_MS 10   /* wait time (0.01 sec) */
 #define AUDIO_CHANNEL 1         /* monoral */
 
-/* HTS_Audio_callback_function: callback function from audio device */
-static void CALLBACK HTS_Audio_callback_function(HWAVEOUT hwaveout, UINT msg,
-                                                 DWORD user_data, DWORD param1,
-                                                 DWORD param2)
+/* HTS_Audio: audio interface for Windows */
+typedef struct _HTS_AudioInterface {
+   HWAVEOUT hwaveout;           /* audio device handle */
+   WAVEFORMATEX waveformatex;   /* wave formatex */
+   unsigned char which_buff;    /* double buffering flag */
+   HTS_Boolean now_buff_1;      /* double buffering flag */
+   HTS_Boolean now_buff_2;      /* double buffering flag */
+   WAVEHDR buff_1;              /* buffer */
+   WAVEHDR buff_2;              /* buffer */
+} HTS_AudioInterface;
+
+/* HTS_AudioInterface_callback_function: callback function from audio device */
+static void CALLBACK HTS_AudioInterface_callback_function(HWAVEOUT hwaveout, UINT msg, DWORD user_data, DWORD param1, DWORD param2)
 {
    WAVEHDR *wavehdr = (WAVEHDR *) param1;
-   HTS_Audio *as = (HTS_Audio *) user_data;
+   HTS_AudioInterface *audio_interface = (HTS_AudioInterface *) user_data;
 
    if (msg == MM_WOM_DONE && wavehdr && (wavehdr->dwFlags & WHDR_DONE)) {
-      if (as->now_buff_1 == TRUE && wavehdr == &(as->buff_1)) {
-         as->now_buff_1 = FALSE;
-      } else if (as->now_buff_2 == TRUE && wavehdr == &(as->buff_2)) {
-         as->now_buff_2 = FALSE;
+      if (audio_interface->now_buff_1 == TRUE && wavehdr == &(audio_interface->buff_1)) {
+         audio_interface->now_buff_1 = FALSE;
+      } else if (audio_interface->now_buff_2 == TRUE && wavehdr == &(audio_interface->buff_2)) {
+         audio_interface->now_buff_2 = FALSE;
       }
    }
 }
 
-/* HTS_Audio_write_buffer: send buffer to audio device */
-static void HTS_Audio_write_buffer(HTS_Audio * as)
+/* HTS_AudioInterface_write: send buffer to audio device */
+static void HTS_AudioInterface_write(HTS_AudioInterface * audio_interface, const short *buff, size_t buff_size)
 {
-   MMRESULT error;
+   MMRESULT result;
 
-   if (as->which_buff == 1) {
-      while (as->now_buff_1 == TRUE)
+   if (audio_interface->which_buff == 1) {
+      while (audio_interface->now_buff_1 == TRUE)
          Sleep(AUDIO_WAIT_BUFF_MS);
-      as->now_buff_1 = TRUE;
-      as->which_buff = 2;
-      memcpy(as->buff_1.lpData, as->buff, as->buff_size * sizeof(short));
-      as->buff_1.dwBufferLength = as->buff_size * sizeof(short);
-      error = waveOutWrite(as->hwaveout, &(as->buff_1), sizeof(WAVEHDR));
+      audio_interface->now_buff_1 = TRUE;
+      audio_interface->which_buff = 2;
+      memcpy(audio_interface->buff_1.lpData, buff, buff_size * sizeof(short));
+      audio_interface->buff_1.dwBufferLength = buff_size * sizeof(short);
+      result = waveOutWrite(audio_interface->hwaveout, &(audio_interface->buff_1), sizeof(WAVEHDR));
    } else {
-      while (as->now_buff_2 == TRUE)
+      while (audio_interface->now_buff_2 == TRUE)
          Sleep(AUDIO_WAIT_BUFF_MS);
-      as->now_buff_2 = TRUE;
-      as->which_buff = 1;
-      memcpy(as->buff_2.lpData, as->buff, as->buff_size * sizeof(short));
-      as->buff_2.dwBufferLength = as->buff_size * sizeof(short);
-      error = waveOutWrite(as->hwaveout, &(as->buff_2), sizeof(WAVEHDR));
+      audio_interface->now_buff_2 = TRUE;
+      audio_interface->which_buff = 1;
+      memcpy(audio_interface->buff_2.lpData, buff, buff_size * sizeof(short));
+      audio_interface->buff_2.dwBufferLength = buff_size * sizeof(short);
+      result = waveOutWrite(audio_interface->hwaveout, &(audio_interface->buff_2), sizeof(WAVEHDR));
    }
 
-   if (error != MMSYSERR_NOERROR)
-      HTS_error(0,
-                "hts_engine: Cannot send datablocks to your output audio device to play waveform.\n");
+   if (result != MMSYSERR_NOERROR)
+      HTS_error(0, "hts_engine: Cannot send datablocks to your output audio device to play waveform.\n");
 }
 
-/* HTS_Audio_open: open audio device */
-void HTS_Audio_open(HTS_Audio * as, int sampling_rate, int max_buff_size)
+/* HTS_AudioInterface_close: close audio device */
+static void HTS_AudioInterface_close(HTS_AudioInterface * audio_interface)
 {
-   MMRESULT error;
+   MMRESULT result;
 
-   /* queue */
-   as->which_buff = 1;
-   as->now_buff_1 = FALSE;
-   as->now_buff_2 = FALSE;
-   as->max_buff_size = max_buff_size;
-   as->buff = (short *) HTS_calloc(max_buff_size, sizeof(short));
+   /* stop audio */
+   result = waveOutReset(audio_interface->hwaveout);
+   if (result != MMSYSERR_NOERROR)
+      HTS_error(0, "hts_engine: Cannot stop and reset your output audio device.\n");
+   /* unprepare */
+   result = waveOutUnprepareHeader(audio_interface->hwaveout, &(audio_interface->buff_1), sizeof(WAVEHDR));
+   if (result != MMSYSERR_NOERROR)
+      HTS_error(0, "hts_engine: Cannot cleanup the audio datablocks to play waveform.\n");
+   result = waveOutUnprepareHeader(audio_interface->hwaveout, &(audio_interface->buff_2), sizeof(WAVEHDR));
+   if (result != MMSYSERR_NOERROR)
+      HTS_error(0, "hts_engine: Cannot cleanup the audio datablocks to play waveform.\n");
+   /* close */
+   result = waveOutClose(audio_interface->hwaveout);
+   if (result != MMSYSERR_NOERROR)
+      HTS_error(0, "hts_engine: Failed to close your output audio device.\n");
+   if (audio_interface->buff_1.lpData != NULL)
+      HTS_free(audio_interface->buff_1.lpData);
+   if (audio_interface->buff_2.lpData != NULL)
+      HTS_free(audio_interface->buff_2.lpData);
+
+   HTS_free(audio_interface);
+}
+
+static HTS_AudioInterface *HTS_AudioInterface_open(size_t sampling_frequency, size_t max_buff_size)
+{
+   HTS_AudioInterface *audio_interface;
+   MMRESULT result;
+
+   /* make audio interface */
+   audio_interface = (HTS_AudioInterface *) HTS_calloc(1, sizeof(HTS_AudioInterface));
+
+   audio_interface->hwaveout = 0;
+   audio_interface->which_buff = 1;
+   audio_interface->now_buff_1 = FALSE;
+   audio_interface->now_buff_2 = FALSE;
 
    /* format */
-   as->waveformatex.wFormatTag = WAVE_FORMAT_PCM;
-   as->waveformatex.nChannels = AUDIO_CHANNEL;
-   as->waveformatex.nSamplesPerSec = sampling_rate;
-   as->waveformatex.wBitsPerSample = sizeof(short) * 8;
-   as->waveformatex.nBlockAlign = AUDIO_CHANNEL
-       * as->waveformatex.wBitsPerSample / 8;
-   as->waveformatex.nAvgBytesPerSec = sampling_rate
-       * as->waveformatex.nBlockAlign;
+   audio_interface->waveformatex.wFormatTag = WAVE_FORMAT_PCM;
+   audio_interface->waveformatex.nChannels = AUDIO_CHANNEL;
+   audio_interface->waveformatex.nSamplesPerSec = sampling_frequency;
+   audio_interface->waveformatex.wBitsPerSample = sizeof(short) * 8;
+   audio_interface->waveformatex.nBlockAlign = AUDIO_CHANNEL * audio_interface->waveformatex.wBitsPerSample / 8;
+   audio_interface->waveformatex.nAvgBytesPerSec = sampling_frequency * audio_interface->waveformatex.nBlockAlign;
    /* open */
-   error =
-       waveOutOpen(&as->hwaveout, WAVE_MAPPER, &as->waveformatex,
-                   (DWORD) HTS_Audio_callback_function, (DWORD) as,
-                   CALLBACK_FUNCTION);
-   if (error != MMSYSERR_NOERROR)
-      HTS_error(0,
-                "hts_engine: Failed to open your output audio device to play waveform.\n");
+   result = waveOutOpen(&audio_interface->hwaveout, WAVE_MAPPER, &audio_interface->waveformatex, (DWORD) HTS_AudioInterface_callback_function, (DWORD) audio_interface, CALLBACK_FUNCTION);
+   if (result != MMSYSERR_NOERROR) {
+      HTS_error(0, "hts_engine: Failed to open your output audio_interface device to play waveform.\n");
+      HTS_free(audio_interface);
+      return NULL;
+   }
 
    /* prepare */
-   as->buff_1.lpData = (LPSTR) HTS_calloc(max_buff_size, sizeof(short));
-   as->buff_1.dwBufferLength = max_buff_size * sizeof(short);
-   as->buff_1.dwFlags = WHDR_BEGINLOOP | WHDR_ENDLOOP;
-   as->buff_1.dwLoops = 1;
-   as->buff_1.lpNext = 0;
-   as->buff_1.reserved = 0;
-   error = waveOutPrepareHeader(as->hwaveout, &(as->buff_1), sizeof(WAVEHDR));
-   if (error != MMSYSERR_NOERROR)
-      HTS_error(0,
-                "hts_engine: Cannot initialize audio datablocks to play waveform.\n");
-   as->buff_2.lpData = (LPSTR) HTS_calloc(max_buff_size, sizeof(short));
-   as->buff_2.dwBufferLength = max_buff_size * sizeof(short);
-   as->buff_2.dwFlags = WHDR_BEGINLOOP | WHDR_ENDLOOP;
-   as->buff_2.dwLoops = 1;
-   as->buff_2.lpNext = 0;
-   as->buff_2.reserved = 0;
-   error = waveOutPrepareHeader(as->hwaveout, &(as->buff_2), sizeof(WAVEHDR));
-   if (error != MMSYSERR_NOERROR)
-      HTS_error(0,
-                "hts_engine: Cannot initialize audio datablocks to play waveform.\n");
+   audio_interface->buff_1.lpData = (LPSTR) HTS_calloc(max_buff_size, sizeof(short));
+   audio_interface->buff_1.dwBufferLength = max_buff_size * sizeof(short);
+   audio_interface->buff_1.dwFlags = WHDR_BEGINLOOP | WHDR_ENDLOOP;
+   audio_interface->buff_1.dwLoops = 1;
+   audio_interface->buff_1.lpNext = 0;
+   audio_interface->buff_1.reserved = 0;
+   result = waveOutPrepareHeader(audio_interface->hwaveout, &(audio_interface->buff_1), sizeof(WAVEHDR));
+   if (result != MMSYSERR_NOERROR) {
+      HTS_error(0, "hts_engine: Cannot initialize audio_interface datablocks to play waveform.\n");
+      HTS_free(audio_interface->buff_1.lpData);
+      HTS_free(audio_interface);
+      return NULL;
+   }
+   audio_interface->buff_2.lpData = (LPSTR) HTS_calloc(max_buff_size, sizeof(short));
+   audio_interface->buff_2.dwBufferLength = max_buff_size * sizeof(short);
+   audio_interface->buff_2.dwFlags = WHDR_BEGINLOOP | WHDR_ENDLOOP;
+   audio_interface->buff_2.dwLoops = 1;
+   audio_interface->buff_2.lpNext = 0;
+   audio_interface->buff_2.reserved = 0;
+   result = waveOutPrepareHeader(audio_interface->hwaveout, &(audio_interface->buff_2), sizeof(WAVEHDR));
+   if (result != MMSYSERR_NOERROR) {
+      HTS_error(0, "hts_engine: Cannot initialize audio_interface datablocks to play waveform.\n");
+      HTS_free(audio_interface->buff_1.lpData);
+      HTS_free(audio_interface->buff_2.lpData);
+      HTS_free(audio_interface);
+      return NULL;
+   }
+
+   return audio_interface;
+}
+
+/* HTS_Audio_initialize: initialize audio */
+void HTS_Audio_initialize(HTS_Audio * audio)
+{
+   if (audio == NULL)
+      return;
+
+   audio->sampling_frequency = 0;
+   audio->max_buff_size = 0;
+   audio->buff = NULL;
+   audio->buff_size = 0;
+   audio->audio_interface = NULL;
+}
+
+/* HTS_Audio_set_parameter: set parameters for audio */
+void HTS_Audio_set_parameter(HTS_Audio * audio, size_t sampling_frequency, size_t max_buff_size)
+{
+   if (audio == NULL)
+      return;
+
+   if (audio->sampling_frequency == sampling_frequency && audio->max_buff_size == max_buff_size)
+      return;
+
+   HTS_Audio_clear(audio);
+
+   if (sampling_frequency == 0 || max_buff_size == 0)
+      return;
+
+   audio->audio_interface = HTS_AudioInterface_open(sampling_frequency, max_buff_size);
+   if (audio->audio_interface == NULL)
+      return;
+
+   audio->sampling_frequency = sampling_frequency;
+   audio->max_buff_size = max_buff_size;
+   audio->buff = (short *) HTS_calloc(max_buff_size, sizeof(short));
+   audio->buff_size = 0;
+}
+
+/* HTS_Audio_write: send data to audio */
+void HTS_Audio_write(HTS_Audio * audio, short data)
+{
+   if (audio == NULL)
+      return;
+
+   audio->buff[audio->buff_size++] = data;
+
+   if (audio->buff_size >= audio->max_buff_size) {
+      if (audio->audio_interface != NULL)
+         HTS_AudioInterface_write((HTS_AudioInterface *) audio->audio_interface, audio->buff, audio->buff_size);
+      audio->buff_size = 0;
+   }
+}
+
+/* HTS_Audio_flush: flush remain data */
+void HTS_Audio_flush(HTS_Audio * audio)
+{
+   HTS_AudioInterface *audio_interface;
+
+   if (audio == NULL || audio->audio_interface == NULL)
+      return;
+
+   audio_interface = (HTS_AudioInterface *) audio->audio_interface;
+   if (audio->buff_size > 0) {
+      HTS_AudioInterface_write(audio_interface, audio->buff, audio->buff_size);
+      audio->buff_size = 0;
+   }
+   while (audio_interface->now_buff_1 == TRUE || audio_interface->now_buff_2 == TRUE)
+      Sleep(AUDIO_WAIT_BUFF_MS);
+}
+
+/* HTS_Audio_clear: free audio */
+void HTS_Audio_clear(HTS_Audio * audio)
+{
+   HTS_AudioInterface *audio_interface;
+
+   if (audio == NULL || audio->audio_interface == NULL)
+      return;
+
+   audio_interface = (HTS_AudioInterface *) audio->audio_interface;
+   HTS_Audio_flush(audio);
+   HTS_AudioInterface_close(audio_interface);
+   if (audio->buff != NULL)
+      free(audio->buff);
+   HTS_Audio_initialize(audio);
+}
+
+#endif                          /* AUDIO_PLAY_WIN32 */
+
+#ifdef AUDIO_PLAY_PORTAUDIO
+
+#include "portaudio.h"
+
+/* HTS_AudioInterface: audio output for PortAudio */
+typedef struct _HTS_AudioInterface {
+   PaStreamParameters parameters;       /* parameters for output stream */
+   PaStream *stream;            /* output stream */
+} HTS_AudioInterface;
+
+/* HTS_AudioInterface_write: send data to audio device */
+static void HTS_AudioInterface_write(HTS_AudioInterface * audio_interface, const short *buff, size_t buff_size)
+{
+   PaError err;
+
+   err = Pa_WriteStream(audio_interface->stream, buff, buff_size);
+   if (err != paNoError && err != paOutputUnderflowed)
+      HTS_error(0, "hts_engine: Cannot send datablocks to your output audio device to play waveform.\n");
+}
+
+/* HTS_AudioInterface_close: close audio device */
+static void HTS_AudioInterface_close(HTS_AudioInterface * audio_interface)
+{
+   PaError err;
+
+   err = Pa_StopStream(audio_interface->stream);
+   if (err != paNoError)
+      HTS_error(0, "hts_engine: Cannot stop your output audio device.\n");
+   err = Pa_CloseStream(audio_interface->stream);
+   if (err != paNoError)
+      HTS_error(0, "hts_engine: Failed to close your output audio device.\n");
+   Pa_Terminate();
+
+   HTS_free(audio_interface);
+}
+
+static HTS_AudioInterface *HTS_AudioInterface_open(size_t sampling_frequency, size_t max_buff_size)
+{
+   HTS_AudioInterface *audio_interface;
+   PaError err;
+
+   audio_interface = HTS_calloc(1, sizeof(HTS_AudioInterface));
+   audio_interface->stream = NULL;
+
+   err = Pa_Initialize();
+   if (err != paNoError) {
+      HTS_error(0, "hts_engine: Failed to initialize your output audio device to play waveform.\n");
+      HTS_free(audio_interface);
+      return NULL;
+   }
+
+   audio_interface->parameters.device = Pa_GetDefaultOutputDevice();
+   audio_interface->parameters.channelCount = 1;
+   audio_interface->parameters.sampleFormat = paInt16;
+   audio_interface->parameters.suggestedLatency = Pa_GetDeviceInfo(audio_interface->parameters.device)->defaultLowOutputLatency;
+   audio_interface->parameters.hostApiSpecificStreamInfo = NULL;
+
+   err = Pa_OpenStream(&audio_interface->stream, NULL, &audio_interface->parameters, sampling_frequency, max_buff_size, paClipOff, NULL, NULL);
+   if (err != paNoError) {
+      HTS_error(0, "hts_engine: Failed to open your output audio device to play waveform.\n");
+      Pa_Terminate();
+      HTS_free(audio_interface);
+      return NULL;
+   }
+
+   err = Pa_StartStream(audio_interface->stream);
+   if (err != paNoError) {
+      HTS_error(0, "hts_engine: Failed to start your output audio device to play waveform.\n");
+      Pa_CloseStream(audio_interface->stream);
+      Pa_Terminate();
+      HTS_free(audio_interface);
+      return NULL;
+   }
+
+   return audio_interface;
+}
+
+/* HTS_Audio_initialize: initialize audio */
+void HTS_Audio_initialize(HTS_Audio * audio)
+{
+   if (audio == NULL)
+      return;
+
+   audio->sampling_frequency = 0;
+   audio->max_buff_size = 0;
+   audio->buff = NULL;
+   audio->buff_size = 0;
+   audio->audio_interface = NULL;
+}
+
+/* HTS_Audio_set_parameter: set parameters for audio */
+void HTS_Audio_set_parameter(HTS_Audio * audio, size_t sampling_frequency, size_t max_buff_size)
+{
+   if (audio == NULL)
+      return;
+
+   if (audio->sampling_frequency == sampling_frequency && audio->max_buff_size == max_buff_size)
+      return;
+
+   HTS_Audio_clear(audio);
+
+   if (sampling_frequency == 0 || max_buff_size == 0)
+      return;
+
+   audio->audio_interface = HTS_AudioInterface_open(sampling_frequency, max_buff_size);
+   if (audio->audio_interface == NULL)
+      return;
+
+   audio->sampling_frequency = sampling_frequency;
+   audio->max_buff_size = max_buff_size;
+   audio->buff = (short *) HTS_calloc(max_buff_size, sizeof(short));
+   audio->buff_size = 0;
 }
 
 /* HTS_Audio_write: send data to audio device */
-void HTS_Audio_write(HTS_Audio * as, short data)
+void HTS_Audio_write(HTS_Audio * audio, short data)
 {
-   as->buff[as->buff_size] = data;
-   as->buff_size++;
-   if (as->buff_size == as->max_buff_size) {
-      HTS_Audio_write_buffer(as);
-      as->buff_size = 0;
+   if (audio == NULL)
+      return;
+
+   audio->buff[audio->buff_size++] = data;
+
+   if (audio->buff_size >= audio->max_buff_size) {
+      if (audio->audio_interface != NULL)
+         HTS_AudioInterface_write((HTS_AudioInterface *) audio->audio_interface, audio->buff, audio->max_buff_size);
+      audio->buff_size = 0;
    }
 }
 
-/* HTS_Audio_close: close audio device */
-void HTS_Audio_close(HTS_Audio * as)
+/* HTS_Audio_flush: flush remain data */
+void HTS_Audio_flush(HTS_Audio * audio)
 {
-   MMRESULT error;
+   HTS_AudioInterface *audio_interface;
 
-   if (as->buff_size != 0)
-      HTS_Audio_write_buffer(as);
-   while (as->now_buff_1 == TRUE)
-      Sleep(AUDIO_WAIT_BUFF_MS);
-   while (as->now_buff_2 == TRUE)
-      Sleep(AUDIO_WAIT_BUFF_MS);
-   /* stop audio */
-   error = waveOutReset(as->hwaveout);
-   if (error != MMSYSERR_NOERROR)
-      HTS_error(0,
-                "hts_engine: Cannot stop and reset your output audio device.\n");
-   /* unprepare */
-   error = waveOutUnprepareHeader(as->hwaveout, &(as->buff_1), sizeof(WAVEHDR));
-   if (error != MMSYSERR_NOERROR)
-      HTS_error(0,
-                "hts_engine: Cannot cleanup the audio datablocks to play waveform.\n");
-   error = waveOutUnprepareHeader(as->hwaveout, &(as->buff_2), sizeof(WAVEHDR));
-   if (error != MMSYSERR_NOERROR)
-      HTS_error(0,
-                "hts_engine: Cannot cleanup the audio datablocks to play waveform.\n");
-   /* close */
-   error = waveOutClose(as->hwaveout);
-   if (error != MMSYSERR_NOERROR)
-      HTS_error(0, "hts_engine: Failed to close your output audio device.\n");
-   HTS_free(as->buff_1.lpData);
-   HTS_free(as->buff_2.lpData);
-   HTS_free(as->buff);
-}
-#endif                          /* AUDIO_PLAY_WIN32 || AUDIO_PLAY_WINCE */
+   if (audio == NULL || audio->audio_interface == NULL)
+      return;
 
-/* for ALSA on Linux */
-#ifdef AUDIO_PLAY_ALSA
-/* HTS_Audio_open: open audio device (dummy) */
-void HTS_Audio_open(HTS_Audio * as, int sampling_rate, int max_buff_size)
-{
+   audio_interface = (HTS_AudioInterface *) audio->audio_interface;
+   if (audio->buff_size > 0) {
+      HTS_AudioInterface_write((HTS_AudioInterface *) audio->audio_interface, audio->buff, audio->buff_size);
+      audio->buff_size = 0;
+   }
 }
 
-/* HTS_Audio_write: send data to audio device (dummy) */
-void HTS_Audio_write(HTS_Audio * as, short data)
+/* HTS_Audio_clear: free audio */
+void HTS_Audio_clear(HTS_Audio * audio)
 {
+   HTS_AudioInterface *audio_interface;
+
+   if (audio == NULL || audio->audio_interface == NULL)
+      return;
+   audio_interface = (HTS_AudioInterface *) audio->audio_interface;
+
+   HTS_Audio_flush(audio);
+   HTS_AudioInterface_close(audio_interface);
+   if (audio->buff != NULL)
+      HTS_free(audio->buff);
+   HTS_Audio_initialize(audio);
 }
 
-/* HTS_Audio_close: close audio device */
-void HTS_Audio_close(HTS_Audio * as)
-{
-}
-#endif                          /* AUDIO_PLAY_ALSA */
+#endif                          /* AUDIO_PLAY_PORTAUDIO */
 
-/* for others */
 #ifdef AUDIO_PLAY_NONE
-/* HTS_Audio_open: open audio device (dummy) */
-void HTS_Audio_open(HTS_Audio * as, int sampling_rate, int max_buff_size)
+
+/* HTS_Audio_initialize: initialize audio */
+void HTS_Audio_initialize(HTS_Audio * audio)
 {
 }
 
-/* HTS_Audio_write: send data to audio device (dummy) */
-void HTS_Audio_write(HTS_Audio * as, short data)
+/* HTS_Audio_set_parameter: set parameters for audio */
+void HTS_Audio_set_parameter(HTS_Audio * audio, size_t sampling_frequeny, size_t max_buff_size)
 {
 }
 
-/* HTS_Audio_close: close audio device (dummy) */
-void HTS_Audio_close(HTS_Audio * as)
+/* HTS_Audio_write: send data to audio */
+void HTS_Audio_write(HTS_Audio * audio, short data)
 {
 }
+
+/* HTS_Audio_flush: flush remain data */
+void HTS_Audio_flush(HTS_Audio * audio)
+{
+}
+
+/* HTS_Audio_clear: free audio */
+void HTS_Audio_clear(HTS_Audio * audio)
+{
+}
+
 #endif                          /* AUDIO_PLAY_NONE */
 
 HTS_AUDIO_C_END;

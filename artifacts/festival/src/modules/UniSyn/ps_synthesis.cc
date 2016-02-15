@@ -53,7 +53,7 @@ void us_generate_wave(EST_Utterance &utt,
     EST_IVector *map, *frame_pm_indices;
     EST_WaveVector *frames;
     EST_Track *source_coef, *target_coef;
-    EST_Wave *sig;
+    EST_Wave *sig, *res;
     EST_FVector gain;
 
     frames = wavevector(utt.relation("SourceCoef", 1)->head()->f("frame"));
@@ -77,6 +77,10 @@ void us_generate_wave(EST_Utterance &utt,
     if (filter_method == "lpc")
       {
 	map_coefs(*source_coef, *target_coef, *map);
+        // Save residual for external prcessing 
+        res = new EST_Wave;
+        res->copy(*sig);
+        utt.relation("TargetCoef", 1)->head()->set_val("residual",est_val(res));
 	// fast version
 	lpc_filter_fast(*target_coef, *sig, *sig);
 	// slower version (but cleaner)

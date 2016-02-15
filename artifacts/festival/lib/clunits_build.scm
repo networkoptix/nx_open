@@ -290,6 +290,7 @@ Dump features for all items of type utype."
     (format t "%s\n" command)
     (system command)))
 
+(defvar clunits_tree_minimum_leafs 0)
 (define (acost:collect_trees unittypes params)
 "Collect the trees into one file as an assoc list"
   (let ((fd (fopen 
@@ -320,7 +321,8 @@ Dump features for all items of type utype."
 	   (set! tree (tree_merge_leafs tree cluster_merge)))
        (if (boundp 'temp_tree_convert)
 	   (set! tree (temp_tree_convert)))
-       (pprintf (list unit tree) fd))
+       (if (> (tree_num_units tree) clunits_tree_minimum_leafs)
+           (pprintf (list unit tree) fd)))
      unittypes)
     (format fd "))\n")
     (fclose fd)))
@@ -361,6 +363,18 @@ Number of leafs of given tree."
      (tree_num_leafs (car (cdr (cdr tree))))))
    (t
     1)))
+
+(define (tree_num_units tree)
+  "(tree_num_units tree)
+Number of leafs of given tree."
+  (cond
+   ((cdr tree)
+    (+
+     (tree_num_units (car (cdr tree)))
+     (tree_num_units (car (cdr (cdr tree))))))
+   (t
+    (length (caar tree))
+     )))
 
 (define (tree_collect_leafs tree)
   "(tree_collect_leafs tree)

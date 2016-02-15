@@ -151,7 +151,7 @@ static STATUS siod_manual()
     symbol = el_current_sym();
     infostring = siod_manual_sym(symbol);
     putc('\n',stderr);
-    fprintf(stderr,infostring);
+    fprintf(stderr,"%s",infostring);
     fflush(stderr);
     putc('\n',stderr);
     fflush(stderr);

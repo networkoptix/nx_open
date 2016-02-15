@@ -64,7 +64,7 @@ int entry_compare(const void *e1, const void *e2)
     LIST_ent le2 = *((LIST_ent *)e2);
     int rcode;
 
-    if ((rcode = fcompare(le1->word,le2->word)) != 0)
+    if ((rcode = fcompare(le1->word,le2->word,0)) != 0)
 	return rcode;
     else if ((rcode = strcmp(le1->pos,le2->pos)) != 0)
 	return rcode;

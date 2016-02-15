@@ -176,7 +176,7 @@ enum EST_read_status load_wave_nist(EST_TokenStream &ts, short **data, int
     if (ts.fread(header,NIST_HDR_SIZE,1) != 1)
 	return wrong_format;
 
-    if (strncmp(header,NIST_SIG,sizeof(NIST_SIG)) != 0)
+    if (strncmp(header,NIST_SIG,strlen(NIST_SIG)) != 0)
 	return wrong_format;
 
     samps = nist_get_param_int(header,"sample_count",-1);

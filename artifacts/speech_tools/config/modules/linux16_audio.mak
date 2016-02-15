@@ -48,6 +48,11 @@ ifeq ($(LINUXAUDIO),alsa)
    MODULE_LIBS += -lasound
 endif
 
+ifeq ($(LINUXAUDIO),pulseaudio)
+   AUDIO_DEFINES += -DSUPPORT_PULSEAUDIO
+   MODULE_LIBS += -lpulse-simple -lpulse
+endif
+
 ifeq ($(LINUXAUDIO),none)
    AUDIO_DEFINES += -DSUPPORT_VOXWARE
 endif

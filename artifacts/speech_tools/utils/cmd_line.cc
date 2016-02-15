@@ -460,7 +460,7 @@ static void output_sgml_synopsis(char **argv, const EST_String &usage)
     fprintf(stdout,"<cmdsynopsis><command>%s</command>", 
 	    (const char *)full.filename());
 
-    fprintf(stdout, (const char *)ts.get_upto_eoln().string());
+    fprintf(stdout,"%s",(const char *)ts.get_upto_eoln().string());
 
     while (!ts.eof())
     {

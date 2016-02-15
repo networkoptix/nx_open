@@ -70,7 +70,7 @@ typedef struct DMATRIX_STRUCT {
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 
 DVECTOR synthesis_body(DMATRIX mcep, DVECTOR f0v, 
-                       EST_Track *str,
+                       EST_Track *str, EST_Track *filtrack,
                        double fs, double framem,
                        double alpha, double beta);
 #define RANDMAX 32767 

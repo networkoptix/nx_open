@@ -47,7 +47,7 @@ using namespace std;
   * This is a struct rather than a class so that it can be initialised
   * in the source of the module. 
   * @author Richard Caley <rjc@cstr,ed,ac,uk>
-  * @version $Id: ModuleDescription.h,v 1.3 2004/09/29 08:56:56 robert Exp $
+  * @version $Id: ModuleDescription.h,v 1.4 2014/11/25 14:32:04 robert Exp $
   */
 
 struct ModuleDescription {
@@ -142,7 +142,9 @@ struct ModuleDescription {
 /// Output operator for descriptions.
 ostream &operator << (ostream &stream, const ModuleDescription &desc);
 
-VAL_REGISTER_CLASS_DCLS(moddesc,ModuleDescription)
-SIOD_REGISTER_CLASS_DCLS(moddesc,ModuleDescription)
+//VAL_REGISTER_CLASS_DCLS(moddesc,ModuleDescription) // clang/llvm complains about this (Rob)
+//SIOD_REGISTER_CLASS_DCLS(moddesc,ModuleDescription)
+VAL_REGISTER_TYPE_DCLS(moddesc,ModuleDescription)
+SIOD_REGISTER_TYPE_DCLS(moddesc,ModuleDescription)
 
 #endif

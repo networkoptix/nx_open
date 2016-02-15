@@ -430,13 +430,13 @@ Good_Turing_smooth(EST_Ngrammar &ngrammar, int maxcount, int mincount)
 	EST_DVector freqs,mapped_freqs;
 	// grammar is of a single order - simple
 	// Find frequency distribution
-	frequency_of_frequencies(freqs,ngrammar);
+	frequency_of_frequencies(freqs,ngrammar,0);
 	// smoothing should be optional - to do
 	smoothed_frequency_distribution_ExponentialFit(freqs,maxcount-1);
 	// Build map of frequencies
 	adjusted_frequencies_BasicGoodTuring(mapped_freqs,freqs,maxcount);
 	// Map all frequencies in grammar to Good Turing Smoothed values
-	map_frequencies(ngrammar,mapped_freqs);
+	map_frequencies(ngrammar,mapped_freqs,0);
 	
     }
     break;

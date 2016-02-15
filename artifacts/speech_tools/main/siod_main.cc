@@ -46,8 +46,6 @@
 static void siod_lisp_vars(void);
 static void siod_load_default_files(void);
 
-void siod_server_init(void);
-
 /** @name <command>siod</command> <emphasis>Scheme Interpreter</emphasis>
     @id siod-manual
   * @toc
@@ -138,8 +136,8 @@ int main(int argc, char **argv)
 
     siod_init(heap_size);
     siod_est_init();
-    siod_server_init();
-    siod_fringe_init();
+    /*    siod_server_init();
+          siod_fringe_init(); */
 
     siod_prog_name = "siod";
 

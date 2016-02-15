@@ -87,6 +87,8 @@ class EST_bracketed_string {
     ///
     int operator !=(const EST_bracketed_string &a) const 
        { return (!(this == &a)); }
+    int operator ==(const EST_bracketed_string &a) const 
+       { return ((this == &a)); }
     ///
     friend ostream& operator << (ostream &s, const EST_bracketed_string &a)
        { (void)a; s << "[a bracketed string]" << endl; return s; }

@@ -291,10 +291,12 @@ static LISP assign_probs(LISP rules, const EST_String &domain,
 
     if (domain == "nlogp")
 	for (r=rules; r != NIL; r = cdr(r))
+        {
 	    if (get_c_float(car(car(r))) == 0)
 		CAR(car(r)) = flocons(40);
 	    else
 		CAR(car(r)) = flocons(-log(get_c_float(car(car(r)))));
+        }
 
     return rules;
 }

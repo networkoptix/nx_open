@@ -120,6 +120,7 @@ extern "C" {
 
 /* WIN32 has stupid names for things */
 #if defined(SYSTEM_IS_WIN32)
+#define isfinite(X) _finite(X)
 #define finite(X) _finite(X)
 #define round(X) win32_round(X)
   inline double win32_round(double d) { return (d>0.0)?floor(d+0.5):ceil(d-0.5);}

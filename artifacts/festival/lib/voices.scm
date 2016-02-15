@@ -324,10 +324,11 @@ the default voice. [see Site initialization]")
 
 (defvar default-voice-priority-list 
   '(kal_diphone
-    cmu_us_bdl_arctic_hts
-    cmu_us_jmk_arctic_hts
-    cmu_us_slt_arctic_hts
-    cmu_us_awb_arctic_hts
+    cmu_us_slt_cg
+    cmu_us_rms_cg
+    cmu_us_bdl_cg
+    cmu_us_jmk_cg
+    cmu_us_awb_cg
 ;    cstr_rpx_nina_multisyn       ; restricted license (lexicon)
 ;    cstr_rpx_jon_multisyn       ; restricted license (lexicon)
 ;    cstr_edi_awb_arctic_multisyn ; restricted license (lexicon)

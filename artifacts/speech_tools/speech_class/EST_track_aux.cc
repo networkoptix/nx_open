@@ -48,9 +48,9 @@
 #include "EST_track_aux.h"
 #include "EST_error.h"
 
-static inline int irint(float f) { return (int)(f+0.5); }
-static inline int irint(double f) { return (int)(f+0.5); }
-static inline int ifloor(float f) { return (int)(f); }
+//static inline int irint(float f) { return (int)(f+0.5); }
+//static inline int irint(double f) { return (int)(f+0.5); }
+//static inline int ifloor(float f) { return (int)(f); }
 
 float correlation(EST_Track &a, EST_Track &b, int cha, int chb);
 

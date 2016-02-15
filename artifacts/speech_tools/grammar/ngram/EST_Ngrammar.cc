@@ -1503,7 +1503,7 @@ bool EST_Ngrammar::compute_backoff_weights(const int mincount,
     
     backoff_restore_unigram_states();
     
-    Good_Turing_discount(*this,maxcount);
+    Good_Turing_discount(*this,maxcount,0.5);
     
     // and since some frequencies will have been set to zero
     // we have to prune away those branches of the tree

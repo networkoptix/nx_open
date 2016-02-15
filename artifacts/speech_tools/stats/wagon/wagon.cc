@@ -82,6 +82,7 @@ static float test_tree_class(WNode &tree,WDataSet &ds,ostream *output);
 static float test_tree_cluster(WNode &tree,WDataSet &dataset, ostream *output);
 static float test_tree_vector(WNode &tree,WDataSet &dataset,ostream *output);
 static float test_tree_trajectory(WNode &tree,WDataSet &dataset,ostream *output);
+static float test_tree_ols(WNode &tree,WDataSet &dataset,ostream *output);
 static int wagon_split(int margin,WNode &node);
 static WQuestion find_best_question(WVectorVector &dset);
 static void construct_binary_ques(int feat,WQuestion &test_ques);
@@ -134,11 +135,13 @@ void wgn_load_dataset(WDataSet &dataset,EST_String fname)
 	do 
 	{
 	    int type = dataset.ftype(i);
-	    if ((type == wndt_float) || (wgn_count_field == i))
+	    if ((type == wndt_float) || 
+                (type == wndt_ols) ||
+                (wgn_count_field == i))
 	    {
 		// need to ensure this is not NaN or Infinity
 		float f = atof(ts.get().string());
-		if (finite(f))
+		if (isfinite(f))
 		    v->set_flt_val(i,f);
 		else
 		{
@@ -223,6 +226,8 @@ static float do_summary(WNode &tree,WDataSet &ds,ostream *output)
 	return test_tree_vector(tree,ds,output);
     else if (wgn_dataset.ftype(wgn_predictee) == wndt_trajectory)
 	return test_tree_trajectory(tree,ds,output);
+    else if (wgn_dataset.ftype(wgn_predictee) == wndt_ols)
+	return test_tree_ols(tree,ds,output);
     else if (wgn_dataset.ftype(wgn_predictee) >= wndt_class)
 	return test_tree_class(tree,ds,output);
     else
@@ -293,6 +298,9 @@ static float test_tree_class(WNode &tree,WDataSet &dataset,ostream *output)
     int i,type;
     float correct=0,total=0, count=0;
 
+    float bcorrect=0, bpredicted=0, bactual=0;
+    float precision=0, recall=0;
+
     for (p=dataset.head(); p != 0; p=p->next())
     {
 	pnode = tree.predict_node((*dataset(p)));
@@ -305,6 +313,20 @@ static float test_tree_class(WNode &tree,WDataSet &dataset,ostream *output)
 	H += (log(prob))*count;
 	type = dataset.ftype(wgn_predictee);
 	real = wgn_discretes[type].name(dataset(p)->get_int_val(wgn_predictee));
+	
+	if (wgn_opt_param == "B_NB_F1")
+	  {
+	    //cout << real << " " << predict << endl;
+	    if (real == "B")
+	      bactual +=count;
+	    if (predict == "B")
+	      {
+		bpredicted += count;
+		if (real == predict)
+		  bcorrect += count;
+	      }
+	    //	    cout <<bactual << " " << bpredicted << " " << bcorrect << endl;
+	  }
 	if (real == predict)
 	    correct += count;
 	total += count;
@@ -322,9 +344,26 @@ static float test_tree_class(WNode &tree,WDataSet &dataset,ostream *output)
 	    pow(2.0,(-1*(H/total))) << endl;
     }
 
+    
     // Minus it so bigger is better 
     if (wgn_opt_param == "entropy")
 	return -pow(2.0,(-1*(H/total)));
+    else if(wgn_opt_param == "B_NB_F1")
+      {
+	if(bpredicted == 0)
+	  precision = 1;
+	else
+	  precision = bcorrect/bpredicted;
+	if(bactual == 0)
+	  recall = 1;
+	else
+	  recall = bcorrect/bactual;
+	float fmeasure = 0;
+	if((precision+recall) !=0)
+	  fmeasure = 2* (precision*recall)/(precision+recall);
+	cout<< "F1 :" << fmeasure << " Prec:" << precision << " Rec:" << recall << " B-Pred:" << bpredicted << " B-Actual:" << bactual << " B-Correct:" << bcorrect << endl;
+	return fmeasure;
+      }
     else
 	return (float)correct/(float)total;
 }
@@ -553,6 +592,74 @@ static float test_tree_float(WNode &tree,WDataSet &dataset,ostream *output)
     for (p=dataset.head(); p != 0; p=p->next())
     {
 	predict = tree.predict((*dataset(p)));
+	real = dataset(p)->get_flt_val(wgn_predictee);
+	if (wgn_count_field == -1)
+	    count = 1.0;
+	else
+	    count = dataset(p)->get_flt_val(wgn_count_field);
+	x.cumulate(predict,count);
+	y.cumulate(real,count);
+	error = predict-real;
+	se.cumulate((error*error),count);
+	e.cumulate(fabs(error),count);
+	xx.cumulate(predict*predict,count);
+	yy.cumulate(real*real,count);
+	xy.cumulate(predict*real,count);
+    }
+
+    // Pearson's product moment correlation coefficient
+//    cor = (xy.mean() - (x.mean()*y.mean()))/
+//	(sqrt(xx.mean()-(x.mean()*x.mean())) *
+//	 sqrt(yy.mean()-(y.mean()*y.mean())));
+    // Because when the variation is X is very small we can
+    // go negative, thus cause the sqrt's to give FPE
+    double v1 = xx.mean()-(x.mean()*x.mean());
+    double v2 = yy.mean()-(y.mean()*y.mean());
+
+    double v3 = v1*v2;
+
+    if (v3 <= 0)
+	// happens when there's very little variation in x
+	cor = 0;
+    else
+	cor = (xy.mean() - (x.mean()*y.mean()))/ sqrt(v3);
+    
+    if (output != NULL)
+    {
+	if (output != &cout)   // save in output file
+	    *output 
+		<< ";; RMSE " << ftoString(sqrt(se.mean()),4,1)
+		<< " Correlation is " << ftoString(cor,4,1)
+		<< " Mean (abs) Error " << ftoString(e.mean(),4,1)
+		<< " (" << ftoString(e.stddev(),4,1) << ")" << endl;
+	
+	cout << "RMSE " << ftoString(sqrt(se.mean()),4,1)
+	    << " Correlation is " << ftoString(cor,4,1)
+	    << " Mean (abs) Error " << ftoString(e.mean(),4,1)
+	    << " (" << ftoString(e.stddev(),4,1) << ")" << endl;
+    }
+
+    if (wgn_opt_param == "rmse")
+	return -sqrt(se.mean());  // * -1 so bigger is better 
+    else
+	return cor;  // should really be % variance, I think
+}
+
+static float test_tree_ols(WNode &tree,WDataSet &dataset,ostream *output)
+{
+    // Test tree against data to get summary of results OLS
+    EST_Litem *p;
+    WNode *leaf;
+    float predict,real;
+    EST_SuffStats x,y,xx,yy,xy,se,e;
+    double cor,error;
+    double count;
+
+    for (p=dataset.head(); p != 0; p=p->next())
+    {
+	leaf = tree.predict_node((*dataset(p)));
+        // do ols to get predict;
+        predict = 0.0;
 	real = dataset(p)->get_flt_val(wgn_predictee);
 	if (wgn_count_field == -1)
 	    count = 1.0;
@@ -915,6 +1022,8 @@ static float score_question_set(WQuestion &q, WVectorVector &ds, int ignorenth)
     WVector *wv;
 
     num_yes = num_no = 0;
+    y.data = &ds;
+    n.data = &ds;
     for (d=0; d < ds.n(); d++)
     {
 	if ((ignorenth < 2) ||
@@ -929,12 +1038,18 @@ static float score_question_set(WQuestion &q, WVectorVector &ds, int ignorenth)
 	    if (q.ask(*wv) == TRUE)
 	    {
 		num_yes++;
-		y.cumulate((*wv)[wgn_predictee],count);
+                if (wgn_dataset.ftype(wgn_predictee) == wndt_ols)
+                    y.cumulate(d,count);  // note the sample number not value
+                else
+                    y.cumulate((*wv)[wgn_predictee],count);
 	    }
 	    else
 	    {
 		num_no++;
-		n.cumulate((*wv)[wgn_predictee],count);
+                if (wgn_dataset.ftype(wgn_predictee) == wndt_ols)
+                    n.cumulate(d,count);  // note the sample number not value
+                else
+                    n.cumulate((*wv)[wgn_predictee],count);
 	    }
 	}
     }
@@ -955,11 +1070,13 @@ static float score_question_set(WQuestion &q, WVectorVector &ds, int ignorenth)
 	return WGN_HUGE_VAL;
 
     float ym,nm,bm;
+    //    printf("awb_debug score_question_set X %f Y %f\n",
+    //    y.samples(), n.samples());
     ym = y.measure();
     nm = n.measure();
     bm = ym + nm;
 
-/*    cout << q << endl;
+    /*    cout << q << endl;
     printf("test question y %f n %f b %f\n",
     ym, nm, bm); */
 

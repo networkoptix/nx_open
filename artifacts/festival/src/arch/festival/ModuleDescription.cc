@@ -149,5 +149,7 @@ ostream &operator << (ostream &s, const ModuleDescription &desc)
   return print(s, desc);
 }
 
-VAL_REGISTER_CLASS(moddesc,ModuleDescription)
-SIOD_REGISTER_CLASS(moddesc,ModuleDescription)
+//VAL_REGISTER_CLASS(moddesc,ModuleDescription)  // clang/llvm complains about this (Rob)
+//SIOD_REGISTER_CLASS(moddesc,ModuleDescription)
+VAL_REGISTER_TYPE(moddesc,ModuleDescription)
+SIOD_REGISTER_TYPE(moddesc,ModuleDescription)

@@ -454,6 +454,7 @@ void EST_Wave::rescale(float gain, int normalize)
 {
     int ns;
     float factor = gain;
+    float nsf;
     
     if (normalize)
     {
@@ -471,7 +472,18 @@ void EST_Wave::rescale(float gain, int normalize)
     for (int i = 0; i < num_samples(); ++i)
       for (int j = 0; j < num_channels(); ++j)
 	{
-	  ns = (int)(((float)a_no_check(i,j) * factor) + 0.5);
+            if (factor == 1.0)
+                ns = a_no_check(i,j);  // avoid float fluctuations
+            else if (factor == -1.0)
+                ns = -a_no_check(i,j);  // avoid float fluctuations
+            else
+            {
+                nsf = (float)a_no_check(i,j) * factor;
+                if (nsf < 0.0)
+                    ns = (int)(nsf - 0.5);
+                else
+                    ns = (int)(nsf + 0.5);
+            }
 	  if (ns < -32766)
 	    a_no_check(i,j)= -32766;
 	  else if (ns > 32766)
@@ -484,7 +496,7 @@ void EST_Wave::rescale(float gain, int normalize)
 void EST_Wave::rescale( const EST_Track &fc )
 {
   int ns, start_sample, end_sample;
-  float target1, target2, increment, factor;
+  float target1, target2, increment, factor, nsf;
   
   int fc_length = fc.length();
   int _num_channels = num_channels();
@@ -507,13 +519,24 @@ void EST_Wave::rescale( const EST_Track &fc )
     factor = target1;
     for( int i=start_sample; i<end_sample; ++i, factor+=increment )
       for( int j=0; j<_num_channels; ++j ){
-	ns = (int)(((float)a_no_check(i,j) * factor) + 0.5);
-	if (ns < -32766)
-	  a_no_check(i,j)= -32766;
-	else if (ns > 32766)
-	  a_no_check(i,j)= 32766;
-	else
-	  a_no_check(i,j)= ns;
+            if (factor == 1.0)
+                ns = a_no_check(i,j);  // avoid float fluctuations
+            else if (factor == -1.0)
+                ns = -a_no_check(i,j);  // avoid float fluctuations
+            else
+            {
+                nsf = (float)a_no_check(i,j) * factor;
+                if (nsf < 0.0)
+                    ns = (int)(nsf - 0.5);
+                else
+                    ns = (int)(nsf + 0.5);
+            }
+          if (ns < -32766)
+              a_no_check(i,j)= -32766;
+          else if (ns > 32766)
+              a_no_check(i,j)= 32766;
+          else
+              a_no_check(i,j)= ns;
       }
     start_sample = end_sample;
     target1 = target2;

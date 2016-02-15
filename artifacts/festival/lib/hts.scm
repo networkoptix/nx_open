@@ -296,7 +296,7 @@
   (format ofd "&%s" 
 	  (if (string-equal "pau" (item.feat s "name"))
 	      "x"
-	      (+ 1 (item.feat s "R:SylStructure.parent.parent.R:Word.content_words_in"))))
+	      (item.feat s "R:SylStructure.parent.parent.R:Word.content_words_in")))
   (format ofd "+%s" 
 	  (if (string-equal "pau" (item.feat s "name"))
 	      "x"

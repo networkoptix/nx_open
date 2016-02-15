@@ -496,7 +496,7 @@ void DiphoneUnitVoice::getUnitSequence( EST_Utterance  *utt )
 	  EST_Item *s1,*s2;
 	  EST_Item *w1=0,*w2=0;
 
-	  cout << "Missing diphone: "<< diphone_name << endl;
+	  cerr << "Missing diphone: "<< diphone_name << endl;
 
 	  if((s1 = parent(it,"SylStructure")))
 	    w1= parent(s1,"SylStructure");
@@ -507,7 +507,7 @@ void DiphoneUnitVoice::getUnitSequence( EST_Utterance  *utt )
 	    {
 	      EST_Item *sil;
 
-	      cout << " Interword so inseting silence.\n";
+	      cerr << " Interword so inseting silence.\n";
 
 	      sil = it->insert_after();
 	      sil->set("name",ph_silence());
@@ -527,13 +527,13 @@ void DiphoneUnitVoice::getUnitSequence( EST_Utterance  *utt )
 	    diphone_backoff_rules)
 	{
 
-	  cout << " diphone still missing, backing off: " << diphone_name << endl;
+	  cerr << " diphone still missing, backing off: " << diphone_name << endl;
 	 
 	  diphone_name = diphone_backoff_rules->backoff(l,r);
 	  l = diphone_name.before("_");
 	  r = diphone_name.after("_");
 	  
-	  cout << " backed off: " << orig << " -> " << diphone_name << endl;
+	  cerr << " backed off: " << orig << " -> " << diphone_name << endl;
 
 	  if( verbosity() > 0 ){
 	    EST_warning("Backing off requested diphone %s to %s", 

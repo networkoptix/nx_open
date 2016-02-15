@@ -15,6 +15,7 @@
 #ifdef unix
 #include <sys/time.h>
 #include <unistd.h>
+static long siod_time_base;
 #endif
 
 static LISP lgetenv(LISP name)
@@ -33,7 +34,7 @@ static LISP lsetenv(LISP name,LISP value)
 
 static LISP lsystem(LISP name)
 {
-    system(get_c_string(name));
+    (void)system(get_c_string(name));
     return NIL;
 }
 
@@ -68,8 +69,6 @@ static LISP lgetpid(void)
 {
     return flocons((float)getpid());
 }
-
-static long siod_time_base;
 
 LISP siod_time()
 {

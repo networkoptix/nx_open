@@ -82,7 +82,7 @@ EST_WFST_State::EST_WFST_State(const EST_WFST_State &state)
 
     p_name = state.p_name;
     p_type = state.p_type;
-    p_tag = p_tag;
+    p_tag = state.p_tag;
     for (p=state.transitions.head(); p != 0; p=p->next())
 	transitions.append(new EST_WFST_Transition(*state.transitions(p)));
 }

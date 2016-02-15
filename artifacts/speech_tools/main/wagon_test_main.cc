@@ -338,6 +338,7 @@ static void test_tree_class(EST_TokenStream &data, FILE *output,
 	    (-1*(H/Q)),pow(2.0,(-1*(H/Q))));
 }
 
+#if 0
 static void test_tree_vector(EST_TokenStream &data, FILE *output, 
                              LISP tree, LISP description)
 {
@@ -374,6 +375,8 @@ static void test_tree_vector(EST_TokenStream &data, FILE *output,
     fprintf(stdout,";; entropy %g perplexity %g\n",
 	    (-1*(H/Q)),pow(2.0,(-1*(H/Q))));
 }
+#endif
+
 
 static LISP wagon_vector_predict(LISP tree, LISP vector, LISP description)
 {

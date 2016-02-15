@@ -114,6 +114,60 @@ static LISP l_exp(LISP n)
     return NIL;
 }
 
+static LISP l_sin(LISP n)
+{
+    if (n && (TYPEP(n,tc_flonum)))
+	return flocons(sin(FLONM(n)));
+    else
+	err("sin: not a number",n);
+    return NIL;
+}
+
+static LISP l_cos(LISP n)
+{
+    if (n && (TYPEP(n,tc_flonum)))
+	return flocons(cos(FLONM(n)));
+    else
+	err("cos: not a number",n);
+    return NIL;
+}
+
+static LISP l_tan(LISP n)
+{
+    if (n && (TYPEP(n,tc_flonum)))
+	return flocons(tan(FLONM(n)));
+    else
+	err("tan: not a number",n);
+    return NIL;
+}
+
+static LISP l_asin(LISP n)
+{
+    if (n && (TYPEP(n,tc_flonum)))
+	return flocons(asin(FLONM(n)));
+    else
+	err("asin: not a number",n);
+    return NIL;
+}
+
+static LISP l_acos(LISP n)
+{
+    if (n && (TYPEP(n,tc_flonum)))
+	return flocons(acos(FLONM(n)));
+    else
+	err("acos: not a number",n);
+    return NIL;
+}
+
+static LISP l_atan(LISP n)
+{
+    if (n && (TYPEP(n,tc_flonum)))
+	return flocons(atan(FLONM(n)));
+    else
+	err("atan: not a number",n);
+    return NIL;
+}
+
 static LISP l_sqrt(LISP n)
 {
     if (n && (TYPEP(n,tc_flonum)))
@@ -197,6 +251,24 @@ void init_subrs_math(void)
  init_subr_1("exp",l_exp,
  "(exp NUM)\n\
  Return e**NUM.");
+ init_subr_1("sin",l_sin,
+ "(sin NUM)\n\
+ Return sine of NUM.");
+ init_subr_1("cos",l_cos,
+ "(cos NUM)\n\
+ Return cosine of NUM.");
+ init_subr_1("tan",l_tan,
+ "(tan NUM)\n\
+ Return tangent of NUM.");
+ init_subr_1("asin",l_asin,
+ "(asin NUM)\n\
+ Return arcsine of NUM.");
+ init_subr_1("acos",l_acos,
+ "(acos NUM)\n\
+ Return arccosine of NUM.");
+ init_subr_1("atan",l_atan,
+ "(atan NUM)\n\
+ Return arctangent of NUM.");
  init_subr_1("sqrt",l_sqrt,
  "(sqrt NUM)\n\
  Return square root of NUM.");

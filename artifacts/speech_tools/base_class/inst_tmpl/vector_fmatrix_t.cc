@@ -40,18 +40,19 @@
 #include "EST_types.h"
 #include "EST_TVector.h"
 
+static const EST_FMatrix def_val_FMatrix;
+static EST_FMatrix error_return_FMatrix;
+template <> const EST_FMatrix *EST_TVector<EST_FMatrix>::def_val = &def_val_FMatrix;
+template <> EST_FMatrix *EST_TVector<EST_FMatrix>::error_return = &error_return_FMatrix;
+
 #if defined(INSTANTIATE_TEMPLATES)
 
 #include "../base_class/EST_TVector.cc"
 
 template class EST_TVector<EST_FMatrix>;
 
-
 #endif
-static const EST_FMatrix def_val_FMatrix;
-static EST_FMatrix error_return_FMatrix;
-template <> const EST_FMatrix *EST_TVector<EST_FMatrix>::def_val = &def_val_FMatrix;
-template <> EST_FMatrix *EST_TVector<EST_FMatrix>::error_return = &error_return_FMatrix;
+
 
 int operator !=(const EST_FMatrix &fm1, 
 		const EST_FMatrix &fm2)

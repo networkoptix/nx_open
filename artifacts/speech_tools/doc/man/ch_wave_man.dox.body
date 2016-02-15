@@ -1,0 +1,153 @@
+/**
+
+@page ch_wave_manual ch_wave
+@brief *Audio file manipulation*
+@tableofcontents
+
+
+@section synopsis Synopsis
+
+@SYNOPSIS@
+
+ch_wave is used to manipulate the format of a waveform
+file. Operations include:
+
+  - file format conversion
+  - resampling (changing the sampling frequency)
+  - byte-swapping
+  - making multiple input files into a single multi-channel output file
+  - making multiple input files into a single single-channel output file
+  - extracting a single channel from a multi-channel waveform
+  - scaling the amplitude of the waveform
+  - low pass and high pass filtering
+  - extracting a time-delimited portion of the waveform
+
+ch_wave is a executable program that serves as a wrap-around for the
+EST_Wave class and the basic wave manipulation functions. More
+advanced waveform processing is performed by the signal processing library.
+
+@section options Options
+
+@OPTIONS@
+
+@section merge_waves Making multiple waves into a single wave
+
+If multiple input files are specified, by default they are concatenated into 
+the output file.
+
+    $ ch_wave kdt_010.wav kdt_011.wav kdt_012.wav kdt_013.wav -o out.wav
+
+In the above example, 4 single channel input files are converted to
+one single channel output file. Multi-channel waveforms can also be
+concatenated provided they all have the same number of input channels.
+
+Multiple input files can be made into a multi-channel output file by 
+using the -pc option:
+
+
+    $ ch_wave kdt_010.wav kdt_011.wav kdt_012.wav kdt_013.wav -o -pc LONGEST out.wav
+
+The argument to -pc can either be LONGEST, in which the output
+waveform is the length of the longest input file, or FIRST in which it
+is the length of the first input file.
+
+@section extract_channel Extracting channels from multi-channel waves
+
+The `-c` option is used to specify channels which should be extracted
+from the input.  If the input is a 4 channel wave,
+
+    $ ch_wave kdt_m.wav -o a.wav -c "0 2"
+
+will extract the 0th and 2nd channel (counting starts from 0). The
+argument to `-c` can be either a single number of a list of numbers
+(wrapped in quotes)
+
+@section extract_region Extracting of a single region from a waveform
+
+There are several ways of extracting a region of a waveform. The
+simplest way is by using the start, end, to and from commands to
+delimit a sub portion of the input wave. For example,
+
+
+    $ ch_wave kdt_010.wav -o small.wav -start 1.45 -end 1.768
+
+
+extracts a subwave starting at 1.45 seconds and extending to 1.768 seconds.
+
+Alternatively,
+
+    $ ch_wave kd_010.wav -o small.wav -from 5000 -to 10000
+
+extracts a subwave starting at 5000 samples and extending to 10000
+samples. Times and samples can be mixed in sub-wave extraction. The
+output waveform will have the same number of channels as the input
+waveform.
+
+@section extract_multiple_regions Extracting of a multiple regions from a waveform
+
+Multiple regions can be extracted from a waveform, but as it would be
+too complicated to specify the start and end points on the command
+line, a label file with start and end points, and file names is used.
+
+The file is called a key label file and in xwaves label format looks
+like:
+
+
+    separator ;
+    #
+    0.308272  121 sil ;  	file kdt_010.01 ;
+    0.440021  121 are ;     file kdt_010.02 ;
+    0.512930  121 your ;    file kdt_010.03 ;
+    0.784097  121 grades ;  file kdt_010.04 ;
+    1.140969  121 higher ;  file kdt_010.05 ;
+    1.258647  121 or ;      file kdt_010.06 ;
+    1.577145  121 lower ;   file kdt_010.07 ;
+    1.725516  121 than ;    file kdt_010.08 ;
+    2.315186  121 nancy's ; file kdt_010.09 ;
+
+Each line represents one region. The first column is the end time of
+that region and the start time of the next. The next two columns are
+colour and an arbitrary name, and the filename in which the output
+waveform is to be stored is kept as a field called file in the last column.
+In this example, each region corresponds to a single word in the file.
+
+If the above file is called "kdt_010.words.keylab", the command:
+
+    $ ch_wave kdt_010.wav -key kdt_010.words -ext .wav -divide
+
+will divide the input waveform into 9 output waveforms called
+kdt_010.01.wav, kdt_010.02.wav ... kdt_010.09.wav. The `-ext` option
+specifies the extension of the new waveforms, and the `-divide` command
+specifies that division of the entire waveform is to take place.
+
+If only a single file is required the `-extract` option can be used, in
+which case its argument is the filename required.
+
+
+    $ ch_wave kdt_010.wav -key kdt_010.words -ext .wav -extract kdt_010.03 \
+          -o kdt_010.03.wav
+
+Note that an output filename should be specified with this option.
+
+@section add_headers Adding headers and format conversion
+
+It is usually a good idea for all waveform files to have headers as
+this way different byte orders, sampling rates etc can be handled
+safely. ch_wave provides a means of adding headers to raw files.
+
+The following adds a header to a file of 16 bit shorts
+
+    $ ch_wave kdt_010.raw1 -o kdt_010.h1.wav -otype nist -f 16000 -itype raw
+
+The following downsamples the input to 8 KHz
+
+    $ ch_wave kdt_010.raw1 -o kdt_010.h2.wav -otype nist -f 16000  \
+              -F 8000 -itype raw
+
+The following takes a 8K ulaw input file and produces a 16bit, 20Khz output file:
+
+    $ ch_wave kdt_010.raw2 -o kdt_010.h3.wav -otype nist -istype ulaw \
+                  -f 8000 -F 20000 -itype raw
+
+*/
+

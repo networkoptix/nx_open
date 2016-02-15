@@ -48,7 +48,7 @@
 /*                                                                          */
 /****************************************************************************/
 
-/*  $Revision: 1.5 $
+/*  $Revision: 1.6 $
 **
 **  Main editing routines for editline library.
 */
@@ -1032,7 +1032,7 @@ STATIC STATUS h_risearch()
     CONST char	*old_prompt;
     char *pat, *hist, *nhist;
     char *nprompt;
-    int patsize, patend, i;
+    int patend, i;
     ECHAR	c;
     int lpos,cpos;
 
@@ -1041,7 +1041,6 @@ STATIC STATUS h_risearch()
     nprompt = walloc(char,80+160);
     pat = walloc(char,80);
     patend=0;
-    patsize=80;
     pat[0] = '\0';
     hist = "";
     lpos = H.Pos;   /* where the search has to start from */

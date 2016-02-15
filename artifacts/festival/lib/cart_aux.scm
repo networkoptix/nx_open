@@ -2,7 +2,7 @@
 ;;;                                                                       ;;
 ;;;                Centre for Speech Technology Research                  ;;
 ;;;                     University of Edinburgh, UK                       ;;
-;;;                       Copyright (c) 1996,1997                         ;;
+;;;                       Copyright (c) 1996-2011                         ;;
 ;;;                        All Rights Reserved.                           ;;
 ;;;                                                                       ;;
 ;;;  Permission is hereby granted, free of charge, to use and distribute  ;;
@@ -178,6 +178,23 @@ This prints out the details as it interprets the tree."
    (t ;; leaf
     (car tree)
     )))
-    
+
+;;;
+;;;  Prediction tree for OLS trees
+;;;     applies OLS coefficients from appropriate leaf of tree
+;;;
+(define (ols_tree_predict i tree)
+  ;; Surprisingly simple function does the necessary work
+  (let ((p (wagon i tree)))
+    (apply
+     +
+     (cons
+      (cadr (car (car p))) ;; Intercept
+      (mapcar
+       (lambda (fp)
+         ;; get feature value and multiple by coefficent
+         (* (parse-number (item.feat i (car fp))) (cadr fp)))
+       (cdr (car p)))))))
+
 (provide 'cart_aux)
 	

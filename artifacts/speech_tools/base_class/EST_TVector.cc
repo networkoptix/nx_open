@@ -258,8 +258,12 @@ int EST_TVector<T>::operator == (const EST_TVector<T> &v) const
 	return 0;
 
     for(int i=0; i<num_columns() ; i++)
-      if (fast_a_v(i) != v.fast_a_v(i))
-	return 0;
+    {
+      if (fast_a_v(i) == v.fast_a_v(i))
+          continue;
+      else
+          return 0;
+    }
     return 1;
 }
 

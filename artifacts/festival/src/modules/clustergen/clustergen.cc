@@ -43,26 +43,32 @@
 #include <cctype>
 #include "festival.h"
 
-LISP mlsa_resynthesis(LISP ltrack, LISP strtrack);
+LISP mlsa_resynthesis(LISP ltrack, LISP strtrack, LISP filtertrack);
 LISP mlpg(LISP ltrack);
-LISP me_mlsa_resynthesis(LISP ltrack, LISP strack);
+
+LISP me_mlsa(LISP ltrack, LISP strtrack) {
+  return mlsa_resynthesis(ltrack, strtrack, NULL);
+}
 
 void festival_clustergen_init(void)
 {
     proclaim_module("clustergen_engine",
-                    "Copyright (C) CMU 2005-2010\n");
+                    "Copyright (C) Carnegie Mellon University 2005-2014\n");
 
-    init_subr_2("mlsa_resynthesis",mlsa_resynthesis,
-                "(mlsa_resynthesis TRACK STRTRACK)\n\
-  Return a WAVE synthesized from the F0/MCEP TRACK, STRTRACK is non-nil, use mixed excitation.");
+    init_subr_3("mlsa_resynthesis", mlsa_resynthesis,
+                "(mlsa_resynthesis TRACK STRTRACK FILTERTRACK)\n\
+  Return a WAVE synthesized from the F0/MCEP TRACK, STRTRACK is non-nil, use mixed excitation.\n\
+  If FILTERTRACK is non-nil, it has filters for excitation");
 
     init_subr_1("mlpg",mlpg,
                 "(mlpg TRACK)\n\
   Return a track suitable for mlsa from a TRACK with dynamics in it.");
 
-    init_subr_2("me_mlsa",me_mlsa_resynthesis,
+    init_subr_2("me_mlsa",me_mlsa,
                 "(me_mlsa TRACK STRTRACK)\n\
-  Return a WAVE resynthesized using Mixed Excitation MLSA.");
+  Return a WAVE synthesized from the F0/MCEP TRACK, STRTRACK is non-nil, use mixed excitation.\n\
+  Deprecated! Use mlsa_resynthesis instead");
+
 
 }
 

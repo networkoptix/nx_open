@@ -41,8 +41,16 @@
 ;; your local program that can play files
 
 ;(Parameter.set 'Audio_Required_Format 'riff)
-;(Parameter.set 'Audio_Command "afplay $FILE")
 ;(Parameter.set 'Audio_Method 'Audio_Command)
+
+;; Apple OSX (if you can file afplay)
+;(Parameter.set 'Audio_Command "afplay $FILE")
+
+;; SOX (play) often a good alternative on cygwin and linux
+;(Parameter.set 'Audio_Command "play -q $FILE")
+
+;; Windows 7 (when sox's play doesn't work -- but this might not exit)
+;(Parameter.set 'Audio_Command "c:/Windows/System32/WindowsPowerShell/v1.0/powershell -c '(New-Object Media.Soundplayer C:/cygwin'$FILE').PlaySync(); Exit;'")
 
 ;; If you want a voice different from the system installed default 
 ;; uncomment the following line and change the name to the voice you

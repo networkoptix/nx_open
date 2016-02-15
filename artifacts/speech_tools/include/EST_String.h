@@ -64,7 +64,7 @@ extern "C" void abort(void);
   * @see string_example
   * @author Alan W Black <awb@cstr.ed.ac.uk>
   * @author Richard Caley <rjc@cstr.ed.ac.uk>
-  * @version $Id: EST_String.h,v 1.7 2009/07/03 17:13:56 awb Exp $
+  * @version $Id: EST_String.h,v 1.10 2014/10/13 13:26:19 robert Exp $
   */
 
 class EST_String {
@@ -574,10 +574,14 @@ public:
       */
     //@{
     friend int fcompare(const EST_String &a, const EST_String &b, 
-			const unsigned char *table=NULL);
+			const unsigned char *table);
+
+	friend inline int fcompare(const EST_String &a, const EST_String &b)
+		{ return fcompare(a,b,NULL); }
+
 
     friend int fcompare(const EST_String &a, const char *b, 
-				const unsigned char *table=NULL);
+				const unsigned char *table);
     ///
     friend inline int fcompare(const EST_String &a, const EST_String &b, 
 			       const EST_String &table) 

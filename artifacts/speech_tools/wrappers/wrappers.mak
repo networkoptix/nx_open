@@ -36,7 +36,7 @@
  ## --------------------------------------------------------------------  ##
  ##                                                                       ##
  ## Make definitions for the module which builds bindings for high level  ##
- ## script languages, such as Perl, for selected EST classes and          ##
+ ## script languages, such as Python, for selected EST classes and          ##
  ## functionality.  This makes use of SWIG                                ##
  ##                                                                       ##
  ###########################################################################
@@ -70,9 +70,6 @@ ifeq ($(DIRNAME),wrappers)
         BUILD_DIRS+=python
     endif
 
-    ifneq ($(findstring PERL5,$(CONFIG_WRAPPER_LANGUAGES)),)
-        BUILD_DIRS+=perl5
-    endif
 endif
 
 ifeq ($(DIRNAME),.)

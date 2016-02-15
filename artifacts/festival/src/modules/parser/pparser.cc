@@ -42,9 +42,48 @@
 #include "parser.h"
 #include "EST_SCFG_Chart.h"
 
+LISP FT_PParse_Generalized_Utt(LISP args, LISP env) {
+  LISP utt;    // Utterance to parse
+  LISP gram;   // Grammar Name
+  LISP prel;   // Relation Name to parse over
+  LISP pfeat;  // Feature Name to parse over
+  LISP crel;   // Relation to create parse in
+
+  args = leval(car(args), env);
+  utt = car(args);
+  gram = car(cdr(args));
+  prel = car(cdr(cdr(args)));
+  pfeat = car(cdr(cdr(cdr(args))));
+  crel = car(cdr(cdr(cdr(cdr(args)))));
+
+  // Parse utt using items in prel, using features in pfeat, and store
+  // the parser output into crel
+
+  EST_Utterance *u;
+  LISP rules;
+  const char *gram_name, *prel_name, *pfeat_name, *crel_name;
+
+  u = get_c_utt(utt);
+  gram_name = get_c_string(gram);
+  prel_name = get_c_string(prel);
+  pfeat_name = get_c_string(pfeat);
+  crel_name = get_c_string(crel);
+
+  rules = siod_get_lval(gram_name, NULL);
+  if (rules == NULL)
+    return utt;
+
+  EST_SCFG grammar(rules);
+
+  scfg_parse(u->relation(prel_name), pfeat_name,
+             u->create_relation(crel_name), grammar);
+
+  return utt;
+}
+
 LISP FT_PParse_Utt(LISP utt)
 {
-    // Parse Words (using part of speech tags) using given 
+    // Parse Words (using part of speech tags) using given
     // probabilistic grammar
     EST_Utterance *u = get_c_utt(utt);
     LISP rules;
@@ -54,7 +93,7 @@ LISP FT_PParse_Utt(LISP utt)
 	return utt;
 
     EST_SCFG grammar(rules);
-    
+
     scfg_parse(u->relation("Word"),"phr_pos",
 	       u->create_relation("Syntax"),grammar);
 
@@ -63,11 +102,11 @@ LISP FT_PParse_Utt(LISP utt)
 
 LISP FT_MultiParse_Utt(LISP utt)
 {
-    // You give them a parser and they just want more ... 
+    // You give them a parser and they just want more ...
     // Because in some modes utterance may contain multiple sentences
     // and the grammars we have only have only deal in more
     // traditional sentences this tries to split the utterance into
-    // sentences and parse them individualls and add them to 
+    // sentences and parse them individualls and add them to
     // a single Syntax relation as a list of trees.
     EST_Utterance *u = get_c_utt(utt);
     LISP rules, eos_tree;
@@ -100,11 +139,11 @@ LISP FT_MultiParse_Utt(LISP utt)
 
 void MultiParse(EST_Utterance &u)
 {
-    // You give them a parser and they just want more ... 
+    // You give them a parser and they just want more ...
     // Because in some modes utterance may contain multiple sentences
     // and the grammars we have only have only deal in more
     // traditional sentences this tries to split the utterance into
-    // sentences and parse them individualls and add them to 
+    // sentences and parse them individualls and add them to
     // a single Syntax release as a list of trees.
     LISP rules, eos_tree;
     EST_Item *s, *w;
@@ -139,6 +178,12 @@ void festival_parser_init(void)
   Parse part of speech tags in Word relation.  Loads the grammar \n\
   from scfg_grammar_filename and saves the best parse\n\
   in the Syntax Relation.");
+
+    init_fsubr("ProbParseGeneralized", FT_PParse_Generalized_Utt,
+                "(ProbParseGeneralized (list utt gram prel pfeat crel))\n"
+                "Parse utt over the prel relation using its pfeat feature\n"
+                "Load grammar from gram, and save parse in relation crel");
+
     festival_def_utt_module("MultiProbParse",FT_MultiParse_Utt,
     "(MultiProbParse UTT)\n\
   Parse part of speech tags in Word relation.  Unlike ProbParse this \n\

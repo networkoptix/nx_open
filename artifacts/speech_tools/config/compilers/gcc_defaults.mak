@@ -98,7 +98,7 @@ TEMPLATE_ARGS =
 ## The -lgcc here is redundant - gcc does this anyway - but it
 ## helps java know what needs to be loaded.
 
-COMPILERLIBS= $(COMPILER_LIBS_DIR:%=-L%) -lstdc++ -lgcc
+COMPILERLIBS= $(COMPILER_LIBS_DIR:%=-L%) -lstdc++
 
 ## special ways of doing things, blank means default
 

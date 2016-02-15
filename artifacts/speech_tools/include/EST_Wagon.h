@@ -71,6 +71,7 @@ enum wn_dtype {/* for predictees and predictors */
                wndt_binary, wndt_float, wndt_class, 
                /* for predictees only */
                wndt_cluster, wndt_vector, wndt_matrix, wndt_trajectory,
+               wndt_ols, 
                /* for ignored features */
                wndt_ignore};
 
@@ -130,7 +131,7 @@ class WQuestion {
 };
 
 enum wnim_type {wnim_unset, wnim_float, wnim_class, 
-                wnim_cluster, wnim_vector, wnim_matrix,
+                wnim_cluster, wnim_vector, wnim_matrix, wnim_ols,
                 wnim_trajectory};
 
 //  Impurity measure for cumulating impurities from set of data
@@ -144,20 +145,24 @@ class WImpurity {
     float cluster_member_mean(int i);
     float vector_impurity();
     float trajectory_impurity();
+    float ols_impurity();
   public:
     EST_IList members;            // Maybe there should be a cluster class
+    EST_FList member_counts;      // AUP: Implement counts for vectors
     EST_SuffStats **trajectory;
+    const WVectorVector *data;          // Needed for ols
     float score;
     int l,width;
 
-    WImpurity() { t=wnim_unset; a.reset(); trajectory=0; l=0; width=0; }
+    WImpurity() { t=wnim_unset; a.reset(); trajectory=0; l=0; width=0; data=0;}
     ~WImpurity();
     WImpurity(const WVectorVector &ds);
     void copy(const WImpurity &s) 
     {
         int i,j; 
-        t=s.t; a=s.a; p=s.p; members=s.members; l=s.l; width=s.width;
+        t=s.t; a=s.a; p=s.p; members=s.members; member_counts = s.member_counts; l=s.l; width=s.width;
         score = s.score;
+        data = s.data;
         if (s.trajectory)
         {
             trajectory = new EST_SuffStats *[l];
@@ -271,5 +276,26 @@ extern EST_String wgn_vertex_output;
 #define wgn_ques_operand(X) (car(cdr(cdr(X))))
 
 int wagon_ask_question(LISP question, LISP value);
+
+int stepwise_ols(const EST_FMatrix &X,
+		 const EST_FMatrix &Y,
+		 const EST_StrList &feat_names,
+		 float limit,
+		 EST_FMatrix &coeffs,
+		 const EST_FMatrix &Xtest,
+		 const EST_FMatrix &Ytest,
+                 EST_IVector &included,
+                 float &best_score);
+int robust_ols(const EST_FMatrix &X,
+	       const EST_FMatrix &Y, 
+	       EST_IVector &included,
+	       EST_FMatrix &coeffs);
+int ols_apply(const EST_FMatrix &samples,
+	      const EST_FMatrix &coeffs,
+	      EST_FMatrix &res);
+int ols_test(const EST_FMatrix &real,
+	     const EST_FMatrix &predicted,
+	     float &correlation,
+	     float &rmse);
 
 #endif /* __WAGON_H__ */

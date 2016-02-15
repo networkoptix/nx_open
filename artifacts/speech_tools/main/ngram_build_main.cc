@@ -429,7 +429,7 @@ int main(int argc, char **argv)
     else if (al.present("-smooth") && !al.present("-backoff"))
     {
 	int smoothcount = atoi(al.val("-smooth"));
-	if(!Good_Turing_smooth(ngrammar,smoothcount))
+	if(!Good_Turing_smooth(ngrammar,smoothcount,0))
 	{
 	    cerr << "build_ngram: Failed to smooth " << order << "-gram" << endl;
 	    exit(1);

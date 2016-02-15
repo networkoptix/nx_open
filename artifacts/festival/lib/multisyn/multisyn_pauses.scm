@@ -75,8 +75,8 @@ Predict pause insertion in a Multisyn unit selection utterance structure."
 		   ;; can't refer to w as we've just deleted it
 		   (item.relation.remove wp 'Phrase)))))
            words)))
-    (utt.relation.print utt 'Word)
-    (utt.relation.print utt 'Segment)
+    ;(utt.relation.print utt 'Word)
+    ;(utt.relation.print utt 'Segment)
     utt))
 
 (define (unitselection_pause_insert word pause)
@@ -85,8 +85,8 @@ Predict pause insertion in a Multisyn unit selection utterance structure."
 (let ((silence (car (cadr (car (PhoneSet.description '(silences))))))
       (seg (item.relation (find_last_seg word) 'Segment))
       pause_item)
-  (format t "  inserting pause after: %s.\n" (item.name seg))
-  (format t "  Inserting pause\n")
+  ;(format stderr "  inserting pause after: %s.\n" (item.name seg))
+  ;(format stderr "  Inserting pause\n")
 ; if next seg is not silence insert one.
   (if (or (not (item.next seg))
 	  (not (string-equal (item.name (item.next seg)) silence)))

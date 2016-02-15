@@ -33,7 +33,7 @@
 /*             Author :  Alistair Conkie and Steve Isard                 */
 /*-----------------------------------------------------------------------*/
 
-#ifndef _T2S_H
+#ifndef _T2S_H_
 #define _T2S_H_
 #define NDIPHS 3000
 #define NFRAMES 23000

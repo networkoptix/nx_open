@@ -58,7 +58,7 @@ EST_Regex RxFILEURL("file:.*");
 static EST_Regex ipnum("[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+");
 
 const int default_http_port = 80;
-const int default_ftp_port = 21;
+//const int default_ftp_port = 21;
 
 #define MAX_LINE_LENGTH (256)
 

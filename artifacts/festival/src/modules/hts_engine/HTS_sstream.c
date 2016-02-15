@@ -1,10 +1,10 @@
 /* ----------------------------------------------------------------- */
-/*           The HMM-Based Speech Synthesis System (HTS)             */
-/*           hts_engine API developed by HTS Working Group           */
+/*           The HMM-Based Speech Synthesis Engine "hts_engine API"  */
+/*           developed by HTS Working Group                          */
 /*           http://hts-engine.sourceforge.net/                      */
 /* ----------------------------------------------------------------- */
 /*                                                                   */
-/*  Copyright (c) 2001-2010  Nagoya Institute of Technology          */
+/*  Copyright (c) 2001-2012  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /*                2001-2008  Tokyo Institute of Technology           */
@@ -55,32 +55,100 @@
 
 HTS_SSTREAM_C_START;
 
+#include <stdlib.h>
+#include <math.h>
+
 /* hts_engine libraries */
 #include "HTS_hidden.h"
 
-static void HTS_set_duration(int *duration, double *mean, double *vari,
-                             double *remain, int size, double frame_length)
+/* HTS_set_duration: set duration from state duration probability distribution */
+static double HTS_set_duration(size_t * duration, double *mean, double *vari, size_t size, double frame_length)
 {
-   int i;
+   size_t i;
+   int j;
    double temp1, temp2;
    double rho = 0.0;
+   size_t sum = 0;
+   size_t target_length;
 
-   if (frame_length != 0.0) {   /* if frame length is specified, rho is determined */
-      temp1 = 0.0;
-      temp2 = 0.0;
+   /* if the frame length is not specified, only the mean vector is used */
+   if (frame_length == 0.0) {
       for (i = 0; i < size; i++) {
-         temp1 += mean[i];
-         temp2 += vari[i];
+         temp1 = (mean[i] + 0.5);
+         if (temp1 < 1.0)
+            duration[i] = 1;
+         else
+            duration[i] = (size_t) temp1;
+         sum += duration[i];
       }
-      rho = (frame_length - temp1) / temp2;
+      return (double) sum;
    }
-   for (i = 0; i < size; i++) {
-      temp1 = mean[i] + rho * vari[i] + *remain;
-      duration[i] = (int) (temp1 + 0.5);
-      if (duration[i] < 1)
+
+   /* get the target frame length */
+   if (frame_length + 0.5 < 1.0)
+      target_length = 1;
+   else
+      target_length = (size_t) (frame_length + 0.5);
+
+   /* check the specified duration */
+   if (target_length <= size) {
+      if (target_length < size)
+         HTS_error(-1, "HTS_set_duration: Specified frame length is too short.\n");
+      for (i = 0; i < size; i++)
          duration[i] = 1;
-      *remain = temp1 - (double) duration[i];
+      return (double) size;
    }
+
+   /* RHO calculation */
+   temp1 = 0.0;
+   temp2 = 0.0;
+   for (i = 0; i < size; i++) {
+      temp1 += mean[i];
+      temp2 += vari[i];
+   }
+   rho = ((double) target_length - temp1) / temp2;
+
+   /* first estimation */
+   for (i = 0; i < size; i++) {
+      temp1 = mean[i] + rho * vari[i] + 0.5;
+      if (temp1 < 1.0)
+         duration[i] = 1;
+      else
+         duration[i] = (size_t) temp1;
+      sum += duration[i];
+   }
+
+   /* loop estimation */
+   while (target_length != sum) {
+      /* sarch flexible state and modify its duration */
+      if (target_length > sum) {
+         j = -1;
+         for (i = 0; i < size; i++) {
+            temp2 = fabs(rho - ((double) duration[i] + 1 - mean[i]) / vari[i]);
+            if (j < 0 || temp1 > temp2) {
+               j = i;
+               temp1 = temp2;
+            }
+         }
+         sum++;
+         duration[j]++;
+      } else {
+         j = -1;
+         for (i = 0; i < size; i++) {
+            if (duration[i] > 1) {
+               temp2 = fabs(rho - ((double) duration[i] - 1 - mean[i]) / vari[i]);
+               if (j < 0 || temp1 > temp2) {
+                  j = i;
+                  temp1 = temp2;
+               }
+            }
+         }
+         sum--;
+         duration[j]--;
+      }
+   }
+
+   return (double) target_length;
 }
 
 /* HTS_SStreamSet_initialize: initialize state stream set */
@@ -95,26 +163,57 @@ void HTS_SStreamSet_initialize(HTS_SStreamSet * sss)
 }
 
 /* HTS_SStreamSet_create: parse label and determine state duration */
-void HTS_SStreamSet_create(HTS_SStreamSet * sss, HTS_ModelSet * ms,
-                           HTS_Label * label, double *duration_iw,
-                           double **parameter_iw, double **gv_iw)
+HTS_Boolean HTS_SStreamSet_create(HTS_SStreamSet * sss, HTS_ModelSet * ms, HTS_Label * label, HTS_Boolean phoneme_alignment_flag, double speed, double *duration_iw, double **parameter_iw, double **gv_iw)
 {
-   int i, j, k;
-   double temp1, temp2;
-   int state;
+   size_t i, j, k;
+   double temp;
+   int shift;
+   size_t state;
    HTS_SStream *sst;
    double *duration_mean, *duration_vari;
-   double duration_remain;
    double frame_length;
-   int next_time;
-   int next_state;
+   size_t next_time;
+   size_t next_state;
+
+   /* check interpolation weights */
+   for (i = 0, temp = 0.0; i < HTS_ModelSet_get_nvoices(ms); i++)
+      temp += duration_iw[i];
+   if (temp == 0.0) {
+      return FALSE;
+   } else if (temp != 1.0) {
+      for (i = 0; i < HTS_ModelSet_get_nvoices(ms); i++)
+         if (duration_iw[i] != 0.0)
+            duration_iw[i] /= temp;
+   }
+
+   for (i = 0; i < HTS_ModelSet_get_nstream(ms); i++) {
+      for (j = 0, temp = 0.0; j < HTS_ModelSet_get_nvoices(ms); j++)
+         temp += parameter_iw[i][j];
+      if (temp == 0.0) {
+         return FALSE;
+      } else if (temp != 1.0) {
+         for (j = 0; j < HTS_ModelSet_get_nvoices(ms); j++)
+            if (parameter_iw[i][j] != 0.0)
+               parameter_iw[i][j] /= temp;
+      }
+      if (HTS_ModelSet_use_gv(ms, i)) {
+         for (j = 0, temp = 0.0; j < HTS_ModelSet_get_nvoices(ms); j++)
+            temp += gv_iw[i][j];
+         if (temp == 0.0)
+            return FALSE;
+         else if (temp != 1.0)
+            for (j = 0; j < HTS_ModelSet_get_nvoices(ms); j++)
+               if (gv_iw[i][j] != 0.0)
+                  gv_iw[i][j] /= temp;
+      }
+   }
 
    /* initialize state sequence */
    sss->nstate = HTS_ModelSet_get_nstate(ms);
    sss->nstream = HTS_ModelSet_get_nstream(ms);
    sss->total_frame = 0;
    sss->total_state = HTS_Label_get_size(label) * sss->nstate;
-   sss->duration = (int *) HTS_calloc(sss->total_state, sizeof(int));
+   sss->duration = (size_t *) HTS_calloc(sss->total_state, sizeof(size_t));
    sss->sstream = (HTS_SStream *) HTS_calloc(sss->nstream, sizeof(HTS_SStream));
    for (i = 0; i < sss->nstream; i++) {
       sst = &sss->sstream[i];
@@ -126,93 +225,48 @@ void HTS_SStreamSet_create(HTS_SStreamSet * sss, HTS_ModelSet * ms,
       else
          sst->msd = NULL;
       for (j = 0; j < sss->total_state; j++) {
-         sst->mean[j] =
-             (double *) HTS_calloc(sst->vector_length, sizeof(double));
-         sst->vari[j] =
-             (double *) HTS_calloc(sst->vector_length, sizeof(double));
+         sst->mean[j] = (double *) HTS_calloc(sst->vector_length * HTS_ModelSet_get_window_size(ms, i), sizeof(double));
+         sst->vari[j] = (double *) HTS_calloc(sst->vector_length * HTS_ModelSet_get_window_size(ms, i), sizeof(double));
       }
-      sst->gv_switch =
-          (HTS_Boolean *) HTS_calloc(sss->total_state, sizeof(HTS_Boolean));
+      sst->gv_switch = (HTS_Boolean *) HTS_calloc(sss->total_state, sizeof(HTS_Boolean));
       for (j = 0; j < sss->total_state; j++)
          sst->gv_switch[j] = TRUE;
    }
 
-   /* check interpolation weights */
-   for (i = 0, temp1 = 0.0;
-        i < HTS_ModelSet_get_duration_interpolation_size(ms); i++)
-      temp1 += duration_iw[i];
-   for (i = 0; i < HTS_ModelSet_get_duration_interpolation_size(ms); i++)
-      if (duration_iw[i] != 0.0)
-         duration_iw[i] /= temp1;
-   for (i = 0; i < sss->nstream; i++) {
-      for (j = 0, temp1 = 0.0;
-           j < HTS_ModelSet_get_parameter_interpolation_size(ms, i); j++)
-         temp1 += parameter_iw[i][j];
-      for (j = 0; j < HTS_ModelSet_get_parameter_interpolation_size(ms, i); j++)
-         if (parameter_iw[i][j] != 0.0)
-            parameter_iw[i][j] /= temp1;
-      if (HTS_ModelSet_use_gv(ms, i)) {
-         for (j = 0, temp1 = 0.0;
-              j < HTS_ModelSet_get_gv_interpolation_size(ms, i); j++)
-            temp1 += gv_iw[i][j];
-         for (j = 0; j < HTS_ModelSet_get_gv_interpolation_size(ms, i); j++)
-            if (gv_iw[i][j] != 0.0)
-               gv_iw[i][j] /= temp1;
-      }
-   }
-
    /* determine state duration */
-   duration_mean =
-       (double *) HTS_calloc(sss->nstate * HTS_Label_get_size(label),
-                             sizeof(double));
-   duration_vari =
-       (double *) HTS_calloc(sss->nstate * HTS_Label_get_size(label),
-                             sizeof(double));
-   duration_remain = 0.0;
+   duration_mean = (double *) HTS_calloc(sss->total_state, sizeof(double));
+   duration_vari = (double *) HTS_calloc(sss->total_state, sizeof(double));
    for (i = 0; i < HTS_Label_get_size(label); i++)
-      HTS_ModelSet_get_duration(ms, HTS_Label_get_string(label, i),
-                                &duration_mean[i * sss->nstate],
-                                &duration_vari[i * sss->nstate], duration_iw);
-   if (HTS_Label_get_frame_specified_flag(label)) {
+      HTS_ModelSet_get_duration(ms, HTS_Label_get_string(label, i), duration_iw, &duration_mean[i * sss->nstate], &duration_vari[i * sss->nstate]);
+   if (phoneme_alignment_flag == TRUE) {
       /* use duration set by user */
       next_time = 0;
       next_state = 0;
       state = 0;
       for (i = 0; i < HTS_Label_get_size(label); i++) {
-         temp1 = HTS_Label_get_start_frame(label, i);
-         temp2 = HTS_Label_get_end_frame(label, i);
-         if (temp2 >= 0) {
-            HTS_set_duration(&sss->duration[next_state],
-                             &duration_mean[next_state],
-                             &duration_vari[next_state], &duration_remain,
-                             state + sss->nstate - next_state,
-                             temp2 - next_time);
-            for (j = next_state; j < state + sss->nstate; j++)
-               next_time += sss->duration[j];
+         temp = HTS_Label_get_end_frame(label, i);
+         if (temp >= 0) {
+            next_time += (size_t) HTS_set_duration(&sss->duration[next_state], &duration_mean[next_state], &duration_vari[next_state], state + sss->nstate - next_state, temp - next_time);
             next_state = state + sss->nstate;
          } else if (i + 1 == HTS_Label_get_size(label)) {
-            HTS_set_duration(&sss->duration[next_state],
-                             &duration_mean[next_state],
-                             &duration_vari[next_state], &duration_remain,
-                             state + sss->nstate - next_state, 0.0);
+            HTS_error(-1, "HTS_SStreamSet_create: The time of final label is not specified.\n");
+            HTS_set_duration(&sss->duration[next_state], &duration_mean[next_state], &duration_vari[next_state], state + sss->nstate - next_state, 0.0);
          }
          state += sss->nstate;
       }
    } else {
       /* determine frame length */
-      if (HTS_Label_get_speech_speed(label) != 1.0) {
-         temp1 = 0.0;
-         for (i = 0; i < HTS_Label_get_size(label) * sss->nstate; i++) {
-            temp1 += duration_mean[i];
+      if (speed != 1.0) {
+         temp = 0.0;
+         for (i = 0; i < sss->total_state; i++) {
+            temp += duration_mean[i];
          }
-         frame_length = temp1 / HTS_Label_get_speech_speed(label);
+         frame_length = temp / speed;
       } else {
          frame_length = 0.0;
       }
       /* set state duration */
-      HTS_set_duration(sss->duration, duration_mean, duration_vari,
-                       &duration_remain,
-                       HTS_Label_get_size(label) * sss->nstate, frame_length);
+      HTS_set_duration(sss->duration, duration_mean, duration_vari, sss->total_state, frame_length);
    }
    HTS_free(duration_mean);
    HTS_free(duration_vari);
@@ -224,14 +278,9 @@ void HTS_SStreamSet_create(HTS_SStreamSet * sss, HTS_ModelSet * ms,
          for (k = 0; k < sss->nstream; k++) {
             sst = &sss->sstream[k];
             if (sst->msd)
-               HTS_ModelSet_get_parameter(ms, HTS_Label_get_string(label, i),
-                                          sst->mean[state], sst->vari[state],
-                                          &sst->msd[state], k, j,
-                                          parameter_iw[k]);
+               HTS_ModelSet_get_parameter(ms, k, j, HTS_Label_get_string(label, i), parameter_iw[k], sst->mean[state], sst->vari[state], &sst->msd[state]);
             else
-               HTS_ModelSet_get_parameter(ms, HTS_Label_get_string(label, i),
-                                          sst->mean[state], sst->vari[state],
-                                          NULL, k, j, parameter_iw[k]);
+               HTS_ModelSet_get_parameter(ms, k, j, HTS_Label_get_string(label, i), parameter_iw[k], sst->mean[state], sst->vari[state], NULL);
          }
          state++;
       }
@@ -244,22 +293,17 @@ void HTS_SStreamSet_create(HTS_SStreamSet * sss, HTS_ModelSet * ms,
       sst->win_max_width = HTS_ModelSet_get_window_max_width(ms, i);
       sst->win_l_width = (int *) HTS_calloc(sst->win_size, sizeof(int));
       sst->win_r_width = (int *) HTS_calloc(sst->win_size, sizeof(int));
-      sst->win_coefficient =
-          (double **) HTS_calloc(sst->win_size, sizeof(double));
+      sst->win_coefficient = (double **) HTS_calloc(sst->win_size, sizeof(double));
       for (j = 0; j < sst->win_size; j++) {
          sst->win_l_width[j] = HTS_ModelSet_get_window_left_width(ms, i, j);
          sst->win_r_width[j] = HTS_ModelSet_get_window_right_width(ms, i, j);
          if (sst->win_l_width[j] + sst->win_r_width[j] == 0)
-            sst->win_coefficient[j] =
-                (double *) HTS_calloc(-2 * sst->win_l_width[j] + 1,
-                                      sizeof(double));
+            sst->win_coefficient[j] = (double *) HTS_calloc(-2 * sst->win_l_width[j] + 1, sizeof(double));
          else
-            sst->win_coefficient[j] =
-                (double *) HTS_calloc(-2 * sst->win_l_width[j], sizeof(double));
+            sst->win_coefficient[j] = (double *) HTS_calloc(-2 * sst->win_l_width[j], sizeof(double));
          sst->win_coefficient[j] -= sst->win_l_width[j];
-         for (k = sst->win_l_width[j]; k <= sst->win_r_width[j]; k++)
-            sst->win_coefficient[j][k] =
-                HTS_ModelSet_get_window_coefficient(ms, i, j, k);
+         for (shift = sst->win_l_width[j]; shift <= sst->win_r_width[j]; shift++)
+            sst->win_coefficient[j][shift] = HTS_ModelSet_get_window_coefficient(ms, i, j, shift);
       }
    }
 
@@ -267,168 +311,147 @@ void HTS_SStreamSet_create(HTS_SStreamSet * sss, HTS_ModelSet * ms,
    for (i = 0; i < sss->nstream; i++) {
       sst = &sss->sstream[i];
       if (HTS_ModelSet_use_gv(ms, i)) {
-         sst->gv_mean =
-             (double *) HTS_calloc(sst->vector_length / sst->win_size,
-                                   sizeof(double));
-         sst->gv_vari =
-             (double *) HTS_calloc(sst->vector_length / sst->win_size,
-                                   sizeof(double));
-         HTS_ModelSet_get_gv(ms, HTS_Label_get_string(label, 0), sst->gv_mean,
-                             sst->gv_vari, i, gv_iw[i]);
+         sst->gv_mean = (double *) HTS_calloc(sst->vector_length, sizeof(double));
+         sst->gv_vari = (double *) HTS_calloc(sst->vector_length, sizeof(double));
+         HTS_ModelSet_get_gv(ms, i, HTS_Label_get_string(label, 0), gv_iw[i], sst->gv_mean, sst->gv_vari);
       } else {
          sst->gv_mean = NULL;
          sst->gv_vari = NULL;
       }
    }
 
-   if (HTS_ModelSet_have_gv_switch(ms) == TRUE)
-      for (i = 0; i < HTS_Label_get_size(label); i++)
-         if (HTS_ModelSet_get_gv_switch(ms, HTS_Label_get_string(label, i)) ==
-             FALSE)
-            for (j = 0; j < sss->nstream; j++)
+   for (i = 0; i < HTS_Label_get_size(label); i++)
+      if (HTS_ModelSet_get_gv_flag(ms, HTS_Label_get_string(label, i)) == FALSE)
+         for (j = 0; j < sss->nstream; j++)
+            if (HTS_ModelSet_use_gv(ms, j) == TRUE)
                for (k = 0; k < sss->nstate; k++)
                   sss->sstream[j].gv_switch[i * sss->nstate + k] = FALSE;
+
+   return TRUE;
 }
 
 /* HTS_SStreamSet_get_nstream: get number of stream */
-int HTS_SStreamSet_get_nstream(HTS_SStreamSet * sss)
+size_t HTS_SStreamSet_get_nstream(HTS_SStreamSet * sss)
 {
    return sss->nstream;
 }
 
 /* HTS_SStreamSet_get_vector_length: get vector length */
-int HTS_SStreamSet_get_vector_length(HTS_SStreamSet * sss, int stream_index)
+size_t HTS_SStreamSet_get_vector_length(HTS_SStreamSet * sss, size_t stream_index)
 {
    return sss->sstream[stream_index].vector_length;
 }
 
 /* HTS_SStreamSet_is_msd: get MSD flag */
-HTS_Boolean HTS_SStreamSet_is_msd(HTS_SStreamSet * sss, int stream_index)
+HTS_Boolean HTS_SStreamSet_is_msd(HTS_SStreamSet * sss, size_t stream_index)
 {
    return sss->sstream[stream_index].msd ? TRUE : FALSE;
 }
 
 /* HTS_SStreamSet_get_total_state: get total number of state */
-int HTS_SStreamSet_get_total_state(HTS_SStreamSet * sss)
+size_t HTS_SStreamSet_get_total_state(HTS_SStreamSet * sss)
 {
    return sss->total_state;
 }
 
 /* HTS_SStreamSet_get_total_frame: get total number of frame */
-int HTS_SStreamSet_get_total_frame(HTS_SStreamSet * sss)
+size_t HTS_SStreamSet_get_total_frame(HTS_SStreamSet * sss)
 {
    return sss->total_frame;
 }
 
 /* HTS_SStreamSet_get_msd: get MSD parameter */
-double HTS_SStreamSet_get_msd(HTS_SStreamSet * sss, int stream_index,
-                              int state_index)
+double HTS_SStreamSet_get_msd(HTS_SStreamSet * sss, size_t stream_index, size_t state_index)
 {
    return sss->sstream[stream_index].msd[state_index];
 }
 
 /* HTS_SStreamSet_window_size: get dynamic window size */
-int HTS_SStreamSet_get_window_size(HTS_SStreamSet * sss, int stream_index)
+size_t HTS_SStreamSet_get_window_size(HTS_SStreamSet * sss, size_t stream_index)
 {
    return sss->sstream[stream_index].win_size;
 }
 
 /* HTS_SStreamSet_get_window_left_width: get left width of dynamic window */
-int HTS_SStreamSet_get_window_left_width(HTS_SStreamSet * sss,
-                                         int stream_index, int window_index)
+int HTS_SStreamSet_get_window_left_width(HTS_SStreamSet * sss, size_t stream_index, size_t window_index)
 {
    return sss->sstream[stream_index].win_l_width[window_index];
 }
 
 /* HTS_SStreamSet_get_winodow_right_width: get right width of dynamic window */
-int HTS_SStreamSet_get_window_right_width(HTS_SStreamSet * sss,
-                                          int stream_index, int window_index)
+int HTS_SStreamSet_get_window_right_width(HTS_SStreamSet * sss, size_t stream_index, size_t window_index)
 {
    return sss->sstream[stream_index].win_r_width[window_index];
 }
 
 /* HTS_SStreamSet_get_window_coefficient: get coefficient of dynamic window */
-double HTS_SStreamSet_get_window_coefficient(HTS_SStreamSet * sss,
-                                             int stream_index,
-                                             int window_index,
-                                             int coefficient_index)
+double HTS_SStreamSet_get_window_coefficient(HTS_SStreamSet * sss, size_t stream_index, size_t window_index, int coefficient_index)
 {
-   return sss->sstream[stream_index].
-       win_coefficient[window_index][coefficient_index];
+   return sss->sstream[stream_index].win_coefficient[window_index][coefficient_index];
 }
 
 /* HTS_SStreamSet_get_window_max_width: get max width of dynamic window */
-int HTS_SStreamSet_get_window_max_width(HTS_SStreamSet * sss, int stream_index)
+size_t HTS_SStreamSet_get_window_max_width(HTS_SStreamSet * sss, size_t stream_index)
 {
    return sss->sstream[stream_index].win_max_width;
 }
 
 /* HTS_SStreamSet_use_gv: get GV flag */
-HTS_Boolean HTS_SStreamSet_use_gv(HTS_SStreamSet * sss, int stream_index)
+HTS_Boolean HTS_SStreamSet_use_gv(HTS_SStreamSet * sss, size_t stream_index)
 {
    return sss->sstream[stream_index].gv_mean ? TRUE : FALSE;
 }
 
 /* HTS_SStreamSet_get_duration: get state duration */
-int HTS_SStreamSet_get_duration(HTS_SStreamSet * sss, int state_index)
+size_t HTS_SStreamSet_get_duration(HTS_SStreamSet * sss, size_t state_index)
 {
    return sss->duration[state_index];
 }
 
 /* HTS_SStreamSet_get_mean: get mean parameter */
-double HTS_SStreamSet_get_mean(HTS_SStreamSet * sss,
-                               int stream_index,
-                               int state_index, int vector_index)
+double HTS_SStreamSet_get_mean(HTS_SStreamSet * sss, size_t stream_index, size_t state_index, size_t vector_index)
 {
    return sss->sstream[stream_index].mean[state_index][vector_index];
 }
 
 /* HTS_SStreamSet_set_mean: set mean parameter */
-void HTS_SStreamSet_set_mean(HTS_SStreamSet * sss, int stream_index,
-                             int state_index, int vector_index, double f)
+void HTS_SStreamSet_set_mean(HTS_SStreamSet * sss, size_t stream_index, size_t state_index, size_t vector_index, double f)
 {
    sss->sstream[stream_index].mean[state_index][vector_index] = f;
 }
 
 /* HTS_SStreamSet_get_vari: get variance parameter */
-double HTS_SStreamSet_get_vari(HTS_SStreamSet * sss,
-                               int stream_index,
-                               int state_index, int vector_index)
+double HTS_SStreamSet_get_vari(HTS_SStreamSet * sss, size_t stream_index, size_t state_index, size_t vector_index)
 {
    return sss->sstream[stream_index].vari[state_index][vector_index];
 }
 
 /* HTS_SStreamSet_set_vari: set variance parameter */
-void HTS_SStreamSet_set_vari(HTS_SStreamSet * sss, int stream_index,
-                             int state_index, int vector_index, double f)
+void HTS_SStreamSet_set_vari(HTS_SStreamSet * sss, size_t stream_index, size_t state_index, size_t vector_index, double f)
 {
    sss->sstream[stream_index].vari[state_index][vector_index] = f;
 }
 
 /* HTS_SStreamSet_get_gv_mean: get GV mean parameter */
-double HTS_SStreamSet_get_gv_mean(HTS_SStreamSet * sss,
-                                  int stream_index, int vector_index)
+double HTS_SStreamSet_get_gv_mean(HTS_SStreamSet * sss, size_t stream_index, size_t vector_index)
 {
    return sss->sstream[stream_index].gv_mean[vector_index];
 }
 
 /* HTS_SStreamSet_get_gv_mean: get GV variance parameter */
-double HTS_SStreamSet_get_gv_vari(HTS_SStreamSet * sss,
-                                  int stream_index, int vector_index)
+double HTS_SStreamSet_get_gv_vari(HTS_SStreamSet * sss, size_t stream_index, size_t vector_index)
 {
    return sss->sstream[stream_index].gv_vari[vector_index];
 }
 
 /* HTS_SStreamSet_set_gv_switch: set GV switch */
-void HTS_SStreamSet_set_gv_switch(HTS_SStreamSet * sss, int stream_index,
-                                  int state_index, HTS_Boolean i)
+void HTS_SStreamSet_set_gv_switch(HTS_SStreamSet * sss, size_t stream_index, size_t state_index, HTS_Boolean i)
 {
    sss->sstream[stream_index].gv_switch[state_index] = i;
 }
 
 /* HTS_SStreamSet_get_gv_switch: get GV switch */
-HTS_Boolean HTS_SStreamSet_get_gv_switch(HTS_SStreamSet * sss, int stream_index,
-                                         int state_index)
+HTS_Boolean HTS_SStreamSet_get_gv_switch(HTS_SStreamSet * sss, size_t stream_index, size_t state_index)
 {
    return sss->sstream[stream_index].gv_switch[state_index];
 }
@@ -436,7 +459,7 @@ HTS_Boolean HTS_SStreamSet_get_gv_switch(HTS_SStreamSet * sss, int stream_index,
 /* HTS_SStreamSet_clear: free state stream set */
 void HTS_SStreamSet_clear(HTS_SStreamSet * sss)
 {
-   int i, j;
+   size_t i, j;
    HTS_SStream *sst;
 
    if (sss->sstream) {
@@ -450,7 +473,7 @@ void HTS_SStreamSet_clear(HTS_SStreamSet * sss)
             HTS_free(sst->msd);
          HTS_free(sst->mean);
          HTS_free(sst->vari);
-         for (j = sst->win_size - 1; j >= 0; j--) {
+         for (j = 0; j < sst->win_size; j++) {
             sst->win_coefficient[j] += sst->win_l_width[j];
             HTS_free(sst->win_coefficient[j]);
          }

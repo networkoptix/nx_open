@@ -128,13 +128,13 @@ long nointerrupt = 1;
 long interrupt_differed = 0;
 LISP oblistvar = NIL;
 LISP current_env = NIL;
-LISP backtrace = NIL;
+static LISP siod_backtrace = NIL;
 LISP restricted = NIL;
 LISP truth = NIL;
 LISP eof_val = NIL;
 LISP sym_errobj = NIL;
-static LISP sym_quote = NIL;
-static LISP sym_dot = NIL;
+LISP sym_quote = NIL;
+LISP sym_dot = NIL;
 LISP unbound_marker = NIL;
 LISP *obarray;
 long obarray_dim = 100;
@@ -483,7 +483,7 @@ static void display_backtrace(LISP args)
     if (cdr(args) == NIL)
     {
 	printf("BACKTRACE:\n");
-	for (i=0,l=backtrace; l != NIL; l=cdr(l),i++)
+	for (i=0,l=siod_backtrace; l != NIL; l=cdr(l),i++)
 	{
 	    fprintf(stdout,"%4d: ",i);
 	    pprintf(stdout,car(l),3,72,2,2);
@@ -494,7 +494,7 @@ static void display_backtrace(LISP args)
     {
 	printf("BACKTRACE:\n");
 	int nth = (int)FLONM(car(cdr(args)));
-	LISP frame = siod_nth(nth,backtrace);
+	LISP frame = siod_nth(nth,siod_backtrace);
 	fprintf(stdout,"%4d: ",nth);
 	pprintf(stdout,frame,3,72,-1,-1);
 	fprintf(stdout,"\n");
@@ -544,7 +544,7 @@ static long repl(struct repl_hooks *h)
 	err("Expression contains functions not in restricted list",x);
     else
     {
-	backtrace = NIL;  /* reset backtrace info */
+	siod_backtrace = NIL;  /* reset backtrace info */
 	if (h->repl_eval == NULL)
 	    x = leval(x,NIL);
 	else
@@ -852,7 +852,7 @@ static void init_storage_1(int init_heap_size)
 	  break;}}
     freelist = heap_org;}
  gc_protect(&oblistvar);
- gc_protect(&backtrace);
+ gc_protect(&siod_backtrace);
  gc_protect(&current_env);
  if (obarray_dim > 1)
    {obarray = (LISP *) must_malloc(sizeof(LISP) * obarray_dim);
@@ -1216,7 +1216,7 @@ static void gc_sweep(void)
  nfreelist = NIL;
  start_rememberring_dead();
  for(ptr=heap_org; ptr < end; ++ptr)
-   if (((*ptr).gc_mark == 0))
+     if (((*ptr).gc_mark) == 0)
      {switch((*ptr).type)
 	{case tc_flonum:
 	    if (FLONMPNAME(ptr) != NULL)
@@ -1386,7 +1386,7 @@ LISP leval(LISP x,LISP qenv)
  struct user_type_hooks *p;
  env = qenv;
  STACK_CHECK(&x);
- backtrace = cons(x,backtrace);
+ siod_backtrace = cons(x,siod_backtrace);
  loop:
  INTERRUPT_CHECK();
  current_env = env;
@@ -1395,12 +1395,12 @@ LISP leval(LISP x,LISP qenv)
       tmp = envlookup(x,env);
       if NNULLP(tmp) 
       {
-	  backtrace = cdr(backtrace);
+	  siod_backtrace = cdr(siod_backtrace);
 	  return(CAR(tmp));
       }
       tmp = VCELL(x);
       if EQ(tmp,unbound_marker) err("unbound variable",x);
-      backtrace = cdr(backtrace);
+      siod_backtrace = cdr(siod_backtrace);
       return tmp;
     case tc_cons:
       tmp = CAR(x);
@@ -1419,25 +1419,25 @@ LISP leval(LISP x,LISP qenv)
       switch TYPE(tmp)
 	{case tc_subr_0:
 	    rval = SUBR0(tmp)();
-	    backtrace = cdr(backtrace);
+	    siod_backtrace = cdr(siod_backtrace);
 	    return rval;
 	 case tc_subr_1:
 	    rval = SUBR1(tmp)(leval(car(CDR(x)),env)); 
-	    backtrace = cdr(backtrace);
+	    siod_backtrace = cdr(siod_backtrace);
 	    return rval;
 	 case tc_subr_2:
 	    x = CDR(x);
 	    arg1 = leval(car(x),env);
 	    x = NULLP(x) ? NIL : CDR(x);
 	    rval = SUBR2(tmp)(arg1,leval(car(x),env));
-	    backtrace = cdr(backtrace);
+	    siod_backtrace = cdr(siod_backtrace);
 	    return rval;
 	 case tc_subr_3:
 	    x = CDR(x);
 	    arg1 = leval(car(x),env);
 	    x = NULLP(x) ? NIL : CDR(x);
 	    rval = SUBR3(tmp)(arg1,leval(car(x),env),leval(car(cdr(x)),env));
-	    backtrace = cdr(backtrace);
+	    siod_backtrace = cdr(siod_backtrace);
 	    return rval;
 	 case tc_subr_4:
 	    x = CDR(x);
@@ -1446,20 +1446,20 @@ LISP leval(LISP x,LISP qenv)
 	    rval = SUBR4(tmp)(arg1,leval(car(x),env),
 			      leval(car(cdr(x)),env),
 			      leval(car(cdr(cdr(x))),env));
-	    backtrace = cdr(backtrace);
+	    siod_backtrace = cdr(siod_backtrace);
 	    return rval;
 	 case tc_lsubr:
 	    rval = SUBR1(tmp)(leval_args(CDR(x),env));
-	    backtrace = cdr(backtrace);
+	    siod_backtrace = cdr(siod_backtrace);
 	    return rval;
 	 case tc_fsubr:
 	    rval = SUBR2(tmp)(CDR(x),env);
-	    backtrace = cdr(backtrace);
+	    siod_backtrace = cdr(siod_backtrace);
 	    return rval;
 	 case tc_msubr:
 	   if NULLP(SUBRM(tmp)(&x,&env)) 
 	   {
-	       backtrace = cdr(backtrace);
+	       siod_backtrace = cdr(siod_backtrace);
 	       return(x);
 	   }
 	   goto loop;
@@ -1478,14 +1478,14 @@ LISP leval(LISP x,LISP qenv)
 	   if (p->leval)
 	     {if NULLP((*p->leval)(tmp,&x,&env)) 
 	      {
-		  backtrace = cdr(backtrace);
+		  siod_backtrace = cdr(siod_backtrace);
 		  return(x); 
 	      }
 	     else 
 		 goto loop;}
 	   err("bad function",tmp);}
     default:
-        backtrace = cdr(backtrace);
+        siod_backtrace = cdr(siod_backtrace);
         return(x);}}
 
 void set_print_hooks(long type,
@@ -1520,20 +1520,15 @@ void set_type_hooks(long type,
 }
 
 int f_getc(FILE *f)
-{long iflag,dflag;
+{long iflag;
  int c;
  iflag = no_interrupt(1);
- dflag = interrupt_differed;
  c = getc(f);
  if ((c == '\n') && (f == stdin) && (siod_interactive))
  {
      fprintf(stdout,"%s",repl_prompt);
      fflush(stdout);
  }
-#ifdef VMS
- if ((dflag == 0) & interrupt_differed & (f == stdin))
-   while((c != 0) & (c != EOF)) c = getc(f);
-#endif
  no_interrupt(iflag);
  return(c);}
 

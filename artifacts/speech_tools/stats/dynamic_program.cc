@@ -42,18 +42,19 @@
 #include "ling_class/EST_Utterance.h"
 
 typedef EST_TVector<EST_Item*> EST_Item_ptr_Vector;
-#if defined(INSTANTIATE_TEMPLATES)
-#include "../base_class/EST_TVector.cc"
-
-template class EST_TVector<EST_Item*>;
-
-#endif
-
 static EST_Item *const def_val_item_ptr = NULL;
 template <> EST_Item* const *EST_Item_ptr_Vector::def_val = &def_val_item_ptr;
 
 static EST_Item* error_return_item_ptr = NULL;
 template <> EST_Item* *EST_Item_ptr_Vector::error_return = &error_return_item_ptr;
+
+#if defined(INSTANTIATE_TEMPLATES)
+
+#include "../base_class/EST_TVector.cc"
+
+template class EST_TVector<EST_Item*>;
+
+#endif
 
 typedef
 float (*local_cost_function)(const EST_Item *item1,

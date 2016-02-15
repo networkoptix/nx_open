@@ -109,7 +109,7 @@ static void festival_main(int argc, char **argv)
 	"--script <ifile>\n"+
         "              Used in #! scripts, runs in batch mode on\n"+
 	"              file and passes all other args to Scheme\n"+
-	"--heap <int> {1000000}\n"+
+	"--heap <int> {10000000}\n"+
         "              Set size of Lisp heap, should not normally need\n"+
         "              to be changed from its default\n"+
 	"-v            Display version number and exit\n"+

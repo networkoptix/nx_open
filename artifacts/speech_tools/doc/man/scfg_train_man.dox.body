@@ -1,0 +1,22 @@
+/**
+
+@page scfg_train_manual scfg_train
+@brief *Train the parameters of a stochastic context free grammar*
+@tableofcontents
+
+@section synopsis Synopsis
+
+@SYNOPSIS@
+
+`scfg_train` takes a stochastic context free grammar (SCFG) and trains
+the probabilities with respect to a given bracket corpus using the
+inside-outside algorithm.   This is basically an implementation
+of Pereira and Schabes 1992.
+
+Note using this program properly may require months of CPU time.
+
+@section options Options
+
+@OPTIONS@
+
+*/

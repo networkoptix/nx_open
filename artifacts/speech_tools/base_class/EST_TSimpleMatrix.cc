@@ -45,6 +45,7 @@
 #include <fstream>
 #include <iostream>
 #include "EST_cutils.h"
+#include <string.h>
 
 template<class T> 
 void EST_TSimpleMatrix<T>::copy_data(const EST_TSimpleMatrix<T> &a)
@@ -98,7 +99,7 @@ void EST_TSimpleMatrix<T>::resize(int new_rows,
 	{
 	  int copy_r = Lof(this->num_rows(), new_rows);
 
-	  just_resize(new_rows, new_cols, &old_vals);
+	  this->just_resize(new_rows, new_cols, &old_vals);
 
           for (q=0; q<(copy_r*new_cols*sizeof(T)); q++) /* memcpy */
               ((char *)this->p_memory)[q] = ((char *)old_vals)[q];
@@ -127,9 +128,9 @@ void EST_TSimpleMatrix<T>::resize(int new_rows,
 	  int copy_r = Lof(this->num_rows(), new_rows);
 	  int copy_c = Lof(this->num_columns(), new_cols);
 	  
-	  just_resize(new_rows, new_cols, &old_vals);
+	  this->just_resize(new_rows, new_cols, &old_vals);
 
-	  set_values(old_vals,
+	  this->set_values(old_vals,
 		     old_row_step, old_column_step,
 		     0, copy_r,
 		     0, copy_c);

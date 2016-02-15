@@ -130,7 +130,7 @@ public:
 	{this->initialise((const void *)defs); };
   EST_TNamedEnumI(EST_TValuedEnumDefinition<const char *,const char *,INFO> defs[], ENUM (*conv)(const char *))
 	{this->initialise((const void *)defs, conv); };
-  const char *name(ENUM tok, int n=0) const {return value(tok,n); };
+  const char *name(ENUM tok, int n=0) const {return this->value(tok,n); };
 
 };
 

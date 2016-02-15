@@ -683,6 +683,30 @@ static EST_Val ff_ssyl_in(EST_Item *s)
     return EST_Val(count);
 }
 
+// This function is modified version of ff_ssyl_in().
+// If first syllable in the current phrase is stressed syllable,
+// ff_ssyl_in() does not count it as stressed syllable.
+// In the following function, this problem is fixed.
+static EST_Val ff_ssyl_in_modified_version(EST_Item *s)
+{
+    // Number of stressed syllables since last phrase break 
+    EST_Item *nn = as(s,"Syllable");
+    EST_Item *fsyl = 
+	as(daughter1(as(parent(s,"SylStructure"),"Phrase")->first(),"SylStructure"),
+	   "Syllable");
+    EST_Item *p;
+    int count;
+
+    if (nn == fsyl) return val_int0;
+    for (count=0,p=nn->prev(); (p != 0); p = p->prev())
+    {
+	if (p->F(stressname,0) == 1)
+	    count ++;
+	if (p == fsyl) break;
+    }
+    return EST_Val(count);
+}
+
 static EST_Val ff_ssyl_out(EST_Item *s)
 {
     // Number of stressed syllables to next phrase break 
@@ -719,6 +743,31 @@ static EST_Val ff_asyl_in(EST_Item *s)
     for (count=0,p=nn->prev(); (p != 0) && (p != fsyl); p = p->prev())
 	if (ff_syl_accented(p) == 1)
 	    count ++;
+    return EST_Val(count);
+}
+
+// This function is modified version of ff_asyl_in().
+// If first syllable in the current phrase is accented syllable,
+// ff_asyl_in() does not count it as accented syllable.
+// In the following function, this problem is fixed.
+static EST_Val ff_asyl_in_modified_version(EST_Item *s)
+{
+    // Number of accented syllables since last phrase break 
+    EST_Item *nn = as(s,"Syllable");
+    // The first syllable in the phrase
+    EST_Item *fsyl = 
+	as(daughter1(as(parent(s,"SylStructure"),"Phrase")->first(),"SylStructure"),
+	   "Syllable");
+    EST_Item *p;
+    int count;
+
+    if (nn == fsyl) return val_int0;
+    for (count=0,p=nn->prev(); (p != 0); p = p->prev())
+    {
+	if (ff_syl_accented(p) == 1)
+	    count ++;
+	if (p == fsyl) break;
+    }
     return EST_Val(count);
 }
 
@@ -916,12 +965,21 @@ void festival_ff_init(void)
     "Syllable.ssyl_in\n\
   Returns number of stressed syllables since last phrase break, not\n\
   including this one.");
+    festival_def_nff("ssyl_in_modified_version","Syllable",ff_ssyl_in_modified_version,
+    "Syllable.ssyl_in_modified_version\n\
+  Returns number of stressed syllables since last phrase break, not\n\
+  including this one.");
     festival_def_nff("ssyl_out","Syllable",ff_ssyl_out,
     "Syllable.ssyl_out\n\
   Returns number of stressed syllables to next phrase break, not including\n\
   this one.");
     festival_def_nff("asyl_in","Syllable",ff_asyl_in,
     "Syllable.asyl_in\n\
+  Returns number of accented syllables since last phrase break, not\n\
+  including this one.  Accentedness is as defined by the syl_accented\n\
+  feature.");
+    festival_def_nff("asyl_in_modified_version","Syllable",ff_asyl_in_modified_version,
+    "Syllable.asyl_in_modified_version\n\
   Returns number of accented syllables since last phrase break, not\n\
   including this one.  Accentedness is as defined by the syl_accented\n\
   feature.");

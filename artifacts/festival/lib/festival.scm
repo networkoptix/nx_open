@@ -332,7 +332,7 @@ is specified and non-nil append this to the current waveform."
 	(filename (nth 1 args))
 	(append (nth 2 args)))
     (if (and append (member 'Wave (utt.relationnames utt)))
-	(wave.append (utt.wave utt) (wave.load filename))
+        (wave.append (utt.wave utt) (wave.load filename))
 	(begin
 	  (utt.relation.create utt 'Wave)
 	  (item.set_feat
@@ -508,7 +508,7 @@ Doing stuff
   (tts FILENAME nil)  Say contexts of file, FILENAME should be 
                       surrounded by double quotes
   (voice_rab_diphone) Select voice (Britsh Male)
-  (voice_ked_diphone) Select voice (American Male)
+  (voice_kal_diphone) Select voice (American Male)
 ")
 
 (define (festival_warranty)
@@ -521,7 +521,7 @@ Doing stuff
 "
                 Centre for Speech Technology Research                  
                      University of Edinburgh, UK                       
-                       Copyright (c) 1996-2010
+                       Copyright (c) 1996-2014
                         All Rights Reserved.                           
                                                                        
   Permission is hereby granted, free of charge, to use and distribute  

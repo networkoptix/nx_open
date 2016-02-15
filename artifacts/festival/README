@@ -1,6 +1,6 @@
 
               The Festival Speech Synthesis System
-                version 2.1 RELEASE November 2010
+                   version 2.4 December 2014
  
 This directory contains the Festival Speech Synthesis System,
 developed at CSTR, University of Edinburgh. The project was originally
@@ -46,6 +46,9 @@ Keep abreast of Festival News by regularly checking the Festival homepage
    http://www.cstr.ed.ac.uk/projects/festival/
 or the US site
    http://festvox.org/festival/
+
+New in Festival 2.2
+   updates to hts (hts_engine 1.07) and clustergen
 
 New in Festival 2.1
    Support for various new GCC compilers

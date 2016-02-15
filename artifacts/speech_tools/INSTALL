@@ -2,7 +2,7 @@ INSTALLATION
 
 Release notes
 
-This documentation covers version 2.1 of the Edinburgh Speech Tools
+This documentation covers version 2.4 of the Edinburgh Speech Tools
 Library. While previous versions of the speech tools were primarily
 released solely to support the Festival Speech Synthesis System, the
 Edinburgh Speech Tools Library now contains sufficiently useful tools
@@ -71,13 +71,13 @@ Sun Sparc Solaris 2.5.1/2.6/2.7/2.9
 
 MacOS GCC 4.2.1 (Snow Leopard default)
 
-Linux GCC 4.2 - 4.5
+Linux GCC 4.2 - 4.8.0
 
-Windows 7 GCC (from Cygwin 1.7), Visual C++ (VS2010).
+Windows 7/8 GCC (from Cygwin 1.7), Visual C++ (VS2010,VS2012).
 
 As stated before C++ compilers are not standard and it is non-trivial
 to find the correct dialect which compiles under all.  We recommend
-the use of GCC 4.4 if you can use it, it is the most likely one to
+the use of GCC 4.6 if you can use it, it is the most likely one to
 work. Some of the compilers listed above produce a large number of
 warnings when compiling the code.
 
@@ -86,7 +86,7 @@ IRIX 5.3, 6.x, OSF (Alphas) and HPUX but at time of writing this we have
 not yet rechecked this version.  AIX4.3 probably works.
 
 
-Java Support
+Java is no longer supported!
 
 The java directory contains optional Java classes which give some
 access to speech tools facilities from Java programs.  This has been
@@ -102,13 +102,13 @@ You may (for instance on Solaris using gcc) need to make shared
 libraries for some compiler support libraries in order to comple the
 full JAVA_CPP support. See Appendix A for details.
 
-Windows 95/98/NT/XP/Vista/7 Port
+Windows 95/98/NT/XP/Vista/7/8 Port
 
 We have done two ports of this code to Windows machines, one uses the
 Cygwin package, which provides a Unix like environment under on Win32
 systems, the other is a native port using Visual C++.
 
-We reccomend using only Windows 7.
+We recommend using only Windows 7.
 
 The port using Visual C++ does not provide all of the
 features of the Unix and Cygwin versions. You will need access to a
@@ -119,7 +119,7 @@ Both Cygwin and Visual C++ ports have a number of limitations.
 
 Shared library creation is not supported.
       Creation of Windows DLLs is different enough from creation of Unix
-      shared libraries that the support does not carry directly accross, and
+      shared libraries that the support does not carry directly across, and
       we haven't yet had time to work on it.
 
 Java not supported
@@ -135,7 +135,7 @@ Command line editing limited
       Networking under Win32 is different from Unix in a number of 
       fairly fundamental ways, we haven't tackled this at all. 
 
-There are no doubt other differences we hve not noticed. We don't use
+There are no doubt other differences we have not noticed. We don't use
 Windows for any of our work and so the Windows builds of our systems
 don't get the extensive use the unix builds do.
 
@@ -150,25 +150,25 @@ by
           unix$ ./configure
 
 This creates the file config/config which for most machines will be
-suitble.  In some circumstances the default.s generated from this
+suitable.  In some circumstances the default.s generated from this
 may not be what you want and you may wish to edit this file.
 
 For Linux we now fully support shared libraries and even recommend
-them. However if you are going to do alot of development and don't
+them. However if you are going to do a lot of development and don't
 understand the consequences of shared libraries and getting
 LD_LIBRARY_PATH correct (or what that is) we recommend you compile
 unshared, the default. If you are going to simply run the speech tools
 (and festival) then shared is a reasonable option. Uncomment the line
 in the config file
 
-          # SHARED = 1
+          # SHARED = 2
 
 Shared support under Solaris is complete for all the speech tools. If
 you need to exec festival scripts using a version of festival built
-with shared libaries, you must either execute them from a featureful
+with shared libraries, you must either execute them from a featureful
 shell (e.g. bash), install the shared libraries in a standard place or
 explicitly set LD_LIBRARY_PATH. Solaris's standard shell doesn't
-support script excutaiton of shells within shells.
+support script execution of shells within shells.
 
 Simple choices for common set ups are given near the top of this
 file. But for some sub-systems you will also need to change pathnames
@@ -189,7 +189,7 @@ use
 
 Note that if you compile with -g (uncommenting DEBUG = 1 is
 config/config the library and the corresponding binaries will be
-large. Particulary the executables, you will need in order of 150
+large. Particularly the executables, you will need in order of 150
 megabytes to compile the system, if your C++ libraries are not
 compiled as shared libraries. If you compile without -g the whole
 library directory is about 12 megabytes on Linux (which has shared
@@ -220,7 +220,7 @@ libraries are speech_tools/lib/libestools.a,
 speech_tools/lib/libestbase.a and speech_tools/lib/libestring.a. For
 most cases a three will be required.
 
-If space is a preminium, compiled with the shared option (binaries
+If space is a premium, compiled with the shared option (binaries
 will be then be substantially smaller) and you can delete all .o files
 
 Some aspects of the system have further dependencies which depend of
@@ -231,11 +231,11 @@ These are uptodate instructions for Visual C++ builds.
 VS2010 was tested but older versions may work
 
 Requirements:
-MS Windows 7
-Visual C++ (VS2010)
-cygwin 1.7
-speech_tools-2.1
-festival-2.1
+MS Windows 7 (or Windows 8)
+Visual C++ (VS2010 or VS2012)
+cygwin 1.7 or later
+speech_tools-2.3
+festival-2.3
 
 Download and install cygwin.
 Optionally download emacs so you have a decent editor :)
@@ -247,13 +247,13 @@ Using cygwins bash shell:
   cd C:/festival
 
 Using cygwin's tar command unpack:
-  tar xvfz speech_tools-2.1.tar.gz 
-  tar xvfz festival-2.1.tar.gz
+  tar xvfz speech_tools-2.3.tar.gz 
+  tar xvfz festival-2.3.tar.gz
   tar xvfz festlex... festvox...
 (where festlex... and festvox... are the voice and lexicon files you
 need.  Do not use winzip to unpack the voices it corrupts them!)
 
-Create Vsual C++ make files: (this may be slow...)
+Create Visual C++ make files: (this may be slow...)
   cd speech_tools
   make VCMakefile
   cp config/vc_config_make_rules-dist config/vc_config_make_rules
@@ -274,7 +274,8 @@ to:
 
 Now switch to a windows command prompt.
 If necessary execute: VCVARSALL.BAT from the VC++ directory structure to set up
-VC++ environment. (you may do this automatically at boot or login.)
+VC++ environment. (you may do this automatically at boot or login, or it should be 
+automatic if using the terminal provided by Visual studio)
 
 Build speech_tools and festival:
   cd c:\festival\speech_tools

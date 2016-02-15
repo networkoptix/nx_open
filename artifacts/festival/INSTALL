@@ -17,10 +17,10 @@ Requirements
    In order to compile Festival you first need the following source
 packages
 
-`festival-2.0-release.tar.gz'
+`festival-2.4-release.tar.gz'
      Festival Speech Synthesis System source
 
-`speech_tools-1.2.4-release.tar.gz'
+`speech_tools-2.4-release.tar.gz'
      The Edinburgh Speech Tools Library
 
 `festlex_NAME.tar.gz'
@@ -141,11 +141,11 @@ Tools Library.  See `speech_tools/INSTALL' for instructions.
 up.  In most cases this will automatically configure festival for your
 particular system.  In most cases you need only type
      gmake
-   and the system will configure itself and conpile, (note you need to
+   and the system will configure itself and compile, (note you need to
 have compiled the Edinburgh Speech Tools `speech_tools-1.2.4' first.
 
    In some case hand configure is require.  All of the configuration
-choise are held in the file `config/config'
+choice are held in the file `config/config'
 
    For the most part Festival configuration inherits the configuration
 from your speech tools config file (`../speech_tools/config/config').
@@ -204,7 +204,7 @@ incorrect argument type, this is also harmless.
 
    The speech tools and festival compile under Windows95 or Windows NT
 with Visual C++ v5.0 using the Microsoft `nmake' make program.  We've
-only done this with the Professonal edition, but have no reason to
+only done this with the Professional  edition, but have no reason to
 believe that it relies on anything not in the standard edition.
 
    In accordance to VC++ conventions, object files are created with
@@ -227,7 +227,7 @@ changes will not cause the correct things to be rebuilt.
 
    In order to compile from the DOS command line using Visual C++ you
 need to have a collection of environment variables set. In Windows NT
-there is an instalation option for Visual C++ which sets these
+there is an installation option for Visual C++ which sets these
 globally. Under Windows95 or if you don't ask for them to be set
 globally under NT you need to run
      vcvars32.bat

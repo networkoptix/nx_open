@@ -44,6 +44,7 @@
 #include "EST_matrix_support.h"
 #include <fstream>
 #include "EST_cutils.h"
+#include <string.h>
 
 template<class T> void EST_TSimpleVector<T>::copy(const EST_TSimpleVector<T> &a)
 {
@@ -70,7 +71,7 @@ template<class T> void EST_TSimpleVector<T>::resize(int newn, int set)
   int old_offset = this->p_offset;
   unsigned int q;
 
-  just_resize(newn, &old_vals);
+  this->just_resize(newn, &old_vals);
 
   if (set && old_vals)
     {

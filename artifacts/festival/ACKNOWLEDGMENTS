@@ -72,7 +72,7 @@ Reading University
 Mari Ostendorf  For giving access to the FM Radio Corpus from which
                 some models were trained.
 LDC & Penn Tree Bank 
-                from which the POS ragger was trained, redistribution
+                from which the POS tagger was trained, redistribution
                 of the models is with permission from the LDC.
 Grady Ward      for the MOBY pronunciation lexicon
 FSF             for G++, make, .... 

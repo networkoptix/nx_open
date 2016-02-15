@@ -127,12 +127,10 @@ int Stringtoi(EST_String s, int success)
 
 int Stringtoi(EST_String s)
 {
-    int success;
     char *a;
     int d;
 
     d = strtol(s, &a, 0);
-    success = (*a == '\0') ? 0: 1;
 
     return d;
 }

@@ -84,19 +84,19 @@ void EST_quiet_error_fn(const char *format, ...);
 void EST_quiet_sys_error_fn(const char *format, ...);
 
 
-#define __S_(X) #X
-#define __s_(X) __S_(X)
+#define _rxp_S_(X) #X
+#define _rxp_s_(X) _rxp_S_(X)
 
-#define EST_bug       (EST_error_where = __FILE__ ", line " __s_(__LINE__)),\
+#define EST_bug       (EST_error_where = __FILE__ ", line " _rxp_s_(__LINE__)),\
 			(*EST_bug_func)
 
 #if defined(EST_DEBUGGING)
 #define EST_exit(N) abort()
-#define EST_error     (EST_error_where = __FILE__ ", line " __s_(__LINE__)),\
+#define EST_error     (EST_error_where = __FILE__ ", line " _rxp_s_(__LINE__)),\
 			(*EST_error_func)
-#define EST_warning   (EST_error_where = __FILE__ ", line " __s_(__LINE__)),\
+#define EST_warning   (EST_error_where = __FILE__ ", line " _rxp_s_(__LINE__)),\
 			(*EST_warning_func)
-#define EST_sys_error (EST_error_where = __FILE__ ", line " __s_(__LINE__)),\
+#define EST_sys_error (EST_error_where = __FILE__ ", line " _rxp_s_(__LINE__)),\
 			  (*EST_sys_error_func)
 #else
 

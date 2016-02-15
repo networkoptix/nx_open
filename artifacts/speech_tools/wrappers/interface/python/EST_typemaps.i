@@ -121,7 +121,7 @@ typedef int Py_ssize_t;
 
   unsigned int i;
   EST_Item *it;
-  for( it = (*$1), i=0; it!=0; it=next(it), ++i )
+  for( it = (*$1), i=0; it!=0; it=it->next(), ++i )
     PyList_SetItem( o1, i, SWIG_NewPointerObj((void *) it, $descriptor(EST_Item*), 0) );
 
   if ((!$result) || ($result == Py_None)) {

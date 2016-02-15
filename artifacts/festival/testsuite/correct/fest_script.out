@@ -92,7 +92,7 @@ num syllables: 9
 Usage: festival Usage:
 festival  <options> <file0> <file1> ...
 In evaluation mode "filenames" starting with ( are evaluated inline
-Festival Speech Synthesis System: 2.1:release November 2010
+Festival Speech Synthesis System: 2.4:beta December 2014
 -q            Load no default setup files
 --libdir <string>
               Set library directory pathname
@@ -115,7 +115,7 @@ Festival Speech Synthesis System: 2.1:release November 2010
 --script <ifile>
               Used in #! scripts, runs in batch mode on
               file and passes all other args to Scheme
---heap <int> {1000000}
+--heap <int> {10000000}
               Set size of Lisp heap, should not normally need
               to be changed from its default
 -v            Display version number and exit

@@ -70,12 +70,20 @@ void f0_to_pitchmarks(EST_Track &fz, EST_Track &pm, int num_channels,
     // hand. Here we find the upper limit and resize at the end
     for (i = 0; i < fz.num_frames(); ++i)
     {
+        if (fz.a_no_check(i) < 0)
+            fz.a_no_check(i) = 0;
+        if (fz.a_no_check(i) > 500)
+            fz.a_no_check(i) = fz.a_no_check(i-1);
+        if (fz.a_no_check(i) > max)
+            max = fz.a_no_check(i);
+#if 0
 	if (fz.a_no_check(i) < 0)
 	    fz.a_no_check(i) = 0;
-	if (fz.a_no_check(i) > 500)
-	    fz.a_no_check(i) = fz.a_no_check(i-1);
+	if (fz.a_no_check(i) > 750)
+	    fz.a_no_check(i) = 749;
 	if (fz.a_no_check(i) > max)
 	    max = fz.a_no_check(i);
+#endif
     }
 
     // Coefficients will also be placed in here, so its best allocate
@@ -145,8 +153,8 @@ void f0_to_pitchmarks_orig(EST_Track &fz, EST_Track &pm, int num_channels,
     {
 	if (fz.a_no_check(i) < 0)
 	    fz.a_no_check(i) = 0;
-	if (fz.a_no_check(i) > 500)
-	    fz.a_no_check(i) = fz.a_no_check(i-1);
+	if (fz.a_no_check(i) > 750)
+	    fz.a_no_check(i) = 749;
 	if (fz.a_no_check(i) > max)
 	    max = fz.a_no_check(i);
     }
@@ -470,25 +478,10 @@ void warp_pitchmarks(EST_Utterance &utt, EST_Track *source_pm,
 
 float local_cost(const EST_Item *s1, const EST_Item *s2)
 {
-<<<<<<< us_prosody.cc
-    utt.create_relation("TargetCoef");
-    EST_Track *target_coef = new EST_Track;
-    EST_Item *end_seg;
-    int num_channels = 0;
-    float end;
-
-    if (utt.relation_present("SourceCoef"))
-    {
-	EST_Track *source_coef = 
-	    track(utt.relation("SourceCoef")->head()->f("coefs"));
-	num_channels = source_coef->num_channels();
-    }
-=======
     float insertion_cost = get_c_int(siod_get_lval("met_insertion", NULL));
     float deletion_cost = get_c_int(siod_get_lval("met_deletion", NULL));
     float substitution_cost = 
 	get_c_int(siod_get_lval("met_substitution", NULL));
->>>>>>> 1.14
 
     EST_String null_sym = "nil";
 

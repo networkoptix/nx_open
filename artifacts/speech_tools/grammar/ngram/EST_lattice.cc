@@ -738,7 +738,6 @@ Lattice::build_distinguished_state_table(bool ** &dst)
     // any final/non-final (or non-final/final) pairs are distinguished immediately
     for(i=0,n_ptr=nodes.head();n_ptr->next()!=NULL;n_ptr=n_ptr->next(),i++){
 	for(j=i+1,n2_ptr=n_ptr->next();n2_ptr!=NULL;n2_ptr=n2_ptr->next(),j++){
-	    
 	    if(final(nodes(n_ptr)) && !final(nodes(n2_ptr)))
 		dst[i][j] = true;
 	    else if(!final(nodes(n_ptr)) && final(nodes(n2_ptr)))
@@ -793,9 +792,7 @@ Lattice::build_distinguished_state_table_direct(bool ** &dst)
 	scan_count++;
 
 	for(i=0,n_ptr=nodes.head();n_ptr->next()!=NULL;n_ptr=n_ptr->next(),i++){
-	    
 	    for(j=i+1,n2_ptr=n_ptr->next();n2_ptr!=NULL;n2_ptr=n2_ptr->next(),j++){
-		
 		cerr << "scan " << scan_count << " : " << i << "," << j << "     \r";
 
 		if(!dst[i][j]){
@@ -956,7 +953,7 @@ Lattice::minimise()
 
 	merge_list.clear();
 	for(i=0,n_ptr=nodes.head();n_ptr->next()!=NULL;n_ptr=n_ptr->next(),i++){
-	    
+
 	    cerr << "merge, processing row " << i << "        \r";
 	    
 	    for(j=i+1,n2_ptr=n_ptr->next();n2_ptr!=NULL;n2_ptr=n2_ptr->next(),j++){

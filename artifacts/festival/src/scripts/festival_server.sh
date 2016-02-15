@@ -119,7 +119,7 @@ create_server_startup()
 (set! server_port $port)
 (set! server_festival_version "$festival" )
 (set! server_log_file "$server_log" )
-(set! server_startup_file "$serer_startup" )
+(set! server_startup_file "$server_startup" )
 
 ;; Marks end of machine created bit
 ;---

@@ -7,16 +7,20 @@ closing a file left open: data/scherr.scm
 caught the error
 checking error handling in interactive mode 
 
-Festival Speech Synthesis System 2.1:release November 2010
+Festival Speech Synthesis System 2.4:beta December 2014
 Copyright (C) University of Edinburgh, 1996-2010. All rights reserved.
 
 clunits: Copyright (C) University of Edinburgh and CMU 1997-2010
-clustergen_engine: Copyright (C) CMU 2005-2010
+clustergen_engine: Copyright (C) Carnegie Mellon University 2005-2014
 hts_engine: 
-The HMM-based speech synthesis system (HTS)
-hts_engine API version 1.04 (http://hts-engine.sourceforge.net/)
-Copyright (C) 2001-2010  Nagoya Institute of Technology
-              2001-2008  Tokyo Institute of Technology
+The HMM-Based Speech Synthesis Engine "hts_engine API"
+hts_engine API version 1.07 (http://hts-engine.sourceforge.net/)
+Copyright (C) The HMM-Based Speech Synthesis Engine "hts_engine API"
+Version 1.07 (http://hts-engine.sourceforge.net/)
+Copyright (C) 2001-2012 Nagoya Institute of Technology
+              2001-2008 Tokyo Institute of Technology
+All rights reserved.
+
 All rights reserved.
 For details type `(festival_warranty)'
 festival> SIOD ERROR: unbound variable : ###########################################################################

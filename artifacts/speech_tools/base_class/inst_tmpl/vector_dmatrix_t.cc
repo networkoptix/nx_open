@@ -40,6 +40,11 @@
 #include "EST_types.h"
 #include "EST_TVector.h"
 
+static const EST_DMatrix def_val_DMatrix;
+static EST_DMatrix error_return_DMatrix;
+template <> const EST_DMatrix *EST_TVector<EST_DMatrix>::def_val = &def_val_DMatrix;
+template <> EST_DMatrix *EST_TVector<EST_DMatrix>::error_return = &error_return_DMatrix;
+
 #if defined(INSTANTIATE_TEMPLATES)
 
 #include "../base_class/EST_TVector.cc"
@@ -47,10 +52,6 @@
 template class EST_TVector<EST_DMatrix>;
 
 #endif
-static const EST_DMatrix def_val_DMatrix;
-static EST_DMatrix error_return_DMatrix;
-template <> const EST_DMatrix *EST_TVector<EST_DMatrix>::def_val = &def_val_DMatrix;
-template <> EST_DMatrix *EST_TVector<EST_DMatrix>::error_return = &error_return_DMatrix;
 
 int operator !=(const EST_DMatrix &fm1, 
 		const EST_DMatrix &fm2)

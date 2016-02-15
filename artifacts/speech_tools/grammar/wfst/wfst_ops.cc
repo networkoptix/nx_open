@@ -340,7 +340,7 @@ void EST_WFST::add_epsilon_reachable(EST_WFST_MultiState *ms) const
 	    {
 		// Add to end of ii if not already there
 		int nstate = s->transitions(i)->state();
-		if (!is_a_member(ii,nstate));
+		if (!is_a_member(ii,nstate))
 		{
 		    ii.append(nstate);
 		    ms->add(nstate); // gets added in order

@@ -1,5 +1,5 @@
 /*
- *	$Id: rateconv.cc,v 1.4 2004/09/29 08:24:16 robert Exp $
+ *	$Id: rateconv.cc,v 1.5 2014/04/07 15:32:10 robert Exp $
  *
  *	RATECONV.C
  *
@@ -382,10 +382,18 @@ static int filtering_on_buffers
 		inbaseidx -= insize - 2*firlen + 2;
 		return(outidx);
 	    }
-	    fir_stereo(inp + inoffset + inbaseidx,
+/* order?
+			   fir_stereo(inp + inoffset + inbaseidx,
 		       coep + cycctr * firlen, firlen,
 		       outp + outidx++, outp + outidx++);
-	    cycctr++;
+
+*/ 
+	    fir_stereo(inp + inoffset + inbaseidx,
+		       coep + cycctr * firlen, firlen,
+		       outp + outidx, outp + outidx+1);
+	    outidx += 2;
+
+		cycctr++;
 	    if (!(cycctr %= up))
 		inbaseidx += 2*down;
 	    if (!(outidx %= outsize))

@@ -105,7 +105,7 @@ static LISP FT_utt_tag_unit( LISP l_utt, LISP l_unitnum )
 
   EST_Item *currentCandidateUsed = item(it->f("source_ph1"));
   
-  printf( "setting omit flag on unit %d (item %p)\n", i-1, currentCandidateUsed ); 
+  fprintf(stderr,  "setting omit flag on unit %d (item %p)\n", i-1, currentCandidateUsed ); 
 
   omitlist->append( currentCandidateUsed );
   

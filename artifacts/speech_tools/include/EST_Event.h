@@ -56,13 +56,13 @@
 #endif
 
 
-class RFCelement{
-    float amp;
-    float dur;
-    float start_amp;
-    float start_pos;
-    EST_String type;
-};
+//class RFCelement{
+//    float amp;
+//    float dur;
+//    float start_amp;
+//    float start_pos;
+//    EST_String type;
+//};
 
 class EventBase{
  private:

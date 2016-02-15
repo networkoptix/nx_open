@@ -51,6 +51,11 @@ void festival_lisp_vars(void);
 void festival_banner(void);
 void festival_load_default_files(void);
 
+// Visual studio 2012 needs this
+#ifdef SYSTEM_IS_WIN32
+#define snprintf _snprintf
+#endif
+
 #define _S_S_S(S) #S
 #define STRINGIZE(S) _S_S_S(S)
 
@@ -94,7 +99,7 @@ void festival_initialize(int load_init_files,int heap_size)
     {
 	siod_init(heap_size);
 	siod_est_init();		// add support for EST objects
-	siod_fringe_init();		// and for talking to fringe.
+	/* siod_fringe_init();	*/	// and for talking to fringe.
 	
 	siod_prog_name = "festival";
 	cdebug = new ofstream("/dev/null");  // This wont work on Win/NT
@@ -386,43 +391,157 @@ LISP l_lr_predict(LISP si, LISP lr_model);
 void festival_unitdb_init(void);
 LISP Gen_Viterbi(LISP utt);
 
-LISP utf8_explode(LISP name)
-{
+inline int utf8_sequence_length(char c0) {
+  // Get the expected length of UTF8 sequence given its most
+  // significant byte
+  return (( 0xE5000000 >> (( c0 >> 3 ) & 0x1E )) & 3 ) + 1;
+}
+
+LISP utf8_explode(LISP name) {
     /* return a list of utf-8 characters as strings */
-    const unsigned char *xxx = (const unsigned char *)get_c_string(name);
-    LISP chars=NIL;
-    int i, l=0;
+    LISP chars = NIL;
+    const char *str = (const char*)get_c_string(name);
     char utf8char[5];
+    char c0;
+    int charlength;
 
-    for (i=0; xxx[i]; i++)
-    {
-        if (xxx[i] < 0x80)  /* one byte */
-        {
-            sprintf(utf8char,"%c",xxx[i]);
-            l = 1;
-        }
-        else if (xxx[i] < 0xe0) /* two bytes */
-        {
-            sprintf(utf8char,"%c%c",xxx[i],xxx[i+1]);
-            i++;
-            l = 2;
-        }
-        else if (xxx[i] < 0xff) /* three bytes */
-        {
-            sprintf(utf8char,"%c%c%c",xxx[i],xxx[i+1],xxx[i+2]);
-            i++; i++;
-            l = 3;
-        }
-        else
-        {
-            sprintf(utf8char,"%c%c%c%c",xxx[i],xxx[i+1],xxx[i+2],xxx[i+3]);
-            i++; i++; i++;
-            l = 4;
-        }
-        chars = cons(strcons(l,utf8char),chars);
+    while ((c0 = *str)) {
+      charlength = utf8_sequence_length(c0);
+      snprintf(utf8char, charlength + 1, "%s", str);
+      chars = cons(strcons(charlength, utf8char), chars);
+      str += charlength;
     }
-    return reverse(chars);
 
+    return reverse(chars);
+}
+
+
+int utf8_ord(const char *utf8_seq) {
+  unsigned int len;
+  int ord;
+
+  unsigned char c0, c1, c2, c3;  // Potential bytes in the UTF8 symbol
+  c0 = utf8_seq[0];
+  len = utf8_sequence_length(c0);
+
+  // Make sure the string sequence we received matches with the
+  // expected length, and that the expected length is nonzero.
+  if ( (len == 0) ||
+       (len != strlen(utf8_seq))) {
+    return -1;
+  }
+
+  if (len == 1) {
+    // ASCII sequence.
+    return c0;
+  }
+
+  c1 = utf8_seq[1];
+  if (len == 2) {
+    ord = ((c0 & 0x1F) << 6) | (c1 & 0x3F);
+    if (ord < 0x80)
+      return -1;
+    return ord;
+  }
+
+  c2 = utf8_seq[2];
+  if (len == 3) {
+    if ((c2 & 0xC0) != 0x80)
+      return -1;
+    ord = ((c0 & 0x0F) << 12) | ((c1 & 0x3F) << 6) | (c2 & 0x3F);
+    if (ord < 0x800 ||
+        (ord >= 0xD800 && ord <= 0xDFFF))
+      return -1;
+    return ord;
+  }
+
+  c3 = utf8_seq[3];
+  if (len == 4) {
+    if ((c3 & 0xC0) != 0x80)
+      return -1;
+    ord =
+        ((c0 & 0x7) << 18) | ((c1 & 0x3F) << 12) |
+        ((c2 & 0x3F) << 6) | (c3 & 0x3F);
+    if (ord < 0x10000 || ord > 0x10FFFF)
+      return -1;
+    return ord;
+  }
+
+  return -1;
+}
+
+LISP utf8_ord_wrapper(LISP utf8_char) {
+  const char *ch = (const char *)get_c_string(utf8_char);
+  return lisp_val(utf8_ord(ch));
+}
+
+int utf8_chr(int ord, char* utf8char) {
+  unsigned int utf8len;
+  int i = 0;
+
+  if (ord < 0x80) {
+    utf8len = 1;
+  } else if (ord < 0x800) {
+    utf8len = 2;
+  } else if (ord <= 0xFFFF) {
+    utf8len = 3;
+  } else if (ord <= 0x200000) {
+    utf8len = 4;
+  } else {
+    // Replace invalid character with FFFD
+    utf8len = 2;
+    ord = 0xFFFD;
+  }
+
+  i = utf8len;  // Index into utf8char
+  utf8char[i--] = 0;
+
+  switch (utf8len) {
+    // These fallthrough deliberately
+    case 6:
+      utf8char[i--] = (ord | 0x80) & 0xBF;
+      ord >>= 6;
+    case 5:
+      utf8char[i--] = (ord | 0x80) & 0xBF;
+      ord >>= 6;
+    case 4:
+      utf8char[i--] = (ord | 0x80) & 0xBF;
+      ord >>= 6;
+    case 3:
+      utf8char[i--] = (ord | 0x80) & 0xBF;
+      ord >>= 6;
+    case 2:
+      utf8char[i--] = (ord | 0x80) & 0xBF;
+      ord >>= 6;
+    case 1:
+      switch (utf8len) {
+        case 0:
+        case 1:
+          utf8char[i--] = ord;
+          break;
+        case 2:
+          utf8char[i--] = ord | 0xC0;
+          break;
+        case 3:
+          utf8char[i--] = ord | 0xE0;
+          break;
+        case 4:
+          utf8char[i--] = ord | 0xF0;
+      }
+  }
+  return utf8len;
+}
+
+LISP utf8_chr_wrapper(LISP ord) {
+  char ch[5];
+  int utf8len;
+
+  utf8len = utf8_chr(get_c_int(ord), ch);
+  if (utf8len == 0) {
+    return NIL;
+  }
+
+  return strcons(utf8len, ch);
 }
 
 void festival_lisp_funcs(void)
@@ -459,6 +578,13 @@ void festival_lisp_funcs(void)
  "(utf8explode utf8string)\n\
   Returns a list of utf-8 characters in given string.");
     
+    init_subr_1("utf8ord", utf8_ord_wrapper,
+ "(utf8ord utf8char)\n\
+  Returns the decimal value utf8 character. -1 if character is invalid.");
+    init_subr_1("utf8chr", utf8_chr_wrapper,
+ "(utf8chr ord)\n\
+  Returns the utf8 character corresponding to given decimal value. Invalid characters are replaced by 0xFFFD.");
+
     init_subr_2("wagon",l_wagon,
  "(wagon ITEM TREE)\n\
   Apply the CART tree TREE to ITEM.  This returns the full\n\

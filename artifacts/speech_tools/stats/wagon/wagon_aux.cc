@@ -237,6 +237,8 @@ void WDataSet::load_description(const EST_String &fname, LISP ignores)
 	    p_type[i] = wndt_vector;
 	else if (tname == "trajectory")
 	    p_type[i] = wndt_trajectory;
+	else if (tname == "ols")
+	    p_type[i] = wndt_ols;
 	else if (tname == "matrix")
 	    p_type[i] = wndt_matrix;
 	else if (tname == "float")
@@ -369,6 +371,8 @@ EST_Val WImpurity::value(void)
 	return EST_Val(p.most_probable(&prob));
     else if (t==wnim_cluster)
 	return EST_Val(a.mean());
+    else if (t==wnim_ols)     /* OLS TBA */
+	return EST_Val(a.mean());
     else if (t==wnim_vector)
 	return EST_Val(a.mean()); /* wnim_vector */
     else if (t==wnim_trajectory)
@@ -385,6 +389,8 @@ double WImpurity::samples(void)
 	return (int)p.samples();
     else if (t==wnim_cluster)
 	return members.length();
+    else if (t==wnim_ols)
+	return members.length();
     else if (t==wnim_vector)
 	return members.length();
     else if (t==wnim_trajectory)
@@ -399,9 +405,12 @@ WImpurity::WImpurity(const WVectorVector &ds)
 
     t=wnim_unset;
     a.reset(); trajectory=0; l=0; width=0;
+    data = &ds;  // for ols, model calculation 
     for (i=0; i < ds.n(); i++)
     {
-	if (wgn_count_field == -1)
+        if (t == wnim_ols)
+            cumulate(i,1);
+        else if (wgn_count_field == -1)
 	    cumulate((*(ds(i)))[wgn_predictee],1);
         else
 	    cumulate((*(ds(i)))[wgn_predictee],
@@ -423,6 +432,8 @@ float WImpurity::measure(void)
 	return p.entropy()*p.samples();
     else if (t == wnim_cluster)
 	return cluster_impurity();
+    else if (t == wnim_ols)
+	return ols_impurity();  /* RMSE for OLS model */
     else
     {
 	cerr << "WImpurity: can't measure unset object" << endl;
@@ -435,12 +446,12 @@ float WImpurity::vector_impurity()
     // Find the mean/stddev for all values in all vectors
     // sum the variances and multiply them by the number of members
     EST_Litem *pp;
+    EST_Litem *countpp;
     int i,j;
     EST_SuffStats b;
     double count = 1;
-
+    
     a.reset();
-
 #if 1
     /* simple distance */
     for (j=0; j<wgn_VertexFeats.num_channels(); j++)
@@ -448,15 +459,67 @@ float WImpurity::vector_impurity()
         if (wgn_VertexFeats.a(0,j) > 0.0)
         {
             b.reset();
-            for (pp=members.head(); pp != 0; pp=pp->next())
+            for (pp=members.head(), countpp=member_counts.head(); pp != 0; pp=pp->next(), countpp=countpp->next())
             {
                 i = members.item(pp);
-                b += wgn_VertexTrack.a(i,j);
+
+		// Accumulate the value with count
+                b.cumulate(wgn_VertexTrack.a(i,j), member_counts.item(countpp)) ;
             }
             a += b.stddev();
             count = b.samples();
         }
     }
+#endif
+
+#if 0
+    EST_SuffStats *c;
+    float x, lshift, rshift, ushift;
+    /* Find base mean, then measure do fshift to find best match */
+    c = new EST_SuffStats[wgn_VertexTrack.num_channels()+1];
+    for (j=0; j<wgn_VertexFeats.num_channels(); j++)
+    {
+        if (wgn_VertexFeats.a(0,j) > 0.0)
+        {
+            c[j].reset();
+            for (pp=members.head(), countpp=member_counts.head(); pp != 0; 
+                 pp=pp->next(), countpp=countpp->next())
+            {
+                i = members.item(pp);
+		// Accumulate the value with count
+                c[j].cumulate(wgn_VertexTrack.a(i,j),member_counts.item(countpp));
+            }
+            count = c[j].samples();
+        }
+    }
+
+    /* Pass through again but vary the num_channels offset (hardcoded) */
+    for (pp=members.head(), countpp=member_counts.head(); pp != 0; 
+         pp=pp->next(), countpp=countpp->next())
+    {
+        int q;
+        float bshift, qshift;
+        /* For each sample */
+        i = members.item(pp);
+        /* Find the value left shifted, unshifted, and right shifted */
+        lshift = 0; ushift = 0; rshift = 0;
+        bshift = 0;
+        for (q=-20; q<=20; q++)
+        {
+            qshift = 0;
+            for (j=67+q; j<147+q/*hardcoded*/; j++)
+            {
+                x = c[j].mean() - wgn_VertexTrack(i,j);
+                qshift += sqrt(x*x);
+                if ((bshift > 0) && (qshift > bshift))
+                    break;
+            }
+            if ((bshift == 0) || (qshift < bshift))
+                bshift = qshift;
+        }
+        a += bshift;
+    }
+    
 #endif
 
 #if 0
@@ -701,6 +764,101 @@ float WImpurity::trajectory_impurity()
     return score;
 }
 
+static void part_to_ols_data(EST_FMatrix &X, EST_FMatrix &Y, 
+                             EST_IVector &included,
+                             EST_StrList &feat_names,
+                             const EST_IList &members,
+                             const WVectorVector &d)
+{
+    int m,n,p;
+    int w, xm=0;
+    EST_Litem *pp;
+    WVector *wv;
+
+    w = wgn_dataset.width();
+    included.resize(w);
+    X.resize(members.length(),w);
+    Y.resize(members.length(),1);
+    feat_names.append("Intercept");
+    included[0] = TRUE;
+
+    for (p=0,pp=members.head(); pp; p++,pp=pp->next())
+    {
+        n = members.item(pp);
+        if (n < 0) 
+        {
+            p--;
+            continue;
+        }
+        wv = d(n);
+	Y.a_no_check(p,0) = (*wv)[0];
+	X.a_no_check(p,0) = 1;
+	for (m=1,xm=1; m < w; m++)
+        {
+            if (wgn_dataset.ftype(m) == wndt_float)
+            {
+                if (p == 0) // only do this once
+                {
+                    feat_names.append(wgn_dataset.feat_name(m));
+                }
+                X.a_no_check(p,xm) = (*wv)[m];
+                included.a_no_check(xm) = FALSE;
+                included.a_no_check(xm) = TRUE;
+                xm++;
+            }
+        }
+    }
+
+    included.resize(xm);
+    X.resize(p,xm);
+    Y.resize(p,1);
+}
+
+float WImpurity::ols_impurity()
+{
+    // Build an OLS model for the current data and measure it against 
+    // the data itself and give a RMSE
+    EST_FMatrix X,Y;
+    EST_IVector included;
+    EST_FMatrix coeffs;
+    EST_StrList feat_names;
+    float best_score;
+    EST_FMatrix coeffsl;
+    EST_FMatrix pred;
+    float cor,rmse;
+
+    // Load the sample members into matrices for ols
+    part_to_ols_data(X,Y,included,feat_names,members,*data);
+
+    // Find the best ols model.
+    // Far too computationally expensive
+    //    if (!stepwise_ols(X,Y,feat_names,0.0,coeffs,
+    //                      X,Y,included,best_score))
+    //  return WGN_HUGE_VAL;  // couldn't find a model
+
+    // Non stepwise model
+    if (!robust_ols(X,Y,included,coeffsl))
+    {
+        //        printf("no robust ols\n");
+        return WGN_HUGE_VAL;
+    }
+    ols_apply(X,coeffsl,pred);
+    ols_test(Y,pred,cor,rmse);
+    best_score = cor;
+
+    printf("Impurity OLS X(%d,%d) Y(%d,%d) %f, %f, %f\n",
+             X.num_rows(),X.num_columns(),Y.num_rows(),Y.num_columns(),
+             rmse,cor,
+             1-best_score);
+    if (fabs(coeffsl[0]) > 10000)
+    {
+        // printf("weird sized Intercept %f\n",coeffsl[0]);
+        return WGN_HUGE_VAL;
+    }
+
+    return (1-best_score) *members.length();
+}
+
 float WImpurity::cluster_impurity()
 {
     // Find the mean distance between all members of the dataset
@@ -808,10 +966,18 @@ void WImpurity::cumulate(const float pv,double count)
 	t = wnim_cluster;
 	members.append((int)pv);
     }
+    else if (wgn_dataset.ftype(wgn_predictee) == wndt_ols)
+    {
+	t = wnim_ols;
+	members.append((int)pv);
+    }
     else if (wgn_dataset.ftype(wgn_predictee) == wndt_vector)
     {
 	t = wnim_vector;
+	
+	// AUP: Implement counts in vectors
 	members.append((int)pv);
+	member_counts.append((float)count);
     }
     else if (wgn_dataset.ftype(wgn_predictee) == wndt_trajectory)
     {
@@ -850,7 +1016,7 @@ ostream & operator <<(ostream &s, WImpurity &imp)
 	s << "(" << imp.a.stddev() << " " << imp.a.mean() << ")";
     else if (imp.t == wnim_vector)
     {
-	EST_Litem *p;
+      EST_Litem *p, *countp;
 	s << "((";
         imp.vector_impurity();
         if (wgn_vertex_output == "mean")  //output means
@@ -858,11 +1024,17 @@ ostream & operator <<(ostream &s, WImpurity &imp)
             for (j=0; j<wgn_VertexTrack.num_channels(); j++)
             {
                 b.reset();
-                for (p=imp.members.head(); p != 0; p=p->next())
+                for (p=imp.members.head(), countp=imp.member_counts.head(); p != 0; p=p->next(), countp=countp->next())
                 {
-                    b += wgn_VertexTrack.a(imp.members.item(p),j);
+		  // Accumulate the members with their counts
+		  b.cumulate(wgn_VertexTrack.a(imp.members.item(p),j), imp.member_counts.item(countp));
+		  //b += wgn_VertexTrack.a(imp.members.item(p),j);
                 }
-                s << "(" << b.mean() << " " << b.stddev() << ")";
+                s << "(" << b.mean() << " ";
+                if (isfinite(b.stddev()))
+                    s << b.stddev() << ")";
+                else
+                    s << "0.001" << ")";
                 if (j+1<wgn_VertexTrack.num_channels())
                     s << " ";
             }
@@ -908,7 +1080,7 @@ ostream & operator <<(ostream &s, WImpurity &imp)
                 s << wgn_VertexTrack.a(bestp,j);
                 //                s << " 0 "; // fake stddev
                 s << " ";
-                if (finite(cs[j].stddev()))
+                if (isfinite(cs[j].stddev()))
                     s << cs[j].stddev();
                 else
                     s << "0";
@@ -955,6 +1127,42 @@ ostream & operator <<(ostream &s, WImpurity &imp)
 	s << ") ";
 	// Mean of cross product of distances (cluster score)
 	s << imp.a.mean() << ")";
+    }
+    else if (imp.t == wnim_ols)
+    {
+        /* Output intercept, feature names and coefficients for ols model */
+        EST_FMatrix X,Y;
+        EST_IVector included;
+        EST_FMatrix coeffs;
+        EST_StrList feat_names;
+        EST_FMatrix coeffsl;
+        EST_FMatrix pred;
+        float cor=0.0,rmse;
+
+        s << "((";
+        // Load the sample members into matrices for ols
+        part_to_ols_data(X,Y,included,feat_names,imp.members,*(imp.data));
+        if (!robust_ols(X,Y,included,coeffsl))
+        {
+            printf("no robust ols\n");
+            // shouldn't happen 
+        }
+        else
+        {
+            ols_apply(X,coeffsl,pred);
+            ols_test(Y,pred,cor,rmse);
+            for (i=0; i<coeffsl.num_rows(); i++)
+            {
+                s << "(";
+                s << feat_names.nth(i);
+                s << " ";
+                s << coeffsl[i];
+                s << ") ";
+            }
+        }
+
+	// Mean of cross product of distances (cluster score)
+	s << ") " << cor << ")";
     }
     else if (imp.t == wnim_class)
     {

@@ -165,10 +165,10 @@ public:
 
 // Auxiliary functions  
 // smoothing
-void frequency_of_frequencies(EST_DVector &ff, EST_Ngrammar &n, int this_order=0);
-void map_frequencies(EST_Ngrammar &n, const EST_DVector &map, int this_order=0);
-bool Good_Turing_smooth(EST_Ngrammar &n, int maxcount, int mincount=0);
-void Good_Turing_discount(EST_Ngrammar &ngrammar, int maxcount, double default_discount=0.5);
+void frequency_of_frequencies(EST_DVector &ff, EST_Ngrammar &n, int this_order);
+void map_frequencies(EST_Ngrammar &n, const EST_DVector &map, int this_order);
+bool Good_Turing_smooth(EST_Ngrammar &n, int maxcount, int mincount);
+void Good_Turing_discount(EST_Ngrammar &ngrammar, int maxcount, double default_discount);
 
 void fs_build_backoff_ngrams(EST_Ngrammar *backoff_ngrams, EST_Ngrammar &ngram);
 int fs_backoff_smooth(EST_Ngrammar *backoff_ngrams, EST_Ngrammar &ngram, int smooth_thresh);

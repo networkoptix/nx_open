@@ -161,7 +161,7 @@ static void siod_print_docstring(const char *symname,
 	    ((dsc[i+1] == '@') ||
 	     (dsc[i+1] == '{') ||
 	     (dsc[i+1] == '}')))
-	    state = state;
+	    continue;
 	else if (state == 0)
 	{
 	    putc(dsc[i],fp);
