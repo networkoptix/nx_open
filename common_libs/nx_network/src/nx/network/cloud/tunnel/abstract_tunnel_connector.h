@@ -22,7 +22,7 @@ namespace cloud {
 /** Creates outgoing specialized AbstractTunnelConnection.
     \note Methods of this class are not thread-safe
  */
-class AbstractTunnelConnector
+class NX_NETWORK_API AbstractTunnelConnector
 :
     public QnStoppableAsync
 {

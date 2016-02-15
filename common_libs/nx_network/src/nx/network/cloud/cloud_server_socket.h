@@ -1,10 +1,10 @@
 #ifndef nx_cc_cloud_server_socket_h
 #define nx_cc_cloud_server_socket_h
 
-#include <nx/utils/async_operation_guard.h>
 #include <nx/network/abstract_socket.h>
-
-#include "tunnel/incoming_tunnel.h"
+#include <nx/network/cloud/mediator_connections.h>
+#include <nx/network/cloud/tunnel/incoming_tunnel_pool.h>
+#include <nx/network/socket_attributes_cache.h>
 
 namespace nx {
 namespace network {
@@ -15,7 +15,8 @@ namespace cloud {
     Listening hostname is reported to the mediator to listen on.
     \todo #ak what listening port should mean in this case?
 */
-class NX_NETWORK_API CloudServerSocket:
+class NX_NETWORK_API CloudServerSocket
+:
     public AbstractSocketAttributesCache<
         AbstractStreamServerSocket, SocketAttributes>
 {

@@ -2,8 +2,7 @@
 
 #include <nx/network/socket_global.h>
 #include <nx/network/stream_socket_wrapper.h>
-
-#include "cloud_tunnel_udt.h"
+#include <nx/network/cloud/tunnel/udp_hole_punching_acceptor.h>
 
 namespace nx {
 namespace network {
@@ -20,11 +19,11 @@ static const std::vector<CloudServerSocket::AcceptorMaker> defaultAcceptorMakers
         if (event.connectionMethods & udpHolePunching)
         {
             event.connectionMethods ^= udpHolePunching; //< used
-            auto acceptor = std::make_unique<UdtTunnelAcceptor>(
-                std::move(selfPeerId),
-                event.connectSessionId, event.originatingPeerID);
+            auto acceptor = std::make_unique<UdpHolePunchingTunnelAcceptor>(
+                std::move(event.connectSessionId),
+                std::move(selfPeerId), std::move(event.originatingPeerID),
+                std::move(event.udpEndpointList));
 
-            acceptor->setTargetAddresses(std::move(event.udpEndpointList));
             return std::unique_ptr<AbstractTunnelAcceptor>(std::move(acceptor));
         }
 
@@ -242,27 +241,28 @@ void CloudServerSocket::startAcceptor(
         m_acceptors.push_back(std::move(acceptor));
     }
 
-    acceptorPtr->accept([this, acceptorPtr](
-        SystemError::ErrorCode code,
-        std::unique_ptr<AbstractTunnelConnection> connection)
-    {
-        NX_LOGX(lm("acceptor %1 returned %2: %3")
-                .arg(acceptorPtr).arg(connection)
-                .arg(SystemError::toString(code)), cl_logDEBUG2);
+    acceptorPtr->accept(
+        [this, acceptorPtr](
+            SystemError::ErrorCode code,
+            std::unique_ptr<AbstractIncomingTunnelConnection> connection)
+        {
+            NX_LOGX(lm("acceptor %1 returned %2: %3")
+                    .arg(acceptorPtr).arg(connection)
+                    .arg(SystemError::toString(code)), cl_logDEBUG2);
 
-        if (code == SystemError::noError)
-            m_tunnelPool->addNewTunnel(std::move(connection));
+            if (code == SystemError::noError)
+                m_tunnelPool->addNewTunnel(std::move(connection));
 
-        QnMutexLocker lock(&m_mutex);
-        const auto it = std::find_if(
-            m_acceptors.begin(), m_acceptors.end(),
-            [&](const std::unique_ptr<AbstractTunnelAcceptor>& a)
-            { return a.get() == acceptorPtr; });
+            QnMutexLocker lock(&m_mutex);
+            const auto it = std::find_if(
+                m_acceptors.begin(), m_acceptors.end(),
+                [&](const std::unique_ptr<AbstractTunnelAcceptor>& a)
+                { return a.get() == acceptorPtr; });
 
-        Q_ASSERT_X(it != m_acceptors.end(), Q_FUNC_INFO,
-                   "Is acceptor already dead?");
-        m_acceptors.erase(it);
-    });
+            Q_ASSERT_X(it != m_acceptors.end(), Q_FUNC_INFO,
+                       "Is acceptor already dead?");
+            m_acceptors.erase(it);
+        });
 }
 
 } // namespace cloud
