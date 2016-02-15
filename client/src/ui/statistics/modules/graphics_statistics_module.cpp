@@ -1,10 +1,39 @@
 
-// Percentage of time when the window is active
-// Percentage of time when the window is in fullscreen mode
+#include "graphics_statistics_module.h"
 
-// Time when video is live (per camera??? what with desync layouts?)
-// Time when video is in archive
-// Time when video is paused
-// Time when the camera is on fullscreen (any camera)
-// Time when control panels are visible (per panel)
-// Time when panels are unpinned
+#include <ui/workbench/workbench_context.h>
+
+QnGraphicsStatisticsModule::QnGraphicsStatisticsModule(QObject *parent)
+    : base_type(parent)
+    , m_context()
+{
+
+}
+
+QnGraphicsStatisticsModule::~QnGraphicsStatisticsModule()
+{
+
+}
+
+QnMetricsHash QnGraphicsStatisticsModule::metrics() const
+{
+    return QnMetricsHash();
+}
+
+void QnGraphicsStatisticsModule::resetMetrics()
+{
+
+}
+
+void QnGraphicsStatisticsModule::setContext(QnWorkbenchContext *context)
+{
+    if (m_context == context)
+        return;
+
+
+    if (m_context)
+        disconnect(m_context, nullptr, this, nullptr);
+
+    m_context = context;
+}
+
