@@ -4,9 +4,9 @@
 ***********************************************************/
 
 #include "camera_advanced_settings_web_page.h"
-#include <QNetworkAccessManager>
-#include <QNetworkCookieJar>
-#include <QNetworkCookie>
+#include <QtNetwork/QNetworkAccessManager>
+#include <QtNetwork/QNetworkCookieJar>
+#include <QtNetwork/QNetworkCookie>
 #include "core/resource/resource.h"
 #include "http/custom_headers.h"
 
@@ -20,7 +20,7 @@ public:
         m_camRes = camRes;
     }
 
-    virtual QList<QNetworkCookie> cookiesForUrl ( const QUrl & url ) const override 
+    virtual QList<QNetworkCookie> cookiesForUrl ( const QUrl & url ) const override
     {
         QN_UNUSED(url);
         QList<QNetworkCookie> result;
