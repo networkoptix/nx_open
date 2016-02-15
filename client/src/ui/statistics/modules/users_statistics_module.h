@@ -22,5 +22,5 @@ public:
     void resetMetrics() override;
 
 private:
-    quint64 m_permissions;
+    QString m_currentUserName;
 };
