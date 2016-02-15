@@ -14,6 +14,8 @@ public:
 
     QString value() const;
 
+    void reset();
+
 private:
     qint64 duration() const;
 

@@ -33,6 +33,12 @@ QString ActiveTimeMetric::value() const
     return QString::number(duration());
 }
 
+void ActiveTimeMetric::reset()
+{
+    activateCounter(false);
+    m_activeStateDurationMs = 0;
+}
+
 qint64 ActiveTimeMetric::duration() const
 {
     const qint64 countedMs = (m_counter.isValid()

@@ -7,6 +7,8 @@ class QnActionManager;
 class AbstractActionMetric;
 typedef QPointer<QnActionManager> QnActionManagerPtr;
 
+class ActionCheckedTimeMetric;
+
 class QnActionsStatisticsModule : public QnAbstractStatisticsModule
 {
     Q_OBJECT
@@ -26,8 +28,11 @@ public:
 
 private:
     typedef QSharedPointer<AbstractActionMetric> MetricsPtr;
+    typedef QSharedPointer<ActionCheckedTimeMetric> CheckedTimeMetricPtr;
+    typedef QHash<QString, CheckedTimeMetricPtr> CheckedTimeMetricsHash;
     typedef QHash<QString, MetricsPtr> MetricsHash;
 
     QnActionManagerPtr m_actionManager;
-    MetricsHash m_metrics;
+    MetricsHash m_triggeredCountMetrics;
+    CheckedTimeMetricsHash m_checkedTimeMetrics;
 };

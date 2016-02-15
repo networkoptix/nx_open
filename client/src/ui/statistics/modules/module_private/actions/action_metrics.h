@@ -44,5 +44,5 @@ public:
     virtual ~ActionCheckedTimeMetric();
 
 private:
-    void onToggled();
+    void updateCounter(bool activate);
 };

@@ -35,7 +35,7 @@ ActionTriggeredCountMetric::ActionTriggeredCountMetric(QnActionManager *actionMa
     , m_values()
 {
     const auto action = actionManager->action(id);
-    connect(, &QAction::triggered
+    connect(action, &QAction::triggered
         , this, &ActionTriggeredCountMetric::onTriggered);
 }
 
@@ -68,13 +68,16 @@ ActionCheckedTimeMetric::ActionCheckedTimeMetric(QnActionManager *actionManager
     : base_type()
     , ActiveTimeMetric()
 {
-    const auto action = actionManager->action(id);
+    auto action = actionManager->action(id);
+    connect(action, &QAction::toggled, this
+        , &ActionCheckedTimeMetric::updateCounter);
 }
 
 ActionCheckedTimeMetric::~ActionCheckedTimeMetric()
 {}
 
-void ActionCheckedTimeMetric::onToggled()
+void ActionCheckedTimeMetric::updateCounter(bool activate)
 {
-
+    activateCounter(activate);
 }
+
