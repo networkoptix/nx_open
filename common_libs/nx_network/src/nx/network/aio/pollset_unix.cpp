@@ -23,6 +23,12 @@
 
 using namespace std;
 
+namespace nx
+{
+
+namespace network
+{
+
 namespace aio
 {
 
@@ -459,6 +465,9 @@ namespace aio
         _end.m_impl->pollSetImpl = m_impl;
         return _end;
     }
+}
+
+}
 }
 
 #endif  //__linux__
