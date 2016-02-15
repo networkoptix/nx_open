@@ -92,9 +92,12 @@ public:
     virtual bool setSendTimeout( unsigned int ms ) override;
     virtual bool getSendTimeout( unsigned int* millis ) const override;
     virtual bool getLastError( SystemError::ErrorCode* errorCode ) const override;
+    bool setRendezvous(bool val);
+
     virtual AbstractSocket::SOCKET_HANDLE handle() const override;
     virtual nx::network::aio::AbstractAioThread* getAioThread() override;
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
+
     // AbstractCommunicatingSocket ------- interface
     virtual bool connect(
         const SocketAddress& remoteAddress,

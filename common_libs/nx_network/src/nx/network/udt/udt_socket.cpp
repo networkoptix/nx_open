@@ -172,8 +172,6 @@ public:
     bool GetSendTimeout( unsigned int* millis ) const ;
     bool GetLastError( SystemError::ErrorCode* errorCode ) const;
     AbstractSocket::SOCKET_HANDLE handle() const;
-    int Recv( void* buffer, unsigned int bufferLen, int flags );
-    int Send( const void* buffer, unsigned int bufferLen );
     bool Reopen();
 
 private:
@@ -448,41 +446,6 @@ AbstractSocket::SOCKET_HANDLE UdtSocketImpl::handle() const {
     return *reinterpret_cast<const AbstractSocket::SOCKET_HANDLE*>(&udtHandle);
 }
 
-
-int UdtSocketImpl::Recv( void* buffer, unsigned int bufferLen, int flags ) {
-    int sz = UDT::recv(udtHandle,reinterpret_cast<char*>(buffer),bufferLen,flags);
-    if( sz == UDT::ERROR ) {
-        // UDT doesn't translate the EOF into a recv with zero return, but instead
-        // it returns error with 2001 error code. We need to detect this and translate
-        // back with a zero return here .
-        int error_code = UDT::getlasterror().getErrorCode();
-        if( error_code == CUDTException::ECONNLOST ) {
-            return 0;
-        } else if( error_code == CUDTException::EINVSOCK ) {
-            // This is another very ugly hack since after our patch for UDT.
-            // UDT cannot distinguish a clean close or a crash. And I cannot
-            // come up with perfect way to patch the code and make it work.
-            // So we just hack here. When we encounter an error Invalid socket,
-            // it should be a clean close when we use a epoll.
-            return 0;
-        } else {
-            DEBUG_(TRACE_("UDT::recv",udtHandle));
-        }
-        SystemError::setLastErrorCode(convertToSystemError(UDT::getlasterror().getErrorCode()));
-    }
-    return sz;
-}
-
-int UdtSocketImpl::Send( const void* buffer, unsigned int bufferLen ) {
-    Q_ASSERT(!IsClosed());
-    int sz = UDT::send(udtHandle,reinterpret_cast<const char*>(buffer),bufferLen,0);
-    DEBUG_(
-        if(sz == UDT::ERROR ) TRACE_("UDT::send",udtHandle));
-    if( sz == UDT::ERROR )
-        SystemError::setLastErrorCode(convertToSystemError(UDT::getlasterror().getErrorCode()));
-    return sz;
-}
-
 // This is a meaningless function. You could call Close and then create another
 // one if you bundle the states not_initialized into the original Socket design.
 bool UdtSocketImpl::Reopen() {
@@ -656,6 +619,12 @@ bool UdtStreamSocket::getLastError( SystemError::ErrorCode* errorCode ) const {
     return m_impl->GetLastError(errorCode);
 }
 
+bool UdtStreamSocket::setRendezvous(bool val)
+{
+    return UDT::setsockopt(
+        m_impl->udtHandle, 0, UDT_RENDEZVOUS, &val, sizeof(bool)) == 0;
+}
+
 bool UdtStreamSocket::connect(
     const SocketAddress& remoteAddress,
     unsigned int timeoutMillis )
@@ -694,11 +663,45 @@ bool UdtStreamSocket::connect(
 }
 
 int UdtStreamSocket::recv( void* buffer, unsigned int bufferLen, int flags ) {
-    return m_impl->Recv(buffer,bufferLen,flags);
+    int sz = UDT::recv(m_impl->udtHandle, reinterpret_cast<char*>(buffer), bufferLen, flags);
+    if (sz == UDT::ERROR)
+    {
+        // UDT doesn't translate the EOF into a recv with zero return, but instead
+        // it returns error with 2001 error code. We need to detect this and translate
+        // back with a zero return here .
+        int error_code = UDT::getlasterror().getErrorCode();
+        if (error_code == CUDTException::ECONNLOST)
+        {
+            return 0;
+        }
+        else if (error_code == CUDTException::EINVSOCK)
+        {
+            // This is another very ugly hack since after our patch for UDT.
+            // UDT cannot distinguish a clean close or a crash. And I cannot
+            // come up with perfect way to patch the code and make it work.
+            // So we just hack here. When we encounter an error Invalid socket,
+            // it should be a clean close when we use a epoll.
+            return 0;
+        }
+        else
+        {
+            DEBUG_(TRACE_("UDT::recv", udtHandle));
+        }
+        SystemError::setLastErrorCode(
+            detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+    }
+    return sz;
 }
 
-int UdtStreamSocket::send( const void* buffer, unsigned int bufferLen ) {
-    return m_impl->Send(buffer,bufferLen);
+int UdtStreamSocket::send( const void* buffer, unsigned int bufferLen )
+{
+    Q_ASSERT(!m_impl->IsClosed());
+    int sz = UDT::send(m_impl->udtHandle, reinterpret_cast<const char*>(buffer), bufferLen, 0);
+    DEBUG_(if (sz == UDT::ERROR) TRACE_("UDT::send", udtHandle));
+    if (sz == UDT::ERROR)
+        SystemError::setLastErrorCode(
+            detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+    return sz;
 }
 
 SocketAddress UdtStreamSocket::getForeignAddress() const {
