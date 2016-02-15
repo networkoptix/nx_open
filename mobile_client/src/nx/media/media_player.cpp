@@ -52,23 +52,52 @@ class PlayerPrivate: public QObject
     Player *q_ptr;
 
 public:
-    Player::State state; //< Holds QT property value. */
-    Player::MediaStatus mediaStatus; //< Holds QT property value. */
-    bool liveMode; //< Either media is on live or archive position. Holds QT property value. */
-    qint64 position; //< UTC Playback position at msec. Holds QT property value. */
-    QAbstractVideoSurface* videoSurface; //< Video surface to render. Holds QT property value. */
-    QUrl url; //< media URL to play. Holds QT property value. */
+    // Holds QT property value.
+    Player::State state;
+    
+    // Holds QT property value.
+    Player::MediaStatus mediaStatus;
+    
+    // Either media is on live or archive position. Holds QT property value.
+    bool liveMode;
+    
+    // UTC Playback position at msec. Holds QT property value.
+    qint64 position;
+    
+    // Video surface to render. Holds QT property value.
+    QAbstractVideoSurface* videoSurface;
+    
+    // Media URL to play. Holds QT property value.
+    QUrl url;
+    
     int maxTextureSize;
 
-    QElapsedTimer ptsTimer; //< main AV timer for playback. */
-    boost::optional<qint64> lastVideoPts; //< last video frame PTS. */
-    qint64 ptsTimerBase; //< timestamp when the PTS timer was started. */
-    QnVideoFramePtr videoFrameToRender; //< decoded video which is awaiting to be rendered. */
-    std::unique_ptr<QnArchiveStreamReader> archiveReader; //< Separate thread. Performs network IO and gets compressed AV data. */
-    std::unique_ptr<PlayerDataConsumer> dataConsumer; //< Separate thread. Decodes compressed AV data. */
-    QTimer* execTimer; //< Timer for delayed call 'presentFrame'. */
-    qint64 lastSeekTimeMs; //< Last seek position. UTC time in msec. */
-    int liveBufferMs; //< Current duration of live buffer in range [kInitialLiveBufferMs.. kMaxLiveBufferMs]. */
+    // Main AV timer for playback.
+    QElapsedTimer ptsTimer; 
+    
+    // Last video frame PTS.
+    boost::optional<qint64> lastVideoPts;
+    
+    // Timestamp when the PTS timer was started.
+    qint64 ptsTimerBase;
+    
+    // Decoded video which is awaiting to be rendered.
+    QnVideoFramePtr videoFrameToRender;
+    
+    // Separate thread. Performs network IO and gets compressed AV data.
+    std::unique_ptr<QnArchiveStreamReader> archiveReader; 
+    
+    // Separate thread. Decodes compressed AV data.
+    std::unique_ptr<PlayerDataConsumer> dataConsumer;
+    
+    // Timer for delayed call to presentFrame().
+    QTimer* execTimer;
+    
+    // Last seek position. UTC time in msec.
+    qint64 lastSeekTimeMs; 
+    
+    // Current duration of live buffer in range [kInitialLiveBufferMs.. kMaxLiveBufferMs].
+    int liveBufferMs; 
 
     enum class BufferState
     {
@@ -77,9 +106,14 @@ public:
         Overflow,
     };
 
-    BufferState liveBufferState; //< live buffer state for the last frame. */
-    int underflowCounter; //< live buffer underflow counter. */
-    int overflowCounter; //< live buffer overflow counter. */
+    // Live buffer state for the last frame.
+    BufferState liveBufferState;
+
+    // Live buffer underflow counter.
+    int underflowCounter;
+
+    // Live buffer overflow counter.
+    int overflowCounter;
 
 private:
     PlayerPrivate(Player* parent);
