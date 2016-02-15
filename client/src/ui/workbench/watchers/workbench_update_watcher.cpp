@@ -84,7 +84,7 @@ void QnWorkbenchUpdateWatcher::at_checker_updateAvailable(const QnUpdateInfo &in
         return;
 
     /* We have no access rights. */
-    if (!menu()->canTrigger(Qn::SystemUpdateAction))
+    if (!menu()->canTrigger(QnActions::SystemUpdateAction))
         return;
 
     /* User was already notified about this release. */
@@ -205,7 +205,7 @@ void QnWorkbenchUpdateWatcher::showUpdateNotification(const QnUpdateInfo &info)
 
     /* We check for 'Yes' button. 'No' and even 'Ok' buttons are considered negative. */
     if (messageBox.clickedStandardButton() == QDialogButtonBox::Yes)
-        action(Qn::SystemUpdateAction)->trigger();
+        action(QnActions::SystemUpdateAction)->trigger();
     else
         qnSettings->setIgnoredUpdateVersion(messageBox.isChecked() ? info.currentRelease : QnSoftwareVersion());
 }

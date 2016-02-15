@@ -82,7 +82,7 @@ bool QnPreferencesDialog::canApplyChanges() {
         /* The slot must be connected as QueuedConnection because it must start the new instance
          * after the settings have been saved. Settings saving will be performed just after this (confirm)
          * without returning to the event loop. */
-        menu()->trigger(Qn::QueueAppRestartAction);
+        menu()->trigger(QnActions::QueueAppRestartAction);
         break;
     default:
         break;

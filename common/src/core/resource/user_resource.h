@@ -30,10 +30,12 @@ public:
 
     QByteArray getCryptSha512Hash() const;
     void setCryptSha512Hash(const QByteArray& hash);
-        
+
     QString getRealm() const;
     void setRealm( const QString& realm );
 
+    // Do not use this method directly.
+    // Use QnWorkbenchAccessController::globalPermissions(user) instead
     quint64 getPermissions() const;
     void setPermissions(quint64 permissions);
 

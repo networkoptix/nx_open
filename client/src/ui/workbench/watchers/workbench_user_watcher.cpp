@@ -93,7 +93,7 @@ void QnWorkbenchUserWatcher::at_resourcePool_resourceRemoved(const QnResourcePtr
 
     setCurrentUser(QnUserResourcePtr());
     if (!qnCommon->remoteGUID().isNull())
-        menu()->trigger(Qn::DisconnectAction, QnActionParameters().withArgument(Qn::ForceRole, true));
+        menu()->trigger(QnActions::DisconnectAction, QnActionParameters().withArgument(Qn::ForceRole, true));
 }
 
 bool QnWorkbenchUserWatcher::isReconnectRequired(const QnUserResourcePtr &user) {

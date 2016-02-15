@@ -368,7 +368,7 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult &result) {
                     qnClientMessageProcessor->setHoldConnection(false);
 
                 if (result.protocolChanged)
-                    menu()->trigger(Qn::DisconnectAction, QnActionParameters().withArgument(Qn::ForceRole, true));
+                    menu()->trigger(QnActions::DisconnectAction, QnActionParameters().withArgument(Qn::ForceRole, true));
             }
             break;
         case QnUpdateResult::Cancelled:
