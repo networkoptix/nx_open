@@ -15,14 +15,14 @@ class AbstractAudioDecoder;
 typedef std::unique_ptr<AbstractAudioDecoder> AudioDecoderPtr;
 
 /* 
-* This class allows to register various implementation for audio decoders. Exact list of decoders can be registered in runtime mode 
+* This class allows to register various implementations of audio decoders. Exact list of decoders can be registered in runtime.
 */
 class AudioDecoderRegistry
 {
 public:
     static AudioDecoderRegistry* instance();
     /*
-    * \returns optimal audio decoder (in case of any) compatible with such frame. Returns null pointer if no compatible decoder found.
+    * \returns optimal audio decoder (in case of any) compatible with such frame. Returns null if no compatible decoder found.
     */
     AudioDecoderPtr createCompatibleDecoder(const CodecID codec);
 
