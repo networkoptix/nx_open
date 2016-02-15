@@ -106,7 +106,6 @@ TEST_F(MediatorFunctionalTest, HolePunchingProcessor_generic)
     api::ResultCode resultCode = api::ResultCode::ok;
     api::ConnectionResultRequest connectionResult;
     connectionResult.connectSessionId = connectRequest.connectSessionId;
-    connectionResult.connectionSucceeded = true;
     std::tie(resultCode) =
         makeSyncCall<api::ResultCode>(
             std::bind(
@@ -209,7 +208,7 @@ TEST_F(MediatorFunctionalTest, HolePunchingProcessor_server_failure)
         api::ResultCode resultCode = api::ResultCode::ok;
         api::ConnectionResultRequest connectionResult;
         connectionResult.connectSessionId = connectRequest.connectSessionId;
-        connectionResult.connectionSucceeded = false;
+        connectionResult.resultCode = api::UdpHolePunchingResultCode::udtConnectFailed;
         std::tie(resultCode) =
             makeSyncCall<api::ResultCode>(
                 std::bind(

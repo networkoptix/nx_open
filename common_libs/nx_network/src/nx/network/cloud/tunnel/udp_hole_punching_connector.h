@@ -12,10 +12,12 @@
 
 #include <boost/optional.hpp>
 
+#include <nx/network/aio/timer.h>
+#include <nx/network/stun/udp_client.h>
+#include <nx/network/udt/udt_socket.h>
+
 #include "nx/network/cloud/data/connect_data.h"
 #include "nx/network/cloud/mediator_connections.h"
-#include "nx/network/stun/udp_client.h"
-#include "nx/network/udt/udt_socket.h"
 
 
 namespace nx {
@@ -44,7 +46,7 @@ public:
         std::chrono::milliseconds timeout,
         std::function<void(
             SystemError::ErrorCode errorCode,
-            std::unique_ptr<AbstractTunnelConnection>)> handler) override;
+            std::unique_ptr<AbstractOutgoingTunnelConnection>)> handler) override;
     virtual const AddressEntry& targetPeerAddress() const override;
 
 private:
@@ -53,10 +55,13 @@ private:
     std::unique_ptr<nx::hpm::api::MediatorClientUdpConnection> m_mediatorUdpClient;
     std::function<void(
         SystemError::ErrorCode errorCode,
-        std::unique_ptr<AbstractTunnelConnection>)> m_completionHandler;
+        std::unique_ptr<AbstractOutgoingTunnelConnection>)> m_completionHandler;
     boost::optional<SocketAddress> m_targetHostUdpAddress;
     std::unique_ptr<stun::UnreliableMessagePipeline> m_udpPipeline;
     std::unique_ptr<UdtStreamSocket> m_udtConnection;
+    nx::hpm::api::ConnectionResultRequest m_connectResultReport;
+    nx::network::aio::Timer m_timer;
+    bool m_done;
 
     /** implementation of \a UnreliableMessagePipelineEventHandler::messageReceived */
     virtual void messageReceived(
@@ -68,12 +73,16 @@ private:
     void onConnectResponse(
         nx::hpm::api::ResultCode resultCode,
         nx::hpm::api::ConnectResponse response);
-    void holePunchingDone();
     void onSynAckReceived(
         SystemError::ErrorCode errorCode,
         stun::Message synAckMessage);
     void onUdtConnectionEstablished(
         SystemError::ErrorCode errorCode);
+    void onTimeout();
+    /** always called within aio thread */
+    void holePunchingDone(
+        nx::hpm::api::UdpHolePunchingResultCode resultCode,
+        SystemError::ErrorCode sysErrorCode);
     void connectSessionReportSent(
         SystemError::ErrorCode /*errorCode*/);
 };

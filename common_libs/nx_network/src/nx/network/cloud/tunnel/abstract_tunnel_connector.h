@@ -11,6 +11,7 @@
 
 #include <utils/common/stoppable.h>
 
+#include "abstract_outgoing_tunnel_connection.h"
 #include "tunnel.h"
 
 
@@ -37,7 +38,7 @@ public:
         std::chrono::milliseconds timeout,
         std::function<void(
             SystemError::ErrorCode errorCode,
-            std::unique_ptr<AbstractTunnelConnection>)> handler) = 0;
+            std::unique_ptr<AbstractOutgoingTunnelConnection>)> handler) = 0;
     virtual const AddressEntry& targetPeerAddress() const = 0;
 };
 

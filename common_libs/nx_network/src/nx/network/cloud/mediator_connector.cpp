@@ -67,6 +67,7 @@ void MediatorConnector::mockupAddress( SocketAddress address )
     NX_LOGX( lit( "Mediator address is mocked up: %1" )
              .arg( address.toString() ), cl_logWARNING );
 
+    m_mediatorAddress = std::move(address);
     m_stunClient->connect( address );
     m_promise->set_value( true );
 }
@@ -103,6 +104,11 @@ void MediatorConnector::pleaseStop( std::function<void()> handler )
     m_timerSocket->pleaseStop(std::move(handler));
 }
 
+boost::optional<SocketAddress> MediatorConnector::mediatorAddress() const
+{
+    return m_mediatorAddress;
+}
+
 static bool isReady(std::future<bool> const& f)
 {
     return f.wait_for(std::chrono::seconds(0)) == std::future_status::ready;
@@ -131,6 +137,7 @@ void MediatorConnector::fetchEndpoint()
             NX_LOGX( lit( "Fetched mediator address: %1" )
                      .arg( address.toString() ), cl_logALWAYS );
 
+            m_mediatorAddress = std::move(address);
             m_stunClient->connect( address );
             if (!isReady(*m_future))
                 m_promise->set_value( true );
