@@ -21,3 +21,7 @@ INCLUDEPATH += ${root.dir}/mediaserver_core/src/
   ext_debug.depends = $(TARGET).debug
   QMAKE_EXTRA_TARGETS += ext_debug ext_debug2
 }
+
+unix:!mac {
+    QMAKE_LFLAGS += "-Wl,-rpath-link,${libdir}/lib/$$CONFIGURATION/"
+}

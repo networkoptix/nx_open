@@ -9,7 +9,7 @@ VERSION = ${release.version}
 unix {
     VERSION = ${linux.release.version}
 }
-QT += ${qt.libs}
+QT += ${qt.libs} core-private
 ADDITIONAL_QT_INCLUDES=${environment.dir}/qt5-custom
 
 
