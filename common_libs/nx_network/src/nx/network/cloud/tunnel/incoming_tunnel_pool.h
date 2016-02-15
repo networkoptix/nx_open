@@ -1,5 +1,8 @@
 #pragma once
 
+#include <deque>
+#include <set>
+
 #include <nx/network/abstract_socket.h>
 #include "abstract_tunnel_acceptor.h"
 
