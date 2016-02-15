@@ -3,7 +3,7 @@
 
 #include <ui/actions/action.h>
 #include <ui/actions/action_manager.h>
-#include <ui/statistics/modules/actions_module_private/action_metrics.h>
+#include <ui/statistics/modules/module_private/action_metrics.h>
 
 #include <utils/common/model_functions.h>
 

@@ -30,14 +30,21 @@ const QString ActionTriggeredCountMetric::kPostfix = lit("trg");
 
 ActionTriggeredCountMetric::ActionTriggeredCountMetric(QnActionManager *actionManager
     , QnActions::IDType id)
+    : base_type()
+    , AbstractActionMetric()
+    , m_values()
 {
-    connect(actionManager->action(id), &QAction::triggered, this, [this](bool /* checked */)
-    {
-        const QString path = makePath(kPostfix, sender());
+    const auto action = actionManager->action(id);
+    connect(, &QAction::triggered
+        , this, &ActionTriggeredCountMetric::onTriggered);
+}
 
-        ++m_values[kPostfix];  // Counts base trigger event number
-        ++m_values[path];
-    });
+void ActionTriggeredCountMetric::onTriggered()
+{
+    const QString path = makePath(kPostfix, sender());
+
+    ++m_values[kPostfix];  // Counts base trigger event number
+    ++m_values[path];
 }
 
 QnMetricsHash ActionTriggeredCountMetric::metrics() const
@@ -52,4 +59,22 @@ QnMetricsHash ActionTriggeredCountMetric::metrics() const
 void ActionTriggeredCountMetric::reset()
 {
     m_values.clear();
+}
+
+//
+
+ActionCheckedTimeMetric::ActionCheckedTimeMetric(QnActionManager *actionManager
+    , QnActions::IDType id)
+    : base_type()
+    , ActiveTimeMetric()
+{
+    const auto action = actionManager->action(id);
+}
+
+ActionCheckedTimeMetric::~ActionCheckedTimeMetric()
+{}
+
+void ActionCheckedTimeMetric::onToggled()
+{
+
 }
