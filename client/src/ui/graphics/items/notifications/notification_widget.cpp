@@ -270,7 +270,7 @@ void QnNotificationWidget::setGeometry(const QRectF &geometry) {
         updateOverlayGeometry();
 }
 
-void QnNotificationWidget::addActionButton(const QIcon &icon, const QString &tooltip, QnActions::Type actionId,
+void QnNotificationWidget::addActionButton(const QIcon &icon, const QString &tooltip, QnActions::IDType actionId,
                                          const QnActionParameters &parameters, bool defaultAction)
 {
     qreal buttonSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, NULL, NULL);

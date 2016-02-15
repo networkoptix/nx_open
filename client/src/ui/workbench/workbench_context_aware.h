@@ -63,7 +63,7 @@ public:
 protected:
     virtual void afterContextInitialized();
 
-    QAction *action(const QnActions::Type id) const;
+    QAction *action(const QnActions::IDType id) const;
 
     QnActionManager *menu() const;
 

@@ -59,7 +59,7 @@ bool QnGeneralSystemAdministrationWidget::hasChanges() const  {
 }
 
 void QnGeneralSystemAdministrationWidget::retranslateUi() {
-    auto shortcutString = [this](const QnActions::Type actionId, const QString &baseString) -> QString {
+    auto shortcutString = [this](const QnActions::IDType actionId, const QString &baseString) -> QString {
         auto shortcut = action(actionId)->shortcut();
         if (shortcut.isEmpty())
             return baseString;

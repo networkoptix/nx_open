@@ -10,13 +10,13 @@
 class QnActions
 {
     Q_GADGET
-    Q_ENUMS(Type)
+    Q_ENUMS(IDType)
 
 public:
     /**
      * Enum of all menu actions.
      */
-    enum Type
+    enum IDType
     {
         /* Actions that are not assigned to any menu. */
 
@@ -1064,7 +1064,7 @@ public:
 
 };
 
-QN_FUSION_DECLARE_FUNCTIONS(QnActions::Type, (lexical)(metatype))
+QN_FUSION_DECLARE_FUNCTIONS(QnActions::IDType, (lexical)(metatype))
 
 namespace Qn
 {

@@ -452,7 +452,7 @@ QMenu *QnSearchBookmarksDialogPrivate::createContextMenu(const QnActionParameter
 {
     auto result = new QMenu();
 
-    const auto addActionToMenu = [this, result, params] (QnActions::Type id, QAction *action)
+    const auto addActionToMenu = [this, result, params] (QnActions::IDType id, QAction *action)
     {
         if (menu()->canTrigger(id, params))
             result->addAction(action);

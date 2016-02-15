@@ -153,7 +153,7 @@ void QnPtzPresetsToursActionFactory::at_action_triggered() {
         return;
 
     QnActionParameters parameters = action->data().value<QnActionParameters>();
-    QnActions::Type actionId = static_cast<QnActions::Type>(
+    QnActions::IDType actionId = static_cast<QnActions::IDType>(
         parameters.argument<int>(Qn::ActionIdRole, QnActions::NoAction));
 
     context()->menu()->trigger(actionId, parameters);

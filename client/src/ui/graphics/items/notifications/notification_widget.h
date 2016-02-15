@@ -104,7 +104,7 @@ public:
 
     void addActionButton(const QIcon &icon,
                          const QString &tooltip = QString(),
-                         QnActions::Type actionId = QnActions::NoAction,
+                         QnActions::IDType actionId = QnActions::NoAction,
                          const QnActionParameters &parameters = QnActionParameters(),
                          bool defaultAction = false);
 
@@ -129,7 +129,7 @@ public:
 signals:
     void notificationLevelChanged();
     void closeTriggered();
-    void actionTriggered(QnActions::Type actionId, const QnActionParameters &parameters);
+    void actionTriggered(QnActions::IDType actionId, const QnActionParameters &parameters);
 
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -153,10 +153,10 @@ private slots:
 private:
     struct ActionData {
         ActionData(): action(QnActions::NoAction){}
-        ActionData(QnActions::Type action): action(action){}
-        ActionData(QnActions::Type action, const QnActionParameters &params): action(action), params(params){}
+        ActionData(QnActions::IDType action): action(action){}
+        ActionData(QnActions::IDType action, const QnActionParameters &params): action(action), params(params){}
 
-        QnActions::Type action;
+        QnActions::IDType action;
         QnActionParameters params;
     };
 

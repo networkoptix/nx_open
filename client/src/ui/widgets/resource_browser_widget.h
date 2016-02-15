@@ -176,7 +176,7 @@ private:
 
     QnCameraThumbnailManager *m_thumbnailManager;
 
-    QMap<QnActions::Type, QAction*> m_renameActions;
+    QMap<QnActions::IDType, QAction*> m_renameActions;
 };
 
 #endif // QN_RESOURCE_BROWSER_WIDGET_H

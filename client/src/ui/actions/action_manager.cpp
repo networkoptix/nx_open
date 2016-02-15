@@ -327,7 +327,7 @@ public:
         m_currentGroup = NULL;
     }
 
-    QnActionBuilder operator()(QnActions::Type id) {
+    QnActionBuilder operator()(QnActions::IDType id) {
         QnAction *action = m_manager->action(id);
         if(action == NULL) {
             action = new QnAction(id, m_manager);
@@ -346,7 +346,7 @@ public:
     }
 
     QnActionBuilder operator()() {
-        return operator()(static_cast<QnActions::Type>(m_lastFreeActionId++));
+        return operator()(static_cast<QnActions::IDType>(m_lastFreeActionId++));
     }
 
 private:
@@ -1915,7 +1915,7 @@ void QnActionManager::registerAction(QnAction *action) {
     emit actionRegistered(action->id());
 }
 
-void QnActionManager::registerAlias(QnActions::Type id, QnActions::Type targetId) {
+void QnActionManager::registerAlias(QnActions::IDType id, QnActions::IDType targetId) {
     if(id == targetId) {
         qnWarning("Action cannot be an alias of itself.");
         return;
@@ -1936,7 +1936,7 @@ void QnActionManager::registerAlias(QnActions::Type id, QnActions::Type targetId
     m_actionById[id] = targetAction;
 }
 
-QnAction *QnActionManager::action(QnActions::Type id) const {
+QnAction *QnActionManager::action(QnActions::IDType id) const {
     return m_actionById.value(id, NULL);
 }
 
@@ -1944,7 +1944,7 @@ QList<QnAction *> QnActionManager::actions() const {
     return m_idByAction.keys();
 }
 
-bool QnActionManager::canTrigger(QnActions::Type id, const QnActionParameters &parameters) {
+bool QnActionManager::canTrigger(QnActions::IDType id, const QnActionParameters &parameters) {
     QnAction *action = m_actionById.value(id);
     if(!action)
         return false;
@@ -1952,7 +1952,7 @@ bool QnActionManager::canTrigger(QnActions::Type id, const QnActionParameters &p
     return action->checkCondition(action->scope(), parameters) == Qn::EnabledAction;
 }
 
-void QnActionManager::trigger(QnActions::Type id, const QnActionParameters &parameters) {
+void QnActionManager::trigger(QnActions::IDType id, const QnActionParameters &parameters) {
     QnAction *action = m_actionById.value(id);
     if(action == NULL) {
         qnWarning("Invalid action id '%1'.", static_cast<int>(id));
@@ -1969,7 +1969,7 @@ void QnActionManager::trigger(QnActions::Type id, const QnActionParameters &para
     action->trigger();
 }
 
-bool QnActionManager::triggerIfPossible(QnActions::Type id, const QnActionParameters &parameters) {
+bool QnActionManager::triggerIfPossible(QnActions::IDType id, const QnActionParameters &parameters) {
     QnAction *action = m_actionById.value(id);
     if(action == NULL) {
         qnWarning("Invalid action id '%1'.", static_cast<int>(id));
@@ -2012,7 +2012,7 @@ QMenu *QnActionManager::newMenu(Qn::ActionScope scope, QWidget *parent, const Qn
     return newMenu(QnActions::NoAction, scope, parent, parameters, options);
 }
 
-QMenu *QnActionManager::newMenu(QnActions::Type rootId, Qn::ActionScope scope, QWidget *parent, const QnActionParameters &parameters, CreationOptions options) {
+QMenu *QnActionManager::newMenu(QnActions::IDType rootId, Qn::ActionScope scope, QWidget *parent, const QnActionParameters &parameters, CreationOptions options) {
     QnAction *rootAction = rootId == QnActions::NoAction ? m_root : action(rootId);
 
     QMenu *result = NULL;
@@ -2160,11 +2160,11 @@ QnActionParameters QnActionManager::currentParameters(QObject *sender) const {
     }
 }
 
-void QnActionManager::redirectAction(QMenu *menu, QnActions::Type sourceId, QAction *targetAction) {
+void QnActionManager::redirectAction(QMenu *menu, QnActions::IDType sourceId, QAction *targetAction) {
     redirectActionRecursive(menu, sourceId, targetAction);
 }
 
-bool QnActionManager::redirectActionRecursive(QMenu *menu, QnActions::Type sourceId, QAction *targetAction) {
+bool QnActionManager::redirectActionRecursive(QMenu *menu, QnActions::IDType sourceId, QAction *targetAction) {
     QList<QAction *> actions = menu->actions();
 
     foreach(QAction *action, actions) {

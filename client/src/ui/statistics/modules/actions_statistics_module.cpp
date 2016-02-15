@@ -9,7 +9,7 @@
 
 namespace
 {
-    QString aliasByActionId(QnActions::Type id)
+    QString aliasByActionId(QnActions::IDType id)
     {
         return QnLexical::serialized(id);
     }
@@ -44,7 +44,7 @@ void QnActionsStatisticsModule::setActionManager(const QnActionManagerPtr &manag
     m_actionManager = manager;
 
     QPointer<QnActionsStatisticsModule> guard(this);
-    const auto createActionMetrics = [this, guard](QnActions::Type id)
+    const auto createActionMetrics = [this, guard](QnActions::IDType id)
     {
         if (!guard || !m_actionManager)
             return;

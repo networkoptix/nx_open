@@ -468,7 +468,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     context->instance<QnFglrxFullScreen>(); /* Init fglrx workaround. */
 
-    QnActions::Type effectiveMaximizeActionId = QnActions::FullscreenAction;
+    QnActions::IDType effectiveMaximizeActionId = QnActions::FullscreenAction;
 #ifdef Q_OS_LINUX
     /* In Ubuntu its launcher is configured to be shown when a non-fullscreen window has appeared.
      * In our case it means that launcher overlaps our fullscreen window when the user opens any dialogs.

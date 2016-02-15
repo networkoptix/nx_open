@@ -31,7 +31,7 @@ public:
     }
 
 private:
-    QToolButton *newActionButton(QnActions::Type actionId, QWidget *parent = NULL) {
+    QToolButton *newActionButton(QnActions::IDType actionId, QWidget *parent = NULL) {
         QToolButton *button = new QToolButton(parent);
         button->setDefaultAction(menu()->action(actionId));
         button->setToolButtonStyle(Qt::ToolButtonTextOnly);

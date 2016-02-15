@@ -162,7 +162,7 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *
 
     qreal buttonSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, NULL, NULL);
 
-    auto newButton = [this, buttonSize](QnActions::Type actionId, int helpTopicId) {
+    auto newButton = [this, buttonSize](QnActions::IDType actionId, int helpTopicId) {
         QnImageButtonWidget *button = new QnImageButtonWidget(m_headerWidget);
         button->setDefaultAction(action(actionId));
         button->setFixedSize(buttonSize);
@@ -736,7 +736,7 @@ void QnNotificationsCollectionWidget::at_list_itemRemoved(QnNotificationWidget *
     qnDeleteLater(item);
 }
 
-void QnNotificationsCollectionWidget::at_item_actionTriggered(QnActions::Type actionId, const QnActionParameters &parameters) {
+void QnNotificationsCollectionWidget::at_item_actionTriggered(QnActions::IDType actionId, const QnActionParameters &parameters) {
     menu()->trigger(actionId, parameters);
 }
 

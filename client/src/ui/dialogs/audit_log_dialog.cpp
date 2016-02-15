@@ -954,7 +954,7 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
 
 }
 
-void QnAuditLogDialog::triggerAction(const QnAuditRecord* record, QnActions::Type ActionId)
+void QnAuditLogDialog::triggerAction(const QnAuditRecord* record, QnActions::IDType ActionId)
 {
     QnResourceList resList;
     for (const auto& id: record->resources) {
