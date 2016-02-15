@@ -39,6 +39,12 @@ public:
     UdtSocket();
     virtual ~UdtSocket();
 
+    /** Binds UDT socket to an existing UDP socket.
+        \note This method can be called just after \a UdtSocket creation.
+        \note if method have failed \a UdtSocket instance MUST be destroyed!
+    */
+    bool bindToUdpSocket(UDPSocket&& udpSocket);
+
     bool getLastError(SystemError::ErrorCode* errorCode);
     bool getRecvTimeout(unsigned int* millis);
     bool getSendTimeout(unsigned int* millis);
@@ -65,7 +71,7 @@ class NX_NETWORK_API UdtStreamSocket
         , public AbstractStreamSocket
 {
 public:
-    UdtStreamSocket(bool natTraversal = true);
+    UdtStreamSocket();
     UdtStreamSocket(detail::UdtSocketImpl* impl);
     // We must declare this trivial constructor even it is trivial.
     // Since this will make std::unique_ptr call correct destructor for our
@@ -149,7 +155,7 @@ public:
         const nx::Buffer& buf,
         std::function<void(SystemError::ErrorCode, size_t)> handler) override;
     virtual void registerTimer(
-        unsigned int timeoutMillis,
+        std::chrono::milliseconds timeoutMillis,
         std::function<void()> handler) override;
 
     //!Implementation of AbstractSocket::post

@@ -61,6 +61,11 @@ public:
         int sockDesc,
         PollableSystemSocketImpl* impl = nullptr );
 
+    Socket(const Socket&) = delete;
+    Socket operator=(const Socket&) = delete;
+    Socket(Socket&&) = default;
+    Socket& operator=(Socket&&) = default;
+
     /**
      *   Close and deallocate this socket
      */
@@ -126,6 +131,12 @@ public:
      */
     bool setLocalPort(unsigned short localPort) ;
 
+    /** Moves ownership pf system socket out of \a Socket instance.
+        Leaves \a Socket instance in undefined state.
+        \note Caller MUST ensure that there are no async socket operations on this instance
+    */
+    AbstractSocket::SOCKET_HANDLE takeHandle();
+
     /**
      *   If WinSock, unload the WinSock DLLs; otherwise do nothing.  We ignore
      *   this in our sample client code but include it in the library for
@@ -154,14 +165,10 @@ public:
     bool createSocket( int type, int protocol );
 
 protected:
-    std::unique_ptr<aio::BaseAsyncSocketImplHelper<Pollable>> m_baseAsyncHelper;
+    aio::BaseAsyncSocketImplHelper<Pollable>* m_baseAsyncHelper;
 
 private:
     bool m_nonBlockingMode;
-
-    // Prevent the user from trying to use value semantics on this object
-    Socket(const Socket &sock);
-    void operator=(const Socket &sock);
 };
 
 /**
@@ -184,6 +191,11 @@ public:
         PollableSystemSocketImpl* sockImpl = nullptr );
 
     virtual ~CommunicatingSocket();
+
+    CommunicatingSocket(const CommunicatingSocket&) = delete;
+    CommunicatingSocket operator=(const CommunicatingSocket&) = delete;
+    CommunicatingSocket(CommunicatingSocket&&) = default;
+    CommunicatingSocket& operator=(CommunicatingSocket&&) = default;
 
     //!Implementation of AbstractCommunicatingSocket::connect
     virtual bool connect(
@@ -211,7 +223,7 @@ public:
         std::function<void( SystemError::ErrorCode, size_t )> handler ) override;
     //!Implementation of AbstractCommunicatingSocket::registerTimer
     virtual void registerTimer(
-        unsigned int timeoutMs,
+        std::chrono::milliseconds timeoutMs,
         std::function<void()> handler ) override;
     //!Implementation of AbstractCommunicatingSocket::cancelAsyncIO
     virtual void cancelIOAsync(
@@ -249,6 +261,11 @@ public:
     //!User by \a TCPServerSocket class
     TCPSocket( int newConnSD );
     virtual ~TCPSocket();
+
+    TCPSocket(const TCPSocket&) = delete;
+    TCPSocket& operator=(const TCPSocket&) = delete;
+    TCPSocket(TCPSocket&&) = default;
+    TCPSocket& operator=(TCPSocket&&) = default;
 
 
     //////////////////////////////////////////////////////////////////////
@@ -292,6 +309,11 @@ public:
     TCPServerSocket();
     ~TCPServerSocket();
 
+    TCPServerSocket(const TCPServerSocket&) = delete;
+    TCPServerSocket& operator=(const TCPServerSocket&) = delete;
+    TCPServerSocket(TCPServerSocket&&) = default;
+    TCPServerSocket& operator=(TCPServerSocket&&) = default;
+
     /**
      *   Blocks until a new connection is established on this socket or error
      *   @return new connection socket
@@ -331,6 +353,11 @@ public:
      *   Construct a UDP socket
      */
     UDPSocket( bool natTraversal = true );
+
+    UDPSocket(const UDPSocket&) = delete;
+    UDPSocket& operator=(const UDPSocket&) = delete;
+    UDPSocket(UDPSocket&&) = default;
+    UDPSocket& operator=(UDPSocket&&) = default;
 
     void setDestPort(unsigned short foreignPort);
 

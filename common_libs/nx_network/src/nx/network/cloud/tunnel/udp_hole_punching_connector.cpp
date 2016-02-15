@@ -27,22 +27,19 @@ UdpHolePunchingTunnelConnector::UdpHolePunchingTunnelConnector(
     m_targetHostAddress(std::move(targetHostAddress)),
     m_connectSessionId(QnUuid::createUuid().toByteArray()),
     m_mediatorUdpClient(
-        new api::MediatorClientUdpConnection(
+        std::make_unique<api::MediatorClientUdpConnection>(
             *nx::network::SocketGlobals::mediatorConnector().mediatorAddress())),   //UdpHolePunchingTunnelConnector MUST not be created if mediator address is unknown
-    m_udpPipeline(new stun::UnreliableMessagePipeline(this)),
     m_done(false)
 {
     assert(nx::network::SocketGlobals::mediatorConnector().mediatorAddress());
 
-    m_mediatorUdpClient->socket()->bindToAioThread(m_timer.getAioThread());
-    m_udpPipeline->socket()->bindToAioThread(m_timer.getAioThread());
+    m_mediatorUdpClient->socket().bindToAioThread(m_timer.getAioThread());
 }
 
 UdpHolePunchingTunnelConnector::~UdpHolePunchingTunnelConnector()
 {
     //it is OK if called after pleaseStop or within aio thread after connect handler has been called
     m_mediatorUdpClient.reset();
-    m_udpPipeline.reset();
     m_udtConnection.reset();
 }
 
@@ -53,7 +50,6 @@ void UdpHolePunchingTunnelConnector::pleaseStop(std::function<void()> handler)
         {
             //m_udtConnection cannot be modified since all processing is already stopped
             m_mediatorUdpClient.reset();
-            m_udpPipeline.reset();
             m_timer.pleaseStopSync();
             if (!m_udtConnection)
                 return handler();
@@ -78,30 +74,13 @@ void UdpHolePunchingTunnelConnector::connect(
         .arg(timeout),
         cl_logDEBUG2);
 
-    if (!m_mediatorUdpClient->socket()->setReuseAddrFlag(true) ||
-        !m_mediatorUdpClient->socket()->bind(
+    if (!m_mediatorUdpClient->socket().setReuseAddrFlag(true) ||
+        !m_mediatorUdpClient->socket().bind(
             SocketAddress(HostAddress::anyHost, 0)))
     {
         const auto errorCode = SystemError::getLastOSErrorCode();
         NX_LOGX(lm("session %1. Failed to bind to mediator udp client to local port. %2")
             .arg(m_connectSessionId).arg(SystemError::getLastOSErrorText()),
-            cl_logWARNING);
-        m_timer.post(
-            [handler = move(handler), errorCode]() mutable
-            {
-                handler(errorCode, nullptr);
-            });
-        return;
-    }
-
-    if (!m_udpPipeline->socket()->setReuseAddrFlag(true) ||
-        !m_udpPipeline->socket()->bind(m_mediatorUdpClient->localAddress()))
-    {
-        const auto errorCode = SystemError::getLastOSErrorCode();
-        NX_LOGX(lm("session %1. Failed to share local UDP address %2. %3")
-            .arg(m_connectSessionId)
-            .arg(m_mediatorUdpClient->localAddress().toString())
-            .arg(SystemError::getLastOSErrorText()),
             cl_logWARNING);
         m_timer.post(
             [handler = move(handler), errorCode]() mutable
@@ -134,70 +113,6 @@ void UdpHolePunchingTunnelConnector::connect(
 const AddressEntry& UdpHolePunchingTunnelConnector::targetPeerAddress() const
 {
     return m_targetHostAddress;
-}
-
-void UdpHolePunchingTunnelConnector::messageReceived(
-    SocketAddress msgSourceAddress,
-    stun::Message message)
-{
-    if (m_done)
-        return;
-    //here we expect SYN request from the target peer
-
-    if (!m_targetHostUdpAddress ||
-        msgSourceAddress != *m_targetHostUdpAddress ||
-        message.header.method != stun::cc::methods::udpHolePunchingSyn)
-    {
-        //NOTE in some cases we can receive SYN request before response from mediator. 
-        //Currently, we just ignore this case. Maybe, we can fill m_targetHostUdpAddress 
-        //if message.attribute<connectSessionId> match m_connectSessionId
-        NX_LOGX(lm("session %1. Received unexpected STUN %2 message from %3")
-            .arg(m_connectSessionId).arg(message.header.method),
-            cl_logDEBUG1);
-        return;
-    }
-
-    api::UdpHolePunchingSyn synRequest;
-    if (!synRequest.parse(message))
-    {
-        NX_LOGX(lm("session %1. Failed to parse STUN message from %2")
-            .arg(m_connectSessionId).arg(msgSourceAddress.toString()),
-            cl_logDEBUG1);
-        return;
-    }
-
-    if (synRequest.connectSessionId != m_connectSessionId)
-    {
-        NX_LOGX(lm("session %1. Received SYN with unknown connect session id (%2) from %3")
-            .arg(m_connectSessionId).arg(synRequest.connectSessionId)
-            .arg(msgSourceAddress.toString()),
-            cl_logDEBUG1);
-        return;
-    }
-
-    NX_LOGX(lm("session %1. Received SYN request message from %2")
-        .arg(m_connectSessionId).arg(msgSourceAddress.toString()),
-        cl_logDEBUG2);
-
-    //sending SYN-ACK in response
-    api::UdpHolePunchingSynAck synAckData;
-    synAckData.connectSessionId = m_connectSessionId;
-    stun::Message synAckMessage(
-        nx::stun::Header(
-            stun::MessageClass::successResponse,
-            stun::cc::methods::udpHolePunchingSynAck));
-    synAckData.serialize(&synAckMessage);
-    m_udpPipeline->sendMessage(
-        msgSourceAddress,
-        std::move(synAckMessage),
-        [](SystemError::ErrorCode /*errorCode*/, SocketAddress) {}); //ignoring send error, since we will failed with timeout anyway
-}
-
-void UdpHolePunchingTunnelConnector::ioFailure(
-    SystemError::ErrorCode errorCode)
-{
-    NX_LOGX(lm("session %1. Udp pipeline reported error. %2")
-        .arg(SystemError::toString(errorCode)), cl_logDEBUG1);
 }
 
 void UdpHolePunchingTunnelConnector::onConnectResponse(
@@ -238,67 +153,28 @@ void UdpHolePunchingTunnelConnector::onConnectResponse(
     m_connectResultReport.resultCode =
         api::UdpHolePunchingResultCode::noSynFromTargetPeer;
 
-    //initiating hole punching
-    //sending SYN to the target host
-    api::UdpHolePunchingSyn requestData;
-    requestData.connectSessionId = m_connectSessionId;
-    stun::Message synRequest(
-        nx::stun::Header(
-            stun::MessageClass::request,
-            stun::cc::methods::udpHolePunchingSyn));
-    requestData.serialize(&synRequest);
-
-    using namespace std::placeholders;
-    //TODO #ak here I use m_mediatorUdpClient to send request not to mediator, 
-        //but to the target peer. 
-        //Maybe, it is better to have another udp client?
-    m_mediatorUdpClient->sendRequestTo(
-        *m_targetHostUdpAddress,
-        std::move(synRequest),
-        /* custom retransmission parameters, */
-        std::bind(&UdpHolePunchingTunnelConnector::onSynAckReceived, this, _1, _2));
-}
-
-void UdpHolePunchingTunnelConnector::onSynAckReceived(
-    SystemError::ErrorCode errorCode,
-    stun::Message synAckMessage)
-{
-    if (m_done)
-        return;
-
-    if (errorCode != SystemError::noError)
+    //initiating rendezvous connect to the target host
+    auto udtConnection = std::make_unique<UdtStreamSocket>();
+    //TODO #ak calculate proper timeout
+    std::chrono::milliseconds connectTimeout(0);
+    if (!m_udtConnection->bindToUdpSocket(m_mediatorUdpClient->takeSocket()) ||    //moving system socket handler from m_mediatorUdpClient to m_udtConnection
+        !m_udtConnection->setRendezvous(true) ||
+        !m_udtConnection->setNonBlockingMode(true) ||
+        !m_udtConnection->setSendTimeout(connectTimeout.count()))
     {
-        NX_LOGX(lm("session %1. No response from target host. %2")
+        const auto errorCode = SystemError::getLastOSErrorCode();
+        NX_LOGX(lm("session %1. Failed to create UDT socket. %2")
             .arg(m_connectSessionId).arg(SystemError::toString(errorCode)),
-            cl_logDEBUG1);
-        return holePunchingDone(
-            api::UdpHolePunchingResultCode::noSynFromTargetPeer,
-            errorCode);
-    }
-
-    //received response from target host. Looks like, hole punching works...
-    //initiating UDT connection...
-    auto udtClientSocket = std::make_unique<UdtStreamSocket>();
-    //udtClientSocket->bindToAioThread(m_mediatorUdpClient->socket()->getAioThread()); //TODO #ak udt sockets live in another thread pool!
-    if (!udtClientSocket->setReuseAddrFlag(true) ||
-        !udtClientSocket->bind(m_mediatorUdpClient->localAddress()))
-    {
-        const auto sysErrorCode = SystemError::getLastOSErrorCode();
-        NX_LOGX(lm("session %1. Failed to bind UDT socket to local address %2. %3")
-            .arg(m_connectSessionId)
-            .arg(m_mediatorUdpClient->localAddress().toString())
-            .arg(SystemError::toString(sysErrorCode)),
             cl_logDEBUG1);
         return holePunchingDone(
             api::UdpHolePunchingResultCode::udtConnectFailed,
             errorCode);
     }
 
-    m_connectResultReport.resultCode =
-        api::UdpHolePunchingResultCode::udtConnectFailed;
+    m_mediatorUdpClient.reset();
 
-    m_udtConnection = std::move(udtClientSocket);
-    assert(m_targetHostUdpAddress);
+    m_udtConnection = std::move(udtConnection);
+    
     m_udtConnection->connectAsync(
         *m_targetHostUdpAddress,
         [this](SystemError::ErrorCode errorCode)
@@ -403,6 +279,13 @@ void UdpHolePunchingTunnelConnector::holePunchingDone(
     m_connectResultReport.resultCode = resultCode;
     m_connectResultReport.sysErrorCode = sysErrorCode;
     using namespace std::placeholders;
+    if (!m_mediatorUdpClient)
+    {
+        //m_mediatorUdpClient has give his socket to udt socket
+        m_mediatorUdpClient = std::make_unique<api::MediatorClientUdpConnection>(
+            *nx::network::SocketGlobals::mediatorConnector().mediatorAddress());
+        m_mediatorUdpClient->socket().bindToAioThread(m_timer.getAioThread());
+    }
     m_mediatorUdpClient->connectionResult(
         m_connectResultReport,
         [](api::ResultCode){ /* ignoring result */ });

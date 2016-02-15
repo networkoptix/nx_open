@@ -182,10 +182,6 @@ private:
 bool UdtSocketImpl::Open() {
     Q_ASSERT(IsClosed());
     udtHandle = UDT::socket(AF_INET,SOCK_STREAM,0);
-#ifdef TRACE_UDT_SOCKET
-    NX_LOG(lit("created UDT socket %1").arg(udtHandle), cl_logDEBUG2);
-#endif
-    VERIFY_(udtHandle != UDT::INVALID_SOCK,"UDT::socket",0);
     if( udtHandle != UDT::INVALID_SOCK ) {
         state_ = OPEN;
         return true;
@@ -505,6 +501,19 @@ UdtSocket::UdtSocket(detail::UdtSocketImpl* impl)
 {
 }
 
+bool UdtSocket::bindToUdpSocket(UDPSocket&& udpSocket)
+{
+    //taking system socket out of udpSocket
+    if (UDT::bind2(m_impl->udtHandle, udpSocket.handle()) != 0)
+    {
+        SystemError::setLastErrorCode(
+            detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+        return false;
+    }
+    udpSocket.takeHandle();
+    return true;
+}
+
 bool UdtSocket::getLastError(SystemError::ErrorCode* errorCode)
 {
     return m_impl->GetLastError(errorCode);
@@ -543,6 +552,26 @@ void UdtSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
 // =====================================================================
 // UdtStreamSocket implementation
 // =====================================================================
+UdtStreamSocket::UdtStreamSocket()
+:
+    m_aioHelper(
+        new aio::AsyncSocketImplHelper<UdtSocket>(this, this, false /*natTraversal*/))
+{
+    m_impl->Open();
+}
+
+UdtStreamSocket::UdtStreamSocket(detail::UdtSocketImpl* impl)
+:
+    UdtSocket(impl),
+    m_aioHelper(new aio::AsyncSocketImplHelper<UdtSocket>(this, this, false))
+{
+}
+
+UdtStreamSocket::~UdtStreamSocket()
+{
+    m_aioHelper->terminate();
+}
+
 bool UdtStreamSocket::bind( const SocketAddress& localAddress ) {
     return m_impl->Bind(localAddress);
 }
@@ -766,7 +795,7 @@ void UdtStreamSocket::sendAsync(
 }
 
 void UdtStreamSocket::registerTimer(
-    unsigned int timeoutMillis,
+    std::chrono::milliseconds timeoutMillis,
     std::function<void()> handler ) 
 {
     return m_aioHelper->registerTimer(timeoutMillis, std::move(handler));
@@ -784,25 +813,6 @@ aio::AbstractAioThread* UdtStreamSocket::getAioThread()
 void UdtStreamSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
     UdtSocket::bindToAioThread(aioThread);
-}
-
-UdtStreamSocket::UdtStreamSocket( bool natTraversal )
-:
-    m_aioHelper(new aio::AsyncSocketImplHelper<UdtSocket>(this, this, natTraversal))
-{
-    m_impl->Open();
-}
-
-UdtStreamSocket::UdtStreamSocket( detail::UdtSocketImpl* impl )
-:
-    UdtSocket(impl),
-    m_aioHelper(new aio::AsyncSocketImplHelper<UdtSocket>(this, this, false))
-{
-}
-
-UdtStreamSocket::~UdtStreamSocket()
-{
-    m_aioHelper->terminate();
 }
 
 // =====================================================================

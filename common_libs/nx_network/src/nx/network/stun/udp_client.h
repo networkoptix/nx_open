@@ -63,7 +63,13 @@ public:
         Message request,
         RequestCompletionHandler completionHandler);
 
-    const std::unique_ptr<AbstractDatagramSocket>& socket();
+    network::UDPSocket& socket();
+    /** Move ownership of socket to the caller.
+        \a UDPClient is in undefined state after this call and MUST be freed
+        \note Can be called within send/recv completion handler 
+            (more specifically, within socket's aio thread) only!
+    */
+    network::UDPSocket takeSocket();
     /** If not called, any vacant local port will be used */
     bool bind(const SocketAddress& localAddress);
     SocketAddress localAddress() const;

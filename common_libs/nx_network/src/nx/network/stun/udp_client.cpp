@@ -68,9 +68,14 @@ void UDPClient::pleaseStop(std::function<void()> handler)
         });
 }
 
-const std::unique_ptr<AbstractDatagramSocket>& UDPClient::socket()
+network::UDPSocket& UDPClient::socket()
 {
     return m_messagePipeline.socket();
+}
+
+network::UDPSocket UDPClient::takeSocket()
+{
+    return m_messagePipeline.takeSocket();
 }
 
 void UDPClient::sendRequestTo(
@@ -78,7 +83,7 @@ void UDPClient::sendRequestTo(
     Message request,
     RequestCompletionHandler completionHandler)
 {
-    m_messagePipeline.socket()->dispatch(std::bind(
+    m_messagePipeline.socket().dispatch(std::bind(
         &UDPClient::sendRequestInternal,
         this,
         std::move(serverAddress),
@@ -168,7 +173,7 @@ void UDPClient::sendRequestInternal(
     requestContext.currentRetransmitTimeout = m_retransmissionTimeout;
     requestContext.originalServerAddress = serverAddress;
     requestContext.timer = SocketFactory::createStreamSocket();
-    requestContext.timer->bindToAioThread(m_messagePipeline.socket()->getAioThread());
+    requestContext.timer->bindToAioThread(m_messagePipeline.socket().getAioThread());
     requestContext.request = std::move(request);
 
     sendRequestAndStartTimer(

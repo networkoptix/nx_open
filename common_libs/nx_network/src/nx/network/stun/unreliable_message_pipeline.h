@@ -15,6 +15,7 @@
 
 #include "nx/network/socket_common.h"
 #include "nx/network/socket_factory.h"
+#include "nx/network/system_socket.h"
 
 
 namespace nx {
@@ -60,8 +61,7 @@ public:
 
     UnreliableMessagePipeline(CustomPipeline* customPipeline)
     :
-        m_customPipeline(customPipeline),
-        m_socket(SocketFactory::createDatagramSocket())
+        m_customPipeline(customPipeline)
     {
     }
 
@@ -70,13 +70,13 @@ public:
     */
     virtual void pleaseStop(std::function<void()> completionHandler) override
     {
-        m_socket->pleaseStop(std::move(completionHandler));
+        m_socket.pleaseStop(std::move(completionHandler));
     }
 
     /** If not called, any vacant local port will be used */
     bool bind(const SocketAddress& localAddress)
     {
-        return m_socket->bind(localAddress);
+        return m_socket.bind(localAddress);
     }
 
     void startReceivingMessages()
@@ -84,13 +84,13 @@ public:
         using namespace std::placeholders;
         m_readBuffer.resize(0);
         m_readBuffer.reserve(nx::network::kMaxUDPDatagramSize);
-        m_socket->recvFromAsync(
+        m_socket.recvFromAsync(
             &m_readBuffer, std::bind(&self_type::onBytesRead, this, _1, _2, _3));
     }
 
     SocketAddress address() const
     {
-        return m_socket->getLocalAddress();
+        return m_socket.getLocalAddress();
     }
 
     /** Messages are pipelined. I.e. this method can be called before previous message has been sent */
@@ -108,7 +108,7 @@ public:
         assert(messageSerializer.serialize(&serializedMessage, &bytesWritten) ==
                 nx_api::SerializerState::done);
 
-        m_socket->dispatch(std::bind(
+        m_socket.dispatch(std::bind(
             &self_type::sendMessageInternal,
             this,
             std::move(destinationEndpoint),
@@ -116,9 +116,20 @@ public:
             std::move(completionHandler)));
     }
 
-    const std::unique_ptr<AbstractDatagramSocket>& socket()
+    UDPSocket& socket()
     {
         return m_socket;
+    }
+
+    /** Move ownership of socket to the caller.
+        \a UnreliableMessagePipeline is in undefined state after this call and MUST be freed
+        \note Can be called within send/recv completion handler 
+            (more specifically, within socket's aio thread) only!
+    */
+    UDPSocket takeSocket()
+    {
+        m_socket.cancelIOSync(aio::etNone);
+        return std::move(m_socket);
     }
 
 private:
@@ -155,7 +166,7 @@ private:
     };
 
     CustomPipeline* m_customPipeline;
-    std::unique_ptr<AbstractDatagramSocket> m_socket;
+    UDPSocket m_socket;
     nx::Buffer m_readBuffer;
     ParserType m_messageParser;
     std::deque<OutgoingMessageContext> m_sendQueue;
@@ -172,7 +183,7 @@ private:
             NX_LOGX(lm("Error reading from socket. %1").
                 arg(SystemError::toString(errorCode)), cl_logDEBUG1);
             m_customPipeline->ioFailure(errorCode);
-            m_socket->registerTimer(
+            m_socket.registerTimer(
                 kRetryReadAfterFailureTimeout,
                 [this]() { startReceivingMessages(); });
             return;
@@ -197,7 +208,7 @@ private:
         m_readBuffer.resize(0);
         m_readBuffer.reserve(nx::network::kMaxUDPDatagramSize);
         using namespace std::placeholders;
-        m_socket->recvFromAsync(
+        m_socket.recvFromAsync(
             &m_readBuffer, std::bind(&self_type::onBytesRead, this, _1, _2, _3));
     }
 
@@ -221,7 +232,7 @@ private:
         OutgoingMessageContext& msgCtx = m_sendQueue.front();
 
         using namespace std::placeholders;
-        m_socket->sendToAsync(
+        m_socket.sendToAsync(
             msgCtx.serializedMessage,
             msgCtx.destinationEndpoint,
             std::bind(&self_type::messageSent, this, _1, _2, _3));

@@ -52,7 +52,7 @@ void UDPMessageResponseSender::addOnConnectionCloseHandler(std::function<void()>
 
 AbstractCommunicatingSocket* UDPMessageResponseSender::socket()
 {
-    return m_udpServer->socket().get();
+    return &m_udpServer->socket();
 }
 
 }   //stun
