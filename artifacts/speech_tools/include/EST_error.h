@@ -186,7 +186,7 @@ enum EST_error_behaviour
 /* but we need the basic versions.                                       */
 
 #if (_MSC_VER > 1800) //if newer than VS 2013, disable warning: pointer truncation from 'const void *' to 'long'
-pragma warning (disable : 4311) 
+#pragma warning (disable : 4311) 
 #endif
 
 inline const char *error_name(const EST_String val) {return val;}
