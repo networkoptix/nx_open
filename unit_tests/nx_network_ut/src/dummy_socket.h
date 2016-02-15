@@ -67,7 +67,7 @@ public:
     virtual void sendAsync( const nx::Buffer& buf,
                             std::function<void( SystemError::ErrorCode, size_t )> handler ) override;
 
-    virtual void registerTimer( unsigned int timeoutMs,
+    virtual void registerTimer( std::chrono::milliseconds timeoutMs,
                                 std::function<void()> handler ) override;
 
     virtual aio::AbstractAioThread* getAioThread() override;

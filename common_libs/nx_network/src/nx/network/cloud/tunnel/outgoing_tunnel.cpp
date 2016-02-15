@@ -192,7 +192,7 @@ void OutgoingTunnel::updateTimerIfNeededNonSafe(
         assert(m_connectHandlers.begin()->first > curTime);
         const auto timeout = m_connectHandlers.begin()->first - curTime;
         m_aioThreadBinder.registerTimer(
-            std::chrono::duration_cast<std::chrono::milliseconds>(timeout).count(),
+            std::chrono::duration_cast<std::chrono::milliseconds>(timeout),
             std::bind(&OutgoingTunnel::onTimer, this));
     }
 }

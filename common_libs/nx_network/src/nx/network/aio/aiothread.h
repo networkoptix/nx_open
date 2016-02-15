@@ -130,13 +130,13 @@ public:
         SocketType* const sock,
         aio::EventType eventToWatch,
         AIOEventHandler<SocketType>* const eventHandler,
-        unsigned int timeoutMs = 0,
+        std::chrono::milliseconds timeoutMs = std::chrono::milliseconds(),
         std::function<void()> socketAddedToPollHandler = std::function<void()>() )
     {
         QnMutexLocker lk(&m_impl->mutex);
 
         //checking queue for reverse task for \a sock
-        if (m_impl->removeReverseTask(sock, eventToWatch, TaskType::tAdding, eventHandler, timeoutMs))
+        if (m_impl->removeReverseTask(sock, eventToWatch, TaskType::tAdding, eventHandler, timeoutMs.count()))
             return;    //ignoring task
 
         m_impl->pollSetModificationQueue.push_back(typename AIOThreadImplType::SocketAddRemoveTask(
@@ -144,7 +144,7 @@ public:
             sock,
             eventToWatch,
             eventHandler,
-            timeoutMs,
+            timeoutMs.count(),
             nullptr,
             socketAddedToPollHandler));
         if (eventToWatch == aio::etRead)
@@ -163,7 +163,7 @@ public:
         SocketType* const sock,
         aio::EventType eventToWatch,
         AIOEventHandler<SocketType>* const eventHandler,
-        unsigned int timeoutMs = 0,
+        std::chrono::milliseconds timeoutMs = std::chrono::milliseconds(0),
         std::function<void()> socketAddedToPollHandler = std::function<void()>() )
     {
         QnMutexLocker lk(&m_impl->mutex);
@@ -185,7 +185,7 @@ public:
             sock,
             eventToWatch,
             eventHandler,
-            timeoutMs,
+            timeoutMs.count(),
             nullptr,
             std::move(socketAddedToPollHandler)));
         if (currentThreadSystemId() != systemThreadId())  //if eventTriggered is lower on stack, socket will be added to pollset before next poll call

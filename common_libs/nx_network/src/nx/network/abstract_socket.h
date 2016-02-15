@@ -12,13 +12,13 @@
 #include <memory>
 
 #include <utils/common/byte_array.h>
+#include <utils/common/systemerror.h>
+#include <utils/common/stoppable.h>
 
 #include "aio/pollset.h"
 #include "buffer.h"
 #include "nettools.h"
 #include "socket_common.h"
-#include "utils/common/systemerror.h"
-#include "utils/common/stoppable.h"
 
 //todo: #ak cancel asynchoronous operations
 
@@ -292,10 +292,10 @@ public:
         \note \a timeoutMs MUST be greater then zero!
     */
     virtual void registerTimer(
-        unsigned int timeoutMs,
+        std::chrono::milliseconds timeout,
         std::function<void()> handler) = 0;
     void registerTimer(
-        std::chrono::milliseconds timeout,
+        unsigned int timeoutMs,
         std::function<void()> handler);
 
     //!Cancel async socket operation. \a cancellationDoneHandler is invoked when cancelled

@@ -229,7 +229,7 @@ public:
     }
     //!Implementation of AbstractCommunicatingSocket::registerTimer
     virtual void registerTimer(
-        unsigned int timeoutMs,
+        std::chrono::milliseconds timeoutMs,
         std::function<void()> handler ) override
     {
         return this->m_implDelegate.registerTimer( timeoutMs, std::move( handler ) );

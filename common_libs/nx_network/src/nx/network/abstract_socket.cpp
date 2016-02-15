@@ -43,10 +43,12 @@ int AbstractCommunicatingSocket::send(const QnByteArray& data)
 }
 
 void AbstractCommunicatingSocket::registerTimer(
-    std::chrono::milliseconds timeout,
+    unsigned int timeout,
     std::function<void()> handler)
 {
-    return registerTimer(timeout.count(), std::move(handler));
+    return registerTimer(
+        std::chrono::milliseconds(timeout),
+        std::move(handler));
 }
 
 void AbstractCommunicatingSocket::pleaseStop(std::function< void() > handler)

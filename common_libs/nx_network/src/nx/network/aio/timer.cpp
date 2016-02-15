@@ -14,7 +14,7 @@ void Timer::start(
     std::chrono::milliseconds timeout,
     std::function<void()> timerFunc)
 {
-    UDPSocket::registerTimer(timeout.count(), std::move(timerFunc));
+    UDPSocket::registerTimer(timeout, std::move(timerFunc));
 }
 
 void Timer::post(std::function<void()> funcToCall)

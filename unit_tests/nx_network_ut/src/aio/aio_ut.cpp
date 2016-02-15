@@ -62,7 +62,7 @@ TEST(aio, socketPolledNotification)
         &socket,
         aio::etRead,
         &evHandler,
-        0,
+        std::chrono::milliseconds(0),
         [&socketAddedFlag](){
             socketAddedFlag = true;
         });
@@ -110,7 +110,7 @@ TEST(aio, pollsetError)
         &socket,
         aio::etRead,
         &evHandler,
-        0,
+        std::chrono::milliseconds(0),
         [&socketAddedFlag, &handlerCalledFlag]() {
             ASSERT_FALSE(handlerCalledFlag.load());
             socketAddedFlag = true;

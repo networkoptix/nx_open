@@ -188,8 +188,8 @@ void DummySocket::sendAsync( const nx::Buffer& /*buf*/,
 {
 }
 
-void DummySocket::registerTimer( unsigned int /*timeoutMs*/,
-                                     std::function<void()> /*handler*/ )
+void DummySocket::registerTimer( std::chrono::milliseconds /*timeoutMs*/,
+                                 std::function<void()> /*handler*/ )
 {
 }
 

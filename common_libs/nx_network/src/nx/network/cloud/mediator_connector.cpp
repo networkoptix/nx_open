@@ -129,7 +129,7 @@ void MediatorConnector::fetchEndpoint()
 
             // retry after some delay
             if( !m_isTerminating )
-                m_timerSocket->registerTimer( RETRY_INTERVAL.count(),
+                m_timerSocket->registerTimer( RETRY_INTERVAL,
                                               [ this ](){ fetchEndpoint(); } );
         }
         else

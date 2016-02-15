@@ -1413,7 +1413,7 @@ int QnSSLSocket::asyncSendInternal(
 }
 
 void QnSSLSocket::registerTimer(
-    unsigned int timeoutMs,
+    std::chrono::milliseconds timeoutMs,
     std::function<void()> handler )
 {
     Q_D(QnSSLSocket);
@@ -1592,7 +1592,7 @@ void QnMixedSSLSocket::sendAsync(
 }
 
 void QnMixedSSLSocket::registerTimer(
-    unsigned int timeoutMs,
+    std::chrono::milliseconds timeoutMs,
     std::function<void()> handler )
 {
     Q_D(QnMixedSSLSocket);

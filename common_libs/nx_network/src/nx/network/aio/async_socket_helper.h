@@ -260,7 +260,9 @@ public:
         nx::network::SocketGlobals::aioService().watchSocketNonSafe( &lk, this->m_socket, aio::etWrite, this );
     }
 
-    void registerTimer( unsigned int timeoutMs, std::function<void()> handler )
+    void registerTimer(
+        std::chrono::milliseconds timeoutMs,
+        std::function<void()> handler )
     {
         if( this->m_socket->impl()->terminated.load( std::memory_order_relaxed ) > 0 )
             return;
@@ -626,8 +628,11 @@ private:
             this->m_socket,
             aio::etWrite,
             this,
-            boost::optional<unsigned int>(),
-            [this, resolvedAddress, sendTimeout](){ m_abstractSocketPtr->connect( resolvedAddress, sendTimeout ); } );    //to be called between pollset.add and pollset.poll
+            boost::none,
+            [this, resolvedAddress, sendTimeout]()
+            {
+                m_abstractSocketPtr->connect( resolvedAddress, std::chrono::milliseconds(sendTimeout) );
+            } );    //to be called between pollset.add and pollset.poll
         return true;
     }
 

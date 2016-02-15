@@ -36,6 +36,11 @@ public:
         std::unique_ptr<PollableImpl> impl = std::unique_ptr<PollableImpl>() );
     virtual ~Pollable() {}
 
+    Pollable(const Pollable&) = delete;
+    Pollable& operator=(const Pollable&) = delete;
+    Pollable(Pollable&&) = default;
+    Pollable& operator=(Pollable&&) = default;
+
     AbstractSocket::SOCKET_HANDLE handle() const;
     /*!
         \note Zero timeout means infinite timeout

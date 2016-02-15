@@ -148,7 +148,7 @@ public:
         if (m_connectTimeout)
         {
             m_aioThreadBinder.registerTimer(
-                m_connectTimeout->count(),
+                *m_connectTimeout,
                 [this, handler]()   //TODO #ak #msvc2015 move to lambda
                 {
                     connectInternal(std::move(handler));

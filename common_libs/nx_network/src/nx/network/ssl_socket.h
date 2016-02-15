@@ -105,7 +105,7 @@ protected:
         std::function<void( SystemError::ErrorCode, size_t )> handler ) override;
     //!Implementation of AbstractCommunicatingSocket::registerTimer
     virtual void registerTimer(
-        unsigned int timeoutMs,
+        std::chrono::milliseconds timeoutMs,
         std::function<void()> handler ) override;
 
 private:
@@ -148,7 +148,7 @@ protected:
         std::function<void( SystemError::ErrorCode, size_t )> handler ) override;
     //!Implementation of AbstractCommunicatingSocket::registerTimer
     virtual void registerTimer(
-        unsigned int timeoutMs,
+        std::chrono::milliseconds timeoutMs,
         std::function<void()> handler ) override;
 
 private:
