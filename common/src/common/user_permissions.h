@@ -1,8 +1,11 @@
 
 #pragma once
 
+#ifdef __cplusplus  // For safe iOS build
 #include <utils/common/model_functions_fwd.h>
+#endif
 
+// TODO: #ynikitenkov Add serialization using metaobject
 #ifndef QN_NO_NAMESPACES
 namespace Qn {
 #endif
