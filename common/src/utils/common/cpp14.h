@@ -22,7 +22,16 @@
 
 namespace std
 {
-#if (defined(_MSC_VER) && _MSC_VER <= 1700) || (defined(__GNUC__) && !__GNUC_PREREQ(4,9))
+#ifdef _MSC_VER
+#   if _MSC_VER <= 1700
+#       define USE_OWN_MAKE_UNIQUE
+#   endif
+#elif defined(__GNUC_PREREQ)
+#   if !__GNUC_PREREQ(4,9)
+#      define USE_OWN_MAKE_UNIQUE
+#   endif
+#endif
+#ifdef USE_OWN_MAKE_UNIQUE
 template<
     typename T>
     std::unique_ptr<T> make_unique()
@@ -76,7 +85,7 @@ template<
         std::forward<Arg3>( arg3 ),
         std::forward<Arg4>( arg4 ) ) );
 }
-#endif
+#endif  //USE_OWN_MAKE_UNIQUE
 }   //std
 
 namespace nx {
