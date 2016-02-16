@@ -146,7 +146,7 @@ AudioFramePtr FfmpegAudioDecoder::decode(const QnConstCompressedAudioDataPtr& fr
     audioFrame->context = d->abstractContext;
 
     // Ffmpeg pts/dts are mixed up here, so it's pkt_dts. Also Convert usec to msec.
-    audioFrame->timestampUsec = d->frame->pkt_dts / 1000;
+    audioFrame->timestampUsec = d->frame->pkt_dts;
 
     return AudioFramePtr(audioFrame);
 }

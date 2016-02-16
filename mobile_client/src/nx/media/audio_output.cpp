@@ -176,5 +176,11 @@ bool AudioOutput::isBuffering() const
     return d->isBuffering;
 }
 
+bool AudioOutput::canAcceptData() const
+{
+    // todo: implement me
+    return true;
+}
+
 } // namespace media
 } // namespace nx

@@ -69,6 +69,11 @@ public:
      */
     bool isBuffering() const;
 
+    /**
+     * @return False if audio buffer is full and can't accept new data right now
+     */
+    bool canAcceptData() const;
+
 signals:
     void stateChanged(QAudio::State state);
 

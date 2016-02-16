@@ -55,7 +55,10 @@ void PlayerDataConsumer::pleaseStop()
 
 bool PlayerDataConsumer::canAcceptData() const
 {
-    return base_type::canAcceptData();
+    if (m_audioOutput && !m_audioOutput->canAcceptData())
+        return false;
+    else
+        return base_type::canAcceptData();
 }
 
 int PlayerDataConsumer::getBufferingMask() const
@@ -137,7 +140,7 @@ QnCompressedVideoDataPtr PlayerDataConsumer::queueVideoFrame(
         // Frame time is inside the audio buffer, delay the frame while audio is buffered.
         return QnCompressedVideoDataPtr();
     }
-
+    m_predecodeQueue.pop_front();
     return result;
 }
 

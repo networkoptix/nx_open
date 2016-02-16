@@ -24,7 +24,7 @@ namespace media {
 namespace {
 
 // Max allowed frame duration. If the distance is higher, then the discontinuity is detected.
-static const qint64 kMaxFrameDuration = 1000 * 5;
+static const qint64 kMaxFrameDurationMs = 1000 * 5;
 
 static const qint64 kLivePosition = -1;
 
@@ -33,6 +33,12 @@ static const int kMaxDelayForResyncMs = 500;
 
 // Max allowed amount of underflow/overflow issues in Live mode before extending live buffer.
 static const int kMaxCounterForWrongLiveBuffer = 2;
+
+// Calculate next time to render later. It used for AV sync in case of audio buffer has hole in the middle.
+// At this case current audio playback position may be significant less than video frame PTS.
+// Audio and video timings will became similar as soon as audio buffer passes a hole.
+static const int kTryLaterIntervalMs = 16;
+
 
 static qint64 msecToUsec(qint64 posMs)
 {
@@ -123,6 +129,7 @@ private:
 
     void at_hurryUp();
     void at_gotVideoFrame();
+    void presentNextFrameDelayed();
 
     void presentNextFrame();
     qint64 getDelayForNextFrameMs(const QVideoFramePtr& frame);
@@ -234,7 +241,28 @@ void PlayerPrivate::at_gotVideoFrame()
             return; //< Display regular frames only if the player is playing.
     }
 
-    qint64 delayToRenderMs = getDelayForNextFrameMs(videoFrameToRender);
+    presentNextFrameDelayed();
+}
+
+void PlayerPrivate::presentNextFrameDelayed()
+{
+    qint64 delayToRenderMs = 0;
+    if (dataConsumer->audioOutput())
+    {
+        delayToRenderMs = getDelayForNextFrameWithAudioMs(videoFrameToRender);
+        // If video delay interval is bigger then audio buffer, it'll block audio playing.
+        // At this case calculate time again after a delay.
+        if (delayToRenderMs > dataConsumer->audioOutput()->currentBufferSizeUsec() / 1000)
+        {
+            QTimer::singleShot(kTryLaterIntervalMs, this, &PlayerPrivate::presentNextFrameDelayed); //< calculate next time to render later
+            return;
+        }
+    }
+    else
+    {
+        delayToRenderMs = getDelayForNextFrameWithoutAudioMs(videoFrameToRender);
+    }
+
     if (delayToRenderMs > 0)
         execTimer->start(delayToRenderMs);
     else
@@ -377,7 +405,7 @@ qint64 PlayerPrivate::getDelayForNextFrameWithoutAudioMs(const QVideoFramePtr& f
     }
 
     if (!lastVideoPts.is_initialized() || //< first time
-        !qBetween(*lastVideoPts, pts, *lastVideoPts + kMaxFrameDuration) || //< pts discontinue
+        !qBetween(*lastVideoPts, pts, *lastVideoPts + kMaxFrameDurationMs) || //< pts discontinue
         metadata.noDelay || //< jump occurred
         pts < lastSeekTimeMs || //< 'coarse' frame. Frame time is less than required jump pos.
         frameDelayMs < -kMaxDelayForResyncMs || //< Resync because the video frame is late for more than threshold.
