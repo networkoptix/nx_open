@@ -108,11 +108,11 @@ void ActionsTriggeredCountMetrics::addActionMetric(QnAction *action)
 
         auto& countByParams = m_values[id];
         ++countByParams[kTriggerdPostfix];  // Counts base trigger event number
-        ++countByParams[path];
+        if (path != kTriggerdPostfix)
+            ++countByParams[path];
     };
 
     connect(action, &QAction::triggered, this, processTriggered);
-    processTriggered();
 }
 
 
