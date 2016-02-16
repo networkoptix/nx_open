@@ -131,12 +131,6 @@ public:
      */
     bool setLocalPort(unsigned short localPort) ;
 
-    /** Moves ownership pf system socket out of \a Socket instance.
-        Leaves \a Socket instance in undefined state.
-        \note Caller MUST ensure that there are no async socket operations on this instance
-    */
-    AbstractSocket::SOCKET_HANDLE takeHandle();
-
     /**
      *   If WinSock, unload the WinSock DLLs; otherwise do nothing.  We ignore
      *   this in our sample client code but include it in the library for

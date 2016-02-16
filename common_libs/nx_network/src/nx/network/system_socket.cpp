@@ -368,14 +368,6 @@ bool Socket<InterfaceToImplement>::setLocalPort(unsigned short localPort)
 }
 
 template<typename InterfaceToImplement>
-AbstractSocket::SOCKET_HANDLE Socket<InterfaceToImplement>::takeHandle()
-{
-    auto systemHandle = Pollable::handle();
-    m_fd = -1;
-    return systemHandle;
-}
-
-template<typename InterfaceToImplement>
 void Socket<InterfaceToImplement>::cleanUp()
 {
 #ifdef _WIN32
