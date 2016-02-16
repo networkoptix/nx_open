@@ -3,7 +3,7 @@
 
 #include <statistics/abstract_statistics_module.h>
 
-class TimeDurationMetric;
+class SingleMetricsHolder;
 
 class QnDurationStatisticsModule : public QnAbstractStatisticsModule
 {
@@ -21,8 +21,7 @@ public:
     void resetMetrics() override;
 
 private:
-    typedef QSharedPointer<TimeDurationMetric> TimeDurationMetricPtr;
-    typedef QHash<QString, TimeDurationMetricPtr> TimeDurationMetricsHash;
+    typedef QSharedPointer<SingleMetricsHolder> BaseMultimetricPtr;
 
-    TimeDurationMetricsHash m_metrics;
+    const BaseMultimetricPtr m_metrics;
 };

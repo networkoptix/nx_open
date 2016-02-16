@@ -3,17 +3,8 @@
 
 #include <statistics/abstract_statistics_module.h>
 
-// + Time when the window is active
-// Time when the window is in fullscreen mode
-
-// Time when video is live (per camera??? what with desync layouts?)
-// Time when video is in archive
-// Time when video is paused
-// Time when the camera is on fullscreen (any camera)
-// Time when control panels are visible (per panel)
-// Time when panels are unpinned
-
 class QnWorkbenchContext;
+class SingleMetricsHolder;
 
 class QnGraphicsStatisticsModule : public QnAbstractStatisticsModule
 {
@@ -26,15 +17,19 @@ public:
 
     virtual ~QnGraphicsStatisticsModule();
 
-    virtual QnMetricsHash metrics() const;
-
-    virtual void resetMetrics();
-
     void setContext(QnWorkbenchContext *context);
 
+    virtual QnMetricsHash metrics() const override;
+
+    virtual void resetMetrics() override;
+
 private:
+    void recreateMetrics();
+
+private:
+    typedef QSharedPointer<SingleMetricsHolder> BaseMultimetricPtr;
     typedef QPointer<QnWorkbenchContext> ContextPtr;
+
     ContextPtr m_context;
-
-
+    BaseMultimetricPtr m_metrics;
 };
