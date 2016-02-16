@@ -172,9 +172,11 @@ void ActionCheckedTimeMetric::addActionMetric(QnAction *action)
             it = m_metrics.insert(id, TimeDurationMetricPtr(new TimeDurationMetric()));
 
         const auto &timeDurationMetric = *it;
+        if (timeDurationMetric->isActive() == checked)
+            return;
+
         timeDurationMetric->activateCounter(checked);
     };
-
     connect(action, &QAction::toggled, this, processToggled);
     processToggled(action->isChecked());
 }
@@ -201,5 +203,6 @@ QnMetricsHash ActionCheckedTimeMetric::metrics() const
 
 void ActionCheckedTimeMetric::reset()
 {
-    m_metrics.clear();
+    for (const auto metric: m_metrics)
+        metric->reset();
 }

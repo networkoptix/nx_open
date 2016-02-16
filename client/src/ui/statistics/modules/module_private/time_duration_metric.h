@@ -18,6 +18,8 @@ public:
 
     void reset();
 
+    bool isActive() const;
+
 private:
     QElapsedTimer m_counter;
     bool m_isActiveState;

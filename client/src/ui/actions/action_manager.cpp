@@ -1869,6 +1869,12 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Show Timeline")).
         toggledText(tr("Hide Timeline"));
 
+    factory(QnActions::ToggleNotificationsAction).
+        flags(Qn::NoTarget);
+        //text(tr("Show Notifications")).         // TODO: #ynikitenkov: uncomment in 2.6
+        //toggledText(tr("Hide Notifications"));  // TODO: #ynikitenkov: uncomment in 2.6
+    action(QnActions::ToggleNotificationsAction)->setCheckable(true);   // TODO: remove in 2.6
+
     factory(QnActions::PinNotificationsAction).
         flags(Qn::Notifications | Qn::NoTarget).
         text(tr("Pin Notifications")).

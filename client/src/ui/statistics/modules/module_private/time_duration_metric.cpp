@@ -35,6 +35,11 @@ QString TimeDurationMetric::value() const
     return QString::number(duration());
 }
 
+bool TimeDurationMetric::isActive() const
+{
+    return m_isActiveState;
+}
+
 void TimeDurationMetric::reset()
 {
     if (m_isActiveState)
