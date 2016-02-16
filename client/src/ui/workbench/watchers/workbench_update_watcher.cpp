@@ -110,6 +110,8 @@ void QnWorkbenchUpdateWatcher::at_checker_updateAvailable(const QnUpdateInfo &in
     QnUpdateInfo oldUpdateInfo = qnSettings->latestUpdateInfo();
     if (oldUpdateInfo.currentRelease != info.currentRelease
         ||
+        oldUpdateInfo.releaseDateMs != info.releaseDateMs
+        ||
         oldUpdateInfo.releaseDeliveryDays != info.releaseDeliveryDays)
     {
         /* New release was published - or we decided to change delivery period. Estimating new delivery date. */

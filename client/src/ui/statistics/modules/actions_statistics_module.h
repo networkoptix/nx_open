@@ -4,7 +4,7 @@
 #include <statistics/abstract_statistics_module.h>
 
 class QnActionManager;
-class AbstractActionMetric;
+class AbstractMultimetric;
 typedef QPointer<QnActionManager> QnActionManagerPtr;
 
 class QnActionsStatisticsModule : public QnAbstractStatisticsModule
@@ -25,9 +25,9 @@ public:
     void resetMetrics() override;
 
 private:
-    typedef QSharedPointer<AbstractActionMetric> MetricsPtr;
-    typedef QHash<QString, MetricsPtr> MetricsHash;
+    typedef QSharedPointer<AbstractMultimetric> MultiMetricsPtr;
+    typedef QList<MultiMetricsPtr> MultimetricsList;
 
     QnActionManagerPtr m_actionManager;
-    MetricsHash m_metrics;
+    MultimetricsList m_multiMetrics;
 };
