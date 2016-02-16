@@ -118,7 +118,7 @@ void MediaServerEmulator::setOnConnectionRequestedHandler(
 }
 
 void MediaServerEmulator::setConnectionAckResponseHandler(
-    std::function<void(api::ResultCode)> handler)
+    std::function<ActionToTake(api::ResultCode)> handler)
 {
     m_connectionAckResponseHandler = std::move(handler);
 }
@@ -127,6 +127,8 @@ void MediaServerEmulator::onConnectionRequested(
     nx::hpm::api::ConnectionRequestedEvent connectionRequestedData)
 {
     using namespace std::placeholders;
+
+    m_connectionRequestedData = connectionRequestedData;
 
     nx::hpm::api::ConnectionAckRequest connectionAckData;
     connectionAckData.connectSessionId = connectionRequestedData.connectSessionId;
@@ -159,8 +161,16 @@ void MediaServerEmulator::onConnectionRequested(
 void MediaServerEmulator::onConnectionAckResponseReceived(
     nx::hpm::api::ResultCode resultCode)
 {
+    ActionToTake action = ActionToTake::ignoreIndication;
+
     if (m_connectionAckResponseHandler)
-        m_connectionAckResponseHandler(resultCode);
+        action = m_connectionAckResponseHandler(resultCode);
+
+    if (action != ActionToTake::proceedWithConnection)
+        return;
+
+    //connecting to originating peer
+    //m_udtStreamSocket = std::make_unique<>
 }
 
 }   //hpm

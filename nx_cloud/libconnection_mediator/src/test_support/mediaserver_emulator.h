@@ -54,7 +54,7 @@ public:
     void setOnConnectionRequestedHandler(
         std::function<ActionToTake(api::ConnectionRequestedEvent)> handler);
     void setConnectionAckResponseHandler(
-        std::function<void(api::ResultCode)> handler);
+        std::function<ActionToTake(api::ResultCode)> handler);
 
 private:
     std::unique_ptr<hpm::api::MediatorConnector> m_mediatorConnector;
@@ -66,7 +66,8 @@ private:
     nx::hpm::api::MediatorServerUdpConnection m_mediatorUdpClient;
     std::function<ActionToTake(nx::hpm::api::ConnectionRequestedEvent)>
         m_onConnectionRequestedHandler;
-    std::function<void(api::ResultCode)> m_connectionAckResponseHandler;
+    std::function<ActionToTake(api::ResultCode)> m_connectionAckResponseHandler;
+    nx::hpm::api::ConnectionRequestedEvent m_connectionRequestedData;
 
     void onConnectionRequested(
         nx::hpm::api::ConnectionRequestedEvent connectionRequestedData);
