@@ -11,14 +11,14 @@
 
 
 ////////////////////////////////////////////////////////////////////////////
-// Some c++ features missing in MS Visual studio 2012 are defined here
-// TODO #ak remove this file after moving to visual studio 2013
+// Some c++14 features missing in MS Visual studio 2012 and GCC 4.8 are
+// defined here
 ////////////////////////////////////////////////////////////////////////////
 
 
 namespace std
 {
-#if _MSC_VER <= 1700
+#if _MSC_VER <= 1700 || GCC_VERSION < 40900
 template<
     typename T>
     std::unique_ptr<T> make_unique()
