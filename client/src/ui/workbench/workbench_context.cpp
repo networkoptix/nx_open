@@ -83,6 +83,7 @@ QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *pa
     qnStatisticsManager->registerStatisticsModule(lit("actions"), actionsStatModule);
 
     const auto userStatModule = instance<QnUsersStatisticsModule>();
+    userStatModule->setContext(this);
     qnStatisticsManager->registerStatisticsModule(lit("users"), userStatModule);
 }
 
@@ -108,7 +109,7 @@ QnWorkbenchContext::~QnWorkbenchContext() {
     m_resourcePool = NULL;
 }
 
-QAction *QnWorkbenchContext::action(const Qn::ActionId id) const {
+QAction *QnWorkbenchContext::action(const QnActions::IDType id) const {
     return m_menu->action(id);
 }
 

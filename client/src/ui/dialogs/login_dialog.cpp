@@ -220,11 +220,11 @@ void QnLoginDialog::accept() {
         QnConnectionDiagnosticsHelper::Result status = QnConnectionDiagnosticsHelper::validateConnection(connectionInfo, errorCode, url, this);
         switch (status) {
         case QnConnectionDiagnosticsHelper::Result::Success:
-            menu()->trigger(Qn::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, url));
+            menu()->trigger(QnActions::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, url));
             updateStoredConnections(url, name);
             break;
         case QnConnectionDiagnosticsHelper::Result::RestartRequested:
-            menu()->trigger(Qn::DelayedForcedExitAction);
+            menu()->trigger(QnActions::DelayedForcedExitAction);
             break; // to avoid cycle
         default:    //error
             return;

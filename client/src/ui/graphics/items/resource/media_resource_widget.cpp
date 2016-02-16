@@ -393,7 +393,7 @@ void QnMediaResourceWidget::createButtons() {
         debugScreenshotButton->setProperty(Qn::NoBlockMotionSelection, true);
         debugScreenshotButton->setToolTip(lit("Debug set of screenshots"));
         connect(debugScreenshotButton, &QnImageButtonWidget::clicked, this, [this] {
-            menu()->trigger(Qn::TakeScreenshotAction, QnActionParameters(this).withArgument<QString>(Qn::FileNameRole, lit("_DEBUG_SCREENSHOT_KEY_")));
+            menu()->trigger(QnActions::TakeScreenshotAction, QnActionParameters(this).withArgument<QString>(Qn::FileNameRole, lit("_DEBUG_SCREENSHOT_KEY_")));
         });
         buttonBar()->addButton(DbgScreenshotButton, debugScreenshotButton);
     }
@@ -958,7 +958,7 @@ int QnMediaResourceWidget::helpTopicAt(const QPointF &) const {
         return (m_ioModuleOverlayWidget && overlayWidgetVisibility(m_ioModuleOverlayWidget) == OverlayVisibility::Visible);
     };
 
-    if (action(Qn::ToggleTourModeAction)->isChecked())
+    if (action(QnActions::ToggleTourModeAction)->isChecked())
         return Qn::MainWindow_Scene_TourInProgress_Help;
 
     Qn::ResourceStatusOverlay statusOverlay = statusOverlayWidget()->statusOverlay();
@@ -1346,7 +1346,7 @@ void QnMediaResourceWidget::at_camDisplay_liveChanged() {
 }
 
 void QnMediaResourceWidget::at_screenshotButton_clicked() {
-    menu()->trigger(Qn::TakeScreenshotAction, this);
+    menu()->trigger(QnActions::TakeScreenshotAction, this);
 }
 
 void QnMediaResourceWidget::at_searchButton_toggled(bool checked) {
@@ -1364,7 +1364,7 @@ void QnMediaResourceWidget::at_ptzButton_toggled(bool checked) {
     setOption(DisplayCrosshair, ptzEnabled);
     if(checked) {
         buttonBar()->setButtonsChecked(MotionSearchButton | ZoomWindowButton, false);
-        action(Qn::JumpToLiveAction)->trigger(); // TODO: #Elric evil hack! Won't work if SYNC is off and this item is not selected?
+        action(QnActions::JumpToLiveAction)->trigger(); // TODO: #Elric evil hack! Won't work if SYNC is off and this item is not selected?
     }
 }
 
@@ -1526,7 +1526,7 @@ void QnMediaResourceWidget::updateOverlayButton() {
         Qn::ResourceStatusOverlay overlay = calculateStatusOverlay();
 
         if (overlay == Qn::OfflineOverlay) {
-            if (menu()->canTrigger(Qn::CameraDiagnosticsAction, m_camera)) {
+            if (menu()->canTrigger(QnActions::CameraDiagnosticsAction, m_camera)) {
                 statusOverlayWidget()->setButtonType(QnStatusOverlayWidget::DiagnosticsButton);
                 return;
             }
@@ -1555,7 +1555,7 @@ void QnMediaResourceWidget::updateOverlayButton() {
 
 void QnMediaResourceWidget::at_statusOverlayWidget_diagnosticsRequested() {
     if (m_camera)
-        menu()->trigger(Qn::CameraDiagnosticsAction, m_camera);
+        menu()->trigger(QnActions::CameraDiagnosticsAction, m_camera);
 }
 
 void QnMediaResourceWidget::at_statusOverlayWidget_ioEnableRequested() {
@@ -1577,7 +1577,7 @@ void QnMediaResourceWidget::at_statusOverlayWidget_ioEnableRequested() {
 }
 
 void QnMediaResourceWidget::at_statusOverlayWidget_moreLicensesRequested() {
-    menu()->trigger(Qn::PreferencesLicensesTabAction);
+    menu()->trigger(QnActions::PreferencesLicensesTabAction);
 }
 
 void QnMediaResourceWidget::at_item_imageEnhancementChanged() {

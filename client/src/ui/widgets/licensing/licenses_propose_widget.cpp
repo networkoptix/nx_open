@@ -48,7 +48,7 @@ QnLicensesProposeWidget::~QnLicensesProposeWidget()
 
 void QnLicensesProposeWidget::afterContextInitialized() {
     connect(context(), &QnWorkbenchContext::userChanged,        this,   &QnLicensesProposeWidget::updateLicensesButtonVisible);
-    connect(ui->moreLicensesButton,     &QPushButton::clicked,  this,   [this]{menu()->trigger(Qn::PreferencesLicensesTabAction);});
+    connect(ui->moreLicensesButton,     &QPushButton::clicked,  this,   [this]{menu()->trigger(QnActions::PreferencesLicensesTabAction);});
     updateLicensesButtonVisible();
 }
 

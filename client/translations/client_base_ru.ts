@@ -6961,8 +6961,8 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Cannot move these %n I/O modules to server %1. Server is unresponsive.</source>
         <translation>
             <numerusform>Невозможно переместить этот модуль ввода-вывода на сервер %1. Сервер не отвечает.</numerusform>
-            <numerusform>Невозможно переместить эти модули ввода-вывода на сервер %1. Сервер не отвечает.</numerusform>
-            <numerusform>Невозможно переместить эти модули ввода-вывода на сервер %1. Сервер не отвечает.</numerusform>
+            <numerusform>Невозможно переместить эти %n модуля ввода-вывода на сервер %1. Сервер не отвечает.</numerusform>
+            <numerusform>Невозможно переместить эти %n модулей ввода-вывода на сервер %1. Сервер не отвечает.</numerusform>
         </translation>
     </message>
     <message numerus="yes">

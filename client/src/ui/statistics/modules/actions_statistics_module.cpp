@@ -5,27 +5,13 @@
 #include <ui/actions/action_manager.h>
 #include <ui/statistics/modules/actions_module_private/action_metrics.h>
 
+#include <utils/common/model_functions.h>
+
 namespace
 {
-    QString aliasByActionId(Qn::ActionId id)
+    QString aliasByActionId(QnActions::IDType id)
     {
-        typedef QHash<Qn::ActionId, QString> AliasesHash;
-        static const auto aliases = []() -> AliasesHash
-        {
-            AliasesHash result;
-            result.insert(Qn::BookmarksModeAction, lit("bookmark_mode"));
-            // TODO: add aliases values
-            return result;
-        }();
-
-
-        const auto it = aliases.find(id);
-        if (it == aliases.end())
-        {
-            //Q_ASSERT_X(false, Q_FUNC_INFO, "Unregistered action couldn't be used for statistics extraction");
-            return lit("unregistered_action_%1").arg(id);
-        }
-        return *it;
+        return QnLexical::serialized(id);
     }
 
     QString makeAlias(const QString &alias, const QString &postfix)
@@ -58,7 +44,7 @@ void QnActionsStatisticsModule::setActionManager(const QnActionManagerPtr &manag
     m_actionManager = manager;
 
     QPointer<QnActionsStatisticsModule> guard(this);
-    const auto createActionMetrics = [this, guard](Qn::ActionId id)
+    const auto createActionMetrics = [this, guard](QnActions::IDType id)
     {
         if (!guard || !m_actionManager)
             return;

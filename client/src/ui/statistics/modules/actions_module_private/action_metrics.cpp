@@ -29,7 +29,7 @@ namespace
 const QString ActionTriggeredCountMetric::kPostfix = lit("trg");
 
 ActionTriggeredCountMetric::ActionTriggeredCountMetric(QnActionManager *actionManager
-    , Qn::ActionId id)
+    , QnActions::IDType id)
 {
     connect(actionManager->action(id), &QAction::triggered, this, [this](bool /* checked */)
     {

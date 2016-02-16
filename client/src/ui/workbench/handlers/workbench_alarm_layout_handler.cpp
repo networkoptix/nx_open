@@ -68,7 +68,7 @@ QnWorkbenchAlarmLayoutHandler::QnWorkbenchAlarmLayoutHandler(QObject *parent)
     : base_type(parent)
     , QnWorkbenchContextAware(parent)
 {
-    connect( action(Qn::OpenInAlarmLayoutAction), &QAction::triggered, this,   [this] {
+    connect( action(QnActions::OpenInAlarmLayoutAction), &QAction::triggered, this,   [this] {
         QnActionParameters parameters = menu()->currentParameters(sender());
         openCamerasInAlarmLayout(parameters.resources().filtered<QnVirtualCameraResource>(), true);
     } );
