@@ -326,7 +326,7 @@
                     <artifactId>festival</artifactId>
                     <version>${festival.version}</version>
                     <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${compiler}</classifier>
+                    <classifier>${profile.classifier}-${arch}-${compiler}</classifier>
                 </dependency>
                 <dependency>
                     <groupId>org.ffmpeg</groupId>

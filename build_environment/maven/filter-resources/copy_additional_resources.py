@@ -116,9 +116,6 @@ if __name__ == '__main__':
                         shutil.copy2(join(plugin_source_dir, qtplugin, file), join(target_dir, 'release', qtplugin))
                         
         for config in ('debug', 'release'):
-            target_vox = join(target_dir, config, 'vox')
-            if os.path.exists(target_vox):
-                shutil.rmtree(target_vox)            
             target_plugins = join(target_dir, config, 'plugins')
             if not os.path.exists(target_plugins):
                 os.makedirs(join(target_dir, config, 'plugins'))

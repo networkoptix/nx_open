@@ -10,6 +10,7 @@
 #include <utils/common/long_runnable.h>
 #include <utils/common/threadqueue.h>
 #include <utils/common/singleton.h>
+#include <utils/common/semaphore.h>
 
 // TODO: #Elric this header does not belong in the source root.
 
@@ -20,7 +21,7 @@
 */
 class TextToWaveServer
 :
-    public QnLongRunnable, 
+    public QnLongRunnable,
     public Singleton<TextToWaveServer>
 {
     Q_OBJECT
