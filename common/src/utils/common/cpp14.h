@@ -9,6 +9,10 @@
 #include <atomic>
 #include <memory>
 
+#ifdef __GNUC__
+#include <features.h>
+#endif
+
 
 ////////////////////////////////////////////////////////////////////////////
 // Some c++14 features missing in MS Visual studio 2012 and GCC 4.8 are
@@ -18,7 +22,7 @@
 
 namespace std
 {
-#if (defined(_MSC_VER) && _MSC_VER <= 1700) || (defined(GCC_VERSION) && GCC_VERSION < 40900)
+#if (defined(_MSC_VER) && _MSC_VER <= 1700) || (defined(__GNUC__) && !__GNUC_PREREQ(4,9))
 template<
     typename T>
     std::unique_ptr<T> make_unique()
