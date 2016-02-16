@@ -3,7 +3,7 @@
 
 #include <core/resource/camera_bookmark.h>
 
-#include <ui/style/warning_style.h>
+#include <ui/style/custom_style.h>
 
 namespace {
     const int defaultTimeoutIdx = 0;
@@ -35,6 +35,8 @@ QnBookmarkWidget::QnBookmarkWidget(QWidget *parent):
 
     connect(ui->nameLineEdit, &QLineEdit::textEdited, this, [this](const QString& text)
     {
+        Q_UNUSED(text);
+
         QPalette palette = this->palette();
         if (!isValid())
             setWarningStyle(&palette);

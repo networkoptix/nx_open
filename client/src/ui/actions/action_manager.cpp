@@ -695,7 +695,7 @@ QnActionManager::QnActionManager(QObject *parent):
             condition(new QnForbiddenInSafeModeCondition(this)).
             autoRepeat(false);
 
-        factory(Qn::NewWebPageAction).
+        factory(QnActions::NewWebPageAction).
             flags(Qn::Main | Qn::Tree).
             requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
             text(tr("Web Page...")).
@@ -921,19 +921,19 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(lit("Ctrl+B")).
         autoRepeat(false);
 
-    factory(Qn::LoginToCLoud).
+    factory(QnActions::LoginToCLoud).
         flags(Qn::NoTarget).
         text(tr("Login to Cloud..."));
 
-    factory(Qn::LogoutFromCloud).
+    factory(QnActions::LogoutFromCloud).
         flags(Qn::NoTarget).
         text(tr("Logout"));
 
-    factory(Qn::OpenCloudMainUrl).
+    factory(QnActions::OpenCloudMainUrl).
         flags(Qn::NoTarget).
         text(tr("Go to %1...").arg(QnAppInfo::cloudName()));
 
-    factory(Qn::OpenCloudManagementUrl).
+    factory(QnActions::OpenCloudManagementUrl).
         flags(Qn::NoTarget).
         text(tr("Manage account..."));
 
