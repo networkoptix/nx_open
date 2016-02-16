@@ -20,9 +20,8 @@ struct FrameBasicInfo
 
     FrameBasicInfo(const QnConstCompressedAudioDataPtr& frame)
     :
-        codec(CODEC_ID_NONE)
+        codec(frame->compressionType)
     {
-        codec = frame->compressionType;
     }
 
     CodecID codec;
@@ -72,11 +71,11 @@ void SeamlessAudioDecoder::pleaseStop()
 }
 
 bool SeamlessAudioDecoder::decode(
-    const QnConstCompressedAudioDataPtr& frame, QnAudioFramePtr* result)
+    const QnConstCompressedAudioDataPtr& frame, AudioFramePtr* result)
 {
     Q_D(SeamlessAudioDecoder);
     if (result)
-        result->clear();
+        result->reset();
 
     FrameBasicInfo frameInfo(frame);
     bool isSimilarParams = frameInfo.codec == d->prevFrameInfo.codec;
@@ -92,12 +91,12 @@ bool SeamlessAudioDecoder::decode(
 
     if (!d->audioDecoder)
         return false;
-    QnAudioFramePtr decodedFrame = d->audioDecoder->decode(frame);
+    AudioFramePtr decodedFrame = d->audioDecoder->decode(frame);
     if (!decodedFrame)
         return false;
-
+    
     *result = std::move(decodedFrame);
-    return !result->isNull();
+    return true;
 }
 
 } // namespace media

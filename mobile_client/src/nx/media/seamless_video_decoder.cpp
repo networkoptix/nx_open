@@ -78,7 +78,7 @@ public:
     int decoderFrameNumToLocalNum(int value) const;
 
 public:
-    std::deque<QnVideoFramePtr> queue; /**< Temporary  buffer for decoded data. */
+    std::deque<QVideoFramePtr> queue; /**< Temporary  buffer for decoded data. */
     VideoDecoderPtr videoDecoder;
     FrameBasicInfo prevFrameInfo;
     int frameNumber; /**< Absolute frame number. */
@@ -149,11 +149,11 @@ void SeamlessVideoDecoder::pleaseStop()
 }
 
 bool SeamlessVideoDecoder::decode(
-    const QnConstCompressedVideoDataPtr& frame, QnVideoFramePtr* result)
+    const QnConstCompressedVideoDataPtr& frame, QVideoFramePtr* result)
 {
     Q_D(SeamlessVideoDecoder);
     if (result)
-        result->clear();
+        result->reset();
 
     FrameBasicInfo frameInfo(frame);
     bool isSimilarParams = frameInfo.codec == d->prevFrameInfo.codec;
@@ -161,11 +161,11 @@ bool SeamlessVideoDecoder::decode(
         isSimilarParams &= frameInfo.size == d->prevFrameInfo.size;
     if (!isSimilarParams)
     {
-        QnVideoFramePtr decodedFrame;
         if (d->videoDecoder)
         {
             for (;;)
             {
+                QVideoFramePtr decodedFrame;
                 int decodedFrameNum = d->videoDecoder->decode(
                     QnConstCompressedVideoDataPtr(), &decodedFrame);
                 if (!decodedFrame)
@@ -191,7 +191,7 @@ bool SeamlessVideoDecoder::decode(
     int decodedFrameNum = 0;
     if (d->videoDecoder)
     {
-        QnVideoFramePtr decodedFrame;
+        QVideoFramePtr decodedFrame;
         decodedFrameNum = d->videoDecoder->decode(frame, &decodedFrame);
         if (decodedFrame)
         {
@@ -205,7 +205,7 @@ bool SeamlessVideoDecoder::decode(
     if (d->queue.empty())
         return decodedFrameNum >= 0; //< Return false if decoding fails and no queued frames are left.
 
-    *result = d->queue.front();
+    *result = std::move(d->queue.front());
     d->queue.pop_front();
     return true;
 }

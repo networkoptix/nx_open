@@ -61,6 +61,9 @@ public:
     // Either media is on live or archive position. Holds QT property value.
     bool liveMode;
 
+    // Auto reconnect if network error
+    bool reconnectOnPlay;
+
     // UTC Playback position at msec. Holds QT property value.
     qint64 position;
 
@@ -82,7 +85,7 @@ public:
     qint64 ptsTimerBase;
 
     // Decoded video which is awaiting to be rendered.
-    QnVideoFramePtr videoFrameToRender;
+    QVideoFramePtr videoFrameToRender;
 
     // Separate thread. Performs network IO and gets compressed AV data.
     std::unique_ptr<QnArchiveStreamReader> archiveReader;
@@ -122,9 +125,9 @@ private:
     void at_gotVideoFrame();
 
     void presentNextFrame();
-    qint64 getDelayForNextFrameMs(const QnVideoFramePtr& frame);
-    qint64 getDelayForNextFrameWithAudioMs(const QnVideoFramePtr& frame);
-    qint64 getDelayForNextFrameWithoutAudioMs(const QnVideoFramePtr& frame);
+    qint64 getDelayForNextFrameMs(const QVideoFramePtr& frame);
+    qint64 getDelayForNextFrameWithAudioMs(const QVideoFramePtr& frame);
+    qint64 getDelayForNextFrameWithoutAudioMs(const QVideoFramePtr& frame);
     bool initDataProvider();
 
     void setState(Player::State state);
@@ -135,7 +138,7 @@ private:
     void resetLiveBufferState();
     void updateLiveBufferState(BufferState value);
 
-    QnVideoFramePtr scaleFrame(const QnVideoFramePtr& videoFrame);
+    QVideoFramePtr scaleFrame(const QVideoFramePtr& videoFrame);
 };
 
 PlayerPrivate::PlayerPrivate(Player *parent)
@@ -145,6 +148,7 @@ PlayerPrivate::PlayerPrivate(Player *parent)
     state(Player::State::Stopped),
     mediaStatus(Player::MediaStatus::NoMedia),
     liveMode(true),
+    reconnectOnPlay(false),
     position(0),
     videoSurface(0),
     maxTextureSize(QnTextureSizeHelper::instance()->maxTextureSize()),
@@ -237,7 +241,7 @@ void PlayerPrivate::at_gotVideoFrame()
         presentNextFrame();
 }
 
-QnVideoFramePtr PlayerPrivate::scaleFrame(const QnVideoFramePtr& videoFrame)
+QVideoFramePtr PlayerPrivate::scaleFrame(const QVideoFramePtr& videoFrame)
 {
     if (videoFrame->width() <= maxTextureSize && videoFrame->height() <= maxTextureSize)
         return videoFrame; //< Scale is not required.
@@ -256,7 +260,7 @@ QnVideoFramePtr PlayerPrivate::scaleFrame(const QnVideoFramePtr& videoFrame)
     videoFrame->unmap();
 
     scaledFrame->setStartTime(videoFrame->startTime());
-    return QnVideoFramePtr(scaledFrame);
+    return QVideoFramePtr(scaledFrame);
 }
 
 void PlayerPrivate::presentNextFrame()
@@ -293,7 +297,7 @@ void PlayerPrivate::presentNextFrame()
     auto metadata = FrameMetadata::deserialize(videoFrameToRender);
     setLiveMode(metadata.flags & QnAbstractMediaData::MediaFlags_LIVE);
 
-    videoFrameToRender.clear();
+    videoFrameToRender.reset();
 
     // Calculate next time to render.
     QTimer::singleShot(0, this, &PlayerPrivate::at_gotVideoFrame);
@@ -326,7 +330,7 @@ void PlayerPrivate::updateLiveBufferState(BufferState value)
     }
 }
 
-qint64 PlayerPrivate::getDelayForNextFrameMs(const QnVideoFramePtr& frame)
+qint64 PlayerPrivate::getDelayForNextFrameMs(const QVideoFramePtr& frame)
 {
     if (dataConsumer->audioOutput())
         return getDelayForNextFrameWithAudioMs(frame);
@@ -334,7 +338,7 @@ qint64 PlayerPrivate::getDelayForNextFrameMs(const QnVideoFramePtr& frame)
         return getDelayForNextFrameWithoutAudioMs(frame);
 }
 
-qint64 PlayerPrivate::getDelayForNextFrameWithAudioMs(const QnVideoFramePtr& frame)
+qint64 PlayerPrivate::getDelayForNextFrameWithAudioMs(const QVideoFramePtr& frame)
 {
     const AudioOutput* audioOutput = dataConsumer->audioOutput();
     const qint64 currentPosUsec = audioOutput->playbackPositionUsec();
@@ -344,7 +348,7 @@ qint64 PlayerPrivate::getDelayForNextFrameWithAudioMs(const QnVideoFramePtr& fra
     return frame->startTime() - currentPosUsec/1000;
 }
 
-qint64 PlayerPrivate::getDelayForNextFrameWithoutAudioMs(const QnVideoFramePtr& frame)
+qint64 PlayerPrivate::getDelayForNextFrameWithoutAudioMs(const QVideoFramePtr& frame)
 {
     const qint64 pts = frame->startTime();
     FrameMetadata metadata = FrameMetadata::deserialize(frame);
@@ -567,6 +571,18 @@ bool Player::liveMode() const
 {
     Q_D(const Player);
     return d->liveMode;
+}
+
+bool Player::reconnectOnPlay() const
+{
+    Q_D(const Player);
+    return d->reconnectOnPlay;
+}
+
+void Player::setReconnectOnPlay(bool reconnectOnPlay)
+{
+    Q_D(Player);
+    d->reconnectOnPlay = reconnectOnPlay;
 }
 
 } // namespace media

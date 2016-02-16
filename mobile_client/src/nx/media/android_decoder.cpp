@@ -291,7 +291,7 @@ FboPtr AndroidDecoderPrivate::createGLResources()
 
     if (!program)
     {
-        program = new QOpenGLShaderProgram;
+        program = new QOpenGLShaderProgram();
 
         QOpenGLShader *vertexShader = new QOpenGLShader(QOpenGLShader::Vertex, program);
         vertexShader->compileSourceCode(
@@ -374,7 +374,7 @@ bool AndroidDecoder::isCompatible(const CodecID codec, const QSize& resolution)
     return resolution.width() <= maxSize.width() && resolution.height() <= maxSize.height();
 }
 
-int AndroidDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QnVideoFramePtr* result)
+int AndroidDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QVideoFramePtr* result)
 {
     Q_D(AndroidDecoder);
 

@@ -88,12 +88,12 @@ void FfmpegVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr&
 {
     if (!frame)
         return;
-
+    
     auto codec = avcodec_find_decoder(frame->compressionType);
     codecContext = avcodec_alloc_context3(codec);
     if (frame->context)
         QnFfmpegHelper::mediaContextToAvCodecContext(codecContext, frame->context);
-    //codecContext->thread_count = 4;
+    //codecContext->thread_count = 4; //< Uncomment this line if decoder with internal buffer is required
     if (avcodec_open2(codecContext, codec, nullptr) < 0)
     {
         qWarning() << "Can't open decoder for codec" << frame->compressionType;
@@ -130,7 +130,7 @@ bool FfmpegVideoDecoder::isCompatible(const CodecID codec, const QSize& resoluti
     return true;
 }
 
-int FfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QnVideoFramePtr* result)
+int FfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QVideoFramePtr* result)
 {
     Q_D(FfmpegVideoDecoder);
 
@@ -177,7 +177,7 @@ int FfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QnVid
     return d->frame->coded_picture_number;
 }
 
-void FfmpegVideoDecoder::ffmpegToQtVideoFrame(QnVideoFramePtr* result)
+void FfmpegVideoDecoder::ffmpegToQtVideoFrame(QVideoFramePtr* result)
 {
     Q_D(FfmpegVideoDecoder);
 

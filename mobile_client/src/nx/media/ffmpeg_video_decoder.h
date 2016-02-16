@@ -25,10 +25,10 @@ public:
 
     static bool isCompatible(const CodecID codec, const QSize& resolution);
     virtual int decode(
-        const QnConstCompressedVideoDataPtr& frame, QnVideoFramePtr* result = nullptr) override;
+        const QnConstCompressedVideoDataPtr& frame, QVideoFramePtr* result = nullptr) override;
 
 private:
-    void ffmpegToQtVideoFrame(QnVideoFramePtr* result);
+    void ffmpegToQtVideoFrame(QVideoFramePtr* result);
 
 private:
     QScopedPointer<FfmpegVideoDecoderPrivate> d_ptr;

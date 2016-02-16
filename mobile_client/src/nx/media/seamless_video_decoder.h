@@ -37,7 +37,7 @@ public:
      * @return True if frame is decoded without errors. For null input data, return true while
      * flushing internal buffer (result is not null)
      */
-    bool decode(const QnConstCompressedVideoDataPtr& frame, QnVideoFramePtr* result = nullptr);
+    bool decode(const QnConstCompressedVideoDataPtr& frame, QVideoFramePtr* result = nullptr);
 
     /**
      * @return Current frame number in range [0..INT_MAX]. This number will be used for the next

@@ -10,7 +10,6 @@
 #include "media_fwd.h"
 
 namespace nx {
-namespace media {
 
 struct AudioFrame
 {
@@ -20,6 +19,8 @@ struct AudioFrame
     qint64 timestampUsec;           //< UTC timestamp
     QnConstMediaContextPtr context; //< codec context. decoder must keep context from input data
 };
+
+namespace media {
 
 /*
 * Interface for video decoder implementation.
@@ -45,7 +46,7 @@ public:
     * \param frame        compressed audio data. 
     * \!returns decoded audio frame or null shared pointer if decoding error
     */
-    virtual QnAudioFramePtr decode(const QnConstCompressedAudioDataPtr& frame) = 0;
+    virtual AudioFramePtr decode(const QnConstCompressedAudioDataPtr& frame) = 0;
 };
 
 }

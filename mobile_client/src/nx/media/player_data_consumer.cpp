@@ -168,7 +168,7 @@ bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& video
         emit hurryUp(); //< Hint to a player to avoid waiting for the currently displaying frame.
     }
 
-    QnVideoFramePtr decodedFrame;
+    QVideoFramePtr decodedFrame;
     if (!m_videoDecoder->decode(data, &decodedFrame))
     {
         qWarning() << Q_FUNC_INFO << "Can't decode video frame. Frame is skipped.";
@@ -181,7 +181,7 @@ bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& video
     return true;
 }
 
-void PlayerDataConsumer::enqueueVideoFrame(QnVideoFramePtr decodedFrame)
+void PlayerDataConsumer::enqueueVideoFrame(QVideoFramePtr decodedFrame)
 {
     Q_ASSERT(decodedFrame);
     QnMutexLocker lock(&m_queueMutex);
@@ -194,12 +194,12 @@ void PlayerDataConsumer::enqueueVideoFrame(QnVideoFramePtr decodedFrame)
     emit gotVideoFrame();
 }
 
-QnVideoFramePtr PlayerDataConsumer::dequeueVideoFrame()
+QVideoFramePtr PlayerDataConsumer::dequeueVideoFrame()
 {
     QnMutexLocker lock(&m_queueMutex);
     if (m_decodedVideo.empty())
-        return QnVideoFramePtr(); //< no data
-    QnVideoFramePtr result = std::move(m_decodedVideo.front());
+        return QVideoFramePtr(); //< no data
+    QVideoFramePtr result = std::move(m_decodedVideo.front());
     m_decodedVideo.pop_front();
     lock.unlock();
 
@@ -216,7 +216,7 @@ QnVideoFramePtr PlayerDataConsumer::dequeueVideoFrame()
 
 bool PlayerDataConsumer::processAudioFrame(const QnCompressedAudioDataPtr& data)
 {
-    QnAudioFramePtr decodedFrame;
+    AudioFramePtr decodedFrame;
     if (!m_audioDecoder->decode(data, &decodedFrame))
     {
         qWarning() << Q_FUNC_INFO << "Can't decode audio frame. Frame is skipped.";

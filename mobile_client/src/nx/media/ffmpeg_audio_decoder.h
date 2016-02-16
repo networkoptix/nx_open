@@ -24,7 +24,7 @@ public:
     virtual ~FfmpegAudioDecoder();
 
     static bool isCompatible(const CodecID codec);
-    virtual QnAudioFramePtr decode(const QnConstCompressedAudioDataPtr& frame) override;
+    virtual AudioFramePtr decode(const QnConstCompressedAudioDataPtr& frame) override;
 
 private:
     QScopedPointer<FfmpegAudioDecoderPrivate> d_ptr;

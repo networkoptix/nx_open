@@ -43,7 +43,7 @@ public:
     void resume();
 
     /** Add audio packet to the internal audio buffer. */
-    void write(const QnAudioFramePtr& audioFrame);
+    void write(const AudioFramePtr& audioFrame);
 
     /**
      * @return Current UTC playback position in microseconds (what you hear now).

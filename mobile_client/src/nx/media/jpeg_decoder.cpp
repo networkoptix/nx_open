@@ -30,7 +30,7 @@ bool JpegDecoder::isCompatible(const CodecID codec, const QSize& resolution)
     return codec == CODEC_ID_MJPEG;
 }
 
-int JpegDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QnVideoFramePtr* result)
+int JpegDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QVideoFramePtr* result)
 {
     Q_D(JpegDecoder);
 

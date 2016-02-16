@@ -30,7 +30,7 @@ public:
     PlayerDataConsumer(const std::unique_ptr<QnArchiveStreamReader>& archiveReader);
     virtual ~PlayerDataConsumer();
 
-    QnVideoFramePtr dequeueVideoFrame();
+    QVideoFramePtr dequeueVideoFrame();
     qint64 queueVideoDurationUsec() const;
     
     const AudioOutput* audioOutput() const;
@@ -63,7 +63,7 @@ private:
     bool processVideoFrame(const QnCompressedVideoDataPtr& data);
     bool processAudioFrame(const QnCompressedAudioDataPtr& data);
 
-    void enqueueVideoFrame(QnVideoFramePtr decodedFrame);
+    void enqueueVideoFrame(QVideoFramePtr decodedFrame);
     int getBufferingMask() const;
     QnCompressedVideoDataPtr queueVideoFrame(const QnCompressedVideoDataPtr& videoFrame);
 
@@ -72,7 +72,7 @@ private:
     std::unique_ptr<SeamlessAudioDecoder> m_audioDecoder;
     std::unique_ptr<AudioOutput> m_audioOutput;
             
-    std::deque<QnVideoFramePtr> m_decodedVideo;
+    std::deque<QVideoFramePtr> m_decodedVideo;
     QnWaitCondition m_queueWaitCond;
     QnMutex m_queueMutex; //< sync with player thread
     QnMutex m_dataProviderMutex; //< sync with dataProvider thread

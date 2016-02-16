@@ -22,7 +22,7 @@ public:
 
     static bool isCompatible(const CodecID codec, const QSize& resolution);
     virtual int decode(
-        const QnConstCompressedVideoDataPtr& frame, QnVideoFramePtr* result = nullptr) override;
+        const QnConstCompressedVideoDataPtr& frame, QVideoFramePtr* result = nullptr) override;
 
 private:
     QScopedPointer<JpegDecoderPrivate> d_ptr;

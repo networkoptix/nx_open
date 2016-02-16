@@ -36,7 +36,7 @@ public:
      * @return True if the frame is decoded without errors. For null input data, return true while
      * flushing internal buffer (result is not null).
      */
-    bool decode(const QnConstCompressedAudioDataPtr& frame, QnAudioFramePtr* result = nullptr);
+    bool decode(const QnConstCompressedAudioDataPtr& frame, AudioFramePtr* result = nullptr);
 
     /**
      * @return Current frame number in range [0..INT_MAX]. This number will be used for the next

@@ -19,7 +19,7 @@ struct FrameMetadata
     FrameMetadata(const QnConstCompressedVideoDataPtr& frame);
 
     bool isNull() const;
-    void serialize(const QnVideoFramePtr& frame) const;
+    void serialize(const QVideoFramePtr& frame) const;
     static FrameMetadata deserialize(const QnConstVideoFramePtr& frame);
             
     QnAbstractMediaData::MediaFlags flags; /**< Various flags passed from compressed video data. */

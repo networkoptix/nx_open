@@ -80,7 +80,7 @@ qint64 AudioOutput::maxBufferSizeUsec() const
     return d->bufferSizeUsec;
 }
 
-void AudioOutput::write(const QnAudioFramePtr& audioFrame)
+void AudioOutput::write(const AudioFramePtr& audioFrame)
 {
     Q_D(AudioOutput);
 
