@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="fr" sourcelanguage="en">
+<TS version="2.1" language="fr" sourcelanguage="en">
 <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
@@ -1978,9 +1978,12 @@ pour voir plus de signets</translation>
         <source>Source camera</source>
         <translation>Source Caméra</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Source and %n more cameras</source>
-        <translation>Source et %n caméras</translation>
+        <translation type="unfinished">
+            <numerusform>Source et %n caméras</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>N/A</source>
@@ -5109,17 +5112,26 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
         <source>&lt;All My I/O Modules&gt;</source>
         <translation>&lt;Toutes Mes module(s) I/O &gt;</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n device(s)&gt;</source>
-        <translation>&lt;%n Périphérique(s)&gt;</translation>
+        <translation type="unfinished">
+            <numerusform>&lt;%n Périphérique(s)&gt;</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n camera(s)&gt;</source>
-        <translation>&lt;%n Caméra(s)&gt;</translation>
+        <translation type="unfinished">
+            <numerusform>&lt;%n Caméra(s)&gt;</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n I/O module(s)&gt;</source>
-        <translation>&lt;%n module(s) I/O &gt;</translation>
+        <translation type="unfinished">
+            <numerusform>&lt;%n module(s) I/O &gt;</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -5880,13 +5892,19 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
         <source>Notice: Only further recording will be backed up. Backup process will ignore existing footage.</source>
         <translation>Avis: Seulement les enregistrement plus loin sera sauvegardé. Processus de sauvegarde ignorera les séquences existantes.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n Camera(s)</source>
-        <translation>%n Caméra(s)</translation>
+        <translation type="unfinished">
+            <numerusform>%n Caméra(s)</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n Device(s)</source>
-        <translation>%n Périphérique(s)</translation>
+        <translation type="unfinished">
+            <numerusform>%n Périphérique(s)</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Backup is finished</source>
@@ -6948,9 +6966,12 @@ Si vous vous voulez désactiver cette fonction, vous pouvez le faire dans le men
         <source>Press %1 to search bookmarks</source>
         <translation>Appuyer %1 pour chercher les signets</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Are you sure you want to delete these %n bookmarks?</source>
-        <translation>Êtes-vous sûr de vouloir effacer ces %n signets?</translation>
+        <translation type="unfinished">
+            <numerusform>Êtes-vous sûr de vouloir effacer ces %n signets?</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>

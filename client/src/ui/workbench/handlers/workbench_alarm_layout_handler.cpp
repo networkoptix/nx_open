@@ -130,7 +130,13 @@ void QnWorkbenchAlarmLayoutHandler::openCamerasInAlarmLayout( const QnVirtualCam
     const bool wasEmptyLayout = layout->items().isEmpty();
 
     /* Disable Sync on layout before adding cameras */
-    layout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState()));
+    const auto syncDisabled = QnStreamSynchronizationState();
+    if (workbench()->currentLayout() == layout)
+    {
+        QnWorkbenchStreamSynchronizer *streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
+        streamSynchronizer->setState(syncDisabled);
+    }
+    layout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(syncDisabled));
 
     // Sort items to guarantee the same item placement for the same set of cameras.
     QnVirtualCameraResourceList sortedCameras = cameras;

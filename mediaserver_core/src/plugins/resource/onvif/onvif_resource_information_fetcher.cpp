@@ -201,7 +201,8 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
             mac = existResource->getMAC().toString();
     }
 
-    if (model.isEmpty() || manufacturer.isEmpty()  || QnMacAddress(mac).isNull())
+    if (model.isEmpty() || manufacturer.isEmpty() || firmware.isEmpty() ||
+        QnMacAddress(mac).isNull())
     {
         OnvifResExtInfo extInfo;
         QAuthenticator auth;

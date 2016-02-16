@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="ru" sourcelanguage="en">
+<TS version="2.1" language="ru" sourcelanguage="en">
 <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
@@ -5178,7 +5178,7 @@ If you understand this and would like to proceed please click Merge to continue.
     <name>QnSearchBookmarksModel</name>
     <message>
         <source>Name</source>
-        <translation>ИмяИмя</translation>
+        <translation>Имя</translation>
     </message>
     <message>
         <source>Start time</source>
@@ -6081,7 +6081,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Routing Management</source>
-        <translation>Управление машрутизацией</translation>
+        <translation>Управление маршрутизацией</translation>
     </message>
     <message>
         <source>Time Synchronization</source>

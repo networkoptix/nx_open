@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="hu" sourcelanguage="en">
+<TS version="2.1" language="hu" sourcelanguage="en">
 <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
@@ -1959,9 +1959,11 @@ több könyvjelző megjelenítéséhez</translation>
         <source>Source camera</source>
         <translation>Forrás kamera</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Source and %n more cameras</source>
-        <translation>Forrás és még %n kamera</translation>
+        <translation type="unfinished">
+            <numerusform>Forrás és még %n kamera</numerusform>
+        </translation>
     </message>
     <message>
         <source>N/A</source>
@@ -5038,17 +5040,23 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <source>&lt;All My I/O Modules&gt;</source>
         <translation>&lt;Minden saját I/O modul&gt;</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n device(s)&gt;</source>
-        <translation>&lt;%n eszköz&gt;</translation>
+        <translation type="unfinished">
+            <numerusform>&lt;%n eszköz&gt;</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n camera(s)&gt;</source>
-        <translation>&lt;%n kamera&gt;</translation>
+        <translation type="unfinished">
+            <numerusform>&lt;%n kamera&gt;</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n I/O module(s)&gt;</source>
-        <translation>&lt;%n I/O modul&gt;</translation>
+        <translation type="unfinished">
+            <numerusform>&lt;%n I/O modul&gt;</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -5803,13 +5811,17 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <source>Notice: Only further recording will be backed up. Backup process will ignore existing footage.</source>
         <translation>Megjegyzés: Csak az újabb adatok biztonsági mentése lesz lehetséges. A meglévő fájlokat figyelmen kívül fogja hagyni.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n Camera(s)</source>
-        <translation>%n kamera</translation>
+        <translation type="unfinished">
+            <numerusform>%n kamera</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n Device(s)</source>
-        <translation>%n eszköz</translation>
+        <translation type="unfinished">
+            <numerusform>%n eszköz</numerusform>
+        </translation>
     </message>
     <message>
         <source>Backup is finished</source>
@@ -6847,9 +6859,11 @@ Ha szeretné kikapcsolni ezt a funkciót, a Rendszer Beállítások menüben meg
         <source>Press %1 to search bookmarks</source>
         <translation>Nyomja meg a %1(e)t a könyvjelzők kereséséhez</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Are you sure you want to delete these %n bookmarks?</source>
-        <translation>Biztosan törli ezt a %n könyvjelzőt?</translation>
+        <translation type="unfinished">
+            <numerusform>Biztosan törli ezt a %n könyvjelzőt?</numerusform>
+        </translation>
     </message>
 </context>
 <context>

@@ -1,9 +1,13 @@
 #pragma once
 
+#ifdef __cplusplus  // For safe iOS build
 #include <utils/common/model_functions_fwd.h>
+#endif
 
-
+// TODO: #ynikitenkov Add serialization using metaobject
+#ifndef QN_NO_NAMESPACES
 namespace Qn {
+#endif
 
     /**
      * Flags describing the actions permitted for the user to do with the
@@ -80,7 +84,9 @@ namespace Qn {
     Qn::Permissions operator-(Qn::Permissions minuend, Qn::Permission subrahend);
     Qn::Permissions operator-(Qn::Permission minuend, Qn::Permission subrahend);
 
+#ifndef QN_NO_NAMESPACES
 } // namespace Qn
+#endif
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::Permission)(Qn::Permissions),

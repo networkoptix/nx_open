@@ -37,7 +37,6 @@ namespace Qn
             PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent ItemDataRole
             ConnectionRole ResourceStatus BitratePerGopType
             StreamQuality SecondStreamQuality PanicMode RebuildState BackupState RecordingType PropertyDataType SerializationFormat PeerType StatisticsDeviceType
-            BookmarkSearchStrategy
             ServerFlag BackupType CameraBackupQuality CameraStatusFlag IOPortType IODefaultState AuditRecordType AuthResult
             RebuildAction BackupAction
             FailoverPriority)
@@ -744,15 +743,6 @@ public:
 
         LC_Count
     };
-
-
-    /** Strategy of the bookmarks search. Used when we are limiting request result size by a fixed number. */
-
-//    enum BookmarkSearchStrategy {
-//        EarliestFirst,  /*< Standard way: select bookmarks by time in direct order. */
-//        LatestFirst,    /*< Select bookmarks by time in reverse order so the latest bookmarks will be returned. */
-//        LongestFirst    /*< Select bookmarks by length. The longest bookmarks will be returned. */
-//    };
 
     // All columns are sorted by database initially, except camera name and tags.
     enum BookmarkSortField
