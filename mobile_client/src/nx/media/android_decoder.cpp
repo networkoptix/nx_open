@@ -3,7 +3,6 @@
 #include <deque>
 
 #include <utils/thread/mutex.h>
-#include "abstract_resource_allocator.h"
 #include <utils/media/h264_utils.h>
 #include <QtGui/QOpenGLContext>
 #include <QtGui/QOpenGLContext>
@@ -21,6 +20,8 @@
 
 #include <QAndroidJniObject>
 #include <QAndroidJniEnvironment>
+
+#include "abstract_resource_allocator.h"
 
 namespace nx {
 namespace media {
@@ -389,8 +390,8 @@ int AndroidDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QnVideoFr
         QAndroidJniObject jCodecName = QAndroidJniObject::fromString(codecName);
         d->initialized = d->javaDecoder.callMethod<jboolean>(
             "init", "(Ljava/lang/String;II)Z",
-            jCodecName.object<jstring>(), 
-            d->frameSize.width(), 
+            jCodecName.object<jstring>(),
+            d->frameSize.width(),
             d->frameSize.height());
         if (!d->initialized)
             return 0; //< wait for I frame

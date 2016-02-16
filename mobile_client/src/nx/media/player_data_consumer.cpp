@@ -1,6 +1,7 @@
+#include "player_data_consumer.h"
+
 #include <nx/streaming/archive_stream_reader.h>
 
-#include "player_data_consumer.h"
 #include "seamless_video_decoder.h"
 #include "seamless_audio_decoder.h"
 #include "abstract_audio_decoder.h"
@@ -31,11 +32,11 @@ PlayerDataConsumer::PlayerDataConsumer(
     m_hurryUpToFrame(0),
     m_noDelayState(NoDelayState::Disabled)
 {
-    connect(archiveReader.get(), &QnArchiveStreamReader::beforeJump, 
+    connect(archiveReader.get(), &QnArchiveStreamReader::beforeJump,
         this, &PlayerDataConsumer::onBeforeJump, Qt::DirectConnection);
-    connect(archiveReader.get(), &QnArchiveStreamReader::jumpOccured, 
+    connect(archiveReader.get(), &QnArchiveStreamReader::jumpOccured,
         this, &PlayerDataConsumer::onJumpOccurred, Qt::DirectConnection);
-    connect(archiveReader.get(), &QnArchiveStreamReader::jumpCanceled, 
+    connect(archiveReader.get(), &QnArchiveStreamReader::jumpCanceled,
         this, &PlayerDataConsumer::onJumpCanceled, Qt::DirectConnection);
 }
 
@@ -122,7 +123,7 @@ QnCompressedVideoDataPtr PlayerDataConsumer::queueVideoFrame(
         return videoFrame; //< Pre-decoding queue is not required.
 
     m_predecodeQueue.push_back(videoFrame);
-    
+
     QnCompressedVideoDataPtr result = m_predecodeQueue.front();
     if (result->timestamp < m_audioOutput->playbackPositionUsec())
     {
@@ -224,7 +225,7 @@ bool PlayerDataConsumer::processAudioFrame(const QnCompressedAudioDataPtr& data)
 
     if (!decodedFrame || !decodedFrame->context)
         return true; //< just skip frame
-    
+
     if (!m_audioOutput)
         m_audioOutput.reset(new AudioOutput(kInitialBufferMs * 1000, kMaxBufferMs * 1000));
     m_audioOutput->write(decodedFrame);

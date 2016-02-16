@@ -11,7 +11,6 @@ static const int kNotInitialized = -1; //< Metadata is not initialized.
 
 } // namespace
 
-
 FrameMetadata::FrameMetadata()
 :
     flags(QnAbstractMediaData::MediaFlags_None),
@@ -42,9 +41,9 @@ FrameMetadata FrameMetadata::deserialize(const QnConstVideoFramePtr& frame)
     return data.canConvert<FrameMetadata>() ? data.value<FrameMetadata>() : FrameMetadata();
 }
 
-bool FrameMetadata::isNull() const 
-{ 
-    return frameNum == kNotInitialized; 
+bool FrameMetadata::isNull() const
+{
+    return frameNum == kNotInitialized;
 }
 
 } // namespace media

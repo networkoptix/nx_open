@@ -6,12 +6,12 @@
 #include <QtOpenGL/qgl.h>
 
 #include <utils/common/delayed.h>
-#include "core/resource_management/resource_pool.h"
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <ui/texture_size_helper.h>
 
-#include "nx/streaming/archive_stream_reader.h"
-#include "nx/streaming/rtsp_client_archive_delegate.h"
+#include <nx/streaming/archive_stream_reader.h>
+#include <nx/streaming/rtsp_client_archive_delegate.h>
 
 #include "player_data_consumer.h"
 #include "frame_metadata.h"
@@ -20,7 +20,7 @@
 
 namespace nx {
 namespace media {
-    
+
 namespace {
 
 // Max allowed frame duration. If the distance is higher, then the discontinuity is detected.
@@ -54,50 +54,50 @@ class PlayerPrivate: public QObject
 public:
     // Holds QT property value.
     Player::State state;
-    
+
     // Holds QT property value.
     Player::MediaStatus mediaStatus;
-    
+
     // Either media is on live or archive position. Holds QT property value.
     bool liveMode;
-    
+
     // UTC Playback position at msec. Holds QT property value.
     qint64 position;
-    
+
     // Video surface to render. Holds QT property value.
     QAbstractVideoSurface* videoSurface;
-    
+
     // Media URL to play. Holds QT property value.
     QUrl url;
-    
+
     int maxTextureSize;
 
     // Main AV timer for playback.
-    QElapsedTimer ptsTimer; 
-    
+    QElapsedTimer ptsTimer;
+
     // Last video frame PTS.
     boost::optional<qint64> lastVideoPts;
-    
+
     // Timestamp when the PTS timer was started.
     qint64 ptsTimerBase;
-    
+
     // Decoded video which is awaiting to be rendered.
     QnVideoFramePtr videoFrameToRender;
-    
+
     // Separate thread. Performs network IO and gets compressed AV data.
-    std::unique_ptr<QnArchiveStreamReader> archiveReader; 
-    
+    std::unique_ptr<QnArchiveStreamReader> archiveReader;
+
     // Separate thread. Decodes compressed AV data.
     std::unique_ptr<PlayerDataConsumer> dataConsumer;
-    
+
     // Timer for delayed call to presentFrame().
     QTimer* execTimer;
-    
+
     // Last seek position. UTC time in msec.
-    qint64 lastSeekTimeMs; 
-    
+    qint64 lastSeekTimeMs;
+
     // Current duration of live buffer in range [kInitialLiveBufferMs.. kMaxLiveBufferMs].
-    int liveBufferMs; 
+    int liveBufferMs;
 
     enum class BufferState
     {
@@ -120,7 +120,7 @@ private:
 
     void at_hurryUp();
     void at_gotVideoFrame();
-    
+
     void presentNextFrame();
     qint64 getDelayForNextFrameMs(const QnVideoFramePtr& frame);
     qint64 getDelayForNextFrameWithAudioMs(const QnVideoFramePtr& frame);
@@ -171,7 +171,7 @@ void PlayerPrivate::setState(Player::State state)
     emit q->playbackStateChanged();
 }
 
-void PlayerPrivate::setMediaStatus(Player::MediaStatus status) 
+void PlayerPrivate::setMediaStatus(Player::MediaStatus status)
 {
     if (mediaStatus == status)
         return;
@@ -204,7 +204,7 @@ void PlayerPrivate::setPosition(qint64 value)
 
 void PlayerPrivate::at_hurryUp()
 {
-    if (videoFrameToRender) 
+    if (videoFrameToRender)
     {
         execTimer->stop();
         presentNextFrame();
@@ -348,7 +348,7 @@ qint64 PlayerPrivate::getDelayForNextFrameWithoutAudioMs(const QnVideoFramePtr& 
 {
     const qint64 pts = frame->startTime();
     FrameMetadata metadata = FrameMetadata::deserialize(frame);
-        
+
     // Calculate time to present next frame
     qint64 mediaQueueLen = usecToMsec(dataConsumer->queueVideoDurationUsec());
     const int frameDelayMs = pts - ptsTimerBase - ptsTimer.elapsed();
@@ -386,7 +386,7 @@ qint64 PlayerPrivate::getDelayForNextFrameWithoutAudioMs(const QnVideoFramePtr& 
         ptsTimer.restart();
         return 0ll;
     }
-    else 
+    else
     {
         lastVideoPts = pts;
         return (pts - ptsTimerBase) - ptsTimer.elapsed();
@@ -402,7 +402,7 @@ bool PlayerPrivate::initDataProvider()
         setMediaStatus(Player::MediaStatus::NoMedia);
         return false;
     }
-    
+
     archiveReader.reset(new QnArchiveStreamReader(resource));
     dataConsumer.reset(new PlayerDataConsumer(archiveReader));
 
@@ -417,7 +417,7 @@ bool PlayerPrivate::initDataProvider()
         {
             setPosition(kLivePosition);
         });
-    
+
     QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
     if (camera)
     {
@@ -457,12 +457,12 @@ Player::Player(QObject *parent)
 {
 }
 
-Player::~Player() 
+Player::~Player()
 {
     stop();
 }
 
-Player::State Player::playbackState() const 
+Player::State Player::playbackState() const
 {
     Q_D(const Player);
     return d->state;
@@ -486,7 +486,7 @@ QAbstractVideoSurface *Player::videoSurface() const
     return d->videoSurface;
 }
 
-qint64 Player::position() const 
+qint64 Player::position() const
 {
     Q_D(const Player);
     return d->position;
@@ -517,12 +517,12 @@ void Player::play()
 
     d->setState(State::Playing);
     d->setMediaStatus(MediaStatus::Loading);
-    
+
     d->lastVideoPts.reset();
     d->at_hurryUp(); //< renew receiving frames
 }
 
-void Player::pause() 
+void Player::pause()
 {
     Q_D(Player);
     d->setState(State::Paused);
@@ -534,7 +534,7 @@ void Player::stop()
 
     if (d->archiveReader && d->dataConsumer)
         d->archiveReader->removeDataProcessor(d->dataConsumer.get());
-    
+
     d->dataConsumer.reset();
     d->archiveReader.reset();
     d->setState(State::Stopped);

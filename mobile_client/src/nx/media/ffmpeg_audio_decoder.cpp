@@ -2,11 +2,10 @@
 
 #include "ffmpeg_audio_decoder.h"
 
-extern "C"
-{
+extern "C" {
 #include <libavformat/avformat.h>
 #include <libswscale/swscale.h>
-}
+} // extern "C"
 
 #include <utils/media/ffmpeg_helper.h>
 #include <utils/thread/mutex.h>
@@ -32,7 +31,7 @@ public:
     }
 
     ~FfmpegAudioDecoderPrivate()
-    { 
+    {
         closeCodecContext();
         av_free(frame);
     }
@@ -95,7 +94,7 @@ QnAudioFramePtr FfmpegAudioDecoder::decode(const QnConstCompressedAudioDataPtr& 
 {
     Q_D(FfmpegAudioDecoder);
 
-    if (!d->codecContext) 
+    if (!d->codecContext)
     {
         d->initContext(frame);
         if (!d->codecContext)
@@ -119,7 +118,7 @@ QnAudioFramePtr FfmpegAudioDecoder::decode(const QnConstCompressedAudioDataPtr& 
 
         d->lastPts = frame->timestamp;
     }
-    else 
+    else
     {
         // There is a known ffmpeg bug. It returns the below time for the very last packet while
         // flushing the internal buffer. So, repeat this time for the empty packet in order to
@@ -138,17 +137,17 @@ QnAudioFramePtr FfmpegAudioDecoder::decode(const QnConstCompressedAudioDataPtr& 
     int frameSize = av_samples_get_buffer_size(
         0, //< output. plane size, optional
         d->codecContext->channels,
-        d->frame->nb_samples, 
+        d->frame->nb_samples,
         d->codecContext->sample_fmt,
         1); //< buffer size alignment. 1 - no alignment (exact size)
 
     AudioFrame* audioFrame = new AudioFrame();
     audioFrame->data.write((const char*)d->frame->data[0], frameSize);
     audioFrame->context = d->abstractContext;
-    
+
     // Ffmpeg pts/dts are mixed up here, so it's pkt_dts. Also Convert usec to msec.
     audioFrame->timestampUsec = d->frame->pkt_dts / 1000;
-    
+
     return QnAudioFramePtr(audioFrame);
 }
 

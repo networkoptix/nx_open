@@ -1,6 +1,7 @@
+#include "seamless_audio_decoder.h"
+
 #include <deque>
 
-#include "seamless_audio_decoder.h"
 #include "abstract_audio_decoder.h"
 #include "audio_decoder_registry.h"
 
@@ -88,7 +89,7 @@ bool SeamlessAudioDecoder::decode(
             frame->compressionType);
         d->prevFrameInfo = frameInfo;
     }
-        
+
     if (!d->audioDecoder)
         return false;
     QnAudioFramePtr decodedFrame = d->audioDecoder->decode(frame);

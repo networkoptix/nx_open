@@ -1,4 +1,5 @@
 #include "jpeg_decoder.h"
+
 #include "utils/jpeg.h"
 
 namespace nx {

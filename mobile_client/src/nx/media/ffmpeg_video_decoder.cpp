@@ -2,11 +2,10 @@
 
 #include "ffmpeg_video_decoder.h"
 
-extern "C"
-{
+extern "C" {
 #include <libavformat/avformat.h>
 #include <libswscale/swscale.h>
-}
+} // extern "C"
 
 #include <utils/media/ffmpeg_helper.h>
 #include <utils/thread/mutex.h>
@@ -26,11 +25,11 @@ public:
         if (av_lockmgr_register(&InitFfmpegLib::lockmgr) != 0)
             qCritical() << "Failed to register ffmpeg lock manager";
     }
-    
+
     static int lockmgr(void** mtx, enum AVLockOp op)
     {
         QnMutex** qMutex = (QnMutex**) mtx;
-        switch (op) 
+        switch (op)
         {
             case AV_LOCK_CREATE:
                 *qMutex = new QnMutex();
@@ -69,7 +68,7 @@ public:
     }
 
     ~FfmpegVideoDecoderPrivate()
-    { 
+    {
         closeCodecContext();
         av_free(frame);
         sws_freeContext(scaleContext);
@@ -135,7 +134,7 @@ int FfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QnVid
 {
     Q_D(FfmpegVideoDecoder);
 
-    if (!d->codecContext) 
+    if (!d->codecContext)
     {
         d->initContext(frame);
         if (!d->codecContext)
@@ -159,7 +158,7 @@ int FfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QnVid
 
         d->lastPts = frame->timestamp;
     }
-    else 
+    else
     {
         // There is a known ffmpeg bug. It returns the below time for the very last packet while
         // flushing internal buffer. So, repeat this time for the empty packet in order to avoid

@@ -1,6 +1,7 @@
+#include "seamless_video_decoder.h"
+
 #include <deque>
 
-#include "seamless_video_decoder.h"
 #include "abstract_video_decoder.h"
 #include "video_decoder_registry.h"
 #include "frame_metadata.h"
@@ -39,11 +40,11 @@ QSize mediaSizeFromRawData(const QnConstCompressedVideoDataPtr& frame)
 struct FrameBasicInfo
 {
     FrameBasicInfo()
-    : 
+    :
         codec(CODEC_ID_NONE)
     {
     }
-        
+
     FrameBasicInfo(const QnConstCompressedVideoDataPtr& frame)
     :
         codec(CODEC_ID_NONE)
@@ -83,7 +84,7 @@ public:
     int frameNumber; /**< Absolute frame number. */
 
     /** Relative frame number (frameNumber value when the decoder was created). */
-    int decoderFrameOffset; 
+    int decoderFrameOffset;
 
     /** Associate extra information with output frames which corresponds to input frames. */
     std::deque<FrameMetadata> metadataQueue;
@@ -185,14 +186,14 @@ bool SeamlessVideoDecoder::decode(
         d->prevFrameInfo = frameInfo;
         d->clearMetadata();
     }
-    
+
     d->addMetadata(frame);
     int decodedFrameNum = 0;
-    if (d->videoDecoder) 
+    if (d->videoDecoder)
     {
         QnVideoFramePtr decodedFrame;
         decodedFrameNum = d->videoDecoder->decode(frame, &decodedFrame);
-        if (decodedFrame) 
+        if (decodedFrame)
         {
             const FrameMetadata metadata = d->findMetadata(
                 d->decoderFrameNumToLocalNum(decodedFrameNum));
