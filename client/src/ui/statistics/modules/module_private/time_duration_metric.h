@@ -3,8 +3,12 @@
 
 #include <QtCore/QElapsedTimer>
 
-class TimeDurationMetric
+#include <ui/statistics/modules/module_private/abstract_single_metric.h>
+
+class TimeDurationMetric : public AbstractSingleMetric
 {
+    typedef AbstractSingleMetric base_type;
+
 public:
     TimeDurationMetric(bool active = false);
 
@@ -12,13 +16,17 @@ public:
 
     void activateCounter(bool isActive);
 
-    QString value() const;
-
-    qint64 duration() const;
-
-    void reset();
-
     bool isActive() const;
+
+public:
+    void reset() override;
+
+    QString value() const override;
+
+    bool significant() const override;
+
+private:
+    qint64 duration() const;
 
 private:
     QElapsedTimer m_counter;

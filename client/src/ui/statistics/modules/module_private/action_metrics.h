@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include <ui/statistics/modules/module_private/abstract_multimetric.h>
+#include <ui/statistics/modules/module_private/single_metrics_holder.h>
 
 class QnAction;
 class QnActionManager;
@@ -62,8 +62,7 @@ protected:
     void addActionMetric(QnAction *action) override;
 
 private:
-    typedef QSharedPointer<TimeDurationMetric> TimeDurationMetricPtr;
-    typedef QHash<int, TimeDurationMetricPtr> MetricsHash;
+    typedef QSharedPointer<SingleMetricsHolder> BaseMultimetricPtr;
 
-    MetricsHash m_metrics;
+    BaseMultimetricPtr m_metrics;
 };
