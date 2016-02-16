@@ -1,7 +1,7 @@
 
 #include "single_metrics_holder.h"
 
-#include <ui/statistics/modules/module_private/time_duration_metric.h>
+#include <ui/statistics/modules/private/time_duration_metric.h>
 
 SingleMetricsHolder::SingleMetricsHolder()
     : base_type()

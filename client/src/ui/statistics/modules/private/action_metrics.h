@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include <ui/statistics/modules/module_private/single_metrics_holder.h>
+#include <ui/statistics/modules/private/single_metrics_holder.h>
 
 class QnAction;
 class QnActionManager;

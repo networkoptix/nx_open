@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include <ui/statistics/modules/module_private/time_duration_metric.h>
+#include <ui/statistics/modules/private/time_duration_metric.h>
 
 class SessionUptimeMetric : public TimeDurationMetric
 {

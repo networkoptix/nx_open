@@ -3,7 +3,7 @@
 
 #include <QtCore/QElapsedTimer>
 
-#include <ui/statistics/modules/module_private/abstract_single_metric.h>
+#include <ui/statistics/modules/private/abstract_single_metric.h>
 
 class TimeDurationMetric : public AbstractSingleMetric
 {

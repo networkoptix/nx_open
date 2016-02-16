@@ -3,7 +3,7 @@
 
 #include <QtCore/QObject>
 
-#include <ui/statistics/modules/module_private/time_duration_metric.h>
+#include <ui/statistics/modules/private/time_duration_metric.h>
 
 class AppActiveTimeMetric : public QObject
     , public TimeDurationMetric

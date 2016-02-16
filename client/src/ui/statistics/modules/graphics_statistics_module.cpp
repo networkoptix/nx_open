@@ -3,8 +3,8 @@
 
 #include <ui/workbench/workbench_context.h>
 
-#include <ui/statistics/modules/module_private/single_metrics_holder.h>
-#include <ui/statistics/modules/module_private/avg_tabs_count_metric.h>
+#include <ui/statistics/modules/private/single_metrics_holder.h>
+#include <ui/statistics/modules/private/avg_tabs_count_metric.h>
 
 QnGraphicsStatisticsModule::QnGraphicsStatisticsModule(QObject *parent)
     : base_type(parent)

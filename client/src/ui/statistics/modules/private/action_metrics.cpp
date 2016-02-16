@@ -4,7 +4,7 @@
 #include <ui/actions/action.h>
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
-#include <ui/statistics/modules/module_private/time_duration_metric.h>
+#include <ui/statistics/modules/private/time_duration_metric.h>
 
 #include <utils/common/model_functions.h>
 
