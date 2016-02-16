@@ -94,7 +94,7 @@ private:
         SystemError::ErrorCode errorCode,
         std::unique_ptr<AbstractStreamSocket> cloudConnection);
 
-    std::atomic_unique_ptr<AbstractStreamSocket> m_socketDelegate;
+    nx::atomic_unique_ptr<AbstractStreamSocket> m_socketDelegate;
     std::function<void(SystemError::ErrorCode)> m_connectHandler;
     nx::utils::AsyncOperationGuard m_asyncConnectGuard;
     /** Used to tie this to aio thread.
