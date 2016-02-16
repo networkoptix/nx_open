@@ -63,18 +63,23 @@ void QnCallCounter::startReporter()
                                 std::chrono::high_resolution_clock::now() -
                                 m_startTime);
 
+                auto totalPeriods = (double)upTime.count() / m_reportPeriod.count();
                 m_lastTriggerTime = std::chrono::high_resolution_clock::now();
 
                 for (auto it = m_callInfo.begin(); it != m_callInfo.end(); ++it)
                 {
-                    auto callsPerPeriod = it->second.totalCalls - 
-                                          it->second.lastTotalCalls;
+                    auto callsAtLastPeriod = it->second.totalCalls - 
+                                             it->second.lastTotalCalls;
 
-                    NX_LOG(lit("(CALL REPORT) Functon: %1\t\tTotal calls: %2\t\tCalls per %3ms: %4")
+                    auto callsPerPeriod = (double)it->second.totalCalls / totalPeriods;
+
+                    NX_LOG(lit("(CALL REPORT) Functon: %1. Total calls: %2. Calls per %3 ms: %4. Calls during last %5 ms: %6.")
                                .arg(it->first)
                                .arg(it->second.totalCalls)
                                .arg(m_reportPeriod.count())
-                               .arg(callsPerPeriod),
+                               .arg(callsPerPeriod)
+                               .arg(m_reportPeriod.count())
+                               .arg(callsAtLastPeriod),
                            cl_logDEBUG1);
 
                     it->second.lastTotalCalls = it->second.totalCalls;
