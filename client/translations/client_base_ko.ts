@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="ko" sourcelanguage="en">
+<TS version="2.1" language="ko" sourcelanguage="en">
 <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
@@ -1957,9 +1957,11 @@ to view more bookmarks</source>
         <source>Source camera</source>
         <translation>선택된 카메라</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Source and %n more cameras</source>
-        <translation></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>N/A</source>
@@ -5035,17 +5037,23 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>&lt;All My I/O Modules&gt;</source>
         <translation>모든 내 I/O 모듈</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n device(s)&gt;</source>
-        <translation>%n 장치들</translation>
+        <translation type="unfinished">
+            <numerusform>%n 장치들</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n camera(s)&gt;</source>
-        <translation>%n 카메라들</translation>
+        <translation type="unfinished">
+            <numerusform>%n 카메라들</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n I/O module(s)&gt;</source>
-        <translation>%n I/O 모듈들</translation>
+        <translation type="unfinished">
+            <numerusform>%n I/O 모듈들</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -5800,13 +5808,17 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Notice: Only further recording will be backed up. Backup process will ignore existing footage.</source>
         <translation>알림:백업시 현재 데이터는 무시하고 앞으로 녹화되는 데이터만 백업 됩니다.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n Camera(s)</source>
-        <translation>%n 카메라들</translation>
+        <translation type="unfinished">
+            <numerusform>%n 카메라들</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n Device(s)</source>
-        <translation>%n 장비들</translation>
+        <translation type="unfinished">
+            <numerusform>%n 장비들</numerusform>
+        </translation>
     </message>
     <message>
         <source>Backup is finished</source>
@@ -6843,9 +6855,11 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Press %1 to search bookmarks</source>
         <translation>북마크 검색을 하려면 %1을 누르세요</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Are you sure you want to delete these %n bookmarks?</source>
-        <translation>%n 개의 북마크를 삭제하시겠습니까?</translation>
+        <translation type="unfinished">
+            <numerusform>%n 개의 북마크를 삭제하시겠습니까?</numerusform>
+        </translation>
     </message>
 </context>
 <context>

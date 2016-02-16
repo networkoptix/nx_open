@@ -17,7 +17,7 @@ QnSendmailBusinessActionWidget::QnSendmailBusinessActionWidget(QWidget *parent) 
     ui->setupUi(this);
 
     connect(ui->emailLineEdit, SIGNAL(textChanged(QString)), this, SLOT(paramsChanged()));
-    connect(ui->settingsButton, &QPushButton::clicked, action(Qn::PreferencesSmtpTabAction), &QAction::trigger);
+    connect(ui->settingsButton, &QPushButton::clicked, action(QnActions::PreferencesSmtpTabAction), &QAction::trigger);
 }
 
 QnSendmailBusinessActionWidget::~QnSendmailBusinessActionWidget()
