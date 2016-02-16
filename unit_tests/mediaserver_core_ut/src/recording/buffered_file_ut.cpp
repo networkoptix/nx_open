@@ -6,7 +6,7 @@
 #include <QFile>
 
 #include <gtest/gtest.h>
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 #include <utils/fs/file.h>
 #include <utils/common/buffered_file.h>
 

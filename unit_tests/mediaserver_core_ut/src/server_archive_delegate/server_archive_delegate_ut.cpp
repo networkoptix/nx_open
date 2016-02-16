@@ -4,6 +4,9 @@
 #define GTEST_HAS_POSIX_RE 0
 #include <gtest/gtest.h>
 
+extern "C" {
+#include <ffmpeg/libavformat/avformat.h>
+}
 #include <plugins/resource/server_archive/server_archive_delegate.h>
 #include <core/resource/storage_plugin_factory.h>
 #include <core/resource_management/resource_pool.h>
