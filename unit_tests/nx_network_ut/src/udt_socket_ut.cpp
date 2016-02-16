@@ -125,7 +125,7 @@ TEST_F(SocketUdt, cancelConnect)
 
     for (int i = 0; i < 100; ++i)
     {
-        UdtStreamSocket sock(false);
+        UdtStreamSocket sock;
         std::atomic<bool> handlerCalled(false);
         ASSERT_TRUE(sock.setNonBlockingMode(true));
         sock.connectAsync(
@@ -146,7 +146,7 @@ TEST(SocketUdt_UdtPollSet, general)
     UdtPollSet pollset;
     ASSERT_TRUE(pollset.isValid());
 
-    UdtStreamSocket sock(false);
+    UdtStreamSocket sock;
 
     ASSERT_TRUE(pollset.add(&sock, aio::etRead, (void*)1));
     ASSERT_TRUE(pollset.add(&sock, aio::etWrite, (void*)2));
