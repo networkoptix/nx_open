@@ -320,14 +320,6 @@ to view more bookmarks</source>
         <translation>ซ่อน FPS</translation>
     </message>
     <message>
-        <source>Ctrl+Alt+F</source>
-        <translation>Ctrl+Alt+F</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+D</source>
-        <translation>Ctrl+Alt+D</translation>
-    </message>
-    <message>
         <source>Drop Resources</source>
         <translation>ลดทรพัยากร</translation>
     </message>
@@ -348,24 +340,12 @@ to view more bookmarks</source>
         <translation>เค้าโครงถัดไป</translation>
     </message>
     <message>
-        <source>Ctrl+Tab</source>
-        <translation>Ctrl+Tab</translation>
-    </message>
-    <message>
         <source>Previous Layout</source>
         <translation>เค้าโครงก่อนหน้า</translation>
     </message>
     <message>
-        <source>Ctrl+Shift+Tab</source>
-        <translation>Ctrl+Shift+Tab</translation>
-    </message>
-    <message>
         <source>Select All</source>
         <translation>เลือกทั้งหมด</translation>
-    </message>
-    <message>
-        <source>Ctrl+A</source>
-        <translation>Ctrl+A</translation>
     </message>
     <message>
         <source>Selection Changed</source>
@@ -382,10 +362,6 @@ to view more bookmarks</source>
     <message>
         <source>Go to Freespace Mode</source>
         <translation>ไปที่โหมดพื้นที่ฟรี</translation>
-    </message>
-    <message>
-        <source>F11</source>
-        <translation>F11</translation>
     </message>
     <message>
         <source>Help</source>
@@ -428,16 +404,8 @@ to view more bookmarks</source>
         <translation>รายการหลัก</translation>
     </message>
     <message>
-        <source>Alt+Space</source>
-        <translation>Alt+Space</translation>
-    </message>
-    <message>
         <source>Connect to Server...</source>
         <translation>เชื่อมต่อกับเซิร์ฟเวอร์ ...</translation>
-    </message>
-    <message>
-        <source>Ctrl+Shift+C</source>
-        <translation>Ctrl+Shift+C</translation>
     </message>
     <message>
         <source>Logout</source>
@@ -450,10 +418,6 @@ to view more bookmarks</source>
     <message>
         <source>Stop Panic Recording</source>
         <translation>หยุดการบันทึกเหตุการณ์ไม่ปรกติ</translation>
-    </message>
-    <message>
-        <source>Ctrl+P</source>
-        <translation>Ctrl+P</translation>
     </message>
     <message>
         <source>New...</source>
@@ -476,20 +440,12 @@ to view more bookmarks</source>
         <translation>แท็บใหม่</translation>
     </message>
     <message>
-        <source>Ctrl+T</source>
-        <translation>Ctrl+T</translation>
-    </message>
-    <message>
         <source>Window</source>
         <translation>หน้าต่าง</translation>
     </message>
     <message>
         <source>New Window</source>
         <translation>หน้าต่างใหม่</translation>
-    </message>
-    <message>
-        <source>Ctrl+N</source>
-        <translation>Ctrl+N</translation>
     </message>
     <message>
         <source>User...</source>
@@ -520,10 +476,6 @@ to view more bookmarks</source>
         <translation>ไฟล์(s)...</translation>
     </message>
     <message>
-        <source>Ctrl+O</source>
-        <translation>Ctrl+O</translation>
-    </message>
-    <message>
         <source>Layout(s)...</source>
         <translation>เค้าโครง(s)...</translation>
     </message>
@@ -536,20 +488,8 @@ to view more bookmarks</source>
         <translation>บันทึกเค้าโครงปัจจุบัน</translation>
     </message>
     <message>
-        <source>Ctrl+S</source>
-        <translation>Ctrl+S</translation>
-    </message>
-    <message>
         <source>Save Current Layout As...</source>
         <translation>บันทึกเค้าโครงปัจจุบันเป็น...</translation>
-    </message>
-    <message>
-        <source>Ctrl+Shift+S</source>
-        <translation>Ctrl+Shift+S</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+S</source>
-        <translation>Ctrl+Alt+S</translation>
     </message>
     <message>
         <source>Save Video Wall View</source>
@@ -562,14 +502,6 @@ to view more bookmarks</source>
     <message>
         <source>Stop Screen Recording</source>
         <translation>หยุดการบันทึกหน้าจอ</translation>
-    </message>
-    <message>
-        <source>Alt+R</source>
-        <translation>Alt+R</translation>
-    </message>
-    <message>
-        <source>Esc</source>
-        <translation>Esc</translation>
     </message>
     <message>
         <source>Stop current action</source>
@@ -596,18 +528,6 @@ to view more bookmarks</source>
         <translation>การคืนค่าลง</translation>
     </message>
     <message>
-        <source>Alt+Enter</source>
-        <translation>Alt+Enter</translation>
-    </message>
-    <message>
-        <source>Alt+Return</source>
-        <translation>Alt+Return</translation>
-    </message>
-    <message>
-        <source>Ctrl+F</source>
-        <translation>Ctrl+F</translation>
-    </message>
-    <message>
         <source>Show Message</source>
         <translation>แสดงข้อความ</translation>
     </message>
@@ -628,10 +548,6 @@ to view more bookmarks</source>
         <translation>ผู้ดูแลระบบ...</translation>
     </message>
     <message>
-        <source>Ctrl+Alt+A</source>
-        <translation>Ctrl+Alt+A</translation>
-    </message>
-    <message>
         <source>Open Web Client...</source>
         <translation>เปิดเว็บ ไคลแอนต์ ...</translation>
     </message>
@@ -642,18 +558,6 @@ to view more bookmarks</source>
     <message>
         <source>Local Settings...</source>
         <translation>การตั้งค่าภายใน...</translation>
-    </message>
-    <message>
-        <source>Ctrl+E</source>
-        <translation>Ctrl+E</translation>
-    </message>
-    <message>
-        <source>Ctrl+L</source>
-        <translation>Ctrl+L</translation>
-    </message>
-    <message>
-        <source>Ctrl+M</source>
-        <translation>Ctrl+M</translation>
     </message>
     <message>
         <source>Merge Systems...</source>
@@ -668,16 +572,8 @@ to view more bookmarks</source>
         <translation>เกี่ยวกับ...</translation>
     </message>
     <message>
-        <source>F1</source>
-        <translation>F1</translation>
-    </message>
-    <message>
         <source>Exit</source>
         <translation>ออก</translation>
-    </message>
-    <message>
-        <source>Alt+F4</source>
-        <translation>Alt+F4</translation>
     </message>
     <message>
         <source>Server...</source>
@@ -720,14 +616,6 @@ to view more bookmarks</source>
         <translation>เปิดโฟลเดอร์</translation>
     </message>
     <message>
-        <source>Ctrl+Enter</source>
-        <translation>Ctrl+Enter</translation>
-    </message>
-    <message>
-        <source>Ctrl+Return</source>
-        <translation>Ctrl+Return</translation>
-    </message>
-    <message>
         <source>Identify</source>
         <translation>แยกแยะ</translation>
     </message>
@@ -749,10 +637,6 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Delete</source>
-        <translation>ลบ</translation>
-    </message>
-    <message>
-        <source>Del</source>
         <translation>ลบ</translation>
     </message>
     <message>
@@ -780,24 +664,12 @@ to view more bookmarks</source>
         <translation>ขยายเต็มจอ</translation>
     </message>
     <message>
-        <source>Enter</source>
-        <translation>Enter</translation>
-    </message>
-    <message>
-        <source>Return</source>
-        <translation>Return</translation>
-    </message>
-    <message>
         <source>Restore Item</source>
         <translation>กลับสู่ปรกติ</translation>
     </message>
     <message>
         <source>Show Info</source>
         <translation>แสดงข้อมูล</translation>
-    </message>
-    <message>
-        <source>Alt+I</source>
-        <translation>Alt+I</translation>
     </message>
     <message>
         <source>Hide Info</source>
@@ -852,10 +724,6 @@ to view more bookmarks</source>
         <translation>แสดงความเคลื่อนไหว</translation>
     </message>
     <message>
-        <source>Alt+G</source>
-        <translation>Alt+G</translation>
-    </message>
-    <message>
         <source>Hide Motion/Smart Search</source>
         <translation>ซ่อนโมชั่น / ค้นหาละเอียด</translation>
     </message>
@@ -876,24 +744,12 @@ to view more bookmarks</source>
         <translation>ตรวจสอบไฟล์ลายน้ำ</translation>
     </message>
     <message>
-        <source>Alt+C</source>
-        <translation>Alt+C</translation>
-    </message>
-    <message>
         <source>Take Screenshot</source>
         <translation>ใช้ภาพหน้าจอ</translation>
     </message>
     <message>
-        <source>Alt+S</source>
-        <translation>Alt+S</translation>
-    </message>
-    <message>
         <source>Image Enhancement...</source>
         <translation>การเพิ่มประสิทธิภาพของภาพ ...</translation>
-    </message>
-    <message>
-        <source>Alt+J</source>
-        <translation>Alt+J</translation>
     </message>
     <message>
         <source>Create Zoom Window</source>
@@ -926,10 +782,6 @@ to view more bookmarks</source>
     <message>
         <source>Rename</source>
         <translation>เปลี่ยนชื่อ</translation>
-    </message>
-    <message>
-        <source>F2</source>
-        <translation>F2</translation>
     </message>
     <message>
         <source>Delete from Disk</source>
@@ -1004,16 +856,8 @@ to view more bookmarks</source>
         <translation>หยุดทัวร์</translation>
     </message>
     <message>
-        <source>Alt+T</source>
-        <translation>Alt+T</translation>
-    </message>
-    <message>
         <source>Close</source>
         <translation>ปิด</translation>
-    </message>
-    <message>
-        <source>Ctrl+W</source>
-        <translation>Ctrl+W</translation>
     </message>
     <message>
         <source>Close All But This</source>
@@ -1024,16 +868,8 @@ to view more bookmarks</source>
         <translation>กำหนดการเลือกเริ่มต้น</translation>
     </message>
     <message>
-        <source>[</source>
-        <translation>[</translation>
-    </message>
-    <message>
         <source>Mark Selection End</source>
         <translation>กำหนดการเลือกสุดท้าย</translation>
-    </message>
-    <message>
-        <source>]</source>
-        <translation>]</translation>
     </message>
     <message>
         <source>Clear Selection</source>
@@ -1064,50 +900,6 @@ to view more bookmarks</source>
         <translation>แสดงการค้นหา...</translation>
     </message>
     <message>
-        <source>Ctrl+Alt+Shift++</source>
-        <translation>Ctrl+Alt+Shift++</translation>
-    </message>
-    <message>
-        <source>Increment Debug Counter</source>
-        <translation>เพิ่ม Debug เคาน์เตอร์</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift+-</source>
-        <translation>Ctrl+Alt+Shift+-</translation>
-    </message>
-    <message>
-        <source>Decrement Debug Counter</source>
-        <translation>ลดการแก้ปัญหาตัวนับ</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift+R</source>
-        <translation>Ctrl+Alt+Shift+R</translation>
-    </message>
-    <message>
-        <source>Show Resource Pool</source>
-        <translation>แสดงทรัพยากรร่วมกัน</translation>
-    </message>
-    <message>
-        <source>Calibrate PTZ</source>
-        <translation>การปรับเทียบ PTZ</translation>
-    </message>
-    <message>
-        <source>Get PTZ Position</source>
-        <translation>ได้รับตำแหน่ง PTZ</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift+D</source>
-        <translation>Ctrl+Alt+Shift+D</translation>
-    </message>
-    <message>
-        <source>Debug Control Panel</source>
-        <translation>แผงควบคุมตรวจแก้จุดบกพร่อง</translation>
-    </message>
-    <message>
-        <source>Space</source>
-        <translation>ช่องว่าง</translation>
-    </message>
-    <message>
         <source>Play</source>
         <translation>เล่น</translation>
     </message>
@@ -1116,72 +908,36 @@ to view more bookmarks</source>
         <translation>หยุด</translation>
     </message>
     <message>
-        <source>Ctrl+Left</source>
-        <translation>Ctrl+Left</translation>
-    </message>
-    <message>
         <source>Previous Frame</source>
         <translation>เฟรมก่อนหน้า</translation>
-    </message>
-    <message>
-        <source>Ctrl+Right</source>
-        <translation>Ctrl+Right</translation>
     </message>
     <message>
         <source>Next Frame</source>
         <translation>เฟรมต่อไป</translation>
     </message>
     <message>
-        <source>Z</source>
-        <translation>Z</translation>
-    </message>
-    <message>
         <source>To Start</source>
         <translation>เริ่ม</translation>
-    </message>
-    <message>
-        <source>X</source>
-        <translation>X</translation>
     </message>
     <message>
         <source>To End</source>
         <translation>จบ</translation>
     </message>
     <message>
-        <source>Ctrl+Up</source>
-        <translation>Ctrl+Up</translation>
-    </message>
-    <message>
         <source>Volume Down</source>
         <translation>ปรับเสียงลง</translation>
-    </message>
-    <message>
-        <source>Ctrl+Down</source>
-        <translation>Ctrl+Down</translation>
     </message>
     <message>
         <source>Volume Up</source>
         <translation>ปรับเสียงขึ้น</translation>
     </message>
     <message>
-        <source>M</source>
-        <translation>M</translation>
-    </message>
-    <message>
         <source>Toggle Mute</source>
         <translation>สลับเสียง</translation>
     </message>
     <message>
-        <source>L</source>
-        <translation>L</translation>
-    </message>
-    <message>
         <source>Jump to Live</source>
         <translation>ข้ามไปยังภาพสด</translation>
-    </message>
-    <message>
-        <source>S</source>
-        <translation>S</translation>
     </message>
     <message>
         <source>Synchronize Streams</source>
@@ -1246,10 +1002,6 @@ to view more bookmarks</source>
     <message>
         <source>Unpin Notifications</source>
         <translation>การแจ้งเตือน Unpin</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+T</source>
-        <translation>Ctrl+Alt+T</translation>
     </message>
     <message>
         <source>Disable Background Animation</source>
@@ -1378,10 +1130,6 @@ to view more bookmarks</source>
     <message>
         <source>Cameras to Backup...</source>
         <translation>สำรองข้อมูลกล้อง ...</translation>
-    </message>
-    <message>
-        <source>Ctrl+B</source>
-        <translation>Ctrl+B</translation>
     </message>
     <message>
         <source>Show Bookmarks</source>
