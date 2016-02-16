@@ -1297,7 +1297,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     const qint64 maxItems = qnSettings->maxPreviewSearchItems();
 
     if(period.durationMs < steps[1]) {
-        QnMessageBox::warning(mainWindow(), tr("Unable to perform preview search."), tr("Selected time period is too short to perform preview search. Please select a longer period."), QMessageBox::Ok);
+        QnMessageBox::warning(mainWindow(), tr("Unable to perform preview search."), tr("Selected time period is too short to perform preview search. Please select a longer period."), QnMessageBox::Ok);
         return;
     }
 
@@ -1486,10 +1486,10 @@ void QnWorkbenchActionHandler::at_serverAddCameraManuallyAction_triggered(){
                         tr("Process in progress..."),
                         tr("Device addition is already in progress. "
                            "Are you sure you want to cancel current process?"), //TODO: #GDM #Common show current process details
-                        QMessageBox::Ok | QMessageBox::Cancel,
-                        QMessageBox::Cancel
+                        QnMessageBox::Ok | QnMessageBox::Cancel,
+                        QnMessageBox::Cancel
             );
-            if (result != QMessageBox::Ok)
+            if (result != QnMessageBox::Ok)
                 return;
         }
         dialog->setServer(server);
@@ -2387,14 +2387,14 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
 
     QScopedPointer<QnWorkbenchStateDependentDialog<QnMessageBox> > messageBox(
         new QnWorkbenchStateDependentDialog<QnMessageBox>(mainWindow()));
-    messageBox->setIcon(QMessageBox::Warning);
+    messageBox->setIcon(QnMessageBox::Warning);
     messageBox->setWindowTitle(tr("Version Mismatch"));
     messageBox->setText(message);
     messageBox->setTextFormat(Qt::RichText);
-    messageBox->setStandardButtons(QMessageBox::Cancel);
+    messageBox->setStandardButtons(QnMessageBox::Cancel);
     setHelpTopic(messageBox.data(), Qn::Upgrade_Help);
 
-    QPushButton *updateButton = messageBox->addButton(tr("Update..."), QMessageBox::HelpRole);
+    QPushButton *updateButton = messageBox->addButton(tr("Update..."), QnMessageBox::HelpRole);
     connect(updateButton, &QPushButton::clicked, this, [this] {
         menu()->trigger(Qn::SystemUpdateAction);
     }, Qt::QueuedConnection);
@@ -2463,7 +2463,7 @@ void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered() {
         success = applauncher::restartClient(version, auth) == applauncher::api::ResultType::ok;
 
     if (!success) {
-        QMessageBox::critical(
+        QnMessageBox::critical(
                     mainWindow(),
                     tr("Launcher process not found."),
                     tr("Cannot restart the client.") + L'\n'

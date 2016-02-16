@@ -673,7 +673,7 @@ void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &r
             if (!QFile::rename(recordedFileName, filePath)) {
                 QString message = tr("Could not overwrite file '%1'. Please try a different name.").arg(filePath);
                 CL_LOG(cl_logWARNING) cl_log.log(message, cl_logWARNING);
-                QnMessageBox::warning(display()->view(), tr("Warning"), message, QMessageBox::Ok, QMessageBox::NoButton);
+                QnMessageBox::warning(display()->view(), tr("Warning"), message, QnMessageBox::Ok, QnMessageBox::NoButton);
                 continue;
             }
 

@@ -77,7 +77,7 @@ void QnWorkbenchLayoutsHandler::renameLayout(const QnLayoutResourcePtr &layout, 
     }
 
     if (!existing.isEmpty()) {
-        if (askOverrideLayout(QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel) == QMessageBox::Cancel)
+        if (askOverrideLayout(QnMessageBox::Ok | QnMessageBox::Cancel, QnMessageBox::Cancel) == QnMessageBox::Cancel)
             return;
         removeLayouts(existing);
     }
@@ -151,7 +151,7 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
         dialog->setName(proposedName);
         setHelpTopic(dialog.data(), Qn::SaveLayout_Help);
 
-        QMessageBox::Button button = QMessageBox::Cancel;
+        QnMessageBox::Button button = QnMessageBox::Cancel;
         do {
             if (!dialog->exec())
                 return;
@@ -172,10 +172,10 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
                     return;
                 }
 
-                switch (askOverrideLayout(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Yes)) {
-                case QMessageBox::Cancel:
+                switch (askOverrideLayout(QnMessageBox::Yes | QnMessageBox::No | QnMessageBox::Cancel, QnMessageBox::Yes)) {
+                case QnMessageBox::Cancel:
                     return;
-                case QMessageBox::Yes:
+                case QnMessageBox::Yes:
                     saveLayout(layout);
                     return;
                 default:
@@ -196,16 +196,16 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
                 continue;
             }
 
-            button = QMessageBox::Yes;
+            button = QnMessageBox::Yes;
             if (!existing.isEmpty()) {
-                button = askOverrideLayout(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Yes);
-                if (button == QMessageBox::Cancel)
+                button = askOverrideLayout(QnMessageBox::Yes | QnMessageBox::No | QnMessageBox::Cancel, QnMessageBox::Yes);
+                if (button == QnMessageBox::Cancel)
                     return;
-                if (button == QMessageBox::Yes) {
+                if (button == QnMessageBox::Yes) {
                     removeLayouts(existing);
                 }
             }
-        } while (button != QMessageBox::Yes);
+        } while (button != QnMessageBox::Yes);
     } else {
         QnLayoutResourceList existing = alreadyExistingLayouts(name, user, layout);
         if (!canRemoveLayouts(existing)) {
@@ -218,7 +218,7 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
         }
 
         if (!existing.isEmpty()) {
-            if (askOverrideLayout(QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel) == QMessageBox::Cancel)
+            if (askOverrideLayout(QnMessageBox::Ok | QnMessageBox::Cancel, QnMessageBox::Cancel) == QnMessageBox::Cancel)
                 return;
             removeLayouts(existing);
         }
@@ -288,8 +288,8 @@ QnLayoutResourceList QnWorkbenchLayoutsHandler::alreadyExistingLayouts(const QSt
     return result;
 }
 
-QMessageBox::StandardButton QnWorkbenchLayoutsHandler::askOverrideLayout(QMessageBox::StandardButtons buttons,
-                                                                        QMessageBox::StandardButton defaultButton) {
+QnMessageBox::StandardButton QnWorkbenchLayoutsHandler::askOverrideLayout(QnMessageBox::StandardButtons buttons,
+                                                                        QnMessageBox::StandardButton defaultButton) {
     return QnMessageBox::warning(
         mainWindow(),
         tr("Layout already exists."),
@@ -509,12 +509,12 @@ void QnWorkbenchLayoutsHandler::at_newUserLayoutAction_triggered() {
     dialog->setName(generateUniqueLayoutName(user, tr("New Layout"), tr("New Layout %1")));
     dialog->setWindowModality(Qt::ApplicationModal);
 
-    QMessageBox::Button button;
+    QnMessageBox::Button button;
     do {
         if(!dialog->exec())
             return;
 
-        button = QMessageBox::Yes;
+        button = QnMessageBox::Yes;
         QnLayoutResourceList existing = alreadyExistingLayouts(dialog->name(), user);
 
         if (!canRemoveLayouts(existing)) {
@@ -535,14 +535,14 @@ void QnWorkbenchLayoutsHandler::at_newUserLayoutAction_triggered() {
                 break;
             }
 
-            button = askOverrideLayout(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Yes);
-            if (button == QMessageBox::Cancel)
+            button = askOverrideLayout(QnMessageBox::Yes | QnMessageBox::No | QnMessageBox::Cancel, QnMessageBox::Yes);
+            if (button == QnMessageBox::Cancel)
                 return;
-            if (button == QMessageBox::Yes) {
+            if (button == QnMessageBox::Yes) {
                 removeLayouts(existing);
             }
         }
-    } while (button != QMessageBox::Yes);
+    } while (button != QnMessageBox::Yes);
 
     QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
     layout->setId(QnUuid::createUuid());
@@ -633,7 +633,7 @@ void QnWorkbenchLayoutsHandler::at_layouts_saved(int status, const QnResourceLis
             tr("Do you want to restore these %n layout(s)?", "", reopeningLayoutResources.size()),
             QDialogButtonBox::Yes | QDialogButtonBox::No
         );
-        if(button == QMessageBox::Yes) {
+        if(button == QnMessageBox::Yes) {
             foreach(const QnLayoutResourcePtr &layoutResource, layoutResources)
                 workbench()->addLayout(new QnWorkbenchLayout(layoutResource, this));
             workbench()->setCurrentLayout(workbench()->layouts().back());

@@ -161,7 +161,7 @@ void QnWorkbenchUpdateWatcher::showUpdateNotification(const QnUpdateInfo &info)
     QnCheckableMessageBox messageBox(mainWindow());
 
     messageBox.setStandardButtons(buttons);
-    messageBox.setIconPixmap(QMessageBox::standardIcon(QMessageBox::Question));
+    messageBox.setIconPixmap(QnMessageBox::standardIcon(QnMessageBox::Question));
 
 #ifdef Q_OS_MAC
     bool hasOutdatedServer = false;

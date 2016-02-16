@@ -188,16 +188,16 @@ void QnLicenseManagerWidget::updateLicenses() {
 
 void QnLicenseManagerWidget::showMessage(const QString &title, const QString &message, bool warning) {
     QScopedPointer<QnWorkbenchStateDependentDialog<QnMessageBox>> messageBox(new QnWorkbenchStateDependentDialog<QnMessageBox>(this));
-    messageBox->setIcon(warning ? QMessageBox::Warning : QMessageBox::Information);
+    messageBox->setIcon(warning ? QnMessageBox::Warning : QnMessageBox::Information);
     messageBox->setWindowTitle(title);
     messageBox->setText(message);
-    QPushButton* copyButton = messageBox->addCustomButton(tr("Copy to Clipboard"), QMessageBox::HelpRole);
+    QPushButton* copyButton = messageBox->addCustomButton(tr("Copy to Clipboard"), QnMessageBox::HelpRole);
     connect(copyButton, &QPushButton::clicked, this, [this, message]{
         qApp->clipboard()->setText(message);
     });
-    messageBox->setStandardButtons(QMessageBox::Ok);
-    messageBox->setEscapeButton(QMessageBox::Ok);
-    messageBox->setDefaultButton(QMessageBox::Ok);
+    messageBox->setStandardButtons(QnMessageBox::Ok);
+    messageBox->setEscapeButton(QnMessageBox::Ok);
+    messageBox->setDefaultButton(QnMessageBox::Ok);
     messageBox->exec();
 }
 
@@ -367,7 +367,7 @@ void QnLicenseManagerWidget::at_licensesReceived(int handle, ec2::ErrorCode erro
     }
 
     if (!message.isEmpty())
-        QMessageBox::information(this, tr("License Activation"), message);
+        QnMessageBox::information(this, tr("License Activation"), message);
 
     ui->licenseWidget->setSerialKey(QString());
 

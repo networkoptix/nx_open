@@ -100,7 +100,6 @@ extern "C" {
 #include <QtWidgets/QListView>
 #include <QtCore/QMap>
 #include <QtWidgets/QMenu>
-#include <QtWidgets/QMessageBox>
 #include <QtGui/QMouseEvent>
 #include <QtCore/QMutex>
 #include <QtCore/QMutexLocker>

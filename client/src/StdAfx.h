@@ -103,7 +103,6 @@ extern "C" {
 #include <QtWidgets/QListView>
 #include <QtCore/QMap>
 #include <QtWidgets/QMenu>
-#include <QtWidgets/QMessageBox>
 #include <QtGui/QMouseEvent>
 #include <nx/utils/thread/mutex.h>
 #include <QtCore/QMutexLocker>
@@ -159,5 +158,6 @@ extern "C" {
 
 #include <nx/utils/thread/wait_condition.h>
 #include <ui/workaround/deprecation.h>
+#include <ui/dialogs/message_box.h>
 
 #endif

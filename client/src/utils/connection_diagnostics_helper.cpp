@@ -142,7 +142,7 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
                 Qn::VersionMismatch_Help,
                 strings(ErrorStrings::UnableConnect),
                 message,
-                QMessageBox::Ok
+                QnMessageBox::Ok
                 );
             return Result::IncompatibleVersion;
         }
@@ -156,7 +156,7 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
             tr("You are about to connect to Server which has a different version:") + L'\n'
             + versionDetails
             + tr("Compatibility mode for versions lower than %1 is not supported.").arg(minSupportedVersion.toString()),
-            QMessageBox::Ok
+            QnMessageBox::Ok
             );
         return Result::IncompatibleVersion;
     }
@@ -188,7 +188,7 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
                 tr("Selected Server has a different version:") + L'\n'
                 + versionDetails
                 + tr("An error has occurred while trying to restart in compatibility mode."),
-                QMessageBox::Ok
+                QnMessageBox::Ok
                 );
 #else
             QnMessageBox::warning(
@@ -220,10 +220,10 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
                 + tr("Client version %1 is required to connect to this Server.").arg(versionString) + L'\n' 
                 + tr("Download version %1?").arg(versionString),
                 
-                QMessageBox::StandardButtons(QMessageBox::Yes | QMessageBox::Cancel),
-                QMessageBox::Cancel
+                QnMessageBox::StandardButtons(QnMessageBox::Yes | QnMessageBox::Cancel),
+                QnMessageBox::Cancel
                 );
-            if( selectedButton == QMessageBox::Yes ) {
+            if( selectedButton == QnMessageBox::Yes ) {
                 QScopedPointer<CompatibilityVersionInstallationDialog> installationDialog(
                             new CompatibilityVersionInstallationDialog(connectionInfo.version, parentWidget));
                 //starting installation
@@ -244,11 +244,11 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
             tr("You are about to connect to Server which has a different version:") + L'\n'
             + versionDetails
             + tr("Would you like to restart the Client in compatibility mode?"),
-            QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel), 
-            QMessageBox::Cancel
+            QnMessageBox::StandardButtons(QnMessageBox::Ok | QnMessageBox::Cancel), 
+            QnMessageBox::Cancel
             );
 
-        if (button != QMessageBox::Ok)
+        if (button != QnMessageBox::Ok)
             return Result::IncompatibleVersion;
 
         switch( applauncher::restartClient(connectionInfo.version, url.toEncoded()) ) {
@@ -256,7 +256,7 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
             return Result::RestartRequested;
 
         case applauncher::api::ResultType::connectError:
-            QMessageBox::critical(
+            QnMessageBox::critical(
                 parentWidget,
                 tr("Launcher process not found."),
                 tr("Cannot restart the Client in compatibility mode.") + L'\n' 
@@ -273,10 +273,10 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
                     tr("Failure"),
                     tr("Failed to launch compatibility version %1").arg(connectionInfo.version.toString(QnSoftwareVersion::MinorFormat)) + L'\n' 
                   + tr("Try to restore version %1?").arg(connectionInfo.version.toString(QnSoftwareVersion::MinorFormat)),
-                    QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel),
-                    QMessageBox::Cancel
+                    QnMessageBox::StandardButtons(QnMessageBox::Ok | QnMessageBox::Cancel),
+                    QnMessageBox::Cancel
                     );
-                if( selectedButton == QMessageBox::Ok ) {
+                if( selectedButton == QnMessageBox::Ok ) {
                     //starting installation
                     QScopedPointer<CompatibilityVersionInstallationDialog> installationDialog(new CompatibilityVersionInstallationDialog(connectionInfo.version, parentWidget));
                     installationDialog->exec();

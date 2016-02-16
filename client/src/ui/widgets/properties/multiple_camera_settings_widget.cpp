@@ -230,17 +230,17 @@ bool QnMultipleCameraSettingsWidget::isValidSecondStream() {
     if (ui->expertSettingsWidget->isSecondStreamEnabled())
         return true;
 
-    auto button = QMessageBox::warning(this,
+    auto button = QnMessageBox::warning(this,
         tr("Invalid Schedule"),
         tr("Second stream is disabled on these cameras. Motion + LQ option has no effect. "\
         "Press \"Yes\" to change recording type to \"Always\" or \"No\" to re-enable second stream."),
-        QMessageBox::StandardButtons(QMessageBox::Yes|QMessageBox::No | QMessageBox::Cancel),
-        QMessageBox::Yes);
+        QnMessageBox::StandardButtons(QnMessageBox::Yes|QnMessageBox::No | QnMessageBox::Cancel),
+        QnMessageBox::Yes);
     switch (button) {
-    case QMessageBox::Yes:
+    case QnMessageBox::Yes:
         ui->cameraScheduleWidget->setScheduleTasks(filteredTasks);
         return true;
-    case QMessageBox::No:
+    case QnMessageBox::No:
         ui->expertSettingsWidget->setSecondStreamEnabled();
         return true;
     default:

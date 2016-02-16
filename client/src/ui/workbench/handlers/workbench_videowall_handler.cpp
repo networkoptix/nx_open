@@ -529,21 +529,21 @@ void QnWorkbenchVideoWallHandler::startVideowallAndExit(const QnVideoWallResourc
         return;
     }
 
-    QMessageBox::StandardButton button =
+    QnMessageBox::StandardButton button =
         QnMessageBox::question(
             mainWindow(),
             Qn::Videowall_VwModeWarning_Help,
             tr("Switch to Video Wall Mode..."),
             tr("Video Wall is about to start. Would you like to close this %1 Client instance?")
                 .arg(QnAppInfo::productNameLong()),
-            QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
-            QMessageBox::Yes
+            QnMessageBox::Yes | QnMessageBox::No | QnMessageBox::Cancel,
+            QnMessageBox::Yes
             );
 
-    if (button == QMessageBox::Cancel)
+    if (button == QnMessageBox::Cancel)
         return;
 
-    if (button == QMessageBox::Yes) {
+    if (button == QnMessageBox::Yes) {
         closeInstanceDelayed();
     }
 
@@ -1371,8 +1371,8 @@ void QnWorkbenchVideoWallHandler::at_stopVideoWallAction_triggered() {
         tr("Confirm Video Wall stop"),
         tr("Are you sure you want to stop Video Wall?") + L'\n'
       + tr("You will have to start it manually."),
-        QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel),
-        QMessageBox::Cancel) == QMessageBox::Cancel)
+        QnMessageBox::StandardButtons(QnMessageBox::Ok | QnMessageBox::Cancel),
+        QnMessageBox::Cancel) == QnMessageBox::Cancel)
         return;
 
     QnVideoWallControlMessage message(QnVideoWallControlMessage::Exit);

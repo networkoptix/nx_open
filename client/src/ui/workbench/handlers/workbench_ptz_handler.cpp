@@ -103,7 +103,7 @@ void QnWorkbenchPtzHandler::at_ptzSavePresetAction_triggered() {
 
     //TODO: #GDM #PTZ fix the text
     if(resource->getStatus() == Qn::Offline || resource->getStatus() == Qn::Unauthorized) {
-        QMessageBox::critical(
+        QnMessageBox::critical(
             mainWindow(),
             tr("Unable to get position from camera."),
             tr("An error has occurred while trying to get the current position from camera %1.").arg(getResourceName(resource))
@@ -146,7 +146,7 @@ void QnWorkbenchPtzHandler::at_ptzActivatePresetAction_triggered() {
             action(Qn::JumpToLiveAction)->trigger(); // TODO: #Elric ?
     } else {
         if(resource->getStatus() == Qn::Offline || resource->getStatus() == Qn::Unauthorized) {
-            QMessageBox::critical(
+            QnMessageBox::critical(
                 mainWindow(),
                 tr("Unable to set position on camera."),
                 tr("An error has occurred while trying to set the current position for camera %1.").arg(getResourceName(resource)) + L'\n'
@@ -199,7 +199,7 @@ void QnWorkbenchPtzHandler::at_ptzActivateTourAction_triggered() {
             action(Qn::JumpToLiveAction)->trigger(); // TODO: #Elric ?
     } else {
         if(resource->getStatus() == Qn::Offline || resource->getStatus() == Qn::Unauthorized) {
-            QMessageBox::critical(
+            QnMessageBox::critical(
                 mainWindow(),
                 tr("Unable to set position on camera."),
                 tr("An error has occurred while trying to set the current position for camera %1.").arg(getResourceName(resource)) + L'\n'

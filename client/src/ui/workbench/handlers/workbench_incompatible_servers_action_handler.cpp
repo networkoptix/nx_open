@@ -40,7 +40,7 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemActio
 {
     if (m_connectTool)
     {
-        QMessageBox::critical(mainWindow(), tr("Error"), tr("Please wait. Requested servers will be added to your system."));
+        QnMessageBox::critical(mainWindow(), tr("Error"), tr("Please wait. Requested servers will be added to your system."));
         return;
     }
 
@@ -83,7 +83,7 @@ void QnWorkbenchIncompatibleServersActionHandler::connectToCurrentSystem(
         password = dialog.textValue();
 
         if (password.isEmpty())
-            QMessageBox::critical(mainWindow(), tr("Error"), tr("Password cannot be empty!"));
+            QnMessageBox::critical(mainWindow(), tr("Error"), tr("Password cannot be empty!"));
         else
             break;
     }
