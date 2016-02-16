@@ -47,10 +47,12 @@ TEST_F(MediatorFunctionalTest, HolePunchingProcessor_generic)
     boost::optional<api::ResultCode> connectionAckResult;
     server1->setConnectionAckResponseHandler(
         [&mtx, &waitCond, &connectionAckResult](api::ResultCode resultCode)
+            -> MediaServerEmulator::ActionToTake
         {
             QnMutexLocker lk(&mtx);
             connectionAckResult = resultCode;
             waitCond.wakeAll();
+            return MediaServerEmulator::ActionToTake::ignoreIndication;
         });
 
     ASSERT_EQ(api::ResultCode::ok, server1->listen());
