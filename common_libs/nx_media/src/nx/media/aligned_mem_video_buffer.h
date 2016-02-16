@@ -1,6 +1,7 @@
 #pragma once
 
-#include <QtMultimedia/qabstractvideobuffer.h>
+#include <QtCore/QScopedPointer>
+#include <QtMultimedia/QAbstractVideoBuffer>
 
 namespace nx {
 namespace media {

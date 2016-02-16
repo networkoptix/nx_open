@@ -2,7 +2,7 @@
 
 #include <QtCore/QObject>
 #include <QtMultimedia/QVideoFrame>
-#include <QOpenGLContext>
+#include <QtGui/QOpenGLContext>
 
 #include <nx/streaming/audio_data_packet.h>
 #include <utils/common/byte_array.h>

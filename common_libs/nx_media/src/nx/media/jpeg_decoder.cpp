@@ -1,6 +1,6 @@
 #include "jpeg_decoder.h"
 
-#include "utils/jpeg.h"
+#include "jpeg.h"
 
 namespace nx {
 namespace media {
@@ -25,7 +25,7 @@ JpegDecoder::JpegDecoder()
 {
 }
 
-bool JpegDecoder::isCompatible(const CodecID codec, const QSize& resolution)
+bool JpegDecoder::isCompatible(const CodecID codec, const QSize& /*resolution*/)
 {
     return codec == CODEC_ID_MJPEG;
 }

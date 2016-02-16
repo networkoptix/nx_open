@@ -10,7 +10,7 @@
 #include <utils/common/util.h>
 #include <utils/thread/mutex.h>
 #include <utils/thread/wait_condition.h>
-#include <utils/jpeg.h>
+#include <nx/media/jpeg.h>
 
 namespace {
 
@@ -37,7 +37,7 @@ void QnMjpegSession::FrameData::clear()
 }
 
 
-class QnMjpegSessionPrivate: public QObject 
+class QnMjpegSessionPrivate: public QObject
 {
     Q_DECLARE_PUBLIC(QnMjpegSession)
 public:
@@ -173,7 +173,7 @@ QnMjpegSession::FrameData QnMjpegSessionPrivate::getFrame()
     return result;
 }
 
-bool QnMjpegSessionPrivate::connect() 
+bool QnMjpegSessionPrivate::connect()
 {
     if (!url.isValid())
         return false;
@@ -207,7 +207,7 @@ bool QnMjpegSessionPrivate::connect()
     return true;
 }
 
-void QnMjpegSessionPrivate::disconnect() 
+void QnMjpegSessionPrivate::disconnect()
 {
     if (reply)
 	{
@@ -409,7 +409,7 @@ QnMjpegSessionPrivate::ParseResult QnMjpegSessionPrivate::parseHeaders()
             break;
 
         // Header length without "\r\n".
-        int length = 
+        int length =
 			((lineEnd > 0 && httpBuffer[lineEnd - 1] == '\r') ? lineEnd - 1 : lineEnd) - pos;
 
         ++lineEnd;
@@ -489,7 +489,7 @@ QnMjpegSessionPrivate::ParseResult QnMjpegSessionPrivate::parseBody()
     }
 
     parserState = ParseBoundary;
-    int framePresentationTimeMSec = (previousFrameTimestampUSec > 0) ? 
+    int framePresentationTimeMSec = (previousFrameTimestampUSec > 0) ?
 		(frameTimestampUSec - previousFrameTimestampUSec) / 1000 : 0;
     if (framePresentationTimeMSec > MAX_FRAME_DURATION)
         framePresentationTimeMSec = MAX_FRAME_DURATION;
@@ -601,7 +601,7 @@ void QnMjpegSession::start()
     Q_D(QnMjpegSession);
 
     executeDelayed(
-		[d]() 
+		[d]()
 	    {
 			d->connect();
 		},

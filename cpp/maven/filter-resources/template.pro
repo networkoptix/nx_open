@@ -117,6 +117,7 @@ INCLUDEPATH +=  ${environment.dir}/boost_1_56_0 \
                 ${project.build.directory} \
                 ${root.dir}/common/src \
                 ${root.dir}/common_libs/nx_streaming/src \
+                ${root.dir}/common_libs/nx_media/src \
                 ${libdir}/include \
                 ${environment.dir}/include \
                 $$ADDITIONAL_QT_INCLUDES \

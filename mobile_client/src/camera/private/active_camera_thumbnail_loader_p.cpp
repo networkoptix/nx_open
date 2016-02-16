@@ -3,7 +3,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <api/server_rest_connection.h>
-#include <utils/jpeg.h>
+#include <nx/media/jpeg.h>
 
 namespace
 {

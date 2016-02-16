@@ -2,19 +2,19 @@
 
 #include <deque>
 
-#include <utils/thread/mutex.h>
-#include <utils/media/h264_utils.h>
 #include <QtGui/QOpenGLContext>
-#include <QtGui/QOpenGLContext>
-#include <QtGui/qopenglfunctions.h>
-#include <QtGui/qopenglshaderprogram.h>
-#include <QtGui/qopenglframebufferobject.h>
+#include <QtGui/QOpenGLFunctions>
+#include <QtGui/QOpenGLShaderProgram>
+#include <QtGui/QOpenGLFramebufferObject>
 
 #include <QtGui/QOpenGLFunctions>
 #include <QtGui/QOffscreenSurface>
-#include <QtGui/qopengl.h>
+#include <QtOpenGL/QtOpenGL>
 #include <QCache>
 #include <QMap>
+
+#include <utils/thread/mutex.h>
+#include <utils/media/h264_utils.h>
 
 #if defined(Q_OS_ANDROID)
 
