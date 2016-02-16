@@ -1518,7 +1518,7 @@ QRect QnNxStyle::subElementRect(
     case SE_PushButtonLayoutItem:
         if (qobject_cast<const QDialogButtonBox *>(widget))
         {
-            const int shift = dp(8);
+            const int shift = dp(16);
             return option->rect.adjusted(-shift, -shift, shift, shift);
         }
         break;
@@ -1699,6 +1699,14 @@ int QnNxStyle::pixelMetric(
     case PM_FocusFrameHMargin:
     case PM_FocusFrameVMargin:
         return dp(1);
+    case PM_LayoutTopMargin:
+    case PM_LayoutBottomMargin:
+    case PM_LayoutLeftMargin:
+    case PM_LayoutRightMargin:
+        return dp(0);
+    case PM_LayoutHorizontalSpacing:
+    case PM_LayoutVerticalSpacing:
+        return dp(8);
     default:
         break;
     }
