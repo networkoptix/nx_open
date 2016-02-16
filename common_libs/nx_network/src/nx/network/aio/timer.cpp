@@ -15,6 +15,16 @@ void Timer::start(
     std::function<void()> timerFunc)
 {
     UDPSocket::registerTimer(timeout, std::move(timerFunc));
+    m_timeout = timeout;
+    m_timerStartClock = std::chrono::steady_clock::now();
+}
+
+std::chrono::nanoseconds Timer::timeToEvent() const
+{
+    const auto elapsed = std::chrono::steady_clock::now() - m_timerStartClock;
+    return elapsed >= m_timeout
+        ? std::chrono::nanoseconds::zero()
+        : m_timeout - elapsed;
 }
 
 void Timer::post(std::function<void()> funcToCall)

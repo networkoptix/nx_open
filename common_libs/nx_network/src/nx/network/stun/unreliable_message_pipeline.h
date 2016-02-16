@@ -10,6 +10,7 @@
 #include <memory>
 
 #include <nx/utils/log/log.h>
+#include <utils/common/cpp14.h>
 #include <utils/common/stoppable.h>
 #include <utils/common/systemerror.h>
 
@@ -137,12 +138,15 @@ public:
 
     /** Move ownership of socket to the caller.
         \a UnreliableMessagePipeline is in undefined state after this call and MUST be freed
-        \note Can be called within send/recv completion handler 
-            (more specifically, within socket's aio thread) only!
+        \note Can be called within send/recv completion handler  only
+            (more specifically, within socket's aio thread)!
     */
     std::unique_ptr<network::UDPSocket> takeSocket()
     {
-        m_socket->cancelIOSync(aio::etNone);
+        if (m_terminationFlag)
+            *m_terminationFlag = true;
+        //we MUST be in aio thread. TODO #ak add assert for aio thread
+        m_socket->cancelIOSync(aio::etNone); 
         return std::move(m_socket);
     }
 

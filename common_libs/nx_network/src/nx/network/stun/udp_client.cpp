@@ -197,7 +197,7 @@ void UDPClient::sendRequestAndStartTimer(
     //starting timer
     requestContext->timer->registerTimer(
         requestContext->currentRetransmitTimeout,
-        std::bind(&UDPClient::timedout, this, request.header.transactionId));
+        std::bind(&UDPClient::timedOut, this, request.header.transactionId));
 }
 
 void UDPClient::messageSent(
@@ -207,7 +207,7 @@ void UDPClient::messageSent(
 {
     auto requestContextIter = m_ongoingRequests.find(transactionId);
     if (requestContextIter == m_ongoingRequests.end())
-        return; //operation may have already timedout. E.g., network interface is loaded
+        return; //operation may have already timedOut. E.g., network interface is loaded
 
     if (errorCode != SystemError::noError)
     {
@@ -232,7 +232,7 @@ void UDPClient::messageSent(
     requestContextIter->second.resolvedServerAddress = std::move(resolvedServerAddress);
 }
 
-void UDPClient::timedout(nx::Buffer transactionId)
+void UDPClient::timedOut(nx::Buffer transactionId)
 {
     auto requestContextIter = m_ongoingRequests.find(transactionId);
     assert(requestContextIter != m_ongoingRequests.end());

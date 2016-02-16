@@ -6,6 +6,7 @@
 #include "mediaserver_emulator.h"
 
 #include <nx/network/cloud/data/result_code.h>
+#include <nx/utils/thread/barrier_handler.h>
 #include <utils/crypt/linux_passwd_crypt.h>
 #include <utils/common/string.h>
 #include <utils/common/sync_call.h>
@@ -27,8 +28,13 @@ MediaServerEmulator::MediaServerEmulator(
         SocketFactory::NatTraversalType::nttDisabled),
     m_systemData(std::move(systemData)),
     m_serverId(serverName.isEmpty() ? generateRandomName(16) : std::move(serverName)),
-    m_mediatorUdpClient(mediatorEndpoint, m_mediatorConnector.get())
+    m_mediatorUdpClient(
+        std::make_unique<nx::hpm::api::MediatorServerUdpConnection>(
+            mediatorEndpoint,
+            m_mediatorConnector.get()))
 {
+    m_mediatorUdpClient->socket()->bindToAioThread(m_timer.getAioThread());
+
     m_mediatorConnector->mockupAddress(std::move(mediatorEndpoint));
 
     m_mediatorConnector->setSystemCredentials(
@@ -40,9 +46,7 @@ MediaServerEmulator::MediaServerEmulator(
 
 MediaServerEmulator::~MediaServerEmulator()
 {
-    if (m_serverClient)
-        m_serverClient->pleaseStopSync();
-    m_mediatorUdpClient.pleaseStopSync();
+    pleaseStopSync();
 }
 
 bool MediaServerEmulator::start()
@@ -108,7 +112,7 @@ SocketAddress MediaServerEmulator::mediatorConnectionLocalAddress() const
 
 SocketAddress MediaServerEmulator::udpHolePunchingEndpoint() const
 {
-    return m_mediatorUdpClient.localAddress();
+    return m_mediatorUdpClient->localAddress();
 }
 
 void MediaServerEmulator::setOnConnectionRequestedHandler(
@@ -153,7 +157,7 @@ void MediaServerEmulator::onConnectionRequested(
         }
     }
 
-    m_mediatorUdpClient.connectionAck(
+    m_mediatorUdpClient->connectionAck(
         std::move(connectionAckData),
         std::bind(&MediaServerEmulator::onConnectionAckResponseReceived, this, _1));
 }
@@ -169,8 +173,70 @@ void MediaServerEmulator::onConnectionAckResponseReceived(
     if (action != ActionToTake::proceedWithConnection)
         return;
 
-    //connecting to originating peer
-    //m_udtStreamSocket = std::make_unique<>
+    if (m_connectionRequestedData.udpEndpointList.empty())
+        return;
+
+    //connecting to the originating peer
+    auto udtStreamSocket = std::make_unique<nx::network::UdtStreamSocket>();
+    auto mediatorUdpClientSocket = m_mediatorUdpClient->takeSocket();
+    m_mediatorUdpClient.reset();
+    if (!udtStreamSocket->bindToUdpSocket(std::move(*mediatorUdpClientSocket)) ||
+        !udtStreamSocket->setNonBlockingMode(true) ||
+        !udtStreamSocket->setRendezvous(true))
+    {
+        return;
+    }
+
+    auto udtStreamServerSocket = std::make_unique<nx::network::UdtStreamServerSocket>();
+    if (!udtStreamServerSocket->setReuseAddrFlag(true) ||
+        !udtStreamServerSocket->bind(udtStreamSocket->getLocalAddress()) ||
+        !udtStreamServerSocket->setNonBlockingMode(true))
+    {
+        return;
+    }
+
+    m_udtStreamSocket = std::move(udtStreamSocket);
+    m_udtStreamServerSocket = std::move(udtStreamServerSocket);
+
+    using namespace std::placeholders;
+    m_udtStreamSocket->connectAsync(
+        m_connectionRequestedData.udpEndpointList.front(),
+        std::bind(&MediaServerEmulator::onUdtConnectDone, this, _1));
+    m_udtStreamServerSocket->acceptAsync(
+        std::bind(&MediaServerEmulator::onUdtConnectionAccepted, this, _1, _2));
+}
+
+void MediaServerEmulator::onUdtConnectDone(SystemError::ErrorCode /*errorCode*/)
+{
+    //TODO #ak
+}
+
+void MediaServerEmulator::onUdtConnectionAccepted(
+    SystemError::ErrorCode /*errorCode*/,
+    AbstractStreamSocket* acceptedSocket)
+{
+    delete acceptedSocket;
+}
+
+void MediaServerEmulator::pleaseStop(std::function<void()> completionHandler)
+{
+    m_timer.pleaseStop(
+        [this, completionHandler = move(completionHandler)]() mutable
+        {
+            if (m_mediatorUdpClient)
+                m_mediatorUdpClient.reset();
+
+            if (!m_serverClient && !m_udtStreamSocket)
+                return completionHandler();
+
+            nx::BarrierHandler barrier(std::move(completionHandler));
+            if (m_serverClient)
+                m_serverClient->pleaseStop(barrier.fork());
+            if (m_udtStreamSocket)
+                m_udtStreamSocket->pleaseStop(barrier.fork());
+            if (m_udtStreamServerSocket)
+                m_udtStreamServerSocket->pleaseStop(barrier.fork());
+        });
 }
 
 }   //hpm

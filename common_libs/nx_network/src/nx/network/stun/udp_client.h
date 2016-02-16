@@ -125,7 +125,7 @@ private:
         SystemError::ErrorCode errorCode,
         nx::Buffer transactionId,
         SocketAddress resolvedServerAddress);
-    void timedout(nx::Buffer transactionId);
+    void timedOut(nx::Buffer transactionId);
     void cleanupWhileInAioThread();
 };
 

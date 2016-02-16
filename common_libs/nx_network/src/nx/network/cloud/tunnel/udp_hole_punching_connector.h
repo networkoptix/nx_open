@@ -34,7 +34,12 @@ class NX_NETWORK_API UdpHolePunchingTunnelConnector
     public AbstractTunnelConnector
 {
 public:
-    UdpHolePunchingTunnelConnector(AddressEntry targetHostAddress);
+    /**
+        @param mediatorAddress This param is for test only
+    */
+    UdpHolePunchingTunnelConnector(
+        AddressEntry targetHostAddress,
+        boost::optional<SocketAddress> mediatorAddress = boost::none);
     virtual ~UdpHolePunchingTunnelConnector();
 
     virtual void pleaseStop(std::function<void()> handler) override;
@@ -60,6 +65,7 @@ private:
     nx::hpm::api::ConnectionResultRequest m_connectResultReport;
     nx::network::aio::Timer m_timer;
     bool m_done;
+    boost::optional<std::chrono::milliseconds> m_connectTimeout;
 
     void onConnectResponse(
         nx::hpm::api::ResultCode resultCode,

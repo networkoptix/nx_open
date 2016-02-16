@@ -22,13 +22,16 @@ namespace cloud {
 using namespace nx::hpm;
 
 UdpHolePunchingTunnelConnector::UdpHolePunchingTunnelConnector(
-    AddressEntry targetHostAddress)
+    AddressEntry targetHostAddress,
+    boost::optional<SocketAddress> mediatorAddress)
 :
     m_targetHostAddress(std::move(targetHostAddress)),
     m_connectSessionId(QnUuid::createUuid().toByteArray()),
     m_mediatorUdpClient(
         std::make_unique<api::MediatorClientUdpConnection>(
-            *nx::network::SocketGlobals::mediatorConnector().mediatorAddress())),   //UdpHolePunchingTunnelConnector MUST not be created if mediator address is unknown
+            mediatorAddress
+            ? mediatorAddress.get()
+            : *nx::network::SocketGlobals::mediatorConnector().mediatorAddress())),   //UdpHolePunchingTunnelConnector MUST not be created if mediator address is unknown
     m_done(false)
 {
     assert(nx::network::SocketGlobals::mediatorConnector().mediatorAddress());
@@ -91,9 +94,12 @@ void UdpHolePunchingTunnelConnector::connect(
     }
 
     if (timeout > std::chrono::milliseconds::zero())
+    {
+        m_connectTimeout = timeout;
         m_timer.start(
             timeout,
             std::bind(&UdpHolePunchingTunnelConnector::onTimeout, this));
+    }
 
     m_completionHandler = std::move(handler);
 
@@ -116,6 +122,38 @@ const AddressEntry& UdpHolePunchingTunnelConnector::targetPeerAddress() const
     return m_targetHostAddress;
 }
 
+namespace {
+api::UdpHolePunchingResultCode mediatorResultToHolePunchingResult(
+    api::ResultCode resultCode)
+{
+    switch (resultCode)
+    {
+        case api::ResultCode::ok:
+            return api::UdpHolePunchingResultCode::ok;
+        case api::ResultCode::networkError:
+        case api::ResultCode::timedOut:
+            return api::UdpHolePunchingResultCode::noResponseFromMediator;
+        default:
+            return api::UdpHolePunchingResultCode::mediatorReportedError;
+    }
+}
+
+SystemError::ErrorCode mediatorResultToSysErrorCode(api::ResultCode resultCode)
+{
+    switch (resultCode)
+    {
+        case api::ResultCode::ok:
+            return SystemError::noError;
+        case api::ResultCode::notFound:
+            return SystemError::hostNotFound;
+        case api::ResultCode::timedOut:
+            return SystemError::timedOut;
+        default:
+            return SystemError::connectionReset;
+    }
+}
+}
+
 void UdpHolePunchingTunnelConnector::onConnectResponse(
     api::ResultCode resultCode,
     api::ConnectResponse response)
@@ -131,8 +169,8 @@ void UdpHolePunchingTunnelConnector::onConnectResponse(
             .arg(m_targetHostAddress.host.toString().toUtf8()),
             cl_logDEBUG1);
         return holePunchingDone(
-            api::UdpHolePunchingResultCode::noResponseFromMediator,
-            SystemError::connectionReset);
+            mediatorResultToHolePunchingResult(resultCode),
+            mediatorResultToSysErrorCode(resultCode));
     }
 
     m_connectResultReport.resultCode =
@@ -156,12 +194,20 @@ void UdpHolePunchingTunnelConnector::onConnectResponse(
 
     //initiating rendezvous connect to the target host
     auto udtConnection = std::make_unique<UdtStreamSocket>();
-    //TODO #ak calculate proper timeout
-    std::chrono::milliseconds connectTimeout(1000);
+    m_timer.cancelSync();   //we are in timer's thread
+    //from now on relying on UdtConnection timeout
+    using namespace std::chrono;
+    milliseconds effectiveConnectTimeout(0);
+    if (m_connectTimeout)
+    {
+        effectiveConnectTimeout = duration_cast<milliseconds>(m_timer.timeToEvent());
+        if (effectiveConnectTimeout == milliseconds::zero())
+            effectiveConnectTimeout = milliseconds(1);   //zero timeout is infinity
+    }
     if (!udtConnection->bindToUdpSocket(std::move(*m_mediatorUdpClient->takeSocket())) ||    //moving system socket handler from m_mediatorUdpClient to m_udtConnection
         !udtConnection->setRendezvous(true) ||
         !udtConnection->setNonBlockingMode(true) ||
-        !udtConnection->setSendTimeout(connectTimeout.count()))
+        !udtConnection->setSendTimeout(effectiveConnectTimeout.count()))
     {
         const auto errorCode = SystemError::getLastOSErrorCode();
         NX_LOGX(lm("session %1. Failed to create UDT socket. %2")
@@ -268,6 +314,7 @@ void UdpHolePunchingTunnelConnector::holePunchingDone(
     //stopping processing of incoming packets, events...
     m_done = true;
 
+    m_connectResultReport.sysErrorCode = sysErrorCode;
     if (resultCode == api::UdpHolePunchingResultCode::noResponseFromMediator)
     {
         //not sending report to mediator since no answer from mediator...
@@ -278,11 +325,10 @@ void UdpHolePunchingTunnelConnector::holePunchingDone(
         //after message has been sent - reporting result to client
     m_connectResultReport.connectSessionId = m_connectSessionId;
     m_connectResultReport.resultCode = resultCode;
-    m_connectResultReport.sysErrorCode = sysErrorCode;
     using namespace std::placeholders;
     if (!m_mediatorUdpClient)
     {
-        //m_mediatorUdpClient has give his socket to udt socket
+        //m_mediatorUdpClient has given away his socket to udt socket
         m_mediatorUdpClient = std::make_unique<api::MediatorClientUdpConnection>(
             *nx::network::SocketGlobals::mediatorConnector().mediatorAddress());
         m_mediatorUdpClient->socket()->bindToAioThread(m_timer.getAioThread());
@@ -326,7 +372,7 @@ void UdpHolePunchingTunnelConnector::connectSessionReportSent(
             *m_targetHostUdpAddress);
     }
     auto completionHandler = std::move(m_completionHandler);
-    completionHandler(sysErrorCodeToReport, nullptr);
+    completionHandler(sysErrorCodeToReport, std::move(tunnelConnection));
 }
 
 } // namespace cloud

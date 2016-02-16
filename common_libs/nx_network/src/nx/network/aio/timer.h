@@ -29,6 +29,7 @@ public:
     void start(
         std::chrono::milliseconds timeout,
         std::function<void()> timerFunc);
+    std::chrono::nanoseconds timeToEvent() const;
     void post(std::function<void()> funcToCall);
     void dispatch(std::function<void()> funcToCall);
     void cancelAsync(std::function<void()> completionHandler);
@@ -39,6 +40,10 @@ public:
 
     AbstractAioThread* getAioThread();
     void bindToAioThread(AbstractAioThread* aioThread);
+
+private:
+    std::chrono::milliseconds m_timeout;
+    std::chrono::steady_clock::time_point m_timerStartClock;
 };
 
 }   //aio
