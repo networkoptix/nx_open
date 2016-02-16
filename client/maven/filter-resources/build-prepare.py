@@ -23,10 +23,5 @@ else:
     help_dir = os.path.join('${libdir}', 'bin/help')
     if os.path.exists(help_dir):
         shutil.rmtree(help_dir)
-    shutil.copytree(help_source_dir, help_dir)            
-    for config in ('debug', 'release'):
-        vox_dir = os.path.join('${libdir}', 'bin', config, 'vox')
-        if os.path.exists(vox_dir):
-            shutil.rmtree(vox_dir)
-        shutil.copytree(vox_source_dir, vox_dir)        
+    shutil.copytree(help_source_dir, help_dir)
     
