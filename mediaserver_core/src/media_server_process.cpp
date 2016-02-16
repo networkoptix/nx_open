@@ -21,6 +21,7 @@
 #include <QtCore/QUrl>
 #include <utils/common/uuid.h>
 #include <utils/common/ldap.h>
+#include <utils/call_counter/call_counter.h>
 #include <QtCore/QThreadPool>
 
 #include <QtNetwork/QUdpSocket>
@@ -1545,6 +1546,8 @@ QHostAddress MediaServerProcess::getPublicAddress()
 
 void MediaServerProcess::run()
 {
+    QnCallCountStart(5000);
+
     ffmpegInit();
 
     QnFileStorageResource::removeOldDirs(); // cleanup temp folders;

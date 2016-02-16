@@ -7,6 +7,7 @@
 #include "utils/common/log.h"
 #include "utils/common/util.h"
 #include "utils/common/buffered_file.h"
+#include "utils/call_counter/call_counter.h"
 #include "recorder/file_deletor.h"
 #include "utils/fs/file.h"
 #include <common/common_module.h>
@@ -195,7 +196,9 @@ bool QnFileStorageResource::checkWriteCap() const
 
     QnMutexLocker lock(&m_writeTestMutex);
     if (!m_writeCapCached.is_initialized())
+    {
         m_writeCapCached = testWriteCapInternal();
+    }
     return *m_writeCapCached;
 
     /*
@@ -409,6 +412,8 @@ int QnFileStorageResource::mountTmpDrive() const
 #else
 bool QnFileStorageResource::updatePermissions() const
 {
+    QnCallCount();
+
     if (getUrl().startsWith("smb://"))
     {
         QString userName = QUrl(getUrl()).userName().isEmpty() ?
@@ -511,6 +516,8 @@ bool QnFileStorageResource::removeFile(const QString& url)
     if (!initOrUpdate())
         return false;
 
+    QnCallCount();
+
     qnFileDeletor->deleteFile(removeProtocolPrefix(translateUrlToLocal(url)));
     return true;
 }
@@ -519,6 +526,8 @@ bool QnFileStorageResource::renameFile(const QString& oldName, const QString& ne
 {
     if (!initOrUpdate())
         return false;
+
+    QnCallCount();
 
     return QFile::rename(translateUrlToLocal(oldName), translateUrlToLocal(newName));
 }
@@ -529,6 +538,8 @@ bool QnFileStorageResource::removeDir(const QString& url)
     if (!initOrUpdate())
         return false;
 
+    QnCallCount();
+
     QDir dir;
     return dir.rmdir(removeProtocolPrefix(translateUrlToLocal(url)));
 }
@@ -537,6 +548,8 @@ bool QnFileStorageResource::isDirExists(const QString& url)
 {
     if (!initOrUpdate())
         return false;
+
+    QnCallCount();
 
     QDir d(translateUrlToLocal(url));
     return d.exists(removeProtocolPrefix(translateUrlToLocal(url)));
@@ -547,11 +560,15 @@ bool QnFileStorageResource::isFileExists(const QString& url)
     if (!initOrUpdate())
         return false;
 
+    QnCallCount();
+
     return QFile::exists(removeProtocolPrefix(translateUrlToLocal(url)));
 }
 
 qint64 QnFileStorageResource::getFreeSpace()
 {
+    QnCallCount();
+
     QString localPathCopy = getLocalPathSafe();
 
     if (!initOrUpdate())
@@ -573,9 +590,11 @@ qint64 QnFileStorageResource::getTotalSpace()
 
     QnMutexLocker locker (&m_writeTestMutex);
     if (m_cachedTotalSpace <= 0)
-        m_cachedTotalSpace = getDiskTotalSpace(
-            localPathCopy.isEmpty() ? getPath() : localPathCopy
-        );
+    {
+        QnCallCount();
+        m_cachedTotalSpace = getDiskTotalSpace(localPathCopy.isEmpty() ? getPath() : 
+                                                                         localPathCopy);
+    }
     return m_cachedTotalSpace;
 }
 
@@ -585,6 +604,8 @@ QnAbstractStorageResource::FileInfoList QnFileStorageResource::getFileList(const
         return QnAbstractStorageResource::FileInfoList();
 
     QnAbstractStorageResource::FileInfoList ret;
+
+    QnCallCount();
 
     QDir dir(translateUrlToLocal(dirName));
     if (!dir.exists())
@@ -613,6 +634,8 @@ qint64 QnFileStorageResource::getFileSize(const QString& url) const
 {
     if (!initOrUpdate())
         return -1;
+
+    QnCallCount();
 
     return QnFile::getFileSize(translateUrlToLocal(url));
 }
@@ -644,6 +667,9 @@ bool QnFileStorageResource::isAvailable() const
         return false;
 
     QnMutexLocker lock(&m_writeTestMutex);
+
+    QnCallCount();
+
     m_writeCapCached = testWriteCapInternal(); // update cached value periodically
     // write check fail is a cause to set dirty to true, thus enabling
     // remount attempt in initOrUpdate()
