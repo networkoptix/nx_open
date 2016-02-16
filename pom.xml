@@ -119,7 +119,6 @@
         <qt.dir>${environment.dir}/${qt.path}</qt.dir>
         <ClientHelpSourceDir>${environment.dir}/help/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}/${customization}</ClientHelpSourceDir>
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
-        <ClientVoxSourceDir>${environment.dir}/festival.vox/lib</ClientVoxSourceDir>
         <unpack.skip>false</unpack.skip>
         <resources.phase>generate-sources</resources.phase>
         <qt.version>5.6.0</qt.version>
@@ -130,7 +129,7 @@
         <protobuf.version>3.0.0-SNAPSHOT</protobuf.version>
         <onvif.version>2.1.2-io-SNAPSHOT</onvif.version>
         <sigar.version>1.7-SNAPSHOT</sigar.version>
-        <festival.version>2.1-SNAPSHOT</festival.version>
+        <festival.version>2.4-SNAPSHOT</festival.version>
         <boost.version>1.56-SNAPSHOT</boost.version>
         <quazip.version>0.7.1-SNAPSHOT</quazip.version>
 
@@ -395,7 +394,7 @@
                 </property>
             </activation>
             <properties>
-                <additional.qtlibs>DBus</additional.qtlibs>
+                <additional.qtlibs>DBus, WebChannel, Webkit, WebkitWidgets</additional.qtlibs>
             </properties>
             <modules>
                 <module>client.core</module>
@@ -523,6 +522,7 @@
                 <unix>true</unix>
                 <windows>false</windows>
                 <script.extension>sh</script.extension>
+                <festival.version>2.1-SNAPSHOT</festival.version>
             </properties>
         </profile>
         <profile>

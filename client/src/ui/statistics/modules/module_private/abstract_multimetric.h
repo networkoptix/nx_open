@@ -3,12 +3,12 @@
 
 #include <statistics/statistics_fwd.h>
 
-class AbstractActionMetric
+class AbstractMultimetric
 {
 public:
-    AbstractActionMetric();
+    AbstractMultimetric();
 
-    virtual ~AbstractActionMetric();
+    virtual ~AbstractMultimetric();
 
     virtual QnMetricsHash metrics() const = 0;
 

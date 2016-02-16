@@ -344,75 +344,75 @@
     </message>
     <message>
         <source>Execute PTZ preset</source>
-        <translation type="unfinished"></translation>
+        <translation>ดำเนิน PTZ ที่ตั้งไว้</translation>
     </message>
     <message>
         <source>Show text overlay</source>
-        <translation type="unfinished"></translation>
+        <translation>แสดงการซ้อนทับข้อความ</translation>
     </message>
     <message>
         <source>Show on Alarm Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>แสดงบนเค้าโครงการเตือนภัย</translation>
     </message>
     <message>
         <source>Archive backup finished</source>
-        <translation type="unfinished"></translation>
+        <translation>การสำรองข้อมูลเอกสารเก่าสำเร็จ</translation>
     </message>
     <message>
         <source>Server &apos;%1&apos; has finished an archive backup</source>
-        <translation type="unfinished"></translation>
+        <translation>เซิร์ฟเวอร์ &apos;%1&apos; ได้ทำการสำรองข้อมูลเสร็จสิ้น</translation>
     </message>
     <message>
         <source>Generic Event at %1</source>
-        <translation type="unfinished"></translation>
+        <translation>เหตุการณ์ทั่วไปที่ %1</translation>
     </message>
     <message>
         <source>Input Port: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>พอร์ตอินพุต: %1</translation>
     </message>
     <message>
         <source>Archive backup is successfully completed</source>
-        <translation type="unfinished"></translation>
+        <translation>การสำรองข้อมูลที่เก็บเสร็จเรียบร้อยแล้ว</translation>
     </message>
     <message>
         <source>I/O Module %1 was disconnected</source>
-        <translation type="unfinished"></translation>
+        <translation>โมดูล I/O %1 ขาดการเชื่อมต่อ</translation>
     </message>
     <message>
         <source>Conflicting Address: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>ที่อยู่ที่ขัดแย้งกัน: %1</translation>
     </message>
     <message>
         <source>Archive backup failed: No available backup storages with sufficient free space</source>
-        <translation type="unfinished"></translation>
+        <translation>การสำรองข้อมูลเอกสารเก่าล้มเหลว: ไม่มีการเก็บรักษาการสำรองข้อมูลที่สามารถใช้ได้กับพื้นที่ว่างเพียงพอ</translation>
     </message>
     <message>
         <source>Archive backup failed: Target storage failure</source>
-        <translation type="unfinished"></translation>
+        <translation>การสำรองข้อมูลเอกสารเก่าล้มเหลว: ความล้มเหลวในการจัดเก็บเป้าหมาย</translation>
     </message>
     <message>
         <source>Archive backup failed: Source file open/read error</source>
-        <translation type="unfinished"></translation>
+        <translation>การสำรองข้อมูลเอกสารเก่าล้มเหลว: ไฟล์ที่มาเปิด / อ่านข้อผิดพลาด</translation>
     </message>
     <message>
         <source>Archive backup failed: Target file create/write error</source>
-        <translation type="unfinished"></translation>
+        <translation>การสำรองข้อมูลเอกสารเก่าล้มเหลว: ไฟล์เป้าหมายสร้างข้อผิดพลาด</translation>
     </message>
     <message>
         <source>Archive backup failed: File catalog error</source>
-        <translation type="unfinished"></translation>
+        <translation>การสำรองข้อมูลเอกสารเก่าล้มเหลว: แคตตาล็อกไฟล์ผิดพลาด</translation>
     </message>
     <message>
         <source>Archive backup finished, but isn&apos;t fully completed because backup time is over. Data is backed up to %1</source>
-        <translation type="unfinished"></translation>
+        <translation>การสำรองข้อมูลเก็บถาวรเสร็จ แต่ไม่เสร็จสมบูรณ์เพราะเวลาการสำรองข้อมูลที่มีมากกว่า ข้อมูลจะถูกสำรองข้อมูลไปยัง %1</translation>
     </message>
     <message>
         <source>Archive backup is canceled by user. Data is backed up to %1</source>
-        <translation type="unfinished"></translation>
+        <translation>การสำรองข้อมูลเอกสารเก่าจะถูกยกเลิกโดยผู้ใช้ ข้อมูลจะถูกสำรองข้อมูลไปยัง %1</translation>
     </message>
     <message>
         <source>Recording on I/O modules is disabled:</source>
-        <translation type="unfinished"></translation>
+        <translation>การบันทึกลงบนโมดูล I/O ปิดการใช้งาน:</translation>
     </message>
 </context>
 <context>
@@ -575,55 +575,55 @@
     </message>
     <message>
         <source>Camera plugin error. %1</source>
-        <translation type="unfinished"></translation>
+        <translation>ข้อผิดพลาดปลั๊กอินกล้อง %1</translation>
     </message>
     <message>
         <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>โปรดลองรีบูตโมดูล I/O แล้วคืนค่าเริ่มต้นจากโรงงานบนหน้าเว็บ.</translation>
     </message>
     <message>
         <source>Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</source>
-        <translation type="unfinished"></translation>
+        <translation>ตรวจสอบให้แน่ใจว่าโมดูล I/O ต่อเข้ากับครือข่าย ลองที่จะรีบูตโมดูล I/O อีกครั้ง.</translation>
     </message>
     <message>
         <source>Could not parse I/O module response. Url %1, request name %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>ไม่สามารถแยกวิเคราะห์ I/O โมดูลการตอบสนอง. Url %1, ขอชื่อ %2.</translation>
     </message>
     <message>
         <source>First, try to turn on recording (if it&apos;s off) and decrease fps in I/O module settings.</source>
-        <translation type="unfinished"></translation>
+        <translation>ครั้งแรกที่พยายามที่จะเปิดการบันทึกภาพ (ถ้าปิด) และลด FPS ในการตั้งค่าโมดูล I/O.</translation>
     </message>
     <message>
         <source>If it doesn&apos;t help, restore factory defaults on the I/O module web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>ถ้ามันช่วยไม่ได้ เรียกคืนค่าเริ่มต้นจากโรงงานบนหน้าเว็บของอุปกรณ์.</translation>
     </message>
     <message>
         <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>โมดูล I/O ที่ต้องการ %1 ผิดพลาดกับ %2&apos;&apos;.</translation>
     </message>
     <message>
         <source>Unknown I/O module issue.</source>
-        <translation type="unfinished"></translation>
+        <translation>ไม่รู้จัก I/O ปัญหาโมดูล.</translation>
     </message>
     <message>
         <source>Invalid data was received from the I/O module %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>ได้รับข้อมูลที่ไม่ถูกต้องจากโมดูล I/O %1.</translation>
     </message>
     <message>
         <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
-        <translation type="unfinished"></translation>
+        <translation>ข้อผิดพลาดของสื่อมากเกินไป โปรดเปิดประเด็นโมดูล I/O โต้ตอบสำหรับรายละเอียดเพิ่มเติม.</translation>
     </message>
     <message>
         <source>Device initialization process is in progress.</source>
-        <translation type="unfinished"></translation>
+        <translation>ขั้นตอนการเริ่มต้นอุปกรณ์ที่อยู่ในความคืบหน้า.</translation>
     </message>
     <message>
         <source>Camera initialization process is in progress.</source>
-        <translation type="unfinished"></translation>
+        <translation>กระบวนการเริ่มต้นกล้องอยู่ในความคืบหน้า.</translation>
     </message>
     <message>
         <source>I/O Module initialization process is in progress.</source>
-        <translation type="unfinished"></translation>
+        <translation>โมดูล I/O เริ่มต้นกระบวนการในความคืบหน้า.</translation>
     </message>
 </context>
 <context>
@@ -645,7 +645,7 @@
     </message>
     <message>
         <source>File explorer failed to open.</source>
-        <translation type="unfinished"></translation>
+        <translation>explore ไฟล์ล้มเหลวในการเปิด.</translation>
     </message>
 </context>
 <context>
@@ -660,11 +660,11 @@
     </message>
     <message>
         <source>Could not initialize audio encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>ไม่สามารถเริ่มต้น เข้ารหัส เสียง.</translation>
     </message>
     <message>
         <source>Could not initialize audio decoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>ไม่สามารถเริ่มต้น ถอดรหัส เสียง.</translation>
     </message>
 </context>
 <context>
@@ -702,7 +702,7 @@
     </message>
     <message>
         <source>Could not initialize video encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>ไม่สามารถเริ่มต้น เข้ารหัส วีดีโอ.</translation>
     </message>
 </context>
 <context>
@@ -860,11 +860,11 @@
     </message>
     <message>
         <source>There was a problem activating your license key. A database error occurred.</source>
-        <translation type="unfinished"></translation>
+        <translation>มีปัญหาในการเปิดใช้งานคีย์ใบอนุญาตของคุณ มีข้อผิดพลาดเกิดขึ้นในฐานข้อมูล.</translation>
     </message>
     <message>
         <source>There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.</source>
-        <translation type="unfinished"></translation>
+        <translation>มีปัญหาในการเปิดใช้งานคีย์ใบอนุญาตของคุณ ได้รับข้อมูลไม่ถูกต้อง โปรดติดต่อทีมสนับสนุนเพื่อรายงานปัญหา.</translation>
     </message>
 </context>
 <context>
@@ -941,31 +941,31 @@
     </message>
     <message numerus="yes">
         <source>%n I/O Module(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n I/O โมดูล (s)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n I/O module(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n I/O โมดูล (s)</numerusform>
         </translation>
     </message>
     <message>
         <source>I/O Modules</source>
-        <translation type="unfinished"></translation>
+        <translation>I/O โมดูล</translation>
     </message>
     <message>
         <source>I/O modules</source>
-        <translation type="unfinished"></translation>
+        <translation>I/O โมดูล</translation>
     </message>
     <message>
         <source>I/O Module</source>
-        <translation type="unfinished">I / O โมดูล</translation>
+        <translation>I/O โมดูล</translation>
     </message>
     <message>
         <source>I/O module</source>
-        <translation type="unfinished"></translation>
+        <translation>I/O โมดูล</translation>
     </message>
 </context>
 <context>
@@ -1093,7 +1093,7 @@
     </message>
     <message>
         <source>File write error. Not enough free space.</source>
-        <translation type="unfinished"></translation>
+        <translation>ข้อผิดพลาดในการเขียนไฟล์ เนื้อที่ว่างไม่เพียงพอ.</translation>
     </message>
 </context>
 <context>
@@ -1157,7 +1157,7 @@
     <name>utils::QnCameraNamesWatcher</name>
     <message>
         <source>Removed camera</source>
-        <translation type="unfinished"></translation>
+        <translation>ลบกล้องออก</translation>
     </message>
 </context>
 </TS>

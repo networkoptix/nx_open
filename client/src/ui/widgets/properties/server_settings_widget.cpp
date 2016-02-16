@@ -94,7 +94,7 @@ QnServerSettingsWidget::QnServerSettingsWidget(QWidget* parent /* = 0*/):
         emit hasChangesChanged();
     });
 
-    connect(ui->failoverPriorityButton, &QPushButton::clicked,  action(Qn::OpenFailoverPriorityAction), &QAction::trigger);
+    connect(ui->failoverPriorityButton, &QPushButton::clicked,  action(QnActions::OpenFailoverPriorityAction), &QAction::trigger);
 
     retranslateUi();
 }
@@ -269,5 +269,5 @@ void QnServerSettingsWidget::updateFailoverLabel() {
 
 
 void QnServerSettingsWidget::at_pingButton_clicked() {
-    menu()->trigger(Qn::PingAction, QnActionParameters(m_server));
+    menu()->trigger(QnActions::PingAction, QnActionParameters(m_server));
 }

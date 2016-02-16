@@ -36,7 +36,7 @@ void QnFglrxFullScreen::updateFglrxMode(bool force) {
     m_fglrxMode = fglrxMode;
 
     if (m_fglrxMode)
-        menu()->registerAlias(Qn::EffectiveMaximizeAction, Qn::MaximizeAction);
+        menu()->registerAlias(QnActions::EffectiveMaximizeAction, QnActions::MaximizeAction);
 }
 
 bool QnFglrxFullScreen::registeredNotify(QWidget *) {

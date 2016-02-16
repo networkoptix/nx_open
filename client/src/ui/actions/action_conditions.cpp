@@ -621,7 +621,7 @@ Qn::ActionVisibility QnArchiveActionCondition::check(const QnResourceList &resou
 }
 
 Qn::ActionVisibility QnToggleTitleBarActionCondition::check(const QnActionParameters &) {
-    return action(Qn::EffectiveMaximizeAction)->isChecked() ? Qn::EnabledAction : Qn::InvisibleAction;
+    return action(QnActions::EffectiveMaximizeAction)->isChecked() ? Qn::EnabledAction : Qn::InvisibleAction;
 }
 
 Qn::ActionVisibility QnNoArchiveActionCondition::check(const QnActionParameters &) {
@@ -1139,26 +1139,21 @@ Qn::ActionVisibility QnIoModuleActionCondition::check(const QnResourceList &reso
 }
 
 Qn::ActionVisibility QnMergeToCurrentSystemActionCondition::check(const QnResourceList &resources) {
-    bool found = false;
+    if (resources.size() != 1)
+        return Qn::InvisibleAction;
 
-    for (const QnResourcePtr &resource: resources) {
-        QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-        if (!server)
-            return Qn::InvisibleAction;
+    QnMediaServerResourcePtr server = resources.first().dynamicCast<QnMediaServerResource>();
+    if (!server)
+        return Qn::InvisibleAction;
 
-        Qn::ResourceStatus status = server->getStatus();
-        if (status != Qn::Incompatible && status != Qn::Unauthorized)
-            return Qn::InvisibleAction;
+    Qn::ResourceStatus status = server->getStatus();
+    if (status != Qn::Incompatible && status != Qn::Unauthorized)
+        return Qn::InvisibleAction;
 
-        if (server->getModuleInformation().ecDbReadOnly)
-            return Qn::InvisibleAction;
+    if (server->getModuleInformation().ecDbReadOnly)
+        return Qn::InvisibleAction;
 
-        found = true;
-    }
-
-    return found
-        ? Qn::EnabledAction
-        : Qn::InvisibleAction;
+    return Qn::EnabledAction;
 }
 
 

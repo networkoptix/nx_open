@@ -32,11 +32,11 @@ QnMergeSystemsDialog::QnMergeSystemsDialog(QWidget *parent) :
     setAccentStyle(ui->buttonBox->button(QDialogButtonBox::Ok));
 
     QStringList successMessage;
-    successMessage 
-        << tr("Success!") 
-        << QString() 
-        << QString() 
-        << tr("The system was configured successfully.") 
+    successMessage
+        << tr("Success!")
+        << QString()
+        << QString()
+        << tr("The system was configured successfully.")
         << tr("The servers from the remote system should appear in your system soon.");
     ui->successLabel->setText(successMessage.join(L'\n'));
 
@@ -82,7 +82,7 @@ void QnMergeSystemsDialog::done(int result)
         url.setPassword(m_adminPassword);
         QnAppServerConnectionFactory::setUrl(url);
 
-        menu()->trigger(Qn::ReconnectAction);
+        menu()->trigger(QnActions::ReconnectAction);
         context()->instance<QnWorkbenchUserWatcher>()->setReconnectOnPasswordChange(true);
     }
 }

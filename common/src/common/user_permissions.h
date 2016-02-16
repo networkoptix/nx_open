@@ -1,15 +1,22 @@
 #pragma once
 
+#ifdef __cplusplus  // For safe iOS build
+#include <utils/common/model_functions_fwd.h>
+#endif
+
+// TODO: #ynikitenkov Add serialization using metaobject
+#ifndef QN_NO_NAMESPACES
 namespace Qn {
+#endif
 
     /**
      * Flags describing the actions permitted for the user to do with the
      * selected resource.
      */
     enum Permission {
+        /* Generic permissions. */
         NoPermissions                           = 0x00000000,   /**< No access */
 
-        /* Generic permissions. */
         ReadPermission                          = 0x00010000,   /**< Generic read access. Having this access right doesn't necessary mean that all information is readable. */
         WritePermission                         = 0x00020000,   /**< Generic write access. Having this access right doesn't necessary mean that all information is writable. */
         SavePermission                          = 0x00040000,   /**< Generic save access. Entity can be saved to the server. */
@@ -77,4 +84,11 @@ namespace Qn {
     Qn::Permissions operator-(Qn::Permissions minuend, Qn::Permission subrahend);
     Qn::Permissions operator-(Qn::Permission minuend, Qn::Permission subrahend);
 
+#ifndef QN_NO_NAMESPACES
 } // namespace Qn
+#endif
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (Qn::Permission)(Qn::Permissions),
+    (lexical)
+    )

@@ -1,4 +1,5 @@
 #include "video_decoder_registry.h"
+
 #include "abstract_video_decoder.h"
 
 namespace nx {
@@ -10,11 +11,12 @@ VideoDecoderRegistry* VideoDecoderRegistry::instance()
     return &instance;
 }
 
-std::unique_ptr<AbstractVideoDecoder> VideoDecoderRegistry::createCompatibleDecoder(const CodecID codec, const QSize& resolution)
+std::unique_ptr<AbstractVideoDecoder> VideoDecoderRegistry::createCompatibleDecoder(
+    const CodecID codec, const QSize& resolution)
 {
-    for (const auto& plugin : m_plugins)
+    for (const auto& plugin: m_plugins)
     {
-        if (plugin.isCompatible(codec, resolution)) 
+        if (plugin.isCompatible(codec, resolution))
         {
             auto result = VideoDecoderPtr(plugin.instance());
             if (plugin.allocator)
@@ -27,7 +29,7 @@ std::unique_ptr<AbstractVideoDecoder> VideoDecoderRegistry::createCompatibleDeco
 
 bool VideoDecoderRegistry::hasCompatibleDecoder(const CodecID codec, const QSize& resolution)
 {
-    for (const auto& plugin : m_plugins)
+    for (const auto& plugin: m_plugins)
     {
         if (plugin.isCompatible(codec, resolution))
             return true;

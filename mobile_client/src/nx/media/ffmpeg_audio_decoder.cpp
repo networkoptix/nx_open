@@ -2,11 +2,10 @@
 
 #include "ffmpeg_audio_decoder.h"
 
-extern "C"
-{
-    #include <libavformat/avformat.h>
-    #include <libswscale/swscale.h>
-}
+extern "C" {
+#include <libavformat/avformat.h>
+#include <libswscale/swscale.h>
+} // extern "C"
 
 #include <utils/media/ffmpeg_helper.h>
 #include <utils/thread/mutex.h>
@@ -14,22 +13,25 @@ extern "C"
 namespace nx {
 namespace media {
 
+//-------------------------------------------------------------------------------------------------
+// FfmpegAudioDecoderPrivate
 
-// ------------------------- FfmpegAudioDecoderPrivate -------------------------
-
-class FfmpegAudioDecoderPrivate : public QObject
+class FfmpegAudioDecoderPrivate: public QObject
 {
     Q_DECLARE_PUBLIC(FfmpegAudioDecoder)
-    FfmpegAudioDecoder *q_ptr;
+    FfmpegAudioDecoder* q_ptr;
+
 public:
-    FfmpegAudioDecoderPrivate():
+    FfmpegAudioDecoderPrivate()
+    :
         frame(avcodec_alloc_frame()),
         codecContext(nullptr),
         lastPts(AV_NOPTS_VALUE)
     {
     }
 
-    ~FfmpegAudioDecoderPrivate() { 
+    ~FfmpegAudioDecoderPrivate()
+    {
         closeCodecContext();
         av_free(frame);
     }
@@ -68,9 +70,11 @@ void FfmpegAudioDecoderPrivate::closeCodecContext()
     codecContext = 0;
 }
 
-// ---------------------- FfmpegAudioDecoder ----------------------
+//-------------------------------------------------------------------------------------------------
+// FfmpegAudioDecoder
 
-FfmpegAudioDecoder::FfmpegAudioDecoder() :
+FfmpegAudioDecoder::FfmpegAudioDecoder()
+:
     AbstractAudioDecoder(),
     d_ptr(new FfmpegAudioDecoderPrivate())
 {
@@ -86,15 +90,15 @@ bool FfmpegAudioDecoder::isCompatible(const CodecID codec)
     return true;
 }
 
-QnAudioFramePtr FfmpegAudioDecoder::decode(const QnConstCompressedAudioDataPtr& frame)
+AudioFramePtr FfmpegAudioDecoder::decode(const QnConstCompressedAudioDataPtr& frame)
 {
     Q_D(FfmpegAudioDecoder);
 
-    if (!d->codecContext) 
+    if (!d->codecContext)
     {
         d->initContext(frame);
         if (!d->codecContext)
-            return QnAudioFramePtr();
+            return AudioFramePtr();
     }
 
     AVPacket avpkt;
@@ -107,16 +111,18 @@ QnAudioFramePtr FfmpegAudioDecoder::decode(const QnConstCompressedAudioDataPtr& 
         if (frame->flags & QnAbstractMediaData::MediaFlags_AVKey)
             avpkt.flags = AV_PKT_FLAG_KEY;
 
-        //  It's already guaranteed by QnByteArray there is an extra space reserved. We must fill padding bytes according to ffmpeg documentation
+        // It's already guaranteed by QnByteArray that there is an extra space reserved. We mus
+        // fill the padding bytes according to ffmpeg documentation.
         if (avpkt.data)
-        memset(avpkt.data + avpkt.size, 0, FF_INPUT_BUFFER_PADDING_SIZE);
+            memset(avpkt.data + avpkt.size, 0, FF_INPUT_BUFFER_PADDING_SIZE);
 
         d->lastPts = frame->timestamp;
     }
-    else 
+    else
     {
-        // there is known a ffmpeg bug. It returns below time for the very last packet while flushing internal buffer.
-        // So, repeat this time for the empty packet in order to aviod the bug
+        // There is a known ffmpeg bug. It returns the below time for the very last packet while
+        // flushing the internal buffer. So, repeat this time for the empty packet in order to
+        // avoid the bug.
         avpkt.pts = avpkt.dts = d->lastPts;
         avpkt.data = nullptr;
         avpkt.size = 0;
@@ -126,20 +132,23 @@ QnAudioFramePtr FfmpegAudioDecoder::decode(const QnConstCompressedAudioDataPtr& 
     avcodec_decode_audio4(d->codecContext, d->frame, &gotData, &avpkt);
 
     if (gotData <= 0)
-        return QnAudioFramePtr(); //< negative value means error
+        return AudioFramePtr(); //< Negative value means error.
 
     int frameSize = av_samples_get_buffer_size(
         0, //< output. plane size, optional
         d->codecContext->channels,
-        d->frame->nb_samples, 
+        d->frame->nb_samples,
         d->codecContext->sample_fmt,
         1); //< buffer size alignment. 1 - no alignment (exact size)
 
-    AudioFrame* audioFrame = new AudioFrame();
+    nx::AudioFrame* audioFrame = new nx::AudioFrame();
     audioFrame->data.write((const char*)d->frame->data[0], frameSize);
     audioFrame->context = d->abstractContext;
-    audioFrame->timestampUsec = d->frame->pkt_dts / 1000; //< ffmpeg pts/dst are mixed up here, so it's pkt_dts. Also Convert usec to msec.
-    return QnAudioFramePtr(audioFrame);
+
+    // Ffmpeg pts/dts are mixed up here, so it's pkt_dts. Also Convert usec to msec.
+    audioFrame->timestampUsec = d->frame->pkt_dts;
+
+    return AudioFramePtr(audioFrame);
 }
 
 } // namespace media

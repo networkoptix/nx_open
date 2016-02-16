@@ -11,10 +11,10 @@ namespace media {
 
 class PlayerPrivate;
 
-/*
-* Main facade class for media player.
-*/
-class Player : public QObject
+/**
+ * Main facade class for the media player.
+ */
+class Player: public QObject
 {
     Q_OBJECT
 
@@ -23,7 +23,7 @@ public:
     {
         Stopped,
         Playing,
-        Paused
+        Paused,
     };
 
     enum class MediaStatus
@@ -37,42 +37,42 @@ public:
         Buffering,
         Buffered,
         EndOfMedia,
-        InvalidMedia
+        InvalidMedia,
     };
 
     Q_ENUMS(State)
     Q_ENUMS(MediaStatus)
 
-    /*
-    * Source url to open.
-    * In order to support multiserver archive, media player supports non standard URL scheme 'camera'. Example to open: "camera://media/<camera_id>"
-    */
+    /**
+     * Source url to open. In order to support multiserver archive, media player supports
+     * non-standard URL scheme 'camera'. Example to open: "camera://media/<camera_id>".
+     */
     Q_PROPERTY(QUrl source READ source WRITE setSource NOTIFY sourceChanged)
             
-    /*
-    * Video source to render decoded data
-    */
-    Q_PROPERTY(QAbstractVideoSurface * videoSurface READ videoSurface WRITE setVideoSurface NOTIFY videoSurfaceChanged)
+    /**
+     * Video source to render decoded data
+     */
+    Q_PROPERTY(QAbstractVideoSurface* videoSurface READ videoSurface WRITE setVideoSurface NOTIFY videoSurfaceChanged)
 
-    /*
-    * Current playback UTC position at msec
-    */
+    /**
+     * Current playback UTC position at msec.
+     */
     Q_PROPERTY(qint64 position READ position WRITE setPosition NOTIFY positionChanged)
 
-    /*
-    * State defined by user action
-    */
+    /**
+     * State defined by user action
+     */
     Q_PROPERTY(State playbackState READ playbackState NOTIFY playbackStateChanged)
 
     /*
-    * Current state defined by internal implementation. For example, if player has got 'play' command 'mediaStatus'
-    * will be changed thought 'buffering' to 'playing' state
-    */
+     * Current state defined by the internal implementation. For example, if the player has got the
+     * 'play' command, 'mediaStatus' will be changed through 'buffering' to 'playing' state.
+     */
     Q_PROPERTY(MediaStatus mediaStatus READ mediaStatus NOTIFY mediaStatusChanged)
 
-    /*
-    * Either player on archive or live position
-    */
+    /**
+     * The player is either on an archive or a live position.
+     */
     Q_PROPERTY(bool liveMode READ liveMode NOTIFY liveModeChanged)
 
 public:
@@ -112,10 +112,11 @@ signals:
     void mediaStatusChanged();
     void reconnectOnPlayChanged();
     void liveModeChanged();
+
 private:
     QScopedPointer<PlayerPrivate> d_ptr;
     Q_DECLARE_PRIVATE(Player);
 };
 
-}
-}
+} // namespace media
+} // namespace nx

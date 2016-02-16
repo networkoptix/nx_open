@@ -29,7 +29,7 @@ class QnWorkbenchDesktopCameraWatcher;
 class QnActionManager;
 
 /**
- * This is a class that ties together all objects comprising the global state 
+ * This is a class that ties together all objects comprising the global state
  * and serves as an application context.
  */
 class QnWorkbenchContext: public QObject, public QnInstanceStorage {
@@ -75,11 +75,9 @@ public:
         return m_mainWindow.data();
     }
 
-    void setMainWindow(QWidget *mainWindow) {
-        m_mainWindow = mainWindow;
-    }
+    void setMainWindow(QWidget *mainWindow);
 
-    QAction *action(const Qn::ActionId id) const;
+    QAction *action(const QnActions::IDType id) const;
 
     QnUserResourcePtr user() const;
 
@@ -88,7 +86,7 @@ public:
 signals:
     /**
      * This signal is emitted whenever the user that is currently logged in changes.
-     * 
+     *
      * \param user                      New user that was logged in. May be null.
      */
     void userChanged(const QnUserResourcePtr &user); // TODO: #Elric remove user parameter
@@ -98,6 +96,8 @@ signals:
      * but before its state is altered in any way by the destructor.
      */
     void aboutToBeDestroyed();
+
+    void mainWindowChanged();
 
 protected slots:
     void at_resourcePool_aboutToBeDestroyed();
@@ -111,7 +111,7 @@ private:
     QScopedPointer<QnActionManager> m_menu;
     QScopedPointer<QnWorkbenchDisplay> m_display;
     QScopedPointer<QnWorkbenchNavigator> m_navigator;
-    
+
     QPointer<QWidget> m_mainWindow;
 
     QnWorkbenchUserWatcher *m_userWatcher;

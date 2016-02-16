@@ -39,7 +39,7 @@ public:
     * \!returns decoded frame number (value >=0)  if frame is decoded without errors. Returns negative value if decoding error.
     * For nullptr input data returns positive value while decoder is flushing internal buffer (result isn't null).
     */
-    virtual int decode(const QnConstCompressedVideoDataPtr& frame, QnVideoFramePtr* result = nullptr) = 0;
+    virtual int decode(const QnConstCompressedVideoDataPtr& frame, QVideoFramePtr* result = nullptr) = 0;
 };
 
 }

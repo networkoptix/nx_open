@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="ru" sourcelanguage="en">
+<TS version="2.1" language="ru" sourcelanguage="en">
 <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
@@ -336,10 +336,6 @@ to view more bookmarks</source>
         <translation>Скрыть частоту кадров</translation>
     </message>
     <message>
-        <source>Ctrl+Alt+F</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Drop Resources</source>
         <translation>Положить ресурсы</translation>
     </message>
@@ -356,24 +352,12 @@ to view more bookmarks</source>
         <translation>Следующая раскладка</translation>
     </message>
     <message>
-        <source>Ctrl+Tab</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Previous Layout</source>
         <translation>Предыдущая раскладка</translation>
     </message>
     <message>
-        <source>Ctrl+Shift+Tab</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Select All</source>
         <translation>Выбрать все</translation>
-    </message>
-    <message>
-        <source>Ctrl+A</source>
-        <translation></translation>
     </message>
     <message>
         <source>Selection Changed</source>
@@ -385,10 +369,6 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Go to Freespace Mode</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>F11</source>
         <translation></translation>
     </message>
     <message>
@@ -424,16 +404,8 @@ to view more bookmarks</source>
         <translation>Главное меню</translation>
     </message>
     <message>
-        <source>Alt+Space</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Connect to Server...</source>
         <translation>Подключиться к серверу...</translation>
-    </message>
-    <message>
-        <source>Ctrl+Shift+C</source>
-        <translation>Ctrl+Shift+C</translation>
     </message>
     <message>
         <source>Start Panic Recording</source>
@@ -442,10 +414,6 @@ to view more bookmarks</source>
     <message>
         <source>Stop Panic Recording</source>
         <translation>Остановить запись по тревоге</translation>
-    </message>
-    <message>
-        <source>Ctrl+P</source>
-        <translation></translation>
     </message>
     <message>
         <source>New...</source>
@@ -468,20 +436,12 @@ to view more bookmarks</source>
         <translation>Создать вкладку</translation>
     </message>
     <message>
-        <source>Ctrl+T</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Window</source>
         <translation>Окно</translation>
     </message>
     <message>
         <source>New Window</source>
         <translation>Создать окно</translation>
-    </message>
-    <message>
-        <source>Ctrl+N</source>
-        <translation></translation>
     </message>
     <message>
         <source>User...</source>
@@ -512,10 +472,6 @@ to view more bookmarks</source>
         <translation>Файл(ы)...</translation>
     </message>
     <message>
-        <source>Ctrl+O</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Layout(s)...</source>
         <translation>Раскладк(и)...</translation>
     </message>
@@ -528,20 +484,8 @@ to view more bookmarks</source>
         <translation>Сохранить раскладку</translation>
     </message>
     <message>
-        <source>Ctrl+S</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Save Current Layout As...</source>
         <translation>Сохранить раскладку как...</translation>
-    </message>
-    <message>
-        <source>Ctrl+Shift+S</source>
-        <translation>Ctrl+Shift+S</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+S</source>
-        <translation></translation>
     </message>
     <message>
         <source>Save Video Wall View</source>
@@ -556,10 +500,6 @@ to view more bookmarks</source>
         <translation>Закончить захват экрана</translation>
     </message>
     <message>
-        <source>Alt+R</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Stop current action</source>
         <translation>Остановить текущее действие</translation>
     </message>
@@ -572,32 +512,12 @@ to view more bookmarks</source>
         <translation>В оконный режим</translation>
     </message>
     <message>
-        <source>Ctrl+F</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Alt+Enter</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Alt+Return</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+T</source>
-        <translation>Ctrl+Alt+T</translation>
-    </message>
-    <message>
         <source>Disable Background Animation</source>
         <translation>Отключить фоновую анимацию</translation>
     </message>
     <message>
         <source>Enable Background Animation</source>
         <translation>Включить анимацию фона</translation>
-    </message>
-    <message>
-        <source>Esc</source>
-        <translation></translation>
     </message>
     <message>
         <source>Minimize</source>
@@ -628,24 +548,12 @@ to view more bookmarks</source>
         <translation>О программе...</translation>
     </message>
     <message>
-        <source>F1</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Exit</source>
         <translation>Выход</translation>
     </message>
     <message>
-        <source>Alt+F4</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Close</source>
         <translation>Закрыть</translation>
-    </message>
-    <message>
-        <source>Ctrl+W</source>
-        <translation></translation>
     </message>
     <message>
         <source>Close All But This</source>
@@ -654,10 +562,6 @@ to view more bookmarks</source>
     <message>
         <source>Open in Layout</source>
         <translation>Открыть в раскладке</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+D</source>
-        <translation>Ctrl+Alt+D</translation>
     </message>
     <message>
         <source>Delayed Open Video Wall</source>
@@ -670,10 +574,6 @@ to view more bookmarks</source>
     <message>
         <source>System Administration...</source>
         <translation>Администрирование системы...</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+A</source>
-        <translation>Ctrl+Alt+A</translation>
     </message>
     <message>
         <source>System Update...</source>
@@ -706,14 +606,6 @@ to view more bookmarks</source>
     <message>
         <source>Open Containing Folder</source>
         <translation>Открыть в каталоге</translation>
-    </message>
-    <message>
-        <source>Ctrl+Enter</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Ctrl+Return</source>
-        <translation></translation>
     </message>
     <message>
         <source>Identify</source>
@@ -772,10 +664,6 @@ to view more bookmarks</source>
         <translation>Поиск по интервалам...</translation>
     </message>
     <message>
-        <source>Calibrate PTZ</source>
-        <translation>Калибровка PTZ</translation>
-    </message>
-    <message>
         <source>Show Title Bar</source>
         <translation>Показать заголовок</translation>
     </message>
@@ -820,18 +708,6 @@ to view more bookmarks</source>
         <translation>Связь с событием...</translation>
     </message>
     <message>
-        <source>Ctrl+E</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Ctrl+L</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Ctrl+M</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Open in New Tab</source>
         <translation>Открыть в новой вкладке</translation>
     </message>
@@ -856,24 +732,12 @@ to view more bookmarks</source>
         <translation>Видео на полный экран</translation>
     </message>
     <message>
-        <source>Enter</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Return</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Restore Item</source>
         <translation>Видео в режим сетки</translation>
     </message>
     <message>
         <source>Show Info</source>
         <translation>Показать информацию</translation>
-    </message>
-    <message>
-        <source>Alt+I</source>
-        <translation></translation>
     </message>
     <message>
         <source>Hide Info</source>
@@ -932,10 +796,6 @@ to view more bookmarks</source>
         <translation>Показать движение</translation>
     </message>
     <message>
-        <source>Alt+G</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Hide Motion/Smart Search</source>
         <translation>Скрыть движение/поиск по движению</translation>
     </message>
@@ -956,24 +816,12 @@ to view more bookmarks</source>
         <translation>Проверить целостность файла</translation>
     </message>
     <message>
-        <source>Alt+C</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Take Screenshot</source>
         <translation>Сделать стоп-кадр</translation>
     </message>
     <message>
-        <source>Alt+S</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Image Enhancement...</source>
         <translation>Коррекция изображения...</translation>
-    </message>
-    <message>
-        <source>Alt+J</source>
-        <translation></translation>
     </message>
     <message>
         <source>Create Zoom Window</source>
@@ -1004,20 +852,12 @@ to view more bookmarks</source>
         <translation>Убрать с раскладки</translation>
     </message>
     <message>
-        <source>Del</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Delete</source>
         <translation>Удалить</translation>
     </message>
     <message>
         <source>Rename</source>
         <translation>Переименовать</translation>
-    </message>
-    <message>
-        <source>F2</source>
-        <translation></translation>
     </message>
     <message>
         <source>Set as Layout Background</source>
@@ -1044,24 +884,8 @@ to view more bookmarks</source>
         <translation>Расстояние между ячейками...</translation>
     </message>
     <message>
-        <source>Alt+T</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Zoom to Selection</source>
         <translation>Приблизить выделенный фрагмент</translation>
-    </message>
-    <message>
-        <source>Get PTZ Position</source>
-        <translation>Получить позицию PTZ</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift+D</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Debug Control Panel</source>
-        <translation>Панель управления отладкой</translation>
     </message>
     <message>
         <source>Pin Notifications</source>
@@ -1116,16 +940,8 @@ to view more bookmarks</source>
         <translation>Отметить начало выделения</translation>
     </message>
     <message>
-        <source>[</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Mark Selection End</source>
         <translation>Отметить конец выделения</translation>
-    </message>
-    <message>
-        <source>]</source>
-        <translation></translation>
     </message>
     <message>
         <source>Clear Selection</source>
@@ -1164,10 +980,6 @@ to view more bookmarks</source>
         <translation>Скрыть календарь</translation>
     </message>
     <message>
-        <source>Ctrl+Alt+Shift++</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Open in Browser...</source>
         <translation>Открыть в браузере...</translation>
     </message>
@@ -1184,96 +996,36 @@ to view more bookmarks</source>
         <translation>Мульти-Видео Экспорт...</translation>
     </message>
     <message>
-        <source>Increment Debug Counter</source>
-        <translation>Инкрементный отладочный счетчик</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift+-</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Decrement Debug Counter</source>
-        <translation>Декрементный отладочный счетчик</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift+R</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Show Resource Pool</source>
-        <translation>Показать хранилище ресурсов</translation>
-    </message>
-    <message>
-        <source>Space</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Ctrl+Left</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Previous Frame</source>
         <translation>Предыдущий кадр</translation>
-    </message>
-    <message>
-        <source>Ctrl+Right</source>
-        <translation></translation>
     </message>
     <message>
         <source>Next Frame</source>
         <translation>Следующий кадр</translation>
     </message>
     <message>
-        <source>Z</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>To Start</source>
         <translation>В начало</translation>
-    </message>
-    <message>
-        <source>X</source>
-        <translation></translation>
     </message>
     <message>
         <source>To End</source>
         <translation>В конец</translation>
     </message>
     <message>
-        <source>Ctrl+Down</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Volume Down</source>
         <translation>Тише</translation>
-    </message>
-    <message>
-        <source>Ctrl+Up</source>
-        <translation></translation>
     </message>
     <message>
         <source>Volume Up</source>
         <translation>Громче</translation>
     </message>
     <message>
-        <source>M</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Toggle Mute</source>
         <translation>Вкл/Выкл заук</translation>
     </message>
     <message>
-        <source>L</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Jump to Live</source>
         <translation>Видео в реальном времени</translation>
-    </message>
-    <message>
-        <source>S</source>
-        <translation></translation>
     </message>
     <message>
         <source>File Settings...</source>
@@ -1394,10 +1146,6 @@ to view more bookmarks</source>
     <message>
         <source>Cameras to Backup...</source>
         <translation>Камеры для резервного копирования...</translation>
-    </message>
-    <message>
-        <source>Ctrl+B</source>
-        <translation>Ctrl+B</translation>
     </message>
     <message>
         <source>Show Bookmarks</source>
@@ -5178,7 +4926,7 @@ If you understand this and would like to proceed please click Merge to continue.
     <name>QnSearchBookmarksModel</name>
     <message>
         <source>Name</source>
-        <translation>ИмяИмя</translation>
+        <translation>Имя</translation>
     </message>
     <message>
         <source>Start time</source>
@@ -6081,7 +5829,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Routing Management</source>
-        <translation>Управление машрутизацией</translation>
+        <translation>Управление маршрутизацией</translation>
     </message>
     <message>
         <source>Time Synchronization</source>
@@ -6961,8 +6709,8 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Cannot move these %n I/O modules to server %1. Server is unresponsive.</source>
         <translation>
             <numerusform>Невозможно переместить этот модуль ввода-вывода на сервер %1. Сервер не отвечает.</numerusform>
-            <numerusform>Невозможно переместить эти модули ввода-вывода на сервер %1. Сервер не отвечает.</numerusform>
-            <numerusform>Невозможно переместить эти модули ввода-вывода на сервер %1. Сервер не отвечает.</numerusform>
+            <numerusform>Невозможно переместить эти %n модуля ввода-вывода на сервер %1. Сервер не отвечает.</numerusform>
+            <numerusform>Невозможно переместить эти %n модулей ввода-вывода на сервер %1. Сервер не отвечает.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -6978,7 +6726,7 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation>
             <numerusform>Этот модуль ввода-вывода найден автоматически. Он может определиться снова после удаления. Вы уверены, что хотите его удалить?</numerusform>
             <numerusform>%n из этих модулей ввода-вывода найдены автоматически. Они могут определиться снова после удаления. Вы уверены, что хотите их удалить?</numerusform>
-            <numerusform></numerusform>
+            <numerusform>%n из этих модулей ввода-вывода найдены автоматически. Они могут определиться снова после удаления. Вы уверены, что хотите их удалить?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -7821,9 +7569,9 @@ If you understand this and would like to proceed please click Merge to continue.
     <message numerus="yes">
         <source>%n items</source>
         <translation>
+            <numerusform>%n элемент</numerusform>
+            <numerusform>%n элемента</numerusform>
             <numerusform>%n элементов</numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message>

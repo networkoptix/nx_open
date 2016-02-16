@@ -26,6 +26,7 @@
 #include <statistics/statistics_manager.h>
 #include <ui/statistics/modules/actions_statistics_module.h>
 #include <ui/statistics/modules/users_statistics_module.h>
+#include <ui/statistics/modules/graphics_statistics_module.h>
 
 
 #ifdef Q_OS_WIN
@@ -83,7 +84,12 @@ QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *pa
     qnStatisticsManager->registerStatisticsModule(lit("actions"), actionsStatModule);
 
     const auto userStatModule = instance<QnUsersStatisticsModule>();
+    userStatModule->setContext(this);
     qnStatisticsManager->registerStatisticsModule(lit("users"), userStatModule);
+
+    const auto graphicsStatModule = instance<QnGraphicsStatisticsModule>();
+    graphicsStatModule->setContext(this);
+    qnStatisticsManager->registerStatisticsModule(lit("graphics"), graphicsStatModule);
 }
 
 QnWorkbenchContext::~QnWorkbenchContext() {
@@ -108,7 +114,17 @@ QnWorkbenchContext::~QnWorkbenchContext() {
     m_resourcePool = NULL;
 }
 
-QAction *QnWorkbenchContext::action(const Qn::ActionId id) const {
+void QnWorkbenchContext::setMainWindow(QWidget *mainWindow)
+{
+    if (m_mainWindow == mainWindow)
+        return;
+
+    m_mainWindow = mainWindow;
+    emit mainWindowChanged();
+}
+
+
+QAction *QnWorkbenchContext::action(const QnActions::IDType id) const {
     return m_menu->action(id);
 }
 

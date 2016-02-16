@@ -24,14 +24,14 @@ public:
         QnWorkbenchContextAware(parent)
     {
         QVBoxLayout *layout = new QVBoxLayout();
-        layout->addWidget(newActionButton(Qn::DebugDecrementCounterAction));
-        layout->addWidget(newActionButton(Qn::DebugIncrementCounterAction));
-        layout->addWidget(newActionButton(Qn::DebugShowResourcePoolAction));
+        layout->addWidget(newActionButton(QnActions::DebugDecrementCounterAction));
+        layout->addWidget(newActionButton(QnActions::DebugIncrementCounterAction));
+        layout->addWidget(newActionButton(QnActions::DebugShowResourcePoolAction));
         setLayout(layout);
     }
 
 private:
-    QToolButton *newActionButton(Qn::ActionId actionId, QWidget *parent = NULL) {
+    QToolButton *newActionButton(QnActions::IDType actionId, QWidget *parent = NULL) {
         QToolButton *button = new QToolButton(parent);
         button->setDefaultAction(menu()->action(actionId));
         button->setToolButtonStyle(Qt::ToolButtonTextOnly);
@@ -47,10 +47,10 @@ QnWorkbenchDebugHandler::QnWorkbenchDebugHandler(QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent)
 {
-    connect(action(Qn::DebugControlPanelAction),                &QAction::triggered,    this,   &QnWorkbenchDebugHandler::at_debugControlPanelAction_triggered);
-    connect(action(Qn::DebugIncrementCounterAction),            &QAction::triggered,    this,   &QnWorkbenchDebugHandler::at_debugIncrementCounterAction_triggered);
-    connect(action(Qn::DebugDecrementCounterAction),            &QAction::triggered,    this,   &QnWorkbenchDebugHandler::at_debugDecrementCounterAction_triggered);
-    connect(action(Qn::DebugShowResourcePoolAction),            &QAction::triggered,    this,   &QnWorkbenchDebugHandler::at_debugShowResourcePoolAction_triggered);
+    connect(action(QnActions::DebugControlPanelAction),                &QAction::triggered,    this,   &QnWorkbenchDebugHandler::at_debugControlPanelAction_triggered);
+    connect(action(QnActions::DebugIncrementCounterAction),            &QAction::triggered,    this,   &QnWorkbenchDebugHandler::at_debugIncrementCounterAction_triggered);
+    connect(action(QnActions::DebugDecrementCounterAction),            &QAction::triggered,    this,   &QnWorkbenchDebugHandler::at_debugDecrementCounterAction_triggered);
+    connect(action(QnActions::DebugShowResourcePoolAction),            &QAction::triggered,    this,   &QnWorkbenchDebugHandler::at_debugShowResourcePoolAction_triggered);
 }
 
 void QnWorkbenchDebugHandler::at_debugControlPanelAction_triggered() {
