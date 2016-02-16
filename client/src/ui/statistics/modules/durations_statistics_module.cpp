@@ -3,8 +3,8 @@
 
 #include <ui/statistics/modules/module_private/time_duration_metric.h>
 
-#include <ui/statistics/modules/module_private/durations/session_uptime_metric.h>
-#include <ui/statistics/modules/module_private/durations/app_active_time_metric.h>
+#include <ui/statistics/modules/module_private/session_uptime_metric.h>
+#include <ui/statistics/modules/module_private/app_active_time_metric.h>
 
 namespace
 {
