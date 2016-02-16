@@ -20,7 +20,9 @@ namespace nx {
 namespace hpm {
 namespace test {
 
-TEST_F(MediatorFunctionalTest, HolePunchingProcessor_generic)
+typedef MediatorFunctionalTest HolePunchingProcessor;
+
+TEST_F(HolePunchingProcessor, generic_tests)
 {
     const std::chrono::milliseconds kMaxConnectResponseWaitTimeout(15000);
 
@@ -138,7 +140,7 @@ TEST_F(MediatorFunctionalTest, HolePunchingProcessor_generic)
     udpClient.pleaseStopSync();
 }
 
-TEST_F(MediatorFunctionalTest, HolePunchingProcessor_server_failure)
+TEST_F(HolePunchingProcessor, server_failure)
 {
     const std::chrono::milliseconds kMaxConnectResponseWaitTimeout(15000);
 
@@ -219,6 +221,39 @@ TEST_F(MediatorFunctionalTest, HolePunchingProcessor_server_failure)
                     std::move(connectionResult),
                     std::placeholders::_1));
         ASSERT_EQ(api::ResultCode::notFound, resultCode);
+
+        udpClient.pleaseStopSync();
+    }
+}
+
+TEST_F(HolePunchingProcessor, destruction)
+{
+    startAndWaitUntilStarted();
+
+    const auto system1 = addRandomSystem();
+    const auto server1 = addRandomServer(system1);
+
+    ASSERT_EQ(api::ResultCode::ok, server1->listen());
+
+    for (int i = 0; i < 100; ++i)
+    {
+        nx::hpm::api::MediatorClientUdpConnection udpClient(endpoint());
+
+        api::ConnectRequest connectRequest;
+        connectRequest.originatingPeerID = QnUuid::createUuid().toByteArray();
+        connectRequest.connectSessionId = QnUuid::createUuid().toByteArray();
+        connectRequest.connectionMethods = api::ConnectionMethod::udpHolePunching;
+        connectRequest.destinationHostName = server1->serverId() + "." + system1.id;
+        std::promise<void> connectResponsePromise;
+        udpClient.connect(
+            connectRequest,
+            [&connectResponsePromise](
+                api::ResultCode resultCode,
+                api::ConnectResponse responseData)
+            {
+                connectResponsePromise.set_value();
+            });
+        connectResponsePromise.get_future().wait();
 
         udpClient.pleaseStopSync();
     }
