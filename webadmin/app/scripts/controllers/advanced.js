@@ -40,7 +40,12 @@ angular.module('webadminApp')
             smptPassword: {label:"SMTP password", type:"text"},
             smtpUser: {label:"SMTP user", type:"text"},
             updateNotificationsEnabled: {label:"Update notifications enabled", type:"checkbox"},
-            arecontRtspEnabled: {label:"Arecont RTSP Enabled", type:"checkbox"}
+            arecontRtspEnabled: {label:"Arecont RTSP Enabled", type:"checkbox"},
+
+            backupNewCamerasByDefault: {label:"Backup new cameras by default",type:"checkbox"},
+            statisticsAllowed: {label:"Send statistics",type:"checkbox"},
+            backupQualities: {label:"Backup qualities",type:"text"},
+            serverDiscoveryPingTimeoutSec:{label:"Server discovery timeout",type:"number"}
         };
 
         mediaserver.systemSettings().then(function(r){
@@ -48,7 +53,14 @@ angular.module('webadminApp')
 
             for(var settingName in $scope.systemSettings){
                 if(!$scope.settingsConfig[settingName]){
-                    $scope.settingsConfig[settingName] = {label:settingName,type:'text'}
+                    var type = 'text';
+                    if( $scope.systemSettings[settingName] === true ||
+                        $scope.systemSettings[settingName] === false ||
+                        $scope.systemSettings[settingName] === "true" ||
+                        $scope.systemSettings[settingName] === "false" ){
+                        type = 'checkbox';
+                    }
+                    $scope.settingsConfig[settingName] = {label:settingName,type:type}
                 }
 
                 if($scope.settingsConfig[settingName].type == 'number'){

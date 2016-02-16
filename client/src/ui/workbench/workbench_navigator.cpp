@@ -61,12 +61,11 @@ extern "C"
 #include <ui/widgets/day_time_widget.h>
 
 #include <ui/workbench/watchers/timeline_bookmarks_watcher.h>
-#include <ui/workbench/watchers/current_layout_items_watcher.h>
 
 #include "extensions/workbench_stream_synchronizer.h"
 #include "watchers/workbench_server_time_watcher.h"
 #include "watchers/workbench_user_inactivity_watcher.h"
-#include "watchers/workbench_bookmark_tags_watcher.h"
+
 #include "workbench.h"
 #include "workbench_display.h"
 #include "workbench_context.h"
@@ -335,18 +334,6 @@ bool QnWorkbenchNavigator::bookmarksModeEnabled() const {
     return m_timeSlider->isBookmarksVisible();
 }
 
-void QnWorkbenchNavigator::updateArchiveState(QnWorkbenchItem *item)
-{
-    if (hasArchive())
-        updateHasArchiveState();
-}
-
-void QnWorkbenchNavigator::onItemAdded(QnWorkbenchItem *item)
-{
-    if (!hasArchive())
-        updateHasArchiveState();
-}
-
 void QnWorkbenchNavigator::setBookmarksModeEnabled(bool enabled)
 {
     if (bookmarksModeEnabled() == enabled)
@@ -364,14 +351,6 @@ void QnWorkbenchNavigator::initialize() {
     Q_ASSERT_X(isValid(), Q_FUNC_INFO, "we should definitely be valid here");
     if (!isValid())
         return;
-
-    const auto itemsWatcher = context()->instance<QnCurrentLayoutItemsWatcher>();
-    connect(itemsWatcher, &QnCurrentLayoutItemsWatcher::itemAdded
-        , this, &QnWorkbenchNavigator::onItemAdded);
-    connect(itemsWatcher, &QnCurrentLayoutItemsWatcher::itemRemoved
-        , this, &QnWorkbenchNavigator::updateArchiveState);
-    connect(itemsWatcher, &QnCurrentLayoutItemsWatcher::itemHidden
-        , this, &QnWorkbenchNavigator::updateArchiveState);
 
     connect(workbench(), &QnWorkbench::currentLayoutChanged
         , this, &QnWorkbenchNavigator::updateSliderOptions);
@@ -581,27 +560,14 @@ bool QnWorkbenchNavigator::hasArchive() const
     return m_hasArchive;
 }
 
-bool QnWorkbenchNavigator::layoutHasAchive()
-{
-    const auto layout = workbench()->currentLayout();
-    if (!layout)
-        return false;
-
-    const auto items = layout->items();
-    return std::any_of(items.begin(), items.end(), [](QnWorkbenchItem *item)
-    {
-        const auto camera = extractCamera(item);
-        if (!camera)
-            return false;
-
-        const bool camHasArchive = !qnCameraHistoryPool->getCameraFootageData(camera, true).empty();
-        return camHasArchive;
-    });
-}
-
 void QnWorkbenchNavigator::updateHasArchiveState()
 {
-    const bool newValue = layoutHasAchive();
+    const bool newValue = boost::algorithm::any_of(m_syncedWidgets, [](QnMediaResourceWidget* widget)
+    {
+        auto camera = widget->resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
+        return camera && !qnCameraHistoryPool->getCameraFootageData(camera, true).empty();
+    });
+
     if (m_hasArchive == newValue)
         return;
 
@@ -609,7 +575,7 @@ void QnWorkbenchNavigator::updateHasArchiveState()
     emit hasArchiveChanged();
 }
 
-bool QnWorkbenchNavigator::hasVideo() const {
+bool QnWorkbenchNavigator::currentWidgetHasVideo() const {
     return m_currentMediaWidget && m_currentMediaWidget->hasVideo();
 }
 
@@ -622,7 +588,7 @@ qreal QnWorkbenchNavigator::minimalSpeed() const {
         if (!reader->isNegativeSpeedSupported())
             return 0.0;
 
-    return hasVideo()
+    return currentWidgetHasVideo()
         ? -16.0
         : 0.0;
 }
@@ -631,7 +597,7 @@ qreal QnWorkbenchNavigator::maximalSpeed() const {
     if (!isPlayingSupported())
         return 0.0;
 
-    return hasVideo()
+    return currentWidgetHasVideo()
         ? 16.0
         : 1.0;
 }
@@ -1116,7 +1082,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
             startTimeMSec =  endTimeMSec - timelineWindowNearLive;
 
             /* And then try to read saved value - it was valid someday. */
-            if (qnSettings->isActiveXMode()) { //TODO: #gdm refactor this safety check sometime
+            if (qnRuntime->isActiveXMode()) { //TODO: #gdm refactor this safety check sometime
                 if (QnWorkbenchItem *item = m_currentMediaWidget->item()) {
                     QnTimePeriod window = item->data(Qn::ItemSliderWindowRole).value<QnTimePeriod>();
                     if (window.isValid()) {
@@ -1770,10 +1736,15 @@ void QnWorkbenchNavigator::at_display_widgetChanged(Qn::ItemRole role) {
 }
 
 void QnWorkbenchNavigator::at_display_widgetAdded(QnResourceWidget *widget) {
-    if(widget->resource()->flags() & Qn::sync) {
-        if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget)){
+    if(widget->resource()->flags() & Qn::sync)
+    {
+        if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
+        {
             addSyncedWidget(mediaWidget);
             connect(mediaWidget, SIGNAL(motionSelectionChanged()), this, SLOT(at_widget_motionSelectionChanged()));
+
+            if (!hasArchive())
+                updateHasArchiveState();
         }
     }
 
@@ -1787,8 +1758,14 @@ void QnWorkbenchNavigator::at_display_widgetAboutToBeRemoved(QnResourceWidget *w
     disconnect(widget->resource(), NULL, this, NULL);
 
     if(widget->resource()->flags() & Qn::sync)
+    {
         if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
+        {
             removeSyncedWidget(mediaWidget);
+            if (hasArchive())
+                updateHasArchiveState();
+        }
+    }
 }
 
 void QnWorkbenchNavigator::at_widget_motionSelectionChanged() {
@@ -1899,8 +1876,8 @@ void QnWorkbenchNavigator::updateHistoryForCamera(QnVirtualCameraResourcePtr cam
 
     if (qnCameraHistoryPool->isCameraHistoryValid(camera))
         return;
-    
-    QnCameraHistoryPool::StartResult result = qnCameraHistoryPool->updateCameraHistoryAsync(camera, [this, camera] (bool success) 
+
+    QnCameraHistoryPool::StartResult result = qnCameraHistoryPool->updateCameraHistoryAsync(camera, [this, camera] (bool success)
     {
         if (!success)
             m_updateHistoryQueue.insert(camera); //< retry loading

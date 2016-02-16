@@ -22,11 +22,18 @@ void QnRuntimeTransactionLog::at_runtimeInfoChanged(const QnPeerRuntimeInfo& run
     QnTranStateKey key(runtimeInfo.data.peer.id, runtimeInfo.data.peer.instanceId);
     m_state.values[key] = runtimeInfo.data.version;
     m_data[key] = runtimeInfo.data;
+    if (runtimeInfo.data.peer.id == qnCommon->moduleGUID())
+        clearOldRuntimeDataUnsafe(lock, QnTranStateKey(qnCommon->moduleGUID(), qnCommon->runningInstanceGUID()));
 }
 
 void QnRuntimeTransactionLog::clearOldRuntimeData(const QnTranStateKey& key)
 {
     QnMutexLocker lock( &m_mutex );
+    clearOldRuntimeDataUnsafe(lock, key);
+}
+
+void QnRuntimeTransactionLog::clearOldRuntimeDataUnsafe(QnMutexLockerBase& lock, const QnTranStateKey& key)
+{
     Q_ASSERT(!key.dbID.isNull());
     auto itr = m_state.values.lowerBound(QnTranStateKey(key.peerID, QnUuid()));
     bool newPeerFound = false;
@@ -46,6 +53,7 @@ void QnRuntimeTransactionLog::clearOldRuntimeData(const QnTranStateKey& key)
     if (newPeerFound && oldPeerFound) {
         QnTransaction<ApiRuntimeData> tran(ApiCommand::runtimeInfoChanged);
         tran.params = m_data[key];
+        lock.unlock();
         emit runtimeDataUpdated(tran);
     }
 }

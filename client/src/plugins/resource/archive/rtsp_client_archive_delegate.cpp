@@ -58,7 +58,8 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* 
     m_isMultiserverAllowed(true),
     m_playNowModeAllowed(true),
     m_reader(reader),
-    m_frameCnt(0)
+    m_frameCnt(0),
+    m_runtimeId(qnCommon->runningInstanceGUID())
 {
     m_footageUpToDate.test_and_set();
     m_rtpDataBuffer = new quint8[MAX_RTP_BUFFER_SIZE];
@@ -179,7 +180,7 @@ void QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(const QnVirtualCam
     QnMediaServerResourceList mediaServerList = qnCameraHistoryPool->getCameraFootageData(camera, true);
 
     /* Check if no archive available on any server. */
-    if (mediaServerList.isEmpty()) {
+    if (mediaServerList.size() <= 1) {
         m_globalMinArchiveTime = qint64(AV_NOPTS_VALUE);
         return;
     }
@@ -255,7 +256,7 @@ bool QnRtspClientArchiveDelegate::openInternal() {
     }
 
     setupRtspSession(m_camera, m_server, &m_rtspSession, m_playNowModeAllowed);
-    m_rtpData = 0;
+    setRtpData(0);
 
     const bool isOpened = m_rtspSession.open(getUrl(m_camera, m_server), m_lastSeekTime).errorCode == CameraDiagnostics::ErrorCode::noError;
     if (isOpened)
@@ -270,7 +271,7 @@ bool QnRtspClientArchiveDelegate::openInternal() {
         m_rtspSession.play(m_position, endTime, m_rtspSession.getScale());
         RTPSession::TrackMap trackInfo =  m_rtspSession.getTrackInfo();
         if (!trackInfo.isEmpty())
-            m_rtpData = trackInfo[0]->ioDevice;
+            setRtpData(trackInfo[0]->ioDevice);
         if (!m_rtpData)
             m_rtspSession.stop();
     }
@@ -314,10 +315,17 @@ void QnRtspClientArchiveDelegate::parseAudioSDP(const QList<QByteArray>& audioSD
     }
 }
 
+void QnRtspClientArchiveDelegate::setRtpData(RTPIODevice* value)
+{
+    QnMutexLocker lock(&m_rtpDataMutex);
+    m_rtpData = value;
+}
+
 void QnRtspClientArchiveDelegate::beforeClose()
 {
     //m_waitBOF = false;
     m_closing = true;
+    QnMutexLocker lock(&m_rtpDataMutex);
     if (m_rtpData)
         m_rtpData->getMediaSocket()->close();
 }
@@ -838,7 +846,7 @@ void QnRtspClientArchiveDelegate::setupRtspSession(const QnVirtualCameraResource
 
     if (!m_auth.videowall.isNull())
         session->setAdditionAttribute(Qn::VIDEOWALL_GUID_HEADER_NAME, m_auth.videowall.toString().toUtf8());
-    session->setAdditionAttribute(Qn::EC2_RUNTIME_GUID_HEADER_NAME, qnCommon->runningInstanceGUID().toByteArray());
+    session->setAdditionAttribute(Qn::EC2_RUNTIME_GUID_HEADER_NAME, m_runtimeId.toByteArray());
     session->setAdditionAttribute(Qn::EC2_INTERNAL_RTP_FORMAT, "1" );
 
 
@@ -857,4 +865,9 @@ void QnRtspClientArchiveDelegate::setPlayNowModeAllowed(bool value)
     m_playNowModeAllowed = value;
     if (!value)
         m_rtspSession.setUsePredefinedTracks(0);
+}
+
+bool QnRtspClientArchiveDelegate::hasVideo() const
+{
+    return m_camera && m_camera->hasVideo(nullptr);
 }

@@ -526,7 +526,7 @@
     </message>
     <message>
         <source>Not authorized. Url %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Not authorised. Url %1.</translation>
     </message>
     <message>
         <source>First, try to turn on recording (if it&apos;s off) and decrease fps in device settings.</source>
@@ -663,11 +663,11 @@
     </message>
     <message>
         <source>Could not initialize audio encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>Could not initialise audio encoder.</translation>
     </message>
     <message>
         <source>Could not initialize audio decoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>Could not initialise audio decoder.</translation>
     </message>
 </context>
 <context>
@@ -705,7 +705,7 @@
     </message>
     <message>
         <source>Could not initialize video encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>Could not initialise video encoder.</translation>
     </message>
 </context>
 <context>

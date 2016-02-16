@@ -37,6 +37,8 @@ public:
     explicit QnClientRuntimeSettings(QObject *parent = nullptr);
     ~QnClientRuntimeSettings();
 
+    bool isDesktopMode() const;
+
 private:
     QN_BEGIN_PROPERTY_STORAGE(VARIABLE_COUNT)
         QN_DECLARE_RW_PROPERTY(bool,                        isSoftwareYuv,          setSoftwareYuv,             SOFTWARE_YUV,               false)
@@ -47,7 +49,7 @@ private:
         QN_DECLARE_RW_PROPERTY(bool,                        isActiveXMode,          setActiveXMode,             ACTIVE_X_MODE,              false)
         QN_DECLARE_RW_PROPERTY(bool,                        showFullInfo,           setShowFullInfo,            SHOW_FULL_INFO,             false)
     QN_END_PROPERTY_STORAGE()
-    
+
 };
 
 #define qnRuntime QnClientRuntimeSettings::instance()

@@ -18,6 +18,8 @@
 #include <utils/network/http/asynchttpclient.h>
 #include <utils/network/http/async_http_client_reply.h>
 
+#include <utils/common/app_info.h>
+
 
 using std::chrono::duration_cast;
 using std::chrono::seconds;

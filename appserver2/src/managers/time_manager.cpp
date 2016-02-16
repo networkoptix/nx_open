@@ -17,6 +17,7 @@
 #include <QtZlib/zlib.h>
 #endif
 
+#include <api/global_settings.h>
 #include <api/runtime_info_manager.h>
 
 #include <common/common_module.h>
@@ -817,6 +818,15 @@ namespace ec2
         auto peerIter = m_peersToSendTimeSyncTo.find( peerID );
         if( peerIter == m_peersToSendTimeSyncTo.end() )
             return;
+
+        if (!QnGlobalSettings::instance()->isTimeSynchronizationEnabled())
+        {
+            peerIter->second.syncTimerID = TimerManager::instance()->addTimer(
+                std::bind(&TimeSynchronizationManager::synchronizeWithPeer, this, peerID),
+                TIME_SYNC_SEND_TIMEOUT_SEC * MILLIS_PER_SEC);
+            return;
+        }
+
         QUrl targetUrl;
         targetUrl.setScheme( lit("http") );
         targetUrl.setHost( peerIter->second.peerAddress.address.toString() );
@@ -1129,11 +1139,24 @@ namespace ec2
 
     void TimeSynchronizationManager::onDbManagerInitialized()
     {
+        QByteArray timePriorityStr;
+        const bool timePriorityStrLoadResult = 
+            QnDbManager::instance()->readMiscParam(
+                LOCAL_TIME_PRIORITY_KEY_PARAM_NAME,
+                &timePriorityStr);
+
+        qint64 restoredTimeDelta = 0;
+        TimePriorityKey restoredPriorityKey;
+        const bool loadSyncTimeResult = 
+            loadSyncTime(
+                QnDbManager::instance(),
+                &restoredTimeDelta,
+                &restoredPriorityKey);
+
         QnMutexLocker lk( &m_mutex );
 
         //restoring local time priority from DB
-        QByteArray timePriorityStr;
-        if (QnDbManager::instance()->readMiscParam(LOCAL_TIME_PRIORITY_KEY_PARAM_NAME, &timePriorityStr))
+        if (timePriorityStrLoadResult)
         {
             const quint64 restoredPriorityKeyVal = timePriorityStr.toULongLong();
             TimePriorityKey restoredPriorityKey;
@@ -1155,35 +1178,40 @@ namespace ec2
             NX_LOG( lit("TimeSynchronizationManager. Successfully restored time priority key %1 from DB").arg(restoredPriorityKeyVal, 0, 16), cl_logWARNING );
         }
 
+        boost::optional<std::pair<qint64, ec2::TimePriorityKey>> syncTimeDataToSave;
         if( m_timeSynchronized )
         {
             //saving time sync information to DB
-            const qint64 curSyncTime = m_usedTimeSyncInfo.syncTime + m_monotonicClock.elapsed() - m_usedTimeSyncInfo.monotonicClockValue;
-            saveSyncTime(
-                QnDbManager::instance(),
+            const qint64 curSyncTime = getSyncTimeNonSafe();
+            syncTimeDataToSave = std::make_pair(
                 QDateTime::currentMSecsSinceEpoch() - curSyncTime,
                 m_usedTimeSyncInfo.timePriorityKey);
         }
         else
         {
             //restoring time sync information from DB
-            qint64 timeDelta = 0;
-            TimePriorityKey savedPriorityKey;
-            if (loadSyncTime(QnDbManager::instance(), &timeDelta, &savedPriorityKey))
+            if (loadSyncTimeResult)
             {
-                m_usedTimeSyncInfo.syncTime = QDateTime::currentMSecsSinceEpoch() - timeDelta;
-                m_usedTimeSyncInfo.timePriorityKey = savedPriorityKey;
+                m_usedTimeSyncInfo.syncTime = QDateTime::currentMSecsSinceEpoch() - restoredTimeDelta;
+                m_usedTimeSyncInfo.timePriorityKey = restoredPriorityKey;
                 m_usedTimeSyncInfo.timePriorityKey.flags &= ~Qn::TF_peerTimeSynchronizedWithInternetServer;
                 m_usedTimeSyncInfo.timePriorityKey.flags &= ~Qn::TF_peerTimeSetByUser;
                 NX_LOG( lit("TimeSynchronizationManager. Successfully restored synchronized time %1 (delta %2, key 0x%3) from DB").
                     arg(QDateTime::fromMSecsSinceEpoch(m_usedTimeSyncInfo.syncTime).toString(Qt::ISODate)).
-                    arg(timeDelta).
-                    arg(savedPriorityKey.toUInt64(), 0, 16), cl_logINFO );
+                    arg(restoredTimeDelta).
+                    arg(restoredPriorityKey.toUInt64(), 0, 16), cl_logINFO );
             }
         }
 
         auto localTimePriorityKey = m_localTimePriorityKey;
         lk.unlock();
+
+        if (syncTimeDataToSave)
+            saveSyncTime(
+                QnDbManager::instance(),
+                syncTimeDataToSave->first,
+                syncTimeDataToSave->second);
+
         updateRuntimeInfoPriority( localTimePriorityKey.toUInt64() );
     }
 

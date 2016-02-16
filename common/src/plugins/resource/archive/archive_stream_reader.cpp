@@ -360,6 +360,21 @@ void QnArchiveStreamReader::startPaused(qint64 startTime)
     start();
 }
 
+bool QnArchiveStreamReader::isCompatiblePacketForMask(const QnAbstractMediaDataPtr& mediaData) const
+{
+    if (hasVideo())
+    {
+        if (mediaData->dataType != QnAbstractMediaData::VIDEO)
+            return false;
+    }
+    else 
+    {
+        if (mediaData->dataType != QnAbstractMediaData::AUDIO)
+            return false;
+    }
+    return !(mediaData->flags & QnAbstractMediaData::MediaFlags_LIVE);
+}
+
 QnAbstractMediaDataPtr QnArchiveStreamReader::getNextData()
 {
     while (!m_skippedMetadata.isEmpty())
@@ -791,7 +806,7 @@ begin_label:
     // Do not display archive in a future
     if (!(m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_UnsyncTime)) 
     {
-        if (videoData && !(videoData->flags & QnAbstractMediaData::MediaFlags_LIVE) && videoData->timestamp > qnSyncTime->currentUSecsSinceEpoch() && !reverseMode)
+        if (isCompatiblePacketForMask(m_currentData) && m_currentData->timestamp > qnSyncTime->currentUSecsSinceEpoch() && !reverseMode)
         {
             m_outOfPlaybackMask = true;
             return createEmptyPacket(reverseMode); // EOF reached
@@ -799,7 +814,7 @@ begin_label:
     }
 
     // ensure Pos At playback mask
-    if (!needToStop() && videoData && !(videoData->flags & QnAbstractMediaData::MediaFlags_Ignore) && !(videoData->flags & QnAbstractMediaData::MediaFlags_LIVE) 
+    if (!needToStop() && isCompatiblePacketForMask(m_currentData) && !(m_currentData->flags & QnAbstractMediaData::MediaFlags_Ignore)
         && m_nextData == 0) // check next data because of first current packet may be < required time (but next packet always > required time)
     {
         m_playbackMaskSync.lock();

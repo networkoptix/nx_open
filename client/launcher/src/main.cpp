@@ -159,7 +159,7 @@ int extractFile(ifstream& srcFile, const wstring& fullFileName, int64_t pos, int
         return -1;
     char* buffer = new char[1024*1024];
     int64_t bytesLeft = fileSize;
-    
+
     do {
         srcFile.read(buffer, min(bytesLeft, 1024*1024ll));
         dstFile.write(buffer, srcFile.gcount());
@@ -178,7 +178,7 @@ bool startProcessAsync(wchar_t* commandline, const wstring& dstDir)
     memset(&lpStartupInfo, 0, sizeof(lpStartupInfo));
     memset(&lpProcessInfo, 0, sizeof(lpProcessInfo));
     return CreateProcess(0, commandline,
-        NULL, NULL, NULL, NULL, NULL, 
+        NULL, NULL, NULL, NULL, NULL,
         dstDir.c_str(),
         &lpStartupInfo,
         &lpProcessInfo);
@@ -193,7 +193,7 @@ int launchFile(const wstring& executePath)
 
     srcFile.seekg(-sizeof(int64_t)*2, std::ios::end); // skip magic, and nov pos
     int64_t magic, novPos, indexTablePos;
-    
+
     srcFile.read((char*) &novPos, sizeof(int64_t));
     srcFile.read((char*) &magic, sizeof(int64_t));
     if (magic != MAGIC)
@@ -210,7 +210,7 @@ int launchFile(const wstring& executePath)
     vector<wstring> fileNameList;
 
     char* buffer = new char[indexEofPos - indexTablePos];
-    try 
+    try
     {
         srcFile.seekg(indexTablePos);
         int64_t curPos = indexTablePos;
@@ -258,6 +258,9 @@ int launchFile(const wstring& executePath)
             wchar_t* arch = sizeof(char*) == 4 ? L"x86" : L"x64";
             wsprintf(buffer, L"\"%s\\vcredist_%s.exe\" /q", toNativeSeparator(dstDir).c_str(), arch);
             int result = _wsystem(buffer);
+
+            // give ms antivirus enough time to have installed redist checked
+            Sleep(5000);
         }
 
         // start client
@@ -267,7 +270,7 @@ int launchFile(const wstring& executePath)
         if (!startProcessAsync(buffer, dstDir))
         {
             // todo: refactor it. Current version have different 'exe' name for installer and debug mode. So, try both names
-            wsprintf(buffer, L"\"%s\" \"%s\"", getFullFileName(dstDir, L"client.exe").c_str(), executePath.c_str());
+            wsprintf(buffer, L"\"%s\" \"%s\"", getFullFileName(dstDir, L"client.bin.exe").c_str(), executePath.c_str());
             startProcessAsync(buffer, dstDir);
         }
 

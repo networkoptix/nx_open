@@ -348,75 +348,75 @@
     </message>
     <message>
         <source>Execute PTZ preset</source>
-        <translation type="unfinished"></translation>
+        <translation>PTZ-Preset ausführen</translation>
     </message>
     <message>
         <source>Show text overlay</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeig Text Overlay</translation>
     </message>
     <message>
         <source>Show on Alarm Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeige Alarmlayout</translation>
     </message>
     <message>
         <source>Archive backup finished</source>
-        <translation type="unfinished"></translation>
+        <translation>Archivsicherung ist abgeschlossen</translation>
     </message>
     <message>
         <source>Server &apos;%1&apos; has finished an archive backup</source>
-        <translation type="unfinished"></translation>
+        <translation>Server &apos;%1&apos; hat eine Archivsicherung abgeschlossen</translation>
     </message>
     <message>
         <source>Generic Event at %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ereignis auf %1</translation>
     </message>
     <message>
         <source>Input Port: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Input Port: %1</translation>
     </message>
     <message>
         <source>Archive backup is successfully completed</source>
-        <translation type="unfinished"></translation>
+        <translation>Archivsicherung ist vollständig abgeschlossen</translation>
     </message>
     <message>
         <source>I/O Module %1 was disconnected</source>
-        <translation type="unfinished"></translation>
+        <translation>I/O Modul %1 wurde getrennt</translation>
     </message>
     <message>
         <source>Conflicting Address: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Adresskonflikt: %1</translation>
     </message>
     <message>
         <source>Archive backup failed: No available backup storages with sufficient free space</source>
-        <translation type="unfinished"></translation>
+        <translation>Archivsicherung fehlgeschlagen: Keine verfügbaren Speicherlaufwerke mit genügend freiem Speicher</translation>
     </message>
     <message>
         <source>Archive backup failed: Target storage failure</source>
-        <translation type="unfinished"></translation>
+        <translation>Archivsicherung fehlgeschlagen: Fehler bei Ziellaufwerk</translation>
     </message>
     <message>
         <source>Archive backup failed: Source file open/read error</source>
-        <translation type="unfinished"></translation>
+        <translation>Archivsicherung fehlgeschlagen: Fehler beim Öffnen/Lesen der Quelldatei</translation>
     </message>
     <message>
         <source>Archive backup failed: Target file create/write error</source>
-        <translation type="unfinished"></translation>
+        <translation>Archivsicherung fehlgeschlagen: Fehler beim Erstellen/Schreiben der Zieldatei</translation>
     </message>
     <message>
         <source>Archive backup failed: File catalog error</source>
-        <translation type="unfinished"></translation>
+        <translation>Archivsicherung fehlgeschlagen: Dateifehler</translation>
     </message>
     <message>
         <source>Archive backup finished, but isn&apos;t fully completed because backup time is over. Data is backed up to %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Archivsicherung abgeschlossen, aber nicht vollständig abgeschlossen, da Sicherungszeit abgelaufen. Daten sind bis zu %1 gesichert</translation>
     </message>
     <message>
         <source>Archive backup is canceled by user. Data is backed up to %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Archivsicherung wurde durch Benutzer abgebrochen. Daten sind bis zu %1 gesichert</translation>
     </message>
     <message>
         <source>Recording on I/O modules is disabled:</source>
-        <translation type="unfinished"></translation>
+        <translation>Aufnahme auf I/O Module ist deaktiviert:</translation>
     </message>
 </context>
 <context>
@@ -511,7 +511,7 @@
     </message>
     <message>
         <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-        <translation>Stellen Sie sicher, dass die Kamera im Netzwerk angeschlossen wurde. Versuchen Sie die Kamerat neu zu starten.</translation>
+        <translation>Stellen Sie sicher, dass die Kamera im Netzwerk angeschlossen wurde. Versuchen Sie die Kamera neu zu starten.</translation>
     </message>
     <message>
         <source>Make sure port %2 is accessible (e.g. forwarded).</source>
@@ -579,55 +579,55 @@
     </message>
     <message>
         <source>Camera plugin error. %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Fehler bei Kamera-Plugin: %1</translation>
     </message>
     <message>
         <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>Versuchen Sie das I/O Modul neu zu starten, setzen Sie es dann über die Webseite auf Werkseinstellungen zurück.</translation>
     </message>
     <message>
         <source>Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</source>
-        <translation type="unfinished"></translation>
+        <translation>Stellen Sie sicher, dass das I/O Modul im Netzwerk angeschlossen ist. Versuchen Sie, dass I/O Modul neu zu starten.</translation>
     </message>
     <message>
         <source>Could not parse I/O module response. Url %1, request name %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Antwort des I/O Moduls konnte nicht analysiert werden. URL %1, angeforderter Name %2.</translation>
     </message>
     <message>
         <source>First, try to turn on recording (if it&apos;s off) and decrease fps in I/O module settings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Versuchen Sie zuerst die Aufnahme einzuschalten (wenn ausgeschaltet) und senken Sie die FPS in den I/O Modul Einstellungen.</translation>
     </message>
     <message>
         <source>If it doesn&apos;t help, restore factory defaults on the I/O module web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wenn das nicht hilft, setzen Sie das I/O Modul über die Webseite auf Werkseinstellungen.</translation>
     </message>
     <message>
         <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>I/O Modul-Abfrage &quot;%1&quot; schlug fehl mit Fehler: &quot;%2&quot;.</translation>
     </message>
     <message>
         <source>Unknown I/O module issue.</source>
-        <translation type="unfinished"></translation>
+        <translation>Unbekanntes I/O Modul Problem.</translation>
     </message>
     <message>
         <source>Invalid data was received from the I/O module %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ungültige Daten wurden vom I/O Modul %1 empfangen.</translation>
     </message>
     <message>
         <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
-        <translation type="unfinished"></translation>
+        <translation>Zu viele Medienfehler. Öffnen Sie bitte das Fehlerprotokoll für weitere Details.</translation>
     </message>
     <message>
         <source>Device initialization process is in progress.</source>
-        <translation type="unfinished"></translation>
+        <translation>Geräteinitialisierungsprozess in Bearbeitung.</translation>
     </message>
     <message>
         <source>Camera initialization process is in progress.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamerainitialisierungsprozess in Bearbeitung.</translation>
     </message>
     <message>
         <source>I/O Module initialization process is in progress.</source>
-        <translation type="unfinished"></translation>
+        <translation>I/O Modul Initialisierungsprozess in Bearbeitung.</translation>
     </message>
 </context>
 <context>
@@ -650,7 +650,7 @@
     </message>
     <message>
         <source>File explorer failed to open.</source>
-        <translation type="unfinished"></translation>
+        <translation>Datei-Explorer konnte nicht geöffnet werden.</translation>
     </message>
 </context>
 <context>
@@ -665,11 +665,11 @@
     </message>
     <message>
         <source>Could not initialize audio encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>Audio-Encoder konnte nicht initialisiert werden.</translation>
     </message>
     <message>
         <source>Could not initialize audio decoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>Audio-Decoder konnte nicht initialisiert werden.</translation>
     </message>
 </context>
 <context>
@@ -707,7 +707,7 @@
     </message>
     <message>
         <source>Could not initialize video encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>Video-Encoder konnte nicht initialisiert werden.</translation>
     </message>
 </context>
 <context>
@@ -870,11 +870,11 @@
     </message>
     <message>
         <source>There was a problem activating your license key. A database error occurred.</source>
-        <translation type="unfinished"></translation>
+        <translation>Es gab ein Problem bei der Aktivierung Ihrer Lizenz. Ein Datenbankfehler ist aufgetreten.</translation>
     </message>
     <message>
         <source>There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.</source>
-        <translation type="unfinished"></translation>
+        <translation>Es gab ein Problem bei der Aktivierung Ihrer Lizenz. Ungültige Daten wurden empfangen. Kontaktieren Sie bitte Supportteam.</translation>
     </message>
 </context>
 <context>
@@ -955,33 +955,33 @@
     </message>
     <message numerus="yes">
         <source>%n I/O Module(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n I/O Modul</numerusform>
+            <numerusform>%n I/O Module</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n I/O module(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n I/O Modul</numerusform>
+            <numerusform>%n I/O Module</numerusform>
         </translation>
     </message>
     <message>
         <source>I/O Modules</source>
-        <translation type="unfinished"></translation>
+        <translation>I/O Module</translation>
     </message>
     <message>
         <source>I/O modules</source>
-        <translation type="unfinished"></translation>
+        <translation>I/O Module</translation>
     </message>
     <message>
         <source>I/O Module</source>
-        <translation type="unfinished">I/O Modul</translation>
+        <translation>I/O Modul</translation>
     </message>
     <message>
         <source>I/O module</source>
-        <translation type="unfinished"></translation>
+        <translation>I/O Modul</translation>
     </message>
 </context>
 <context>
@@ -1109,7 +1109,7 @@
     </message>
     <message>
         <source>File write error. Not enough free space.</source>
-        <translation type="unfinished"></translation>
+        <translation>Fehler beim Schreiben. Nicht genügend Speicherplatz.</translation>
     </message>
 </context>
 <context>
@@ -1173,7 +1173,7 @@
     <name>utils::QnCameraNamesWatcher</name>
     <message>
         <source>Removed camera</source>
-        <translation type="unfinished"></translation>
+        <translation>Entfernte Kamera</translation>
     </message>
 </context>
 </TS>

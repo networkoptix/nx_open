@@ -82,8 +82,9 @@ public:
     Q_SLOT bool setPlaying(bool playing);
     bool isPlayingSupported() const;
 
-    bool hasVideo() const;
+    bool currentWidgetHasVideo() const;
 
+    /** Any of the syncable widgets on the layout has archive. */
     bool hasArchive() const;
 
     qreal speed() const;
@@ -144,7 +145,7 @@ protected:
     QnThumbnailsLoader *thumbnailLoader(const QnMediaResourcePtr &resource);
     QnThumbnailsLoader *thumbnailLoaderByWidget(QnMediaResourceWidget *widget);
 
-    protected slots:
+protected slots:
     void updateCentralWidget();
     void updateCurrentWidget();
     void updateSliderFromReader(bool keepInWindow = true);
@@ -218,14 +219,7 @@ private:
     void updateHistoryForCamera(QnVirtualCameraResourcePtr camera);
     void updateSliderBookmarks();
 
-    void onItemAdded(QnWorkbenchItem *item);
-
-    void updateArchiveState(QnWorkbenchItem *item);
-
     void updateHasArchiveState();
-
-    bool layoutHasAchive();
-
 private:
     QnWorkbenchStreamSynchronizer *m_streamSynchronizer;
     QTime m_updateSliderTimer;
@@ -283,6 +277,7 @@ private:
     /** Set of cameras, for which history was not loaded and should be updated again. */
     QSet<QnVirtualCameraResourcePtr> m_updateHistoryQueue;
 
+    /** At least one of the synced widgets has archive. */
     bool m_hasArchive;
 };
 
