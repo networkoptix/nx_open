@@ -197,6 +197,7 @@ bool QnFileStorageResource::checkWriteCap() const
     QnMutexLocker lock(&m_writeTestMutex);
     if (!m_writeCapCached.is_initialized())
     {
+        QnCallCount();
         m_writeCapCached = testWriteCapInternal();
     }
     return *m_writeCapCached;
@@ -757,6 +758,7 @@ bool QnFileStorageResource::isLocal(const QString &url)
     if (url.contains(lit("://")))
         return false;
 
+    QnCallCount();
     auto platformMonitor = static_cast<QnPlatformMonitor*>(qnPlatform->monitor());
 
     QList<QnPlatformMonitor::PartitionSpace> partitions =
