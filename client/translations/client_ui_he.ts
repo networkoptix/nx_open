@@ -1005,21 +1005,6 @@
     </message>
     <message>
         <location/>
-        <source>Ctrl+E</source>
-        <translation>Ctrl +E</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Ctrl+L</source>
-        <translation>Ctrl +L</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Ctrl+M</source>
-        <translation>Ctrl +M</translation>
-    </message>
-    <message>
-        <location/>
         <source>Monitor All Servers on a Single Layout</source>
         <translation>נטר את כל השרתים בפריסה אחת</translation>
     </message>
@@ -1032,11 +1017,6 @@
         <location/>
         <source>System Backup and Restore</source>
         <translation>גבוי ושחזור המערכת</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Ctrl+B</source>
-        <translation></translation>
     </message>
     <message>
         <location/>
