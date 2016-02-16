@@ -1,7 +1,5 @@
 #include "web_view.h"
 
-#ifdef GDM_TODO
-
 #include <QtNetwork/QNetworkReply>
 #include <QtWebKit/QWebHistory>
 
@@ -121,5 +119,3 @@ void QnWebView::setStatus(WebViewPageStatus value)
     m_status = value;
     emit statusChanged();
 }
-
-#endif

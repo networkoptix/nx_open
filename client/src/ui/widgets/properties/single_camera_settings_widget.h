@@ -20,9 +20,7 @@ class QVBoxLayout;
 class QnCameraMotionMaskWidget;
 class QnCameraSettingsWidgetPrivate;
 class QnImageProvider;
-#ifdef GDM_TODO
 class CameraAdvancedSettingsWebPage;
-#endif
 
 class QnSingleCameraSettingsWidget : public Connective<QWidget>, public QnWorkbenchContextAware {
     Q_OBJECT

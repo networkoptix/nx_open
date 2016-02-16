@@ -109,9 +109,7 @@ extern "C"
 
 #include "utils/common/long_runnable.h"
 
-#ifdef ENABLE_TEXT_TO_SPEECH
 #include "text_to_wav.h"
-#endif
 
 #include "common/common_module.h"
 #include "ui/style/noptix_style.h"
@@ -389,20 +387,13 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QApplication::setQuitOnLastWindowClosed(true);
     QApplication::setWindowIcon(qnSkin->icon("window_icon.png"));
 
-    QApplication::setStyle(skin->newStyle(customizer->genericPalette())); // TODO: #Elric here three qWarning's are issued (bespin bug), qnDeleteLater with null receiver
+    QApplication::setStyle(skin->newStyle(customizer->genericPalette()));
 #ifdef Q_OS_MACX
     application->setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 #endif
 
-#ifdef ENABLE_TEXT_TO_SPEECH
     QScopedPointer<TextToWaveServer> textToWaveServer(new TextToWaveServer());
     textToWaveServer->start();
-#endif
-
-#ifdef Q_WS_X11
-    //   QnX11LauncherWorkaround x11LauncherWorkaround;
-    //   application->installEventFilter(&x11LauncherWorkaround);
-#endif
 
 #ifdef Q_OS_WIN
     new QnIexploreUrlHandler(application); /* All effects are placed in the constructor. */
