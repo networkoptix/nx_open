@@ -6,7 +6,7 @@
 class TimeDurationMetric
 {
 public:
-    TimeDurationMetric();
+    TimeDurationMetric(bool active = false);
 
     virtual ~TimeDurationMetric();
 

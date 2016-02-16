@@ -42,6 +42,8 @@ public:
 
     void saveCurrentStatistics();
 
+    void resetStatistics();
+
 private:
     void unregisterModule(const QString &alias);
 

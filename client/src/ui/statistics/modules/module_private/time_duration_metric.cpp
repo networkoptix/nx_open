@@ -1,12 +1,13 @@
 
 #include "time_duration_metric.h"
 
-TimeDurationMetric::TimeDurationMetric()
+TimeDurationMetric::TimeDurationMetric(bool active)
     : m_counter()
     , m_isActiveState(false)
     , m_activeStateDurationMs(0)
 {
     m_counter.invalidate();
+    activateCounter(active);
 }
 
 TimeDurationMetric::~TimeDurationMetric()
@@ -36,7 +37,8 @@ QString TimeDurationMetric::value() const
 
 void TimeDurationMetric::reset()
 {
-    activateCounter(false);
+    if (m_isActiveState)
+        m_counter.restart();
     m_activeStateDurationMs = 0;
 }
 

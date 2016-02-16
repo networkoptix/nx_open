@@ -282,12 +282,6 @@ void QnStatisticsManager::saveCurrentStatistics()
 
     auto metrics = getMetrics();
 
-    for(const auto module: m_modules)
-    {
-        if (module)
-            module->resetMetrics();
-    }
-
     if (metrics.empty())
         return;
 
@@ -302,6 +296,14 @@ void QnStatisticsManager::saveCurrentStatistics()
     m_storage->storeMetrics(metrics);
 }
 
+void QnStatisticsManager::resetStatistics()
+{
+    for(const auto module: m_modules)
+    {
+        if (module)
+            module->resetMetrics();
+    }
+}
 
 
 

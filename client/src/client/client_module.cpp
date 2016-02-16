@@ -82,6 +82,8 @@ namespace
 
         QObject::connect(QnClientMessageProcessor::instance(), &QnClientMessageProcessor::connectionClosed
             , statManager, &QnStatisticsManager::saveCurrentStatistics);
+        QObject::connect(QnClientMessageProcessor::instance(), &QnClientMessageProcessor::connectionOpened
+            , statManager, &QnStatisticsManager::resetStatistics);
         QObject::connect(QnClientMessageProcessor::instance(), &QnClientMessageProcessor::initialResourcesReceived
             , statManager, &QnStatisticsManager::sendStatistics);
     }
