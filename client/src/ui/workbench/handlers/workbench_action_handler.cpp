@@ -533,7 +533,7 @@ void QnWorkbenchActionHandler::submitInstantDrop() {
 void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &user) {
 	if (qnRuntime->isDesktopMode())
     {
-		if (user && user->isAdmin())
+		if (user)
 	        context()->instance<QnWorkbenchUpdateWatcher>()->start();
         else
             context()->instance<QnWorkbenchUpdateWatcher>()->stop();
