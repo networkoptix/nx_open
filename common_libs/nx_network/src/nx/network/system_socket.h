@@ -63,8 +63,8 @@ public:
 
     Socket(const Socket&) = delete;
     Socket& operator=(const Socket&) = delete;
-    Socket(Socket&&);
-    Socket& operator=(Socket&&);
+    Socket(Socket&&) = delete;
+    Socket& operator=(Socket&&) = delete;
 
     /**
      *   Close and deallocate this socket
@@ -192,8 +192,8 @@ public:
 
     CommunicatingSocket(const CommunicatingSocket&) = delete;
     CommunicatingSocket& operator=(const CommunicatingSocket&) = delete;
-    CommunicatingSocket(CommunicatingSocket&&);
-    CommunicatingSocket& operator=(CommunicatingSocket&&);
+    CommunicatingSocket(CommunicatingSocket&&) = delete;
+    CommunicatingSocket& operator=(CommunicatingSocket&&) = delete;
 
     virtual ~CommunicatingSocket();
 
@@ -264,8 +264,8 @@ public:
 
     TCPSocket(const TCPSocket&) = delete;
     TCPSocket& operator=(const TCPSocket&) = delete;
-    TCPSocket(TCPSocket&&) = default;
-    TCPSocket& operator=(TCPSocket&&) = default;
+    TCPSocket(TCPSocket&&) = delete;
+    TCPSocket& operator=(TCPSocket&&) = delete;
 
 
     //////////////////////////////////////////////////////////////////////
@@ -311,8 +311,8 @@ public:
 
     TCPServerSocket(const TCPServerSocket&) = delete;
     TCPServerSocket& operator=(const TCPServerSocket&) = delete;
-    TCPServerSocket(TCPServerSocket&&) = default;
-    TCPServerSocket& operator=(TCPServerSocket&&) = default;
+    TCPServerSocket(TCPServerSocket&&) = delete;
+    TCPServerSocket& operator=(TCPServerSocket&&) = delete;
 
     /**
      *   Blocks until a new connection is established on this socket or error
@@ -356,8 +356,8 @@ public:
 
     UDPSocket(const UDPSocket&) = delete;
     UDPSocket& operator=(const UDPSocket&) = delete;
-    UDPSocket(UDPSocket&&) = default;
-    UDPSocket& operator=(UDPSocket&&) = default;
+    UDPSocket(UDPSocket&&) = delete;
+    UDPSocket& operator=(UDPSocket&&) = delete;
 
     void setDestPort(unsigned short foreignPort);
 

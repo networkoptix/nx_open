@@ -76,34 +76,6 @@ namespace network {
 //////////////////////////////////////////////////////////
 // Socket implementation
 //////////////////////////////////////////////////////////
-
-template<typename InterfaceToImplement>
-Socket<InterfaceToImplement>::Socket(Socket&& rhs)
-:
-    Pollable(std::move(rhs))
-{
-    m_baseAsyncHelper = rhs.m_baseAsyncHelper;
-    rhs.m_baseAsyncHelper = nullptr;
-
-    m_nonBlockingMode = rhs.m_nonBlockingMode;
-}
-
-template<typename InterfaceToImplement>
-Socket<InterfaceToImplement>& Socket<InterfaceToImplement>::operator=(Socket&& rhs)
-{
-    if (&rhs == this)
-        return *this;
-
-    Pollable::operator=(std::move(rhs));
-
-    m_baseAsyncHelper = rhs.m_baseAsyncHelper;
-    rhs.m_baseAsyncHelper = nullptr;
-
-    m_nonBlockingMode = rhs.m_nonBlockingMode;
-
-    return *this;
-}
-
 template<typename InterfaceToImplement>
 Socket<InterfaceToImplement>::~Socket()
 {
@@ -640,37 +612,10 @@ CommunicatingSocket<InterfaceToImplement>::CommunicatingSocket(
 }
 
 template<typename InterfaceToImplement>
-CommunicatingSocket<InterfaceToImplement>::CommunicatingSocket(CommunicatingSocket&& rhs)
-:
-    Socket<InterfaceToImplement>(std::move(rhs))
-{
-    m_aioHelper = rhs.m_aioHelper;
-    rhs.m_aioHelper = nullptr;
-
-    m_connected = rhs.m_connected;
-}
-
-template<typename InterfaceToImplement>
-CommunicatingSocket<InterfaceToImplement>& 
-    CommunicatingSocket<InterfaceToImplement>::operator=(CommunicatingSocket&& rhs)
-{
-    if (&rhs == this)
-        return *this;
-
-    Socket<InterfaceToImplement>::operator=(std::move(rhs));
-
-    m_aioHelper = rhs.m_aioHelper;
-    rhs.m_aioHelper = nullptr;
-
-    m_connected = rhs.m_connected;
-
-    return *this;
-}
-
-template<typename InterfaceToImplement>
 CommunicatingSocket<InterfaceToImplement>::~CommunicatingSocket()
 {
-    m_aioHelper->terminate();
+    if (m_aioHelper)
+        m_aioHelper->terminate();
 }
 
 template<typename InterfaceToImplement>

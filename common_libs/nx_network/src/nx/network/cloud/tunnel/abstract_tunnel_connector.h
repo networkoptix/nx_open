@@ -32,6 +32,7 @@ public:
     /** Establishes connection to the target host.
         It is allowed to pipeline this method calls. 
         But these calls MUST be synchronized by caller.
+        \param timeout 0 means no timeout
         \param handler \a AbstractTunnelConnector can be safely freed within this handler
      */
     virtual void connect(

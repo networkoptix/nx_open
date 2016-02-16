@@ -503,6 +503,10 @@ UdtSocket::UdtSocket(detail::UdtSocketImpl* impl)
 
 bool UdtSocket::bindToUdpSocket(UDPSocket&& udpSocket)
 {
+    //switching socket to blocking mode
+    if (!udpSocket.setNonBlockingMode(false))
+        return false;
+
     //taking system socket out of udpSocket
     if (UDT::bind2(m_impl->udtHandle, udpSocket.handle()) != 0)
     {

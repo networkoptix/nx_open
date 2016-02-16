@@ -37,8 +37,8 @@ public:
 
     Pollable(const Pollable&) = delete;
     Pollable& operator=(const Pollable&) = delete;
-    Pollable(Pollable&&);
-    Pollable& operator=(Pollable&&);
+    Pollable(Pollable&&) = delete;
+    Pollable& operator=(Pollable&&) = delete;
 
     virtual ~Pollable() {}
 

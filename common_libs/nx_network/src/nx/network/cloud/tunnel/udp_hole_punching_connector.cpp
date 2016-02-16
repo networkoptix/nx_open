@@ -33,7 +33,7 @@ UdpHolePunchingTunnelConnector::UdpHolePunchingTunnelConnector(
 {
     assert(nx::network::SocketGlobals::mediatorConnector().mediatorAddress());
 
-    m_mediatorUdpClient->socket().bindToAioThread(m_timer.getAioThread());
+    m_mediatorUdpClient->socket()->bindToAioThread(m_timer.getAioThread());
 }
 
 UdpHolePunchingTunnelConnector::~UdpHolePunchingTunnelConnector()
@@ -74,8 +74,8 @@ void UdpHolePunchingTunnelConnector::connect(
         .arg(timeout),
         cl_logDEBUG2);
 
-    if (!m_mediatorUdpClient->socket().setReuseAddrFlag(true) ||
-        !m_mediatorUdpClient->socket().bind(
+    if (!m_mediatorUdpClient->socket()->setReuseAddrFlag(true) ||
+        !m_mediatorUdpClient->socket()->bind(
             SocketAddress(HostAddress::anyHost, 0)))
     {
         const auto errorCode = SystemError::getLastOSErrorCode();
@@ -90,9 +90,10 @@ void UdpHolePunchingTunnelConnector::connect(
         return;
     }
 
-    m_timer.start(
-        timeout,
-        std::bind(&UdpHolePunchingTunnelConnector::onTimeout, this));
+    if (timeout > std::chrono::milliseconds::zero())
+        m_timer.start(
+            timeout,
+            std::bind(&UdpHolePunchingTunnelConnector::onTimeout, this));
 
     m_completionHandler = std::move(handler);
 
@@ -156,11 +157,11 @@ void UdpHolePunchingTunnelConnector::onConnectResponse(
     //initiating rendezvous connect to the target host
     auto udtConnection = std::make_unique<UdtStreamSocket>();
     //TODO #ak calculate proper timeout
-    std::chrono::milliseconds connectTimeout(0);
-    if (!m_udtConnection->bindToUdpSocket(m_mediatorUdpClient->takeSocket()) ||    //moving system socket handler from m_mediatorUdpClient to m_udtConnection
-        !m_udtConnection->setRendezvous(true) ||
-        !m_udtConnection->setNonBlockingMode(true) ||
-        !m_udtConnection->setSendTimeout(connectTimeout.count()))
+    std::chrono::milliseconds connectTimeout(1000);
+    if (!udtConnection->bindToUdpSocket(std::move(*m_mediatorUdpClient->takeSocket())) ||    //moving system socket handler from m_mediatorUdpClient to m_udtConnection
+        !udtConnection->setRendezvous(true) ||
+        !udtConnection->setNonBlockingMode(true) ||
+        !udtConnection->setSendTimeout(connectTimeout.count()))
     {
         const auto errorCode = SystemError::getLastOSErrorCode();
         NX_LOGX(lm("session %1. Failed to create UDT socket. %2")
@@ -284,7 +285,7 @@ void UdpHolePunchingTunnelConnector::holePunchingDone(
         //m_mediatorUdpClient has give his socket to udt socket
         m_mediatorUdpClient = std::make_unique<api::MediatorClientUdpConnection>(
             *nx::network::SocketGlobals::mediatorConnector().mediatorAddress());
-        m_mediatorUdpClient->socket().bindToAioThread(m_timer.getAioThread());
+        m_mediatorUdpClient->socket()->bindToAioThread(m_timer.getAioThread());
     }
     m_mediatorUdpClient->connectionResult(
         m_connectResultReport,
