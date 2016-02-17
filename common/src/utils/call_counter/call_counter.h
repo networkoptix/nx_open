@@ -42,7 +42,7 @@ private:
     std::mutex m_mutex;
 
     std::condition_variable m_cond;
-    std::atomic<bool> m_needStop;
+    bool m_needStop;
 
     std::chrono::high_resolution_clock::time_point m_startTime;
     std::chrono::high_resolution_clock::time_point m_lastTriggerTime;

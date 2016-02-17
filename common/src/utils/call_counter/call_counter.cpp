@@ -9,7 +9,10 @@ QnCallCounter::QnCallCounter(std::chrono::milliseconds reportPeriod)
 
 QnCallCounter::~QnCallCounter()
 {
-    m_needStop = true;
+    {
+        std::lock_guard<std::mutex> lk(m_mutex);
+        m_needStop = true;
+    }
     m_cond.notify_all();
 
     if (m_thread.joinable())
@@ -51,11 +54,7 @@ void QnCallCounter::startReporter()
                                                     m_lastTriggerTime);
 
                                     if (timeSinceLastReport < m_reportPeriod)
-                                    {
-                                        if (m_needStop)
-                                            return true;
                                         return false;
-                                    }
                                     
                                     return true;
                                 });
