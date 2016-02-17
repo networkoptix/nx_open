@@ -66,6 +66,21 @@ QnLogMessage QnLogMessage::arg(const void* a, int fieldWidth, QChar fillChar) co
         reinterpret_cast<qulonglong>(a), fieldWidth - 2, 16, fillChar));
 }
 
+QnLogMessage QnLogMessage::arg(const std::chrono::milliseconds a, int fieldWidth, QChar fillChar) const
+{
+    return m_str.arg(QString::fromLatin1("%1ms").arg(a.count()), fieldWidth, fillChar);
+}
+
+QnLogMessage QnLogMessage::arg(const std::chrono::seconds a, int fieldWidth, QChar fillChar) const
+{
+    return m_str.arg(QString::fromLatin1("%1s").arg(a.count()), fieldWidth, fillChar);
+}
+
+QnLogMessage QnLogMessage::arg(const std::chrono::microseconds a, int fieldWidth, QChar fillChar) const
+{
+    return m_str.arg(QString::fromLatin1("%1usec").arg(a.count()), fieldWidth, fillChar);
+}
+
 QnLogMessage::operator QString() const
 {
     return m_str;

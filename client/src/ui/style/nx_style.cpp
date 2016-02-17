@@ -129,6 +129,12 @@ QnPaletteColor QnNxStyle::findColor(const QColor &color) const
     return d->findColor(color);
 }
 
+QnPaletteColor QnNxStyle::mainColor(QnNxStyle::Colors::Palette palette) const
+{
+    Q_D(const QnNxStyle);
+    return d->mainColor(palette);
+}
+
 void QnNxStyle::drawSwitch(QPainter *painter, const QStyleOption *option, const QWidget *widget) const
 {
     Q_D(const QnNxStyle);
@@ -146,7 +152,35 @@ void QnNxStyle::drawPrimitive(
     switch (element)
     {
     case PE_FrameFocusRect:
-        return;
+        {
+            QColor widgetColor = option->palette.window().color();
+            bool dotted = false;
+
+            if (qobject_cast<const QPushButton *>(widget))
+                widgetColor = option->palette.button().color();
+
+            if (qobject_cast<const QCheckBox *>(widget) ||
+                qobject_cast<const QRadioButton *>(widget) ||
+                qobject_cast<const QSlider *>(widget))
+            {
+                dotted = true;
+            }
+
+            bool dark = isDark(widgetColor);
+            QColor color = mainColor(Colors::kBlue).darker(dark ? 4 : -4);
+
+            QPen pen(color);
+            if (dotted)
+                pen.setStyle(Qt::DotLine);
+
+            QnScopedPainterPenRollback penRollback(painter, pen);
+            QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
+
+            painter->drawRoundedRect(eroded(QRectF(option->rect), 0.5), Metrics::kRounding, Metrics::kRounding);
+
+            return;
+        }
+        break;
 
     case PE_PanelButtonTool:
     case PE_PanelButtonCommand:
@@ -221,6 +255,9 @@ void QnNxStyle::drawPrimitive(
                 painter->drawLine(option->rect.left() + 1, option->rect.top() + 1,
                                   option->rect.left() + 1, option->rect.bottom() - 1);
             }
+
+            if (option->state.testFlag(State_HasFocus))
+                drawPrimitive(PE_FrameFocusRect, option, painter, widget);
 
             painter->restore();
         }
@@ -423,6 +460,9 @@ void QnNxStyle::drawComplexControl(
                 QRectF rect = subControlRect(CC_ComboBox, comboBox, SC_ComboBoxArrow, widget);
                 drawArrow(Down, painter, rect.translated(0, -1), option->palette.color(QPalette::Text));
             }
+
+            if (comboBox->state.testFlag(State_HasFocus))
+                drawPrimitive(PE_FrameFocusRect, option, painter, widget);
 
             painter->restore();
             return;
@@ -755,6 +795,14 @@ void QnNxStyle::drawControl(
         {
             switch (frame->frameShape)
             {
+            case QFrame::Box:
+                {
+                    QnPaletteColor mainColor = findColor(option->palette.color(QPalette::Shadow)).darker(1);
+                    QnScopedPainterPenRollback penRollback(painter, mainColor.color());
+                    painter->drawRect(frame->rect.adjusted(0, 0, -1, -1));
+                }
+                return;
+
             case QFrame::HLine:
                 {
                     QnPaletteColor mainColor = findColor(option->palette.color(QPalette::Dark)).darker(1);
@@ -1470,10 +1518,13 @@ QRect QnNxStyle::subElementRect(
     case SE_PushButtonLayoutItem:
         if (qobject_cast<const QDialogButtonBox *>(widget))
         {
-            const int shift = dp(8);
+            const int shift = dp(16);
             return option->rect.adjusted(-shift, -shift, shift, shift);
         }
         break;
+
+    case SE_PushButtonFocusRect:
+        return option->rect;
 
     case SE_ProgressBarGroove:
         if (const QStyleOptionProgressBar *progressBar =
@@ -1616,8 +1667,6 @@ int QnNxStyle::pixelMetric(
     case PM_TabBarTabShiftHorizontal:
         return 0;
     case PM_DefaultFrameWidth:
-        if (qobject_cast<const QMenu *>(widget))
-            return 0;
         return 0;
     case PM_SliderThickness:
         return dp(18);
@@ -1647,6 +1696,17 @@ int QnNxStyle::pixelMetric(
         return Metrics::kSortIndicatorSize;
     case PM_HeaderMargin:
         return dp(6);
+    case PM_FocusFrameHMargin:
+    case PM_FocusFrameVMargin:
+        return dp(1);
+    case PM_LayoutTopMargin:
+    case PM_LayoutBottomMargin:
+    case PM_LayoutLeftMargin:
+    case PM_LayoutRightMargin:
+        return dp(0);
+    case PM_LayoutHorizontalSpacing:
+    case PM_LayoutVerticalSpacing:
+        return dp(8);
     default:
         break;
     }
@@ -1797,6 +1857,8 @@ int QnNxStyle::styleHint(
         return 0;
     case SH_Header_ArrowAlignment:
         return Qt::AlignRight | Qt::AlignVCenter;
+    case SH_FocusFrame_AboveWidget:
+        return 1;
     default:
         break;
     }
@@ -1871,4 +1933,23 @@ QnNxStyle *QnNxStyle::instance()
         style = proxyStyle->baseStyle();
 
     return qobject_cast<QnNxStyle *>(style);
+}
+
+QString QnNxStyle::Colors::paletteName(QnNxStyle::Colors::Palette palette)
+{
+    switch (palette)
+    {
+    case kBase:
+        return lit("dark");
+    case kContrast:
+        return lit("light");
+    case kBlue:
+        return lit("blue");
+    case kGreen:
+        return lit("green");
+    case kBrang:
+        return lit("brand");
+    }
+
+    return QString();
 }

@@ -59,7 +59,7 @@ rest::Handle ServerConnection::cameraThumbnailAsync( const QnThumbnailRequestDat
 Handle ServerConnection::getStatisticsSettingsAsync(Result<QByteArray>::type callback
     , QThread *targetThread)
 {
-    static const QnEmptyRequestData kEmptyParams;
+    static const QnEmptyRequestData kEmptyParams = QnEmptyRequestData();
     return executeGet(lit("/ec2/statistics/settings"), kEmptyParams.toParams(), callback, targetThread);
 }
 

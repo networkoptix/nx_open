@@ -1,5 +1,3 @@
-#ifdef ENABLE_TEXT_TO_SPEECH
-
 #include <QtCore/QCoreApplication>
 #include <QtCore/QFile>
 
@@ -364,5 +362,3 @@ QSharedPointer<TextToWaveServer::SynthetiseSpeechTask> TextToWaveServer::addTask
     task->dest = dest;
     return m_textQueue.push( task ) ? task : QSharedPointer<SynthetiseSpeechTask>();
 }
-
-#endif

@@ -37,24 +37,24 @@ void QnGridWidgetHelper::exportToFile(QTableView *grid, QWidget *parent, const Q
             fileName += selectedExtension;
 
             if (QFile::exists(fileName)) {
-                QMessageBox::StandardButton button = QMessageBox::information(
+                QnMessageBox::StandardButton button = QnMessageBox::information(
                     parent,
                     tr("Save As"),
                     tr("File '%1' already exists. Overwrite?").arg(QFileInfo(fileName).completeBaseName()),
-                    QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel
+                    QnMessageBox::Yes | QnMessageBox::No | QnMessageBox::Cancel
                 );
 
-                if(button == QMessageBox::Cancel || button == QMessageBox::No)
+                if(button == QnMessageBox::Cancel || button == QnMessageBox::No)
                     return;
             }
         }
 
         if (QFile::exists(fileName) && !QFile::remove(fileName)) {
-            QMessageBox::critical(
+            QnMessageBox::critical(
                 parent,
                 tr("Could not overwrite file"),
                 tr("File '%1' is used by another process. Please try another name.").arg(QFileInfo(fileName).completeBaseName()),
-                QMessageBox::Ok
+                QnMessageBox::Ok
             );
             continue;
         }

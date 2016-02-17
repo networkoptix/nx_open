@@ -20,22 +20,8 @@ namespace style
         static const int kHeaderSize;
         static const int kViewRowHeight;
         static const int kSortIndicatorSize;
+        static const int kRounding;
         static const QSize kSwitchSize;
-    };
-
-    class Colors
-    {
-    public:
-        enum Palette
-        {
-            kBase,
-            kContrast,
-            kBlue,
-            kGreen,
-            kBrang
-        };
-
-        static QString paletteName(Palette palette);
     };
 
     class Properties

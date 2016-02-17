@@ -13,11 +13,28 @@ class QnNxStyle : public QCommonStyle, public QnGeometry
     typedef QCommonStyle base_type;
 
 public:
+    class Colors
+    {
+    public:
+        enum Palette
+        {
+            kBase,
+            kContrast,
+            kBlue,
+            kGreen,
+            kBrang
+        };
+
+        static QString paletteName(Palette palette);
+    };
+
+public:
     QnNxStyle();
 
     void setGenericPalette(const QnGenericPalette &palette);
 
     QnPaletteColor findColor(const QColor &color) const;
+    QnPaletteColor mainColor(Colors::Palette palette) const;
 
     void drawSwitch(
             QPainter *painter,

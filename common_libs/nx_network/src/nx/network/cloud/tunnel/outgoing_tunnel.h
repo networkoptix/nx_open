@@ -72,6 +72,7 @@ private:
     bool m_terminated;
     boost::optional<std::chrono::steady_clock::time_point> m_timerTargetClock;
     int m_counter;
+    std::shared_ptr<AbstractOutgoingTunnelConnection> m_connection;
 
     void updateTimerIfNeeded();
     void updateTimerIfNeededNonSafe(
@@ -88,7 +89,7 @@ private:
     void onConnectorFinished(
         CloudConnectType connectorType,
         SystemError::ErrorCode errorCode,
-        std::unique_ptr<AbstractTunnelConnection> connection);
+        std::unique_ptr<AbstractOutgoingTunnelConnection> connection);
 
     void connectorsTerminated(
         std::function<void()> pleaseStopCompletionHandler);

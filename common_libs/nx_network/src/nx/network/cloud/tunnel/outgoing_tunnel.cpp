@@ -192,7 +192,7 @@ void OutgoingTunnel::updateTimerIfNeededNonSafe(
         assert(m_connectHandlers.begin()->first > curTime);
         const auto timeout = m_connectHandlers.begin()->first - curTime;
         m_aioThreadBinder.registerTimer(
-            std::chrono::duration_cast<std::chrono::milliseconds>(timeout).count(),
+            std::chrono::duration_cast<std::chrono::milliseconds>(timeout),
             std::bind(&OutgoingTunnel::onTimer, this));
     }
 }
@@ -265,7 +265,7 @@ void OutgoingTunnel::startAsyncTunnelConnect(QnMutexLockerBase* const /*locker*/
             kCloudConnectorTimeout,
             [connectorType, this](
                 SystemError::ErrorCode errorCode,
-                std::unique_ptr<AbstractTunnelConnection> connection)
+                std::unique_ptr<AbstractOutgoingTunnelConnection> connection)
             {
                 m_aioThreadBinder.post(
                     [this, connectorType, errorCode, connection = move(connection)]() mutable
@@ -282,7 +282,7 @@ void OutgoingTunnel::startAsyncTunnelConnect(QnMutexLockerBase* const /*locker*/
 void OutgoingTunnel::onConnectorFinished(
     CloudConnectType connectorType,
     SystemError::ErrorCode errorCode,
-    std::unique_ptr<AbstractTunnelConnection> connection)
+    std::unique_ptr<AbstractOutgoingTunnelConnection> connection)
 {
     QnMutexLocker lk(&m_mutex);
 

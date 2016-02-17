@@ -20,8 +20,10 @@
 
 using namespace std;
 
-namespace aio
-{
+namespace nx {
+namespace network {
+namespace aio {
+
     typedef AIOThread<Pollable> SystemAIOThread;
 
     static std::atomic<AIOService*> AIOService_instance( nullptr );
@@ -78,4 +80,7 @@ namespace aio
     {
         return m_udtSocketAIO;
     }
-}
+
+}   //aio
+}   //network
+}   //nx

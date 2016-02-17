@@ -27,6 +27,9 @@ public:
     typedef std::function<std::unique_ptr< AbstractStreamSocket >(
         bool /*sslRequired*/,
         NatTraversalType /*natTraversalRequired*/)> CreateStreamSocketFuncType;
+    typedef std::function<std::unique_ptr< AbstractStreamServerSocket >(
+        bool /*sslRequired*/,
+        NatTraversalType /*natTraversalRequired*/)> CreateStreamServerSocketFuncType;
 
 
     static std::unique_ptr< AbstractDatagramSocket > createDatagramSocket();
@@ -57,6 +60,8 @@ public:
     /** Sets new factory. Returns old one */
     static CreateStreamSocketFuncType 
         setCreateStreamSocketFunc(CreateStreamSocketFuncType newFactoryFunc);
+    static CreateStreamServerSocketFuncType
+        setCreateStreamServerSocketFunc(CreateStreamServerSocketFuncType newFactoryFunc);
 
 private:
     SocketFactory();

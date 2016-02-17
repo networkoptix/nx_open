@@ -78,7 +78,10 @@
 #define STUB_(c) c
 #endif
 
-namespace detail{
+
+namespace nx {
+namespace network {
+namespace detail {
 // =========================================================
 // Udt library initialization and tear down routine.
 // =========================================================
@@ -169,8 +172,6 @@ public:
     bool GetSendTimeout( unsigned int* millis ) const ;
     bool GetLastError( SystemError::ErrorCode* errorCode ) const;
     AbstractSocket::SOCKET_HANDLE handle() const;
-    int Recv( void* buffer, unsigned int bufferLen, int flags );
-    int Send( const void* buffer, unsigned int bufferLen );
     bool Reopen();
 
 private:
@@ -181,10 +182,6 @@ private:
 bool UdtSocketImpl::Open() {
     Q_ASSERT(IsClosed());
     udtHandle = UDT::socket(AF_INET,SOCK_STREAM,0);
-#ifdef TRACE_UDT_SOCKET
-    NX_LOG(lit("created UDT socket %1").arg(udtHandle), cl_logDEBUG2);
-#endif
-    VERIFY_(udtHandle != UDT::INVALID_SOCK,"UDT::socket",0);
     if( udtHandle != UDT::INVALID_SOCK ) {
         state_ = OPEN;
         return true;
@@ -445,41 +442,6 @@ AbstractSocket::SOCKET_HANDLE UdtSocketImpl::handle() const {
     return *reinterpret_cast<const AbstractSocket::SOCKET_HANDLE*>(&udtHandle);
 }
 
-
-int UdtSocketImpl::Recv( void* buffer, unsigned int bufferLen, int flags ) {
-    int sz = UDT::recv(udtHandle,reinterpret_cast<char*>(buffer),bufferLen,flags);
-    if( sz == UDT::ERROR ) {
-        // UDT doesn't translate the EOF into a recv with zero return, but instead
-        // it returns error with 2001 error code. We need to detect this and translate
-        // back with a zero return here .
-        int error_code = UDT::getlasterror().getErrorCode();
-        if( error_code == CUDTException::ECONNLOST ) {
-            return 0;
-        } else if( error_code == CUDTException::EINVSOCK ) {
-            // This is another very ugly hack since after our patch for UDT.
-            // UDT cannot distinguish a clean close or a crash. And I cannot
-            // come up with perfect way to patch the code and make it work.
-            // So we just hack here. When we encounter an error Invalid socket,
-            // it should be a clean close when we use a epoll.
-            return 0;
-        } else {
-            DEBUG_(TRACE_("UDT::recv",udtHandle));
-        }
-        SystemError::setLastErrorCode(convertToSystemError(UDT::getlasterror().getErrorCode()));
-    }
-    return sz;
-}
-
-int UdtSocketImpl::Send( const void* buffer, unsigned int bufferLen ) {
-    Q_ASSERT(!IsClosed());
-    int sz = UDT::send(udtHandle,reinterpret_cast<const char*>(buffer),bufferLen,0);
-    DEBUG_(
-        if(sz == UDT::ERROR ) TRACE_("UDT::send",udtHandle));
-    if( sz == UDT::ERROR )
-        SystemError::setLastErrorCode(convertToSystemError(UDT::getlasterror().getErrorCode()));
-    return sz;
-}
-
 // This is a meaningless function. You could call Close and then create another
 // one if you bundle the states not_initialized into the original Socket design.
 bool UdtSocketImpl::Reopen() {
@@ -539,6 +501,23 @@ UdtSocket::UdtSocket(detail::UdtSocketImpl* impl)
 {
 }
 
+bool UdtSocket::bindToUdpSocket(UDPSocket&& udpSocket)
+{
+    //switching socket to blocking mode
+    if (!udpSocket.setNonBlockingMode(false))
+        return false;
+
+    //taking system socket out of udpSocket
+    if (UDT::bind2(m_impl->udtHandle, udpSocket.handle()) != 0)
+    {
+        SystemError::setLastErrorCode(
+            detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+        return false;
+    }
+    udpSocket.takeHandle();
+    return true;
+}
+
 bool UdtSocket::getLastError(SystemError::ErrorCode* errorCode)
 {
     return m_impl->GetLastError(errorCode);
@@ -577,6 +556,26 @@ void UdtSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
 // =====================================================================
 // UdtStreamSocket implementation
 // =====================================================================
+UdtStreamSocket::UdtStreamSocket()
+:
+    m_aioHelper(
+        new aio::AsyncSocketImplHelper<UdtSocket>(this, this, false /*natTraversal*/))
+{
+    m_impl->Open();
+}
+
+UdtStreamSocket::UdtStreamSocket(detail::UdtSocketImpl* impl)
+:
+    UdtSocket(impl),
+    m_aioHelper(new aio::AsyncSocketImplHelper<UdtSocket>(this, this, false))
+{
+}
+
+UdtStreamSocket::~UdtStreamSocket()
+{
+    m_aioHelper->terminate();
+}
+
 bool UdtStreamSocket::bind( const SocketAddress& localAddress ) {
     return m_impl->Bind(localAddress);
 }
@@ -653,6 +652,12 @@ bool UdtStreamSocket::getLastError( SystemError::ErrorCode* errorCode ) const {
     return m_impl->GetLastError(errorCode);
 }
 
+bool UdtStreamSocket::setRendezvous(bool val)
+{
+    return UDT::setsockopt(
+        m_impl->udtHandle, 0, UDT_RENDEZVOUS, &val, sizeof(bool)) == 0;
+}
+
 bool UdtStreamSocket::connect(
     const SocketAddress& remoteAddress,
     unsigned int timeoutMillis )
@@ -691,11 +696,45 @@ bool UdtStreamSocket::connect(
 }
 
 int UdtStreamSocket::recv( void* buffer, unsigned int bufferLen, int flags ) {
-    return m_impl->Recv(buffer,bufferLen,flags);
+    int sz = UDT::recv(m_impl->udtHandle, reinterpret_cast<char*>(buffer), bufferLen, flags);
+    if (sz == UDT::ERROR)
+    {
+        // UDT doesn't translate the EOF into a recv with zero return, but instead
+        // it returns error with 2001 error code. We need to detect this and translate
+        // back with a zero return here .
+        int error_code = UDT::getlasterror().getErrorCode();
+        if (error_code == CUDTException::ECONNLOST)
+        {
+            return 0;
+        }
+        else if (error_code == CUDTException::EINVSOCK)
+        {
+            // This is another very ugly hack since after our patch for UDT.
+            // UDT cannot distinguish a clean close or a crash. And I cannot
+            // come up with perfect way to patch the code and make it work.
+            // So we just hack here. When we encounter an error Invalid socket,
+            // it should be a clean close when we use a epoll.
+            return 0;
+        }
+        else
+        {
+            DEBUG_(TRACE_("UDT::recv", udtHandle));
+        }
+        SystemError::setLastErrorCode(
+            detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+    }
+    return sz;
 }
 
-int UdtStreamSocket::send( const void* buffer, unsigned int bufferLen ) {
-    return m_impl->Send(buffer,bufferLen);
+int UdtStreamSocket::send( const void* buffer, unsigned int bufferLen )
+{
+    Q_ASSERT(!m_impl->IsClosed());
+    int sz = UDT::send(m_impl->udtHandle, reinterpret_cast<const char*>(buffer), bufferLen, 0);
+    DEBUG_(if (sz == UDT::ERROR) TRACE_("UDT::send", udtHandle));
+    if (sz == UDT::ERROR)
+        SystemError::setLastErrorCode(
+            detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+    return sz;
 }
 
 SocketAddress UdtStreamSocket::getForeignAddress() const {
@@ -760,7 +799,7 @@ void UdtStreamSocket::sendAsync(
 }
 
 void UdtStreamSocket::registerTimer(
-    unsigned int timeoutMillis,
+    std::chrono::milliseconds timeoutMillis,
     nx::utils::MoveOnlyFunc<void()> handler )
 {
     return m_aioHelper->registerTimer(timeoutMillis, std::move(handler));
@@ -778,25 +817,6 @@ aio::AbstractAioThread* UdtStreamSocket::getAioThread()
 void UdtStreamSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
     UdtSocket::bindToAioThread(aioThread);
-}
-
-UdtStreamSocket::UdtStreamSocket( bool natTraversal )
-:
-    m_aioHelper(new AsyncSocketImplHelper<UdtSocket>(this, this, natTraversal))
-{
-    m_impl->Open();
-}
-
-UdtStreamSocket::UdtStreamSocket( detail::UdtSocketImpl* impl )
-:
-    UdtSocket(impl),
-    m_aioHelper(new AsyncSocketImplHelper<UdtSocket>(this, this, false))
-{
-}
-
-UdtStreamSocket::~UdtStreamSocket()
-{
-    m_aioHelper->terminate();
 }
 
 // =====================================================================
@@ -961,7 +981,7 @@ void UdtStreamServerSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
 
 UdtStreamServerSocket::UdtStreamServerSocket()
 :
-    m_aioHelper(new AsyncServerSocketHelper<UdtSocket>( this, this ) )
+    m_aioHelper(new aio::AsyncServerSocketHelper<UdtSocket>( this, this ) )
 {
     m_impl->Open();
 }
@@ -970,3 +990,6 @@ UdtStreamServerSocket::~UdtStreamServerSocket()
 {
     m_aioHelper->cancelIOSync();
 }
+
+}   //network
+}   //nx

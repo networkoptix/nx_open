@@ -81,7 +81,10 @@ Qn::Permissions QnWorkbenchAccessController::globalPermissions(const QnUserResou
     if(!user)
         return result;
 
-    result = static_cast<Qn::Permissions>(user->getPermissions());
+    // QFlags uses int internally and don't have a constructor from quint64.
+    // Also we don't place values bigger than uint max to the user permissions
+    // so we can just cast permissions to int.
+    result = static_cast<Qn::Permissions>(static_cast<int>(user->getPermissions()));
 
     if(user->isAdmin())
         result |= Qn::GlobalOwnerPermissions;

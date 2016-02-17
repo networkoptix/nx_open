@@ -26,11 +26,7 @@ namespace network {
 
 class SocketGlobals;
 
-} // namespace network
-} // namespace nx
-
-namespace aio
-{
+namespace aio {
     //TODO #ak think about removing sockets dictionary and mutex (only in release, probably). some data from dictionary can be moved to socket
 
     //!Monitors multiple sockets for asynchronous events and triggers handler (\a AIOEventHandler) on event
@@ -113,7 +109,7 @@ namespace aio
         template<class SocketType, class HandlerType>
         void registerTimer(
             SocketType* const sock,
-            unsigned int timeoutMillis,
+            std::chrono::milliseconds timeoutMillis,
             AIOEventHandler<SocketType>* const eventHandler )
         {
             QnMutexLocker lk( &m_mutex );
@@ -122,7 +118,7 @@ namespace aio
                 sock,
                 aio::etTimedOut,
                 eventHandler,
-                timeoutMillis);
+                timeoutMillis.count());
         }
 
         //!Returns \a true, if socket is still listened for state changes
@@ -205,7 +201,7 @@ namespace aio
             SocketType* const sock,
             aio::EventType eventToWatch,
             AIOEventHandler<SocketType>* const eventHandler,
-            boost::optional<unsigned int> timeoutMillis = boost::optional<unsigned int>(),
+            boost::optional<std::chrono::milliseconds> timeoutMillis = boost::optional<std::chrono::milliseconds>(),
             std::function<void()> socketAddedToPollHandler = std::function<void()>() )
         {
             SocketAIOContext<SocketType>& aioHandlingContext = getAIOHandlingContext<SocketType>();
@@ -249,7 +245,7 @@ namespace aio
                 {
                     assert( false );
                 }
-                timeoutMillis = sockTimeoutMS;
+                timeoutMillis = std::chrono::milliseconds(sockTimeoutMS);
             }
 
             //checking, if that socket is already polled
@@ -269,8 +265,11 @@ namespace aio
                     break;
                 }
             }
-            if( sameSockAndEventIter != aioHandlingContext.sockets.end() && sameSockAndEventIter->second.second == timeoutMillis )
+            if( sameSockAndEventIter != aioHandlingContext.sockets.end() &&
+                sameSockAndEventIter->second.second == timeoutMillis.get() )
+            {
                 return;    //socket already monitored for eventToWatch
+            }
 
             if( (closestSockIter != aioHandlingContext.sockets.end()) && (closestSockIter->first.first == sockCtx.first) )  //same socket is already polled
             {
@@ -345,7 +344,9 @@ namespace aio
 
             std::vector<std::unique_ptr<AIOThreadType>> aioThreadPool;
             //!map<pair<socket, event_type>, pair<thread, socket timeout>>
-            std::map<std::pair<SocketType*, aio::EventType>, std::pair<AIOThreadType*, unsigned int> > sockets;
+            std::map<
+                std::pair<SocketType*, aio::EventType>,
+                std::pair<AIOThreadType*, std::chrono::milliseconds> > sockets;
         };
 
         SocketAIOContext<Pollable> m_systemSocketAIO;
@@ -436,6 +437,9 @@ namespace aio
             lock->relock();
         }
     };
-}
+
+}   //aio
+}   //network
+}   //nx
 
 #endif  //AIOSERVICE_H

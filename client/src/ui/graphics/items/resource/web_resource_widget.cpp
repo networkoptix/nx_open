@@ -1,7 +1,5 @@
 #include "web_resource_widget.h"
 
-#ifdef GDM_TODO
-
 #include <core/resource/resource.h>
 
 #include <ui/style/skin.h>
@@ -168,5 +166,3 @@ QString QnWebResourceWidget::calculateDetailsText() const
 {
     return resource()->getUrl();
 }
-
-#endif

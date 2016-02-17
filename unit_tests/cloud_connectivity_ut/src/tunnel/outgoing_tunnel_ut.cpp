@@ -20,17 +20,16 @@ namespace cloud {
 
 class DummyConnection
 :
-    public AbstractTunnelConnection
+    public AbstractOutgoingTunnelConnection
 {
 public:
     static std::atomic<size_t> instanceCount;
 
     DummyConnection(
-        const String& remotePeerId,
+        const String& /*remotePeerId*/,
         bool connectionShouldWorkFine,
         bool singleShot)
     :
-        AbstractTunnelConnection(remotePeerId),
         m_connectionShouldWorkFine(connectionShouldWorkFine),
         m_singleShot(singleShot)
     {
@@ -50,7 +49,7 @@ public:
     virtual void establishNewConnection(
         boost::optional<std::chrono::milliseconds> /*timeout*/,
         SocketAttributes /*socketAttributes*/,
-        SocketHandler handler) override
+        OnNewConnectionHandler handler) override
     {
         m_aioThreadBinder.post(
             [this, handler]()
@@ -66,11 +65,6 @@ public:
                     handler(SystemError::connectionReset, nullptr, false);
                 }
             });
-    }
-
-    virtual void accept(SocketHandler /*handler*/) override
-    {
-        assert(false);
     }
 
 private:
@@ -149,12 +143,12 @@ public:
         std::chrono::milliseconds timeout,
         nx::utils::MoveOnlyFunc<void(
             SystemError::ErrorCode errorCode,
-            std::unique_ptr<AbstractTunnelConnection>)> handler) override
+            std::unique_ptr<AbstractOutgoingTunnelConnection>)> handler) override
     {
         if (m_connectTimeout)
         {
             m_aioThreadBinder.registerTimer(
-                m_connectTimeout->count(),
+                *m_connectTimeout,
                 [this, handler = std::move(handler)]() mutable
                 {
                     connectInternal(std::move(handler));
@@ -182,7 +176,7 @@ private:
     void connectInternal(
         nx::utils::MoveOnlyFunc<void(
             SystemError::ErrorCode errorCode,
-            std::unique_ptr<AbstractTunnelConnection>)> handler)
+            std::unique_ptr<AbstractOutgoingTunnelConnection>)> handler)
     {
         m_aioThreadBinder.post(
             [this, handler = move(handler)]()

@@ -280,7 +280,7 @@ void CloudStreamSocket::sendAsync(
 }
 
 void CloudStreamSocket::registerTimer(
-    unsigned int timeoutMs,
+    std::chrono::milliseconds timeoutMs,
     nx::utils::MoveOnlyFunc<void()> handler)
 {
     m_aioThreadBinder->registerTimer(timeoutMs, std::move(handler));

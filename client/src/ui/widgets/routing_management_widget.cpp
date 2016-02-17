@@ -19,7 +19,7 @@
 #include <ui/common/read_only.h>
 #include "ui/models/resource_list_model.h"
 #include "ui/models/server_addresses_model.h"
-#include "ui/style/warning_style.h"
+#include "ui/style/custom_style.h"
 #include <ui/delegates/switch_item_delegate.h>
 
 #include <nx/network/socket_common.h>
@@ -467,10 +467,10 @@ void QnRoutingManagementWidget::at_serverAddressesModel_dataChanged(const QModel
 void QnRoutingManagementWidget::reportUrlEditingError(int error) {
     switch (error) {
     case QnServerAddressesModel::InvalidUrl:
-        QMessageBox::critical(this, tr("Error"), tr("You have entered an invalid URL."));
+        QnMessageBox::critical(this, tr("Error"), tr("You have entered an invalid URL."));
         break;
     case QnServerAddressesModel::ExistingUrl:
-        QMessageBox::warning(this, tr("Warning"), tr("This URL is already in the address list."));
+        QnMessageBox::warning(this, tr("Warning"), tr("This URL is already in the address list."));
         break;
     }
 }

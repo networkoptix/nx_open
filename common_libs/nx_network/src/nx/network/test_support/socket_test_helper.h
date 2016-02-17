@@ -48,6 +48,7 @@ public:
     virtual void pleaseStop() override;
 
     int id() const;
+    void setLocalAddress(SocketAddress addr);
     void start();
 
     size_t totalBytesSent() const;
@@ -66,6 +67,7 @@ private:
     size_t m_totalBytesSent;
     size_t m_totalBytesReceived;
     int m_id;
+    boost::optional<SocketAddress> m_localAddress;
     bool m_accepted;
 
     void onConnected( int id, SystemError::ErrorCode );
@@ -95,6 +97,7 @@ public:
     virtual void pleaseStop() override;
     virtual void join() override;
 
+    void setLocalAddress(SocketAddress addr);
     bool start();
 
     SocketAddress addressBeingListened() const;
@@ -104,6 +107,7 @@ private:
     const size_t m_bytesToSendThrough;
     QnMutex m_mutex;
     std::list<std::shared_ptr<TestConnection>> m_acceptedConnections;
+    SocketAddress m_localAddress;
 
     void onNewConnection( SystemError::ErrorCode errorCode, AbstractStreamSocket* newConnection );
     void onConnectionDone( TestConnection* connection );
@@ -129,6 +133,7 @@ public:
     virtual void join() override;
 
     void enableErrorEmulation(int errorPercent);
+    void setLocalAddress(SocketAddress addr);
     void start();
 
     size_t totalConnectionsEstablished() const;
@@ -152,6 +157,7 @@ private:
     std::default_random_engine m_randomEngine;
     std::uniform_int_distribution<int> m_errorEmulationDistribution;
     int m_errorEmulationPercent;
+    boost::optional<SocketAddress> m_localAddress;
 
     void onConnectionFinished( int id, ConnectionsContainer::iterator connectionIter );
 };

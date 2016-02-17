@@ -69,13 +69,19 @@ int getSystemErrCode()
 #endif
 
 
+namespace nx {
+namespace network {
+
+
 //////////////////////////////////////////////////////////
 // Socket implementation
 //////////////////////////////////////////////////////////
-
 template<typename InterfaceToImplement>
-Socket<InterfaceToImplement>::~Socket() {
+Socket<InterfaceToImplement>::~Socket()
+{
     close();
+    delete m_baseAsyncHelper;
+    m_baseAsyncHelper = nullptr;
 }
 
 template<typename InterfaceToImplement>
@@ -384,7 +390,7 @@ unsigned short Socket<InterfaceToImplement>::resolveService(
 
 template<typename InterfaceToImplement>
 Socket<InterfaceToImplement>::Socket(
-    std::unique_ptr<BaseAsyncSocketImplHelper<Pollable>> asyncHelper,
+    std::unique_ptr<aio::BaseAsyncSocketImplHelper<Pollable>> asyncHelper,
     int type,
     int protocol,
     PollableSystemSocketImpl* impl )
@@ -392,7 +398,7 @@ Socket<InterfaceToImplement>::Socket(
     Pollable(
         INVALID_SOCKET,
         std::unique_ptr<PollableSystemSocketImpl>(impl) ),
-    m_baseAsyncHelper( std::move(asyncHelper) ),
+    m_baseAsyncHelper( asyncHelper.release() ),
     m_nonBlockingMode( false )
 {
     createSocket( type, protocol );
@@ -400,14 +406,14 @@ Socket<InterfaceToImplement>::Socket(
 
 template<typename InterfaceToImplement>
 Socket<InterfaceToImplement>::Socket(
-    std::unique_ptr<BaseAsyncSocketImplHelper<Pollable>> asyncHelper,
+    std::unique_ptr<aio::BaseAsyncSocketImplHelper<Pollable>> asyncHelper,
     int _sockDesc,
     PollableSystemSocketImpl* impl )
 :
     Pollable(
         _sockDesc,
         std::unique_ptr<PollableSystemSocketImpl>(impl) ),
-    m_baseAsyncHelper( std::move(asyncHelper) ),
+    m_baseAsyncHelper( asyncHelper.release() ),
     m_nonBlockingMode( false )
 {
 }
@@ -421,7 +427,7 @@ Socket<InterfaceToImplement>::Socket(
     Pollable(
         INVALID_SOCKET,
         std::unique_ptr<PollableSystemSocketImpl>(impl) ),
-    m_baseAsyncHelper( new BaseAsyncSocketImplHelper<Pollable>(this) ),
+    m_baseAsyncHelper( new aio::BaseAsyncSocketImplHelper<Pollable>(this) ),
     m_nonBlockingMode( false )
 {
     createSocket( type, protocol );
@@ -435,7 +441,7 @@ Socket<InterfaceToImplement>::Socket(
     Pollable(
         _sockDesc,
         std::unique_ptr<PollableSystemSocketImpl>(impl) ),
-    m_baseAsyncHelper( new BaseAsyncSocketImplHelper<Pollable>(this) ),
+    m_baseAsyncHelper( new aio::BaseAsyncSocketImplHelper<Pollable>(this) ),
     m_nonBlockingMode( false )
 {
 }
@@ -490,7 +496,10 @@ bool Socket<InterfaceToImplement>::createSocket(int type, int protocol)
     // Make a new socket
     m_fd = socket(PF_INET, type, protocol);
     if( m_fd < 0 )
+    {
+        qWarning() << strerror(errno);
         return false;
+    }
 
 #ifdef SO_NOSIGPIPE
     int set = 1;
@@ -560,8 +569,8 @@ CommunicatingSocket<InterfaceToImplement>::CommunicatingSocket(
     PollableSystemSocketImpl* sockImpl)
 :
     Socket<InterfaceToImplement>(
-        std::unique_ptr<BaseAsyncSocketImplHelper<Pollable>>(
-            new AsyncSocketImplHelper<Pollable>(
+        std::unique_ptr<aio::BaseAsyncSocketImplHelper<Pollable>>(
+            new aio::AsyncSocketImplHelper<Pollable>(
                 this,
                 this,
                 natTraversal)),
@@ -571,7 +580,7 @@ CommunicatingSocket<InterfaceToImplement>::CommunicatingSocket(
     m_aioHelper(nullptr),
     m_connected(false)
 {
-    m_aioHelper = static_cast<AsyncSocketImplHelper<Pollable>*>(this->m_baseAsyncHelper.get());
+    m_aioHelper = static_cast<aio::AsyncSocketImplHelper<Pollable>*>(this->m_baseAsyncHelper);
 }
 
 template<typename InterfaceToImplement>
@@ -581,8 +590,8 @@ CommunicatingSocket<InterfaceToImplement>::CommunicatingSocket(
     PollableSystemSocketImpl* sockImpl)
 :
     Socket<InterfaceToImplement>(
-        std::unique_ptr<BaseAsyncSocketImplHelper<Pollable>>(
-            new AsyncSocketImplHelper<Pollable>(
+        std::unique_ptr<aio::BaseAsyncSocketImplHelper<Pollable>>(
+            new aio::AsyncSocketImplHelper<Pollable>(
                 this,
                 this,
                 natTraversal)),
@@ -591,13 +600,14 @@ CommunicatingSocket<InterfaceToImplement>::CommunicatingSocket(
     m_aioHelper(nullptr),
     m_connected(true)   //this constructor is used is server socket
 {
-    m_aioHelper = static_cast<AsyncSocketImplHelper<Pollable>*>(this->m_baseAsyncHelper.get());
+    m_aioHelper = static_cast<aio::AsyncSocketImplHelper<Pollable>*>(this->m_baseAsyncHelper);
 }
 
 template<typename InterfaceToImplement>
 CommunicatingSocket<InterfaceToImplement>::~CommunicatingSocket()
 {
-    m_aioHelper->terminate();
+    if (m_aioHelper)
+        m_aioHelper->terminate();
 }
 
 template<typename InterfaceToImplement>
@@ -847,13 +857,13 @@ void CommunicatingSocket<InterfaceToImplement>::sendAsync(
 
 template<typename InterfaceToImplement>
 void CommunicatingSocket<InterfaceToImplement>::registerTimer(
-    unsigned int timeoutMs,
+    std::chrono::milliseconds timeoutMs,
     nx::utils::MoveOnlyFunc<void()> handler )
 {
     //currently, aio considers 0 timeout as no timeout and will NOT call handler
-    Q_ASSERT(timeoutMs > 0);
-    if (timeoutMs == 0)
-        timeoutMs = 1;  //handler of zero timer will NOT be called
+    Q_ASSERT(timeoutMs > std::chrono::milliseconds(0));
+    if (timeoutMs == std::chrono::milliseconds(0))
+        timeoutMs = std::chrono::milliseconds(1);  //handler of zero timer will NOT be called
     return m_aioHelper->registerTimer(timeoutMs, std::move(handler));
 }
 
@@ -1206,7 +1216,7 @@ class TCPServerSocketPrivate
 {
 public:
     int socketHandle;
-    AsyncServerSocketHelper<Pollable> asyncServerSocketHelper;
+    aio::AsyncServerSocketHelper<Pollable> asyncServerSocketHelper;
 
     TCPServerSocketPrivate(
         Socket<AbstractStreamServerSocket>* sock,
@@ -1597,3 +1607,6 @@ int UDPSocket::recvFrom(
     }
     return rtn;
 }
+
+}   //network
+}   //nx

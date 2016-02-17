@@ -10,27 +10,27 @@
 
 #include <ui/workaround/cancel_drag.h>
 
-static QMessageBox::StandardButton showNewMessageBox(QWidget *parent, QMessageBox::Icon icon, int helpTopicId, const QString& title, const QString& text, QMessageBox::StandardButtons buttons, QMessageBox::StandardButton defaultButton) {
-    QnMessageBox msgBox(icon, helpTopicId, title, text, QMessageBox::NoButton, parent);
+static QnMessageBox::StandardButton showNewMessageBox(QWidget *parent, QnMessageBox::Icon icon, int helpTopicId, const QString& title, const QString& text, QnMessageBox::StandardButtons buttons, QnMessageBox::StandardButton defaultButton) {
+    QnMessageBox msgBox(icon, helpTopicId, title, text, QnMessageBox::NoButton, parent);
     QDialogButtonBox *buttonBox = msgBox.findChild<QDialogButtonBox *>();
     assert(buttonBox != 0);
 
-    uint mask = QMessageBox::FirstButton;
-    while (mask <= QMessageBox::LastButton) {
+    uint mask = QnMessageBox::FirstButton;
+    while (mask <= QnMessageBox::LastButton) {
         uint sb = buttons & mask;
         mask <<= 1;
         if (!sb)
             continue;
-        QPushButton *button = msgBox.addButton((QMessageBox::StandardButton)sb);
+        QPushButton *button = msgBox.addButton((QnMessageBox::StandardButton)sb);
         // Choose the first accept role as the default
         if (msgBox.defaultButton())
             continue;
-        if ((defaultButton == QMessageBox::NoButton && buttonBox->buttonRole(button) == QDialogButtonBox::AcceptRole)
-            || (defaultButton != QMessageBox::NoButton && sb == uint(defaultButton)))
+        if ((defaultButton == QnMessageBox::NoButton && buttonBox->buttonRole(button) == QDialogButtonBox::AcceptRole)
+            || (defaultButton != QnMessageBox::NoButton && sb == uint(defaultButton)))
             msgBox.setDefaultButton(button);
     }
     if (msgBox.exec() == -1)
-        return QMessageBox::Cancel;
+        return QnMessageBox::Cancel;
     return msgBox.standardButton(msgBox.clickedButton());
 }
 
@@ -54,7 +54,7 @@ QnMessageBox::StandardButton QnMessageBox::information(QWidget *parent, const QS
     return showNewMessageBox(parent, Information, Qn::Empty_Help, title, text, buttons, defaultButton);
 }
 
-QMessageBox::StandardButton QnMessageBox::question(QWidget *parent, int helpTopicId, const QString &title, const QString& text, StandardButtons buttons, StandardButton defaultButton) {
+QnMessageBox::StandardButton QnMessageBox::question(QWidget *parent, int helpTopicId, const QString &title, const QString& text, StandardButtons buttons, StandardButton defaultButton) {
     return showNewMessageBox(parent, Question, helpTopicId, title, text, buttons, defaultButton);
 }
 
@@ -63,7 +63,7 @@ QnMessageBox::StandardButton QnMessageBox::question(QWidget *parent, const QStri
     return showNewMessageBox(parent, Question, Qn::Empty_Help, title, text, buttons, defaultButton);
 }
 
-QMessageBox::StandardButton QnMessageBox::warning(QWidget *parent, int helpTopicId, const QString &title, const QString& text, StandardButtons buttons, StandardButton defaultButton) {
+QnMessageBox::StandardButton QnMessageBox::warning(QWidget *parent, int helpTopicId, const QString &title, const QString& text, StandardButtons buttons, StandardButton defaultButton) {
     return showNewMessageBox(parent, Warning, helpTopicId, title, text, buttons, defaultButton);
 }
 
@@ -72,7 +72,7 @@ QnMessageBox::StandardButton QnMessageBox::warning(QWidget *parent, const QStrin
     return showNewMessageBox(parent, Warning, Qn::Empty_Help, title, text, buttons, defaultButton);
 }
 
-QMessageBox::StandardButton QnMessageBox::critical(QWidget *parent, int helpTopicId, const QString &title, const QString& text, StandardButtons buttons, StandardButton defaultButton) {
+QnMessageBox::StandardButton QnMessageBox::critical(QWidget *parent, int helpTopicId, const QString &title, const QString& text, StandardButtons buttons, StandardButton defaultButton) {
     return showNewMessageBox(parent, Critical, helpTopicId, title, text, buttons, defaultButton);
 }
 
@@ -81,7 +81,7 @@ QnMessageBox::StandardButton QnMessageBox::critical(QWidget *parent, const QStri
     return showNewMessageBox(parent, Critical, Qn::Empty_Help, title, text, buttons, defaultButton);
 }
 
-QPushButton* QnMessageBox::addCustomButton(const QString &text, QMessageBox::ButtonRole role) {
+QPushButton* QnMessageBox::addCustomButton(const QString &text, QnMessageBox::ButtonRole role) {
     QPushButton* button = addButton(text, role);
     if (!button)
         return button;

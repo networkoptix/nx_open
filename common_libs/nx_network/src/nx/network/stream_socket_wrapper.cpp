@@ -119,7 +119,7 @@ void StreamSocketWrapper::sendAsync(
 { m_socket->sendAsync(buf, std::move(handler)); }
 
 void StreamSocketWrapper::registerTimer(
-    unsigned int timeoutMs, nx::utils::MoveOnlyFunc<void()> handler)
+    std::chrono::milliseconds timeoutMs, nx::utils::MoveOnlyFunc<void()> handler)
 { m_socket->registerTimer(timeoutMs, std::move(handler)); }
 
 void StreamSocketWrapper::cancelIOAsync(

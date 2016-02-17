@@ -18,12 +18,12 @@
 namespace nx {
 namespace stun {
 
-class NX_NETWORK_API AsyncClient
+class NX_NETWORK_API AbstractAsyncClient
 {
 public:
     static const struct Timeouts { uint send, recv, reconnect; } DEFAULT_TIMEOUTS;
 
-    virtual ~AsyncClient() {}
+    virtual ~AbstractAsyncClient() {}
 
     typedef std::function<void(Message)> IndicationHandler;
     typedef std::function<void(SystemError::ErrorCode, Message)> RequestHandler;
@@ -74,8 +74,8 @@ public:
 };
 
 //!Connects to STUN server, sends requests, receives responses and indications
-class NX_NETWORK_API AsyncClientImpl:
-    public AsyncClient,
+class NX_NETWORK_API AsyncClient:
+    public AbstractAsyncClient,
     public StreamConnectionHolder<
 		nx_api::BaseStreamProtocolConnectionEmbeddable<
 			Message,
@@ -92,10 +92,10 @@ public:
 
     typedef BaseConnectionType ConnectionType;
 
-    AsyncClientImpl(Timeouts timeouts = DEFAULT_TIMEOUTS);
-    ~AsyncClientImpl() override;
+    AsyncClient(Timeouts timeouts = DEFAULT_TIMEOUTS);
+    ~AsyncClient() override;
 
-    Q_DISABLE_COPY( AsyncClientImpl );
+    Q_DISABLE_COPY( AsyncClient );
 
     void connect(SocketAddress endpoint, bool useSsl = false) override;
     bool setIndicationHandler(int method, IndicationHandler handler) override;

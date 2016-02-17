@@ -12,9 +12,13 @@
 #include <nx/network/system_socket.h>
 
 
+namespace nx {
+namespace network {
+namespace aio {
+
 class DummyEventHandler
 :
-    public aio::AIOEventHandler<Pollable>
+    public AIOEventHandler<Pollable>
 {
 public:
     DummyEventHandler(std::function<void(Pollable*, aio::EventType)> func)
@@ -58,7 +62,7 @@ TEST(aio, socketPolledNotification)
         &socket,
         aio::etRead,
         &evHandler,
-        0,
+        std::chrono::milliseconds(0),
         [&socketAddedFlag](){
             socketAddedFlag = true;
         });
@@ -106,7 +110,7 @@ TEST(aio, pollsetError)
         &socket,
         aio::etRead,
         &evHandler,
-        0,
+        std::chrono::milliseconds(0),
         [&socketAddedFlag, &handlerCalledFlag]() {
             ASSERT_FALSE(handlerCalledFlag.load());
             socketAddedFlag = true;
@@ -117,3 +121,7 @@ TEST(aio, pollsetError)
     ASSERT_TRUE(socketAddedFlag);
     ASSERT_TRUE(handlerCalledFlag.load());
 }
+
+}   //aio
+}   //network
+}   //nx

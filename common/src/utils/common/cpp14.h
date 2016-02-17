@@ -9,16 +9,29 @@
 #include <atomic>
 #include <memory>
 
+#ifdef __GNUC__
+#include <features.h>
+#endif
+
 
 ////////////////////////////////////////////////////////////////////////////
-// Some c++ features missing in MS Visual studio 2012 are defined here
-// TODO #ak remove this file after moving to visual studio 2013
+// Some c++14 features missing in MS Visual studio 2012 and GCC 4.8 are
+// defined here
 ////////////////////////////////////////////////////////////////////////////
 
 
 namespace std
 {
-#if _MSC_VER <= 1700
+#ifdef _MSC_VER
+#   if _MSC_VER <= 1700
+#       define USE_OWN_MAKE_UNIQUE
+#   endif
+#elif defined(__GNUC_PREREQ)
+#   if !__GNUC_PREREQ(4,9)
+#      define USE_OWN_MAKE_UNIQUE
+#   endif
+#endif
+#ifdef USE_OWN_MAKE_UNIQUE
 template<
     typename T>
     std::unique_ptr<T> make_unique()
@@ -72,8 +85,12 @@ template<
         std::forward<Arg3>( arg3 ),
         std::forward<Arg4>( arg4 ) ) );
 }
-#endif
+#endif  //USE_OWN_MAKE_UNIQUE
+}   //std
 
+namespace nx {
+
+//TODO #ak move this out of here! std version will look like atomic<unique_ptr>
 template<typename T>
 class atomic_unique_ptr
 {
@@ -149,6 +166,7 @@ public:
 private:
     std::atomic<T*> m_ptr;
 };
-}
+
+}   //nx
 
 #endif  //libcommon_cpp14_h

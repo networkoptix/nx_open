@@ -187,7 +187,7 @@ QnCheckableMessageBox::question(QWidget *parent, int helpTopicId, const QString 
         QDialogButtonBox::StandardButtons buttons, QDialogButtonBox::StandardButton defaultButton, QDialogButtonBox::StandardButton cancelButton) {
     QnCheckableMessageBox mb(parent);
     mb.setWindowTitle(title);
-    mb.setIconPixmap(QMessageBox::standardIcon(QMessageBox::Question));
+    mb.setIconPixmap(QnMessageBox::standardIcon(QnMessageBox::Question));
     mb.setText(question);
     if (!checkBoxText.isEmpty())
         mb.setCheckBoxText(checkBoxText);
@@ -211,7 +211,7 @@ QnCheckableMessageBox::warning(QWidget *parent, int helpTopicId, const QString &
         QDialogButtonBox::StandardButtons buttons, QDialogButtonBox::StandardButton defaultButton, QDialogButtonBox::StandardButton cancelButton) {
     QnCheckableMessageBox mb(parent);
     mb.setWindowTitle(title);
-    mb.setIconPixmap(QMessageBox::standardIcon(QMessageBox::Warning));
+    mb.setIconPixmap(QnMessageBox::standardIcon(QnMessageBox::Warning));
     mb.setText(warning);
     if (!checkBoxText.isEmpty())
         mb.setCheckBoxText(checkBoxText);

@@ -17,6 +17,7 @@ namespace style
     const int Metrics::kHeaderSize = dp(32);
     const int Metrics::kViewRowHeight = dp(24);
     const int Metrics::kSortIndicatorSize = dp(14);
+    const int Metrics::kRounding = dp(1);
     const QSize Metrics::kSwitchSize(dp(30), dp(15));
 
     const char *Properties::kHoveredRowProperty = "_qn_hoveredRow";
@@ -65,22 +66,4 @@ namespace style
             return 0;
         return rect.top() + rect.height() * y;
     }
-
-    QString Colors::paletteName(Colors::Palette palette)
-    {
-        switch (palette)
-        {
-        case kBase:
-            return lit("dark");
-        case kContrast:
-            return lit("light");
-        case kBlue:
-            return lit("blue");
-        case kGreen:
-            return lit("green");
-        case kBrang:
-            return lit("brand");
-        }
-    }
-
 }

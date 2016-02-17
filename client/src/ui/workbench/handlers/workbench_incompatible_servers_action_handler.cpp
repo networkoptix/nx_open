@@ -30,8 +30,8 @@ QnWorkbenchIncompatibleServersActionHandler::QnWorkbenchIncompatibleServersActio
     m_connectTool(0),
     m_mergeDialog(0)
 {
-    connect(action(Qn::ConnectToCurrentSystem),         SIGNAL(triggered()),    this,   SLOT(at_connectToCurrentSystemAction_triggered()));
-    connect(action(Qn::MergeSystems),                   SIGNAL(triggered()),    this,   SLOT(at_mergeSystemsAction_triggered()));
+    connect(action(QnActions::ConnectToCurrentSystem),         SIGNAL(triggered()),    this,   SLOT(at_connectToCurrentSystemAction_triggered()));
+    connect(action(QnActions::MergeSystems),                   SIGNAL(triggered()),    this,   SLOT(at_mergeSystemsAction_triggered()));
 }
 
 QnWorkbenchIncompatibleServersActionHandler::~QnWorkbenchIncompatibleServersActionHandler() {}
@@ -40,7 +40,7 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemActio
 {
     if (m_connectTool)
     {
-        QMessageBox::critical(mainWindow(), tr("Error"), tr("Please wait. Requested servers will be added to your system."));
+        QnMessageBox::critical(mainWindow(), tr("Error"), tr("Please wait. Requested servers will be added to your system."));
         return;
     }
 
@@ -83,7 +83,7 @@ void QnWorkbenchIncompatibleServersActionHandler::connectToCurrentSystem(
         password = dialog.textValue();
 
         if (password.isEmpty())
-            QMessageBox::critical(mainWindow(), tr("Error"), tr("Password cannot be empty!"));
+            QnMessageBox::critical(mainWindow(), tr("Error"), tr("Password cannot be empty!"));
         else
             break;
     }

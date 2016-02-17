@@ -20,7 +20,7 @@
 #include <ui/dialogs/progress_dialog.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-#include <ui/style/warning_style.h>
+#include <ui/style/custom_style.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_auto_starter.h>
 #include <ui/workaround/widgets_signals_workaround.h>
@@ -158,7 +158,7 @@ bool QnLookAndFeelPreferencesWidget::canDiscardChanges() {
     if (backgroundAllowed)
     {
         qnSettings->setBackground(m_oldBackground);
-        action(Qn::ToggleBackgroundAnimationAction)->setChecked(
+        action(QnActions::ToggleBackgroundAnimationAction)->setChecked(
             m_oldBackground.animationEnabled);
     }
     return true;
@@ -294,7 +294,7 @@ void QnLookAndFeelPreferencesWidget::setupBackgroundUi() {
         if (m_updating)
             return;
 
-        action(Qn::ToggleBackgroundAnimationAction)->setChecked(checked);
+        action(QnActions::ToggleBackgroundAnimationAction)->setChecked(checked);
 
         QnClientBackground background = qnSettings->background();
         background.animationEnabled = checked;

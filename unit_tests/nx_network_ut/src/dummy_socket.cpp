@@ -6,6 +6,9 @@
 #include "dummy_socket.h"
 
 
+namespace nx {
+namespace network {
+
 DummySocket::DummySocket()
 :
     m_localAddress( HostAddress::localhost, rand() )
@@ -186,7 +189,7 @@ void DummySocket::sendAsync( const nx::Buffer& /*buf*/,
 }
 
 void DummySocket::registerTimer(
-    unsigned int /*timeoutMs*/,
+    std::chrono::milliseconds /*timeoutMs*/,
     nx::utils::MoveOnlyFunc<void()> /*handler*/ )
 {
 }
@@ -258,3 +261,6 @@ bool BufferSocket::isConnected() const
 {
     return m_isOpened;
 }
+
+}   //network
+}   //nx

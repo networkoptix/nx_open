@@ -374,7 +374,7 @@ void QnPtzManageDialog::at_savePositionButton_clicked() {
         return;
 
     if(m_resource->getStatus() == Qn::Offline || m_resource->getStatus() == Qn::Unauthorized) {
-        QMessageBox::critical(
+        QnMessageBox::critical(
             this,
             tr("Could not get position from camera."),
             tr("An error has occurred while trying to get the current position from camera %1.").arg(m_resource->getName()) + L'\n'
@@ -396,7 +396,7 @@ void QnPtzManageDialog::at_goToPositionButton_clicked() {
         return;
 
     if(m_resource->getStatus() == Qn::Offline || m_resource->getStatus() == Qn::Unauthorized) {
-        QMessageBox::critical(
+        QnMessageBox::critical(
             this,
             tr("Could not set position for camera."),
             tr("An error has occurred while trying to set the current position for camera %1.").arg(m_resource->getName()) + L'\n'
@@ -437,7 +437,7 @@ void QnPtzManageDialog::at_startTourButton_clicked() {
         return;
 
     if(m_resource->getStatus() == Qn::Offline || m_resource->getStatus() == Qn::Unauthorized) {
-        QMessageBox::critical(
+        QnMessageBox::critical(
             this,
             tr("Could not set position for camera."),
             tr("An error has occurred while trying to set the current position for camera %1.").arg(m_resource->getName()) + L'\n'
@@ -679,7 +679,7 @@ bool QnPtzManageDialog::tryClose(bool force) {
 
 bool QnPtzManageDialog::askToSaveChanges(bool cancelIsAllowed /* = true*/) {
 
-    QMessageBox::StandardButtons allowedButtons = QnMessageBox::Yes | QnMessageBox::No;
+    QnMessageBox::StandardButtons allowedButtons = QnMessageBox::Yes | QnMessageBox::No;
     if (cancelIsAllowed)
         allowedButtons |= QnMessageBox::Cancel;
 

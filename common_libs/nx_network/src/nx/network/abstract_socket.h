@@ -13,18 +13,26 @@
 
 #include <nx/utils/move_only_func.h>
 #include <utils/common/byte_array.h>
+#include <utils/common/systemerror.h>
+#include <utils/common/stoppable.h>
 
 #include "aio/pollset.h"
 #include "buffer.h"
 #include "nettools.h"
 #include "socket_common.h"
-#include "utils/common/systemerror.h"
-#include "utils/common/stoppable.h"
 
 //todo: #ak cancel asynchoronous operations
 
 // forward
-namespace aio { class AbstractAioThread; }
+namespace nx {
+namespace network {
+namespace aio {
+
+class AbstractAioThread;
+
+}   //aio
+}   //network
+}   //nx
 
 /** Base interface for sockets. Provides methods to set different socket configuration parameters.
 
@@ -172,7 +180,7 @@ public:
     /*!
         \note if socket is not bound to any thread yet, binds it automatically
     */
-    virtual aio::AbstractAioThread* getAioThread() = 0;
+    virtual nx::network::aio::AbstractAioThread* getAioThread() = 0;
 
     //!Binds current socket to specified AIOThread
     /*!
@@ -180,7 +188,7 @@ public:
               specified tread (e.g. it's already bound to different thread or
               certaind thread type is not the same)
      */
-    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) = 0;
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) = 0;
 };
 
 //!Interface for writing to/reading from socket
@@ -285,10 +293,10 @@ public:
         \note \a timeoutMs MUST be greater then zero!
     */
     virtual void registerTimer(
-        unsigned int timeoutMs,
+        std::chrono::milliseconds timeout,
         nx::utils::MoveOnlyFunc<void()> handler) = 0;
     void registerTimer(
-        std::chrono::milliseconds timeout,
+        unsigned int timeoutMs,
         nx::utils::MoveOnlyFunc<void()> handler);
 
     //!Cancel async socket operation. \a cancellationDoneHandler is invoked when cancelled
@@ -296,7 +304,7 @@ public:
         \param eventType event to cancel
     */
     virtual void cancelIOAsync(
-        aio::EventType eventType,
+        nx::network::aio::EventType eventType,
         std::function< void() > handler) = 0;
 
     //!Cancels async operation and blocks until cancellation is stopped
@@ -304,7 +312,7 @@ public:
         \note It is guaranteed that no handler with \a eventType is running or will be called after return of this method
         \note If invoked within socket's aio thread, cancels immediately, without blocking
     */
-    virtual void cancelIOSync(aio::EventType eventType) = 0;
+    virtual void cancelIOSync(nx::network::aio::EventType eventType) = 0;
 
     //!Implementation of QnStoppable::pleaseStop
     virtual void pleaseStop( std::function< void() > handler ) override;

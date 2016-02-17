@@ -560,7 +560,7 @@ bool QnResourcePoolModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction
         else
             parameters = QnActionParameters(resources);
         parameters.setArgument(Qn::VideoWallItemGuidRole, node->uuid());
-        menu()->trigger(Qn::DropOnVideoWallItemAction, parameters);
+        menu()->trigger(QnActions::DropOnVideoWallItemAction, parameters);
     } else if(QnLayoutResourcePtr layout = node->resource().dynamicCast<QnLayoutResource>()) {
         QnResourceList medias;
         foreach( QnResourcePtr res, resources )
@@ -569,7 +569,7 @@ bool QnResourcePoolModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction
                 medias.push_back( res );
         }
 
-        menu()->trigger(Qn::OpenInLayoutAction, QnActionParameters(medias).withArgument(Qn::LayoutResourceRole, layout));
+        menu()->trigger(QnActions::OpenInLayoutAction, QnActionParameters(medias).withArgument(Qn::LayoutResourceRole, layout));
     } else if(QnUserResourcePtr user = node->resource().dynamicCast<QnUserResource>()) {
         foreach(const QnResourcePtr &resource, resources) {
             if(resource->getParentId() == user->getId())
@@ -580,7 +580,7 @@ bool QnResourcePoolModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction
                 continue; /* Can drop only layout resources on user. */
 
             menu()->trigger(
-                Qn::SaveLayoutAsAction,
+                QnActions::SaveLayoutAsAction,
                 QnActionParameters(layout).
                 withArgument(Qn::UserResourceRole, user).
                 withArgument(Qn::ResourceNameRole, layout->getName())
@@ -597,7 +597,7 @@ bool QnResourcePoolModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction
 
             QnNetworkResourceList cameras = resources.filtered<QnNetworkResource>();
             if(!cameras.empty())
-                menu()->trigger(Qn::MoveCameraAction, QnActionParameters(cameras).withArgument(Qn::MediaServerResourceRole, server));
+                menu()->trigger(QnActions::MoveCameraAction, QnActionParameters(cameras).withArgument(Qn::MediaServerResourceRole, server));
         }
     }
 

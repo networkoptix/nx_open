@@ -13,7 +13,11 @@
 #include <nx/network/socket.h>
 
 
+namespace nx {
+namespace network {
 class UDPSocket;
+}   //network
+}   //nx
 struct QnCameraConflictList;
 
 class QnMServerResourceSearcher : public QnLongRunnable

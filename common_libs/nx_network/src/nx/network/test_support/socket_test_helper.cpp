@@ -97,14 +97,19 @@ TestConnection::~TestConnection()
     --TestConnection_count;
 }
 
+void TestConnection::pleaseStop()
+{
+    //TODO #ak
+}
+
 int TestConnection::id() const
 {
     return m_id;
 }
 
-void TestConnection::pleaseStop()
+void TestConnection::setLocalAddress(SocketAddress addr)
 {
-    //TODO
+    m_localAddress = std::move(addr);
 }
 
 void TestConnection::start()
@@ -114,12 +119,15 @@ void TestConnection::start()
     if( m_connected )
         return startIO();
 
-    if (!m_socket->setNonBlockingMode(true))
+    if (!m_socket->setNonBlockingMode(true) || 
+        (m_localAddress && !m_socket->bind(*m_localAddress)))
+    {
         return m_socket->post(std::bind(
             &TestConnection::onConnected,
             this,
             m_id,
             SystemError::getLastOSErrorCode()));
+    }
 
     m_socket->connectAsync(
         m_remoteAddress,
@@ -268,7 +276,7 @@ void RandomDataTcpServer::join()
 bool RandomDataTcpServer::start()
 {
     m_serverSocket = SocketFactory::createStreamServerSocket();
-    if( !m_serverSocket->bind(SocketAddress()) ||
+    if( !m_serverSocket->bind(m_localAddress) ||
         !m_serverSocket->listen() )
     {
         m_serverSocket.reset();
@@ -279,6 +287,11 @@ bool RandomDataTcpServer::start()
         std::placeholders::_1, std::placeholders::_2 ) );
 
     return true;
+}
+
+void RandomDataTcpServer::setLocalAddress(SocketAddress addr)
+{
+    m_localAddress = std::move(addr);
 }
 
 SocketAddress RandomDataTcpServer::addressBeingListened() const
@@ -383,6 +396,11 @@ void ConnectionsGenerator::enableErrorEmulation(int errorPercent)
     m_errorEmulationPercent = errorPercent;
 }
 
+void ConnectionsGenerator::setLocalAddress(SocketAddress addr)
+{
+    m_localAddress = std::move(addr);
+}
+
 void ConnectionsGenerator::start()
 {
     for( size_t i = 0; i < m_maxSimultaneousConnectionsCount; ++i )
@@ -396,6 +414,8 @@ void ConnectionsGenerator::start()
             std::bind(&ConnectionsGenerator::onConnectionFinished, this,
                       std::placeholders::_1, std::prev(m_connections.end())) ) );
         m_connections.back().swap( connection );
+        if (m_localAddress)
+            m_connections.back()->setLocalAddress(*m_localAddress);
         m_connections.back()->start();
         ++m_totalConnectionsEstablished;
     }

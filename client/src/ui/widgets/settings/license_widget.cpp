@@ -13,7 +13,7 @@
 #include <ui/common/palette.h>
 #include <ui/dialogs/custom_file_dialog.h>
 #include <ui/dialogs/file_dialog.h>
-#include <ui/style/warning_style.h>
+#include <ui/style/custom_style.h>
 
 #include <utils/common/app_info.h>
 #include <utils/common/product_features.h>
@@ -63,7 +63,7 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent):
 
     connect(ui->copyHwidButton, &QPushButton::clicked,  this, [this] {
         qApp->clipboard()->setText(ui->hardwareIdEdit->text());
-        QMessageBox::information(this, tr("Success"), tr("Hardware ID copied to clipboard."));
+        QnMessageBox::information(this, tr("Success"), tr("Hardware ID copied to clipboard."));
     });
 
     connect(ui->pasteKeyButton, &QPushButton::clicked,  this, [this] {
@@ -176,7 +176,7 @@ void QnLicenseWidget::at_browseLicenseFileButton_clicked() {
 
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QMessageBox::warning(this, tr("Error"), tr("Could not open the file %1").arg(fileName));
+        QnMessageBox::warning(this, tr("Error"), tr("Could not open the file %1").arg(fileName));
         return;
     }
 

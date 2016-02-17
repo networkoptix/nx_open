@@ -9,6 +9,9 @@
 #include <nx/network/abstract_socket.h>
 
 
+namespace nx {
+namespace network {
+
 //!Base class for socket, reading/writing data from/to any source (e.g., file)
 class DummySocket
 :
@@ -65,7 +68,7 @@ public:
                             std::function<void( SystemError::ErrorCode, size_t )> handler ) override;
 
     virtual void registerTimer(
-        unsigned int timeoutMs,
+        std::chrono::milliseconds timeoutMs,
         nx::utils::MoveOnlyFunc<void()> handler ) override;
 
     virtual aio::AbstractAioThread* getAioThread() override;
@@ -100,5 +103,8 @@ private:
     bool m_isOpened;
     size_t m_curPos;
 };
+
+}   //network
+}   //nx
 
 #endif  //DUMMY_SOCKET_H

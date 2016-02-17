@@ -57,13 +57,13 @@ qint64 QnServerArchiveDelegate::startTime() const
         ret = m_catalogHi[i] && 
               m_catalogHi[i]->minTime() != AV_NOPTS_VALUE && 
               m_catalogHi[i]->minTime() < ret ?
-                    ret = m_catalogHi[i]->minTime() :
+                    m_catalogHi[i]->minTime() :
                     ret;
 
         ret = m_catalogLow[i] && 
               m_catalogLow[i]->minTime() != AV_NOPTS_VALUE && 
               m_catalogLow[i]->minTime() < ret ?
-                    ret = m_catalogLow[i]->minTime() :
+                    m_catalogLow[i]->minTime() :
                     ret;
     }
     return ret == INT64_MAX ? AV_NOPTS_VALUE : ret*1000;
@@ -80,13 +80,13 @@ qint64 QnServerArchiveDelegate::endTime() const
         ret = m_catalogHi[i] && 
               m_catalogHi[i]->maxTime() != AV_NOPTS_VALUE && 
               m_catalogHi[i]->maxTime() > ret  ?
-                    ret = m_catalogHi[i]->maxTime() :
+                    m_catalogHi[i]->maxTime() :
                     ret;
 
         ret = m_catalogLow[i] && 
               m_catalogLow[i]->maxTime() != AV_NOPTS_VALUE && 
               m_catalogLow[i]->maxTime() > ret ?
-                    ret = m_catalogLow[i]->maxTime() :
+                    m_catalogLow[i]->maxTime() :
                     ret;
     }
     return ret == 0 ? AV_NOPTS_VALUE 

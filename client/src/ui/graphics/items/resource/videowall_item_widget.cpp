@@ -356,7 +356,7 @@ void QnVideowallItemWidget::dropEvent(QGraphicsSceneDragDropEvent *event) {
     parameters.setArgument(Qn::VideoWallItemGuidRole, m_itemUuid);
     parameters.setArgument(Qn::KeyboardModifiersRole, event->modifiers());
 
-    menu()->trigger(Qn::DropOnVideoWallItemAction, parameters);
+    menu()->trigger(QnActions::DropOnVideoWallItemAction, parameters);
 
     event->acceptProposedAction();
 }
@@ -425,7 +425,7 @@ void QnVideowallItemWidget::at_doubleClicked(Qt::MouseButton button) {
         return;
 
     menu()->triggerIfPossible(
-        Qn::StartVideoWallControlAction,
+        QnActions::StartVideoWallControlAction,
         QnActionParameters(m_indices)
     );
 }

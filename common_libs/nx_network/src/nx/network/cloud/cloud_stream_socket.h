@@ -72,7 +72,7 @@ public:
         const nx::Buffer& buf,
         std::function<void(SystemError::ErrorCode, size_t)> handler) override;
     virtual void registerTimer(
-        unsigned int timeoutMs,
+        std::chrono::milliseconds timeoutMs,
         nx::utils::MoveOnlyFunc<void()> handler) override;
 
     virtual aio::AbstractAioThread* getAioThread() override;
@@ -94,7 +94,7 @@ private:
         SystemError::ErrorCode errorCode,
         std::unique_ptr<AbstractStreamSocket> cloudConnection);
 
-    std::atomic_unique_ptr<AbstractStreamSocket> m_socketDelegate;
+    nx::atomic_unique_ptr<AbstractStreamSocket> m_socketDelegate;
     std::function<void(SystemError::ErrorCode)> m_connectHandler;
     nx::utils::AsyncOperationGuard m_asyncConnectGuard;
     /** Used to tie this to aio thread.

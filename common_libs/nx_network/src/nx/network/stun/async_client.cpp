@@ -7,10 +7,10 @@
 namespace nx {
 namespace stun {
 
-const AsyncClient::Timeouts AsyncClient::DEFAULT_TIMEOUTS = { 3000, 3000, 60000 };
+const AbstractAsyncClient::Timeouts AbstractAsyncClient::DEFAULT_TIMEOUTS = { 3000, 3000, 60000 };
 
 boost::optional< QString >
-    AsyncClient::hasError(SystemError::ErrorCode code, const Message& message)
+    AbstractAsyncClient::hasError(SystemError::ErrorCode code, const Message& message)
 {
     if( code != SystemError::noError )
         return lit( "System error %1: %2" )
@@ -28,7 +28,7 @@ boost::optional< QString >
     return boost::none;
 }
 
-AsyncClientImpl::AsyncClientImpl(Timeouts timeouts):
+AsyncClient::AsyncClient(Timeouts timeouts):
     m_timeouts(timeouts),
     m_useSsl(false),
     m_state(State::disconnected),
@@ -36,7 +36,7 @@ AsyncClientImpl::AsyncClientImpl(Timeouts timeouts):
 {
 }
 
-AsyncClientImpl::~AsyncClientImpl()
+AsyncClient::~AsyncClient()
 {
     std::unique_ptr< AbstractStreamSocket > connectingSocket;
     std::unique_ptr< BaseConnectionType > baseConnection;
@@ -58,7 +58,7 @@ AsyncClientImpl::~AsyncClientImpl()
     timerSocket->pleaseStopSync();
 }
 
-void AsyncClientImpl::connect(SocketAddress endpoint, bool useSsl)
+void AsyncClient::connect(SocketAddress endpoint, bool useSsl)
 {
     QnMutexLocker lock( &m_mutex );
     m_endpoint = std::move( endpoint );
@@ -66,19 +66,19 @@ void AsyncClientImpl::connect(SocketAddress endpoint, bool useSsl)
     openConnectionImpl( &lock );
 }
 
-bool AsyncClientImpl::setIndicationHandler(int method, IndicationHandler handler)
+bool AsyncClient::setIndicationHandler(int method, IndicationHandler handler)
 {
     QnMutexLocker lock(&m_mutex);
     return m_indicationHandlers.emplace(method, std::move(handler)).second;
 }
 
-bool AsyncClientImpl::ignoreIndications(int method)
+bool AsyncClient::ignoreIndications(int method)
 {
     QnMutexLocker lock(&m_mutex);
     return m_indicationHandlers.erase(method);
 }
 
-void AsyncClientImpl::sendRequest(Message request, RequestHandler handler)
+void AsyncClient::sendRequest(Message request, RequestHandler handler)
 {
     QnMutexLocker lock( &m_mutex );
     m_requestQueue.push_back( std::make_pair(
@@ -105,7 +105,7 @@ void AsyncClientImpl::sendRequest(Message request, RequestHandler handler)
     };
 }
 
-SocketAddress AsyncClientImpl::localAddress() const
+SocketAddress AsyncClient::localAddress() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_baseConnection
@@ -113,12 +113,12 @@ SocketAddress AsyncClientImpl::localAddress() const
         : SocketAddress();
 }
 
-void AsyncClientImpl::closeConnection(SystemError::ErrorCode errorCode)
+void AsyncClient::closeConnection(SystemError::ErrorCode errorCode)
 {
     closeConnection(errorCode, nullptr);
 }
 
-void AsyncClientImpl::closeConnection(
+void AsyncClient::closeConnection(
     SystemError::ErrorCode errorCode,
     BaseConnectionType* connection)
 {
@@ -137,7 +137,7 @@ void AsyncClientImpl::closeConnection(
         baseConnection->pleaseStop();
 }
 
-void AsyncClientImpl::openConnectionImpl(QnMutexLockerBase* lock)
+void AsyncClient::openConnectionImpl(QnMutexLockerBase* lock)
 {
     if( !m_endpoint )
     {
@@ -184,7 +184,7 @@ void AsyncClientImpl::openConnectionImpl(QnMutexLockerBase* lock)
     }
 }
 
-void AsyncClientImpl::closeConnectionImpl(
+void AsyncClient::closeConnectionImpl(
         QnMutexLockerBase* lock, SystemError::ErrorCode code)
 {
     auto connectingSocket = std::move( m_connectingSocket );
@@ -212,7 +212,7 @@ void AsyncClientImpl::closeConnectionImpl(
         });
 }
 
-void AsyncClientImpl::dispatchRequestsInQueue(QnMutexLockerBase* lock)
+void AsyncClient::dispatchRequestsInQueue(QnMutexLockerBase* lock)
 {
     static_cast< void >( lock );
     while( !m_requestQueue.empty() )
@@ -246,7 +246,7 @@ void AsyncClientImpl::dispatchRequestsInQueue(QnMutexLockerBase* lock)
     }
 }
 
-void AsyncClientImpl::onConnectionComplete(SystemError::ErrorCode code)
+void AsyncClient::onConnectionComplete(SystemError::ErrorCode code)
 {
     QnMutexLocker lock( &m_mutex );
     if( m_state == State::terminated )
@@ -267,7 +267,7 @@ void AsyncClientImpl::onConnectionComplete(SystemError::ErrorCode code)
     dispatchRequestsInQueue( &lock );
 }
 
-void AsyncClientImpl::processMessage(Message message)
+void AsyncClient::processMessage(Message message)
 {
     QnMutexLocker lock( &m_mutex );
     if( m_state == State::terminated )

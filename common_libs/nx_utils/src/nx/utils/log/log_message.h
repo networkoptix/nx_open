@@ -6,8 +6,9 @@
 #ifndef NX_LOG_MESSAGE_H
 #define NX_LOG_MESSAGE_H
 
-#include <string>
+#include <chrono>
 #include <memory>
+#include <string>
 #include <type_traits>
 
 #include <QtCore/QByteArray>
@@ -51,6 +52,9 @@ public:
     QnLogMessage arg(const std::string& a, int fieldWidth = 0, QChar fillChar = QLatin1Char(' ')) const;
     QnLogMessage arg(const QnUuid& a, int fieldWidth = 0, QChar fillChar = QLatin1Char(' ')) const;
     QnLogMessage arg(const void* a, int fieldWidth = 0, QChar fillChar = QLatin1Char(' ')) const;
+    QnLogMessage arg(const std::chrono::milliseconds a, int fieldWidth = 0, QChar fillChar = QLatin1Char(' ')) const;
+    QnLogMessage arg(const std::chrono::seconds a, int fieldWidth = 0, QChar fillChar = QLatin1Char(' ')) const;
+    QnLogMessage arg(const std::chrono::microseconds a, int fieldWidth = 0, QChar fillChar = QLatin1Char(' ')) const;
 
     template<typename T>
     QnLogMessage arg(
@@ -99,7 +103,12 @@ public:
     template<typename T>
     QnLogMessage container(const T& a)
     {
-        return arg(containerString(a, QLatin1String(", "), QLatin1String(""), QLatin1String("") ));
+        return arg(
+            containerString(
+                a,
+                QLatin1String(", "),
+                QLatin1String(""),
+                QLatin1String("") ));
     }
 
     operator QString() const; 

@@ -11,6 +11,9 @@
 #include "dummy_socket.h"
 
 
+namespace nx {
+namespace network {
+
 //!Reads data from file. Sent data is just ignored
 class FileSocket
 :
@@ -34,5 +37,8 @@ private:
     std::ifstream m_file;
     size_t m_bytesRead;
 };
+
+}   //network
+}   //nx
 
 #endif  //FILE_SOCKET_H

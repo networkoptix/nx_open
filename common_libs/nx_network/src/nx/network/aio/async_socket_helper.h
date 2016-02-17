@@ -19,6 +19,10 @@
 #include "../socket_global.h"
 
 
+namespace nx {
+namespace network {
+namespace aio {
+
 //TODO #ak come up with new name for this class or remove it
 //TODO #ak also, some refactor needed to use AsyncSocketImplHelper with server socket
 //TODO #ak move timers to AbstractSocket
@@ -256,7 +260,9 @@ public:
         nx::network::SocketGlobals::aioService().watchSocketNonSafe( &lk, this->m_socket, aio::etWrite, this );
     }
 
-    void registerTimer( unsigned int timeoutMs, nx::utils::MoveOnlyFunc<void()> handler )
+    void registerTimer(
+        std::chrono::milliseconds timeoutMs,
+        nx::utils::MoveOnlyFunc<void()> handler )
     {
         if( this->m_socket->impl()->terminated.load( std::memory_order_relaxed ) > 0 )
             return;
@@ -622,8 +628,11 @@ private:
             this->m_socket,
             aio::etWrite,
             this,
-            boost::optional<unsigned int>(),
-            [this, resolvedAddress, sendTimeout](){ m_abstractSocketPtr->connect( resolvedAddress, sendTimeout ); } );    //to be called between pollset.add and pollset.poll
+            boost::none,
+            [this, resolvedAddress, sendTimeout]()
+            {
+                m_abstractSocketPtr->connect( resolvedAddress, std::chrono::milliseconds(sendTimeout) );
+            } );    //to be called between pollset.add and pollset.poll
         return true;
     }
 
@@ -754,5 +763,9 @@ private:
     std::atomic<int> m_acceptAsyncCallCount;
     bool* m_terminatedFlagPtr;
 };
+
+}   //aio
+}   //network
+}   //nx
 
 #endif  //ASYNC_SOCKET_HELPER_H

@@ -10,7 +10,7 @@
 #include <ui/actions/action_parameters.h>
 
 #include <ui/screen_recording/screen_recorder.h>
-#include <ui/style/warning_style.h>
+#include <ui/style/custom_style.h>
 
 #include <ui/widgets/settings/general_preferences_widget.h>
 #include <ui/widgets/settings/look_and_feel_preferences_widget.h>
@@ -25,6 +25,8 @@ QnPreferencesDialog::QnPreferencesDialog(QWidget *parent):
     ui(new Ui::PreferencesDialog())
 {
     ui->setupUi(this);
+
+    setAccentStyle(ui->buttonBox->button(QDialogButtonBox::Ok));
 
     addPage(GeneralPage, new QnGeneralPreferencesWidget(this), tr("General"));
     addPage(LookAndFeelPage, new QnLookAndFeelPreferencesWidget(this), tr("Look and Feel"));
@@ -47,7 +49,6 @@ QnPreferencesDialog::QnPreferencesDialog(QWidget *parent):
         );
     }
 
-    resize(1, 1); // set widget size to minimal possible
     loadDataToUi();
 }
 
@@ -69,20 +70,20 @@ bool QnPreferencesDialog::canApplyChanges() {
     if (allPagesCanApplyChanges)
         return true;
 
-    QMessageBox::StandardButton result = QMessageBox::information(
+    QnMessageBox::StandardButton result = QnMessageBox::information(
         this,
         tr("Information"),
         tr("Some changes will take effect only after application restart. Do you want to restart the application now?"),
-        QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
-        QMessageBox::Yes);
+        QnMessageBox::Yes | QnMessageBox::No | QnMessageBox::Cancel,
+        QnMessageBox::Yes);
     switch (result) {
-    case QMessageBox::Cancel:
+    case QnMessageBox::Cancel:
         return false;
-    case QMessageBox::Yes:
+    case QnMessageBox::Yes:
         /* The slot must be connected as QueuedConnection because it must start the new instance
          * after the settings have been saved. Settings saving will be performed just after this (confirm)
          * without returning to the event loop. */
-        menu()->trigger(Qn::QueueAppRestartAction);
+        menu()->trigger(QnActions::QueueAppRestartAction);
         break;
     default:
         break;
