@@ -44,12 +44,12 @@ QImage decompressJpegImage(const char *data, size_t size)
 
     return QImage(buffer, width, height, QImage::Format_ARGB32, &imageCleanup, buffer);
 }
-#else
+#else // USE_LIBJPEG
 QImage decompressJpegImage(const char *data, size_t size)
 {
-    return QImage::fromData(reinterpret_cast<const uchar*>(data), size);
+    return QImage::fromData(reinterpret_cast<const uchar*>(data), (int) size);
 }
-#endif
+#endif // USE_LIBJPEG
 
 QImage decompressJpegImage(const QByteArray &data)
 {

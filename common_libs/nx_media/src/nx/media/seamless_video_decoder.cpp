@@ -2,12 +2,14 @@
 
 #include <deque>
 
-#include "abstract_video_decoder.h"
-#include "video_decoder_registry.h"
-#include "frame_metadata.h"
+#include <QtMultimedia/QVideoFrame>
 
 #include <utils/media/jpeg_utils.h>
 #include <utils/media/h264_utils.h>
+
+#include "abstract_video_decoder.h"
+#include "video_decoder_registry.h"
+#include "frame_metadata.h"
 
 namespace nx {
 namespace media {
