@@ -18,8 +18,8 @@ os.environ["DYLD_FRAMEWORK_PATH"] = '${qt.dir}/lib'
 os.environ["DYLD_LIBRARY_PATH"] = '${libdir}/lib/${build.configuration}:${arch.dir}'
 os.environ["LD_LIBRARY_PATH"] = '${libdir}/lib/${build.configuration}'
 
-def execute(command):
-    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+def execute(commands):
+    process = subprocess.Popen(commands, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     output = ''
    
     # Poll process for new output until finished
@@ -34,7 +34,7 @@ def execute(command):
     if (exitCode == 0):
         return output
     else:
-        raise Exception(command, exitCode, output)
+        raise Exception(commands, exitCode, output)
 
 def fileIsAllowed(file, exclusions):
     for exclusion in exclusions:
@@ -150,23 +150,18 @@ if __name__ == '__main__':
         gentext(f, '${project.build.sourceDirectory}', ['.h'], 'HEADERS += ')
         gentext(f, '${project.build.sourceDirectory}', ['.ui'], 'FORMS += ')
         gen_includepath(f, '${libdir}/include')
-        #gen_includepath(f, '${environment.dir}/include')   #these dirs are explicitely included to allow replace boost in single branch
+        gen_includepath(f, '${environment.dir}/include')
         f.close()
     
     if os.path.exists(os.path.join(r'${project.build.directory}', output_pro_file)):
         print (' ++++++++++++++++++++++++++++++++ qMake info: ++++++++++++++++++++++++++++++++')        
-        execute('${qt.dir}/bin/qmake -query')
+        execute([r'${qt.dir}/bin/qmake', '-query'])
         print (' ++++++++++++++++++++++++++++++++ generating project file ++++++++++++++++++++++++++++++++')        
         if '${platform}' == 'windows':
             vc_path = r'%s..\..\VC\bin' % os.getenv('${VCVars}')
-            print(vc_path)
             os.environ["path"] += os.pathsep + vc_path
-            os.system('echo %PATH%')
-            #os.system('cd ${qt.dir} && ${qt.dir}/qtbinpatcher.exe')
-            
-            execute(r'${qt.dir}/bin/qmake -spec ${qt.spec} -tp vc -o ${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj {0}'.format(output_pro_file))
-            
-            execute(r'${qt.dir}/bin/qmake -spec ${qt.spec} CONFIG+=${build.configuration} -o ${project.build.directory}/Makefile {0}'.format(output_pro_file))
+            execute([r'${qt.dir}/bin/qmake', '-spec', '${qt.spec}', '-tp', 'vc', '-o,', r'${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj', output_pro_file)           
+            execute([r'${qt.dir}/bin/qmake', '-spec', '${qt.spec}', r'CONFIG+=${build.configuration}', '-o', r'${project.build.directory}/Makefile', output_pro_file)
         else:
             os.system('export DYLD_FRAMEWORK_PATH=%s && export LD_LIBRARY_PATH=%s && ${qt.dir}/bin/qmake -spec ${qt.spec} CONFIG+=${build.configuration} -o ${project.build.directory}/Makefile.${build.configuration} %s' % (ldpath, ldpath, output_pro_file))
             

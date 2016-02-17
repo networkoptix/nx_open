@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QSharedPointer>
+
 class QVideoFrame;
 
 namespace nx {
@@ -15,7 +17,7 @@ typedef std::shared_ptr<const AudioFrame> ConstAudioFramePtr;
 namespace media {
 
 class AbstractResourceAllocator;
-class AudioFrame;
+struct AudioFrame;
 
 static const int kMediaAlignment = 32;
 

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <QtCore/QObject>
-#include <QtMultimedia/QVideoFrame>
 
 #include <nx/streaming/video_data_packet.h>
 

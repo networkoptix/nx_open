@@ -3,12 +3,12 @@
 #include <QtMultimedia/QAbstractVideoSurface>
 #include <QtMultimedia/QVideoSurfaceFormat>
 #include <QtCore/QElapsedTimer>
-#include <QtOpenGL/qgl.h>
+#include <QtOpenGL/QGL>
+#include <QtCore/QTimer>
 
 #include <utils/common/delayed.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
-#include <ui/texture_size_helper.h>
 
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/streaming/rtsp_client_archive_delegate.h>
@@ -158,7 +158,7 @@ PlayerPrivate::PlayerPrivate(Player *parent)
     reconnectOnPlay(false),
     position(0),
     videoSurface(0),
-    maxTextureSize(QnTextureSizeHelper::instance()->maxTextureSize()),
+    maxTextureSize(4096), //< TODO mike: STUB: Find a way to pass QnTextureSizeHelper::instance()->maxTextureSize()
     ptsTimerBase(0),
     execTimer(new QTimer(this)),
     lastSeekTimeMs(AV_NOPTS_VALUE),
