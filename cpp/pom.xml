@@ -234,7 +234,7 @@
 
                                         <!-- Disabling moc preprocessor steps, since we do it with jom -->
                                         <replacement>
-                                            <xpath>//Project/PropertyGroup/CustomBuild[contains(@Include,'.h')]</xpath>
+                                            <xpath>//Project/ItemGroup/CustomBuild[contains(@Include,'.h')]</xpath>
                                             <token><![CDATA[</CustomBuild>]]></token>
                                             <value><![CDATA[
       <ExcludedFromBuild>true</ExcludedFromBuild>
