@@ -396,6 +396,7 @@ default_sequence () {
 case "$1" in
   start)
     touch /forcefsck
+    /etc/init.d/nx1button start    
     default_sequence
     exit 0
     ;;
