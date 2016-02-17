@@ -24,7 +24,7 @@ public:
     void at_openCloudManagementUrlAction_triggered();
 
 public:
-    QScopedPointer<QnLoginToCloudDialog> loginToCloudDialog;
+    QPointer<QnLoginToCloudDialog> loginToCloudDialog;
 };
 
 QnWorkbenchCloudHandler::QnWorkbenchCloudHandler(QObject *parent)
@@ -56,13 +56,13 @@ void QnWorkbenchCloudHandlerPrivate::at_loginToCloudAction_triggered()
 
     if (!loginToCloudDialog)
     {
-        loginToCloudDialog.reset(new QnLoginToCloudDialog(q->mainWindow()));
+        loginToCloudDialog = new QnLoginToCloudDialog(q->mainWindow());
         loginToCloudDialog->setLogin(qnSettings->cloudLogin());
         loginToCloudDialog->show();
 
         connect(loginToCloudDialog, &QnLoginToCloudDialog::finished, this, [this]()
         {
-            loginToCloudDialog.reset();
+            loginToCloudDialog->deleteLater();
         });
     }
 
