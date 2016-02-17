@@ -15,6 +15,7 @@
     <name>NX Network Library</name>
 
     <properties>
+        <guid>${nx_network.guid}</guid>
         <!--Global libs-->
         <template>lib</template>
         <qt.libs>core gui network xml xmlpatterns sql concurrent multimedia</qt.libs>

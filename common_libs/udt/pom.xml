@@ -16,6 +16,7 @@
 
     <properties>
         <!--Global libs-->
+        <guid>${udt.guid}</guid>
         <template>lib</template>
         <qt.libs>core gui network xml xmlpatterns sql concurrent multimedia</qt.libs>
         <template>lib</template>

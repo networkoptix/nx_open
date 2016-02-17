@@ -229,7 +229,7 @@
                                         <replacement>
                                             <xpath>//Project/PropertyGroup</xpath>
                                             <token><![CDATA[<ProjectGuid>\{(.*)}]]></token>
-                                            <value><![CDATA[<ProjectGuid>${guid}]]></value>
+                                            <value><![CDATA[<ProjectGuid>\${guid}]]></value>
                                         </replacement>
 
                                         <!-- Disabling moc preprocessor steps, since we do it with jom -->
