@@ -14,11 +14,11 @@ BarrierHandler::BarrierHandler(nx::utils::MoveOnlyFunc<void()> handler)
         });
 }
 
-std::function< void() > BarrierHandler::fork()
+std::function<void()> BarrierHandler::fork()
 {
     // TODO: move lambda
     auto holder = std::make_shared<
-            std::shared_ptr< BarrierHandler > >(m_handlerHolder);
+            std::shared_ptr<BarrierHandler>>(m_handlerHolder);
     return [holder]() { holder->reset(); };
 }
 

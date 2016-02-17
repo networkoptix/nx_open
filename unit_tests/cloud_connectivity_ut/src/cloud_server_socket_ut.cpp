@@ -170,7 +170,7 @@ NX_NETWORK_SERVER_SOCKET_TEST_CASE(
     [this](){ return makeServerSocket(); },
     &std::make_unique<network::test::MultipleClientSocketTester<3>>);
 
-void testTunnelConnect(SystemError::ErrorCode expectedResult)
+static void testTunnelConnect(bool isSuccessExpected)
 {
     auto client = std::make_unique<TCPSocket>(false);
     ASSERT_TRUE(client->setNonBlockingMode(true));
@@ -181,7 +181,8 @@ void testTunnelConnect(SystemError::ErrorCode expectedResult)
         network::test::kServerAddress,
         [&](SystemError::ErrorCode c){ result.set_value(c); });
 
-    EXPECT_EQ(result.get_future().get(), expectedResult);
+    const auto code = result.get_future().get();
+    EXPECT_EQ(code == SystemError::noError, isSuccessExpected) << code;
     client->pleaseStopSync();
 }
 
@@ -208,7 +209,7 @@ TEST(CloudServerSocketBaseTcpTest, OpenTunnelOnIndication)
     ASSERT_TRUE(server->listen(1));
 
     // there is not tunnel yet
-    testTunnelConnect(SystemError::connectionRefused);
+    testTunnelConnect(false);
 
     hpm::api::ConnectionRequestedEvent event;
     event.connectSessionId = String("someSessionId");
@@ -221,7 +222,7 @@ TEST(CloudServerSocketBaseTcpTest, OpenTunnelOnIndication)
     stunAsyncClient->emulateIndication(message);
 
     // now we can use estabilished tunnel
-    testTunnelConnect(SystemError::noError);
+    testTunnelConnect(true);
     server->pleaseStopSync();
 }
 

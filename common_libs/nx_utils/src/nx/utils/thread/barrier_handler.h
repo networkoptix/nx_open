@@ -15,11 +15,11 @@ namespace nx {
 class NX_UTILS_API BarrierHandler
 {
 public:
-    BarrierHandler(nx::utils::MoveOnlyFunc< void() > handler );
-    std::function< void() > fork();
+    BarrierHandler(nx::utils::MoveOnlyFunc<void()> handler );
+    std::function<void()> fork();
 
 private:
-    std::shared_ptr< BarrierHandler > m_handlerHolder;
+    std::shared_ptr<BarrierHandler> m_handlerHolder;
 };
 
 } // namespace nx
