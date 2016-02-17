@@ -175,12 +175,12 @@ void CloudServerSocket::pleaseStop(std::function<void()> handler)
         stop();
 }
 
-void CloudServerSocket::post(std::function<void()> handler)
+void CloudServerSocket::post(nx::utils::MoveOnlyFunc<void()> handler)
 {
     m_ioThreadSocket->post(std::move(handler));
 }
 
-void CloudServerSocket::dispatch(std::function<void()> handler)
+void CloudServerSocket::dispatch(nx::utils::MoveOnlyFunc<void()> handler)
 {
     m_ioThreadSocket->dispatch(std::move(handler));
 }

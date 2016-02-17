@@ -119,11 +119,11 @@ void StreamSocketWrapper::sendAsync(
 { m_socket->sendAsync(buf, std::move(handler)); }
 
 void StreamSocketWrapper::registerTimer(
-    std::chrono::milliseconds timeoutMs, std::function<void()> handler)
+    std::chrono::milliseconds timeoutMs, nx::utils::MoveOnlyFunc<void()> handler)
 { m_socket->registerTimer(timeoutMs, std::move(handler)); }
 
 void StreamSocketWrapper::cancelIOAsync(
-    aio::EventType eventType, std::function<void()> handler)
+    aio::EventType eventType, nx::utils::MoveOnlyFunc<void()> handler)
 { m_socket->cancelIOAsync(eventType, std::move(handler)); }
 
 void StreamSocketWrapper::cancelIOSync(aio::EventType eventType)
@@ -135,10 +135,10 @@ bool StreamSocketWrapper::reopen()
 void StreamSocketWrapper::pleaseStop(std::function<void()> handler)
 { return m_socket->pleaseStop(std::move(handler)); }
 
-void StreamSocketWrapper::post(std::function<void()> handler)
+void StreamSocketWrapper::post(nx::utils::MoveOnlyFunc<void()> handler)
 { return m_socket->post(std::move(handler)); }
 
-void StreamSocketWrapper::dispatch(std::function<void()> handler)
+void StreamSocketWrapper::dispatch(nx::utils::MoveOnlyFunc<void()> handler)
 { return m_socket->dispatch(std::move(handler)); }
 
 } // namespace network

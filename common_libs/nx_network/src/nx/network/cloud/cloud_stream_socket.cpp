@@ -196,7 +196,7 @@ bool CloudStreamSocket::isConnected() const
 
 void CloudStreamSocket::cancelIOAsync(
     aio::EventType eventType,
-    std::function<void()> handler)
+    nx::utils::MoveOnlyFunc<void()> handler)
 {
     if (eventType == aio::etWrite || eventType == aio::etNone)
     {
@@ -211,7 +211,7 @@ void CloudStreamSocket::cancelIOAsync(
 
     m_aioThreadBinder->cancelIOAsync(
         eventType,
-        [this, eventType, handler]()   //TODO #ak #msvc2015 move to lambda
+        [this, eventType, handler = move(handler)]() mutable
         {
             if (m_socketDelegate)
                 m_socketDelegate->cancelIOSync(eventType);
@@ -231,12 +231,12 @@ void CloudStreamSocket::cancelIOSync(aio::EventType eventType)
         m_socketDelegate->cancelIOSync(eventType);
 }
 
-void CloudStreamSocket::post(std::function<void()> handler)
+void CloudStreamSocket::post(nx::utils::MoveOnlyFunc<void()> handler)
 {
     m_aioThreadBinder->post(std::move(handler));
 }
 
-void CloudStreamSocket::dispatch(std::function<void()> handler)
+void CloudStreamSocket::dispatch(nx::utils::MoveOnlyFunc<void()> handler)
 {
     m_aioThreadBinder->dispatch(std::move(handler));
 }
@@ -281,7 +281,7 @@ void CloudStreamSocket::sendAsync(
 
 void CloudStreamSocket::registerTimer(
     std::chrono::milliseconds timeoutMs,
-    std::function<void()> handler)
+    nx::utils::MoveOnlyFunc<void()> handler)
 {
     m_aioThreadBinder->registerTimer(timeoutMs, std::move(handler));
 }

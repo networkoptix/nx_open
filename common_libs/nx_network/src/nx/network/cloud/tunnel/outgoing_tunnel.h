@@ -89,7 +89,7 @@ private:
     void onConnectorFinished(
         CloudConnectType connectorType,
         SystemError::ErrorCode errorCode,
-        std::shared_ptr<AbstractOutgoingTunnelConnection> connection);
+        std::unique_ptr<AbstractOutgoingTunnelConnection> connection);
 
     void connectorsTerminated(
         std::function<void()> pleaseStopCompletionHandler);

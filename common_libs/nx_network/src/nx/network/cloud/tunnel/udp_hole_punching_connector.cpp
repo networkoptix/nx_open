@@ -68,7 +68,7 @@ int UdpHolePunchingTunnelConnector::getPriority() const
 
 void UdpHolePunchingTunnelConnector::connect(
     std::chrono::milliseconds timeout,
-    std::function<void(
+    nx::utils::MoveOnlyFunc<void(
         SystemError::ErrorCode errorCode,
         std::unique_ptr<AbstractOutgoingTunnelConnection>)> handler)
 {

@@ -48,7 +48,7 @@ public:
     /** Only one connect can be running at a time. */
     virtual void connect(
         std::chrono::milliseconds timeout,
-        std::function<void(
+        nx::utils::MoveOnlyFunc<void(
             SystemError::ErrorCode errorCode,
             std::unique_ptr<AbstractOutgoingTunnelConnection>)> handler) override;
     virtual const AddressEntry& targetPeerAddress() const override;
@@ -57,7 +57,7 @@ private:
     const AddressEntry m_targetHostAddress;
     const nx::String m_connectSessionId;
     std::unique_ptr<nx::hpm::api::MediatorClientUdpConnection> m_mediatorUdpClient;
-    std::function<void(
+    nx::utils::MoveOnlyFunc<void(
         SystemError::ErrorCode errorCode,
         std::unique_ptr<AbstractOutgoingTunnelConnection>)> m_completionHandler;
     boost::optional<SocketAddress> m_targetHostUdpAddress;

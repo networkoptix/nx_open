@@ -329,13 +329,13 @@ bool Socket<InterfaceToImplement>::setSendTimeout( unsigned int ms )
 }
 
 template<typename InterfaceToImplement>
-void Socket<InterfaceToImplement>::post(std::function<void()> handler)
+void Socket<InterfaceToImplement>::post(nx::utils::MoveOnlyFunc<void()> handler)
 {
     m_baseAsyncHelper->post(std::move(handler));
 }
 
 template<typename InterfaceToImplement>
-void Socket<InterfaceToImplement>::dispatch(std::function<void()> handler)
+void Socket<InterfaceToImplement>::dispatch(nx::utils::MoveOnlyFunc<void()> handler)
 {
     m_baseAsyncHelper->dispatch(std::move(handler));
 }
@@ -820,7 +820,7 @@ void CommunicatingSocket<InterfaceToImplement>::shutdown()
 template<typename InterfaceToImplement>
 void CommunicatingSocket<InterfaceToImplement>::cancelIOAsync(
     aio::EventType eventType,
-    std::function<void()> cancellationDoneHandler)
+    nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler)
 {
     m_aioHelper->cancelIOAsync(eventType, std::move(cancellationDoneHandler));
 }
@@ -858,7 +858,7 @@ void CommunicatingSocket<InterfaceToImplement>::sendAsync(
 template<typename InterfaceToImplement>
 void CommunicatingSocket<InterfaceToImplement>::registerTimer(
     std::chrono::milliseconds timeoutMs,
-    std::function<void()> handler )
+    nx::utils::MoveOnlyFunc<void()> handler )
 {
     //currently, aio considers 0 timeout as no timeout and will NOT call handler
     Q_ASSERT(timeoutMs > std::chrono::milliseconds(0));

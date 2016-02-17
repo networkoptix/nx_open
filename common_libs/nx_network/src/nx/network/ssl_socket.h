@@ -71,7 +71,7 @@ public:
 
     virtual void cancelIOAsync(
         nx::network::aio::EventType eventType,
-        std::function<void()> cancellationDoneHandler) override;
+        nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler) override;
     virtual void cancelIOSync(nx::network::aio::EventType eventType) override;
 
 protected:
@@ -106,7 +106,7 @@ protected:
     //!Implementation of AbstractCommunicatingSocket::registerTimer
     virtual void registerTimer(
         std::chrono::milliseconds timeoutMs,
-        std::function<void()> handler ) override;
+        nx::utils::MoveOnlyFunc<void()> handler ) override;
 
 private:
     // Async version
@@ -131,7 +131,7 @@ public:
 
     virtual void cancelIOAsync(
         nx::network::aio::EventType eventType,
-        std::function<void()> cancellationDoneHandler) override;
+        nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler) override;
 
 protected:
     //!Implementation of AbstractCommunicatingSocket::connectAsync
@@ -149,7 +149,7 @@ protected:
     //!Implementation of AbstractCommunicatingSocket::registerTimer
     virtual void registerTimer(
         std::chrono::milliseconds timeoutMs,
-        std::function<void()> handler ) override;
+        nx::utils::MoveOnlyFunc<void()> handler ) override;
 
 private:
     Q_DECLARE_PRIVATE(QnMixedSSLSocket);

@@ -112,7 +112,9 @@ public:
     void sendMessage(
         SocketAddress destinationEndpoint,
         const MessageType& message,
-        std::function<void(SystemError::ErrorCode, SocketAddress)> completionHandler)
+        std::function<void(
+            SystemError::ErrorCode /*sysErrorCode*/,
+            SocketAddress /*resolvedTargetAddress*/)> completionHandler)
     {
         //serializing message
         SerializerType messageSerializer;

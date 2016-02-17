@@ -12,7 +12,7 @@ namespace aio {
 
 void Timer::start(
     std::chrono::milliseconds timeout,
-    std::function<void()> timerFunc)
+    nx::utils::MoveOnlyFunc<void()> timerFunc)
 {
     UDPSocket::registerTimer(timeout, std::move(timerFunc));
     m_timeout = timeout;
@@ -27,17 +27,17 @@ std::chrono::nanoseconds Timer::timeToEvent() const
         : m_timeout - elapsed;
 }
 
-void Timer::post(std::function<void()> funcToCall)
+void Timer::post(nx::utils::MoveOnlyFunc<void()> funcToCall)
 {
     UDPSocket::post(std::move(funcToCall));
 }
 
-void Timer::dispatch(std::function<void()> funcToCall)
+void Timer::dispatch(nx::utils::MoveOnlyFunc<void()> funcToCall)
 {
     UDPSocket::dispatch(std::move(funcToCall));
 }
 
-void Timer::cancelAsync(std::function<void()> completionHandler)
+void Timer::cancelAsync(nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
     UDPSocket::cancelIOAsync(etTimedOut, std::move(completionHandler));
 }

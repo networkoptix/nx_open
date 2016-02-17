@@ -44,7 +44,7 @@ int AbstractCommunicatingSocket::send(const QnByteArray& data)
 
 void AbstractCommunicatingSocket::registerTimer(
     unsigned int timeout,
-    std::function<void()> handler)
+    nx::utils::MoveOnlyFunc<void()> handler)
 {
     return registerTimer(
         std::chrono::milliseconds(timeout),

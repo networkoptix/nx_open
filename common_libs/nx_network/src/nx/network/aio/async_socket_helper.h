@@ -38,7 +38,7 @@ public:
 
     virtual ~BaseAsyncSocketImplHelper() {}
 
-    void post( std::function<void()>&& handler )
+    void post(nx::utils::MoveOnlyFunc<void()> handler)
     {
         if( m_socket->impl()->terminated.load( std::memory_order_relaxed ) > 0 )
             return;
@@ -46,7 +46,7 @@ public:
         nx::network::SocketGlobals::aioService().post( m_socket, std::move(handler) );
     }
 
-    void dispatch( std::function<void()>&& handler )
+    void dispatch(nx::utils::MoveOnlyFunc<void()> handler)
     {
         if( m_socket->impl()->terminated.load( std::memory_order_relaxed ) > 0 )
             return;
@@ -262,7 +262,7 @@ public:
 
     void registerTimer(
         std::chrono::milliseconds timeoutMs,
-        std::function<void()> handler )
+        nx::utils::MoveOnlyFunc<void()> handler )
     {
         if( this->m_socket->impl()->terminated.load( std::memory_order_relaxed ) > 0 )
             return;
@@ -279,15 +279,16 @@ public:
             timeoutMs );
     }
 
-    void cancelIOAsync( const aio::EventType eventType,
-                        std::function<void()> handler )
+    void cancelIOAsync(
+        const aio::EventType eventType,
+        nx::utils::MoveOnlyFunc<void()> handler )
     {
-        auto cancelImpl = [=]()
+        auto cancelImpl = [this, eventType, handler = move(handler)]() mutable
         {
             // cancelIOSync will be instant from socket's IO thread
             nx::network::SocketGlobals::aioService().dispatch(
                 this->m_socket,
-                [=]()
+                [this, eventType, handler = move(handler)]() mutable
                 {
                     cancelAsyncIOWhileInAioThread(eventType);
                     handler();
@@ -295,7 +296,9 @@ public:
         };
 
         if (eventType == aio::etWrite || eventType == aio::etNone)
-            nx::network::SocketGlobals::addressResolver().cancel(this, std::move(cancelImpl));
+            nx::network::SocketGlobals::addressResolver().cancel(
+                this,
+                std::move(cancelImpl));
         else
             cancelImpl();
     }
@@ -344,7 +347,7 @@ private:
     const nx::Buffer* m_sendBuffer;
     int m_sendBufPos;
 
-    std::function<void()> m_timerHandler;
+    nx::utils::MoveOnlyFunc<void()> m_timerHandler;
     size_t m_registerTimerCallCounter;
 
     bool* m_connectSendHandlerTerminatedFlag;
@@ -738,14 +741,17 @@ public:
         return nx::network::SocketGlobals::aioService().watchSocketNonSafe(&lk, m_sock, aio::etRead, this);
     }
 
-    void cancelIOAsync(std::function< void() > handler)
+    void cancelIOAsync(nx::utils::MoveOnlyFunc< void() > handler)
     {
-        nx::network::SocketGlobals::aioService().dispatch(this->m_sock, [=]()
-        {
-            nx::network::SocketGlobals::aioService().removeFromWatch(m_sock, aio::etRead, true);
-            ++m_acceptAsyncCallCount;
-            handler();
-        } );
+        nx::network::SocketGlobals::aioService().dispatch(
+            this->m_sock,
+            [this, handler = move(handler)]() mutable
+            {
+                nx::network::SocketGlobals::aioService().removeFromWatch(
+                    m_sock, aio::etRead, true);
+                ++m_acceptAsyncCallCount;
+                handler();
+            });
     }
 
     void cancelIOSync()

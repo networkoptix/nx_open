@@ -72,9 +72,9 @@ public:
     //!Implementation of AbstractSocket::handle
     virtual AbstractSocket::SOCKET_HANDLE handle() const override { return m_abstractSocketProvider()->handle(); }
     //!Implementation of AbstractSocket::post
-    virtual void post( std::function<void()> handler ) override { m_abstractSocketProvider()->post( std::move(handler) ); }
+    virtual void post( nx::utils::MoveOnlyFunc<void()> handler ) override { m_abstractSocketProvider()->post( std::move(handler) ); }
     //!Implementation of AbstractSocket::dispatch
-    virtual void dispatch( std::function<void()> handler ) override { m_abstractSocketProvider()->dispatch( std::move(handler) ); }
+    virtual void dispatch( nx::utils::MoveOnlyFunc<void()> handler ) override { m_abstractSocketProvider()->dispatch( std::move(handler) ); }
     //!Implementation of AbstractSocket::getAioThread
     virtual nx::network::aio::AbstractAioThread* getAioThread() override { return m_abstractSocketProvider()->getAioThread(); }
     //!Implementation of AbstractSocket::bindToAioThread
@@ -236,9 +236,11 @@ public:
     }
     virtual void cancelIOAsync(
         nx::network::aio::EventType eventType,
-        std::function<void()> cancellationDoneHandler) override
+        nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler) override
     {
-        return this->m_implDelegate.cancelIOAsync(eventType, std::move(cancellationDoneHandler));
+        return this->m_implDelegate.cancelIOAsync(
+            eventType,
+            std::move(cancellationDoneHandler));
     }
     virtual void cancelIOSync(nx::network::aio::EventType eventType) override
     {

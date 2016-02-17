@@ -114,9 +114,9 @@ public:
     //!Implementation of AbstractSocket::setSendTimeout
     virtual bool setSendTimeout( unsigned int ms ) override;
     //!Implementation of AbstractSocket::post
-    virtual void post( std::function<void()> handler ) override;
+    virtual void post( nx::utils::MoveOnlyFunc<void()> handler ) override;
     //!Implementation of AbstractSocket::dispatch
-    virtual void dispatch( std::function<void()> handler ) override;
+    virtual void dispatch( nx::utils::MoveOnlyFunc<void()> handler ) override;
 
     /**
      *   Get the local port
@@ -218,11 +218,11 @@ public:
     //!Implementation of AbstractCommunicatingSocket::registerTimer
     virtual void registerTimer(
         std::chrono::milliseconds timeoutMs,
-        std::function<void()> handler ) override;
+        nx::utils::MoveOnlyFunc<void()> handler ) override;
     //!Implementation of AbstractCommunicatingSocket::cancelAsyncIO
     virtual void cancelIOAsync(
         nx::network::aio::EventType eventType,
-        std::function<void()> cancellationDoneHandler) override;
+        nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler) override;
     virtual void cancelIOSync(nx::network::aio::EventType eventType) override;
 
     virtual void close() override;

@@ -267,16 +267,13 @@ void OutgoingTunnel::startAsyncTunnelConnect(QnMutexLockerBase* const /*locker*/
                 SystemError::ErrorCode errorCode,
                 std::unique_ptr<AbstractOutgoingTunnelConnection> connection)
             {
-                //TODO #ak #msvc2015 move unique_ptr<connection> to lambda
-                std::shared_ptr<AbstractOutgoingTunnelConnection>
-                    connectionShared(std::move(connection));
                 m_aioThreadBinder.post(
-                    [this, connectorType, errorCode, connectionShared]() mutable
+                    [this, connectorType, errorCode, connection = move(connection)]() mutable
                     {
                         onConnectorFinished(
                             connectorType,
                             errorCode,
-                            std::move(connectionShared));
+                            std::move(connection));
                     });
             });
     }
@@ -285,7 +282,7 @@ void OutgoingTunnel::startAsyncTunnelConnect(QnMutexLockerBase* const /*locker*/
 void OutgoingTunnel::onConnectorFinished(
     CloudConnectType connectorType,
     SystemError::ErrorCode errorCode,
-    std::shared_ptr<AbstractOutgoingTunnelConnection> connection)
+    std::unique_ptr<AbstractOutgoingTunnelConnection> connection)
 {
     QnMutexLocker lk(&m_mutex);
 

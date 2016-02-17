@@ -751,7 +751,7 @@ bool UdtStreamSocket::reopen() {
 
 void UdtStreamSocket::cancelIOAsync(
     aio::EventType eventType,
-    std::function<void()> cancellationDoneHandler)
+    nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler)
 {
     return m_aioHelper->cancelIOAsync(
         eventType,
@@ -763,14 +763,14 @@ void UdtStreamSocket::cancelIOSync(aio::EventType eventType)
     m_aioHelper->cancelIOSync(eventType);
 }
 
-void UdtStreamSocket::post( std::function<void()> handler )
+void UdtStreamSocket::post( nx::utils::MoveOnlyFunc<void()> handler )
 {
     nx::network::SocketGlobals::aioService().post(
         static_cast<UdtSocket*>(this),
         std::move(handler) );
 }
 
-void UdtStreamSocket::dispatch( std::function<void()> handler )
+void UdtStreamSocket::dispatch( nx::utils::MoveOnlyFunc<void()> handler )
 {
     nx::network::SocketGlobals::aioService().dispatch(
         static_cast<UdtSocket*>(this),
@@ -800,7 +800,7 @@ void UdtStreamSocket::sendAsync(
 
 void UdtStreamSocket::registerTimer(
     std::chrono::milliseconds timeoutMillis,
-    std::function<void()> handler ) 
+    nx::utils::MoveOnlyFunc<void()> handler )
 {
     return m_aioHelper->registerTimer(timeoutMillis, std::move(handler));
 }
@@ -943,14 +943,14 @@ bool UdtStreamServerSocket::getLastError( SystemError::ErrorCode* errorCode ) co
     return m_impl->GetLastError(errorCode);
 }
 
-void UdtStreamServerSocket::post( std::function<void()> handler )
+void UdtStreamServerSocket::post( nx::utils::MoveOnlyFunc<void()> handler )
 {
     nx::network::SocketGlobals::aioService().post(
         static_cast<UdtSocket*>(this),
         std::move(handler) );
 }
 
-void UdtStreamServerSocket::dispatch( std::function<void()> handler )
+void UdtStreamServerSocket::dispatch( nx::utils::MoveOnlyFunc<void()> handler )
 {
     nx::network::SocketGlobals::aioService().dispatch(
         static_cast<UdtSocket*>(this),

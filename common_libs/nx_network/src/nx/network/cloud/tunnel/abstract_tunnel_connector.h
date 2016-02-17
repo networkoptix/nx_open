@@ -9,6 +9,7 @@
 #include <functional>
 #include <memory>
 
+#include <nx/utils/move_only_func.h>
 #include <utils/common/stoppable.h>
 
 #include "abstract_outgoing_tunnel_connection.h"
@@ -37,7 +38,7 @@ public:
      */
     virtual void connect(
         std::chrono::milliseconds timeout,
-        std::function<void(
+        nx::utils::MoveOnlyFunc<void(
             SystemError::ErrorCode errorCode,
             std::unique_ptr<AbstractOutgoingTunnelConnection>)> handler) = 0;
     virtual const AddressEntry& targetPeerAddress() const = 0;
