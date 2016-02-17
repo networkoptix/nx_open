@@ -71,7 +71,7 @@
 #include <ui/dialogs/camera_addition_dialog.h>
 #include <ui/dialogs/progress_dialog.h>
 #include <ui/dialogs/business_rules_dialog.h>
-#include <ui/dialogs/checkable_message_box.h>
+#include <ui/dialogs/message_box.h>
 #include <ui/dialogs/failover_priority_dialog.h>
 #include <ui/dialogs/backup_cameras_dialog.h>
 #include <ui/dialogs/layout_settings_dialog.h>
@@ -1297,7 +1297,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     const qint64 maxItems = qnSettings->maxPreviewSearchItems();
 
     if(period.durationMs < steps[1]) {
-        QnMessageBox::warning(mainWindow(), tr("Unable to perform preview search."), tr("Selected time period is too short to perform preview search. Please select a longer period."), QnMessageBox::Ok);
+        QnMessageBox::warning(mainWindow(), tr("Unable to perform preview search."), tr("Selected time period is too short to perform preview search. Please select a longer period."), QDialogButtonBox::Ok);
         return;
     }
 
@@ -1486,10 +1486,10 @@ void QnWorkbenchActionHandler::at_serverAddCameraManuallyAction_triggered(){
                         tr("Process in progress..."),
                         tr("Device addition is already in progress. "
                            "Are you sure you want to cancel current process?"), //TODO: #GDM #Common show current process details
-                        QnMessageBox::Ok | QnMessageBox::Cancel,
-                        QnMessageBox::Cancel
+                        QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+                        QDialogButtonBox::Cancel
             );
-            if (result != QnMessageBox::Ok)
+            if (result != QDialogButtonBox::Ok)
                 return;
         }
         dialog->setServer(server);
@@ -2391,10 +2391,10 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
     messageBox->setWindowTitle(tr("Version Mismatch"));
     messageBox->setText(message);
     messageBox->setTextFormat(Qt::RichText);
-    messageBox->setStandardButtons(QnMessageBox::Cancel);
+    messageBox->setStandardButtons(QDialogButtonBox::Cancel);
     setHelpTopic(messageBox.data(), Qn::Upgrade_Help);
 
-    QPushButton *updateButton = messageBox->addButton(tr("Update..."), QnMessageBox::HelpRole);
+    QPushButton *updateButton = messageBox->addButton(tr("Update..."), QDialogButtonBox::HelpRole);
     connect(updateButton, &QPushButton::clicked, this, [this] {
         menu()->trigger(QnActions::SystemUpdateAction);
     }, Qt::QueuedConnection);

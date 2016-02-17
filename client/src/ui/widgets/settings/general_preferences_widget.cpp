@@ -151,7 +151,7 @@ void QnGeneralPreferencesWidget::at_addExtraMediaFolderButton_clicked() {
         return;
 
     if(!ui->extraMediaFoldersList->findItems(dirName, Qt::MatchExactly).empty()) {
-        QnMessageBox::information(this, tr("Folder has already been added."), tr("This folder has already been added."), QnMessageBox::Ok);
+        QnMessageBox::information(this, tr("Folder has already been added."), tr("This folder has already been added."), QDialogButtonBox::Ok);
         return;
     }
 

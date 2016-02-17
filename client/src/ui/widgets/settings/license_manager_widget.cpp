@@ -191,13 +191,13 @@ void QnLicenseManagerWidget::showMessage(const QString &title, const QString &me
     messageBox->setIcon(warning ? QnMessageBox::Warning : QnMessageBox::Information);
     messageBox->setWindowTitle(title);
     messageBox->setText(message);
-    QPushButton* copyButton = messageBox->addCustomButton(tr("Copy to Clipboard"), QnMessageBox::HelpRole);
+    QPushButton* copyButton = messageBox->addCustomButton(tr("Copy to Clipboard"), QDialogButtonBox::HelpRole);
     connect(copyButton, &QPushButton::clicked, this, [this, message]{
         qApp->clipboard()->setText(message);
     });
-    messageBox->setStandardButtons(QnMessageBox::Ok);
-    messageBox->setEscapeButton(QnMessageBox::Ok);
-    messageBox->setDefaultButton(QnMessageBox::Ok);
+    messageBox->setStandardButtons(QDialogButtonBox::Ok);
+    messageBox->setEscapeButton(QDialogButtonBox::Ok);
+    messageBox->setDefaultButton(QDialogButtonBox::Ok);
     messageBox->exec();
 }
 

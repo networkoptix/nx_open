@@ -146,8 +146,8 @@ void QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered() {
 
     if (QnMessageBox::information(mainWindow(),
             tr("Confirm Deletion"), message,
-            QnMessageBox::Ok | QnMessageBox::Cancel,
-            QnMessageBox::Cancel) != QnMessageBox::Ok)
+            QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+            QDialogButtonBox::Cancel) != QDialogButtonBox::Ok)
         return;
 
     qnCameraBookmarksManager->deleteCameraBookmark(bookmark.guid);
@@ -165,8 +165,8 @@ void QnWorkbenchBookmarksHandler::at_removeBookmarksAction_triggered()
 
     if (QnMessageBox::information(mainWindow(),
         tr("Confirm Deletion"), message,
-        QnMessageBox::Ok | QnMessageBox::Cancel,
-        QnMessageBox::Cancel) != QnMessageBox::Ok)
+        QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+        QDialogButtonBox::Cancel) != QDialogButtonBox::Ok)
         return;
 
     for (const auto bookmark: bookmarks)

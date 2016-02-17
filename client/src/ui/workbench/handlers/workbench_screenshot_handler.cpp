@@ -425,13 +425,13 @@ bool QnWorkbenchScreenshotHandler::updateParametersFromDialog(QnScreenshotParame
             fileName += selectedExtension;
 
             if (QFile::exists(fileName)) {
-                QnMessageBox::StandardButton button = QnMessageBox::information(
+                QDialogButtonBox::StandardButton button = QnMessageBox::information(
                     mainWindow(),
                     tr("Save As"),
                     tr("File '%1' already exists. Do you want to overwrite it?").arg(QFileInfo(fileName).fileName()),
-                    QnMessageBox::Yes | QnMessageBox::No
+                    QDialogButtonBox::Yes | QDialogButtonBox::No
                     );
-                if (button == QnMessageBox::No)
+                if (button == QDialogButtonBox::No)
                     continue;
             }
         }
@@ -446,7 +446,7 @@ bool QnWorkbenchScreenshotHandler::updateParametersFromDialog(QnScreenshotParame
                 mainWindow(),
                 tr("Could not overwrite file."),
                 tr("File '%1' is used by another process. Please enter another name.").arg(QFileInfo(fileName).fileName()),
-                QnMessageBox::Ok
+                QDialogButtonBox::Ok
                 );
             continue;
         }

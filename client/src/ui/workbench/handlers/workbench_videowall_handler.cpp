@@ -54,7 +54,6 @@
 #include <ui/dialogs/attach_to_videowall_dialog.h>
 #include <ui/dialogs/resource_list_dialog.h>
 #include <ui/dialogs/videowall_settings_dialog.h>
-#include <ui/dialogs/checkable_message_box.h>
 #include <ui/dialogs/message_box.h>
 #include <ui/graphics/items/generic/graphics_message_box.h>
 #include <ui/graphics/items/resource/resource_widget.h>
@@ -529,21 +528,21 @@ void QnWorkbenchVideoWallHandler::startVideowallAndExit(const QnVideoWallResourc
         return;
     }
 
-    QnMessageBox::StandardButton button =
+    QDialogButtonBox::StandardButton button =
         QnMessageBox::question(
             mainWindow(),
             Qn::Videowall_VwModeWarning_Help,
             tr("Switch to Video Wall Mode..."),
             tr("Video Wall is about to start. Would you like to close this %1 Client instance?")
                 .arg(QnAppInfo::productNameLong()),
-            QnMessageBox::Yes | QnMessageBox::No | QnMessageBox::Cancel,
-            QnMessageBox::Yes
+            QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel,
+            QDialogButtonBox::Yes
             );
 
-    if (button == QnMessageBox::Cancel)
+    if (button == QDialogButtonBox::Cancel)
         return;
 
-    if (button == QnMessageBox::Yes) {
+    if (button == QDialogButtonBox::Yes) {
         closeInstanceDelayed();
     }
 
@@ -1371,8 +1370,8 @@ void QnWorkbenchVideoWallHandler::at_stopVideoWallAction_triggered() {
         tr("Confirm Video Wall stop"),
         tr("Are you sure you want to stop Video Wall?") + L'\n'
       + tr("You will have to start it manually."),
-        QnMessageBox::StandardButtons(QnMessageBox::Ok | QnMessageBox::Cancel),
-        QnMessageBox::Cancel) == QnMessageBox::Cancel)
+        QDialogButtonBox::StandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel),
+        QDialogButtonBox::Cancel) == QDialogButtonBox::Cancel)
         return;
 
     QnVideoWallControlMessage message(QnVideoWallControlMessage::Exit);

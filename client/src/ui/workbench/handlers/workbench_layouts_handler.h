@@ -60,7 +60,7 @@ private:
      * @param defaultButton         Default button.
      * @return                      Selected button.
      */
-    QnMessageBox::StandardButton askOverrideLayout(QnMessageBox::StandardButtons buttons, QnMessageBox::StandardButton defaultButton);
+    QDialogButtonBox::StandardButton askOverrideLayout(QDialogButtonBox::StandardButtons buttons, QDialogButtonBox::StandardButton defaultButton);
 
     bool canRemoveLayouts(const QnLayoutResourceList &layouts);
 

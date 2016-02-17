@@ -14,7 +14,7 @@
 #include <common/common_module.h>
 
 #include <ui/actions/action_manager.h>
-#include <ui/dialogs/checkable_message_box.h>
+#include <ui/dialogs/message_box.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/globals.h>
@@ -160,10 +160,10 @@ void QnWorkbenchUpdateWatcher::showUpdateNotification(const QnUpdateInfo &info)
         message += lit("</span><br/>");
     }
 
-    QnCheckableMessageBox messageBox(mainWindow());
+    QnMessageBox messageBox(mainWindow());
 
     messageBox.setStandardButtons(buttons);
-    messageBox.setIconPixmap(QnMessageBox::standardIcon(QnMessageBox::Question));
+    messageBox.setIcon(QnMessageBox::Question);
 
 #ifdef Q_OS_MAC
     bool hasOutdatedServer = false;
@@ -179,15 +179,16 @@ void QnWorkbenchUpdateWatcher::showUpdateNotification(const QnUpdateInfo &info)
     {
         actionMessage = tr("Please update %1 Client.").arg(QnAppInfo::productNameLong());
         messageBox.setStandardButtons(QDialogButtonBox::Ok);
-        messageBox.setIconPixmap(QMessageBox::standardIcon(QMessageBox::Information));
+        messageBox.setIcon(QMessageBox::Information);
     }
 #endif
 
     message += actionMessage;
 
     messageBox.setWindowTitle(title);
-    messageBox.setRichText(message);
-    messageBox.setCheckBoxText(tr("Do not notify me again about this update."));
+    messageBox.setTextFormat(Qt::RichText);
+    messageBox.setText(message);
+    messageBox.checkBox()->setText(tr("Do not notify me again about this update."));
     setHelpTopic(&messageBox, Qn::Upgrade_Help);
 
     if (info.releaseNotesUrl.isValid())
@@ -209,5 +210,5 @@ void QnWorkbenchUpdateWatcher::showUpdateNotification(const QnUpdateInfo &info)
     if (messageBox.clickedStandardButton() == QDialogButtonBox::Yes)
         action(QnActions::SystemUpdateAction)->trigger();
     else
-        qnSettings->setIgnoredUpdateVersion(messageBox.isChecked() ? info.currentRelease : QnSoftwareVersion());
+        qnSettings->setIgnoredUpdateVersion(messageBox.checkBox()->isChecked() ? info.currentRelease : QnSoftwareVersion());
 }

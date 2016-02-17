@@ -486,17 +486,17 @@ void QnLoginDialog::at_saveButton_clicked() {
     bool autoLogin = qnSettings->autoLogin();
 
     if (connections.contains(name)){
-        QnMessageBox::StandardButton button = QnMessageBox::warning(this, tr("Connection already exists."),
+        QDialogButtonBox::StandardButton button = QnMessageBox::warning(this, tr("Connection already exists."),
                                                                   tr("A connection with this name already exists. Do you want to overwrite it?"),
-                                                                  QnMessageBox::Yes | QnMessageBox::No | QnMessageBox::Cancel,
-                                                                  QnMessageBox::Yes);
+                                                                  QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel,
+                                                                  QDialogButtonBox::Yes);
         switch(button) {
-        case QnMessageBox::Cancel:
+        case QDialogButtonBox::Cancel:
             return;
-        case QnMessageBox::No:
+        case QDialogButtonBox::No:
             name = connections.generateUniqueName(name);
             break;
-        case QnMessageBox::Yes:
+        case QDialogButtonBox::Yes:
             connections.removeOne(name);
             break;
         default:
@@ -529,7 +529,7 @@ void QnLoginDialog::at_deleteButton_clicked() {
 
     if (QnMessageBox::warning(this, tr("Delete Connections"),
                                    tr("Are you sure you want to delete this connection: %1?").arg(L'\n' + name),
-                             QnMessageBox::Yes, QnMessageBox::No) == QnMessageBox::No)
+                             QDialogButtonBox::Yes, QDialogButtonBox::No) == QDialogButtonBox::No)
         return;
 
 

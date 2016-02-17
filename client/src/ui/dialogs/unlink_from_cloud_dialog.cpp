@@ -42,8 +42,8 @@ QnUnlinkFromCloudDialog::QnUnlinkFromCloudDialog(QWidget *parent)
 {
     setWindowTitle(tr("Unlink from cloud"));
     setText(tr("You are going to disconnect this system from the cloud account."));
-    setStandardButtons(QnMessageBox::Ok | QnMessageBox::Cancel);
-    setDefaultButton(QnMessageBox::Ok);
+    setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    setDefaultButton(QDialogButtonBox::Ok);
     //TODO: #dklychkov set help topic
 }
 
@@ -53,7 +53,7 @@ QnUnlinkFromCloudDialog::~QnUnlinkFromCloudDialog()
 
 void QnUnlinkFromCloudDialog::done(int result)
 {
-    if (result == QnMessageBox::Ok)
+    if (result == QDialogButtonBox::Ok)
     {
         Q_D(QnUnlinkFromCloudDialog);
 
@@ -92,7 +92,7 @@ void QnUnlinkFromCloudDialogPrivate::lockUi(bool lock)
 
     const bool enabled = !lock;
 
-    q->button(QnMessageBox::Ok)->setEnabled(enabled);
+    q->button(QDialogButtonBox::Ok)->setEnabled(enabled);
 }
 
 void QnUnlinkFromCloudDialogPrivate::unbindSystem()
@@ -130,7 +130,7 @@ void QnUnlinkFromCloudDialogPrivate::showFailure(const QString &message)
                             helpTopic(q),
                             tr("Error"),
                             tr("Can not unlink the system from the cloud"),
-                            QnMessageBox::Ok,
+                            QDialogButtonBox::Ok,
                             q);
 
     if (!message.isEmpty())

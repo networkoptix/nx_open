@@ -144,7 +144,7 @@ void QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_error(QnCloudStatusWatch
                             helpTopic(q),
                             tr("Error"),
                             message,
-                            QnMessageBox::Ok,
+                            QDialogButtonBox::Ok,
                             q);
 
     unlockUi();

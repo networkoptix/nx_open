@@ -130,8 +130,8 @@ void QnNotificationSoundManagerDialog::at_deleteButton_clicked() {
     if (QnMessageBox::question(this,
                               tr("Confirm File Deletion"),
                               tr("Are you sure you want to delete '%1'?").arg(title),
-                              QnMessageBox::Ok,
-                              QnMessageBox::Cancel) == QnMessageBox::Cancel)
+                              QDialogButtonBox::Ok,
+                              QDialogButtonBox::Cancel) == QDialogButtonBox::Cancel)
         return;
 
     context()->instance<QnAppServerNotificationCache>()->deleteFile(filename);

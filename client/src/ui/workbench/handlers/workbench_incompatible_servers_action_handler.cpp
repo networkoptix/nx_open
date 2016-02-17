@@ -187,10 +187,10 @@ bool QnWorkbenchIncompatibleServersActionHandler::validateStartLicenses(
         "As only 1 START license is allowed per System after your merge you will only have 1 START license remaining.\n"\
         "If you understand this and would like to proceed please click Merge to continue.\n");
 
-    QnMessageBox messageBox(QnMessageBox::Warning, 0, tr("Warning!"), message, QnMessageBox::Cancel);
-    messageBox.addButton(tr("Merge"), QnMessageBox::AcceptRole);
+    QnMessageBox messageBox(QnMessageBox::Warning, 0, tr("Warning!"), message, QDialogButtonBox::Cancel);
+    messageBox.addButton(tr("Merge"), QDialogButtonBox::AcceptRole);
 
-    return messageBox.exec() != QnMessageBox::Cancel;
+    return messageBox.exec() != QDialogButtonBox::Cancel;
 }
 
 bool QnWorkbenchIncompatibleServersActionHandler::serverHasStartLicenses(

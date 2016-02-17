@@ -693,13 +693,13 @@ bool QnSingleCameraSettingsWidget::isValidSecondStream() {
         tr("Invalid Schedule"),
         tr("Second stream is disabled on this camera. Motion + LQ option has no effect. "
         "Press \"Yes\" to change recording type to \"Always\" or \"No\" to re-enable second stream."),
-        QnMessageBox::StandardButtons(QnMessageBox::Yes|QnMessageBox::No | QnMessageBox::Cancel),
-        QnMessageBox::Yes);
+        QDialogButtonBox::StandardButtons(QDialogButtonBox::Yes|QDialogButtonBox::No | QDialogButtonBox::Cancel),
+        QDialogButtonBox::Yes);
     switch (button) {
-    case QnMessageBox::Yes:
+    case QDialogButtonBox::Yes:
         ui->cameraScheduleWidget->setScheduleTasks(filteredTasks);
         return true;
-    case QnMessageBox::No:
+    case QDialogButtonBox::No:
         ui->expertSettingsWidget->setSecondStreamEnabled();
         return true;
     default:
@@ -844,8 +844,8 @@ void QnSingleCameraSettingsWidget::at_resetMotionRegionsButton_clicked() {
     if (QnMessageBox::warning(this,
         tr("Confirm motion regions reset"),
         tr("Are you sure you want to reset motion regions to the defaults?") + L'\n' + tr("This action CANNOT be undone!"),
-        QnMessageBox::StandardButtons(QnMessageBox::Ok | QnMessageBox::Cancel),
-        QnMessageBox::Cancel) == QnMessageBox::Cancel)
+        QDialogButtonBox::StandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel),
+        QDialogButtonBox::Cancel) == QDialogButtonBox::Cancel)
         return;
 
     if (m_motionWidget)

@@ -200,7 +200,7 @@ void QnLinkToCloudDialogPrivate::showSuccess()
                             helpTopic(q),
                             q->windowTitle(),
                             tr("The system is successfully linked to %1").arg(q->ui->accountLineEdit->text()),
-                            QnMessageBox::Ok,
+                            QDialogButtonBox::Ok,
                             q->parentWidget());
 
     messageBox.exec();
@@ -216,7 +216,7 @@ void QnLinkToCloudDialogPrivate::showFailure(const QString &message)
                             helpTopic(q),
                             tr("Error"),
                             tr("Could not link the system to the cloud"),
-                            QnMessageBox::Ok,
+                            QDialogButtonBox::Ok,
                             q);
 
     if (!message.isEmpty())

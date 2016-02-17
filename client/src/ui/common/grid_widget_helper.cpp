@@ -37,14 +37,14 @@ void QnGridWidgetHelper::exportToFile(QTableView *grid, QWidget *parent, const Q
             fileName += selectedExtension;
 
             if (QFile::exists(fileName)) {
-                QnMessageBox::StandardButton button = QnMessageBox::information(
+                QDialogButtonBox::StandardButton button = QnMessageBox::information(
                     parent,
                     tr("Save As"),
                     tr("File '%1' already exists. Overwrite?").arg(QFileInfo(fileName).completeBaseName()),
-                    QnMessageBox::Yes | QnMessageBox::No | QnMessageBox::Cancel
+                    QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel
                 );
 
-                if(button == QnMessageBox::Cancel || button == QnMessageBox::No)
+                if(button == QDialogButtonBox::Cancel || button == QDialogButtonBox::No)
                     return;
             }
         }
@@ -54,7 +54,7 @@ void QnGridWidgetHelper::exportToFile(QTableView *grid, QWidget *parent, const Q
                 parent,
                 tr("Could not overwrite file"),
                 tr("File '%1' is used by another process. Please try another name.").arg(QFileInfo(fileName).completeBaseName()),
-                QnMessageBox::Ok
+                QDialogButtonBox::Ok
             );
             continue;
         }

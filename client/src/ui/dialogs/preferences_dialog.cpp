@@ -70,16 +70,16 @@ bool QnPreferencesDialog::canApplyChanges() {
     if (allPagesCanApplyChanges)
         return true;
 
-    QnMessageBox::StandardButton result = QnMessageBox::information(
+    QDialogButtonBox::StandardButton result = QnMessageBox::information(
         this,
         tr("Information"),
         tr("Some changes will take effect only after application restart. Do you want to restart the application now?"),
-        QnMessageBox::Yes | QnMessageBox::No | QnMessageBox::Cancel,
-        QnMessageBox::Yes);
+        QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel,
+        QDialogButtonBox::Yes);
     switch (result) {
-    case QnMessageBox::Cancel:
+    case QDialogButtonBox::Cancel:
         return false;
-    case QnMessageBox::Yes:
+    case QDialogButtonBox::Yes:
         /* The slot must be connected as QueuedConnection because it must start the new instance
          * after the settings have been saved. Settings saving will be performed just after this (confirm)
          * without returning to the event loop. */
