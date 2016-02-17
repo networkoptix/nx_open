@@ -21,7 +21,7 @@ public:
     void resetMetrics() override;
 
 private:
-    typedef QSharedPointer<SingleMetricsHolder> BaseMultimetricPtr;
+    typedef QSharedPointer<SingleMetricsHolder> SingleMetricsHolderPtr;
 
-    const BaseMultimetricPtr m_metrics;
+    const SingleMetricsHolderPtr m_metrics;
 };

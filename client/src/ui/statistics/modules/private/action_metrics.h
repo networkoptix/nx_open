@@ -62,7 +62,7 @@ protected:
     void addActionMetric(QnAction *action) override;
 
 private:
-    typedef QSharedPointer<SingleMetricsHolder> BaseMultimetricPtr;
+    typedef QSharedPointer<SingleMetricsHolder> SingleMetricsHolderPtr;
 
-    BaseMultimetricPtr m_metrics;
+    SingleMetricsHolderPtr m_metrics;
 };

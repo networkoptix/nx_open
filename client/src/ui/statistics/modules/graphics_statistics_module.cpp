@@ -5,6 +5,7 @@
 
 #include <ui/statistics/modules/private/single_metrics_holder.h>
 #include <ui/statistics/modules/private/avg_tabs_count_metric.h>
+#include <ui/statistics/modules/private/camera_fullscreen_metric.h>
 #include <ui/statistics/modules/private/preview_search_duration_metric.h>
 #include <ui/statistics/modules/private/motion_search_duration_metric.h>
 
@@ -57,6 +58,14 @@ void QnGraphicsStatisticsModule::recreateMetrics()
 
             m_metrics->addMetric(lit("avg_tabs_cnt"), avgTabsCount);
             m_metrics->addMetric(lit("psearch_duration_ms"), psearchDuration);
+        }
+
+        const auto display = m_context->display();
+        if (display)
+        {
+            const auto cameraFullscreenMetric = AbstractSingleMetricPtr(
+                new CameraFullscreenMetric(display));
+            m_metrics->addMetric(lit("camera_fullscreen_duration_ms"), cameraFullscreenMetric);
         }
 
         const auto msearchDuration = AbstractSingleMetricPtr(

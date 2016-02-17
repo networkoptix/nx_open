@@ -27,9 +27,9 @@ private:
     void recreateMetrics();
 
 private:
-    typedef QSharedPointer<SingleMetricsHolder> BaseMultimetricPtr;
+    typedef QSharedPointer<SingleMetricsHolder> SingleMetricsHolderPtr;
     typedef QPointer<QnWorkbenchContext> ContextPtr;
 
     ContextPtr m_context;
-    BaseMultimetricPtr m_metrics;
+    SingleMetricsHolderPtr m_metrics;
 };
