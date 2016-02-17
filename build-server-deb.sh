@@ -1,5 +1,4 @@
 #!/bin/sh
-set -x
 if [ -n "$1" ]; then
     threads="-T $1"
 else
