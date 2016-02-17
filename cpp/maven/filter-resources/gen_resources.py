@@ -160,8 +160,8 @@ if __name__ == '__main__':
         if '${platform}' == 'windows':
             vc_path = r'%s..\..\VC\bin' % os.getenv('${VCVars}')
             os.environ["path"] += os.pathsep + vc_path
-            execute([r'${qt.dir}/bin/qmake', '-spec', '${qt.spec}', '-tp', 'vc', '-o,', r'${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj', output_pro_file)           
-            execute([r'${qt.dir}/bin/qmake', '-spec', '${qt.spec}', r'CONFIG+=${build.configuration}', '-o', r'${project.build.directory}/Makefile', output_pro_file)
+            execute([r'${qt.dir}/bin/qmake', '-spec', '${qt.spec}', '-tp', 'vc', '-o,', r'${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj', output_pro_file])           
+            execute([r'${qt.dir}/bin/qmake', '-spec', '${qt.spec}', r'CONFIG+=${build.configuration}', '-o', r'${project.build.directory}/Makefile', output_pro_file])
         else:
             os.system('export DYLD_FRAMEWORK_PATH=%s && export LD_LIBRARY_PATH=%s && ${qt.dir}/bin/qmake -spec ${qt.spec} CONFIG+=${build.configuration} -o ${project.build.directory}/Makefile.${build.configuration} %s' % (ldpath, ldpath, output_pro_file))
             
