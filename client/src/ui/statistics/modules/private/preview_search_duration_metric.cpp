@@ -7,25 +7,27 @@
 PreviewSearchDurationMetric::PreviewSearchDurationMetric(QnWorkbench *workbench)
     : base_type()
     , TimeDurationMetric()
-    , m_workbench(workbench)
 {
-    if (!m_workbench)
+    if (!workbench)
         return;
 
+    QPointer<QnWorkbench> workbenchGuard(workbench);
     QPointer<PreviewSearchDurationMetric> guard(this);
-    const auto layoutChangedHandler = [this, guard]()
+
+    const auto layoutChangedHandler =
+        [this, guard, workbenchGuard]()
     {
-        if (!guard || !m_workbench)
+        if (!guard || !workbenchGuard)
             return;
 
-        const auto layout = m_workbench->currentLayout();
+        const auto layout = workbenchGuard->currentLayout();
         const bool isPreviewSearchLayout = (layout
             && layout->isSearchLayout());
 
         activateCounter(isPreviewSearchLayout);
     };
 
-    connect(m_workbench, &QnWorkbench::currentLayoutChanged
+    connect(workbench, &QnWorkbench::currentLayoutChanged
         , this, layoutChangedHandler);
 }
 
