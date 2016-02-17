@@ -1,14 +1,16 @@
 
 #pragma once
 
-#include <ui/statistics/modules/private/single_metrics_holder.h>
+
+#include <statistics/base/base_fwd.h>
+#include <statistics/base/statistics_values_provider.h>
 
 class QnAction;
 class QnActionManager;
 class TimeDurationMetric;
 
 class AbstractActionsMetrics : public QObject
-    , public AbstractMultimetric
+    , public QnStatisticsValuesProvider
 {
     typedef QObject base_type;
 
@@ -30,7 +32,7 @@ class ActionsTriggeredCountMetrics : public AbstractActionsMetrics
 public:
     ActionsTriggeredCountMetrics(QnActionManager *actionManager);
 
-    QnMetricsHash metrics() const override;
+    QnStatisticValuesHash values() const override;
 
     void reset() override;
 
@@ -54,7 +56,7 @@ public:
 
     virtual ~ActionCheckedTimeMetric();
 
-    QnMetricsHash metrics() const override;
+    QnStatisticValuesHash values() const override;
 
     void reset() override;
 
@@ -62,7 +64,5 @@ protected:
     void addActionMetric(QnAction *action) override;
 
 private:
-    typedef QSharedPointer<SingleMetricsHolder> SingleMetricsHolderPtr;
-
-    SingleMetricsHolderPtr m_metrics;
+    QnMetricsContainerPtr m_metrics;
 };

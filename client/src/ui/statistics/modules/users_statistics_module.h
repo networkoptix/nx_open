@@ -18,9 +18,9 @@ public:
 
     virtual ~QnUsersStatisticsModule();
 
-    QnMetricsHash metrics() const override;
+    QnStatisticValuesHash values() const override;
 
-    void resetMetrics() override;
+    void reset() override;
 
     void setContext(QnWorkbenchContext *context);
 

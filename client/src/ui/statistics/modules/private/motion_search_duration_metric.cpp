@@ -9,7 +9,7 @@
 
 MotionSearchDurationMetric::MotionSearchDurationMetric(QnWorkbenchContext *context)
     : base_type()
-    , TimeDurationMetric()
+    , QnTimeDurationMetric()
     , m_context(context)
     , m_widgets()
 {
@@ -47,7 +47,7 @@ void MotionSearchDurationMetric::addWidget(QnResourceWidget *resourceWidget)
     connect(mediaWidget, &QnResourceWidget::optionsChanged
         , this, &MotionSearchDurationMetric::updateCounterState);
 
-    if (isFromCurrentLayout(mediaWidget) && !isActive())
+    if (isFromCurrentLayout(mediaWidget) && !isCounterActive())
         updateCounterState();
 }
 
@@ -61,7 +61,7 @@ void MotionSearchDurationMetric::removeWidget(QnResourceWidget *resourceWidget)
     disconnect(mediaWidget, nullptr, this, nullptr);
     m_widgets.erase(mediaWidget);
 
-    if (isFromCurrentLayout(mediaWidget) && isActive())
+    if (isFromCurrentLayout(mediaWidget) && isCounterActive())
         updateCounterState();
 }
 
@@ -74,7 +74,7 @@ void MotionSearchDurationMetric::updateCounterState()
             && (mediaWidget->options().testFlag(QnResourceWidget::DisplayMotion)));
     });
 
-    activateCounter(activate);
+    setCounterActive(activate);
 }
 
 bool MotionSearchDurationMetric::isFromCurrentLayout(const QnMediaResourceWidgetPtr &widget)

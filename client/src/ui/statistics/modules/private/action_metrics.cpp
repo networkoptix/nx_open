@@ -4,7 +4,8 @@
 #include <ui/actions/action.h>
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
-#include <ui/statistics/modules/private/time_duration_metric.h>
+#include <statistics/base/metrics_container.h>
+#include <statistics/base/time_duration_metric.h>
 
 #include <utils/common/model_functions.h>
 
@@ -48,10 +49,10 @@ namespace
 
 namespace
 {
-    class ActionDurationMetric : public TimeDurationMetric
+    class ActionDurationMetric : public QnTimeDurationMetric
         , public QObject
     {
-        typedef TimeDurationMetric base_type;
+        typedef QnTimeDurationMetric base_type;
     public:
         ActionDurationMetric(QnAction *action);
 
@@ -74,11 +75,11 @@ namespace
                 return;
 
             // TODO: remove debug output, id and unnecessary condition
-            if (isActive() == checked)
+            if (isCounterActive() == checked)
                 return;
             qDebug() << "Checked changed: " << aliasByActionId(id) << ":" << checked;
 
-            activateCounter(checked);
+            setCounterActive(checked);
         };
 
         QObject::connect(action, &QAction::toggled, this, processToggled);
@@ -93,7 +94,7 @@ namespace
 
 AbstractActionsMetrics::AbstractActionsMetrics(QnActionManager *actionManager)
     : base_type()
-    , AbstractMultimetric()
+    , QnStatisticsValuesProvider()
 {
     if (!actionManager)
         return;
@@ -162,9 +163,9 @@ void ActionsTriggeredCountMetrics::addActionMetric(QnAction *action)
 }
 
 
-QnMetricsHash ActionsTriggeredCountMetrics::metrics() const
+QnStatisticValuesHash ActionsTriggeredCountMetrics::values() const
 {
-    QnMetricsHash result;
+    QnStatisticValuesHash result;
     for (auto it = m_values.cbegin(); it != m_values.end(); ++it)
     {
         const auto actionId = static_cast<QnActions::IDType>(it.key());
@@ -192,7 +193,7 @@ void ActionsTriggeredCountMetrics::reset()
 
 ActionCheckedTimeMetric::ActionCheckedTimeMetric(QnActionManager *actionManager)
     : base_type(actionManager)
-    , m_metrics(new SingleMetricsHolder())
+    , m_metrics(new QnMetricsContainer())
 {
     if (!actionManager)
         return;
@@ -213,13 +214,13 @@ void ActionCheckedTimeMetric::addActionMetric(QnAction *action)
 
     const auto alias = aliasByActionId(action->id());
     const auto finalAlias = makeAlias(alias, kCheckedTimePostfix);
-    m_metrics->addMetric(finalAlias, AbstractSingleMetricPtr(
+    m_metrics->addMetric(finalAlias, QnAbstractMetricPtr(
         new ActionDurationMetric(action)));
 }
 
-QnMetricsHash ActionCheckedTimeMetric::metrics() const
+QnStatisticValuesHash ActionCheckedTimeMetric::values() const
 {
-    return m_metrics->metrics();
+    return m_metrics->values();
 }
 
 void ActionCheckedTimeMetric::reset()

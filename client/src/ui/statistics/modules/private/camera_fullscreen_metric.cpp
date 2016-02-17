@@ -14,7 +14,7 @@ namespace
 
 CameraFullscreenMetric::CameraFullscreenMetric(QnWorkbenchDisplay *display)
     : base_type()
-    , TimeDurationMetric()
+    , QnTimeDurationMetric()
     , m_currentFullscreenWidget()
 {
     if (!display)
@@ -36,7 +36,7 @@ CameraFullscreenMetric::CameraFullscreenMetric(QnWorkbenchDisplay *display)
         else if (isCurrentFullscreenWidget)
             m_currentFullscreenWidget = nullptr;
 
-        activateCounter(m_currentFullscreenWidget != nullptr);
+        setCounterActive(m_currentFullscreenWidget != nullptr);
     };
 
     const auto addWidgetHandler =
@@ -62,7 +62,7 @@ CameraFullscreenMetric::CameraFullscreenMetric(QnWorkbenchDisplay *display)
             return;
 
         m_currentFullscreenWidget = nullptr;
-        activateCounter(false);
+        setCounterActive(false);
     };
 
     connect(display, &QnWorkbenchDisplay::widgetAdded

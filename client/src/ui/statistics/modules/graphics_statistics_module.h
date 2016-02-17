@@ -1,10 +1,10 @@
 
 #pragma once
 
+#include <statistics/base/base_fwd.h>
 #include <statistics/abstract_statistics_module.h>
 
 class QnWorkbenchContext;
-class SingleMetricsHolder;
 
 class QnGraphicsStatisticsModule : public QnAbstractStatisticsModule
 {
@@ -19,17 +19,16 @@ public:
 
     void setContext(QnWorkbenchContext *context);
 
-    virtual QnMetricsHash metrics() const override;
+    virtual QnStatisticValuesHash values() const override;
 
-    virtual void resetMetrics() override;
+    virtual void reset() override;
 
 private:
     void recreateMetrics();
 
 private:
-    typedef QSharedPointer<SingleMetricsHolder> SingleMetricsHolderPtr;
     typedef QPointer<QnWorkbenchContext> ContextPtr;
 
     ContextPtr m_context;
-    SingleMetricsHolderPtr m_metrics;
+    QnMetricsContainerPtr m_metrics;
 };

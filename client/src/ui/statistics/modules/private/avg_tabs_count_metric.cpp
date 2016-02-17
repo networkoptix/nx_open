@@ -2,11 +2,11 @@
 #include "avg_tabs_count_metric.h"
 
 #include <ui/workbench/workbench.h>
-#include <ui/statistics/modules/private/time_duration_metric.h>
+#include <statistics/base/time_duration_metric.h>
 
 AvgTabsCountMetric::AvgTabsCountMetric(QnWorkbench *workbench)
     : base_type()
-    , AbstractSingleMetric()
+    , QnAbstractMetric()
     , m_workbench(workbench)
     , m_tabsCountDurations()
 {
@@ -20,18 +20,18 @@ AvgTabsCountMetric::AvgTabsCountMetric(QnWorkbench *workbench)
             return;
 
         for (const auto &metric: m_tabsCountDurations)
-            metric->activateCounter(false);
+            metric->setCounterActive(false);
 
         const auto layoutsCount = m_workbench->layouts().size();
         auto it = m_tabsCountDurations.find(layoutsCount);
         if (it == m_tabsCountDurations.end())
         {
             it = m_tabsCountDurations.insert(layoutsCount
-                , TimeDurationMetricPtr(new TimeDurationMetric()));
+                , QnTimeDurationMetricPtr(new QnTimeDurationMetric()));
         }
 
         const auto durationCounter = *it;
-        durationCounter->activateCounter(true);
+        durationCounter->setCounterActive(true);
     };
 
     connect(m_workbench, &QnWorkbench::layoutsChanged
@@ -40,11 +40,6 @@ AvgTabsCountMetric::AvgTabsCountMetric(QnWorkbench *workbench)
 
 AvgTabsCountMetric::~AvgTabsCountMetric()
 {}
-
-bool AvgTabsCountMetric::significant() const
-{
-    return true;
-}
 
 QString AvgTabsCountMetric::value() const
 {

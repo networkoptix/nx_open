@@ -32,16 +32,16 @@ QnUsersStatisticsModule::QnUsersStatisticsModule(QObject *parent)
 QnUsersStatisticsModule::~QnUsersStatisticsModule()
 {}
 
-QnMetricsHash QnUsersStatisticsModule::metrics() const
+QnStatisticValuesHash QnUsersStatisticsModule::values() const
 {
     if (!m_context)
-        return QnMetricsHash();
+        return QnStatisticValuesHash();
 
     const auto accessController = m_context->accessController();
     if (!accessController)
-        return QnMetricsHash();
+        return QnStatisticValuesHash();
 
-    QnMetricsHash result;
+    QnStatisticValuesHash result;
 
     const auto availableUsers = qnResPool->getResources<QnUserResource>();
     Q_ASSERT_X(!availableUsers.isEmpty(), Q_FUNC_INFO, "Can't gather metrics for empty users list");
@@ -80,7 +80,7 @@ QnMetricsHash QnUsersStatisticsModule::metrics() const
     return result;
 }
 
-void QnUsersStatisticsModule::resetMetrics()
+void QnUsersStatisticsModule::reset()
 {
 }
 

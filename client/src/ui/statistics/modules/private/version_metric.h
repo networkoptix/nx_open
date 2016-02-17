@@ -1,11 +1,11 @@
 
 #pragma once
 
-#include <ui/statistics/modules/private/abstract_single_metric.h>
+#include <statistics/base/abstract_metric.h>
 
-class VersionMetric : public AbstractSingleMetric
+class VersionMetric : public QnAbstractMetric
 {
-    typedef AbstractSingleMetric base_type;
+    typedef QnAbstractMetric base_type;
 public:
     VersionMetric();
 

@@ -47,7 +47,7 @@ public:
 private:
     void unregisterModule(const QString &alias);
 
-    QnMetricsHash getMetrics() const;
+    QnStatisticValuesHash getValues() const;
 
 private:
     typedef QPointer<QnAbstractStatisticsModule> ModulePtr;

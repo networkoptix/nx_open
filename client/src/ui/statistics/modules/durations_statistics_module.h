@@ -1,9 +1,8 @@
 
 #pragma once
 
+#include <statistics/base/base_fwd.h>
 #include <statistics/abstract_statistics_module.h>
-
-class SingleMetricsHolder;
 
 class QnDurationStatisticsModule : public QnAbstractStatisticsModule
 {
@@ -16,12 +15,10 @@ public:
 
     virtual ~QnDurationStatisticsModule();
 
-    QnMetricsHash metrics() const override;
+    QnStatisticValuesHash values() const override;
 
-    void resetMetrics() override;
+    void reset() override;
 
 private:
-    typedef QSharedPointer<SingleMetricsHolder> SingleMetricsHolderPtr;
-
-    const SingleMetricsHolderPtr m_metrics;
+    const QnMetricsContainerPtr m_metrics;
 };

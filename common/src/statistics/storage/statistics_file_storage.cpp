@@ -110,7 +110,7 @@ QnStatisticsFileStorage::QnStatisticsFileStorage()
 QnStatisticsFileStorage::~QnStatisticsFileStorage()
 {}
 
-void QnStatisticsFileStorage::storeMetrics(const QnMetricsHash &metrics)
+void QnStatisticsFileStorage::storeMetrics(const QnStatisticValuesHash &metrics)
 {
     if (!m_statisticsDirectory.exists())
         return;
@@ -152,8 +152,8 @@ QnMetricHashesList QnStatisticsFileStorage::getMetricsList(qint64 startTimeUtcMs
             continue;
 
         bool success = false;
-        const QnMetricsHash metrics = QJson::deserialized(
-            json, QnMetricsHash(), &success);
+        const QnStatisticValuesHash metrics = QJson::deserialized(
+            json, QnStatisticValuesHash(), &success);
         if (success)
             result.append(metrics);
     }

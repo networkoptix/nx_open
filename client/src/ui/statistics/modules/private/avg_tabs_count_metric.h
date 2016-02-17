@@ -4,13 +4,13 @@
 #include <QtCore/QObject>
 
 #include <utils/common/connective.h>
-#include <ui/statistics/modules/private/private_fwd.h>
-#include <ui/statistics/modules/private/abstract_single_metric.h>
+#include <statistics/base/base_fwd.h>
+#include <statistics/base/abstract_metric.h>
 
 class QnWorkbench;
 
 class AvgTabsCountMetric : public Connective<QObject>
-    , public AbstractSingleMetric
+    , public QnAbstractMetric
 {
     typedef Connective<QObject> base_type;
 
@@ -19,15 +19,13 @@ public:
 
     virtual ~AvgTabsCountMetric();
 
-    bool significant() const override;
-
     QString value() const override;
 
     void reset() override;
 
 private:
     typedef QPointer<QnWorkbench> QnWorkbenchPtr;
-    typedef QHash<int, TimeDurationMetricPtr> TabsCountDurationsMetrics;
+    typedef QHash<int, QnTimeDurationMetricPtr> TabsCountDurationsMetrics;
 
     const QnWorkbenchPtr m_workbench;
     TabsCountDurationsMetrics m_tabsCountDurations;

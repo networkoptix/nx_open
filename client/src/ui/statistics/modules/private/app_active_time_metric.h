@@ -3,10 +3,10 @@
 
 #include <QtCore/QObject>
 
-#include <ui/statistics/modules/private/time_duration_metric.h>
+#include <statistics/base/time_duration_metric.h>
 
 class AppActiveTimeMetric : public QObject
-    , public TimeDurationMetric
+    , public QnTimeDurationMetric
 {
     typedef QObject base_type;
 

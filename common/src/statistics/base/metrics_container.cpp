@@ -1,19 +1,19 @@
 
-#include "single_metrics_holder.h"
+#include "metrics_container.h"
 
-#include <ui/statistics/modules/private/time_duration_metric.h>
+#include <statistics/base/abstract_metric.h>
 
-SingleMetricsHolder::SingleMetricsHolder()
+QnMetricsContainer::QnMetricsContainer()
     : base_type()
     , m_metrics()
 {}
 
-SingleMetricsHolder::~SingleMetricsHolder()
+QnMetricsContainer::~QnMetricsContainer()
 {}
 
-QnMetricsHash SingleMetricsHolder::metrics() const
+QnStatisticValuesHash QnMetricsContainer::values() const
 {
-    QnMetricsHash result;
+    QnStatisticValuesHash result;
     for (auto it = m_metrics.begin(); it != m_metrics.end(); ++it)
     {
         const auto metric = it.value();
@@ -27,19 +27,19 @@ QnMetricsHash SingleMetricsHolder::metrics() const
     return result;
 }
 
-void SingleMetricsHolder::reset()
+void QnMetricsContainer::reset()
 {
     for(const auto metric: m_metrics)
         metric->reset();
 }
 
-void SingleMetricsHolder::addMetric(const QString &alias
-    , const AbstractSingleMetricPtr &metric)
+void QnMetricsContainer::addMetric(const QString &alias
+    , const QnAbstractMetricPtr &metric)
 {
     m_metrics.insert(alias, metric);
 }
 
-void SingleMetricsHolder::clearMetrics()
+void QnMetricsContainer::clearMetrics()
 {
     m_metrics.clear();
 }

@@ -1,11 +1,11 @@
 
 #pragma once
 
-#include <ui/statistics/modules/private/time_duration_metric.h>
+#include <statistics/base/time_duration_metric.h>
 
-class SessionUptimeMetric : public TimeDurationMetric
+class SessionUptimeMetric : public QnTimeDurationMetric
 {
-    typedef TimeDurationMetric base_type;
+    typedef QnTimeDurationMetric base_type;
 
 public:
     SessionUptimeMetric()

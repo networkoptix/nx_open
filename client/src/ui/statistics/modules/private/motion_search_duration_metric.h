@@ -6,14 +6,14 @@
 #include <QtCore/QObject>
 
 #include <utils/common/connective.h>
-#include <ui/statistics/modules/private/time_duration_metric.h>
+#include <statistics/base/time_duration_metric.h>
 
 class QnResourceWidget;
 class QnMediaResourceWidget;
 class QnWorkbenchContext;
 
 class MotionSearchDurationMetric : public Connective<QObject>
-    , public TimeDurationMetric
+    , public QnTimeDurationMetric
 {
     typedef Connective<QObject> base_type;
 

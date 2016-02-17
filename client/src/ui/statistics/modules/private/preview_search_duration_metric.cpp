@@ -6,7 +6,7 @@
 
 PreviewSearchDurationMetric::PreviewSearchDurationMetric(QnWorkbench *workbench)
     : base_type()
-    , TimeDurationMetric()
+    , QnTimeDurationMetric()
 {
     if (!workbench)
         return;
@@ -24,7 +24,7 @@ PreviewSearchDurationMetric::PreviewSearchDurationMetric(QnWorkbench *workbench)
         const bool isPreviewSearchLayout = (layout
             && layout->isSearchLayout());
 
-        activateCounter(isPreviewSearchLayout);
+        setCounterActive(isPreviewSearchLayout);
     };
 
     connect(workbench, &QnWorkbench::currentLayoutChanged

@@ -81,10 +81,10 @@ namespace
         return std::any_of(filters.cbegin(), filters.cend(), matchFilter);
     }
 
-    QnMetricsHash filteredMetrics(const QnMetricsHash &source
+    QnStatisticValuesHash filteredMetrics(const QnStatisticValuesHash &source
         , const QnStringsSet &filters)
     {
-        QnMetricsHash result;
+        QnStatisticValuesHash result;
         for (auto it = source.cbegin(); it != source.cend(); ++it)
         {
             const auto metricAlias = it.key();
@@ -175,9 +175,9 @@ void QnStatisticsManager::setSettings(QnStatisticsSettingsPtr settings)
         , this, &QnStatisticsManager::sendStatistics);
 }
 
-QnMetricsHash QnStatisticsManager::getMetrics() const
+QnStatisticValuesHash QnStatisticsManager::getValues() const
 {
-    QnMetricsHash result;
+    QnStatisticValuesHash result;
     for (auto it = m_modules.cbegin(); it != m_modules.cend(); ++it)
     {
         const auto moduleAlias = it.key();
@@ -185,12 +185,12 @@ QnMetricsHash QnStatisticsManager::getMetrics() const
         if (!module)
             continue;
 
-        const auto data = module->metrics();
-        for (auto itData = data.cbegin(); itData != data.cend(); ++itData)
+        const auto values = module->values();
+        for (auto itValue = values.cbegin(); itValue != values.cend(); ++itValue)
         {
-            const auto subAlias = itData.key();
+            const auto subAlias = itValue.key();
             const auto fullAlias = lit("%1_%2").arg(moduleAlias, subAlias);
-            result.insert(fullAlias, itData.value());
+            result.insert(fullAlias, itValue.value());
         }
     }
     return result;
@@ -280,7 +280,7 @@ void QnStatisticsManager::saveCurrentStatistics()
     if (m_clientId.isNull())
         return;
 
-    auto metrics = getMetrics();
+    auto metrics = getValues();
 
     if (metrics.empty())
         return;
@@ -301,7 +301,7 @@ void QnStatisticsManager::resetStatistics()
     for(const auto module: m_modules)
     {
         if (module)
-            module->resetMetrics();
+            module->reset();
     }
 }
 
