@@ -820,7 +820,7 @@ void CommunicatingSocket<InterfaceToImplement>::shutdown()
 template<typename InterfaceToImplement>
 void CommunicatingSocket<InterfaceToImplement>::cancelIOAsync(
     aio::EventType eventType,
-    std::function<void()> cancellationDoneHandler)
+    nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler)
 {
     m_aioHelper->cancelIOAsync(eventType, std::move(cancellationDoneHandler));
 }

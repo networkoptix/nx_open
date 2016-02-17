@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <cassert>
 #include <functional>
 
 
@@ -41,8 +42,18 @@ class MoveOnlyFunc
         {
             assert(false);
         }
-        MoveOnlyFuncWrapper(MoveOnlyFuncWrapper&&) = default;
-        MoveOnlyFuncWrapper& operator=(MoveOnlyFuncWrapper&&) = default;
+        MoveOnlyFuncWrapper(MoveOnlyFuncWrapper&& rhs)
+        :
+            m_func(std::move(rhs.m_func))
+        {
+        }
+        MoveOnlyFuncWrapper& operator=(MoveOnlyFuncWrapper&& rhs)
+        {
+            if (&rhs == this)
+                return *this;
+            m_func = std::move(rhs.m_func);
+            return *this;
+        }
 
         template<class... Args>
         auto operator() (Args&&... args)
@@ -60,12 +71,10 @@ public:
         std::function<F>(std::move(func))
     {
     }
-    template<class _Func>
-    MoveOnlyFunc(_Func&& func)
+
+    MoveOnlyFunc(std::nullptr_t val)
     :
-        std::function<F>(
-            MoveOnlyFuncWrapper<typename std::remove_reference<_Func>::type>(
-                std::forward<_Func>(func)))
+        std::function<F>(val)
     {
     }
 
@@ -73,6 +82,21 @@ public:
     MoveOnlyFunc& operator=(MoveOnlyFunc&&) = default;
     MoveOnlyFunc(const MoveOnlyFunc&) = delete;
     MoveOnlyFunc& operator=(const MoveOnlyFunc&) = delete;
+
+    template<class _Func>
+    MoveOnlyFunc(_Func func)
+    :
+        std::function<F>(MoveOnlyFuncWrapper<_Func>(std::move(func)))
+    {
+    }
+
+    template<class _Func>
+    const MoveOnlyFunc& operator=(_Func func)
+    {
+        auto x = MoveOnlyFuncWrapper<_Func>(std::move(func));
+        std::function<F>::operator=(std::move(x));
+        return *this;
+    }
 
     using std::function<F>::operator();
     using std::function<F>::operator bool;

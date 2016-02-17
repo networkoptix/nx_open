@@ -71,7 +71,7 @@ public:
 
     virtual void cancelIOAsync(
         nx::network::aio::EventType eventType,
-        std::function<void()> cancellationDoneHandler) override;
+        nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler) override;
     virtual void cancelIOSync(nx::network::aio::EventType eventType) override;
 
 protected:
@@ -131,7 +131,7 @@ public:
 
     virtual void cancelIOAsync(
         nx::network::aio::EventType eventType,
-        std::function<void()> cancellationDoneHandler) override;
+        nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler) override;
 
 protected:
     //!Implementation of AbstractCommunicatingSocket::connectAsync

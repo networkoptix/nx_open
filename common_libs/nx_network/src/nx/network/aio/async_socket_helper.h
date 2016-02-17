@@ -279,15 +279,16 @@ public:
             timeoutMs );
     }
 
-    void cancelIOAsync( const aio::EventType eventType,
-                        std::function<void()> handler )
+    void cancelIOAsync(
+        const aio::EventType eventType,
+        nx::utils::MoveOnlyFunc<void()> handler )
     {
-        auto cancelImpl = [=]()
+        auto cancelImpl = [this, eventType, handler = move(handler)]() mutable
         {
             // cancelIOSync will be instant from socket's IO thread
             nx::network::SocketGlobals::aioService().dispatch(
                 this->m_socket,
-                [=]()
+                [this, eventType, handler = move(handler)]() mutable
                 {
                     cancelAsyncIOWhileInAioThread(eventType);
                     handler();
@@ -295,7 +296,9 @@ public:
         };
 
         if (eventType == aio::etWrite || eventType == aio::etNone)
-            nx::network::SocketGlobals::addressResolver().cancel(this, std::move(cancelImpl));
+            nx::network::SocketGlobals::addressResolver().cancel(
+                this,
+                std::move(cancelImpl));
         else
             cancelImpl();
     }
@@ -738,14 +741,17 @@ public:
         return nx::network::SocketGlobals::aioService().watchSocketNonSafe(&lk, m_sock, aio::etRead, this);
     }
 
-    void cancelIOAsync(std::function< void() > handler)
+    void cancelIOAsync(nx::utils::MoveOnlyFunc< void() > handler)
     {
-        nx::network::SocketGlobals::aioService().dispatch(this->m_sock, [=]()
-        {
-            nx::network::SocketGlobals::aioService().removeFromWatch(m_sock, aio::etRead, true);
-            ++m_acceptAsyncCallCount;
-            handler();
-        } );
+        nx::network::SocketGlobals::aioService().dispatch(
+            this->m_sock,
+            [this, handler = move(handler)]() mutable
+            {
+                nx::network::SocketGlobals::aioService().removeFromWatch(
+                    m_sock, aio::etRead, true);
+                ++m_acceptAsyncCallCount;
+                handler();
+            });
     }
 
     void cancelIOSync()

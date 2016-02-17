@@ -116,7 +116,7 @@ public:
     //!Implementation of AbstractCommunicatingSocket::cancelAsyncIO
     virtual void cancelIOAsync(
         nx::network::aio::EventType eventType,
-        std::function<void()> cancellationDoneHandler) override;
+        nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler) override;
     virtual void cancelIOSync(nx::network::aio::EventType eventType) override;
 
     // AbstractStreamSocket ------ interface

@@ -54,7 +54,7 @@ public:
 
     virtual void cancelIOAsync(
         aio::EventType eventType,
-        std::function<void()> handler) override;
+        nx::utils::MoveOnlyFunc<void()> handler) override;
     virtual void cancelIOSync(aio::EventType eventType) override;
 
     //!Implementation of AbstractSocket::*

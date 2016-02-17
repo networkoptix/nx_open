@@ -47,7 +47,9 @@ public:
     void registerTimer(
         std::chrono::milliseconds timeoutMs,
         nx::utils::MoveOnlyFunc<void()> handler) override;
-    void cancelIOAsync(aio::EventType eventType, std::function<void()> handler) override;
+    void cancelIOAsync(
+        aio::EventType eventType,
+        nx::utils::MoveOnlyFunc<void()> handler) override;
     void cancelIOSync(aio::EventType eventType) override;
 
     //!Implementation of AbstractStreamSocket::*

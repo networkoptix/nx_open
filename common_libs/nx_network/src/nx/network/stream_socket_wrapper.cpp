@@ -123,7 +123,7 @@ void StreamSocketWrapper::registerTimer(
 { m_socket->registerTimer(timeoutMs, std::move(handler)); }
 
 void StreamSocketWrapper::cancelIOAsync(
-    aio::EventType eventType, std::function<void()> handler)
+    aio::EventType eventType, nx::utils::MoveOnlyFunc<void()> handler)
 { m_socket->cancelIOAsync(eventType, std::move(handler)); }
 
 void StreamSocketWrapper::cancelIOSync(aio::EventType eventType)

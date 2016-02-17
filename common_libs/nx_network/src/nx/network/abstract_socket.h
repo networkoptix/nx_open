@@ -305,7 +305,7 @@ public:
     */
     virtual void cancelIOAsync(
         nx::network::aio::EventType eventType,
-        std::function< void() > handler) = 0;
+        nx::utils::MoveOnlyFunc< void() > handler) = 0;
 
     //!Cancels async operation and blocks until cancellation is stopped
     /*!

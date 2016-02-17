@@ -236,9 +236,11 @@ public:
     }
     virtual void cancelIOAsync(
         nx::network::aio::EventType eventType,
-        std::function<void()> cancellationDoneHandler) override
+        nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler) override
     {
-        return this->m_implDelegate.cancelIOAsync(eventType, std::move(cancellationDoneHandler));
+        return this->m_implDelegate.cancelIOAsync(
+            eventType,
+            std::move(cancellationDoneHandler));
     }
     virtual void cancelIOSync(nx::network::aio::EventType eventType) override
     {

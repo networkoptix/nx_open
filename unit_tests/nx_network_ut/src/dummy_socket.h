@@ -44,7 +44,7 @@ public:
     virtual SocketAddress getForeignAddress() const override;
     virtual void cancelIOAsync(
         aio::EventType eventType,
-        std::function<void()> cancellationDoneHandler) override;
+        nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler) override;
     virtual void cancelIOSync(aio::EventType eventType) override;
 
     virtual bool reopen() override;

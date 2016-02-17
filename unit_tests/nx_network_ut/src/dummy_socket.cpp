@@ -121,7 +121,7 @@ SocketAddress DummySocket::getForeignAddress() const
 
 void DummySocket::cancelIOAsync(
     aio::EventType /*eventType*/,
-    std::function< void() > cancellationDoneHandler)
+    nx::utils::MoveOnlyFunc< void() > cancellationDoneHandler)
 {
     cancellationDoneHandler();
 }

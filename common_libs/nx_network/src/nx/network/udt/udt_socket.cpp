@@ -751,7 +751,7 @@ bool UdtStreamSocket::reopen() {
 
 void UdtStreamSocket::cancelIOAsync(
     aio::EventType eventType,
-    std::function<void()> cancellationDoneHandler)
+    nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler)
 {
     return m_aioHelper->cancelIOAsync(
         eventType,

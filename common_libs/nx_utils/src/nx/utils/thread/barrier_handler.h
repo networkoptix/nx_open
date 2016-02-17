@@ -5,6 +5,8 @@
 #include <memory>
 
 #include "mutex.h"
+#include "../move_only_func.h"
+
 
 namespace nx {
 
@@ -13,7 +15,7 @@ namespace nx {
 class NX_UTILS_API BarrierHandler
 {
 public:
-    BarrierHandler( std::function< void() > handler );
+    BarrierHandler(nx::utils::MoveOnlyFunc< void() > handler );
     std::function< void() > fork();
 
 private:
