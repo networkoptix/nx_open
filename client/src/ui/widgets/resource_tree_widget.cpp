@@ -20,7 +20,6 @@
 #include <ui/models/resource_search_proxy_model.h>
 
 #include <ui/style/noptix_style.h>
-#include <ui/style/proxy_style.h>
 #include <ui/style/skin.h>
 
 #include <ui/workbench/workbench.h>
