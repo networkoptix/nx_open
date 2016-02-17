@@ -22,8 +22,7 @@ class NX_NETWORK_API CloudServerSocket
 {
 public:
     typedef std::function<std::unique_ptr<AbstractTunnelAcceptor>(
-            const String&  /*selfPeerId*/,
-            hpm::api::ConnectionRequestedEvent& /*event*/)> AcceptorMaker;
+            hpm::api::ConnectionRequestedEvent&)> AcceptorMaker;
 
     static const std::vector<AcceptorMaker> kDefaultAcceptorMakers;
 

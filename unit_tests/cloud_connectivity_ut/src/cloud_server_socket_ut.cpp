@@ -78,10 +78,9 @@ struct FakeTcpTunnelAcceptor
     public AbstractTunnelAcceptor
 {
     FakeTcpTunnelAcceptor(
-        String remotePeerId, boost::optional<SocketAddress> address,
+        boost::optional<SocketAddress> address,
         size_t socketsPerConnection = 1000)
     :
-        m_remotePeerId(std::move(remotePeerId)),
         m_address(std::move(address)),
         m_socketsPerConnection(socketsPerConnection),
         m_ioThreadSocket(new TCPSocket)
@@ -108,7 +107,6 @@ struct FakeTcpTunnelAcceptor
         m_ioThreadSocket->pleaseStop(std::move(handler));
     }
 
-    String m_remotePeerId;
     boost::optional<SocketAddress> m_address;
     size_t m_socketsPerConnection;
     std::unique_ptr<AbstractCommunicatingSocket> m_ioThreadSocket;
@@ -133,11 +131,11 @@ struct CloudServerSocketTcpTester
 
             // IP based acceptor
             startAcceptor(std::make_unique<FakeTcpTunnelAcceptor>(
-                "somePeerId", SocketAddress(addr.address, addr.port + i)));
+                SocketAddress(addr.address, addr.port + i)));
 
             // also start useless acceptors
             startAcceptor(std::make_unique<FakeTcpTunnelAcceptor>(
-                "somePeerId", boost::none));
+                boost::none));
         }
 
         return true;
@@ -192,13 +190,14 @@ TEST(CloudServerSocketBaseTcpTest, OpenTunnelOnIndication)
     auto stunAsyncClient = std::make_shared<network::test::StunAsyncClientMock>();
     EXPECT_CALL(*stunAsyncClient, setIndicationHandler(
         stun::cc::indications::connectionRequested, ::testing::_)).Times(1);
+    EXPECT_CALL(*stunAsyncClient, remoteAddress()).Times(::testing::AnyNumber());
 
     std::vector<CloudServerSocket::AcceptorMaker> acceptorMakers;
     acceptorMakers.push_back(
-        [](const String&, hpm::api::ConnectionRequestedEvent& event)
+        [](hpm::api::ConnectionRequestedEvent& event)
         {
             return std::make_unique<FakeTcpTunnelAcceptor>(
-                event.originatingPeerID, network::test::kServerAddress);
+                network::test::kServerAddress);
         });
 
     auto server = std::make_unique<CloudServerSocket>(
@@ -248,16 +247,17 @@ protected:
         m_stunClient = std::make_shared<network::test::StunAsyncClientMock>();
         EXPECT_CALL(*m_stunClient, setIndicationHandler(
             stun::cc::indications::connectionRequested, ::testing::_)).Times(1);
+        EXPECT_CALL(*m_stunClient, remoteAddress()).Times(::testing::AnyNumber());
 
         std::vector<CloudServerSocket::AcceptorMaker> acceptorMakers;
         acceptorMakers.push_back(
-            [this](const String&, hpm::api::ConnectionRequestedEvent& event)
+            [this](hpm::api::ConnectionRequestedEvent& event)
             {
                 const auto it = m_peerAddresses.find(event.originatingPeerID);
                 assert(it != m_peerAddresses.end());
 
                 return std::make_unique<FakeTcpTunnelAcceptor>(
-                    it->first, it->second, kClientCount);
+                    it->second, kClientCount);
             });
 
         m_server = std::make_unique<CloudServerSocket>(

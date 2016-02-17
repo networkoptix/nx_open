@@ -12,16 +12,13 @@ static const std::vector<CloudServerSocket::AcceptorMaker> defaultAcceptorMakers
 {
     std::vector<CloudServerSocket::AcceptorMaker> makers;
 
-    makers.push_back([](
-        const String& selfPeerId, hpm::api::ConnectionRequestedEvent& event)
+    makers.push_back([](hpm::api::ConnectionRequestedEvent& event)
     {
         using namespace hpm::api::ConnectionMethod;
         if (event.connectionMethods & udpHolePunching)
         {
             event.connectionMethods ^= udpHolePunching; //< used
             auto acceptor = std::make_unique<UdpHolePunchingTunnelAcceptor>(
-                std::move(event.connectSessionId),
-                std::move(selfPeerId), std::move(event.originatingPeerID),
                 std::move(event.udpEndpointList));
 
             return std::unique_ptr<AbstractTunnelAcceptor>(std::move(acceptor));
@@ -111,10 +108,17 @@ bool CloudServerSocket::listen(int queueLen)
     m_mediatorConnection->setOnConnectionRequestedHandler([this](
         hpm::api::ConnectionRequestedEvent event)
     {
-        const String selfPeerId = m_mediatorConnection->selfPeerId();
         for (const auto& maker: m_acceptorMakers)
-            if (auto acceptor = maker(selfPeerId, event))
+        {
+            if (auto acceptor = maker(event))
+            {
+                acceptor->setConnectionInfo(
+                    event.connectSessionId, event.originatingPeerID);
+
+                acceptor->setMediatorConnection(m_mediatorConnection);
                 startAcceptor(std::move(acceptor));
+            }
+        }
 
         if (event.connectionMethods)
             NX_LOG(lm("Unsupported ConnectionMethods: %1")

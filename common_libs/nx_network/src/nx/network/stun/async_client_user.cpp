@@ -14,6 +14,11 @@ SocketAddress AsyncClientUser::localAddress() const
     return m_client->localAddress();
 }
 
+SocketAddress AsyncClientUser::remoteAddress() const
+{
+    return m_client->remoteAddress();
+}
+
 AsyncClientUser::AsyncClientUser(std::shared_ptr<AbstractAsyncClient> client)
     : m_operationsInProgress(0)
     , m_client(std::move(client))
