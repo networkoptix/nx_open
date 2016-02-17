@@ -67,6 +67,7 @@ protected:
     const std::vector<AcceptorMaker> m_acceptorMakers;
 
     QnMutex m_mutex;
+    bool m_terminated;
     std::vector<std::unique_ptr<AbstractTunnelAcceptor>> m_acceptors;
     std::unique_ptr<IncomingTunnelPool> m_tunnelPool;
     mutable SystemError::ErrorCode m_lastError;

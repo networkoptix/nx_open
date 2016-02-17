@@ -11,6 +11,7 @@ IncomingTunnelPool::IncomingTunnelPool(
     aio::AbstractAioThread* ioThread, size_t acceptLimit)
 :
     m_acceptLimit(acceptLimit),
+    m_terminated(false),
     m_ioThreadSocket(new TCPSocket)
 {
     m_ioThreadSocket->bindToAioThread(ioThread);
@@ -65,13 +66,17 @@ void IncomingTunnelPool::getNextSocketAsync(
 
 void IncomingTunnelPool::pleaseStop(std::function<void()> handler)
 {
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_terminated = true;
+    }
+
     BarrierHandler barrier(
         [this, handler]()
         {
             m_ioThreadSocket->pleaseStop(std::move(handler));
         });
 
-    QnMutexLocker lock(&m_mutex);
     for (const auto& tunnel : m_pool)
         tunnel->pleaseStop(barrier.fork());
 }
@@ -92,7 +97,9 @@ void IncomingTunnelPool::acceptTunnel(
                     .arg(connection).arg(SystemError::toString(code)),
                     cl_logDEBUG1);
 
-                m_pool.erase(connection);
+                if (!m_terminated)
+                    m_pool.erase(connection);
+
                 return;
             }
 

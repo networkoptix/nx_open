@@ -39,6 +39,7 @@ CloudServerSocket::CloudServerSocket(
         std::vector<AcceptorMaker> acceptorMakers)
     : m_mediatorConnection(mediatorConnection)
     , m_acceptorMakers(acceptorMakers)
+    , m_terminated(false)
     , m_ioThreadSocket(new TCPSocket)
 {
     // TODO: #mu default values for m_socketAttributes shall match default
@@ -105,25 +106,25 @@ AbstractSocket::SOCKET_HANDLE CloudServerSocket::handle() const
 bool CloudServerSocket::listen(int queueLen)
 {
     initTunnelPool(queueLen);
-    m_mediatorConnection->setOnConnectionRequestedHandler([this](
-        hpm::api::ConnectionRequestedEvent event)
-    {
-        for (const auto& maker: m_acceptorMakers)
+    m_mediatorConnection->setOnConnectionRequestedHandler(
+        [this](hpm::api::ConnectionRequestedEvent event)
         {
-            if (auto acceptor = maker(event))
+            for (const auto& maker: m_acceptorMakers)
             {
-                acceptor->setConnectionInfo(
-                    event.connectSessionId, event.originatingPeerID);
+                if (auto acceptor = maker(event))
+                {
+                    acceptor->setConnectionInfo(
+                        event.connectSessionId, event.originatingPeerID);
 
-                acceptor->setMediatorConnection(m_mediatorConnection);
-                startAcceptor(std::move(acceptor));
+                    acceptor->setMediatorConnection(m_mediatorConnection);
+                    startAcceptor(std::move(acceptor));
+                }
             }
-        }
 
-        if (event.connectionMethods)
-            NX_LOG(lm("Unsupported ConnectionMethods: %1")
-                .arg(event.connectionMethods), cl_logWARNING);
-    });
+            if (event.connectionMethods)
+                NX_LOG(lm("Unsupported ConnectionMethods: %1")
+                    .arg(event.connectionMethods), cl_logWARNING);
+        });
 
     return true;
 }
@@ -153,23 +154,30 @@ AbstractStreamSocket* CloudServerSocket::accept()
 
 void CloudServerSocket::pleaseStop(std::function<void()> handler)
 {
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_terminated = true;
+    }
+
     auto stop = [this, handler]()
     {
         if (m_mediatorConnection)
             m_mediatorConnection.reset();
 
-        BarrierHandler barrier([this, handler]()
-        {
-            // 3rd - Stop Tunnel Pool and IO thread
-            BarrierHandler barrier(std::move(handler));
-            m_tunnelPool->pleaseStop(barrier.fork());
-            m_ioThreadSocket->pleaseStop(barrier.fork());
+        BarrierHandler barrier(
+            [this, handler]()
+            {
+                // 3rd - Stop Tunnel Pool and IO thread
+                BarrierHandler barrier(std::move(handler));
+                m_ioThreadSocket->pleaseStop(barrier.fork());
+                if (m_tunnelPool)
+                    m_tunnelPool->pleaseStop(barrier.fork());
 
-        });
+            });
 
         // 2nd - Stop Acceptors
-        for (auto& connector : m_acceptors)
-            connector->pleaseStop(barrier.fork());
+        for (auto& acceptor : m_acceptors)
+            acceptor->pleaseStop(barrier.fork());
     };
 
     // 1st - Stop Indications
@@ -210,22 +218,23 @@ void CloudServerSocket::acceptAsync(
             NX_LOGX(lm("accepted socket %1").arg(socket), cl_logDEBUG2);
 
             m_acceptedSocket = std::move(socket);
-            m_ioThreadSocket->post([this, handler]()
-            {
-                auto socket = std::move(m_acceptedSocket);
-                m_acceptedSocket = nullptr;
+            m_ioThreadSocket->post(
+                [this, handler]()
+                {
+                    auto socket = std::move(m_acceptedSocket);
+                    m_acceptedSocket = nullptr;
 
-                if (socket)
-                {
-                    NX_LOGX(lm("return socket %1").arg(socket), cl_logDEBUG2);
-                    handler(SystemError::noError, socket.release());
-                }
-                else
-                {
-                    NX_LOGX(lm("accept timed out"), cl_logDEBUG2);
-                    handler(SystemError::timedOut, nullptr);
-                }
-            });
+                    if (socket)
+                    {
+                        NX_LOGX(lm("return socket %1").arg(socket), cl_logDEBUG2);
+                        handler(SystemError::noError, socket.release());
+                    }
+                    else
+                    {
+                        NX_LOGX(lm("accept timed out"), cl_logDEBUG2);
+                        handler(SystemError::timedOut, nullptr);
+                    }
+                });
         },
         m_socketAttributes.recvTimeout);
 }
@@ -254,18 +263,24 @@ void CloudServerSocket::startAcceptor(
                     .arg(acceptorPtr).arg(connection)
                     .arg(SystemError::toString(code)), cl_logDEBUG2);
 
+            {
+                QnMutexLocker lock(&m_mutex);
+                if (m_terminated)
+                    return; // will wait for pleaseStop handler
+
+                const auto it = std::find_if(
+                    m_acceptors.begin(), m_acceptors.end(),
+                    [&](const std::unique_ptr<AbstractTunnelAcceptor>& a)
+                    { return a.get() == acceptorPtr; });
+
+                Q_ASSERT_X(it != m_acceptors.end(), Q_FUNC_INFO,
+                           "Is acceptor already dead?");
+
+                m_acceptors.erase(it);
+            }
+
             if (code == SystemError::noError)
                 m_tunnelPool->addNewTunnel(std::move(connection));
-
-            QnMutexLocker lock(&m_mutex);
-            const auto it = std::find_if(
-                m_acceptors.begin(), m_acceptors.end(),
-                [&](const std::unique_ptr<AbstractTunnelAcceptor>& a)
-                { return a.get() == acceptorPtr; });
-
-            Q_ASSERT_X(it != m_acceptors.end(), Q_FUNC_INFO,
-                       "Is acceptor already dead?");
-            m_acceptors.erase(it);
         });
 }
 

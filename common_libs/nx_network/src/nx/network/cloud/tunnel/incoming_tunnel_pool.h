@@ -40,6 +40,7 @@ private:
     const size_t m_acceptLimit;
     mutable QnMutex m_mutex;
 
+    bool m_terminated;
     std::set<std::shared_ptr<AbstractIncomingTunnelConnection>> m_pool;
     std::unique_ptr<AbstractCommunicatingSocket> m_ioThreadSocket;
     std::function<void(std::unique_ptr<AbstractStreamSocket>)> m_acceptHandler;
