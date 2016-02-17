@@ -21,7 +21,7 @@ CameraFullscreenMetric::CameraFullscreenMetric(QnWorkbenchDisplay *display)
         return;
 
     const QPointer<CameraFullscreenMetric> guard(this);
-    const auto widgetOptionsChangedHandler = [this](const WidgetPointer &widget)
+    const auto widgetOptionsChangedHandler = [this, guard](const WidgetPointer &widget)
     {
         if (!guard)
             return;

@@ -8,6 +8,7 @@
 #include <ui/statistics/modules/private/camera_fullscreen_metric.h>
 #include <ui/statistics/modules/private/preview_search_duration_metric.h>
 #include <ui/statistics/modules/private/motion_search_duration_metric.h>
+#include <ui/statistics/modules/private/version_metric.h>
 
 QnGraphicsStatisticsModule::QnGraphicsStatisticsModule(QObject *parent)
     : base_type(parent)
@@ -72,5 +73,9 @@ void QnGraphicsStatisticsModule::recreateMetrics()
             new MotionSearchDurationMetric(m_context));
         m_metrics->addMetric(lit("msearch_duration_ms"), msearchDuration);
     }
+
+    const auto versionMetric = AbstractSingleMetricPtr(
+        new VersionMetric());
+    m_metrics->addMetric(lit("version"), versionMetric);
 }
 
