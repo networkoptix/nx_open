@@ -43,6 +43,10 @@ void QnGraphicsStatisticsModule::recreateMetrics()
 {
     m_metrics.reset(new SingleMetricsHolder());
 
-  //  const auto avgTabsMetric = AbstractSingleMetricPtr(new AvgTabsCountMetric(m_context));
+    if (m_context)
+    {
+        m_metrics->addMetric(lit("avg_tabs_cnt"), AbstractSingleMetricPtr(
+            new AvgTabsCountMetric(m_context->workbench())));
+    }
 }
 

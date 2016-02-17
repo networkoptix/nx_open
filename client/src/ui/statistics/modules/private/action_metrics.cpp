@@ -63,6 +63,9 @@ namespace
         : base_type()
         , QObject()
     {
+        if (!action)
+            return;
+
         const auto id = action->id();
         const auto guard = makePointer(this);
         const auto processToggled = [this, guard, id](bool checked)

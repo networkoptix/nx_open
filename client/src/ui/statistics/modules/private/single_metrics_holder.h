@@ -1,10 +1,8 @@
 
 #pragma once
 
+#include <ui/statistics/modules/private/private_fwd.h>
 #include <ui/statistics/modules/private/abstract_multimetric.h>
-
-class AbstractSingleMetric;
-typedef QSharedPointer<AbstractSingleMetric> AbstractSingleMetricPtr;
 
 class SingleMetricsHolder : public AbstractMultimetric
 {

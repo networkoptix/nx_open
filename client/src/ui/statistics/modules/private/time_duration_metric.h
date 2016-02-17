@@ -25,7 +25,6 @@ public:
 
     bool significant() const override;
 
-private:
     qint64 duration() const;
 
 private:
