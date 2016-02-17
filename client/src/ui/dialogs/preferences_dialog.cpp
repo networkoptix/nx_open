@@ -26,8 +26,6 @@ QnPreferencesDialog::QnPreferencesDialog(QWidget *parent):
 {
     ui->setupUi(this);
 
-    setAccentStyle(ui->buttonBox->button(QDialogButtonBox::Ok));
-
     addPage(GeneralPage, new QnGeneralPreferencesWidget(this), tr("General"));
     addPage(LookAndFeelPage, new QnLookAndFeelPreferencesWidget(this), tr("Look and Feel"));
 

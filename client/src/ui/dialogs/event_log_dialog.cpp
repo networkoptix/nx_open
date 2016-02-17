@@ -59,7 +59,6 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
     ui->setupUi(this);
 
     setWarningStyle(ui->warningLabel);
-    setAccentStyle(ui->buttonBox->button(QDialogButtonBox::Ok));
 
     setHelpTopic(this, Qn::MainWindow_Notifications_EventLog_Help);
 

@@ -31,7 +31,6 @@
 #include <ui/help/help_topics.h>
 #include <ui/delegates/business_rule_item_delegate.h>
 #include <ui/style/resource_icon_cache.h>
-#include <ui/style/custom_style.h>
 
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -160,8 +159,6 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
 {
     ui->setupUi(this);
     retranslateUi();
-
-    setAccentStyle(ui->buttonBox->button(QDialogButtonBox::Ok));
 
     m_resetDefaultsButton = new QPushButton(tr("Reset Default Rules"));
     m_resetDefaultsButton->setEnabled(false);

@@ -185,12 +185,20 @@ void QnNxStyle::drawPrimitive(
     case PE_PanelButtonTool:
     case PE_PanelButtonCommand:
         {
-            painter->save();
-
             const bool pressed = option->state & State_Sunken;
             const bool hovered = option->state & State_MouseOver;
 
-            QnPaletteColor mainColor = findColor(option->palette.color(QPalette::Button));
+            QnPaletteColor mainColor = findColor(option->palette.button().color());
+
+            if (option->state.testFlag(State_Enabled))
+            {
+                if (const QStyleOptionButton *button =
+                       qstyleoption_cast<const QStyleOptionButton *>(option))
+                {
+                    if (button->features.testFlag(QStyleOptionButton::DefaultButton))
+                        mainColor = this->mainColor(Colors::kBlue);
+                }
+            }
 
             QColor buttonColor = mainColor;
             QColor shadowColor = mainColor.darker(2);
@@ -207,18 +215,15 @@ void QnNxStyle::drawPrimitive(
                 shadowColor = mainColor.darker(1);
             }
 
-            painter->setPen(Qt::NoPen);
-            painter->setRenderHint(QPainter::Antialiasing);
-
             QRect rect = option->rect.adjusted(0, 0, 0, -1);
 
-            painter->setBrush(shadowColor);
-            painter->drawRoundedRect(rect.adjusted(0, shadowShift, 0, shadowShift), 2, 2);
+            QnScopedPainterPenRollback penRollback(painter, Qt::NoPen);
+            QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
+            QnScopedPainterBrushRollback brushRollback(painter, shadowColor);
 
+            painter->drawRoundedRect(rect.adjusted(0, shadowShift, 0, shadowShift), 2, 2);
             painter->setBrush(buttonColor);
             painter->drawRoundedRect(rect.adjusted(0, qMax(0, -shadowShift), 0, 0), 2, 2);
-
-            painter->restore();
         }
         return;
 

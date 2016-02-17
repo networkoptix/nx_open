@@ -24,7 +24,6 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/globals.h>
-#include <ui/style/custom_style.h>
 #include <ui/widgets/framed_label.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
@@ -142,8 +141,6 @@ QnLayoutSettingsDialog::QnLayoutSettingsDialog(QWidget *parent) :
     m_isUpdating(false)
 {
     ui->setupUi(this);
-
-    setAccentStyle(ui->buttonBox->button(QDialogButtonBox::Ok));
 
     setHelpTopic(ui->lockedCheckBox,        Qn::LayoutSettings_Locking_Help);
     setHelpTopic(ui->backgroundGroupBox,    Qn::LayoutSettings_EMapping_Help);

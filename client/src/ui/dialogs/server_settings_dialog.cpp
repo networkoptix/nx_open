@@ -8,7 +8,6 @@
 #include <ui/help/help_topics.h>
 #include <ui/widgets/properties/server_settings_widget.h>
 #include <ui/widgets/properties/recording_statistics_widget.h>
-#include <ui/style/custom_style.h>
 
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
@@ -27,8 +26,6 @@ QnServerSettingsDialog::QnServerSettingsDialog(QWidget *parent)
     , m_webPageButton(new QPushButton(tr("Open Web Page..."), this))
 {
     ui->setupUi(this);
-
-    setAccentStyle(ui->buttonBox->button(QDialogButtonBox::Ok));
 
     addPage(SettingsPage, m_generalPage, tr("General"));
     addPage(StorageManagmentPage, m_storagesPage, tr("Storage Management"));

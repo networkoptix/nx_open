@@ -25,16 +25,12 @@
 #include <ui/workbench/workbench_state_manager.h>
 #include <ui/workbench/watchers/workbench_safemode_watcher.h>
 
-#include <ui/style/custom_style.h>
-
 QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent) 
     : base_type(parent)
     , ui(new Ui::QnSystemAdministrationDialog)
 {
     ui->setupUi(this);
     setHelpTopic(this, Qn::Administration_Help);
-
-    setAccentStyle(ui->buttonBox->button(QDialogButtonBox::Ok));
 
     auto updatesWidget = new QnServerUpdatesWidget(this);
     auto generalWidget = new QnGeneralSystemAdministrationWidget(this);

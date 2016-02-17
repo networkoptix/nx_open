@@ -29,8 +29,6 @@ QnMergeSystemsDialog::QnMergeSystemsDialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    setAccentStyle(ui->buttonBox->button(QDialogButtonBox::Ok));
-
     QStringList successMessage;
     successMessage
         << tr("Success!")

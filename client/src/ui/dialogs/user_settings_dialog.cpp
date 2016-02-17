@@ -47,8 +47,6 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent):
 {
     ui->setupUi(this);
 
-    setAccentStyle(ui->buttonBox->button(QDialogButtonBox::Ok));
-
     for(const QnUserResourcePtr &user: qnResPool->getResources<QnUserResource>())
         m_userByLogin[user->getName().toLower()] = user;
 
