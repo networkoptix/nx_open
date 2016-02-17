@@ -423,7 +423,7 @@
                 <python.dir>${libdir}/${arch}/python/scripts</python.dir>
                 <python.executable>python.exe</python.executable>
                 <python.virtualenv>virtualenv.exe</python.virtualenv>
-                <buildenv.script>get_buildenv.bat</buildenv.script>
+                <buildenv.script>get_buildenv_2.6.bat</buildenv.script>
                 <platform>windows</platform>
                 <box>windows</box>
                 <compiler>msvc2015u1</compiler>

@@ -150,7 +150,6 @@ if __name__ == '__main__':
         gentext(f, '${project.build.sourceDirectory}', ['.h'], 'HEADERS += ')
         gentext(f, '${project.build.sourceDirectory}', ['.ui'], 'FORMS += ')
         gen_includepath(f, '${libdir}/include')
-        gen_includepath(f, '${environment.dir}/include')
         f.close()
     
     if os.path.exists(os.path.join(r'${project.build.directory}', output_pro_file)):
