@@ -169,53 +169,6 @@
                         <artifactId>replacer</artifactId>
                         <version>1.5.2</version>
                         <executions>
-                            <execution>
-                                <id>fix-arch-x64-QMAKE-SUCKS!!!!!!!!!!</id>
-								<phase>process-resources</phase>
-                                <goals>
-                                    <goal>replace</goal>
-                                </goals>
-                                <configuration>
-                                    <encoding>utf-8</encoding>
-                                    <file>${project.build.sourceDirectory}/${project.artifactId}-x64.vcxproj</file>
-                                    <!-- <excludes>
-                                        <exclude>**/vmaxproxy-x64.vcproj</exclude>
-                                    </excludes> --> 
-                                    <ignoreMissingFile>true</ignoreMissingFile>   
-									<escape>true</escape>
-									<regex>false</regex>									
-                                    <replacements>
-                                        <replacement>
-                                            <token>Win32</token>
-                                            <value>${arch}</value>
-                                        </replacement>								
-                                    </replacements>
-                                </configuration>                                
-                            </execution>
-                            <execution>
-                                <id>fix-arch-x86-QMAKE-SUCKS!!!!!!!!!!</id>
-								<phase>process-resources</phase>
-                                <goals>
-                                    <goal>replace</goal>
-                                </goals>
-                                <configuration>
-                                    <encoding>utf-8</encoding>
-                                    <file>${project.build.sourceDirectory}/${project.artifactId}-x86.vcxproj</file>
-                                    <!-- <excludes>
-                                        <exclude>**/vmaxproxy-x64.vcproj</exclude>
-                                    </excludes> --> 
-                                    <ignoreMissingFile>true</ignoreMissingFile>          
-									<escape>true</escape>
-									<regex>false</regex>	                                    
-                                    <replacements>
-                                        <replacement>
-                                            <token>x64</token>
-                                            <value>Win32</value>
-                                        </replacement>
-                                    </replacements>
-                                </configuration>                                
-                            </execution>
-
                             <!-- Fixing qmake-generated msvc2012 project files. Sometimes this step will be unnecessary (when qmake is fixed) -->
                             <execution>
                                 <id>fix-vcxproj-QMAKE-SUCKS!!!!!!!!!!</id>
@@ -321,17 +274,6 @@
                                             <value>
                                                 <![CDATA[<ExceptionHandling>Async</ExceptionHandling>]]></value>
                                         </replacement>
-
-                                        <!-- Adding "Create precompiled header option" to StdAfx.cpp compile options -->
-                                        <!-- <replacement>
-                                            <xpath>//Project/ItemGroup/ClCompile[contains(@Include,'StdAfx.cpp')]</xpath>
-                                            <token>CustomBuild</token>
-                                            <value>None</value>
-                                        </replacement>
-                                        <replacement>
-                                            <token><![CDATA[<ClCompile Include="StdAfx.cpp"/>]]></token>
-                                            <value><![CDATA[<None Include="StdAfx.cpp"/>]]></value>
-                                        </replacement> -->
 
                                     </replacements>
                                     <skip>${replace.skip}</skip>
