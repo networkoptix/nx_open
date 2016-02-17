@@ -117,6 +117,8 @@
         <libdir>${root.dir}/build_environment/target</libdir>
         <qt.path>artifacts/qt/${qt.version}/${platform}/${arch}/${box}/${build.configuration}</qt.path>
         <qt.dir>${environment.dir}/${qt.path}</qt.dir>
+         <!-- Can take values 'pdb', 'src' or both ('pdb, src')  -->
+        <qt.debug></qt.debug>
         <ClientHelpSourceDir>${environment.dir}/help/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}/${customization}</ClientHelpSourceDir>
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
         <unpack.skip>false</unpack.skip>
