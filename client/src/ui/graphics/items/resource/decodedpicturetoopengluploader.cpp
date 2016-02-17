@@ -11,12 +11,6 @@
 #ifdef _WIN32
 #include <D3D9.h>
 #endif
-//    #define GL_GLEXT_PROTOTYPES 1
-//    #ifdef Q_OS_MACX
-//    #include <glext.h>
-//    #else
-//    #include <GL/glext.h>
-//    #endif
 
 #include <QtGui/qopengl.h>
 extern "C"
