@@ -6,6 +6,7 @@
 #include <ui/statistics/modules/private/single_metrics_holder.h>
 #include <ui/statistics/modules/private/avg_tabs_count_metric.h>
 #include <ui/statistics/modules/private/preview_search_duration_metric.h>
+#include <ui/statistics/modules/private/motion_search_duration_metric.h>
 
 QnGraphicsStatisticsModule::QnGraphicsStatisticsModule(QObject *parent)
     : base_type(parent)
@@ -51,12 +52,16 @@ void QnGraphicsStatisticsModule::recreateMetrics()
         {
             const auto avgTabsCount = AbstractSingleMetricPtr(
                 new AvgTabsCountMetric(workbench));
-            const auto psearchDuration =AbstractSingleMetricPtr(
+            const auto psearchDuration = AbstractSingleMetricPtr(
                 new PreviewSearchDurationMetric(workbench));
 
             m_metrics->addMetric(lit("avg_tabs_cnt"), avgTabsCount);
             m_metrics->addMetric(lit("psearch_duration_ms"), psearchDuration);
         }
+
+        const auto msearchDuration = AbstractSingleMetricPtr(
+            new MotionSearchDurationMetric(m_context));
+        m_metrics->addMetric(lit("msearch_duration_ms"), msearchDuration);
     }
 }
 
