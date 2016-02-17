@@ -27,10 +27,10 @@ private:
     };
 
 public:
-    QnCallCounter(int reportPeriodMs);
+    QnCallCounter(std::chrono::milliseconds reportPeriod);
     ~QnCallCounter();
 
-    void count(QString functionName);
+    void incrementCallCount(QString functionName);
 
 private:
     void startReporter();
@@ -49,22 +49,17 @@ private:
     std::chrono::milliseconds m_reportPeriod;
 };
 
-//#define QN_CALL_COUNT
+#define QN_CALL_COUNT
 
 #ifdef QN_CALL_COUNT
 #   define QnCallCountStart(val) \
         auto qnCallCounterPtr = std::unique_ptr<QnCallCounter>(new QnCallCounter(val))
 #
-#   define QnCallCount() \
-        do \
-        { \
-            if (QnCallCounter::instance()) \
-                QnCallCounter::instance()->count(Q_FUNC_INFO); \
-        } \
-        while(0)
+#   define QnIncrementCallCount() \
+        QnCallCounter::instance()->incrementCallCount(Q_FUNC_INFO) 
 #else
 #   define QnCallCountStart(val) 
-#   define QnCallCount() 
+#   define QnIncrementCallCount() 
 #endif
 
 #endif // __CALL_COUNTER_H__

@@ -1,8 +1,8 @@
 #include "call_counter.h"
 
-QnCallCounter::QnCallCounter(int reportPeriodMs)
+QnCallCounter::QnCallCounter(std::chrono::milliseconds reportPeriod)
     : m_needStop(false),
-      m_reportPeriod(reportPeriodMs)
+      m_reportPeriod(reportPeriod)
 {
     startReporter();
 }
@@ -16,7 +16,7 @@ QnCallCounter::~QnCallCounter()
         m_thread.join();
 }
 
-void QnCallCounter::count(QString functionName)
+void QnCallCounter::incrementCallCount(QString functionName)
 {
     std::lock_guard<std::mutex> lk(m_mutex);
     if (m_callInfo.find(functionName) == m_callInfo.cend())

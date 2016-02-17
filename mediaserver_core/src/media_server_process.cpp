@@ -1546,7 +1546,7 @@ QHostAddress MediaServerProcess::getPublicAddress()
 
 void MediaServerProcess::run()
 {
-    QnCallCountStart(5000);
+    QnCallCountStart(std::chrono::milliseconds(5000));
 
     ffmpegInit();
 
