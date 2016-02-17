@@ -51,7 +51,11 @@ void QnCallCounter::startReporter()
                                                     m_lastTriggerTime);
 
                                     if (timeSinceLastReport < m_reportPeriod)
+                                    {
+                                        if (m_needStop)
+                                            return true;
                                         return false;
+                                    }
                                     
                                     return true;
                                 });
