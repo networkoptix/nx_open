@@ -49,7 +49,7 @@ private:
     std::chrono::milliseconds m_reportPeriod;
 };
 
-#define QN_CALL_COUNT
+//#define QN_CALL_COUNT
 
 #ifdef QN_CALL_COUNT
 #   define QnCallCountStart(val) \
