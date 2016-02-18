@@ -1,0 +1,128 @@
+/* Palette spec is here: http://4yppjt.axshare.com/#p=colors */
+
+$dark_core:    #53707F;
+$dark_core_index: 17;
+$dark_offset:  #050708;
+
+@function dark($index) {
+  @return $dark_core - ($dark_core_index - $index) * $dark_offset;
+}
+
+$light_core:    #FFF;
+$light_core_index:  1;
+$light_offset:  #0A0807;
+
+@function light($index) {
+  @return $light_core - ($index - $light_core_index) * $light_offset;
+}
+
+$blue11:        #2592C3;
+$blue10:        #2FA2DB;
+$blue8:         #43C2FF;
+
+
+$dark1: dark(1);
+$dark2: dark(2);
+$dark3: dark(3);
+$dark4: dark(4);
+$dark5: dark(5);
+$dark6: dark(6);
+$dark7: dark(7);
+$dark8: dark(8);
+$dark9: dark(9);
+$dark10: dark(10);
+$dark11: dark(11);
+$dark12: dark(12);
+$dark13: dark(13);
+$dark14: dark(14);
+$dark15: dark(15);
+$dark16: dark(16);
+$dark17: dark(17);
+
+
+
+
+$light1: light(1);
+$light2: light(2);
+$light3: light(3);
+$light4: light(4);
+$light5: light(5);
+$light6: light(6);
+$light7: light(7);
+$light8: light(8);
+$light9: light(9);
+$light10: light(10);
+$light11: light(11);
+$light12: light(12);
+$light13: light(13);
+$light14: light(14);
+$light15: light(15);
+$light16: light(16);
+$light17: light(17);
+
+
+$brand_d4:                #076281;
+
+
+
+$shadow:                  $dark5;
+$shadow_d1:               $dark6;
+$base:                    $dark7;
+$window:                  $dark7;
+$dark:                    $dark9;
+$mid:                     $dark10;
+$button:                  $dark11;
+
+$brightText:              $light1;
+$buttonText:              $light4;
+$text:                    $light4;
+$light:                   $light10;
+$windowText:              $light16;
+
+$link:                    $blue10;
+$linkVisited:             $blue11;
+
+$brandContrast:           white;
+
+
+
+
+
+
+.dark1	{background-color: $dark1	;}
+.dark2	{background-color: $dark2	;}
+.dark3	{background-color: $dark3	;}
+.dark4	{background-color: $dark4	;}
+.dark5	{background-color: $dark5	;}
+.dark6	{background-color: $dark6	;}
+.dark7	{background-color: $dark7	;}
+.dark8	{background-color: $dark8	;}
+.dark9	{background-color: $dark9	;}
+.dark10	{background-color: $dark10	;}
+.dark11	{background-color: $dark11	;}
+.dark12	{background-color: $dark12	;}
+.dark13	{background-color: $dark13	;}
+.dark14	{background-color: $dark14	;}
+.dark15	{background-color: $dark15	;}
+.dark16	{background-color: $dark16	;}
+.dark17	{background-color: $dark17	;}
+
+.light1	{background-color: $light1	;}
+.light2	{background-color: $light2	;}
+.light3	{background-color: $light3	;}
+.light4	{background-color: $light4	;}
+.light5	{background-color: $light5	;}
+.light6	{background-color: $light6	;}
+.light7	{background-color: $light7	;}
+.light8	{background-color: $light8	;}
+.light9	{background-color: $light9	;}
+.light10	{background-color: $light10	;}
+.light11	{background-color: $light11	;}
+.light12	{background-color: $light12	;}
+.light13	{background-color: $light13	;}
+.light14	{background-color: $light14	;}
+.light15	{background-color: $light15	;}
+.light16	{background-color: $light16	;}
+.light17	{background-color: $light17	;}
+
+.dark1:after{content: $dark1;}
