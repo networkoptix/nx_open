@@ -30,6 +30,7 @@ void MediatorConnector::enable( bool waitComplete )
         {
             needToFetch = true;
             m_promise = std::promise< bool >();
+            m_future = m_promise->get_future();
         }
     }
 
@@ -37,7 +38,7 @@ void MediatorConnector::enable( bool waitComplete )
         fetchEndpoint();
 
     if( waitComplete )
-        m_promise->get_future().wait();
+        m_future->wait();
 }
 
 std::shared_ptr<MediatorClientTcpConnection> MediatorConnector::clientConnection()
@@ -66,6 +67,7 @@ void MediatorConnector::mockupAddress( SocketAddress address )
     NX_LOGX( lit( "Mediator address is mocked up: %1" )
              .arg( address.toString() ), cl_logWARNING );
 
+    m_mediatorAddress = std::move(address);
     m_stunClient->connect( address );
     m_promise->set_value( true );
 }
@@ -102,6 +104,16 @@ void MediatorConnector::pleaseStop( std::function<void()> handler )
     m_timerSocket->pleaseStop(std::move(handler));
 }
 
+boost::optional<SocketAddress> MediatorConnector::mediatorAddress() const
+{
+    return m_mediatorAddress;
+}
+
+static bool isReady(std::future<bool> const& f)
+{
+    return f.wait_for(std::chrono::seconds(0)) == std::future_status::ready;
+}
+
 void MediatorConnector::fetchEndpoint()
 {
     m_endpointFetcher.get(
@@ -112,11 +124,12 @@ void MediatorConnector::fetchEndpoint()
             NX_LOGX( lit( "Can not fetch mediator address: HTTP %1" )
                      .arg( status ), cl_logERROR );
 
-            m_promise->set_value( false );
+            if (!isReady(*m_future))
+                m_promise->set_value( false );
 
             // retry after some delay
             if( !m_isTerminating )
-                m_timerSocket->registerTimer( RETRY_INTERVAL.count(),
+                m_timerSocket->registerTimer( RETRY_INTERVAL,
                                               [ this ](){ fetchEndpoint(); } );
         }
         else
@@ -124,9 +137,10 @@ void MediatorConnector::fetchEndpoint()
             NX_LOGX( lit( "Fetched mediator address: %1" )
                      .arg( address.toString() ), cl_logALWAYS );
 
-
+            m_mediatorAddress = std::move(address);
             m_stunClient->connect( address );
-            m_promise->set_value( true );
+            if (!isReady(*m_future))
+                m_promise->set_value( true );
         }
     });
 }

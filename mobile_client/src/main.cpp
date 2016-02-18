@@ -28,7 +28,33 @@
 #include "ui/texture_size_helper.h"
 #include "camera/camera_thumbnail_cache.h"
 
+#include <nx/media/video_decoder_registry.h>
+#include <nx/media/audio_decoder_registry.h>
+#include <nx/media/ffmpeg_video_decoder.h>
+#include <nx/media/ffmpeg_audio_decoder.h>
+#include <nx/media/android_decoder.h>
+#include <nx/media/jpeg_decoder.h>
+
+#include <QtGui/QOpenGLContext>
+#include <QtGui/QOpenGLFunctions>
+#include "resource_allocator.h"
+
+
 #include "version.h"
+
+void initDecoders(QQuickWindow *window)
+{
+    using namespace nx::media;
+#if defined(Q_OS_ANDROID)
+    std::shared_ptr<AbstractResourceAllocator> allocator(new ResourceAllocator(window));
+    VideoDecoderRegistry::instance()->addPlugin<AndroidDecoder>(std::move(allocator));
+#endif
+#ifndef DISABLE_FFMPEG
+    VideoDecoderRegistry::instance()->addPlugin<FfmpegVideoDecoder>();
+    AudioDecoderRegistry::instance()->addPlugin<FfmpegAudioDecoder>();
+#endif
+    VideoDecoderRegistry::instance()->addPlugin<JpegDecoder>();
+}
 
 int runUi(QGuiApplication *application) {
     QScopedPointer<QnCameraThumbnailCache> thumbnailsCache(new QnCameraThumbnailCache());
@@ -92,6 +118,7 @@ int runUi(QGuiApplication *application) {
     QObject::connect(&engine, &QQmlEngine::quit, application, &QGuiApplication::quit);
 
     prepareWindow();
+    initDecoders(mainWindow.data());
 
     return application->exec();
 }

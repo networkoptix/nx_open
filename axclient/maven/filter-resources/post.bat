@@ -1,4 +1,4 @@
-call "%VS110COMNTOOLS%\..\..\VC\vcvarsall.bat"
+call "%${VCVars}%\..\..\VC\vcvarsall.bat"
 
 set CONFIG=%1
 echo config = %CONFIG%

@@ -171,12 +171,12 @@
     <message>
         <location/>
         <source>To</source>
-        <translation type="unfinished"></translation>
+        <translation>אל</translation>
     </message>
     <message>
         <location/>
         <source>All Servers are offline. Audit data is not available.</source>
-        <translation type="unfinished"></translation>
+        <translation>כל השרתים אינם זמינים. מידע הבדיקה אינו זמין.</translation>
     </message>
 </context>
 <context>
@@ -184,32 +184,32 @@
     <message>
         <location filename="../src/ui/dialogs/backup_schedule_dialog.ui"/>
         <source>Backup Schedule...</source>
-        <translation type="unfinished"></translation>
+        <translation>לוח זמנים לגיבוי...</translation>
     </message>
     <message>
         <location/>
         <source>Execute backup on the following days:</source>
-        <translation type="unfinished"></translation>
+        <translation>הפעל גיבוי בימים הבאים:</translation>
     </message>
     <message>
         <location/>
         <source>Finish:</source>
-        <translation type="unfinished"></translation>
+        <translation>סיום:</translation>
     </message>
     <message>
         <location/>
         <source>Start:</source>
-        <translation type="unfinished"></translation>
+        <translation>התחלה:</translation>
     </message>
     <message>
         <location/>
         <source>Limit Bandwidth to:</source>
-        <translation type="unfinished"></translation>
+        <translation>הגבל רוחב פס ל:</translation>
     </message>
     <message>
         <location/>
         <source>Mbit/s</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -217,27 +217,27 @@
     <message>
         <location filename="../src/ui/widgets/business/bookmark_business_action_widget.ui"/>
         <source>Fixed duration:</source>
-        <translation type="unfinished"></translation>
+        <translation>משך זמן קבוע:</translation>
     </message>
     <message>
         <location/>
         <source>seconds</source>
-        <translation type="unfinished"></translation>
+        <translation>שניות</translation>
     </message>
     <message>
         <location/>
         <source>Tags:</source>
-        <translation type="unfinished"></translation>
+        <translation>תגים:</translation>
     </message>
     <message>
         <location/>
         <source>Pre-recording:</source>
-        <translation type="unfinished"></translation>
+        <translation>לפני הקלטה:</translation>
     </message>
     <message>
         <location/>
         <source>Post-recording:</source>
-        <translation type="unfinished"></translation>
+        <translation>אחרי הקלטה:</translation>
     </message>
 </context>
 <context>
@@ -245,32 +245,32 @@
     <message>
         <location filename="../src/ui/widgets/bookmark_widget.ui"/>
         <source>&amp;Name</source>
-        <translation type="unfinished">&amp;שם</translation>
+        <translation>&amp;שם</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Timeout</source>
-        <translation type="unfinished">&amp;זמן קצוב</translation>
+        <translation>&amp;זמן קצוב</translation>
     </message>
     <message>
         <location/>
         <source>T&amp;ags</source>
-        <translation type="unfinished">ת&amp;גיות</translation>
+        <translation>ת&amp;גיות</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Description</source>
-        <translation type="unfinished">&amp;תיאור</translation>
+        <translation>&amp;תיאור</translation>
     </message>
     <message>
         <location/>
         <source>List of tags divided by commas or spaces</source>
-        <translation type="unfinished"></translation>
+        <translation>רשימת תגיות מופרדת על ידי רווחים או פסיקים</translation>
     </message>
     <message>
         <location/>
         <source>Popular tags</source>
-        <translation type="unfinished"></translation>
+        <translation>תגיות פופלריות</translation>
     </message>
 </context>
 <context>
@@ -278,27 +278,27 @@
     <message>
         <location filename="../src/ui/dialogs/search_bookmarks_dialog.ui"/>
         <source>-</source>
-        <translation type="unfinished">-</translation>
+        <translation>-</translation>
     </message>
     <message>
         <location/>
         <source>Refresh</source>
-        <translation type="unfinished">רענן</translation>
+        <translation>רענן</translation>
     </message>
     <message>
         <location/>
         <source>&lt; Any camera &gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;כל מצלמה&gt;</translation>
     </message>
     <message>
         <location/>
         <source>All Servers are offline. Logs are not available.</source>
-        <translation type="unfinished">כל השרתים אינם מקוונים. רשימות התיעוד אינן זמינות.</translation>
+        <translation>כל השרתים אינם זמינים. היומנים אינם זמינים.</translation>
     </message>
     <message>
         <location/>
         <source>Bookmark Log</source>
-        <translation type="unfinished"></translation>
+        <translation>יומן סימניות</translation>
     </message>
 </context>
 <context>
@@ -485,12 +485,12 @@
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_params_widget.ui"/>
         <source>Category</source>
-        <translation type="unfinished">קטגוריה</translation>
+        <translation>קטגוריה</translation>
     </message>
     <message>
         <location/>
         <source>Refresh</source>
-        <translation type="unfinished">רענן</translation>
+        <translation>רענן</translation>
     </message>
 </context>
 <context>
@@ -503,7 +503,7 @@
     <message>
         <location/>
         <source>This camera has no advanced settings</source>
-        <translation type="unfinished"></translation>
+        <translation>למצלמה זו אין הגדרות מתקדמות</translation>
     </message>
 </context>
 <context>
@@ -887,7 +887,7 @@
     <message>
         <location filename="../src/ui/widgets/business/ptz_preset_business_action_widget.ui"/>
         <source>&amp;PTZ preset:</source>
-        <translation type="unfinished"></translation>
+        <translation>פריסט &amp;PTZ:</translation>
     </message>
 </context>
 <context>
@@ -1005,21 +1005,6 @@
     </message>
     <message>
         <location/>
-        <source>Ctrl+E</source>
-        <translation>Ctrl +E</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Ctrl+L</source>
-        <translation>Ctrl +L</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Ctrl+M</source>
-        <translation>Ctrl +M</translation>
-    </message>
-    <message>
-        <location/>
         <source>Monitor All Servers on a Single Layout</source>
         <translation>נטר את כל השרתים בפריסה אחת</translation>
     </message>
@@ -1035,43 +1020,33 @@
     </message>
     <message>
         <location/>
-        <source>Ctrl+B</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>&amp;Alarm/Event Rules...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;אזעקה/חוקי אירוע...</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Event Log...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;יומן אירועים...</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Health Monitoring...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;ניטור בריאות...</translation>
     </message>
     <message>
         <location/>
         <source>Audit Trail...</source>
-        <translation type="unfinished"></translation>
+        <translation>נתיב בדיקה...</translation>
     </message>
     <message>
         <location/>
         <source>Open Audit Trail Log</source>
-        <translation type="unfinished"></translation>
+        <translation>פתח יומן נתיב בדיקה</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Bookmarks...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Bookmarks List (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+B&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;סימניות...</translation>
     </message>
 </context>
 <context>
@@ -1094,7 +1069,7 @@
     <message>
         <location/>
         <source>Default Rotation:</source>
-        <translation type="unfinished"></translation>
+        <translation>סיבוב ברירת מחדל</translation>
     </message>
 </context>
 <context>
@@ -1304,7 +1279,7 @@
     <message>
         <location/>
         <source>This license type requires a higher software version.</source>
-        <translation type="unfinished"></translation>
+        <translation>רשיון זה דורש גרסת תוכנה גבוהה יותר</translation>
     </message>
 </context>
 <context>
@@ -1573,7 +1548,7 @@
     <message>
         <location/>
         <source>Time Mode:</source>
-        <translation type="unfinished"></translation>
+        <translation>מצב זמן:</translation>
     </message>
 </context>
 <context>
@@ -1868,7 +1843,7 @@
     <message>
         <location/>
         <source>You will be reconnected.</source>
-        <translation type="unfinished"></translation>
+        <translation>תחובר מחדש.</translation>
     </message>
 </context>
 <context>
@@ -2000,7 +1975,7 @@
     <message>
         <location/>
         <source>Unable to check updates on the Internet.</source>
-        <translation type="unfinished"></translation>
+        <translation>לא ניתן לבדוק גרסאות באינטרנט.</translation>
     </message>
 </context>
 <context>
@@ -2123,7 +2098,7 @@
     <message>
         <location/>
         <source>Please wait while the connection is being restored...</source>
-        <translation type="unfinished"></translation>
+        <translation>המתן בזמן שהחיבור מחודש...</translation>
     </message>
 </context>
 <context>
@@ -2465,17 +2440,17 @@
     <message>
         <location filename="../src/ui/widgets/business/show_on_alarm_layout_action_widget.ui"/>
         <source>for</source>
-        <translation type="unfinished"></translation>
+        <translation>ל</translation>
     </message>
     <message>
         <location/>
         <source>Force Alarm Layout opening</source>
-        <translation type="unfinished"></translation>
+        <translation>כפה פתיחת פריסת אזעקה</translation>
     </message>
     <message>
         <location/>
         <source>Also show source camera</source>
-        <translation type="unfinished"></translation>
+        <translation>הצג גם את המצלמה המשוייכת</translation>
     </message>
 </context>
 <context>
@@ -2483,27 +2458,27 @@
     <message>
         <location filename="../src/ui/widgets/business/show_text_overlay_action_widget.ui"/>
         <source>seconds</source>
-        <translation type="unfinished"></translation>
+        <translation>שניות</translation>
     </message>
     <message>
         <location/>
         <source>Display text for:</source>
-        <translation type="unfinished"></translation>
+        <translation>הצג טקסט עבור:</translation>
     </message>
     <message>
         <location/>
         <source>Use custom text:</source>
-        <translation type="unfinished"></translation>
+        <translation>השתמש בטקסט:</translation>
     </message>
     <message>
         <location/>
         <source>Rule will work only for prolonged events</source>
-        <translation type="unfinished"></translation>
+        <translation>החוק יעבוד רק עבור חוקים מתמשכים</translation>
     </message>
     <message>
         <location/>
         <source>Also show on source camera</source>
-        <translation type="unfinished"></translation>
+        <translation>הצג גם במצלמת המקור</translation>
     </message>
 </context>
 <context>
@@ -2679,7 +2654,7 @@
     <message>
         <location/>
         <source>I/O ports</source>
-        <translation type="unfinished"></translation>
+        <translation>פורטי קלט/פלט</translation>
     </message>
 </context>
 <context>
@@ -2687,62 +2662,62 @@
     <message>
         <location filename="../src/ui/widgets/system_settings/smtp_advanced_settings_widget.ui"/>
         <source>SMTP &amp;Server:</source>
-        <translation type="unfinished">&amp;שרת SMTP:</translation>
+        <translation>&amp;שרת SMTP:</translation>
     </message>
     <message>
         <location/>
         <source>&amp;User:</source>
-        <translation type="unfinished">&amp;משתמש:</translation>
+        <translation>&amp;משתמש:</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Password:</source>
-        <translation type="unfinished">&amp;סיסמה:</translation>
+        <translation>&amp;סיסמא:</translation>
     </message>
     <message>
         <location/>
         <source>Email:</source>
-        <translation type="unfinished">אימייל:</translation>
+        <translation>כתובת דואר:</translation>
     </message>
     <message>
         <location/>
         <source>P&amp;ort:</source>
-        <translation type="unfinished">י&amp;ציאה:</translation>
+        <translation>י&amp;ציאה:</translation>
     </message>
     <message>
         <location/>
         <source>Unsecure Connection</source>
-        <translation type="unfinished">חיבור לא מאובטח</translation>
+        <translation>חיבור לא מאובטח</translation>
     </message>
     <message>
         <location/>
         <source>(recommended)</source>
-        <translation type="unfinished">(מומלץ)</translation>
+        <translation>(מומלץ)</translation>
     </message>
     <message>
         <location/>
         <source>Secure connection using TLS.</source>
-        <translation type="unfinished">חיבור מאובטח באמצעות TLS.</translation>
+        <translation>חיבור מאובטח באמצעות TLS.</translation>
     </message>
     <message>
         <location/>
         <source>Secure connection using SSL.</source>
-        <translation type="unfinished">חיבור מאובטח באמצעות SSL.</translation>
+        <translation>חיבור מאובטח באמצעות SSL.</translation>
     </message>
     <message>
         <location/>
         <source>&amp;System Signature:</source>
-        <translation type="unfinished">חתימת &amp;מערכת:</translation>
+        <translation>חתימת &amp;מערכת:</translation>
     </message>
     <message>
         <location/>
         <source>Enter a short system description here.</source>
-        <translation type="unfinished">הכנס כאן תיאור קצר למערכת.</translation>
+        <translation>הכנס כאן תיאור קצר למערכת.</translation>
     </message>
     <message>
         <location/>
         <source>Support Signature:</source>
-        <translation type="unfinished">חתימת תמיכה:</translation>
+        <translation>חתימת תמיכה:</translation>
     </message>
 </context>
 <context>
@@ -2768,27 +2743,27 @@
     <message>
         <location filename="../src/ui/widgets/system_settings/smtp_simple_settings_widget.ui"/>
         <source>&amp;Email:</source>
-        <translation type="unfinished">&amp;אימייל:</translation>
+        <translation>&amp;כתובת דואר:</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Password:</source>
-        <translation type="unfinished">&amp;סיסמה:</translation>
+        <translation>&amp;סיסמא:</translation>
     </message>
     <message>
         <location/>
         <source>&amp;System Signature:</source>
-        <translation type="unfinished">חתימת &amp;מערכת:</translation>
+        <translation>חתימת &amp;מערכת:</translation>
     </message>
     <message>
         <location/>
         <source>Enter a short system description here.</source>
-        <translation type="unfinished">הכנס כאן תיאור קצר למערכת.</translation>
+        <translation>הכנס כאן תיאור קצר למערכת.</translation>
     </message>
     <message>
         <location/>
         <source>Support Signature:</source>
-        <translation type="unfinished">חתימת תמיכה:</translation>
+        <translation>חתימת תמיכה:</translation>
     </message>
 </context>
 <context>
@@ -2796,42 +2771,42 @@
     <message>
         <location filename="../src/ui/widgets/system_settings/smtp_test_connection_widget.ui"/>
         <source>Server:</source>
-        <translation type="unfinished">שרת:</translation>
+        <translation>שרת:</translation>
     </message>
     <message>
         <location/>
         <source>Port:</source>
-        <translation type="unfinished">יציאה:</translation>
+        <translation>יציאה:</translation>
     </message>
     <message>
         <location/>
         <source>User:</source>
-        <translation type="unfinished">משתמש:</translation>
+        <translation>משתמש:</translation>
     </message>
     <message>
         <location/>
         <source>Security:</source>
-        <translation type="unfinished">אבטחה:</translation>
+        <translation>אבטחה:</translation>
     </message>
     <message>
         <location/>
         <source>Progress:</source>
-        <translation type="unfinished">התקדמות:</translation>
+        <translation>התקדמות:</translation>
     </message>
     <message>
         <location/>
         <source>Result:</source>
-        <translation type="unfinished">תוצאה:</translation>
+        <translation>תוצאה:</translation>
     </message>
     <message>
         <location/>
         <source>OK</source>
-        <translation type="unfinished">אישור</translation>
+        <translation>אישור</translation>
     </message>
     <message>
         <location/>
         <source>Cancel</source>
-        <translation type="unfinished">ביטול</translation>
+        <translation>ביטול</translation>
     </message>
 </context>
 <context>
@@ -2839,94 +2814,94 @@
     <message>
         <location filename="../src/ui/widgets/properties/storage_config_widget.ui"/>
         <source>Rebuild Archive Index</source>
-        <translation type="unfinished"></translation>
+        <translation>בנה אינדקס ארכיון מחדש</translation>
     </message>
     <message>
         <location/>
         <source>Backup progress</source>
-        <translation type="unfinished"></translation>
+        <translation>התקדמות גיבוי</translation>
     </message>
     <message>
         <location/>
         <source>Cancel</source>
-        <translation type="unfinished">ביטול</translation>
+        <translation>ביטול</translation>
     </message>
     <message>
         <location/>
         <source>Start Backup Now</source>
-        <translation type="unfinished"></translation>
+        <translation>התחל גיבוי עכשיו</translation>
     </message>
     <message>
         <location/>
         <source>Unchecking the storage will cause nothing but writing stop.
 It won&apos;t deny oldest footage removing from the drive.</source>
-        <translation type="unfinished">ביטול הסימון מאחסון יגרום רק להפסקת הכתיבה.
+        <translation>ביטול הסימון מאחסון יגרום רק להפסקת הכתיבה.
 פעולה זו לא תמנע הסרת הקלטות ישנות מהכונן.</translation>
     </message>
     <message>
         <location/>
         <source>Add External Storage...</source>
-        <translation type="unfinished">הוסף אחסון חיצוני...</translation>
+        <translation>הוסף אחסון חיצוני...</translation>
     </message>
     <message>
         <location/>
         <source>Main Storage Locations</source>
-        <translation type="unfinished"></translation>
+        <translation>מיקום איחסון חיצוני</translation>
     </message>
     <message>
         <location/>
         <source>Backup Storage Locations</source>
-        <translation type="unfinished"></translation>
+        <translation>מיקום איחסון לגיבוי</translation>
     </message>
     <message>
         <location/>
         <source>Execute Backup</source>
-        <translation type="unfinished"></translation>
+        <translation>הפעל גיבוי</translation>
     </message>
     <message>
         <location/>
         <source>Set Schedule...</source>
-        <translation type="unfinished"></translation>
+        <translation>הגדר לוח זמנים...</translation>
     </message>
     <message>
         <location/>
         <source>You haven&apos;t configured any backup storage. Backup won&apos;t be performed.</source>
-        <translation type="unfinished"></translation>
+        <translation>לא הוגדר איחסון לגיבוי. הגיבוי לא יתבצע.</translation>
     </message>
     <message>
         <location/>
         <source>Storage backup is available if there are 2 or more valid storage drives in the system.</source>
-        <translation type="unfinished"></translation>
+        <translation>הגיבוי זמין אם ישנם 2 כונני איחסון או יותר במערכת.</translation>
     </message>
     <message>
         <location/>
         <source>Global Backup Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>הגדרות גיבוי כלליות</translation>
     </message>
     <message>
         <location/>
         <source>Backup Archive From:</source>
-        <translation type="unfinished"></translation>
+        <translation>גבה ארכיון מ:</translation>
     </message>
     <message>
         <location/>
         <source>Backup Quality:</source>
-        <translation type="unfinished"></translation>
+        <translation>איכות גיבוי:</translation>
     </message>
     <message>
         <location/>
         <source>&lt;Select at least one camera&gt; </source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;בחר לפחות מצלמה אחת&gt;</translation>
     </message>
     <message>
         <location/>
         <source>Server Backup Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>הגדרות גיבוי שרת</translation>
     </message>
     <message>
         <location/>
         <source>Backup Time Label</source>
-        <translation type="unfinished"></translation>
+        <translation>תווית זמן גיבוי</translation>
     </message>
 </context>
 <context>
@@ -2934,7 +2909,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <location filename="../src/ui/widgets/properties/storage_rebuild_widget.ui"/>
         <source>Cancel</source>
-        <translation type="unfinished">ביטול</translation>
+        <translation>ביטול</translation>
     </message>
 </context>
 <context>
@@ -2985,7 +2960,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <location/>
         <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
-        <translation type="unfinished">אזהרה! צעד זה יהפוך את הגדרות האיכות וקצב הפריימים(FPS) ב&quot;לוח זמני הקלטות&quot; ללא רלוונטיים.</translation>
+        <translation>אזהרה! צעד זה יהפוך את הגדרות האיכות וקצב הפריימים(FPS) ב&quot;לוח זמני הקלטות&quot; ללא רלוונטיים.</translation>
     </message>
 </context>
 <context>

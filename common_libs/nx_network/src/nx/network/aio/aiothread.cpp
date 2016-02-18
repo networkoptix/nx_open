@@ -15,8 +15,13 @@
     //from new polling "session"? Something needs to be done about it
 
 
-namespace aio
-{
-    template class AIOThread<Pollable>;
-    template class AIOThread<UdtSocket>;
-}
+namespace nx {
+namespace network {
+namespace aio {
+
+template class AIOThread<Pollable>;
+template class AIOThread<UdtSocket>;
+
+}   //aio
+}   //network
+}   //nx

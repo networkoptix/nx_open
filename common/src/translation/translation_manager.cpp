@@ -21,8 +21,7 @@ QnTranslationManager::QnTranslationManager(QObject *parent):
     addPrefix(defaultPrefix);
     addPrefix(lit("qt"));
     addPrefix(lit("qtbase"));
-    addPrefix(lit("qtmultimedia"));
-    
+
     addSearchPath(defaultSearchPath);
     // Closing a backdoor for custom translations --Elric
     /*if(qApp) {

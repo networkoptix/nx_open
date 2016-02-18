@@ -45,7 +45,7 @@ QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent)
 
     connect(ui->linkButton,         &QPushButton::clicked,  d,  &QnCloudManagementWidgetPrivate::at_linkButton_clicked);
     connect(ui->unlinkButton,       &QPushButton::clicked,  d,  &QnCloudManagementWidgetPrivate::at_unlinkButton_clicked);
-    connect(ui->goToCloudButton,    &QPushButton::clicked,  action(Qn::OpenCloudMainUrl),   &QAction::trigger);
+    connect(ui->goToCloudButton,    &QPushButton::clicked,  action(QnActions::OpenCloudMainUrl),   &QAction::trigger);
 
     if (QnUserResourcePtr admin = qnResPool->getAdministrator())
     {

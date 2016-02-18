@@ -11,6 +11,9 @@
 #include "../aio/pollset.h"
 
 
+namespace nx {
+namespace network {
+
 namespace detail {
 class UdtPollSetImpl;
 class UdtPollSetConstIteratorImpl;
@@ -33,7 +36,7 @@ public:
 
         UdtSocket* socket();
         const UdtSocket* socket() const;
-        aio::EventType eventType() const;
+        nx::network::aio::EventType eventType() const;
         void* userData();
 
         bool operator==(const const_iterator& right) const;
@@ -55,11 +58,11 @@ public:
         return static_cast<bool>(m_impl);
     }
     void interrupt();
-    bool add(UdtSocket* sock, aio::EventType eventType, void* userData = NULL);
-    void* remove(UdtSocket*  sock, aio::EventType eventType);
-    void* getUserData(UdtSocket*  sock, aio::EventType eventType) const;
+    bool add(UdtSocket* sock, nx::network::aio::EventType eventType, void* userData = NULL);
+    void* remove(UdtSocket*  sock, nx::network::aio::EventType eventType);
+    void* getUserData(UdtSocket*  sock, nx::network::aio::EventType eventType) const;
     bool canAcceptSocket(UdtSocket* sock) const { Q_UNUSED(sock); return true; }
-    int poll(int millisToWait = aio::INFINITE_TIMEOUT);
+    int poll(int millisToWait = nx::network::aio::INFINITE_TIMEOUT);
     const_iterator begin() const;
     const_iterator end() const;
     size_t size() const;
@@ -72,5 +75,8 @@ private:
     detail::UdtPollSetImpl* m_impl;
     Q_DISABLE_COPY(UdtPollSet)
 };
+
+}   //network
+}   //nx
 
 #endif  //NX_NETWORK_UDT_POLLSET_H

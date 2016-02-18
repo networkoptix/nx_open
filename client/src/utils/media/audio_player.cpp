@@ -12,6 +12,7 @@
 #include <core/resource/resource.h>
 #include <plugins/resource/avi/avi_archive_delegate.h>
 #include <utils/common/util.h>
+
 #include <text_to_wav.h>
 
 #include "../../camera/audio_stream_display.h"
@@ -215,8 +216,9 @@ void AudioPlayer::run()
             case sSynthesizing:
             case sSynthesizingAutoPlay:
             {
-                if( !m_synthesizingTarget->open( QIODevice::WriteOnly ) ||
-                    !TextToWaveServer::instance()->generateSoundSync( m_textToPlay, m_synthesizingTarget.get() ) )
+
+                if (!m_synthesizingTarget->open(QIODevice::WriteOnly) ||
+                    !TextToWaveServer::instance()->generateSoundSync(m_textToPlay, m_synthesizingTarget.get()))
                 {
                     emit done();
                     m_state = sReady;
@@ -224,14 +226,14 @@ void AudioPlayer::run()
                     continue;
                 }
                 m_synthesizingTarget->close();
-                if( m_state == sSynthesizingAutoPlay )
+                if (m_state == sSynthesizingAutoPlay)
                     m_state = sPlaying;
                 else
                     m_state = sReady;
 
                 //opening media
-                if( !m_synthesizingTarget->open( QIODevice::ReadOnly ) ||
-                    !openNonSafe( m_synthesizingTarget.release() ) )
+                if (!m_synthesizingTarget->open(QIODevice::ReadOnly) ||
+                    !openNonSafe(m_synthesizingTarget.release()))
                 {
                     emit done();
                     m_state = sReady;
@@ -240,7 +242,6 @@ void AudioPlayer::run()
                 }
                 break;
             }
-
             case sPlaying:
             {
                     //reading frame

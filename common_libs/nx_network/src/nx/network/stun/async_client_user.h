@@ -17,14 +17,17 @@ public:
     /** Returns local connection address in case if client is connected to STUN server */
     SocketAddress localAddress() const;
 
+    /** Returns STUN server address in case if client has one */
+    SocketAddress remoteAddress() const;
+
     /** Shall be called before the last shared_pointer is gone */
     virtual void pleaseStop(std::function<void()> handler) override;
 
 protected:
-    AsyncClientUser(std::shared_ptr<AsyncClient> client);
+    AsyncClientUser(std::shared_ptr<AbstractAsyncClient> client);
 
-    void sendRequest(Message request, AsyncClient::RequestHandler handler);
-    bool setIndicationHandler(int method, AsyncClient::IndicationHandler handler);
+    void sendRequest(Message request, AbstractAsyncClient::RequestHandler handler);
+    bool setIndicationHandler(int method, AbstractAsyncClient::IndicationHandler handler);
 
 private:
     bool startOperation();
@@ -33,7 +36,7 @@ private:
 
     QnMutex m_mutex;
     size_t m_operationsInProgress;
-    std::shared_ptr<AsyncClient> m_client;
+    std::shared_ptr<AbstractAsyncClient> m_client;
     std::function<void()> m_stopHandler;
 };
 

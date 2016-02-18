@@ -164,7 +164,7 @@
                 <File Id="ClientQt5Xml$(var.suffix).dll" Name="Qt5Xml$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Xml$(var.suffix).dll" DiskId="6" />
             </Component>
             <Component>
-                <File Id="ClientQt5XmlPatterns$(var.suffix).dll" Name="Qt5XmlPatterns$(var.suffix).dll" Source="$(var.SourceDir)\..\Qt5XmlPatterns$(var.suffix).dll" DiskId="6" />
+                <File Id="ClientQt5XmlPatterns$(var.suffix).dll" Name="Qt5XmlPatterns$(var.suffix).dll" Source="$(var.SourceDir)\Qt5XmlPatterns$(var.suffix).dll" DiskId="6" />
             </Component>
             <Component>            
                 <File Id="ClientQt5Widgets$(var.suffix).dll" Name="Qt5Widgets$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Widgets$(var.suffix).dll" DiskId="7"  />
@@ -174,6 +174,15 @@
             </Component>             
             <Component>
                 <File Id="ClientQt5Sql$(var.suffix).dll" Name="Qt5Sql$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Sql$(var.suffix).dll" DiskId="7"  />                
+            </Component>
+			<Component>
+                <File Id="ClientQt5Sensors$(var.suffix).dll" Name="Qt5Sensors$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Sensors$(var.suffix).dll" DiskId="7"  />                
+            </Component>            
+			<Component>
+                <File Id="ClientQt5Positioning$(var.suffix).dll" Name="Qt5Positioning$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Positioning$(var.suffix).dll" DiskId="7"  />                
+            </Component>            
+			<Component>
+                <File Id="ClientQt5WebChannel$(var.suffix).dll" Name="Qt5WebChannel$(var.suffix).dll" Source="$(var.SourceDir)\Qt5WebChannel$(var.suffix).dll" DiskId="7"  />                
             </Component>            
 
             <Component>
@@ -198,13 +207,13 @@
             </Component>             
             <?if $(var.webkit) = true ?>
             <Component>
-                <File Id="Clienticudt53.dll" Name="icudt53.dll" Source="$(var.SourceDir)\icudt53.dll" DiskId="8"  />                
+                <File Id="Clienticudt55.dll" Name="icudt55.dll" Source="$(var.SourceDir)\icudt55.dll" DiskId="8"  />                
             </Component>                 
             <Component>
-                <File Id="Clienticuin53.dll" Name="icuin53.dll" Source="$(var.SourceDir)\icuin53.dll" DiskId="9"  />                
+                <File Id="Clienticuin55.dll" Name="icuin55.dll" Source="$(var.SourceDir)\icuin55.dll" DiskId="9"  />                
             </Component>                 
             <Component>
-                <File Id="Clienticuuc5.dll" Name="icuuc53.dll" Source="$(var.SourceDir)\icuuc53.dll" DiskId="9"  />                
+                <File Id="Clienticuuc5.dll" Name="icuuc55.dll" Source="$(var.SourceDir)\icuuc55.dll" DiskId="9"  />                
             </Component>
             <?endif?>            
             <?if $(var.angle) = true ?>         

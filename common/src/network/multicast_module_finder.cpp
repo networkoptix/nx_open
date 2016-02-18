@@ -9,6 +9,7 @@
 #include <nx/utils/log/log.h>
 #include <utils/common/systemerror.h>
 #include <utils/common/product_features.h>
+#include <utils/common/cpp14.h>
 
 #include <nx/network/socket.h>
 #include <nx/network/system_socket.h>
@@ -31,6 +32,8 @@ namespace {
 
 
 } // anonymous namespace
+
+using namespace nx::network;
 
 QnMulticastModuleFinder::QnMulticastModuleFinder(
     bool clientOnly,
@@ -96,7 +99,7 @@ void QnMulticastModuleFinder::updateInterfaces() {
         try {
             //if( addressToUse == QHostAddress(lit("127.0.0.1")) )
             //    continue;
-            std::unique_ptr<UDPSocket> sock( new UDPSocket() );
+            auto sock = std::make_unique<nx::network::UDPSocket>();
             sock->bind(SocketAddress(address.toString(), 0));
             sock->getLocalAddress();    //requesting local address. During this call local port is assigned to socket
             sock->setDestAddr(SocketAddress(m_multicastGroupAddress.toString(), m_multicastGroupPort));
@@ -104,7 +107,7 @@ void QnMulticastModuleFinder::updateInterfaces() {
             if (m_serverSocket)
                 m_serverSocket->joinGroup(m_multicastGroupAddress.toString(), address.toString());
 
-            if (!m_pollSet.add(it.value()->implementationDelegate(), aio::etRead, it.value())) {
+            if (!m_pollSet.add(it.value(), aio::etRead, it.value())) {
                 const auto error = SystemError::getLastOSErrorText();
                 Q_ASSERT_X(false, Q_FUNC_INFO, error.toUtf8().data());
             }
@@ -115,7 +118,7 @@ void QnMulticastModuleFinder::updateInterfaces() {
 
     for (const QHostAddress &address: addressesToRemove) {
         UDPSocket *socket = m_clientSockets.take(address);
-        m_pollSet.remove(socket->implementationDelegate(), aio::etRead);
+        m_pollSet.remove(socket, aio::etRead);
         if (m_serverSocket)
             m_serverSocket->leaveGroup(m_multicastGroupAddress.toString(), address.toString());
     }
@@ -128,12 +131,12 @@ void QnMulticastModuleFinder::clearInterfaces() {
         for (auto it = m_clientSockets.begin(); it != m_clientSockets.end(); ++it)
             m_serverSocket->leaveGroup(m_multicastGroupAddress.toString(), it.key().toString());
 
-        m_pollSet.remove(m_serverSocket->implementationDelegate(), aio::etRead);
+        m_pollSet.remove(m_serverSocket.get(), aio::etRead);
         m_serverSocket.reset();
     }
 
     for (UDPSocket *socket: m_clientSockets) {
-        m_pollSet.remove(socket->implementationDelegate(), aio::etRead);
+        m_pollSet.remove(socket, aio::etRead);
         delete socket;
     }
     m_clientSockets.clear();
@@ -259,7 +262,7 @@ void QnMulticastModuleFinder::run() {
         m_serverSocket->bind(SocketAddress(HostAddress::anyHost, m_multicastGroupPort));
 
         //TODO #ak currently PollSet is designed for internal usage in aio, that's why we have to use socket->implementationDelegate()
-        if (!m_pollSet.add(m_serverSocket->implementationDelegate(), aio::etRead, m_serverSocket.data()))
+        if (!m_pollSet.add(m_serverSocket.get(), aio::etRead, m_serverSocket.get()))
         {
             const auto error = SystemError::getLastOSErrorText();
             Q_ASSERT_X(false, Q_FUNC_INFO, error.toUtf8().data());
@@ -315,7 +318,7 @@ void QnMulticastModuleFinder::run() {
 
             UDPSocket* udpSocket = static_cast<UDPSocket*>(it.userData());
 
-            if (udpSocket == m_serverSocket.data())
+            if (udpSocket == m_serverSocket.get())
                 processDiscoveryRequest(udpSocket);
             else
                 processDiscoveryResponse(udpSocket);

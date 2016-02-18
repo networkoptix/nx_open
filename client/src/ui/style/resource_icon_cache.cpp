@@ -37,6 +37,7 @@ QnResourceIconCache::QnResourceIconCache(QObject *parent): QObject(parent) {
     m_cache.insert(OtherSystem,             qnSkin->icon("tree/system.png"));
     m_cache.insert(OtherSystems,            qnSkin->icon("tree/other_systems.png"));
     m_cache.insert(WebPage,                 qnSkin->icon("tree/webpage.png"));
+    m_cache.insert(WebPages,                qnSkin->icon("tree/webpages.png"));
 
     m_cache.insert(Media | Offline,         qnSkin->icon("tree/media_offline.png"));
     m_cache.insert(Image | Offline,         qnSkin->icon("tree/snapshot_offline.png"));
@@ -52,7 +53,7 @@ QnResourceIconCache::QnResourceIconCache(QObject *parent): QObject(parent) {
     m_cache.insert(VideoWallItem | Offline, qnSkin->icon("tree/screen_offline.png"));
     m_cache.insert(IOModule | Offline,      qnSkin->icon("tree/io_offline.png"));
     m_cache.insert(IOModule | Unauthorized, qnSkin->icon("tree/io_unauthorized.png"));
-    m_cache.insert(WebPage | Offline,       qnSkin->icon("tree/webpage.png"));
+    m_cache.insert(WebPage | Offline,       qnSkin->icon("tree/webpage_offline.png"));
 
     /* Read-only server that is auto-discovered. */
     m_cache.insert(Server | Incompatible | ReadOnly,    qnSkin->icon("tree/server_incompatible_readonly.png"));

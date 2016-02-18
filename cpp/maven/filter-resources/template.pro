@@ -9,7 +9,7 @@ VERSION = ${release.version}
 unix {
     VERSION = ${linux.release.version}
 }
-QT += ${qt.libs}
+QT += ${qt.libs} core-private
 ADDITIONAL_QT_INCLUDES=${environment.dir}/qt5-custom
 
 
@@ -103,7 +103,7 @@ OBJECTS_DIR = ${project.build.directory}/build/$$CONFIGURATION/
 MOC_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
 UI_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
 RCC_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
-LIBS += -L$$OUTPUT_PATH/lib/$$CONFIGURATION -L${qt.dir}/lib -L$$OUTPUT_PATH/bin/$$CONFIGURATION
+LIBS += -L$$OUTPUT_PATH/lib -L$$OUTPUT_PATH/lib/$$CONFIGURATION -L${qt.dir}/lib -L$$OUTPUT_PATH/bin/$$CONFIGURATION
 !win*:!mac {
     LIBS += -Wl,-rpath-link,${qt.dir}/lib
 }
@@ -119,10 +119,15 @@ INCLUDEPATH +=  ${environment.dir}/boost_1_56_0 \
                 ${root.dir}/common_libs/nx_network/src \
                 ${root.dir}/common_libs/nx_utils/src \
                 ${root.dir}/common_libs/nx_streaming/src \
+                ${root.dir}/common_libs/nx_media/src \
                 ${libdir}/include \
                 $$ADDITIONAL_QT_INCLUDES \
-                ${qt.dir}/include/QtCore/$$QT_VERSION/ \
+                ${qt.dir}/include/QtCore/ \
                 ${qt.dir}/include/QtCore/$$QT_VERSION/QtCore/ \
+                ${qt.dir}/include/QtQuick/$$QT_VERSION/ \
+                ${qt.dir}/include/QtQuick/$$QT_VERSION/QtQuick/ \
+
+
 
 win* {
     DEFINES += \
@@ -195,7 +200,7 @@ win* {
   DEFINES += ${global.windows.defines}
   win32-msvc* {
     # Note on /bigobj: http://stackoverflow.com/questions/15110580/penalty-of-the-msvs-linker-flag-bigobj
-    QMAKE_CXXFLAGS += -MP /Fd$$OBJECTS_DIR /bigobj /wd4290
+    QMAKE_CXXFLAGS += -MP /Fd$$OBJECTS_DIR /bigobj /wd4290 /wd4661 /wd4100 /we4717
     # /OPT:NOREF is here for a reason, see http://stackoverflow.com/questions/6363991/visual-studio-debug-information-in-release-build.
     QMAKE_CXXFLAGS_RELEASE += /Zi /wd4250
     QMAKE_LFLAGS_RELEASE += /DEBUG /OPT:NOREF
@@ -264,7 +269,6 @@ macx {
 }
 
 INCLUDEPATH += ${environment.dir}/boost_1_56_0
-INCLUDEPATH += ${environment.dir}/include/ffmpeg-misc-headers-win32
 INCLUDEPATH += ${environment.dir}/include/glext
 
 ## ANDROID

@@ -72,7 +72,7 @@ void QnNotificationToolTipWidget::ensureThumbnail(QnImageProvider* provider) {
     m_thumbnailLabel->setAlignment(Qt::AlignCenter);
     m_thumbnailLabel->setClickableButtons(Qt::LeftButton | Qt::RightButton);
     setPaletteColor(m_thumbnailLabel, QPalette::Window, Qt::transparent);
-    m_layout->insertItem(0, m_thumbnailLabel);
+    m_layout->addItem(m_thumbnailLabel);
     connect(m_thumbnailLabel, SIGNAL(clicked(Qt::MouseButton)), this, SLOT(at_thumbnailLabel_clicked(Qt::MouseButton)));
 
     if (!provider->image().isNull()) {
@@ -270,7 +270,7 @@ void QnNotificationWidget::setGeometry(const QRectF &geometry) {
         updateOverlayGeometry();
 }
 
-void QnNotificationWidget::addActionButton(const QIcon &icon, const QString &tooltip, Qn::ActionId actionId,
+void QnNotificationWidget::addActionButton(const QIcon &icon, const QString &tooltip, QnActions::IDType actionId,
                                          const QnActionParameters &parameters, bool defaultAction)
 {
     qreal buttonSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, NULL, NULL);

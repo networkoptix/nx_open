@@ -1336,6 +1336,9 @@ int QnTimeSlider::helpTopicAt(const QPointF &pos) const {
     if (hasMotion)
         return Qn::MainWindow_MediaItem_SmartSearch_Help;
 
+    if (!m_bookmarksHelper->bookmarksAtPosition(valueFromPosition(pos), m_msecsPerPixel).isEmpty())
+        return Qn::Bookmarks_Usage_Help;
+
     return Qn::MainWindow_Slider_Timeline_Help;
 }
 

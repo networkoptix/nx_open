@@ -224,7 +224,7 @@ std::vector< AddressEntry > AddressResolver::resolveSync(
     return promise.get_future().get();
 }
 
-void AddressResolver::cancel( void* requestId, std::function< void() > handler )
+void AddressResolver::cancel( void* requestId, nx::utils::MoveOnlyFunc< void() > handler )
 {
     boost::optional< std::promise< bool > > promise;
     if( !handler )

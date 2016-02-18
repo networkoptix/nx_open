@@ -1,5 +1,6 @@
 #ifndef __UDT_SOCKET_TEST_H__
 #define __UDT_SOCKET_TEST_H__
+
 #include <memory>
 
 // Usage:
@@ -34,6 +35,11 @@
 // For analyzing, only very simple statistic will be output on the screen. So, some third party analyzing program should be used , like netstat.
 // I have no idea for the analyzing right now, and I will continue exploring on this thing. 
 
+class QCoreApplication;
+
+namespace nx {
+namespace network {
+
 class NX_NETWORK_API UdtSocketProfile {
 public:
     virtual bool run() = 0;
@@ -41,7 +47,9 @@ public:
     virtual ~UdtSocketProfile() {}
 };
 
-class QCoreApplication;
 std::unique_ptr<UdtSocketProfile> NX_NETWORK_API createUdtSocketProfile( const QCoreApplication& app );
+
+}   //network
+}   //nx
 
 #endif // __UDT_SOCKET_TEST_H__

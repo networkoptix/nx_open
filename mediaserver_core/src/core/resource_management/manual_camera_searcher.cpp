@@ -18,8 +18,6 @@
 #include <core/resource/resource.h>
 #include <core/resource/network_resource.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/webpage_resource.h>
-
 
 
 static const int MAX_PERCENT = 100;
@@ -85,25 +83,10 @@ namespace {
             );
     }
 
-    QnManualResourceSearchEntry entryFromWebPage(const QnWebPageResourcePtr &webPage)
-    {
-        return QnManualResourceSearchEntry(
-              QUrl(webPage->getUrl()).host()
-            , webPage->getUrl()
-            , qnResTypePool->getResourceType(webPage->getTypeId())->getName()
-            , QnResourceTypePool::kWebPageTypeId
-            , webPage->getUniqueId()
-            , resourceExistsInPool(webPage)
-            );
-    }
-
     QnManualResourceSearchEntry entryFromResource(const QnResourcePtr &resource)
     {
         if (const QnSecurityCamResourcePtr &camera = resource.dynamicCast<QnSecurityCamResource>())
             return entryFromCamera(camera);
-
-        if (const QnWebPageResourcePtr &webPage = resource.dynamicCast<QnWebPageResource>())
-            return entryFromWebPage(webPage);
 
         return QnManualResourceSearchEntry();
     }

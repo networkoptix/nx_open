@@ -20,7 +20,7 @@
 #include <ui/dialogs/progress_dialog.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-#include <ui/style/warning_style.h>
+#include <ui/style/custom_style.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_auto_starter.h>
 #include <ui/workaround/widgets_signals_workaround.h>
@@ -47,7 +47,7 @@ QnLookAndFeelPreferencesWidget::QnLookAndFeelPreferencesWidget(QWidget *parent) 
     setHelpTopic(this,                                                        Qn::SystemSettings_General_Customizing_Help);
     setHelpTopic(ui->languageLabel,           ui->languageComboBox,           Qn::SystemSettings_General_Language_Help);
     setHelpTopic(ui->tourCycleTimeLabel,      ui->tourCycleTimeSpinBox,       Qn::SystemSettings_General_TourCycleTime_Help);
-    setHelpTopic(ui->showIpInTreeLabel,       ui->showIpInTreeCheckBox,       Qn::SystemSettings_General_ShowIpInTree_Help);
+    setHelpTopic(ui->showIpInTreeCheckBox,                                    Qn::SystemSettings_General_ShowIpInTree_Help);
 
     setupLanguageUi();
     setupSkinUi();
@@ -120,10 +120,10 @@ void QnLookAndFeelPreferencesWidget::loadDataToUi() {
     m_oldBackground = background;
 
     if (!backgroundAllowed) {
-        ui->animationEnabledCheckBox->setChecked(false);
-        ui->imageEnabledCheckBox->setChecked(false);
+        ui->animationGroupBox->setChecked(false);
+        ui->imageGroupBox->setChecked(false);
     } else {
-        ui->animationEnabledCheckBox->setChecked(background.animationEnabled);
+        ui->animationGroupBox->setChecked(background.animationEnabled);
         ui->animationColorComboBox->setCurrentIndex(ui->animationColorComboBox->findData(qVariantFromValue(background.animationMode)));
         ui->colorSelectButton->setEnabled(background.animationMode == Qn::CustomAnimation);
         QColor customColor = background.animationCustomColor;
@@ -133,7 +133,7 @@ void QnLookAndFeelPreferencesWidget::loadDataToUi() {
         ui->animationOpacitySpinBox->setValue(qRound(customColor.alphaF() * 100));
         updateAnimationCustomColor();
 
-        ui->imageEnabledCheckBox->setChecked(background.imageEnabled);
+        ui->imageGroupBox->setChecked(background.imageEnabled);
         ui->imageNameLineEdit->setText(background.imageOriginalName);
         ui->imageModeComboBox->setCurrentIndex(ui->imageModeComboBox->findData(qVariantFromValue(background.imageMode)));
         ui->imageOpacitySpinBox->setValue(qRound(background.imageOpacity * 100));
@@ -158,7 +158,7 @@ bool QnLookAndFeelPreferencesWidget::canDiscardChanges() {
     if (backgroundAllowed)
     {
         qnSettings->setBackground(m_oldBackground);
-        action(Qn::ToggleBackgroundAnimationAction)->setChecked(
+        action(QnActions::ToggleBackgroundAnimationAction)->setChecked(
             m_oldBackground.animationEnabled);
     }
     return true;
@@ -290,22 +290,18 @@ void QnLookAndFeelPreferencesWidget::setupBackgroundUi() {
     ui->imageModeComboBox->addItem(tr("Fit"),     qVariantFromValue(Qn::FitImage));
     ui->imageModeComboBox->addItem(tr("Crop"),    qVariantFromValue(Qn::CropImage));
 
-    connect(ui->animationEnabledCheckBox, &QCheckBox::toggled, this, [this] (bool checked) {
-        ui->animationWidget->setEnabled(checked);
-
+    connect(ui->animationGroupBox, &QGroupBox::toggled, this, [this] (bool checked) {
         if (m_updating)
             return;
 
-        action(Qn::ToggleBackgroundAnimationAction)->setChecked(checked);
+        action(QnActions::ToggleBackgroundAnimationAction)->setChecked(checked);
 
         QnClientBackground background = qnSettings->background();
         background.animationEnabled = checked;
         qnSettings->setBackground(background);
     });
 
-    connect(ui->imageEnabledCheckBox, &QCheckBox::toggled, this, [this] (bool checked) {
-        ui->imageWidget->setEnabled(checked);
-
+    connect(ui->imageGroupBox, &QGroupBox::toggled, this, [this] (bool checked) {
         if (m_updating)
             return;
 

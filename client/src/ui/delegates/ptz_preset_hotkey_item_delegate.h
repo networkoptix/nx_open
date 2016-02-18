@@ -1,7 +1,7 @@
 #ifndef QN_PTZ_PRESET_HOTKEY_ITEM_DELEGATE_H
 #define QN_PTZ_PRESET_HOTKEY_ITEM_DELEGATE_H
 
-#include <QStyledItemDelegate>
+#include <QtWidgets/QStyledItemDelegate>
 
 class QnComboBoxContainerEventFilter;
 

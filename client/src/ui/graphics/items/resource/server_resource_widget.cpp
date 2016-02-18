@@ -13,7 +13,6 @@
 #include <core/resource/resource_name.h>
 
 #include <api/media_server_statistics_manager.h>
-
 #include <ui/actions/action_parameters.h>
 #include <ui/actions/action_manager.h>
 #include <ui/animation/variant_animator.h>
@@ -25,6 +24,8 @@
 #include <ui/graphics/items/generic/image_button_bar.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/standard/graphics_label.h>
+#include <ui/graphics/items/resource/button_ids.h>
+#include <ui/graphics/items/overlays/buttons_overlay.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/opengl/gl_context_data.h>
 #include <ui/graphics/painters/radial_gradient_painter.h>
@@ -507,7 +508,7 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     showLogButton->setToolTip(tr("Show Log"));
     setHelpTopic(showLogButton, Qn::MainWindow_MonitoringItem_Log_Help);
     connect(showLogButton, SIGNAL(clicked()), this, SLOT(at_showLogButton_clicked()));
-    buttonBar()->addButton(ShowLogButton, showLogButton);
+    buttonsOverlay()->rightButtonsBar()->addButton(Qn::ShowLogButton, showLogButton);
 
     QnImageButtonWidget *checkIssuesButton = new QnImageButtonWidget();
     checkIssuesButton->setIcon(qnSkin->icon("item/issues.png"));
@@ -515,7 +516,7 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     checkIssuesButton->setProperty(Qn::NoBlockMotionSelection, true);
     checkIssuesButton->setToolTip(tr("Check Issues"));
     connect(checkIssuesButton, SIGNAL(clicked()), this, SLOT(at_checkIssuesButton_clicked()));
-    buttonBar()->addButton(CheckIssuesButton, checkIssuesButton);
+    buttonsOverlay()->rightButtonsBar()->addButton(Qn::CheckIssuesButton, checkIssuesButton);
 
 //    connect(headerOverlayWidget(), SIGNAL(opacityChanged()), this, SLOT(updateInfoOpacity()));
 
@@ -524,7 +525,6 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     updateTitleText();
     //updateInfoOpacity();
     updateInfoText();
-    updateDetailsText();
     at_statistics_received();
 }
 
@@ -626,7 +626,8 @@ void QnServerResourceWidget::addOverlays() {
     mainOverlayWidget->setLayout(mainOverlayLayout);
     mainOverlayWidget->setAcceptedMouseButtons(Qt::NoButton);
     mainOverlayWidget->setOpacity(1.0);
-    addOverlayWidget(mainOverlayWidget, UserVisible, true);
+    addOverlayWidget(mainOverlayWidget
+        , detail::OverlayParams(UserVisible, true));
 }
 
 QnServerResourceWidget::LegendButtonBar QnServerResourceWidget::buttonBarByDeviceType(const Qn::StatisticsDeviceType deviceType) const {
@@ -790,11 +791,12 @@ QString QnServerResourceWidget::calculateTitleText() const {
         : name;
 }
 
-QnResourceWidget::Buttons QnServerResourceWidget::calculateButtonsVisibility() const {
-    Buttons result = base_type::calculateButtonsVisibility();
-    result &= (CloseButton | RotateButton | InfoButton);
+int QnServerResourceWidget::calculateButtonsVisibility() const
+{
+    int result = base_type::calculateButtonsVisibility();
+    result &= (Qn::CloseButton | Qn::RotateButton | Qn::InfoButton);
     if (!qnRuntime->isVideoWallMode() && !qnRuntime->isActiveXMode())
-        result |= PingButton | ShowLogButton | CheckIssuesButton;
+        result |= (Qn::PingButton | Qn::ShowLogButton | Qn::CheckIssuesButton);
     return result;
 }
 
@@ -868,14 +870,14 @@ void QnServerResourceWidget::at_statistics_received() {
 }
 
 void QnServerResourceWidget::at_pingButton_clicked() {
-    menu()->trigger(Qn::PingAction, QnActionParameters(m_resource));
+    menu()->trigger(QnActions::PingAction, QnActionParameters(m_resource));
 }
 
 void QnServerResourceWidget::at_showLogButton_clicked() {
-    menu()->trigger(Qn::ServerLogsAction, QnActionParameters(m_resource));
+    menu()->trigger(QnActions::ServerLogsAction, QnActionParameters(m_resource));
 }
 
 void QnServerResourceWidget::at_checkIssuesButton_clicked() {
-    menu()->trigger(Qn::ServerIssuesAction, QnActionParameters(m_resource));
+    menu()->trigger(QnActions::ServerIssuesAction, QnActionParameters(m_resource));
 }
 

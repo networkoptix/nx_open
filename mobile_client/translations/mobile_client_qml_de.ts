@@ -5,13 +5,13 @@
     <name>QnCameraFlow</name>
     <message>
         <source>Hidden cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>Versteckte Kameras</translation>
     </message>
     <message numerus="yes">
         <source>%n cameras are hidden</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n Kamera ist versteckt</numerusform>
+            <numerusform>%n Kameras sind versteckt</numerusform>
         </translation>
     </message>
 </context>
@@ -20,109 +20,110 @@
     <message>
         <source>Authentication
 required</source>
-        <translation type="unfinished"></translation>
+        <translation>Authentifizierung
+erforderlich</translation>
     </message>
     <message>
         <source>Offline</source>
-        <translation type="unfinished"></translation>
+        <translation>Offline</translation>
     </message>
 </context>
 <context>
     <name>QnCameraMenu</name>
     <message>
         <source>Quality</source>
-        <translation type="unfinished">Qualität</translation>
+        <translation>Qualität</translation>
     </message>
     <message>
         <source>Auto</source>
-        <translation type="unfinished">Auto</translation>
+        <translation>Auto</translation>
     </message>
 </context>
 <context>
     <name>QnDiscoveredSessionItem</name>
     <message>
         <source>incompatible server version</source>
-        <translation type="unfinished"></translation>
+        <translation>Inkompatible Serverversion</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Unbekannt</translation>
     </message>
 </context>
 <context>
     <name>QnHiddenCameraItem</name>
     <message>
         <source>Show</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeigen</translation>
     </message>
 </context>
 <context>
     <name>QnHorizontalCalendarLayout</name>
     <message>
         <source>Close</source>
-        <translation type="unfinished"></translation>
+        <translation>Schließen</translation>
     </message>
 </context>
 <context>
     <name>QnLiveVideoNavigation</name>
     <message>
         <source>LIVE</source>
-        <translation type="unfinished"></translation>
+        <translation>Live</translation>
     </message>
 </context>
 <context>
     <name>QnLoginPage</name>
     <message>
         <source>New Connection</source>
-        <translation type="unfinished"></translation>
+        <translation>Neue Verbindung</translation>
     </message>
     <message>
         <source>Host</source>
-        <translation type="unfinished"></translation>
+        <translation>Host</translation>
     </message>
     <message>
         <source>Port (optional)</source>
-        <translation type="unfinished"></translation>
+        <translation>Port (optional)</translation>
     </message>
     <message>
         <source>Login</source>
-        <translation type="unfinished"></translation>
+        <translation>Login</translation>
     </message>
     <message>
         <source>Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Passwort</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Speichern</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished">Löschen</translation>
+        <translation>Löschen</translation>
     </message>
     <message>
         <source>Connect</source>
-        <translation type="unfinished"></translation>
+        <translation>Verbinden</translation>
     </message>
     <message>
         <source>Auto-discovered systems</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatisch ermittelte Systeme</translation>
     </message>
     <message>
         <source>Incorrect login or password</source>
-        <translation type="unfinished"></translation>
+        <translation>Falscher Benutzername oder Passwort</translation>
     </message>
     <message>
         <source>Server or network is not available</source>
-        <translation type="unfinished"></translation>
+        <translation>Server oder Netzwerk ist nicht erreichbar</translation>
     </message>
     <message>
         <source>Incompatible server</source>
-        <translation type="unfinished"></translation>
+        <translation>Inkompatibler Server</translation>
     </message>
     <message>
         <source>Incompatible server version %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Inkompatible Serverversion %1</translation>
     </message>
 </context>
 <context>
@@ -130,126 +131,127 @@ required</source>
     <message>
         <source>To connect to old servers please download the legacy application from Google Play.</source>
         <comment>&quot;Google Play&quot; is the name of the main Android application store.</comment>
-        <translation type="unfinished"></translation>
+        <translation>Um eine Verbindung mit alten Servern herzustellen, laden Sie sich die alte Anwendung von Google Play.</translation>
     </message>
     <message>
         <source>To connect to old servers please download the legacy application from the App Store.</source>
         <comment>&quot;App Store&quot; is the name of the main Apple application store.</comment>
-        <translation type="unfinished"></translation>
+        <translation>Um eine Verbindung mit alten Servern herzustellen, laden Sie sich die alte Anwendung vom App Store.</translation>
     </message>
     <message>
         <source>To connect to old servers please download the legacy application from the Internet.</source>
-        <translation type="unfinished"></translation>
+        <translation>Um eine Verbindung mit alten Servern herzustellen, laden Sie sich die alte Anwendung aus dem Internet.</translation>
     </message>
     <message>
         <source>Download</source>
-        <translation type="unfinished"></translation>
+        <translation>Download</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Abbrechen</translation>
+        <translation>Abbrechen</translation>
     </message>
 </context>
 <context>
     <name>QnQualityDialog</name>
     <message>
         <source>Video quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Videoqualität</translation>
     </message>
     <message>
         <source>Auto</source>
-        <translation type="unfinished">Auto</translation>
+        <translation>Auto</translation>
     </message>
 </context>
 <context>
     <name>QnResourcesPage</name>
     <message>
         <source>Server offline</source>
-        <translation type="unfinished"></translation>
+        <translation>Server ist offline</translation>
     </message>
     <message>
         <source>Loading...</source>
-        <translation type="unfinished">Lade...</translation>
+        <translation>Lade...</translation>
     </message>
     <message>
         <source>Connecting...</source>
-        <translation type="unfinished"></translation>
+        <translation>Verbinde...</translation>
     </message>
 </context>
 <context>
     <name>QnSearchItem</name>
     <message>
         <source>Search</source>
-        <translation type="unfinished">Suche</translation>
+        <translation>Suche</translation>
     </message>
 </context>
 <context>
     <name>QnSettingsPage</name>
     <message>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Einstellungen</translation>
     </message>
     <message>
         <source>Show offline cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeige Offline-Kameras</translation>
     </message>
 </context>
 <context>
     <name>QnSideNavigation</name>
     <message>
         <source>Saved connections</source>
-        <translation type="unfinished"></translation>
+        <translation>Gespeicherte Verbindungen</translation>
     </message>
     <message>
         <source>New connection</source>
-        <translation type="unfinished"></translation>
+        <translation>Neue Verbindung</translation>
     </message>
     <message>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Einstellungen</translation>
     </message>
 </context>
 <context>
     <name>QnVerticalCalendarLayout</name>
     <message>
         <source>Close</source>
-        <translation type="unfinished"></translation>
+        <translation>Schließen</translation>
     </message>
 </context>
 <context>
     <name>QnVideoNavigation</name>
     <message>
         <source>No Archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Kein Archiv</translation>
     </message>
     <message>
         <source>LIVE</source>
-        <translation type="unfinished"></translation>
+        <translation>Live</translation>
     </message>
     <message>
         <source>d MMMM yyyy</source>
         <comment>DO NOT TRANSLATE THIS STRING!</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>QnVideoPage</name>
     <message>
         <source>Server offline</source>
-        <translation type="unfinished"></translation>
+        <translation>Server ist offline</translation>
     </message>
     <message>
         <source>Authentication
 required</source>
-        <translation type="unfinished"></translation>
+        <translation>Authentifizierung
+erforderlich</translation>
     </message>
     <message>
         <source>Camera offline</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamera ist offline</translation>
     </message>
     <message>
         <source>Can&apos;t load video</source>
-        <translation type="unfinished"></translation>
+        <translation>Video kann nicht geladen werden</translation>
     </message>
 </context>
 </TS>

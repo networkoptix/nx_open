@@ -5,7 +5,7 @@
 
 #include <common/common_module.h>
 #include <watchers/cloud_status_watcher.h>
-#include <ui/style/warning_style.h>
+#include <ui/style/custom_style.h>
 
 class QnCloudStatusPanelPrivate : public QObject
 {
@@ -59,11 +59,11 @@ QnCloudStatusPanelPrivate::QnCloudStatusPanelPrivate(QnCloudStatusPanel *parent)
 {
     Q_Q(QnCloudStatusPanel);
 
-    cloudMenu->addAction(q->action(Qn::OpenCloudMainUrl));
+    cloudMenu->addAction(q->action(QnActions::OpenCloudMainUrl));
     systemsMenu = cloudMenu->addMenu(tr("Connect to System..."));
     cloudMenu->addSeparator();
-    cloudMenu->addAction(q->action(Qn::OpenCloudManagementUrl));
-    cloudMenu->addAction(q->action(Qn::LogoutFromCloud));
+    cloudMenu->addAction(q->action(QnActions::OpenCloudManagementUrl));
+    cloudMenu->addAction(q->action(QnActions::LogoutFromCloud));
 
     QnCloudStatusWatcher *cloudStatusWatcher = qnCommon->instance<QnCloudStatusWatcher>();
     connect(cloudStatusWatcher,     &QnCloudStatusWatcher::statusChanged,           this,   &QnCloudStatusPanelPrivate::updateUi);
@@ -125,5 +125,5 @@ void QnCloudStatusPanelPrivate::at_clicked()
         return;
     }
 
-    q->action(Qn::LoginToCLoud)->trigger();
+    q->action(QnActions::LoginToCLoud)->trigger();
 }

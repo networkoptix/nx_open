@@ -2,6 +2,9 @@
 
 #include <ui/dialogs/private/search_bookmarks_dialog_p.h>
 
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
+
 QnSearchBookmarksDialog::QnSearchBookmarksDialog(const QString &filterText
     , qint64 utcStartTimeMs
     , qint64 utcFinishTimeMs
@@ -9,6 +12,7 @@ QnSearchBookmarksDialog::QnSearchBookmarksDialog(const QString &filterText
     : base_type(parent)
     , d_ptr(new QnSearchBookmarksDialogPrivate(filterText, utcStartTimeMs, utcFinishTimeMs, this))
 {
+    setHelpTopic(this, Qn::Bookmarks_Search_Help);
 }
 
 QnSearchBookmarksDialog::~QnSearchBookmarksDialog()

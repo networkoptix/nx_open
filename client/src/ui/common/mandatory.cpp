@@ -1,6 +1,6 @@
 #include "mandatory.h"
 
-#include <ui/style/warning_style.h>
+#include <ui/style/custom_style.h>
 
 bool defaultValidateFunction( const QString &text ) {
     return !text.trimmed().isEmpty();

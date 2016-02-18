@@ -13,11 +13,11 @@ namespace
 {
     const int kRetryInterval = 10 * 1000;
 
-    QnCloudSystemList getCloudSystemList(const api::SystemDataList &systemsList)
+    QnCloudSystemList getCloudSystemList(const api::SystemDataExList &systemsList)
     {
         QnCloudSystemList result;
 
-        for (const api::SystemData &systemData : systemsList.systems)
+        for (const api::SystemDataEx &systemData : systemsList.systems)
         {
             if (systemData.status != api::ssActivated)
                 continue;
@@ -160,7 +160,7 @@ void QnCloudStatusWatcher::updateSystems()
         return;
 
     d->cloudConnection->systemManager()->getSystems(
-            [this](api::ResultCode result, const api::SystemDataList &systemsList)
+            [this](api::ResultCode result, const api::SystemDataExList &systemsList)
             {
                 QnCloudSystemList cloudSystems;
 

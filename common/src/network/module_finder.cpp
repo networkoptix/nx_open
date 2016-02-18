@@ -185,6 +185,7 @@ void QnModuleFinder::setModuleStatus(const QnUuid &moduleId, Qn::ResourceStatus 
     case Qn::Incompatible:
         break;
     case Qn::Offline:
+        lk.unlock();
         removeModule(moduleId);
         return;
     default:

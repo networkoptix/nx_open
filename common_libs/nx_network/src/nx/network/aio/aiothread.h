@@ -28,6 +28,8 @@
 #include "../udt/udt_pollset.h"
 
 
+namespace nx {
+namespace network {
 namespace aio {
 namespace detail {
 
@@ -97,10 +99,10 @@ public:
     /*!
         \param mutex Mutex to use for exclusive access to internal data
     */
-    AIOThread( QnMutex* const aioServiceMutex ) //TODO: #ak give up using single aioServiceMutex for all aio threads
+    AIOThread()
     :
         QnLongRunnable( false ),
-        m_impl( new AIOThreadImplType( aioServiceMutex ) )
+        m_impl( new AIOThreadImplType() )
     {
         setObjectName(QString::fromLatin1("AIOThread") );
     }
@@ -128,13 +130,13 @@ public:
         SocketType* const sock,
         aio::EventType eventToWatch,
         AIOEventHandler<SocketType>* const eventHandler,
-        unsigned int timeoutMs = 0,
+        std::chrono::milliseconds timeoutMs = std::chrono::milliseconds(),
         std::function<void()> socketAddedToPollHandler = std::function<void()>() )
     {
-        //NOTE m_impl->aioServiceMutex is locked up the stack
+        QnMutexLocker lk(&m_impl->mutex);
 
         //checking queue for reverse task for \a sock
-        if (m_impl->removeReverseTask(sock, eventToWatch, TaskType::tAdding, eventHandler, timeoutMs))
+        if (m_impl->removeReverseTask(sock, eventToWatch, TaskType::tAdding, eventHandler, timeoutMs.count()))
             return;    //ignoring task
 
         m_impl->pollSetModificationQueue.push_back(typename AIOThreadImplType::SocketAddRemoveTask(
@@ -142,7 +144,7 @@ public:
             sock,
             eventToWatch,
             eventHandler,
-            timeoutMs,
+            timeoutMs.count(),
             nullptr,
             socketAddedToPollHandler));
         if (eventToWatch == aio::etRead)
@@ -161,12 +163,11 @@ public:
         SocketType* const sock,
         aio::EventType eventToWatch,
         AIOEventHandler<SocketType>* const eventHandler,
-        unsigned int timeoutMs = 0,
+        std::chrono::milliseconds timeoutMs = std::chrono::milliseconds(0),
         std::function<void()> socketAddedToPollHandler = std::function<void()>() )
     {
+        QnMutexLocker lk(&m_impl->mutex);
         //TODO #ak looks like copy-paste of previous method. Remove copy-paste nahuy!!!
-
-        //NOTE m_impl->aioServiceMutex is locked up the stack
 
         //this task does not cancel any other task. TODO #ak maybe it should cancel another timeout change?
         ////checking queue for reverse task for \a sock
@@ -184,7 +185,7 @@ public:
             sock,
             eventToWatch,
             eventHandler,
-            timeoutMs,
+            timeoutMs.count(),
             nullptr,
             std::move(socketAddedToPollHandler)));
         if (currentThreadSystemId() != systemThreadId())  //if eventTriggered is lower on stack, socket will be added to pollset before next poll call
@@ -205,7 +206,7 @@ public:
         bool waitForRunningHandlerCompletion,
         std::function<void()> pollingStoppedHandler = std::function<void()>())
     {
-        //NOTE m_impl->aioServiceMutex is locked down the stack
+        QnMutexLocker lk(&m_impl->mutex);
 
         //checking queue for reverse task for \a sock
         if (m_impl->removeReverseTask(sock, eventType, TaskType::tRemoving, NULL, 0))
@@ -223,11 +224,14 @@ public:
         //inAIOThread is false in case async operation cancellation. In most cases, inAIOThread is true
         if (inAIOThread)
         {
+            lk.unlock();
             //removing socket from pollset does not invalidate iterators (iterating pollset may be higher the stack)
             m_impl->removeSocketFromPollSet(sock, eventType);
             userData = nullptr;
+            return;
         }
-        else if (waitForRunningHandlerCompletion)
+        
+        if (waitForRunningHandlerCompletion)
         {
             std::atomic<int> taskCompletedCondition(0);
             //we MUST remove socket from pollset before returning from here
@@ -243,7 +247,7 @@ public:
 
             //we can be sure that socket will be removed before next poll
 
-            m_impl->aioServiceMutex->unlock();
+            lk.unlock();
 
             //TODO #ak maybe we just have to wait for remove completion, but not for running handler completion?
             //I.e., is it possible that handler was launched (or still running) after removal task completion?
@@ -251,8 +255,8 @@ public:
             //waiting for event handler completion (if it running)
             while (handlingData->beingProcessed.load() > 0)
             {
-                m_impl->mutex.lock();
-                m_impl->mutex.unlock();
+                m_impl->socketEventProcessingMutex.lock();
+                m_impl->socketEventProcessingMutex.unlock();
             }
 
             //waiting for socket to be removed from pollset
@@ -260,7 +264,7 @@ public:
                 msleep(0);    //yield. TODO #ak Better replace it with conditional_variable
                                 //TODO #ak if remove task completed, doesn't it mean handler is not running and never be launched?
 
-            m_impl->aioServiceMutex->lock();
+            lk.relock();
         }
         else
         {
@@ -278,8 +282,10 @@ public:
     }
 
     //!Queues \a functor to be executed from within this aio thread as soon as possible
-    void post( SocketType* const sock, std::function<void()>&& functor )
+    void post( SocketType* const sock, nx::utils::MoveOnlyFunc<void()> functor )
     {
+        QnMutexLocker lk(&m_impl->mutex);
+
         m_impl->pollSetModificationQueue.push_back(
             typename AIOThreadImplType::PostAsyncCallTask(
                 sock,
@@ -290,13 +296,11 @@ public:
     }
 
     //!If called in this aio thread, then calls \a functor immediately, otherwise queues \a functor in same way as \a aio::AIOThread::post does
-    void dispatch( SocketType* const sock, std::function<void()>&& functor )
+    void dispatch( SocketType* const sock, nx::utils::MoveOnlyFunc<void()> functor )
     {
         if (currentThreadSystemId() == systemThreadId())  //if called from this aio thread
         {
-            m_impl->aioServiceMutex->unlock();
             functor();
-            m_impl->aioServiceMutex->lock();
             return;
         }
         //otherwise posting functor
@@ -306,13 +310,21 @@ public:
     //!Cancels calls scheduled with \a aio::AIOThread::post and \a aio::AIOThread::dispatch
     void cancelPostedCalls( SocketType* const sock, bool waitForRunningHandlerCompletion )
     {
+        QnMutexLocker lk(&m_impl->mutex);
+
         const bool inAIOThread = currentThreadSystemId() == systemThreadId();
         if (inAIOThread)
         {
             //removing postedCall tasks and posted calls
-            m_impl->cancelPostedCallsInternal(sock->impl()->socketSequence);
+            auto postedCallsToRemove = m_impl->cancelPostedCallsInternal(
+                &lk,
+                sock->impl()->socketSequence);
+            lk.unlock();
+            //removing postedCallsToRemove with mutex unlocked since there can be indirect calls to this
+            return;
         }
-        else if (waitForRunningHandlerCompletion)
+        
+        if (waitForRunningHandlerCompletion)
         {
             //posting cancellation task
             m_impl->pollSetModificationQueue.push_back(
@@ -324,7 +336,7 @@ public:
 
             //we can be sure that socket will be removed before next poll
 
-            m_impl->aioServiceMutex->unlock();
+            lk.unlock();
 
             //waiting for posted calls processing to finish
             while (m_impl->processingPostedCalls == 1)
@@ -335,7 +347,7 @@ public:
                                 //  Although, it may still be in the queue.
                                 //  But, socket can be safely removed, since we use socketSequence
 
-            m_impl->aioServiceMutex->lock();
+            lk.relock();
         }
         else
         {
@@ -380,7 +392,7 @@ protected:
             //taking clock of the next periodic task
             qint64 nextPeriodicEventClock = 0;
             {
-                QnMutexLocker lk(&m_impl->mutex);
+                QnMutexLocker lk(&m_impl->socketEventProcessingMutex);
                 nextPeriodicEventClock = m_impl->periodicTasksByClock.empty() ? 0 : m_impl->periodicTasksByClock.cbegin()->first;
             }
 
@@ -449,7 +461,7 @@ public:
         //!0 means no timeout
         unsigned int timeout;
         std::atomic<int>* taskCompletionEvent;
-        std::function<void()> postHandler;
+        nx::utils::MoveOnlyFunc<void()> postHandler;
         std::function<void()> taskCompletionHandler;
 
         /*!
@@ -483,7 +495,7 @@ public:
     public:
         PostAsyncCallTask(
             SocketType* const _socket,
-            std::function<void()>&& _postHandler)
+            nx::utils::MoveOnlyFunc<void()> _postHandler)
         :
             SocketAddRemoveTask(
                 TaskType::tCallFunc,
@@ -551,15 +563,12 @@ public:
     //TODO #ak too many mutexes here. Refactoring required
 
     PollSetType pollSet;
-    //TODO #ak MUST remove this mutex from here
-    QnMutex* const aioServiceMutex;
-    /*!
-        \note This variable is accessed with \a aioServiceMutex locked
-    */
     std::deque<SocketAddRemoveTask> pollSetModificationQueue;
     unsigned int newReadMonitorTaskCount;
     unsigned int newWriteMonitorTaskCount;
+    /** used to make public API thread-safe (to serialize access to internal structures) */
     mutable QnMutex mutex;
+    mutable QnMutex socketEventProcessingMutex;
     //TODO #ak get rid of map here to avoid undesired allocations
     std::multimap<qint64, PeriodicTaskData> periodicTasksByClock;
     //TODO #ak use cyclic array here to minimize allocations
@@ -569,9 +578,8 @@ public:
     std::deque<SocketAddRemoveTask> postedCalls;
     std::atomic<int> processingPostedCalls;
 
-    AIOThreadImpl(QnMutex* const _aioServiceMutex)
+    AIOThreadImpl()
     :
-        aioServiceMutex(_aioServiceMutex),
         newReadMonitorTaskCount(0),
         newWriteMonitorTaskCount(0),
         processingPostedCalls(0)
@@ -587,17 +595,15 @@ public:
 
     void processPollSetModificationQueue(TaskType taskFilter)
     {
-        if (pollSetModificationQueue.empty())
-            return;
-
-        QnMutexLocker lk(aioServiceMutex);
+        std::vector<SocketAddRemoveTask> elementsToRemove;
+        QnMutexLocker lk(&mutex);
 
         for (typename std::deque<SocketAddRemoveTask>::iterator
             it = pollSetModificationQueue.begin();
             it != pollSetModificationQueue.end();
             )
         {
-            const SocketAddRemoveTask& task = *it;
+            SocketAddRemoveTask& task = *it;
             if ((taskFilter != TaskType::tAll) && (task.type != taskFilter))
             {
                 ++it;
@@ -650,15 +656,29 @@ public:
                 case TaskType::tCallFunc:
                 {
                     assert(task.postHandler);
-                    //TODO #ak why just moving task from one container to another? 
-                    //  Why not store it in postedCalls only?
+                    assert(!task.taskCompletionEvent && !task.taskCompletionHandler);
                     postedCalls.push_back(std::move(task));
-                    break;
+                    //this task differs from every else in a way that it is not processed here, 
+                        //just moved to another container. TODO #ak is it really needed to move to another container?
+                    it = pollSetModificationQueue.erase(it);
+                    continue;
                 }
 
                 case TaskType::tCancelPostedCalls:
                 {
-                    cancelPostedCallsInternal(task.socketSequence);
+                    auto postedCallsToRemove = cancelPostedCallsInternal(&lk, task.socketSequence);
+                    if (elementsToRemove.empty())
+                    {
+                        elementsToRemove = std::move(postedCallsToRemove);
+                    }
+                    else
+                    {
+                        elementsToRemove.reserve(elementsToRemove.size() + postedCallsToRemove.size());
+                        std::move(
+                            postedCallsToRemove.begin(),
+                            postedCallsToRemove.end(),
+                            std::back_inserter(elementsToRemove));
+                    }
                     break;
                 }
 
@@ -825,12 +845,12 @@ public:
 
             //NX_LOG( QString::fromLatin1("processing %1, eventType %2").arg((size_t)socket, 0, 16).arg(handlerToInvokeType), cl_logDEBUG1 );
 
-            //no need to lock aioServiceMutex, since data is removed in this thread only
+            //no need to lock mutex, since data is removed in this thread only
             std::shared_ptr<AIOEventHandlingData<SocketType>> handlingData =
                 static_cast<AIOEventHandlingDataHolder<SocketType>*>(
                     socket->impl()->eventTypeToUserData[handlerToInvokeType])->data;
 
-            QnMutexLocker lk(&mutex);
+            QnMutexLocker lk(&socketEventProcessingMutex);
             ++handlingData->beingProcessed;
             //TODO #ak possibly some atomic fence is required here
             if (handlingData->markedForRemoval.load(std::memory_order_relaxed) > 0) //socket has been removed from watch
@@ -860,7 +880,7 @@ public:
 
         for (;; )
         {
-            QnMutexLocker lk(&mutex);
+            QnMutexLocker lk(&socketEventProcessingMutex);
 
             PeriodicTaskData periodicTaskData;
             {
@@ -872,7 +892,7 @@ public:
                 periodicTasksByClock.erase(it);
             }
 
-            //no need to lock aioServiceMutex, since data is removed in this thread only
+            //no need to lock mutex, since data is removed in this thread only
             std::shared_ptr<AIOEventHandlingData<SocketType>> handlingData = periodicTaskData.data; //TODO #ak do we really need to copy shared_ptr here?
             ++handlingData->beingProcessed;
             //TODO #ak atomic fence is required here (to avoid reordering)
@@ -948,7 +968,7 @@ public:
         SocketType* _socket,
         aio::EventType eventType)
     {
-        QnMutexLocker lk(&mutex);
+        QnMutexLocker lk(&socketEventProcessingMutex);
         addPeriodicTaskNonSafe(taskClock, handlingData, _socket, eventType);
     }
 
@@ -963,31 +983,75 @@ public:
             PeriodicTaskData(handlingData, _socket, eventType)));
     }
 
-    void cancelPostedCallsInternal(SocketSequenceType socketSequence)
+    /** Moves elements to remove to a temporary container and returns it.
+        Elements may contain functor which may contain aio objects (sockets) which will be remove
+        when removing functor. This may lead to a dead lock if we not release \a lock
+     */
+    std::vector<SocketAddRemoveTask> cancelPostedCallsInternal(
+        QnMutexLockerBase* const /*lock*/,
+        SocketSequenceType socketSequence)
     {
-        for (typename std::deque<SocketAddRemoveTask>::iterator
-            it = pollSetModificationQueue.begin();
-            it != pollSetModificationQueue.end();
-            )
-        {
-            if (it->type == TaskType::tCallFunc && it->socketSequence == socketSequence)
-                it = pollSetModificationQueue.erase(it);
-            else
-                ++it;
-        }
+        //for (typename std::deque<SocketAddRemoveTask>::iterator
+        //    it = pollSetModificationQueue.begin();
+        //    it != pollSetModificationQueue.end();
+        //    )
+        //{
+        //    if (it->type == TaskType::tCallFunc && it->socketSequence == socketSequence)
+        //        it = pollSetModificationQueue.erase(it);
+        //    else
+        //        ++it;
+        //}
 
-        //TODO #ak copy-paste. Refactor it!
+        //for (typename std::deque<SocketAddRemoveTask>::iterator
+        //    it = postedCalls.begin();
+        //    it != postedCalls.end();
+        //    )
+        //{
+        //    if (it->socketSequence == socketSequence)
+        //        it = postedCalls.erase(it);
+        //    else
+        //        ++it;
+        //}
 
-        for (typename std::deque<SocketAddRemoveTask>::iterator
-            it = postedCalls.begin();
-            it != postedCalls.end();
-            )
-        {
-            if (it->socketSequence == socketSequence)
-                it = postedCalls.erase(it);
-            else
-                ++it;
-        }
+        //detecting range of elements to remove
+        const auto tasksToRemoveRangeStart = std::remove_if(
+            pollSetModificationQueue.begin(),
+            pollSetModificationQueue.end(),
+            [socketSequence](const SocketAddRemoveTask& val)
+            {
+                return val.type == TaskType::tCallFunc &&
+                       val.socketSequence == socketSequence;
+            });
+
+        const auto postedCallsRemoveRangeStart = std::remove_if(
+            postedCalls.begin(),
+            postedCalls.end(),
+            [socketSequence](const SocketAddRemoveTask& val)
+            {
+                return val.socketSequence == socketSequence;
+            });
+
+        //moving elements to remove to local container
+        std::vector<SocketAddRemoveTask> elementsToRemove;
+        elementsToRemove.reserve(
+            std::distance(tasksToRemoveRangeStart, pollSetModificationQueue.end())+
+            std::distance(postedCallsRemoveRangeStart, postedCalls.end()));
+
+        auto elementsToRemoveInserter = std::back_inserter(elementsToRemove);
+        for (auto it = tasksToRemoveRangeStart; it != pollSetModificationQueue.end(); ++it)
+            elementsToRemoveInserter = std::move(*it);
+        for (auto it = postedCallsRemoveRangeStart; it != postedCalls.end(); ++it)
+            elementsToRemoveInserter = std::move(*it);
+
+        //removing elements from source container
+        pollSetModificationQueue.erase(
+            tasksToRemoveRangeStart,
+            pollSetModificationQueue.end());
+        postedCalls.erase(
+            postedCallsRemoveRangeStart,
+            postedCalls.end());
+
+        return elementsToRemove;
     }
 
 private:
@@ -1023,13 +1087,13 @@ class AIOThread
         typename socket_to_pollset_static_map::get<SocketType>::value> base_type;
 
 public:
-    AIOThread(QnMutex* const aioServiceMutex)
-    :
-        base_type(aioServiceMutex)
+    AIOThread()
     {
     }
 };
 
 }   //aio
+}   //network
+}   //nx
 
 #endif  //AIOTHREAD_H

@@ -135,7 +135,7 @@ private:
     Q_DECLARE_PRIVATE(QnCameraSettingsWidget)
 
     QScopedPointer<Ui::SingleCameraSettingsWidget> ui;
-  
+
     QnVirtualCameraResourcePtr m_camera;
     bool m_cameraSupportsMotion;
 
@@ -160,7 +160,7 @@ private:
     bool m_inUpdateMaxFps;
 
     QHash<QnUuid, QnImageProvider*> m_imageProvidersByResourceId;
-    
+
 };
 
 #endif // CAMERA_SETTINGS_DIALOG_H

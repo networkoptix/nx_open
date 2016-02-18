@@ -38,14 +38,10 @@ UDPClient::RequestContext::RequestContext(RequestContext&& rhs)
 
 UDPClient::UDPClient()
 :
-    m_receivingMessages(false),
-    m_messagePipeline(this),
-    m_retransmissionTimeout(kDefaultRetransmissionTimeOut),
-    m_maxRetransmissions(kDefaultMaxRetransmissions)
+    UDPClient(SocketAddress())
 {
 }
 
-//TODO #ak #msvc2015 delegating constructor
 UDPClient::UDPClient(SocketAddress serverAddress)
 :
     m_receivingMessages(false),
@@ -56,31 +52,30 @@ UDPClient::UDPClient(SocketAddress serverAddress)
 {
 }
 
+UDPClient::~UDPClient()
+{
+    //if not in aio thread and pleaseStop has not been called earlier - 
+        //undefined behavior can occur
+    cleanupWhileInAioThread();
+}
+
 void UDPClient::pleaseStop(std::function<void()> handler)
 {
     m_messagePipeline.pleaseStop(
-        [/*std::move*/ handler, this](){  //TODO #ak #msvc2015 move to lambda
-            //reporting failure for all ongoing requests
-            std::vector<RequestCompletionHandler> completionHandlers;
-            for (const auto& requestData: m_ongoingRequests)
-            {
-                completionHandlers.emplace_back(
-                    std::move(requestData.second.completionHandler));
-            }
-            //timers can be safely removed since we are in aio thread
-            m_ongoingRequests.clear();
-            
-            for (auto& completionHandler: completionHandlers)
-                completionHandler(
-                    SystemError::interrupted,
-                    Message());
+        [handler = std::move(handler), this](){
+            cleanupWhileInAioThread();
             handler();
         });
 }
 
-const std::unique_ptr<AbstractDatagramSocket>& UDPClient::socket()
+const std::unique_ptr<network::UDPSocket>& UDPClient::socket()
 {
     return m_messagePipeline.socket();
+}
+
+std::unique_ptr<network::UDPSocket> UDPClient::takeSocket()
+{
+    return m_messagePipeline.takeSocket();
 }
 
 void UDPClient::sendRequestTo(
@@ -202,7 +197,7 @@ void UDPClient::sendRequestAndStartTimer(
     //starting timer
     requestContext->timer->registerTimer(
         requestContext->currentRetransmitTimeout,
-        std::bind(&UDPClient::timedout, this, request.header.transactionId));
+        std::bind(&UDPClient::timedOut, this, request.header.transactionId));
 }
 
 void UDPClient::messageSent(
@@ -212,7 +207,7 @@ void UDPClient::messageSent(
 {
     auto requestContextIter = m_ongoingRequests.find(transactionId);
     if (requestContextIter == m_ongoingRequests.end())
-        return; //operation may have already timedout. E.g., network interface is loaded
+        return; //operation may have already timedOut. E.g., network interface is loaded
 
     if (errorCode != SystemError::noError)
     {
@@ -237,7 +232,7 @@ void UDPClient::messageSent(
     requestContextIter->second.resolvedServerAddress = std::move(resolvedServerAddress);
 }
 
-void UDPClient::timedout(nx::Buffer transactionId)
+void UDPClient::timedOut(nx::Buffer transactionId)
 {
     auto requestContextIter = m_ongoingRequests.find(transactionId);
     assert(requestContextIter != m_ongoingRequests.end());
@@ -255,6 +250,24 @@ void UDPClient::timedout(nx::Buffer transactionId)
         requestContextIter->second.originalServerAddress,
         requestContextIter->second.request,
         &requestContextIter->second);
+}
+
+void UDPClient::cleanupWhileInAioThread()
+{
+    //reporting failure for all ongoing requests
+    std::vector<RequestCompletionHandler> completionHandlers;
+    for (const auto& requestData : m_ongoingRequests)
+    {
+        completionHandlers.emplace_back(
+            std::move(requestData.second.completionHandler));
+    }
+    //timers can be safely removed since we are in aio thread
+    m_ongoingRequests.clear();
+
+    for (auto& completionHandler : completionHandlers)
+        completionHandler(
+            SystemError::interrupted,
+            Message());
 }
 
 }   //stun

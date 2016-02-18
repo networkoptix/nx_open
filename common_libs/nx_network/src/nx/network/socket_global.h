@@ -8,8 +8,7 @@
 #include "cloud/address_resolver.h"
 #include "cloud/mediator_address_publisher.h"
 #include "cloud/mediator_connector.h"
-#include "cloud/tunnel/incoming_tunnel.h"
-#include "cloud/tunnel/outgoing_tunnel.h"
+#include "cloud/tunnel/outgoing_tunnel_pool.h"
 
 
 namespace nx {
@@ -33,10 +32,6 @@ public:
     inline static
     hpm::api::MediatorConnector& mediatorConnector()
     { return *s_instance->m_mediatorConnector; }
-
-    inline static
-    cloud::IncomingTunnelPool& incomingTunnelPool()
-    { return s_instance->m_incomingTunnelPool; }
 
     inline static
     cloud::OutgoingTunnelPool& outgoingTunnelPool()
@@ -74,7 +69,6 @@ private:
     std::unique_ptr<hpm::api::MediatorConnector> m_mediatorConnector;
     cloud::AddressResolver m_addressResolver;
     cloud::MediatorAddressPublisher m_addressPublisher;
-    cloud::IncomingTunnelPool m_incomingTunnelPool;
     cloud::OutgoingTunnelPool m_outgoingTunnelPool;
 };
 

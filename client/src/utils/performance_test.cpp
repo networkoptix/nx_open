@@ -65,6 +65,6 @@ void QnPerformanceTest::detectLightMode() {
         message += QCoreApplication::translate("QnPerformanceTest", "For full-featured mode please use another computer.");
         QnMessageBox::warning(NULL, 0,
                               QCoreApplication::translate("QnPerformanceTest", "Warning!"), message,
-                              QMessageBox::StandardButtons(QMessageBox::Ok), QMessageBox::Ok);
+                              QDialogButtonBox::StandardButtons(QDialogButtonBox::Ok), QDialogButtonBox::Ok);
     }
 }

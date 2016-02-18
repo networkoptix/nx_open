@@ -29,6 +29,8 @@ TEST(CloudModuleEndPointFetcher, common)
             SocketAddress endpoint)
         {
             endpointPromise.set_value(resCode);
+            if (resCode != nx_http::StatusCode::ok)
+                int x = 0;
             cdbEndpoint = endpoint;
         });
     ASSERT_EQ(endpointFuture.get(), nx_http::StatusCode::ok);

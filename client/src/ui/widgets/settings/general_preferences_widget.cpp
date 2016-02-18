@@ -17,7 +17,7 @@
 #include <ui/dialogs/file_dialog.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-#include <ui/style/warning_style.h>
+#include <ui/style/custom_style.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_auto_starter.h>
 
@@ -35,17 +35,15 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
 
     ui->doubleBufferWarningLabel->setText(tr("Disable only if the client takes too much CPU"));
 
-    if(!this->context()->instance<QnWorkbenchAutoStarter>()->isSupported()) {
+    if (!this->context()->instance<QnWorkbenchAutoStarter>()->isSupported())
         ui->autoStartCheckBox->hide();
-        ui->autoStartLabel->hide();
-    }
 
     setHelpTopic(ui->mainMediaFolderGroupBox, ui->extraMediaFoldersGroupBox,  Qn::SystemSettings_General_MediaFolders_Help);
     setHelpTopic(ui->browseLogsButton,                                        Qn::SystemSettings_General_Logs_Help);
-    setHelpTopic(ui->pauseOnInactivityLabel,  ui->pauseOnInactivityCheckBox,  Qn::SystemSettings_General_AutoPause_Help);
+    setHelpTopic(ui->pauseOnInactivityCheckBox,                               Qn::SystemSettings_General_AutoPause_Help);
     setHelpTopic(ui->idleTimeoutSpinBox,      ui->idleTimeoutWidget,          Qn::SystemSettings_General_AutoPause_Help);
-    setHelpTopic(ui->autoStartCheckBox,       ui->autoStartLabel,             Qn::SystemSettings_General_AutoStartWithSystem_Help);
-    setHelpTopic(ui->doubleBufferCheckbox,    ui->doubleBufferLabel,          Qn::SystemSettings_General_DoubleBuffering_Help);
+    setHelpTopic(ui->autoStartCheckBox,                                       Qn::SystemSettings_General_AutoStartWithSystem_Help);
+    setHelpTopic(ui->doubleBufferCheckbox,                                    Qn::SystemSettings_General_DoubleBuffering_Help);
     setHelpTopic(ui->doubleBufferWarningLabel,ui->doubleBufferRestartLabel,   Qn::SystemSettings_General_DoubleBuffering_Help);
 
     setWarningStyle(ui->downmixWarningLabel);
@@ -153,7 +151,7 @@ void QnGeneralPreferencesWidget::at_addExtraMediaFolderButton_clicked() {
         return;
 
     if(!ui->extraMediaFoldersList->findItems(dirName, Qt::MatchExactly).empty()) {
-        QMessageBox::information(this, tr("Folder has already been added."), tr("This folder has already been added."), QMessageBox::Ok);
+        QnMessageBox::information(this, tr("Folder has already been added."), tr("This folder has already been added."), QDialogButtonBox::Ok);
         return;
     }
 
@@ -172,7 +170,7 @@ void QnGeneralPreferencesWidget::at_extraMediaFoldersList_selectionChanged() {
 void QnGeneralPreferencesWidget::at_browseLogsButton_clicked() {
     const QString logsLocation = QStandardPaths::writableLocation(QStandardPaths::DataLocation) + QLatin1String("/log");
     if (!QDir(logsLocation).exists()) {
-        QMessageBox::information(this,
+        QnMessageBox::information(this,
                                  tr("Information"),
                                  tr("Folder '%1' does not exist.").arg(logsLocation));
         return;

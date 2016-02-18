@@ -26,7 +26,7 @@ QnServerSettingsDialog::QnServerSettingsDialog(QWidget *parent)
     , m_webPageButton(new QPushButton(tr("Open Web Page..."), this))
 {
     ui->setupUi(this);
-  
+
     addPage(SettingsPage, m_generalPage, tr("General"));
     addPage(StorageManagmentPage, m_storagesPage, tr("Storage Management"));
     addPage(StatisticsPage, m_statisticsPage, tr("Storage Analytics"));
@@ -35,7 +35,7 @@ QnServerSettingsDialog::QnServerSettingsDialog(QWidget *parent)
     connect(this, &QnGenericTabbedDialog::dialogClosed, m_statisticsPage, &QnRecordingStatisticsWidget::resetForecast);
 
     connect(m_webPageButton, &QPushButton::clicked, this, [this] {
-        menu()->trigger(Qn::WebClientAction, m_server);
+        menu()->trigger(QnActions::WebClientAction, m_server);
     });
 
 

@@ -19,6 +19,10 @@
 #include "../socket_global.h"
 
 
+namespace nx {
+namespace network {
+namespace aio {
+
 //TODO #ak come up with new name for this class or remove it
 //TODO #ak also, some refactor needed to use AsyncSocketImplHelper with server socket
 //TODO #ak move timers to AbstractSocket
@@ -34,7 +38,7 @@ public:
 
     virtual ~BaseAsyncSocketImplHelper() {}
 
-    void post( std::function<void()>&& handler )
+    void post(nx::utils::MoveOnlyFunc<void()> handler)
     {
         if( m_socket->impl()->terminated.load( std::memory_order_relaxed ) > 0 )
             return;
@@ -42,7 +46,7 @@ public:
         nx::network::SocketGlobals::aioService().post( m_socket, std::move(handler) );
     }
 
-    void dispatch( std::function<void()>&& handler )
+    void dispatch(nx::utils::MoveOnlyFunc<void()> handler)
     {
         if( m_socket->impl()->terminated.load( std::memory_order_relaxed ) > 0 )
             return;
@@ -85,10 +89,8 @@ public:
         m_recvHandlerTerminatedFlag( nullptr ),
         m_timerHandlerTerminatedFlag( nullptr ),
         m_threadHandlerIsRunningIn( NULL ),
-        m_natTraversalEnabled( _natTraversalEnabled )
-#ifdef _DEBUG
-        , m_asyncSendIssued( false )
-#endif
+        m_natTraversalEnabled( _natTraversalEnabled ),
+        m_asyncSendIssued( false )
     {
         assert( this->m_socket );
         assert( m_abstractSocketPtr );
@@ -258,7 +260,9 @@ public:
         nx::network::SocketGlobals::aioService().watchSocketNonSafe( &lk, this->m_socket, aio::etWrite, this );
     }
 
-    void registerTimer( unsigned int timeoutMs, std::function<void()> handler )
+    void registerTimer(
+        std::chrono::milliseconds timeoutMs,
+        nx::utils::MoveOnlyFunc<void()> handler )
     {
         if( this->m_socket->impl()->terminated.load( std::memory_order_relaxed ) > 0 )
             return;
@@ -275,35 +279,58 @@ public:
             timeoutMs );
     }
 
-    void cancelIOAsync( const aio::EventType eventType,
-                        std::function<void()> handler )
+    void cancelIOAsync(
+        const aio::EventType eventType,
+        nx::utils::MoveOnlyFunc<void()> handler )
     {
-        auto cancelImpl = [=]()
+        auto cancelImpl = [this, eventType, handler = move(handler)]() mutable
         {
             // cancelIOSync will be instant from socket's IO thread
-            nx::network::SocketGlobals::aioService().dispatch( this->m_socket, [=]()
-            {
-                stopPollingSocket( this->m_socket, eventType );
-                std::atomic_thread_fence( std::memory_order_acquire );
-
-                //we are in aio thread, CommunicatingSocketImpl::eventTriggered is down the stack
-                //  avoiding unnecessary removeFromWatch calls in eventTriggered
-
-                if (eventType == aio::etRead || eventType == aio::etNone)
-                    ++m_recvAsyncCallCounter;
-                if (eventType == aio::etWrite || eventType == aio::etNone)
-                    ++m_connectSendAsyncCallCounter;
-                if (eventType == aio::etTimedOut || eventType == aio::etNone)
-                    ++m_registerTimerCallCounter;
-
-                handler();
-            });
+            nx::network::SocketGlobals::aioService().dispatch(
+                this->m_socket,
+                [this, eventType, handler = move(handler)]() mutable
+                {
+                    cancelAsyncIOWhileInAioThread(eventType);
+                    handler();
+                });
         };
 
         if (eventType == aio::etWrite || eventType == aio::etNone)
-            nx::network::SocketGlobals::addressResolver().cancel(this, std::move(cancelImpl));
+            nx::network::SocketGlobals::addressResolver().cancel(
+                this,
+                std::move(cancelImpl));
         else
             cancelImpl();
+    }
+
+    void cancelIOSync(aio::EventType eventType)
+    {
+        if (this->m_socket->impl()->aioThread.load() == QThread::currentThread())
+        {
+            cancelAsyncIOWhileInAioThread(eventType);
+        }
+        else
+        {
+            std::promise< bool > promise;
+            cancelIOAsync(eventType, [&]() { promise.set_value(true); });
+            promise.get_future().wait();
+        }
+    }
+
+    void cancelAsyncIOWhileInAioThread(const aio::EventType eventType)
+    {
+        stopPollingSocket(eventType);
+        std::atomic_thread_fence(std::memory_order_acquire);    //TODO #ak looks like it is not needed
+
+        //we are in aio thread, CommunicatingSocketImpl::eventTriggered is down the stack
+        //  avoiding unnecessary removeFromWatch calls in eventTriggered
+
+        if (eventType == aio::etRead || eventType == aio::etNone)
+            ++m_recvAsyncCallCounter;
+        if (eventType == aio::etWrite || eventType == aio::etNone)
+            ++m_connectSendAsyncCallCounter;
+        if (eventType == aio::etTimedOut || eventType == aio::etNone)
+            ++m_registerTimerCallCounter;
     }
 
 private:
@@ -320,7 +347,7 @@ private:
     const nx::Buffer* m_sendBuffer;
     int m_sendBufPos;
 
-    std::function<void()> m_timerHandler;
+    nx::utils::MoveOnlyFunc<void()> m_timerHandler;
     size_t m_registerTimerCallCounter;
 
     bool* m_connectSendHandlerTerminatedFlag;
@@ -604,24 +631,26 @@ private:
             this->m_socket,
             aio::etWrite,
             this,
-            boost::optional<unsigned int>(),
-            [this, resolvedAddress, sendTimeout](){ m_abstractSocketPtr->connect( resolvedAddress, sendTimeout ); } );    //to be called between pollset.add and pollset.poll
+            boost::none,
+            [this, resolvedAddress, sendTimeout]()
+            {
+                m_abstractSocketPtr->connect( resolvedAddress, std::chrono::milliseconds(sendTimeout) );
+            } );    //to be called between pollset.add and pollset.poll
         return true;
     }
 
     //!Call this from within aio thread only
-    void stopPollingSocket(
-        SocketType* sock,
-        const aio::EventType eventType)
+    void stopPollingSocket(const aio::EventType eventType)
     {
         //TODO #ak move this method to aioservice?
-        nx::network::SocketGlobals::aioService().cancelPostedCalls(sock, true);
+        if (eventType == aio::etNone)
+            nx::network::SocketGlobals::aioService().cancelPostedCalls(this->m_socket, true);
         if (eventType == aio::etNone || eventType == aio::etRead)
-            nx::network::SocketGlobals::aioService().removeFromWatch(sock, aio::etRead, true);
+            nx::network::SocketGlobals::aioService().removeFromWatch(this->m_socket, aio::etRead, true);
         if (eventType == aio::etNone || eventType == aio::etWrite)
-            nx::network::SocketGlobals::aioService().removeFromWatch(sock, aio::etWrite, true);
+            nx::network::SocketGlobals::aioService().removeFromWatch(this->m_socket, aio::etWrite, true);
         if (eventType == aio::etNone || eventType == aio::etTimedOut)
-            nx::network::SocketGlobals::aioService().removeFromWatch(sock, aio::etTimedOut, true);
+            nx::network::SocketGlobals::aioService().removeFromWatch(this->m_socket, aio::etTimedOut, true);
     }
 };
 
@@ -712,14 +741,17 @@ public:
         return nx::network::SocketGlobals::aioService().watchSocketNonSafe(&lk, m_sock, aio::etRead, this);
     }
 
-    void cancelIOAsync(std::function< void() > handler)
+    void cancelIOAsync(nx::utils::MoveOnlyFunc< void() > handler)
     {
-        nx::network::SocketGlobals::aioService().dispatch(this->m_sock, [=]()
-        {
-            nx::network::SocketGlobals::aioService().removeFromWatch(m_sock, aio::etRead, true);
-            ++m_acceptAsyncCallCount;
-            handler();
-        } );
+        nx::network::SocketGlobals::aioService().dispatch(
+            this->m_sock,
+            [this, handler = move(handler)]() mutable
+            {
+                nx::network::SocketGlobals::aioService().removeFromWatch(
+                    m_sock, aio::etRead, true);
+                ++m_acceptAsyncCallCount;
+                handler();
+            });
     }
 
     void cancelIOSync()
@@ -737,5 +769,9 @@ private:
     std::atomic<int> m_acceptAsyncCallCount;
     bool* m_terminatedFlagPtr;
 };
+
+}   //aio
+}   //network
+}   //nx
 
 #endif  //ASYNC_SOCKET_HELPER_H

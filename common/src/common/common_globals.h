@@ -39,7 +39,6 @@ namespace Qn
             PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent ItemDataRole
             ConnectionRole ResourceStatus BitratePerGopType
             StreamQuality SecondStreamQuality PanicMode RebuildState BackupState RecordingType PropertyDataType SerializationFormat PeerType StatisticsDeviceType
-            BookmarkSearchStrategy
             ServerFlag BackupType CameraBackupQuality CameraStatusFlag IOPortType IODefaultState AuditRecordType AuthResult
             RebuildAction BackupAction
             FailoverPriority)
@@ -555,8 +554,8 @@ public:
         FileNameRole,                               /**< Role for target filename. Used in TakeScreenshotAction. */
         TitleRole,                                  /**< Role for dialog title. Used in MessageBoxAction. */
         TextRole,                                   /**< Role for dialog text. Used in MessageBoxAction. */
-        UrlRole,                                    /**< Role for target url. Used in BrowseUrlAction and ConnectAction. */
-        ForceRole,                                  /**< Role for 'forced' flag. Used in DisconnectAction */
+        UrlRole,                                    /**< Role for target url. Used in BrowseUrlAction and QnActions::ConnectAction. */
+        ForceRole,                                  /**< Role for 'forced' flag. Used in QnActions::DisconnectAction */
         CameraBookmarkRole,                         /**< Role for the selected camera bookmark (if any). Used in Edit/RemoveCameraBookmarkAction */
         CameraBookmarkListRole,                     /**< Role for the list of bookmarks. Used in RemoveBookmarksAction */
         BookmarkTagRole,                            /**< Role for bookmark tag. Used in OpenBookmarksSearchAction */
@@ -604,6 +603,8 @@ public:
         BackupSettingsDataRole,                     /**< return BackupSettingsData, used in BackupSettings model */
         TextWidthDataRole,                          /**< used in BackupSettings model */
 
+        ActionEmitterType,                          /** */
+        ActionEmittedBy,                            /** */
         RoleCount
     };
 
@@ -745,15 +746,6 @@ public:
 
         LC_Count
     };
-
-
-    /** Strategy of the bookmarks search. Used when we are limiting request result size by a fixed number. */
-
-//    enum BookmarkSearchStrategy {
-//        EarliestFirst,  /*< Standard way: select bookmarks by time in direct order. */
-//        LatestFirst,    /*< Select bookmarks by time in reverse order so the latest bookmarks will be returned. */
-//        LongestFirst    /*< Select bookmarks by length. The longest bookmarks will be returned. */
-//    };
 
     // All columns are sorted by database initially, except camera name and tags.
     enum BookmarkSortField

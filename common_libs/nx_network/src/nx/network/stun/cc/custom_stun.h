@@ -46,6 +46,9 @@ namespace methods
         connect,
 
         connectionResult,
+
+        udpHolePunchingSyn,
+        udpHolePunchingSynAck,
     };
 
     NX_NETWORK_API nx::String toString(Value val);
@@ -97,7 +100,8 @@ namespace attrs
         udtHpEndpointList,
         connectionMethods,
 
-        connectionSucceeded,
+        udpHolePunchingResultCode,
+        systemErrorCode,
     };
 
     NX_NETWORK_API const char* toString(AttributeType val);
@@ -159,10 +163,18 @@ namespace attrs
         ConnectionMethods(const String& value): StringAttribute(TYPE, value) {}
     };
 
-    struct NX_NETWORK_API ConnectionSucceeded: StringAttribute
+    struct NX_NETWORK_API UdpHolePunchingResultCodeAttr: stun::attrs::IntAttribute
     {
-        static const AttributeType TYPE = connectionSucceeded;
-        ConnectionSucceeded(const String& value): StringAttribute(TYPE, value) {}
+        static const AttributeType TYPE = udpHolePunchingResultCode;
+        UdpHolePunchingResultCodeAttr(int value)
+            : stun::attrs::IntAttribute(TYPE, value) {}
+    };
+
+    struct NX_NETWORK_API SystemErrorCodeAttr: stun::attrs::IntAttribute
+    {
+        static const AttributeType TYPE = systemErrorCode;
+        SystemErrorCodeAttr(int value)
+            : stun::attrs::IntAttribute(TYPE, value) {}
     };
 
 

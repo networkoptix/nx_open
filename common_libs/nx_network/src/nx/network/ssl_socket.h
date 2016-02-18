@@ -15,6 +15,9 @@
 struct bio_st;
 typedef struct bio_st BIO; /* This one is from OpenSSL, which we don't want to include in this header. */
 
+namespace nx {
+namespace network {
+
 class QnSSLSocketPrivate;
 class QnMixedSSLSocketPrivate;
 
@@ -67,8 +70,9 @@ public:
     bool doClientHandshake();
 
     virtual void cancelIOAsync(
-        aio::EventType eventType,
-        std::function<void()> cancellationDoneHandler) override;
+        nx::network::aio::EventType eventType,
+        nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler) override;
+    virtual void cancelIOSync(nx::network::aio::EventType eventType) override;
 
 protected:
     enum IOMode
@@ -101,8 +105,8 @@ protected:
         std::function<void( SystemError::ErrorCode, size_t )> handler ) override;
     //!Implementation of AbstractCommunicatingSocket::registerTimer
     virtual void registerTimer(
-        unsigned int timeoutMs,
-        std::function<void()> handler ) override;
+        std::chrono::milliseconds timeoutMs,
+        nx::utils::MoveOnlyFunc<void()> handler ) override;
 
 private:
     // Async version
@@ -126,8 +130,8 @@ public:
     virtual int send( const void* buffer, unsigned int bufferLen ) override;
 
     virtual void cancelIOAsync(
-        aio::EventType eventType,
-        std::function<void()> cancellationDoneHandler) override;
+        nx::network::aio::EventType eventType,
+        nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler) override;
 
 protected:
     //!Implementation of AbstractCommunicatingSocket::connectAsync
@@ -144,8 +148,8 @@ protected:
         std::function<void( SystemError::ErrorCode, size_t )> handler ) override;
     //!Implementation of AbstractCommunicatingSocket::registerTimer
     virtual void registerTimer(
-        unsigned int timeoutMs,
-        std::function<void()> handler ) override;
+        std::chrono::milliseconds timeoutMs,
+        nx::utils::MoveOnlyFunc<void()> handler ) override;
 
 private:
     Q_DECLARE_PRIVATE(QnMixedSSLSocket);
@@ -190,6 +194,8 @@ private:
     void connectionAccepted(SystemError::ErrorCode errorCode, AbstractStreamSocket* newSocket);
 };
 
+}   //network
+}   //nx
 
 #endif // ENABLE_SSL
 

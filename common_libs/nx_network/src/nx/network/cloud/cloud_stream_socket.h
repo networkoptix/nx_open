@@ -1,7 +1,12 @@
-#ifndef NX_CC_CLOUD_STREAM_SOCKET_H
-#define NX_CC_CLOUD_STREAM_SOCKET_H
+/**********************************************************
+* Jan 27, 2016
+* akolesnikov
+***********************************************************/
+
+#pragma once
 
 #include <nx/utils/async_operation_guard.h>
+#include <utils/common/cpp14.h>
 
 #include "nx/network/abstract_socket.h"
 #include "nx/network/socket_global.h"
@@ -18,7 +23,7 @@ namespace cloud {
     If connection to peer requires using udp hole punching than this socket uses UDT.
     \note Actual socket is instanciated only when address is known (\a AbstractCommunicatingSocket::connect or \a AbstractCommunicatingSocket::connectAsync)
 */
-class CloudStreamSocket
+class NX_NETWORK_API CloudStreamSocket
 :
     public AbstractStreamSocketAttributesCache<AbstractStreamSocket>
 {
@@ -49,11 +54,12 @@ public:
 
     virtual void cancelIOAsync(
         aio::EventType eventType,
-        std::function<void()> handler) override;
+        nx::utils::MoveOnlyFunc<void()> handler) override;
+    virtual void cancelIOSync(aio::EventType eventType) override;
 
     //!Implementation of AbstractSocket::*
-    virtual void post( std::function<void()> handler ) override;
-    virtual void dispatch( std::function<void()> handler ) override;
+    virtual void post(nx::utils::MoveOnlyFunc<void()> handler ) override;
+    virtual void dispatch(nx::utils::MoveOnlyFunc<void()> handler ) override;
 
     //!Implementation of AbstractCommunicatingSocket::*
     virtual void connectAsync(
@@ -66,8 +72,8 @@ public:
         const nx::Buffer& buf,
         std::function<void(SystemError::ErrorCode, size_t)> handler) override;
     virtual void registerTimer(
-        unsigned int timeoutMs,
-        std::function<void()> handler) override;
+        std::chrono::milliseconds timeoutMs,
+        nx::utils::MoveOnlyFunc<void()> handler) override;
 
     virtual aio::AbstractAioThread* getAioThread() override;
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
@@ -75,24 +81,29 @@ public:
 private:
     int recvImpl(nx::Buffer* const buf);
 
+    void onAddressResolved(
+        std::shared_ptr<nx::utils::AsyncOperationGuard::SharedGuard> sharedOperationGuard,
+        int remotePort,
+        SystemError::ErrorCode osErrorCode,
+        std::vector<AddressEntry> dnsEntries);
     bool startAsyncConnect(
         //const SocketAddress& originalAddress,
         std::vector<AddressEntry> dnsEntries,
         int port);
-    void cloudConnectDone(
+    void onCloudConnectDone(
         SystemError::ErrorCode errorCode,
         std::unique_ptr<AbstractStreamSocket> cloudConnection);
 
-    std::unique_ptr<AbstractStreamSocket> m_socketDelegate;
+    nx::atomic_unique_ptr<AbstractStreamSocket> m_socketDelegate;
     std::function<void(SystemError::ErrorCode)> m_connectHandler;
-    nx::utils::AsyncOperationGuard m_asyncGuard;
+    nx::utils::AsyncOperationGuard m_asyncConnectGuard;
     /** Used to tie this to aio thread.
     //TODO #ak replace with aio thread timer */
     std::unique_ptr<AbstractDatagramSocket> m_aioThreadBinder;
+    std::atomic<std::promise<std::pair<SystemError::ErrorCode, size_t>>*> m_recvPromisePtr;
+    std::atomic<std::promise<std::pair<SystemError::ErrorCode, size_t>>*> m_sendPromisePtr;
 };
 
 } // namespace cloud
 } // namespace network
 } // namespace nx
-
-#endif  //NX_CC_CLOUD_STREAM_SOCKET_H

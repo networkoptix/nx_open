@@ -11,7 +11,7 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/skin.h>
-#include <ui/style/warning_style.h>
+#include <ui/style/custom_style.h>
 #include <ui/widgets/dwm.h>
 #include <ui/workbench/workbench_context.h>
 

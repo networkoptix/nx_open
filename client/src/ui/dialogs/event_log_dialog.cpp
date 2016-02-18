@@ -28,7 +28,8 @@
 #include <ui/models/event_log_model.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/skin.h>
-#include <ui/style/warning_style.h>
+#include <ui/style/custom_style.h>
+#include <ui/widgets/snapped_scrollbar.h>
 
 #include <ui/workbench/workbench_context.h>
 #include <ui/workaround/widgets_signals_workaround.h>
@@ -131,6 +132,9 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
     ui->eventRulesButton->setIcon(qnSkin->icon("tree/layout.png"));
     ui->loadingProgressBar->hide();
 
+    QnSnappedScrollBar *scrollBar = new QnSnappedScrollBar(this);
+    ui->gridEvents->setVerticalScrollBar(scrollBar->proxyScrollBar());
+
     connect(m_filterAction,         &QAction::triggered,                this,   &QnEventLogDialog::at_filterAction_triggered);
     connect(m_resetFilterAction,    &QAction::triggered,                this,   &QnEventLogDialog::at_resetFilterAction_triggered);
     connect(m_clipboardAction,      &QAction::triggered,                this,   &QnEventLogDialog::at_clipboardAction_triggered);
@@ -142,7 +146,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
     connect(ui->eventComboBox,      QnComboboxCurrentIndexChanged,      this,   &QnEventLogDialog::updateData);
     connect(ui->actionComboBox,     QnComboboxCurrentIndexChanged,      this,   &QnEventLogDialog::updateData);
     connect(ui->refreshButton,      &QAbstractButton::clicked,          this,   &QnEventLogDialog::updateData);
-    connect(ui->eventRulesButton,   &QAbstractButton::clicked,          this->context()->action(Qn::BusinessEventsAction), &QAction::trigger);
+    connect(ui->eventRulesButton,   &QAbstractButton::clicked,          this->context()->action(QnActions::BusinessEventsAction), &QAction::trigger);
 
     connect(ui->cameraButton,       &QAbstractButton::clicked,          this,   &QnEventLogDialog::at_cameraButton_clicked);
     connect(ui->gridEvents,         &QTableView::clicked,               this,   &QnEventLogDialog::at_eventsGrid_clicked);
@@ -309,7 +313,7 @@ void QnEventLogDialog::updateHeaderWidth()
     if (ui->dateEditFrom->width() == 0)
         return;
 
-    int space = ui->mainGridLayout->horizontalSpacing();
+    int space = ui->mainGridLayout->spacing();
     int offset = 0; // ui->gridEvents->verticalHeader()->sizeHint().width();
     space--; // grid line delimiter
     ui->gridEvents->horizontalHeader()->resizeSection(0, ui->dateEditFrom->width() + ui->dateEditTo->width() + ui->delimLabel->width() + space - offset);
@@ -387,7 +391,7 @@ void QnEventLogDialog::at_eventsGrid_clicked(const QModelIndex& idx)
         QnActionParameters params(resources);
         params.setArgument(Qn::ItemTimeRole, pos);
 
-        context()->menu()->trigger(Qn::OpenInNewLayoutAction, params);
+        context()->menu()->trigger(QnActions::OpenInNewLayoutAction, params);
 
         if (isMaximized())
             showNormal();

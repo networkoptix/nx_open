@@ -38,6 +38,8 @@ signals:
         * this signal is emitted
         */
         void runtimeDataUpdated(const QnTransaction<ApiRuntimeData>& data);
+private:
+        void clearOldRuntimeDataUnsafe(QnMutexLockerBase& lock, const QnTranStateKey& key);
 private slots:
         void at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo);
     private:

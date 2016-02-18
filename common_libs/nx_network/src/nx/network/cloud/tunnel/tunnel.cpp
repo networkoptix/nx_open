@@ -2,7 +2,7 @@
 #include "tunnel.h"
 
 #include <nx/network/socket_global.h>
-#include <nx/network/cloud/cloud_tunnel_udt.h>
+
 
 namespace nx {
 namespace network {
@@ -18,7 +18,7 @@ Tunnel::Tunnel(String remotePeerId)
 Tunnel::Tunnel(std::unique_ptr<AbstractTunnelConnection> connection)
     : m_state(State::kConnected)
     , m_connection(std::move(connection))
-    , m_remotePeerId(connection->getRemotePeerId())
+    , m_remotePeerId(m_connection->getRemotePeerId())
 {
 }
 
@@ -94,8 +94,8 @@ void Tunnel::pleaseStop(std::function<void()> handler)
     BarrierHandler barrier(std::move(handler));
 
     QnMutexLocker lock(&m_mutex);
-    for (const auto& connector : m_connectors)
-        connector.second->pleaseStop(barrier.fork());
+//    for (const auto& connector : m_connectors)
+//        connector.second->pleaseStop(barrier.fork());
 
     if (m_connection)
         m_connection->pleaseStop(barrier.fork());

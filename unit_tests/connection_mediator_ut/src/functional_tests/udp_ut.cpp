@@ -12,8 +12,9 @@
 #include <utils/common/string.h>
 #include <utils/common/sync_call.h>
 
-#include "mediaserver_emulator.h"
-#include "mediator_functional_test.h"
+#include <test_support/mediaserver_emulator.h>
+
+#include "functional_tests/mediator_functional_test.h"
 
 
 namespace nx {

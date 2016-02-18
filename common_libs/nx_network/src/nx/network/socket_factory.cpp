@@ -11,6 +11,9 @@
 
 #include "utils/common/cpp14.h"
 
+
+using namespace nx::network;
+
 std::unique_ptr< AbstractDatagramSocket > SocketFactory::createDatagramSocket()
 {
     return std::unique_ptr< AbstractDatagramSocket >(new UDPSocket(false));
@@ -45,10 +48,8 @@ static std::unique_ptr< AbstractStreamSocket > streamSocket(
             {
                 case SocketFactory::NatTraversalType::nttAuto:
                 case SocketFactory::NatTraversalType::nttEnabled:
-                    return std::make_unique< UdtStreamSocket >( true );
-
                 case SocketFactory::NatTraversalType::nttDisabled:
-                    return std::make_unique< UdtStreamSocket >( false );
+                    return std::make_unique< UdtStreamSocket >();
 
                 default:
                     return nullptr;
@@ -60,10 +61,18 @@ static std::unique_ptr< AbstractStreamSocket > streamSocket(
     };
 }
 
+namespace {
+SocketFactory::CreateStreamSocketFuncType createStreamSocketFunc;
+SocketFactory::CreateStreamServerSocketFuncType createStreamServerSocketFunc;
+}
+
 std::unique_ptr< AbstractStreamSocket > SocketFactory::createStreamSocket(
     bool sslRequired,
     SocketFactory::NatTraversalType natTraversalRequired )
 {
+    if (createStreamSocketFunc)
+        return createStreamSocketFunc(sslRequired, natTraversalRequired);
+
     auto result = streamSocket( natTraversalRequired,
                                 s_enforcedStreamSocketType );
 
@@ -101,6 +110,9 @@ std::unique_ptr< AbstractStreamServerSocket > SocketFactory::createStreamServerS
     bool sslRequired,
     SocketFactory::NatTraversalType natTraversalRequired )
 {
+    if (createStreamServerSocketFunc)
+        return createStreamServerSocketFunc(sslRequired, natTraversalRequired);
+
     auto result = streamServerSocket( natTraversalRequired,
                                       s_enforcedStreamSocketType );
 
@@ -130,6 +142,24 @@ void SocketFactory::enforceStreamSocketType( SocketType type )
 bool SocketFactory::isStreamSocketTypeEnforced()
 {
     return s_enforcedStreamSocketType != SocketType::Default;
+}
+
+SocketFactory::CreateStreamSocketFuncType 
+    SocketFactory::setCreateStreamSocketFunc(
+        CreateStreamSocketFuncType newFactoryFunc)
+{
+    auto bak = std::move(createStreamSocketFunc);
+    createStreamSocketFunc = std::move(newFactoryFunc);
+    return bak;
+}
+
+SocketFactory::CreateStreamServerSocketFuncType
+    SocketFactory::setCreateStreamServerSocketFunc(
+        CreateStreamServerSocketFuncType newFactoryFunc)
+{
+    auto bak = std::move(createStreamServerSocketFunc);
+    createStreamServerSocketFunc = std::move(newFactoryFunc);
+    return bak;
 }
 
 std::atomic< SocketFactory::SocketType >

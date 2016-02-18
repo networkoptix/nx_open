@@ -17,6 +17,7 @@ namespace Qn {
         ServersNode,            /**< Root node for remote resources. */
         OtherSystemsNode,       /**< Root node for remote resources which are incompatible with current system and cannot be used. */
         UsersNode,              /**< Root node for user resources. */
+        WebPagesNode,           /**> Root node for webpages. */
 
         BastardNode,            /**< Root node for hidden resources. */
 
@@ -256,6 +257,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::LightModeFlags),
     (metatype)(numeric)
     )
+
 
 
 //TODO: #GDM #2.4 move back to client_module_functions.cpp. See commit a0edb9aa5abede1b5c9ab1c9ce52cc912286d090.

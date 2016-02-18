@@ -12,9 +12,13 @@
 #include <nx/network/system_socket.h>
 
 
+namespace nx {
+namespace network {
+namespace aio {
+
 class DummyEventHandler
 :
-    public aio::AIOEventHandler<Pollable>
+    public AIOEventHandler<Pollable>
 {
 public:
     DummyEventHandler(std::function<void(Pollable*, aio::EventType)> func)
@@ -51,15 +55,14 @@ TEST(aio, socketPolledNotification)
         });
     std::atomic<bool> socketAddedFlag(false);
 
-    QnMutex mtx;
-    aio::AIOThread<Pollable> aioThread(&mtx);
+    aio::AIOThread<Pollable> aioThread;
     aioThread.start();
 
     aioThread.watchSocket(
-        socket.implementationDelegate(),
+        &socket,
         aio::etRead,
         &evHandler,
-        0,
+        std::chrono::milliseconds(0),
         [&socketAddedFlag](){
             socketAddedFlag = true;
         });
@@ -100,15 +103,14 @@ TEST(aio, pollsetError)
             handlerCalledPromise.set_value();
         });
 
-    QnMutex mtx;
-    aio::detail::AIOThread<Pollable, TestPollSet> aioThread(&mtx);
+    aio::detail::AIOThread<Pollable, TestPollSet> aioThread;
     aioThread.start();
 
     aioThread.watchSocket(
-        socket.implementationDelegate(),
+        &socket,
         aio::etRead,
         &evHandler,
-        0,
+        std::chrono::milliseconds(0),
         [&socketAddedFlag, &handlerCalledFlag]() {
             ASSERT_FALSE(handlerCalledFlag.load());
             socketAddedFlag = true;
@@ -119,3 +121,7 @@ TEST(aio, pollsetError)
     ASSERT_TRUE(socketAddedFlag);
     ASSERT_TRUE(handlerCalledFlag.load());
 }
+
+}   //aio
+}   //network
+}   //nx

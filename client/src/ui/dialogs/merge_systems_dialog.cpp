@@ -11,7 +11,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <ui/common/ui_resource_name.h>
-#include <ui/style/warning_style.h>
+#include <ui/style/custom_style.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/actions/action_manager.h>
@@ -30,11 +30,11 @@ QnMergeSystemsDialog::QnMergeSystemsDialog(QWidget *parent) :
     ui->setupUi(this);
 
     QStringList successMessage;
-    successMessage 
-        << tr("Success!") 
-        << QString() 
-        << QString() 
-        << tr("The system was configured successfully.") 
+    successMessage
+        << tr("Success!")
+        << QString()
+        << QString()
+        << tr("The system was configured successfully.")
         << tr("The servers from the remote system should appear in your system soon.");
     ui->successLabel->setText(successMessage.join(L'\n'));
 
@@ -80,7 +80,7 @@ void QnMergeSystemsDialog::done(int result)
         url.setPassword(m_adminPassword);
         QnAppServerConnectionFactory::setUrl(url);
 
-        menu()->trigger(Qn::ReconnectAction);
+        menu()->trigger(QnActions::ReconnectAction);
         context()->instance<QnWorkbenchUserWatcher>()->setReconnectOnPasswordChange(true);
     }
 }
@@ -299,7 +299,7 @@ void QnMergeSystemsDialog::at_mergeTool_mergeFinished(
         if (!message.isEmpty())
             message.prepend(lit("\n"));
 
-        QMessageBox::critical(this, tr("Error"), tr("Cannot merge systems.") + message);
+        QnMessageBox::critical(this, tr("Error"), tr("Cannot merge systems.") + message);
 
         context()->instance<QnWorkbenchUserWatcher>()->setReconnectOnPasswordChange(true);
 

@@ -1,5 +1,8 @@
+
 #include "socket_common.h"
+
 #include "socket_global.h"
+
 
 const HostAddress HostAddress::localhost( QLatin1String("127.0.0.1") );
 const HostAddress HostAddress::anyHost( (uint32_t)INADDR_ANY );

@@ -17,8 +17,10 @@
 #include "../system_socket.h"
 
 
-namespace aio
-{
+namespace nx {
+namespace network {
+namespace aio {
+
     static const size_t INITIAL_FDSET_SIZE = 1024;
     static const size_t FDSET_INCREASE_STEP = 1024;
 
@@ -374,8 +376,8 @@ namespace aio
         m_impl( new PollSetImpl() )
     {
         m_impl->sockets.emplace(
-            m_impl->dummySocket->implementationDelegate()->handle(),
-            PollSetImpl::SockCtx( m_impl->dummySocket->implementationDelegate(), aio::etRead ) );
+            m_impl->dummySocket->handle(),
+            PollSetImpl::SockCtx( m_impl->dummySocket.get(), aio::etRead ) );
         m_impl->dummySocket->setNonBlockingMode( true );
         m_impl->dummySocket->bind( SocketAddress( HostAddress::localhost, 0 ) );
         
@@ -518,7 +520,10 @@ namespace aio
         _end.m_impl->fdIndex = m_impl->exceptfds->fd_count;
         return _end;
     }
-}
+
+}   //aio
+}   //network
+}   //nx
 
 #endif
 

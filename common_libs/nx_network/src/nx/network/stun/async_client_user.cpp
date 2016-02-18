@@ -14,7 +14,12 @@ SocketAddress AsyncClientUser::localAddress() const
     return m_client->localAddress();
 }
 
-AsyncClientUser::AsyncClientUser(std::shared_ptr<AsyncClient> client)
+SocketAddress AsyncClientUser::remoteAddress() const
+{
+    return m_client->remoteAddress();
+}
+
+AsyncClientUser::AsyncClientUser(std::shared_ptr<AbstractAsyncClient> client)
     : m_operationsInProgress(0)
     , m_client(std::move(client))
 {
@@ -30,12 +35,12 @@ void AsyncClientUser::pleaseStop(std::function<void()> handler)
 }
 
 void AsyncClientUser::sendRequest(Message request,
-                                  AsyncClient::RequestHandler handler)
+                                  AbstractAsyncClient::RequestHandler handler)
 {
 
 
     auto wrapper = [this](const std::shared_ptr<AsyncClientUser>& self,
-                      const AsyncClient::RequestHandler& handler,
+                      const AbstractAsyncClient::RequestHandler& handler,
                       SystemError::ErrorCode code, Message message)
     {
         if (!self->startOperation())
@@ -51,10 +56,10 @@ void AsyncClientUser::sendRequest(Message request,
 }
 
 bool AsyncClientUser::setIndicationHandler(int method,
-                                         AsyncClient::IndicationHandler handler)
+                                         AbstractAsyncClient::IndicationHandler handler)
 {
     auto wrapper = [method](const std::shared_ptr<AsyncClientUser>& self,
-                            const AsyncClient::IndicationHandler& handler,
+                            const AbstractAsyncClient::IndicationHandler& handler,
                             Message message)
     {
         if (!self->startOperation())

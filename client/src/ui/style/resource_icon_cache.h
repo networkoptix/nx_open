@@ -35,6 +35,7 @@ public:
         OtherSystems,
         IOModule,
         WebPage,
+        WebPages,
         TypeMask        = 0xFF,
 
         Offline         = 1 << 8,

@@ -197,12 +197,12 @@ void MultipleServerSocket::pleaseStop(std::function<void()> handler)
         socket->pleaseStop(barrier.fork());
 }
 
-void MultipleServerSocket::post( std::function<void()> handler)
+void MultipleServerSocket::post(nx::utils::MoveOnlyFunc<void()> handler)
 {
     m_timerSocket->post(std::move(handler));
 }
 
-void MultipleServerSocket::dispatch(std::function<void()> handler)
+void MultipleServerSocket::dispatch(nx::utils::MoveOnlyFunc<void()> handler)
 {
     m_timerSocket->dispatch(std::move(handler));
 }
@@ -213,7 +213,7 @@ void MultipleServerSocket::acceptAsync(
 {
     dispatch([this, handler]()
     {
-        Q_ASSERT_X(!m_acceptHandler, Q_FUNC_INFO, "concurent accept call");
+        Q_ASSERT_X(!m_acceptHandler, Q_FUNC_INFO, "concurrent accept call");
         m_acceptHandler = std::move(handler);
 
         if (m_recvTmeout)

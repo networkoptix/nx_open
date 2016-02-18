@@ -1,8 +1,6 @@
 #ifndef abstract_data_consumer_h_2111
 #define abstract_data_consumer_h_2111
 
-#ifdef ENABLE_DATA_PROVIDERS
-
 #include <core/dataconsumer/abstract_data_receptor.h>
 #include <utils/common/long_runnable.h>
 #include <nx/streaming/data_packet_queue.h>
@@ -43,7 +41,5 @@ protected:
 protected:
     QnDataPacketQueue m_dataQueue;
 };
-
-#endif // ENABLE_DATA_PROVIDERS
 
 #endif // abstract_data_consumer_h_2111

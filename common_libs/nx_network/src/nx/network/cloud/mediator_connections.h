@@ -144,6 +144,20 @@ public:
             std::move(completionHandler));
     }
 
+    String selfPeerId() const
+    {
+        if (m_connector)
+            if (auto credentials = m_connector->getSystemCredentials())
+                return credentials->systemId + String(".") + credentials->serverId;
+
+        return String();
+    }
+
+    AbstractCloudSystemCredentialsProvider* credentialsProvider() const
+    {
+        return m_connector;
+    }
+
 protected:
     template<typename RequestData, typename CompletionHandlerType>
     void doAuthRequest(
@@ -182,7 +196,7 @@ class MediatorServerTcpConnection
 {
 public:
     MediatorServerTcpConnection(
-        std::shared_ptr<nx::stun::AsyncClient> stunClient,
+        std::shared_ptr<nx::stun::AbstractAsyncClient> stunClient,
         AbstractCloudSystemCredentialsProvider* connector)
     :
         MediatorServerConnection<stun::AsyncClientUser>(

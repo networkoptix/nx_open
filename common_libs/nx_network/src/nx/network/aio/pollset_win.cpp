@@ -17,8 +17,10 @@
 #include "../system_socket.h"
 
 
-namespace aio
-{
+namespace nx {
+namespace network {
+namespace aio {
+
     typedef std::map<Pollable*, void*> PolledSockets;
     typedef std::pair<Pollable*, void*> SocketContext;
 
@@ -387,7 +389,10 @@ namespace aio
     {
         return FD_SETSIZE / 2 - 1;  //1 - for dummy socket, /2 is required to be able to add any socket already present (we MUST always handle every socket in single thread)
     }
-}
+
+}   //aio
+}   //network
+}   //nx
 
 #endif
 

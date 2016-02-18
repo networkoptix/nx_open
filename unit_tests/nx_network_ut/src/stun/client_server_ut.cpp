@@ -33,7 +33,7 @@ protected:
     };
 };
 
-const AsyncClient::Timeouts CLIENT_TIMEOUTS = { 100, 100, 500 };
+const AbstractAsyncClient::Timeouts CLIENT_TIMEOUTS = { 100, 100, 500 };
 
 class StunClientServerTest
         : public ::testing::Test
@@ -79,7 +79,7 @@ protected:
 
     const SocketAddress address;
     nx::stun::MessageDispatcher dispatcher;
-    std::shared_ptr< AsyncClient > client;
+    std::shared_ptr< AbstractAsyncClient > client;
     std::unique_ptr< TestServer > server;
 };
 
@@ -174,7 +174,7 @@ TEST_F( StunClientServerTest, Indications )
 struct TestUser
     : public AsyncClientUser
 {
-    TestUser( std::shared_ptr<AsyncClient> client )
+    TestUser( std::shared_ptr<AbstractAsyncClient> client )
         : AsyncClientUser(std::move(client)) {}
 
     void request()

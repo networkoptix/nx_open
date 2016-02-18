@@ -6,8 +6,10 @@
 #include "pollset.h"
 
 
-namespace aio
-{
+namespace nx {
+namespace network {
+namespace aio {
+
     const char* toString( EventType eventType )
     {
         switch( eventType )
@@ -26,4 +28,7 @@ namespace aio
                 return "unknown";
         }
     }
-}
+
+}   //aio
+}   //network
+}   //nx

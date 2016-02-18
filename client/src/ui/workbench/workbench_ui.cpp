@@ -416,9 +416,9 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     initGraphicsMessageBox();
 
     /* Connect to display. */
-    display()->view()->addAction(action(Qn::FreespaceAction));
-    connect(action(Qn::FreespaceAction),&QAction::triggered,                        this,           &QnWorkbenchUi::at_freespaceAction_triggered);
-    connect(action(Qn::EffectiveMaximizeAction), &QAction::triggered,               this,           [this](){ if(m_inFreespace) at_freespaceAction_triggered();});
+    display()->view()->addAction(action(QnActions::FreespaceAction));
+    connect(action(QnActions::FreespaceAction),&QAction::triggered,                        this,           &QnWorkbenchUi::at_freespaceAction_triggered);
+    connect(action(QnActions::EffectiveMaximizeAction), &QAction::triggered,               this,           [this](){ if(m_inFreespace) at_freespaceAction_triggered();});
     connect(display(),                  &QnWorkbenchDisplay::viewportGrabbed,       this,           &QnWorkbenchUi::disableProxyUpdates);
     connect(display(),                  &QnWorkbenchDisplay::viewportUngrabbed,     this,           &QnWorkbenchUi::enableProxyUpdates);
     connect(display(),                  &QnWorkbenchDisplay::widgetChanged,         this,           &QnWorkbenchUi::at_display_widgetChanged);
@@ -552,11 +552,20 @@ void QnWorkbenchUi::updateControlsVisibility(bool animate) {    // TODO
         return;
     }
 
+    const auto resourceIsWebPage = [this]()
+    {
+        if (!navigator()->currentWidget())
+            return false;
+
+        const auto resource = navigator()->currentWidget()->resource();
+        return (resource && resource->flags().testFlag(Qn::web_page));
+    };
+
     bool sliderVisible =
         navigator()->currentWidget() != NULL &&
-        !(navigator()->currentWidget()->resource()->flags() & (Qn::still_image | Qn::server | Qn::videowall)) &&
+        !(navigator()->currentWidget()->resource()->flags() & (Qn::still_image | Qn::server | Qn::videowall)) && !resourceIsWebPage() &&
         ((accessController()->globalPermissions() & Qn::GlobalViewArchivePermission) || !(navigator()->currentWidget()->resource()->flags() & Qn::live)) &&
-        !action(Qn::ToggleTourModeAction)->isChecked();
+        !action(QnActions::ToggleTourModeAction)->isChecked();
 
     if(m_inactive) {
         bool hovered = isHovered();
@@ -719,7 +728,7 @@ void QnWorkbenchUi::at_freespaceAction_triggered() {
 	if (qnRuntime->isActiveXMode())
 		return;
 
-    QAction *fullScreenAction = action(Qn::EffectiveMaximizeAction);
+    QAction *fullScreenAction = action(QnActions::EffectiveMaximizeAction);
 
     bool isFullscreen = fullScreenAction->isChecked();
 
@@ -736,7 +745,7 @@ void QnWorkbenchUi::at_freespaceAction_triggered() {
         setNotificationsOpened(false, isFullscreen, false);
 
         updateViewportMargins(); /* This one is needed here so that fit-in-view operates on correct margins. */ // TODO: #Elric change code so that this call is not needed.
-        action(Qn::FitInViewAction)->trigger();
+        action(QnActions::FitInViewAction)->trigger();
 
         m_inFreespace = true;
     } else {
@@ -746,7 +755,7 @@ void QnWorkbenchUi::at_freespaceAction_triggered() {
         setNotificationsOpened(qnSettings->isNotificationsOpened(), isFullscreen);
 
         updateViewportMargins(); /* This one is needed here so that fit-in-view operates on correct margins. */ // TODO: #Elric change code so that this call is not needed.
-        action(Qn::FitInViewAction)->trigger();
+        action(QnActions::FitInViewAction)->trigger();
 
         m_inFreespace = false;
     }
@@ -948,16 +957,16 @@ void QnWorkbenchUi::updateTreeOpacity(bool animate) {
 }
 
 bool QnWorkbenchUi::isTreePinned() const {
-    return action(Qn::PinTreeAction)->isChecked();
+    return action(QnActions::PinTreeAction)->isChecked();
 }
 
 bool QnWorkbenchUi::isCalendarPinned() const
 {
-    return action(Qn::PinCalendarAction)->isChecked();
+    return action(QnActions::PinCalendarAction)->isChecked();
 }
 
 bool QnWorkbenchUi::isTreeOpened() const {
-    return action(Qn::ToggleTreeAction)->isChecked();
+    return action(QnActions::ToggleTreeAction)->isChecked();
 }
 
 void QnWorkbenchUi::setTreeOpened(bool opened, bool animate, bool save) {
@@ -972,7 +981,7 @@ void QnWorkbenchUi::setTreeOpened(bool opened, bool animate, bool save) {
     m_treeShowingProcessor->forceHoverLeave(); /* So that it don't bring it back. */
 
     QN_SCOPED_VALUE_ROLLBACK(&m_ignoreClickEvent, true);
-    action(Qn::ToggleTreeAction)->setChecked(opened);
+    action(QnActions::ToggleTreeAction)->setChecked(opened);
 
     qreal newX = opened ? 0.0 : -m_treeItem->size().width() - 1.0 /* Just in case. */;
     if (animate) {
@@ -1079,7 +1088,7 @@ void QnWorkbenchUi::at_treeWidget_activated(const QnResourcePtr &resource) {
     if(!resource || resource.dynamicCast<QnUserResource>())
         return;
 
-    menu()->trigger(Qn::DropResourcesAction, resource);
+    menu()->trigger(QnActions::DropResourcesAction, resource);
 }
 
 void QnWorkbenchUi::at_treeItem_paintGeometryChanged() {
@@ -1174,10 +1183,10 @@ void QnWorkbenchUi::createTreeWidget() {
     m_treeItem->setFocusPolicy(Qt::StrongFocus);
     m_treeItem->setProperty(Qn::NoHandScrollOver, true);
 
-    m_treePinButton = newPinButton(m_controlsWidget, action(Qn::PinTreeAction));
+    m_treePinButton = newPinButton(m_controlsWidget, action(QnActions::PinTreeAction));
     m_treePinButton->setFocusProxy(m_treeItem);
 
-    m_treeShowButton = newShowHideButton(m_controlsWidget, action(Qn::ToggleTreeAction));
+    m_treeShowButton = newShowHideButton(m_controlsWidget, action(QnActions::ToggleTreeAction));
     m_treeShowButton->setFocusProxy(m_treeItem);
 
     m_treeResizerWidget = new QnResizerWidget(Qt::Horizontal, m_controlsWidget);
@@ -1253,7 +1262,7 @@ void QnWorkbenchUi::createTreeWidget() {
         connectTreeHidingProcessor();
     }
 
-    connect(m_treeWidget,               &QnResourceBrowserWidget::selectionChanged, action(Qn::SelectionChangeAction),  &QAction::trigger);
+    connect(m_treeWidget,               &QnResourceBrowserWidget::selectionChanged, action(QnActions::SelectionChangeAction),  &QAction::trigger);
     connect(m_treeWidget,               &QnResourceBrowserWidget::activated,        this,                               &QnWorkbenchUi::at_treeWidget_activated);
     connect(m_treeOpacityProcessor,     &HoverFocusProcessor::hoverLeft,            this,                               &QnWorkbenchUi::updateTreeOpacityAnimated);
     connect(m_treeOpacityProcessor,     &HoverFocusProcessor::hoverEntered,         this,                               &QnWorkbenchUi::updateTreeOpacityAnimated);
@@ -1263,10 +1272,10 @@ void QnWorkbenchUi::createTreeWidget() {
     connect(m_treeItem,                 &QnMaskedProxyWidget::paintRectChanged,     this,                               &QnWorkbenchUi::at_treeItem_paintGeometryChanged);
     connect(m_treeItem,                 &QGraphicsWidget::geometryChanged,          this,                               &QnWorkbenchUi::at_treeItem_paintGeometryChanged);
     connect(m_treeResizerWidget,        &QGraphicsWidget::geometryChanged,          this,                               &QnWorkbenchUi::at_treeResizerWidget_geometryChanged, Qt::QueuedConnection);
-    connect(action(Qn::ToggleTreeAction),       &QAction::toggled,                  this,                               [this](bool checked){ if (!m_ignoreClickEvent) setTreeOpened(checked);});
-    connect(action(Qn::PinTreeAction),          &QAction::toggled,                  this,                               &QnWorkbenchUi::at_pinTreeAction_toggled);
-    connect(action(Qn::PinNotificationsAction), &QAction::toggled,                  this,                               &QnWorkbenchUi::at_pinNotificationsAction_toggled);
-    connect(action(Qn::PinCalendarAction),      &QAction::toggled,                  QnClientSettings::instance(),       &QnClientSettings::setCalendarPinned);
+    connect(action(QnActions::ToggleTreeAction),       &QAction::toggled,                  this,                               [this](bool checked){ if (!m_ignoreClickEvent) setTreeOpened(checked);});
+    connect(action(QnActions::PinTreeAction),          &QAction::toggled,                  this,                               &QnWorkbenchUi::at_pinTreeAction_toggled);
+    connect(action(QnActions::PinNotificationsAction), &QAction::toggled,                  this,                               &QnWorkbenchUi::at_pinNotificationsAction_toggled);
+    connect(action(QnActions::PinCalendarAction),      &QAction::toggled,                  QnClientSettings::instance(),       &QnClientSettings::setCalendarPinned);
 }
 
 #pragma endregion Tree widget methods
@@ -1313,7 +1322,7 @@ void QnWorkbenchUi::setTitleOpened(bool opened, bool animate, bool save) {
     m_inFreespace = false;
 
     QN_SCOPED_VALUE_ROLLBACK(&m_ignoreClickEvent, true);
-    action(Qn::ToggleTitleBarAction)->setChecked(opened);
+    action(QnActions::ToggleTitleBarAction)->setChecked(opened);
 
     if (save)
         qnSettings->setTitleOpened(opened);
@@ -1345,7 +1354,7 @@ void QnWorkbenchUi::setTitleVisible(bool visible, bool animate) {
 }
 
 bool QnWorkbenchUi::isTitleOpened() const {
-    return action(Qn::ToggleTitleBarAction)->isChecked();
+    return action(QnActions::ToggleTitleBarAction)->isChecked();
 }
 
 void QnWorkbenchUi::setTitleOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate) {
@@ -1442,18 +1451,18 @@ void QnWorkbenchUi::createTitleWidget() {
     m_tabBarWidget->installEventFilter(m_tabBarItem);
     connect(m_tabBarWidget, &QnLayoutTabBar::tabTextChanged, this, [this](){ m_titleItem->layout()->updateGeometry(); });
 
-    m_mainMenuButton = newActionButton(action(Qn::MainMenuAction), 1.5, Qn::MainWindow_TitleBar_MainMenu_Help);
+    m_mainMenuButton = newActionButton(action(QnActions::MainMenuAction), 1.5, Qn::MainWindow_TitleBar_MainMenu_Help);
 
     QGraphicsLinearLayout *tabBarLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     tabBarLayout->setContentsMargins(0, 0, 0, 0);
     tabBarLayout->setSpacing(0);
     tabBarLayout->addItem(m_tabBarItem);
     tabBarLayout->setItemSpacing(tabBarLayout->count() - 1, 6);
-    GraphicsWidget *newTabButton = newActionButton(action(Qn::OpenNewTabAction), 1.0, Qn::MainWindow_TitleBar_NewLayout_Help);
+    GraphicsWidget *newTabButton = newActionButton(action(QnActions::OpenNewTabAction), 1.0, Qn::MainWindow_TitleBar_NewLayout_Help);
     tabBarLayout->addItem(newTabButton);
     tabBarLayout->setAlignment(newTabButton, Qt::AlignVCenter);
     tabBarLayout->setItemSpacing(tabBarLayout->count() - 1, 6);
-    GraphicsWidget *layoutMenuButton = newActionButton(action(Qn::OpenCurrentUserLayoutMenu));
+    GraphicsWidget *layoutMenuButton = newActionButton(action(QnActions::OpenCurrentUserLayoutMenu));
     tabBarLayout->addItem(layoutMenuButton);
     tabBarLayout->setAlignment(layoutMenuButton, Qt::AlignVCenter);
     tabBarLayout->addStretch(0x1000);
@@ -1465,11 +1474,11 @@ void QnWorkbenchUi::createTitleWidget() {
     QGraphicsLinearLayout * windowButtonsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     windowButtonsLayout->setContentsMargins(0, 0, 2, 0);
     windowButtonsLayout->setSpacing(4);
-    windowButtonsLayout->addItem(newActionButton(action(Qn::WhatsThisAction)));
-    windowButtonsLayout->addItem(newActionButton(action(Qn::MinimizeAction)));
-    windowButtonsLayout->addItem(newActionButton(action(Qn::EffectiveMaximizeAction)
+    windowButtonsLayout->addItem(newActionButton(action(QnActions::WhatsThisAction)));
+    windowButtonsLayout->addItem(newActionButton(action(QnActions::MinimizeAction)));
+    windowButtonsLayout->addItem(newActionButton(action(QnActions::EffectiveMaximizeAction)
         , kDefaultSizeMultiplier, Qn::MainWindow_Fullscreen_Help));
-    windowButtonsLayout->addItem(newActionButton(action(Qn::ExitAction)));
+    windowButtonsLayout->addItem(newActionButton(action(QnActions::ExitAction)));
 
     m_windowButtonsWidget = new GraphicsWidget();
     m_windowButtonsWidget->setLayout(windowButtonsLayout);
@@ -1491,17 +1500,17 @@ void QnWorkbenchUi::createTitleWidget() {
     m_titleRightButtonsLayout->setContentsMargins(0, 4, 0, 0);
     if (QnScreenRecorder::isSupported())
     {
-        m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::ToggleScreenRecordingAction)
+        m_titleRightButtonsLayout->addItem(newActionButton(action(QnActions::ToggleScreenRecordingAction)
         , kDefaultSizeMultiplier, Qn::MainWindow_ScreenRecording_Help));
     }
-    m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::OpenLoginDialogAction)
+    m_titleRightButtonsLayout->addItem(newActionButton(action(QnActions::OpenLoginDialogAction)
         , kDefaultSizeMultiplier, Qn::Login_Help));
     m_titleRightButtonsLayout->addItem(m_windowButtonsWidget);
     titleLayout->addItem(m_titleRightButtonsLayout);
     m_titleItem->setLayout(titleLayout);
     titleLayout->activate(); /* So that it would set title's size. */
 
-    m_titleShowButton = newShowHideButton(m_controlsWidget, action(Qn::ToggleTitleBarAction));
+    m_titleShowButton = newShowHideButton(m_controlsWidget, action(QnActions::ToggleTitleBarAction));
     {
         QTransform transform;
         transform.rotate(-90);
@@ -1528,7 +1537,7 @@ void QnWorkbenchUi::createTitleWidget() {
     m_titleOpacityAnimatorGroup->addAnimator(opacityAnimator(m_titleBackgroundItem)); /* Speed of 1.0 is OK here. */
     m_titleOpacityAnimatorGroup->addAnimator(opacityAnimator(m_titleShowButton));
 
-    connect(m_tabBarWidget,             &QnLayoutTabBar::closeRequested,        this,   [this](QnWorkbenchLayout *layout){ menu()->trigger(Qn::CloseLayoutAction, QnWorkbenchLayoutList() << layout);});
+    connect(m_tabBarWidget,             &QnLayoutTabBar::closeRequested,        this,   [this](QnWorkbenchLayout *layout){ menu()->trigger(QnActions::CloseLayoutAction, QnWorkbenchLayoutList() << layout);});
     connect(m_titleOpacityProcessor,    &HoverFocusProcessor::hoverEntered,     this,   &QnWorkbenchUi::updateTitleOpacityAnimated);
     connect(m_titleOpacityProcessor,    &HoverFocusProcessor::hoverLeft,        this,   &QnWorkbenchUi::updateTitleOpacityAnimated);
     connect(m_titleOpacityProcessor,    &HoverFocusProcessor::hoverEntered,     this,   &QnWorkbenchUi::updateControlsVisibilityAnimated);
@@ -1537,10 +1546,10 @@ void QnWorkbenchUi::createTitleWidget() {
 #ifndef Q_OS_MACX
     connect(m_tabBarWidget,             &QnLayoutTabBar::tabCloseRequested,     m_titleItem,    &QnClickableWidget::skipDoubleClick);
     connect(m_tabBarWidget,             &QnLayoutTabBar::currentChanged,        m_titleItem,    &QnClickableWidget::skipDoubleClick);
-    connect(m_titleItem,                &QnClickableWidget::doubleClicked,      action(Qn::EffectiveMaximizeAction), &QAction::toggle);
+    connect(m_titleItem,                &QnClickableWidget::doubleClicked,      action(QnActions::EffectiveMaximizeAction), &QAction::toggle);
 #endif
     connect(titleMenuSignalizer,        &QnAbstractEventSignalizer::activated,  this,   &QnWorkbenchUi::at_titleItem_contextMenuRequested);
-    connect(action(Qn::ToggleTitleBarAction), &QAction::toggled,                this,   [this](bool checked){ if (!m_ignoreClickEvent) setTitleOpened(checked);});
+    connect(action(QnActions::ToggleTitleBarAction), &QAction::toggled,                this,   [this](bool checked){ if (!m_ignoreClickEvent) setTitleOpened(checked);});
 }
 
 #pragma endregion Title methods
@@ -1797,7 +1806,7 @@ void QnWorkbenchUi::createNotificationsWidget() {
     m_notificationsItem->setProperty(Qn::NoHandScrollOver, true);
     setHelpTopic(m_notificationsItem, Qn::MainWindow_Notifications_Help);
 
-    m_notificationsPinButton = newPinButton(m_controlsWidget, action(Qn::PinNotificationsAction));
+    m_notificationsPinButton = newPinButton(m_controlsWidget, action(QnActions::PinNotificationsAction));
     m_notificationsPinButton->setFocusProxy(m_notificationsItem);
 
     QnBlinkingImageButtonWidget* blinker = new QnBlinkingImageButtonWidget(m_controlsWidget);
@@ -1892,7 +1901,7 @@ void QnWorkbenchUi::setCalendarOpacity(qreal opacity, bool animate) {
 
 void QnWorkbenchUi::setCalendarOpened(bool opened, bool animate)
 {
-    if (!opened && isCalendarPinned() && action(Qn::ToggleCalendarAction)->isChecked())
+    if (!opened && isCalendarPinned() && action(QnActions::ToggleCalendarAction)->isChecked())
     {
         return;
     }
@@ -1911,7 +1920,7 @@ void QnWorkbenchUi::setCalendarOpened(bool opened, bool animate)
         m_calendarItem->setPaintSize(newSize);
     }
 
-    action(Qn::ToggleCalendarAction)->setChecked(opened);
+    action(QnActions::ToggleCalendarAction)->setChecked(opened);
 
     if(!opened)
         setDayTimeWidgetOpened(opened, animate);
@@ -1959,7 +1968,7 @@ void QnWorkbenchUi::updateCalendarVisibility(bool animate) {
         calendarEmpty = c->isEmpty(); /* Small hack. We have a signal that updates visibility if a calendar receive new data */
 
     bool calendarEnabled = !calendarEmpty && (navigator()->currentWidget() && navigator()->currentWidget()->resource()->flags() & Qn::utc);
-    action(Qn::ToggleCalendarAction)->setEnabled(calendarEnabled); // TODO: #GDM #Common does this belong here?
+    action(QnActions::ToggleCalendarAction)->setEnabled(calendarEnabled); // TODO: #GDM #Common does this belong here?
 
     bool calendarVisible = calendarEnabled && m_sliderVisible && isSliderOpened();
 
@@ -2062,7 +2071,7 @@ void QnWorkbenchUi::createCalendarWidget() {
     m_calendarItem->resize(250, 200);
     m_calendarItem->setProperty(Qn::NoHandScrollOver, true);
 
-    m_calendarPinButton = newPinButton(m_controlsWidget, action(Qn::PinCalendarAction));
+    m_calendarPinButton = newPinButton(m_controlsWidget, action(QnActions::PinCalendarAction));
     m_calendarPinButton->setFocusProxy(m_calendarItem);
 
     m_dayTimeItem = new QnMaskedProxyWidget(m_controlsWidget);
@@ -2072,7 +2081,7 @@ void QnWorkbenchUi::createCalendarWidget() {
     m_dayTimeItem->setProperty(Qn::NoHandScrollOver, true);
     m_dayTimeItem->stackBefore(m_calendarItem);
 
-    m_dayTimeMinimizeButton = newActionButton(action(Qn::MinimizeDayTimeViewAction)
+    m_dayTimeMinimizeButton = newActionButton(action(QnActions::MinimizeDayTimeViewAction)
         , kDefaultSizeMultiplier, kDefaultHelpTopicId, m_controlsWidget);
     m_dayTimeMinimizeButton->setFocusProxy(m_dayTimeItem);
 
@@ -2121,8 +2130,8 @@ void QnWorkbenchUi::createCalendarWidget() {
     connect(calendarHidingProcessor,    &HoverFocusProcessor::hoverLeft,        this,   [this](){ setCalendarOpened(false);});
     connect(m_calendarItem,             &QnMaskedProxyWidget::paintRectChanged, this,   &QnWorkbenchUi::at_calendarItem_paintGeometryChanged);
     connect(m_calendarItem,             &QGraphicsWidget::geometryChanged,      this,   &QnWorkbenchUi::at_calendarItem_paintGeometryChanged);
-    connect(action(Qn::ToggleCalendarAction), &QAction::toggled,                this,   [this](bool checked) { setCalendarOpened(checked); });
-    connect(action(Qn::MinimizeDayTimeViewAction), &QAction::triggered,        this,   [this]() { setDayTimeWidgetOpened(false, true); });
+    connect(action(QnActions::ToggleCalendarAction), &QAction::toggled,                this,   [this](bool checked) { setCalendarOpened(checked); });
+    connect(action(QnActions::MinimizeDayTimeViewAction), &QAction::triggered,        this,   [this]() { setDayTimeWidgetOpened(false, true); });
 
     enum { kCellsCountOffset = 2 };
     const int size = calendarWidget->headerHeight();
@@ -2156,7 +2165,7 @@ void QnWorkbenchUi::setThumbnailsVisible(bool visible) {
 }
 
 bool QnWorkbenchUi::isSliderOpened() const {
-    return action(Qn::ToggleSliderAction)->isChecked();
+    return action(QnActions::ToggleSliderAction)->isChecked();
 }
 
 void QnWorkbenchUi::setSliderOpened(bool opened, bool animate, bool save) {
@@ -2170,7 +2179,7 @@ void QnWorkbenchUi::setSliderOpened(bool opened, bool animate, bool save) {
     m_inFreespace = false;
 
     QN_SCOPED_VALUE_ROLLBACK(&m_ignoreClickEvent, true);
-    action(Qn::ToggleSliderAction)->setChecked(opened);
+    action(QnActions::ToggleSliderAction)->setChecked(opened);
 
     qreal newY = m_controlsWidgetRect.bottom() + (opened ? -m_sliderItem->size().height() : 48.0 /* So that tooltips are not opened. */);
     if (animate) {
@@ -2356,7 +2365,7 @@ void QnWorkbenchUi::at_sliderResizerWidget_geometryChanged() {
 
     updateSliderResizerGeometry();
 
-    action(Qn::ToggleThumbnailsAction)->setChecked(isThumbnailsVisible());
+    action(QnActions::ToggleThumbnailsAction)->setChecked(isThumbnailsVisible());
 }
 
 void QnWorkbenchUi::createSliderWidget()
@@ -2373,7 +2382,7 @@ void QnWorkbenchUi::createSliderWidget()
     m_sliderItem->speedSlider()->toolTipItem()->setProperty(Qn::NoHandScrollOver, true);
     m_sliderItem->volumeSlider()->toolTipItem()->setProperty(Qn::NoHandScrollOver, true);
 
-    m_sliderShowButton = newShowHideButton(m_controlsWidget, action(Qn::ToggleSliderAction));
+    m_sliderShowButton = newShowHideButton(m_controlsWidget, action(QnActions::ToggleSliderAction));
     {
         QTransform transform;
         transform.rotate(-90);
@@ -2463,7 +2472,7 @@ void QnWorkbenchUi::createSliderWidget()
         connect(navigator(),           &QnWorkbenchNavigator::speedChanged,         this,           &QnWorkbenchUi::updateCalendarVisibilityAnimated);
     }
 
-    connect(action(Qn::ToggleTourModeAction),   &QAction::toggled, this, [this](bool toggled)
+    connect(action(QnActions::ToggleTourModeAction),   &QAction::toggled, this, [this](bool toggled)
     {
         /// If tour mode is going to be turned on, focus should be forced to main window
         /// because otherwise we can't cancel tour mode by clicking any key (in some cases)
@@ -2471,9 +2480,9 @@ void QnWorkbenchUi::createSliderWidget()
             mainWindow()->setFocus();
     });
 
-    connect(action(Qn::ToggleTourModeAction),   &QAction::toggled,                  this,           &QnWorkbenchUi::updateControlsVisibilityAnimated);
-    connect(action(Qn::ToggleThumbnailsAction), &QAction::toggled,                  this,           [this](bool checked){ setThumbnailsVisible(checked); });
-    connect(action(Qn::ToggleSliderAction),     &QAction::toggled,                  this,           [this](bool checked){ if (!m_ignoreClickEvent) setSliderOpened(checked);});
+    connect(action(QnActions::ToggleTourModeAction),   &QAction::toggled,                  this,           &QnWorkbenchUi::updateControlsVisibilityAnimated);
+    connect(action(QnActions::ToggleThumbnailsAction), &QAction::toggled,                  this,           [this](bool checked){ setThumbnailsVisible(checked); });
+    connect(action(QnActions::ToggleSliderAction),     &QAction::toggled,                  this,           [this](bool checked){ if (!m_ignoreClickEvent) setSliderOpened(checked);});
 
 
     const auto getActionParamsFunc = [this](const QnCameraBookmark &bookmark) -> QnActionParameters
@@ -2516,13 +2525,13 @@ void QnWorkbenchUi::createSliderWidget()
     connect(bookmarksViewer, &QnBookmarksViewer::editBookmarkClicked, this
         , [this, getActionParamsFunc](const QnCameraBookmark &bookmark)
     {
-        menu()->triggerIfPossible(Qn::EditCameraBookmarkAction, getActionParamsFunc(bookmark));
+        menu()->triggerIfPossible(QnActions::EditCameraBookmarkAction, getActionParamsFunc(bookmark));
     });
 
     connect(bookmarksViewer, &QnBookmarksViewer::removeBookmarkClicked, this
         , [this, getActionParamsFunc](const QnCameraBookmark &bookmark)
     {
-        menu()->triggerIfPossible(Qn::RemoveCameraBookmarkAction, getActionParamsFunc(bookmark));
+        menu()->triggerIfPossible(QnActions::RemoveCameraBookmarkAction, getActionParamsFunc(bookmark));
     });
 
     connect(bookmarksViewer, &QnBookmarksViewer::playBookmark, this
@@ -2538,7 +2547,7 @@ void QnWorkbenchUi::createSliderWidget()
     {
         QnActionParameters params;
         params.setArgument(Qn::BookmarkTagRole, tag);
-        menu()->triggerIfPossible(Qn::OpenBookmarksSearchAction, params);
+        menu()->triggerIfPossible(QnActions::OpenBookmarksSearchAction, params);
     });
 
 }
@@ -2565,8 +2574,8 @@ void QnWorkbenchUi::createDebugWidget() {
     debugLabel = m_debugOverlayLabel;
     previousMsgHandler = qInstallMessageHandler(uiMsgHandler);
 
-    display()->view()->addAction(action(Qn::ShowDebugOverlayAction));
-    connect(action(Qn::ShowDebugOverlayAction),  &QAction::toggled,  this, [&](bool toggled){m_debugOverlayLabel->setVisible(toggled);});
+    display()->view()->addAction(action(QnActions::ShowDebugOverlayAction));
+    connect(action(QnActions::ShowDebugOverlayAction),  &QAction::toggled,  this, [&](bool toggled){m_debugOverlayLabel->setVisible(toggled);});
 }
 
 #pragma endregion Debug overlay methods
@@ -2591,7 +2600,7 @@ void QnWorkbenchUi::setFpsVisible(bool fpsVisible) {
 
     m_fpsItem->setText(QString());
 
-    action(Qn::ShowFpsAction)->setChecked(fpsVisible);
+    action(QnActions::ShowFpsAction)->setChecked(fpsVisible);
 }
 
 void QnWorkbenchUi::updateFpsGeometry() {
@@ -2613,8 +2622,8 @@ void QnWorkbenchUi::createFpsWidget() {
     setPaletteColor(m_fpsItem, QPalette::Window, Qt::transparent);
     setPaletteColor(m_fpsItem, QPalette::WindowText,  QColor(63, 159, 216));
 
-    display()->view()->addAction(action(Qn::ShowFpsAction));
-    connect(action(Qn::ShowFpsAction),  &QAction::toggled,                      this,   &QnWorkbenchUi::setFpsVisible);
+    display()->view()->addAction(action(QnActions::ShowFpsAction));
+    connect(action(QnActions::ShowFpsAction),  &QAction::toggled,                      this,   &QnWorkbenchUi::setFpsVisible);
     connect(m_fpsItem,                  &QGraphicsWidget::geometryChanged,      this,   &QnWorkbenchUi::updateFpsGeometry);
     setFpsVisible(false);
 }

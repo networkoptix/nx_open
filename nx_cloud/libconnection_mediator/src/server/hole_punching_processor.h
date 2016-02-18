@@ -39,6 +39,7 @@ public:
         AbstractCloudDataProvider* cloudData,
         nx::stun::MessageDispatcher* dispatcher,
         ListeningPeerPool* const listeningPeerPool);
+    virtual ~HolePunchingProcessor();
 
     void connect(
         const ConnectionStrongRef& connection,

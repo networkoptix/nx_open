@@ -6,6 +6,9 @@
 #include "dummy_socket.h"
 
 
+namespace nx {
+namespace network {
+
 DummySocket::DummySocket()
 :
     m_localAddress( HostAddress::localhost, rand() )
@@ -118,9 +121,13 @@ SocketAddress DummySocket::getForeignAddress() const
 
 void DummySocket::cancelIOAsync(
     aio::EventType /*eventType*/,
-    std::function< void() > cancellationDoneHandler)
+    nx::utils::MoveOnlyFunc< void() > cancellationDoneHandler)
 {
     cancellationDoneHandler();
+}
+
+void DummySocket::cancelIOSync(aio::EventType /*eventType*/)
+{
 }
 
 bool DummySocket::reopen()
@@ -158,11 +165,11 @@ bool DummySocket::getKeepAlive( boost::optional< KeepAliveOptions >* /*result*/ 
     return false;
 }
 
-void DummySocket::post( std::function<void()> /*handler*/ )
+void DummySocket::post(nx::utils::MoveOnlyFunc<void()> /*handler*/ )
 {
 }
 
-void DummySocket::dispatch( std::function<void()> /*handler*/ )
+void DummySocket::dispatch(nx::utils::MoveOnlyFunc<void()> /*handler*/ )
 {
 }
 
@@ -181,8 +188,9 @@ void DummySocket::sendAsync( const nx::Buffer& /*buf*/,
 {
 }
 
-void DummySocket::registerTimer( unsigned int /*timeoutMs*/,
-                                     std::function<void()> /*handler*/ )
+void DummySocket::registerTimer(
+    std::chrono::milliseconds /*timeoutMs*/,
+    nx::utils::MoveOnlyFunc<void()> /*handler*/ )
 {
 }
 
@@ -253,3 +261,6 @@ bool BufferSocket::isConnected() const
 {
     return m_isOpened;
 }
+
+}   //network
+}   //nx

@@ -1,12 +1,13 @@
 #ifndef NX_CC_DNS_TABLE_H
 #define NX_CC_DNS_TABLE_H
 
-#include <utils/common/guard.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/network/dns_resolver.h>
+#include <utils/common/guard.h>
 
 #include "cdb_endpoint_fetcher.h"
 #include "mediator_connections.h"
+
 
 //!Types used in resolving peer names
 /*!
@@ -128,7 +129,9 @@ public:
         if \a handler not provided the method will block until actual
         cancelation is done
     */
-    void cancel( void* requestId, std::function< void() > handler = nullptr );
+    void cancel(
+        void* requestId,
+        nx::utils::MoveOnlyFunc< void() > handler = nullptr );
     bool isRequestIdKnown( void* requestId ) const;
 
     void pleaseStop( std::function<void()> handler ) override;

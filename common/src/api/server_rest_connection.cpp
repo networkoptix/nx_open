@@ -1,9 +1,12 @@
 #include <atomic>
 #include "server_rest_connection.h"
 
+#include <api/model/cloud_credentials_data.h>
 #include <api/app_server_connection.h>
+#include <api/helpers/empty_request_data.h>
 #include <api/helpers/chunks_request_data.h>
 #include <api/helpers/thumbnail_request_data.h>
+#include <api/helpers/send_statistics_request_data.h>
 
 #include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
@@ -15,7 +18,7 @@
 #include <network/router.h>
 #include <http/custom_headers.h>
 #include <nx/network/http/httptypes.h>
-#include "utils/common/delayed.h"
+#include <utils/common/delayed.h>
 
 namespace {
     static const size_t ResponseReadTimeoutMs = 15 * 1000;
@@ -53,13 +56,44 @@ rest::Handle ServerConnection::cameraThumbnailAsync( const QnThumbnailRequestDat
     return executeGet(lit("/ec2/cameraThumbnail"), request.toParams(), callback, targetThread);
 }
 
-Handle ServerConnection::saveCloudSystemCredentials(const QString &cloudSystemID, const QString &cloudAuthKey, Result<EmptyResponseType>::type callback, QThread *targetThread)
+Handle ServerConnection::getStatisticsSettingsAsync(Result<QByteArray>::type callback
+    , QThread *targetThread)
 {
-    QnRequestParamList params;
-    params << QnRequestParam("cloudSystemID", cloudSystemID);
-    params << QnRequestParam("cloudAuthKey", cloudAuthKey);
+    static const QnEmptyRequestData kEmptyParams = QnEmptyRequestData();
+    return executeGet(lit("/ec2/statistics/settings"), kEmptyParams.toParams(), callback, targetThread);
+}
 
-    return executeGet(lit("/api/saveCloudSystemCredentials"), params, callback, targetThread);
+Handle ServerConnection::sendStatisticsAsync(const QnSendStatisticsRequestData &request
+    , PostCallback callback
+    , QThread *targetThread)
+{
+    static const nx_http::StringType kJsonContentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
+
+    const nx_http::BufferType data = QJson::serialized(request.metricsList);
+    if (data.isEmpty())
+        return Handle();
+
+    return executePost(lit("/ec2/statistics/send"), request.toParams()
+        , kJsonContentType, data, callback, targetThread);
+}
+
+Handle ServerConnection::saveCloudSystemCredentials(
+    const QString& cloudSystemId,
+    const QString& cloudAuthKey,
+    Result<EmptyResponseType>::type callback,
+    QThread* targetThread)
+{
+    CloudCredentialsData data;
+    data.cloudSystemId = cloudSystemId;
+    data.cloudAuthenticationKey = cloudAuthKey;
+
+    return executePost(
+        lit("/api/saveCloudSystemCredentials"),
+        QnRequestParamList(),
+        Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+        QJson::serialized(std::move(data)),
+        callback,
+        targetThread);
 }
 
 // --------------------------- private implementation -------------------------------------

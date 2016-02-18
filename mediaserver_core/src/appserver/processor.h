@@ -44,7 +44,6 @@ private:
 private:
     void addNewCamera(const QnVirtualCameraResourcePtr& cameraResource);
 
-    void addNewWebPageInternal(const QnWebPageResourcePtr &webPage);
     void addNewCameraInternal(const QnVirtualCameraResourcePtr& cameraResource);
 
     //void requestFinished(const QnHTTPRawResponse& response, int handle);

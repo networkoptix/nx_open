@@ -10,7 +10,7 @@
 #include <api/global_settings.h>
 #include <utils/common/ldap.h>
 
-#include <ui/style/warning_style.h>
+#include <ui/style/custom_style.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 

@@ -38,6 +38,7 @@ QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, Qn:
            type == Qn::ServersNode ||
            type == Qn::OtherSystemsNode ||
            type == Qn::UsersNode ||
+           type == Qn::WebPagesNode ||
            type == Qn::RootNode ||
            type == Qn::BastardNode ||
            type == Qn::SystemNode ||
@@ -63,6 +64,11 @@ QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, Qn:
     case Qn::UsersNode:
         m_displayName = m_name = tr("Users");
         m_icon = qnResIconCache->icon(QnResourceIconCache::Users);
+        break;
+    case Qn::WebPagesNode:
+        m_displayName = m_name = tr("Web Pages");
+        m_icon = qnResIconCache->icon(QnResourceIconCache::WebPages);
+        m_bastard = true; /* Invisible by default until has children. */
         break;
     case Qn::BastardNode:
         m_displayName = m_name = QLatin1String("_HIDDEN_"); /* This node is always hidden. */
@@ -302,6 +308,9 @@ bool QnResourcePoolModelNode::calculateBastard() const {
     case Qn::OtherSystemsNode:
         return !QnGlobalSettings::instance()->isServerAutoDiscoveryEnabled() || m_children.isEmpty();
 
+    case Qn::WebPagesNode:
+        return m_children.isEmpty();
+
     case Qn::RecorderNode:
     case Qn::SystemNode:
         return m_children.isEmpty();
@@ -450,7 +459,7 @@ Qt::ItemFlags QnResourcePoolModelNode::flags(int column) const {
         switch(m_type) {
         case Qn::ResourceNode:
         case Qn::EdgeNode:
-            m_editable.value = m_model->context()->menu()->canTrigger(Qn::RenameResourceAction, QnActionParameters(m_resource)); //TODO: #GDM #VW make this context-aware?
+            m_editable.value = m_model->context()->menu()->canTrigger(QnActions::RenameResourceAction, QnActionParameters(m_resource)); //TODO: #GDM #VW make this context-aware?
             break;
         case Qn::VideoWallItemNode:
         case Qn::VideoWallMatrixNode:
@@ -615,9 +624,9 @@ bool QnResourcePoolModelNode::setData(const QVariant &value, int role, int colum
     parameters.setArgument(Qn::NodeTypeRole, m_type);
 
     if (isVideoWallEntity)
-        m_model->context()->menu()->trigger(Qn::RenameVideowallEntityAction, parameters);
+        m_model->context()->menu()->trigger(QnActions::RenameVideowallEntityAction, parameters);
     else
-        m_model->context()->menu()->trigger(Qn::RenameResourceAction, parameters);
+        m_model->context()->menu()->trigger(QnActions::RenameResourceAction, parameters);
     return true;
 }
 

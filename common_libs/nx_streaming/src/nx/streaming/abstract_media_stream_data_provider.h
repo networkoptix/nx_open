@@ -1,8 +1,6 @@
 #ifndef ABSTRACT_MEDIA_STREAM_DATA_PROVIDER
 #define ABSTRACT_MEDIA_STREAM_DATA_PROVIDER
 
-#ifdef ENABLE_DATA_PROVIDERS
-
 #include <QtCore/QSharedPointer>
 #include <nx/streaming/media_stream_statistics.h>
 #include <nx/streaming/abstract_stream_data_provider.h>
@@ -25,6 +23,7 @@ public:
     virtual ~QnAbstractMediaStreamDataProvider();
 
     const QnMediaStreamStatistics* getStatistics(int channel) const;
+    int getNumberOfChannels() const;
     float getBitrateMbps() const;
     float getFrameRate() const;
     float getAverageGopSize() const;
@@ -70,8 +69,5 @@ private:
 };
 
 typedef QSharedPointer<QnAbstractMediaStreamDataProvider> QnAbstractMediaStreamDataProviderPtr;
-
-
-#endif // ENABLE_DATA_PROVIDERS
 
 #endif // ABSTRACT_MEDIA_STREAM_DATA_PROVIDER

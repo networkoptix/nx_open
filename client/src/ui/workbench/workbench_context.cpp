@@ -23,6 +23,12 @@
 #include <ui/workbench/watchers/workbench_layout_watcher.h>
 #include "workbench_license_notifier.h"
 
+#include <statistics/statistics_manager.h>
+#include <ui/statistics/modules/actions_statistics_module.h>
+#include <ui/statistics/modules/users_statistics_module.h>
+#include <ui/statistics/modules/graphics_statistics_module.h>
+
+
 #ifdef Q_OS_WIN
 #include "watchers/workbench_desktop_camera_watcher_win.h"
 #endif
@@ -44,7 +50,7 @@ QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *pa
     m_layoutWatcher = instance<QnWorkbenchLayoutWatcher>();
     m_snapshotManager.reset(new QnWorkbenchLayoutSnapshotManager(this));
 
-    /* 
+    /*
      * Access controller should be initialized early because a lot of other modules use it.
      * It depends on snapshotManager only,
      */
@@ -52,7 +58,7 @@ QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *pa
 
     m_workbench.reset(new QnWorkbench(this));
 
-    
+
     m_userWatcher = instance<QnWorkbenchUserWatcher>();
 #ifdef Q_OS_WIN
     instance<QnWorkbenchDesktopCameraWatcher>();
@@ -70,6 +76,20 @@ QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *pa
 
 	if (!qnRuntime->isActiveXMode())
 		instance<QnWorkbenchLicenseNotifier>(); // TODO: #Elric belongs here?
+
+    // Adds statistics modules
+
+    const auto actionsStatModule = instance<QnActionsStatisticsModule>();
+    actionsStatModule->setActionManager(m_menu.data()); // TODO: #ynikitenkov refactor QnActionManager to singleton
+    qnStatisticsManager->registerStatisticsModule(lit("actions"), actionsStatModule);
+
+    const auto userStatModule = instance<QnUsersStatisticsModule>();
+    userStatModule->setContext(this);
+    qnStatisticsManager->registerStatisticsModule(lit("users"), userStatModule);
+
+    const auto graphicsStatModule = instance<QnGraphicsStatisticsModule>();
+    graphicsStatModule->setContext(this);
+    qnStatisticsManager->registerStatisticsModule(lit("graphics"), graphicsStatModule);
 }
 
 QnWorkbenchContext::~QnWorkbenchContext() {
@@ -94,7 +114,17 @@ QnWorkbenchContext::~QnWorkbenchContext() {
     m_resourcePool = NULL;
 }
 
-QAction *QnWorkbenchContext::action(const Qn::ActionId id) const {
+void QnWorkbenchContext::setMainWindow(QWidget *mainWindow)
+{
+    if (m_mainWindow == mainWindow)
+        return;
+
+    m_mainWindow = mainWindow;
+    emit mainWindowChanged();
+}
+
+
+QAction *QnWorkbenchContext::action(const QnActions::IDType id) const {
     return m_menu->action(id);
 }
 

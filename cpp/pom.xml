@@ -3,12 +3,12 @@
     <parent>
         <artifactId>hdwitness</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>3.0.0-SNAPSHOT</version>
+        <version>2.6.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>2.6.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cpp</artifactId>
     <packaging>pom</packaging>
@@ -169,69 +169,6 @@
                         <artifactId>replacer</artifactId>
                         <version>1.5.2</version>
                         <executions>
-                            <execution>
-                                <id>fix-arch-x64-QMAKE-SUCKS!!!!!!!!!!</id>
-								<phase>process-resources</phase>
-                                <goals>
-                                    <goal>replace</goal>
-                                </goals>
-                                <configuration>
-                                    <encoding>utf-8</encoding>
-                                    <file>${project.build.sourceDirectory}/${project.artifactId}-x64.vcxproj</file>
-                                    <!-- <excludes>
-                                        <exclude>**/vmaxproxy-x64.vcproj</exclude>
-                                    </excludes> --> 
-                                    <ignoreMissingFile>true</ignoreMissingFile>   
-									<escape>true</escape>
-									<regex>false</regex>									
-                                    <replacements>
-                                        <replacement>
-                                            <token>Win32</token>
-                                            <value>${arch}</value>
-                                        </replacement>         
-                                        <replacement>
-                                            <token>Name="VCLibrarianTool"</token>
-                                            <value>Name="VCLibrarianTool" \n                AdditionalOptions="/MACHINE:${arch}"</value>
-                                        </replacement>  
-                                        <replacement>
-                                            <token>;c:\Qt\5.4.2\qt-5.4.2-x64-msvc2012-opengl\lib\Qt5Core.lib;</token>
-                                            <value>;</value>
-                                        </replacement>  										
-                                    </replacements>
-                                </configuration>                                
-                            </execution>
-                            <execution>
-                                <id>fix-arch-x86-QMAKE-SUCKS!!!!!!!!!!</id>
-								<phase>process-resources</phase>
-                                <goals>
-                                    <goal>replace</goal>
-                                </goals>
-                                <configuration>
-                                    <encoding>utf-8</encoding>
-                                    <file>${project.build.sourceDirectory}/${project.artifactId}-x86.vcxproj</file>
-                                    <!-- <excludes>
-                                        <exclude>**/vmaxproxy-x64.vcproj</exclude>
-                                    </excludes> --> 
-                                    <ignoreMissingFile>true</ignoreMissingFile>          
-									<escape>true</escape>
-									<regex>false</regex>	                                    
-                                    <replacements>
-                                        <replacement>
-                                            <token>x64</token>
-                                            <value>Win32</value>
-                                        </replacement>         
-                                        <replacement>
-                                            <token>Name="VCLibrarianTool"</token>
-                                            <value>Name="VCLibrarianTool" \n                AdditionalOptions="/MACHINE:${arch}"</value>
-                                        </replacement> 
-                                        <replacement>
-                                            <token>;c:\Qt\5.4.2\qt-5.4.2-x86-msvc2012-opengl\lib\Qt5Core.lib;</token>
-                                            <value>;</value>
-                                        </replacement>         
-                                    </replacements>
-                                </configuration>                                
-                            </execution>
-
                             <!-- Fixing qmake-generated msvc2012 project files. Sometimes this step will be unnecessary (when qmake is fixed) -->
                             <execution>
                                 <id>fix-vcxproj-QMAKE-SUCKS!!!!!!!!!!</id>
@@ -245,20 +182,6 @@
                                     <ignoreErrors>true</ignoreErrors>
                                     <file>${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj</file>
                                     <replacements>
-                                        <!-- Adding custom build steps since qmake cannot do that for msvc2012 project file -->
-                                        <!--<replacement>
-                                            <token>
-                                                <![CDATA[<RootNamespace>${project.artifactId}</RootNamespace>]]></token>
-                                            <value>
-                                                <![CDATA[<RootNamespace>${project.artifactId}</RootNamespace><LocalDebuggerWorkingDirectory>$(OutputDirectory)</LocalDebuggerWorkingDirectory>]]></value>
-                                        </replacement> -->
-
-                                        <!-- Disabling optimization for debug builds -->
-                                        <replacement>
-                                            <xpath>//Project/ItemDefinitionGroup[contains(@Condition,'Debug')]</xpath>
-                                            <token><![CDATA[<WarningLevel>Level3</WarningLevel>]]></token>
-                                            <value><![CDATA[<WarningLevel>Level3</WarningLevel><Optimization>Disabled</Optimization>]]></value>
-                                        </replacement>
 
                                         <replacement>
                                             <token>
@@ -267,12 +190,6 @@
                                                 <![CDATA[</RootNamespace>
     <TargetName>${project.artifactId}</TargetName>]]></value>
                                         </replacement> 
-                                        <replacement>
-                                            <token>
-                                                <![CDATA[<PlatformToolSet>v110</PlatformToolSet>]]></token>
-                                            <value>
-                                                <![CDATA[<PlatformToolSet>${PlatformToolSet}</PlatformToolSet>]]></value>
-                                        </replacement>         
                                         <replacement>
                                             <token>
                                                 <![CDATA[<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">]]></token>
@@ -299,28 +216,7 @@
                                         <replacement>
                                             <token>${project.artifactId}${parsedVersion.majorVersion}</token>
                                             <value>${project.artifactId}</value>
-                                        </replacement>
-                                        <replacement>
-                                            <xpath>//Project/ItemGroup/None[contains(@Include,'.proto')]</xpath>
-                                            <token>
-                                                <![CDATA[<None\s*Include=\"(.*)[\\/]{1}([\w\d_\-]+)\.([\w\d_\-]+)\".*/>]]></token>
-                                            <value>
-                                                <![CDATA[
-    <CustomBuild Include="$1/$2.$3">
-      <AdditionalInputs>\$(OutputDirectory)../../../bin/protoc.exe;$1/$2.$3</AdditionalInputs>
-      <Command>\$(OutputDirectory)\..\\..\\..\\bin\\protoc.exe --proto_path=./api/pb --cpp_out=../${arch}/build/\$(Configuration)/generated/ ./$1/$2.$3</Command>
-      <Message>Generating code from $1/$2.$3 to $2.pb.cc</Message>
-      <Outputs>../${arch}/build/\$(Configuration)/generated/$2.pb.cc</Outputs>
-    </CustomBuild>
-]]></value>
-                                        </replacement>
-
-                                        <!-- Fixing compiling of *.pb.cc files -->
-                                        <replacement>
-                                            <xpath>//Project/ItemGroup/CustomBuild[contains(@Include,'.pb.cc')]</xpath>
-                                            <token>CustomBuild</token>
-                                            <value>ClCompile</value>
-                                        </replacement>
+                                        </replacement>         
 
                                         <!-- Disabling compile of .res file (otherwise we come into duplicate resource error during linkage) -->
                                         <replacement>
@@ -333,12 +229,12 @@
                                         <replacement>
                                             <xpath>//Project/PropertyGroup</xpath>
                                             <token><![CDATA[<ProjectGuid>\{(.*)}]]></token>
-                                            <value><![CDATA[<ProjectGuid>${guid}]]></value>
+                                            <value><![CDATA[<ProjectGuid>\${guid}]]></value>
                                         </replacement>
 
                                         <!-- Disabling moc preprocessor steps, since we do it with jom -->
                                         <replacement>
-                                            <xpath>//Project/PropertyGroup/CustomBuild[contains(@Include,'.h')]</xpath>
+                                            <xpath>//Project/ItemGroup/CustomBuild[contains(@Include,'.h')]</xpath>
                                             <token><![CDATA[</CustomBuild>]]></token>
                                             <value><![CDATA[
       <ExcludedFromBuild>true</ExcludedFromBuild>
@@ -379,36 +275,6 @@
                                                 <![CDATA[<ExceptionHandling>Async</ExceptionHandling>]]></value>
                                         </replacement>
 
-                                        <!-- Adding "Create precompiled header option" to StdAfx.cpp compile options -->
-                                        <!-- <replacement>
-                                            <xpath>//Project/ItemGroup/ClCompile[contains(@Include,'StdAfx.cpp')]</xpath>
-                                            <token>CustomBuild</token>
-                                            <value>None</value>
-                                        </replacement>
-                                        <replacement>
-                                            <token><![CDATA[<ClCompile Include="StdAfx.cpp"/>]]></token>
-                                            <value><![CDATA[<None Include="StdAfx.cpp"/>]]></value>
-                                        </replacement> -->
-                                    </replacements>
-                                    <skip>${replace.skip}</skip>
-                                </configuration>                                
-                            </execution>
-                            <execution>
-                                <id>fix-vcxproj-finalname-QMAKE-SUCKS!!!!!!!!!!</id>
-                                <phase>process-resources</phase>
-                                <goals>
-                                    <goal>replace</goal>
-                                </goals>
-                                <configuration>
-                                    <encoding>utf-8</encoding>
-                                    <unescape>no</unescape>
-                                    <ignoreErrors>true</ignoreErrors>
-                                    <file>${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj</file>
-                                    <replacements>
-                                        <replacement>
-                                            <token>${project.artifactId}${parsedVersion.majorVersion}</token>
-                                            <value>${project.artifactId}</value>
-                                        </replacement>
                                     </replacements>
                                     <skip>${replace.skip}</skip>
                                 </configuration>                                

@@ -3,6 +3,8 @@
 
 #include <future>
 
+#include <boost/optional.hpp>
+
 #include <nx/network/stun/async_client.h>
 
 #include "abstract_cloud_system_credentials_provider.h"
@@ -39,6 +41,8 @@ public:
 
     void pleaseStop( std::function<void()> handler ) override;
 
+    boost::optional<SocketAddress> mediatorAddress() const;
+
 private:
     void fetchEndpoint();
 
@@ -47,9 +51,12 @@ private:
     boost::optional< SystemCredentials > m_credentials;
 
     boost::optional< std::promise< bool > > m_promise;
-    std::shared_ptr< stun::AsyncClient > m_stunClient;
+    boost::optional< std::future< bool > > m_future;
+
+    std::shared_ptr< stun::AbstractAsyncClient > m_stunClient;
     nx::network::cloud::CloudModuleEndPointFetcher m_endpointFetcher;
     std::unique_ptr< AbstractStreamSocket > m_timerSocket;
+    boost::optional<SocketAddress> m_mediatorAddress;
 };
 
 } // namespace api
