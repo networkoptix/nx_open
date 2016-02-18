@@ -1,6 +1,6 @@
 $icon-font-path: "../fonts/";
 
-@import 'sass-bootstrap/lib/_variables.scss';
+@import '../bower_components/sass-bootstrap/lib/_variables.scss';
 
 *{
   font-family: "Roboto";
@@ -434,4 +434,10 @@ span.danger{
 }
 .navbar-default{
   border:none;
+}
+
+.cloud-dialog-frame{
+  border: none;
+  width: 100%;
+  height: 400px;
 }

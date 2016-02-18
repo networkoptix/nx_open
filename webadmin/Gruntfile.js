@@ -68,6 +68,7 @@ module.exports = function (grunt) {
                 },
                 files: [
                     '<%= yeoman.app %>/{,*/}*.html',
+                    '<%= yeoman.app %>/views/**',
                     '.tmp/styles/{,*/}*.css',
                     '<%= yeoman.app %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}'
                 ]
@@ -77,7 +78,7 @@ module.exports = function (grunt) {
         // The actual grunt server settings
         connect: {
             options: {
-                port: 9000,
+                port: 10000,
                 // Change this to '0.0.0.0' to access the server from outside.
                 hostname: '0.0.0.0',
                 livereload: 35729
@@ -167,8 +168,15 @@ module.exports = function (grunt) {
                 {context: '/media/',    host: '10.0.2.169', port: 7011},
                 {context: '/proxy/',    host: '10.0.2.169', port: 7011}/**/
 
+                // Nx1 Cloud 3.0
+                {context: '/api/',      host: '10.0.3.65', port: 7001},
+                {context: '/ec2/',      host: '10.0.3.65', port: 7001},
+                {context: '/hls/',      host: '10.0.3.65', port: 7001},
+                {context: '/media/',    host: '10.0.3.65', port: 7001},
+                {context: '/proxy/',    host: '10.0.3.65', port: 7001}/**/
+
                 // Sasha
-                {context: '/api/',      host: '10.0.2.119', port: 7042},
+                /*{context: '/api/',      host: '10.0.2.119', port: 7042},
                 {context: '/ec2/',      host: '10.0.2.119', port: 7042},
                 {context: '/hls/',      host: '10.0.2.119', port: 7042},
                 {context: '/media/',    host: '10.0.2.119', port: 7042},
@@ -240,7 +248,7 @@ module.exports = function (grunt) {
 
                         return middlewares;
                     },
-                    port: 9000,
+                    port: 10000,
 
                     base: [
                         '.tmp',

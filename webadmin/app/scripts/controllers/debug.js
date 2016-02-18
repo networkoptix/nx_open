@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('DebugCtrl', function ($scope, mediaserver) {
+    .controller('DebugCtrl', function ($scope, mediaserver, $sessionStorage) {
 
         mediaserver.getUser().then(function(user){
             if(!user.isOwner){
@@ -9,30 +9,37 @@ angular.module('webadminApp')
             }
         });
 
-        // '/api/pingSystem?password=' + password  + '&url=' + encodeURIComponent(url));
-        $scope.method={
-            name:'/api/pingSystem',
-            data:'',
-            params:'{\n\t"password":"admin",\n\t"url":"http://demo.networkoptix.com:7001/"\n}',
-            method:'POST'
+        $scope.session = $sessionStorage;
+
+        if(!$scope.session.method){
+            $scope.session.method = {
+                name:'/api/pingSystem',
+                data:'',
+                params:'{\n\t"password":"admin",\n\t"url":"http://demo.networkoptix.com:7001/"\n}',
+                method:'POST'
+            };
+        }
+
+        $scope.result={
+
         };
 
         $scope.getDebugUrl = function(){
 
-            var params = $scope.method.params;
+            var params = $scope.session.method.params;
             if(params && params!='') {
                 try {
                     params = JSON.parse(params);
                 } catch (a) {
-                    return "GET-params is not a valid json object";
+                    return "GET-params is not a valid json object: " + a;
                 }
             }
 
-            return mediaserver.debugFunctionUrl($scope.method.name, params);
+            return mediaserver.debugFunctionUrl($scope.session.method.name, params);
         };
 
         $scope.testMethod = function(){
-            var data = $scope.method.data;
+            var data = $scope.session.method.data;
             if(data && data!='') {
                 try {
                     data = JSON.parse(data);
@@ -43,7 +50,7 @@ angular.module('webadminApp')
                 }
             }
 
-            var params = $scope.method.params;
+            var params = $scope.session.method.params;
             if(params && params!='') {
                 try {
                     params = JSON.parse(params);
@@ -55,13 +62,12 @@ angular.module('webadminApp')
             }
 
 
-            mediaserver.debugFunction($scope.method.method, $scope.method.name, params, data).then(function(success){
-                console.log(success);
-                $scope.method.status = success.status + ": " + success.statusText;
-                $scope.method.result = JSON.stringify(success.data, null, "\t");
+            mediaserver.debugFunction($scope.session.method.method, $scope.session.method.name, params, data).then(function(success){
+                $scope.result.status = success.status + ": " + success.statusText;
+                $scope.result.result = JSON.stringify(success.data, null, "\t");
             },function(error){
-                $scope.method.status = error.status + ": " + error.statusText;
-                $scope.method.result =  "Error:" + JSON.stringify(error.data, null, "\t");
+                $scope.result.status = error.status + ": " + error.statusText;
+                $scope.result.result =  "Error:" + JSON.stringify(error.data, null, "\t");
             });
         }
 
