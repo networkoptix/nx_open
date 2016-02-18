@@ -48,15 +48,6 @@ namespace
         return kResult;
     }
 
-    typedef std::shared_ptr<QFile> QFileCloseGuard;
-    QFileCloseGuard createFileCloseGuard(QFile *file)
-    {
-        return QFileCloseGuard(file, [](QFile *file)
-        {
-            file->close();
-        });
-    }
-
     bool writeToFile(const QString &absoluteFileName
         , const QByteArray &data)
     {
@@ -66,12 +57,7 @@ namespace
         if (!output.isOpen())
             return false;
 
-        qint64 writtenSize = 0;
-        {
-            const auto closeGuard = createFileCloseGuard(&output);
-            writtenSize = output.write(data);
-        }
-
+        const qint64 writtenSize = output.write(data);
         return (writtenSize == data.size());
     }
 
@@ -84,7 +70,6 @@ namespace
         if (!input.open(QIODevice::ReadOnly))
             return QByteArray();
 
-        const auto closeGuard = createFileCloseGuard(&input);
         return input.readAll();
     }
 
