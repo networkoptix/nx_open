@@ -176,7 +176,7 @@ module.exports = function (grunt) {
                 {context: '/proxy/',    host: '10.0.3.65', port: 7001}/**/
 
                 // Sasha
-                {context: '/api/',      host: '10.0.2.119', port: 7042},
+                /*{context: '/api/',      host: '10.0.2.119', port: 7042},
                 {context: '/ec2/',      host: '10.0.2.119', port: 7042},
                 {context: '/hls/',      host: '10.0.2.119', port: 7042},
                 {context: '/media/',    host: '10.0.2.119', port: 7042},
