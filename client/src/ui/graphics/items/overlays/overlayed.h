@@ -44,7 +44,7 @@ namespace detail {
         void removeOverlayWidget(QGraphicsWidget *widget);
 
         OverlayVisibility overlayWidgetVisibility(QGraphicsWidget *widget) const;
-        void setOverlayWidgetVisibility(QGraphicsWidget *widget, OverlayVisibility visibility);
+        void setOverlayWidgetVisibility(QGraphicsWidget *widget, OverlayVisibility visibility, bool animate = true);
         void updateOverlayWidgetsVisibility(bool animate = true);
 
         static void setOverlayWidgetVisible(QGraphicsWidget* widget, bool visible = true, bool animate = true);

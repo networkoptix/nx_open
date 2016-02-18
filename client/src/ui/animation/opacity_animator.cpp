@@ -39,11 +39,9 @@ Q_GLOBAL_STATIC(VariantAnimator, staticVariantAnimator);
 
 VariantAnimator *opacityAnimator(QGraphicsObject *item, qreal speed)
 {
+    Q_ASSERT_X(item != nullptr, Q_FUNC_INFO, "Item cannot be null here");
     if(item == NULL)
-    {
-        qnNullWarning(item);
         return staticVariantAnimator();
-    }
 
     VariantAnimator *animator = item->property(opacityAnimatorPropertyName).value<VariantAnimator *>();
     if (animator)
@@ -55,17 +53,17 @@ VariantAnimator *opacityAnimator(QGraphicsObject *item, qreal speed)
     AnimationTimer *animationTimer = NULL;
     AnimatedBase *animatedBase = dynamic_cast<AnimatedBase *>(item);
 
-    if(!animatedBase) {
-        if(!item->scene()) {
-            qnWarning("Cannot create opacity animator for an item not on a scene.");
+    if(!animatedBase)
+    {
+        Q_ASSERT_X(item->scene() != nullptr, Q_FUNC_INFO, "Cannot create opacity animator for an item not on a scene.");
+        if(!item->scene())
             return staticVariantAnimator();
-        }
 
         animationTimer = InstrumentManager::animationTimer(item->scene());
-        if(!animationTimer) {
-            qnWarning("Cannot create opacity animator for an item on a scene that has no associated animation instrument.");
+        Q_ASSERT_X(animationTimer != nullptr, Q_FUNC_INFO,
+            "Cannot create opacity animator for an item on a scene that has no associated animation instrument.");
+        if(!animationTimer)
             return staticVariantAnimator();
-        }
     }
 
     animator = new VariantAnimator(item);

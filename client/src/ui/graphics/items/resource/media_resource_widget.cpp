@@ -1511,7 +1511,7 @@ void QnMediaResourceWidget::updateIoModuleVisibility(bool animate) {
     const ResourceStates states = getResourceStates();
     const bool correctState = (!states.isOffline && !states.isUnauthorized && states.isRealTimeSource);
     const OverlayVisibility visibility =  (m_ioCouldBeShown && correctState ? Visible : Invisible);
-    setOverlayWidgetVisibility(m_ioModuleOverlayWidget, visibility);
+    setOverlayWidgetVisibility(m_ioModuleOverlayWidget, visibility, animate);
     updateOverlayWidgetsVisibility(animate);
 
     setStatusOverlay(calculateStatusOverlay());
