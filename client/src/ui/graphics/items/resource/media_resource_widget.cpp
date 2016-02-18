@@ -1514,7 +1514,7 @@ void QnMediaResourceWidget::updateIoModuleVisibility(bool animate) {
     setOverlayWidgetVisibility(m_ioModuleOverlayWidget, visibility, animate);
     updateOverlayWidgetsVisibility(animate);
 
-    setStatusOverlay(calculateStatusOverlay());
+    setStatusOverlay(calculateStatusOverlay(), animate);
     updateOverlayButton();
 }
 

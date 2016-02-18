@@ -763,18 +763,22 @@ Qn::ResourceStatusOverlay QnResourceWidget::statusOverlay() const {
     return m_statusOverlay;
 }
 
-void QnResourceWidget::setStatusOverlay(Qn::ResourceStatusOverlay statusOverlay) {
+void QnResourceWidget::setStatusOverlay(Qn::ResourceStatusOverlay statusOverlay, bool animate)
+{
     if(m_statusOverlay == statusOverlay)
         return;
 
     m_statusOverlay = statusOverlay;
+    m_statusOverlayWidget->setStatusOverlay(statusOverlay);
 
-    if(statusOverlay == Qn::EmptyOverlay) {
-        opacityAnimator(m_statusOverlayWidget)->animateTo(0.0);
-    } else {
-        opacityAnimator(m_statusOverlayWidget)->animateTo(1.0);
-        m_statusOverlayWidget->setStatusOverlay(statusOverlay);
-    }
+    qreal opacity = statusOverlay == Qn::EmptyOverlay
+        ? 0.0
+        : 1.0;
+
+    if(animate)
+        opacityAnimator(m_statusOverlayWidget)->animateTo(opacity);
+    else
+        m_statusOverlayWidget->setOpacity(opacity);
 }
 
 Qn::ResourceStatusOverlay QnResourceWidget::calculateStatusOverlay(int resourceStatus, bool hasVideo) const {
