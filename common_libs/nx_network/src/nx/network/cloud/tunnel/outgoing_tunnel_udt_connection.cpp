@@ -7,6 +7,7 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/barrier_handler.h>
+#include <utils/common/cpp14.h>
 
 
 namespace nx {
@@ -38,7 +39,7 @@ void OutgoingTunnelUdtConnection::pleaseStop(
             //cancelling ongoing connects
             QnMutexLocker lk(&m_mutex);
             std::map<UdtStreamSocket*, ConnectionContext> ongoingConnections;
-            ongoingConnections.swap(std::move(m_ongoingConnections));
+            ongoingConnections.swap(m_ongoingConnections);
             lk.unlock();
 
             BarrierHandler completionHandlerCaller(std::move(completionHandler));
