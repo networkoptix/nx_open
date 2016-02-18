@@ -539,6 +539,9 @@ QString QnResourceWidget::calculateDetailsText() const {
 }
 
 void QnResourceWidget::updateDetailsText() {
+    if (!isOverlayWidgetVisible(m_overlayWidgets.detailsOverlay))
+        return;
+
     const QString text = calculateDetailsText();
     m_overlayWidgets.detailsItem->setHtml(text);
     m_overlayWidgets.detailsItem->setVisible(!text.isEmpty());
@@ -549,6 +552,9 @@ QString QnResourceWidget::calculatePositionText() const {
 }
 
 void QnResourceWidget::updatePositionText() {
+    if (!isOverlayWidgetVisible(m_overlayWidgets.positionOverlay))
+        return;
+
     const QString text = calculatePositionText();
     m_overlayWidgets.positionItem->setHtml(text);
     m_overlayWidgets.positionItem->setVisible(!text.isEmpty());
@@ -843,8 +849,16 @@ void QnResourceWidget::updateHud(bool animate) {
 
     setOverlayWidgetVisible(m_overlayWidgets.cameraNameWithButtonsOverlay,  showCameraNameWithButtons,  animate);
     setOverlayWidgetVisible(m_overlayWidgets.cameraNameOnlyOverlay,         showOnlyCameraName,         animate);
+
+    bool updatePositionTextRequired = (showPosition && !isOverlayWidgetVisible(m_overlayWidgets.positionOverlay));
     setOverlayWidgetVisible(m_overlayWidgets.positionOverlay,               showPosition,               animate);
+    if (updatePositionTextRequired)
+        updatePositionText();
+
+    bool updateDetailsTextRequired = (showDetailedInfo && !isOverlayWidgetVisible(m_overlayWidgets.detailsOverlay));
     setOverlayWidgetVisible(m_overlayWidgets.detailsOverlay,                showDetailedInfo,           animate);
+    if (updateDetailsTextRequired)
+        updateDetailsText();
 }
 
 bool QnResourceWidget::isHovered() const {

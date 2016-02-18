@@ -7,6 +7,11 @@
 
 #include <utils/common/warnings.h>
 
+namespace
+{
+    const qreal kOverlayWidgetAnimationSpeed = 1.0;
+}
+
 detail::OverlayedBase::OverlayWidget::OverlayWidget()
     : visibility(OverlayVisibility::Invisible)
     , widget(nullptr)
@@ -159,9 +164,26 @@ void detail::OverlayedBase::setOverlayWidgetVisible(QGraphicsWidget* widget, boo
 
     qreal opacity = visible ? 1.0 : 0.0;
 
-    if(animate) {
-        opacityAnimator(widget, 1.0)->animateTo(opacity);
-    } else {
+    if(animate)
+    {
+        opacityAnimator(widget, kOverlayWidgetAnimationSpeed)->animateTo(opacity);
+    }
+    else
+    {
         widget->setOpacity(opacity);
     }
+    Q_ASSERT_X(isOverlayWidgetVisible(widget) == visible, Q_FUNC_INFO, "Validate checking function");
+}
+
+bool detail::OverlayedBase::isOverlayWidgetVisible(QGraphicsWidget* widget)
+{
+    if (!widget)
+        return false;
+
+    if (hasOpacityAnimator(widget))
+    {
+        auto animator = opacityAnimator(widget, kOverlayWidgetAnimationSpeed);
+        return !qFuzzyIsNull(animator->targetValue().toDouble());
+    }
+    return !qFuzzyIsNull(widget->opacity());
 }

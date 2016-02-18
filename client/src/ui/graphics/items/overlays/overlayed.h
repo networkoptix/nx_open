@@ -48,6 +48,7 @@ namespace detail {
         void updateOverlayWidgetsVisibility(bool animate = true);
 
         static void setOverlayWidgetVisible(QGraphicsWidget* widget, bool visible = true, bool animate = true);
+        static bool isOverlayWidgetVisible(QGraphicsWidget* widget);
     private:
         template<class Base>
         friend class ::Overlayed;
