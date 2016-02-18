@@ -72,8 +72,10 @@ namespace Qn {
         AllPermissions                          = 0xFFFFFFFF
     };
 
+#ifdef __cplusplus
     Q_DECLARE_FLAGS(Permissions, Permission)
     Q_DECLARE_OPERATORS_FOR_FLAGS(Permissions)
+#endif
 
 #ifndef QN_NO_NAMESPACES
 } // namespace Qn
