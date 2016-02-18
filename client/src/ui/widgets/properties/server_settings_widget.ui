@@ -11,12 +11,33 @@
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0">
+   <property name="spacing">
+    <number>16</number>
+   </property>
+   <property name="leftMargin">
+    <number>16</number>
+   </property>
+   <property name="topMargin">
+    <number>16</number>
+   </property>
+   <property name="rightMargin">
+    <number>16</number>
+   </property>
+   <property name="bottomMargin">
+    <number>16</number>
+   </property>
    <item>
     <layout class="QFormLayout" name="formLayout">
+     <property name="horizontalSpacing">
+      <number>8</number>
+     </property>
+     <property name="verticalSpacing">
+      <number>8</number>
+     </property>
      <item row="0" column="0">
       <widget class="QLabel" name="nameLabel">
        <property name="text">
-        <string>Name:</string>
+        <string>Name</string>
        </property>
       </widget>
      </item>
@@ -26,7 +47,7 @@
      <item row="1" column="0">
       <widget class="QLabel" name="ipAddressLabel">
        <property name="text">
-        <string>IP Address:</string>
+        <string>IP Address</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -35,6 +56,9 @@
      </item>
      <item row="1" column="1">
       <layout class="QHBoxLayout" name="horizontalLayout">
+       <property name="spacing">
+        <number>8</number>
+       </property>
        <item>
         <widget class="QLineEdit" name="ipAddressLineEdit">
          <property name="readOnly">
@@ -60,7 +84,7 @@
      <item row="2" column="0">
       <widget class="QLabel" name="portLabel">
        <property name="text">
-        <string>Port:</string>
+        <string>Port</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -82,25 +106,42 @@
    <item>
     <widget class="QGroupBox" name="failoverGroupBox">
      <property name="title">
-      <string>Failover</string>
+      <string>Fai&amp;lover</string>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
      </property>
      <property name="checked">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
-      <item>
-       <widget class="QCheckBox" name="failoverCheckBox">
-        <property name="text">
-         <string notr="true">&lt;Enable failover (server will take cameras/devices automatically from offline servers)&gt;</string>
-        </property>
-       </widget>
-      </item>
+      <property name="spacing">
+       <number>8</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>8</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
       <item>
        <widget class="QWidget" name="maxCamerasWidget" native="true">
         <property name="enabled">
          <bool>false</bool>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_6">
+         <property name="spacing">
+          <number>8</number>
+         </property>
          <property name="leftMargin">
           <number>0</number>
          </property>

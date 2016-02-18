@@ -629,14 +629,6 @@ void QnNxStyle::drawComplexControl(
 
             const bool flat = groupBox->features.testFlag(QStyleOptionFrame::Flat);
 
-            if (flat)
-            {
-                QFont font = painter->font();
-                font.setPixelSize(font.pixelSize() + 2);
-                font.setWeight(QFont::DemiBold);
-                painter->setFont(font);
-            }
-
             QRect labelRect = subControlRect(CC_GroupBox, groupBox, SC_GroupBoxLabel, widget);
 
             if (groupBox->subControls.testFlag(SC_GroupBoxFrame))
@@ -679,9 +671,50 @@ void QnNxStyle::drawComplexControl(
 
             if (groupBox->subControls.testFlag(SC_GroupBoxLabel))
             {
-                drawItemText(painter, labelRect, Qt::AlignCenter | Qt::TextHideMnemonic,
-                             groupBox->palette, groupBox->state.testFlag(QStyle::State_Enabled),
-                             groupBox->text, flat ? QPalette::Text : QPalette::WindowText);
+                int flags = Qt::AlignLeft | Qt::AlignVCenter | Qt::TextHideMnemonic;
+
+                if (flat)
+                {
+                    QString text = groupBox->text;
+                    QString detailText;
+
+                    int splitPos = text.indexOf(QLatin1Char('\t'));
+                    if (splitPos >= 0)
+                    {
+                        detailText = text.mid(splitPos + 1);
+                        text = text.left(splitPos);
+                    }
+
+                    QRect rect = labelRect;
+
+                    if (!text.isEmpty())
+                    {
+                        QFont font = painter->font();
+                        font.setPixelSize(font.pixelSize() + 2);
+                        font.setWeight(QFont::DemiBold);
+
+                        QnScopedPainterFontRollback fontRollback(painter, font);
+
+                        drawItemText(painter, rect, flags,
+                                     groupBox->palette, groupBox->state.testFlag(QStyle::State_Enabled),
+                                     text, QPalette::Text);
+
+                        rect.setLeft(rect.left() + QFontMetrics(font).size(flags, text).width());
+                    }
+
+                    if (!detailText.isEmpty())
+                    {
+                        drawItemText(painter, rect, Qt::AlignCenter | Qt::TextHideMnemonic,
+                                     groupBox->palette, groupBox->state.testFlag(QStyle::State_Enabled),
+                                     detailText, QPalette::WindowText);
+                    }
+                }
+                else
+                {
+                    drawItemText(painter, labelRect, flags,
+                                 groupBox->palette, groupBox->state.testFlag(QStyle::State_Enabled),
+                                 groupBox->text, QPalette::WindowText);
+                }
             }
 
             if (groupBox->subControls.testFlag(SC_GroupBoxCheckBox))
@@ -1408,12 +1441,34 @@ QRect QnNxStyle::subControlRect(
                 {
                     if (widget)
                     {
-                        QStyleOptionGroupBox opt = *groupBox;
+                        QString text = groupBox->text;
+                        QString detailText;
+
+                        int splitPos = text.indexOf(QLatin1Char('\t'));
+                        if (splitPos >= 0)
+                        {
+                            detailText = text.mid(splitPos + 1);
+                            text = text.left(splitPos);
+                        }
+
                         QFont font = widget->font();
                         font.setPixelSize(font.pixelSize() + 2);
                         font.setWeight(QFont::DemiBold);
-                        opt.fontMetrics = QFontMetrics(font);
-                        rect = base_type::subControlRect(control, &opt, subControl, widget);
+
+                        int flags = Qt::AlignTop |
+                                    Qt::AlignLeft |
+                                    Qt::TextHideMnemonic;
+
+                        QSize size = QFontMetrics(font).size(flags, text);
+
+                        if (!detailText.isEmpty())
+                        {
+                            QSize detailSize = QFontMetrics(widget->font())
+                                               .size(flags, detailText);
+                            size.rwidth() += detailSize.width();
+                        }
+
+                        rect = QRect(QPoint(), size);
                     }
 
                     rect.moveLeft(0);
