@@ -28,10 +28,19 @@
     <link rel="stylesheet" href="customization/styles-native.css">
 
 </head>
-<body ng-app="webadminApp" class="inline-webadmin">
+<body ng-app="webadminApp">
 
 <!-- Add your site or application content here -->
-<div class="panel master" ng-view=""></div>
+<div class="container">
+    <div class="master">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                Configure new server
+            </div>
+            <div ng-view=""></div>
+        </div>
+    </div>
+</div>
 
 <!-- build:js scripts/vendor.js -->
 <!-- bower:js -->
