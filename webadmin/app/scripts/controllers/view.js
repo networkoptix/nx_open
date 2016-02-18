@@ -24,6 +24,12 @@ angular.module('webadminApp').controller('ViewCtrl',
         $scope.activeCamera = null;
         $scope.searchCams = '';
 
+
+        mediaserver.systemSettings().then(function(r){
+            $scope.webclientDisabled = r.data.reply.settings.crossdomainEnabled == 'false' ;
+            console.log($scope.webclientDisabled, r.data.reply.settings.crossdomainEnabled);
+        });
+
         var isAdmin = false;
         var canViewLive = false;
         var canViewArchive = false;
