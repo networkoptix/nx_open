@@ -218,11 +218,11 @@ void QnStatisticsManager::sendStatistics()
         ? timeStamp - kMsInDay * settings.storeDays
         : getLastSentTime(m_storage));
 
-    enum { kMinSendPeriodMs = 1 * 1000};   // TODO: change to appropriate value _ don't forget
     const auto msSinceSent = (timeStamp > minTimeStampMs
         ? timeStamp - minTimeStampMs : 0);
 
-    if (!filtersChanged && (msSinceSent < kMinSendPeriodMs))
+    enum { kMsInSec = 1000 };
+    if (!filtersChanged && (msSinceSent < settings.minSendPeriodSecs * kMsInSec))
         return;
 
     const auto totalMetricsList = m_storage->getMetricsList(
