@@ -188,7 +188,7 @@ void QnWorkbenchUpdateWatcher::showUpdateNotification(const QnUpdateInfo &info)
     messageBox.setWindowTitle(title);
     messageBox.setTextFormat(Qt::RichText);
     messageBox.setText(message);
-    messageBox.checkBox()->setText(tr("Do not notify me again about this update."));
+    messageBox.setCheckBoxText(tr("Do not notify me again about this update."));
     setHelpTopic(&messageBox, Qn::Upgrade_Help);
 
     if (info.releaseNotesUrl.isValid())
@@ -204,11 +204,11 @@ void QnWorkbenchUpdateWatcher::showUpdateNotification(const QnUpdateInfo &info)
     messageBox.adjustSize();
     messageBox.setGeometry(QnGeometry::aligned(messageBox.size(), mainWindow()->geometry(), Qt::AlignCenter));
 
-    messageBox.exec();
+    int result = messageBox.exec();
 
     /* We check for 'Yes' button. 'No' and even 'Ok' buttons are considered negative. */
-    if (messageBox.clickedStandardButton() == QDialogButtonBox::Yes)
+    if (result == QDialogButtonBox::Yes)
         action(QnActions::SystemUpdateAction)->trigger();
     else
-        qnSettings->setIgnoredUpdateVersion(messageBox.checkBox()->isChecked() ? info.currentRelease : QnSoftwareVersion());
+        qnSettings->setIgnoredUpdateVersion(messageBox.isChecked() ? info.currentRelease : QnSoftwareVersion());
 }
