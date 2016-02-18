@@ -8,8 +8,9 @@ void QnStoppableAsync::pleaseStopSync()
     fut.wait();
 }
 
-void QnStoppableAsync::pleaseStopImpl( std::vector< UniquePtr > stoppables,
-                                       std::function< void() > completionHandler )
+void QnStoppableAsync::pleaseStopImpl(
+    std::vector< UniquePtr > stoppables,
+    nx::utils::MoveOnlyFunc< void() > completionHandler )
 {
     Q_ASSERT_X( completionHandler, Q_FUNC_INFO,
                 "There is no other way to understend if QnStoppableAsync if stopped, "
@@ -24,7 +25,7 @@ void QnStoppableAsync::pleaseStopImpl( std::vector< UniquePtr > stoppables,
             std::vector< std::unique_ptr< QnStoppableAsync > > >(
                 std::move( stoppables ) );
     auto sharedHandler = std::make_shared<
-            std::function< void() > >( std::move( completionHandler ) );
+            nx::utils::MoveOnlyFunc< void() > >( std::move( completionHandler ) );
 
     nx::BarrierHandler barrier( [ = ]()
     {

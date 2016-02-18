@@ -67,7 +67,7 @@ void UdpHolePunchingTunnelAcceptor::accept(std::function<void(
 }
 
 void UdpHolePunchingTunnelAcceptor::pleaseStop(
-    std::function<void()> handler)
+    nx::utils::MoveOnlyFunc<void()> handler)
 {
     BarrierHandler barrier(
         [this]()

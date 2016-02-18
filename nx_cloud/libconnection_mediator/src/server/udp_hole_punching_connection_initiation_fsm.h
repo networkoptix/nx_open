@@ -39,7 +39,7 @@ public:
         const ListeningPeerPool::ConstDataLocker& serverPeerDataLocker,
         std::function<void(api::ResultCode)> onFsmFinishedEventHandler);
 
-    virtual void pleaseStop(std::function<void()> completionHandler);
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler);
 
     void onConnectRequest(
         const ConnectionStrongRef& connection,

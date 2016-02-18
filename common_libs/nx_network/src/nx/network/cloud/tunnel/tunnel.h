@@ -29,7 +29,7 @@ public:
 
     const String& getRemotePeerId() const { return m_remotePeerId; }
 
-    typedef std::function<void(
+    typedef nx::utils::MoveOnlyFunc<void(
         SystemError::ErrorCode,
         std::unique_ptr<AbstractStreamSocket>,
         bool /*stillValid*/)> SocketHandler;
@@ -92,7 +92,7 @@ public:
     void setStateHandler(std::function<void(State)> handler);
 
     /** Implementation of QnStoppableAsync::pleaseStop */
-    void pleaseStop(std::function<void()> handler) override;
+    void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
 protected:
     void startConnectors(QnMutexLockerBase* lock);

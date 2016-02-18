@@ -86,7 +86,7 @@ void socketSimpleSync(
         serverMaker);
 
     // give the server some time to start
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 
     std::thread clientThread([&endpointToConnectTo, &testMessage,
                               clientCount, &clientMaker]()
@@ -94,7 +94,8 @@ void socketSimpleSync(
         for (int i = clientCount; i > 0; --i)
         {
             auto client = clientMaker();
-            EXPECT_TRUE(client->connect(endpointToConnectTo, 500));
+            EXPECT_TRUE(client->connect(endpointToConnectTo, 500)) 
+                << SystemError::getLastOSErrorText().toStdString();
             EXPECT_EQ(
                 client->send(testMessage.constData(), testMessage.size() + 1),
                 testMessage.size() + 1) << SystemError::getLastOSErrorText().toStdString();

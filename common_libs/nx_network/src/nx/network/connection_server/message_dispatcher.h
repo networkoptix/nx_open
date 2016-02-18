@@ -52,7 +52,7 @@ public:
         Stop dispatching requests. \a StunRequestDispatcher::dispatchRequest returns \a false if dispatcher has been stopped
         \note request dispatching cannot be resumed after it has been stopped
     */
-    virtual void pleaseStop( std::function<void()> /*completionHandler*/ ) override
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> /*completionHandler*/) override
     {
         //TODO #ak
     }

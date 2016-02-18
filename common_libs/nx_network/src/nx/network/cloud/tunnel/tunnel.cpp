@@ -89,7 +89,7 @@ void Tunnel::changeState(State state, QnMutexLockerBase* lock)
         handler(state);
 }
 
-void Tunnel::pleaseStop(std::function<void()> handler)
+void Tunnel::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
     BarrierHandler barrier(std::move(handler));
 

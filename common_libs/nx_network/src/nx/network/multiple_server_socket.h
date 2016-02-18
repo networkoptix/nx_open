@@ -52,7 +52,7 @@ public:
     AbstractStreamSocket* accept() override;
 
     //!Implementation of QnStoppable::pleaseStop
-    void pleaseStop(std::function<void()> handler) override;
+    void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
     //!Implementation of AbstractSocket::*
     void post(nx::utils::MoveOnlyFunc<void()> handler) override;

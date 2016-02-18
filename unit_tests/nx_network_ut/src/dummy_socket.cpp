@@ -173,18 +173,21 @@ void DummySocket::dispatch(nx::utils::MoveOnlyFunc<void()> /*handler*/ )
 {
 }
 
-void DummySocket::connectAsync( const SocketAddress& /*addr*/,
-                                    std::function<void( SystemError::ErrorCode )> /*handler*/ )
+void DummySocket::connectAsync(
+    const SocketAddress& /*addr*/,
+    nx::utils::MoveOnlyFunc<void( SystemError::ErrorCode )> /*handler*/ )
 {
 }
 
-void DummySocket::readSomeAsync( nx::Buffer* const /*buf*/,
-                                 std::function<void( SystemError::ErrorCode, size_t )> /*handler*/ )
+void DummySocket::readSomeAsync(
+    nx::Buffer* const /*buf*/,
+    std::function<void( SystemError::ErrorCode, size_t )> /*handler*/ )
 {
 }
 
-void DummySocket::sendAsync( const nx::Buffer& /*buf*/,
-                                 std::function<void( SystemError::ErrorCode, size_t )> /*handler*/ )
+void DummySocket::sendAsync(
+    const nx::Buffer& /*buf*/,
+    std::function<void( SystemError::ErrorCode, size_t )> /*handler*/ )
 {
 }
 

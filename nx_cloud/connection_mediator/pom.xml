@@ -17,6 +17,7 @@
     <name>Nx Cloud Connection Mediator</name>
 
     <properties>
+        <guid>${connection_mediator.guid}</guid>
         <product.title>${company.name} Mediator</product.title>
         <!--Global libs-->
         <qt.libs>core network concurrent sql xml</qt.libs>

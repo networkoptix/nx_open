@@ -254,7 +254,7 @@ public:
     */
     virtual void connectAsync(
         const SocketAddress& addr,
-        std::function<void(SystemError::ErrorCode)> handler) = 0;
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) = 0;
 
     //!Reads bytes from socket asynchronously
     /*!
@@ -315,7 +315,7 @@ public:
     virtual void cancelIOSync(nx::network::aio::EventType eventType) = 0;
 
     //!Implementation of QnStoppable::pleaseStop
-    virtual void pleaseStop( std::function< void() > handler ) override;
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
     //!Implementation of QnStoppable::pleaseStopSync
     virtual void pleaseStopSync() override;
 };

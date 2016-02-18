@@ -28,7 +28,7 @@ public:
     OutgoingTunnelPool();
     virtual ~OutgoingTunnelPool();
 
-    virtual void pleaseStop(std::function<void()> completionHandler) override;
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
 
     /** Establish new connection.
     * \param socketAttributes attribute values to apply to a newly-created socket
@@ -50,7 +50,7 @@ private:
     const std::unique_ptr<OutgoingTunnel>& 
         getTunnel(const AddressEntry& targetHostAddress);
     void removeTunnel(TunnelDictionary::iterator tunnelIter);
-    void tunnelsStopped(std::function<void()> completionHandler);
+    void tunnelsStopped(nx::utils::MoveOnlyFunc<void()> completionHandler);
 };
 
 } // namespace cloud

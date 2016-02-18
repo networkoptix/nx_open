@@ -46,7 +46,7 @@ UdpHolePunchingTunnelConnector::~UdpHolePunchingTunnelConnector()
     m_udtConnection.reset();
 }
 
-void UdpHolePunchingTunnelConnector::pleaseStop(std::function<void()> handler)
+void UdpHolePunchingTunnelConnector::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
     m_timer.post(
         [this, handler = std::move(handler)]() mutable
@@ -368,8 +368,8 @@ void UdpHolePunchingTunnelConnector::connectSessionReportSent(
     else
     {
         tunnelConnection = std::make_unique<OutgoingTunnelUdtConnection>(
-            std::move(m_udtConnection),
-            *m_targetHostUdpAddress);
+            m_connectSessionId,
+            std::move(m_udtConnection));
     }
     auto completionHandler = std::move(m_completionHandler);
     completionHandler(sysErrorCodeToReport, std::move(tunnelConnection));

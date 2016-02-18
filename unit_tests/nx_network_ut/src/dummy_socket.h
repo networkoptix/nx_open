@@ -58,14 +58,17 @@ public:
     virtual void post( nx::utils::MoveOnlyFunc<void()> handler ) override;
     virtual void dispatch(nx::utils::MoveOnlyFunc<void()> handler ) override;
 
-    virtual void connectAsync( const SocketAddress& addr,
-                               std::function<void( SystemError::ErrorCode )> handler ) override;
+    virtual void connectAsync(
+        const SocketAddress& addr,
+        nx::utils::MoveOnlyFunc<void( SystemError::ErrorCode )> handler ) override;
 
-    virtual void readSomeAsync( nx::Buffer* const buf,
-                                std::function<void( SystemError::ErrorCode, size_t )> handler ) override;
+    virtual void readSomeAsync(
+        nx::Buffer* const buf,
+        std::function<void( SystemError::ErrorCode, size_t )> handler ) override;
 
-    virtual void sendAsync( const nx::Buffer& buf,
-                            std::function<void( SystemError::ErrorCode, size_t )> handler ) override;
+    virtual void sendAsync(
+        const nx::Buffer& buf,
+        std::function<void( SystemError::ErrorCode, size_t )> handler ) override;
 
     virtual void registerTimer(
         std::chrono::milliseconds timeoutMs,

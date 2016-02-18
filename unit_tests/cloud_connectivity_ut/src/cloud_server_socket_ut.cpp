@@ -55,10 +55,10 @@ struct FakeTcpTunnelConnection
             });
     }
 
-    void pleaseStop(std::function<void()> handler) override
+    void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override
     {
         m_server->pleaseStop(
-            [this, handler]
+            [this, handler = std::move(handler)]
             {
                 NX_LOGX(lm("exhausted"), cl_logDEBUG1);
                 m_server.reset();
@@ -102,7 +102,7 @@ struct FakeTcpTunnelAcceptor
         handler(SystemError::noError, std::move(connection));
     }
 
-    void pleaseStop(std::function<void()> handler) override
+    void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override
     {
         m_ioThreadSocket->pleaseStop(std::move(handler));
     }

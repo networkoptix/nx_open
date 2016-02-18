@@ -42,7 +42,7 @@ public:
         boost::optional<SocketAddress> mediatorAddress = boost::none);
     virtual ~UdpHolePunchingTunnelConnector();
 
-    virtual void pleaseStop(std::function<void()> handler) override;
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
     virtual int getPriority() const override;
     /** Only one connect can be running at a time. */

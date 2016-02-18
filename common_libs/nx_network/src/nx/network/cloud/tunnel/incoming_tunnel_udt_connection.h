@@ -20,7 +20,7 @@ public:
         SystemError::ErrorCode,
         std::unique_ptr<AbstractStreamSocket>)> handler) override;
 
-    void pleaseStop(std::function<void()> handler) override;
+    void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
 private:
     std::unique_ptr<UdtStreamSocket> m_connectionSocket;

@@ -22,7 +22,7 @@ public:
     void setUpdateInterval( TimerDuration updateInterval );
     void updateAddresses( std::list< SocketAddress > addresses );
 
-    void pleaseStop( std::function<void()> handler ) override;
+    void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
 private:
     void setupUpdateTimer( QnMutexLockerBase* lk );

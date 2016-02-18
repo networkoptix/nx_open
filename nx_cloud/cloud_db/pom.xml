@@ -22,6 +22,7 @@
     <name>Nx Cloud cloud_db</name>
 
     <properties>
+        <guid>${cloud_db.guid}</guid>
         <product.title>${company.name} cloud_db</product.title>
         <!--Global libs-->
         <qt.libs>core network concurrent sql xml</qt.libs>

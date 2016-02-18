@@ -49,7 +49,7 @@ void IncomingTunnelUdtConnection::accept(std::function<void(
 }
 
 void IncomingTunnelUdtConnection::pleaseStop(
-    std::function<void()> handler)
+    nx::utils::MoveOnlyFunc<void()> handler)
 {
     BarrierHandler barrier(std::move(handler));
     m_connectionSocket->pleaseStop(barrier.fork());

@@ -139,7 +139,9 @@ public:
         }
     }
 
-    void connectAsync( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler )
+    void connectAsync(
+        const SocketAddress& addr,
+        nx::utils::MoveOnlyFunc<void( SystemError::ErrorCode )> handler )
     {
         //TODO with UDT we have to maintain pollset.add(socket), socket.connect, pollset.poll pipeline
 
@@ -155,18 +157,24 @@ public:
         unsigned int sendTimeout = 0;
 #ifdef _DEBUG
         bool isNonBlockingModeEnabled = false;
-        if (!m_abstractSocketPtr->getNonBlockingMode(&isNonBlockingModeEnabled))
+#endif
+        if (!m_abstractSocketPtr->getSendTimeout(&sendTimeout)
+#ifdef _DEBUG
+            || !m_abstractSocketPtr->getNonBlockingMode(&isNonBlockingModeEnabled)
+#endif
+            )
         {
-            this->post(std::bind(m_connectHandler, SystemError::getLastOSErrorCode()));
+            this->post(
+                [handler = move(handler), 
+                    errorCode = SystemError::getLastOSErrorCode()]() mutable
+                { 
+                    handler(errorCode);
+                });
             return;
         }
+#ifdef _DEBUG
         assert( isNonBlockingModeEnabled );
 #endif
-        if (!m_abstractSocketPtr->getSendTimeout(&sendTimeout))
-        {
-            this->post(std::bind(m_connectHandler, SystemError::getLastOSErrorCode()));
-            return;
-        }
 
         m_connectHandler = std::move( handler );
 
@@ -176,21 +184,30 @@ public:
         if( addr.address.isResolved() )
         {
             if (!startAsyncConnect(addr))
-                this->post(std::bind(m_connectHandler, SystemError::getLastOSErrorCode()));
+                this->post(
+                    [handler = move(m_connectHandler),
+                        errorCode = SystemError::getLastOSErrorCode()]() mutable
+                    {
+                        handler(errorCode);
+                    });
             return;
         }
 
         nx::network::SocketGlobals::addressResolver().resolveAsync(
             addr.address,
-            [this, addr]( SystemError::ErrorCode code,
+            [this, addr]( SystemError::ErrorCode errorCode,
                           std::vector< nx::network::cloud::AddressEntry > addresses )
             {
                 //always calling m_connectHandler within aio thread socket is bound to
                 if( addresses.empty() )
                 {
-                    if (code == SystemError::noError)
-                        code = SystemError::hostNotFound;
-                    this->post( std::bind( m_connectHandler, code ) );
+                    if (errorCode == SystemError::noError)
+                        errorCode = SystemError::hostNotFound;
+                    this->post(
+                        [handler = move(m_connectHandler), errorCode]() mutable
+                        {
+                            handler(errorCode);
+                        });
                     return;
                 }
 
@@ -206,14 +223,21 @@ public:
                         for( const auto& attr : entry.attributes )
                             if( attr.type == nx::network::cloud::AddressAttributeType::nxApiPort )
                                 target.port = static_cast< quint16 >( attr.value );
-                        if( !startAsyncConnect( target ) )
-                            this->post( std::bind( m_connectHandler,
-                                                   SystemError::getLastOSErrorCode() ) );
+                        if( startAsyncConnect( target ) )
+                            return;
+                        errorCode = SystemError::getLastOSErrorCode();
                         break;
                     }
                     default:
-                        this->post( std::bind( m_connectHandler, SystemError::hostNotFound ) );
-                };
+                        errorCode = SystemError::hostNotFound;
+                        break;
+                }
+
+                this->post(
+                    [handler = move(m_connectHandler), errorCode]() mutable
+                    {
+                        handler(errorCode);
+                    });
             },
             m_natTraversalEnabled,
             this );
@@ -336,7 +360,7 @@ public:
 private:
     AbstractCommunicatingSocket* m_abstractSocketPtr;
 
-    std::function<void( SystemError::ErrorCode )> m_connectHandler;
+    nx::utils::MoveOnlyFunc<void( SystemError::ErrorCode )> m_connectHandler;
     size_t m_connectSendAsyncCallCounter;
 
     std::function<void( SystemError::ErrorCode, size_t )> m_recvHandler;

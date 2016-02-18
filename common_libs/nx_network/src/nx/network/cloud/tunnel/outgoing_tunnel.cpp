@@ -32,7 +32,7 @@ OutgoingTunnel::~OutgoingTunnel()
     assert(m_terminated);
 }
 
-void OutgoingTunnel::pleaseStop(std::function<void()> handler)
+void OutgoingTunnel::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
     QnMutexLocker lk(&m_mutex);
 
@@ -41,13 +41,14 @@ void OutgoingTunnel::pleaseStop(std::function<void()> handler)
     if (!m_connectors.empty())
     {
         BarrierHandler barrier(
-            [this, handler]()
-        {
-            m_aioThreadBinder.post(std::bind(
-                &OutgoingTunnel::connectorsTerminated,
-                this,
-                std::move(handler)));
-        });
+            [this, handler = std::move(handler)]() mutable
+            {
+                m_aioThreadBinder.post(
+                    [this, handler = std::move(handler)]() mutable
+                    {
+                        connectorsTerminated(std::move(handler));
+                    });
+            });
         for (const auto& connectorData: m_connectors)
             connectorData.second->pleaseStop(barrier.fork());
     }
@@ -58,7 +59,7 @@ void OutgoingTunnel::pleaseStop(std::function<void()> handler)
 }
 
 void OutgoingTunnel::connectorsTerminated(
-    std::function<void()> pleaseStopCompletionHandler)
+    nx::utils::MoveOnlyFunc<void()> pleaseStopCompletionHandler)
 {
     QnMutexLocker lk(&m_mutex);
     connectorsTerminatedNonSafe(&lk, std::move(pleaseStopCompletionHandler));
@@ -66,33 +67,33 @@ void OutgoingTunnel::connectorsTerminated(
 
 void OutgoingTunnel::connectorsTerminatedNonSafe(
     QnMutexLockerBase* const /*lock*/,
-    std::function<void()> pleaseStopCompletionHandler)
+    nx::utils::MoveOnlyFunc<void()> pleaseStopCompletionHandler)
 {
     m_connectors.clear();
 
     //cancelling connection
     if (m_connection)
         m_connection->pleaseStop(
-            std::bind(
-                &OutgoingTunnel::connectionTerminated,
-                this,
-                std::move(pleaseStopCompletionHandler)));
+            [this, handler = std::move(pleaseStopCompletionHandler)]() mutable
+            {
+                connectionTerminated(std::move(handler));
+            });
     else
         connectionTerminated(std::move(pleaseStopCompletionHandler));
 }
 
 void OutgoingTunnel::connectionTerminated(
-    std::function<void()> pleaseStopCompletionHandler)
+    nx::utils::MoveOnlyFunc<void()> pleaseStopCompletionHandler)
 {
     m_aioThreadBinder.post(
-        [this, pleaseStopCompletionHandler]()   //TODO #ak #msvc2015 move to lambda
+        [this, handler = std::move(pleaseStopCompletionHandler)]() mutable
         {
             m_aioThreadBinder.pleaseStopSync();
             {
                 //waiting for OutgoingTunnel::pleaseStop still running in another thread to return
                 QnMutexLocker lk(&m_mutex);
             }
-            pleaseStopCompletionHandler();
+            handler();
         });
 }
 

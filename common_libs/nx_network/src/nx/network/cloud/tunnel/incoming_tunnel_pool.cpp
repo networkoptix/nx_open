@@ -64,7 +64,7 @@ void IncomingTunnelPool::getNextSocketAsync(
             *timeout, [this](){ callAcceptHandler(true); });
 }
 
-void IncomingTunnelPool::pleaseStop(std::function<void()> handler)
+void IncomingTunnelPool::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
     {
         QnMutexLocker lock(&m_mutex);
@@ -72,7 +72,7 @@ void IncomingTunnelPool::pleaseStop(std::function<void()> handler)
     }
 
     BarrierHandler barrier(
-        [this, handler]()
+        [this, handler = std::move(handler)]() mutable
         {
             m_ioThreadSocket->pleaseStop(std::move(handler));
         });

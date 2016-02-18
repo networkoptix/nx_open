@@ -103,7 +103,7 @@ bool StreamSocketWrapper::isConnected() const
 
 void StreamSocketWrapper::connectAsync(
     const SocketAddress& /*addr*/,
-    std::function<void(SystemError::ErrorCode)> /*handler*/)
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> /*handler*/)
 {
     Q_ASSERT_X(false, Q_FUNC_INFO, "Not supported");
 }
@@ -132,7 +132,7 @@ void StreamSocketWrapper::cancelIOSync(aio::EventType eventType)
 bool StreamSocketWrapper::reopen()
 { return m_socket->reopen(); }
 
-void StreamSocketWrapper::pleaseStop(std::function<void()> handler)
+void StreamSocketWrapper::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 { return m_socket->pleaseStop(std::move(handler)); }
 
 void StreamSocketWrapper::post(nx::utils::MoveOnlyFunc<void()> handler)

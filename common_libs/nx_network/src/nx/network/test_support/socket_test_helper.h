@@ -177,8 +177,9 @@ public:
         return TCPSocket::connect(modifyAddress(address), timeout);
     }
 
-    void connectAsync(const SocketAddress& address,
-                      std::function<void(SystemError::ErrorCode)> handler) override
+    void connectAsync(
+        const SocketAddress& address,
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override
     {
         TCPSocket::connectAsync(modifyAddress(address), std::move(handler));
     }

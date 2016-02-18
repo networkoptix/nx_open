@@ -113,7 +113,7 @@ void MediatorAddressPublisher::publishPingedAddresses( QnMutexLockerBase* lk )
         });
 }
 
-void MediatorAddressPublisher::pleaseStop(std::function<void()> handler)
+void MediatorAddressPublisher::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
     {
         QnMutexLocker lk( &m_mutex );

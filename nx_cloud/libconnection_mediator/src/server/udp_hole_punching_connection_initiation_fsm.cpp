@@ -41,7 +41,7 @@ UDPHolePunchingConnectionInitiationFsm::UDPHolePunchingConnectionInitiationFsm(
 }
 
 void UDPHolePunchingConnectionInitiationFsm::pleaseStop(
-    std::function<void()> completionHandler)
+    nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
     m_timer.pleaseStop(std::move(completionHandler));
 }
