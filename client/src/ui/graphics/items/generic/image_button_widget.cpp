@@ -32,7 +32,7 @@
 #include <utils/math/color_transformations.h>
 #include "opengl_renderer.h"
 
-#include <ui/statistics/modules/buttons_statistics_module.h>
+#include <ui/statistics/modules/controls_statistics_module.h>
 
 //#define QN_IMAGE_BUTTON_WIDGET_DEBUG
 
@@ -96,7 +96,7 @@ QnImageButtonWidget::QnImageButtonWidget(const QString &statisticsAlias
     m_actionIconOverridden(false),
     m_initialized(false)
 {
-    qnButtonsStatisticsModule->registerButton(statisticsAlias, this);
+    qnControlsStatisticsModule->registerButton(statisticsAlias, this);
     setAcceptedMouseButtons(Qt::LeftButton);
     setClickableButtons(Qt::LeftButton);
     setAcceptHoverEvents(true);

@@ -1,22 +1,22 @@
 
-#include "buttons_statistics_module.h"
+#include "controls_statistics_module.h"
 
 namespace
 {
-    const auto kMetricPrefix = lit("btn_clck_cnt");
+    const auto kMetricPrefix = lit("clck_cnt");
 }
 
-QnButtonsStatisticsModule::QnButtonsStatisticsModule()
+QnControlsStatisticsModule::QnControlsStatisticsModule()
     : QnAbstractStatisticsModule()
     , m_clicksCount()
 {
 }
 
-QnButtonsStatisticsModule::~QnButtonsStatisticsModule()
+QnControlsStatisticsModule::~QnControlsStatisticsModule()
 {
 }
 
-QnStatisticValuesHash QnButtonsStatisticsModule::values() const
+QnStatisticValuesHash QnControlsStatisticsModule::values() const
 {
     QnStatisticValuesHash result;
     for (auto it = m_clicksCount.cbegin(); it != m_clicksCount.cend(); ++it)
@@ -24,17 +24,17 @@ QnStatisticValuesHash QnButtonsStatisticsModule::values() const
         const auto alias = it.key();
         const auto fullAlias = lit("%1_%2").arg(kMetricPrefix, alias);
         const auto value = QString::number(it.value());
-        result.insert(alias, value);
+        result.insert(fullAlias, value);
     }
     return result;
 }
 
-void QnButtonsStatisticsModule::reset()
+void QnControlsStatisticsModule::reset()
 {
     m_clicksCount.clear();
 }
 
-void QnButtonsStatisticsModule::onButtonPressed(const QString &alias)
+void QnControlsStatisticsModule::registerPressEvent(const QString &alias)
 {
     qDebug() << "Button clicked: " << alias;
     ++m_clicksCount[alias];
