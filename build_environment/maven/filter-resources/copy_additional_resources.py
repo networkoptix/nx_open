@@ -13,7 +13,7 @@ qtlibs = make_list("""${qtlibs}""") + make_list("""${additional.qtlibs}""")
 
 qtplugins = make_list("""${qtplugins}""") + make_list("""${additional.qtplugins}""")
 
-qtbasedir = '${environment.dir}/${qt.dir}'
+qtbasedir = '${qt.dir}'
 
 def get_platform():
     if sys.platform == 'win32':
