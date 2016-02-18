@@ -1006,21 +1006,6 @@
     </message>
     <message>
         <location/>
-        <source>Ctrl+E</source>
-        <translation>Ctrl+E</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Ctrl+L</source>
-        <translation>Ctrl+L</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Ctrl+M</source>
-        <translation>Ctrl+M</translation>
-    </message>
-    <message>
-        <location/>
         <source>System Settings</source>
         <translation>Ustawienia systemu</translation>
     </message>
@@ -1033,11 +1018,6 @@
         <location/>
         <source>System Backup and Restore</source>
         <translation>Kopia i przywracanie systemu</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Ctrl+B</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
