@@ -149,7 +149,6 @@ void QnAboutDialog::retranslateUi()
     credits << lit("<b>OpenAL %1</b> - Copyright (c) 2000-2006 %2.").arg(QtvAudioDevice::instance()->versionString()).arg(QtvAudioDevice::instance()->company());
     credits << lit("<b>SIGAR %1</b> - Copyright (c) 2004-2011 VMware Inc.").arg(versionString(QnAppInfo::sigarVersion()));
     credits << lit("<b>Boost %1</b> - Copyright (c) 2000-2012 Boost developers.").arg(versionString(QnAppInfo::boostVersion()));
-    credits << lit("<b>Bespin style</b> - Copyright (c) 2007-2010 Thomas Luebking.");
 
     int maxTextureSize = QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE);
 
