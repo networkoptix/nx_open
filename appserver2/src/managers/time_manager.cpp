@@ -17,6 +17,7 @@
 #include <QtZlib/zlib.h>
 #endif
 
+#include <api/global_settings.h>
 #include <api/runtime_info_manager.h>
 
 #include <common/common_module.h>
@@ -112,9 +113,15 @@ namespace ec2
         if( right_internetFlagSet < internetFlagSet )
             return false;
 
+        if (sequence != right.sequence)
+        {
+            //taking into account sequence overflow. it should be same as "sequence < right.sequence" 
+                //but with respect to sequence overflow
+            return ((quint16)(right.sequence - sequence)) <
+                   (std::numeric_limits<decltype(sequence)>::max() / 2);
+        }
+
         return
-            sequence < right.sequence ? true :
-            sequence > right.sequence ? false :
             flags < right.flags ? true :
             flags > right.flags ? false :
             seed < right.seed;
@@ -728,6 +735,15 @@ namespace ec2
         auto peerIter = m_peersToSendTimeSyncTo.find( peerID );
         if( peerIter == m_peersToSendTimeSyncTo.end() )
             return;
+
+        if (!QnGlobalSettings::instance()->isTimeSynchronizationEnabled())
+        {
+            peerIter->second.syncTimerID = TimerManager::instance()->addTimer(
+                std::bind(&TimeSynchronizationManager::synchronizeWithPeer, this, peerID),
+                TIME_SYNC_SEND_TIMEOUT_SEC * MILLIS_PER_SEC);
+            return;
+        }
+
         QUrl targetUrl;
         targetUrl.setScheme( lit("http") );
         targetUrl.setHost( peerIter->second.peerAddress.address.toString() );
@@ -1063,7 +1079,7 @@ namespace ec2
             peerSystemTimeData.peerSysTime = QDateTime::currentMSecsSinceEpoch();
             peerSystemTimeReceivedNonSafe( peerSystemTimeData );
 
-            NX_LOG( lit("TimeSynchronizationManager. Successfully restored time priority key %1 from DB").arg(restoredPriorityKeyVal), cl_logWARNING );
+            NX_LOG( lit("TimeSynchronizationManager. Successfully restored time priority key %1 from DB").arg(restoredPriorityKeyVal, 0, 16), cl_logWARNING );
         }
 
         if( m_timeSynchronized )

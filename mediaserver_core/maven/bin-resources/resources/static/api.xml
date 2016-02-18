@@ -1703,6 +1703,24 @@
                         <caption>JSON data.</caption>
                     </result>
                 </function>
+                <function>
+                    <name>systemSettings</name>
+                    <description>Get or set global system settings. If called with no arguments, just returns list of all system settings with their values</description>
+                    <method>GET</method>
+                    <params>
+                        <param>
+                            <name>{param name}</name>
+                            <description>name of system parameter. E.g., ec2AliveUpdateIntervalSec</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>{param value}</name>
+                            <description>New value for the specified parameter</description>
+                            <optional>true</optional>
+                        </param>
+                    </params>
+                    <result/>
+                </function>
                 <function proprietary="true">
                     <name>execute</name>
                     <description>Execute any script from subfolder 'scripts' of media server. Script name provides directly in a URL path like '/api/execute/script1.sh'.
@@ -1733,27 +1751,27 @@
                         <param>
                             <name>timestamp</name>
                             <description>Event date and time. It could be either UTC milliseconds or human readible date and time at ISO 8601 format.
-							If eventTimestamp is absent, current server date and time is used.
-							</description>
+                            If eventTimestamp is absent, current server date and time is used.
+                            </description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>source</name>
                             <description> External device name. It could be used as a filter at business rules to math different action with different devices.
-							              Also, user could see device name in the notifications panel. For instance: 'POS terminal 5'.
-							</description>
+                                          Also, user could see device name in the notifications panel. For instance: 'POS terminal 5'.
+                            </description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>caption</name>
                             <description> Short event description. It could be used as a filter at business rules to math different action with different events.
-							</description>
+                            </description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>description</name>
                             <description> Long event description. It could be used as a filter at business rules to math different action with different events.
-							</description>
+                            </description>
                             <optional>true</optional>
                         </param>
                         <param>
@@ -1776,7 +1794,7 @@
                         <param>
                             <name>state</name>
                             <description> Generic events can be used either with long actions like 'do recording' or instant actions like 'send email'. If you are going to use long actions with Generic events, this parameter should be filled.
-							</description>
+                            </description>
                             <optional>true</optional>
                             <values>
                                 <value>

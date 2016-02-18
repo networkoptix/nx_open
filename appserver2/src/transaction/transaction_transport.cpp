@@ -6,6 +6,8 @@
 #include <QtCore/QUrlQuery>
 #include <QtCore/QTimer>
 
+#include <api/global_settings.h>
+
 #include <nx_ec/ec_proto_version.h>
 #include <utils/bsf/sized_data_decoder.h>
 #include <utils/common/timermanager.h>
@@ -26,7 +28,6 @@
 #include "core/resource/media_server_resource.h"
 #include "api/app_server_connection.h"
 #include "core/resource/user_resource.h"
-#include "api/global_settings.h"
 #include "database/db_manager.h"
 #include "http/custom_headers.h"
 #include "version.h"
@@ -35,7 +36,10 @@
 //#define USE_SINGLE_TWO_WAY_CONNECTION
 //!if not defined, ubjson is used
 //#define USE_JSON
+#ifndef USE_JSON
 #define ENCODE_TO_BASE64
+#endif
+#define AGGREGATE_TRANSACTIONS_BEFORE_SEND
 //#define PIPELINE_POST_REQUESTS
 
 
@@ -112,8 +116,8 @@ void QnTransactionTransport::default_initializer()
     m_base64EncodeOutgoingTransactions = false;
     m_sentTranSequence = 0;
     m_waiterCount = 0;
-    m_tcpKeepAliveTimeout = Settings::instance()->connectionKeepAliveTimeout();
-    m_keepAliveProbeCount = Settings::instance()->keepAliveProbeCount();
+    m_tcpKeepAliveTimeout = QnGlobalSettings::instance()->connectionKeepAliveTimeout();
+    m_keepAliveProbeCount = QnGlobalSettings::instance()->keepAliveProbeCount();
     m_idleConnectionTimeout = m_tcpKeepAliveTimeout * m_keepAliveProbeCount;
 }
 
@@ -148,6 +152,16 @@ QnTransactionTransport::QnTransactionTransport(
     //TODO #ak use binary filter stream for serializing transactions
     m_base64EncodeOutgoingTransactions = nx_http::getHeaderValue(
         request.headers, Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME ) == "true";
+
+    auto keepAliveHeaderIter = request.headers.find(Qn::EC2_CONNECTION_TIMEOUT_HEADER_NAME);
+    if (keepAliveHeaderIter != request.headers.end())
+    {
+        nx_http::header::KeepAlive keepAliveHeader;
+        if (keepAliveHeader.parse(keepAliveHeaderIter->second))
+            m_tcpKeepAliveTimeout = std::max(
+                std::chrono::duration_cast<std::chrono::seconds>(m_tcpKeepAliveTimeout),
+                keepAliveHeader.timeout);
+    }
 
     if( m_connectionType == ConnectionType::bidirectional )
         m_incomingDataSocket = m_outgoingDataSocket;
@@ -517,6 +531,11 @@ void QnTransactionTransport::doOutgoingConnect(const QUrl& remotePeerUrl)
         m_httpClient->addAdditionalHeader(
             Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME,
             "true" );
+    m_httpClient->addAdditionalHeader(
+        Qn::EC2_CONNECTION_TIMEOUT_HEADER_NAME,
+        nx_http::header::KeepAlive(
+            std::chrono::duration_cast<std::chrono::seconds>(
+                m_tcpKeepAliveTimeout)).toString());
 
     QUrlQuery q;
     {
@@ -943,6 +962,7 @@ void QnTransactionTransport::monitorConnectionForClosure(
 
 QUrl QnTransactionTransport::generatePostTranUrl()
 {
+    //return m_postTranBaseUrl;
     QUrl postTranUrl = m_postTranBaseUrl;
     postTranUrl.setPath( lit("%1/%2").arg(postTranUrl.path()).arg(++m_sentTranSequence) );
     return postTranUrl;
@@ -986,9 +1006,11 @@ bool QnTransactionTransport::isHttpKeepAliveTimeout() const
 void QnTransactionTransport::serializeAndSendNextDataBuffer()
 {
     assert( !m_dataToSend.empty() );
-    
+
+#ifdef AGGREGATE_TRANSACTIONS_BEFORE_SEND
     if( m_base64EncodeOutgoingTransactions )
         aggregateOutgoingTransactionsNonSafe();
+#endif  //AGGREGATE_TRANSACTIONS_BEFORE_SEND
 
     DataToSend& dataCtx = m_dataToSend.front();
 
@@ -1301,6 +1323,16 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
                 m_incomingTransactionStreamParser,
                 nx_bsf::last( m_incomingTransactionStreamParser ),
                 std::make_shared<nx_bsf::SizedDataDecodingFilter>() );
+        }
+
+        auto keepAliveHeaderIter = m_httpClient->response()->headers.find(Qn::EC2_CONNECTION_TIMEOUT_HEADER_NAME);
+        if (keepAliveHeaderIter != m_httpClient->response()->headers.end())
+        {
+            nx_http::header::KeepAlive keepAliveHeader;
+            if (keepAliveHeader.parse(keepAliveHeaderIter->second))
+                m_tcpKeepAliveTimeout = std::max(
+                    std::chrono::duration_cast<std::chrono::seconds>(m_tcpKeepAliveTimeout),
+                    keepAliveHeader.timeout);
         }
 
         m_incomingDataSocket = m_httpClient->takeSocket();
