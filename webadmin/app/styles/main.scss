@@ -2,6 +2,8 @@ $icon-font-path: "../fonts/";
 
 @import '../bower_components/sass-bootstrap/lib/_variables.scss';
 
+@import 'master';
+
 *{
   font-family: "Roboto";
 }
@@ -440,4 +442,9 @@ span.danger{
   border: none;
   width: 100%;
   height: 400px;
+}
+
+
+.master .panel-footer {
+  min-height: 55px;
 }
