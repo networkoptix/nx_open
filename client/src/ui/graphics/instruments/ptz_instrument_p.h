@@ -25,7 +25,7 @@ class PtzArrowItem: public Customized<GraphicsPathItem> {
     typedef Customized<GraphicsPathItem> base_type;
 
 public:
-    PtzArrowItem(QGraphicsItem *parent = NULL): 
+    PtzArrowItem(QGraphicsItem *parent = NULL):
         base_type(parent),
         m_size(QSizeF(32, 32)),
         m_pathValid(false)
@@ -76,7 +76,7 @@ protected:
         path.closeSubpath();
 
         setPath(path);
-        
+
         QPen pen = this->pen();
         pen.setWidthF(qMax(m_size.width(), m_size.height()) / 16.0);
         setPen(pen);
@@ -98,12 +98,13 @@ class PtzImageButtonWidget: public QnTextButtonWidget {
     typedef QnTextButtonWidget base_type;
 
 public:
-    PtzImageButtonWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0):
-        base_type(parent, windowFlags)
+    PtzImageButtonWidget(const QString &statisticsAlias
+        , QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0)
+        : base_type(statisticsAlias, parent, windowFlags)
     {
         setFrameShape(Qn::EllipticalFrame);
         setRelativeFrameWidth(1.0 / 16.0);
-        
+
         setStateOpacity(0, 0.4);
         setStateOpacity(Hovered, 0.7);
         setStateOpacity(Pressed, 1.0);
@@ -139,8 +140,8 @@ class PtzManipulatorWidget: public GraphicsWidget {
     typedef GraphicsWidget base_type;
 
 public:
-    PtzManipulatorWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0): 
-        base_type(parent, windowFlags) 
+    PtzManipulatorWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0):
+        base_type(parent, windowFlags)
     {
         setPen(QPen(QColor(128, 196, 255, 192), 0.0));
         setBrush(QColor(128, 196, 255, 64).lighter(120));
@@ -182,7 +183,7 @@ class PtzOverlayWidget: public GraphicsWidget {
     typedef GraphicsWidget base_type;
 
 public:
-    PtzOverlayWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0): 
+    PtzOverlayWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0):
         base_type(parent, windowFlags),
         m_markersMode(Qt::Horizontal | Qt::Vertical)
     {
@@ -205,32 +206,32 @@ public:
         /* Note that construction order is important as it defines which items are on top. */
         m_manipulatorWidget = new PtzManipulatorWidget(this);
 
-        m_zoomInButton = new PtzImageButtonWidget(this);
+        m_zoomInButton = new PtzImageButtonWidget(lit("ptz_overlay_zoom_in"), this);
         m_zoomInButton->setIcon(qnSkin->icon("item/ptz_zoom_in.png"));
         m_zoomInButton->setToolTip(tr("Zoom In"));
 
-        m_zoomOutButton = new PtzImageButtonWidget(this);
+        m_zoomOutButton = new PtzImageButtonWidget(lit("ptz_overlay_zoom_out"), this);
         m_zoomOutButton->setIcon(qnSkin->icon("item/ptz_zoom_out.png"));
         m_zoomOutButton->setToolTip(tr("Zoom Out"));
 
-        m_focusInButton = new PtzImageButtonWidget(this);
+        m_focusInButton = new PtzImageButtonWidget(lit("ptz_overlay_focus_in"), this);
         m_focusInButton->setIcon(qnSkin->icon("item/ptz_focus_in.png"));
         m_focusInButton->setToolTip(tr("Focus Far"));
         m_focusInButton->setFrameShape(Qn::CustomFrame);
         m_focusInButton->setCustomFramePath(upRoundPath);
 
-        m_focusOutButton = new PtzImageButtonWidget(this);
+        m_focusOutButton = new PtzImageButtonWidget(lit("ptz_overlay_focus_out"), this);
         m_focusOutButton->setIcon(qnSkin->icon("item/ptz_focus_out.png"));
         m_focusOutButton->setToolTip(tr("Focus Near"));
         m_focusOutButton->setFrameShape(Qn::CustomFrame);
         m_focusOutButton->setCustomFramePath(downRoundPath);
 
-        m_focusAutoButton = new PtzImageButtonWidget(this);
+        m_focusAutoButton = new PtzImageButtonWidget(lit("ptz_overlay_focus_auto"), this);
         m_focusAutoButton->setIcon(qnSkin->icon("item/ptz_focus_auto.png"));
         m_focusAutoButton->setToolTip(tr("Auto Focus"));
         m_focusAutoButton->setFrameShape(Qn::RectangularFrame);
 
-        m_modeButton = new PtzImageButtonWidget(this);
+        m_modeButton = new PtzImageButtonWidget(lit("ptz_overlay_mode"), this);
         m_modeButton->setToolTip(tr("Change Dewarping Mode"));
 
         connect(m_focusAutoButton, &QGraphicsObject::visibleChanged, this, &PtzOverlayWidget::updateLayout);
@@ -323,11 +324,11 @@ public:
         if (m_markersMode & Qt::Horizontal) {
             qreal x = unit * 3.0;
             while(x < rect.width() / 2.0) {
-                crosshairLines 
+                crosshairLines
                     << center + QPointF(-x, unit / 2.0) << center + QPointF(-x, -unit / 2.0);
 
                 if(x < rect.width() / 2.0 - 3.0 * unit || !m_focusInButton->isVisible())
-                    crosshairLines 
+                    crosshairLines
                     << center + QPointF( x, unit / 2.0) << center + QPointF( x, -unit / 2.0);
 
                 x += unit;
@@ -337,7 +338,7 @@ public:
         if (m_markersMode & Qt::Vertical) {
             qreal y = unit * 3.0;
             while(y < rect.height() / 2.0) {
-                crosshairLines 
+                crosshairLines
                     << center + QPointF(unit / 2.0,  y) << center + QPointF(-unit / 2.0,  y)
                     << center + QPointF(unit / 2.0, -y) << center + QPointF(-unit / 2.0, -y);
                 y += unit;
@@ -373,7 +374,7 @@ private:
 
         m_zoomInButton->setGeometry(QRectF(center - xStep * 3 - yStep * 2.5, 1.5 * size));
         m_zoomOutButton->setGeometry(QRectF(center + xStep * 1.5 - yStep * 2.5, 1.5 * size));
-        
+
         if(m_focusAutoButton->isVisible()) {
             m_focusInButton->setGeometry(QRectF(right - xStep * 2.5 - yStep * 2.25, 1.5 * size));
             m_focusAutoButton->setGeometry(QRectF(right - xStep * 2.5 - yStep * 0.75, 1.5 * size));
@@ -431,8 +432,8 @@ class PtzSplashItem: public Customized<QnSplashItem> {
     typedef Customized<QnSplashItem> base_type;
 
 public:
-    PtzSplashItem(QGraphicsItem *parent = NULL): 
-        base_type(parent) 
+    PtzSplashItem(QGraphicsItem *parent = NULL):
+        base_type(parent)
     {
         setColor(QColor(128, 196, 255, 128));
     }

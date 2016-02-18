@@ -41,6 +41,7 @@ QnGraphicsStatisticsModule::~QnGraphicsStatisticsModule()
 
 QnStatisticValuesHash QnGraphicsStatisticsModule::values() const
 {
+
     return m_metrics->values();
 }
 

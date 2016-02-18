@@ -57,7 +57,7 @@ QnStatusOverlayWidget::QnStatusOverlayWidget(const QnResourcePtr &resource, QGra
     , m_resource(resource)
     , m_statusOverlay(Qn::EmptyOverlay)
     , m_buttonType(NoButton)
-    , m_button(new QnTextButtonWidget(this))
+    , m_button(new QnTextButtonWidget(lit("resource_status_overlay_do_action"), this))
 {
     setAcceptedMouseButtons(0);
 

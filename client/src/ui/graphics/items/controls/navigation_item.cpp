@@ -35,20 +35,11 @@
 
 #include <core/resource/resource.h>
 
+#include <utils/common/model_functions.h>
+
 #include "time_slider.h"
 #include "time_scroll_bar.h"
 #include "clock_label.h"
-
-namespace {
-    QnImageButtonWidget *newActionButton(QAction *action, QGraphicsItem *parent = NULL) {
-        QnImageButtonWidget *button = new QnImageButtonWidget(parent);
-        button->setDefaultAction(action);
-        button->setCached(true);
-        return button;
-    }
-
-} // anonymous namespace
-
 
 QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     base_type(parent),
@@ -67,43 +58,43 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     setPaletteColor(this, QPalette::Window, Qt::black);
 
     /* Create buttons. */
-    m_jumpBackwardButton = newActionButton(action(QnActions::JumpToStartAction));
+    m_jumpBackwardButton = newActionButton(QnActions::JumpToStartAction);
     m_jumpBackwardButton->setIcon(qnSkin->icon("slider/navigation/rewind_backward.png"));
     m_jumpBackwardButton->setPreferredSize(32, 32);
 
-    m_stepBackwardButton = newActionButton(action(QnActions::PreviousFrameAction));
+    m_stepBackwardButton = newActionButton(QnActions::PreviousFrameAction);
     m_stepBackwardButton->setIcon(qnSkin->icon("slider/navigation/step_backward.png"));
     m_stepBackwardButton->setPreferredSize(32, 32);
 
-    m_playButton = newActionButton(action(QnActions::PlayPauseAction));
+    m_playButton = newActionButton(QnActions::PlayPauseAction);
     m_playButton->setIcon(qnSkin->icon("slider/navigation/play.png", "slider/navigation/pause.png"));
     m_playButton->setPreferredSize(32, 32);
 
-    m_stepForwardButton = newActionButton(action(QnActions::NextFrameAction));
+    m_stepForwardButton = newActionButton(QnActions::NextFrameAction);
     m_stepForwardButton->setIcon(qnSkin->icon("slider/navigation/step_forward.png"));
     m_stepForwardButton->setPreferredSize(32, 32);
 
-    m_jumpForwardButton = newActionButton(action(QnActions::JumpToEndAction));
+    m_jumpForwardButton = newActionButton(QnActions::JumpToEndAction);
     m_jumpForwardButton->setIcon(qnSkin->icon("slider/navigation/rewind_forward.png"));
     m_jumpForwardButton->setPreferredSize(32, 32);
 
-    m_muteButton = newActionButton(action(QnActions::ToggleMuteAction));
+    m_muteButton = newActionButton(QnActions::ToggleMuteAction);
     m_muteButton->setIcon(qnSkin->icon("slider/buttons/unmute.png", "slider/buttons/mute.png"));
     m_muteButton->setPreferredSize(20, 20);
 
-    m_liveButton = newActionButton(action(QnActions::JumpToLiveAction));
+    m_liveButton = newActionButton(QnActions::JumpToLiveAction);
     m_liveButton->setIcon(qnSkin->icon("slider/buttons/live.png"));
     m_liveButton->setPreferredSize(48, 24);
 
-    m_syncButton = newActionButton(action(QnActions::ToggleSyncAction));
+    m_syncButton = newActionButton(QnActions::ToggleSyncAction);
     m_syncButton->setIcon(qnSkin->icon("slider/buttons/sync.png"));
     m_syncButton->setPreferredSize(48, 24);
 
-    m_bookmarksModeButton = newActionButton(action(QnActions::BookmarksModeAction));
+    m_bookmarksModeButton = newActionButton(QnActions::BookmarksModeAction);
     m_bookmarksModeButton->setIcon(qnSkin->icon("slider/buttons/bookmarks.png"));
     m_bookmarksModeButton->setPreferredSize(48, 24);
 
-    m_calendarButton = newActionButton(action(QnActions::ToggleCalendarAction));
+    m_calendarButton = newActionButton(QnActions::ToggleCalendarAction);
     m_calendarButton->setIcon(qnSkin->icon("slider/buttons/calendar.png"));
     m_calendarButton->setPreferredSize(48, 24);
 
@@ -603,3 +594,12 @@ void QnNavigationItem::at_stepForwardButton_clicked() {
     }
 }
 
+QnImageButtonWidget *QnNavigationItem::newActionButton(QnActions::IDType id)
+{
+    const auto statAlias = lit("%1_%2").arg(lit("navigation_item")
+        , QnLexical::serialized(id));
+    QnImageButtonWidget *button = new QnImageButtonWidget(statAlias);
+    button->setDefaultAction(action(id));
+    button->setCached(true);
+    return button;
+}

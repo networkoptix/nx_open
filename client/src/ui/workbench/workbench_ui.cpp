@@ -89,6 +89,8 @@
 #include "workbench_access_controller.h"
 #include <common/common_module.h>
 
+#include <utils/common/model_functions.h>
+
 #ifdef _DEBUG
 //#define QN_DEBUG_WIDGET
 #endif
@@ -102,6 +104,15 @@ namespace {
     const qreal kDefaultSizeMultiplier = 1.0;
     const int kDefaultHelpTopicId = -1;
 
+    QString aliasFromAction(QAction *action)
+    {
+        static const auto kUndefinedAlias = lit("undefined");
+        const auto ourAction = dynamic_cast<QnAction *>(action);
+        if (!ourAction)
+            return kUndefinedAlias;
+        return QnLexical::serialized(ourAction->id());
+    }
+
     QnImageButtonWidget *newActionButton(QAction *action, qreal sizeMultiplier = kDefaultSizeMultiplier
         , int helpTopicId = kDefaultHelpTopicId, QGraphicsItem *parent = nullptr)
     {
@@ -114,11 +125,12 @@ namespace {
 
         qreal rotationSpeed = action->property(Qn::ToolButtonCheckedRotationSpeed).toReal();
         if(!qFuzzyIsNull(rotationSpeed)) {
-            QnRotatingImageButtonWidget *rotatingButton = new QnRotatingImageButtonWidget(parent);
+            QnRotatingImageButtonWidget *rotatingButton =
+                new QnRotatingImageButtonWidget(aliasFromAction(action), parent);
             rotatingButton->setRotationSpeed(rotationSpeed);
             button = rotatingButton;
         } else {
-            button = new QnImageButtonWidget(parent);
+            button = new QnImageButtonWidget(aliasFromAction(action), parent);
         }
 
         button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed, QSizePolicy::ToolButton);
@@ -132,8 +144,11 @@ namespace {
         return button;
     }
 
-    QnImageButtonWidget *newShowHideButton(QGraphicsItem *parent = NULL, QAction *action = NULL) {
-        QnImageButtonWidget *button = new QnImageButtonWidget(parent);
+    QnImageButtonWidget *newShowHideButton(QGraphicsItem *parent, QAction *action)
+    {
+        QnImageButtonWidget *button = new QnImageButtonWidget(
+            aliasFromAction(action), parent);
+
         button->setFixedSize(showHideButtonSize);
         button->setImageMargins(showHideButtonMargins);
         if (action)
@@ -149,8 +164,10 @@ namespace {
         return button;
     }
 
-    QnImageButtonWidget *newPinButton(QGraphicsItem *parent = NULL, QAction *action = NULL) {
-        QnImageButtonWidget *button = new QnImageButtonWidget(parent);
+    QnImageButtonWidget *newPinButton(QGraphicsItem *parent, QAction *action)
+    {
+        QnImageButtonWidget *button = new QnImageButtonWidget(
+            aliasFromAction(action), parent);
 
         int size = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, NULL, NULL);
         button->resize(size, size);
@@ -1803,7 +1820,8 @@ void QnWorkbenchUi::createNotificationsWidget() {
     m_notificationsPinButton = newPinButton(m_controlsWidget, pinNotificationsAction);
     m_notificationsPinButton->setFocusProxy(m_notificationsItem);
 
-    QnBlinkingImageButtonWidget* blinker = new QnBlinkingImageButtonWidget(m_controlsWidget);
+    QnBlinkingImageButtonWidget* blinker = new QnBlinkingImageButtonWidget(
+        lit("notifications_collection_widget_toggle"), m_controlsWidget);
     m_notificationsShowButton = blinker;
     m_notificationsShowButton->setFixedSize(showHideButtonSize);
     m_notificationsShowButton->setImageMargins(showHideButtonMargins);
@@ -2401,11 +2419,11 @@ void QnWorkbenchUi::createSliderWidget()
         connect(m_sliderAutoHideTimer, &QTimer::timeout, this, [this](){setSliderVisible(false, true);});
     }
 
-    QnImageButtonWidget *sliderZoomOutButton = new QnImageButtonWidget();
+    QnImageButtonWidget *sliderZoomOutButton = new QnImageButtonWidget(lit("slider_zoom_in"));
     sliderZoomOutButton->setIcon(qnSkin->icon("slider/buttons/zoom_out.png"));
     sliderZoomOutButton->setPreferredSize(16, 16);
 
-    QnImageButtonWidget *sliderZoomInButton = new QnImageButtonWidget();
+    QnImageButtonWidget *sliderZoomInButton = new QnImageButtonWidget(lit("slider_zoom_out"));
     sliderZoomInButton->setIcon(qnSkin->icon("slider/buttons/zoom_in.png"));
     sliderZoomInButton->setPreferredSize(16, 16);
 

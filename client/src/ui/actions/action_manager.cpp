@@ -1290,6 +1290,7 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(lit("Alt+G")).
         condition(new QnSmartSearchActionCondition(false, this));
 
+    // TODO: #ynikitenkov remove this action, use StartSmartSearchAction with checked state!
     factory(QnActions::StopSmartSearchAction).
         flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
         text(tr("Hide Motion/Smart Search")).

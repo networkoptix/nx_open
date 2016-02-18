@@ -304,7 +304,8 @@ void QnResourceWidget::setupIconButton(QGraphicsLinearLayout *layout
 
 void QnResourceWidget::insertIconButtonCopy(QGraphicsLinearLayout *layout)
 {
-    auto iconButtonCopy = new QnImageButtonWidget();
+    auto iconButtonCopy = new QnImageButtonWidget(QString()); // It is non-clickable icon only
+                                                              // We don't need statistics alias here
     iconButtonCopy->setPreferredSize(kButtonsSize, kButtonsSize);
 
     setupIconButton(layout, iconButtonCopy);
@@ -337,13 +338,13 @@ void QnResourceWidget::addMainOverlay() {
 }
 
 void QnResourceWidget::createButtons() {
-    QnImageButtonWidget *closeButton = new QnImageButtonWidget();
+    QnImageButtonWidget *closeButton = new QnImageButtonWidget(lit("res_widget_close"));
     closeButton->setIcon(qnSkin->icon("item/close.png"));
     closeButton->setProperty(Qn::NoBlockMotionSelection, true);
     closeButton->setToolTip(tr("Close"));
     connect(closeButton, &QnImageButtonWidget::clicked, this, &QnResourceWidget::close);
 
-    QnImageButtonWidget *infoButton = new QnImageButtonWidget();
+    QnImageButtonWidget *infoButton = new QnImageButtonWidget(lit("res_widget_info"));
     infoButton->setIcon(qnSkin->icon("item/info.png"));
     infoButton->setCheckable(true);
     infoButton->setChecked(item()->displayInfo());
@@ -351,7 +352,7 @@ void QnResourceWidget::createButtons() {
     infoButton->setToolTip(tr("Information"));
     connect(infoButton, &QnImageButtonWidget::toggled, this, &QnResourceWidget::at_infoButton_toggled);
 
-    QnImageButtonWidget *rotateButton = new QnImageButtonWidget();
+    QnImageButtonWidget *rotateButton = new QnImageButtonWidget(lit("res_widget_rotate"));
     rotateButton->setIcon(qnSkin->icon("item/rotate.png"));
     rotateButton->setProperty(Qn::NoBlockMotionSelection, true);
     rotateButton->setToolTip(tr("Rotate"));
@@ -366,7 +367,8 @@ void QnResourceWidget::createButtons() {
     m_buttonBar->addButton(RotateButton, rotateButton);
     connect(m_buttonBar, SIGNAL(checkedButtonsChanged()), this, SLOT(at_buttonBar_checkedButtonsChanged()));
 
-    m_iconButton = new QnImageButtonWidget();
+    m_iconButton = new QnImageButtonWidget(QString());  // It is non-clickable icon only
+                                                        // We don't need statistics alias here
     m_iconButton->setParent(this);
     m_iconButton->setPreferredSize(kButtonsSize, kButtonsSize);
     m_iconButton->setVisible(false);
