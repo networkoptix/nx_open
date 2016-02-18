@@ -32,6 +32,7 @@
         <nxemail.guid>{0034cf9a-0454-475d-9b54-87d4b4a6b65b}</nxemail.guid>
         <nx_streaming.guid>{3c0acd3f-d641-4690-a7c5-129cb4bea938}</nx_streaming.guid>
         <nx_media.guid>{3fbafa12-f3a7-4fd2-bafc-256427399a56}</nx_media.guid>
+        <nx_audio.guid>{d335c660-3c62-4048-a1eb-b1606159a2dd}</nx_audio.guid>
         <appserver2.guid>{16bb7b01-5096-4cee-93ae-b34b3153459f}</appserver2.guid>
         <axiscamplugin.guid>{c27722d6-d3ae-41dc-9467-52d93f5b119a}</axiscamplugin.guid>
         <evidence_plugin.guid>{061d1513-9a37-4d14-90f5-11d42d2d7827}</evidence_plugin.guid>
@@ -873,6 +874,7 @@
             <modules>
                 <module>client.core</module>
                 <module>common_libs/nx_media</module>
+                <module>common_libs/nx_audio</module>
                 <module>mobile_client</module>
             </modules>
         </profile>

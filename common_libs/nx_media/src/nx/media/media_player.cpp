@@ -247,9 +247,18 @@ void PlayerPrivate::at_gotVideoFrame()
 void PlayerPrivate::presentNextFrameDelayed()
 {
     qint64 delayToRenderMs = 0;
-    if (dataConsumer->audioOutput())
+    if (dataConsumer && dataConsumer->audioOutput())
     {
+        if (dataConsumer->audioOutput()->isBufferUnderflow())
+        {
+            // If audio buffer is empty we have to display current video frame to unblock data stream 
+            // and allow audio data to fill the buffer.
+            presentNextFrame();
+            return;
+        }
+
         delayToRenderMs = getDelayForNextFrameWithAudioMs(videoFrameToRender);
+
         // If video delay interval is bigger then audio buffer, it'll block audio playing.
         // At this case calculate time again after a delay.
         if (delayToRenderMs > dataConsumer->audioOutput()->currentBufferSizeUsec() / 1000)
@@ -354,7 +363,7 @@ void PlayerPrivate::updateLiveBufferState(BufferState value)
     if (underflowCounter + overflowCounter >= kMaxCounterForWrongLiveBuffer)
     {
         // Too much underflow/overflow issues. Extend live buffer.
-        liveBufferMs = qMin(liveBufferMs * kBufferGrowStep, kMaxBufferMs);
+        liveBufferMs = qMin(liveBufferMs * kBufferGrowStep, kMaxLiveBufferMs);
     }
 }
 
@@ -373,7 +382,8 @@ qint64 PlayerPrivate::getDelayForNextFrameWithAudioMs(const QVideoFramePtr& fram
     if (currentPosUsec == AudioOutput::kUnknownPosition)
         return 0; //< Position isn't known yet. Play video without delay.
 
-    return frame->startTime() - currentPosUsec/1000;
+    qint64 delayToAudioMs = frame->startTime() - currentPosUsec / 1000;
+    return delayToAudioMs;
 }
 
 qint64 PlayerPrivate::getDelayForNextFrameWithoutAudioMs(const QVideoFramePtr& frame)
