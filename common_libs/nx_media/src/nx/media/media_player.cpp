@@ -39,6 +39,9 @@ static const int kMaxCounterForWrongLiveBuffer = 2;
 // Audio and video timings will became similar as soon as audio buffer passes a hole.
 static const int kTryLaterIntervalMs = 16;
 
+// Default value for max openGL texture size
+static const int kDefaultMaxTextureSize = 2048;
+
 
 static qint64 msecToUsec(qint64 posMs)
 {
@@ -158,7 +161,7 @@ PlayerPrivate::PlayerPrivate(Player *parent)
     reconnectOnPlay(false),
     position(0),
     videoSurface(0),
-    maxTextureSize(4096), //< TODO mike: STUB: Find a way to pass QnTextureSizeHelper::instance()->maxTextureSize()
+    maxTextureSize(kDefaultMaxTextureSize),
     ptsTimerBase(0),
     execTimer(new QTimer(this)),
     lastSeekTimeMs(AV_NOPTS_VALUE),
@@ -545,6 +548,18 @@ void Player::setPosition(qint64 value)
         d->position = value;
 
     d->at_hurryUp(); //< renew receiving frames
+}
+
+int Player::maxTextureSize() const
+{
+    Q_D(const Player);
+    return d->maxTextureSize;
+}
+
+void Player::setMaxTextureSize(int value)
+{
+    Q_D(Player);
+    d->maxTextureSize = value;
 }
 
 void Player::play()
