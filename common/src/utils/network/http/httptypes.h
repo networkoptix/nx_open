@@ -380,7 +380,8 @@ namespace nx_http
             {
                 none,
                 basic,
-                digest
+                digest,
+                automatic
             };
 
             const char* toString( Value val );

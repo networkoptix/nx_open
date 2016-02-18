@@ -23,7 +23,14 @@ Qn::AuthResult QnClientAuthHelper::authenticate(
         if (!authenticateHeader.parse(authHeaderBuf))
             return Qn::Auth_WrongDigest;
         authenticationCtx->authenticateHeader = std::move(authenticateHeader);
+    } else if (
+        response.statusLine.statusCode == nx_http::StatusCode::proxyAuthenticationRequired ||
+        response.statusLine.statusCode == nx_http::StatusCode::unauthorized
+    ){
+        authenticationCtx->authenticateHeader =
+                nx_http::header::WWWAuthenticate(nx_http::header::AuthScheme::basic);
     }
+
     authenticationCtx->responseStatusCode = response.statusLine.statusCode;
 
     return addAuthorizationToRequest(
