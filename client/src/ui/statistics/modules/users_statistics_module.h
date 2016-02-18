@@ -5,9 +5,8 @@
 #include <ui/workbench/workbench_context_aware.h>
 #include <statistics/abstract_statistics_module.h>
 
-class QnWorkbenchContext;
-
 class QnUsersStatisticsModule : public QnAbstractStatisticsModule
+    , public QnWorkbenchContextAware
 {
     Q_OBJECT
 
@@ -21,10 +20,4 @@ public:
     QnStatisticValuesHash values() const override;
 
     void reset() override;
-
-    void setContext(QnWorkbenchContext *context);
-
-private:
-    typedef QPointer<QnWorkbenchContext> ContextPtr;
-    ContextPtr m_context;
 };

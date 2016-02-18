@@ -17,7 +17,7 @@ QnStatisticValuesHash QnMetricsContainer::values() const
     for (auto it = m_metrics.begin(); it != m_metrics.end(); ++it)
     {
         const auto metric = it.value();
-        if (!metric->significant())
+        if (!metric->isSignificant())
             continue;
 
         const auto alias = it.key();

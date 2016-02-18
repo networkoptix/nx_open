@@ -35,7 +35,7 @@ QString QnTimeDurationMetric::value() const
     return QString::number(duration());
 }
 
-bool QnTimeDurationMetric::significant() const
+bool QnTimeDurationMetric::isSignificant() const
 {
     return (duration() > 0);
 }

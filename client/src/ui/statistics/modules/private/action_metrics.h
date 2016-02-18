@@ -12,6 +12,8 @@ class TimeDurationMetric;
 class AbstractActionsMetrics : public QObject
     , public QnStatisticsValuesProvider
 {
+    Q_OBJECT
+
     typedef QObject base_type;
 
 public:
@@ -27,6 +29,8 @@ protected:
 
 class ActionsTriggeredCountMetrics : public AbstractActionsMetrics
 {
+    Q_OBJECT
+
     typedef AbstractActionsMetrics base_type;
 
 public:
@@ -49,6 +53,8 @@ private:
 
 class ActionCheckedTimeMetric : public AbstractActionsMetrics
 {
+    Q_OBJECT
+
     typedef AbstractActionsMetrics base_type;
 
 public:

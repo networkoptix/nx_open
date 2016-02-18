@@ -10,6 +10,7 @@ AvgTabsCountMetric::AvgTabsCountMetric(QnWorkbench *workbench)
     , m_workbench(workbench)
     , m_tabsCountDurations()
 {
+    Q_ASSERT_X(m_workbench, Q_FUNC_INFO, "Workbench is null");
     if (!m_workbench)
         return;
 
@@ -44,7 +45,7 @@ AvgTabsCountMetric::~AvgTabsCountMetric()
 QString AvgTabsCountMetric::value() const
 {
     double sum = 0.0;
-    qint64 overalDuration = 0.0;
+    qint64 overalDuration = 0;
     for (auto it = m_tabsCountDurations.cbegin();
         it != m_tabsCountDurations.cend(); ++it)
     {
@@ -56,7 +57,7 @@ QString AvgTabsCountMetric::value() const
         overalDuration += duration;
     }
 
-    if (!overalDuration)
+    if (overalDuration != 0)
         return QString::number(0);
 
     return QString::number(sum / static_cast<double>(overalDuration));

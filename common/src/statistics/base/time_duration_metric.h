@@ -23,7 +23,7 @@ public:
 
     QString value() const override;
 
-    bool significant() const override;
+    bool isSignificant() const override;
 
     qint64 duration() const;
 

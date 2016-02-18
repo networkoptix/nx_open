@@ -85,11 +85,9 @@ QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *pa
     qnStatisticsManager->registerStatisticsModule(lit("actions"), actionsStatModule);
 
     const auto userStatModule = instance<QnUsersStatisticsModule>();
-    userStatModule->setContext(this);
     qnStatisticsManager->registerStatisticsModule(lit("users"), userStatModule);
 
     const auto graphicsStatModule = instance<QnGraphicsStatisticsModule>();
-    graphicsStatModule->setContext(this);
     qnStatisticsManager->registerStatisticsModule(lit("graphics"), graphicsStatModule);
 
     const auto durationStatModule = instance<QnDurationStatisticsModule>();

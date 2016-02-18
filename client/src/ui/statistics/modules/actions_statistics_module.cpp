@@ -45,14 +45,14 @@ void QnActionsStatisticsModule::setActionManager(const QnActionManagerPtr &manag
 QnStatisticValuesHash QnActionsStatisticsModule::values() const
 {
     QnStatisticValuesHash result;
-    for (const auto multiMetric: m_modules)
-        result.unite(multiMetric->values());
+    for (const auto module: m_modules)
+        result.unite(module->values());
 
     return result;
 }
 
 void QnActionsStatisticsModule::reset()
 {
-    for (const auto &multiMetrics:m_modules)
-        multiMetrics->reset();
+    for (const auto &module:m_modules)
+        module->reset();
 }

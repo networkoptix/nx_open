@@ -11,7 +11,7 @@ public:
 
     virtual ~VersionMetric();
 
-    bool significant() const override;
+    bool isSignificant() const override;
 
     QString value() const override;
 

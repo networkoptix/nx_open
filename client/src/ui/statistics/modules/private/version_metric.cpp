@@ -10,7 +10,7 @@ VersionMetric::VersionMetric()
 VersionMetric::~VersionMetric()
 {}
 
-bool VersionMetric::significant() const
+bool VersionMetric::isSignificant() const
 {
     return true;
 }

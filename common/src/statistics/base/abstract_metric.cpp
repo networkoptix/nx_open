@@ -7,7 +7,7 @@ QnAbstractMetric::QnAbstractMetric()
 QnAbstractMetric::~QnAbstractMetric()
 {}
 
-bool QnAbstractMetric::significant() const
+bool QnAbstractMetric::isSignificant() const
 {
     return true;
 }

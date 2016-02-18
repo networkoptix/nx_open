@@ -25,7 +25,7 @@ namespace
 
 QnUsersStatisticsModule::QnUsersStatisticsModule(QObject *parent)
     : base_type(parent)
-    , m_context()
+    , QnWorkbenchContextAware(parent)
 {
 }
 
@@ -34,10 +34,7 @@ QnUsersStatisticsModule::~QnUsersStatisticsModule()
 
 QnStatisticValuesHash QnUsersStatisticsModule::values() const
 {
-    if (!m_context)
-        return QnStatisticValuesHash();
-
-    const auto accessController = m_context->accessController();
+    const auto accessController = context()->accessController();
     if (!accessController)
         return QnStatisticValuesHash();
 
@@ -68,7 +65,7 @@ QnStatisticValuesHash QnUsersStatisticsModule::values() const
     }
 
     // Adds current user permissions metric
-    const auto currentUser = m_context->user();
+    const auto currentUser = context()->user();
     Q_ASSERT_X(currentUser, Q_FUNC_INFO, "There is no current user!");
     if (!currentUser)
         return result;
@@ -82,11 +79,6 @@ QnStatisticValuesHash QnUsersStatisticsModule::values() const
 
 void QnUsersStatisticsModule::reset()
 {
-}
-
-void QnUsersStatisticsModule::setContext(QnWorkbenchContext *context)
-{
-    m_context = context;
 }
 
 

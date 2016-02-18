@@ -100,15 +100,12 @@ AbstractActionsMetrics::AbstractActionsMetrics(QnActionManager *actionManager)
         return;
 
     const auto guard = makePointer(this);
-    const auto actionManagerPtr = makePointer(actionManager);
-
-    const auto addAction =
-        [this, guard, actionManagerPtr](QnActions::IDType id)
+    const auto addAction = [this, guard, actionManager](QnActions::IDType id)
     {
-        if (!guard || !actionManagerPtr)
+        if (!guard)
             return;
 
-        const auto action = actionManagerPtr->action(id);
+        const auto action = actionManager->action(id);
         if (!action)
             return;
 
@@ -120,11 +117,6 @@ AbstractActionsMetrics::AbstractActionsMetrics(QnActionManager *actionManager)
 
 AbstractActionsMetrics::~AbstractActionsMetrics()
 {}
-
-void AbstractActionsMetrics::addActionMetric(QnAction * /* action */)
-{
-    Q_ASSERT_X(false, Q_FUNC_INFO, "Pure virtual function called!");
-}
 
 //
 

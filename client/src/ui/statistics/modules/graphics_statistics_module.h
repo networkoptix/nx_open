@@ -3,10 +3,10 @@
 
 #include <statistics/base/base_fwd.h>
 #include <statistics/abstract_statistics_module.h>
-
-class QnWorkbenchContext;
+#include <ui/workbench/workbench_context_aware.h>
 
 class QnGraphicsStatisticsModule : public QnAbstractStatisticsModule
+    , public QnWorkbenchContextAware
 {
     Q_OBJECT
 
@@ -17,18 +17,10 @@ public:
 
     virtual ~QnGraphicsStatisticsModule();
 
-    void setContext(QnWorkbenchContext *context);
-
     virtual QnStatisticValuesHash values() const override;
 
     virtual void reset() override;
 
 private:
-    void recreateMetrics();
-
-private:
-    typedef QPointer<QnWorkbenchContext> ContextPtr;
-
-    ContextPtr m_context;
-    QnMetricsContainerPtr m_metrics;
+    const QnMetricsContainerPtr m_metrics;
 };
