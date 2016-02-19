@@ -21,7 +21,7 @@ QnStatisticsSettingsWatcher::QnStatisticsSettingsWatcher(QObject *parent)
     , m_updateTimer(new QTimer())
     , m_handle()
 {
-    enum { kUpdatePeriodMs = 3 * 1000 };
+    enum { kUpdatePeriodMs = 5 * 60 * 1000 };
     m_updateTimer->setSingleShot(false);
     m_updateTimer->setInterval(kUpdatePeriodMs);
     m_updateTimer->start();
