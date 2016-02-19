@@ -1,4 +1,4 @@
-#include "android_decoder.h"
+#include "android_video_decoder.h"
 
 #include <deque>
 
@@ -120,14 +120,14 @@ void fillInputBuffer(JNIEnv *env, jobject thiz, jobject buffer, jlong srcDataPtr
     memcpy(bytes, srcData, dataSize);
 }
 
-// ------------------------- AndroidDecoderPrivate -------------------------
+// ------------------------- AndroidVideoDecoderPrivate -------------------------
 
-class AndroidDecoderPrivate : public QObject
+class AndroidVideoDecoderPrivate : public QObject
 {
-    Q_DECLARE_PUBLIC(AndroidDecoder)
-    AndroidDecoder *q_ptr;
+    Q_DECLARE_PUBLIC(AndroidVideoDecoder)
+    AndroidVideoDecoder *q_ptr;
 public:
-    AndroidDecoderPrivate():
+    AndroidVideoDecoderPrivate():
         frameNumber(0),
         initialized(false),
         javaDecoder("com/networkoptix/nxwitness/media/QnMediaDecoder"),
@@ -136,7 +136,7 @@ public:
         registerNativeMethods();
     }
 
-    ~AndroidDecoderPrivate()
+    ~AndroidVideoDecoderPrivate()
     {
         javaDecoder.callMethod<void>("releaseDecoder");
     }
@@ -196,11 +196,11 @@ private:
 
 void renderFrameToFbo(void* opaque)
 {
-    AndroidDecoderPrivate* d = static_cast<AndroidDecoderPrivate*>(opaque);
+    AndroidVideoDecoderPrivate* d = static_cast<AndroidVideoDecoderPrivate*>(opaque);
     d->renderFrameToFbo();
 }
 
-void AndroidDecoderPrivate::renderFrameToFbo()
+void AndroidVideoDecoderPrivate::renderFrameToFbo()
 {
     QOpenGLFunctions *funcs = QOpenGLContext::currentContext()->functions();
 
@@ -280,7 +280,7 @@ void AndroidDecoderPrivate::renderFrameToFbo()
 
 }
 
-FboPtr AndroidDecoderPrivate::createGLResources()
+FboPtr AndroidVideoDecoderPrivate::createGLResources()
 {
     QOpenGLContext *ctx = QOpenGLContext::currentContext();
     QOpenGLFunctions *funcs = ctx->functions();
@@ -330,26 +330,26 @@ FboPtr AndroidDecoderPrivate::createGLResources()
     return fbo;
 }
 
-// ---------------------- AndroidDecoder ----------------------
+// ---------------------- AndroidVideoDecoder ----------------------
 
-AndroidDecoder::AndroidDecoder():
+AndroidVideoDecoder::AndroidVideoDecoder():
     AbstractVideoDecoder(),
-    d_ptr(new AndroidDecoderPrivate())
+    d_ptr(new AndroidVideoDecoderPrivate())
 
 {
 }
 
-AndroidDecoder::~AndroidDecoder()
+AndroidVideoDecoder::~AndroidVideoDecoder()
 {
 }
 
-void AndroidDecoder::setAllocator(AbstractResourceAllocator* allocator)
+void AndroidVideoDecoder::setAllocator(AbstractResourceAllocator* allocator)
 {
-    Q_D(AndroidDecoder);
+    Q_D(AndroidVideoDecoder);
     d->allocator = allocator;
 }
 
-bool AndroidDecoder::isCompatible(const CodecID codec, const QSize& resolution)
+bool AndroidVideoDecoder::isCompatible(const CodecID codec, const QSize& resolution)
 {
     static QMap<CodecID, QSize> maxDecoderSize;
     static QMutex mutex;
@@ -374,9 +374,9 @@ bool AndroidDecoder::isCompatible(const CodecID codec, const QSize& resolution)
     return resolution.width() <= maxSize.width() && resolution.height() <= maxSize.height();
 }
 
-int AndroidDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QVideoFramePtr* result)
+int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QVideoFramePtr* result)
 {
-    Q_D(AndroidDecoder);
+    Q_D(AndroidVideoDecoder);
 
     if (!d->initialized)
     {
@@ -400,7 +400,7 @@ int AndroidDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QVideoFra
     jlong outFrameNum;
     if (frame)
     {
-        d->frameNumToPtsCache.push_back(AndroidDecoderPrivate::PtsData(d->frameNumber, frame->timestamp));
+        d->frameNumToPtsCache.push_back(AndroidVideoDecoderPrivate::PtsData(d->frameNumber, frame->timestamp));
         outFrameNum = d->javaDecoder.callMethod<jlong>(
             "decodeFrame", "(JIJ)J",
             (jlong) frame->data(),
