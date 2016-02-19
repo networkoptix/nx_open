@@ -8,15 +8,48 @@ namespace media_db
 namespace
 {
 
-QDataStream &operator << (QDataStream &stream, const FileHeader &fh)
+QDataStream &operator << (QDataStream &stream, const CameraOperation &cameraOp)
 {
-    return stream << fh.byte_1 << fh.byte_2;
+    return stream << cameraOp.part_1 << cameraOp.cameraUniqueId;
 }
 
-QDataStream &operator >> (QDataStream &stream, FileHeader &fh)
+QDataStream &operator >> (QDataStream &stream, CameraOperation &cameraOp)
 {
-    return stream >> fh.byte_1 >> fh.byte_2;
+    return stream >> cameraOp.part_1>> cameraOp.cameraUniqueId;
 }
+
+template<typename StructToWrite>
+QDataStream &operator << (QDataStream &stream, const StructToWrite &s)
+{
+    return stream << s.part_1<< s.part_2;
+}
+
+template<typename StructToWrite>
+QDataStream &operator >> (QDataStream &stream, StructToWrite &s)
+{
+    return stream >> s.part_1>> s.part_2;
+}
+
+class RecordVisitor : public boost::static_visitor<>
+{
+public:
+    RecordVisitor(DbHelperHandler *handler, Error *error, QDataStream* stream)
+        : m_handler(handler),
+          m_error(error),
+          m_stream(stream)
+    {}
+   
+    template<typename StructToWrite>
+    void operator()(const StructToWrite &s) const
+    {
+        *m_stream << s;
+    }
+
+private:
+    DbHelperHandler *m_handler;
+    Error *m_error;
+    QDataStream *m_stream;
+};
 
 } // namespace <anonymous>
 
@@ -77,17 +110,38 @@ Error DbHelper::readRecord()
 {
     std::lock_guard<std::mutex> lk(m_mutex);
     RecordBase rb;
-    m_stream >> rb.byte_1;
+    m_stream >> rb.part_1;
+    quint64 part_2;
+    Error error;
 
     switch (rb.recordType())
     {
     case RecordType::FileOperationAdd:
-        break;
     case RecordType::FileOperationDelete:
-        break;
-    case RecordType::CameraOperationAdd:
+    {
+        m_stream >> part_2;
+        error = getError();
+        m_handler->handleMediaFileOp(MediaFileOperation(rb.part_1, part_2), error);
         break;
     }
+    case RecordType::CameraOperationAdd:
+    {
+        CameraOperation cameraOp(rb.part_1);
+        QByteArray bArray;
+        bArray.resize(cameraOp.getCameraUniqueIdLen());
+        m_stream.readRawData(bArray.data(), cameraOp.getCameraUniqueIdLen());
+        cameraOp.cameraUniqueId = bArray;
+        error = getError();
+        m_handler->handleCameraOp(cameraOp, error);
+        break;
+    }
+    default:
+        m_handler->handleError(Error::ParseError);
+        error = Error::ParseError;
+        break;
+    }
+
+    return error;
 }
 
 void DbHelper::writeRecordAsync(const WriteRecordType &record)
@@ -111,7 +165,11 @@ void DbHelper::startWriter()
 
                 auto record = m_writeQueue.front();
                 m_writeQueue.pop();
-                boost::apply_visitor(record);
+
+                Error error;
+                RecordVisitor vis(m_handler, &error, &m_stream);
+                boost::apply_visitor(vis, record);
+                m_handler->handleRecordWrite(error);
             }
         });
 }
