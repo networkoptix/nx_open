@@ -185,7 +185,7 @@ nx_http::StatusCode::Value SettingsActionHandler::loadSettingsLocally(QnStatisti
     if (!server || !hasInternetConnection(server))
         return nx_http::StatusCode::noContent;
 
-    static const QUrl kSettingsUrl = QUrl::fromUserInput(lit("http://127.0.01:8080/stat/statistics.json")); //TODO: change me to correct
+    static const QUrl kSettingsUrl = QUrl::fromUserInput(lit("http://127.0.0.1:8080/stat/statistics.json")); //TODO: change me to correct
 
     nx_http::BufferType buffer;
     int statusCode = nx_http::StatusCode::noContent;
