@@ -15,7 +15,10 @@ angular.module('webadminApp')
             $scope.session.method = {
                 name:'/api/pingSystem',
                 data:'',
-                params:'{\n\t "password": "admin",\n\t "url": "http://demo.networkoptix.com:7001/"\n}',
+                params: JSON.stringify({
+                    password: 'admin',
+                    url: 'http://demo.networkoptix.com:7001/'
+                }, null,  '\t '),
                 method:'POST'
             };
         }
