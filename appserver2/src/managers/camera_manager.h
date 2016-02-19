@@ -115,7 +115,7 @@ namespace ec2
         //!Implementation of AbstractCameraManager::saveUserAttributes
         virtual int saveUserAttributes( const QnCameraUserAttributesList& cameraAttributes, impl::SimpleHandlerPtr handler ) override;
         //!Implementation of AbstractCameraManager::getUserAttributes
-        virtual int getUserAttributes( const QnUuid& cameraId, impl::GetCameraUserAttributesHandlerPtr handler ) override;
+        virtual int getUserAttributes( const QnUuid& serverId, impl::GetCameraUserAttributesHandlerPtr handler ) override;
         //!Implementation of AbstractCameraManager::remove
         virtual int remove( const QnUuid& id, impl::SimpleHandlerPtr handler ) override;
 
