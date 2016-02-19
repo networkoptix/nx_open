@@ -72,7 +72,7 @@ QnPtzControllerPool::QnPtzControllerPool(QObject *parent):
     const int maxThreads = 32;
 #endif
     d->commandThreadPool->setMaxThreadCount(maxThreads);
-    d->commandThreadPool->setExpiryTimeout(-1); // default experation timeout is 30 second. But it has a bug in QT < v.5.3
+    d->commandThreadPool->setExpiryTimeout(-1); // default expiration timeout is 30 second. But it has a bug in QT < v.5.3
 
     connect(d->resourcePool,    &QnResourcePool::resourceAdded,             this,   &QnPtzControllerPool::registerResource);
     connect(d->resourcePool,    &QnResourcePool::resourceRemoved,           this,   &QnPtzControllerPool::unregisterResource);
@@ -80,12 +80,12 @@ QnPtzControllerPool::QnPtzControllerPool(QObject *parent):
         registerResource(resource);
 }
 
-QnPtzControllerPool::~QnPtzControllerPool() 
+QnPtzControllerPool::~QnPtzControllerPool()
 {
     while(!d->controllerByResource.isEmpty())
         unregisterResource(d->controllerByResource.begin().key());
 
-    //have to wait until all posted events have been processed, deleteLater can be called 
+    //have to wait until all posted events have been processed, deleteLater can be called
         //within event slot, that's why we specify second parameter
     WaitingForQThreadToEmptyEventQueue waitingForObjectsToBeFreed( d->executorThread, 3 );
     waitingForObjectsToBeFreed.join();
@@ -164,7 +164,7 @@ void QnPtzControllerPoolPrivate::updateController(const QnResourcePtr &resource)
     controllerByResource.insert(resource, controller);
 
     /* Some controller require an event loop to function, so we move them
-     * to executor thread. Note that controllers don't run synchronous requests 
+     * to executor thread. Note that controllers don't run synchronous requests
      * in their associated thread, so this won't present any problems for
      * other users of the executor thread. */
     QnPtzControllerPtr controllerIt = controller;
