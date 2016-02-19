@@ -47,7 +47,7 @@ void OutgoingTunnelUdtConnection::pleaseStop(
             {
                 connectionContext.second.connection->pleaseStop(
                     [connectionContext = std::move(connectionContext),
-                        handler = completionHandlerCaller.fork()]() mutable
+                        handler = completionHandlerCaller.fork()]()
                     {
                         connectionContext.second.completionHandler(
                             SystemError::interrupted,
@@ -56,6 +56,8 @@ void OutgoingTunnelUdtConnection::pleaseStop(
                         handler();
                     });
             }
+            m_controlConnection->pleaseStop(completionHandlerCaller.fork());
+            m_aioTimer.pleaseStopSync();
         });
 }
 
@@ -70,7 +72,8 @@ void OutgoingTunnelUdtConnection::establishNewConnection(
         .arg(m_connectionId), cl_logDEBUG2);
 
     auto newConnection = std::make_unique<UdtStreamSocket>();
-    if (!socketAttributes.applyTo(newConnection.get()))
+    if (!socketAttributes.applyTo(newConnection.get()) ||
+        !newConnection->setNonBlockingMode(true))
     {
         const auto errorCode = SystemError::getLastOSErrorCode();
         NX_LOGX(lm("connection %1. Failed to apply socket options to new connection. %2")
@@ -86,32 +89,65 @@ void OutgoingTunnelUdtConnection::establishNewConnection(
 
     QnMutexLocker lk(&m_mutex);
 
-    //TODO #ak timeout support
     auto connectionPtr = newConnection.get();
     m_ongoingConnections.emplace(
         connectionPtr,
         ConnectionContext{std::move(newConnection), std::move(handler)});
     
-    connectionPtr->connectAsync(
-        m_remoteHostAddress,
-        [this, connectionPtr](SystemError::ErrorCode errorCode)
+    //has to start connect and timer atomically, 
+        //but this can be done from socket's aio thread only
+    connectionPtr->post(    //switching to connectionPtr's aio thread
+        [this, connectionPtr, timeout]
         {
-            //ensuring connectionPtr can be safely freed in any thread
-            connectionPtr->post(
-                [this, connectionPtr, errorCode]()
+            QnMutexLocker lk(&m_mutex);
+            //checking that connection has not been cancelled by pleaseStop
+            if (m_ongoingConnections.find(connectionPtr) == m_ongoingConnections.end())
+                return; //connection has been cancelled by pleaseStop, ignoring...
+
+            connectionPtr->connectAsync(
+                m_remoteHostAddress,
+                [this, connectionPtr, timoutPresent = static_cast<bool>(timeout)](
+                    SystemError::ErrorCode errorCode)
                 {
-                    //switching execution to m_aioTimer's thread
-                    m_aioTimer.post(
-                        std::bind(
-                            &OutgoingTunnelUdtConnection::onConnectDone, this,
-                            connectionPtr, errorCode));
+                    //cancelling timer
+                    if (timoutPresent)
+                        connectionPtr->cancelIOSync(aio::etTimedOut);
+
+                    onConnectCompleted(connectionPtr, errorCode);
                 });
+
+            if (timeout)
+                connectionPtr->registerTimer(
+                    *timeout,
+                    [connectionPtr, this]
+                    {
+                        connectionPtr->cancelIOSync(aio::etNone);   //cancelling connect
+                        onConnectCompleted(connectionPtr, SystemError::timedOut);
+                    });
         });
 
     assert(!m_terminated);
 }
 
-void OutgoingTunnelUdtConnection::onConnectDone(
+void OutgoingTunnelUdtConnection::onConnectCompleted(
+    UdtStreamSocket* connectionPtr,
+    SystemError::ErrorCode errorCode)
+{
+    //called from \a connectionPtr completion handler
+
+    //ensuring connectionPtr can be safely freed in any thread
+    connectionPtr->post(
+        [this, connectionPtr, errorCode]()
+    {
+        //switching execution to m_aioTimer's thread
+        m_aioTimer.post(
+            std::bind(
+                &OutgoingTunnelUdtConnection::reportConnectResult, this,
+                connectionPtr, errorCode));
+    });
+}
+
+void OutgoingTunnelUdtConnection::reportConnectResult(
     UdtStreamSocket* connectionPtr,
     SystemError::ErrorCode errorCode)
 {

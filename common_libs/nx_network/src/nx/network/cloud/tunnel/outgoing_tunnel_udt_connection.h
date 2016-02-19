@@ -24,7 +24,7 @@ namespace cloud {
     Also, makes some efforts to keep UDP hole opened
     \note \a OutgoingTunnelUdtConnection instance can be safely freed in new connection handler
 */
-class OutgoingTunnelUdtConnection
+class NX_NETWORK_API OutgoingTunnelUdtConnection
 :
     public AbstractOutgoingTunnelConnection
 {
@@ -59,7 +59,10 @@ private:
     QnMutex m_mutex;
     std::atomic<bool> m_terminated;
 
-    void onConnectDone(
+    void onConnectCompleted(
+        UdtStreamSocket* connectionPtr,
+        SystemError::ErrorCode errorCode);
+    void reportConnectResult(
         UdtStreamSocket* connectionPtr,
         SystemError::ErrorCode errorCode);
 };
