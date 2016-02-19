@@ -187,7 +187,8 @@ bool detail::OverlayedBase::isOverlayWidgetVisible(QGraphicsWidget* widget)
     if (hasOpacityAnimator(widget))
     {
         auto animator = opacityAnimator(widget, kOverlayWidgetAnimationSpeed);
-        return !qFuzzyIsNull(animator->targetValue().toDouble());
+        if (animator->isRunning())
+            return !qFuzzyIsNull(animator->targetValue().toDouble());
     }
     return !qFuzzyIsNull(widget->opacity());
 }
