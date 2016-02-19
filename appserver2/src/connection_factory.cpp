@@ -328,27 +328,27 @@ namespace ec2
          *         %value RT_Never Never record.
          *         %value RT_MotionAndLowQuality Always record low quality
          *             stream, and record high quality stream on motion.
-         * %param dayOfWeek Day of week for the recording task.
-         *     %value 1 Monday
-         *     %value 2 Tuesday
-         *     %value 3 Wednesday
-         *     %value 4 Thursday
-         *     %value 5 Friday
-         *     %value 6 Saturday
-         *     %value 7 Sunday
-         * %param beforeThreshold The number of seconds before a motion event to
-         *     record the video for.
-         * %param afterThreshold The number of seconds after a motion event to
-         *     record the video for.
-         * %param streamQuality Quality of the recording.
-         *     %value QualityLowest
-         *     %value QualityLow
-         *     %value QualityNormal
-         *     %value QualityHigh
-         *     %value QualityHighest
-         *     %value QualityPreSet
-         *     %value QualityNotDefined
-         * %param fps Frames per second (integer).
+         *     %param scheduleTask.dayOfWeek Day of week for the recording task.
+         *         %value 1 Monday
+         *         %value 2 Tuesday
+         *         %value 3 Wednesday
+         *         %value 4 Thursday
+         *         %value 5 Friday
+         *         %value 6 Saturday
+         *         %value 7 Sunday
+         *     %param scheduleTask.beforeThreshold The number of seconds before a motion event to
+         *         record the video for.
+         *     %param scheduleTask.afterThreshold The number of seconds after a motion event to
+         *         record the video for.
+         *     %param scheduleTask.streamQuality Quality of the recording.
+         *         %value QualityLowest
+         *         %value QualityLow
+         *         %value QualityNormal
+         *         %value QualityHigh
+         *         %value QualityHighest
+         *         %value QualityPreSet
+         *         %value QualityNotDefined
+         *     %param scheduleTask.fps Frames per second (integer).
          * %param audioEnabled Whether the audio is enabled on the camera.
          *     %value false
          *     %value true
