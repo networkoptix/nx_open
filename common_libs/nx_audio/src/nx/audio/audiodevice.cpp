@@ -1,4 +1,4 @@
-#include "audioDevice.h"
+#include "audiodevice.h"
 
 #include <QtCore/QScopedPointer>
 
