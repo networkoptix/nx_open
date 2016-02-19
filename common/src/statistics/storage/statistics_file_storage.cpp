@@ -13,11 +13,9 @@ namespace
 
     const qint64 kNotStatisticsFileTimeStamp = 0;
 
-    const auto localDataDirectory = QDir(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
-
     QDir getCustomDirectory(const QString &leafDirectoryName)
     {
-        auto directory = localDataDirectory;
+        auto directory = QDir(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
         if (!directory.exists(leafDirectoryName))
         {
             if (!directory.mkdir(leafDirectoryName))
@@ -32,7 +30,7 @@ namespace
 
     QDir getStatisticsDirectory()
     {
-        static const auto kStatisticsDirectoryName = lit("nx_statistics");
+        static const auto kStatisticsDirectoryName = lit("statistics");
         static const auto kResult =
             getCustomDirectory(kStatisticsDirectoryName);
 
@@ -41,7 +39,7 @@ namespace
 
     QDir getCustomDataDirectory()
     {
-        static const auto kCustomDirectoryName = lit("nx_custom");
+        static const auto kCustomDirectoryName = lit("custom_properties");
         static const auto kResult =
             getCustomDirectory(kCustomDirectoryName);
 
