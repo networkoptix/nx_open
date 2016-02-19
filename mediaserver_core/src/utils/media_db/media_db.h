@@ -1,5 +1,5 @@
-#ifndef __MEDIA_DB_TYPES_H__
-#define __MEDIA_DB_TYPES_H__
+#ifndef __MEDIA_DB_H__
+#define __MEDIA_DB_H__
 
 #include <queue>
 #include <thread>

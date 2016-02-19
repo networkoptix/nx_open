@@ -1,4 +1,4 @@
-#include "media_db_types.h"
+#include "media_db.h"
 
 namespace nx
 {
