@@ -212,6 +212,11 @@
     <name>../static/views/account.html</name>
     <message>
       <location filename="../static/views/account.html"/>
+      <source>Account</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
       <source>Email address</source>
       <translation> </translation>
     </message>
@@ -222,7 +227,17 @@
     </message>
     <message>
       <location/>
+      <source>First name is required.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
       <source>Last name</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Last name is required.</source>
       <translation> </translation>
     </message>
     <message>
@@ -242,7 +257,37 @@
     </message>
     <message>
       <location/>
-      <source>Save&quot;</source>
+      <source>Your account was successfully saved.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Couldn\'t save your data:</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Save</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Your password was successfully changed.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Couldn\'t change your password:</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>New password</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Change password&quot;</source>
       <translation> </translation>
     </message>
   </context>
@@ -250,6 +295,16 @@
     <name>../static/views/activate_restore.html</name>
     <message>
       <location filename="../static/views/activate_restore.html"/>
+      <source>Account activation</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Confirm your account</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
       <source>Email address</source>
       <translation> </translation>
     </message>
@@ -261,6 +316,16 @@
     <message>
       <location/>
       <source>Please, enter a valid email.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Restore password</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Set new password</source>
       <translation> </translation>
     </message>
     <message>
@@ -295,12 +360,22 @@
     </message>
     <message>
       <location/>
+      <source>Send</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
       <source>You are going to restore your password. Please, enter your account email.</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
       <source>Confirmation link was send to your email. Check it for creating a new password</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Restore password</source>
       <translation> </translation>
     </message>
     <message>
@@ -315,7 +390,17 @@
     </message>
     <message>
       <location/>
-      <source>Couldn\'t save new password:&quot;</source>
+      <source>Couldn\'t save new password:</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>New password</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Save password&quot;</source>
       <translation> </translation>
     </message>
   </context>
@@ -346,11 +431,56 @@
       <source>You are going to disconnect system &quot;&quot; from cloud.</source>
       <translation> </translation>
     </message>
+    <message>
+      <location/>
+      <source>Registering system in cloud ...</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Registered in cloud portal</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Couldn\'t register your system:</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Connect</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Disconnect system from cloud ...</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>System was disconnected from cloud portal</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Couldn\'t disconnect your system:</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Disconnect&quot;</source>
+      <translation> </translation>
+    </message>
   </context>
   <context>
     <name>../static/views/debug.html</name>
     <message>
       <location filename="../static/views/debug.html"/>
+      <source>Debug notifications</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
       <source>Email</source>
       <translation> </translation>
     </message>
@@ -402,22 +532,22 @@
     <name>../static/views/register.html</name>
     <message>
       <location filename="../static/views/register.html"/>
-      <source>Nx Cloud</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Register to be happy!</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
       <source>First name</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
+      <source>First name is required.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
       <source>Last name</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Last name is required.</source>
       <translation> </translation>
     </message>
     <message>
@@ -458,6 +588,26 @@
     <message>
       <location/>
       <source>You must comply.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Your account was successfully registered. Please, check your email to confirm it</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Some error has happened:</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Password</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Register&quot;</source>
       <translation> </translation>
     </message>
   </context>
@@ -564,7 +714,27 @@
     </message>
     <message>
       <location/>
-      <source>gettingSystemUsers&quot;</source>
+      <source>gettingSystemUsers</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Cannot delete the system:</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Users list is unavailable:</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>unsharingMessage</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Sharing failed:&quot;</source>
       <translation> </translation>
     </message>
   </context>
@@ -590,6 +760,21 @@
       <source>Open in Nx Witness</source>
       <translation> </translation>
     </message>
+    <message>
+      <location/>
+      <source>false</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Systems list is unavailable:</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>gettingSystems&quot;</source>
+      <translation> </translation>
+    </message>
   </context>
   <context>
     <name>../static/views/components/dialog.html</name>
@@ -613,21 +798,21 @@
       <source>Close</source>
       <translation> </translation>
     </message>
+    <message>
+      <location/>
+      <source>modal</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>modal&quot;</source>
+      <translation> </translation>
+    </message>
   </context>
   <context>
-    <name>../static/views/components/header.html</name>
+    <name>../static/views/components/footer.html</name>
     <message>
-      <location filename="../static/views/components/header.html"/>
-      <source>&amp;nbsp;</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Support</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
+      <location filename="../static/views/components/footer.html"/>
       <source>About</source>
       <translation> </translation>
     </message>
@@ -638,12 +823,40 @@
     </message>
     <message>
       <location/>
-      <source>How to connect your system</source>
+      <source>Help</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>About Networkoptix</source>
+      <source>Support</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Terms</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>&amp;copy; 2016 Networkoptix</source>
+      <translation> </translation>
+    </message>
+  </context>
+  <context>
+    <name>../static/views/components/header.html</name>
+    <message>
+      <location filename="../static/views/components/header.html"/>
+      <source>&amp;nbsp;</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>About</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Systems</source>
       <translation> </translation>
     </message>
     <message>
@@ -669,11 +882,6 @@
     <message>
       <location/>
       <source>Logout</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>uib-dropdown uib-dropdown-toggle</source>
       <translation> </translation>
     </message>
   </context>

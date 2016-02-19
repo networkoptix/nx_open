@@ -58,14 +58,12 @@ def api_success(data=None, status_code=status.HTTP_200_OK):
 
 
 def require_params(request, params_list):
-    miss_params = False
     error_data = {}
     for param in params_list:
         if param not in request.data or request.data[param] == '':
-            miss_params = True
             error_data[param] = ['This field is required.']
 
-    if miss_params:
+    if error_data:
         raise APIRequestException('Parameters are missing', ErrorCodes.wrong_parameters,
                                   error_data=error_data)
 

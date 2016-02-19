@@ -17,7 +17,7 @@ def process_js_file(file_name):
     with open(file_name, 'r') as file_descriptor:
         data = file_descriptor.read()
         strings = re.findall("(?<=').+?(?<!\\\\)(?=')", data)
-        if len(strings) == 0:
+        if not strings:
             return None
         return {
             'filename': file_name,
@@ -31,7 +31,7 @@ def process_html_file(file_name):
         data = file_descriptor.read()
         inline = process_inline_text(data)
         attributes = process_attributes(data)
-        if len(inline) == 0 and len(attributes) == 0:
+        if not inline and not attributes:
             return None
         return {
             'filename': file_name,
@@ -75,7 +75,7 @@ def process_attributes(data):
     for attr in ignore_single_attributes:   # ignore attributes which can be used without values
         data = re.sub('\s+' + attr + '=".+?"', '', data)        # remove attribute if it has value in quotes anyway
         data = re.sub('\s+' + attr + '=[^\s>]+', '', data)      # remove attribute if it has value without quotes anyway
-        data = re.sub('\s+' + attr + '(?=[\s>])', '', data)     # remove attribute without value
+        data = re.sub('\s+' + attr + '(?=[\s/>])', '', data)     # remove attribute without value
 
     data = re.sub(r'<\S+?\s*/?>', '', data)     # remove tags without attributes
     data = re.sub(r'<\S+', '', data)            # remove tags
