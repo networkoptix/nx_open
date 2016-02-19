@@ -58,9 +58,9 @@ def disconnect(request):
 
 
 @api_view(['POST'])
-@permission_classes((IsAuthenticated, ))
+@permission_classes((AllowAny, ))
 @handle_exceptions
 def connect(request):
-    require_params(request, ('name',))
-    data = cloud_api.System.bind(request.user.email, request.session['password'], request.data['name'])
+    require_params(request, ('name', 'email', 'password'))
+    data = cloud_api.System.bind(request.data['email'], request.data['password'], request.data['name'])
     return api_success(data)
