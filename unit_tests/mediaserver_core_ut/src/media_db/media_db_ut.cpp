@@ -6,6 +6,8 @@
 
 #include <random>
 #include <climits>
+#include <vector>
+#include <algorithm>
 
 #include "utils/media_db/media_db.h"
 #include "common/common_globals.h"
@@ -66,11 +68,11 @@ struct TestFileOperation
     int chunksCatalog;
 };
 
-TestFileOperation generateFileOperation()
+TestFileOperation generateFileOperation(int code)
 {
     return{ genRandomNumber<0, 4398046511103LL>(), genRandomNumber<0, 140737488355327LL>(),
-            (int)genRandomNumber<0, 1>(), (int)genRandomNumber<0, 65535>(),
-            (int)genRandomNumber<0, 1048575>(), (int)genRandomNumber<0, 1>() };
+            code, (int)genRandomNumber<0, 65535>(),
+            (int)genRandomNumber<0, 1048575LL>(), (int)genRandomNumber<0, 1>() };
 }
 
 struct TestCameraOperation
@@ -80,10 +82,85 @@ struct TestCameraOperation
     int id;
 };
 
-TestCameraOperation generateCameraOperaion()
+TestCameraOperation generateCameraOperation()
 {
     return{ 2, (int)genRandomNumber<0, 16383>(), (int)genRandomNumber<0, 65535>() };
 }
+
+typedef boost::variant<TestFileHeader, TestFileOperation, TestCameraOperation> TestRecord;
+
+template<typename Record>
+class RecordTestVisitor: public boost::static_visitor<bool>
+{
+public:
+    RecordTestVisitor(const Record &r) : m_record(r) {}
+
+    template<typename OtherRecord>
+    typename std::enable_if<std::is_same<Record, OtherRecord>::value, bool>::type 
+    operator() (const OtherRecord &other)
+    {
+        return other == m_record;
+    }
+
+    template<typename OtherRecord>
+    typename std::enable_if<!std::is_same<Record, OtherRecord>::value, bool>::type 
+    operator() (const OtherRecord &other)
+    {
+        return false;
+    }
+private:
+    Record m_record;
+};
+
+struct TestData
+{
+    TestRecord data;
+    bool visited;
+
+    TestData(const TestRecord &record, bool visited) : data(record), visited(visited) {}
+};
+typedef std::vector<TestData> TestDataVector;
+
+struct TestDataManager
+{
+    TestDataManager(size_t dataSize)
+    {
+        for (size_t i = 0; i < dataSize; ++i) {
+            switch (genRandomNumber<0, 2>()) {
+            case 0:
+                dataVector.emplace_back(generateFileHeader(), false);
+                break;
+            case 1:
+                switch (genRandomNumber<0, 1>()) {
+                case 0:
+                    dataVector.emplace_back(generateFileOperation(0), false);
+                    break;
+                case 1:
+                    dataVector.emplace_back(generateFileOperation(1), false);
+                    break;
+                }
+                break;
+            case 2:
+                dataVector.emplace_back(generateCameraOperation(), false);
+                break;
+            }
+        }
+    }
+
+    template<typename Record>
+    bool seekAndSet(const Record &record)
+    {
+        auto it = std::find_if(dataVector.begin(), dataVector.end(),
+                               [&record](const TestData &td) {
+                                    return boost::apply_visitor(record, 
+                                                                RecordTestVisitor<Record>(td.data));
+                               });
+        if (it != m_dataVector.end())
+            it->visited = true;
+    }
+
+    TestDataVector dataVector;
+};
 
 TEST(MediaDb_test, ReadWrite)
 {
@@ -94,6 +171,9 @@ TEST(MediaDb_test, ReadWrite)
     dbFile.open(QIODevice::ReadOnly);
     TestDbHelperHandler testHandler;
     nx::media_db::DbHelper dbHelper(&dbFile, &testHandler);
+
+    TestDataManager tdm(10000);
+    for ()
 
     recursiveClean(workDirPath);
 }
