@@ -36,6 +36,5 @@ void QnControlsStatisticsModule::reset()
 
 void QnControlsStatisticsModule::registerPressEvent(const QString &alias)
 {
-    qDebug() << "Button clicked: " << alias;
     ++m_clicksCount[alias];
 }

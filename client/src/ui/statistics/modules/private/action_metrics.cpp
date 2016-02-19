@@ -77,7 +77,6 @@ namespace
             // TODO: remove debug output, id and unnecessary condition
             if (isCounterActive() == checked)
                 return;
-            qDebug() << "Checked changed: " << aliasByActionId(id) << ":" << checked;
 
             setCounterActive(checked);
         };
@@ -147,8 +146,6 @@ void ActionsTriggeredCountMetrics::addActionMetric(QnAction *action)
         ++countByParams[kTriggerdPostfix];  // Counts base trigger event number
         if (path != kTriggerdPostfix)
             ++countByParams[path];
-
-        qDebug() << "Action triggered " << aliasByActionId(id) << " " << path;
     };
 
     connect(action, &QAction::triggered, this, processTriggered);
