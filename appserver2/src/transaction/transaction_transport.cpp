@@ -140,7 +140,7 @@ QnTransactionTransport::QnTransactionTransport(
     m_contentEncoding = contentEncoding;
     m_connectionGuid = connectionGuid;
 
-    if( !m_outgoingDataSocket->setSendTimeout(m_idleConnectionTimeout.count()) )
+    if( !m_outgoingDataSocket->setSendTimeout(SOCKET_TIMEOUT/*m_idleConnectionTimeout.count()*/) )
     {
         const auto osErrorCode = SystemError::getLastOSErrorCode();
         NX_LOG(QnLog::EC2_TRAN_LOG,
