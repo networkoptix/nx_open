@@ -5,6 +5,7 @@
 
 #include <nx/network/cloud/tunnel/outgoing_tunnel_udt_connection.h>
 #include <nx/network/udt/udt_socket.h>
+#include <utils/common/cpp14.h>
 
 
 namespace nx {
