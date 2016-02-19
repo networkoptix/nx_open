@@ -1,5 +1,5 @@
 'use strict';
-
+/*global md5, Base64 */
 angular.module('webadminApp')
     .controller('LoginCtrl', function ($scope, mediaserver, ipCookie,$sessionStorage) {
 
@@ -64,7 +64,7 @@ angular.module('webadminApp')
 
                 // Check auth again
                 $scope.authorizing = true;
-                mediaserver.getCurrentUser(true).then(reload).catch(function(error){
+                mediaserver.getCurrentUser(true).then(reload).catch(function(/*error*/){
                     $scope.authorizing = false;
                     alert('Login or password is incorrect');
                 });
