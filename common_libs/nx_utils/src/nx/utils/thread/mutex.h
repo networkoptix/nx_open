@@ -95,8 +95,68 @@ public:
 #include <QtCore/QReadWriteLock>
 
 typedef QMutex QnMutex;
-typedef QMutexLocker QnMutexLocker;
-typedef QMutexLocker QnMutexLockerBase;
+
+/** Adding this class since \a QMutexLocker does not have move operations */
+class QnMutexLocker
+{
+public:
+    QnMutexLocker(QMutex* const mtx)
+    :
+        m_mutex(mtx),
+        m_locked(false)
+    {
+        relock();
+    }
+    ~QnMutexLocker()
+    {
+        if (m_locked)
+            unlock();
+    }
+
+    QnMutexLocker(QnMutexLocker&& rhs)
+    {
+        m_mutex = rhs.m_mutex;
+        rhs.m_mutex = nullptr;
+        m_locked = rhs.m_locked;
+        rhs.m_locked = false;
+    }
+    QnMutexLocker& operator=(QnMutexLocker&& rhs)
+    {
+        if (this == &rhs)
+            return *this;
+        if (m_locked)
+            unlock();
+        m_mutex = rhs.m_mutex;
+        rhs.m_mutex = nullptr;
+        m_locked = rhs.m_locked;
+        rhs.m_locked = false;
+        return *this;
+    }
+
+    QMutex* mutex()
+    {
+        return m_mutex;
+    }
+
+    void relock()
+    {
+        Q_ASSERT(!m_locked);
+        m_mutex->lock();
+        m_locked = true;
+    }
+    void unlock()
+    {
+        Q_ASSERT(m_locked);
+        m_mutex->unlock();
+        m_locked = false;
+    }
+
+private:
+    QnMutex* m_mutex;
+    bool m_locked;
+};
+
+typedef QnMutexLocker QnMutexLockerBase;
 
 typedef QReadWriteLock QnReadWriteLock;
 typedef QReadLocker QnReadLocker;

@@ -108,6 +108,9 @@ QnMutexLockerBase& QnMutexLockerBase::operator=(QnMutexLockerBase&& rhs)
     if (this == &rhs)
         return *this;
 
+    if (m_locked)
+        unlock();
+
     m_mtx = rhs.m_mtx;
     m_sourceFile = rhs.m_sourceFile;
     m_sourceLine = rhs.m_sourceLine;
