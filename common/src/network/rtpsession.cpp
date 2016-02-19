@@ -399,7 +399,7 @@ RTPSession::RTPSession( std::unique_ptr<AbstractStreamSocket> tcpSock )
     m_additionalReadBufferPos( 0 ),
     m_additionalReadBufferSize( 0 ),
     m_userAgent(nx_http::userAgentString()),
-    m_defaultAuthScheme(nx_http::header::AuthScheme::basic)
+    m_defaultAuthScheme(nx_http::header::AuthScheme::digest)
 {
     m_responseBuffer = new quint8[RTSP_BUFFER_LEN];
     m_responseBufferLen = 0;
@@ -683,16 +683,11 @@ CameraDiagnostics::Result RTPSession::open(const QString& url, qint64 startTime)
 
     tmp = extractRTSPParam(QLatin1String(response), QLatin1String("Content-Location:"));
     if (!tmp.isEmpty())
-    {
         m_contentBase = tmp;
-    }
 
     tmp = extractRTSPParam(QLatin1String(response), QLatin1String("Content-Base:"));
     if (!tmp.isEmpty())
-    {
         m_contentBase = tmp;
-    }
-
 
 
     CameraDiagnostics::Result result = CameraDiagnostics::NoErrorResult();
@@ -791,14 +786,15 @@ QByteArray RTPSession::calcDefaultNonce() const
 #if 1
 void RTPSession::addAuth( nx_http::Request* const request )
 {
-    if(m_defaultAuthScheme != nx_http::header::AuthScheme::automatic){
+    if(m_defaultAuthScheme != nx_http::header::AuthScheme::automatic)
+    {
         QnClientAuthHelper::addAuthorizationToRequest(
             m_auth,
             request,
             &m_rtspAuthCtx );   //ignoring result
     }
-
-    if(m_defaultAuthScheme == nx_http::header::AuthScheme::automatic){
+    else
+    {
         m_defaultAuthScheme = nx_http::header::AuthScheme::basic;
         m_rtspAuthCtx.authenticateHeader = nx_http::header::WWWAuthenticate(m_defaultAuthScheme);
     }
@@ -1034,11 +1030,12 @@ bool RTPSession::sendSetup()
             QUrl() : QUrl(QString::fromLatin1(trackInfo->setupURL));
 
         request.requestLine.method = "SETUP";
-        if( setupUrl.isRelative() ){
-            request.requestLine.url = QUrl(m_contentBase).resolved(setupUrl);
-
+        if( setupUrl.isRelative() )
+        {
             // SETUP postfix should be writen after url query params. It's invalid url, but it's required according to RTSP standard
-            // To previous comment: where is it defined? I didn't find such requirement in rfc2326
+            request.requestLine.url = m_contentBase
+                    + (m_contentBase.endsWith(lit("/")) ? lit("") : lit("/"))
+                    + setupUrl.toString();
         }
         else
         {

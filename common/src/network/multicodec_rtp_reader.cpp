@@ -43,7 +43,7 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(
     m_role(Qn::CR_Default),
     m_gotData(false),
     m_rtpStarted(false),
-    m_prefferedAuthScheme(nx_http::header::AuthScheme::basic)
+    m_prefferedAuthScheme(nx_http::header::AuthScheme::digest)
 {
     QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(res);
     if (netRes)
