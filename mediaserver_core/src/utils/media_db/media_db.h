@@ -5,6 +5,7 @@
 #include <thread>
 #include <mutex>
 #include <condition_variable>
+#include <cmath>
 
 #include <boost/variant.hpp>
 #include <QtCore>
@@ -32,6 +33,8 @@ enum class RecordType
     CameraOperationAdd = 2,
 };
 
+inline quint64 getBitMask(int width) { return (quint64)std::pow(2, width) - 1; }
+
 struct RecordBase
 {
     quint64 part_1;
@@ -46,26 +49,26 @@ struct MediaFileOperation : RecordBase
     quint64 part_2;
 
     MediaFileOperation(quint64 i1 = 0, quint64 i2 = 0) : RecordBase(i1), part_2(i2) {}
-    int cameraId() const { return (part_1 >> 0x2) & 0x10; }
-    void setCameraId(int cameraId) { part_1 |= ((quint64)cameraId & 0x10) << 0x2; }
+    int cameraId() const { return (part_1 >> 0x2) & 0xffff; }
+    void setCameraId(int cameraId) { part_1 |= ((quint64)cameraId & 0xffff) << 0x2; }
 
-    qint64 startTime() const { return (part_1 >> 0x12) & 0x2All; }
-    void setStartTime(qint64 startTime) { part_1 |= ((quint64)startTime & 0x2All) << 0x12; }
+    qint64 startTime() const { return (part_1 >> 0x12) & getBitMask(0x2all); }
+    void setStartTime(qint64 startTime) { part_1 |= ((quint64)startTime & getBitMask(0x2all)) << 0x12; }
 
     int duration() const
     {
-        quint64 p1 = (part_1 >> 0x3C) & 0x4;
-        quint64 p2 = part_2 & 0x10;
+        quint64 p1 = (part_1 >> 0x3c) & 0xf;
+        quint64 p2 = part_2 & getBitMask(0x10);
         return p2 | (p1 << 0x10);
     }
     void setDuration(int duration)
     {
-        part_1 |= (((quint64)duration >> 0x10) & 0x4) << 0x3C;
-        part_2 |= (quint64)duration & 0x10;
+        part_1 |= (((quint64)duration >> 0x10) & 0xf) << 0x3C;
+        part_2 |= (quint64)duration & getBitMask(0x10);
     }
 
-    qint64 fileSize() const { return (part_2 >> 0x10) & 0x2Fll; }
-    void setFileSize(qint64 fileSize) { part_2 |= ((quint64)fileSize & 0x2Fll) << 0x10; }
+    qint64 fileSize() const { return (part_2 >> 0x10) & getBitMask(0x2Fll); }
+    void setFileSize(qint64 fileSize) { part_2 |= ((quint64)fileSize & getBitMask(0x2Fll)) << 0x10; }
 
     int catalog() const { return (part_2 >> 0x3F) & 0x1; }
     void setCatalog(int catalog) { part_2 |= ((quint64)catalog & 0x1) << 0x3F; }
@@ -80,11 +83,11 @@ struct CameraOperation : RecordBase
           cameraUniqueId(ar)
     {}
 
-    int getCameraUniqueIdLen() const { return (part_1 >> 0x2) & 0xE; }
-    void setCameraUniqueIdLen(int len) { part_1 |= ((quint64)len & 0xE) << 0x2; }
+    int getCameraUniqueIdLen() const { return (part_1 >> 0x2) & getBitMask(0xE); }
+    void setCameraUniqueIdLen(int len) { part_1 |= ((quint64)len & getBitMask(0xE)) << 0x2; }
 
-    int cameraId() const { return (part_1 >> 0x10) & 0x10; }
-    void setCameraId(int cameraId) { part_1 |= ((quint64)cameraId & 0x10) << 0x10; }
+    int cameraId() const { return (part_1 >> 0x10) & getBitMask(0x10); }
+    void setCameraId(int cameraId) { part_1 |= ((quint64)cameraId & getBitMask(0x10)) << 0x10; }
 };
 
 typedef boost::variant<MediaFileOperation, CameraOperation> WriteRecordType;

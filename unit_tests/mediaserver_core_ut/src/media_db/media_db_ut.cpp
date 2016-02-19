@@ -18,24 +18,35 @@ bool recursiveClean(const QString &path);
 class TestDbHelperHandler : public nx::media_db::DbHelperHandler
 {
 public:
+    TestDbHelperHandler(nx::media_db::Error *error) : m_error(error) {}
+
     void handleCameraOp(const nx::media_db::CameraOperation &cameraOp, 
                         nx::media_db::Error error) override
     {
+        ASSERT_TRUE(error == nx::media_db::Error::NoError);
+        *m_error = error;
     }
 
     void handleMediaFileOp(const nx::media_db::MediaFileOperation &mediaFileOp, 
                            nx::media_db::Error error) override
     {
+        ASSERT_TRUE(error == nx::media_db::Error::NoError);
+        *m_error = error;
     }
 
     void handleError(nx::media_db::Error error) override
     {
+        ASSERT_TRUE(error == nx::media_db::Error::NoError);
+        *m_error = error;
     }
 
     void handleRecordWrite(nx::media_db::Error error) override
     {
+        ASSERT_TRUE(error == nx::media_db::Error::NoError);
+        *m_error = error;
     }
 private:
+    nx::media_db::Error *m_error;
 };
 
 template<qint64 From, qint64 To>
@@ -43,7 +54,7 @@ qint64 genRandomNumber()
 {
     static std::random_device rd;
     static std::mt19937 gen(rd());
-    std::uniform_int_distribution<int> dist(From, To);
+    static std::uniform_int_distribution<qint64> dist(From, To);
 
     return dist(gen);
 }
@@ -127,10 +138,10 @@ public:
         nx::media_db::MediaFileOperation fileOp;
         fileOp.setCameraId(tfo.cameraId);
         fileOp.setCatalog(tfo.chunksCatalog);
-        fileOp.setCameraId(tfo.duration);
+        fileOp.setDuration(tfo.duration);
         fileOp.setFileSize(tfo.fileSize);
         fileOp.setRecordType(nx::media_db::RecordType(tfo.code));
-        fileOp.setCameraId(tfo.startTime);
+        fileOp.setStartTime(tfo.startTime);
 
         m_helper->writeRecordAsync(fileOp);
     }
@@ -139,7 +150,7 @@ public:
     {
         nx::media_db::CameraOperation camOp;
         camOp.setCameraId(tco.code);
-        camOp.setCameraId(tco.uuidLen);
+        camOp.setCameraUniqueIdLen(tco.uuidLen);
         camOp.setRecordType(nx::media_db::RecordType(tco.code));
 
         m_helper->writeRecordAsync(camOp);
@@ -161,12 +172,10 @@ struct TestDataManager
 {
     TestDataManager(size_t dataSize)
     {
+        dataVector.emplace_back(generateFileHeader(), false);
         for (size_t i = 0; i < dataSize; ++i) {
-            switch (genRandomNumber<0, 2>()) {
+            switch (genRandomNumber<0, 1>()) {
             case 0:
-                dataVector.emplace_back(generateFileHeader(), false);
-                break;
-            case 1:
                 switch (genRandomNumber<0, 1>()) {
                 case 0:
                     dataVector.emplace_back(generateFileOperation(0), false);
@@ -176,7 +185,7 @@ struct TestDataManager
                     break;
                 }
                 break;
-            case 2:
+            case 1:
                 dataVector.emplace_back(generateCameraOperation(), false);
                 break;
             }
@@ -199,19 +208,38 @@ struct TestDataManager
     TestDataVector dataVector;
 };
 
+QString workDirPath = qApp->applicationDirPath() + lit("/tmp/media_db");
+
 TEST(MediaDb_test, ReadWrite)
 {
-    QString workDirPath = qApp->applicationDirPath() + lit("/tmp/media_db");
     QDir().mkpath(workDirPath);
 
     QFile dbFile(workDirPath + lit("/file.mdb"));
-    dbFile.open(QIODevice::ReadOnly);
-    TestDbHelperHandler testHandler;
+    dbFile.open(QIODevice::ReadWrite);
+
+    nx::media_db::Error error;
+    TestDbHelperHandler testHandler(&error);
     nx::media_db::DbHelper dbHelper(&dbFile, &testHandler);
 
-    TestDataManager tdm(10000);
+    TestDataManager tdm(10);
     for (auto &data : tdm.dataVector)
         boost::apply_visitor(RecordWriteVisitor(&dbHelper), data.data);
 
+    dbFile.close();
+    dbFile.open(QIODevice::ReadWrite);
+
+    uint8_t dbVersion;
+    auto err = dbHelper.readFileHeader(&dbVersion);
+    ASSERT_TRUE(err == nx::media_db::Error::NoError);
+
+    while (error == nx::media_db::Error::NoError)
+        dbHelper.readRecord();
+
+    dbFile.close();
+    recursiveClean(workDirPath);
+}
+
+TEST(MediaDb_test, Cleanup)
+{
     recursiveClean(workDirPath);
 }
