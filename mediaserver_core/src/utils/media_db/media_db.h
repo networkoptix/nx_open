@@ -45,7 +45,7 @@ struct MediaFileOperation : RecordBase
 {
     quint64 part_2;
 
-    MediaFileOperation(quint64 i1, quint64 i2 = 0) : RecordBase(i1), part_2(i2) {}
+    MediaFileOperation(quint64 i1 = 0, quint64 i2 = 0) : RecordBase(i1), part_2(i2) {}
     int cameraId() const { return (part_1 >> 0x2) & 0x10; }
     void setCameraId(int cameraId) { part_1 |= ((quint64)cameraId & 0x10) << 0x2; }
 
@@ -75,7 +75,7 @@ struct CameraOperation : RecordBase
 {
     QByteArray cameraUniqueId;
 
-    CameraOperation(quint64 i1, const QByteArray &ar = QByteArray()) 
+    CameraOperation(quint64 i1 = 0, const QByteArray &ar = QByteArray()) 
         : RecordBase(i1),
           cameraUniqueId(ar)
     {}

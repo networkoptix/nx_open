@@ -97,19 +97,55 @@ public:
 
     template<typename OtherRecord>
     typename std::enable_if<std::is_same<Record, OtherRecord>::value, bool>::type 
-    operator() (const OtherRecord &other)
+    operator() (const OtherRecord &other) const
     {
         return other == m_record;
     }
 
     template<typename OtherRecord>
     typename std::enable_if<!std::is_same<Record, OtherRecord>::value, bool>::type 
-    operator() (const OtherRecord &other)
+    operator() (const OtherRecord &other) const
     {
         return false;
     }
 private:
     Record m_record;
+};
+
+class RecordWriteVisitor : public boost::static_visitor<>
+{
+public:
+    RecordWriteVisitor(nx::media_db::DbHelper *helper) : m_helper(helper) {}
+
+    void operator() (const TestFileHeader &tfh) const
+    {
+        m_helper->writeFileHeader(tfh.dbVersion);
+    }
+
+    void operator() (const TestFileOperation &tfo) const
+    {
+        nx::media_db::MediaFileOperation fileOp;
+        fileOp.setCameraId(tfo.cameraId);
+        fileOp.setCatalog(tfo.chunksCatalog);
+        fileOp.setCameraId(tfo.duration);
+        fileOp.setFileSize(tfo.fileSize);
+        fileOp.setRecordType(nx::media_db::RecordType(tfo.code));
+        fileOp.setCameraId(tfo.startTime);
+
+        m_helper->writeRecordAsync(fileOp);
+    }
+
+    void operator() (const TestCameraOperation &tco) const
+    {
+        nx::media_db::CameraOperation camOp;
+        camOp.setCameraId(tco.code);
+        camOp.setCameraId(tco.uuidLen);
+        camOp.setRecordType(nx::media_db::RecordType(tco.code));
+
+        m_helper->writeRecordAsync(camOp);
+    }
+private:
+    nx::media_db::DbHelper *m_helper;
 };
 
 struct TestData
@@ -152,8 +188,9 @@ struct TestDataManager
     {
         auto it = std::find_if(dataVector.begin(), dataVector.end(),
                                [&record](const TestData &td) {
-                                    return boost::apply_visitor(record, 
-                                                                RecordTestVisitor<Record>(td.data));
+                                    return boost::apply_visitor(
+                                                record, 
+                                                RecordTestVisitor<Record>(td.data));
                                });
         if (it != m_dataVector.end())
             it->visited = true;
@@ -173,7 +210,8 @@ TEST(MediaDb_test, ReadWrite)
     nx::media_db::DbHelper dbHelper(&dbFile, &testHandler);
 
     TestDataManager tdm(10000);
-    for ()
+    for (auto &data : tdm.dataVector)
+        boost::apply_visitor(RecordWriteVisitor(&dbHelper), data.data);
 
     recursiveClean(workDirPath);
 }
