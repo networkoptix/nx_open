@@ -22,7 +22,7 @@ angular.module('webadminApp')
             disabledVendors: {label:"Disabled vendors", type:"text"},
             ec2AliveUpdateIntervalSec: {label:"System alive update interval", type:"number"},
             ec2ConnectionKeepAliveTimeoutSec: {label:"Connection keep alive timeout", type:"number"},
-            ec2KeepAliveProbeCount: {label:"Connection keep probes", type:"number"},
+            ec2KeepAliveProbeCount: {label:"Connection keep alive probes", type:"number"},
             emailFrom: {label:"Email from", type:"text"},
             emailSignature: {label:"Email signature", type:"text"},
             emailSupportEmail: {label:"Support Email", type:"text"},
