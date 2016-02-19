@@ -388,7 +388,7 @@ RTPSession::RTPSession( std::unique_ptr<AbstractStreamSocket> tcpSock )
     m_additionalReadBufferPos( 0 ),
     m_additionalReadBufferSize( 0 ),
     m_userAgent(nx_http::userAgentString()),
-    m_defaultAuthScheme(nx_http::header::AuthScheme::digest)
+    m_defaultAuthScheme(nx_http::header::AuthScheme::basic)
 {
     m_responseBuffer = new quint8[RTSP_BUFFER_LEN];
     m_responseBufferLen = 0;
