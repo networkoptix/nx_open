@@ -260,7 +260,8 @@ public:
 private:
     typedef QnMultiserverRequestContext<QnSendStatisticsRequestData> Context;
 
-    nx_http::StatusCode::Value sendStatisticsLocally(const QByteArray &metricsList);
+    nx_http::StatusCode::Value sendStatisticsLocally(const QByteArray &metricsList
+        , const QString &statisticsServerUrl);
 
     nx_http::StatusCode::Value sendStatisticsRemotely(const QByteArray &metricsList
         , const QnMediaServerResourcePtr &server
@@ -279,8 +280,10 @@ int SendStatisticsActionHandler::executePost(const QnRequestParamList& params
     , QByteArray &/* result */, QByteArray &/*resultContentType*/
     , int port)
 {
+    QnSendStatisticsRequestData requestData =
+        QnMultiserverRequestData::fromParams<QnSendStatisticsRequestData>(params);
+
     // TODO: add support of specified in parameters format, not only json!
-    QnSendStatisticsRequestData requestData;
     const bool correctJson = QJson::deserialize<QnMetricHashesList>(
         body, &requestData.metricsList);
 
@@ -294,7 +297,7 @@ int SendStatisticsActionHandler::executePost(const QnRequestParamList& params
     nx_http::StatusCode::Value resultCode = nx_http::StatusCode::notAcceptable;
     if (request.isLocal)
     {
-        sendStatisticsLocally(body);
+        sendStatisticsLocally(body, request.statisticsServerUrl);
     }
     else
     {
@@ -302,7 +305,7 @@ int SendStatisticsActionHandler::executePost(const QnRequestParamList& params
         for (const auto server: qnResPool->getAllServers(Qn::Online))
         {
             resultCode = (server->getId() == moduleGuid
-                ? sendStatisticsLocally(body)
+                ? sendStatisticsLocally(body, request.statisticsServerUrl)
                 : sendStatisticsRemotely(body, server, &context));
 
             if (resultCode == nx_http::StatusCode::ok)
@@ -314,18 +317,17 @@ int SendStatisticsActionHandler::executePost(const QnRequestParamList& params
 }
 
 nx_http::StatusCode::Value SendStatisticsActionHandler::sendStatisticsLocally(
-    const QByteArray &metricsList)
+    const QByteArray &metricsList
+    , const QString &statisticsServerUrl)
 {
     const auto moduleGuid = qnCommon->moduleGUID();
     const auto server = qnResPool->getResourceById<QnMediaServerResource>(moduleGuid);
     if (!server || !hasInternetConnection(server))
         return nx_http::StatusCode::notAcceptable;
 
-    static const QUrl kStatisticsUrl = QUrl::fromUserInput(lit("http://10.0.3.163/statserver/api/save/clientSessions"));
-
     auto httpCode = nx_http::StatusCode::notAcceptable;
     const auto error = nx_http::uploadDataSync(
-        kStatisticsUrl, metricsList, kJsonContentType, &httpCode);
+        statisticsServerUrl, metricsList, kJsonContentType, &httpCode);
 
     return (error == SystemError::noError
         ? httpCode : nx_http::StatusCode::internalServerError);

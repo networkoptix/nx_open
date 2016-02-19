@@ -268,6 +268,7 @@ void QnStatisticsManager::sendStatistics()
     };
 
     QnSendStatisticsRequestData request;
+    request.statisticsServerUrl = settings.statisticsServerUrl;
     request.metricsList = totalFiltered;
     m_handle = connection->sendStatisticsAsync(request, callback, QThread::currentThread());
 }
