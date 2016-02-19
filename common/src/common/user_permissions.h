@@ -1,6 +1,11 @@
-#ifndef QN_USER_PERMISSIONS_H
-#define QN_USER_PERMISSIONS_H
 
+#pragma once
+
+#ifdef __cplusplus  // For safe iOS build
+#include <utils/common/model_functions_fwd.h>
+#endif
+
+// TODO: #ynikitenkov Add serialization using metaobject
 #ifndef QN_NO_NAMESPACES
 namespace Qn {
 #endif
@@ -67,8 +72,11 @@ namespace Qn {
         AllPermissions                          = 0xFFFFFFFF
     };
 
+#ifdef __cplusplus
+    Q_DECLARE_FLAGS(Permissions, Permission)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(Permissions)
+#endif
+
 #ifndef QN_NO_NAMESPACES
 } // namespace Qn
 #endif
-
-#endif //QN_USER_PERMISSIONS_H

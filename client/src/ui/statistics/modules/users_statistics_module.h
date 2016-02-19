@@ -1,13 +1,16 @@
 
 #pragma once
 
+#include <core/resource/resource_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <statistics/abstract_statistics_module.h>
 
-/// Stores current user permissions
+class QnWorkbenchContext;
+
 class QnUsersStatisticsModule : public QnAbstractStatisticsModule
-    , public QnWorkbenchContextAware
 {
+    Q_OBJECT
+
     typedef QnAbstractStatisticsModule base_type;
 
 public:
@@ -19,6 +22,9 @@ public:
 
     void resetMetrics() override;
 
+    void setContext(QnWorkbenchContext *context);
+
 private:
-    quint64 m_permissions;
+    typedef QPointer<QnWorkbenchContext> ContextPtr;
+    ContextPtr m_context;
 };

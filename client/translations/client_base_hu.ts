@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="hu" sourcelanguage="en">
+<TS version="2.1" language="hu" sourcelanguage="en">
 <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
@@ -321,14 +321,6 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>FPS elrejtése</translation>
     </message>
     <message>
-        <source>Ctrl+Alt+F</source>
-        <translation>Ctrl+Alt+F</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+D</source>
-        <translation>Ctrl+Alt+D</translation>
-    </message>
-    <message>
         <source>Drop Resources</source>
         <translation>Eszköz bedobása</translation>
     </message>
@@ -349,24 +341,12 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Következő elrendezés</translation>
     </message>
     <message>
-        <source>Ctrl+Tab</source>
-        <translation>Ctrl+Tab</translation>
-    </message>
-    <message>
         <source>Previous Layout</source>
         <translation>Előző elrendezés</translation>
     </message>
     <message>
-        <source>Ctrl+Shift+Tab</source>
-        <translation>Ctrl+Shift+Tab</translation>
-    </message>
-    <message>
         <source>Select All</source>
         <translation>Mind kijelölése</translation>
-    </message>
-    <message>
-        <source>Ctrl+A</source>
-        <translation>Ctrl+A</translation>
     </message>
     <message>
         <source>Selection Changed</source>
@@ -383,10 +363,6 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
         <source>Go to Freespace Mode</source>
         <translation>Freespace módra váltás</translation>
-    </message>
-    <message>
-        <source>F11</source>
-        <translation>F11</translation>
     </message>
     <message>
         <source>Help</source>
@@ -429,16 +405,8 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Főmenü</translation>
     </message>
     <message>
-        <source>Alt+Space</source>
-        <translation>Alt+szóköz</translation>
-    </message>
-    <message>
         <source>Connect to Server...</source>
         <translation>Csatlakozás szerverhez...</translation>
-    </message>
-    <message>
-        <source>Ctrl+Shift+C</source>
-        <translation>Ctrl+Shift+C</translation>
     </message>
     <message>
         <source>Logout</source>
@@ -451,10 +419,6 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
         <source>Stop Panic Recording</source>
         <translation>Pánikrögzítés leállítása</translation>
-    </message>
-    <message>
-        <source>Ctrl+P</source>
-        <translation>Ctrl+P</translation>
     </message>
     <message>
         <source>New...</source>
@@ -477,20 +441,12 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Új lapfül</translation>
     </message>
     <message>
-        <source>Ctrl+T</source>
-        <translation>Ctrl+T</translation>
-    </message>
-    <message>
         <source>Window</source>
         <translation>Ablak</translation>
     </message>
     <message>
         <source>New Window</source>
         <translation>Új ablak</translation>
-    </message>
-    <message>
-        <source>Ctrl+N</source>
-        <translation>Ctrl+N</translation>
     </message>
     <message>
         <source>User...</source>
@@ -521,10 +477,6 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Fájl(ok)...</translation>
     </message>
     <message>
-        <source>Ctrl+O</source>
-        <translation>Ctrl+O</translation>
-    </message>
-    <message>
         <source>Layout(s)...</source>
         <translation>Elrendezés(ek)...</translation>
     </message>
@@ -537,20 +489,8 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Jelenlegi elrendezés mentése</translation>
     </message>
     <message>
-        <source>Ctrl+S</source>
-        <translation>Ctrl+S</translation>
-    </message>
-    <message>
         <source>Save Current Layout As...</source>
         <translation>Jelenlegi elrendezés mentése mint...</translation>
-    </message>
-    <message>
-        <source>Ctrl+Shift+S</source>
-        <translation>Ctrl+Shift+S</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+S</source>
-        <translation>Ctrl+Alt+S</translation>
     </message>
     <message>
         <source>Save Video Wall View</source>
@@ -563,14 +503,6 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
         <source>Stop Screen Recording</source>
         <translation>Képernyőfelvétel leállítása</translation>
-    </message>
-    <message>
-        <source>Alt+R</source>
-        <translation>Alt+R</translation>
-    </message>
-    <message>
-        <source>Esc</source>
-        <translation>Esc</translation>
     </message>
     <message>
         <source>Stop current action</source>
@@ -597,18 +529,6 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Visszaállítás tálcaméretre</translation>
     </message>
     <message>
-        <source>Alt+Enter</source>
-        <translation>Alt+Enter</translation>
-    </message>
-    <message>
-        <source>Alt+Return</source>
-        <translation>Alt+Return</translation>
-    </message>
-    <message>
-        <source>Ctrl+F</source>
-        <translation>Ctrl+F</translation>
-    </message>
-    <message>
         <source>Show Message</source>
         <translation>Üzenet megjelenítése</translation>
     </message>
@@ -629,10 +549,6 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Rendszer adminisztráció...</translation>
     </message>
     <message>
-        <source>Ctrl+Alt+A</source>
-        <translation>Ctrl+Alt+A</translation>
-    </message>
-    <message>
         <source>Open Web Client...</source>
         <translation>Megnyitás web kliensben...</translation>
     </message>
@@ -643,18 +559,6 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
         <source>Local Settings...</source>
         <translation>Helyi beállítások...</translation>
-    </message>
-    <message>
-        <source>Ctrl+E</source>
-        <translation>Ctrl+E</translation>
-    </message>
-    <message>
-        <source>Ctrl+L</source>
-        <translation>Ctrl+L</translation>
-    </message>
-    <message>
-        <source>Ctrl+M</source>
-        <translation>Ctrl+M</translation>
     </message>
     <message>
         <source>Merge Systems...</source>
@@ -669,16 +573,8 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Névjegy...</translation>
     </message>
     <message>
-        <source>F1</source>
-        <translation>F1</translation>
-    </message>
-    <message>
         <source>Exit</source>
         <translation>Kilépés</translation>
-    </message>
-    <message>
-        <source>Alt+F4</source>
-        <translation>Alt+F4</translation>
     </message>
     <message>
         <source>Server...</source>
@@ -721,14 +617,6 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Tartalmazó mappa megnyitása</translation>
     </message>
     <message>
-        <source>Ctrl+Enter</source>
-        <translation>Ctrl+Enter</translation>
-    </message>
-    <message>
-        <source>Ctrl+Return</source>
-        <translation>Ctrl+Return</translation>
-    </message>
-    <message>
         <source>Identify</source>
         <translation>Azonosítás</translation>
     </message>
@@ -751,10 +639,6 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
         <source>Delete</source>
         <translation>Törlés</translation>
-    </message>
-    <message>
-        <source>Del</source>
-        <translation>Del</translation>
     </message>
     <message>
         <source>Update Layout</source>
@@ -781,24 +665,12 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Elem maximalizálása</translation>
     </message>
     <message>
-        <source>Enter</source>
-        <translation>Enter</translation>
-    </message>
-    <message>
-        <source>Return</source>
-        <translation>Return</translation>
-    </message>
-    <message>
         <source>Restore Item</source>
         <translation>Elem visszaállítása</translation>
     </message>
     <message>
         <source>Show Info</source>
         <translation>Info megjelenítése</translation>
-    </message>
-    <message>
-        <source>Alt+I</source>
-        <translation>Alt+I</translation>
     </message>
     <message>
         <source>Hide Info</source>
@@ -853,10 +725,6 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>MOzgás megjelenítése</translation>
     </message>
     <message>
-        <source>Alt+G</source>
-        <translation>Alt+G</translation>
-    </message>
-    <message>
         <source>Hide Motion/Smart Search</source>
         <translation>Mozgás elrejtése/Okoskeresés</translation>
     </message>
@@ -877,24 +745,12 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Vízjel ellenőrzése</translation>
     </message>
     <message>
-        <source>Alt+C</source>
-        <translation>Alt+C</translation>
-    </message>
-    <message>
         <source>Take Screenshot</source>
         <translation>Fénykép készítése</translation>
     </message>
     <message>
-        <source>Alt+S</source>
-        <translation>Alt+S</translation>
-    </message>
-    <message>
         <source>Image Enhancement...</source>
         <translation>Kép javítása...</translation>
-    </message>
-    <message>
-        <source>Alt+J</source>
-        <translation>Alt+J</translation>
     </message>
     <message>
         <source>Create Zoom Window</source>
@@ -927,10 +783,6 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
         <source>Rename</source>
         <translation>Átnevezés</translation>
-    </message>
-    <message>
-        <source>F2</source>
-        <translation>F2</translation>
     </message>
     <message>
         <source>Delete from Disk</source>
@@ -1009,16 +861,8 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Túra leállítása</translation>
     </message>
     <message>
-        <source>Alt+T</source>
-        <translation>Alt+T</translation>
-    </message>
-    <message>
         <source>Close</source>
         <translation>Bezár</translation>
-    </message>
-    <message>
-        <source>Ctrl+W</source>
-        <translation>Ctrl+W</translation>
     </message>
     <message>
         <source>Close All But This</source>
@@ -1029,16 +873,8 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Adja meg a jelölés kezdetét</translation>
     </message>
     <message>
-        <source>[</source>
-        <translation>[</translation>
-    </message>
-    <message>
         <source>Mark Selection End</source>
         <translation>Adja meg a jelölés végét</translation>
-    </message>
-    <message>
-        <source>]</source>
-        <translation>]</translation>
     </message>
     <message>
         <source>Clear Selection</source>
@@ -1069,50 +905,6 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Keresés előnézet...</translation>
     </message>
     <message>
-        <source>Ctrl+Alt+Shift++</source>
-        <translation>Ctrl+Alt+Shift++</translation>
-    </message>
-    <message>
-        <source>Increment Debug Counter</source>
-        <translation>Növekvő hibaszűrésszámláló</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift+-</source>
-        <translation>Ctrl+Alt+Shift++</translation>
-    </message>
-    <message>
-        <source>Decrement Debug Counter</source>
-        <translation>Csökkenő hibaszűrésszámláló</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift+R</source>
-        <translation>Ctrl+Alt+Shift+R</translation>
-    </message>
-    <message>
-        <source>Show Resource Pool</source>
-        <translation>Eszközpark megjelenítése</translation>
-    </message>
-    <message>
-        <source>Calibrate PTZ</source>
-        <translation>PTZ kalibrálás</translation>
-    </message>
-    <message>
-        <source>Get PTZ Position</source>
-        <translation>PTZ pozíció megadása</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift+D</source>
-        <translation>Ctrl+Alt+Shift+D</translation>
-    </message>
-    <message>
-        <source>Debug Control Panel</source>
-        <translation>Hibaszűrés vezérlőpanel</translation>
-    </message>
-    <message>
-        <source>Space</source>
-        <translation>Szóköz</translation>
-    </message>
-    <message>
         <source>Play</source>
         <translation>Play</translation>
     </message>
@@ -1121,72 +913,36 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>Pause</translation>
     </message>
     <message>
-        <source>Ctrl+Left</source>
-        <translation>Ctrl+bal</translation>
-    </message>
-    <message>
         <source>Previous Frame</source>
         <translation>Előző kocka</translation>
-    </message>
-    <message>
-        <source>Ctrl+Right</source>
-        <translation>Ctrl+jobb</translation>
     </message>
     <message>
         <source>Next Frame</source>
         <translation>Következő kocka</translation>
     </message>
     <message>
-        <source>Z</source>
-        <translation>Z</translation>
-    </message>
-    <message>
         <source>To Start</source>
         <translation>Elejéhez</translation>
-    </message>
-    <message>
-        <source>X</source>
-        <translation>X</translation>
     </message>
     <message>
         <source>To End</source>
         <translation>Végéhez</translation>
     </message>
     <message>
-        <source>Ctrl+Up</source>
-        <translation>Ctrl+fel</translation>
-    </message>
-    <message>
         <source>Volume Down</source>
         <translation>Hangerő le</translation>
-    </message>
-    <message>
-        <source>Ctrl+Down</source>
-        <translation>Ctrl+le</translation>
     </message>
     <message>
         <source>Volume Up</source>
         <translation>Hangerő fel</translation>
     </message>
     <message>
-        <source>M</source>
-        <translation>M</translation>
-    </message>
-    <message>
         <source>Toggle Mute</source>
         <translation>Némitás váltása</translation>
     </message>
     <message>
-        <source>L</source>
-        <translation>L</translation>
-    </message>
-    <message>
         <source>Jump to Live</source>
         <translation>Élőmódba ugrás</translation>
-    </message>
-    <message>
-        <source>S</source>
-        <translation>S</translation>
     </message>
     <message>
         <source>Synchronize Streams</source>
@@ -1251,10 +1007,6 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
         <source>Unpin Notifications</source>
         <translation>Figylemeztetések feloldása</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+T</source>
-        <translation>Ctrl+Alt+T</translation>
     </message>
     <message>
         <source>Disable Background Animation</source>
@@ -1379,10 +1131,6 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
         <source>Cameras to Backup...</source>
         <translation>Kamerák biztonsági mentése...</translation>
-    </message>
-    <message>
-        <source>Ctrl+B</source>
-        <translation>Ctrl+B</translation>
     </message>
     <message>
         <source>Show Bookmarks</source>
@@ -1959,9 +1707,11 @@ több könyvjelző megjelenítéséhez</translation>
         <source>Source camera</source>
         <translation>Forrás kamera</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Source and %n more cameras</source>
-        <translation>Forrás és még %n kamera</translation>
+        <translation type="unfinished">
+            <numerusform>Forrás és még %n kamera</numerusform>
+        </translation>
     </message>
     <message>
         <source>N/A</source>
@@ -5038,17 +4788,23 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <source>&lt;All My I/O Modules&gt;</source>
         <translation>&lt;Minden saját I/O modul&gt;</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n device(s)&gt;</source>
-        <translation>&lt;%n eszköz&gt;</translation>
+        <translation type="unfinished">
+            <numerusform>&lt;%n eszköz&gt;</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n camera(s)&gt;</source>
-        <translation>&lt;%n kamera&gt;</translation>
+        <translation type="unfinished">
+            <numerusform>&lt;%n kamera&gt;</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n I/O module(s)&gt;</source>
-        <translation>&lt;%n I/O modul&gt;</translation>
+        <translation type="unfinished">
+            <numerusform>&lt;%n I/O modul&gt;</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -5803,13 +5559,17 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <source>Notice: Only further recording will be backed up. Backup process will ignore existing footage.</source>
         <translation>Megjegyzés: Csak az újabb adatok biztonsági mentése lesz lehetséges. A meglévő fájlokat figyelmen kívül fogja hagyni.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n Camera(s)</source>
-        <translation>%n kamera</translation>
+        <translation type="unfinished">
+            <numerusform>%n kamera</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n Device(s)</source>
-        <translation>%n eszköz</translation>
+        <translation type="unfinished">
+            <numerusform>%n eszköz</numerusform>
+        </translation>
     </message>
     <message>
         <source>Backup is finished</source>
@@ -6847,9 +6607,11 @@ Ha szeretné kikapcsolni ezt a funkciót, a Rendszer Beállítások menüben meg
         <source>Press %1 to search bookmarks</source>
         <translation>Nyomja meg a %1(e)t a könyvjelzők kereséséhez</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Are you sure you want to delete these %n bookmarks?</source>
-        <translation>Biztosan törli ezt a %n könyvjelzőt?</translation>
+        <translation type="unfinished">
+            <numerusform>Biztosan törli ezt a %n könyvjelzőt?</numerusform>
+        </translation>
     </message>
 </context>
 <context>

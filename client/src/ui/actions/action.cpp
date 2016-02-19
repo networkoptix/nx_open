@@ -28,7 +28,7 @@
 #include "action_factories.h"
 #include "action_parameter_types.h"
 
-QnAction::QnAction(Qn::ActionId id, QObject *parent):
+QnAction::QnAction(QnActions::IDType id, QObject *parent):
     QAction(parent),
     QnWorkbenchContextAware(parent),
     m_id(id),

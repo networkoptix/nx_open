@@ -9,6 +9,7 @@ namespace
     QnCameraBookmark createValidBookmark(qint64 startTimeMs = 0) {
         QnCameraBookmark result;
         result.guid = QnUuid::createUuid();
+        result.name = lit("Bookmark");
         result.cameraId = "testcamera";
         result.startTimeMs = startTimeMs;
         result.durationMs = kDefaultBookmarkDurationMs;

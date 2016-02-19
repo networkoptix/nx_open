@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="ko" sourcelanguage="en">
+<TS version="2.1" language="ko" sourcelanguage="en">
 <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
@@ -319,10 +319,6 @@ to view more bookmarks</source>
         <translation>프레임 숨김</translation>
     </message>
     <message>
-        <source>Ctrl+Alt+F</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Drop Resources</source>
         <translation>리스소 이동</translation>
     </message>
@@ -339,24 +335,12 @@ to view more bookmarks</source>
         <translation>다음 레이아웃</translation>
     </message>
     <message>
-        <source>Ctrl+Tab</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Previous Layout</source>
         <translation>이전 레이아웃</translation>
     </message>
     <message>
-        <source>Ctrl+Shift+Tab</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Select All</source>
         <translation>전체 선택</translation>
-    </message>
-    <message>
-        <source>Ctrl+A</source>
-        <translation></translation>
     </message>
     <message>
         <source>Selection Changed</source>
@@ -369,10 +353,6 @@ to view more bookmarks</source>
     <message>
         <source>Go to Freespace Mode</source>
         <translation>여유 공간 모드로 이동</translation>
-    </message>
-    <message>
-        <source>F11</source>
-        <translation></translation>
     </message>
     <message>
         <source>Help</source>
@@ -403,16 +383,8 @@ to view more bookmarks</source>
         <translation>주 메뉴</translation>
     </message>
     <message>
-        <source>Alt+Space</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Connect to Server...</source>
         <translation>서버 연결...</translation>
-    </message>
-    <message>
-        <source>Ctrl+Shift+C</source>
-        <translation></translation>
     </message>
     <message>
         <source>Logout</source>
@@ -425,10 +397,6 @@ to view more bookmarks</source>
     <message>
         <source>Stop Panic Recording</source>
         <translation>긴급 녹화 멈춤</translation>
-    </message>
-    <message>
-        <source>Ctrl+P</source>
-        <translation></translation>
     </message>
     <message>
         <source>New...</source>
@@ -451,20 +419,12 @@ to view more bookmarks</source>
         <translation>신규 탭</translation>
     </message>
     <message>
-        <source>Ctrl+T</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Window</source>
         <translation>윈도우</translation>
     </message>
     <message>
         <source>New Window</source>
         <translation>신규 윈도우</translation>
-    </message>
-    <message>
-        <source>Ctrl+N</source>
-        <translation></translation>
     </message>
     <message>
         <source>User...</source>
@@ -495,10 +455,6 @@ to view more bookmarks</source>
         <translation>파일...</translation>
     </message>
     <message>
-        <source>Ctrl+O</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Layout(s)...</source>
         <translation>레이아웃...</translation>
     </message>
@@ -511,16 +467,8 @@ to view more bookmarks</source>
         <translation>현재 레이아웃 저장</translation>
     </message>
     <message>
-        <source>Ctrl+S</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Save Current Layout As...</source>
         <translation>현재 레이아웃 다른이름으로 저장...</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+S</source>
-        <translation></translation>
     </message>
     <message>
         <source>Save Video Wall View</source>
@@ -535,14 +483,6 @@ to view more bookmarks</source>
         <translation>화면 저장 멈춤</translation>
     </message>
     <message>
-        <source>Alt+R</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Esc</source>
-        <translation>취소</translation>
-    </message>
-    <message>
         <source>Stop current action</source>
         <translation>현재 동작 멈춤</translation>
     </message>
@@ -553,18 +493,6 @@ to view more bookmarks</source>
     <message>
         <source>Exit Fullscreen</source>
         <translation>전체화면 나가기</translation>
-    </message>
-    <message>
-        <source>Ctrl+F</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Alt+Enter</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Alt+Return</source>
-        <translation></translation>
     </message>
     <message>
         <source>Minimize</source>
@@ -595,18 +523,6 @@ to view more bookmarks</source>
         <translation>웹 클라이언트 열기...</translation>
     </message>
     <message>
-        <source>Ctrl+E</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Ctrl+L</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Ctrl+M</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>How-to Videos and FAQ...</source>
         <translation>사용법 동영상과 FAQ...</translation>
     </message>
@@ -615,16 +531,8 @@ to view more bookmarks</source>
         <translation>상세...</translation>
     </message>
     <message>
-        <source>F1</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Exit</source>
         <translation>나가기</translation>
-    </message>
-    <message>
-        <source>Alt+F4</source>
-        <translation></translation>
     </message>
     <message>
         <source>Merge to Currently Connected System...</source>
@@ -635,20 +543,12 @@ to view more bookmarks</source>
         <translation>닫기</translation>
     </message>
     <message>
-        <source>Ctrl+W</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Close All But This</source>
         <translation>현재창을 제외한 모든 창 닫기</translation>
     </message>
     <message>
         <source>Open in Layout</source>
         <translation>레이아웃 열기</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+D</source>
-        <translation></translation>
     </message>
     <message>
         <source>Delayed Open Video Wall</source>
@@ -665,10 +565,6 @@ to view more bookmarks</source>
     <message>
         <source>System Administration...</source>
         <translation>관리자...</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+A</source>
-        <translation></translation>
     </message>
     <message>
         <source>System Update...</source>
@@ -719,14 +615,6 @@ to view more bookmarks</source>
         <translation>연결된 폴더 열기</translation>
     </message>
     <message>
-        <source>Ctrl+Enter</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Ctrl+Return</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Identify</source>
         <translation>확인</translation>
     </message>
@@ -771,24 +659,12 @@ to view more bookmarks</source>
         <translation>최대화</translation>
     </message>
     <message>
-        <source>Enter</source>
-        <translation>확인</translation>
-    </message>
-    <message>
-        <source>Return</source>
-        <translation>되돌리기</translation>
-    </message>
-    <message>
         <source>Restore Item</source>
         <translation>복원</translation>
     </message>
     <message>
         <source>Show Info</source>
         <translation>정보 보기</translation>
-    </message>
-    <message>
-        <source>Alt+I</source>
-        <translation></translation>
     </message>
     <message>
         <source>Hide Info</source>
@@ -855,10 +731,6 @@ to view more bookmarks</source>
         <translation>움직임 보기</translation>
     </message>
     <message>
-        <source>Alt+G</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Hide Motion/Smart Search</source>
         <translation>모션/스마트 검색 숨김</translation>
     </message>
@@ -879,24 +751,12 @@ to view more bookmarks</source>
         <translation>파일 변조 확인</translation>
     </message>
     <message>
-        <source>Alt+C</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Take Screenshot</source>
         <translation>스크린 샷</translation>
     </message>
     <message>
-        <source>Alt+S</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Image Enhancement...</source>
         <translation>이미지 향상...</translation>
-    </message>
-    <message>
-        <source>Alt+J</source>
-        <translation></translation>
     </message>
     <message>
         <source>Create Zoom Window</source>
@@ -927,24 +787,12 @@ to view more bookmarks</source>
         <translation>레이아웃 제거</translation>
     </message>
     <message>
-        <source>Del</source>
-        <translation>제거</translation>
-    </message>
-    <message>
-        <source>Ctrl+Shift+S</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Delete</source>
         <translation>삭제</translation>
     </message>
     <message>
         <source>Rename</source>
         <translation>이름변경</translation>
-    </message>
-    <message>
-        <source>F2</source>
-        <translation></translation>
     </message>
     <message>
         <source>Delete from Disk</source>
@@ -1015,24 +863,12 @@ to view more bookmarks</source>
         <translation>전환 멈춤</translation>
     </message>
     <message>
-        <source>Alt+T</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Mark Selection Start</source>
         <translation>시작 위치</translation>
     </message>
     <message>
-        <source>[</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Mark Selection End</source>
         <translation>종료 위치</translation>
-    </message>
-    <message>
-        <source>]</source>
-        <translation></translation>
     </message>
     <message>
         <source>Clear Selection</source>
@@ -1063,50 +899,6 @@ to view more bookmarks</source>
         <translation>미리보기 검색...</translation>
     </message>
     <message>
-        <source>Ctrl+Alt+Shift++</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Increment Debug Counter</source>
-        <translation>디버그 횟수 증분</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift+-</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Decrement Debug Counter</source>
-        <translation>디버그 횟수 감소</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift+R</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Show Resource Pool</source>
-        <translation>리스소 공간 보기</translation>
-    </message>
-    <message>
-        <source>Calibrate PTZ</source>
-        <translation>PTZ 교정</translation>
-    </message>
-    <message>
-        <source>Get PTZ Position</source>
-        <translation>PTZ 위치 가져오기</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift+D</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Debug Control Panel</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Space</source>
-        <translation>여유공간</translation>
-    </message>
-    <message>
         <source>Play</source>
         <translation>재생</translation>
     </message>
@@ -1115,72 +907,36 @@ to view more bookmarks</source>
         <translation>일시정지</translation>
     </message>
     <message>
-        <source>Ctrl+Left</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Previous Frame</source>
         <translation>이전 프레임</translation>
-    </message>
-    <message>
-        <source>Ctrl+Right</source>
-        <translation></translation>
     </message>
     <message>
         <source>Next Frame</source>
         <translation>다음 프레임</translation>
     </message>
     <message>
-        <source>Z</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>To Start</source>
         <translation>시작</translation>
-    </message>
-    <message>
-        <source>X</source>
-        <translation></translation>
     </message>
     <message>
         <source>To End</source>
         <translation>종료</translation>
     </message>
     <message>
-        <source>Ctrl+Up</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Volume Down</source>
         <translation>볼륨 낮춤</translation>
-    </message>
-    <message>
-        <source>Ctrl+Down</source>
-        <translation></translation>
     </message>
     <message>
         <source>Volume Up</source>
         <translation>볼륨 높임</translation>
     </message>
     <message>
-        <source>M</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Toggle Mute</source>
         <translation>음소거</translation>
     </message>
     <message>
-        <source>L</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Jump to Live</source>
         <translation>라이브 점프</translation>
-    </message>
-    <message>
-        <source>S</source>
-        <translation></translation>
     </message>
     <message>
         <source>Synchronize Streams</source>
@@ -1245,10 +1001,6 @@ to view more bookmarks</source>
     <message>
         <source>Unpin Notifications</source>
         <translation>알림 비고정</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+T</source>
-        <translation></translation>
     </message>
     <message>
         <source>Disable Background Animation</source>
@@ -1377,10 +1129,6 @@ to view more bookmarks</source>
     <message>
         <source>Cameras to Backup...</source>
         <translation>백업할 카메라</translation>
-    </message>
-    <message>
-        <source>Ctrl+B</source>
-        <translation>Ctrl+B</translation>
     </message>
     <message>
         <source>Show Bookmarks</source>
@@ -1957,9 +1705,11 @@ to view more bookmarks</source>
         <source>Source camera</source>
         <translation>선택된 카메라</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Source and %n more cameras</source>
-        <translation></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>N/A</source>
@@ -5035,17 +4785,23 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>&lt;All My I/O Modules&gt;</source>
         <translation>모든 내 I/O 모듈</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n device(s)&gt;</source>
-        <translation>%n 장치들</translation>
+        <translation type="unfinished">
+            <numerusform>%n 장치들</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n camera(s)&gt;</source>
-        <translation>%n 카메라들</translation>
+        <translation type="unfinished">
+            <numerusform>%n 카메라들</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n I/O module(s)&gt;</source>
-        <translation>%n I/O 모듈들</translation>
+        <translation type="unfinished">
+            <numerusform>%n I/O 모듈들</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -5800,13 +5556,17 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Notice: Only further recording will be backed up. Backup process will ignore existing footage.</source>
         <translation>알림:백업시 현재 데이터는 무시하고 앞으로 녹화되는 데이터만 백업 됩니다.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n Camera(s)</source>
-        <translation>%n 카메라들</translation>
+        <translation type="unfinished">
+            <numerusform>%n 카메라들</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n Device(s)</source>
-        <translation>%n 장비들</translation>
+        <translation type="unfinished">
+            <numerusform>%n 장비들</numerusform>
+        </translation>
     </message>
     <message>
         <source>Backup is finished</source>
@@ -6843,9 +6603,11 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Press %1 to search bookmarks</source>
         <translation>북마크 검색을 하려면 %1을 누르세요</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Are you sure you want to delete these %n bookmarks?</source>
-        <translation>%n 개의 북마크를 삭제하시겠습니까?</translation>
+        <translation type="unfinished">
+            <numerusform>%n 개의 북마크를 삭제하시겠습니까?</numerusform>
+        </translation>
     </message>
 </context>
 <context>

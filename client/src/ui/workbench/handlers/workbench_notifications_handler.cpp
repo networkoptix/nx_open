@@ -52,7 +52,7 @@ QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent
     connect(messageProcessor,   &QnCommonMessageProcessor::timeServerSelectionRequired,     this,   [this] {
         setSystemHealthEventVisible(QnSystemHealth::NoPrimaryTimeServer, true);
     });
-    connect( action( Qn::SelectTimeServerAction ), &QAction::triggered,                     this,   [this] {
+    connect( action(QnActions::SelectTimeServerAction), &QAction::triggered,                     this,   [this] {
         setSystemHealthEventVisible( QnSystemHealth::NoPrimaryTimeServer, false );
     } );
 

@@ -3,13 +3,14 @@
 
 #include <QtCore/QObject>
 
+#include <utils/common/connective.h>
 #include <statistics/statistics_fwd.h>
 
-class QnAbstractStatisticsModule : public QObject
+class QnAbstractStatisticsModule : public Connective<QObject>
 {
     Q_OBJECT
 
-    typedef QObject base_type;
+    typedef Connective<QObject> base_type;
 
 public:
     QnAbstractStatisticsModule(QObject *parent = nullptr);
