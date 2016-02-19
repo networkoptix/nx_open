@@ -59,6 +59,17 @@ qint64 genRandomNumber()
     return dist(gen);
 }
 
+void generateCameraUid(QByteArray *camUid, size_t n)
+{
+    camUid->resize(n);
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    static std::uniform_int_distribution<int> dist(65, 90);
+
+    for (size_t i = 0; i < n; i++)
+        camUid->append(dist(gen));
+}
+
 struct TestFileHeader
 {
     int dbVersion;
@@ -91,11 +102,16 @@ struct TestCameraOperation
     int code;
     int uuidLen;
     int id;
+    QByteArray camUniqueId;
 };
 
 TestCameraOperation generateCameraOperation()
 {
-    return{ 2, (int)genRandomNumber<0, 16383>(), (int)genRandomNumber<0, 65535>() };
+    int camUidLen = (int)genRandomNumber<5, 30>();
+    QByteArray camUid;
+    generateCameraUid(&camUid, camUidLen);
+
+    return{ 2, camUidLen, (int)genRandomNumber<0, 65535>(), camUid };
 }
 
 typedef boost::variant<TestFileHeader, TestFileOperation, TestCameraOperation> TestRecord;
@@ -149,9 +165,10 @@ public:
     void operator() (const TestCameraOperation &tco) const
     {
         nx::media_db::CameraOperation camOp;
-        camOp.setCameraId(tco.code);
+        camOp.setCameraId(tco.id);
         camOp.setCameraUniqueIdLen(tco.uuidLen);
         camOp.setRecordType(nx::media_db::RecordType(tco.code));
+        camOp.setCameraUniqueId(tco.camUniqueId);
 
         m_helper->writeRecordAsync(camOp);
     }

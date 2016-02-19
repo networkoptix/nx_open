@@ -15,7 +15,7 @@ QDataStream &operator << (QDataStream &stream, const CameraOperation &cameraOp)
 
 QDataStream &operator >> (QDataStream &stream, CameraOperation &cameraOp)
 {
-    return stream >> cameraOp.part_1>> cameraOp.cameraUniqueId;
+    return stream >> cameraOp.part_1 >> cameraOp.cameraUniqueId;
 }
 
 template<typename StructToWrite>

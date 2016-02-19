@@ -88,6 +88,9 @@ struct CameraOperation : RecordBase
 
     int cameraId() const { return (part_1 >> 0x10) & getBitMask(0x10); }
     void setCameraId(int cameraId) { part_1 |= ((quint64)cameraId & getBitMask(0x10)) << 0x10; }
+
+    QByteArray getCameraUniqueId() const { return cameraUniqueId; }
+    void setCameraUniqueId(const QByteArray &uniqueId) { cameraUniqueId = uniqueId; }
 };
 
 typedef boost::variant<MediaFileOperation, CameraOperation> WriteRecordType;
