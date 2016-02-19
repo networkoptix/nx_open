@@ -68,7 +68,7 @@ struct TestFileOperation
 
 TestFileOperation generateFileOperation()
 {
-    return{ genRandomNumber<0, LLONG_MAX>(), genRandomNumber<0, LLONG_MAX>(),
+    return{ genRandomNumber<0, 4398046511103LL>(), genRandomNumber<0, 140737488355327LL>(),
             (int)genRandomNumber<0, 1>(), (int)genRandomNumber<0, 65535>(),
             (int)genRandomNumber<0, 1048575>(), (int)genRandomNumber<0, 1>() };
 }
