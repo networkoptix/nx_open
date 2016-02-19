@@ -186,9 +186,10 @@ angular.module('webadminApp')
             },
 
 
-            mergeSystems: function(url,password,currentPassword,keepMySystem){
+            mergeSystems: function(url, remoteLogin, remotePassword, currentPassword, keepMySystem){
                 return wrapPost(proxy + '/api/mergeSystems?' + $.param({
-                    password: password,
+                    login: remoteLogin,
+                    password: remotePassword,
                     currentPassword: currentPassword,
                     url: url,
                     takeRemoteSettings: !keepMySystem

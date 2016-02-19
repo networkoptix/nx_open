@@ -15,7 +15,7 @@
     </p>
     <form class="master-controls">
         <div class="form-group">
-            <input type="text" class="form-control" placeholder="System name">
+            <input ng-model="settings.systemName" type="text" class="form-control" placeholder="System name">
         </div>
     </form>
     <p class="vertical-bottom">
@@ -43,10 +43,10 @@
     <h2>Connect to <span class="product-name">Nx Cloud</span></h2>
     <form class="master-controls">
         <div class="form-group">
-            <input class="form-control" type="email" placeholder="Email">
+            <input ng-model="settings.cloudEmail" class="form-control" type="email" placeholder="Email">
         </div>
         <div class="form-group">
-            <input class="form-control" type="password" placeholder="Password">
+            <input ng-model="settings.cloudPassword" class="form-control" type="password" placeholder="Password">
         </div>
     </form>
 </div>
@@ -55,12 +55,12 @@
     <h2>Create administrator user</h2>
     <form class="master-controls">
         <div class="form-group">
-            <input class="form-control" type="text" placeholder="Login">
+            <input ng-model="settings.localLogin" class="form-control" type="text" placeholder="Login">
         </div>
         <div class="form-group">
-            <input class="form-control" type="password" placeholder="Password"></div>
+            <input ng-model="settings.localPassword" class="form-control" type="password" placeholder="Password"></div>
         <div class="form-group">
-            <input class="form-control" type="password" placeholder="Repeat password">
+            <input ng-model="settings.localPasswordConfirm" class="form-control" type="password" placeholder="Repeat password">
         </div>
     </form>
 </div>
@@ -68,17 +68,32 @@
 <div class="panel-body text-center" ng-if="stepIs('merge')">
     <h2>Connect server to existing system</h2>
     <form class="master-controls">
+
         <div class="form-group">
-            <input class="form-control" type="text" placeholder="Select system">
+            <div class="input-group" dropdown>
+                <input ng-model="settings.remoteSystem" ng-change="findSystem" type="text" class="form-control"
+                       id="otherSystemUrl" placeholder="http(s)://host:port" required />
+
+                <ul class="dropdown-menu" role="menu" id="discoveredUrls">
+                    <li ng-if="discoveredUrls.length == 0" id="no-systems-message"><a>No systems found</a></li>
+                    <li ng-repeat="system in discoveredUrls">
+                        <a ng-click="selectSystem(system);">{{system.systemName}} ({{system.ip}} - {{system.name}})</a>
+                    </li>
+                </ul>
+
+                <span type="button" class="input-group-addon dropdown-toggle">
+                    <span class="caret"></span>
+                </span>
+            </div>
             <p class="help-block text-left">
-                10.0.3.43:7001 (Server1)
+                {{settings.remoteSystemHint}}
             </p>
         </div>
         <div class="form-group">
-            <input class="form-control" type="text" placeholder="Login">
+            <input ng-model="settings.remoteLogin" class="form-control" type="text" placeholder="Login">
         </div>
         <div class="form-group">
-            <input class="form-control" type="password" placeholder="Password">
+            <input ng-model="settings.remotePassword" class="form-control" type="password" placeholder="Password">
         </div>
     </form>
 </div>

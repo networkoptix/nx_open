@@ -1,4 +1,5 @@
 'use strict';
+/*exported Config */
 
 var Config = {
     globalEditServersPermissions:0x00000020 ,
@@ -6,6 +7,7 @@ var Config = {
     globalViewLivePermission:0x00000080,
 
     cloud:{
+        apiUrl: 'http://cloud-demo.hdw.mx/api',
         portalWhiteList:'http://cloud-demo.hdw.mx/**',
         portalUrl: 'http://cloud-demo.hdw.mx',
         portalRegisterUrl: 'http://cloud-demo.hdw.mx/static/index.html#/register',
