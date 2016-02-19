@@ -1,15 +1,19 @@
 
 #pragma once
 
-#include <ui/statistics/modules/module_private/abstract_multimetric.h>
+
+#include <statistics/base/base_fwd.h>
+#include <statistics/base/statistics_values_provider.h>
 
 class QnAction;
 class QnActionManager;
 class TimeDurationMetric;
 
 class AbstractActionsMetrics : public QObject
-    , public AbstractMultimetric
+    , public QnStatisticsValuesProvider
 {
+    Q_OBJECT
+
     typedef QObject base_type;
 
 public:
@@ -25,12 +29,14 @@ protected:
 
 class ActionsTriggeredCountMetrics : public AbstractActionsMetrics
 {
+    Q_OBJECT
+
     typedef AbstractActionsMetrics base_type;
 
 public:
     ActionsTriggeredCountMetrics(QnActionManager *actionManager);
 
-    QnMetricsHash metrics() const override;
+    QnStatisticValuesHash values() const override;
 
     void reset() override;
 
@@ -47,6 +53,8 @@ private:
 
 class ActionCheckedTimeMetric : public AbstractActionsMetrics
 {
+    Q_OBJECT
+
     typedef AbstractActionsMetrics base_type;
 
 public:
@@ -54,7 +62,7 @@ public:
 
     virtual ~ActionCheckedTimeMetric();
 
-    QnMetricsHash metrics() const override;
+    QnStatisticValuesHash values() const override;
 
     void reset() override;
 
@@ -62,8 +70,5 @@ protected:
     void addActionMetric(QnAction *action) override;
 
 private:
-    typedef QSharedPointer<TimeDurationMetric> TimeDurationMetricPtr;
-    typedef QHash<int, TimeDurationMetricPtr> MetricsHash;
-
-    MetricsHash m_metrics;
+    QnMetricsContainerPtr m_metrics;
 };

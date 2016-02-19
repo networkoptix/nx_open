@@ -304,7 +304,8 @@ void QnResourceWidget::setupIconButton(QGraphicsLinearLayout *layout
 
 void QnResourceWidget::insertIconButtonCopy(QGraphicsLinearLayout *layout)
 {
-    auto iconButtonCopy = new QnImageButtonWidget();
+    auto iconButtonCopy = new QnImageButtonWidget(QString()); // It is non-clickable icon only
+                                                              // We don't need statistics alias here
     iconButtonCopy->setPreferredSize(kButtonsSize, kButtonsSize);
 
     setupIconButton(layout, iconButtonCopy);
@@ -337,13 +338,13 @@ void QnResourceWidget::addMainOverlay() {
 }
 
 void QnResourceWidget::createButtons() {
-    QnImageButtonWidget *closeButton = new QnImageButtonWidget();
+    QnImageButtonWidget *closeButton = new QnImageButtonWidget(lit("res_widget_close"));
     closeButton->setIcon(qnSkin->icon("item/close.png"));
     closeButton->setProperty(Qn::NoBlockMotionSelection, true);
     closeButton->setToolTip(tr("Close"));
     connect(closeButton, &QnImageButtonWidget::clicked, this, &QnResourceWidget::close);
 
-    QnImageButtonWidget *infoButton = new QnImageButtonWidget();
+    QnImageButtonWidget *infoButton = new QnImageButtonWidget(lit("res_widget_info"));
     infoButton->setIcon(qnSkin->icon("item/info.png"));
     infoButton->setCheckable(true);
     infoButton->setChecked(item()->displayInfo());
@@ -351,7 +352,7 @@ void QnResourceWidget::createButtons() {
     infoButton->setToolTip(tr("Information"));
     connect(infoButton, &QnImageButtonWidget::toggled, this, &QnResourceWidget::at_infoButton_toggled);
 
-    QnImageButtonWidget *rotateButton = new QnImageButtonWidget();
+    QnImageButtonWidget *rotateButton = new QnImageButtonWidget(lit("res_widget_rotate"));
     rotateButton->setIcon(qnSkin->icon("item/rotate.png"));
     rotateButton->setProperty(Qn::NoBlockMotionSelection, true);
     rotateButton->setToolTip(tr("Rotate"));
@@ -366,7 +367,8 @@ void QnResourceWidget::createButtons() {
     m_buttonBar->addButton(RotateButton, rotateButton);
     connect(m_buttonBar, SIGNAL(checkedButtonsChanged()), this, SLOT(at_buttonBar_checkedButtonsChanged()));
 
-    m_iconButton = new QnImageButtonWidget();
+    m_iconButton = new QnImageButtonWidget(QString());  // It is non-clickable icon only
+                                                        // We don't need statistics alias here
     m_iconButton->setParent(this);
     m_iconButton->setPreferredSize(kButtonsSize, kButtonsSize);
     m_iconButton->setVisible(false);
@@ -539,6 +541,9 @@ QString QnResourceWidget::calculateDetailsText() const {
 }
 
 void QnResourceWidget::updateDetailsText() {
+    if (!isOverlayWidgetVisible(m_overlayWidgets.detailsOverlay))
+        return;
+
     const QString text = calculateDetailsText();
     m_overlayWidgets.detailsItem->setHtml(text);
     m_overlayWidgets.detailsItem->setVisible(!text.isEmpty());
@@ -549,6 +554,9 @@ QString QnResourceWidget::calculatePositionText() const {
 }
 
 void QnResourceWidget::updatePositionText() {
+    if (!isOverlayWidgetVisible(m_overlayWidgets.positionOverlay))
+        return;
+
     const QString text = calculatePositionText();
     m_overlayWidgets.positionItem->setHtml(text);
     m_overlayWidgets.positionItem->setVisible(!text.isEmpty());
@@ -757,18 +765,22 @@ Qn::ResourceStatusOverlay QnResourceWidget::statusOverlay() const {
     return m_statusOverlay;
 }
 
-void QnResourceWidget::setStatusOverlay(Qn::ResourceStatusOverlay statusOverlay) {
+void QnResourceWidget::setStatusOverlay(Qn::ResourceStatusOverlay statusOverlay, bool animate)
+{
     if(m_statusOverlay == statusOverlay)
         return;
 
     m_statusOverlay = statusOverlay;
+    m_statusOverlayWidget->setStatusOverlay(statusOverlay);
 
-    if(statusOverlay == Qn::EmptyOverlay) {
-        opacityAnimator(m_statusOverlayWidget)->animateTo(0.0);
-    } else {
-        opacityAnimator(m_statusOverlayWidget)->animateTo(1.0);
-        m_statusOverlayWidget->setStatusOverlay(statusOverlay);
-    }
+    qreal opacity = statusOverlay == Qn::EmptyOverlay
+        ? 0.0
+        : 1.0;
+
+    if(animate)
+        opacityAnimator(m_statusOverlayWidget)->animateTo(opacity);
+    else
+        m_statusOverlayWidget->setOpacity(opacity);
 }
 
 Qn::ResourceStatusOverlay QnResourceWidget::calculateStatusOverlay(int resourceStatus, bool hasVideo) const {
@@ -843,8 +855,16 @@ void QnResourceWidget::updateHud(bool animate) {
 
     setOverlayWidgetVisible(m_overlayWidgets.cameraNameWithButtonsOverlay,  showCameraNameWithButtons,  animate);
     setOverlayWidgetVisible(m_overlayWidgets.cameraNameOnlyOverlay,         showOnlyCameraName,         animate);
+
+    bool updatePositionTextRequired = (showPosition && !isOverlayWidgetVisible(m_overlayWidgets.positionOverlay));
     setOverlayWidgetVisible(m_overlayWidgets.positionOverlay,               showPosition,               animate);
+    if (updatePositionTextRequired)
+        updatePositionText();
+
+    bool updateDetailsTextRequired = (showDetailedInfo && !isOverlayWidgetVisible(m_overlayWidgets.detailsOverlay));
     setOverlayWidgetVisible(m_overlayWidgets.detailsOverlay,                showDetailedInfo,           animate);
+    if (updateDetailsTextRequired)
+        updateDetailsText();
 }
 
 bool QnResourceWidget::isHovered() const {

@@ -25,23 +25,20 @@ namespace
 
 QnUsersStatisticsModule::QnUsersStatisticsModule(QObject *parent)
     : base_type(parent)
-    , m_context()
+    , QnWorkbenchContextAware(parent)
 {
 }
 
 QnUsersStatisticsModule::~QnUsersStatisticsModule()
 {}
 
-QnMetricsHash QnUsersStatisticsModule::metrics() const
+QnStatisticValuesHash QnUsersStatisticsModule::values() const
 {
-    if (!m_context)
-        return QnMetricsHash();
-
-    const auto accessController = m_context->accessController();
+    const auto accessController = context()->accessController();
     if (!accessController)
-        return QnMetricsHash();
+        return QnStatisticValuesHash();
 
-    QnMetricsHash result;
+    QnStatisticValuesHash result;
 
     const auto availableUsers = qnResPool->getResources<QnUserResource>();
     Q_ASSERT_X(!availableUsers.isEmpty(), Q_FUNC_INFO, "Can't gather metrics for empty users list");
@@ -68,7 +65,7 @@ QnMetricsHash QnUsersStatisticsModule::metrics() const
     }
 
     // Adds current user permissions metric
-    const auto currentUser = m_context->user();
+    const auto currentUser = context()->user();
     Q_ASSERT_X(currentUser, Q_FUNC_INFO, "There is no current user!");
     if (!currentUser)
         return result;
@@ -80,13 +77,8 @@ QnMetricsHash QnUsersStatisticsModule::metrics() const
     return result;
 }
 
-void QnUsersStatisticsModule::resetMetrics()
+void QnUsersStatisticsModule::reset()
 {
-}
-
-void QnUsersStatisticsModule::setContext(QnWorkbenchContext *context)
-{
-    m_context = context;
 }
 
 

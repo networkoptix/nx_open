@@ -229,7 +229,7 @@ class LegendButtonWidget: public QnImageButtonWidget {
 
 public:
     LegendButtonWidget(const QString &text, const QColor &color, QGraphicsItem *parent = NULL):
-        base_type(parent, 0),
+        base_type(lit("server_resource_legend"), parent, 0),
         m_text(text),
         m_color(color)
     {
@@ -500,7 +500,7 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     addOverlays();
 
     /* Setup buttons */
-    QnImageButtonWidget *showLogButton = new QnImageButtonWidget();
+    QnImageButtonWidget *showLogButton = new QnImageButtonWidget(lit("server_widget_show_log"));
     showLogButton->setIcon(qnSkin->icon("item/log.png"));
     showLogButton->setCheckable(false);
     showLogButton->setProperty(Qn::NoBlockMotionSelection, true);
@@ -509,7 +509,7 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     connect(showLogButton, SIGNAL(clicked()), this, SLOT(at_showLogButton_clicked()));
     buttonBar()->addButton(ShowLogButton, showLogButton);
 
-    QnImageButtonWidget *checkIssuesButton = new QnImageButtonWidget();
+    QnImageButtonWidget *checkIssuesButton = new QnImageButtonWidget(lit("server_widget_check_issues"));
     checkIssuesButton->setIcon(qnSkin->icon("item/issues.png"));
     checkIssuesButton->setCheckable(false);
     checkIssuesButton->setProperty(Qn::NoBlockMotionSelection, true);

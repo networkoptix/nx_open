@@ -7,8 +7,9 @@
 
 #include <utils/math/linear_combination.h>
 
-QnTextButtonWidget::QnTextButtonWidget(QGraphicsItem *parent, Qt::WindowFlags windowFlags):
-    base_type(parent, windowFlags),
+QnTextButtonWidget::QnTextButtonWidget(const QString &statisticsAlias
+    , QGraphicsItem *parent, Qt::WindowFlags windowFlags):
+    base_type(statisticsAlias, parent, windowFlags),
     m_alignment(Qt::AlignCenter),
     m_pixmapValid(false),
     m_relativeFrameWidth(-1.0)
@@ -100,13 +101,13 @@ void QnTextButtonWidget::paint(QPainter *painter, StateFlags startState, StateFl
     /* Draw frame. */
     paintFrame(painter, rect);
 
-    /* Draw image. */ 
+    /* Draw image. */
     QnImageButtonWidget::paint(
-        painter, 
-        startState, 
-        endState, 
-        progress, 
-        widget, 
+        painter,
+        startState,
+        endState,
+        progress,
+        widget,
         QnGeometry::expanded(
             QnGeometry::aspectRatio(pixmap(0).size()),
             QnGeometry::eroded(rect, frameWidth()),

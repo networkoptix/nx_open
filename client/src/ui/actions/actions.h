@@ -1004,6 +1004,8 @@ public:
          */
         ToggleSliderAction,
 
+        ToggleNotificationsAction,
+
         PinNotificationsAction,
 
         /* Playback actions. */
