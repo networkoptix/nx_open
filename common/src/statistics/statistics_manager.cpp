@@ -129,7 +129,7 @@ bool QnStatisticsManager::registerStatisticsModule(const QString &alias
 {
     if (m_modules.contains(alias))
     {
-        Q_ASSERT_X(false, Q_FUNC_INFO, "Module has been registered already!");
+       // Q_ASSERT_X(false, Q_FUNC_INFO, "Module has been registered already!");
         return false;
     }
 
