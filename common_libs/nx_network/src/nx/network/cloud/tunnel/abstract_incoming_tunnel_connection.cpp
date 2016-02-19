@@ -5,15 +5,10 @@ namespace network {
 namespace cloud {
 
 AbstractIncomingTunnelConnection::AbstractIncomingTunnelConnection(
-    String remotePeerId)
+    String connectionId)
 :
-    m_remotePeerId(std::move(remotePeerId))
+    m_connectionId(std::move(connectionId))
 {
-}
-
-const String& AbstractIncomingTunnelConnection::getRemotePeerId() const
-{
-    return m_remotePeerId;
 }
 
 } // namespace cloud

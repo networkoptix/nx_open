@@ -12,16 +12,12 @@ namespace api {
 
 void UdpHolePunchingSyn::serialize(nx::stun::Message* const message)
 {
-    message->newAttribute<stun::cc::attrs::ConnectionId>(connectSessionId);
 }
 
 bool UdpHolePunchingSyn::parse(const nx::stun::Message& message)
 {
-    return readStringAttributeValue<stun::cc::attrs::ConnectionId>(
-        message,
-        &connectSessionId);
+    return true;
 }
-
 
 void UdpHolePunchingSynAck::serialize(nx::stun::Message* const message)
 {

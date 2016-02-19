@@ -10,7 +10,7 @@ namespace network {
 namespace cloud {
 
 // TODO #mux comment
-class UdpHolePunchingTunnelAcceptor
+class NX_NETWORK_API UdpHolePunchingTunnelAcceptor
 :
     public AbstractTunnelAcceptor
 {

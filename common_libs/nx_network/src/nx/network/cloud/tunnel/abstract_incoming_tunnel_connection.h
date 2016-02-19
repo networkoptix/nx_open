@@ -18,9 +18,7 @@ class NX_NETWORK_API AbstractIncomingTunnelConnection
     public QnStoppableAsync
 {
 public:
-    AbstractIncomingTunnelConnection(String remotePeerId);
-
-    const String& getRemotePeerId() const;
+    AbstractIncomingTunnelConnection(String connectionId);
 
     /**
      *  Accepts new connection from peer (like socket)
@@ -35,7 +33,7 @@ public:
         std::unique_ptr<AbstractStreamSocket>)> handler) = 0;
 
 protected:
-    const String m_remotePeerId;
+    const String m_connectionId;
 };
 
 } // namespace cloud
