@@ -150,3 +150,8 @@ QnAbstractArchiveDelegate::ArchiveChunkInfo QnSyncPlayArchiveDelegate::getLastUs
 {
     return m_ownerDelegate->getLastUsedChunkInfo();
 }
+
+bool QnSyncPlayArchiveDelegate::hasVideo() const
+{
+    return m_ownerDelegate->hasVideo();
+}

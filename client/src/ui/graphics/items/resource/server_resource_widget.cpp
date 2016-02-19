@@ -524,7 +524,6 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     updateTitleText();
     //updateInfoOpacity();
     updateInfoText();
-    updateDetailsText();
     at_statistics_received();
 }
 
@@ -868,14 +867,14 @@ void QnServerResourceWidget::at_statistics_received() {
 }
 
 void QnServerResourceWidget::at_pingButton_clicked() {
-    menu()->trigger(Qn::PingAction, QnActionParameters(m_resource));
+    menu()->trigger(QnActions::PingAction, QnActionParameters(m_resource));
 }
 
 void QnServerResourceWidget::at_showLogButton_clicked() {
-    menu()->trigger(Qn::ServerLogsAction, QnActionParameters(m_resource));
+    menu()->trigger(QnActions::ServerLogsAction, QnActionParameters(m_resource));
 }
 
 void QnServerResourceWidget::at_checkIssuesButton_clicked() {
-    menu()->trigger(Qn::ServerIssuesAction, QnActionParameters(m_resource));
+    menu()->trigger(QnActions::ServerIssuesAction, QnActionParameters(m_resource));
 }
 

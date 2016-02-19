@@ -1011,21 +1011,6 @@
     </message>
     <message>
         <location/>
-        <source>Ctrl+E</source>
-        <translation>Ctrl+E</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Ctrl+L</source>
-        <translation>Ctrl+L</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Ctrl+M</source>
-        <translation>Ctrl+M</translation>
-    </message>
-    <message>
-        <location/>
         <source>System Settings</source>
         <translation>Cài đặt hệ thống</translation>
     </message>
@@ -1038,11 +1023,6 @@
         <location/>
         <source>System Backup and Restore</source>
         <translation>Sao lưu hệ thống và phục hồi</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Ctrl+B</source>
-        <translation>Ctrl+B</translation>
     </message>
     <message>
         <location/>

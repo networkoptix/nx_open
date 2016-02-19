@@ -66,8 +66,6 @@ private:
     bool isCameraTimeChanged(const RtspStatistic& statistics);
     void reset();
 private:
-    qint64 m_lastTime;
-    //double m_lastResultInSec;
     QElapsedTimer m_timer;
     qint64 m_localStartTime;
     //qint64 m_cameraTimeDrift;

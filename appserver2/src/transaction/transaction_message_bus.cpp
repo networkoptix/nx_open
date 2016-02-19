@@ -288,6 +288,7 @@ namespace ec2
         moveToThread(m_thread);
         qRegisterMetaType<QnTransactionTransport::State>(); // TODO: #Elric #EC2 registration
         qRegisterMetaType<QnAbstractTransaction>("QnAbstractTransaction");
+        qRegisterMetaType<QnTransaction<ApiRuntimeData> >("QnTransaction<ApiRuntimeData>");
         m_timer = new QTimer();
         connect(m_timer, &QTimer::timeout, this, &QnTransactionMessageBus::at_timer);
         m_timer->start(500);
@@ -380,12 +381,12 @@ namespace ec2
         m_alivePeers.erase(itr);
 
 #ifdef _DEBUG
-    if (m_alivePeers.isEmpty()) {
-        QnTranState runtimeState;
-        QList<QnTransaction<ApiRuntimeData>> result;
-        m_runtimeTransactionLog->getTransactionsAfter(runtimeState, result);
-        Q_ASSERT(result.size() == 1 && result[0].peerID == qnCommon->moduleGUID());
-    }
+        if (m_alivePeers.isEmpty()) {
+            QnTranState runtimeState;
+            QList<QnTransaction<ApiRuntimeData>> result;
+            m_runtimeTransactionLog->getTransactionsAfter(runtimeState, result);
+            Q_ASSERT(result.size() == 1 && result[0].peerID == qnCommon->moduleGUID());
+        }
 #endif
 
         // 2. remove peers proxy via current peer
@@ -405,40 +406,40 @@ namespace ec2
             removeAlivePeer(p, true, true);
     }
 
-void QnTransactionMessageBus::addDelayedAliveTran(QnTransaction<ApiPeerAliveData>&& tran, int timeout)
-{
-    DelayedAliveData data;
-    data.tran = std::move(tran);
-    data.timeToSend = m_relativeTimer.elapsed() + timeout;
-    m_delayedAliveTran.insert(tran.params.peer.id, std::move(data));
-}
-
-void QnTransactionMessageBus::sendDelayedAliveTran()
-{
-    for (auto itr = m_delayedAliveTran.begin(); itr != m_delayedAliveTran.end();)
+    void QnTransactionMessageBus::addDelayedAliveTran(QnTransaction<ApiPeerAliveData>&& tran, int timeout)
     {
-        DelayedAliveData& data = itr.value();
-        if (m_relativeTimer.elapsed() >= data.timeToSend)
+        DelayedAliveData data;
+        data.tran = std::move(tran);
+        data.timeToSend = m_relativeTimer.elapsed() + timeout;
+        m_delayedAliveTran.insert(tran.params.peer.id, std::move(data));
+    }
+
+    void QnTransactionMessageBus::sendDelayedAliveTran()
+    {
+        for (auto itr = m_delayedAliveTran.begin(); itr != m_delayedAliveTran.end();)
         {
-            bool isAliveNow = m_alivePeers.contains(data.tran.params.peer.id);
-            bool isAliveDelayed = data.tran.params.isAlive;
-            if (isAliveNow == isAliveDelayed) {
-                QnTransactionTransportHeader ttHeader;
-                if (data.tran.params.peer.id != qnCommon->moduleGUID() )
-                    ttHeader.distance = 1;
-                ttHeader.processedPeers = connectedServerPeers() << qnCommon->moduleGUID();
-                ttHeader.fillSequence();
-                sendTransactionInternal(std::move(data.tran), ttHeader); // resend broadcast alive info for that peer
-                itr = m_delayedAliveTran.erase(itr);
+            DelayedAliveData& data = itr.value();
+            if (m_relativeTimer.elapsed() >= data.timeToSend)
+            {
+                bool isAliveNow = m_alivePeers.contains(data.tran.params.peer.id);
+                bool isAliveDelayed = data.tran.params.isAlive;
+                if (isAliveNow == isAliveDelayed) {
+                    QnTransactionTransportHeader ttHeader;
+                    if (data.tran.params.peer.id != qnCommon->moduleGUID() )
+                        ttHeader.distance = 1;
+                    ttHeader.processedPeers = connectedServerPeers() << qnCommon->moduleGUID();
+                    ttHeader.fillSequence();
+                    sendTransactionInternal(std::move(data.tran), ttHeader); // resend broadcast alive info for that peer
+                    itr = m_delayedAliveTran.erase(itr);
+                }
+                else
+                    ++itr;
             }
-            else
+            else {
                 ++itr;
-        }
-        else {
-            ++itr;
+            }
         }
     }
-}
 
     bool QnTransactionMessageBus::gotAliveData(const ApiPeerAliveData &aliveData, QnTransactionTransport* transport, const QnTransactionTransportHeader* ttHeader)
     {
@@ -1680,7 +1681,6 @@ void QnTransactionMessageBus::sendDelayedAliveTran()
         m_remoteUrls.clear();
         reconnectAllPeers(&lock);
     }
-
     void QnTransactionMessageBus::reconnectAllPeers()
     {
         QnMutexLocker lock(&m_mutex);

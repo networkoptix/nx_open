@@ -142,7 +142,7 @@ void QnCameraListDialog::at_camerasView_doubleClicked(const QModelIndex &index) 
 
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
     if (resource)
-        context()->menu()->trigger(Qn::CameraSettingsAction, QnActionParameters(resource));
+        context()->menu()->trigger(QnActions::CameraSettingsAction, QnActionParameters(resource));
 }
 
 void QnCameraListDialog::at_camerasView_customContextMenuRequested(const QPoint &) {

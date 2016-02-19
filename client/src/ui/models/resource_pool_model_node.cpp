@@ -450,7 +450,7 @@ Qt::ItemFlags QnResourcePoolModelNode::flags(int column) const {
         switch(m_type) {
         case Qn::ResourceNode:
         case Qn::EdgeNode:
-            m_editable.value = m_model->context()->menu()->canTrigger(Qn::RenameResourceAction, QnActionParameters(m_resource)); //TODO: #GDM #VW make this context-aware?
+            m_editable.value = m_model->context()->menu()->canTrigger(QnActions::RenameResourceAction, QnActionParameters(m_resource)); //TODO: #GDM #VW make this context-aware?
             break;
         case Qn::VideoWallItemNode:
         case Qn::VideoWallMatrixNode:
@@ -615,9 +615,9 @@ bool QnResourcePoolModelNode::setData(const QVariant &value, int role, int colum
     parameters.setArgument(Qn::NodeTypeRole, m_type);
 
     if (isVideoWallEntity)
-        m_model->context()->menu()->trigger(Qn::RenameVideowallEntityAction, parameters);
+        m_model->context()->menu()->trigger(QnActions::RenameVideowallEntityAction, parameters);
     else
-        m_model->context()->menu()->trigger(Qn::RenameResourceAction, parameters);
+        m_model->context()->menu()->trigger(QnActions::RenameResourceAction, parameters);
     return true;
 }
 

@@ -84,7 +84,7 @@ void QnWorkbenchUpdateWatcher::at_checker_updateAvailable(const QnUpdateInfo &in
         return;
 
     /* We have no access rights. */
-    if (!menu()->canTrigger(Qn::SystemUpdateAction))
+    if (!menu()->canTrigger(QnActions::SystemUpdateAction))
         return;
 
     /* User was already notified about this release. */
@@ -110,6 +110,8 @@ void QnWorkbenchUpdateWatcher::at_checker_updateAvailable(const QnUpdateInfo &in
     QnUpdateInfo oldUpdateInfo = qnSettings->latestUpdateInfo();
     if (oldUpdateInfo.currentRelease != info.currentRelease
         ||
+        oldUpdateInfo.releaseDateMs != info.releaseDateMs
+        ||
         oldUpdateInfo.releaseDeliveryDays != info.releaseDeliveryDays)
     {
         /* New release was published - or we decided to change delivery period. Estimating new delivery date. */
@@ -131,6 +133,8 @@ void QnWorkbenchUpdateWatcher::at_checker_updateAvailable(const QnUpdateInfo &in
 
 void QnWorkbenchUpdateWatcher::showUpdateNotification(const QnUpdateInfo &info)
 {
+    m_notifiedVersion = info.currentRelease;
+
     QnSoftwareVersion current = qnCommon->engineVersion();
     bool majorVersionChange = info.currentRelease.major() > current.major() || info.currentRelease.minor() > current.minor();
 
@@ -203,9 +207,7 @@ void QnWorkbenchUpdateWatcher::showUpdateNotification(const QnUpdateInfo &info)
 
     /* We check for 'Yes' button. 'No' and even 'Ok' buttons are considered negative. */
     if (messageBox.clickedStandardButton() == QDialogButtonBox::Yes)
-        action(Qn::SystemUpdateAction)->trigger();
+        action(QnActions::SystemUpdateAction)->trigger();
     else
         qnSettings->setIgnoredUpdateVersion(messageBox.isChecked() ? info.currentRelease : QnSoftwareVersion());
-
-    m_notifiedVersion = info.currentRelease;
 }

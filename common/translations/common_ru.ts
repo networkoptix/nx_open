@@ -235,7 +235,7 @@
     </message>
     <message>
         <source>Generic Event</source>
-        <translation>Общее событие</translation>
+        <translation>Произвольное событие</translation>
     </message>
     <message>
         <source> (%1)</source>
@@ -350,75 +350,75 @@
     </message>
     <message>
         <source>Execute PTZ preset</source>
-        <translation type="unfinished"></translation>
+        <translation>Перейти на позицию PTZ</translation>
     </message>
     <message>
         <source>Show text overlay</source>
-        <translation type="unfinished"></translation>
+        <translation>Показать текст поверх видео</translation>
     </message>
     <message>
         <source>Show on Alarm Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Показать на тревожной раскладке</translation>
     </message>
     <message>
         <source>Archive backup finished</source>
-        <translation type="unfinished"></translation>
+        <translation>Резервное копирование архива завершено</translation>
     </message>
     <message>
         <source>Server &apos;%1&apos; has finished an archive backup</source>
-        <translation type="unfinished"></translation>
+        <translation>Сервер &apos;%1&apos; завершил резервное копирование архива</translation>
     </message>
     <message>
         <source>Generic Event at %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Генерируемое событие на %1</translation>
     </message>
     <message>
         <source>Input Port: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Входящий порт: %1</translation>
     </message>
     <message>
         <source>Archive backup is successfully completed</source>
-        <translation type="unfinished"></translation>
+        <translation>Резервное копирование архива успешно завершено</translation>
     </message>
     <message>
         <source>I/O Module %1 was disconnected</source>
-        <translation type="unfinished"></translation>
+        <translation>Модуль ввода/вывода %1  отсоединен</translation>
     </message>
     <message>
         <source>Conflicting Address: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Конфликтующий адрес: %1</translation>
     </message>
     <message>
         <source>Archive backup failed: No available backup storages with sufficient free space</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка резервного копирования архива: Нет доступных резервных хранилищ с достаточным объемом свободного места</translation>
     </message>
     <message>
         <source>Archive backup failed: Target storage failure</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка резервного копирования архива: Ошибка целевого хранилища</translation>
     </message>
     <message>
         <source>Archive backup failed: Source file open/read error</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка резервного копирования архива: Ошибка чтения исходного файла</translation>
     </message>
     <message>
         <source>Archive backup failed: Target file create/write error</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка резервного копирования архива: Ошибка записи целевого файла</translation>
     </message>
     <message>
         <source>Archive backup failed: File catalog error</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка резервного копирования архива: Ошибка файлового каталога</translation>
     </message>
     <message>
         <source>Archive backup finished, but isn&apos;t fully completed because backup time is over. Data is backed up to %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Резервное копирование архива завершено не полностью, так как время, отведенное на резевное копирование, истекло. Резервоное копирование выполнено до %1</translation>
     </message>
     <message>
         <source>Archive backup is canceled by user. Data is backed up to %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Резервное копирование отменено пользователем. Резервоное копирование выполнено до %1</translation>
     </message>
     <message>
         <source>Recording on I/O modules is disabled:</source>
-        <translation type="unfinished"></translation>
+        <translation>Запись на модуле ввода/вывода отклочена:</translation>
     </message>
 </context>
 <context>
@@ -581,55 +581,55 @@
     </message>
     <message>
         <source>Camera plugin error. %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка драйвера камеры. %1</translation>
     </message>
     <message>
         <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>Перезагрузите модуль ввода/вывода, зайтем сбросьте его настройки к стандартным через веб-интерфейс.</translation>
     </message>
     <message>
         <source>Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</source>
-        <translation type="unfinished"></translation>
+        <translation>Убедитесь, что модуль ввода/вывода подключен к сети. Попробуйте его перезагрузить.</translation>
     </message>
     <message>
         <source>Could not parse I/O module response. Url %1, request name %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно разобрать ответ модуля ввода/вывода. URL %1, имя запроса %2.</translation>
     </message>
     <message>
         <source>First, try to turn on recording (if it&apos;s off) and decrease fps in I/O module settings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Попробуйте включить запись (если она отключена).</translation>
     </message>
     <message>
         <source>If it doesn&apos;t help, restore factory defaults on the I/O module web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>Если это не помогает, восстановите заводские настройки на веб-странице модуля ввода/вывода.</translation>
     </message>
     <message>
         <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Запрос модуля ввода/вывода &quot;%1&quot; вернул ошибку &quot;%2&quot;.</translation>
     </message>
     <message>
         <source>Unknown I/O module issue.</source>
-        <translation type="unfinished"></translation>
+        <translation>Неизвестная проблема с модулем ввода/вывода.</translation>
     </message>
     <message>
         <source>Invalid data was received from the I/O module %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Модуль ввода/вывода %1 вернул некорректные данные.</translation>
     </message>
     <message>
         <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
-        <translation type="unfinished"></translation>
+        <translation>Слишком много ошибок медиа. Откройте диалог ошибок устройства для подробностей.</translation>
     </message>
     <message>
         <source>Device initialization process is in progress.</source>
-        <translation type="unfinished"></translation>
+        <translation>Устройство в процессе инициализации.</translation>
     </message>
     <message>
         <source>Camera initialization process is in progress.</source>
-        <translation type="unfinished"></translation>
+        <translation>Камера в процессе инициализации.</translation>
     </message>
     <message>
         <source>I/O Module initialization process is in progress.</source>
-        <translation type="unfinished"></translation>
+        <translation>Модуль ввода/вывода в процессе инициализации.</translation>
     </message>
 </context>
 <context>
@@ -651,7 +651,7 @@
     </message>
     <message>
         <source>File explorer failed to open.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка открытия проводника.</translation>
     </message>
 </context>
 <context>
@@ -666,11 +666,11 @@
     </message>
     <message>
         <source>Could not initialize audio encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка инициализации кодировщика видео.</translation>
     </message>
     <message>
         <source>Could not initialize audio decoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка инициализации кодировщика звука.</translation>
     </message>
 </context>
 <context>
@@ -708,7 +708,7 @@
     </message>
     <message>
         <source>Could not initialize video encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка инициализации кодировщика видео.</translation>
     </message>
 </context>
 <context>
@@ -874,11 +874,11 @@
     </message>
     <message>
         <source>There was a problem activating your license key. A database error occurred.</source>
-        <translation type="unfinished"></translation>
+        <translation>При активации лицензионного ключа произошла ошибка базы данных.</translation>
     </message>
     <message>
         <source>There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.</source>
-        <translation type="unfinished"></translation>
+        <translation>При активации лицензионного ключа произошла ошибка при получении данных. Пожалуйста, свяжитесь со службой поддержки.</translation>
     </message>
 </context>
 <context>
@@ -963,35 +963,35 @@
     </message>
     <message numerus="yes">
         <source>%n I/O Module(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n модуль ввода/вывода</numerusform>
+            <numerusform>%n модуля ввода/вывода</numerusform>
+            <numerusform>%n модулей ввода/вывода</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n I/O module(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n модуль ввода/вывода</numerusform>
+            <numerusform>%n модуля ввода/вывода</numerusform>
+            <numerusform>%n модулей ввода/вывода</numerusform>
         </translation>
     </message>
     <message>
         <source>I/O Modules</source>
-        <translation type="unfinished"></translation>
+        <translation>Модули ввода/вывода</translation>
     </message>
     <message>
         <source>I/O modules</source>
-        <translation type="unfinished"></translation>
+        <translation>Модули ввода/вывода</translation>
     </message>
     <message>
         <source>I/O Module</source>
-        <translation type="unfinished">Модуль ввода/вывода</translation>
+        <translation>Модуль ввода/вывода</translation>
     </message>
     <message>
         <source>I/O module</source>
-        <translation type="unfinished"></translation>
+        <translation>модуль ввода/вывода</translation>
     </message>
 </context>
 <context>
@@ -1119,7 +1119,7 @@
     </message>
     <message>
         <source>File write error. Not enough free space.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка записи файла. Недостаточно места.</translation>
     </message>
 </context>
 <context>
@@ -1183,7 +1183,7 @@
     <name>utils::QnCameraNamesWatcher</name>
     <message>
         <source>Removed camera</source>
-        <translation type="unfinished"></translation>
+        <translation>Удаленная камера</translation>
     </message>
 </context>
 </TS>

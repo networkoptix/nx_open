@@ -348,75 +348,75 @@
     </message>
     <message>
         <source>Execute PTZ preset</source>
-        <translation type="unfinished"></translation>
+        <translation>调用PTZ预置位</translation>
     </message>
     <message>
         <source>Show text overlay</source>
-        <translation type="unfinished"></translation>
+        <translation>显示文本覆盖</translation>
     </message>
     <message>
         <source>Show on Alarm Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>显示报警视图</translation>
     </message>
     <message>
         <source>Archive backup finished</source>
-        <translation type="unfinished"></translation>
+        <translation>录像备份完成</translation>
     </message>
     <message>
         <source>Server &apos;%1&apos; has finished an archive backup</source>
-        <translation type="unfinished"></translation>
+        <translation>服务器 &apos;%1已完成录像备份</translation>
     </message>
     <message>
         <source>Generic Event at %1</source>
-        <translation type="unfinished"></translation>
+        <translation>通用事件在 %1</translation>
     </message>
     <message>
         <source>Input Port: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>输入端口: %1</translation>
     </message>
     <message>
         <source>Archive backup is successfully completed</source>
-        <translation type="unfinished"></translation>
+        <translation>录像备份已完成</translation>
     </message>
     <message>
         <source>I/O Module %1 was disconnected</source>
-        <translation type="unfinished"></translation>
+        <translation>I/O模块 %1无法连接</translation>
     </message>
     <message>
         <source>Conflicting Address: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>冲突地址: %1</translation>
     </message>
     <message>
         <source>Archive backup failed: No available backup storages with sufficient free space</source>
-        <translation type="unfinished"></translation>
+        <translation>录像备份失败:存储服务器上没有可用的空间</translation>
     </message>
     <message>
         <source>Archive backup failed: Target storage failure</source>
-        <translation type="unfinished"></translation>
+        <translation>录像备份失败:目标存储失败</translation>
     </message>
     <message>
         <source>Archive backup failed: Source file open/read error</source>
-        <translation type="unfinished"></translation>
+        <translation>录像备份失败:系统文件打开/读取错误</translation>
     </message>
     <message>
         <source>Archive backup failed: Target file create/write error</source>
-        <translation type="unfinished"></translation>
+        <translation>录像备份失败:目标文件创建写入错误</translation>
     </message>
     <message>
         <source>Archive backup failed: File catalog error</source>
-        <translation type="unfinished"></translation>
+        <translation>录像备份失败:文件目录错误</translation>
     </message>
     <message>
         <source>Archive backup finished, but isn&apos;t fully completed because backup time is over. Data is backed up to %1</source>
-        <translation type="unfinished"></translation>
+        <translation>录像备份结束,因备份超时备份未全部完成,数据备份至%1</translation>
     </message>
     <message>
         <source>Archive backup is canceled by user. Data is backed up to %1</source>
-        <translation type="unfinished"></translation>
+        <translation>录像备份已取消,数据保存至 %1</translation>
     </message>
     <message>
         <source>Recording on I/O modules is disabled:</source>
-        <translation type="unfinished"></translation>
+        <translation>I/O模块录像已无效:</translation>
     </message>
 </context>
 <context>
@@ -579,55 +579,55 @@
     </message>
     <message>
         <source>Camera plugin error. %1</source>
-        <translation type="unfinished"></translation>
+        <translation>摄像机插件错误. %1</translation>
     </message>
     <message>
         <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>请重启I/O模块,再通过网页恢复设备默认出场设置.</translation>
     </message>
     <message>
         <source>Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</source>
-        <translation type="unfinished"></translation>
+        <translation>请确保I/O模块已连接至网络,请重新启动I/O模块.</translation>
     </message>
     <message>
         <source>Could not parse I/O module response. Url %1, request name %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>无法获取I/O模块响应.URL  %1,请求名称 %2.</translation>
     </message>
     <message>
         <source>First, try to turn on recording (if it&apos;s off) and decrease fps in I/O module settings.</source>
-        <translation type="unfinished"></translation>
+        <translation>请开启录像并降低I/O模块fps的设置.</translation>
     </message>
     <message>
         <source>If it doesn&apos;t help, restore factory defaults on the I/O module web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>请通过I/O网页恢复设备出场设置.</translation>
     </message>
     <message>
         <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>I/O模块请求 &quot;%1&quot;发生错误在&quot; %2&quot;.</translation>
     </message>
     <message>
         <source>Unknown I/O module issue.</source>
-        <translation type="unfinished"></translation>
+        <translation>I/O模块发生未知错误.</translation>
     </message>
     <message>
         <source>Invalid data was received from the I/O module %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>从I/O模块 %1接收到无效数据.</translation>
     </message>
     <message>
         <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
-        <translation type="unfinished"></translation>
+        <translation>视频流错误,请打开I/O模块问题日志获取更多内容.</translation>
     </message>
     <message>
         <source>Device initialization process is in progress.</source>
-        <translation type="unfinished"></translation>
+        <translation>设备初始化进行中.</translation>
     </message>
     <message>
         <source>Camera initialization process is in progress.</source>
-        <translation type="unfinished"></translation>
+        <translation>摄像机初始化进行中.</translation>
     </message>
     <message>
         <source>I/O Module initialization process is in progress.</source>
-        <translation type="unfinished"></translation>
+        <translation>I/O模块初始化进行中.</translation>
     </message>
 </context>
 <context>
@@ -649,7 +649,7 @@
     </message>
     <message>
         <source>File explorer failed to open.</source>
-        <translation type="unfinished"></translation>
+        <translation>文件资源管理器打开失败.</translation>
     </message>
 </context>
 <context>
@@ -664,11 +664,11 @@
     </message>
     <message>
         <source>Could not initialize audio encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>无法初始化音频编码器.</translation>
     </message>
     <message>
         <source>Could not initialize audio decoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>无法初始化音频解码器。</translation>
     </message>
 </context>
 <context>
@@ -706,7 +706,7 @@
     </message>
     <message>
         <source>Could not initialize video encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -865,11 +865,11 @@
     </message>
     <message>
         <source>There was a problem activating your license key. A database error occurred.</source>
-        <translation type="unfinished"></translation>
+        <translation>激活授权许可时，发生数据库错误.</translation>
     </message>
     <message>
         <source>There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.</source>
-        <translation type="unfinished"></translation>
+        <translation>激活授权许可时发生错误,收到无效数据,请联系技术支持团队解决此问题.</translation>
     </message>
 </context>
 <context>
@@ -946,31 +946,31 @@
     </message>
     <message numerus="yes">
         <source>%n I/O Module(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n I/O 模块</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n I/O module(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n I/O 模块</numerusform>
         </translation>
     </message>
     <message>
         <source>I/O Modules</source>
-        <translation type="unfinished"></translation>
+        <translation>I/O 模块</translation>
     </message>
     <message>
         <source>I/O modules</source>
-        <translation type="unfinished"></translation>
+        <translation>I/O 模块</translation>
     </message>
     <message>
         <source>I/O Module</source>
-        <translation type="unfinished">I/O模块</translation>
+        <translation>I/O模块</translation>
     </message>
     <message>
         <source>I/O module</source>
-        <translation type="unfinished"></translation>
+        <translation>I/O 模块</translation>
     </message>
 </context>
 <context>
@@ -1099,7 +1099,7 @@
     </message>
     <message>
         <source>File write error. Not enough free space.</source>
-        <translation type="unfinished"></translation>
+        <translation>文件写入错误，没有足够空间.</translation>
     </message>
 </context>
 <context>
@@ -1163,7 +1163,7 @@
     <name>utils::QnCameraNamesWatcher</name>
     <message>
         <source>Removed camera</source>
-        <translation type="unfinished"></translation>
+        <translation>移除摄像机</translation>
     </message>
 </context>
 </TS>
