@@ -90,7 +90,7 @@ angular.module('webadminApp')
                 }
             } else {
                 alert('Settings saved');
-                if( $scope.settings.port !=  window.location.port ) {
+                if( $scope.settings.port !==  window.location.port ) {
                     window.location.href = (window.location.protocol + '//' + window.location.hostname + ':' + $scope.settings.port + window.location.pathname + window.location.hash);
                 }else{
                     window.location.reload();
@@ -183,16 +183,16 @@ angular.module('webadminApp')
 
             var allSettings = data.data;
             var cloudId = _.find(allSettings, function (setting) {
-                return setting.name == 'cloudSystemID';
+                return setting.name === 'cloudSystemID';
             });
             $scope.cloudSystemID = cloudId ? cloudId.value : '';
 
-            if ($scope.cloudSystemID.trim() == '') {
+            if ($scope.cloudSystemID.trim() === '') {
                 $scope.cloudSystemID = null;
             }
 
             var cloudAccount = _.find(allSettings, function (setting) {
-                return setting.name == 'cloudAccountName';
+                return setting.name === 'cloudAccountName';
             });
             $scope.cloudAccountName = cloudAccount ? cloudAccount.value : null;
 

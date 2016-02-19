@@ -292,7 +292,8 @@ module.exports = function (grunt) {
             },
             all: [
                 'Gruntfile.js',
-                '<%= yeoman.app %>/scripts/{,*/}*.js'
+                '<%= yeoman.app %>/scripts/{,*/}*.js',
+                '!<%= yeoman.app %>/scripts/vendor/**'
             ],
             test: {
                 options: {
@@ -589,7 +590,7 @@ module.exports = function (grunt) {
 
             }
         },
-        protractor_webdriver: {
+        'protractor_webdriver': {
             options:{
 
             },

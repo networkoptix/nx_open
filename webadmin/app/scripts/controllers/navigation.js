@@ -42,5 +42,5 @@ angular.module('webadminApp')
 
         $scope.closeAlert = function(){
             $scope.session.serverInfoAlertHidden = true;
-        }
+        };
     });

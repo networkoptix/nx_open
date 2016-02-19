@@ -7,23 +7,22 @@ angular.module('webadminApp')
             password :''
         };
 
-        function errorHandler(error){
-            if(result.data.errorString && result.data.errorString!=''){
-                alert("Error: " + result.data.errorString);
+        function errorHandler(result){
+            if(result.data.errorString && result.data.errorString !== ''){
+                alert('Error: ' + result.data.errorString);
                 return;
             }
-            alert("Error");
-            return errorToShow;
+            alert('Error');
         }
 
         function resultHandler(result){
-            if(result.data.errorString && result.data.errorString!=''){
-                alert("Error: " + result.data.errorString);
+            if(result.data.errorString && result.data.errorString !== ''){
+                alert('Error: ' + result.data.errorString);
                 return;
             }
 
             mediaserver.clearCloudSystemCredentials().then(function(){
-                alert("Success");
+                alert('Success');
                 window.location.reload();
             },errorHandler);
 
@@ -33,7 +32,7 @@ angular.module('webadminApp')
             if($scope.form.$valid) {
                 mediaserver.changeSystem($scope.settings.systemName, $scope.settings.password).then(resultHandler, errorHandler);
             }else{
-                alert("form is invalid");
+                alert('form is invalid');
             }
         };
 

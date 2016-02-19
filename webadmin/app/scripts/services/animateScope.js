@@ -8,7 +8,7 @@ angular.module('webadminApp')
         var updationLimit = null;// Limit animations to stop process at some point
         var defaultDuration = 1000;
         var defaultScope = null;
-        var defaultAnimation = "linear";
+        var defaultAnimation = 'linear';
         function Animation(scope,value,target,duration,dependency){
             this.scope = scope;
             this.value = value;
@@ -25,13 +25,13 @@ angular.module('webadminApp')
 
         Animation.prototype.interpolate = function(start,stop,time,duration, dependency) {
             switch(dependency){
-                case "smooth":
+                case 'smooth':
                     return this.smooth(start,stop,time,duration);
-                case "fading":
+                case 'fading':
                     return this.fading(start,stop,time,duration);
-                case "dryResistance":
+                case 'dryResistance':
                     return this.dryResistance(start,stop,time,duration);
-                case "linear":
+                /*case 'linear':*/
                 default:
                     return this.linear(start,stop,time,duration);
             }
@@ -54,7 +54,7 @@ angular.module('webadminApp')
             var delta = (Math.sin(time/duration * Math.PI - Math.PI / 2) + 1)/2;
             var result =start + (stop - start) *delta;
             if(Number.isNaN(result)){
-               console.error("animation isNaN");
+               console.error('animation isNaN');
             }
             return  result;
         };
@@ -148,7 +148,7 @@ angular.module('webadminApp')
                 scope.$apply();
             });
         }
-        function animationFunction(digestContext){
+        function animationFunction(/*digestContext*/){
             if(!animationRunning) {
                 return;
             }
