@@ -81,7 +81,7 @@ void AudioOutput::write(const AudioFramePtr& audioFrame)
         d->audioOutput->state() == QAudio::ActiveState && //< and playing,
         d->audioOutput->isBufferUnderflow(); //< but no data in the buffer at all
 
-    QnCodecAudioFormat audioFormat(audioFrame->context);
+    QnAudioFormat audioFormat(QnCodecAudioFormat(audioFrame->context));
     audioFormat.setCodec(lit("audio/pcm"));
     if (!d->audioOutput || //< first call
         d->audioOutput->format() != audioFormat || //< Audio format has been changed

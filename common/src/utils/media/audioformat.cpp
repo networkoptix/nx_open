@@ -365,6 +365,24 @@ QnAudioFormat::SampleType QnAudioFormat::sampleType() const
     return d->sampleType;
 }
 
+qint64 QnAudioFormat::durationForBytes(int bytes) const
+{
+    if (!isValid() || bytes <= 0)
+        return 0;
+
+    // We round the byte count to ensure whole frames
+    return qint64(1000000LL * (bytes / bytesPerFrame())) / sampleRate();
+}
+
+int QnAudioFormat::bytesPerFrame() const
+{
+    if (!isValid())
+        return 0;
+
+    return (sampleSize() * channelCount()) / 8;
+}
+
+
 /*!
     \enum QnAudioFormat::SampleType
 

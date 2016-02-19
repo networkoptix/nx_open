@@ -15,7 +15,7 @@ namespace nx {
 namespace audio {
 
 
-Sound::Sound(ALCdevice *device, const QAudioFormat& audioFormat):
+Sound::Sound(ALCdevice *device, const QnAudioFormat& audioFormat):
     QObject()
 {
     m_audioFormat = audioFormat;
@@ -89,9 +89,9 @@ void Sound::setVolumeLevel(float volumeLevel)
     alSourcef(m_source, AL_GAIN, volumeLevel);
 }
 
-int Sound::getOpenAlFormat(const QAudioFormat &audioFormat)
+int Sound::getOpenAlFormat(const QnAudioFormat &audioFormat)
 {
-    if (audioFormat.sampleType() == QAudioFormat::Float)
+    if (audioFormat.sampleType() == QnAudioFormat::Float)
         return false;
 
     QByteArray requestFormat;
@@ -232,7 +232,7 @@ bool Sound::playImpl()
     return true;
 }
 
-bool Sound::isFormatSupported(const QAudioFormat& format)
+bool Sound::isFormatSupported(const QnAudioFormat& format)
 {
     return getOpenAlFormat(format) != 0;
 }
@@ -368,7 +368,7 @@ void Sound::internalClear()
     m_source = 0;
 }
 
-QAudioFormat Sound::format() const
+QnAudioFormat Sound::format() const
 {
     return m_audioFormat;
 }

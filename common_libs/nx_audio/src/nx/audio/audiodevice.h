@@ -7,7 +7,7 @@
 typedef struct ALCdevice_struct ALCdevice;
 typedef struct ALCcontext_struct ALCcontext;
 
-class QAudioFormat;
+class QnAudioFormat;
 
 namespace nx {
 namespace audio {
@@ -23,7 +23,7 @@ public:
     AudioDevice(QObject *parent = NULL);
     ~AudioDevice();
 
-    Sound *createSound(const QAudioFormat &format);
+    Sound *createSound(const QnAudioFormat &format);
 
     /**
      * @return volume level in range [0..1]

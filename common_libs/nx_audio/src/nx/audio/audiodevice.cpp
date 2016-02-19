@@ -135,7 +135,7 @@ void AudioDevice::setMute(bool mute)
     setVolume(!mute ? (m_volume < 0.0f ? -m_volume : m_volume) : 0.0f);
 }
 
-Sound *AudioDevice::createSound(const QAudioFormat &format)
+Sound *AudioDevice::createSound(const QnAudioFormat &format)
 {
     if (!m_device || !m_context)
         return 0;

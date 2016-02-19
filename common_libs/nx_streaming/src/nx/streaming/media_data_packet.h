@@ -6,13 +6,7 @@
 #include <QtCore/QVector>
 #include <QtCore/QRect>
 
-// TODO: #Elric implement this ifdef on utils/media/audioformat.h level.
-#if defined(HAS_QMULTIMEDIA_LIB)
-#   include <QtMultimedia/QAudioFormat>
-#   define QnAudioFormat QAudioFormat
-#else
-#   include <utils/media/audioformat.h> 
-#endif
+#include <utils/media/audioformat.h> 
 
 #include <utils/common/byte_array.h>
 #include <utils/media/sse_helper.h>

@@ -4,6 +4,7 @@
 #include <QtCore/QVector>
 #include <QtMultimedia/QAudio>
 #include <QtMultimedia/QAudioFormat>
+#include <utils/media/audioformat.h>
 
 class AudioDevice;
 typedef struct ALCdevice_struct ALCdevice;
@@ -18,7 +19,7 @@ namespace audio {
 class Sound: public QObject
 {
 public:
-    Sound(ALCdevice *device, const QAudioFormat& audioFormat);
+    Sound(ALCdevice *device, const QnAudioFormat& audioFormat);
     ~Sound();
 
     bool isValid() const { return m_isValid; }
@@ -52,7 +53,7 @@ public:
     /**
      * @return audio format playing
      */
-    QAudioFormat format() const;
+    QnAudioFormat format() const;
 
     /**
      * @return playback state
@@ -71,12 +72,12 @@ public:
     /**
      * @return True if audio format is supported
      */
-    static bool isFormatSupported(const QAudioFormat &format);
+    static bool isFormatSupported(const QnAudioFormat &format);
 
 private:
     uint bufferTime() const;
     bool setup();
-    static int getOpenAlFormat(const QAudioFormat &audioFormat);
+    static int getOpenAlFormat(const QnAudioFormat &audioFormat);
     uint bitRate() const;
     bool playImpl();
     
@@ -87,7 +88,7 @@ private:
 
 private:
     mutable QnMutex m_mtx;
-    QAudioFormat m_audioFormat;
+    QnAudioFormat m_audioFormat;
 
     uint m_tmpBuffer[1024];
 
