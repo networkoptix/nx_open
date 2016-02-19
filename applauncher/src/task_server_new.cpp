@@ -10,7 +10,7 @@
 
 #include <qtsinglecoreapplication.h>
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/ipc/named_pipe_socket.h>
 
 #include "abstract_request_processor.h"

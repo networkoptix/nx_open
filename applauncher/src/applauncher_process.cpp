@@ -10,7 +10,7 @@
 #include <QtNetwork/QLocalSocket>
 
 #include <api/ipc_pipe_names.h>
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/process.h>
 
 #include "process_utils.h"
