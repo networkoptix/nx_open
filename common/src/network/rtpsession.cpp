@@ -1023,7 +1023,7 @@ bool RTPSession::sendSetup()
         {
             // SETUP postfix should be writen after url query params. It's invalid url, but it's required according to RTSP standard
             request.requestLine.url = m_contentBase
-                    + (m_contentBase.endsWith(lit("/")) ? lit("") : lit("/"))
+                    + ((m_contentBase.endsWith(lit("/")) || setupUrl.isEmpty()) ? lit("") : lit("/"))
                     + setupUrl.toString();
         }
         else
