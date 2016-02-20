@@ -4,7 +4,8 @@
 #include <ui/actions/action.h>
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
-#include <ui/statistics/modules/module_private/time_duration_metric.h>
+#include <statistics/base/metrics_container.h>
+#include <statistics/base/time_duration_metric.h>
 
 #include <utils/common/model_functions.h>
 
@@ -46,24 +47,64 @@ namespace
     }
 }
 
+namespace
+{
+    class ActionDurationMetric : public QnTimeDurationMetric
+        , public QObject
+    {
+        typedef QnTimeDurationMetric base_type;
+    public:
+        ActionDurationMetric(QnAction *action);
+
+        virtual ~ActionDurationMetric();
+    private:
+    };
+
+    ActionDurationMetric::ActionDurationMetric(QnAction *action)
+        : base_type()
+        , QObject()
+    {
+        if (!action)
+            return;
+
+        const auto id = action->id();
+        const auto guard = makePointer(this);
+        const auto processToggled = [this, guard, id](bool checked)
+        {
+            if (!guard)
+                return;
+
+            // TODO: remove debug output, id and unnecessary condition
+            if (isCounterActive() == checked)
+                return;
+
+            setCounterActive(checked);
+        };
+
+        QObject::connect(action, &QAction::toggled, this, processToggled);
+        processToggled(action->isChecked());
+    }
+
+    ActionDurationMetric::~ActionDurationMetric()
+    {}
+}
+
 //
+
 AbstractActionsMetrics::AbstractActionsMetrics(QnActionManager *actionManager)
     : base_type()
-    , AbstractMultimetric()
+    , QnStatisticsValuesProvider()
 {
     if (!actionManager)
         return;
 
     const auto guard = makePointer(this);
-    const auto actionManagerPtr = makePointer(actionManager);
-
-    const auto addAction =
-        [this, guard, actionManagerPtr](QnActions::IDType id)
+    const auto addAction = [this, guard, actionManager](QnActions::IDType id)
     {
-        if (!guard || !actionManagerPtr)
+        if (!guard)
             return;
 
-        const auto action = actionManagerPtr->action(id);
+        const auto action = actionManager->action(id);
         if (!action)
             return;
 
@@ -75,11 +116,6 @@ AbstractActionsMetrics::AbstractActionsMetrics(QnActionManager *actionManager)
 
 AbstractActionsMetrics::~AbstractActionsMetrics()
 {}
-
-void AbstractActionsMetrics::addActionMetric(QnAction *action)
-{
-    Q_ASSERT_X(false, Q_FUNC_INFO, "Pure virtual function called!");
-}
 
 //
 
@@ -108,17 +144,17 @@ void ActionsTriggeredCountMetrics::addActionMetric(QnAction *action)
 
         auto& countByParams = m_values[id];
         ++countByParams[kTriggerdPostfix];  // Counts base trigger event number
-        ++countByParams[path];
+        if (path != kTriggerdPostfix)
+            ++countByParams[path];
     };
 
     connect(action, &QAction::triggered, this, processTriggered);
-    processTriggered();
 }
 
 
-QnMetricsHash ActionsTriggeredCountMetrics::metrics() const
+QnStatisticValuesHash ActionsTriggeredCountMetrics::values() const
 {
-    QnMetricsHash result;
+    QnStatisticValuesHash result;
     for (auto it = m_values.cbegin(); it != m_values.end(); ++it)
     {
         const auto actionId = static_cast<QnActions::IDType>(it.key());
@@ -146,7 +182,7 @@ void ActionsTriggeredCountMetrics::reset()
 
 ActionCheckedTimeMetric::ActionCheckedTimeMetric(QnActionManager *actionManager)
     : base_type(actionManager)
-    , m_metrics()
+    , m_metrics(new QnMetricsContainer())
 {
     if (!actionManager)
         return;
@@ -160,46 +196,23 @@ ActionCheckedTimeMetric::~ActionCheckedTimeMetric()
 
 void ActionCheckedTimeMetric::addActionMetric(QnAction *action)
 {
-    const auto id = action->id();
-    const auto guard = makePointer(this);
-    const auto processToggled = [this, guard, id](bool checked)
-    {
-        if (!guard)
-            return;
+    if (!action)
+        return;
 
-        auto it = m_metrics.find(id);
-        if (it == m_metrics.end())
-            it = m_metrics.insert(id, TimeDurationMetricPtr(new TimeDurationMetric()));
+    static const auto kCheckedTimePostfix = lit("chkd_ms");
 
-        const auto &timeDurationMetric = *it;
-        timeDurationMetric->activateCounter(checked);
-    };
-
-    connect(action, &QAction::toggled, this, processToggled);
-    processToggled(action->isChecked());
+    const auto alias = aliasByActionId(action->id());
+    const auto finalAlias = makeAlias(alias, kCheckedTimePostfix);
+    m_metrics->addMetric(finalAlias, QnAbstractMetricPtr(
+        new ActionDurationMetric(action)));
 }
 
-
-QnMetricsHash ActionCheckedTimeMetric::metrics() const
+QnStatisticValuesHash ActionCheckedTimeMetric::values() const
 {
-    QnMetricsHash result;
-    for (auto it = m_metrics.begin(); it != m_metrics.end(); ++it)
-    {
-        const auto metric = it.value();
-        if (metric->duration() <= 0)
-            continue;
-
-        static const auto kCheckedTimePostfix = lit("chkd_ms");
-
-        const auto actionId = static_cast<QnActions::IDType>(it.key());
-        const auto alias = aliasByActionId(actionId);
-        const auto finalAlias = makeAlias(alias, kCheckedTimePostfix);
-        result.insert(finalAlias, metric->value());
-    }
-    return result;
+    return m_metrics->values();
 }
 
 void ActionCheckedTimeMetric::reset()
 {
-    m_metrics.clear();
+    m_metrics->reset();
 }

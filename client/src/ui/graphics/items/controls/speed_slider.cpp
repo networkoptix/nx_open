@@ -7,6 +7,8 @@
 
 #include <ui/animation/variant_animator.h>
 
+#include <ui/statistics/modules/controls_statistics_module.h>
+
 namespace {
     inline qint64 speedToPosition(qreal speed, qreal minimalStep) {
         if(speed < -minimalStep) {
@@ -32,7 +34,7 @@ namespace {
 } // anonymous namespace
 
 
-QnSpeedSlider::QnSpeedSlider(QGraphicsItem *parent): 
+QnSpeedSlider::QnSpeedSlider(QGraphicsItem *parent):
     base_type(parent),
     m_roundedSpeed(0.0),
     m_minimalSpeedStep(1.0),
@@ -57,6 +59,8 @@ QnSpeedSlider::QnSpeedSlider(QGraphicsItem *parent):
 
     /* Make sure that tooltip text is updated. */
     sliderChange(SliderValueChange);
+
+    qnControlsStatisticsModule->registerSlider(lit("speed_slider"), this);
 }
 
 QnSpeedSlider::~QnSpeedSlider() {
@@ -123,7 +127,7 @@ void QnSpeedSlider::setMinimalSpeedStep(qreal minimalSpeedStep) {
         qnWarning("Invalid minimal speed step '%1'.", minimalSpeedStep);
         return;
     }
-    
+
     if(qFuzzyCompare(m_minimalSpeedStep, minimalSpeedStep))
         return;
 
@@ -147,7 +151,7 @@ void QnSpeedSlider::restartSpeedAnimation() {
 void QnSpeedSlider::finishAnimations() {
     if(m_animator->isRunning()) {
         m_animator->stop();
-        
+
         setSpeed(m_defaultSpeed);
     }
 }

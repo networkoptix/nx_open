@@ -89,6 +89,8 @@
 #include "workbench_access_controller.h"
 #include <common/common_module.h>
 
+#include <utils/common/model_functions.h>
+
 #ifdef _DEBUG
 //#define QN_DEBUG_WIDGET
 #endif
@@ -102,6 +104,15 @@ namespace {
     const qreal kDefaultSizeMultiplier = 1.0;
     const int kDefaultHelpTopicId = -1;
 
+    QString aliasFromAction(QAction *action)
+    {
+        static const auto kUndefinedAlias = lit("undefined");
+        const auto ourAction = dynamic_cast<QnAction *>(action);
+        if (!ourAction)
+            return kUndefinedAlias;
+        return QnLexical::serialized(ourAction->id());
+    }
+
     QnImageButtonWidget *newActionButton(QAction *action, qreal sizeMultiplier = kDefaultSizeMultiplier
         , int helpTopicId = kDefaultHelpTopicId, QGraphicsItem *parent = nullptr)
     {
@@ -114,11 +125,12 @@ namespace {
 
         qreal rotationSpeed = action->property(Qn::ToolButtonCheckedRotationSpeed).toReal();
         if(!qFuzzyIsNull(rotationSpeed)) {
-            QnRotatingImageButtonWidget *rotatingButton = new QnRotatingImageButtonWidget(parent);
+            QnRotatingImageButtonWidget *rotatingButton =
+                new QnRotatingImageButtonWidget(aliasFromAction(action), parent);
             rotatingButton->setRotationSpeed(rotationSpeed);
             button = rotatingButton;
         } else {
-            button = new QnImageButtonWidget(parent);
+            button = new QnImageButtonWidget(aliasFromAction(action), parent);
         }
 
         button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed, QSizePolicy::ToolButton);
@@ -132,8 +144,11 @@ namespace {
         return button;
     }
 
-    QnImageButtonWidget *newShowHideButton(QGraphicsItem *parent = NULL, QAction *action = NULL) {
-        QnImageButtonWidget *button = new QnImageButtonWidget(parent);
+    QnImageButtonWidget *newShowHideButton(QGraphicsItem *parent, QAction *action)
+    {
+        QnImageButtonWidget *button = new QnImageButtonWidget(
+            aliasFromAction(action), parent);
+
         button->setFixedSize(showHideButtonSize);
         button->setImageMargins(showHideButtonMargins);
         if (action)
@@ -149,8 +164,10 @@ namespace {
         return button;
     }
 
-    QnImageButtonWidget *newPinButton(QGraphicsItem *parent = NULL, QAction *action = NULL) {
-        QnImageButtonWidget *button = new QnImageButtonWidget(parent);
+    QnImageButtonWidget *newPinButton(QGraphicsItem *parent, QAction *action)
+    {
+        QnImageButtonWidget *button = new QnImageButtonWidget(
+            aliasFromAction(action), parent);
 
         int size = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, NULL, NULL);
         button->resize(size, size);
@@ -1173,10 +1190,14 @@ void QnWorkbenchUi::createTreeWidget() {
     m_treeItem->setFocusPolicy(Qt::StrongFocus);
     m_treeItem->setProperty(Qn::NoHandScrollOver, true);
 
-    m_treePinButton = newPinButton(m_controlsWidget, action(QnActions::PinTreeAction));
+    const auto pinTreeAction = action(QnActions::PinTreeAction);
+    pinTreeAction->setChecked(qnSettings->isTreePinned());
+    m_treePinButton = newPinButton(m_controlsWidget, pinTreeAction);
     m_treePinButton->setFocusProxy(m_treeItem);
 
-    m_treeShowButton = newShowHideButton(m_controlsWidget, action(QnActions::ToggleTreeAction));
+    const auto toggleTreeAction = action(QnActions::ToggleTreeAction);
+    toggleTreeAction->setChecked(qnSettings->isTreeOpened());
+    m_treeShowButton = newShowHideButton(m_controlsWidget, toggleTreeAction);
     m_treeShowButton->setFocusProxy(m_treeItem);
 
     m_treeResizerWidget = new QnResizerWidget(Qt::Horizontal, m_controlsWidget);
@@ -1493,7 +1514,8 @@ void QnWorkbenchUi::createTitleWidget() {
     m_titleItem->setLayout(titleLayout);
     titleLayout->activate(); /* So that it would set title's size. */
 
-    m_titleShowButton = newShowHideButton(m_controlsWidget, action(QnActions::ToggleTitleBarAction));
+    const auto toggleTitleBarAction = action(QnActions::ToggleTitleBarAction);
+    m_titleShowButton = newShowHideButton(m_controlsWidget, toggleTitleBarAction);
     {
         QTransform transform;
         transform.rotate(-90);
@@ -1533,6 +1555,8 @@ void QnWorkbenchUi::createTitleWidget() {
 #endif
     connect(titleMenuSignalizer,        &QnAbstractEventSignalizer::activated,  this,   &QnWorkbenchUi::at_titleItem_contextMenuRequested);
     connect(action(QnActions::ToggleTitleBarAction), &QAction::toggled,                this,   [this](bool checked){ if (!m_ignoreClickEvent) setTitleOpened(checked);});
+
+    toggleTitleBarAction->setChecked(qnSettings->isTitleOpened());
 }
 
 #pragma endregion Title methods
@@ -1567,8 +1591,11 @@ void QnWorkbenchUi::setNotificationsOpened(bool opened, bool animate, bool save)
     QN_SCOPED_VALUE_ROLLBACK(&m_ignoreClickEvent, true);
     m_notificationsShowButton->setChecked(opened);
 
+    action(QnActions::ToggleNotificationsAction)->setChecked(opened);
     if (save)
         qnSettings->setNotificationsOpened(opened);
+
+
 }
 
 void QnWorkbenchUi::setNotificationsShowButtonUsed(bool used) {
@@ -1788,11 +1815,13 @@ void QnWorkbenchUi::createNotificationsWidget() {
     m_notificationsItem = new QnNotificationsCollectionWidget(m_controlsWidget, 0, context());
     m_notificationsItem->setProperty(Qn::NoHandScrollOver, true);
     setHelpTopic(m_notificationsItem, Qn::MainWindow_Notifications_Help);
+    const auto pinNotificationsAction = action(QnActions::PinNotificationsAction);
 
-    m_notificationsPinButton = newPinButton(m_controlsWidget, action(QnActions::PinNotificationsAction));
+    m_notificationsPinButton = newPinButton(m_controlsWidget, pinNotificationsAction);
     m_notificationsPinButton->setFocusProxy(m_notificationsItem);
 
-    QnBlinkingImageButtonWidget* blinker = new QnBlinkingImageButtonWidget(m_controlsWidget);
+    QnBlinkingImageButtonWidget* blinker = new QnBlinkingImageButtonWidget(
+        lit("notifications_collection_widget_toggle"), m_controlsWidget);
     m_notificationsShowButton = blinker;
     m_notificationsShowButton->setFixedSize(showHideButtonSize);
     m_notificationsShowButton->setImageMargins(showHideButtonMargins);
@@ -1844,6 +1873,12 @@ void QnWorkbenchUi::createNotificationsWidget() {
     connect(m_notificationsItem,                &QGraphicsWidget::geometryChanged,                      this,   &QnWorkbenchUi::at_notificationsItem_geometryChanged);
     connect(m_notificationsItem,                &QnNotificationsCollectionWidget::visibleSizeChanged,   this,   &QnWorkbenchUi::at_notificationsItem_geometryChanged);
     connect(m_notificationsItem,                &QnNotificationsCollectionWidget::sizeHintChanged,      this,   &QnWorkbenchUi::updateNotificationsGeometry);
+
+    pinNotificationsAction->setChecked(qnSettings->isNotificationsPinned());
+
+    const auto toggleNotificationsAction = action(QnActions::ToggleNotificationsAction);
+    const auto isOpened = qnSettings->isNotificationsOpened();
+    toggleNotificationsAction->setChecked(qnSettings->isNotificationsOpened());
 }
 
 #pragma endregion Notifications widget methods
@@ -2054,7 +2089,8 @@ void QnWorkbenchUi::createCalendarWidget() {
     m_calendarItem->resize(250, 200);
     m_calendarItem->setProperty(Qn::NoHandScrollOver, true);
 
-    m_calendarPinButton = newPinButton(m_controlsWidget, action(QnActions::PinCalendarAction));
+    const auto pinCalendarAction = action(QnActions::PinCalendarAction);
+    m_calendarPinButton = newPinButton(m_controlsWidget, pinCalendarAction);
     m_calendarPinButton->setFocusProxy(m_calendarItem);
 
     m_dayTimeItem = new QnMaskedProxyWidget(m_controlsWidget);
@@ -2121,6 +2157,8 @@ void QnWorkbenchUi::createCalendarWidget() {
     m_calendarPinOffset = QPoint(-kCellsCountOffset * size
         , (size - m_calendarPinButton->size().height()) / 2.0f);
     m_dayTimeOffset = QPoint(-m_dayTimeWidget->headerHeight() , 0);
+
+    pinCalendarAction->setChecked(qnSettings->isCalendarPinned());
 }
 
 #pragma endregion Calendar and DayTime widget methods
@@ -2365,7 +2403,8 @@ void QnWorkbenchUi::createSliderWidget()
     m_sliderItem->speedSlider()->toolTipItem()->setProperty(Qn::NoHandScrollOver, true);
     m_sliderItem->volumeSlider()->toolTipItem()->setProperty(Qn::NoHandScrollOver, true);
 
-    m_sliderShowButton = newShowHideButton(m_controlsWidget, action(QnActions::ToggleSliderAction));
+    const auto toggleSliderAction = action(QnActions::ToggleSliderAction);
+    m_sliderShowButton = newShowHideButton(m_controlsWidget, toggleSliderAction);
     {
         QTransform transform;
         transform.rotate(-90);
@@ -2380,11 +2419,11 @@ void QnWorkbenchUi::createSliderWidget()
         connect(m_sliderAutoHideTimer, &QTimer::timeout, this, [this](){setSliderVisible(false, true);});
     }
 
-    QnImageButtonWidget *sliderZoomOutButton = new QnImageButtonWidget();
+    QnImageButtonWidget *sliderZoomOutButton = new QnImageButtonWidget(lit("slider_zoom_in"));
     sliderZoomOutButton->setIcon(qnSkin->icon("slider/buttons/zoom_out.png"));
     sliderZoomOutButton->setPreferredSize(16, 16);
 
-    QnImageButtonWidget *sliderZoomInButton = new QnImageButtonWidget();
+    QnImageButtonWidget *sliderZoomInButton = new QnImageButtonWidget(lit("slider_zoom_out"));
     sliderZoomInButton->setIcon(qnSkin->icon("slider/buttons/zoom_in.png"));
     sliderZoomInButton->setPreferredSize(16, 16);
 
@@ -2533,6 +2572,7 @@ void QnWorkbenchUi::createSliderWidget()
         menu()->triggerIfPossible(QnActions::OpenBookmarksSearchAction, params);
     });
 
+    toggleSliderAction->setChecked(qnSettings->isSliderOpened());
 }
 
 #pragma endregion Slider methods
