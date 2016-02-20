@@ -25,15 +25,10 @@ QDataStream &operator << (QDataStream &stream, const StructToWrite &s)
 class RecordVisitor : public boost::static_visitor<>
 {
 public:
-    RecordVisitor(QDataStream* stream)
-        : m_stream(stream)
-    {}
+    RecordVisitor(QDataStream* stream) : m_stream(stream) {}
    
     template<typename StructToWrite>
-    void operator()(const StructToWrite &s) const
-    {
-        *m_stream << s;
-    }
+    void operator()(const StructToWrite &s) const { *m_stream << s; }
 
 private:
     QDataStream *m_stream;
@@ -183,12 +178,15 @@ void DbHelper::startWriter()
                 if (m_needStop)
                     return;
 
-                auto record = m_writeQueue.front();
-                m_writeQueue.pop();
+                while (!m_writeQueue.empty())
+                {
+                    auto record = m_writeQueue.front();
+                    m_writeQueue.pop();
 
-                RecordVisitor vis(&m_stream);
-                boost::apply_visitor(vis, record);
-                m_handler->handleRecordWrite(getError());
+                    RecordVisitor vis(&m_stream);
+                    boost::apply_visitor(vis, record);
+                    m_handler->handleRecordWrite(getError());
+                }
 
                 lk.unlock();
                 m_writerDoneCond.notify_all();
