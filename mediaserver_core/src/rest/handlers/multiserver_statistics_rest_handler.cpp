@@ -16,6 +16,8 @@
 
 namespace
 {
+    const auto kSendStatUser = lit("nx");
+    const auto kSendStatPass = lit("f087996adb40eaed989b73e2d5a37c951f559956c44f6f8cdfb6f127ca4136cd");
     const nx_http::StringType kJsonContentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
 
     QString makeFullPath(const QString &basePath
@@ -326,8 +328,8 @@ nx_http::StatusCode::Value SendStatisticsActionHandler::sendStatisticsLocally(
         return nx_http::StatusCode::notAcceptable;
 
     auto httpCode = nx_http::StatusCode::notAcceptable;
-    const auto error = nx_http::uploadDataSync(
-        statisticsServerUrl, metricsList, kJsonContentType, &httpCode);
+    const auto error = nx_http::uploadDataSync(statisticsServerUrl, metricsList
+        , kJsonContentType, kSendStatUser, kSendStatPass, &httpCode);
 
     return (error == SystemError::noError
         ? httpCode : nx_http::StatusCode::internalServerError);
@@ -358,8 +360,8 @@ nx_http::StatusCode::Value SendStatisticsActionHandler::sendStatisticsRemotely(
     };
 
     const QUrl apiUrl = getServerApiUrl(path(), server, *context);
-    runMultiserverUploadRequest(apiUrl
-        , metricsList, kJsonContentType, server, completionFunc, context);
+    runMultiserverUploadRequest(apiUrl, metricsList, kJsonContentType
+        , kSendStatUser, kSendStatPass, server, completionFunc, context);
     context->waitForDone();
     return result;
 }
