@@ -194,7 +194,7 @@ public:
     //!Implementation of AbstractCommunicatingSocket::connect
     virtual bool connect(
         const SocketAddress& remoteAddress,
-        unsigned int timeoutMillis ) override;
+        unsigned int timeoutMillis = DEFAULT_TIMEOUT_MILLIS) override;
     //!Implementation of AbstractCommunicatingSocket::recv
     virtual int recv( void* buffer, unsigned int bufferLen, int flags ) override;
     //!Implementation of AbstractCommunicatingSocket::send
@@ -315,7 +315,7 @@ public:
     static int accept(int sockDesc);
 
     //!Implementation of AbstractStreamServerSocket::listen
-    virtual bool listen(int queueLen) override;
+    virtual bool listen(int queueLen = 128) override;
     //!Implementation of AbstractStreamServerSocket::accept
     virtual AbstractStreamSocket* accept() override;
     //!Implementation of QnStoppable::pleaseStop
