@@ -250,6 +250,42 @@ TEST_F(SocketUdt, rendezvousConnect)
     acceptorSocket.pleaseStopSync();
 }
 
+TEST_F(SocketUdt, DISABLED_acceptingFirstConnection)
+{
+    const std::chrono::seconds timeToWaitForSocketAccepted(1);
+    const int loopLength = 271;
+
+    for (int i = 0; i < loopLength; ++i)
+    {
+        UdtStreamServerSocket serverSocket;
+        ASSERT_TRUE(serverSocket.bind(SocketAddress(HostAddress::localhost, 0)));
+        ASSERT_TRUE(serverSocket.listen());
+        ASSERT_TRUE(serverSocket.setNonBlockingMode(true));
+
+        std::promise<SystemError::ErrorCode> socketAcceptedPromise;
+        serverSocket.acceptAsync(
+            [&socketAcceptedPromise](
+                SystemError::ErrorCode errorCode,
+                AbstractStreamSocket* /*socket*/)
+            {
+                socketAcceptedPromise.set_value(errorCode);
+            });
+
+        //std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+        UdtStreamSocket clientSock;
+        ASSERT_TRUE(clientSock.connect(serverSocket.getLocalAddress()));
+
+        auto future = socketAcceptedPromise.get_future();
+        ASSERT_EQ(
+            std::future_status::ready,
+            future.wait_for(timeToWaitForSocketAccepted));
+        ASSERT_EQ(SystemError::noError, future.get());
+
+        serverSocket.pleaseStopSync();
+    }
+}
+
 }   //test
 }   //network
 }   //nx
