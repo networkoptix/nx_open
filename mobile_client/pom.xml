@@ -21,7 +21,7 @@
         <!--Global libs-->
         <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc</ffmpeg.libs>
         <qt.libs>core qml quick concurrent network sql multimedia xml</qt.libs>
-        <global.libs>-lappserver2 -lnx_streaming -lnx_media -lnx_audio -lcommon -lclient.core</global.libs>
+        <global.libs>-lclient.core -lnx_media -lnx_audio -lnx_streaming -lappserver2 -lcommon</global.libs>
 
         <!--Specific os libs used-->
         <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -lDxErr -ld3d9 -lopenal32 -lssleay32 -llibeay32</windows.oslibs>

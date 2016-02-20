@@ -59,6 +59,13 @@ namespace {
                 return QString();
         }
     }
+
+    void fillInputBuffer(JNIEnv *env, jobject thiz, jobject buffer, jlong srcDataPtr, jint dataSize)
+    {
+        void* bytes = env->GetDirectBufferAddress(buffer);
+        void* srcData = (void*) srcDataPtr;
+        memcpy(bytes, srcData, dataSize);
+    }
 }
 
 // --------------------------------------------------------------------------------------------------
@@ -113,12 +120,6 @@ private:
 // --------------------------------------------------------------------------------------------------
 
 
-void fillInputBuffer(JNIEnv *env, jobject thiz, jobject buffer, jlong srcDataPtr, jint dataSize)
-{
-    void* bytes = env->GetDirectBufferAddress(buffer);
-    void* srcData = (void*) srcDataPtr;
-    memcpy(bytes, srcData, dataSize);
-}
 
 // ------------------------- AndroidVideoDecoderPrivate -------------------------
 

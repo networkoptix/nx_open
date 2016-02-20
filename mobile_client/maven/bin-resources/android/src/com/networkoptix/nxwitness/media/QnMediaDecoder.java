@@ -250,7 +250,7 @@ public class QnMediaDecoder {
               ByteBuffer inputBuffer = inputBuffers[inputBufferId];
               inputBuffer.allocateDirect(frameSize);
               fillInputBuffer(inputBuffer, srcDataPtr, frameSize); //< C++ callback
-              codec.queueInputBuffer(inputBufferId, 0, frameSize, frameNum, 0);
+              codec.queueInputBuffer(inputBufferId, 0, frameSize, 0, 0);
             }
             else {
                 System.out.println("error dequeueInputBuffer");

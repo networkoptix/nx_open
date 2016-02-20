@@ -45,12 +45,12 @@ namespace {
                 return QString();
         }
     }
+
+    void fillInputBuffer(JNIEnv *env, jobject thiz, jobject buffer, jlong srcDataPtr, jint dataSize);
+    void readOutputBuffer(JNIEnv *env, jobject thiz, jlong cObject, jobject buffer, jint bufferSize);
 }
 
 // ------------------------------------------------------------------------------
-
-void fillInputBuffer(JNIEnv *env, jobject thiz, jobject buffer, jlong srcDataPtr, jint dataSize);
-void readOutputBuffer(JNIEnv *env, jobject thiz, jlong cObject, jobject buffer, jint dataSize);
 
 
 // ------------------------- AndroidAudioDecoderPrivate -------------------------
@@ -102,20 +102,24 @@ private:
     AudioFramePtr audioFrame;
 };
 
-// --------------------------------------------------------------------------------------------------
+namespace {
 
 void fillInputBuffer(JNIEnv *env, jobject thiz, jobject buffer, jlong srcDataPtr, jint dataSize)
 {
+    Q_UNUSED(thiz);
     void* bytes = env->GetDirectBufferAddress(buffer);
     void* srcData = (void*)srcDataPtr;
     memcpy(bytes, srcData, dataSize);
 }
 
-void readOutputBuffer(JNIEnv *env, jobject thiz, jobject buffer, jint bufferSize, jlong cObject)
+void readOutputBuffer(JNIEnv *env, jobject thiz, jlong cObject, jobject buffer, jint bufferSize)
 {
+    Q_UNUSED(thiz);
     AndroidAudioDecoderPrivate* decoder = static_cast<AndroidAudioDecoderPrivate*> ((void*) cObject);
     void* bytes = env->GetDirectBufferAddress(buffer);
     decoder->readOutputBuffer(bytes, bufferSize);
+}
+
 }
 
 // ---------------------- AndroidAudioDecoder ----------------------
