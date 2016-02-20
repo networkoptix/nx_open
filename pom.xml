@@ -404,11 +404,13 @@
             </activation>
             <properties>
                 <additional.qtlibs>DBus, WebChannel, Webkit, WebkitWidgets</additional.qtlibs>
+                <additional.qtplugins>audio</additional.qtplugins>
             </properties>
             <modules>
                 <module>client.core</module>
                 <module>client</module>
                 <module>client.bin</module>
+                <module>common_libs/nx_audio</module>
                 <module>nx_cloud/cloud_db</module>
                 <module>nx_cloud/connection_mediator</module>
                 <module>nx_cloud/libcloud_db</module>
