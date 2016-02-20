@@ -22,6 +22,7 @@
     <name>Nx Cloud Connection Mediator Lib</name>
 
     <properties>
+        <guid>${libconnection_mediator.guid}</guid>
         <release.version>${parsedVersion.majorVersion}${parsedVersion.minorVersion}${parsedVersion.incrementalVersion}</release.version>
         <product.title>${company.name} Mediator Lib</product.title>
         <template>lib</template>

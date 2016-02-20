@@ -11,7 +11,7 @@
 
 #include <functional>
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/gzip/gzip_uncompressor.h>
 #include <utils/fs/async_file_processor.h>
 #include <utils/media/custom_output_stream.h>
@@ -411,11 +411,7 @@ namespace detail
             this, &GetFileOperation::onHttpDone,
             Qt::DirectConnection );
         m_httpClient->setUseCompression( false );   //not using compression for server to report Content-Length
-        if( !m_httpClient->doGet( downloadUrl ) )
-        {
-            //TODO/IMPL we must return false here and cancel async stat. But for the moment cancellation is not implemented, so assert is here...
-            assert( false );
-        }
+        m_httpClient->doGet( downloadUrl );
 
         return true;
     }
@@ -475,17 +471,7 @@ namespace detail
             m_httpClient.get(), &nx_http::AsyncHttpClient::done,
             this, &GetFileOperation::onHttpDone,
             Qt::DirectConnection );
-        if( !m_httpClient->doGet( downloadUrl ) )
-        {
-            setResult( ResultCode::downloadFailure );
-            setErrorText( SystemError::getLastOSErrorText() );
-            {
-                std::unique_lock<std::mutex> lk( m_mutex );
-                m_state = State::sFinished;
-            }
-            m_handler->operationDone( shared_from_this() );
-            return false;
-        }
+        m_httpClient->doGet( downloadUrl );
 
         return true;
     }

@@ -85,7 +85,7 @@ private:
     void onUdtConnectionAccepted(
         SystemError::ErrorCode errorCode,
         AbstractStreamSocket* acceptedSocket);
-    virtual void pleaseStop(std::function<void()> completionHandler) override;
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
 
     MediaServerEmulator(const MediaServerEmulator&);
     MediaServerEmulator& operator=(const MediaServerEmulator&);

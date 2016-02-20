@@ -78,7 +78,7 @@ QN_FUSION_DEFINE_KEY(optional)
 #define QN_FUSION_LIT_CAT(A, B) \
     QN_FUSION_LIT_CAT_I(A, B)
 
-#if _MSC_VER < 1900 //< MSVC pre-2015
+#if defined(_MSC_VER) && _MSC_VER < 1900 //< MSVC pre-2015
 #   define QN_FUSION_LIT_CAT_I(A, B) QStringLiteral(A BOOST_PP_CAT(L, B))
 #else
 #   define QN_FUSION_LIT_CAT_I(A, B) QStringLiteral(A B)

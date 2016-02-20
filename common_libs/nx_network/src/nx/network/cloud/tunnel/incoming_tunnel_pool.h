@@ -31,7 +31,7 @@ public:
         boost::optional<unsigned int> timeout);
 
     /** Cancels all operations in progress */
-    void pleaseStop(std::function<void()> handler) override;
+    void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
 private:
     void acceptTunnel(std::shared_ptr<AbstractIncomingTunnelConnection> connection);

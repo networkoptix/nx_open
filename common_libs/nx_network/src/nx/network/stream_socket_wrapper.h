@@ -34,7 +34,7 @@ public:
 
     void connectAsync(
         const SocketAddress& addr,
-        std::function<void(SystemError::ErrorCode)> handler) override;
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
 
     void readSomeAsync(
         nx::Buffer* const buf,
@@ -56,7 +56,7 @@ public:
     bool reopen() override;
 
     //!Implementation of QnStoppable::pleaseStop
-    void pleaseStop(std::function<void()> handler) override;
+    void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
     //!Implementation of AbstractSocket::*
     void post(nx::utils::MoveOnlyFunc<void()> handler) override;

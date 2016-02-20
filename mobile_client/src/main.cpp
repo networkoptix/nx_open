@@ -32,8 +32,12 @@
 #include <nx/media/audio_decoder_registry.h>
 #include <nx/media/ffmpeg_video_decoder.h>
 #include <nx/media/ffmpeg_audio_decoder.h>
-#include <nx/media/android_decoder.h>
 #include <nx/media/jpeg_decoder.h>
+
+#if defined(Q_OS_ANDROID)
+#include <nx/media/android_video_decoder.h>
+#include <nx/media/android_audio_decoder.h>
+#endif
 
 #include <QtGui/QOpenGLContext>
 #include <QtGui/QOpenGLFunctions>

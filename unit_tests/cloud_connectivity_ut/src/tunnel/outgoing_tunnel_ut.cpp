@@ -41,7 +41,7 @@ public:
         --instanceCount;
     }
 
-    virtual void pleaseStop(std::function<void()> completionHandler) override
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override
     {
         completionHandler();
     }
@@ -130,9 +130,9 @@ public:
         --instanceCount;
     }
 
-    virtual void pleaseStop(std::function<void()> completionHandler) override
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override
     {
-        m_aioThreadBinder.pleaseStop(std::bind(completionHandler));
+        m_aioThreadBinder.pleaseStop(std::move(completionHandler));
     }
 
     virtual int getPriority() const override

@@ -83,7 +83,7 @@ public:
     /**
         \note \a completionHandler is invoked in socket's aio thread
     */
-    virtual void pleaseStop(std::function<void()> completionHandler) override
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override
     {
         m_socket->pleaseStop(std::move(completionHandler));
     }

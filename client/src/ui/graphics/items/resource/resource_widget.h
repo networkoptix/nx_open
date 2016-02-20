@@ -299,7 +299,7 @@ protected:
     virtual bool isHovered() const;
 
     Qn::ResourceStatusOverlay statusOverlay() const;
-    void setStatusOverlay(Qn::ResourceStatusOverlay statusOverlay);
+    void setStatusOverlay(Qn::ResourceStatusOverlay statusOverlay, bool animate = true);
     Qn::ResourceStatusOverlay calculateStatusOverlay(int resourceStatus, bool hasVideo) const;
     virtual Qn::ResourceStatusOverlay calculateStatusOverlay() const;
     Q_SLOT void updateStatusOverlay();

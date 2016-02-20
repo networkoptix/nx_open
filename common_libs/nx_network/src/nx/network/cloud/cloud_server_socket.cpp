@@ -152,20 +152,20 @@ AbstractStreamSocket* CloudServerSocket::accept()
     return acceptedSocket.release();
 }
 
-void CloudServerSocket::pleaseStop(std::function<void()> handler)
+void CloudServerSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
     {
         QnMutexLocker lock(&m_mutex);
         m_terminated = true;
     }
 
-    auto stop = [this, handler]()
+    auto stop = [this, handler = std::move(handler)]() mutable
     {
         if (m_mediatorConnection)
             m_mediatorConnection.reset();
 
         BarrierHandler barrier(
-            [this, handler]()
+            [this, handler = std::move(handler)]() mutable
             {
                 // 3rd - Stop Tunnel Pool and IO thread
                 BarrierHandler barrier(std::move(handler));

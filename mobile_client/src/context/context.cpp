@@ -8,6 +8,7 @@
 #include "login_session_manager.h"
 #include "context_settings.h"
 #include "ui/window_utils.h"
+#include "ui/texture_size_helper.h"
 
 namespace {
 #if !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
@@ -78,4 +79,9 @@ void QnContext::setKeepScreenOn(bool keepScreenOn) {
 
 void QnContext::enterFullscreen() {
     hideSystemUi();
+}
+
+int QnContext::getMaxTextureSize() const
+{
+    return QnTextureSizeHelper::instance()->maxTextureSize();
 }

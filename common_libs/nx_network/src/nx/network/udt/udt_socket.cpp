@@ -779,7 +779,7 @@ void UdtStreamSocket::dispatch( nx::utils::MoveOnlyFunc<void()> handler )
 
 void UdtStreamSocket::connectAsync(
     const SocketAddress& addr,
-    std::function<void( SystemError::ErrorCode )> handler )
+    nx::utils::MoveOnlyFunc<void( SystemError::ErrorCode )> handler )
 {
     return m_aioHelper->connectAsync( addr, std::move(handler) );
 }
@@ -863,7 +863,9 @@ AbstractStreamSocket* UdtStreamServerSocket::accept()  {
     }
 }
 
-void UdtStreamServerSocket::pleaseStop( std::function< void() > handler ) {
+void UdtStreamServerSocket::pleaseStop( 
+    nx::utils::MoveOnlyFunc< void() > handler )
+{
     m_aioHelper->cancelIOAsync( std::move( handler ) );
 }
 

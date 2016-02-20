@@ -1319,6 +1319,7 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(lit("Alt+G")).
         condition(new QnSmartSearchActionCondition(false, this));
 
+    // TODO: #ynikitenkov remove this action, use StartSmartSearchAction with checked state!
     factory(QnActions::StopSmartSearchAction).
         flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
         text(tr("Hide Motion/Smart Search")).
@@ -1897,6 +1898,12 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::NoTarget).
         text(tr("Show Timeline")).
         toggledText(tr("Hide Timeline"));
+
+    factory(QnActions::ToggleNotificationsAction).
+        flags(Qn::NoTarget);
+        //text(tr("Show Notifications")).         // TODO: #ynikitenkov: uncomment in 2.6
+        //toggledText(tr("Hide Notifications"));  // TODO: #ynikitenkov: uncomment in 2.6
+    action(QnActions::ToggleNotificationsAction)->setCheckable(true);   // TODO: remove in 2.6
 
     factory(QnActions::PinNotificationsAction).
         flags(Qn::Notifications | Qn::NoTarget).

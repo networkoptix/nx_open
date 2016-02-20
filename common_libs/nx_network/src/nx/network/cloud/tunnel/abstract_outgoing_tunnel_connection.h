@@ -24,13 +24,21 @@ class AbstractOutgoingTunnelConnection
     public QnStoppableAsync
 {
 public:
+    /**
+        @param stillValid If \a false, connection cannot be used anymore 
+            (every subsequent \a AbstractOutgoingTunnelConnection::establishNewConnection call will fail)
+    */
     typedef std::function<void(
         SystemError::ErrorCode,
         std::unique_ptr<AbstractStreamSocket>,
-        bool /*stillValid*/)> OnNewConnectionHandler;
+        bool stillValid)> OnNewConnectionHandler;
 
     virtual ~AbstractOutgoingTunnelConnection() {}
 
+    /**
+        \note Actual implementation MUST support connect request pipelining but 
+            does not have to be neither thread-safe nor reenterable
+    */
     virtual void establishNewConnection(
         boost::optional<std::chrono::milliseconds> timeout,
         SocketAttributes socketAttributes,

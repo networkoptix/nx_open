@@ -26,7 +26,7 @@ public:
     virtual ~CloudAcceptor();
 
     //!Implementation of QnStoppableAsync::pleaseStop
-    virtual void pleaseStop( std::function<void()>&& completionHandler ) override;
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
 
     bool acceptAsync( std::function<void(const ErrorDescription&, AbstractStreamSocket*)>&& completionHandler );
 };

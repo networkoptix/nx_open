@@ -1,21 +1,12 @@
 
 #pragma once
 
+#include <statistics/base/base_fwd.h>
 #include <statistics/abstract_statistics_module.h>
-
-// + Time when the window is active
-// Time when the window is in fullscreen mode
-
-// Time when video is live (per camera??? what with desync layouts?)
-// Time when video is in archive
-// Time when video is paused
-// Time when the camera is on fullscreen (any camera)
-// Time when control panels are visible (per panel)
-// Time when panels are unpinned
-
-class QnWorkbenchContext;
+#include <ui/workbench/workbench_context_aware.h>
 
 class QnGraphicsStatisticsModule : public QnAbstractStatisticsModule
+    , public QnWorkbenchContextAware
 {
     Q_OBJECT
 
@@ -26,15 +17,10 @@ public:
 
     virtual ~QnGraphicsStatisticsModule();
 
-    virtual QnMetricsHash metrics() const;
+    virtual QnStatisticValuesHash values() const override;
 
-    virtual void resetMetrics();
-
-    void setContext(QnWorkbenchContext *context);
+    virtual void reset() override;
 
 private:
-    typedef QPointer<QnWorkbenchContext> ContextPtr;
-    ContextPtr m_context;
-
-
+    const QnMetricsContainerPtr m_metrics;
 };

@@ -6,6 +6,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mobile_client-x64", "src\mo
 		${common.guid} = ${common.guid}
 		${nx_streaming.guid} = ${nx_streaming.guid}
 		${nx_media.guid} = ${nx_media.guid}
+		${nx_audio.guid} = ${nx_audio.guid}
 		${client.core.guid} = ${client.core.guid}
 	EndProjectSection
 EndProject
@@ -20,6 +21,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_streaming-x64", "..\common_libs\nx_streaming\src\nx_streaming-x64.vcxproj", "${nx_streaming.guid}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_media-x64", "..\common_libs\nx_media\src\nx_media-x64.vcxproj", "${nx_media.guid}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_audio-x64", "..\common_libs\nx_audio\src\nx_audio-x64.vcxproj", "${nx_audio.guid}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "appserver2-x64", "..\appserver2\src\appserver2-x64.vcxproj", "${appserver2.guid}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -52,6 +55,10 @@ Global
 		${nx_media.guid}.Debug|x64.Build.0 = Debug|x64
 		${nx_media.guid}.Release|x64.ActiveCfg = Release|x64
 		${nx_media.guid}.Release|x64.Build.0 = Release|x64
+		${nx_audio.guid}.Debug|x64.ActiveCfg = Debug|x64
+		${nx_audio.guid}.Debug|x64.Build.0 = Debug|x64
+		${nx_audio.guid}.Release|x64.ActiveCfg = Release|x64
+		${nx_audio.guid}.Release|x64.Build.0 = Release|x64
 		${appserver2.guid}.Debug|x64.ActiveCfg = Debug|x64
 		${appserver2.guid}.Debug|x64.Build.0 = Debug|x64
 		${appserver2.guid}.Release|x64.ActiveCfg = Release|x64

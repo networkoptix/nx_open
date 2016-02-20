@@ -22,6 +22,7 @@
     <name>Nx CloudDb C++ Client</name>
 
     <properties>
+        <guid>${cloud_db_client.guid}</guid>
         <release.version>${parsedVersion.majorVersion}${parsedVersion.minorVersion}${parsedVersion.incrementalVersion}</release.version>
         <product.title>${company.name} cloud_db_client</product.title>
         <template>lib</template>

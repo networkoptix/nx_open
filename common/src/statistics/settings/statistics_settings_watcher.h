@@ -30,9 +30,13 @@ private:
     void updateSettingsImpl(int delayMs);
 
 private:
-    typedef QScopedPointer<QTimer> TimerPtr;
-    typedef QScopedPointer<QnStatisticsSettings> SettingsPtr;
+    void setSettings(const QnStatisticsSettings &settings);
 
+    void resetSettings();
+
+private:
+    typedef QScopedPointer<QnStatisticsSettings> SettingsPtr;
+    typedef QScopedPointer<QTimer> TimerPtr;
     SettingsPtr m_settings;
     TimerPtr m_updateTimer;
 

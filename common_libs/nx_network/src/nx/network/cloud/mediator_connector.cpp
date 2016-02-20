@@ -94,7 +94,7 @@ boost::optional<SystemCredentials> MediatorConnector::getSystemCredentials() con
     return m_credentials;
 }
 
-void MediatorConnector::pleaseStop( std::function<void()> handler )
+void MediatorConnector::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
     {
         QnMutexLocker lk( &m_mutex );

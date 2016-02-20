@@ -834,7 +834,7 @@ void CommunicatingSocket<InterfaceToImplement>::cancelIOSync(aio::EventType even
 template<typename InterfaceToImplement>
 void CommunicatingSocket<InterfaceToImplement>::connectAsync(
     const SocketAddress& addr,
-    std::function<void( SystemError::ErrorCode )> handler )
+    nx::utils::MoveOnlyFunc<void( SystemError::ErrorCode )> handler )
 {
     return m_aioHelper->connectAsync( addr, std::move(handler) );
 }
@@ -1290,22 +1290,23 @@ bool TCPServerSocket::listen(int queueLen)
     return ::listen( handle(), queueLen ) == 0;
 }
 
-void TCPServerSocket::pleaseStop(std::function<void()> completionHandler)
+void TCPServerSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
     //TODO #ak add general implementation to Socket class and remove this method
-    dispatch( [ this, completionHandler ]()
-    {
-        //impl()->terminated.store(true, std::memory_order_relaxed);
+    dispatch(
+        [this, completionHandler = std::move(completionHandler)]()
+        {
+            //impl()->terminated.store(true, std::memory_order_relaxed);
 
-        nx::network::SocketGlobals::aioService().cancelPostedCalls(
-            static_cast<Pollable*>(this), true);
-        nx::network::SocketGlobals::aioService().removeFromWatch(
-            static_cast<Pollable*>(this), aio::etRead, true);
-        nx::network::SocketGlobals::aioService().removeFromWatch(
-            static_cast<Pollable*>(this), aio::etTimedOut, true);
+            nx::network::SocketGlobals::aioService().cancelPostedCalls(
+                static_cast<Pollable*>(this), true);
+            nx::network::SocketGlobals::aioService().removeFromWatch(
+                static_cast<Pollable*>(this), aio::etRead, true);
+            nx::network::SocketGlobals::aioService().removeFromWatch(
+                static_cast<Pollable*>(this), aio::etTimedOut, true);
 
-        completionHandler();
-    } );
+            completionHandler();
+        });
 }
 
 //!Implementation of AbstractStreamServerSocket::accept

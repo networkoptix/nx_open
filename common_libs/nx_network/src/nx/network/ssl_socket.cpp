@@ -1359,7 +1359,7 @@ void QnSSLSocket::cancelIOSync(nx::network::aio::EventType eventType)
 
 void QnSSLSocket::connectAsync(
     const SocketAddress& addr,
-    std::function<void( SystemError::ErrorCode )> handler )
+    nx::utils::MoveOnlyFunc<void( SystemError::ErrorCode )> handler )
 {
     Q_D( const QnSSLSocket );
     return d->wrappedSocket->connectAsync( addr, std::move(handler) );
@@ -1520,7 +1520,7 @@ void QnMixedSSLSocket::cancelIOAsync(
 
 void QnMixedSSLSocket::connectAsync(
     const SocketAddress& addr,
-    std::function<void( SystemError::ErrorCode )> handler )
+    nx::utils::MoveOnlyFunc<void( SystemError::ErrorCode )> handler )
 {
     Q_D( QnMixedSSLSocket );
     if( d->useSSL )
@@ -1629,7 +1629,7 @@ AbstractStreamSocket* SSLServerSocket::accept()
         return new QnSSLSocket(acceptedSock, true);
 }
 
-void SSLServerSocket::pleaseStop(std::function< void() > handler)
+void SSLServerSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
     return m_delegateSocket->pleaseStop(std::move(handler));
 }

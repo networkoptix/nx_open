@@ -449,9 +449,9 @@ void UdtSocketProfileClient::ScheduleConnection() {
             conn->socket->connectAsync(
                 SocketAddress( HostAddress(address_), port_ ) ,
                 std::bind(
-                &UdtSocketProfileClient::OnConnect,
-                this,
-                std::placeholders::_1, conn.get()));
+                    &UdtSocketProfileClient::OnConnect,
+                    this,
+                    std::placeholders::_1, conn.get()));
             conn.release();
             ++active_conn_sockets_size_;
             ++scheduled_size;

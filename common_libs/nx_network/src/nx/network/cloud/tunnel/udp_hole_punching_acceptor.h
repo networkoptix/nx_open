@@ -10,7 +10,7 @@ namespace network {
 namespace cloud {
 
 // TODO #mux comment
-class UdpHolePunchingTunnelAcceptor
+class NX_NETWORK_API UdpHolePunchingTunnelAcceptor
 :
     public AbstractTunnelAcceptor
 {
@@ -22,7 +22,7 @@ public:
         SystemError::ErrorCode,
         std::unique_ptr<AbstractIncomingTunnelConnection>)> handler) override;
 
-    void pleaseStop(std::function<void()> handler) override;
+    void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
 private:
     void initiateConnection();
@@ -37,7 +37,7 @@ private:
     std::unique_ptr<hpm::api::MediatorServerUdpConnection> m_udpMediatorConnection;
     std::unique_ptr<UdtStreamSocket> m_udtConnectionSocket;
 
-    std::function<void()> m_stopHandler;
+    nx::utils::MoveOnlyFunc<void()> m_stopHandler;
     std::function<void(
         SystemError::ErrorCode,
         std::unique_ptr<AbstractIncomingTunnelConnection>)> m_acceptHandler;

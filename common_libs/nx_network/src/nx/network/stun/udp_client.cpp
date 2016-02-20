@@ -59,7 +59,7 @@ UDPClient::~UDPClient()
     cleanupWhileInAioThread();
 }
 
-void UDPClient::pleaseStop(std::function<void()> handler)
+void UDPClient::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
     m_messagePipeline.pleaseStop(
         [handler = std::move(handler), this](){

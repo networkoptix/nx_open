@@ -326,6 +326,7 @@ angular.module('webadminApp')
                 if( proxy === Config.demo){
                     serverUrl = proxy + '/';
                 }
+
                 //RecordedTimePeriods
                 return  wrapGet(serverUrl + 'ec2/recordedTimePeriods' +
                     '?' + (label||'') +

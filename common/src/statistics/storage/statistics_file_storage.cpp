@@ -13,11 +13,9 @@ namespace
 
     const qint64 kNotStatisticsFileTimeStamp = 0;
 
-    const auto localDataDirectory = QDir(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
-
     QDir getCustomDirectory(const QString &leafDirectoryName)
     {
-        auto directory = localDataDirectory;
+        auto directory = QDir(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
         if (!directory.exists(leafDirectoryName))
         {
             if (!directory.mkdir(leafDirectoryName))
@@ -32,7 +30,7 @@ namespace
 
     QDir getStatisticsDirectory()
     {
-        static const auto kStatisticsDirectoryName = lit("nx_statistics");
+        static const auto kStatisticsDirectoryName = lit("statistics");
         static const auto kResult =
             getCustomDirectory(kStatisticsDirectoryName);
 
@@ -41,20 +39,11 @@ namespace
 
     QDir getCustomDataDirectory()
     {
-        static const auto kCustomDirectoryName = lit("nx_custom");
+        static const auto kCustomDirectoryName = lit("custom_properties");
         static const auto kResult =
             getCustomDirectory(kCustomDirectoryName);
 
         return kResult;
-    }
-
-    typedef std::shared_ptr<QFile> QFileCloseGuard;
-    QFileCloseGuard createFileCloseGuard(QFile *file)
-    {
-        return QFileCloseGuard(file, [](QFile *file)
-        {
-            file->close();
-        });
     }
 
     bool writeToFile(const QString &absoluteFileName
@@ -66,12 +55,7 @@ namespace
         if (!output.isOpen())
             return false;
 
-        qint64 writtenSize = 0;
-        {
-            const auto closeGuard = createFileCloseGuard(&output);
-            writtenSize = output.write(data);
-        }
-
+        const qint64 writtenSize = output.write(data);
         return (writtenSize == data.size());
     }
 
@@ -84,7 +68,6 @@ namespace
         if (!input.open(QIODevice::ReadOnly))
             return QByteArray();
 
-        const auto closeGuard = createFileCloseGuard(&input);
         return input.readAll();
     }
 
@@ -110,7 +93,7 @@ QnStatisticsFileStorage::QnStatisticsFileStorage()
 QnStatisticsFileStorage::~QnStatisticsFileStorage()
 {}
 
-void QnStatisticsFileStorage::storeMetrics(const QnMetricsHash &metrics)
+void QnStatisticsFileStorage::storeMetrics(const QnStatisticValuesHash &metrics)
 {
     if (!m_statisticsDirectory.exists())
         return;
@@ -152,8 +135,8 @@ QnMetricHashesList QnStatisticsFileStorage::getMetricsList(qint64 startTimeUtcMs
             continue;
 
         bool success = false;
-        const QnMetricsHash metrics = QJson::deserialized(
-            json, QnMetricsHash(), &success);
+        const QnStatisticValuesHash metrics = QJson::deserialized(
+            json, QnStatisticValuesHash(), &success);
         if (success)
             result.append(metrics);
     }

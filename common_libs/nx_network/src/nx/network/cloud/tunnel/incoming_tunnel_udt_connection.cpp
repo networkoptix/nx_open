@@ -1,27 +1,43 @@
 #include "incoming_tunnel_udt_connection.h"
 
 #include <nx/utils/log/log.h>
+#include <nx/network/cloud/data/udp_hole_punching_connection_initiation_data.h>
+#include <nx/network/stun/message_serializer.h>
 
 namespace nx {
 namespace network {
 namespace cloud {
 
 IncomingTunnelUdtConnection::IncomingTunnelUdtConnection(
-    String remotePeerId, std::unique_ptr<UdtStreamSocket> connectionSocket)
+    String connectionId,
+    std::unique_ptr<UdtStreamSocket> connectionSocket,
+    std::chrono::milliseconds maxKeepAliveInterval)
 :
-    AbstractIncomingTunnelConnection(std::move(remotePeerId)),
+    AbstractIncomingTunnelConnection(std::move(connectionId)),
+    m_maxKeepAliveInterval(maxKeepAliveInterval),
+    m_lastKeepAlive(std::chrono::system_clock::now()),
+    m_state(SystemError::noError),
     m_connectionSocket(std::move(connectionSocket)),
     m_serverSocket(new UdtStreamServerSocket)
 {
-    // TODO: read for UdpHolePunchingSyn on m_serverSocket and send back
-    //      UdpHolePunchingSyn
-
     m_serverSocket->bindToAioThread(m_connectionSocket->getAioThread());
     if (!m_serverSocket->setNonBlockingMode(true) ||
         !m_serverSocket->bind(m_connectionSocket->getLocalAddress()) ||
         !m_serverSocket->listen())
     {
-        m_serverSocket.reset();
+        NX_LOGX(lm("Can not listen on server socket: ")
+            .arg(SystemError::getLastOSErrorText()), cl_logWARNING);
+
+        m_state = SystemError::getLastOSErrorCode();
+    }
+    else
+    {
+        NX_LOGX(lm("Listening for new connections"), cl_logDEBUG1);
+
+        m_connectionBuffer.reserve(1024);
+        m_connectionParser.setMessage(&m_connectionMessage);
+        monitorKeepAlive();
+        readConnectionRequest();
     }
 }
 
@@ -29,32 +45,151 @@ void IncomingTunnelUdtConnection::accept(std::function<void(
     SystemError::ErrorCode,
     std::unique_ptr<AbstractStreamSocket>)> handler)
 {
-    if (!m_serverSocket)
-        handler(SystemError::connectionReset, nullptr);
+    Q_ASSERT_X(!m_acceptHandler, Q_FUNC_INFO, "Concurent accept");
+    m_connectionSocket->post(
+        [this, handler = std::move(handler)]()
+        {
+            if (m_state != SystemError::noError)
+                return handler(m_state, nullptr);
 
-    m_acceptHandler = std::move(handler);
-    m_serverSocket->acceptAsync(
-        [this](SystemError::ErrorCode code,
-               AbstractStreamSocket* socket)
-    {
-        NX_LOGX(lm("Accepted %1: %2").arg(socket)
-            .arg(SystemError::toString(code)), cl_logDEBUG2);
+            m_acceptHandler = std::move(handler);
+            m_serverSocket->acceptAsync(
+                [this](SystemError::ErrorCode code,
+                       AbstractStreamSocket* socket)
+            {
+                m_lastKeepAlive = std::chrono::system_clock::now();
+                NX_LOGX(lm("Accepted %1 (%2)")
+                    .arg(socket).arg(SystemError::toString(code)), cl_logDEBUG2);
 
-        const auto handler = std::move(m_acceptHandler);
-        m_acceptHandler = nullptr;
-        handler(
-            SystemError::noError,
-            std::unique_ptr<AbstractStreamSocket>(socket));
-    });
+                if (code != SystemError::noError)
+                {
+                    m_state = code;
+                    m_serverSocket.reset();
+                }
+
+                const auto handler = std::move(m_acceptHandler);
+                m_acceptHandler = nullptr;
+                handler(
+                    SystemError::noError,
+                    std::unique_ptr<AbstractStreamSocket>(socket));
+            });
+        });
 }
 
 void IncomingTunnelUdtConnection::pleaseStop(
-    std::function<void()> handler)
+    nx::utils::MoveOnlyFunc<void()> handler)
 {
-    BarrierHandler barrier(std::move(handler));
-    m_connectionSocket->pleaseStop(barrier.fork());
+    m_connectionSocket->pleaseStop(
+        [this, handler = std::move(handler)]()
+        {
+            if (m_serverSocket)
+                m_serverSocket->pleaseStopSync();
+
+            handler();
+        });
+}
+
+void IncomingTunnelUdtConnection::monitorKeepAlive()
+{
+    using namespace std::chrono;
+    auto timePassed = system_clock::now() - m_lastKeepAlive;
+    if (timePassed >= m_maxKeepAliveInterval)
+        return connectionSocketError(SystemError::timedOut);
+
+    auto next = duration_cast<milliseconds>(m_maxKeepAliveInterval - timePassed);
+    m_connectionSocket->registerTimer(next, [this](){ monitorKeepAlive(); });
+}
+
+void IncomingTunnelUdtConnection::readConnectionRequest()
+{
+    m_connectionParser.reset();
+    readRequest();
+}
+
+void IncomingTunnelUdtConnection::readRequest()
+{
+    m_connectionBuffer.resize(0);
+    m_connectionSocket->readSomeAsync(
+        &m_connectionBuffer,
+        [this](SystemError::ErrorCode code, size_t)
+        {
+            if (code != SystemError::noError)
+                return connectionSocketError(code);
+
+            m_lastKeepAlive = std::chrono::system_clock::now();
+            size_t processed = 0;
+            switch(m_connectionParser.parse(
+                m_connectionBuffer, &processed))
+            {
+                case nx_api::ParserState::init:
+                case nx_api::ParserState::inProgress:
+                    return readRequest();
+
+                case nx_api::ParserState::done:
+                {
+                    hpm::api::UdpHolePunchingSyn syn;
+                    if (!syn.parse(m_connectionMessage))
+                        return connectionSocketError(SystemError::invalidData);
+
+                    return writeResponse();
+                }
+
+                case nx_api::ParserState::failed:
+                    return connectionSocketError(SystemError::invalidData);
+            };
+        });
+}
+
+
+void IncomingTunnelUdtConnection::writeResponse()
+{
+    NX_LOGX(lm("Send SYN+ACK for connection %1")
+        .arg(m_connectionId), cl_logDEBUG2);
+
+    hpm::api::UdpHolePunchingSynAck synAck;
+    synAck.connectSessionId = m_connectionId;
+
+    stun::Message message;
+    synAck.serialize(&message);
+
+    stun::MessageSerializer serializer;
+    serializer.setMessage(&message);
+
+    size_t written;
+    m_connectionBuffer.resize(0);
+    serializer.serialize(&m_connectionBuffer, &written);
+
+    m_connectionSocket->sendAsync(
+        m_connectionBuffer,
+        [this]( SystemError::ErrorCode code, size_t)
+        {
+            if (code != SystemError::noError)
+                return connectionSocketError(code);
+
+            m_lastKeepAlive = std::chrono::system_clock::now();
+            readConnectionRequest();
+        });
+}
+
+void IncomingTunnelUdtConnection::connectionSocketError(
+    SystemError::ErrorCode code)
+{
+    NX_LOGX(lm("Connection socket error (%1), closing tunnel...")
+        .arg(SystemError::toString(code)), cl_logWARNING);
+
+    m_state = code;
     if (m_serverSocket)
-        m_serverSocket->pleaseStop(barrier.fork());
+    {
+        m_serverSocket->pleaseStopSync(); // we are in IO thread
+        m_serverSocket.reset();
+    }
+
+    if (m_acceptHandler)
+    {
+        const auto handler = std::move(m_acceptHandler);
+        m_acceptHandler = nullptr;
+        return handler(code, nullptr);
+    }
 }
 
 } // namespace cloud

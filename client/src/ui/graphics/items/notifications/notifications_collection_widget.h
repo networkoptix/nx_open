@@ -33,7 +33,8 @@ class QnBlinkingImageButtonWidget: public QnImageButtonWidget, public AnimationT
     typedef QnImageButtonWidget base_type;
 
 public:
-    QnBlinkingImageButtonWidget(QGraphicsItem *parent = NULL);
+    QnBlinkingImageButtonWidget(const QString &statisticsAlias
+        , QGraphicsItem *parent = NULL);
 
 public slots:
     void setNotificationCount(int count);

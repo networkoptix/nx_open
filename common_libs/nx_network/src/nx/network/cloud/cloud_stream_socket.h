@@ -64,7 +64,7 @@ public:
     //!Implementation of AbstractCommunicatingSocket::*
     virtual void connectAsync(
         const SocketAddress& address,
-        std::function<void(SystemError::ErrorCode)> handler) override;
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
     virtual void readSomeAsync(
         nx::Buffer* const buf,
         std::function<void(SystemError::ErrorCode, size_t)> handler) override;
@@ -95,7 +95,7 @@ private:
         std::unique_ptr<AbstractStreamSocket> cloudConnection);
 
     nx::atomic_unique_ptr<AbstractStreamSocket> m_socketDelegate;
-    std::function<void(SystemError::ErrorCode)> m_connectHandler;
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_connectHandler;
     nx::utils::AsyncOperationGuard m_asyncConnectGuard;
     /** Used to tie this to aio thread.
     //TODO #ak replace with aio thread timer */

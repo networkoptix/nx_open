@@ -18,9 +18,9 @@ struct FakeTcpTunnelConnection
     AbstractIncomingTunnelConnection
 {
     FakeTcpTunnelConnection(
-        String remotePeerId, SocketAddress address, size_t sockets = 1000)
+        String connectionId, SocketAddress address, size_t sockets = 1000)
     :
-        AbstractIncomingTunnelConnection(std::move(remotePeerId)),
+        AbstractIncomingTunnelConnection(std::move(connectionId)),
         m_sockets(sockets),
         m_server(std::make_unique<TCPServerSocket>())
     {
@@ -30,7 +30,7 @@ struct FakeTcpTunnelConnection
             m_sockets = 0;
 
         NX_LOGX(lm("for %1 listen %2 for %3 sockets")
-                .arg(m_remotePeerId).arg(address.toString())
+                .arg(connectionId).arg(address.toString())
                 .arg(m_sockets), cl_logDEBUG1);
     }
 
@@ -55,10 +55,10 @@ struct FakeTcpTunnelConnection
             });
     }
 
-    void pleaseStop(std::function<void()> handler) override
+    void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override
     {
         m_server->pleaseStop(
-            [this, handler]
+            [this, handler = std::move(handler)]
             {
                 NX_LOGX(lm("exhausted"), cl_logDEBUG1);
                 m_server.reset();
@@ -102,7 +102,7 @@ struct FakeTcpTunnelAcceptor
         handler(SystemError::noError, std::move(connection));
     }
 
-    void pleaseStop(std::function<void()> handler) override
+    void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override
     {
         m_ioThreadSocket->pleaseStop(std::move(handler));
     }

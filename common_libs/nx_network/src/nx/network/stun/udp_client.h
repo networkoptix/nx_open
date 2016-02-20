@@ -47,7 +47,7 @@ public:
     UDPClient(SocketAddress serverAddress);
     virtual ~UDPClient();
 
-    virtual void pleaseStop(std::function<void()> handler) override;
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
     /**
         \param request MUST contain unique transactionId

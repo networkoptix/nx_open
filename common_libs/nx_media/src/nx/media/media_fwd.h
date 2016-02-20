@@ -1,7 +1,5 @@
 #pragma once
 
-#include <QSharedPointer>
-
 class QVideoFrame;
 
 namespace nx {
@@ -24,8 +22,12 @@ static const int kMediaAlignment = 32;
 // Initial duration for media buffer.
 static const int kInitialBufferMs = 200;
 
-// Maximum duration for media buffer. Buffer can be extended dynamically.
-static const int kMaxBufferMs = 1200;
+// Maximum duration for live media buffer. 
+// Live buffer can be extended dynamically in range [kInitialBufferMs..kMaxLiveBufferMs]
+static const int kMaxLiveBufferMs = 1200;
+
+// Maximum duration for media buffer in archive mode.
+static const int kMaxArchiveBufferMs = 3000;
 
 // Increase buffer at N times if overflow/underflow issues.
 static const qreal kBufferGrowStep = 2.0;

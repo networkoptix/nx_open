@@ -243,7 +243,7 @@ void CloudStreamSocket::dispatch(nx::utils::MoveOnlyFunc<void()> handler)
 
 void CloudStreamSocket::connectAsync(
     const SocketAddress& address,
-    std::function<void(SystemError::ErrorCode)> handler)
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
     m_connectHandler = std::move(handler);
 
@@ -347,7 +347,7 @@ bool CloudStreamSocket::startAsyncConnect(
             }
             m_socketDelegate->connectAsync(
                 SocketAddress(std::move(dnsEntry.host), port),
-                m_connectHandler);
+                std::move(m_connectHandler));
             return true;
 
         case AddressType::cloud:

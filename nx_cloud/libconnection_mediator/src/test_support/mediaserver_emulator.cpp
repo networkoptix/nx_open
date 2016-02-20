@@ -218,7 +218,7 @@ void MediaServerEmulator::onUdtConnectionAccepted(
     delete acceptedSocket;
 }
 
-void MediaServerEmulator::pleaseStop(std::function<void()> completionHandler)
+void MediaServerEmulator::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
     m_timer.pleaseStop(
         [this, completionHandler = move(completionHandler)]() mutable

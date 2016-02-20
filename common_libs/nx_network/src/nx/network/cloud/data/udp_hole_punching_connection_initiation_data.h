@@ -17,8 +17,6 @@ class NX_NETWORK_API UdpHolePunchingSyn
     public StunMessageData
 {
 public:
-    nx::String connectSessionId;
-
     void serialize(nx::stun::Message* const message);
     bool parse(const nx::stun::Message& message);
 };

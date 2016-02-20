@@ -32,7 +32,7 @@ UDPServer::~UDPServer()
     pleaseStopSync();
 }
 
-void UDPServer::pleaseStop(std::function<void()> handler)
+void UDPServer::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
     m_messagePipeline.pleaseStop(std::move(handler));
 }

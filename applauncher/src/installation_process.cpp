@@ -12,7 +12,7 @@
 #include <QtXml/QXmlSimpleReader>
 
 #include <plugins/videodecoder/stree/streesaxhandler.h>
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 
 #include "mirror_list_xml_parse_handler.h"
 #include "version.h"
@@ -72,13 +72,7 @@ bool InstallationProcess::start( const QString& mirrorListUrl )
     m_fileSizeByEntry.clear();
     m_state = State::downloadMirrorList;
     m_status = applauncher::api::InstallationStatus::inProgress;
-    if( !m_httpClient->doGet(QUrl(mirrorListUrl)) )
-    {
-        m_state = State::init;
-        m_status = applauncher::api::InstallationStatus::failed;
-        return false;
-    }
-
+    m_httpClient->doGet(QUrl(mirrorListUrl));
     return true;
 }
 
@@ -265,7 +259,7 @@ void InstallationProcess::onHttpDone( nx_http::AsyncHttpClientPtr httpClient )
         m_status = applauncher::api::InstallationStatus::failed;
         return;
     }
-    m_currentTree.reset( xmlHandler.releaseTree() );
+    m_currentTree = xmlHandler.releaseTree();
 
     stree::ResourceContainer inputData;
     inputData.put( ProductParameters::product, m_productName );
@@ -304,9 +298,9 @@ void InstallationProcess::onHttpDone( nx_http::AsyncHttpClientPtr httpClient )
     std::forward_list<QUrl> mirrorList;
     {
         QString urlStr;
-        for( result.goToBeginning(); result.next(); )
-            if( result.resID() == ProductParameters::mirrorUrl )
-                mirrorList.push_front( QUrl(result.value().toString()) );
+        for (auto it = result.begin(); !it->atEnd(); it->next())
+            if (it->resID() == ProductParameters::mirrorUrl)
+                mirrorList.push_front(QUrl(it->value().toString()));
     }
 
     if( mirrorList.empty() )

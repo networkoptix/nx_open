@@ -47,7 +47,10 @@
 #include <utils/app_server_notification_cache.h>
 #include <utils/multi_image_provider.h>
 
-namespace {
+#include <utils/common/model_functions.h>
+
+namespace
+{
     const qreal widgetHeight = 24;
     const QSize kDefaultThumbnailSize(0, QnThumbnailRequestData::kMinimumSize);
 
@@ -63,8 +66,9 @@ namespace {
 
 } //anonymous namespace
 
-QnBlinkingImageButtonWidget::QnBlinkingImageButtonWidget(QGraphicsItem *parent):
-    base_type(parent),
+QnBlinkingImageButtonWidget::QnBlinkingImageButtonWidget(const QString &statisticsAlias
+    , QGraphicsItem *parent):
+    base_type(statisticsAlias, parent),
     m_time(0),
     m_count(0)
 {
@@ -163,8 +167,11 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *
 
     qreal buttonSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, NULL, NULL);
 
-    auto newButton = [this, buttonSize](QnActions::IDType actionId, int helpTopicId) {
-        QnImageButtonWidget *button = new QnImageButtonWidget(m_headerWidget);
+    auto newButton = [this, buttonSize](QnActions::IDType actionId, int helpTopicId)
+    {
+        const auto statAlias = lit("%1_%2").arg(lit("notifications_collection_widget")
+            , QnLexical::serialized(actionId));
+        QnImageButtonWidget *button = new QnImageButtonWidget(statAlias, m_headerWidget);
         button->setDefaultAction(action(actionId));
         button->setFixedSize(buttonSize);
         button->setCached(true);

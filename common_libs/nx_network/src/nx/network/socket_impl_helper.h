@@ -209,7 +209,7 @@ public:
     //!Implementation of AbstractCommunicatingSocket::connectAsync
     virtual void connectAsync(
         const SocketAddress& addr,
-        std::function<void( SystemError::ErrorCode )> handler ) override
+        nx::utils::MoveOnlyFunc<void( SystemError::ErrorCode )> handler ) override
     {
         return this->m_implDelegate.connectAsync( addr, std::move(handler) );
     }

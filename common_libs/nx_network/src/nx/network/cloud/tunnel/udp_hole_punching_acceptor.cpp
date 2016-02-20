@@ -1,6 +1,7 @@
 #include "udp_hole_punching_acceptor.h"
 
-#include "incoming_tunnel_udt_connection.h"
+#include <nx/network/cloud/cloud_config.h>
+#include <nx/network/cloud/tunnel/incoming_tunnel_udt_connection.h>
 
 #include <utils/serialization/lexical.h>
 
@@ -67,7 +68,7 @@ void UdpHolePunchingTunnelAcceptor::accept(std::function<void(
 }
 
 void UdpHolePunchingTunnelAcceptor::pleaseStop(
-    std::function<void()> handler)
+    nx::utils::MoveOnlyFunc<void()> handler)
 {
     BarrierHandler barrier(
         [this]()
@@ -96,7 +97,8 @@ void UdpHolePunchingTunnelAcceptor::executeAcceptHandler(
 
 void UdpHolePunchingTunnelAcceptor::initiateConnection()
 {
-    m_udtConnectionSocket->setRendezvous(true);
+    assert(m_udtConnectionSocket->setRendezvous(true));
+    assert(m_udtConnectionSocket->setSendTimeout(kHpUdtConnectTimeout.count()));
     m_udtConnectionSocket->connectAsync(
         m_addresses.front(), // TODO: #mux Can there be more then one?
         [this](SystemError::ErrorCode code)
@@ -115,7 +117,7 @@ void UdpHolePunchingTunnelAcceptor::initiateConnection()
             executeAcceptHandler(
                 SystemError::noError,
                 std::make_unique<IncomingTunnelUdtConnection>(
-                    m_remotePeerId, std::move(socket)));
+                    m_connectionId, std::move(socket)));
         });
 }
 

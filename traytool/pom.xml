@@ -28,8 +28,8 @@
             <type>pom</type> 
             <scope>system</scope>
             <systemPath>${root.dir}/common/pom.xml</systemPath>
-        </dependency>			
-    </dependencies>		
+        </dependency>           
+    </dependencies>     
 
     <properties>
         <guid>${traytool.guid}</guid>
@@ -37,7 +37,7 @@
         <product.display.title>${traytool.display.name}</product.display.title>
         <template>app</template>
         <!--Global libs-->
-        <global.libs>-lcommon</global.libs>
+        <global.libs>-lcommon -lnx_utils</global.libs>
         <!--Specific os libs used-->
         <qt.libs>core gui widgets</qt.libs>
         <ffmpeg.libs></ffmpeg.libs>

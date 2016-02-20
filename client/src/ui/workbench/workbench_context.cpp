@@ -27,6 +27,7 @@
 #include <ui/statistics/modules/actions_statistics_module.h>
 #include <ui/statistics/modules/users_statistics_module.h>
 #include <ui/statistics/modules/graphics_statistics_module.h>
+#include <ui/statistics/modules/durations_statistics_module.h>
 
 
 #ifdef Q_OS_WIN
@@ -84,12 +85,13 @@ QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *pa
     qnStatisticsManager->registerStatisticsModule(lit("actions"), actionsStatModule);
 
     const auto userStatModule = instance<QnUsersStatisticsModule>();
-    userStatModule->setContext(this);
     qnStatisticsManager->registerStatisticsModule(lit("users"), userStatModule);
 
     const auto graphicsStatModule = instance<QnGraphicsStatisticsModule>();
-    graphicsStatModule->setContext(this);
     qnStatisticsManager->registerStatisticsModule(lit("graphics"), graphicsStatModule);
+
+    const auto durationStatModule = instance<QnDurationStatisticsModule>();
+    qnStatisticsManager->registerStatisticsModule(lit("durations"), durationStatModule);
 }
 
 QnWorkbenchContext::~QnWorkbenchContext() {

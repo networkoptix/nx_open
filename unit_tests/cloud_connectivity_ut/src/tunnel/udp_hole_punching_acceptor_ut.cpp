@@ -7,9 +7,7 @@ namespace network {
 namespace cloud {
 namespace test {
 
-
-
-}   //namespace test
-}   //namespace cloud
-}   //namespace network
-}   //namespace nx
+} // namespace test
+} // namespace cloud
+} // namespace network
+} // namespace nx

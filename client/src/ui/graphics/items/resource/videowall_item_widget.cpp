@@ -115,7 +115,7 @@ void QnVideowallItemWidget::initInfoOverlay() {
     m_headerLabel->setAcceptedMouseButtons(0);
     m_headerLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
 
-    m_infoButton = new QnImageButtonWidget();
+    m_infoButton = new QnImageButtonWidget(lit("videowall_info"));
     m_infoButton->setIcon(qnSkin->icon("item/info.png"));
     m_infoButton->setCheckable(true);
     m_infoButton->setToolTip(tr("Information"));

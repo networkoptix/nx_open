@@ -12,10 +12,10 @@ unix {
 QT += ${qt.libs} core-private
 ADDITIONAL_QT_INCLUDES=${environment.dir}/qt5-custom
 
-
 ## GLOBAL CONFIGURATIONS
 CONFIG += precompile_header $$BUILDLIB $$LIBTYPE
 CONFIG -= flat
+CONFIG += no_private_qt_headers_warning
 DEFINES += USE_NX_HTTP __STDC_CONSTANT_MACROS ${global.defines}
 DEFINES += ${customization.defines}
 DEFINES += ${additional.defines}
@@ -120,6 +120,7 @@ INCLUDEPATH +=  ${environment.dir}/boost_1_56_0 \
                 ${root.dir}/common_libs/nx_utils/src \
                 ${root.dir}/common_libs/nx_streaming/src \
                 ${root.dir}/common_libs/nx_media/src \
+                ${root.dir}/common_libs/nx_audio/src \
                 ${libdir}/include \
                 $$ADDITIONAL_QT_INCLUDES \
                 ${qt.dir}/include/QtCore/ \
