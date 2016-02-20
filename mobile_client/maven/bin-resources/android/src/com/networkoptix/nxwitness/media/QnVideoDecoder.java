@@ -23,7 +23,8 @@ import android.media.MediaCodecInfo.CodecCapabilities;
 import android.media.MediaCodecInfo.VideoCapabilities;
 import android.media.MediaCodecList;
 
-public class QnMediaDecoder {
+public class QnVideoDecoder 
+{
 
 
     public boolean init(String codecName, int width, int height)

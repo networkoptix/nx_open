@@ -21,16 +21,16 @@ import android.media.MediaCodecInfo.CodecCapabilities;
 import android.media.MediaCodecInfo.VideoCapabilities;
 import android.media.MediaCodecList;
 
-public class QnMediaDecoder {
+public class QnAudioDecoder 
+{
 
-
-    public boolean init(String codecName)
+    public boolean init(String codecName,  int sampleRate, int channelCount)
     {
         try
         {
             System.out.println("codecName=" + codecName);
 
-            format = MediaFormat.createAudioFormat(codecName);
+            format = MediaFormat.createAudioFormat(codecName, sampleRate, channelCount);
             codec = MediaCodec.createDecoderByType(codecName);
             codec.configure(format, null, null, 0);
 

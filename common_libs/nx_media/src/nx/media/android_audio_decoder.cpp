@@ -155,12 +155,14 @@ AudioFramePtr AndroidAudioDecoder::decode(const QnConstCompressedAudioDataPtr& f
 
     if (!d->initialized)
     {
-
+        QnCodecAudioFormat audioFormat(audioFrame->context);
         QString codecName = codecToString(frame->compressionType);
         QAndroidJniObject jCodecName = QAndroidJniObject::fromString(codecName);
         d->initialized = d->javaDecoder.callMethod<jboolean>(
-            "init", "(Ljava/lang/String;)Z",
-            jCodecName.object<jstring>());
+            "init", "(Ljava/lang/String;II)Z",
+            jCodecName.object<jstring>(),
+            audioFormat.sampleRate(),
+            audioFormat.channels());
         if (!d->initialized)
             return AudioFramePtr();
     }
