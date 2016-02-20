@@ -61,6 +61,10 @@ def disconnect(request):
 @permission_classes((AllowAny, ))
 @handle_exceptions
 def connect(request):
-    require_params(request, ('name', 'email', 'password'))
-    data = cloud_api.System.bind(request.data['email'], request.data['password'], request.data['name'])
+    require_params(request, ('name',))
+    if request.user.is_authenticated():
+        data = cloud_api.System.unbind(request.user.email, request.session['password'], request.data['system_id'])
+    else:
+        require_params(request, ('email', 'password'))
+        data = cloud_api.System.bind(request.data['email'], request.data['password'], request.data['name'])
     return api_success(data)

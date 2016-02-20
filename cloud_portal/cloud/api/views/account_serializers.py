@@ -2,8 +2,6 @@ from api.models import Account
 from rest_framework import serializers
 import django
 from cloud import settings
-import re
-import json
 
 
 class CreateAccountSerializer(serializers.Serializer):  # ModelSerializer
@@ -29,7 +27,8 @@ class CreateAccountSerializer(serializers.Serializer):  # ModelSerializer
             raise serializers.ValidationError("Incorrect password")
 
         # popular passwords list
-        if value in settings.PASSWORD_REQUIREMENTS['common_passwords'] or (value.upper() == value and value.lower() in common_passwords):
+        if value in settings.PASSWORD_REQUIREMENTS['common_passwords'] or \
+                (value.upper() == value and value.lower() in settings.PASSWORD_REQUIREMENTS['common_passwords']):
             raise serializers.ValidationError("Too common password")
 
         return value
