@@ -98,7 +98,7 @@ angular.module('webadminApp')
                 return;
             }*/
 
-            mediaserver.mergeSystems($scope.settings.url,'admin',$scope.settings.password,
+            mediaserver.mergeSystems($scope.settings.url,Config.defaultLogin,$scope.settings.password,
                 $scope.settings.currentPassword,$scope.settings.keepMySystem).then(function(r){
                 if(r.data.error!=='0') {
                     var errorToShow = errorHandler(r.data.errorString);

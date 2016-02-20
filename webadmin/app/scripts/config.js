@@ -2,6 +2,10 @@
 /*exported Config */
 
 var Config = {
+
+    defaultLogin: 'admin',
+    defaultPassword: 'admin',
+
     globalEditServersPermissions:0x00000020 ,
     globalViewArchivePermission:0x00000100,
     globalViewLivePermission:0x00000080,

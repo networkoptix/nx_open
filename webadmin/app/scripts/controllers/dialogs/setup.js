@@ -13,18 +13,18 @@ angular.module('webadminApp')
             cloudEmail: '',
             cloudPassword: '',
 
-            localLogin: 'admin',
+            localLogin: Config.defaultLogin,
             localPassword: '',
             localPasswordConfirmation:'',
 
             remoteSystem: '',
-            remoteLogin:'',
+            remoteLogin: Config.defaultLogin,
             remotePassword:''
         };
 
         $scope.serverAddress = window.location.host;
 
-        var nativeClientObject = setupDialog; // Qt registered object
+        var nativeClientObject = typeof(setupDialog)=='undefined'?null:setupDialog; // Qt registered object
         var debugMode = !!nativeClientObject;
 
         $scope.stepIs = function(step){
@@ -35,7 +35,7 @@ angular.module('webadminApp')
             if(nativeClientObject) {
                 window.close();
             }else{
-                $location.path("/settings");
+                $location.path('/settings');
                 window.location.reload();
             }
         };
@@ -57,6 +57,12 @@ angular.module('webadminApp')
             }
         };
 
+        $scope.cantGoNext = function(){
+            if($scope.activeStep.valid){
+                return !$scope.activeStep.valid();
+            }
+            return false;
+        };
 
         $scope.createAccount = function(event){
             if(nativeClientObject) {
@@ -85,7 +91,7 @@ angular.module('webadminApp')
         }
 
         function errorHandler(error){
-            alert("error happened");
+            alert('error happened');
             console.error(error);
         }
 
@@ -140,7 +146,7 @@ angular.module('webadminApp')
                 $scope.settings.selectedSystem.url,
                 $scope.settings.remoteLogin,
                 $scope.settings.remotePassword,
-                'admin',
+                Config.defaultLogin,
                 false
             ).then(function(r){
                 if(r.data.error!=='0') {
@@ -199,6 +205,9 @@ angular.module('webadminApp')
 
 
         /* Wizard workflow */
+        function required(val){
+            return val && val.trim() != '';
+        }
 
         $scope.wizardFlow = {
             0:{
@@ -209,14 +218,21 @@ angular.module('webadminApp')
             },
             systemName:{
                 back: 'start',
-                next: 'cloudIntro'
+                next: 'cloudIntro',
+                valid: function(){
+                    return required($scope.settings.systemName);
+                }
             },
             cloudIntro:{
                 back: 'systemName'
             },
             cloudLogin:{
                 back: 'cloudIntro',
-                next: connectToCloud
+                next: connectToCloud,
+                valid: function(){
+                    return required($scope.settings.cloudLogin) &&
+                        required($scope.settings.cloudPassword);
+                }
             },
             cloudSuccess:{
                 finish: true
@@ -227,18 +243,29 @@ angular.module('webadminApp')
             },
             merge:{
                 onShow: discoverSystems,
-                next: connectToAnotherSystem
+                next: connectToAnotherSystem,
+                valid: function(){
+                    return required($scope.settings.remoteSystem) &&
+                        required($scope.settings.remoteLogin) &&
+                        required($scope.settings.remotePassword);
+                }
             },
             mergeSuccess:{
                 finish: true
             },
 
             localLogin:{
-                next: initOfflineSystem
+                next: initOfflineSystem,
+                valid: function(){
+                    return required($scope.settings.localLogin) &&
+                        required($scope.settings.localPassword) &&
+                        required($scope.settings.localPasswordConfirmation);
+                }
             },
             localSuccess:{
                 finish:true
             }
         };
+        mediaserver.login(Config.defaultLogin,Config.defaultPassword);
         checkMySystem();
     });

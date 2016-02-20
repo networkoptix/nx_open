@@ -47,7 +47,6 @@ angular.module('webadminApp')
             if(confirm('This server will be disconnected from old server and turned into new one')){
                 mediaserver.detachServer().then(function(){
                     //2. throw him to master
-                    mediaserver.login('admin','admin');
                     $location.path('/setup');
                     window.location.reload();
                 });

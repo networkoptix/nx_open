@@ -13,9 +13,9 @@
         The system name is used to help identify or locate<br>
         your system.
     </p>
-    <form class="master-controls">
+    <form class="master-controls" name="systemNameForm">
         <div class="form-group">
-            <input ng-model="settings.systemName" type="text" class="form-control" placeholder="System name">
+            <input ng-model="settings.systemName" type="text" class="form-control" placeholder="System name" autofocus>
         </div>
     </form>
     <p class="vertical-bottom">
@@ -30,7 +30,7 @@
         everywhere, if it has internet connection.<br>
     </p>
     <p class="master-controls">
-        <button class="btn btn-primary" ng-click="createAccount()">Create new account</button>&nbsp;&nbsp;
+        <button class="btn btn-primary" ng-click="createAccount()" autofocus>Create new account</button>&nbsp;&nbsp;
         <button class="btn btn-default" ng-click="next('cloudLogin')">Use existing</button>
     </p>
     <p class="vertical-bottom">
@@ -43,7 +43,7 @@
     <h2>Connect to <span class="product-name">Nx Cloud</span></h2>
     <form class="master-controls">
         <div class="form-group">
-            <input ng-model="settings.cloudEmail" class="form-control" type="email" placeholder="Email">
+            <input ng-model="settings.cloudEmail" class="form-control" type="email" placeholder="Email" autofocus>
         </div>
         <div class="form-group">
             <input ng-model="settings.cloudPassword" class="form-control" type="password" placeholder="Password">
@@ -55,10 +55,10 @@
     <h2>Create administrator user</h2>
     <form class="master-controls">
         <div class="form-group">
-            <input ng-model="settings.localLogin" class="form-control" type="text" placeholder="Login">
+            <input ng-model="settings.localLogin" class="form-control" type="text" placeholder="Login" readonly>
         </div>
         <div class="form-group">
-            <input ng-model="settings.localPassword" class="form-control" type="password" placeholder="Password"></div>
+            <input ng-model="settings.localPassword" class="form-control" type="password" placeholder="Password" autofocus></div>
         <div class="form-group">
             <input ng-model="settings.localPasswordConfirm" class="form-control" type="password" placeholder="Repeat password">
         </div>
@@ -72,7 +72,7 @@
         <div class="form-group">
             <div class="input-group" dropdown>
                 <input ng-model="settings.remoteSystem" ng-change="findSystem" type="text" class="form-control"
-                       id="otherSystemUrl" placeholder="http(s)://host:port" required />
+                       id="otherSystemUrl" placeholder="http(s)://host:port" required autofocus/>
 
                 <ul class="dropdown-menu" role="menu" id="discoveredUrls">
                     <li ng-if="discoveredUrls.length == 0" id="no-systems-message"><a>No systems found</a></li>
@@ -90,10 +90,10 @@
             </p>
         </div>
         <div class="form-group">
-            <input ng-model="settings.remoteLogin" class="form-control" type="text" placeholder="Login">
+            <input ng-model="settings.remoteLogin" class="form-control" type="text" placeholder="Login" required>
         </div>
         <div class="form-group">
-            <input ng-model="settings.remotePassword" class="form-control" type="password" placeholder="Password">
+            <input ng-model="settings.remotePassword" class="form-control" type="password" placeholder="Password" required>
         </div>
     </form>
 </div>
@@ -128,7 +128,13 @@
 
 
 <div class="panel-footer">
-    <button class="btn btn-default" ng-if="activeStep.back" ng-click="back()"><span class="glyphicon glyphicon-arrow-left"></span></button>
-    <button class="btn btn-primary pull-right" ng-if="activeStep.next" ng-click="next()">Next <span class="glyphicon glyphicon-arrow-right"></span></button>
-    <button class="btn btn-primary pull-right" ng-if="activeStep.finish" ng-click="finish()">Finish</button>
+    <button class="btn btn-default" ng-if="activeStep.back"
+            ng-click="back()"><span class="glyphicon glyphicon-arrow-left"></span></button>
+    <button class="btn btn-primary pull-right" ng-if="activeStep.next"
+            ng-disabled="cantGoNext()"
+            enter-button
+            ng-click="next()">Next <span class="glyphicon glyphicon-arrow-right"></span></button>
+    <button class="btn btn-primary pull-right" ng-if="activeStep.finish"
+            enter-button
+            ng-click="finish()" autofocus>Finish</button>
 </div>
