@@ -27,10 +27,10 @@ then
 else
   update 2>&1
 fi
+if [[ "${box}" == "bpi" ]]; then reboot; fi
 /etc/init.d/$COMPANY_NAME-mediaserver start
 /etc/init.d/cron start
 
-if [[ "${box}" == "bpi" ]]; then reboot; fi
 sleep 3
 # Determining Server Port
 SERVER_PORT=`cat /opt/$COMPANY_NAME/mediaserver/etc/mediaserver.conf | grep port= | grep -o '[0-9]\+'`
