@@ -38,7 +38,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "appserver2-x86", "..\appser
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_streaming-x86", "..\common_libs\nx_streaming\src\nx_streaming-x64.vcxproj", "${nx_streaming.guid}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_audio-x86", "..\common_libs\nx_streaming\src\nx_audio-x86.vcxproj", "${nx_audio.guid}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_audio-x86", "..\common_libs\nx_audio\src\nx_audio-x86.vcxproj", "${nx_audio.guid}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_network-x86", "..\common_libs\nx_network\src\nx_network-x64.vcxproj", "${nx_network.guid}"
 	ProjectSection(ProjectDependencies) = postProject
