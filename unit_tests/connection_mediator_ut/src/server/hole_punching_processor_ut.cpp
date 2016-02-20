@@ -32,6 +32,7 @@ TEST_F(HolePunchingProcessor, generic_tests)
 
     const auto system1 = addRandomSystem();
     const auto server1 = addRandomServer(system1);
+    ASSERT_NE(nullptr, server1);
 
     //TODO #ak #msvc2015 use future/promise
     QnMutex mtx;

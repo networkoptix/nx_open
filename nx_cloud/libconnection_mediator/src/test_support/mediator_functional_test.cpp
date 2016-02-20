@@ -8,6 +8,7 @@
 #include <chrono>
 #include <functional>
 #include <future>
+#include <iostream>
 #include <sstream>
 #include <thread>
 #include <tuple>
@@ -19,6 +20,7 @@
 #include <utils/common/string.h>
 #include <utils/common/sync_call.h>
 #include <utils/crypt/linux_passwd_crypt.h>
+#include <utils/serialization/lexical.h>
 
 #include "local_cloud_data_provider.h"
 #include "socket_globals_holder.h"
@@ -182,8 +184,18 @@ std::unique_ptr<MediaServerEmulator> MediatorFunctionalTest::addRandomServer(
     const AbstractCloudDataProvider::System& system)
 {
     auto server = std::make_unique<MediaServerEmulator>(endpoint(), system);
-    if (!server->start() || (server->registerOnMediator() != api::ResultCode::ok))
+    if (!server->start())
+    {
+        std::cerr<<"Failed to start server"<<std::endl;
         return nullptr;
+    }
+    const auto resultCode = server->registerOnMediator();
+    if (resultCode != api::ResultCode::ok)
+    {
+        std::cerr<<"Failed to register server on mediator. "
+            <<QnLexical::serialized(resultCode).toStdString()<<std::endl;
+        return nullptr;
+    }
     return server;
 }
 
