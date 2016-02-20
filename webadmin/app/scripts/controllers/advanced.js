@@ -17,36 +17,35 @@ angular.module('webadminApp')
         });
 
         $scope.settingsConfig = {
-            auditTrailEnabled: {label:"Audit trail enabled", type:"checkbox"},
-            cameraSettingsOptimization: {label:"Camera settings optimization", type:"checkbox"},
-            disabledVendors: {label:"Disabled vendors", type:"text"},
-            ec2AliveUpdateIntervalSec: {label:"System alive update interval", type:"number"},
-            ec2ConnectionKeepAliveTimeoutSec: {label:"Connection keep alive timeout", type:"number"},
-            ec2KeepAliveProbeCount: {label:"Connection keep probes", type:"number"},
-            emailFrom: {label:"Email from", type:"text"},
-            emailSignature: {label:"Email signature", type:"text"},
-            emailSupportEmail: {label:"Support Email", type:"text"},
-            ldapAdminDn: {label:"LDAP admin DN", type:"text"},
-            ldapAdminPassword: {label:"LDAP admin password", type:"text"},
-            ldapSearchBase: {label:"LDAP search base", type:"text"},
-            ldapSearchFilter: {label:"LDAP search filter", type:"text"},
-            ldapUri: {label:"LDAP URI", type:"text"},
-            serverAutoDiscoveryEnabled: {label:"Server auto discovery enabled", type:"checkbox"},
-            smtpConnectionType: {label:"SMTP connection type", type:"text"},
-            smtpHost: {label:"SMTP host", type:"text"},
-            smtpPort: {label:"SMTP port", type:"number"},
-            smtpSimple: {label:"SMTP simple", type:"checkbox"},
-            smtpTimeout: {label:"SMTP timeout", type:"number"},
-            smptPassword: {label:"SMTP password", type:"text"},
-            smtpUser: {label:"SMTP user", type:"text"},
-            updateNotificationsEnabled: {label:"Update notifications enabled", type:"checkbox"},
-            crossdomainEnabled: {label:"Enable webclient flash player support (crossdomain.xml)", type:"checkbox"},	    
-            arecontRtspEnabled: {label:"Arecont RTSP Enabled", type:"checkbox"},
+            auditTrailEnabled: {label:'Audit trail enabled', type:'checkbox'},
+            cameraSettingsOptimization: {label:'Camera settings optimization', type:'checkbox'},
+            disabledVendors: {label:'Disabled vendors', type:'text'},
+            ec2AliveUpdateIntervalSec: {label:'System alive update interval', type:'number'},
+            ec2ConnectionKeepAliveTimeoutSec: {label:'Connection keep alive timeout', type:'number'},
+            ec2KeepAliveProbeCount: {label:'Connection keep alive probes', type:'number'},
+            emailFrom: {label:'Email from', type:'text'},
+            emailSignature: {label:'Email signature', type:'text'},
+            emailSupportEmail: {label:'Support Email', type:'text'},
+            ldapAdminDn: {label:'LDAP admin DN', type:'text'},
+            ldapAdminPassword: {label:'LDAP admin password', type:'text'},
+            ldapSearchBase: {label:'LDAP search base', type:'text'},
+            ldapSearchFilter: {label:'LDAP search filter', type:'text'},
+            ldapUri: {label:'LDAP URI', type:'text'},
+            serverAutoDiscoveryEnabled: {label:'Server auto discovery enabled', type:'checkbox'},
+            smtpConnectionType: {label:'SMTP connection type', type:'text'},
+            smtpHost: {label:'SMTP host', type:'text'},
+            smtpPort: {label:'SMTP port', type:'number'},
+            smtpSimple: {label:'SMTP simple', type:'checkbox'},
+            smtpTimeout: {label:'SMTP timeout', type:'number'},
+            smptPassword: {label:'SMTP password', type:'text'},
+            smtpUser: {label:'SMTP user', type:'text'},
+            updateNotificationsEnabled: {label:'Update notifications enabled', type:'checkbox'},
+            arecontRtspEnabled: {label:'Arecont RTSP Enabled', type:'checkbox'},
 
-            backupNewCamerasByDefault: {label:"Backup new cameras by default",type:"checkbox"},
-            statisticsAllowed: {label:"Send statistics",type:"checkbox"},
-            backupQualities: {label:"Backup qualities",type:"text"},
-            serverDiscoveryPingTimeoutSec:{label:"Server discovery timeout",type:"number"}
+            backupNewCamerasByDefault: {label:'Backup new cameras by default',type:'checkbox'},
+            statisticsAllowed: {label:'Send statistics',type:'checkbox'},
+            backupQualities: {label:'Backup qualities',type:'text'},
+            serverDiscoveryPingTimeoutSec:{label:'Server discovery timeout',type:'number'}
         };
 
         mediaserver.systemSettings().then(function(r){
@@ -57,20 +56,20 @@ angular.module('webadminApp')
                     var type = 'text';
                     if( $scope.systemSettings[settingName] === true ||
                         $scope.systemSettings[settingName] === false ||
-                        $scope.systemSettings[settingName] === "true" ||
-                        $scope.systemSettings[settingName] === "false" ){
+                        $scope.systemSettings[settingName] === 'true' ||
+                        $scope.systemSettings[settingName] === 'false' ){
                         type = 'checkbox';
                     }
-                    $scope.settingsConfig[settingName] = {label:settingName,type:type}
+                    $scope.settingsConfig[settingName] = {label:settingName,type:type};
                 }
 
-                if($scope.settingsConfig[settingName].type == 'number'){
+                if($scope.settingsConfig[settingName].type === 'number'){
                     $scope.systemSettings[settingName] = parseInt($scope.systemSettings[settingName]);
                 }
-                if($scope.systemSettings[settingName] == 'true'){
+                if($scope.systemSettings[settingName] === 'true'){
                     $scope.systemSettings[settingName] = true;
                 }
-                if($scope.systemSettings[settingName] == 'false'){
+                if($scope.systemSettings[settingName] === 'false'){
                     $scope.systemSettings[settingName] = false;
                 }
 
@@ -82,14 +81,14 @@ angular.module('webadminApp')
             var changedSettings = {};
             var hasChanges = false;
             for(var settingName in $scope.systemSettings){
-                if($scope.settingsConfig[settingName].oldValue != $scope.systemSettings[settingName]){
+                if($scope.settingsConfig[settingName].oldValue !== $scope.systemSettings[settingName]){
                     changedSettings[settingName] = $scope.systemSettings[settingName];
                     hasChanges = true;
                 }
             }
             if(hasChanges){
                 mediaserver.systemSettings(changedSettings).then(function(r){
-                    if(typeof(r.error)!=='undefined' && r.error!=='0') {
+                    if(typeof(r.error) !== 'undefined' && r.error !== '0') {
 
                         console.log(r);
 
@@ -213,26 +212,26 @@ angular.module('webadminApp')
             $scope.transLogLevel = $scope.oldTransLogLevel = data.data.reply;
         });
 
-        function errorLogLevel(error){
-            alert("Error while saving");
+        function errorLogLevel(/*error*/){
+            alert('Error while saving');
             window.location.reload();
 
         }
         function successLogLevel(){
-            alert("Settings saved");
+            alert('Settings saved');
             window.location.reload();
         }
 
         function changeTransactionLogLevel(){
-            if($scope.transLogLevel != $scope.oldTransLogLevel) {
-                mediaserver.logLevel(3, $scope.transLogLevel).then(successLogLevel,errorLogLevel);;
+            if($scope.transLogLevel !== $scope.oldTransLogLevel) {
+                mediaserver.logLevel(3, $scope.transLogLevel).then(successLogLevel,errorLogLevel);
                 return;
             }
             successLogLevel();
         }
 
         $scope.changeLogLevels = function(){
-            if($scope.mainLogLevel != $scope.oldMainLogLevel) {
+            if($scope.mainLogLevel !== $scope.oldMainLogLevel) {
                 mediaserver.logLevel(0, $scope.mainLogLevel).then(changeTransactionLogLevel,errorLogLevel);
                 return;
             }

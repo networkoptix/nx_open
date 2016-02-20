@@ -35,8 +35,7 @@ module.exports = function (grunt) {
         wiredep: {
             target: {
                 src: [
-                    '<%= yeoman.app %>/login.html',
-                    '<%= yeoman.app %>/index.html',
+                    '<%= yeoman.app %>/*.html',
                     '<%= yeoman.app %>/index.xsl'
                 ],
                 ignorePath: '<%= yeoman.app %>/'
@@ -292,7 +291,8 @@ module.exports = function (grunt) {
             },
             all: [
                 'Gruntfile.js',
-                '<%= yeoman.app %>/scripts/{,*/}*.js'
+                '<%= yeoman.app %>/scripts/{,*/}*.js',
+                '!<%= yeoman.app %>/scripts/vendor/**'
             ],
             test: {
                 options: {
@@ -397,7 +397,7 @@ module.exports = function (grunt) {
         // concat, minify and revision files. Creates configurations in memory so
         // additional tasks can operate on them
         useminPrepare: {
-            html: ['<%= yeoman.app %>/login.html','<%= yeoman.app %>/index.html', '<%= yeoman.app %>/api.xsl'],
+            html: ['<%= yeoman.app %>/*.html', '<%= yeoman.app %>/api.xsl'],
             options: {
                 dest: '<%= yeoman.dist %>'
             }
@@ -589,7 +589,7 @@ module.exports = function (grunt) {
 
             }
         },
-        protractor_webdriver: {
+        'protractor_webdriver': {
             options:{
 
             },

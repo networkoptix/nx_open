@@ -10,7 +10,7 @@ angular.module('webadminApp', [
 ]).config(function ($routeProvider) {
     $routeProvider
         .when('/setup', {
-            templateUrl: 'views/dialogs/setup.html',
+            templateUrl: 'views/dialogs/setup-inline.html',
             controller: 'SetupCtrl'
         })
         .otherwise({

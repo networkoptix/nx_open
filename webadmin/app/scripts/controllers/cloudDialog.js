@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('CloudDialogCtrl', function ($scope, $modalInstance, mediaserver, connect, systemName, cloudSystemID) {
+    .controller('CloudDialogCtrl', function ($scope, $modalInstance, mediaserver, connect, systemName) {
 
         //1. Detect action: connect or disconnect
         if(connect) {
@@ -26,7 +26,7 @@ angular.module('webadminApp')
             $scope.finished = true;
             $scope.succeed = true;
 
-            if(result.data.errorString && result.data.errorString!=''){
+            if(result.data.errorString && result.data.errorString !== ''){
                 $scope.errorMessage     += ': ' + result.data.errorString;
                 $scope.succeed = false;
             }

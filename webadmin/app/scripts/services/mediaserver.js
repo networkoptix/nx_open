@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .factory('mediaserver', function ($http, $modal, $q, ipCookie,$log) {
+    .factory('mediaserver', function ($http, $modal, $q, ipCookie) {
 
         var cacheModuleInfo = null;
         var cacheCurrentUser = null;
@@ -14,7 +14,7 @@ angular.module('webadminApp')
                 var pair = params[i].split('=');
                 if(pair[0] === 'proxy'){
                     proxy = '/proxy/' + pair[1];
-                    if(pair[1] == 'demo'){
+                    if(pair[1] === 'demo'){
                         proxy = Config.demo;
                     }
                     break;
@@ -53,14 +53,14 @@ angular.module('webadminApp')
             //1. recheck
             cacheModuleInfo = null;
             if(offlineDialog === null) { //Dialog is not displayed
-                getSettings(true).catch(function (error) {
+                getSettings(true).catch(function (/*error*/) {
                     offlineDialog = $modal.open({
                         templateUrl: 'offline_modal',
                         controller: 'OfflineCtrl',
                         keyboard:false,
                         backdrop:'static'
                     });
-                    offlineDialog.result.then(function (info) {//Dialog closed - means server is online
+                    offlineDialog.result.then(function (/*info*/) {//Dialog closed - means server is online
                         offlineDialog = null;
                     });
                 });
@@ -94,7 +94,7 @@ angular.module('webadminApp')
                 return proxy;
             },
             mediaDemo:function(){
-                if(proxy == Config.demo){
+                if(proxy === Config.demo){
                     return Config.demoMedia;
                 }
                 return false;
@@ -132,7 +132,10 @@ angular.module('webadminApp')
                     deferred.resolve(false);
                 }
                 this.getCurrentUser().then(function(result){
-                    var isAdmin = result.data.reply.isAdmin || (result.data.reply.permissions & Config.globalEditServersPermissions);
+                    /*jshint bitwise: false*/
+                    var hasEditServerPermission = result.data.reply.permissions & Config.globalEditServersPermissions;
+                    /*jshint bitwise: true*/
+                    var isAdmin = result.data.reply.isAdmin || hasEditServerPermission;
 
                     var isOwner = result.data.reply.isAdmin ;
 
@@ -169,10 +172,51 @@ angular.module('webadminApp')
                 });
             },
 
-            changeSystem:function(systemName,pasword){
+            setupCloudSystem:function(systemName, systemId, authKey){
+                var defer = $q.defer();
+                function errorHandler(error){
+                    defer.reject(error);
+                }
+                this.changeSystemName($scope.settings.systemName).then(
+                    function(){
+                        this.saveCloudSystemCredentials(message.data.systemId, message.data.authKey).
+                            then(function(result){
+                                defer.resolve(result);
+                            }, errorHandler);
+                    }, errorHandler);
+                return defer.promise;
+
+                // TODO: wait for https://networkoptix.atlassian.net/browse/VMS-2081
+                return wrapPost(proxy + '/api/setupCloudSystem',{
+                    systemName: systemName,
+                    systemId: systemId,
+                    authKey: authKey
+                });
+            },
+
+            setupLocalSystem:function(systemName, adminAccount, adminPassword){
+
+                return this.changeSystem(systemName, adminAccount, adminPassword);
+
+                // TODO: wait for https://networkoptix.atlassian.net/browse/VMS-2081
+                return wrapPost(proxy + '/api/setupLocalSystem',{
+                    systemName: systemName,
+                    adminAccount: adminAccount,
+                    adminPassword: adminPassword
+                });
+            },
+
+
+            changeSystemName:function(systemName){
                 return wrapPost(proxy + '/api/configure?' + $.param({
-                    systemName:systemName,
-                    password:password
+                    systemName:systemName
+                }));
+            },
+            changeSystem:function(systemName,login,password){
+                return wrapPost(proxy + '/api/configure?' + $.param({
+                    systemName: systemName,
+                    login: login,
+                    password: password
                 }));
             },
 
@@ -183,9 +227,10 @@ angular.module('webadminApp')
             },
 
 
-            mergeSystems: function(url,password,currentPassword,keepMySystem){
+            mergeSystems: function(url, remoteLogin, remotePassword, currentPassword, keepMySystem){
                 return wrapPost(proxy + '/api/mergeSystems?' + $.param({
-                    password: password,
+                    login: remoteLogin,
+                    password: remotePassword,
                     currentPassword: currentPassword,
                     url: url,
                     takeRemoteSettings: !keepMySystem
@@ -278,7 +323,7 @@ angular.module('webadminApp')
                 if(serverUrl !== '/' && serverUrl !== '' && serverUrl !== null){
                     serverUrl = '/proxy/'+ serverUrl + '/';
                 }
-                if( proxy == Config.demo){
+                if( proxy === Config.demo){
                     serverUrl = proxy + '/';
                 }
 
@@ -295,13 +340,13 @@ angular.module('webadminApp')
             },
             debugFunctionUrl:function(url,getParams){
                 var delimeter = url.indexOf('?')>=0? '&':'?';
-                return proxy + url + delimeter + $.param(getParams)
+                return proxy + url + delimeter + $.param(getParams);
             },
             debugFunction:function(method,url,getParams,postParams){
                 switch(method){
-                    case "GET":
+                    case 'GET':
                         return $http.get(this.debugFunctionUrl(url,getParams));
-                    case "POST":
+                    case 'POST':
                         return $http.post(this.debugFunctionUrl(url,getParams), postParams);
 
                 }

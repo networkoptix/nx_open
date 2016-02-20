@@ -2,62 +2,9 @@ $icon-font-path: "../fonts/";
 
 @import 'native-theme/main';
 
-.master{
-  width:510px;
-  margin: 0 auto;
-}
-.master .panel{
 
-}
-.master .panel-body{
-  height:315px;
-  position:relative;
-}
+@import 'master';
 
-.vertical-center{
-  width:100%;
-  position:absolute;
-  left:0;
-  top:50%;
-  transform: translateY(-50%);
-  margin:0 !important;
-}
-
-.vertical-bottom{
-  width:100%;
-  position:absolute;
-  bottom:0;
-  left:0;
-}
-
-.master h2{
-  margin-top:30px;
-  margin-bottom:16px;
-}
-
-.master p.master-description{
-  height: 32px;
-  line-height: 1.6;
-}
-
-.master .master-controls{
-  margin-top:50px;
-}
-.master form{
-  width: 240px;
-  display: inline-block;
-}
-
-
-.master .form-group{
-  margin-bottom: 8px;
-}
-
-
-.master .master-success{
-  height:70px;
-  font-size: 80px;
-}
 
 
 body.inline-webadmin{
