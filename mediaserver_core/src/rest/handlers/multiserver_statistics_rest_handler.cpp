@@ -148,28 +148,34 @@ int SettingsActionHandler::executeGet(const QnRequestParamList &params
     , QByteArray &result, QByteArray &contentType
     , int port)
 {
-    Context context(QnEmptyRequestData(), port);
+    const QnEmptyRequestData request =
+        QnMultiserverRequestData::fromParams<QnEmptyRequestData>(params);
 
-    const auto &request = context.request();
+    Context context(request, port);
 
     QnStatisticsSettings settings;
     nx_http::StatusCode::Value resultCode = nx_http::StatusCode::noContent;
-    if (request.isLocal)
-    {
-        resultCode = loadSettingsLocally(settings);
-    }
-    else
-    {
-        const auto moduleGuid = qnCommon->moduleGUID();
-        for (const auto server: qnResPool->getAllServers(Qn::Online))
-        {
-            resultCode = (server->getId() == moduleGuid
-                ? loadSettingsLocally(settings)
-                : loadSettingsRemotely(settings, server, &context));
 
-            if (resultCode == nx_http::StatusCode::ok)
-                break;
-        }
+    resultCode = loadSettingsLocally(settings);
+    if (resultCode == nx_http::StatusCode::ok)
+    {
+        QnFusionRestHandlerDetail::serialize(settings, result, contentType
+            , request.format, request.extraFormatting);
+        return nx_http::StatusCode::ok;
+    }
+
+    if (request.isLocal)
+        return resultCode;
+
+    const auto moduleGuid = qnCommon->moduleGUID();
+    for (const auto server: qnResPool->getAllServers(Qn::Online))
+    {
+        if (server->getId() == moduleGuid)
+            continue;
+
+        resultCode = loadSettingsRemotely(settings, server, &context);
+        if (resultCode == nx_http::StatusCode::ok)
+            break;
     }
 
     if (resultCode != nx_http::StatusCode::ok)
@@ -282,39 +288,35 @@ int SendStatisticsActionHandler::executePost(const QnRequestParamList& params
     , QByteArray &/* result */, QByteArray &/*resultContentType*/
     , int port)
 {
-    QnSendStatisticsRequestData requestData =
+    QnSendStatisticsRequestData request =
         QnMultiserverRequestData::fromParams<QnSendStatisticsRequestData>(params);
 
     // TODO: add support of specified in parameters format, not only json!
     const bool correctJson = QJson::deserialize<QnMetricHashesList>(
-        body, &requestData.metricsList);
+        body, &request.metricsList);
 
     Q_ASSERT_X(correctJson, Q_FUNC_INFO, "Incorect json with mertics received!");
     if (!correctJson)
         return nx_http::StatusCode::invalidParameter;
 
-    Context context(requestData, port);    // todo add context initialization
-    const auto request = context.request();
+    Context context(request, port);
 
-    nx_http::StatusCode::Value resultCode = nx_http::StatusCode::notAcceptable;
-    if (request.isLocal)
-    {
+    nx_http::StatusCode::Value resultCode =
         sendStatisticsLocally(body, request.statisticsServerUrl);
-    }
-    else
+
+    if (request.isLocal)
+        return resultCode;
+
+    const auto moduleGuid = qnCommon->moduleGUID();
+    for (const auto server: qnResPool->getAllServers(Qn::Online))
     {
-        const auto moduleGuid = qnCommon->moduleGUID();
-        for (const auto server: qnResPool->getAllServers(Qn::Online))
-        {
-            resultCode = (server->getId() == moduleGuid
-                ? sendStatisticsLocally(body, request.statisticsServerUrl)
-                : sendStatisticsRemotely(body, server, &context));
+        if (server->getId() == moduleGuid)
+            continue;
 
-            if (resultCode == nx_http::StatusCode::ok)
-                break;
-        }
+        resultCode = sendStatisticsRemotely(body, server, &context);
+        if (resultCode == nx_http::StatusCode::ok)
+            break;
     }
-
     return resultCode;
 }
 
