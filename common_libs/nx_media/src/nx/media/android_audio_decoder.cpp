@@ -49,6 +49,12 @@ namespace {
     }
 }
 
+// ------------------------------------------------------------------------------
+
+void fillInputBuffer(JNIEnv *env, jobject thiz, jobject buffer, jlong srcDataPtr, jint dataSize);
+void readOutputBuffer(JNIEnv *env, jobject thiz, , jlong cObject, jobject buffer, jint dataSize);
+
+
 // ------------------------- AndroidAudioDecoderPrivate -------------------------
 
 class AndroidAudioDecoderPrivate: public QObject
@@ -74,7 +80,8 @@ public:
         using namespace std::placeholders;
 
         JNINativeMethod methods[] {
-            {"fillInputBuffer", "(Ljava/nio/ByteBuffer;JI)V", reinterpret_cast<void *>(nx::media::fillInputBuffer)}
+            {"fillInputBuffer", "(Ljava/nio/ByteBuffer;JI)V", reinterpret_cast<void *>(nx::media::fillInputBuffer)},
+            { "readOutputBuffer", "(Ljava/nio/ByteBuffer;JJI)V", reinterpret_cast<void *>(nx::media::readOutputBuffer) }
         };
 
         QAndroidJniEnvironment env;
@@ -107,12 +114,12 @@ void fillInputBuffer(JNIEnv *env, jobject thiz, jobject buffer, jlong srcDataPtr
     memcpy(bytes, srcData, dataSize);
 }
 
-void readOutputBuffer(JNIEnv *env, jobject thiz, , jlong cObject, jobject buffer, jint dataSize)
+void readOutputBuffer(JNIEnv *env, jobject thiz, jobject buffer, jint bufferSize, jlong cObject)
 {
     AndroidAudioDecoderPrivate* decoder = static_cast<AndroidVideoDecoderPrivate*> (void*) (cObject);
     void* bytes = env->GetDirectBufferAddress(buffer);
     const void* srcData = (void*)srcDataPtr;
-    decoder->readOutputBuffer(srcData, dataSize);
+    decoder->readOutputBuffer(srcData, bufferSize);
 }
 
 // ---------------------- AndroidAudioDecoder ----------------------
@@ -158,10 +165,12 @@ AudioFramePtr AndroidAudioDecoder::decode(const QnConstCompressedAudioDataPtr& f
             return AudioFramePtr();
     }
 
-    d->javaDecoder.callMethod<jlong>(
-        "decodeAudio", "(JI)Z",
+    audioFrame.clear();
+    d->javaDecoder.callMethod<jboolean>(
+        "decodeAudio", "(JIJ)Z",
         (jlong) frame->data(),
-        (jint) frame->dataSize());
+        (jint) frame->dataSize(),
+        (jlong) (void*) this);
 
     if (audioFrame)
     {
