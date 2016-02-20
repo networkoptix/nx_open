@@ -18,11 +18,6 @@ UdpHolePunchingTunnelAcceptor::UdpHolePunchingTunnelAcceptor(
 {
 }
 
-UdpHolePunchingTunnelAcceptor::~UdpHolePunchingTunnelAcceptor()
-{
-    NX_LOGX(lm("~UdpHolePunchingTunnelAcceptor()"), cl_logDEBUG2);
-}
-
 void UdpHolePunchingTunnelAcceptor::setUdtConnectTimeout(
     std::chrono::milliseconds timeout)
 {
@@ -73,12 +68,10 @@ void UdpHolePunchingTunnelAcceptor::pleaseStop(
     {
         QnMutexLocker lock(&m_mutex);
         m_stopHandler = std::move(handler);
-        NX_LOGX(lm("pleaseStop request"), cl_logDEBUG2);
     }
 
     auto callHandler = [this]()
     {
-        NX_LOGX(lm("pleaseStop is done"), cl_logDEBUG2);
         const auto handler = std::move(m_stopHandler);
         handler();
     };
@@ -164,9 +157,6 @@ void UdpHolePunchingTunnelAcceptor::executeAcceptHandler(
     SystemError::ErrorCode code,
     std::unique_ptr<AbstractIncomingTunnelConnection> connection)
 {
-    NX_LOGX(lm("Accepted %1: %2").arg(connection)
-        .arg(SystemError::toString(code)), cl_logDEBUG2);
-
     const auto handler = std::move(m_acceptHandler);
     m_acceptHandler = nullptr;
 

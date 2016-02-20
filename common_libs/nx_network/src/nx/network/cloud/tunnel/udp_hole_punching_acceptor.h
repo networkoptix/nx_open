@@ -16,7 +16,6 @@ class NX_NETWORK_API UdpHolePunchingTunnelAcceptor
 {
 public:
     explicit UdpHolePunchingTunnelAcceptor(SocketAddress peerAddress);
-    ~UdpHolePunchingTunnelAcceptor() override;
 
     void setUdtConnectTimeout(std::chrono::milliseconds timeout);
     void setUdpRetransmissionTimeout(std::chrono::milliseconds timeout);
