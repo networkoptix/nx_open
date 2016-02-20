@@ -78,7 +78,7 @@ public:
 
         JNINativeMethod methods[] {
             {"fillInputBuffer", "(Ljava/nio/ByteBuffer;JI)V", reinterpret_cast<void *>(nx::media::fillInputBuffer)},
-            { "readOutputBuffer", "(Ljava/nio/ByteBuffer;JJI)V", reinterpret_cast<void *>(nx::media::readOutputBuffer) }
+            { "readOutputBuffer", "(JLjava/nio/ByteBuffer;I)V", reinterpret_cast<void *>(nx::media::readOutputBuffer) }
         };
 
         QAndroidJniEnvironment env;

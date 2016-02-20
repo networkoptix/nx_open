@@ -260,15 +260,15 @@ public class QnMediaDecoder {
             MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
             int outputBufferId = codec.dequeueOutputBuffer(info, 0);
 
-			if (outputBufferId >= 0)
-			{
-				ByteBuffer outputBuffer = codec.getOutputBuffer(outputBufferId);
-				readOutputBuffer(outputBuffer, outputBuffer.capacity(), cObject);
-				codec.releaseOutputBuffer(outputBufferId, false);
-				return true;
-			}
+            if (outputBufferId >= 0)
+            {
+                ByteBuffer outputBuffer = codec.getOutputBuffer(outputBufferId);
+                readOutputBuffer(cObject, outputBuffer, outputBuffer.capacity());
+                codec.releaseOutputBuffer(outputBufferId, false);
+                return true;
+            }
 
-			return false;
+            return false;
               
         }
         catch(IllegalStateException e)
@@ -286,8 +286,7 @@ public class QnMediaDecoder {
     }
 
     private static native void fillInputBuffer(ByteBuffer buffer,  long srcDataPtr, int frameSize);
-	private static native void readOutputBuffer(ByteBuffer buffer, long bufferSize, long cObject);
-
+    private static native void readOutputBuffer(long cObject, ByteBuffer buffer, int bufferSize);
     ByteBuffer[] inputBuffers;
     private MediaCodec codec;
     private MediaFormat format;
