@@ -325,6 +325,9 @@ TEST(MediaDb_test, ReadWrite)
 
     uint8_t dbVersion;
     error = dbHelper.readFileHeader(&dbVersion);
+
+    ASSERT_TRUE(dbVersion == boost::get<TestFileHeader>(tdm.dataVector[0].data).dbVersion);
+    tdm.dataVector[0].visited = true;
     ASSERT_TRUE(error == nx::media_db::Error::NoError);
 
     while (error == nx::media_db::Error::NoError)
@@ -332,6 +335,68 @@ TEST(MediaDb_test, ReadWrite)
 
     dbFile.close();
     recursiveClean(workDirPath);
+
+    size_t readRecords = std::count_if(tdm.dataVector.cbegin(), tdm.dataVector.cend(),
+                                       [](const TestData &td) { return td.visited; });
+    ASSERT_TRUE(readRecords == tdm.dataVector.size());
+}
+
+TEST(MediaDb_test, ReadWrite_MT)
+{
+    QString workDirPath = qApp->applicationDirPath() + lit("/tmp/media_db");
+    QDir().mkpath(workDirPath);
+
+    QFile dbFile(workDirPath + lit("/file.mdb"));
+    dbFile.open(QIODevice::ReadWrite);
+
+    const size_t threadsNum = 4;
+    nx::media_db::Error error;
+    TestDataManager tdm(threadsNum * 1000);
+    TestDbHelperHandler testHandler(&error, &tdm);
+    nx::media_db::DbHelper dbHelper(&dbFile, &testHandler);
+    dbHelper.setMode(nx::media_db::Mode::Write);
+
+    //write header
+    boost::apply_visitor(RecordWriteVisitor(&dbHelper), tdm.dataVector[0].data);
+
+    std::vector<std::thread> threads;
+    for (size_t i = 0; i < threadsNum; ++i)
+    {
+            threads.emplace_back(
+                std::thread([&dbHelper, &tdm, i]
+                            {
+                                size_t j = i == 0 ? 1 : i * 1000;
+                                for (; j < (i + 1) * 1000; ++j)
+                                    boost::apply_visitor(RecordWriteVisitor(&dbHelper),
+                                                         tdm.dataVector[j].data);
+                            }));
+    }
+
+    for (size_t i = 0; i < threadsNum; ++i)
+        if (threads[i].joinable())
+            threads[i].join();
+
+    dbHelper.setMode(nx::media_db::Mode::Read);
+    dbHelper.reset();
+    dbFile.close();
+    dbFile.open(QIODevice::ReadWrite);
+
+    uint8_t dbVersion;
+    error = dbHelper.readFileHeader(&dbVersion);
+
+    ASSERT_TRUE(dbVersion == boost::get<TestFileHeader>(tdm.dataVector[0].data).dbVersion);
+    tdm.dataVector[0].visited = true;
+    ASSERT_TRUE(error == nx::media_db::Error::NoError);
+
+    while (error == nx::media_db::Error::NoError)
+        dbHelper.readRecord();
+
+    dbFile.close();
+    recursiveClean(workDirPath);
+
+    size_t readRecords = std::count_if(tdm.dataVector.cbegin(), tdm.dataVector.cend(),
+                                       [](const TestData &td) { return td.visited; });
+    ASSERT_TRUE(readRecords + 1 == tdm.dataVector.size());
 }
 
 TEST(MediaDb_test, Cleanup)
