@@ -6,6 +6,7 @@
 #pragma once
 
 #include <nx/utils/async_operation_guard.h>
+#include <nx/utils/atomic_unique_ptr.h>
 #include <utils/common/cpp14.h>
 
 #include "nx/network/abstract_socket.h"
@@ -94,7 +95,7 @@ private:
         SystemError::ErrorCode errorCode,
         std::unique_ptr<AbstractStreamSocket> cloudConnection);
 
-    nx::atomic_unique_ptr<AbstractStreamSocket> m_socketDelegate;
+    nx::utils::AtomicUniquePtr<AbstractStreamSocket> m_socketDelegate;
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_connectHandler;
     nx::utils::AsyncOperationGuard m_asyncConnectGuard;
     /** Used to tie this to aio thread.
