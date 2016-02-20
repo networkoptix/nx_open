@@ -12,10 +12,10 @@ unix {
 QT += ${qt.libs} core-private
 ADDITIONAL_QT_INCLUDES=${environment.dir}/qt5-custom
 
-
 ## GLOBAL CONFIGURATIONS
 CONFIG += precompile_header $$BUILDLIB $$LIBTYPE
 CONFIG -= flat
+CONFIG += no_private_qt_headers_warning
 DEFINES += USE_NX_HTTP __STDC_CONSTANT_MACROS ${global.defines}
 DEFINES += ${customization.defines}
 DEFINES += ${additional.defines}
