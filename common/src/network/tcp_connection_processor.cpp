@@ -13,9 +13,6 @@
 #include "tcp_connection_priv.h"
 #include "err.h"
 
-#include "version.h"
-
-
 #ifndef Q_OS_WIN
 #   include <netinet/tcp.h>
 #endif
@@ -107,7 +104,7 @@ int QnTCPConnectionProcessor::isFullMessage(
         *fullMessageSize = expectedSize;
     if (expectedSize > message.size())
         return 0;
-    else 
+    else
         return expectedSize;
 }
 
@@ -333,7 +330,7 @@ bool QnTCPConnectionProcessor::readRequest()
     {
         int readed;
         readed = d->socket->recv(d->tcpReadBuffer, TCP_READ_BUFFER_SIZE);
-        if (readed > 0) 
+        if (readed > 0)
         {
             //globalTimeout.restart();
             d->clientRequest.append((const char*) d->tcpReadBuffer, readed);
@@ -374,7 +371,7 @@ bool QnTCPConnectionProcessor::readSingleRequest()
 
     if( !d->clientRequest.isEmpty() )   //TODO #ak it is more reliable to check for the first call of this method
     {
-        //due to bug in QnTCPConnectionProcessor::readRequest() d->clientRequest 
+        //due to bug in QnTCPConnectionProcessor::readRequest() d->clientRequest
         //    can contain multiple interleaved requests.
         //    Have to parse them!
         assert( d->interleavedMessageData.isEmpty() );
@@ -474,7 +471,7 @@ SocketAddress QnTCPConnectionProcessor::remoteHostAddress() const
 void QnTCPConnectionProcessor::releaseSocket()
 {
     Q_D(QnTCPConnectionProcessor);
-    d->socket.clear();    
+    d->socket.clear();
 }
 
 int QnTCPConnectionProcessor::redirectTo(const QByteArray& page, QByteArray& contentType)

@@ -30,3 +30,5 @@ unix:!mac {
 }
 
 OTHER_FILES += ${root.dir}/client/src/ui/help/help_topics.i
+
+SOURCES += ${project.build.directory}/client_app_info_impl.cpp

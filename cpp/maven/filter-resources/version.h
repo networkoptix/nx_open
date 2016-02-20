@@ -60,7 +60,6 @@
 #define QN_IOS_PLAYBUTTON_TINT          "${ios.playButton.tint}"
 #define QN_IOS_SHARED_GROUP_ID          "${ios.group_identifier}"
 #define QN_IOS_NEW_APP_APPSTORE_ID      "${ios.new_app_appstore_id}"
-#define NX_EC_EC2_PROTO_VERSION         ${nxec.ec2ProtoVersion}
 
 #define QN_AX_CLASS_ID                  "${ax.classId}"
 #define QN_AX_INTERFACE_ID              "${ax.interfaceId}"
@@ -70,27 +69,4 @@
 
 #define QN_CLOUD_MODULES_XML            "${cloud.modulesXmlUrl}"
 
-/* 
- * These constants are here for windows resource file.
- *
- * DO NOT USE THEM IN YOUR CODE. 
- * DO NOT ADD NEW CONSTANTS HERE.
- */
-#define VER_LINUX_ORGANIZATION_NAME     "${deb.customization.company.name}" // TODO: #Elric move up
-#define VER_FILEVERSION                 ${parsedVersion.majorVersion},${parsedVersion.minorVersion},${parsedVersion.incrementalVersion},${buildNumber}
-#define VER_FILEVERSION_STR             "${release.version}.${buildNumber}"
-#define VER_PRODUCTVERSION              ${parsedVersion.majorVersion},${parsedVersion.minorVersion},${parsedVersion.incrementalVersion}
-#define VER_PRODUCTVERSION_STR          "${release.version}.${buildNumber}"
-#define VER_COMPANYNAME_STR             "${company.name}"
-#define VER_FILEDESCRIPTION_STR         "${product.display.title}"
-#define VER_INTERNALNAME_STR            "${product.title}"
-#define VER_LEGALCOPYRIGHT_STR          "Copyright (c) 2011-2016 Network Optix"
-#define VER_LEGALTRADEMARKS1_STR        "All Rights Reserved"
-#define VER_LEGALTRADEMARKS2_STR        VER_LEGALTRADEMARKS1_STR
-#define VER_ORIGINALFILENAME_STR        "${project.artifactId}.exe"
-#define VER_PRODUCTNAME_STR             "${project.artifactId}"
-#define VER_COMPANYDOMAIN_STR           "${company.url}"
-
-#define IDI_ICON_APPLICATION            101
-#define IDI_ICON_VIDEOWALL              102
-/* Dear Developer. Please add new constants to the code block above (QN_* definitions). Thank you. */
+#define VER_LINUX_ORGANIZATION_NAME     "${deb.customization.company.name}"

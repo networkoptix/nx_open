@@ -30,7 +30,6 @@
 #include "core/resource/user_resource.h"
 #include "database/db_manager.h"
 #include "http/custom_headers.h"
-#include "version.h"
 #include "settings.h"
 
 //#define USE_SINGLE_TWO_WAY_CONNECTION

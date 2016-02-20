@@ -17,6 +17,7 @@
 
 #include <camera/camera_bookmarks_manager.h>
 
+#include <client/client_app_info.h>
 #include <client/client_startup_parameters.h>
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
@@ -48,8 +49,6 @@
 #include <ui/statistics/modules/controls_statistics_module.h>
 
 #include <watchers/cloud_status_watcher.h>
-
-#include "version.h"
 
 namespace
 {
@@ -109,8 +108,8 @@ QnClientModule::QnClientModule(const QnStartupParameters &startupParams
 
     /* Set up application parameters so that QSettings know where to look for settings. */
     QApplication::setOrganizationName(QnAppInfo::organizationName());
-    QApplication::setApplicationName(lit(QN_APPLICATION_NAME));
-    QApplication::setApplicationDisplayName(lit(QN_APPLICATION_DISPLAY_NAME));
+    QApplication::setApplicationName(QnClientAppInfo::applicationName());
+    QApplication::setApplicationDisplayName(QnClientAppInfo::applicationDisplayName());
     if (QApplication::applicationVersion().isEmpty())
         QApplication::setApplicationVersion(QnAppInfo::applicationVersion());
     QApplication::setStartDragDistance(20);
