@@ -32,7 +32,6 @@ extern "C"
 #include <nx/utils/log/log.h>
 #include <utils/media/ffmpeg_helper.h>
 
-//TODO: #rvasilenko #fixme! What for this awful code duplication???
 namespace {
 
     // mux audio 1 and audio 2 to audio1 buffer

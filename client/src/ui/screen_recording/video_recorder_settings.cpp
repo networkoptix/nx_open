@@ -8,7 +8,6 @@
 #ifdef Q_OS_WIN
 #   include <d3d9.h>
 #   include <plugins/resource/desktop_win/screen_grabber.h>
-#   include <plugins/resource/desktop_win/desktop_file_encoder.h>
 #   include <plugins/resource/desktop_win/win_audio_device_info.h>
 #endif
 
@@ -22,7 +21,7 @@ QnVideoRecorderSettings::QnVideoRecorderSettings(QObject *parent) :
     QObject(parent)
 {
     settings.beginGroup(QLatin1String("videoRecording"));
-    
+
     /*
     // update settings from previous version
     QString primary = settings.value(QLatin1String("primaryAudioDevice")).toString();
@@ -32,7 +31,7 @@ QnVideoRecorderSettings::QnVideoRecorderSettings(QObject *parent) :
         //primary   += QLatin1String(" (1)");
         secondary += QLatin1String(" (2)");
         QStringList devices = availableDeviceNames(QAudio::AudioInput);
-        for (int i = 0; i < devices.size(); ++i) 
+        for (int i = 0; i < devices.size(); ++i)
         {
             if (devices[i] == secondary) {
                 settings.setValue(QLatin1String("primaryAudioDevice"), primary);
@@ -60,7 +59,7 @@ QString QnVideoRecorderSettings::getFullDeviceName(const QString& shortName)
 QStringList QnVideoRecorderSettings::availableDeviceNames(QAudio::Mode mode)
 {
     QMap<QString, int> devices;
-    foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(mode)) 
+    foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(mode))
     {
         QString devName = getFullDeviceName(info.deviceName());
         QMap<QString, int>::iterator existingDevice = devices.find(devName);
@@ -103,7 +102,7 @@ QnAudioDeviceInfo QnVideoRecorderSettings::getDeviceByName(const QString& _name,
     if (name == QObject::tr("None"))
         return QnAudioDeviceInfo();
 
-    foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(mode)) 
+    foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(mode))
     {
         if (name.startsWith(info.deviceName())) {
             if (--devNum == 0)
@@ -236,7 +235,7 @@ void QnVideoRecorderSettings::setRecordingFolder(QString folder) {
     settings.setValue(QLatin1String("recordingFolder"), folder);
 }
 
-float QnVideoRecorderSettings::qualityToNumeric(Qn::DecoderQuality quality) 
+float QnVideoRecorderSettings::qualityToNumeric(Qn::DecoderQuality quality)
 {
     switch(quality) {
         case Qn::BestQuality:        return 1.0;
@@ -276,7 +275,7 @@ int QnVideoRecorderSettings::screenToAdapter(int screen)
 #endif
 }
 
-QSize QnVideoRecorderSettings::resolutionToSize(Qn::Resolution resolution) 
+QSize QnVideoRecorderSettings::resolutionToSize(Qn::Resolution resolution)
 {
     QSize result(0, 0);
     switch(resolution) {
