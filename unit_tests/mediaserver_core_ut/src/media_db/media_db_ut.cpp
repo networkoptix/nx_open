@@ -174,7 +174,7 @@ struct TestDataManager
                                [&record](const TestData &td) 
                                {
                                    if (const Record* r = boost::get<Record>(&td.data))
-                                       return *r == record;
+                                       return *r == record && !td.visited;
                                    return false;
                                });
         if (it != dataVector.end())
@@ -310,7 +310,7 @@ TEST(MediaDb_test, ReadWrite)
     dbFile.open(QIODevice::ReadWrite);
 
     nx::media_db::Error error;
-    TestDataManager tdm(2);
+    TestDataManager tdm(10000);
     TestDbHelperHandler testHandler(&error, &tdm);
     nx::media_db::DbHelper dbHelper(&dbFile, &testHandler);
     dbHelper.setMode(nx::media_db::Mode::Write);

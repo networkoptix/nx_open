@@ -10,7 +10,10 @@ namespace
 
 QDataStream &operator << (QDataStream &stream, const CameraOperation &cameraOp)
 {
-    return stream << cameraOp.part_1 << cameraOp.cameraUniqueId;
+    stream << cameraOp.part_1;
+    stream.writeRawData(cameraOp.cameraUniqueId.data(), cameraOp.getCameraUniqueIdLen());
+
+    return stream;
 }
 
 template<typename StructToWrite>
@@ -103,7 +106,6 @@ Error DbHelper::readRecord()
         return Error::WrongMode;
     RecordBase rb;
     m_stream >> rb.part_1;
-    quint64 part_2;
     Error error;
 
     switch (rb.getRecordType())
@@ -111,6 +113,7 @@ Error DbHelper::readRecord()
     case RecordType::FileOperationAdd:
     case RecordType::FileOperationDelete:
     {
+        quint64 part_2;
         m_stream >> part_2;
         error = getError();
         m_handler->handleMediaFileOp(MediaFileOperation(rb.part_1, part_2), error);
@@ -119,10 +122,9 @@ Error DbHelper::readRecord()
     case RecordType::CameraOperationAdd:
     {
         CameraOperation cameraOp(rb.part_1);
-        QByteArray bArray;
-        bArray.resize(cameraOp.getCameraUniqueIdLen());
-        m_stream.readRawData(bArray.data(), cameraOp.getCameraUniqueIdLen());
-        cameraOp.cameraUniqueId = bArray;
+        cameraOp.cameraUniqueId.resize(cameraOp.getCameraUniqueIdLen());
+        m_stream.readRawData(cameraOp.cameraUniqueId.data(),
+                             cameraOp.getCameraUniqueIdLen());
         error = getError();
         m_handler->handleCameraOp(cameraOp, error);
         break;
