@@ -319,7 +319,7 @@ TEST_F(OutgoingTunnelUdtConnectionTest, controlConnectionFailure)
     auto connectContexts = startConnections(&tunnelConnection, 1);
     auto future = connectContexts[0].connectedPromise.get_future();
     auto result = future.get();
-    ASSERT_EQ(false, result.stillValid);    //tunnel is invalid since control connection has timed out
+    ASSERT_FALSE(result.stillValid);    //tunnel is invalid since control connection has timed out
     ASSERT_NE(nullptr, result.connection);  //but connection still succeeded
     ASSERT_EQ(SystemError::noError, result.errorCode);
 
