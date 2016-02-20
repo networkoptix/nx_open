@@ -15,8 +15,12 @@ class NX_NETWORK_API UdpHolePunchingTunnelAcceptor
     public AbstractTunnelAcceptor
 {
 public:
-    UdpHolePunchingTunnelAcceptor(
-        std::list<SocketAddress> addresses);
+    explicit UdpHolePunchingTunnelAcceptor(SocketAddress peerAddress);
+    ~UdpHolePunchingTunnelAcceptor() override;
+
+    void setUdtConnectTimeout(std::chrono::milliseconds timeout);
+    void setUdpRetransmissionTimeout(std::chrono::milliseconds timeout);
+    void setUdpMaxRetransmissions(int count);
 
     void accept(std::function<void(
         SystemError::ErrorCode,
@@ -25,13 +29,16 @@ public:
     void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
 private:
-    void initiateConnection();
-    bool checkPleaseStop();
+    void connectionAckResult(nx::hpm::api::ResultCode code);
+    void initiateUdtConnection();
     void executeAcceptHandler(
         SystemError::ErrorCode errorCode,
         std::unique_ptr<AbstractIncomingTunnelConnection> connection = nullptr);
 
-    const std::list<SocketAddress> m_addresses;
+    const SocketAddress m_peerAddress;
+    std::chrono::milliseconds m_udtConnectTimeout;
+    std::chrono::milliseconds m_udpRetransmissionTimeout;
+    int m_udpMaxRetransmissions;
 
     QnMutex m_mutex;
     std::unique_ptr<hpm::api::MediatorServerUdpConnection> m_udpMediatorConnection;

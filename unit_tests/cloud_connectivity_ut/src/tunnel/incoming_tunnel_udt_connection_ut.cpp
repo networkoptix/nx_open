@@ -34,9 +34,8 @@ protected:
         ASSERT_EQ(results.pop(), SystemError::noError);
 
         connection = std::make_unique<IncomingTunnelUdtConnection>(
-             kConnectionId.toUtf8(), std::move(tmpSocket),
-             std::chrono::milliseconds(1000));
-
+             kConnectionId.toUtf8(), std::move(tmpSocket));
+        connection->setMaxKeepAliveInterval(std::chrono::seconds(1));
         acceptForever();
     }
 

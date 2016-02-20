@@ -346,7 +346,7 @@ public:
     /**
      *   Construct a UDP socket
      */
-    UDPSocket( bool natTraversal = true );
+    explicit UDPSocket( bool natTraversal = true );
 
     UDPSocket(const UDPSocket&) = delete;
     UDPSocket& operator=(const UDPSocket&) = delete;

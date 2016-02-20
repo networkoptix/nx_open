@@ -18,8 +18,12 @@ static const std::vector<CloudServerSocket::AcceptorMaker> defaultAcceptorMakers
         if (event.connectionMethods & udpHolePunching)
         {
             event.connectionMethods ^= udpHolePunching; //< used
+            Q_ASSERT(event.udpEndpointList.size() == 1);
+            if (!event.udpEndpointList.size())
+                return std::unique_ptr<AbstractTunnelAcceptor>();
+
             auto acceptor = std::make_unique<UdpHolePunchingTunnelAcceptor>(
-                std::move(event.udpEndpointList));
+                std::move(event.udpEndpointList.front()));
 
             return std::unique_ptr<AbstractTunnelAcceptor>(std::move(acceptor));
         }
