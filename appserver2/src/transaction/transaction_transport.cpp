@@ -85,6 +85,9 @@ namespace ConnectionType
 
 static const int DEFAULT_READ_BUFFER_SIZE = 4 * 1024;
 static const int SOCKET_TIMEOUT = 1000 * 1000;
+//following value is for VERY slow networks and VERY large transactions (e.g., some large image)
+    //Connection keep-alive timeout is not influenced by this value
+static const std::chrono::minutes kSocketSendTimeout(23);
 const char* QnTransactionTransport::TUNNEL_MULTIPART_BOUNDARY = "ec2boundary";
 const char* QnTransactionTransport::TUNNEL_CONTENT_TYPE = "multipart/mixed; boundary=ec2boundary";
 
@@ -140,7 +143,9 @@ QnTransactionTransport::QnTransactionTransport(
     m_contentEncoding = contentEncoding;
     m_connectionGuid = connectionGuid;
 
-    if( !m_outgoingDataSocket->setSendTimeout(SOCKET_TIMEOUT/*m_idleConnectionTimeout.count()*/) )
+    using namespace std::chrono;
+    if (!m_outgoingDataSocket->setSendTimeout(
+            duration_cast<milliseconds>(kSocketSendTimeout).count()))
     {
         const auto osErrorCode = SystemError::getLastOSErrorCode();
         NX_LOG(QnLog::EC2_TRAN_LOG,
@@ -1103,8 +1108,10 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
         //using http client just to authenticate on server
         if( !m_outgoingTranClient )
         {
+            using namespace std::chrono;
             m_outgoingTranClient = nx_http::AsyncHttpClient::create();
-            m_outgoingTranClient->setSendTimeoutMs(m_idleConnectionTimeout.count());
+            m_outgoingTranClient->setSendTimeoutMs(
+                duration_cast<milliseconds>(kSocketSendTimeout).count());   //it can take a long time to send large transactions
             m_outgoingTranClient->setResponseReadTimeoutMs(m_idleConnectionTimeout.count());
             m_outgoingTranClient->addAdditionalHeader(
                 Qn::EC2_CONNECTION_GUID_HEADER_NAME,
@@ -1557,8 +1564,10 @@ void QnTransactionTransport::startListeningNonSafe()
 
     if( m_incomingDataSocket )
     {
+        using namespace std::chrono;
         m_incomingDataSocket->setRecvTimeout(SOCKET_TIMEOUT);
-        m_incomingDataSocket->setSendTimeout(SOCKET_TIMEOUT);
+        m_incomingDataSocket->setSendTimeout(
+            duration_cast<milliseconds>(kSocketSendTimeout).count());
         m_incomingDataSocket->setNonBlockingMode(true);
         using namespace std::placeholders;
         m_lastReceiveTimer.restart();
