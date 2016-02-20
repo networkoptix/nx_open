@@ -205,8 +205,8 @@ public:
         top.id = cameraOp.getCameraId();
         top.uuidLen = cameraOp.getCameraUniqueIdLen();
         
-        EXPECT_TRUE(m_tdm->seekAndSet(top));
         *m_error = error;
+        ASSERT_TRUE(m_tdm->seekAndSet(top));
     }
 
     void handleMediaFileOp(const nx::media_db::MediaFileOperation &mediaFileOp, 
@@ -217,24 +217,24 @@ public:
         tfop.chunksCatalog = mediaFileOp.getCatalog();
         tfop.code = (int)mediaFileOp.getRecordType();
         tfop.duration = mediaFileOp.getDuration();
-        tfop.fileSize = mediaFileOp.getDuration();
+        tfop.fileSize = mediaFileOp.getFileSize();
         tfop.startTime = mediaFileOp.getStartTime();
 
-        EXPECT_TRUE(m_tdm->seekAndSet(tfop));
         *m_error = error;
+        ASSERT_TRUE(m_tdm->seekAndSet(tfop));
     }
 
     void handleError(nx::media_db::Error error) override
     {
-        EXPECT_TRUE(false);
         *m_error = error;
+        ASSERT_TRUE(false);
     }
 
     void handleRecordWrite(nx::media_db::Error error) override
     {
-        EXPECT_TRUE(error == nx::media_db::Error::NoError ||
-                    error == nx::media_db::Error::Eof);
         *m_error = error;
+        ASSERT_TRUE(error == nx::media_db::Error::NoError ||
+                    error == nx::media_db::Error::Eof);
     }
 private:
     nx::media_db::Error *m_error;
@@ -310,7 +310,7 @@ TEST(MediaDb_test, ReadWrite)
     dbFile.open(QIODevice::ReadWrite);
 
     nx::media_db::Error error;
-    TestDataManager tdm(1);
+    TestDataManager tdm(2);
     TestDbHelperHandler testHandler(&error, &tdm);
     nx::media_db::DbHelper dbHelper(&dbFile, &testHandler);
     dbHelper.setMode(nx::media_db::Mode::Write);

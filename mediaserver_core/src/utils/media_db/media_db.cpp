@@ -13,21 +13,10 @@ QDataStream &operator << (QDataStream &stream, const CameraOperation &cameraOp)
     return stream << cameraOp.part_1 << cameraOp.cameraUniqueId;
 }
 
-QDataStream &operator >> (QDataStream &stream, CameraOperation &cameraOp)
-{
-    return stream >> cameraOp.part_1 >> cameraOp.cameraUniqueId;
-}
-
 template<typename StructToWrite>
 QDataStream &operator << (QDataStream &stream, const StructToWrite &s)
 {
     return stream << s.part_1<< s.part_2;
-}
-
-template<typename StructToWrite>
-QDataStream &operator >> (QDataStream &stream, StructToWrite &s)
-{
-    return stream >> s.part_1>> s.part_2;
 }
 
 class RecordVisitor : public boost::static_visitor<>
@@ -88,7 +77,7 @@ Error DbHelper::readFileHeader(uint8_t *version)
     if (m_mode == Mode::Write)
         return Error::WrongMode;
     FileHeader fh;
-    m_stream >> fh;
+    m_stream >> fh.part_1 >> fh.part_2;
     if (version)
         *version = fh.getDbVersion();
 
