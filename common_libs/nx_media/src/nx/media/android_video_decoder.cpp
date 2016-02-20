@@ -131,7 +131,7 @@ public:
     AndroidVideoDecoderPrivate():
         frameNumber(0),
         initialized(false),
-        javaDecoder("com/networkoptix/nxwitness/media/QnMediaDecoder"),
+        javaDecoder("com/networkoptix/nxwitness/media/QnVideoDecoder"),
         program(nullptr)
     {
         registerNativeMethods();
@@ -364,7 +364,7 @@ bool AndroidVideoDecoder::isCompatible(const CodecID codec, const QSize& resolut
     if (!maxDecoderSize.contains(codec))
     {
         QAndroidJniObject jCodecName = QAndroidJniObject::fromString(codecMimeType);
-        QAndroidJniObject javaDecoder("com/networkoptix/nxwitness/media/QnMediaDecoder");
+        QAndroidJniObject javaDecoder("com/networkoptix/nxwitness/media/QnVideoDecoder");
         jint maxWidth = javaDecoder.callMethod<jint>("maxDecoderWidth", "(Ljava/lang/String;)I", jCodecName.object<jstring>());
         jint maxHeight = javaDecoder.callMethod<jint>("maxDecoderHeight", "(Ljava/lang/String;)I", jCodecName.object<jstring>());
         QSize size(maxWidth, maxHeight);

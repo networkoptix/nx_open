@@ -239,54 +239,7 @@ public class QnMediaDecoder {
         }
     }
 
-    public boolean decodeAudio(long srcDataPtr, int frameSize, long cObject)
-    {
-        try
-        {
-            final long timeoutUs = 1000 * 3000; //< 3 second
-            int inputBufferId = codec.dequeueInputBuffer(timeoutUs);
-            if (inputBufferId >= 0)
-            {
-              ByteBuffer inputBuffer = inputBuffers[inputBufferId];
-              inputBuffer.allocateDirect(frameSize);
-              fillInputBuffer(inputBuffer, srcDataPtr, frameSize); //< C++ callback
-              codec.queueInputBuffer(inputBufferId, 0, frameSize, 0, 0);
-            }
-            else {
-                System.out.println("error dequeueInputBuffer");
-                return false;
-            }
-
-            MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
-            int outputBufferId = codec.dequeueOutputBuffer(info, 0);
-
-            if (outputBufferId >= 0)
-            {
-                ByteBuffer outputBuffer = codec.getOutputBuffer(outputBufferId);
-                readOutputBuffer(cObject, outputBuffer, outputBuffer.capacity());
-                codec.releaseOutputBuffer(outputBufferId, false);
-                return true;
-            }
-
-            return false;
-              
-        }
-        catch(IllegalStateException e)
-        {
-            System.out.println("IllegalStateException" + e.toString());
-            System.out.println("IllegalStateException" + e.getMessage());
-            return false;
-        }
-        catch(Exception e)
-        {
-            System.out.println("Exception" + e.toString());
-            System.out.println("Exception" + e.getMessage());
-            return false;
-        }
-    }
-
     private static native void fillInputBuffer(ByteBuffer buffer,  long srcDataPtr, int frameSize);
-    private static native void readOutputBuffer(long cObject, ByteBuffer buffer, int bufferSize);
     ByteBuffer[] inputBuffers;
     private MediaCodec codec;
     private MediaFormat format;

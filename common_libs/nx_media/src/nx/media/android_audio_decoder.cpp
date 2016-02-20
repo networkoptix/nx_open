@@ -62,7 +62,7 @@ class AndroidAudioDecoderPrivate: public QObject
 public:
     AndroidAudioDecoderPrivate():
         initialized(false),
-        javaDecoder("com/networkoptix/nxwitness/media/QnMediaDecoder")
+        javaDecoder("com/networkoptix/nxwitness/media/QnAudioDecoder")
     {
         registerNativeMethods();
     }
@@ -167,7 +167,7 @@ AudioFramePtr AndroidAudioDecoder::decode(const QnConstCompressedAudioDataPtr& f
 
     d->audioFrame.reset();
     d->javaDecoder.callMethod<jboolean>(
-        "decodeAudio", "(JIJ)Z",
+        "decodeFrame", "(JIJ)Z",
         (jlong) frame->data(),
         (jint) frame->dataSize(),
         (jlong) (void*) this);
