@@ -74,7 +74,7 @@ void runMultiserverUploadRequest(QUrl url
     const auto downloadRequest = [completionFunc, data, contentType, user, password]
         (const QUrl &url, const nx_http::HttpHeaders &headers, Context *context)
     {
-        context->executeGuarded([url, data, completionFunc, headers, contentType, context]()
+        context->executeGuarded([url, data, completionFunc, headers, user, password, contentType, context]()
         {
             nx_http::uploadDataAsync(url, data, contentType, user, password, headers, completionFunc);
             context->incRequestsCount();
