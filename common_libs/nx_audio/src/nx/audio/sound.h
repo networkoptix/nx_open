@@ -1,9 +1,10 @@
 #pragma once
 
-#include <utils/thread/mutex.h>
 #include <QtCore/QVector>
 #include <QtMultimedia/QAudio>
 #include <QtMultimedia/QAudioFormat>
+
+#include <nx/utils/thread/mutex.h>
 #include <utils/media/audioformat.h>
 
 class AudioDevice;
@@ -80,7 +81,7 @@ private:
     static int getOpenAlFormat(const QnAudioFormat &audioFormat);
     uint bitRate() const;
     bool playImpl();
-    
+
     static bool outError(int err, const char *strerr);
     static int checkOpenALErrorDebug(ALCdevice *device);
     bool internalPlay(const void *data, uint size);
