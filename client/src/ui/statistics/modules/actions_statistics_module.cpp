@@ -3,7 +3,7 @@
 
 #include <ui/actions/action.h>
 #include <ui/actions/action_manager.h>
-#include <ui/statistics/modules/module_private/action_metrics.h>
+#include <ui/statistics/modules/private/action_metrics.h>
 
 namespace
 {
@@ -17,7 +17,7 @@ namespace
 QnActionsStatisticsModule::QnActionsStatisticsModule(QObject *parent)
     : base_type(parent)
     , m_actionManager()
-    , m_multiMetrics()
+    , m_modules()
 {
 }
 
@@ -33,26 +33,26 @@ void QnActionsStatisticsModule::setActionManager(const QnActionManagerPtr &manag
     if (m_actionManager)
     {
         disconnect(m_actionManager, nullptr, this, nullptr);
-        m_multiMetrics.clear();
+        m_modules.clear();
     }
 
     m_actionManager = manager;
 
-    m_multiMetrics.append(createMetrics<ActionsTriggeredCountMetrics>(manager));
-    m_multiMetrics.append(createMetrics<ActionCheckedTimeMetric>(manager));
+    m_modules.append(createMetrics<ActionsTriggeredCountMetrics>(manager));
+    m_modules.append(createMetrics<ActionCheckedTimeMetric>(manager));
 }
 
-QnMetricsHash QnActionsStatisticsModule::metrics() const
+QnStatisticValuesHash QnActionsStatisticsModule::values() const
 {
-    QnMetricsHash result;
-    for (const auto multiMetric: m_multiMetrics)
-        result.unite(multiMetric->metrics());
+    QnStatisticValuesHash result;
+    for (const auto module: m_modules)
+        result.unite(module->values());
 
     return result;
 }
 
-void QnActionsStatisticsModule::resetMetrics()
+void QnActionsStatisticsModule::reset()
 {
-    for (const auto &multiMetrics:m_multiMetrics)
-        multiMetrics->reset();
+    for (const auto &module:m_modules)
+        module->reset();
 }

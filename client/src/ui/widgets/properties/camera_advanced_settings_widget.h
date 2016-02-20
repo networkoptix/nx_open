@@ -35,6 +35,9 @@ public:
 signals:
     void hasChangesChanged();
 
+protected:
+    virtual void hideEvent(QHideEvent *event) override;
+
 private:
     void initWebView();
 

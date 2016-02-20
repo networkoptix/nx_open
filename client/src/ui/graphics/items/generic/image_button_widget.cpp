@@ -32,6 +32,8 @@
 #include <utils/math/color_transformations.h>
 #include "opengl_renderer.h"
 
+#include <ui/statistics/modules/controls_statistics_module.h>
+
 //#define QN_IMAGE_BUTTON_WIDGET_DEBUG
 
 namespace {
@@ -80,7 +82,8 @@ class QnImageButtonHoverProgressAccessor: public AbstractAccessor {
     }
 };
 
-QnImageButtonWidget::QnImageButtonWidget(QGraphicsItem *parent, Qt::WindowFlags windowFlags):
+QnImageButtonWidget::QnImageButtonWidget(const QString &statisticsAlias
+    , QGraphicsItem *parent, Qt::WindowFlags windowFlags):
     base_type(parent, windowFlags),
     m_pixmapCacheValid(false),
     m_state(0),
@@ -93,6 +96,7 @@ QnImageButtonWidget::QnImageButtonWidget(QGraphicsItem *parent, Qt::WindowFlags 
     m_actionIconOverridden(false),
     m_initialized(false)
 {
+    qnControlsStatisticsModule->registerButton(statisticsAlias, this);
     setAcceptedMouseButtons(Qt::LeftButton);
     setClickableButtons(Qt::LeftButton);
     setAcceptHoverEvents(true);
@@ -742,8 +746,9 @@ void QnImageButtonWidget::updateVao(const QRectF &rect) {
 // -------------------------------------------------------------------------- //
 // QnRotatingImageButtonWidget
 // -------------------------------------------------------------------------- //
-QnRotatingImageButtonWidget::QnRotatingImageButtonWidget(QGraphicsItem *parent, Qt::WindowFlags windowFlags):
-    base_type(parent, windowFlags),
+QnRotatingImageButtonWidget::QnRotatingImageButtonWidget(const QString &statisticsAlias
+    , QGraphicsItem *parent, Qt::WindowFlags windowFlags):
+    base_type(statisticsAlias, parent, windowFlags),
     m_rotationSpeed(360.0),
     m_rotation(0.0)
 {

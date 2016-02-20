@@ -10,7 +10,9 @@
 
 #include <ui/graphics/items/standard/graphics_widget.h>
 #include <ui/common/geometry.h>
+
 #include <memory>
+#include <array>
 
 class QnPausedPainter;
 class QnLoadingProgressPainter;
@@ -57,14 +59,13 @@ private:
         UnauthorizedText,
         UnauthorizedSubText,
         LoadingText,
-        NoVideoStreamText,
         AnalogLicenseText,
         VideowallLicenseText,
         IoModuleDisabledText,
         TextCount
     };
 
-    void paintFlashingText(QPainter *painter, const QStaticText &text, qreal textSize, const QPointF &offset = QPointF());
+    void paintFlashingText(QPainter *painter, OverlayText textId, qreal textSize, const QPointF &offset = QPointF());
     void paintPixmap(QPainter *painter, const QPixmap &picture, qreal imageSize);
 
     void updateLayout();
@@ -81,7 +82,7 @@ private:
     QSharedPointer<QnLoadingProgressPainter> m_loadingProgressPainter;
     Qn::ResourceStatusOverlay m_statusOverlay;
 
-    boost::array<QStaticText, TextCount> m_staticTexts;
+    std::array<QString, TextCount> m_texts;
 
     QFont m_staticFont;
 

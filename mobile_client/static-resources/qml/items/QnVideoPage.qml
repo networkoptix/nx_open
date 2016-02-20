@@ -278,7 +278,10 @@ QnPage {
                 video.screenshotSource = ""
         }
 
-        Component.onCompleted: player.playLive()
+        Component.onCompleted: {
+            player.maxTextureSize = getMaxTextureSize()
+            player.playLive()
+        }
     }
 
     QnCameraAccessRightsHelper {

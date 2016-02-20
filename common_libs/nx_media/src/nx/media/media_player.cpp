@@ -39,6 +39,9 @@ static const int kMaxCounterForWrongLiveBuffer = 2;
 // Audio and video timings will became similar as soon as audio buffer passes a hole.
 static const int kTryLaterIntervalMs = 16;
 
+// Default value for max openGL texture size
+static const int kDefaultMaxTextureSize = 2048;
+
 
 static qint64 msecToUsec(qint64 posMs)
 {
@@ -158,7 +161,7 @@ PlayerPrivate::PlayerPrivate(Player *parent)
     reconnectOnPlay(false),
     position(0),
     videoSurface(0),
-    maxTextureSize(4096), //< TODO mike: STUB: Find a way to pass QnTextureSizeHelper::instance()->maxTextureSize()
+    maxTextureSize(kDefaultMaxTextureSize),
     ptsTimerBase(0),
     execTimer(new QTimer(this)),
     lastSeekTimeMs(AV_NOPTS_VALUE),
@@ -247,9 +250,18 @@ void PlayerPrivate::at_gotVideoFrame()
 void PlayerPrivate::presentNextFrameDelayed()
 {
     qint64 delayToRenderMs = 0;
-    if (dataConsumer->audioOutput())
+    if (dataConsumer && dataConsumer->audioOutput())
     {
+        if (dataConsumer->audioOutput()->isBufferUnderflow())
+        {
+            // If audio buffer is empty we have to display current video frame to unblock data stream 
+            // and allow audio data to fill the buffer.
+            presentNextFrame();
+            return;
+        }
+
         delayToRenderMs = getDelayForNextFrameWithAudioMs(videoFrameToRender);
+
         // If video delay interval is bigger then audio buffer, it'll block audio playing.
         // At this case calculate time again after a delay.
         if (delayToRenderMs > dataConsumer->audioOutput()->currentBufferSizeUsec() / 1000)
@@ -354,7 +366,7 @@ void PlayerPrivate::updateLiveBufferState(BufferState value)
     if (underflowCounter + overflowCounter >= kMaxCounterForWrongLiveBuffer)
     {
         // Too much underflow/overflow issues. Extend live buffer.
-        liveBufferMs = qMin(liveBufferMs * kBufferGrowStep, kMaxBufferMs);
+        liveBufferMs = qMin(liveBufferMs * kBufferGrowStep, kMaxLiveBufferMs);
     }
 }
 
@@ -373,7 +385,8 @@ qint64 PlayerPrivate::getDelayForNextFrameWithAudioMs(const QVideoFramePtr& fram
     if (currentPosUsec == AudioOutput::kUnknownPosition)
         return 0; //< Position isn't known yet. Play video without delay.
 
-    return frame->startTime() - currentPosUsec/1000;
+    qint64 delayToAudioMs = frame->startTime() - currentPosUsec / 1000;
+    return delayToAudioMs;
 }
 
 qint64 PlayerPrivate::getDelayForNextFrameWithoutAudioMs(const QVideoFramePtr& frame)
@@ -535,6 +548,18 @@ void Player::setPosition(qint64 value)
         d->position = value;
 
     d->at_hurryUp(); //< renew receiving frames
+}
+
+int Player::maxTextureSize() const
+{
+    Q_D(const Player);
+    return d->maxTextureSize;
+}
+
+void Player::setMaxTextureSize(int value)
+{
+    Q_D(Player);
+    d->maxTextureSize = value;
 }
 
 void Player::play()

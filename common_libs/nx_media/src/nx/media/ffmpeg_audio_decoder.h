@@ -3,7 +3,6 @@
 #ifndef DISABLE_FFMPEG
 
 #include <QtCore/QObject>
-#include <QtMultimedia/QVideoFrame>
 
 #include <nx/streaming/audio_data_packet.h>
 

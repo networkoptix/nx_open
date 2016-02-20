@@ -45,6 +45,7 @@
 #include <statistics/statistics_manager.h>
 #include <statistics/storage/statistics_file_storage.h>
 #include <statistics/settings/statistics_settings_watcher.h>
+#include <ui/statistics/modules/controls_statistics_module.h>
 
 #include <watchers/cloud_status_watcher.h>
 
@@ -82,10 +83,18 @@ namespace
         statManager->setStorage(QnStatisticsStoragePtr(new QnStatisticsFileStorage()));
         statManager->setSettings(QnStatisticsSettingsPtr(new QnStatisticsSettingsWatcher()));
 
+        static const QScopedPointer<QnControlsStatisticsModule> controlsStatisticsModule(
+            new QnControlsStatisticsModule());
+
+        statManager->registerStatisticsModule(lit("controls"), controlsStatisticsModule.data());
+
         QObject::connect(QnClientMessageProcessor::instance(), &QnClientMessageProcessor::connectionClosed
             , statManager, &QnStatisticsManager::saveCurrentStatistics);
+        QObject::connect(QnClientMessageProcessor::instance(), &QnClientMessageProcessor::connectionOpened
+            , statManager, &QnStatisticsManager::resetStatistics);
         QObject::connect(QnClientMessageProcessor::instance(), &QnClientMessageProcessor::initialResourcesReceived
             , statManager, &QnStatisticsManager::sendStatistics);
+
     }
 }
 

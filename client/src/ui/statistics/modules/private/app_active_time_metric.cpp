@@ -4,7 +4,7 @@
 
 AppActiveTimeMetric::AppActiveTimeMetric(QObject *parent)
     : base_type(parent)
-    , TimeDurationMetric()
+    , QnTimeDurationMetric()
 {
     qApp->installEventFilter(this);
 }
@@ -24,7 +24,7 @@ bool AppActiveTimeMetric::eventFilter(QObject *watched, QEvent *event)
     if (!isActiveApplicationEvent && (event->type() != QEvent::ApplicationDeactivate))
         return false;
 
-    activateCounter(isActiveApplicationEvent);
+    setCounterActive(isActiveApplicationEvent);
     return false;
 }
 

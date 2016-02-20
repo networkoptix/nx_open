@@ -95,6 +95,9 @@ public:
     void setSampleType(QnAudioFormat::SampleType sampleType);
     QnAudioFormat::SampleType sampleType() const;
 
+    qint64 durationForBytes(int bytes) const;
+    int bytesPerFrame() const;
+
 private:
     QSharedDataPointer<QnAudioFormatPrivate> d;
 };

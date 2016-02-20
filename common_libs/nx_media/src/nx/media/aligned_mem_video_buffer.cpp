@@ -1,7 +1,7 @@
 #include "aligned_mem_video_buffer.h"
 
 #include <utils/common/qt_private_headers.h>
-#include QT_PRIVATE_HEADER(QtMultimedia, qabstractvideobuffer_p.h)
+#include QT_PRIVATE_HEADER(QtMultimedia,qabstractvideobuffer_p.h)
 
 namespace nx
 {

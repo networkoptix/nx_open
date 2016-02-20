@@ -2,6 +2,12 @@
 #include "abstract_audio_decoder.h"
 
 #include <deque>
+#include <atomic>
+
+#include <nx/audio/sound.h>
+#include <nx/audio/audiodevice.h>
+
+#include <QtCore/QMutex>
 
 namespace nx {
 namespace media {
@@ -14,7 +20,6 @@ struct AudioOutputPrivate
     AudioOutputPrivate(int initialBufferUsec, int maxBufferUsec)
     :
         bufferSizeUsec(initialBufferUsec),
-        audioIoDevice(nullptr),
         frameDurationUsec(0),
         isBuffering(false),
         initialBufferUsec(initialBufferUsec),
@@ -22,14 +27,14 @@ struct AudioOutputPrivate
     {
     }
 
-    std::unique_ptr<QAudioOutput> audioOutput;
-    qint64 bufferSizeUsec; //< Current value for the buffer at microseconds
-    QIODevice* audioIoDevice; //< QAudioOutput internal IO device
+    std::unique_ptr<nx::audio::Sound> audioOutput;
+    std::atomic<qint64> bufferSizeUsec; //< Current value for the buffer at microseconds
     qint64 frameDurationUsec; //< Single audio frame duration at microseconds
     std::deque<qint64> timestampQueue; //< last audio frames timestamps at UTC microseconds
     bool isBuffering; //< True if filling input buffer in progress
     const int initialBufferUsec; //< Initial size for the audio buffer
     const int maxBufferUsec; //< Maximum allowed size for the audio buffer
+    mutable QMutex mutex;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -37,7 +42,6 @@ struct AudioOutputPrivate
 
 AudioOutput::AudioOutput(int initialBufferMs, int maxBufferMs)
 :
-    QAudioOutput(),
     d_ptr(new AudioOutputPrivate(initialBufferMs, maxBufferMs))
 {
 }
@@ -46,23 +50,10 @@ AudioOutput::~AudioOutput()
 {
 }
 
-void AudioOutput::start()
-{
-    Q_D(AudioOutput);
-    if (d->audioOutput)
-        d->audioOutput->start();
-}
-
-void AudioOutput::stop()
-{
-    Q_D(AudioOutput);
-    if (d->audioOutput)
-        d->audioOutput->stop();
-}
-
 void AudioOutput::suspend()
 {
     Q_D(AudioOutput);
+    QMutexLocker lock(&d->mutex);
     if (d->audioOutput)
         d->audioOutput->suspend();
 }
@@ -70,11 +61,12 @@ void AudioOutput::suspend()
 void AudioOutput::resume()
 {
     Q_D(AudioOutput);
+    QMutexLocker lock(&d->mutex);
     if (d->audioOutput && !d->isBuffering)
         d->audioOutput->resume();
 }
 
-qint64 AudioOutput::maxBufferSizeUsec() const
+qint64 AudioOutput::bufferSizeUsec() const
 {
     Q_D(const AudioOutput);
     return d->bufferSizeUsec;
@@ -83,29 +75,25 @@ qint64 AudioOutput::maxBufferSizeUsec() const
 void AudioOutput::write(const AudioFramePtr& audioFrame)
 {
     Q_D(AudioOutput);
-
-    const bool bufferUnderflow = 
+    QMutexLocker lock(&d->mutex);
+    const bool bufferUnderflow =
         d->audioOutput && //< Audio exists
         d->audioOutput->state() == QAudio::ActiveState && //< and playing,
-        d->audioOutput->bytesFree() == d->audioOutput->bufferSize(); //< but no data in the buffer at all
+        d->audioOutput->isBufferUnderflow(); //< but no data in the buffer at all
 
-    QnCodecAudioFormat audioFormat(audioFrame->context);
+    QnAudioFormat audioFormat(QnCodecAudioFormat(audioFrame->context));
     audioFormat.setCodec(lit("audio/pcm"));
     if (!d->audioOutput || //< first call
         d->audioOutput->format() != audioFormat || //< Audio format has been changed
-        !d->audioIoDevice || //< Some internal error
         !d->frameDurationUsec || //< Some internal error or empty data
         bufferUnderflow) //< Audio underflow, recreate with larger buffer
     {
         // Reset audio device
         if (bufferUnderflow)
-            d->bufferSizeUsec = qMin(d->bufferSizeUsec * kBufferGrowStep, kMaxBufferMs * 1000);
+            d->bufferSizeUsec = qMin(d->bufferSizeUsec * kBufferGrowStep, kMaxLiveBufferMs * 1000);
 
-        d->audioOutput.reset(new QAudioOutput(audioFormat));
-        d->audioOutput->setBufferSize(audioFormat.bytesForDuration(d->bufferSizeUsec));
-        d->audioIoDevice = d->audioOutput->start();
-        if (!d->audioIoDevice)
-            return; //< Some error occurred. Wait for the next frame.
+        auto audioOutput = nx::audio::AudioDevice::instance()->createSound(audioFormat);
+        d->audioOutput.reset(audioOutput);
 
         d->audioOutput->suspend(); //< Don't play audio while filling internal buffer.
         d->isBuffering = true;
@@ -116,21 +104,25 @@ void AudioOutput::write(const AudioFramePtr& audioFrame)
             return;
     }
 
-    d->audioIoDevice->write((const char *)audioFrame->data.data(), audioFrame->data.size());
+    d->audioOutput->write((const quint8*) audioFrame->data.data(), audioFrame->data.size());
 
     // Update sliding window with last audio PTS.
     d->timestampQueue.push_back(audioFrame->timestampUsec);
-    const int maxFrames =
-        d->bufferSizeUsec / d->frameDurationUsec; //< max amount of frames in the audio queue
-    const int deprecatedFrames =
-        d->timestampQueue.size() - maxFrames;  //< how many frames out of the queue now
+    
+    // max amount of frames in the audio queue
+    qint64 elapsed = d->audioOutput->playTimeElapsedUsec();
+    int maxFrames = (elapsed + d->frameDurationUsec -1) / d->frameDurationUsec; //< Rounding up
+    
+    // how many frames out of the queue now
+    const int deprecatedFrames = d->timestampQueue.size() - maxFrames;
+    
     if (deprecatedFrames > 0)
     {
         d->timestampQueue.erase(
             d->timestampQueue.begin(), d->timestampQueue.begin() + deprecatedFrames);
     }
 
-    if (d->isBuffering && currentBufferSizeUsec() >= maxBufferSizeUsec() / 2)
+    if (d->isBuffering && d->audioOutput->playTimeElapsedUsec() >= bufferSizeUsec())
     {
         d->isBuffering = false;
         d->audioOutput->resume();
@@ -140,46 +132,72 @@ void AudioOutput::write(const AudioFramePtr& audioFrame)
 qint64 AudioOutput::currentBufferSizeUsec() const
 {
     Q_D(const AudioOutput);
+    QMutexLocker lock(&d->mutex);
     if (!d->audioOutput)
         return 0;
-    int bufferUsedBytes = d->audioOutput->bufferSize() - d->audioOutput->bytesFree();
-    if (d->audioOutput->state() != QAudio::ActiveState)
-    {
-        // Addition buffer. Data is queued but is not processed.
-        bufferUsedBytes += d->audioIoDevice->bytesAvailable();
-    }
-    return d->audioOutput->format().durationForBytes(bufferUsedBytes);
+    return d->audioOutput->playTimeElapsedUsec();
 }
 
 qint64 AudioOutput::playbackPositionUsec() const
 {
     Q_D(const AudioOutput);
-    if (!d->frameDurationUsec || d->timestampQueue.empty())
+    QMutexLocker lock(&d->mutex);
+    if (!d->audioOutput || !d->frameDurationUsec || d->timestampQueue.empty())
         return kUnknownPosition; //< unknown position
+
+    const qint64 bufferSizeUsec = d->audioOutput->playTimeElapsedUsec();
 
     // Consider we write a single frame and call playbackPositionUsec() immediately. In this case
     // queuedFrames returns 1. If queuedFrames is zero, then the very last queued frame already has
     // finished playing.
     const int queueSize = (int) d->timestampQueue.size();
-    const int queuedFrames = currentBufferSizeUsec() / d->frameDurationUsec;
+
+    int queuedFrames = bufferSizeUsec / d->frameDurationUsec;
+    const qint64 rest = bufferSizeUsec % d->frameDurationUsec;
+    qint64 offset = 0;
+    if (rest > 0)
+    {
+        ++queuedFrames;
+        offset = d->frameDurationUsec - rest;
+    }
+
     if (queuedFrames == 0)
     {
         // Last queued frame has finished playing.
         return d->timestampQueue[queueSize - 1] + d->frameDurationUsec;
     }
-    return d->timestampQueue[qMax(0, queueSize - queuedFrames)];
+
+    return d->timestampQueue[qMax(0, queueSize - queuedFrames)] + offset;
+}
+
+bool AudioOutput::isBufferUnderflow() const
+{
+    Q_D(const AudioOutput);
+    return d->audioOutput && d->audioOutput->isBufferUnderflow();
 }
 
 bool AudioOutput::isBuffering() const
 {
     Q_D(const AudioOutput);
+    QMutexLocker lock(&d->mutex);
     return d->isBuffering;
 }
 
 bool AudioOutput::canAcceptData() const
 {
-    // todo: implement me
-    return true;
+    Q_D(const AudioOutput);
+    QMutexLocker lock(&d->mutex);
+    if (!d->audioOutput)
+        return true;
+    return d->audioOutput->playTimeElapsedUsec() < kMaxArchiveBufferMs * 1000;
+}
+
+QAudio::State AudioOutput::state() const
+{
+    Q_D(const AudioOutput);
+    QMutexLocker lock(&d->mutex);
+    return d->audioOutput ? d->audioOutput->state() : QAudio::StoppedState;
+
 }
 
 } // namespace media

@@ -8,12 +8,15 @@ class QnClientPtzControllerPool: public QnPtzControllerPool {
     typedef QnPtzControllerPool base_type;
 
 public:
-    QnClientPtzControllerPool(QObject *parent = NULL): base_type(parent) {}
+    QnClientPtzControllerPool(QObject *parent = NULL);
 
 protected:
     virtual void registerResource(const QnResourcePtr &resource) override;
     virtual void unregisterResource(const QnResourcePtr &resource) override;
     virtual QnPtzControllerPtr createController(const QnResourcePtr &resource) const override;
+
+private:
+    void cacheCameraPresets(const QnVirtualCameraResourcePtr &camera);
 };
 
 #endif // QN_CLIENT_PTZ_CONTROLLER_POOL_H

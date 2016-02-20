@@ -15,19 +15,19 @@ namespace media {
 /*
 * This class implements hardware android video decoder
 */
-class AndroidDecoderPrivate;
-class AndroidDecoder : public AbstractVideoDecoder
+class AndroidVideoDecoderPrivate;
+class AndroidVideoDecoder : public AbstractVideoDecoder
 {
 public:
-    AndroidDecoder();
-    virtual ~AndroidDecoder();
+    AndroidVideoDecoder();
+    virtual ~AndroidVideoDecoder();
 
     static bool isCompatible(const CodecID codec, const QSize& resolution);
     virtual int decode(const QnConstCompressedVideoDataPtr& frame, QVideoFramePtr* result = nullptr) override;
     virtual void setAllocator(AbstractResourceAllocator* allocator) override;
 private:
-    QScopedPointer<AndroidDecoderPrivate> d_ptr;
-    Q_DECLARE_PRIVATE(AndroidDecoder);
+    QScopedPointer<AndroidVideoDecoderPrivate> d_ptr;
+    Q_DECLARE_PRIVATE(AndroidVideoDecoder);
 };
 
 }

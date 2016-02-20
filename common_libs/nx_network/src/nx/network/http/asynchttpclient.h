@@ -384,12 +384,16 @@ namespace nx_http
     void NX_NETWORK_API uploadDataAsync(const QUrl &url
         , const QByteArray &data
         , const QByteArray &contentType
+        , const QString &user
+        , const QString &password
         , const nx_http::HttpHeaders &extraHeaders
         , const UploadCompletionHandler &callback);
 
     SystemError::ErrorCode NX_NETWORK_API uploadDataSync(const QUrl &url
         , const QByteArray &data
         , const QByteArray &contentType
+        , const QString &user
+        , const QString &password
         , nx_http::StatusCode::Value *httpCode = nullptr);
 }
 

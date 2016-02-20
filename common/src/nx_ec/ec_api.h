@@ -454,8 +454,8 @@ namespace ec2
         /*!
             \param handler Functor with params: (ErrorCode, const QnCameraUserAttributesList& cameraUserAttributesList)
         */
-        template<class TargetType, class HandlerType> int getUserAttributes( const QnUuid& cameraId, TargetType* target, HandlerType handler ) {
-            return getUserAttributes( cameraId, std::static_pointer_cast<impl::GetCameraUserAttributesHandler>(std::make_shared<impl::CustomGetCameraUserAttributesHandler<TargetType, HandlerType>>(target, handler)) );
+        template<class TargetType, class HandlerType> int getUserAttributes( const QnUuid& serverId, TargetType* target, HandlerType handler ) {
+            return getUserAttributes( serverId, std::static_pointer_cast<impl::GetCameraUserAttributesHandler>(std::make_shared<impl::CustomGetCameraUserAttributesHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
         ErrorCode getUserAttributesSync(const QnUuid& cameraId, QnCameraUserAttributesList* const cameraAttrsList ) {
@@ -478,7 +478,7 @@ namespace ec2
         virtual int getCamerasWithArchiveList( impl::GetCamerasHistoryHandlerPtr handler ) = 0;
         virtual int save( const QnVirtualCameraResourceList& cameras, impl::AddCameraHandlerPtr handler ) = 0;
         virtual int saveUserAttributes( const QnCameraUserAttributesList& cameras, impl::SimpleHandlerPtr handler ) = 0;
-        virtual int getUserAttributes( const QnUuid& cameraId, impl::GetCameraUserAttributesHandlerPtr handler ) = 0;
+        virtual int getUserAttributes( const QnUuid& serverId, impl::GetCameraUserAttributesHandlerPtr handler ) = 0;
         virtual int remove( const QnUuid& id, impl::SimpleHandlerPtr handler ) = 0;
     };
 

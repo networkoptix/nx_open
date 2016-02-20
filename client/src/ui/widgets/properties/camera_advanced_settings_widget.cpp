@@ -23,6 +23,10 @@ namespace {
         return status == Qn::Online || status == Qn::Recording;
     }
 
+    //TODO: #GDM #2.6 #tr
+    /* Untranslatable for now. */
+    const QByteArray kLoadingWebPage = "Loading...";
+
 }
 
 QnCameraAdvancedSettingsWidget::QnCameraAdvancedSettingsWidget(QWidget* parent /* = 0*/) :
@@ -143,9 +147,21 @@ void QnCameraAdvancedSettingsWidget::submitToResource()
     ui->cameraAdvancedParamsWidget->saveValues();
 }
 
+void QnCameraAdvancedSettingsWidget::hideEvent(QHideEvent *event)
+{
+    if (m_page != Page::Web)
+        return;
+
+    ui->webView->triggerPageAction(QWebPage::Stop);
+    ui->webView->triggerPageAction(QWebPage::StopScheduledPageRefresh);
+    ui->webView->setContent(kLoadingWebPage);
+}
+
 void QnCameraAdvancedSettingsWidget::initWebView() {
     m_cameraAdvancedSettingsWebPage = new CameraAdvancedSettingsWebPage(ui->webView);
     ui->webView->setPage(m_cameraAdvancedSettingsWebPage);
+
+    ui->webView->setContent(kLoadingWebPage);
 
     QStyle* style = QStyleFactory().create(lit("fusion"));
     ui->webView->setStyle(style);
@@ -209,7 +225,7 @@ void QnCameraAdvancedSettingsWidget::at_authenticationRequired(QNetworkReply* /*
     authenticator->setPassword(m_camera->getAuth().password());
 }
 
-void QnCameraAdvancedSettingsWidget::at_proxyAuthenticationRequired(const QNetworkProxy &, QAuthenticator * authenticator) {
+void QnCameraAdvancedSettingsWidget::at_proxyAuthenticationRequired(const QNetworkProxy & , QAuthenticator * authenticator) {
     QnMutexLocker locker(&m_cameraMutex);
     if (!m_camera)
         return;

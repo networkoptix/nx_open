@@ -75,6 +75,8 @@ public:
      */
     Q_PROPERTY(bool liveMode READ liveMode NOTIFY liveModeChanged)
 
+
+    Q_PROPERTY(int maxTextureSize READ maxTextureSize WRITE setMaxTextureSize)
 public:
     Player(QObject *parent = nullptr);
     ~Player();
@@ -89,6 +91,9 @@ public:
 
     qint64 position() const;
     void setPosition(qint64 value);
+
+    int maxTextureSize() const;
+    void setMaxTextureSize(int value);
 
     bool reconnectOnPlay() const;
     void setReconnectOnPlay(bool reconnectOnPlay);

@@ -16,6 +16,8 @@
 
 namespace
 {
+    const auto kSendStatUser = lit("nx");
+    const auto kSendStatPass = lit("f087996adb40eaed989b73e2d5a37c951f559956c44f6f8cdfb6f127ca4136cd");
     const nx_http::StringType kJsonContentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
 
     QString makeFullPath(const QString &basePath
@@ -185,7 +187,7 @@ nx_http::StatusCode::Value SettingsActionHandler::loadSettingsLocally(QnStatisti
     if (!server || !hasInternetConnection(server))
         return nx_http::StatusCode::noContent;
 
-    static const QUrl kSettingsUrl(lit("http://127.0.01:8080/stat/statistics.json")); //TODO: change me to correct
+    static const QUrl kSettingsUrl = QUrl::fromUserInput(lit("http://127.0.0.1:8080/stat/statistics.json")); //TODO: change me to correct
 
     nx_http::BufferType buffer;
     int statusCode = nx_http::StatusCode::noContent;
@@ -260,7 +262,8 @@ public:
 private:
     typedef QnMultiserverRequestContext<QnSendStatisticsRequestData> Context;
 
-    nx_http::StatusCode::Value sendStatisticsLocally(const QByteArray &metricsList);
+    nx_http::StatusCode::Value sendStatisticsLocally(const QByteArray &metricsList
+        , const QString &statisticsServerUrl);
 
     nx_http::StatusCode::Value sendStatisticsRemotely(const QByteArray &metricsList
         , const QnMediaServerResourcePtr &server
@@ -279,8 +282,10 @@ int SendStatisticsActionHandler::executePost(const QnRequestParamList& params
     , QByteArray &/* result */, QByteArray &/*resultContentType*/
     , int port)
 {
+    QnSendStatisticsRequestData requestData =
+        QnMultiserverRequestData::fromParams<QnSendStatisticsRequestData>(params);
+
     // TODO: add support of specified in parameters format, not only json!
-    QnSendStatisticsRequestData requestData;
     const bool correctJson = QJson::deserialize<QnMetricHashesList>(
         body, &requestData.metricsList);
 
@@ -294,7 +299,7 @@ int SendStatisticsActionHandler::executePost(const QnRequestParamList& params
     nx_http::StatusCode::Value resultCode = nx_http::StatusCode::notAcceptable;
     if (request.isLocal)
     {
-        sendStatisticsLocally(body);
+        sendStatisticsLocally(body, request.statisticsServerUrl);
     }
     else
     {
@@ -302,7 +307,7 @@ int SendStatisticsActionHandler::executePost(const QnRequestParamList& params
         for (const auto server: qnResPool->getAllServers(Qn::Online))
         {
             resultCode = (server->getId() == moduleGuid
-                ? sendStatisticsLocally(body)
+                ? sendStatisticsLocally(body, request.statisticsServerUrl)
                 : sendStatisticsRemotely(body, server, &context));
 
             if (resultCode == nx_http::StatusCode::ok)
@@ -314,18 +319,17 @@ int SendStatisticsActionHandler::executePost(const QnRequestParamList& params
 }
 
 nx_http::StatusCode::Value SendStatisticsActionHandler::sendStatisticsLocally(
-    const QByteArray &metricsList)
+    const QByteArray &metricsList
+    , const QString &statisticsServerUrl)
 {
     const auto moduleGuid = qnCommon->moduleGUID();
     const auto server = qnResPool->getResourceById<QnMediaServerResource>(moduleGuid);
     if (!server || !hasInternetConnection(server))
         return nx_http::StatusCode::notAcceptable;
 
-    static const QUrl kStatisticsUrl(lit("http://10.0.3.163/statserver/api/save/clientSessions"));
-
     auto httpCode = nx_http::StatusCode::notAcceptable;
-    const auto error = nx_http::uploadDataSync(
-        kStatisticsUrl, metricsList, kJsonContentType, &httpCode);
+    const auto error = nx_http::uploadDataSync(statisticsServerUrl, metricsList
+        , kJsonContentType, kSendStatUser, kSendStatPass, &httpCode);
 
     return (error == SystemError::noError
         ? httpCode : nx_http::StatusCode::internalServerError);
@@ -356,8 +360,8 @@ nx_http::StatusCode::Value SendStatisticsActionHandler::sendStatisticsRemotely(
     };
 
     const QUrl apiUrl = getServerApiUrl(path(), server, *context);
-    runMultiserverUploadRequest(apiUrl
-        , metricsList, kJsonContentType, server, completionFunc, context);
+    runMultiserverUploadRequest(apiUrl, metricsList, kJsonContentType
+        , kSendStatUser, kSendStatPass, server, completionFunc, context);
     context->waitForDone();
     return result;
 }

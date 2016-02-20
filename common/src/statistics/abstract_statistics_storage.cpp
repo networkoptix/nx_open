@@ -7,7 +7,7 @@ QnAbstractStatisticsStorage::QnAbstractStatisticsStorage()
 QnAbstractStatisticsStorage::~QnAbstractStatisticsStorage()
 {}
 
-void QnAbstractStatisticsStorage::storeMetrics(const QnMetricsHash &metrics)
+void QnAbstractStatisticsStorage::storeMetrics(const QnStatisticValuesHash &metrics)
 {
     Q_ASSERT_X(false, Q_FUNC_INFO, "Pure virtual method called!");
 }

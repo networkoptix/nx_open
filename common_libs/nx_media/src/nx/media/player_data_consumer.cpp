@@ -230,7 +230,7 @@ bool PlayerDataConsumer::processAudioFrame(const QnCompressedAudioDataPtr& data)
         return true; //< just skip frame
 
     if (!m_audioOutput)
-        m_audioOutput.reset(new AudioOutput(kInitialBufferMs * 1000, kMaxBufferMs * 1000));
+        m_audioOutput.reset(new AudioOutput(kInitialBufferMs * 1000, kMaxLiveBufferMs * 1000));
     m_audioOutput->write(decodedFrame);
     return true;
 }

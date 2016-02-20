@@ -21,6 +21,9 @@
 #include "opengl_renderer.h"
 #include "ui/style/skin.h"
 #include "utils/math/color_transformations.h"
+#include <ui/common/text_pixmap_cache.h>
+
+#include <ui/workaround/sharp_pixmap_painting.h>
 
 /** @def QN_RESOURCE_WIDGET_FLASHY_LOADING_OVERLAY
  *
@@ -43,50 +46,42 @@ namespace {
 
     Q_GLOBAL_STATIC(QnGlContextData<QnPausedPainter>, qn_pausedPainterStorage);
 
-    const qreal staticFontSize = 50;
+    const qreal kStaticFontSize = 50;
 
-    const int flashingPeriodMSec = 1000;
+    const int kFlashingPeriodMs = 1000;
 
 } // anonymous namespace
-
 
 QnStatusOverlayWidget::QnStatusOverlayWidget(const QnResourcePtr &resource, QGraphicsWidget *parent, Qt::WindowFlags windowFlags)
     : base_type(parent, windowFlags)
     , m_resource(resource)
     , m_statusOverlay(Qn::EmptyOverlay)
     , m_buttonType(NoButton)
-    , m_button(new QnTextButtonWidget(this))
+    , m_button(new QnTextButtonWidget(lit("resource_status_overlay_do_action"), this))
 {
     setAcceptedMouseButtons(0);
 
     QnVirtualCameraResourcePtr camera = m_resource.dynamicCast<QnVirtualCameraResource>();
 
     /* Init static text. */
-    m_staticFont.setPointSizeF(staticFontSize);
+    m_staticFont.setPointSizeF(kStaticFontSize);
     m_staticFont.setStyleHint(QFont::SansSerif, QFont::ForceOutline);
 
-    m_staticTexts[NoDataText] = tr("NO DATA");
-    m_staticTexts[OfflineText] = tr("NO SIGNAL");
-    m_staticTexts[ServerOfflineText] = tr("Server Offline");
-    m_staticTexts[UnauthorizedText] = tr("Unauthorized");
-    m_staticTexts[UnauthorizedSubText] = QnDeviceDependentStrings::getNameFromSet(
+    m_texts[NoDataText] = tr("NO DATA");
+    m_texts[OfflineText] = tr("NO SIGNAL");
+    m_texts[ServerOfflineText] = tr("Server Offline");
+    m_texts[UnauthorizedText] = tr("Unauthorized");
+    m_texts[UnauthorizedSubText] = QnDeviceDependentStrings::getNameFromSet(
             QnCameraDeviceStringSet(
                 tr("Please check authentication information in device settings"),
                 tr("Please check authentication information in camera settings"),
                 tr("Please check authentication information in I/O module settings")
             ), camera
         );
-    m_staticTexts[AnalogLicenseText] = tr("Activate analog license to remove this message");
-    m_staticTexts[VideowallLicenseText] = tr("Activate Video Wall license to remove this message");
-    m_staticTexts[LoadingText] = tr("Loading...");
-    m_staticTexts[NoVideoStreamText] = tr("No video stream");
-    m_staticTexts[IoModuleDisabledText] = tr("Module is disabled");
-
-    for (QStaticText &staticText : m_staticTexts) {
-        staticText.setPerformanceHint(QStaticText::AggressiveCaching);
-        staticText.setTextOption(QTextOption(Qt::AlignCenter));
-        staticText.prepare(QTransform(), m_staticFont);
-    }
+    m_texts[AnalogLicenseText] = tr("Activate analog license to remove this message");
+    m_texts[VideowallLicenseText] = tr("Activate Video Wall license to remove this message");
+    m_texts[LoadingText] = tr("Loading...");
+    m_texts[IoModuleDisabledText] = tr("Module is disabled");
 
     /* Init button. */
     m_button->setObjectName(lit("statusOverlayButton"));
@@ -278,36 +273,36 @@ void QnStatusOverlayWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
 
         if(m_statusOverlay == Qn::LoadingOverlay) {
 #ifdef QN_RESOURCE_WIDGET_FLASHY_LOADING_OVERLAY
-            paintFlashingText(painter, m_staticTexts[LoadingText], 0.125, QPointF(0.0, 0.15));
+            paintFlashingText(painter, LoadingText, 0.125, QPointF(0.0, 0.15));
 #else
-            paintFlashingText(painter, m_staticTexts[LoadingText], 0.125);
+            paintFlashingText(painter, LoadingText, 0.125);
 #endif
         }
     }
 
     switch (m_statusOverlay) {
     case Qn::NoDataOverlay:
-        paintFlashingText(painter, m_staticTexts[NoDataText], 0.125);
+        paintFlashingText(painter, NoDataText, 0.125);
         break;
     case Qn::OfflineOverlay:
-        paintFlashingText(painter, m_staticTexts[OfflineText], 0.125);
+        paintFlashingText(painter, OfflineText, 0.125);
         break;
     case Qn::UnauthorizedOverlay:
-        paintFlashingText(painter, m_staticTexts[UnauthorizedText], 0.125);
-        paintFlashingText(painter, m_staticTexts[UnauthorizedSubText], 0.05, QPointF(0.0, 0.25));
+        paintFlashingText(painter, UnauthorizedText, 0.125);
+        paintFlashingText(painter, UnauthorizedSubText, 0.05, QPointF(0.0, 0.25));
         break;
     case Qn::ServerUnauthorizedOverlay:
-        paintFlashingText(painter, m_staticTexts[UnauthorizedText], 0.125);
+        paintFlashingText(painter, UnauthorizedText, 0.125);
         break;
     case Qn::ServerOfflineOverlay:
-        paintFlashingText(painter, m_staticTexts[ServerOfflineText], 0.125);
+        paintFlashingText(painter, ServerOfflineText, 0.125);
         break;
     case Qn::AnalogWithoutLicenseOverlay:
         {
             QRectF rect = this->rect();
             int count = qFloor(qMax(1.0, rect.height() / rect.width()) * 7.5);
             for (int i = -count; i <= count; i++)
-                paintFlashingText(painter, m_staticTexts[AnalogLicenseText], 0.035, QPointF(0.0, 0.06 * i));
+                paintFlashingText(painter, AnalogLicenseText, 0.035, QPointF(0.0, 0.06 * i));
             break;
         }
     case Qn::VideowallWithoutLicenseOverlay:
@@ -315,17 +310,16 @@ void QnStatusOverlayWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
             QRectF rect = this->rect();
             int count = qFloor(qMax(1.0, rect.height() / rect.width()) * 7.5);
             for (int i = -count; i <= count; i++)
-                paintFlashingText(painter, m_staticTexts[VideowallLicenseText], 0.035, QPointF(0.0, 0.06 * i));
+                paintFlashingText(painter, VideowallLicenseText, 0.035, QPointF(0.0, 0.06 * i));
             break;
         }
     case Qn::NoVideoDataOverlay:
-        //paintFlashingText(painter, m_staticTexts[NoVideoStreamText], 0.125);
         if (!m_ioSpeakerPixmap)
             m_ioSpeakerPixmap.reset(new QPixmap(qnSkin->pixmap("item/io_speaker.png")));
         paintPixmap(painter, *m_ioSpeakerPixmap, 0.064);
         break;
     case Qn::IoModuleDisabledOverlay:
-        paintFlashingText(painter, m_staticTexts[IoModuleDisabledText], 0.112);
+        paintFlashingText(painter, IoModuleDisabledText, 0.112);
         break;
     default:
         break;
@@ -333,29 +327,28 @@ void QnStatusOverlayWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
 
 }
 
-void QnStatusOverlayWidget::paintFlashingText(QPainter *painter, const QStaticText &text, qreal textSize, const QPointF &offset) {
-    QRectF rect = this->rect();
-    qreal unit = qMin(rect.width(), rect.height());
+void QnStatusOverlayWidget::paintFlashingText(QPainter *painter, OverlayText textId, qreal textSize, const QPointF &offset)
+{
+    QRect rect = this->rect().toRect();
+    int unit = qMin(rect.width(), rect.height());
 
-    QnScopedPainterFontRollback fontRollback(painter, m_staticFont);
-    QnScopedPainterPenRollback penRollback(painter, palette().color(QPalette::WindowText));
+    QPixmap text = QnTextPixmapCache::instance()->pixmap(
+        m_texts[textId],
+        m_staticFont,
+        palette().color(QPalette::WindowText));
+
+    qreal scaleFactor = textSize * unit / kStaticFontSize;
+    if (text.width() * scaleFactor > rect.width())
+        scaleFactor = rect.width() / text.width();
+
     QnScopedPainterTransformRollback transformRollback(painter);
 
-    qreal scaleFactor = textSize * unit / staticFontSize;
-    if (text.size().width() * scaleFactor > rect.width())
-        scaleFactor = rect.width() / text.size().width();
-
     qreal opacity = painter->opacity();
-    painter->setOpacity(opacity * qAbs(std::sin(QDateTime::currentMSecsSinceEpoch() / qreal(flashingPeriodMSec * 2) * M_PI)));
+    painter->setOpacity(opacity * qAbs(std::sin(QDateTime::currentMSecsSinceEpoch() / qreal(kFlashingPeriodMs * 2) * M_PI)));
     painter->translate(rect.center() + offset * unit);
     painter->scale(scaleFactor, scaleFactor);
-
-    painter->drawStaticText(-toPoint(text.size() / 2), text);
+    paintPixmapSharp(painter, text, -toPoint(text.size() / 2));
     painter->setOpacity(opacity);
-
-    Q_UNUSED(transformRollback)
-    Q_UNUSED(penRollback)
-    Q_UNUSED(fontRollback) // TODO: #Elric remove
 }
 
 void QnStatusOverlayWidget::paintPixmap(QPainter *painter, const QPixmap &picture, qreal imageSize)
@@ -365,12 +358,11 @@ void QnStatusOverlayWidget::paintPixmap(QPainter *painter, const QPixmap &pictur
 
     QnScopedPainterTransformRollback transformRollback(painter);
 
-    qreal scaleFactor = imageSize * unit / staticFontSize;
+    qreal scaleFactor = imageSize * unit / kStaticFontSize;
     if (picture.size().width() * scaleFactor > rect.width())
         scaleFactor = rect.width() / picture.size().width();
 
     qreal opacity = painter->opacity();
-    //painter->setOpacity(opacity * qAbs(std::sin(QDateTime::currentMSecsSinceEpoch() / qreal(flashingPeriodMSec * 2) * M_PI)));
     painter->translate(rect.center());
     painter->scale(scaleFactor, scaleFactor);
 

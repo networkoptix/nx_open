@@ -13,10 +13,8 @@ class AudioOutputPrivate;
 /* Extends QT audio output and provides more flexible methods for time control. They are used for
  * audio/video sync.
  */
-class AudioOutput: public QAudioOutput
+class AudioOutput
 {
-    Q_OBJECT
-
 public:
 
     static const qint64 kUnknownPosition = -1;
@@ -30,12 +28,6 @@ public:
 
     virtual ~AudioOutput();
             
-    /** Start play audio */
-    void start();
-
-    /** Stop play audio */
-    void stop();
-
     /** Pause play audio */
     void suspend();
 
@@ -51,10 +43,15 @@ public:
     qint64 playbackPositionUsec() const;
 
     /**
+     * @return True in internal audio buffer is underflow
+     */
+    bool isBufferUnderflow() const;
+
+    /**
      * @return Size for the internal buffer in microseconds. This value could be increased
      * automatically if AudioOutput detects buffer underflow issue.
      */
-    qint64 maxBufferSizeUsec() const;
+    qint64 bufferSizeUsec() const;
 
     /**
      * Free space in the buffer can be calculated as maxBufferSizeUsec() - currentBufferSizeUsec().
@@ -74,8 +71,7 @@ public:
      */
     bool canAcceptData() const;
 
-signals:
-    void stateChanged(QAudio::State state);
+    QAudio::State state() const;
 
 private:
     QScopedPointer<AudioOutputPrivate> d_ptr;
