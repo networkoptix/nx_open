@@ -17,4 +17,3 @@ angular.module('webadminApp', [
             redirectTo: '/setup'
         });
 });
-Config.inlineMode = true;

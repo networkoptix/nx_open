@@ -24,14 +24,15 @@ angular.module('webadminApp')
 
         $scope.serverAddress = window.location.host;
 
-        var debugMode = Config.inlineMode;
+        var nativeClientObject = setupDialog; // Qt registered object
+        var debugMode = !!nativeClientObject;
 
         $scope.stepIs = function(step){
             return $scope.step == step;
         };
         $scope.finish = function(){
             $scope.next('start');
-            if(Config.inlineMode) {
+            if(nativeClientObject) {
                 window.close();
             }else{
                 $location.path("/settings");
@@ -57,13 +58,21 @@ angular.module('webadminApp')
         };
 
 
-        $scope.createAccount = function(){
-            window.open(Config.cloud.portalRegisterUrl);
+        $scope.createAccount = function(event){
+            if(nativeClientObject) {
+                nativeClientObject.openUrlInBrowser(Config.cloud.portalRegisterUrl);
+            }else{
+                window.open(Config.cloud.portalRegisterUrl);
+            }
             $scope.next('cloudLogin');
         };
 
-        $scope.learnMore = function(){
-            window.open(Config.cloud.portalUrl);
+        $scope.portalUrl = Config.cloud.portalUrl;
+        $scope.learnMore = function($event){
+            if(nativeClientObject) {
+                nativeClientObject.openUrlInBrowser($scope.portalUrl);
+                $event.preventDefault();
+            }
         };
 
 

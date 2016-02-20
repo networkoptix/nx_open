@@ -34,7 +34,7 @@
         <button class="btn btn-default" ng-click="next('cloudLogin')">Use existing</button>
     </p>
     <p class="vertical-bottom">
-        <a href="" ng-click="learnMore()">Learn more about <span class="product-name">Nx Cloud</span>?</a><br><br>
+        <a ng-href="{{portalUrl}}" target="_blank" ng-click="learnMore($event)">Learn more about <span class="product-name">Nx Cloud</span>?</a><br><br>
         <a href="" ng-click="next('localLogin')">Do not connect to internet now</a>
     </p>
 </div>
