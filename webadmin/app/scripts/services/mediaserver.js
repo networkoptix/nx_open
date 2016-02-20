@@ -172,10 +172,51 @@ angular.module('webadminApp')
                 });
             },
 
-            changeSystem:function(systemName,password){
+            setupCloudSystem:function(systemName, systemId, authKey){
+                var defer = $q.defer();
+                function errorHandler(error){
+                    defer.reject(error);
+                }
+                this.changeSystemName($scope.settings.systemName).then(
+                    function(){
+                        this.saveCloudSystemCredentials(message.data.systemId, message.data.authKey).
+                            then(function(result){
+                                defer.resolve(result);
+                            }, errorHandler);
+                    }, errorHandler);
+                return defer.promise;
+
+                // TODO: wait for https://networkoptix.atlassian.net/browse/VMS-2081
+                return wrapPost(proxy + '/api/setupCloudSystem',{
+                    systemName: systemName,
+                    systemId: systemId,
+                    authKey: authKey
+                });
+            },
+
+            setupLocalSystem:function(systemName, adminAccount, adminPassword){
+
+                return this.changeSystem(systemName, adminAccount, adminPassword);
+
+                // TODO: wait for https://networkoptix.atlassian.net/browse/VMS-2081
+                return wrapPost(proxy + '/api/setupLocalSystem',{
+                    systemName: systemName,
+                    adminAccount: adminAccount,
+                    adminPassword: adminPassword
+                });
+            },
+
+
+            changeSystemName:function(systemName){
                 return wrapPost(proxy + '/api/configure?' + $.param({
-                    systemName:systemName,
-                    password:password
+                    systemName:systemName
+                }));
+            },
+            changeSystem:function(systemName,login,password){
+                return wrapPost(proxy + '/api/configure?' + $.param({
+                    systemName: systemName,
+                    login: login,
+                    password: password
                 }));
             },
 

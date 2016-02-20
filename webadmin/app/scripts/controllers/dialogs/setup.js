@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('SetupCtrl', function ($scope, mediaserver, $sessionStorage) {
+    .controller('SetupCtrl', function ($scope, mediaserver, $sessionStorage, cloudAPI) {
 
         /*
             This is kind of universal wizard controller.
@@ -13,7 +13,7 @@ angular.module('webadminApp')
             cloudEmail: '',
             cloudPassword: '',
 
-            localLogin: '',
+            localLogin: 'admin',
             localPassword: '',
             localPasswordConfirmation:'',
 
@@ -21,6 +21,10 @@ angular.module('webadminApp')
             remoteLogin:'',
             remotePassword:''
         };
+
+        $scope.serverAddress = window.location.host;
+
+        var debugMode = true;
 
         $scope.stepIs = function(step){
             return $scope.step == step;
@@ -66,6 +70,11 @@ angular.module('webadminApp')
             });
         }
 
+        function errorHandler(error){
+            alert("error happened");
+            console.error(error);
+        }
+
         /* Connect to another server section */
         function discoverSystems() {
             mediaserver.discoveredPeers().then(function (r) {
@@ -102,6 +111,10 @@ angular.module('webadminApp')
 
         function connectToAnotherSystem(){
 
+            if(debugMode){
+                $scope.next('mergeSuccess');
+                return;
+            }
             mediaserver.mergeSystems(
                 $scope.settings.selectedSystem.url,
                 $scope.settings.remoteLogin,
@@ -126,19 +139,40 @@ angular.module('webadminApp')
 
         function connectToCloud(){
 
-            // 1. Check cloud credentials here.
+            if(debugMode){
+                $scope.next('cloudSuccess');
+                return;
+            }
+            function errorHandler()
+            {
+                $scope.next('cloudFailure');
+            }
 
-            // TODO: Try to call cloud-connect here
-
-            console.log('connect to cloud');
-            $scope.next('cloudSuccess');
+            //1. Request auth key from cloud_db
+            cloudAPI.connect( $scope.settings.systemName, $scope.settings.cloudEmail, $scope.settings.cloudPassword).then(
+                function(message){
+                    //2. Save settings to local server
+                    mediaserver.setupCloudSystem($scope.settings.systemName, message.data.systemId, message.data.authKey).then(function(){
+                        // TODO: check new authorization here
+                        $scope.next('cloudSuccess');
+                    },errorHandler);
+                }, errorHandler);
         }
 
         /* Offline system section */
 
         function initOfflineSystem(){
-            console.log('dolocal');
-            $scope.next('localSuccess');
+
+            if(debugMode){
+                $scope.next('localSuccess');
+                return;
+            }
+            mediaserver.setupCloudSystem($scope.settings.systemName, $scope.settings.localLogin, $scope.settings.localPassword).then(function(){
+                // TODO: check new authorization here
+                $scope.next('localSuccess');
+            },function(){
+                $scope.next('cloudFailure');
+            });
         }
 
 

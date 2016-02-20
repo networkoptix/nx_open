@@ -104,16 +104,16 @@
     <p>You can connect to your system using</p>
     <h4><a href="" ng-click="cloudPortal()"><span class="product-name">Nx Cloud</span> portal</a></h4>
     <p>or your cloud account:</p>
-    <h4>apats@networkoptix.com</h4>
+    <h4>{{settings.cloudEmail}}</h4>
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('localSuccess') || stepIs('mergeSuccess')">
     <div class="master-success"><span class="glyphicon glyphicon-ok"></span></div>
     <h2>System is ready to use</h2>
     <p>Server address:</p>
-    <h4>10.0.145.215:7001</h4>
+    <h4>{{serverAddress}}</h4>
     <p>Administrator login:</p>
-    <h4>admin</h4>
+    <h4>{{settings.localLogin}}</h4>
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('cloudFailure')">
