@@ -109,8 +109,8 @@ public:
     void closeConnection(SystemError::ErrorCode errorCode) override;
 
     /*! \note Required by \a nx_api::BaseServerConnection */
-    void closeConnection(
-        SystemError::ErrorCode errorCode, BaseConnectionType* connection);
+    virtual void closeConnection(
+        SystemError::ErrorCode errorCode, BaseConnectionType* connection) override;
 
 private:
     enum class State

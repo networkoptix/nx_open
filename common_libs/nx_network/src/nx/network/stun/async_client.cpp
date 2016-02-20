@@ -50,7 +50,7 @@ AsyncClient::~AsyncClient()
     }
 
     if (baseConnection)
-        baseConnection->pleaseStop();
+        baseConnection->pleaseStopSync();
 
     if( connectingSocket )
         connectingSocket->pleaseStopSync();
@@ -141,9 +141,6 @@ void AsyncClient::closeConnection(
     Q_ASSERT_X( !baseConnection || !connection ||
                 connection == baseConnection.get(),
                 Q_FUNC_INFO, "Incorrect closeConnection call" );
-
-    if (baseConnection)
-        baseConnection->pleaseStop();
 }
 
 void AsyncClient::openConnectionImpl(QnMutexLockerBase* lock)
