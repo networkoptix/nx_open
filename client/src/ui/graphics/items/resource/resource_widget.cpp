@@ -793,12 +793,12 @@ void QnResourceWidget::updateHud(bool animate) {
     const bool showButtonsOverlay = (showOnlyCameraName || showCameraNameWithButtons);
 
 
-    bool updatePositionTextRequired = (showPosition && !isOverlayWidgetVisible(m_overlayWidgets.positionOverlay));
+    bool updatePositionTextRequired = (showPosition && !isOverlayWidgetVisible(m_overlayWidgets->positionOverlay));
     setOverlayWidgetVisible(m_overlayWidgets->positionOverlay,               showPosition,               animate);
     if (updatePositionTextRequired)
         updatePositionText();
 
-    bool updateDetailsTextRequired = (showDetailedInfo && !isOverlayWidgetVisible(m_overlayWidgets.detailsOverlay));
+    bool updateDetailsTextRequired = (showDetailedInfo && !isOverlayWidgetVisible(m_overlayWidgets->detailsOverlay));
     setOverlayWidgetVisible(m_overlayWidgets->detailsOverlay,                showDetailedInfo,           animate);
     if (updateDetailsTextRequired)
         updateDetailsText();

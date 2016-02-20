@@ -71,12 +71,6 @@ extern "C" {
 
 /* QT headers. */
 
-//#ifdef Q_OS_WIN
-//#include <QtMultimedia/QAudio>
-//#include <QtMultimedia/QAudioFormat>
-//#include <QtMultimedia/QAudioOutput>
-//#endif
-
 #include <QtNetwork/QAuthenticator>
 #include <QtCore/QBuffer>
 #include <QtGui/QCloseEvent>
