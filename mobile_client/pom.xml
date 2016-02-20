@@ -28,7 +28,7 @@
         <windows.oslibs.release/>
         <windows.oslibs.debug/>
         <linux.oslibs>${ffmpeg.libs} -lssl -lcrypto -lFestival -lestools -leststring -lestbase -lmp3lame -lz -lopenal -lX11 -lXfixes -lGL -lGLU -ltermcap -lfaac -lquazip</linux.oslibs>
-        <android.oslibs>-lssl -lcrypto -lturbojpeg</android.oslibs>
+        <android.oslibs>-lssl -lcrypto -lturbojpeg -lopenal</android.oslibs>
         <ios.oslibs>-lssl -lcrypto -lturbojpeg</ios.oslibs>
         <!--Global defines-->
         <global.defines>CL_FORCE_LOGO</global.defines>

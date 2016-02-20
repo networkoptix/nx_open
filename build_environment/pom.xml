@@ -303,20 +303,6 @@
                     <type>tar.gz</type>
                     <classifier>${qt.classifier}${compile.options}</classifier>
                 </dependency>-->
-                <dependency>
-                    <groupId>net.sourceforge</groupId>
-                    <artifactId>quazip</artifactId>
-                    <version>${quazip.version}</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>
-                <dependency>
-                    <groupId>org</groupId>
-                    <artifactId>festival</artifactId>
-                    <version>${festival.version}</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>
             </dependencies>
         </profile>
         <profile>
@@ -343,6 +329,20 @@
                     <groupId>com.google</groupId>
                     <artifactId>gmock</artifactId>
                     <version>1.7.0-SNAPSHOT</version>
+                    <type>tar.gz</type>
+                    <classifier>${profile.classifier}-${compiler}</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>net.sourceforge</groupId>
+                    <artifactId>quazip</artifactId>
+                    <version>${quazip.version}</version>
+                    <type>tar.gz</type>
+                    <classifier>${profile.classifier}-${compiler}</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>org</groupId>
+                    <artifactId>festival</artifactId>
+                    <version>${festival.version}</version>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${compiler}</classifier>
                 </dependency>
@@ -774,6 +774,13 @@
                     <groupId>net.sourceforge</groupId>
                     <artifactId>libjpeg-turbo</artifactId>
                     <version>1.4.2-SNAPSHOT</version>
+                    <type>tar.gz</type>
+                    <classifier>${profile.classifier}</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>com.creativelabs</groupId>
+                    <artifactId>openal</artifactId>
+                    <version>1.17.2-SNAPSHOT</version>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}</classifier>
                 </dependency>
