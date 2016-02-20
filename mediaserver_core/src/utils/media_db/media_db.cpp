@@ -33,10 +33,8 @@ QDataStream &operator >> (QDataStream &stream, StructToWrite &s)
 class RecordVisitor : public boost::static_visitor<>
 {
 public:
-    RecordVisitor(DbHelperHandler *handler, Error *error, QDataStream* stream)
-        : m_handler(handler),
-          m_error(error),
-          m_stream(stream)
+    RecordVisitor(QDataStream* stream)
+        : m_stream(stream)
     {}
    
     template<typename StructToWrite>
@@ -46,8 +44,6 @@ public:
     }
 
 private:
-    DbHelperHandler *m_handler;
-    Error *m_error;
     QDataStream *m_stream;
 };
 
@@ -57,7 +53,8 @@ DbHelper::DbHelper(QIODevice *device, DbHelperHandler *const handler)
 : m_device(device),
   m_handler(handler),
   m_stream(device),
-  m_needStop(false)
+  m_needStop(false),
+  m_mode(Mode::Read)
 {
     m_stream.setByteOrder(QDataStream::LittleEndian);
     startWriter();
@@ -88,6 +85,8 @@ Error DbHelper::getError() const
 Error DbHelper::readFileHeader(uint8_t *version)
 {
     std::lock_guard<std::mutex> lk(m_mutex);
+    if (m_mode == Mode::Write)
+        return Error::WrongMode;
     FileHeader fh;
     m_stream >> fh;
     if (version)
@@ -99,6 +98,8 @@ Error DbHelper::readFileHeader(uint8_t *version)
 Error DbHelper::writeFileHeader(uint8_t dbVersion)
 {
     std::lock_guard<std::mutex> lk(m_mutex);
+    if (m_mode == Mode::Read)
+        return Error::WrongMode;
     FileHeader fh;
     fh.setDbVersion(dbVersion);
     m_stream << fh;
@@ -109,12 +110,14 @@ Error DbHelper::writeFileHeader(uint8_t dbVersion)
 Error DbHelper::readRecord()
 {
     std::lock_guard<std::mutex> lk(m_mutex);
+    if (m_mode == Mode::Write)
+        return Error::WrongMode;
     RecordBase rb;
     m_stream >> rb.part_1;
     quint64 part_2;
     Error error;
 
-    switch (rb.recordType())
+    switch (rb.getRecordType())
     {
     case RecordType::FileOperationAdd:
     case RecordType::FileOperationDelete:
@@ -144,10 +147,36 @@ Error DbHelper::readRecord()
     return error;
 }
 
-void DbHelper::writeRecordAsync(const WriteRecordType &record)
+Error DbHelper::writeRecordAsync(const WriteRecordType &record)
+{
+    {
+        std::lock_guard<std::mutex> lk(m_mutex);
+        if (m_mode == Mode::Read)
+            return Error::WrongMode;
+        m_writeQueue.push(record);
+    }
+    m_cond.notify_all();
+    return Error::NoError;
+}
+
+void DbHelper::reset()
 {
     std::lock_guard<std::mutex> lk(m_mutex);
-    m_writeQueue.push(record);
+    m_stream.resetStatus();
+}
+
+void DbHelper::setMode(Mode mode)
+{
+    std::unique_lock<std::mutex> lk(m_mutex);
+    m_mode = mode;
+    if (!m_writeQueue.empty())
+        m_writerDoneCond.wait(lk, [this] { return m_writeQueue.empty(); });
+}
+
+Mode DbHelper::getMode() const
+{
+    std::lock_guard<std::mutex> lk(m_mutex);
+    return m_mode;
 }
 
 void DbHelper::startWriter()
@@ -158,7 +187,7 @@ void DbHelper::startWriter()
             while (1)
             {
                 std::unique_lock<std::mutex> lk(m_mutex);
-                m_cond.wait(lk, [this] { return !m_writeQueue.empty(); });
+                m_cond.wait(lk, [this] { return !m_writeQueue.empty() || m_needStop; });
                 
                 if (m_needStop)
                     return;
@@ -166,10 +195,12 @@ void DbHelper::startWriter()
                 auto record = m_writeQueue.front();
                 m_writeQueue.pop();
 
-                Error error;
-                RecordVisitor vis(m_handler, &error, &m_stream);
+                RecordVisitor vis(&m_stream);
                 boost::apply_visitor(vis, record);
-                m_handler->handleRecordWrite(error);
+                m_handler->handleRecordWrite(getError());
+
+                lk.unlock();
+                m_writerDoneCond.notify_all();
             }
         });
 }

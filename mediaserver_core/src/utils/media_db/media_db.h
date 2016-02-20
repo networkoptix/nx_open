@@ -33,6 +33,12 @@ enum class RecordType
     CameraOperationAdd = 2,
 };
 
+enum class Mode
+{
+    Read,
+    Write
+};
+
 inline quint64 getBitMask(int width) { return (quint64)std::pow(2, width) - 1; }
 
 struct RecordBase
@@ -40,7 +46,7 @@ struct RecordBase
     quint64 part_1;
     
     RecordBase(quint64 i = 0) : part_1(i) {}
-    RecordType recordType() const { return static_cast<RecordType>(part_1 & 0x3); }
+    RecordType getRecordType() const { return static_cast<RecordType>(part_1 & 0x3); }
     void setRecordType(RecordType recordType) { part_1 |= (quint64)recordType & 0x3; }
 };
 
@@ -49,13 +55,13 @@ struct MediaFileOperation : RecordBase
     quint64 part_2;
 
     MediaFileOperation(quint64 i1 = 0, quint64 i2 = 0) : RecordBase(i1), part_2(i2) {}
-    int cameraId() const { return (part_1 >> 0x2) & 0xffff; }
+    int getCameraId() const { return (part_1 >> 0x2) & 0xffff; }
     void setCameraId(int cameraId) { part_1 |= ((quint64)cameraId & 0xffff) << 0x2; }
 
-    qint64 startTime() const { return (part_1 >> 0x12) & getBitMask(0x2all); }
+    qint64 getStartTime() const { return (part_1 >> 0x12) & getBitMask(0x2all); }
     void setStartTime(qint64 startTime) { part_1 |= ((quint64)startTime & getBitMask(0x2all)) << 0x12; }
 
-    int duration() const
+    int getDuration() const
     {
         quint64 p1 = (part_1 >> 0x3c) & 0xf;
         quint64 p2 = part_2 & getBitMask(0x10);
@@ -67,10 +73,10 @@ struct MediaFileOperation : RecordBase
         part_2 |= (quint64)duration & getBitMask(0x10);
     }
 
-    qint64 fileSize() const { return (part_2 >> 0x10) & getBitMask(0x2Fll); }
+    qint64 getFileSize() const { return (part_2 >> 0x10) & getBitMask(0x2Fll); }
     void setFileSize(qint64 fileSize) { part_2 |= ((quint64)fileSize & getBitMask(0x2Fll)) << 0x10; }
 
-    int catalog() const { return (part_2 >> 0x3F) & 0x1; }
+    int getCatalog() const { return (part_2 >> 0x3F) & 0x1; }
     void setCatalog(int catalog) { part_2 |= ((quint64)catalog & 0x1) << 0x3F; }
 };
 
@@ -86,7 +92,7 @@ struct CameraOperation : RecordBase
     int getCameraUniqueIdLen() const { return (part_1 >> 0x2) & getBitMask(0xE); }
     void setCameraUniqueIdLen(int len) { part_1 |= ((quint64)len & getBitMask(0xE)) << 0x2; }
 
-    int cameraId() const { return (part_1 >> 0x10) & getBitMask(0x10); }
+    int getCameraId() const { return (part_1 >> 0x10) & getBitMask(0x10); }
     void setCameraId(int cameraId) { part_1 |= ((quint64)cameraId & getBitMask(0x10)) << 0x10; }
 
     QByteArray getCameraUniqueId() const { return cameraUniqueId; }
@@ -101,7 +107,8 @@ enum class Error
     ReadError,
     WriteError,
     ParseError,
-    Eof
+    Eof,
+    WrongMode
 };
 
 class DbHelperHandler
@@ -127,8 +134,12 @@ public:
     Error writeFileHeader(uint8_t dbVersion);
 
     Error readRecord();
-    void writeRecordAsync(const WriteRecordType &record);
+    Error writeRecordAsync(const WriteRecordType &record);
     void stopWriter();
+    void reset();
+
+    void setMode(Mode mode);
+    Mode getMode() const;
 
 private:
     void startWriter();
@@ -141,9 +152,11 @@ private:
     QDataStream m_stream;
 
     std::thread m_thread;
-    std::mutex m_mutex;
+    mutable std::mutex m_mutex;
     std::condition_variable m_cond;
+    std::condition_variable m_writerDoneCond;
     bool m_needStop;
+    Mode m_mode;
 };
 
 } // namespace media_db
