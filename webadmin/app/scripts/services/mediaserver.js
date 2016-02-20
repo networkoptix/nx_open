@@ -90,6 +90,42 @@ angular.module('webadminApp')
             return obj;
         }
         return {
+            login:function(login,password){
+                // Calculate digest
+                var realm = ipCookie('realm');
+                var nonce = ipCookie('nonce');
+
+                var digest = md5(login + ':' + realm + ':' + password);
+                var method = md5('GET:');
+                var authDigest = md5(digest + ':' + nonce + ':' + method);
+                var auth = Base64.encode(login + ':' + nonce + ':' + authDigest);
+
+                /*
+                 console.log('debug auth - realm:',realm);
+                 console.log('debug auth - nonce:',nonce);
+                 console.log('debug auth - login:',login);
+                 console.log('debug auth - password:',$scope.user.password);
+                 console.log('debug auth - digest = md5(login:realm:password):',digest);
+                 console.log('debug auth - method:','GET:');
+                 console.log('debug auth - md5(method):',method);
+                 console.log('debug auth -  authDigest = md5(digest:nonce:md5(method)):',authDigest);
+                 console.log('debug auth -  auth = base64(login:nonce:authDigest):',auth);
+                 */
+
+                ipCookie('auth',auth, { path: '/' });
+
+                var rtspmethod = md5('PLAY:');
+                var rtspDigest = md5(digest + ':' + nonce + ':' + rtspmethod);
+                var authRtsp = Base64.encode(login + ':' + nonce + ':' + rtspDigest);
+                ipCookie('auth_rtsp',authRtsp, { path: '/' });
+
+                //Old cookies:  // TODO: REMOVE THIS SECTION
+                //ipCookie('response',auth_digest, { path: '/' });
+                //ipCookie('username',login, { path: '/' });
+
+                // Check auth again
+                return this.getCurrentUser(true);
+            },
             url:function(){
                 return proxy;
             },
@@ -172,6 +208,14 @@ angular.module('webadminApp')
                 });
             },
 
+            detachServer:function(){
+                var defer = $q.defer();
+                defer.resolve(true);
+                return defer.promise;
+
+                // TODO: wait for https://networkoptix.atlassian.net/browse/VMS-2081
+                // return wrapPost(proxy + '/api/detachServer');
+            },
             setupCloudSystem:function(systemName, systemId, authKey){
                 var defer = $q.defer();
                 function errorHandler(error){
@@ -187,11 +231,12 @@ angular.module('webadminApp')
                 return defer.promise;
 
                 // TODO: wait for https://networkoptix.atlassian.net/browse/VMS-2081
-                return wrapPost(proxy + '/api/setupCloudSystem',{
+                /* return wrapPost(proxy + '/api/setupCloudSystem',{
                     systemName: systemName,
                     systemId: systemId,
                     authKey: authKey
                 });
+                */
             },
 
             setupLocalSystem:function(systemName, adminAccount, adminPassword){
@@ -199,11 +244,12 @@ angular.module('webadminApp')
                 return this.changeSystem(systemName, adminAccount, adminPassword);
 
                 // TODO: wait for https://networkoptix.atlassian.net/browse/VMS-2081
-                return wrapPost(proxy + '/api/setupLocalSystem',{
+                /* return wrapPost(proxy + '/api/setupLocalSystem',{
                     systemName: systemName,
                     adminAccount: adminAccount,
                     adminPassword: adminPassword
                 });
+                */
             },
 
 

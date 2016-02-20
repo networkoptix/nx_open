@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('SetupCtrl', function ($scope, mediaserver, $sessionStorage, cloudAPI) {
+    .controller('SetupCtrl', function ($scope, mediaserver, cloudAPI, $location) {
 
         /*
             This is kind of universal wizard controller.
@@ -24,14 +24,19 @@ angular.module('webadminApp')
 
         $scope.serverAddress = window.location.host;
 
-        var debugMode = true;
+        var debugMode = Config.inlineMode;
 
         $scope.stepIs = function(step){
             return $scope.step == step;
         };
         $scope.finish = function(){
             $scope.next('start');
-            console.log('close');
+            if(Config.inlineMode) {
+                window.close();
+            }else{
+                $location.path("/settings");
+                window.location.reload();
+            }
         };
         $scope.back = function(){
             $scope.next($scope.activeStep.back);
@@ -73,6 +78,13 @@ angular.module('webadminApp')
         function errorHandler(error){
             alert("error happened");
             console.error(error);
+        }
+
+        function updateCredentials(login,password){
+            mediaserver.login(login,password).then(checkMySystem,
+                function(error){
+                    console.error(error);
+                });
         }
 
         /* Connect to another server section */
@@ -129,7 +141,8 @@ angular.module('webadminApp')
                         return;
                     }
                 }
-                checkMySystem();
+                updateCredentials( $scope.settings.remoteLogin, $scope.settings.remotePassword);
+
                 $scope.next('mergeSuccess');
             });
         }
@@ -153,7 +166,7 @@ angular.module('webadminApp')
                 function(message){
                     //2. Save settings to local server
                     mediaserver.setupCloudSystem($scope.settings.systemName, message.data.systemId, message.data.authKey).then(function(){
-                        // TODO: check new authorization here
+                        updateCredentials( $scope.settings.cloudEmail, $scope.settings.cloudPassword);
                         $scope.next('cloudSuccess');
                     },errorHandler);
                 }, errorHandler);
@@ -168,7 +181,7 @@ angular.module('webadminApp')
                 return;
             }
             mediaserver.setupCloudSystem($scope.settings.systemName, $scope.settings.localLogin, $scope.settings.localPassword).then(function(){
-                // TODO: check new authorization here
+                updateCredentials( $scope.settings.localLogin, $scope.settings.localPassword);
                 $scope.next('localSuccess');
             },function(){
                 $scope.next('cloudFailure');
