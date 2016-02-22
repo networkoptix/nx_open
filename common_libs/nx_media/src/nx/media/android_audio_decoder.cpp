@@ -61,6 +61,7 @@ class AndroidAudioDecoderPrivate: public QObject
     AndroidAudioDecoder *q_ptr;
 public:
     AndroidAudioDecoderPrivate():
+        frameNumber(0),
         initialized(false),
         javaDecoder("com/networkoptix/nxwitness/media/QnAudioDecoder")
     {
@@ -96,42 +97,12 @@ public:
         audioFrame->data.write((const char*) buffer, bufferSize);
     }
 
-    void buildAdditionHeader(const QnConstCompressedAudioDataPtr& audio)
-    {
-        switch (audio->compressionType)
-        {
-        case CODEC_ID_AAC:
-        {
-            if (audio->context->getExtradataSize() >= 2)
-            {
-                // build AAC adts header
-                const quint8* configParams = audio->context->getExtradata();
-                int profile = (configParams[0]>>3)&0x1f;
-                int frequency_index = (configParams[0]&0x7) <<1 | (configParams[1]>>7) &0x1;
-                int channel_config = (configParams[1]>>3) &0xf;
-                int finallength = audio->dataSize() + 7;
-
-                additionHeader.resize(7);
-                additionHeader[0] = 0xff;
-                additionHeader[1] = 0xf1;
-                additionHeader[2] = ((profile - 1) << 6) + (frequency_index << 2) +(channel_config >> 2);
-                additionHeader[3] = ((channel_config & 0x3) << 6) + (finallength >> 11);
-                additionHeader[4] = (finallength & 0x7ff) >> 3;
-                additionHeader[5] = ((finallength & 7) << 5) + 0x1f;
-                additionHeader[6] = 0xfc;
-            }
-            break;
-        }
-        default:
-            break;
-        }
-    }
-
 private:
+    qint64 frameNumber;
     bool initialized;
     QAndroidJniObject javaDecoder;
     AudioFramePtr audioFrame;
-    QByteArray additionHeader;
+    std::deque<PtsData> frameNumToPtsCache;
 };
 
 namespace {
@@ -178,12 +149,12 @@ bool AndroidAudioDecoder::isCompatible(const CodecID codec)
     return !codecMimeType.isEmpty();
 }
 
-AudioFramePtr AndroidAudioDecoder::decode(const QnConstCompressedAudioDataPtr& frame)
+bool AndroidAudioDecoder::decode(const QnConstCompressedAudioDataPtr& frame, AudioFramePtr* const outFrame)
 {
     Q_D(AndroidAudioDecoder);
 
     if (!frame)
-        return AudioFramePtr();
+        return false;
 
     if (!d->initialized)
     {
@@ -199,23 +170,35 @@ AudioFramePtr AndroidAudioDecoder::decode(const QnConstCompressedAudioDataPtr& f
             (jlong) frame->context->getExtradata(),
             frame->context->getExtradataSize());
         if (!d->initialized)
-            return AudioFramePtr();
+            return false;
     }
 
     d->audioFrame.reset();
-    d->javaDecoder.callMethod<jboolean>(
-        "decodeFrame", "(JIJ)Z",
+    d->frameNumToPtsCache.push_back(AndroidVideoDecoderPrivate::PtsData(d->frameNumber, frame->timestamp));
+    jlong outFrameNum = d->javaDecoder.callMethod<jboolean>(
+        "decodeFrame", "(JIJJ)Z",
         (jlong) frame->data(),
         (jint) frame->dataSize(),
+        (jlong) ++d->frameNumber, //< put input frames in range [1..N]
         (jlong) (void*) this);
+
+    if (outFrameNum <= 0)
+        return false; //< decoder returns frames in range [1..N]
 
     if (d->audioFrame)
     {
-        d->audioFrame->context = frame->context;
-        d->audioFrame->timestampUsec = frame->timestamp;
+        while (!d->frameNumToPtsCache.empty() && d->frameNumToPtsCache.front().first < outFrameNum)
+            d->frameNumToPtsCache.pop_front(); //< In case of decoder skipped some input frames
+        if (!d->frameNumToPtsCache.empty() && d->frameNumToPtsCache.front().first == outFrameNum)
+        {
+            qint64 pts = d->frameNumToPtsCache.front().second;
+            d->audioFrame->timestampUsec = pts;
+            d->audioFrame->context = frame->context;
+            *outFrame = std::move(d->audioFrame);
+        }
     }
     
-    return d->audioFrame;
+    return true;
 }
 
 } // namespace media
