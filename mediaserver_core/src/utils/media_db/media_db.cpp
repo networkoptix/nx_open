@@ -126,7 +126,10 @@ Error DbHelper::readRecord()
 
     Error error = getError();
     if (error != Error::NoError)
+    {
         m_handler->handleError(Error::ReadError);
+        return error;
+    }
 
     switch (rb.getRecordType())
     {
