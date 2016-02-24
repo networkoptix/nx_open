@@ -104,7 +104,7 @@ void OutgoingTunnelUdtConnection::pleaseStop(
 }
 
 void OutgoingTunnelUdtConnection::establishNewConnection(
-    boost::optional<std::chrono::milliseconds> timeout,
+    std::chrono::milliseconds timeout,
     SocketAttributes socketAttributes,
     OnNewConnectionHandler handler)
 {
@@ -155,7 +155,7 @@ void OutgoingTunnelUdtConnection::setControlConnectionClosedHandler(
 
 void OutgoingTunnelUdtConnection::proceedWithConnection(
     UdtStreamSocket* connectionPtr,
-    boost::optional<std::chrono::milliseconds> timeout)
+    std::chrono::milliseconds timeout)
 {
     //we are in connectionPtr socket aio thread
 
@@ -165,9 +165,11 @@ void OutgoingTunnelUdtConnection::proceedWithConnection(
     if (m_ongoingConnections.find(connectionPtr) == m_ongoingConnections.end())
         return; //connection has been cancelled by pleaseStop, ignoring...
 
+    const bool timoutPresent = timeout > std::chrono::milliseconds::zero();
+
     connectionPtr->connectAsync(
         m_remoteHostAddress,
-        [this, connectionPtr, timoutPresent = static_cast<bool>(timeout)](
+        [this, connectionPtr, timoutPresent](
             SystemError::ErrorCode errorCode)
         {
             //cancelling timer
@@ -177,9 +179,9 @@ void OutgoingTunnelUdtConnection::proceedWithConnection(
             onConnectCompleted(connectionPtr, errorCode);
         });
 
-    if (timeout)
+    if (timoutPresent)
         connectionPtr->registerTimer(
-            *timeout,
+            timeout,
             [connectionPtr, this]
             {
                 connectionPtr->cancelIOSync(aio::etNone);   //cancelling connect
@@ -196,13 +198,13 @@ void OutgoingTunnelUdtConnection::onConnectCompleted(
     //ensuring connectionPtr can be safely freed in any thread
     connectionPtr->post(
         [this, connectionPtr, errorCode]()
-    {
-        //switching execution to m_aioTimer's thread
-        m_aioTimer.post(
-            std::bind(
-                &OutgoingTunnelUdtConnection::reportConnectResult, this,
-                connectionPtr, errorCode));
-    });
+        {
+            //switching execution to m_aioTimer's thread
+            m_aioTimer.post(
+                std::bind(
+                    &OutgoingTunnelUdtConnection::reportConnectResult, this,
+                    connectionPtr, errorCode));
+        });
 }
 
 void OutgoingTunnelUdtConnection::reportConnectResult(

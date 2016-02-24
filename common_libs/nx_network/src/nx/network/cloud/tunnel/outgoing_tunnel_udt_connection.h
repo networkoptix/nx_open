@@ -75,7 +75,7 @@ public:
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
 
     virtual void establishNewConnection(
-        boost::optional<std::chrono::milliseconds> timeout,
+        std::chrono::milliseconds timeout,
         SocketAttributes socketAttributes,
         OnNewConnectionHandler handler) override;
 
@@ -108,7 +108,7 @@ private:
 
     void proceedWithConnection(
         UdtStreamSocket* connectionPtr,
-        boost::optional<std::chrono::milliseconds> timeout);
+        std::chrono::milliseconds timeout);
     void onConnectCompleted(
         UdtStreamSocket* connectionPtr,
         SystemError::ErrorCode errorCode);
