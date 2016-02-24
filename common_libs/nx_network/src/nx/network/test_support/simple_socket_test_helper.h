@@ -22,7 +22,7 @@ namespace /* anonimous */ {
 const SocketAddress kServerAddress("127.0.0.1:12345");
 const QByteArray kTestMessage("Ping");
 const int kClientCount(10);
-const std::chrono::milliseconds kTestTimeout(500);
+const std::chrono::milliseconds kTestTimeout(1000);
 
 }
 
@@ -31,7 +31,8 @@ void syncSocketServerMainFunc(
     const SocketAddress& endpointToBindTo,
     const boost::optional<QByteArray> testMessage,
     int clientCount,
-    ServerSocketMaker serverMaker)
+    ServerSocketMaker serverMaker,
+    std::promise<void>* startedPromise)
 {
     auto server = serverMaker();
     ASSERT_TRUE(server->setReuseAddrFlag(true));
@@ -40,6 +41,9 @@ void syncSocketServerMainFunc(
         << SystemError::getLastOSErrorText().toStdString();
     ASSERT_TRUE(server->listen(clientCount))
         << SystemError::getLastOSErrorText().toStdString();
+
+    if (startedPromise)
+        startedPromise->set_value();
 
     for (int i = clientCount; i > 0; --i)
     {
@@ -78,15 +82,16 @@ void socketSimpleSync(
     const QByteArray& testMessage = kTestMessage,
     int clientCount = kClientCount)
 {
+    std::promise<void> promise;
     std::thread serverThread(
         syncSocketServerMainFunc<ServerSocketMaker>,
         endpointToBindTo,
         testMessage,
         clientCount,
-        serverMaker);
+        serverMaker,
+        &promise);
 
-    // give the server some time to start
-    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+    promise.get_future().wait();
 
     std::thread clientThread([&endpointToConnectTo, &testMessage,
                               clientCount, &clientMaker]()
@@ -94,7 +99,7 @@ void socketSimpleSync(
         for (int i = clientCount; i > 0; --i)
         {
             auto client = clientMaker();
-            EXPECT_TRUE(client->connect(endpointToConnectTo, 500)) 
+            EXPECT_TRUE(client->connect(endpointToConnectTo, kTestTimeout.count()))
                 << SystemError::getLastOSErrorText().toStdString();
             EXPECT_EQ(
                 client->send(testMessage.constData(), testMessage.size() + 1),
@@ -203,19 +208,20 @@ void shutdownSocket(
     const SocketAddress& endpointToBindTo = kServerAddress,
     const SocketAddress& endpointToConnectTo = kServerAddress)
 {
+    std::promise<void> promise;
     std::thread serverThread(
         syncSocketServerMainFunc<ServerSocketMaker>,
         endpointToBindTo,
         boost::none,
         1,
-        serverMaker);
+        serverMaker,
+        &promise);
 
-    // give the server some time to start
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    promise.get_future().wait();
 
     auto client = clientMaker();
     ASSERT_TRUE(client->setRecvTimeout(10 * 1000));   //10 seconds
-    EXPECT_TRUE(client->connect(endpointToConnectTo, 500));
+    EXPECT_TRUE(client->connect(endpointToConnectTo, kTestTimeout.count()));
     std::atomic<bool> recvExited(false);
     std::thread clientThread(
         [&client, &recvExited]()

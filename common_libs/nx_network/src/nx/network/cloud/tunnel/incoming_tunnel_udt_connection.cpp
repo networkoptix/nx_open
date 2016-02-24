@@ -120,6 +120,7 @@ void IncomingTunnelUdtConnection::readRequest()
         &m_connectionBuffer,
         [this](SystemError::ErrorCode code, size_t)
         {
+            Q_ASSERT(code != SystemError::timedOut);
             if (code != SystemError::noError)
                 return connectionSocketError(code);
 
