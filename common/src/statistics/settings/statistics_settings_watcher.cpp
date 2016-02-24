@@ -21,7 +21,7 @@ QnStatisticsSettingsWatcher::QnStatisticsSettingsWatcher(QObject *parent)
     , m_updateTimer(new QTimer())
     , m_handle()
 {
-    enum { kUpdatePeriodMs = 5 * 60 * 1000 };
+    enum { kUpdatePeriodMs = 60 * 60 * 1000 };  // every hour
     m_updateTimer->setSingleShot(false);
     m_updateTimer->setInterval(kUpdatePeriodMs);
     m_updateTimer->start();
@@ -72,24 +72,16 @@ void QnStatisticsSettingsWatcher::updateSettingsImpl(int delayMs)
             return;
 
         m_handle = rest::Handle();
-        enum { kUpdateOnFailDelayMs = 5 * 60 * 1000 };
-        if (!success)
-        {
-            resetSettings();
-            updateSettingsImpl(kUpdateOnFailDelayMs);
-            return;
-        }
 
-        bool deserialized = false;
-        const auto settings = QJson::deserialized(data, QnStatisticsSettings(), &deserialized);
-        if (!deserialized)
+        QnStatisticsSettings settings;
+        if (!success || !QJson::deserialize(data, &settings))
         {
             resetSettings();
-            updateSettingsImpl(kUpdateOnFailDelayMs);
             return;
         }
 
         setSettings(settings);
+        m_updateTimer->start();
     };
 
     if (delayMs != kImmediately)
