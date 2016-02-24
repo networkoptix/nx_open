@@ -119,7 +119,6 @@ angular.module('webadminApp')
 
                 $scope.discoveredUrls = systems;
                 _.filter(systems, function(module){
-                    console.log(systemName);
                     return module.systemName !== $scope.serverInfo.systemName;
                 });
             });
