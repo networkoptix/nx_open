@@ -24,29 +24,39 @@ import android.media.MediaCodecList;
 public class QnAudioDecoder 
 {
 
-    public boolean init(String codecName,  int sampleRate, int channelCount)
+    public boolean init(String codecName,  int sampleRate, int channelCount,
+                        long extraDataPtr, int extraDataSize)
     {
         try
         {
-            System.out.println("codecName=" + codecName);
+            System.out.println("Audio codecName=" + codecName);
 
             format = MediaFormat.createAudioFormat(codecName, sampleRate, channelCount);
+            if (extraDataSize > 0)
+            {
+                System.out.println("Set Audio extraData. size=" + extraDataSize);
+                ByteBuffer extraDataBuffer = ByteBuffer.allocateDirect(extraDataSize);
+                fillInputBuffer(extraDataBuffer, extraDataPtr, extraDataSize); //< C++ callback
+                format.setByteBuffer("csd-0", extraDataBuffer);
+            }
+
             codec = MediaCodec.createDecoderByType(codecName);
             codec.configure(format, null, null, 0);
 
             codec.start();
+            System.out.println("audio codec started");
             inputBuffers = codec.getInputBuffers();
-            System.out.println("codec started");
+            outputBuffers = codec.getOutputBuffers();
             return true;
         } catch(java.io.IOException e)
         {
-            System.out.println("codec start failed");
+            System.out.println("audio codec start failed");
             return false;
         }
         catch(Exception e)
         {
-            System.out.println("Exception" + e.toString());
-            System.out.println("Exception" + e.getMessage());
+            System.out.println("Audio start failed. Exception" + e.toString());
+            System.out.println("Audio start failed. Exception" + e.getMessage());
             return false;
         }
     }
@@ -61,7 +71,7 @@ public class QnAudioDecoder
         }
     }
 
-    public boolean decodeFrame(long srcDataPtr, int frameSize, long cObject)
+    public long decodeFrame(long srcDataPtr, int frameSize, long timestampUs, long cObject)
     {
         try
         {
@@ -72,38 +82,48 @@ public class QnAudioDecoder
               ByteBuffer inputBuffer = inputBuffers[inputBufferId];
               inputBuffer.allocateDirect(frameSize);
               fillInputBuffer(inputBuffer, srcDataPtr, frameSize); //< C++ callback
-              codec.queueInputBuffer(inputBufferId, 0, frameSize, 0, 0);
+              codec.queueInputBuffer(inputBufferId, 0, frameSize, timestampUs, 0);
             }
             else {
                 System.out.println("error dequeueInputBuffer");
-                return false;
+                return -1;
             }
 
             MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
             int outputBufferId = codec.dequeueOutputBuffer(info, 0);
 
-            if (outputBufferId >= 0)
+            switch (outputBufferId)
             {
-                ByteBuffer outputBuffer = codec.getOutputBuffer(outputBufferId);
+            case MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED:
+                System.out.println("Audio MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED");
+                return 0; // no error
+            case MediaCodec.INFO_OUTPUT_FORMAT_CHANGED:
+                format = codec.getOutputFormat(); // option B
+                System.out.println("Audio MediaCodec.INFO_OUTPUT_FORMAT_CHANGED");
+                return 0; // no error
+            case MediaCodec.INFO_TRY_AGAIN_LATER:
+                System.out.println("Audio MediaCodec.INFO_TRY_AGAIN_LATER");
+                return 0; // no error
+            default:
+                long outTimestampUs = info.presentationTimeUs;
+                ByteBuffer outputBuffer = outputBuffers[outputBufferId];
                 readOutputBuffer(cObject, outputBuffer, outputBuffer.capacity());
                 codec.releaseOutputBuffer(outputBufferId, false);
-                return true;
+                return outTimestampUs;
             }
 
-            return false;
-              
         }
         catch(IllegalStateException e)
         {
             System.out.println("IllegalStateException" + e.toString());
             System.out.println("IllegalStateException" + e.getMessage());
-            return false;
+            return -1;
         }
         catch(Exception e)
         {
             System.out.println("Exception" + e.toString());
             System.out.println("Exception" + e.getMessage());
-            return false;
+            return -1;
         }
     }
 
@@ -111,6 +131,7 @@ public class QnAudioDecoder
     private static native void readOutputBuffer(long cObject, ByteBuffer buffer, int bufferSize);
 
     ByteBuffer[] inputBuffers;
+    ByteBuffer[] outputBuffers;
     private MediaCodec codec;
     private MediaFormat format;
 }

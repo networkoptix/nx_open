@@ -61,7 +61,7 @@ class AndroidAudioDecoderPrivate: public QObject
     AndroidAudioDecoder *q_ptr;
 public:
     AndroidAudioDecoderPrivate():
-        frameNumber(0),
+        magic(1234567),
         initialized(false),
         javaDecoder("com/networkoptix/nxwitness/media/QnAudioDecoder")
     {
@@ -98,11 +98,10 @@ public:
     }
 
 private:
-    qint64 frameNumber;
+    int magic;
     bool initialized;
     QAndroidJniObject javaDecoder;
     AudioFramePtr audioFrame;
-    std::deque<PtsData> frameNumToPtsCache;
 };
 
 namespace {
@@ -174,28 +173,21 @@ bool AndroidAudioDecoder::decode(const QnConstCompressedAudioDataPtr& frame, Aud
     }
 
     d->audioFrame.reset();
-    d->frameNumToPtsCache.push_back(AndroidVideoDecoderPrivate::PtsData(d->frameNumber, frame->timestamp));
-    jlong outFrameNum = d->javaDecoder.callMethod<jboolean>(
-        "decodeFrame", "(JIJJ)Z",
+    jlong outFrameTimestamp = d->javaDecoder.callMethod<jlong>(
+        "decodeFrame", "(JIJJ)J",
         (jlong) frame->data(),
         (jint) frame->dataSize(),
-        (jlong) ++d->frameNumber, //< put input frames in range [1..N]
-        (jlong) (void*) this);
+        (jlong) frame->timestamp,
+        (jlong) (const void*) d_ptr.data());
 
-    if (outFrameNum <= 0)
-        return false; //< decoder returns frames in range [1..N]
+    if (outFrameTimestamp < 0)
+        return false;
 
     if (d->audioFrame)
     {
-        while (!d->frameNumToPtsCache.empty() && d->frameNumToPtsCache.front().first < outFrameNum)
-            d->frameNumToPtsCache.pop_front(); //< In case of decoder skipped some input frames
-        if (!d->frameNumToPtsCache.empty() && d->frameNumToPtsCache.front().first == outFrameNum)
-        {
-            qint64 pts = d->frameNumToPtsCache.front().second;
-            d->audioFrame->timestampUsec = pts;
-            d->audioFrame->context = frame->context;
-            *outFrame = std::move(d->audioFrame);
-        }
+        d->audioFrame->timestampUsec = outFrameTimestamp;
+        d->audioFrame->context = frame->context;
+        *outFrame = std::move(d->audioFrame);
     }
     
     return true;

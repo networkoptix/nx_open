@@ -24,7 +24,10 @@ android {
 # TODO: #dklychkov make this not hardcoded
     PRE_TARGETDEPS += \
         $$OUTPUT_PATH/lib/$$CONFIGURATION/libcommon.a \
-        $$OUTPUT_PATH/lib/$$CONFIGURATION/libappserver2.a
+        $$OUTPUT_PATH/lib/$$CONFIGURATION/libappserver2.a \
+        $$OUTPUT_PATH/lib/$$CONFIGURATION/libnx_audio.a \
+        $$OUTPUT_PATH/lib/$$CONFIGURATION/libnx_media.a \
+        $$OUTPUT_PATH/lib/$$CONFIGURATION/libnx_streaming.a
     
     ANDROID_EXTRA_LIBS += \
         $$OUTPUT_PATH/lib/$$CONFIGURATION/libcrypto.so \
