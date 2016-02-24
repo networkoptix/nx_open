@@ -104,7 +104,8 @@ get_serial_number() {
     if [ -f /tmp/serial ]; then rm /tmp/serial; fi
     SERIAL=$(/tmp/fw_printenv serial | sed 's/serial=//')
     echo $SERIAL > /tmp/serial
-    SERIAL_CHECK=$(cat /tmp/serial | grep '2014\|2015')
+    SERIAL_SHORT=${SERIAL%?????}
+    SERIAL_CHECK=$(echo $SERIAL_SHORT | grep '2014\|2015')
     if [ -z $SERIAL_CHECK ]; then RESET=true; else RESET=false; fi    
     echo "++++++++++++++ SERIAL NUMBER:"$SERIAL" ++++++++++++++" >&2 >/dev/kmsg
     echo `date` "++++++++++++++ SERIAL NUMBER:"$SERIAL" ++++++++++++++" >> $NX1LOG
