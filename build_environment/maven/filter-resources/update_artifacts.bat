@@ -4,13 +4,13 @@ set SOURCE=%NX_RSYNC_SOURCE%
 if "%NX_RSYNC_SOURCE%" == "" (
   set SOURCE=enk.me
 )
-set QT_PATH=%SOURCE%/buildenv/artifacts/qt/${qt.version}/${platform}/${arch}
+set QT_PATH=%SOURCE%/buildenv/${qt.path}
 
 set BUILDENVDIR=%cd%
 set RSYNC=%BUILDENVDIR%\rsync-win32\rsync -rtvL --chmod=ugo=rwx
 
-mkdir %BUILDENVDIR%\artifacts\qt\${qt.version}\${platform}\${arch}
-cd %BUILDENVDIR%\artifacts\qt\${qt.version}\${platform}
+mkdir %BUILDENVDIR%\${qt.path}
+cd %BUILDENVDIR%\${qt.path}
 
 @setlocal enableextensions enabledelayedexpansion
 @echo off
