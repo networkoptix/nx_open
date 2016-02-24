@@ -13,6 +13,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <statistics/abstract_statistics_settings_loader.h>
+#include <ec2_statictics_reporter.h>
 
 namespace
 {
@@ -60,6 +61,8 @@ namespace
         return QJson::deserialize(body, &dummy);
     };
 }
+
+const QString QnMultiserverStatisticsRestHandler::kSettingsUrlParam = lit("clientStatisticsSettingsUrl");
 
 class StatisticsActionHandler
 {
@@ -193,11 +196,21 @@ nx_http::StatusCode::Value SettingsActionHandler::loadSettingsLocally(QnStatisti
     if (!server || !hasInternetConnection(server))
         return nx_http::StatusCode::noContent;
 
-    static const QUrl kSettingsUrl = QUrl::fromUserInput(lit("http://127.0.0.1:8080/stat/statistics.json")); //TODO: change me to correct
+    static const auto settingsUrl = []()
+    {
+        static const auto kSettingsUrl =
+            ec2::Ec2StaticticsReporter::DEFAULT_SERVER_API + lit("/config/client_stats.json");
+
+        const auto admin = qnResPool->getAdministrator();
+        const auto localSettingsUrl = (admin ? admin->getProperty(
+            QnMultiserverStatisticsRestHandler::kSettingsUrlParam) : QString());
+        return QUrl::fromUserInput(localSettingsUrl.isEmpty()
+            ? kSettingsUrl : localSettingsUrl);
+    }();
 
     nx_http::BufferType buffer;
     int statusCode = nx_http::StatusCode::noContent;
-    if (nx_http::downloadFileSync(kSettingsUrl, &statusCode, &buffer) != SystemError::noError)
+    if (nx_http::downloadFileSync(settingsUrl, &statusCode, &buffer) != SystemError::noError)
         return nx_http::StatusCode::noContent;
 
     if (!QJson::deserialize(buffer, &outputSettings))

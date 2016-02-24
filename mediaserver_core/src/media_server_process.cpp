@@ -2203,7 +2203,8 @@ void MediaServerProcess::run()
 
         // TODO: fix, when VS supports init lists:
         //       for (const auto& param : { stats::SR_TIME_CYCLE, stats::SR_SERVER_API })
-        const QString* statParams[] = { &stats::SR_TIME_CYCLE, &stats::SR_SERVER_API };
+        const QString* statParams[] = { &stats::SR_TIME_CYCLE, &stats::SR_SERVER_API
+            , &QnMultiserverStatisticsRestHandler::kSettingsUrlParam };
         for (auto it = &statParams[0]; it != &statParams[sizeof(statParams)/sizeof(statParams[0])]; ++it)
         {
             const QString& param = **it;
