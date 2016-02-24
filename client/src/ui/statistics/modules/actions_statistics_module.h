@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include <statistics/base/base_fwd.h>
 #include <statistics/abstract_statistics_module.h>
 
 class QnActionManager;
@@ -20,14 +21,13 @@ public:
 
     void setActionManager(const QnActionManagerPtr &manager);
 
-    QnMetricsHash metrics() const override;
+    QnStatisticValuesHash values() const override;
 
-    void resetMetrics() override;
+    void reset() override;
 
 private:
-    typedef QSharedPointer<AbstractMultimetric> MultiMetricsPtr;
-    typedef QList<MultiMetricsPtr> MultimetricsList;
+    typedef QList<QnStatisticsValuesProviderPtr> ModulesList;
 
     QnActionManagerPtr m_actionManager;
-    MultimetricsList m_multiMetrics;
+    ModulesList m_modules;
 };

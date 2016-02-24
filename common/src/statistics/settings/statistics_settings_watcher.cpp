@@ -10,13 +10,18 @@
 #include <api/server_rest_connection.h>
 #include <core/resource/media_server_resource.h>
 
+namespace
+{
+    enum { kImmediately = 0 };
+}
+
 QnStatisticsSettingsWatcher::QnStatisticsSettingsWatcher(QObject *parent)
     : base_type(parent)
     , m_settings()
     , m_updateTimer(new QTimer())
     , m_handle()
 {
-    enum { kUpdatePeriodMs = 30 * 60 * 1000 };
+    enum { kUpdatePeriodMs = 5 * 60 * 1000 };
     m_updateTimer->setSingleShot(false);
     m_updateTimer->setInterval(kUpdatePeriodMs);
     m_updateTimer->start();
@@ -45,7 +50,6 @@ QnStatisticsSettings QnStatisticsSettingsWatcher::settings()
 
 void QnStatisticsSettingsWatcher::updateSettings()
 {
-    enum { kImmediately = 0 };
     updateSettingsImpl(kImmediately);
 }
 
@@ -71,6 +75,7 @@ void QnStatisticsSettingsWatcher::updateSettingsImpl(int delayMs)
         enum { kUpdateOnFailDelayMs = 5 * 60 * 1000 };
         if (!success)
         {
+            resetSettings();
             updateSettingsImpl(kUpdateOnFailDelayMs);
             return;
         }
@@ -79,34 +84,55 @@ void QnStatisticsSettingsWatcher::updateSettingsImpl(int delayMs)
         const auto settings = QJson::deserialized(data, QnStatisticsSettings(), &deserialized);
         if (!deserialized)
         {
+            resetSettings();
             updateSettingsImpl(kUpdateOnFailDelayMs);
             return;
         }
 
-        m_settings.reset(new QnStatisticsSettings(settings));
-        emit settingsAvailableChanged();
+        setSettings(settings);
     };
 
-    const auto getStatSettingsHandler = [this, callback, guard]()
+    if (delayMs != kImmediately)
     {
-        if (!guard)
-            return;
+        const auto updateSettingsHandler = [this, guard]()
+        {
+            if (guard)
+                updateSettings();
+        };
 
-        const auto server = qnCommon->currentServer();
-        if (!server)
-            return;
+        executeDelayedParented(updateSettingsHandler, delayMs, this);
+        return;
+    }
 
-        const auto connection = server->restConnection();
-        if (!connection)
-            return;
+    const auto server = qnCommon->currentServer();
+    if (!server)
+        return;
 
-        m_handle = connection->getStatisticsSettingsAsync(
-            callback, QThread::currentThread());
-    };
+    const auto connection = server->restConnection();
+    if (!connection)
+        return;
 
-    if (!delayMs)
-        getStatSettingsHandler();
-    else
-        executeDelayedParented(getStatSettingsHandler, delayMs, this);
+    m_handle = connection->getStatisticsSettingsAsync(
+        callback, QThread::currentThread());
+    return;
+
 }
 
+void QnStatisticsSettingsWatcher::resetSettings()
+{
+    if (!m_settings)
+        return;
+
+    m_settings.reset();
+    emit settingsAvailableChanged();
+}
+
+void QnStatisticsSettingsWatcher::setSettings(const QnStatisticsSettings &settings)
+{
+    const bool sameSettings = (m_settings && (*m_settings == settings));
+    if (sameSettings)
+        return;
+
+    m_settings.reset(new QnStatisticsSettings(settings));
+    emit settingsAvailableChanged();
+}

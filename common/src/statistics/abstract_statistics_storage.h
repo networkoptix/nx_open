@@ -14,7 +14,7 @@ public:
     virtual ~QnAbstractStatisticsStorage();
 
 public:
-    virtual void storeMetrics(const QnMetricsHash &metrics) = 0;
+    virtual void storeMetrics(const QnStatisticValuesHash &metrics) = 0;
 
     virtual QnMetricHashesList getMetricsList(qint64 startTimeMs
         , int limit) const = 0;

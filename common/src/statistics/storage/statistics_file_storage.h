@@ -12,7 +12,7 @@ public:
     virtual ~QnStatisticsFileStorage();
 
 private:
-    void storeMetrics(const QnMetricsHash &metrics) override;
+    void storeMetrics(const QnStatisticValuesHash &metrics) override;
 
     QnMetricHashesList getMetricsList(qint64 startTimeMs, int limit) const override;
 

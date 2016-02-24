@@ -44,6 +44,9 @@ public:
     bool isServerAutoDiscoveryEnabled() const;
     void setServerAutoDiscoveryEnabled(bool enabled);
 
+    bool isCrossdomainXmlEnabled() const;
+    void setCrossdomainXmlEnabled(bool enabled);
+
     QnEmailSettings emailSettings() const;
     void setEmailSettings(const QnEmailSettings &settings);
 
@@ -113,6 +116,7 @@ private:
     QnResourcePropertyAdaptor<bool> *m_auditTrailEnabledAdaptor;
     QnResourcePropertyAdaptor<QString> *m_disabledVendorsAdaptor;
     QnResourcePropertyAdaptor<bool> *m_serverAutoDiscoveryEnabledAdaptor;
+    QnResourcePropertyAdaptor<bool> *m_crossdomainXmlEnabledAdaptor;
     QnResourcePropertyAdaptor<bool> *m_updateNotificationsEnabledAdaptor;
     QnResourcePropertyAdaptor<bool> *m_timeSynchronizationEnabledAdaptor;
     QnResourcePropertyAdaptor<Qn::CameraBackupQualities> *m_backupQualitiesAdaptor;
