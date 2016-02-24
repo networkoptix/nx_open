@@ -8,14 +8,6 @@ namespace media_db
 namespace
 {
 
-QDataStream &operator << (QDataStream &stream, const CameraOperation &cameraOp)
-{
-    stream << cameraOp.part_1;
-    stream.writeRawData(cameraOp.cameraUniqueId.data(), cameraOp.getCameraUniqueIdLen());
-
-    return stream;
-}
-
 template<typename StructToWrite>
 QDataStream &operator << (QDataStream &stream, const StructToWrite &s)
 {
@@ -25,13 +17,29 @@ QDataStream &operator << (QDataStream &stream, const StructToWrite &s)
 class RecordVisitor : public boost::static_visitor<>
 {
 public:
-    RecordVisitor(QDataStream* stream) : m_stream(stream) {}
+    RecordVisitor(QDataStream* stream, Error *error) : m_stream(stream), m_error(error) {}
    
+    void operator() (const CameraOperation &camOp) const
+    {
+        *m_stream << camOp.part_1;
+        if (m_stream->status() == QDataStream::WriteFailed)
+        {
+            *m_error = Error::WriteError;
+            return;
+        }
+        int bytesToWrite = camOp.getCameraUniqueIdLen();
+        int bytesWritten = m_stream->writeRawData(camOp.cameraUniqueId.data(),
+                                                  bytesToWrite);
+        if (bytesToWrite != bytesWritten)
+            *m_error = Error::WriteError;
+    }
+
     template<typename StructToWrite>
-    void operator()(const StructToWrite &s) const { *m_stream << s; }
+    void operator() (const StructToWrite &s) const { *m_stream << s; }
 
 private:
     QDataStream *m_stream;
+    Error *m_error;
 };
 
 } // namespace <anonymous>
@@ -118,7 +126,7 @@ Error DbHelper::readRecord()
 
     Error error = getError();
     if (error != Error::NoError)
-        m_handler->handleError(error);
+        m_handler->handleError(Error::ReadError);
 
     switch (rb.getRecordType())
     {
@@ -134,9 +142,11 @@ Error DbHelper::readRecord()
     case RecordType::CameraOperationAdd:
     {
         CameraOperation cameraOp(rb.part_1);
-        cameraOp.cameraUniqueId.resize(cameraOp.getCameraUniqueIdLen());
-        m_stream.readRawData(cameraOp.cameraUniqueId.data(),
-                             cameraOp.getCameraUniqueIdLen());
+        int bytesToRead = cameraOp.getCameraUniqueIdLen();
+        cameraOp.cameraUniqueId.resize(bytesToRead);
+        int bytesRead = m_stream.readRawData(cameraOp.cameraUniqueId.data(), bytesToRead);
+        if (bytesRead != bytesToRead)
+            return Error::ReadError;
         error = getError();
         m_handler->handleCameraOp(cameraOp, error);
         break;
@@ -200,9 +210,23 @@ void DbHelper::startWriter()
                     auto record = m_writeQueue.front();
                     m_writeQueue.pop();
 
-                    RecordVisitor vis(&m_stream);
+                    Error error;
+                    RecordVisitor vis(&m_stream, &error);
                     boost::apply_visitor(vis, record);
-                    m_handler->handleRecordWrite(getError());
+                    if (error == Error::WriteError)
+                    {
+                        m_handler->handleRecordWrite(error);
+                        break;
+                    }
+
+                    error = getError();
+                    if (error == Error::WriteError)
+                    {
+                        m_handler->handleRecordWrite(error);
+                        break;
+                    } 
+                    else
+                        m_handler->handleRecordWrite(error);
                 }
 
                 lk.unlock();

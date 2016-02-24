@@ -231,7 +231,6 @@ public:
     void handleError(nx::media_db::Error error) override
     {
         *m_error = error;
-        ASSERT_TRUE(false);
     }
 
     void handleRecordWrite(nx::media_db::Error error) override
@@ -373,7 +372,7 @@ TEST(MediaDb_test, DbFileTruncate)
         initDbFile(&dbFile);
 
         nx::media_db::Error error;
-        TestDataManager tdm(100);
+        TestDataManager tdm(2);
         TestDbHelperHandler testHandler(&error, &tdm);
         nx::media_db::DbHelper dbHelper(&dbFile, &testHandler);
         dbHelper.setMode(nx::media_db::Mode::Write);
@@ -407,6 +406,8 @@ TEST(MediaDb_test, DbFileTruncate)
 
         while (error == nx::media_db::Error::NoError)
             dbHelper.readRecord();
+
+        ASSERT_TRUE(error == nx::media_db::Error::ReadError);
 
         dbFile.close();
         recursiveClean(workDirPath);
