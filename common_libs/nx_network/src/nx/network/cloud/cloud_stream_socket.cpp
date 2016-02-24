@@ -353,10 +353,6 @@ bool CloudStreamSocket::startAsyncConnect(
         case AddressType::cloud:
         case AddressType::unknown:  //if peer is unknown, trying to establish cloud connect
         {
-            unsigned int sockSendTimeout = 0;
-            if (!getSendTimeout(&sockSendTimeout))
-                return false;
-
             //establishing cloud connect
             unsigned int sendTimeoutMillis = 0;
             if (!getSendTimeout(&sendTimeoutMillis))
@@ -377,6 +373,7 @@ bool CloudStreamSocket::startAsyncConnect(
                         errorCode,
                         std::move(cloudConnection));
                 });
+            return true;
         }
 
         default:
