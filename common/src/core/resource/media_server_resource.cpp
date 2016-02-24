@@ -229,7 +229,12 @@ QnMediaServerConnectionPtr QnMediaServerResource::apiConnection()
     /* We want the video server connection to be deleted in its associated thread,
      * no matter where the reference count reached zero. Hence the custom deleter. */
     if (!m_apiConnection && !m_apiUrl.isEmpty())
-        m_apiConnection = QnMediaServerConnectionPtr(new QnMediaServerConnection(this, QnAppServerConnectionFactory::videowallGuid()), &qnDeleteLater);
+    {
+        QnMediaServerResourcePtr thisPtr = toSharedPointer(this).dynamicCast<QnMediaServerResource>();
+        m_apiConnection = QnMediaServerConnectionPtr(
+            new QnMediaServerConnection(thisPtr, QnAppServerConnectionFactory::videowallGuid()),
+            &qnDeleteLater);
+    }
 
     return m_apiConnection;
 }
