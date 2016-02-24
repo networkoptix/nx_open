@@ -61,6 +61,7 @@ void MediatorConnector::mockupAddress( SocketAddress address )
                     "Address resolving is already in progress!" );
 
         m_promise = std::promise< bool >();
+        m_future = m_promise->get_future();
     }
 
 
