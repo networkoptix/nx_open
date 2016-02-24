@@ -6,6 +6,7 @@
 #ifndef NX_MEDIATOR_PROCESS_PUBLIC_H
 #define NX_MEDIATOR_PROCESS_PUBLIC_H
 
+#include <nx/utils/move_only_func.h>
 #include <utils/common/stoppable.h>
 
 
@@ -21,6 +22,9 @@ class MediatorProcessPublic
 public:
     MediatorProcessPublic(int argc, char **argv);
     virtual ~MediatorProcessPublic();
+
+    void setOnStartedEventHandler(
+        nx::utils::MoveOnlyFunc<void(bool /*result*/)> handler);
 
     virtual void pleaseStop() override;
 

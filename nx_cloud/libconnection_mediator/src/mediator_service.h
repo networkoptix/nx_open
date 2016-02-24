@@ -13,6 +13,7 @@
 #include <qtsinglecoreapplication.h>
 #include <qtservice.h>
 
+#include <nx/utils/move_only_func.h>
 #include <utils/common/stoppable.h>
 
 
@@ -29,7 +30,10 @@ class MediatorProcess
     public QnStoppable
 {
 public:
-    MediatorProcess( int argc, char **argv );
+    MediatorProcess(int argc, char **argv);
+
+    void setOnStartedEventHandler(
+        nx::utils::MoveOnlyFunc<void(bool /*result*/)> handler);
 
     //!Implementation of QnStoppable::pleaseStop
     virtual void pleaseStop() override;
@@ -43,6 +47,7 @@ private:
     std::unique_ptr<QSettings> m_settings;
     int m_argc;
     char** m_argv;
+    nx::utils::MoveOnlyFunc<void(bool /*result*/)> m_startedEventHandler;
 
     QString getDataDirectory();
     int printHelp();
