@@ -10,6 +10,8 @@ angular.module('webadminApp')
                     return;
                 }
 
+
+
                 var formName = element.attr('ng-form') || element.closest('form').attr('name');
                 var fieldName = input.attr('name');
 
@@ -21,6 +23,8 @@ angular.module('webadminApp')
                 });
 
                 function updateValidity(){
+
+                    console.log(input);
                     var touched = scope[formName][fieldName].$touched;
                     var valid = scope[formName][fieldName].$valid;
                     if(!touched){

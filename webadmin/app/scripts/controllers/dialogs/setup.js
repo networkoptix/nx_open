@@ -2,10 +2,10 @@
 
 angular.module('webadminApp')
     .controller('SetupCtrl', function ($scope, mediaserver, cloudAPI, $location) {
-
         /*
             This is kind of universal wizard controller.
         */
+
         // Common model
         $scope.settings = {
             systemName: '',
@@ -27,43 +27,8 @@ angular.module('webadminApp')
         var nativeClientObject = typeof(setupDialog)=='undefined'?null:setupDialog; // Qt registered object
         var debugMode = !!nativeClientObject;
 
-        $scope.stepIs = function(step){
-            return $scope.step == step;
-        };
-        $scope.finish = function(){
-            $scope.next('start');
-            if(nativeClientObject) {
-                window.close();
-            }else{
-                $location.path('/settings');
-                window.location.reload();
-            }
-        };
-        $scope.back = function(){
-            $scope.next($scope.activeStep.back);
-        };
-        $scope.next = function(target){
-            if(!target) {
-                var activeStep = $scope.activeStep || $scope.wizardFlow[0];
-                target = activeStep.next || activeStep.finish;
-            }
-            if($.isFunction(target)){
-                return target();
-            }
-            $scope.step = target;
-            $scope.activeStep = $scope.wizardFlow[target];
-            if($scope.activeStep.onShow){
-                $scope.activeStep.onShow();
-            }
-        };
 
-        $scope.cantGoNext = function(){
-            if($scope.activeStep.valid){
-                return !$scope.activeStep.valid();
-            }
-            return false;
-        };
-
+        /* Fucntions for external calls (open links) */
         $scope.createAccount = function(event){
             if(nativeClientObject) {
                 nativeClientObject.openUrlInBrowser(Config.cloud.portalRegisterUrl);
@@ -72,7 +37,6 @@ angular.module('webadminApp')
             }
             $scope.next('cloudLogin');
         };
-
         $scope.portalUrl = Config.cloud.portalUrl;
         $scope.learnMore = function($event){
             if(nativeClientObject) {
@@ -82,6 +46,7 @@ angular.module('webadminApp')
         };
 
 
+        /* Common helpers: error handling, check current system, error handler */
         function checkMySystem(){
             mediaserver.getSettings().then(function (r) {
                 $scope.serverInfo = r.data.reply;
@@ -102,6 +67,7 @@ angular.module('webadminApp')
                 });
         }
 
+
         /* Connect to another server section */
         function discoverSystems() {
             mediaserver.discoveredPeers().then(function (r) {
@@ -119,12 +85,14 @@ angular.module('webadminApp')
                     return system;
                 });
 
+                systems = _.sortBy(systems,function(system){
+                    return system.visibleName;
+                });
                 $scope.discoveredUrls = _.filter(systems, function(module){
                     return module.systemName !== $scope.serverInfo.systemName;
                 });
             });
         }
-
 
         var lastList = [];
         var lastSearch = null;
@@ -230,11 +198,49 @@ angular.module('webadminApp')
             });
         }
 
+        /* Common wizard functions */
+        $scope.stepIs = function(step){
+            return $scope.step == step;
+        };
+        $scope.finish = function(){
+            $scope.next('start');
+            if(nativeClientObject) {
+                window.close();
+            }else{
+                $location.path('/settings');
+                window.location.reload();
+            }
+        };
+        $scope.back = function(){
+            $scope.next($scope.activeStep.back);
+        };
+        $scope.next = function(target){
+            if(!target) {
+                var activeStep = $scope.activeStep || $scope.wizardFlow[0];
+                target = activeStep.next || activeStep.finish;
+            }
+            if($.isFunction(target)){
+                return target();
+            }
+            $scope.step = target;
+            $scope.activeStep = $scope.wizardFlow[target];
+            if($scope.activeStep.onShow){
+                $scope.activeStep.onShow();
+            }
+        };
+        $scope.cantGoNext = function(){
+            if($scope.activeStep.valid){
+                return !$scope.activeStep.valid();
+            }
+            return false;
+        };
+
+        function required(val){
+            return val && (!val.trim || val.trim() != '');
+        }
+
 
         /* Wizard workflow */
-        function required(val){
-            return val && val.trim() != '';
-        }
 
         $scope.wizardFlow = {
             0:{
@@ -269,10 +275,11 @@ angular.module('webadminApp')
                 next: 'localLogin'
             },
             merge:{
+                back: 'systemName',
                 onShow: discoverSystems,
                 next: connectToAnotherSystem,
                 valid: function(){
-                    return $scope.settings.remoteSystem &&
+                    return required($scope.settings.remoteSystem) &&
                         required($scope.settings.remoteLogin) &&
                         required($scope.settings.remotePassword);
                 }
@@ -294,5 +301,8 @@ angular.module('webadminApp')
             }
         };
         mediaserver.login(Config.defaultLogin,Config.defaultPassword);
+
+
+        /* initiate wizard */
         checkMySystem();
     });

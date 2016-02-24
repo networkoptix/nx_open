@@ -77,11 +77,12 @@
     <h2>Connect server to existing system</h2>
     <form class="master-controls" name="remoteSystemForm" disable-autocomplete>
 
-        <div class="form-group" >
-            <ui-select ng-model="settings.remoteSystem" reset-search-input="false">
-                <ui-select-match placeholder="Systems...">{{$select.selected.systemName}}</ui-select-match>
+        <div class="form-group">
+            <ui-select ng-model="settings.remoteSystem" reset-search-input="false" required autofocus>
+                <ui-select-match placeholder="Systems..."
+                                 name="remoteSystem">{{$select.selected.systemName}}</ui-select-match>
                 <ui-select-choices
-                        repeat="system as system in getSystems($select.search) | filter: { visibleName: $select.search} | limitTo: 8: 0">
+                        repeat="system as system in getSystems($select.search) | filter: { visibleName: $select.search}">
                     <div ng-bind-html="system.visibleName | highlight: $select.search"></div>
                 </ui-select-choices>
             </ui-select>

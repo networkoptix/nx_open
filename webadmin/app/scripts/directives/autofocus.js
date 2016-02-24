@@ -4,20 +4,10 @@ angular.module('webadminApp')
     .directive('autofocus', ['$timeout', function($timeout) {
         return {
             restrict: 'A',
-            scope:{
-                autofocus: '='
-            },
             link : function(scope, $element) {
-                function update() {
-                    if(typeof(scope.autofocus) === 'undefined' || scope.autofocus) {
-                        $timeout(function () {
-                            $element[0].focus();
-                        });
-                    }
-                }
-
-                scope.$watch('autofocus',update);
-                update();
+                $timeout(function () {
+                    $element[0].focus();
+                });
             }
         };
     }]).directive('enterButton', function() {

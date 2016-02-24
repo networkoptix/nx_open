@@ -56,13 +56,25 @@
   text-align: left;
 }
 
-.ui-select-bootstrap > .btn-default-focus,
+.ui-select-bootstrap > .btn-default-focus > .btn,
 .ui-select-bootstrap > .ui-select-match > .btn{
   background-color: $input-bg;
   border-color: $input-border;
   color: $input-color;
+  font-weight: normal;
 }
 .ui-select-bootstrap .ui-select-choices-row>a{
   padding-left: 7px;
   padding-right: 7px;
+}
+
+
+/* touched, invalid - highlight with red */
+.ui-select-container.ng-invalid.ng-touched .btn{
+  border-color: $state-danger-text;
+}
+
+/* touched, but focused - not highlight with red */
+.ui-select-container > .btn-default-focus > .btn{
+  border-color: $input-border !important;
 }
