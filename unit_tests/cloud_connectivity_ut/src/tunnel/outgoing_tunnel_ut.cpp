@@ -47,7 +47,7 @@ public:
     }
 
     virtual void establishNewConnection(
-        boost::optional<std::chrono::milliseconds> /*timeout*/,
+        std::chrono::milliseconds /*timeout*/,
         SocketAttributes /*socketAttributes*/,
         OnNewConnectionHandler handler) override
     {
@@ -113,13 +113,14 @@ public:
 
     DummyConnector(
         AddressEntry targetPeerAddress,
-        std::chrono::milliseconds connectTimeout)
+        std::chrono::milliseconds connectTimeout,
+        std::promise<void>* const canSucceedEvent = nullptr)
     :
         m_targetPeerAddress(std::move(targetPeerAddress)),
         m_connectSuccessfully(true),
         m_connectionShouldWorkFine(true),
         m_singleShotConnection(false),
-        m_canSucceedEvent(nullptr),
+        m_canSucceedEvent(canSucceedEvent),
         m_connectTimeout(std::move(connectTimeout))
     {
         ++instanceCount;
@@ -140,7 +141,7 @@ public:
         return 0;
     }
     virtual void connect(
-        std::chrono::milliseconds timeout,
+        std::chrono::milliseconds /*timeout*/,
         nx::utils::MoveOnlyFunc<void(
             SystemError::ErrorCode errorCode,
             std::unique_ptr<AbstractOutgoingTunnelConnection>)> handler) override
@@ -210,6 +211,13 @@ public:
     typedef std::promise<std::pair<
         SystemError::ErrorCode,
         std::unique_ptr<AbstractStreamSocket >> > ConnectionCompletedPromise;
+
+    struct ConnectionContext
+    {
+        ConnectionCompletedPromise completionPromise;
+        std::chrono::steady_clock::time_point startTime;
+        std::chrono::steady_clock::time_point endTime;
+    };
 
     OutgoingTunnelTest()
     {
@@ -492,58 +500,73 @@ TEST_F(OutgoingTunnelTest, connectTimeout)
     const bool singleShotConnection = false;
     const bool connectionWillSucceedValues[1] = { true };
     const auto connectorTimeout = std::chrono::seconds(7);
-    const int connectionsToCreate = 10;
+    const int connectionsToCreate = 70;
 
-    for (const bool connectionWillSucceed : connectionWillSucceedValues)
-    {
-        AddressEntry addressEntry("nx_test.com:12345");
-        OutgoingTunnel tunnel(std::move(addressEntry));
+    for (int i = 0; i < 5; ++i)
+        for (const bool connectionWillSucceed : connectionWillSucceedValues)
+        {
+            AddressEntry addressEntry("nx_test.com:12345");
+            OutgoingTunnel tunnel(std::move(addressEntry));
 
-        setConnectorFactoryFunc(
-            [connectorTimeout](const AddressEntry& targetAddress) -> 
-                ConnectorFactory::CloudConnectors
-            {
-                ConnectorFactory::CloudConnectors connectors;
-                connectors.emplace(
-                    CloudConnectType::udtHp,
-                    std::make_unique<DummyConnector>(
-                        targetAddress,
-                        connectorTimeout));
-                return connectors;
-            });
+            std::promise<void> doConnectEvent;
 
-        const std::chrono::milliseconds timeout = std::chrono::seconds(2);
-        const std::chrono::milliseconds timeoutCorrection = timeout / 5;
-
-        std::vector<ConnectionCompletedPromise> connectedPromises;
-        connectedPromises.resize(connectionsToCreate);
-        for (auto& connectedPromise: connectedPromises)
-            tunnel.establishNewConnection(
-                timeout,
-                SocketAttributes(),
-                [&connectedPromise](
-                    SystemError::ErrorCode errorCode,
-                    std::unique_ptr<AbstractStreamSocket> socket)
+            setConnectorFactoryFunc(
+                [connectorTimeout, &doConnectEvent](const AddressEntry& targetAddress) ->
+                    ConnectorFactory::CloudConnectors
                 {
-                    connectedPromise.set_value(std::make_pair(errorCode, std::move(socket)));
+                    ConnectorFactory::CloudConnectors connectors;
+                    connectors.emplace(
+                        CloudConnectType::udtHp,
+                        std::make_unique<DummyConnector>(
+                            targetAddress,
+                            connectorTimeout,
+                            (rand() & 1) ? &doConnectEvent : nullptr));
+                    return connectors;
                 });
 
-        const auto timeBefore = std::chrono::steady_clock::now();
+            const std::chrono::milliseconds timeout(1 + (rand() % 2000));
+            const std::chrono::milliseconds minTimeoutCorrection(500);
+            const std::chrono::milliseconds timeoutCorrection =
+                (timeout / 5) > minTimeoutCorrection
+                ? (timeout / 5)
+                : minTimeoutCorrection;
 
-        for (auto& connectedPromise : connectedPromises)
-        {
-            const auto result = connectedPromise.get_future().get();
-            const auto timeAfter = std::chrono::steady_clock::now();
+            std::vector<ConnectionContext> connectedPromises;
+            connectedPromises.resize(connectionsToCreate);
+            for (auto& connectionContext: connectedPromises)
+            {
+                std::this_thread::sleep_for(std::chrono::microseconds(rand() & 0xffff));
+                connectionContext.startTime = std::chrono::steady_clock::now();
+                tunnel.establishNewConnection(
+                    timeout,
+                    SocketAttributes(),
+                    [&connectionContext](
+                        SystemError::ErrorCode errorCode,
+                        std::unique_ptr<AbstractStreamSocket> socket)
+                    {
+                        connectionContext.endTime = std::chrono::steady_clock::now();
+                        connectionContext.completionPromise.set_value(
+                            std::make_pair(errorCode, std::move(socket)));
+                    });
+            }
 
-            ASSERT_EQ(SystemError::timedOut, result.first);
-            ASSERT_EQ(nullptr, result.second);
-            ASSERT_TRUE(
-                (timeAfter - timeBefore > (timeout - timeoutCorrection)) &&
-                (timeAfter - timeBefore < (timeout + timeoutCorrection)));
+            //signalling connector to succeed
+            doConnectEvent.set_value();
+
+            for (auto& connectionContext : connectedPromises)
+            {
+                const auto result = connectionContext.completionPromise.get_future().get();
+                const auto actualTimeout = connectionContext.endTime - connectionContext.startTime;
+
+                ASSERT_EQ(SystemError::timedOut, result.first);
+                ASSERT_EQ(nullptr, result.second);
+                ASSERT_TRUE(
+                    (actualTimeout > (timeout - timeoutCorrection)) &&
+                    (actualTimeout < (timeout + timeoutCorrection)));
+            }
+
+            tunnel.pleaseStopSync();
         }
-
-        tunnel.pleaseStopSync();
-    }
 }
 
 } // namespace cloud

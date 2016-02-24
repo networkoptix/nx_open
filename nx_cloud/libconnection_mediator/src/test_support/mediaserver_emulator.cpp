@@ -84,6 +84,11 @@ nx::String MediaServerEmulator::serverId() const
     return m_serverId;
 }
 
+nx::String MediaServerEmulator::fullName() const
+{
+    return m_serverId + "." + m_systemData.id;
+}
+
 SocketAddress MediaServerEmulator::endpoint() const
 {
     return m_httpServer.address();
