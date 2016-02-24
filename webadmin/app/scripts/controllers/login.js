@@ -1,5 +1,5 @@
 'use strict';
-/*global md5, Base64 */
+
 angular.module('webadminApp')
     .controller('LoginCtrl', function ($scope, mediaserver, ipCookie,$sessionStorage) {
 

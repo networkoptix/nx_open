@@ -1,4 +1,5 @@
 
+
 <div class="panel-body text-center" ng-if="stepIs('start')">
     <div class="vertical-center">
         <h2>Welcome to Nx Witness.</h2>
@@ -14,8 +15,9 @@
         your system.
     </p>
     <form class="master-controls" name="systemNameForm">
-        <div  class="form-group" validate-field>
-            <input ng-model="settings.systemName" name="systemName" type="text" class="form-control" placeholder="System name" required autofocus>
+        <div class="form-group" validate-field>
+            <input ng-model="settings.systemName" name="systemName" type="text" class="form-control"
+                   placeholder="System name" required autofocus>
         </div>
     </form>
     <p class="vertical-bottom">
@@ -26,7 +28,7 @@
 <div class="panel-body text-center" ng-if="stepIs('cloudIntro')">
     <h2>Connect to <span class="product-name">Nx Cloud</span></h2>
     <p class="master-description">
-        Cloud account allows you to access to your system from<br>
+       cloud account allows you to access to your system from<br>
         everywhere, if it has internet connection.<br>
     </p>
     <p class="master-controls">
@@ -34,66 +36,67 @@
         <button class="btn btn-default" ng-click="next('cloudLogin')">Use existing</button>
     </p>
     <p class="vertical-bottom">
-        <a ng-href="{{portalUrl}}" target="_blank" ng-click="learnMore($event)">Learn more about <span class="product-name">Nx Cloud</span>?</a><br><br>
+        <a ng-href="{{portalUrl}}" target="_blank" ng-click="learnMore($event)">Learn more about
+            <span class="product-name">Nx Cloud</span>?</a><br><br>
         <a href="" ng-click="next('localLogin')">Do not connect to internet now</a>
     </p>
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('cloudLogin')">
     <h2>Connect to <span class="product-name">Nx Cloud</span></h2>
-    <form class="master-controls">
-        <div  class="form-group" validate-field>
-            <input ng-model="settings.cloudEmail" name="cloudEmail" class="form-control" type="email" placeholder="Email" required autofocus>
+    <form class="master-controls" disable-autocomplete>
+        <div class="form-group" validate-field>
+            <input ng-model="settings.cloudEmail" name="cloudEmail" class="form-control"
+                   type="email" placeholder="Email" required autofocus>
         </div>
-        <div  class="form-group" validate-field>
-            <input ng-model="settings.cloudPassword" name="cloudPassword" class="form-control" type="password" required placeholder="Password">
+        <div class="form-group" validate-field>
+            <input ng-model="settings.cloudPassword" name="cloudPassword" class="form-control"
+                   type="password" required placeholder="Password">
         </div>
     </form>
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('localLogin')">
     <h2>Create administrator user</h2>
-    <form class="master-controls">
-        <div  class="form-group" validate-field>
-            <input ng-model="settings.localLogin" name="localLogin" class="form-control" type="text" placeholder="Login" required readonly>
+    <form class="master-controls" disable-autocomplete>
+        <div class="form-group" validate-field>
+            <input ng-model="settings.localLogin" name="localLogin" class="form-control"
+                   type="text" placeholder="Login" required readonly>
         </div>
-        <div  class="form-group" validate-field>
-            <input ng-model="settings.localPassword" name="localPassword" class="form-control" type="password" placeholder="Password" required autofocus></div>
-        <div  class="form-group" validate-field>
-            <input ng-model="settings.localPasswordConfirm" name="localPasswordConfirm" class="form-control" type="password" placeholder="Repeat password" required>
+        <div class="form-group" validate-field>
+            <input ng-model="settings.localPassword" name="localPassword" class="form-control"
+                   type="password" placeholder="Password" required autofocus></div>
+        <div class="form-group" validate-field>
+            <input ng-model="settings.localPasswordConfirm" name="localPasswordConfirm" class="form-control"
+                   type="password" placeholder="Repeat password" required>
         </div>
     </form>
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('merge')">
     <h2>Connect server to existing system</h2>
-    <form class="master-controls" name="remoteSystemForm">
+    <form class="master-controls" name="remoteSystemForm" disable-autocomplete>
 
-        <div  class="form-group" validate-field>
-            <div class="input-group" dropdown>
-                <input ng-model="settings.remoteSystem" name="remoteSystem" ng-change="findSystem" type="text" class="form-control"
-                       id="otherSystemUrl" placeholder="http(s)://host:port" required autofocus/>
+        <div class="form-group" >
+            <ui-select ng-model="settings.remoteSystem" reset-search-input="false">
+                <ui-select-match placeholder="Systems...">{{$select.selected.systemName}}</ui-select-match>
+                <ui-select-choices
+                        repeat="system as system in getSystems($select.search) | filter: { visibleName: $select.search} | limitTo: 8: 0">
+                    <div ng-bind-html="system.visibleName | highlight: $select.search"></div>
+                </ui-select-choices>
+            </ui-select>
 
-                <ul class="dropdown-menu" role="menu" id="discoveredUrls">
-                    <li ng-if="discoveredUrls.length == 0" id="no-systems-message"><a>No systems found</a></li>
-                    <li ng-repeat="system in discoveredUrls">
-                        <a ng-click="selectSystem(system);">{{system.systemName}} ({{system.ip}} - {{system.name}})</a>
-                    </li>
-                </ul>
-
-                <span type="button" class="input-group-addon dropdown-toggle">
-                    <span class="caret"></span>
-                </span>
-            </div>
             <p class="help-block text-left">
-                {{settings.remoteSystemHint}}
+                {{settings.remoteSystem.hint}}
             </p>
         </div>
-        <div  class="form-group" validate-field>
-            <input ng-model="settings.remoteLogin" name="remoteLogin" class="form-control" type="text" placeholder="Login" required>
+        <div class="form-group" validate-field>
+            <input ng-model="settings.remoteLogin" name="remoteLogin" class="form-control" type="text"
+                   placeholder="Login" required>
         </div>
-        <div  class="form-group" validate-field>
-            <input ng-model="settings.remotePassword" name="remotePassword" class="form-control" type="password" placeholder="Password" required>
+        <div class="form-group" validate-field>
+            <input ng-model="settings.remotePassword" name="remotePassword" class="form-control" type="password"
+                   placeholder="Password" required>
         </div>
     </form>
 </div>

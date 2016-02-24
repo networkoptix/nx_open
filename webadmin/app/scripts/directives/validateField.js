@@ -4,7 +4,7 @@ angular.module('webadminApp')
     .directive('validateField', function () {
         return{
             restrict:'A',
-            link:function(scope, element, attrs) {
+            link:function(scope, element/*, attrs*/) {
                 var input = element.find('input,textarea');
                 if(!input.get(0)){ // No input inside - do nothing, just ignore directive
                     return;
@@ -14,9 +14,6 @@ angular.module('webadminApp')
                 var fieldName = input.attr('name');
 
                 var scopeName = formName + '.' + fieldName;
-
-                scope.$watch(scopeName + '.$valid',updateValidity);
-                scope.$watch(scopeName + '.$touched',updateValidity);
 
                 input.on('focus',function(){
                     scope[formName][fieldName].$setUntouched();
@@ -37,7 +34,11 @@ angular.module('webadminApp')
 
                     element.addClass('has-error');
                 }
+
+                scope.$watch(scopeName + '.$valid',updateValidity);
+                scope.$watch(scopeName + '.$touched',updateValidity);
+
                 updateValidity();
             }
-        }
+        };
     });

@@ -6,6 +6,7 @@ angular.module('webadminApp', [
     'ngSanitize',
     'ngRoute',
     'ui.bootstrap',
+    'ui.select',
     'ngStorage'
 ]).config(function ($routeProvider) {
     $routeProvider

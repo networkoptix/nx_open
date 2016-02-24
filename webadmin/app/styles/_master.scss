@@ -51,3 +51,18 @@
   height:70px;
   font-size: 80px;
 }
+
+.master .dropdown{
+  text-align: left;
+}
+
+.ui-select-bootstrap > .btn-default-focus,
+.ui-select-bootstrap > .ui-select-match > .btn{
+  background-color: $input-bg;
+  border-color: $input-border;
+  color: $input-color;
+}
+.ui-select-bootstrap .ui-select-choices-row>a{
+  padding-left: 7px;
+  padding-right: 7px;
+}

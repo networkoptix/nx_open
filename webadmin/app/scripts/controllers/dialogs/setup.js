@@ -107,32 +107,60 @@ angular.module('webadminApp')
             mediaserver.discoveredPeers().then(function (r) {
                 var systems = _.map(r.data.reply, function(module)
                 {
-                    return {
+                    var system = {
                         url: module.remoteAddresses[0] + ':' + module.port,
                         systemName: module.systemName,
                         ip: module.remoteAddresses[0],
                         name: module.name
                     };
+
+                    system.visibleName = system.systemName + ' (' + system.url + ' - ' + system.name + ')';
+                    system.hint = system.url + ' (' + system.name + ')';
+                    return system;
                 });
 
-                console.log(r.data.reply, systems);
-
-                $scope.discoveredUrls = systems;
-                _.filter(systems, function(module){
+                $scope.discoveredUrls = _.filter(systems, function(module){
                     return module.systemName !== $scope.serverInfo.systemName;
                 });
             });
         }
 
-        $scope.selectSystem = function (system){
-            $scope.settings.remoteSystem = system.systemName;
-            $scope.settings.remoteSystemHint = system.url + ' (' + system.name + ')';
-            $scope.settings.selectedSystem = system;
-        };
 
-        $scope.findSystem = function(){
-            $scope.settings.selectedSystem = null;
-            $scope.settings.remoteSystemHint = '';
+        var lastList = [];
+        var lastSearch = null;
+        $scope.getSystems = function(search){
+
+            if(search == lastSearch){
+                return lastList;
+            }
+            if(!search) {
+                return $scope.discoveredUrls;
+            }
+
+            var systems = $scope.discoveredUrls;
+
+            if(lastSearch){
+                systems.shift();
+            }
+
+            var oldSystem = _.find($scope.discoveredUrls,function(system){
+                return system.visibleName == search;
+            });
+
+            if(!oldSystem) {
+                systems.unshift({
+                    url: search,
+                    systemName: search,
+                    visibleName: search,
+                    hint: search,
+                    ip: search,
+                    name: search
+                });
+            }
+
+            lastSearch = search;
+            lastList = systems;
+            return lastList;
         };
 
         function connectToAnotherSystem(){
@@ -142,10 +170,10 @@ angular.module('webadminApp')
                 return;
             }
             mediaserver.mergeSystems(
-                $scope.settings.selectedSystem.url,
+                $scope.settings.remoteSystem.url,
                 $scope.settings.remoteLogin,
                 $scope.settings.remotePassword,
-                Config.defaultLogin,
+                Config.defaultPassword,
                 false
             ).then(function(r){
                 if(r.data.error!=='0') {
@@ -244,7 +272,7 @@ angular.module('webadminApp')
                 onShow: discoverSystems,
                 next: connectToAnotherSystem,
                 valid: function(){
-                    return required($scope.settings.remoteSystem) &&
+                    return $scope.settings.remoteSystem &&
                         required($scope.settings.remoteLogin) &&
                         required($scope.settings.remotePassword);
                 }

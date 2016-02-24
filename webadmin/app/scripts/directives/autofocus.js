@@ -19,7 +19,7 @@ angular.module('webadminApp')
                 scope.$watch('autofocus',update);
                 update();
             }
-        }
+        };
     }]).directive('enterButton', function() {
         return {
             restrict: 'A',
@@ -27,7 +27,7 @@ angular.module('webadminApp')
                 var $body = $('body');
 
                 function keyHandler(event){
-                    if(event.keyCode == 13){
+                    if(event.keyCode === 13){
                         if($element.is(':disabled')){
                             return false;
                         }
@@ -41,5 +41,5 @@ angular.module('webadminApp')
                     $body.unbind('keyup.enter');
                 });
             }
-        }
+        };
     });
