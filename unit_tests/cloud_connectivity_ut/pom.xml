@@ -17,6 +17,7 @@
     <name>cloud_connectivity unit tests</name>
 
     <properties>
+        <guid>${cloud_connectivity_ut.guid}</guid>
         <product.title>cloud_connectivity unit tests</product.title>
         <!--Global libs-->
         <qt.libs>core network concurrent xml xmlpatterns sql multimedia</qt.libs>

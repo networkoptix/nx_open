@@ -61,9 +61,10 @@
         <ftpstorageplugin.guid>{f6c9f457-910c-4c0d-bb67-b4f752a8664e}</ftpstorageplugin.guid>
         <storage_plugin_test_client.guid>{83e8bbad-6976-45da-bdd7-baf8f17fc71c}</storage_plugin_test_client.guid>
         <common_ut.guid>{2f2d9175-70c1-404d-82e3-5e797b92263c}</common_ut.guid>
+        <cloud_connectivity_ut.guid>{2f2d9175-70c1-404d-82e3-5e797b92263c}</cloud_connectivity_ut.guid>
         <libcloud_db.guid>{BBA5BB95-B669-42C4-8074-EE0E361C094E}></libcloud_db.guid>
         <cloud_db.guid>{44ADCF67-21B0-403D-A771-C138B11CDB83}></cloud_db.guid>
-        <connection_mediator.guid>{B16E0ED9-9ED1-48DB-B85E-D285838340BB}</connection_mediator.guid>
+        <connection_mediator.guid>{f568398b-8ca3-44cc-9707-d1f63b2aa1c6}</connection_mediator.guid>
         <libconnection_mediator.guid>{109DCEE1-AADA-4C88-9FE4-8521525EF7FF}</libconnection_mediator.guid>
 
         <!-- Components' Naming -->
