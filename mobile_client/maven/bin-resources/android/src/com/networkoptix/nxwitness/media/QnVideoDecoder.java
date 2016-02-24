@@ -139,10 +139,8 @@ public class QnVideoDecoder
             int inputBufferId = codec.dequeueInputBuffer(timeoutUs);
             if (inputBufferId >= 0)
             {
-              //ByteBuffer inputBuffer = codec.getInputBuffer(inputBufferId);
               ByteBuffer inputBuffer = inputBuffers[inputBufferId];
-              inputBuffer.allocateDirect(frameSize);
-              fillInputBuffer(inputBuffer, srcDataPtr, frameSize); //< C++ callback
+              fillInputBuffer(inputBuffer, srcDataPtr, frameSize, inputBuffer.capacity()); //< C++ callback
               codec.queueInputBuffer(inputBufferId, 0, frameSize, frameNum, 0);
             }
             else {
@@ -240,7 +238,7 @@ public class QnVideoDecoder
         }
     }
 
-    private static native void fillInputBuffer(ByteBuffer buffer,  long srcDataPtr, int frameSize);
+    private static native void fillInputBuffer(ByteBuffer buffer,  long srcDataPtr, int frameSize, int capacity);
     ByteBuffer[] inputBuffers;
     private MediaCodec codec;
     private MediaFormat format;

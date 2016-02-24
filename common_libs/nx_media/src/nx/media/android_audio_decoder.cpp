@@ -46,7 +46,7 @@ namespace {
         }
     }
 
-    void fillInputBuffer(JNIEnv *env, jobject thiz, jobject buffer, jlong srcDataPtr, jint dataSize);
+    void fillInputBuffer(JNIEnv *env, jobject thiz, jobject buffer, jlong srcDataPtr, jint dataSize, jint capacity);
     void readOutputBuffer(JNIEnv *env, jobject thiz, jlong cObject, jobject buffer, jint bufferSize);
 }
 
@@ -61,7 +61,6 @@ class AndroidAudioDecoderPrivate: public QObject
     AndroidAudioDecoder *q_ptr;
 public:
     AndroidAudioDecoderPrivate():
-        magic(1234567),
         initialized(false),
         javaDecoder("com/networkoptix/nxwitness/media/QnAudioDecoder")
     {
@@ -78,7 +77,7 @@ public:
         using namespace std::placeholders;
 
         JNINativeMethod methods[] {
-            {"fillInputBuffer", "(Ljava/nio/ByteBuffer;JI)V", reinterpret_cast<void *>(nx::media::fillInputBuffer)},
+            {"fillInputBuffer", "(Ljava/nio/ByteBuffer;JII)V", reinterpret_cast<void *>(nx::media::fillInputBuffer)},
             { "readOutputBuffer", "(JLjava/nio/ByteBuffer;I)V", reinterpret_cast<void *>(nx::media::readOutputBuffer) }
         };
 
@@ -98,7 +97,6 @@ public:
     }
 
 private:
-    int magic;
     bool initialized;
     QAndroidJniObject javaDecoder;
     AudioFramePtr audioFrame;
@@ -106,12 +104,14 @@ private:
 
 namespace {
 
-void fillInputBuffer(JNIEnv *env, jobject thiz, jobject buffer, jlong srcDataPtr, jint dataSize)
+void fillInputBuffer(JNIEnv *env, jobject thiz, jobject buffer, jlong srcDataPtr, jint dataSize, jint capacity)
 {
     Q_UNUSED(thiz);
     void* bytes = env->GetDirectBufferAddress(buffer);
     void* srcData = (void*)srcDataPtr;
-    memcpy(bytes, srcData, dataSize);
+    if (capacity < dataSize)
+        qWarning() << "fillInputBuffer: capacity less then dataSize." << capacity << "<" << dataSize;
+    memcpy(bytes, srcData, qMin(capacity, dataSize));
 }
 
 void readOutputBuffer(JNIEnv *env, jobject thiz, jlong cObject, jobject buffer, jint bufferSize)

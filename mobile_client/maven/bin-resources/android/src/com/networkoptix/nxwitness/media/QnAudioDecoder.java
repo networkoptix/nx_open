@@ -29,14 +29,14 @@ public class QnAudioDecoder
     {
         try
         {
-            System.out.println("Audio codecName=" + codecName);
+            System.out.println("Audio codecName=" + codecName + "sampleRate=" + sampleRate + "channels" + channelCount);
 
             format = MediaFormat.createAudioFormat(codecName, sampleRate, channelCount);
             if (extraDataSize > 0)
             {
                 System.out.println("Set Audio extraData. size=" + extraDataSize);
                 ByteBuffer extraDataBuffer = ByteBuffer.allocateDirect(extraDataSize);
-                fillInputBuffer(extraDataBuffer, extraDataPtr, extraDataSize); //< C++ callback
+                fillInputBuffer(extraDataBuffer, extraDataPtr, extraDataSize, extraDataBuffer.capacity()); //< C++ callback
                 format.setByteBuffer("csd-0", extraDataBuffer);
             }
 
@@ -80,8 +80,7 @@ public class QnAudioDecoder
             if (inputBufferId >= 0)
             {
               ByteBuffer inputBuffer = inputBuffers[inputBufferId];
-              inputBuffer.allocateDirect(frameSize);
-              fillInputBuffer(inputBuffer, srcDataPtr, frameSize); //< C++ callback
+              fillInputBuffer(inputBuffer, srcDataPtr, frameSize, inputBuffer.capacity()); //< C++ callback
               codec.queueInputBuffer(inputBufferId, 0, frameSize, timestampUs, 0);
             }
             else {
@@ -107,11 +106,10 @@ public class QnAudioDecoder
             default:
                 long outTimestampUs = info.presentationTimeUs;
                 ByteBuffer outputBuffer = outputBuffers[outputBufferId];
-                readOutputBuffer(cObject, outputBuffer, outputBuffer.capacity());
+                readOutputBuffer(cObject, outputBuffer, info.size);
                 codec.releaseOutputBuffer(outputBufferId, false);
                 return outTimestampUs;
             }
-
         }
         catch(IllegalStateException e)
         {
@@ -127,7 +125,7 @@ public class QnAudioDecoder
         }
     }
 
-    private static native void fillInputBuffer(ByteBuffer buffer,  long srcDataPtr, int frameSize);
+    private static native void fillInputBuffer(ByteBuffer buffer,  long srcDataPtr, int frameSize, int capacity);
     private static native void readOutputBuffer(long cObject, ByteBuffer buffer, int bufferSize);
 
     ByteBuffer[] inputBuffers;

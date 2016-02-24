@@ -60,11 +60,14 @@ namespace {
         }
     }
 
-    void fillInputBuffer(JNIEnv *env, jobject thiz, jobject buffer, jlong srcDataPtr, jint dataSize)
+    void fillInputBuffer(JNIEnv *env, jobject thiz, jobject buffer, jlong srcDataPtr, jint dataSize, jint capacity)
     {
+        Q_UNUSED(thiz);
         void* bytes = env->GetDirectBufferAddress(buffer);
         void* srcData = (void*) srcDataPtr;
-        memcpy(bytes, srcData, dataSize);
+        if (capacity < dataSize)
+            qWarning() << "fillInputBuffer: capacity less then dataSize." << capacity << "<" << dataSize;
+        memcpy(bytes, srcData, qMin(dataSize, capacity));
     }
 }
 
@@ -165,7 +168,7 @@ public:
         using namespace std::placeholders;
 
         JNINativeMethod methods[] {
-            {"fillInputBuffer", "(Ljava/nio/ByteBuffer;JI)V", reinterpret_cast<void *>(nx::media::fillInputBuffer)}
+            {"fillInputBuffer", "(Ljava/nio/ByteBuffer;JII)V", reinterpret_cast<void *>(nx::media::fillInputBuffer)}
         };
 
         QAndroidJniEnvironment env;
