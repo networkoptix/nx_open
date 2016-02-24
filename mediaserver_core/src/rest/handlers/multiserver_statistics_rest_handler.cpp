@@ -208,6 +208,21 @@ nx_http::StatusCode::Value SettingsActionHandler::loadSettingsLocally(QnStatisti
             ? kSettingsUrl : localSettingsUrl);
     }();
 
+    typedef QScopedPointer<QnStatisticsSettings> SettingsPtr;
+    static SettingsPtr settingsCache;
+    static QElapsedTimer outdateTimer;
+
+    if (!outdateTimer.isValid())
+        outdateTimer.start();
+
+    enum { kMinSettingsUpdateTime = 4 * 60 * 60 * 1000 }; // every 4 hours
+    if (!outdateTimer.hasExpired(kMinSettingsUpdateTime) && settingsCache)
+    {
+        outputSettings = *settingsCache;
+        return nx_http::StatusCode::ok;
+    };
+
+    settingsCache.reset();
     nx_http::BufferType buffer;
     int statusCode = nx_http::StatusCode::noContent;
     if (nx_http::downloadFileSync(settingsUrl, &statusCode, &buffer) != SystemError::noError)
@@ -216,6 +231,8 @@ nx_http::StatusCode::Value SettingsActionHandler::loadSettingsLocally(QnStatisti
     if (!QJson::deserialize(buffer, &outputSettings))
         return nx_http::StatusCode::internalServerError;
 
+    outdateTimer.restart();
+    settingsCache.reset(new QnStatisticsSettings(outputSettings));
     return nx_http::StatusCode::ok;
 }
 

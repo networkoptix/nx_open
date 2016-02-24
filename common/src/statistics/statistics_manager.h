@@ -52,6 +52,9 @@ private:
 private:
     typedef QPointer<QnAbstractStatisticsModule> ModulePtr;
     typedef QHash<QString, ModulePtr> ModulesMap;
+    typedef QScopedPointer<QTimer> TimerPtr;
+
+    TimerPtr m_updateSettingsTimer;
 
     QnUuid m_clientId;
 
