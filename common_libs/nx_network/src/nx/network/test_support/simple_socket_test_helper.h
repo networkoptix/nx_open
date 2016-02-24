@@ -202,6 +202,77 @@ void socketSimpleAsync(
 }
 
 template<typename ServerSocketMaker, typename ClientSocketMaker>
+    void socketMultiConnect(
+        const ServerSocketMaker& serverMaker,
+        const ClientSocketMaker& clientMaker,
+        const SocketAddress& endpoint = kServerAddress,
+        int clientCount = kClientCount)
+{
+    static const std::chrono::milliseconds timeout(500);
+
+    nx::SyncQueue< SystemError::ErrorCode > acceptResults;
+    nx::SyncQueue< SystemError::ErrorCode > connectResults;
+
+    std::vector<std::unique_ptr<AbstractStreamSocket>> acceptedSockets;
+    std::vector<std::unique_ptr<AbstractStreamSocket>> connectedSockets;
+
+    auto server = serverMaker();
+    ASSERT_TRUE(server->setNonBlockingMode(true));
+    ASSERT_TRUE(server->setReuseAddrFlag(true));
+    ASSERT_TRUE(server->setRecvTimeout(timeout.count()));
+    ASSERT_TRUE(server->bind(endpoint)) << SystemError::getLastOSErrorText().toStdString();
+    ASSERT_TRUE(server->listen(clientCount)) << SystemError::getLastOSErrorText().toStdString();
+
+    std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)> acceptor = 
+        [&](SystemError::ErrorCode code, AbstractStreamSocket* socket)
+        {
+            acceptResults.push(code);
+            if (code != SystemError::noError)
+                return;
+
+            acceptedSockets.emplace_back(socket);
+            server->acceptAsync(acceptor);
+        };
+
+    server->acceptAsync(acceptor);
+    std::this_thread::sleep_for(std::chrono::milliseconds(50)); // for UDT only
+
+    std::function<void(int)> connectNewClients =
+        [&](int clientsToConnect)
+        {
+            if (clientsToConnect == 0)
+                return;
+
+            auto testClient = clientMaker();
+            ASSERT_TRUE(testClient->setNonBlockingMode(true));
+            ASSERT_TRUE(testClient->setSendTimeout(timeout.count()));
+
+            connectedSockets.push_back(std::move(testClient));
+            connectedSockets.back()->connectAsync(
+                endpoint, 
+                [&, clientsToConnect, connectNewClients]
+                    (SystemError::ErrorCode code)
+                {
+                    connectResults.push(code);
+                    if (code == SystemError::noError)
+                        connectNewClients(clientsToConnect - 1);
+                });
+        };
+
+    connectNewClients(clientCount);
+
+    for (int i = 0; i < clientCount; ++i)
+    {
+        ASSERT_EQ(acceptResults.pop(), SystemError::noError);
+        ASSERT_EQ(connectResults.pop(), SystemError::noError);
+    }
+
+    server->pleaseStopSync();
+    for (auto& socket : connectedSockets)
+        socket->pleaseStopSync();
+}
+
+template<typename ServerSocketMaker, typename ClientSocketMaker>
 void shutdownSocket(
     const ServerSocketMaker& serverMaker,
     const ClientSocketMaker& clientMaker,
@@ -433,6 +504,8 @@ void socketAcceptTimeoutAsync(
         { nx::network::test::socketSimpleAsync(mkServer, mkClient); }           \
     Type(Name, SimpleTrueAsync)                                                 \
         { nx::network::test::socketSimpleTrueAsync(mkServer, mkClient); }       \
+    Type(Name, SimpleMultiConnect)                                              \
+        { nx::network::test::socketMultiConnect(mkServer, mkClient); }          \
 
 #define NX_NETWORK_CLIENT_SOCKET_TEST_CASE(Type, Name, mkServer, mkClient)  \
     NX_NETWORK_CLIENT_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient)     \

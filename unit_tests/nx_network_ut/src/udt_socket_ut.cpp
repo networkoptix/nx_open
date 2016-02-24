@@ -161,7 +161,7 @@ TEST(SocketUdt_UdtPollSet, general)
 }
 
 NX_NETWORK_BOTH_SOCKETS_TEST_CASE(
-    TEST, SocketUdt,
+    TEST, SocketUdt_Simple,
     &std::make_unique<UdtStreamServerSocket>,
     &std::make_unique<UdtStreamSocket>)
 
