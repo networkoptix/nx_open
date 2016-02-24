@@ -19,7 +19,7 @@ QDataStream &operator << (QDataStream &stream, const CameraOperation &cameraOp)
 template<typename StructToWrite>
 QDataStream &operator << (QDataStream &stream, const StructToWrite &s)
 {
-    return stream << s.part_1<< s.part_2;
+    return stream << s.part_1 << s.part_2;
 }
 
 class RecordVisitor : public boost::static_visitor<>
@@ -52,11 +52,22 @@ DbHelper::~DbHelper()
     stopWriter();
 }
 
+QIODevice *DbHelper::getDevice() const
+{
+    std::lock_guard<std::mutex> lk(m_mutex);
+    return m_device;
+}
+
+void DbHelper::setDevice(QIODevice *device)
+{
+    std::lock_guard<std::mutex> lk(m_mutex);
+    m_device = device;
+    m_stream.setDevice(m_device);
+    m_stream.resetStatus();
+}
+
 Error DbHelper::getError() const
 {
-    if (m_stream.atEnd())
-        return Error::Eof;
-
     switch (m_stream.status())
     {
     case QDataStream::Status::ReadCorruptData:
@@ -65,6 +76,9 @@ Error DbHelper::getError() const
     case QDataStream::Status::WriteFailed:
         return Error::WriteError;
     }
+
+    if (m_stream.atEnd())
+        return Error::Eof;
 
     return Error::NoError;
 }
@@ -101,7 +115,10 @@ Error DbHelper::readRecord()
         return Error::WrongMode;
     RecordBase rb;
     m_stream >> rb.part_1;
-    Error error;
+
+    Error error = getError();
+    if (error != Error::NoError)
+        m_handler->handleError(error);
 
     switch (rb.getRecordType())
     {

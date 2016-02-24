@@ -133,6 +133,8 @@ public:
     DbHelper(QIODevice *device, DbHelperHandler *const handler);
     ~DbHelper();
 
+    DbHelper& operator = (DbHelper&& other) = default;
+
     Error readFileHeader(uint8_t *dbVersion);
     Error writeFileHeader(uint8_t dbVersion);
 
@@ -143,6 +145,9 @@ public:
 
     void setMode(Mode mode);
     Mode getMode() const;
+
+    QIODevice *getDevice() const;
+    void setDevice(QIODevice *device);
 
 private:
     void startWriter();

@@ -199,19 +199,24 @@ public:
     void handleCameraOp(const nx::media_db::CameraOperation &cameraOp, 
                         nx::media_db::Error error) override
     {
+        if ((*m_error = error) == nx::media_db::Error::ReadError)
+            return;
+
         TestCameraOperation top;
         top.camUniqueId = cameraOp.getCameraUniqueId();
         top.code = (int)cameraOp.getRecordType();
         top.id = cameraOp.getCameraId();
         top.uuidLen = cameraOp.getCameraUniqueIdLen();
         
-        *m_error = error;
         ASSERT_TRUE(m_tdm->seekAndSet(top));
     }
 
     void handleMediaFileOp(const nx::media_db::MediaFileOperation &mediaFileOp, 
                            nx::media_db::Error error) override
     {
+        if ((*m_error = error) == nx::media_db::Error::ReadError)
+            return;
+
         TestFileOperation tfop;
         tfop.cameraId = mediaFileOp.getCameraId();
         tfop.chunksCatalog = mediaFileOp.getCatalog();
@@ -220,7 +225,6 @@ public:
         tfop.fileSize = mediaFileOp.getFileSize();
         tfop.startTime = mediaFileOp.getStartTime();
 
-        *m_error = error;
         ASSERT_TRUE(m_tdm->seekAndSet(tfop));
     }
 
@@ -240,6 +244,16 @@ private:
     nx::media_db::Error *m_error;
     TestDataManager *m_tdm;
 };
+
+const QString workDirPath = qApp->applicationDirPath() + lit("/tmp/media_db");
+
+void initDbFile(QFile *dbFile)
+{
+    QDir().mkpath(workDirPath);
+
+    dbFile->setFileName(workDirPath + lit("/file.mdb"));
+    dbFile->open(QIODevice::ReadWrite);
+}
 
 TEST(MediaDb_test, BitsTwiddling)
 {
@@ -303,27 +317,35 @@ TEST(MediaDb_test, BitsTwiddling)
 
 TEST(MediaDb_test, ReadWrite)
 {
-    QString workDirPath = qApp->applicationDirPath() + lit("/tmp/media_db");
-    QDir().mkpath(workDirPath);
-
-    QFile dbFile(workDirPath + lit("/file.mdb"));
-    dbFile.open(QIODevice::ReadWrite);
+    QFile dbFile;
+    initDbFile(&dbFile);
 
     nx::media_db::Error error;
     TestDataManager tdm(10000);
     TestDbHelperHandler testHandler(&error, &tdm);
     nx::media_db::DbHelper dbHelper(&dbFile, &testHandler);
+
+    // Wrong mode test 
+    error = dbHelper.writeFileHeader(
+        boost::get<TestFileHeader>(
+            tdm.dataVector[0].data).dbVersion);
+
+    ASSERT_TRUE(error == nx::media_db::Error::WrongMode);
+
     dbHelper.setMode(nx::media_db::Mode::Write);
 
     for (auto &data : tdm.dataVector)
         boost::apply_visitor(RecordWriteVisitor(&dbHelper), data.data);
 
-    dbHelper.setMode(nx::media_db::Mode::Read);
     dbHelper.reset();
     dbFile.close();
     dbFile.open(QIODevice::ReadWrite);
 
     uint8_t dbVersion;
+    error = dbHelper.readFileHeader(&dbVersion);
+    ASSERT_TRUE(error == nx::media_db::Error::WrongMode);
+
+    dbHelper.setMode(nx::media_db::Mode::Read);
     error = dbHelper.readFileHeader(&dbVersion);
 
     ASSERT_TRUE(dbVersion == boost::get<TestFileHeader>(tdm.dataVector[0].data).dbVersion);
@@ -341,13 +363,65 @@ TEST(MediaDb_test, ReadWrite)
     ASSERT_TRUE(readRecords == tdm.dataVector.size());
 }
 
+TEST(MediaDb_test, DbFileTruncate)
+{
+    int truncateCount = 1000;
+
+    while (truncateCount-- >= 0)
+    {
+        QFile dbFile;
+        initDbFile(&dbFile);
+
+        nx::media_db::Error error;
+        TestDataManager tdm(100);
+        TestDbHelperHandler testHandler(&error, &tdm);
+        nx::media_db::DbHelper dbHelper(&dbFile, &testHandler);
+        dbHelper.setMode(nx::media_db::Mode::Write);
+
+        for (auto &data : tdm.dataVector)
+            boost::apply_visitor(RecordWriteVisitor(&dbHelper), data.data);
+
+        dbHelper.reset();
+        dbFile.close();
+        dbFile.open(QIODevice::ReadOnly);
+
+        auto content = dbFile.readAll();
+        dbFile.close();
+        ASSERT_TRUE(dbFile.remove());
+        // truncating randomly last record
+        content.truncate(content.size() - genRandomNumber<1, sizeof(qint64) * 2 - 1>());
+        initDbFile(&dbFile);
+        dbFile.write(content);
+        dbFile.close();
+
+        dbFile.open(QIODevice::ReadOnly);
+        dbHelper.setMode(nx::media_db::Mode::Read);
+        dbHelper.setDevice(&dbFile);
+
+        uint8_t dbVersion;
+        error = dbHelper.readFileHeader(&dbVersion);
+
+        ASSERT_TRUE(dbVersion == boost::get<TestFileHeader>(tdm.dataVector[0].data).dbVersion);
+        tdm.dataVector[0].visited = true;
+        ASSERT_TRUE(error == nx::media_db::Error::NoError);
+
+        while (error == nx::media_db::Error::NoError)
+            dbHelper.readRecord();
+
+        dbFile.close();
+        recursiveClean(workDirPath);
+
+        size_t readRecords = std::count_if(tdm.dataVector.cbegin(), tdm.dataVector.cend(),
+                                           [](const TestData &td) { return td.visited; });
+        // we've read all except the very last one record
+        ASSERT_TRUE(readRecords == tdm.dataVector.size() - 1);
+    }
+}
+
 TEST(MediaDb_test, ReadWrite_MT)
 {
-    QString workDirPath = qApp->applicationDirPath() + lit("/tmp/media_db");
-    QDir().mkpath(workDirPath);
-
-    QFile dbFile(workDirPath + lit("/file.mdb"));
-    dbFile.open(QIODevice::ReadWrite);
+    QFile dbFile;
+    initDbFile(&dbFile);
 
     const size_t threadsNum = 4;
     nx::media_db::Error error;
@@ -356,7 +430,7 @@ TEST(MediaDb_test, ReadWrite_MT)
     nx::media_db::DbHelper dbHelper(&dbFile, &testHandler);
     dbHelper.setMode(nx::media_db::Mode::Write);
 
-    //write header
+    //write header explicitely
     boost::apply_visitor(RecordWriteVisitor(&dbHelper), tdm.dataVector[0].data);
 
     std::vector<std::thread> threads;
@@ -401,6 +475,5 @@ TEST(MediaDb_test, ReadWrite_MT)
 
 TEST(MediaDb_test, Cleanup)
 {
-    QString workDirPath = qApp->applicationDirPath() + lit("/tmp/media_db");
     recursiveClean(workDirPath);
 }
