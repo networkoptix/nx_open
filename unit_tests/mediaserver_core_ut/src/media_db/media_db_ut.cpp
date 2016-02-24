@@ -244,10 +244,10 @@ private:
     TestDataManager *m_tdm;
 };
 
-const QString workDirPath = qApp->applicationDirPath() + lit("/tmp/media_db");
 
 void initDbFile(QFile *dbFile)
 {
+    const QString workDirPath = qApp->applicationDirPath() + lit("/tmp/media_db");
     QDir().mkpath(workDirPath);
 
     dbFile->setFileName(workDirPath + lit("/file.mdb"));
@@ -316,6 +316,7 @@ TEST(MediaDb_test, BitsTwiddling)
 
 TEST(MediaDb_test, ReadWrite)
 {
+    const QString workDirPath = qApp->applicationDirPath() + lit("/tmp/media_db");
     QFile dbFile;
     initDbFile(&dbFile);
 
@@ -364,7 +365,8 @@ TEST(MediaDb_test, ReadWrite)
 
 TEST(MediaDb_test, DbFileTruncate)
 {
-    int truncateCount = 1000;
+    const QString workDirPath = qApp->applicationDirPath() + lit("/tmp/media_db");
+    int truncateCount = 100;
 
     while (truncateCount-- >= 0)
     {
@@ -380,21 +382,20 @@ TEST(MediaDb_test, DbFileTruncate)
         for (auto &data : tdm.dataVector)
             boost::apply_visitor(RecordWriteVisitor(&dbHelper), data.data);
 
-        dbHelper.reset();
+        dbHelper.setMode(nx::media_db::Mode::Read);
         dbFile.close();
         dbFile.open(QIODevice::ReadOnly);
 
-        auto content = dbFile.readAll();
-        dbFile.close();
+        QByteArray content = dbFile.readAll();
         ASSERT_TRUE(dbFile.remove());
         // truncating randomly last record
         content.truncate(content.size() - genRandomNumber<1, sizeof(qint64) * 2 - 1>());
+
         initDbFile(&dbFile);
         dbFile.write(content);
         dbFile.close();
 
         dbFile.open(QIODevice::ReadOnly);
-        dbHelper.setMode(nx::media_db::Mode::Read);
         dbHelper.setDevice(&dbFile);
 
         uint8_t dbVersion;
@@ -408,9 +409,7 @@ TEST(MediaDb_test, DbFileTruncate)
             dbHelper.readRecord();
 
         ASSERT_TRUE(error == nx::media_db::Error::ReadError);
-
-        dbFile.close();
-        recursiveClean(workDirPath);
+        ASSERT_TRUE(dbFile.remove());
 
         size_t readRecords = std::count_if(tdm.dataVector.cbegin(), tdm.dataVector.cend(),
                                            [](const TestData &td) { return td.visited; });
@@ -421,6 +420,7 @@ TEST(MediaDb_test, DbFileTruncate)
 
 TEST(MediaDb_test, ReadWrite_MT)
 {
+    const QString workDirPath = qApp->applicationDirPath() + lit("/tmp/media_db");
     QFile dbFile;
     initDbFile(&dbFile);
 
@@ -476,5 +476,6 @@ TEST(MediaDb_test, ReadWrite_MT)
 
 TEST(MediaDb_test, Cleanup)
 {
+    const QString workDirPath = qApp->applicationDirPath() + lit("/tmp/media_db");
     recursiveClean(workDirPath);
 }
