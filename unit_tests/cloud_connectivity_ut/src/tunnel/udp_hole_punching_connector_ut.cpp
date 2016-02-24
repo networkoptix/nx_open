@@ -153,6 +153,8 @@ TEST_F(UdpHolePunchingTunnelConnector, general)
 
     ASSERT_EQ(SystemError::noError, connectResult.errorCode);
     ASSERT_NE(nullptr, connectResult.connection);
+
+    connectResult.connection->pleaseStopSync();
 }
 
 TEST_F(UdpHolePunchingTunnelConnector, timeout)
