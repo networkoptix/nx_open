@@ -32,9 +32,14 @@ angular.module('webadminApp')
         var loginDialog = null;
         function offlineHandler(error){
             // Check 401 against offline
+            var inlineMode = typeof(setupDialog)=='undefined'; // Qt registered object
+            var isInFrame = window.self !== window.top; // If we are in frame - do not show dialog
+
+            if(isInFrame || inlineMode){
+                return; // inline mode - do not do anything
+            }
             if(error.status === 401) {
-                var isInFrame = window.self !== window.top; // If we are in frame - do not show dialog
-                if (!isInFrame && loginDialog === null) { //Dialog is not displayed
+                if (loginDialog === null) { //Dialog is not displayed
                     loginDialog = $modal.open({
                         templateUrl: 'views/login.html',
                         keyboard:false,
