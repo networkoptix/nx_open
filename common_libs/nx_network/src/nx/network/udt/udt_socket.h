@@ -51,11 +51,11 @@ public:
     bool getRecvTimeout(unsigned int* millis);
     bool getSendTimeout(unsigned int* millis);
 
-    CommonSocketImpl<UdtSocket>* impl();
-    const CommonSocketImpl<UdtSocket>* impl() const;
+    //CommonSocketImpl<UdtSocket>* impl();
+    //const CommonSocketImpl<UdtSocket>* impl() const;
 
-    nx::network::aio::AbstractAioThread* getAioThread();
-    void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread);
+    //nx::network::aio::AbstractAioThread* getAioThread();
+    //void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread);
 
 protected:
     UdtSocket( detail::UdtSocketImpl* impl );
@@ -166,7 +166,7 @@ public:
     virtual void dispatch( nx::utils::MoveOnlyFunc<void()> handler ) override;
 
 private:
-    std::unique_ptr<aio::AsyncSocketImplHelper<UdtSocket>> m_aioHelper;
+    std::unique_ptr<aio::AsyncSocketImplHelper<Pollable>> m_aioHelper;
 
 private:
     Q_DISABLE_COPY(UdtStreamSocket)
@@ -216,7 +216,7 @@ public:
     virtual void acceptAsync( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )> handler ) ;
 
 private:
-    std::unique_ptr<aio::AsyncServerSocketHelper<UdtSocket>> m_aioHelper;
+    std::unique_ptr<aio::AsyncServerSocketHelper<Pollable>> m_aioHelper;
 
     Q_DISABLE_COPY(UdtStreamServerSocket)
 };

@@ -1,5 +1,5 @@
 
-#if 1
+#if 0
 
 #include "sys_udt_pollset_aggregator.h"
 
@@ -134,7 +134,7 @@ bool PollSetAggregator::add(
     EventType eventType,
     void* userData)
 {
-    if (sock->isUdtSocket)
+    if (sock->impl()->isUdtSocket)
         return add(static_cast<UdtSocket*>(sock), eventType, userData);
     return m_sysPollSet.add(sock, eventType, userData);
 }

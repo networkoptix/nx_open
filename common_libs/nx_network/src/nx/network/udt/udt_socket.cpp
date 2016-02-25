@@ -481,24 +481,26 @@ struct UdtEpollHandlerHelper {
 
 UdtSocket::UdtSocket()
 :
-    m_impl( new detail::UdtSocketImpl() )
+    UdtSocket(new detail::UdtSocketImpl())
 {
 }
 
 UdtSocket::~UdtSocket()
 {
-    delete m_impl;
-    m_impl = nullptr;
+    //delete m_impl;
+    //m_impl = nullptr;
 
     //TODO #ak if socket is destroyed in its aio thread, it can cleanup here
 
-    assert(!nx::network::SocketGlobals::aioService().isSocketBeingWatched(this));
+    assert(!nx::network::SocketGlobals::aioService()
+        .isSocketBeingWatched(static_cast<Pollable*>(this)));
 }
 
 UdtSocket::UdtSocket(detail::UdtSocketImpl* impl)
 :
-    m_impl(impl)
+    Pollable(-1, std::unique_ptr<detail::UdtSocketImpl>(impl))
 {
+    this->m_impl = static_cast<detail::UdtSocketImpl*>(this->Pollable::m_impl.get());
 }
 
 bool UdtSocket::bindToUdpSocket(UDPSocket&& udpSocket)
@@ -533,25 +535,25 @@ bool UdtSocket::getSendTimeout(unsigned int* millis)
     return m_impl->GetSendTimeout(millis);
 }
 
-CommonSocketImpl<UdtSocket>* UdtSocket::impl()
-{
-    return m_impl;
-}
+//CommonSocketImpl<UdtSocket>* UdtSocket::impl()
+//{
+//    return m_impl;
+//}
+//
+//const CommonSocketImpl<UdtSocket>* UdtSocket::impl() const
+//{
+//    return m_impl;
+//}
 
-const CommonSocketImpl<UdtSocket>* UdtSocket::impl() const
-{
-    return m_impl;
-}
-
-aio::AbstractAioThread* UdtSocket::getAioThread()
-{
-    return nx::network::SocketGlobals::aioService().getSocketAioThread(this);
-}
-
-void UdtSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
-{
-    nx::network::SocketGlobals::aioService().bindSocketToAioThread(this, aioThread);
-}
+//aio::AbstractAioThread* UdtSocket::getAioThread()
+//{
+//    return nx::network::SocketGlobals::aioService().getSocketAioThread(this);
+//}
+//
+//void UdtSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
+//{
+//    nx::network::SocketGlobals::aioService().bindSocketToAioThread(this, aioThread);
+//}
 
 // =====================================================================
 // UdtStreamSocket implementation
@@ -559,7 +561,7 @@ void UdtSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
 UdtStreamSocket::UdtStreamSocket()
 :
     m_aioHelper(
-        new aio::AsyncSocketImplHelper<UdtSocket>(this, this, false /*natTraversal*/))
+        new aio::AsyncSocketImplHelper<Pollable>(this, this, false /*natTraversal*/))
 {
     m_impl->Open();
 }
@@ -567,7 +569,7 @@ UdtStreamSocket::UdtStreamSocket()
 UdtStreamSocket::UdtStreamSocket(detail::UdtSocketImpl* impl)
 :
     UdtSocket(impl),
-    m_aioHelper(new aio::AsyncSocketImplHelper<UdtSocket>(this, this, false))
+    m_aioHelper(new aio::AsyncSocketImplHelper<Pollable>(this, this, false))
 {
 }
 
@@ -633,7 +635,12 @@ bool UdtStreamSocket::getRecvBufferSize( unsigned int* buffSize ) const {
 }
 
 bool UdtStreamSocket::setRecvTimeout( unsigned int millis ) {
-    return m_impl->SetRecvTimeout(millis);
+    if (m_impl->SetRecvTimeout(millis))
+    {
+        m_readTimeoutMS = millis;
+        return true;
+    }
+    return false;
 }
 
 bool UdtStreamSocket::getRecvTimeout( unsigned int* millis ) const {
@@ -641,7 +648,12 @@ bool UdtStreamSocket::getRecvTimeout( unsigned int* millis ) const {
 }
 
 bool UdtStreamSocket::setSendTimeout( unsigned int ms )  {
-    return m_impl->SetSendTimeout(ms);
+    if (m_impl->SetSendTimeout(ms))
+    {
+        m_writeTimeoutMS = ms;
+        return true;
+    }
+    return false;
 }
 
 bool UdtStreamSocket::getSendTimeout( unsigned int* millis ) const {
@@ -766,14 +778,14 @@ void UdtStreamSocket::cancelIOSync(aio::EventType eventType)
 void UdtStreamSocket::post( nx::utils::MoveOnlyFunc<void()> handler )
 {
     nx::network::SocketGlobals::aioService().post(
-        static_cast<UdtSocket*>(this),
+        static_cast<Pollable*>(this),
         std::move(handler) );
 }
 
 void UdtStreamSocket::dispatch( nx::utils::MoveOnlyFunc<void()> handler )
 {
     nx::network::SocketGlobals::aioService().dispatch(
-        static_cast<UdtSocket*>(this),
+        static_cast<Pollable*>(this),
         std::move(handler) );
 }
 
@@ -926,7 +938,12 @@ bool UdtStreamServerSocket::getRecvBufferSize( unsigned int* buffSize ) const {
 }
 
 bool UdtStreamServerSocket::setRecvTimeout( unsigned int millis ) {
-    return m_impl->SetRecvTimeout(millis);
+    if (m_impl->SetRecvTimeout(millis))
+    {
+        m_readTimeoutMS = millis;
+        return true;
+    }
+    return false;
 }
 
 bool UdtStreamServerSocket::getRecvTimeout( unsigned int* millis ) const {
@@ -934,7 +951,12 @@ bool UdtStreamServerSocket::getRecvTimeout( unsigned int* millis ) const {
 }
 
 bool UdtStreamServerSocket::setSendTimeout( unsigned int ms ) {
-    return m_impl->SetSendTimeout(ms);
+    if (m_impl->SetSendTimeout(ms))
+    {
+        m_writeTimeoutMS = ms;
+        return true;
+    }
+    return false;
 }
 
 bool UdtStreamServerSocket::getSendTimeout( unsigned int* millis ) const {
@@ -948,14 +970,14 @@ bool UdtStreamServerSocket::getLastError( SystemError::ErrorCode* errorCode ) co
 void UdtStreamServerSocket::post( nx::utils::MoveOnlyFunc<void()> handler )
 {
     nx::network::SocketGlobals::aioService().post(
-        static_cast<UdtSocket*>(this),
+        static_cast<Pollable*>(this),
         std::move(handler) );
 }
 
 void UdtStreamServerSocket::dispatch( nx::utils::MoveOnlyFunc<void()> handler )
 {
     nx::network::SocketGlobals::aioService().dispatch(
-        static_cast<UdtSocket*>(this),
+        static_cast<Pollable*>(this),
         std::move(handler) );
 }
 
@@ -983,7 +1005,7 @@ void UdtStreamServerSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
 
 UdtStreamServerSocket::UdtStreamServerSocket()
 :
-    m_aioHelper(new aio::AsyncServerSocketHelper<UdtSocket>( this, this ) )
+    m_aioHelper(new aio::AsyncServerSocketHelper<Pollable>( this, this ) )
 {
     m_impl->Open();
 }

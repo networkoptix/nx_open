@@ -659,7 +659,7 @@ private:
             [this, resolvedAddress, sendTimeout]()
             {
                 m_abstractSocketPtr->connect( resolvedAddress, std::chrono::milliseconds(sendTimeout) );
-            } );    //to be called between pollset.add and pollset.poll
+            });    //to be called between pollset.add and pollset.poll
         return true;
     }
 

@@ -22,10 +22,11 @@
 
 #include "aioeventhandler.h"
 #include "pollset.h"
+#include "unified_pollset.h"
 #include "../detail/socket_sequence.h"
 #include "../system_socket.h"
 #include "../udt/udt_socket.h"
-#include "../udt/udt_pollset.h"
+//#include "../udt/udt_pollset.h"
 
 
 namespace nx {
@@ -402,7 +403,7 @@ protected:
                 : (nextPeriodicEventClock < curClock ? 0 : nextPeriodicEventClock - curClock);
 
             //if there are posted calls, just checking sockets state in non-blocking mode
-            const int pollTimeout = m_impl->postedCalls.empty() ? millisToTheNextPeriodicEvent : 0;
+            const int pollTimeout = m_impl->postedCalls.empty() ? millisToTheNextPeriodicEvent : INFINITE_TIMEOUT;
             const int triggeredSocketCount = m_impl->pollSet.poll(pollTimeout);
 
             if (needToStop())
@@ -1064,8 +1065,8 @@ private:
 namespace socket_to_pollset_static_map
 {
 template<class SocketType> struct get {};
-template<> struct get<Pollable> { typedef PollSet value; };
-template<> struct get<UdtSocket> { typedef UdtPollSet value; };
+template<> struct get<Pollable> { typedef UnifiedPollSet value; };
+//template<> struct get<UdtSocket> { typedef UdtPollSet value; };
 }
 
 class AbstractAioThread

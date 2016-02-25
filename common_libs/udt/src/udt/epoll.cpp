@@ -168,7 +168,8 @@ int CEPoll::add_ssock(const int eid, const SYSSOCKET& s, const int* events)
 #elif _WIN32
 #endif
 
-   p->second.m_sLocals.insert(s);
+   int& eventMask = p->second.m_sLocals[s];
+   eventMask |= *events;
 
    return 0;
 }
@@ -326,12 +327,12 @@ int CEPoll::wait(const int eid, set<UDTSOCKET>* readfds, set<UDTSOCKET>* writefd
          FD_ZERO(&readfds);
          FD_ZERO(&writefds);
 
-         for (set<SYSSOCKET>::const_iterator i = p->second.m_sLocals.begin(); i != p->second.m_sLocals.end(); ++ i)
+         for (map<SYSSOCKET, int>::const_iterator i = p->second.m_sLocals.begin(); i != p->second.m_sLocals.end(); ++ i)
          {
-            if (lrfds)
-               FD_SET(*i, &readfds);
-            if (lwfds)
-               FD_SET(*i, &writefds);
+            if (lrfds && (i->second & UDT_EPOLL_IN) > 0)
+               FD_SET(i->first, &readfds);
+            if (lwfds && (i->second & UDT_EPOLL_OUT) > 0)
+               FD_SET(i->first, &writefds);
          }
 
          timeval tv;
@@ -339,17 +340,17 @@ int CEPoll::wait(const int eid, set<UDTSOCKET>* readfds, set<UDTSOCKET>* writefd
          tv.tv_usec = 0;
          if (::select(0, &readfds, &writefds, NULL, &tv) > 0)
          {
-            //TODO use win32-specific select features to get O(1) here
-            for (set<SYSSOCKET>::const_iterator i = p->second.m_sLocals.begin(); i != p->second.m_sLocals.end(); ++ i)
+            //TODO #ak use win32-specific select features to get O(1) here
+            for (map<SYSSOCKET, int>::const_iterator i = p->second.m_sLocals.begin(); i != p->second.m_sLocals.end(); ++ i)
             {
-               if (lrfds && FD_ISSET(*i, &readfds))
+               if (lrfds && FD_ISSET(i->first, &readfds))
                {
-                  lrfds->insert(*i);
+                  lrfds->insert(i->first);
                   ++ total;
                }
-               if (lwfds && FD_ISSET(*i, &writefds))
+               if (lwfds && FD_ISSET(i->first, &writefds))
                {
-                  lwfds->insert(*i);
+                  lwfds->insert(i->first);
                   ++ total;
                }
             }
@@ -363,7 +364,8 @@ int CEPoll::wait(const int eid, set<UDTSOCKET>* readfds, set<UDTSOCKET>* writefd
          return total;
 
       if ((msTimeOut >= 0) && (int64_t(CTimer::getTime() - entertime) >= msTimeOut * 1000LL))
-         throw CUDTException(6, 3, 0);
+         //throw CUDTException(6, 3, 0);
+          return 0; //on timeout epoll_wait MUST return 0!
 
       CTimer::waitForEvent();
    }

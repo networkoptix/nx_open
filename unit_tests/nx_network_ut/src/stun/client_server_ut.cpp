@@ -110,8 +110,8 @@ TEST_F( StunClientServerTest, Connectivity )
 
 TEST_F( StunClientServerTest, RequestResponse )
 {
-    client->connect( address );
     startServer();
+    client->connect(address);
     {
         Message request( Header( MessageClass::request, MethodType::bindingMethod ) );
 
