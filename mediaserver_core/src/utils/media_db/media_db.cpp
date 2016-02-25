@@ -186,6 +186,7 @@ void DbHelper::setMode(Mode mode)
 {
     std::unique_lock<std::mutex> lk(m_mutex);
     m_mode = mode;
+    m_stream.resetStatus();
     if (!m_writeQueue.empty())
         m_writerDoneCond.wait(lk, [this] { return m_writeQueue.empty(); });
 }
