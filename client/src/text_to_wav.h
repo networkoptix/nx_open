@@ -1,7 +1,5 @@
 #pragma once
 
-#ifdef ENABLE_TEXT_TO_SPEECH
-
 #include <QtCore/QIODevice>
 #include <QtCore/QSharedPointer>
 #include <QtCore/QString>
@@ -79,5 +77,3 @@ private:
 
     QSharedPointer<SynthetiseSpeechTask> addTaskToQueue( const QString& text, QIODevice* const dest );
 };
-
-#endif //ENABLE_TEXT_TO_SPEECH

@@ -1,17 +1,18 @@
 
 #pragma once
 
+#include <statistics/base/base_fwd.h>
 #include <statistics/abstract_statistics_module.h>
 
-#include <utils/common/connective.h>
-
 class QnActionManager;
-class AbstractActionMetric;
+class AbstractMultimetric;
 typedef QPointer<QnActionManager> QnActionManagerPtr;
 
-class QnActionsStatisticsModule : public Connective<QnAbstractStatisticsModule>
+class QnActionsStatisticsModule : public QnAbstractStatisticsModule
 {
-    typedef Connective<QnAbstractStatisticsModule> base_type;
+    Q_OBJECT
+
+    typedef QnAbstractStatisticsModule base_type;
 
 public:
     QnActionsStatisticsModule(QObject *parent);
@@ -20,14 +21,13 @@ public:
 
     void setActionManager(const QnActionManagerPtr &manager);
 
-    QnMetricsHash metrics() const override;
+    QnStatisticValuesHash values() const override;
 
-    void resetMetrics() override;
+    void reset() override;
 
 private:
-    typedef QSharedPointer<AbstractActionMetric> MetricsPtr;
-    typedef QHash<QString, MetricsPtr> MetricsHash;
+    typedef QList<QnStatisticsValuesProviderPtr> ModulesList;
 
     QnActionManagerPtr m_actionManager;
-    MetricsHash m_metrics;
+    ModulesList m_modules;
 };

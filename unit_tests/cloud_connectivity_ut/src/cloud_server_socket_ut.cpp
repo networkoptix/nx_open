@@ -18,9 +18,9 @@ struct FakeTcpTunnelConnection
     AbstractIncomingTunnelConnection
 {
     FakeTcpTunnelConnection(
-        String remotePeerId, SocketAddress address, size_t sockets = 1000)
+        String connectionId, SocketAddress address, size_t sockets = 1000)
     :
-        AbstractIncomingTunnelConnection(std::move(remotePeerId)),
+        AbstractIncomingTunnelConnection(std::move(connectionId)),
         m_sockets(sockets),
         m_server(std::make_unique<TCPServerSocket>())
     {
@@ -30,7 +30,7 @@ struct FakeTcpTunnelConnection
             m_sockets = 0;
 
         NX_LOGX(lm("for %1 listen %2 for %3 sockets")
-                .arg(m_remotePeerId).arg(address.toString())
+                .arg(connectionId).arg(address.toString())
                 .arg(m_sockets), cl_logDEBUG1);
     }
 
@@ -55,10 +55,10 @@ struct FakeTcpTunnelConnection
             });
     }
 
-    void pleaseStop(std::function<void()> handler) override
+    void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override
     {
         m_server->pleaseStop(
-            [this, handler]
+            [this, handler = std::move(handler)]
             {
                 NX_LOGX(lm("exhausted"), cl_logDEBUG1);
                 m_server.reset();
@@ -78,10 +78,9 @@ struct FakeTcpTunnelAcceptor
     public AbstractTunnelAcceptor
 {
     FakeTcpTunnelAcceptor(
-        String remotePeerId, boost::optional<SocketAddress> address,
+        boost::optional<SocketAddress> address,
         size_t socketsPerConnection = 1000)
     :
-        m_remotePeerId(std::move(remotePeerId)),
         m_address(std::move(address)),
         m_socketsPerConnection(socketsPerConnection),
         m_ioThreadSocket(new TCPSocket)
@@ -103,12 +102,11 @@ struct FakeTcpTunnelAcceptor
         handler(SystemError::noError, std::move(connection));
     }
 
-    void pleaseStop(std::function<void()> handler) override
+    void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override
     {
         m_ioThreadSocket->pleaseStop(std::move(handler));
     }
 
-    String m_remotePeerId;
     boost::optional<SocketAddress> m_address;
     size_t m_socketsPerConnection;
     std::unique_ptr<AbstractCommunicatingSocket> m_ioThreadSocket;
@@ -133,11 +131,11 @@ struct CloudServerSocketTcpTester
 
             // IP based acceptor
             startAcceptor(std::make_unique<FakeTcpTunnelAcceptor>(
-                "somePeerId", SocketAddress(addr.address, addr.port + i)));
+                SocketAddress(addr.address, addr.port + i)));
 
             // also start useless acceptors
             startAcceptor(std::make_unique<FakeTcpTunnelAcceptor>(
-                "somePeerId", boost::none));
+                boost::none));
         }
 
         return true;
@@ -172,7 +170,7 @@ NX_NETWORK_SERVER_SOCKET_TEST_CASE(
     [this](){ return makeServerSocket(); },
     &std::make_unique<network::test::MultipleClientSocketTester<3>>);
 
-void testTunnelConnect(SystemError::ErrorCode expectedResult)
+static void testTunnelConnect(bool isSuccessExpected)
 {
     auto client = std::make_unique<TCPSocket>(false);
     ASSERT_TRUE(client->setNonBlockingMode(true));
@@ -183,7 +181,8 @@ void testTunnelConnect(SystemError::ErrorCode expectedResult)
         network::test::kServerAddress,
         [&](SystemError::ErrorCode c){ result.set_value(c); });
 
-    EXPECT_EQ(result.get_future().get(), expectedResult);
+    const auto code = result.get_future().get();
+    EXPECT_EQ(code == SystemError::noError, isSuccessExpected) << code;
     client->pleaseStopSync();
 }
 
@@ -192,13 +191,14 @@ TEST(CloudServerSocketBaseTcpTest, OpenTunnelOnIndication)
     auto stunAsyncClient = std::make_shared<network::test::StunAsyncClientMock>();
     EXPECT_CALL(*stunAsyncClient, setIndicationHandler(
         stun::cc::indications::connectionRequested, ::testing::_)).Times(1);
+    EXPECT_CALL(*stunAsyncClient, remoteAddress()).Times(::testing::AnyNumber());
 
     std::vector<CloudServerSocket::AcceptorMaker> acceptorMakers;
     acceptorMakers.push_back(
-        [](const String&, hpm::api::ConnectionRequestedEvent& event)
+        [](hpm::api::ConnectionRequestedEvent& event)
         {
             return std::make_unique<FakeTcpTunnelAcceptor>(
-                event.originatingPeerID, network::test::kServerAddress);
+                network::test::kServerAddress);
         });
 
     auto server = std::make_unique<CloudServerSocket>(
@@ -209,7 +209,7 @@ TEST(CloudServerSocketBaseTcpTest, OpenTunnelOnIndication)
     ASSERT_TRUE(server->listen(1));
 
     // there is not tunnel yet
-    testTunnelConnect(SystemError::connectionRefused);
+    testTunnelConnect(false);
 
     hpm::api::ConnectionRequestedEvent event;
     event.connectSessionId = String("someSessionId");
@@ -222,7 +222,7 @@ TEST(CloudServerSocketBaseTcpTest, OpenTunnelOnIndication)
     stunAsyncClient->emulateIndication(message);
 
     // now we can use estabilished tunnel
-    testTunnelConnect(SystemError::noError);
+    testTunnelConnect(true);
     server->pleaseStopSync();
 }
 
@@ -248,16 +248,17 @@ protected:
         m_stunClient = std::make_shared<network::test::StunAsyncClientMock>();
         EXPECT_CALL(*m_stunClient, setIndicationHandler(
             stun::cc::indications::connectionRequested, ::testing::_)).Times(1);
+        EXPECT_CALL(*m_stunClient, remoteAddress()).Times(::testing::AnyNumber());
 
         std::vector<CloudServerSocket::AcceptorMaker> acceptorMakers;
         acceptorMakers.push_back(
-            [this](const String&, hpm::api::ConnectionRequestedEvent& event)
+            [this](hpm::api::ConnectionRequestedEvent& event)
             {
                 const auto it = m_peerAddresses.find(event.originatingPeerID);
                 assert(it != m_peerAddresses.end());
 
                 return std::make_unique<FakeTcpTunnelAcceptor>(
-                    it->first, it->second, kClientCount);
+                    it->second, kClientCount);
             });
 
         m_server = std::make_unique<CloudServerSocket>(

@@ -182,10 +182,6 @@ private:
 bool UdtSocketImpl::Open() {
     Q_ASSERT(IsClosed());
     udtHandle = UDT::socket(AF_INET,SOCK_STREAM,0);
-#ifdef TRACE_UDT_SOCKET
-    NX_LOG(lit("created UDT socket %1").arg(udtHandle), cl_logDEBUG2);
-#endif
-    VERIFY_(udtHandle != UDT::INVALID_SOCK,"UDT::socket",0);
     if( udtHandle != UDT::INVALID_SOCK ) {
         state_ = OPEN;
         return true;
@@ -505,6 +501,23 @@ UdtSocket::UdtSocket(detail::UdtSocketImpl* impl)
 {
 }
 
+bool UdtSocket::bindToUdpSocket(UDPSocket&& udpSocket)
+{
+    //switching socket to blocking mode
+    if (!udpSocket.setNonBlockingMode(false))
+        return false;
+
+    //taking system socket out of udpSocket
+    if (UDT::bind2(m_impl->udtHandle, udpSocket.handle()) != 0)
+    {
+        SystemError::setLastErrorCode(
+            detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+        return false;
+    }
+    udpSocket.takeHandle();
+    return true;
+}
+
 bool UdtSocket::getLastError(SystemError::ErrorCode* errorCode)
 {
     return m_impl->GetLastError(errorCode);
@@ -543,6 +556,26 @@ void UdtSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
 // =====================================================================
 // UdtStreamSocket implementation
 // =====================================================================
+UdtStreamSocket::UdtStreamSocket()
+:
+    m_aioHelper(
+        new aio::AsyncSocketImplHelper<UdtSocket>(this, this, false /*natTraversal*/))
+{
+    m_impl->Open();
+}
+
+UdtStreamSocket::UdtStreamSocket(detail::UdtSocketImpl* impl)
+:
+    UdtSocket(impl),
+    m_aioHelper(new aio::AsyncSocketImplHelper<UdtSocket>(this, this, false))
+{
+}
+
+UdtStreamSocket::~UdtStreamSocket()
+{
+    m_aioHelper->terminate();
+}
+
 bool UdtStreamSocket::bind( const SocketAddress& localAddress ) {
     return m_impl->Bind(localAddress);
 }
@@ -718,7 +751,7 @@ bool UdtStreamSocket::reopen() {
 
 void UdtStreamSocket::cancelIOAsync(
     aio::EventType eventType,
-    std::function<void()> cancellationDoneHandler)
+    nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler)
 {
     return m_aioHelper->cancelIOAsync(
         eventType,
@@ -730,14 +763,14 @@ void UdtStreamSocket::cancelIOSync(aio::EventType eventType)
     m_aioHelper->cancelIOSync(eventType);
 }
 
-void UdtStreamSocket::post( std::function<void()> handler )
+void UdtStreamSocket::post( nx::utils::MoveOnlyFunc<void()> handler )
 {
     nx::network::SocketGlobals::aioService().post(
         static_cast<UdtSocket*>(this),
         std::move(handler) );
 }
 
-void UdtStreamSocket::dispatch( std::function<void()> handler )
+void UdtStreamSocket::dispatch( nx::utils::MoveOnlyFunc<void()> handler )
 {
     nx::network::SocketGlobals::aioService().dispatch(
         static_cast<UdtSocket*>(this),
@@ -746,7 +779,7 @@ void UdtStreamSocket::dispatch( std::function<void()> handler )
 
 void UdtStreamSocket::connectAsync(
     const SocketAddress& addr,
-    std::function<void( SystemError::ErrorCode )> handler )
+    nx::utils::MoveOnlyFunc<void( SystemError::ErrorCode )> handler )
 {
     return m_aioHelper->connectAsync( addr, std::move(handler) );
 }
@@ -766,8 +799,8 @@ void UdtStreamSocket::sendAsync(
 }
 
 void UdtStreamSocket::registerTimer(
-    unsigned int timeoutMillis,
-    std::function<void()> handler ) 
+    std::chrono::milliseconds timeoutMillis,
+    nx::utils::MoveOnlyFunc<void()> handler )
 {
     return m_aioHelper->registerTimer(timeoutMillis, std::move(handler));
 }
@@ -784,25 +817,6 @@ aio::AbstractAioThread* UdtStreamSocket::getAioThread()
 void UdtStreamSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
     UdtSocket::bindToAioThread(aioThread);
-}
-
-UdtStreamSocket::UdtStreamSocket( bool natTraversal )
-:
-    m_aioHelper(new aio::AsyncSocketImplHelper<UdtSocket>(this, this, natTraversal))
-{
-    m_impl->Open();
-}
-
-UdtStreamSocket::UdtStreamSocket( detail::UdtSocketImpl* impl )
-:
-    UdtSocket(impl),
-    m_aioHelper(new aio::AsyncSocketImplHelper<UdtSocket>(this, this, false))
-{
-}
-
-UdtStreamSocket::~UdtStreamSocket()
-{
-    m_aioHelper->terminate();
 }
 
 // =====================================================================
@@ -849,7 +863,9 @@ AbstractStreamSocket* UdtStreamServerSocket::accept()  {
     }
 }
 
-void UdtStreamServerSocket::pleaseStop( std::function< void() > handler ) {
+void UdtStreamServerSocket::pleaseStop( 
+    nx::utils::MoveOnlyFunc< void() > handler )
+{
     m_aioHelper->cancelIOAsync( std::move( handler ) );
 }
 
@@ -929,14 +945,14 @@ bool UdtStreamServerSocket::getLastError( SystemError::ErrorCode* errorCode ) co
     return m_impl->GetLastError(errorCode);
 }
 
-void UdtStreamServerSocket::post( std::function<void()> handler )
+void UdtStreamServerSocket::post( nx::utils::MoveOnlyFunc<void()> handler )
 {
     nx::network::SocketGlobals::aioService().post(
         static_cast<UdtSocket*>(this),
         std::move(handler) );
 }
 
-void UdtStreamServerSocket::dispatch( std::function<void()> handler )
+void UdtStreamServerSocket::dispatch( nx::utils::MoveOnlyFunc<void()> handler )
 {
     nx::network::SocketGlobals::aioService().dispatch(
         static_cast<UdtSocket*>(this),

@@ -7,4 +7,6 @@
 // because we can't create QnMultiserverRequestData directly
 class QnEmptyRequestData : public QnMultiserverRequestData
 {
+public:
+    QnEmptyRequestData();
 };

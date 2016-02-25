@@ -10,12 +10,12 @@ angular.module('webadminApp')
                 ngSource:'=',
                 ngName:'='
             },
-            link: function (scope, element, attrs) {
-                var $_current = element;
+            link: function (scope, element/*, attrs*/) {
+                var $current = element;
 
 
                 //scope.$watch('[' + attrs.ngData + ',' + attrs.ngParam + ']', function (newVal) {
-                    $_current.html(''); // destroy object
+                    $current.html(''); // destroy object
 
                     var content = '';
                     var paramsplain ='';
@@ -40,9 +40,9 @@ angular.module('webadminApp')
                         content +
                         '</object>';
 
-                    $_current.html(objectHTML);
+                    $current.html(objectHTML);
 
                 //}, true);
             }
-        }
+        };
     });

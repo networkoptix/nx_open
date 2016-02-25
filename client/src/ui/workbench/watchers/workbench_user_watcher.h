@@ -45,7 +45,6 @@ public:
     void setReconnectOnPasswordChange(bool reconnect);
 
 signals:
-    void userAboutToBeChanged(const QnUserResourcePtr &user);
     void userChanged(const QnUserResourcePtr &user);
     void reconnectRequired();
 

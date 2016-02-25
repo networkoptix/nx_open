@@ -66,6 +66,9 @@ public:
     //!Returns local address if client is connected to the server
     virtual SocketAddress localAddress() const = 0;
 
+    //!Returns server address if client knows one
+    virtual SocketAddress remoteAddress() const = 0;
+
     //!Closes connection, also engage reconnect
     virtual void closeConnection(SystemError::ErrorCode errorCode) = 0;
 
@@ -102,11 +105,12 @@ public:
     bool ignoreIndications(int method) override;
     void sendRequest(Message request, RequestHandler handler) override;
     SocketAddress localAddress() const override;
+    SocketAddress remoteAddress() const override;
     void closeConnection(SystemError::ErrorCode errorCode) override;
 
     /*! \note Required by \a nx_api::BaseServerConnection */
-    void closeConnection(
-        SystemError::ErrorCode errorCode, BaseConnectionType* connection);
+    virtual void closeConnection(
+        SystemError::ErrorCode errorCode, BaseConnectionType* connection) override;
 
 private:
     enum class State

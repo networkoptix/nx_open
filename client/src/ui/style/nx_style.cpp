@@ -185,12 +185,20 @@ void QnNxStyle::drawPrimitive(
     case PE_PanelButtonTool:
     case PE_PanelButtonCommand:
         {
-            painter->save();
-
             const bool pressed = option->state & State_Sunken;
             const bool hovered = option->state & State_MouseOver;
 
-            QnPaletteColor mainColor = findColor(option->palette.color(QPalette::Button));
+            QnPaletteColor mainColor = findColor(option->palette.button().color());
+
+            if (option->state.testFlag(State_Enabled))
+            {
+                if (const QStyleOptionButton *button =
+                       qstyleoption_cast<const QStyleOptionButton *>(option))
+                {
+                    if (button->features.testFlag(QStyleOptionButton::DefaultButton))
+                        mainColor = this->mainColor(Colors::kBlue);
+                }
+            }
 
             QColor buttonColor = mainColor;
             QColor shadowColor = mainColor.darker(2);
@@ -207,18 +215,15 @@ void QnNxStyle::drawPrimitive(
                 shadowColor = mainColor.darker(1);
             }
 
-            painter->setPen(Qt::NoPen);
-            painter->setRenderHint(QPainter::Antialiasing);
-
             QRect rect = option->rect.adjusted(0, 0, 0, -1);
 
-            painter->setBrush(shadowColor);
-            painter->drawRoundedRect(rect.adjusted(0, shadowShift, 0, shadowShift), 2, 2);
+            QnScopedPainterPenRollback penRollback(painter, Qt::NoPen);
+            QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
+            QnScopedPainterBrushRollback brushRollback(painter, shadowColor);
 
+            painter->drawRoundedRect(rect.adjusted(0, shadowShift, 0, shadowShift), 2, 2);
             painter->setBrush(buttonColor);
             painter->drawRoundedRect(rect.adjusted(0, qMax(0, -shadowShift), 0, 0), 2, 2);
-
-            painter->restore();
         }
         return;
 
@@ -624,14 +629,6 @@ void QnNxStyle::drawComplexControl(
 
             const bool flat = groupBox->features.testFlag(QStyleOptionFrame::Flat);
 
-            if (flat)
-            {
-                QFont font = painter->font();
-                font.setPixelSize(font.pixelSize() + 2);
-                font.setWeight(QFont::DemiBold);
-                painter->setFont(font);
-            }
-
             QRect labelRect = subControlRect(CC_GroupBox, groupBox, SC_GroupBoxLabel, widget);
 
             if (groupBox->subControls.testFlag(SC_GroupBoxFrame))
@@ -674,9 +671,50 @@ void QnNxStyle::drawComplexControl(
 
             if (groupBox->subControls.testFlag(SC_GroupBoxLabel))
             {
-                drawItemText(painter, labelRect, Qt::AlignCenter | Qt::TextHideMnemonic,
-                             groupBox->palette, groupBox->state.testFlag(QStyle::State_Enabled),
-                             groupBox->text, flat ? QPalette::Text : QPalette::WindowText);
+                int flags = Qt::AlignLeft | Qt::AlignVCenter | Qt::TextHideMnemonic;
+
+                if (flat)
+                {
+                    QString text = groupBox->text;
+                    QString detailText;
+
+                    int splitPos = text.indexOf(QLatin1Char('\t'));
+                    if (splitPos >= 0)
+                    {
+                        detailText = text.mid(splitPos + 1);
+                        text = text.left(splitPos);
+                    }
+
+                    QRect rect = labelRect;
+
+                    if (!text.isEmpty())
+                    {
+                        QFont font = painter->font();
+                        font.setPixelSize(font.pixelSize() + 2);
+                        font.setWeight(QFont::DemiBold);
+
+                        QnScopedPainterFontRollback fontRollback(painter, font);
+
+                        drawItemText(painter, rect, flags,
+                                     groupBox->palette, groupBox->state.testFlag(QStyle::State_Enabled),
+                                     text, QPalette::Text);
+
+                        rect.setLeft(rect.left() + QFontMetrics(font).size(flags, text).width());
+                    }
+
+                    if (!detailText.isEmpty())
+                    {
+                        drawItemText(painter, rect, Qt::AlignCenter | Qt::TextHideMnemonic,
+                                     groupBox->palette, groupBox->state.testFlag(QStyle::State_Enabled),
+                                     detailText, QPalette::WindowText);
+                    }
+                }
+                else
+                {
+                    drawItemText(painter, labelRect, flags,
+                                 groupBox->palette, groupBox->state.testFlag(QStyle::State_Enabled),
+                                 groupBox->text, QPalette::WindowText);
+                }
             }
 
             if (groupBox->subControls.testFlag(SC_GroupBoxCheckBox))
@@ -1403,12 +1441,34 @@ QRect QnNxStyle::subControlRect(
                 {
                     if (widget)
                     {
-                        QStyleOptionGroupBox opt = *groupBox;
+                        QString text = groupBox->text;
+                        QString detailText;
+
+                        int splitPos = text.indexOf(QLatin1Char('\t'));
+                        if (splitPos >= 0)
+                        {
+                            detailText = text.mid(splitPos + 1);
+                            text = text.left(splitPos);
+                        }
+
                         QFont font = widget->font();
                         font.setPixelSize(font.pixelSize() + 2);
                         font.setWeight(QFont::DemiBold);
-                        opt.fontMetrics = QFontMetrics(font);
-                        rect = base_type::subControlRect(control, &opt, subControl, widget);
+
+                        int flags = Qt::AlignTop |
+                                    Qt::AlignLeft |
+                                    Qt::TextHideMnemonic;
+
+                        QSize size = QFontMetrics(font).size(flags, text);
+
+                        if (!detailText.isEmpty())
+                        {
+                            QSize detailSize = QFontMetrics(widget->font())
+                                               .size(flags, detailText);
+                            size.rwidth() += detailSize.width();
+                        }
+
+                        rect = QRect(QPoint(), size);
                     }
 
                     rect.moveLeft(0);
@@ -1518,7 +1578,7 @@ QRect QnNxStyle::subElementRect(
     case SE_PushButtonLayoutItem:
         if (qobject_cast<const QDialogButtonBox *>(widget))
         {
-            const int shift = dp(8);
+            const int shift = dp(16);
             return option->rect.adjusted(-shift, -shift, shift, shift);
         }
         break;
@@ -1699,6 +1759,14 @@ int QnNxStyle::pixelMetric(
     case PM_FocusFrameHMargin:
     case PM_FocusFrameVMargin:
         return dp(1);
+    case PM_LayoutTopMargin:
+    case PM_LayoutBottomMargin:
+    case PM_LayoutLeftMargin:
+    case PM_LayoutRightMargin:
+        return dp(0);
+    case PM_LayoutHorizontalSpacing:
+    case PM_LayoutVerticalSpacing:
+        return dp(8);
     default:
         break;
     }

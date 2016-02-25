@@ -11,14 +11,15 @@
 #include <functional>
 #include <memory>
 
+#include <nx/utils/move_only_func.h>
 #include <utils/common/byte_array.h>
+#include <utils/common/systemerror.h>
+#include <utils/common/stoppable.h>
 
 #include "aio/pollset.h"
 #include "buffer.h"
 #include "nettools.h"
 #include "socket_common.h"
-#include "utils/common/systemerror.h"
-#include "utils/common/stoppable.h"
 
 //todo: #ak cancel asynchoronous operations
 
@@ -167,13 +168,13 @@ public:
         \note Call will always be queued. I.e., if called from handler running in aio thread, it will be called after handler has returned
         \note \a handler execution is cancelled if socket polling for every event is cancelled
     */
-    virtual void post(std::function<void()> handler) = 0;
+    virtual void post(nx::utils::MoveOnlyFunc<void()> handler) = 0;
     //!Call \a handler from within aio thread \a sock is bound to
     /*!
         \note If called in aio thread, handler will be called from within this method, otherwise - queued like \a AbstractSocket::post does
         \note \a handler execution is cancelled if socket polling for every event is cancelled
     */
-    virtual void dispatch(std::function<void()> handler) = 0;
+    virtual void dispatch(nx::utils::MoveOnlyFunc<void()> handler) = 0;
 
     //!Returns pointer to AIOThread this socket is bound to
     /*!
@@ -253,7 +254,7 @@ public:
     */
     virtual void connectAsync(
         const SocketAddress& addr,
-        std::function<void(SystemError::ErrorCode)> handler) = 0;
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) = 0;
 
     //!Reads bytes from socket asynchronously
     /*!
@@ -292,11 +293,11 @@ public:
         \note \a timeoutMs MUST be greater then zero!
     */
     virtual void registerTimer(
-        unsigned int timeoutMs,
-        std::function<void()> handler) = 0;
-    void registerTimer(
         std::chrono::milliseconds timeout,
-        std::function<void()> handler);
+        nx::utils::MoveOnlyFunc<void()> handler) = 0;
+    void registerTimer(
+        unsigned int timeoutMs,
+        nx::utils::MoveOnlyFunc<void()> handler);
 
     //!Cancel async socket operation. \a cancellationDoneHandler is invoked when cancelled
     /*!
@@ -304,7 +305,7 @@ public:
     */
     virtual void cancelIOAsync(
         nx::network::aio::EventType eventType,
-        std::function< void() > handler) = 0;
+        nx::utils::MoveOnlyFunc< void() > handler) = 0;
 
     //!Cancels async operation and blocks until cancellation is stopped
     /*!
@@ -314,7 +315,7 @@ public:
     virtual void cancelIOSync(nx::network::aio::EventType eventType) = 0;
 
     //!Implementation of QnStoppable::pleaseStop
-    virtual void pleaseStop( std::function< void() > handler ) override;
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
     //!Implementation of QnStoppable::pleaseStopSync
     virtual void pleaseStopSync() override;
 };

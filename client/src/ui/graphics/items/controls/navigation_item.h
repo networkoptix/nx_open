@@ -66,6 +66,9 @@ protected:
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *) override;
 
 private:
+    QnImageButtonWidget *newActionButton(QnActions::IDType id);
+
+private:
     QnImageButtonWidget *m_jumpBackwardButton;
     QnImageButtonWidget *m_stepBackwardButton;
     QnImageButtonWidget *m_playButton;

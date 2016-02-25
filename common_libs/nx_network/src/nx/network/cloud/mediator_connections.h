@@ -153,6 +153,11 @@ public:
         return String();
     }
 
+    AbstractCloudSystemCredentialsProvider* credentialsProvider() const
+    {
+        return m_connector;
+    }
+
 protected:
     template<typename RequestData, typename CompletionHandlerType>
     void doAuthRequest(

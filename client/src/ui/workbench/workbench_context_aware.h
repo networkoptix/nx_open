@@ -18,9 +18,9 @@ class QnWorkbenchNavigator;
 class QnWorkbenchCustomizer;
 
 /**
- * This class simplifies access to workbench context. 
- * 
- * If some class needs access to workbench context, 
+ * This class simplifies access to workbench context.
+ *
+ * If some class needs access to workbench context,
  * it can simply derive from <tt>QnWorkbenchContextAware</tt> and
  * pass its context-aware parent into constructor.
  */
@@ -28,7 +28,7 @@ class QnWorkbenchContextAware {
 public:
     /**
      * Constructor.
-     * 
+     *
      * \param parent                    Parent for this object. Must itself be
      *                                  a child of some context-aware object,
      *                                  or of a context. Must not be NULL.
@@ -41,7 +41,7 @@ public:
 
     /**
      * Virtual destructor.
-     * 
+     *
      * We do <tt>dynamic_cast</tt>s to <tt>QnWorkbenchContextAware</tt>, so this
      * class better have a vtable.
      */
@@ -63,7 +63,7 @@ public:
 protected:
     virtual void afterContextInitialized();
 
-    QAction *action(const Qn::ActionId id) const;
+    QAction *action(const QnActions::IDType id) const;
 
     QnActionManager *menu() const;
 

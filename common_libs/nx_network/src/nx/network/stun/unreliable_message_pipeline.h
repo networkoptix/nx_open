@@ -10,11 +10,13 @@
 #include <memory>
 
 #include <nx/utils/log/log.h>
+#include <utils/common/cpp14.h>
 #include <utils/common/stoppable.h>
 #include <utils/common/systemerror.h>
 
 #include "nx/network/socket_common.h"
 #include "nx/network/socket_factory.h"
+#include "nx/network/system_socket.h"
 
 
 namespace nx {
@@ -36,10 +38,12 @@ public:
 };
 
 /** Pipeline for transferring messages over unreliable transport (datagram socket).
-        Deliveres received messages to \a UnreliableMessagePipelineEventHandler<\a MessageType> instance
+    This is a helper class for implementing UDP server/client of message-orientied protocol.
+    Received messages are delivered to \a UnreliableMessagePipelineEventHandler<\a MessageType> instance.
     \note All events are delivered within internal socket's aio thread
-    \note This is a helper class for implementing UDP server/client of
-        message-orientied protocol
+    \note \a UnreliableMessagePipeline object can be safely freed within any event handler
+        (more generally, within internal socket's aio thread).
+        To delete it in another thread, cancel I/O with \a UnreliableMessagePipeline::pleaseStop call
  */
 template<
     class MessageType,
@@ -58,17 +62,28 @@ class UnreliableMessagePipeline
 public:
     typedef UnreliableMessagePipelineEventHandler<MessageType> CustomPipeline;
 
+    /**
+        @param customPipeline \a UnreliableMessagePipeline does not take
+            ownership of \a customPipeline
+    */
     UnreliableMessagePipeline(CustomPipeline* customPipeline)
     :
         m_customPipeline(customPipeline),
-        m_socket(SocketFactory::createDatagramSocket())
+        m_socket(std::make_unique<UDPSocket>()),
+        m_terminationFlag(nullptr)
     {
+    }
+
+    ~UnreliableMessagePipeline()
+    {
+        if (m_terminationFlag)
+            *m_terminationFlag = true;
     }
 
     /**
         \note \a completionHandler is invoked in socket's aio thread
     */
-    virtual void pleaseStop(std::function<void()> completionHandler) override
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override
     {
         m_socket->pleaseStop(std::move(completionHandler));
     }
@@ -97,7 +112,9 @@ public:
     void sendMessage(
         SocketAddress destinationEndpoint,
         const MessageType& message,
-        std::function<void(SystemError::ErrorCode, SocketAddress)> completionHandler)
+        std::function<void(
+            SystemError::ErrorCode /*sysErrorCode*/,
+            SocketAddress /*resolvedTargetAddress*/)> completionHandler)
     {
         //serializing message
         SerializerType messageSerializer;
@@ -116,9 +133,23 @@ public:
             std::move(completionHandler)));
     }
 
-    const std::unique_ptr<AbstractDatagramSocket>& socket()
+    const std::unique_ptr<network::UDPSocket>& socket()
     {
         return m_socket;
+    }
+
+    /** Move ownership of socket to the caller.
+        \a UnreliableMessagePipeline is in undefined state after this call and MUST be freed
+        \note Can be called within send/recv completion handler  only
+            (more specifically, within socket's aio thread)!
+    */
+    std::unique_ptr<network::UDPSocket> takeSocket()
+    {
+        if (m_terminationFlag)
+            *m_terminationFlag = true;
+        //we MUST be in aio thread. TODO #ak add assert for aio thread
+        m_socket->cancelIOSync(aio::etNone); 
+        return std::move(m_socket);
     }
 
 private:
@@ -155,10 +186,11 @@ private:
     };
 
     CustomPipeline* m_customPipeline;
-    std::unique_ptr<AbstractDatagramSocket> m_socket;
+    std::unique_ptr<UDPSocket> m_socket;
     nx::Buffer m_readBuffer;
     ParserType m_messageParser;
     std::deque<OutgoingMessageContext> m_sendQueue;
+    bool* m_terminationFlag;
 
     void onBytesRead(
         SystemError::ErrorCode errorCode,
@@ -171,7 +203,12 @@ private:
         {
             NX_LOGX(lm("Error reading from socket. %1").
                 arg(SystemError::toString(errorCode)), cl_logDEBUG1);
+            bool terminated = false;
+            m_terminationFlag = &terminated;
             m_customPipeline->ioFailure(errorCode);
+            if (terminated)
+                return; //this has been freed
+            m_terminationFlag = nullptr;
             m_socket->registerTimer(
                 kRetryReadAfterFailureTimeout,
                 [this]() { startReceivingMessages(); });
@@ -184,9 +221,14 @@ private:
         m_messageParser.setMessage(&msg);
         if (m_messageParser.parse(m_readBuffer, &bytesParsed) == nx_api::ParserState::done)
         {
+            bool terminated = false;
+            m_terminationFlag = &terminated;
             m_customPipeline->messageReceived(
                 std::move(sourceAddress),
                 std::move(msg));
+            if (terminated)
+                return; //this has been freed
+            m_terminationFlag = nullptr;
         }
         else
         {

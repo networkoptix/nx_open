@@ -6,7 +6,7 @@ namespace stun {
 AsyncClientUser::~AsyncClientUser()
 {
     QnMutexLocker lk( &m_mutex );
-    Q_ASSERT_X(m_stopHandler, Q_FUNC_INFO, "pleaseStop was not called");
+    Q_ASSERT_X(m_pleaseStopHasBeenCalled, Q_FUNC_INFO, "pleaseStop was not called");
 }
 
 SocketAddress AsyncClientUser::localAddress() const
@@ -14,17 +14,24 @@ SocketAddress AsyncClientUser::localAddress() const
     return m_client->localAddress();
 }
 
+SocketAddress AsyncClientUser::remoteAddress() const
+{
+    return m_client->remoteAddress();
+}
+
 AsyncClientUser::AsyncClientUser(std::shared_ptr<AbstractAsyncClient> client)
     : m_operationsInProgress(0)
     , m_client(std::move(client))
+    , m_pleaseStopHasBeenCalled(false)
 {
 }
 
-void AsyncClientUser::pleaseStop(std::function<void()> handler)
+void AsyncClientUser::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
     QnMutexLocker lk(&m_mutex);
     Q_ASSERT_X(!m_stopHandler, Q_FUNC_INFO, "pleaseStop is called 2nd time");
     m_stopHandler = std::move(handler);
+    m_pleaseStopHasBeenCalled = true;
     m_client.reset();
     checkHandler(&lk);
 }
@@ -96,7 +103,7 @@ void AsyncClientUser::checkHandler(QnMutexLockerBase* lk)
     if (m_stopHandler && m_operationsInProgress == 0)
     {
         const auto client = std::move(m_client);
-        const auto handler = m_stopHandler;
+        const auto handler = std::move(m_stopHandler);
 
         lk->unlock();
         handler();

@@ -12,7 +12,7 @@ public:
     {
         m_thread = std::thread( [ this ]()
         {
-            std::function< void() > handler;
+            nx::utils::MoveOnlyFunc< void() > handler;
             {
                 QnMutexLocker lk( &m_mutex );
                 while( !m_handler )
@@ -29,7 +29,7 @@ public:
 
     bool isRunning() const { return m_isRunning; }
 
-    virtual void pleaseStop( std::function< void() > completionHandler ) override
+    virtual void pleaseStop( nx::utils::MoveOnlyFunc< void() > completionHandler ) override
     {
         QnMutexLocker lk( &m_mutex );
         m_handler = std::move( completionHandler );
@@ -40,7 +40,7 @@ private:
     QnMutex m_mutex;
     bool m_isRunning;
     QnWaitCondition m_condition;
-    std::function< void() > m_handler;
+    nx::utils::MoveOnlyFunc< void() > m_handler;
     std::thread m_thread;
 };
 

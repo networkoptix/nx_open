@@ -2,7 +2,6 @@
 #ifdef _WIN32
 
 #include "systemexcept_win32.h"
-#include "version.h"
 
 #include <memory>
 #include <fstream>
@@ -85,7 +84,7 @@ static bool GetCrashPrefix( char* sCrashPrefix )
 static
 void WriteDump( HANDLE hThread , PEXCEPTION_POINTERS ex ) {
 
-    static const pfMiniDumpWriteDump MiniDumpWriteDumpAddress = 
+    static const pfMiniDumpWriteDump MiniDumpWriteDumpAddress =
         Win32FuncResolver::instance()->resolveFunction<pfMiniDumpWriteDump> (
         L"DbgHelp.dll",
         "MiniDumpWriteDump",
@@ -104,13 +103,13 @@ void WriteDump( HANDLE hThread , PEXCEPTION_POINTERS ex ) {
             0,
             sAppData)))
         return;
-    
+
     char sCrashPrefix[MAX_PATH];
     if( !GetCrashPrefix( sCrashPrefix ) )
         return;
 
     // it should not acquire any global lock internally. Otherwise
-    // we may deadlock here. 
+    // we may deadlock here.
     char sFileName[MAX_PATH];
     if( sprintf(sFileName, "%s\\%s_%i.dmp", sAppData, sCrashPrefix, GetCurrentProcessId() ) < 0)
         return;
@@ -127,29 +126,29 @@ void WriteDump( HANDLE hThread , PEXCEPTION_POINTERS ex ) {
     if( hFile == INVALID_HANDLE_VALUE )
         return;
 
-    MINIDUMP_EXCEPTION_INFORMATION sMDumpExcept; 
+    MINIDUMP_EXCEPTION_INFORMATION sMDumpExcept;
 
-    sMDumpExcept.ThreadId           = ::GetCurrentThreadId(); 
-    sMDumpExcept.ExceptionPointers  = ex; 
-    sMDumpExcept.ClientPointers     = FALSE; 
+    sMDumpExcept.ThreadId           = ::GetCurrentThreadId();
+    sMDumpExcept.ExceptionPointers  = ex;
+    sMDumpExcept.ClientPointers     = FALSE;
 
     // This will generate the full minidump. I don't know the specific
     // requirements of our dump file. If it is used for online report
-    // or online analyzing, we may need to generate small dump file 
+    // or online analyzing, we may need to generate small dump file
 
-    MINIDUMP_TYPE sMDumpType =  (MINIDUMP_TYPE)( MiniDumpWithFullMemoryInfo | 
-                                                MiniDumpWithHandleData | 
-                                                MiniDumpWithThreadInfo | 
-                                            MiniDumpWithUnloadedModules ); 
+    MINIDUMP_TYPE sMDumpType =  (MINIDUMP_TYPE)( MiniDumpWithFullMemoryInfo |
+                                                MiniDumpWithHandleData |
+                                                MiniDumpWithThreadInfo |
+                                            MiniDumpWithUnloadedModules );
     if( globalCrashDumpSettingsInstance.dumpFullMemory )
     {
         //TODO #ak if add MiniDumpWithCodeSegs, generated dump has 0 size
         sMDumpType = (MINIDUMP_TYPE)( sMDumpType |
-            MiniDumpWithFullMemory | 
+            MiniDumpWithFullMemory |
             MiniDumpWithDataSegs | MiniDumpWithProcessThreadData | MiniDumpWithFullAuxiliaryState );
     }
 
-    MiniDumpWriteDumpAddress( 
+    MiniDumpWriteDumpAddress(
         ::GetCurrentProcess(),
         ::GetCurrentProcessId(),
         hFile,
@@ -272,7 +271,7 @@ std::string win32_exception::getCrashPattern()
 }
 
 static
-HANDLE 
+HANDLE
 CreateLegacyDumpFile() {
     char sAppData[MAX_PATH];
     if( FAILED(SHGetFolderPathA(
@@ -282,13 +281,13 @@ CreateLegacyDumpFile() {
             0,
             sAppData)))
         return INVALID_HANDLE_VALUE;
-    
+
     char sCrashPrefix[MAX_PATH];
     if( !GetCrashPrefix( sCrashPrefix ) )
         return INVALID_HANDLE_VALUE;
 
     // it should not acquire any global lock internally. Otherwise
-    // we may deadlock here. 
+    // we may deadlock here.
     char sFileName[MAX_PATH];
     if( sprintf( sFileName, "%s\\%s_%i.except", sAppData, sCrashPrefix, GetCurrentProcessId() ) < 0)
         return INVALID_HANDLE_VALUE;

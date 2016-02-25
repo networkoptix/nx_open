@@ -16,6 +16,10 @@ public:
         ON_CALL(*this, setIndicationHandler(::testing::_, ::testing::_))
             .WillByDefault(::testing::Invoke(
                 this, &StunAsyncClientMock::setIndicationHandlerImpl));
+        ON_CALL(*this, localAddress())
+            .WillByDefault(::testing::Return(SocketAddress()));
+        ON_CALL(*this, remoteAddress())
+            .WillByDefault(::testing::Return(SocketAddress()));
     }
 
     MOCK_METHOD2(connect, void(SocketAddress, bool));
@@ -23,6 +27,7 @@ public:
     MOCK_METHOD1(ignoreIndications, bool(int));
     MOCK_METHOD2(sendRequest, void(stun::Message, RequestHandler));
     MOCK_CONST_METHOD0(localAddress, SocketAddress());
+    MOCK_CONST_METHOD0(remoteAddress, SocketAddress());
     MOCK_METHOD1(closeConnection, void(SystemError::ErrorCode));
 
     void emulateIndication(stun::Message indication)

@@ -129,10 +129,12 @@ public:
         if \a handler not provided the method will block until actual
         cancelation is done
     */
-    void cancel( void* requestId, std::function< void() > handler = nullptr );
+    void cancel(
+        void* requestId,
+        nx::utils::MoveOnlyFunc< void() > handler = nullptr );
     bool isRequestIdKnown( void* requestId ) const;
 
-    void pleaseStop( std::function<void()> handler ) override;
+    void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
 private:
     struct HostAddressInfo

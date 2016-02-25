@@ -9,16 +9,29 @@
 #include <atomic>
 #include <memory>
 
+#ifdef __GNUC__
+#include <features.h>
+#endif
+
 
 ////////////////////////////////////////////////////////////////////////////
-// Some c++ features missing in MS Visual studio 2012 are defined here
-// TODO #ak remove this file after moving to visual studio 2013
+// Some c++14 features missing in MS Visual studio 2012 and GCC 4.8 are
+// defined here
 ////////////////////////////////////////////////////////////////////////////
 
 
 namespace std
 {
-#if _MSC_VER <= 1700
+#ifdef _MSC_VER
+#   if _MSC_VER <= 1700
+#       define USE_OWN_MAKE_UNIQUE
+#   endif
+#elif defined(__GNUC_PREREQ)
+#   if !__GNUC_PREREQ(4,9)
+#      define USE_OWN_MAKE_UNIQUE
+#   endif
+#endif
+#ifdef USE_OWN_MAKE_UNIQUE
 template<
     typename T>
     std::unique_ptr<T> make_unique()
@@ -72,83 +85,7 @@ template<
         std::forward<Arg3>( arg3 ),
         std::forward<Arg4>( arg4 ) ) );
 }
-#endif
-
-template<typename T>
-class atomic_unique_ptr
-{
-    typedef void (atomic_unique_ptr<T>::*bool_type)() const;
-    void this_type_does_not_support_comparisons() const {}
-
-public:
-    atomic_unique_ptr(T* ptr = nullptr)
-    :
-        m_ptr(ptr)
-    {
-    }
-    atomic_unique_ptr(atomic_unique_ptr&& rhs)
-    {
-        auto ptr = rhs.m_ptr.exchange(nullptr);
-        m_ptr.store(ptr);
-    }
-    ~atomic_unique_ptr()
-    {
-        auto ptr = m_ptr.exchange(nullptr);
-        delete ptr;
-    }
-
-    void reset(T* ptr = nullptr)
-    {
-        auto oldPtr = m_ptr.exchange(ptr);
-        delete oldPtr;
-    }
-    T* release()
-    {
-        return m_ptr.exchange(nullptr);
-    }
-    T* get()
-    {
-        return m_ptr.load();
-    }
-    const T* get() const
-    {
-        return m_ptr.load();
-    }
-
-    template<typename D>
-    atomic_unique_ptr& operator=(atomic_unique_ptr<D>&& rhs)
-    {
-        if (this == rhs)
-            return *this;
-
-        reset(rhs.release());
-        return *this;
-    }
-    template<typename D>
-    atomic_unique_ptr& operator=(std::unique_ptr<D>&& rhs)
-    {
-        reset(rhs.release());
-        return *this;
-    }
-    T* operator->()
-    {
-        return get();
-    }
-    const T* operator->() const
-    {
-        return get();
-    }
-
-    operator bool_type() const
-    {
-        return m_ptr.load()
-            ? &atomic_unique_ptr<T>::this_type_does_not_support_comparisons
-            : nullptr;
-    }
-
-private:
-    std::atomic<T*> m_ptr;
-};
-}
+#endif  //USE_OWN_MAKE_UNIQUE
+}   //std
 
 #endif  //libcommon_cpp14_h

@@ -21,6 +21,7 @@
 #include "ui/models/server_addresses_model.h"
 #include "ui/style/custom_style.h"
 #include <ui/delegates/switch_item_delegate.h>
+#include <ui/widgets/snapped_scrollbar.h>
 
 #include <nx/network/socket_common.h>
 #include "utils/common/string.h"
@@ -190,9 +191,6 @@ QnRoutingManagementWidget::QnRoutingManagementWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->splitter->setStretchFactor(0, 1);
-    ui->splitter->setStretchFactor(1, 2);
-
     ui->addressesView->setItemDelegateForColumn(QnServerAddressesModel::InUseColumn, new QnSwitchItemDelegate(this));
 
     setWarningStyle(ui->warningLabel);
@@ -220,6 +218,10 @@ QnRoutingManagementWidget::QnRoutingManagementWidget(QWidget *parent) :
     ui->addressesView->header()->setSectionResizeMode(QnServerAddressesModel::InUseColumn, QHeaderView::ResizeToContents);
     ui->addressesView->header()->setSectionsMovable(false);
 
+    QnSnappedScrollBar *scrollBar = new QnSnappedScrollBar(this);
+    scrollBar->setUseItemViewPaddingWhenVisible(true);
+    ui->addressesView->setVerticalScrollBar(scrollBar->proxyScrollBar());
+
     connect(ui->serversView->selectionModel(),  &QItemSelectionModel::currentRowChanged,        this,   &QnRoutingManagementWidget::at_serversView_currentIndexChanged);
     connect(ui->addressesView->selectionModel(),&QItemSelectionModel::currentRowChanged,        this,   &QnRoutingManagementWidget::updateUi);
     connect(m_serverAddressesModel,             &QnServerAddressesModel::dataChanged,           this,   &QnRoutingManagementWidget::at_serverAddressesModel_dataChanged);
@@ -229,7 +231,6 @@ QnRoutingManagementWidget::QnRoutingManagementWidget(QWidget *parent) :
 
     connect(qnResPool,  &QnResourcePool::resourceAdded,     this,   &QnRoutingManagementWidget::at_resourcePool_resourceAdded);
     connect(qnResPool,  &QnResourcePool::resourceRemoved,   this,   &QnRoutingManagementWidget::at_resourcePool_resourceRemoved);
-
 
     m_serverListModel->setResources(qnResPool->getResourcesWithFlag(Qn::server));
 
@@ -369,7 +370,7 @@ void QnRoutingManagementWidget::updateFromModel() {
 void QnRoutingManagementWidget::updateUi() {
     QModelIndex sourceIndex = m_sortedServerAddressesModel->mapToSource(ui->addressesView->currentIndex());
 
-    ui->addButton->setEnabled(ui->serversView->currentIndex().isValid()&& !isReadOnly());
+    ui->buttonsWidget->setVisible(ui->serversView->currentIndex().isValid() && !isReadOnly());
     ui->removeButton->setEnabled(m_serverAddressesModel->isManualAddress(sourceIndex) && !isReadOnly());
 }
 
@@ -467,10 +468,10 @@ void QnRoutingManagementWidget::at_serverAddressesModel_dataChanged(const QModel
 void QnRoutingManagementWidget::reportUrlEditingError(int error) {
     switch (error) {
     case QnServerAddressesModel::InvalidUrl:
-        QMessageBox::critical(this, tr("Error"), tr("You have entered an invalid URL."));
+        QnMessageBox::critical(this, tr("Error"), tr("You have entered an invalid URL."));
         break;
     case QnServerAddressesModel::ExistingUrl:
-        QMessageBox::warning(this, tr("Warning"), tr("This URL is already in the address list."));
+        QnMessageBox::warning(this, tr("Warning"), tr("This URL is already in the address list."));
         break;
     }
 }

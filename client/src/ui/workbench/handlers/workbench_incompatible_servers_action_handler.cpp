@@ -30,8 +30,8 @@ QnWorkbenchIncompatibleServersActionHandler::QnWorkbenchIncompatibleServersActio
     m_connectTool(0),
     m_mergeDialog(0)
 {
-    connect(action(Qn::ConnectToCurrentSystem),         SIGNAL(triggered()),    this,   SLOT(at_connectToCurrentSystemAction_triggered()));
-    connect(action(Qn::MergeSystems),                   SIGNAL(triggered()),    this,   SLOT(at_mergeSystemsAction_triggered()));
+    connect(action(QnActions::ConnectToCurrentSystem),         SIGNAL(triggered()),    this,   SLOT(at_connectToCurrentSystemAction_triggered()));
+    connect(action(QnActions::MergeSystems),                   SIGNAL(triggered()),    this,   SLOT(at_mergeSystemsAction_triggered()));
 }
 
 QnWorkbenchIncompatibleServersActionHandler::~QnWorkbenchIncompatibleServersActionHandler() {}
@@ -40,7 +40,7 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemActio
 {
     if (m_connectTool)
     {
-        QMessageBox::critical(mainWindow(), tr("Error"), tr("Please wait. Requested servers will be added to your system."));
+        QnMessageBox::critical(mainWindow(), tr("Error"), tr("Please wait. Requested servers will be added to your system."));
         return;
     }
 
@@ -83,7 +83,7 @@ void QnWorkbenchIncompatibleServersActionHandler::connectToCurrentSystem(
         password = dialog.textValue();
 
         if (password.isEmpty())
-            QMessageBox::critical(mainWindow(), tr("Error"), tr("Password cannot be empty!"));
+            QnMessageBox::critical(mainWindow(), tr("Error"), tr("Password cannot be empty!"));
         else
             break;
     }
@@ -187,10 +187,10 @@ bool QnWorkbenchIncompatibleServersActionHandler::validateStartLicenses(
         "As only 1 START license is allowed per System after your merge you will only have 1 START license remaining.\n"\
         "If you understand this and would like to proceed please click Merge to continue.\n");
 
-    QnMessageBox messageBox(QnMessageBox::Warning, 0, tr("Warning!"), message, QnMessageBox::Cancel);
-    messageBox.addButton(tr("Merge"), QnMessageBox::AcceptRole);
+    QnMessageBox messageBox(QnMessageBox::Warning, 0, tr("Warning!"), message, QDialogButtonBox::Cancel);
+    messageBox.addButton(tr("Merge"), QDialogButtonBox::AcceptRole);
 
-    return messageBox.exec() != QnMessageBox::Cancel;
+    return messageBox.exec() != QDialogButtonBox::Cancel;
 }
 
 bool QnWorkbenchIncompatibleServersActionHandler::serverHasStartLicenses(

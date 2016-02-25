@@ -9,7 +9,7 @@
 #include <map>
 #include <mutex>
 
-#include <cloud_data_provider.h>
+#include "../cloud_data_provider.h"
 
 
 namespace nx {

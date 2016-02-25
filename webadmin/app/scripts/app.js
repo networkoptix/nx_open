@@ -9,7 +9,11 @@ angular.module('webadminApp', [
     'ui.bootstrap',
     'tc.chartjs',
     'ngStorage'
-]).config(function ($routeProvider) {
+]).config(function($sceDelegateProvider) {
+    $sceDelegateProvider.resourceUrlWhitelist([
+        'self',
+        Config.cloud.portalWhiteList]);
+}).config(function ($routeProvider) {
     $routeProvider
         .when('/settings', {
             templateUrl: 'views/settings.html',
@@ -71,9 +75,9 @@ angular.module('webadminApp', [
             templateUrl: 'views/log.html',
             controller: 'LogCtrl'
         })
-        .when('/log', {
-            templateUrl: 'views/log.html',
-            controller: 'LogCtrl'
+        .when('/setup', {
+            templateUrl: 'views/dialogs/setup.html',
+            controller: 'SetupCtrl'
         })
         .otherwise({
             redirectTo: '/view'

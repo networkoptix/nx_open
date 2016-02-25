@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 class QThread;
 class QTimer;
 

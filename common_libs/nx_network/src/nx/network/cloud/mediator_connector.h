@@ -39,7 +39,7 @@ public:
     void setSystemCredentials( boost::optional<SystemCredentials> value );
     virtual boost::optional<SystemCredentials> getSystemCredentials() const;
 
-    void pleaseStop( std::function<void()> handler ) override;
+    void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
     boost::optional<SocketAddress> mediatorAddress() const;
 

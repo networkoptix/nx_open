@@ -1,5 +1,4 @@
-#ifndef QN_APPINFO_H
-#define QN_APPINFO_H
+#pragma once
 
 #include <QtCore/QString>
 
@@ -29,14 +28,14 @@ struct QnAppInfo {
     static QString productNameShort();
     static QString productNameLong();
     static QString customizationName();
-    
+
     static QString defaultLanguage();
-    
+
     static QString clientExecutableName();
     static QString applauncherExecutableName();
-    
+
     static QString mediaFolderName();
-    
+
     static QString licensingEmailAddress();
     static QString companyUrl();
 
@@ -76,4 +75,3 @@ struct QnAppInfo {
     }
 };
 
-#endif // QN_APPINFO_H

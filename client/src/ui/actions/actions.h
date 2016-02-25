@@ -7,11 +7,17 @@
 
 #include <client/client_globals.h>
 
-namespace Qn {
+class QnActions
+{
+    Q_GADGET
+    Q_ENUMS(IDType)
+
+public:
     /**
      * Enum of all menu actions.
      */
-    enum ActionId {
+    enum IDType
+    {
         /* Actions that are not assigned to any menu. */
 
         /**
@@ -1003,6 +1009,8 @@ namespace Qn {
          */
         ToggleSliderAction,
 
+        ToggleNotificationsAction,
+
         PinNotificationsAction,
 
         /* Playback actions. */
@@ -1081,6 +1089,12 @@ namespace Qn {
         NoAction = -1
     };
 
+};
+
+QN_FUSION_DECLARE_FUNCTIONS(QnActions::IDType, (lexical)(metatype))
+
+namespace Qn
+{
     /**
      * Scope of an action.
      *
@@ -1098,6 +1112,7 @@ namespace Qn {
         NotificationsScope      = 0x00000020,
         ScopeMask               = 0x000000FF
     };
+
     Q_DECLARE_FLAGS(ActionScopes, ActionScope);
 
     /**
@@ -1218,8 +1233,6 @@ namespace QnActionTypes {
     };
     Q_DECLARE_FLAGS(ClientModes, ClientMode)
 }
-
-Q_DECLARE_METATYPE(Qn::ActionId);
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::ActionScopes);
 Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::ActionParameterTypes);

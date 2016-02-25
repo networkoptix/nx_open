@@ -31,20 +31,24 @@ namespace cloud {
  */
 class NX_NETWORK_API UdpHolePunchingTunnelConnector
 :
-    public AbstractTunnelConnector,
-    private nx::network::UnreliableMessagePipelineEventHandler<stun::Message>
+    public AbstractTunnelConnector
 {
 public:
-    UdpHolePunchingTunnelConnector(AddressEntry targetHostAddress);
+    /**
+        @param mediatorAddress This param is for test only
+    */
+    UdpHolePunchingTunnelConnector(
+        AddressEntry targetHostAddress,
+        boost::optional<SocketAddress> mediatorAddress = boost::none);
     virtual ~UdpHolePunchingTunnelConnector();
 
-    virtual void pleaseStop(std::function<void()> handler) override;
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
     virtual int getPriority() const override;
     /** Only one connect can be running at a time. */
     virtual void connect(
         std::chrono::milliseconds timeout,
-        std::function<void(
+        nx::utils::MoveOnlyFunc<void(
             SystemError::ErrorCode errorCode,
             std::unique_ptr<AbstractOutgoingTunnelConnection>)> handler) override;
     virtual const AddressEntry& targetPeerAddress() const override;
@@ -53,29 +57,19 @@ private:
     const AddressEntry m_targetHostAddress;
     const nx::String m_connectSessionId;
     std::unique_ptr<nx::hpm::api::MediatorClientUdpConnection> m_mediatorUdpClient;
-    std::function<void(
+    nx::utils::MoveOnlyFunc<void(
         SystemError::ErrorCode errorCode,
         std::unique_ptr<AbstractOutgoingTunnelConnection>)> m_completionHandler;
     boost::optional<SocketAddress> m_targetHostUdpAddress;
-    std::unique_ptr<stun::UnreliableMessagePipeline> m_udpPipeline;
     std::unique_ptr<UdtStreamSocket> m_udtConnection;
     nx::hpm::api::ConnectionResultRequest m_connectResultReport;
     nx::network::aio::Timer m_timer;
     bool m_done;
-
-    /** implementation of \a UnreliableMessagePipelineEventHandler::messageReceived */
-    virtual void messageReceived(
-        SocketAddress msgSourceAddress,
-        stun::Message message) override;
-    /** implementation of \a UnreliableMessagePipelineEventHandler::ioFailure */
-    virtual void ioFailure(SystemError::ErrorCode errorCode) override;
+    boost::optional<std::chrono::milliseconds> m_connectTimeout;
 
     void onConnectResponse(
         nx::hpm::api::ResultCode resultCode,
         nx::hpm::api::ConnectResponse response);
-    void onSynAckReceived(
-        SystemError::ErrorCode errorCode,
-        stun::Message synAckMessage);
     void onUdtConnectionEstablished(
         SystemError::ErrorCode errorCode);
     void onTimeout();

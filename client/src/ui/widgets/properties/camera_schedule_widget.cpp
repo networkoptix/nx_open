@@ -840,7 +840,7 @@ void QnCameraScheduleWidget::at_displayFpsCheckBox_stateChanged(int state)
 
 void QnCameraScheduleWidget::at_licensesButton_clicked()
 {
-    menu()->trigger(Qn::PreferencesLicensesTabAction);
+    menu()->trigger(QnActions::PreferencesLicensesTabAction);
 }
 
 void QnCameraScheduleWidget::at_releaseSignalizer_activated(QObject *target) {
@@ -854,7 +854,7 @@ void QnCameraScheduleWidget::at_releaseSignalizer_activated(QObject *target) {
     using boost::algorithm::all_of;
 
     if(m_cameras.size() > 1) {
-        QMessageBox::warning(
+        QnMessageBox::warning(
             this,
             tr("Warning"),
             tr("Motion Recording is disabled or not supported on some of the selected cameras. Please go to the motion setup page to ensure it is supported and enabled.")
@@ -868,17 +868,17 @@ void QnCameraScheduleWidget::at_releaseSignalizer_activated(QObject *target) {
         bool hasMotion = all_of(m_cameras, [](const QnVirtualCameraResourcePtr &camera) {return camera->hasMotion(); });
 
         if (hasMotion && !hasDualStreaming) {
-            QMessageBox::warning(
+            QnMessageBox::warning(
                 this,
                 tr("Warning"),
                 tr("Dual-Streaming is not supported on this camera."));
         } else if(!hasMotion && !hasDualStreaming) {
-            QMessageBox::warning(
+            QnMessageBox::warning(
                 this,
                 tr("Warning"),
                 tr("Dual-Streaming and Motion Detection are not available on this camera."));
         } else /* Has dual streaming but not motion */ {
-            QMessageBox::warning(
+            QnMessageBox::warning(
                 this,
                 tr("Warning"),
                 tr("Motion Recording is disabled. Please go to the motion setup page to setup the cameras's motion area and sensitivity."));

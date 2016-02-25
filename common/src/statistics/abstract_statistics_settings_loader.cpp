@@ -8,12 +8,14 @@ namespace
     {
         kDefaultLimit = 1
         , kDefaultStoreDays = 30
+        , kDefaultMinSendPeriodSecs = 60 * 60   // 1 hour
     };
 }
 
 QnStatisticsSettings::QnStatisticsSettings()
     : limit(kDefaultLimit)
     , storeDays(kDefaultStoreDays)
+    , minSendPeriodSecs(kDefaultMinSendPeriodSecs)
     , filters()
 {}
 

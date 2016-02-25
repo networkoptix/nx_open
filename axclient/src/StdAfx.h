@@ -59,12 +59,6 @@ extern "C" {
 /* QT headers. */
 #include <QtWidgets/QAction>
 
-#ifdef Q_OS_WIN
-#   include <QtMultimedia/QAudio>
-#   include <QtMultimedia/QAudioFormat>
-#   include <QtMultimedia/QAudioOutput>
-#endif
-
 #include <QAuthenticator>
 #include <QtCore/QBuffer>
 #include <QtWidgets/QCheckBox>

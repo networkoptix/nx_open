@@ -10,7 +10,7 @@
 #include <QThread>
 
 #include <utils/common/command_line_parser.h>
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/app_info.h>
 #include <nx/network/socket_global.h>
 #include "version.h"
@@ -146,9 +146,6 @@ int main( int argc, char* argv[] )
         cl_log.create( logFilePath, 1024*1024*10, 5, cl_logWARNING );
         QnLog::initLog( logLevel );
     }
-
-    // TODO: #mu ON/OFF switch in settings?
-    nx::network::SocketGlobals::cloudInfo().enableMediator();
 
     NX_LOG( appName + " started", cl_logALWAYS );
     NX_LOG( "Software version: " + QnAppInfo::applicationVersion(), cl_logALWAYS );

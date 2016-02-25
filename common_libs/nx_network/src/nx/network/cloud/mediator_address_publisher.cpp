@@ -46,7 +46,7 @@ void MediatorAddressPublisher::setupUpdateTimer( QnMutexLockerBase* /*lk*/ )
     if( m_state == State::kTerminated )
         return;
 
-    m_timerSocket->registerTimer( m_updateInterval.count(), [ this ]()
+    m_timerSocket->registerTimer( m_updateInterval, [ this ]()
     {
         QnMutexLocker lk( &m_mutex );
         pingReportedAddresses( &lk );
@@ -113,7 +113,7 @@ void MediatorAddressPublisher::publishPingedAddresses( QnMutexLockerBase* lk )
         });
 }
 
-void MediatorAddressPublisher::pleaseStop(std::function<void()> handler)
+void MediatorAddressPublisher::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
     {
         QnMutexLocker lk( &m_mutex );

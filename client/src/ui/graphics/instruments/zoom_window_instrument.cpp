@@ -754,7 +754,7 @@ void ZoomWindowInstrument::at_resizing(QGraphicsView *view, QGraphicsWidget *, R
     if(!newTargetWidget || newTargetWidget == windowTarget()->overlay()->target()) 
         return;
     
-    QnAction *action = menu()->action(Qn::CreateZoomWindowAction);
+    QnAction *action = menu()->action(QnActions::CreateZoomWindowAction);
     if(!action || action->checkCondition(action->scope(), QnActionParameters(newTargetWidget)) != Qn::EnabledAction)
         return;
 

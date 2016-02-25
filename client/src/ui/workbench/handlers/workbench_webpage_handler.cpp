@@ -36,7 +36,7 @@ QnWorkbenchWebPageHandler::QnWorkbenchWebPageHandler(QObject *parent /*= 0*/)
             webPage->setStatus(Qn::Online);
     });
 
-    connect(action(Qn::NewWebPageAction),   &QAction::triggered,        this,   &QnWorkbenchWebPageHandler::at_newWebPageAction_triggered);
+    connect(action(QnActions::NewWebPageAction),   &QAction::triggered,        this,   &QnWorkbenchWebPageHandler::at_newWebPageAction_triggered);
 }
 
 QnWorkbenchWebPageHandler::~QnWorkbenchWebPageHandler()

@@ -24,6 +24,7 @@ angular.module('webadminApp')
             $scope.oldPort = r.data.reply.port;
         });
 
+        $scope.Config = Config;
         $scope.password = '';
         $scope.oldPassword = '';
         $scope.confirmPassword = '';
@@ -35,6 +36,19 @@ angular.module('webadminApp')
                 resolve: {
                     items: function () {
                         return $scope.settings;
+                    }
+                }
+            });
+        };
+
+
+        $scope.openDisconnectDialog = function () {
+            $modal.open({
+                templateUrl: 'views/disconnectServer.html',
+                controller: 'DisconnectServerCtrl',
+                resolve: {
+                    system:function(){
+                        return null;
                     }
                 }
             });
@@ -76,7 +90,7 @@ angular.module('webadminApp')
                 }
             } else {
                 alert('Settings saved');
-                if( $scope.settings.port !=  window.location.port ) {
+                if( $scope.settings.port !==  window.location.port ) {
                     window.location.href = (window.location.protocol + '//' + window.location.hostname + ':' + $scope.settings.port + window.location.pathname + window.location.hash);
                 }else{
                     window.location.reload();
@@ -85,28 +99,13 @@ angular.module('webadminApp')
         }
 
         $scope.save = function () {
-
-
             if($scope.settingsForm.$valid) {
-                if($scope.oldSystemName !== $scope.settings.systemName &&
-                    !confirm('If there are others servers in local network with "' + $scope.settings.systemName +
-                        '" system name then it could lead to this server settings loss. Continue?')){
-                    $scope.settings.systemName = $scope.oldSystemName;
-                }
-
-                if($scope.oldSystemName !== $scope.settings.systemName  || $scope.oldPort !== $scope.settings.port ) {
-                    mediaserver.saveSettings($scope.settings.systemName, $scope.settings.port).then(resultHandler, errorHandler);
-                }
+                mediaserver.changePort($scope.settings.port).then(resultHandler, errorHandler);
             }else{
                 alert('form is not valid');
             }
         };
 
-        $scope.changePassword = function () {
-            if($scope.password === $scope.confirmPassword) {
-                mediaserver.changePassword($scope.password, $scope.oldPassword).then(resultHandler, errorHandler);
-            }
-        };
 // execute/scryptname&mode
         $scope.restart = function () {
             if(confirm('Do you want to restart server now?')){
@@ -179,4 +178,58 @@ angular.module('webadminApp')
                 });
             },1000);
         });
+
+        mediaserver.getSystemSettings().then(function(data){
+
+            var allSettings = data.data;
+            var cloudId = _.find(allSettings, function (setting) {
+                return setting.name === 'cloudSystemID';
+            });
+            $scope.cloudSystemID = cloudId ? cloudId.value : '';
+
+            if ($scope.cloudSystemID.trim() === '') {
+                $scope.cloudSystemID = null;
+            }
+
+            var cloudAccount = _.find(allSettings, function (setting) {
+                return setting.name === 'cloudAccountName';
+            });
+            $scope.cloudAccountName = cloudAccount ? cloudAccount.value : null;
+
+        });
+
+
+        function openCloudDialog(connect){
+            $modal.open({
+                templateUrl: 'views/cloudDialog.html',
+                controller: 'CloudDialogCtrl',
+                backdrop:'static',
+                size:'lg',
+                keyboard:false,
+                resolve:{
+                    connect:function(){
+                        return connect;
+                    },
+                    systemName:function(){
+                        return $scope.settings.systemName;
+                    },
+                    cloudSystemID:function(){
+                        return $scope.cloudSystemID;
+                    }
+                }
+            }).finally(function(){
+                window.location.reload();
+            });
+        }
+        $scope.disconnectFromCloud = function() { // Disconnect from Cloud
+            //Open Disconnect Dialog
+            openCloudDialog(false);
+        };
+
+        $scope.connectToCloud = function() { // Connect to Cloud
+            //Open Connect Dialog
+            openCloudDialog(true);
+        };
+
+
     });

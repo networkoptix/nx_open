@@ -5,7 +5,7 @@
 #include <core/resource/media_server_resource.h>
 #include <api/server_rest_connection.h>
 #include <common/common_module.h>
-#include <utils/jpeg.h>
+#include <nx/media/jpeg.h>
 
 namespace {
 

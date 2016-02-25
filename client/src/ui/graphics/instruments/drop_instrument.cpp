@@ -199,19 +199,19 @@ bool DropInstrument::dropEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent *eve
 
     // try to drop videowall items first
     if (context->menu()->triggerIfPossible(
-        Qn::StartVideoWallControlAction,
+        QnActions::StartVideoWallControlAction,
         QnActionParameters(m_videoWallItems))) {
 
     }
     else
     if(!m_intoNewLayout) {
         context->menu()->trigger(
-            Qn::DropResourcesAction,
+            QnActions::DropResourcesAction,
             QnActionParameters(m_resources).withArgument(Qn::ItemPositionRole, context->workbench()->mapper()->mapToGridF(event->scenePos()))
         );
     } else {
         context->menu()->trigger(
-            Qn::DropResourcesIntoNewLayoutAction,
+            QnActions::DropResourcesIntoNewLayoutAction,
             QnActionParameters(m_resources)
         );
     }

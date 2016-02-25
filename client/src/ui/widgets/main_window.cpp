@@ -86,7 +86,6 @@
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
 #include <ui/style/noptix_style.h>
-#include <ui/style/proxy_style.h>
 #include <ui/workaround/qtbug_workaround.h>
 #include <ui/workaround/vsync_workaround.h>
 #include <ui/screen_recording/screen_recorder.h>
@@ -223,7 +222,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
         }
         updateHelpTopic();
     });
-    connect(action(Qn::ToggleTourModeAction), &QAction::toggled, this, &QnMainWindow::updateHelpTopic);
+    connect(action(QnActions::ToggleTourModeAction), &QAction::toggled, this, &QnMainWindow::updateHelpTopic);
     updateHelpTopic();
 
     m_view.reset(new QnGraphicsView(m_scene.data()));
@@ -239,7 +238,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
         display()->setNormalMarginFlags(Qn::MarginsAffectSize | Qn::MarginsAffectPosition);
 
     if (qnSettings->lightMode() & Qn::LightModeNoSceneBackground)
-        action(Qn::ToggleBackgroundAnimationAction)->setDisabled(true);
+        action(QnActions::ToggleBackgroundAnimationAction)->setDisabled(true);
 
     m_controller.reset(new QnWorkbenchController(this));
     if (qnRuntime->isVideoWallMode())
@@ -287,48 +286,48 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     context->instance<QnWorkbenchUserInactivityWatcher>()->setMainWindow(this);
 
     /* Set up actions. Only these actions will be available through hotkeys. */
-    addAction(action(Qn::NextLayoutAction));
-    addAction(action(Qn::PreviousLayoutAction));
-    addAction(action(Qn::SaveCurrentLayoutAction));
-    addAction(action(Qn::SaveCurrentLayoutAsAction));
-    addAction(action(Qn::SaveCurrentVideoWallReviewAction));
-    addAction(action(Qn::ExitAction));
-    addAction(action(Qn::EscapeHotkeyAction));
-    addAction(action(Qn::FullscreenMaximizeHotkeyAction));
-    addAction(action(Qn::AboutAction));
-    addAction(action(Qn::PreferencesGeneralTabAction));
-    addAction(action(Qn::OpenBookmarksSearchAction));
-    addAction(action(Qn::OpenBusinessLogAction));
-    addAction(action(Qn::CameraListAction));
-    addAction(action(Qn::BusinessEventsAction));
-    addAction(action(Qn::OpenFileAction));
-    addAction(action(Qn::OpenNewTabAction));
-    addAction(action(Qn::OpenNewWindowAction));
-    addAction(action(Qn::CloseLayoutAction));
-    addAction(action(Qn::MainMenuAction));
-    addAction(action(Qn::OpenLoginDialogAction));
-    addAction(action(Qn::OpenInFolderAction));
-    addAction(action(Qn::RemoveLayoutItemAction));
-    addAction(action(Qn::RemoveFromServerAction));
-    addAction(action(Qn::DeleteVideoWallItemAction));
-    addAction(action(Qn::DeleteVideowallMatrixAction));
-    addAction(action(Qn::SelectAllAction));
-    addAction(action(Qn::CheckFileSignatureAction));
-    addAction(action(Qn::TakeScreenshotAction));
-    addAction(action(Qn::AdjustVideoAction));
-    addAction(action(Qn::TogglePanicModeAction));
-    addAction(action(Qn::ToggleTourModeAction));
-    addAction(action(Qn::DebugIncrementCounterAction));
-    addAction(action(Qn::DebugDecrementCounterAction));
-    addAction(action(Qn::DebugShowResourcePoolAction));
-    addAction(action(Qn::DebugControlPanelAction));
-    addAction(action(Qn::ToggleBackgroundAnimationAction));
-    addAction(action(Qn::SystemAdministrationAction));
+    addAction(action(QnActions::NextLayoutAction));
+    addAction(action(QnActions::PreviousLayoutAction));
+    addAction(action(QnActions::SaveCurrentLayoutAction));
+    addAction(action(QnActions::SaveCurrentLayoutAsAction));
+    addAction(action(QnActions::SaveCurrentVideoWallReviewAction));
+    addAction(action(QnActions::ExitAction));
+    addAction(action(QnActions::EscapeHotkeyAction));
+    addAction(action(QnActions::FullscreenMaximizeHotkeyAction));
+    addAction(action(QnActions::AboutAction));
+    addAction(action(QnActions::PreferencesGeneralTabAction));
+    addAction(action(QnActions::OpenBookmarksSearchAction));
+    addAction(action(QnActions::OpenBusinessLogAction));
+    addAction(action(QnActions::CameraListAction));
+    addAction(action(QnActions::BusinessEventsAction));
+    addAction(action(QnActions::OpenFileAction));
+    addAction(action(QnActions::OpenNewTabAction));
+    addAction(action(QnActions::OpenNewWindowAction));
+    addAction(action(QnActions::CloseLayoutAction));
+    addAction(action(QnActions::MainMenuAction));
+    addAction(action(QnActions::OpenLoginDialogAction));
+    addAction(action(QnActions::OpenInFolderAction));
+    addAction(action(QnActions::RemoveLayoutItemAction));
+    addAction(action(QnActions::RemoveFromServerAction));
+    addAction(action(QnActions::DeleteVideoWallItemAction));
+    addAction(action(QnActions::DeleteVideowallMatrixAction));
+    addAction(action(QnActions::SelectAllAction));
+    addAction(action(QnActions::CheckFileSignatureAction));
+    addAction(action(QnActions::TakeScreenshotAction));
+    addAction(action(QnActions::AdjustVideoAction));
+    addAction(action(QnActions::TogglePanicModeAction));
+    addAction(action(QnActions::ToggleTourModeAction));
+    addAction(action(QnActions::DebugIncrementCounterAction));
+    addAction(action(QnActions::DebugDecrementCounterAction));
+    addAction(action(QnActions::DebugShowResourcePoolAction));
+    addAction(action(QnActions::DebugControlPanelAction));
+    addAction(action(QnActions::ToggleBackgroundAnimationAction));
+    addAction(action(QnActions::SystemAdministrationAction));
 
-    connect(action(Qn::MaximizeAction),     SIGNAL(toggled(bool)),                          this,                                   SLOT(setMaximized(bool)));
-    connect(action(Qn::FullscreenAction),   SIGNAL(toggled(bool)),                          this,                                   SLOT(setFullScreen(bool)));
-    connect(action(Qn::MinimizeAction),     SIGNAL(triggered()),                            this,                                   SLOT(minimize()));
-    connect(action(Qn::FullscreenMaximizeHotkeyAction), SIGNAL(triggered()),                action(Qn::EffectiveMaximizeAction),    SLOT(trigger()));
+    connect(action(QnActions::MaximizeAction),     SIGNAL(toggled(bool)),                          this,                                   SLOT(setMaximized(bool)));
+    connect(action(QnActions::FullscreenAction),   SIGNAL(toggled(bool)),                          this,                                   SLOT(setFullScreen(bool)));
+    connect(action(QnActions::MinimizeAction),     SIGNAL(triggered()),                            this,                                   SLOT(minimize()));
+    connect(action(QnActions::FullscreenMaximizeHotkeyAction), SIGNAL(triggered()),                action(QnActions::EffectiveMaximizeAction),    SLOT(trigger()));
 
     menu()->setTargetProvider(m_ui.data());
 
@@ -353,9 +352,9 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     tabBarLayout->setSpacing(0);
     tabBarLayout->addWidget(m_tabBar);
     tabBarLayout->addSpacing(6);
-    tabBarLayout->addWidget(newActionButton(action(Qn::OpenNewTabAction), false, 1.0, Qn::MainWindow_TitleBar_NewLayout_Help));
+    tabBarLayout->addWidget(newActionButton(action(QnActions::OpenNewTabAction), false, 1.0, Qn::MainWindow_TitleBar_NewLayout_Help));
     tabBarLayout->addSpacing(6);
-    tabBarLayout->addWidget(newActionButton(action(Qn::OpenCurrentUserLayoutMenu), true));
+    tabBarLayout->addWidget(newActionButton(action(QnActions::OpenCurrentUserLayoutMenu), true));
     tabBarLayout->addStretch(0x1000);
 
     QnCloudStatusPanel *cloudPanel = new QnCloudStatusPanel(context, this);
@@ -364,15 +363,15 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_windowButtonsLayout = new QHBoxLayout();
     m_windowButtonsLayout->setContentsMargins(4, 0, 2, 0);
     m_windowButtonsLayout->setSpacing(4);
-    m_windowButtonsLayout->addWidget(newActionButton(action(Qn::WhatsThisAction), false, 1.0, Qn::MainWindow_ContextHelp_Help));
-    m_windowButtonsLayout->addWidget(newActionButton(action(Qn::MinimizeAction)));
-    m_windowButtonsLayout->addWidget(newActionButton(action(Qn::EffectiveMaximizeAction), false, 1.0, Qn::MainWindow_Fullscreen_Help));
-    m_windowButtonsLayout->addWidget(newActionButton(action(Qn::ExitAction)));
+    m_windowButtonsLayout->addWidget(newActionButton(action(QnActions::WhatsThisAction), false, 1.0, Qn::MainWindow_ContextHelp_Help));
+    m_windowButtonsLayout->addWidget(newActionButton(action(QnActions::MinimizeAction)));
+    m_windowButtonsLayout->addWidget(newActionButton(action(QnActions::EffectiveMaximizeAction), false, 1.0, Qn::MainWindow_Fullscreen_Help));
+    m_windowButtonsLayout->addWidget(newActionButton(action(QnActions::ExitAction)));
 
     /* Title layout. We cannot create a widget for title bar since there appears to be
      * no way to make it transparent for non-client area windows messages. */
-    m_mainMenuButton = newActionButton(action(Qn::MainMenuAction), true, 1.5, Qn::MainWindow_TitleBar_MainMenu_Help);
-    connect(action(Qn::MainMenuAction), &QAction::triggered, this, &QnMainWindow::skipDoubleClick);
+    m_mainMenuButton = newActionButton(action(QnActions::MainMenuAction), true, 1.5, Qn::MainWindow_TitleBar_MainMenu_Help);
+    connect(action(QnActions::MainMenuAction), &QAction::triggered, this, &QnMainWindow::skipDoubleClick);
 
     m_titleLayout = new QHBoxLayout();
     m_titleLayout->setContentsMargins(0, 0, 0, 0);
@@ -381,8 +380,8 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_titleLayout->addWidget(tabBarWidget, 0x1000, Qt::AlignBottom);
     m_titleLayout->addWidget(cloudPanel);
     if (QnScreenRecorder::isSupported())
-        m_titleLayout->addWidget(newActionButton(action(Qn::ToggleScreenRecordingAction), false, 1.0, Qn::MainWindow_ScreenRecording_Help));
-    m_titleLayout->addWidget(newActionButton(action(Qn::OpenLoginDialogAction), false, 1.0, Qn::Login_Help));
+        m_titleLayout->addWidget(newActionButton(action(QnActions::ToggleScreenRecordingAction), false, 1.0, Qn::MainWindow_ScreenRecording_Help));
+    m_titleLayout->addWidget(newActionButton(action(QnActions::OpenLoginDialogAction), false, 1.0, Qn::Login_Help));
     m_titleLayout->addLayout(m_windowButtonsLayout);
 
     /* Layouts. */
@@ -409,7 +408,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 #endif
 
     /* Open single tab. */
-    action(Qn::OpenNewTabAction)->trigger();
+    action(QnActions::OpenNewTabAction)->trigger();
 
 #ifdef Q_OS_MACX
     //initialize system-wide menu
@@ -538,7 +537,7 @@ void QnMainWindow::updateScreenInfo() {
 }
 
 void QnMainWindow::updateHelpTopic() {
-    if (action(Qn::ToggleTourModeAction)->isChecked()) {
+    if (action(QnActions::ToggleTourModeAction)->isChecked()) {
         setHelpTopic(m_scene.data(), Qn::MainWindow_Scene_TourInProgress_Help, true);
         return;
     }
@@ -581,7 +580,7 @@ bool QnMainWindow::handleMessage(const QString &message) {
     if (resources.isEmpty())
         return false;
 
-    menu()->trigger(Qn::DropResourcesAction, resources);
+    menu()->trigger(QnActions::DropResourcesAction, resources);
     return true;
 }
 
@@ -607,8 +606,8 @@ void QnMainWindow::updateDecorationsState() {
 #endif
     bool maximized = isMaximized();
 
-    action(Qn::FullscreenAction)->setChecked(fullScreen);
-    action(Qn::MaximizeAction)->setChecked(maximized);
+    action(QnActions::FullscreenAction)->setChecked(fullScreen);
+    action(QnActions::MaximizeAction)->setChecked(maximized);
 
 #ifdef Q_OS_MACX
     bool uiTitleUsed = fullScreen;
@@ -734,7 +733,7 @@ bool QnMainWindow::event(QEvent *event) {
 void QnMainWindow::closeEvent(QCloseEvent* event)
 {
     event->ignore();
-    menu()->trigger(Qn::ExitAction);
+    menu()->trigger(QnActions::ExitAction);
 }
 
 void QnMainWindow::mouseReleaseEvent(QMouseEvent *event) {
@@ -761,7 +760,7 @@ void QnMainWindow::mouseDoubleClickEvent(QMouseEvent *event) {
         }
 
         if (!m_skipDoubleClick)
-            action(Qn::EffectiveMaximizeAction)->toggle();
+            action(QnActions::EffectiveMaximizeAction)->toggle();
         event->accept();
     }
     m_skipDoubleClick = false;
@@ -825,7 +824,7 @@ void QnMainWindow::dragLeaveEvent(QDragLeaveEvent *) {
 }
 
 void QnMainWindow::dropEvent(QDropEvent *event) {
-    menu()->trigger(Qn::DropResourcesIntoNewLayoutAction, m_dropResources);
+    menu()->trigger(QnActions::DropResourcesIntoNewLayoutAction, m_dropResources);
 
     event->acceptProposedAction();
 }
@@ -833,12 +832,12 @@ void QnMainWindow::dropEvent(QDropEvent *event) {
 void QnMainWindow::keyPressEvent(QKeyEvent *event) {
     base_type::keyPressEvent(event);
 
-    if (!action(Qn::ToggleTourModeAction)->isChecked())
+    if (!action(QnActions::ToggleTourModeAction)->isChecked())
         return;
 
     if (event->key() == Qt::Key_Alt || event->key() == Qt::Key_Control)
         return;
-    menu()->trigger(Qn::ToggleTourModeAction);
+    menu()->trigger(QnActions::ToggleTourModeAction);
 }
 
 void QnMainWindow::resizeEvent(QResizeEvent *event) {
@@ -883,5 +882,5 @@ void QnMainWindow::at_fileOpenSignalizer_activated(QObject *, QEvent *event) {
 void QnMainWindow::at_tabBar_closeRequested(QnWorkbenchLayout *layout) {
     QnWorkbenchLayoutList layouts;
     layouts.push_back(layout);
-    menu()->trigger(Qn::CloseLayoutAction, layouts);
+    menu()->trigger(QnActions::CloseLayoutAction, layouts);
 }

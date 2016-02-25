@@ -59,7 +59,7 @@ UDPClient::~UDPClient()
     cleanupWhileInAioThread();
 }
 
-void UDPClient::pleaseStop(std::function<void()> handler)
+void UDPClient::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
     m_messagePipeline.pleaseStop(
         [handler = std::move(handler), this](){
@@ -68,9 +68,14 @@ void UDPClient::pleaseStop(std::function<void()> handler)
         });
 }
 
-const std::unique_ptr<AbstractDatagramSocket>& UDPClient::socket()
+const std::unique_ptr<network::UDPSocket>& UDPClient::socket()
 {
     return m_messagePipeline.socket();
+}
+
+std::unique_ptr<network::UDPSocket> UDPClient::takeSocket()
+{
+    return m_messagePipeline.takeSocket();
 }
 
 void UDPClient::sendRequestTo(
@@ -192,7 +197,7 @@ void UDPClient::sendRequestAndStartTimer(
     //starting timer
     requestContext->timer->registerTimer(
         requestContext->currentRetransmitTimeout,
-        std::bind(&UDPClient::timedout, this, request.header.transactionId));
+        std::bind(&UDPClient::timedOut, this, request.header.transactionId));
 }
 
 void UDPClient::messageSent(
@@ -202,7 +207,7 @@ void UDPClient::messageSent(
 {
     auto requestContextIter = m_ongoingRequests.find(transactionId);
     if (requestContextIter == m_ongoingRequests.end())
-        return; //operation may have already timedout. E.g., network interface is loaded
+        return; //operation may have already timedOut. E.g., network interface is loaded
 
     if (errorCode != SystemError::noError)
     {
@@ -227,7 +232,7 @@ void UDPClient::messageSent(
     requestContextIter->second.resolvedServerAddress = std::move(resolvedServerAddress);
 }
 
-void UDPClient::timedout(nx::Buffer transactionId)
+void UDPClient::timedOut(nx::Buffer transactionId)
 {
     auto requestContextIter = m_ongoingRequests.find(transactionId);
     assert(requestContextIter != m_ongoingRequests.end());

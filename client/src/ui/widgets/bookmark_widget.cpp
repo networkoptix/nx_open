@@ -3,6 +3,8 @@
 
 #include <core/resource/camera_bookmark.h>
 
+#include <ui/style/custom_style.h>
+
 namespace {
     const int defaultTimeoutIdx = 0;
 }
@@ -31,7 +33,16 @@ QnBookmarkWidget::QnBookmarkWidget(QWidget *parent):
         updateTagsList();
     });
 
-    connect(ui->nameLineEdit, &QLineEdit::textEdited, this, &QnBookmarkWidget::validChanged);
+    connect(ui->nameLineEdit, &QLineEdit::textEdited, this, [this](const QString& text)
+    {
+        Q_UNUSED(text);
+
+        QPalette palette = this->palette();
+        if (!isValid())
+            setWarningStyle(&palette);
+        ui->nameLabel->setPalette(palette);
+        emit validChanged();
+    });
 
     // TODO: #3.0 #rvasilenko Remove when bookmark timeout will be implemented.
     // Then change defaultTimeoutIdx constant value to '3'.

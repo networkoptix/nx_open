@@ -121,7 +121,7 @@ SocketAddress DummySocket::getForeignAddress() const
 
 void DummySocket::cancelIOAsync(
     aio::EventType /*eventType*/,
-    std::function< void() > cancellationDoneHandler)
+    nx::utils::MoveOnlyFunc< void() > cancellationDoneHandler)
 {
     cancellationDoneHandler();
 }
@@ -165,31 +165,35 @@ bool DummySocket::getKeepAlive( boost::optional< KeepAliveOptions >* /*result*/ 
     return false;
 }
 
-void DummySocket::post( std::function<void()> /*handler*/ )
+void DummySocket::post(nx::utils::MoveOnlyFunc<void()> /*handler*/ )
 {
 }
 
-void DummySocket::dispatch( std::function<void()> /*handler*/ )
+void DummySocket::dispatch(nx::utils::MoveOnlyFunc<void()> /*handler*/ )
 {
 }
 
-void DummySocket::connectAsync( const SocketAddress& /*addr*/,
-                                    std::function<void( SystemError::ErrorCode )> /*handler*/ )
+void DummySocket::connectAsync(
+    const SocketAddress& /*addr*/,
+    nx::utils::MoveOnlyFunc<void( SystemError::ErrorCode )> /*handler*/ )
 {
 }
 
-void DummySocket::readSomeAsync( nx::Buffer* const /*buf*/,
-                                 std::function<void( SystemError::ErrorCode, size_t )> /*handler*/ )
+void DummySocket::readSomeAsync(
+    nx::Buffer* const /*buf*/,
+    std::function<void( SystemError::ErrorCode, size_t )> /*handler*/ )
 {
 }
 
-void DummySocket::sendAsync( const nx::Buffer& /*buf*/,
-                                 std::function<void( SystemError::ErrorCode, size_t )> /*handler*/ )
+void DummySocket::sendAsync(
+    const nx::Buffer& /*buf*/,
+    std::function<void( SystemError::ErrorCode, size_t )> /*handler*/ )
 {
 }
 
-void DummySocket::registerTimer( unsigned int /*timeoutMs*/,
-                                     std::function<void()> /*handler*/ )
+void DummySocket::registerTimer(
+    std::chrono::milliseconds /*timeoutMs*/,
+    nx::utils::MoveOnlyFunc<void()> /*handler*/ )
 {
 }
 

@@ -158,7 +158,7 @@ bool QnLookAndFeelPreferencesWidget::canDiscardChanges() {
     if (backgroundAllowed)
     {
         qnSettings->setBackground(m_oldBackground);
-        action(Qn::ToggleBackgroundAnimationAction)->setChecked(
+        action(QnActions::ToggleBackgroundAnimationAction)->setChecked(
             m_oldBackground.animationEnabled);
     }
     return true;
@@ -294,7 +294,7 @@ void QnLookAndFeelPreferencesWidget::setupBackgroundUi() {
         if (m_updating)
             return;
 
-        action(Qn::ToggleBackgroundAnimationAction)->setChecked(checked);
+        action(QnActions::ToggleBackgroundAnimationAction)->setChecked(checked);
 
         QnClientBackground background = qnSettings->background();
         background.animationEnabled = checked;

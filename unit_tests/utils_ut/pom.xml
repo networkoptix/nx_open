@@ -1,0 +1,40 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <parent>
+        <artifactId>build_ut</artifactId>
+        <groupId>com.networkoptix.hdwitness</groupId>
+        <version>2.6.0-SNAPSHOT</version>
+        <relativePath>../build_ut</relativePath>
+    </parent>
+
+    <groupId>com.networkoptix.hdwitness</groupId>
+    <version>2.6.0-SNAPSHOT</version>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>utils_ut</artifactId>
+    <packaging>pom</packaging>
+    <name>libnx_utils unit tests</name>
+
+    <properties>
+        <product.title>nx_utils unit tests</product.title>
+        <!--Global libs-->
+        <qt.libs>core network concurrent xml xmlpatterns sql multimedia</qt.libs>
+        <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lswresample -lpostproc</ffmpeg.libs>
+        <global.libs>-lnx_utils</global.libs>
+        <!--Specific os libs used-->
+        <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm ssleay32.lib libeay32.lib Wldap32.lib</windows.oslibs>
+        <linux.oslibs>-lavcodec -lavformat -lavutil -lquazip -lfaac -lssl -lcrypto</linux.oslibs>
+        <linux.arm.oslibs></linux.arm.oslibs>
+        <windows.oslibs.release></windows.oslibs.release>
+        <windows.oslibs.debug></windows.oslibs.debug>
+        <mac.oslibs></mac.oslibs>
+        <!--Global defines-->
+        <global.defines></global.defines>
+        <!--Specific os defines-->
+        <windows.defines>_VARIADIC_MAX=10</windows.defines>
+        <linux.defines/>
+        <mac.defines/>
+    </properties>
+
+</project>

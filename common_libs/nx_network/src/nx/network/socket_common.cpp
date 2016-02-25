@@ -240,6 +240,12 @@ SocketAddress::SocketAddress( const QString& str )
     initializeFromString(str);
 }
 
+SocketAddress::SocketAddress(const QByteArray& utf8Str)
+:
+    SocketAddress(QString::fromUtf8(utf8Str))
+{
+}
+
 SocketAddress::SocketAddress( const char* str )
 :
     port( 0 )

@@ -8,6 +8,8 @@
 #include <chrono>
 #include <functional>
 
+#include <nx/utils/move_only_func.h>
+
 #include "nx/network/system_socket.h"
 
 
@@ -28,10 +30,11 @@ public:
 
     void start(
         std::chrono::milliseconds timeout,
-        std::function<void()> timerFunc);
-    void post(std::function<void()> funcToCall);
-    void dispatch(std::function<void()> funcToCall);
-    void cancelAsync(std::function<void()> completionHandler);
+        nx::utils::MoveOnlyFunc<void()> timerFunc);
+    std::chrono::nanoseconds timeToEvent() const;
+    void post(nx::utils::MoveOnlyFunc<void()> funcToCall);
+    void dispatch(nx::utils::MoveOnlyFunc<void()> funcToCall);
+    void cancelAsync(nx::utils::MoveOnlyFunc<void()> completionHandler);
     /** Cancels timer waiting for \a timerFunc to complete.
         Can be safely called within timer's aio thread
     */
@@ -39,6 +42,10 @@ public:
 
     AbstractAioThread* getAioThread();
     void bindToAioThread(AbstractAioThread* aioThread);
+
+private:
+    std::chrono::milliseconds m_timeout;
+    std::chrono::steady_clock::time_point m_timerStartClock;
 };
 
 }   //aio

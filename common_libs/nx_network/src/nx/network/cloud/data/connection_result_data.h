@@ -20,6 +20,7 @@ enum class UdpHolePunchingResultCode
 {
     ok,
     noResponseFromMediator,
+    mediatorReportedError,
     targetPeerHasNoUdpAddress,
     noSynFromTargetPeer,
     udtConnectFailed

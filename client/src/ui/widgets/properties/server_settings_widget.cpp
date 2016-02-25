@@ -81,8 +81,9 @@ QnServerSettingsWidget::QnServerSettingsWidget(QWidget* parent /* = 0*/):
 
     connect(ui->nameLineEdit,           &QLineEdit::textChanged,    this,   &QnAbstractPreferencesWidget::hasChangesChanged);
 
-    connect(ui->failoverCheckBox,       &QCheckBox::stateChanged,       this,   [this] {
-        ui->maxCamerasWidget->setEnabled(ui->failoverCheckBox->isChecked());
+    connect(ui->failoverGroupBox,       &QGroupBox::toggled,       this,   [this](bool checked)
+    {
+        ui->maxCamerasWidget->setEnabled(checked);
         updateFailoverLabel();
         emit hasChangesChanged();
     });
@@ -94,7 +95,7 @@ QnServerSettingsWidget::QnServerSettingsWidget(QWidget* parent /* = 0*/):
         emit hasChangesChanged();
     });
 
-    connect(ui->failoverPriorityButton, &QPushButton::clicked,  action(Qn::OpenFailoverPriorityAction), &QAction::trigger);
+    connect(ui->failoverPriorityButton, &QPushButton::clicked,  action(QnActions::OpenFailoverPriorityAction), &QAction::trigger);
 
     retranslateUi();
 }
@@ -137,7 +138,7 @@ void QnServerSettingsWidget::setServer(const QnMediaServerResourcePtr &server) {
 
 void QnServerSettingsWidget::setReadOnlyInternal(bool readOnly) {
     using ::setReadOnly;
-    setReadOnly(ui->failoverCheckBox, readOnly);
+    setReadOnly(ui->failoverGroupBox, readOnly);
     setReadOnly(ui->maxCamerasSpinBox, readOnly);
 
 }
@@ -162,7 +163,7 @@ bool QnServerSettingsWidget::hasChanges() const {
     if (m_server->getName() != ui->nameLineEdit->text())
         return true;
 
-    if (m_server->isRedundancy() != ui->failoverCheckBox->isChecked())
+    if (m_server->isRedundancy() != ui->failoverGroupBox->isChecked())
         return true;
 
     if (m_server->isRedundancy() &&
@@ -173,10 +174,11 @@ bool QnServerSettingsWidget::hasChanges() const {
 }
 
 void QnServerSettingsWidget::retranslateUi() {
-    ui->failoverCheckBox->setText(QnDeviceDependentStrings::getDefaultNameFromSet(
-        tr("Enable failover (server will take devices automatically from offline servers)"),
-        tr("Enable failover (server will take cameras automatically from offline servers)")
-        ));
+    QString failoverText = QnDeviceDependentStrings::getDefaultNameFromSet(
+        tr("server will take devices automatically from offline servers"),
+        tr("server will take cameras automatically from offline servers"));
+
+    ui->failoverGroupBox->setTitle(tr("Failover \t") + lit("(%1)").arg(failoverText));
 
     ui->maxCamerasLabel->setText(QnDeviceDependentStrings::getDefaultNameFromSet(
         tr("Max devices on this server:"),
@@ -206,7 +208,7 @@ void QnServerSettingsWidget::loadDataToUi() {
         currentMaxCamerasValue = maxCameras;
 
     ui->maxCamerasSpinBox->setValue(currentMaxCamerasValue);
-    ui->failoverCheckBox->setChecked(m_server->isRedundancy());
+    ui->failoverGroupBox->setChecked(m_server->isRedundancy());
     ui->maxCamerasWidget->setEnabled(m_server->isRedundancy());
 
     m_maxCamerasAdjusted = false;
@@ -222,7 +224,7 @@ void QnServerSettingsWidget::applyChanges() {
     qnResourcesChangesManager->saveServer(m_server, [this](const QnMediaServerResourcePtr &server) {
         server->setName(ui->nameLineEdit->text());
         server->setMaxCameras(ui->maxCamerasSpinBox->value());
-        server->setRedundancy(ui->failoverCheckBox->isChecked());
+        server->setRedundancy(ui->failoverGroupBox->isChecked());
     });
 }
 
@@ -261,7 +263,7 @@ void QnServerSettingsWidget::updateFailoverLabel() {
     };
 
     QString error;
-    if (ui->failoverCheckBox->isChecked())
+    if (ui->failoverGroupBox->isChecked())
         error = getErrorText();
 
     ui->failoverWarningLabel->setText(error);
@@ -269,5 +271,5 @@ void QnServerSettingsWidget::updateFailoverLabel() {
 
 
 void QnServerSettingsWidget::at_pingButton_clicked() {
-    menu()->trigger(Qn::PingAction, QnActionParameters(m_server));
+    menu()->trigger(QnActions::PingAction, QnActionParameters(m_server));
 }

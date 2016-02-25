@@ -1,11 +1,6 @@
-#ifndef QN_CAMERA_ADVANCED_SETTINGS_WIDGET_H
-#define QN_CAMERA_ADVANCED_SETTINGS_WIDGET_H
+#pragma once
 
 #include <QtWidgets/QWidget>
-
-#ifdef GDM_TODO
-#include <QtWebEngineWidgets/QWebEngineView>
-#endif
 
 #include <core/resource/resource_fwd.h>
 
@@ -40,13 +35,16 @@ public:
 signals:
     void hasChangesChanged();
 
+protected:
+    virtual void hideEvent(QHideEvent *event) override;
+
 private:
     void initWebView();
 
     void updatePage();
 
     void at_authenticationRequired(QNetworkReply* reply, QAuthenticator * authenticator);
-    void at_proxyAuthenticationRequired ( const QNetworkProxy & , QAuthenticator * authenticator);
+    void at_proxyAuthenticationRequired(const QNetworkProxy &, QAuthenticator * authenticator);
 private:
     enum class Page {
         Empty,
@@ -56,15 +54,8 @@ private:
     void setPage(Page page);
 
     QScopedPointer<Ui::CameraAdvancedSettingsWidget> ui;
-#ifdef GDM_TODO
-    QWebEngineView *m_webView;
-#endif
     Page m_page;
     QnVirtualCameraResourcePtr m_camera;
     QnMutex m_cameraMutex;
-#ifdef GDM_TODO
     CameraAdvancedSettingsWebPage* m_cameraAdvancedSettingsWebPage;
-#endif
 };
-
-#endif // QN_CAMERA_ADVANCED_SETTINGS_WIDGET_H

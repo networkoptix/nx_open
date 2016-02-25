@@ -151,7 +151,7 @@ void QnGeneralPreferencesWidget::at_addExtraMediaFolderButton_clicked() {
         return;
 
     if(!ui->extraMediaFoldersList->findItems(dirName, Qt::MatchExactly).empty()) {
-        QMessageBox::information(this, tr("Folder has already been added."), tr("This folder has already been added."), QMessageBox::Ok);
+        QnMessageBox::information(this, tr("Folder has already been added."), tr("This folder has already been added."), QDialogButtonBox::Ok);
         return;
     }
 
@@ -170,7 +170,7 @@ void QnGeneralPreferencesWidget::at_extraMediaFoldersList_selectionChanged() {
 void QnGeneralPreferencesWidget::at_browseLogsButton_clicked() {
     const QString logsLocation = QStandardPaths::writableLocation(QStandardPaths::DataLocation) + QLatin1String("/log");
     if (!QDir(logsLocation).exists()) {
-        QMessageBox::information(this,
+        QnMessageBox::information(this,
                                  tr("Information"),
                                  tr("Folder '%1' does not exist.").arg(logsLocation));
         return;

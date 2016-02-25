@@ -3,7 +3,6 @@ sys.path.insert(0, '${basedir}/../common')
 #sys.path.insert(0, os.path.join('..', '..', 'common'))
 
 help_source_dir = '${ClientHelpSourceDir}'
-vox_source_dir = '${ClientVoxSourceDir}'
 target_dir = '${libdir}'
 
 if '${platform}' == 'windows':
@@ -13,10 +12,6 @@ if '${platform}' == 'windows':
             shutil.rmtree(help_dir)
         shutil.copytree(help_source_dir, help_dir)
         for config in ('debug', 'release'):
-            vox_dir = os.path.join('${libdir}', arch, 'bin', config, 'vox')
-            if os.path.exists(vox_dir):
-                shutil.rmtree(vox_dir)
-            shutil.copytree(vox_source_dir, vox_dir)
             target_plugins = os.path.join(target_dir, arch, 'bin', config, 'plugins')
             if os.path.exists(os.path.join(target_plugins, 'hw_decoding_conf.xml')):
                 os.unlink(os.path.join(target_plugins, 'hw_decoding_conf.xml'))
@@ -28,10 +23,5 @@ else:
     help_dir = os.path.join('${libdir}', 'bin/help')
     if os.path.exists(help_dir):
         shutil.rmtree(help_dir)
-    shutil.copytree(help_source_dir, help_dir)            
-    for config in ('debug', 'release'):
-        vox_dir = os.path.join('${libdir}', 'bin', config, 'vox')
-        if os.path.exists(vox_dir):
-            shutil.rmtree(vox_dir)
-        shutil.copytree(vox_source_dir, vox_dir)        
+    shutil.copytree(help_source_dir, help_dir)
     

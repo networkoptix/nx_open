@@ -1,0 +1,33 @@
+
+@import '_theme_palette';
+@import '_theme_variables';
+
+@import '../../bower_components/sass-bootstrap/lib/bootstrap';
+
+@import '_theme_override';
+
+html {
+  position: relative;
+  height: 100%;
+}
+body {
+  margin-top:10px;
+}
+
+/* add beta-symbol after product name everywhere */
+.product-name:after{
+  content: "(\03B2)";
+  font-style: italic;
+  color: $gray;
+  font-size: 90%;
+}
+
+a .product-name:after {
+  color: $link-color;
+}
+
+
+
+.inline-block{
+  display: inline-block;
+}

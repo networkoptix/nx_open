@@ -10,14 +10,7 @@
 
 #ifdef _WIN32
 #include <D3D9.h>
-//#include <DXerr.h>    --lib is not supported anymore
 #endif
-//    #define GL_GLEXT_PROTOTYPES 1
-//    #ifdef Q_OS_MACX
-//    #include <glext.h>
-//    #else
-//    #include <GL/glext.h>
-//    #endif
 
 #include <QtGui/qopengl.h>
 extern "C"
@@ -964,10 +957,7 @@ private:
         res = surf->LockRect( &lockedRect, &rectToLock, D3DLOCK_NOSYSLOCK | D3DLOCK_READONLY );
         if( res != D3D_OK )
         {
-            /* --disabled as DxErr lib is not supported anymore
-            NX_LOG( lit("AsyncPicDataUploader. Failed to map dxva surface (%1). Ignoring decoded picture...").
-                arg(QString::fromWCharArray(DXGetErrorDescription(res))), cl_logERROR );
-            */
+            NX_LOG( lit("AsyncPicDataUploader. Failed to map dxva surface. Ignoring decoded picture..."), cl_logERROR );
             return false;
         }
 #endif

@@ -15,8 +15,8 @@
 #include <nx/network/cloud/mediator_connector.h>
 #include <nx/network/socket_common.h>
 
-#include <cloud_data_provider.h>
-#include <mediator_process_public.h>
+#include "../cloud_data_provider.h"
+#include "../mediator_process_public.h"
 
 #include "local_cloud_data_provider.h"
 #include "mediaserver_emulator.h"
@@ -66,6 +66,7 @@ private:
     std::vector<char*> m_args;
     std::unique_ptr<MediatorProcessPublic> m_mediatorInstance;
     std::future<int> m_mediatorProcessFuture;
+    std::promise<bool /*result*/> m_mediatorStartedPromise;
     //MediatorConnector m_mediatorConnector;
     LocalCloudDataProvider m_cloudDataProvider;
 };

@@ -47,7 +47,7 @@ public:
     UDPClient(SocketAddress serverAddress);
     virtual ~UDPClient();
 
-    virtual void pleaseStop(std::function<void()> handler) override;
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
     /**
         \param request MUST contain unique transactionId
@@ -63,7 +63,13 @@ public:
         Message request,
         RequestCompletionHandler completionHandler);
 
-    const std::unique_ptr<AbstractDatagramSocket>& socket();
+    const std::unique_ptr<network::UDPSocket>& socket();
+    /** Move ownership of socket to the caller.
+        \a UDPClient is in undefined state after this call and MUST be freed
+        \note Can be called within send/recv completion handler 
+            (more specifically, within socket's aio thread) only!
+    */
+    std::unique_ptr<network::UDPSocket> takeSocket();
     /** If not called, any vacant local port will be used */
     bool bind(const SocketAddress& localAddress);
     SocketAddress localAddress() const;
@@ -119,7 +125,7 @@ private:
         SystemError::ErrorCode errorCode,
         nx::Buffer transactionId,
         SocketAddress resolvedServerAddress);
-    void timedout(nx::Buffer transactionId);
+    void timedOut(nx::Buffer transactionId);
     void cleanupWhileInAioThread();
 };
 

@@ -102,10 +102,10 @@ void QnPtzPresetHotkeyItemDelegate::setModelData(QWidget *editor, QAbstractItemM
                               ? tr("This hotkey is used by preset \"%1\".").arg(existing.presetModel.preset.name)
                               : tr("This hotkey is used by tour \"%1\".").arg(existing.tourModel.tour.name);
 
-            QnMessageBox messageBox(QnMessageBox::Question, 0, tr("Change hotkey"), message, QnMessageBox::Cancel);
-            messageBox.addButton(tr("Reassign"), QnMessageBox::AcceptRole);
+            QnMessageBox messageBox(QnMessageBox::Question, 0, tr("Change hotkey"), message, QDialogButtonBox::Cancel);
+            messageBox.addButton(tr("Reassign"), QDialogButtonBox::AcceptRole);
 
-            if (messageBox.exec() == QnMessageBox::Cancel)
+            if (messageBox.exec() == QDialogButtonBox::Cancel)
                 return;
 
             QModelIndex existingIndex = ptzModel->index(ptzModel->rowNumber(existing), QnPtzManageModel::HotkeyColumn);

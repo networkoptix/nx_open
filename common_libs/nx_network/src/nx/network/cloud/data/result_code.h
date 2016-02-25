@@ -25,7 +25,7 @@ enum class ResultCode
     otherLogicError,
     notImplemented,
     noSuitableConnectionMethod,
-    timedout,
+    timedOut,
     serverConnectionBroken,
     noReplyFromServer,
     badTransport

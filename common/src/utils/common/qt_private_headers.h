@@ -23,3 +23,4 @@
 #define QT_CORE_PRIVATE_HEADER(header) QT_PRIVATE_HEADER(QtCore, header)
 #define QT_GUI_PRIVATE_HEADER(header) QT_PRIVATE_HEADER(QtGui, header)
 #define QT_WIDGETS_PRIVATE_HEADER(header) QT_PRIVATE_HEADER(QtWidgets, header)
+#define QT_MULTIMEDIA_PRIVATE_HEADER(header) QT_PRIVATE_HEADER(QtMultimedia, header)

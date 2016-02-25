@@ -125,7 +125,7 @@ TEST_F(SocketUdt, cancelConnect)
 
     for (int i = 0; i < 100; ++i)
     {
-        UdtStreamSocket sock(false);
+        UdtStreamSocket sock;
         std::atomic<bool> handlerCalled(false);
         ASSERT_TRUE(sock.setNonBlockingMode(true));
         sock.connectAsync(
@@ -146,7 +146,7 @@ TEST(SocketUdt_UdtPollSet, general)
     UdtPollSet pollset;
     ASSERT_TRUE(pollset.isValid());
 
-    UdtStreamSocket sock(false);
+    UdtStreamSocket sock;
 
     ASSERT_TRUE(pollset.add(&sock, aio::etRead, (void*)1));
     ASSERT_TRUE(pollset.add(&sock, aio::etWrite, (void*)2));
@@ -161,7 +161,7 @@ TEST(SocketUdt_UdtPollSet, general)
 }
 
 NX_NETWORK_BOTH_SOCKETS_TEST_CASE(
-    TEST, SocketUdt,
+    TEST, SocketUdt_Simple,
     &std::make_unique<UdtStreamServerSocket>,
     &std::make_unique<UdtStreamSocket>)
 
@@ -248,6 +248,42 @@ TEST_F(SocketUdt, rendezvousConnect)
     //cleaning up
     connectorSocket.pleaseStopSync();
     acceptorSocket.pleaseStopSync();
+}
+
+TEST_F(SocketUdt, DISABLED_acceptingFirstConnection)
+{
+    const std::chrono::seconds timeToWaitForSocketAccepted(1);
+    const int loopLength = 271;
+
+    for (int i = 0; i < loopLength; ++i)
+    {
+        UdtStreamServerSocket serverSocket;
+        ASSERT_TRUE(serverSocket.bind(SocketAddress(HostAddress::localhost, 0)));
+        ASSERT_TRUE(serverSocket.listen());
+        ASSERT_TRUE(serverSocket.setNonBlockingMode(true));
+
+        std::promise<SystemError::ErrorCode> socketAcceptedPromise;
+        serverSocket.acceptAsync(
+            [&socketAcceptedPromise](
+                SystemError::ErrorCode errorCode,
+                AbstractStreamSocket* /*socket*/)
+            {
+                socketAcceptedPromise.set_value(errorCode);
+            });
+
+        //std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+        UdtStreamSocket clientSock;
+        ASSERT_TRUE(clientSock.connect(serverSocket.getLocalAddress()));
+
+        auto future = socketAcceptedPromise.get_future();
+        ASSERT_EQ(
+            std::future_status::ready,
+            future.wait_for(timeToWaitForSocketAccepted));
+        ASSERT_EQ(SystemError::noError, future.get());
+
+        serverSocket.pleaseStopSync();
+    }
 }
 
 }   //test

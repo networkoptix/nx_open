@@ -83,7 +83,7 @@ void QnUpdateProcess::run() {
     checkForUpdatesTask->start();
 
     exec();
- 
+
     if (m_updateResult == QnUpdateResult::Cancelled) {
         if (m_currentTask)
             m_currentTask->cancel();
@@ -183,7 +183,7 @@ void QnUpdateProcess::setPeerStage(const QnUuid &peerId, QnPeerUpdateStage stage
         return;
 
     QnPeerUpdateInformation &info = m_updateInformationById[peerId];
-    if (info.stage == stage) 
+    if (info.stage == stage)
         return;
 
     info.stage = stage;
@@ -300,9 +300,9 @@ void QnUpdateProcess::finishUpdate(QnUpdateResult::Value value) {
 
 void QnUpdateProcess::installClientUpdate() {
     /* Check if we skip this step. */
-    if (m_clientRequiresInstaller 
+    if (m_clientRequiresInstaller
         || m_target.denyClientUpdates
-        || qnSettings->isClientUpdateDisabled() 
+        || qnSettings->isClientUpdateDisabled()
         || m_clientUpdateFile->version == qnCommon->engineVersion())
     {
             NX_LOG(lit("Update: QnUpdateProcess: Client update skipped."), cl_logDEBUG1);

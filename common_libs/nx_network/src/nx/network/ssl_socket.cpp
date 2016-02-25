@@ -1340,12 +1340,12 @@ bool QnSSLSocket::enableClientEncryption()
 
 void QnSSLSocket::cancelIOAsync(
     nx::network::aio::EventType eventType,
-    std::function<void()> cancellationDoneHandler)
+    nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler)
 {
     Q_D(const QnSSLSocket);
     d->wrappedSocket->cancelIOAsync(
         eventType,
-        [cancellationDoneHandler, d](){
+        [cancellationDoneHandler = move(cancellationDoneHandler), d](){
             d->async_ssl_ptr->Clear();
             cancellationDoneHandler();
         });
@@ -1359,7 +1359,7 @@ void QnSSLSocket::cancelIOSync(nx::network::aio::EventType eventType)
 
 void QnSSLSocket::connectAsync(
     const SocketAddress& addr,
-    std::function<void( SystemError::ErrorCode )> handler )
+    nx::utils::MoveOnlyFunc<void( SystemError::ErrorCode )> handler )
 {
     Q_D( const QnSSLSocket );
     return d->wrappedSocket->connectAsync( addr, std::move(handler) );
@@ -1413,8 +1413,8 @@ int QnSSLSocket::asyncSendInternal(
 }
 
 void QnSSLSocket::registerTimer(
-    unsigned int timeoutMs,
-    std::function<void()> handler )
+    std::chrono::milliseconds timeoutMs,
+    nx::utils::MoveOnlyFunc<void()> handler )
 {
     Q_D(QnSSLSocket);
     return d->wrappedSocket->registerTimer( timeoutMs, std::move(handler) );
@@ -1509,18 +1509,18 @@ int QnMixedSSLSocket::send( const void* buffer, unsigned int bufferLen )
 
 void QnMixedSSLSocket::cancelIOAsync(
     nx::network::aio::EventType eventType,
-    std::function<void()> cancellationDoneHandler)
+    nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler)
 {
     Q_D(QnMixedSSLSocket);
     if (d->useSSL)
         QnSSLSocket::cancelIOAsync(eventType, std::move(cancellationDoneHandler));
     else
-        d->wrappedSocket->cancelIOAsync(eventType, cancellationDoneHandler);
+        d->wrappedSocket->cancelIOAsync(eventType, std::move(cancellationDoneHandler));
 }
 
 void QnMixedSSLSocket::connectAsync(
     const SocketAddress& addr,
-    std::function<void( SystemError::ErrorCode )> handler )
+    nx::utils::MoveOnlyFunc<void( SystemError::ErrorCode )> handler )
 {
     Q_D( QnMixedSSLSocket );
     if( d->useSSL )
@@ -1592,8 +1592,8 @@ void QnMixedSSLSocket::sendAsync(
 }
 
 void QnMixedSSLSocket::registerTimer(
-    unsigned int timeoutMs,
-    std::function<void()> handler )
+    std::chrono::milliseconds timeoutMs,
+    nx::utils::MoveOnlyFunc<void()> handler )
 {
     Q_D(QnMixedSSLSocket);
     return d->wrappedSocket->registerTimer( timeoutMs, std::move(handler) );
@@ -1629,7 +1629,7 @@ AbstractStreamSocket* SSLServerSocket::accept()
         return new QnSSLSocket(acceptedSock, true);
 }
 
-void SSLServerSocket::pleaseStop(std::function< void() > handler)
+void SSLServerSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
     return m_delegateSocket->pleaseStop(std::move(handler));
 }

@@ -12,6 +12,7 @@
 
 #include <ui/dialogs/link_to_cloud_dialog.h>
 #include <ui/dialogs/unlink_from_cloud_dialog.h>
+#include <ui/dialogs/setup_wizard_dialog.h>
 
 class QnCloudManagementWidgetPrivate : public QObject
 {
@@ -45,7 +46,14 @@ QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent)
 
     connect(ui->linkButton,         &QPushButton::clicked,  d,  &QnCloudManagementWidgetPrivate::at_linkButton_clicked);
     connect(ui->unlinkButton,       &QPushButton::clicked,  d,  &QnCloudManagementWidgetPrivate::at_unlinkButton_clicked);
-    connect(ui->goToCloudButton,    &QPushButton::clicked,  action(Qn::OpenCloudMainUrl),   &QAction::trigger);
+    connect(ui->goToCloudButton,    &QPushButton::clicked,  action(QnActions::OpenCloudMainUrl),   &QAction::trigger);
+
+    connect(ui->setupWizardButton,  &QPushButton::clicked,  d, [this]()
+        {
+            QnSetupWizardDialog *dialog = new QnSetupWizardDialog(this);
+            dialog->exec();
+        }
+    );
 
     if (QnUserResourcePtr admin = qnResPool->getAdministrator())
     {

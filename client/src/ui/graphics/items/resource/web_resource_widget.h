@@ -1,7 +1,5 @@
 #pragma once
 
-#ifdef GDM_TODO
-
 #include <ui/graphics/items/resource/resource_widget.h>
 
 class QnWebView;
@@ -36,5 +34,3 @@ private:
 private:
     QnWebView * const m_webView;
 };
-
-#endif

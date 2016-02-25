@@ -7,6 +7,7 @@
 
 #include <nx/network/stun/message_dispatcher.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/thread/barrier_handler.h>
 
 #include "listening_peer_pool.h"
 
@@ -54,6 +55,29 @@ HolePunchingProcessor::HolePunchingProcessor(
                 std::move(connection),
                 std::move(message));
         });
+}
+
+HolePunchingProcessor::~HolePunchingProcessor()
+{
+    ConnectSessionsDictionary localSessions;
+    {
+        QnMutexLocker lk(&m_mutex);
+        std::swap(localSessions, m_activeConnectSessions);
+    }
+
+    if (localSessions.empty())
+        return;
+
+    std::promise<void> allSessionsStoppedPromise;
+    {
+        nx::BarrierHandler barrier(
+            [&allSessionsStoppedPromise]() { allSessionsStoppedPromise.set_value(); });
+        for (const auto& connectSession: localSessions)
+            connectSession.second->pleaseStop(barrier.fork());
+    }
+
+    //waiting for all sessions to stop...
+    allSessionsStoppedPromise.get_future().wait();
 }
 
 void HolePunchingProcessor::connect(
@@ -205,6 +229,9 @@ void HolePunchingProcessor::connectSessionFinished(
     api::ResultCode connectionResult)
 {
     QnMutexLocker lk(&m_mutex);
+
+    if (m_activeConnectSessions.empty())
+        return; //HolePunchingProcessor is being stopped currently?
 
     NX_LOGX(lm("connect session %1 finished with result %2").
         arg(sessionIter->first).arg(QnLexical::serialized(connectionResult)),

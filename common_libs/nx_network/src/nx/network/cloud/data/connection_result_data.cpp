@@ -18,6 +18,7 @@ using namespace stun::cc;
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(UdpHolePunchingResultCode,
     (UdpHolePunchingResultCode::ok, "ok")
     (UdpHolePunchingResultCode::noResponseFromMediator, "noResponseFromMediator")
+    (UdpHolePunchingResultCode::mediatorReportedError, "mediatorReportedError")
     (UdpHolePunchingResultCode::targetPeerHasNoUdpAddress, "targetPeerHasNoUdpAddress")
     (UdpHolePunchingResultCode::noSynFromTargetPeer, "noSynFromTargetPeer")
     (UdpHolePunchingResultCode::udtConnectFailed, "udtConnectFailed")

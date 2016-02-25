@@ -5,14 +5,6 @@
 
 #include "aggregationsurface.h"
 
-
-//#define GL_GLEXT_PROTOTYPES 1
-//#ifdef Q_OS_MACX
-//#include <glext.h>
-//#else
-//#include <GL/glext.h>
-//#endif
-//#define GL_GLEXT_PROTOTYPES 1
 #include <QtGui/qopengl.h>
 
 #include <utils/math/math.h>
@@ -82,7 +74,7 @@ class QnGlRendererTexture1
 {
 public:
     QnGlRendererTexture1()
-    : 
+    :
         m_allocated(false),
         m_internalFormat(-1),
         m_textureSize(QSize(0, 0)),
@@ -130,7 +122,7 @@ public:
 
         //QSize textureSize = QSize( qPower2Ceil((unsigned)stride / pixelSize, ROUND_COEFF), height );
         QSize textureSize = QSize( minPow2(stride / pixelSize) , minPow2(height) );
-            
+
 
         if( m_textureSize.width() < textureSize.width() || m_textureSize.height() < textureSize.height() || m_internalFormat != internalFormat )
         {
@@ -444,7 +436,7 @@ void AggregationSurface::ensureUploadedToOGL( const QRect& rect, qreal opacity )
                 lineInPixelsSize /= 4; // RGBA, BGRA
                 break;
         }
-      
+
         loadImageData(texture->textureSize().width(),texture->textureSize().height(),lineInPixelsSize,h[0],bytesPerPixel,glRGBFormat(m_format),pixels);
         m_textureFormat = PIX_FMT_RGBA;
 
@@ -556,7 +548,7 @@ QRect AggregationSurface::findAndLockRect( const QSize& requestedRectSize )
         }
     }
 
-    //TODO/BUG this implementation is buggy. E.g., if nonOverlappingUnlockedRects is (0,0,5,10) and (5,5,10,10) and requested size is (10, 5) 
+    //TODO/BUG this implementation is buggy. E.g., if nonOverlappingUnlockedRects is (0,0,5,10) and (5,5,10,10) and requested size is (10, 5)
         //we won't lock anything, although rect (0,5,10,10) is available. Rect coords in this example are (x1,y1,x2,y2)
 
     return QRect();

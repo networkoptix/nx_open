@@ -39,6 +39,12 @@ public:
     UdtSocket();
     virtual ~UdtSocket();
 
+    /** Binds UDT socket to an existing UDP socket.
+        \note This method can be called just after \a UdtSocket creation.
+        \note if method have failed \a UdtSocket instance MUST be destroyed!
+    */
+    bool bindToUdpSocket(UDPSocket&& udpSocket);
+
     bool getLastError(SystemError::ErrorCode* errorCode);
     bool getRecvTimeout(unsigned int* millis);
     bool getSendTimeout(unsigned int* millis);
@@ -65,7 +71,7 @@ class NX_NETWORK_API UdtStreamSocket
         , public AbstractStreamSocket
 {
 public:
-    UdtStreamSocket(bool natTraversal = true);
+    UdtStreamSocket();
     UdtStreamSocket(detail::UdtSocketImpl* impl);
     // We must declare this trivial constructor even it is trivial.
     // Since this will make std::unique_ptr call correct destructor for our
@@ -110,7 +116,7 @@ public:
     //!Implementation of AbstractCommunicatingSocket::cancelAsyncIO
     virtual void cancelIOAsync(
         nx::network::aio::EventType eventType,
-        std::function<void()> cancellationDoneHandler) override;
+        nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler) override;
     virtual void cancelIOSync(nx::network::aio::EventType eventType) override;
 
     // AbstractStreamSocket ------ interface
@@ -141,7 +147,7 @@ public:
     }
     virtual void connectAsync(
         const SocketAddress& addr,
-        std::function<void(SystemError::ErrorCode)> handler) override;
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
     virtual void readSomeAsync(
         nx::Buffer* const buf,
         std::function<void(SystemError::ErrorCode, size_t)> handler) override;
@@ -149,13 +155,13 @@ public:
         const nx::Buffer& buf,
         std::function<void(SystemError::ErrorCode, size_t)> handler) override;
     virtual void registerTimer(
-        unsigned int timeoutMillis,
-        std::function<void()> handler) override;
+        std::chrono::milliseconds timeoutMillis,
+        nx::utils::MoveOnlyFunc<void()> handler) override;
 
     //!Implementation of AbstractSocket::post
-    virtual void post( std::function<void()> handler ) override;
+    virtual void post( nx::utils::MoveOnlyFunc<void()> handler ) override;
     //!Implementation of AbstractSocket::dispatch
-    virtual void dispatch( std::function<void()> handler ) override;
+    virtual void dispatch( nx::utils::MoveOnlyFunc<void()> handler ) override;
 
 private:
     std::unique_ptr<aio::AsyncSocketImplHelper<UdtSocket>> m_aioHelper;
@@ -176,7 +182,7 @@ public:
     // AbstractStreamServerSocket -------------- interface
     virtual bool listen( int queueLen = 128 ) ;
     virtual AbstractStreamSocket* accept() ;
-    virtual void pleaseStop( std::function< void() > handler ) override;
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc< void() > handler) override;
 
     virtual bool bind(const SocketAddress& localAddress);
     virtual SocketAddress getLocalAddress() const;
@@ -202,9 +208,9 @@ public:
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
     //!Implementation of AbstractSocket::post
-    virtual void post( std::function<void()> handler ) override;
+    virtual void post( nx::utils::MoveOnlyFunc<void()> handler ) override;
     //!Implementation of AbstractSocket::dispatch
-    virtual void dispatch( std::function<void()> handler ) override;
+    virtual void dispatch( nx::utils::MoveOnlyFunc<void()> handler ) override;
     virtual void acceptAsync( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )> handler ) ;
 
 private:

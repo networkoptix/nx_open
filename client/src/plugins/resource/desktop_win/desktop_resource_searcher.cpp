@@ -20,13 +20,13 @@ static QnDesktopResourceSearcher* inst = 0;
 
 QnDesktopResourceSearcher &QnDesktopResourceSearcher::instance()
 {
-    
+
     return *inst;
 }
 
 void QnDesktopResourceSearcher::initStaticInstance(QnDesktopResourceSearcher* searcher)
 {
-    //Q_ASSERT(inst == 0); 
+    //Q_ASSERT(inst == 0);
     inst = searcher;
 }
 
@@ -35,7 +35,7 @@ QnDesktopResourceSearcher::QnDesktopResourceSearcher(QGLWidget* mainWidget)
     m_mainWidget = mainWidget;
 #ifdef Q_OS_WIN
     m_pD3D = Direct3DCreate9(D3D_SDK_VERSION);
-#else 
+#else
     m_pD3D = NULL;
 #endif
 }

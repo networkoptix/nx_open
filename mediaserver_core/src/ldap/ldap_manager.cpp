@@ -88,7 +88,7 @@ public:
     }
 
     QString toCompoundString() const {
-        if (isSimple())
+        if (!isSimple())
             return m_value;
 
         return QString(lit("(%1)")).arg(m_value);

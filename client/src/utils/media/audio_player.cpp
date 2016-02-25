@@ -13,9 +13,7 @@
 #include <plugins/resource/avi/avi_archive_delegate.h>
 #include <utils/common/util.h>
 
-#ifdef ENABLE_TEXT_TO_SPEECH
 #include <text_to_wav.h>
-#endif
 
 #include "../../camera/audio_stream_display.h"
 
@@ -217,7 +215,6 @@ void AudioPlayer::run()
         {
             case sSynthesizing:
             case sSynthesizingAutoPlay:
-#ifdef ENABLE_TEXT_TO_SPEECH
             {
 
                 if (!m_synthesizingTarget->open(QIODevice::WriteOnly) ||
@@ -245,14 +242,6 @@ void AudioPlayer::run()
                 }
                 break;
             }
-#else
-            {
-                emit done();
-                m_state = sReady;
-                m_resultCode = rcSynthesizingError;
-                break;
-            }
-#endif
             case sPlaying:
             {
                     //reading frame

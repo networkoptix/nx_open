@@ -32,7 +32,7 @@ UDPServer::~UDPServer()
     pleaseStopSync();
 }
 
-void UDPServer::pleaseStop(std::function<void()> handler)
+void UDPServer::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
     m_messagePipeline.pleaseStop(std::move(handler));
 }
@@ -77,7 +77,7 @@ void UDPServer::sendMessage(
         });
 }
 
-const std::unique_ptr<AbstractDatagramSocket>& UDPServer::socket()
+const std::unique_ptr<network::UDPSocket>& UDPServer::socket()
 {
     return m_messagePipeline.socket();
 }

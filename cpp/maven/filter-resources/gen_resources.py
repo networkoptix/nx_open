@@ -18,14 +18,15 @@ os.environ["DYLD_FRAMEWORK_PATH"] = '${qt.dir}/lib'
 os.environ["DYLD_LIBRARY_PATH"] = '${libdir}/lib/${build.configuration}:${arch.dir}'
 os.environ["LD_LIBRARY_PATH"] = '${libdir}/lib/${build.configuration}'
 
-def execute(command):
-    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+def execute(commands):
+    process = subprocess.Popen(commands, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     output = ''
-
+   
     # Poll process for new output until finished
     for line in iter(process.stdout.readline, ""):
-        print line,
-        output += line
+        text = line.rstrip() + '\n' 
+        sys.stdout.write(text)
+        output += line.rstrip()
 
     process.wait()
     exitCode = process.returncode
@@ -33,7 +34,7 @@ def execute(command):
     if (exitCode == 0):
         return output
     else:
-        raise Exception(command, exitCode, output)
+        raise Exception(commands, exitCode, output)
 
 def fileIsAllowed(file, exclusions):
     for exclusion in exclusions:
@@ -147,42 +148,19 @@ if __name__ == '__main__':
                 fo.close()
         gentext(f, '${project.build.sourceDirectory}', ['.cpp', '.c'], 'SOURCES += ')
         gentext(f, '${project.build.sourceDirectory}', ['.h'], 'HEADERS += ')
-        gentext(f, '${project.build.sourceDirectory}', ['.proto'], 'PB_FILES += ')
         gentext(f, '${project.build.sourceDirectory}', ['.ui'], 'FORMS += ')
         gen_includepath(f, '${libdir}/include')
-        #gen_includepath(f, '${environment.dir}/include')   #these dirs are explicitely included to allow replace boost in single branch
         f.close()
     
     if os.path.exists(os.path.join(r'${project.build.directory}', output_pro_file)):
-        print (' ++++++++++++++++++++++++++++++++ generating project file ++++++++++++++++++++++++++++++++')
-        qmake = os.system('${qt.dir}/bin/qmake -query')
-        print (' ++++++++++++++++++++++++++++++++ qMake info: ++++++++++++++++++++++++++++++++')
+        print (' ++++++++++++++++++++++++++++++++ qMake info: ++++++++++++++++++++++++++++++++')        
+        execute([r'${qt.dir}/bin/qmake', '-query'])
+        print (' ++++++++++++++++++++++++++++++++ generating project file ++++++++++++++++++++++++++++++++')        
         if '${platform}' == 'windows':
-            vc_path = r'%s..\..\VC\bin' % os.getenv('VS110COMNTOOLS')
-            print(vc_path)
+            vc_path = r'%s..\..\VC\bin' % os.getenv('${VCVars}')
             os.environ["path"] += os.pathsep + vc_path
-            os.system('echo %PATH%')
-            os.system('cd ${qt.dir} && ${qt.dir}/qtbinpatcher.exe')
-            p = subprocess.Popen(r'qmake.bat %s' % output_pro_file, shell=True, stdout=PIPE)
-            p = subprocess.Popen(r'${qt.dir}/bin/qmake -spec ${qt.spec} CONFIG+=${build.configuration} -o ${project.build.directory}/Makefile %s' % output_pro_file, shell=True, stdout=PIPE)
-            out, err = p.communicate()
-            print out
-            p.wait()
-            if p.returncode:  
-                print "failed with code: %s" % str(p.returncode) 
-                sys.exit(1)
-
-            #os.system('${qt.dir}/bin/qmake -spec ${qt.spec} -tp vc -o ${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj %s' % output_pro_file)
-            
-            #if '${arch}' == 'x64' and '${force_x86}' == 'false':
-            #    replace ('${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj', 'Win32', '${arch}')
-            #    replace ('${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj', 'Name="VCLibrarianTool"', 'Name="VCLibrarianTool" \n                AdditionalOptions="/MACHINE:x64"')
-            #print ('f++++++++++++++++++++++++++++++++++++++ Replacing +++++++++++++++++++++++++++++++++++++++')
-            #replace ('${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj', '<None\s*Include=\"(.*)[\\/]{1}([\w\d_\-]+)\.([\w\d_\-]+)\".*/>', '''    <CustomBuild Include="$1/$2.$3"> \n
-      #<AdditionalInputs>${libdir}/build/bin/protoc;$1/$2.$3</AdditionalInputs> \n
-      #<Command         >${libdir}/build/bin/protoc --proto_path=${root}/${project.artifactId}/src/api/pb --cpp_out=${root}/${project.artifactId}/x86/build/\$(Configuration)/generated/ ${root}/${project.artifactId}/src/$1/$2.$3</Command> \n
-      #<Message         >Generating code from $1/$2.$3 to $2.pb.cc</Message> \n
-      #<Outputs         >${root}/${project.artifactId}/x86/build/\$(Configuration)/generated/$2.pb.cc</Outputs> \n
-    #</CustomBuild>''')
+            execute([r'${qt.dir}/bin/qmake', '-spec', '${qt.spec}', '-tp', 'vc', '-o', r'${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj', output_pro_file])           
+            execute([r'${qt.dir}/bin/qmake', '-spec', '${qt.spec}', r'CONFIG+=${build.configuration}', '-o', r'${project.build.directory}/Makefile', output_pro_file])
         else:
             os.system('export DYLD_FRAMEWORK_PATH=%s && export LD_LIBRARY_PATH=%s && ${qt.dir}/bin/qmake -spec ${qt.spec} CONFIG+=${build.configuration} -o ${project.build.directory}/Makefile.${build.configuration} %s' % (ldpath, ldpath, output_pro_file))
+            

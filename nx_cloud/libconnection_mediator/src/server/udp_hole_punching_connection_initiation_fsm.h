@@ -7,11 +7,13 @@
 
 #include <functional>
 
+#include <nx/network/aio/timer.h>
 #include <nx/network/buffer.h>
 #include <nx/network/cloud/data/connect_data.h>
 #include <nx/network/cloud/data/connection_ack_data.h>
 #include <nx/network/cloud/data/connection_result_data.h>
 #include <nx/network/cloud/data/result_code.h>
+#include <utils/common/stoppable.h>
 
 #include "listening_peer_pool.h"
 
@@ -19,7 +21,13 @@
 namespace nx {
 namespace hpm {
 
+/**
+    \note Object can be safely freed while in \a onFsmFinishedEventHandler handler.
+        Otherwise, one has to stop it with \a QnStoppableAsync::pleaseStop
+*/
 class UDPHolePunchingConnectionInitiationFsm
+:
+    public QnStoppableAsync
 {
 public:
     /** 
@@ -30,6 +38,8 @@ public:
         nx::String connectionID,
         const ListeningPeerPool::ConstDataLocker& serverPeerDataLocker,
         std::function<void(api::ResultCode)> onFsmFinishedEventHandler);
+
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler);
 
     void onConnectRequest(
         const ConnectionStrongRef& connection,
@@ -57,7 +67,7 @@ private:
     State m_state;
     nx::String m_connectionID;
     std::function<void(api::ResultCode)> m_onFsmFinishedEventHandler;
-    std::unique_ptr<AbstractStreamSocket> m_timer;
+    nx::network::aio::Timer m_timer;
     ConnectionWeakRef m_serverConnectionWeakRef;
     std::function<void(api::ResultCode, api::ConnectResponse)> m_connectResponseSender;
     

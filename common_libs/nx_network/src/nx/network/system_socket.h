@@ -61,6 +61,11 @@ public:
         int sockDesc,
         PollableSystemSocketImpl* impl = nullptr );
 
+    Socket(const Socket&) = delete;
+    Socket& operator=(const Socket&) = delete;
+    Socket(Socket&&) = delete;
+    Socket& operator=(Socket&&) = delete;
+
     /**
      *   Close and deallocate this socket
      */
@@ -109,9 +114,9 @@ public:
     //!Implementation of AbstractSocket::setSendTimeout
     virtual bool setSendTimeout( unsigned int ms ) override;
     //!Implementation of AbstractSocket::post
-    virtual void post( std::function<void()> handler ) override;
+    virtual void post( nx::utils::MoveOnlyFunc<void()> handler ) override;
     //!Implementation of AbstractSocket::dispatch
-    virtual void dispatch( std::function<void()> handler ) override;
+    virtual void dispatch( nx::utils::MoveOnlyFunc<void()> handler ) override;
 
     /**
      *   Get the local port
@@ -154,14 +159,10 @@ public:
     bool createSocket( int type, int protocol );
 
 protected:
-    std::unique_ptr<aio::BaseAsyncSocketImplHelper<Pollable>> m_baseAsyncHelper;
+    aio::BaseAsyncSocketImplHelper<Pollable>* m_baseAsyncHelper;
 
 private:
     bool m_nonBlockingMode;
-
-    // Prevent the user from trying to use value semantics on this object
-    Socket(const Socket &sock);
-    void operator=(const Socket &sock);
 };
 
 /**
@@ -183,12 +184,17 @@ public:
         int newConnSD,
         PollableSystemSocketImpl* sockImpl = nullptr );
 
+    CommunicatingSocket(const CommunicatingSocket&) = delete;
+    CommunicatingSocket& operator=(const CommunicatingSocket&) = delete;
+    CommunicatingSocket(CommunicatingSocket&&) = delete;
+    CommunicatingSocket& operator=(CommunicatingSocket&&) = delete;
+
     virtual ~CommunicatingSocket();
 
     //!Implementation of AbstractCommunicatingSocket::connect
     virtual bool connect(
         const SocketAddress& remoteAddress,
-        unsigned int timeoutMillis ) override;
+        unsigned int timeoutMillis = AbstractCommunicatingSocket::DEFAULT_TIMEOUT_MILLIS) override;
     //!Implementation of AbstractCommunicatingSocket::recv
     virtual int recv( void* buffer, unsigned int bufferLen, int flags ) override;
     //!Implementation of AbstractCommunicatingSocket::send
@@ -200,7 +206,7 @@ public:
     //!Implementation of AbstractCommunicatingSocket::connectAsync
     virtual void connectAsync(
         const SocketAddress& addr,
-        std::function<void( SystemError::ErrorCode )> handler ) override;
+        nx::utils::MoveOnlyFunc<void( SystemError::ErrorCode )> handler ) override;
     //!Implementation of AbstractCommunicatingSocket::readSomeAsync
     virtual void readSomeAsync(
         nx::Buffer* const buf,
@@ -211,12 +217,12 @@ public:
         std::function<void( SystemError::ErrorCode, size_t )> handler ) override;
     //!Implementation of AbstractCommunicatingSocket::registerTimer
     virtual void registerTimer(
-        unsigned int timeoutMs,
-        std::function<void()> handler ) override;
+        std::chrono::milliseconds timeoutMs,
+        nx::utils::MoveOnlyFunc<void()> handler ) override;
     //!Implementation of AbstractCommunicatingSocket::cancelAsyncIO
     virtual void cancelIOAsync(
         nx::network::aio::EventType eventType,
-        std::function<void()> cancellationDoneHandler) override;
+        nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler) override;
     virtual void cancelIOSync(nx::network::aio::EventType eventType) override;
 
     virtual void close() override;
@@ -249,6 +255,11 @@ public:
     //!User by \a TCPServerSocket class
     TCPSocket( int newConnSD );
     virtual ~TCPSocket();
+
+    TCPSocket(const TCPSocket&) = delete;
+    TCPSocket& operator=(const TCPSocket&) = delete;
+    TCPSocket(TCPSocket&&) = delete;
+    TCPSocket& operator=(TCPSocket&&) = delete;
 
 
     //////////////////////////////////////////////////////////////////////
@@ -292,6 +303,11 @@ public:
     TCPServerSocket();
     ~TCPServerSocket();
 
+    TCPServerSocket(const TCPServerSocket&) = delete;
+    TCPServerSocket& operator=(const TCPServerSocket&) = delete;
+    TCPServerSocket(TCPServerSocket&&) = delete;
+    TCPServerSocket& operator=(TCPServerSocket&&) = delete;
+
     /**
      *   Blocks until a new connection is established on this socket or error
      *   @return new connection socket
@@ -299,11 +315,11 @@ public:
     static int accept(int sockDesc);
 
     //!Implementation of AbstractStreamServerSocket::listen
-    virtual bool listen(int queueLen) override;
+    virtual bool listen(int queueLen = 128) override;
     //!Implementation of AbstractStreamServerSocket::accept
     virtual AbstractStreamSocket* accept() override;
     //!Implementation of QnStoppable::pleaseStop
-    virtual void pleaseStop(std::function< void() > handler) override;
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc< void() > handler) override;
 
     //!Implementation of AbstractStreamServerSocket::acceptAsync
     virtual void acceptAsync(
@@ -330,7 +346,12 @@ public:
     /**
      *   Construct a UDP socket
      */
-    UDPSocket( bool natTraversal = true );
+    explicit UDPSocket( bool natTraversal = true );
+
+    UDPSocket(const UDPSocket&) = delete;
+    UDPSocket& operator=(const UDPSocket&) = delete;
+    UDPSocket(UDPSocket&&) = delete;
+    UDPSocket& operator=(UDPSocket&&) = delete;
 
     void setDestPort(unsigned short foreignPort);
 

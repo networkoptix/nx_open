@@ -24,22 +24,22 @@ OutgoingTunnelPool::~OutgoingTunnelPool()
     assert(m_terminated);
 }
 
-void OutgoingTunnelPool::pleaseStop(std::function<void()> completionHandler)
+void OutgoingTunnelPool::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
     //stopping all tunnels. Assuming noone calls establishNewConnection anymore
     QnMutexLocker lock(&m_mutex);
     nx::BarrierHandler tunnelsStoppedFuture(
-        std::bind(
-            &OutgoingTunnelPool::tunnelsStopped,
-            this,
-            std::move(completionHandler)));
+        [this, completionHandler = move(completionHandler)]() mutable
+        {
+            tunnelsStopped(std::move(completionHandler));
+        });
     for (const auto& tunnel: m_pool)
         tunnel.second->pleaseStop(tunnelsStoppedFuture.fork());
 }
 
 void OutgoingTunnelPool::establishNewConnection(
     const AddressEntry& targetHostAddress,
-    boost::optional<std::chrono::milliseconds> timeout,
+    std::chrono::milliseconds timeout,
     SocketAttributes socketAttributes,
     OutgoingTunnel::NewConnectionHandler handler)
 {
@@ -89,7 +89,7 @@ void OutgoingTunnelPool::removeTunnel(TunnelDictionary::iterator tunnelIter)
 }
 
 void OutgoingTunnelPool::tunnelsStopped(
-    std::function<void()> completionHandler)
+    nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
     m_terminated = true;
     completionHandler();

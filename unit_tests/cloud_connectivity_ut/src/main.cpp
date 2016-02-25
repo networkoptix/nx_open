@@ -9,10 +9,12 @@
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
 
+#include <libconnection_mediator/src/test_support/socket_globals_holder.h>
+
 
 int main(int argc, char **argv)
 {
-    nx::network::SocketGlobals::InitGuard sgGuard;
+    SocketGlobalsHolder socketGlobalsInstance;
     ::testing::InitGoogleMock(&argc, argv);
 
     for (int i = 0; i < argc; ++i)

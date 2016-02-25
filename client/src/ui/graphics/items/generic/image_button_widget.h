@@ -46,7 +46,9 @@ public:
     };
     Q_DECLARE_FLAGS(StateFlags, StateFlag)
 
-    QnImageButtonWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0);
+    QnImageButtonWidget(const QString &statisticsAlias
+        , QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0);
+
     virtual ~QnImageButtonWidget();
 
     QIcon icon() const;
@@ -181,7 +183,8 @@ class QnRotatingImageButtonWidget: public QnImageButtonWidget, public AnimationT
     Q_OBJECT
     typedef QnImageButtonWidget base_type;
 public:
-    QnRotatingImageButtonWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0);
+    QnRotatingImageButtonWidget(const QString &statisticsAlias
+        , QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0);
 
     qreal rotationSpeed() const {
         return m_rotationSpeed;

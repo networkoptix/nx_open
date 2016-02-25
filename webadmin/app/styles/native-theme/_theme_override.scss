@@ -1,0 +1,60 @@
+/* Here we override some default bootstrap styles and behavior for our purposes */
+
+
+@import '_theme_variables';
+
+/*
+These hacks are to make header and dialog have a bit different colors
+
+.panel-heading{
+  border:1px solid $dark12;
+}
+.panel-body{
+  border:1px solid $dark14;
+  border-top-color:transparent;
+}
+
+.panel-footer{
+  border:1px solid $dark14;
+}
+*/
+
+.panel-heading{
+  border-top-left-radius: $panel-border-radius;
+  border-top-right-radius: $panel-border-radius;
+  font-weight:bold;
+
+  padding-top: 4px;
+  padding-bottom: 3px;
+}
+.panel-body{
+  border-bottom: 1px solid $shadow;
+}
+.panel-footer{
+  padding-top: 14px;
+  padding-bottom: 16px;
+  min-height:59px;
+
+  border-top:1px solid $dark;
+  border-bottom-left-radius: $panel-border-radius;
+  border-bottom-right-radius: $panel-border-radius;
+}
+
+.form-control:focus{
+  border-color: $brand_d4;
+  box-shadow: none;
+}
+
+
+.help-block {
+  color: $windowText; // lighten the text some for contrast
+  font-size: 90%;
+  margin-top:4px;
+  margin-bottom:16px;
+}
+
+h4{
+  font-weight: 500;
+  margin-top:8px;
+  margin-bottom:16px;
+}

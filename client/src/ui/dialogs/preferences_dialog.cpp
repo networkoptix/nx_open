@@ -26,8 +26,6 @@ QnPreferencesDialog::QnPreferencesDialog(QWidget *parent):
 {
     ui->setupUi(this);
 
-    setAccentStyle(ui->buttonBox->button(QDialogButtonBox::Ok));
-
     addPage(GeneralPage, new QnGeneralPreferencesWidget(this), tr("General"));
     addPage(LookAndFeelPage, new QnLookAndFeelPreferencesWidget(this), tr("Look and Feel"));
 
@@ -70,20 +68,20 @@ bool QnPreferencesDialog::canApplyChanges() {
     if (allPagesCanApplyChanges)
         return true;
 
-    QMessageBox::StandardButton result = QMessageBox::information(
+    QDialogButtonBox::StandardButton result = QnMessageBox::information(
         this,
         tr("Information"),
         tr("Some changes will take effect only after application restart. Do you want to restart the application now?"),
-        QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
-        QMessageBox::Yes);
+        QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel,
+        QDialogButtonBox::Yes);
     switch (result) {
-    case QMessageBox::Cancel:
+    case QDialogButtonBox::Cancel:
         return false;
-    case QMessageBox::Yes:
+    case QDialogButtonBox::Yes:
         /* The slot must be connected as QueuedConnection because it must start the new instance
          * after the settings have been saved. Settings saving will be performed just after this (confirm)
          * without returning to the event loop. */
-        menu()->trigger(Qn::QueueAppRestartAction);
+        menu()->trigger(QnActions::QueueAppRestartAction);
         break;
     default:
         break;

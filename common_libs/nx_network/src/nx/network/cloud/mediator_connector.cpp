@@ -61,6 +61,7 @@ void MediatorConnector::mockupAddress( SocketAddress address )
                     "Address resolving is already in progress!" );
 
         m_promise = std::promise< bool >();
+        m_future = m_promise->get_future();
     }
 
 
@@ -94,7 +95,7 @@ boost::optional<SystemCredentials> MediatorConnector::getSystemCredentials() con
     return m_credentials;
 }
 
-void MediatorConnector::pleaseStop( std::function<void()> handler )
+void MediatorConnector::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
     {
         QnMutexLocker lk( &m_mutex );
@@ -129,7 +130,7 @@ void MediatorConnector::fetchEndpoint()
 
             // retry after some delay
             if( !m_isTerminating )
-                m_timerSocket->registerTimer( RETRY_INTERVAL.count(),
+                m_timerSocket->registerTimer( RETRY_INTERVAL,
                                               [ this ](){ fetchEndpoint(); } );
         }
         else

@@ -71,7 +71,7 @@ public:
 
     virtual void cancelIOAsync(
         nx::network::aio::EventType eventType,
-        std::function<void()> cancellationDoneHandler) override;
+        nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler) override;
     virtual void cancelIOSync(nx::network::aio::EventType eventType) override;
 
 protected:
@@ -94,7 +94,7 @@ protected:
     //!Implementation of AbstractCommunicatingSocket::connectAsync
     virtual void connectAsync(
         const SocketAddress& addr,
-        std::function<void( SystemError::ErrorCode )> handler ) override;
+        nx::utils::MoveOnlyFunc<void( SystemError::ErrorCode )> handler ) override;
     //!Implementation of AbstractCommunicatingSocket::readSomeAsync
     virtual void readSomeAsync(
         nx::Buffer* const buf,
@@ -105,8 +105,8 @@ protected:
         std::function<void( SystemError::ErrorCode, size_t )> handler ) override;
     //!Implementation of AbstractCommunicatingSocket::registerTimer
     virtual void registerTimer(
-        unsigned int timeoutMs,
-        std::function<void()> handler ) override;
+        std::chrono::milliseconds timeoutMs,
+        nx::utils::MoveOnlyFunc<void()> handler ) override;
 
 private:
     // Async version
@@ -131,13 +131,13 @@ public:
 
     virtual void cancelIOAsync(
         nx::network::aio::EventType eventType,
-        std::function<void()> cancellationDoneHandler) override;
+        nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler) override;
 
 protected:
     //!Implementation of AbstractCommunicatingSocket::connectAsync
     virtual void connectAsync(
         const SocketAddress& addr,
-        std::function<void( SystemError::ErrorCode )> handler ) override;
+        nx::utils::MoveOnlyFunc<void( SystemError::ErrorCode )> handler ) override;
     //!Implementation of AbstractCommunicatingSocket::readSomeAsync
     virtual void readSomeAsync(
         nx::Buffer* const buf,
@@ -148,8 +148,8 @@ protected:
         std::function<void( SystemError::ErrorCode, size_t )> handler ) override;
     //!Implementation of AbstractCommunicatingSocket::registerTimer
     virtual void registerTimer(
-        unsigned int timeoutMs,
-        std::function<void()> handler ) override;
+        std::chrono::milliseconds timeoutMs,
+        nx::utils::MoveOnlyFunc<void()> handler ) override;
 
 private:
     Q_DECLARE_PRIVATE(QnMixedSSLSocket);
@@ -177,7 +177,7 @@ public:
     //!Implementation of SSLServerSocket::accept
     virtual AbstractStreamSocket* accept() override;
     //!Implementation of QnStoppable::pleaseStop
-    virtual void pleaseStop( std::function< void() > handler ) override;
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc< void() > handler) override;
 
 protected:
     //!Implementation of SSLServerSocket::acceptAsync

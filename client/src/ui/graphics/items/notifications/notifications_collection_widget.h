@@ -33,7 +33,8 @@ class QnBlinkingImageButtonWidget: public QnImageButtonWidget, public AnimationT
     typedef QnImageButtonWidget base_type;
 
 public:
-    QnBlinkingImageButtonWidget(QGraphicsItem *parent = NULL);
+    QnBlinkingImageButtonWidget(const QString &statisticsAlias
+        , QGraphicsItem *parent = NULL);
 
 public slots:
     void setNotificationCount(int count);
@@ -100,7 +101,7 @@ private:
     void updateBlinker();
 
     void at_list_itemRemoved(QnNotificationWidget *item);
-    void at_item_actionTriggered(Qn::ActionId actionId, const QnActionParameters &parameters);
+    void at_item_actionTriggered(QnActions::IDType actionId, const QnActionParameters &parameters);
     void at_notificationCache_fileDownloaded(const QString& filename);
 
 private:

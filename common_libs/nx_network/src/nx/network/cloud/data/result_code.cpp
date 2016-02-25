@@ -23,7 +23,7 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(ResultCode,
     (ResultCode::otherLogicError, "otherLogicError")
     (ResultCode::notImplemented, "notImplemented")
     (ResultCode::noSuitableConnectionMethod, "noSuitableConnectionMethod")
-    (ResultCode::timedout, "timedout")
+    (ResultCode::timedOut, "timedOut")
     (ResultCode::serverConnectionBroken, "serverConnectionBroken")
     (ResultCode::noReplyFromServer, "noReplyFromServer")
     (ResultCode::badTransport, "badTransport")

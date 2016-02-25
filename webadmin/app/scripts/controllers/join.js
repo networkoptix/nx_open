@@ -71,7 +71,7 @@ angular.module('webadminApp')
                     return false;
             }
             return errorToShow;
-        };
+        }
 
         $scope.test = function () {
 
@@ -83,7 +83,7 @@ angular.module('webadminApp')
                 if(r.data.error!=='0'){
                     var errorToShow = errorHandler(r.data.errorString);
                     if(errorToShow){
-                        alert("Connection failed: " + errorToShow);
+                        alert('Connection failed: ' + errorToShow);
                         return;
                     }
                 }
@@ -98,11 +98,12 @@ angular.module('webadminApp')
                 return;
             }*/
 
-            mediaserver.mergeSystems($scope.settings.url,$scope.settings.password,$scope.settings.currentPassword,$scope.settings.keepMySystem).then(function(r){
+            mediaserver.mergeSystems($scope.settings.url,'admin',$scope.settings.password,
+                $scope.settings.currentPassword,$scope.settings.keepMySystem).then(function(r){
                 if(r.data.error!=='0') {
                     var errorToShow = errorHandler(r.data.errorString);
                     if (errorToShow) {
-                        alert("Merge failed: " + errorToShow);
+                        alert('Merge failed: ' + errorToShow);
                         return;
                     }
                 }

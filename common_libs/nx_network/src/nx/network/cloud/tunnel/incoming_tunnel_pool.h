@@ -31,7 +31,7 @@ public:
         boost::optional<unsigned int> timeout);
 
     /** Cancels all operations in progress */
-    void pleaseStop(std::function<void()> handler) override;
+    void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
 private:
     void acceptTunnel(std::shared_ptr<AbstractIncomingTunnelConnection> connection);
@@ -40,6 +40,7 @@ private:
     const size_t m_acceptLimit;
     mutable QnMutex m_mutex;
 
+    bool m_terminated;
     std::set<std::shared_ptr<AbstractIncomingTunnelConnection>> m_pool;
     std::unique_ptr<AbstractCommunicatingSocket> m_ioThreadSocket;
     std::function<void(std::unique_ptr<AbstractStreamSocket>)> m_acceptHandler;

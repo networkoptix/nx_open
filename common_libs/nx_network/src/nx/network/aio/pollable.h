@@ -34,9 +34,20 @@ public:
     Pollable(
         AbstractSocket::SOCKET_HANDLE fd,
         std::unique_ptr<PollableImpl> impl = std::unique_ptr<PollableImpl>() );
+
+    Pollable(const Pollable&) = delete;
+    Pollable& operator=(const Pollable&) = delete;
+    Pollable(Pollable&&) = delete;
+    Pollable& operator=(Pollable&&) = delete;
+
     virtual ~Pollable() {}
 
     AbstractSocket::SOCKET_HANDLE handle() const;
+    /** Moves ownership pf system socket out of \a Socket instance.
+        Leaves \a Socket instance in undefined state.
+        \note Caller MUST ensure that there are no async socket operations on this instance
+    */
+    AbstractSocket::SOCKET_HANDLE takeHandle();
     /*!
         \note Zero timeout means infinite timeout
     */

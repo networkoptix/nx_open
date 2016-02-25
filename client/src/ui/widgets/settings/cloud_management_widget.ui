@@ -56,6 +56,13 @@
          </property>
         </widget>
        </item>
+       <item alignment="Qt::AlignLeft">
+        <widget class="QPushButton" name="setupWizardButton">
+         <property name="text">
+          <string>Setup Wizard</string>
+         </property>
+        </widget>
+       </item>
        <item>
         <spacer name="verticalSpacer">
          <property name="orientation">

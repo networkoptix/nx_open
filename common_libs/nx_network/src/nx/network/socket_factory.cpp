@@ -48,10 +48,8 @@ static std::unique_ptr< AbstractStreamSocket > streamSocket(
             {
                 case SocketFactory::NatTraversalType::nttAuto:
                 case SocketFactory::NatTraversalType::nttEnabled:
-                    return std::make_unique< UdtStreamSocket >( true );
-
                 case SocketFactory::NatTraversalType::nttDisabled:
-                    return std::make_unique< UdtStreamSocket >( false );
+                    return std::make_unique< UdtStreamSocket >();
 
                 default:
                     return nullptr;

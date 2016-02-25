@@ -259,6 +259,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     )
 
 
+
 //TODO: #GDM #2.4 move back to client_module_functions.cpp. See commit a0edb9aa5abede1b5c9ab1c9ce52cc912286d090.
 //Looks like problem is in gcc-4.8.1
 

@@ -11,6 +11,7 @@ IncomingTunnelPool::IncomingTunnelPool(
     aio::AbstractAioThread* ioThread, size_t acceptLimit)
 :
     m_acceptLimit(acceptLimit),
+    m_terminated(false),
     m_ioThreadSocket(new TCPSocket)
 {
     m_ioThreadSocket->bindToAioThread(ioThread);
@@ -63,15 +64,19 @@ void IncomingTunnelPool::getNextSocketAsync(
             *timeout, [this](){ callAcceptHandler(true); });
 }
 
-void IncomingTunnelPool::pleaseStop(std::function<void()> handler)
+void IncomingTunnelPool::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_terminated = true;
+    }
+
     BarrierHandler barrier(
-        [this, handler]()
+        [this, handler = std::move(handler)]() mutable
         {
             m_ioThreadSocket->pleaseStop(std::move(handler));
         });
 
-    QnMutexLocker lock(&m_mutex);
     for (const auto& tunnel : m_pool)
         tunnel->pleaseStop(barrier.fork());
 }
@@ -85,34 +90,40 @@ void IncomingTunnelPool::acceptTunnel(
             SystemError::ErrorCode code,
             std::unique_ptr<AbstractStreamSocket> socket)
         {
-            if (code != SystemError::noError)
             {
                 QnMutexLocker lock(&m_mutex);
-                NX_LOGX(lm("tunnel %1 is brocken: %2")
-                    .arg(connection).arg(SystemError::toString(code)),
-                    cl_logDEBUG1);
+                if (m_terminated)
+                    return;
 
-                m_pool.erase(connection);
-                return;
+                if (code != SystemError::noError)
+                {
+                    NX_LOGX(lm("tunnel %1 is brocken: %2")
+                        .arg(connection).arg(SystemError::toString(code)),
+                        cl_logDEBUG1);
+
+                    m_pool.erase(connection);
+                    return;
+                }
+
+                if (m_acceptedSockets.size() >= m_acceptLimit)
+                {
+                    // TODO: #mux Stop accepting tunnel?
+                    //  wouldn't really help while we acceptiong other tunnels
+                    //  better to implement epoll like system with tunnels and
+                    //  their connections
+                    NX_LOGX(lm("sockets queue overflow: %1").arg(m_acceptLimit),
+                        cl_logWARNING);
+                }
+                else
+                {
+                    m_acceptedSockets.push_back(std::move(socket));
+                    if (m_acceptHandler)
+                        m_ioThreadSocket->post(
+                            [this](){ callAcceptHandler(false); });
+                }
             }
 
             acceptTunnel(std::move(connection));
-
-            QnMutexLocker lock(&m_mutex);
-            if (m_acceptedSockets.size() >= m_acceptLimit)
-            {
-                // TODO: #mux Stop accepting tunnel?
-                //  wouldn't really help while we acceptiong other tunnels
-                //  better to implement epoll like system with tunnels and
-                //  their connections
-                NX_LOGX(lm("sockets queue overflow: %1").arg(m_acceptLimit),
-                    cl_logWARNING);
-                return;
-            }
-
-            m_acceptedSockets.push_back(std::move(socket));
-            if (m_acceptHandler)
-                m_ioThreadSocket->post([this](){ callAcceptHandler(false); });
         });
 }
 

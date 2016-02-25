@@ -38,14 +38,15 @@ public:
     /**
        \note Calling party MUST not use object after \a OutgoingTunnel::pleaseStop call
      */
-    virtual void pleaseStop(std::function<void()> handler) override;
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
     /** Establish new connection.
-    * \param socketAttributes attribute values to apply to a newly-created socket
+    * @param timeout Zero means no timeout
+    * @param socketAttributes attribute values to apply to a newly-created socket
     * \note This method is re-enterable. So, it can be called in
     *        different threads simultaneously */
     void establishNewConnection(
-        boost::optional<std::chrono::milliseconds> timeout,
+        std::chrono::milliseconds timeout,
         SocketAttributes socketAttributes,
         NewConnectionHandler handler);
     /** same as above, but no timeout */
@@ -57,7 +58,8 @@ private:
     struct ConnectionRequestData
     {
         SocketAttributes socketAttributes;
-        boost::optional<std::chrono::milliseconds> timeout;
+        /** zero - no timeout */
+        std::chrono::milliseconds timeout;
         NewConnectionHandler handler;
     };
 
@@ -89,15 +91,15 @@ private:
     void onConnectorFinished(
         CloudConnectType connectorType,
         SystemError::ErrorCode errorCode,
-        std::shared_ptr<AbstractOutgoingTunnelConnection> connection);
+        std::unique_ptr<AbstractOutgoingTunnelConnection> connection);
 
     void connectorsTerminated(
-        std::function<void()> pleaseStopCompletionHandler);
+        nx::utils::MoveOnlyFunc<void()> pleaseStopCompletionHandler);
     void connectorsTerminatedNonSafe(
         QnMutexLockerBase* const /*lock*/,
-        std::function<void()> pleaseStopCompletionHandler);
+        nx::utils::MoveOnlyFunc<void()> pleaseStopCompletionHandler);
     void connectionTerminated(
-        std::function<void()> pleaseStopCompletionHandler);
+        nx::utils::MoveOnlyFunc<void()> pleaseStopCompletionHandler);
 };
 
 } // namespace cloud

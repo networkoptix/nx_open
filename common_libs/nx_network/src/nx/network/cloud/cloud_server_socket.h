@@ -22,8 +22,7 @@ class NX_NETWORK_API CloudServerSocket
 {
 public:
     typedef std::function<std::unique_ptr<AbstractTunnelAcceptor>(
-            const String&  /*selfPeerId*/,
-            hpm::api::ConnectionRequestedEvent& /*event*/)> AcceptorMaker;
+            hpm::api::ConnectionRequestedEvent&)> AcceptorMaker;
 
     static const std::vector<AcceptorMaker> kDefaultAcceptorMakers;
 
@@ -47,11 +46,11 @@ public:
     AbstractStreamSocket* accept() override;
 
     //!Implementation of QnStoppable::pleaseStop
-    void pleaseStop(std::function<void()> handler) override;
+    void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
     //!Implementation of AbstractSocket::*
-    void post(std::function<void()> handler) override;
-    void dispatch(std::function<void()> handler) override;
+    void post(nx::utils::MoveOnlyFunc<void()> handler) override;
+    void dispatch(nx::utils::MoveOnlyFunc<void()> handler) override;
     aio::AbstractAioThread* getAioThread() override;
     void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
@@ -63,16 +62,25 @@ public:
 protected:
     void initTunnelPool(int queueLen);
     void startAcceptor(std::unique_ptr<AbstractTunnelAcceptor> acceptor);
+    void onListenRequestCompleted(
+        nx::hpm::api::ResultCode resultCode,
+        std::function<void(SystemError::ErrorCode code,
+                           AbstractStreamSocket*)> handler);
+    void acceptAsyncInternal(
+        std::function<void(SystemError::ErrorCode code,
+                           AbstractStreamSocket*)> handler);
 
     std::shared_ptr<hpm::api::MediatorServerTcpConnection> m_mediatorConnection;
     const std::vector<AcceptorMaker> m_acceptorMakers;
 
     QnMutex m_mutex;
+    bool m_terminated;
     std::vector<std::unique_ptr<AbstractTunnelAcceptor>> m_acceptors;
     std::unique_ptr<IncomingTunnelPool> m_tunnelPool;
     mutable SystemError::ErrorCode m_lastError;
     std::unique_ptr<AbstractCommunicatingSocket> m_ioThreadSocket;
     std::unique_ptr<AbstractStreamSocket> m_acceptedSocket;
+    bool m_listenIssued;
 };
 
 } // namespace cloud

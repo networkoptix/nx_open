@@ -224,7 +224,7 @@ std::vector< AddressEntry > AddressResolver::resolveSync(
     return promise.get_future().get();
 }
 
-void AddressResolver::cancel( void* requestId, std::function< void() > handler )
+void AddressResolver::cancel( void* requestId, nx::utils::MoveOnlyFunc< void() > handler )
 {
     boost::optional< std::promise< bool > > promise;
     if( !handler )
@@ -260,7 +260,7 @@ bool AddressResolver::isRequestIdKnown( void* requestId ) const
     return m_requests.count( requestId );
 }
 
-void AddressResolver::pleaseStop( std::function<void()> handler )
+void AddressResolver::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
     // TODO: make DnsResolver QnStoppableAsync
     m_dnsResolver.pleaseStop();
@@ -391,7 +391,9 @@ void AddressResolver::mediatorResolve( HaInfoIterator info, QnMutexLockerBase* l
     lk->unlock();
     m_mediatorConnection->resolve(
         nx::hpm::api::ResolveRequest(info->first.toString().toUtf8()),
-        [this, info](nx::hpm::api::ResultCode resultCode, nx::hpm::api::ResolveResponse response)
+        [this, info](
+            nx::hpm::api::ResultCode resultCode,
+            nx::hpm::api::ResolveResponse response)
         {
             std::vector< Guard > guards;
 
@@ -406,6 +408,12 @@ void AddressResolver::mediatorResolve( HaInfoIterator info, QnMutexLockerBase* l
                         AddressAttributeType::nxApiPort, it.port ) );
                     entries.push_back( std::move( entry ) );
                 }
+
+                //if target host supports cloud connect, adding corresponding address entry
+                if (response.connectionMethods != 0)
+                    entries.emplace_back(
+                        AddressType::cloud,
+                        HostAddress(info->first.toString()));
             }
 
             info->second.setMediatorEntries(std::move(entries));

@@ -64,6 +64,7 @@ public:
 
     Q_INVOKABLE void setKeepScreenOn(bool keepScreenOn);
 
+    Q_INVOKABLE int getMaxTextureSize() const;
 signals:
     /* Dummy signals to prevent non-NOTIFYable warnings */
     void connectionManagerChanged();

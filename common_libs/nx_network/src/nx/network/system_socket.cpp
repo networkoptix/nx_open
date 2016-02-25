@@ -72,13 +72,16 @@ int getSystemErrCode()
 namespace nx {
 namespace network {
 
+
 //////////////////////////////////////////////////////////
 // Socket implementation
 //////////////////////////////////////////////////////////
-
 template<typename InterfaceToImplement>
-Socket<InterfaceToImplement>::~Socket() {
+Socket<InterfaceToImplement>::~Socket()
+{
     close();
+    delete m_baseAsyncHelper;
+    m_baseAsyncHelper = nullptr;
 }
 
 template<typename InterfaceToImplement>
@@ -326,13 +329,13 @@ bool Socket<InterfaceToImplement>::setSendTimeout( unsigned int ms )
 }
 
 template<typename InterfaceToImplement>
-void Socket<InterfaceToImplement>::post(std::function<void()> handler)
+void Socket<InterfaceToImplement>::post(nx::utils::MoveOnlyFunc<void()> handler)
 {
     m_baseAsyncHelper->post(std::move(handler));
 }
 
 template<typename InterfaceToImplement>
-void Socket<InterfaceToImplement>::dispatch(std::function<void()> handler)
+void Socket<InterfaceToImplement>::dispatch(nx::utils::MoveOnlyFunc<void()> handler)
 {
     m_baseAsyncHelper->dispatch(std::move(handler));
 }
@@ -395,7 +398,7 @@ Socket<InterfaceToImplement>::Socket(
     Pollable(
         INVALID_SOCKET,
         std::unique_ptr<PollableSystemSocketImpl>(impl) ),
-    m_baseAsyncHelper( std::move(asyncHelper) ),
+    m_baseAsyncHelper( asyncHelper.release() ),
     m_nonBlockingMode( false )
 {
     createSocket( type, protocol );
@@ -410,7 +413,7 @@ Socket<InterfaceToImplement>::Socket(
     Pollable(
         _sockDesc,
         std::unique_ptr<PollableSystemSocketImpl>(impl) ),
-    m_baseAsyncHelper( std::move(asyncHelper) ),
+    m_baseAsyncHelper( asyncHelper.release() ),
     m_nonBlockingMode( false )
 {
 }
@@ -577,7 +580,7 @@ CommunicatingSocket<InterfaceToImplement>::CommunicatingSocket(
     m_aioHelper(nullptr),
     m_connected(false)
 {
-    m_aioHelper = static_cast<aio::AsyncSocketImplHelper<Pollable>*>(this->m_baseAsyncHelper.get());
+    m_aioHelper = static_cast<aio::AsyncSocketImplHelper<Pollable>*>(this->m_baseAsyncHelper);
 }
 
 template<typename InterfaceToImplement>
@@ -597,13 +600,14 @@ CommunicatingSocket<InterfaceToImplement>::CommunicatingSocket(
     m_aioHelper(nullptr),
     m_connected(true)   //this constructor is used is server socket
 {
-    m_aioHelper = static_cast<aio::AsyncSocketImplHelper<Pollable>*>(this->m_baseAsyncHelper.get());
+    m_aioHelper = static_cast<aio::AsyncSocketImplHelper<Pollable>*>(this->m_baseAsyncHelper);
 }
 
 template<typename InterfaceToImplement>
 CommunicatingSocket<InterfaceToImplement>::~CommunicatingSocket()
 {
-    m_aioHelper->terminate();
+    if (m_aioHelper)
+        m_aioHelper->terminate();
 }
 
 template<typename InterfaceToImplement>
@@ -816,7 +820,7 @@ void CommunicatingSocket<InterfaceToImplement>::shutdown()
 template<typename InterfaceToImplement>
 void CommunicatingSocket<InterfaceToImplement>::cancelIOAsync(
     aio::EventType eventType,
-    std::function<void()> cancellationDoneHandler)
+    nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler)
 {
     m_aioHelper->cancelIOAsync(eventType, std::move(cancellationDoneHandler));
 }
@@ -830,7 +834,7 @@ void CommunicatingSocket<InterfaceToImplement>::cancelIOSync(aio::EventType even
 template<typename InterfaceToImplement>
 void CommunicatingSocket<InterfaceToImplement>::connectAsync(
     const SocketAddress& addr,
-    std::function<void( SystemError::ErrorCode )> handler )
+    nx::utils::MoveOnlyFunc<void( SystemError::ErrorCode )> handler )
 {
     return m_aioHelper->connectAsync( addr, std::move(handler) );
 }
@@ -853,13 +857,13 @@ void CommunicatingSocket<InterfaceToImplement>::sendAsync(
 
 template<typename InterfaceToImplement>
 void CommunicatingSocket<InterfaceToImplement>::registerTimer(
-    unsigned int timeoutMs,
-    std::function<void()> handler )
+    std::chrono::milliseconds timeoutMs,
+    nx::utils::MoveOnlyFunc<void()> handler )
 {
     //currently, aio considers 0 timeout as no timeout and will NOT call handler
-    Q_ASSERT(timeoutMs > 0);
-    if (timeoutMs == 0)
-        timeoutMs = 1;  //handler of zero timer will NOT be called
+    Q_ASSERT(timeoutMs > std::chrono::milliseconds(0));
+    if (timeoutMs == std::chrono::milliseconds(0))
+        timeoutMs = std::chrono::milliseconds(1);  //handler of zero timer will NOT be called
     return m_aioHelper->registerTimer(timeoutMs, std::move(handler));
 }
 
@@ -1286,22 +1290,23 @@ bool TCPServerSocket::listen(int queueLen)
     return ::listen( handle(), queueLen ) == 0;
 }
 
-void TCPServerSocket::pleaseStop(std::function<void()> completionHandler)
+void TCPServerSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
     //TODO #ak add general implementation to Socket class and remove this method
-    dispatch( [ this, completionHandler ]()
-    {
-        //impl()->terminated.store(true, std::memory_order_relaxed);
+    dispatch(
+        [this, completionHandler = std::move(completionHandler)]()
+        {
+            //impl()->terminated.store(true, std::memory_order_relaxed);
 
-        nx::network::SocketGlobals::aioService().cancelPostedCalls(
-            static_cast<Pollable*>(this), true);
-        nx::network::SocketGlobals::aioService().removeFromWatch(
-            static_cast<Pollable*>(this), aio::etRead, true);
-        nx::network::SocketGlobals::aioService().removeFromWatch(
-            static_cast<Pollable*>(this), aio::etTimedOut, true);
+            nx::network::SocketGlobals::aioService().cancelPostedCalls(
+                static_cast<Pollable*>(this), true);
+            nx::network::SocketGlobals::aioService().removeFromWatch(
+                static_cast<Pollable*>(this), aio::etRead, true);
+            nx::network::SocketGlobals::aioService().removeFromWatch(
+                static_cast<Pollable*>(this), aio::etTimedOut, true);
 
-        completionHandler();
-    } );
+            completionHandler();
+        });
 }
 
 //!Implementation of AbstractStreamServerSocket::accept

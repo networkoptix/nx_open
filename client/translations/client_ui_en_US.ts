@@ -1005,21 +1005,6 @@
     </message>
     <message>
         <location/>
-        <source>Ctrl+E</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Ctrl+L</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Ctrl+M</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
         <source>Monitor All Servers on a Single Layout</source>
         <translation></translation>
     </message>
@@ -1031,11 +1016,6 @@
     <message>
         <location/>
         <source>System Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Ctrl+B</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

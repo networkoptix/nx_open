@@ -14,7 +14,7 @@
 #include <common/common_module.h>
 
 #include <ui/actions/action_manager.h>
-#include <ui/dialogs/checkable_message_box.h>
+#include <ui/dialogs/message_box.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/globals.h>
@@ -84,7 +84,7 @@ void QnWorkbenchUpdateWatcher::at_checker_updateAvailable(const QnUpdateInfo &in
         return;
 
     /* We have no access rights. */
-    if (!menu()->canTrigger(Qn::SystemUpdateAction))
+    if (!menu()->canTrigger(QnActions::SystemUpdateAction))
         return;
 
     /* User was already notified about this release. */
@@ -109,6 +109,8 @@ void QnWorkbenchUpdateWatcher::at_checker_updateAvailable(const QnUpdateInfo &in
 
     QnUpdateInfo oldUpdateInfo = qnSettings->latestUpdateInfo();
     if (oldUpdateInfo.currentRelease != info.currentRelease
+        ||
+        oldUpdateInfo.releaseDateMs != info.releaseDateMs
         ||
         oldUpdateInfo.releaseDeliveryDays != info.releaseDeliveryDays)
     {
@@ -158,10 +160,10 @@ void QnWorkbenchUpdateWatcher::showUpdateNotification(const QnUpdateInfo &info)
         message += lit("</span><br/>");
     }
 
-    QnCheckableMessageBox messageBox(mainWindow());
+    QnMessageBox messageBox(mainWindow());
 
     messageBox.setStandardButtons(buttons);
-    messageBox.setIconPixmap(QMessageBox::standardIcon(QMessageBox::Question));
+    messageBox.setIcon(QnMessageBox::Question);
 
 #ifdef Q_OS_MAC
     bool hasOutdatedServer = false;
@@ -177,14 +179,15 @@ void QnWorkbenchUpdateWatcher::showUpdateNotification(const QnUpdateInfo &info)
     {
         actionMessage = tr("Please update %1 Client.").arg(QnAppInfo::productNameLong());
         messageBox.setStandardButtons(QDialogButtonBox::Ok);
-        messageBox.setIconPixmap(QMessageBox::standardIcon(QMessageBox::Information));
+        messageBox.setIcon(QMessageBox::Information);
     }
 #endif
 
     message += actionMessage;
 
     messageBox.setWindowTitle(title);
-    messageBox.setRichText(message);
+    messageBox.setTextFormat(Qt::RichText);
+    messageBox.setText(message);
     messageBox.setCheckBoxText(tr("Do not notify me again about this update."));
     setHelpTopic(&messageBox, Qn::Upgrade_Help);
 
@@ -201,11 +204,11 @@ void QnWorkbenchUpdateWatcher::showUpdateNotification(const QnUpdateInfo &info)
     messageBox.adjustSize();
     messageBox.setGeometry(QnGeometry::aligned(messageBox.size(), mainWindow()->geometry(), Qt::AlignCenter));
 
-    messageBox.exec();
+    int result = messageBox.exec();
 
     /* We check for 'Yes' button. 'No' and even 'Ok' buttons are considered negative. */
-    if (messageBox.clickedStandardButton() == QDialogButtonBox::Yes)
-        action(Qn::SystemUpdateAction)->trigger();
+    if (result == QDialogButtonBox::Yes)
+        action(QnActions::SystemUpdateAction)->trigger();
     else
         qnSettings->setIgnoredUpdateVersion(messageBox.isChecked() ? info.currentRelease : QnSoftwareVersion());
 }

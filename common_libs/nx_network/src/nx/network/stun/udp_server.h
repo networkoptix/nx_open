@@ -37,7 +37,7 @@ public:
     UDPServer(const MessageDispatcher& dispatcher);
     virtual ~UDPServer();
 
-    virtual void pleaseStop(std::function<void()> handler) override;
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
     bool bind(const SocketAddress& localAddress);
     /** Start receiving messages.
@@ -52,7 +52,7 @@ public:
         SocketAddress destinationEndpoint,
         const Message& message,
         std::function<void(SystemError::ErrorCode)> completionHandler);
-    const std::unique_ptr<AbstractDatagramSocket>& socket();
+    const std::unique_ptr<network::UDPSocket>& socket();
 
 private:
     PipelineType m_messagePipeline;

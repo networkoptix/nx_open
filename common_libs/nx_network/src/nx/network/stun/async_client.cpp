@@ -50,7 +50,7 @@ AsyncClient::~AsyncClient()
     }
 
     if (baseConnection)
-        baseConnection->pleaseStop();
+        baseConnection->pleaseStopSync();
 
     if( connectingSocket )
         connectingSocket->pleaseStopSync();
@@ -113,6 +113,15 @@ SocketAddress AsyncClient::localAddress() const
         : SocketAddress();
 }
 
+SocketAddress AsyncClient::remoteAddress() const
+{
+    QnMutexLocker lock(&m_mutex);
+    if (m_endpoint)
+        return *m_endpoint;
+
+    return SocketAddress();
+}
+
 void AsyncClient::closeConnection(SystemError::ErrorCode errorCode)
 {
     closeConnection(errorCode, nullptr);
@@ -132,9 +141,6 @@ void AsyncClient::closeConnection(
     Q_ASSERT_X( !baseConnection || !connection ||
                 connection == baseConnection.get(),
                 Q_FUNC_INFO, "Incorrect closeConnection call" );
-
-    if (baseConnection)
-        baseConnection->pleaseStop();
 }
 
 void AsyncClient::openConnectionImpl(QnMutexLockerBase* lock)

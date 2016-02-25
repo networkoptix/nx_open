@@ -43,13 +43,15 @@ int AbstractCommunicatingSocket::send(const QnByteArray& data)
 }
 
 void AbstractCommunicatingSocket::registerTimer(
-    std::chrono::milliseconds timeout,
-    std::function<void()> handler)
+    unsigned int timeout,
+    nx::utils::MoveOnlyFunc<void()> handler)
 {
-    return registerTimer(timeout.count(), std::move(handler));
+    return registerTimer(
+        std::chrono::milliseconds(timeout),
+        std::move(handler));
 }
 
-void AbstractCommunicatingSocket::pleaseStop(std::function< void() > handler)
+void AbstractCommunicatingSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
     cancelIOAsync(nx::network::aio::EventType::etNone, std::move(handler));
 }

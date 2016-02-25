@@ -1,0 +1,86 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <!--
+        Example pom for delegating maven goals to msbuild so it builds the "solution"
+
+        A solution can be a group of projects, but here we only have one.
+        It should also be possible to have one maven project per solution project,
+        and have a parent pom to deletegate the build.
+    -->
+
+    <parent>
+        <artifactId>common_libs</artifactId>
+        <groupId>com.networkoptix.hdwitness</groupId>
+        <version>2.6.0-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+
+    <groupId>com.networkoptix.hdwitness</groupId>
+    <version>2.6.0-SNAPSHOT</version>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>nx_media</artifactId>
+    <packaging>pom</packaging>
+    <name>Nx media</name>
+
+    <properties>
+        <guid>${nx_media.guid}</guid>
+        <product.title>${company.name} nx_media</product.title>
+        <!--Global libs-->
+        <qt.libs>core gui multimedia opengl multimedia-private</qt.libs>
+        <global.libs>-lcommon</global.libs>
+        <!--Specific os libs used-->
+        <windows.oslibs></windows.oslibs>
+        <windows.oslibs.release/>
+        <windows.oslibs.debug/>
+        <linux.oslibs></linux.oslibs>
+        <mac.oslibs></mac.oslibs>
+        <!--Global defines-->
+        <global.defines/>
+        <!--Specific os defines-->
+        <windows.defines/>
+        <linux.defines/>
+        <mac.defines/>
+        <android.defines/>
+        <ios.defines/>
+    </properties>
+
+    <profiles>
+        <profile>
+            <id>windows</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+            </activation>            
+            <properties>
+                <buildLib>staticlib</buildLib>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>unix</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                </os> 
+            </activation>            
+            <properties>
+                <buildLib>sharedlib</buildLib>
+            </properties>
+        </profile>  
+
+        <profile>
+            <id>mobile-android</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>box</name>
+                    <value>android</value>
+                </property>
+            </activation>
+            <properties>
+                <buildLib>staticlib</buildLib>
+            </properties>
+        </profile>
+    </profiles> 
+
+</project>

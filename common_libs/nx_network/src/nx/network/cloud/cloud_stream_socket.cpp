@@ -196,7 +196,7 @@ bool CloudStreamSocket::isConnected() const
 
 void CloudStreamSocket::cancelIOAsync(
     aio::EventType eventType,
-    std::function<void()> handler)
+    nx::utils::MoveOnlyFunc<void()> handler)
 {
     if (eventType == aio::etWrite || eventType == aio::etNone)
     {
@@ -211,7 +211,7 @@ void CloudStreamSocket::cancelIOAsync(
 
     m_aioThreadBinder->cancelIOAsync(
         eventType,
-        [this, eventType, handler]()   //TODO #ak #msvc2015 move to lambda
+        [this, eventType, handler = move(handler)]() mutable
         {
             if (m_socketDelegate)
                 m_socketDelegate->cancelIOSync(eventType);
@@ -231,19 +231,19 @@ void CloudStreamSocket::cancelIOSync(aio::EventType eventType)
         m_socketDelegate->cancelIOSync(eventType);
 }
 
-void CloudStreamSocket::post(std::function<void()> handler)
+void CloudStreamSocket::post(nx::utils::MoveOnlyFunc<void()> handler)
 {
     m_aioThreadBinder->post(std::move(handler));
 }
 
-void CloudStreamSocket::dispatch(std::function<void()> handler)
+void CloudStreamSocket::dispatch(nx::utils::MoveOnlyFunc<void()> handler)
 {
     m_aioThreadBinder->dispatch(std::move(handler));
 }
 
 void CloudStreamSocket::connectAsync(
     const SocketAddress& address,
-    std::function<void(SystemError::ErrorCode)> handler)
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
     m_connectHandler = std::move(handler);
 
@@ -280,8 +280,8 @@ void CloudStreamSocket::sendAsync(
 }
 
 void CloudStreamSocket::registerTimer(
-    unsigned int timeoutMs,
-    std::function<void()> handler)
+    std::chrono::milliseconds timeoutMs,
+    nx::utils::MoveOnlyFunc<void()> handler)
 {
     m_aioThreadBinder->registerTimer(timeoutMs, std::move(handler));
 }
@@ -347,16 +347,12 @@ bool CloudStreamSocket::startAsyncConnect(
             }
             m_socketDelegate->connectAsync(
                 SocketAddress(std::move(dnsEntry.host), port),
-                m_connectHandler);
+                std::move(m_connectHandler));
             return true;
 
         case AddressType::cloud:
         case AddressType::unknown:  //if peer is unknown, trying to establish cloud connect
         {
-            unsigned int sockSendTimeout = 0;
-            if (!getSendTimeout(&sockSendTimeout))
-                return false;
-
             //establishing cloud connect
             unsigned int sendTimeoutMillis = 0;
             if (!getSendTimeout(&sendTimeoutMillis))
@@ -377,6 +373,7 @@ bool CloudStreamSocket::startAsyncConnect(
                         errorCode,
                         std::move(cloudConnection));
                 });
+            return true;
         }
 
         default:

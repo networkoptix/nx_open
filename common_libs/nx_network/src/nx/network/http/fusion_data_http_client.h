@@ -79,7 +79,7 @@ public:
     virtual ~BaseFusionDataHttpClient() {}
 
     //!Implementation of QnStoppableAsync::pleaseStopAsync
-    virtual void pleaseStop( std::function<void()> handler ) override
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override
     {
         m_httpClient->terminate();
         handler();

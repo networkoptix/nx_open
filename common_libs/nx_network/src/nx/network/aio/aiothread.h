@@ -130,13 +130,13 @@ public:
         SocketType* const sock,
         aio::EventType eventToWatch,
         AIOEventHandler<SocketType>* const eventHandler,
-        unsigned int timeoutMs = 0,
+        std::chrono::milliseconds timeoutMs = std::chrono::milliseconds(),
         std::function<void()> socketAddedToPollHandler = std::function<void()>() )
     {
         QnMutexLocker lk(&m_impl->mutex);
 
         //checking queue for reverse task for \a sock
-        if (m_impl->removeReverseTask(sock, eventToWatch, TaskType::tAdding, eventHandler, timeoutMs))
+        if (m_impl->removeReverseTask(sock, eventToWatch, TaskType::tAdding, eventHandler, timeoutMs.count()))
             return;    //ignoring task
 
         m_impl->pollSetModificationQueue.push_back(typename AIOThreadImplType::SocketAddRemoveTask(
@@ -144,7 +144,7 @@ public:
             sock,
             eventToWatch,
             eventHandler,
-            timeoutMs,
+            timeoutMs.count(),
             nullptr,
             socketAddedToPollHandler));
         if (eventToWatch == aio::etRead)
@@ -163,7 +163,7 @@ public:
         SocketType* const sock,
         aio::EventType eventToWatch,
         AIOEventHandler<SocketType>* const eventHandler,
-        unsigned int timeoutMs = 0,
+        std::chrono::milliseconds timeoutMs = std::chrono::milliseconds(0),
         std::function<void()> socketAddedToPollHandler = std::function<void()>() )
     {
         QnMutexLocker lk(&m_impl->mutex);
@@ -185,7 +185,7 @@ public:
             sock,
             eventToWatch,
             eventHandler,
-            timeoutMs,
+            timeoutMs.count(),
             nullptr,
             std::move(socketAddedToPollHandler)));
         if (currentThreadSystemId() != systemThreadId())  //if eventTriggered is lower on stack, socket will be added to pollset before next poll call
@@ -282,7 +282,7 @@ public:
     }
 
     //!Queues \a functor to be executed from within this aio thread as soon as possible
-    void post( SocketType* const sock, std::function<void()>&& functor )
+    void post( SocketType* const sock, nx::utils::MoveOnlyFunc<void()> functor )
     {
         QnMutexLocker lk(&m_impl->mutex);
 
@@ -296,7 +296,7 @@ public:
     }
 
     //!If called in this aio thread, then calls \a functor immediately, otherwise queues \a functor in same way as \a aio::AIOThread::post does
-    void dispatch( SocketType* const sock, std::function<void()>&& functor )
+    void dispatch( SocketType* const sock, nx::utils::MoveOnlyFunc<void()> functor )
     {
         if (currentThreadSystemId() == systemThreadId())  //if called from this aio thread
         {
@@ -461,7 +461,7 @@ public:
         //!0 means no timeout
         unsigned int timeout;
         std::atomic<int>* taskCompletionEvent;
-        std::function<void()> postHandler;
+        nx::utils::MoveOnlyFunc<void()> postHandler;
         std::function<void()> taskCompletionHandler;
 
         /*!
@@ -495,7 +495,7 @@ public:
     public:
         PostAsyncCallTask(
             SocketType* const _socket,
-            std::function<void()>&& _postHandler)
+            nx::utils::MoveOnlyFunc<void()> _postHandler)
         :
             SocketAddRemoveTask(
                 TaskType::tCallFunc,
@@ -603,7 +603,7 @@ public:
             it != pollSetModificationQueue.end();
             )
         {
-            const SocketAddRemoveTask& task = *it;
+            SocketAddRemoveTask& task = *it;
             if ((taskFilter != TaskType::tAll) && (task.type != taskFilter))
             {
                 ++it;
@@ -656,10 +656,12 @@ public:
                 case TaskType::tCallFunc:
                 {
                     assert(task.postHandler);
-                    //TODO #ak why just moving task from one container to another? 
-                    //  Why not store it in postedCalls only?
+                    assert(!task.taskCompletionEvent && !task.taskCompletionHandler);
                     postedCalls.push_back(std::move(task));
-                    break;
+                    //this task differs from every else in a way that it is not processed here, 
+                        //just moved to another container. TODO #ak is it really needed to move to another container?
+                    it = pollSetModificationQueue.erase(it);
+                    continue;
                 }
 
                 case TaskType::tCancelPostedCalls:
