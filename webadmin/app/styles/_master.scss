@@ -82,3 +82,14 @@
 .master .alert{
   padding:10px;
 }
+
+.master-modal{
+  overflow-y: auto;
+  display: block;
+}
+
+@media screen and (min-height: 550px) {
+  .master-modal {
+    margin-top: 135px;
+  }
+}
