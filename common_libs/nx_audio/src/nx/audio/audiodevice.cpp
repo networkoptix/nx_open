@@ -40,6 +40,9 @@ AudioDevice::AudioDevice(QObject *parent)
 #endif
 
     m_device = alcOpenDevice(NULL);
+    quint32* gggData = (quint32*)m_device;
+    gggData[5] = 1; //< override num_updates field
+
     if (!m_device)
     {
         qWarning("OpenAL: unable to open Device");

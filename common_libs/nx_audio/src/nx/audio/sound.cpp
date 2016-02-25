@@ -11,6 +11,8 @@
 #include "utils/common/sleep.h"
 #include "audiodevice.h"
 
+#include <qDebug>
+
 namespace nx {
 namespace audio {
 
@@ -37,6 +39,7 @@ Sound::Sound(ALCdevice *device, const QnAudioFormat& audioFormat):
     m_deinitialized = false;
     m_isValid = setup();
     m_paused = false;
+    m_queuedDurationUs = 0;
 
     connect(AudioDevice::instance(), &AudioDevice::volumeChanged, this, [this] (float value)
     {
@@ -167,7 +170,7 @@ void Sound::clearBuffers(bool clearAll)
     }
 }
 
-uint Sound::playTimeElapsedUsec()
+qint64 Sound::playTimeElapsedUsec()
 {
     QnMutexLocker lock( &m_mtx );
 
@@ -178,15 +181,33 @@ uint Sound::playTimeElapsedUsec()
 
     ALfloat offset;
     ALint queued = 0;
-    alGetSourcef(m_source, AL_SEC_OFFSET, &offset);
-    checkOpenALErrorDebug(m_device);
+
     alGetSourcei(m_source, AL_BUFFERS_QUEUED, &queued);
     checkOpenALErrorDebug(m_device);
+    
+#ifdef SOFT_PLAYTIME_ELAPSED
+    if (queued == 0)
+        restartSoftTimer();
 
-    uint res = static_cast<uint>(bufferTime() * queued - offset * 1000000.0f);
-
-    uint unbufferedDuration = (m_proxyBufferLen * 1000000) / bitRate();
-    return res +unbufferedDuration;
+#ifdef SOFT_PLAYTIME_ELAPSED_DEBUG
+    qint64 unbufferedDurationUs = (m_proxyBufferLen * 1000000) / bitRate();
+    alGetSourcef(m_source, AL_SEC_OFFSET, &offset);
+    checkOpenALErrorDebug(m_device);
+    qint64 internalBufferUs = static_cast<qint64>(bufferTime() * queued - offset * 1000000.0f);
+    qint64 hardResult = internalBufferUs + unbufferedDurationUs;
+#endif
+    qint64 result = qMax(0ll, m_queuedDurationUs - m_timer.elapsedUS());
+#ifdef SOFT_PLAYTIME_ELAPSED_DEBUG
+    qWarning() << "soft to hard jitter:" << (result - hardResult)/1000.0 << "ms";
+#endif
+    return result;
+#else
+    qint64 unbufferedDurationUs = (m_proxyBufferLen * 1000000) / bitRate();
+    alGetSourcef(m_source, AL_SEC_OFFSET, &offset);
+    checkOpenALErrorDebug(m_device);
+    qint64 internalBufferUs = static_cast<qint64>(bufferTime() * queued - offset * 1000000.0f);
+    return internalBufferUs + unbufferedDurationUs;
+#endif
 }
 
 bool Sound::isBufferUnderflow()
@@ -206,6 +227,14 @@ bool Sound::isBufferUnderflow()
     return queued == 0;
 }
 
+#ifdef SOFT_PLAYTIME_ELAPSED
+void Sound::restartSoftTimer()
+{
+    m_queuedDurationUs = 0;
+    m_timer.restart();
+}
+#endif
+
 bool Sound::playImpl()
 {
     ALint state = 0;
@@ -222,8 +251,16 @@ bool Sound::playImpl()
         ALint queuedBuffers = 0;
         alGetSourcei(m_source, AL_BUFFERS_QUEUED, &queuedBuffers);
         checkOpenALErrorDebug(m_device);
-        if (queuedBuffers) {
+        if (queuedBuffers) 
+        {
             // play
+#ifdef SOFT_PLAYTIME_ELAPSED
+            auto timerState = m_timer.state();
+            if (timerState == nx::ElapsedTimer::State::Stopped)
+                restartSoftTimer();
+            else if (timerState == nx::ElapsedTimer::State::Paused)
+                m_timer.resume();
+#endif
             alSourcePlay(m_source);
             checkOpenALErrorDebug(m_device);
             return true;
@@ -250,6 +287,9 @@ QAudio::State Sound::state() const
 bool Sound::write(const quint8* data, uint size)
 {
     QnMutexLocker lock( &m_mtx );
+#ifdef SOFT_PLAYTIME_ELAPSED
+    m_queuedDurationUs += (size * 1000000ll) / bitRate();
+#endif
 
     if (m_deinitialized)
     {
@@ -333,6 +373,9 @@ void Sound::suspend()
     QnMutexLocker lock( &m_mtx );
     m_paused = true;
     alSourcePause(m_source);
+#ifdef SOFT_PLAYTIME_ELAPSED
+    m_timer.suspend();
+#endif
 }
 
 void Sound::resume()
@@ -359,6 +402,9 @@ void Sound::internalClear()
 
 #ifdef Q_OS_MAC
     QnSleep::msleep(bufferTime()/1000);
+#endif
+#ifdef SOFT_PLAYTIME_ELAPSED
+    m_timer.stop();
 #endif
 
     clearBuffers(true);
