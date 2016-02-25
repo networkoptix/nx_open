@@ -149,13 +149,13 @@
         <qtlibs>
             Core, Network, Xml, Concurrent, Sql, Multimedia, OpenGL, Widgets, Gui, X11Extras,
             PrintSupport, MultimediaWidgets, Quick, MultimediaQuick_p, Qml,
-            XmlPatterns
+            XmlPatterns, XcbQpa
         </qtlibs>
         <additional.qtlibs/>
 
         <!--QT plugins used-->
         <qtplugins>
-            imageformats, platforms
+            imageformats, platforms, xcbglintegrations
         </qtplugins>
         <additional.qtplugins/>
 
