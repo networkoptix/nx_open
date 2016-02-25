@@ -85,7 +85,7 @@ bool operator == (const TestCameraOperation &lhs, const TestCameraOperation &rhs
 
 TestCameraOperation generateCameraOperation()
 {
-    int camUidLen = (int)genRandomNumber<5, 30>();
+    int camUidLen = (int)genRandomNumber<20, 40>();
     QByteArray camUid;
     generateCameraUid(&camUid, camUidLen);
 
@@ -366,7 +366,7 @@ TEST(MediaDb_test, ReadWrite)
 TEST(MediaDb_test, DbFileTruncate)
 {
     const QString workDirPath = qApp->applicationDirPath() + lit("/tmp/media_db");
-    int truncateCount = 100;
+    int truncateCount = 1000;
 
     while (truncateCount-- >= 0)
     {
@@ -374,7 +374,7 @@ TEST(MediaDb_test, DbFileTruncate)
         initDbFile(&dbFile);
 
         nx::media_db::Error error;
-        TestDataManager tdm(2);
+        TestDataManager tdm(1);
         TestDbHelperHandler testHandler(&error, &tdm);
         nx::media_db::DbHelper dbHelper(&dbFile, &testHandler);
         dbHelper.setMode(nx::media_db::Mode::Write);
@@ -403,18 +403,18 @@ TEST(MediaDb_test, DbFileTruncate)
 
         ASSERT_TRUE(dbVersion == boost::get<TestFileHeader>(tdm.dataVector[0].data).dbVersion);
         tdm.dataVector[0].visited = true;
-        ASSERT_TRUE(error == nx::media_db::Error::NoError);
+        ASSERT_TRUE(error == nx::media_db::Error::NoError) << (int)error;
 
         while (error == nx::media_db::Error::NoError)
             dbHelper.readRecord();
 
-        ASSERT_TRUE(error == nx::media_db::Error::ReadError);
+        ASSERT_TRUE(error == nx::media_db::Error::ReadError) << (int)error;
         ASSERT_TRUE(dbFile.remove());
 
         size_t readRecords = std::count_if(tdm.dataVector.cbegin(), tdm.dataVector.cend(),
                                            [](const TestData &td) { return td.visited; });
         // we've read all except the very last one record
-        ASSERT_TRUE(readRecords == tdm.dataVector.size() - 1);
+        ASSERT_TRUE(readRecords == tdm.dataVector.size() - 1) << readRecords;
     }
 }
 

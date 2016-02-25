@@ -149,8 +149,9 @@ Error DbHelper::readRecord()
         cameraOp.cameraUniqueId.resize(bytesToRead);
         int bytesRead = m_stream.readRawData(cameraOp.cameraUniqueId.data(), bytesToRead);
         if (bytesRead != bytesToRead)
-            return Error::ReadError;
-        error = getError();
+            error = Error::ReadError;
+        else
+            error = getError();
         m_handler->handleCameraOp(cameraOp, error);
         break;
     }
