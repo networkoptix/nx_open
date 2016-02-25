@@ -204,7 +204,7 @@ nx_http::StatusCode::Value SettingsActionHandler::loadSettingsLocally(QnStatisti
         const auto admin = qnResPool->getAdministrator();
         const auto localSettingsUrl = (admin ? admin->getProperty(
             QnMultiserverStatisticsRestHandler::kSettingsUrlParam) : QString());
-        return QUrl::fromUserInput(localSettingsUrl.isEmpty()
+        return QUrl::fromUserInput(localSettingsUrl.trimmed().isEmpty()
             ? kSettingsUrl : localSettingsUrl);
     }();
 
