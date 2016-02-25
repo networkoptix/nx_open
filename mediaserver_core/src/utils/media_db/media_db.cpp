@@ -44,10 +44,10 @@ private:
 
 } // namespace <anonymous>
 
-DbHelper::DbHelper(QIODevice *device, DbHelperHandler *const handler)
-: m_device(device),
+DbHelper::DbHelper(DbHelperHandler *const handler)
+: m_device(nullptr),
   m_handler(handler),
-  m_stream(device),
+  m_stream(m_device),
   m_needStop(false),
   m_mode(Mode::Read)
 {

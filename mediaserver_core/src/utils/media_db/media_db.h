@@ -130,7 +130,7 @@ class DbHelper
 {
     typedef std::queue<WriteRecordType> WriteQueue;
 public:
-    DbHelper(QIODevice *device, DbHelperHandler *const handler);
+    DbHelper(DbHelperHandler *const handler);
     ~DbHelper();
 
     DbHelper& operator = (DbHelper&& other) = default;

@@ -413,7 +413,7 @@ TEST(MediaDb_test, DbFileTruncate)
 
         size_t readRecords = std::count_if(tdm.dataVector.cbegin(), tdm.dataVector.cend(),
                                            [](const TestData &td) { return td.visited; });
-        // we've read all except the very last one record
+        // we've read all except the very last record
         ASSERT_TRUE(readRecords == tdm.dataVector.size() - 1) << readRecords;
     }
 }
