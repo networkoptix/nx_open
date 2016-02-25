@@ -47,9 +47,7 @@ public:
     bool isValid() const;
     void interrupt();
     bool add(Pollable* const sock, EventType eventType, void* userData = NULL);
-    bool add(UdtSocket* const sock, EventType eventType, void* userData = NULL);
     void remove(Pollable* const sock, EventType eventType);
-    void remove(UdtSocket* const sock, EventType eventType);
     size_t size() const;
     int poll( int millisToWait = INFINITE_TIMEOUT );
 
@@ -60,6 +58,9 @@ private:
     PollSet m_sysPollSet;
     UdtPollSet m_udtPollSet;
     UdtPollingThread* m_udtPollingThread;
+
+    bool add(UdtSocket* const sock, EventType eventType, void* userData = NULL);
+    void remove(UdtSocket* const sock, EventType eventType);
 };
 
 }   //aio

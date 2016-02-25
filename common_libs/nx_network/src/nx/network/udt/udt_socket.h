@@ -34,6 +34,8 @@ class UdtSocketImpl;
 
 // Adding a level indirection to make C++ type system happy.
 class NX_NETWORK_API UdtSocket
+:
+    public Pollable
 {
 public:
     UdtSocket();

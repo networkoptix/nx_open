@@ -134,29 +134,18 @@ bool PollSetAggregator::add(
     EventType eventType,
     void* userData)
 {
+    if (sock->isUdtSocket)
+        return add(static_cast<UdtSocket*>(sock), eventType, userData);
     return m_sysPollSet.add(sock, eventType, userData);
-}
-
-bool PollSetAggregator::add(
-    UdtSocket* const sock,
-    EventType eventType,
-    void* userData)
-{
-    return m_udtPollSet.add(sock, eventType, userData);
 }
 
 void PollSetAggregator::remove(
     Pollable* const sock,
     EventType eventType)
 {
+    if (sock->isUdtSocket)
+        return remove(static_cast<UdtSocket*>(sock), eventType);
     return m_sysPollSet.remove(sock, eventType);
-}
-
-void PollSetAggregator::remove(
-    UdtSocket* const sock,
-    EventType eventType)
-{
-    return m_udtPollSet.remove(sock, eventType);
 }
 
 size_t PollSetAggregator::size() const
@@ -184,6 +173,21 @@ PollSetAggregator::const_iterator PollSetAggregator::begin() const
 
 PollSetAggregator::const_iterator PollSetAggregator::end() const
 {
+}
+
+bool PollSetAggregator::add(
+    UdtSocket* const sock,
+    EventType eventType,
+    void* userData)
+{
+    return m_udtPollSet.add(sock, eventType, userData);
+}
+
+void PollSetAggregator::remove(
+    UdtSocket* const sock,
+    EventType eventType)
+{
+    return m_udtPollSet.remove(sock, eventType);
 }
 
 }   //aio
