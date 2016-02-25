@@ -62,7 +62,7 @@ namespace nx_http
     /************************************************************************/
     /* Comparator for case-insensitive comparison in STL assos. containers  */
     /************************************************************************/
-    struct NX_NETWORK_API ci_less 
+    struct NX_NETWORK_API ci_less
 		: std::binary_function<QByteArray, QByteArray, bool>
     {
         // case-independent (ci) compare_less binary function
@@ -88,7 +88,7 @@ namespace nx_http
     /*!
         \return iterator of added element
     */
-    HttpHeaders::iterator NX_NETWORK_API insertOrReplaceHeader( 
+    HttpHeaders::iterator NX_NETWORK_API insertOrReplaceHeader(
 		HttpHeaders* const headers, const HttpHeader& newHeader );
 
     HttpHeaders::iterator NX_NETWORK_API insertHeader(
@@ -196,7 +196,7 @@ namespace nx_http
         StringType* const headerName,
         StringType* const headerValue,
         const ConstBufferRefType& data );
-    
+
 	bool NX_NETWORK_API parseHeader(
         ConstBufferRefType* const headerName,
         ConstBufferRefType* const headerValue,
@@ -217,12 +217,16 @@ namespace nx_http
         {
             undefined = 0,
             _continue = 100,
+
             ok = 200,
             noContent = 204,
             partialContent = 206,
+
             multipleChoices = 300,
-            moved_permanently = 301,
+            movedPermanently = 301,
             moved = 302,
+            notModified = 304,
+
             badRequest = 400,
             unauthorized = 401,
             forbidden = 403,
@@ -232,6 +236,7 @@ namespace nx_http
             proxyAuthenticationRequired = 407,
             rangeNotSatisfiable = 416,
             invalidParameter = 451,
+
             internalServerError = 500,
             notImplemented = 501,
             serviceUnavailable = 503
@@ -245,7 +250,7 @@ namespace nx_http
     {
 	public:
         typedef StringType ValueType;
-    
+
         static const StringType GET;
         static const StringType HEAD;
         static const StringType POST;
