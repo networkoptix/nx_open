@@ -136,7 +136,8 @@ bool UdtPollSetImpl::initializeInterruptSocket()
     }
 
     // adding this iterrupt_socket_ to the epoll set
-    int ret = UDT::epoll_add_ssock(epoll_fd_, interrupt_socket_.handle());
+    const int events = UDT_EPOLL_IN;
+    int ret = UDT::epoll_add_ssock(epoll_fd_, interrupt_socket_.handle(), &events);
     if (ret <0)
     {
         SystemError::setLastErrorCode(detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
