@@ -188,6 +188,7 @@ qint64 Sound::playTimeElapsedUsec()
     clearBuffers(false);
 
     ALint queued = 0;
+    ALfloat offset = 0;
 
     alGetSourcei(m_source, AL_BUFFERS_QUEUED, &queued);
     checkOpenALErrorDebug(m_device);
