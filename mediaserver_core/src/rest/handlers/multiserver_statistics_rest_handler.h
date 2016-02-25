@@ -11,6 +11,8 @@ class QnMultiserverStatisticsRestHandler : public QnFusionRestHandler
     typedef QnFusionRestHandler base_type;
 
 public:
+    static const QString kSettingsUrlParam;
+
     QnMultiserverStatisticsRestHandler(const QString &basePath);
 
     ~QnMultiserverStatisticsRestHandler();
