@@ -111,7 +111,7 @@ void AudioOutput::write(const AudioFramePtr& audioFrame)
     
     // max amount of frames in the audio queue
     qint64 elapsed = d->audioOutput->playTimeElapsedUsec();
-    int maxFrames = (elapsed + d->frameDurationUsec -1) / d->frameDurationUsec; //< Rounding up
+    int maxFrames = elapsed / d->frameDurationUsec + 1;
     
     // how many frames out of the queue now
     const int deprecatedFrames = d->timestampQueue.size() - maxFrames;

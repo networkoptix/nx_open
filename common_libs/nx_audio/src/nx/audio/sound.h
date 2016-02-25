@@ -6,11 +6,7 @@
 #include <QtMultimedia/QAudioFormat>
 #include <utils/media/audioformat.h>
 
-#define SOFT_PLAYTIME_ELAPSED
-
-#ifdef SOFT_PLAYTIME_ELAPSED
 #include <utils/timer.h>
-#endif
 
 class AudioDevice;
 typedef struct ALCdevice_struct ALCdevice;
@@ -91,7 +87,6 @@ private:
     static int checkOpenALErrorDebug(ALCdevice *device);
     bool internalPlay(const void *data, uint size);
     void clearBuffers(bool clearAll);
-    void restartSoftTimer();
 private:
     mutable QnMutex m_mtx;
     QnAudioFormat m_audioFormat;
@@ -110,10 +105,10 @@ private:
     int m_proxyBufferLen;
     bool m_deinitialized;
     bool m_paused;
-#ifdef SOFT_PLAYTIME_ELAPSED
+
     nx::ElapsedTimer m_timer;
     qint64 m_queuedDurationUs;
-#endif
+
 private:
     void internalClear();
     static int checkOpenALError(ALCdevice *device);
