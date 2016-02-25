@@ -11,7 +11,7 @@
 #include "utils/common/sleep.h"
 #include "audiodevice.h"
 
-#include <qDebug>
+#include <QDebug>
 
 namespace nx {
 namespace audio {
@@ -179,7 +179,6 @@ qint64 Sound::playTimeElapsedUsec()
 
     clearBuffers(false);
 
-    ALfloat offset;
     ALint queued = 0;
 
     alGetSourcei(m_source, AL_BUFFERS_QUEUED, &queued);
@@ -202,6 +201,7 @@ qint64 Sound::playTimeElapsedUsec()
 #endif
     return result;
 #else
+    ALfloat offset;
     qint64 unbufferedDurationUs = (m_proxyBufferLen * 1000000) / bitRate();
     alGetSourcef(m_source, AL_SEC_OFFSET, &offset);
     checkOpenALErrorDebug(m_device);
