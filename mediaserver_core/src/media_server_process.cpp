@@ -2201,6 +2201,7 @@ void MediaServerProcess::run()
         typedef ec2::Ec2StaticticsReporter stats;
         bool adminParamsChanged = false;
 
+        // TODO: #ynikitenkov fix to use qnGlobalSettings in 2.6
         // TODO: fix, when VS supports init lists:
         //       for (const auto& param : { stats::SR_TIME_CYCLE, stats::SR_SERVER_API })
         const QString* statParams[] = { &stats::SR_TIME_CYCLE, &stats::SR_SERVER_API

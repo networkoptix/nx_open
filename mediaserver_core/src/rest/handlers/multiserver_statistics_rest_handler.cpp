@@ -201,6 +201,7 @@ nx_http::StatusCode::Value SettingsActionHandler::loadSettingsLocally(QnStatisti
         static const auto kSettingsUrl =
             ec2::Ec2StaticticsReporter::DEFAULT_SERVER_API + lit("/config/client_stats.json");
 
+        // TODO: #ynikitenkov fix to use qnGlobalSettings in 2.6
         const auto admin = qnResPool->getAdministrator();
         const auto localSettingsUrl = (admin ? admin->getProperty(
             QnMultiserverStatisticsRestHandler::kSettingsUrlParam) : QString());
@@ -321,7 +322,7 @@ int SendStatisticsActionHandler::executePost(const QnRequestParamList& params
     QnSendStatisticsRequestData request =
         QnMultiserverRequestData::fromParams<QnSendStatisticsRequestData>(params);
 
-    // TODO: add support of specified in parameters format, not only json!
+    // TODO: #ynikitenkov add support of specified in parameters format, not only json!
     const bool correctJson = QJson::deserialize<QnMetricHashesList>(
         body, &request.metricsList);
 
