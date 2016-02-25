@@ -91,7 +91,10 @@ namespace ite
         if(open())
             ITE_LOG() << FMT("Open rx %d successfull", m_rxID);
         else
-            ITE_LOG() << FMT("Open rx %d failed", m_rxID);
+        {
+            ITE_LOG() << FMT("Open rx %d failed, device is not operational", m_rxID);
+            return;
+        }
 
         m_watchDogThread = std::thread(
             [this]
@@ -223,6 +226,8 @@ namespace ite
 
                 if (m_devReader)
                     m_devReader->stop();
+                else
+                    m_devReader.reset(new DevReader);
 
                 m_devReader->subscribe(It930x::PID_RETURN_CHANNEL);
                 m_devReader->start(m_it930x.get(), SEARCH_READ_TIME);

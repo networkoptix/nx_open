@@ -36,8 +36,6 @@ namespace ite
     class Timer
     {
     public:
-        //typedef ClockRDTSC Clock;
-        //typedef std::chrono::steady_clock Clock;
         typedef std::chrono::high_resolution_clock Clock;
 
         Timer(bool start = false)
