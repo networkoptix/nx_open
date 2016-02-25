@@ -241,6 +241,6 @@
     </xsl:template>
     <xsl:template match="result">
         <xsl:value-of select="caption"/>
-        <xsl:apply-templates/>
+        <xsl:apply-templates select="params"/>
     </xsl:template>
 </xsl:stylesheet>
