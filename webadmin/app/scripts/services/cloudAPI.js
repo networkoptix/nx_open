@@ -10,7 +10,7 @@ angular.module('webadminApp')
                 });
             },
             connect:function(systemName, email, password){
-                return $http.post(Config.cloud.apiUrl + '/account/connect',{
+                return $http.post(Config.cloud.apiUrl + '/systems/connect',{
                     name: systemName,
                     email: email,
                     password: password

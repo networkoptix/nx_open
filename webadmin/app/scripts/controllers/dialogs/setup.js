@@ -28,7 +28,7 @@ angular.module('webadminApp')
         var debugMode = !!nativeClientObject;
 
 
-        /* Fucntions for external calls (open links) */
+        /* Funсtions for external calls (open links) */
         $scope.createAccount = function(event){
             if(nativeClientObject) {
                 nativeClientObject.openUrlInBrowser(Config.cloud.portalRegisterUrl);
@@ -53,11 +53,6 @@ angular.module('webadminApp')
                 $scope.next('start');// go to start
                 // If system is not new - go to success
             });
-        }
-
-        function errorHandler(error){
-            alert('error happened');
-            console.error(error);
         }
 
         function updateCredentials(login,password){
@@ -131,8 +126,34 @@ angular.module('webadminApp')
             return lastList;
         };
 
-        function connectToAnotherSystem(){
+        function formatError(errorToShow){
+            var errorMessages = {
+                'FAIL':'System is unreachable or doesn\'t exist.',
+                'currentPassword':'Incorrect current password',
+                'UNAUTHORIZED':'Wrong password.',
+                'password':'Wrong password.',
+                'INCOMPATIBLE':'Remote system has incompatible version.',
+                'url':'Wrong url.',
+                'SAFE_MODE':'Can\'t connect to a system. Remote system is in safe mode.',
+                'CONFIGURATION_ERROR':'Can\'t connect to a system. Maybe one of the systems is in safe mode.',
 
+                // Cloud errors:
+                'notAuthorized': 'Login or password are incorrect',
+                'accountNotActivated': 'Please, confirm your account first'
+            };
+            return errorMessages[errorToShow] || errorToShow;
+        }
+        function remoteErrorHandler(error){
+            var errorMessage = 'Connection error (' + error.status + ')';
+            if(error.data.errorString){
+                errorMessage = formatError(error.data.errorString);
+            }
+            $scope.settings.remoteError = errorMessage;
+            console.error(error);
+        }
+
+        function connectToAnotherSystem(){
+            $scope.settings.remoteError = false;
             if(debugMode){
                 $scope.next('mergeSuccess');
                 return;
@@ -145,26 +166,34 @@ angular.module('webadminApp')
                 false
             ).then(function(r){
                 if(r.data.error!=='0') {
-                    var errorToShow = errorHandler(r.data.errorString);
-                    if (errorToShow) {
-                        alert('Merge failed: ' + errorToShow);
-                        return;
-                    }
+                    remoteErrorHandler(r);
+                    return;
                 }
                 updateCredentials( $scope.settings.remoteLogin, $scope.settings.remotePassword);
-
                 $scope.next('mergeSuccess');
-            });
+            },remoteErrorHandler);
         }
-
 
         /* Connect to cloud section */
 
         function connectToCloud(){
-
+            $scope.settings.cloudError = false;
             if(debugMode){
                 $scope.next('cloudSuccess');
                 return;
+            }
+            function cloudErrorHandler(error)
+            {
+                if(error.status === 401){
+                    if(error.data.resultCode) {
+                        $scope.settings.cloudError = formatError(error.data.resultCode);
+                    }else{
+                        $scope.settings.cloudError = formatError('notAuthorized');
+                    }
+                    return;
+                }
+                // Do not go further here, show connection error
+                $scope.next('cloudFailure');
             }
             function errorHandler()
             {
@@ -179,10 +208,19 @@ angular.module('webadminApp')
                         updateCredentials( $scope.settings.cloudEmail, $scope.settings.cloudPassword);
                         $scope.next('cloudSuccess');
                     },errorHandler);
-                }, errorHandler);
+                }, cloudErrorHandler);
         }
 
         /* Offline system section */
+
+        function offlineErrorHandler(error){
+            var errorMessage = 'Connection error (' + error.status + ')';
+            if(error.data.errorString){
+                errorMessage = formatError(error.data.errorString);
+            }
+            $scope.settings.localError = errorMessage;
+            $scope.next('localFailure');
+        }
 
         function initOfflineSystem(){
 
@@ -190,11 +228,15 @@ angular.module('webadminApp')
                 $scope.next('localSuccess');
                 return;
             }
-            mediaserver.setupCloudSystem($scope.settings.systemName, $scope.settings.localLogin, $scope.settings.localPassword).then(function(){
+            mediaserver.setupCloudSystem($scope.settings.systemName, $scope.settings.localLogin, $scope.settings.localPassword).then(function(r){
+                if(r.data.error!=='0') {
+                    offlineErrorHandler(r);
+                    return;
+                }
                 updateCredentials( $scope.settings.localLogin, $scope.settings.localPassword);
                 $scope.next('localSuccess');
-            },function(){
-                $scope.next('cloudFailure');
+            },function(error){
+                offlineErrorHandler(error);;
             });
         }
 
@@ -263,7 +305,7 @@ angular.module('webadminApp')
                 back: 'cloudIntro',
                 next: connectToCloud,
                 valid: function(){
-                    return required($scope.settings.cloudLogin) &&
+                    return required($scope.settings.cloudEmail)
                         required($scope.settings.cloudPassword);
                 }
             },
@@ -298,7 +340,11 @@ angular.module('webadminApp')
             },
             localSuccess:{
                 finish:true
+            },
+            localFailure:{
+                back:'systemName'
             }
+
         };
         mediaserver.login(Config.defaultLogin,Config.defaultPassword);
 

@@ -221,9 +221,10 @@ angular.module('webadminApp')
                 function errorHandler(error){
                     defer.reject(error);
                 }
-                this.changeSystemName($scope.settings.systemName).then(
-                    function(){
-                        this.saveCloudSystemCredentials(message.data.systemId, message.data.authKey).
+                var self = this;
+                this.changeSystemName(systemName).then(
+                    function(message){
+                        self.saveCloudSystemCredentials(message.data.systemId, message.data.authKey).
                             then(function(result){
                                 defer.resolve(result);
                             }, errorHandler);

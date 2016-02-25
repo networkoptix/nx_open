@@ -23,8 +23,6 @@ angular.module('webadminApp')
                 });
 
                 function updateValidity(){
-
-                    console.log(input);
                     var touched = scope[formName][fieldName].$touched;
                     var valid = scope[formName][fieldName].$valid;
                     if(!touched){

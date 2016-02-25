@@ -143,12 +143,17 @@ angular.module('webadminApp')
 
         function checkServersIp(server,i){
             var ips = server.networkAddresses.split(';');
-            var port = server.apiUrl.substring(server.apiUrl.lastIndexOf(':'));
+
+            var port = '';
+            if(!ips[i].includes(':')){
+                port = server.apiUrl.substring(server.apiUrl.lastIndexOf(':'));
+            }
+
             var url = window.location.protocol + '//' + ips[i] + port;
 
             mediaserver.getSettings(url).then(function(){
                 server.apiUrl = url;
-            },function(){
+            },function(error){
                 if(i < ips.length-1) {
                     checkServersIp(server, i + 1);
                 }
