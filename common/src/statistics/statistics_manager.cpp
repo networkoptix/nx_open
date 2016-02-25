@@ -187,8 +187,10 @@ void QnStatisticsManager::setSettings(QnStatisticsSettingsPtr settings)
     connect(m_settings.get(), &QnAbstractStatisticsSettingsLoader::settingsAvailableChanged
         , this, [this]()
     {
+        if (m_settings->settingsAvailable())
+            sendStatistics();
+
         m_updateSettingsTimer->start();
-        sendStatistics();
     });
 
     if (!qnGlobalSettings->isStatisticsAllowed())
@@ -224,9 +226,14 @@ QnStatisticValuesHash QnStatisticsManager::getValues() const
 void QnStatisticsManager::sendStatistics()
 {
     if (!m_settings || !m_storage || m_handle
-        || !qnGlobalSettings->isStatisticsAllowed()
-        || !m_settings->settingsAvailable())
+        || !qnGlobalSettings->isStatisticsAllowed())
     {
+        return;
+    }
+
+    if (!m_settings->settingsAvailable())
+    {
+        m_settings->updateSettings();
         return;
     }
 
