@@ -25,7 +25,7 @@ angular.module('webadminApp')
         $scope.serverAddress = window.location.host;
 
         var nativeClientObject = typeof(setupDialog)=='undefined'?null:setupDialog; // Qt registered object
-        var debugMode = !!nativeClientObject;
+        var debugMode = !!nativeClientObject || $location.search().debug;
 
 
         /* Funсtions for external calls (open links) */
@@ -47,12 +47,25 @@ angular.module('webadminApp')
 
 
         /* Common helpers: error handling, check current system, error handler */
-        function checkMySystem(){
-            mediaserver.getSettings().then(function (r) {
-                $scope.serverInfo = r.data.reply;
-                $scope.next('start');// go to start
-                // If system is not new - go to success
+        function checkMySystem(user){
+            $scope.settings.localLogin = user.name || Config.defaultLogin;
+
+            mediaserver.systemCloudInfo().then(function(data){
+                $scope.settings.cloudSystemID = data.cloudSystemID;
+                $scope.settings.cloudLogin = data.cloudAccountName;
+                $scope.next('cloudSuccess');
+            },function(){
+                mediaserver.getSettings().then(function (r) {
+                    $scope.serverInfo = r.data.reply;
+
+                    if(debugMode || $scope.serverInfo.serverFlags.includes(Config.newServerFlag)) {
+                        $scope.next('start');// go to start
+                    }else{
+                        $scope.next('localSuccess');
+                    }
+                });
             });
+
         }
 
         function updateCredentials(login,password){
@@ -155,7 +168,7 @@ angular.module('webadminApp')
         function connectToAnotherSystem(){
             $scope.settings.remoteError = false;
             if(debugMode){
-                $scope.next('mergeSuccess');
+                $scope.next('localSuccess');
                 return;
             }
             mediaserver.mergeSystems(
@@ -170,7 +183,6 @@ angular.module('webadminApp')
                     return;
                 }
                 updateCredentials( $scope.settings.remoteLogin, $scope.settings.remotePassword);
-                $scope.next('mergeSuccess');
             },remoteErrorHandler);
         }
 
@@ -206,7 +218,6 @@ angular.module('webadminApp')
                     //2. Save settings to local server
                     mediaserver.setupCloudSystem($scope.settings.systemName, message.data.systemId, message.data.authKey).then(function(){
                         updateCredentials( $scope.settings.cloudEmail, $scope.settings.cloudPassword);
-                        $scope.next('cloudSuccess');
                     },errorHandler);
                 }, cloudErrorHandler);
         }
@@ -234,7 +245,6 @@ angular.module('webadminApp')
                     return;
                 }
                 updateCredentials( $scope.settings.localLogin, $scope.settings.localPassword);
-                $scope.next('localSuccess');
             },function(error){
                 offlineErrorHandler(error);;
             });
@@ -346,9 +356,11 @@ angular.module('webadminApp')
             }
 
         };
-        mediaserver.login(Config.defaultLogin,Config.defaultPassword);
-
 
         /* initiate wizard */
-        checkMySystem();
+
+        mediaserver.getUser().then(checkMySystem,function(){
+            updateCredentials(Config.defaultLogin,Config.defaultPassword);
+        });
+        //
     });

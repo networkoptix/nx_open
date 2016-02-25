@@ -183,23 +183,12 @@ angular.module('webadminApp')
             },1000);
         });
 
-        mediaserver.getSystemSettings().then(function(data){
-
-            var allSettings = data.data;
-            var cloudId = _.find(allSettings, function (setting) {
-                return setting.name === 'cloudSystemID';
-            });
-            $scope.cloudSystemID = cloudId ? cloudId.value : '';
-
-            if ($scope.cloudSystemID.trim() === '') {
-                $scope.cloudSystemID = null;
-            }
-
-            var cloudAccount = _.find(allSettings, function (setting) {
-                return setting.name === 'cloudAccountName';
-            });
-            $scope.cloudAccountName = cloudAccount ? cloudAccount.value : null;
-
+        mediaserver.systemCloudInfo().then(function(data){
+            $scope.cloudSystemID = data.cloudSystemID;
+            $scope.cloudAccountName = data.cloudAccountName;
+        },function(){
+            $scope.cloudSystemID = null;
+            $scope.cloudAccountName = null;
         });
 
 

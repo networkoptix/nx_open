@@ -54,7 +54,6 @@ angular.module('webadminApp')
             if(error.status === 0) {
                 return; // Canceled request - do nothing here
             }
-            console.log(error);
             //1. recheck
             cacheModuleInfo = null;
             if(offlineDialog === null) { //Dialog is not displayed
@@ -129,7 +128,7 @@ angular.module('webadminApp')
                 //ipCookie('username',login, { path: '/' });
 
                 // Check auth again
-                return this.getCurrentUser(true);
+                return this.getUser(true);
             },
             url:function(){
                 return proxy;
@@ -185,6 +184,8 @@ angular.module('webadminApp')
                         isOwner:isOwner,
                         name:result.data.reply.name
                     });
+                },function(){
+                    deferred.reject(null);
                 });
                 return deferred.promise;
             },
@@ -211,6 +212,32 @@ angular.module('webadminApp')
                 return $http.get(url + '/api/moduleInformation?showAddresses=true',{
                     timeout: 3*1000
                 });
+            },
+            systemCloudInfo:function(){
+                var deferred = $q.defer();
+                this.getSystemSettings().then(function(data){
+
+                    var allSettings = data.data;
+                    var cloudId = _.find(allSettings, function (setting) {
+                        return setting.name === 'cloudSystemID';
+                    });
+                    var cloudSystemID = cloudId ? cloudId.value : '';
+
+                    if (cloudSystemID.trim() === '' || cloudSystemID === '{00000000-0000-0000-0000-000000000000}') {
+                        deferred.reject(null);
+                        return;
+                    }
+
+                    var cloudAccount = _.find(allSettings, function (setting) {
+                        return setting.name === 'cloudAccountName';
+                    });
+
+                    deferred.resolve({
+                        cloudSystemID:cloudSystemID,
+                        cloudAccountName: cloudAccount
+                    });
+                });
+                return deferred.promise;
             },
 
             detachServer:function(){
