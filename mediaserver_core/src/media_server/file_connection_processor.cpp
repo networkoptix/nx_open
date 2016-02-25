@@ -53,14 +53,6 @@ namespace {
 
     QIODevicePtr getStaticFile(const QString& relativePath)
     {
-        //TODO: #gdm 2.6 ask #ebalashov if we need a secret key for this
-        {   /* Development override path. */
-            QString fileName = getDataDirectory() + "/web/" + relativePath;
-            QIODevicePtr result(new QFile(fileName));
-            if (result->open(QFile::ReadOnly))
-                return result;
-        }
-
         {   /* Check external package. */
             static const QString packageName = QDir(qApp->applicationDirPath()).filePath(kExternalResourcesPackageName);
             QIODevicePtr result(new QuaZipFile(packageName, relativePath));
