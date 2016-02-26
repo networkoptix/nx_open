@@ -292,14 +292,12 @@ namespace ec2
         registerUpdateFuncHandler<ApiCameraAttributesDataList>(p, ApiCommand::saveCameraUserAttributesList);
 
         /**%apidoc POST /ec2/saveCameraUserAttributes
-         * Save additional camera attributes.
+         * Save additional camera attributes for a single camera.
          * <p>
          * Parameters should be passed as a JSON object in POST message body with
          * content type "application/json". Example of such object can be seen in
          * the result of the corresponding GET function.
          * </p>
-         * %param cameraID Camera unique id.
-         * %param cameraName Camera name.
          * %param userDefinedGroupName Name of the user-defined camera group.
          * %param scheduleEnabled Whether recording to the archive is enabled for the camera.
          *     %value false
@@ -395,7 +393,8 @@ namespace ec2
          * Read additional camera attributes.
          * %// TODO: This function is named inconsistently - should end with 'List'.
          * %// TODO: Not published param[opt] id Server unique Id.
-         * %return List of additional camera attributes objects.
+         * %param[default] format
+         * %return List of additional camera attributes objects for all cameras in the requested format.
          *     %param cameraID Camera unique id.
          *     %param cameraName Camera name.
          *     %param userDefinedGroupName Name of the user-defined camera group.
@@ -488,7 +487,7 @@ namespace ec2
          * %// AbstractCameraManager::getUserAttributes
          */
         registerGetFuncHandler<QnUuid, ApiCameraAttributesDataList>(p, ApiCommand::getCameraUserAttributes);
-
+        
         //AbstractCameraManager::addCameraHistoryItem
         registerUpdateFuncHandler<ApiServerFootageData>(p, ApiCommand::addCameraHistoryItem);
 
@@ -503,7 +502,7 @@ namespace ec2
         registerGetFuncHandler<std::nullptr_t, ApiServerFootageDataList>(p, ApiCommand::getCameraHistoryItems);
 
         /**%apidoc GET /ec2/getCamerasEx
-         * Read camera list
+         * Read camera list.
          * %param[default] format
          * %param[opt] id Server unique Id
          * %return List of objects with camera information formatted in the requested format.

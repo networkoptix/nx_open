@@ -261,14 +261,15 @@ bool QnRtspClientArchiveDelegate::openInternal() {
     const bool isOpened = m_rtspSession.open(getUrl(m_camera, m_server), m_lastSeekTime).errorCode == CameraDiagnostics::ErrorCode::noError;
     if (isOpened)
     {
-        if (m_isMultiserverAllowed)
-            checkMinTimeFromOtherServer(m_camera);
-
         qint64 endTime = m_position;
         if (m_forcedEndTime)
             endTime = m_forcedEndTime;
 
         m_rtspSession.play(m_position, endTime, m_rtspSession.getScale());
+
+        if (m_isMultiserverAllowed)
+            checkMinTimeFromOtherServer(m_camera);
+
         RTPSession::TrackMap trackInfo =  m_rtspSession.getTrackInfo();
         if (!trackInfo.isEmpty())
             setRtpData(trackInfo[0]->ioDevice);
