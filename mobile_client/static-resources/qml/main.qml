@@ -202,6 +202,8 @@ Window {
             }
             else if (connectionState == QnConnectionManager.Disconnected && currentSessionId == "")
             {
+                unlockScreenOrientation()
+
                 loginSessionManager.lastUsedSessionId = ""
                 settings.sessionId = ""
 
