@@ -1,16 +1,41 @@
 ﻿#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os, sys
+import os, sys, shutil
 import dependencies
 
 sys.path.insert(0, dependencies.RDEP_PATH)
 import rdep
 sys.path.pop(0)
 
-def fetch_packages(packages):
-    debug = "debug" in dependencies.BUILD_CONFIGURATION
+debug = "debug" in dependencies.BUILD_CONFIGURATION
+
+def fetch_packages(packages):    
     return rdep.fetch_packages(packages, dependencies.PLATFORM, dependencies.ARCH, dependencies.BOX, debug, True)
+    
+    
+def copy_package(package):
+    path = rdep.locate_package(package, dependencies.PLATFORM, dependencies.ARCH, dependencies.BOX, debug)
+    if not path:
+        print "Could not locate {0}".format(package)
+        return False
+    
+    target_dir = dependencies.TARGET_DIRECTORY
+    print "Copying package {0} into {1}".format(package, target_dir)
+    for dirname, dirnames, filenames in os.walk(path):
+        rel_dir = os.path.relpath(dirname, path)
+        dir = os.path.abspath(os.path.join(target_dir, rel_dir))
+        if not os.path.isdir(dir):
+            os.makedirs(dir)               
+        for filename in filenames:
+            entry = os.path.join(dirname, filename)
+            shutil.copy(entry, dir)
+    return True
+
+    
+def copy_packages(packages):
+    return all([copy_package(package) for package in packages])  
+    
     
 def get_dependencies():
     packages = dependencies.get_packages()
@@ -24,6 +49,9 @@ def get_dependencies():
         print "Cannot fetch packages"
         sys.exit(1)
     
+    if not copy_packages(packages):
+        print "Cannot copy packages"
+        sys.exit(1)
     
     
 if __name__ == '__main__':   
