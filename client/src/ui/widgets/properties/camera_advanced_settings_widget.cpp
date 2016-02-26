@@ -23,6 +23,10 @@ namespace {
         return status == Qn::Online || status == Qn::Recording;
     }
 
+    //TODO: #GDM #2.6 #tr
+    /* Untranslatable for now. */
+    const QByteArray kLoadingWebPage = "Loading...";
+
 }
 
 QnCameraAdvancedSettingsWidget::QnCameraAdvancedSettingsWidget(QWidget* parent /* = 0*/):
@@ -80,19 +84,19 @@ void QnCameraAdvancedSettingsWidget::setPage(Page page) {
 
 
 void QnCameraAdvancedSettingsWidget::updatePage() {
-    
+
     auto calculatePage = [this]{
         if (!m_camera)
             return Page::Empty;
 
         QnResourceData resourceData = qnCommon->dataPool()->data(m_camera);
         bool hasWebPage = resourceData.value<bool>(lit("showUrl"), false);
-        if (hasWebPage) 
+        if (hasWebPage)
             return Page::Web;
 
-        if (!m_camera->getProperty(Qn::CAMERA_ADVANCED_PARAMETERS).isEmpty()) 
+        if (!m_camera->getProperty(Qn::CAMERA_ADVANCED_PARAMETERS).isEmpty())
             return Page::Manual;
-        
+
         return Page::Empty;
     };
 
@@ -142,9 +146,21 @@ void QnCameraAdvancedSettingsWidget::submitToResource()
     ui->cameraAdvancedParamsWidget->saveValues();
 }
 
+void QnCameraAdvancedSettingsWidget::hideEvent(QHideEvent *event)
+{
+    if (m_page != Page::Web)
+        return;
+
+    ui->webView->triggerPageAction(QWebPage::Stop);
+    ui->webView->triggerPageAction(QWebPage::StopScheduledPageRefresh);
+    ui->webView->setContent(kLoadingWebPage);
+}
+
 void QnCameraAdvancedSettingsWidget::initWebView() {
     m_cameraAdvancedSettingsWebPage = new CameraAdvancedSettingsWebPage(ui->webView);
     ui->webView->setPage(m_cameraAdvancedSettingsWebPage);
+
+    ui->webView->setContent(kLoadingWebPage);
 
     QStyle* style = QStyleFactory().create(lit("fusion"));
     ui->webView->setStyle(style);
@@ -152,32 +168,32 @@ void QnCameraAdvancedSettingsWidget::initWebView() {
     QPalette palGreenHlText = this->palette();
 
     // Outline around the menu
-    palGreenHlText.setColor(QPalette::Window, Qt::gray);    
+    palGreenHlText.setColor(QPalette::Window, Qt::gray);
     palGreenHlText.setColor(QPalette::WindowText, Qt::black);
 
-    palGreenHlText.setColor(QPalette::BrightText, Qt::gray);  
+    palGreenHlText.setColor(QPalette::BrightText, Qt::gray);
     palGreenHlText.setColor(QPalette::BrightText, Qt::black);
 
     // combo button
-    palGreenHlText.setColor(QPalette::Button, Qt::gray);  
+    palGreenHlText.setColor(QPalette::Button, Qt::gray);
     palGreenHlText.setColor(QPalette::ButtonText, Qt::black);
 
     // combo menu
-    palGreenHlText.setColor(QPalette::Base, Qt::gray);  
+    palGreenHlText.setColor(QPalette::Base, Qt::gray);
     palGreenHlText.setColor(QPalette::Text, Qt::black);
 
     // tool tips
-    palGreenHlText.setColor(QPalette::ToolTipBase, Qt::gray);  
+    palGreenHlText.setColor(QPalette::ToolTipBase, Qt::gray);
     palGreenHlText.setColor(QPalette::ToolTipText, Qt::black);
 
-    palGreenHlText.setColor(QPalette::NoRole, Qt::gray);  
-    palGreenHlText.setColor(QPalette::AlternateBase, Qt::gray);  
+    palGreenHlText.setColor(QPalette::NoRole, Qt::gray);
+    palGreenHlText.setColor(QPalette::AlternateBase, Qt::gray);
 
-    palGreenHlText.setColor(QPalette::Link, Qt::black);  
-    palGreenHlText.setColor(QPalette::LinkVisited, Qt::black);  
+    palGreenHlText.setColor(QPalette::Link, Qt::black);
+    palGreenHlText.setColor(QPalette::LinkVisited, Qt::black);
 
     // highlight button & menu
-    palGreenHlText.setColor(QPalette::Highlight, Qt::gray);   
+    palGreenHlText.setColor(QPalette::Highlight, Qt::gray);
     palGreenHlText.setColor(QPalette::HighlightedText, Qt::black);
 
     // to customize the disabled color
@@ -208,7 +224,7 @@ void QnCameraAdvancedSettingsWidget::at_authenticationRequired(QNetworkReply* /*
     authenticator->setPassword(m_camera->getAuth().password());
 }
 
-void QnCameraAdvancedSettingsWidget::at_proxyAuthenticationRequired(const QNetworkProxy & , QAuthenticator * authenticator) {    
+void QnCameraAdvancedSettingsWidget::at_proxyAuthenticationRequired(const QNetworkProxy & , QAuthenticator * authenticator) {
     QnMutexLocker locker( &m_cameraMutex );
     if (!m_camera)
         return;

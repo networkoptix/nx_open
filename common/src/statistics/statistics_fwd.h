@@ -14,11 +14,9 @@ typedef std::unique_ptr<QnAbstractStatisticsStorage> QnStatisticsStoragePtr;
 class QnAbstractStatisticsSettingsLoader;
 typedef std::unique_ptr<QnAbstractStatisticsSettingsLoader> QnStatisticsSettingsPtr;
 
-typedef QString QnMetricAlias;
-typedef QString QnMetricValue;
-typedef QHash<QnMetricAlias, QnMetricValue> QnMetricsHash;
+typedef QHash<QString, QString> QnStatisticValuesHash;
 
-typedef QList<QnMetricsHash> QnMetricHashesList;
+typedef QList<QnStatisticValuesHash> QnMetricHashesList;
 typedef QSet<QString> QnStringsSet;
 
 Q_DECLARE_METATYPE(QnMetricHashesList)

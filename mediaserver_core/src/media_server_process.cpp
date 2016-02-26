@@ -1407,7 +1407,6 @@ void MediaServerProcess::at_cameraIPConflict(const QHostAddress& host, const QSt
 bool MediaServerProcess::initTcpListener()
 {
     m_httpModManager.reset( new nx_http::HttpModManager() );
-    m_httpModManager->addUrlRewriteExact( lit( "/crossdomain.xml" ), lit( "/static/crossdomain.xml" ) );
     m_autoRequestForwarder.reset( new QnAutoRequestForwarder() );
     m_autoRequestForwarder->addPathToIgnore(lit("/ec2/*"));
     m_httpModManager->addCustomRequestMod( std::bind(
@@ -2190,6 +2189,9 @@ void MediaServerProcess::run()
     //CLDeviceSearcher::instance()->addDeviceServer(&IQEyeDeviceServer::instance());
 
     loadResourcesFromECS(messageProcessor.data());
+    if (QnGlobalSettings::instance()->isCrossdomainXmlEnabled())
+        m_httpModManager->addUrlRewriteExact( lit( "/crossdomain.xml" ), lit( "/static/crossdomain.xml" ) );
+
     if (QnUserResourcePtr adminUser = qnResPool->getAdministrator())
     {
         qnCommon->updateModuleInformation();
@@ -2199,9 +2201,11 @@ void MediaServerProcess::run()
         typedef ec2::Ec2StaticticsReporter stats;
         bool adminParamsChanged = false;
 
+        // TODO: #ynikitenkov fix to use qnGlobalSettings in 2.6
         // TODO: fix, when VS supports init lists:
         //       for (const auto& param : { stats::SR_TIME_CYCLE, stats::SR_SERVER_API })
-        const QString* statParams[] = { &stats::SR_TIME_CYCLE, &stats::SR_SERVER_API };
+        const QString* statParams[] = { &stats::SR_TIME_CYCLE, &stats::SR_SERVER_API
+            , &QnMultiserverStatisticsRestHandler::kSettingsUrlParam };
         for (auto it = &statParams[0]; it != &statParams[sizeof(statParams)/sizeof(statParams[0])]; ++it)
         {
             const QString& param = **it;

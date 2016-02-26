@@ -329,10 +329,6 @@ para ver los marcadores</translation>
         <translation>Ocultar FPS</translation>
     </message>
     <message>
-        <source>Ctrl+Alt+F</source>
-        <translation>Ctrl+Alt+F</translation>
-    </message>
-    <message>
         <source>Drop Resources</source>
         <translation>Colocar Recursos</translation>
     </message>
@@ -349,24 +345,12 @@ para ver los marcadores</translation>
         <translation>Diseño de página siguiente</translation>
     </message>
     <message>
-        <source>Ctrl+Tab</source>
-        <translation>Ctrl+Tab</translation>
-    </message>
-    <message>
         <source>Previous Layout</source>
         <translation>Diseño anterior</translation>
     </message>
     <message>
-        <source>Ctrl+Shift+Tab</source>
-        <translation>Ctrl+Shift+Tab</translation>
-    </message>
-    <message>
         <source>Select All</source>
         <translation>Seleccionar todo</translation>
-    </message>
-    <message>
-        <source>Ctrl+A</source>
-        <translation>Ctrl+A</translation>
     </message>
     <message>
         <source>Selection Changed</source>
@@ -379,10 +363,6 @@ para ver los marcadores</translation>
     <message>
         <source>Go to Freespace Mode</source>
         <translation>Ir a Modo Freespace</translation>
-    </message>
-    <message>
-        <source>F11</source>
-        <translation>F11</translation>
     </message>
     <message>
         <source>Help</source>
@@ -413,16 +393,8 @@ para ver los marcadores</translation>
         <translation>Menú Principal</translation>
     </message>
     <message>
-        <source>Alt+Space</source>
-        <translation>Alt+Espacio</translation>
-    </message>
-    <message>
         <source>Connect to Server...</source>
         <translation>Conectar al servidor...</translation>
-    </message>
-    <message>
-        <source>Ctrl+Shift+C</source>
-        <translation>Ctrl+Shift+C</translation>
     </message>
     <message>
         <source>Logout</source>
@@ -435,10 +407,6 @@ para ver los marcadores</translation>
     <message>
         <source>Stop Panic Recording</source>
         <translation>Detener Grabación de Pánico</translation>
-    </message>
-    <message>
-        <source>Ctrl+P</source>
-        <translation>Ctrl+P</translation>
     </message>
     <message>
         <source>New...</source>
@@ -461,20 +429,12 @@ para ver los marcadores</translation>
         <translation>Nueva Pestaña</translation>
     </message>
     <message>
-        <source>Ctrl+T</source>
-        <translation>Ctrl+T</translation>
-    </message>
-    <message>
         <source>Window</source>
         <translation>Ventana</translation>
     </message>
     <message>
         <source>New Window</source>
         <translation>Nueva Ventana</translation>
-    </message>
-    <message>
-        <source>Ctrl+N</source>
-        <translation>Ctrl+N</translation>
     </message>
     <message>
         <source>User...</source>
@@ -505,10 +465,6 @@ para ver los marcadores</translation>
         <translation>Archivo (s) ...</translation>
     </message>
     <message>
-        <source>Ctrl+O</source>
-        <translation>Ctrl+O</translation>
-    </message>
-    <message>
         <source>Layout(s)...</source>
         <translation>Diseño(s)...</translation>
     </message>
@@ -521,20 +477,8 @@ para ver los marcadores</translation>
         <translation>Guardar diseño actual</translation>
     </message>
     <message>
-        <source>Ctrl+S</source>
-        <translation>Ctrl+S</translation>
-    </message>
-    <message>
         <source>Save Current Layout As...</source>
         <translation>Guardar diseño actual como...</translation>
-    </message>
-    <message>
-        <source>Ctrl+Shift+S</source>
-        <translation>Ctrl+Shift+C</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+S</source>
-        <translation>Ctrl+Alt+S</translation>
     </message>
     <message>
         <source>Save Video Wall View</source>
@@ -549,14 +493,6 @@ para ver los marcadores</translation>
         <translation>Detenga la grabación de pantalla</translation>
     </message>
     <message>
-        <source>Alt+R</source>
-        <translation>Alt+R</translation>
-    </message>
-    <message>
-        <source>Esc</source>
-        <translation>Esc</translation>
-    </message>
-    <message>
         <source>Stop current action</source>
         <translation>Detenga la acción actual</translation>
     </message>
@@ -567,18 +503,6 @@ para ver los marcadores</translation>
     <message>
         <source>Exit Fullscreen</source>
         <translation>Salir de la pantalla completa</translation>
-    </message>
-    <message>
-        <source>Ctrl+F</source>
-        <translation>Ctrl+F</translation>
-    </message>
-    <message>
-        <source>Alt+Enter</source>
-        <translation>Alt+Enter</translation>
-    </message>
-    <message>
-        <source>Alt+Return</source>
-        <translation>Alt+Return</translation>
     </message>
     <message>
         <source>Minimize</source>
@@ -613,18 +537,6 @@ para ver los marcadores</translation>
         <translation>Abrir Web Client...</translation>
     </message>
     <message>
-        <source>Ctrl+E</source>
-        <translation>Ctrl+E</translation>
-    </message>
-    <message>
-        <source>Ctrl+L</source>
-        <translation>Ctrl+L</translation>
-    </message>
-    <message>
-        <source>Ctrl+M</source>
-        <translation>Ctrl+M</translation>
-    </message>
-    <message>
         <source>How-to Videos and FAQ...</source>
         <translation>Vídeos y preguntas frecuentes... </translation>
     </message>
@@ -633,16 +545,8 @@ para ver los marcadores</translation>
         <translation>Acerca de ...</translation>
     </message>
     <message>
-        <source>F1</source>
-        <translation>F1</translation>
-    </message>
-    <message>
         <source>Exit</source>
         <translation>Salida</translation>
-    </message>
-    <message>
-        <source>Alt+F4</source>
-        <translation>Alt+F4</translation>
     </message>
     <message>
         <source>Merge to Currently Connected System...</source>
@@ -653,20 +557,12 @@ para ver los marcadores</translation>
         <translation>Cerrar</translation>
     </message>
     <message>
-        <source>Ctrl+W</source>
-        <translation>Ctrl+W</translation>
-    </message>
-    <message>
         <source>Close All But This</source>
         <translation>Cierre Todas Menos Esta</translation>
     </message>
     <message>
         <source>Open in Layout</source>
         <translation>Abrir en Diseño</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+D</source>
-        <translation>Ctrl+Alt+D</translation>
     </message>
     <message>
         <source>Delayed Open Video Wall</source>
@@ -683,10 +579,6 @@ para ver los marcadores</translation>
     <message>
         <source>System Administration...</source>
         <translation>Administración del sistema ...</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+A</source>
-        <translation>Ctrl+Alt+A</translation>
     </message>
     <message>
         <source>System Update...</source>
@@ -737,14 +629,6 @@ para ver los marcadores</translation>
         <translation>Abrir carpeta contenedora</translation>
     </message>
     <message>
-        <source>Ctrl+Enter</source>
-        <translation>Ctrl+Enter</translation>
-    </message>
-    <message>
-        <source>Ctrl+Return</source>
-        <translation>Ctrl+Return</translation>
-    </message>
-    <message>
         <source>Identify</source>
         <translation>Identificar</translation>
     </message>
@@ -789,24 +673,12 @@ para ver los marcadores</translation>
         <translation>Maximizar el artículo</translation>
     </message>
     <message>
-        <source>Enter</source>
-        <translation>Entrar</translation>
-    </message>
-    <message>
-        <source>Return</source>
-        <translation>Retorno</translation>
-    </message>
-    <message>
         <source>Restore Item</source>
         <translation>Restaurar elemento</translation>
     </message>
     <message>
         <source>Show Info</source>
         <translation>Mostrar información</translation>
-    </message>
-    <message>
-        <source>Alt+I</source>
-        <translation>Alt+I</translation>
     </message>
     <message>
         <source>Hide Info</source>
@@ -869,10 +741,6 @@ para ver los marcadores</translation>
         <translation>Mostrar movimiento</translation>
     </message>
     <message>
-        <source>Alt+G</source>
-        <translation>Alt+G</translation>
-    </message>
-    <message>
         <source>Hide Motion/Smart Search</source>
         <translation>Ocultar Movimiento/Búsqueda inteligente</translation>
     </message>
@@ -893,24 +761,12 @@ para ver los marcadores</translation>
         <translation>Compruebe Marcas en el Archivo</translation>
     </message>
     <message>
-        <source>Alt+C</source>
-        <translation>Alt+C</translation>
-    </message>
-    <message>
         <source>Take Screenshot</source>
         <translation>Tomar captura de pantalla</translation>
     </message>
     <message>
-        <source>Alt+S</source>
-        <translation>Alt+S</translation>
-    </message>
-    <message>
         <source>Image Enhancement...</source>
         <translation>Mejora la imagen...</translation>
-    </message>
-    <message>
-        <source>Alt+J</source>
-        <translation>Alt+J</translation>
     </message>
     <message>
         <source>Create Zoom Window</source>
@@ -941,20 +797,12 @@ para ver los marcadores</translation>
         <translation>Retire del diseño</translation>
     </message>
     <message>
-        <source>Del</source>
-        <translation>Del</translation>
-    </message>
-    <message>
         <source>Delete</source>
         <translation>Borrar</translation>
     </message>
     <message>
         <source>Rename</source>
         <translation>renombra</translation>
-    </message>
-    <message>
-        <source>F2</source>
-        <translation>F2</translation>
     </message>
     <message>
         <source>Delete from Disk</source>
@@ -1025,24 +873,12 @@ para ver los marcadores</translation>
         <translation>Para Recorrido</translation>
     </message>
     <message>
-        <source>Alt+T</source>
-        <translation>Alt+T</translation>
-    </message>
-    <message>
         <source>Mark Selection Start</source>
         <translation>Marca inicio de selección</translation>
     </message>
     <message>
-        <source>[</source>
-        <translation>[</translation>
-    </message>
-    <message>
         <source>Mark Selection End</source>
         <translation>Marca selección final</translation>
-    </message>
-    <message>
-        <source>]</source>
-        <translation>]</translation>
     </message>
     <message>
         <source>Clear Selection</source>
@@ -1073,50 +909,6 @@ para ver los marcadores</translation>
         <translation>Vista Previa búsqueda...</translation>
     </message>
     <message>
-        <source>Ctrl+Alt+Shift++</source>
-        <translation>Ctrl+Alt+Shift++</translation>
-    </message>
-    <message>
-        <source>Increment Debug Counter</source>
-        <translation>Incremento contador de depuración</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift+-</source>
-        <translation>Ctrl+Alt+Shift+-</translation>
-    </message>
-    <message>
-        <source>Decrement Debug Counter</source>
-        <translation>Disminución contador de depuración</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift+R</source>
-        <translation>Ctrl+Alt+Shift+R</translation>
-    </message>
-    <message>
-        <source>Show Resource Pool</source>
-        <translation>Mostrar grupo de recursos</translation>
-    </message>
-    <message>
-        <source>Calibrate PTZ</source>
-        <translation>Calibrar PTZ</translation>
-    </message>
-    <message>
-        <source>Get PTZ Position</source>
-        <translation>Obtener PTZ Posición</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift+D</source>
-        <translation>Ctrl+Alt+Shift+D</translation>
-    </message>
-    <message>
-        <source>Debug Control Panel</source>
-        <translation>Depurar Panel de Control</translation>
-    </message>
-    <message>
-        <source>Space</source>
-        <translation>Espacio</translation>
-    </message>
-    <message>
         <source>Play</source>
         <translation>Jugar</translation>
     </message>
@@ -1125,72 +917,36 @@ para ver los marcadores</translation>
         <translation>Pausa</translation>
     </message>
     <message>
-        <source>Ctrl+Left</source>
-        <translation>Ctrl+Left</translation>
-    </message>
-    <message>
         <source>Previous Frame</source>
         <translation>Fotograma anterior</translation>
-    </message>
-    <message>
-        <source>Ctrl+Right</source>
-        <translation>Ctrl+Right</translation>
     </message>
     <message>
         <source>Next Frame</source>
         <translation>Siguiente fotograma</translation>
     </message>
     <message>
-        <source>Z</source>
-        <translation>Z</translation>
-    </message>
-    <message>
         <source>To Start</source>
         <translation>Para empezar</translation>
-    </message>
-    <message>
-        <source>X</source>
-        <translation>X</translation>
     </message>
     <message>
         <source>To End</source>
         <translation>Para finalizar</translation>
     </message>
     <message>
-        <source>Ctrl+Up</source>
-        <translation>Ctrl+Up</translation>
-    </message>
-    <message>
         <source>Volume Down</source>
         <translation>Bajar volumen</translation>
-    </message>
-    <message>
-        <source>Ctrl+Down</source>
-        <translation>Ctrl+Down</translation>
     </message>
     <message>
         <source>Volume Up</source>
         <translation>Subir volumen</translation>
     </message>
     <message>
-        <source>M</source>
-        <translation>M</translation>
-    </message>
-    <message>
         <source>Toggle Mute</source>
         <translation>Activar silencio</translation>
     </message>
     <message>
-        <source>L</source>
-        <translation>L</translation>
-    </message>
-    <message>
         <source>Jump to Live</source>
         <translation>IR a en vivo</translation>
-    </message>
-    <message>
-        <source>S</source>
-        <translation>S</translation>
     </message>
     <message>
         <source>Synchronize Streams</source>
@@ -1255,10 +1011,6 @@ para ver los marcadores</translation>
     <message>
         <source>Unpin Notifications</source>
         <translation>Desprender notificaciones</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+T</source>
-        <translation>Ctrl+Alt+T</translation>
     </message>
     <message>
         <source>Disable Background Animation</source>
@@ -1387,10 +1139,6 @@ para ver los marcadores</translation>
     <message>
         <source>Cameras to Backup...</source>
         <translation>Cámaras para copia de seguridad...</translation>
-    </message>
-    <message>
-        <source>Ctrl+B</source>
-        <translation>Ctrl +B</translation>
     </message>
     <message>
         <source>Show Bookmarks</source>

@@ -13,9 +13,12 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <statistics/abstract_statistics_settings_loader.h>
+#include <ec2_statictics_reporter.h>
 
 namespace
 {
+    const auto kSendStatUser = lit("nx");
+    const auto kSendStatPass = lit("f087996adb40eaed989b73e2d5a37c951f559956c44f6f8cdfb6f127ca4136cd");
     const nx_http::StringType kJsonContentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
 
     QString makeFullPath(const QString &basePath
@@ -58,6 +61,76 @@ namespace
         return QJson::deserialize(body, &dummy);
     };
 }
+
+namespace
+{
+    class SettingsCache
+    {
+    public:
+        static void update(const QnStatisticsSettings &settings);
+
+        static void clear();
+
+        static bool copyTo(QnStatisticsSettings &output);
+
+    private:
+        SettingsCache();
+
+        static SettingsCache &instance();
+
+    private:
+        typedef QScopedPointer<QnStatisticsSettings> SettingsPtr;
+
+        QMutex m_mutex;
+        QElapsedTimer m_timer;
+        SettingsPtr m_settings;
+    };
+
+    SettingsCache::SettingsCache()
+        : m_mutex()
+        , m_timer()
+        , m_settings()
+    {
+        m_timer.start();
+    }
+
+    SettingsCache &SettingsCache::instance()
+    {
+        static SettingsCache inst;
+        return inst;
+    }
+
+    void SettingsCache::update(const QnStatisticsSettings &settings)
+    {
+        const QMutexLocker guard(&instance().m_mutex);
+        instance().m_timer.restart();
+        instance().m_settings.reset(new QnStatisticsSettings(settings));
+    }
+
+    void SettingsCache::clear()
+    {
+        const QMutexLocker guard(&instance().m_mutex);
+        instance().m_timer.restart();
+        instance().m_settings.reset();
+    }
+
+    bool SettingsCache::copyTo(QnStatisticsSettings &output)
+    {
+        const QMutexLocker guard(&instance().m_mutex);
+
+        enum { kMinSettingsUpdateTime = 4 * 60 * 60 * 1000 }; // every 4 hours
+
+        auto &settings = instance().m_settings;
+        auto &timer = instance().m_timer;
+        if (!settings || timer.hasExpired(kMinSettingsUpdateTime))
+            return false;
+
+        output = *settings;
+        return true;
+    }
+}
+
+const QString QnMultiserverStatisticsRestHandler::kSettingsUrlParam = lit("clientStatisticsSettingsUrl");
 
 class StatisticsActionHandler
 {
@@ -146,28 +219,34 @@ int SettingsActionHandler::executeGet(const QnRequestParamList &params
     , QByteArray &result, QByteArray &contentType
     , int port)
 {
-    Context context(QnEmptyRequestData(), port);
+    const QnEmptyRequestData request =
+        QnMultiserverRequestData::fromParams<QnEmptyRequestData>(params);
 
-    const auto &request = context.request();
+    Context context(request, port);
 
     QnStatisticsSettings settings;
     nx_http::StatusCode::Value resultCode = nx_http::StatusCode::noContent;
-    if (request.isLocal)
-    {
-        resultCode = loadSettingsLocally(settings);
-    }
-    else
-    {
-        const auto moduleGuid = qnCommon->moduleGUID();
-        for (const auto server: qnResPool->getAllServers(Qn::Online))
-        {
-            resultCode = (server->getId() == moduleGuid
-                ? loadSettingsLocally(settings)
-                : loadSettingsRemotely(settings, server, &context));
 
-            if (resultCode == nx_http::StatusCode::ok)
-                break;
-        }
+    resultCode = loadSettingsLocally(settings);
+    if (resultCode == nx_http::StatusCode::ok)
+    {
+        QnFusionRestHandlerDetail::serialize(settings, result, contentType
+            , request.format, request.extraFormatting);
+        return nx_http::StatusCode::ok;
+    }
+
+    if (request.isLocal)
+        return resultCode;
+
+    const auto moduleGuid = qnCommon->moduleGUID();
+    for (const auto server: qnResPool->getAllServers(Qn::Online))
+    {
+        if (server->getId() == moduleGuid)
+            continue;
+
+        resultCode = loadSettingsRemotely(settings, server, &context);
+        if (resultCode == nx_http::StatusCode::ok)
+            break;
     }
 
     if (resultCode != nx_http::StatusCode::ok)
@@ -185,16 +264,33 @@ nx_http::StatusCode::Value SettingsActionHandler::loadSettingsLocally(QnStatisti
     if (!server || !hasInternetConnection(server))
         return nx_http::StatusCode::noContent;
 
-    static const QUrl kSettingsUrl = QUrl::fromUserInput(lit("http://127.0.01:8080/stat/statistics.json")); //TODO: change me to correct
+    static const auto settingsUrl = []()
+    {
+        static const auto kSettingsUrl =
+            ec2::Ec2StaticticsReporter::DEFAULT_SERVER_API + lit("/config/client_stats.json");
+
+        // TODO: #ynikitenkov fix to use qnGlobalSettings in 2.6
+        const auto admin = qnResPool->getAdministrator();
+        const auto localSettingsUrl = (admin ? admin->getProperty(
+            QnMultiserverStatisticsRestHandler::kSettingsUrlParam) : QString());
+        return QUrl::fromUserInput(localSettingsUrl.trimmed().isEmpty()
+            ? kSettingsUrl : localSettingsUrl);
+    }();
+
+    if (SettingsCache::copyTo(outputSettings))
+        return nx_http::StatusCode::ok;
+
+    SettingsCache::clear();
 
     nx_http::BufferType buffer;
     int statusCode = nx_http::StatusCode::noContent;
-    if (nx_http::downloadFileSync(kSettingsUrl, &statusCode, &buffer) != SystemError::noError)
+    if (nx_http::downloadFileSync(settingsUrl, &statusCode, &buffer) != SystemError::noError)
         return nx_http::StatusCode::noContent;
 
     if (!QJson::deserialize(buffer, &outputSettings))
         return nx_http::StatusCode::internalServerError;
 
+    SettingsCache::update(outputSettings);
     return nx_http::StatusCode::ok;
 }
 
@@ -260,7 +356,8 @@ public:
 private:
     typedef QnMultiserverRequestContext<QnSendStatisticsRequestData> Context;
 
-    nx_http::StatusCode::Value sendStatisticsLocally(const QByteArray &metricsList);
+    nx_http::StatusCode::Value sendStatisticsLocally(const QByteArray &metricsList
+        , const QString &statisticsServerUrl);
 
     nx_http::StatusCode::Value sendStatisticsRemotely(const QByteArray &metricsList
         , const QnMediaServerResourcePtr &server
@@ -279,53 +376,50 @@ int SendStatisticsActionHandler::executePost(const QnRequestParamList& params
     , QByteArray &/* result */, QByteArray &/*resultContentType*/
     , int port)
 {
-    // TODO: add support of specified in parameters format, not only json!
-    QnSendStatisticsRequestData requestData;
+    QnSendStatisticsRequestData request =
+        QnMultiserverRequestData::fromParams<QnSendStatisticsRequestData>(params);
+
+    // TODO: #ynikitenkov add support of specified in parameters format, not only json!
     const bool correctJson = QJson::deserialize<QnMetricHashesList>(
-        body, &requestData.metricsList);
+        body, &request.metricsList);
 
     Q_ASSERT_X(correctJson, Q_FUNC_INFO, "Incorect json with mertics received!");
     if (!correctJson)
         return nx_http::StatusCode::invalidParameter;
 
-    Context context(requestData, port);    // todo add context initialization
-    const auto request = context.request();
+    Context context(request, port);
 
-    nx_http::StatusCode::Value resultCode = nx_http::StatusCode::notAcceptable;
+    nx_http::StatusCode::Value resultCode =
+        sendStatisticsLocally(body, request.statisticsServerUrl);
+
     if (request.isLocal)
-    {
-        sendStatisticsLocally(body);
-    }
-    else
-    {
-        const auto moduleGuid = qnCommon->moduleGUID();
-        for (const auto server: qnResPool->getAllServers(Qn::Online))
-        {
-            resultCode = (server->getId() == moduleGuid
-                ? sendStatisticsLocally(body)
-                : sendStatisticsRemotely(body, server, &context));
+        return resultCode;
 
-            if (resultCode == nx_http::StatusCode::ok)
-                break;
-        }
-    }
+    const auto moduleGuid = qnCommon->moduleGUID();
+    for (const auto server: qnResPool->getAllServers(Qn::Online))
+    {
+        if (server->getId() == moduleGuid)
+            continue;
 
+        resultCode = sendStatisticsRemotely(body, server, &context);
+        if (resultCode == nx_http::StatusCode::ok)
+            break;
+    }
     return resultCode;
 }
 
 nx_http::StatusCode::Value SendStatisticsActionHandler::sendStatisticsLocally(
-    const QByteArray &metricsList)
+    const QByteArray &metricsList
+    , const QString &statisticsServerUrl)
 {
     const auto moduleGuid = qnCommon->moduleGUID();
     const auto server = qnResPool->getResourceById<QnMediaServerResource>(moduleGuid);
     if (!server || !hasInternetConnection(server))
         return nx_http::StatusCode::notAcceptable;
 
-    static const QUrl kStatisticsUrl = QUrl::fromUserInput(lit("http://10.0.3.163/statserver/api/save/clientSessions"));
-
     auto httpCode = nx_http::StatusCode::notAcceptable;
-    const auto error = nx_http::uploadDataSync(
-        kStatisticsUrl, metricsList, kJsonContentType, &httpCode);
+    const auto error = nx_http::uploadDataSync(statisticsServerUrl, metricsList
+        , kJsonContentType, kSendStatUser, kSendStatPass, &httpCode);
 
     return (error == SystemError::noError
         ? httpCode : nx_http::StatusCode::internalServerError);
@@ -356,8 +450,8 @@ nx_http::StatusCode::Value SendStatisticsActionHandler::sendStatisticsRemotely(
     };
 
     const QUrl apiUrl = getServerApiUrl(path(), server, *context);
-    runMultiserverUploadRequest(apiUrl
-        , metricsList, kJsonContentType, server, completionFunc, context);
+    runMultiserverUploadRequest(apiUrl, metricsList, kJsonContentType
+        , kSendStatUser, kSendStatPass, server, completionFunc, context);
     context->waitForDone();
     return result;
 }

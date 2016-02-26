@@ -415,12 +415,16 @@ namespace nx_http
     bool uploadDataAsync(const QUrl &url
         , const QByteArray &data
         , const QByteArray &contentType
+        , const QString &user
+        , const QString &password
         , const nx_http::HttpHeaders &extraHeaders
         , const UploadCompletionHandler &callback);
 
     SystemError::ErrorCode uploadDataSync(const QUrl &url
         , const QByteArray &data
         , const QByteArray &contentType
+        , const QString &user
+        , const QString &password
         , nx_http::StatusCode::Value *httpCode = nullptr);
 }
 

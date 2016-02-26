@@ -320,10 +320,6 @@ to view more bookmarks</source>
         <translation>隐藏每秒帧数</translation>
     </message>
     <message>
-        <source>Ctrl+Alt+F</source>
-        <translation>Ctrl+Alt+F</translation>
-    </message>
-    <message>
         <source>Drop Resources</source>
         <translation>拖放资源</translation>
     </message>
@@ -336,24 +332,12 @@ to view more bookmarks</source>
         <translation>下个视窗</translation>
     </message>
     <message>
-        <source>Ctrl+Tab</source>
-        <translation>Ctrl+Tab</translation>
-    </message>
-    <message>
         <source>Previous Layout</source>
         <translation>前一个视窗</translation>
     </message>
     <message>
-        <source>Ctrl+Shift+Tab</source>
-        <translation>Ctrl+Shift+Tab</translation>
-    </message>
-    <message>
         <source>Select All</source>
         <translation>选择所有</translation>
-    </message>
-    <message>
-        <source>Ctrl+A</source>
-        <translation>Ctrl+A</translation>
     </message>
     <message>
         <source>Selection Changed</source>
@@ -366,10 +350,6 @@ to view more bookmarks</source>
     <message>
         <source>Go to Freespace Mode</source>
         <translation>进入自由空间模式</translation>
-    </message>
-    <message>
-        <source>F11</source>
-        <translation>F11</translation>
     </message>
     <message>
         <source>Event Log...</source>
@@ -392,16 +372,8 @@ to view more bookmarks</source>
         <translation>主菜单</translation>
     </message>
     <message>
-        <source>Alt+Space</source>
-        <translation>Alt+Space</translation>
-    </message>
-    <message>
         <source>Connect to Server...</source>
         <translation>连接到服务器...</translation>
-    </message>
-    <message>
-        <source>Ctrl+Shift+C</source>
-        <translation>Ctrl+Shift+C</translation>
     </message>
     <message>
         <source>New...</source>
@@ -424,20 +396,12 @@ to view more bookmarks</source>
         <translation>新标签</translation>
     </message>
     <message>
-        <source>Ctrl+T</source>
-        <translation>Ctrl+T</translation>
-    </message>
-    <message>
         <source>Window</source>
         <translation>窗口</translation>
     </message>
     <message>
         <source>New Window</source>
         <translation>新窗口</translation>
-    </message>
-    <message>
-        <source>Ctrl+N</source>
-        <translation>Ctrl+N</translation>
     </message>
     <message>
         <source>User...</source>
@@ -464,10 +428,6 @@ to view more bookmarks</source>
         <translation>文件...</translation>
     </message>
     <message>
-        <source>Ctrl+O</source>
-        <translation>Ctrl+O</translation>
-    </message>
-    <message>
         <source>Layout(s)...</source>
         <translation>视窗...</translation>
     </message>
@@ -480,20 +440,8 @@ to view more bookmarks</source>
         <translation>保存当前视窗</translation>
     </message>
     <message>
-        <source>Ctrl+S</source>
-        <translation>Ctrl+S</translation>
-    </message>
-    <message>
         <source>Save Current Layout As...</source>
         <translation>当前视窗另存为...</translation>
-    </message>
-    <message>
-        <source>Ctrl+Shift+S</source>
-        <translation>Ctrl+Shift+S</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+S</source>
-        <translation>Ctrl+Alt+S</translation>
     </message>
     <message>
         <source>Save Video Wall View</source>
@@ -508,32 +456,12 @@ to view more bookmarks</source>
         <translation>结束屏幕录像</translation>
     </message>
     <message>
-        <source>Alt+R</source>
-        <translation>Alt+R</translation>
-    </message>
-    <message>
         <source>Go to Fullscreen</source>
         <translation>全屏</translation>
     </message>
     <message>
         <source>Exit Fullscreen</source>
         <translation>退出全屏</translation>
-    </message>
-    <message>
-        <source>Ctrl+F</source>
-        <translation>Ctrl+F</translation>
-    </message>
-    <message>
-        <source>Alt+Enter</source>
-        <translation>Alt+Enter</translation>
-    </message>
-    <message>
-        <source>Alt+Return</source>
-        <translation>Alt+Return</translation>
-    </message>
-    <message>
-        <source>Esc</source>
-        <translation>退出</translation>
     </message>
     <message>
         <source>Minimize</source>
@@ -544,10 +472,6 @@ to view more bookmarks</source>
         <translation>最大化</translation>
     </message>
     <message>
-        <source>Ctrl+P</source>
-        <translation>Ctrl+P</translation>
-    </message>
-    <message>
         <source>About...</source>
         <translation>关于...</translation>
     </message>
@@ -556,16 +480,8 @@ to view more bookmarks</source>
         <translation>退出</translation>
     </message>
     <message>
-        <source>Alt+F4</source>
-        <translation>Alt+F4</translation>
-    </message>
-    <message>
         <source>Close</source>
         <translation>关闭</translation>
-    </message>
-    <message>
-        <source>Ctrl+W</source>
-        <translation>Ctrl+W</translation>
     </message>
     <message>
         <source>Close All But This</source>
@@ -584,20 +500,8 @@ to view more bookmarks</source>
         <translation>打开包含的文件夹</translation>
     </message>
     <message>
-        <source>Ctrl+Enter</source>
-        <translation>Ctrl+Enter</translation>
-    </message>
-    <message>
-        <source>Ctrl+Return</source>
-        <translation>Ctrl+Return</translation>
-    </message>
-    <message>
         <source>Open Layouts</source>
         <translation>打开视窗</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+D</source>
-        <translation></translation>
     </message>
     <message>
         <source>Delayed Open Video Wall</source>
@@ -610,10 +514,6 @@ to view more bookmarks</source>
     <message>
         <source>System Administration...</source>
         <translation>系统管理...</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+A</source>
-        <translation></translation>
     </message>
     <message>
         <source>System Update...</source>
@@ -684,14 +584,6 @@ to view more bookmarks</source>
         <translation>项目最大化</translation>
     </message>
     <message>
-        <source>Enter</source>
-        <translation>进入</translation>
-    </message>
-    <message>
-        <source>Return</source>
-        <translation>返回</translation>
-    </message>
-    <message>
         <source>Restore Item</source>
         <translation>还原项目</translation>
     </message>
@@ -702,10 +594,6 @@ to view more bookmarks</source>
     <message>
         <source>Show Motion/Smart Search</source>
         <translation>显示移动/智能搜索</translation>
-    </message>
-    <message>
-        <source>Alt+G</source>
-        <translation>Alt+G</translation>
     </message>
     <message>
         <source>Hide Motion/Smart Search</source>
@@ -724,16 +612,8 @@ to view more bookmarks</source>
         <translation>检查文件水印</translation>
     </message>
     <message>
-        <source>Alt+C</source>
-        <translation>Alt+C</translation>
-    </message>
-    <message>
         <source>Take Screenshot</source>
         <translation>截屏</translation>
-    </message>
-    <message>
-        <source>Alt+S</source>
-        <translation>Alt+S</translation>
     </message>
     <message>
         <source>Rotate to...</source>
@@ -764,10 +644,6 @@ to view more bookmarks</source>
         <translation>联网到当前系统...</translation>
     </message>
     <message>
-        <source>Ctrl+Alt+T</source>
-        <translation>Ctrl+Alt+T</translation>
-    </message>
-    <message>
         <source>Disable Background Animation</source>
         <translation>不使用动画背景</translation>
     </message>
@@ -776,24 +652,12 @@ to view more bookmarks</source>
         <translation>使用动画背景</translation>
     </message>
     <message>
-        <source>Del</source>
-        <translation>删除</translation>
-    </message>
-    <message>
         <source>Delete</source>
         <translation>删除</translation>
     </message>
     <message>
         <source>Rename</source>
         <translation>重命名</translation>
-    </message>
-    <message>
-        <source>F2</source>
-        <translation>F2</translation>
-    </message>
-    <message>
-        <source>Alt+T</source>
-        <translation>Alt+T</translation>
     </message>
     <message>
         <source>Delete from Disk</source>
@@ -828,16 +692,8 @@ to view more bookmarks</source>
         <translation>标记开始</translation>
     </message>
     <message>
-        <source>[</source>
-        <translation>[</translation>
-    </message>
-    <message>
         <source>Mark Selection End</source>
         <translation>标记结束</translation>
-    </message>
-    <message>
-        <source>]</source>
-        <translation>]</translation>
     </message>
     <message>
         <source>Clear Selection</source>
@@ -850,22 +706,6 @@ to view more bookmarks</source>
     <message>
         <source>Hide Thumbnails</source>
         <translation>隐藏缩略图</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift++</source>
-        <translation>Ctrl+Alt+Shift++</translation>
-    </message>
-    <message>
-        <source>Increment Debug Counter</source>
-        <translation>增加调试计数器</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift+-</source>
-        <translation>Ctrl+Alt+Shift+-</translation>
-    </message>
-    <message>
-        <source>Decrement Debug Counter</source>
-        <translation>减少调试计数器</translation>
     </message>
     <message>
         <source>Monitor</source>
@@ -896,44 +736,20 @@ to view more bookmarks</source>
         <translation>隐藏日历</translation>
     </message>
     <message>
-        <source>Space</source>
-        <translation>空格</translation>
-    </message>
-    <message>
-        <source>Ctrl+Left</source>
-        <translation>Ctrl+Left</translation>
-    </message>
-    <message>
         <source>Previous Frame</source>
         <translation>前一帧</translation>
-    </message>
-    <message>
-        <source>Ctrl+Right</source>
-        <translation>Ctrl+Right</translation>
     </message>
     <message>
         <source>Next Frame</source>
         <translation>下一帧</translation>
     </message>
     <message>
-        <source>Z</source>
-        <translation>Z</translation>
-    </message>
-    <message>
         <source>To Start</source>
         <translation>到开始</translation>
     </message>
     <message>
-        <source>X</source>
-        <translation>X</translation>
-    </message>
-    <message>
         <source>To End</source>
         <translation>到结束</translation>
-    </message>
-    <message>
-        <source>Ctrl+Down</source>
-        <translation>Ctrl+Down</translation>
     </message>
     <message>
         <source>Volume Down</source>
@@ -952,36 +768,16 @@ to view more bookmarks</source>
         <translation>删除标签...</translation>
     </message>
     <message>
-        <source>Ctrl+Up</source>
-        <translation>Ctrl+Up</translation>
-    </message>
-    <message>
         <source>Volume Up</source>
         <translation>提高音量</translation>
-    </message>
-    <message>
-        <source>M</source>
-        <translation>M</translation>
     </message>
     <message>
         <source>Toggle Mute</source>
         <translation>切换静音</translation>
     </message>
     <message>
-        <source>L</source>
-        <translation>L</translation>
-    </message>
-    <message>
         <source>Jump to Live</source>
         <translation>跳转到实时视频</translation>
-    </message>
-    <message>
-        <source>S</source>
-        <translation>S</translation>
-    </message>
-    <message>
-        <source>F1</source>
-        <translation>F1</translation>
     </message>
     <message>
         <source>Play</source>
@@ -1024,10 +820,6 @@ to view more bookmarks</source>
         <translation>显示信息</translation>
     </message>
     <message>
-        <source>Alt+I</source>
-        <translation>Alt+I</translation>
-    </message>
-    <message>
         <source>Hide Info</source>
         <translation>隐藏信息</translation>
     </message>
@@ -1050,18 +842,6 @@ to view more bookmarks</source>
     <message>
         <source>Export Multi-Video...</source>
         <translation>导出多个录像...</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift+R</source>
-        <translation>Ctrl+Alt+Shift+R</translation>
-    </message>
-    <message>
-        <source>Show Resource Pool</source>
-        <translation>显示资源库</translation>
-    </message>
-    <message>
-        <source>Get PTZ Position</source>
-        <translation>获取云台位置</translation>
     </message>
     <message>
         <source>Show Title Bar</source>
@@ -1108,10 +888,6 @@ to view more bookmarks</source>
         <translation>报警/事件规则...</translation>
     </message>
     <message>
-        <source>Ctrl+E</source>
-        <translation>Ctrl+E</translation>
-    </message>
-    <message>
         <source>Change Resolution...</source>
         <translation>修改分辨率...</translation>
     </message>
@@ -1156,18 +932,6 @@ to view more bookmarks</source>
         <translation>视窗设定...</translation>
     </message>
     <message>
-        <source>Ctrl+L</source>
-        <translation>Ctrl+L</translation>
-    </message>
-    <message>
-        <source>Ctrl+M</source>
-        <translation>Ctrl+M</translation>
-    </message>
-    <message>
-        <source>Alt+J</source>
-        <translation>Alt+J</translation>
-    </message>
-    <message>
         <source>Create Zoom Window</source>
         <translation>创建缩放窗口</translation>
     </message>
@@ -1182,10 +946,6 @@ to view more bookmarks</source>
     <message>
         <source>Server Diagnostics...</source>
         <translation>服务器诊断...</translation>
-    </message>
-    <message>
-        <source>Calibrate PTZ</source>
-        <translation>校准PTZ</translation>
     </message>
     <message>
         <source>Pin Notifications</source>
@@ -1250,14 +1010,6 @@ to view more bookmarks</source>
     <message>
         <source>Zoom to Selection</source>
         <translation>放大选择</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift+D</source>
-        <translation>Ctrl+Alt+Shift+D</translation>
-    </message>
-    <message>
-        <source>Debug Control Panel</source>
-        <translation>调试控制板面</translation>
     </message>
     <message>
         <source>File Settings...</source>
@@ -1378,10 +1130,6 @@ to view more bookmarks</source>
     <message>
         <source>Cameras to Backup...</source>
         <translation>摄像机备份...</translation>
-    </message>
-    <message>
-        <source>Ctrl+B</source>
-        <translation>Ctrl+B</translation>
     </message>
     <message>
         <source>Show Bookmarks</source>

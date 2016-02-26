@@ -26,6 +26,7 @@ QnPage {
         readonly property bool cameraOffline: player.atLive && player.resourceHelper.resourceStatus == QnMediaResourceHelper.Offline
         readonly property bool cameraUnauthorized: player.atLive && player.resourceHelper.resourceStatus == QnMediaResourceHelper.Unauthorized
         readonly property bool failed: player.failed
+        readonly property bool offline: serverOffline || cameraOffline
 
         property bool showOfflineStatus: false
         property bool cameraWarningVisible: (showOfflineStatus || cameraUnauthorized || d.failed) && !player.playing
@@ -33,27 +34,30 @@ QnPage {
         property bool resumeOnActivate: false
         property bool resumeAtLive: false
 
+        onOfflineChanged:
+        {
+            if (offline)
+            {
+                offlineStatusDelay.restart()
+            }
+            else
+            {
+                offlineStatusDelay.stop()
+                showOfflineStatus = false
+            }
+        }
+
         Timer {
             id: offlineStatusDelay
 
             interval: 20 * 1000
             repeat: false
-            running: d.serverOffline || d.cameraOffline
+            running: false
 
             onTriggered: d.showOfflineStatus = true
         }
 
         onShowOfflineStatusChanged: updateOfflineDisplay()
-
-        onServerOfflineChanged: {
-            if (!d.serverOffline)
-                d.showOfflineStatus = d.cameraOffline
-        }
-
-        onCameraOfflineChanged: {
-            if (!d.cameraOffline)
-                d.showOfflineStatus = d.serverOffline
-        }
 
         onFailedChanged: {
             if (failed)

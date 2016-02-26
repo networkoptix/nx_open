@@ -1,5 +1,6 @@
 import QtQuick 2.4
 import QtQuick.Controls 1.2
+import QtQuick.Window 2.2
 
 import com.networkoptix.qml 1.0
 
@@ -12,6 +13,8 @@ Item {
     id: cameraFlow
 
     property alias model: cameraGrid.model
+
+    property bool animationsEnabled: true
 
     clip: true
 
@@ -124,20 +127,25 @@ Item {
         }
 
         move: Transition {
+            enabled: animationsEnabled
             NumberAnimation { properties: "x,y"; duration: 250; easing.type: Easing.OutCubic }
         }
         displaced: Transition {
+            enabled: animationsEnabled
             NumberAnimation { properties: "x,y"; duration: 250; easing.type: Easing.OutCubic }
         }
         add: Transition {
             id: addTransition
+            enabled: animationsEnabled
             NumberAnimation { property: "y"; from: addTransition.ViewTransition.destination.y + dp(56); duration: 250; easing.type: Easing.OutCubic }
         }
         populate: Transition {
             id: populateTransition
+            enabled: animationsEnabled
             NumberAnimation { property: "y"; from: populateTransition.ViewTransition.destination.y + dp(56); duration: 250; easing.type: Easing.OutCubic }
         }
         remove: Transition {
+            enabled: animationsEnabled
             NumberAnimation { property: "opacity"; to: 0.0; duration: 250; easing.type: Easing.OutCubic }
         }
 
@@ -307,10 +315,12 @@ Item {
 
                         move: Transition
                         {
+                            enabled: animationsEnabled
                             NumberAnimation { properties: "y"; duration: 250; easing.type: Easing.OutCubic }
                         }
                         add: Transition
                         {
+                            enabled: animationsEnabled
                             NumberAnimation { property: "opacity"; from: 0; to: 1; duration: 250; easing.type: Easing.OutCubic }
                         }
                     }

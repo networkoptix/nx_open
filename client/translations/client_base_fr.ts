@@ -328,10 +328,6 @@ pour voir plus de signets</translation>
         <translation>Cacher IPS</translation>
     </message>
     <message>
-        <source>Ctrl+Alt+F</source>
-        <translation>Ctrl+Alt+F</translation>
-    </message>
-    <message>
         <source>Drop Resources</source>
         <translation>Déposer ressources</translation>
     </message>
@@ -344,24 +340,12 @@ pour voir plus de signets</translation>
         <translation>Mise en page suivante</translation>
     </message>
     <message>
-        <source>Ctrl+Tab</source>
-        <translation>Ctrl+Tab</translation>
-    </message>
-    <message>
         <source>Previous Layout</source>
         <translation>Mise en page précédente</translation>
     </message>
     <message>
-        <source>Ctrl+Shift+Tab</source>
-        <translation>Ctrl+Shift+Tab</translation>
-    </message>
-    <message>
         <source>Select All</source>
         <translation>Sélectionner tous</translation>
-    </message>
-    <message>
-        <source>Ctrl+A</source>
-        <translation>Ctrl+A</translation>
     </message>
     <message>
         <source>Selection Changed</source>
@@ -374,10 +358,6 @@ pour voir plus de signets</translation>
     <message>
         <source>Go to Freespace Mode</source>
         <translation>Passer en mode espace libre</translation>
-    </message>
-    <message>
-        <source>F11</source>
-        <translation>F11</translation>
     </message>
     <message>
         <source>Event Log...</source>
@@ -400,16 +380,8 @@ pour voir plus de signets</translation>
         <translation>Menu principal</translation>
     </message>
     <message>
-        <source>Alt+Space</source>
-        <translation>Alt+Espace</translation>
-    </message>
-    <message>
         <source>Connect to Server...</source>
         <translation>Connexion au serveur...</translation>
-    </message>
-    <message>
-        <source>Ctrl+Shift+C</source>
-        <translation>Ctrl+Maj+C</translation>
     </message>
     <message>
         <source>New...</source>
@@ -432,20 +404,12 @@ pour voir plus de signets</translation>
         <translation>Nouvel Onglet</translation>
     </message>
     <message>
-        <source>Ctrl+T</source>
-        <translation>Ctrl+T</translation>
-    </message>
-    <message>
         <source>Window</source>
         <translation>Fenêtre</translation>
     </message>
     <message>
         <source>New Window</source>
         <translation>Nouvelle Fenêtre</translation>
-    </message>
-    <message>
-        <source>Ctrl+N</source>
-        <translation>Ctrl+N</translation>
     </message>
     <message>
         <source>User...</source>
@@ -472,10 +436,6 @@ pour voir plus de signets</translation>
         <translation>Fichier(s)...</translation>
     </message>
     <message>
-        <source>Ctrl+O</source>
-        <translation>Ctrl+O</translation>
-    </message>
-    <message>
         <source>Layout(s)...</source>
         <translation>Mise(s) en page...</translation>
     </message>
@@ -488,20 +448,8 @@ pour voir plus de signets</translation>
         <translation>Sauvegarder la mise en page actuelle</translation>
     </message>
     <message>
-        <source>Ctrl+S</source>
-        <translation>Ctrl+S</translation>
-    </message>
-    <message>
         <source>Save Current Layout As...</source>
         <translation>Sauvegarder la mise en page sous...</translation>
-    </message>
-    <message>
-        <source>Ctrl+Shift+S</source>
-        <translation>Ctrl+Maj+S</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+S</source>
-        <translation>Ctrl+Alt+S</translation>
     </message>
     <message>
         <source>Save Video Wall View</source>
@@ -516,32 +464,12 @@ pour voir plus de signets</translation>
         <translation>Arrêter l&apos;enregistrement d&apos;écran</translation>
     </message>
     <message>
-        <source>Alt+R</source>
-        <translation>Alt+R</translation>
-    </message>
-    <message>
         <source>Go to Fullscreen</source>
         <translation>Aller en plein écran</translation>
     </message>
     <message>
         <source>Exit Fullscreen</source>
         <translation>Quitter plein écran</translation>
-    </message>
-    <message>
-        <source>Ctrl+F</source>
-        <translation>Ctrl+F</translation>
-    </message>
-    <message>
-        <source>Alt+Enter</source>
-        <translation>Alt+Entrer</translation>
-    </message>
-    <message>
-        <source>Alt+Return</source>
-        <translation>Alt+Retour</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+T</source>
-        <translation>Ctrl+Alt+T</translation>
     </message>
     <message>
         <source>Disable Background Animation</source>
@@ -552,20 +480,12 @@ pour voir plus de signets</translation>
         <translation>Activer l&apos;Animation de Fond</translation>
     </message>
     <message>
-        <source>Esc</source>
-        <translation>Échap</translation>
-    </message>
-    <message>
         <source>Minimize</source>
         <translation>Minimiser</translation>
     </message>
     <message>
         <source>Maximize</source>
         <translation>Maximiser</translation>
-    </message>
-    <message>
-        <source>Ctrl+P</source>
-        <translation>Ctrl+P</translation>
     </message>
     <message>
         <source>About...</source>
@@ -576,16 +496,8 @@ pour voir plus de signets</translation>
         <translation>Quitter</translation>
     </message>
     <message>
-        <source>Alt+F4</source>
-        <translation>Alt+F4</translation>
-    </message>
-    <message>
         <source>Close</source>
         <translation>Fermer</translation>
-    </message>
-    <message>
-        <source>Ctrl+W</source>
-        <translation>Ctrl+W</translation>
     </message>
     <message>
         <source>Close All But This</source>
@@ -604,20 +516,8 @@ pour voir plus de signets</translation>
         <translation>Ouvrir le dossier contenant</translation>
     </message>
     <message>
-        <source>Ctrl+Enter</source>
-        <translation>Ctrl+Enter</translation>
-    </message>
-    <message>
-        <source>Ctrl+Return</source>
-        <translation>Ctrl+Return</translation>
-    </message>
-    <message>
         <source>Open Layouts</source>
         <translation>Ouvrir les mises en page</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+D</source>
-        <translation>Ctrl+Alt+D</translation>
     </message>
     <message>
         <source>Delayed Open Video Wall</source>
@@ -630,10 +530,6 @@ pour voir plus de signets</translation>
     <message>
         <source>System Administration...</source>
         <translation>Administration Système...</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+A</source>
-        <translation>Ctrl+Alt+A</translation>
     </message>
     <message>
         <source>System Update...</source>
@@ -704,14 +600,6 @@ pour voir plus de signets</translation>
         <translation>Maximiser l&apos;élément</translation>
     </message>
     <message>
-        <source>Enter</source>
-        <translation>Entrer</translation>
-    </message>
-    <message>
-        <source>Return</source>
-        <translation>Retour</translation>
-    </message>
-    <message>
         <source>Restore Item</source>
         <translation>Restaurer l&apos;élément</translation>
     </message>
@@ -722,10 +610,6 @@ pour voir plus de signets</translation>
     <message>
         <source>Show Motion/Smart Search</source>
         <translation>Afficher la recherche Mouvement/Intelligente</translation>
-    </message>
-    <message>
-        <source>Alt+G</source>
-        <translation>Alt+G</translation>
     </message>
     <message>
         <source>Hide Motion/Smart Search</source>
@@ -744,16 +628,8 @@ pour voir plus de signets</translation>
         <translation>Vérifiez le filigrane du fichier</translation>
     </message>
     <message>
-        <source>Alt+C</source>
-        <translation>Alt+C</translation>
-    </message>
-    <message>
         <source>Take Screenshot</source>
         <translation>Prendre une capture d&apos;écran</translation>
-    </message>
-    <message>
-        <source>Alt+S</source>
-        <translation>Alt+S</translation>
     </message>
     <message>
         <source>Rotate to...</source>
@@ -780,24 +656,12 @@ pour voir plus de signets</translation>
         <translation>Retirer de la mise en page</translation>
     </message>
     <message>
-        <source>Del</source>
-        <translation>Supp</translation>
-    </message>
-    <message>
         <source>Delete</source>
         <translation>Supprimer</translation>
     </message>
     <message>
         <source>Rename</source>
         <translation>Renommer</translation>
-    </message>
-    <message>
-        <source>F2</source>
-        <translation>F2</translation>
-    </message>
-    <message>
-        <source>Alt+T</source>
-        <translation>Alt+T</translation>
     </message>
     <message>
         <source>Delete from Disk</source>
@@ -836,16 +700,8 @@ pour voir plus de signets</translation>
         <translation>Marquer la sélection de début</translation>
     </message>
     <message>
-        <source>[</source>
-        <translation>[</translation>
-    </message>
-    <message>
         <source>Mark Selection End</source>
         <translation>Marquer la sélection de fin</translation>
-    </message>
-    <message>
-        <source>]</source>
-        <translation>]</translation>
     </message>
     <message>
         <source>Clear Selection</source>
@@ -866,22 +722,6 @@ pour voir plus de signets</translation>
     <message>
         <source>Hide Thumbnails</source>
         <translation>Cacher les miniatures</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift++</source>
-        <translation>Ctrl+Alt+Shift++</translation>
-    </message>
-    <message>
-        <source>Increment Debug Counter</source>
-        <translation>Incrémenter compteur de débogage</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift+-</source>
-        <translation>Ctrl+Alt+Shift+-</translation>
-    </message>
-    <message>
-        <source>Decrement Debug Counter</source>
-        <translation>Décrémenter compteur de débogage</translation>
     </message>
     <message>
         <source>Monitor</source>
@@ -912,80 +752,36 @@ pour voir plus de signets</translation>
         <translation>Arrêter le tour</translation>
     </message>
     <message>
-        <source>Space</source>
-        <translation>Espace</translation>
-    </message>
-    <message>
-        <source>Ctrl+Left</source>
-        <translation>Ctrl+Gauche</translation>
-    </message>
-    <message>
         <source>Previous Frame</source>
         <translation>Image précédente</translation>
-    </message>
-    <message>
-        <source>Ctrl+Right</source>
-        <translation>Ctrl+Droite</translation>
     </message>
     <message>
         <source>Next Frame</source>
         <translation>Image suivante</translation>
     </message>
     <message>
-        <source>Z</source>
-        <translation>Z</translation>
-    </message>
-    <message>
         <source>To Start</source>
         <translation>Pour Démarrer</translation>
-    </message>
-    <message>
-        <source>X</source>
-        <translation>X</translation>
     </message>
     <message>
         <source>To End</source>
         <translation>Pour Terminer</translation>
     </message>
     <message>
-        <source>Ctrl+Down</source>
-        <translation>Ctrl+Bas</translation>
-    </message>
-    <message>
         <source>Volume Down</source>
         <translation>Baisser le volume</translation>
-    </message>
-    <message>
-        <source>Ctrl+Up</source>
-        <translation>Ctrl+Haut</translation>
     </message>
     <message>
         <source>Volume Up</source>
         <translation>Monter le volume</translation>
     </message>
     <message>
-        <source>M</source>
-        <translation>M</translation>
-    </message>
-    <message>
         <source>Toggle Mute</source>
         <translation>Basculer Sourdine</translation>
     </message>
     <message>
-        <source>L</source>
-        <translation>L</translation>
-    </message>
-    <message>
         <source>Jump to Live</source>
         <translation>Aller en direct</translation>
-    </message>
-    <message>
-        <source>S</source>
-        <translation>S</translation>
-    </message>
-    <message>
-        <source>F1</source>
-        <translation>F1</translation>
     </message>
     <message>
         <source>Play</source>
@@ -1028,10 +824,6 @@ pour voir plus de signets</translation>
         <translation>Afficher les infos</translation>
     </message>
     <message>
-        <source>Alt+I</source>
-        <translation>Alt+I</translation>
-    </message>
-    <message>
         <source>Hide Info</source>
         <translation>Cacher les infos</translation>
     </message>
@@ -1058,18 +850,6 @@ pour voir plus de signets</translation>
     <message>
         <source>Export Multi-Video...</source>
         <translation>Exporter Multi-Vidéo...</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift+R</source>
-        <translation>Ctrl+Alt+Shift+R</translation>
-    </message>
-    <message>
-        <source>Show Resource Pool</source>
-        <translation>Afficher le pool Ressource</translation>
-    </message>
-    <message>
-        <source>Get PTZ Position</source>
-        <translation>Obtenir la position PTZ</translation>
     </message>
     <message>
         <source>Show Title Bar</source>
@@ -1116,10 +896,6 @@ pour voir plus de signets</translation>
         <translation>Règles Alarme/Événement...</translation>
     </message>
     <message>
-        <source>Ctrl+E</source>
-        <translation>Ctrl+E</translation>
-    </message>
-    <message>
         <source>Change Resolution...</source>
         <translation>Modifier la résolution...</translation>
     </message>
@@ -1164,18 +940,6 @@ pour voir plus de signets</translation>
         <translation>Paramètres de la mise en page...</translation>
     </message>
     <message>
-        <source>Ctrl+L</source>
-        <translation>Ctrl+L</translation>
-    </message>
-    <message>
-        <source>Ctrl+M</source>
-        <translation>Ctrl+M</translation>
-    </message>
-    <message>
-        <source>Alt+J</source>
-        <translation>Alt+J</translation>
-    </message>
-    <message>
         <source>Create Zoom Window</source>
         <translation>Créer une fenêtre zoom</translation>
     </message>
@@ -1190,10 +954,6 @@ pour voir plus de signets</translation>
     <message>
         <source>Server Diagnostics...</source>
         <translation>Diagnostics Serveur...</translation>
-    </message>
-    <message>
-        <source>Calibrate PTZ</source>
-        <translation>Calibration PTZ</translation>
     </message>
     <message>
         <source>Pin Notifications</source>
@@ -1259,14 +1019,6 @@ pour voir plus de signets</translation>
     <message>
         <source>Zoom to Selection</source>
         <translation>Zoom sur la sélection</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift+D</source>
-        <translation>Ctrl+Alt+Maj+D</translation>
-    </message>
-    <message>
-        <source>Debug Control Panel</source>
-        <translation>Panneau de configuration &apos;Debug&apos;</translation>
     </message>
     <message>
         <source>File Settings...</source>
@@ -1387,10 +1139,6 @@ pour voir plus de signets</translation>
     <message>
         <source>Cameras to Backup...</source>
         <translation>Caméras à sauvegarder...</translation>
-    </message>
-    <message>
-        <source>Ctrl+B</source>
-        <translation>Ctrl+B</translation>
     </message>
     <message>
         <source>Show Bookmarks</source>

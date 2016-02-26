@@ -170,8 +170,8 @@
 
     <form class="form row" role="form" name="systemSettings" novalidate >
         <div class="form-group" ng-repeat="(setting,value) in systemSettings">
-            <label class="col-sm-4" for="{{setting}}">{{settingsConfig[setting].label}}</label>
-            <div class="col-sm-8">
+            <label class="col-sm-6" for="{{setting}}">{{settingsConfig[setting].label}}</label>
+            <div class="col-sm-6">
                 <input ng-if="settingsConfig[setting].type == 'checkbox' " type="checkbox"
                        style="height: 22px"
                        id="{{setting}}"

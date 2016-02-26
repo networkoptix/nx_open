@@ -1,6 +1,8 @@
 
 #include "statistics_manager.h"
 
+#include <QtCore/QTimer>
+
 #include <utils/common/model_functions.h>
 #include <common/common_module.h>
 #include <api/global_settings.h>
@@ -81,10 +83,10 @@ namespace
         return std::any_of(filters.cbegin(), filters.cend(), matchFilter);
     }
 
-    QnMetricsHash filteredMetrics(const QnMetricsHash &source
+    QnStatisticValuesHash filteredMetrics(const QnStatisticValuesHash &source
         , const QnStringsSet &filters)
     {
-        QnMetricsHash result;
+        QnStatisticValuesHash result;
         for (auto it = source.cbegin(); it != source.cend(); ++it)
         {
             const auto metricAlias = it.key();
@@ -114,12 +116,18 @@ namespace
 
 QnStatisticsManager::QnStatisticsManager(QObject *parent)
     : base_type(parent)
+    , m_updateSettingsTimer(new QTimer())
     , m_clientId()
     , m_handle()
     , m_settings()
     , m_storage()
     , m_modules()
-{}
+{
+    enum { kUpdatePeriodMs = 4 * 60 * 60 * 1000 };  // every 4 hours
+    m_updateSettingsTimer->setSingleShot(false);
+    m_updateSettingsTimer->setInterval(kUpdatePeriodMs);
+    m_updateSettingsTimer->start();
+}
 
 QnStatisticsManager::~QnStatisticsManager()
 {}
@@ -128,10 +136,7 @@ bool QnStatisticsManager::registerStatisticsModule(const QString &alias
     ,  QnAbstractStatisticsModule *module)
 {
     if (m_modules.contains(alias))
-    {
-        Q_ASSERT_X(false, Q_FUNC_INFO, "Module has been registered already!");
         return false;
-    }
 
     m_modules.insert(alias, ModulePtr(module));
 
@@ -164,20 +169,42 @@ void QnStatisticsManager::setStorage(QnStatisticsStoragePtr storage)
 void QnStatisticsManager::setSettings(QnStatisticsSettingsPtr settings)
 {
     if (m_settings)
+    {
         disconnect(m_settings.get(), nullptr, this, nullptr);
+        disconnect(m_updateSettingsTimer, nullptr, this, nullptr);
+    }
 
     m_settings = std::move(settings);
+    if (!m_settings)
+        return;
+
+    connect(m_updateSettingsTimer, &QTimer::timeout, m_settings.get(), [this]()
+    {
+        if (qnGlobalSettings->isStatisticsAllowed() && m_settings)
+            m_settings->updateSettings();
+    });
+
+    connect(m_settings.get(), &QnAbstractStatisticsSettingsLoader::settingsAvailableChanged
+        , this, [this]()
+    {
+        if (m_settings->settingsAvailable())
+            sendStatistics();
+
+        m_updateSettingsTimer->start();
+    });
+
+    if (!qnGlobalSettings->isStatisticsAllowed())
+        return;
 
     if (m_settings->settingsAvailable())
         sendStatistics();
-
-    connect(m_settings.get(), &QnAbstractStatisticsSettingsLoader::settingsAvailableChanged
-        , this, &QnStatisticsManager::sendStatistics);
+    else
+        m_settings->updateSettings();
 }
 
-QnMetricsHash QnStatisticsManager::getMetrics() const
+QnStatisticValuesHash QnStatisticsManager::getValues() const
 {
-    QnMetricsHash result;
+    QnStatisticValuesHash result;
     for (auto it = m_modules.cbegin(); it != m_modules.cend(); ++it)
     {
         const auto moduleAlias = it.key();
@@ -185,12 +212,12 @@ QnMetricsHash QnStatisticsManager::getMetrics() const
         if (!module)
             continue;
 
-        const auto data = module->metrics();
-        for (auto itData = data.cbegin(); itData != data.cend(); ++itData)
+        const auto values = module->values();
+        for (auto itValue = values.cbegin(); itValue != values.cend(); ++itValue)
         {
-            const auto subAlias = itData.key();
+            const auto subAlias = itValue.key();
             const auto fullAlias = lit("%1_%2").arg(moduleAlias, subAlias);
-            result.insert(fullAlias, itData.value());
+            result.insert(fullAlias, itValue.value());
         }
     }
     return result;
@@ -199,9 +226,14 @@ QnMetricsHash QnStatisticsManager::getMetrics() const
 void QnStatisticsManager::sendStatistics()
 {
     if (!m_settings || !m_storage || m_handle
-        || !m_settings->settingsAvailable()
         || !qnGlobalSettings->isStatisticsAllowed())
     {
+        return;
+    }
+
+    if (!m_settings->settingsAvailable())
+    {
+        m_settings->updateSettings();
         return;
     }
 
@@ -218,11 +250,11 @@ void QnStatisticsManager::sendStatistics()
         ? timeStamp - kMsInDay * settings.storeDays
         : getLastSentTime(m_storage));
 
-    enum { kMinSendPeriodMs = 1 * 1000};   // TODO: change to appropriate value _ don't forget
     const auto msSinceSent = (timeStamp > minTimeStampMs
         ? timeStamp - minTimeStampMs : 0);
 
-    if (!filtersChanged && (msSinceSent < kMinSendPeriodMs))
+    enum { kMsInSec = 1000 };
+    if (!filtersChanged && (msSinceSent < settings.minSendPeriodSecs * kMsInSec))
         return;
 
     const auto totalMetricsList = m_storage->getMetricsList(
@@ -268,6 +300,7 @@ void QnStatisticsManager::sendStatistics()
     };
 
     QnSendStatisticsRequestData request;
+    request.statisticsServerUrl = settings.statisticsServerUrl;
     request.metricsList = totalFiltered;
     m_handle = connection->sendStatisticsAsync(request, callback, QThread::currentThread());
 }
@@ -280,13 +313,7 @@ void QnStatisticsManager::saveCurrentStatistics()
     if (m_clientId.isNull())
         return;
 
-    auto metrics = getMetrics();
-
-    for(const auto module: m_modules)
-    {
-        if (module)
-            module->resetMetrics();
-    }
+    auto metrics = getValues();
 
     if (metrics.empty())
         return;
@@ -302,6 +329,14 @@ void QnStatisticsManager::saveCurrentStatistics()
     m_storage->storeMetrics(metrics);
 }
 
+void QnStatisticsManager::resetStatistics()
+{
+    for(const auto module: m_modules)
+    {
+        if (module)
+            module->reset();
+    }
+}
 
 
 

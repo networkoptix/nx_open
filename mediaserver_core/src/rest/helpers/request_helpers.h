@@ -66,17 +66,23 @@ template<typename Context, typename CompletionFunc>
 void runMultiserverUploadRequest(QUrl url
     , const QByteArray &data
     , const QByteArray &contentType
+    , const QString &user
+    , const QString &password
     , const QnMediaServerResourcePtr &server
     , const CompletionFunc &completionFunc
     , Context *context)
 {
-    const auto downloadRequest = [completionFunc, data, contentType]
+    const auto downloadRequest = [completionFunc, data, contentType, user, password]
         (const QUrl &url, const nx_http::HttpHeaders &headers, Context *context)
     {
-        context->executeGuarded([url, data, completionFunc, headers, contentType, context]()
+        context->executeGuarded([url, data, completionFunc, headers
+            , contentType, context, user, password]()
         {
-            if (nx_http::uploadDataAsync(url, data, contentType, headers, completionFunc))
+            if (nx_http::uploadDataAsync(url, data, contentType
+                , user, password, headers, completionFunc))
+            {
                 context->incRequestsCount();
+            }
         });
     };
 

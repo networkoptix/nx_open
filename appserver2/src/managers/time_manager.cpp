@@ -326,7 +326,7 @@ namespace ec2
         quint64 checkSystemTimeTaskID = 0;
         {
             QnMutexLocker lk( &m_mutex );
-            m_terminated = false;
+            m_terminated = true;
 
             broadcastSysTimeTaskID = m_broadcastSysTimeTaskID;
             m_broadcastSysTimeTaskID = 0;
