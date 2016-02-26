@@ -8,8 +8,7 @@ ARCH = "${arch}"
 BOX = "${box}"
 BUILD_CONFIGURATION = "${build.configuration}"
 TARGET_DIRECTORY = "${libdir}"
-#RDEP_PATH = os.path.join(os.path.dirname(os.path.realpath("${environment.dir}")), "rdep")
-RDEP_PATH = os.path.join("c:\\develop\\devtools", "rdep")
+RDEP_PATH = os.path.join("${environment.dir}", "rdep")
 
 def make_list(string):
     return [v.strip() for v in string.split(',') if v]
