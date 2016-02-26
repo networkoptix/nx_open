@@ -145,7 +145,21 @@
                             </arguments>                                    
                             <workingDirectory>${project.build.directory}</workingDirectory>     
                         </configuration>
-                    </execution>                    
+                    </execution>  
+                    <execution>
+                        <id>get-rdep-artifacts</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${init.python.dir}/${python.executable}</executable>
+                            <arguments>
+                                <argument>${project.build.directory}/get_dependencies.py</argument>
+                            </arguments>                                    
+                            <workingDirectory>${project.build.directory}</workingDirectory>  
+                        </configuration>
+                    </execution>                     
                 </executions>
             </plugin>                   
         </plugins>      

@@ -7,7 +7,7 @@ sys.path.append(basedir + '/' + '../..')
 from main import get_environment_variable, cd
 
 def make_list(string):
-    return [v.strip() for v in string.split(',')]
+    return [v.strip() for v in string.split(',') if v]
 
 qtlibs = make_list("""${qtlibs}""") + make_list("""${additional.qtlibs}""")
 

@@ -165,6 +165,9 @@
         </qtplugins>
         <additional.qtplugins/>
 
+        <!-- List of commonly used RDep packages -->
+        <rdep.packages/>
+        
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>

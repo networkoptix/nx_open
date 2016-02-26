@@ -43,6 +43,8 @@
         <linux.defines/>
         <mac.defines/>
 
+        <rdep.packages>server-external-2.6.0</rdep.packages>
+        
     </properties>
 
     <dependencies>
@@ -167,30 +169,7 @@
                                 <argument>${project.build.directory}/additional-resources/static/api.xml</argument>
                             </arguments>
                         </configuration>
-                    </execution>
-                    <execution>
-                        <id>get-rdep-artifacts</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>python</executable>
-                            <arguments>
-                                <argument>${environment.dir}/rdep/rdep.py</argument>
-                                <argument>--copy-to</argument>
-                                <argument>${libdir}</argument>
-                                <argument>--platform</argument>
-                                <argument>${platform}</argument>
-                                <argument>--arch</argument>
-                                <argument>${arch}</argument>
-                                <argument>--box</argument>
-                                <argument>${box}</argument>
-                                <!--> List of required packages </!-->
-                                <argument>server-external-2.6.0</argument>
-                            </arguments>
-                        </configuration>
-                    </execution>                     
+                    </execution>                   
                 </executions>
             </plugin>
         </plugins>
