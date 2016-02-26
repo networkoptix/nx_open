@@ -15,6 +15,13 @@ angular.module('webadminApp')
                     email: email,
                     password: password
                 });
+            },
+            disconnect:function(systemName, email, password){
+                return $http.post(Config.cloud.apiUrl + '/systems/disconnect',{
+                    name: systemName,
+                    email: email,
+                    password: password
+                });
             }
         };
     });

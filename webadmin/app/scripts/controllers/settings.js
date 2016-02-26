@@ -194,10 +194,10 @@ angular.module('webadminApp')
 
         function openCloudDialog(connect){
             $modal.open({
-                templateUrl: 'views/cloudDialog.html',
+                templateUrl: 'views/dialogs/cloudDialog.html',
                 controller: 'CloudDialogCtrl',
                 backdrop:'static',
-                size:'lg',
+                size:'sm',
                 keyboard:false,
                 resolve:{
                     connect:function(){
@@ -206,11 +206,14 @@ angular.module('webadminApp')
                     systemName:function(){
                         return $scope.settings.systemName;
                     },
+                    cloudAccountName:function(){
+                        return $scope.cloudAccountName;
+                    },
                     cloudSystemID:function(){
                         return $scope.cloudSystemID;
                     }
                 }
-            }).finally(function(){
+            }).result.finally(function(){
                 window.location.reload();
             });
         }
