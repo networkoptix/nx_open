@@ -35,6 +35,18 @@ int QnMultiserverThumbnailRestHandler::executeGet( const QString& path, const Qn
 {
     Q_UNUSED(path);
     auto request = QnMultiserverRequestData::fromParams<QnThumbnailRequestData>(params);
+
+    if (request.camera && !request.camera->hasVideo(nullptr))
+    {
+        return genericError(
+            nx_http::StatusCode::badRequest
+            , lit("Camera has no video")
+            , result
+            , contentType
+            , request.format
+            , request.extraFormatting);
+    }
+
     if (!request.isValid())
     {
         return genericError(
