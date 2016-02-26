@@ -5,8 +5,8 @@
 QnMobileClientTranslationManager::QnMobileClientTranslationManager(QObject *parent) :
     base_type(parent)
 {
-    addPrefix(lit("base"));
-    addPrefix(lit("qml"));
+    addPrefix(lit("mobile_client_base"));
+    addPrefix(lit("mobile_client_qml"));
 }
 
 QnMobileClientTranslationManager::~QnMobileClientTranslationManager()
