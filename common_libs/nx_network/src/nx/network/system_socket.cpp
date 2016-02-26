@@ -1216,14 +1216,12 @@ class TCPServerSocketPrivate
 {
 public:
     int socketHandle;
-    aio::AsyncServerSocketHelper<Pollable> asyncServerSocketHelper;
+    aio::AsyncServerSocketHelper<TCPServerSocket> asyncServerSocketHelper;
 
-    TCPServerSocketPrivate(
-        Socket<AbstractStreamServerSocket>* sock,
-        AbstractStreamServerSocket* abstractSock)
+    TCPServerSocketPrivate(TCPServerSocket* sock)
     :
         socketHandle( -1 ),
-        asyncServerSocketHelper(sock, abstractSock)
+        asyncServerSocketHelper(sock)
     {
     }
 
@@ -1256,7 +1254,7 @@ TCPServerSocket::TCPServerSocket()
     base_type(
         SOCK_STREAM,
         IPPROTO_TCP,
-        new TCPServerSocketPrivate( this, this ) )
+        new TCPServerSocketPrivate(this))
 {
     static_cast<TCPServerSocketPrivate*>(impl())->socketHandle = handle();
 }
@@ -1312,17 +1310,22 @@ void TCPServerSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandl
 //!Implementation of AbstractStreamServerSocket::accept
 AbstractStreamSocket* TCPServerSocket::accept()
 {
+    return systemAccept();
+}
+
+AbstractStreamSocket* TCPServerSocket::systemAccept()
+{
     TCPServerSocketPrivate* d = static_cast<TCPServerSocketPrivate*>(impl());
 
     unsigned int recvTimeoutMs = 0;
-    if( !getRecvTimeout( &recvTimeoutMs ) )
+    if (!getRecvTimeout(&recvTimeoutMs))
         return nullptr;
 
     bool nonBlockingMode = false;
-    if( !getNonBlockingMode(&nonBlockingMode) )
+    if (!getNonBlockingMode(&nonBlockingMode))
         return nullptr;
 
-    return d->accept( recvTimeoutMs, nonBlockingMode );
+    return d->accept(recvTimeoutMs, nonBlockingMode);
 }
 
 bool TCPServerSocket::setListen(int queueLen)

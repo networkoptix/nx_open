@@ -327,6 +327,8 @@ public:
             SystemError::ErrorCode,
             AbstractStreamSocket*)> handler) override;
 
+    AbstractStreamSocket* systemAccept();
+
 private:
     bool setListen(int queueLen);
 };

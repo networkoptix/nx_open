@@ -450,7 +450,7 @@ void socketAcceptTimeoutSync(
     const auto start = std::chrono::system_clock::now();
     EXPECT_EQ(server->accept(), nullptr);
     EXPECT_EQ(SystemError::getLastOSErrorCode(), SystemError::timedOut);
-    EXPECT_TRUE(std::chrono::system_clock::now() - start < timeout * 2);
+    EXPECT_LT(std::chrono::system_clock::now() - start, timeout * 2);
 }
 
 template<typename ServerSocketMaker>

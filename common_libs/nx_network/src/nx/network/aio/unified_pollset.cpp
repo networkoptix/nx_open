@@ -371,13 +371,16 @@ bool UnifiedPollSet::removeSocket(
         return true;
     }
 
-    if (addToPollSet(m_epollFd, handle, &newEventMask) != 0)
-    {
-        socketDictionary->erase(it);
-        SystemError::setLastErrorCode(
-            detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
-        return false;
-    }
+    //ignoring error since for udt sockets it fails if unrecoverable error happended to socket
+        //TODO #ak But, this is, of course, not correct. MUST fix! Most likely, it will required AioThread modifications
+    addToPollSet(m_epollFd, handle, &newEventMask);
+    //if (addToPollSet(m_epollFd, handle, &newEventMask) != 0)
+    //{
+    //    socketDictionary->erase(it);
+    //    SystemError::setLastErrorCode(
+    //        detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+    //    return false;
+    //}
 
     it->second.eventMask = newEventMask;
     return true;
