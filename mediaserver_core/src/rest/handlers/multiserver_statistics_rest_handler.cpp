@@ -62,6 +62,74 @@ namespace
     };
 }
 
+namespace
+{
+    class SettingsCache
+    {
+    public:
+        static void update(const QnStatisticsSettings &settings);
+
+        static void clear();
+
+        static bool copyTo(QnStatisticsSettings &output);
+
+    private:
+        SettingsCache();
+
+        static SettingsCache &instance();
+
+    private:
+        typedef QScopedPointer<QnStatisticsSettings> SettingsPtr;
+
+        QMutex m_mutex;
+        QElapsedTimer m_timer;
+        SettingsPtr m_settings;
+    };
+
+    SettingsCache::SettingsCache()
+        : m_mutex()
+        , m_timer()
+        , m_settings()
+    {
+        m_timer.start();
+    }
+
+    SettingsCache &SettingsCache::instance()
+    {
+        static SettingsCache inst;
+        return inst;
+    }
+
+    void SettingsCache::update(const QnStatisticsSettings &settings)
+    {
+        const QMutexLocker guard(&instance().m_mutex);
+        instance().m_timer.restart();
+        instance().m_settings.reset(new QnStatisticsSettings(settings));
+    }
+
+    void SettingsCache::clear()
+    {
+        const QMutexLocker guard(&instance().m_mutex);
+        instance().m_timer.restart();
+        instance().m_settings.reset();
+    }
+
+    bool SettingsCache::copyTo(QnStatisticsSettings &output)
+    {
+        const QMutexLocker guard(&instance().m_mutex);
+
+        enum { kMinSettingsUpdateTime = 4 * 60 * 60 * 1000 }; // every 4 hours
+
+        auto &settings = instance().m_settings;
+        auto &timer = instance().m_timer;
+        if (!settings || timer.hasExpired(kMinSettingsUpdateTime))
+            return false;
+
+        output = *settings;
+        return true;
+    }
+}
+
 const QString QnMultiserverStatisticsRestHandler::kSettingsUrlParam = lit("clientStatisticsSettingsUrl");
 
 class StatisticsActionHandler
@@ -209,21 +277,11 @@ nx_http::StatusCode::Value SettingsActionHandler::loadSettingsLocally(QnStatisti
             ? kSettingsUrl : localSettingsUrl);
     }();
 
-    typedef QScopedPointer<QnStatisticsSettings> SettingsPtr;
-    static SettingsPtr settingsCache;
-    static QElapsedTimer outdateTimer;
-
-    if (!outdateTimer.isValid())
-        outdateTimer.start();
-
-    enum { kMinSettingsUpdateTime = 4 * 60 * 60 * 1000 }; // every 4 hours
-    if (!outdateTimer.hasExpired(kMinSettingsUpdateTime) && settingsCache)
-    {
-        outputSettings = *settingsCache;
+    if (SettingsCache::copyTo(outputSettings))
         return nx_http::StatusCode::ok;
-    };
 
-    settingsCache.reset();
+    SettingsCache::clear();
+
     nx_http::BufferType buffer;
     int statusCode = nx_http::StatusCode::noContent;
     if (nx_http::downloadFileSync(settingsUrl, &statusCode, &buffer) != SystemError::noError)
@@ -232,8 +290,7 @@ nx_http::StatusCode::Value SettingsActionHandler::loadSettingsLocally(QnStatisti
     if (!QJson::deserialize(buffer, &outputSettings))
         return nx_http::StatusCode::internalServerError;
 
-    outdateTimer.restart();
-    settingsCache.reset(new QnStatisticsSettings(outputSettings));
+    SettingsCache::update(outputSettings);
     return nx_http::StatusCode::ok;
 }
 
