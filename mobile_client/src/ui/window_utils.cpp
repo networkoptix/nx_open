@@ -1,5 +1,17 @@
 #include "window_utils.h"
 
+#include <QtGui/QGuiApplication>
+#include <QtGui/QWindow>
+
+QWindow *getMainWindow()
+{
+    QWindowList windows = qApp->topLevelWindows();
+    if (windows.size() != 1)
+        return nullptr;
+
+    return windows.first();
+}
+
 #if !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
 
 void prepareWindow() {}
@@ -25,3 +37,12 @@ void setKeepScreenOn(bool keepScreenOn) {
 }
 
 #endif
+
+void setScreenOrientation(Qt::ScreenOrientation orientation)
+{
+    QWindow *window = getMainWindow();
+    if (!window)
+        return;
+
+    window->reportContentOrientationChange(orientation);
+}
