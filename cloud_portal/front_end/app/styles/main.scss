@@ -219,6 +219,10 @@ footer .nav > li > a{
   font-size: 90%;
 }
 
+a .product-name:after {
+  color: $link-color;
+}
+
 
 .inline-block{
   display: inline-block;
