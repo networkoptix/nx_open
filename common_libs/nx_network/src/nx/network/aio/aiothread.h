@@ -176,7 +176,7 @@ public:
 
         //if socket is marked for removal, not adding task
         void* userData = sock->impl()->eventTypeToUserData[eventToWatch];
-        assert(userData != nullptr);  //socket is not polled, but someone wants to change timeout
+        NX_ASSERT(userData != nullptr);  //socket is not polled, but someone wants to change timeout
         if (static_cast<AIOEventHandlingDataHolder<SocketType>*>(userData)->data->markedForRemoval.load(std::memory_order_relaxed) > 0)
             return;   //socket marked for removal, ignoring timeout change (like, cancelling it right now)
 
@@ -213,7 +213,7 @@ public:
             return;    //ignoring task
 
         void*& userData = sock->impl()->eventTypeToUserData[eventType];
-        Q_ASSERT(userData != NULL);   //socket is not polled. assert?
+        NX_ASSERT(userData != NULL);   //socket is not polled. NX_ASSERT?
         std::shared_ptr<AIOEventHandlingData<SocketType>> handlingData = static_cast<AIOEventHandlingDataHolder<SocketType>*>(userData)->data;
         if (handlingData->markedForRemoval.load(std::memory_order_relaxed) > 0)
             return;   //socket already marked for removal
@@ -655,8 +655,8 @@ public:
 
                 case TaskType::tCallFunc:
                 {
-                    assert(task.postHandler);
-                    assert(!task.taskCompletionEvent && !task.taskCompletionHandler);
+                    NX_ASSERT(task.postHandler);
+                    NX_ASSERT(!task.taskCompletionEvent && !task.taskCompletionHandler);
                     postedCalls.push_back(std::move(task));
                     //this task differs from every else in a way that it is not processed here, 
                         //just moved to another container. TODO #ak is it really needed to move to another container?
@@ -683,7 +683,7 @@ public:
                 }
 
                 default:
-                    assert(false);
+                    NX_ASSERT(false);
             }
             if (task.taskCompletionEvent)
                 task.taskCompletionEvent->store(1, std::memory_order_relaxed);
@@ -781,7 +781,7 @@ public:
                     continue;   //event handler changed, cannot ignore task
                                 //cancelling remove task
                 void* userData = sock->impl()->eventTypeToUserData[eventType];
-                Q_ASSERT(userData);
+                NX_ASSERT(userData);
                 static_cast<AIOEventHandlingDataHolder<SocketType>*>(userData)->data->timeout = newTimeoutMS;
                 static_cast<AIOEventHandlingDataHolder<SocketType>*>(userData)->data->markedForRemoval.store(0);
 
@@ -802,7 +802,7 @@ public:
                 {
                     if (it->socket == sock && it->eventType == eventType)
                     {
-                        assert(it->type == TaskType::tChangingTimeout);
+                        NX_ASSERT(it->type == TaskType::tChangingTimeout);
                         it = pollSetModificationQueue.erase(it);
                     }
                 }

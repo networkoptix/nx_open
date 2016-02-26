@@ -120,7 +120,7 @@ namespace nx_http
     */
     void AsyncHttpClient::doGet( const QUrl& url )
     {
-        Q_ASSERT( url.isValid() );
+        NX_ASSERT( url.isValid() );
 
         resetDataBeforeNewRequest();
         m_url = url;
@@ -133,7 +133,7 @@ namespace nx_http
         const nx_http::StringType& contentType,
         nx_http::StringType messageBody)
     {
-        Q_ASSERT(url.isValid());
+        NX_ASSERT(url.isValid());
 
         resetDataBeforeNewRequest();
         m_url = url;
@@ -151,7 +151,7 @@ namespace nx_http
         const nx_http::StringType& contentType,
         nx_http::StringType messageBody )
     {
-        Q_ASSERT(url.isValid());
+        NX_ASSERT(url.isValid());
 
         resetDataBeforeNewRequest();
         m_url = url;
@@ -271,11 +271,11 @@ namespace nx_http
         if( m_terminated )
             return;
 
-        Q_ASSERT( sock == m_socket.data() );
+        NX_ASSERT( sock == m_socket.data() );
 
         if( m_state != sWaitingConnectToHost )
         {
-            Q_ASSERT( false );
+            NX_ASSERT( false );
             return;
         }
 
@@ -315,11 +315,11 @@ namespace nx_http
         if( m_terminated )
             return;
 
-        Q_ASSERT( sock == m_socket.data() );
+        NX_ASSERT( sock == m_socket.data() );
 
         if( m_state != sSendingRequest )
         {
-            Q_ASSERT( false );
+            NX_ASSERT( false );
             return;
         }
 
@@ -375,7 +375,7 @@ namespace nx_http
         if( m_terminated )
             return;
 
-        Q_ASSERT( sock == m_socket.data() );
+        NX_ASSERT( sock == m_socket.data() );
 
         if( errorCode != SystemError::noError )
         {
@@ -530,7 +530,7 @@ namespace nx_http
                 }
 
                 //message body has been received with request
-                assert( m_httpStreamReader.state() == HttpStreamReader::messageDone || m_httpStreamReader.state() == HttpStreamReader::parseError );
+                NX_ASSERT( m_httpStreamReader.state() == HttpStreamReader::messageDone || m_httpStreamReader.state() == HttpStreamReader::parseError );
 
                 m_state = m_httpStreamReader.state() == HttpStreamReader::parseError ? sFailed : sDone;
                 lk.unlock();
@@ -569,7 +569,7 @@ namespace nx_http
 
             default:
             {
-                Q_ASSERT( false );
+                NX_ASSERT( false );
                 break;
             }
         }
@@ -692,7 +692,7 @@ namespace nx_http
             return bytesRead;
         }
 
-        Q_ASSERT( m_httpStreamReader.currentMessageNumber() <= m_awaitedMessageNumber );
+        NX_ASSERT( m_httpStreamReader.currentMessageNumber() <= m_awaitedMessageNumber );
         if( m_httpStreamReader.currentMessageNumber() < m_awaitedMessageNumber )
             return bytesRead;   //reading some old message, not changing state in this case
 
@@ -796,7 +796,7 @@ namespace nx_http
     bool AsyncHttpClient::resendRequestWithAuthorization( const nx_http::Response& response )
     {
         //if response contains WWW-Authenticate with Digest authentication, generating "Authorization: Digest" header and adding it to custom headers
-        Q_ASSERT( response.statusLine.statusCode == StatusCode::unauthorized );
+        NX_ASSERT( response.statusLine.statusCode == StatusCode::unauthorized );
 
         HttpHeaders::const_iterator wwwAuthenticateIter = response.headers.find( "WWW-Authenticate" );
         if( wwwAuthenticateIter == response.headers.end() )

@@ -45,7 +45,7 @@ StreamingChunkCacheKey::StreamingChunkCacheKey(
     m_isLive( false )
     //,m_auxiliaryParams( auxiliaryParams )
 {
-    Q_ASSERT( !containerFormat.isEmpty() );
+    NX_ASSERT( !containerFormat.isEmpty() );
 
     std::multimap<QString, QString>::const_iterator it = auxiliaryParams.find( StreamingParams::VIDEO_CODEC_PARAM_NAME );
     if( it != auxiliaryParams.end() )

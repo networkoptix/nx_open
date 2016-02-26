@@ -187,7 +187,7 @@ namespace nx_hls
                     m_chunks.pop_front();
                 }
 
-                Q_ASSERT( !m_chunks.empty() );
+                NX_ASSERT( !m_chunks.empty() );
 
                 while( !m_timestampToBlock.empty() && (m_timestampToBlock.front().second < m_chunks.front().startTimestamp) )
                 {

@@ -108,7 +108,7 @@ namespace nx_http
 
                 case depleteLineFeedBeforeBinaryData:
                 {
-                    assert( offset < data.size() );
+                    NX_ASSERT( offset < data.size() );
                     size_t bytesRead = 0;
                     m_lineSplitter.finishCurrentLineEnding( data.mid( offset ), &bytesRead );
                     offset += bytesRead;
@@ -118,7 +118,7 @@ namespace nx_http
 
                 case readingSizedBinaryData:
                 {
-                    assert( m_contentLength != (unsigned int)-1 );
+                    NX_ASSERT( m_contentLength != (unsigned int)-1 );
                     const size_t bytesToRead = std::min<size_t>( m_contentLength - m_currentFrame.size(), data.size()-offset );
                     m_currentFrame += data.mid( offset, bytesToRead );
                     offset += bytesToRead;

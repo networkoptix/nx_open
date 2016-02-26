@@ -8,6 +8,7 @@
 #include <cstring>
 
 #include <plugins/plugin_tools.h>
+#include <nx/utils/log/assert.h>
 
 
 MotionDataPicture::MotionDataPicture( nxcip::PixelFormat _pixelFormat )
@@ -19,7 +20,7 @@ MotionDataPicture::MotionDataPicture( nxcip::PixelFormat _pixelFormat )
     m_height( nxcip::DEFAULT_MOTION_DATA_PICTURE_WIDTH ),
     m_stride( 0 )
 {
-    assert( m_pixelFormat == nxcip::PIX_FMT_MONOBLACK || m_pixelFormat == nxcip::PIX_FMT_GRAY8 );
+    NX_ASSERT( m_pixelFormat == nxcip::PIX_FMT_MONOBLACK || m_pixelFormat == nxcip::PIX_FMT_GRAY8 );
 
     switch( m_pixelFormat )
     {

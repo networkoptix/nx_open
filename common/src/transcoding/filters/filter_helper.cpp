@@ -143,7 +143,7 @@ QList<QnAbstractImageFilterPtr> QnImageFilterHelper::createFilterChain(const QSi
 
         qreal resizeRatio = 1.0;
 
-        Q_ASSERT( resultResolution.width() > 0 && resultResolution.height() > 0 );
+        NX_ASSERT( resultResolution.width() > 0 && resultResolution.height() > 0 );
 
         if( resultResolution.width() > resolutionLimit.width() &&
             resultResolution.width() > 0 )

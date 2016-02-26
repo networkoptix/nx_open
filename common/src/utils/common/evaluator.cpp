@@ -23,7 +23,7 @@ namespace Qee {
         case Comma:     return lit("COMMA");
         case End:       return lit("END");
         case Invalid:   return lit("INVALID");
-        default:        assert(false); return QString();
+        default:        NX_ASSERT(false); return QString();
         }
     }
 
@@ -42,7 +42,7 @@ namespace Qee {
         case Call:      return lit("CALL");
         case MCall:     return lit("MCALL");
         case Nop:       return lit("NOP");
-        default:        assert(false); return QString();
+        default:        NX_ASSERT(false); return QString();
         }
     }
 
@@ -747,7 +747,7 @@ namespace Qee {
             call(stack, instruction);
             break;
         default:
-            assert(false);
+            NX_ASSERT(false);
         }
     }
 
@@ -778,7 +778,7 @@ namespace Qee {
         case Div:   return l / r;
         case And:   return l & r;
         case Or:    return l | r;
-        default:    assert(false); return 0;
+        default:    NX_ASSERT(false); return 0;
         }
     }
 
@@ -790,7 +790,7 @@ namespace Qee {
         case Div:   return l / r;
         case And:
         case Or:    throw IllegalArgumentException(lit("Invalid parameter type for operation %1('%2', '%2')").arg(serialized(op)).arg(lit("double")));
-        default:    assert(false); return 0;
+        default:    NX_ASSERT(false); return 0;
         }
     }
 
@@ -813,7 +813,7 @@ namespace Qee {
         case Neg:   return -v;
         case Udd:   return v;
         case Not:   return ~v;
-        default:    assert(false); return 0;
+        default:    NX_ASSERT(false); return 0;
         }
     }
 
@@ -822,7 +822,7 @@ namespace Qee {
         case Neg:   return -v;
         case Udd:   return v;
         case Not:   throw IllegalArgumentException(lit("Invalid parameter type for operation %1('%2')").arg(serialized(op)).arg(lit("double")));
-        default:    assert(false); return 0;
+        default:    NX_ASSERT(false); return 0;
         }
     }
 

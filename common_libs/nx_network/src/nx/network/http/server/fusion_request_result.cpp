@@ -85,7 +85,7 @@ nx_http::StatusCode::Value FusionRequestResult::httpStatusCode() const
         case FusionRequestErrorClass::internalError:
             return nx_http::StatusCode::internalServerError;
         default:
-            assert(false);
+            NX_ASSERT(false);
             return nx_http::StatusCode::internalServerError;
     }
 }

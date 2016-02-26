@@ -17,7 +17,7 @@ QnAbstractMediaStreamDataProvider::QnAbstractMediaStreamDataProvider(const QnRes
 {
     memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame));
     m_mediaResource = res;
-    Q_ASSERT(dynamic_cast<QnMediaResource*>(m_mediaResource.data()));
+    NX_ASSERT(dynamic_cast<QnMediaResource*>(m_mediaResource.data()));
     resetTimeCheck();
     m_isCamera = dynamic_cast<const QnPhysicalCameraResource*>(res.data()) != nullptr;
     //QnMediaResourcePtr mr = getResource().dynamicCast<QnMediaResource>();
@@ -120,7 +120,7 @@ bool QnAbstractMediaStreamDataProvider::afterGetData(const QnAbstractDataPacketP
         {
             if (videoData->channelNumber>CL_MAX_CHANNEL_NUMBER-1)
             {
-                Q_ASSERT(false);
+                NX_ASSERT(false);
                 return false;
             }
 
@@ -153,7 +153,7 @@ const QnMediaStreamStatistics* QnAbstractMediaStreamDataProvider::getStatistics(
 
 int QnAbstractMediaStreamDataProvider::getNumberOfChannels() const
 {
-    Q_ASSERT_X(m_numberOfchannels, Q_FUNC_INFO, "No channels?");
+    NX_ASSERT(m_numberOfchannels, Q_FUNC_INFO, "No channels?");
     return m_numberOfchannels ? m_numberOfchannels : 1;
 }
 

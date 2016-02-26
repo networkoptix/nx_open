@@ -29,7 +29,7 @@ namespace nx_http
                 std::unique_ptr<nx_http::AbstractMsgBodySource> )
             > completionHandler )
     {
-        assert( requestMsg.type == nx_http::MessageType::request );
+        NX_ASSERT( requestMsg.type == nx_http::MessageType::request );
 
         //creating response here to support pipelining
         Message responseMsg( MessageType::response );

@@ -4,6 +4,7 @@
 #include <database/server_db.h>
 
 #include "utils/common/synctime.h"
+#include <nx/utils/log/assert.h>
 
 namespace
 {
@@ -28,14 +29,15 @@ QnMServerAuditManager::~QnMServerAuditManager()
 int QnMServerAuditManager::addAuditRecordInternal(const QnAuditRecord& record)
 {
     if (record.isLoginType())
-        Q_ASSERT(record.resources.empty());
+        NX_ASSERT(record.resources.empty());
+
     return qnServerDb->addAuditRecord(filteredRecord(record));
 }
 
 int QnMServerAuditManager::updateAuditRecordInternal(int internalId, const QnAuditRecord& record)
 {
     if (record.isLoginType())
-        Q_ASSERT(record.resources.empty());
+        NX_ASSERT(record.resources.empty());
 
     return qnServerDb->updateAuditRecord(internalId, filteredRecord(record));
 }

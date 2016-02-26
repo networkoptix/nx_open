@@ -76,7 +76,7 @@ namespace nx_http
             stree::ResourceContainer&& authInfo,
             CompletionFuncRefType&& completionFunc )
         {
-            assert( message.type == nx_http::MessageType::request );
+            NX_ASSERT( message.type == nx_http::MessageType::request );
 
 #ifndef SINGLE_REQUEST_PROCESSOR_PER_REQUEST
             auto it = m_processors.find( message.request->requestLine.url.path() );

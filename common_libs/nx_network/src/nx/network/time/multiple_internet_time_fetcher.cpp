@@ -58,7 +58,7 @@ void MultipleInternetTimeFetcher::getTimeAsync( std::function<void(qint64, Syste
 
     QnMutexLocker lk( &m_mutex );
 
-    assert( !m_timeFetchers.empty() );
+    NX_ASSERT( !m_timeFetchers.empty() );
 
     for( std::unique_ptr<TimeFetcherContext>& ctx: m_timeFetchers )
     {
@@ -93,7 +93,7 @@ void MultipleInternetTimeFetcher::timeFetchingDone(
     ctx->errorCode = errorCode;
     ctx->state = TimeFetcherContext::done;
 
-    Q_ASSERT( m_awaitedAnswers > 0 );
+    NX_ASSERT( m_awaitedAnswers > 0 );
     if( (--m_awaitedAnswers) > 0 )
         return;
 
@@ -134,7 +134,7 @@ void MultipleInternetTimeFetcher::timeFetchingDone(
         ++collectedValuesCount;
     }
 
-    Q_ASSERT( collectedValuesCount > 0 );
+    NX_ASSERT( collectedValuesCount > 0 );
 
     auto handlerFunc = std::move( m_handlerFunc );
     lk.unlock();

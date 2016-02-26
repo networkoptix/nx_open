@@ -83,13 +83,13 @@ namespace nx_hls
 
     void HLSSession::setPlaylistManager( MediaQuality streamQuality, const AbstractPlaylistManagerPtr& value )
     {
-        assert( streamQuality == MEDIA_Quality_High || MEDIA_Quality_Low );
+        NX_ASSERT( streamQuality == MEDIA_Quality_High || MEDIA_Quality_Low );
         m_playlistManagers[streamQuality] = value;
     }
 
     const AbstractPlaylistManagerPtr& HLSSession::playlistManager( MediaQuality streamQuality ) const
     {
-        assert( streamQuality == MEDIA_Quality_High || MEDIA_Quality_Low );
+        NX_ASSERT( streamQuality == MEDIA_Quality_High || MEDIA_Quality_Low );
         return m_playlistManagers[streamQuality];
     }
 
@@ -157,7 +157,7 @@ namespace nx_hls
 
     HLSSessionPool::HLSSessionPool()
     {
-        assert( HLSSessionPool_instance == nullptr );
+        NX_ASSERT( HLSSessionPool_instance == nullptr );
         HLSSessionPool_instance = this;
     }
 
@@ -187,7 +187,7 @@ namespace nx_hls
         QnMutexLocker lk( &m_mutex );
         if( !m_sessionByID.insert( std::make_pair(session->id(), HLSSessionContext(session, keepAliveTimeoutMS)) ).second )
             return false;
-        Q_ASSERT( (keepAliveTimeoutMS == 0) || (m_lockedIDs.find(session->id()) != m_lockedIDs.end()) );   //session with keep-alive timeout can only be accessed under lock
+        NX_ASSERT( (keepAliveTimeoutMS == 0) || (m_lockedIDs.find(session->id()) != m_lockedIDs.end()) );   //session with keep-alive timeout can only be accessed under lock
         return true;
     }
 
@@ -197,7 +197,7 @@ namespace nx_hls
         std::map<QString, HLSSessionContext>::const_iterator it = m_sessionByID.find( id );
         if( it == m_sessionByID.end() )
             return NULL;
-        Q_ASSERT( (it->second.keepAliveTimeoutMS == 0) || (m_lockedIDs.find(id) != m_lockedIDs.end()) );   //session with keep-alive timeout can only be accessed under lock
+        NX_ASSERT( (it->second.keepAliveTimeoutMS == 0) || (m_lockedIDs.find(id) != m_lockedIDs.end()) );   //session with keep-alive timeout can only be accessed under lock
         return it->second.session;
     }
 

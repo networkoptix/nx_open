@@ -47,7 +47,7 @@ void IncomingTunnelPool::getNextSocketAsync(
     boost::optional<unsigned int> timeout)
 {
     QnMutexLocker lock(&m_mutex);
-    Q_ASSERT_X(!m_acceptHandler, Q_FUNC_INFO, "Multiple accepts are not supported");
+    NX_ASSERT(!m_acceptHandler, Q_FUNC_INFO, "Multiple accepts are not supported");
 
     if (!m_acceptedSockets.empty())
     {

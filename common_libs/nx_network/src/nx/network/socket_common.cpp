@@ -109,7 +109,7 @@ QString HostAddress::toString() const
 {
     if( !m_addrStr )
     {
-        Q_ASSERT( m_addressResolved );
+        NX_ASSERT( m_addressResolved );
         m_addrStr = QLatin1String(inet_ntoa(m_sinAddr));
     }
     return m_addrStr.get();
@@ -172,7 +172,7 @@ struct in_addr HostAddress::inAddr(bool* ok) const
 {
     if( !m_addressResolved )
     {
-        Q_ASSERT( m_addrStr );
+        NX_ASSERT( m_addrStr );
         const auto addrs = nx::network::SocketGlobals::addressResolver().resolveSync(
                     m_addrStr.get(), false );
 

@@ -1,5 +1,7 @@
 #include "data_stream_helpers.h"
 
+#include <nx/utils/log/assert.h>
+
 namespace dsh {
 
 void reverse(QByteArray& array)
@@ -20,7 +22,7 @@ QByteArray reversed(const QByteArray& array)
 
 int write(QDataStream& stream, const QByteArray& data, int size)
 {
-    Q_ASSERT(data.size() == size);
+    NX_ASSERT(data.size() == size);
     if (stream.byteOrder() == QDataStream::LittleEndian)
     {
         QByteArray rev(data);

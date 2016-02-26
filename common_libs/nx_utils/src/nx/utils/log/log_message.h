@@ -113,7 +113,7 @@ public:
 
     operator QString() const; 
 
-    std::string toStdString() { return m_str.toStdString(); }
+    std::string toStdString() const { return m_str.toStdString(); }
 
 private:
     QString m_str;

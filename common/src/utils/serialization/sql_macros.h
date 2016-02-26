@@ -67,7 +67,7 @@ namespace QnSqlDetail {
         bool operator()(const T &, const Access &access, const QnFusion::start_tag &) {
             using namespace QnFusion;
 
-            assert(m_mapping.indices.size() >= access(member_count));
+            NX_ASSERT(m_mapping.indices.size() >= access(member_count));
             return true;
         }
 

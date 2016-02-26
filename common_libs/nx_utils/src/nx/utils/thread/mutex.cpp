@@ -9,6 +9,7 @@
 
 #include "mutex_impl.h"
 #include "thread_util.h"
+#include <nx/utils/log/assert.h>
 
 
 ////////////////////////////////////////////////////////////
@@ -130,15 +131,15 @@ QnMutex* QnMutexLockerBase::mutex()
 
 void QnMutexLockerBase::relock()
 {
-    Q_ASSERT( !m_locked );
+    NX_ASSERT( !m_locked );
     m_mtx->lock( m_sourceFile, m_sourceLine, ++m_relockCount );
     m_locked = true;
 }
 
 void QnMutexLockerBase::unlock()
 {
-    //assert here to verify that developer knows what he is doing when he tries to unlock already unlocked mutex
-    Q_ASSERT( m_locked );
+    //NX_ASSERT here to verify that developer knows what he is doing when he tries to unlock already unlocked mutex
+    NX_ASSERT( m_locked );
     m_mtx->unlock();
     m_locked = false;
 }

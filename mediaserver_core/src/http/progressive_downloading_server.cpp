@@ -228,7 +228,7 @@ private:
     {
         //Preparing output packet. Have to do everything right here to avoid additional frame copying
         //TODO shared chunked buffer and socket::writev is wanted very much here
-//        Q_ASSERT(timestamp - m_lastSentTime < MAX_FRAME_DURATION * 1000);
+//        NX_ASSERT(timestamp - m_lastSentTime < MAX_FRAME_DURATION * 1000);
 
         QByteArray outPacket;
         if (m_owner->getTranscoder()->getVideoCodecContext()->codec_id == CODEC_ID_MJPEG)

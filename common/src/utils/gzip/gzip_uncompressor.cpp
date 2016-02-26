@@ -5,6 +5,7 @@
 
 #include "gzip_uncompressor.h"
 
+#include <nx/utils/log/assert.h>
 
 static const int OUTPUT_BUFFER_SIZE = 16*1024;
 
@@ -45,7 +46,7 @@ bool GZipUncompressor::processData( const QnByteArrayConstRef& data )
                 zResult = inflateInit2(&m_zStream, 16+MAX_WBITS);
                 if( zResult != Z_OK )
                 {
-                    assert( false );
+                    NX_ASSERT( false );
                 }
                 m_state = State::inProgress;
 
@@ -137,7 +138,7 @@ bool GZipUncompressor::processData( const QnByteArrayConstRef& data )
                 break;
 
             default:
-                assert( false );
+                NX_ASSERT( false );
         }
 
         break;

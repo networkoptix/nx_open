@@ -12,7 +12,7 @@ void QnStoppableAsync::pleaseStopImpl(
     std::vector< UniquePtr > stoppables,
     nx::utils::MoveOnlyFunc< void() > completionHandler )
 {
-    Q_ASSERT_X( completionHandler, Q_FUNC_INFO,
+    NX_ASSERT( completionHandler, Q_FUNC_INFO,
                 "There is no other way to understend if QnStoppableAsync if stopped, "
                 "but this handler" );
 

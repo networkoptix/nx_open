@@ -2,6 +2,7 @@
 #define FROM_THIS_TO_SHARED_H
 
 #include <cassert>
+#include <nx/utils/log/assert.h>
 
 #include "core/resource/shared_resource_pointer.h"
 
@@ -30,8 +31,8 @@ private:
     template<class T2>
     void initWeakPointer(const QSharedPointer<T2>& pointer)
     {
-        assert(!pointer.isNull());
-        assert(m_weakPointer.toStrongRef().isNull()); /* Error in this line means that you have created two distinct shared pointers to a single resource instance. */
+        NX_ASSERT(!pointer.isNull());
+        NX_ASSERT(m_weakPointer.toStrongRef().isNull()); /* Error in this line means that you have created two distinct shared pointers to a single resource instance. */
 
         m_weakPointer = pointer;
     }

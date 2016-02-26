@@ -210,7 +210,7 @@ static Buffer hmacSha1( const String& key, const Message* message )
     serializer.setMessage(message);
     if (serializer.serialize(&buffer, &bytes) != nx_api::SerializerState::done)
     {
-        Q_ASSERT(false);
+        NX_ASSERT(false);
     }
 
     return hmacSha1( key, buffer );
@@ -224,7 +224,7 @@ void Message::insertIntegrity( const String& userName, const String& key )
         attrs::MessageIntegrity::SIZE, 0 ) );
 
     const auto hmac = hmacSha1( key, this );
-    Q_ASSERT( hmac.size() == attrs::MessageIntegrity::SIZE );
+    NX_ASSERT( hmac.size() == attrs::MessageIntegrity::SIZE );
     newAttribute< attrs::MessageIntegrity >( hmac );
 }
 

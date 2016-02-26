@@ -12,6 +12,7 @@
 #include <nx/utils/thread/mutex.h>
 
 #include "log_message.h"
+#include "assert.h"
 
 
 // TODO: #Elric #enum

@@ -22,6 +22,7 @@
 #include <QtCore/QUrl>
 
 #include <nx/network/buffer.h>
+#include <nx/utils/log/assert.h>
 
 #include "qnbytearrayref.h"
 

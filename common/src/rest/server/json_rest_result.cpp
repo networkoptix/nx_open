@@ -42,13 +42,13 @@ QnUbjsonRestResult::QnUbjsonRestResult(const QnRestResult& base) :
 
 /* Dummy methods to make fusion macro compile for json and ubjson at once.  */
 void serialize(const QJsonValue &value, QnUbjsonWriter<QByteArray> *stream) {
-    Q_ASSERT_X(false, Q_FUNC_INFO, "We should not serialize QJsonValue to UBJson.");
+    NX_ASSERT(false, Q_FUNC_INFO, "We should not serialize QJsonValue to UBJson.");
     QN_UNUSED(value, stream);
     return;
 }
 
 bool deserialize(QnUbjsonReader<QByteArray> *stream, QJsonValue *target) {
-    Q_ASSERT_X(false, Q_FUNC_INFO, "We should not serialize QJsonValue to UBJson.");
+    NX_ASSERT(false, Q_FUNC_INFO, "We should not serialize QJsonValue to UBJson.");
     QN_UNUSED(stream, target);
     return true;
 }

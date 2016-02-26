@@ -1,5 +1,7 @@
 #include "server_additional_addresses_dictionary.h"
 
+#include <nx/utils/log/assert.h>
+
 QnServerAdditionalAddressesDictionary::QnServerAdditionalAddressesDictionary(QObject *parent):
         QObject(parent)
 {
@@ -17,13 +19,13 @@ QList<QUrl> QnServerAdditionalAddressesDictionary::ignoredUrls(const QnUuid &ser
 }
 
 void QnServerAdditionalAddressesDictionary::setAdditionalUrls(const QnUuid &serverId, const QList<QUrl> &additionalUrls) {
-    Q_ASSERT(!serverId.isNull());
+    NX_ASSERT(!serverId.isNull());
     QnMutexLocker lock(&m_mutex);
     m_discoveryInfoById[serverId].additionalUrls = additionalUrls;
 }
 
 void QnServerAdditionalAddressesDictionary::setIgnoredUrls(const QnUuid &serverId, const QList<QUrl> &additionalUrls) {
-    Q_ASSERT(!serverId.isNull());
+    NX_ASSERT(!serverId.isNull());
     QnMutexLocker lock(&m_mutex);
     m_discoveryInfoById[serverId].ignoredUrls = additionalUrls;
 }

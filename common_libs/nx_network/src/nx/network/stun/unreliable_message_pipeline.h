@@ -122,7 +122,7 @@ public:
         serializedMessage.reserve(nx::network::kTypicalMtuSize);
         messageSerializer.setMessage(&message);
         size_t bytesWritten = 0;
-        assert(messageSerializer.serialize(&serializedMessage, &bytesWritten) ==
+        NX_ASSERT(messageSerializer.serialize(&serializedMessage, &bytesWritten) ==
                 nx_api::SerializerState::done);
 
         m_socket->dispatch(std::bind(
@@ -147,7 +147,7 @@ public:
     {
         if (m_terminationFlag)
             *m_terminationFlag = true;
-        //we MUST be in aio thread. TODO #ak add assert for aio thread
+        //we MUST be in aio thread. TODO #ak add NX_ASSERT for aio thread
         m_socket->cancelIOSync(aio::etNone); 
         return std::move(m_socket);
     }
@@ -274,7 +274,7 @@ private:
         SocketAddress resolvedTargetAddress,
         size_t bytesSent)
     {
-        assert(!m_sendQueue.empty());
+        NX_ASSERT(!m_sendQueue.empty());
         if (errorCode != SystemError::noError)
         {
             NX_LOGX(lm("Failed to send message destinationEndpoint %1. %2").
@@ -283,7 +283,7 @@ private:
         }
         else
         {
-            assert(bytesSent == m_sendQueue.front().serializedMessage.size());
+            NX_ASSERT(bytesSent == m_sendQueue.front().serializedMessage.size());
         }
 
         if (m_sendQueue.front().completionHandler)

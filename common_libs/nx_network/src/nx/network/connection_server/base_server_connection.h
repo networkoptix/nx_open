@@ -158,7 +158,7 @@ namespace nx_api
                     SystemError::connectionReset,
                     static_cast<CustomConnectionType*>(this) );
 
-            assert( m_readBuffer.size() == bytesRead );
+            NX_ASSERT( m_readBuffer.size() == bytesRead );
             static_cast<CustomConnectionType*>(this)->bytesReceived( m_readBuffer ); 
             m_readBuffer.resize( 0 );
             m_streamSocket->readSomeAsync(
@@ -171,7 +171,7 @@ namespace nx_api
             if( errorCode != SystemError::noError )
                 return handleSocketError( errorCode );
 
-            assert( count == m_bytesToSend );
+            NX_ASSERT( count == m_bytesToSend );
 
             static_cast<CustomConnectionType*>(this)->readyToSendData();
         }
@@ -181,7 +181,7 @@ namespace nx_api
             switch( errorCode )
             {
                 case SystemError::noError:
-                    assert( false );
+                    NX_ASSERT( false );
                     break;
 
                 case SystemError::connectionReset:

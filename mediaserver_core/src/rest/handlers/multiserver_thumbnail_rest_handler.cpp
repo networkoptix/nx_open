@@ -96,7 +96,7 @@ int QnMultiserverThumbnailRestHandler::getThumbnailLocal( const QnThumbnailReque
     }
     else if (request.imageFormat == QnThumbnailRequestData::RawFormat)
     {
-        Q_ASSERT_X(false, Q_FUNC_INFO, "Method is not implemeted");
+        NX_ASSERT(false, Q_FUNC_INFO, "Method is not implemeted");
         //TODO: #rvasilenko implement me!!!
     }
     else
@@ -128,7 +128,7 @@ int QnMultiserverThumbnailRestHandler::getThumbnailRemote( const QnMediaServerRe
     typedef QnMultiserverRequestContext<QnThumbnailRequestData> QnThumbnailRequestContext;
 
     QnThumbnailRequestContext context(request, ownerPort);
-    Q_ASSERT_X(!request.isLocal, Q_FUNC_INFO, "Local request must be processed before");
+    NX_ASSERT(!request.isLocal, Q_FUNC_INFO, "Local request must be processed before");
 
     QUrl apiUrl(server->getApiUrl());
     apiUrl.setPath(L'/' + urlPath);

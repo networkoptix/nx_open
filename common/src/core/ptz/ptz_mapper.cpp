@@ -165,5 +165,5 @@ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnPtzMapperPtr *ta
 }
 
 void serialize(QnJsonContext *, const QnPtzMapperPtr &, QJsonValue *) {
-    assert(false); /* Not supported for now. */
+    NX_ASSERT(false); /* Not supported for now. */
 }

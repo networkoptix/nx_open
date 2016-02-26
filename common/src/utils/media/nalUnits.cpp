@@ -1,5 +1,4 @@
 #include "nalUnits.h"
-#include <assert.h>
 #include "bitStream.h"
 #include <QtCore/QString>
 #include <QtCore/QTextStream>
@@ -19,7 +18,7 @@ int NALUnit::calc_rbsp_trailing_bits_cnt(uint8_t val)
     while ((val & 1) == 0) {
         cnt++;
         val >>= 1;
-        assert(val != 0);
+        NX_ASSERT(val != 0);
         if (val == 0)
             return 0;
     }
@@ -153,7 +152,7 @@ int NALUnit::encodeNAL(quint8* srcBuffer, quint8* srcEnd, quint8* dstBuffer, siz
             srcBuffer++;
     }
     
-    Q_ASSERT(srcEnd >= srcStart);
+    NX_ASSERT(srcEnd >= srcStart);
     //conversion to uint possible cause srcEnd should always be greater then srcStart
     if (dstBufferSize < uint(srcEnd - srcStart)) 
         return -1;
@@ -266,7 +265,7 @@ int NALUnit::deserialize(quint8* buffer, quint8* end)
         return NOT_ENOUGHT_BUFFER;
 
 
-    //assert((*buffer & 0x80) == 0);
+    //NX_ASSERT((*buffer & 0x80) == 0);
     if ((*buffer & 0x80) != 0) {
         qWarning() << "Invalid forbidden_zero_bit for nal unit " << (*buffer & 0x1f);
     }
@@ -525,7 +524,7 @@ void PPSUnit::duplicatePPS(PPSUnit& oldPPS, int ppsID, bool cabac)
     if (bitWriter.getBitsCount() % 8 != 0)
         bitWriter.putBits(8 - bitWriter.getBitsCount() % 8, 0);
     m_nalBufferLen = bitWriter.getBitsCount() / 8 + 1;
-    assert(m_nalBufferLen <= oldPPS.m_nalBufferLen + 4);
+    NX_ASSERT(m_nalBufferLen <= oldPPS.m_nalBufferLen + 4);
 }
 
 
@@ -838,7 +837,7 @@ void SPSUnit::setFps(double fps)
     time_scale *= 2;
 
     //num_units_in_tick = time_scale/2 / fps;
-    assert(num_units_in_tick_bit_pos > 0);
+    NX_ASSERT(num_units_in_tick_bit_pos > 0);
     updateBits(num_units_in_tick_bit_pos, 32, num_units_in_tick);
     updateBits(num_units_in_tick_bit_pos + 32, 32, time_scale);
 }
@@ -945,7 +944,7 @@ bool SliceUnit::moveHeaderField(int fieldOffset, int newLen, int oldLen)
         return false;
 
 
-    assert(bitDiff >= 0);
+    NX_ASSERT(bitDiff >= 0);
     if (bitDiff > 0)
     {
         if (pps->entropy_coding_mode_flag)
@@ -1011,7 +1010,7 @@ bool SliceUnit::increasePicOrderFieldLen(int newLen, int oldLen)
 
     int picOrderBitPos = m_picOrderBitPos + 8; // original field does not inculde nal code byte
 
-    assert(bitDiff >= 0);
+    NX_ASSERT(bitDiff >= 0);
     if (bitDiff > 0)
     {
         if (pps->entropy_coding_mode_flag)
@@ -1172,7 +1171,7 @@ int SliceUnit::deserializeSliceHeader(const QMap<quint32, const SPSUnit*>& spsMa
             dec_ref_pic_marking();
         if( pps->entropy_coding_mode_flag  &&  slice_type  !=  I_TYPE  &&  slice_type  !=  SI_TYPE ) {
             cabac_init_idc = extractUEGolombCode();
-            //assert(cabac_init_idc >=0 &&  cabac_init_idc <= 2);
+            //NX_ASSERT(cabac_init_idc >=0 &&  cabac_init_idc <= 2);
         }
         slice_qp_delta = extractSEGolombCode();
         if( slice_type  ==  SP_TYPE  ||  slice_type  ==  SI_TYPE ) {
@@ -1348,7 +1347,7 @@ int SliceUnit::NextMbAddress(int n)
 
 void SliceUnit::setFrameNum(int frameNum)
 {
-    assert(m_frameNumBitPos != 0);
+    NX_ASSERT(m_frameNumBitPos != 0);
     updateBits(m_frameNumBitPos, m_frameNumBits, frameNum);
     if (m_picOrderBitPos > 0)
         updateBits(m_picOrderBitPos, m_picOrderNumBits, frameNum*2 + bottom_field_flag);
@@ -1455,7 +1454,7 @@ int SliceUnit::serializeSliceHeader(BitStreamWriter& bitWriter, const QMap<quint
             if( pps->pic_order_present_flag &&  !m_field_pic_flag)
                 writeUEGolombCode(bitWriter, delta_pic_order_cnt_bottom);
         }
-        assert (m_shortDeserializeMode == false);
+        NX_ASSERT (m_shortDeserializeMode == false);
 
 
         if(sps->pic_order_cnt_type == 1 && !sps->delta_pic_order_always_zero_flag) 
@@ -1712,7 +1711,7 @@ int SEIUnit::updateSeiParam(SPSUnit& sps, bool removePulldown, int orig_hrd_para
         curBuff += payloadSize;
     }
     if (m_nalBufferLen < tmpBufferLen) {
-        //assert(m_nalBufferLen < tmpBufferLen);
+        //NX_ASSERT(m_nalBufferLen < tmpBufferLen);
         delete [] m_nalBuffer;
         m_nalBuffer = new quint8[tmpBufferLen];
     }

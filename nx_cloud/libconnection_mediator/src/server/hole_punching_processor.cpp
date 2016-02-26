@@ -98,7 +98,7 @@ void HolePunchingProcessor::connect(
         request);
     if (validationResult != api::ResultCode::ok)
         return completionHandler(validationResult, api::ConnectResponse());
-    assert(static_cast<bool>(targetPeerDataLocker));
+    NX_ASSERT(static_cast<bool>(targetPeerDataLocker));
 
     //preparing and saving connection context
     QnMutexLocker lk(&m_mutex);

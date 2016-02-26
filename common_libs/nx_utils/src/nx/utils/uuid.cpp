@@ -6,6 +6,7 @@
 #include "uuid.h"
 
 #include <type_traits>
+#include <nx/utils/log/assert.h>
 
 QnUuid::QnUuid()
 {
@@ -23,7 +24,7 @@ QnUuid::QnUuid( const QString& text )
 {
     if( !text.isEmpty() )
     {
-        Q_ASSERT(
+        NX_ASSERT(
             text.size() == 36 ||    // xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
             text.size() == 38 );    //{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}
     }
@@ -35,7 +36,7 @@ QnUuid::QnUuid( const QByteArray& text )
 {
     if( !text.isEmpty() )
     {
-        Q_ASSERT(
+        NX_ASSERT(
             text.size() == 36 ||    // xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
             text.size() == 38 );    //{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}
     }
@@ -47,7 +48,7 @@ QnUuid::QnUuid( const std::string& text )
 {
     if( !text.empty() )
     {
-        Q_ASSERT(
+        NX_ASSERT(
             text.size() == 36 ||    // xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
             text.size() == 38 );    //{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}
     }

@@ -73,7 +73,7 @@ bool QnAvigilonResource::startInputPortMonitoringAsync( std::function<void(bool)
 
     QnMutexLocker lk(&m_ioPortMutex);
 
-    Q_ASSERT( !m_inputMonitored );
+    NX_ASSERT( !m_inputMonitored );
     m_inputMonitored = true;
 
     m_checkInputPortStatusTimerID = TimerManager::instance()->addTimer(

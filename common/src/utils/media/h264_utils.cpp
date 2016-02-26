@@ -28,7 +28,7 @@ void readH264NALUsFromExtraData(
     const QnConstCompressedVideoDataPtr& data,
     std::vector<std::pair<const quint8*, size_t>>* const nalUnits)
 {
-    assert(data->context);
+    NX_ASSERT(data->context);
     const unsigned char* p = data->context->getExtradata();
 
     //sps & pps is in the extradata, parsing it...
@@ -81,7 +81,7 @@ void readH264NALUsFromAnnexBStream(
         curNalu = nextNalu)
     {
         nextNalu = NALUnit::findNALWithStartCodeEx(curNalu, dataEnd, &naluEnd);
-        Q_ASSERT(nextNalu > curNalu);
+        NX_ASSERT(nextNalu > curNalu);
         //skipping leading_zero_8bits and trailing_zero_8bits
         while ((naluEnd > curNalu) && (*(naluEnd - 1) == 0))
             --naluEnd;

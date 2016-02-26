@@ -35,7 +35,7 @@ public:
     void createdNotify(QnLongRunnable *runnable) {
         QnMutexLocker locker( &m_mutex );
 
-        assert(runnable && !m_created.contains(runnable));
+        NX_ASSERT(runnable && !m_created.contains(runnable));
 
         m_created.insert(runnable);
     }
@@ -43,7 +43,7 @@ public:
     void startedNotify(QnLongRunnable *runnable) {
         QnMutexLocker locker( &m_mutex );
 
-        assert(runnable && !m_running.contains(runnable));
+        NX_ASSERT(runnable && !m_running.contains(runnable));
 
         m_running.insert(runnable);
     }
@@ -51,7 +51,7 @@ public:
     void finishedNotify(QnLongRunnable *runnable) {
         QnMutexLocker locker( &m_mutex );
 
-        assert(runnable); //  && m_running.contains(runnable)
+        NX_ASSERT(runnable); //  && m_running.contains(runnable)
 
         m_running.remove(runnable);
         if(m_running.isEmpty())
@@ -61,7 +61,7 @@ public:
     void destroyedNotify(QnLongRunnable *runnable) {
         QnMutexLocker locker( &m_mutex );
 
-        assert(runnable && m_created.contains(runnable));
+        NX_ASSERT(runnable && m_created.contains(runnable));
 
         m_created.remove(runnable);
     }
@@ -211,7 +211,7 @@ void QnLongRunnable::stop() {
     DEBUG_CODE(
         if(m_type) {
             const std::type_info *type = &typeid(*this);
-            assert(*type == *m_type); /* You didn't call stop() from derived class's destructor! Die! */
+            NX_ASSERT(*type == *m_type); /* You didn't call stop() from derived class's destructor! Die! */
 
             m_type = NULL; /* So that we don't check it again. */
         }

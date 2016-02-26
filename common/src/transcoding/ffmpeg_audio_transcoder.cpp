@@ -55,7 +55,7 @@ bool QnFfmpegAudioTranscoder::open(const QnConstCompressedAudioDataPtr& audio)
 
 bool QnFfmpegAudioTranscoder::open(const QnConstMediaContextPtr& context)
 {
-    assert(context);
+    NX_ASSERT(context);
 
     AVCodec* avCodec = avcodec_find_encoder(m_codecId);
     if (avCodec == 0)
@@ -189,7 +189,7 @@ int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
 
             m_decodedBufferSize += out_size;
         }
-        Q_ASSERT(m_decodedBufferSize < AVCODEC_MAX_AUDIO_FRAME_SIZE);
+        NX_ASSERT(m_decodedBufferSize < AVCODEC_MAX_AUDIO_FRAME_SIZE);
     }
 
     if( !result )

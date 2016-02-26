@@ -75,7 +75,7 @@ namespace {
 QnGlobalSettings::QnGlobalSettings(QObject *parent):
     base_type(parent)
 {
-    assert(qnResPool);
+    NX_ASSERT(qnResPool);
 
     m_allAdaptors
         << initEmailAdaptors()

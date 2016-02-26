@@ -21,15 +21,15 @@ QnFfmpegHelper::StaticHolder QnFfmpegHelper::StaticHolder::instance;
 
 void QnFfmpegHelper::copyAvCodecContextField(void **fieldPtr, const void* data, size_t size)
 {
-    assert(fieldPtr);
+    NX_ASSERT(fieldPtr);
 
     av_freep(fieldPtr);
 
     if (size > 0)
     {
-        assert(data);
+        NX_ASSERT(data);
         *fieldPtr = av_malloc(size);
-        assert(*fieldPtr);
+        NX_ASSERT(*fieldPtr);
         memcpy(*fieldPtr, data, size);
     }
 }
@@ -37,7 +37,7 @@ void QnFfmpegHelper::copyAvCodecContextField(void **fieldPtr, const void* data, 
 void QnFfmpegHelper::mediaContextToAvCodecContext(
     AVCodecContext* av, const QnConstMediaContextPtr& media)
 {
-    assert(av);
+    NX_ASSERT(av);
 
     // NOTE: Here explicit runtime type dispatching is used instead of a more complex visitor-based pattern.
     // Generation of AVCodecContext from QnMediaContext cannot be done in QnMediaContext because that class
@@ -46,17 +46,17 @@ void QnFfmpegHelper::mediaContextToAvCodecContext(
     if (avCodecMediaContext)
     {
         int r = avcodec_copy_context(av, avCodecMediaContext->getAvCodecContext());
-        assert(r == 0);
+        NX_ASSERT(r == 0);
         return;
     }
 
     AVCodec* const codec = findAvCodec(media->getCodecId());
-    assert(codec);
+    NX_ASSERT(codec);
     int r = avcodec_get_context_defaults3(av, codec);
-    assert(r == 0);
+    NX_ASSERT(r == 0);
     av->codec = codec;
     // codec_type is copied by avcodec_get_context_defaults3() above.
-    Q_ASSERT_X(av->codec_type == media->getCodecType(), Q_FUNC_INFO, "codec_type is not the same.");
+    NX_ASSERT(av->codec_type == media->getCodecType(), Q_FUNC_INFO, "codec_type is not the same.");
 
     copyMediaContextFieldsToAvCodecContext(av, media);
 }
@@ -113,9 +113,9 @@ AVCodec* QnFfmpegHelper::findAvCodec(CodecID codecId)
 AVCodecContext* QnFfmpegHelper::createAvCodecContext(CodecID codecId)
 {
     AVCodec* codec = findAvCodec(codecId);
-    assert(codec);
+    NX_ASSERT(codec);
     AVCodecContext* context = avcodec_alloc_context3(codec);
-    assert(context);
+    NX_ASSERT(context);
     context->codec = codec;
     context->codec_id = codecId;
     return context;
@@ -123,12 +123,12 @@ AVCodecContext* QnFfmpegHelper::createAvCodecContext(CodecID codecId)
 
 AVCodecContext* QnFfmpegHelper::createAvCodecContext(const AVCodecContext* context)
 {
-    assert(context);
+    NX_ASSERT(context);
 
     AVCodecContext* newContext = avcodec_alloc_context3(nullptr);
-    assert(newContext);
+    NX_ASSERT(newContext);
     int r = avcodec_copy_context(newContext, context);
-    assert(r == 0);
+    NX_ASSERT(r == 0);
     return newContext;
 }
 

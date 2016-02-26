@@ -98,7 +98,7 @@ void AsyncClient::sendRequest(Message request, RequestHandler handler)
             return;
 
         default:
-            Q_ASSERT_X( false, Q_FUNC_INFO, "m_state is invalid" );
+            NX_ASSERT( false, Q_FUNC_INFO, "m_state is invalid" );
             NX_LOGX( lit( "m_state has invalid value: %1" )
                     .arg( static_cast< int >( m_state ) ), cl_logERROR );
             return;
@@ -138,7 +138,7 @@ void AsyncClient::closeConnection(
 		baseConnection = std::move( m_baseConnection );
     }
 
-    Q_ASSERT_X( !baseConnection || !connection ||
+    NX_ASSERT( !baseConnection || !connection ||
                 connection == baseConnection.get(),
                 Q_FUNC_INFO, "Incorrect closeConnection call" );
 }
@@ -183,7 +183,7 @@ void AsyncClient::openConnectionImpl(QnMutexLockerBase* lock)
             return;
 
         default:
-            Q_ASSERT_X( false, Q_FUNC_INFO, "m_state is invalid" );
+            NX_ASSERT( false, Q_FUNC_INFO, "m_state is invalid" );
             NX_LOGX( lit( "m_state has invalid value: %1" )
                      .arg( static_cast< int >( m_state ) ), cl_logERROR );
             return;
@@ -231,7 +231,7 @@ void AsyncClient::dispatchRequestsInQueue(QnMutexLockerBase* lock)
         if ( !m_requestsInProgress.emplace(
                  tid, std::move( handler ) ).second )
         {
-            Q_ASSERT_X( false, Q_FUNC_INFO,
+            NX_ASSERT( false, Q_FUNC_INFO,
                         "transactionId is not unique" );
 
             NX_LOGX( lit( "transactionId is not unique: %1" )
@@ -261,7 +261,7 @@ void AsyncClient::onConnectionComplete(SystemError::ErrorCode code)
     if( code != SystemError::noError )
         return closeConnectionImpl( &lock, code );
 
-    assert(!m_baseConnection);
+    NX_ASSERT(!m_baseConnection);
 
     m_baseConnection.reset( new BaseConnectionType( this, std::move(m_connectingSocket) ) );
     m_baseConnection->setMessageHandler( 
@@ -282,7 +282,7 @@ void AsyncClient::processMessage(Message message)
     switch( message.header.messageClass )
     {
         case MessageClass::request:
-            Q_ASSERT_X( false, Q_FUNC_INFO, "client does not support requests" );
+            NX_ASSERT( false, Q_FUNC_INFO, "client does not support requests" );
             NX_LOGX( lit( "Client does not support requests" ), cl_logERROR );
             return;
 
@@ -293,7 +293,7 @@ void AsyncClient::processMessage(Message message)
             const auto it = m_requestsInProgress.find( message.header.transactionId );
             if( it == m_requestsInProgress.end() )
             {
-                Q_ASSERT_X( false, Q_FUNC_INFO, "unexpected transactionId" );
+                NX_ASSERT( false, Q_FUNC_INFO, "unexpected transactionId" );
                 NX_LOGX( lit( "Unexpected transactionId: %2" )
                          .arg( QString::fromUtf8( message.header.transactionId.toHex() ) ),
                          cl_logERROR );
@@ -328,7 +328,7 @@ void AsyncClient::processMessage(Message message)
         }
 
         default:
-            Q_ASSERT_X( false, Q_FUNC_INFO, "messageClass is invalid" );
+            NX_ASSERT( false, Q_FUNC_INFO, "messageClass is invalid" );
             NX_LOGX( lit( "messageClass has invalid value: %1" )
                      .arg( static_cast< int >( message.header.messageClass ) ),
                      cl_logERROR );

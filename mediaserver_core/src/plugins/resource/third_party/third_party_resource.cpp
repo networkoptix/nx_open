@@ -302,7 +302,7 @@ QnTimePeriodList QnThirdPartyResource::getDtsTimePeriodsByMotionRegion(
         return QnTimePeriodList();
 
     nxcip::BaseCameraManager2* camManager2 = static_cast<nxcip::BaseCameraManager2*>(m_camManager->getRef()->queryInterface( nxcip::IID_BaseCameraManager2 ));
-    Q_ASSERT( camManager2 );
+    NX_ASSERT( camManager2 );
 
     QnTimePeriodList resultTimePeriods;
 

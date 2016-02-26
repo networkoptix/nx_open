@@ -127,7 +127,7 @@ bool QnServerArchiveDelegate::open(const QnResourcePtr &resource)
     QnNetworkResourcePtr netResource = 
         qSharedPointerDynamicCast<QnNetworkResource>(resource);
 
-    Q_ASSERT(netResource != 0);
+    NX_ASSERT(netResource != 0);
     m_dialQualityHelper.setResource(netResource);
     
     setCatalogs();

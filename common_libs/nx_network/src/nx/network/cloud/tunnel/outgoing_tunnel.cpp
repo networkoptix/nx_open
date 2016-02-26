@@ -29,7 +29,7 @@ OutgoingTunnel::OutgoingTunnel(AddressEntry targetPeerAddress)
 
 OutgoingTunnel::~OutgoingTunnel()
 {
-    assert(m_terminated);
+    NX_ASSERT(m_terminated);
 }
 
 void OutgoingTunnel::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
@@ -103,7 +103,7 @@ void OutgoingTunnel::establishNewConnection(
     NewConnectionHandler handler)
 {
     QnMutexLocker lk(&m_mutex);
-    assert(!m_terminated);
+    NX_ASSERT(!m_terminated);
 
     switch(m_state)
     {
@@ -153,7 +153,7 @@ void OutgoingTunnel::establishNewConnection(
         }
 
         default:
-            Q_ASSERT_X(
+            NX_ASSERT(
                 false,
                 Q_FUNC_INFO,
                 lm("Unexpected state %1")

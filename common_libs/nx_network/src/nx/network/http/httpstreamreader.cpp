@@ -9,6 +9,7 @@
 
 #include "utils/gzip/gzip_uncompressor.h"
 #include "utils/media/custom_output_stream.h"
+#include <nx/utils/log/assert.h>
 
 
 namespace nx_http
@@ -318,14 +319,14 @@ namespace nx_http
             }
 
             default:
-                Q_ASSERT( false );
+                NX_ASSERT( false );
                 return false;
         }
     }
 
     bool HttpStreamReader::prepareToReadMessageBody()
     {
-        Q_ASSERT( m_httpMessage.type != MessageType::none );
+        NX_ASSERT( m_httpMessage.type != MessageType::none );
 
         if( m_httpMessage.type == MessageType::request )
         {
@@ -520,7 +521,7 @@ namespace nx_http
                 }
 
                 default:
-                    Q_ASSERT( false );
+                    NX_ASSERT( false );
                     break;
             }
 
