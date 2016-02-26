@@ -32,7 +32,7 @@ bool assertFailure(
         ((condition) || \
             nx::utils::assertFailure(__FILE__, __LINE__, #condition, message))
 #else
-    #define NX_ASSERT_IMPL
+    #define NX_ASSERT_IMPL(condition, message)
 #endif
 
 
