@@ -54,7 +54,7 @@
             <scope>system</scope>
             <systemPath>${root.dir}/nx_sdk/nx_sdk/vms-archive.zip</systemPath>            
         </dependency>
-		
+
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>nx_storage_sdk</artifactId>
@@ -72,7 +72,7 @@
             <scope>system</scope>
             <systemPath>${root.dir}/common/pom.xml</systemPath>
         </dependency>
-		
+
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>nx_network</artifactId>
@@ -140,14 +140,14 @@
                             <stripVersion>true</stripVersion>
                         </configuration>
                     </execution>
-                </executions>
+                </executions>               
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.1.1</version>
                 <executions>
-                     <execution>
+                    <execution>
                         <id>gen-api-xml</id>
                         <phase>generate-sources</phase>
                         <goals>
@@ -167,7 +167,30 @@
                                 <argument>${project.build.directory}/additional-resources/static/api.xml</argument>
                             </arguments>
                         </configuration>
-                    </execution>                 
+                    </execution>
+                    <execution>
+                        <id>get-rdep-artifacts</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>python</executable>
+                            <arguments>
+                                <argument>${environment.dir}/rdep/rdep.py</argument>
+                                <argument>--copy-to</argument>
+                                <argument>${libdir}</argument>
+                                <argument>--platform</argument>
+                                <argument>${platform}</argument>
+                                <argument>--arch</argument>
+                                <argument>${arch}</argument>
+                                <argument>--box</argument>
+                                <argument>${box}</argument>
+                                <!--> List of required packages </!-->
+                                <argument>server-external-2.6.0</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>                     
                 </executions>
             </plugin>
         </plugins>
