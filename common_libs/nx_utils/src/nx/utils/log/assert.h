@@ -5,37 +5,46 @@
 
 #include "log_message.h"
 
+
 namespace nx {
 namespace utils {
 
-template<typename Location, typename Reason>
-bool assertFailure(const Location& location, const Reason& reason)
+template<typename Reason>
+bool assertFailure(
+    const char* file, int line, const char* condition, const Reason& message)
 {
-    #ifdef _DEBUG
-        const auto message = lm(">>>FAILURE %1 %2").arg(location).arg(reason);
-        std::cerr << std::endl << message.toStdString() << std::endl;
+    const auto out = lm(">>>FAILURE %1:%2 NX_ASSERT(%3) %4")
+        .arg(file).arg(line).arg(condition).arg(message);
 
-        // SIGSEGV now!
-        *reinterpret_cast<volatile int*>(0) = 7;
-    #else
-        // NX_LOG?
-    #endif
+    std::cerr << std::endl << out.toStdString() << std::endl;
 
+    // SIGSEGV now!
+    *reinterpret_cast<volatile int*>(0) = 7;
     return true;
 }
 
 } // namespace utils
 } // namespace nx
 
-#define NX_ASSERT3(expression, location, reason) \
-    ((expression) || nx::utils::assertFailure(location, reason))
 
-#define NX_ASSERT2(expression, location) \
-    NX_ASSERT3(expression, location, "NX_ASSERT:" #expression " = false")
+#ifdef _DEBUG
+    #define NX_ASSERT_IMPL(condition, message) \
+        ((condition) || \
+            nx::utils::assertFailure(__FILE__, __LINE__, #condition, message))
+#else
+    #define NX_ASSERT_IMPL
+#endif
 
-#define NX_STRING_ARG(x) #x
-#define NX_ASSERT1(expression) \
-    NX_ASSERT2(expression, __FILE__ ":" NX_STRING_ARG(__LINE__))
+
+#define NX_ASSERT1(condition) \
+    NX_ASSERT_IMPL(condition, "")
+
+#define NX_ASSERT2(condition, message) \
+    NX_ASSERT_IMPL(condition, message)
+
+#define NX_ASSERT3(condition, where, message) \
+    NX_ASSERT_IMPL(condition, lm("[%1] %2").arg(where).arg(message))
+
 
 #define NX_GET_4TH_ARG(a1, a2, a3, a4, ...) a4
 #define NX_ASSERT_SELECTOR(...) \

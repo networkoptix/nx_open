@@ -46,6 +46,7 @@ public:
 
     QnLogMessage arg(const QString & a, int fieldWidth = 0, QChar fillChar = QLatin1Char(' ')) const;
     QnLogMessage arg(char a, int fieldWidth = 0, QChar fillChar = QLatin1Char(' ')) const;
+    QnLogMessage arg(const char* a, int fieldWidth = 0, QChar fillChar = QLatin1Char(' ')) const;
     QnLogMessage arg(QChar a, int fieldWidth = 0, QChar fillChar = QLatin1Char(' ')) const;
     QnLogMessage arg(double a, int fieldWidth = 0, char format = 'g', int precision = -1, QChar fillChar = QLatin1Char(' ')) const;
     QnLogMessage arg(const QByteArray& a, int fieldWidth = 0, QChar fillChar = QLatin1Char(' ')) const;
