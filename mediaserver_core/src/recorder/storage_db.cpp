@@ -1,4 +1,5 @@
 #include <cassert>
+#include <algorithm>
 #include "storage_db.h"
 
 #include <QtSql/QSqlQuery>
@@ -347,7 +348,17 @@ void QnStorageDb::handleMediaFileOp(const nx::media_db::MediaFileOperation &medi
     if (error == nx::media_db::Error::ReadError)
         return;
 
+    uint16_t cameraId = mediaFileOp.getCameraId();
+    auto cameraIt = m_uuidToHash.right.find(cameraId);
 
+    // camera with this ID should have already been found
+    assert(cameraIt != m_uuidToHash.right.cend());
+
+    auto resultCameraIt = std::find_if(m_readResult.cbegin(), m_readResult.cend(),
+                                       [cameraIt](const DeviceFileCatalogPtr &catalog)
+                                       {
+                                           return catalog->cameraUniqueId() == cameraIt->second;
+                                       });;
 }
 
 void QnStorageDb::handleError(nx::media_db::Error error) 
