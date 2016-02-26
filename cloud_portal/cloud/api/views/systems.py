@@ -49,11 +49,17 @@ def access_roles(request, system_id):
 
 
 @api_view(['POST'])
-@permission_classes((IsAuthenticated, ))
+@permission_classes((AllowAny, ))
 @handle_exceptions
 def disconnect(request):
     require_params(request, ('system_id',))
-    cloud_api.System.unbind(request.user.email, request.session['password'], request.data['system_id'])
+
+    if request.user.is_authenticated():
+        cloud_api.System.unbind(request.user.email, request.session['password'], request.data['system_id'])
+        return api_success()
+
+    require_params(request, ('email', 'password'))
+    cloud_api.System.unbind(request.data['email'], request.data['password'], request.data['system_id'])
     return api_success()
 
 
@@ -63,8 +69,9 @@ def disconnect(request):
 def connect(request):
     require_params(request, ('name',))
     if request.user.is_authenticated():
-        data = cloud_api.System.unbind(request.user.email, request.session['password'], request.data['system_id'])
-    else:
-        require_params(request, ('email', 'password'))
-        data = cloud_api.System.bind(request.data['email'], request.data['password'], request.data['name'])
+        data = cloud_api.System.bind(request.user.email, request.session['password'], request.data['system_id'])
+        return api_success(data)
+
+    require_params(request, ('email', 'password'))
+    data = cloud_api.System.bind(request.data['email'], request.data['password'], request.data['name'])
     return api_success(data)
