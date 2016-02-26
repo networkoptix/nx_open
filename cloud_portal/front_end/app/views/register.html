@@ -56,19 +56,9 @@
                 </div>
             </div>
         </div>
-        <div class="form-group" validate-field>
-            <div class="col-sm-offset-4 col-sm-4">
-                <div class="checkbox">
-                    <label ><input type="checkbox" ng-model="account.agree" name="agree" id="agree"
-                                   required> I agree with <a href="#/static/eula" target="_blank">Terms and Conditions</a></label>
-                </div>
-            </div>
-            <div class="col-sm-4">
-                <span class="help-block" ng-if="registerForm.agree.$touched && registerForm.agree.$error.required">You must comply.</span>
-            </div>
-        </div>
         <div class="form-group">
             <div class="col-sm-offset-4 col-sm-8">
+                <p><b>By clicking Register, you agree to our <a href="#/static/eula" target="_blank">Terms and Conditions</a></b></p>
                 <process-button process="register"
                                 form="registerForm"
                                 button-text="'Register'"></process-button>
