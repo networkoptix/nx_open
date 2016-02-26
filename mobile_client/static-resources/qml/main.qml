@@ -213,6 +213,8 @@ Window {
         }
 
         onConnectionFailed: {
+            unlockScreenOrientation()
+
             Main.openFailedSession(
                         currentSessionId,
                         currentHost, currentPort,
