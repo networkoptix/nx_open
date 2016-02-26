@@ -166,7 +166,7 @@
                                 <argument>-template-xml</argument>
                                 <argument>${root.dir}/mediaserver_core/api/api_template.xml</argument>                                
                                 <argument>-output-xml</argument>
-                                <argument>${project.build.directory}/additional-resources/static/api.xml</argument>
+                                <argument>${project.build.directory}/resources/static/api.xml</argument>
                             </arguments>
                         </configuration>
                     </execution>                   
