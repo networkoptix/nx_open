@@ -19,22 +19,6 @@ class QnStorageDb: public nx::media_db::DbHelperHandler
     typedef boost::bimap<QString, uint16_t> UuidToHash;
 
 public:
-    struct DeleteRecordInfo
-    {
-        DeleteRecordInfo(): startTimeMs(-1) {}
-        DeleteRecordInfo(const QString& cameraUniqueId,
-                         QnServer::ChunksCatalog catalog, 
-                         qint64 startTimeMs): 
-            cameraUniqueId(cameraUniqueId),
-            catalog(catalog),
-            startTimeMs(startTimeMs) 
-        {}
-
-        QString cameraUniqueId;
-        QnServer::ChunksCatalog catalog;
-        qint64 startTimeMs;
-    };
-
     QnStorageDb(const QnStorageResourcePtr& storage, int storageIndex);
     virtual ~QnStorageDb();
 
@@ -52,7 +36,7 @@ public:
     /*!
         \return \a false if failed to save to DB
     */
-    bool flushRecords();
+    bool flushRecords() { return true; }
     QVector<DeviceFileCatalogPtr> loadFullFileCatalog();
 
     bool replaceChunks(const QString& cameraUniqueId,
@@ -71,13 +55,6 @@ private: // nx::media_db::DbHelperHandler implementation
 
 private:
     bool createDatabase(const QString &fileName);
-
-    bool flushRecordsNoLock();
-    bool deleteRecordsInternal(const DeleteRecordInfo& delRecord);
-    bool addRecordInternal(const QString& cameraUniqueId,
-                           QnServer::ChunksCatalog catalog,
-                           const DeviceFileCatalog::Chunk& chunk);
-
     QVector<DeviceFileCatalogPtr> loadChunksFileCatalog();
 
     void addCatalogFromMediaFolder(const QString& postfix, 
@@ -87,26 +64,7 @@ private:
 private:
     QnStorageResourcePtr m_storage;
     int m_storageIndex;
-    QElapsedTimer m_lastTranTime;
-
-    struct DelayedData 
-    {
-        DelayedData (const QString& cameraUniqueId = QString(), 
-                     QnServer::ChunksCatalog catalog = QnServer::ChunksCatalogCount, 
-                     const DeviceFileCatalog::Chunk& chunk = DeviceFileCatalog::Chunk()): 
-            cameraUniqueId(cameraUniqueId), 
-            catalog(catalog),
-            chunk(chunk) {}
-
-        QString cameraUniqueId;
-        QnServer::ChunksCatalog catalog;
-        DeviceFileCatalog::Chunk chunk;
-    };
-
     mutable QnMutex m_syncMutex;
-    QVector<DelayedData> m_delayedData;
-    QVector<DeleteRecordInfo> m_recordsToDelete;
-    bool m_needReopenDB;
 
     nx::media_db::DbHelper m_dbHelper;
     std::unique_ptr<QIODevice> m_ioDevice;
@@ -114,7 +72,9 @@ private:
     uint8_t m_dbVersion;
     QVector<DeviceFileCatalogPtr> m_readResult;
     UuidToHash m_uuidToHash;
-    nx::media_db::Error m_lastError;
+
+    nx::media_db::Error m_lastWriteError;
+    nx::media_db::Error m_lastReadError;
 };
 
 typedef std::shared_ptr<QnStorageDb> QnStorageDbPtr;

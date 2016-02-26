@@ -52,6 +52,7 @@ struct TestFileOperation
     int code;
     int cameraId;
     int duration;
+    int timeZone;
     int chunksCatalog;
 };
 
@@ -59,14 +60,15 @@ bool operator == (const TestFileOperation &lhs, const TestFileOperation &rhs)
 {
     return lhs.startTime == rhs.startTime && lhs.fileSize == rhs.fileSize &&
            lhs.code == rhs.code && lhs.cameraId == rhs.cameraId &&
-           lhs.duration == rhs.duration && lhs.chunksCatalog == rhs.chunksCatalog;
+           lhs.timeZone == rhs.timeZone && lhs.duration == rhs.duration && 
+           lhs.chunksCatalog == rhs.chunksCatalog;
 }
 
 TestFileOperation generateFileOperation(int code)
 {
-    return{ genRandomNumber<0, 4398046511103LL>(), genRandomNumber<0, 140737488355327LL>(),
-            code, (int)genRandomNumber<0, 65535>(),
-            (int)genRandomNumber<0, 1048575LL>(), (int)genRandomNumber<0, 1>() };
+    return{ genRandomNumber<0, 4398046511103LL>(), genRandomNumber<0, 1099511627776LL>(),
+            code, (int)genRandomNumber<0, 65535>(), (int)genRandomNumber<0, 1048575LL>(), 
+            (int) genRandomNumber<1, 127>(), (int)genRandomNumber<0, 1>() };
 }
 
 struct TestCameraOperation
@@ -110,6 +112,7 @@ public:
         fileOp.setCameraId(tfo.cameraId);
         fileOp.setCatalog(tfo.chunksCatalog);
         fileOp.setDuration(tfo.duration);
+        fileOp.setTimeZone(tfo.timeZone);
         fileOp.setFileSize(tfo.fileSize);
         fileOp.setRecordType(nx::media_db::RecordType(tfo.code));
         fileOp.setStartTime(tfo.startTime);
@@ -222,6 +225,7 @@ public:
         tfop.chunksCatalog = mediaFileOp.getCatalog();
         tfop.code = (int)mediaFileOp.getRecordType();
         tfop.duration = mediaFileOp.getDuration();
+        tfop.timeZone = mediaFileOp.getTimeZone();
         tfop.fileSize = mediaFileOp.getFileSize();
         tfop.startTime = mediaFileOp.getStartTime();
 
@@ -282,7 +286,9 @@ TEST(MediaDb_test, BitsTwiddling)
         mfop.setCameraId(tfop.cameraId);
         mfop.setCatalog(tfop.chunksCatalog);
         mfop.setDuration(tfop.duration);
+        mfop.setTimeZone(tfop.timeZone);
         mfop.setFileSize(tfop.fileSize);
+        mfop.setStartTime(tfop.startTime);
         mfop.setRecordType(nx::media_db::RecordType(tfop.code));
 
         ASSERT_TRUE(mfop.getCameraId() == tfop.cameraId);
@@ -290,6 +296,8 @@ TEST(MediaDb_test, BitsTwiddling)
         ASSERT_TRUE(mfop.getDuration() == tfop.duration);
         ASSERT_TRUE(mfop.getFileSize() == tfop.fileSize);
         ASSERT_TRUE(mfop.getRecordType() == nx::media_db::RecordType(tfop.code));
+        ASSERT_TRUE(mfop.getStartTime() == tfop.startTime);
+        ASSERT_TRUE(mfop.getTimeZone() == tfop.timeZone);
     }
 
     std::vector<TestCameraOperation> copVector;
@@ -323,7 +331,8 @@ TEST(MediaDb_test, ReadWrite_Simple)
     nx::media_db::Error error;
     TestDataManager tdm(10000);
     TestDbHelperHandler testHandler(&error, &tdm);
-    nx::media_db::DbHelper dbHelper(&dbFile, &testHandler);
+    nx::media_db::DbHelper dbHelper(&testHandler);
+    dbHelper.setDevice(&dbFile);
 
     // Wrong mode test 
     error = dbHelper.writeFileHeader(
@@ -376,7 +385,9 @@ TEST(MediaDb_test, DbFileTruncate)
         nx::media_db::Error error;
         TestDataManager tdm(1);
         TestDbHelperHandler testHandler(&error, &tdm);
-        nx::media_db::DbHelper dbHelper(&dbFile, &testHandler);
+        nx::media_db::DbHelper dbHelper(&testHandler);
+
+        dbHelper.setDevice(&dbFile);
         dbHelper.setMode(nx::media_db::Mode::Write);
 
         for (auto &data : tdm.dataVector)
@@ -430,7 +441,9 @@ TEST(MediaDb_test, ReadWrite_MT)
     nx::media_db::Error error;
     TestDataManager tdm(threadsNum * recordsCount);
     TestDbHelperHandler testHandler(&error, &tdm);
-    nx::media_db::DbHelper dbHelper(&dbFile, &testHandler);
+    nx::media_db::DbHelper dbHelper(&testHandler);
+
+    dbHelper.setDevice(&dbFile);
     dbHelper.setMode(nx::media_db::Mode::Write);
 
     //write header explicitely

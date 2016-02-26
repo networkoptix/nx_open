@@ -141,7 +141,17 @@ public:
             request.auth.setUser(lit("admin"));
             request.auth.setPassword(lit("12345"));
             using namespace std::placeholders;
-            m_runningRequestId = m_client.execRequest(request, std::bind(&MulticastHttpTestWorker::callbackTimeout, this, _1, _2, _3), 50);
+            m_runningRequestId = m_client.execRequest(
+                request, 
+                std::bind(
+                    &MulticastHttpTestWorker::callbackTimeout,
+                    this,
+                    std::placeholders::_1,
+                    std::placeholders::_2,
+                    std::placeholders::_3
+                ), 
+                50
+            );
         }
     };
 
@@ -156,7 +166,17 @@ public:
         request.auth.setPassword(lit("12345"));
 
         using namespace std::placeholders;
-        m_runningRequestId = m_client.execRequest(request, std::bind(&MulticastHttpTestWorker::callbackTimeout, this, _1, _2, _3), 50);
+        m_runningRequestId = m_client.execRequest(
+            request, 
+            std::bind(
+                &MulticastHttpTestWorker::callbackTimeout,
+                this,
+                std::placeholders::_1,
+                std::placeholders::_2,
+                std::placeholders::_3
+            ), 
+            50
+        );
     }
 
     void doPasswordTest()

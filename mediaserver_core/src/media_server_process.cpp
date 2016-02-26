@@ -1900,7 +1900,6 @@ void MediaServerProcess::run()
     PluginManager pluginManager(QString(), &pluginContainer);
     PluginManager::instance()->loadPlugins( MSSettings::roSettings() );
 
-    using namespace std::placeholders;
     for (const auto storagePlugin :
          PluginManager::instance()->findNxPlugins<nx_spl::StorageFactory>(nx_spl::IID_StorageFactory))
     {
@@ -1908,7 +1907,7 @@ void MediaServerProcess::run()
             storagePlugin->storageType(),
             std::bind(
                 &QnThirdPartyStorageResource::instance,
-                _1,
+                std::placeholders::_1,
                 storagePlugin
             ),
             false

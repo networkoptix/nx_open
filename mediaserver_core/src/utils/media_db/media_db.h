@@ -76,8 +76,11 @@ struct MediaFileOperation : RecordBase
         part_2 |= (quint64)duration & getBitMask(0x10);
     }
 
-    qint64 getFileSize() const { return (part_2 >> 0x10) & getBitMask(0x2Fll); }
-    void setFileSize(qint64 fileSize) { part_2 |= ((quint64)fileSize & getBitMask(0x2Fll)) << 0x10; }
+    int getTimeZone() const { return (part_2 >> 0x10) & getBitMask(0x7); }
+    void setTimeZone(int timeZone) { part_2 |= ((quint64)timeZone & getBitMask(0x7)) << 0x10; }
+
+    qint64 getFileSize() const { return (part_2 >> 0x17) & getBitMask(0x28ll); }
+    void setFileSize(qint64 fileSize) { part_2 |= ((quint64)fileSize & getBitMask(0x28ll)) << 0x17; }
 
     int getCatalog() const { return (part_2 >> 0x3F) & 0x1; }
     void setCatalog(int catalog) { part_2 |= ((quint64)catalog & 0x1) << 0x3F; }

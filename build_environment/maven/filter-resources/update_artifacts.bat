@@ -4,13 +4,13 @@ set SOURCE=%NX_RSYNC_SOURCE%
 if "%NX_RSYNC_SOURCE%" == "" (
   set SOURCE=enk.me
 )
-set QT_PATH=%SOURCE%/buildenv/${qt.path}
+set QT_PATH=%SOURCE%/buildenv/artifacts/qt/${qt.version}/${platform}/${arch}
 
 set BUILDENVDIR=%cd%
 set RSYNC=%BUILDENVDIR%\rsync-win32\rsync -rtvL --chmod=ugo=rwx
 
-mkdir %BUILDENVDIR%\${qt.path}
-cd %BUILDENVDIR%\${qt.path}
+mkdir %BUILDENVDIR%\artifacts\qt\${qt.version}\${platform}\${arch}
+cd %BUILDENVDIR%\artifacts\qt\${qt.version}\${platform}
 
 @setlocal enableextensions enabledelayedexpansion
 @echo off
@@ -29,3 +29,4 @@ if not x%debug_mode:src=%==x%debug_mode% (
 endlocal
 
 cd %BUILDENVDIR%
+
