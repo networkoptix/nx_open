@@ -81,12 +81,16 @@ private:
     bool setup();
     static int getOpenAlFormat(const QnAudioFormat &audioFormat);
     uint bitRate() const;
+    uint sampleSize() const;
     bool playImpl();
     
     static bool outError(int err, const char *strerr);
     static int checkOpenALErrorDebug(ALCdevice *device);
     bool internalPlay(const void *data, uint size);
     void clearBuffers(bool clearAll);
+
+    qint64 maxAudioJitterUs() const;
+    qint64 deviceLayerBufferSizeUs() const;
 private:
     mutable QnMutex m_mtx;
     QnAudioFormat m_audioFormat;

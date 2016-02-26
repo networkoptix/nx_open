@@ -19,7 +19,19 @@ namespace nx {
 namespace audio {
 
 namespace {
-    static const qint64 kMaxAudioJitter = 64 * 1000;
+    static const qint64 kDefaultMaxAudioJitterUs = 64 * 1000;
+
+    // openal data from private headers
+    struct ALCdevice_struct
+    {
+        uint refCnt;
+        ALCboolean Connected;
+        enum DeviceType {Playback,Capture, Loopback } Type;
+        ALuint       Frequency;
+        ALuint       UpdateSize;
+        ALuint       NumUpdates;
+    };
+
 }
 
 
@@ -151,6 +163,11 @@ uint Sound::bitRate() const
     return m_frequency * (m_bitsPerSample / 8) * m_numChannels;
 }
 
+uint Sound::sampleSize() const
+{
+    return (m_bitsPerSample / 8) * m_numChannels;
+}
+
 uint Sound::bufferTime() const
 {
     uint result = static_cast<uint>(1000000.0f * m_size / bitRate());
@@ -176,6 +193,31 @@ void Sound::clearBuffers(bool clearAll)
             checkOpenALErrorDebug(m_device);
         }
     }
+}
+
+qint64  Sound::deviceLayerBufferSizeUs() const
+{
+#ifdef Q_OS_ANDROID
+    const ALCdevice_struct* devicePriv = (const ALCdevice_struct*) m_device;
+    // I am not sure about this expression. I've found it by experiment
+    // Still have no idea why *2 multiplier is required
+    int bufferedSamples =  devicePriv->NumUpdates * devicePriv->UpdateSize;
+    return 1000000ll * bufferedSamples * 2 / m_frequency;
+#else
+    return 0;
+#endif
+}
+
+
+qint64 Sound::maxAudioJitterUs() const
+{
+#ifdef Q_OS_ANDROID
+    const ALCdevice_struct* devicePriv = (const ALCdevice_struct*) m_device;
+    int bufferedSamples =  devicePriv->NumUpdates * devicePriv->UpdateSize;
+    return 1000000ll * bufferedSamples / m_frequency;
+#else
+    return kDefaultMaxAudioJitterUs;
+#endif
 }
 
 qint64 Sound::playTimeElapsedUsec()
@@ -205,14 +247,16 @@ qint64 Sound::playTimeElapsedUsec()
     qWarning() << "soft to hard jitter:" << (softResultUs - openalResultUs) / 1000.0 << "ms";
 #endif
 
-    if (qAbs(softResultUs - openalResultUs) > kMaxAudioJitter)
+    if (qAbs(softResultUs - openalResultUs) > maxAudioJitterUs())
     {
         m_queuedDurationUs = openalResultUs;
         m_timer.restart();
     }
         
-
-    return m_queuedDurationUs - m_timer.elapsedUS();
+    qint64 result = m_queuedDurationUs - m_timer.elapsedUS();
+    if (result > 0)
+        result += deviceLayerBufferSizeUs();
+    return result;
 }
 
 bool Sound::isBufferUnderflow()
