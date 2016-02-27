@@ -122,7 +122,7 @@ void AudioOutput::write(const AudioFramePtr& audioFrame)
             d->timestampQueue.begin(), d->timestampQueue.begin() + deprecatedFrames);
     }
 
-    if (d->isBuffering && d->audioOutput->playTimeElapsedUsec() >= bufferSizeUsec())
+    if (d->isBuffering && elapsed >= bufferSizeUsec())
     {
         d->isBuffering = false;
         d->audioOutput->resume();
@@ -145,7 +145,7 @@ qint64 AudioOutput::playbackPositionUsec() const
     if (!d->audioOutput || !d->frameDurationUsec || d->timestampQueue.empty())
         return kUnknownPosition; //< unknown position
 
-    const qint64 bufferSizeUsec = d->audioOutput->playTimeElapsedUsec();
+    qint64 bufferSizeUsec = d->audioOutput->playTimeElapsedUsec();
 
     // Consider we write a single frame and call playbackPositionUsec() immediately. In this case
     // queuedFrames returns 1. If queuedFrames is zero, then the very last queued frame already has
@@ -161,13 +161,11 @@ qint64 AudioOutput::playbackPositionUsec() const
         offset = d->frameDurationUsec - rest;
     }
 
-    if (queuedFrames == 0)
-    {
-        // Last queued frame has finished playing.
-        return d->timestampQueue[queueSize - 1] + d->frameDurationUsec;
-    }
+    qint64 resultUs = (queuedFrames == 0) ?
+        d->timestampQueue[queueSize - 1] + d->frameDurationUsec :
+        d->timestampQueue[qMax(0, queueSize - queuedFrames)] + offset;
 
-    return d->timestampQueue[qMax(0, queueSize - queuedFrames)] + offset;
+    return resultUs;
 }
 
 bool AudioOutput::isBufferUnderflow() const

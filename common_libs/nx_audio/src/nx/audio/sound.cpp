@@ -20,20 +20,7 @@ namespace audio {
 
 namespace {
     static const qint64 kDefaultMaxAudioJitterUs = 64 * 1000;
-
-    // openal data from private headers
-    struct ALCdevice_struct
-    {
-        uint refCnt;
-        ALCboolean Connected;
-        enum DeviceType {Playback,Capture, Loopback } Type;
-        ALuint       Frequency;
-        ALuint       UpdateSize;
-        ALuint       NumUpdates;
-    };
-
 }
-
 
 Sound::Sound(ALCdevice *device, const QnAudioFormat& audioFormat):
     QObject()
@@ -42,12 +29,15 @@ Sound::Sound(ALCdevice *device, const QnAudioFormat& audioFormat):
     m_numChannels = audioFormat.channelCount();
     m_frequency = audioFormat.sampleRate();
     m_bitsPerSample = audioFormat.sampleSize();
-    m_size = bitRate() / 30; // use 33 ms buffers
-
+    /*
+    m_size = bitRate() / 32; // use 30+ ms buffers
     // Multiply by 2 to align OpenAL buffer
     int sampleSize = 2 * audioFormat.channelCount() * audioFormat.sampleSize() / 8;
     if (m_size % sampleSize)
         m_size += sampleSize - (m_size % sampleSize);
+    */
+    m_size = AudioDevice::internalBufferInSamples(device) * sampleSize();
+
 
     m_proxyBuffer = new quint8[m_size];
     m_proxyBufferLen = 0;
@@ -195,14 +185,15 @@ void Sound::clearBuffers(bool clearAll)
     }
 }
 
-qint64  Sound::deviceLayerBufferSizeUs() const
+qint64  Sound::extraAudioDelayUs() const
 {
+    if (state() != QAudio::ActiveState)
+        return 0;
+
 #ifdef Q_OS_ANDROID
-    const ALCdevice_struct* devicePriv = (const ALCdevice_struct*) m_device;
     // I am not sure about this expression. I've found it by experiment
-    // Still have no idea why *2 multiplier is required
-    int bufferedSamples =  devicePriv->NumUpdates * devicePriv->UpdateSize;
-    return 1000000ll * bufferedSamples * 2 / m_frequency;
+    int bufferedSamples =  4 * AudioDevice::internalBufferInSamples(m_device);
+    return 1000000ll * bufferedSamples / m_frequency;
 #else
     return 0;
 #endif
@@ -212,8 +203,8 @@ qint64  Sound::deviceLayerBufferSizeUs() const
 qint64 Sound::maxAudioJitterUs() const
 {
 #ifdef Q_OS_ANDROID
-    const ALCdevice_struct* devicePriv = (const ALCdevice_struct*) m_device;
-    int bufferedSamples =  devicePriv->NumUpdates * devicePriv->UpdateSize;
+    // I am not sure about this expression. I've found it by experiment
+    int bufferedSamples =  2 * AudioDevice::internalBufferInSamples(m_device);
     return 1000000ll * bufferedSamples / m_frequency;
 #else
     return kDefaultMaxAudioJitterUs;
@@ -242,7 +233,6 @@ qint64 Sound::playTimeElapsedUsec()
     qint64 openalResultUs = internalBufferUs + unbufferedDurationUs;
 
     qint64 softResultUs = m_queuedDurationUs - m_timer.elapsedUS();
-
 #ifdef SOFT_PLAYTIME_ELAPSED_DEBUG
     qWarning() << "soft to hard jitter:" << (softResultUs - openalResultUs) / 1000.0 << "ms";
 #endif
@@ -251,12 +241,9 @@ qint64 Sound::playTimeElapsedUsec()
     {
         m_queuedDurationUs = openalResultUs;
         m_timer.restart();
+        softResultUs = openalResultUs;
     }
-        
-    qint64 result = m_queuedDurationUs - m_timer.elapsedUS();
-    if (result > 0)
-        result += deviceLayerBufferSizeUs();
-    return result;
+    return softResultUs + extraAudioDelayUs();
 }
 
 bool Sound::isBufferUnderflow()

@@ -90,7 +90,10 @@ private:
     void clearBuffers(bool clearAll);
 
     qint64 maxAudioJitterUs() const;
-    qint64 deviceLayerBufferSizeUs() const;
+    /**
+     * Device specific extra delay for played audio
+     */
+    qint64 extraAudioDelayUs() const;
 private:
     mutable QnMutex m_mtx;
     QnAudioFormat m_audioFormat;

@@ -46,9 +46,12 @@ public:
     void setMute(bool mute);
 
 private:
+    friend class Sound;
+
     QString versionString() const;
     QString company() const;
-
+    static int internalBufferInSamples(ALCdevice* device);
+    void initDeviceInternal();
 signals:
     void volumeChanged(float value);
 
