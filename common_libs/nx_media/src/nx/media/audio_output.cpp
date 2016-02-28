@@ -21,7 +21,7 @@ struct AudioOutputPrivate
     :
         bufferSizeUsec(initialBufferUsec),
         frameDurationUsec(0),
-        isBuffering(false),
+        bufferingBytes(0),
         initialBufferUsec(initialBufferUsec),
         maxBufferUsec(maxBufferUsec)
     {
@@ -31,7 +31,7 @@ struct AudioOutputPrivate
     std::atomic<qint64> bufferSizeUsec; //< Current value for the buffer at microseconds
     qint64 frameDurationUsec; //< Single audio frame duration at microseconds
     std::deque<qint64> timestampQueue; //< last audio frames timestamps at UTC microseconds
-    bool isBuffering; //< True if filling input buffer in progress
+    int bufferingBytes; //< Value > 0 if filling input buffer in progress
     const int initialBufferUsec; //< Initial size for the audio buffer
     const int maxBufferUsec; //< Maximum allowed size for the audio buffer
     mutable QMutex mutex;
@@ -62,7 +62,7 @@ void AudioOutput::resume()
 {
     Q_D(AudioOutput);
     QMutexLocker lock(&d->mutex);
-    if (d->audioOutput && !d->isBuffering)
+    if (d->audioOutput && d->bufferingBytes <= 0)
         d->audioOutput->resume();
 }
 
@@ -96,7 +96,7 @@ void AudioOutput::write(const AudioFramePtr& audioFrame)
         d->audioOutput.reset(audioOutput);
 
         d->audioOutput->suspend(); //< Don't play audio while filling internal buffer.
-        d->isBuffering = true;
+        d->bufferingBytes = audioFormat.bytesForDuration(d->bufferSizeUsec);
 
         // Assume all frames have same duration.
         d->frameDurationUsec = audioFormat.durationForBytes(audioFrame->data.size());
@@ -122,10 +122,11 @@ void AudioOutput::write(const AudioFramePtr& audioFrame)
             d->timestampQueue.begin(), d->timestampQueue.begin() + deprecatedFrames);
     }
 
-    if (d->isBuffering && elapsed >= bufferSizeUsec())
+    if (d->bufferingBytes > 0)
     {
-        d->isBuffering = false;
-        d->audioOutput->resume();
+        d->bufferingBytes = qMax(d->bufferingBytes - (int) audioFrame->data.size(), 0);
+        if (d->bufferingBytes <= 0)
+            d->audioOutput->resume();
     }
 }
 
@@ -178,7 +179,7 @@ bool AudioOutput::isBuffering() const
 {
     Q_D(const AudioOutput);
     QMutexLocker lock(&d->mutex);
-    return d->isBuffering;
+    return d->bufferingBytes > 0;
 }
 
 bool AudioOutput::canAcceptData() const

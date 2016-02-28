@@ -187,9 +187,6 @@ void Sound::clearBuffers(bool clearAll)
 
 qint64  Sound::extraAudioDelayUs() const
 {
-    if (state() != QAudio::ActiveState)
-        return 0;
-
 #ifdef Q_OS_ANDROID
     // I am not sure about this expression. I've found it by experiment
     int bufferedSamples =  4 * AudioDevice::internalBufferInSamples(m_device);
