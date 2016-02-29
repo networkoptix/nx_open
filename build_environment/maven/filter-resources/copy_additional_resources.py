@@ -109,7 +109,10 @@ if __name__ == '__main__':
             
             if qtplugin != '':
                 print join(plugin_source_dir, qtplugin)
-                for file in os.listdir(join(plugin_source_dir, qtplugin)):
+                plugin_dir = join(plugin_source_dir, qtplugin)
+                if not os.path.isdir(plugin_dir):
+                    continue
+                for file in os.listdir(plugin_dir):
                     if fnmatch.fnmatch(file, 'q*d.*'):
                         shutil.copy2(join(plugin_source_dir, qtplugin, file), join(target_dir, 'debug', qtplugin))
                     else:
