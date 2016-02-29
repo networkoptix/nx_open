@@ -227,7 +227,7 @@ bool PlayerDataConsumer::processAudioFrame(const QnCompressedAudioDataPtr& data)
     }
 
     if (!decodedFrame || !decodedFrame->context)
-        return true; //< just skip frame
+        return true; //< decoder is buffering. true means input frame processed
 
     if (!m_audioOutput)
         m_audioOutput.reset(new AudioOutput(kInitialBufferMs * 1000, kMaxLiveBufferMs * 1000));

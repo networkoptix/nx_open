@@ -23,7 +23,8 @@ import android.media.MediaCodecInfo.CodecCapabilities;
 import android.media.MediaCodecInfo.VideoCapabilities;
 import android.media.MediaCodecList;
 
-public class QnMediaDecoder {
+public class QnVideoDecoder 
+{
 
 
     public boolean init(String codecName, int width, int height)
@@ -138,10 +139,8 @@ public class QnMediaDecoder {
             int inputBufferId = codec.dequeueInputBuffer(timeoutUs);
             if (inputBufferId >= 0)
             {
-              //ByteBuffer inputBuffer = codec.getInputBuffer(inputBufferId);
               ByteBuffer inputBuffer = inputBuffers[inputBufferId];
-              inputBuffer.allocateDirect(frameSize);
-              fillInputBuffer(inputBuffer, srcDataPtr, frameSize); //< C++ callback
+              fillInputBuffer(inputBuffer, srcDataPtr, frameSize, inputBuffer.capacity()); //< C++ callback
               codec.queueInputBuffer(inputBufferId, 0, frameSize, frameNum, 0);
             }
             else {
@@ -239,9 +238,7 @@ public class QnMediaDecoder {
         }
     }
 
-
-    private static native void fillInputBuffer(ByteBuffer buffer, long srcDataPtr, int frameSize);
-
+    private static native void fillInputBuffer(ByteBuffer buffer,  long srcDataPtr, int frameSize, int capacity);
     ByteBuffer[] inputBuffers;
     private MediaCodec codec;
     private MediaFormat format;

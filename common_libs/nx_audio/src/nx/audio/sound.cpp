@@ -11,9 +11,16 @@
 #include "utils/common/sleep.h"
 #include "audiodevice.h"
 
+#include <QDebug>
+
+//#define SOFT_PLAYTIME_ELAPSED_DEBUG
+
 namespace nx {
 namespace audio {
 
+namespace {
+    static const qint64 kDefaultMaxAudioJitterUs = 64 * 1000;
+}
 
 Sound::Sound(ALCdevice *device, const QnAudioFormat& audioFormat):
     QObject()
@@ -22,12 +29,15 @@ Sound::Sound(ALCdevice *device, const QnAudioFormat& audioFormat):
     m_numChannels = audioFormat.channelCount();
     m_frequency = audioFormat.sampleRate();
     m_bitsPerSample = audioFormat.sampleSize();
-    m_size = bitRate() / 30; // use 33 ms buffers
-
+    /*
+    m_size = bitRate() / 32; // use 30+ ms buffers
     // Multiply by 2 to align OpenAL buffer
     int sampleSize = 2 * audioFormat.channelCount() * audioFormat.sampleSize() / 8;
     if (m_size % sampleSize)
         m_size += sampleSize - (m_size % sampleSize);
+    */
+    m_size = AudioDevice::internalBufferInSamples(device) * sampleSize();
+
 
     m_proxyBuffer = new quint8[m_size];
     m_proxyBufferLen = 0;
@@ -37,6 +47,9 @@ Sound::Sound(ALCdevice *device, const QnAudioFormat& audioFormat):
     m_deinitialized = false;
     m_isValid = setup();
     m_paused = false;
+
+    m_queuedDurationUs = 0;
+
 
     connect(AudioDevice::instance(), &AudioDevice::volumeChanged, this, [this] (float value)
     {
@@ -140,6 +153,11 @@ uint Sound::bitRate() const
     return m_frequency * (m_bitsPerSample / 8) * m_numChannels;
 }
 
+uint Sound::sampleSize() const
+{
+    return (m_bitsPerSample / 8) * m_numChannels;
+}
+
 uint Sound::bufferTime() const
 {
     uint result = static_cast<uint>(1000000.0f * m_size / bitRate());
@@ -167,7 +185,30 @@ void Sound::clearBuffers(bool clearAll)
     }
 }
 
-uint Sound::playTimeElapsedUsec()
+qint64  Sound::extraAudioDelayUs() const
+{
+#ifdef Q_OS_ANDROID
+    // I am not sure about this expression. I've found it by experiment
+    int bufferedSamples =  4 * AudioDevice::internalBufferInSamples(m_device);
+    return 1000000ll * bufferedSamples / m_frequency;
+#else
+    return 0;
+#endif
+}
+
+
+qint64 Sound::maxAudioJitterUs() const
+{
+#ifdef Q_OS_ANDROID
+    // I am not sure about this expression. I've found it by experiment
+    int bufferedSamples =  2 * AudioDevice::internalBufferInSamples(m_device);
+    return 1000000ll * bufferedSamples / m_frequency;
+#else
+    return kDefaultMaxAudioJitterUs;
+#endif
+}
+
+qint64 Sound::playTimeElapsedUsec()
 {
     QnMutexLocker lock( &m_mtx );
 
@@ -176,17 +217,30 @@ uint Sound::playTimeElapsedUsec()
 
     clearBuffers(false);
 
-    ALfloat offset;
     ALint queued = 0;
-    alGetSourcef(m_source, AL_SEC_OFFSET, &offset);
-    checkOpenALErrorDebug(m_device);
+    ALfloat offset = 0;
+
     alGetSourcei(m_source, AL_BUFFERS_QUEUED, &queued);
     checkOpenALErrorDebug(m_device);
 
-    uint res = static_cast<uint>(bufferTime() * queued - offset * 1000000.0f);
+    qint64 unbufferedDurationUs = (m_proxyBufferLen * 1000000) / bitRate();
+    alGetSourcef(m_source, AL_SEC_OFFSET, &offset);
+    checkOpenALErrorDebug(m_device);
+    qint64 internalBufferUs = static_cast<qint64>(bufferTime() * queued - offset * 1000000.0f);
+    qint64 openalResultUs = internalBufferUs + unbufferedDurationUs;
 
-    uint unbufferedDuration = (m_proxyBufferLen * 1000000) / bitRate();
-    return res +unbufferedDuration;
+    qint64 softResultUs = m_queuedDurationUs - m_timer.elapsedUS();
+#ifdef SOFT_PLAYTIME_ELAPSED_DEBUG
+    qWarning() << "soft to hard jitter:" << (softResultUs - openalResultUs) / 1000.0 << "ms";
+#endif
+
+    if (qAbs(softResultUs - openalResultUs) > maxAudioJitterUs())
+    {
+        m_queuedDurationUs = openalResultUs;
+        m_timer.restart();
+        softResultUs = openalResultUs;
+    }
+    return softResultUs + extraAudioDelayUs();
 }
 
 bool Sound::isBufferUnderflow()
@@ -213,7 +267,8 @@ bool Sound::playImpl()
     alGetSourcei(m_source, AL_SOURCE_STATE, &state);
     checkOpenALErrorDebug(m_device);
     // if already playing
-    if (AL_PLAYING != state) {
+    if (AL_PLAYING != state) 
+    {
         float volume = AudioDevice::instance()->volume();
         alSourcef(m_source, AL_GAIN, volume);
 
@@ -222,8 +277,14 @@ bool Sound::playImpl()
         ALint queuedBuffers = 0;
         alGetSourcei(m_source, AL_BUFFERS_QUEUED, &queuedBuffers);
         checkOpenALErrorDebug(m_device);
-        if (queuedBuffers) {
+        if (queuedBuffers) 
+        {
             // play
+            auto timerState = m_timer.state();
+            if (timerState == nx::ElapsedTimer::State::Stopped)
+                m_timer.restart();
+            else if (timerState == nx::ElapsedTimer::State::Paused)
+                m_timer.resume();
             alSourcePlay(m_source);
             checkOpenALErrorDebug(m_device);
             return true;
@@ -250,6 +311,7 @@ QAudio::State Sound::state() const
 bool Sound::write(const quint8* data, uint size)
 {
     QnMutexLocker lock( &m_mtx );
+    m_queuedDurationUs += (size * 1000000ll) / bitRate();
 
     if (m_deinitialized)
     {
@@ -283,6 +345,7 @@ bool Sound::write(const quint8* data, uint size)
 bool Sound::internalPlay(const void* data, uint size)
 {
     clearBuffers(false);
+
     ALuint buf = 0;
     alGenBuffers(1, &buf);
     checkOpenALErrorDebug(m_device);
@@ -333,6 +396,7 @@ void Sound::suspend()
     QnMutexLocker lock( &m_mtx );
     m_paused = true;
     alSourcePause(m_source);
+    m_timer.suspend();
 }
 
 void Sound::resume()
@@ -360,6 +424,7 @@ void Sound::internalClear()
 #ifdef Q_OS_MAC
     QnSleep::msleep(bufferTime()/1000);
 #endif
+    m_timer.stop();
 
     clearBuffers(true);
     alDeleteSources(1, &m_source);

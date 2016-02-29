@@ -37,6 +37,8 @@ public:
 
     virtual QnStatisticsSettings settings() = 0;
 
+    virtual void updateSettings() = 0;
+
 signals:
     void settingsAvailableChanged();
 };

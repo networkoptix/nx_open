@@ -7,6 +7,8 @@
 #include <nx/utils/thread/mutex.h>
 #include <utils/media/audioformat.h>
 
+#include <utils/timer.h>
+
 class AudioDevice;
 typedef struct ALCdevice_struct ALCdevice;
 
@@ -38,7 +40,7 @@ public:
     /**
      * @return internal buffer duration in microseconds
      */
-    uint playTimeElapsedUsec();
+    qint64 playTimeElapsedUsec();
 
     /**
      * @return True if no data in the internal buffer
@@ -80,6 +82,7 @@ private:
     bool setup();
     static int getOpenAlFormat(const QnAudioFormat &audioFormat);
     uint bitRate() const;
+    uint sampleSize() const;
     bool playImpl();
 
     static bool outError(int err, const char *strerr);
@@ -87,6 +90,11 @@ private:
     bool internalPlay(const void *data, uint size);
     void clearBuffers(bool clearAll);
 
+    qint64 maxAudioJitterUs() const;
+    /**
+     * Device specific extra delay for played audio
+     */
+    qint64 extraAudioDelayUs() const;
 private:
     mutable QnMutex m_mtx;
     QnAudioFormat m_audioFormat;
@@ -105,6 +113,10 @@ private:
     int m_proxyBufferLen;
     bool m_deinitialized;
     bool m_paused;
+
+    nx::ElapsedTimer m_timer;
+    qint64 m_queuedDurationUs;
+
 private:
     void internalClear();
     static int checkOpenALError(ALCdevice *device);

@@ -374,6 +374,14 @@ qint64 QnAudioFormat::durationForBytes(int bytes) const
     return qint64(1000000LL * (bytes / bytesPerFrame())) / sampleRate();
 }
 
+int QnAudioFormat::bytesForDuration(qint64 durationUs) const
+{
+    if (!isValid() || durationUs <= 0)
+        return 0;
+
+    return int((durationUs * bytesPerFrame() * sampleRate()) / 1000000LL);
+}
+
 int QnAudioFormat::bytesPerFrame() const
 {
     if (!isValid())

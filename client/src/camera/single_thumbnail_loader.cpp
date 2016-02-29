@@ -7,6 +7,7 @@
 #include <common/common_module.h>
 
 #include <core/resource/media_server_resource.h>
+#include <core/resource/camera_resource.h>
 
 #include <utils/common/model_functions.h>
 
@@ -28,6 +29,16 @@ QnSingleThumbnailLoader::QnSingleThumbnailLoader(const QnVirtualCameraResourcePt
     m_request.rotation = rotation;
     m_request.size = size;
     m_request.imageFormat = format;
+
+    if (!camera || !camera->hasVideo(nullptr))
+    {
+        if (statusPixmapManager)
+        {
+            QPixmap statusPixmap = statusPixmapManager->statusPixmap(QnCameraThumbnailManager::NoData);
+            m_image = statusPixmap.toImage();
+        }
+        return;
+    }
 
     if (statusPixmapManager)
     {

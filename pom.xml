@@ -155,13 +155,13 @@
         <qtlibs>
             Core, Network, Xml, Concurrent, Sql, Multimedia, OpenGL, Widgets, Gui, X11Extras,
             PrintSupport, MultimediaWidgets, Quick, MultimediaQuick_p, Qml,
-            XmlPatterns
+            XmlPatterns, XcbQpa
         </qtlibs>
         <additional.qtlibs/>
 
         <!--QT plugins used-->
         <qtplugins>
-            imageformats, platforms
+            imageformats, platforms, xcbglintegrations
         </qtplugins>
         <additional.qtplugins/>
 
@@ -878,7 +878,6 @@
                 </property>
             </activation>
             <properties>
-                <qt.version>5.6.0</qt.version>
                 <compile.options/>
                 <additional.qtplugins>audio</additional.qtplugins>
             </properties>
@@ -907,6 +906,7 @@
             <properties>
                 <platform>android</platform>
                 <toolchain.version>android</toolchain.version>
+                <qt.version>5.5.1</qt.version>
                 <qt.spec>android-g++</qt.spec>
                 <qt.classifier>${platform}-${arch}</qt.classifier>
                 <libdir>${root.dir}/build_environment/target</libdir>

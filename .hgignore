@@ -108,6 +108,7 @@ axiscamplugin/arm
 
 build_environment/dependencies/x86
 build_environment/dependencies/x64
+build_environment/target-android
 
 client/bin
 client/build
@@ -150,6 +151,8 @@ client.bin/arm
 
 common/bin
 common/build
+common_libs/nx_media/arm
+common_libs/nx_audio/arm
 common/src/common.pro
 common/src/plugins/resources/archive/filetypes.h
 common/src/Makefile
