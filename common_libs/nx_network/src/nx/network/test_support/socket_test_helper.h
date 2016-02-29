@@ -49,6 +49,7 @@ public:
 
     int id() const;
     void setLocalAddress(SocketAddress addr);
+    SocketAddress getLocalAddress() const;
     void start();
 
     size_t totalBytesSent() const;
