@@ -22,10 +22,19 @@ CachedOutputStream::~CachedOutputStream()
     stop();
 }
 
-void CachedOutputStream::postPacket( const QByteArray& data )
+void CachedOutputStream::postPacket(const QByteArray& data, int maxQueueSize)
 {
-    if( data.isEmpty() )
+    if (data.isEmpty())
         return;
+    if (maxQueueSize > -1 && m_packetsToSend.size() > maxQueueSize)
+    {
+        QnMutexLocker lk(&m_mutex);
+        while (m_packetsToSend.size() > maxQueueSize && !m_failed && !needToStop())
+            m_cond.wait(lk.mutex());
+
+        if (m_failed || needToStop())
+            return;
+    }
     m_packetsToSend.push( data );
 }
 
@@ -60,5 +69,7 @@ void CachedOutputStream::run()
             m_failed = true;
             break;
         }
+        m_cond.wakeAll();
     }
+    m_cond.wakeAll();
 }
