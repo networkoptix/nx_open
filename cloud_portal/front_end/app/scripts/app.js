@@ -4,6 +4,7 @@ angular.module('cloudApp', [
     'ipCookie',
     'ngResource',
     'ngSanitize',
+    'ngAnimate',
     'ngRoute',
     'ui.bootstrap',
     'ngStorage'

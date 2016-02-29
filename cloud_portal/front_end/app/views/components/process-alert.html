@@ -1,13 +1,18 @@
-<div>
-    <div class="alert alert-success" ng-if="successMessage && process.success"
-         ng-bind-html="successMessage"></div>
 
-    <div class="alert alert-danger" ng-if="process.error && process.errorMessage"
-         ng-bind-html="errorPrefix + ' ' + process.errorMessage"></div>
+<uib-alert type="success" class="alert-top" ng-animate="'example'"
+           ng-if="successMessage && process.success && !shown.success"
+           dismiss-on-timeout="{{alertTimeout}}"
+           close="closeAlert('success');" ><span ng-bind-html="successMessage"></span></uib-alert>
 
-    <div class="alert alert-info" ng-if="introMessage && !process.running && !process.success && !process.error"
-         ng-bind-html="introMessage"></div>
+<uib-alert type="danger" class="alert-top"
+           ng-if="process.errorMessage && process.error && !shown.error"
+           dismiss-on-timeout="{{alertTimeout}}"
+           close="closeAlert('error');" ><span ng-bind-html="errorPrefix + ' ' + process.errorMessage"></span></uib-alert>
 
-    <div class="alert alert-warning" ng-if="processMessage && process.running"
-         ng-bind-html="processMessage"></div>
-</div>
+<uib-alert type="warning"
+           ng-if="processMessage && process.processing && !shown.process"
+        ><span ng-bind-html="processMessage"></span></uib-alert>
+
+<uib-alert type="info"
+           ng-if="introMessage && !process.processing && !process.success && !process.error && !shown.intro"
+        ><span ng-bind-html="introMessage"></span></uib-alert>

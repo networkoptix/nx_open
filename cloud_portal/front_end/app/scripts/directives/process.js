@@ -13,6 +13,17 @@ angular.module('cloudApp').directive('processAlert', function () {
             },
             link:function(scope,element,attrs){
                 scope.attrs = attrs;
+                scope.shown = {};
+
+                scope.alertTimeout = Config.alertTimeout;
+                scope.closeAlert = function(type){
+                    console.log("close alert", type, Config.alertTimeout);
+                    scope.shown[type] = true;
+                };
+
+                scope.$watch('process.processing',function(){
+                    scope.shown = {};
+                });
             }
         };
     }).directive('processButton', function () {

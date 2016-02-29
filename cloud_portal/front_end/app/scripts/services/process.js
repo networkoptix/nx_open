@@ -5,6 +5,9 @@ angular.module('cloudApp')
     .factory('process', function ($q) {
 
         function formatError(error,errorCodes){
+            if(!error || !error.resultCode){
+                return L.errorCodes.unknownError;
+            }
             if(errorCodes && typeof(errorCodes[error.resultCode]) != 'undefined'){
                 if($.isFunction(errorCodes[error.resultCode])){
                     var result = errorCodes[error.resultCode](error);

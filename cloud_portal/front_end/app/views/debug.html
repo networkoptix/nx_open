@@ -1,4 +1,24 @@
 <form class="form-horizontal" novalidate>
+
+    <h1>Debug alerts</h1>
+    <pre>{{formatJSON(debugProcess.process)}}</pre>
+    <process-alert process="debugProcess.process"
+                   process-message="'Processing'"
+                   intro-message="'Intro'"
+                   success-message="'Success!'"
+                   error-prefix="'Fail!'"></process-alert>
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <label><input type="checkbox" ng-model="debugProcess.success"/>Success</label>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <button class="btn btn-primary" ng-click="debugProcess.process.run()">Run process</button>
+        </div>
+    </div>
+
+
     <h1>Debug notifications</h1>
     <div class="form-group">
         <label class="col-sm-2 control-label">Email</label>

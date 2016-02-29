@@ -51,12 +51,6 @@ footer .nav > li > a{
     padding: 6px 12px;
 }
 
-.alert-danger{
-    white-space: pre-wrap;
-}
-
-
-
 .loading .auth-visible,
 .loading .auth-hidden{
     display: none;
@@ -227,3 +221,32 @@ a .product-name:after {
 .inline-block{
   display: inline-block;
 }
+
+.alert-top{
+  position:fixed;
+  top: 30px;
+  left:50%;
+  transform: translateX(-50%);
+  min-width: 500px;
+  z-index:1100;
+
+
+ &.ng-animate {
+    transition: 0.5s linear all;
+
+    &.ng-enter {
+      opacity: 0;
+    }
+    &.ng-enter-active{
+      opacity: 1;
+    }
+
+    &.ng-leave {
+      opacity: 1;
+    }
+    &.ng-leave-active{
+       opacity: 0;
+    }
+  }
+}
+
