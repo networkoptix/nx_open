@@ -179,8 +179,13 @@ protected:
         }
 
         QnByteArray result(CL_MEDIA_ALIGNMENT, 0);
+        bool isArchive = !(media->flags & QnAbstractMediaData::MediaFlags_LIVE);
 
-        QnByteArray* const resultPtr = (m_dataOutput.get() && m_dataOutput->packetsInQueue() > m_maxFramesToCacheBeforeDrop) ? NULL : &result;
+        QnByteArray* const resultPtr = 
+            (m_dataOutput.get() && 
+             !isArchive && // thin out only live frames
+             m_dataOutput->packetsInQueue() > m_maxFramesToCacheBeforeDrop) ? NULL : &result;
+
         if( !resultPtr )
         {
             NX_LOG( lit("Insufficient bandwidth to %1. Skipping frame...").
@@ -279,6 +284,18 @@ private:
         //sending frame
         if (m_dataOutput.get())
         {
+            while (m_dataOutput->packetsInQueue() > m_maxFramesToCacheBeforeDrop)
+            {   // Wait if bandwidth is not sufficient
+                // This is to ensure that we will send every archive packet.
+                // This shouldn't affect live packets, as we thin them out above. 
+                // Refer to processData() for details.
+                std::this_thread::sleep_for(std::chrono::milliseconds(200));
+                if (m_dataOutput->failed())
+                {
+                    m_needStop = true;
+                    return;
+                }
+            }
             m_dataOutput->postPacket(outPacket);
             if (m_dataOutput->failed())
                 m_needStop = true;
