@@ -313,7 +313,7 @@ nx_http::StatusCode::Value SettingsActionHandler::loadSettingsRemotely(
         if ((osErrorCode == SystemError::noError)
             && (httpCode == nx_http::StatusCode::ok))
         {
-            settings = QnUbjson::deserialized(body, settings, &success);
+            settings = QJson::deserialized(body, settings, &success);
         }
 
         const auto updateOutputDataCallback =
