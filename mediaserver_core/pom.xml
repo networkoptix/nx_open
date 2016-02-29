@@ -28,7 +28,7 @@
         <!--Global libs-->
         <qt.libs>core network xml xmlpatterns sql concurrent multimedia</qt.libs>
         <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lswresample -lpostproc</ffmpeg.libs>
-        <global.libs>-lcommon -lappserver2 -lonvif -lquazip -ludt -lnx_email -lnx_streaming</global.libs>
+        <global.libs>-lcommon -lappserver2 -lonvif -lquazip -ludt -lnx_email -lnx_streaming -lnx_network</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>Ws2_32.lib DbgHelp.lib sigar.lib -lIphlpapi -lwinmm -lssleay32 -llibeay32</windows.oslibs>
         <linux.oslibs>-lmp3lame -lssl -lcrypto -lsigar -lfaac -lvpx -lvorbisenc -lvorbis -ldl -lssl</linux.oslibs>
