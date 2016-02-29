@@ -81,7 +81,7 @@ namespace
     private:
         typedef QScopedPointer<QnStatisticsSettings> SettingsPtr;
 
-        QMutex m_mutex;
+        QnMutex m_mutex;
         QElapsedTimer m_timer;
         SettingsPtr m_settings;
     };
@@ -102,21 +102,21 @@ namespace
 
     void SettingsCache::update(const QnStatisticsSettings &settings)
     {
-        const QMutexLocker guard(&instance().m_mutex);
+        const QnMutexLocker guard(&instance().m_mutex);
         instance().m_timer.restart();
         instance().m_settings.reset(new QnStatisticsSettings(settings));
     }
 
     void SettingsCache::clear()
     {
-        const QMutexLocker guard(&instance().m_mutex);
+        const QnMutexLocker guard(&instance().m_mutex);
         instance().m_timer.restart();
         instance().m_settings.reset();
     }
 
     bool SettingsCache::copyTo(QnStatisticsSettings &output)
     {
-        const QMutexLocker guard(&instance().m_mutex);
+        const QnMutexLocker guard(&instance().m_mutex);
 
         enum { kMinSettingsUpdateTime = 4 * 60 * 60 * 1000 }; // every 4 hours
 
