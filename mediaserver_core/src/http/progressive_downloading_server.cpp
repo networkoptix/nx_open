@@ -57,6 +57,7 @@ public:
         m_owner(owner),
         m_standFrameDuration( standFrameDuration ),
         m_lastMediaTime(AV_NOPTS_VALUE),
+        m_lastSentTime(AV_NOPTS_VALUE),
         m_utcShift(0),
         m_maxFramesToCacheBeforeDrop( maxFramesToCacheBeforeDrop ),
         m_adaptiveSleep( MAX_FRAME_DURATION*1000 ),
@@ -169,8 +170,8 @@ protected:
 
         if (media && !(media->flags & QnAbstractMediaData::MediaFlags_LIVE) && m_continuousTimestamps)
         {
-            if (m_lastMediaTime != (qint64)AV_NOPTS_VALUE && 
-                media->timestamp - m_lastMediaTime > MAX_FRAME_DURATION*1000 &&
+            if (m_lastSentTime != (qint64)AV_NOPTS_VALUE && m_lastMediaTime != (qint64)AV_NOPTS_VALUE && 
+                media->timestamp - m_lastSentTime > MAX_FRAME_DURATION*1000 &&
                 media->timestamp != (qint64)AV_NOPTS_VALUE && media->timestamp != DATETIME_NOW)
             {
                 m_utcShift -= (media->timestamp - m_lastMediaTime) - 1000000/60;
@@ -195,6 +196,7 @@ protected:
             if( resultPtr && result.size() > 0 )
             {
                 sendFrame(media->timestamp, result);
+                m_lastSentTime = m_lastMediaTime;
             }
         }
         else
