@@ -257,7 +257,7 @@ void QnNotificationsCollectionWidget::loadThumbnailForItem(QnNotificationWidget 
                                                            const QnVirtualCameraResourcePtr &camera,
                                                            qint64 msecSinceEpoch)
 {
-    if (!camera)
+    if (!camera || !camera->hasVideo(nullptr))
         return;
 
     QnSingleThumbnailLoader *loader = new QnSingleThumbnailLoader(
