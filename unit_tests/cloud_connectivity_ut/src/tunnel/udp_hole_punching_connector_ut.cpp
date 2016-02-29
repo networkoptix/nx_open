@@ -228,7 +228,6 @@ TEST_F(UdpHolePunchingTunnelConnector, cancellation)
         cloud::UdpHolePunchingTunnelConnector connector(
             SocketAddress((server->serverId() + "." + system.id).constData()));
 
-        auto t1 = std::chrono::steady_clock::now();
         connector.connect(
             std::chrono::milliseconds::zero(),
             [](

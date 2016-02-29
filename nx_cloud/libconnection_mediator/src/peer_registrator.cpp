@@ -52,7 +52,7 @@ PeerRegistrator::PeerRegistrator(
             });
 
     // TODO: NX_LOG
-    Q_ASSERT_X(result, Q_FUNC_INFO, "Could not register one of processors");
+    NX_ASSERT(result, Q_FUNC_INFO, "Could not register one of processors");
 }
 
 void PeerRegistrator::bind(

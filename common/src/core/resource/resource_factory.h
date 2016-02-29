@@ -4,6 +4,7 @@
 #include "resource_fwd.h"
 
 #include <utils/common/id.h>
+#include <nx/utils/log/assert.h>
 
 struct QnResourceParams {
     QnResourceParams() {}
@@ -16,7 +17,7 @@ struct QnResourceParams {
         url(url),
         vendor(vendor)
     {
-        assert( !resID.isNull() );
+        NX_ASSERT( !resID.isNull() );
     }
 
     QnUuid resID;

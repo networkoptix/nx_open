@@ -69,7 +69,7 @@ namespace aio {
             }
             else
             {
-                assert( false );
+                NX_ASSERT( false );
                 return (*setToUse)->end();
             }
 
@@ -296,14 +296,14 @@ namespace aio {
             setToUse = &m_impl->writeSockets;
         else
         {
-            assert( false );
+            NX_ASSERT( false );
             return false;
         }
 
         //assuming that canAcceptSocket has been called prior to this method
         if( !setToUse->emplace( sock, userData ).second )
             return true;    //socket is already there
-        assert( setToUse->size() <= FD_SETSIZE );
+        NX_ASSERT( setToUse->size() <= FD_SETSIZE );
         return true;
     }
 

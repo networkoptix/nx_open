@@ -192,7 +192,7 @@ QueueFileWriter* QnWriterPool::getWriter(const QnUuid& writerPoolId)
     WritersMap::iterator itr = m_writers.find(writerPoolId);
     if (itr == m_writers.end())
         itr = m_writers.insert(writerPoolId, new QueueFileWriter());
-    Q_ASSERT(m_writers.size() < 16); // increase this value if you need more storages
+    NX_ASSERT(m_writers.size() < 16); // increase this value if you need more storages
     return itr.value();
 }
 

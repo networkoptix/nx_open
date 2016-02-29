@@ -223,7 +223,7 @@ QnMediaServerResourcePtr QnRtspClientArchiveDelegate::getServerOnTime(qint64 tim
 
 bool QnRtspClientArchiveDelegate::open(const QnResourcePtr &resource) {
     QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
-    Q_ASSERT(camera);
+    NX_ASSERT(camera);
     if (!camera)
         return false;
 

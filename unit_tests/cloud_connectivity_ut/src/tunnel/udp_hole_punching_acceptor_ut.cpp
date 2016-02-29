@@ -17,6 +17,8 @@ const SocketAddress kMediatorAddress("127.0.0.1:12345");
 const SocketAddress k2ndPeerAddress("127.0.0.1:12346");
 const String kRemotePeerId("SomePeerId");
 const String kConnectionSessionId("SomeSessionId");
+const std::chrono::milliseconds kSocketTimeout(2000);
+const std::chrono::milliseconds kUdpRetryTimeout(500);
 
 class DummyCloudSystemCredentialsProvider
 :
@@ -59,8 +61,8 @@ protected:
                 onUdpRequest(std::move(c), std::move(m));
             });
 
-        assert(udpStunServer.bind(kMediatorAddress));
-        assert(udpStunServer.listen());
+        NX_ASSERT(udpStunServer.bind(kMediatorAddress));
+        NX_ASSERT(udpStunServer.listen());
     }
 
     void createAndStartAcceptor(size_t socketsToAccept)
@@ -71,8 +73,8 @@ protected:
         tunnelAcceptor.reset(new UdpHolePunchingTunnelAcceptor(k2ndPeerAddress));
         tunnelAcceptor->setConnectionInfo(kConnectionSessionId, kRemotePeerId);
         tunnelAcceptor->setMediatorConnection(mediatorConnection);
-        tunnelAcceptor->setUdtConnectTimeout(std::chrono::seconds(1));
-        tunnelAcceptor->setUdpRetransmissionTimeout(std::chrono::milliseconds(500));
+        tunnelAcceptor->setUdtConnectTimeout(kSocketTimeout);
+        tunnelAcceptor->setUdpRetransmissionTimeout(kUdpRetryTimeout);
         tunnelAcceptor->setUdpMaxRetransmissions(1);
 
         tunnelAcceptor->accept(
@@ -147,7 +149,7 @@ protected:
     {
         auto socket = std::make_unique<UdtStreamSocket>();
         ASSERT_TRUE(socket->setRendezvous(true));
-        ASSERT_TRUE(socket->setSendTimeout(1000));
+        ASSERT_TRUE(socket->setSendTimeout(kSocketTimeout.count()));
         ASSERT_TRUE(socket->setNonBlockingMode(true));
         ASSERT_TRUE(socket->bind(k2ndPeerAddress));
         socket->connectAsync(
@@ -168,7 +170,7 @@ protected:
     void connectClientSocket(const SocketAddress& address)
     {
         auto socket = std::make_unique<UdtStreamSocket>();
-        ASSERT_TRUE(socket->setSendTimeout(3000));
+        ASSERT_TRUE(socket->setSendTimeout(kSocketTimeout.count()));
         ASSERT_TRUE(socket->setNonBlockingMode(true));
         socket->connectAsync(
             address,
@@ -207,8 +209,6 @@ protected:
     stun::MessageDispatcher stunMessageDispatcher;
     stun::UDPServer udpStunServer;
 
-    enum class UdtServerBehaviour { kIgnoreRequest, };
-
     bool isUdpServerEnabled;
     size_t connectionRequests;
     SyncQueue<SystemError::ErrorCode> connectResults;
@@ -244,7 +244,7 @@ TEST_F(UdpHolePunchingTunnelAcceptorTest, UdtConnectTimeout)
 TEST_F(UdpHolePunchingTunnelAcceptorTest, UdtConnectPleaseStop)
 {
     createAndStartAcceptor(1);
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    std::this_thread::sleep_for(kUdpRetryTimeout);
     tunnelAcceptor->pleaseStopSync();
     tunnelAcceptor.reset();
     ASSERT_TRUE(acceptResults.isEmpty());
@@ -266,7 +266,8 @@ TEST_F(UdpHolePunchingTunnelAcceptorTest, MultiUdtConnect)
     ASSERT_EQ(acceptResults.pop(), SystemError::noError); // connection
     for (size_t i = 0; i < 5; ++i)
     {
-        ASSERT_EQ(acceptResults.pop(), SystemError::noError); // socket
+        ASSERT_EQ(acceptResults.pop(), SystemError::noError) 
+            << "i = " << i; // socket
         ASSERT_EQ(connectResults.pop(), SystemError::noError);
     }
 }

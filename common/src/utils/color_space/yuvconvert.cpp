@@ -28,7 +28,7 @@ void yuv444_argb32_simd_intr(unsigned char * dst, const unsigned char * py,
                             const unsigned int dst_stride, const unsigned int y_stride,
                             const unsigned int uv_stride, quint8 alpha)
 {
-    Q_ASSERT(qPower2Ceil(width, 16) <= y_stride && qPower2Ceil(width*4,64) <= dst_stride);
+    NX_ASSERT(qPower2Ceil(width, 16) <= y_stride && qPower2Ceil(width*4,64) <= dst_stride);
     __m128i sse_alpha_intrs = _mm_setr_epi8(alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha); /* SSE2. */
     int xSteps = qPower2Ceil(width, 16) / 16;
 
@@ -97,7 +97,7 @@ void yuv422_argb32_simd_intr(unsigned char * dst, const unsigned char * py,
                             const unsigned int dst_stride, const unsigned int y_stride,
                             const unsigned int uv_stride, quint8 alpha)
 {
-    Q_ASSERT(qPower2Ceil(width, 16) <= y_stride && qPower2Ceil(width*4,64) <= dst_stride);
+    NX_ASSERT(qPower2Ceil(width, 16) <= y_stride && qPower2Ceil(width*4,64) <= dst_stride);
     __m128i sse_alpha_intrs = _mm_setr_epi8(alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha); /* SSE2. */
     int xSteps = qPower2Ceil(width, 16) / 16;
 
@@ -171,7 +171,7 @@ void yuv420_argb32_simd_intr(unsigned char * dst, const unsigned char * py,
                             const unsigned int dst_stride, const unsigned int y_stride,
                             const unsigned int uv_stride, quint8 alpha)
 {
-    Q_ASSERT(qPower2Ceil(width, 16) <= y_stride && qPower2Ceil(width*4,64) <= dst_stride);
+    NX_ASSERT(qPower2Ceil(width, 16) <= y_stride && qPower2Ceil(width*4,64) <= dst_stride);
     __m128i sse_alpha_intrs = _mm_setr_epi8(alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha); /* SSE2. */
     int xSteps = qPower2Ceil(width, 16) / 16;
     __m128i u00, u01, bu0, bu1, v00, v01, rv0, rv1;
@@ -276,8 +276,8 @@ void yuv420_argb32_simd_intr(unsigned char * dst, const unsigned char * py,
 
 void bgra_to_yv12_simd_intr(const quint8* rgba, int xStride, quint8* y, quint8* u, quint8* v, int yStride, int uvStride, int width, int height, bool flip)
 {
-    // this assert does not work in layout background setup --gdm
-    //Q_ASSERT( qPower2Ceil((unsigned int)width, 8) == (unsigned int)width );
+    // this NX_ASSERT does not work in layout background setup --gdm
+    //NX_ASSERT( qPower2Ceil((unsigned int)width, 8) == (unsigned int)width );
 
     static const __m128i sse_2000         = _mm_setr_epi16( 0x2020, 0x2020, 0x2020, 0x2020, 0x2020, 0x2020, 0x2020, 0x2020 ); /* SSE2. */
     static const __m128i sse_00a0         = _mm_setr_epi16( 0x0210, 0x0210, 0x0210, 0x0210, 0x0210, 0x0210, 0x0210, 0x0210 ); /* SSE2. */
@@ -294,7 +294,7 @@ void bgra_to_yv12_simd_intr(const quint8* rgba, int xStride, quint8* y, quint8* 
     static const __m128i uv_b_coeff = _mm_setr_epi16(-0.071*K, -0.071*K, -0.071*K, -0.071*K,     0.439*K,  0.439*K,  0.439*K,  0.439*K ); /* SSE2. */
 
     int xSteps = qPower2Ceil((unsigned int)width, 8)/8;
-    Q_ASSERT( xSteps*4 <= xStride );
+    NX_ASSERT( xSteps*4 <= xStride );
     if (flip)
     {
         y += yStride*(height-1);

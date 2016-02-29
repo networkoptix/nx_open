@@ -62,7 +62,7 @@ void QnRuntimeInfoManager::storedItemChanged(const QnPeerRuntimeInfo &item) {
 }
 
 QnPeerRuntimeInfo QnRuntimeInfoManager::localInfo() const {
-    Q_ASSERT(m_items->hasItem(qnCommon->moduleGUID()));
+    NX_ASSERT(m_items->hasItem(qnCommon->moduleGUID()));
     return m_items->getItem(qnCommon->moduleGUID());
 }
 
@@ -84,7 +84,7 @@ bool QnRuntimeInfoManager::hasItem(const QnUuid& id)
 void QnRuntimeInfoManager::updateLocalItem(const QnPeerRuntimeInfo& value)
 {
     QnMutexLocker lock( &m_updateMutex );
-    Q_ASSERT(value.uuid == qnCommon->moduleGUID());
+    NX_ASSERT(value.uuid == qnCommon->moduleGUID());
     QnPeerRuntimeInfo modifiedValue = value;
     if (m_items->hasItem(value.uuid)) {
         int oldVersion = m_items->getItem(value.uuid).data.version;

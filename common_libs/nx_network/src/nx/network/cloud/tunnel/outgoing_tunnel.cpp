@@ -29,7 +29,7 @@ OutgoingTunnel::OutgoingTunnel(AddressEntry targetPeerAddress)
 
 OutgoingTunnel::~OutgoingTunnel()
 {
-    assert(m_terminated);
+    NX_ASSERT(m_terminated);
 }
 
 void OutgoingTunnel::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
@@ -98,12 +98,12 @@ void OutgoingTunnel::connectionTerminated(
 }
 
 void OutgoingTunnel::establishNewConnection(
-    boost::optional<std::chrono::milliseconds> timeout,
+    std::chrono::milliseconds timeout,
     SocketAttributes socketAttributes,
     NewConnectionHandler handler)
 {
     QnMutexLocker lk(&m_mutex);
-    assert(!m_terminated);
+    NX_ASSERT(!m_terminated);
 
     switch(m_state)
     {
@@ -139,12 +139,12 @@ void OutgoingTunnel::establishNewConnection(
         {
             //saving handler for later use
             const auto timeoutTimePoint =
-                timeout
-                ? std::chrono::steady_clock::now() + timeout.get()
+                timeout > std::chrono::milliseconds::zero()
+                ? std::chrono::steady_clock::now() + timeout
                 : std::chrono::steady_clock::time_point::max();
             ConnectionRequestData data;
             data.socketAttributes = std::move(socketAttributes);
-            data.timeout = std::move(timeout);
+            data.timeout = timeout;
             data.handler = std::move(handler);
             m_connectHandlers.emplace(timeoutTimePoint, std::move(data));
 
@@ -153,11 +153,11 @@ void OutgoingTunnel::establishNewConnection(
         }
 
         default:
-            Q_ASSERT_X(
+            NX_ASSERT(
                 false,
                 Q_FUNC_INFO,
-                lm("Unexpected state %1").
-                    arg(stateToString(m_state)).toStdString().c_str());
+                lm("Unexpected state %1")
+                    .arg(stateToString(m_state)).toStdString().c_str());
             break;
     }
 }
@@ -167,7 +167,7 @@ void OutgoingTunnel::establishNewConnection(
     NewConnectionHandler handler)
 {
     establishNewConnection(
-        boost::none,
+        std::chrono::milliseconds::zero(),
         std::move(socketAttributes),
         std::move(handler));
 }
@@ -190,8 +190,10 @@ void OutgoingTunnel::updateTimerIfNeededNonSafe(
 
         //starting new timer
         m_timerTargetClock = m_connectHandlers.begin()->first;
-        assert(m_connectHandlers.begin()->first > curTime);
-        const auto timeout = m_connectHandlers.begin()->first - curTime;
+        const auto timeout =
+            m_connectHandlers.begin()->first > curTime
+            ? (m_connectHandlers.begin()->first - curTime)
+            : std::chrono::milliseconds::zero();    //timeout has already expired
         m_aioThreadBinder.registerTimer(
             std::chrono::duration_cast<std::chrono::milliseconds>(timeout),
             std::bind(&OutgoingTunnel::onTimer, this));
@@ -309,7 +311,7 @@ void OutgoingTunnel::onConnectorFinished(
             using namespace std::placeholders;
             auto handler = std::move(connectRequest.second.handler);
             m_connection->establishNewConnection(
-                std::move(connectRequest.second.timeout),   //TODO #ak recalculate timeout
+                connectRequest.second.timeout,   //TODO #ak recalculate timeout
                 std::move(connectRequest.second.socketAttributes),
                 [handler, this](    //TODO #ak #msvc2015 move to lambda
                     SystemError::ErrorCode errorCode,

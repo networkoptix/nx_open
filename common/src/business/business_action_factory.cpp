@@ -80,7 +80,7 @@ QnAbstractBusinessActionPtr QnBusinessActionFactory::createAction(const QnBusine
             break;
 
         default:
-            Q_ASSERT_X(false, Q_FUNC_INFO, "All action types must be handled.");
+            NX_ASSERT(false, Q_FUNC_INFO, "All action types must be handled.");
             break;
     }
 

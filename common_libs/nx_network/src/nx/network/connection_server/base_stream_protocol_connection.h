@@ -81,7 +81,7 @@ namespace nx_api
                 {
                     case ParserState::init:
                     case ParserState::inProgress:
-                        assert( bytesProcessed == buf.size() );
+                        NX_ASSERT( bytesProcessed == buf.size() );
                         return;
 
                     case ParserState::done:
@@ -112,7 +112,7 @@ namespace nx_api
             {
                 //message sent, triggerring completion handler
                 std::function<void( SystemError::ErrorCode )> sendCompletionHandler;
-                assert( !m_sendQueue.empty() );
+                NX_ASSERT( !m_sendQueue.empty() );
                 //completion handler is allowed to remove this connection, so moving handler to local variable
                 sendCompletionHandler = std::move( m_sendQueue.front().handler );
                 m_serializer.setMessage( nullptr );
@@ -136,7 +136,7 @@ namespace nx_api
             if( (m_serializerState == SerializerState::needMoreBufferSpace) && (bytesWritten == 0) )
             {
                 //TODO #ak increase buffer
-                assert( false );
+                NX_ASSERT( false );
             }
             //assuming that all bytes will be written or none
             BaseType::sendBufAsync(m_writeBuffer);
@@ -268,7 +268,7 @@ namespace nx_api
             }
             else if( task.buf )
             {
-                assert( m_writeBuffer.isEmpty() );
+                NX_ASSERT( m_writeBuffer.isEmpty() );
                 m_writeBuffer = std::move( task.buf.get() );
                 m_serializerState = SerializerState::done;
                 BaseType::sendBufAsync( m_writeBuffer );
@@ -279,7 +279,7 @@ namespace nx_api
         {
             bool connectionFreed = false;
             m_connectionFreedFlag = &connectionFreed;
-            assert( !m_sendQueue.empty() );
+            NX_ASSERT( !m_sendQueue.empty() );
             auto handler = std::move( m_sendQueue.front().handler );
             handler( errorCode );
             if( connectionFreed )

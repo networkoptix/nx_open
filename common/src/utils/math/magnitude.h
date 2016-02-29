@@ -89,7 +89,7 @@ public:
     }
 
     /**
-     * Note that this function will assert if the type of the supplied variant
+     * Note that this function will NX_ASSERT if the type of the supplied variant
      * does not match the type of this magnitude calculator.
      *
      * \param value                     Value to calculate magnitude for.

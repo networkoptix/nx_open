@@ -41,11 +41,12 @@ public:
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
     /** Establish new connection.
-    * \param socketAttributes attribute values to apply to a newly-created socket
+    * @param timeout Zero means no timeout
+    * @param socketAttributes attribute values to apply to a newly-created socket
     * \note This method is re-enterable. So, it can be called in
     *        different threads simultaneously */
     void establishNewConnection(
-        boost::optional<std::chrono::milliseconds> timeout,
+        std::chrono::milliseconds timeout,
         SocketAttributes socketAttributes,
         NewConnectionHandler handler);
     /** same as above, but no timeout */
@@ -57,7 +58,8 @@ private:
     struct ConnectionRequestData
     {
         SocketAttributes socketAttributes;
-        boost::optional<std::chrono::milliseconds> timeout;
+        /** zero - no timeout */
+        std::chrono::milliseconds timeout;
         NewConnectionHandler handler;
     };
 

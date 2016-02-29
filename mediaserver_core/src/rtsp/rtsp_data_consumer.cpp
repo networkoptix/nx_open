@@ -18,7 +18,7 @@
 
 const auto checkConstantsEquality = []()
 {
-    assert((AV_NOPTS_VALUE == DATETIME_INVALID) && "DATETIME_INVALID must be equal to AV_NOPTS_VALUE.");
+    NX_ASSERT((AV_NOPTS_VALUE == DATETIME_INVALID) && "DATETIME_INVALID must be equal to AV_NOPTS_VALUE.");
     return true;
 }();
 
@@ -135,7 +135,7 @@ bool QnRtspDataConsumer::isMediaTimingsSlow() const
     QnMutexLocker lock( &m_liveTimingControlMtx );
     if (m_lastLiveTime == (qint64)AV_NOPTS_VALUE)
         return false;
-    Q_ASSERT(m_firstLiveTime != (qint64)AV_NOPTS_VALUE);
+    NX_ASSERT(m_firstLiveTime != (qint64)AV_NOPTS_VALUE);
     //qint64 elapsed = m_liveTimer.elapsed()*1000;
     bool rez = m_lastLiveTime - m_firstLiveTime < m_liveTimer.elapsed()*1000;
 
@@ -327,7 +327,7 @@ void QnRtspDataConsumer::createDataPacketTCP(QnByteArray& sendBuffer, QnAbstract
             QnFfmpegHelper::serializeCodecContext(currentContext->ctx(), &codecCtxData);
             buildRtspTcpHeader(rtpTcpChannel, ssrc + 1, codecCtxData.size(), true, 0, RTP_FFMPEG_GENERIC_CODE); // ssrc+1 - switch data subchannel to context subchannel
             sendBuffer.write(m_rtspTcpHeader, rtpHeaderSize);
-            Q_ASSERT(!codecCtxData.isEmpty());
+            NX_ASSERT(!codecCtxData.isEmpty());
             m_owner->bufferData(codecCtxData);
         }
     }
@@ -393,7 +393,7 @@ void QnRtspDataConsumer::createDataPacketTCP(QnByteArray& sendBuffer, QnAbstract
 
 void QnRtspDataConsumer::setStreamingSpeed(int speed)
 {
-    Q_ASSERT( speed > 0 );
+    NX_ASSERT( speed > 0 );
     m_streamingSpeed = speed <= 0 ? 1 : speed;
 }
 
@@ -432,7 +432,7 @@ void QnRtspDataConsumer::sendMetadata(const QByteArray& metadata)
             m_owner->sendBuffer(m_sendBuffer);
         }
         else  if (metadataTrack->mediaSocket) {
-            Q_ASSERT(m_sendBuffer.size() > 4 && m_sendBuffer.size() < 16384);
+            NX_ASSERT(m_sendBuffer.size() > 4 && m_sendBuffer.size() < 16384);
             metadataTrack->mediaSocket->send(m_sendBuffer.data()+4, m_sendBuffer.size()-4);
         }
 
@@ -475,7 +475,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
 
     if( (m_streamingSpeed != MAX_STREAMING_SPEED) && (m_streamingSpeed != 1) )
     {
-        Q_ASSERT( !media->flags.testFlag(QnAbstractMediaData::MediaFlags_LIVE) );
+        NX_ASSERT( !media->flags.testFlag(QnAbstractMediaData::MediaFlags_LIVE) );
         //TODO #ak changing packet's timestamp. It is OK for archive, but generally unsafe.
             //Introduce safe solution
         if( !media->flags.testFlag(QnAbstractMediaData::MediaFlags_LIVE) )
@@ -610,7 +610,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
             m_owner->sendBuffer(m_sendBuffer);
         }
         else {
-            Q_ASSERT(m_sendBuffer.size() > 4 && m_sendBuffer.size() < 16384);
+            NX_ASSERT(m_sendBuffer.size() > 4 && m_sendBuffer.size() < 16384);
             AbstractDatagramSocket* mediaSocket = isRtcp ? trackInfo->rtcpSocket : trackInfo->mediaSocket;
             mediaSocket->send(m_sendBuffer.data()+4, m_sendBuffer.size()-4);
         }

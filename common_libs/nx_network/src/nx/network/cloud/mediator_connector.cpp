@@ -57,10 +57,11 @@ void MediatorConnector::mockupAddress( SocketAddress address )
 {
     {
         QnMutexLocker lk( &m_mutex );
-        Q_ASSERT_X( !m_promise, Q_FUNC_INFO,
+        NX_ASSERT( !m_promise, Q_FUNC_INFO,
                     "Address resolving is already in progress!" );
 
         m_promise = std::promise< bool >();
+        m_future = m_promise->get_future();
     }
 
 

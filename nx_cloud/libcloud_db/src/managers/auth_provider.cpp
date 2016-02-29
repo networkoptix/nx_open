@@ -65,7 +65,7 @@ void AuthenticationProvider::getCdbNonce(
         (QByteArray::fromRawData(reinterpret_cast<const char*>(&timestamp), sizeof(timestamp))
             +md5Hash).toBase64();
 
-    assert(nonce.size() == CDB_NONCE_SIZE);
+    NX_ASSERT(nonce.size() == CDB_NONCE_SIZE);
 
     api::NonceData result;
     result.nonce.assign(nonce.constData(), nonce.size());

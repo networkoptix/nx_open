@@ -5,6 +5,7 @@
 #include <cmath>
 
 #include "util.h"
+#include <nx/utils/log/assert.h>
 
 namespace
 {
@@ -456,8 +457,8 @@ QStringList naturalStringSort(const QStringList &list, Qt::CaseSensitivity caseS
 }
 
 void naturalStringCompareTestCase(const QString &l, const QString &r, int value) {
-    assert(qBound(-1, naturalStringCompare(l, r, Qt::CaseInsensitive), 1) == value);
-    assert(qBound(-1, naturalStringCompare(r, l, Qt::CaseInsensitive), 1) == -value);
+    NX_ASSERT(qBound(-1, naturalStringCompare(l, r, Qt::CaseInsensitive), 1) == value);
+    NX_ASSERT(qBound(-1, naturalStringCompare(r, l, Qt::CaseInsensitive), 1) == -value);
 }
 
 void naturalStringCompareTest() {

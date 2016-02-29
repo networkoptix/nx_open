@@ -19,8 +19,8 @@ QnTourPtzController::QnTourPtzController(const QnPtzControllerPtr &baseControlle
     m_adaptor(new QnJsonResourcePropertyAdaptor<QnPtzTourHash>(lit("ptzTours"), QnPtzTourHash(), this)),
     m_executor(new QnTourPtzExecutor(baseController))
 {
-    assert(qnPtzPool); /* Ptz pool must exist as it hosts executor thread. */
-    assert(!baseController->hasCapabilities(Qn::AsynchronousPtzCapability)); // TODO: #Elric
+    NX_ASSERT(qnPtzPool); /* Ptz pool must exist as it hosts executor thread. */
+    NX_ASSERT(!baseController->hasCapabilities(Qn::AsynchronousPtzCapability)); // TODO: #Elric
 
     if(!baseController->hasCapabilities(Qn::VirtualPtzCapability)) // TODO: #Elric implement it in a saner way
         m_executor->moveToThread(qnPtzPool->executorThread()); 

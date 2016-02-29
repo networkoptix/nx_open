@@ -5,6 +5,7 @@
 #include <nx/utils/uuid.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
+#include <nx/utils/log/assert.h>
 
 
 template<class KeyType, class MappedType>
@@ -100,8 +101,8 @@ private:
     {
         QnMutexLocker lk( &m_mutex );
         auto it = m_elements.find( key );
-        assert( it != m_elements.end() );
-        assert( it->second->locked );
+        NX_ASSERT( it != m_elements.end() );
+        NX_ASSERT( it->second->locked );
         it->second->locked = false;
         m_cond.wakeAll();
     }

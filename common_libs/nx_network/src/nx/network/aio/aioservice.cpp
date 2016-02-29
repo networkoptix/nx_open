@@ -36,7 +36,7 @@ namespace aio {
         initializeAioThreadPool(&m_systemSocketAIO, threadCount);
         initializeAioThreadPool(&m_udtSocketAIO, threadCount);
 
-        assert(!m_systemSocketAIO.aioThreadPool.empty() && !m_udtSocketAIO.aioThreadPool.empty());
+        NX_ASSERT(!m_systemSocketAIO.aioThreadPool.empty() && !m_udtSocketAIO.aioThreadPool.empty());
         if( m_systemSocketAIO.aioThreadPool.empty() && m_udtSocketAIO.aioThreadPool.empty() )
         {
             //I wish we used exceptions

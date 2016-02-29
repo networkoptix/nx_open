@@ -396,7 +396,7 @@ QString defaultLocalAddress(const QHostAddress& target)
 
             QString result = socket.localAddress().toString();
 
-            Q_ASSERT(result.length() > 0 );
+            NX_ASSERT(result.length() > 0 );
 
             return result;
         }
@@ -453,7 +453,7 @@ QnStorageResourcePtr createStorage(const QnUuid& serverId, const QString& path)
     storage->setUsedForWriting(storage->isWritable());
 
     QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName("Storage");
-    Q_ASSERT(resType);
+    NX_ASSERT(resType);
     if (resType)
         storage->setTypeId(resType->getId());
     storage->setParentId(serverGuid());
@@ -1271,7 +1271,7 @@ void MediaServerProcess::updateStatisticsAllowedSettings() {
 
     {   /* Security check */
         const auto admin = qnResPool->getAdministrator();
-        Q_ASSERT_X(admin, Q_FUNC_INFO, "Administrator must exist here");
+        NX_ASSERT(admin, Q_FUNC_INFO, "Administrator must exist here");
         if (!admin)
             return;
     }
@@ -2105,7 +2105,7 @@ void MediaServerProcess::run()
     MSSettings::roSettings()->setValue(APPSERVER_PASSWORD, "");
 #ifdef _DEBUG
     MSSettings::roSettings()->sync();
-    Q_ASSERT_X(MSSettings::roSettings()->value(APPSERVER_PASSWORD).toString().isEmpty(), Q_FUNC_INFO, "appserverPassword is not emptyu in registry. Restart the server as Administrator");
+    NX_ASSERT(MSSettings::roSettings()->value(APPSERVER_PASSWORD).toString().isEmpty(), Q_FUNC_INFO, "appserverPassword is not emptyu in registry. Restart the server as Administrator");
 #endif
 
     if (needToStop()) {
@@ -2181,7 +2181,7 @@ void MediaServerProcess::run()
             this, "at_portMappingChanged", Qt::AutoConnection,
             Q_ARG(QString, address.toString()));
 
-        Q_ASSERT_X(result, Q_FUNC_INFO, "Could not call at_portMappingChanged(...)");
+        NX_ASSERT(result, Q_FUNC_INFO, "Could not call at_portMappingChanged(...)");
     });
 
     std::unique_ptr<QnAppserverResourceProcessor> serverResourceProcessor( new QnAppserverResourceProcessor(m_mediaServer->getId()) );

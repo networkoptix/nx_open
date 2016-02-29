@@ -91,7 +91,7 @@ void StreamingChunk::appendData( const nx::Buffer& data )
 
     {
         QnMutexLocker lk( &m_mutex );
-        Q_ASSERT( m_modificationState == State::opened );
+        NX_ASSERT( m_modificationState == State::opened );
         if( m_data.capacity() < m_data.size() + data.size() )
             m_data.reserve( m_data.size() + data.size() + BUF_INCREASE_STEP );
         m_data.append( data );
@@ -109,7 +109,7 @@ void StreamingChunk::doneModification( StreamingChunk::ResultCode /*result*/ )
 {
     {
         QnMutexLocker lk( &m_mutex );
-        Q_ASSERT( m_modificationState == State::opened );
+        NX_ASSERT( m_modificationState == State::opened );
         m_modificationState = State::closed;
         m_cond.wakeAll();
     }
@@ -167,7 +167,7 @@ bool StreamingChunkInputStream::tryRead( nx::Buffer* const dataBuffer )
         return m_chunk->tryRead( &m_readCtx, dataBuffer );
     }
 
-    assert( m_chunk->isClosed() && m_chunk->sizeInBytes() > 0 );
+    NX_ASSERT( m_chunk->isClosed() && m_chunk->sizeInBytes() > 0 );
     //supporting byte range only on closed chunk
     if( !(m_chunk->isClosed() && m_chunk->sizeInBytes() > 0) )
         return false;

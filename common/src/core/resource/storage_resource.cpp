@@ -135,7 +135,7 @@ float QnStorageResource::getAvarageWritingUsage() const
 
 void QnStorageResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields)
 {
-    Q_ASSERT(other->getParentId() == getParentId() && other->getUrl() == getUrl());
+    NX_ASSERT(other->getParentId() == getParentId() && other->getUrl() == getUrl());
     QnResource::updateInner(other, modifiedFields);
 
     QnStorageResource* localOther = dynamic_cast<QnStorageResource*>(other.data());

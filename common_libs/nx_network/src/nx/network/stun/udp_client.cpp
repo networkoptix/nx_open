@@ -167,7 +167,7 @@ void UDPClient::sendRequestInternal(
 
     auto insertedValue = m_ongoingRequests.emplace(
         request.header.transactionId, RequestContext());
-    assert(insertedValue.second);   //asserting on non-unique transactionID
+    NX_ASSERT(insertedValue.second);   //asserting on non-unique transactionID
     RequestContext& requestContext = insertedValue.first->second;
     requestContext.completionHandler = std::move(completionHandler);
     requestContext.currentRetransmitTimeout = m_retransmissionTimeout;
@@ -235,7 +235,7 @@ void UDPClient::messageSent(
 void UDPClient::timedOut(nx::Buffer transactionId)
 {
     auto requestContextIter = m_ongoingRequests.find(transactionId);
-    assert(requestContextIter != m_ongoingRequests.end());
+    NX_ASSERT(requestContextIter != m_ongoingRequests.end());
     ++requestContextIter->second.retryNumber;
     if (requestContextIter->second.retryNumber > m_maxRetransmissions)
     {

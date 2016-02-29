@@ -60,7 +60,7 @@ QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
     m_role = Qn::CR_LiveVideo;
     m_timeSinceLastMetaData.restart();
     m_cameraRes = res.dynamicCast<QnPhysicalCameraResource>();
-    Q_ASSERT(m_cameraRes);
+    NX_ASSERT(m_cameraRes);
     m_prevCameraControlDisabled = m_cameraRes->isCameraControlDisabled();
     m_videoChannels = m_cameraRes->getVideoLayout()->channelCount();
     m_isPhysicalResource = res.dynamicCast<QnPhysicalCameraResource>();
@@ -352,7 +352,7 @@ void QnLiveStreamProvider::onGotAudioFrame(const QnCompressedAudioDataPtr& audio
 
 void QnLiveStreamProvider::onPrimaryFpsUpdated(int newFps)
 {
-    Q_ASSERT(getRole() == Qn::CR_SecondaryLiveVideo);
+    NX_ASSERT(getRole() == Qn::CR_SecondaryLiveVideo);
     // now primary has newFps
     // this is secondary stream
     // need to adjust fps 
@@ -379,7 +379,7 @@ void QnLiveStreamProvider::onPrimaryFpsUpdated(int newFps)
 
 
 
-    //Q_ASSERT(newSecFps>=0); // default fps is 10. Some camers has lower fps and assert is appear
+    //NX_ASSERT(newSecFps>=0); // default fps is 10. Some camers has lower fps and NX_ASSERT is appear
 
     setFps(qMax(1,newSecFps));
 }

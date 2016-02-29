@@ -343,7 +343,7 @@ db::DBResult AccountManager::fetchAccounts( QSqlDatabase* connection, int* const
         auto emailCopy = account.email;
         if (!m_cache.insert(std::move(emailCopy), std::move(account)))
         {
-            assert( false );
+            NX_ASSERT( false );
         }
     }
 
@@ -570,7 +570,7 @@ nx::db::DBResult AccountManager::updateAccountInDB(
     QSqlDatabase* const connection,
     const data::AccountUpdateDataWithEmail& accountData)
 {
-    assert(static_cast<bool>(accountData.passwordHa1) ||
+    NX_ASSERT(static_cast<bool>(accountData.passwordHa1) ||
            static_cast<bool>(accountData.fullName) ||
            static_cast<bool>(accountData.customization));
     

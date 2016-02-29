@@ -118,12 +118,12 @@ bool QnRtspH264Encoder::getNextPacket(QnByteArray& sendBuffer)
         // write nal payload
         sendBuffer.write((const char*) m_currentData, payloadLen);
         if (isLastPacket()) {
-            Q_ASSERT(m_currentData + payloadLen == m_nalEnd);
+            NX_ASSERT(m_currentData + payloadLen == m_nalEnd);
             goNextNal();
         }
         else {
             m_currentData += payloadLen;
-            Q_ASSERT(m_currentData < m_nalEnd);
+            NX_ASSERT(m_currentData < m_nalEnd);
         }
     }
     return true;

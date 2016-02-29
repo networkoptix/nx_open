@@ -21,7 +21,7 @@ OutgoingTunnelPool::OutgoingTunnelPool()
 
 OutgoingTunnelPool::~OutgoingTunnelPool()
 {
-    assert(m_terminated);
+    NX_ASSERT(m_terminated);
 }
 
 void OutgoingTunnelPool::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)
@@ -39,7 +39,7 @@ void OutgoingTunnelPool::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHa
 
 void OutgoingTunnelPool::establishNewConnection(
     const AddressEntry& targetHostAddress,
-    boost::optional<std::chrono::milliseconds> timeout,
+    std::chrono::milliseconds timeout,
     SocketAttributes socketAttributes,
     OutgoingTunnel::NewConnectionHandler handler)
 {

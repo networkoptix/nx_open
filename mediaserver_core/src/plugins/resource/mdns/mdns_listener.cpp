@@ -33,7 +33,7 @@ QnMdnsListener::QnMdnsListener()
     updateSocketList();
     readDataFromSocket();
 
-    assert(QnMdnsListener_instance == nullptr);
+    NX_ASSERT(QnMdnsListener_instance == nullptr);
     QnMdnsListener_instance = this;
 }
 

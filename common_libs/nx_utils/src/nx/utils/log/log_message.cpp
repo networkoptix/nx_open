@@ -40,6 +40,11 @@ QnLogMessage QnLogMessage::arg(char a, int fieldWidth, QChar fillChar) const
     return m_str.arg(a, fieldWidth, fillChar);
 }
 
+QnLogMessage QnLogMessage::arg(const char* a, int fieldWidth, QChar fillChar) const
+{
+    return m_str.arg(a, fieldWidth, fillChar);
+}
+
 QnLogMessage QnLogMessage::arg(QChar a, int fieldWidth, QChar fillChar) const
 {
     return m_str.arg(a, fieldWidth, fillChar);

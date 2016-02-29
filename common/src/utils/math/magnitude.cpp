@@ -14,6 +14,7 @@
 #include <QtGui/QColor>
 
 #include <utils/common/synchronized_flat_storage.h>
+#include <nx/utils/log/assert.h>
 
 namespace {
     template<class T>
@@ -77,13 +78,13 @@ void MagnitudeCalculator::registerCalculator(MagnitudeCalculator *calculator) {
 }
 
 qreal MagnitudeCalculator::calculate(const QVariant &value) const {
-    assert(value.userType() == m_type || m_type == 0);
+    NX_ASSERT(value.userType() == m_type || m_type == 0);
 
     return calculate(value.constData());
 }
 
 qreal MagnitudeCalculator::calculate(const void *value) const {
-    assert(value != NULL);
+    NX_ASSERT(value != NULL);
 
     return calculateInternal(value);
 }

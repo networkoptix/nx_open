@@ -257,7 +257,7 @@ namespace nx_http
         const BufferType& ha1,
         const BufferType& nonce)
     {
-        assert((ha1.size() + 1 + nonce.size()) % MD5_CHUNK_LEN == 0);
+        NX_ASSERT((ha1.size() + 1 + nonce.size()) % MD5_CHUNK_LEN == 0);
 
         MD5_CTX md5Ctx;
         MD5_Init(&md5Ctx);
@@ -276,7 +276,7 @@ namespace nx_http
         const BufferType& nonceTrailer,
         const BufferType& ha2)
     {
-        assert((MD5_DIGEST_LENGTH*2 + 1 + intermediateResponseNonceLen) % MD5_CHUNK_LEN == 0);
+        NX_ASSERT((MD5_DIGEST_LENGTH*2 + 1 + intermediateResponseNonceLen) % MD5_CHUNK_LEN == 0);
 
         const auto intermediateResponseBin = QByteArray::fromHex(intermediateResponse);
 

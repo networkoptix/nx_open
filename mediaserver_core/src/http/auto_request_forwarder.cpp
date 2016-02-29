@@ -56,7 +56,7 @@ void QnAutoRequestForwarder::processRequest( nx_http::Request* const request )
         findCameraUniqueID( *request, urlQuery, &cameraRes ) )
     {
         //detecting owner of res and adding SERVER_GUID_HEADER_NAME
-        Q_ASSERT( cameraRes );
+        NX_ASSERT( cameraRes );
 
         //checking for the time requested to select desired server
         qint64 timestampMs = -1;

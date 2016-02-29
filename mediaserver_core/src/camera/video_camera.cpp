@@ -604,7 +604,7 @@ bool QnVideoCamera::ensureLiveCacheStarted( MediaQuality streamQuality, qint64 t
 {
     QnMutexLocker lock( &m_getReaderMutex );
  
-    assert( streamQuality == MEDIA_Quality_High || streamQuality == MEDIA_Quality_Low );
+    NX_ASSERT( streamQuality == MEDIA_Quality_High || streamQuality == MEDIA_Quality_Low );
 
     if( streamQuality == MEDIA_Quality_High )
     {

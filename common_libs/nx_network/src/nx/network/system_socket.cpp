@@ -801,7 +801,7 @@ template<typename InterfaceToImplement>
 void CommunicatingSocket<InterfaceToImplement>::close()
 {
     //checking that socket is not registered in aio
-    assert( !nx::network::SocketGlobals::aioService().isSocketBeingWatched( static_cast<Pollable*>(this) ) );
+    NX_ASSERT( !nx::network::SocketGlobals::aioService().isSocketBeingWatched( static_cast<Pollable*>(this) ) );
 
     m_connected = false;
     Socket<InterfaceToImplement>::close();
@@ -861,7 +861,7 @@ void CommunicatingSocket<InterfaceToImplement>::registerTimer(
     nx::utils::MoveOnlyFunc<void()> handler )
 {
     //currently, aio considers 0 timeout as no timeout and will NOT call handler
-    Q_ASSERT(timeoutMs > std::chrono::milliseconds(0));
+    NX_ASSERT(timeoutMs > std::chrono::milliseconds(0));
     if (timeoutMs == std::chrono::milliseconds(0))
         timeoutMs = std::chrono::milliseconds(1);  //handler of zero timer will NOT be called
     return m_aioHelper->registerTimer(timeoutMs, std::move(handler));
@@ -1264,7 +1264,7 @@ TCPServerSocket::TCPServerSocket()
 TCPServerSocket::~TCPServerSocket()
 {
     //checking that socket is not registered in aio
-    Q_ASSERT_X(
+    NX_ASSERT(
         !nx::network::SocketGlobals::aioService().isSocketBeingWatched(static_cast<Pollable*>(this)),
         Q_FUNC_INFO,
         "You MUST cancel running async socket operation before deleting socket if you delete socket from non-aio thread (2)");

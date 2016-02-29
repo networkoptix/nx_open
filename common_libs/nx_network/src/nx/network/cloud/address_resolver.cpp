@@ -22,7 +22,7 @@ QString toString( const AddressType& type )
         case AddressType::cloud:    return lit( "cloud" );
     };
 
-    Q_ASSERT_X( false, Q_FUNC_INFO, "undefined AddressType" );
+    NX_ASSERT( false, Q_FUNC_INFO, "undefined AddressType" );
     return lit( "undefined=%1" ).arg( static_cast< int >( type ) );
 }
 
@@ -53,7 +53,7 @@ QString AddressAttribute::toString() const
             return lit( "nxApiPort=%1" ).arg( value );
     };
 
-    Q_ASSERT_X( false, Q_FUNC_INFO, "undefined AddressAttributeType" );
+    NX_ASSERT( false, Q_FUNC_INFO, "undefined AddressAttributeType" );
     return lit( "undefined=%1" ).arg( static_cast< int >( type ) );
 }
 
@@ -98,7 +98,7 @@ AddressResolver::AddressResolver(
 void AddressResolver::addFixedAddress( const HostAddress& hostName,
                                        const SocketAddress& hostAddress )
 {
-    Q_ASSERT_X(!hostName.isResolved(), Q_FUNC_INFO, "Hostname should be unresolved");
+    NX_ASSERT(!hostName.isResolved(), Q_FUNC_INFO, "Hostname should be unresolved");
 
     QnMutexLocker lk(&m_mutex);
     AddressEntry entry(hostAddress);
@@ -240,7 +240,7 @@ void AddressResolver::cancel( void* requestId, nx::utils::MoveOnlyFunc< void() >
         const auto range = m_requests.equal_range( requestId );
         for( auto it = range.first; it != range.second; )
         {
-            Q_ASSERT_X( !it->second.guard, Q_FUNC_INFO,
+            NX_ASSERT( !it->second.guard, Q_FUNC_INFO,
                         "cancel has already been called for this requestId" );
 
             if( it->second.inProgress && !it->second.guard )
@@ -391,7 +391,9 @@ void AddressResolver::mediatorResolve( HaInfoIterator info, QnMutexLockerBase* l
     lk->unlock();
     m_mediatorConnection->resolve(
         nx::hpm::api::ResolveRequest(info->first.toString().toUtf8()),
-        [this, info](nx::hpm::api::ResultCode resultCode, nx::hpm::api::ResolveResponse response)
+        [this, info](
+            nx::hpm::api::ResultCode resultCode,
+            nx::hpm::api::ResolveResponse response)
         {
             std::vector< Guard > guards;
 
@@ -406,6 +408,12 @@ void AddressResolver::mediatorResolve( HaInfoIterator info, QnMutexLockerBase* l
                         AddressAttributeType::nxApiPort, it.port ) );
                     entries.push_back( std::move( entry ) );
                 }
+
+                //if target host supports cloud connect, adding corresponding address entry
+                if (response.connectionMethods != 0)
+                    entries.emplace_back(
+                        AddressType::cloud,
+                        HostAddress(info->first.toString()));
             }
 
             info->second.setMediatorEntries(std::move(entries));

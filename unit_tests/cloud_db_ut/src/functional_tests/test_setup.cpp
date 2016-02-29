@@ -260,7 +260,7 @@ api::ResultCode CdbFunctionalTest::addActivatedAccount(
     if (resCode != api::ResultCode::ok)
         return resCode;
 
-    assert(accountData->email == email);
+    NX_ASSERT(accountData->email == email);
 
     resCode = getAccount(
         accountData->email,

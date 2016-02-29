@@ -1,6 +1,7 @@
 #include "multicast_http_client.h"
 #include <QCryptographicHash>
 #include "network/authutil.h"
+#include <nx/utils/log/assert.h>
 
 namespace QnMulticast
 {
@@ -99,7 +100,7 @@ void HTTPClient::cancelRequest(const QUuid& requestId)
 
 void HTTPClient::setDefaultTimeout(int timeoutMs)
 {
-    Q_ASSERT(timeoutMs > 0);
+    NX_ASSERT(timeoutMs > 0);
     m_defaultTimeoutMs = timeoutMs;
 }
 

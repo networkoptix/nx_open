@@ -41,8 +41,8 @@ void UdpHolePunchingTunnelAcceptor::accept(std::function<void(
 {
     {
         QnMutexLocker lock(&m_mutex);
-        Q_ASSERT(!m_acceptHandler);
-        Q_ASSERT(!m_udpMediatorConnection);
+        NX_ASSERT(!m_acceptHandler);
+        NX_ASSERT(!m_udpMediatorConnection);
 
         m_acceptHandler = std::move(handler);
         m_udpMediatorConnection = std::make_unique<
@@ -160,7 +160,7 @@ void UdpHolePunchingTunnelAcceptor::executeAcceptHandler(
     const auto handler = std::move(m_acceptHandler);
     m_acceptHandler = nullptr;
 
-    Q_ASSERT(handler);
+    NX_ASSERT(handler);
     return handler(code, std::move(connection));
 }
 

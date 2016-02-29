@@ -103,7 +103,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
     }
 
     auto camera = qnCameraPool->getVideoCamera( resource );
-    Q_ASSERT( camera );
+    NX_ASSERT( camera );
 
     //validating transcoding parameters
     if( !validateTranscodingParameters( transcodeParams ) )
@@ -215,7 +215,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
         {
             //chunk is in future not futher, than MAX_CHUNK_TIMESTAMP_ADVANCE_MICROS, scheduling transcoding on data availability
             pair<map<int, TranscodeContext>::iterator, bool> p = m_scheduledTranscodings.insert( make_pair( newTranscodingID, TranscodeContext() ) );
-            Q_ASSERT( p.second );
+            NX_ASSERT( p.second );
 
             p.first->second.mediaResource = cameraResource;
             p.first->second.dataSourceCtx = dataSourceCtx;
@@ -374,7 +374,7 @@ std::unique_ptr<QnTranscoder> StreamingChunkTranscoder::createTranscoder(
         }
         else
         {
-            assert( false );
+            NX_ASSERT( false );
             videoResolution = QSize( 1280, 720 );  //TODO: #ak get resolution of resource video stream. This resolution is ignored when TM_DirectStreamCopy is used
         }
     }

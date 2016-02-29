@@ -480,7 +480,7 @@ void QnCommonMessageProcessor::onGotInitialNotification(const ec2::QnFullResourc
                 qWarning() << "Time for peer" << info.peerId << "received before peer was found";
                 continue;
             }
-            Q_ASSERT(QnRuntimeInfoManager::instance()->item(info.peerId).data.peer.peerType == Qn::PT_Server);
+            NX_ASSERT(QnRuntimeInfoManager::instance()->item(info.peerId).data.peer.peerType == Qn::PT_Server);
             emit peerTimeChanged(info.peerId, syncTime, info.time);
         }
     });
