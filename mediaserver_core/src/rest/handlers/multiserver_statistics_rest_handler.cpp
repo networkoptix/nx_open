@@ -231,7 +231,7 @@ int SettingsActionHandler::executeGet(const QnRequestParamList &params
     if (resultCode == nx_http::StatusCode::ok)
     {
         QnFusionRestHandlerDetail::serialize(settings, result, contentType
-            , request.format, request.extraFormatting);
+            , Qn::JsonFormat, request.extraFormatting);
         return nx_http::StatusCode::ok;
     }
 
@@ -253,7 +253,7 @@ int SettingsActionHandler::executeGet(const QnRequestParamList &params
         return resultCode;
 
     QnFusionRestHandlerDetail::serialize(settings, result, contentType
-        , request.format, request.extraFormatting);
+        , Qn::JsonFormat, request.extraFormatting);
     return nx_http::StatusCode::ok;
 }
 
