@@ -56,7 +56,12 @@ QnDirectModuleFinderHelper::QnDirectModuleFinderHelper(QnModuleFinder *moduleFin
     m_elapsedTimer.start();
 }
 
-void QnDirectModuleFinderHelper::addForcedUrl(QUrl url) {
+void QnDirectModuleFinderHelper::addForcedUrl(QUrl url) 
+{
+    url.setUserName(QString());
+    url.setPassword(QString());
+    url.setScheme(lit("http"));
+
     m_forcedUrls.insert(std::move(url));
     updateModuleFinder();
 }

@@ -30,6 +30,7 @@ namespace {
     const int kDefaultMaxConnections = 30;
     const std::chrono::seconds kDiscoveryCheckInterval(60);
     const int kTimerIntervalMs = 1000;
+    const int kHttpTimeoutMs = 5000;
 
     QUrl trimmedUrl(const QUrl &url) {
         QUrl result;
@@ -136,6 +137,7 @@ void QnDirectModuleFinder::activateRequests() {
         m_lastCheckByUrl[trimmedUrl(url)] = time;
 
         nx_http::AsyncHttpClientPtr client = nx_http::AsyncHttpClient::create();
+        client->setSendTimeoutMs(kHttpTimeoutMs);
         std::unique_ptr<QnAsyncHttpClientReply> reply( new QnAsyncHttpClientReply(client, this) );
         connect(reply.get(), &QnAsyncHttpClientReply::finished, this, &QnDirectModuleFinder::at_reply_finished);
 
