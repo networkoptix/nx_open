@@ -29,7 +29,7 @@ public:
     CachedOutputStream( QnTCPConnectionProcessor* const tcpOutput );
     ~CachedOutputStream();
 
-    //! blocks if m_packetsToSend.size() > maxQueue
+    //! blocks if m_packetsToSend.size() > maxQueueSize
     void postPacket(const QByteArray& data, int maxQueueSize = -1);
     bool failed() const;
     size_t packetsInQueue() const;
