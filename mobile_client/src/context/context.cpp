@@ -60,6 +60,10 @@ void QnContext::exitFullscreen() {
     showSystemUi();
 }
 
+void QnContext::enterFullscreen() {
+    hideSystemUi();
+}
+
 int QnContext::getStatusBarHeight() const {
     return statusBarHeight();
 }
@@ -76,6 +80,8 @@ void QnContext::setKeepScreenOn(bool keepScreenOn) {
     ::setKeepScreenOn(keepScreenOn);
 }
 
-void QnContext::enterFullscreen() {
-    hideSystemUi();
+void QnContext::setScreenOrientation(Qt::ScreenOrientation orientation)
+{
+    ::setScreenOrientation(orientation);
 }
+

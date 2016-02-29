@@ -13,6 +13,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <statistics/abstract_statistics_settings_loader.h>
+#include <ec2_statictics_reporter.h>
 
 namespace
 {
@@ -60,6 +61,76 @@ namespace
         return QJson::deserialize(body, &dummy);
     };
 }
+
+namespace
+{
+    class SettingsCache
+    {
+    public:
+        static void update(const QnStatisticsSettings &settings);
+
+        static void clear();
+
+        static bool copyTo(QnStatisticsSettings &output);
+
+    private:
+        SettingsCache();
+
+        static SettingsCache &instance();
+
+    private:
+        typedef QScopedPointer<QnStatisticsSettings> SettingsPtr;
+
+        QMutex m_mutex;
+        QElapsedTimer m_timer;
+        SettingsPtr m_settings;
+    };
+
+    SettingsCache::SettingsCache()
+        : m_mutex()
+        , m_timer()
+        , m_settings()
+    {
+        m_timer.start();
+    }
+
+    SettingsCache &SettingsCache::instance()
+    {
+        static SettingsCache inst;
+        return inst;
+    }
+
+    void SettingsCache::update(const QnStatisticsSettings &settings)
+    {
+        const QMutexLocker guard(&instance().m_mutex);
+        instance().m_timer.restart();
+        instance().m_settings.reset(new QnStatisticsSettings(settings));
+    }
+
+    void SettingsCache::clear()
+    {
+        const QMutexLocker guard(&instance().m_mutex);
+        instance().m_timer.restart();
+        instance().m_settings.reset();
+    }
+
+    bool SettingsCache::copyTo(QnStatisticsSettings &output)
+    {
+        const QMutexLocker guard(&instance().m_mutex);
+
+        enum { kMinSettingsUpdateTime = 4 * 60 * 60 * 1000 }; // every 4 hours
+
+        auto &settings = instance().m_settings;
+        auto &timer = instance().m_timer;
+        if (!settings || timer.hasExpired(kMinSettingsUpdateTime))
+            return false;
+
+        output = *settings;
+        return true;
+    }
+}
+
+const QString QnMultiserverStatisticsRestHandler::kSettingsUrlParam = lit("clientStatisticsSettingsUrl");
 
 class StatisticsActionHandler
 {
@@ -193,16 +264,33 @@ nx_http::StatusCode::Value SettingsActionHandler::loadSettingsLocally(QnStatisti
     if (!server || !hasInternetConnection(server))
         return nx_http::StatusCode::noContent;
 
-    static const QUrl kSettingsUrl = QUrl::fromUserInput(lit("http://127.0.0.1:8080/stat/statistics.json")); //TODO: change me to correct
+    static const auto settingsUrl = []()
+    {
+        static const auto kSettingsUrl =
+            ec2::Ec2StaticticsReporter::DEFAULT_SERVER_API + lit("/config/client_stats.json");
+
+        // TODO: #ynikitenkov fix to use qnGlobalSettings in 2.6
+        const auto admin = qnResPool->getAdministrator();
+        const auto localSettingsUrl = (admin ? admin->getProperty(
+            QnMultiserverStatisticsRestHandler::kSettingsUrlParam) : QString());
+        return QUrl::fromUserInput(localSettingsUrl.trimmed().isEmpty()
+            ? kSettingsUrl : localSettingsUrl);
+    }();
+
+    if (SettingsCache::copyTo(outputSettings))
+        return nx_http::StatusCode::ok;
+
+    SettingsCache::clear();
 
     nx_http::BufferType buffer;
     int statusCode = nx_http::StatusCode::noContent;
-    if (nx_http::downloadFileSync(kSettingsUrl, &statusCode, &buffer) != SystemError::noError)
+    if (nx_http::downloadFileSync(settingsUrl, &statusCode, &buffer) != SystemError::noError)
         return nx_http::StatusCode::noContent;
 
     if (!QJson::deserialize(buffer, &outputSettings))
         return nx_http::StatusCode::internalServerError;
 
+    SettingsCache::update(outputSettings);
     return nx_http::StatusCode::ok;
 }
 
@@ -291,7 +379,7 @@ int SendStatisticsActionHandler::executePost(const QnRequestParamList& params
     QnSendStatisticsRequestData request =
         QnMultiserverRequestData::fromParams<QnSendStatisticsRequestData>(params);
 
-    // TODO: add support of specified in parameters format, not only json!
+    // TODO: #ynikitenkov add support of specified in parameters format, not only json!
     const bool correctJson = QJson::deserialize<QnMetricHashesList>(
         body, &request.metricsList);
 

@@ -8,6 +8,8 @@ Item {
     implicitWidth: dp(48)
     implicitHeight: dp(48)
 
+    anchors.alignWhenCentered: false
+
     property color color: "white"
     property int progress: -1
     property real lineWidth: dp(3)
@@ -41,7 +43,8 @@ Item {
 
         renderStrategy: Canvas.Cooperative
 
-        property real radius: Math.min(indicator.width, indicator.height) / 2 - lineWidth
+        property real lineWidth: indicator.lineWidth / iconScale()
+        property real radius: Math.min(width, height) / 2 - canvas.lineWidth
 
         property real arcStart: 0
         property real arcEnd: 0
@@ -58,11 +61,11 @@ Item {
             var ctx = canvas.getContext('2d')
             ctx.reset()
 
-            ctx.lineWidth = lineWidth
+            ctx.lineWidth = canvas.lineWidth
             ctx.strokeStyle = color
             ctx.lineCap = "butt"
 
-            ctx.arc(indicator.width / 2, indicator.height / 2, radius, arcStart, arcEnd, false)
+            ctx.arc(canvas.width / 2, canvas.height / 2, radius, arcStart, arcEnd, false)
             ctx.stroke()
         }
 
