@@ -2539,7 +2539,7 @@ bool QnPlOnvifResource::loadAdvancedParametersTemplate(QnCameraAdvancedParams &p
     return loadXmlParametersInternal(params, lit(":/camera_advanced_params/onvif.xml"));
 }
 
-bool QnPlOnvifResource::loadXmlParametersInternal(QnCameraAdvancedParams &params, const QString& paramsTemplateFileName) const 
+bool QnPlOnvifResource::loadXmlParametersInternal(QnCameraAdvancedParams &params, const QString& paramsTemplateFileName) const
 {
     QFile paramsTemplateFile(paramsTemplateFileName);
 #ifdef _DEBUG
