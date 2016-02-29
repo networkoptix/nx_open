@@ -112,7 +112,7 @@ void QnCameraThumbnailManager::setThumbnailSize(const QSize &size)
 
 rest::Handle QnCameraThumbnailManager::loadThumbnailForCamera(const QnVirtualCameraResourcePtr &camera) {
 
-    if (!camera)
+    if (!camera || !camera->hasVideo(nullptr))
         return kInvalidHandle;
 
     QnThumbnailRequestData request;
