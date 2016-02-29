@@ -226,8 +226,10 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
                     continue;
                 }
                 qint64 timestamp = packetTimestamp(packet);
-                if (!hasVideo() && m_lastSeekTime != AV_NOPTS_VALUE && timestamp < m_lastSeekTime)
+                if (!hasVideo() && m_lastSeekTime != AV_NOPTS_VALUE && timestamp < m_lastSeekTime) {
+                    av_free_packet(&packet);
                     continue; // seek is broken for audio only media streams
+                }
                 QnWritableCompressedAudioData* audioData = new QnWritableCompressedAudioData(CL_MEDIA_ALIGNMENT, packet.size, getCodecContext(stream));
                 //audioData->format.fromAvStream(stream->codec);
                 time_base = av_q2d(stream->time_base)*1e+6;

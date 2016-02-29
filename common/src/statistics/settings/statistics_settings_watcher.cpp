@@ -1,8 +1,6 @@
 
 #include "statistics_settings_watcher.h"
 
-#include <QtCore/QTimer>
-
 #include <utils/common/delayed.h>
 #include <utils/common/model_functions.h>
 #include <utils/network/http/asynchttpclient.h>
@@ -18,18 +16,8 @@ namespace
 QnStatisticsSettingsWatcher::QnStatisticsSettingsWatcher(QObject *parent)
     : base_type(parent)
     , m_settings()
-    , m_updateTimer(new QTimer())
     , m_handle()
 {
-    enum { kUpdatePeriodMs = 5 * 60 * 1000 };
-    m_updateTimer->setSingleShot(false);
-    m_updateTimer->setInterval(kUpdatePeriodMs);
-    m_updateTimer->start();
-
-    connect(m_updateTimer, &QTimer::timeout
-        , this, &QnStatisticsSettingsWatcher::updateSettings);
-
-    updateSettings();
 }
 
 QnStatisticsSettingsWatcher::~QnStatisticsSettingsWatcher()
@@ -37,9 +25,6 @@ QnStatisticsSettingsWatcher::~QnStatisticsSettingsWatcher()
 
 bool QnStatisticsSettingsWatcher::settingsAvailable()
 {
-    if (!m_settings)
-        updateSettings();
-
     return m_settings;
 }
 
@@ -72,20 +57,11 @@ void QnStatisticsSettingsWatcher::updateSettingsImpl(int delayMs)
             return;
 
         m_handle = rest::Handle();
-        enum { kUpdateOnFailDelayMs = 5 * 60 * 1000 };
-        if (!success)
-        {
-            resetSettings();
-            updateSettingsImpl(kUpdateOnFailDelayMs);
-            return;
-        }
 
-        bool deserialized = false;
-        const auto settings = QJson::deserialized(data, QnStatisticsSettings(), &deserialized);
-        if (!deserialized)
+        QnStatisticsSettings settings;
+        if (!success || !QJson::deserialize(data, &settings))
         {
             resetSettings();
-            updateSettingsImpl(kUpdateOnFailDelayMs);
             return;
         }
 
