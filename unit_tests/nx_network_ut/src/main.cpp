@@ -48,22 +48,27 @@ bool readCmdArguments(int argc, char **argv)
         }
     }
 
-    QString logLevel("DEBUG");
-    const auto logLevelIter = args.find("log-level");
-    if (logLevelIter != args.end())
-        logLevel = logLevelIter->second;
+    //testing whether any logging argument is given...
+    const auto anyLogArgIter = args.lower_bound("log");
+    if (anyLogArgIter != args.end() && anyLogArgIter->first.startsWith("log"))
+    {
+        QString logLevel("DEBUG");
+        const auto logLevelIter = args.find("log-level");
+        if (logLevelIter != args.end())
+            logLevel = logLevelIter->second;
 
-    QString logFile("nx_network_ut.log");
-    const auto logFileIter = args.find("log-file");
-    if (logFileIter != args.end())
-        logFile = logFileIter->second;
+        QString logFile("nx_network_ut.log");
+        const auto logFileIter = args.find("log-file");
+        if (logFileIter != args.end())
+            logFile = logFileIter->second;
 
-    QnLog::initLog(logLevel);
-    cl_log.create(
-        logFile,
-        1024 * 1024 * 10,
-        5,
-        QnLog::logLevelFromString(logLevel));
+        QnLog::initLog(logLevel);
+        cl_log.create(
+            logFile,
+            1024 * 1024 * 10,
+            5,
+            QnLog::logLevelFromString(logLevel));
+    }
 
     return true;
 }
