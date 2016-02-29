@@ -218,7 +218,7 @@ TEST_F(SocketUdt, rendezvousConnect)
             return std::make_unique<UdtStreamServerSocket>();
         });
 
-    const size_t bytesToSendThroughConnection = 1024;
+    const size_t bytesToSendThroughConnection = 128*1024;
     const int maxSimultaneousConnections = 25;
     const std::chrono::seconds testDuration(3);
 
