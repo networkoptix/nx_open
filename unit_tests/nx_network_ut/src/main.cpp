@@ -30,7 +30,7 @@ bool readCmdArguments(int argc, char **argv)
     std::multimap<QString, QString> args;
     parseCmdArgs(argc, argv, &args);
 
-    const auto enforceSocketTypeIter = args.find("--enforce-socket");
+    const auto enforceSocketTypeIter = args.find("enforce-socket");
     if (enforceSocketTypeIter != args.end())
     {
         if (enforceSocketTypeIter->second == "tcp")

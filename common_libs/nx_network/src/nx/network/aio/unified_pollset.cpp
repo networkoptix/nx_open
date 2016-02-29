@@ -1,3 +1,7 @@
+/**********************************************************
+* Feb 25, 2016
+* akolesnikov
+***********************************************************/
 
 #include "unified_pollset.h"
 
@@ -289,6 +293,10 @@ int UnifiedPollSet::poll(int millisToWait)
         m_interruptSocket.recv(buf, sizeof(buf), 0);   //ignoring result and data...
         m_readSysFds.erase(it);
     }
+
+    removePhantomSockets(&m_readUdtFds);
+    removePhantomSockets(&m_writeUdtFds);
+
     return result;
 }
 
@@ -354,16 +362,18 @@ bool UnifiedPollSet::removeSocket(
     std::map<SocketHandle, SocketContext>* const socketDictionary)
 {
     auto it = socketDictionary->find(handle);
-    Q_ASSERT(it != socketDictionary->end());
+    //Q_ASSERT(it != socketDictionary->end());
     if (it == socketDictionary->end())
-        return true;
+        return true;    //for now, this is valid case if adding to pollset has failed
 
     int newEventMask = it->second.eventMask & (~eventToRemoveMask);
     if (newEventMask == it->second.eventMask)
         return true; //nothing to do
 
     if (removeFromPollSet(m_epollFd, handle) != 0)
-        return false;
+    {
+        //return false;
+    }
 
     if (newEventMask == 0)
     {
@@ -517,6 +527,17 @@ void UnifiedPollSet::moveIterToTheNextEvent(ConstIteratorImpl* const iter) const
                 break;
         }
         break;
+    }
+}
+
+void UnifiedPollSet::removePhantomSockets(std::set<UDTSOCKET>* const udtFdSet)
+{
+    for (auto it = udtFdSet->begin(); it != udtFdSet->end();)
+    {
+        if (m_udtSockets.find(*it) == m_udtSockets.end())
+            it = udtFdSet->erase(it);   //UDT sometimes reports phantom FD
+        else
+            ++it;
     }
 }
 

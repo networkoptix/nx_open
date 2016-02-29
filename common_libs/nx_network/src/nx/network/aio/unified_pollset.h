@@ -1,3 +1,7 @@
+/**********************************************************
+* Feb 25, 2016
+* akolesnikov
+***********************************************************/
 
 #pragma once
 
@@ -151,6 +155,7 @@ private:
     UDPSocket m_interruptSocket;
 
     void moveIterToTheNextEvent(ConstIteratorImpl* const iter) const;
+    void removePhantomSockets(std::set<UDTSOCKET>* const udtFdSet);
 };
 
 }   //aio

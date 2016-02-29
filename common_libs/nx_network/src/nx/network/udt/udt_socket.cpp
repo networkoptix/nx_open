@@ -181,7 +181,12 @@ SocketAddress UdtSocketImpl::GetPeerAddress() const {
 bool UdtSocketImpl::Close() {
     //Q_ASSERT(!IsClosed());
 
-    int val = 1;
+    if (udtHandle == UDT::INVALID_SOCK)
+        return true;    //already closed
+
+    //TODO #ak linger MUST be optional
+        //set UDT_LINGER to 1 if socket is in blocking mode?
+    int val = 0;
     UDT::setsockopt(udtHandle, 0, UDT_LINGER, &val, sizeof(val));
 
 #ifdef TRACE_UDT_SOCKET
@@ -195,12 +200,18 @@ bool UdtSocketImpl::Close() {
 }
 
 bool UdtSocketImpl::Shutdown() {
-    // UDT Reference: Functions: close():
-    //  In UDT, shutdown is not supported.
-    //  All sockets should be closed if they are not used any more.
+    //TODO #ak implementing shutdown via close may lead to undefined behavior in case of handle reuse
 
-    // TODO: implement somehow or remove from API
-    return true;
+#if 0   //no LINGER
+    const int ret = UDT::close(udtHandle);
+    udtHandle = UDT::INVALID_SOCK;
+    state_ = CLOSED;
+    return ret == 0;
+
+    return false;
+#else
+    return Close();
+#endif
 }
 
 bool UdtSocketImpl::IsClosed() const {
@@ -789,6 +800,13 @@ bool UdtStreamServerSocket::listen( int backlog )
 
 AbstractStreamSocket* UdtStreamServerSocket::accept()
 {
+    bool isNonBlocking = false;
+    if (!getNonBlockingMode(&isNonBlocking))
+        return nullptr;
+
+    if (isNonBlocking)
+        return systemAccept();
+
     //this method always blocks
     std::promise<
         std::pair<SystemError::ErrorCode, AbstractStreamSocket*>

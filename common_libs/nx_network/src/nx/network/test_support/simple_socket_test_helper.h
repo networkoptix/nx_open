@@ -42,18 +42,45 @@ void syncSocketServerMainFunc(
     ASSERT_TRUE(server->listen(clientCount))
         << SystemError::getLastOSErrorText().toStdString();
 
-    if (startedPromise)
-        startedPromise->set_value();
-
     for (int i = clientCount; i > 0; --i)
     {
         static const int BUF_SIZE = 128;
 
-        QByteArray buffer(BUF_SIZE, char(0));
-        std::unique_ptr<AbstractStreamSocket> client(server->accept());
+        std::unique_ptr<AbstractStreamSocket> client;
+        if (startedPromise)
+        {
+            //we must trigger startedPromise after actual accept call: UDT requirement
+            std::promise<
+                std::pair<SystemError::ErrorCode, std::unique_ptr<AbstractStreamSocket>>
+            > acceptedPromise;
+            server->acceptAsync(
+                [&acceptedPromise](
+                    SystemError::ErrorCode errorCode,
+                    AbstractStreamSocket* socket)
+                {
+                    acceptedPromise.set_value(
+                        std::make_pair(
+                            errorCode,
+                            std::unique_ptr<AbstractStreamSocket>(socket)));
+                });
+
+            startedPromise->set_value();
+            startedPromise = nullptr;
+
+            auto acceptResult = acceptedPromise.get_future().get();
+            client = std::move(acceptResult.second);
+            if (acceptResult.first != SystemError::noError)
+                SystemError::setLastErrorCode(acceptResult.first);
+        }
+        else
+        {
+            client.reset(server->accept());
+        }
+        
         ASSERT_TRUE(client.get())
             << SystemError::getLastOSErrorText().toStdString() << " on " << i;
 
+        QByteArray buffer(BUF_SIZE, char(0));
         int bufDataSize = 0;
         for (;;)
         {
