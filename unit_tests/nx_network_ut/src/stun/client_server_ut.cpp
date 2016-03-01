@@ -33,7 +33,7 @@ protected:
     };
 };
 
-const AbstractAsyncClient::Timeouts CLIENT_TIMEOUTS = { 100, 100, 500 };
+const AbstractAsyncClient::Timeouts CLIENT_TIMEOUTS = { 1000, 1000, 5000 };
 
 class StunClientServerTest
         : public ::testing::Test
@@ -62,8 +62,10 @@ protected:
     void startServer()
     {
         server = std::make_unique< TestServer >(dispatcher);
-        EXPECT_TRUE( server->bind( address ) );
-        EXPECT_TRUE( server->listen() );
+        EXPECT_TRUE( server->bind( address ) ) 
+            << SystemError::getLastOSErrorText().toStdString();
+        EXPECT_TRUE( server->listen() ) 
+            << SystemError::getLastOSErrorText().toStdString();
     }
 
     SystemError::ErrorCode sendIndicationSync( int method )
@@ -110,6 +112,8 @@ TEST_F( StunClientServerTest, Connectivity )
 
 TEST_F( StunClientServerTest, RequestResponse )
 {
+    const auto t1 = std::chrono::steady_clock::now();
+
     startServer();
     client->connect(address);
     {
@@ -119,7 +123,11 @@ TEST_F( StunClientServerTest, RequestResponse )
         client->sendRequest( std::move( request ), waiter.pusher() );
 
         const auto result = waiter.pop();
+        const auto timePassed = 
+            std::chrono::duration_cast<std::chrono::milliseconds>(
+                std::chrono::steady_clock::now() - t1);
         ASSERT_EQ( result.first, SystemError::noError );
+
 
         const auto& response = result.second;
         ASSERT_EQ( response.header.messageClass, MessageClass::successResponse );
