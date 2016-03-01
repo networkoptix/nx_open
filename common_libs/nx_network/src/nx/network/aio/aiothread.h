@@ -132,7 +132,7 @@ public:
         aio::EventType eventToWatch,
         AIOEventHandler<SocketType>* const eventHandler,
         std::chrono::milliseconds timeoutMs = std::chrono::milliseconds(),
-        std::function<void()> socketAddedToPollHandler = std::function<void()>() )
+        nx::utils::MoveOnlyFunc<void()> socketAddedToPollHandler = nx::utils::MoveOnlyFunc<void()>() )
     {
         QnMutexLocker lk(&m_impl->mutex);
 
@@ -147,7 +147,7 @@ public:
             eventHandler,
             timeoutMs.count(),
             nullptr,
-            socketAddedToPollHandler));
+            std::move(socketAddedToPollHandler)));
         if (eventToWatch == aio::etRead)
             ++m_impl->newReadMonitorTaskCount;
         else if (eventToWatch == aio::etWrite)
@@ -205,7 +205,7 @@ public:
         SocketType* const sock,
         aio::EventType eventType,
         bool waitForRunningHandlerCompletion,
-        std::function<void()> pollingStoppedHandler = std::function<void()>())
+        nx::utils::MoveOnlyFunc<void()> pollingStoppedHandler = nx::utils::MoveOnlyFunc<void()>())
     {
         QnMutexLocker lk(&m_impl->mutex);
 
@@ -463,7 +463,7 @@ public:
         unsigned int timeout;
         std::atomic<int>* taskCompletionEvent;
         nx::utils::MoveOnlyFunc<void()> postHandler;
-        std::function<void()> taskCompletionHandler;
+        nx::utils::MoveOnlyFunc<void()> taskCompletionHandler;
 
         /*!
             \param taskCompletionEvent if not NULL, set to 1 after processing task
@@ -475,7 +475,7 @@ public:
             AIOEventHandler<SocketType>* const _eventHandler,
             unsigned int _timeout = 0,
             std::atomic<int>* const _taskCompletionEvent = nullptr,
-            std::function<void()> _taskCompletionHandler = std::function<void()>())
+            nx::utils::MoveOnlyFunc<void()> _taskCompletionHandler = nx::utils::MoveOnlyFunc<void()>())
         :
             type(_type),
             socket(_socket),
@@ -484,7 +484,7 @@ public:
             eventHandler(_eventHandler),
             timeout(_timeout),
             taskCompletionEvent(_taskCompletionEvent),
-            taskCompletionHandler(_taskCompletionHandler)
+            taskCompletionHandler(std::move(_taskCompletionHandler))
         {
         }
     };

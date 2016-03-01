@@ -129,7 +129,7 @@ private:
 };
 
 bool UdtSocketImpl::Open() {
-    Q_ASSERT(IsClosed());
+    NX_ASSERT(IsClosed());
     udtHandle = UDT::socket(AF_INET,SOCK_STREAM,0);
     if( udtHandle != UDT::INVALID_SOCK ) {
         state_ = OPEN;
@@ -179,7 +179,7 @@ SocketAddress UdtSocketImpl::GetPeerAddress() const {
 }
 
 bool UdtSocketImpl::Close() {
-    //Q_ASSERT(!IsClosed());
+    //NX_ASSERT(!IsClosed());
 
     if (udtHandle == UDT::INVALID_SOCK)
         return true;    //already closed
@@ -219,7 +219,7 @@ bool UdtSocketImpl::IsClosed() const {
 }
 
 bool UdtSocketImpl::SetReuseAddrFlag( bool reuseAddr ) {
-    Q_ASSERT(!IsClosed());
+    NX_ASSERT(!IsClosed());
     int reuseAddrInt = reuseAddr ? 1 : 0;
     int ret = UDT::setsockopt(udtHandle, 0, UDT_REUSEADDR, &reuseAddrInt, sizeof(reuseAddrInt));
     if( ret != 0 )
@@ -228,7 +228,7 @@ bool UdtSocketImpl::SetReuseAddrFlag( bool reuseAddr ) {
 }
 
 bool UdtSocketImpl::GetReuseAddrFlag( bool* val ) const {
-    Q_ASSERT(!IsClosed());
+    NX_ASSERT(!IsClosed());
     int len = sizeof(*val);
     int ret = UDT::getsockopt(udtHandle,0,UDT_REUSEADDR,val,&len);
     if( ret != 0 )
@@ -237,7 +237,7 @@ bool UdtSocketImpl::GetReuseAddrFlag( bool* val ) const {
 }
 
 bool UdtSocketImpl::SetNonBlockingMode( bool val ) {
-    Q_ASSERT(!IsClosed());
+    NX_ASSERT(!IsClosed());
     bool value = !val;
     int ret = UDT::setsockopt(udtHandle,0,UDT_SNDSYN,&value,sizeof(value));
     if( ret != 0 )
@@ -252,7 +252,7 @@ bool UdtSocketImpl::SetNonBlockingMode( bool val ) {
 }
 
 bool UdtSocketImpl::GetNonBlockingMode( bool* val ) const {
-    Q_ASSERT(!IsClosed());
+    NX_ASSERT(!IsClosed());
     int len = sizeof(*val);
     int ret = UDT::getsockopt(udtHandle,0,UDT_SNDSYN,val,&len);
 
@@ -272,7 +272,7 @@ bool UdtSocketImpl::GetNonBlockingMode( bool* val ) const {
 //BTW, I have never seen it changing once per 30 minutes for a given path
 
 bool UdtSocketImpl::GetMtu( unsigned int* mtuValue ) const {
-    Q_ASSERT(!IsClosed());
+    NX_ASSERT(!IsClosed());
     *mtuValue = 1500; // Ethernet MTU 
     return true;
 }
@@ -281,8 +281,8 @@ bool UdtSocketImpl::GetMtu( unsigned int* mtuValue ) const {
 // what you give will definitely become the real buffer size .
 
 bool UdtSocketImpl::SetSendBufferSize( unsigned int buffSize ) {
-    Q_ASSERT(!IsClosed());
-    Q_ASSERT( buffSize < static_cast<unsigned int>(std::numeric_limits<int>::max()) );
+    NX_ASSERT(!IsClosed());
+    NX_ASSERT( buffSize < static_cast<unsigned int>(std::numeric_limits<int>::max()) );
     int buff_size = static_cast<int>(buffSize);
     int ret = UDT::setsockopt(udtHandle, 0, UDT_SNDBUF, &buff_size, sizeof(buff_size));
     if( ret != 0 )
@@ -292,7 +292,7 @@ bool UdtSocketImpl::SetSendBufferSize( unsigned int buffSize ) {
 }
 
 bool UdtSocketImpl::GetSendBufferSize( unsigned int* buffSize ) const{
-    Q_ASSERT(!IsClosed());
+    NX_ASSERT(!IsClosed());
     int buff_size;
     int len = sizeof(buff_size);
     int ret = UDT::getsockopt(udtHandle, 0, UDT_SNDBUF, &buff_size, &len);
@@ -304,8 +304,8 @@ bool UdtSocketImpl::GetSendBufferSize( unsigned int* buffSize ) const{
 }
 
 bool UdtSocketImpl::SetRecvBufferSize( unsigned int buffSize ){
-    Q_ASSERT(!IsClosed());
-    Q_ASSERT(buffSize < static_cast<unsigned int>(std::numeric_limits<int>::max()));
+    NX_ASSERT(!IsClosed());
+    NX_ASSERT(buffSize < static_cast<unsigned int>(std::numeric_limits<int>::max()));
     int buff_size = static_cast<int>(buffSize);
     int ret = UDT::setsockopt(udtHandle, 0, UDT_RCVBUF, &buff_size, sizeof(buff_size));
     if( ret != 0 )
@@ -315,7 +315,7 @@ bool UdtSocketImpl::SetRecvBufferSize( unsigned int buffSize ){
 }
 
 bool UdtSocketImpl::GetRecvBufferSize( unsigned int* buffSize ) const{
-    Q_ASSERT(!IsClosed());
+    NX_ASSERT(!IsClosed());
     int buff_size;
     int len = sizeof(buff_size);
     int ret = UDT::getsockopt(udtHandle,0,UDT_RCVBUF,&buff_size,&len);
@@ -327,8 +327,8 @@ bool UdtSocketImpl::GetRecvBufferSize( unsigned int* buffSize ) const{
 }
 
 bool UdtSocketImpl::SetRecvTimeout( unsigned int millis ) {
-    Q_ASSERT(!IsClosed());
-    Q_ASSERT( millis < static_cast<unsigned int>(std::numeric_limits<int>::max()) );
+    NX_ASSERT(!IsClosed());
+    NX_ASSERT( millis < static_cast<unsigned int>(std::numeric_limits<int>::max()) );
     int time = millis ? static_cast<int>(millis) : -1;
     int ret = UDT::setsockopt(
         udtHandle,0,UDT_RCVTIMEO,&time,sizeof(time));
@@ -339,7 +339,7 @@ bool UdtSocketImpl::SetRecvTimeout( unsigned int millis ) {
 }
 
 bool UdtSocketImpl::GetRecvTimeout( unsigned int* millis ) const {
-    Q_ASSERT(!IsClosed());
+    NX_ASSERT(!IsClosed());
     int time;
     int len = sizeof(time);
     int ret = UDT::getsockopt(
@@ -351,8 +351,8 @@ bool UdtSocketImpl::GetRecvTimeout( unsigned int* millis ) const {
 }
 
 bool UdtSocketImpl::SetSendTimeout( unsigned int ms ) {
-    Q_ASSERT(!IsClosed());
-    Q_ASSERT( ms < static_cast<unsigned int>(std::numeric_limits<int>::max()) );
+    NX_ASSERT(!IsClosed());
+    NX_ASSERT( ms < static_cast<unsigned int>(std::numeric_limits<int>::max()) );
     int time = ms ? static_cast<int>(ms) : -1;
     int ret = UDT::setsockopt(
         udtHandle,0,UDT_SNDTIMEO,&time,sizeof(time));
@@ -362,7 +362,7 @@ bool UdtSocketImpl::SetSendTimeout( unsigned int ms ) {
 }
 
 bool UdtSocketImpl::GetSendTimeout( unsigned int* millis ) const {
-    Q_ASSERT(!IsClosed());
+    NX_ASSERT(!IsClosed());
     int time;
     int len = sizeof(time);
     int ret = UDT::getsockopt(
@@ -374,14 +374,14 @@ bool UdtSocketImpl::GetSendTimeout( unsigned int* millis ) const {
 }
 
 bool UdtSocketImpl::GetLastError( SystemError::ErrorCode* errorCode ) const {
-    Q_ASSERT(!IsClosed());
+    NX_ASSERT(!IsClosed());
     *errorCode = static_cast<SystemError::ErrorCode>(UDT::getlasterror().getErrno());
     return true;
 }
 
 AbstractSocket::SOCKET_HANDLE UdtSocketImpl::handle() const {
-    Q_ASSERT(!IsClosed());
-    Q_ASSERT(sizeof(UDTSOCKET) == sizeof(AbstractSocket::SOCKET_HANDLE));
+    NX_ASSERT(!IsClosed());
+    NX_ASSERT(sizeof(UDTSOCKET) == sizeof(AbstractSocket::SOCKET_HANDLE));
     return *reinterpret_cast<const AbstractSocket::SOCKET_HANDLE*>(&udtHandle);
 }
 
@@ -617,7 +617,7 @@ bool UdtStreamSocket::connect(
 {
     //TODO #ak use timeoutMillis
 
-    Q_ASSERT(m_impl->state_ == detail::UdtSocketImpl::OPEN);
+    NX_ASSERT(m_impl->state_ == detail::UdtSocketImpl::OPEN);
     sockaddr_in addr;
     detail::AddressFrom(remoteAddress, &addr);
     // The official documentation doesn't advice using select but here we just need
@@ -676,7 +676,7 @@ int UdtStreamSocket::recv( void* buffer, unsigned int bufferLen, int flags ) {
 
 int UdtStreamSocket::send( const void* buffer, unsigned int bufferLen )
 {
-    Q_ASSERT(!m_impl->IsClosed());
+    NX_ASSERT(!m_impl->IsClosed());
     int sz = UDT::send(m_impl->udtHandle, reinterpret_cast<const char*>(buffer), bufferLen, 0);
     if (sz == UDT::ERROR)
         SystemError::setLastErrorCode(
@@ -783,7 +783,7 @@ UdtStreamServerSocket::~UdtStreamServerSocket()
 
 bool UdtStreamServerSocket::listen( int backlog )
 {
-    Q_ASSERT(m_impl->state_ == detail::UdtSocketImpl::OPEN);
+    NX_ASSERT(m_impl->state_ == detail::UdtSocketImpl::OPEN);
     int ret = UDT::listen(m_impl->udtHandle, backlog);
     if (ret != 0)
     {
@@ -950,7 +950,7 @@ void UdtStreamServerSocket::dispatch( nx::utils::MoveOnlyFunc<void()> handler )
 
 AbstractStreamSocket* UdtStreamServerSocket::systemAccept()
 {
-    Q_ASSERT(m_impl->state_ == detail::UdtSocketImpl::ESTABLISHED);
+    NX_ASSERT(m_impl->state_ == detail::UdtSocketImpl::ESTABLISHED);
     UDTSOCKET ret = UDT::accept(m_impl->udtHandle, NULL, NULL);
     if (ret == UDT::INVALID_SOCK)
     {
