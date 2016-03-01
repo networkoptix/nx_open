@@ -91,7 +91,7 @@ TestConnection::~TestConnection()
 
     {
         std::unique_lock<std::mutex> lk(mtx1);
-        assert(terminatedSocketsIDs.emplace(m_id, _socket ? true : false).second);
+        NX_ASSERT(terminatedSocketsIDs.emplace(m_id, _socket ? true : false).second);
     }
 #ifdef DEBUG_OUTPUT
     std::cout<<"TestConnection::~TestConnection. "<<m_id<<std::endl;
@@ -408,7 +408,7 @@ void ConnectionsGenerator::pleaseStop()
 void ConnectionsGenerator::join()
 {
     std::unique_lock<std::mutex> lk( m_mutex );
-    assert( m_terminated );
+    NX_ASSERT( m_terminated );
     while( !m_connections.empty() )
     {
         std::unique_ptr<TestConnection> connection = std::move(m_connections.front());
@@ -474,7 +474,7 @@ void ConnectionsGenerator::onConnectionFinished(int id, ConnectionsContainer::it
 
     {
         std::unique_lock<std::mutex> lk(mtx1);
-        assert(terminatedSocketsIDs.find(id) == terminatedSocketsIDs.end());
+        NX_ASSERT(terminatedSocketsIDs.find(id) == terminatedSocketsIDs.end());
     }
 
     //if( !m_finishedConnectionsIDs.insert( id ).second )

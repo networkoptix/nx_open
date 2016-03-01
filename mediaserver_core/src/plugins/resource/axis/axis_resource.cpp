@@ -829,7 +829,7 @@ CLHttpStatus QnPlAxisResource::readAxisParameter(
 
 void QnPlAxisResource::onMonitorResponseReceived( nx_http::AsyncHttpClientPtr httpClient )
 {
-    Q_ASSERT( httpClient );
+    NX_ASSERT( httpClient );
     int index = -1;
     QnMutexLocker lk( &m_inputPortMutex );
     if( m_ioHttpMonitor[0].httpClient == httpClient )
@@ -860,7 +860,7 @@ void QnPlAxisResource::onMonitorResponseReceived( nx_http::AsyncHttpClientPtr ht
 
 void QnPlAxisResource::onCurrentIOStateResponseReceived( nx_http::AsyncHttpClientPtr httpClient )
 {
-    Q_ASSERT( httpClient );
+    NX_ASSERT( httpClient );
 
     if (httpClient->failed())
     {
@@ -891,7 +891,7 @@ void QnPlAxisResource::onCurrentIOStateResponseReceived( nx_http::AsyncHttpClien
 
 void QnPlAxisResource::onMonitorMessageBodyAvailable( nx_http::AsyncHttpClientPtr httpClient )
 {
-    Q_ASSERT( httpClient );
+    NX_ASSERT( httpClient );
 
     int index = -1;
     QnMutexLocker lk( &m_inputPortMutex );

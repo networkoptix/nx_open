@@ -158,7 +158,7 @@ void MediaServerEmulator::onConnectionRequested(
                 m_mediatorConnector.reset();
                 return;
             default:
-                assert(false);
+                NX_ASSERT(false);
         }
     }
 

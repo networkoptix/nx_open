@@ -18,7 +18,7 @@ bool QnResourceStatusWatcher::isSetStatusInProgress(const QnResourcePtr &resourc
 
 void QnResourceStatusWatcher::at_resource_statusChanged(const QnResourcePtr &resource)
 {
-    //Q_ASSERT_X(!resource->hasFlags(Qn::foreigner), Q_FUNC_INFO, "Status changed for foreign resource!");
+    //NX_ASSERT(!resource->hasFlags(Qn::foreigner), Q_FUNC_INFO, "Status changed for foreign resource!");
     //if (resource.dynamicCast<QnMediaServerResource>())
     //    return;
 

@@ -48,7 +48,7 @@ OutgoingTunnelUdtConnection::OutgoingTunnelUdtConnection(
 
 OutgoingTunnelUdtConnection::~OutgoingTunnelUdtConnection()
 {
-    assert(m_pleaseStopHasBeenCalled && m_pleaseStopCompleted);
+    NX_ASSERT(m_pleaseStopHasBeenCalled && m_pleaseStopCompleted);
 }
 
 void OutgoingTunnelUdtConnection::pleaseStop(
@@ -108,7 +108,7 @@ void OutgoingTunnelUdtConnection::establishNewConnection(
     SocketAttributes socketAttributes,
     OnNewConnectionHandler handler)
 {
-    assert(!m_pleaseStopHasBeenCalled);
+    NX_ASSERT(!m_pleaseStopHasBeenCalled);
 
     NX_LOGX(lm("connection %1. New stream socket has been requested")
         .arg(m_connectionId), cl_logDEBUG2);
@@ -144,7 +144,7 @@ void OutgoingTunnelUdtConnection::establishNewConnection(
             &OutgoingTunnelUdtConnection::proceedWithConnection, this,
             connectionPtr, timeout));
 
-    assert(!m_pleaseStopHasBeenCalled);
+    NX_ASSERT(!m_pleaseStopHasBeenCalled);
 }
 
 void OutgoingTunnelUdtConnection::setControlConnectionClosedHandler(
@@ -250,7 +250,7 @@ void OutgoingTunnelUdtConnection::closeConnection(
         return; //pleaseStop has already been called...
 
     //we are in connection's aio thread
-    assert(connection == controlConnection.get());
+    NX_ASSERT(connection == controlConnection.get());
 }
 
 void OutgoingTunnelUdtConnection::onStunMessageReceived(

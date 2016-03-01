@@ -206,7 +206,7 @@ void CloudStreamSocket::cancelIOAsync(
 
     if (m_socketDelegate)
     {
-        assert(m_aioThreadBinder->getAioThread() == m_socketDelegate->getAioThread());
+        NX_ASSERT(m_aioThreadBinder->getAioThread() == m_socketDelegate->getAioThread());
     }
 
     m_aioThreadBinder->cancelIOAsync(
@@ -377,7 +377,7 @@ bool CloudStreamSocket::startAsyncConnect(
         }
 
         default:
-            assert(false);
+            NX_ASSERT(false);
             SystemError::setLastErrorCode(SystemError::hostUnreach);
             return false;
     }
@@ -416,12 +416,12 @@ void CloudStreamSocket::onCloudConnectDone(
     if (errorCode == SystemError::noError)
     {
         m_socketDelegate = std::move(cloudConnection);
-        assert(cloudConnection->getAioThread() == m_aioThreadBinder->getAioThread());
+        NX_ASSERT(cloudConnection->getAioThread() == m_aioThreadBinder->getAioThread());
         setDelegate(m_socketDelegate.get());
     }
     else
     {
-        assert(!cloudConnection);
+        NX_ASSERT(!cloudConnection);
     }
     auto userHandler = std::move(m_connectHandler);
     userHandler(errorCode);  //this object can be freed in handler, so using local variable for handler

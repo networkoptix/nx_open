@@ -5,6 +5,7 @@
 
 #include <plugins/plugin_tools.h>
 #include <utils/memory/system_allocator.h>
+#include <nx/utils/log/assert.h>
 
 #include "warnings.h"
 
@@ -115,7 +116,7 @@ unsigned int QnByteArray::write( const char *data, unsigned int size )
 
 void QnByteArray::uncheckedWrite( const char *data, unsigned int size )
 {
-    Q_ASSERT_X(m_size + size <= m_capacity, "Buffer MUST be preallocated!", Q_FUNC_INFO);
+    NX_ASSERT(m_size + size <= m_capacity, "Buffer MUST be preallocated!", Q_FUNC_INFO);
     memcpy(m_data + m_size, data, size);  //1s
     m_size += size;
 }
@@ -257,7 +258,7 @@ QnByteArray& QnByteArray::operator=( QnByteArray&& right )
 
 bool QnByteArray::reallocate(unsigned int capacity)
 {
-    Q_ASSERT(capacity > 0);
+    NX_ASSERT(capacity > 0);
 
     if (capacity < m_size)
     {

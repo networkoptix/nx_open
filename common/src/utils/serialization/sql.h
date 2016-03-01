@@ -7,6 +7,7 @@
 #include <QtSql/QSqlQuery>
 
 #include <utils/common/conversion_wrapper.h>
+#include <nx/utils/log/assert.h>
 
 #include "sql_fwd.h"
 #include "sql_index_mapping.h"
@@ -48,7 +49,7 @@ namespace QnSqlDetail {
 namespace QnSql {
     template<class T>
     void bind(const T &value, QSqlQuery *target) {
-        assert(target);
+        NX_ASSERT(target);
 
         QnSqlDetail::bind_internal(value, target);
     }
@@ -60,7 +61,7 @@ namespace QnSql {
 
     template<class T>
     void fetch(const QnSqlIndexMapping &mapping, const QSqlRecord &value, T *target) {
-        assert(target);
+        NX_ASSERT(target);
 
         QnSqlDetail::fetch_internal(mapping, value, target);
     }
@@ -87,7 +88,7 @@ namespace QnSql {
 
     template<class T>
     void serialize_field(const T &value, QVariant *target) {
-        assert(target);
+        NX_ASSERT(target);
 
         QnSqlDetail::serialize_field_internal(value, target);
     }
@@ -101,7 +102,7 @@ namespace QnSql {
 
     template<class T>
     void deserialize_field(const QVariant &value, T *target) {
-        assert(target);
+        NX_ASSERT(target);
 
         QnSqlDetail::deserialize_field_internal(value, target);
     }

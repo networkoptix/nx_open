@@ -116,7 +116,7 @@ void QnClientPullMediaStreamProvider::run()
             {
                 if (videoData->channelNumber>CL_MAX_CHANNEL_NUMBER-1)
                 {
-                    Q_ASSERT(false);
+                    NX_ASSERT(false);
                     continue;
                 }
 

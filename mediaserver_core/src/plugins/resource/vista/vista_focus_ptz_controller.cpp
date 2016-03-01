@@ -36,7 +36,7 @@ QnVistaFocusPtzController::QnVistaFocusPtzController(const QnPtzControllerPtr &b
     m_capabilities(Qn::NoPtzCapabilities),
     m_isMotor(false)
 {
-    assert(m_resource);
+    NX_ASSERT(m_resource);
 
     init();
 }

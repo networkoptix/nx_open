@@ -178,7 +178,7 @@ public:
     {
         if (!m_delegate)
         {
-            Q_ASSERT_X(false, Q_FUNC_INFO, "Not supported");
+            NX_ASSERT(false, Q_FUNC_INFO, "Not supported");
             return -1;
         }
 
@@ -191,7 +191,7 @@ public:
             if (m_socketAttributes.aioThread)
                 return *m_socketAttributes.aioThread;
 
-            Q_ASSERT_X(false, Q_FUNC_INFO,
+            NX_ASSERT(false, Q_FUNC_INFO,
                        "Notfully supported while delegate is not set");
         }
 

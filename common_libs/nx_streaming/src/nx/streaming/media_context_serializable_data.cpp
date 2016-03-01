@@ -42,7 +42,7 @@ static bool checkMatrixSize(
     const QString warning = QString(QLatin1String(
         "QnMediaContext deserialization error: Invalid %s length: %d")).
         arg(QLatin1String(caption)).arg(matrix.size());
-    Q_ASSERT_X(false, Q_FUNC_INFO, warning.toLatin1());
+    NX_ASSERT(false, Q_FUNC_INFO, warning.toLatin1());
     qWarning() << warning;
     return false;
 }
@@ -54,7 +54,7 @@ bool QnMediaContextSerializableData::deserialize(const QByteArray& data)
     {
         static const char* const kWarning =
             "QnMediaContext deserialization error: Fusion has failed.";
-        Q_ASSERT_X(false, Q_FUNC_INFO, kWarning);
+        NX_ASSERT(false, Q_FUNC_INFO, kWarning);
         qWarning() << kWarning;
         return false;
     }

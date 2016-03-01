@@ -221,8 +221,8 @@ public:
 
     OutgoingTunnelTest()
     {
-        assert(DummyConnector::instanceCount == 0);
-        assert(DummyConnection::instanceCount == 0);
+        NX_ASSERT(DummyConnector::instanceCount == 0);
+        NX_ASSERT(DummyConnection::instanceCount == 0);
     }
 
     ~OutgoingTunnelTest()
@@ -230,8 +230,8 @@ public:
         if (m_oldFactoryFunc)
             ConnectorFactory::setFactoryFunc(std::move(*m_oldFactoryFunc));
 
-        assert(DummyConnector::instanceCount == 0);
-        assert(DummyConnection::instanceCount == 0);
+        NX_ASSERT(DummyConnector::instanceCount == 0);
+        NX_ASSERT(DummyConnection::instanceCount == 0);
     }
 
     void setConnectorFactoryFunc(ConnectorFactory::FactoryFunc newFactoryFunc)

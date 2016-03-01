@@ -137,7 +137,7 @@ private:
         std::unique_ptr<AbstractStreamSocket> socketAp(socket);
         if (m_first)
         {
-            assert(errorCode == SystemError::noError);
+            NX_ASSERT(errorCode == SystemError::noError);
             m_controlConnection = std::move(socketAp);
             m_first = false;
             if (m_onControlConnectionEstablishedHander)
@@ -229,7 +229,7 @@ TEST_F(OutgoingTunnelUdtConnectionTest, timeout)
             connectTime > connectContexts[i].timeout
             ? connectTime - connectContexts[i].timeout
             : connectContexts[i].timeout - connectTime;
-        //NOTE some timeout fault will always be there, so this assert may fail sometimes
+        //NOTE some timeout fault will always be there, so this NX_ASSERT may fail sometimes
         ASSERT_LE(connectTimeDiff, acceptableTimeoutFault);
     }
 

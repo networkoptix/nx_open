@@ -1,5 +1,4 @@
 #ifdef ENABLE_ACTI
-
 #include "acti_resource.h"
 
 #include <functional>
@@ -357,6 +356,10 @@ CameraDiagnostics::Result QnActiResource::initInternal()
     QScopedPointer<QnAbstractPtzController> ptzController(createPtzControllerInternal());
     setPtzCapabilities(ptzController->getCapabilities());
 
+    //if(report.value("company name").toLower().trimmed() == lit("network optix")){
+        fetchAndSetAdvancedParameters(report.value("model number"));
+    //}
+
     setProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, m_hasAudio ? 1 : 0);
     setProperty(Qn::MAX_FPS_PARAM_NAME, getMaxFps());
     setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, !m_resolution[1].isEmpty() ? 1 : 0);
@@ -451,7 +454,12 @@ bool QnActiResource::startInputPortMonitoringAsync( std::function<void(bool)>&& 
     {
         if( !setupURLCommandRequestStr.isEmpty() )
             setupURLCommandRequestStr += QLatin1String("&");
-        setupURLCommandRequestStr += lit("EVENT_RSPCMD%1=%2,[%3/%4/di=%1],[%3/%5/di=%1]").arg(i).arg(EVENT_HTTP_SERVER_NUMBER).arg(cgiPath).arg(CAMERA_EVENT_ACTIVATED_PARAM_NAME).arg(CAMERA_EVENT_DEACTIVATED_PARAM_NAME);
+        setupURLCommandRequestStr += lit("EVENT_RSPCMD%1=%2,[%3/%4/di=%1],[%3/%5/di=%1]")
+                .arg(i)
+                .arg(EVENT_HTTP_SERVER_NUMBER)
+                .arg(cgiPath)
+                .arg(CAMERA_EVENT_ACTIVATED_PARAM_NAME)
+                .arg(CAMERA_EVENT_DEACTIVATED_PARAM_NAME);
     }
     responseMsgBody = makeActiRequest(
         QLatin1String("encoder"),
@@ -699,6 +707,447 @@ void QnActiResource::initializeIO( const QMap<QByteArray, QByteArray>& systemInf
         m_outputCount = it.value().toInt();
     if( m_outputCount > 0 )
         setCameraCapability(Qn::RelayOutputCapability, true);
+}
+
+bool QnActiResource::getParamPhysical(const QString& id, QString& value)
+{
+    QSet<QString> idList = {id};
+    QnCameraAdvancedParamValueList result;
+    bool success = false;
+    success = getParamsPhysical(idList, result);
+
+    if(success)
+    {
+        success = false;
+        for(const auto& paramValue: result)
+            if(id == paramValue.id)
+            {
+                value = paramValue.value;
+                success = true;
+                break;
+            }
+    }
+
+    return success;
+}
+
+bool QnActiResource::setParamPhysical(const QString& id, const QString& value)
+{
+    bool success = false;
+    QnCameraAdvancedParamValueList values = {QnCameraAdvancedParamValue(id, value)};
+    QnCameraAdvancedParamValueList result;
+
+    success = setParamsPhysical(values, result);
+
+    return success;
+}
+
+bool QnActiResource::getParamsPhysical(const QSet<QString> &idList, QnCameraAdvancedParamValueList &result)
+{
+    QMap<QString, QSet<QPair<QString, int> > > composites;
+    QMap<QString, QString> queries;
+
+    for(auto paramId: idList){\
+
+        if(paramId == lit("SAVE_REBOOT")
+            || paramId == lit("CONFIG_RESET")
+            || paramId == lit("FACTORY_DEFAULT"))
+        {
+            continue;
+        }
+
+        auto param = m_advancedParameters.getParameterById(paramId);
+        auto group = param.readCmd.isEmpty() ? lit("encoder") : param.readCmd;
+
+        if(!queries.contains(group))
+            queries[group] = lit("");
+
+        if(param.writeCmd.startsWith("composite-"))
+        {
+            auto composite = getMainParameter(param);
+            queries[group] += composite.first + lit("&");
+            composites[composite.first]
+                .insert(QPair<QString, int>(param.id, composite.second));
+        }
+        else
+        {
+            queries[group] += param.id + lit("&");
+        }
+    }
+
+    for(const auto& q: queries.keys())
+    {
+        CLHttpStatus status;
+        auto response = makeActiRequest(q, queries[q], status, true);
+
+        QnCameraAdvancedParamValueList params;
+        parseCameraParametersResponse(response, params);
+
+        for(auto& param: params)
+        {
+            if(composites.contains(param.id))
+            {
+                for(const auto& compositeParam: composites[param.id])
+                {
+                    result.append(
+                        QnCameraAdvancedParamValue(
+                            compositeParam.first,
+                            getNthParameterInCompositeValue(
+                                param.value,
+                                compositeParam.second)));
+                }
+            }
+            else
+            {
+                convertParamValueToInternal(
+                    param.value,
+                    m_advancedParameters.getParameterById(param.id));
+                result.append(param);
+            }
+        }
+
+
+    }
+    return true;
+}
+
+bool QnActiResource::setParamsPhysical(const QnCameraAdvancedParamValueList &values, QnCameraAdvancedParamValueList &result)
+{
+    CLHttpStatus status;
+    bool hasReboot = false;
+    bool hasReset = false;
+    QString resetType;
+
+    //Main parameter, set of composite parameters (aggregateId (paramValue, position in aggregate))
+    QMap<QString, QSet<QPair<QString, int> > > composites;
+
+    //Original values of composite parameters (id, value)
+    QMap<QString, QString> compositeValues;
+
+    //Queries to retreive composite values (group, query)
+    QMap<QString, QString> compositeQueries;
+
+    //Queries to set all needed stuff (group, query)
+    QMap<QString, QString> queries;
+
+
+
+    for(const auto& value: values)
+    {
+        if(value.id == lit("SAVE_REBOOT"))
+        {
+            hasReboot = true;
+            continue;
+        }
+
+        if( value.id == lit("CONFIG_RESET") || value.id == lit("FACTORY_DEFAULT"))
+        {
+            hasReset = true;
+            resetType = value.id;
+            break;
+        }
+
+        auto param = m_advancedParameters.getParameterById(value.id);
+        auto paramId = value.id;
+        auto paramValue = value.value;
+        auto group = param.readCmd.isEmpty() ? lit("encoder") : param.readCmd;
+
+        if(!queries.contains(group))
+            queries[group] = lit("");
+
+        if(param.writeCmd.startsWith("composite-"))
+        {
+            auto composite = getMainParameter(param);
+            if(!compositeQueries.contains(group))
+                compositeQueries[group] = lit("");
+
+            if(!composites.contains(composite.first))
+                compositeQueries[group] += composite.first + lit("&");
+            compositeValues[param.id] = paramValue;
+            composites[composite.first].insert(
+                QPair<QString, int>(
+                    paramId,
+                    composite.second));
+
+
+        }
+        else
+        {
+            convertParamValueFromInternal(paramValue, param);
+            queries[group] += paramId + lit("=") + paramValue + lit("&");
+        }
+    }
+
+    if(hasReset)
+    {
+        auto response = makeActiRequest(lit("system"), resetType, status);
+        return true;
+    }
+
+    for(const auto& q: compositeQueries.keys())
+    {
+        auto response = makeActiRequest(q, compositeQueries[q], status, true);
+        QnCameraAdvancedParamValueList params;
+        parseCameraParametersResponse(response, params);
+
+        for(auto& parsed: params)
+        {
+            QString paramId;
+            for(const auto& composite: composites[parsed.id])
+            {
+                setNthParameterInCompositeValue(
+                    parsed.value,
+                    compositeValues[composite.first],
+                    composite.second);
+                paramId = composite.first;
+            }
+
+            auto param = m_advancedParameters.getParameterById(paramId);
+            auto group = param.readCmd.isEmpty() ? lit("encoder"): param.readCmd;
+
+            queries[group] += parsed.id + lit("=") + parsed.value + lit("&");
+        }
+    }
+
+    for(const auto& q: queries.keys())
+    {
+        auto response = makeActiRequest(
+            q,
+            queries[q],
+            status,
+            true);
+
+        QnCameraAdvancedParamValueList params;
+        parseCameraParametersResponse(response, params);
+
+        for(const auto& param: params)
+        {
+            if(composites.contains(param.id))
+            {
+                for(const auto& composite: composites[param.id])
+                {
+                    result.append(QnCameraAdvancedParamValue(
+                        composite.first,
+                        getNthParameterInCompositeValue(
+                            param.value,
+                            composite.second)));
+                }
+            }
+            else
+                result.append(param);
+
+        }
+    }
+
+    if(hasReboot)
+    {
+        auto response = makeActiRequest(lit("system"), lit("SAVE_REBOOT"), status);
+        return true;
+    }
+
+    return result.size() == values.size();
+}
+
+bool QnActiResource::parseParameter(const QString& paramStr, QnCameraAdvancedParamValue& value)
+{
+    bool success = false;
+    auto split = paramStr.trimmed().split('=');
+
+    if(split.size() == 2)
+    {
+        success = true;
+        if(split[0].startsWith("OK:"))
+            value.id = split[0].split(' ')[1].trimmed();
+        else
+            value.id = split[0];
+
+        value.value = split[1].mid(1, split[1].size()-2);
+    }
+
+    return success;
+}
+
+bool QnActiResource::parseCameraParametersResponse(const QByteArray& response, QnCameraAdvancedParamValueList& result)
+{
+    auto lines = response.split('\n');
+    for(const auto& line: lines)
+    {
+        if(line.startsWith("ERROR:"))
+            continue;
+        QnCameraAdvancedParamValue param;
+        if(parseParameter(line, param))
+            result.append(param);
+    }
+
+    return true;
+}
+
+void QnActiResource::convertParamValueFromInternal(QString &paramValue, const QnCameraAdvancedParameter &param)
+{
+    if(param.dataType == QnCameraAdvancedParameter::DataType::Enumeration)
+    {
+        paramValue = param.toInternalRange(paramValue);
+        if(param.writeCmd == lit("comma_separated"))
+            paramValue = paramValue.replace('|', ',');
+    }
+    else if(param.dataType == QnCameraAdvancedParameter::DataType::Bool)
+        paramValue = paramValue == lit("true") ?  lit("1") : lit("0");
+}
+
+void QnActiResource::convertParamValueToInternal(QString &paramValue, const QnCameraAdvancedParameter &param)
+{
+    if(param.dataType == QnCameraAdvancedParameter::DataType::Enumeration)
+    {
+        paramValue = param.toInternalRange(paramValue);
+        if(param.writeCmd == lit("comma_separated"))
+            paramValue = paramValue.replace(',', '|');
+    }
+    else if(param.dataType == QnCameraAdvancedParameter::DataType::Bool)
+        paramValue = paramValue == lit("1") ?  lit("true") : lit("false");
+}
+
+QString QnActiResource::getNthParameterInCompositeValue(const QString &paramValue, const int& n)
+{
+    QString res;
+    auto split = paramValue.split(',');
+    if(n < split.size())
+        res = split[n];
+
+    return res;
+}
+
+bool QnActiResource::setNthParameterInCompositeValue(QString& compositeValue, const QString& paramValue, const int& n)
+{
+    bool success = false;
+    auto split = compositeValue.split(',');
+    if(n < split.size())
+    {
+        split[n] = paramValue;
+        compositeValue = split.join(lit(","));
+        success = true;
+    }
+
+    return success;
+}
+
+QPair<QString, int> QnActiResource::getMainParameter(const QnCameraAdvancedParameter& compositeParam)
+{
+    QPair<QString, int> result(lit(""), 0);
+    auto composite = compositeParam.writeCmd;
+    if(composite.startsWith("composite-"))
+    {
+        auto split = composite.split('-');
+        if(split.size() == 3)
+        {
+            result.first = split[1];
+            result.second = split[2].toInt();
+        }
+    }
+
+    return result;
+}
+
+bool QnActiResource::loadAdvancedParametersTemplateFromFile(QnCameraAdvancedParams& params, const QString& templateFilename)
+{
+    QFile paramsTemplateFile(templateFilename);
+#ifdef _DEBUG
+    QnCameraAdvacedParamsXmlParser::validateXml(&paramsTemplateFile);
+#endif
+    bool result = QnCameraAdvacedParamsXmlParser::readXml(&paramsTemplateFile, params);
+#ifdef _DEBUG
+    if (!result)
+        qWarning() << "Error while parsing xml" << templateFilename;
+#endif
+    return result;
+}
+
+void QnActiResource::fetchAndSetAdvancedParameters(const QString model)
+{
+    QnMutexLocker lock( &m_physicalParamsMutex );
+    m_advancedParameters.clear();
+    QString templateFile =
+        model ==  lit("E12A") ?
+            lit("nx-cube.xml") :
+        model == lit("E924") ?
+            lit("nx-dome.xml") :
+        model == lit("E925") ?
+            lit("nx-fisheye.xml") : lit("nx-cube.xml");
+
+    QnCameraAdvancedParams params;
+    if (!loadAdvancedParametersTemplateFromFile(
+            params,
+            lit(":/camera_advanced_params/") + templateFile))
+        return;
+
+    QSet<QString> supportedParams = calculateSupportedAdvancedParameters(params);
+    m_advancedParameters = params.filtered(supportedParams);
+    QnCameraAdvancedParamsReader::setParamsToResource(this->toSharedPointer(), m_advancedParameters);
+}
+
+QSet<QString> QnActiResource::calculateSupportedAdvancedParameters(const QnCameraAdvancedParams &allParams)
+{
+
+    QSet<QString> supported;
+    QMap<QString, QSet<QString> > composites;
+    auto paramIds = allParams.allParameterIds();
+
+    QMap<QString, QString> queries;
+    CLHttpStatus status;
+
+    for(const auto& paramId: paramIds)
+        if(paramId != lit("SAVE_REBOOT")
+            && paramId != lit("CONFIG_RESET")
+            && paramId != lit("FACTORY_DEFAULT"))
+        {
+            auto param = allParams.getParameterById(paramId);
+            auto readCmd = param.readCmd;
+
+            if(readCmd.isEmpty())
+                readCmd = lit("encoder");
+
+            if(!queries.contains(readCmd))
+                queries[readCmd] = lit("");
+
+            if(param.writeCmd.startsWith(lit("composite-")))
+            {
+                auto split = param.writeCmd.split('-');
+                if(!composites.contains(split[1]))
+                    composites[split[1]] = QSet<QString>();
+                composites[split[1]].insert(paramId);
+                queries[readCmd] += split[1] + "&";
+            }
+            else
+                queries[readCmd] += paramId + "&";
+        }
+
+    for(const auto& q: queries.keys())
+    {
+        auto response = makeActiRequest(q, queries[q], status, true);
+        auto lines = response.split('\n');
+        QList<QByteArray> idAndValue;
+        for(auto line: lines)
+        {
+            if(!line.startsWith("ERROR"))
+            {
+                idAndValue = line.split('=');
+                if(idAndValue.size() == 2)
+                {
+                    if(composites.contains(idAndValue[0]))
+                        for(const auto& s: composites[idAndValue[0]])
+                            supported.insert(s);
+                    else
+                        supported.insert(idAndValue[0]);
+                }
+
+            }
+        }
+    }
+
+    supported.insert(lit("SAVE_REBOOT"));
+    supported.insert(lit("CONFIG_RESET"));
+    supported.insert(lit("FACTORY_DEFAULT"));
+
+    return supported;
 }
 
 #endif // #ifdef ENABLE_ACTI

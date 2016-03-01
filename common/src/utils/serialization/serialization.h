@@ -9,6 +9,7 @@
 #include <QtCore/QVariant>
 #endif
 
+#include <nx/utils/log/assert.h>
 #include <utils/common/conversion_wrapper.h>
 #include <utils/common/flat_map.h>
 #include <utils/common/synchronized_flat_storage.h>
@@ -84,21 +85,21 @@ public:
 
 #ifndef QN_NO_QT
     void serialize(context_type *ctx, const QVariant &value, data_type *target) const {
-        assert(ctx && value.userType() == type() && target);
+        NX_ASSERT(ctx && value.userType() == type() && target);
 
         serializeInternal(ctx, value.constData(), target);
     }
 #endif
 
     void serialize(context_type *ctx, const void *value, data_type *target) const {
-        assert(ctx && value && target);
+        NX_ASSERT(ctx && value && target);
 
         serializeInternal(ctx, value, target);
     }
 
 #ifndef QN_NO_QT
     bool deserialize(context_type *ctx, const data_type &value, QVariant *target) const {
-        assert(ctx && target);
+        NX_ASSERT(ctx && target);
 
         *target = QVariant(type(), static_cast<const void *>(NULL));
         return deserializeInternal(ctx, value, target->data());
@@ -106,7 +107,7 @@ public:
 #endif
 
     bool deserialize(context_type *ctx, const data_type &value, void *target) const {
-        assert(ctx && target);
+        NX_ASSERT(ctx && target);
 
         return deserializeInternal(ctx, value, target);
     }
@@ -143,21 +144,21 @@ public:
 
 #ifndef QN_NO_QT
     void serialize(const QVariant &value, data_type *target) const {
-        assert(value.userType() == type() && target);
+        NX_ASSERT(value.userType() == type() && target);
 
         serializeInternal(value.constData(), target);
     }
 #endif
 
     void serialize(const void *value, data_type *target) const {
-        assert(value && target);
+        NX_ASSERT(value && target);
 
         serializeInternal(value, target);
     }
 
 #ifndef QN_NO_QT
     bool deserialize(const data_type &value, QVariant *target) const {
-        assert(target);
+        NX_ASSERT(target);
 
         *target = QVariant(type(), static_cast<const void *>(NULL));
         return deserializeInternal(value, target->data());
@@ -165,7 +166,7 @@ public:
 #endif
 
     bool deserialize(const data_type &value, void *target) const {
-        assert(target);
+        NX_ASSERT(target);
 
         return deserializeInternal(value, target);
     }
@@ -315,13 +316,13 @@ namespace QnSerialization {
 
     template<class T, class D>
     void serialize(const T &value, D *target) {
-        assert(target);
+        NX_ASSERT(target);
         QnSerializationDetail::serialize_internal(value, target);
     }
 
     template<class T, class D>
     bool deserialize(const D &value, T *target) {
-        assert(target);
+        NX_ASSERT(target);
         return QnSerializationDetail::deserialize_internal(value, target);
     }
 
@@ -333,13 +334,13 @@ namespace QnSerialization {
 
     template<class Context, class T, class D>
     void serialize(Context *ctx, const T &value, D *target) {
-        assert(ctx && target);
+        NX_ASSERT(ctx && target);
         QnSerializationDetail::serialize_internal(ctx, value, target);
     }
 
     template<class Context, class T, class D>
     bool deserialize(Context *ctx, const D &value, T *target) {
-        assert(ctx && target);
+        NX_ASSERT(ctx && target);
         return QnSerializationDetail::deserialize_internal(ctx, value, target);
     }
 

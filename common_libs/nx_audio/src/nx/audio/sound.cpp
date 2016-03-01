@@ -10,6 +10,7 @@
 
 #include "utils/common/sleep.h"
 #include "audiodevice.h"
+#include <nx/utils/log/assert.h>
 
 namespace nx {
 namespace audio {
@@ -54,7 +55,7 @@ Sound::~Sound()
 
 bool Sound::setup()
 {
-    Q_ASSERT(m_bitsPerSample && m_numChannels && m_size);
+    NX_ASSERT(m_bitsPerSample && m_numChannels && m_size);
     if (!m_bitsPerSample || !m_numChannels || !m_size )
         return false;
 

@@ -19,6 +19,12 @@
     "data": [
         {
             "keys": [
+                "Camera"
+            ],
+            "forceONVIF": false
+        },
+        {
+            "keys": [
                 "VISTA|*",
                 "DW|*"
             ],

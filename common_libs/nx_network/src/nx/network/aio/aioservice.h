@@ -149,7 +149,7 @@ namespace aio {
             QnMutexLocker lk(&m_mutex);
             //if sock is not still bound to aio thread, binding it
             auto& threadToUse = m_systemSocketAIO.aioThreadPool[rand() % m_systemSocketAIO.aioThreadPool.size()];
-            assert(threadToUse);
+            NX_ASSERT(threadToUse);
             lk.unlock();
             threadToUse->post(nullptr, std::move(handler));
         }
@@ -177,12 +177,12 @@ namespace aio {
         void bindSocketToAioThread(Pollable* sock, AbstractAioThread* aioThread)
         {
             const auto desired = dynamic_cast<aio::AIOThread<Pollable>*>(aioThread);
-            Q_ASSERT_X(desired, Q_FUNC_INFO, "Inappropriate AIO thread type");
+            NX_ASSERT(desired, Q_FUNC_INFO, "Inappropriate AIO thread type");
 
             aio::AIOThread<Pollable>* expected = nullptr;
             if(!sock->impl()->aioThread.compare_exchange_strong(expected, desired))
             {
-                Q_ASSERT_X(false, Q_FUNC_INFO,
+                NX_ASSERT(false, Q_FUNC_INFO,
                            "Socket is already bound to some AIO thread");
             }
         }
@@ -238,7 +238,7 @@ namespace aio {
                 }
                 else
                 {
-                    assert( false );
+                    NX_ASSERT( false );
                 }
                 timeoutMillis = std::chrono::milliseconds(sockTimeoutMS);
             }
@@ -283,7 +283,7 @@ namespace aio {
                 sockCtx,
                 std::make_pair(threadToUse, timeoutMillis.get())).second)
             {
-                assert(false);
+                NX_ASSERT(false);
             }
             lock->unlock();
             threadToUse->watchSocket(
@@ -383,7 +383,7 @@ namespace aio {
             if (!thread) // socket has not been bound to aio thread yet
                 thread = bindSocketToAioThread(lock, sock);
 
-            Q_ASSERT(thread);
+            NX_ASSERT(thread);
             return thread;
         }
 

@@ -80,14 +80,14 @@ void ServerConnection::processMessage( Message message )
             break;
 
         default:
-            Q_ASSERT( false );  //not supported yet
+            NX_ASSERT( false );  //not supported yet
     }
 }
 
 void ServerConnection::setDestructHandler( std::function< void() > handler )
 {
     QnMutexLocker lk( &m_mutex );
-    Q_ASSERT_X( !(handler && m_destructHandler), Q_FUNC_INFO,
+    NX_ASSERT( !(handler && m_destructHandler), Q_FUNC_INFO,
                 "Can not set new hadler while previous is not removed" );
 
     m_destructHandler = std::move( handler );

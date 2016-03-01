@@ -6,7 +6,7 @@ namespace stun {
 AsyncClientUser::~AsyncClientUser()
 {
     QnMutexLocker lk( &m_mutex );
-    Q_ASSERT_X(m_pleaseStopHasBeenCalled, Q_FUNC_INFO, "pleaseStop was not called");
+    NX_ASSERT(m_pleaseStopHasBeenCalled, Q_FUNC_INFO, "pleaseStop was not called");
 }
 
 SocketAddress AsyncClientUser::localAddress() const
@@ -29,7 +29,7 @@ AsyncClientUser::AsyncClientUser(std::shared_ptr<AbstractAsyncClient> client)
 void AsyncClientUser::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
     QnMutexLocker lk(&m_mutex);
-    Q_ASSERT_X(!m_stopHandler, Q_FUNC_INFO, "pleaseStop is called 2nd time");
+    NX_ASSERT(!m_stopHandler, Q_FUNC_INFO, "pleaseStop is called 2nd time");
     m_stopHandler = std::move(handler);
     m_pleaseStopHasBeenCalled = true;
     m_client.reset();

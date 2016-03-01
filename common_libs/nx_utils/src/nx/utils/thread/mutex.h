@@ -140,13 +140,13 @@ public:
 
     void relock()
     {
-        Q_ASSERT(!m_locked);
+        NX_ASSERT(!m_locked);
         m_mutex->lock();
         m_locked = true;
     }
     void unlock()
     {
-        Q_ASSERT(m_locked);
+        NX_ASSERT(m_locked);
         m_mutex->unlock();
         m_locked = false;
     }

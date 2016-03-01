@@ -707,7 +707,7 @@ void QnPlOnvifResource::fetchAndSetPrimarySecondaryResolution()
 
 
     if (m_secondaryResolution != EMPTY_RESOLUTION_PAIR) {
-        Q_ASSERT(m_secondaryResolution.width() <= SECONDARY_STREAM_MAX_RESOLUTION.width() &&
+        NX_ASSERT(m_secondaryResolution.width() <= SECONDARY_STREAM_MAX_RESOLUTION.width() &&
             m_secondaryResolution.height() <= SECONDARY_STREAM_MAX_RESOLUTION.height());
         return;
     }
@@ -732,7 +732,7 @@ void QnPlOnvifResource::fetchAndSetPrimarySecondaryResolution()
             m_primaryResolution = resolution;
             m_secondaryResolution = tmp;
 
-            Q_ASSERT(m_secondaryResolution.width() <= SECONDARY_STREAM_MAX_RESOLUTION.width() &&
+            NX_ASSERT(m_secondaryResolution.width() <= SECONDARY_STREAM_MAX_RESOLUTION.width() &&
                 m_secondaryResolution.height() <= SECONDARY_STREAM_MAX_RESOLUTION.height());
 
             return;
@@ -2539,7 +2539,7 @@ bool QnPlOnvifResource::loadAdvancedParametersTemplate(QnCameraAdvancedParams &p
     return loadXmlParametersInternal(params, lit(":/camera_advanced_params/onvif.xml"));
 }
 
-bool QnPlOnvifResource::loadXmlParametersInternal(QnCameraAdvancedParams &params, const QString& paramsTemplateFileName) const 
+bool QnPlOnvifResource::loadXmlParametersInternal(QnCameraAdvancedParams &params, const QString& paramsTemplateFileName) const
 {
     QFile paramsTemplateFile(paramsTemplateFileName);
 #ifdef _DEBUG
@@ -2799,7 +2799,7 @@ bool QnPlOnvifResource::startInputPortMonitoringAsync( std::function<void(bool)>
 
     {
         QnMutexLocker lk( &m_ioPortMutex );
-        Q_ASSERT( !m_inputMonitored );
+        NX_ASSERT( !m_inputMonitored );
         m_inputMonitored = true;
     }
 
@@ -3257,7 +3257,7 @@ void QnPlOnvifResource::onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* as
         return;
 
     using namespace std::placeholders;
-    Q_ASSERT( m_nextPullMessagesTimerID == 0 );
+    NX_ASSERT( m_nextPullMessagesTimerID == 0 );
     if( m_nextPullMessagesTimerID == 0 )    //otherwise, we already have timer somehow
         m_nextPullMessagesTimerID = TimerManager::instance()->addTimer(
             std::bind(&QnPlOnvifResource::pullMessages, this, _1),
@@ -3269,7 +3269,7 @@ void QnPlOnvifResource::onPullMessagesResponseReceived(
     int resultCode,
     const _onvifEvents__PullMessagesResponse& response)
 {
-    Q_ASSERT( resultCode == SOAP_OK || resultCode == SOAP_MUSTUNDERSTAND );
+    NX_ASSERT( resultCode == SOAP_OK || resultCode == SOAP_MUSTUNDERSTAND );
 
     const qint64 currentRequestSendClock = m_monotonicClock.elapsed();
 

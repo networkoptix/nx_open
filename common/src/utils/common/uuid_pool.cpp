@@ -1,6 +1,7 @@
 #include "uuid_pool.h"
 
 #include <type_traits>
+#include <nx/utils/log/assert.h>
 
 namespace {
     /* Quite reasonable default size for all pools. */
@@ -24,7 +25,7 @@ void QnUuidPool::markAsUsed(const QnUuid &id) {
     offset_type i = offset(id);
     if (m_usageData.size() < i)
         m_usageData.resize(i, false);
-    Q_ASSERT_X(m_usageData[i] == false, Q_FUNC_INFO, "Uuids must not be used twice");
+    NX_ASSERT(m_usageData[i] == false, Q_FUNC_INFO, "Uuids must not be used twice");
     m_usageData[i] = true;
 }
 
@@ -33,7 +34,7 @@ void QnUuidPool::markAsFree(const QnUuid &id) {
         return;
 
     offset_type i = offset(id);
-    Q_ASSERT_X(m_usageData.size() >= i && m_usageData[i] == true, Q_FUNC_INFO, "Uuids must not be freed twice");
+    NX_ASSERT(m_usageData.size() >= i && m_usageData[i] == true, Q_FUNC_INFO, "Uuids must not be freed twice");
     if (m_usageData.size() < i)
         return;
     m_usageData[i] = false;
@@ -47,7 +48,7 @@ QnUuid QnUuidPool::getFreeId() const {
 
     offset_type i = std::distance(m_usageData.cbegin(), iter);
     QnUuid result(QnUuid::createUuidFromPool(m_baseid, i));
-    Q_ASSERT_X(belongsToPool(result), Q_FUNC_INFO, "Make sure returned id is valid");
+    NX_ASSERT(belongsToPool(result), Q_FUNC_INFO, "Make sure returned id is valid");
 
     return result;
 }

@@ -494,7 +494,7 @@ int QnSignHelper::correctX264Bitstream(const QByteArray& srcCodecExtraData, QnCo
     }
 
     int newLen= newSps.log2_max_pic_order_cnt_lsb;
-    Q_ASSERT(newLen <= oldLen);
+    NX_ASSERT(newLen <= oldLen);
 
     bufEnd = videoBuf + out_size;
     SliceUnit frame;
@@ -509,7 +509,7 @@ int QnSignHelper::correctX264Bitstream(const QByteArray& srcCodecExtraData, QnCo
 
     oldLen = oldSps.log2_max_frame_num;
     newLen = newSps.log2_max_frame_num;
-    Q_ASSERT(newLen <= oldLen);
+    NX_ASSERT(newLen <= oldLen);
     if (!frame.moveHeaderField(frame.m_frameNumBitPos+8, oldLen, newLen)) 
         return out_size;
 

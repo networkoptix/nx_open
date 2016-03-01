@@ -155,7 +155,7 @@ protected:
         T reply;
         if(status == 0) {
             Qn::SerializationFormat format = Qn::serializationFormatFromHttpContentType(response.headers.value("Content-Type"));
-            Q_ASSERT_X(format != Qn::UnsupportedFormat, Q_FUNC_INFO, "Invalid content-type header");
+            NX_ASSERT(format != Qn::UnsupportedFormat, Q_FUNC_INFO, "Invalid content-type header");
             
             switch (format) {
             case Qn::JsonFormat:

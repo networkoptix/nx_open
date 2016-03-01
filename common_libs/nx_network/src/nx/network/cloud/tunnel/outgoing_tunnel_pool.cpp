@@ -21,7 +21,7 @@ OutgoingTunnelPool::OutgoingTunnelPool()
 
 OutgoingTunnelPool::~OutgoingTunnelPool()
 {
-    assert(m_terminated);
+    NX_ASSERT(m_terminated);
 }
 
 void OutgoingTunnelPool::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)

@@ -306,9 +306,9 @@ bool CLVideoDecoderOutput::isPixelFormatSupported(PixelFormat format)
 
 void CLVideoDecoderOutput::copyDataFrom(const AVFrame* frame)
 {
-    Q_ASSERT(width == frame->width);
-    Q_ASSERT(height == frame->height);
-    Q_ASSERT(format == frame->format);
+    NX_ASSERT(width == frame->width);
+    NX_ASSERT(height == frame->height);
+    NX_ASSERT(format == frame->format);
 
     const AVPixFmtDescriptor* descr = &av_pix_fmt_descriptors[format];
     for (int i = 0; i < descr->nb_components && frame->data[i]; ++i)

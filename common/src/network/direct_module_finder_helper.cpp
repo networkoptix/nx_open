@@ -41,7 +41,7 @@ QnDirectModuleFinderHelper::QnDirectModuleFinderHelper(QnModuleFinder *moduleFin
     m_clientMode(clientMode),
     m_moduleFinder(moduleFinder)
 {
-    Q_ASSERT(moduleFinder);
+    NX_ASSERT(moduleFinder);
 
     connect(qnResPool,  &QnResourcePool::resourceAdded,     this,   &QnDirectModuleFinderHelper::at_resourceAdded);
     connect(qnResPool,  &QnResourcePool::resourceRemoved,   this,   &QnDirectModuleFinderHelper::at_resourceRemoved);

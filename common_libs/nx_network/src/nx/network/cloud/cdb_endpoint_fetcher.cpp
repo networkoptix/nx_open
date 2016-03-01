@@ -150,7 +150,7 @@ void CloudModuleEndPointFetcher::endpointSelected(
         return signalWaitingHandlers(result, std::move(selectedEndpoint));
 
     QnMutexLocker lk(&m_mutex);
-    Q_ASSERT(!m_endpoint);
+    NX_ASSERT(!m_endpoint);
     m_endpoint = selectedEndpoint;
     lk.unlock();
     signalWaitingHandlers(result, selectedEndpoint);

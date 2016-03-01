@@ -20,7 +20,7 @@ quint32 qFloatDistance(float a, float b)
        * Integers and floats have the same endian
     */
     Q_STATIC_ASSERT(sizeof(quint32) == sizeof(float));
-    Q_ASSERT(qIsFinite(a) && qIsFinite(b));
+    NX_ASSERT(qIsFinite(a) && qIsFinite(b));
     if (a == b)
         return 0;
     if ((a < 0) != (b < 0)) {
@@ -62,7 +62,7 @@ quint64 qFloatDistance(double a, double b)
        * Integers and floats have the same endian
     */
     Q_STATIC_ASSERT(sizeof(quint64) == sizeof(double));
-    Q_ASSERT(qIsFinite(a) && qIsFinite(b));
+    NX_ASSERT(qIsFinite(a) && qIsFinite(b));
     if (a == b)
         return 0;
     if ((a < 0) != (b < 0)) {

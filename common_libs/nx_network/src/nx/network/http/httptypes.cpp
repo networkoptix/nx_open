@@ -1270,7 +1270,7 @@ namespace nx_http
 
         quint64 ContentRange::rangeLength() const
         {
-            Q_ASSERT( !rangeSpec.end || (rangeSpec.end >= rangeSpec.start) );
+            NX_ASSERT( !rangeSpec.end || (rangeSpec.end >= rangeSpec.start) );
 
             if( rangeSpec.end )
                 return rangeSpec.end.get() - rangeSpec.start + 1;   //both boundaries are inclusive
@@ -1282,7 +1282,7 @@ namespace nx_http
 
         StringType ContentRange::toString() const
         {
-            Q_ASSERT( !rangeSpec.end || (rangeSpec.end >= rangeSpec.start) );
+            NX_ASSERT( !rangeSpec.end || (rangeSpec.end >= rangeSpec.start) );
 
             StringType str = unitName;
             str += " ";

@@ -27,7 +27,7 @@ namespace
     {
         CodecID codecId = packet->compressionType;
 
-        Q_ASSERT_X( codecId == CODEC_ID_H264, "IFrame detection", "only CODEC_ID_H264 is supported" );
+        NX_ASSERT( codecId == CODEC_ID_H264, "IFrame detection", "only CODEC_ID_H264 is supported" );
 
         if( !packet || codecId != CODEC_ID_H264 )
             return false;
@@ -67,7 +67,7 @@ ThirdPartyStreamReader::ThirdPartyStreamReader(
     m_cameraCapabilities( 0 )
 {
     m_thirdPartyRes = getResource().dynamicCast<QnThirdPartyResource>();
-    Q_ASSERT( m_thirdPartyRes );
+    NX_ASSERT( m_thirdPartyRes );
 
     m_audioLayout.reset( new QnResourceCustomAudioLayout() );
 
@@ -117,7 +117,7 @@ void ThirdPartyStreamReader::updateSoftwareMotion()
             for( int y = rect.top(); y <= rect.bottom(); ++y )
                 for( int x = rect.left(); x <= rect.right(); ++x )
                 {
-                    assert( y < motionMask->width() && x < motionMask->height() );
+                    NX_ASSERT( y < motionMask->width() && x < motionMask->height() );
                     motionMask->setPixel( y, x, sensitivityToMask[sens] );
                     //m_motionMask[x * MD_HEIGHT + y] = sensitivityToMask[sens];
                     //m_motionSensMask[x * MD_HEIGHT + y] = sens;
@@ -539,8 +539,8 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader( nxcip::StreamRe
 
                         if( motionPicture.pixelFormat() == nxcip::PIX_FMT_MONOBLACK )
                         {
-                            assert( motionPicture.width() == MD_HEIGHT && motionPicture.height() == MD_WIDTH );
-                            assert( motionPicture.xStride(0) * CHAR_BIT == motionPicture.width() );
+                            NX_ASSERT( motionPicture.width() == MD_HEIGHT && motionPicture.height() == MD_WIDTH );
+                            NX_ASSERT( motionPicture.xStride(0) * CHAR_BIT == motionPicture.width() );
 
                             motion->assign( motionPicture.data(), srcVideoPacket->timestamp(), DEFAULT_MOTION_DURATION );
                         }
@@ -570,7 +570,7 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader( nxcip::StreamRe
             break;    //end of data
 
         default:
-            Q_ASSERT( false );
+            NX_ASSERT( false );
             break;
     }
 
@@ -642,7 +642,7 @@ void ThirdPartyStreamReader::initializeAudioContext( const nxcip::AudioFormat& a
             av->sample_fmt = AV_SAMPLE_FMT_FLT;
             break;
         default:
-            assert( false );
+            NX_ASSERT( false );
     }
 
     //if (c->extradata_size > 0)

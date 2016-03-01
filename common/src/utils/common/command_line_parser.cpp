@@ -6,6 +6,7 @@
 #include <QtCore/QStringList>
 
 #include <utils/common/warnings.h>
+#include <nx/utils/log/assert.h>
 
 namespace {
     const QString uriDelimiter(lit("://"));
@@ -188,7 +189,7 @@ bool QnCommandLineParser::parse(int &argc, char **argv, QTextStream *errorStream
 
         /* Write value out if needed. */
         if(parameter.target() && parameter.metaType() && result) {
-            assert(value.userType() == parameter.type());
+            NX_ASSERT(value.userType() == parameter.type());
 
             parameter.metaType()->construct(parameter.target(), value.data());
         }
