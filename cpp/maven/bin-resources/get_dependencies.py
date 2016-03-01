@@ -25,6 +25,7 @@ TODO:
 0) check if artifact is already processed (copy rdpack to qt-5.6.0.rdpack)
 1) read copy-target list from artifact, by default - bin subdirectory
 2) copy only selected resources to the target dir(s?), e.g. TARGET_DIRECTORY\x64\bin\debug
+QT scenario is located in the copy_additional_resources.py script. After _all_ is implemented, is should be removed.
 '''
     target_dir = dependencies.TARGET_DIRECTORY
     print "Copying package {0} into {1}".format(package, target_dir)
