@@ -144,7 +144,9 @@ void AIOService::bindSocketToAioThread(Pollable* sock, AbstractAioThread* aioThr
     aio::AIOThread<Pollable>* expected = nullptr;
     if (!sock->impl()->aioThread.compare_exchange_strong(expected, desired))
     {
-        NX_ASSERT(false, Q_FUNC_INFO,
+        NX_ASSERT(
+            expected == desired,  //already bound to desired thread?
+            Q_FUNC_INFO,
             "Socket is already bound to some AIO thread");
     }
 }
