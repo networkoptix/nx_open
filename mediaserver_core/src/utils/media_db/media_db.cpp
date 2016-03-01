@@ -62,13 +62,13 @@ DbHelper::~DbHelper()
 
 QIODevice *DbHelper::getDevice() const
 {
-    std::lock_guard<std::mutex> lk(m_mutex);
+    QnMutexLocker lk(&m_mutex);
     return m_device;
 }
 
 void DbHelper::setDevice(QIODevice *device)
 {
-    std::lock_guard<std::mutex> lk(m_mutex);
+    QnMutexLocker lk(&m_mutex);
     m_device = device;
     m_stream.setDevice(m_device);
     m_stream.resetStatus();
@@ -93,7 +93,7 @@ Error DbHelper::getError() const
 
 Error DbHelper::readFileHeader(uint8_t *version)
 {
-    std::lock_guard<std::mutex> lk(m_mutex);
+    QnMutexLocker lk(&m_mutex);
     if (m_mode == Mode::Write)
         return Error::WrongMode;
     FileHeader fh;
@@ -106,7 +106,7 @@ Error DbHelper::readFileHeader(uint8_t *version)
 
 Error DbHelper::writeFileHeader(uint8_t dbVersion)
 {
-    std::lock_guard<std::mutex> lk(m_mutex);
+    QnMutexLocker lk(&m_mutex);
     if (m_mode == Mode::Read)
         return Error::WrongMode;
     FileHeader fh;
@@ -118,7 +118,7 @@ Error DbHelper::writeFileHeader(uint8_t dbVersion)
 
 Error DbHelper::readRecord()
 {
-    std::lock_guard<std::mutex> lk(m_mutex);
+    QnMutexLocker lk(&m_mutex);
     if (m_mode == Mode::Write)
         return Error::WrongMode;
     RecordBase rb;
@@ -167,33 +167,33 @@ Error DbHelper::readRecord()
 Error DbHelper::writeRecordAsync(const WriteRecordType &record)
 {
     {
-        std::lock_guard<std::mutex> lk(m_mutex);
+        QnMutexLocker lk(&m_mutex);
         if (m_mode == Mode::Read)
             return Error::WrongMode;
         m_writeQueue.push(record);
     }
-    m_cond.notify_all();
+    m_cond.wakeAll();
     return Error::NoError;
 }
 
 void DbHelper::reset()
 {
-    std::lock_guard<std::mutex> lk(m_mutex);
+    QnMutexLocker lk(&m_mutex);
     m_stream.resetStatus();
 }
 
 void DbHelper::setMode(Mode mode)
 {
-    std::unique_lock<std::mutex> lk(m_mutex);
+    QnMutexLocker lk(&m_mutex);
     m_mode = mode;
     m_stream.resetStatus();
-    if (!m_writeQueue.empty())
-        m_writerDoneCond.wait(lk, [this] { return m_writeQueue.empty(); });
+    while (!m_writeQueue.empty())
+        m_writerDoneCond.wait(lk.mutex());
 }
 
 Mode DbHelper::getMode() const
 {
-    std::lock_guard<std::mutex> lk(m_mutex);
+    QnMutexLocker lk(&m_mutex);
     return m_mode;
 }
 
@@ -204,8 +204,9 @@ void DbHelper::startWriter()
         {
             while (1)
             {
-                std::unique_lock<std::mutex> lk(m_mutex);
-                m_cond.wait(lk, [this] { return !m_writeQueue.empty() || m_needStop; });
+                QnMutexLocker lk(&m_mutex);
+                while (m_writeQueue.empty() && !m_needStop)
+                    m_cond.wait(lk.mutex());
                 
                 if (m_needStop)
                     return;
@@ -235,7 +236,7 @@ void DbHelper::startWriter()
                 }
 
                 lk.unlock();
-                m_writerDoneCond.notify_all();
+                m_writerDoneCond.wakeAll();
             }
         });
 }
@@ -243,10 +244,10 @@ void DbHelper::startWriter()
 void DbHelper::stopWriter()
 {
     {
-        std::lock_guard<std::mutex> lk(m_mutex);
+        QnMutexLocker lk(&m_mutex);
         m_needStop = true;
     }
-    m_cond.notify_all();
+    m_cond.wakeAll();
 
     if (m_thread.joinable())
         m_thread.join();

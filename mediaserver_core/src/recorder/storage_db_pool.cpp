@@ -119,8 +119,8 @@ QnStorageDbPtr QnStorageDbPool::getSDB(const QnStorageResourcePtr &storage)
             return QnStorageDbPtr();
         }
         //        qWarning() << "DB Path: " << dbPath << "\n";
-        QString fileName = closeDirPath(dbPath) + QString::fromLatin1("%1_media.sqlite").arg(simplifiedGUID);
-        QString oldFileName = closeDirPath(dbPath) + QString::fromLatin1("media.sqlite");
+        QString fileName = closeDirPath(dbPath) + QString::fromLatin1("%1_media.nxdb").arg(simplifiedGUID);
+        QString oldFileName = closeDirPath(dbPath) + QString::fromLatin1("media.nxdb");
 
         if (storage->getCapabilities() & QnAbstractStorageResource::DBReady)
         {
@@ -140,7 +140,7 @@ QnStorageDbPtr QnStorageDbPool::getSDB(const QnStorageResourcePtr &storage)
             m_chunksDB[storage->getUrl()] = sdb;
         }
         else {
-            qWarning()  << "can't initialize sqlLite database! File open failed: " << fileName;
+            qWarning()  << "can't initialize nx media database! File open failed: " << fileName;
             return QnStorageDbPtr();
         }
     }

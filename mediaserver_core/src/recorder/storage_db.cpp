@@ -1,5 +1,6 @@
 #include <cassert>
 #include <algorithm>
+#include <string>
 #include "storage_db.h"
 
 #include <QtSql/QSqlQuery>
@@ -11,6 +12,8 @@
 #include <utils/serialization/sql.h>
 #include <nx/utils/log/log.h>
 #include "utils/common/util.h"
+
+const uint8_t kDbVersion = 1;
 
 QnStorageDb::QnStorageDb(const QnStorageResourcePtr& s, int storageIndex):
     m_storage(s),
@@ -26,6 +29,20 @@ QnStorageDb::~QnStorageDb()
 {
 }
 
+int QnStorageDb::fillCameraOp(nx::media_db::CameraOperation &cameraOp,
+                              const QString &cameraUniqueId)
+{
+    size_t hashVal = std::hash<std::string>()(cameraUniqueId.toStdString());
+    int cameraId = (int)((hashVal & 0xffff) ^ (hashVal >> 0x10));
+
+    cameraOp.setRecordType(nx::media_db::RecordType::CameraOperationAdd);
+    cameraOp.setCameraId(cameraId);
+    cameraOp.setCameraUniqueIdLen(cameraUniqueId.size());
+    cameraOp.setCameraUniqueId(QByteArray::fromRawData(cameraUniqueId.toLatin1().constData(),
+                                                       cameraUniqueId.size()));
+    return cameraId;
+}
+
 bool QnStorageDb::deleteRecords(const QString& cameraUniqueId,
                                 QnServer::ChunksCatalog catalog,
                                 qint64 startTimeMs)
@@ -34,12 +51,20 @@ bool QnStorageDb::deleteRecords(const QString& cameraUniqueId,
     {
         QnMutexLocker lk(&m_syncMutex);
         auto it = m_uuidToHash.left.find(cameraUniqueId);
-        assert(it != m_uuidToHash.left.end());
-        cameraId = it->second;
+        if (it == m_uuidToHash.left.end())
+        {
+            nx::media_db::CameraOperation cameraOp;
+            cameraId = fillCameraOp(cameraOp, cameraUniqueId);
+            m_uuidToHash.insert(UuidToHash::value_type(cameraUniqueId, cameraId));
+            m_dbHelper.writeRecordAsync(cameraOp);
+        }
+        else
+            cameraId = it->second;
     }
     nx::media_db::MediaFileOperation mediaFileOp;
     mediaFileOp.setCameraId(cameraId);
     mediaFileOp.setCatalog(catalog);
+    mediaFileOp.setStartTime(startTimeMs);
     mediaFileOp.setRecordType(nx::media_db::RecordType::FileOperationDelete);
 
     assert(m_dbHelper.getMode() == nx::media_db::Mode::Write);
@@ -66,8 +91,15 @@ bool QnStorageDb::addRecord(const QString& cameraUniqueId,
     {
         QnMutexLocker lk(&m_syncMutex);
         auto it = m_uuidToHash.left.find(cameraUniqueId);
-        assert(it != m_uuidToHash.left.end());
-        cameraId = it->second;
+        if (it == m_uuidToHash.left.end())
+        {
+            nx::media_db::CameraOperation cameraOp;
+            cameraId = fillCameraOp(cameraOp, cameraUniqueId);
+            m_uuidToHash.insert(UuidToHash::value_type(cameraUniqueId, cameraId));
+            m_dbHelper.writeRecordAsync(cameraOp);
+        }
+        else
+            cameraId = it->second;
     }
     nx::media_db::MediaFileOperation mediaFileOp;
     mediaFileOp.setCameraId(cameraId);
@@ -112,18 +144,35 @@ bool QnStorageDb::open(const QString& fileName)
     return createDatabase(fileName);
 }
 
+bool QnStorageDb::resetIoDevice()
+{
+    m_ioDevice.reset(m_storage->open(m_dbFileName, QIODevice::ReadWrite));
+    if (!m_ioDevice)
+        return false;
+    m_dbHelper.setDevice(m_ioDevice.get());
+    return true;
+}
+
 bool QnStorageDb::createDatabase(const QString &fileName)
 {
     m_dbFileName = fileName;
-    m_ioDevice.reset(m_storage->open(fileName, QIODevice::ReadWrite));
-    if (!m_ioDevice)
+    if (!resetIoDevice())
         return false;
 
-    m_dbHelper.setDevice(m_ioDevice.get());
     m_dbHelper.setMode(nx::media_db::Mode::Read);
     
     if (m_dbHelper.readFileHeader(&m_dbVersion) != nx::media_db::Error::NoError)
-        return false;
+    {   // either file has just been created or unrecognized format
+        m_ioDevice.reset();
+        m_storage->removeFile(fileName);
+
+        if (!resetIoDevice())
+            return false;
+
+        m_dbHelper.setMode(nx::media_db::Mode::Write);
+        m_dbHelper.writeFileHeader(kDbVersion);
+        m_dbVersion = kDbVersion;
+    }
 
     //m_lastTranTime.restart();
     return true;
@@ -178,12 +227,12 @@ void QnStorageDb::addCatalogFromMediaFolder(const QString& postfix,
 QVector<DeviceFileCatalogPtr> QnStorageDb::loadChunksFileCatalog() 
 {
     m_readResult.clear();
-    assert(m_dbHelper.getMode() == nx::media_db::Mode::Read);
+    m_dbHelper.setMode(nx::media_db::Mode::Read);
     assert(m_dbHelper.getDevice());
 
-    while ((m_lastReadError = m_dbHelper.readRecord()) == nx::media_db::Error::NoError)
-        m_dbHelper.readRecord();
+    while ((m_lastReadError = m_dbHelper.readRecord()) == nx::media_db::Error::NoError);
 
+    m_dbHelper.setMode(nx::media_db::Mode::Write);
     return m_readResult;
 }
 

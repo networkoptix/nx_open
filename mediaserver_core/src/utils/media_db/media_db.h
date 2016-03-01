@@ -3,12 +3,13 @@
 
 #include <queue>
 #include <thread>
-#include <mutex>
-#include <condition_variable>
 #include <cmath>
 
 #include <boost/variant.hpp>
 #include <QtCore>
+
+#include "utils/thread/mutex.h"
+#include "utils/thread/wait_condition.h"
 
 // Refer to https://networkoptix.atlassian.net/wiki/display/SD/Proprietary+media+database+record+format 
 // for DB records format details.
@@ -163,9 +164,9 @@ private:
     QDataStream m_stream;
 
     std::thread m_thread;
-    mutable std::mutex m_mutex;
-    std::condition_variable m_cond;
-    std::condition_variable m_writerDoneCond;
+    mutable QnMutex m_mutex;
+    QnWaitCondition m_cond;
+    QnWaitCondition m_writerDoneCond;
     bool m_needStop;
     Mode m_mode;
 };

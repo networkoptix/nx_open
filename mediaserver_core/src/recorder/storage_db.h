@@ -61,6 +61,10 @@ private:
                                    QnServer::ChunksCatalog catalog,
                                    QVector<DeviceFileCatalogPtr>& result);
 
+    bool resetIoDevice();
+    // returns cameraId (hash from cameraUniqueId)
+    int fillCameraOp(nx::media_db::CameraOperation &cameraOp, const QString &cameraUniqueId);
+
 private:
     QnStorageResourcePtr m_storage;
     int m_storageIndex;
