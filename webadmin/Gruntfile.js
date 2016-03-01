@@ -229,6 +229,8 @@ module.exports = function (grunt) {
             test: {
                 options: {
                     middleware: function (connect, options) {
+
+                        var serveStatic = require('serve-static');
                         if (!Array.isArray(options.base)) {
                             options.base = [options.base];
                         }
@@ -238,12 +240,12 @@ module.exports = function (grunt) {
 
                         // Serve static files.
                         options.base.forEach(function (base) {
-                            middlewares.push(connect.static(base));
+                            middlewares.push(serveStatic(base));
                         });
 
                         // Make directory browse-able.
-                        var directory = options.directory || options.base[options.base.length - 1];
-                        middlewares.push(connect.directory(directory));
+                        // var directory = options.directory || options.base[options.base.length - 1];
+                        // middlewares.push(connect.directory(directory));
 
                         return middlewares;
                     },
