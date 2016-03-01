@@ -403,7 +403,7 @@ protected:
                 : (nextPeriodicEventClock < curClock ? 0 : nextPeriodicEventClock - curClock);
 
             //if there are posted calls, just checking sockets state in non-blocking mode
-            const int pollTimeout = m_impl->postedCalls.empty() ? millisToTheNextPeriodicEvent : INFINITE_TIMEOUT;
+            const int pollTimeout = m_impl->postedCalls.empty() ? millisToTheNextPeriodicEvent : 0;
             const int triggeredSocketCount = m_impl->pollSet.poll(pollTimeout);
 
             if (needToStop())
