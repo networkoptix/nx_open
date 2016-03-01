@@ -415,8 +415,8 @@ void CloudStreamSocket::onCloudConnectDone(
 {
     if (errorCode == SystemError::noError)
     {
-        m_socketDelegate = std::move(cloudConnection);
         NX_ASSERT(cloudConnection->getAioThread() == m_aioThreadBinder->getAioThread());
+        m_socketDelegate = std::move(cloudConnection);
         setDelegate(m_socketDelegate.get());
     }
     else
