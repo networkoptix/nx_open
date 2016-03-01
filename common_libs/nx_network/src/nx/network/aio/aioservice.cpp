@@ -139,8 +139,7 @@ aio::AIOThread<Pollable>* AIOService::getSocketAioThread(Pollable* sock)
 
 void AIOService::bindSocketToAioThread(Pollable* sock, AbstractAioThread* aioThread)
 {
-    const auto desired = dynamic_cast<aio::AIOThread<Pollable>*>(aioThread);
-    NX_ASSERT(desired, Q_FUNC_INFO, "Inappropriate AIO thread type");
+    const auto desired = static_cast<aio::AIOThread<Pollable>*>(aioThread);
 
     aio::AIOThread<Pollable>* expected = nullptr;
     if (!sock->impl()->aioThread.compare_exchange_strong(expected, desired))
