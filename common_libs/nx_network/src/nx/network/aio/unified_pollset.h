@@ -135,7 +135,7 @@ private:
         std::map<SocketHandle, SocketContext>* const socketDictionary);
     template<typename SocketHandle>
     bool removeSocket(
-        UDTSOCKET handle,
+        SocketHandle handle,
         int eventToRemoveMask,
         int(*addToPollSet)(int, SocketHandle, const int*),
         int(*removeFromPollSet)(int, SocketHandle),
@@ -145,10 +145,10 @@ private:
     bool removeUdtSocket(UDTSOCKET handle, int eventToRemoveMask);
     bool addSysSocket(AbstractSocket::SOCKET_HANDLE handle, int newEventMask, Pollable* socket);
     bool removeSysSocket(AbstractSocket::SOCKET_HANDLE handle, int eventToRemoveMask);
-    bool isElementBeingUsed(
+    bool isUdtElementBeingUsed(
         CurrentSet currentSet,
         UDTSOCKET handle) const;
-    bool isElementBeingUsed(
+    bool isSysElementBeingUsed(
         CurrentSet currentSet,
         AbstractSocket::SOCKET_HANDLE handle) const;
     std::set<ConstIteratorImpl*> m_iterators;

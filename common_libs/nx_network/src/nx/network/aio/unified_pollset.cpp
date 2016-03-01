@@ -234,12 +234,12 @@ void UnifiedPollSet::remove(Pollable* const sock, EventType eventType)
         removeUdtSocket(udtHandle, udtEvent);
 
         if ((udtEvent & UDT_EPOLL_IN) > 0 &&
-            !isElementBeingUsed(CurrentSet::udtRead, udtHandle))
+            !isUdtElementBeingUsed(CurrentSet::udtRead, udtHandle))
         {
             m_readUdtFds.erase(udtHandle);
         }
         if ((udtEvent & UDT_EPOLL_OUT) > 0 &&
-            !isElementBeingUsed(CurrentSet::udtWrite, udtHandle))
+            !isUdtElementBeingUsed(CurrentSet::udtWrite, udtHandle))
         {
             m_writeUdtFds.erase(udtHandle);
         }
@@ -249,12 +249,12 @@ void UnifiedPollSet::remove(Pollable* const sock, EventType eventType)
         removeSysSocket(sock->handle(), udtEvent);
 
         if ((udtEvent & UDT_EPOLL_IN) > 0 &&
-            !isElementBeingUsed(CurrentSet::sysRead, sock->handle()))
+            !isSysElementBeingUsed(CurrentSet::sysRead, sock->handle()))
         {
             m_readSysFds.erase(sock->handle());
         }
         if ((udtEvent & UDT_EPOLL_OUT) > 0 &&
-            !isElementBeingUsed(CurrentSet::sysWrite, sock->handle()))
+            !isSysElementBeingUsed(CurrentSet::sysWrite, sock->handle()))
         {
             m_writeSysFds.erase(sock->handle());
         }
@@ -355,7 +355,7 @@ bool UnifiedPollSet::addSocket(
 
 template<typename SocketHandle>
 bool UnifiedPollSet::removeSocket(
-    UDTSOCKET handle,
+    SocketHandle handle,
     int eventToRemoveMask,
     int(*addToPollSet)(int, SocketHandle, const int*),
     int(*removeFromPollSet)(int, SocketHandle),
@@ -443,7 +443,7 @@ bool UnifiedPollSet::removeSysSocket(
         &m_sysSockets);
 }
 
-bool UnifiedPollSet::isElementBeingUsed(
+bool UnifiedPollSet::isUdtElementBeingUsed(
     CurrentSet currentSet,
     UDTSOCKET handle) const
 {
@@ -460,7 +460,7 @@ bool UnifiedPollSet::isElementBeingUsed(
     return false;
 }
 
-bool UnifiedPollSet::isElementBeingUsed(
+bool UnifiedPollSet::isSysElementBeingUsed(
     CurrentSet currentSet,
     AbstractSocket::SOCKET_HANDLE handle) const
 {
