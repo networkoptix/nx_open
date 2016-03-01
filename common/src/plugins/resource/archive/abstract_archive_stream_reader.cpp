@@ -140,7 +140,7 @@ void QnAbstractArchiveReader::run()
         {
             if (videoData->flags & AV_PKT_FLAG_KEY)
                 m_gotKeyFrame[videoData->channelNumber]++;
-            else
+            else if (!m_gotKeyFrame[videoData->channelNumber])
                 continue; // need key data but got not key data
         }
 
