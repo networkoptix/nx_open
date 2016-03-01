@@ -459,7 +459,7 @@ static int lockmgr(void **mtx, enum AVLockOp op)
 
 static void ffmpegInit()
 {
-    av_register_all();
+    avcodec_register_all();
 
     if(av_lockmgr_register(lockmgr) != 0)
     {

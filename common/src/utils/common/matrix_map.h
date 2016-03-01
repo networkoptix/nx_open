@@ -13,6 +13,8 @@
 #include <utils/common/hash.h>
 #include <utils/common/collection.h>
 
+#include <nx/utils/log/assert.h>
+
 /**
  * Matrix map is an abstraction of an infinite two-dimensional sparse array.
  * 
