@@ -52,6 +52,7 @@ void CachedOutputStream::pleaseStop()
 {
     m_packetsToSend.push( QByteArray() );   //signaling thread that it is time to die
     QnLongRunnable::pleaseStop();
+    m_cond.wakeAll();
 }
 
 void CachedOutputStream::run()
