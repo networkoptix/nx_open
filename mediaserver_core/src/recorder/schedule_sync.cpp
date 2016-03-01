@@ -487,33 +487,32 @@ int QnScheduleSync::forceStart()
 
 QnBackupStatusData QnScheduleSync::getStatus() const
 {
+    QnMutexLocker lk(&m_syncDataMutex);
+
     QnBackupStatusData ret;
     ret.state = m_syncing || m_forced ? Qn::BackupState_InProgress :
                                         Qn::BackupState_None;
     ret.backupTimeMs = m_syncEndTimePoint;
-    {
-        QnMutexLocker lk(&m_syncDataMutex);
-        int totalChunks = std::accumulate(
-            m_syncData.cbegin(),
-            m_syncData.cend(),
-            0,
-            [](int ac, const SyncDataMap::value_type &p)
-            {
-                return ac + p.second.totalChunks;
-            }
-        ); 
-        int processedChunks = std::accumulate(
-            m_syncData.cbegin(),
-            m_syncData.cend(),
-            0,
-            [](int ac, const SyncDataMap::value_type &p)
-            {
-                return ac + p.second.currentIndex - p.second.startIndex;
-            }
-        ); 
-        ret.progress = (double) processedChunks / 
-                       (double) (totalChunks == 0 ? 1 : totalChunks);
-    }
+    int totalChunks = std::accumulate(
+        m_syncData.cbegin(),
+        m_syncData.cend(),
+        0,
+        [](int ac, const SyncDataMap::value_type &p)
+        {
+            return ac + p.second.totalChunks;
+        }
+    ); 
+    int processedChunks = std::accumulate(
+        m_syncData.cbegin(),
+        m_syncData.cend(),
+        0,
+        [](int ac, const SyncDataMap::value_type &p)
+        {
+            return ac + p.second.currentIndex - p.second.startIndex;
+        }
+    ); 
+    ret.progress = (double) processedChunks / 
+                    (double) (totalChunks == 0 ? 1 : totalChunks);
     return ret;
 }
 
@@ -622,9 +621,11 @@ void QnScheduleSync::run()
                 continue;
 
             auto result = synchronize(isItTimeForSync);
+            qint64 syncEndTimePointLocal = 0;
             {
                 QnMutexLocker lk(&m_syncDataMutex);
                 m_syncData.clear();
+                syncEndTimePointLocal = m_syncEndTimePoint;
             }
             m_forced = false;
             m_syncing = false;
@@ -634,10 +635,10 @@ void QnScheduleSync::run()
                                 result != QnBusiness::BackupEndOfPeriod;  
 
             if (backupFailed && !m_failReported) {
-                emit backupFinished(m_syncEndTimePoint, result);
+                emit backupFinished(syncEndTimePointLocal, result);
                 m_failReported = true;
             } else if (!backupFailed) {
-                emit backupFinished(m_syncEndTimePoint, result);
+                emit backupFinished(syncEndTimePointLocal, result);
                 m_failReported = false; 
             }
         }
