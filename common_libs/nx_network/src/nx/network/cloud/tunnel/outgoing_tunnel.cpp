@@ -24,7 +24,7 @@ OutgoingTunnel::OutgoingTunnel(AddressEntry targetPeerAddress)
     m_terminated(false),
     m_counter(0)
 {
-    m_aioThreadBinder.getAioThread();   //binds to aio thread
+    m_timer.getAioThread();   //binds to aio thread
 }
 
 OutgoingTunnel::~OutgoingTunnel()
@@ -43,7 +43,7 @@ void OutgoingTunnel::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
         BarrierHandler barrier(
             [this, handler = std::move(handler)]() mutable
             {
-                m_aioThreadBinder.post(
+                m_timer.post(
                     [this, handler = std::move(handler)]() mutable
                     {
                         connectorsTerminated(std::move(handler));
@@ -85,10 +85,10 @@ void OutgoingTunnel::connectorsTerminatedNonSafe(
 void OutgoingTunnel::connectionTerminated(
     nx::utils::MoveOnlyFunc<void()> pleaseStopCompletionHandler)
 {
-    m_aioThreadBinder.post(
+    m_timer.post(
         [this, handler = std::move(pleaseStopCompletionHandler)]() mutable
         {
-            m_aioThreadBinder.pleaseStopSync();
+            m_timer.pleaseStopSync();
             {
                 //waiting for OutgoingTunnel::pleaseStop still running in another thread to return
                 QnMutexLocker lk(&m_mutex);
@@ -128,7 +128,7 @@ void OutgoingTunnel::establishNewConnection(
 
         case State::kClosed:
             lk.unlock();
-            m_aioThreadBinder.post(
+            m_timer.post(
                 std::bind(handler, SystemError::connectionReset, nullptr));
             break;
 
@@ -148,7 +148,7 @@ void OutgoingTunnel::establishNewConnection(
             data.handler = std::move(handler);
             m_connectHandlers.emplace(timeoutTimePoint, std::move(data));
 
-            m_aioThreadBinder.post(std::bind(&OutgoingTunnel::updateTimerIfNeeded, this));
+            m_timer.post(std::bind(&OutgoingTunnel::updateTimerIfNeeded, this));
             break;
         }
 
@@ -186,7 +186,7 @@ void OutgoingTunnel::updateTimerIfNeededNonSafe(
         (!m_timerTargetClock || *m_timerTargetClock > m_connectHandlers.begin()->first))
     {
         //cancelling current timer
-        m_aioThreadBinder.cancelIOSync(aio::etTimedOut);
+        m_timer.cancelSync();
 
         //starting new timer
         m_timerTargetClock = m_connectHandlers.begin()->first;
@@ -194,7 +194,7 @@ void OutgoingTunnel::updateTimerIfNeededNonSafe(
             m_connectHandlers.begin()->first > curTime
             ? (m_connectHandlers.begin()->first - curTime)
             : std::chrono::milliseconds::zero();    //timeout has already expired
-        m_aioThreadBinder.registerTimer(
+        m_timer.start(
             std::chrono::duration_cast<std::chrono::milliseconds>(timeout),
             std::bind(&OutgoingTunnel::onTimer, this));
     }
@@ -243,7 +243,7 @@ void OutgoingTunnel::onConnectFinished(
 
 void OutgoingTunnel::onTunnelClosed()
 {
-    m_aioThreadBinder.dispatch(
+    m_timer.dispatch(
         [this]()
         {
             std::function<void(State)> tunnelClosedHandler;
@@ -270,7 +270,7 @@ void OutgoingTunnel::startAsyncTunnelConnect(QnMutexLockerBase* const /*locker*/
                 SystemError::ErrorCode errorCode,
                 std::unique_ptr<AbstractOutgoingTunnelConnection> connection)
             {
-                m_aioThreadBinder.post(
+                m_timer.post(
                     [this, connectorType, errorCode, connection = move(connection)]() mutable
                     {
                         onConnectorFinished(
