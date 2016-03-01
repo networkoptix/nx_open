@@ -3,9 +3,7 @@
 
 import os
 
-PLATFORM = "${platform}"
-ARCH = "${arch}"
-BOX = "${box}"
+TARGET = "${rdep.target}"
 BUILD_CONFIGURATION = "${build.configuration}"
 TARGET_DIRECTORY = "${libdir}"
 RDEP_PATH = os.path.join("${environment.dir}", "rdep")
@@ -21,7 +19,7 @@ def get_packages():
     
 def print_configuration():
     print get_packages()
-    print PLATFORM, ARCH, BOX, BUILD_CONFIGURATION
+    print TARGET, BUILD_CONFIGURATION
     print TARGET_DIRECTORY
     print RDEP_PATH
     

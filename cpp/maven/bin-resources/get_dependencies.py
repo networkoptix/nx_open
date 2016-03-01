@@ -11,15 +11,21 @@ sys.path.pop(0)
 debug = "debug" in dependencies.BUILD_CONFIGURATION
 
 def fetch_packages(packages):    
-    return rdep.fetch_packages(packages, dependencies.PLATFORM, dependencies.ARCH, dependencies.BOX, debug, True)
+    return rdep.fetch_packages(packages, dependencies.TARGET, debug, True)
     
     
 def copy_package(package):
-    path = rdep.locate_package(package, dependencies.PLATFORM, dependencies.ARCH, dependencies.BOX, debug)
+    path = rdep.locate_package(package, dependencies.TARGET, debug)
     if not path:
         print "Could not locate {0}".format(package)
         return False
     
+'''
+TODO:
+0) check if artifact is already processed (copy rdpack to qt-5.6.0.rdpack)
+1) read copy-target list from artifact, by default - bin subdirectory
+2) copy only selected resources to the target dir(s?), e.g. TARGET_DIRECTORY\x64\bin\debug
+'''
     target_dir = dependencies.TARGET_DIRECTORY
     print "Copying package {0} into {1}".format(package, target_dir)
     for dirname, dirnames, filenames in os.walk(path):
