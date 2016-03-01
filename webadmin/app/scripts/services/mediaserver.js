@@ -32,7 +32,7 @@ angular.module('webadminApp')
         var loginDialog = null;
         function offlineHandler(error){
             // Check 401 against offline
-            var inlineMode = typeof(setupDialog)=='undefined'; // Qt registered object
+            var inlineMode = typeof(setupDialog)!='undefined'; // Qt registered object
             var isInFrame = window.self !== window.top; // If we are in frame - do not show dialog
 
             if(isInFrame || inlineMode){
@@ -166,12 +166,12 @@ angular.module('webadminApp')
             hasProxy:function(){
                 return proxy !=='';
             },
-            getUser:function(){
+            getUser:function(reload){
                 var deferred = $q.defer();
                 if(this.hasProxy()){ // Proxy means read-only
                     deferred.resolve(false);
                 }
-                this.getCurrentUser().then(function(result){
+                this.getCurrentUser(reload).then(function(result){
                     /*jshint bitwise: false*/
                     var hasEditServerPermission = result.data.reply.permissions & Config.globalEditServersPermissions;
                     /*jshint bitwise: true*/
@@ -184,8 +184,8 @@ angular.module('webadminApp')
                         isOwner:isOwner,
                         name:result.data.reply.name
                     });
-                },function(){
-                    deferred.reject(null);
+                },function(error){
+                    deferred.reject(error);
                 });
                 return deferred.promise;
             },
