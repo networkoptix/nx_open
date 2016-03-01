@@ -229,6 +229,38 @@ TEST(StunMessageSerialization, serialization2)
     ASSERT_EQ(buffer1, buffer);
 }
 
+TEST(StunMessageSerialization, serialization3)
+{
+    stun::Message response(stun::Header(
+        stun::MessageClass::errorResponse,
+        stun::MethodType::bindingMethod,
+        "abra-kadabra"));
+
+    // TODO: verify with RFC
+    response.newAttribute< stun::attrs::ErrorDescription >(
+        404, "Method is not supported");    //TODO #ak replace 404 with constant
+
+    Buffer serializedMessage;
+    serializedMessage.reserve(100);
+    MessageSerializer serializer1;
+    serializer1.setMessage(&response);
+    size_t bytesWritten = 0;
+    ASSERT_EQ(
+        nx_api::SerializerState::done,
+        serializer1.serialize(&serializedMessage, &bytesWritten));
+
+
+    MessageParser parser;
+    Message checkMessage;
+    parser.setMessage(&checkMessage);
+    size_t bytesRead = 0;
+    ASSERT_EQ(
+        nx_api::ParserState::done,
+        parser.parse(serializedMessage, &bytesRead));
+    const auto attr = checkMessage.getAttribute<stun::attrs::ErrorDescription>();
+    //ASSERT_EQ(testData, attr->getBuffer());
+}
+
 TEST( StunMessageSerialization, Authentification )
 {
     String user( "user" ), key( "key" );

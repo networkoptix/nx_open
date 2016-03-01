@@ -165,6 +165,8 @@ nx_api::SerializerState::Type MessageSerializer::serializeMagicCookieAndTransact
     if( buffer->WriteUint32( MAGIC_COOKIE ) == NULL ) {
         return nx_api::SerializerState::needMoreBufferSpace;
     }
+
+    assert(m_message->header.transactionId.size() == 12);
     // Transaction ID
     if( buffer->WriteBytes( m_message->header.transactionId.data(),
                             m_message->header.transactionId.size() ) == NULL ) {

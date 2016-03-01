@@ -659,7 +659,7 @@ private:
             [this, resolvedAddress, sendTimeout]()
             {
                 m_abstractSocketPtr->connect( resolvedAddress, std::chrono::milliseconds(sendTimeout) );
-            } );    //to be called between pollset.add and pollset.poll
+            });    //to be called between pollset.add and pollset.poll
         return true;
     }
 
@@ -683,13 +683,12 @@ private:
 template <class SocketType>
 class AsyncServerSocketHelper
 :
-    public aio::AIOEventHandler<SocketType>
+    public aio::AIOEventHandler<Pollable>
 {
 public:
-    AsyncServerSocketHelper(SocketType* _sock, AbstractStreamServerSocket* _abstractServerSocket)
+    AsyncServerSocketHelper(SocketType* _sock)
     :
         m_sock(_sock),
-        m_abstractServerSocket(_abstractServerSocket),
         m_threadHandlerIsRunningIn(NULL),
         m_acceptAsyncCallCount(0),
         m_terminatedFlagPtr(nullptr)
@@ -703,7 +702,7 @@ public:
             *m_terminatedFlagPtr = true;
     }
 
-    virtual void eventTriggered(SocketType* sock, aio::EventType eventType) throw() override
+    virtual void eventTriggered(Pollable* sock, aio::EventType eventType) throw() override
     {
         NX_ASSERT(m_acceptHandler);
 
@@ -730,7 +729,7 @@ public:
             case aio::etRead:
             {
                 //accepting socket
-                AbstractStreamSocket* newSocket = m_abstractServerSocket->accept();
+                AbstractStreamSocket* newSocket = m_sock->systemAccept();
                 acceptHandlerBakLocal(
                     newSocket != nullptr ? SystemError::noError : SystemError::getLastOSErrorCode(),
                     newSocket);
@@ -787,7 +786,6 @@ public:
 
 private:
     SocketType* m_sock;
-    AbstractStreamServerSocket* m_abstractServerSocket;
     std::atomic<Qt::HANDLE> m_threadHandlerIsRunningIn;
     std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)> m_acceptHandler;
     std::atomic<int> m_acceptAsyncCallCount;
