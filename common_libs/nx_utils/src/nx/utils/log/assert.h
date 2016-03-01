@@ -35,6 +35,7 @@ bool assertFailure(
     #define NX_ASSERT_IMPL(condition, message)
 #endif
 
+#define NX_ASSERT_MSVC_EXPAND(x) x
 
 #define NX_ASSERT1(condition) \
     NX_ASSERT_IMPL(condition, "")
@@ -47,7 +48,6 @@ bool assertFailure(
 
 
 #define NX_GET_4TH_ARG(a1, a2, a3, a4, ...) a4
-#define NX_ASSERT_SELECTOR(...) \
-    NX_GET_4TH_ARG(__VA_ARGS__, NX_ASSERT3, NX_ASSERT2, NX_ASSERT1)
 
-#define NX_ASSERT(...) NX_ASSERT_SELECTOR(__VA_ARGS__)(__VA_ARGS__)
+#define NX_ASSERT(...) NX_ASSERT_MSVC_EXPAND(   \
+    NX_GET_4TH_ARG(__VA_ARGS__, NX_ASSERT3, NX_ASSERT2, NX_ASSERT1)(__VA_ARGS__))
