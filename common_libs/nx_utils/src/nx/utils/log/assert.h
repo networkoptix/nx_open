@@ -29,7 +29,7 @@ bool assertFailure(
 
 #ifdef _DEBUG
     #define NX_ASSERT_IMPL(condition, message) \
-        ((condition) || \
+        static_cast<void>((condition) || \
             nx::utils::assertFailure(__FILE__, __LINE__, #condition, message))
 #else
     #define NX_ASSERT_IMPL(condition, message)
