@@ -235,7 +235,7 @@ template<typename ServerSocketMaker, typename ClientSocketMaker>
         const SocketAddress& endpoint = kServerAddress,
         int clientCount = kClientCount)
 {
-    static const std::chrono::milliseconds timeout(500);
+    static const std::chrono::milliseconds timeout(1500);
 
     nx::SyncQueue< SystemError::ErrorCode > acceptResults;
     nx::SyncQueue< SystemError::ErrorCode > connectResults;

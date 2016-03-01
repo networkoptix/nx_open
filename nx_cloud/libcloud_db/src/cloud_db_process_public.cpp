@@ -28,6 +28,12 @@ void CloudDBProcessPublic::pleaseStop()
     m_impl->pleaseStop();
 }
 
+void CloudDBProcessPublic::setOnStartedEventHandler(
+    nx::utils::MoveOnlyFunc<void(bool)> handler)
+{
+    m_impl->setOnStartedEventHandler(std::move(handler));
+}
+
 int CloudDBProcessPublic::exec()
 {
     return m_impl->exec();

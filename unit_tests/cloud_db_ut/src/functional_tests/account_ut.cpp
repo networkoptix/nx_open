@@ -39,7 +39,7 @@ TEST_F(CdbFunctionalTest, account_activation)
         });
 
     //waiting for cloud_db initialization
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     api::ResultCode result = api::ResultCode::ok;
 
@@ -86,7 +86,7 @@ TEST_F(CdbFunctionalTest, account_reactivation)
         });
 
     //waiting for cloud_db initialization
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     api::ResultCode result = api::ResultCode::ok;
 
@@ -142,7 +142,7 @@ TEST_F(CdbFunctionalTest, account_reactivation_activated_account)
         });
 
     //waiting for cloud_db initialization
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     api::ResultCode result = api::ResultCode::ok;
     api::AccountData account1;
@@ -174,7 +174,7 @@ TEST_F(CdbFunctionalTest, account_general)
         });
 
     //waiting for cloud_db initialization
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     api::ResultCode result = api::ResultCode::ok;
 
@@ -263,7 +263,7 @@ TEST_F(CdbFunctionalTest, account_badRegistration)
             return std::make_unique<EmailManagerStub>(&mockedEmailManager);
         });
 
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     api::ResultCode result = api::ResultCode::ok;
 
@@ -310,7 +310,7 @@ TEST_F(CdbFunctionalTest, account_badRegistration)
 TEST_F(CdbFunctionalTest, account_requestQueryDecode)
 {
     //waiting for cloud_db initialization
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     api::ResultCode result = api::ResultCode::ok;
 
@@ -349,7 +349,7 @@ TEST_F(CdbFunctionalTest, account_requestQueryDecode)
 
 TEST_F(CdbFunctionalTest, account_update)
 {
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     api::AccountData account1;
     std::string account1Password;
@@ -399,7 +399,7 @@ TEST_F(CdbFunctionalTest, account_resetPassword_general)
             return std::make_unique<EmailManagerStub>(&mockedEmailManager);
         });
 
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     for (int i = 0; i < 2; ++i)
     {
@@ -463,7 +463,7 @@ TEST_F(CdbFunctionalTest, account_resetPassword_expiration)
     addArg("-accountManager/passwordResetCodeExpirationTimeoutSec");
     addArg(QByteArray::number((unsigned int)expirationPeriod.count()).constData());
 
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     //adding account
     api::AccountData account1;
@@ -508,7 +508,7 @@ TEST_F(CdbFunctionalTest, account_resetPassword_expiration)
 //checks that password reset code is valid for changing password only
 TEST_F(CdbFunctionalTest, account_resetPassword_authorization)
 {
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     //adding account
     api::AccountData account1;
@@ -601,7 +601,7 @@ TEST_F(CdbFunctionalTest, account_resetPassword_authorization)
 
 TEST_F(CdbFunctionalTest, account_reset_password_activates_account)
 {
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     //adding account
     api::AccountData account1;
