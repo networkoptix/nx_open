@@ -157,7 +157,7 @@ hr {
   &.active{
     background-color: transparentize($light5,0.5) !important;
     border-color: transparentize($light5,0.5) !important;
-    box-shadow: inset 0px 1px 0px 1px $light9;
+    @include box-shadow(inset 0px 1px 0px 1px $light9);
     outline: none;
   }
 }
@@ -174,7 +174,7 @@ hr {
   &.active{
     background-color: $brand_core !important;
     border-color: $brand_core !important;
-    box-shadow: inset 0px 1px 0px 1px $brand_d2;
+    @include box-shadow(inset 0px 1px 0px 1px $brand_d2);
     outline: none;
   }
 }
@@ -189,4 +189,22 @@ select.form-control{
   .modal-content {
     @include box-shadow(0px 20px 50px 0px transparentize($dark15,0.85));
   }
+}
+
+.alert {
+  font-size: $font-size-h4;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  @include box-shadow(0px 8px 4px 0px transparentize($light16, 0.9));
+}
+.alert-dismissable .close, .alert-dismissible .close{
+  -webkit-appearance: none !important;
+  outline: none !important;
+  &:hover,
+  &:focus,
+  &:active{
+    -webkit-appearance: none !important;
+    outline: none !important;
+  }
+
 }
