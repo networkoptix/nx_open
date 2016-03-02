@@ -191,6 +191,7 @@ protected:
 private:
     void updateSignatureAttr(size_t i);
     qint64 findNextIFrame(qint64 baseTime);
+    void cleanFfmpegContexts();
 protected:
     QnResourcePtr m_device;
     bool m_firstTime;

@@ -134,7 +134,7 @@ void QnAbstractArchiveStreamReader::run()
             continue;
         }
 
-        if (videoData && needKeyData())
+        if (videoData && needKeyData(videoData->channelNumber))
         {
             if (videoData->flags & AV_PKT_FLAG_KEY)
                 m_gotKeyFrame[videoData->channelNumber]++;

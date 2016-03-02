@@ -55,9 +55,24 @@
                 <param name = "MaxFPS" default_value = "42"/>
             </params>
         </resource>        
-        <resource name = "12586" public = "12176"/>
-        <resource name = "12585" public = "12176"/>        
-        <resource name = "20585" public = "20185"/>
+        <resource name = "12586" public = "12176"> 
+            <params>
+                <param name = "MaxFPS" default_value = "10"/>
+                <param name = "VideoLayout" default_value = "width=4;height=1;sensors=3,2,1,0"/>                    
+            </params>
+        </resource>    
+        <resource name = "12585" public = "12176"> 
+            <params>
+                <param name = "MaxFPS" default_value = "10"/>
+                <param name = "VideoLayout" default_value = "width=4;height=1;sensors=3,2,1,0"/>                    
+            </params>
+        </resource>          
+        <resource name = "20585" public = "20185">
+            <params>
+                <param name = "MaxFPS" default_value = "7"/>
+                <param name = "VideoLayout" default_value = "width=4;height=1;sensors=3,2,1,0"/>                
+            </params>
+        </resource>            
         <resource name = "3215" public = "3226"/>
         <resource name = "3216" public = "3226"/>        
         <resource name = "1215" public = "1115">

@@ -979,6 +979,8 @@ void QnRtspConnectionProcessor::createDataProvider()
 
     if (!d->dataProcessor) {
         d->dataProcessor = new QnRtspDataConsumer(this);
+        if (d->mediaRes)
+            d->dataProcessor->setResource(d->mediaRes->toResourcePtr());
         d->dataProcessor->pauseNetwork();
         int speed = 1;  //real time
         if( d->useProprietaryFormat )
