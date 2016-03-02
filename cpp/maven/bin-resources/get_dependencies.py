@@ -83,6 +83,8 @@ def copy_package_for_configuration(package, path, debug):
         return True
 
     print "Copying package {0} into {1}".format(package, target_dir)
+    if not debug:
+        install_dependency(path, target_dir, True)
     install_dependency(path, target_dir, debug)
 
     shutil.copy(os.path.join(path, rdep.PACKAGE_CONFIG_NAME), description_file)
