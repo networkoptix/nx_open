@@ -8,20 +8,20 @@ $font-family-base:        "Roboto", "Helvetica Neue", Helvetica, Arial, sans-ser
 $brand-primary:         $blue10;
 $brand-info:            $blue8;
 
-$gray-darker:            dark(7);     //~#222
-$gray-dark:              dark(11);    //~#333
-$gray:                   dark(17);    //~#555
-$gray-light:             light(11);   //~#999
-$gray-lighter:           light(3);    //~#EEE
+$gray-darker:            $dark7;     //~#222
+$gray-dark:              $dark11;    //~#333
+$gray:                   $dark17;    //~#555
+$gray-light:             $light11;   //~#999
+$gray-lighter:           $light3;    //~#EEE
 
 
-$body-bg:                 light(2);
-$navbar-default-bg:       light(1);
-$navbar-default-link-color: $gray-dark;
+$body-bg:                 $light2;
+$navbar-default-bg:       $light1;
+$navbar-default-link-color: $dark10;
 $navbar-margin-bottom:    10px;
 
 
-$common-border-color:   light(5);
+$common-border-color:   $light4;
 
 $dropdown-border:                         $common-border-color;
 $navbar-default-toggle-border-color:      $common-border-color;
@@ -42,7 +42,7 @@ $modal-header-border-color: transparent;
 
 
 $font-size-base:          14px;
-$font-size-large:         ceil($font-size-base * 1.15); // ~16px
+$font-size-large:         15px; // ceil($font-size-base * 1.15); // ~16px
 $font-size-small:         ceil($font-size-base * 0.85); // ~12px
 
 $font-size-h1:            ceil($font-size-base * 1.57); // ~22px
