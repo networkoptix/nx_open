@@ -104,6 +104,9 @@ get_serial_number() {
     if [ -f /tmp/serial ]; then rm /tmp/serial; fi
     SERIAL=$(/tmp/fw_printenv serial | sed 's/serial=//')
     echo $SERIAL > /tmp/serial
+    SERIAL_SHORT=${SERIAL%???????}
+    SERIAL_CHECK=$(echo $SERIAL_SHORT | grep '14\|15')
+    if [ -z $SERIAL_CHECK ]; then RESET=true; else RESET=false; fi    
     echo "++++++++++++++ SERIAL NUMBER:"$SERIAL" ++++++++++++++" >&2 >/dev/kmsg
     echo `date` "++++++++++++++ SERIAL NUMBER:"$SERIAL" ++++++++++++++" >> $NX1LOG
     rm /tmp/fw_printenv
@@ -396,6 +399,7 @@ default_sequence () {
 case "$1" in
   start)
     touch /forcefsck
+    if [ $RESET = 'true' ]; then /etc/init.d/nx1button start; fi
     default_sequence
     exit 0
     ;;
