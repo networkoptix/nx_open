@@ -38,9 +38,10 @@ $thumbnail-border:                        $common-border-color;
 $input-border:                            $common-border-color;
 $btn-default-border:                      $common-border-color;
 
-$table-border-color:        transparent;
-$modal-footer-border-color: transparent;
-$modal-header-border-color: transparent;
+$table-border-color:          transparent;
+$modal-footer-border-color:   transparent;
+$modal-header-border-color:   transparent;
+$modal-content-border-color:  transparent;
 
 
 $font-size-base:          14px;
@@ -82,3 +83,7 @@ $jumbotron-bg:              transparent;
 
 
 $grid-gutter-width:       16px;
+
+$modal-backdrop-bg:         $dark9;
+$modal-backdrop-opacity:    0.1;
+$modal-content-bg:          $light1;
