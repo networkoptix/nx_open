@@ -24,7 +24,7 @@ def copy_recursive(src, dst):
     source_dir = src
     template = "*"
     if contains_template:
-        template_pos = src.rfind(os.sep)
+        template_pos = src.rfind('/')   #hardcode, requires refactoring
         source_dir = src[:template_pos]
         template = src[template_pos+1:]
 
@@ -36,14 +36,16 @@ def copy_recursive(src, dst):
     if not os.path.exists(source_dir):
         return
 
-    print "Walking.."
+    print "Walking over {0}, destination is {1}".format(source_dir, dst_dir)
     for dirname, _, filenames in os.walk(source_dir):
         rel_dir = os.path.relpath(dirname, source_dir)
         dir = os.path.abspath(os.path.join(dst_dir, rel_dir))
+        print "Processing dir {0}, copying into {1}".format(dirname, dir)
         if not os.path.isdir(dir):
             os.makedirs(dir)
         for filename in filenames:
             if contains_template and not fnmatch.fnmatch(filename, template):
+                print "File {0} does not match template {1}".format(filename, template)
                 continue
             entry = os.path.join(dirname, filename)
             shutil.copy2(entry, dir)
@@ -54,7 +56,7 @@ def get_copy_list(package_dir):
     config.read(os.path.join(package_dir, rdep.PACKAGE_CONFIG_NAME))
 
     if not config.has_option("General", "copy"):
-        return [ "bin" ]
+        return [ "bin/*.*" ]
 
     return config.get("General", "copy").split()
 
