@@ -130,10 +130,9 @@ def copy_package(package):
     return True
 
 def copy_packages(packages):
+    # Clear dependenciy files
     for debug in [ False, True ]:
-        pri = get_deps_pri_file(debug)
-        if os.path.exists(pri):
-            os.remove(pri)
+        open(get_deps_pri_file(debug), "w").close()
 
     return all([copy_package(package) for package in packages])
 
