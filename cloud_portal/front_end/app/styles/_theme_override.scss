@@ -121,6 +121,8 @@ hr {
 
 .form-control{
   box-shadow: none;
+  padding: $padding-base-vertical $padding-input-horizontal;
+
   &:focus {
     box-shadow: none;
   }
@@ -128,5 +130,51 @@ hr {
   &[disabled],
   fieldset[disabled] & {
     opacity:0.3;
+  }
+}
+
+
+.btn{
+  outline: none !important;;
+  &:hover,
+  &:active,
+  &.active,
+  &:focus,
+  &.focus {
+    outline: none !important;
+  }
+}
+
+.btn-default{
+  &:hover,
+  &:focus,
+  &.focus {
+    background-color: transparentize($light5,0.75);
+    border-color: $light8;
+  }
+
+  &:active,
+  &.active{
+    background-color: transparentize($light5,0.5) !important;
+    border-color: transparentize($light5,0.5) !important;
+    box-shadow: inset 0px 1px 0px 1px $light9;
+    outline: none;
+  }
+}
+
+.btn-primary{
+  &:hover,
+  &:focus,
+  &.focus {
+    background-color: $brand_l1;
+    border-color: $brand_core;
+  }
+
+  &:active,
+  &.active{
+    background-color: $brand_core !important;
+    border-color: $brand_core !important;
+    box-shadow: inset 0px 1px 0px 1px $brand_d2;
+    outline: none;
   }
 }

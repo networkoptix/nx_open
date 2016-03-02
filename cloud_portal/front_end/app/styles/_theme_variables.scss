@@ -36,6 +36,7 @@ $panel-inner-border:                      $common-border-color;
 $panel-default-border:                    $common-border-color;
 $thumbnail-border:                        $common-border-color;
 $input-border:                            $common-border-color;
+$btn-default-border:                      $common-border-color;
 
 $table-border-color:        transparent;
 $modal-footer-border-color: transparent;
@@ -66,13 +67,17 @@ $input-height-base:       32px;
 $input-bg:                $light1;
 $input-color:             $dark4;
 $input-border-focus:      $blue10;
-$padding-base-horizontal:  10px;
 $state-danger-text:       $error;
 $input-bg-disabled:       transparentize($light5,0.75);
-$cursor-disabled:           pointer;
+$cursor-disabled:           default;
+$padding-input-horizontal:  10px;
 
+
+$padding-base-horizontal:  16px;
+$padding-base-vertical:     5px;
 
 $btn-default-bg:            transparent;
+$button-primary-border:     $brand_d1;
 $jumbotron-bg:              transparent;
 
 
