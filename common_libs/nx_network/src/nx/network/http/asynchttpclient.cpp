@@ -1050,10 +1050,11 @@ namespace nx_http
     void uploadDataAsync(const QUrl &url
         , const QByteArray &data
         , const QByteArray &contentType
-        , const QString &user
-        , const QString &password
         , const nx_http::HttpHeaders &extraHeaders
-        , const UploadCompletionHandler &callback)
+        , const UploadCompletionHandler &callback
+        , const AsyncHttpClient::AuthType authType
+        , const QString &user
+        , const QString &password)
     {
         nx_http::AsyncHttpClientPtr httpClientHolder = nx_http::AsyncHttpClient::create();
         httpClientHolder->setAdditionalHeaders(extraHeaders);
@@ -1061,6 +1062,8 @@ namespace nx_http
             httpClientHolder->setUserName(user);
         if (!password.isEmpty())
             httpClientHolder->setUserPassword(password);
+
+        httpClientHolder->setAuthType(authType);
 
         auto completionFunc = [callback, httpClientHolder]
             (nx_http::AsyncHttpClientPtr httpClient) mutable
@@ -1093,6 +1096,7 @@ namespace nx_http
         , const QByteArray &contentType
         , const QString &user
         , const QString &password
+        , const AsyncHttpClient::AuthType authType
         , nx_http::StatusCode::Value *httpCode)
     {
         bool done = false;
@@ -1118,7 +1122,7 @@ namespace nx_http
         };
 
         uploadDataAsync(url, data, contentType
-            , user, password, nx_http::HttpHeaders(), callback);
+            , nx_http::HttpHeaders(), callback, authType, user, password);
 
         std::unique_lock<std::mutex> guard(mutex);
         while(!done)

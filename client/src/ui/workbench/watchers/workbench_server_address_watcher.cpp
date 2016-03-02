@@ -4,50 +4,51 @@
 
 #include "network/module_finder.h"
 #include "network/direct_module_finder_helper.h"
-#include "network/module_information.h"
 #include "client/client_message_processor.h"
 #include "client/client_settings.h"
 
-
-QnWorkbenchServerAddressWatcher::QnWorkbenchServerAddressWatcher(QObject *parent) :
-    QObject(parent),
-    QnWorkbenchContextAware(parent)
+namespace
 {
-    QnModuleFinder *moduleFinder = QnModuleFinder::instance();
+    const int kMaxUrlsToStore = 8;
+}
+
+QnWorkbenchServerAddressWatcher::QnWorkbenchServerAddressWatcher(
+        QObject* parent)
+    : QObject(parent)
+    , QnWorkbenchContextAware(parent)
+{
+    auto moduleFinder = QnModuleFinder::instance();
     if (!moduleFinder)
         return;
 
-    m_urls = QSet<QUrl>::fromList(qnSettings->knownServerUrls());
-
-    connect(moduleFinder, &QnModuleFinder::moduleAddressFound, this, &QnWorkbenchServerAddressWatcher::at_moduleFinder_moduleUrlFound);
-    moduleFinder->directModuleFinderHelper()->setForcedUrls(m_urls);
-
-    connect(
-        QnClientMessageProcessor::instance(), &QnClientMessageProcessor::connectionOpened,
-        this, &QnWorkbenchServerAddressWatcher::at_ec_connection_established );
-}
-
-void QnWorkbenchServerAddressWatcher::at_moduleFinder_moduleUrlFound(const QnModuleInformation &moduleInformation, const SocketAddress &address) {
-    Q_UNUSED(moduleInformation)
-
-    QUrl url;
-    url.setScheme(lit("http"));
-    url.setHost(address.address.toString());
-    url.setPort(address.port);
-
-    if (m_urls.contains(url))
+    auto directModuleFinderHelper = moduleFinder->directModuleFinderHelper();
+    if (!directModuleFinderHelper)
         return;
 
-    m_urls.insert(url);
-    qnSettings->setKnownServerUrls(m_urls.toList());
-    QnModuleFinder::instance()->directModuleFinderHelper()->setForcedUrls(m_urls);
-}
+    m_urls = qnSettings->knownServerUrls();
+    if (m_urls.size() > kMaxUrlsToStore)
+    {
+        m_urls = m_urls.mid(0, kMaxUrlsToStore);
+        qnSettings->setKnownServerUrls(m_urls);
+    }
+    directModuleFinderHelper->setForcedUrls(QSet<QUrl>::fromList(m_urls));
 
-void QnWorkbenchServerAddressWatcher::at_ec_connection_established()
-{
-    QUrl url = QnAppServerConnectionFactory::url();
-    url.setPath( QString() );
+    connect(QnClientMessageProcessor::instance(), &QnClientMessageProcessor::connectionOpened,
+            this, [this, directModuleFinderHelper]()
+            {
+                QUrl url = QnAppServerConnectionFactory::url();
+                url.setPath(QString());
 
-    auto dmf = QnModuleFinder::instance()->directModuleFinderHelper();
-    dmf->addForcedUrl( std::move( url ) );
+                // Place url to the top of the list
+                m_urls.removeOne(url);
+                m_urls.prepend(url);
+                while (m_urls.size() > kMaxUrlsToStore)
+                    m_urls.removeLast();
+
+                directModuleFinderHelper->setForcedUrls(
+                            QSet<QUrl>::fromList(m_urls));
+
+                qnSettings->setKnownServerUrls(m_urls);
+            }
+    );
 }

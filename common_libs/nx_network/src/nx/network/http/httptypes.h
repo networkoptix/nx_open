@@ -221,7 +221,7 @@ namespace nx_http
             ok = 200,
             noContent = 204,
             partialContent = 206,
-
+            lastSuccessCode = 299,
             multipleChoices = 300,
             movedPermanently = 301,
             moved = 302,
