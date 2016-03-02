@@ -79,14 +79,14 @@ def install_dependency(dependency_dir, target_dir, debug):
 def copy_package_for_configuration(package, path, debug):
     target_dir = dependencies.TARGET_DIRECTORY
 
-    description_file = os.path.join(target_dir, package + rdep.PACKAGE_CONFIG_NAME)
+    installation_marker = (package if not debug else package + "-debug") + rdep.PACKAGE_CONFIG_NAME
+
+    description_file = os.path.join(target_dir, installation_marker)
 
     if os.path.isfile(description_file):
         return True
 
     print "Copying package {0} into {1}".format(package, target_dir)
-    if not debug:
-        install_dependency(path, target_dir, True)
     install_dependency(path, target_dir, debug)
 
     shutil.copy(os.path.join(path, rdep.PACKAGE_CONFIG_NAME), description_file)
@@ -119,8 +119,13 @@ def copy_package(package):
             return False
 
         if debug_path == release_path:
+            print "No debug package found. Using release package {0}".format(versioned)
+
+            copy_package_for_configuration(versioned, release_path, True)
+
             if os.path.isfile(pri_file):
                 append_pri(pri_file, True)
+
             return True
 
         copy_package_for_configuration(versioned, debug_path, True)
@@ -128,8 +133,6 @@ def copy_package(package):
         debug_pri_file = os.path.join(debug_path, package + "-debug.pri")
         if os.path.isfile(debug_pri_file):
             append_pri(debug_pri_file, True)
-        elif os.path.isfile(pri_file):
-            append_pri(pri_file, True)
 
     return True
 
