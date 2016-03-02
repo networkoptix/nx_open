@@ -43,7 +43,7 @@
         <linux.defines/>
         <mac.defines/>
 
-        <rdep.packages>server-external-2.6.0</rdep.packages>
+        <rdep.packages>server-external</rdep.packages>
         
     </properties>
 

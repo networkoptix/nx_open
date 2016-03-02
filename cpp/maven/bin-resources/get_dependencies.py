@@ -3,6 +3,7 @@
 
 import os, sys, shutil
 import dependencies
+import ConfigParser
 
 sys.path.insert(0, dependencies.RDEP_PATH)
 import rdep
@@ -23,21 +24,34 @@ def copy_recursive(src, dst):
             entry = os.path.join(dirname, filename)
             shutil.copy2(entry, dir)
 
+def get_copy_list(package_dir):
+    config = ConfigParser.ConfigParser()
+    config.read(os.path.join(package_dir, rdep.PACKAGE_CONFIG_NAME))
+
+    if not config.has_option("General", "copy"):
+        return [ "bin" ]
+
+    return config.get("General", "copy").split()
+
 def install_dependency(dependency_dir, target_dir, debug):
-    bin_dir = os.path.join(dependency_dir, "bin")
     bin_dst = os.path.join(target_dir, "bin")
 
-    if os.path.exists(bin_dir):
+    copy_list = get_copy_list(dependency_dir)
+
+    for scr in copy_list:
+        if not os.path.exists(src):
+            continue
+
         debug_dir = os.path.join(bin_dst, "debug")
         if not os.path.isdir(debug_dir):
             os.path.mkdirs(debug_dir)
-        copy_recursive(bin_dir, debug_dir)
+        copy_recursive(src, debug_dir)
 
         if not debug:
             release_dir = os.path.join(bin_dst, "release")
             if not os.path.isdir(release_dir):
                 os.path.mkdirs(release_dir)
-            copy_recursive(bin_dir, release_dir)
+            copy_recursive(src, release_dir)
 
 def copy_package_for_configuration(package, path, debug):
     target_dir = dependencies.TARGET_DIRECTORY
@@ -54,10 +68,6 @@ def copy_package_for_configuration(package, path, debug):
     return True
 
 def copy_package(package):
-# TODO:
-# 1) read copy-target list from artifact, by default - bin subdirectory
-# 2) copy only selected resources to the target dir(s?), e.g. TARGET_DIRECTORY\x64\bin\debug
-# QT scenario is located in the copy_additional_resources.py script. After _all_ is implemented, is should be removed.
     release_path = rdep.locate_package(dependencies.TARGET, package)
     if not release_path:
         print "Could not locate {0}".format(package)

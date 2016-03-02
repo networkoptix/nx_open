@@ -40,7 +40,7 @@
         <mac.defines/>
         <android.defines/>
         <ios.defines/>
-        <rdep.packages>qt-5.6.0</rdep.packages>
+        <rdep.packages>qt</rdep.packages>
     </properties>
 
     <dependencies>
