@@ -117,3 +117,16 @@ hr {
   margin-top:    16px;
   margin-bottom: 16px;
 }
+
+
+.form-control{
+  box-shadow: none;
+  &:focus {
+    box-shadow: none;
+  }
+
+  &[disabled],
+  fieldset[disabled] & {
+    opacity:0.3;
+  }
+}

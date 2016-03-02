@@ -21,7 +21,7 @@ $navbar-default-link-color: $dark10;
 $navbar-margin-bottom:    10px;
 
 
-$common-border-color:   $light4;
+$common-border-color:   $light5;
 
 $dropdown-border:                         $common-border-color;
 $navbar-default-toggle-border-color:      $common-border-color;
@@ -35,6 +35,7 @@ $list-group-border:                       $common-border-color;
 $panel-inner-border:                      $common-border-color;
 $panel-default-border:                    $common-border-color;
 $thumbnail-border:                        $common-border-color;
+$input-border:                            $common-border-color;
 
 $table-border-color:        transparent;
 $modal-footer-border-color: transparent;
@@ -56,9 +57,19 @@ $font-size-h6:            ceil($font-size-base * 0.85); // ~12px
 $btn-font-weight:         bold;
 $headings-font-weight:    lighter;
 
-$border-radius-base:      3px;
-$border-radius-large:     3px;
-$border-radius-small:     3px;
+$border-radius-base:      2px;
+$border-radius-large:     2px;
+$border-radius-small:     2px;
+
+
+$input-height-base:       32px;
+$input-bg:                $light1;
+$input-color:             $dark4;
+$input-border-focus:      $blue10;
+$padding-base-horizontal:  10px;
+$state-danger-text:       $error;
+$input-bg-disabled:       transparentize($light5,0.75);
+$cursor-disabled:           pointer;
 
 
 $btn-default-bg:            transparent;
