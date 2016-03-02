@@ -176,15 +176,8 @@
                 <File Id="ClientQt5Sql$(var.suffix).dll" Name="Qt5Sql$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Sql$(var.suffix).dll" DiskId="7"  />                
             </Component>
 			<Component>
-                <File Id="ClientQt5Sensors$(var.suffix).dll" Name="Qt5Sensors$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Sensors$(var.suffix).dll" DiskId="7"  />                
-            </Component>            
-			<Component>
-                <File Id="ClientQt5Positioning$(var.suffix).dll" Name="Qt5Positioning$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Positioning$(var.suffix).dll" DiskId="7"  />                
-            </Component>            
-			<Component>
                 <File Id="ClientQt5WebChannel$(var.suffix).dll" Name="Qt5WebChannel$(var.suffix).dll" Source="$(var.SourceDir)\Qt5WebChannel$(var.suffix).dll" DiskId="7"  />                
             </Component>            
-
             <Component>
                 <File Id="ClientQt5PrintSupport$(var.suffix).dll" Name="Qt5PrintSupport$(var.suffix).dll" Source="$(var.SourceDir)\Qt5PrintSupport$(var.suffix).dll" DiskId="7"  />                
             </Component>             
