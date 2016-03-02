@@ -59,7 +59,7 @@ QnFfmpegAudioDecoder::QnFfmpegAudioDecoder(QnCompressedAudioDataPtr data):
         QnFfmpegHelper::mediaContextToAvCodecContext(c, data->context);
     }
     else {
-        Q_ASSERT_X(false, Q_FUNC_INFO, "Audio packets without codec is deprecated!");
+        NX_ASSERT(false, Q_FUNC_INFO, "Audio packets without codec is deprecated!");
         /*
         c->codec_id = m_codec;
         c->codec_type = AVMEDIA_TYPE_AUDIO;
@@ -111,7 +111,7 @@ bool QnFfmpegAudioDecoder::decode(QnCompressedAudioDataPtr& data, QnByteArray& r
 
         if (outbuf_len + out_size > (int)result.capacity())
         {
-            //Q_ASSERT_X(false, Q_FUNC_INFO, "Too small output buffer for audio decoding!");
+            //NX_ASSERT(false, Q_FUNC_INFO, "Too small output buffer for audio decoding!");
             result.reserve(result.capacity() * 2);
             outbuf = (quint8*) result.data() + outbuf_len;
         }

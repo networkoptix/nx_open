@@ -61,8 +61,8 @@ protected:
                 onUdpRequest(std::move(c), std::move(m));
             });
 
-        assert(udpStunServer.bind(kMediatorAddress));
-        assert(udpStunServer.listen());
+        NX_ASSERT(udpStunServer.bind(kMediatorAddress));
+        NX_ASSERT(udpStunServer.listen());
     }
 
     void createAndStartAcceptor(size_t socketsToAccept)

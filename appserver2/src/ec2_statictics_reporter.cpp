@@ -24,6 +24,7 @@ static const QString SERVER_API_COMMAND = lit("statserver/api/report");
 namespace ec2
 {
     const QString Ec2StaticticsReporter::SR_LAST_TIME = lit("statisticsReportLastTime");
+    const QString Ec2StaticticsReporter::SR_LAST_NUMBER = lit("statisticsReportLastNumber");
     const QString Ec2StaticticsReporter::SR_TIME_CYCLE = lit("statisticsReportTimeCycle");
     const QString Ec2StaticticsReporter::SR_SERVER_API = lit("statisticsReportServerApi");
     const QString Ec2StaticticsReporter::SYSTEM_ID = lit("systemId");
@@ -229,6 +230,7 @@ namespace ec2
     ErrorCode Ec2StaticticsReporter::initiateReport(QString* reportApi)
     {
         ApiSystemStatistics data;
+        data.reportInfo.number = m_admin->getProperty(SR_LAST_NUMBER).toInt();
         auto res = collectReportData(nullptr, &data);
         if (res != ErrorCode::ok)
         {
@@ -287,6 +289,8 @@ namespace ec2
             const auto now = qnSyncTime->currentDateTime().toUTC();
             m_plannedReportTime = boost::none;
 
+            const int lastNumber = m_admin->getProperty(SR_LAST_NUMBER).toInt();
+            m_admin->setProperty(SR_LAST_NUMBER, lastNumber + 1);
             m_admin->setProperty(SR_LAST_TIME, now.toString(Qt::ISODate));
             propertyDictionary->saveParams(m_admin->getId());
         }
@@ -297,7 +301,6 @@ namespace ec2
 
             NX_LOG(lit("Ec2StaticticsReporter: doPost to %1 has failed, update timer cycle to %2")
                    .arg(httpClient->url().toString()).arg(m_timerCycle), cl_logWARNING);
-
         }
 
         setupTimer();

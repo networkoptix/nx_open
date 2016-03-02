@@ -184,7 +184,7 @@ void PluginUsageWatcher::run()
 
 bool PluginUsageWatcher::lockSharedMemory()
 {
-    Q_ASSERT( !m_sharedMemoryLocked );
+    NX_ASSERT( !m_sharedMemoryLocked );
     m_sharedMemoryLocked = m_sharedMemoryLocker.lock();
     if( !m_sharedMemoryLocked )
     {
@@ -196,7 +196,7 @@ bool PluginUsageWatcher::lockSharedMemory()
 
 bool PluginUsageWatcher::unlockSharedMemory()
 {
-    Q_ASSERT( m_sharedMemoryLocked );
+    NX_ASSERT( m_sharedMemoryLocked );
     m_sharedMemoryLocked = !m_sharedMemoryLocker.unlock();
     if( m_sharedMemoryLocked )
     {

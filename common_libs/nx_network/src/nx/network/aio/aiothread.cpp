@@ -20,7 +20,7 @@ namespace network {
 namespace aio {
 
 template class AIOThread<Pollable>;
-template class AIOThread<UdtSocket>;
+//template class AIOThread<UdtSocket>;
 
 }   //aio
 }   //network

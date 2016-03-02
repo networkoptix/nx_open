@@ -141,7 +141,7 @@ void QnDirectModuleFinder::activateRequests() {
 
         client->doGet(url);
 
-        Q_ASSERT_X(!m_activeRequests.contains(url), "Duplicate request issued", Q_FUNC_INFO);
+        NX_ASSERT(!m_activeRequests.contains(url), "Duplicate request issued", Q_FUNC_INFO);
         m_activeRequests.insert(url, reply.release());
     }
 }
@@ -151,8 +151,8 @@ void QnDirectModuleFinder::at_reply_finished(QnAsyncHttpClientReply *reply) {
 
     QUrl url = reply->url();
     const auto replyIter = m_activeRequests.find(url);
-    Q_ASSERT_X(replyIter != m_activeRequests.end(), "Reply that is not in the set of active requests has finished! (1)", Q_FUNC_INFO);
-    Q_ASSERT_X(replyIter.value() == reply, "Reply that is not in the set of active requests has finished! (2)", Q_FUNC_INFO);
+    NX_ASSERT(replyIter != m_activeRequests.end(), "Reply that is not in the set of active requests has finished! (1)", Q_FUNC_INFO);
+    NX_ASSERT(replyIter.value() == reply, "Reply that is not in the set of active requests has finished! (2)", Q_FUNC_INFO);
     if (replyIter != m_activeRequests.end())
         m_activeRequests.erase(replyIter);
 

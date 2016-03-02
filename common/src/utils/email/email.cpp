@@ -129,7 +129,7 @@ QnEmailSettings QnEmailAddress::settings() const {
 }
 
 void QnEmailAddress::initSmtpPresets() const {
-    Q_ASSERT(qApp && qApp->thread() == QThread::currentThread());
+    NX_ASSERT(qApp && qApp->thread() == QThread::currentThread());
 
     QFile file(QLatin1String(":/smtp.json"));
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))

@@ -103,7 +103,7 @@ void QnServerStreamRecorder::at_recordingFinished(
     if (status.lastError == QnStreamRecorder::NoError)
         return;
 
-    Q_ASSERT(m_mediaServer);
+    NX_ASSERT(m_mediaServer);
     if (m_mediaServer) {
         if (!m_diskErrorWarned)
         {
@@ -224,7 +224,7 @@ void QnServerStreamRecorder::updateStreamParams()
                 liveProvider->setQuality(m_currentScheduleTask.getStreamQuality());
             }
             else {
-                Q_ASSERT(camera);
+                NX_ASSERT(camera);
                 liveProvider->setFps(camera->getMaxFps()-5);
                 liveProvider->setQuality(Qn::QualityHighest);
             }
@@ -245,7 +245,7 @@ void QnServerStreamRecorder::beforeProcessData(const QnConstAbstractMediaDataPtr
 {
     m_lastMediaTime = media->timestamp;
 
-    Q_ASSERT_X(m_dualStreamingHelper, Q_FUNC_INFO, "Dual streaming helper must be defined!");
+    NX_ASSERT(m_dualStreamingHelper, Q_FUNC_INFO, "Dual streaming helper must be defined!");
     QnConstMetaDataV1Ptr metaData = std::dynamic_pointer_cast<const QnMetaDataV1>(media);
     if (metaData) {
         m_dualStreamingHelper->onMotion(metaData.get());
@@ -534,7 +534,7 @@ void QnServerStreamRecorder::updateCamera(const QnSecurityCamResourcePtr& camera
 {
     QnMutexLocker lock( &m_scheduleMutex );
     m_schedule = cameraRes->getScheduleTasks();
-    Q_ASSERT_X(m_dualStreamingHelper, Q_FUNC_INFO, "DualStreaming helper must be defined!");
+    NX_ASSERT(m_dualStreamingHelper, Q_FUNC_INFO, "DualStreaming helper must be defined!");
     m_lastSchedulePeriod.clear();
     updateScheduleInfo(qnSyncTime->currentMSecsSinceEpoch());
 
@@ -548,20 +548,20 @@ void QnServerStreamRecorder::updateCamera(const QnSecurityCamResourcePtr& camera
 bool QnServerStreamRecorder::isRedundantSyncOn() const
 {
     auto mediaServer = qnCommon->currentServer();
-    Q_ASSERT(mediaServer);
+    NX_ASSERT(mediaServer);
 
     if (mediaServer->getBackupSchedule().backupType != Qn::Backup_RealTime)
         return false;
 
     auto cam = m_device.dynamicCast<QnSecurityCamResource>();
-    Q_ASSERT(cam);
+    NX_ASSERT(cam);
 
     Qn::CameraBackupQualities cameraBackupQualities = cam->getActualBackupQualities();
 
     if (m_catalog == QnServer::HiQualityCatalog)
         return cameraBackupQualities.testFlag(Qn::CameraBackup_HighQuality);
 
-    Q_ASSERT_X(m_catalog == QnServer::LowQualityCatalog, Q_FUNC_INFO, "Only two options are allowed");
+    NX_ASSERT(m_catalog == QnServer::LowQualityCatalog, Q_FUNC_INFO, "Only two options are allowed");
     return cameraBackupQualities.testFlag(Qn::CameraBackup_LowQuality);
 }
 
@@ -570,7 +570,7 @@ void QnServerStreamRecorder::getStoragesAndFileNames(QnAbstractMediaStreamDataPr
     if (!m_fixedFileName)
     {
         QnNetworkResourcePtr netResource = qSharedPointerDynamicCast<QnNetworkResource>(m_device);
-        Q_ASSERT_X(netResource != 0, Q_FUNC_INFO, "Only network resources can be used with storage manager!");
+        NX_ASSERT(netResource != 0, Q_FUNC_INFO, "Only network resources can be used with storage manager!");
         m_recordingContextVector.clear();
 
         auto normalStorage = qnNormalStorageMan->getOptimalStorageRoot(provider);

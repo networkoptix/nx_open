@@ -48,14 +48,14 @@ public:
     }
     // Use this function to set up the message length position 
     std::uint16_t* WriteMessageLength() {
-        Q_ASSERT(m_headerLength == NULL);
+        NX_ASSERT(m_headerLength == NULL);
         void* ret = Poke(2);
         if( ret == NULL ) return NULL;
         m_headerLength = reinterpret_cast<std::uint16_t*>(ret);
         return m_headerLength;
     }
     std::uint16_t* WriteMessageLength( std::uint16_t length ) {
-        Q_ASSERT(m_headerLength != NULL);
+        NX_ASSERT(m_headerLength != NULL);
         qToBigEndian(length,reinterpret_cast<uchar*>(m_headerLength));
         return m_headerLength;
     }
@@ -165,6 +165,8 @@ nx_api::SerializerState::Type MessageSerializer::serializeMagicCookieAndTransact
     if( buffer->WriteUint32( MAGIC_COOKIE ) == NULL ) {
         return nx_api::SerializerState::needMoreBufferSpace;
     }
+
+    assert(m_message->header.transactionId.size() == 12);
     // Transaction ID
     if( buffer->WriteBytes( m_message->header.transactionId.data(),
                             m_message->header.transactionId.size() ) == NULL ) {
@@ -215,13 +217,13 @@ nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue( Messag
     default:
         if( attribute->getType() > attrs::unknown )
             return serializeAttributeValue_Buffer( buffer , *static_cast<const Unknown*>(attribute) ,value);
-        Q_ASSERT(0);
+        NX_ASSERT(0);
         return nx_api::SerializerState::done;
     }
 }
 
 nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_XORMappedAddress( MessageSerializerBuffer* buffer ,const attrs::XorMappedAddress& attribute , std::size_t* value ) {
-    Q_ASSERT( attribute.family == XorMappedAddress::IPV4 || attribute.family == XorMappedAddress::IPV6 );
+    NX_ASSERT( attribute.family == XorMappedAddress::IPV4 || attribute.family == XorMappedAddress::IPV6 );
     std::size_t cur_pos = buffer->position();
     if( buffer->WriteUint16(attribute.family) == NULL ) 
         return nx_api::SerializerState::needMoreBufferSpace;
@@ -251,7 +253,7 @@ nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_XORMapp
 }
 
 nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_Fingerprint( MessageSerializerBuffer* buffer ,const attrs::FingerPrint& attribute , std::size_t* value ) {
-    Q_ASSERT( buffer->size() >= 24 ); // Header + FingerprintHeader
+    NX_ASSERT( buffer->size() >= 24 ); // Header + FingerprintHeader
     // Ignore original FingerPrint message
     Q_UNUSED(attribute);
     boost::crc_32_type crc32;
@@ -348,7 +350,7 @@ nx_api::SerializerState::Type MessageSerializer::serializeAttributes( MessageSer
             }
             // Checking for really large message may round our body size 
             std::size_t padding_attribute_value_size = calculatePaddingSize(attribute_value_size);
-            Q_ASSERT( padding_attribute_value_size + 4 + *length <= std::numeric_limits<std::uint16_t>::max() );
+            NX_ASSERT( padding_attribute_value_size + 4 + *length <= std::numeric_limits<std::uint16_t>::max() );
             qToBigEndian(static_cast<std::uint16_t>(attribute_value_size),reinterpret_cast<uchar*>(attribute_len));
             *length += static_cast<std::uint16_t>(4 + padding_attribute_value_size);
             return true;
@@ -404,8 +406,8 @@ nx_api::SerializerState::Type MessageSerializer::serialize(
             user_buffer->reserve( user_buffer->capacity() * 2 );
         }
 
-        Q_ASSERT(m_initialized && checkMessageIntegratiy());
-        Q_ASSERT(user_buffer->size() == 0 && user_buffer->capacity() != 0);
+        NX_ASSERT(m_initialized && checkMessageIntegratiy());
+        NX_ASSERT(user_buffer->size() == 0 && user_buffer->capacity() != 0);
         MessageSerializerBuffer buffer(user_buffer);
         *bytesWritten = user_buffer->size();
         // header serialization

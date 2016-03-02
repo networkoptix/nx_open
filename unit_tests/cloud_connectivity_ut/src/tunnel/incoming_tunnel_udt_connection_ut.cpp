@@ -25,8 +25,8 @@ protected:
         SyncQueue<SystemError::ErrorCode> results;
 
         auto tmpSocket = makeSocket(true);
-        Q_ASSERT(tmpSocket->setSendTimeout(0));
-        Q_ASSERT(tmpSocket->setRecvTimeout(0));
+        NX_ASSERT(tmpSocket->setSendTimeout(0));
+        NX_ASSERT(tmpSocket->setRecvTimeout(0));
         connectionAddress = tmpSocket->getLocalAddress();
 
         freeSocket = makeSocket(true);
@@ -45,11 +45,11 @@ protected:
     std::unique_ptr<UdtStreamSocket> makeSocket(bool randevous = false)
     {
         auto socket = std::make_unique<UdtStreamSocket>();
-        Q_ASSERT(socket->setRendezvous(randevous));
-        Q_ASSERT(socket->setSendTimeout(kSocketTimeout.count()));
-        Q_ASSERT(socket->setRecvTimeout(kSocketTimeout.count()));
-        Q_ASSERT(socket->setNonBlockingMode(true));
-        Q_ASSERT(socket->bind(SocketAddress(HostAddress::localhost, 0)));
+        NX_ASSERT(socket->setRendezvous(randevous));
+        NX_ASSERT(socket->setSendTimeout(kSocketTimeout.count()));
+        NX_ASSERT(socket->setRecvTimeout(kSocketTimeout.count()));
+        NX_ASSERT(socket->setNonBlockingMode(true));
+        NX_ASSERT(socket->bind(SocketAddress(HostAddress::localhost, 0)));
         return std::move(socket);
     }
 
@@ -241,7 +241,7 @@ TEST_F(IncomingTunnelUdtConnectionTest, PleaseStopOnRun)
                 for (;;)
                 {
                     auto socket = std::make_unique<UdtStreamSocket>();
-                    Q_ASSERT(socket->setSendTimeout(kSocketTimeout.count()));
+                    NX_ASSERT(socket->setSendTimeout(kSocketTimeout.count()));
                     if (!socket->connect(connectionAddress))
                         return;
                 }

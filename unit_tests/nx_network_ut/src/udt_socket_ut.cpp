@@ -14,6 +14,7 @@
 #include <nx/network/udt/udt_pollset.h>
 #include <nx/network/test_support/simple_socket_test_helper.h>
 #include <nx/network/test_support/socket_test_helper.h>
+#include <utils/common/string.h>
 
 
 namespace nx {
@@ -161,7 +162,7 @@ TEST(SocketUdt_UdtPollSet, general)
 }
 
 NX_NETWORK_BOTH_SOCKETS_TEST_CASE(
-    TEST, SocketUdt_Simple,
+    TEST_F, SocketUdt,
     &std::make_unique<UdtStreamServerSocket>,
     &std::make_unique<UdtStreamSocket>)
 
@@ -218,7 +219,7 @@ TEST_F(SocketUdt, rendezvousConnect)
             return std::make_unique<UdtStreamServerSocket>();
         });
 
-    const size_t bytesToSendThroughConnection = 1024;
+    const size_t bytesToSendThroughConnection = 128*1024;
     const int maxSimultaneousConnections = 25;
     const std::chrono::seconds testDuration(3);
 
@@ -250,7 +251,7 @@ TEST_F(SocketUdt, rendezvousConnect)
     acceptorSocket.pleaseStopSync();
 }
 
-TEST_F(SocketUdt, DISABLED_acceptingFirstConnection)
+TEST_F(SocketUdt, acceptingFirstConnection)
 {
     const std::chrono::seconds timeToWaitForSocketAccepted(1);
     const int loopLength = 271;
@@ -284,6 +285,67 @@ TEST_F(SocketUdt, DISABLED_acceptingFirstConnection)
 
         serverSocket.pleaseStopSync();
     }
+}
+
+TEST_F(SocketUdt, allDataReadAfterFin)
+{
+    const int testMessageLength = 16;
+    const std::chrono::milliseconds connectTimeout(3000);
+    const std::chrono::milliseconds recvTimeout(3000);
+
+    UdtStreamServerSocket server;
+    //TCPServerSocket server;
+    ASSERT_TRUE(server.setNonBlockingMode(true));
+    ASSERT_TRUE(server.bind(SocketAddress(HostAddress::localhost, 0)));
+    ASSERT_TRUE(server.listen());
+
+    std::promise<
+        std::pair<SystemError::ErrorCode, std::unique_ptr<AbstractStreamSocket>>
+    > connectionAcceptedPromise;
+
+    server.acceptAsync(
+        [&connectionAcceptedPromise](
+            SystemError::ErrorCode errorCode,
+            AbstractStreamSocket* sock)
+        {
+            connectionAcceptedPromise.set_value(
+                std::make_pair(errorCode, std::unique_ptr<AbstractStreamSocket>(sock)));
+        });
+
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+
+    auto clientSock = std::make_unique<UdtStreamSocket>();
+    //auto clientSock = std::make_unique<TCPSocket>();
+    ASSERT_TRUE(clientSock->bind(SocketAddress(HostAddress::localhost, 0)));
+    ASSERT_NE(server.getLocalAddress(), clientSock->getLocalAddress());
+
+    ASSERT_TRUE(clientSock->connect(server.getLocalAddress()));
+
+    auto connectionAcceptedFuture = connectionAcceptedPromise.get_future();
+    ASSERT_EQ(
+        std::future_status::ready,
+        connectionAcceptedFuture.wait_for(connectTimeout));
+    auto acceptResult = connectionAcceptedFuture.get();
+    ASSERT_EQ(SystemError::noError, acceptResult.first);
+
+    const QByteArray testMessage = generateRandomName(testMessageLength);
+    ASSERT_EQ(
+        testMessage.size(),
+        clientSock->send(testMessage.constData(), testMessage.size()));
+
+    clientSock.reset();
+
+    //reading out accepted socket
+    auto acceptedSocket = std::move(acceptResult.second);
+
+    ASSERT_TRUE(acceptedSocket->setRecvTimeout(recvTimeout.count()))
+        << SystemError::getLastOSErrorText().toStdString();
+
+    const auto recvBuffer = readNBytes(acceptedSocket.get(), testMessage.size());
+    ASSERT_EQ(testMessage, recvBuffer)
+        << SystemError::getLastOSErrorText().toStdString();
+
+    server.pleaseStopSync();
 }
 
 }   //test

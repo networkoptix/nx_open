@@ -2,6 +2,7 @@
 #define QN_INSTANCE_STORAGE_H
 
 #include <cassert>
+#include <nx/utils/log/assert.h>
 
 #include <type_traits>
 
@@ -39,7 +40,7 @@ protected:
     void store(I *instance) {
         static_assert(std::is_convertible<I *, T *>::value, "Provided value must be convertible to the specified instance type T.");
 
-        assert(!m_instanceByMetaObject.contains(&T::staticMetaObject));
+        NX_ASSERT(!m_instanceByMetaObject.contains(&T::staticMetaObject));
 
         m_instanceByMetaObject.insert(&T::staticMetaObject, instance);
         m_instances.push_back(instance);

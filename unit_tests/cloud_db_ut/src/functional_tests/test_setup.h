@@ -31,11 +31,11 @@ public:
     ~CdbFunctionalTest();
 
     void start();
-    void startAndWaitUntilStarted();
-    void waitUntilStarted();
+    bool startAndWaitUntilStarted();
+    bool waitUntilStarted();
     void stop();
     //!restarts process
-    void restart();
+    bool restart();
 
     void addArg(const char* arg);
 
@@ -147,6 +147,7 @@ private:
         decltype(&destroyConnectionFactory)
     > m_connectionFactory;
     api::ModuleInfo m_moduleInfo;
+    std::unique_ptr<std::promise<bool /*result*/>> m_cdbStartedPromise;
 };
 
 namespace api {

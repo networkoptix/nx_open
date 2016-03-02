@@ -9,6 +9,7 @@
 #include <cstdint>
 #include <functional>
 #include <nx/network/buffer.h>
+#include <nx/utils/log/assert.h>
 
 #include "message.h"
 

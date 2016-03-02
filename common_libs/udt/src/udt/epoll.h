@@ -55,7 +55,7 @@ struct CEPollDesc
    std::set<UDTSOCKET> m_sUDTSocksEx;        // set of UDT sockets waiting for exceptions
 
    int m_iLocalID;                           // local system epoll ID
-   std::set<SYSSOCKET> m_sLocals;            // set of local (non-UDT) descriptors
+   std::map<SYSSOCKET, int> m_sLocals;       // map<local (non-UDT) descriptor, event mask (UDT_EPOLL_IN | UDT_EPOLL_OUT | UDT_EPOLL_ERR)>
 
    std::set<UDTSOCKET> m_sUDTWrites;         // UDT sockets ready for write
    std::set<UDTSOCKET> m_sUDTReads;          // UDT sockets ready for read

@@ -109,7 +109,7 @@ void QnIpRangeCheckerAsync::onDone( nx_http::AsyncHttpClientPtr httpClient )
     QnMutexLocker lk( &m_mutex );
 
     std::set<nx_http::AsyncHttpClientPtr>::iterator it = m_socketsBeingScanned.find( httpClient );
-    Q_ASSERT( it != m_socketsBeingScanned.end() );
+    NX_ASSERT( it != m_socketsBeingScanned.end() );
     if( httpClient->totalBytesRead() > 0 )
         m_openedIPs.push_back( httpClient->url().host() );
 

@@ -92,8 +92,8 @@ public:
         m_natTraversalEnabled( _natTraversalEnabled ),
         m_asyncSendIssued( false )
     {
-        assert( this->m_socket );
-        assert( m_abstractSocketPtr );
+        NX_ASSERT( this->m_socket );
+        NX_ASSERT( m_abstractSocketPtr );
     }
 
     virtual ~AsyncSocketImplHelper()
@@ -132,7 +132,7 @@ public:
         else
         {
             //checking that socket is not registered in aio
-            Q_ASSERT_X(
+            NX_ASSERT(
                 !nx::network::SocketGlobals::aioService().isSocketBeingWatched(this->m_socket),
                 Q_FUNC_INFO,
                 "You MUST cancel running async socket operation before deleting socket if you delete socket from non-aio thread (2)" );
@@ -173,13 +173,13 @@ public:
             return;
         }
 #ifdef _DEBUG
-        assert( isNonBlockingModeEnabled );
+        NX_ASSERT( isNonBlockingModeEnabled );
 #endif
 
         m_connectHandler = std::move( handler );
 
         //TODO #ak if address is already resolved (or is an ip address) better make synchronous non-blocking call
-        //NOTE: socket cannot be read from/written to if not connected yet. TODO #ak check that with assert
+        //NOTE: socket cannot be read from/written to if not connected yet. TODO #ak check that with NX_ASSERT
 
         if( addr.address.isResolved() )
         {
@@ -217,11 +217,11 @@ public:
                 const auto& entry = addresses.front();
                 switch( entry.type )
                 {
-                    case nx::network::cloud::AddressType::regular:
+                    case nx::network::cloud::AddressType::kLocal:
                     {
                         SocketAddress target( entry.host, addr.port );
                         for( const auto& attr : entry.attributes )
-                            if( attr.type == nx::network::cloud::AddressAttributeType::nxApiPort )
+                            if( attr.type == nx::network::cloud::AddressAttributeType::kPort )
                                 target.port = static_cast< quint16 >( attr.value );
                         if( startAsyncConnect( target ) )
                             return;
@@ -250,9 +250,9 @@ public:
 
         static const int DEFAULT_RESERVE_SIZE = 4*1024;
 
-        //this assert is not critical but is a signal of possible 
+        //this NX_ASSERT is not critical but is a signal of possible 
             //ineffective memory usage in calling code
-        Q_ASSERT( buf->capacity() > buf->size() );
+        NX_ASSERT( buf->capacity() > buf->size() );
 
         if( buf->capacity() == buf->size() )
             buf->reserve( DEFAULT_RESERVE_SIZE );
@@ -269,9 +269,9 @@ public:
         if( this->m_socket->impl()->terminated.load( std::memory_order_relaxed ) > 0 )
             return;
 
-        assert( buf.size() > 0 );
+        NX_ASSERT( buf.size() > 0 );
 
-        //assert does not stop all threads immediately, so performing segmentation fault
+        //NX_ASSERT does not stop all threads immediately, so performing segmentation fault
         if( m_asyncSendIssued.exchange(true) )
             *((int*)nullptr) = 12;
 
@@ -384,7 +384,7 @@ private:
 
     virtual void eventTriggered( SocketType* sock, aio::EventType eventType ) throw() override
     {
-        assert( this->m_socket == sock );
+        NX_ASSERT( this->m_socket == sock );
 
         //TODO #ak split this method to multiple methods
 
@@ -494,7 +494,7 @@ private:
 
                 std::unique_ptr<AsyncSocketImplHelper, decltype(__finally_read)> cleanupGuard( this, __finally_read );
 
-                assert( m_recvHandler );
+                NX_ASSERT( m_recvHandler );
 
                 //reading to buffer
                 const auto bufSizeBak = m_recvBuffer->size();
@@ -528,7 +528,7 @@ private:
                 else
                 {
                     //can send some bytes
-                    assert( m_sendHandler );
+                    NX_ASSERT( m_sendHandler );
 
                     std::unique_ptr<AsyncSocketImplHelper, decltype(__finally_write)> cleanupGuard( this, __finally_write );
 
@@ -567,7 +567,7 @@ private:
 
             case aio::etReadTimedOut:
             {
-                assert( m_recvHandler );
+                NX_ASSERT( m_recvHandler );
 
                 m_recvHandlerTerminatedFlag = &terminated;
                 std::unique_ptr<AsyncSocketImplHelper, decltype(__finally_read)> cleanupGuard( this, __finally_read );
@@ -586,7 +586,7 @@ private:
                 }
                 else
                 {
-                    assert( m_sendHandler );
+                    NX_ASSERT( m_sendHandler );
                     std::unique_ptr<AsyncSocketImplHelper, decltype(__finally_write)> cleanupGuard( this, __finally_write );
                     sendHandlerLocal( SystemError::timedOut, (size_t)-1 );
                 }
@@ -627,7 +627,7 @@ private:
             }
 
             default:
-                assert( false );
+                NX_ASSERT( false );
                 break;
         }
     }
@@ -640,10 +640,10 @@ private:
         bool isNonBlockingModeEnabled = false;
         if( !m_abstractSocketPtr->getNonBlockingMode( &isNonBlockingModeEnabled ) )
             return false;
-        assert( isNonBlockingModeEnabled );
+        NX_ASSERT( isNonBlockingModeEnabled );
 #endif
 
-        assert( !m_asyncSendIssued.exchange( true ) );
+        NX_ASSERT( !m_asyncSendIssued.exchange( true ) );
 
         if( !m_abstractSocketPtr->getSendTimeout( &sendTimeout ) )
             return false;
@@ -659,7 +659,7 @@ private:
             [this, resolvedAddress, sendTimeout]()
             {
                 m_abstractSocketPtr->connect( resolvedAddress, std::chrono::milliseconds(sendTimeout) );
-            } );    //to be called between pollset.add and pollset.poll
+            });    //to be called between pollset.add and pollset.poll
         return true;
     }
 
@@ -683,13 +683,12 @@ private:
 template <class SocketType>
 class AsyncServerSocketHelper
 :
-    public aio::AIOEventHandler<SocketType>
+    public aio::AIOEventHandler<Pollable>
 {
 public:
-    AsyncServerSocketHelper(SocketType* _sock, AbstractStreamServerSocket* _abstractServerSocket)
+    AsyncServerSocketHelper(SocketType* _sock)
     :
         m_sock(_sock),
-        m_abstractServerSocket(_abstractServerSocket),
         m_threadHandlerIsRunningIn(NULL),
         m_acceptAsyncCallCount(0),
         m_terminatedFlagPtr(nullptr)
@@ -703,9 +702,9 @@ public:
             *m_terminatedFlagPtr = true;
     }
 
-    virtual void eventTriggered(SocketType* sock, aio::EventType eventType) throw() override
+    virtual void eventTriggered(Pollable* sock, aio::EventType eventType) throw() override
     {
-        assert(m_acceptHandler);
+        NX_ASSERT(m_acceptHandler);
 
         bool terminated = false;    //set to true just before object destruction
         m_terminatedFlagPtr = &terminated;
@@ -730,7 +729,7 @@ public:
             case aio::etRead:
             {
                 //accepting socket
-                AbstractStreamSocket* newSocket = m_abstractServerSocket->accept();
+                AbstractStreamSocket* newSocket = m_sock->systemAccept();
                 acceptHandlerBakLocal(
                     newSocket != nullptr ? SystemError::noError : SystemError::getLastOSErrorCode(),
                     newSocket);
@@ -750,7 +749,7 @@ public:
             }
 
             default:
-                assert(false);
+                NX_ASSERT(false);
                 break;
         }
     }
@@ -787,7 +786,6 @@ public:
 
 private:
     SocketType* m_sock;
-    AbstractStreamServerSocket* m_abstractServerSocket;
     std::atomic<Qt::HANDLE> m_threadHandlerIsRunningIn;
     std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)> m_acceptHandler;
     std::atomic<int> m_acceptAsyncCallCount;

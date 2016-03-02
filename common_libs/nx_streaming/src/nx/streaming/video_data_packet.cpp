@@ -40,7 +40,7 @@ QnWritableCompressedVideoData::QnWritableCompressedVideoData(
     QnCompressedVideoData( ctx ),
     m_data(/*&videoPacketCyclicAllocator,*/ alignment, capacity)
 {
-    Q_ASSERT(capacity <= MAX_ALLOWED_FRAME_SIZE);
+    NX_ASSERT(capacity <= MAX_ALLOWED_FRAME_SIZE);
 }
 
 QnWritableCompressedVideoData::QnWritableCompressedVideoData(
@@ -52,7 +52,7 @@ QnWritableCompressedVideoData::QnWritableCompressedVideoData(
     QnCompressedVideoData( ctx ),
     m_data(allocator, alignment, capacity)
 {
-    Q_ASSERT(capacity <= MAX_ALLOWED_FRAME_SIZE);
+    NX_ASSERT(capacity <= MAX_ALLOWED_FRAME_SIZE);
 }
 
 //!Implementation of QnAbstractMediaData::clone

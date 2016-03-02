@@ -13,6 +13,7 @@
 #include <QtGui/QColor>
 
 #include <utils/common/synchronized_flat_storage.h>
+#include <nx/utils/log/assert.h>
 
 namespace {
     template<class T>
@@ -84,7 +85,7 @@ void LinearCombinator::registerCombinator(LinearCombinator *combinator) {
 }
 
 QVariant LinearCombinator::combine(qreal a, const QVariant &x, qreal b, const QVariant &y) const {
-    assert((x.userType() == m_type && y.userType() == m_type) || m_type == 0);
+    NX_ASSERT((x.userType() == m_type && y.userType() == m_type) || m_type == 0);
 
     QVariant result(m_type, static_cast<const void *>(NULL));
     calculateInternal(a, x.constData(), b, y.constData(), result.data());
@@ -92,7 +93,7 @@ QVariant LinearCombinator::combine(qreal a, const QVariant &x, qreal b, const QV
 }
 
 void LinearCombinator::combine(qreal a, const void *x, qreal b, const void *y, void *result) const {
-    assert(x != NULL && y != NULL && result != NULL);
+    NX_ASSERT(x != NULL && y != NULL && result != NULL);
 
     calculateInternal(a, x, b, y, result);
 }

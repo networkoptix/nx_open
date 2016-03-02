@@ -1,5 +1,7 @@
 #include "cycle_buffer.h"
 
+#include <nx/utils/log/assert.h>
+
 QnMediaCyclicBuffer::QnMediaCyclicBuffer(size_type bufferSize, int align):
     m_buffer(0),
     m_maxSize(bufferSize),
@@ -8,7 +10,7 @@ QnMediaCyclicBuffer::QnMediaCyclicBuffer(size_type bufferSize, int align):
 {
     if (bufferSize > 0) {
         m_buffer = (value_type*) qMallocAligned(bufferSize, align);
-        Q_ASSERT_X(m_buffer, Q_FUNC_INFO, "not enough memory");
+        NX_ASSERT(m_buffer, Q_FUNC_INFO, "not enough memory");
     }
 }
 
@@ -24,7 +26,7 @@ void QnMediaCyclicBuffer::push_back(const value_type* data, size_type size)
 
 void QnMediaCyclicBuffer::insert(size_type pos, const value_type* data, size_type size)
 {
-    Q_ASSERT(pos + size <= m_maxSize);
+    NX_ASSERT(pos + size <= m_maxSize);
     size_type updPos = (m_offset + pos) % m_maxSize;
     int copySize = qMin(m_maxSize - updPos, size);
     memcpy(m_buffer + updPos, data, copySize);
@@ -36,7 +38,7 @@ void QnMediaCyclicBuffer::insert(size_type pos, const value_type* data, size_typ
 
 void QnMediaCyclicBuffer::pop_front(size_type size)
 {
-    Q_ASSERT(m_size >= size);
+    NX_ASSERT(m_size >= size);
     
     m_size -= size;
     m_offset += size;
@@ -48,7 +50,7 @@ const QnMediaCyclicBuffer::value_type* QnMediaCyclicBuffer::unfragmentedData(siz
 {
     if (size == -1)
         size = m_size;
-    Q_ASSERT(pos + size <= m_size);
+    NX_ASSERT(pos + size <= m_size);
     size_type reqPos = (m_offset + pos) % m_maxSize;
     if (reqPos + size > m_maxSize) {
         reallocateBuffer();
@@ -61,7 +63,7 @@ std::vector<QnMediaCyclicBuffer::Range> QnMediaCyclicBuffer::fragmentedData(size
 {
     if (size == -1)
         size = m_size;
-    Q_ASSERT(pos + size <= m_size);
+    NX_ASSERT(pos + size <= m_size);
 
     std::vector<QnMediaCyclicBuffer::Range> result;
     if (m_size == 0 || size == 0)

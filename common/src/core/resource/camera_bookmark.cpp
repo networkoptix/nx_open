@@ -121,7 +121,7 @@ namespace
             return makePredByGetter(cameraNameGetter, isAscending);
         }
         default:
-            Q_ASSERT_X(false, Q_FUNC_INFO, "Invalid bookmark sorting field!");
+            NX_ASSERT(false, Q_FUNC_INFO, "Invalid bookmark sorting field!");
             return BinaryPredicate();
         };
     };
@@ -148,7 +148,7 @@ namespace
     QnCameraBookmarkList getSparseByIters(ItersLinkedList &bookmarkIters
         , int limit)
     {
-        Q_ASSERT_X(limit > 0, Q_FUNC_INFO, "Limit should be greater than 0!");
+        NX_ASSERT(limit > 0, Q_FUNC_INFO, "Limit should be greater than 0!");
         if (limit <= 0)
             return QnCameraBookmarkList();
 
@@ -183,7 +183,7 @@ namespace
         , int limit
         , const BinaryPredicate &pred)
     {
-        Q_ASSERT_X(limit > 0, Q_FUNC_INFO, "Limit should be greater than 0!");
+        NX_ASSERT(limit > 0, Q_FUNC_INFO, "Limit should be greater than 0!");
         if (limit <= 0)
             return QnCameraBookmarkList();
 
@@ -271,7 +271,7 @@ QnCameraBookmarkList QnCameraBookmark::mergeCameraBookmarks(const QnMultiServerC
     , const QnBookmarkSparsingOptions &sparsing
     , int limit)
 {
-    Q_ASSERT_X(limit > 0, Q_FUNC_INFO, "Limit should be greater than 0!");
+    NX_ASSERT(limit > 0, Q_FUNC_INFO, "Limit should be greater than 0!");
     if (limit <= 0)
         return QnCameraBookmarkList();
 
@@ -293,7 +293,7 @@ QnCameraBookmarkList QnCameraBookmark::mergeCameraBookmarks(const QnMultiServerC
 }
 
 QnCameraBookmarkTagList QnCameraBookmarkTag::mergeCameraBookmarkTags(const QnMultiServerCameraBookmarkTagList &source, int limit) {
-    Q_ASSERT_X(limit > 0, Q_FUNC_INFO, "Limit must be correct");
+    NX_ASSERT(limit > 0, Q_FUNC_INFO, "Limit must be correct");
     if (limit <= 0)
         return QnCameraBookmarkTagList();
 

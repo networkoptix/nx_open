@@ -55,6 +55,10 @@ private:
 
     QByteArray getDeviceXml(const QUrl& url);
 
+    QMap<QString, QString> getNxDataByActiModel(const QString& model) const;
+
+    bool isNxDevice(const nx_upnp::DeviceInfo& devInfo) const;
+
     void createResource(
         const nx_upnp::DeviceInfo& devInfo,
         const QnMacAddress& mac,

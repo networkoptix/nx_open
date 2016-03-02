@@ -61,7 +61,7 @@ namespace {
 }
 
 QnCameraAdvancedParams QnCameraAdvancedParamsReader::paramsFromResource(const QnResourcePtr &resource) {
-    Q_ASSERT(resource);
+    NX_ASSERT(resource);
     QByteArray serialized = encodedParamsFromResource(resource).toUtf8();
     if (serialized.isEmpty())
         return QnCameraAdvancedParams();
@@ -69,18 +69,18 @@ QnCameraAdvancedParams QnCameraAdvancedParamsReader::paramsFromResource(const Qn
 }
 
 void QnCameraAdvancedParamsReader::setParamsToResource(const QnResourcePtr &resource, const QnCameraAdvancedParams &params) {
-    Q_ASSERT(resource);
+    NX_ASSERT(resource);
     QByteArray serialized = QJson::serialized(params);
     setEncodedParamsToResource(resource, QString::fromUtf8(serialized));
 }
 
 QString QnCameraAdvancedParamsReader::encodedParamsFromResource(const QnResourcePtr &resource) {
-    Q_ASSERT(resource);
+    NX_ASSERT(resource);
     return resource->getProperty(advancedParametersKey);
 }
 
 void QnCameraAdvancedParamsReader::setEncodedParamsToResource(const QnResourcePtr &resource, const QString &params) {
-    Q_ASSERT(resource);
+    NX_ASSERT(resource);
     resource->setProperty(advancedParametersKey, params);
 }
 
@@ -89,7 +89,7 @@ QnCachingCameraAdvancedParamsReader::QnCachingCameraAdvancedParamsReader(QObject
 {}
 
 QnCameraAdvancedParams QnCachingCameraAdvancedParamsReader::params(const QnResourcePtr &resource) const {
-    Q_ASSERT(resource);
+    NX_ASSERT(resource);
     QnUuid id = resource->getId();
 
     /* Check if we have already read parameters for this camera. */
@@ -123,7 +123,7 @@ bool QnCameraAdvacedParamsXmlParser::validateXml(QIODevice *xmlSource) {
     QXmlSchema schema;
     if (!schema.load(validatorSchemaUrl))
         return false;
-    Q_ASSERT(schema.isValid());
+    NX_ASSERT(schema.isValid());
     QXmlSchemaValidator validator(schema);
     QnXMLValidationMessageHandler msgHandler;
     validator.setMessageHandler(&msgHandler);

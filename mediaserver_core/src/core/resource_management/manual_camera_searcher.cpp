@@ -137,7 +137,7 @@ struct PluginsEnumerator {
         QList<SinglePluginChecker> result;
         for(QnAbstractResourceSearcher* as: QnResourceDiscoveryManager::instance()->plugins()) {
             QnAbstractNetworkResourceSearcher* ns = dynamic_cast<QnAbstractNetworkResourceSearcher*>(as);
-            Q_ASSERT( ns );
+            NX_ASSERT( ns );
             result << SinglePluginChecker(ns, url, auth);
         }
         return result;
@@ -303,7 +303,7 @@ QnManualCameraSearchProcessStatus QnManualCameraSearcher::status() const {
             NX_LOG( lit(" -----------------3 %1 : %2").arg(result.status.current).arg(result.status.total), cl_logDEBUG1 );
         } else {
             const size_t maxProgress = m_scanProgress->progressMaximum() - m_scanProgress->progressMinimum();
-            Q_ASSERT( m_scanProgress->progressMaximum() >= m_scanProgress->progressMinimum() );
+            NX_ASSERT( m_scanProgress->progressMaximum() >= m_scanProgress->progressMinimum() );
             const size_t currentProgress = m_scanProgress->progressValue();
             //considering it to be second half of entire job
             result.status = QnManualResourceSearchStatus(

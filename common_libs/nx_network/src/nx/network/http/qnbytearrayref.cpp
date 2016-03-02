@@ -6,6 +6,7 @@
 #include "qnbytearrayref.h"
 
 #include <cstring>
+#include <nx/utils/log/assert.h>
 
 
 QnByteArrayConstRef::QnByteArrayConstRef()
@@ -25,8 +26,8 @@ QnByteArrayConstRef::QnByteArrayConstRef(
     m_offset( offset ),
     m_count( count == npos ? src.size()-offset : count )
 {
-    Q_ASSERT( m_offset <= (size_type)src.size() );
-    Q_ASSERT( m_count <= (size_type)src.size() );
+    NX_ASSERT( m_offset <= (size_type)src.size() );
+    NX_ASSERT( m_count <= (size_type)src.size() );
 }
 
 const QnByteArrayConstRef::value_type* QnByteArrayConstRef::data() const
@@ -142,7 +143,7 @@ QnByteArrayConstRef QnByteArrayConstRef::trimmed( const value_type* charsToTrim 
 
 void QnByteArrayConstRef::pop_front( size_type count )
 {
-    Q_ASSERT( count <= m_count );
+    NX_ASSERT( count <= m_count );
 
     m_offset += count;
     m_count -= count;
@@ -165,7 +166,7 @@ bool QnByteArrayConstRef::isEqualCaseInsensitive( const char* str, size_t strLen
 
 const QnByteArrayConstRef::value_type& QnByteArrayConstRef::operator[]( size_type index ) const
 {
-    Q_ASSERT( index < m_count );
+    NX_ASSERT( index < m_count );
     return *(constData()+index);
 }
 

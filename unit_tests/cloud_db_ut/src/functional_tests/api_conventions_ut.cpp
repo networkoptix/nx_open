@@ -22,7 +22,7 @@ namespace cdb {
 TEST_F(CdbFunctionalTest, api_conventions_general)
 {
     //waiting for cloud_db initialization
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     api::AccountData account1;
     std::string account1Password;
@@ -89,7 +89,7 @@ TEST_F(CdbFunctionalTest, api_conventions_usingPostMethod)
         testData, api::AccountData(), &success);
     ASSERT_TRUE(success);
 
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     auto client = nx_http::AsyncHttpClient::create();
     QUrl url;
@@ -114,7 +114,7 @@ TEST_F(CdbFunctionalTest, api_conventions_usingPostMethod)
 
 TEST_F(CdbFunctionalTest, api_conventions_jsonInUnauthorizedResponse)
 {
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     for (int i = 0; i < 2; ++i)
     {
@@ -154,7 +154,7 @@ TEST_F(CdbFunctionalTest, api_conventions_jsonInUnauthorizedResponse)
 
 TEST_F(CdbFunctionalTest, api_conventions_jsonInOkResponse)
 {
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     api::AccountData account1;
     std::string account1Password;

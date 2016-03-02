@@ -46,7 +46,7 @@ public:
     }
 
     bool readBool(bool *target) {
-        assert(target);
+        NX_ASSERT(target);
 
         peekMarker();
         if(m_peekedMarker == QnUbjson::TrueMarker) {
@@ -113,7 +113,7 @@ public:
     }
 
     bool readUtf8String(QString *target) {
-        assert(target);
+        NX_ASSERT(target);
 
         QByteArray tmp;
         if(!readUtf8String(&tmp))
@@ -124,7 +124,7 @@ public:
     }
 
     bool readBinaryData(QByteArray *target) {
-        assert(target);
+        NX_ASSERT(target);
 
         if(!readArrayStart())
             return false;
@@ -146,7 +146,7 @@ public:
 
     template <class T, std::size_t N>
     bool readBinaryData(std::array<T, N> *target) {
-        assert(target);
+        NX_ASSERT(target);
         
         if(!readArrayStart())
             return false;
@@ -261,7 +261,7 @@ public:
 private:
     template<class T>
     bool readNumberInternal(QnUbjson::Marker expectedMarker, T *target) {
-        assert(target);
+        NX_ASSERT(target);
 
         peekMarker();
         if(m_peekedMarker != expectedMarker) 
@@ -275,7 +275,7 @@ private:
     }
 
     bool readUtf8StringInternal(QnUbjson::Marker expectedMarker, QByteArray *target) {
-        assert(target);
+        NX_ASSERT(target);
 
         peekMarker();
         if(m_peekedMarker != expectedMarker)
@@ -352,7 +352,7 @@ private:
     }
 
     QnUbjson::Marker readMarkerInternal() {
-        assert(!m_peeked);
+        NX_ASSERT(!m_peeked);
 
         State &state = m_stateStack.back();
         switch (state.status) {

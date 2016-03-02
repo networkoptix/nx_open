@@ -20,7 +20,7 @@ static const std::vector<CloudServerSocket::AcceptorMaker> defaultAcceptorMakers
         if (event.connectionMethods & udpHolePunching)
         {
             event.connectionMethods ^= udpHolePunching; //< used
-            Q_ASSERT(event.udpEndpointList.size() == 1);
+            NX_ASSERT(event.udpEndpointList.size() == 1);
             if (!event.udpEndpointList.size())
                 return std::unique_ptr<AbstractTunnelAcceptor>();
 
@@ -80,18 +80,18 @@ SocketAddress CloudServerSocket::getLocalAddress() const
 
 void CloudServerSocket::close()
 {
-    Q_ASSERT_X(false, Q_FUNC_INFO, "Not implemented...");
+    NX_ASSERT(false, Q_FUNC_INFO, "Not implemented...");
 }
 
 bool CloudServerSocket::isClosed() const
 {
-    Q_ASSERT_X(false, Q_FUNC_INFO, "Not implemented...");
+    NX_ASSERT(false, Q_FUNC_INFO, "Not implemented...");
     return false;
 }
 
 void CloudServerSocket::shutdown()
 {
-    Q_ASSERT_X(false, Q_FUNC_INFO, "Not implemented...");
+    NX_ASSERT(false, Q_FUNC_INFO, "Not implemented...");
 }
 
 bool CloudServerSocket::getLastError(SystemError::ErrorCode* errorCode) const
@@ -106,7 +106,7 @@ bool CloudServerSocket::getLastError(SystemError::ErrorCode* errorCode) const
 
 AbstractSocket::SOCKET_HANDLE CloudServerSocket::handle() const
 {
-    Q_ASSERT(false);
+    NX_ASSERT(false);
     return (AbstractSocket::SOCKET_HANDLE)(-1);
 }
 
@@ -141,7 +141,7 @@ AbstractStreamSocket* CloudServerSocket::accept()
     if (m_socketAttributes.nonBlockingMode && *m_socketAttributes.nonBlockingMode)
     {
         if (auto socket = m_tunnelPool->getNextSocketIfAny())
-            return new StreamSocketWrapper(std::move(socket));
+            return socket.release();
 
         SystemError::setLastErrorCode(SystemError::wouldBlock);
         return nullptr;
@@ -149,13 +149,20 @@ AbstractStreamSocket* CloudServerSocket::accept()
 
     std::promise<SystemError::ErrorCode> promise;
     std::unique_ptr<AbstractStreamSocket> acceptedSocket;
-    acceptAsync([&](SystemError::ErrorCode code, AbstractStreamSocket* socket)
-    {
-        acceptedSocket.reset(socket);
-        promise.set_value(code);
-    });
+    acceptAsync(
+        [&](SystemError::ErrorCode code, AbstractStreamSocket* socket)
+        {
+            acceptedSocket.reset(socket);
+            promise.set_value(code);
+        });
 
-    SystemError::setLastErrorCode(promise.get_future().get());
+    const auto errorCode = promise.get_future().get();
+    if (errorCode != SystemError::noError)
+    {
+        SystemError::setLastErrorCode(errorCode);
+        return nullptr;
+    }
+
     return acceptedSocket.release();
 }
 
@@ -223,7 +230,7 @@ void CloudServerSocket::acceptAsync(
         m_listenIssued = true;
         const auto cloudCredentials =
             SocketGlobals::mediatorConnector().getSystemCredentials();
-        if (cloudCredentials)   //TODO #ak this should be assert, but it will break some tests...
+        if (cloudCredentials)   //TODO #ak this should be NX_ASSERT, but it will break some tests...
         {
             nx::hpm::api::ListenRequest listenRequestData;
             listenRequestData.systemId = cloudCredentials->systemId;
@@ -276,7 +283,7 @@ void CloudServerSocket::startAcceptor(
                     [&](const std::unique_ptr<AbstractTunnelAcceptor>& a)
                     { return a.get() == acceptorPtr; });
 
-                Q_ASSERT_X(it != m_acceptors.end(), Q_FUNC_INFO,
+                NX_ASSERT(it != m_acceptors.end(), Q_FUNC_INFO,
                            "Is acceptor already dead?");
 
                 m_acceptors.erase(it);
@@ -312,7 +319,7 @@ void CloudServerSocket::acceptAsyncInternal(
     m_tunnelPool->getNextSocketAsync(
         [this, handler](std::unique_ptr<AbstractStreamSocket> socket)
         {
-            Q_ASSERT_X(!m_acceptedSocket, Q_FUNC_INFO, "concurrently accepted socket");
+            NX_ASSERT(!m_acceptedSocket, Q_FUNC_INFO, "concurrently accepted socket");
             NX_LOGX(lm("accepted socket %1").arg(socket), cl_logDEBUG2);
 
             m_acceptedSocket = std::move(socket);

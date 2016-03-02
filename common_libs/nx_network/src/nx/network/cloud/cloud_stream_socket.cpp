@@ -206,7 +206,7 @@ void CloudStreamSocket::cancelIOAsync(
 
     if (m_socketDelegate)
     {
-        assert(m_aioThreadBinder->getAioThread() == m_socketDelegate->getAioThread());
+        NX_ASSERT(m_aioThreadBinder->getAioThread() == m_socketDelegate->getAioThread());
     }
 
     m_aioThreadBinder->cancelIOAsync(
@@ -334,7 +334,7 @@ bool CloudStreamSocket::startAsyncConnect(
     const AddressEntry& dnsEntry = dnsEntries[0];
     switch (dnsEntry.type)
     {
-        case AddressType::regular:
+        case AddressType::kLocal:
             //using tcp connection
             m_socketDelegate.reset(new TCPSocket(true));
             setDelegate(m_socketDelegate.get());
@@ -342,7 +342,7 @@ bool CloudStreamSocket::startAsyncConnect(
                 return false;
             for (const auto& attr: dnsEntry.attributes)
             {
-                if (attr.type == AddressAttributeType::nxApiPort)
+                if (attr.type == AddressAttributeType::kPort)
                     port = static_cast<quint16>(attr.value);
             }
             m_socketDelegate->connectAsync(
@@ -350,8 +350,8 @@ bool CloudStreamSocket::startAsyncConnect(
                 std::move(m_connectHandler));
             return true;
 
-        case AddressType::cloud:
-        case AddressType::unknown:  //if peer is unknown, trying to establish cloud connect
+        case AddressType::kCloud:
+        case AddressType::kUnknown:  //if peer is unknown, trying to establish cloud connect
         {
             //establishing cloud connect
             unsigned int sendTimeoutMillis = 0;
@@ -377,7 +377,7 @@ bool CloudStreamSocket::startAsyncConnect(
         }
 
         default:
-            assert(false);
+            NX_ASSERT(false);
             SystemError::setLastErrorCode(SystemError::hostUnreach);
             return false;
     }
@@ -415,13 +415,13 @@ void CloudStreamSocket::onCloudConnectDone(
 {
     if (errorCode == SystemError::noError)
     {
+        NX_ASSERT(cloudConnection->getAioThread() == m_aioThreadBinder->getAioThread());
         m_socketDelegate = std::move(cloudConnection);
-        assert(cloudConnection->getAioThread() == m_aioThreadBinder->getAioThread());
         setDelegate(m_socketDelegate.get());
     }
     else
     {
-        assert(!cloudConnection);
+        NX_ASSERT(!cloudConnection);
     }
     auto userHandler = std::move(m_connectHandler);
     userHandler(errorCode);  //this object can be freed in handler, so using local variable for handler

@@ -120,7 +120,7 @@ T parseMessageBody(const Qn::SerializationFormat& format, const nx_http::BufferT
     default:
         if (success)
             *success = false;
-        Q_ASSERT_X(0, Q_FUNC_INFO, "Unsupported data format");
+        NX_ASSERT(0, Q_FUNC_INFO, "Unsupported data format");
         break;
     }
     return T();

@@ -40,7 +40,7 @@ bool StreamSocketWrapper::getNonBlockingMode(bool* val) const
 
 bool StreamSocketWrapper::connect(const SocketAddress& sa, unsigned int ms)
 {
-    Q_ASSERT_X(false, Q_FUNC_INFO, "Not supported");
+    NX_ASSERT(false, Q_FUNC_INFO, "Not supported");
     return false;
 }
 
@@ -105,7 +105,7 @@ void StreamSocketWrapper::connectAsync(
     const SocketAddress& /*addr*/,
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> /*handler*/)
 {
-    Q_ASSERT_X(false, Q_FUNC_INFO, "Not supported");
+    NX_ASSERT(false, Q_FUNC_INFO, "Not supported");
 }
 
 void StreamSocketWrapper::readSomeAsync(

@@ -6,8 +6,9 @@
 #include "socket_test_helper.h"
 
 #include <atomic>
-
 #include <iostream>
+
+#include <nx/utils/log/log.h>
 
 
 namespace nx {
@@ -77,6 +78,8 @@ static std::map<int, bool> terminatedSocketsIDs;
 
 TestConnection::~TestConnection()
 {
+    NX_LOGX(lm("accepted %1. Destroying...").arg(m_accepted), cl_logDEBUG1);
+
     std::unique_ptr<AbstractStreamSocket> _socket;
     {
         std::unique_lock<std::mutex> lk( m_mutex );
@@ -88,7 +91,7 @@ TestConnection::~TestConnection()
 
     {
         std::unique_lock<std::mutex> lk(mtx1);
-        assert(terminatedSocketsIDs.emplace(m_id, _socket ? true : false).second);
+        NX_ASSERT(terminatedSocketsIDs.emplace(m_id, _socket ? true : false).second);
     }
 #ifdef DEBUG_OUTPUT
     std::cout<<"TestConnection::~TestConnection. "<<m_id<<std::endl;
@@ -110,6 +113,11 @@ int TestConnection::id() const
 void TestConnection::setLocalAddress(SocketAddress addr)
 {
     m_localAddress = std::move(addr);
+}
+
+SocketAddress TestConnection::getLocalAddress() const
+{
+    return m_socket->getLocalAddress();
 }
 
 void TestConnection::start()
@@ -176,16 +184,30 @@ void TestConnection::startIO()
     m_socket->readSomeAsync(
         &m_readBuffer,
         std::bind(&TestConnection::onDataReceived, this, m_id, _1, _2) );
+    NX_LOGX(lm("accepted %1. Sending %2 bytes of data to %3")
+        .arg(m_accepted).arg(m_outData.size())
+        .arg(m_socket->getForeignAddress().toString()),
+        cl_logDEBUG1);
     m_socket->sendAsync(
         m_outData,
         std::bind(&TestConnection::onDataSent, this, m_id, _1, _2) );
 }
 
-void TestConnection::onDataReceived( int id, SystemError::ErrorCode errorCode, size_t bytesRead )
+void TestConnection::onDataReceived(
+    int id,
+    SystemError::ErrorCode errorCode,
+    size_t bytesRead)
 {
-#ifdef DEBUG_OUTPUT
-    std::cout<<"TestConnection::onDataReceived. "<<id<<std::endl;
-#endif
+    if (errorCode == SystemError::noError)
+    {
+        NX_LOGX(lm("accepted %1. Received %2 bytes of data")
+            .arg(m_accepted).arg(bytesRead), cl_logDEBUG1);
+    }
+    else
+    {
+        NX_LOGX(lm("accepted %1. Receive error: %2")
+            .arg(m_accepted).arg(SystemError::toString(errorCode)), cl_logDEBUG1);
+    }
 
     std::unique_lock<std::mutex> lk( m_mutex );
     if( m_terminated )
@@ -210,9 +232,12 @@ void TestConnection::onDataReceived( int id, SystemError::ErrorCode errorCode, s
 
 void TestConnection::onDataSent( int id, SystemError::ErrorCode errorCode, size_t bytesWritten )
 {
-#ifdef DEBUG_OUTPUT
-    std::cout<<"TestConnection::onDataSent. "<<id<<std::endl;
-#endif
+    if (errorCode != SystemError::noError)
+    {
+        NX_LOGX(lm("accepted %1. Send error: %2")
+            .arg(m_accepted).arg(SystemError::toString(errorCode)),
+            cl_logDEBUG1);
+    }
 
     std::unique_lock<std::mutex> lk( m_mutex );
     if( m_terminated )
@@ -236,6 +261,10 @@ void TestConnection::onDataSent( int id, SystemError::ErrorCode errorCode, size_
     }
 
     using namespace std::placeholders;
+    NX_LOGX(lm("accepted %1. Sending %2 bytes of data to %3")
+        .arg(m_accepted).arg(m_outData.size())
+        .arg(m_socket->getForeignAddress().toString()),
+        cl_logDEBUG1);
     m_socket->sendAsync(
         m_outData,
         std::bind(&TestConnection::onDataSent, this, m_id, _1, _2) );
@@ -314,6 +343,9 @@ void RandomDataTcpServer::onNewConnection(
             std::unique_ptr<AbstractStreamSocket>(newConnection),
             m_bytesToSendThrough,
             std::bind(&RandomDataTcpServer::onConnectionDone, this, std::placeholders::_2 )));
+        NX_LOGX(lm("Accepted connection %1. local address %2")
+            .arg(testConnection.get()).arg(testConnection->getLocalAddress().toString()),
+            cl_logDEBUG1);
         testConnection->start();
         QnMutexLocker lk(&m_mutex);
         m_acceptedConnections.emplace_back(std::move(testConnection));
@@ -376,7 +408,7 @@ void ConnectionsGenerator::pleaseStop()
 void ConnectionsGenerator::join()
 {
     std::unique_lock<std::mutex> lk( m_mutex );
-    assert( m_terminated );
+    NX_ASSERT( m_terminated );
     while( !m_connections.empty() )
     {
         std::unique_ptr<TestConnection> connection = std::move(m_connections.front());
@@ -442,7 +474,7 @@ void ConnectionsGenerator::onConnectionFinished(int id, ConnectionsContainer::it
 
     {
         std::unique_lock<std::mutex> lk(mtx1);
-        assert(terminatedSocketsIDs.find(id) == terminatedSocketsIDs.end());
+        NX_ASSERT(terminatedSocketsIDs.find(id) == terminatedSocketsIDs.end());
     }
 
     //if( !m_finishedConnectionsIDs.insert( id ).second )

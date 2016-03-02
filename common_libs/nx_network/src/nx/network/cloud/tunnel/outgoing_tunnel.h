@@ -8,6 +8,7 @@
 #include <utils/common/stoppable.h>
 
 #include "abstract_tunnel_connector.h"
+#include "nx/network/aio/timer.h"
 #include "nx/network/system_socket.h"
 #include "tunnel.h"
 
@@ -70,7 +71,7 @@ private:
         ConnectionRequestData> m_connectHandlers;
     std::map<CloudConnectType, std::unique_ptr<AbstractTunnelConnector>> m_connectors;
     //TODO #ak replace with aio timer when it is available
-    UDPSocket m_aioThreadBinder;
+    aio::Timer m_timer;
     bool m_terminated;
     boost::optional<std::chrono::steady_clock::time_point> m_timerTargetClock;
     int m_counter;

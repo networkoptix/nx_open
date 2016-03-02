@@ -24,8 +24,8 @@ struct FakeTcpTunnelConnection
         m_sockets(sockets),
         m_server(std::make_unique<TCPServerSocket>())
     {
-        assert(m_server->setNonBlockingMode(true));
-        assert(m_server->setReuseAddrFlag(true));
+        NX_ASSERT(m_server->setNonBlockingMode(true));
+        NX_ASSERT(m_server->setReuseAddrFlag(true));
         if (!m_server->bind(address) || !m_server->listen())
             m_sockets = 0;
 
@@ -255,7 +255,7 @@ protected:
             [this](hpm::api::ConnectionRequestedEvent& event)
             {
                 const auto it = m_peerAddresses.find(event.originatingPeerID);
-                assert(it != m_peerAddresses.end());
+                NX_ASSERT(it != m_peerAddresses.end());
 
                 return std::make_unique<FakeTcpTunnelAcceptor>(
                     it->second, kClientCount);

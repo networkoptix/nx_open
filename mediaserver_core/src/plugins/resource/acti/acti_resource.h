@@ -2,7 +2,7 @@
 #define __ACTI_RESOURCE_H__
 
 #ifdef ENABLE_ACTI
-
+#include <QtCore/QFile>
 #include <QtCore/QMap>
 #include <nx/utils/thread/mutex.h>
 
@@ -14,6 +14,8 @@
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/simple_http_client.h>
 #include <nx/network/http/multipartcontentparser.h>
+#include <utils/xml/camera_advanced_param_reader.h>
+
 
 
 class QnActiPtzController;
@@ -27,6 +29,11 @@ class QnActiResource
 
 public:
     static const QString MANUFACTURE;
+    static const QString CAMERA_PARAMETER_GROUP_ENCODER;
+    static const QString CAMERA_PARAMETER_GROUP_SYSTEM;
+    static const QString CAMERA_PARAMETER_GROUP_DEFAULT;
+    static const QString DEFAULT_ADVANCED_PARAMETERS_TEMPLATE;
+    static const QString ADVANCED_PARAMETERS_TEMPLATE_PARAMETER_NAME;
 
     static const int MAX_STREAMS = 2;
 
@@ -37,6 +44,11 @@ public:
     virtual void checkIfOnlineAsync( std::function<void(bool)> completionHandler ) override;
     
     virtual QString getDriverName() const override;
+
+    virtual bool getParamPhysical(const QString &id, QString &value) override;
+    virtual bool getParamsPhysical(const QSet<QString> &idList, QnCameraAdvancedParamValueList& result) override;
+    virtual bool setParamPhysical(const QString &id, const QString& value) override;
+    virtual bool setParamsPhysical(const QnCameraAdvancedParamValueList &values, QnCameraAdvancedParamValueList &result) override;
 
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
 
@@ -111,6 +123,19 @@ private:
     void initializePtz();
     void initializeIO( const QMap<QByteArray, QByteArray>& systemInfo );
     bool isRtspAudioSupported(const QByteArray& platform, const QByteArray& firmware) const;
+    void fetchAndSetAdvancedParameters();
+    QString getAdvancedParametersTemplate() const;
+    bool loadAdvancedParametersTemplateFromFile(QnCameraAdvancedParams& params, const QString& filename);
+    QSet<QString> calculateSupportedAdvancedParameters(const QnCameraAdvancedParams& allParams) const;
+    bool parseParameter(const QString& paramId, QnCameraAdvancedParamValue& param) const;
+    QString getNthParameterInAgregateValue(const QString& paramValue, const int& paramPosition) const;
+    bool setNthParameterInAgregateValue(QString& agregateValue, const QString& paramValue, const int& paramPosition) const;
+    QnCameraAdvancedAgregateParameterInfo getAgregateInfo(const QnCameraAdvancedParameter& param) const;
+    void convertParamValueToInternal(QString& paramValue, const QnCameraAdvancedParameter& param) const;
+    void convertParamValueFromInternal(QString& paramValue, const QnCameraAdvancedParameter& param) const;
+    bool parseCameraParametersResponse(const QByteArray& response, QnCameraAdvancedParamValueList& result) const;
+    QString getParameterGroup(const QnCameraAdvancedParameter& param) const;
+    bool isComponentOfAgregate(const QnCameraAdvancedParameter& param) const;
 
 private:
     class TriggerOutputTask
@@ -161,7 +186,10 @@ private:
     int m_inputCount;
     bool m_inputMonitored;
     QnMutex m_audioCfgMutex;
+    QnMutex m_physicalParamsMutex;
     boost::optional<bool> m_audioInputOn;
+    QnCameraAdvancedParams m_advancedParameters;
+    QnCameraAdvancedParams m_advancedParametersCache;
 };
 
 #endif // #ifdef ENABLE_ACTI

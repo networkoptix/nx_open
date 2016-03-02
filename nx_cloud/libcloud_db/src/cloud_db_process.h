@@ -47,6 +47,9 @@ public:
     //!Implementation of QnStoppable::pleaseStop
     virtual void pleaseStop() override;
 
+    void setOnStartedEventHandler(
+        nx::utils::MoveOnlyFunc<void(bool /*result*/)> handler);
+
 protected:
     virtual int executeApplication() override;
     virtual void start() override;
@@ -59,6 +62,7 @@ private:
     char** m_argv;
     std::atomic<bool> m_terminated;
     int m_timerID;
+    nx::utils::MoveOnlyFunc<void(bool /*result*/)> m_startedEventHandler;
 
     void initializeLogging( const conf::Settings& settings );
     void registerApiHandlers(

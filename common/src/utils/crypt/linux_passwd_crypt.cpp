@@ -11,6 +11,7 @@
 #endif
 
 #include <QCryptographicHash>
+#include <nx/utils/log/assert.h>
 
 
 namespace 
@@ -44,7 +45,7 @@ namespace
     void shiftArrayRight( unsigned char* data, size_t dataSize, size_t bitsCount )
     {
         //TODO #ak moving by number of bytes and modifing bitsCount
-        assert( bitsCount < 8 );
+        NX_ASSERT( bitsCount < 8 );
 
         if( bitsCount == 0 )
             return;
@@ -179,7 +180,7 @@ bool setRootPasswordDigest( const QByteArray& userName, const QByteArray& digest
 
     return shadowFile.write( shadowFileContents ) == shadowFileContents.size();
 #else
-    assert( false );
+    NX_ASSERT( false );
     return false;
 #endif
 }

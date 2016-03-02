@@ -21,7 +21,7 @@ public:
 
 protected:
     virtual void serializeInternal(QnJsonContext *, const void *, QJsonValue *) const override {
-        assert(false); /* Not supported for now. */
+        NX_ASSERT(false); /* Not supported for now. */
     }
 
     virtual bool deserializeInternal(QnJsonContext *ctx, const QJsonValue &value, void *target) const override {
@@ -61,7 +61,7 @@ private:
     template<class T>
     void registerKey(const QString &key) {
         QnJsonSerializer *serializer = QnJsonSerializer::serializer(qMetaTypeId<T>());
-        assert(serializer);
+        NX_ASSERT(serializer);
         m_serializerByKey.insert(key, serializer);
     }
 
@@ -91,7 +91,7 @@ bool QnResourceData::value(const QString &key, int type, void *value, const Copy
         qnWarning("Resource data for key '%1' was requested with a non-standard type '%2'.", key, QMetaType::typeName(type));
 
     QnJsonSerializer *serializer = QnJsonSerializer::serializer(type);
-    assert(serializer);
+    NX_ASSERT(serializer);
 
     QnJsonContext ctx;
     return serializer->deserialize(&ctx, data.json, value);

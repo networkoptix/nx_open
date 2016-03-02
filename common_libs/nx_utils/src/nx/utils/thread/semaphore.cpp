@@ -2,6 +2,7 @@
 
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
+#include <nx/utils/log/assert.h>
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QDateTime>
 
@@ -25,7 +26,7 @@ public:
 
 QnSemaphore::QnSemaphore(int n)
 {
-    Q_ASSERT_X(n >= 0, "QnSemaphore", "parameter 'n' must be non-negative");
+    NX_ASSERT(n >= 0, "QnSemaphore", "parameter 'n' must be non-negative");
     d = new QnSemaphorePrivate(n);
 }
 
@@ -47,7 +48,7 @@ QnSemaphore::~QnSemaphore()
 */
 void QnSemaphore::acquire(int n)
 {
-    Q_ASSERT_X(n >= 0, "QnSemaphore::acquire", "parameter 'n' must be non-negative");
+    NX_ASSERT(n >= 0, "QnSemaphore::acquire", "parameter 'n' must be non-negative");
     QnMutexLocker locker( &d->mutex );
     while (n > d->avail)
         d->cond.wait(locker.mutex());
@@ -66,7 +67,7 @@ void QnSemaphore::acquire(int n)
 */
 void QnSemaphore::release(int n)
 {
-    Q_ASSERT_X(n >= 0, "QnSemaphore::release", "parameter 'n' must be non-negative");
+    NX_ASSERT(n >= 0, "QnSemaphore::release", "parameter 'n' must be non-negative");
     QnMutexLocker locker( &d->mutex );
     d->avail += n;
     d->cond.wakeAll();
@@ -97,7 +98,7 @@ int QnSemaphore::available() const
 */
 bool QnSemaphore::tryAcquire(int n)
 {
-    Q_ASSERT_X(n >= 0, "QnSemaphore::tryAcquire", "parameter 'n' must be non-negative");
+    NX_ASSERT(n >= 0, "QnSemaphore::tryAcquire", "parameter 'n' must be non-negative");
     QnMutexLocker locker( &d->mutex );
     if (n > d->avail)
         return false;
@@ -123,7 +124,7 @@ bool QnSemaphore::tryAcquire(int n)
 */
 bool QnSemaphore::tryAcquire(int n, int timeout)
 {
-    Q_ASSERT_X(n >= 0, "QnSemaphore::tryAcquire", "parameter 'n' must be non-negative");
+    NX_ASSERT(n >= 0, "QnSemaphore::tryAcquire", "parameter 'n' must be non-negative");
     QnMutexLocker locker( &d->mutex );
     if (timeout < 0) {
         while (n > d->avail)

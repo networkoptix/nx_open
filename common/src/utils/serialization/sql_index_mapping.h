@@ -4,6 +4,7 @@
 #include <cassert>
 
 #include <QtCore/QVector>
+#include <nx/utils/log/assert.h>
 
 namespace QnSqlDetail {
     class MappingVisitor;
@@ -16,7 +17,7 @@ public:
     QnSqlIndexMapping() {}
 
     int index(int field) {
-        assert(field >= 0);
+        NX_ASSERT(field >= 0);
 
         if(field >= indices.size())
             return -1;
@@ -25,7 +26,7 @@ public:
     }
 
     void setIndex(int field, int index) {
-        assert(field >= 0);
+        NX_ASSERT(field >= 0);
         
         if(field >= indices.size()) {
             indices.reserve(field + 1);

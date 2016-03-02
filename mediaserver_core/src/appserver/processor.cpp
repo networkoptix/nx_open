@@ -104,7 +104,7 @@ void QnAppserverResourceProcessor::at_mutexLocked()
     if (mutex->checkUserData())
     {
         // add camera if and only if it absent on the other server
-        Q_ASSERT(data.cameraResource->hasFlags(Qn::parent_change) || qnResPool->getAllNetResourceByPhysicalId(mutex->name()).isEmpty());
+        NX_ASSERT(data.cameraResource->hasFlags(Qn::parent_change) || qnResPool->getAllNetResourceByPhysicalId(mutex->name()).isEmpty());
         addNewCameraInternal(data.cameraResource);
     }
 
@@ -134,7 +134,7 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
         return;   //ignoring newly discovered camera
 
     cameraResource->setFlags(cameraResource->flags() & ~Qn::parent_change);
-    Q_ASSERT(!cameraResource->getId().isNull());
+    NX_ASSERT(!cameraResource->getId().isNull());
     QnVirtualCameraResourceList cameras;
     ec2::AbstractECConnectionPtr connect = QnAppServerConnectionFactory::getConnection2();
 

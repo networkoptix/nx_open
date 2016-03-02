@@ -7,6 +7,7 @@
 
 #include <cassert>
 #include <functional>
+#include <nx/utils/log/assert.h>
 
 
 namespace nx {
@@ -36,11 +37,11 @@ class MoveOnlyFunc
         :
             m_func(std::move(const_cast<MoveOnlyFuncWrapper&>(rhs).m_func))
         {
-            assert(false);
+            NX_ASSERT(false);
         }
         MoveOnlyFuncWrapper& operator=(const MoveOnlyFuncWrapper&)
         {
-            assert(false);
+            NX_ASSERT(false);
         }
         MoveOnlyFuncWrapper(MoveOnlyFuncWrapper&& rhs)
         :

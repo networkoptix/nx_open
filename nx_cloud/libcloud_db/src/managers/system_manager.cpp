@@ -315,7 +315,7 @@ void SystemManager::getAccessRoleList(
             cl_logDEBUG2);
     if (accessRole == api::SystemAccessRole::none)
     {
-        Q_ASSERT(false);
+        NX_ASSERT(false);
         return completionHandler(
             api::ResultCode::notAuthorized,
             api::SystemAccessRoleList());
@@ -639,7 +639,7 @@ api::SystemAccessRoleList SystemManager::getSharingPermissions(
     switch (accessRole)
     {
         case api::SystemAccessRole::none:
-            Q_ASSERT(false);
+            NX_ASSERT(false);
             break;
 
         case api::SystemAccessRole::maintenance:
@@ -730,7 +730,7 @@ nx::db::DBResult SystemManager::fetchSystems(QSqlDatabase* connection, int* cons
         auto idCopy = system.id;
         if (!m_cache.insert(std::move(idCopy), std::move(system)))
         {
-            assert(false);
+            NX_ASSERT(false);
         }
 
         //TODO #ak other indexes may be required also (e.g., systems by account, systems by name, etc..)
