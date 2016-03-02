@@ -1,4 +1,4 @@
-QT -= gui core-private
+QT -= gui core core-private
 
 win* {
     DEFINES += UDT_API=__declspec(dllexport)
