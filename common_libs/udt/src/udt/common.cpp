@@ -326,44 +326,25 @@ void CTimer::sleep()
 //
 // Automatically lock in constructor
 CGuard::CGuard(pthread_mutex_t& lock):
-m_Mutex(lock),
-m_iLocked()
+    m_Mutex(lock),
+    m_iLocked(false)
 {
-   #ifndef _WIN32
-      m_iLocked = pthread_mutex_lock(&m_Mutex);
-   #else
-      m_iLocked = WaitForSingleObject(m_Mutex, INFINITE);
-   #endif
+    m_iLocked = enterCS(m_Mutex);
 }
 
 // Automatically unlock in destructor
 CGuard::~CGuard()
 {
-   #ifndef _WIN32
-      if (0 == m_iLocked)
-         pthread_mutex_unlock(&m_Mutex);
-   #else
-      if (WAIT_FAILED != m_iLocked)
-         ReleaseMutex(m_Mutex);
-   #endif
+    unlock();
 }
 
-void CGuard::enterCS(pthread_mutex_t& lock)
+void CGuard::unlock()
 {
-   #ifndef _WIN32
-      pthread_mutex_lock(&lock);
-   #else
-      WaitForSingleObject(lock, INFINITE);
-   #endif
-}
-
-void CGuard::leaveCS(pthread_mutex_t& lock)
-{
-   #ifndef _WIN32
-      pthread_mutex_unlock(&lock);
-   #else
-      ReleaseMutex(lock);
-   #endif
+    if (m_iLocked)
+    {
+        leaveCS(m_Mutex);
+        m_iLocked = false;
+    }
 }
 
 void CGuard::createMutex(pthread_mutex_t& lock)
@@ -403,10 +384,29 @@ void CGuard::releaseCond(pthread_cond_t& cond)
 
 }
 
+bool CGuard::enterCS(pthread_mutex_t& lock)
+{
+#ifndef _WIN32
+    return pthread_mutex_lock(&lock) == 0;
+#else
+    return WaitForSingleObject(lock, INFINITE) == WAIT_OBJECT_0;
+#endif
+}
+
+bool CGuard::leaveCS(pthread_mutex_t& lock)
+{
+#ifndef _WIN32
+    return pthread_mutex_unlock(&lock) == 0;
+#else
+    return ReleaseMutex(lock) != 0;
+#endif
+}
+
+
 //
 CUDTException::CUDTException(int major, int minor, int err):
-m_iMajor(major),
-m_iMinor(minor)
+    m_iMajor(major),
+    m_iMinor(minor)
 {
    if (-1 == err)
       #ifndef _WIN32

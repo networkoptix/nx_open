@@ -216,6 +216,19 @@ int CEPoll::remove_ssock(const int eid, const SYSSOCKET& s)
 
 int CEPoll::wait(const int eid, set<UDTSOCKET>* readfds, set<UDTSOCKET>* writefds, int64_t msTimeOut, set<SYSSOCKET>* lrfds, set<SYSSOCKET>* lwfds)
 {
+    CEPollDesc* epollContext = nullptr;
+    {
+        //NOTE calls with same eid MUST be synchronized by caller!
+            //That is, while we are in this method no calls with same eid are possible
+        CGuard lk(m_EPollLock);
+
+        map<int, CEPollDesc>::iterator it = m_mPolls.find(eid);
+        if (it == m_mPolls.end())
+            throw CUDTException(5, 13);
+        epollContext = &it->second;
+    }
+
+
    // if all fields is NULL and waiting time is infinite, then this would be a deadlock
    if (!readfds && !writefds && !lrfds && lwfds && (msTimeOut < 0))
       throw CUDTException(5, 3, 0);
@@ -231,44 +244,37 @@ int CEPoll::wait(const int eid, set<UDTSOCKET>* readfds, set<UDTSOCKET>* writefd
    int64_t entertime = CTimer::getTime();
    while (true)
    {
-      CGuard::enterCS(m_EPollLock);
+        {
+            CGuard lk(m_EPollLock);
+            if (epollContext->m_sUDTSocksIn.empty() && epollContext->m_sUDTSocksOut.empty() && epollContext->m_sLocals.empty() && (msTimeOut < 0))
+            {
+                // no socket is being monitored, this may be a deadlock
+                throw CUDTException(5, 3);
+            }
 
-      map<int, CEPollDesc>::iterator p = m_mPolls.find(eid);
-      if (p == m_mPolls.end())
-      {
-         CGuard::leaveCS(m_EPollLock);
-         throw CUDTException(5, 13);
-      }
-
-      if (p->second.m_sUDTSocksIn.empty() && p->second.m_sUDTSocksOut.empty() && p->second.m_sLocals.empty() && (msTimeOut < 0))
-      {
-         // no socket is being monitored, this may be a deadlock
-         CGuard::leaveCS(m_EPollLock);
-         throw CUDTException(5, 3);
-      }
-
-      // Sockets with exceptions are returned to both read and write sets.
-      if ((NULL != readfds) && (!p->second.m_sUDTReads.empty() || !p->second.m_sUDTExcepts.empty()))
-      {
-         *readfds = p->second.m_sUDTReads;
-         for (set<UDTSOCKET>::const_iterator i = p->second.m_sUDTExcepts.begin(); i != p->second.m_sUDTExcepts.end(); ++ i)
-            readfds->insert(*i);
-         total += p->second.m_sUDTReads.size() + p->second.m_sUDTExcepts.size();
-      }
-      if ((NULL != writefds) && (!p->second.m_sUDTWrites.empty() || !p->second.m_sUDTExcepts.empty()))
-      {
-         *writefds = p->second.m_sUDTWrites;
-         for (set<UDTSOCKET>::const_iterator i = p->second.m_sUDTExcepts.begin(); i != p->second.m_sUDTExcepts.end(); ++ i)
-            writefds->insert(*i);
-         total += p->second.m_sUDTWrites.size() + p->second.m_sUDTExcepts.size();
-      }
+            // Sockets with exceptions are returned to both read and write sets.
+            if ((NULL != readfds) && (!epollContext->m_sUDTReads.empty() || !epollContext->m_sUDTExcepts.empty()))
+            {
+                *readfds = epollContext->m_sUDTReads;
+                for (set<UDTSOCKET>::const_iterator i = epollContext->m_sUDTExcepts.begin(); i != epollContext->m_sUDTExcepts.end(); ++ i)
+                readfds->insert(*i);
+                total += epollContext->m_sUDTReads.size() + epollContext->m_sUDTExcepts.size();
+            }
+            if ((NULL != writefds) && (!epollContext->m_sUDTWrites.empty() || !epollContext->m_sUDTExcepts.empty()))
+            {
+                *writefds = epollContext->m_sUDTWrites;
+                for (set<UDTSOCKET>::const_iterator i = epollContext->m_sUDTExcepts.begin(); i != epollContext->m_sUDTExcepts.end(); ++ i)
+                writefds->insert(*i);
+                total += epollContext->m_sUDTWrites.size() + epollContext->m_sUDTExcepts.size();
+            }
+        }
 
       if (lrfds || lwfds)
       {
 #if __linux__ 
-         const int max_events = p->second.m_sLocals.size();
+         const int max_events = 1024;
          epoll_event ev[max_events];
-         int nfds = ::epoll_wait(p->second.m_iLocalID, ev, max_events, 0);
+         int nfds = ::epoll_wait(epollContext->m_iLocalID, ev, max_events, 0);
 
          for (int i = 0; i < nfds; ++ i)
          {
@@ -296,7 +302,7 @@ int CEPoll::wait(const int eid, set<UDTSOCKET>* readfds, set<UDTSOCKET>* writefd
             timeout.tv_nsec = (msTimeOut % MILLIS_IN_SEC) * NSEC_IN_MS;
         }
         int nfds = kevent(
-            p->second.m_iLocalID,
+            epollContext->m_iLocalID,
             NULL,
             0,
             ev,
@@ -327,7 +333,7 @@ int CEPoll::wait(const int eid, set<UDTSOCKET>* readfds, set<UDTSOCKET>* writefd
          FD_ZERO(&readfds);
          FD_ZERO(&writefds);
 
-         for (map<SYSSOCKET, int>::const_iterator i = p->second.m_sLocals.begin(); i != p->second.m_sLocals.end(); ++ i)
+         for (map<SYSSOCKET, int>::const_iterator i = epollContext->m_sLocals.begin(); i != epollContext->m_sLocals.end(); ++ i)
          {
             if (lrfds && (i->second & UDT_EPOLL_IN) > 0)
                FD_SET(i->first, &readfds);
@@ -341,7 +347,7 @@ int CEPoll::wait(const int eid, set<UDTSOCKET>* readfds, set<UDTSOCKET>* writefd
          if (::select(0, &readfds, &writefds, NULL, &tv) > 0)
          {
             //TODO #ak use win32-specific select features to get O(1) here
-            for (map<SYSSOCKET, int>::const_iterator i = p->second.m_sLocals.begin(); i != p->second.m_sLocals.end(); ++ i)
+            for (map<SYSSOCKET, int>::const_iterator i = epollContext->m_sLocals.begin(); i != epollContext->m_sLocals.end(); ++ i)
             {
                if (lrfds && FD_ISSET(i->first, &readfds))
                {
@@ -357,8 +363,6 @@ int CEPoll::wait(const int eid, set<UDTSOCKET>* readfds, set<UDTSOCKET>* writefd
          }
 #endif
       }
-
-      CGuard::leaveCS(m_EPollLock);
 
       if (total > 0)
          return total;
@@ -411,7 +415,7 @@ void update_epoll_sets(const UDTSOCKET& uid, const set<UDTSOCKET>& watch, set<UD
 
 int CEPoll::update_events(const UDTSOCKET& uid, std::set<int>& eids, int events, bool enable)
 {
-   CGuard pg(m_EPollLock);
+    CGuard pg(m_EPollLock);
 
    map<int, CEPollDesc>::iterator p;
 
