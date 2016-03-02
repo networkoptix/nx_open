@@ -120,9 +120,10 @@ def copy_package(package):
             return True
 
         copy_package_for_configuration(versioned, debug_path, True)
+
         debug_pri_file = os.path.join(debug_path, package + "-debug.pri")
         if os.path.isfile(debug_pri_file):
-            append_pri(debug_pri_file)
+            append_pri(debug_pri_file, True)
         elif os.path.isfile(pri_file):
             append_pri(pri_file, True)
 
