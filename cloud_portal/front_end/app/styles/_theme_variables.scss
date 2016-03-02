@@ -68,7 +68,6 @@ $input-height-base:       32px;
 $input-bg:                $light1;
 $input-color:             $dark4;
 $input-border-focus:      $blue10;
-$state-danger-text:       $error;
 $input-bg-disabled:       transparentize($light5,0.75);
 $cursor-disabled:           default;
 $padding-input-horizontal:  10px;
@@ -94,9 +93,18 @@ $state-success-text:             $green3;
 $state-success-bg:               $green2;
 $state-success-border:           $green1;
 
-$state-danger-text:                $red3;
-$state-danger-bg:                  $red2;
-$state-danger-border:              $red1;
+
+
+$state-danger-text:       $error;
+
+/*
+$state-danger-bg:                $red2;
+$state-danger-border:            $red1;
+*/
+
+$alert-danger-bg:              $red3;
+$alert-danger-border:          $red2;
+$alert-danger-text:            $red1;
 
 
 $state-warning-text:             #8a6d3b !default;
