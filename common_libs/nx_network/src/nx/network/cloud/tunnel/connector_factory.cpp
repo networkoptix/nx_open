@@ -22,7 +22,7 @@ ConnectorFactory::CloudConnectors
 
     CloudConnectors connectors;
     connectors.emplace(
-        CloudConnectType::udtHp,
+        CloudConnectType::kUdtHp,
         std::make_unique<UdpHolePunchingTunnelConnector>(
             address));
     return connectors;

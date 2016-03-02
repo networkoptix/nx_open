@@ -334,7 +334,7 @@ bool CloudStreamSocket::startAsyncConnect(
     const AddressEntry& dnsEntry = dnsEntries[0];
     switch (dnsEntry.type)
     {
-        case AddressType::regular:
+        case AddressType::kLocal:
             //using tcp connection
             m_socketDelegate.reset(new TCPSocket(true));
             setDelegate(m_socketDelegate.get());
@@ -342,7 +342,7 @@ bool CloudStreamSocket::startAsyncConnect(
                 return false;
             for (const auto& attr: dnsEntry.attributes)
             {
-                if (attr.type == AddressAttributeType::nxApiPort)
+                if (attr.type == AddressAttributeType::kPort)
                     port = static_cast<quint16>(attr.value);
             }
             m_socketDelegate->connectAsync(
@@ -350,8 +350,8 @@ bool CloudStreamSocket::startAsyncConnect(
                 std::move(m_connectHandler));
             return true;
 
-        case AddressType::cloud:
-        case AddressType::unknown:  //if peer is unknown, trying to establish cloud connect
+        case AddressType::kCloud:
+        case AddressType::kUnknown:  //if peer is unknown, trying to establish cloud connect
         {
             //establishing cloud connect
             unsigned int sendTimeoutMillis = 0;

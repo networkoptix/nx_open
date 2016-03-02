@@ -266,7 +266,7 @@ TEST_F(OutgoingTunnelTest, general)
             {
                 ConnectorFactory::CloudConnectors connectors;
                 connectors.emplace(
-                    CloudConnectType::udtHp,
+                    CloudConnectType::kUdtHp,
                     std::make_unique<DummyConnector>(
                         targetAddress,
                         connectorWillSucceed,
@@ -344,7 +344,7 @@ TEST_F(OutgoingTunnelTest, singleShotConnection)
         {
             ConnectorFactory::CloudConnectors connectors;
             connectors.emplace(
-                CloudConnectType::udtHp,
+                CloudConnectType::kUdtHp,
                 std::make_unique<DummyConnector>(
                     targetAddress,
                     connectorWillSucceed,
@@ -402,7 +402,7 @@ TEST_F(OutgoingTunnelTest, handlersQueueingWhileInConnectingState)
         {
             ConnectorFactory::CloudConnectors connectors;
             connectors.emplace(
-                CloudConnectType::udtHp,
+                CloudConnectType::kUdtHp,
                 std::make_unique<DummyConnector>(
                     targetAddress,
                     &doConnectEvent));
@@ -458,7 +458,7 @@ TEST_F(OutgoingTunnelTest, cancellation)
                 {
                     ConnectorFactory::CloudConnectors connectors;
                     connectors.emplace(
-                        CloudConnectType::udtHp,
+                        CloudConnectType::kUdtHp,
                         std::make_unique<DummyConnector>(
                             targetAddress,
                             connectorWillSucceed,
@@ -516,7 +516,7 @@ TEST_F(OutgoingTunnelTest, connectTimeout)
                 {
                     ConnectorFactory::CloudConnectors connectors;
                     connectors.emplace(
-                        CloudConnectType::udtHp,
+                        CloudConnectType::kUdtHp,
                         std::make_unique<DummyConnector>(
                             targetAddress,
                             connectorTimeout,

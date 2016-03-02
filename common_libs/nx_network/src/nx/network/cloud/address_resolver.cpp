@@ -6,74 +6,75 @@
 #include <nx/network/socket_global.h>
 #include <nx/network/stun/cc/custom_stun.h>
 
-static const auto DNS_CACHE_TIME = std::chrono::seconds( 10 );
-static const auto MEDIATOR_CACHE_TIME = std::chrono::minutes( 1 );
+static const auto DNS_CACHE_TIME = std::chrono::seconds(10);
+static const auto MEDIATOR_CACHE_TIME = std::chrono::minutes(1);
 
 namespace nx {
 namespace network {
 namespace cloud {
 
-QString toString( const AddressType& type )
+QString toString(const AddressType& type)
 {
-    switch( type )
+    switch(type)
     {
-        case AddressType::unknown:  return lit( "unknown" );
-        case AddressType::regular:  return lit( "regular" );
-        case AddressType::cloud:    return lit( "cloud" );
+        case AddressType::kUnknown: return lit("kUnknown");
+        case AddressType::kCloud: return lit("kCloud");
     };
 
     NX_ASSERT( false, Q_FUNC_INFO, "undefined AddressType" );
     return lit( "undefined=%1" ).arg( static_cast< int >( type ) );
 }
 
-AddressAttribute::AddressAttribute( AddressAttributeType type_, quint64 value_ )
+AddressAttribute::AddressAttribute(AddressAttributeType type_, quint64 value_)
     : type( type_ )
     , value( value_ )
 {
 }
 
-bool AddressAttribute::operator ==( const AddressAttribute& rhs ) const
+bool AddressAttribute::operator ==(const AddressAttribute& rhs) const
 {
     return type == rhs.type && value == rhs.value;
 }
 
-bool AddressAttribute::operator <( const AddressAttribute& rhs ) const
+bool AddressAttribute::operator <(const AddressAttribute& rhs) const
 {
     return type < rhs.type && value < rhs.value;
 }
 
 QString AddressAttribute::toString() const
 {
-    switch( type )
+    switch(type)
     {
-        case AddressAttributeType::nxApiPort:
-            return lit( "nxApiPort=%1" ).arg( value );
+        case AddressAttributeType::kUnknown:
+            return lit("kUnknown");
+        case AddressAttributeType::kPort:
+            return lit("kPort=%1").arg(value);
     };
 
     NX_ASSERT( false, Q_FUNC_INFO, "undefined AddressAttributeType" );
     return lit( "undefined=%1" ).arg( static_cast< int >( type ) );
 }
 
-AddressEntry::AddressEntry( AddressType type_, HostAddress host_ )
+AddressEntry::AddressEntry(AddressType type_, HostAddress host_)
     : type( type_ )
     , host( std::move( host_ ) )
 {
 }
 
-AddressEntry::AddressEntry( const SocketAddress& address )
-    : type(AddressType::regular)
+AddressEntry::AddressEntry(const SocketAddress& address)
+    : type(AddressType::kLocal)
     , host(address.address)
 {
     attributes.push_back(AddressAttribute(
-        AddressAttributeType::nxApiPort, address.port));
+        AddressAttributeType::kPort, address.port));
 }
 
-bool AddressEntry::operator ==( const AddressEntry& rhs ) const
+bool AddressEntry::operator ==(const AddressEntry& rhs) const
 {
     return type == rhs.type && host == rhs.host && attributes == rhs.attributes;
 }
 
-bool AddressEntry::operator <( const AddressEntry& rhs ) const
+bool AddressEntry::operator <(const AddressEntry& rhs) const
 {
     return type < rhs.type && host < rhs.host && attributes < rhs.attributes;
 }
@@ -87,13 +88,14 @@ QString AddressEntry::toString() const
 }
 
 AddressResolver::AddressResolver(
-        std::shared_ptr<hpm::api::MediatorClientTcpConnection> mediatorConnection)
-    : m_mediatorConnection(std::move(mediatorConnection))
+    std::shared_ptr<hpm::api::MediatorClientTcpConnection> mediatorConnection)
+:
+    m_mediatorConnection(std::move(mediatorConnection))
 {
 }
 
-void AddressResolver::addFixedAddress( const HostAddress& hostName,
-                                       const SocketAddress& hostAddress )
+void AddressResolver::addFixedAddress(
+    const HostAddress& hostName, const SocketAddress& hostAddress )
 {
     NX_ASSERT(!hostName.isResolved(), Q_FUNC_INFO, "Hostname should be unresolved");
 
@@ -109,13 +111,14 @@ void AddressResolver::addFixedAddress( const HostAddress& hostName,
 
         entries.push_back(std::move(entry));
 
-        // we possibly could also grabHandlers to bring the result before DNS is
-        // resolved (if in progress), but it does not cause a serious delay so far
+        // we possibly could also grabHandlers() to bring the result before DNS
+        // is resolved (if in progress), but it does not cause a serious delay
+        // so far
     }
 }
 
-void AddressResolver::removeFixedAddress( const HostAddress& hostName,
-                                          const SocketAddress& hostAddress )
+void AddressResolver::removeFixedAddress(
+    const HostAddress& hostName, const SocketAddress& hostAddress)
 {
     QnMutexLocker lk(&m_mutex);
     AddressEntry entry(hostAddress);
@@ -132,9 +135,10 @@ void AddressResolver::removeFixedAddress( const HostAddress& hostName,
 }
 
 void AddressResolver::resolveDomain(
-    const HostAddress& domain, std::function<void(std::vector<HostAddress>)> handler )
+    const HostAddress& domain,
+    utils::MoveOnlyFunc<void(std::vector<TypedAddres>)> handler)
 {
-    std::vector<HostAddress> subdomains;
+    std::vector<TypedAddres> subdomains;
     const auto suffix = lit(".") + domain.toString();
     {
         // TODO: #mux Think about better representation to increase performance
@@ -143,7 +147,10 @@ void AddressResolver::resolveDomain(
             if (info.first.toString().endsWith(suffix) &&
                 !info.second.getAll().empty())
             {
-                subdomains.push_back(info.first);
+                bool hasFixed = !info.second.fixedEntries.empty();
+                subdomains.emplace_back(
+                    info.first,
+                    hasFixed ? AddressType::kLocal : AddressType::kCloud);
             }
     }
 
@@ -151,23 +158,14 @@ void AddressResolver::resolveDomain(
     handler(std::move(subdomains));
 }
 
-template< typename T >
-static QString containerToQString( const T& container )
-{
-    QString str;
-    for( const auto& each : container )
-        str += lit(" ") + each.toString();
-    return str;
-}
-
 void AddressResolver::resolveAsync(
-        const HostAddress& hostName, ResolveHandler handler,
-        bool natTraversal, void* requestId )
+    const HostAddress& hostName, ResolveHandler handler,
+    bool natTraversal, void* requestId)
 {
     if( hostName.isResolved() )
         return handler( SystemError::noError,
                         std::vector< AddressEntry >( 1, AddressEntry(
-                            AddressType::regular, hostName ) ) );
+                            AddressType::kLocal, hostName ) ) );
 
     QnMutexLocker lk( &m_mutex );
     auto info = m_info.emplace( hostName, HostAddressInfo() ).first;
@@ -202,8 +200,8 @@ void AddressResolver::resolveAsync(
             mediatorResolve( info, &lk );
 }
 
-std::vector< AddressEntry > AddressResolver::resolveSync(
-        const HostAddress& hostName, bool natTraversal = false )
+std::vector<AddressEntry> AddressResolver::resolveSync(
+     const HostAddress& hostName, bool natTraversal = false)
 {
     std::promise< std::vector< AddressEntry > > promise;
     auto handler = [ & ]( SystemError::ErrorCode code,
@@ -221,7 +219,8 @@ std::vector< AddressEntry > AddressResolver::resolveSync(
     return promise.get_future().get();
 }
 
-void AddressResolver::cancel( void* requestId, nx::utils::MoveOnlyFunc< void() > handler )
+void AddressResolver::cancel(
+    void* requestId, nx::utils::MoveOnlyFunc<void()> handler)
 {
     boost::optional< std::promise< bool > > promise;
     if( !handler )
@@ -251,7 +250,7 @@ void AddressResolver::cancel( void* requestId, nx::utils::MoveOnlyFunc< void() >
         promise->get_future().wait();
 }
 
-bool AddressResolver::isRequestIdKnown( void* requestId ) const
+bool AddressResolver::isRequestIdKnown(void* requestId) const
 {
     QnMutexLocker lk( &m_mutex );
     return m_requests.count( requestId );
@@ -277,7 +276,7 @@ AddressResolver::HostAddressInfo::HostAddressInfo()
 }
 
 void AddressResolver::HostAddressInfo::setDnsEntries(
-        std::vector< AddressEntry > entries )
+    std::vector<AddressEntry> entries )
 {
     m_dnsState = State::resolved;
     m_dnsResolveTime = std::chrono::system_clock::now();
@@ -309,7 +308,7 @@ void AddressResolver::HostAddressInfo::checkExpirations()
     }
 }
 
-bool AddressResolver::HostAddressInfo::isResolved( bool natTraversal ) const
+bool AddressResolver::HostAddressInfo::isResolved(bool natTraversal) const
 {
     if( !fixedEntries.empty() )
         return true; // fixed entries are in priority
@@ -323,7 +322,7 @@ bool AddressResolver::HostAddressInfo::isResolved( bool natTraversal ) const
     return ( !natTraversal || m_mediatorState == State::resolved );
 }
 
-std::vector< AddressEntry > AddressResolver::HostAddressInfo::getAll() const
+std::vector<AddressEntry> AddressResolver::HostAddressInfo::getAll() const
 {
     std::vector< AddressEntry > entries( fixedEntries );
     entries.insert( entries.end(), m_dnsEntries.begin(), m_dnsEntries.end() );
@@ -332,11 +331,12 @@ std::vector< AddressEntry > AddressResolver::HostAddressInfo::getAll() const
 }
 
 AddressResolver::RequestInfo::RequestInfo(
-        HostAddress _address, bool _natTraversal, ResolveHandler _handler )
-    : address( std::move( _address ) )
-    , inProgress( false )
-    , natTraversal( _natTraversal )
-    , handler( std::move( _handler ) )
+    HostAddress _address, bool _natTraversal, ResolveHandler _handler)
+:
+    address( std::move( _address ) ),
+    inProgress( false ),
+    natTraversal( _natTraversal ),
+    handler( std::move( _handler ) )
 {
 }
 
@@ -350,7 +350,7 @@ AddressResolver::RequestInfo::RequestInfo(RequestInfo&& right)
 {
 }
 
-void AddressResolver::dnsResolve( HaInfoIterator info )
+void AddressResolver::dnsResolve(HaInfoIterator info)
 {
     auto functor = [ = ]( SystemError::ErrorCode code, const HostAddress& host )
     {
@@ -361,7 +361,7 @@ void AddressResolver::dnsResolve( HaInfoIterator info )
         std::vector< AddressEntry > entries;
         if( code == SystemError::noError )
         {
-            entries.push_back( AddressEntry( AddressType::regular, hostAddress ) );
+            entries.push_back( AddressEntry( AddressType::kLocal, hostAddress ) );
             NX_LOGX( lit( "Address %1 is resolved to %2" )
                      .arg( info->first.toString() )
                      .arg( hostAddress.toString() ), cl_logDEBUG1 );
@@ -382,7 +382,7 @@ void AddressResolver::dnsResolve( HaInfoIterator info )
     m_dnsResolver.resolveAddressAsync( info->first, std::move( functor ), this );
 }
 
-void AddressResolver::mediatorResolve( HaInfoIterator info, QnMutexLockerBase* lk )
+void AddressResolver::mediatorResolve(HaInfoIterator info, QnMutexLockerBase* lk)
 {
     info->second.mediatorProgress();
     lk->unlock();
@@ -400,16 +400,17 @@ void AddressResolver::mediatorResolve( HaInfoIterator info, QnMutexLockerBase* l
             {
                 for (const auto& it : response.endpoints)
                 {
-                    AddressEntry entry( AddressType::regular, it.address );
+                    AddressEntry entry( AddressType::kLocal, it.address );
                     entry.attributes.push_back( AddressAttribute(
-                        AddressAttributeType::nxApiPort, it.port ) );
+                        AddressAttributeType::kPort, it.port ) );
                     entries.push_back( std::move( entry ) );
                 }
 
-                //if target host supports cloud connect, adding corresponding address entry
+                // if target host supports cloud connect, adding corresponding
+                // address entry
                 if (response.connectionMethods != 0)
                     entries.emplace_back(
-                        AddressType::cloud,
+                        AddressType::kCloud,
                         HostAddress(info->first.toString()));
             }
 
@@ -418,7 +419,7 @@ void AddressResolver::mediatorResolve( HaInfoIterator info, QnMutexLockerBase* l
         });
 }
 
-std::vector< Guard > AddressResolver::grabHandlers(
+std::vector<Guard> AddressResolver::grabHandlers(
         SystemError::ErrorCode lastErrorCode, HaInfoIterator info,
         QnMutexLockerBase* /*lk*/ )
 {
