@@ -39,6 +39,7 @@
         <android.defines/>
         <ios.defines/>
         <rdep.packages>openssl</rdep.packages>
+        <rdep.windows.packages>quazip</rdep.windows.packages>
         <rdep.linux.packages>quazip</rdep.linux.packages>
 
         <project.version.code>${buildNumber}</project.version.code>

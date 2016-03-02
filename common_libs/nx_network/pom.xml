@@ -39,6 +39,7 @@
         <ios.defines/>
         <buildLib>sharedLib</buildLib>
         <rdep.packages>openssl</rdep.packages>
+        <rdep.windows.packages>quazip</rdep.windows.packages>
         <rdep.linux.packages>quazip</rdep.linux.packages>
         <rdep.mac.packages>quazip</rdep.mac.packages>
     </properties>
