@@ -46,9 +46,6 @@ QString AddressAttribute::toString() const
 {
     switch( type )
     {
-        case AddressAttributeType::peerFoundPassively:
-            return lit( "peerFoundPassively" );
-
         case AddressAttributeType::nxApiPort:
             return lit( "nxApiPort=%1" ).arg( value );
     };
