@@ -16,26 +16,26 @@ def fetch_packages(packages):
     versioned = [dependencies.get_versioned_package_name(package) for package in packages]
     return rdep.fetch_packages(dependencies.TARGET, versioned, debug)
 
-    
+
 #Supports templates such as bin/*.dll
 def copy_recursive(src, dst):
     contains_template = "*" in src
-    
+
     source_dir = src
     template = "*"
     if contains_template:
         template_pos = src.rfind(os.sep)
         source_dir = src[:template_pos]
         template = src[template_pos+1:]
-    
+
     dst_dir = dst
     if contains_template:
         template_pos = dst.rfind(os.sep)
         dst_dir = dst[:template_pos]
-    
+
     if not os.path.exists(source_dir):
         return
-    
+
     print "Walking.."
     for dirname, _, filenames in os.walk(source_dir):
         rel_dir = os.path.relpath(dirname, source_dir)
@@ -120,10 +120,10 @@ def copy_package(package):
             return True
 
         copy_package_for_configuration(versioned, debug_path, True)
-        debug_pri_file = os.path.join(release_path, package + "-debug.pri")
+        debug_pri_file = os.path.join(debug_path, package + "-debug.pri")
         if os.path.isfile(debug_pri_file):
             append_pri(debug_pri_file)
-        else:
+        elif os.path.isfile(pri_file):
             append_pri(pri_file, True)
 
     return True
