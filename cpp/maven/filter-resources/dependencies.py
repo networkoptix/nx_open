@@ -4,9 +4,15 @@
 import os
 
 TARGET = "${rdep.target}"
-BUILD_CONFIGURATION = "${build.configuration}"
-TARGET_DIRECTORY = "${libdir}"
 RDEP_PATH = os.path.join("${environment.dir}", "rdep")
+BUILD_CONFIGURATION = "${build.configuration}"
+PLATFORM = "${platform}"
+
+if "windows" in PLATFORM:
+    TARGET_DIRECTORY = "${libdir}/${arch}"
+else:
+    TARGET_DIRECTORY = "${libdir}"
+
 
 #TODO: This needs a better place
 DEPENDENCY_VERSIONS = {

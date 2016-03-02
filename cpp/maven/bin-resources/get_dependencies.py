@@ -4,6 +4,7 @@
 import os, sys, shutil
 import dependencies
 import ConfigParser
+import fnmatch
 
 sys.path.insert(0, dependencies.RDEP_PATH)
 import rdep
@@ -15,16 +16,39 @@ def fetch_packages(packages):
     versioned = [dependencies.get_versioned_package_name(package) for package in packages]
     return rdep.fetch_packages(dependencies.TARGET, versioned, debug)
 
+    
+#Supports templates such as bin/*.dll
 def copy_recursive(src, dst):
-    for dirname, _, filenames in os.walk(src):
-        rel_dir = os.path.relpath(dirname, src)
-        dir = os.path.abspath(os.path.join(dst, rel_dir))
+    contains_template = "*" in src
+    
+    source_dir = src
+    template = "*"
+    if contains_template:
+        template_pos = src.rfind(os.sep)
+        source_dir = src[:template_pos]
+        template = src[template_pos+1:]
+    
+    dst_dir = dst
+    if contains_template:
+        template_pos = dst.rfind(os.sep)
+        dst_dir = dst[:template_pos]
+    
+    if not os.path.exists(source_dir):
+        return
+    
+    print "Walking.."
+    for dirname, _, filenames in os.walk(source_dir):
+        rel_dir = os.path.relpath(dirname, source_dir)
+        dir = os.path.abspath(os.path.join(dst_dir, rel_dir))
         if not os.path.isdir(dir):
             os.makedirs(dir)
         for filename in filenames:
+            if contains_template and not fnmatch.fnmatch(filename, template):
+                continue
             entry = os.path.join(dirname, filename)
             shutil.copy2(entry, dir)
 
+#TODO: this parser functionality should be moved to RDep
 def get_copy_list(package_dir):
     config = ConfigParser.ConfigParser()
     config.read(os.path.join(package_dir, rdep.PACKAGE_CONFIG_NAME))
@@ -42,22 +66,13 @@ def install_dependency(dependency_dir, target_dir, debug):
 
     for entry in copy_list:
         src = os.path.join(dependency_dir, entry)
-
-        if not os.path.exists(src):
-            continue
-
-        debug_dst = os.path.join(bin_dst, "debug", os.path.basename(entry))
-        if not os.path.isdir(debug_dst):
-            os.makedirs(debug_dst)
-        print "Copying {0} to {1}".format(src, debug_dst)
-        copy_recursive(src, debug_dst)
-
-        if not debug:
-            release_dst = os.path.join(bin_dst, "release", os.path.basename(entry))
-            if not os.path.isdir(release_dst):
-                os.makedirs(release_dst)
-            print "Copying {0} to {1}".format(src, release_dst)
-            copy_recursive(src, release_dst)
+        dst_build_config = "debug" if debug else "release"
+        dst = os.path.join(bin_dst, dst_build_config, os.path.basename(entry))
+        contains_template = "*" in entry
+        if not contains_template and not os.path.isdir(dst):
+            os.makedirs(dst)
+        print "Copying {0} to {1}".format(src, dst)
+        copy_recursive(src, dst)
 
 def copy_package_for_configuration(package, path, debug):
     target_dir = dependencies.TARGET_DIRECTORY
