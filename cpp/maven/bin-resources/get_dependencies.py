@@ -4,7 +4,7 @@
 import os, sys, shutil
 import dependencies
 import ConfigParser
-import fnmatch
+import glob
 
 sys.path.insert(0, dependencies.RDEP_PATH)
 import rdep
@@ -19,36 +19,27 @@ def fetch_packages(packages):
 
 #Supports templates such as bin/*.dll
 def copy_recursive(src, dst):
-    contains_template = "*" in src
+    if "*" in src:
+        entries = glob.glob(src)
+    else:
+        entries = [ src ]
 
-    source_dir = src
-    template = "*"
-    if contains_template:
-        template_pos = src.rfind('/')   #hardcode, requires refactoring
-        source_dir = src[:template_pos]
-        template = src[template_pos+1:]
+    for entry in entries:
+        if os.path.isfile(entry):
+            shutil.copy2(entry, dst)
 
-    dst_dir = dst
-    if contains_template:
-        template_pos = dst.rfind(os.sep)
-        dst_dir = dst[:template_pos]
+        elif os.path.isdir(entry):
+            dst_basedir = os.path.join(dst, os.path.basename(entry))
 
-    if not os.path.exists(source_dir):
-        return
+            for dirname, _, filenames in os.walk(entry):
+                rel_dir = os.path.relpath(dirname, entry)
+                dst_dir = os.path.abspath(os.path.join(dst_basedir, rel_dir))
 
-    print "Walking over {0}, destination is {1}".format(source_dir, dst_dir)
-    for dirname, _, filenames in os.walk(source_dir):
-        rel_dir = os.path.relpath(dirname, source_dir)
-        dir = os.path.abspath(os.path.join(dst_dir, rel_dir))
-        print "Processing dir {0}, copying into {1}".format(dirname, dir)
-        if not os.path.isdir(dir):
-            os.makedirs(dir)
-        for filename in filenames:
-            if contains_template and not fnmatch.fnmatch(filename, template):
-                print "File {0} does not match template {1}".format(filename, template)
-                continue
-            entry = os.path.join(dirname, filename)
-            shutil.copy2(entry, dir)
+                if not os.path.isdir(dst_dir):
+                    os.makedirs(dst_dir)
+
+                for filename in filenames:
+                    shutil.copy2(os.path.join(dirname, filename), dst_dir)
 
 #TODO: this parser functionality should be moved to RDep
 def get_copy_list(package_dir):
@@ -56,25 +47,22 @@ def get_copy_list(package_dir):
     config.read(os.path.join(package_dir, rdep.PACKAGE_CONFIG_NAME))
 
     if not config.has_option("General", "copy"):
-        return [ "bin/*.*" ]
+        return [ "bin/*" ]
 
     return config.get("General", "copy").split()
 
 def install_dependency(dependency_dir, target_dir, debug):
     print "Installing dependency from {0}".format(dependency_dir)
-    bin_dst = os.path.join(target_dir, "bin")
+    bin_dst = os.path.join(target_dir, "bin", "debug" if debug else "release")
+    if not os.path.isdir(bin_dst):
+        os.makedirs(bin_dst)
 
     copy_list = get_copy_list(dependency_dir)
 
     for entry in copy_list:
         src = os.path.join(dependency_dir, entry)
-        dst_build_config = "debug" if debug else "release"
-        dst = os.path.join(bin_dst, dst_build_config, os.path.basename(entry))
-        contains_template = "*" in entry
-        if not contains_template and not os.path.isdir(dst):
-            os.makedirs(dst)
-        print "Copying {0} to {1}".format(src, dst)
-        copy_recursive(src, dst)
+        print "Copying {0} to {1}".format(src, bin_dst)
+        copy_recursive(src, bin_dst)
 
 def copy_package_for_configuration(package, path, debug):
     target_dir = dependencies.TARGET_DIRECTORY
