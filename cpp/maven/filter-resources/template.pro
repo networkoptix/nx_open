@@ -44,7 +44,7 @@ CONFIG(debug, debug|release) {
     CONFIG += console
   }
   win* {
-    LIBS = ${windows.oslibs.debug}
+    LIBS += ${windows.oslibs.debug}
   } else {
     DEFINES += _DEBUG
   }
@@ -57,7 +57,7 @@ else {
   CONFIG += silent
   CONFIGURATION=release
   win* {
-    LIBS = ${windows.oslibs.release}
+    LIBS += ${windows.oslibs.release}
   }
 
   !win32 {
