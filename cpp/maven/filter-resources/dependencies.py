@@ -43,15 +43,24 @@ def get_versioned_package_name(package):
         return package + "-" + version
     return package
 
-def make_list(string):
-    return [v.strip() for v in string.split(',') if v]
-
 def get_packages():
     packages = """${rdep.packages}"""
+
+    if TARGET.startswith("windows"):
+        packages += """ ${rdep.windows.packages}"""
+    elif TARGET.startswith("linux"):
+        packages += """ ${rdep.linux.packages}"""
+    elif TARGET.startswith("macos"):
+        packages += """ ${rdep.mac.packages}"""
+    elif TARGET.startswith("android"):
+        packages += """ ${rdep.android.packages}"""
+    elif TARGET.startswith("ios"):
+        packages += """ ${rdep.ios.packages}"""
+
     if '${' in packages:
         return []
 
-    return make_list(packages)
+    return packages.split()
 
 def print_configuration():
     print get_packages()

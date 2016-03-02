@@ -24,7 +24,7 @@
         <global.libs>-lnx_utils</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm Wldap32.lib</windows.oslibs>
-        <linux.oslibs>-lavcodec -lavformat -lavutil -lquazip -lfaac </linux.oslibs>
+        <linux.oslibs>-lavcodec -lavformat -lavutil -lfaac </linux.oslibs>
         <linux.arm.oslibs></linux.arm.oslibs>
         <windows.oslibs.release></windows.oslibs.release>
         <windows.oslibs.debug></windows.oslibs.debug>

@@ -141,7 +141,7 @@
         <sigar.version>1.7-SNAPSHOT</sigar.version>
         <festival.version>2.4-SNAPSHOT</festival.version>
         <boost.version>1.56-SNAPSHOT</boost.version>
-        <quazip.version>0.7.1-SNAPSHOT</quazip.version>
+        <quazip.version>0.7.1</quazip.version>
 
         <!-- Set parent (parent.customization) and child (customization) customizations here -->
         <customization>default</customization>
@@ -740,7 +740,7 @@
                 </property>
             </activation>
             <properties>
-                <quazip.version>0.7-SNAPSHOT</quazip.version>
+                <quazip.version>0.7</quazip.version>
                 <toolchain.version>rpi</toolchain.version>
                 <compiler>bpi</compiler>
                 <openssl.version>1.0.0j</openssl.version>
@@ -766,7 +766,7 @@
                 </property>
             </activation>
             <properties>
-                <quazip.version>0.7-SNAPSHOT</quazip.version>
+                <quazip.version>0.7</quazip.version>
                 <toolchain.version>rpi</toolchain.version>
                 <compiler>bpi</compiler>
                 <openssl.version>1.0.0j</openssl.version>

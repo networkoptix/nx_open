@@ -26,7 +26,7 @@
         <product.title>${company.name} cloud_db</product.title>
         <!--Global libs-->
         <qt.libs>core network concurrent sql xml</qt.libs>
-        <global.libs>-lcloud_db -lnx_utils -lcommon -lnx_streaming -ludt -lnx_network -lcloud_db_client -lquazip</global.libs>
+        <global.libs>-lcloud_db -lnx_utils -lcommon -lnx_streaming -ludt -lnx_network -lcloud_db_client</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm</windows.oslibs>
         <windows.oslibs.release/>
@@ -39,7 +39,7 @@
         <windows.defines/>
         <linux.defines/>
         <mac.defines/>
-        <rdep.packages>openssl</rdep.packages>
+        <rdep.packages>openssl quazip</rdep.packages>
     </properties>
 
     <dependencies>

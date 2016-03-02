@@ -28,7 +28,7 @@
         <!--Global libs-->
         <qt.libs>core network xml xmlpatterns sql concurrent multimedia</qt.libs>
         <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lswresample -lpostproc</ffmpeg.libs>
-        <global.libs>-lmediaserver_core -lcommon -lnx_utils -lnx_network -lnx_streaming -lappserver2 -lonvif -lquazip -ludt -lcloud_db_client -lnx_email</global.libs>
+        <global.libs>-lmediaserver_core -lcommon -lnx_utils -lnx_network -lnx_streaming -lappserver2 -lonvif -ludt -lcloud_db_client -lnx_email</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>Ws2_32.lib DbgHelp.lib sigar.lib -lIphlpapi -lwinmm Wldap32.lib Crypt32.lib</windows.oslibs>
         <linux.oslibs>-lldap -lmp3lame -lsigar -lfaac -lvpx -lvorbisenc -lvorbis -ldl</linux.oslibs>
@@ -42,7 +42,7 @@
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
         <linux.defines/>
         <mac.defines/>
-        <rdep.packages>openssl</rdep.packages>
+        <rdep.packages>openssl quazip</rdep.packages>
 
     </properties>
 

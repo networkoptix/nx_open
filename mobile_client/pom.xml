@@ -27,7 +27,7 @@
         <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -ld3d9 -lopenal32</windows.oslibs>
         <windows.oslibs.release/>
         <windows.oslibs.debug/>
-        <linux.oslibs>${ffmpeg.libs} -lmp3lame -lz -lopenal -lX11 -lXfixes -lGL -lGLU -ltermcap -lsigar -lfaac -lquazip</linux.oslibs>
+        <linux.oslibs>${ffmpeg.libs} -lmp3lame -lz -lopenal -lX11 -lXfixes -lGL -lGLU -ltermcap -lsigar -lfaac</linux.oslibs>
         <android.oslibs>-lturbojpeg -lopenal</android.oslibs>
         <ios.oslibs>-lturbojpeg</ios.oslibs>
         <!--Global defines-->
@@ -39,6 +39,7 @@
         <android.defines/>
         <ios.defines/>
         <rdep.packages>openssl</rdep.packages>
+        <rdep.linux.packages>quazip</rdep.linux.packages>
 
         <project.version.code>${buildNumber}</project.version.code>
         <project.version.name>${release.version}</project.version.name>

@@ -40,7 +40,7 @@
         <template>app</template>
         <qt.libs>core gui network xml widgets</qt.libs>
         <ffmpeg.libs></ffmpeg.libs>
-        <global.libs>-lcommon -lnx_utils -lnx_network -lnx_streaming -lquazip -ludt</global.libs>
+        <global.libs>-lcommon -lnx_utils -lnx_network -lnx_streaming -ludt</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>DbgHelp.lib Ws2_32.lib Iphlpapi.lib Winmm.lib</windows.oslibs>
         <windows.oslibs.release></windows.oslibs.release> 
@@ -53,6 +53,6 @@
         <windows.defines/>
         <linux.defines/>
         <mac.defines/>    
-        <rdep.packages>openssl</rdep.packages>
+        <rdep.packages>openssl quazip</rdep.packages>
     </properties>   
 </project>

@@ -30,7 +30,7 @@
         <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc</ffmpeg.libs>
         <!--Global libs-->
         <!-- Disabled msvs 2015 libs> -lFestival -lestools -leststring -lestbase/!-->
-        <global.libs>-lcommon -lappserver2 -lclient.core -lclient -lquazip</global.libs>
+        <global.libs>-lcommon -lappserver2 -lclient.core -lclient</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lOle32 -lwinmm -ld3d9 -lopenal32 -lsigar</windows.oslibs>
         <windows.oslibs.release/>
@@ -44,7 +44,7 @@
         <windows.defines/>
         <linux.defines/>
         <mac.defines/>
-        <rdep.packages>openssl</rdep.packages>
+        <rdep.packages>openssl quazip</rdep.packages>
     </properties>
 
     <dependencies>

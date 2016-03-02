@@ -26,7 +26,7 @@
         <windows.oslibs>-lcommon -lws2_32 DbgHelp.lib -lIphlpapi -lOle32 -lsigar -lSecur32 -lwinmm</windows.oslibs>
         <windows.oslibs.release/>
         <windows.oslibs.debug/>
-        <linux.oslibs>-lsigar -lswscale -lquazip</linux.oslibs>
+        <linux.oslibs>-lsigar -lswscale</linux.oslibs>
         <mac.oslibs>-framework IOKit -framework CoreFoundation  -lz -framework QtConcurrent -lsigar-universal64-macosx</mac.oslibs>
         <android.oslibs>-lz</android.oslibs>
         <!--Global defines-->
@@ -39,6 +39,8 @@
         <ios.defines/>
         <buildLib>sharedLib</buildLib>
         <rdep.packages>openssl</rdep.packages>
+        <rdep.linux.packages>quazip</rdep.linux.packages>
+        <rdep.mac.packages>quazip</rdep.mac.packages>
     </properties>
 
     <dependencies>

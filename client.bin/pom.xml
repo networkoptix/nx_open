@@ -23,7 +23,7 @@
         <qt.libs>core gui network opengl xml sql multimedia concurrent webkit webkitwidgets</qt.libs>
         <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc</ffmpeg.libs>
         <!-- ATTENTION!!! -lestbase should be the LATEST in the list!!! Required for Linux -->
-        <global.libs>-lcommon -lnx_utils -lnx_network -lnx_streaming -lnx_audio -lappserver2 -lclient.core -lclient -lquazip -lcloud_db_client -lFestival -lestools -leststring -lestbase</global.libs>
+        <global.libs>-lcommon -lnx_utils -lnx_network -lnx_streaming -lnx_audio -lappserver2 -lclient.core -lclient -lcloud_db_client -lFestival -lestools -leststring -lestbase</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -ld3d9 -lopenal32 -lsigar</windows.oslibs>
         <windows.oslibs.release/>
@@ -36,7 +36,7 @@
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
         <linux.defines/>
         <mac.defines/>
-        <rdep.packages>openssl</rdep.packages>
+        <rdep.packages>openssl quazip</rdep.packages>
     </properties>
 
     <dependencies>

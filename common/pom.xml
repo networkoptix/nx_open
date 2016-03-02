@@ -29,8 +29,8 @@
         <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc</ffmpeg.libs>
         <!--Specific os libs used-->
         <windows.oslibs>-lws2_32 -lIphlpapi -lOle32 -lsigar -lSecur32</windows.oslibs>
-        <linux.oslibs>-lsigar -lquazip</linux.oslibs>
-        <mac.oslibs>-framework IOKit -framework CoreFoundation -lz -framework QtConcurrent -lsigar-universal64-macosx -lquazip</mac.oslibs>
+        <linux.oslibs>-lsigar</linux.oslibs>
+        <mac.oslibs>-framework IOKit -framework CoreFoundation -lz -framework QtConcurrent -lsigar-universal64-macosx</mac.oslibs>
         <android.oslibs>-lz</android.oslibs>
         <!--Global defines-->
         <global.defines/>
@@ -40,7 +40,9 @@
         <mac.defines/>
         <android.defines/>
         <ios.defines/>
-        <rdep.packages>qt, openssl</rdep.packages>
+        <rdep.packages>qt openssl</rdep.packages>
+        <rdep.linux.packages>quazip</rdep.linux.packages>
+        <rdep.mac.packages>quazip</rdep.mac.packages>
     </properties>
 
     <dependencies>
