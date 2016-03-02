@@ -27,7 +27,7 @@
     <build>
         <directory>${arch}</directory>
         <outputDirectory>${arch}</outputDirectory>
-        <sourceDirectory>${basedir}/src</sourceDirectory> 
+        <sourceDirectory>${basedir}/src</sourceDirectory>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -63,18 +63,18 @@
                         </goals>
                         <configuration>
                             <outputDirectory>${project.build.directory}</outputDirectory>
-                            <resources>          
+                            <resources>
                                 <resource>
                                     <directory>${root.dir}/cpp/maven/filter-resources</directory>
                                     <filtering>true</filtering>
-                                </resource>                                
+                                </resource>
                                 <resource>
                                     <directory>${root.dir}/cpp/maven/bin-resources</directory>
                                     <filtering>false</filtering>
-                                </resource>                                
-                            </resources>              
+                                </resource>
+                            </resources>
                             <encoding>UTF-8</encoding>
-                        </configuration>            
+                        </configuration>
                     </execution>
                     <execution>
                         <id>generate-solution</id>
@@ -84,14 +84,14 @@
                         </goals>
                         <configuration>
                             <outputDirectory>${project.basedir}</outputDirectory>
-                            <resources>          
+                            <resources>
                                 <resource>
                                     <directory>maven/solution</directory>
                                     <filtering>true</filtering>
-                                </resource>                                                           
-                            </resources>              
+                                </resource>
+                            </resources>
                             <encoding>UTF-8</encoding>
-                        </configuration>            
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -100,6 +100,20 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.1.1</version>
                 <executions>
+                    <execution>
+                        <id>get-rdep-artifacts</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${init.python.dir}/${python.executable}</executable>
+                            <arguments>
+                                <argument>${project.build.directory}/get_dependencies.py</argument>
+                            </arguments>
+                            <workingDirectory>${project.build.directory}</workingDirectory>
+                        </configuration>
+                    </execution>
                     <execution>
                         <id>gen-qrc</id>
                         <phase>process-sources</phase>
@@ -111,7 +125,7 @@
                             <arguments>
                                 <argument>${project.build.directory}/gen_resources.py</argument>
                             </arguments>
-                            <workingDirectory>${project.build.directory}</workingDirectory>     
+                            <workingDirectory>${project.build.directory}</workingDirectory>
                             <environmentVariables>
                                 <ANDROID_SDK_ROOT>${android.sdk}</ANDROID_SDK_ROOT>
                                 <ANDROID_NDK_ROOT>${android.ndk}</ANDROID_NDK_ROOT>
@@ -129,7 +143,7 @@
                             <arguments>
                                 <argument>build-prepare.py</argument>
                             </arguments>
-                            <workingDirectory>${project.build.directory}</workingDirectory>     
+                            <workingDirectory>${project.build.directory}</workingDirectory>
                         </configuration>
                     </execution>
                     <execution>
@@ -142,27 +156,13 @@
                             <executable>${init.python.dir}/${python.executable}</executable>
                             <arguments>
                                 <argument>${project.build.directory}/build.py</argument>
-                            </arguments>                                    
-                            <workingDirectory>${project.build.directory}</workingDirectory>     
+                            </arguments>
+                            <workingDirectory>${project.build.directory}</workingDirectory>
                         </configuration>
-                    </execution>  
-                    <execution>
-                        <id>get-rdep-artifacts</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>${init.python.dir}/${python.executable}</executable>
-                            <arguments>
-                                <argument>${project.build.directory}/get_dependencies.py</argument>
-                            </arguments>                                    
-                            <workingDirectory>${project.build.directory}</workingDirectory>  
-                        </configuration>
-                    </execution>                     
+                    </execution>
                 </executions>
-            </plugin>                   
-        </plugins>      
+            </plugin>
+        </plugins>
     </build>
     <profiles>
         <profile>
@@ -177,7 +177,7 @@
                 <exclude_platform>unix</exclude_platform>
             </properties>
             <build>
-                <plugins>                   
+                <plugins>
                     <plugin>
                         <groupId>com.google.code.maven-replacer-plugin</groupId>
                         <artifactId>replacer</artifactId>
@@ -203,7 +203,7 @@
                                             <value>
                                                 <![CDATA[</RootNamespace>
     <TargetName>${project.artifactId}</TargetName>]]></value>
-                                        </replacement> 
+                                        </replacement>
                                         <replacement>
                                             <token>
                                                 <![CDATA[<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">]]></token>
@@ -214,7 +214,7 @@
       <SubSystem Condition="'%(Link.SubSystem)'=='' Or '%(Link.SubSystem)'=='NotSet'">Windows</SubSystem>
     </Link>
   </ItemDefinitionGroup>]]></value>
-                                        </replacement> 
+                                        </replacement>
                                         <replacement>
                                             <token>
                                                 <![CDATA[release</ProgramDataBaseFileName>]]></token>
@@ -230,7 +230,7 @@
                                         <replacement>
                                             <token>${project.artifactId}${parsedVersion.majorVersion}</token>
                                             <value>${project.artifactId}</value>
-                                        </replacement>         
+                                        </replacement>
 
                                         <!-- Disabling compile of .res file (otherwise we come into duplicate resource error during linkage) -->
                                         <replacement>
@@ -238,7 +238,7 @@
                                             <token>CustomBuild</token>
                                             <value>None</value>
                                         </replacement>
-                                        
+
                                         <!-- Replacing GUIDs to predefined ones -->
                                         <replacement>
                                             <xpath>//Project/PropertyGroup</xpath>
@@ -291,7 +291,7 @@
 
                                     </replacements>
                                     <skip>${replace.skip}</skip>
-                                </configuration>                                
+                                </configuration>
                             </execution>
                             <execution>
                                 <id>fix-makefile-QMAKE-SUCKS!!!!!!!!!!</id>
@@ -316,11 +316,11 @@
                                         <replacement>
                                             <token>${project.artifactId}${parsedVersion.majorVersion}</token>
                                             <value>${project.artifactId}</value>
-                                        </replacement>                                      
+                                        </replacement>
                                     </replacements>
                                     <skip>${replace.skip}</skip>
-                                </configuration>                                
-                            </execution>                            
+                                </configuration>
+                            </execution>
                         </executions>
                     </plugin>
                 </plugins>
@@ -332,12 +332,12 @@
             <activation>
                 <os>
                     <family>unix</family>
-                </os> 
-            </activation>            
+                </os>
+            </activation>
             <properties>
                 <rename-skip>false</rename-skip>
             </properties>
-            <build> 
+            <build>
                 <plugins>
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
@@ -352,15 +352,15 @@
                                 </goals>
                                 <configuration>
                                     <executable>${project.build.directory}/build.sh</executable>
-                                    <workingDirectory>${project.build.directory}</workingDirectory>     
+                                    <workingDirectory>${project.build.directory}</workingDirectory>
                                 </configuration>
                             </execution>
                         </executions>
                     </plugin>
-                </plugins>  
-            </build>            
-        </profile>  
-        
+                </plugins>
+            </build>
+        </profile>
+
         <profile>
             <id>linux-arm</id>
             <activation>
@@ -368,7 +368,7 @@
                 <os>
                     <family>unix</family>
                     <name>linux</name>
-                </os> 
+                </os>
                 <property>
                     <name>arch</name>
                     <value>arm</value>
@@ -410,7 +410,7 @@
                 </property>
             </activation>
             <build>
-                <plugins>                   
+                <plugins>
                     <plugin>
                         <groupId>com.google.code.maven-replacer-plugin</groupId>
                         <artifactId>replacer</artifactId>
@@ -427,19 +427,19 @@
                                     <regex>false</regex>
                                     <encoding>utf-8</encoding>
                                     <file>${project.build.directory}/Makefile.release</file>
-                                    <ignoreMissingFile>true</ignoreMissingFile>                                    
+                                    <ignoreMissingFile>true</ignoreMissingFile>
                                     <replacements>
                                         <replacement>
                                             <token> /usr/include/c++/4.8</token>
                                             <value> </value>
-                                        </replacement>         
+                                        </replacement>
                                     </replacements>
-                                </configuration>                                   
-                            </execution>                          
+                                </configuration>
+                            </execution>
                         </executions>
                     </plugin>
                 </plugins>
             </build>
-        </profile>         
-    </profiles> 
+        </profile>
+    </profiles>
 </project>

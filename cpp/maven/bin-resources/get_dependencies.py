@@ -34,24 +34,29 @@ def get_copy_list(package_dir):
     return config.get("General", "copy").split()
 
 def install_dependency(dependency_dir, target_dir, debug):
+    print "Installing dependency from {0}".format(dependency_dir)
     bin_dst = os.path.join(target_dir, "bin")
 
     copy_list = get_copy_list(dependency_dir)
 
-    for scr in copy_list:
+    for entry in copy_list:
+        src = os.path.join(dependency_dir, entry)
+
         if not os.path.exists(src):
             continue
 
-        debug_dir = os.path.join(bin_dst, "debug")
-        if not os.path.isdir(debug_dir):
-            os.path.mkdirs(debug_dir)
-        copy_recursive(src, debug_dir)
+        debug_dst = os.path.join(bin_dst, "debug", os.path.basename(entry))
+        if not os.path.isdir(debug_dst):
+            os.makedirs(debug_dst)
+        print "Copying {0} to {1}".format(src, debug_dst)
+        copy_recursive(src, debug_dst)
 
         if not debug:
-            release_dir = os.path.join(bin_dst, "release")
-            if not os.path.isdir(release_dir):
-                os.path.mkdirs(release_dir)
-            copy_recursive(src, release_dir)
+            release_dst = os.path.join(bin_dst, "release", os.path.basename(entry))
+            if not os.path.isdir(release_dst):
+                os.makedirs(release_dst)
+            print "Copying {0} to {1}".format(src, release_dst)
+            copy_recursive(src, release_dst)
 
 def copy_package_for_configuration(package, path, debug):
     target_dir = dependencies.TARGET_DIRECTORY
