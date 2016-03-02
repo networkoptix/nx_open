@@ -536,13 +536,15 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     }
 
     bool isLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
-    if (media->dataType == QnAbstractMediaData::VIDEO)
+    bool isVideo = media->dataType == QnAbstractMediaData::VIDEO;
+    bool isAudio = media->dataType == QnAbstractMediaData::AUDIO;
+    if (isVideo || isAudio)
     {
         bool isKeyFrame = media->flags & AV_PKT_FLAG_KEY;
         bool isSecondaryProvider = media->flags & QnAbstractMediaData::MediaFlags_LowQuality;
         {
             QnMutexLocker lock( &m_qualityChangeMutex );
-            if (isKeyFrame && m_newLiveQuality != MEDIA_Quality_None)
+            if (isKeyFrame && isVideo && m_newLiveQuality != MEDIA_Quality_None)
             {
                 if (m_newLiveQuality == MEDIA_Quality_Low && isSecondaryProvider) {
                     setLiveQualityInternal(MEDIA_Quality_Low); // slow network. Reduce quality
@@ -556,16 +558,20 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
                 }
             }
         }
-        if (isLive) {
+        if (isLive) 
+        {
             if (m_liveQuality != MEDIA_Quality_Low && isSecondaryProvider)
                 return true; // data for other live quality stream
             else if (m_liveQuality == MEDIA_Quality_Low && !isSecondaryProvider)
                 return true; // data for other live quality stream
 
-            if (isKeyFrame)
-                m_needKeyData[media->channelNumber] = false;
-            else if (!isKeyFrame && m_needKeyData[media->channelNumber])
-                return true; // wait for I frame for this channel
+            if (isVideo)
+            {
+                if (isKeyFrame)
+                    m_needKeyData[media->channelNumber] = false;
+                else if (!isKeyFrame && m_needKeyData[media->channelNumber])
+                    return true; // wait for I frame for this channel
+            }
         }
     }
 
