@@ -9,7 +9,7 @@ VERSION = ${release.version}
 unix {
     VERSION = ${linux.release.version}
 }
-QT += ${qt.libs} core-private
+QT = ${qt.libs}
 ADDITIONAL_QT_INCLUDES=${environment.dir}/qt5-custom
 
 ## GLOBAL CONFIGURATIONS
@@ -105,7 +105,16 @@ OBJECTS_DIR = ${project.build.directory}/build/$$CONFIGURATION/
 MOC_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
 UI_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
 RCC_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
-LIBS += -L$$OUTPUT_PATH/lib -L$$OUTPUT_PATH/lib/$$CONFIGURATION -L${qt.dir}/lib -L$$OUTPUT_PATH/bin/$$CONFIGURATION
+
+#temporary hardcode
+CONFIG(debug, debug|release) {
+    LIBS += -L${qt.dir}-debug/lib
+}
+else {
+    LIBS += -L${qt.dir}/lib
+}
+
+LIBS += -L$$OUTPUT_PATH/lib -L$$OUTPUT_PATH/lib/$$CONFIGURATION -L$$OUTPUT_PATH/bin/$$CONFIGURATION
 !win*:!mac {
     LIBS += -Wl,-rpath-link,${qt.dir}/lib
 }
