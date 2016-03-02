@@ -167,9 +167,6 @@
             <Component>
                 <File Id="Serverquazip.dll" Name="quazip.dll" Source="$(var.SourceDir)\quazip.dll" DiskId="10" />                
             </Component>
-            <Component>
-                <File Id="Serverzlibwapi.dll" Name="zlibwapi.dll" Source="$(var.SourceDir)\zlibwapi.dll" DiskId="10" />                
-            </Component>             
         </ComponentGroup>
 
         <ComponentGroup Id="ServerImageFormats" Directory="ServerImageFormats">
