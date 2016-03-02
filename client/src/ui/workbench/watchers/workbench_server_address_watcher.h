@@ -1,3 +1,5 @@
+#pragma once
+
 #include <QtCore/QObject>
 #include <ui/workbench/workbench_context_aware.h>
 
