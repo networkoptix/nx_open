@@ -147,7 +147,7 @@ private:
 
     QnServerBackupSchedule  m_schedule;
     qint64                  m_syncTimePoint;
-    std::atomic<qint64>     m_syncEndTimePoint;
+    qint64                  m_syncEndTimePoint;
     QnMutex                 m_syncPointMutex;
 
     SyncDataMap           m_syncData;
