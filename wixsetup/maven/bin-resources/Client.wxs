@@ -220,9 +220,6 @@
             <Component>
                 <File Id="Clientquazip.dll" Name="quazip.dll" Source="$(var.SourceDir)\quazip.dll" DiskId="10" />                
             </Component>
-            <Component>
-                <File Id="Clientzlibwapi.dll" Name="zlibwapi.dll" Source="$(var.SourceDir)\zlibwapi.dll" DiskId="10"  />                
-            </Component>                                           
         </ComponentGroup>
 
         <ComponentGroup Id="ClientOpenAL" Directory="$(var.clientDirId)">
