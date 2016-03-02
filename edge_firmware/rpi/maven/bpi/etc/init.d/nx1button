@@ -48,7 +48,7 @@ start() {
 }
 
 start_watchdog() {
-    WATCHDOG_PID="`ps -eO command | grep run_watchdog | grep -v grep |  awk {'print $1'}`"
+    WATCHDOG_PID="`ps -eO command | grep run_watchdog | grep button | grep -v grep |  awk {'print $1'}`"
     if [ "$WATCHDOG_PID" ]; then
         echo "nx1button watchdog is already running with pid $WATCHDOG_PID"
         return 0
