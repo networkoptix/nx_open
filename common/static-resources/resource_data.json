@@ -98,7 +98,8 @@
                 "DW|DWC-MF21M4TIR","Win4NET Co., Ltd.|Clebo-MF21M4TIR",
                 "DW|DWC-MF21M8TIR","Win4NET Co., Ltd.|Clebo-MF21M8TIR",
                 "DW|DWC-MF21M4FM","Win4NET Co., Ltd.|Clebo-MF21M4FM",
-                "DW|DWC-MF21M8FM","Win4NET Co., Ltd.|Clebo-MF21M8FM"
+                "DW|DWC-MF21M8FM","Win4NET Co., Ltd.|Clebo-MF21M8FM",
+                "DW|DWC-MB950TIR", "DW|DWC-MV950TIR"
             ],
             "ptzCapabilities": "NoPtzCapabilities"
         },
