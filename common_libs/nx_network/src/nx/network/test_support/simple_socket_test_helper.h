@@ -2,6 +2,8 @@
 #ifndef SIMPLE_SOCKET_TEST_HELPER_H
 #define SIMPLE_SOCKET_TEST_HELPER_H
 
+#include <iostream>
+
 #include <boost/optional.hpp>
 
 #include <utils/thread/sync_queue.h>
@@ -22,9 +24,33 @@ namespace /* anonimous */ {
 const SocketAddress kServerAddress("127.0.0.1:12345");
 const QByteArray kTestMessage("Ping");
 const int kClientCount(10);
-const std::chrono::milliseconds kTestTimeout(1000);
+const std::chrono::milliseconds kTestTimeout(3000);
 
 }
+
+template<typename SocketType>
+QByteArray readNBytes(SocketType* clientSocket, int count)
+{
+    const int BUF_SIZE = std::max<int>(count, 128);
+
+    QByteArray buffer(BUF_SIZE, char(0));
+    int bufDataSize = 0;
+    for (;;)
+    {
+        const auto bytesRead = clientSocket->recv(
+            buffer.data() + bufDataSize,
+            buffer.size() - bufDataSize,
+            0);
+        if (bytesRead <= 0)
+            return QByteArray();
+
+        bufDataSize += bytesRead;
+        if (bufDataSize >= count)
+            return buffer.mid(0, bufDataSize);
+    }
+}
+
+
 
 template<typename ServerSocketMaker>
 void syncSocketServerMainFunc(
@@ -44,8 +70,6 @@ void syncSocketServerMainFunc(
 
     for (int i = clientCount; i > 0; --i)
     {
-        static const int BUF_SIZE = 128;
-
         std::unique_ptr<AbstractStreamSocket> client;
         if (startedPromise)
         {
@@ -70,7 +94,15 @@ void syncSocketServerMainFunc(
             auto acceptResult = acceptedPromise.get_future().get();
             client = std::move(acceptResult.second);
             if (acceptResult.first != SystemError::noError)
+            {
                 SystemError::setLastErrorCode(acceptResult.first);
+            }
+            else
+            {
+                ASSERT_NE(nullptr, client);
+                ASSERT_TRUE(client->setNonBlockingMode(false))
+                    << SystemError::getLastOSErrorText().toStdString();
+            }
         }
         else
         {
@@ -79,24 +111,36 @@ void syncSocketServerMainFunc(
         
         ASSERT_TRUE(client.get())
             << SystemError::getLastOSErrorText().toStdString() << " on " << i;
+        ASSERT_TRUE(client->setRecvTimeout(kTestTimeout.count()));
+        ASSERT_TRUE(client->setSendTimeout(kTestTimeout.count()));
 
-        QByteArray buffer(BUF_SIZE, char(0));
-        int bufDataSize = 0;
+        if (!testMessage)
+            continue;
+
+        const auto incomingMessage = readNBytes(client.get(), testMessage->size());
+        ASSERT_TRUE(!incomingMessage.isEmpty())
+            << SystemError::getLastOSErrorText().toStdString();
+
+        ASSERT_EQ(*testMessage, incomingMessage);
+
+        const int bytesSent = client->send(*testMessage);
+        ASSERT_NE(-1, bytesSent) << SystemError::getLastOSErrorText().toStdString();
+
+        //waiting for connection to be closed by client
+        QByteArray buf(64, 0);
         for (;;)
         {
-            const auto bytesRead = client->recv(
-                buffer.data() + bufDataSize,
-                buffer.size() - bufDataSize);
-            ASSERT_NE(-1, bytesRead)
-                << SystemError::getLastOSErrorText().toStdString();
-
+            int bytesRead = client->recv(buf.data(), buf.size());
             if (bytesRead == 0)
-                break;  //connection closed
-            bufDataSize += bytesRead;
+                break;
+            const auto errorCode = SystemError::getLastOSErrorCode();
+            if (bytesRead == -1 &&
+                errorCode != SystemError::timedOut && 
+                errorCode != SystemError::interrupted)
+            {
+                break;
+            }
         }
-
-        if (testMessage)
-            EXPECT_STREQ(testMessage->constData(), buffer.constData());
     }
 }
 
@@ -128,9 +172,20 @@ void socketSimpleSync(
             auto client = clientMaker();
             EXPECT_TRUE(client->connect(endpointToConnectTo, kTestTimeout.count()))
                 << SystemError::getLastOSErrorText().toStdString();
+            ASSERT_TRUE(client->setRecvTimeout(kTestTimeout.count()));
+            ASSERT_TRUE(client->setSendTimeout(kTestTimeout.count()));
+
             EXPECT_EQ(
-                client->send(testMessage.constData(), testMessage.size() + 1),
-                testMessage.size() + 1) << SystemError::getLastOSErrorText().toStdString();
+                testMessage.size(),
+                client->send(testMessage.constData(), testMessage.size()))
+                    << SystemError::getLastOSErrorText().toStdString();
+
+            const auto incomingMessage = readNBytes(client.get(), testMessage.size());
+            ASSERT_TRUE(!incomingMessage.isEmpty())
+                << SystemError::getLastOSErrorText().toStdString();
+            ASSERT_EQ(testMessage, incomingMessage);
+
+            client.reset();
         }
     });
 
