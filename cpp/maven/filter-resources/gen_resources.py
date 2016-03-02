@@ -106,6 +106,9 @@ def replace(file,searchExp,replaceExp):
         sys.stdout.write(line)
 
 def gen_includepath(file, path):
+    if not os.path.isdir(path):
+        return
+
     for dirs in os.walk(path).next()[1]:
         if(dirs.endswith('win32')):
             print >> file, '\nwin*:INCLUDEPATH += %s/%s' % (path, dirs)
