@@ -12,7 +12,8 @@ sys.path.pop(0)
 debug = "debug" in dependencies.BUILD_CONFIGURATION
 
 def fetch_packages(packages):
-    return rdep.fetch_packages(dependencies.TARGET, packages, debug)
+    versioned = [dependencies.get_versioned_package_name(package) for package in packages]
+    return rdep.fetch_packages(dependencies.TARGET, versioned, debug)
 
 def copy_recursive(src, dst):
     for dirname, _, filenames in os.walk(src):
@@ -72,28 +73,52 @@ def copy_package_for_configuration(package, path, debug):
     shutil.copy(os.path.join(path, rdep.PACKAGE_CONFIG_NAME), description_file)
     return True
 
+def get_deps_pri_file(debug = False):
+    return "dependencies-debug.pri" if debug else "dependencies.pri"
+
+def append_pri(pri_file, debug = False):
+    with open(get_deps_pri_file(debug), "a") as file:
+        file.write("include({0})\n".format(pri_file))
+
 def copy_package(package):
-    release_path = rdep.locate_package(dependencies.TARGET, package)
+    versioned = dependencies.get_versioned_package_name(package)
+    release_path = rdep.locate_package(dependencies.TARGET, versioned)
     if not release_path:
-        print "Could not locate {0}".format(package)
+        print "Could not locate {0}".format(versioned)
         return False
 
-    copy_package_for_configuration(package, release_path, False)
+    copy_package_for_configuration(versioned, release_path, False)
+
+    pri_file = os.path.join(release_path, package + ".pri")
+    if os.path.isfile(pri_file):
+        append_pri(pri_file)
 
     if debug:
-        debug_path = rdep.locate_package(dependencies.TARGET, package, debug)
+        debug_path = rdep.locate_package(dependencies.TARGET, versioned, debug)
         if not debug_path:
-            print "Could not locate {0}".format(package)
+            print "Could not locate {0}".format(versioned)
             return False
 
         if debug_path == release_path:
+            if os.path.isfile(pri_file):
+                append_pri(pri_file, True)
             return True
 
-        copy_package_for_configuration(package, debug_path, True)
+        copy_package_for_configuration(versioned, debug_path, True)
+        debug_pri_file = os.path.join(release_path, package + "-debug.pri")
+        if os.path.isfile(debug_pri_file):
+            append_pri(debug_pri_file)
+        else:
+            append_pri(pri_file, True)
 
     return True
 
 def copy_packages(packages):
+    for debug in [ False, True ]:
+        pri = get_deps_pri_file(debug)
+        if os.path.exists(pri):
+            os.remove(pri)
+
     return all([copy_package(package) for package in packages])
 
 

@@ -38,6 +38,7 @@ include( optional_functionality.pri )
 
 
 CONFIG(debug, debug|release) {
+  include(dependencies-debug.pri)
   CONFIGURATION=debug
   isEmpty(BUILDLIB) {
     CONFIG += console
@@ -52,6 +53,7 @@ CONFIG(debug, debug|release) {
   #DEFINES += ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK
 }
 else {
+  include(dependencies.pri)
   CONFIG += silent
   CONFIGURATION=release
   win* {
@@ -265,7 +267,7 @@ macx {
   }
 
   contains(TEMPLATE, "lib") {
-    QMAKE_LFLAGS += -undefined dynamic_lookup 
+    QMAKE_LFLAGS += -undefined dynamic_lookup
   }
 }
 

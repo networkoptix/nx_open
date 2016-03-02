@@ -133,7 +133,7 @@
         <resources.phase>generate-sources</resources.phase>
         <qt.version>5.6.0</qt.version>
         <ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
-        <openssl.version>1.0.2e-SNAPSHOT</openssl.version>
+        <openssl.version>1.0.2e</openssl.version>
         <openldap.version>2.4.42-SNAPSHOT</openldap.version>
         <sasl2.version>2.1.26-SNAPSHOT</sasl2.version>
         <protobuf.version>2.6.0-SNAPSHOT</protobuf.version>

@@ -45,7 +45,7 @@ def get_packages():
     if '${' in packages:
         return []
 
-    return [get_versioned_package_name(package) for package in make_list(packages)]
+    return make_list(packages)
 
 def print_configuration():
     print get_packages()

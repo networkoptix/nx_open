@@ -40,7 +40,7 @@
         <mac.defines/>
         <android.defines/>
         <ios.defines/>
-        <rdep.packages>qt</rdep.packages>
+        <rdep.packages>qt, openssl</rdep.packages>
     </properties>
 
     <dependencies>
