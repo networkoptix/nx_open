@@ -1,15 +1,9 @@
-/**********************************************************
-* 11 feb 2015
-* akolesnikov
-***********************************************************/
-
 #ifdef USE_OWN_MUTEX
 
 #include "mutex.h"
 
 #include "mutex_impl.h"
 #include "thread_util.h"
-#include <nx/utils/log/assert.h>
 
 
 ////////////////////////////////////////////////////////////

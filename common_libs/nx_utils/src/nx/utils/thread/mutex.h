@@ -1,10 +1,7 @@
-/**********************************************************
-* 11 feb 2015
-* akolesnikov
-***********************************************************/
-
 #ifndef NX_MUTEX_H
 #define NX_MUTEX_H
+
+#include <nx/utils/log/assert.h>
 
 #ifdef USE_OWN_MUTEX
 
