@@ -21,10 +21,10 @@ os.environ["LD_LIBRARY_PATH"] = '${libdir}/lib/${build.configuration}'
 def execute(commands):
     process = subprocess.Popen(commands, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     output = ''
-   
+
     # Poll process for new output until finished
     for line in iter(process.stdout.readline, ""):
-        text = line.rstrip() + '\n' 
+        text = line.rstrip() + '\n'
         sys.stdout.write(text)
         output += line.rstrip()
 
@@ -41,7 +41,7 @@ def fileIsAllowed(file, exclusions):
         if file.endswith(exclusion):
             return False
     return True
-        
+
 def genqrc(qrcname, qrcprefix, pathes, exclusions, additions=''):
     os.path = posixpath
 
@@ -57,23 +57,23 @@ def genqrc(qrcname, qrcprefix, pathes, exclusions, additions=''):
             for f in files:
                 if fileIsAllowed(f, exclusions):
                     print >> qrcfile, '<file alias="%s">%s</file>' % (os.path.join(parent, f), os.path.join(root, f))
-  
+
     print >> qrcfile, additions
     print >> qrcfile, '</qresource>'
     print >> qrcfile, '</RCC>'
-  
+
     qrcfile.close()
 
 def rreplace(s, old, new):
     li = s.rsplit(old, 1)
     return new.join(li)
-    
-def gentext(file, path, extensions, text): 
+
+def gentext(file, path, extensions, text):
     os.path = posixpath
-   
+
     for root, dirs, files in os.walk(path):
         parent = root[len(path) + 1:]
-        
+
         for f in files:
             n = os.path.splitext(f)[0]
             p = os.path.join(parent, f)
@@ -82,7 +82,7 @@ def gentext(file, path, extensions, text):
                     continue
                 if n == 'StdAfx':
                     continue
-                
+
                 cond = ''
                 if n.endswith('_win') or parent.endswith('_win'):
                     cond = 'win*:'
@@ -96,7 +96,7 @@ def gentext(file, path, extensions, text):
                         cond += '!mac:'
                     if(os.path.exists(rreplace(p, '_unix', '_linux'))):
                         cond += '!linux*:'
-                
+
                 print >> file, '\n%s%s%s/%s' % (cond, text, path, os.path.join(parent, f))
 
 def replace(file,searchExp,replaceExp):
@@ -105,21 +105,21 @@ def replace(file,searchExp,replaceExp):
             line = re.sub(r'%s', r'%s', line.rstrip() % (searchExp, replaceExp))
         sys.stdout.write(line)
 
-def gen_includepath(file, path):      
+def gen_includepath(file, path):
     for dirs in os.walk(path).next()[1]:
         if(dirs.endswith('win32')):
             print >> file, '\nwin*:INCLUDEPATH += %s/%s' % (path, dirs)
         else:
             print >> file, '\nINCLUDEPATH += %s/%s' % (path, dirs)
-                    
+
 if __name__ == '__main__':
     if not os.path.exists('${project.build.directory}/build'):
-        os.makedirs('${project.build.directory}/build') 
+        os.makedirs('${project.build.directory}/build')
     gencomp_cpp(open('${project.build.sourceDirectory}/compatibility_info.cpp', 'w'))
     if not os.path.exists(translations_target_dir):
-        os.makedirs(translations_target_dir) 
+        os.makedirs(translations_target_dir)
 
-    if os.path.exists(translations_dir):    
+    if os.path.exists(translations_dir):
         for f in listdir(translations_dir):
             for translation in translations:
                 if not translation:
@@ -129,7 +129,7 @@ if __name__ == '__main__':
                         os.system('${qt.dir}/bin/lrelease %s/%s -qm %s/%s.qm' % (translations_dir, f, translations_target_dir, os.path.splitext(f)[0]))
                     else:
                         os.system('export DYLD_LIBRARY_PATH=%s && export LD_LIBRARY_PATH=%s && ${qt.dir}/bin/lrelease %s/%s -qm %s/%s.qm' % (ldpath, ldpath, translations_dir, f, translations_target_dir, os.path.splitext(f)[0]))
-  
+
     exceptions = ['vmsclient.png', '.ai', '.svg', '.profile']
     genqrc('build/${project.artifactId}.qrc', '/', ['${project.build.directory}/resources','${project.basedir}/static-resources','${customization.dir}/icons'], exceptions)
     if os.path.exists('${project.build.directory}/additional-resources'):
@@ -137,7 +137,7 @@ if __name__ == '__main__':
         pro_file = open('${project.artifactId}-specifics.pro', 'a')
         print >> pro_file, 'RESOURCES += ${project.build.directory}/build/${project.artifactId}_additional.qrc'
         pro_file.close()
-    
+
     if os.path.exists(os.path.join(r'${project.build.directory}', template_file)):
         f = open(output_pro_file, "w")
         for file in [template_file, specifics_file]:
@@ -151,16 +151,16 @@ if __name__ == '__main__':
         gentext(f, '${project.build.sourceDirectory}', ['.ui'], 'FORMS += ')
         gen_includepath(f, '${libdir}/include')
         f.close()
-    
+
     if os.path.exists(os.path.join(r'${project.build.directory}', output_pro_file)):
-        print (' ++++++++++++++++++++++++++++++++ qMake info: ++++++++++++++++++++++++++++++++')        
+        print (' ++++++++++++++++++++++++++++++++ qMake info: ++++++++++++++++++++++++++++++++')
         execute([r'${qt.dir}/bin/qmake', '-query'])
-        print (' ++++++++++++++++++++++++++++++++ generating project file ++++++++++++++++++++++++++++++++')        
+        print (' ++++++++++++++++++++++++++++++++ generating project file ++++++++++++++++++++++++++++++++')
         if '${platform}' == 'windows':
             vc_path = r'%s..\..\VC\bin' % os.getenv('${VCVars}')
             os.environ["path"] += os.pathsep + vc_path
-            execute([r'${qt.dir}/bin/qmake', '-spec', '${qt.spec}', '-tp', 'vc', '-o', r'${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj', output_pro_file])           
+            execute([r'${qt.dir}/bin/qmake', '-spec', '${qt.spec}', '-tp', 'vc', '-o', r'${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj', output_pro_file])
             execute([r'${qt.dir}/bin/qmake', '-spec', '${qt.spec}', r'CONFIG+=${build.configuration}', '-o', r'${project.build.directory}/Makefile', output_pro_file])
         else:
             os.system('export DYLD_FRAMEWORK_PATH=%s && export LD_LIBRARY_PATH=%s && ${qt.dir}/bin/qmake -spec ${qt.spec} CONFIG+=${build.configuration} -o ${project.build.directory}/Makefile.${build.configuration} %s' % (ldpath, ldpath, output_pro_file))
-            
+
