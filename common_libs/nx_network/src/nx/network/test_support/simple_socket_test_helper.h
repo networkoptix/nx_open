@@ -466,7 +466,8 @@ void socketSimpleAcceptMixed(
 
     // let the client get in the server listen queue
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    ASSERT_NE(server->accept(), nullptr);
+    ASSERT_NE(server->accept(), nullptr)
+        << SystemError::getLastOSErrorText().toStdString();
 
     pleaseStopSync(std::move(client));
     pleaseStopSync(std::move(server));

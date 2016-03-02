@@ -254,7 +254,7 @@ TEST_F(SocketUdt, rendezvousConnect)
 TEST_F(SocketUdt, acceptingFirstConnection)
 {
     const std::chrono::seconds timeToWaitForSocketAccepted(1);
-    const int loopLength = 271;
+    const int loopLength = 71;
 
     for (int i = 0; i < loopLength; ++i)
     {
@@ -287,7 +287,7 @@ TEST_F(SocketUdt, acceptingFirstConnection)
     }
 }
 
-TEST_F(SocketUdt, allDataReadAfterFin)
+TEST_F(SocketUdt, DISABLED_allDataReadAfterFin)
 {
     const int testMessageLength = 16;
     const std::chrono::milliseconds connectTimeout(3000);
