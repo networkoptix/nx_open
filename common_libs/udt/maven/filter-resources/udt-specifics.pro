@@ -1,5 +1,4 @@
-TEMPLATE = lib
-CONFIG += console
+QT -= gui core-private
 
 win* {
     DEFINES += UDT_API=__declspec(dllexport)
