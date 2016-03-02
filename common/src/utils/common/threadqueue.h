@@ -138,6 +138,26 @@ public:
         m_bufferLen -= count;
     }
 
+    void remoteAt(int index)
+    {
+        QnMutexLocker mutex( &m_cs );
+        remoteAtUnsafe(index);
+    }
+
+    void remoteAtUnsafe(int index)
+    {
+        int bufferIndex = (m_headIndex + index) % m_buffer.size();
+        int toMove = m_bufferLen - index - 1;
+        for (int i = 0; i < toMove; ++i)
+        {
+            int nextIndex = (bufferIndex + 1) % m_buffer.size();
+            m_buffer[bufferIndex] = std::move(m_buffer[nextIndex]);
+            bufferIndex = nextIndex;
+        }
+        m_buffer[bufferIndex] = T();
+        --m_bufferLen;
+    }
+
     void lock()
     {
         m_cs.lock();
