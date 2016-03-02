@@ -3,9 +3,6 @@ from subprocess import Popen, PIPE
 from os.path import dirname, join, exists, isfile
 from os import listdir
 
-sys.path.insert(0, '${root.dir}/common')
-from gencomp import gencomp_cpp
-
 template_file='template.pro'
 specifics_file='${project.artifactId}-specifics.pro'
 output_pro_file='${project.artifactId}.pro'
@@ -118,7 +115,7 @@ def gen_includepath(file, path):
 if __name__ == '__main__':
     if not os.path.exists('${project.build.directory}/build'):
         os.makedirs('${project.build.directory}/build')
-    #gencomp_cpp(open('${project.build.sourceDirectory}/compatibility_info.cpp', 'w'))
+
     if not os.path.exists(translations_target_dir):
         os.makedirs(translations_target_dir)
 

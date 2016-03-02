@@ -57,6 +57,38 @@
     </dependencies>
 
     <build>
+    <directory>${arch}</directory>
+        <outputDirectory>${arch}</outputDirectory>
+        <sourceDirectory>${basedir}/src</sourceDirectory>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.1.1</version>
+                <executions>
+                    <execution>
+                        <id>gen-compatibility</id>
+                        <phase>process-sources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${init.python.dir}/${python.executable}</executable>
+                            <arguments>
+                                <argument>${root.dir}/common/gencomp.py</argument>
+                                <argument>c++</argument>
+                                <argument>${project.build.sourceDirectory}/compatibility_info.cpp</argument>
+                            </arguments>
+                            <workingDirectory>${project.build.directory}</workingDirectory>
+                            <environmentVariables>
+                                <ANDROID_SDK_ROOT>${android.sdk}</ANDROID_SDK_ROOT>
+                                <ANDROID_NDK_ROOT>${android.ndk}</ANDROID_NDK_ROOT>
+                            </environmentVariables>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
 
     <profiles>
