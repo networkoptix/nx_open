@@ -839,7 +839,23 @@ void UdtStreamServerSocket::acceptAsync(
         SystemError::ErrorCode,
         AbstractStreamSocket*)> handler)
 {
-    return m_aioHelper->acceptAsync(std::move(handler));
+    return m_aioHelper->acceptAsync(
+        [handler = std::move(handler)](
+            SystemError::ErrorCode errorCode,
+            AbstractStreamSocket* socket)
+        {
+            //every accepted socket MUST be in blocking mode!
+            if (socket)
+            {
+                if (!socket->setNonBlockingMode(false))
+                {
+                    delete socket;
+                    socket = nullptr;
+                    errorCode = SystemError::getLastOSErrorCode();
+                }
+            }
+            handler(errorCode, socket);
+        });
 }
 
 void UdtStreamServerSocket::pleaseStop( 

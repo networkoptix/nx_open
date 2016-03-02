@@ -141,7 +141,7 @@ AbstractStreamSocket* CloudServerSocket::accept()
     if (m_socketAttributes.nonBlockingMode && *m_socketAttributes.nonBlockingMode)
     {
         if (auto socket = m_tunnelPool->getNextSocketIfAny())
-            return new StreamSocketWrapper(std::move(socket));
+            return socket.release();
 
         SystemError::setLastErrorCode(SystemError::wouldBlock);
         return nullptr;
@@ -149,13 +149,20 @@ AbstractStreamSocket* CloudServerSocket::accept()
 
     std::promise<SystemError::ErrorCode> promise;
     std::unique_ptr<AbstractStreamSocket> acceptedSocket;
-    acceptAsync([&](SystemError::ErrorCode code, AbstractStreamSocket* socket)
-    {
-        acceptedSocket.reset(socket);
-        promise.set_value(code);
-    });
+    acceptAsync(
+        [&](SystemError::ErrorCode code, AbstractStreamSocket* socket)
+        {
+            acceptedSocket.reset(socket);
+            promise.set_value(code);
+        });
 
-    SystemError::setLastErrorCode(promise.get_future().get());
+    const auto errorCode = promise.get_future().get();
+    if (errorCode != SystemError::noError)
+    {
+        SystemError::setLastErrorCode(errorCode);
+        return nullptr;
+    }
+
     return acceptedSocket.release();
 }
 
