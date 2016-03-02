@@ -22,7 +22,7 @@
         <qt.libs>core network xml concurrent sql multimedia</qt.libs>
         <global.libs>-lcommon -lnx_utils -lnx_streaming -lnx_network -ludt -lcloud_db_client -lconnection_mediator</global.libs>
         <!--Specific os libs used-->
-        <windows.oslibs>Ws2_32.lib DbgHelp.lib Winmm.lib -lssleay32 -llibeay32 Iphlpapi.lib</windows.oslibs>
+        <windows.oslibs>Ws2_32.lib DbgHelp.lib Winmm.lib Iphlpapi.lib</windows.oslibs>
         <linux.oslibs>-lavcodec -lavformat -lavutil -lquazip -lfaac</linux.oslibs>
         <linux.arm.oslibs></linux.arm.oslibs>
         <windows.oslibs.release></windows.oslibs.release>
@@ -34,6 +34,7 @@
         <windows.defines>_VARIADIC_MAX=10</windows.defines>
         <linux.defines/>
         <mac.defines/>
+        <rdep.packages>openssl</rdep.packages>
     </properties>
 
     <dependencies>

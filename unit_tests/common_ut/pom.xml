@@ -25,12 +25,12 @@
         <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lswresample -lpostproc</ffmpeg.libs>
         <global.libs>-lcommon -lnx_utils -lnx_network -lnx_streaming -lonvif -lquazip -ludt</global.libs>
         <!--Specific os libs used-->
-        <windows.oslibs>Ws2_32.lib DbgHelp.lib sigar.lib -lIphlpapi -lwinmm -lssleay32 -llibeay32 Wldap32.lib</windows.oslibs>
-        <linux.oslibs>-lmp3lame -lssl -lcrypto -lsigar -lfaac -lvpx -lvorbisenc -lvorbis</linux.oslibs>
-        <linux.arm.oslibs>-lssl -lcrypto -lsigar</linux.arm.oslibs>
+        <windows.oslibs>Ws2_32.lib DbgHelp.lib sigar.lib -lIphlpapi -lwinmm Wldap32.lib</windows.oslibs>
+        <linux.oslibs>-lmp3lame -lsigar -lfaac -lvpx -lvorbisenc -lvorbis</linux.oslibs>
+        <linux.arm.oslibs>-lsigar</linux.arm.oslibs>
         <windows.oslibs.release></windows.oslibs.release>
         <windows.oslibs.debug></windows.oslibs.debug>
-        <mac.oslibs>-lssl -lbz2 -framework IOKit -framework CoreServices -lsigar-universal64-macosx</mac.oslibs>
+        <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices -lsigar-universal64-macosx</mac.oslibs>
         <!--Global defines-->
         <global.defines></global.defines>
         <!--Specific os defines-->
@@ -38,6 +38,7 @@
         <linux.defines/>
         <mac.defines/>
         <path>${env.PATH}</path>
+        <rdep.packages>openssl</rdep.packages>
     </properties>
 
     <dependencies>

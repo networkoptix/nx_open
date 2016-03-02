@@ -190,27 +190,6 @@
                     <type>tar.gz</type>
                     <classifier>${platform}-x64</classifier>
                 </dependency>
-                <!-- <dependency>
-                    <groupId>com.digia</groupId>
-                    <version>${qt.version}</version>
-                    <artifactId>qt</artifactId>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-x86${compile.options}</classifier>
-                </dependency>
-                <dependency>
-                    <groupId>com.digia</groupId>
-                    <version>${qt.version}</version>
-                    <artifactId>qt</artifactId>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-x64${compile.options}</classifier>
-                </dependency> -->
-                <dependency>
-                    <groupId>org.openssl</groupId>
-                    <artifactId>openssl</artifactId>
-                    <version>${openssl.version}</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>
                 <dependency>
                     <groupId>com.creativelabs</groupId>
                     <artifactId>openal</artifactId>
@@ -369,13 +348,6 @@
             </activation>
             <dependencies>
                 <dependency>
-                    <groupId>org.openssl</groupId>
-                    <artifactId>openssl</artifactId>
-                    <version>${openssl.version}</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>
-                <dependency>
                     <groupId>org.ffmpeg</groupId>
                     <artifactId>ffmpeg</artifactId>
                     <version>${ffmpeg.version}</version>
@@ -445,13 +417,6 @@
                     <classifier>${profile.classifier}-${compiler}</classifier>
                 </dependency>
                 <dependency>
-                    <groupId>org.openssl</groupId>
-                    <artifactId>openssl</artifactId>
-                    <version>${openssl.version}</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>
-                <dependency>
                     <groupId>org.ffmpeg</groupId>
                     <artifactId>ffmpeg</artifactId>
                     <version>${ffmpeg.version}</version>
@@ -507,13 +472,6 @@
                     <groupId>org.cyrus</groupId>
                     <artifactId>sasl2</artifactId>
                     <version>${sasl2.version}</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>
-                <dependency>
-                    <groupId>org.openssl</groupId>
-                    <artifactId>openssl</artifactId>
-                    <version>${openssl.version}</version>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${compiler}</classifier>
                 </dependency>
@@ -631,13 +589,6 @@
                     <classifier>${profile.classifier}-${compiler}</classifier>
                 </dependency>
                 <dependency>
-                    <groupId>org.openssl</groupId>
-                    <artifactId>openssl</artifactId>
-                    <version>${openssl.version}</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>
-                <dependency>
                     <groupId>org.ffmpeg</groupId>
                     <artifactId>ffmpeg</artifactId>
                     <version>${ffmpeg.version}</version>
@@ -690,13 +641,6 @@
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${compiler}</classifier>
                 </dependency>                     
-                <dependency>
-                    <groupId>org.openssl</groupId>
-                    <artifactId>openssl</artifactId>
-                    <version>${openssl.version}</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>
                 <dependency>
                     <groupId>org.ffmpeg</groupId>
                     <artifactId>ffmpeg</artifactId>
@@ -774,13 +718,6 @@
             </activation>
             <dependencies>
                 <dependency>
-                    <groupId>org.openssl</groupId>
-                    <artifactId>openssl</artifactId>
-                    <version>${openssl.version}</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}</classifier>
-                </dependency>
-                <dependency>
                     <groupId>net.sourceforge</groupId>
                     <artifactId>libjpeg-turbo</artifactId>
                     <version>1.4.2-SNAPSHOT</version>
@@ -809,13 +746,6 @@
                 </property>
             </activation>
             <dependencies>
-                <dependency>
-                    <groupId>org.openssl</groupId>
-                    <artifactId>openssl</artifactId>
-                    <version>${openssl.version}</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}</classifier>
-                </dependency>
                 <dependency>
                     <groupId>net.sourceforge</groupId>
                     <artifactId>libjpeg-turbo</artifactId>

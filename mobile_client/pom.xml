@@ -24,12 +24,12 @@
         <global.libs>-lclient.core -lnx_media -lnx_audio -lnx_streaming -lappserver2 -lcommon</global.libs>
 
         <!--Specific os libs used-->
-        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -ld3d9 -lopenal32 -lssleay32 -llibeay32</windows.oslibs>
+        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -ld3d9 -lopenal32</windows.oslibs>
         <windows.oslibs.release/>
         <windows.oslibs.debug/>
-        <linux.oslibs>${ffmpeg.libs} -lssl -lcrypto -lmp3lame -lz -lopenal -lX11 -lXfixes -lGL -lGLU -ltermcap -lsigar -lfaac -lquazip</linux.oslibs>
-        <android.oslibs>-lssl -lcrypto -lturbojpeg -lopenal</android.oslibs>
-        <ios.oslibs>-lssl -lcrypto -lturbojpeg</ios.oslibs>
+        <linux.oslibs>${ffmpeg.libs} -lmp3lame -lz -lopenal -lX11 -lXfixes -lGL -lGLU -ltermcap -lsigar -lfaac -lquazip</linux.oslibs>
+        <android.oslibs>-lturbojpeg -lopenal</android.oslibs>
+        <ios.oslibs>-lturbojpeg</ios.oslibs>
         <!--Global defines-->
         <global.defines>CL_FORCE_LOGO</global.defines>
         <!--Specific os defines-->
@@ -38,6 +38,7 @@
         <mac.defines/>
         <android.defines/>
         <ios.defines/>
+        <rdep.packages>openssl</rdep.packages>
 
         <project.version.code>${buildNumber}</project.version.code>
         <project.version.name>${release.version}</project.version.name>

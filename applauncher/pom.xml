@@ -31,6 +31,7 @@
         </dependency>
     </dependencies>
 
+    <!-- >Why the small applaucher uses openssl, nx_streaming, udt and so on? O_O </!-->
     <properties>
         <guid>${applauncher.guid}</guid>
         <product.title>${applauncher.name}</product.title>
@@ -41,7 +42,7 @@
         <ffmpeg.libs></ffmpeg.libs>
         <global.libs>-lcommon -lnx_utils -lnx_network -lnx_streaming -lquazip -ludt</global.libs>
         <!--Specific os libs used-->
-        <windows.oslibs>DbgHelp.lib ssleay32.lib libeay32.lib Ws2_32.lib Iphlpapi.lib Winmm.lib</windows.oslibs>
+        <windows.oslibs>DbgHelp.lib Ws2_32.lib Iphlpapi.lib Winmm.lib</windows.oslibs>
         <windows.oslibs.release></windows.oslibs.release> 
         <windows.oslibs.debug></windows.oslibs.debug>        
         <linux.oslibs></linux.oslibs>
@@ -51,6 +52,7 @@
         <!--Specific os defines-->
         <windows.defines/>
         <linux.defines/>
-        <mac.defines/>      
+        <mac.defines/>    
+        <rdep.packages>openssl</rdep.packages>
     </properties>   
 </project>
