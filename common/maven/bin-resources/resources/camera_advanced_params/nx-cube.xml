@@ -35,14 +35,14 @@
 					dataType="Number"
 					range="1,255"
 					readCmd="encoder"
-					writeCmd="composite-VIDEO_WB_GAIN-0"/>
+					writeCmd="VIDEO_WB_GAIN=VIDEO_WB_R_GAIN-0"/>
 				<param id="VIDEO_WB_B_GAIN"
 					name="White Balance B Gain (Manual Mode)"
 					decription="Blue color gain. Affects only in manual white balance mode"
 					dataType="Number"
 					range="1,255"
 					readCmd="encoder"
-					writeCmd="composite-VIDEO_WB_GAIN-1"/>
+					writeCmd="VIDEO_WB_GAIN=VIDEO_WB_B_GAIN-1"/>
 				<param id="VIDEO_EXPOSURE_MODE"
 					name="Exposure Mode"
 					dataType="Enumeration"

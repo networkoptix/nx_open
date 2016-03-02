@@ -12,6 +12,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/hash.h>
 #include <utils/common/collection.h>
+#include <nx/utils/log/assert.h>
 
 #include <nx/utils/log/assert.h>
 

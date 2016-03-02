@@ -17,6 +17,7 @@
 #include <utils/xml/camera_advanced_param_reader.h>
 
 
+
 class QnActiPtzController;
 
 class QnActiResource
@@ -28,6 +29,11 @@ class QnActiResource
 
 public:
     static const QString MANUFACTURE;
+    static const QString CAMERA_PARAMETER_GROUP_ENCODER;
+    static const QString CAMERA_PARAMETER_GROUP_SYSTEM;
+    static const QString CAMERA_PARAMETER_GROUP_DEFAULT;
+    static const QString DEFAULT_ADVANCED_PARAMETERS_TEMPLATE;
+    static const QString ADVANCED_PARAMETERS_TEMPLATE_PARAMETER_NAME;
 
     static const int MAX_STREAMS = 2;
 
@@ -117,17 +123,19 @@ private:
     void initializePtz();
     void initializeIO( const QMap<QByteArray, QByteArray>& systemInfo );
     bool isRtspAudioSupported(const QByteArray& platform, const QByteArray& firmware) const;
-    void fetchAndSetAdvancedParameters(const QString model);
+    void fetchAndSetAdvancedParameters();
+    QString getAdvancedParametersTemplate() const;
     bool loadAdvancedParametersTemplateFromFile(QnCameraAdvancedParams& params, const QString& filename);
-    bool fetchActualCameraAdvancedParameters(QnCameraAdvancedParams& params);
-    QSet<QString> calculateSupportedAdvancedParameters(const QnCameraAdvancedParams& allParams);
-    bool parseParameter(const QString& paramId, QnCameraAdvancedParamValue& param);
-    QString getNthParameterInCompositeValue(const QString& paramValue, const int& n);
-    bool setNthParameterInCompositeValue(QString& compositeValue, const QString& paramValue, const int& n);
-    QPair<QString, int> getMainParameter(const QnCameraAdvancedParameter& compositeParam);
-    void convertParamValueToInternal(QString& paramValue, const QnCameraAdvancedParameter& param);
-    void convertParamValueFromInternal(QString& paramValue, const QnCameraAdvancedParameter& param);
-    bool parseCameraParametersResponse(const QByteArray& response, QnCameraAdvancedParamValueList& result);
+    QSet<QString> calculateSupportedAdvancedParameters(const QnCameraAdvancedParams& allParams) const;
+    bool parseParameter(const QString& paramId, QnCameraAdvancedParamValue& param) const;
+    QString getNthParameterInAgregateValue(const QString& paramValue, const int& paramPosition) const;
+    bool setNthParameterInAgregateValue(QString& agregateValue, const QString& paramValue, const int& paramPosition) const;
+    QnCameraAdvancedAgregateParameterInfo getAgregateInfo(const QnCameraAdvancedParameter& param) const;
+    void convertParamValueToInternal(QString& paramValue, const QnCameraAdvancedParameter& param) const;
+    void convertParamValueFromInternal(QString& paramValue, const QnCameraAdvancedParameter& param) const;
+    bool parseCameraParametersResponse(const QByteArray& response, QnCameraAdvancedParamValueList& result) const;
+    QString getParameterGroup(const QnCameraAdvancedParameter& param) const;
+    bool isComponentOfAgregate(const QnCameraAdvancedParameter& param) const;
 
 private:
     class TriggerOutputTask

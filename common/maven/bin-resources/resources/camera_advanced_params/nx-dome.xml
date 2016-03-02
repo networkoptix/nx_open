@@ -35,14 +35,14 @@
 					dataType="Number"
 					range="1,255"
 					readCmd="encoder"
-					writeCmd="composite-VIDEO_WB_GAIN-0"/>
+					writeCmd="VIDEO_WB_GAIN=VIDEO_WB_R_GAIN-0"/>
 				<param id="VIDEO_WB_B_GAIN"
 					name="White Balance B Gain"
 					description="Blue color gain (1-255). Affects only in manual white balance mode"
 					dataType="Number"
 					range="1,255"
 					readCmd="encoder"
-					writeCmd="composite-VIDEO_WB_GAIN-1"/>
+					writeCmd="VIDEO_WB_GAIN=VIDEO_WB_B_GAIN-1"/>
 				<param id="VIDEO_EXPOSURE_MODE"
 					name="Exposure Mode"
 					dataType="Enumeration"
@@ -115,7 +115,7 @@
 					dataType="Number"
 					range="1,10"
 					readCmd="encoder"
-					writeCmd="composite-ADAP_IRLED_CONFIG-0"/>
+					writeCmd="ADAP_IRLED_CONFIG=ADAP_IRLED_CONFIG_FIRST-0"/>
 			</group>
 			<group name="Extra Settings">
 				<param 	id="VIDEO_MIRROR_MODE"
