@@ -341,6 +341,11 @@ qint64 QBufferedFile::readData (char * data, qint64 len )
     return rez;
 }
 
+bool QBufferedFile::atEnd() const
+{
+    return m_fileEngine->eof();
+}
+
 qint64 QBufferedFile::writeData ( const char * data, qint64 len )
 {
     if (m_lastSeekPos != (qint64)AV_NOPTS_VALUE) {

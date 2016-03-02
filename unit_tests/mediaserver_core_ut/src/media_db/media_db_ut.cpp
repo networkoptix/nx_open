@@ -66,9 +66,23 @@ bool operator == (const TestFileOperation &lhs, const TestFileOperation &rhs)
 
 TestFileOperation generateFileOperation(int code)
 {
+    int tz = genRandomNumber<0, 14>() * 60;
+    switch (genRandomNumber<0, 2>())
+    {
+    case 0:
+        break;
+    case 1:
+        tz += 30;
+        break;
+    case 2:
+        tz += 45;
+        break;
+    }
+    tz *= genRandomNumber<0, 1>() == 0 ? 1 : -1;
+
     return{ genRandomNumber<0, 4398046511103LL>(), genRandomNumber<0, 1099511627776LL>(),
             code, (int)genRandomNumber<0, 65535>(), (int)genRandomNumber<0, 1048575LL>(), 
-            (int) genRandomNumber<1, 127>(), (int)genRandomNumber<0, 1>() };
+            tz, (int)genRandomNumber<0, 1>() };
 }
 
 struct TestCameraOperation
