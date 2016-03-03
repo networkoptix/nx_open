@@ -95,8 +95,7 @@ public:
     RandomDataTcpServer(const QByteArray& dataToSend);
     virtual ~RandomDataTcpServer();
 
-    void setServerSocketFactoryFunc(
-        nx::utils::MoveOnlyFunc<std::unique_ptr<AbstractStreamServerSocket>()> func);
+    void setServerSocket(std::unique_ptr<AbstractStreamServerSocket> serverSock);
 
     virtual void pleaseStop() override;
     virtual void join() override;
@@ -112,9 +111,6 @@ private:
     QnMutex m_mutex;
     std::list<std::shared_ptr<TestConnection>> m_acceptedConnections;
     SocketAddress m_localAddress;
-    nx::utils::MoveOnlyFunc<
-        std::unique_ptr<AbstractStreamServerSocket>()
-    > m_serverSocketFactoryFunc;
 
     void onNewConnection( SystemError::ErrorCode errorCode, AbstractStreamSocket* newConnection );
     void onConnectionDone( TestConnection* connection );

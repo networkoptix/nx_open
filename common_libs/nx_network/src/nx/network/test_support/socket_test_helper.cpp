@@ -287,10 +287,10 @@ RandomDataTcpServer::~RandomDataTcpServer()
     join();
 }
 
-void RandomDataTcpServer::setServerSocketFactoryFunc(
-    nx::utils::MoveOnlyFunc<std::unique_ptr<AbstractStreamServerSocket>()> func)
+void RandomDataTcpServer::setServerSocket(
+    std::unique_ptr<AbstractStreamServerSocket> serverSock)
 {
-    m_serverSocketFactoryFunc = std::move(func);
+    m_serverSocket = std::move(serverSock);
 }
 
 void RandomDataTcpServer::pleaseStop()
@@ -310,10 +310,8 @@ void RandomDataTcpServer::join()
 
 bool RandomDataTcpServer::start()
 {
-    m_serverSocket = 
-        m_serverSocketFactoryFunc
-        ? m_serverSocketFactoryFunc()
-        : SocketFactory::createStreamServerSocket();
+    if (!m_serverSocket)
+        m_serverSocket = SocketFactory::createStreamServerSocket();
     if( !m_serverSocket->bind(m_localAddress) ||
         !m_serverSocket->listen() )
     {

@@ -59,6 +59,9 @@ public:
         std::function<void(SystemError::ErrorCode,
                            AbstractStreamSocket*)> handler) override;
 
+    /** Invokes listen on mediator */
+    bool registerOnMediatorSync();
+
 protected:
     void initTunnelPool(int queueLen);
     void startAcceptor(std::unique_ptr<AbstractTunnelAcceptor> acceptor);
