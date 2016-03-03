@@ -42,8 +42,6 @@
 #include "core/resource_management/status_dictionary.h"
 #include "core/resource/camera_history.h"
 
-Q_DECLARE_METATYPE(ec2::ApiFullInfoData)
-
 QnCommonMessageProcessor::QnCommonMessageProcessor(QObject *parent) :
     base_type(parent)
 {
