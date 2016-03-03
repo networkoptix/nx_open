@@ -8,6 +8,6 @@
 <ng-include ng-if="settings.template" src="settings.template"></ng-include>
 <div class="modal-footer" ng-if="settings.hasFooter">
     <button type="button" class="btn btn-default" data-dismiss="modal" ng-if="!settings.cancellable" ng-click="cancel()" >Cancel</button>
-    <button type="button" class="btn btn-primary" ng-if="!settings.cancellable" ng-click="ok()" >Ok</button>
-    <button type="button" class="btn btn-primary" ng-if="settings.cancellable" ng-click="close()" >Close</button>
+    <button type="button" class="btn" ng-class="settings.buttonClass" ng-if="!settings.cancellable" ng-click="ok()" >{{settings.actionLabel}}</button>
+    <button type="button" class="btn" ng-class="settings.buttonClass" ng-if="settings.cancellable" ng-click="close()" >Close</button>
 </div>

@@ -92,7 +92,7 @@ angular.module('cloudApp')
             if($scope.isOwner ){
 
                 // User is the owner. Deleting system means unbinding it and disconnecting all accounts
-                dialogs.confirm(L.system.confirmDisconnect).
+                dialogs.confirm(L.system.confirmDisconnect, L.system.confirmDisconnectTitle, L.system.confirmDisconnectAction, 'danger').
                     then(function(){
                         $scope.deletingSystem = process.init(function(){
                             return cloudApi.disconnect(systemId);
@@ -102,7 +102,7 @@ angular.module('cloudApp')
 
             }else{
                 // User is not owner. Deleting means he'll lose access to it
-                dialogs.confirm(L.system.confirmUnshareFromMe).
+                dialogs.confirm(L.system.confirmUnshareFromMe, L.system.confirmUnshareFromMeTitle, L.system.confirmUnshareFromMeAction, 'danger').
                     then(function(){
                         $scope.deletingSystem = process.init(function(){
                             return cloudApi.unshare(systemId, $scope.account.email);
@@ -127,7 +127,7 @@ angular.module('cloudApp')
             if($scope.account.email == user.accountEmail){
                 return $scope.delete();
             }
-            dialogs.confirm(L.system.confirmUnshare).
+            dialogs.confirm(L.system.confirmUnshare, L.system.confirmUnshareTitle, L.system.confirmUnshareAction, 'danger').
                 then(function(){
                     // Run a process of sharing
                     $scope.unsharingMessage = L.system.permissionsRemoved.replace('{accountEmail}',user.accountEmail);

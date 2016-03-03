@@ -2,7 +2,7 @@
 
 angular.module('cloudApp')
     .factory('dialogs', function ($http, $uibModal, $q, $location) {
-        function openDialog(title, template, url, content, hasFooter, cancellable, params, closable){
+        function openDialog(title, template, url, content, hasFooter, cancellable, params, closable, actionLabel, buttonType){
 
             //scope.inline = typeof($location.search().inline) != 'undefined';
 
@@ -26,7 +26,9 @@ angular.module('cloudApp')
                             content:content,
                             cancellable: cancellable,
                             params: params,
-                            closable: closable || cancellable
+                            actionLabel: actionLabel || L.dialogs.okButton,
+                            closable: closable || cancellable,
+                            buttonClass: buttonType? 'btn-'+ buttonType : 'btn-primary'
                         };
                     },
                     params:function(){
@@ -67,16 +69,15 @@ angular.module('cloudApp')
 
         return {
             alert:function(message, title){
-                return openDialog(title, null, null, message, true, true).result;
+                return openDialog(title, null, null, message, true, true, null, true).result;
             },
-            confirm:function(message, title){
-                return openDialog(title, null, null, message, true, false).result;
+            confirm:function(message, title, actionLabel, actionType){
+                return openDialog(title, null, null, message, true, false, null, false, actionLabel, actionType).result;
             },
             login:function(force){
-                return openDialog('Login to Nx Cloud', 'views/login.html', 'login', null, false, !force, null, true).result;
+                return openDialog(L.dialogs.loginTitle, 'views/login.html', 'login', null, false, !force, null, true).result;
             },
             share:function(systemId, isOwner, share){
-
                 var url = 'share';
                 if(share){
                     url += '/' + share.accountEmail;

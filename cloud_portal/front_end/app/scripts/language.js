@@ -1,6 +1,10 @@
 'use strict';
 
 var L = {
+    dialogs:{
+        okButton: 'Ok',
+        loginTitle: 'Login to Nx Cloud'
+    },
     systemStatuses:{
         notActivated: 'not activated',
         activated: 'activated',
@@ -71,8 +75,17 @@ var L = {
     },
     system:{
         confirmDisconnect: "You are going to completely disconnect your system from the cloud. Are you sure?",
+        confirmDisconnectTitle: "Disconnect system?",
+        confirmDisconnectAction: "Disconnect",
+
         confirmUnshareFromMe: "You are going to disconnect this system from your account. You will lose an access for this system. Are you sure?",
+        confirmUnshareFromMeTitle: "Delete system?",
+        confirmUnshareFromMeAction: "Delete",
+
         confirmUnshare: "You are going to debar user from the system. Are you sure?",
+        confirmUnshareTitle: "Delete User?",
+        confirmUnshareAction: "Delete",
+
         permissionsRemoved: 'Permissions were removed from {accountEmail}'
     }
 };
