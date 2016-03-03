@@ -5,12 +5,13 @@
 
 #include <iostream>
 
-#include <utils/common/command_line_parser.h>
-
 #include <nx/network/cloud/cloud_server_socket.h>
 #include <nx/network/cloud/cloud_stream_socket.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/test_support/socket_test_helper.h>
+
+#include <utils/common/command_line_parser.h>
+#include <utils/common/string.h>
 
 
 void printHelp();
@@ -56,13 +57,15 @@ int runInListenMode(const std::multimap<QString, QString>& args)
         std::cerr << "error. Required parameter cloud-credentials MUST have format system_id:authentication_key" << std::endl;
         return 1;
     }
+    QString serverId = generateRandomName(7);
+    readArg(args, "server-id", &serverId);
 
     SocketGlobals::InitGuard socketGlobalsGuard;
 
     SocketGlobals::mediatorConnector().setSystemCredentials(
         nx::hpm::api::SystemCredentials(
             credentials[0].toUtf8(),
-            QnUuid::createUuid().toByteArray(),
+            serverId.toUtf8(),
             credentials[1].toUtf8()));
     SocketGlobals::mediatorConnector().enable(true);
 
@@ -74,7 +77,9 @@ int runInListenMode(const std::multimap<QString, QString>& args)
             SystemError::getLastOSErrorText().toStdString() << std::endl;
         return 1;
     }
-    std::cout << "listening on mediator" << std::endl;
+    std::cout << "listening on mediator. Address "
+        << serverId.toStdString()<<"."<< credentials[0].toStdString()
+        << std::endl;
 
     //TODO #ak RandomDataTcpServer does not fit well at the moment: 
         //should fit it to this tool's needs
@@ -90,7 +95,10 @@ int runInListenMode(const std::multimap<QString, QString>& args)
 
     for (;;)
     {
-        std::cout<<"Enter \"exit\" to quit >> ";
+        std::cout<<
+            "Enter \"exit\" to exit... \n"
+            "\n"
+            ">> ";
         std::string s;
         std::cin>>s;
         if (s == "exit")
@@ -103,9 +111,53 @@ int runInListenMode(const std::multimap<QString, QString>& args)
     return 0;
 }
 
+const int kDefaultTotalConnections = 100;
+const int kDefaultMaxConcurrentConnections = 10;
+const int kDefaultBytesToSend = 100000;
+
 int runInConnectMode(const std::multimap<QString, QString>& args)
 {
-    return 1;
+    QString target;
+    if (!readArg(args, "target", &target))
+    {
+        std::cerr << "error. Required parameter \"target\" is missing" << std::endl;
+        return 1;
+    }
+
+    int totalConnections = kDefaultTotalConnections;
+    readArg(args, "total-connections", &totalConnections);
+
+    int maxConcurrentConnections = kDefaultMaxConcurrentConnections;
+    readArg(args, "max-concurrent-connections", &maxConcurrentConnections);
+
+    int bytesToSend = kDefaultBytesToSend;
+    readArg(args, "bytes-to-send", &bytesToSend);
+
+    nx::network::test::ConnectionsGenerator connectionsGenerator(
+        SocketAddress(target),
+        maxConcurrentConnections,
+        bytesToSend,
+        totalConnections);
+
+    std::promise<void> finishedPromise;
+    connectionsGenerator.setOnFinishedHandler(
+        [&finishedPromise]{ finishedPromise.set_value(); });
+
+    const auto startTime = std::chrono::steady_clock::now();
+    connectionsGenerator.start();
+    finishedPromise.get_future().wait();
+    const auto testDuration =
+        std::chrono::duration_cast<std::chrono::seconds>(
+            std::chrono::steady_clock::now() - startTime);
+
+    std::cout<<"connect summary: "
+        "Total time: "<< testDuration.count() <<"s. "
+        "Total connections: "<<connectionsGenerator.totalConnectionsEstablished()<<". "
+        "Total bytes sent: "<<connectionsGenerator.totalBytesSent()<<". "
+        "Total bytes received: "<<connectionsGenerator.totalBytesReceived()<<
+        std::endl;
+
+    return 0;
 }
 
 void printHelp()
@@ -116,6 +168,7 @@ void printHelp()
         "  --listen                         Enable listen mode\n"
         "  --cloud-credentials={system_id}:{authentication_key}"
         "                                   Specify credentials to use to connect to mediator\n"
+        "  --server-id={server_id}          Id used when registering on mediator\n"
         "\n"
         "Connect mode:\n"
         "  --connect                        Enable connect mode\n"

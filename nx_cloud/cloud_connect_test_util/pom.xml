@@ -20,7 +20,7 @@
         <guid>${cloud_connect_test_util.guid}</guid>
         <product.title>${company.name} Cloud Connect Testing Utility</product.title>
         <!--Global libs-->
-        <qt.libs>core concurrent</qt.libs>
+        <qt.libs>core concurrent xml</qt.libs>
         <global.libs>-lcommon -lnx_streaming -lnx_network -lnx_utils -ludt</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm ssleay32.lib libeay32.lib</windows.oslibs>

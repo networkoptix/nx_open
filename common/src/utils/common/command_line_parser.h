@@ -137,4 +137,13 @@ void parseCmdArgs(
     char **argv,
     std::multimap<QString, QString>* const args);
 
+bool readArg(
+    const std::multimap<QString, QString>& args,
+    const QString& name,
+    QString* const value);
+bool readArg(
+    const std::multimap<QString, QString>& args,
+    const QString& name,
+    int* const value);
+
 #endif // QN_COMMAND_LINE_PARSER_H
