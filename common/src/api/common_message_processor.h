@@ -16,6 +16,8 @@
 #include <nx/utils/singleton.h>
 #include <utils/common/connective.h>
 
+class QnResourceFactory;
+
 class QnCommonMessageProcessor: public Connective<QObject>, public Singleton<QnCommonMessageProcessor>
 {
     Q_OBJECT
@@ -31,8 +33,8 @@ public:
 
     QMap<QnUuid, QnBusinessEventRulePtr> businessRules() const;
 
-    void resetServerUserAttributesList( const QnMediaServerUserAttributesList& serverUserAttributesList );
-    void resetCameraUserAttributesList( const QnCameraUserAttributesList& cameraUserAttributesList );
+    void resetServerUserAttributesList( const ec2::ApiMediaServerUserAttributesDataList& serverUserAttributesList );
+    void resetCameraUserAttributesList( const ec2::ApiCameraAttributesDataList& cameraUserAttributesList );
     void resetPropertyList(const ec2::ApiResourceParamWithRefDataList& params);
     void resetStatusList(const ec2::ApiResourceStatusDataList& params);
 signals:
@@ -71,19 +73,20 @@ protected:
     virtual void handleRemotePeerFound(const ec2::ApiPeerAliveData &data);
     virtual void handleRemotePeerLost(const ec2::ApiPeerAliveData &data);
 
-    virtual void onGotInitialNotification(const ec2::QnFullResourceData& fullData);
+    virtual void onGotInitialNotification(const ec2::ApiFullInfoData& fullData);
     virtual void onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus status) = 0;
     virtual void execBusinessActionInternal(const QnAbstractBusinessActionPtr& /*action*/) {}
-    
-    virtual void afterRemovingResource(const QnUuid &id);
 
-    virtual void resetResources(const QnResourceList &resources);
-    void resetLicenses(const QnLicenseList &licenses);
+    void resetResourceTypes(const ec2::ApiResourceTypeDataList& resTypes);
+    void resetResources(const ec2::ApiFullInfoData& fullData);
+    void resetLicenses(const ec2::ApiLicenseDataList& licenses);
     void resetCamerasWithArchiveList(const ec2::ApiServerFootageDataList &cameraHistoryList);
-    
+    void resetTime();
+
     virtual bool canRemoveResource(const QnUuid& resourceId);
     virtual void removeResourceIgnored(const QnUuid& resourceId);
 
+    virtual QnResourceFactory* getResourceFactory() const = 0;
 
 public slots:
     void on_businessEventAddedOrUpdated(const QnBusinessEventRulePtr &rule);
@@ -91,11 +94,11 @@ public slots:
     void on_licenseRemoved(const QnLicensePtr &license);
 
 private slots:
-    void on_gotInitialNotification(const ec2::QnFullResourceData &fullData);
+    void on_gotInitialNotification(const ec2::ApiFullInfoData& fullData);
     void on_gotDiscoveryData(const ec2::ApiDiscoveryData &discoveryData, bool addInformation);
 
-    void on_remotePeerFound(const ec2::ApiPeerAliveData &data);
-    void on_remotePeerLost(const ec2::ApiPeerAliveData &data);
+    void on_remotePeerFound(const ec2::ApiPeerAliveData& data);
+    void on_remotePeerLost(const ec2::ApiPeerAliveData& data);
 
     void on_resourceStatusChanged(const QnUuid &resourceId, Qn::ResourceStatus status );
     void on_resourceParamChanged(const ec2::ApiResourceParamWithRefData& param );
@@ -110,7 +113,7 @@ private slots:
 
     void on_businessEventRemoved(const QnUuid &id);
     void on_businessActionBroadcasted(const QnAbstractBusinessActionPtr &businessAction);
-    void on_businessRuleReset(const QnBusinessEventRuleList &rules);
+    void on_businessRuleReset(const ec2::ApiBusinessRuleDataList& rules);
     void on_broadcastBusinessAction(const QnAbstractBusinessActionPtr& action);
     void on_execBusinessAction( const QnAbstractBusinessActionPtr& action );
 protected:

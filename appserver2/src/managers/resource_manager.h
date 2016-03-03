@@ -35,12 +35,6 @@ namespace ec2
             // nothing to do
         }
 
-        /*
-        void triggerNotification( const QnTransaction<ApiSetResourceDisabledData>& tran ) {
-            emit disabledChanged( QnUuid(tran.params.id), tran.params.disabled );
-        }
-        */
-
         void triggerNotification( const QnTransaction<ApiResourceParamWithRefData>& tran ) {
             emit resourceParamChanged(tran.params );
         }
@@ -95,7 +89,7 @@ namespace ec2
         //!Implementation of AbstractResourceManager::remove
         virtual int remove( const QnUuid& id, impl::SimpleHandlerPtr handler ) override;
         virtual int remove( const QVector<QnUuid>& idList, impl::SimpleHandlerPtr handler ) override;
-        
+
     private:
         QueryProcessorType* const m_queryProcessor;
 

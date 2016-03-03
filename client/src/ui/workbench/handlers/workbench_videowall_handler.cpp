@@ -253,7 +253,7 @@ namespace {
     class QnVideowallReviewLayoutResource: public QnLayoutResource {
     public:
         QnVideowallReviewLayoutResource(const QnVideoWallResourcePtr &videowall):
-            QnLayoutResource(qnResTypePool)
+            QnLayoutResource()
         {
             addFlags(Qn::local);
             setName(videowall->getName());
@@ -1150,7 +1150,7 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(const QnResourc
             desiredAspectRatio = ar;
     }
 
-    QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
+    QnLayoutResourcePtr layout(new QnLayoutResource());
     layout->setId(m_uuidPool->getFreeId());
     if (filtered.size() == 1) {
         QnResourcePtr resource = filtered.first();

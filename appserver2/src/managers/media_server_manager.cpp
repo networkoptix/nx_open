@@ -34,7 +34,7 @@ namespace ec2
         auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ApiMediaServerDataList& servers) {
             QnMediaServerResourceList outData;
             if( errorCode == ErrorCode::ok )
-                fromApiToResourceList(servers, outData, m_resCtx);
+                fromApiToResourceList(servers, outData);
             handler->done( reqID, errorCode, outData);
         };
         m_queryProcessor->template processQueryAsync<QnUuid, ApiMediaServerDataList, decltype(queryDoneHandler)> (
@@ -46,16 +46,6 @@ namespace ec2
     int QnMediaServerManager<T>::save( const QnMediaServerResourcePtr& resource, impl::SaveServerHandlerPtr handler )
     {
         const int reqID = generateRequestID();
-
-        /*
-        QnAbstractStorageResourceList storages = resource->getStorages();
-        for (int i = 0; i < storages.size(); ++i)
-        {
-            if (storages[i]->getId().isNull())
-                storages[i]->setId(QnUuid::createUuid());
-        }
-        resource->setStorages(storages);
-        */
 
         //performing request
         auto tran = prepareTransaction( ApiCommand::saveMediaServer, resource );
@@ -113,10 +103,7 @@ namespace ec2
     {
         const int reqID = generateRequestID();
         auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ApiMediaServerUserAttributesDataList& serverUserAttributesList ) {
-            QnMediaServerUserAttributesList outData;
-            if( errorCode == ErrorCode::ok )
-                fromApiToResourceList(serverUserAttributesList, outData);
-            handler->done( reqID, errorCode, outData );
+            handler->done( reqID, errorCode, serverUserAttributesList);
         };
         m_queryProcessor->template processQueryAsync<QnUuid, ApiMediaServerUserAttributesDataList, decltype(queryDoneHandler)>
             ( ApiCommand::getServerUserAttributes, mediaServerId, queryDoneHandler );
@@ -127,18 +114,18 @@ namespace ec2
     int QnMediaServerManager<T>::getStorages( const QnUuid& mediaServerId, impl::GetStoragesHandlerPtr handler )
     {
         const int reqID = generateRequestID();
-        auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ApiStorageDataList& storages ) 
+        auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ApiStorageDataList& storages )
         {
             QnResourceList outData;
             if( errorCode == ErrorCode::ok )
-                fromApiToResourceList(storages, outData, m_resCtx);
+                fromApiToResourceList(storages, outData, m_resCtx.resFactory);
             handler->done( reqID, errorCode, outData );
         };
         m_queryProcessor->template processQueryAsync<QnUuid, ApiStorageDataList, decltype(queryDoneHandler)>
             ( ApiCommand::getStorages, mediaServerId, queryDoneHandler );
         return reqID;
     }
-    
+
     template<class T>
     QnTransaction<ApiMediaServerData> QnMediaServerManager<T>::prepareTransaction( ApiCommand::Value command, const QnMediaServerResourcePtr& resource )
     {
@@ -167,7 +154,7 @@ namespace ec2
     void QnMediaServerNotificationManager::triggerNotification( const QnTransaction<ApiMediaServerUserAttributesDataList>& tran )
     {
         assert( tran.command == ApiCommand::saveServerUserAttributesList );
-        for(const ApiMediaServerUserAttributesData& attrs: tran.params) 
+        for(const ApiMediaServerUserAttributesData& attrs: tran.params)
         {
             QnMediaServerUserAttributesPtr serverAttrs( new QnMediaServerUserAttributes() );
             fromApiToResource( attrs, serverAttrs );
@@ -205,11 +192,12 @@ namespace ec2
 
     void QnMediaServerNotificationManager::triggerNotification( const QnTransaction<ApiStorageDataList>& tran )
     {
-        QnResourceTypePtr resType = m_resCtx.resTypePool->getResourceTypeByName(lit("Storage"));
-        if (!resType)
+        auto resTypeId = qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kStorageTypeId);
+        if (resTypeId.isNull())
             return;
+
         for(const ec2::ApiStorageData& apiStorageData: tran.params) {
-            QnStorageResourcePtr storage = m_resCtx.resFactory->createResource(resType->getId(), 
+            QnStorageResourcePtr storage = m_resCtx.resFactory->createResource(resTypeId,
                 QnResourceParams(apiStorageData.id, apiStorageData.url, QString())).dynamicCast<QnStorageResource>();
             fromApiToResource(apiStorageData, storage);
             emit storageChanged( std::move(storage) );
@@ -220,11 +208,11 @@ namespace ec2
     {
         assert( tran.command == ApiCommand::saveStorage);
 
-        QnResourceTypePtr resType = m_resCtx.resTypePool->getResourceTypeByName(lit("Storage"));
-        if (!resType)
+        auto resTypeId = qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kStorageTypeId);
+        if (resTypeId.isNull())
             return;
 
-        QnStorageResourcePtr storage = m_resCtx.resFactory->createResource(resType->getId(), 
+        QnStorageResourcePtr storage = m_resCtx.resFactory->createResource(resTypeId,
             QnResourceParams(tran.params.id, tran.params.url, QString())).dynamicCast<QnStorageResource>();
         fromApiToResource(tran.params, storage);
         emit storageChanged( std::move(storage) );
@@ -233,8 +221,8 @@ namespace ec2
     void QnMediaServerNotificationManager::triggerNotification( const QnTransaction<ApiMediaServerData>& tran )
     {
         assert( tran.command == ApiCommand::saveMediaServer);
-        QnMediaServerResourcePtr mserverRes(new QnMediaServerResource(m_resCtx.resTypePool));
-        fromApiToResource(tran.params, mserverRes, m_resCtx);
+        QnMediaServerResourcePtr mserverRes(new QnMediaServerResource());
+        fromApiToResource(tran.params, mserverRes);
         emit addedOrUpdated( std::move(mserverRes ));
     }
 

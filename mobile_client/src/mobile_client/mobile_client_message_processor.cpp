@@ -30,12 +30,6 @@ void QnMobileClientMessageProcessor::updateResource(const QnResourcePtr &resourc
         updateMainServerApiUrl();
 }
 
-void QnMobileClientMessageProcessor::resetResources(const QnResourceList &resources) {
-    base_type::resetResources(resources);
-
-    updateMainServerApiUrl();
-}
-
 void QnMobileClientMessageProcessor::updateMainServerApiUrl() {
     QnMediaServerResourcePtr server = qnCommon->currentServer();
     if (!server)

@@ -32,7 +32,6 @@ protected:
 
     virtual void onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus ) override;
     virtual void init(const ec2::AbstractECConnectionPtr& connection) override;
-    virtual void afterRemovingResource(const QnUuid& id) override;
     void execBusinessActionInternal(const QnAbstractBusinessActionPtr& action) override;
     bool isLocalAddress(const QString& addr) const;
 
@@ -52,6 +51,7 @@ protected:
      */
     virtual void removeResourceIgnored(const QnUuid& resourceId) override;
 
+    virtual QnResourceFactory* getResourceFactory() const override;
 private slots:
     void at_updateChunkReceived(const QString &updateId, const QByteArray &data, qint64 offset);
     void at_updateInstallationRequested(const QString &updateId);

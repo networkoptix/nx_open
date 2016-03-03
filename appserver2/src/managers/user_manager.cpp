@@ -14,9 +14,9 @@
 namespace ec2
 {
     template<class QueryProcessorType>
-    QnUserManager<QueryProcessorType>::QnUserManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx )
+    QnUserManager<QueryProcessorType>::QnUserManager( QueryProcessorType* const queryProcessor)
     :
-        QnUserNotificationManager(resCtx),
+        QnUserNotificationManager(),
         m_queryProcessor( queryProcessor )
     {
     }
@@ -58,9 +58,9 @@ namespace ec2
     {
         //after successfull call completion users.front()->getPassword() is empty, so saving it here
         QString newPassword = users.front()->getPassword();
-        queryProcessor->processUpdateAsync( tran, 
+        queryProcessor->processUpdateAsync( tran,
             [queryProcessor, handler, reqID, users, newPassword]( ec2::ErrorCode errorCode ){
-                if( errorCode == ec2::ErrorCode::ok 
+                if( errorCode == ec2::ErrorCode::ok
                     && queryProcessor->userName() == users.front()->getName()
                     && !newPassword.isEmpty()
                     )

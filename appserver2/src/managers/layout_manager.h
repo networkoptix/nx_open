@@ -18,7 +18,7 @@ namespace ec2
         public AbstractLayoutManager
     {
     public:
-        QnLayoutNotificationManager( const ResourceContext& resCtx ) : m_resCtx( resCtx ) {}
+        QnLayoutNotificationManager( ) {}
 
         void triggerNotification( const QnTransaction<ApiIdData>& tran )
         {
@@ -29,7 +29,7 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiLayoutData>& tran )
         {
             assert( tran.command == ApiCommand::saveLayout);
-            QnLayoutResourcePtr layoutResource(new QnLayoutResource(m_resCtx.resTypePool));
+            QnLayoutResourcePtr layoutResource(new QnLayoutResource());
             fromApiToResource(tran.params, layoutResource);
             emit addedOrUpdated( layoutResource );
         }
@@ -37,16 +37,13 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiLayoutDataList>& tran )
         {
             assert(tran.command == ApiCommand::saveLayouts );
-            for(const ApiLayoutData& layout: tran.params) 
+            for(const ApiLayoutData& layout: tran.params)
             {
-                QnLayoutResourcePtr layoutResource(new QnLayoutResource(m_resCtx.resTypePool));
+                QnLayoutResourcePtr layoutResource(new QnLayoutResource());
                 fromApiToResource(layout, layoutResource);
                 emit addedOrUpdated( layoutResource );
             }
         }
-
-    protected:
-        const ResourceContext m_resCtx;
     };
 
 
@@ -57,7 +54,7 @@ namespace ec2
         public QnLayoutNotificationManager
     {
     public:
-        QnLayoutManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx );
+        QnLayoutManager( QueryProcessorType* const queryProcessor );
 
         virtual int getLayouts( impl::GetLayoutsHandlerPtr handler ) override;
         virtual int save( const QnLayoutResourceList& resources, impl::SimpleHandlerPtr handler ) override;

@@ -1101,7 +1101,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
         messageProcessor->resetStatusList( statusList );
 
         //reading server attributes
-        QnMediaServerUserAttributesList mediaServerUserAttributesList;
+        ec2::ApiMediaServerUserAttributesDataList mediaServerUserAttributesList;
         while ((rez = ec2Connection->getMediaServerManager()->getUserAttributesSync(QnUuid(), &mediaServerUserAttributesList)) != ec2::ErrorCode::ok)
         {
             NX_LOG( lit("QnMain::run(): Can't get server user attributes list. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1 );
@@ -1137,7 +1137,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
         }
 
         //reading camera attributes
-        QnCameraUserAttributesList cameraUserAttributesList;
+        ec2::ApiCameraAttributesDataList cameraUserAttributesList;
         while ((rez = ec2Connection->getCameraManager()->getUserAttributesSync(QnUuid(), &cameraUserAttributesList)) != ec2::ErrorCode::ok)
         {
             NX_LOG( lit("QnMain::run(): Can't get camera user attributes list. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1 );
@@ -1825,8 +1825,7 @@ void MediaServerProcess::run()
 
     ec2::ResourceContext resCtx(
         QnResourceDiscoveryManager::instance(),
-        qnResPool,
-        qnResTypePool );
+        qnResPool);
     //passing settings
     std::map<QString, QVariant> confParams;
     for( const auto& paramName: MSSettings::roSettings()->allKeys() )
@@ -1983,7 +1982,7 @@ void MediaServerProcess::run()
         QnMediaServerResourcePtr server = findServer(ec2Connection);
 
         if (!server) {
-            server = QnMediaServerResourcePtr(new QnMediaServerResource(qnResTypePool));
+            server = QnMediaServerResourcePtr(new QnMediaServerResource());
             server->setId(serverGuid());
             server->setMaxCameras(DEFAULT_MAX_CAMERAS);
             isNewServerInstance = true;

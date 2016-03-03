@@ -26,7 +26,7 @@ class QnMediaServerResource : public QnResource
     Q_PROPERTY(QString apiUrl READ getApiUrl WRITE setApiUrl)
 
 public:
-    QnMediaServerResource(const QnResourceTypePool* resTypePool);
+    QnMediaServerResource();
     virtual ~QnMediaServerResource();
 
     virtual QString getUniqueId() const;
@@ -154,12 +154,6 @@ private:
     mutable QnResourcePtr m_firstCamera;
 
     Qn::PanicMode calculatePanicMode() const;
-};
-
-class QnMediaServerResourceFactory : public QnResourceFactory
-{
-public:
-    virtual QnResourcePtr createResource(const QnUuid& resourceTypeId, const QnResourceParams& params) override;
 };
 
 Q_DECLARE_METATYPE(QnMediaServerResourcePtr);

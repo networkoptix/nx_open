@@ -16,7 +16,7 @@ namespace ec2
         public AbstractUserManager
     {
     public:
-        QnUserNotificationManager( const ResourceContext& resCtx ) : m_resCtx( resCtx ) {}
+        QnUserNotificationManager( ) {}
 
         void triggerNotification( const QnTransaction<ApiUserData>& tran )
         {
@@ -31,9 +31,6 @@ namespace ec2
             assert( tran.command == ApiCommand::removeUser );
             emit removed( QnUuid(tran.params.id) );
         }
-
-    protected:
-        ResourceContext m_resCtx;
     };
 
 
@@ -43,7 +40,7 @@ namespace ec2
         public QnUserNotificationManager
     {
     public:
-        QnUserManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx );
+        QnUserManager( QueryProcessorType* const queryProcessor);
 
         virtual int getUsers(const QnUuid& userId, impl::GetUsersHandlerPtr handler ) override;
         virtual int save( const QnUserResourcePtr& resource, impl::AddUserHandlerPtr handler ) override;

@@ -27,7 +27,7 @@ namespace ec2
     {
         const int reqID = generateRequestID();
 
-        //preparing output data 
+        //preparing output data
         QnVirtualCameraResourceList cameraList;
         Q_ASSERT_X(
             resource->getId() == QnVirtualCameraResource::uniqueIdToId( resource->getUniqueId() ),
@@ -40,7 +40,7 @@ namespace ec2
 
         using namespace std::placeholders;
         m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::AddCameraHandler::done ), handler, reqID, _1, cameraList ) );
-        
+
         return reqID;
     }
 
@@ -135,10 +135,7 @@ namespace ec2
         const int reqID = generateRequestID();
 
         auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ApiCameraAttributesDataList& cameraUserAttributesList ) {
-            QnCameraUserAttributesList outData;
-            if( errorCode == ErrorCode::ok )
-                fromApiToResourceList(cameraUserAttributesList, outData);
-            handler->done( reqID, errorCode, outData );
+            handler->done( reqID, errorCode, cameraUserAttributesList);
         };
         m_queryProcessor->template processQueryAsync<QnUuid, ApiCameraAttributesDataList, decltype(queryDoneHandler)>
             ( ApiCommand::getCameraUserAttributes, serverId, queryDoneHandler );

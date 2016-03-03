@@ -13,9 +13,9 @@
 namespace ec2
 {
     template<class QueryProcessorType>
-    QnVideowallManager<QueryProcessorType>::QnVideowallManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx )
+    QnVideowallManager<QueryProcessorType>::QnVideowallManager( QueryProcessorType* const queryProcessor )
     :
-        QnVideowallNotificationManager( resCtx ),
+        QnVideowallNotificationManager(),
         m_queryProcessor( queryProcessor )
     {
     }

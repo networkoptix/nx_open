@@ -79,6 +79,17 @@
 #include <nx_ec/data/api_discovery_data.h>
 #include <nx_ec/data/api_resource_data.h>
 #include <nx_ec/data/api_reverse_connection_data.h>
+#include <nx_ec/data/api_full_info_data.h>
+#include <nx_ec/data/api_webpage_data.h>
+#include <nx_ec/data/api_videowall_data.h>
+#include <nx_ec/data/api_user_data.h>
+#include <nx_ec/data/api_resource_type_data.h>
+#include <nx_ec/data/api_license_data.h>
+#include <nx_ec/data/api_layout_data.h>
+#include <nx_ec/data/api_camera_data.h>
+#include <nx_ec/data/api_business_rule_data.h>
+
+
 #include "api/model/api_ioport_data.h"
 #include "api/model/recording_stats_reply.h"
 #include "api/model/audit/audit_record.h"
@@ -295,6 +306,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<ec2::ApiCameraHistoryData>("ApiCameraHistoryData");
     qRegisterMetaType<ec2::ApiCameraHistoryDataList>("ApiCameraHistoryDataList");
     qRegisterMetaType<ec2::ApiCameraHistoryDataList>("ec2::ApiCameraHistoryDataList");
+    qRegisterMetaType<ec2::ApiFullInfoData>("ec2::ApiFullInfoData");
 
     qRegisterMetaType<QnUuid>();
     qRegisterMetaTypeStreamOperators<QnUuid>();

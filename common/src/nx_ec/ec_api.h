@@ -16,7 +16,6 @@
 #include <api/model/email_attachment.h>
 
 #include <core/resource/camera_bookmark_fwd.h>
-#include <core/resource/camera_user_attributes.h>
 #include <core/resource/videowall_control_message.h>
 
 #include <nx_ec/impl/ec_api_impl.h>
@@ -30,6 +29,8 @@
 #include <nx_ec/data/api_camera_history_data.h>
 #include <nx_ec/data/api_reverse_connection_data.h>
 #include <nx_ec/data/api_client_info_data.h>
+#include <nx_ec/data/api_camera_attributes_data.h>
+#include <nx_ec/data/api_media_server_data.h>
 
 #include "ec_api_fwd.h"
 
@@ -323,7 +324,7 @@ namespace ec2
             \param mediaServerId if not NULL, returned list contains at most one element: the one, corresponding to \a mediaServerId.
                 If NULL, returned list contains data of all known servers
         */
-        ErrorCode getUserAttributesSync(const QnUuid& mediaServerId, QnMediaServerUserAttributesList* const serverAttrsList ) {
+        ErrorCode getUserAttributesSync(const QnUuid& mediaServerId, ec2::ApiMediaServerUserAttributesDataList* const serverAttrsList ) {
             int(AbstractMediaServerManager::*fn)(const QnUuid&, impl::GetServerUserAttributesHandlerPtr) = &AbstractMediaServerManager::getUserAttributes;
             return impl::doSyncCall<impl::GetServerUserAttributesHandler>( std::bind(fn, this, mediaServerId, std::placeholders::_1), serverAttrsList );
         }
@@ -458,7 +459,7 @@ namespace ec2
             return getUserAttributes( serverId, std::static_pointer_cast<impl::GetCameraUserAttributesHandler>(std::make_shared<impl::CustomGetCameraUserAttributesHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
-        ErrorCode getUserAttributesSync(const QnUuid& cameraId, QnCameraUserAttributesList* const cameraAttrsList ) {
+        ErrorCode getUserAttributesSync(const QnUuid& cameraId, ec2::ApiCameraAttributesDataList* const cameraAttrsList ) {
             int(AbstractCameraManager::*fn)(const QnUuid&, impl::GetCameraUserAttributesHandlerPtr) = &AbstractCameraManager::getUserAttributes;
             return impl::doSyncCall<impl::GetCameraUserAttributesHandler>( std::bind(fn, this, cameraId, std::placeholders::_1), cameraAttrsList );
         }
@@ -604,7 +605,7 @@ namespace ec2
         void addedOrUpdated( QnBusinessEventRulePtr businessRule );
         void removed( QnUuid id );
         void businessActionBroadcasted( const QnAbstractBusinessActionPtr& businessAction );
-        void businessRuleReset( const QnBusinessEventRuleList& rules );
+        void businessRuleReset( const ec2::ApiBusinessRuleDataList& rules );
         void gotBroadcastAction(const QnAbstractBusinessActionPtr& action);
         void execBusinessAction(const QnAbstractBusinessActionPtr& action);
 
@@ -1173,13 +1174,13 @@ namespace ec2
             \param licenses
             \param cameraHistoryItems
         */
-        void initNotification(QnFullResourceData fullData);
+        void initNotification(const ec2::ApiFullInfoData& fullData);
         void runtimeInfoChanged(const ec2::ApiRuntimeData& runtimeInfo);
 
         void reverseConnectionRequested(const ec2::ApiReverseConnectionData& reverseConnetionData);
 
-        void remotePeerFound(ApiPeerAliveData data);
-        void remotePeerLost(ApiPeerAliveData data);
+        void remotePeerFound(const ec2::ApiPeerAliveData& data);
+        void remotePeerLost(const ec2::ApiPeerAliveData& data);
         void remotePeerUnauthorized(const QnUuid& id);
 
         void settingsChanged(ec2::ApiResourceParamDataList settings);
@@ -1197,23 +1198,20 @@ namespace ec2
     {
         QnResourceFactory* resFactory;
         QnResourcePool* pool;
-        const QnResourceTypePool* resTypePool;
 
         ResourceContext()
         :
             resFactory( nullptr ),
-            pool( nullptr ),
-            resTypePool( nullptr )
+            pool( nullptr )
         {
         }
         ResourceContext(
             QnResourceFactory* _resFactory,
-            QnResourcePool* _pool,
-            const QnResourceTypePool* _resTypePool )
+            QnResourcePool* _pool
+            )
         :
             resFactory( _resFactory ),
-            pool( _pool ),
-            resTypePool( _resTypePool )
+            pool( _pool )
         {
         }
     };

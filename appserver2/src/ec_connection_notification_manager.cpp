@@ -238,9 +238,7 @@ namespace ec2
     }
 
     void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiFullInfoData>& tran ) {
-        QnFullResourceData fullResData;
-        fromApiToResourceList(tran.params, fullResData, m_resCtx);
-        emit m_ecConnection->initNotification(fullResData);
+        emit m_ecConnection->initNotification(tran.params);
         for(const ApiDiscoveryData& data: tran.params.discoveryData)
             m_discoveryManager->triggerNotification(data);
     }

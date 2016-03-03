@@ -1,9 +1,22 @@
 #include "common_message_processor.h"
 
 #include <nx_ec/ec_api.h>
+#include <nx_ec/data/api_full_info_data.h>
 #include <nx_ec/data/api_discovery_data.h>
+#include <nx_ec/data/api_conversion_functions.h>
+#include <nx_ec/data/api_media_server_data.h>
+#include <nx_ec/data/api_camera_data.h>
+#include <nx_ec/data/api_camera_attributes_data.h>
+#include <nx_ec/data/api_webpage_data.h>
+#include <nx_ec/data/api_videowall_data.h>
+#include <nx_ec/data/api_user_data.h>
+#include <nx_ec/data/api_resource_type_data.h>
+#include <nx_ec/data/api_license_data.h>
+#include <nx_ec/data/api_layout_data.h>
+#include <nx_ec/data/api_business_rule_data.h>
 
 #include <api/app_server_connection.h>
+
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/layout_resource.h>
@@ -28,6 +41,8 @@
 #include "core/resource_management/resource_properties.h"
 #include "core/resource_management/status_dictionary.h"
 #include "core/resource/camera_history.h"
+
+Q_DECLARE_METATYPE(ec2::ApiFullInfoData)
 
 QnCommonMessageProcessor::QnCommonMessageProcessor(QObject *parent) :
     base_type(parent)
@@ -122,7 +137,8 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     connect(discoveryManager, &ec2::AbstractDiscoveryManager::discoveredServerChanged, this, &QnCommonMessageProcessor::discoveredServerChanged);
 }
 
-void QnCommonMessageProcessor::disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection) {
+void QnCommonMessageProcessor::disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection)
+{
     connection->disconnect(this);
     connection->getResourceManager()->disconnect(this);
     connection->getMediaServerManager()->disconnect(this);
@@ -137,10 +153,10 @@ void QnCommonMessageProcessor::disconnectFromConnection(const ec2::AbstractECCon
     connection->getMiscManager()->disconnect(this);
 }
 
-void QnCommonMessageProcessor::on_gotInitialNotification(const ec2::QnFullResourceData &fullData)
+void QnCommonMessageProcessor::on_gotInitialNotification(const ec2::ApiFullInfoData& fullData)
 {
     onGotInitialNotification(fullData);
-    on_businessRuleReset(fullData.bRules);
+    on_businessRuleReset(fullData.rules);
 }
 
 void QnCommonMessageProcessor::on_gotDiscoveryData(const ec2::ApiDiscoveryData &data, bool addInformation)
@@ -216,8 +232,6 @@ void QnCommonMessageProcessor::on_resourceRemoved( const QnUuid& resourceId )
 {
     if (canRemoveResource(resourceId))
     {
-        //beforeRemovingResource(resourceId);
-
         if (QnResourcePtr ownResource = qnResPool->getResourceById(resourceId))
         {
             // delete dependent objects
@@ -225,8 +239,6 @@ void QnCommonMessageProcessor::on_resourceRemoved( const QnUuid& resourceId )
                 qnResPool->removeResource(subRes);
             qnResPool->removeResource(ownResource);
         }
-
-        afterRemovingResource(resourceId);
     }
     else
         removeResourceIgnored(resourceId);
@@ -311,13 +323,16 @@ void QnCommonMessageProcessor::on_businessActionBroadcasted( const QnAbstractBus
     // nothing to do for a while
 }
 
-void QnCommonMessageProcessor::on_businessRuleReset( const QnBusinessEventRuleList& rules )
+void QnCommonMessageProcessor::on_businessRuleReset( const ec2::ApiBusinessRuleDataList& rules )
 {
+    QnBusinessEventRuleList qnRules;
+    fromApiToResourceList(rules, qnRules);
+
     m_rules.clear();
-    for(const QnBusinessEventRulePtr &bRule: rules)
+    for(const QnBusinessEventRulePtr &bRule: qnRules)
         m_rules[bRule->id()] = bRule;
 
-    emit businessRuleReset(rules);
+    emit businessRuleReset(qnRules);
 }
 
 void QnCommonMessageProcessor::on_broadcastBusinessAction( const QnAbstractBusinessActionPtr& action )
@@ -330,25 +345,27 @@ void QnCommonMessageProcessor::on_execBusinessAction( const QnAbstractBusinessAc
     execBusinessActionInternal(action);
 }
 
-//TODO: #rvasilenko ec2 relate logic. remove from this class
-void QnCommonMessageProcessor::afterRemovingResource(const QnUuid& id)
+void QnCommonMessageProcessor::resetResourceTypes(const ec2::ApiResourceTypeDataList& resTypes)
 {
-    Q_UNUSED(id)
-    /*
-    for(const QnBusinessEventRulePtr& bRule: m_rules.values())
-    {
-        if (bRule->eventResources().contains(id) || bRule->actionResources().contains(id))
-        {
-            QnBusinessEventRulePtr updatedRule(bRule->clone());
-            updatedRule->removeResource(id);
-            emit businessRuleChanged(updatedRule);
-        }
-    }
-    */
+    QnResourceTypeList qnResTypes;
+    fromApiToResourceList(resTypes, qnResTypes);
+    qnResTypePool->replaceResourceTypeList(qnResTypes);
 }
 
+void QnCommonMessageProcessor::resetResources(const ec2::ApiFullInfoData& fullData)
+{
+    QnResourceList resources;
 
-void QnCommonMessageProcessor::resetResources(const QnResourceList& resources) {
+    QnResourceFactory* factory = getResourceFactory();
+
+    fromApiToResourceList(fullData.servers, resources);
+    fromApiToResourceList(fullData.cameras, resources, factory);
+    fromApiToResourceList(fullData.users, resources);
+    fromApiToResourceList(fullData.layouts, resources);
+    fromApiToResourceList(fullData.videowalls, resources);
+    fromApiToResourceList(fullData.webPages, resources);
+    fromApiToResourceList(fullData.storages, resources, factory);
+
     /* Store all remote resources id to clean them if they are not in the list anymore. */
     QHash<QnUuid, QnResourcePtr> remoteResources;
     for (const QnResourcePtr &resource: qnResPool->getResourcesWithFlag(Qn::remote))
@@ -356,7 +373,8 @@ void QnCommonMessageProcessor::resetResources(const QnResourceList& resources) {
 
     /* Packet adding. */
     qnResPool->beginTran();
-    for (const QnResourcePtr& resource: resources) {
+    for (const QnResourcePtr& resource: resources)
+    {
         /* Update existing. */
         updateResource(resource);
 
@@ -370,12 +388,43 @@ void QnCommonMessageProcessor::resetResources(const QnResourceList& resources) {
         qnResPool->removeResource(resource);
 }
 
-void QnCommonMessageProcessor::resetLicenses(const QnLicenseList& licenses) {
+void QnCommonMessageProcessor::resetLicenses(const ec2::ApiLicenseDataList& licenses)
+{
     qnLicensePool->replaceLicenses(licenses);
 }
 
 void QnCommonMessageProcessor::resetCamerasWithArchiveList(const ec2::ApiServerFootageDataList& cameraHistoryList) {
     qnCameraHistoryPool->resetServerFootageData(cameraHistoryList);
+}
+
+void QnCommonMessageProcessor::resetTime()
+{
+    qnSyncTime->reset();
+
+    if (!m_connection)
+        return;
+
+    auto timeManager = m_connection->getTimeManager();
+    timeManager->getCurrentTime(this, [this](int handle, ec2::ErrorCode errCode, qint64 syncTime)
+    {
+        Q_UNUSED(handle);
+        if (errCode != ec2::ErrorCode::ok || !m_connection)
+            return;
+
+        emit syncTimeChanged(syncTime);
+
+        ec2::QnPeerTimeInfoList peers = m_connection->getTimeManager()->getPeerTimeInfoList();
+        for (const ec2::QnPeerTimeInfo &info : peers)
+        {
+            if (!QnRuntimeInfoManager::instance()->hasItem(info.peerId))
+            {
+                qWarning() << "Time for peer" << info.peerId << "received before peer was found";
+                continue;
+            }
+            Q_ASSERT(QnRuntimeInfoManager::instance()->item(info.peerId).data.peer.peerType == Qn::PT_Server);
+            emit peerTimeChanged(info.peerId, syncTime, info.time);
+        }
+    });
 }
 
 bool QnCommonMessageProcessor::canRemoveResource(const QnUuid &)
@@ -396,23 +445,29 @@ void QnCommonMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData 
 }
 
 
-void QnCommonMessageProcessor::resetServerUserAttributesList( const QnMediaServerUserAttributesList& serverUserAttributesList )
+void QnCommonMessageProcessor::resetServerUserAttributesList( const ec2::ApiMediaServerUserAttributesDataList& serverUserAttributesList )
 {
     QnMediaServerUserAttributesPool::instance()->clear();
-    for( const QnMediaServerUserAttributesPtr& serverAttrs: serverUserAttributesList )
+    for( const auto& serverAttrs: serverUserAttributesList )
     {
-        QnMediaServerUserAttributesPool::ScopedLock userAttributesLock( QnMediaServerUserAttributesPool::instance(), serverAttrs->serverID );
-        *(*userAttributesLock) = *serverAttrs;
+        QnMediaServerUserAttributesPtr dstElement(new QnMediaServerUserAttributes());
+        fromApiToResource(serverAttrs, dstElement);
+
+        QnMediaServerUserAttributesPool::ScopedLock userAttributesLock( QnMediaServerUserAttributesPool::instance(), serverAttrs.serverID );
+        *(*userAttributesLock) = *dstElement;
     }
 }
 
-void QnCommonMessageProcessor::resetCameraUserAttributesList( const QnCameraUserAttributesList& cameraUserAttributesList )
+void QnCommonMessageProcessor::resetCameraUserAttributesList( const ec2::ApiCameraAttributesDataList& cameraUserAttributesList )
 {
     QnCameraUserAttributePool::instance()->clear();
-    for( const QnCameraUserAttributesPtr& cameraAttrs: cameraUserAttributesList )
+    for( const auto & cameraAttrs: cameraUserAttributesList )
     {
-        QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), cameraAttrs->cameraID );
-        *(*userAttributesLock) = *cameraAttrs;
+        QnCameraUserAttributesPtr dstElement(new QnCameraUserAttributes());
+        fromApiToResource(cameraAttrs, dstElement);
+
+        QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), cameraAttrs.cameraID );
+        *(*userAttributesLock) = *dstElement;
     }
 }
 
@@ -448,42 +503,20 @@ void QnCommonMessageProcessor::resetStatusList(const ec2::ApiResourceStatusDataL
         on_resourceStatusChanged(statusData.id , statusData.status);
 }
 
-void QnCommonMessageProcessor::onGotInitialNotification(const ec2::QnFullResourceData& fullData)
+void QnCommonMessageProcessor::onGotInitialNotification(const ec2::ApiFullInfoData& fullData)
 {
     QnServerAdditionalAddressesDictionary::instance()->clear();
-    //QnAppServerConnectionFactory::setBox(fullData.serverInfo.platform);
-    resetServerUserAttributesList( fullData.serverUserAttributesList );
-    resetCameraUserAttributesList( fullData.cameraUserAttributesList );
-    resetResources(fullData.resources);
+
+    resetResourceTypes(fullData.resourceTypes);
+    resetResources(fullData);
+    resetServerUserAttributesList(fullData.serversUserAttributesList);
+    resetCameraUserAttributesList(fullData.cameraUserAttributesList);
     resetPropertyList(fullData.allProperties);
-    resetLicenses(fullData.licenses);
-    resetCamerasWithArchiveList(fullData.camerasWithArchiveList);
+    resetCamerasWithArchiveList(fullData.cameraHistory);
     resetStatusList(fullData.resStatusList);
 
-    //on_runtimeInfoChanged(fullData.serverInfo);
-    qnSyncTime->reset();
-
-    if (!m_connection)
-        return;
-
-    auto timeManager = m_connection->getTimeManager();
-    timeManager->getCurrentTime(this, [this](int handle, ec2::ErrorCode errCode, qint64 syncTime) {
-        Q_UNUSED(handle);
-        if (errCode != ec2::ErrorCode::ok || !m_connection)
-            return;
-
-        emit syncTimeChanged(syncTime);
-
-        ec2::QnPeerTimeInfoList peers = m_connection->getTimeManager()->getPeerTimeInfoList();
-        for(const ec2::QnPeerTimeInfo &info: peers) {
-            if( !QnRuntimeInfoManager::instance()->hasItem(info.peerId) ) {
-                qWarning() << "Time for peer" << info.peerId << "received before peer was found";
-                continue;
-            }
-            Q_ASSERT(QnRuntimeInfoManager::instance()->item(info.peerId).data.peer.peerType == Qn::PT_Server);
-            emit peerTimeChanged(info.peerId, syncTime, info.time);
-        }
-    });
+    resetLicenses(fullData.licenses);
+    resetTime();
 
     emit initialResourcesReceived();
 }
@@ -492,5 +525,6 @@ QMap<QnUuid, QnBusinessEventRulePtr> QnCommonMessageProcessor::businessRules() c
     return m_rules;
 }
 
-void QnCommonMessageProcessor::updateResource(const QnResourcePtr& ) {
+void QnCommonMessageProcessor::updateResource(const QnResourcePtr& )
+{
 }

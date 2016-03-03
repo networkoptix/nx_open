@@ -4,11 +4,12 @@
 
 #include <nx/utils/log/log.h>
 
-const QString QnResourceTypePool::desktopCameraTypeName = lit("SERVER_DESKTOP_CAMERA");
+const QString QnResourceTypePool::kDesktopCameraTypeName(lit("SERVER_DESKTOP_CAMERA"));
 const QString QnResourceTypePool::kLayoutTypeId(lit("Layout"));
 const QString QnResourceTypePool::kServerTypeId(lit("Server"));
 const QString QnResourceTypePool::kVideoWallTypeId(lit("Videowall"));
 const QString QnResourceTypePool::kWebPageTypeId(lit("WebPage"));
+const QString QnResourceTypePool::kStorageTypeId(lit("Storage"));
 
 
 QnResourceType::QnResourceType()
@@ -86,7 +87,7 @@ QList<QnUuid> QnResourceType::allParentList() const
 
 void QnResourceType::addParamType(const QString& name, const QString& defaultValue)
 {
-    QnMutexLocker lock( &m_allParamTypeListCacheMutex ); // in case of connect to anther app server 
+    QnMutexLocker lock( &m_allParamTypeListCacheMutex ); // in case of connect to anther app server
     m_paramTypeList.insert(name, defaultValue);
 }
 
@@ -255,7 +256,8 @@ QnResourceTypePtr QnResourceTypePool::desktopCameraResourceType() const {
     {
         for(auto itr = m_resourceTypeMap.begin(); itr != m_resourceTypeMap.end(); ++itr)
         {
-            if (itr.value()->getName() == desktopCameraTypeName) {
+            if (itr.value()->getName() == kDesktopCameraTypeName)
+            {
                 m_desktopCamResourceType = itr.value();
                 break;
             }

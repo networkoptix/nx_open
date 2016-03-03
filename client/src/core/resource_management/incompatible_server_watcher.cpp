@@ -310,7 +310,7 @@ QnUuid QnIncompatibleServerWatcherPrivate::getFakeId(const QnUuid &realId) const
 QnMediaServerResourcePtr QnIncompatibleServerWatcherPrivate::makeResource(
         const ec2::ApiDiscoveredServerData &serverData)
 {
-    QnMediaServerResourcePtr server(new QnMediaServerResource(qnResTypePool));
+    QnMediaServerResourcePtr server(new QnMediaServerResource());
 
     server->setId(QnUuid::createUuid());
     server->setStatus(serverData.status, true);

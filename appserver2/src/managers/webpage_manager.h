@@ -11,19 +11,17 @@ namespace ec2
     class QnWebPageNotificationManager: public AbstractWebPageManager
     {
     public:
-        QnWebPageNotificationManager( const ResourceContext& resCtx );
+        QnWebPageNotificationManager();
 
         void triggerNotification( const QnTransaction<ApiWebPageData>& tran );
         void triggerNotification( const QnTransaction<ApiIdData>& tran );
-    protected:
-        ResourceContext m_resCtx;
     };
 
     template<class QueryProcessorType>
     class QnWebPageManager: public QnWebPageNotificationManager
     {
     public:
-        QnWebPageManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx );
+        QnWebPageManager( QueryProcessorType* const queryProcessor);
 
     protected:
         virtual int getWebPages( impl::GetWebPagesHandlerPtr handler ) override;

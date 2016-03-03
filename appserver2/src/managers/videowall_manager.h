@@ -16,7 +16,7 @@ namespace ec2
         public AbstractVideowallManager
     {
     public:
-        QnVideowallNotificationManager( const ResourceContext& resCtx ) : m_resCtx( resCtx ) {}
+        QnVideowallNotificationManager() {}
 
         void triggerNotification( const QnTransaction<ApiVideowallData>& tran )
         {
@@ -39,8 +39,6 @@ namespace ec2
             emit controlMessage(message);
         }
 
-    protected:
-        ResourceContext m_resCtx;
     };
 
     template<class QueryProcessorType>
@@ -49,7 +47,7 @@ namespace ec2
         public QnVideowallNotificationManager
     {
     public:
-        QnVideowallManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx );
+        QnVideowallManager( QueryProcessorType* const queryProcessor );
 
     protected:
         virtual int getVideowalls( impl::GetVideowallsHandlerPtr handler ) override;

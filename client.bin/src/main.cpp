@@ -423,10 +423,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(
         getConnectionFactory( startupParams.videoWallGuid.isNull() ? Qn::PT_DesktopClient : Qn::PT_VideowallClient ) );
-    ec2::ResourceContext resCtx(
-        QnClientCameraFactory::instance(),
-        qnResPool,
-        qnResTypePool );
+    ec2::ResourceContext resCtx(QnClientResourceFactory::instance(), qnResPool);
 	ec2ConnectionFactory->setContext( resCtx );
     QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2ConnectionFactory.get() );
 

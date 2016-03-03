@@ -10,9 +10,9 @@
 namespace ec2
 {
     template<class QueryProcessorType>
-    QnLayoutManager<QueryProcessorType>::QnLayoutManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx )
+    QnLayoutManager<QueryProcessorType>::QnLayoutManager( QueryProcessorType* const queryProcessor )
     :
-        QnLayoutNotificationManager( resCtx ),
+        QnLayoutNotificationManager( ),
         m_queryProcessor( queryProcessor )
     {
     }
@@ -25,7 +25,7 @@ namespace ec2
         auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ApiLayoutDataList& layouts) {
             QnLayoutResourceList outData;
             if( errorCode == ErrorCode::ok )
-                fromApiToResourceList(layouts, outData, m_resCtx);
+                fromApiToResourceList(layouts, outData);
             handler->done( reqID, errorCode, outData);
         };
         m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiLayoutDataList, decltype(queryDoneHandler)>
@@ -51,7 +51,7 @@ namespace ec2
 
         using namespace std::placeholders;
         m_queryProcessor->processUpdateAsync( tran, std::bind( &impl::SimpleHandler::done, handler, reqID, _1 ) );
-        
+
         return reqID;
     }
 

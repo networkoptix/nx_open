@@ -257,7 +257,7 @@ namespace ec2
         DEFINE_TWO_ARG_HANDLER( SaveServer, ErrorCode, QnMediaServerResourcePtr)
         DEFINE_TWO_ARG_HANDLER( SaveResource, ErrorCode, QnResourcePtr)
         DEFINE_TWO_ARG_HANDLER( GetServers, ErrorCode, QnMediaServerResourceList )
-        DEFINE_TWO_ARG_HANDLER( GetServerUserAttributes, ErrorCode, QnMediaServerUserAttributesList )
+        DEFINE_TWO_ARG_HANDLER( GetServerUserAttributes, ErrorCode, ApiMediaServerUserAttributesDataList)
         DEFINE_TWO_ARG_HANDLER( GetStorages, ErrorCode, QnResourceList )
 
 
@@ -266,7 +266,7 @@ namespace ec2
         //////////////////////////////////////////////////////////
         DEFINE_TWO_ARG_HANDLER( AddCamera, ErrorCode, QnVirtualCameraResourceList )
         DEFINE_TWO_ARG_HANDLER( GetCameras, ErrorCode, QnVirtualCameraResourceList )
-        DEFINE_TWO_ARG_HANDLER( GetCameraUserAttributes, ErrorCode, QnCameraUserAttributesList )
+        DEFINE_TWO_ARG_HANDLER( GetCameraUserAttributes, ErrorCode, ApiCameraAttributesDataList )
         DEFINE_TWO_ARG_HANDLER( GetCamerasHistory, ErrorCode, ApiServerFootageDataList )
 
 

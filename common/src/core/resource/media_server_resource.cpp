@@ -50,13 +50,13 @@ private:
     QnMediaServerResourcePtr m_resource;
 };
 
-QnMediaServerResource::QnMediaServerResource(const QnResourceTypePool* resTypePool):
+QnMediaServerResource::QnMediaServerResource():
     m_serverFlags(Qn::SF_None),
     m_panicModeCache(
         std::bind(&QnMediaServerResource::calculatePanicMode, this),
         &m_mutex )
 {
-    setTypeId(resTypePool->getFixedResourceTypeId(QnResourceTypePool::kServerTypeId));
+    setTypeId(qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kServerTypeId));
     addFlags(Qn::server | Qn::remote);
     removeFlags(Qn::media); // TODO: #Elric is this call needed here?
 
@@ -247,16 +247,6 @@ rest::QnConnectionPtr QnMediaServerResource::restConnection()
         m_restConnection = rest::QnConnectionPtr(new rest::ServerConnection(getId()));
 
     return m_restConnection;
-}
-
-QnResourcePtr QnMediaServerResourceFactory::createResource(const QnUuid& resourceTypeId, const QnResourceParams& /*params*/)
-{
-    Q_UNUSED(resourceTypeId)
-
-    QnResourcePtr result(new QnMediaServerResource(qnResTypePool));
-    //result->deserialize(parameters);
-
-    return result;
 }
 
 QnStorageResourceList QnMediaServerResource::getStorages() const

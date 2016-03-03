@@ -66,11 +66,12 @@ class QN_EXPORT QnResourceTypePool
 public:
     typedef QMap<QnUuid, QnResourceTypePtr> QnResourceTypeMap;
 
-    static const QString desktopCameraTypeName;
+    static const QString kDesktopCameraTypeName;
     static const QString kLayoutTypeId;
     static const QString kServerTypeId;
     static const QString kVideoWallTypeId;
     static const QString kWebPageTypeId;
+    static const QString kStorageTypeId;
 
     static QnResourceTypePool *instance();
 

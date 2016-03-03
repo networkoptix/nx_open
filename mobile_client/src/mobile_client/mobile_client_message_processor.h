@@ -15,7 +15,6 @@ public:
     bool isConnected() const;
 
     virtual void updateResource(const QnResourcePtr &resource) override;
-    virtual void resetResources(const QnResourceList &resources) override;
 
 private:
     void updateMainServerApiUrl();

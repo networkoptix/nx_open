@@ -4,6 +4,7 @@
 
 #include <api/global_settings.h>
 
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_properties.h>
 #include <core/resource/media_server_resource.h>
@@ -130,11 +131,11 @@ namespace ec2
         QnResourceTypeList typesList;
         manager->getResourceTypesSync(&typesList);
         for (auto& rType : typesList)
-            if (rType->getName() == QnResourceTypePool::desktopCameraTypeName)
+            if (rType->getName() == QnResourceTypePool::kDesktopCameraTypeName)
                 return rType->getId();
 
         NX_LOG(lit("Ec2StaticticsReporter: Can not get %1 resource type, using null")
-               .arg(QnResourceTypePool::desktopCameraTypeName), cl_logWARNING);
+               .arg(QnResourceTypePool::kDesktopCameraTypeName), cl_logWARNING);
         return QnUuid();
     }
 

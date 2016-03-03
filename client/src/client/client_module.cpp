@@ -148,7 +148,7 @@ QnClientModule::QnClientModule(const QnStartupParameters &startupParams
     common->store<QnDesktopClientMessageProcessor>(new QnDesktopClientMessageProcessor());
     common->store<QnCameraHistoryPool>(new QnCameraHistoryPool());
     common->store<QnRuntimeInfoManager>(new QnRuntimeInfoManager());
-    common->store<QnClientCameraFactory>(new QnClientCameraFactory());
+    common->store<QnClientResourceFactory>(new QnClientResourceFactory());
 
     common->store<QnResourcesChangesManager>(new QnResourcesChangesManager());
     common->store<QnCameraBookmarksManager>(new QnCameraBookmarksManager());
@@ -168,7 +168,7 @@ QnClientModule::QnClientModule(const QnStartupParameters &startupParams
     //NOTE QNetworkProxyFactory::setApplicationProxyFactory takes ownership of object
     QNetworkProxyFactory::setApplicationProxyFactory(new QnNetworkProxyFactory());
 
-    QnAppServerConnectionFactory::setDefaultFactory(QnClientCameraFactory::instance());
+    QnAppServerConnectionFactory::setDefaultFactory(QnClientResourceFactory::instance());
 }
 
 QnClientModule::~QnClientModule() {

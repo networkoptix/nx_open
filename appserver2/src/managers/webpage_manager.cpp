@@ -18,8 +18,7 @@
 
 namespace ec2
 {
-    QnWebPageNotificationManager::QnWebPageNotificationManager(const ResourceContext &resCtx)
-        : m_resCtx(resCtx)
+    QnWebPageNotificationManager::QnWebPageNotificationManager()
     {}
 
     void QnWebPageNotificationManager::triggerNotification(const QnTransaction<ApiWebPageData> &tran)
@@ -39,8 +38,8 @@ namespace ec2
 
 
     template<class QueryProcessorType>
-    QnWebPageManager<QueryProcessorType>::QnWebPageManager(QueryProcessorType* const queryProcessor, const ResourceContext &resCtx)
-        : QnWebPageNotificationManager(resCtx)
+    QnWebPageManager<QueryProcessorType>::QnWebPageManager(QueryProcessorType* const queryProcessor)
+        : QnWebPageNotificationManager()
         , m_queryProcessor(queryProcessor)
     {}
 
