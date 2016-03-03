@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('DebugCtrl', function ($scope, mediaserver, $sessionStorage, $location) {
+    .controller('DebugCtrl', function ($scope, mediaserver, $sessionStorage, $location, dialogs) {
 
         mediaserver.getUser().then(function(user){
             if(!user.isOwner){
@@ -48,7 +48,7 @@ angular.module('webadminApp')
                     data = JSON.parse(data);
                 } catch (a) {
                     console.error(a);
-                    alert( 'POST-params is not a valid json object ');
+                    dialogs.alert( 'POST-params is not a valid json object ');
                     return;
                 }
             }
@@ -59,7 +59,7 @@ angular.module('webadminApp')
                     params = JSON.parse(params);
                 } catch (a) {
                     console.error(a);
-                    alert( 'GET-params is not a valid json object ');
+                    dialogs.alert( 'GET-params is not a valid json object ');
                     return;
                 }
             }

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('JoinCtrl', function ($scope, $modalInstance, $interval, mediaserver) {
+    .controller('JoinCtrl', function ($scope, $modalInstance, $interval, mediaserver,dialogs) {
         $scope.settings = {
             url :'',
             password :'',
@@ -67,7 +67,7 @@ angular.module('webadminApp')
                     break;
                 case 'STARTER_LICENSE_ERROR':
                     errorToShow = 'Warning: You are about to merge Systems with START licenses. As only 1 START license is allowed per System after your merge you will only have 1 START license remaining. If you understand this and would like to proceed please click Merge to continue.';
-                    alert(errorToShow);
+                    dialogs.alert(errorToShow);
                     return false;
             }
             return errorToShow;
@@ -83,7 +83,7 @@ angular.module('webadminApp')
                 if(r.data.error!=='0'){
                     var errorToShow = errorHandler(r.data.errorString);
                     if(errorToShow){
-                        alert('Connection failed: ' + errorToShow);
+                        dialogs.alert('Connection failed: ' + errorToShow);
                         return;
                     }
                 }
@@ -103,11 +103,11 @@ angular.module('webadminApp')
                 if(r.data.error!=='0') {
                     var errorToShow = errorHandler(r.data.errorString);
                     if (errorToShow) {
-                        alert('Merge failed: ' + errorToShow);
+                        dialogs.alert('Merge failed: ' + errorToShow);
                         return;
                     }
                 }
-                alert('Merge succeed.');
+                dialogs.alert('Merge succeed.');
                 window.location.reload();
             });
         };

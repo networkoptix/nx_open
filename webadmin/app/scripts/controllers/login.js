@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('LoginCtrl', function ($scope, mediaserver, ipCookie,$sessionStorage) {
+    .controller('LoginCtrl', function ($scope, mediaserver, ipCookie,$sessionStorage,dialogs) {
 
 
         // Login digest: http://en.wikipedia.org/wiki/Digest_access_authentication
@@ -33,7 +33,7 @@ angular.module('webadminApp')
                 $scope.authorizing = true;
                 mediaserver.login(login,password).then(reload,function(/*error*/){
                     $scope.authorizing = false;
-                    alert('Login or password is incorrect');
+                    dialogs.alert('Login or password is incorrect');
                 });
             }
         };

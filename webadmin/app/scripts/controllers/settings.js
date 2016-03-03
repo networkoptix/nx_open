@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('SettingsCtrl', function ($scope, $modal, $log, mediaserver,$location,$timeout) {
+    .controller('SettingsCtrl', function ($scope, $modal, $log, mediaserver,$location,$timeout, dialogs) {
 
         mediaserver.getUser().then(function(user){
             if(!user.isAdmin){
@@ -44,13 +44,13 @@ angular.module('webadminApp')
 
         $scope.openDisconnectDialog = function () {
             //1. confirm detach
-            if(confirm('This server will be disconnected from old server and turned into new one')){
+            dialogs.confirm('This server will be disconnected from old server and turned into new one').then(function(){
                 mediaserver.detachServer().then(function(){
                     //2. throw him to master
                     $location.path('/setup');
                     window.location.reload();
                 });
-            }
+            });
         };
 
         function restartServer(passPort){
@@ -68,7 +68,7 @@ angular.module('webadminApp')
 
 
         function errorHandler(){
-            alert ('Connection error');
+            dialogs.alert ('Connection error');
             return false;
         }
         function resultHandler (r){
@@ -82,13 +82,13 @@ angular.module('webadminApp')
                     case 'PASSWORD':
                         errorToShow = 'Wrong password.';
                 }
-                alert('Error: ' + errorToShow);
+                dialogs.alert('Error: ' + errorToShow);
             }else if (data.reply.restartNeeded) {
-                if (confirm('All changes saved. New settings will be applied after restart. \n Do you want to restart server now?')) {
+                dialogs.confirm('All changes saved. New settings will be applied after restart. \n Do you want to restart server now?').then(function() {
                     restartServer(true);
-                }
+                });
             } else {
-                alert('Settings saved');
+                dialogs.alert('Settings saved');
                 if( $scope.settings.port !==  window.location.port ) {
                     window.location.href = (window.location.protocol + '//' + window.location.hostname + ':' + $scope.settings.port + window.location.pathname + window.location.hash);
                 }else{
@@ -101,15 +101,15 @@ angular.module('webadminApp')
             if($scope.settingsForm.$valid) {
                 mediaserver.changePort($scope.settings.port).then(resultHandler, errorHandler);
             }else{
-                alert('form is not valid');
+                dialogs.alert('form is not valid');
             }
         };
 
 // execute/scryptname&mode
         $scope.restart = function () {
-            if(confirm('Do you want to restart server now?')){
+            dialogs.confirm('Do you want to restart server now?').then(function(){
                 restartServer(false);
-            }
+            });
         };
         $scope.canHardwareRestart = false;
         $scope.canRestoreSettings = false;
@@ -124,21 +124,21 @@ angular.module('webadminApp')
         });
 
         $scope.hardwareRestart = function(){
-            if(confirm('Do you want to restart server\'s operation system?')){
+            dialogs.confirm('Do you want to restart server\'s operation system?').then(function(){
                 mediaserver.execute('reboot').then(resultHandler, errorHandler);
-            }
+            });
         };
 
         $scope.restoreSettings = function(){
-            if(confirm('Do you want to restart all server\'s settings? Archive will be saved, but network settings will be reset.')){
+            dialogs.confirm('Do you want to restart all server\'s settings? Archive will be saved, but network settings will be reset.').then(function(){
                 mediaserver.execute('restore').then(resultHandler, errorHandler);
-            }
+            });
         };
 
         $scope.restoreSettingsNotNetwork = function(){
-            if(confirm('Do you want to restart all server\'s settings? Archive and network settings will be saved.')){
+            dialogs.confirm('Do you want to restart all server\'s settings? Archive and network settings will be saved.').then(function(){
                 mediaserver.execute('restore_keep_ip').then(resultHandler, errorHandler);
-            }
+            });
         };
 
         function checkServersIp(server,i){
