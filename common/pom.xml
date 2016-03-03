@@ -78,7 +78,7 @@
                             <arguments>
                                 <argument>${root.dir}/common/gencomp.py</argument>
                                 <argument>c++</argument>
-                                <argument>${project.build.sourceDirectory}/compatibility_info.cpp</argument>
+                                <argument>${project.build.directory}/compatibility_info.cpp</argument>
                             </arguments>
                             <workingDirectory>${project.build.directory}</workingDirectory>
                             <environmentVariables>

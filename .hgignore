@@ -28,7 +28,6 @@ ecs.db-wal
 *.o
 *.lastbuildstate
 !launcher*.vcproj
-compatibility_info.cpp
 *_tmp.py*
 donotrebuild
 vms.pro
