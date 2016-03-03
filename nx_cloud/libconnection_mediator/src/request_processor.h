@@ -16,10 +16,9 @@ struct MediaserverData
     String systemId;
     String serverId;
 
-    MediaserverData() {}
     MediaserverData(
-        String _systemId,
-        String _serverId)
+        String _systemId = String(),
+        String _serverId = String())
     :
         systemId(std::move(_systemId)),
         serverId(std::move(_serverId))
@@ -38,7 +37,12 @@ struct MediaserverData
 
     String hostName() const
     {
-        return systemId + "." + serverId;
+        return serverId + "." + systemId;
+    }
+
+    QString toString() const
+    {
+        return QString::fromUtf8(hostName());
     }
 };
 

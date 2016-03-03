@@ -1,10 +1,4 @@
-/**********************************************************
-* Dec 22, 2015
-* akolesnikov
-***********************************************************/
-
-#ifndef NX_MEDIATOR_API_RESOLVE_DATA_H
-#define NX_MEDIATOR_API_RESOLVE_DATA_H
+#pragma once
 
 #include <cstdint>
 #include <list>
@@ -20,21 +14,21 @@ namespace nx {
 namespace hpm {
 namespace api {
 
-class NX_NETWORK_API ResolveRequest
+class NX_NETWORK_API ResolvePeerRequest
 :
     public StunMessageData
 {
 public:
     nx::String hostName;
 
-    ResolveRequest();
-    ResolveRequest(nx::String _hostName);
+    ResolvePeerRequest();
+    ResolvePeerRequest(nx::String _hostName);
 
     void serialize(nx::stun::Message* const message);
     bool parse(const nx::stun::Message& message);
 };
  
-class NX_NETWORK_API ResolveResponse
+class NX_NETWORK_API ResolvePeerResponse
 :
     public StunMessageData
 {
@@ -42,7 +36,7 @@ public:
     std::list<SocketAddress> endpoints;
     ConnectionMethods connectionMethods;
 
-    ResolveResponse();
+    ResolvePeerResponse();
 
     /*!
         \note after this method call object contents are undefined
@@ -54,5 +48,3 @@ public:
 } // namespace api
 } // namespace hpm
 } // namespace nx
-
-#endif  //NX_MEDIATOR_API_RESOLVE_DATA_H

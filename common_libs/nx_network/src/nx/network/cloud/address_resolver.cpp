@@ -18,6 +18,7 @@ QString toString(const AddressType& type)
     switch(type)
     {
         case AddressType::kUnknown: return lit("kUnknown");
+        case AddressType::kLocal: return lit("kLocal");
         case AddressType::kCloud: return lit("kCloud");
     };
 
@@ -386,11 +387,11 @@ void AddressResolver::mediatorResolve(HaInfoIterator info, QnMutexLockerBase* lk
 {
     info->second.mediatorProgress();
     lk->unlock();
-    m_mediatorConnection->resolve(
-        nx::hpm::api::ResolveRequest(info->first.toString().toUtf8()),
+    m_mediatorConnection->resolvePeer(
+        nx::hpm::api::ResolvePeerRequest(info->first.toString().toUtf8()),
         [this, info](
             nx::hpm::api::ResultCode resultCode,
-            nx::hpm::api::ResolveResponse response)
+            nx::hpm::api::ResolvePeerResponse response)
         {
             std::vector< Guard > guards;
 

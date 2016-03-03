@@ -14,7 +14,8 @@
 #include "data/connection_result_data.h"
 #include "data/listen_data.h"
 #include "data/ping_data.h"
-#include "data/resolve_data.h"
+#include "data/resolve_peer_data.h"
+#include "data/resolve_domain_data.h"
 
 
 namespace nx {
@@ -38,14 +39,26 @@ public:
     {
     }
 
-    void resolve(
-        nx::hpm::api::ResolveRequest resolveData,
+    void resolveDomain(
+        nx::hpm::api::ResolveDomainRequest resolveData,
         std::function<void(
             nx::hpm::api::ResultCode,
-            nx::hpm::api::ResolveResponse)> completionHandler)
+            nx::hpm::api::ResolveDomainResponse)> completionHandler)
     {
         this->doRequest(
-            stun::cc::methods::resolve,
+            stun::cc::methods::resolveDomain,
+            std::move(resolveData),
+            std::move(completionHandler));
+    }
+
+    void resolvePeer(
+        nx::hpm::api::ResolvePeerRequest resolveData,
+        std::function<void(
+            nx::hpm::api::ResultCode,
+            nx::hpm::api::ResolvePeerResponse)> completionHandler)
+    {
+        this->doRequest(
+            stun::cc::methods::resolvePeer,
             std::move(resolveData),
             std::move(completionHandler));
     }
