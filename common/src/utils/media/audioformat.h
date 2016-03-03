@@ -97,6 +97,8 @@ public:
     QnAudioFormat::SampleType sampleType() const;
 
     qint64 durationForBytes(int bytes) const;
+    int bytesForDuration(qint64 durationUs) const;
+
     int bytesPerFrame() const;
 
 private:

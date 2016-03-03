@@ -20,20 +20,21 @@
         <guid>${connection_mediator.guid}</guid>
         <product.title>${company.name} Mediator</product.title>
         <!--Global libs-->
-        <qt.libs>core network concurrent sql xml</qt.libs>
+        <qt.libs>core gui network concurrent sql xml</qt.libs>
         <global.libs>-lcommon -lnx_streaming -lnx_network -lnx_utils -ludt -lcloud_db_client -lconnection_mediator</global.libs>
         <!--Specific os libs used-->
-        <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm ssleay32.lib libeay32.lib</windows.oslibs>
+        <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm</windows.oslibs>
         <windows.oslibs.release/>
         <windows.oslibs.debug/>
-        <linux.oslibs>-lssl -lcrypto -lavcodec -lavformat -lavutil -lavdevice -lavfilter -lpostproc -lswscale -lswresample -lvpx -lsigar -lquazip -lfaac</linux.oslibs>
-        <mac.oslibs>-lssl -lcrypto -lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
+        <linux.oslibs>-lavcodec -lavformat -lavutil -lavdevice -lavfilter -lpostproc -lswscale -lswresample -lvpx -lsigar -lfaac</linux.oslibs>
+        <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
         <!--Global defines-->
         <global.defines/>
         <!--Specific os defines-->
         <windows.defines/>
         <linux.defines/>
         <mac.defines/>
+        <rdep.packages>openssl quazip</rdep.packages>
     </properties>
 
     <dependencies>

@@ -24,9 +24,9 @@ public:
 
     QnStatisticsSettings settings() override;
 
-private:
-    void updateSettings();
+    void updateSettings() override;
 
+private:
     void updateSettingsImpl(int delayMs);
 
 private:
@@ -36,9 +36,8 @@ private:
 
 private:
     typedef QScopedPointer<QnStatisticsSettings> SettingsPtr;
-    typedef QScopedPointer<QTimer> TimerPtr;
+
     SettingsPtr m_settings;
-    TimerPtr m_updateTimer;
 
     rest::Handle m_handle;
 };

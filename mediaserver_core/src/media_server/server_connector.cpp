@@ -41,6 +41,9 @@ void QnServerConnector::at_moduleFinder_moduleAddressFound(const QnModuleInforma
                    .arg(moduleInformation.version.toString()),
                    cl_logINFO);
         }
+        NX_LOG(lit("QnServerConnector. Removing address %1 from module %2 since incompatible")
+            .arg(address.toString()).arg(moduleInformation.id.toString()),
+            cl_logDEBUG1);
         removeConnection(moduleInformation, address);
         return;
     }
@@ -49,6 +52,9 @@ void QnServerConnector::at_moduleFinder_moduleAddressFound(const QnModuleInforma
 }
 
 void QnServerConnector::at_moduleFinder_moduleAddressLost(const QnModuleInformation &moduleInformation, const SocketAddress &address) {
+    NX_LOG(lit("QnServerConnector. Removing address %1 from module %2 since address has been lost")
+        .arg(address.toString()).arg(moduleInformation.id.toString()),
+        cl_logDEBUG1);
     removeConnection(moduleInformation, address);
 }
 
@@ -58,7 +64,12 @@ void QnServerConnector::at_moduleFinder_moduleChanged(const QnModuleInformation 
             addConnection(moduleInformation, address);
     } else {
         for (const SocketAddress &address: m_moduleFinder->moduleAddresses(moduleInformation.id))
+        {
+            NX_LOG(lit("QnServerConnector. Removing address %1 from module %2 since module has been changed")
+                .arg(address.toString()).arg(moduleInformation.id.toString()),
+                cl_logDEBUG1);
             removeConnection(moduleInformation, address);
+        }
     }
 }
 
@@ -131,7 +142,12 @@ void QnServerConnector::stop() {
     }
 
     for (auto it = usedUrls.begin(); it != usedUrls.end(); ++it)
+    {
+        NX_LOG(lit("QnServerConnector. Removing address %1 from module %2 since stopping...")
+            .arg(it.key()).arg(it->peerId.toString()),
+            cl_logDEBUG1);
         removeConnection(m_moduleFinder->moduleInformation(it->peerId), it.key());
+    }
 
     {
         QnMutexLocker lock( &m_mutex );

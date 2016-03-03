@@ -1,0 +1,4 @@
+{{#aggregated}}
+	<td class="error">Reason: {{reason}}</td>
+	<td><i>{{timestamp}}</i></td>
+{{/aggregated}}

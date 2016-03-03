@@ -20,7 +20,7 @@ struct AudioFrame;
 static const int kMediaAlignment = 32;
 
 // Initial duration for media buffer.
-static const int kInitialBufferMs = 200;
+static const int kInitialBufferMs = 256;
 
 // Maximum duration for live media buffer. 
 // Live buffer can be extended dynamically in range [kInitialBufferMs..kMaxLiveBufferMs]

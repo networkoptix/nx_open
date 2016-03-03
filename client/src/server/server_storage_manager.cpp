@@ -443,8 +443,20 @@ void QnServerStorageManager::at_storageSpaceReply( int status, const QnStorageSp
     QnResourceList storagesToDelete;
     for (const QnStorageResourcePtr &storage: requestKey.server->getStorages())
     {
+        /*
+         * Skipping storages that are really present in the server resource pool.
+         * They will be deleted on storageRemoved transaction.
+         */
+        QnClientStorageResourcePtr clientStorage = storage.dynamicCast<QnClientStorageResource>();
+        Q_ASSERT_X(clientStorage, Q_FUNC_INFO, "Only client storage intances must exist on the client side.");
+        if (clientStorage && clientStorage->isActive())
+            continue;
+
+        /* Skipping storages that are confirmed by server. */
         if (receivedStorages.contains(storage->getUrl()))
             continue;
+
+        /* Removing other storages (e.g. external drives that were switched off. */
         storagesToDelete << storage;
     }
 

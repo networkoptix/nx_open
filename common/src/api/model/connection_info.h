@@ -13,7 +13,6 @@
 
 #include "compatibility_item.h"
 
-typedef QnSoftwareVersion SoftwareVersionType; // TODO: #Elric #ec2 remove
 #endif
 
 
@@ -24,7 +23,7 @@ struct QnConnectionInfo {
     QnConnectionInfo();
 
     QUrl ecUrl;
-    SoftwareVersionType version;
+    QnSoftwareVersion version;
     QList<QnCompatibilityItem> compatibilityItems;
     QString systemName;
     QString ecsGuid;    //TODO: #GDM make QnUuid
@@ -41,7 +40,7 @@ struct QnConnectionInfo {
 
 #ifndef QN_NO_QT
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (QnCompatibilityItem)(QnConnectionInfo), 
+    (QnCompatibilityItem)(QnConnectionInfo),
     (ubjson)(metatype)(xml)(json)(csv_record)
 )
 #endif

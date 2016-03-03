@@ -90,7 +90,7 @@ bool FfmpegAudioDecoder::isCompatible(const CodecID codec)
     return true;
 }
 
-AudioFramePtr FfmpegAudioDecoder::decode(const QnConstCompressedAudioDataPtr& frame)
+bool FfmpegAudioDecoder::decode(const QnConstCompressedAudioDataPtr& frame, AudioFramePtr* const outFrame)
 {
     Q_D(FfmpegAudioDecoder);
 
@@ -98,7 +98,7 @@ AudioFramePtr FfmpegAudioDecoder::decode(const QnConstCompressedAudioDataPtr& fr
     {
         d->initContext(frame);
         if (!d->codecContext)
-            return AudioFramePtr();
+            return false;
     }
 
     AVPacket avpkt;
@@ -132,7 +132,7 @@ AudioFramePtr FfmpegAudioDecoder::decode(const QnConstCompressedAudioDataPtr& fr
     avcodec_decode_audio4(d->codecContext, d->frame, &gotData, &avpkt);
 
     if (gotData <= 0)
-        return AudioFramePtr(); //< Negative value means error.
+        return false; //< Negative value means error.
 
     int frameSize = av_samples_get_buffer_size(
         0, //< output. plane size, optional
@@ -148,7 +148,8 @@ AudioFramePtr FfmpegAudioDecoder::decode(const QnConstCompressedAudioDataPtr& fr
     // Ffmpeg pts/dts are mixed up here, so it's pkt_dts. Also Convert usec to msec.
     audioFrame->timestampUsec = d->frame->pkt_dts;
 
-    return AudioFramePtr(audioFrame);
+    outFrame->reset(audioFrame);
+    return true;
 }
 
 } // namespace media

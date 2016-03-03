@@ -2315,21 +2315,23 @@ void MediaServerProcess::run()
 
         hostSystemPasswordSynchronizer->syncLocalHostRootPasswordWithAdminIfNeeded( adminUser );
 
-        typedef ec2::Ec2StaticticsReporter stats;
         bool adminParamsChanged = false;
 
-        // TODO: fix, when VS supports init lists:
-        //       for (const auto& param : { stats::SR_TIME_CYCLE, ... })
-        const QString* statParams[] = {
-            &stats::SR_TIME_CYCLE, &stats::SR_SERVER_API,
-            &Qn::CLOUD_SYSTEM_ID, &Qn::CLOUD_SYSTEM_AUTH_KEY };
-        for (auto it = &statParams[0]; it != &statParams[sizeof(statParams)/sizeof(statParams[0])]; ++it)
+        /* List of global setting, that can be overridden in server local config (e.g. by installer) */
+        QStringList replaceableParameters {
+            ec2::Ec2StaticticsReporter::SR_TIME_CYCLE,
+            ec2::Ec2StaticticsReporter::SR_SERVER_API,
+            Qn::CLOUD_SYSTEM_ID,
+            Qn::CLOUD_SYSTEM_AUTH_KEY,
+            QnMultiserverStatisticsRestHandler::kSettingsUrlParam};
+
+        for (const QString& key: replaceableParameters)
         {
-            const QString& param = **it;
-            const QString val = MSSettings::roSettings()->value(param, lit("")).toString();
-            if (adminUser->setProperty(param, val, QnResource::NO_ALLOW_EMPTY))
+            const QString value = MSSettings::roSettings()->value(key).toString();
+            // TODO: #ynikitenkov fix to use qnGlobalSettings in 2.6
+            if (adminUser->setProperty(key, value, QnResource::NO_ALLOW_EMPTY))
             {
-                MSSettings::roSettings()->remove(param);
+                MSSettings::roSettings()->remove(key);
                 adminParamsChanged = true;
             }
         }
