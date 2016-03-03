@@ -97,12 +97,9 @@ TEST_F(UdpHolePunching, loadTest)
     const int bytesToSendThroughConnection = 1024 * 1024;
 
     test::RandomDataTcpServer server(bytesToSendThroughConnection);
-    server.setServerSocketFactoryFunc(
-        []() -> std::unique_ptr<AbstractStreamServerSocket>
-        {
-            return std::make_unique<CloudServerSocket>(
-                SocketGlobals::mediatorConnector().systemConnection());
-        });
+    server.setServerSocket(
+        std::make_unique<CloudServerSocket>(
+            SocketGlobals::mediatorConnector().systemConnection()));
     ASSERT_TRUE(server.start());
 
     test::ConnectionsGenerator connectionsGenerator(
