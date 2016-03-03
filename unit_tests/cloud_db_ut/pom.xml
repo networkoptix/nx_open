@@ -23,7 +23,7 @@
         <global.libs>-lcommon -lnx_utils -lnx_network -lnx_streaming -lnx_email -ludt -lcloud_db -lcloud_db_client</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm ssleay32.lib libeay32.lib Wldap32.lib</windows.oslibs>
-        <linux.oslibs>-lavcodec -lavformat -lavutil -lquazip -lfaac -lssl -lcrypto</linux.oslibs>
+        <linux.oslibs>-lavcodec -lavformat -lavutil -lquazip -lfaac -lssl -lcrypto -lswscale -lmp3lame</linux.oslibs>
         <linux.arm.oslibs></linux.arm.oslibs>
         <windows.oslibs.release></windows.oslibs.release>
         <windows.oslibs.debug></windows.oslibs.debug>
