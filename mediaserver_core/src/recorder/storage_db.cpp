@@ -129,13 +129,14 @@ bool QnStorageDb::replaceChunks(const QString& cameraUniqueId,
                                 const std::deque<DeviceFileCatalog::Chunk>& chunks)
 {
     bool result = true;
+    bool delResult = deleteRecords(cameraUniqueId, catalog, -1);
+
     for (const auto &chunk : chunks)
     {
-        bool delResult = deleteRecords(cameraUniqueId, catalog, chunk.startTimeMs);
         bool addResult = addRecord(cameraUniqueId, catalog, chunk);
-        result = result && delResult && addResult;
+        result = result && addResult;
     }
-    return result;
+    return result && delResult;
 }
 
 bool QnStorageDb::open(const QString& fileName)
@@ -225,16 +226,35 @@ void QnStorageDb::addCatalogFromMediaFolder(const QString& postfix,
 
 QVector<DeviceFileCatalogPtr> QnStorageDb::loadChunksFileCatalog() 
 {
-    m_readResult.clear();
+    m_readData.clear();
     m_dbHelper.setMode(nx::media_db::Mode::Read);
     assert(m_dbHelper.getDevice());
 
     while ((m_lastReadError = m_dbHelper.readRecord()) == nx::media_db::Error::NoError);
 
     m_dbHelper.setMode(nx::media_db::Mode::Write);
-    return m_readResult;
+    return buildReadResult();
 }
 
+QVector<DeviceFileCatalogPtr> QnStorageDb::buildReadResult() const
+{
+    QVector<DeviceFileCatalogPtr> result;
+    for (auto it = m_readData.cbegin(); it != m_readData.cend(); ++it)
+    {
+        DeviceFileCatalogPtr newFileCatalog(new DeviceFileCatalog(it->first, 
+                                                                  QnServer::ChunksCatalog::LowQualityCatalog,
+                                                                  QnServer::StoragePool::None));
+        newFileCatalog->assignChunksUnsafe(it->second[0].cbegin(), it->second[0].cend());
+        result.push_back(newFileCatalog);
+
+        newFileCatalog = DeviceFileCatalogPtr(new DeviceFileCatalog(it->first, 
+                                                                    QnServer::ChunksCatalog::HiQualityCatalog,
+                                                                    QnServer::StoragePool::None));
+        newFileCatalog->assignChunksUnsafe(it->second[1].cbegin(), it->second[1].cend());
+        result.push_back(newFileCatalog);
+    }
+    return result;
+}
 
 void QnStorageDb::handleCameraOp(const nx::media_db::CameraOperation &cameraOp,
                                  nx::media_db::Error error) 
@@ -256,48 +276,58 @@ void QnStorageDb::handleMediaFileOp(const nx::media_db::MediaFileOperation &medi
         return;
 
     uint16_t cameraId = mediaFileOp.getCameraId();
-    auto cameraIt = m_uuidToHash.right.find(cameraId);
+    auto cameraUuidIt = m_uuidToHash.right.find(cameraId);
     auto opType = mediaFileOp.getRecordType();
+    auto opCatalog = mediaFileOp.getCatalog();
 
     // camera with this ID should have already been found
-    assert(cameraIt != m_uuidToHash.right.end());
+    assert(cameraUuidIt != m_uuidToHash.right.end());
 
-    auto resultCameraIt = std::find_if(m_readResult.cbegin(), m_readResult.cend(),
-                                       [cameraIt, &mediaFileOp](const DeviceFileCatalogPtr &catalog)
-                                       {
-                                           return catalog->cameraUniqueId() == cameraIt->second &&
-                                                  catalog->getCatalog() == mediaFileOp.getCatalog();
-                                       });
-    DeviceFileCatalogPtr fileCatalog;
-    if (resultCameraIt != m_readResult.cend())
-        fileCatalog = *resultCameraIt;
-    else
+    auto existCameraIt = m_readData.find(cameraUuidIt->second);
+    bool emplaceSuccess;
+    if (existCameraIt == m_readData.cend())
+        std::tie(existCameraIt, emplaceSuccess) = m_readData.emplace(cameraUuidIt->second, LowHiChunksCatalogs());
+
+    int catalogIndex = opCatalog == QnServer::ChunksCatalog::LowQualityCatalog ? 0 : 1;
+    ChunkSet *currentChunkSet = &existCameraIt->second[catalogIndex];
+
+    DeviceFileCatalog::Chunk newChunk(
+        DeviceFileCatalog::Chunk(mediaFileOp.getStartTime(), m_storageIndex,
+                                 DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION,
+                                 mediaFileOp.getDuration(), mediaFileOp.getTimeZone(),
+                                 (quint16)(mediaFileOp.getFileSize() >> 32),
+                                 (quint32)mediaFileOp.getFileSize()));
+    switch (opType)
     {
-        //if (opType == nx::media_db::RecordType::FileOperationDelete)
-        //    assert(false);
-
-        fileCatalog = DeviceFileCatalogPtr(
-            new DeviceFileCatalog(cameraIt->second, 
-                                  (QnServer::ChunksCatalog)mediaFileOp.getCatalog(), 
-                                  QnServer::StoragePool::None));
-        m_readResult.append(fileCatalog);
+    case nx::media_db::RecordType::FileOperationAdd:
+    {
+        auto existChunk = currentChunkSet->find(newChunk);
+        if (existChunk == currentChunkSet->cend())
+            currentChunkSet->insert(newChunk);
+        else
+        {
+            currentChunkSet->erase(existChunk);
+            currentChunkSet->insert(newChunk);
+        }
+        break;
     }
-
-    if (opType == nx::media_db::RecordType::FileOperationAdd)
+    case nx::media_db::RecordType::FileOperationDelete:
     {
-        std::deque<DeviceFileCatalog::Chunk> tmpDeque;
-        tmpDeque.push_back(DeviceFileCatalog::Chunk(mediaFileOp.getStartTime(), m_storageIndex,
-                                                    DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION,
-                                                    mediaFileOp.getDuration(), mediaFileOp.getTimeZone(),
-                                                    (quint16)(mediaFileOp.getFileSize() >> 32),
-                                                    (quint32)mediaFileOp.getFileSize()));
-        fileCatalog->addChunks(tmpDeque);
+        if (newChunk.startTimeMs == -1)
+            currentChunkSet->clear();
+        else
+            for (auto it = currentChunkSet->begin(); it != currentChunkSet->end();)
+            {
+                if (it->startTimeMs == newChunk.startTimeMs)
+                    it = currentChunkSet->erase(it);
+                else
+                    ++it;
+            }
+        break;
     }
-    else if (opType == nx::media_db::RecordType::FileOperationDelete)
-    {
-    } 
-    else
+    default:
         assert(false);
+    }
 }
 
 void QnStorageDb::handleError(nx::media_db::Error error) 

@@ -202,6 +202,10 @@ public:
 
     static std::deque<Chunk> mergeChunks(const std::deque<Chunk>& chunk1, const std::deque<Chunk>& chunk2);
     void addChunks(const std::deque<Chunk>& chunk);
+
+    template<typename It>
+    void assignChunksUnsafe(It begin, It end) { m_chunks.assign(begin, end); }
+
     bool fromCSVFile(const QString& fileName);
     QnServer::ChunksCatalog getRole() const;
     QnRecordingStatsData getStatistics(qint64 bitrateAnalizePeriodMs) const;

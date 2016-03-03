@@ -5,6 +5,8 @@
 #include <deque>
 #include <vector>
 #include <map>
+#include <set>
+#include <array>
 #include <boost/bimap.hpp>
 
 #include <QElapsedTimer>
@@ -17,6 +19,9 @@
 class QnStorageDb: public nx::media_db::DbHelperHandler 
 {
     typedef boost::bimap<QString, uint16_t> UuidToHash;
+    typedef std::set<DeviceFileCatalog::Chunk> ChunkSet;
+    typedef std::array<ChunkSet, 2> LowHiChunksCatalogs;
+    typedef std::map<QString, LowHiChunksCatalogs> UuidToCatalogs;
 
 public:
     QnStorageDb(const QnStorageResourcePtr& storage, int storageIndex);
@@ -64,6 +69,7 @@ private:
     bool resetIoDevice();
     // returns cameraId (hash from cameraUniqueId)
     int fillCameraOp(nx::media_db::CameraOperation &cameraOp, const QString &cameraUniqueId);
+    QVector<DeviceFileCatalogPtr> buildReadResult() const;
 
 private:
     QnStorageResourcePtr m_storage;
@@ -74,8 +80,8 @@ private:
     std::unique_ptr<QIODevice> m_ioDevice;
     QString m_dbFileName;
     uint8_t m_dbVersion;
-    QVector<DeviceFileCatalogPtr> m_readResult;
     UuidToHash m_uuidToHash;
+    UuidToCatalogs m_readData;
 
     nx::media_db::Error m_lastWriteError;
     nx::media_db::Error m_lastReadError;
