@@ -20,6 +20,13 @@ static qint32 ffmpegReadPacket(void *opaque, quint8* buf, int size)
     return 0;
 }
 
+bool QnFfmpegTranscoder::isCodecSupported(CodecID id) const
+{
+    if (!m_formatCtx || !m_formatCtx->oformat)
+        return false;
+    return avformat_query_codec(m_formatCtx->oformat, id, FF_COMPLIANCE_NORMAL) == 1;
+}
+
 static qint32 ffmpegWritePacket(void *opaque, quint8* buf, int size)
 {
     Q_UNUSED(opaque)
