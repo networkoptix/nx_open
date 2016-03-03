@@ -38,7 +38,9 @@
                 <input ng-hide="lockEmail" type="email" class="form-control" ng-model="account.email" id="registerEmail" maxlength="255"
                        name="registerEmail" required autocomplete="off"  ng-pattern="Config.emailRegex"
                        ng-change="hideAlreadyExists()">
-                <p ng-if="lockEmail" class="form-control-static">{{account.email}}</p>
+
+                <input type="text"  ng-if="lockEmail"
+                       class="form-control" ng-model="account.email" readonly>
             </div>
             <div class="col-sm-4">
                 <span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">Email is required.</span>
