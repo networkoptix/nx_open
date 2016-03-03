@@ -172,8 +172,10 @@ angular.module('webadminApp')
 
         mediaserver.getMediaServers().then(function(data){
             $scope.mediaServers = _.sortBy(data.data,function(server){
+                // Set active state for server
+                server.active = $scope.settings.id.replace('{','').replace('}','') === server.id.replace('{','').replace('}','');
                 return (server.status==='Online'?'0':'1') + server.Name + server.id;
-                // Сортировка: online->name->id
+                // Sorting: online->name->id
             });
             $timeout(function() {
                 _.each($scope.mediaServers, function (server) {
