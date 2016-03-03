@@ -44,9 +44,7 @@ public:
     QnMainWindow(QnWorkbenchContext *context, QWidget *parent = 0, Qt::WindowFlags flags = 0);
     virtual ~QnMainWindow();
 
-    bool isTitleVisible() const {
-        return m_titleVisible;
-    }
+    bool isTitleVisible() const;
 
     Options options() const;
     void setOptions(Options options);
@@ -79,6 +77,7 @@ protected:
     virtual bool nativeEvent(const QByteArray &eventType, void *message, long *result) override;
 
 protected slots:
+    void setWelcomeScreenVisible(bool visible);
     void setTitleVisible(bool visible);
     void setWindowButtonsVisible(bool visible);
     void setMaximized(bool maximized);
@@ -93,6 +92,8 @@ protected slots:
     void at_tabBar_closeRequested(QnWorkbenchLayout *layout);
 
 private:
+    void updateWidgetsVisibility();
+
     void showFullScreen();
     void showNormal();
 
@@ -112,11 +113,13 @@ private:
     QnLayoutTabBar *m_tabBar;
     QToolButton *m_mainMenuButton;
 
+    QStackedWidget * const m_currentPageHolder;
     QBoxLayout *m_titleLayout;
     QBoxLayout *m_windowButtonsLayout;
     QBoxLayout *m_viewLayout;
     QBoxLayout *m_globalLayout;
 
+    bool m_welcomeScreenVisible;
     bool m_titleVisible;
 
     /** Set the flag to skip next double-click. Used to workaround invalid double click when

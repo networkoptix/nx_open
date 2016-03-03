@@ -62,6 +62,7 @@ signals:
     void moduleAddressFound(const QnModuleInformation &moduleInformation, const SocketAddress &address);
     void moduleAddressLost(const QnModuleInformation &moduleInformation, const SocketAddress &address);
     void moduleConflict(const QnModuleInformation &moduleInformation, const SocketAddress &address);
+    void modulePrimaryAddressChanged(const QnModuleInformation &moduleInformation, const SocketAddress &address);
 
 private:
     void at_responseReceived(const QnModuleInformation &moduleInformation, const SocketAddress &address);
@@ -73,23 +74,6 @@ private:
     void sendModuleInformation(const QnModuleInformation &moduleInformation, const SocketAddress &address, Qn::ResourceStatus status);
 
     void removeModule(const QnUuid &id);
-
-private:
-    /* Mutex prevents concurrent reading/wrighting of m_moduleItemById content.
-     * All modifications are done in private methods and work always in the same thread,
-     * so no need to preserve concurrent wrighting. Mutex should only guarantee
-     * correct state of m_moduleItemById for public getters.
-     */
-    mutable QnMutex m_itemsMutex;
-
-    QElapsedTimer m_elapsedTimer;
-    QTimer *m_timer;
-
-    bool m_clientMode;
-
-    QScopedPointer<QnMulticastModuleFinder> m_multicastModuleFinder;
-    QnDirectModuleFinder *m_directModuleFinder;
-    QnDirectModuleFinderHelper *m_helper;
 
     struct ModuleItem {
         QnModuleInformation moduleInformation;
@@ -107,6 +91,26 @@ private:
             status(Qn::Incompatible)
         {}
     };
+
+    void updatePrimaryAddress(ModuleItem &item
+        , const SocketAddress &address);
+
+private:
+    /* Mutex prevents concurrent reading/wrighting of m_moduleItemById content.
+     * All modifications are done in private methods and work always in the same thread,
+     * so no need to preserve concurrent wrighting. Mutex should only guarantee
+     * correct state of m_moduleItemById for public getters.
+     */
+    mutable QnMutex m_itemsMutex;
+
+    QElapsedTimer m_elapsedTimer;
+    QTimer *m_timer;
+
+    bool m_clientMode;
+
+    QScopedPointer<QnMulticastModuleFinder> m_multicastModuleFinder;
+    QnDirectModuleFinder *m_directModuleFinder;
+    QnDirectModuleFinderHelper *m_helper;
 
     QHash<QnUuid, ModuleItem> m_moduleItemById;
     QHash<SocketAddress, QnUuid> m_idByAddress;
