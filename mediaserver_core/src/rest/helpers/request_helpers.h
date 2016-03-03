@@ -78,9 +78,9 @@ void runMultiserverUploadRequest(QUrl url
             , contentType, context, user, password]()
         {
             nx_http::uploadDataAsync(url, data, contentType, headers
-                , completionFunc, nx_http::AsyncHttpClient::authDigestWithPasswordHash)
-            
-            context->incRequestsCount();            
+                , completionFunc, nx_http::AsyncHttpClient::authDigestWithPasswordHash);
+
+            context->incRequestsCount();
         });
     };
 

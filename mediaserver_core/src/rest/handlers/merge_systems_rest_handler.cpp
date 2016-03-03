@@ -21,7 +21,7 @@
 #include "network/direct_module_finder.h"
 #include "utils/common/app_info.h"
 #include "utils/common/model_functions.h"
-#include "utils/common/log.h"
+#include <nx/utils/log/log.h>
 #include "api/model/ping_reply.h"
 #include "audit/audit_manager.h"
 #include "rest/server/rest_connection_processor.h"
@@ -227,8 +227,8 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(
 
     QString systemName = QString::fromUtf8(QUrl::toPercentEncoding(qnCommon->localSystemName()));
 
-    //saving user data before /api/configure call to prevent race condition, 
-    //  when we establish transaction connection to remote server and receive updated 
+    //saving user data before /api/configure call to prevent race condition,
+    //  when we establish transaction connection to remote server and receive updated
     //  saveUser transaction before passing admin to /ec2/saveUser call
     {   /* Save current admin inside the remote system */
 
