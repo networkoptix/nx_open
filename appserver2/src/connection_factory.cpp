@@ -487,7 +487,7 @@ namespace ec2
          * %// AbstractCameraManager::getUserAttributes
          */
         registerGetFuncHandler<QnUuid, ApiCameraAttributesDataList>(p, ApiCommand::getCameraUserAttributes);
-        
+
         //AbstractCameraManager::addCameraHistoryItem
         registerUpdateFuncHandler<ApiServerFootageData>(p, ApiCommand::addCameraHistoryItem);
 
@@ -1202,7 +1202,7 @@ namespace ec2
                     return connectToOldEC(
                         ecURL,
                         [reqID, handler](ErrorCode errorCode, const QnConnectionInfo& oldECConnectionInfo) {
-                            if( errorCode == ErrorCode::ok && oldECConnectionInfo.version >= SoftwareVersionType( 2, 3, 0 ) )
+                            if( errorCode == ErrorCode::ok && oldECConnectionInfo.version >= QnSoftwareVersion( 2, 3, 0 ) )
                                 handler->done(  //somehow, connected to 2.3 server with old ec connection. Returning error, since could not connect to ec 2.3 during normal connect
                                     reqID,
                                     ErrorCode::ioError,
@@ -1282,7 +1282,7 @@ namespace ec2
         if (response)
             connectionInfo->effectiveUserName =
                 nx_http::getHeaderValue(response->headers, Qn::EFFECTIVE_USER_NAME_HEADER_NAME);
-        
+
 		if (!loginInfo.clientInfo.id.isNull())
         {
 			auto clientInfo = loginInfo.clientInfo;
