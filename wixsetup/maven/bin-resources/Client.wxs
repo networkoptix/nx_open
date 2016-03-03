@@ -227,9 +227,6 @@
             <Component>
                 <File Id="OpenAL32.dll" Name="OpenAL32.dll" Source="$(var.SourceDir)\OpenAL32.dll" DiskId="10"/>
             </Component>
-            <Component>
-                <File Id="wrap_oal.dll" Name="wrap_oal.dll" Source="$(var.SourceDir)\wrap_oal.dll" DiskId="10"/>
-            </Component>
         </ComponentGroup>
 
         <ComponentGroup Id="ClientOpenSSL" Directory="$(var.clientDirId)">
@@ -293,7 +290,7 @@
             <ComponentGroupRef Id="ClientOpenSSL" />
             <ComponentRef Id="ClientSigar"/>        
             <ComponentRef Id="ClientVsRedistributable"/>
-            <ComponentRef Id="bespin" />         
+            <!-- <ComponentRef Id="bespin" />         -->
         </Feature>
     </Fragment>
 </Wix>
