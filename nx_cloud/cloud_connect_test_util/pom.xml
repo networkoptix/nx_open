@@ -21,7 +21,7 @@
         <product.title>${company.name} Cloud Connect Testing Utility</product.title>
         <!--Global libs-->
         <qt.libs>core concurrent xml</qt.libs>
-        <global.libs>-lcommon -lnx_streaming -lnx_network -lnx_utils -ludt</global.libs>
+        <global.libs>-lcommon -lnx_streaming -lnx_network -lnx_utils -ludt -lquazip</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm ssleay32.lib libeay32.lib</windows.oslibs>
         <windows.oslibs.release/>
