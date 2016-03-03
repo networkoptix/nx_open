@@ -25,17 +25,16 @@ describe('Information Page', function () {
         expect(p.storagesNodes.count()).toBeGreaterThan(0); // storages exist
         expect(p.storagesNodes.first().element(by.css(".storage-url")).getText()).toMatch(/[\w\d/\\]+/); // Except one good url
         expect(p.storagesNodes.first().element(by.css(".storage-total-space")).getText()).toMatch(/[\d+\.?\d*\s*\wB]+/);// GB,  TB  - it's size
-        expect(p.storagesNodes.first().element(by.css(".storage-indicators")).element(by.css(".glyphicon")).isDisplayed()).toBe(true); // At least one indicator
+        expect(p.storagesNodes.first().element(by.css(".storage-indicators")).element(by.css("[title~=Internal]")).isDisplayed()).toBe(true); // At least one indicator
+
     });
 
     it("health monitoring: should display legend",function(){
         browser.ignoreSynchronization = true;
 
-        // var EC = protractor.ExpectedConditions;
+        var EC = protractor.ExpectedConditions;
         // Waits for the .legend-checkbox to be present on the dom.
-        // browser.wait(EC.presenceOf($(".legend-checkbox")), 5000);
-        browser.wait($(".legend-checkbox"), 5000);
-        //browser.wait(element.all(by.repeater("dataset in datasets")), 5000);
+        browser.wait(EC.presenceOf($(".legend-checkbox")), 5000);
 
         expect(p.hmLegendNodes.count()).toBeGreaterThan(1); //legend exists, except 2+ elements
     });

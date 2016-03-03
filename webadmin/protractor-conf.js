@@ -17,8 +17,8 @@ exports.config = {
 
   // Spec patterns are relative to the current working directly when
   // protractor is called.
-  // specs: ['test/e2e/**/*spec.js'],
-  specs: ['test/e2e/info/*spec.js'],
+  specs: ['test/e2e/**/*spec.js'],
+  // specs: ['test/e2e/settings/*spec.js'],
 
   // Options to be passed to Jasmine-node.
   jasmineNodeOpts: {
@@ -28,14 +28,14 @@ exports.config = {
 
   // Authentication before running tests
   onPrepare: function() {
-    browser.driver.get('http://127.0.0.1:10000'); // find the way to insert baseUrl here
+    browser.get('/');
     browser.waitForAngular();
 
     element(by.model('user.username')).sendKeys('admin');
     element(by.model('user.password')).sendKeys('admin');
     element(by.buttonText('Log in')).click();
 
-    // Login takes some time, so wait until it's done.
+    // Login takes some time, so wait until it's done. Todo: think about better wait command
     return browser.driver.wait(function() {
       return browser.driver.getCurrentUrl();
     }, 10000);

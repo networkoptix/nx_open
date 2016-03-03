@@ -14,7 +14,7 @@ describe('Advanced Page', function () {
         var storage = p.storagesRows.first();
         expect(storage.element(by.css(".storage-url")).getText()).toMatch(/[\w\d\:]*(\/[\w\d]*)+/);
         expect(storage.element(by.css(".progress")).getAttribute("title")).toMatch(/Reserved\:\s\d+\.?\d*\s*\wB,\s+Free\:\s\d+\.?\d*\s*\wB,\s+Occupied\:\s\d+\.?\d*\s*\wB,\s+Total:\s\d+\.?\d*\s*\wB/);
-        expect(storage.element(by.css(".glyphicon")).isDisplayed()).toBe(true);
+        expect(storage.element(by.css("[title~=Internal]")).isDisplayed()).toBe(true);
     });
 
 
@@ -72,7 +72,7 @@ describe('Advanced Page', function () {
             expect(p.reduceArchiveAlert.isDisplayed()).toBe(true);
 
             // This part of the test will be available, when alert dialogs are removed from the code
-
+            expect("alert").toBe("removed");
             // p.saveButton.click().then(function(){
             //     var alertDialog = ptor.switchTo().alert();
             //     expect(alertDialog.getText()).toContain("Possible partial remove of the video footage is expected");
@@ -81,34 +81,35 @@ describe('Advanced Page', function () {
         });
     });
 
-    // This test will be available, when alert dialogs are removed from the code
 
-    // it("should save settings and display it after reload",function(){
-    //     p.get();
-    //     p.setStorageLimit(1);
+    it("should save settings and display it after reload",function(){
+        p.get();
+        p.setStorageLimit(1);
 
-    //     p.saveButton.click().then(function(){
-    //         var alertDialog = ptor.switchTo().alert();
-    //         expect(alertDialog.getText()).toContain("Settings saved");
-    //         alertDialog.accept();
+        // This test will be available, when alert dialogs are removed from the code
+        expect("alert").toBe("removed");
+/*        p.saveButton.click().then(function(){
+            var alertDialog = ptor.switchTo().alert();
+            expect(alertDialog.getText()).toContain("Settings saved");
+            alertDialog.accept();
 
-    //         p.get();
-    //         expect(p.storageLimitInput.getAttribute("value")).toBe("1");
+            p.get();
+            expect(p.storageLimitInput.getAttribute("value")).toBe("1");
 
-    //         p.setStorageLimit(5);
+            p.setStorageLimit(5);
 
-    //         console.log("click 3");
-    //         p.saveButton.click().then(function(){
-    //             var alertDialog = ptor.switchTo().alert();
-    //             expect(alertDialog.getText()).toContain("Settings saved");
-    //             alertDialog.accept();
+            console.log("click 3");
+            p.saveButton.click().then(function(){
+                var alertDialog = ptor.switchTo().alert();
+                expect(alertDialog.getText()).toContain("Settings saved");
+                alertDialog.accept();
 
-    //             p.get();
-    //             expect(p.storageLimitInput.getAttribute("value")).toBe("5");
-    //         });
+                p.get();
+                expect(p.storageLimitInput.getAttribute("value")).toBe("5");
+            });
 
-    //     });
-    // });
+        });*/
+    });
 
     it("should forbid disabling all storages",function(){
         p.get();
@@ -156,24 +157,20 @@ describe('Advanced Page', function () {
     });
 
 
-    // This test will be available, when alert dialogs are removed from the code
+    it("should upload some bad file and display an error",function(){
+        var path = require('path');
 
-    // it("should upload some bad file and display an error",function(){
-    //     var path = require('path');
+        var fileToUpload = './po.js';
+        var absolutePath = path.resolve(__dirname, fileToUpload);
 
-    //     var fileToUpload = './po.js';
-    //     var absolutePath = path.resolve(__dirname, fileToUpload);
-    //     p.upgradeButton.sendKeys(absolutePath).then(function(){
-    //         // browser.ignoreSynchronization = true;
-    //         // browser.sleep(100);
-    //         // browser.wait(protractor.ExpectedConditions.alertIsPresent(), 10000);
+        // This test will be available, when alert dialogs are removed from the code
+        expect("alert").toBe("removed");
+        // p.upgradeButton.sendKeys(absolutePath).then(function(){
 
-    //         var alertDialog = browser.switchTo().alert();
+        //     var alertDialog = browser.switchTo().alert();
 
-    //         expect(alertDialog.getText()).toContain("Updating failed");
-    //         alertDialog.accept();
-
-    //         // browser.ignoreSynchronization = false;
-    //     });
-    // });
+        //     expect(alertDialog.getText()).toContain("Updating failed");
+        //     alertDialog.accept();
+        // });
+    });
 });

@@ -6,6 +6,9 @@ describe('Merge Dialog', function () {
 
     var p = new Page();
 
+    expect("tests for merging systems").toBe("written");
+    return;
+
     it("should open merge dialog",function(){
         p.get();
         expect(p.mergeButton.isDisplayed()).toBe(true);
