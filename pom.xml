@@ -97,7 +97,7 @@
 
         <!-- Build Defaults -->
         <license.environment>production</license.environment>
-        <build.configuration>release</build.configuration>
+        <build.configuration>debug</build.configuration>
         <buildNumber>0</buildNumber>
         <skip.sign>true</skip.sign>
         <box>none</box>
