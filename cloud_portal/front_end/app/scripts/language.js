@@ -72,6 +72,7 @@ var L = {
     system:{
         confirmDisconnect: "You are going to completely disconnect your system from the cloud. Are you sure?",
         confirmUnshareFromMe: "You are going to disconnect this system from your account. You will lose an access for this system. Are you sure?",
+        confirmUnshare: "You are going to debar user from the system. Are you sure?",
         permissionsRemoved: 'Permissions were removed from {accountEmail}'
     }
 };

@@ -127,15 +127,19 @@ angular.module('cloudApp')
             if($scope.account.email == user.accountEmail){
                 return $scope.delete();
             }
-            // Run a process of sharing
-            $scope.unsharingMessage = L.system.permissionsRemoved.replace('{accountEmail}',user.accountEmail);
-            $scope.unsharing = process.init(function(){
-                return cloudApi.unshare(systemId, user.accountEmail);
-            }).then(function(){
-                // Update users list
-                $scope.system.users = _.without($scope.system.users, user);
-            });
-            $scope.unsharing.run();
+            dialogs.confirm(L.system.confirmUnshare).
+                then(function(){
+                    // Run a process of sharing
+                    $scope.unsharingMessage = L.system.permissionsRemoved.replace('{accountEmail}',user.accountEmail);
+                    $scope.unsharing = process.init(function(){
+                        return cloudApi.unshare(systemId, user.accountEmail);
+                    }).then(function(){
+                        // Update users list
+                        $scope.system.users = _.without($scope.system.users, user);
+                    });
+                    $scope.unsharing.run();
+                });
+
         };
 
     });
