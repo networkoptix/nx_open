@@ -19,6 +19,7 @@ QString toString(const AddressType& type)
     {
         case AddressType::kUnknown: return lit("kUnknown");
         case AddressType::kCloud: return lit("kCloud");
+        case AddressType::kLocal: return lit("kLocal");
     };
 
     NX_ASSERT( false, Q_FUNC_INFO, "undefined AddressType" );

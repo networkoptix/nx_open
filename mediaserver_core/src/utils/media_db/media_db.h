@@ -8,8 +8,8 @@
 #include <boost/variant.hpp>
 #include <QtCore>
 
-#include "utils/thread/mutex.h"
-#include "utils/thread/wait_condition.h"
+#include "nx/utils/thread/mutex.h"
+#include "nx/utils/thread/wait_condition.h"
 
 // Refer to https://networkoptix.atlassian.net/wiki/display/SD/Proprietary+media+database+record+format 
 // for DB records format details.

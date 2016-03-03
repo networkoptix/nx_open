@@ -263,9 +263,10 @@ void QnStorageDb::handleMediaFileOp(const nx::media_db::MediaFileOperation &medi
     assert(cameraIt != m_uuidToHash.right.end());
 
     auto resultCameraIt = std::find_if(m_readResult.cbegin(), m_readResult.cend(),
-                                       [cameraIt](const DeviceFileCatalogPtr &catalog)
+                                       [cameraIt, &mediaFileOp](const DeviceFileCatalogPtr &catalog)
                                        {
-                                           return catalog->cameraUniqueId() == cameraIt->second;
+                                           return catalog->cameraUniqueId() == cameraIt->second &&
+                                                  catalog->getCatalog() == mediaFileOp.getCatalog();
                                        });
     DeviceFileCatalogPtr fileCatalog;
     if (resultCameraIt != m_readResult.cend())
