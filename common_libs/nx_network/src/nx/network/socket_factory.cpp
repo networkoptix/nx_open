@@ -9,6 +9,7 @@
 #include "udt/udt_socket.h"
 #include "ssl_socket.h"
 
+#include "cloud/cloud_stream_socket.h"
 #include "utils/common/cpp14.h"
 
 
@@ -34,7 +35,7 @@ static std::unique_ptr< AbstractStreamSocket > streamSocket(
             {
                 case SocketFactory::NatTraversalType::nttAuto:
                 case SocketFactory::NatTraversalType::nttEnabled:
-                    return std::make_unique< TCPSocket >( true );
+                    return std::make_unique< cloud::CloudStreamSocket >();
 
                 case SocketFactory::NatTraversalType::nttDisabled:
                     return std::make_unique< TCPSocket >( false );

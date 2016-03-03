@@ -172,7 +172,7 @@ void UDPClient::sendRequestInternal(
     requestContext.completionHandler = std::move(completionHandler);
     requestContext.currentRetransmitTimeout = m_retransmissionTimeout;
     requestContext.originalServerAddress = serverAddress;
-    requestContext.timer = SocketFactory::createStreamSocket();
+    requestContext.timer = std::make_unique<nx::network::aio::Timer>();
     requestContext.timer->bindToAioThread(m_messagePipeline.socket()->getAioThread());
     requestContext.request = std::move(request);
 
@@ -195,7 +195,7 @@ void UDPClient::sendRequestAndStartTimer(
     //TODO #ak we should start timer after request has actually been sent
 
     //starting timer
-    requestContext->timer->registerTimer(
+    requestContext->timer->start(
         requestContext->currentRetransmitTimeout,
         std::bind(&UDPClient::timedOut, this, request.header.transactionId));
 }

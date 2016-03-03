@@ -14,7 +14,6 @@ MediatorAddressPublisher::MediatorAddressPublisher(
         std::shared_ptr< hpm::api::MediatorServerTcpConnection > mediatorConnection)
     : m_updateInterval( DEFAULT_UPDATE_INTERVAL )
     , m_state( State::kInit )
-    , m_timerSocket( SocketFactory::createStreamSocket() )
     , m_mediatorConnection( std::move(mediatorConnection) )
 {
 }
@@ -46,11 +45,13 @@ void MediatorAddressPublisher::setupUpdateTimer( QnMutexLockerBase* /*lk*/ )
     if( m_state == State::kTerminated )
         return;
 
-    m_timerSocket->registerTimer( m_updateInterval, [ this ]()
-    {
-        QnMutexLocker lk( &m_mutex );
-        pingReportedAddresses( &lk );
-    } );
+    m_timer.start(
+        m_updateInterval,
+        [this]()
+        {
+            QnMutexLocker lk( &m_mutex );
+            pingReportedAddresses( &lk );
+        });
 }
 
 void MediatorAddressPublisher::pingReportedAddresses( QnMutexLockerBase* lk )
@@ -121,7 +122,7 @@ void MediatorAddressPublisher::pleaseStop(nx::utils::MoveOnlyFunc<void()> handle
     }
 
     nx::BarrierHandler barrier( std::move(handler) );
-    m_timerSocket->pleaseStop( barrier.fork() );
+    m_timer.pleaseStop( barrier.fork() );
 
     QnMutexLocker lk( &m_mutex );
     if( m_mediatorConnection )

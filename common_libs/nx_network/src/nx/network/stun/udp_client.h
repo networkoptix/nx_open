@@ -12,6 +12,7 @@
 #include "message_parser.h"
 #include "message_serializer.h"
 #include "unreliable_message_pipeline.h"
+#include "nx/network/aio/timer.h"
 
 
 namespace nx {
@@ -90,7 +91,7 @@ private:
         std::chrono::milliseconds currentRetransmitTimeout;
         int retryNumber;
         //TODO #ak use some aio thread timer when it is available
-        std::unique_ptr<AbstractStreamSocket> timer;
+        std::unique_ptr<nx::network::aio::Timer> timer;
         SocketAddress originalServerAddress;
         /** this address reported by socket on send completion */
         SocketAddress resolvedServerAddress;
