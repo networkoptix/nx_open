@@ -62,8 +62,6 @@ angular.module('webadminApp')
              }
              */
 
-
-
             return modalInstance;
         }
 
