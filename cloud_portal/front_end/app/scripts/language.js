@@ -71,7 +71,12 @@ var L = {
     },
     sharing:{
         cantEditYourself: 'Can\'t edit yourself',
-        confirmOwner: 'You are going to change the owner of your system. You will not be able to return this power back!'
+        confirmOwner: 'You are going to change the owner of your system. You will not be able to return this power back!',
+
+        shareTitle: 'Share',
+        shareConfirmButton: 'Share',
+        editShareTitle: 'Edit users permissions',
+        editShareConfirmButton: 'Save'
     },
     system:{
         confirmDisconnect: "You are going to completely disconnect your system from the cloud. Are you sure?",

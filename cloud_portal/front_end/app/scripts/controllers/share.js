@@ -13,6 +13,7 @@ angular.module('cloudApp')
 
         $scope.Config = Config;
         $scope.L = L;
+        $scope.buttonText = L.sharing.shareConfirmButton;
 
         var dialogSettings = findSettings($scope);
 
@@ -30,6 +31,7 @@ angular.module('cloudApp')
                     $scope.$parent.cancel(L.share.cantEditYourself);
                 }
             });
+            $scope.buttonText = L.sharing.editShareConfirmButton;
         }
 
         function processAccessRoles(roles){

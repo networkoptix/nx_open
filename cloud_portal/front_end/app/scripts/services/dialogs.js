@@ -79,10 +79,12 @@ angular.module('cloudApp')
             },
             share:function(systemId, isOwner, share){
                 var url = 'share';
+                var title = L.sharing.shareTitle;
                 if(share){
                     url += '/' + share.accountEmail;
+                    title = L.sharing.editShareTitle;
                 }
-                return openDialog('Share', 'views/share.html', url, null, false, true,{
+                return openDialog(title, 'views/share.html', url, null, false, true,{
                     systemId: systemId,
                     share: share,
                     isOwner: isOwner
