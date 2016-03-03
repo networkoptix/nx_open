@@ -25,7 +25,7 @@
         <guid>${cloud_db.guid}</guid>
         <product.title>${company.name} cloud_db</product.title>
         <!--Global libs-->
-        <qt.libs>core network concurrent sql xml</qt.libs>
+        <qt.libs>core gui network concurrent sql xml</qt.libs>
         <global.libs>-lcloud_db -lnx_utils -lcommon -lnx_streaming -ludt -lnx_network -lcloud_db_client</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm</windows.oslibs>
