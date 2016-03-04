@@ -65,8 +65,9 @@ bool CloudStreamSocket::isClosed() const
 void CloudStreamSocket::shutdown()
 {
     //interrupting blocking calls
+    std::promise<void> stoppedPromise;
     pleaseStop(
-        [this](){
+        [this, &stoppedPromise](){
             if (m_recvPromisePtr.load())
             {
                 m_recvPromisePtr.load()->set_value(
@@ -80,9 +81,13 @@ void CloudStreamSocket::shutdown()
                     std::make_pair(SystemError::interrupted, 0));
                 m_sendPromisePtr.store(nullptr);
             }
+
+            stoppedPromise.set_value();
         });
     if (m_socketDelegate)
         m_socketDelegate->shutdown();
+
+    stoppedPromise.get_future().wait();
 }
 
 AbstractSocket::SOCKET_HANDLE CloudStreamSocket::handle() const
