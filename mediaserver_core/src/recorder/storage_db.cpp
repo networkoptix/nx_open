@@ -203,18 +203,9 @@ bool QnStorageDb::createDatabase(const QString &fileName)
     
     if (m_dbHelper.readFileHeader(&m_dbVersion) != nx::media_db::Error::NoError)
     {   // either file has just been created or unrecognized format
-        m_ioDevice.reset();
-        m_storage->removeFile(fileName);
-
-        if (!resetIoDevice())
-            return false;
-
-        m_dbHelper.setMode(nx::media_db::Mode::Write);
-        m_dbHelper.writeFileHeader(kDbVersion);
-        m_dbVersion = kDbVersion;
+        return startDbFile();
     }
 
-    //m_lastTranTime.restart();
     return true;
 }
 
@@ -264,26 +255,34 @@ void QnStorageDb::addCatalogFromMediaFolder(const QString& postfix,
     }
 }
 
+bool QnStorageDb::startDbFile()
+{
+    m_ioDevice.reset();
+    m_storage->removeFile(m_dbFileName);
+
+    if (!resetIoDevice())
+        return false;
+
+    m_dbHelper.setMode(nx::media_db::Mode::Write);
+    m_dbHelper.writeFileHeader(kDbVersion);
+    m_dbVersion = kDbVersion;
+
+    return true;
+}
+
 QVector<DeviceFileCatalogPtr> QnStorageDb::loadChunksFileCatalog() 
 {
     m_readData.clear();
     m_dbHelper.setMode(nx::media_db::Mode::Read);
+
     assert(m_dbHelper.getDevice());
+    if ((!m_dbHelper.getDevice() || !m_ioDevice->isOpen()) && !startDbFile())
+        return QVector<DeviceFileCatalogPtr>();
 
     while ((m_lastReadError = m_dbHelper.readRecord()) == nx::media_db::Error::NoError);
 
-    if (!vacuum())
-    {
-        m_ioDevice.reset();
-        m_storage->removeFile(m_dbFileName);
-
-        if (!resetIoDevice())
-            return QVector<DeviceFileCatalogPtr>();
-
-        m_dbHelper.setMode(nx::media_db::Mode::Write);
-        m_dbHelper.writeFileHeader(kDbVersion);
-        m_dbVersion = kDbVersion;
-    }
+    if (!vacuum() && !startDbFile())
+        return QVector<DeviceFileCatalogPtr>();
 
     m_dbHelper.setMode(nx::media_db::Mode::Write);
     return buildReadResult();

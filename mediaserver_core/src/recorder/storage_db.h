@@ -73,6 +73,7 @@ private:
     QVector<DeviceFileCatalogPtr> buildReadResult() const;
     bool vacuum();
     bool checkDataConsistency(const UuidToCatalogs &readDataCopy) const;
+    bool startDbFile();
 
 private:
     QnStorageResourcePtr m_storage;
