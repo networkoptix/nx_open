@@ -14,7 +14,14 @@ int QnSetupCloudSystemRestHandler::executeGet(const QString&, const QnRequestPar
         return nx_http::StatusCode::ok;
     }
 
-    if (!changeSystemName(params.value(lit("systemName")), 0, 0))
+    QString newSystemName = params.value(lit("systemName"));
+    if (newSystemName.isEmpty())
+    {
+        result.setError(QnJsonRestResult::MissingParameter, lit("Parameter 'systemName' must be provided."));
+        return nx_http::StatusCode::ok;
+    }
+
+    if (!changeSystemName(newSystemName, 0, 0))
     {
         result.setError(QnRestResult::CantProcessRequest, lit("Internal server error. Can't change system name."));
         return nx_http::StatusCode::internalServerError;
