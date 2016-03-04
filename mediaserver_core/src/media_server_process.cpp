@@ -66,6 +66,7 @@
 #include <nx_ec/ec_proto_version.h>
 #include <nx_ec/data/api_user_data.h>
 #include <nx_ec/managers/abstract_user_manager.h>
+#include <nx_ec/managers/abstract_layout_manager.h>
 
 #include <platform/platform_abstraction.h>
 
@@ -1219,7 +1220,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
 
     {
         //loading layouts
-        QnLayoutResourceList layouts;
+        ec2::ApiLayoutDataList layouts;
         while(( rez = ec2Connection->getLayoutManager()->getLayoutsSync(&layouts))  != ec2::ErrorCode::ok)
         {
             qDebug() << "QnMain::run(): Can't get layouts. Reason: " << ec2::toString(rez);
@@ -1229,7 +1230,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
         }
 
         for(const auto &layout: layouts)
-            messageProcessor->updateResource(layout);
+            messageProcessor->updateLayout(layout);
     }
 
     {

@@ -7,12 +7,10 @@
 
 namespace ec2
 {
-/*!
-\note All methods are asynchronous if other not specified
-*/
-    class AbstractUserManager
-        :
-        public QObject
+    /*!
+    \note All methods are asynchronous if other not specified
+    */
+    class AbstractUserManager: public QObject
     {
         Q_OBJECT
 
@@ -22,7 +20,8 @@ namespace ec2
         /*!
         \param handler Functor with params: (ErrorCode, const QnUserResourceList&)
         */
-        template<class TargetType, class HandlerType> int getUsers(TargetType* target, HandlerType handler)
+        template<class TargetType, class HandlerType>
+        int getUsers(TargetType* target, HandlerType handler)
         {
             return getUsers(userId, std::static_pointer_cast<impl::GetUsersHandler>(
                 std::make_shared<impl::CustomGetUsersHandler<TargetType, HandlerType>>(target, handler)));
@@ -30,14 +29,17 @@ namespace ec2
 
         ErrorCode getUsersSync(ec2::ApiUserDataList* const userList)
         {
-            int(AbstractUserManager::*fn)(impl::GetUsersHandlerPtr) = &AbstractUserManager::getUsers;
-            return impl::doSyncCall<impl::GetUsersHandler>(std::bind(fn, this, std::placeholders::_1), userList);
+            return impl::doSyncCall<impl::GetUsersHandler>([this](impl::GetUsersHandlerPtr handler)
+            {
+                this->getUsers(handler);
+            }, userList);
         }
 
         /*!
         \param handler Functor with params: (ErrorCode)
         */
-        template<class TargetType, class HandlerType> int save(const ec2::ApiUserData& user, const QString& newPassword, TargetType* target, HandlerType handler)
+        template<class TargetType, class HandlerType>
+        int save(const ec2::ApiUserData& user, const QString& newPassword, TargetType* target, HandlerType handler)
         {
             return save(user, newPassword, std::static_pointer_cast<impl::AddUserHandler>(
                 std::make_shared<impl::CustomAddUserHandler<TargetType, HandlerType>>(target, handler)));
@@ -54,7 +56,8 @@ namespace ec2
         /*!
         \param handler Functor with params: (ErrorCode)
         */
-        template<class TargetType, class HandlerType> int remove(const QnUuid& id, TargetType* target, HandlerType handler) {
+        template<class TargetType, class HandlerType>
+        int remove(const QnUuid& id, TargetType* target, HandlerType handler) {
             return remove(id, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }

@@ -179,7 +179,7 @@ namespace ec2
             void emitGetUsersDone( int reqID, const ErrorCode p1, const ec2::ApiUserDataList& p2 ) { emit onGetUsersDone( reqID, p1, p2 ); }
             void emitGetBusinessRulesDone( int reqID, const ErrorCode p1, const QnBusinessEventRuleList& p2 ) { emit onGetBusinessRulesDone( reqID, p1, p2 ); }
             void emitGetLicensesDone( int reqID, const ErrorCode p1, const QnLicenseList& p2 ) { emit onGetLicensesDone( reqID, p1, p2 ); }
-            void emitGetLayoutsDone( int reqID, const ErrorCode p1, const QnLayoutResourceList& p2 ) { emit onGetLayoutsDone( reqID, p1, p2 ); }
+            void emitGetLayoutsDone( int reqID, const ErrorCode p1, const ec2::ApiLayoutDataList& p2 ) { emit onGetLayoutsDone( reqID, p1, p2 ); }
             void emitGetStoredFileDone( int reqID, const ErrorCode p1, const QByteArray& p2 ) { emit onGetStoredFileDone( reqID, p1, p2 ); }
             void emitListDirectoryDone( int reqID, const ErrorCode p1, const QStringList& p2 ) { emit onListDirectoryDone( reqID, p1, p2 ); }
             void emitCurrentTimeDone( int reqID, const ErrorCode p1, const qint64& p2 ) { emit onCurrentTimeDone( reqID, p1, p2 ); }
@@ -216,7 +216,7 @@ namespace ec2
             void onGetUsersDone( int reqID, const ErrorCode, const ec2::ApiUserDataList& );
             void onGetBusinessRulesDone( int reqID, const ErrorCode, const QnBusinessEventRuleList& );
             void onGetLicensesDone( int reqID, const ErrorCode, const QnLicenseList& );
-            void onGetLayoutsDone( int reqID, const ErrorCode, const QnLayoutResourceList& );
+            void onGetLayoutsDone( int reqID, const ErrorCode, const ec2::ApiLayoutDataList& );
             void onGetStoredFileDone( int reqID, const ErrorCode, const QByteArray& );
             void onListDirectoryDone( int reqID, const ErrorCode, const QStringList& );
             void onCurrentTimeDone( int reqID, const ErrorCode, const qint64& );
@@ -292,7 +292,7 @@ namespace ec2
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractLayoutManager
         //////////////////////////////////////////////////////////
-        DEFINE_TWO_ARG_HANDLER( GetLayouts, ErrorCode, QnLayoutResourceList )
+        DEFINE_TWO_ARG_HANDLER( GetLayouts, ErrorCode, ec2::ApiLayoutDataList )
 
 
         //////////////////////////////////////////////////////////

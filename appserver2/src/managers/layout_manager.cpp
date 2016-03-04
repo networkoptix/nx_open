@@ -1,11 +1,7 @@
-
 #include "layout_manager.h"
-
-#include <core/resource/layout_resource.h>
 
 #include "fixed_url_client_query_processor.h"
 #include "server_query_processor.h"
-
 
 namespace ec2
 {
@@ -21,12 +17,9 @@ namespace ec2
     int QnLayoutManager<QueryProcessorType>::getLayouts( impl::GetLayoutsHandlerPtr handler )
     {
         const int reqID = generateRequestID();
-
-        auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ApiLayoutDataList& layouts) {
-            QnLayoutResourceList outData;
-            if( errorCode == ErrorCode::ok )
-                fromApiToResourceList(layouts, outData);
-            handler->done( reqID, errorCode, outData);
+        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiLayoutDataList& layouts)
+        {
+            handler->done( reqID, errorCode, layouts);
         };
         m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiLayoutDataList, decltype(queryDoneHandler)>
             ( ApiCommand::getLayouts, nullptr, queryDoneHandler );
@@ -34,24 +27,14 @@ namespace ec2
     }
 
     template<class QueryProcessorType>
-    int QnLayoutManager<QueryProcessorType>::save( const QnLayoutResourceList& layouts, impl::SimpleHandlerPtr handler )
+    int QnLayoutManager<QueryProcessorType>::save(const ec2::ApiLayoutData& layout, impl::SimpleHandlerPtr handler)
     {
         const int reqID = generateRequestID();
-
-        //preparing output data
-		ApiCommand::Value command = ApiCommand::saveLayouts;
-        for( QnLayoutResourcePtr layout: layouts )
+        auto tran = prepareTransaction(ApiCommand::saveLayout, layout );
+        m_queryProcessor->processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
         {
-            if( layout->getId().isNull() )
-			    layout->setId( QnUuid::createUuid() );
-        }
-
-        //performing request
-        auto tran = prepareTransaction( command, layouts );
-
-        using namespace std::placeholders;
-        m_queryProcessor->processUpdateAsync( tran, std::bind( &impl::SimpleHandler::done, handler, reqID, _1 ) );
-
+            handler->done(reqID, errorCode);
+        });
         return reqID;
     }
 
@@ -60,8 +43,10 @@ namespace ec2
     {
         const int reqID = generateRequestID();
         auto tran = prepareTransaction( ApiCommand::removeLayout, id );
-        using namespace std::placeholders;
-        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1 ) );
+        m_queryProcessor->processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
+        {
+            handler->done(reqID, errorCode);
+        });
         return reqID;
     }
 
@@ -74,11 +59,9 @@ namespace ec2
     }
 
     template<class T>
-    QnTransaction<ApiLayoutDataList> QnLayoutManager<T>::prepareTransaction( ApiCommand::Value command, const QnLayoutResourceList& layouts )
+    QnTransaction<ApiLayoutData> QnLayoutManager<T>::prepareTransaction( ApiCommand::Value command, const ec2::ApiLayoutData& layout )
     {
-        QnTransaction<ApiLayoutDataList> tran(command);
-        fromResourceListToApi(layouts, tran.params);
-        return tran;
+        return QnTransaction<ApiLayoutData>(command, layout);
     }
 
     template class QnLayoutManager<FixedUrlClientQueryProcessor>;

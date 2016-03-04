@@ -1,15 +1,7 @@
 #include "user_manager.h"
 
-#include <functional>
-
-#include <QtConcurrent/QtConcurrent>
-
 #include "fixed_url_client_query_processor.h"
-#include "database/db_manager.h"
-#include "transaction/transaction_log.h"
 #include "server_query_processor.h"
-#include "nx_ec/data/api_conversion_functions.h"
-
 
 namespace ec2
 {
@@ -21,15 +13,17 @@ namespace ec2
     {
     }
 
-    template<class T>
-    int QnUserManager<T>::getUsers(impl::GetUsersHandlerPtr handler )
+    template<class QueryProcessorType>
+    int QnUserManager<QueryProcessorType>::getUsers(impl::GetUsersHandlerPtr handler )
     {
         const int reqID = generateRequestID();
 
-        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiUserDataList& users) {
+        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiUserDataList& users)
+        {
             handler->done( reqID, errorCode, users);
         };
-        m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiUserDataList, decltype(queryDoneHandler)> ( ApiCommand::getUsers, nullptr, queryDoneHandler);
+        m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiUserDataList, decltype(queryDoneHandler)>
+            ( ApiCommand::getUsers, nullptr, queryDoneHandler);
         return reqID;
     }
 
@@ -87,8 +81,10 @@ namespace ec2
     {
         const int reqID = generateRequestID();
         auto tran = prepareTransaction( ApiCommand::removeUser, id );
-        using namespace std::placeholders;
-        m_queryProcessor->processUpdateAsync( tran, std::bind( &impl::SimpleHandler::done, handler, reqID, _1 ) );
+        m_queryProcessor->processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
+        {
+            handler->done(reqID, errorCode);
+        });
         return reqID;
     }
 

@@ -31,6 +31,7 @@ public:
 
     virtual void updateResource(const QnResourcePtr &resource);
     virtual void updateUser(const ec2::ApiUserData& user);
+    virtual void updateLayout(const ec2::ApiLayoutData& layout);
 
     QMap<QnUuid, QnBusinessEventRulePtr> businessRules() const;
 

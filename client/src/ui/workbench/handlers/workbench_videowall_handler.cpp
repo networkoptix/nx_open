@@ -84,6 +84,7 @@
 #include <utils/common/string.h>
 #include <utils/license_usage_helper.h>
 #include <utils/common/uuid_pool.h>
+#include <utils/common/counter.h>
 
 #include <utils/common/app_info.h>
 
@@ -425,22 +426,20 @@ void QnWorkbenchVideoWallHandler::resetLayout(const QnVideoWallItemIndexList &it
         updateItemsLayout(items, layout->getId());
     };
 
-    if (snapshotManager()->isLocal(layout) || snapshotManager()->isModified(layout)) {
-        QnLayoutResourceList unsavedLayouts;
-        unsavedLayouts << layout;
-        QnWorkbenchLayoutReplyProcessor *processor = new QnWorkbenchLayoutReplyProcessor(snapshotManager(), unsavedLayouts);
-        connect(processor, &QnWorkbenchLayoutReplyProcessor::finished, this,
-            [this, items, layout, reset](int status, const QnResourceList &resources, int handle) {
-            Q_UNUSED(resources)
-            Q_UNUSED(handle)
-            if (status != 0)
+    if (snapshotManager()->isLocal(layout) || snapshotManager()->isModified(layout))
+    {
+        auto callback = [this, items, reset](bool success, const QnLayoutResourcePtr &layout)
+        {
+            if (!success)
                 QnMessageBox::warning(mainWindow(), tr("Error"), tr("The changes cannot be applied. Unexpected error occurred."));
             else
                 reset(items, layout);
-        });
-        snapshotManager()->save(unsavedLayouts, processor);
+        };
+        snapshotManager()->save(layout, callback);
         propertyDictionary->saveParamsAsync(layout->getId());
-    } else {
+    }
+    else
+    {
         reset(items, layout);
     }
 }
@@ -456,7 +455,8 @@ void QnWorkbenchVideoWallHandler::swapLayouts(const QnVideoWallItemIndex firstIn
     if (secondLayout && (snapshotManager()->isLocal(secondLayout) || snapshotManager()->isModified(secondLayout)))
         unsavedLayouts << secondLayout;
 
-    auto swap = [this](const QnVideoWallItemIndex firstIndex, const QnLayoutResourcePtr &firstLayout, const QnVideoWallItemIndex &secondIndex, const QnLayoutResourcePtr &secondLayout) {
+    auto swap = [this](const QnVideoWallItemIndex firstIndex, const QnLayoutResourcePtr &firstLayout, const QnVideoWallItemIndex &secondIndex, const QnLayoutResourcePtr &secondLayout)
+    {
         QnVideoWallItem firstItem = firstIndex.item();
         firstItem.layout = firstLayout? firstLayout->getId() : QnUuid();
         firstIndex.videowall()->items()->updateItem(firstItem);
@@ -468,19 +468,47 @@ void QnWorkbenchVideoWallHandler::swapLayouts(const QnVideoWallItemIndex firstIn
         saveVideowalls(QSet<QnVideoWallResourcePtr>() << firstIndex.videowall() << secondIndex.videowall());
     };
 
-    if (!unsavedLayouts.isEmpty()) {
-        QnWorkbenchLayoutReplyProcessor *processor = new QnWorkbenchLayoutReplyProcessor(snapshotManager(), unsavedLayouts);
-        connect(processor, &QnWorkbenchLayoutReplyProcessor::finished, this,
-            [this, firstIndex, firstLayout, secondIndex, secondLayout, swap](int status, const QnResourceList &resources, int handle) {
-            Q_UNUSED(resources)
-            Q_UNUSED(handle)
-            if (status != 0)
+    if (!unsavedLayouts.isEmpty())
+    {
+
+        auto callback = [this, firstIndex, firstLayout, secondIndex, secondLayout, swap](bool success, const QnLayoutResourcePtr &layout)
+        {
+            Q_UNUSED(layout);
+            if (!success)
                 QnMessageBox::warning(mainWindow(), tr("Error"), tr("The changes cannot be applied. Unexpected error occurred."));
             else
                 swap(firstIndex, firstLayout, secondIndex, secondLayout);
-        });
-        snapshotManager()->save(unsavedLayouts, processor);
-    } else {
+        };
+
+        if (unsavedLayouts.size() == 1)
+        {
+            snapshotManager()->save(unsavedLayouts.first(), callback);
+        }
+        else
+        {
+            /* Avoiding double swap */
+            //TODO: #GDM refactor it
+            bool bothSuccess = true;
+            QnCounter *counter = new QnCounter(2);
+            connect(counter, &QnCounter::reachedZero, this, [callback, &bothSuccess, counter]()
+            {
+                callback(bothSuccess, QnLayoutResourcePtr());
+                counter->deleteLater();
+            });
+
+            auto localCallback = [&bothSuccess, counter](bool success, const QnLayoutResourcePtr &layout)
+            {
+                Q_UNUSED(layout);
+                bothSuccess &= success;
+                counter->decrement();
+            };
+            for (const QnLayoutResourcePtr& layout: unsavedLayouts)
+                snapshotManager()->save(layout, localCallback);
+        }
+
+    }
+    else
+    {
         swap(firstIndex, firstLayout, secondIndex, secondLayout);
     }
 }

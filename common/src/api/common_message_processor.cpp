@@ -2,6 +2,7 @@
 
 #include <nx_ec/ec_api.h>
 #include <nx_ec/managers/abstract_user_manager.h>
+#include <nx_ec/managers/abstract_layout_manager.h>
 
 #include <nx_ec/data/api_full_info_data.h>
 #include <nx_ec/data/api_discovery_data.h>
@@ -98,7 +99,7 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     connect(userManager, &ec2::AbstractUserManager::removed,                        this, &QnCommonMessageProcessor::on_resourceRemoved );
 
     auto layoutManager = connection->getLayoutManager();
-    connect(layoutManager, &ec2::AbstractLayoutManager::addedOrUpdated,             this, [this](const QnLayoutResourcePtr &layout){updateResource(layout);});
+    connect(layoutManager, &ec2::AbstractLayoutManager::addedOrUpdated,             this, [this](const ec2::ApiLayoutData &layout){updateLayout(layout);});
     connect(layoutManager, &ec2::AbstractLayoutManager::removed,                    this, &QnCommonMessageProcessor::on_resourceRemoved );
 
     auto videowallManager = connection->getVideowallManager();
@@ -360,7 +361,6 @@ void QnCommonMessageProcessor::resetResources(const ec2::ApiFullInfoData& fullDa
 
     fromApiToResourceList(fullData.servers, resources);
     fromApiToResourceList(fullData.cameras, resources, factory);
-    fromApiToResourceList(fullData.layouts, resources);
     fromApiToResourceList(fullData.videowalls, resources);
     fromApiToResourceList(fullData.webPages, resources);
     fromApiToResourceList(fullData.storages, resources, factory);
@@ -385,6 +385,12 @@ void QnCommonMessageProcessor::resetResources(const ec2::ApiFullInfoData& fullDa
     {
         updateUser(user);
         remoteResources.remove(user.id);
+    }
+
+    for (const ec2::ApiLayoutData& layout : fullData.layouts)
+    {
+        updateLayout(layout);
+        remoteResources.remove(layout.id);
     }
 
     qnResPool->commit();
@@ -540,4 +546,11 @@ void QnCommonMessageProcessor::updateUser(const ec2::ApiUserData& user)
     QnUserResourcePtr qnUser(new QnUserResource());
     fromApiToResource(user, qnUser);
     updateResource(qnUser);
+}
+
+void QnCommonMessageProcessor::updateLayout(const ec2::ApiLayoutData& layout)
+{
+    QnLayoutResourcePtr qnLayout(new QnLayoutResource());
+    fromApiToResource(layout, qnLayout);
+    updateResource(qnLayout);
 }

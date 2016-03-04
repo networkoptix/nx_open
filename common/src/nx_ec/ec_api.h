@@ -621,57 +621,6 @@ namespace ec2
     /*!
         \note All methods are asynchronous if other not specified
     */
-    class AbstractLayoutManager
-    :
-        public QObject
-    {
-        Q_OBJECT
-
-    public:
-        virtual ~AbstractLayoutManager() {}
-
-        /*!
-            \param handler Functor with params: (ErrorCode, const QnLayoutResourceList&)
-        */
-        template<class TargetType, class HandlerType> int getLayouts( TargetType* target, HandlerType handler ) {
-            return getLayouts( std::static_pointer_cast<impl::GetLayoutsHandler>(
-                std::make_shared<impl::CustomGetLayoutsHandler<TargetType, HandlerType>>(target, handler)) );
-        }
-
-        ErrorCode getLayoutsSync(QnLayoutResourceList* const layoutsList ) {
-            int(AbstractLayoutManager::*fn)(impl::GetLayoutsHandlerPtr) = &AbstractLayoutManager::getLayouts;
-            return impl::doSyncCall<impl::GetLayoutsHandler>( std::bind(fn, this, std::placeholders::_1), layoutsList );
-        }
-
-        /*!
-            \param handler Functor with params: (ErrorCode)
-        */
-        template<class TargetType, class HandlerType> int save( const QnLayoutResourceList& resources, TargetType* target, HandlerType handler ) {
-            return save( resources, std::static_pointer_cast<impl::SimpleHandler>(
-                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
-        }
-        /*!
-            \param handler Functor with params: (ErrorCode)
-        */
-        template<class TargetType, class HandlerType> int remove( const QnUuid& resource, TargetType* target, HandlerType handler ) {
-            return remove( resource, std::static_pointer_cast<impl::SimpleHandler>(
-                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
-        }
-
-    signals:
-        void addedOrUpdated( QnLayoutResourcePtr camera );
-        void removed( QnUuid id );
-
-    protected:
-        virtual int getLayouts( impl::GetLayoutsHandlerPtr handler ) = 0;
-        virtual int save( const QnLayoutResourceList& resources, impl::SimpleHandlerPtr handler ) = 0;
-        virtual int remove( const QnUuid& resource, impl::SimpleHandlerPtr handler ) = 0;
-    };
-
-
-    /*!
-        \note All methods are asynchronous if other not specified
-    */
     class AbstractVideowallManager
     :
         public QObject

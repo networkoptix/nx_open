@@ -9,6 +9,8 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/layout_resource.h>
 
+#include <nx_ec/managers/abstract_layout_manager.h>
+
 namespace {
     const int timeout = 60*1000;    //check once a minute
 }
@@ -19,7 +21,7 @@ QnDesktopCameraDeleter::QnDesktopCameraDeleter(QObject *parent): QObject(parent)
         deleteQueuedResources();
         updateQueue();
     });
-    timer->start(timeout);   
+    timer->start(timeout);
 }
 
 void QnDesktopCameraDeleter::deleteQueuedResources() {
@@ -40,7 +42,7 @@ void QnDesktopCameraDeleter::deleteQueuedResources() {
 }
 
 void QnDesktopCameraDeleter::updateQueue() {
-    
+
     QnResourceList desktopCameras = qnResPool->getResourcesWithFlag(Qn::desktop_camera);
     for(const QnResourcePtr &resource: desktopCameras) {
         if (resource->getStatus() == Qn::Offline)

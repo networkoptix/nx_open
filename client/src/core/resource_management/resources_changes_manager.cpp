@@ -23,6 +23,7 @@
 #include <nx_ec/data/api_webpage_data.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/managers/abstract_user_manager.h>
+#include <nx_ec/managers/abstract_layout_manager.h>
 
 QnResourcesChangesManager::QnResourcesChangesManager(QObject* parent /*= nullptr*/):
     base_type(parent)
@@ -372,7 +373,10 @@ void QnResourcesChangesManager::saveLayout(const QnLayoutResourcePtr &layout, La
     if (!connection)
         return;
 
-    connection->getLayoutManager()->save(QnLayoutResourceList() << layout, this, [this, layout, sessionGuid, backup]( int reqID, ec2::ErrorCode errorCode ) {
+    ec2::ApiLayoutData apiLayout;
+    ec2::fromResourceToApi(layout, apiLayout);
+
+    connection->getLayoutManager()->save(apiLayout, this, [this, layout, sessionGuid, backup]( int reqID, ec2::ErrorCode errorCode ) {
         Q_UNUSED(reqID);
 
         /* Check if all OK */

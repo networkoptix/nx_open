@@ -1,11 +1,8 @@
-#ifndef __USER_MANAGER_H_
-#define __USER_MANAGER_H_
+#pragma once
 
-#include <core/resource/user_resource.h>
+#include <transaction/transaction.h>
 
-#include "transaction/transaction.h"
-#include "nx_ec/data/api_user_data.h"
-#include "nx_ec/data/api_conversion_functions.h"
+#include <nx_ec/data/api_user_data.h>
 #include <nx_ec/managers/abstract_user_manager.h>
 
 namespace ec2
@@ -17,14 +14,14 @@ namespace ec2
 
         void triggerNotification( const QnTransaction<ApiUserData>& tran )
         {
-            assert( tran.command == ApiCommand::saveUser);
+            assert(tran.command == ApiCommand::saveUser);
             emit addedOrUpdated(tran.params);
         }
 
         void triggerNotification( const QnTransaction<ApiIdData>& tran )
         {
-            assert( tran.command == ApiCommand::removeUser );
-            emit removed( QnUuid(tran.params.id) );
+            assert(tran.command == ApiCommand::removeUser);
+            emit removed(tran.params.id);
         }
     };
 
@@ -46,5 +43,3 @@ namespace ec2
         QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value command, const QnUuid& resource );
     };
 }
-
-#endif  // __USER_MANAGER_H_
