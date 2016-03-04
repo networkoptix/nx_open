@@ -62,6 +62,8 @@ build_environment/target/buildenv.timestamp
 build_environment/x86
 build_environment/x64
 build_environment/arm
+build-jom
+build-vs
 common_libs/nx_streaming/arm
 
 build_environment/maven/filter-resources/current_config

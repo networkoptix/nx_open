@@ -117,9 +117,6 @@ add_definitions(-DUSE_NX_HTTP
                 -DUDT_API=__declspec\(dllimport\)
                 )
 
-#file(STRINGS "${CMAKE_SOURCE_DIR}/customization/default-values.properties" product.name.short)
-#file(STRINGS "${CMAKE_SOURCE_DIR}/customization/${customization}/build.properties" product.name.short)
-
 if (NOT SKIP_GEN)
   file (GLOB_RECURSE FILTERED_FILES "${PROJECT_SOURCE_DIR}/resources/filter/*")
   foreach(filename ${FILTERED_FILES})
@@ -174,8 +171,6 @@ find_package(Qt5Widgets)
   #endif()
 #endif()
 
-QT5_CREATE_TRANSLATION(...)
-
 if (NOT MSVC)
   # Enable the C++11 standard
   set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} -std=c++11 -Werror=enum-compare -Werror=reorder -Werror=delete-non-virtual-dtor -Werror=return-type -Werror=conversion-null -Wuninitialized)
@@ -210,6 +205,27 @@ foreach (filename ${CPP_FILES})
   message (${filename}) 
 endforeach (filename ${CPP_FILES})
 
+file (GLOB_RECURSE ALL_TRANSLATION_FILES "${PROJECT_SOURCE_DIR}/translations/*")
+foreach (filename ${ALL_TRANSLATION_FILES})
+  foreach (translation ${translations})
+    if(filename MATCHES "${translation}.ts")
+      get_filename_component(NAME ${filename} NAME)
+      get_filename_component(PATH ${filename} PATH)
+      list(APPEND TRANSLATION_FILES ${filename})
+      #list(APPEND QM_FILES ${PATH}/${NAME}.qm)
+    endif()  
+  endforeach (${translation})
+endforeach(filename ${ALL_TRANSLATION_FILES})
+
+foreach (filename ${TRANSLATION_FILES})
+  message ("Adding translation: " ${filename}) 
+endforeach (filename ${TRANSLATION_FILES})
+
+QT5_ADD_TRANSLATION(QM_FILES ${TRANSLATION_FILES})
+
+foreach (filename ${QM_FILES})
+  message ("Adding translation: " ${filename}) 
+endforeach (filename ${QM_FILES})
 
 qt5_wrap_ui(UI_HEADERS ${UI_FILES})
 qt5_add_resources(RESOURCE_FILES ${PROJECT_BINARY_DIR}/${PROJECT_SHORTNAME}.qrc)
