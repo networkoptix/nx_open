@@ -2,6 +2,8 @@
 #include "systems_model.h"
 
 #include <utils/math/math.h>
+#include <utils/common/app_info.h>
+#include <utils/common/software_version.h>
 #include <network/systems_finder.h>
 
 namespace
@@ -11,11 +13,19 @@ namespace
     enum RoleId
     {
         FirstRoleId = Qt::UserRole + 1
-        
+
         , NameRoleId = FirstRoleId
         , UserRoleId
+
+        , IsCloudSystemRoleId
+
+        , IsCompatibleRoleId
+        , IsCompatibleVersionRoleId
+        , IsCorrectCustomizaionRoleId
+
+        // For local systems 
+        , HostRoleId
         
-        , IsCloudSystem
         
         , AfterLastRoleId
     };
@@ -25,9 +35,68 @@ namespace
         RoleNames result;
         result.insert(NameRoleId, "systemName");
         result.insert(UserRoleId, "userName");
-        result.insert(IsCloudSystem, "isCloudSystem");
+
+        result.insert(IsCloudSystemRoleId, "isCloudSystem");
+        result.insert(IsCompatibleRoleId, "isCompatible");
+        result.insert(IsCompatibleVersionRoleId, "isCompatibleVersion");
+        result.insert(IsCorrectCustomizaionRoleId, "isCorrectCustomizaion");
+
+        result.insert(HostRoleId, "host");
+
         return result;
     }();
+
+    bool isCorrectCustomization(const QnSystemDescriptionPtr &sysemDescription)
+    {
+        const auto servers = sysemDescription->servers();
+        if (servers.isEmpty())
+            return true;
+
+        const auto customization = QnAppInfo::customizationName();
+        const auto predicate = [customization](const QnModuleInformation &serverInfo)
+        {
+            return (customization == serverInfo.customization);
+        };
+
+        const bool hasCorrectCustomization = 
+            std::any_of(servers.begin(), servers.end(), predicate);
+        return hasCorrectCustomization;
+    }
+
+    bool isCompatibleVersion(const QnSystemDescriptionPtr &sysemDescription)
+    {
+        const auto servers = sysemDescription->servers();
+        if (servers.isEmpty())
+            return true;
+
+        const QnSoftwareVersion appVersion(QnAppInfo::applicationVersion());
+        const auto predicate = [appVersion](const QnModuleInformation &serverInfo)
+        {
+            return isCompatible(appVersion, serverInfo.version);
+        };
+
+        const bool hasCorrectVersion = 
+            std::any_of(servers.begin(), servers.end(), predicate);
+        return hasCorrectVersion;
+    }
+
+    bool isCompatibleSystem(const QnSystemDescriptionPtr &sysemDescription)
+    {
+        return (isCompatibleVersion(sysemDescription)
+            && isCorrectCustomization(sysemDescription));
+    }
+
+    QString getSystemHost(const QnSystemDescriptionPtr &sysemDescription)
+    {        
+        const auto servers = sysemDescription->servers();
+        if (servers.isEmpty())
+            return QString();
+
+        const auto serverId = servers.first().id;
+        const auto primaryAddress =
+            sysemDescription->getServerPrimaryAddress(serverId);
+        return primaryAddress.toString();
+    }
 }
 
 QnSystemsModel::QnSystemsModel(QObject *parent)
@@ -71,9 +140,22 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
     case NameRoleId:
         return systemDescription->name();
     case UserRoleId:
-        return lit("replace me");
+        return lit("Some user name <replace me>");
+    case IsCloudSystemRoleId:
+        return systemDescription->isCloudSystem();
+
+    case IsCompatibleRoleId:
+        return isCompatibleSystem(systemDescription);
+    case IsCorrectCustomizaionRoleId:
+        return isCorrectCustomization(systemDescription);
+    case IsCompatibleVersionRoleId:
+        return isCompatibleVersion(systemDescription);
+    case HostRoleId:
+        return getSystemHost(systemDescription);
+
+    default:
+        return QVariant();
     }
-    return QVariant();
 }
 
 RoleNames QnSystemsModel::roleNames() const

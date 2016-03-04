@@ -8,7 +8,15 @@ QnSystemsFinder::QnSystemsFinder(QObject *parent)
     , m_directSystemsFinder(new QnDirectSystemsFinder())
     , m_cloudSystemsFinder(/*new QnCloudSystemsFinder()*/)
 {
+    const auto connectFinder = [this](const SystemsFinderPtr &finder)
+    {
+        connect(finder, &QnAbstractSystemsFinder::systemDiscovered
+            , this, &QnSystemsFinder::systemDiscovered);
+        connect(finder, &QnAbstractSystemsFinder::systemLost
+            , this, &QnSystemsFinder::systemLost);
+    };
 
+    connectFinder(m_directSystemsFinder);
 }
 
 QnSystemsFinder::~QnSystemsFinder()
