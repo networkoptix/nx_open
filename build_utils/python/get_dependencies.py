@@ -105,7 +105,7 @@ def get_package_for_configuration(package, debug):
     pri_file = os.path.join(location, package + ".pri")
     if not os.path.isfile(pri_file):
         pri_file = locate_pri_file(location)
-    if os.path.isfile(pri_file):
+    if pri_file and os.path.isfile(pri_file):
         append_pri(pri_file, debug)
 
     if not installed:
