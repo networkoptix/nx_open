@@ -262,6 +262,7 @@ typedef QSharedPointer<DeviceFileCatalog> DeviceFileCatalogPtr;
 bool operator < (const DeviceFileCatalog::Chunk& first, const DeviceFileCatalog::Chunk& other);
 bool operator < (qint64 first, const DeviceFileCatalog::Chunk& other);
 bool operator < (const DeviceFileCatalog::Chunk& other, qint64 first);
+bool operator == (const DeviceFileCatalog::Chunk &lhs, const DeviceFileCatalog::Chunk &rhs);
 
 inline bool operator == (const DeviceFileCatalog::UniqueChunk    &lhs, 
                          const DeviceFileCatalog::UniqueChunk    &rhs)

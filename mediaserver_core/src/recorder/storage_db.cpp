@@ -15,6 +15,46 @@
 
 const uint8_t kDbVersion = 1;
 
+namespace
+{
+
+class VacuumHandler : public nx::media_db::DbHelperHandler
+{
+public:
+    VacuumHandler(QnStorageDb::UuidToCatalogs &readData) : m_readData(readData) {}
+
+public:
+    void handleCameraOp(const nx::media_db::CameraOperation &cameraOp,
+                        nx::media_db::Error error) override
+    {
+
+    }
+
+    void handleMediaFileOp(const nx::media_db::MediaFileOperation &mediaFileOp,
+                           nx::media_db::Error error) override
+    {
+
+    }
+
+    void handleError(nx::media_db::Error error) override
+    {
+        m_error = error;
+    }
+
+    void handleRecordWrite(nx::media_db::Error error) override
+    {
+        m_error = error;
+    }
+
+    nx::media_db::Error getError() const { return m_error; }
+
+private:
+    QnStorageDb::UuidToCatalogs &m_readData;
+    nx::media_db::Error m_error;
+};
+
+} // namespace <anonynous>
+
 QnStorageDb::QnStorageDb(const QnStorageResourcePtr& s, int storageIndex):
     m_storage(s),
     m_storageIndex(storageIndex),
@@ -232,8 +272,132 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadChunksFileCatalog()
 
     while ((m_lastReadError = m_dbHelper.readRecord()) == nx::media_db::Error::NoError);
 
+    if (!vacuum())
+    {
+        m_ioDevice.reset();
+        m_storage->removeFile(m_dbFileName);
+
+        if (!resetIoDevice())
+            return QVector<DeviceFileCatalogPtr>();
+
+        m_dbHelper.setMode(nx::media_db::Mode::Write);
+        m_dbHelper.writeFileHeader(kDbVersion);
+        m_dbVersion = kDbVersion;
+    }
+
     m_dbHelper.setMode(nx::media_db::Mode::Write);
     return buildReadResult();
+}
+
+bool QnStorageDb::vacuum()
+{
+    QString tmpDbFileName = m_dbFileName + ".tmp";
+    std::unique_ptr<QIODevice> tmpFile(m_storage->open(tmpDbFileName,
+                                                       QIODevice::ReadWrite));
+    if (!tmpFile)
+        return false;
+
+    VacuumHandler vh(m_readData);
+    nx::media_db::DbHelper tmpDbHelper(&vh);
+    tmpDbHelper.setDevice(tmpFile.get());
+    tmpDbHelper.setMode(nx::media_db::Mode::Write);
+
+    nx::media_db::Error error = tmpDbHelper.writeFileHeader(m_dbVersion);
+    if (error == nx::media_db::Error::WriteError)
+        return false;
+
+    for (auto it = m_uuidToHash.right.begin(); it != m_uuidToHash.right.end(); ++it)
+    {
+        nx::media_db::CameraOperation camOp;
+        camOp.setCameraId(it->first);
+        camOp.setCameraUniqueId(QByteArray(it->second.toLatin1().constData(),
+                                           it->second.size()));
+        camOp.setRecordType(nx::media_db::RecordType::CameraOperationAdd);
+        camOp.setCameraUniqueIdLen(it->second.size());
+
+        tmpDbHelper.writeRecordAsync(camOp);
+    }
+
+    for (auto it = m_readData.cbegin(); it != m_readData.cend(); ++it)
+    {
+        for (size_t i = 0; i < 2; ++i)
+        {
+            for (auto chunkIt = it->second[i].cbegin(); chunkIt != it->second[i].cend(); ++chunkIt)
+            {
+                nx::media_db::MediaFileOperation mediaFileOp;
+                auto cameraIdIt = m_uuidToHash.left.find(it->first);
+                assert(cameraIdIt != m_uuidToHash.left.end());
+
+                mediaFileOp.setCameraId(cameraIdIt->second);
+                mediaFileOp.setCatalog(i == 0 ? QnServer::ChunksCatalog::LowQualityCatalog :
+                                       QnServer::ChunksCatalog::HiQualityCatalog);
+                mediaFileOp.setDuration(chunkIt->durationMs);
+                mediaFileOp.setFileSize(chunkIt->getFileSize());
+                mediaFileOp.setRecordType(nx::media_db::RecordType::FileOperationAdd);
+                mediaFileOp.setStartTime(chunkIt->startTimeMs);
+                mediaFileOp.setTimeZone(chunkIt->timeZone);
+
+                tmpDbHelper.writeRecordAsync(mediaFileOp);
+            }
+        }
+    }
+    if (vh.getError() == nx::media_db::Error::WriteError)
+        return false;
+    tmpDbHelper.setMode(nx::media_db::Mode::Read); // flush
+
+    m_ioDevice.reset();
+    bool res = m_storage->removeFile(m_dbFileName);
+    assert(res);
+
+    tmpFile.reset();
+    res = m_storage->renameFile(tmpDbFileName, m_dbFileName);
+    assert(res);
+
+    res = resetIoDevice();
+    assert(res);
+    
+    auto readDataCopy = m_readData;
+    uint8_t dbVersion;
+
+    m_readData.clear();
+    m_dbHelper.setMode(nx::media_db::Mode::Read);
+    assert(m_dbHelper.getDevice());
+
+    error = m_dbHelper.readFileHeader(&dbVersion);
+    assert(error == nx::media_db::Error::NoError);
+    assert(dbVersion == m_dbVersion);
+    if (error == nx::media_db::Error::ReadError || dbVersion != m_dbVersion)
+        return false;
+
+    while ((m_lastReadError = m_dbHelper.readRecord()) == nx::media_db::Error::NoError);
+
+    bool isDataConsistent = checkDataConsistency(readDataCopy);
+    assert(isDataConsistent);
+    if (!isDataConsistent)
+        return false;
+
+    return true;
+}
+
+bool QnStorageDb::checkDataConsistency(const UuidToCatalogs &readDataCopy) const
+{
+    for (auto it = readDataCopy.cbegin(); it != readDataCopy.cend(); ++it)
+    {
+        auto otherIt = m_readData.find(it->first);
+        if (otherIt == m_readData.cend())
+        {
+            if (it->second[0].size() != 0 || it->second[1].size() != 0)
+                return false;
+            else
+                continue;
+        }
+        for (size_t i = 0; i < 2; ++i)
+        {
+            if (otherIt->second[i] != it->second[i])
+                return false;
+        }
+    }
+    return true;
 }
 
 QVector<DeviceFileCatalogPtr> QnStorageDb::buildReadResult() const
@@ -327,6 +491,7 @@ void QnStorageDb::handleMediaFileOp(const nx::media_db::MediaFileOperation &medi
     }
     default:
         assert(false);
+        break;
     }
 }
 

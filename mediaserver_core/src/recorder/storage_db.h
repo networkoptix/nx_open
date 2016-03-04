@@ -18,6 +18,7 @@
 
 class QnStorageDb: public nx::media_db::DbHelperHandler 
 {
+public:
     typedef boost::bimap<QString, uint16_t> UuidToHash;
     typedef std::set<DeviceFileCatalog::Chunk> ChunkSet;
     typedef std::array<ChunkSet, 2> LowHiChunksCatalogs;
@@ -70,6 +71,8 @@ private:
     // returns cameraId (hash from cameraUniqueId)
     int fillCameraOp(nx::media_db::CameraOperation &cameraOp, const QString &cameraUniqueId);
     QVector<DeviceFileCatalogPtr> buildReadResult() const;
+    bool vacuum();
+    bool checkDataConsistency(const UuidToCatalogs &readDataCopy) const;
 
 private:
     QnStorageResourcePtr m_storage;
