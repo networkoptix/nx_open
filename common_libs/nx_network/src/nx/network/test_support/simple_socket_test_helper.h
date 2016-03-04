@@ -204,8 +204,8 @@ void socketSimpleAsync(
     int clientCount,
     StopSocketFunc stopSocket)
 {
-    nx::SyncQueue< SystemError::ErrorCode > serverResults;
-    nx::SyncQueue< SystemError::ErrorCode > clientResults;
+    nx::TestSyncQueue< SystemError::ErrorCode > serverResults;
+    nx::TestSyncQueue< SystemError::ErrorCode > clientResults;
 
     auto server = serverMaker();
     ASSERT_TRUE(server->setNonBlockingMode(true));
@@ -289,8 +289,8 @@ template<typename ServerSocketMaker, typename ClientSocketMaker>
 {
     static const std::chrono::milliseconds timeout(1500);
 
-    nx::SyncQueue< SystemError::ErrorCode > acceptResults;
-    nx::SyncQueue< SystemError::ErrorCode > connectResults;
+    nx::TestSyncQueue< SystemError::ErrorCode > acceptResults;
+    nx::TestSyncQueue< SystemError::ErrorCode > connectResults;
 
     std::vector<std::unique_ptr<AbstractStreamSocket>> acceptedSockets;
     std::vector<std::unique_ptr<AbstractStreamSocket>> connectedSockets;
@@ -426,7 +426,7 @@ void socketSimpleTrueAsync(
     const QByteArray& testMessage = kTestMessage,
     int clientCount = kClientCount)
 {
-    nx::SyncQueue<bool> stopQueue;
+    nx::TestSyncQueue<bool> stopQueue;
     socketSimpleAsync<ServerSocketMaker, ClientSocketMaker>(
         serverMaker, clientMaker, serverAddress, serverAddress, testMessage, clientCount,
         [&](std::unique_ptr<QnStoppableAsync> socket)
@@ -477,7 +477,7 @@ void socketSingleAioThread(
 {
     aio::AbstractAioThread* aioThread(nullptr);
     std::vector<decltype(clientMaker())> sockets;
-    nx::SyncQueue<std::thread::id> threadIdQueue;
+    nx::TestSyncQueue<std::thread::id> threadIdQueue;
 
     for (auto i = 0; i < clientCount; ++i)
     {
@@ -546,7 +546,7 @@ void socketAcceptTimeoutAsync(
     ASSERT_TRUE(server->bind(serverAddress));
     ASSERT_TRUE(server->listen(5));
 
-    nx::SyncQueue< SystemError::ErrorCode > serverResults;
+    nx::TestSyncQueue< SystemError::ErrorCode > serverResults;
     const auto start = std::chrono::system_clock::now();
     server->acceptAsync([&](SystemError::ErrorCode /*code*/,
                             AbstractStreamSocket* /*socket*/)

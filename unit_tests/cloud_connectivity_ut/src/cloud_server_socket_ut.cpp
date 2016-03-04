@@ -439,7 +439,7 @@ protected:
     std::map<String, SocketAddress> m_peerAddresses;
     std::shared_ptr<network::test::StunAsyncClientMock> m_stunClient;
     std::unique_ptr<AbstractStreamServerSocket> m_server;
-    SyncQueue<Counters> m_connectedResutls;
+    TestSyncQueue<Counters> m_connectedResutls;
     std::vector<std::thread> m_threads;
 
     QnMutex m_mutex;

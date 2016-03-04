@@ -93,7 +93,7 @@ TEST_F( ConnectTest, BindConnect )
         request.insertIntegrity( SYSTEM_ID, AUTH_KEY );
         cloud.expect_getSystem( SYSTEM_ID, AUTH_KEY );
 
-        SyncMultiQueue< SystemError::ErrorCode, stun::Message > waiter;
+        TestSyncMultiQueue< SystemError::ErrorCode, stun::Message > waiter;
         msClient.sendRequest( std::move( request ), waiter.pusher() );
 
         const auto result = waiter.pop();

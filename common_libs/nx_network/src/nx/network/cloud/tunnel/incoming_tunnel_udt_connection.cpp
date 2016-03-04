@@ -118,11 +118,14 @@ void IncomingTunnelUdtConnection::readRequest()
     m_connectionBuffer.resize(0);
     m_connectionSocket->readSomeAsync(
         &m_connectionBuffer,
-        [this](SystemError::ErrorCode code, size_t)
+        [this](SystemError::ErrorCode code, size_t bytesRead)
         {
             NX_ASSERT(code != SystemError::timedOut);
             if (code != SystemError::noError)
                 return connectionSocketError(code);
+
+            if (bytesRead == 0)
+                return connectionSocketError(SystemError::connectionReset);
 
             m_lastKeepAlive = std::chrono::system_clock::now();
             size_t processed = 0;

@@ -72,7 +72,7 @@ TEST_F( StunCustomTest, Ping )
     mediaserverApi.expect_pingServer( GOOD_ADDRESS, SERVER_ID, true );
     mediaserverApi.expect_pingServer( BAD_ADDRESS, SERVER_ID, false );
 
-    SyncMultiQueue< SystemError::ErrorCode, Message > waiter;
+    TestSyncMultiQueue< SystemError::ErrorCode, Message > waiter;
     client.sendRequest( std::move( request ), waiter.pusher() );
 
     const auto result = waiter.pop();
@@ -103,7 +103,7 @@ TEST_F( StunCustomTest, BindResolve )
         request.insertIntegrity(SYSTEM_ID, AUTH_KEY );
         cloudData.expect_getSystem( SYSTEM_ID, AUTH_KEY );
 
-        SyncMultiQueue< SystemError::ErrorCode, Message > waiter;
+        TestSyncMultiQueue< SystemError::ErrorCode, Message > waiter;
         msClient.sendRequest( std::move( request ), waiter.pusher() );
 
         const auto result = waiter.pop();
@@ -119,7 +119,7 @@ TEST_F( StunCustomTest, BindResolve )
         request.newAttribute< stun::cc::attrs::PeerId >( "SomeClient" );
         request.newAttribute< stun::cc::attrs::HostName >( SYSTEM_ID );
 
-        SyncMultiQueue< SystemError::ErrorCode, Message > waiter;
+        TestSyncMultiQueue< SystemError::ErrorCode, Message > waiter;
         msClient.sendRequest( std::move( request ), waiter.pusher() );
 
         const auto result = waiter.pop();
@@ -138,7 +138,7 @@ TEST_F( StunCustomTest, BindResolve )
         request.newAttribute< stun::cc::attrs::HostName >(
             SERVER_ID + "." + SYSTEM_ID );
 
-        SyncMultiQueue< SystemError::ErrorCode, Message > waiter;
+        TestSyncMultiQueue< SystemError::ErrorCode, Message > waiter;
         msClient.sendRequest( std::move( request ), waiter.pusher() );
 
         const auto result = waiter.pop();
@@ -155,7 +155,7 @@ TEST_F( StunCustomTest, BindResolve )
         request.newAttribute< stun::cc::attrs::PeerId >( "SomeClient" );
         request.newAttribute< stun::cc::attrs::HostName >( "WrongDomain" );
 
-        SyncMultiQueue< SystemError::ErrorCode, Message > waiter;
+        TestSyncMultiQueue< SystemError::ErrorCode, Message > waiter;
         msClient.sendRequest( std::move( request ), waiter.pusher() );
 
         const auto result = waiter.pop();
@@ -172,7 +172,7 @@ TEST_F( StunCustomTest, BindResolve )
         request.newAttribute< stun::cc::attrs::PeerId >( "SomeClient" );
         request.newAttribute< stun::cc::attrs::HostName >( "WrongHost" );
 
-        SyncMultiQueue< SystemError::ErrorCode, Message > waiter;
+        TestSyncMultiQueue< SystemError::ErrorCode, Message > waiter;
         msClient.sendRequest( std::move( request ), waiter.pusher() );
 
         const auto result = waiter.pop();

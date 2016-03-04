@@ -14,7 +14,7 @@ TEST( MediaserverApi, DISABLED_Hardcode )
     nx::stun::MessageDispatcher dispatcher;
     CloudDataProviderMock cloud;
     MediaserverApi api( &cloud, &dispatcher );
-    SyncMultiQueue< SocketAddress, bool > results;
+    TestSyncMultiQueue< SocketAddress, bool > results;
 
     // 1. success
     api.pingServer( lit("localhost:7001"),
