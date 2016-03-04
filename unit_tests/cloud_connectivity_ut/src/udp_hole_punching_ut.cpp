@@ -69,7 +69,7 @@ private:
     }
 };
 
-TEST_F(UdpHolePunching, simple)
+TEST_F(UdpHolePunching, simpleSync)
 {
     test::socketSimpleSync(
         []{
@@ -79,7 +79,10 @@ TEST_F(UdpHolePunching, simple)
         &std::make_unique<CloudStreamSocket>,
         SocketAddress(HostAddress::localhost, 0),
         SocketAddress(m_server->fullName()));
+}
 
+TEST_F(UdpHolePunching, simpleAsync)
+{
     test::socketSimpleAsync(
         []{
             return std::make_unique<CloudServerSocket>(

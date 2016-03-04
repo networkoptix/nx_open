@@ -227,19 +227,20 @@ void socketSimpleAsync(
         clients.emplace_back(socket);
         auto& client = clients.back();
         ASSERT_TRUE(client->setNonBlockingMode(true));
-        client->readSomeAsync(&serverBuffer, [&](SystemError::ErrorCode code,
-            size_t size)
-        {
-            if (code == SystemError::noError)
+        client->readSomeAsync(
+            &serverBuffer,
+            [&](SystemError::ErrorCode code, size_t size)
             {
-                EXPECT_GT(size, 0);
-                EXPECT_STREQ(serverBuffer.data(), testMessage.data());
-                serverBuffer.resize(0);
-            }
+                if (code == SystemError::noError)
+                {
+                    EXPECT_GT(size, 0);
+                    EXPECT_STREQ(serverBuffer.data(), testMessage.data());
+                    serverBuffer.resize(0);
+                }
 
-            stopSocket(std::move(client));
-            serverResults.push(code);
-        });
+                stopSocket(std::move(client));
+                serverResults.push(code);
+            });
 
         server->acceptAsync(acceptor);
     };
@@ -251,26 +252,22 @@ void socketSimpleAsync(
         ASSERT_TRUE(testClient->setNonBlockingMode(true));
         ASSERT_TRUE(testClient->setSendTimeout(5000));
 
-        // have to introduce wait here since subscribing to socket events
-        // (acceptAsync) takes some time and UDT ignores connections received
-        // before first accept call
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
-
         QByteArray clientBuffer;
         clientBuffer.reserve(128);
         testClient->connectAsync(endpointToConnectTo, [&](SystemError::ErrorCode code)
         {
             ASSERT_EQ(code, SystemError::noError);
-            testClient->sendAsync(testMessage, [&](SystemError::ErrorCode code,
-                size_t size)
-            {
-                clientResults.push(code);
-                if (code != SystemError::noError)
-                    return;
+            testClient->sendAsync(
+                testMessage,
+                [&](SystemError::ErrorCode code, size_t size)
+                {
+                    clientResults.push(code);
+                    if (code != SystemError::noError)
+                        return;
 
-                EXPECT_EQ(code, SystemError::noError);
-                EXPECT_EQ(size, testMessage.size());
-            });
+                    EXPECT_EQ(code, SystemError::noError);
+                    EXPECT_EQ(size, testMessage.size());
+                });
         });
 
         ASSERT_EQ(serverResults.pop(), SystemError::noError); // accept
