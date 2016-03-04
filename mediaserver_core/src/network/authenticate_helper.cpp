@@ -27,6 +27,9 @@
 #include "network/auth/cdb_nonce_fetcher.h"
 #include "network/auth/cloud_user_authenticator.h"
 
+#include <nx_ec/data/api_conversion_functions.h>
+#include <nx_ec/managers/abstract_user_manager.h>
+
 
 ////////////////////////////////////////////////////////////
 //// class QnAuthHelper
@@ -128,7 +131,7 @@ Qn::AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_ht
             auto authResult = authenticateByUrl(
                 authQueryParam,
                 request.requestLine.version.protocol == nx_rtsp::rtsp_1_0.protocol
-                    ? "PLAY"    //for rtsp always using PLAY since client software does not know 
+                    ? "PLAY"    //for rtsp always using PLAY since client software does not know
                                 //which request underlying player will issue first
                     : request.requestLine.method,
                 response,
@@ -491,7 +494,7 @@ Qn::AuthResult QnAuthHelper::doBasicAuth(
 {
     assert(authorization.authScheme == nx_http::header::AuthScheme::basic);
 
-    Qn::AuthResult errCode = Qn::Auth_WrongLogin;     
+    Qn::AuthResult errCode = Qn::Auth_WrongLogin;
 
 #ifdef USE_USER_RESOURCE_PROVIDER
     QnResourcePtr res;
@@ -580,7 +583,7 @@ Qn::AuthResult QnAuthHelper::doCookieAuthorization(
 
     QMap<nx_http::BufferType, nx_http::BufferType> params;
     nx_http::header::parseDigestAuthParams( authData, &params, ';' );
-        
+
     Qn::AuthResult authResult = Qn::Auth_Forbidden;
     if( params.contains( URL_QUERY_AUTH_KEY_NAME ) )
     {
@@ -696,7 +699,7 @@ Qn::AuthResult QnAuthHelper::authenticateByUrl(
 
     if( !m_nonceProvider->isNonceValid(authorization.digest->params["nonce"]) )
         return Qn::Auth_WrongDigest;
-    
+
 #ifdef USE_USER_RESOURCE_PROVIDER
     QnResourcePtr res;
     Qn::AuthResult errCode = Qn::Auth_WrongLogin;
@@ -779,8 +782,14 @@ void QnAuthHelper::applyClientCalculatedPasswordHashToResource(
     userResource->setDigest( userDigestData.ha1Digest, true );
     userResource->setCryptSha512Hash( userDigestData.cryptSha512Hash );
     userResource->setHash( QByteArray() );
+
+    ec2::ApiUserData userData;
+    fromResourceToApi(userResource, userData);
+
+
     QnAppServerConnectionFactory::getConnection2()->getUserManager()->save(
-        userResource,
+        userData,
+        QString(),
         ec2::DummyHandler::instance(),
         &ec2::DummyHandler::onRequestDone );
 }

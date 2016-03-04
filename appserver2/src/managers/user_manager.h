@@ -3,17 +3,14 @@
 
 #include <core/resource/user_resource.h>
 
-#include "nx_ec/ec_api.h"
 #include "transaction/transaction.h"
 #include "nx_ec/data/api_user_data.h"
 #include "nx_ec/data/api_conversion_functions.h"
-
+#include <nx_ec/managers/abstract_user_manager.h>
 
 namespace ec2
 {
-    class QnUserNotificationManager
-    :
-        public AbstractUserManager
+    class QnUserNotificationManager: public AbstractUserManager
     {
     public:
         QnUserNotificationManager( ) {}
@@ -21,9 +18,7 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiUserData>& tran )
         {
             assert( tran.command == ApiCommand::saveUser);
-            QnUserResourcePtr userResource(new QnUserResource());
-            fromApiToResource(tran.params, userResource);
-            emit addedOrUpdated( userResource );
+            emit addedOrUpdated(tran.params);
         }
 
         void triggerNotification( const QnTransaction<ApiIdData>& tran )
@@ -35,21 +30,19 @@ namespace ec2
 
 
     template<class QueryProcessorType>
-    class QnUserManager
-    :
-        public QnUserNotificationManager
+    class QnUserManager: public QnUserNotificationManager
     {
     public:
         QnUserManager( QueryProcessorType* const queryProcessor);
 
-        virtual int getUsers(const QnUuid& userId, impl::GetUsersHandlerPtr handler ) override;
-        virtual int save( const QnUserResourcePtr& resource, impl::AddUserHandlerPtr handler ) override;
+        virtual int getUsers(impl::GetUsersHandlerPtr handler ) override;
+        virtual int save( const ec2::ApiUserData& user, const QString& newPassword, impl::AddUserHandlerPtr handler ) override;
         virtual int remove( const QnUuid& id, impl::SimpleHandlerPtr handler ) override;
 
     private:
         QueryProcessorType* const m_queryProcessor;
 
-        QnTransaction<ApiUserData> prepareTransaction( ApiCommand::Value command, const QnUserResourcePtr& resource );
+        QnTransaction<ApiUserData> prepareTransaction( ApiCommand::Value command, const ec2::ApiUserData& user);
         QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value command, const QnUuid& resource );
     };
 }

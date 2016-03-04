@@ -10,6 +10,7 @@ const QString QnResourceTypePool::kServerTypeId(lit("Server"));
 const QString QnResourceTypePool::kVideoWallTypeId(lit("Videowall"));
 const QString QnResourceTypePool::kWebPageTypeId(lit("WebPage"));
 const QString QnResourceTypePool::kStorageTypeId(lit("Storage"));
+const QString QnResourceTypePool::kUserTypeId(lit("User"));
 
 
 QnResourceType::QnResourceType()

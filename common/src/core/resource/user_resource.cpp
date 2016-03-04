@@ -18,6 +18,7 @@ QnUserResource::QnUserResource():
     m_passwordExpirationTimestamp(0)
 {
     addFlags(Qn::user | Qn::remote);
+    setTypeId(qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kUserTypeId));
 }
 
 QnUserResource::QnUserResource(const QnUserResource& right)
@@ -96,7 +97,7 @@ void QnUserResource::generateHash() {
 
 bool QnUserResource::checkPassword(const QString &password) {
     QnMutexLocker locker( &m_mutex );
-    
+
     if( !m_digest.isEmpty() )
     {
         return nx_http::calcHa1( m_name.toLower(), m_realm, password ) == m_digest;

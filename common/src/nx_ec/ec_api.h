@@ -618,68 +618,6 @@ namespace ec2
         virtual int resetBusinessRules( impl::SimpleHandlerPtr handler ) = 0;
     };
 
-
-    /*!
-        \note All methods are asynchronous if other not specified
-    */
-    class AbstractUserManager
-    :
-        public QObject
-    {
-        Q_OBJECT
-
-    public:
-        virtual ~AbstractUserManager() {}
-
-        /*!
-            \param handler Functor with params: (ErrorCode, const QnUserResourceList&)
-        */
-        template<class TargetType, class HandlerType> int getUsers(const QnUuid& userId, TargetType* target, HandlerType handler ) {
-            return getUsers(userId, std::static_pointer_cast<impl::GetUsersHandler>(
-                std::make_shared<impl::CustomGetUsersHandler<TargetType, HandlerType>>(target, handler)) );
-        }
-
-        ErrorCode getUsersSync(const QnUuid& userId, QnUserResourceList* const userList ) {
-            int(AbstractUserManager::*fn)(const QnUuid&, impl::GetUsersHandlerPtr) = &AbstractUserManager::getUsers;
-            return impl::doSyncCall<impl::GetUsersHandler>(std::bind(fn, this, userId, std::placeholders::_1), userList );
-        }
-
-        /*!
-            \param handler Functor with params: (ErrorCode)
-        */
-        template<class TargetType, class HandlerType> int save( const QnUserResourcePtr& resource, TargetType* target, HandlerType handler ) {
-            return save( resource, std::static_pointer_cast<impl::AddUserHandler>(
-                std::make_shared<impl::CustomAddUserHandler<TargetType, HandlerType>>(target, handler)) );
-        }
-
-        ErrorCode saveSync(const QnUserResourcePtr &userRes, QnUserResourceList * const users) {
-            return impl::doSyncCall<impl::AddUserHandler>(
-                [=](const impl::AddUserHandlerPtr &handler) {
-                    return this->save(userRes, handler);
-                },
-                users
-            );
-        }
-
-        /*!
-            \param handler Functor with params: (ErrorCode)
-        */
-        template<class TargetType, class HandlerType> int remove( const QnUuid& id, TargetType* target, HandlerType handler ) {
-            return remove( id, std::static_pointer_cast<impl::SimpleHandler>(
-                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
-        }
-
-    signals:
-        void addedOrUpdated( QnUserResourcePtr camera );
-        void removed( QnUuid id );
-
-    private:
-        virtual int getUsers(const QnUuid& userId, impl::GetUsersHandlerPtr handler ) = 0;
-        virtual int save( const QnUserResourcePtr& resource, impl::AddUserHandlerPtr handler ) = 0;
-        virtual int remove( const QnUuid& id, impl::SimpleHandlerPtr handler ) = 0;
-    };
-
-
     /*!
         \note All methods are asynchronous if other not specified
     */

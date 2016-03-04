@@ -1,6 +1,8 @@
 #include "common_message_processor.h"
 
 #include <nx_ec/ec_api.h>
+#include <nx_ec/managers/abstract_user_manager.h>
+
 #include <nx_ec/data/api_full_info_data.h>
 #include <nx_ec/data/api_discovery_data.h>
 #include <nx_ec/data/api_conversion_functions.h>
@@ -92,7 +94,7 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     connect(cameraManager, &ec2::AbstractCameraManager::cameraRemoved,              this, &QnCommonMessageProcessor::on_resourceRemoved );
 
     auto userManager = connection->getUserManager();
-    connect(userManager, &ec2::AbstractUserManager::addedOrUpdated,                 this, [this](const QnUserResourcePtr &user){updateResource(user);});
+    connect(userManager, &ec2::AbstractUserManager::addedOrUpdated,                 this, [this](const ec2::ApiUserData &user){updateUser(user);});
     connect(userManager, &ec2::AbstractUserManager::removed,                        this, &QnCommonMessageProcessor::on_resourceRemoved );
 
     auto layoutManager = connection->getLayoutManager();
@@ -358,7 +360,6 @@ void QnCommonMessageProcessor::resetResources(const ec2::ApiFullInfoData& fullDa
 
     fromApiToResourceList(fullData.servers, resources);
     fromApiToResourceList(fullData.cameras, resources, factory);
-    fromApiToResourceList(fullData.users, resources);
     fromApiToResourceList(fullData.layouts, resources);
     fromApiToResourceList(fullData.videowalls, resources);
     fromApiToResourceList(fullData.webPages, resources);
@@ -379,6 +380,13 @@ void QnCommonMessageProcessor::resetResources(const ec2::ApiFullInfoData& fullDa
         /* And keep them from removing. */
         remoteResources.remove(resource->getId());
     }
+
+    for (const ec2::ApiUserData& user : fullData.users)
+    {
+        updateUser(user);
+        remoteResources.remove(user.id);
+    }
+
     qnResPool->commit();
 
     /* Remove absent resources. */
@@ -525,4 +533,11 @@ QMap<QnUuid, QnBusinessEventRulePtr> QnCommonMessageProcessor::businessRules() c
 
 void QnCommonMessageProcessor::updateResource(const QnResourcePtr& )
 {
+}
+
+void QnCommonMessageProcessor::updateUser(const ec2::ApiUserData& user)
+{
+    QnUserResourcePtr qnUser(new QnUserResource());
+    fromApiToResource(user, qnUser);
+    updateResource(qnUser);
 }

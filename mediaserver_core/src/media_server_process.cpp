@@ -64,6 +64,8 @@
 #include <nx_ec/ec2_lib.h>
 #include <nx_ec/ec_api.h>
 #include <nx_ec/ec_proto_version.h>
+#include <nx_ec/data/api_user_data.h>
+#include <nx_ec/managers/abstract_user_manager.h>
 
 #include <platform/platform_abstraction.h>
 
@@ -1184,8 +1186,8 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
 
     {
         //loading users
-        QnUserResourceList users;
-        while(( rez = ec2Connection->getUserManager()->getUsersSync(QnUuid(), &users))  != ec2::ErrorCode::ok)
+        ec2::ApiUserDataList users;
+        while(( rez = ec2Connection->getUserManager()->getUsersSync(&users))  != ec2::ErrorCode::ok)
         {
             qDebug() << "QnMain::run(): Can't get users. Reason: " << ec2::toString(rez);
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
@@ -1193,8 +1195,8 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
                 return;
         }
 
-        for(const QnUserResourcePtr &user: users)
-            messageProcessor->updateResource(user);
+        for(const auto &user: users)
+            messageProcessor->updateUser(user);
 
         /* Here the admin user must exist, global settings also. */
         updateStatisticsAllowedSettings();
@@ -2308,6 +2310,25 @@ void MediaServerProcess::run()
     if (QnGlobalSettings::instance()->isCrossdomainXmlEnabled())
         m_httpModManager->addUrlRewriteExact( lit( "/crossdomain.xml" ), lit( "/static/crossdomain.xml" ) );
 
+    //TODO: #GDM #2.6 take keys from one place
+    {
+        const QString statisticsReportTimeCycleKey(lit("statisticsReportTimeCycle"));
+        const QString value = MSSettings::roSettings()->value(statisticsReportTimeCycleKey).toString();
+        if (!value.isEmpty())
+            qnGlobalSettings->setStatisticsReportTimeCycle(value);
+        MSSettings::roSettings()->remove(statisticsReportTimeCycleKey);
+    }
+
+    {
+        const QString statisticsReportServerApiKey(lit("statisticsReportServerApi"));
+        const QString value = MSSettings::roSettings()->value(statisticsReportServerApiKey).toString();
+        if (!value.isEmpty())
+            qnGlobalSettings->setStatisticsReportServerApi(value);
+        MSSettings::roSettings()->remove(statisticsReportServerApiKey);
+    }
+
+    qnGlobalSettings->synchronizeNow();
+
     if (QnUserResourcePtr adminUser = qnResPool->getAdministrator())
     {
         qnCommon->updateModuleInformation();
@@ -2318,8 +2339,6 @@ void MediaServerProcess::run()
 
         /* List of global setting, that can be overridden in server local config (e.g. by installer) */
         QStringList replaceableParameters {
-            ec2::Ec2StaticticsReporter::SR_TIME_CYCLE,
-            ec2::Ec2StaticticsReporter::SR_SERVER_API,
             Qn::CLOUD_SYSTEM_ID,
             Qn::CLOUD_SYSTEM_AUTH_KEY,
             QnMultiserverStatisticsRestHandler::kSettingsUrlParam};
@@ -2587,22 +2606,20 @@ void MediaServerProcess::at_emptyDigestDetected(const QnUserResourcePtr& user, c
     const ec2::AbstractECConnectionPtr& appServerConnection = QnAppServerConnectionFactory::getConnection2();
     if (user->getDigest().isEmpty() && !m_updateUserRequests.contains(user->getId()))
     {
-        user->setPassword(password);
         user->setName(login);
+        user->setPassword(password);
         user->generateHash();
-        m_updateUserRequests << user->getId();
-        appServerConnection->getUserManager()->save(
-            user, this,
-            [this, user]( int /*reqID*/, ec2::ErrorCode errorCode )
-            {
-                if (errorCode == ec2::ErrorCode::ok) {
-                    ec2::ApiUserData userData;
-                    fromResourceToApi(user, userData);
-                    user->setDigest(userData.digest);
-                    user->setCryptSha512Hash(userData.cryptSha512Hash);
-                }
-                m_updateUserRequests.remove(user->getId());
-            } );
+
+        ec2::ApiUserData userData;
+        fromResourceToApi(user, userData);
+
+        QnUuid userId = user->getId();
+        m_updateUserRequests << userId;
+        appServerConnection->getUserManager()->save(userData, password, this, [this, userId]( int reqID, ec2::ErrorCode errorCode )
+        {
+            QN_UNUSED(reqID, errorCode);
+            m_updateUserRequests.remove(userId);
+        } );
     }
 }
 

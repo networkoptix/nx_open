@@ -30,6 +30,7 @@ public:
     virtual void init(const ec2::AbstractECConnectionPtr& connection);
 
     virtual void updateResource(const QnResourcePtr &resource);
+    virtual void updateUser(const ec2::ApiUserData& user);
 
     QMap<QnUuid, QnBusinessEventRulePtr> businessRules() const;
 

@@ -1919,7 +1919,6 @@ void QnWorkbenchActionHandler::at_newUserAction_triggered() {
     } while (!validateResourceName(user, user->getName()));
 
     user->setId(QnUuid::createUuid());
-    user->setTypeByName(lit("User"));
 
     qnResourcesChangesManager->saveUser(user, [](const QnUserResourcePtr &){});
     user->setPassword(QString()); // forget the password now

@@ -307,6 +307,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<ec2::ApiCameraHistoryDataList>("ApiCameraHistoryDataList");
     qRegisterMetaType<ec2::ApiCameraHistoryDataList>("ec2::ApiCameraHistoryDataList");
     qRegisterMetaType<ec2::ApiFullInfoData>("ec2::ApiFullInfoData");
+    qRegisterMetaType<ec2::ApiUserData>("ec2::ApiUserData");
 
     qRegisterMetaType<QnUuid>();
     qRegisterMetaTypeStreamOperators<QnUuid>();

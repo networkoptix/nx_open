@@ -22,17 +22,14 @@ namespace ec2
     }
 
     template<class T>
-    int QnUserManager<T>::getUsers(const QnUuid& userId, impl::GetUsersHandlerPtr handler )
+    int QnUserManager<T>::getUsers(impl::GetUsersHandlerPtr handler )
     {
         const int reqID = generateRequestID();
 
         auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiUserDataList& users) {
-            QnUserResourceList outData;
-            if( errorCode == ErrorCode::ok )
-                fromApiToResourceList(users, outData);
-            handler->done( reqID, errorCode, outData );
+            handler->done( reqID, errorCode, users);
         };
-        m_queryProcessor->template processQueryAsync<QnUuid, ApiUserDataList, decltype(queryDoneHandler)> ( ApiCommand::getUsers, userId, queryDoneHandler);
+        m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiUserDataList, decltype(queryDoneHandler)> ( ApiCommand::getUsers, nullptr, queryDoneHandler);
         return reqID;
     }
 
@@ -42,10 +39,14 @@ namespace ec2
         QnTransaction<ApiUserData>& tran,
         impl::AddUserHandlerPtr handler,
         const int reqID,
-        QnUserResourceList users )
+        const ec2::ApiUserData& user,
+        const QString& newPassword)
     {
-        using namespace std::placeholders;
-        queryProcessor->processUpdateAsync( tran, std::bind( &impl::AddUserHandler::done, handler, reqID, _1, users ) );
+        QN_UNUSED(user, newPassword); /* Actual only for FixedUrlClientQueryProcessor implementation */
+        queryProcessor->processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
+        {
+            handler->done(reqID, errorCode);
+        });
     }
 
     template<>
@@ -54,34 +55,30 @@ namespace ec2
         QnTransaction<ApiUserData>& tran,
         impl::AddUserHandlerPtr handler,
         const int reqID,
-        QnUserResourceList users )
+        const ec2::ApiUserData& user,
+        const QString& newPassword)
     {
         //after successfull call completion users.front()->getPassword() is empty, so saving it here
-        QString newPassword = users.front()->getPassword();
         queryProcessor->processUpdateAsync( tran,
-            [queryProcessor, handler, reqID, users, newPassword]( ec2::ErrorCode errorCode ){
+            [queryProcessor, handler, reqID, user, newPassword]( ec2::ErrorCode errorCode )
+        {
                 if( errorCode == ec2::ErrorCode::ok
-                    && queryProcessor->userName() == users.front()->getName()
+                    && queryProcessor->userName() == user.name
                     && !newPassword.isEmpty()
                     )
                     queryProcessor->setPassword( newPassword );
-                handler->done( reqID, errorCode, users );
-            });
+                handler->done( reqID, errorCode );
+        });
     }
 
     template<class T>
-    int QnUserManager<T>::save( const QnUserResourcePtr& resource, impl::AddUserHandlerPtr handler )
+    int QnUserManager<T>::save( const ec2::ApiUserData& user, const QString& newPassword, impl::AddUserHandlerPtr handler )
     {
-        //preparing output data
-        QnUserResourceList users;
-        if (resource->getId().isNull()) {
-            resource->setId(QnUuid::createUuid());
-        }
-        users.push_back( resource );
+        Q_ASSERT_X(!user.id.isNull(), Q_FUNC_INFO, "User id must be set before saving");
 
         const int reqID = generateRequestID();
-        auto tran = prepareTransaction( ApiCommand::saveUser, resource );
-        callSaveUserAsync( m_queryProcessor, tran, handler, reqID, users );
+        auto tran = prepareTransaction( ApiCommand::saveUser, user);
+        callSaveUserAsync( m_queryProcessor, tran, handler, reqID, user, newPassword);
         return reqID;
     }
 
@@ -96,11 +93,9 @@ namespace ec2
     }
 
     template<class T>
-    QnTransaction<ApiUserData> QnUserManager<T>::prepareTransaction( ApiCommand::Value command, const QnUserResourcePtr& resource )
+    QnTransaction<ApiUserData> QnUserManager<T>::prepareTransaction( ApiCommand::Value command, const ec2::ApiUserData& user )
     {
-        QnTransaction<ApiUserData> tran(command);
-        fromResourceToApi(resource, tran.params);
-        return tran;
+        return QnTransaction<ApiUserData>(command, user);
     }
 
     template<class T>

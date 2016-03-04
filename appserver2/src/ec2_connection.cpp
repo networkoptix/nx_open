@@ -31,10 +31,10 @@ namespace ec2
 
         QnTransactionMessageBus::instance()->setHandler( notificationManager() );
 
-        // NODE: Ec2StaticticsReporter can only be created after connection is estabilished
+        // NOTE: Ec2StaticticsReporter can only be created after connection is established
         if (m_isInitialized)
             m_staticticsReporter.reset(new Ec2StaticticsReporter(
-                getUserManager(), getResourceManager(), getMediaServerManager()));
+                getResourceManager(), getMediaServerManager()));
     }
 
     Ec2DirectConnection::~Ec2DirectConnection()

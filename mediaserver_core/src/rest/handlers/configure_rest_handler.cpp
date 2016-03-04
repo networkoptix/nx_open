@@ -2,6 +2,10 @@
 
 #include "nx_ec/ec_api.h"
 #include "nx_ec/dummy_handler.h"
+#include <nx_ec/data/api_user_data.h>
+#include <nx_ec/data/api_conversion_functions.h>
+#include <nx_ec/managers/abstract_user_manager.h>
+
 #include "transaction/transaction_message_bus.h"
 #include "api/app_server_connection.h"
 #include "common/common_module.h"
@@ -30,7 +34,7 @@ namespace {
     };
 }
 
-int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner) 
+int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner)
 {
     Q_UNUSED(path)
 
@@ -84,7 +88,7 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
         QString description = lit("%1 -> %2").arg(oldSystemName).arg(systemName);
         auditRecord.addParam("description", description.toUtf8());
         qnAuditManager->addAuditRecord(auditRecord);
-        
+
         if (!wholeSystem)
             resetConnections();
     }
@@ -179,7 +183,8 @@ int QnConfigureRestHandler::changeAdminPassword(
         return ResultOk;
     }
 
-    if (!password.isEmpty()) {
+    if (!password.isEmpty())
+    {
         /* check old password */
         if (!admin->checkPassword(oldPassword))
             return ResultFail;
@@ -187,18 +192,24 @@ int QnConfigureRestHandler::changeAdminPassword(
         /* set new password */
         updateAdmin->setPassword(password);
         updateAdmin->generateHash();
-        QnUserResourceList updatedUsers;
-        if (QnAppServerConnectionFactory::getConnection2()->getUserManager()->saveSync(updateAdmin, &updatedUsers) != ec2::ErrorCode::ok)
+        ec2::ApiUserData userData;
+        fromResourceToApi(updateAdmin, userData);
+
+        if (QnAppServerConnectionFactory::getConnection2()->getUserManager()->saveSync(userData) != ec2::ErrorCode::ok)
             return ResultFail;
         updateAdmin->setPassword(QString());
-    } else {
+    }
+    else
+    {
         updateAdmin->setRealm(realm);
         updateAdmin->setHash(passwordHash);
         updateAdmin->setDigest(passwordDigest);
         if( !cryptSha512Hash.isEmpty() )
             updateAdmin->setCryptSha512Hash(cryptSha512Hash);
-        QnUserResourceList updatedUsers;
-        if (QnAppServerConnectionFactory::getConnection2()->getUserManager()->saveSync(updateAdmin, &updatedUsers) != ec2::ErrorCode::ok)
+
+        ec2::ApiUserData userData;
+        fromResourceToApi(updateAdmin, userData);
+        if (QnAppServerConnectionFactory::getConnection2()->getUserManager()->saveSync(userData) != ec2::ErrorCode::ok)
             return ResultFail;
     }
 
@@ -233,7 +244,7 @@ int QnConfigureRestHandler::changePort(int port) {
         if (!socket.bind(port, bindMode))
             return ResultFail;
     }
-    
+
     QnMediaServerResourcePtr savedServer;
     QUrl url = server->getUrl();
     url.setPort(port);

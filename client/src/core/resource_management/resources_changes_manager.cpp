@@ -22,6 +22,7 @@
 #include <nx_ec/data/api_layout_data.h>
 #include <nx_ec/data/api_webpage_data.h>
 #include <nx_ec/data/api_conversion_functions.h>
+#include <nx_ec/managers/abstract_user_manager.h>
 
 QnResourcesChangesManager::QnResourcesChangesManager(QObject* parent /*= nullptr*/):
     base_type(parent)
@@ -289,7 +290,10 @@ void QnResourcesChangesManager::saveUser(const QnUserResourcePtr &user, UserChan
     if (!connection)
         return;
 
-    connection->getUserManager()->save(user, this, [this, user, sessionGuid, backup]( int reqID, ec2::ErrorCode errorCode ) {
+    ec2::ApiUserData apiUser;
+    fromResourceToApi(user, apiUser);
+
+    connection->getUserManager()->save(apiUser, user->getPassword(), this, [this, user, sessionGuid, backup]( int reqID, ec2::ErrorCode errorCode ) {
         Q_UNUSED(reqID);
 
         /* Check if all OK */

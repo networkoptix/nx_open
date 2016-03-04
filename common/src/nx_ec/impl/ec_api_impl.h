@@ -172,11 +172,11 @@ namespace ec2
             void emitGetServerUserAttributesDone( int reqID, const ErrorCode p1, const QnMediaServerUserAttributesList& p2 ) { emit onGetServerUserAttributesDone( reqID, p1, p2 ); }
             void emitGetStoragesDone( int reqID, const ErrorCode p1, const QnResourceList& p2 ) { emit onGetStoragesDone( reqID, p1, p2 ); }
             void emitAddCameraDone( int reqID, const ErrorCode p1, const QnVirtualCameraResourceList& p2 ) { emit onAddCameraDone( reqID, p1, p2 ); }
-            void emitAddUserDone( int reqID, const ErrorCode p1, const QnUserResourceList& p2 ) { emit onAddUserDone( reqID, p1, p2 ); }
+            void emitAddUserDone( int reqID, const ErrorCode p1 ) { emit onAddUserDone( reqID, p1 ); }
             void emitGetCamerasDone( int reqID, const ErrorCode p1, const QnVirtualCameraResourceList& p2 ) { emit onGetCamerasDone( reqID, p1, p2 ); }
             void emitGetCameraUserAttributesDone( int reqID, const ErrorCode p1, const QnCameraUserAttributesList& p2 ) { emit onGetCameraUserAttributesDone( reqID, p1, p2 ); }
             void emitGetCamerasHistoryDone( int reqID, const ErrorCode p1, const ApiServerFootageDataList& p2 ) { emit onGetCamerasHistoryDone( reqID, p1, p2 ); }
-            void emitGetUsersDone( int reqID, const ErrorCode p1, const QnUserResourceList& p2 ) { emit onGetUsersDone( reqID, p1, p2 ); }
+            void emitGetUsersDone( int reqID, const ErrorCode p1, const ec2::ApiUserDataList& p2 ) { emit onGetUsersDone( reqID, p1, p2 ); }
             void emitGetBusinessRulesDone( int reqID, const ErrorCode p1, const QnBusinessEventRuleList& p2 ) { emit onGetBusinessRulesDone( reqID, p1, p2 ); }
             void emitGetLicensesDone( int reqID, const ErrorCode p1, const QnLicenseList& p2 ) { emit onGetLicensesDone( reqID, p1, p2 ); }
             void emitGetLayoutsDone( int reqID, const ErrorCode p1, const QnLayoutResourceList& p2 ) { emit onGetLayoutsDone( reqID, p1, p2 ); }
@@ -209,11 +209,11 @@ namespace ec2
             void onGetServerUserAttributesDone( int reqID, const ErrorCode, const QnMediaServerUserAttributesList& );
             void onGetStoragesDone( int reqID, const ErrorCode, const QnResourceList& );
             void onAddCameraDone( int reqID, const ErrorCode, const QnVirtualCameraResourceList& );
-            void onAddUserDone( int reqID, const ErrorCode, const QnUserResourceList& );
+            void onAddUserDone( int reqID, const ErrorCode );
             void onGetCamerasDone( int reqID, const ErrorCode, const QnVirtualCameraResourceList& );
             void onGetCameraUserAttributesDone( int reqID, const ErrorCode, const QnCameraUserAttributesList& );
             void onGetCamerasHistoryDone( int reqID, const ErrorCode, const ApiServerFootageDataList& );
-            void onGetUsersDone( int reqID, const ErrorCode, const QnUserResourceList& );
+            void onGetUsersDone( int reqID, const ErrorCode, const ec2::ApiUserDataList& );
             void onGetBusinessRulesDone( int reqID, const ErrorCode, const QnBusinessEventRuleList& );
             void onGetLicensesDone( int reqID, const ErrorCode, const QnLicenseList& );
             void onGetLayoutsDone( int reqID, const ErrorCode, const QnLayoutResourceList& );
@@ -273,8 +273,8 @@ namespace ec2
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractUserManager
         //////////////////////////////////////////////////////////
-        DEFINE_TWO_ARG_HANDLER( GetUsers, ErrorCode, QnUserResourceList )
-        DEFINE_TWO_ARG_HANDLER( AddUser, ErrorCode, QnUserResourceList )
+        DEFINE_TWO_ARG_HANDLER( GetUsers, ErrorCode, ec2::ApiUserDataList )
+        DEFINE_ONE_ARG_HANDLER( AddUser, ErrorCode )
 
 
         //////////////////////////////////////////////////////////

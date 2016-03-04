@@ -72,6 +72,7 @@ public:
     static const QString kVideoWallTypeId;
     static const QString kWebPageTypeId;
     static const QString kStorageTypeId;
+    static const QString kUserTypeId;
 
     static QnResourceTypePool *instance();
 
