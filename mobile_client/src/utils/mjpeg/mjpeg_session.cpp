@@ -128,6 +128,8 @@ void QnMjpegSessionPrivate::decodeFrame(const QByteArray &data, qint64 timestamp
 
     QnMjpegSession::FrameData frameData;
     frameData.image = decompressJpegImage(data.data(), data.size());
+    if (frameData.image.isNull())
+        return;
     frameData.timestamp = timestampMs;
     frameData.presentationTime = presentationTime;
 
