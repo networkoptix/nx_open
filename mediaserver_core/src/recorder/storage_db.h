@@ -79,6 +79,7 @@ private:
     QnStorageResourcePtr m_storage;
     int m_storageIndex;
     mutable QnMutex m_syncMutex;
+    mutable QnMutex m_modeMutex;
 
     nx::media_db::DbHelper m_dbHelper;
     std::unique_ptr<QIODevice> m_ioDevice;

@@ -86,6 +86,7 @@ bool QnStorageDb::deleteRecords(const QString& cameraUniqueId,
                                 QnServer::ChunksCatalog catalog,
                                 qint64 startTimeMs)
 {
+    QnMutexLocker lk(&m_modeMutex);
     int cameraId;
     {
         QnMutexLocker lk(&m_syncMutex);
@@ -126,6 +127,7 @@ bool QnStorageDb::addRecord(const QString& cameraUniqueId,
                             QnServer::ChunksCatalog catalog, 
                             const DeviceFileCatalog::Chunk& chunk)
 {
+    QnMutexLocker lk(&m_modeMutex);
     int cameraId;
     {
         QnMutexLocker lk(&m_syncMutex);
@@ -272,12 +274,29 @@ bool QnStorageDb::startDbFile()
 
 QVector<DeviceFileCatalogPtr> QnStorageDb::loadChunksFileCatalog() 
 {
+    QnMutexLocker lk(&m_modeMutex);
     m_readData.clear();
     m_dbHelper.setMode(nx::media_db::Mode::Read);
 
-    assert(m_dbHelper.getDevice());
-    if ((!m_dbHelper.getDevice() || !m_ioDevice->isOpen()) && !startDbFile())
+    if (!resetIoDevice())
+    {
+        startDbFile();
         return QVector<DeviceFileCatalogPtr>();
+    }
+
+    if (m_dbHelper.readFileHeader(&m_dbVersion) != nx::media_db::Error::NoError)
+    {
+        startDbFile();
+        return QVector<DeviceFileCatalogPtr>();
+    }
+
+    assert(m_dbHelper.getDevice());
+
+    if ((!m_dbHelper.getDevice() || !m_ioDevice->isOpen()))
+    {
+        startDbFile();
+        return QVector<DeviceFileCatalogPtr>();
+    }
 
     while ((m_lastReadError = m_dbHelper.readRecord()) == nx::media_db::Error::NoError);
 
