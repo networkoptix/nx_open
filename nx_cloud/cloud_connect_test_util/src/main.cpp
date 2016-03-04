@@ -28,6 +28,8 @@ int main(int argc, char* argv[])
         return 0;
     }
 
+    nx::network::SocketGlobals::InitGuard socketGlobalsGuard;
+
     //reading mode
     if (args.find("listen") != args.end())
         return runInListenMode(args);
@@ -59,8 +61,6 @@ int runInListenMode(const std::multimap<QString, QString>& args)
     }
     QString serverId = generateRandomName(7);
     readArg(args, "server-id", &serverId);
-
-    SocketGlobals::InitGuard socketGlobalsGuard;
 
     SocketGlobals::mediatorConnector().setSystemCredentials(
         nx::hpm::api::SystemCredentials(
@@ -112,7 +112,7 @@ int runInListenMode(const std::multimap<QString, QString>& args)
 }
 
 const int kDefaultTotalConnections = 100;
-const int kDefaultMaxConcurrentConnections = 10;
+const int kDefaultMaxConcurrentConnections = 1;
 const int kDefaultBytesToSend = 100000;
 
 int runInConnectMode(const std::multimap<QString, QString>& args)
@@ -123,6 +123,8 @@ int runInConnectMode(const std::multimap<QString, QString>& args)
         std::cerr << "error. Required parameter \"target\" is missing" << std::endl;
         return 1;
     }
+
+    nx::network::SocketGlobals::mediatorConnector().enable(true);
 
     int totalConnections = kDefaultTotalConnections;
     readArg(args, "total-connections", &totalConnections);

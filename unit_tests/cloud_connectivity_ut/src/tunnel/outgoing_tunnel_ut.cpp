@@ -28,10 +28,12 @@ public:
     DummyConnection(
         const String& /*remotePeerId*/,
         bool connectionShouldWorkFine,
-        bool singleShot)
+        bool singleShot,
+        std::promise<std::chrono::milliseconds>* tunnelConnectionInvokedPromise = nullptr)
     :
         m_connectionShouldWorkFine(connectionShouldWorkFine),
-        m_singleShot(singleShot)
+        m_singleShot(singleShot),
+        m_tunnelConnectionInvokedPromise(tunnelConnectionInvokedPromise)
     {
         ++instanceCount;
     }
@@ -47,10 +49,16 @@ public:
     }
 
     virtual void establishNewConnection(
-        std::chrono::milliseconds /*timeout*/,
+        std::chrono::milliseconds timeout,
         SocketAttributes /*socketAttributes*/,
         OnNewConnectionHandler handler) override
     {
+        if (m_tunnelConnectionInvokedPromise)
+        {
+            m_tunnelConnectionInvokedPromise->set_value(timeout);
+            m_tunnelConnectionInvokedPromise = nullptr;
+        }
+
         m_aioThreadBinder.post(
             [this, handler]()
             {
@@ -71,6 +79,7 @@ private:
     UDPSocket m_aioThreadBinder;
     bool m_connectionShouldWorkFine;
     const bool m_singleShot;
+    std::promise<std::chrono::milliseconds>* m_tunnelConnectionInvokedPromise;
 };
 
 std::atomic<size_t> DummyConnection::instanceCount(0);
@@ -87,28 +96,49 @@ public:
         AddressEntry targetPeerAddress,
         bool connectSuccessfully,
         bool connectionShouldWorkFine,
-        bool singleShotConnection)
+        bool singleShotConnection,
+        std::promise<void>* const canSucceedEvent,
+        boost::optional<std::chrono::milliseconds> connectTimeout)
     :
         m_targetPeerAddress(std::move(targetPeerAddress)),
         m_connectSuccessfully(connectSuccessfully),
         m_connectionShouldWorkFine(connectionShouldWorkFine),
         m_singleShotConnection(singleShotConnection),
-        m_canSucceedEvent(nullptr)
+        m_canSucceedEvent(canSucceedEvent),
+        m_connectTimeout(std::move(connectTimeout)),
+        m_tunnelConnectionInvokedPromise(nullptr)
     {
         ++instanceCount;
     }
 
     DummyConnector(
         AddressEntry targetPeerAddress,
+        bool connectSuccessfully,
+        bool connectionShouldWorkFine,
+        bool singleShotConnection)
+    :
+        DummyConnector(
+            std::move(targetPeerAddress),
+            connectSuccessfully,
+            connectionShouldWorkFine,
+            singleShotConnection,
+            nullptr,
+            boost::none)
+    {
+    }
+
+    DummyConnector(
+        AddressEntry targetPeerAddress,
         std::promise<void>* const canSucceedEvent)
     :
-        m_targetPeerAddress(std::move(targetPeerAddress)),
-        m_connectSuccessfully(true),
-        m_connectionShouldWorkFine(true),
-        m_singleShotConnection(false),
-        m_canSucceedEvent(canSucceedEvent)
+        DummyConnector(
+            std::move(targetPeerAddress),
+            true,
+            true,
+            false,
+            canSucceedEvent,
+            boost::none)
     {
-        ++instanceCount;
     }
 
     DummyConnector(
@@ -116,14 +146,14 @@ public:
         std::chrono::milliseconds connectTimeout,
         std::promise<void>* const canSucceedEvent = nullptr)
     :
-        m_targetPeerAddress(std::move(targetPeerAddress)),
-        m_connectSuccessfully(true),
-        m_connectionShouldWorkFine(true),
-        m_singleShotConnection(false),
-        m_canSucceedEvent(canSucceedEvent),
-        m_connectTimeout(std::move(connectTimeout))
+        DummyConnector(
+            std::move(targetPeerAddress),
+            true,
+            true,
+            false,
+            canSucceedEvent,
+            connectTimeout)
     {
-        ++instanceCount;
     }
 
     ~DummyConnector()
@@ -165,6 +195,12 @@ public:
         return m_targetPeerAddress;
     }
 
+    void setConnectionInvokedPromise(
+        std::promise<std::chrono::milliseconds>* const tunnelConnectionInvokedPromise)
+    {
+        m_tunnelConnectionInvokedPromise = tunnelConnectionInvokedPromise;
+    }
+
 private:
     AddressEntry m_targetPeerAddress;
     UDPSocket m_aioThreadBinder;
@@ -173,6 +209,7 @@ private:
     const bool m_singleShotConnection;
     std::promise<void>* const m_canSucceedEvent;
     boost::optional<std::chrono::milliseconds> m_connectTimeout;
+    std::promise<std::chrono::milliseconds>* m_tunnelConnectionInvokedPromise;
 
     void connectInternal(
         nx::utils::MoveOnlyFunc<void(
@@ -191,7 +228,8 @@ private:
                         std::make_unique<DummyConnection>(
                             m_targetPeerAddress.host.toString().toLatin1(),
                             m_connectionShouldWorkFine,
-                            m_singleShotConnection));
+                            m_singleShotConnection,
+                            m_tunnelConnectionInvokedPromise));
                 else
                     handler(
                         SystemError::connectionRefused,
@@ -567,6 +605,70 @@ TEST_F(OutgoingTunnelTest, connectTimeout)
 
             tunnel.pleaseStopSync();
         }
+}
+
+/** testing that tunnel passes correct connect timeout to tunnel connection */
+TEST_F(OutgoingTunnelTest, connectTimeout2)
+{
+    const bool connectorWillSucceed = true;
+    const bool singleShotConnection = false;
+    const bool connectionWillSucceedValues[1] = { true };
+    //const auto connectorTimeout = std::chrono::seconds(3);
+
+    AddressEntry addressEntry("nx_test.com:12345");
+    OutgoingTunnel tunnel(std::move(addressEntry));
+
+    std::promise<std::chrono::milliseconds> tunnelConnectionInvokedPromise;
+
+    setConnectorFactoryFunc(
+        [/*connectorTimeout,*/ &tunnelConnectionInvokedPromise](
+            const AddressEntry& targetAddress) -> ConnectorFactory::CloudConnectors
+        {
+            ConnectorFactory::CloudConnectors connectors;
+            auto connector = 
+                std::make_unique<DummyConnector>(
+                    targetAddress,
+                    /*connectorTimeout*/ nullptr);
+            connector->setConnectionInvokedPromise(&tunnelConnectionInvokedPromise);
+            connectors.emplace(
+                CloudConnectType::kUdtHp,
+                std::move(connector));
+            return connectors;
+        });
+
+    const std::chrono::seconds connectionTimeout(3);
+
+    ConnectionContext connectionContext;
+    //std::this_thread::sleep_for(std::chrono::microseconds(rand() & 0xffff));
+    connectionContext.startTime = std::chrono::steady_clock::now();
+    tunnel.establishNewConnection(
+        connectionTimeout,
+        SocketAttributes(),
+        [&connectionContext](
+            SystemError::ErrorCode errorCode,
+            std::unique_ptr<AbstractStreamSocket> socket)
+        {
+            connectionContext.endTime = std::chrono::steady_clock::now();
+            connectionContext.completionPromise.set_value(
+                std::make_pair(errorCode, std::move(socket)));
+        });
+
+    ASSERT_EQ(
+        std::future_status::ready,
+        connectionContext.completionPromise.get_future().wait_for(connectionTimeout * 2));
+
+    //waiting for DummyConnection::establishNewConnection call and checking timeout
+    auto tunnelConnectionInvokedFuture = tunnelConnectionInvokedPromise.get_future();
+    ASSERT_EQ(
+        std::future_status::ready,
+        tunnelConnectionInvokedFuture.wait_for(std::chrono::milliseconds::zero()));
+    const auto timeout = tunnelConnectionInvokedFuture.get();
+    ASSERT_LE(timeout, connectionTimeout);
+    ASSERT_GE(
+        timeout,
+        connectionTimeout - (connectionContext.endTime - connectionContext.startTime));
+
+    tunnel.pleaseStopSync();
 }
 
 } // namespace cloud

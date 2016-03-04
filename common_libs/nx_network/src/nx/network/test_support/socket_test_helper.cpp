@@ -120,6 +120,8 @@ SocketAddress TestConnection::getLocalAddress() const
     return m_socket->getLocalAddress();
 }
 
+const std::chrono::milliseconds kDefaultSendTimeout(7000);
+
 void TestConnection::start()
 {
     std::unique_lock<std::mutex> lk(m_mutex);
@@ -128,6 +130,7 @@ void TestConnection::start()
         return startIO();
 
     if (!m_socket->setNonBlockingMode(true) || 
+        !m_socket->setSendTimeout(kDefaultSendTimeout.count()) ||
         (m_localAddress && !m_socket->bind(*m_localAddress)))
     {
         return m_socket->post(std::bind(
