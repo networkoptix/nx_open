@@ -29,7 +29,7 @@
         <!--Global libs-->
         <qt.libs>core network xml xmlpatterns sql concurrent multimedia</qt.libs>
         <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lswresample -lpostproc</ffmpeg.libs>
-        <global.libs>-lmediaserver_core -lcommon -lappserver2 -lonvif -lnxemail</global.libs>
+        <global.libs>-lmediaserver_core -lcommon -lappserver2 -lonvif -lnx_email -lcloud_db_client</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>Ws2_32.lib DbgHelp.lib sigar.lib -lIphlpapi -lwinmm Wldap32.lib Crypt32.lib</windows.oslibs>
         <linux.oslibs>-lmp3lame -lsigar -lfaac -lvpx -lvorbisenc -lvorbis -ldl -lldap</linux.oslibs>
