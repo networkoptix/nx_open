@@ -38,7 +38,7 @@ int QnSetupLocalSystemRestHandler::executeGet(const QString &, const QnRequestPa
         return nx_http::StatusCode::ok;
     }
 
-    if (!changeSystemName(newSystemName), 0, 0))
+    if (!changeSystemName(newSystemName, 0, 0))
     {
         result.setError(QnRestResult::CantProcessRequest, lit("Internal server error. Can't change system name."));
         return nx_http::StatusCode::internalServerError;
