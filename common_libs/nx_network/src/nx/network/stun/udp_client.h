@@ -37,7 +37,7 @@ class NX_NETWORK_API UDPClient
     private nx::network::UnreliableMessagePipelineEventHandler<Message>
 {
 public:
-    typedef std::function<void(
+    typedef utils::MoveOnlyFunc<void(
         SystemError::ErrorCode errorCode,
         Message response)> RequestCompletionHandler;
 
@@ -115,9 +115,7 @@ private:
     void sendRequestInternal(
         SocketAddress serverAddress,
         Message request,
-        std::function<void(
-            SystemError::ErrorCode errorCode,
-            Message response)> completionHandler);
+        RequestCompletionHandler completionHandler);
     void sendRequestAndStartTimer(
         SocketAddress serverAddress,
         const Message& request,

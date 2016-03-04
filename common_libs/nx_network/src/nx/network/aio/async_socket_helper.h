@@ -217,11 +217,11 @@ public:
                 const auto& entry = addresses.front();
                 switch( entry.type )
                 {
-                    case nx::network::cloud::AddressType::kLocal:
+                    case nx::network::cloud::AddressType::direct:
                     {
                         SocketAddress target( entry.host, addr.port );
                         for( const auto& attr : entry.attributes )
-                            if( attr.type == nx::network::cloud::AddressAttributeType::kPort )
+                            if( attr.type == nx::network::cloud::AddressAttributeType::port )
                                 target.port = static_cast< quint16 >( attr.value );
                         if( startAsyncConnect( target ) )
                             return;

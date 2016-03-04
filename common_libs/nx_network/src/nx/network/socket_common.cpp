@@ -65,7 +65,8 @@ HostAddress::HostAddress( const QByteArray& _ipv6 )
 {
     memset( &m_sinAddr, 0, sizeof(m_sinAddr) );
 
-    if( _ipv6.size() != IP_V6_MAP_PREFIX.size() + sizeof(m_sinAddr.s_addr) ) return;
+    if( _ipv6.size() != IP_V6_MAP_PREFIX.size() +
+        static_cast<int>(sizeof(m_sinAddr.s_addr)) ) return;
     if( !_ipv6.startsWith(IP_V6_MAP_PREFIX) ) return;
 
     uint32_t _ipv4;

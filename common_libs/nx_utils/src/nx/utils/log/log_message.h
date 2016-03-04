@@ -18,6 +18,18 @@
 
 class QnUuid;
 
+template<typename First, typename Second>
+QString toString(
+    const std::pair<First, Second>& pair,
+    const QString& prefix = QString::fromLatin1("( "),
+    const QString& suffix = QString::fromLatin1(" )"),
+    const QString& delimiter = QString::fromLatin1(": "))
+{
+    return QString::fromLatin1("%1%2%3%4%5").arg(prefix)
+        .arg(toString(pair.first)).arg(delimiter)
+        .arg(toString(pair.second)).arg(suffix);
+}
+
 template<typename Container>
 QString containerString(const Container& container,
     const QString& delimiter = QString::fromLatin1(", "),

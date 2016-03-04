@@ -41,7 +41,7 @@ public:
 
     void resolveDomain(
         nx::hpm::api::ResolveDomainRequest resolveData,
-        std::function<void(
+        utils::MoveOnlyFunc<void(
             nx::hpm::api::ResultCode,
             nx::hpm::api::ResolveDomainResponse)> completionHandler)
     {
@@ -53,7 +53,7 @@ public:
 
     void resolvePeer(
         nx::hpm::api::ResolvePeerRequest resolveData,
-        std::function<void(
+        utils::MoveOnlyFunc<void(
             nx::hpm::api::ResultCode,
             nx::hpm::api::ResolvePeerResponse)> completionHandler)
     {
@@ -65,7 +65,7 @@ public:
 
     void connect(
         nx::hpm::api::ConnectRequest connectData,
-        std::function<void(
+        utils::MoveOnlyFunc<void(
             nx::hpm::api::ResultCode,
             nx::hpm::api::ConnectResponse)> completionHandler)
     {
@@ -77,7 +77,7 @@ public:
 
     void connectionResult(
         nx::hpm::api::ConnectionResultRequest resultData,
-        std::function<void(nx::hpm::api::ResultCode)> completionHandler)
+        utils::MoveOnlyFunc<void(nx::hpm::api::ResultCode)> completionHandler)
     {
         this->doRequest(
             stun::cc::methods::connectionResult,
@@ -114,7 +114,7 @@ public:
     */
     void ping(
         nx::hpm::api::PingRequest requestData,
-        std::function<void(
+        utils::MoveOnlyFunc<void(
             nx::hpm::api::ResultCode,
             nx::hpm::api::PingResponse)> completionHandler)
     {
@@ -127,7 +127,7 @@ public:
     /** reports to mediator that local server is available on \a addresses */
     void bind(
         nx::hpm::api::BindRequest requestData,
-        std::function<void(nx::hpm::api::ResultCode)> completionHandler)
+        utils::MoveOnlyFunc<void(nx::hpm::api::ResultCode)> completionHandler)
     {
         this->doAuthRequest(
             stun::cc::methods::bind,
@@ -138,7 +138,7 @@ public:
     /** notifies mediator this server is willing to accept cloud connections */
     void listen(
         nx::hpm::api::ListenRequest listenParams,
-        std::function<void(nx::hpm::api::ResultCode)> completionHandler)
+        utils::MoveOnlyFunc<void(nx::hpm::api::ResultCode)> completionHandler)
     {
         this->doAuthRequest(
             stun::cc::methods::listen,
@@ -149,7 +149,7 @@ public:
     /** server uses this request to confirm its willingness to proceed with cloud connection */
     void connectionAck(
         nx::hpm::api::ConnectionAckRequest request,
-        std::function<void(nx::hpm::api::ResultCode)> completionHandler)
+        utils::MoveOnlyFunc<void(nx::hpm::api::ResultCode)> completionHandler)
     {
         this->doAuthRequest(
             stun::cc::methods::connectionAck,

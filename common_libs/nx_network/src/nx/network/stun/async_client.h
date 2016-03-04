@@ -27,7 +27,8 @@ public:
     virtual ~AbstractAsyncClient() {}
 
     typedef std::function<void(Message)> IndicationHandler;
-    typedef std::function<void(SystemError::ErrorCode, Message)> RequestHandler;
+    typedef utils::MoveOnlyFunc<void(
+        SystemError::ErrorCode, Message)> RequestHandler;
 
     //!Asynchronously openes connection to the server
     /*!

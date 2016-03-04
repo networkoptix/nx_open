@@ -71,7 +71,6 @@ void MediatorAddressPublisher::pingReportedAddresses( QnMutexLockerBase* lk )
             nx::hpm::api::PingResponse responseData)
         {
             QnMutexLocker lk( &m_mutex );
-
             if (resultCode != nx::hpm::api::ResultCode::ok)
             {
                 m_pingedAddresses.clear();
