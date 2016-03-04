@@ -378,7 +378,7 @@ protected:
                 SystemError::ErrorCode code, size_t size)
             {
                 if (code != SystemError::noError ||
-                    size != static_caast<size_t>(
+                    size != static_cast<size_t>(
                         network::test::kTestMessage.size()))
                 {
                     return retryOnClient(
