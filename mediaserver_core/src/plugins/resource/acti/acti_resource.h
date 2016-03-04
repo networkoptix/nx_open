@@ -128,14 +128,34 @@ private:
     bool loadAdvancedParametersTemplateFromFile(QnCameraAdvancedParams& params, const QString& filename);
     QSet<QString> calculateSupportedAdvancedParameters(const QnCameraAdvancedParams& allParams) const;
     bool parseParameter(const QString& paramId, QnCameraAdvancedParamValue& param) const;
-    QString getNthParameterInAgregateValue(const QString& paramValue, const int& paramPosition) const;
-    bool setNthParameterInAgregateValue(QString& agregateValue, const QString& paramValue, const int& paramPosition) const;
-    QnCameraAdvancedAgregateParameterInfo getAgregateInfo(const QnCameraAdvancedParameter& param) const;
-    void convertParamValueToInternal(QString& paramValue, const QnCameraAdvancedParameter& param) const;
-    void convertParamValueFromInternal(QString& paramValue, const QnCameraAdvancedParameter& param) const;
-    bool parseCameraParametersResponse(const QByteArray& response, QnCameraAdvancedParamValueList& result) const;
-    QString getParameterGroup(const QnCameraAdvancedParameter& param) const;
-    bool isComponentOfAgregate(const QnCameraAdvancedParameter& param) const;
+    void parseCameraParametersResponse(const QByteArray& response, QnCameraAdvancedParamValueList& result) const;
+    void parseCameraParametersResponse(const QByteArray& response, QMap<QString, QString>& result) const;
+
+    void convertParamValueToDeviceFormat(QString& paramValue, const QnCameraAdvancedParameter& param) const;
+    void convertParamValueFromDeviceFormat(QString& paramValue, const QnCameraAdvancedParameter& param) const;
+    QString getParamGroup(const QnCameraAdvancedParameter& param) const;
+    QString getParamCmd(const QnCameraAdvancedParameter& param) const;
+
+    QList<QnCameraAdvancedParameter> getParamsByIds(const QSet<QString>& idList) const;
+    QMap<QString, QnCameraAdvancedParameter> getParamsMap(const QSet<QString>& idList) const;
+
+    bool isMaintenanceParam(const QnCameraAdvancedParameter& param) const;
+
+    QMap<QString, QString> buildGetParamsQueries(const QList<QnCameraAdvancedParameter>& params) const;
+    QMap<QString, QString> buildSetParamsQueries(const QnCameraAdvancedParamValueList& values) const;
+    QMap<QString, QString> buildMaintenanceQueries(const QnCameraAdvancedParamValueList& values) const;
+
+    QMap<QString, QString> executeParamsQueries(const QMap<QString, QString>& queries) const;
+    void parseParamsQueriesResult(
+        const QMap<QString, QString>& queriesResult,
+        const QList<QnCameraAdvancedParameter>& params,
+        QnCameraAdvancedParamValueList& result) const;
+
+    QMap<QString, QString> resolveQueries(QMap<QString, QnCameraAdvancedParamQueryInfo>& queries) const;
+
+    void getParamsByMask(const QString& paramValue, const QString& mask, QMap<QString, QString>& result) const;
+    void fillMissingParams(QString& templ, const QString& real) const;
+
 
 private:
     class TriggerOutputTask

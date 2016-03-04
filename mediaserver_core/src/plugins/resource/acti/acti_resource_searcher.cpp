@@ -268,11 +268,10 @@ void QnActiResourceSearcher::createResource(
     resource->setTypeId(m_resTypeId);
 
     if(isNx)
-    {
-        auto data = getNxDataByActiModel(devInfo.modelName);
+    {    
         resource->setVendor(NX_VENDOR);
-        resource->setName(data["name"]);
-        resource->setModel(data["model"]);
+        resource->setName(resourceData.value<QString>(NX_DEVICE_NAME_PARAMETER_NAME));
+        resource->setModel(resourceData.value<QString>(NX_DEVICE_MODEL_PARAMETER_NAME));
     }
     else
     {
@@ -296,17 +295,6 @@ void QnActiResourceSearcher::createResource(
     }
 
     result << resource;
-}
-
-QMap<QString, QString> QnActiResourceSearcher::getNxDataByActiModel(const QString &model) const
-{
-    QMap<QString, QString> data;
-    QnResourceData resourceData = qnCommon->dataPool()->data(manufacture(), model);
-
-    data["name"] = resourceData.value<QString>(NX_DEVICE_NAME_PARAMETER_NAME);
-    data["model"] = resourceData.value<QString>(NX_DEVICE_MODEL_PARAMETER_NAME);
-
-    return data;
 }
 
 bool QnActiResourceSearcher::isNxDevice(const nx_upnp::DeviceInfo& devInfo) const

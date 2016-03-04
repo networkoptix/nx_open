@@ -46,10 +46,10 @@ QString AddressAttribute::toString() const
 {
     switch(type)
     {
-        case AddressAttributeType::unknown:
-            return lit("unknown");
-        case AddressAttributeType::port:
-            return lit("port=%1").arg(value);
+        case AddressAttributeType::kUnknown:
+            return lit("kUnknown");
+        case AddressAttributeType::kPort:
+            return lit("kPort=%1").arg(value);
     };
 
     NX_ASSERT( false, Q_FUNC_INFO, "undefined AddressAttributeType" );
@@ -63,11 +63,11 @@ AddressEntry::AddressEntry(AddressType type_, HostAddress host_)
 }
 
 AddressEntry::AddressEntry(const SocketAddress& address)
-    : type(AddressType::direct)
+    : type(AddressType::kLocal)
     , host(address.address)
 {
     attributes.push_back(AddressAttribute(
-        AddressAttributeType::port, address.port));
+        AddressAttributeType::kPort, address.port));
 }
 
 bool AddressEntry::operator ==(const AddressEntry& rhs) const
@@ -139,37 +139,24 @@ void AddressResolver::resolveDomain(
     const HostAddress& domain,
     utils::MoveOnlyFunc<void(std::vector<TypedAddres>)> handler)
 {
-    m_mediatorConnection->resolveDomain(
-        nx::hpm::api::ResolveDomainRequest(domain.toString().toUtf8()),
-        [this, domain, handler = std::move(handler)](
-            nx::hpm::api::ResultCode resultCode,
-            nx::hpm::api::ResolveDomainResponse response)
-        {
-            NX_LOGX(lm("Domain %1 resolution on mediator result: %1")
-                .arg(domain.toString()).arg(nx::hpm::api::toString(resultCode)),
-                cl_logDEBUG2);
-
-            std::vector<TypedAddres> subdomains;
-            const auto suffix = lit(".") + domain.toString();
+    std::vector<TypedAddres> subdomains;
+    const auto suffix = lit(".") + domain.toString();
+    {
+        // TODO: #mux Think about better representation to increase performance
+        QnMutexLocker lk( &m_mutex );
+        for (const auto& info : m_info)
+            if (info.first.toString().endsWith(suffix) &&
+                !info.second.getAll().empty())
             {
-                // TODO: #mux Think about better representation to increase performance
-                QnMutexLocker lk( &m_mutex );
-                for (const auto& info : m_info)
-                    if (info.first.toString().endsWith(suffix) &&
-                        !info.second.fixedEntries.empty())
-                    {
-                        subdomains.emplace_back(info.first, AddressType::direct);
-                    }
+                bool hasFixed = !info.second.fixedEntries.empty();
+                subdomains.emplace_back(
+                    info.first,
+                    hasFixed ? AddressType::kLocal : AddressType::kCloud);
             }
+    }
 
-            for (const auto& host : response.hostNames)
-                subdomains.emplace_back(HostAddress(host), AddressType::cloud);
-
-            NX_LOGX(lm("Domain %1 is resolvet to: %2")
-                .arg(domain.toString()).container(subdomains), cl_logDEBUG1);
-
-            handler(std::move(subdomains));
-        });
+    // TODO: #mux We also should resolve these in mediator and fire handler later
+    handler(std::move(subdomains));
 }
 
 void AddressResolver::resolveAsync(
@@ -179,7 +166,7 @@ void AddressResolver::resolveAsync(
     if( hostName.isResolved() )
         return handler( SystemError::noError,
                         std::vector< AddressEntry >( 1, AddressEntry(
-                            AddressType::direct, hostName ) ) );
+                            AddressType::kLocal, hostName ) ) );
 
     QnMutexLocker lk( &m_mutex );
     auto info = m_info.emplace( hostName, HostAddressInfo() ).first;
@@ -375,7 +362,7 @@ void AddressResolver::dnsResolve(HaInfoIterator info)
         std::vector< AddressEntry > entries;
         if( code == SystemError::noError )
         {
-            entries.push_back( AddressEntry( AddressType::direct, hostAddress ) );
+            entries.push_back( AddressEntry( AddressType::kLocal, hostAddress ) );
             NX_LOGX( lit( "Address %1 is resolved to %2" )
                      .arg( info->first.toString() )
                      .arg( hostAddress.toString() ), cl_logDEBUG1 );
@@ -400,11 +387,11 @@ void AddressResolver::mediatorResolve(HaInfoIterator info, QnMutexLockerBase* lk
 {
     info->second.mediatorProgress();
     lk->unlock();
-    m_mediatorConnection->resolvePeer(
-        nx::hpm::api::ResolvePeerRequest(info->first.toString().toUtf8()),
+    m_mediatorConnection->resolve(
+        nx::hpm::api::ResolveRequest(info->first.toString().toUtf8()),
         [this, info](
             nx::hpm::api::ResultCode resultCode,
-            nx::hpm::api::ResolvePeerResponse response)
+            nx::hpm::api::ResolveResponse response)
         {
             std::vector< Guard > guards;
 
@@ -414,9 +401,9 @@ void AddressResolver::mediatorResolve(HaInfoIterator info, QnMutexLockerBase* lk
             {
                 for (const auto& it : response.endpoints)
                 {
-                    AddressEntry entry( AddressType::direct, it.address );
+                    AddressEntry entry( AddressType::kLocal, it.address );
                     entry.attributes.push_back( AddressAttribute(
-                        AddressAttributeType::port, it.port ) );
+                        AddressAttributeType::kPort, it.port ) );
                     entries.push_back( std::move( entry ) );
                 }
 
@@ -424,7 +411,7 @@ void AddressResolver::mediatorResolve(HaInfoIterator info, QnMutexLockerBase* lk
                 // address entry
                 if (response.connectionMethods != 0)
                     entries.emplace_back(
-                        AddressType::cloud,
+                        AddressType::kCloud,
                         HostAddress(info->first.toString()));
             }
 

@@ -35,14 +35,14 @@
 					dataType="Number"
 					range="1,255"
 					readCmd="encoder"
-					writeCmd="VIDEO_WB_GAIN=VIDEO_WB_R_GAIN-0"/>
+					writeCmd="VIDEO_WB_GAIN=%VIDEO_WB_R_GAIN,%VIDEO_WB_B_GAIN"/>
 				<param id="VIDEO_WB_B_GAIN"
 					name="White Balance B Gain"
 					description="Blue color gain (1-255). Affects only in manual white balance mode"
 					dataType="Number"
 					range="1,255"
 					readCmd="encoder"
-					writeCmd="VIDEO_WB_GAIN=VIDEO_WB_B_GAIN-1"/>
+					writeCmd="VIDEO_WB_GAIN=%VIDEO_WB_R_GAIN,%VIDEO_WB_B_GAIN"/>
 				<param id="VIDEO_EXPOSURE_MODE"
 					name="Exposure Mode"
 					dataType="Enumeration"
@@ -78,7 +78,7 @@
 					range = "Disabled,Low,Medium,High,Highest"
 					internalRange="OFF|0|0,AUTO|1|0,AUTO|64|0,AUTO|128|0,AUTO|255|0"
 					readCmd="encoder"
-					writeCmd="comma_separated"/>
+					writeCmd="VIDEO_WDR=%%VIDEO_WDR"/>
 				<param 	id="VIDEO_BLC_MODE"
 					name="BLC Mode"
 					description="Backlight Compensation Mode"
@@ -94,7 +94,7 @@
 			<group name="Day/Night">
 				<param	id="VIDEO_DAYNIGHT_MODE"
 					name="Day/Night Mode"
-					description=""
+					description="Day/Night mode. Affects only if manual IR LED control is not enabled"
 					dataType="Enumeration"
 					range="AUTO,DAY,NIGHT"
 					readCmd="encoder"/>
@@ -106,7 +106,7 @@
 					readCmd="encoder"/>
 				<param 	id="VIDEO_DN_IRLED"
 					name="IR LED Control"
-					description=""
+					description="Manual IR LED control"
 					dataType="Bool"
 					readCmd="encoder"/>
 				<param	id="ADAP_IRLED_CONFIG_FIRST"
@@ -115,7 +115,7 @@
 					dataType="Number"
 					range="1,10"
 					readCmd="encoder"
-					writeCmd="ADAP_IRLED_CONFIG=ADAP_IRLED_CONFIG_FIRST-0"/>
+					writeCmd="ADAP_IRLED_CONFIG=%ADAP_IRLED_CONFIG_FIRST,%ADAP_IRLED_CONFIG_REST"/>
 			</group>
 			<group name="Extra Settings">
 				<param 	id="VIDEO_MIRROR_MODE"
@@ -170,17 +170,20 @@
 				dataType="Button"
 				name="Reboot" 
 				description="This operation reboots the device."
-				readCmd="system"/>
+				readCmd="system"
+                writeCmd="!SAVE_REBOOT"/>
 			<param 	id="CONFIG_RESET"
 				dataType="Button"
 				name="Soft Reset"
 				description="Reset settings to factory default except IP settings"
-				readCmd="system"/>
+				readCmd="system"
+                writeCmd="!CONFIG_RESET"/>
 			<param 	id="FACTORY_DEFAULT"
 				dataType="Button"
 				name="Hard Reset"
 				description="Reset settings to factory default (includes IP settings)"
-				readCmd="system"/>
+				readCmd="system"
+                writeCmd="!FACTORY_DEFAULT"/>
 		</group>
 	</parameters>
 </plugin>
