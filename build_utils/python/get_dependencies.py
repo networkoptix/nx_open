@@ -62,6 +62,21 @@ def install_dependency(dependency_dir, target_dir, debug):
         print "Copying {0} to {1}".format(src, bin_dst)
         copy_recursive(src, bin_dst)
 
+def locate_pri_file(path):
+    if not os.path.isdir(path):
+        return None
+
+    result = None
+
+    for file in os.listdir(path):
+        if file.endswith(".pri"):
+            if result:
+                return None
+            else:
+                result = os.path.join(path, file)
+
+    return result
+
 def get_deps_pri_file(debug = False):
     return "dependencies-debug.pri" if debug else "dependencies.pri"
 
@@ -87,6 +102,8 @@ def get_package_for_configuration(package, debug):
         return False
 
     pri_file = os.path.join(location, package + ".pri")
+    if not os.path.isfile(pri_file):
+        pri_file = locate_pri_file(location)
     if os.path.isfile(pri_file):
         append_pri(pri_file, debug)
 
