@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <random>
 #include <thread>
 
 #include <nx/network/cloud/tunnel/udp_hole_punching_acceptor.h>
@@ -256,7 +257,7 @@ TEST_F(UdpHolePunchingTunnelAcceptorTest, ConnectPleaseStop)
         NX_LOG(lm("== %1 == delay: %2 ms").arg(i).arg(delay), cl_logALWAYS);
 
         createAndStartAcceptor(1);
-        std::this_thread::sleep_for(decltype(kUdpRetryTimeout)(delay));
+        std::this_thread::sleep_for(std::chrono::milliseconds(delay));
         tunnelAcceptor->pleaseStopSync();
         tunnelAcceptor.reset();
         ASSERT_TRUE(acceptResults.isEmpty());
