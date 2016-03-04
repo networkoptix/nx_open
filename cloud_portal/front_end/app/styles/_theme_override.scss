@@ -95,11 +95,17 @@ h1>.label{
   .modal-footer{
     margin-top: 0;
     text-align: left;
+
+    .form-control-static{
+      min-height:32px;
+    }
   }
 
   .modal-dialog {
     width: 400px;
   }
+
+
 }
 
 @media (min-width: $screen-sm-min) {
@@ -217,6 +223,29 @@ select.form-control{
   &:active{
     -webkit-appearance: none !important;
     outline: none !important;
+  }
+
+}
+
+
+label {
+  line-height:  16px;
+  margin-bottom: 8px;
+}
+
+
+.radio,
+.checkbox {
+  margin-top: 16px;
+  margin-bottom: 16px;
+  line-height: 16px;
+  label{
+    min-height: 16px;
+  }
+
+  input[type="radio"],
+  input[type="checkbox"] {
+    margin: 2px 0 0;
   }
 
 }
