@@ -79,6 +79,10 @@ h1>.label{
   vertical-align: 33%;
 }
 
+.modal-open {
+  overflow: auto;
+}
+
 .modal {
   &.fade .modal-dialog {
     @include translate(0, -20px);
@@ -95,10 +99,6 @@ h1>.label{
   .modal-footer{
     margin-top: 0;
     text-align: left;
-
-    .form-control-static{
-      min-height:32px;
-    }
   }
 
   .modal-dialog {
@@ -113,19 +113,15 @@ h1>.label{
     height:40px;
   }
 
-
+  .help-block{ /* Do not jump modal size when help block changes (help-block is below the input)*/
+    min-height:40px;
+  }
 }
 
 @media (min-width: $screen-sm-min) {
   .modal-content {
     @include box-shadow(0px 20px 50px 0px transparentize($dark15,0.85));
   }
-}
-
-
-
-.modal .help-block{ /* Do not jump modal size when help block changes (help-block is below the input)*/
-  min-height:40px;
 }
 
 @media (min-width: $screen-sm-min) {
@@ -256,4 +252,8 @@ label {
     margin-top: 2px;
   }
 
+}
+
+.form-control-static{
+  min-height:32px;
 }

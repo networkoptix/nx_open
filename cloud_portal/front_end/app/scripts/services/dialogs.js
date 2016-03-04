@@ -1,6 +1,10 @@
 'use strict';
 
-angular.module('cloudApp')
+
+angular.module('cloudApp').run(function($http,$templateCache) {
+        $http.get('views/login.html', {cache: $templateCache});
+        $http.get('views/share.html', {cache: $templateCache});
+    })
     .factory('dialogs', function ($http, $uibModal, $q, $location) {
         function openDialog(title, template, url, content, hasFooter, cancellable, params, closable, actionLabel, buttonType){
 
