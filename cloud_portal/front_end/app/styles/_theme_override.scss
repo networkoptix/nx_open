@@ -79,19 +79,35 @@ h1>.label{
   vertical-align: 33%;
 }
 
-.modal-body{
-  padding-top: 0;
-  padding-bottom: 0;
+.modal {
+  &.fade .modal-dialog {
+    @include translate(0, -20px);
+    @include transition-transform(0.1s ease-out);
+  }
+
+  &.in .modal-dialog { @include translate(0, 0) }
+
+  .modal-body{
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .modal-footer{
+    margin-top: 0;
+    text-align: left;
+  }
+
+  .modal-dialog {
+    width: 400px;
+  }
 }
 
-.modal-footer{
-  margin-top: 0;
-  text-align: left;
+@media (min-width: $screen-sm-min) {
+  .modal-content {
+    @include box-shadow(0px 20px 50px 0px transparentize($dark15,0.85));
+  }
 }
 
-.modal-dialog {
-  width: 400px;
-}
 
 
 .modal .help-block{ /* Do not jump modal size when help block changes (help-block is below the input)*/
@@ -185,11 +201,7 @@ select.form-control{
 }
 
 
-@media (min-width: $screen-sm-min) {
-  .modal-content {
-    @include box-shadow(0px 20px 50px 0px transparentize($dark15,0.85));
-  }
-}
+
 
 .alert {
   font-size: $font-size-h4;
