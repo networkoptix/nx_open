@@ -75,6 +75,7 @@ protected:
 
     std::unique_ptr<AbstractStreamServerSocket> m_serverSocket;
     std::unique_ptr<AbstractStreamSocket> m_controlConnection;
+    std::list<std::unique_ptr<AbstractStreamSocket>> m_acceptedSockets;
 
     std::vector<ConnectContext> startConnections(
         OutgoingTunnelUdtConnection* const tunnelConnection,
@@ -127,7 +128,6 @@ protected:
 
 private:
     bool m_first;
-    std::list<std::unique_ptr<AbstractStreamSocket>> m_acceptedSockets;
     nx::utils::MoveOnlyFunc<void()> m_onControlConnectionEstablishedHander;
 
     void onNewConnectionAccepted(
@@ -169,6 +169,7 @@ TEST_F(OutgoingTunnelUdtConnectionTest, common)
 
     auto udtConnection = std::make_unique<UdtStreamSocket>();
     ASSERT_TRUE(udtConnection->connect(serverEndpoint()));
+    const auto localAddress = udtConnection->getLocalAddress();
 
     OutgoingTunnelUdtConnection tunnelConnection(
         QnUuid::createUuid().toByteArray(),
@@ -176,9 +177,19 @@ TEST_F(OutgoingTunnelUdtConnectionTest, common)
 
     auto connectContexts = startConnections(&tunnelConnection, connectionsToCreate);
 
+    //waiting for all connections to complete
+    std::list<ConnectResult> connectResults;
     for (auto& connectContext : connectContexts)
+        connectResults.emplace_back(connectContext.connectedPromise.get_future().get());
+
+    //checking that connection uses right port to connect
+    for (const auto& sock : m_acceptedSockets)
     {
-        const auto result = connectContext.connectedPromise.get_future().get();
+        ASSERT_EQ(localAddress, sock->getForeignAddress());
+    }
+
+    for (auto& result: connectResults)
+    {
         ASSERT_EQ(SystemError::noError, result.errorCode);
         ASSERT_NE(nullptr, result.connection);
         ASSERT_TRUE(result.stillValid);

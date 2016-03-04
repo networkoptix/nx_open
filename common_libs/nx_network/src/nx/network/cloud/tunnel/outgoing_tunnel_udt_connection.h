@@ -96,6 +96,7 @@ private:
     };
 
     const nx::String m_connectionId;
+    const SocketAddress m_localPunchedAddress;
     const SocketAddress m_remoteHostAddress;
     nx::utils::AtomicUniquePtr<ConnectionType> m_controlConnection;
     const UdpHolePunchingTimeouts m_timeouts;

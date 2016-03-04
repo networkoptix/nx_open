@@ -20,6 +20,7 @@ OutgoingTunnelUdtConnection::OutgoingTunnelUdtConnection(
     UdpHolePunchingTimeouts timeouts)
 :
     m_connectionId(std::move(connectionId)),
+    m_localPunchedAddress(udtConnection->getLocalAddress()),
     m_remoteHostAddress(udtConnection->getForeignAddress()),
     m_controlConnection(
         std::make_unique<ConnectionType>(this, std::move(udtConnection))),
@@ -115,6 +116,7 @@ void OutgoingTunnelUdtConnection::establishNewConnection(
 
     auto newConnection = std::make_unique<UdtStreamSocket>();
     if (!socketAttributes.applyTo(newConnection.get()) ||
+        !newConnection->bind(m_localPunchedAddress) ||
         !newConnection->setNonBlockingMode(true))
     {
         const auto errorCode = SystemError::getLastOSErrorCode();
