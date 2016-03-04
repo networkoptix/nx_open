@@ -86,13 +86,13 @@ def get_package_for_configuration(package, debug):
         print "Could not locate {0}".format(versioned)
         return False
 
+    pri_file = os.path.join(location, package + ".pri")
+    if os.path.isfile(pri_file):
+        append_pri(pri_file, debug)
+
     if not installed:
         print "Copying package {0} into {1} for {2}".format(package, target_dir, configuration_name(debug))
         install_dependency(location, target_dir, debug)
-
-        pri_file = os.path.join(location, package + ".pri")
-        if os.path.isfile(pri_file):
-            append_pri(pri_file, debug)
 
         shutil.copy(os.path.join(location, rdep.PACKAGE_CONFIG_NAME), description_file)
 
@@ -108,15 +108,11 @@ def get_package(package):
 
     return True
 
-def copy_packages(packages):
+def get_dependencies():
     # Clear dependenciy files
     for debug in [ False, True ]:
         open(get_deps_pri_file(debug), "w").close()
 
-    return all([copy_package(package) for package in packages])
-
-
-def get_dependencies():
     packages = dependencies.get_packages()
     if not packages:
         print "No dependencies found"
