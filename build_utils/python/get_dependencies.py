@@ -46,9 +46,12 @@ def get_copy_list(package_dir):
 
     return config.get("General", "copy").split()
 
+def configuration_name(debug):
+    return "debug" if debug else "release"
+
 def install_dependency(dependency_dir, target_dir, debug):
     print "Installing dependency from {0}".format(dependency_dir)
-    bin_dst = os.path.join(target_dir, "bin", "debug" if debug else "release")
+    bin_dst = os.path.join(target_dir, "bin", configuration_name(debug))
     if not os.path.isdir(bin_dst):
         os.makedirs(bin_dst)
 
@@ -75,7 +78,7 @@ def get_package_for_configuration(package, debug):
     installed = os.path.isfile(description_file)
 
     if not installed:
-        print "Fetching package {0}".format(package)
+        print "Fetching package {0} for {1}".format(package, configuration_name(debug))
         rdep.fetch_packages(dependencies.TARGET, [ versioned ], debug)
 
     location = rdep.locate_package(dependencies.TARGET, versioned)
@@ -84,7 +87,7 @@ def get_package_for_configuration(package, debug):
         return False
 
     if not installed:
-        print "Copying package {0} into {1}".format(package, target_dir)
+        print "Copying package {0} into {1} for {2}".format(package, target_dir, configuration_name(debug))
         install_dependency(location, target_dir, debug)
 
         pri_file = os.path.join(location, package + ".pri")
