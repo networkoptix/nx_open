@@ -153,6 +153,11 @@ void socketSimpleSync(
     const QByteArray& testMessage = kTestMessage,
     int clientCount = kClientCount)
 {
+    auto failClient = clientMaker();
+    EXPECT_FALSE(failClient->connect(endpointToConnectTo, kTestTimeout.count()));
+    ASSERT_NE(SystemError::getLastOSErrorCode(), SystemError::noError);
+    failClient.reset();
+
     std::promise<void> promise;
     std::thread serverThread(
         syncSocketServerMainFunc<ServerSocketMaker>,
@@ -206,6 +211,14 @@ void socketSimpleAsync(
 {
     nx::TestSyncQueue< SystemError::ErrorCode > serverResults;
     nx::TestSyncQueue< SystemError::ErrorCode > clientResults;
+
+    auto failClient = clientMaker();
+    ASSERT_TRUE(failClient->setNonBlockingMode(true));
+    ASSERT_TRUE(failClient->setSendTimeout(1000));
+    failClient->connectAsync(endpointToConnectTo, clientResults.pusher());
+    ASSERT_NE(clientResults.pop(), SystemError::noError);
+    failClient->pleaseStopSync();
+    failClient.reset();
 
     auto server = serverMaker();
     ASSERT_TRUE(server->setNonBlockingMode(true));
