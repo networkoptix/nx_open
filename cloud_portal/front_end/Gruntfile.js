@@ -67,7 +67,7 @@ module.exports = function (grunt) {
                     livereload: '<%= connect.options.livereload %>'
                 },
                 files: [
-                    '<%= yeoman.app %>/{,*/}*.html',
+                    '<%= yeoman.app %>/**.html',
                     '.tmp/styles/{,*/}*.css',
                     '<%= yeoman.app %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}'
                 ]
@@ -83,8 +83,14 @@ module.exports = function (grunt) {
                 livereload: 35729
             },
             proxies: [
-                {context: '/api/',    host: '127.0.0.1', port: 8000},
-                {context: '/notifications/',    host: '127.0.0.1', port: 8000}
+                // Local pyhton manage.py runserver
+                /*{context: '/api/',    host: '127.0.0.1', port: 8000},
+                {context: '/notifications/',    host: '127.0.0.1', port: 8000}/**/
+
+
+                // cloud-demo.hdw.mx
+                {context: '/api/',    host: 'cloud-demo.hdw.mx', port: 80},
+                {context: '/notifications/',    host: 'cloud-demo.hdw.mx', port: 80}/**/
             ],
             livereload: {
                 options: {
@@ -315,7 +321,7 @@ module.exports = function (grunt) {
                     {
                         expand: true,
                         cwd: '<%= yeoman.app %>/images',
-                        src: '{,*/}*.{png,jpg,jpeg,gif}',
+                        src: '{,*/}*.{png,jpg,jpeg}',
                         dest: '<%= yeoman.dist %>/images'
                     }
                 ]
