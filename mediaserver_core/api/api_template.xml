@@ -316,6 +316,7 @@
                     </description>
                     <optional>false</optional>
                   </param>
+                </params>
                 <result>
                   <caption>Json result with error code</caption>
                 </result>
@@ -341,9 +342,10 @@
                     <description> New system name </description>
                     <optional>false</optional>
                   </param>
-                  <result>
-                    <caption>Json result with error code</caption>
-                  </result>
+                </params>
+                <result>
+                  <caption>Json result with error code</caption>
+                </result>
               </function>
               <function>
                 <name>setupCloudSystem</name>
@@ -357,6 +359,7 @@
                     <description> Current password for admin user </description>
                     <optional>false</optional>
                   </param>
+                  <param>
                     <name>systemName</name>
                     <description> New system name </description>
                     <optional>false</optional>
@@ -371,10 +374,10 @@
                     <description> could system id </description>
                     <optional>false</optional>
                   </param>
-                  <param>
-                  <result>
-                    <caption>Json result with error code</caption>
-                  </result>
+                </params>
+                <result>
+                  <caption>Json result with error code</caption>
+                </result>
                 </function>
                 <function>
                     <name>doCameraDiagnosticsStep</name>
