@@ -244,6 +244,7 @@ private:
     QElapsedTimer m_clearMotionTimer;
     QElapsedTimer m_clearBookmarksTimer;
     QElapsedTimer m_removeEmtyDirTimer;
+    QElapsedTimer m_vacuumDbTimer;
     QMap<QString, qint64> m_lastCatalogTimes;
     QSharedPointer <QnStorageDbPool> m_storageDbPoolRef;
     std::unique_ptr<QnScheduleSync> m_scheduleSync;

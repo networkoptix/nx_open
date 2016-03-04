@@ -24,14 +24,14 @@ public:
     VacuumHandler(QnStorageDb::UuidToCatalogs &readData) : m_readData(readData) {}
 
 public:
-    void handleCameraOp(const nx::media_db::CameraOperation &cameraOp,
-                        nx::media_db::Error error) override
+    void handleCameraOp(const nx::media_db::CameraOperation &/*cameraOp*/,
+                        nx::media_db::Error /*error*/) override
     {
 
     }
 
-    void handleMediaFileOp(const nx::media_db::MediaFileOperation &mediaFileOp,
-                           nx::media_db::Error error) override
+    void handleMediaFileOp(const nx::media_db::MediaFileOperation &/*mediaFileOp*/,
+                           nx::media_db::Error /*error*/) override
     {
 
     }
@@ -87,6 +87,13 @@ bool QnStorageDb::deleteRecords(const QString& cameraUniqueId,
                                 qint64 startTimeMs)
 {
     QnMutexLocker lk(&m_modeMutex);
+    return deleteRecordsUnsafe(cameraUniqueId, catalog, startTimeMs);
+}
+
+bool QnStorageDb::deleteRecordsUnsafe(const QString& cameraUniqueId,
+                                      QnServer::ChunksCatalog catalog,
+                                      qint64 startTimeMs)
+{
     int cameraId;
     {
         QnMutexLocker lk(&m_syncMutex);
@@ -122,12 +129,18 @@ bool QnStorageDb::deleteRecords(const QString& cameraUniqueId,
     return true;
 }
 
-
-bool QnStorageDb::addRecord(const QString& cameraUniqueId, 
-                            QnServer::ChunksCatalog catalog, 
+bool QnStorageDb::addRecord(const QString& cameraUniqueId,
+                            QnServer::ChunksCatalog catalog,
                             const DeviceFileCatalog::Chunk& chunk)
 {
     QnMutexLocker lk(&m_modeMutex);
+    return addRecordUnsafe(cameraUniqueId, catalog, chunk);
+}
+
+bool QnStorageDb::addRecordUnsafe(const QString& cameraUniqueId,
+                                  QnServer::ChunksCatalog catalog,
+                                  const DeviceFileCatalog::Chunk& chunk)
+{
     int cameraId;
     {
         QnMutexLocker lk(&m_syncMutex);
@@ -171,11 +184,12 @@ bool QnStorageDb::replaceChunks(const QString& cameraUniqueId,
                                 const std::deque<DeviceFileCatalog::Chunk>& chunks)
 {
     bool result = true;
-    bool delResult = deleteRecords(cameraUniqueId, catalog, -1);
+    QnMutexLocker lk(&m_modeMutex);
+    bool delResult = deleteRecordsUnsafe(cameraUniqueId, catalog, -1);
 
     for (const auto &chunk : chunks)
     {
-        bool addResult = addRecord(cameraUniqueId, catalog, chunk);
+        bool addResult = addRecordUnsafe(cameraUniqueId, catalog, chunk);
         result = result && addResult;
     }
     return result && delResult;

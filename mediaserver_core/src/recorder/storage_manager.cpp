@@ -431,6 +431,7 @@ QnStorageManager::QnStorageManager(QnServer::StoragePool role):
     m_clearMotionTimer.restart();
     m_clearBookmarksTimer.restart();
     m_removeEmtyDirTimer.invalidate();
+    m_vacuumDbTimer.restart();
 }
 
 //std::deque<DeviceFileCatalog::Chunk> QnStorageManager::correctChunksFromMediaData(const DeviceFileCatalogPtr &fileCatalog, const QnStorageResourcePtr &storage, const std::deque<DeviceFileCatalog::Chunk>& chunks)
@@ -1187,6 +1188,13 @@ void QnStorageManager::clearSpace(bool forced)
         m_removeEmtyDirTimer.restart();
         for (const QnStorageResourcePtr &storage : storages)
             removeEmptyDirs(storage);
+    }
+
+    if (!m_vacuumDbTimer.isValid() || m_vacuumDbTimer.elapsed() > MSECS_PER_DAY)
+    {
+        m_vacuumDbTimer.restart();
+        for (const QnStorageResourcePtr &storage : storages)
+            addDataFromDatabase(storage);
     }
 
     // 4. DB cleanup

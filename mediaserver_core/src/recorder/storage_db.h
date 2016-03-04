@@ -75,6 +75,13 @@ private:
     bool checkDataConsistency(const UuidToCatalogs &readDataCopy) const;
     bool startDbFile();
 
+    bool deleteRecordsUnsafe(const QString& cameraUniqueId, 
+                             QnServer::ChunksCatalog catalog, 
+                             qint64 startTimeMs = -1);
+
+    bool addRecordUnsafe(const QString& cameraUniqueId,
+                         QnServer::ChunksCatalog catalog,
+                         const DeviceFileCatalog::Chunk& chunk);
 private:
     QnStorageResourcePtr m_storage;
     int m_storageIndex;
