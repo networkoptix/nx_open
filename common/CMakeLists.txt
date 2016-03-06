@@ -1,42 +1,26 @@
-###
-# Copyright (c) 2009, Paul Gideon Dann
-#
-# Permission to use, copy, modify, and/or distribute this software for any
-# purpose with or without fee is hereby granted, provided that the above
-# copyright notice and this permission notice appear in all copies.
-#
-# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-###
-
 cmake_minimum_required(VERSION 2.8.11)
 
 # Default configuration values. These must be before the project command or
 # they won't work in Windows.
 # If no build type is specified, default to "Release"
 
-if (NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE Release CACHE STRING
-      "Release Debug RelWithDebInfo"
-      FORCE)
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release CACHE STRING
+        "Release Debug RelWithDebInfo"
+        FORCE)
 endif()
 # Install to "dist" directory in Windows for testing and as a staging directory
 # for the installer.
-if (WIN32 AND NOT CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX dist CACHE STRING "Install path prefix.")
+if(WIN32 AND NOT CMAKE_INSTALL_PREFIX)
+    set(CMAKE_INSTALL_PREFIX dist CACHE STRING "Install path prefix.")
 endif()
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/defines.h.cmake
                ${CMAKE_CURRENT_BINARY_DIR}/defines.h)
 
 include(default_properties)
-message (${CMAKE_PREFIX_PATH})
-               
+message(${CMAKE_PREFIX_PATH})
+
 project(common)
 set(PROJECT_SHORTNAME "common")
 set(PROJECT_LONGNAME "${company.name} Common Library")
@@ -45,8 +29,8 @@ set(PROJECT_VERSION "2.5.0")
 include(default_project_properties)
 # Additional Include Directories
 include_directories($ENV{environment}/boost_1_56_0
-                    src 
-                    ${CMAKE_SOURCE_DIR}/common/src 
+                    src
+                    ${CMAKE_SOURCE_DIR}/common/src
                     $ENV{environment}/include
                     #$ENV{environment}/include/ffmpeg-misc-headers-win32
                     $ENV{environment}/include/glext
@@ -84,11 +68,11 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 
-add_definitions(-DUSE_NX_HTTP 
+add_definitions(-DUSE_NX_HTTP
                 -DNOMINMAX=
-                -D__STDC_CONSTANT_MACROS 
-                -D_USING_V110_SDK71_ 
-                -DENABLE_VMAX 
+                -D__STDC_CONSTANT_MACROS
+                -D_USING_V110_SDK71_
+                -DENABLE_VMAX
                 -DQN_EXPORT=
                 -DUNICODE
                 -DENABLE_ONVIF
@@ -96,7 +80,7 @@ add_definitions(-DUSE_NX_HTTP
                 -DENABLE_ACTI
                 -DENABLE_ARECONT
                 -DENABLE_DLINK
-                -DENABLE_DROID                
+                -DENABLE_DROID
                 -DENABLE_TEST_CAMERA
                 -DENABLE_STARDOT
                 -DENABLE_IQE
@@ -117,30 +101,30 @@ add_definitions(-DUSE_NX_HTTP
                 -DUDT_API=__declspec\(dllimport\)
                 )
 
-if (NOT SKIP_GEN)
-  file (GLOB_RECURSE FILTERED_FILES "${PROJECT_SOURCE_DIR}/resources/filter/*")
-  foreach(filename ${FILTERED_FILES})
-    string (REPLACE "${PROJECT_SOURCE_DIR}/resources/filter/" "" filename ${filename})
-    configure_file(${PROJECT_SOURCE_DIR}/resources/filter/${filename}
-                   ${CMAKE_CURRENT_BINARY_DIR}/${filename})
-    message ("Filtering and Copying: " ${filename})
-  endforeach(filename ${FILTERED_FILES})
+if(NOT SKIP_GEN)
+    file(GLOB_RECURSE FILTERED_FILES "${PROJECT_SOURCE_DIR}/resources/filter/*")
+    foreach(filename ${FILTERED_FILES})
+        string(REPLACE "${PROJECT_SOURCE_DIR}/resources/filter/" "" filename ${filename})
+        configure_file(${PROJECT_SOURCE_DIR}/resources/filter/${filename}
+                       ${CMAKE_CURRENT_BINARY_DIR}/${filename})
+        message("Filtering and Copying: " ${filename})
+    endforeach(filename ${FILTERED_FILES})
 
-  file (GLOB_RECURSE COMMON_FILTERED_FILES "${CMAKE_SOURCE_DIR}/cpp/resources/filter/*") 
-  foreach(filename ${COMMON_FILTERED_FILES})
-    string (REPLACE "${CMAKE_SOURCE_DIR}/cpp/resources/filter/" "" filename ${filename})
-    configure_file(${CMAKE_SOURCE_DIR}/cpp/resources/filter/${filename}
-                   ${CMAKE_CURRENT_BINARY_DIR}/${filename})
-    message ("Filtering and Copying: " ${filename})
-  endforeach(filename ${COMMON_FILTERED_FILES})  
-  
-  #configure_file(${CMAKE_SOURCE_DIR}/cpp/scripts/gen_resources.py
-  #               ${CMAKE_CURRENT_BINARY_DIR}/gen_resources.py) 
-  #file(GLOB RESOURCES "${PROJECT_SOURCE_DIR}/resources/filter/*")
-  file(COPY ${RESOURCES} DESTINATION ${PROJECT_BINARY_DIR})
-  execute_process( 
-    COMMAND $ENV{environment}/python/x64/python.exe ${CMAKE_CURRENT_BINARY_DIR}/gen_resources.py
-  )
+    file(GLOB_RECURSE COMMON_FILTERED_FILES "${CMAKE_SOURCE_DIR}/cpp/resources/filter/*")
+    foreach(filename ${COMMON_FILTERED_FILES})
+        string(REPLACE "${CMAKE_SOURCE_DIR}/cpp/resources/filter/" "" filename ${filename})
+        configure_file(${CMAKE_SOURCE_DIR}/cpp/resources/filter/${filename}
+                    ${CMAKE_CURRENT_BINARY_DIR}/${filename})
+        message("Filtering and Copying: " ${filename})
+    endforeach(filename ${COMMON_FILTERED_FILES})
+
+    #configure_file(${CMAKE_SOURCE_DIR}/cpp/scripts/gen_resources.py
+    #               ${CMAKE_CURRENT_BINARY_DIR}/gen_resources.py)
+    #file(GLOB RESOURCES "${PROJECT_SOURCE_DIR}/resources/filter/*")
+    file(COPY ${RESOURCES} DESTINATION ${PROJECT_BINARY_DIR})
+    execute_process(
+        COMMAND $ENV{environment}/python/x64/python.exe ${CMAKE_CURRENT_BINARY_DIR}/gen_resources.py
+    )
 endif()
 
 # Configure Qt
@@ -156,9 +140,9 @@ find_package(Qt5LinguistTools)
 find_package(Qt5Widgets)
 
 # Windows application icon
-#if (WIN32)
+#if(WIN32)
   #set(WINDOWS_RES_FILE ${PROJECT_BINARY_DIR}/${PROJECT_SHORTNAME}.obj)
-  #if (MSVC)
+  #if(MSVC)
   #  add_custom_command(OUTPUT ${WINDOWS_RES_FILE}
   #    COMMAND rc.exe /fo ${WINDOWS_RES_FILE} ${PROJECT_BINARY_DIR}/${PROJECT_SHORTNAME}.rc
   #    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/win
@@ -171,9 +155,16 @@ find_package(Qt5Widgets)
   #endif()
 #endif()
 
-if (NOT MSVC)
-  # Enable the C++11 standard
-  set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} -std=c++11 -Werror=enum-compare -Werror=reorder -Werror=delete-non-virtual-dtor -Werror=return-type -Werror=conversion-null -Wuninitialized)
+if(NOT MSVC)
+    # Enable the C++11 standard
+    set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS}
+        -std=c++11
+        -Werror=enum-compare
+        -Werror=reorder
+        -Werror=delete-non-virtual-dtor
+        -Werror=return-type
+        -Werror=conversion-null
+        -Wuninitialized)
 endif()
 
 file(GLOB_RECURSE UI_FILES src/*.ui)
@@ -181,51 +172,51 @@ file(GLOB_RECURSE CODE_FILES src/*.cpp)
 
 set(CPP_FILES ${CODE_FILES})
 
-foreach (filename ${CODE_FILES})
-  if(filename MATCHES "_unix.cpp" OR filename MATCHES "_win.cpp")
-    #message (${filename})
-    list(REMOVE_ITEM CPP_FILES ${filename})
-  endif()
-  if (UNIX)
-    if(filename MATCHES "_unix.cpp")
-      #message (${filename})
-      list(APPEND CPP_FILES ${filename})
-    endif()  
-  elseif (WIN32)
-    if(filename MATCHES "_win.cpp")
-      #message (${filename})
-      list(APPEND CPP_FILES ${filename})
-    endif()  
-  endif()  
-endforeach (filename ${CODE_FILES})
+foreach(filename ${CODE_FILES})
+    if(filename MATCHES "_unix.cpp" OR filename MATCHES "_win.cpp")
+        #message(${filename})
+        list(REMOVE_ITEM CPP_FILES ${filename})
+    endif()
+    if(UNIX)
+        if(filename MATCHES "_unix.cpp")
+            #message(${filename})
+            list(APPEND CPP_FILES ${filename})
+        endif()
+    elseif(WIN32)
+        if(filename MATCHES "_win.cpp")
+            #message(${filename})
+            list(APPEND CPP_FILES ${filename})
+        endif()
+    endif()
+endforeach(filename ${CODE_FILES})
 
 list(REMOVE_DUPLICATES CPP_FILES)
 
-foreach (filename ${CPP_FILES})
-  message (${filename}) 
-endforeach (filename ${CPP_FILES})
+foreach(filename ${CPP_FILES})
+    message(${filename})
+endforeach(filename ${CPP_FILES})
 
-file (GLOB_RECURSE ALL_TRANSLATION_FILES "${PROJECT_SOURCE_DIR}/translations/*")
-foreach (filename ${ALL_TRANSLATION_FILES})
-  foreach (translation ${translations})
-    if(filename MATCHES "${translation}.ts")
-      get_filename_component(NAME ${filename} NAME)
-      get_filename_component(PATH ${filename} PATH)
-      list(APPEND TRANSLATION_FILES ${filename})
-      #list(APPEND QM_FILES ${PATH}/${NAME}.qm)
-    endif()  
-  endforeach (${translation})
+file(GLOB_RECURSE ALL_TRANSLATION_FILES "${PROJECT_SOURCE_DIR}/translations/*")
+foreach(filename ${ALL_TRANSLATION_FILES})
+    foreach(translation ${translations})
+        if(filename MATCHES "${translation}.ts")
+            get_filename_component(NAME ${filename} NAME)
+            get_filename_component(PATH ${filename} PATH)
+            list(APPEND TRANSLATION_FILES ${filename})
+            #list(APPEND QM_FILES ${PATH}/${NAME}.qm)
+        endif()
+    endforeach(${translation})
 endforeach(filename ${ALL_TRANSLATION_FILES})
 
-foreach (filename ${TRANSLATION_FILES})
-  message ("Adding translation: " ${filename}) 
-endforeach (filename ${TRANSLATION_FILES})
+foreach(filename ${TRANSLATION_FILES})
+    message("Adding translation: " ${filename})
+endforeach(filename ${TRANSLATION_FILES})
 
 QT5_ADD_TRANSLATION(QM_FILES ${TRANSLATION_FILES})
 
-foreach (filename ${QM_FILES})
-  message ("Adding translation: " ${filename}) 
-endforeach (filename ${QM_FILES})
+foreach(filename ${QM_FILES})
+    message("Adding translation: " ${filename})
+endforeach(filename ${QM_FILES})
 
 qt5_wrap_ui(UI_HEADERS ${UI_FILES})
 qt5_add_resources(RESOURCE_FILES ${PROJECT_BINARY_DIR}/${PROJECT_SHORTNAME}.qrc)
@@ -252,24 +243,16 @@ add_library(${PROJECT_SHORTNAME} STATIC
   ${SETDDM}
 )
 target_link_libraries(${PROJECT_SHORTNAME}
-  Qt5::Core Qt5::Gui Qt5::Network Ws2_32.lib glu32.lib opengl32.lib odbccp32.lib 
+  Qt5::Core Qt5::Gui Qt5::Network Ws2_32.lib glu32.lib opengl32.lib odbccp32.lib
 )
 
 set_target_properties(${PROJECT_SHORTNAME} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "src/stdafx.h")
 cotire(${PROJECT_SHORTNAME})
 
-# Testing configuration
-# enable_testing()
-# set(TEST_LINK_LIBRARIES Qt5::Test)
-
-if (UNIX)
-  install(TARGETS ${PROJECT_SHORTNAME}
-          RUNTIME DESTINATION bin)
-elseif (WIN32)
-  install(TARGETS ${PROJECT_SHORTNAME}
-          DESTINATION .)
+if(UNIX)
+    install(TARGETS ${PROJECT_SHORTNAME}
+            RUNTIME DESTINATION bin)
+elseif(WIN32)
+    install(TARGETS ${PROJECT_SHORTNAME}
+            DESTINATION .)
 endif()
-
-#if (WIN32)
-#  add_subdirectory(win)
-#endif()
