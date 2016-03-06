@@ -49,7 +49,7 @@ if (WIN32)
   if(MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
     message(STATUS "Added parallel build arguments to CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
-  endif()  
+  endif()
 endif()
 
 set (qt.version 5.6.0)
@@ -69,7 +69,7 @@ endif()
 set(
   CMAKE_MODULE_PATH
     ${CMAKE_MODULE_PATH}
-    ${PROJECT_SOURCE_DIR}/modules
+    ${PROJECT_SOURCE_DIR}/build_utils/cmake
 )
 
 #file(STRINGS "${CMAKE_SOURCE_DIR}/customization/default-values.properties" product.name.short)
