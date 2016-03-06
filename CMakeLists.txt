@@ -60,6 +60,7 @@ set(CMAKE_MODULE_PATH
 
 include(add_module)
 include(cotire)
+include(find_sources)
 #include(println)
 
 add_module(
