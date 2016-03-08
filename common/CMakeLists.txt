@@ -18,9 +18,6 @@ endif()
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/defines.h.cmake
                ${CMAKE_CURRENT_BINARY_DIR}/defines.h)
 
-include(default_properties)
-message(${CMAKE_PREFIX_PATH})
-
 project(common)
 set(PROJECT_SHORTNAME "common")
 set(PROJECT_LONGNAME "${company.name} Common Library")
@@ -29,46 +26,16 @@ set(PROJECT_VERSION "2.6.0")
 include(default_project_properties)
 
 # Additional Include Directories
-include_directories($ENV{environment}/boost_1_56_0
-                    src
-                    ${CMAKE_SOURCE_DIR}/common/src
-                    $ENV{environment}/include
-                    #$ENV{environment}/include/ffmpeg-misc-headers-win32
-                    $ENV{environment}/include/glext
-                    $ENV{environment}/qt5-custom
-                    ${CMAKE_SOURCE_DIR}/common_libs/nx_utils/src
-                    ${CMAKE_SOURCE_DIR}/common_libs/nx_network/src
-                    ${CMAKE_SOURCE_DIR}/common_libs/nx_streaming/src
-                    ${CMAKE_SOURCE_DIR}/common_libs/nx_media/src
-                    ${CMAKE_SOURCE_DIR}/common_libs/nx_audio/src
-                    $ENV{environment}/qt5-custom
-                    $ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}/include/QtZlib
-                    $ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}/include/QtCore/${qt.version}/QtCore
-                    $ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}/include/QtCore/${qt.version}
-                    $ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}/include/QtCore
-                    $ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}/include/QtQuick/${qt.version}/QtQuick
-                    $ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}/include/QtQuick/${qt.version}
-                    $ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}/include/QtQuick
-                    $ENV{environment}/artifacts/openal/${openal.version}/include
-                    $ENV{environment}/artifacts/openal/${openal.version}/include/AL
-                    $ENV{environment}/artifacts/directx/${directx.version}/include
-                    $ENV{environment}/artifacts/festival/${festival.version}/include
-                    $ENV{environment}/artifacts/ffmpeg/${ffmpeg.version}/include
-                    $ENV{environment}/artifacts/gmock/${gmock.version}/include
-                    $ENV{environment}/artifacts/gtest/${gtest.version}/include
-                    $ENV{environment}/artifacts/mfx/${mfx.version}/include
-                    $ENV{environment}/artifacts/onvif/${onvif.version}/include
-                    $ENV{environment}/artifacts/openssl/${openssl.version}/include
-                    $ENV{environment}/artifacts/quazip/${quazip.version}/include
-                    $ENV{environment}/artifacts/sigar/${sigar.version}/include
-                    $ENV{environment}/artifacts/vmax_integration/${vmax_integration.version}/include
-                    )
-
 # Global CMake options
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 #set (CMAKE_AUTOMOC_MOC_OPTIONS "-bstdafx.h" "-fstdafx.h")
+
+# Additional Include Directories
+include_directories (${include_directories}
+                    src
+                    )
 
 # Configure Qt
 find_package(Qt5Core REQUIRED)

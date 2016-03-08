@@ -35,8 +35,19 @@ if(WIN32)
         message(STATUS "Added parallel build arguments to CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
     endif()
 endif()
-
-set(qt.version 5.6.0)
+set (openal.version "1.16")
+set (directx.version "JUN2010")
+set (festival.version "2.1")
+set (ffmpeg.version "0.11.4")
+set (gmock.version "1.7.0")
+set (gtest.version "1.7.0")
+set (mfx.version "2012-R2")
+set (onvif.version "2.1.2-io")
+set (openssl.version "1.0.2e")
+set (quazip.version "0.6.2")
+set (sigar.version "1.7")
+set (vmax_integration.version "2.1")
+set (qt.version 5.6.0)
 
 set(CMAKE_PREFIX_PATH "$ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}")
 if(NOT CMAKE_BUILD_TYPE)
@@ -44,25 +55,7 @@ if(NOT CMAKE_BUILD_TYPE)
         "Debug Release RelWithDebInfo"
         FORCE)
 endif()
-# Install to "dist" directory in Windows for testing and as a staging directory
-# for the installer.
-if(WIN32 AND NOT CMAKE_INSTALL_PREFIX)
-    set(CMAKE_INSTALL_PREFIX dist CACHE STRING "Install path prefix.")
-endif()
 
-set(CMAKE_MODULE_PATH
-    ${CMAKE_MODULE_PATH}
-    ${PROJECT_SOURCE_DIR}/build_utils/cmake
-)
-
-#file(STRINGS "${CMAKE_SOURCE_DIR}/customization/default-values.properties" product.name.short)
-#file(STRINGS "${CMAKE_SOURCE_DIR}/customization/${customization}/build.properties" product.name.short)
-
-include(add_module)
-include(cotire)
-include(find_sources)
-include(add_translations)
-include(process_resources)
 add_definitions(-DUSE_NX_HTTP
                 -DNOMINMAX=
                 -D__STDC_CONSTANT_MACROS
@@ -95,8 +88,59 @@ add_definitions(-DUSE_NX_HTTP
                 -DNX_UTILS_API=__declspec\(dllimport\)
                 -DUDT_API=__declspec\(dllimport\)
                 )
-#include(println)
 
+# Install to "dist" directory in Windows for testing and as a staging directory
+# for the installer.
+if(WIN32 AND NOT CMAKE_INSTALL_PREFIX)
+    set(CMAKE_INSTALL_PREFIX dist CACHE STRING "Install path prefix.")
+endif()
+
+set(CMAKE_MODULE_PATH
+    ${CMAKE_MODULE_PATH}
+    ${PROJECT_SOURCE_DIR}/build_utils/cmake
+)
+
+include(default_properties)
+include(add_module)
+include(cotire)
+include(find_sources)
+include(add_translations)
+include(process_resources)
+
+include_directories($ENV{environment}/boost_1_56_0
+                    ${CMAKE_SOURCE_DIR}/common/src
+                    $ENV{environment}/include
+                    #$ENV{environment}/include/ffmpeg-misc-headers-win32
+                    $ENV{environment}/include/glext
+                    $ENV{environment}/qt5-custom
+                    ${CMAKE_SOURCE_DIR}/common_libs/nx_utils/src
+                    ${CMAKE_SOURCE_DIR}/common_libs/nx_network/src
+                    ${CMAKE_SOURCE_DIR}/common_libs/nx_streaming/src
+                    ${CMAKE_SOURCE_DIR}/common_libs/nx_media/src
+                    ${CMAKE_SOURCE_DIR}/common_libs/nx_audio/src
+                    $ENV{environment}/qt5-custom
+                    $ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}/include/QtZlib
+                    $ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}/include/QtCore/${qt.version}/QtCore
+                    $ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}/include/QtCore/${qt.version}
+                    $ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}/include/QtCore
+                    $ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}/include/QtQuick/${qt.version}/QtQuick
+                    $ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}/include/QtQuick/${qt.version}
+                    $ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}/include/QtQuick
+                    $ENV{environment}/artifacts/openal/${openal.version}/include
+                    $ENV{environment}/artifacts/openal/${openal.version}/include/AL
+                    $ENV{environment}/artifacts/directx/${directx.version}/include
+                    $ENV{environment}/artifacts/festival/${festival.version}/include
+                    $ENV{environment}/artifacts/ffmpeg/${ffmpeg.version}/include
+                    $ENV{environment}/artifacts/gmock/${gmock.version}/include
+                    $ENV{environment}/artifacts/gtest/${gtest.version}/include
+                    $ENV{environment}/artifacts/mfx/${mfx.version}/include
+                    $ENV{environment}/artifacts/onvif/${onvif.version}/include
+                    $ENV{environment}/artifacts/openssl/${openssl.version}/include
+                    $ENV{environment}/artifacts/quazip/${quazip.version}/include
+                    $ENV{environment}/artifacts/sigar/${sigar.version}/include
+                    $ENV{environment}/artifacts/vmax_integration/${vmax_integration.version}/include
+                    )
+                    
 add_module(
     NAMES
         nxtool

@@ -46,8 +46,8 @@ function(find_sources src_dir)
 
     set(CPP_FILES ${RESULT_FILES} PARENT_SCOPE)
     set(UI_FILES ${UI_FILES} PARENT_SCOPE)
-  foreach(filename ${RESULT_FILES})
-    message("Adding source: " ${filename})
-  endforeach(filename ${RESULT_FILES})      
+  #foreach(filename ${RESULT_FILES})
+  #  message("Adding source: " ${filename})
+  #endforeach(filename ${RESULT_FILES})      
     
 endfunction()

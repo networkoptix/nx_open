@@ -11,9 +11,9 @@ function(add_translations src_dir)
       endforeach(${translation})
   endforeach(filename ${ALL_TRANSLATION_FILES})
 
-  foreach(filename ${TRANSLATION_FILES})
-      message("Adding translation: " ${filename})
-  endforeach(filename ${TRANSLATION_FILES})
+  #foreach(filename ${TRANSLATION_FILES})
+  #    message("Adding translation: " ${filename})
+  #endforeach(filename ${TRANSLATION_FILES})
   
   find_package(Qt5LinguistTools)
   QT5_ADD_TRANSLATION(QM_FILES ${TRANSLATION_FILES})    

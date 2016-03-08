@@ -34,9 +34,7 @@ endif()
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/defines.h.cmake
                ${CMAKE_CURRENT_BINARY_DIR}/defines.h)
-
-include(default_properties)
-               
+              
 project(nxtool)
 set(PROJECT_SHORTNAME "nxtool")
 set(PROJECT_LONGNAME "${nxtool.company.name} Server Tool")
@@ -53,10 +51,8 @@ set(CMAKE_AUTOUIC ON)
 #file(STRINGS "${CMAKE_SOURCE_DIR}/customization/${customization}/build.properties" product.name.short)
 
 # Additional Include Directories
-include_directories (src 
-                    ${CMAKE_SOURCE_DIR}/common/src 
-                    $ENV{environment}/include 
-                    $ENV{environment}/boost_1_56_0
+include_directories (${include_directories}
+                    src
                     )
 
 # Configure Qt
