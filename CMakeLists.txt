@@ -7,6 +7,11 @@ set(majorVersion 2)
 set(minorVersion 6)
 set(incrementalVersion 0)
 
+# Global CMake options
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
+
 if(NOT customization)
     set(customization default)
 endif()
@@ -54,6 +59,18 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release CACHE STRING
         "Debug Release RelWithDebInfo"
         FORCE)
+endif()
+
+if(NOT MSVC)
+    # Enable the C++11 standard
+    set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS}
+        -std=c++11
+        -Werror=enum-compare
+        -Werror=reorder
+        -Werror=delete-non-virtual-dtor
+        -Werror=return-type
+        -Werror=conversion-null
+        -Wuninitialized)
 endif()
 
 add_definitions(-DUSE_NX_HTTP
@@ -105,7 +122,9 @@ include(add_module)
 include(cotire)
 include(find_sources)
 include(add_translations)
+include(process_rc)
 include(process_resources)
+include(precompiled_header)
 
 include_directories($ENV{environment}/boost_1_56_0
                     ${CMAKE_SOURCE_DIR}/common/src
@@ -140,10 +159,29 @@ include_directories($ENV{environment}/boost_1_56_0
                     $ENV{environment}/artifacts/sigar/${sigar.version}/include
                     $ENV{environment}/artifacts/vmax_integration/${vmax_integration.version}/include
                     )
+
+LINK_DIRECTORIES($ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}
+                 $ENV{environment}/artifacts/openal/${openal.version}/${platform}/${box}/${arch}/lib/${configuration}
+                 $ENV{environment}/artifacts/directx/${directx.version}/${platform}/${box}/${arch}/lib/${configuration}
+                 $ENV{environment}/artifacts/festival/${festival.version}/${platform}/${box}/${arch}/lib/${configuration}
+                 $ENV{environment}/artifacts/ffmpeg/${ffmpeg.version}/${platform}/${box}/${arch}/lib/${configuration}
+                 $ENV{environment}/artifacts/gmock/${gmock.version}/${platform}/${box}/${arch}/lib/${configuration}
+                 $ENV{environment}/artifacts/gtest/${gtest.version}/${platform}/${box}/${arch}/lib/${configuration}
+                 $ENV{environment}/artifacts/mfx/${mfx.version}/${platform}/${box}/${arch}/lib/${configuration}
+                 $ENV{environment}/artifacts/onvif/${onvif.version}/${platform}/${box}/${arch}/lib/${configuration}
+                 $ENV{environment}/artifacts/openssl/${openssl.version}/${platform}/${box}/${arch}/lib/${configuration}
+                 $ENV{environment}/artifacts/quazip/${quazip.version}/${platform}/${box}/${arch}/lib/${configuration}
+                 $ENV{environment}/artifacts/sigar/${sigar.version}/${platform}/${box}/${arch}/lib/${configuration}
+                 $ENV{environment}/artifacts/vmax_integration/${vmax_integration.version}/${platform}/${box}/${arch}/lib/${configuration}
+                 )                    
+                    
+find_package(Qt5Widgets REQUIRED)
+find_package(Qt5Core REQUIRED)
+find_package(Qt5LinguistTools)
                     
 add_module(
     NAMES
         nxtool
-        common
+        #common
     STATUS_SHORT_NAMES
 )

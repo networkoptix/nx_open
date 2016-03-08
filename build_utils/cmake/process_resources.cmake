@@ -1,4 +1,7 @@
 function(process_resources)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/defines.h.cmake
+                 ${CMAKE_CURRENT_BINARY_DIR}/defines.h
+                 )
   file(GLOB_RECURSE FILTERED_FILES "${PROJECT_SOURCE_DIR}/resources/filter/*")
   foreach(filename ${FILTERED_FILES})
     string(REPLACE "${PROJECT_SOURCE_DIR}/resources/filter/" "" filename ${filename})
@@ -19,7 +22,5 @@ function(process_resources)
   #               ${CMAKE_CURRENT_BINARY_DIR}/gen_resources.py)
   #file(GLOB RESOURCES "${PROJECT_SOURCE_DIR}/resources/filter/*")
   #file(COPY ${RESOURCES} DESTINATION ${PROJECT_BINARY_DIR})
-  execute_process(
-      COMMAND $ENV{environment}/python/x64/python.exe ${CMAKE_CURRENT_BINARY_DIR}/gen_resources.py
-  )  
+  execute_process(COMMAND $ENV{environment}/python/x64/python.exe ${CMAKE_CURRENT_BINARY_DIR}/gen_resources.py)  
 endfunction()
