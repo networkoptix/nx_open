@@ -24,6 +24,8 @@
 #include <QtCore/QByteArray>
 #include <QtCore/QSettings>
 
+#include <utils/common/log.h>
+
 #include "util.h"
 #include "licensing/hardware_info.h"
 #include "hardware_id.h"
@@ -33,6 +35,86 @@
 # pragma comment(lib, "wbemuuid.lib")
 
 namespace LLUtil {
+
+HRESULT GetDisabledNICS(IWbemServices *pSvc, std::vector<_bstr_t>& paths) {
+    HRESULT hres;
+
+    IEnumWbemClassObject* pEnumerator = NULL;
+    hres = pSvc->ExecQuery( L"WQL", L"SELECT * FROM Win32_NetworkAdapter WHERE PhysicalAdapter=true AND NetEnabled=false",
+        WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY, NULL, &pEnumerator);
+
+    if (FAILED(hres))
+    {
+        NX_LOG(QString(lit("GetDisabledNICS(): ExecQuery failed. Error code = 0x%1, Message: %2")).arg((long)hres, 0, 16).arg(QString::fromWCharArray(_com_error(hres).ErrorMessage())), cl_logINFO);
+        return 1;               // Program has failed.
+    }
+
+    // Get the data from the WQL sentence
+    IWbemClassObject *pclsObj = NULL;
+    ULONG uReturn = 0;
+    
+    while (pEnumerator)
+    {
+        HRESULT hr = pEnumerator->Next(WBEM_INFINITE, 1, &pclsObj, &uReturn);
+
+        if(0 == uReturn || FAILED(hr))
+            break;
+
+        _bstr_t path;
+        VARIANT vtProp;
+
+        hr = pclsObj->Get(L"__Path", 0, &vtProp, 0, 0); // String
+        if (!FAILED(hr))
+        {
+            if (!((vtProp.vt==VT_NULL) || (vtProp.vt==VT_EMPTY) || (vtProp.vt & VT_ARRAY)))
+                path = vtProp.bstrVal;
+
+        }
+        VariantClear(&vtProp);
+
+        if (path.length() == 0)
+            continue;
+
+        paths.push_back(path);
+
+        pclsObj->Release();
+        pclsObj=NULL;
+    }
+
+    pEnumerator->Release();
+    if (pclsObj!=NULL)
+        pclsObj->Release();
+
+    return S_OK;
+}
+
+HRESULT EnableNICSAtPaths(IWbemServices *pSvc, const std::vector<_bstr_t>& paths) {
+    HRESULT hres  = S_OK;
+
+    for (_bstr_t path: paths) {
+        IWbemCallResult *result = NULL;
+        hres = pSvc->ExecMethod(path, _bstr_t("Enable"), 0, NULL, NULL, NULL, &result);
+
+        LONG lStatus;
+        result->GetCallStatus(5000, &lStatus);
+    }
+
+    return hres;
+}
+
+HRESULT DisableNICSAtPaths(IWbemServices *pSvc, const std::vector<_bstr_t>& paths) {
+    HRESULT hres  = S_OK;
+
+    for (_bstr_t path: paths) {
+        IWbemCallResult *result = NULL;
+        hres = pSvc->ExecMethod(path, _bstr_t("Disable"), 0, NULL, NULL, NULL, &result);
+
+        LONG lStatus;
+        result->GetCallStatus(5000, &lStatus);
+    }
+
+    return hres;
+}
 
 static void findMacAddresses(IWbemServices *pSvc, QnMacAndDeviceClassList& devices) {
     HRESULT hres;
@@ -313,10 +395,6 @@ void LLUtil::fillHardwareIds(QStringList& hardwareIds, QSettings *settings, QnHa
 
     // Step 2: --------------------------------------------------
     // Set general COM security levels --------------------------
-    // Note: If you are using Windows 2000, you need to specify -
-    // the default authentication credentials for a user by using
-    // a SOLE_AUTHENTICATION_LIST structure in the pAuthList ----
-    // parameter of CoInitializeSecurity ------------------------
 
     hres =  CoInitializeSecurity(
         NULL,
@@ -419,8 +497,30 @@ void LLUtil::fillHardwareIds(QStringList& hardwareIds, QSettings *settings, QnHa
         throw HardwareIdError(os.str());
     }
 
+    // Find disabled NICs
+    std::vector<_bstr_t> paths;
+    if (GetDisabledNICS(pSvc, paths) == S_OK) {
+        // Temporarily enable them
+        if (EnableNICSAtPaths(pSvc, paths) == S_OK) {
+            // Wait up to 10 seconds for all interfaces to be enabled
+            for (int i = 0; i < 10; i++) {
+                std::vector<_bstr_t> tmpPaths;
+                GetDisabledNICS(pSvc, tmpPaths);
+
+                if (tmpPaths.empty()) {
+                    break;
+                } else {
+                    Sleep(1000);
+                }
+            }
+        }
+    }
 
     findMacAddresses(pSvc, hardwareInfo.nics);
+
+    // Disable enabled NICs again if were any
+    DisableNICSAtPaths(pSvc, paths);
+
     hardwareInfo.mac = getMacAddress(hardwareInfo.nics, settings);
 
     // Only for HWID1
