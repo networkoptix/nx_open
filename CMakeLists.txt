@@ -61,11 +61,45 @@ set(CMAKE_MODULE_PATH
 include(add_module)
 include(cotire)
 include(find_sources)
+include(add_translations)
+include(process_resources)
+add_definitions(-DUSE_NX_HTTP
+                -DNOMINMAX=
+                -D__STDC_CONSTANT_MACROS
+                -D_USING_V110_SDK71_
+                -DENABLE_VMAX
+                -DQN_EXPORT=
+                -DUNICODE
+                -DENABLE_ONVIF
+                -DENABLE_AXIS
+                -DENABLE_ACTI
+                -DENABLE_ARECONT
+                -DENABLE_DLINK
+                -DENABLE_DROID
+                -DENABLE_TEST_CAMERA
+                -DENABLE_STARDOT
+                -DENABLE_IQE
+                -DENABLE_ISD
+                -DENABLE_PULSE_CAMERA
+                -DENABLE_COLDSTORE
+                -DENABLE_MDNS
+                -DENABLE_ARCHIVE
+                -DENABLE_THIRD_PARTY
+                -DENABLE_SOFTWARE_MOTION_DETECTION
+                -DENABLE_DESKTOP_CAMERA
+                -DENABLE_DATA_PROVIDERS
+                -DENABLE_SENDMAIL
+                -DENABLE_SSL
+                -DUSE_OWN_MUTEX
+                -DNX_NETWORK_API=__declspec\(dllimport\)
+                -DNX_UTILS_API=__declspec\(dllimport\)
+                -DUDT_API=__declspec\(dllimport\)
+                )
 #include(println)
 
 add_module(
     NAMES
-        #nxtool
+        nxtool
         common
     STATUS_SHORT_NAMES
 )

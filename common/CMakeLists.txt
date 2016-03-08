@@ -27,6 +27,7 @@ set(PROJECT_LONGNAME "${company.name} Common Library")
 set(PROJECT_VERSION "2.6.0")
 
 include(default_project_properties)
+
 # Additional Include Directories
 include_directories($ENV{environment}/boost_1_56_0
                     src
@@ -67,65 +68,7 @@ include_directories($ENV{environment}/boost_1_56_0
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
-
-add_definitions(-DUSE_NX_HTTP
-                -DNOMINMAX=
-                -D__STDC_CONSTANT_MACROS
-                -D_USING_V110_SDK71_
-                -DENABLE_VMAX
-                -DQN_EXPORT=
-                -DUNICODE
-                -DENABLE_ONVIF
-                -DENABLE_AXIS
-                -DENABLE_ACTI
-                -DENABLE_ARECONT
-                -DENABLE_DLINK
-                -DENABLE_DROID
-                -DENABLE_TEST_CAMERA
-                -DENABLE_STARDOT
-                -DENABLE_IQE
-                -DENABLE_ISD
-                -DENABLE_PULSE_CAMERA
-                -DENABLE_COLDSTORE
-                -DENABLE_MDNS
-                -DENABLE_ARCHIVE
-                -DENABLE_THIRD_PARTY
-                -DENABLE_SOFTWARE_MOTION_DETECTION
-                -DENABLE_DESKTOP_CAMERA
-                -DENABLE_DATA_PROVIDERS
-                -DENABLE_SENDMAIL
-                -DENABLE_SSL
-                -DUSE_OWN_MUTEX
-                -DNX_NETWORK_API=__declspec\(dllimport\)
-                -DNX_UTILS_API=__declspec\(dllimport\)
-                -DUDT_API=__declspec\(dllimport\)
-                )
-
-if(NOT SKIP_GEN)
-    file(GLOB_RECURSE FILTERED_FILES "${PROJECT_SOURCE_DIR}/resources/filter/*")
-    foreach(filename ${FILTERED_FILES})
-        string(REPLACE "${PROJECT_SOURCE_DIR}/resources/filter/" "" filename ${filename})
-        configure_file(${PROJECT_SOURCE_DIR}/resources/filter/${filename}
-                       ${CMAKE_CURRENT_BINARY_DIR}/${filename})
-        message("Filtering and Copying: " ${filename})
-    endforeach(filename ${FILTERED_FILES})
-
-    file(GLOB_RECURSE COMMON_FILTERED_FILES "${CMAKE_SOURCE_DIR}/cpp/resources/filter/*")
-    foreach(filename ${COMMON_FILTERED_FILES})
-        string(REPLACE "${CMAKE_SOURCE_DIR}/cpp/resources/filter/" "" filename ${filename})
-        configure_file(${CMAKE_SOURCE_DIR}/cpp/resources/filter/${filename}
-                    ${CMAKE_CURRENT_BINARY_DIR}/${filename})
-        message("Filtering and Copying: " ${filename})
-    endforeach(filename ${COMMON_FILTERED_FILES})
-
-    #configure_file(${CMAKE_SOURCE_DIR}/cpp/scripts/gen_resources.py
-    #               ${CMAKE_CURRENT_BINARY_DIR}/gen_resources.py)
-    #file(GLOB RESOURCES "${PROJECT_SOURCE_DIR}/resources/filter/*")
-    file(COPY ${RESOURCES} DESTINATION ${PROJECT_BINARY_DIR})
-    execute_process(
-        COMMAND $ENV{environment}/python/x64/python.exe ${CMAKE_CURRENT_BINARY_DIR}/gen_resources.py
-    )
-endif()
+#set (CMAKE_AUTOMOC_MOC_OPTIONS "-bstdafx.h" "-fstdafx.h")
 
 # Configure Qt
 find_package(Qt5Core REQUIRED)
@@ -136,24 +79,7 @@ find_package(Qt5XmlPatterns REQUIRED)
 find_package(Qt5Sql REQUIRED)
 find_package(Qt5Concurrent REQUIRED)
 find_package(Qt5Multimedia REQUIRED)
-find_package(Qt5LinguistTools)
 find_package(Qt5Widgets)
-
-# Windows application icon
-#if(WIN32)
-  #set(WINDOWS_RES_FILE ${PROJECT_BINARY_DIR}/${PROJECT_SHORTNAME}.obj)
-  #if(MSVC)
-  #  add_custom_command(OUTPUT ${WINDOWS_RES_FILE}
-  #    COMMAND rc.exe /fo ${WINDOWS_RES_FILE} ${PROJECT_BINARY_DIR}/${PROJECT_SHORTNAME}.rc
-  #    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/win
-  #  )
-  #else()
-  #  add_custom_command(OUTPUT ${WINDOWS_RES_FILE}
-  #    COMMAND windres.exe ${PROJECT_BINARY_DIR}/${PROJECT_SHORTNAME} ${WINDOWS_RES_FILE}
-  #    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/win
-  #  )
-  #endif()
-#endif()
 
 if(NOT MSVC)
     # Enable the C++11 standard
@@ -168,29 +94,8 @@ if(NOT MSVC)
 endif()
 
 find_sources(src)
-
-file(GLOB_RECURSE ALL_TRANSLATION_FILES "${PROJECT_SOURCE_DIR}/translations/*")
-foreach(filename ${ALL_TRANSLATION_FILES})
-    foreach(translation ${translations})
-        if(filename MATCHES "${translation}.ts")
-            get_filename_component(NAME ${filename} NAME)
-            get_filename_component(PATH ${filename} PATH)
-            list(APPEND TRANSLATION_FILES ${filename})
-            #list(APPEND QM_FILES ${PATH}/${NAME}.qm)
-        endif()
-    endforeach(${translation})
-endforeach(filename ${ALL_TRANSLATION_FILES})
-
-foreach(filename ${TRANSLATION_FILES})
-    message("Adding translation: " ${filename})
-endforeach(filename ${TRANSLATION_FILES})
-
-QT5_ADD_TRANSLATION(QM_FILES ${TRANSLATION_FILES})
-
-foreach(filename ${QM_FILES})
-    message("Adding translation: " ${filename})
-endforeach(filename ${QM_FILES})
-
+process_resources()
+add_translations(translations)
 qt5_wrap_ui(UI_HEADERS ${UI_FILES})
 qt5_add_resources(RESOURCE_FILES ${PROJECT_BINARY_DIR}/${PROJECT_SHORTNAME}.qrc)
 
@@ -209,11 +114,30 @@ LINK_DIRECTORIES($ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch
                  $ENV{environment}/artifacts/vmax_integration/${vmax_integration.version}/${platform}/${box}/${arch}/lib/${configuration}
                  )
 
+#MACRO(ADD_MSVC_PRECOMPILED_HEADER PrecompiledHeader PrecompiledSource SourcesVar)
+#  IF(MSVC)
+#    GET_FILENAME_COMPONENT(PrecompiledBasename ${PrecompiledHeader} NAME_WE)
+#    SET(PrecompiledBinary "$(IntDir)${PrecompiledBasename}.pch")
+#    SET(Sources ${${SourcesVar}})
+
+#    SET_SOURCE_FILES_PROPERTIES(${PrecompiledSource}
+#                                PROPERTIES COMPILE_FLAGS "/Yc\"${PrecompiledHeader}\" /Fp\"${PrecompiledBinary}\""
+#                                           OBJECT_OUTPUTS "${PrecompiledBinary}")
+#    SET_SOURCE_FILES_PROPERTIES(${Sources}
+#                                PROPERTIES COMPILE_FLAGS "/Yu\"${PrecompiledHeader}\" /FI\"${PrecompiledHeader}\" /Fp\"${PrecompiledBinary}\""
+#                                           OBJECT_DEPENDS "${PrecompiledBinary}")  
+    # Add precompiled header to SourcesVar
+#    LIST(APPEND ${SourcesVar} ${PrecompiledSource})
+#  ENDIF(MSVC)
+#ENDMACRO(ADD_MSVC_PRECOMPILED_HEADER)
+#if(MSVC)
+#  ADD_MSVC_PRECOMPILED_HEADER("src/StdAfx.h" "src/StdAfx.cpp" CPP_FILES)
+#endif()
+                 
 add_library(${PROJECT_SHORTNAME} STATIC
   ${UI_HEADERS}
   ${CPP_FILES}
   ${RESOURCE_FILES}
-  ${SETDDM}
 )
 target_link_libraries(${PROJECT_SHORTNAME}
   Qt5::Core Qt5::Gui Qt5::Network Ws2_32.lib glu32.lib opengl32.lib odbccp32.lib

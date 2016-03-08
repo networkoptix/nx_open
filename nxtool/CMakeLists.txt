@@ -53,33 +53,11 @@ set(CMAKE_AUTOUIC ON)
 #file(STRINGS "${CMAKE_SOURCE_DIR}/customization/${customization}/build.properties" product.name.short)
 
 # Additional Include Directories
-include_directories (src ${CMAKE_SOURCE_DIR}/common/src $ENV{environment}/include $ENV{environment}/include/boost)
-
-if (NOT SKIP_GEN)
-  file (GLOB_RECURSE FILTERED_FILES "${PROJECT_SOURCE_DIR}/resources/filter/*")
-  foreach(filename ${FILTERED_FILES})
-    string (REPLACE "${PROJECT_SOURCE_DIR}/resources/filter/" "" filename ${filename})
-    configure_file(${PROJECT_SOURCE_DIR}/resources/filter/${filename}
-                   ${CMAKE_CURRENT_BINARY_DIR}/${filename})
-    message ("Filtering and Copying: " ${filename})
-  endforeach(filename ${FILTERED_FILES})
-
-  file (GLOB_RECURSE COMMON_FILTERED_FILES "${CMAKE_SOURCE_DIR}/cpp/scripts/*") 
-  foreach(filename ${COMMON_FILTERED_FILES})
-    string (REPLACE "${CMAKE_SOURCE_DIR}/cpp/scripts/" "" filename ${filename})
-    configure_file(${CMAKE_SOURCE_DIR}/cpp/scripts/${filename}
-                   ${CMAKE_CURRENT_BINARY_DIR}/${filename})
-    message ("Filtering and Copying: " ${filename})
-  endforeach(filename ${COMMON_FILTERED_FILES})  
-  
-  #configure_file(${CMAKE_SOURCE_DIR}/cpp/scripts/gen_resources.py
-  #               ${CMAKE_CURRENT_BINARY_DIR}/gen_resources.py) 
-  #file(GLOB RESOURCES "${PROJECT_SOURCE_DIR}/resources/filter/*")
-  file(COPY ${RESOURCES} DESTINATION ${PROJECT_BINARY_DIR})
-  execute_process( 
-    COMMAND $ENV{environment}/python/x64/python.exe ${CMAKE_CURRENT_BINARY_DIR}/gen_resources.py
-  )
-endif()
+include_directories (src 
+                    ${CMAKE_SOURCE_DIR}/common/src 
+                    $ENV{environment}/include 
+                    $ENV{environment}/boost_1_56_0
+                    )
 
 # Configure Qt
 find_package(Qt5Qml REQUIRED)
@@ -90,50 +68,44 @@ find_package(Qt5Network REQUIRED)
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5LinguistTools)
 
+if (NOT MSVC)
+  # Enable the C++11 standard
+  set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} -std=c++11)
+endif()
+find_sources(src)
+process_resources()
+add_translations(translations)
+qt5_wrap_ui(UI_HEADERS ${UI_FILES})
+qt5_add_resources(RESOURCE_FILES ${PROJECT_BINARY_DIR}/${PROJECT_SHORTNAME}.qrc)
+
 # Windows application icon
 if (WIN32)
   set(WINDOWS_RES_FILE ${PROJECT_BINARY_DIR}/${PROJECT_SHORTNAME}.obj)
   if (MSVC)
     add_custom_command(OUTPUT ${WINDOWS_RES_FILE}
       COMMAND rc.exe /fo ${WINDOWS_RES_FILE} ${PROJECT_BINARY_DIR}/module.rc
-      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/win
+      WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
     )
   else()
     add_custom_command(OUTPUT ${WINDOWS_RES_FILE}
       COMMAND windres.exe ${PROJECT_BINARY_DIR}/${PROJECT_SHORTNAME} ${WINDOWS_RES_FILE}
-      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/win
+      WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
     )
   endif()
 endif()
 
-QT5_CREATE_TRANSLATION(...)
-
-if (NOT MSVC)
-  # Enable the C++11 standard
-  set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} -std=c++11)
-endif()
-
-file(GLOB_RECURSE UI_FILES src/*.ui)
-file(GLOB_RECURSE CODE_FILES src/*.cpp)
-
-qt5_wrap_ui(UI_HEADERS ${UI_FILES})
-qt5_add_resources(RESOURCE_FILES ${PROJECT_BINARY_DIR}/${PROJECT_SHORTNAME}.qrc)
-
 add_executable(${PROJECT_SHORTNAME} WIN32
   ${UI_HEADERS}
-  ${CODE_FILES}
+  ${CPP_FILES}
   ${RESOURCE_FILES}
   ${WINDOWS_RES_FILE}
 )
 target_link_libraries(${PROJECT_SHORTNAME}
   Qt5::Qml Qt5::Quick Qt5::Core Qt5::Gui Qt5::Network Ws2_32.lib glu32.lib opengl32.lib odbccp32.lib
 )
-set_target_properties(${PROJECT_SHORTNAME} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "src/stdafx.h")
-cotire(${PROJECT_SHORTNAME})
+#set_target_properties(${PROJECT_SHORTNAME} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "src/stdafx.h")
+#cotire(${PROJECT_SHORTNAME})
 
-# Testing configuration
-# enable_testing()
-# set(TEST_LINK_LIBRARIES Qt5::Test)
 
 if (UNIX)
   install(TARGETS ${PROJECT_SHORTNAME}
