@@ -42,7 +42,7 @@
 					dataType="Number"
 					range="1,255"
 					readCmd="encoder"
-					writeCmd="VIDEO_WB_GAIN=%VIDEO_WB_B_GAIN,%VIDEO_WB_B_GAIN"/>
+					writeCmd="VIDEO_WB_GAIN=%VIDEO_WB_R_GAIN,%VIDEO_WB_B_GAIN"/>
 				<param id="VIDEO_EXPOSURE_MODE"
 					name="Exposure Mode"
 					dataType="Enumeration"
@@ -171,19 +171,19 @@
 				name="Reboot" 
 				description="This operation reboots the device."
 				readCmd="system"
-                writeCmd="!SAVE_REBOOT"/>
+                writeCmd="SAVE_REBOOT"/>
 			<param 	id="CONFIG_RESET"
 				dataType="Button"
 				name="Soft Reset"
 				description="Reset settings to factory default except IP settings"
 				readCmd="system"
-                writeCmd="!CONFIG_RESET"/>
+                writeCmd="CONFIG_RESET"/>
 			<param 	id="FACTORY_DEFAULT"
 				dataType="Button"
 				name="Hard Reset"
 				description="Reset settings to factory default (includes IP settings)"
 				readCmd="system"
-                writeCmd="!FACTORY_DEFAULT"/>
+                writeCmd="FACTORY_DEFAULT"/>
 		</group>
 	</parameters>
 </plugin>

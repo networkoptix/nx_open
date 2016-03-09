@@ -743,9 +743,10 @@ bool QnActiResource::setParamPhysical(const QString& id, const QString& value)
 
 bool QnActiResource::getParamsPhysical(const QSet<QString> &idList, QnCameraAdvancedParamValueList &result)
 {
+    bool success = true;
     const auto params = getParamsByIds(idList);
     const auto queries = buildGetParamsQueries(params);
-    const auto queriesResults = executeParamsQueries(queries);
+    const auto queriesResults = executeParamsQueries(queries, success);
     parseParamsQueriesResult(queriesResults, params, result);
 
     return result.size() == idList.size();
@@ -753,6 +754,7 @@ bool QnActiResource::getParamsPhysical(const QSet<QString> &idList, QnCameraAdva
 
 bool QnActiResource::setParamsPhysical(const QnCameraAdvancedParamValueList &values, QnCameraAdvancedParamValueList &result)
 {
+    bool success;
     QSet<QString> idList;
 
     for(const auto& value: values)
@@ -760,14 +762,14 @@ bool QnActiResource::setParamsPhysical(const QnCameraAdvancedParamValueList &val
 
     const auto params = getParamsByIds(idList);
     const auto queries = buildSetParamsQueries(values);
-    const auto queriesResults = executeParamsQueries(queries);
+    const auto queriesResults = executeParamsQueries(queries, success);
     parseParamsQueriesResult(queriesResults, params, result);
 
     const auto maintenanceQueries = buildMaintenanceQueries(values);
-    if(maintenanceQueries.size())
+    if(!maintenanceQueries.empty())
     {
-        executeParamsQueries(maintenanceQueries);
-        return true;
+        executeParamsQueries(maintenanceQueries, success);
+        return success;
     }
 
     return result.size() == values.size();
@@ -775,7 +777,7 @@ bool QnActiResource::setParamsPhysical(const QnCameraAdvancedParamValueList &val
 
 bool QnActiResource::isMaintenanceParam(const QnCameraAdvancedParameter &param) const
 {
-    return getParamCmd(param).startsWith("!");
+    return param.dataType == QnCameraAdvancedParameter::DataType::Button;
 }
 
 QList<QnCameraAdvancedParameter> QnActiResource::getParamsByIds(const QSet<QString>& idList) const
@@ -816,7 +818,9 @@ QMap<QString, QString> QnActiResource::resolveQueries(QMap<QString, QnCameraAdva
     }
 
     for(const auto& agregateName : respParams.keys())
-        fillMissingParams(queries[agregateName].cmd, respParams[agregateName]);
+        queries[agregateName].cmd = fillMissingParams(
+            queries[agregateName].cmd,
+            respParams[agregateName]);
 
     for(const auto& agregate: queries.keys())
         setQueries[queries[agregate].group] += agregate + lit("=") + queries[agregate].cmd + lit("&");
@@ -824,29 +828,20 @@ QMap<QString, QString> QnActiResource::resolveQueries(QMap<QString, QnCameraAdva
     return setQueries;
 }
 
-void QnActiResource::fillMissingParams(QString &templ, const QString &real) const
+QString QnActiResource::fillMissingParams(const QString &unresolvedTemplate, const QString &valueFromCamera) const
 {
-    auto tplSplit = templ.split(",");
-    auto realSplit = real.split(",");
+    auto templateValues = unresolvedTemplate.split(",");
+    auto cameraValues = valueFromCamera.split(",");
 
-    for(size_t i = 0; i < tplSplit.size(); i++)
+    for(size_t i = 0; i < templateValues.size(); i++)
     {
-        if(i >= realSplit.size())
+        if(i >= cameraValues.size())
             break;
-
-        if(tplSplit.at(i).startsWith("%%"))
-        {
-            QStringList join;
-            for(size_t j = i; j < realSplit.size(); j++)
-                join.append(realSplit.at(j));
-            tplSplit[i] = join.join(',');
-            break;
-        }
-        else if(tplSplit.at(i).startsWith("%"))
-            tplSplit[i] = realSplit.at(i);
+        else if(templateValues.at(i).startsWith("%"))
+            templateValues[i] = cameraValues.at(i);
     }
 
-    templ = tplSplit.join(',');
+    return templateValues.join(',');
 }
 
 QMap<QString, QString> QnActiResource::buildGetParamsQueries(const QList<QnCameraAdvancedParameter> &params) const
@@ -882,7 +877,7 @@ QMap<QString, QString> QnActiResource::buildSetParamsQueries(const QnCameraAdvan
     for(const auto& val: values)
         paramToValue[val.id] = val.value;
 
-    auto paramsMap = getParamsMap(paramToValue.keys().toSet());
+    const auto paramsMap = getParamsMap(paramToValue.keys().toSet());
 
     for(const auto& id: paramsMap.keys())
     {
@@ -892,7 +887,7 @@ QMap<QString, QString> QnActiResource::buildSetParamsQueries(const QnCameraAdvan
             continue;
         }
 
-        auto split = getParamCmd(paramsMap[id]).split('=');\
+        auto split = getParamCmd(paramsMap[id]).split('=');
 
         if(split.size() < 2)
             continue;
@@ -915,17 +910,19 @@ QMap<QString, QString> QnActiResource::buildSetParamsQueries(const QnCameraAdvan
         agregateToCmd[agregate].cmd = agregateToCmd[agregate].cmd
             .replace(lit("%") + paramId, paramToValue[paramId]);
     }
-
     return resolveQueries(agregateToCmd);
 }
 
-QMap<QString, QString> QnActiResource::executeParamsQueries(const QMap<QString, QString>& queries) const
+QMap<QString, QString> QnActiResource::executeParamsQueries(const QMap<QString, QString>& queries, bool& isSuccessfull) const
 {
     CLHttpStatus status;
     QMap<QString, QString> result;
+    isSuccessfull = true;
     for(const auto& q: queries.keys())
     {
         auto response = makeActiRequest(q, queries[q], status, true);
+        if(status != CL_HTTP_SUCCESS)
+            isSuccessfull = false;
         parseCameraParametersResponse(response, result);
     }
 
@@ -991,25 +988,17 @@ QString QnActiResource::getParamCmd(const QnCameraAdvancedParameter &param) cons
 void QnActiResource::getParamsByMask(const QString &paramValue, const QString &mask, QMap<QString, QString>& result) const
 {
 
-    auto paramNames = mask.split(',');
-    auto paramValues = paramValue.split(',');
+    const auto paramNames = mask.split(',');
+    const auto paramValues = paramValue.split(',');
+    const auto paramCount = paramNames.size();
 
-    for(size_t i = 0; i < paramNames.size(); i++)
+    for(size_t i = 0; i < paramCount; i++)
     {
-        auto name = paramNames.at(i);
-
-        //parameter catches all values till the end of the list
-        if(name.startsWith("%%"))
-        {
-            QStringList join;
-            for(size_t j = i; j < paramValues.size(); j++)
-                join.append(paramValues.at(j));
-            result[name.right(name.size() -2)] = join.join(',');
-            break;
-        }
-        //parameter catches single value
-        else if(name.startsWith("%") && i < paramValues.size())
-            result[name.right(name.size() -1)] = paramValues.at(i);
+        auto name = paramNames.at(i).mid(1);
+        if(i < paramCount - 1)
+            result[name] = paramValues.at(i);
+        else
+            result[name] = paramValues.mid(i).join(',');
     }
 }
 
@@ -1127,6 +1116,7 @@ QSet<QString> QnActiResource::calculateSupportedAdvancedParameters(const QnCamer
     QList<QnCameraAdvancedParameter> paramsList;
     QSet<QString> result;
     auto paramIds = allParams.allParameterIds();
+    bool success = true;
 
     for(const auto& id: paramIds)
     {
@@ -1137,7 +1127,7 @@ QSet<QString> QnActiResource::calculateSupportedAdvancedParameters(const QnCamer
     }
 
     auto queries = buildGetParamsQueries(paramsList);
-    auto queriesResult = executeParamsQueries(queries);
+    auto queriesResult = executeParamsQueries(queries, success);
 
     for(const auto& param: paramsList)
     {

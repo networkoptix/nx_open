@@ -145,7 +145,7 @@ private:
     QMap<QString, QString> buildSetParamsQueries(const QnCameraAdvancedParamValueList& values) const;
     QMap<QString, QString> buildMaintenanceQueries(const QnCameraAdvancedParamValueList& values) const;
 
-    QMap<QString, QString> executeParamsQueries(const QMap<QString, QString>& queries) const;
+    QMap<QString, QString> executeParamsQueries(const QMap<QString, QString>& queries, bool& isSuccessfull) const;
     void parseParamsQueriesResult(
         const QMap<QString, QString>& queriesResult,
         const QList<QnCameraAdvancedParameter>& params,
@@ -154,7 +154,7 @@ private:
     QMap<QString, QString> resolveQueries(QMap<QString, QnCameraAdvancedParamQueryInfo>& queries) const;
 
     void getParamsByMask(const QString& paramValue, const QString& mask, QMap<QString, QString>& result) const;
-    void fillMissingParams(QString& templ, const QString& real) const;
+    QString fillMissingParams(const QString& unresolvedTemplate, const QString& valueFromCamera) const;
 
 
 private:

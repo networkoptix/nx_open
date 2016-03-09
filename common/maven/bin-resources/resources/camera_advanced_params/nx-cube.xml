@@ -88,7 +88,7 @@
 					range = "Disabled,Low,Medium,High,Highest"
 					internalRange="OFF|0|0,AUTO|1|0,AUTO|64|0,AUTO|128|0,AUTO|255|0"
 					readCmd="encoder"
-					writeCmd="VIDEO_WDR=%%VIDEO_WDR"/>
+					writeCmd="VIDEO_WDR=%VIDEO_WDR"/>
 				<param 	id="VIDEO_BLC_MODE"
 					name="BLC Mode"
 					description="Backlight Compensation Mode"
@@ -168,16 +168,16 @@
 				name="Reboot" 
 				description="This operation reboots the device."
 				readCmd="system"
-                writeCmd="!SAVE_REBOOT"/>
+                writeCmd="SAVE_REBOOT"/>
 			<param 	id="CONFIG_RESET"
 				dataType="Button"
 				name="Soft Reset"
 				description="Reset settings to factory default except IP settings"
 				readCmd="system"
-                writeCmd="!CONFIG_RESET"/>
+                writeCmd="CONFIG_RESET"/>
 			<param 	id="FACTORY_DEFAULT"
 				dataType="Button"
-                writeCmd="!FACTORY_DEFAULT"
+                writeCmd="FACTORY_DEFAULT"
 				name="Hard Reset"
 				description="Reset all settings to factory default (inсludes IP settings)"
 				readCmd="system"/>
