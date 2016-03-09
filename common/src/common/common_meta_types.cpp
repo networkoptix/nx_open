@@ -306,10 +306,13 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<ec2::ApiCameraHistoryData>("ApiCameraHistoryData");
     qRegisterMetaType<ec2::ApiCameraHistoryDataList>("ApiCameraHistoryDataList");
     qRegisterMetaType<ec2::ApiCameraHistoryDataList>("ec2::ApiCameraHistoryDataList");
+
     qRegisterMetaType<ec2::ApiFullInfoData>("ec2::ApiFullInfoData");
     qRegisterMetaType<ec2::ApiUserData>("ec2::ApiUserData");
     qRegisterMetaType<ec2::ApiLayoutData>("ec2::ApiLayoutData");
     qRegisterMetaType<ec2::ApiLayoutItemData>("ec2::ApiLayoutItemData");
+    qRegisterMetaType<ec2::ApiVideowallData>("ec2::ApiVideowallData");
+    qRegisterMetaType<ec2::ApiVideowallControlMessageData>("ec2::ApiVideowallControlMessageData");
 
     qRegisterMetaType<QnUuid>();
     qRegisterMetaTypeStreamOperators<QnUuid>();

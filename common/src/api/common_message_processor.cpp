@@ -3,6 +3,7 @@
 #include <nx_ec/ec_api.h>
 #include <nx_ec/managers/abstract_user_manager.h>
 #include <nx_ec/managers/abstract_layout_manager.h>
+#include <nx_ec/managers/abstract_videowall_manager.h>
 
 #include <nx_ec/data/api_full_info_data.h>
 #include <nx_ec/data/api_discovery_data.h>
@@ -11,11 +12,8 @@
 #include <nx_ec/data/api_camera_data.h>
 #include <nx_ec/data/api_camera_attributes_data.h>
 #include <nx_ec/data/api_webpage_data.h>
-#include <nx_ec/data/api_videowall_data.h>
-#include <nx_ec/data/api_user_data.h>
 #include <nx_ec/data/api_resource_type_data.h>
 #include <nx_ec/data/api_license_data.h>
-#include <nx_ec/data/api_layout_data.h>
 #include <nx_ec/data/api_business_rule_data.h>
 
 #include <api/app_server_connection.h>
@@ -95,15 +93,15 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     connect(cameraManager, &ec2::AbstractCameraManager::cameraRemoved,              this, &QnCommonMessageProcessor::on_resourceRemoved );
 
     auto userManager = connection->getUserManager();
-    connect(userManager, &ec2::AbstractUserManager::addedOrUpdated,                 this, [this](const ec2::ApiUserData &user){updateUser(user);});
+    connect(userManager, &ec2::AbstractUserManager::addedOrUpdated,                 this, [this](const ec2::ApiUserData& user){updateUser(user);});
     connect(userManager, &ec2::AbstractUserManager::removed,                        this, &QnCommonMessageProcessor::on_resourceRemoved );
 
     auto layoutManager = connection->getLayoutManager();
-    connect(layoutManager, &ec2::AbstractLayoutManager::addedOrUpdated,             this, [this](const ec2::ApiLayoutData &layout){updateLayout(layout);});
+    connect(layoutManager, &ec2::AbstractLayoutManager::addedOrUpdated,             this, [this](const ec2::ApiLayoutData& layout){updateLayout(layout);});
     connect(layoutManager, &ec2::AbstractLayoutManager::removed,                    this, &QnCommonMessageProcessor::on_resourceRemoved );
 
     auto videowallManager = connection->getVideowallManager();
-    connect(videowallManager, &ec2::AbstractVideowallManager::addedOrUpdated,       this, [this](const QnVideoWallResourcePtr &videowall){updateResource(videowall);});
+    connect(videowallManager, &ec2::AbstractVideowallManager::addedOrUpdated,       this, [this](const ec2::ApiVideowallData& videowall){updateVideowall(videowall);});
     connect(videowallManager, &ec2::AbstractVideowallManager::removed,              this, &QnCommonMessageProcessor::on_resourceRemoved );
     connect(videowallManager, &ec2::AbstractVideowallManager::controlMessage,       this, &QnCommonMessageProcessor::videowallControlMessageReceived );
 
@@ -553,4 +551,11 @@ void QnCommonMessageProcessor::updateLayout(const ec2::ApiLayoutData& layout)
     QnLayoutResourcePtr qnLayout(new QnLayoutResource());
     fromApiToResource(layout, qnLayout);
     updateResource(qnLayout);
+}
+
+void QnCommonMessageProcessor::updateVideowall(const ec2::ApiVideowallData& videowall)
+{
+    QnVideoWallResourcePtr qnVideowall(new QnVideoWallResource());
+    fromApiToResource(videowall, qnVideowall);
+    updateResource(qnVideowall);
 }

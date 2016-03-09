@@ -18,7 +18,7 @@ namespace ec2
         virtual ~AbstractLayoutManager() {}
 
         /*!
-        \param handler Functor with params: (ErrorCode, const QnLayoutResourceList&)
+        \param handler Functor with params: (ErrorCode, const ApiLayoutDataList&)
         */
         template<class TargetType, class HandlerType>
         int getLayouts(TargetType* target, HandlerType handler)

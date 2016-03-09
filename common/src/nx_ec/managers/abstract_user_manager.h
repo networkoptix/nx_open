@@ -41,13 +41,13 @@ namespace ec2
         template<class TargetType, class HandlerType>
         int save(const ec2::ApiUserData& user, const QString& newPassword, TargetType* target, HandlerType handler)
         {
-            return save(user, newPassword, std::static_pointer_cast<impl::AddUserHandler>(
-                std::make_shared<impl::CustomAddUserHandler<TargetType, HandlerType>>(target, handler)));
+            return save(user, newPassword, std::static_pointer_cast<impl::SimpleHandler>(
+                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
 
         ErrorCode saveSync(const ec2::ApiUserData &user, const QString& newPassword = QString())
         {
-            return impl::doSyncCall<impl::AddUserHandler>([=](const impl::AddUserHandlerPtr &handler)
+            return impl::doSyncCall<impl::SimpleHandler>([=](const impl::SimpleHandlerPtr &handler)
             {
                 return this->save(user, newPassword, handler);
             });
@@ -68,7 +68,7 @@ namespace ec2
 
     private:
         virtual int getUsers(impl::GetUsersHandlerPtr handler) = 0;
-        virtual int save(const ec2::ApiUserData& user, const QString& newPassword, impl::AddUserHandlerPtr handler) = 0;
+        virtual int save(const ec2::ApiUserData& user, const QString& newPassword, impl::SimpleHandlerPtr handler) = 0;
         virtual int remove(const QnUuid& id, impl::SimpleHandlerPtr handler) = 0;
     };
 

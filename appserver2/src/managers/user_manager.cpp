@@ -31,7 +31,7 @@ namespace ec2
     void callSaveUserAsync(
         QueryProcessorType* const queryProcessor,
         QnTransaction<ApiUserData>& tran,
-        impl::AddUserHandlerPtr handler,
+        impl::SimpleHandlerPtr handler,
         const int reqID,
         const ec2::ApiUserData& user,
         const QString& newPassword)
@@ -47,7 +47,7 @@ namespace ec2
     void callSaveUserAsync<FixedUrlClientQueryProcessor>(
         FixedUrlClientQueryProcessor* const queryProcessor,
         QnTransaction<ApiUserData>& tran,
-        impl::AddUserHandlerPtr handler,
+        impl::SimpleHandlerPtr handler,
         const int reqID,
         const ec2::ApiUserData& user,
         const QString& newPassword)
@@ -66,7 +66,7 @@ namespace ec2
     }
 
     template<class T>
-    int QnUserManager<T>::save( const ec2::ApiUserData& user, const QString& newPassword, impl::AddUserHandlerPtr handler )
+    int QnUserManager<T>::save( const ec2::ApiUserData& user, const QString& newPassword, impl::SimpleHandlerPtr handler )
     {
         Q_ASSERT_X(!user.id.isNull(), Q_FUNC_INFO, "User id must be set before saving");
 

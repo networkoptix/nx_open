@@ -32,6 +32,7 @@ public:
     virtual void updateResource(const QnResourcePtr &resource);
     virtual void updateUser(const ec2::ApiUserData& user);
     virtual void updateLayout(const ec2::ApiLayoutData& layout);
+    virtual void updateVideowall(const ec2::ApiVideowallData& videowall);
 
     QMap<QnUuid, QnBusinessEventRulePtr> businessRules() const;
 
@@ -56,7 +57,7 @@ signals:
     void businessActionReceived(const QnAbstractBusinessActionPtr& action);
     void execBusinessAction(const QnAbstractBusinessActionPtr& action);
 
-    void videowallControlMessageReceived(const QnVideoWallControlMessage &message);
+    void videowallControlMessageReceived(const ec2::ApiVideowallControlMessageData& message);
 
     void runtimeInfoChanged(const ec2::ApiRuntimeData &runtimeInfo);
     void remotePeerFound(const ec2::ApiPeerAliveData &data);

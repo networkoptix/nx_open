@@ -160,7 +160,6 @@ namespace ec2
             void emitGetResourceTypesDone( int reqID, const ErrorCode p1, const QnResourceTypeList& p2 ) { emit onGetResourceTypesDone( reqID, p1, p2 ); }
             void emitSetResourceStatusDone( int reqID, const ErrorCode p1, const QnUuid& p2 ) { emit onSetResourceStatusDone( reqID, p1, p2 ); }
             void emitSaveResourceDone( int reqID, const ErrorCode p1, const QnResourcePtr& p2 ) { emit onSaveResourceDone( reqID, p1, p2 ); }
-            //void emitSetResourceDisabledDone( int reqID, const ErrorCode p1, const QnUuid& p2 ) { emit onSetResourceDisabledDone( reqID, p1, p2 ); }
             void emitGetResourcesDone( int reqID, const ErrorCode p1, const QnResourceList& p2 ) { emit onGetResourcesDone( reqID, p1, p2 ); }
             void emitGetResourceDone( int reqID, const ErrorCode p1, const QnResourcePtr& p2 ) { emit onGetResourceDone( reqID, p1, p2 ); }
             void emitGetKvPairsDone( int reqID, const ErrorCode p1, const ApiResourceParamWithRefDataList& p2 ) { emit onGetKvPairsDone( reqID, p1, p2 ); }
@@ -172,7 +171,6 @@ namespace ec2
             void emitGetServerUserAttributesDone( int reqID, const ErrorCode p1, const QnMediaServerUserAttributesList& p2 ) { emit onGetServerUserAttributesDone( reqID, p1, p2 ); }
             void emitGetStoragesDone( int reqID, const ErrorCode p1, const QnResourceList& p2 ) { emit onGetStoragesDone( reqID, p1, p2 ); }
             void emitAddCameraDone( int reqID, const ErrorCode p1, const QnVirtualCameraResourceList& p2 ) { emit onAddCameraDone( reqID, p1, p2 ); }
-            void emitAddUserDone( int reqID, const ErrorCode p1 ) { emit onAddUserDone( reqID, p1 ); }
             void emitGetCamerasDone( int reqID, const ErrorCode p1, const QnVirtualCameraResourceList& p2 ) { emit onGetCamerasDone( reqID, p1, p2 ); }
             void emitGetCameraUserAttributesDone( int reqID, const ErrorCode p1, const QnCameraUserAttributesList& p2 ) { emit onGetCameraUserAttributesDone( reqID, p1, p2 ); }
             void emitGetCamerasHistoryDone( int reqID, const ErrorCode p1, const ApiServerFootageDataList& p2 ) { emit onGetCamerasHistoryDone( reqID, p1, p2 ); }
@@ -187,8 +185,7 @@ namespace ec2
             void emitGetDiscoveryDataDone( int reqID, const ErrorCode p1, const ApiDiscoveryDataList& p2 ) { emit onGetDiscoveryDataDone( reqID, p1, p2 ); }
             void emitTestConnectionDone( int reqID, const ErrorCode p1, const QnConnectionInfo& p2 ) { emit onTestConnectionDone( reqID, p1, p2 ); }
             void emitConnectDone( int reqID, const ErrorCode p1, const AbstractECConnectionPtr &p2 ) { emit onConnectDone( reqID, p1, p2 ); }
-            void emitAddVideowallDone( int reqID, const ErrorCode p1, const QnVideoWallResourceList& p2 ) { emit onAddVideowallDone( reqID, p1, p2 ); }
-            void emitGetVideowallsDone( int reqID, const ErrorCode p1, const QnVideoWallResourceList& p2 ) { emit onGetVideowallsDone( reqID, p1, p2 ); }
+            void emitGetVideowallsDone( int reqID, const ErrorCode p1, const ec2::ApiVideowallDataList& p2 ) { emit onGetVideowallsDone( reqID, p1, p2 ); }
             void emitAddWebPageDone( int reqID, const ErrorCode p1, const QnWebPageResourceList& p2 ) { emit onAddWebPageDone( reqID, p1, p2 ); }
             void emitGetWebPagesDone( int reqID, const ErrorCode p1, const QnWebPageResourceList& p2 ) { emit onGetWebPagesDone( reqID, p1, p2 ); }
 
@@ -209,7 +206,6 @@ namespace ec2
             void onGetServerUserAttributesDone( int reqID, const ErrorCode, const QnMediaServerUserAttributesList& );
             void onGetStoragesDone( int reqID, const ErrorCode, const QnResourceList& );
             void onAddCameraDone( int reqID, const ErrorCode, const QnVirtualCameraResourceList& );
-            void onAddUserDone( int reqID, const ErrorCode );
             void onGetCamerasDone( int reqID, const ErrorCode, const QnVirtualCameraResourceList& );
             void onGetCameraUserAttributesDone( int reqID, const ErrorCode, const QnCameraUserAttributesList& );
             void onGetCamerasHistoryDone( int reqID, const ErrorCode, const ApiServerFootageDataList& );
@@ -224,8 +220,7 @@ namespace ec2
             void onGetDiscoveryDataDone( int reqID, const ErrorCode, const ApiDiscoveryDataList& );
             void onTestConnectionDone( int reqID, const ErrorCode, const QnConnectionInfo& );
             void onConnectDone( int reqID, const ErrorCode, const AbstractECConnectionPtr &);
-            void onAddVideowallDone( int reqID, const ErrorCode, const QnVideoWallResourceList& );
-            void onGetVideowallsDone( int reqID, const ErrorCode, const QnVideoWallResourceList& );
+            void onGetVideowallsDone(int reqID, const ErrorCode, const ec2::ApiVideowallDataList&);
             void onAddWebPageDone( int reqID, const ErrorCode, const QnWebPageResourceList& );
             void onGetWebPagesDone( int reqID, const ErrorCode, const QnWebPageResourceList& );
         };
@@ -274,7 +269,6 @@ namespace ec2
         ///////// Handlers for AbstractUserManager
         //////////////////////////////////////////////////////////
         DEFINE_TWO_ARG_HANDLER( GetUsers, ErrorCode, ec2::ApiUserDataList )
-        DEFINE_ONE_ARG_HANDLER( AddUser, ErrorCode )
 
 
         //////////////////////////////////////////////////////////
@@ -298,8 +292,7 @@ namespace ec2
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractVideowallManager
         //////////////////////////////////////////////////////////
-        DEFINE_TWO_ARG_HANDLER( GetVideowalls, ErrorCode, QnVideoWallResourceList )
-        DEFINE_TWO_ARG_HANDLER( AddVideowall, ErrorCode, QnVideoWallResourceList )
+        DEFINE_TWO_ARG_HANDLER( GetVideowalls, ErrorCode, ec2::ApiVideowallDataList)
 
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractWebPageManager

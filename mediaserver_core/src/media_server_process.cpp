@@ -67,6 +67,7 @@
 #include <nx_ec/data/api_user_data.h>
 #include <nx_ec/managers/abstract_user_manager.h>
 #include <nx_ec/managers/abstract_layout_manager.h>
+#include <nx_ec/managers/abstract_videowall_manager.h>
 
 #include <platform/platform_abstraction.h>
 
@@ -1205,7 +1206,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
 
     {
         //loading videowalls
-        QnVideoWallResourceList videowalls;
+        ec2::ApiVideowallDataList videowalls;
         while(( rez = ec2Connection->getVideowallManager()->getVideowallsSync(&videowalls))  != ec2::ErrorCode::ok)
         {
             qDebug() << "QnMain::run(): Can't get videowalls. Reason: " << ec2::toString(rez);
@@ -1214,8 +1215,8 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
                 return;
         }
 
-        for(const QnVideoWallResourcePtr &videowall: videowalls)
-            messageProcessor->updateResource(videowall);
+        for (const ec2::ApiVideowallData& videowall: videowalls)
+            messageProcessor->updateVideowall(videowall);
     }
 
     {
@@ -1279,7 +1280,8 @@ void MediaServerProcess::updateStatisticsAllowedSettings() {
             return;
     }
 
-    auto setValue = [this](bool value) {
+    auto setValue = [this](bool value)
+    {
         qnGlobalSettings->setStatisticsAllowed(value);
         qnGlobalSettings->synchronizeNow();
     };
@@ -1289,16 +1291,20 @@ void MediaServerProcess::updateStatisticsAllowedSettings() {
 
     /* Value set by installer has the greatest priority */
     const auto confStats = MSSettings::roSettings()->value(statisticsReportAllowed);
-    if (!confStats.isNull()) {
-        if (confStats.toString() != lit("")) {
+    if (!confStats.isNull())
+    {
+        if (confStats.toString() != lit(""))
+        {
             setValue(confStats.toBool());
             /* Cleanup installer value. */
             MSSettings::roSettings()->setValue(statisticsReportAllowed, lit(""));
             MSSettings::roSettings()->sync();
         }
-    } else
+    }
+    else
     /* If user didn't make the decision in the current version, check if he made it in the previous version */
-    if (!qnGlobalSettings->isStatisticsAllowedDefined() && m_mediaServer && m_mediaServer->hasProperty(statisticsReportAllowed)) {
+    if (!qnGlobalSettings->isStatisticsAllowedDefined() && m_mediaServer && m_mediaServer->hasProperty(statisticsReportAllowed))
+    {
         bool value;
         if (QnLexical::deserialize(m_mediaServer->getProperty(statisticsReportAllowed), &value))
             setValue(value);

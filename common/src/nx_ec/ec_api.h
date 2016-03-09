@@ -618,67 +618,7 @@ namespace ec2
         virtual int resetBusinessRules( impl::SimpleHandlerPtr handler ) = 0;
     };
 
-    /*!
-        \note All methods are asynchronous if other not specified
-    */
-    class AbstractVideowallManager
-    :
-        public QObject
-    {
-        Q_OBJECT
 
-    public:
-        virtual ~AbstractVideowallManager() {}
-
-        /*!
-            \param handler Functor with params: (ErrorCode, const QnVideoWallResourceList&)
-        */
-        template<class TargetType, class HandlerType> int getVideowalls( TargetType* target, HandlerType handler ) {
-            return getVideowalls( std::static_pointer_cast<impl::GetVideowallsHandler>(
-                std::make_shared<impl::CustomGetVideowallsHandler<TargetType, HandlerType>>(target, handler)) );
-        }
-
-        ErrorCode getVideowallsSync(QnVideoWallResourceList* const videowallList ) {
-            int(AbstractVideowallManager::*fn)(impl::GetVideowallsHandlerPtr) = &AbstractVideowallManager::getVideowalls;
-            return impl::doSyncCall<impl::GetVideowallsHandler>( std::bind(fn, this, std::placeholders::_1), videowallList );
-        }
-
-
-        /*!
-            \param handler Functor with params: (ErrorCode)
-        */
-        template<class TargetType, class HandlerType> int save( const QnVideoWallResourcePtr& resource, TargetType* target, HandlerType handler ) {
-            return save( resource, std::static_pointer_cast<impl::AddVideowallHandler>(
-                std::make_shared<impl::CustomAddVideowallHandler<TargetType, HandlerType>>(target, handler)) );
-        }
-        /*!
-            \param handler Functor with params: (ErrorCode)
-        */
-        template<class TargetType, class HandlerType> int remove( const QnUuid& id, TargetType* target, HandlerType handler ) {
-            return remove( id, std::static_pointer_cast<impl::SimpleHandler>(
-                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
-        }
-
-        /*!
-            \param handler Functor with params: (ErrorCode)
-        */
-        template<class TargetType, class HandlerType> int sendControlMessage(const QnVideoWallControlMessage& message, TargetType* target, HandlerType handler ) {
-            return sendControlMessage(message, std::static_pointer_cast<impl::SimpleHandler>(
-                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
-        }
-
-    signals:
-        void addedOrUpdated(const QnVideoWallResourcePtr &videowall);
-        void removed(const QnUuid &id);
-        void controlMessage(const QnVideoWallControlMessage &message);
-
-    protected:
-        virtual int getVideowalls( impl::GetVideowallsHandlerPtr handler ) = 0;
-        virtual int save( const QnVideoWallResourcePtr& resource, impl::AddVideowallHandlerPtr handler ) = 0;
-        virtual int remove( const QnUuid& id, impl::SimpleHandlerPtr handler ) = 0;
-
-        virtual int sendControlMessage(const QnVideoWallControlMessage& message, impl::SimpleHandlerPtr handler) = 0;
-    };
 
         /*!
         \note All methods are asynchronous if other not specified

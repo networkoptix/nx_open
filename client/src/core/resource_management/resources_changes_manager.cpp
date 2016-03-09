@@ -22,8 +22,10 @@
 #include <nx_ec/data/api_layout_data.h>
 #include <nx_ec/data/api_webpage_data.h>
 #include <nx_ec/data/api_conversion_functions.h>
+
 #include <nx_ec/managers/abstract_user_manager.h>
 #include <nx_ec/managers/abstract_layout_manager.h>
+#include <nx_ec/managers/abstract_videowall_manager.h>
 
 QnResourcesChangesManager::QnResourcesChangesManager(QObject* parent /*= nullptr*/):
     base_type(parent)
@@ -294,7 +296,8 @@ void QnResourcesChangesManager::saveUser(const QnUserResourcePtr &user, UserChan
     ec2::ApiUserData apiUser;
     fromResourceToApi(user, apiUser);
 
-    connection->getUserManager()->save(apiUser, user->getPassword(), this, [this, user, sessionGuid, backup]( int reqID, ec2::ErrorCode errorCode ) {
+    connection->getUserManager()->save(apiUser, user->getPassword(), this, [this, user, sessionGuid, backup]( int reqID, ec2::ErrorCode errorCode )
+    {
         Q_UNUSED(reqID);
 
         /* Check if all OK */
@@ -317,7 +320,7 @@ void QnResourcesChangesManager::saveUser(const QnUserResourcePtr &user, UserChan
 /************************************************************************/
 /* VideoWalls block                                                     */
 /************************************************************************/
-
+//TODO: #GDM #Safe Mode
 void QnResourcesChangesManager::saveVideoWall(const QnVideoWallResourcePtr &videoWall, VideoWallChangesFunction applyChanges) {
     if (!applyChanges)
         return;
@@ -334,7 +337,10 @@ void QnResourcesChangesManager::saveVideoWall(const QnVideoWallResourcePtr &vide
     if (!connection)
         return;
 
-    connection->getVideowallManager()->save(videoWall, this, [this, videoWall, sessionGuid, backup]( int reqID, ec2::ErrorCode errorCode ) {
+    ec2::ApiVideowallData apiVideowall;
+    ec2::fromResourceToApi(videoWall, apiVideowall);
+    connection->getVideowallManager()->save(apiVideowall, this, [this, videoWall, sessionGuid, backup]( int reqID, ec2::ErrorCode errorCode )
+    {
         Q_UNUSED(reqID);
 
         /* Check if all OK */

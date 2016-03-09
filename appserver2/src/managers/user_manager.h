@@ -33,7 +33,7 @@ namespace ec2
         QnUserManager( QueryProcessorType* const queryProcessor);
 
         virtual int getUsers(impl::GetUsersHandlerPtr handler ) override;
-        virtual int save( const ec2::ApiUserData& user, const QString& newPassword, impl::AddUserHandlerPtr handler ) override;
+        virtual int save( const ec2::ApiUserData& user, const QString& newPassword, impl::SimpleHandlerPtr handler ) override;
         virtual int remove( const QnUuid& id, impl::SimpleHandlerPtr handler ) override;
 
     private:
