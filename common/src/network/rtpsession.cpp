@@ -300,9 +300,14 @@ void QnRtspTimeHelper::printTime(double jitter)
 
 qint64 QnRtspTimeHelper::getUsecTime(quint32 rtpTime, const RtspStatistic& statistics, int frequency, bool recursiveAllowed)
 {
+    /*
     if (statistics.isEmpty())
+    {
         return qnSyncTime->currentMSecsSinceEpoch() * 1000;
-    else {
+    }
+    else 
+    */
+    {
         int rtpTimeDiff = rtpTime - statistics.timestamp;
         double resultInSecs = cameraTimeToLocalTime(statistics.nptTime + rtpTimeDiff / double(frequency));
         double localTimeInSecs = qnSyncTime->currentMSecsSinceEpoch()/1000.0;
@@ -334,7 +339,7 @@ qint64 QnRtspTimeHelper::getUsecTime(quint32 rtpTime, const RtspStatistic& stati
         if ((camTimeChanged || localTimeChanged || gotInvalidTime) && recursiveAllowed)
         {
             qint64 currentUsecTime = getUsecTimer();
-            if (currentUsecTime - m_lastWarnTime > 2000 * 1000ll)
+            if (!statistics.isEmpty() && currentUsecTime - m_lastWarnTime > 2000 * 1000ll)
             {
                 if (camTimeChanged) {
                     NX_LOG(QString(lit("Camera time has been changed or receiving latency > 10 seconds. Resync time for camera %1")).arg(m_resId), cl_logWARNING);
