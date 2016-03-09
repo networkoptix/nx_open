@@ -197,13 +197,8 @@ void QnAbstractMediaStreamDataProvider::checkTime(const QnAbstractMediaDataPtr& 
     {
         // correct packets timestamp if we have got several packets very fast
         int channel = media->channelNumber;
-        qint64 minDelta = MIN_FRAME_DURATION;
         if (media->dataType == QnAbstractMediaData::AUDIO)
-        {
             channel = CL_MAX_CHANNELS; //< use last vector element for audio timings control
-            static const qint64 kMinAudioFrame = 1000ll; //< 1 ms
-            minDelta = kMinAudioFrame;
-        }
         if (media->flags & (QnAbstractMediaData::MediaFlags_BOF | QnAbstractMediaData::MediaFlags_ReverseBlockStart))
         {
             resetTimeCheck();
@@ -212,7 +207,7 @@ void QnAbstractMediaStreamDataProvider::checkTime(const QnAbstractMediaDataPtr& 
         {
             qint64 timeDiff = media->timestamp - m_lastMediaTime[channel];
             // if timeDiff < -N it may be time correction or dayling time change
-            if (timeDiff >=-TIME_RESYNC_THRESHOLD  && timeDiff < minDelta)
+            if (timeDiff >=-TIME_RESYNC_THRESHOLD  && timeDiff < MIN_FRAME_DURATION)
             {
                 //most likely, timestamp reported by camera are not that good
                 NX_LOG(lit("Timestamp correction. ts diff %1, camera %2, %3 stream").
@@ -221,7 +216,7 @@ void QnAbstractMediaStreamDataProvider::checkTime(const QnAbstractMediaDataPtr& 
                     arg((media->flags & QnAbstractMediaData::MediaFlags_LowQuality) ? lit("low") : lit("high")),
                     cl_logDEBUG1);
 
-                media->timestamp = m_lastMediaTime[channel] + minDelta;
+                media->timestamp = m_lastMediaTime[channel] + MIN_FRAME_DURATION;
             }
         }
         m_lastMediaTime[channel] = media->timestamp;
