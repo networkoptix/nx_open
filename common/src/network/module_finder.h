@@ -2,6 +2,7 @@
 
 #include <chrono>
 
+#include <QtCore/QUrl>
 #include <QtCore/QHash>
 #include <QtCore/QElapsedTimer>
 #include <QtNetwork/QHostAddress>
