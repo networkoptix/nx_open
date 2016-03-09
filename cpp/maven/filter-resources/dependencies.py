@@ -1,18 +1,7 @@
 ﻿#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 import os
-
-TARGET = "${rdep.target}"
-RDEP_PATH = os.path.join("${environment.dir}", "rdep")
-BUILD_CONFIGURATION = "${build.configuration}"
-PLATFORM = "${platform}"
-
-if "windows" in PLATFORM:
-    TARGET_DIRECTORY = "${libdir}/${arch}"
-else:
-    TARGET_DIRECTORY = "${libdir}"
-
+import get_dependencies
 
 #TODO: This needs a better place
 DEPENDENCY_VERSIONS = {
@@ -43,30 +32,39 @@ def get_versioned_package_name(package):
         return package + "-" + version
     return package
 
-def get_packages():
+def get_packages(target):
     packages = """${rdep.packages}"""
 
-    if TARGET.startswith("windows"):
+    if target.startswith("windows"):
         packages += """ ${rdep.windows.packages}"""
-    elif TARGET.startswith("linux"):
+    elif target.startswith("linux"):
         packages += """ ${rdep.linux.packages}"""
-    elif TARGET.startswith("macos"):
+    elif target.startswith("macos"):
         packages += """ ${rdep.mac.packages}"""
-    elif TARGET.startswith("android"):
+    elif target.startswith("android"):
         packages += """ ${rdep.android.packages}"""
-    elif TARGET.startswith("ios"):
+    elif target.startswith("ios"):
         packages += """ ${rdep.ios.packages}"""
 
     if '{' in packages:
         return []
 
-    return packages.split()
-
-def print_configuration():
-    print get_packages()
-    print TARGET, BUILD_CONFIGURATION
-    print TARGET_DIRECTORY
-    print RDEP_PATH
+    return [get_versioned_package_name(package) for package in packages.split()]
 
 if __name__ == '__main__':
-    print_configuration()
+    target = "${rdep.target}"
+    debug = "${build.configuration}" == "debug"
+    target_dir = "${libdir}"
+    if "windows" in "${platform}":
+        target_dir = os.path.join(target_dir, "${arch}")
+    packages = get_packages(target)
+
+    print "------------------------------------------------------------------------"
+    print "Get packages"
+    print "------------------------------------------------------------------------"
+    print "Target:", target
+    print "Target dir:", target_dir
+    print "Debug:", debug
+    print "Packages:", packages
+
+    get_dependencies.get_dependencies(target, packages, target_dir, debug)
