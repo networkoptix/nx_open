@@ -173,17 +173,22 @@ private:
     void addNewConnections();
 };
 
-/** \class TCPSocket modification which randomly connects to different ports
- *  according to @param kShift */
+/**
+ * A TCPSocket modification which randomly connects to different ports according to @p kShift.
+ */
 template<quint16 kShift>
 class MultipleClientSocketTester
-    : public TCPSocket
+:
+    public TCPSocket
 {
 public:
     MultipleClientSocketTester()
-        : TCPSocket() {}
+    :
+        TCPSocket()
+    {
+    }
 
-    bool connect(const SocketAddress& address, unsigned int timeout ) override
+    bool connect(const SocketAddress& address, unsigned int timeout) override
     {
         return TCPSocket::connect(modifyAddress(address), timeout);
     }
@@ -200,8 +205,10 @@ private:
     {
         static quint16 modifier = 0;
         if (m_address == SocketAddress())
+        {
             m_address = SocketAddress(
                 address.address, address.port + (modifier++ % kShift));
+        }
 
         return m_address;
     }
@@ -209,8 +216,8 @@ private:
     SocketAddress m_address;
 };
 
-}   //test
-}   //network
-}   //nx
+} // namespace test
+} // namespace network
+} // namespace nx
 
 #endif  //SOCKET_TEST_HELPER_H
