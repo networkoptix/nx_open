@@ -118,7 +118,7 @@ bool QnStorageDb::deleteRecordsUnsafe(const QString& cameraUniqueId,
     m_dbHelper.writeRecordAsync(mediaFileOp);
 
     {
-        QnMutexLocker lk(&m_syncMutex);
+        QnMutexLocker lk(&m_errorMutex);
         if (m_lastWriteError != nx::media_db::Error::NoError &&
             m_lastWriteError != nx::media_db::Error::Eof)
         {
@@ -168,7 +168,7 @@ bool QnStorageDb::addRecordUnsafe(const QString& cameraUniqueId,
     m_dbHelper.writeRecordAsync(mediaFileOp);
 
     {
-        QnMutexLocker lk(&m_syncMutex);
+        QnMutexLocker lk(&m_errorMutex);
         if (m_lastWriteError != nx::media_db::Error::NoError &&
             m_lastWriteError != nx::media_db::Error::Eof)
         {
@@ -312,7 +312,12 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadChunksFileCatalog()
         return QVector<DeviceFileCatalogPtr>();
     }
 
-    while ((m_lastReadError = m_dbHelper.readRecord()) == nx::media_db::Error::NoError);
+    nx::media_db::Error error;
+    while ((error = m_dbHelper.readRecord()) == nx::media_db::Error::NoError)
+    {
+        QnMutexLocker lk(&m_errorMutex);
+        m_lastReadError = error;
+    }
 
     if (!vacuum() && !startDbFile())
         return QVector<DeviceFileCatalogPtr>();
@@ -401,7 +406,11 @@ bool QnStorageDb::vacuum()
     if (error == nx::media_db::Error::ReadError || dbVersion != m_dbVersion)
         return false;
 
-    while ((m_lastReadError = m_dbHelper.readRecord()) == nx::media_db::Error::NoError);
+    while ((error= m_dbHelper.readRecord()) == nx::media_db::Error::NoError)
+    {
+        QnMutexLocker lk(&m_errorMutex);
+        m_lastReadError = error;
+    }
 
     bool isDataConsistent = checkDataConsistency(readDataCopy);
     assert(isDataConsistent);
@@ -468,7 +477,12 @@ void QnStorageDb::handleCameraOp(const nx::media_db::CameraOperation &cameraOp,
 void QnStorageDb::handleMediaFileOp(const nx::media_db::MediaFileOperation &mediaFileOp,
                                     nx::media_db::Error error) 
 {
-    if ((m_lastReadError = error) == nx::media_db::Error::ReadError)
+    {
+        QnMutexLocker lk(&m_errorMutex);
+        m_lastReadError = error;
+    }
+
+    if (error == nx::media_db::Error::ReadError)
         return;
 
     uint16_t cameraId = mediaFileOp.getCameraId();
@@ -529,12 +543,12 @@ void QnStorageDb::handleMediaFileOp(const nx::media_db::MediaFileOperation &medi
 
 void QnStorageDb::handleError(nx::media_db::Error error) 
 {
-    QnMutexLocker lk(&m_syncMutex);
+    QnMutexLocker lk(&m_errorMutex);
     m_lastReadError = error;
 }
 
 void QnStorageDb::handleRecordWrite(nx::media_db::Error error)
 {
-    QnMutexLocker lk(&m_syncMutex);
+    QnMutexLocker lk(&m_errorMutex);
     m_lastWriteError = error;
 }

@@ -9,8 +9,13 @@
 #include <vector>
 #include <algorithm>
 
-#include "utils/media_db/media_db.h"
-#include "common/common_globals.h"
+#include "plugins/storage/file_storage/file_storage_resource.h"
+#include <recorder/storage_manager.h>
+#include <plugins/storage/file_storage/file_storage_resource.h>
+#include <core/resource_management/status_dictionary.h>
+#include <common/common_module.h>
+#include <core/resource_management/resource_properties.h>
+#include <utils/common/util.h>
 #include <QtCore>
 
 bool recursiveClean(const QString &path);
@@ -203,6 +208,130 @@ struct TestDataManager
     }
 
     TestDataVector dataVector;
+};
+
+class TestChunkManager
+{
+public:
+    struct Catalog
+    {
+        QByteArray cameraUniqueId;
+        QnServer::ChunksCatalog quality;
+    };
+
+    struct TestChunk
+    {
+        DeviceFileCatalog::Chunk chunk;
+        bool isDeleted;
+        bool isVisited;
+        Catalog *catalog;
+    };
+
+    typedef std::vector<TestChunk> TestChunkCont;
+    typedef std::vector<Catalog> CatalogCont;
+
+public:
+    TestChunkManager(int cameraCount)
+    {
+        for (int i = 0; i < cameraCount; ++i)
+        {
+            QByteArray camuuid;
+            generateCameraUid(&camuuid, genRandomNumber<7, 15>());
+            Catalog c1 = { camuuid, QnServer::LowQualityCatalog };
+            Catalog c2 = { camuuid, QnServer::HiQualityCatalog };
+            
+            m_catalogs.push_back(c1);
+            m_catalogs.push_back(c2);
+        }
+    }
+
+    TestChunk generateAddOperation()
+    {   
+        static std::random_device rd;
+        static std::mt19937 gen(rd());
+        static std::uniform_int_distribution<qint64> dist(0, m_catalogs.size() - 1);
+
+        Catalog *catalog = &m_catalogs[dist(gen)];
+        TestFileOperation fileOp = generateFileOperation(0);
+        DeviceFileCatalog::Chunk chunk(fileOp.startTime, 1,
+                                       DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION,
+                                       fileOp.duration, fileOp.timeZone,
+                                       (quint16)(fileOp.fileSize >> 32),
+                                       (quint32)(fileOp.fileSize));
+
+        TestChunk ret;
+        ret.catalog = catalog;
+        ret.isDeleted = false;
+        ret.isVisited = false;
+        ret.chunk = chunk;
+
+        m_chunks.push_back(ret);
+
+        return ret;
+    }
+
+    TestChunk *generateRemoveOperation()
+    {
+        std::vector<TestChunk *> unremovedChunks;
+        for (size_t i = 0; i < m_chunks.size(); ++i)
+        {
+            if (m_chunks[i].isDeleted == false)
+                unremovedChunks.push_back(&m_chunks[i]);
+        }
+        if (unremovedChunks.empty())
+            return nullptr;
+        static std::random_device rd;
+        static std::mt19937 gen(rd());
+        static std::uniform_int_distribution<qint64> dist(0, unremovedChunks.size() - 1);
+
+        TestChunk *chunk = unremovedChunks[dist(gen)];
+        chunk->isDeleted = true;
+        return chunk;
+    }
+
+    std::pair<Catalog, std::deque<DeviceFileCatalog::Chunk>> generateReplaceOperation(int size)
+    {
+        static std::random_device rd;
+        static std::mt19937 gen(rd());
+        static std::uniform_int_distribution<qint64> dist(0, m_catalogs.size() - 1);
+
+        Catalog *catalog = &m_catalogs[dist(gen)];
+        for (size_t i = 0; i < m_chunks.size(); ++i)
+        {
+            if (m_chunks[i].catalog->cameraUniqueId == catalog->cameraUniqueId &&
+                m_chunks[i].catalog->quality == catalog->quality)
+            {
+                m_chunks[i].isDeleted = true;
+            }
+        }
+
+        std::deque<DeviceFileCatalog::Chunk> ret;
+        for (int i = 0; i < size; ++i)
+        {
+            TestFileOperation fileOp = generateFileOperation(0);
+            DeviceFileCatalog::Chunk chunk(fileOp.startTime, 1,
+                                           DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION,
+                                           fileOp.duration, fileOp.timeZone,
+                                           (quint16)((fileOp.fileSize) >> 32),
+                                           (quint32)(fileOp.fileSize));
+
+            TestChunk tc;
+            tc.catalog = catalog;
+            tc.isDeleted = false;
+            tc.chunk = chunk;
+
+            m_chunks.push_back(tc);
+            ret.push_back(tc.chunk);
+        }
+
+        return std::make_pair(*catalog, ret);
+    }
+
+    TestChunkCont &get() { return m_chunks; }
+
+private:
+    TestChunkCont m_chunks;
+    CatalogCont m_catalogs;
 };
 
 class TestDbHelperHandler : public nx::media_db::DbHelperHandler
@@ -548,6 +677,128 @@ TEST(MediaDb_test, ReadWrite_MT)
     ASSERT_TRUE(readRecords == tdm.dataVector.size()) << readRecords;
     dbFile.close();
     recursiveClean(workDirPath);
+}
+
+TEST(MediaDb_test, StorageDB)
+{
+    const QString workDirPath = qApp->applicationDirPath() + lit("/tmp/media_db");
+
+    std::unique_ptr<QnCommonModule> commonModule;
+    if (!qnCommon) {
+        commonModule = std::unique_ptr<QnCommonModule>(new QnCommonModule);
+    }
+    commonModule->setModuleGUID("{A680980C-70D1-4545-A5E5-72D89E33648B}");
+
+    std::unique_ptr<QnResourceStatusDictionary> statusDictionary;
+    if (!qnStatusDictionary) {
+        statusDictionary = std::unique_ptr<QnResourceStatusDictionary>(
+                new QnResourceStatusDictionary);
+    }
+
+    std::unique_ptr<QnResourcePropertyDictionary> propDictionary;
+    if (!propertyDictionary) {
+        propDictionary = std::unique_ptr<QnResourcePropertyDictionary>(
+            new QnResourcePropertyDictionary);
+    }
+
+    std::unique_ptr<QnStorageDbPool> dbPool;
+    if (!qnStorageDbPool) {
+        dbPool = std::unique_ptr<QnStorageDbPool>(new QnStorageDbPool);
+    }
+
+    QnFileStorageResourcePtr storage(new QnFileStorageResource);
+    storage->setUrl(workDirPath);
+
+    QnStorageDb sdb(storage, 1);
+    bool result = sdb.open(workDirPath + lit("test.nxdb"));
+    ASSERT_TRUE(result);
+    
+    sdb.loadFullFileCatalog();
+
+    QnMutex mutex;
+    std::vector<std::thread> threads;
+    TestChunkManager tcm(128);
+    
+    auto writerFunc = [&mutex, &sdb, &tcm]
+    {
+        for (int i = 0; i < 5000; ++i)
+        {
+            int diceRoll = genRandomNumber<0, 10>();
+            switch (diceRoll)
+            {
+            case 0:
+                {
+                    QnMutexLocker lk(&mutex);
+                    auto p = tcm.generateReplaceOperation(genRandomNumber<10, 100>());
+                    sdb.replaceChunks(p.first.cameraUniqueId, p.first.quality, p.second);
+                }
+            break;
+            case 1:
+            case 2:
+                {
+                    QnMutexLocker lk(&mutex);
+                    auto *chunk = tcm.generateRemoveOperation();
+                    if (chunk)
+                        sdb.deleteRecords(chunk->catalog->cameraUniqueId,
+                                          chunk->catalog->quality,
+                                          chunk->chunk.startTimeMs);
+                }
+                break;
+            default:
+                {
+                    QnMutexLocker lk(&mutex);
+                    auto chunk = tcm.generateAddOperation();
+                    sdb.addRecord(chunk.catalog->cameraUniqueId,
+                                  chunk.catalog->quality,
+                                  chunk.chunk);
+                }
+                break;
+            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        }
+    };
+
+    auto readerFunc = [&mutex, &tcm, &sdb]
+    {
+        for (size_t i = 0; i < 10; ++i)
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+            QnMutexLocker lk(&mutex);
+            auto dbChunkCatalogs = sdb.loadFullFileCatalog();
+
+            for (auto catalogIt = dbChunkCatalogs.cbegin(); catalogIt != dbChunkCatalogs.cend(); ++catalogIt)
+            {
+                for (auto chunkIt = (*catalogIt)->getChunks().cbegin(); chunkIt != (*catalogIt)->getChunks().cend(); ++chunkIt)
+                {
+                    TestChunkManager::TestChunkCont::iterator tcmIt = std::find_if(tcm.get().begin(), tcm.get().end(),
+                          [catalogIt, chunkIt](const TestChunkManager::TestChunk &tc)
+                          {
+                              return tc.catalog->cameraUniqueId == (*catalogIt)->cameraUniqueId() &&
+                                     tc.catalog->quality == (*catalogIt)->getCatalog() &&
+                                     !tc.isVisited && tc.chunk == *chunkIt;
+                          });
+                    bool tcmChunkFound = tcmIt != tcm.get().end();
+                    EXPECT_TRUE(tcmIt != tcm.get().end());
+                    if (tcmChunkFound)
+                        tcmIt->isVisited = true;
+                }
+            }
+
+            bool allVisited = std::none_of(tcm.get().begin(), tcm.get().end(), [](const TestChunkManager::TestChunk &tc) { return !tc.isDeleted && !tc.isVisited; });
+            ASSERT_EQ(allVisited, true);
+
+            for (auto tcmIt = tcm.get().begin(); tcmIt != tcm.get().end(); ++tcmIt)
+                tcmIt->isVisited = false;
+        }
+    };
+
+    for (size_t i = 0; i < 3; ++i)
+        threads.push_back(std::thread(writerFunc));
+
+    threads.push_back(std::thread(readerFunc));
+
+    for (auto &t : threads)
+        t.join();
 }
 
 TEST(MediaDb_test, Cleanup)

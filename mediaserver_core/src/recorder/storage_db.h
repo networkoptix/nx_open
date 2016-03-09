@@ -11,7 +11,7 @@
 
 #include <QElapsedTimer>
 
-#include <server/server_globals.h>
+//#include <server/server_globals.h>
 #include "utils/media_db/media_db.h"
 
 #include "device_file_catalog.h"
@@ -68,7 +68,7 @@ private:
                                    QVector<DeviceFileCatalogPtr>& result);
 
     bool resetIoDevice();
-    // returns cameraId (hash from cameraUniqueId)
+    // returns cameraId (hash for cameraUniqueId)
     int fillCameraOp(nx::media_db::CameraOperation &cameraOp, const QString &cameraUniqueId);
     QVector<DeviceFileCatalogPtr> buildReadResult() const;
     bool vacuum();
@@ -87,6 +87,7 @@ private:
     int m_storageIndex;
     mutable QnMutex m_syncMutex;
     mutable QnMutex m_modeMutex;
+    mutable QnMutex m_errorMutex;
 
     nx::media_db::DbHelper m_dbHelper;
     std::unique_ptr<QIODevice> m_ioDevice;

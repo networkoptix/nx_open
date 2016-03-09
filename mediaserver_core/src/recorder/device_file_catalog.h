@@ -211,6 +211,9 @@ public:
     QnRecordingStatsData getStatistics(qint64 bitrateAnalizePeriodMs) const;
 
     QnServer::StoragePool getStoragePool() const;
+
+    // only for unit tests, don't use in production.
+    std::deque<Chunk> &getChunks() { return m_chunks; }
 private:
 
     bool csvMigrationCheckFile(const Chunk& chunk, QnStorageResourcePtr storage);
