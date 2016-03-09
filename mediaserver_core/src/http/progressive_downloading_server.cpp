@@ -625,9 +625,6 @@ void QnProgressiveDownloadingConsumer::run()
         bool isUTCRequest = !decodedUrlQuery.queryItemValue("posonly").isNull();
         auto camera = qnCameraPool->getVideoCamera(resource);
 
-        QnVirtualCameraResourcePtr camRes = resource.dynamicCast<QnVirtualCameraResource>();
-        if (camRes && camRes->isAudioEnabled())
-            d->transcoder.setAudioCodec(CODEC_ID_VORBIS, QnTranscoder::TM_FfmpegTranscode);
         bool isLive = position.isEmpty() || position == "now";
 
         QnProgressiveDownloadingDataConsumer dataConsumer(
@@ -747,6 +744,10 @@ void QnProgressiveDownloadingConsumer::run()
             sendResponse(CODE_INTERNAL_ERROR, "plain/text");
             return;
         }
+
+        QnVirtualCameraResourcePtr camRes = resource.dynamicCast<QnVirtualCameraResource>();
+        if (camRes && camRes->isAudioEnabled() && d->transcoder.isCodecSupported(CODEC_ID_VORBIS))
+            d->transcoder.setAudioCodec(CODEC_ID_VORBIS, QnTranscoder::TM_FfmpegTranscode);
 
         dataProvider->addDataProcessor(&dataConsumer);
         d->chunkedMode = true;

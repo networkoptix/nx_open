@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SERVER_INTERFACE_WATCHER_H
+#define SERVER_INTERFACE_WATCHER_H
 
 #include <QtCore/QObject>
 
@@ -15,8 +16,10 @@ public:
 private slots:
     void at_connectionChanged(const QnModuleInformation &moduleInformation);
     void at_resourcePool_statusChanged(const QnResourcePtr &resource);
-    void at_initialResourcesReceived();
+    void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
 
 private:
     void updatePriaryInterface(const QnMediaServerResourcePtr &server);
 };
+
+#endif // SERVER_INTERFACE_WATCHER_H
