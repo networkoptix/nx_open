@@ -22,14 +22,9 @@ void QnSystemsFinder::addSystemsFinder(QnAbstractSystemsFinder *finder)
         connect(finder, &QnAbstractSystemsFinder::systemLost
         , this, &QnSystemsFinder::systemLost);
 
-
-    const QPointer<QnSystemsFinder> guard;
     const auto destroyedConnection = 
-        connect(finder, &QObject::destroyed, this, [this, finder, guard]()
+        connect(finder, &QObject::destroyed, this, [this, finder]()
     {
-        if (!guard)
-            return;
-
         m_finders.remove(finder);
     });
 
@@ -44,7 +39,7 @@ void QnSystemsFinder::addSystemsFinder(QnAbstractSystemsFinder *finder)
 QnAbstractSystemsFinder::SystemDescriptionList QnSystemsFinder::systems() const
 {
     SystemDescriptionList result;
-    for (auto it = m_finders.begin(); it != m_finders.end(); ++it)
-        result << it.key()->systems();
+    for (const auto finder: m_finders.keys())
+        result << finder->systems();
     return result;
 }

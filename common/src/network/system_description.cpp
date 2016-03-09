@@ -63,10 +63,7 @@ bool QnSystemDescription::isCloudSystem() const
 
 QnSystemDescription::ServersList QnSystemDescription::servers() const
 {
-    ServersList result;
-    for (const auto &serverInfo: m_servers)
-        result.append(serverInfo);
-    return result;
+    return m_servers.values();
 }
 
 void QnSystemDescription::addServer(const QnModuleInformation &serverInfo)

@@ -24,9 +24,8 @@ public: //overrides
     SystemDescriptionList systems() const override;
 
 private:
-    typedef QPointer<QnAbstractSystemsFinder> SystemsFinderPtr;
-    typedef QMap<SystemsFinderPtr, QnConnectionsHolder::Pointer> 
-        SystemsFinderList;
+    typedef QMap<QnAbstractSystemsFinder *
+        , QnConnectionsHolder::Pointer> SystemsFinderList;
 
     SystemsFinderList m_finders;
 };

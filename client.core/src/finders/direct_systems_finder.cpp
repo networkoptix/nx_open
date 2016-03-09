@@ -27,11 +27,7 @@ QnDirectSystemsFinder::~QnDirectSystemsFinder()
 
 QnAbstractSystemsFinder::SystemDescriptionList QnDirectSystemsFinder::systems() const
 {
-    SystemDescriptionList result;
-    for (const auto systemDesciption: m_systems)
-        result.append(systemDesciption);
-
-    return result;
+    return m_systems.values();
 }
 
 void QnDirectSystemsFinder::addServer(const QnModuleInformation &moduleInformation)
@@ -96,7 +92,7 @@ void QnDirectSystemsFinder::removeServer(const QnModuleInformation &moduleInform
 void QnDirectSystemsFinder::updateServer(const SystemsHash::iterator systemIt
     , const QnModuleInformation &moduleInformation)
 {
-    const bool isServer = moduleInformation.type != QnModuleInformation::nxMediaServerId();
+    const bool isServer = moduleInformation.type == QnModuleInformation::nxMediaServerId();
     Q_ASSERT_X(isServer, Q_FUNC_INFO, "Module is not server");
     if (!isServer)
         return;
