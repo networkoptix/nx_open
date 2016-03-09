@@ -132,8 +132,8 @@ void QnMjpegPlayerPrivate::processFrame() {
     if (frameData.image.width() > maxTextureSize || frameData.image.height() > maxTextureSize)
         frameData.image = frameData.image.scaled(maxTextureSize, maxTextureSize, Qt::KeepAspectRatio);
 
-    QVideoFrame frame(frameData.image);
-    if (videoSurface) {
+    if (videoSurface && !frameData.image.isNull()) {
+        QVideoFrame frame(frameData.image);
         if (videoSurface->isActive() && videoSurface->surfaceFormat().pixelFormat() != frame.pixelFormat())
             videoSurface->stop();
 
