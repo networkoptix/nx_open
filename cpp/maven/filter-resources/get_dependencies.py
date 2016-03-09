@@ -1,7 +1,7 @@
 ﻿#!/usr/bin/env python
 
 import os
-import get_dependencies
+import rdep_dependencies
 
 #TODO: This needs a better place
 DEPENDENCY_VERSIONS = {
@@ -67,4 +67,4 @@ if __name__ == '__main__':
     print "Debug:", debug
     print "Packages:", packages
 
-    get_dependencies.get_dependencies(target, packages, target_dir, debug)
+    rdep_dependencies.get_dependencies(target, packages, target_dir, debug)

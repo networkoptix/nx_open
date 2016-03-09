@@ -109,7 +109,7 @@
                         <configuration>
                             <executable>${init.python.dir}/${python.executable}</executable>
                             <arguments>
-                                <argument>dependencies.py</argument>
+                                <argument>get_dependencies.py</argument>
                             </arguments>
                             <environmentVariables>
                                 <PYTHONPATH>${root.dir}/build_utils/python</PYTHONPATH>
