@@ -1,7 +1,9 @@
 function(process_resources)  
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/defines.h.cmake
-                 ${CMAKE_CURRENT_BINARY_DIR}/defines.h
-                 )
+  if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/defines.h.cmake")
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/defines.h.cmake
+                   ${CMAKE_CURRENT_BINARY_DIR}/defines.h
+                   )
+  endif()
   file(GLOB_RECURSE FILTERED_RESOURCES "${PROJECT_SOURCE_DIR}/maven/filter-resources/*" "${CMAKE_SOURCE_DIR}/cpp/maven/filter-resources/*")
   foreach(filename ${FILTERED_RESOURCES})
     message("Filtering and Copying: " ${filename})  

@@ -135,6 +135,7 @@ include_directories($ENV{environment}/boost_1_56_0
                     $ENV{environment}/include/glext
                     $ENV{environment}/qt5-custom
                     ${CMAKE_SOURCE_DIR}/common_libs/nx_utils/src
+                    ${CMAKE_SOURCE_DIR}/common_libs/nx_utils/src/nx
                     ${CMAKE_SOURCE_DIR}/common_libs/nx_network/src
                     ${CMAKE_SOURCE_DIR}/common_libs/nx_streaming/src
                     ${CMAKE_SOURCE_DIR}/common_libs/nx_media/src
@@ -162,20 +163,21 @@ include_directories($ENV{environment}/boost_1_56_0
                     $ENV{environment}/artifacts/vmax_integration/${vmax_integration.version}/include
                     )
 
-LINK_DIRECTORIES($ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}
-                 $ENV{environment}/artifacts/openal/${openal.version}/${platform}/${box}/${arch}/lib/${configuration}
-                 $ENV{environment}/artifacts/directx/${directx.version}/${platform}/${box}/${arch}/lib/${configuration}
-                 $ENV{environment}/artifacts/festival/${festival.version}/${platform}/${box}/${arch}/lib/${configuration}
-                 $ENV{environment}/artifacts/ffmpeg/${ffmpeg.version}/${platform}/${box}/${arch}/lib/${configuration}
-                 $ENV{environment}/artifacts/gmock/${gmock.version}/${platform}/${box}/${arch}/lib/${configuration}
-                 $ENV{environment}/artifacts/gtest/${gtest.version}/${platform}/${box}/${arch}/lib/${configuration}
-                 $ENV{environment}/artifacts/mfx/${mfx.version}/${platform}/${box}/${arch}/lib/${configuration}
-                 $ENV{environment}/artifacts/onvif/${onvif.version}/${platform}/${box}/${arch}/lib/${configuration}
-                 $ENV{environment}/artifacts/openssl/${openssl.version}/${platform}/${box}/${arch}/lib/${configuration}
-                 $ENV{environment}/artifacts/quazip/${quazip.version}/${platform}/${box}/${arch}/lib/${configuration}
-                 $ENV{environment}/artifacts/sigar/${sigar.version}/${platform}/${box}/${arch}/lib/${configuration}
-                 $ENV{environment}/artifacts/vmax_integration/${vmax_integration.version}/${platform}/${box}/${arch}/lib/${configuration}
-                 )                    
+LINK_DIRECTORIES(${CMAKE_BINARY_DIR}/common
+                $ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}
+                $ENV{environment}/artifacts/openal/${openal.version}/${platform}/${box}/${arch}/lib/${configuration}
+                $ENV{environment}/artifacts/directx/${directx.version}/${platform}/${box}/${arch}/lib/${configuration}
+                $ENV{environment}/artifacts/festival/${festival.version}/${platform}/${box}/${arch}/lib/${configuration}
+                $ENV{environment}/artifacts/ffmpeg/${ffmpeg.version}/${platform}/${box}/${arch}/lib/${configuration}
+                $ENV{environment}/artifacts/gmock/${gmock.version}/${platform}/${box}/${arch}/lib/${configuration}
+                $ENV{environment}/artifacts/gtest/${gtest.version}/${platform}/${box}/${arch}/lib/${configuration}
+                $ENV{environment}/artifacts/mfx/${mfx.version}/${platform}/${box}/${arch}/lib/${configuration}
+                $ENV{environment}/artifacts/onvif/${onvif.version}/${platform}/${box}/${arch}/lib/${configuration}
+                $ENV{environment}/artifacts/openssl/${openssl.version}/${platform}/${box}/${arch}/lib/${configuration}
+                $ENV{environment}/artifacts/quazip/${quazip.version}/${platform}/${box}/${arch}/lib/${configuration}
+                $ENV{environment}/artifacts/sigar/${sigar.version}/${platform}/${box}/${arch}/lib/${configuration}
+                $ENV{environment}/artifacts/vmax_integration/${vmax_integration.version}/${platform}/${box}/${arch}/lib/${configuration}
+                )                    
                     
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Core REQUIRED)
@@ -183,7 +185,8 @@ find_package(Qt5LinguistTools)
                     
 add_module(
     NAMES
-        nxtool
-        common
+        #nxtool
+        #common
+        common_libs
     STATUS_SHORT_NAMES
 )

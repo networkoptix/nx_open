@@ -16,7 +16,6 @@ endif()
 project(nxtool)
 set(PROJECT_SHORTNAME "nxtool")
 set(PROJECT_LONGNAME "${nxtool.company.name} Server Tool")
-set(PROJECT_VERSION "2.5.0")
 set(WINDOWS_RES_FILE ${PROJECT_BINARY_DIR}/${PROJECT_SHORTNAME}.obj)
 include(default_project_properties)
 
