@@ -6,6 +6,9 @@
 class QnConnectionsHolder
 {
 public:
+    typedef QSharedPointer<QnConnectionsHolder> Pointer;
+    static Pointer create();
+
     QnConnectionsHolder();
 
     ~QnConnectionsHolder();

@@ -1,6 +1,11 @@
 
 #include "connections_holder.h"
 
+QnConnectionsHolder::Pointer QnConnectionsHolder::create()
+{
+    return Pointer(new QnConnectionsHolder());
+}
+
 QnConnectionsHolder::QnConnectionsHolder()
     : m_connections()
 {}

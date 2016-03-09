@@ -5,8 +5,14 @@
 
 class QnCloudSystemsFinder : public QnAbstractSystemsFinder
 {
+    Q_OBJECT
+    typedef QnAbstractSystemsFinder base_type;
 public:
-    QnCloudSystemsFinder();
+    QnCloudSystemsFinder(QObject *parent = nullptr);
+
+
+public: // overrides
+    SystemDescriptionList systems() const override;
 
 private:
     void onConnectedToCloud(const QString &userName);

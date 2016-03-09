@@ -2,7 +2,10 @@
 #pragma once
 
 #include <nx/utils/singleton.h>
+#include <utils/common/connections_holder.h>
 #include <network/abstract_systems_finder.h>
+
+class ConnectionsHolder;
 
 class QnSystemsFinder : public QnAbstractSystemsFinder
     , public Singleton<QnSystemsFinder>
@@ -11,18 +14,21 @@ class QnSystemsFinder : public QnAbstractSystemsFinder
     typedef QnAbstractSystemsFinder base_type;
 
 public:
-    QnSystemsFinder(QObject *parent = nullptr);
+    explicit QnSystemsFinder(QObject *parent = nullptr);
 
     virtual ~QnSystemsFinder();
     
+    void addSystemsFinder(QnAbstractSystemsFinder *finder);
+
 public: //overrides
     SystemDescriptionList systems() const override;
 
 private:
-    typedef QScopedPointer<QnAbstractSystemsFinder> SystemsFinderPtr;
+    typedef QPointer<QnAbstractSystemsFinder> SystemsFinderPtr;
+    typedef QMap<SystemsFinderPtr, QnConnectionsHolder::Pointer> 
+        SystemsFinderList;
 
-    const SystemsFinderPtr m_directSystemsFinder;
-    const SystemsFinderPtr m_cloudSystemsFinder;
+    SystemsFinderList m_finders;
 };
 
 

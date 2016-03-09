@@ -119,6 +119,8 @@ extern "C"
 #include <nx_ec/dummy_handler.h>
 #include <network/module_finder.h>
 #include <network/systems_finder.h>
+#include <network/direct_systems_finder.h>
+#include <network/cloud_systems_finder.h>
 #include <network/router.h>
 #include <api/network_proxy_factory.h>
 #include <utils/server_interface_watcher.h>
@@ -468,7 +470,13 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     moduleFinder->start();
 
     // TODO: #ynikitenkov: move to common module? -> dependency on moduleFinder
-    const QScopedPointer<QnAbstractSystemsFinder> systemsFinder(new QnSystemsFinder());
+
+    typedef QScopedPointer<QnAbstractSystemsFinder> SystemsFinderPtr;
+    const QScopedPointer<QnSystemsFinder> systemsFinder(new QnSystemsFinder());
+    const SystemsFinderPtr directSystemsFinder(new QnDirectSystemsFinder());
+    const SystemsFinderPtr cloudSystemsFinder(new QnCloudSystemsFinder());
+    systemsFinder->addSystemsFinder(directSystemsFinder.data());
+    systemsFinder->addSystemsFinder(cloudSystemsFinder.data());
 
     QScopedPointer<QnRouter> router(new QnRouter(moduleFinder.data()));
 
