@@ -6,7 +6,7 @@
 #include <utils/common/generic_guard.h>
 #include <utils/common/software_version.h>
 #include <utils/common/connections_holder.h>
-#include <network/systems_finder.h>
+#include <finders/systems_finder.h>
 
 namespace
 {

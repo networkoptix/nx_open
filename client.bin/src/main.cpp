@@ -118,9 +118,9 @@ extern "C"
 #include <nx_ec/ec2_lib.h>
 #include <nx_ec/dummy_handler.h>
 #include <network/module_finder.h>
-#include <network/systems_finder.h>
-#include <network/direct_systems_finder.h>
-#include <network/cloud_systems_finder.h>
+#include <finders/systems_finder.h>
+#include <finders/direct_systems_finder.h>
+#include <finders/cloud_systems_finder.h>
 #include <network/router.h>
 #include <api/network_proxy_factory.h>
 #include <utils/server_interface_watcher.h>

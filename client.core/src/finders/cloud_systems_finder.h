@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include <network/abstract_systems_finder.h>
+#include <finders/abstract_systems_finder.h>
 
 class QnCloudSystemsFinder : public QnAbstractSystemsFinder
 {

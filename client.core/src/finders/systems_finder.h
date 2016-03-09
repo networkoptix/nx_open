@@ -3,7 +3,7 @@
 
 #include <nx/utils/singleton.h>
 #include <utils/common/connections_holder.h>
-#include <network/abstract_systems_finder.h>
+#include <finders/abstract_systems_finder.h>
 
 class ConnectionsHolder;
 
