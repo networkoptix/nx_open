@@ -281,7 +281,6 @@ void QnCommonMetaTypes::initialize() {
 
     qRegisterMetaType<ec2::ErrorCode>( "ErrorCode" );
     qRegisterMetaType<ec2::AbstractECConnectionPtr>( "AbstractECConnectionPtr" );
-    qRegisterMetaType<ec2::QnFullResourceData>( "QnFullResourceData" );
     qRegisterMetaType<ec2::QnPeerTimeInfo>( "QnPeerTimeInfo" );
     qRegisterMetaType<ec2::QnPeerTimeInfoList>( "QnPeerTimeInfoList" );
     qRegisterMetaType<ec2::ApiPeerAliveData>( "ApiPeerAliveData" );

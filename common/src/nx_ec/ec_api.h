@@ -45,19 +45,6 @@ struct QnModuleInformation;
 */
 namespace ec2
 {
-    struct QnFullResourceData
-    {
-        QnResourceTypeList resTypes;
-        QnResourceList resources;
-        QnMediaServerUserAttributesList serverUserAttributesList;
-        QnCameraUserAttributesList cameraUserAttributesList;
-        QnBusinessEventRuleList bRules; // TODO: #Elric #EC2 rename
-        ApiServerFootageDataList camerasWithArchiveList;
-        QnLicenseList licenses;
-        ec2::ApiResourceParamWithRefDataList allProperties;
-        ec2::ApiResourceStatusDataList resStatusList;
-    };
-
     struct QnPeerTimeInfo {
 
         QnPeerTimeInfo():
@@ -1105,7 +1092,6 @@ namespace ec2
     };
 }
 
-Q_DECLARE_METATYPE(ec2::QnFullResourceData);
 Q_DECLARE_METATYPE(ec2::QnPeerTimeInfo);
 Q_DECLARE_METATYPE(ec2::QnPeerTimeInfoList);
 
