@@ -28,6 +28,7 @@ namespace style
     {
     public:
         static const char *kHoveredRowProperty;
+        static const char *kAccentStyleProperty;
     };
 
     qreal dpr(qreal value);

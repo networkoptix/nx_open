@@ -192,12 +192,8 @@ void QnNxStyle::drawPrimitive(
 
             if (option->state.testFlag(State_Enabled))
             {
-                if (const QStyleOptionButton *button =
-                       qstyleoption_cast<const QStyleOptionButton *>(option))
-                {
-                    if (button->features.testFlag(QStyleOptionButton::DefaultButton))
-                        mainColor = this->mainColor(Colors::kBlue);
-                }
+                if (widget && widget->property(Properties::kAccentStyleProperty).toBool())
+                    mainColor = this->mainColor(Colors::kBlue);
             }
 
             QColor buttonColor = mainColor;
