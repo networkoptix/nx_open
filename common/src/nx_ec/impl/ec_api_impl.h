@@ -186,8 +186,7 @@ namespace ec2
             void emitTestConnectionDone( int reqID, const ErrorCode p1, const QnConnectionInfo& p2 ) { emit onTestConnectionDone( reqID, p1, p2 ); }
             void emitConnectDone( int reqID, const ErrorCode p1, const AbstractECConnectionPtr &p2 ) { emit onConnectDone( reqID, p1, p2 ); }
             void emitGetVideowallsDone( int reqID, const ErrorCode p1, const ec2::ApiVideowallDataList& p2 ) { emit onGetVideowallsDone( reqID, p1, p2 ); }
-            void emitAddWebPageDone( int reqID, const ErrorCode p1, const QnWebPageResourceList& p2 ) { emit onAddWebPageDone( reqID, p1, p2 ); }
-            void emitGetWebPagesDone( int reqID, const ErrorCode p1, const QnWebPageResourceList& p2 ) { emit onGetWebPagesDone( reqID, p1, p2 ); }
+            void emitGetWebPagesDone( int reqID, const ErrorCode p1, const ec2::ApiWebPageDataList& p2 ) { emit onGetWebPagesDone( reqID, p1, p2 ); }
 
         signals:
             void onSimpleDone( int reqID, const ErrorCode );
@@ -221,8 +220,7 @@ namespace ec2
             void onTestConnectionDone( int reqID, const ErrorCode, const QnConnectionInfo& );
             void onConnectDone( int reqID, const ErrorCode, const AbstractECConnectionPtr &);
             void onGetVideowallsDone(int reqID, const ErrorCode, const ec2::ApiVideowallDataList&);
-            void onAddWebPageDone( int reqID, const ErrorCode, const QnWebPageResourceList& );
-            void onGetWebPagesDone( int reqID, const ErrorCode, const QnWebPageResourceList& );
+            void onGetWebPagesDone( int reqID, const ErrorCode, const ec2::ApiWebPageDataList& );
         };
 
 
@@ -297,8 +295,7 @@ namespace ec2
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractWebPageManager
         //////////////////////////////////////////////////////////
-        DEFINE_TWO_ARG_HANDLER( GetWebPages, ErrorCode, QnWebPageResourceList )
-        DEFINE_TWO_ARG_HANDLER( AddWebPage, ErrorCode, QnWebPageResourceList )
+        DEFINE_TWO_ARG_HANDLER( GetWebPages, ErrorCode, ec2::ApiWebPageDataList)
 
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractStoredFileManager

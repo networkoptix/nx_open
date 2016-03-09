@@ -26,6 +26,7 @@
 #include <nx_ec/managers/abstract_user_manager.h>
 #include <nx_ec/managers/abstract_layout_manager.h>
 #include <nx_ec/managers/abstract_videowall_manager.h>
+#include <nx_ec/managers/abstract_webpage_manager.h>
 
 QnResourcesChangesManager::QnResourcesChangesManager(QObject* parent /*= nullptr*/):
     base_type(parent)
@@ -422,7 +423,10 @@ void QnResourcesChangesManager::saveWebPage(const QnWebPageResourcePtr &webPage,
     if (!connection)
         return;
 
-    connection->getWebPageManager()->save(webPage, this, [this, webPage, sessionGuid, backup]( int reqID, ec2::ErrorCode errorCode ) {
+    ec2::ApiWebPageData apiWebpage;
+    ec2::fromResourceToApi(webPage, apiWebpage);
+
+    connection->getWebPageManager()->save(apiWebpage, this, [this, webPage, sessionGuid, backup]( int reqID, ec2::ErrorCode errorCode ) {
         Q_UNUSED(reqID);
 
         /* Check if all OK */

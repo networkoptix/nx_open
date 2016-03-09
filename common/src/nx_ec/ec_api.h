@@ -605,61 +605,6 @@ namespace ec2
         virtual int resetBusinessRules( impl::SimpleHandlerPtr handler ) = 0;
     };
 
-
-
-        /*!
-        \note All methods are asynchronous if other not specified
-    */
-    class AbstractWebPageManager
-    :
-        public QObject
-    {
-        Q_OBJECT
-
-    public:
-        virtual ~AbstractWebPageManager() {}
-
-        /*!
-            \param handler Functor with params: (ErrorCode, const QnWebPageResourceList&)
-        */
-        template<class TargetType, class HandlerType> int getWebPages( TargetType* target, HandlerType handler ) {
-            return getWebPages( std::static_pointer_cast<impl::GetWebPagesHandler>(
-                std::make_shared<impl::CustomGetWebPagesHandler<TargetType, HandlerType>>(target, handler)) );
-        }
-
-        ErrorCode getWebPagesSync(QnWebPageResourceList* const webPageList ) {
-            int(AbstractWebPageManager::*fn)(impl::GetWebPagesHandlerPtr) = &AbstractWebPageManager::getWebPages;
-            return impl::doSyncCall<impl::GetWebPagesHandler>( std::bind(fn, this, std::placeholders::_1), webPageList );
-        }
-
-
-        /*!
-            \param handler Functor with params: (ErrorCode)
-        */
-        template<class TargetType, class HandlerType> int save( const QnWebPageResourcePtr& resource, TargetType* target, HandlerType handler ) {
-            return save( resource, std::static_pointer_cast<impl::AddWebPageHandler>(
-                std::make_shared<impl::CustomAddWebPageHandler<TargetType, HandlerType>>(target, handler)) );
-        }
-        /*!
-            \param handler Functor with params: (ErrorCode)
-        */
-        template<class TargetType, class HandlerType> int remove( const QnUuid& id, TargetType* target, HandlerType handler ) {
-            return remove( id, std::static_pointer_cast<impl::SimpleHandler>(
-                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
-        }
-
-    signals:
-        void addedOrUpdated(const QnWebPageResourcePtr &videowall);
-        void removed(const QnUuid &id);
-
-    protected:
-        virtual int getWebPages( impl::GetWebPagesHandlerPtr handler ) = 0;
-        virtual int save( const QnWebPageResourcePtr& resource, impl::AddWebPageHandlerPtr handler ) = 0;
-        virtual int remove( const QnUuid& id, impl::SimpleHandlerPtr handler ) = 0;
-
-    };
-
-
     /*!
         \note All methods are asynchronous if other not specified
     */

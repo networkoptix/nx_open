@@ -4,6 +4,7 @@
 #include <nx_ec/managers/abstract_user_manager.h>
 #include <nx_ec/managers/abstract_layout_manager.h>
 #include <nx_ec/managers/abstract_videowall_manager.h>
+#include <nx_ec/managers/abstract_webpage_manager.h>
 
 #include <nx_ec/data/api_full_info_data.h>
 #include <nx_ec/data/api_discovery_data.h>
@@ -11,7 +12,6 @@
 #include <nx_ec/data/api_media_server_data.h>
 #include <nx_ec/data/api_camera_data.h>
 #include <nx_ec/data/api_camera_attributes_data.h>
-#include <nx_ec/data/api_webpage_data.h>
 #include <nx_ec/data/api_resource_type_data.h>
 #include <nx_ec/data/api_license_data.h>
 #include <nx_ec/data/api_business_rule_data.h>
@@ -112,7 +112,7 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     connect(videowallManager, &ec2::AbstractVideowallManager::controlMessage,       this, &QnCommonMessageProcessor::videowallControlMessageReceived );
 
     auto webPageManager = connection->getWebPageManager();
-    connect(webPageManager, &ec2::AbstractWebPageManager::addedOrUpdated,           this, [this](const QnWebPageResourcePtr &webPage){updateResource(webPage);});
+    connect(webPageManager, &ec2::AbstractWebPageManager::addedOrUpdated,           this, on_resourceUpdated);
     connect(webPageManager, &ec2::AbstractWebPageManager::removed,                  this, &QnCommonMessageProcessor::on_resourceRemoved );
 
     auto licenseManager = connection->getLicenseManager();
@@ -365,7 +365,6 @@ void QnCommonMessageProcessor::resetResources(const ec2::ApiFullInfoData& fullDa
 
     fromApiToResourceList(fullData.servers, resources);
     fromApiToResourceList(fullData.cameras, resources, factory);
-    fromApiToResourceList(fullData.webPages, resources);
     fromApiToResourceList(fullData.storages, resources, factory);
 
     /* Store all remote resources id to clean them if they are not in the list anymore. */
@@ -373,7 +372,8 @@ void QnCommonMessageProcessor::resetResources(const ec2::ApiFullInfoData& fullDa
     for (const QnResourcePtr &resource: qnResPool->getResourcesWithFlag(Qn::remote))
         remoteResources.insert(resource->getId(), resource);
 
-    auto updateResources = [this, &remoteResources](const auto& source) {
+    auto updateResources = [this, &remoteResources](const auto& source)
+    {
         for (const auto& resource : source)
         {
             updateResource(resource);
@@ -394,6 +394,7 @@ void QnCommonMessageProcessor::resetResources(const ec2::ApiFullInfoData& fullDa
     updateResources(fullData.users);
     updateResources(fullData.layouts);
     updateResources(fullData.videowalls);
+    updateResources(fullData.webPages);
 
     qnResPool->commit();
 
@@ -562,4 +563,11 @@ void QnCommonMessageProcessor::updateResource(const ec2::ApiVideowallData& video
     QnVideoWallResourcePtr qnVideowall(new QnVideoWallResource());
     fromApiToResource(videowall, qnVideowall);
     updateResource(qnVideowall);
+}
+
+void QnCommonMessageProcessor::updateResource(const ec2::ApiWebPageData& webpage)
+{
+    QnWebPageResourcePtr qnWebpage(new QnWebPageResource());
+    fromApiToResource(webpage, qnWebpage);
+    updateResource(qnWebpage);
 }

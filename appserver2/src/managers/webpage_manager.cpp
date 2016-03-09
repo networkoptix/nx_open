@@ -1,20 +1,7 @@
 #include "webpage_manager.h"
 
-#include <functional>
-
-#include <QtConcurrent/QtConcurrent>
-
 #include "fixed_url_client_query_processor.h"
 #include "server_query_processor.h"
-
-#include <core/resource/webpage_resource.h>
-
-#include <database/db_manager.h>
-
-#include <nx_ec/data/api_conversion_functions.h>
-
-#include <transaction/transaction_log.h>
-
 
 namespace ec2
 {
@@ -24,9 +11,7 @@ namespace ec2
     void QnWebPageNotificationManager::triggerNotification(const QnTransaction<ApiWebPageData> &tran)
     {
         assert(tran.command == ApiCommand::saveWebPage);
-        QnWebPageResourcePtr webPage(new QnWebPageResource());
-        fromApiToResource(tran.params, webPage);
-        emit addedOrUpdated( webPage );
+        emit addedOrUpdated(tran.params);
     }
 
     void QnWebPageNotificationManager::triggerNotification(const QnTransaction<ApiIdData> &tran)
@@ -35,8 +20,6 @@ namespace ec2
         emit removed( QnUuid(tran.params.id) );
     }
 
-
-
     template<class QueryProcessorType>
     QnWebPageManager<QueryProcessorType>::QnWebPageManager(QueryProcessorType* const queryProcessor)
         : QnWebPageNotificationManager()
@@ -44,55 +27,50 @@ namespace ec2
     {}
 
 
-    template<class T>
-    int QnWebPageManager<T>::getWebPages( impl::GetWebPagesHandlerPtr handler )
+    template<class QueryProcessorType>
+    int QnWebPageManager<QueryProcessorType>::getWebPages( impl::GetWebPagesHandlerPtr handler )
     {
         const int reqID = generateRequestID();
-
-        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiWebPageDataList& webPages) {
-            QnWebPageResourceList outData;
-            if( errorCode == ErrorCode::ok )
-                fromApiToResourceList(webPages, outData);
-            handler->done( reqID, errorCode, outData );
+        auto queryDoneHandler = [reqID, handler](ErrorCode errorCode, const ec2::ApiWebPageDataList& webpages)
+        {
+            handler->done(reqID, errorCode, webpages);
         };
         m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiWebPageDataList, decltype(queryDoneHandler)> ( ApiCommand::getWebPages, nullptr, queryDoneHandler);
         return reqID;
     }
 
-    template<class T>
-    int QnWebPageManager<T>::save( const QnWebPageResourcePtr& webPage, impl::AddWebPageHandlerPtr handler )
+    template<class QueryProcessorType>
+    int QnWebPageManager<QueryProcessorType>::save( const ec2::ApiWebPageData& webpage, impl::SimpleHandlerPtr handler )
     {
-        //preparing output data
-        QnWebPageResourceList webPages;
-        webPages.push_back(webPage);
-
         const int reqID = generateRequestID();
-        auto tran = prepareTransaction( ApiCommand::saveWebPage, webPage );
-        using namespace std::placeholders;
-        m_queryProcessor->processUpdateAsync( tran, std::bind( &impl::AddWebPageHandler::done, handler, reqID, _1, webPages ) );
+        auto tran = prepareTransaction(ApiCommand::saveWebPage, webpage);
+        m_queryProcessor->processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
+        {
+            handler->done(reqID, errorCode);
+        });
         return reqID;
     }
 
-    template<class T>
-    int QnWebPageManager<T>::remove( const QnUuid& id, impl::SimpleHandlerPtr handler )
+    template<class QueryProcessorType>
+    int QnWebPageManager<QueryProcessorType>::remove( const QnUuid& id, impl::SimpleHandlerPtr handler )
     {
         const int reqID = generateRequestID();
-        auto tran = prepareTransaction( ApiCommand::removeWebPage, id );
-        using namespace std::placeholders;
-        m_queryProcessor->processUpdateAsync( tran, std::bind( &impl::SimpleHandler::done, handler, reqID, _1 ) );
+        auto tran = prepareTransaction(ApiCommand::removeWebPage, id);
+        m_queryProcessor->processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
+        {
+            handler->done(reqID, errorCode);
+        });
         return reqID;
     }
 
-    template<class T>
-    QnTransaction<ApiWebPageData> QnWebPageManager<T>::prepareTransaction(ApiCommand::Value command, const QnWebPageResourcePtr &resource)
+    template<class QueryProcessorType>
+    QnTransaction<ApiWebPageData> QnWebPageManager<QueryProcessorType>::prepareTransaction(ApiCommand::Value command, const ec2::ApiWebPageData& webpage)
     {
-        QnTransaction<ApiWebPageData> tran(command);
-        fromResourceToApi( resource, tran.params );
-        return tran;
+        return QnTransaction<ApiWebPageData>(command, webpage);
     }
 
-    template<class T>
-    QnTransaction<ApiIdData> QnWebPageManager<T>::prepareTransaction(ApiCommand::Value command, const QnUuid &id)
+    template<class QueryProcessorType>
+    QnTransaction<ApiIdData> QnWebPageManager<QueryProcessorType>::prepareTransaction(ApiCommand::Value command, const QnUuid &id)
     {
         QnTransaction<ApiIdData> tran(command);
         tran.params.id = id;
@@ -101,10 +79,6 @@ namespace ec2
 
     template class QnWebPageManager<ServerQueryProcessor>;
     template class QnWebPageManager<FixedUrlClientQueryProcessor>;
-
-
-
-
 }
 
 

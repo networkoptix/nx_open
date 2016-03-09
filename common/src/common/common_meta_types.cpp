@@ -312,6 +312,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<ec2::ApiLayoutItemData>("ec2::ApiLayoutItemData");
     qRegisterMetaType<ec2::ApiVideowallData>("ec2::ApiVideowallData");
     qRegisterMetaType<ec2::ApiVideowallControlMessageData>("ec2::ApiVideowallControlMessageData");
+    qRegisterMetaType<ec2::ApiWebPageData>("ec2::ApiWebPageData");
 
     qRegisterMetaType<QnUuid>();
     qRegisterMetaTypeStreamOperators<QnUuid>();

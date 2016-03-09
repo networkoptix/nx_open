@@ -1,8 +1,6 @@
 #pragma once
 
 #include <transaction/transaction.h>
-
-#include <nx_ec/data/api_videowall_data.h>
 #include <nx_ec/managers/abstract_videowall_manager.h>
 
 namespace ec2
@@ -10,25 +8,11 @@ namespace ec2
     class QnVideowallNotificationManager: public AbstractVideowallManager
     {
     public:
-        QnVideowallNotificationManager() {}
+        QnVideowallNotificationManager();
 
-        void triggerNotification( const QnTransaction<ApiVideowallData>& tran )
-        {
-            assert(tran.command == ApiCommand::saveVideowall);
-            emit addedOrUpdated(tran.params);
-        }
-
-        void triggerNotification( const QnTransaction<ApiIdData>& tran )
-        {
-            assert(tran.command == ApiCommand::removeVideowall);
-            emit removed(tran.params.id);
-        }
-
-        void triggerNotification(const QnTransaction<ApiVideowallControlMessageData>& tran)
-        {
-            assert(tran.command == ApiCommand::videowallControl);
-            emit controlMessage(tran.params);
-        }
+        void triggerNotification( const QnTransaction<ApiVideowallData>& tran );
+        void triggerNotification( const QnTransaction<ApiIdData>& tran );
+        void triggerNotification(const QnTransaction<ApiVideowallControlMessageData>& tran);
 
     };
 

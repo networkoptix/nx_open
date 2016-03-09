@@ -5,17 +5,37 @@
 
 namespace ec2
 {
+
+    QnVideowallNotificationManager::QnVideowallNotificationManager() {}
+
+    void QnVideowallNotificationManager::triggerNotification(const QnTransaction<ApiVideowallData>& tran)
+    {
+        assert(tran.command == ApiCommand::saveVideowall);
+        emit addedOrUpdated(tran.params);
+    }
+
+    void QnVideowallNotificationManager::triggerNotification(const QnTransaction<ApiIdData>& tran)
+    {
+        assert(tran.command == ApiCommand::removeVideowall);
+        emit removed(tran.params.id);
+    }
+
+    void QnVideowallNotificationManager::triggerNotification(const QnTransaction<ApiVideowallControlMessageData>& tran)
+    {
+        assert(tran.command == ApiCommand::videowallControl);
+        emit controlMessage(tran.params);
+    }
+
+
     template<class QueryProcessorType>
     QnVideowallManager<QueryProcessorType>::QnVideowallManager(QueryProcessorType* const queryProcessor)
     :
         QnVideowallNotificationManager(),
         m_queryProcessor( queryProcessor )
-    {
-    }
+    {}
 
-
-    template<class T>
-    int QnVideowallManager<T>::getVideowalls( impl::GetVideowallsHandlerPtr handler )
+    template<class QueryProcessorType>
+    int QnVideowallManager<QueryProcessorType>::getVideowalls( impl::GetVideowallsHandlerPtr handler )
     {
         const int reqID = generateRequestID();
         auto queryDoneHandler = [reqID, handler](ErrorCode errorCode, const ApiVideowallDataList& videowalls)

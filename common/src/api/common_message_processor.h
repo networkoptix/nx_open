@@ -33,6 +33,7 @@ public:
     virtual void updateResource(const ec2::ApiUserData& user);
     virtual void updateResource(const ec2::ApiLayoutData& layout);
     virtual void updateResource(const ec2::ApiVideowallData& videowall);
+    virtual void updateResource(const ec2::ApiWebPageData& webpage);
 
     QMap<QnUuid, QnBusinessEventRulePtr> businessRules() const;
 

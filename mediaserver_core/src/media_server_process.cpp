@@ -68,6 +68,7 @@
 #include <nx_ec/managers/abstract_user_manager.h>
 #include <nx_ec/managers/abstract_layout_manager.h>
 #include <nx_ec/managers/abstract_videowall_manager.h>
+#include <nx_ec/managers/abstract_webpage_manager.h>
 
 #include <platform/platform_abstraction.h>
 
