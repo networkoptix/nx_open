@@ -4,19 +4,17 @@
 namespace
 {
 
+// TODO: #ynikitenkov Add fusion functions
+#define EXTRACT_CHANGE_FLAG(fieldName, flag) static_cast<QnServerFields>(     \
+    before.fieldName != after.fieldName ? flag : QnServerField::NoField)
+    
     QnServerFields getChanges(const QnModuleInformation &before
         , const QnModuleInformation &after)
-    {
-        // TODO: #ynikitenkov Add fusion functions
-
-#define EXTRACT_CHANGE_FLAG(fieldName, flag) static_cast<QnServerFields>(     \
-        before.fieldName != after.fieldName ? flag : QnServerField::NoField)
-        
+    {        
         return (EXTRACT_CHANGE_FLAG(systemName, QnServerField::SystemNameField)
             || EXTRACT_CHANGE_FLAG(name, QnServerField::NameField));
-
-#undef EXTRACT_CHANGE_FLAG
     }
+#undef EXTRACT_CHANGE_FLAG
 }
 
 QnSystemDescriptionPtr QnSystemDescription::createLocalSystem(const QnUuid &systemId
