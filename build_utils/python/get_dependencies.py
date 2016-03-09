@@ -3,7 +3,7 @@
 
 import os, sys, shutil
 import dependencies
-import portalocker
+import filelock
 import ConfigParser
 import glob
 
@@ -119,7 +119,7 @@ def get_package_for_configuration(package, debug):
 def get_package(package):
     lock_file = os.path.join(dependencies.TARGET_DIRECTORY, "rdep.lock")
 
-    with portalocker.Lock(lock_file, fail_when_locked = False, flags = portalocker.LOCK_EX) as lock:
+    with filelock.Lock(lock_file) as lock:
         if not get_package_for_configuration(package, False):
             return False
 
