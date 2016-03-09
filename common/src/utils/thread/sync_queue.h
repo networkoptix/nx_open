@@ -16,7 +16,7 @@ class SyncQueue
 {
 public:
     Result pop();
-    boost::optional<Result> pop(std::chrono::microseconds timeout);
+    boost::optional<Result> pop(std::chrono::milliseconds timeout);
 
     void push(Result result);
     bool isEmpty();
@@ -50,7 +50,7 @@ Result SyncQueue<Result>::pop()
 }
 
 template< typename Result>
-boost::optional<Result> SyncQueue<Result>::pop(std::chrono::microseconds timeout)
+boost::optional<Result> SyncQueue<Result>::pop(std::chrono::milliseconds timeout)
 {
     QnMutexLocker lock(&m_mutex);
     if (m_queue.empty()) // no false positive in QWaitCondition
@@ -118,7 +118,7 @@ public:
     Result pop() /* overlap */
     {
         auto value = SyncQueue<Result>::pop(kTestSyncQueueTimeout);
-        NX_ASSERT(value);
+        NX_ASSERT(value, "TestSyncQueue::pop() timeout");
         return std::move(*value);
     }
 };
@@ -132,7 +132,7 @@ public:
     std::pair<R1, R2> pop() /* overlap */
     {
         auto value = SyncMultiQueue<R1, R2>::pop(kTestSyncQueueTimeout);
-        NX_ASSERT(value);
+        NX_ASSERT(value, "TestSyncMultiQueue::pop() timeout");
         return std::move(*value);
     }
 };
