@@ -3,15 +3,19 @@
 
 #include <QtCore/QAbstractListModel>
 
+#include <utils/common/connective.h>
 #include <network/system_description.h>
 
-class QnSystemsModel : public QAbstractListModel
+class QnConnectionsHolder;
+
+class QnSystemsModel : public Connective<QAbstractListModel>
 {
     Q_OBJECT
-    typedef QAbstractListModel base_type;
+    typedef Connective<QAbstractListModel> base_type;
 
 public:
-    QnSystemsModel(QObject *parent = nullptr);
+    QnSystemsModel(int maxCount
+        , QObject *parent = nullptr);
 
     virtual ~QnSystemsModel();
 
@@ -27,8 +31,24 @@ private:
 
     void removeSystem(const QnUuid &systemId);
 
-private:
-    typedef QVector<QnSystemDescriptionPtr> SystemsList;
+    struct InternalSystemData;
+    typedef QSharedPointer<InternalSystemData> InternalSystemDataPtr;
+    typedef QVector<InternalSystemDataPtr> InternalList;
 
-    SystemsList m_systems;
+    InternalList::iterator getInternalDataIt(
+        const QnSystemDescriptionPtr &systemDescription);
+
+    void serverChanged(const QnSystemDescriptionPtr &systemDescription
+        , const QnUuid &serverId
+        , QnServerFields fields);
+
+private:
+    typedef QScopedPointer<QnConnectionsHolder> QnConnectionsHolderPtr;
+    typedef std::function<bool(const InternalSystemDataPtr &first
+        , const InternalSystemDataPtr &second)> LessPred;
+
+    const int m_maxCount;
+    const QnConnectionsHolderPtr m_connectionsHolder;
+    const LessPred m_lessPred;
+    InternalList m_internalData;
 };

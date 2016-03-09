@@ -15,6 +15,7 @@ enum class QnServerField
     NoField                 = 0x0
     , NameField             = 0x1
     , SystemNameField       = 0x2
+    , PrimaryAddressField   = 0x4
 };
 Q_DECLARE_FLAGS(QnServerFields, QnServerField)
 
@@ -43,6 +44,8 @@ public:
     
     void addServer(const QnModuleInformation &serverInfo);
 
+    bool isContainServer(const QnUuid &serverId) const;
+
     QnModuleInformation getServer(const QnUuid &serverId) const;
 
     void updateServer(const QnModuleInformation &serverInfo);
@@ -61,8 +64,6 @@ signals:
 
     void serverChanged(const QnUuid &serverId
         , QnServerFields flags);
-    
-    void serverPrimaryAddressChanged(const QnUuid &serverId);
 
 private:
     QnSystemDescription(const QnUuid &systemId

@@ -57,6 +57,8 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject *parent)
 
     connect(action(QnActions::DisconnectAction), &QAction::triggered
         , this, &QnWorkbenchWelcomeScreen::showScreen);
+
+    setVisible(true);
 }
 
 QnWorkbenchWelcomeScreen::~QnWorkbenchWelcomeScreen()
@@ -102,7 +104,8 @@ void QnWorkbenchWelcomeScreen::setEnabled(bool isEnabled)
 
 QObject *QnWorkbenchWelcomeScreen::createSystemsModel()
 {
-    return (new QnSystemsModel(this));
+    enum { kMaxTilesCount = 4 };
+    return (new QnSystemsModel(kMaxTilesCount, this));
 }
 
 void QnWorkbenchWelcomeScreen::connectToAnotherSystem()

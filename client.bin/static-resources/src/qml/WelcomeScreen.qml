@@ -14,8 +14,8 @@ Rectangle
     {
         anchors.centerIn: parent;
 
-        rows: 2;
-        columns: 4;
+        rows: 5;
+        columns: 5;
 
         spacing: 16;
 

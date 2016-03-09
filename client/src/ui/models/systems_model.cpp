@@ -3,7 +3,9 @@
 
 #include <utils/math/math.h>
 #include <utils/common/app_info.h>
+#include <utils/common/generic_guard.h>
 #include <utils/common/software_version.h>
+#include <utils/common/connections_holder.h>
 #include <network/systems_finder.h>
 
 namespace
@@ -14,7 +16,7 @@ namespace
     {
         FirstRoleId = Qt::UserRole + 1
 
-        , NameRoleId = FirstRoleId
+        , SystemNameRoleId = FirstRoleId
         , UserRoleId
 
         , IsCloudSystemRoleId
@@ -33,7 +35,7 @@ namespace
     const auto kRoleNames = []() -> RoleNames
     {
         RoleNames result;
-        result.insert(NameRoleId, "systemName");
+        result.insert(SystemNameRoleId, "systemName");
         result.insert(UserRoleId, "userName");
 
         result.insert(IsCloudSystemRoleId, "isCloudSystem");
@@ -97,18 +99,63 @@ namespace
             sysemDescription->getServerPrimaryAddress(serverId);
         return primaryAddress.toString();
     }
+
+    template<typename DataType, typename ResultType>
+    ResultType getLessSystemPred()
+    {
+        const auto lessPredicate = [](const DataType &firstData
+            , const DataType &secondData)
+        {
+            const auto first = firstData->system;
+            const auto second = secondData->system;
+
+            const bool firstIsCloudSystem = first->isCloudSystem();
+            const bool sameType = 
+                (firstIsCloudSystem == second->isCloudSystem());
+            if (!sameType)
+                return firstIsCloudSystem;
+
+            const bool firstCompatible = isCompatibleSystem(first);
+            const bool sameCompatible = 
+                (firstCompatible == isCompatibleSystem(second));
+            if (!sameCompatible)
+                return firstCompatible;
+
+            return (first->name() < second->name());
+        };
+        return lessPredicate;
+    }
 }
 
-QnSystemsModel::QnSystemsModel(QObject *parent)
+///
+struct QnSystemsModel::InternalSystemData
+{
+    QnSystemDescriptionPtr system;
+    QnConnectionsHolder connections;
+};
+
+///
+
+QnSystemsModel::QnSystemsModel(int maxCount
+    , QObject *parent)
     : base_type(parent)
-    , m_systems()
+    , m_maxCount(maxCount)
+    , m_connectionsHolder(new QnConnectionsHolder())
+    , m_lessPred(getLessSystemPred<InternalSystemDataPtr, LessPred>())
+    , m_internalData()
 {
     Q_ASSERT_X(qnSystemsFinder, Q_FUNC_INFO, "Systems finder is null!");
     
-    connect(qnSystemsFinder, &QnAbstractSystemsFinder::systemDiscovered
+    const auto discoveredConnection = 
+        connect(qnSystemsFinder, &QnAbstractSystemsFinder::systemDiscovered
         , this, &QnSystemsModel::addSystem);
-    connect(qnSystemsFinder, &QnAbstractSystemsFinder::systemLost
+
+    const auto lostConnection = 
+        connect(qnSystemsFinder, &QnAbstractSystemsFinder::systemLost
         , this, &QnSystemsModel::removeSystem);
+
+    m_connectionsHolder->add(discoveredConnection);
+    m_connectionsHolder->add(lostConnection);
 
     for (const auto system : qnSystemsFinder->systems())
         addSystem(system);
@@ -122,7 +169,7 @@ int QnSystemsModel::rowCount(const QModelIndex &parent) const
     if (parent.isValid())
         return 0;
 
-    return m_systems.count();
+    return std::min(m_internalData.count(), m_maxCount);
 }
 
 QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
@@ -134,10 +181,10 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
     if (!qBetween(0, row, rowCount()))
         return QVariant();
 
-    const auto systemDescription = m_systems[row];
+    const auto systemDescription = m_internalData[row]->system;
     switch(role)
     {
-    case NameRoleId:
+    case SystemNameRoleId:
         return systemDescription->name();
     case UserRoleId:
         return lit("Some user name <replace me>");
@@ -152,7 +199,6 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
         return isCompatibleVersion(systemDescription);
     case HostRoleId:
         return getSystemHost(systemDescription);
-
     default:
         return QVariant();
     }
@@ -165,40 +211,122 @@ RoleNames QnSystemsModel::roleNames() const
 
 void QnSystemsModel::addSystem(const QnSystemDescriptionPtr &systemDescription)
 {
-    static const auto predicate = [](const QnSystemDescriptionPtr &first
-        , const QnSystemDescriptionPtr &second)
-    {
-        const bool isSameType =
-            (first->isCloudSystem() == second->isCloudSystem());
+    const auto data = InternalSystemDataPtr(new InternalSystemData(
+        { systemDescription, QnConnectionsHolder() }));
+    
+    const auto insertPos = std::upper_bound(m_internalData.begin()
+        , m_internalData.end(), data, m_lessPred);
 
-        return (isSameType ? (first->name() < second->name())
-            : first->isCloudSystem());
+    const int position = (insertPos == m_internalData.end()
+        ? m_internalData.size() : insertPos - m_internalData.begin());
+
+    const QPointer<QnSystemsModel> guard(this);
+    const auto serverChangedHandler = [this, guard, systemDescription]
+        (const QnUuid &serverId, QnServerFields fields)
+    {
+        if (!guard)
+            return;
+
+        serverChanged(systemDescription, serverId, fields);
     };
 
-    const auto insertPos = std::upper_bound(m_systems.begin()
-        , m_systems.end(), systemDescription, predicate);
+    const auto serverChangedConnection =
+        connect(systemDescription, &QnSystemDescription::serverChanged
+            , this, serverChangedHandler);
 
-    const int position = (insertPos == m_systems.end()
-        ? m_systems.size() : insertPos - m_systems.begin());
+    data->connections.add(serverChangedConnection);
 
-    beginInsertRows(QModelIndex(), position, position);
-    m_systems.insert(insertPos, systemDescription);
-    endInsertRows();
+    const bool isMaximumNumber = (m_internalData.size() >= m_maxCount);
+    const bool emitInsertSignal = (position < m_maxCount);
+
+    {
+        const auto beginInsertRowsCallback = [this, position]()
+        { 
+            beginInsertRows(QModelIndex(), position, position); 
+        };
+        const auto endInserRowsCallback = [this]() 
+            { endInsertRows(); };
+
+        const auto insertionGuard = (emitInsertSignal ?  
+            QnGenericGuard::create(beginInsertRowsCallback, endInserRowsCallback)
+            : QnGenericGuard::createEmpty());
+        m_internalData.insert(insertPos, data);
+    }
+
+    if (isMaximumNumber)
+    {
+        beginRemoveRows(QModelIndex(), m_maxCount, m_maxCount);
+        endRemoveRows();
+    }
 }
 
 void QnSystemsModel::removeSystem(const QnUuid &systemId)
 {
-    const auto removeIt = std::find_if(m_systems.begin()
-        , m_systems.end(), [systemId](const QnSystemDescriptionPtr &value)
+    const auto removeIt = std::find_if(m_internalData.begin()
+        , m_internalData.end(), [systemId](const InternalSystemDataPtr &value)
     {
-        return (value->id() == systemId);
+        return (value->system->id() == systemId);
     });
 
-    if (removeIt == m_systems.end())
+    if (removeIt == m_internalData.end())
         return;
 
-    const int pos = (removeIt - m_systems.begin());
-    beginRemoveRows(QModelIndex(), pos, pos);
-    m_systems.erase(removeIt);
-    endRemoveRows();
+    const int position = (removeIt - m_internalData.begin());
+    const bool moreThanMaximum = (m_internalData.size() > m_maxCount);
+    const bool emitRemoveSignal = (position <= m_maxCount);
+
+    {
+        const auto beginRemoveRowsHandler = [this, position]()
+        { beginRemoveRows(QModelIndex(), position, position); };
+        const auto endRemoveRowsHandler = [this]()
+        { endRemoveRows(); };
+
+        const auto removeGuard = (emitRemoveSignal
+            ? QnGenericGuard::create(beginRemoveRowsHandler, endRemoveRowsHandler)
+            : QnGenericGuard::createEmpty());
+        m_internalData.erase(removeIt);
+    }
+
+    if (moreThanMaximum)
+    {
+        beginInsertRows(QModelIndex(), m_maxCount - 1, m_maxCount - 1);
+        endInsertRows();
+    }
 }
+
+QnSystemsModel::InternalList::iterator QnSystemsModel::getInternalDataIt(
+    const QnSystemDescriptionPtr &systemDescription)
+{
+    const auto data = InternalSystemDataPtr(new InternalSystemData(
+        { systemDescription, QnConnectionsHolder() }));
+    const auto it = std::lower_bound(m_internalData.begin()
+        , m_internalData.end(), data, m_lessPred);
+
+    if (it == m_internalData.end())
+        return m_internalData.end();
+    
+    const auto foundId = (*it)->system->id();
+    return (foundId == systemDescription->id() ? it : m_internalData.end());
+}
+
+void QnSystemsModel::serverChanged(const QnSystemDescriptionPtr &systemDescription
+    , const QnUuid &serverId
+    , QnServerFields fields)
+{
+    const auto dataIt = getInternalDataIt(systemDescription);
+    if (dataIt == m_internalData.end())
+        return;
+
+    const int row = (dataIt - m_internalData.begin());
+
+    const auto modelIndex = index(row);
+    const auto testFlag = [this, modelIndex, fields](QnServerField field, int role)
+    {
+        if (fields.testFlag(field))
+            emit dataChanged(modelIndex, modelIndex, QVector<int>(1, role));
+    };
+
+    testFlag(QnServerField::PrimaryAddressField, HostRoleId);
+}
+
+

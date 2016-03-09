@@ -37,7 +37,6 @@
         <linux.defines/>
         <mac.defines/>
         <rdep.packages>openssl quazip</rdep.packages>
-        <rdep.packages>qt</rdep.packages> 
     </properties>
 
     <dependencies>

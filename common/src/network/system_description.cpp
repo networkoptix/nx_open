@@ -85,6 +85,11 @@ void QnSystemDescription::addServer(const QnModuleInformation &serverInfo)
     emit serverAdded(serverInfo.id);
 }
 
+bool QnSystemDescription::isContainServer(const QnUuid &serverId) const
+{
+    return m_servers.contains(serverId);
+}
+
 QnModuleInformation QnSystemDescription::getServer(const QnUuid &serverId) const
 {
     Q_ASSERT_X(m_servers.contains(serverId), Q_FUNC_INFO
@@ -129,6 +134,7 @@ void QnSystemDescription::setPrimaryAddress(const QnUuid &serverId
     , const SocketAddress &address)
 {
     const bool containsServer = m_servers.contains(serverId);
+    
     Q_ASSERT_X(containsServer, Q_FUNC_INFO
         , "System does not contain specified server");
     
@@ -136,7 +142,7 @@ void QnSystemDescription::setPrimaryAddress(const QnUuid &serverId
         return;
 
     m_primaryAddresses[serverId] = address;
-    emit serverPrimaryAddressChanged(serverId);
+    emit serverChanged(serverId, QnServerField::PrimaryAddressField);
 }
 
 SocketAddress QnSystemDescription::getServerPrimaryAddress(const QnUuid &serverId) const

@@ -390,6 +390,9 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
         QnMutexLocker lk(&m_itemsMutex);
 
         item.moduleInformation = moduleInformation;
+        if (moduleInformation.id != item.moduleInformation.id)
+            int iI = 0;
+
         if (item.primaryAddress.port == 0 && !ignoredAddress)
             updatePrimaryAddress(item, address);
 

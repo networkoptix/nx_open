@@ -46,16 +46,28 @@ void QnDirectSystemsFinder::addServer(const QnModuleInformation &moduleInformati
         return;
     }
 
-    const auto localSystemId = QnUuid::createUuid();
-    const auto systemDescription = QnSystemDescription::createLocalSystem(
-        localSystemId, moduleInformation.systemName);
-    systemDescription->addServer(moduleInformation);
-    
-    const auto newSystemIt = m_systems.insert(
-        moduleInformation.name, systemDescription);
-    m_serverToSystem[moduleInformation.id] = newSystemIt;
+    auto itSystem = m_systems.find(moduleInformation.systemName);
+    const auto createNewSystem = (itSystem == m_systems.end());
+    if (createNewSystem)
+    {
+        const auto localSystemId = QnUuid::createUuid();
+        const auto systemDescription = QnSystemDescription::createLocalSystem(
+            localSystemId, moduleInformation.systemName);
 
-    emit systemDiscovered(systemDescription);
+        itSystem = m_systems.insert(
+            moduleInformation.systemName, systemDescription);
+    }
+
+    const auto systemDescription = itSystem.value();
+    if (systemDescription->isContainServer(moduleInformation.id))
+        systemDescription->updateServer(moduleInformation);
+    else
+        systemDescription->addServer(moduleInformation);
+    
+    m_serverToSystem[moduleInformation.id] = itSystem;
+
+    if (createNewSystem)
+        emit systemDiscovered(systemDescription);
 }
 
 void QnDirectSystemsFinder::removeServer(const QnModuleInformation &moduleInformation)
@@ -89,9 +101,9 @@ void QnDirectSystemsFinder::updateServer(const SystemsHash::iterator systemIt
     if (!isServer)
         return;
 
-    const bool isInKnownServer = (systemIt != m_systems.end());
-    Q_ASSERT_X(isInKnownServer, Q_FUNC_INFO, "Server is not known");
-    if (!isInKnownServer)
+    const bool serverIsInKnownSystem = (systemIt != m_systems.end());
+    Q_ASSERT_X(serverIsInKnownSystem, Q_FUNC_INFO, "Server is not known");
+    if (!serverIsInKnownSystem)
         return;
 
     auto systemDescription = systemIt.value();
@@ -105,9 +117,9 @@ void QnDirectSystemsFinder::updatePrimaryAddress(const QnModuleInformation &modu
         return;
     
     const auto systemIt = getSystemItByServer(moduleInformation.id);
-    const bool isInKnownServer = (systemIt != m_systems.end());
-    Q_ASSERT_X(isInKnownServer, Q_FUNC_INFO, "Server is not known");
-    if (!isInKnownServer)
+    const bool serverIsInKnownSystem = (systemIt != m_systems.end());
+    Q_ASSERT_X(serverIsInKnownSystem, Q_FUNC_INFO, "Server is not known");
+    if (!serverIsInKnownSystem)
         return;
 
     const auto serverDescrption = systemIt.value();
