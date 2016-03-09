@@ -109,10 +109,10 @@
                         <configuration>
                             <executable>${init.python.dir}/${python.executable}</executable>
                             <arguments>
-                                <argument>${root.dir}/build_utils/python/get_dependencies.py</argument>
+                                <argument>get_dependencies.py</argument>
                             </arguments>
                             <environmentVariables>
-                                <PYTHONPATH>${project.build.directory}</PYTHONPATH>
+                                <PYTHONPATH>${root.dir}/build_utils/python</PYTHONPATH>
                             </environmentVariables>
                             <workingDirectory>${project.build.directory}</workingDirectory>
                         </configuration>

@@ -42,17 +42,26 @@ QColor QnNxStylePrivate::checkBoxColor(const QStyleOption *option, bool radio) c
     QnPaletteColor mainColor = findColor(option->palette.color(QPalette::Text));
     QColor color = mainColor.darker(6);
 
-    if (option->state & QStyle::State_Off)
+    if (option->state.testFlag(QStyle::State_Off))
     {
-        if (option->state & QStyle::State_MouseOver)
+        if (option->state.testFlag(QStyle::State_MouseOver) ||
+            option->state.testFlag(QStyle::State_HasFocus))
+        {
             color = mainColor.darker(4);
+        }
     }
-    else if (option->state & QStyle::State_On || option->state & QStyle::State_NoChange)
+    else if (option->state.testFlag(QStyle::State_On) ||
+             option->state.testFlag(QStyle::State_NoChange))
     {
-        if (!radio && option->state & QStyle::State_MouseOver)
+        if (!radio && (option->state.testFlag(QStyle::State_MouseOver) ||
+                       option->state.testFlag(QStyle::State_HasFocus)))
+        {
             color = mainColor.lighter(3);
+        }
         else
+        {
             color = mainColor;
+        }
     }
 
     return color;
@@ -70,9 +79,14 @@ void QnNxStylePrivate::drawSwitch(
 
     int colorShift = 0;
     if (option->state.testFlag(QStyle::State_Sunken))
+    {
         colorShift = -1;
-    else if (option->state.testFlag(QStyle::State_MouseOver))
+    }
+    else if (option->state.testFlag(QStyle::State_MouseOver) ||
+             option->state.testFlag(QStyle::State_HasFocus))
+    {
         colorShift = 1;
+    }
 
     QnPaletteColor backgroundColor = findColor(option->palette.button().color()).lighter(colorShift);
     QnPaletteColor gripColor = findColor(option->palette.window().color());

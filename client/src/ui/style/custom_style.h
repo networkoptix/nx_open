@@ -8,4 +8,4 @@ void setWarningStyle(QWidget *widget);
 void setWarningStyle(QPalette *palette);
 QString setWarningStyleHtml(const QString &source);
 
-void setAccentStyle(QPushButton *button);
+void setAccentStyle(QAbstractButton* button, bool accent = true);

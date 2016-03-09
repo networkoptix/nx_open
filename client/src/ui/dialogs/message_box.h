@@ -51,8 +51,8 @@ public:
     QDialogButtonBox::StandardButton standardButton(QAbstractButton *button) const;
     QPushButton *button(QDialogButtonBox::StandardButton which) const;
 
-    QPushButton *defaultButton() const;
-    void setDefaultButton(QPushButton *button);
+    QAbstractButton *defaultButton() const;
+    void setDefaultButton(QAbstractButton *button);
     void setDefaultButton(QDialogButtonBox::StandardButton button);
 
     QAbstractButton *escapeButton() const;

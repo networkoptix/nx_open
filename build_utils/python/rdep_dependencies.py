@@ -1,17 +1,21 @@
 ﻿#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 import os, sys, shutil
-import dependencies
-import portalocker
+import argparse
+import tempfile
+import filelock
 import ConfigParser
 import glob
 
-sys.path.insert(0, dependencies.RDEP_PATH)
-import rdep
-sys.path.pop(0)
+RDEP_PATH = os.path.join(os.getenv("environment"), "rdep")
+if not os.path.isdir(RDEP_PATH):
+    print "Could find RDEP at {0}".format(RDEP_PATH)
+    exit(1)
 
-debug = "debug" in dependencies.BUILD_CONFIGURATION
+sys.path.insert(0, RDEP_PATH)
+import rdep
+import platform_detection
+sys.path.pop(0)
 
 #Supports templates such as bin/*.dll
 def copy_recursive(src, dst):
@@ -85,21 +89,18 @@ def append_pri(pri_file, debug = False):
     with open(get_deps_pri_file(debug), "a") as file:
         file.write("include({0})\n".format(pri_file))
 
-def get_package_for_configuration(package, debug):
-    target_dir = dependencies.TARGET_DIRECTORY
-    versioned = dependencies.get_versioned_package_name(package)
-
+def get_package_for_configuration(target, package, target_dir, debug):
     installation_marker = (package if not debug else package + "-debug") + rdep.PACKAGE_CONFIG_NAME
     description_file = os.path.join(target_dir, installation_marker)
     installed = os.path.isfile(description_file)
 
     if not installed:
         print "Fetching package {0} for {1}".format(package, configuration_name(debug))
-        rdep.fetch_packages(dependencies.TARGET, [ versioned ], debug)
+        rdep.fetch_packages(target, [ package ], debug)
 
-    location = rdep.locate_package(dependencies.TARGET, versioned)
+    location = rdep.locate_package(target, package)
     if not location:
-        print "Could not locate {0}".format(versioned)
+        print "Could not locate {0}".format(package)
         return False
 
     pri_file = os.path.join(location, package + ".pri")
@@ -116,35 +117,41 @@ def get_package_for_configuration(package, debug):
 
     return True
 
-def get_package(package):
-    lock_file = os.path.join(dependencies.TARGET_DIRECTORY, "rdep.lock")
+def get_package(target, package, target_dir, debug = False):
+    lock_file = os.path.join(tempfile.gettempdir(), "rdep.lock")
 
-    with portalocker.Lock(lock_file, fail_when_locked = False, flags = portalocker.LOCK_EX) as lock:
-        if not get_package_for_configuration(package, False):
+    with filelock.Lock(lock_file) as lock:
+        if not get_package_for_configuration(target, package, target_dir, False):
             return False
 
         if debug:
-            if not get_package_for_configuration(package, True):
+            if not get_package_for_configuration(target, package, target_dir, True):
                 return False
 
     return True
 
-def get_dependencies():
+def get_dependencies(target, packages, target_dir, debug = False):
     # Clear dependenciy files
     for debug in [ False, True ]:
         open(get_deps_pri_file(debug), "w").close()
 
-    packages = dependencies.get_packages()
     if not packages:
         print "No dependencies found"
         return
 
-    dependencies.print_configuration()
-
     for package in packages:
-        if not get_package(package):
+        if not get_package(target, package, target_dir, debug):
             print "Cannot get package {0}".format(package)
             sys.exit(1)
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("-t", "--target",       help="Target classifier.",  default = platform_detection.detect_target())
+    parser.add_argument("-o", "--target-dir",   help="Target directory.",   default = os.getcwd())
+    parser.add_argument("-d", "--debug",        help="Sync debug version.",                 action="store_true")
+    parser.add_argument("packages", nargs='*',  help="Packages to sync.",   default="")
+
+    args = parser.parse_args()
+
     get_dependencies()
