@@ -190,7 +190,10 @@ int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
     }
 
     if( !result )
+    {
+        m_decodedBufferSize = 0; //< we asked to skip input data
         return 0;
+    }
 
     int encoderFrameSize = m_encoderCtx->frame_size * sampleSize(m_encoderCtx->sample_fmt) * m_encoderCtx->channels;
 
