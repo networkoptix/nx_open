@@ -913,16 +913,16 @@ QMap<QString, QString> QnActiResource::buildSetParamsQueries(const QnCameraAdvan
     return resolveQueries(agregateToCmd);
 }
 
-QMap<QString, QString> QnActiResource::executeParamsQueries(const QMap<QString, QString>& queries, bool& isSuccessfull) const
+QMap<QString, QString> QnActiResource::executeParamsQueries(const QMap<QString, QString>& queries, bool& isSuccessful) const
 {
     CLHttpStatus status;
     QMap<QString, QString> result;
-    isSuccessfull = true;
+    isSuccessful = true;
     for(const auto& q: queries.keys())
     {
         auto response = makeActiRequest(q, queries[q], status, true);
         if(status != CL_HTTP_SUCCESS)
-            isSuccessfull = false;
+            isSuccessful = false;
         parseCameraParametersResponse(response, result);
     }
 

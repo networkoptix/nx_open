@@ -145,7 +145,7 @@ private:
     QMap<QString, QString> buildSetParamsQueries(const QnCameraAdvancedParamValueList& values) const;
     QMap<QString, QString> buildMaintenanceQueries(const QnCameraAdvancedParamValueList& values) const;
 
-    QMap<QString, QString> executeParamsQueries(const QMap<QString, QString>& queries, bool& isSuccessfull) const;
+    QMap<QString, QString> executeParamsQueries(const QMap<QString, QString>& queries, bool& isSuccessful) const;
     void parseParamsQueriesResult(
         const QMap<QString, QString>& queriesResult,
         const QList<QnCameraAdvancedParameter>& params,
