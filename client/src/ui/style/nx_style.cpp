@@ -152,41 +152,14 @@ void QnNxStyle::drawPrimitive(
     switch (element)
     {
     case PE_FrameFocusRect:
-        {
-            QColor widgetColor = option->palette.window().color();
-            bool dotted = false;
-
-            if (qobject_cast<const QPushButton *>(widget))
-                widgetColor = option->palette.button().color();
-
-            if (qobject_cast<const QCheckBox *>(widget) ||
-                qobject_cast<const QRadioButton *>(widget) ||
-                qobject_cast<const QSlider *>(widget))
-            {
-                dotted = true;
-            }
-
-            bool dark = isDark(widgetColor);
-            QColor color = mainColor(Colors::kBlue).darker(dark ? 4 : -4);
-
-            QPen pen(color);
-            if (dotted)
-                pen.setStyle(Qt::DotLine);
-
-            QnScopedPainterPenRollback penRollback(painter, pen);
-            QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
-
-            painter->drawRoundedRect(eroded(QRectF(option->rect), 0.5), Metrics::kRounding, Metrics::kRounding);
-
-            return;
-        }
-        break;
+        return;
 
     case PE_PanelButtonTool:
     case PE_PanelButtonCommand:
         {
-            const bool pressed = option->state & State_Sunken;
-            const bool hovered = option->state & State_MouseOver;
+            const bool pressed = option->state.testFlag(State_Sunken);
+            const bool hovered = option->state.testFlag(State_MouseOver) ||
+                                 option->state.testFlag(State_HasFocus);
 
             QnPaletteColor mainColor = findColor(option->palette.button().color());
 
@@ -256,9 +229,6 @@ void QnNxStyle::drawPrimitive(
                 painter->drawLine(option->rect.left() + 1, option->rect.top() + 1,
                                   option->rect.left() + 1, option->rect.bottom() - 1);
             }
-
-            if (option->state.testFlag(State_HasFocus))
-                drawPrimitive(PE_FrameFocusRect, option, painter, widget);
 
             painter->restore();
         }
@@ -462,9 +432,6 @@ void QnNxStyle::drawComplexControl(
                 drawArrow(Down, painter, rect.translated(0, -1), option->palette.color(QPalette::Text));
             }
 
-            if (comboBox->state.testFlag(State_HasFocus))
-                drawPrimitive(PE_FrameFocusRect, option, painter, widget);
-
             painter->restore();
             return;
         }
@@ -478,7 +445,8 @@ void QnNxStyle::drawComplexControl(
             QRect handleRect = proxy()->subControlRect(CC_Slider, option, SC_SliderHandle, widget);
 
             const bool horizontal = slider->orientation == Qt::Horizontal;
-            const bool hovered = slider->state.testFlag(State_MouseOver);
+            const bool hovered = slider->state.testFlag(State_MouseOver) ||
+                                 option->state.testFlag(State_HasFocus);
 
             QnPaletteColor mainDark = findColor(slider->palette.color(QPalette::Window));
             QnPaletteColor mainLight = findColor(slider->palette.color(QPalette::WindowText));
@@ -906,7 +874,8 @@ void QnNxStyle::drawControl(
             if (!isTabRounded(tab->shape))
                 return;
 
-            if (!tab->state.testFlag(QStyle::State_Selected) && tab->state.testFlag(QStyle::State_MouseOver))
+            if (!tab->state.testFlag(QStyle::State_Selected) &&
+                (tab->state.testFlag(QStyle::State_MouseOver) || tab->state.testFlag(State_HasFocus)))
             {
                 painter->save();
 
@@ -964,7 +933,7 @@ void QnNxStyle::drawControl(
                 color = tab->palette.color(QPalette::Highlight);
                 painter->fillRect(rect, color);
             }
-            else if (tab->state & State_MouseOver)
+            else if (tab->state.testFlag(State_MouseOver) || tab->state.testFlag(State_HasFocus))
             {
                 if (isTabRounded(tab->shape))
                 {
@@ -989,7 +958,7 @@ void QnNxStyle::drawControl(
         if (const QStyleOptionHeader *header =
                 qstyleoption_cast<const QStyleOptionHeader*>(option))
         {
-            if (header->state.testFlag(State_MouseOver))
+            if (header->state.testFlag(State_MouseOver) || header->state.testFlag(State_HasFocus))
             {
                 QColor color = findColor(header->palette.midlight().color()).darker(1);
                 color.setAlphaF(0.2);
