@@ -3,6 +3,8 @@ import QtQuick.Controls 1.2;
 
 Rectangle
 {
+    id: thisComponent;
+
     anchors.fill: parent;
     color: palette.window;
     enabled: context.isEnabled;
@@ -14,8 +16,10 @@ Rectangle
     {
         anchors.centerIn: parent;
 
-        rows: 5;
-        columns: 5;
+        rows: (itemsSource.count > 3 ? 2 : 1);
+        columns: (itemsSource.count > 3
+            ? (itemsSource.count / 2 + itemsSource.count % 2)
+            : itemsSource.count);
 
         spacing: 16;
 

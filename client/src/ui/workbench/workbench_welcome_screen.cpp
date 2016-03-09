@@ -104,7 +104,7 @@ void QnWorkbenchWelcomeScreen::setEnabled(bool isEnabled)
 
 QObject *QnWorkbenchWelcomeScreen::createSystemsModel()
 {
-    enum { kMaxTilesCount = 4 };
+    enum { kMaxTilesCount = 8 };
     return (new QnSystemsModel(kMaxTilesCount, this));
 }
 
