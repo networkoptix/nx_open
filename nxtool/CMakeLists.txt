@@ -17,7 +17,7 @@ project(nxtool)
 set(PROJECT_SHORTNAME "nxtool")
 set(PROJECT_LONGNAME "${nxtool.company.name} Server Tool")
 set(PROJECT_VERSION "2.5.0")
-
+set(WINDOWS_RES_FILE ${PROJECT_BINARY_DIR}/${PROJECT_SHORTNAME}.obj)
 include(default_project_properties)
 
 # Additional Include Directories
@@ -32,24 +32,7 @@ find_package(Qt5Network REQUIRED)
 
 #precompiled_header()
 find_sources(src)
-#process_rc()
-#todo: not working as function. Rewrite.
-if (WIN32)
-  set(WINDOWS_RES_FILE ${PROJECT_BINARY_DIR}/${PROJECT_SHORTNAME}.obj)
-  if (MSVC)
-    add_custom_command(OUTPUT ${WINDOWS_RES_FILE}
-      COMMAND rc.exe /fo ${WINDOWS_RES_FILE} ${PROJECT_BINARY_DIR}/module.rc
-      WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
-    )
-    message ("Processing Resources from ${PROJECT_BINARY_DIR}/module.rc")
-  else()
-    add_custom_command(OUTPUT ${WINDOWS_RES_FILE}
-      COMMAND windres.exe ${PROJECT_BINARY_DIR}/${PROJECT_SHORTNAME} ${WINDOWS_RES_FILE}
-      WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
-    )
-  endif()
-endif()
-find_sources(src)
+process_rc()
 process_resources()
 add_translations(translations)
 qt5_wrap_ui(UI_HEADERS ${UI_FILES})

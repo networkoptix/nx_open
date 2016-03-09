@@ -1,5 +1,5 @@
 #include <windows.h>
-#include "${project.build.directory}/app_icons.h"
+#include "app_icons.h"
 
 IDI_ICON_APPLICATION    ICON    DISCARDABLE     "${customization.dir}/icons/hdw_logo.ico"
 IDI_ICON_VIDEOWALL      ICON    DISCARDABLE     "${customization.dir}/icons/videowall.ico"

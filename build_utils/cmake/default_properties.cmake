@@ -10,3 +10,7 @@ set (CMAKE_PREFIX_PATH "$ENV{environment}/artifacts/qt/${qt.version}/${platform}
 
 execute_process(COMMAND hg id -i OUTPUT_VARIABLE changeSet)
 string(REPLACE "\n" "" changeSet ${changeSet})
+
+set(parsedVersion.majorVersion ${majorVersion})
+set(parsedVersion.minorVersion ${minorVersion})
+set(parsedVersion.incrementalVersion ${incrementalVersion})

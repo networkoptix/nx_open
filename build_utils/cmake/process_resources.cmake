@@ -1,26 +1,35 @@
-function(process_resources)
+function(process_resources)  
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/defines.h.cmake
                  ${CMAKE_CURRENT_BINARY_DIR}/defines.h
                  )
-  file(GLOB_RECURSE FILTERED_FILES "${PROJECT_SOURCE_DIR}/resources/filter/*")
-  foreach(filename ${FILTERED_FILES})
-    string(REPLACE "${PROJECT_SOURCE_DIR}/resources/filter/" "" filename ${filename})
-    configure_file(${PROJECT_SOURCE_DIR}/resources/filter/${filename}
-                   ${CMAKE_CURRENT_BINARY_DIR}/${filename})
-    message("Filtering and Copying: " ${filename})
-  endforeach(filename ${FILTERED_FILES})
-
-  file(GLOB_RECURSE COMMON_FILTERED_FILES "${CMAKE_SOURCE_DIR}/cpp/resources/filter/*")
-  foreach(filename ${COMMON_FILTERED_FILES})
-    string(REPLACE "${CMAKE_SOURCE_DIR}/cpp/resources/filter/" "" filename ${filename})
-    configure_file(${CMAKE_SOURCE_DIR}/cpp/resources/filter/${filename}
-                   ${CMAKE_CURRENT_BINARY_DIR}/${filename})
-    message("Filtering and Copying: " ${filename})
-  endforeach(filename ${COMMON_FILTERED_FILES})
-
-  #configure_file(${CMAKE_SOURCE_DIR}/cpp/scripts/gen_resources.py
-  #               ${CMAKE_CURRENT_BINARY_DIR}/gen_resources.py)
-  #file(GLOB RESOURCES "${PROJECT_SOURCE_DIR}/resources/filter/*")
-  #file(COPY ${RESOURCES} DESTINATION ${PROJECT_BINARY_DIR})
-  execute_process(COMMAND $ENV{environment}/python/x64/python.exe ${CMAKE_CURRENT_BINARY_DIR}/gen_resources.py)  
+  file(GLOB_RECURSE FILTERED_RESOURCES "${PROJECT_SOURCE_DIR}/maven/filter-resources/*" "${CMAKE_SOURCE_DIR}/cpp/maven/filter-resources/*")
+  foreach(filename ${FILTERED_RESOURCES})
+    message("Filtering and Copying: " ${filename})  
+    string(REPLACE "${PROJECT_SOURCE_DIR}/maven/filter-resources/" "" name ${filename})
+    string(REPLACE "${CMAKE_SOURCE_DIR}/cpp/maven/filter-resources/" "" name ${name})    
+    configure_file(${filename} ${CMAKE_CURRENT_BINARY_DIR}/${name})
+  endforeach(filename ${FILTERED_RESOURCES})
+  
+  file(GLOB_RECURSE STATIC_RESOURCES "${PROJECT_SOURCE_DIR}/static-resources/*" "${PROJECT_SOURCE_DIR}/maven/bin-resources/resources/*" "${CMAKE_CURRENT_BINARY_DIR}/resources/*")
+  file(WRITE ${PROJECT_BINARY_DIR}/${PROJECT_SHORTNAME}.qrc "<!DOCTYPE RCC>
+")
+  file(APPEND ${PROJECT_BINARY_DIR}/${PROJECT_SHORTNAME}.qrc "<RCC version=\"1.0\">
+")
+  file(APPEND ${PROJECT_BINARY_DIR}/${PROJECT_SHORTNAME}.qrc "<qresource prefix=\"/\">
+")
+  foreach(filename ${STATIC_RESOURCES})
+    get_filename_component(STATIC_RESOURCE_DIR ${filename} DIRECTORY)
+    get_filename_component(STATIC_RESOURCE_FILENAME ${filename} NAME)
+    string(REPLACE "${PROJECT_SOURCE_DIR}/static-resources/" "" STATIC_RESOURCE_DIR ${STATIC_RESOURCE_DIR})
+    string(REPLACE "${PROJECT_SOURCE_DIR}/maven/bin-resources/resources/" "" STATIC_RESOURCE_DIR ${STATIC_RESOURCE_DIR})
+    string(REPLACE "${CMAKE_CURRENT_BINARY_DIR}/resources/" "" STATIC_RESOURCE_DIR ${STATIC_RESOURCE_DIR})
+    file(APPEND ${PROJECT_BINARY_DIR}/${PROJECT_SHORTNAME}.qrc "  <file alias=\"${STATIC_RESOURCE_DIR}/${STATIC_RESOURCE_FILENAME}\">${filename}</file>
+")
+    message("Adding ${filename} to QRC")
+  endforeach(filename ${STATIC_RESOURCES})
+  file(APPEND ${PROJECT_BINARY_DIR}/${PROJECT_SHORTNAME}.qrc "</qresource>
+")
+  file(APPEND ${PROJECT_BINARY_DIR}/${PROJECT_SHORTNAME}.qrc "</RCC>
+")
+  #execute_process(COMMAND $ENV{environment}/python/x64/python.exe ${CMAKE_CURRENT_BINARY_DIR}/gen_resources.py)  
 endfunction()

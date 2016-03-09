@@ -57,7 +57,7 @@ def get_packages():
     elif TARGET.startswith("ios"):
         packages += """ ${rdep.ios.packages}"""
 
-    if '${' in packages:
+    if '{' in packages:
         return []
 
     return packages.split()

@@ -53,6 +53,7 @@ set (quazip.version "0.6.2")
 set (sigar.version "1.7")
 set (vmax_integration.version "2.1")
 set (qt.version 5.6.0)
+set (boost.version 1.56.0)
 
 set(CMAKE_PREFIX_PATH "$ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}")
 if(NOT CMAKE_BUILD_TYPE)
@@ -128,6 +129,7 @@ include(precompiled_header)
 
 include_directories($ENV{environment}/boost_1_56_0
                     ${CMAKE_SOURCE_DIR}/common/src
+                    ${CMAKE_SOURCE_DIR}/cpp/maven/bin-resources
                     $ENV{environment}/include
                     #$ENV{environment}/include/ffmpeg-misc-headers-win32
                     $ENV{environment}/include/glext
@@ -182,6 +184,6 @@ find_package(Qt5LinguistTools)
 add_module(
     NAMES
         nxtool
-        #common
+        common
     STATUS_SHORT_NAMES
 )
