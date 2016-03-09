@@ -1198,7 +1198,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
         }
 
         for(const auto &user: users)
-            messageProcessor->updateUser(user);
+            messageProcessor->updateResource(user);
 
         /* Here the admin user must exist, global settings also. */
         updateStatisticsAllowedSettings();
@@ -1216,7 +1216,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
         }
 
         for (const ec2::ApiVideowallData& videowall: videowalls)
-            messageProcessor->updateVideowall(videowall);
+            messageProcessor->updateResource(videowall);
     }
 
     {
@@ -1231,7 +1231,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
         }
 
         for(const auto &layout: layouts)
-            messageProcessor->updateLayout(layout);
+            messageProcessor->updateResource(layout);
     }
 
     {

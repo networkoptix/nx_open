@@ -65,7 +65,13 @@ void QnCommonMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
 }
 
 
-void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnectionPtr &connection) {
+void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnectionPtr &connection)
+{
+    auto on_resourceUpdated = [this](const auto& resource)
+    {
+        updateResource(resource);
+    };
+
     connect(connection, &ec2::AbstractECConnection::remotePeerFound,                this, &QnCommonMessageProcessor::on_remotePeerFound );
     connect(connection, &ec2::AbstractECConnection::remotePeerLost,                 this, &QnCommonMessageProcessor::on_remotePeerLost );
     connect(connection, &ec2::AbstractECConnection::initNotification,               this, &QnCommonMessageProcessor::on_gotInitialNotification );
@@ -93,15 +99,15 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     connect(cameraManager, &ec2::AbstractCameraManager::cameraRemoved,              this, &QnCommonMessageProcessor::on_resourceRemoved );
 
     auto userManager = connection->getUserManager();
-    connect(userManager, &ec2::AbstractUserManager::addedOrUpdated,                 this, [this](const ec2::ApiUserData& user){updateUser(user);});
+    connect(userManager, &ec2::AbstractUserManager::addedOrUpdated,                 this, on_resourceUpdated);
     connect(userManager, &ec2::AbstractUserManager::removed,                        this, &QnCommonMessageProcessor::on_resourceRemoved );
 
     auto layoutManager = connection->getLayoutManager();
-    connect(layoutManager, &ec2::AbstractLayoutManager::addedOrUpdated,             this, [this](const ec2::ApiLayoutData& layout){updateLayout(layout);});
+    connect(layoutManager, &ec2::AbstractLayoutManager::addedOrUpdated,             this, on_resourceUpdated);
     connect(layoutManager, &ec2::AbstractLayoutManager::removed,                    this, &QnCommonMessageProcessor::on_resourceRemoved );
 
     auto videowallManager = connection->getVideowallManager();
-    connect(videowallManager, &ec2::AbstractVideowallManager::addedOrUpdated,       this, [this](const ec2::ApiVideowallData& videowall){updateVideowall(videowall);});
+    connect(videowallManager, &ec2::AbstractVideowallManager::addedOrUpdated,       this, on_resourceUpdated);
     connect(videowallManager, &ec2::AbstractVideowallManager::removed,              this, &QnCommonMessageProcessor::on_resourceRemoved );
     connect(videowallManager, &ec2::AbstractVideowallManager::controlMessage,       this, &QnCommonMessageProcessor::videowallControlMessageReceived );
 
@@ -359,7 +365,6 @@ void QnCommonMessageProcessor::resetResources(const ec2::ApiFullInfoData& fullDa
 
     fromApiToResourceList(fullData.servers, resources);
     fromApiToResourceList(fullData.cameras, resources, factory);
-    fromApiToResourceList(fullData.videowalls, resources);
     fromApiToResourceList(fullData.webPages, resources);
     fromApiToResourceList(fullData.storages, resources, factory);
 
@@ -367,6 +372,14 @@ void QnCommonMessageProcessor::resetResources(const ec2::ApiFullInfoData& fullDa
     QHash<QnUuid, QnResourcePtr> remoteResources;
     for (const QnResourcePtr &resource: qnResPool->getResourcesWithFlag(Qn::remote))
         remoteResources.insert(resource->getId(), resource);
+
+    auto updateResources = [this, &remoteResources](const auto& source) {
+        for (const auto& resource : source)
+        {
+            updateResource(resource);
+            remoteResources.remove(resource.id);
+        }
+    };
 
     /* Packet adding. */
     qnResPool->beginTran();
@@ -378,18 +391,9 @@ void QnCommonMessageProcessor::resetResources(const ec2::ApiFullInfoData& fullDa
         /* And keep them from removing. */
         remoteResources.remove(resource->getId());
     }
-
-    for (const ec2::ApiUserData& user : fullData.users)
-    {
-        updateUser(user);
-        remoteResources.remove(user.id);
-    }
-
-    for (const ec2::ApiLayoutData& layout : fullData.layouts)
-    {
-        updateLayout(layout);
-        remoteResources.remove(layout.id);
-    }
+    updateResources(fullData.users);
+    updateResources(fullData.layouts);
+    updateResources(fullData.videowalls);
 
     qnResPool->commit();
 
@@ -539,21 +543,21 @@ void QnCommonMessageProcessor::updateResource(const QnResourcePtr& )
 {
 }
 
-void QnCommonMessageProcessor::updateUser(const ec2::ApiUserData& user)
+void QnCommonMessageProcessor::updateResource(const ec2::ApiUserData& user)
 {
     QnUserResourcePtr qnUser(new QnUserResource());
     fromApiToResource(user, qnUser);
     updateResource(qnUser);
 }
 
-void QnCommonMessageProcessor::updateLayout(const ec2::ApiLayoutData& layout)
+void QnCommonMessageProcessor::updateResource(const ec2::ApiLayoutData& layout)
 {
     QnLayoutResourcePtr qnLayout(new QnLayoutResource());
     fromApiToResource(layout, qnLayout);
     updateResource(qnLayout);
 }
 
-void QnCommonMessageProcessor::updateVideowall(const ec2::ApiVideowallData& videowall)
+void QnCommonMessageProcessor::updateResource(const ec2::ApiVideowallData& videowall)
 {
     QnVideoWallResourcePtr qnVideowall(new QnVideoWallResource());
     fromApiToResource(videowall, qnVideowall);

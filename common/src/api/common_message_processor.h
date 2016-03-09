@@ -30,9 +30,9 @@ public:
     virtual void init(const ec2::AbstractECConnectionPtr& connection);
 
     virtual void updateResource(const QnResourcePtr &resource);
-    virtual void updateUser(const ec2::ApiUserData& user);
-    virtual void updateLayout(const ec2::ApiLayoutData& layout);
-    virtual void updateVideowall(const ec2::ApiVideowallData& videowall);
+    virtual void updateResource(const ec2::ApiUserData& user);
+    virtual void updateResource(const ec2::ApiLayoutData& layout);
+    virtual void updateResource(const ec2::ApiVideowallData& videowall);
 
     QMap<QnUuid, QnBusinessEventRulePtr> businessRules() const;
 
