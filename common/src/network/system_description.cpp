@@ -11,8 +11,10 @@ namespace
     QnServerFields getChanges(const QnModuleInformation &before
         , const QnModuleInformation &after)
     {        
-        return (EXTRACT_CHANGE_FLAG(systemName, QnServerField::SystemNameField)
-            || EXTRACT_CHANGE_FLAG(name, QnServerField::NameField));
+        const auto result = (EXTRACT_CHANGE_FLAG(systemName, QnServerField::SystemNameField)
+            | EXTRACT_CHANGE_FLAG(name, QnServerField::NameField));
+
+        return result;
     }
 #undef EXTRACT_CHANGE_FLAG
 }
