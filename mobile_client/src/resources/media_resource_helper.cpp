@@ -654,7 +654,11 @@ void QnMediaResourceHelper::updateCurrentStream()
         return;
 
     QnTimePeriod period;
-    QnMediaServerResourcePtr server = qnCameraHistoryPool->getMediaServerOnTime(m_camera, m_position, &period);
+    QnMediaServerResourcePtr server =
+            qnCameraHistoryPool->getMediaServerOnTime(
+                    m_camera,
+                    m_position < 0 ? DATETIME_NOW : m_position,
+                    &period);
     if (!server)
         return;
 
