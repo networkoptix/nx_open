@@ -25,13 +25,13 @@
         <guid>${cloud_db.guid}</guid>
         <product.title>${company.name} cloud_db</product.title>
         <!--Global libs-->
-        <qt.libs>core network concurrent sql xml</qt.libs>
-        <global.libs>-lcloud_db -lnx_utils -lcommon -lnx_streaming -ludt -lnx_network -lcloud_db_client -lquazip</global.libs>
+        <qt.libs>core gui network concurrent sql xml</qt.libs>
+        <global.libs>-lcloud_db -lnx_utils -lcommon -lnx_streaming -ludt -lnx_network -lcloud_db_client</global.libs>
         <!--Specific os libs used-->
-        <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm ssleay32.lib libeay32.lib</windows.oslibs>
+        <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm</windows.oslibs>
         <windows.oslibs.release/>
         <windows.oslibs.debug/>
-        <linux.oslibs>-lavcodec -lavformat -lavutil -lfaac -lswscale -lvpx -lssl -lcrypto</linux.oslibs>
+        <linux.oslibs>-lavcodec -lavformat -lavutil -lfaac -lswscale -lvpx</linux.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
         <!--Global defines-->
         <global.defines/>
@@ -39,6 +39,7 @@
         <windows.defines/>
         <linux.defines/>
         <mac.defines/>
+        <rdep.packages>openssl quazip</rdep.packages>
     </properties>
 
     <dependencies>

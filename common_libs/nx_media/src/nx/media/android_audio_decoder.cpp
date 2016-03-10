@@ -36,8 +36,6 @@ namespace {
                 return lit("audio/g711-alaw");
             case CODEC_ID_PCM_MULAW:
                 return lit("audio/g711-mlaw");
-            case CODEC_ID_PCM_MULAW:
-                return lit("audio/g711-mlaw");
             case CODEC_ID_MP2:
             case CODEC_ID_MP3:
                 return lit("audio/mpeg");
@@ -47,7 +45,13 @@ namespace {
                 return QString();
         }
     }
+
+    void fillInputBuffer(JNIEnv *env, jobject thiz, jobject buffer, jlong srcDataPtr, jint dataSize, jint capacity);
+    void readOutputBuffer(JNIEnv *env, jobject thiz, jlong cObject, jobject buffer, jint bufferSize);
 }
+
+// ------------------------------------------------------------------------------
+
 
 // ------------------------- AndroidAudioDecoderPrivate -------------------------
 
@@ -58,8 +62,7 @@ class AndroidAudioDecoderPrivate: public QObject
 public:
     AndroidAudioDecoderPrivate():
         initialized(false),
-        javaDecoder("com/networkoptix/nxwitness/media/QnMediaDecoder"),
-        program(nullptr)
+        javaDecoder("com/networkoptix/nxwitness/media/QnAudioDecoder")
     {
         registerNativeMethods();
     }
@@ -74,7 +77,8 @@ public:
         using namespace std::placeholders;
 
         JNINativeMethod methods[] {
-            {"fillInputBuffer", "(Ljava/nio/ByteBuffer;JI)V", reinterpret_cast<void *>(nx::media::fillInputBuffer)}
+            {"fillInputBuffer", "(Ljava/nio/ByteBuffer;JII)V", reinterpret_cast<void *>(nx::media::fillInputBuffer)},
+            { "readOutputBuffer", "(JLjava/nio/ByteBuffer;I)V", reinterpret_cast<void *>(nx::media::readOutputBuffer) }
         };
 
         QAndroidJniEnvironment env;
@@ -86,39 +90,44 @@ public:
         env->DeleteLocalRef(objectClass);
     }
 
-    void AndroidAudioDecoderPrivate::readOutputBuffer(const void* buffer, int bufferSize)
+    void readOutputBuffer(const void* buffer, int bufferSize)
     {
         audioFrame.reset(new nx::AudioFrame());
         audioFrame->data.write((const char*) buffer, bufferSize);
     }
 
 private:
-    std::unique_ptr<nx::AudioFrame> audioFrame;
     bool initialized;
     QAndroidJniObject javaDecoder;
+    AudioFramePtr audioFrame;
 };
 
-// --------------------------------------------------------------------------------------------------
+namespace {
 
-void fillInputBuffer(JNIEnv *env, jobject thiz, jobject buffer, jlong srcDataPtr, jint dataSize)
+void fillInputBuffer(JNIEnv *env, jobject thiz, jobject buffer, jlong srcDataPtr, jint dataSize, jint capacity)
 {
+    Q_UNUSED(thiz);
     void* bytes = env->GetDirectBufferAddress(buffer);
     void* srcData = (void*)srcDataPtr;
-    memcpy(bytes, srcData, dataSize);
+    if (capacity < dataSize)
+        qWarning() << "fillInputBuffer: capacity less then dataSize." << capacity << "<" << dataSize;
+    memcpy(bytes, srcData, qMin(capacity, dataSize));
 }
 
-void readOutputBuffer(JNIEnv *env, jobject thiz, , jlong cObject, jobject buffer, jint dataSize)
+void readOutputBuffer(JNIEnv *env, jobject thiz, jlong cObject, jobject buffer, jint bufferSize)
 {
-    AndroidAudioDecoderPrivate* decoder = static_cast<AndroidVideoDecoderPrivate*> (void*) (cObject);
+    Q_UNUSED(thiz);
+    AndroidAudioDecoderPrivate* decoder = static_cast<AndroidAudioDecoderPrivate*> ((void*) cObject);
     void* bytes = env->GetDirectBufferAddress(buffer);
-    const void* srcData = (void*)srcDataPtr;
-    decoder->readOutputBuffer(srcData, dataSize);
+    decoder->readOutputBuffer(bytes, bufferSize);
+}
+
 }
 
 // ---------------------- AndroidAudioDecoder ----------------------
 
 AndroidAudioDecoder::AndroidAudioDecoder():
-    AbstractVideoDecoder(),
+    AbstractAudioDecoder(),
     d_ptr(new AndroidAudioDecoderPrivate())
 
 {
@@ -139,38 +148,49 @@ bool AndroidAudioDecoder::isCompatible(const CodecID codec)
     return !codecMimeType.isEmpty();
 }
 
-AudioFramePtr AndroidAudioDecoder::decode(const QnConstCompressedAudioDataPtr& frame)
+bool AndroidAudioDecoder::decode(const QnConstCompressedAudioDataPtr& frame, AudioFramePtr* const outFrame)
 {
     Q_D(AndroidAudioDecoder);
 
     if (!frame)
-        return AudioFramePtr();
+        return false;
 
     if (!d->initialized)
     {
-
+        QnCodecAudioFormat audioFormat(frame->context);
         QString codecName = codecToString(frame->compressionType);
         QAndroidJniObject jCodecName = QAndroidJniObject::fromString(codecName);
+
         d->initialized = d->javaDecoder.callMethod<jboolean>(
-            "init", "(Ljava/lang/String;)Z",
-            jCodecName.object<jstring>());
+            "init", "(Ljava/lang/String;IIJI)Z",
+            jCodecName.object<jstring>(),
+            audioFormat.sampleRate(),
+            audioFormat.channels(),
+            (jlong) frame->context->getExtradata(),
+            frame->context->getExtradataSize());
         if (!d->initialized)
-            return AudioFramePtr();
+            return false;
     }
 
-    d->javaDecoder.callMethod<jlong>(
-        "decodeAudio", "(JI)Z",
+    d->audioFrame.reset();
+    jlong outFrameTimestamp = d->javaDecoder.callMethod<jlong>(
+        "decodeFrame", "(JIJJ)J",
         (jlong) frame->data(),
-        (jint) frame->dataSize());
+        (jint) frame->dataSize(),
+        (jlong) frame->timestamp,
+        (jlong) (const void*) d_ptr.data());
 
-    if (audioFrame)
+    if (outFrameTimestamp < 0)
+        return false;
+
+    if (d->audioFrame)
     {
-        audioFrame->context = d->abstractContext;
-        audioFrame->timestampUsec = d->frame->pkt_dts;
+        d->audioFrame->timestampUsec = outFrameTimestamp;
+        d->audioFrame->context = frame->context;
+        *outFrame = std::move(d->audioFrame);
     }
     
-    std::unique_ptr<AudioFrame> result(std::move(audioFrame));
-    return AudioFramePtr(result);
+    return true;
 }
 
 } // namespace media

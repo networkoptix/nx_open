@@ -642,7 +642,7 @@ CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTim
         targetAddress = m_proxyAddr;
         destinationPort = m_proxyPort;
     }
-    if( !m_tcpSock->connect(targetAddress, destinationPort) )
+    if( !m_tcpSock->connect(targetAddress, destinationPort, TCP_CONNECT_TIMEOUT) )
         return CameraDiagnostics::CannotOpenCameraMediaPortResult(url, destinationPort);
 
     m_tcpSock->setNoDelay(true);

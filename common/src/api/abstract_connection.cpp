@@ -26,8 +26,7 @@ bool QnAbstractReplyProcessor::connect(const char *signal, QObject *receiver, co
     }
 }
 
-//TODO: #GDM #High change resource parameter to shared pointer
-QnAbstractConnection::QnAbstractConnection(QObject *parent, QnResource* targetRes): 
+QnAbstractConnection::QnAbstractConnection(QObject *parent, const QnResourcePtr& targetRes):
     base_type(parent),
     m_targetRes(targetRes)
 {}
@@ -71,7 +70,7 @@ void QnAbstractConnection::setSerializer(QnLexicalSerializer *serializer) {
 }
 
 QString QnAbstractConnection::objectName(int object) const {
-    QString result;    
+    QString result;
     serializer()->serialize(object, &result);
     return result;
 }
@@ -110,11 +109,11 @@ int QnAbstractConnection::sendAsyncRequest(int operation, int object, const QnRe
     return QnSessionManager::instance()->sendAsyncRequest(
         operation,
         url,
-        objectName(object), 
-        actualHeaders, 
-        params, 
+        objectName(object),
+        actualHeaders,
+        params,
         data,
-        processor, 
+        processor,
         "processReply"
     );
 }
@@ -181,11 +180,13 @@ int QnAbstractConnection::sendSyncPostRequest(int object, const QnRequestParamLi
     return sendSyncPostRequest(object, QnRequestHeaderList(), params, data, reply);
 }
 
-QnResource *QnAbstractConnection::targetResource() const {
+QnResourcePtr QnAbstractConnection::targetResource() const
+{
     return m_targetRes;
 }
 
-bool QnAbstractConnection::isReady() const {
+bool QnAbstractConnection::isReady() const
+{
     return true;
 }
 

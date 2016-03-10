@@ -42,6 +42,7 @@
         <!--Specific os defines-->
         <windows.defines/>
         <linux.defines/>
-        <mac.defines/>      
+        <mac.defines/>
+        <rdep.packages>qt</rdep.packages>        
     </properties>    
 </project>

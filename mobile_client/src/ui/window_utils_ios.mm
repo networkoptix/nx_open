@@ -1,21 +1,12 @@
 #include "window_utils.h"
 
 #include <UIKit/UIKit.h>
-#include <QtGui/QGuiApplication>
 #include <QtGui/QWindow>
 
-namespace {
-    QWindow *topWindow() {
-        QWindowList windows = qApp->topLevelWindows();
-        if (windows.size() != 1)
-            return nullptr;
-
-        return windows.first();
-    }
-}
-
-void prepareWindow() {
-    if (QWindow *window = topWindow()) {
+void prepareWindow()
+{
+    if (QWindow *window = getMainWindow())
+    {
         window->setFlags(window->flags() | Qt::MaximizeUsingFullscreenGeometryHint);
         window->showMaximized();
     }

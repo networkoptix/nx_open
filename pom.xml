@@ -100,7 +100,7 @@
 
         <!-- Build Defaults -->
         <license.environment>production</license.environment>
-        <build.configuration>release</build.configuration>
+        <build.configuration>debug</build.configuration>
         <buildNumber>0</buildNumber>
         <skip.sign>true</skip.sign>
         <box>none</box>
@@ -125,18 +125,19 @@
         <compiler.arguments />
 
         <libdir>${root.dir}/build_environment/target</libdir>
-        <qt.path>artifacts/qt/${qt.version}/${platform}/${arch}/${box}</qt.path>
+        <rdep.target>${platform}-${arch}</rdep.target>
+        <qt.path>rdep/packages/${rdep.target}/qt-${qt.version}</qt.path>
         <qt.dir>${environment.dir}/${qt.path}</qt.dir>
          <!-- Can take values 'pdb', 'src' or both ('pdb, src')  -->
         <qt.debug></qt.debug>
         <ClientHelpSourceDir>${environment.dir}/help/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}/${customization}</ClientHelpSourceDir>
-        <ClientVoxSourceDir>${environment.dir}/festival.vox/lib</ClientVoxSourceDir>
+        <ClientVoxSourceDir>${libdir}/${arch}/bin/release/vox</ClientVoxSourceDir>
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
         <unpack.skip>false</unpack.skip>
         <resources.phase>generate-sources</resources.phase>
         <qt.version>5.6.0</qt.version>
         <ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
-        <openssl.version>1.0.2e-SNAPSHOT</openssl.version>
+        <openssl.version>1.0.2e</openssl.version>
         <openldap.version>2.4.42-SNAPSHOT</openldap.version>
         <sasl2.version>2.1.26-SNAPSHOT</sasl2.version>
         <protobuf.version>2.6.0-SNAPSHOT</protobuf.version>
@@ -144,7 +145,7 @@
         <sigar.version>1.7-SNAPSHOT</sigar.version>
         <festival.version>2.4-SNAPSHOT</festival.version>
         <boost.version>1.56-SNAPSHOT</boost.version>
-        <quazip.version>0.7.1-SNAPSHOT</quazip.version>
+        <quazip.version>0.7.1</quazip.version>
 
         <!-- Set parent (parent.customization) and child (customization) customizations here -->
         <customization>default</customization>
@@ -159,16 +160,25 @@
         <qtlibs>
             Core, Network, Xml, Concurrent, Sql, Multimedia, OpenGL, Widgets, Gui, X11Extras,
             PrintSupport, MultimediaWidgets, Quick, MultimediaQuick_p, Qml,
-            XmlPatterns
+            XmlPatterns, XcbQpa
         </qtlibs>
         <additional.qtlibs/>
 
         <!--QT plugins used-->
         <qtplugins>
-            imageformats, platforms
+            imageformats, platforms, xcbglintegrations
         </qtplugins>
         <additional.qtplugins/>
 
+        <!-- List of commonly used RDep packages -->
+        <rdep.packages/>
+        <rdep.windows.packages/>
+        <rdep.linux.packages/>
+        <rdep.mac.packages/>
+        <rdep.android.packages/>
+        <rdep.ios.packages/>
+        
+        
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
@@ -664,7 +674,7 @@
                 <toolchain.version>codesourcery-2014.05</toolchain.version>
                 <compiler>2011.09</compiler>
                 <qt.spec>linux-arm-gnueabi-g++-2014.05</qt.spec>
-                <openssl.version>1.0.0j-SNAPSHOT</openssl.version>
+                <openssl.version>1.0.0j</openssl.version>
                 <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
                 <modification>isd</modification>
             </properties>
@@ -691,7 +701,7 @@
                 <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
                 <toolchain.version>linaro-multilib-2013.09</toolchain.version>
                 <compiler>${toolchain.version}</compiler>
-                <openssl.version>1.0.1f-SNAPSHOT</openssl.version>
+                <openssl.version>1.0.1f</openssl.version>
                 <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
                 <modification>isd_s2</modification>
             </properties>
@@ -717,7 +727,7 @@
             <properties>
                 <toolchain.version>rpi</toolchain.version>
                 <compiler>${toolchain.version}</compiler>
-                <openssl.version>1.0.0j-SNAPSHOT</openssl.version>
+                <openssl.version>1.0.0j</openssl.version>
                 <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
                 <modification>rpi</modification>
             </properties>
@@ -742,10 +752,10 @@
                 </property>
             </activation>
             <properties>
-                <quazip.version>0.7-SNAPSHOT</quazip.version>
+                <quazip.version>0.7</quazip.version>
                 <toolchain.version>rpi</toolchain.version>
                 <compiler>bpi</compiler>
-                <openssl.version>1.0.0j-SNAPSHOT</openssl.version>
+                <openssl.version>1.0.0j</openssl.version>
                 <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
                 <modification>bpi</modification>
             </properties>
@@ -768,10 +778,10 @@
                 </property>
             </activation>
             <properties>
-                <quazip.version>0.7-SNAPSHOT</quazip.version>
+                <quazip.version>0.7</quazip.version>
                 <toolchain.version>rpi</toolchain.version>
                 <compiler>bpi</compiler>
-                <openssl.version>1.0.0j-SNAPSHOT</openssl.version>
+                <openssl.version>1.0.0j</openssl.version>
                 <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
                 <modification>bananapi</modification>
                 <qt.classifier>${platform}-${arch}-bpi</qt.classifier>
@@ -880,7 +890,6 @@
                 </property>
             </activation>
             <properties>
-                <qt.version>5.6.0</qt.version>
                 <compile.options/>
                 <additional.qtplugins>audio</additional.qtplugins>
             </properties>
@@ -909,6 +918,7 @@
             <properties>
                 <platform>android</platform>
                 <toolchain.version>android</toolchain.version>
+                <qt.version>5.5.1</qt.version>
                 <qt.spec>android-g++</qt.spec>
                 <qt.classifier>${platform}-${arch}</qt.classifier>
                 <libdir>${root.dir}/build_environment/target</libdir>
@@ -919,7 +929,7 @@
                 <android.ndk>${environment.dir}/android/android-ndk</android.ndk>
                 <android.ndk.host>linux-x86_64</android.ndk.host>
                 <android.toolchain.version>4.8</android.toolchain.version>
-                <openssl.version>1.0.2d-SNAPSHOT</openssl.version>
+                <openssl.version>1.0.2d</openssl.version>
                 <additional.defines>DISABLE_FFMPEG</additional.defines>
                 <compile.option1/>
             </properties>
@@ -968,7 +978,7 @@
                 <compiler>clang</compiler>
                 <additional.compiler>clang</additional.compiler>
                 <profile.classifier>${platform}-${arch}</profile.classifier>
-                <openssl.version>1.0.1i-SNAPSHOT</openssl.version>
+                <openssl.version>1.0.1i</openssl.version>
                 <compile.option1/>
             </properties>
         </profile>

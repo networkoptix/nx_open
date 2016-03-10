@@ -55,7 +55,9 @@ public:
     static bool execSQLScript(const QByteArray& scriptData, QSqlDatabase& database);
     //!Reads file \a fileName and calls \a QnDbHelper::execSQLScript
     static bool execSQLFile(const QString& fileName, QSqlDatabase& database);
+
     static bool execSQLQuery(QSqlQuery *query, const char* details);
+    static bool prepareSQLQuery(QSqlQuery *query, const QString &queryStr, const char* details);
 
 protected:
     bool isObjectExists(const QString& objectType, const QString& objectName, QSqlDatabase& database);

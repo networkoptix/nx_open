@@ -1,0 +1,15 @@
+﻿<div class="content">
+    <div class="callout">
+        <h4>入力詳細:</h4>
+        <table class="details">
+            <tr>
+                <th>入力ポート</th>
+                <th>時間</th>
+            </tr>
+            {{#aggregated}}
+                <tr><td>{{inputPort}}</td>
+                    <td><i>{{timestamp}}</i></td></tr>
+            {{/aggregated}}
+        </table>
+    </div>
+</div>

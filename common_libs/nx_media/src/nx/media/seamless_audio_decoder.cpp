@@ -91,12 +91,11 @@ bool SeamlessAudioDecoder::decode(
 
     if (!d->audioDecoder)
         return false;
-    AudioFramePtr decodedFrame = d->audioDecoder->decode(frame);
-    if (!decodedFrame)
-        return false;
-    
-    *result = std::move(decodedFrame);
-    return true;
+    AudioFramePtr decodedFrame;
+    bool success = d->audioDecoder->decode(frame, &decodedFrame);
+    if (decodedFrame)
+        *result = std::move(decodedFrame);
+    return success;
 }
 
 } // namespace media

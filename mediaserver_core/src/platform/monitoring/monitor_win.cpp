@@ -228,7 +228,12 @@ public:
             return 0.0;
         
         PDH_FMT_COUNTERVALUE result;
-        PDH_STATUS status = PdhCalculateCounterFromRawValue(counter, PDH_FMT_DOUBLE | PDH_FMT_NOCAP100, const_cast<PDH_RAW_COUNTER *>(&current), const_cast<PDH_RAW_COUNTER *>(&last), &result);
+        PDH_STATUS status = PdhCalculateCounterFromRawValue(
+            counter,
+            PDH_FMT_DOUBLE /*| PDH_FMT_NOCAP100*/,  //TODO #ak disk usage can be greater then 100% somehow. Maybe, disk can do some I/O concurrently
+            const_cast<PDH_RAW_COUNTER *>(&current),
+            const_cast<PDH_RAW_COUNTER *>(&last),
+            &result);
         if(status != PDH_CSTATUS_NEW_DATA && status != ERROR_SUCCESS) {
             checkError("PdhCalculateCounterFromRawValue", status);
             return 0.0;

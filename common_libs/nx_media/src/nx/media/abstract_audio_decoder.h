@@ -44,9 +44,10 @@ public:
     * It's guarantee all source frames have same codec context.
     *
     * \param frame        compressed audio data. 
-    * \!returns decoded audio frame or null shared pointer if decoding error
+    * \param outFrame     decoded audio data.
+    * \!returns true if no decoder error. outFrame may stay empty if decoder fills internal buffer.
     */
-    virtual AudioFramePtr decode(const QnConstCompressedAudioDataPtr& frame) = 0;
+    virtual bool decode(const QnConstCompressedAudioDataPtr& frame, AudioFramePtr* const outFrame) = 0;
 };
 
 }

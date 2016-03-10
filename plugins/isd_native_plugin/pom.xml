@@ -28,7 +28,7 @@
         <ffmpeg.libs></ffmpeg.libs>
         <global.libs>-lcommon -lnx_streaming</global.libs>
         <!--Specific os libs used-->
-        <windows.oslibs>Ws2_32.lib common.lib ssleay32.lib libeay32.lib Iphlpapi.lib</windows.oslibs>
+        <windows.oslibs>Ws2_32.lib common.lib Iphlpapi.lib</windows.oslibs>
         <windows.oslibs.release/>
         <windows.oslibs.debug/>
         <linux.oslibs/>
@@ -38,6 +38,7 @@
         <mac.defines/>
         <!--Specific os defines-->
         <windows.defines>WIN32_LEAN_AND_MEAN</windows.defines>
+        <rdep.packages>openssl</rdep.packages>
     </properties>
     <dependencies>
         <dependency>

@@ -22,7 +22,7 @@ public:
     virtual ~AndroidAudioDecoder();
 
     static bool isCompatible(const CodecID codec);
-    virtual AudioFramePtr decode(const QnConstCompressedAudioDataPtr& frame) override;
+    virtual bool decode(const QnConstCompressedAudioDataPtr& frame, AudioFramePtr* const outFrame) override;
 private:
     QScopedPointer<AndroidAudioDecoderPrivate> d_ptr;
     Q_DECLARE_PRIVATE(AndroidAudioDecoder);
