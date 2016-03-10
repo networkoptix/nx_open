@@ -94,9 +94,16 @@ namespace
         return !(flags & (Qn::SF_ArmServer | Qn::SF_Edge));
     }
 
-    qint64 fixedPosition(qint64 pos)
+    QnMediaServerResourcePtr serverAtPosition(
+            const QnVirtualCameraResourcePtr &camera,
+            qint64 position,
+            QnTimePeriod *foundPeriod = nullptr)
     {
-        return pos < 0 ? DATETIME_NOW : pos;
+        if (position < 0 || position == DATETIME_NOW)
+            return camera->getParentServer();
+
+        return qnCameraHistoryPool->getMediaServerOnTime(
+                camera, position, foundPeriod);
     }
 
 } // anonymous namespace
@@ -488,8 +495,7 @@ void QnMediaResourceHelper::updateFinalTimestamp()
     }
 
     QnTimePeriod period;
-    qnCameraHistoryPool->getMediaServerOnTime(
-            m_camera, fixedPosition(m_position), &period);
+    serverAtPosition(m_camera, m_position, &period);
 
     setFinalTimestamp(period.isValid() && !period.isInfinite() ? period.endTimeMs() : -1);
 }
@@ -509,8 +515,7 @@ QnMediaServerResourcePtr QnMediaResourceHelper::serverAtCurrentPosition() const
     if (position != -1)
         position = m_chunkProvider->closestChunkStartMs(position, true);
 
-    return qnCameraHistoryPool->getMediaServerOnTime(
-                m_camera, fixedPosition(position));
+    return serverAtPosition(m_camera, position);
 }
 
 QnMediaResourceHelper::Protocol QnMediaResourceHelper::protocol() const
@@ -673,9 +678,8 @@ void QnMediaResourceHelper::updateCurrentStream()
         return;
 
     QnTimePeriod period;
-    QnMediaServerResourcePtr server =
-            qnCameraHistoryPool->getMediaServerOnTime(
-                    m_camera, fixedPosition(m_position), &period);
+    QnMediaServerResourcePtr server = serverAtPosition(
+            m_camera, m_position, &period);
     if (!server)
         return;
 
@@ -693,6 +697,11 @@ void QnMediaResourceHelper::updateCurrentStream()
         emit protocolChanged();
         emit aspectRatioChanged();
     }
+    else if (m_useTranscoding && m_url.isEmpty())
+    {
+        updateStardardResolutions();
+        emit resolutionsChanged();
+    }
 
     updateUrl();
 }
@@ -702,7 +711,7 @@ void QnMediaResourceHelper::at_resource_parentIdChanged(const QnResourcePtr &res
     if (m_camera != resource)
         return;
 
-    updateUrl();
+    updateCurrentStream();
 }
 
 void QnMediaResourceHelper::updateStardardResolutions()
@@ -716,6 +725,9 @@ void QnMediaResourceHelper::updateStardardResolutions()
         if (resolution <= maxResolution)
             m_standardResolutions.append(resolution);
     }
+
+    if (m_standardResolutions.isEmpty())
+        m_standardResolutions.append(maxResolution);
 
     maxResolution = m_standardResolutions.last();
 
