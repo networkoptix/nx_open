@@ -124,7 +124,8 @@ void QnMjpegPlayerPrivate::processFrame() {
     int presentationTime = frameData.presentationTime;
 
     position += presentationTime;
-    timestamp = frameData.timestamp;
+    if (frameData.timestamp > 0)
+        timestamp = frameData.timestamp;
 
     if (frameTimer.isValid())
         presentationTime -= qMax(0, static_cast<int>(frameTimer.elapsed()) - framePresentationTime);

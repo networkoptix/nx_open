@@ -94,6 +94,11 @@ namespace
         return !(flags & (Qn::SF_ArmServer | Qn::SF_Edge));
     }
 
+    qint64 fixedPosition(qint64 pos)
+    {
+        return pos < 0 ? DATETIME_NOW : pos;
+    }
+
 } // anonymous namespace
 
 QnMediaResourceHelper::QnMediaResourceHelper(QObject *parent)
@@ -102,7 +107,6 @@ QnMediaResourceHelper::QnMediaResourceHelper(QObject *parent)
     , m_finalTimestamp(-1)
     , m_resolution(0)
     , m_nativeStreamIndex(1)
-    , m_transcodingSupported(true)
     , m_useTranscoding(true)
     , m_transcodingProtocol(transcodingProtocol)
     , m_nativeProtocol(nativeStreamProtocol)
@@ -484,7 +488,8 @@ void QnMediaResourceHelper::updateFinalTimestamp()
     }
 
     QnTimePeriod period;
-    qnCameraHistoryPool->getMediaServerOnTime(m_camera, m_position, &period);
+    qnCameraHistoryPool->getMediaServerOnTime(
+            m_camera, fixedPosition(m_position), &period);
 
     setFinalTimestamp(period.isValid() && !period.isInfinite() ? period.endTimeMs() : -1);
 }
@@ -504,7 +509,8 @@ QnMediaServerResourcePtr QnMediaResourceHelper::serverAtCurrentPosition() const
     if (position != -1)
         position = m_chunkProvider->closestChunkStartMs(position, true);
 
-    return qnCameraHistoryPool->getMediaServerOnTime(m_camera, position);
+    return qnCameraHistoryPool->getMediaServerOnTime(
+                m_camera, fixedPosition(position));
 }
 
 QnMediaResourceHelper::Protocol QnMediaResourceHelper::protocol() const
@@ -655,11 +661,13 @@ void QnMediaResourceHelper::updateCurrentStream()
         return;
 
     QnTimePeriod period;
-    QnMediaServerResourcePtr server = qnCameraHistoryPool->getMediaServerOnTime(m_camera, m_position, &period);
+    QnMediaServerResourcePtr server =
+            qnCameraHistoryPool->getMediaServerOnTime(
+                    m_camera, fixedPosition(m_position), &period);
     if (!server)
         return;
 
-    bool useTranscoding = m_transcodingSupported && transcodingSupportedForServer(server);
+    bool useTranscoding = transcodingSupportedForServer(server);
 
     if (m_useTranscoding != useTranscoding)
     {
@@ -696,9 +704,6 @@ void QnMediaResourceHelper::updateStardardResolutions()
         if (resolution <= maxResolution)
             m_standardResolutions.append(resolution);
     }
-
-    if (!m_transcodingSupported)
-        return;
 
     maxResolution = m_standardResolutions.last();
 
