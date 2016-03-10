@@ -23,7 +23,7 @@ namespace
 
         , IsCompatibleRoleId
         , IsCompatibleVersionRoleId
-        , IsCorrectCustomizaionRoleId
+        , IsCorrectCustomizationRoleId
 
         // For local systems 
         , HostRoleId
@@ -41,7 +41,7 @@ namespace
         result.insert(IsCloudSystemRoleId, "isCloudSystem");
         result.insert(IsCompatibleRoleId, "isCompatible");
         result.insert(IsCompatibleVersionRoleId, "isCompatibleVersion");
-        result.insert(IsCorrectCustomizaionRoleId, "isCorrectCustomizaion");
+        result.insert(IsCorrectCustomizationRoleId, "isCorrectCustomization");
 
         result.insert(HostRoleId, "host");
 
@@ -193,7 +193,7 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
 
     case IsCompatibleRoleId:
         return isCompatibleSystem(systemDescription);
-    case IsCorrectCustomizaionRoleId:
+    case IsCorrectCustomizationRoleId:
         return isCorrectCustomization(systemDescription);
     case IsCompatibleVersionRoleId:
         return isCompatibleVersion(systemDescription);
@@ -220,13 +220,9 @@ void QnSystemsModel::addSystem(const QnSystemDescriptionPtr &systemDescription)
     const int position = (insertPos == m_internalData.end()
         ? m_internalData.size() : insertPos - m_internalData.begin());
 
-    const QPointer<QnSystemsModel> guard(this);
-    const auto serverChangedHandler = [this, guard, systemDescription]
+    const auto serverChangedHandler = [this, systemDescription]
         (const QnUuid &serverId, QnServerFields fields)
     {
-        if (!guard)
-            return;
-
         serverChanged(systemDescription, serverId, fields);
     };
 
@@ -277,9 +273,9 @@ void QnSystemsModel::removeSystem(const QnUuid &systemId)
 
     {
         const auto beginRemoveRowsHandler = [this, position]()
-        { beginRemoveRows(QModelIndex(), position, position); };
+            { beginRemoveRows(QModelIndex(), position, position); };
         const auto endRemoveRowsHandler = [this]()
-        { endRemoveRows(); };
+            { endRemoveRows(); };
 
         const auto removeGuard = (emitRemoveSignal
             ? QnGenericGuard::create(beginRemoveRowsHandler, endRemoveRowsHandler)

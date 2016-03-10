@@ -47,10 +47,14 @@ Rectangle
                 {
                     id: cloudSystemTile;
 
-                    Item {}
+                    CloudSystemTile
+                    {
+                        systemName: model.systemName;
+
+                    }
                 }
 
-                sourceComponent: (itemsSource.model.isCloudSystem
+                sourceComponent: (model.isCloudSystem
                     ? cloudSystemTile : localSystemTile);
             }
         }

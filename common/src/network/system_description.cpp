@@ -82,7 +82,7 @@ void QnSystemDescription::addServer(const QnModuleInformation &serverInfo)
     emit serverAdded(serverInfo.id);
 }
 
-bool QnSystemDescription::isContainServer(const QnUuid &serverId) const
+bool QnSystemDescription::containsServer(const QnUuid &serverId) const
 {
     return m_servers.contains(serverId);
 }

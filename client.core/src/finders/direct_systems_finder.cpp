@@ -55,7 +55,7 @@ void QnDirectSystemsFinder::addServer(const QnModuleInformation &moduleInformati
     }
 
     const auto systemDescription = itSystem.value();
-    if (systemDescription->isContainServer(moduleInformation.id))
+    if (systemDescription->containsServer(moduleInformation.id))
         systemDescription->updateServer(moduleInformation);
     else
         systemDescription->addServer(moduleInformation);
@@ -82,6 +82,7 @@ void QnDirectSystemsFinder::removeServer(const QnModuleInformation &moduleInform
         return;
 
     const auto systemDescription = systemIt.value();
+    systemDescription->removeServer(moduleInformation.id);
     if (!systemDescription->servers().isEmpty())
         return;
 

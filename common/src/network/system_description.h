@@ -44,7 +44,7 @@ public:
     
     void addServer(const QnModuleInformation &serverInfo);
 
-    bool isContainServer(const QnUuid &serverId) const;
+    bool containsServer(const QnUuid &serverId) const;
 
     QnModuleInformation getServer(const QnUuid &serverId) const;
 

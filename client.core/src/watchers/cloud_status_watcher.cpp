@@ -228,7 +228,10 @@ void QnCloudStatusWatcherPrivate::updateConnection(bool initial)
     cloudConnection.reset();
 
     if (cloudLogin.isEmpty() || cloudPassword.isEmpty())
+    {
+        setCloudSystems(QnCloudSystemList());
         return;
+    }
 
     cloudConnection = connectionFactory->createConnection(cloudLogin.toStdString(), cloudPassword.toStdString());
 

@@ -2,23 +2,11 @@
 #include "cloud_systems_finder.h"
 
 #include <common/common_module.h>
-
-namespace
-{
-    typedef QSet<QnUuid> IdsSet;
-
-    IdsSet getSystemIds(const QnAbstractSystemsFinder::SystemDescriptionList &systems)
-    {
-        IdsSet result;
-        for (const auto system : systems)
-            result.insert(system->id());
-        return result;
-    };
-
-}
+#include <nx/network/socket_global.h>
 
 QnCloudSystemsFinder::QnCloudSystemsFinder(QObject *parent)
     : base_type(parent)
+    , m_mutex()
     , m_systems()
 {
     const auto cloudWatcher = qnCommon->instance<QnCloudStatusWatcher>();
@@ -27,9 +15,11 @@ QnCloudSystemsFinder::QnCloudSystemsFinder(QObject *parent)
     connect(cloudWatcher, &QnCloudStatusWatcher::statusChanged
         , this, &QnCloudSystemsFinder::onCloudStatusChanged);
     connect(cloudWatcher, &QnCloudStatusWatcher::cloudSystemsChanged
-        , this, &QnCloudSystemsFinder::onCloudSystemsChanged);
+        , this, &QnCloudSystemsFinder::setCloudSystems);
     connect(cloudWatcher, &QnCloudStatusWatcher::error
         , this, &QnCloudSystemsFinder::onCloudError);
+    connect(this, &QnAbstractSystemsFinder::systemDiscovered
+        , this, &QnCloudSystemsFinder::onSystemDiscovered);
 }
 
 QnCloudSystemsFinder::~QnCloudSystemsFinder()
@@ -37,7 +27,8 @@ QnCloudSystemsFinder::~QnCloudSystemsFinder()
 
 QnAbstractSystemsFinder::SystemDescriptionList QnCloudSystemsFinder::systems() const
 {
-    return m_systems;
+    const QnMutexLocker lock(&m_mutex);
+    return m_systems.values();
 }
 
 void QnCloudSystemsFinder::onCloudStatusChanged(QnCloudStatusWatcher::Status status)
@@ -45,42 +36,53 @@ void QnCloudSystemsFinder::onCloudStatusChanged(QnCloudStatusWatcher::Status sta
     switch (status)
     {
     case QnCloudStatusWatcher::Online:
-        break;  // TODO: handle if it is needed
+    {
+        const auto cloudWatcher = qnCommon->instance<QnCloudStatusWatcher>();
+//        cloudWatcher->updateSystems();
+        break;
+    }
 
     case QnCloudStatusWatcher::LoggedOut:
     case QnCloudStatusWatcher::Unauthorized:
-        break;  // TODO: handle if it is needed
-
     case QnCloudStatusWatcher::Offline:
-        break;  // TODO: #ynikitenkov add offline systems handling
+//        setCloudSystems(QnCloudSystemList());
+        break;  
     }
 }
 
-void QnCloudSystemsFinder::onCloudSystemsChanged(const QnCloudSystemList &systems)
+void QnCloudSystemsFinder::setCloudSystems(const QnCloudSystemList &systems)
 {
-    SystemDescriptionList updatedSystems;
+    // TODO: add sync
+    SystemsHash updatedSystems;
     for (const auto system : systems)
     {
-        updatedSystems.append(QnSystemDescription::createCloudSystem(
-            system.id, system.name));
+        updatedSystems.insert(system.id
+            , QnSystemDescription::createCloudSystem(system.id, system.name));
     }
 
-    const auto oldIds = getSystemIds(m_systems);
-    const auto newIds = getSystemIds(m_systems);
+    typedef QSet<QnUuid> IdsSet;
 
-    const auto removedIds = IdsSet(oldIds).subtract(newIds);
-    const auto addedIds = IdsSet(newIds).subtract(oldIds);
+    const auto newIds = updatedSystems.keys().toSet();
+    IdsSet removedIds;
 
-    std::swap(m_systems, updatedSystems);
+    {
+        const QnMutexLocker lock(&m_mutex);
+        
+        const auto oldIds = m_systems.keys().toSet();
+        const auto addedIds = IdsSet(newIds).subtract(oldIds);
+
+        removedIds = IdsSet(oldIds).subtract(newIds);
+
+        std::swap(m_systems, updatedSystems);
+        for (const auto system : m_systems)
+        {
+            if (addedIds.contains(system->id()))
+                emit systemDiscovered(system);
+        }
+    }
     
     for (const auto removedId : removedIds)
         emit systemLost(removedId);
-
-    for (const auto system : m_systems)
-    {
-        if (addedIds.contains(system->id()))
-            emit systemDiscovered(system);
-    }
 }
 
 void QnCloudSystemsFinder::onCloudError(QnCloudStatusWatcher::ErrorCode error)
@@ -88,4 +90,29 @@ void QnCloudSystemsFinder::onCloudError(QnCloudStatusWatcher::ErrorCode error)
     // TODO: #ynikitenkov handle errors. Now it is assumed that systems are reset 
     // if any error automatically
 }
+
+void QnCloudSystemsFinder::onSystemDiscovered(const QnSystemDescriptionPtr &system)
+{
+    typedef std::vector<HostAddress> HostAddressVector;
+    
+    auto &resolver = nx::network::SocketGlobals::addressResolver();
+
+    const QPointer<QnCloudSystemsFinder> guard(this);
+    const auto id = system->id();
+    const auto resolvedHandler = [this, guard, id](const HostAddressVector &hosts)
+    {
+        if (!guard)
+            return;
+
+        const auto it = m_systems.find(id);
+        if (it == m_systems.end())
+            return;
+
+        int i = 0;
+    };
+
+    const auto cloudHost = HostAddress(id.toString());
+    resolver.resolveDomain(cloudHost, resolvedHandler);
+}
+
 
