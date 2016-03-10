@@ -17,6 +17,8 @@ if time.timezone == 28800:
 elif time.timezone == -10800:
     SYNC_URL = "rsync://enk.me/buildenv/rdep/packages"
 
+GENERATE_CMAKE_DEPS = False
+
 #Supports templates such as bin/*.dll
 def copy_recursive(src, dst):
     if "*" in src:
@@ -67,14 +69,19 @@ def install_dependency(dependency_dir, target_dir, debug):
         print "Copying {0} to {1}".format(src, bin_dst)
         copy_recursive(src, bin_dst)
 
-def locate_pri_file(path):
+def get_deps_file_suffix():
+    return ".cmake" if GENERATE_CMAKE_DEPS else ".pri"
+
+def locate_deps_file(path):
     if not os.path.isdir(path):
         return None
 
     result = None
 
+    suffix = get_deps_file_suffix()
+
     for file in os.listdir(path):
-        if file.endswith(".pri"):
+        if file.endswith(suffix):
             if result:
                 return None
             else:
@@ -82,12 +89,13 @@ def locate_pri_file(path):
 
     return result
 
-def get_deps_pri_file(debug = False):
-    return "dependencies-debug.pri" if debug else "dependencies.pri"
+def get_deps_file(debug = False):
+    base = "dependencies-debug" if debug else "dependencies"
+    return base + get_deps_file_suffix()
 
-def append_pri(pri_file, debug = False):
-    with open(get_deps_pri_file(debug), "a") as file:
-        file.write("include({0})\n".format(pri_file))
+def append_deps(deps_file, debug = False):
+    with open(get_deps_file(debug), "a") as file:
+        file.write("include({0})\n".format(deps_file))
 
 def get_package_for_configuration(target, package, target_dir, debug):
     installation_marker = (package if not debug else package + "-debug") + rdep.PACKAGE_CONFIG_NAME
@@ -103,11 +111,11 @@ def get_package_for_configuration(target, package, target_dir, debug):
         print "Could not locate {0}".format(package)
         return False
 
-    pri_file = os.path.join(location, package + ".pri")
-    if not os.path.isfile(pri_file):
-        pri_file = locate_pri_file(location)
-    if pri_file and os.path.isfile(pri_file):
-        append_pri(pri_file, debug)
+    deps_file = os.path.join(location, package + ".pri")
+    if not os.path.isfile(deps_file):
+        deps_file = locate_deps_file(location)
+    if deps_file and os.path.isfile(deps_file):
+        append_deps(deps_file, debug)
 
     if not installed:
         print "Copying package {0} into {1} for {2}".format(package, target_dir, configuration_name(debug))
@@ -130,8 +138,11 @@ def get_package(target, package, target_dir, debug = False):
 
     return True
 
-def get_dependencies(target, packages, target_dir, debug = False):
+def get_dependencies(target, packages, target_dir, debug = False, deps_file = "qmake"):
     global SYNC_URL
+    global GENERATE_CMAKE_DEPS
+
+    GENERATE_CMAKE_DEPS = deps_file == "cmake"
 
     if not os.path.isdir(REPOSITORY_PATH):
         os.makedirs(REPOSITORY_PATH)
@@ -144,7 +155,7 @@ def get_dependencies(target, packages, target_dir, debug = False):
 
     # Clear dependenciy files
     for debug in [ False, True ]:
-        open(get_deps_pri_file(debug), "w").close()
+        open(get_deps_file(debug), "w").close()
 
     if not packages:
         print "No dependencies found"
@@ -161,8 +172,9 @@ if __name__ == '__main__':
     parser.add_argument("-t", "--target",       help="Target classifier.",  default = platform_detection.detect_target())
     parser.add_argument("-o", "--target-dir",   help="Target directory.",   default = os.getcwd())
     parser.add_argument("-d", "--debug",        help="Sync debug version.",                 action="store_true")
+    parser.add_argument("--deps-file",          help="Generate dependencies file.",  default = "qmake")
     parser.add_argument("packages", nargs='*',  help="Packages to sync.",   default="")
 
     args = parser.parse_args()
 
-    get_dependencies()
+    get_dependencies(args.target, args.packages, args.target_dir, args.debug, args.deps_file)
