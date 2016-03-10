@@ -85,7 +85,7 @@ TestFileOperation generateFileOperation(int code)
     }
     tz *= genRandomNumber<0, 1>() == 0 ? 1 : -1;
 
-    return{ genRandomNumber<0, 4398046511103LL>(), genRandomNumber<0, 1099511627776LL>(),
+    return{ genRandomNumber<1000, 439804651110LL>(), genRandomNumber<0, 1099511627776LL>(),
             code, (int)genRandomNumber<0, 65535>(), (int)genRandomNumber<0, 1048575LL>(), 
             tz, (int)genRandomNumber<0, 1>() };
 }
@@ -280,9 +280,9 @@ public:
         }
         if (unremovedChunks.empty())
             return nullptr;
-        static std::random_device rd;
-        static std::mt19937 gen(rd());
-        static std::uniform_int_distribution<qint64> dist(0, unremovedChunks.size() - 1);
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<qint64> dist(0, unremovedChunks.size() - 1);
 
         TestChunk *chunk = unremovedChunks[dist(gen)];
         chunk->isDeleted = true;
@@ -291,9 +291,9 @@ public:
 
     std::pair<Catalog, std::deque<DeviceFileCatalog::Chunk>> generateReplaceOperation(int size)
     {
-        static std::random_device rd;
-        static std::mt19937 gen(rd());
-        static std::uniform_int_distribution<qint64> dist(0, m_catalogs.size() - 1);
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<qint64> dist(0, m_catalogs.size() - 1);
 
         Catalog *catalog = &m_catalogs[dist(gen)];
         for (size_t i = 0; i < m_chunks.size(); ++i)
@@ -318,6 +318,7 @@ public:
             TestChunk tc;
             tc.catalog = catalog;
             tc.isDeleted = false;
+            tc.isVisited = false;
             tc.chunk = chunk;
 
             m_chunks.push_back(tc);
@@ -710,14 +711,14 @@ TEST(MediaDb_test, StorageDB)
     storage->setUrl(workDirPath);
 
     QnStorageDb sdb(storage, 1);
-    bool result = sdb.open(workDirPath + lit("test.nxdb"));
+    bool result = sdb.open(workDirPath + lit("/test.nxdb"));
     ASSERT_TRUE(result);
     
     sdb.loadFullFileCatalog();
 
     QnMutex mutex;
     std::vector<std::thread> threads;
-    TestChunkManager tcm(128);
+    TestChunkManager tcm(12);
     
     auto writerFunc = [&mutex, &sdb, &tcm]
     {
@@ -766,25 +767,35 @@ TEST(MediaDb_test, StorageDB)
             QnMutexLocker lk(&mutex);
             auto dbChunkCatalogs = sdb.loadFullFileCatalog();
 
-            for (auto catalogIt = dbChunkCatalogs.cbegin(); catalogIt != dbChunkCatalogs.cend(); ++catalogIt)
+            for (auto catalogIt = dbChunkCatalogs.cbegin(); 
+                 catalogIt != dbChunkCatalogs.cend();
+                 ++catalogIt)
             {
-                for (auto chunkIt = (*catalogIt)->getChunks().cbegin(); chunkIt != (*catalogIt)->getChunks().cend(); ++chunkIt)
+                for (auto chunkIt = (*catalogIt)->getChunks().cbegin();
+                     chunkIt != (*catalogIt)->getChunks().cend();
+                     ++chunkIt)
                 {
-                    TestChunkManager::TestChunkCont::iterator tcmIt = std::find_if(tcm.get().begin(), tcm.get().end(),
-                          [catalogIt, chunkIt](const TestChunkManager::TestChunk &tc)
-                          {
-                              return tc.catalog->cameraUniqueId == (*catalogIt)->cameraUniqueId() &&
-                                     tc.catalog->quality == (*catalogIt)->getCatalog() &&
-                                     !tc.isVisited && tc.chunk == *chunkIt;
-                          });
+                    TestChunkManager::TestChunkCont::iterator tcmIt = 
+                        std::find_if(tcm.get().begin(), 
+                                     tcm.get().end(),
+                                     [catalogIt, chunkIt](const TestChunkManager::TestChunk &tc)
+                                     {
+                                         return tc.catalog->cameraUniqueId == (*catalogIt)->cameraUniqueId() &&
+                                                tc.catalog->quality == (*catalogIt)->getCatalog() &&
+                                                !tc.isVisited && !tc.isDeleted && tc.chunk == *chunkIt;
+                                     });
                     bool tcmChunkFound = tcmIt != tcm.get().end();
-                    EXPECT_TRUE(tcmIt != tcm.get().end());
+                    EXPECT_TRUE(tcmChunkFound);
                     if (tcmChunkFound)
                         tcmIt->isVisited = true;
                 }
             }
 
-            bool allVisited = std::none_of(tcm.get().begin(), tcm.get().end(), [](const TestChunkManager::TestChunk &tc) { return !tc.isDeleted && !tc.isVisited; });
+            bool allVisited = std::none_of(tcm.get().begin(), tcm.get().end(), 
+                                           [](const TestChunkManager::TestChunk &tc) 
+                                           {
+                                               return !tc.isDeleted && !tc.isVisited; 
+                                           });
             ASSERT_EQ(allVisited, true);
 
             for (auto tcmIt = tcm.get().begin(); tcmIt != tcm.get().end(); ++tcmIt)
@@ -792,13 +803,15 @@ TEST(MediaDb_test, StorageDB)
         }
     };
 
-    for (size_t i = 0; i < 3; ++i)
+    for (size_t i = 0; i < 1; ++i)
         threads.push_back(std::thread(writerFunc));
 
     threads.push_back(std::thread(readerFunc));
 
     for (auto &t : threads)
         t.join();
+
+    recursiveClean(workDirPath);
 }
 
 TEST(MediaDb_test, Cleanup)

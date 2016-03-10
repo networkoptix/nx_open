@@ -62,8 +62,18 @@ struct MediaFileOperation : RecordBase
     int getCameraId() const { return (part_1 >> 0x2) & 0xffff; }
     void setCameraId(int cameraId) { part_1 |= ((quint64)cameraId & 0xffff) << 0x2; }
 
-    qint64 getStartTime() const { return (part_1 >> 0x12) & getBitMask(0x2all); }
-    void setStartTime(qint64 startTime) { part_1 |= ((quint64)startTime & getBitMask(0x2all)) << 0x12; }
+    qint64 getStartTime() const 
+    {   // -1 is a special value which designates that this operation
+        // should be done with entire catalog instead of one chunk.
+        qint64 ret = (part_1 >> 0x12) & getBitMask(0x2all); 
+        return ret == 1 ? -1 : ret;
+    }
+
+    void setStartTime(qint64 startTime) 
+    { 
+        startTime = startTime == -1 ? 1 : startTime;
+        part_1 |= ((quint64)startTime & getBitMask(0x2all)) << 0x12; 
+    }
 
     int getDuration() const
     {
