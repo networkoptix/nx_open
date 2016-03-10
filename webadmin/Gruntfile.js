@@ -578,7 +578,7 @@ module.exports = function (grunt) {
                     mode: 'zip'
                 },
                 files: [
-                    { src: '<%= yeoman.app %>/../static' }
+                    { src: '<%= yeoman.app %>/../static/**' }
                 ]
             }
         },
