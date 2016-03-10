@@ -6,16 +6,16 @@ import tempfile
 import filelock
 import ConfigParser
 import glob
-
-RDEP_PATH = os.path.join(os.getenv("environment"), "rdep")
-if not os.path.isdir(RDEP_PATH):
-    print "Could find RDEP at {0}".format(RDEP_PATH)
-    exit(1)
-
-sys.path.insert(0, RDEP_PATH)
+import time
 import rdep
 import platform_detection
-sys.path.pop(0)
+
+REPOSITORY_PATH = os.path.join(os.getenv("environment"), "packages")
+SYNC_URL = "rsync://hdw.mx/buildenv/rdep/packages"
+if time.timezone == 28800:
+    SYNC_URL = "rsync://la.hdw.mx/buildenv/rdep/packages"
+elif time.timezone == -10800:
+    SYNC_URL = "rsync://enk.me/buildenv/rdep/packages"
 
 #Supports templates such as bin/*.dll
 def copy_recursive(src, dst):
@@ -96,9 +96,9 @@ def get_package_for_configuration(target, package, target_dir, debug):
 
     if not installed:
         print "Fetching package {0} for {1}".format(package, configuration_name(debug))
-        rdep.fetch_packages(target, [ package ], debug)
+        rdep.fetch_packages(REPOSITORY_PATH, SYNC_URL, target, [ package ], debug)
 
-    location = rdep.locate_package(target, package)
+    location = rdep.locate_package(REPOSITORY_PATH, target, package)
     if not location:
         print "Could not locate {0}".format(package)
         return False
@@ -131,6 +131,17 @@ def get_package(target, package, target_dir, debug = False):
     return True
 
 def get_dependencies(target, packages, target_dir, debug = False):
+    global SYNC_URL
+
+    if not os.path.isdir(REPOSITORY_PATH):
+        os.makedirs(REPOSITORY_PATH)
+
+    if not rdep.check_repository(REPOSITORY_PATH):
+        if not rdep.init_repository(REPOSITORY_PATH, SYNC_URL):
+            exit(1)
+
+    SYNC_URL = rdep.get_sync_url(REPOSITORY_PATH)
+
     # Clear dependenciy files
     for debug in [ False, True ]:
         open(get_deps_pri_file(debug), "w").close()
