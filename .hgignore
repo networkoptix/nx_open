@@ -328,6 +328,7 @@ html
 
 webadmin/node_modules
 webadmin/dist
+webadmin/external.zip
 webadmin/.tmp
 webadmin/.idea
 webadmin/.sass-cache
