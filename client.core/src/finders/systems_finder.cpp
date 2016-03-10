@@ -28,10 +28,9 @@ void QnSystemsFinder::addSystemsFinder(QnAbstractSystemsFinder *finder)
         m_finders.remove(finder);
     });
 
-    const auto connectionHolder = QnConnectionsHolder::create();
-    connectionHolder->add(discoveredConnection);
-    connectionHolder->add(lostConnection);
-    connectionHolder->add(destroyedConnection);
+    const auto connectionHolder = QnDisconnectHelper::create();
+    *connectionHolder << discoveredConnection << lostConnection
+        << destroyedConnection;
 
     m_finders.insert(finder, connectionHolder);
 }

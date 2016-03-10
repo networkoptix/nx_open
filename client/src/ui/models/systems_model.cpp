@@ -12,6 +12,8 @@ namespace
 {
     typedef QHash<int, QByteArray> RoleNames;
 
+    enum { kMaxTilesCount = 8 };
+
     enum RoleId
     {
         FirstRoleId = Qt::UserRole + 1
@@ -29,7 +31,7 @@ namespace
         , HostRoleId
         
         
-        , AfterLastRoleId
+        , RolesCount
     };
 
     const auto kRoleNames = []() -> RoleNames
@@ -57,6 +59,7 @@ namespace
         const auto customization = QnAppInfo::customizationName();
         const auto predicate = [customization](const QnModuleInformation &serverInfo)
         {
+            // TODO: improve me https://networkoptix.atlassian.net/browse/VMS-2163
             return (customization == serverInfo.customization);
         };
 
@@ -74,7 +77,8 @@ namespace
         const QnSoftwareVersion appVersion(QnAppInfo::applicationVersion());
         const auto predicate = [appVersion](const QnModuleInformation &serverInfo)
         {
-            return isCompatible(appVersion, serverInfo.version);
+            // TODO: improve me https://networkoptix.atlassian.net/browse/VMS-2166
+            return serverInfo.hasCompatibleVersion();
         };
 
         const bool hasCorrectVersion = 
@@ -85,7 +89,9 @@ namespace
     bool isCompatibleSystem(const QnSystemDescriptionPtr &sysemDescription)
     {
         return (isCompatibleVersion(sysemDescription)
-            && isCorrectCustomization(sysemDescription));
+            && isCorrectCustomization(sysemDescription)
+            // TODO: add more checks
+            );
     }
 
     QString getSystemHost(const QnSystemDescriptionPtr &sysemDescription)
@@ -131,17 +137,16 @@ namespace
 struct QnSystemsModel::InternalSystemData
 {
     QnSystemDescriptionPtr system;
-    QnConnectionsHolder connections;
+    QnDisconnectHelper connections;
 };
 
 ///
 
-QnSystemsModel::QnSystemsModel(int maxCount
-    , QObject *parent)
+QnSystemsModel::QnSystemsModel(QObject *parent)
     : base_type(parent)
-    , m_maxCount(maxCount)
-    , m_connectionsHolder(new QnConnectionsHolder())
+    , m_maxCount(kMaxTilesCount)    // TODO: do we need to change it dynamically or from outside? Think about it.
     , m_lessPred(getLessSystemPred<InternalSystemDataPtr, LessPred>())
+    , m_connections()
     , m_internalData()
 {
     Q_ASSERT_X(qnSystemsFinder, Q_FUNC_INFO, "Systems finder is null!");
@@ -154,8 +159,7 @@ QnSystemsModel::QnSystemsModel(int maxCount
         connect(qnSystemsFinder, &QnAbstractSystemsFinder::systemLost
         , this, &QnSystemsModel::removeSystem);
 
-    m_connectionsHolder->add(discoveredConnection);
-    m_connectionsHolder->add(lostConnection);
+    m_connections << discoveredConnection << lostConnection;
 
     for (const auto system : qnSystemsFinder->systems())
         addSystem(system);
@@ -174,7 +178,7 @@ int QnSystemsModel::rowCount(const QModelIndex &parent) const
 
 QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
 {
-    if (!index.isValid() || !qBetween<int>(FirstRoleId, role, AfterLastRoleId))
+    if (!index.isValid() || !qBetween<int>(FirstRoleId, role, RolesCount))
         return QVariant();
 
     const auto row = index.row();
@@ -212,7 +216,7 @@ RoleNames QnSystemsModel::roleNames() const
 void QnSystemsModel::addSystem(const QnSystemDescriptionPtr &systemDescription)
 {
     const auto data = InternalSystemDataPtr(new InternalSystemData(
-        { systemDescription, QnConnectionsHolder() }));
+        { systemDescription, QnDisconnectHelper() }));
     
     const auto insertPos = std::upper_bound(m_internalData.begin()
         , m_internalData.end(), data, m_lessPred);
@@ -244,8 +248,8 @@ void QnSystemsModel::addSystem(const QnSystemDescriptionPtr &systemDescription)
             { endInsertRows(); };
 
         const auto insertionGuard = (emitInsertSignal ?  
-            QnGenericGuard::create(beginInsertRowsCallback, endInserRowsCallback)
-            : QnGenericGuard::createEmpty());
+            QnRaiiGuard::create(beginInsertRowsCallback, endInserRowsCallback)
+            : QnRaiiGuard::createEmpty());
         m_internalData.insert(insertPos, data);
     }
 
@@ -278,8 +282,8 @@ void QnSystemsModel::removeSystem(const QnUuid &systemId)
             { endRemoveRows(); };
 
         const auto removeGuard = (emitRemoveSignal
-            ? QnGenericGuard::create(beginRemoveRowsHandler, endRemoveRowsHandler)
-            : QnGenericGuard::createEmpty());
+            ? QnRaiiGuard::create(beginRemoveRowsHandler, endRemoveRowsHandler)
+            : QnRaiiGuard::createEmpty());
         m_internalData.erase(removeIt);
     }
 
@@ -294,7 +298,7 @@ QnSystemsModel::InternalList::iterator QnSystemsModel::getInternalDataIt(
     const QnSystemDescriptionPtr &systemDescription)
 {
     const auto data = InternalSystemDataPtr(new InternalSystemData(
-        { systemDescription, QnConnectionsHolder() }));
+        { systemDescription, QnDisconnectHelper() }));
     const auto it = std::lower_bound(m_internalData.begin()
         , m_internalData.end(), data, m_lessPred);
 

@@ -32,9 +32,6 @@ QnAbstractSystemsFinder::SystemDescriptionList QnDirectSystemsFinder::systems() 
 
 void QnDirectSystemsFinder::addServer(const QnModuleInformation &moduleInformation)
 {
-    if (moduleInformation.type != QnModuleInformation::nxMediaServerId())
-        return;
-
     const auto systemIt = getSystemItByServer(moduleInformation.id);
     if (systemIt != m_systems.end())
     {
@@ -60,7 +57,7 @@ void QnDirectSystemsFinder::addServer(const QnModuleInformation &moduleInformati
     else
         systemDescription->addServer(moduleInformation);
     
-    m_serverToSystem[moduleInformation.id] = itSystem;
+    m_serverToSystem[moduleInformation.id] = systemDescription->name();
 
     if (createNewSystem)
         emit systemDiscovered(systemDescription);
@@ -68,9 +65,6 @@ void QnDirectSystemsFinder::addServer(const QnModuleInformation &moduleInformati
 
 void QnDirectSystemsFinder::removeServer(const QnModuleInformation &moduleInformation)
 {
-    if (moduleInformation.type != QnModuleInformation::nxMediaServerId())
-        return;
-
     const auto systemIt = getSystemItByServer(moduleInformation.id);
     const auto serverIsInKnownSystem = (systemIt != m_systems.end());
     Q_ASSERT_X(serverIsInKnownSystem, Q_FUNC_INFO, "Server is not known");
@@ -93,11 +87,6 @@ void QnDirectSystemsFinder::removeServer(const QnModuleInformation &moduleInform
 void QnDirectSystemsFinder::updateServer(const SystemsHash::iterator systemIt
     , const QnModuleInformation &moduleInformation)
 {
-    const bool isServer = moduleInformation.type == QnModuleInformation::nxMediaServerId();
-    Q_ASSERT_X(isServer, Q_FUNC_INFO, "Module is not server");
-    if (!isServer)
-        return;
-
     const bool serverIsInKnownSystem = (systemIt != m_systems.end());
     Q_ASSERT_X(serverIsInKnownSystem, Q_FUNC_INFO, "Server is not known");
     if (!serverIsInKnownSystem)
@@ -110,9 +99,6 @@ void QnDirectSystemsFinder::updateServer(const SystemsHash::iterator systemIt
 void QnDirectSystemsFinder::updatePrimaryAddress(const QnModuleInformation &moduleInformation
     , const SocketAddress &address)
 {
-    if (moduleInformation.type != QnModuleInformation::nxMediaServerId())
-        return;
-    
     const auto systemIt = getSystemItByServer(moduleInformation.id);
     const bool serverIsInKnownSystem = (systemIt != m_systems.end());
     Q_ASSERT_X(serverIsInKnownSystem, Q_FUNC_INFO, "Server is not known");
@@ -127,7 +113,11 @@ QnDirectSystemsFinder::SystemsHash::iterator
 QnDirectSystemsFinder::getSystemItByServer(const QnUuid &serverId)
 {
     const auto it = m_serverToSystem.find(serverId);
-    return (it == m_serverToSystem.end() ? m_systems.end() : it.value());
+    if (it == m_serverToSystem.end())
+        return m_systems.end();
+
+    const auto systemName = it.value();
+    return m_systems.find(systemName);
 }
 
 

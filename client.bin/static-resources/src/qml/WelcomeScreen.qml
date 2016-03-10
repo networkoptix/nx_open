@@ -1,5 +1,6 @@
 import QtQuick 2.5;
 import QtQuick.Controls 1.2;
+import Networkoptix 1.0;
 
 Rectangle
 {
@@ -18,15 +19,14 @@ Rectangle
 
         rows: (itemsSource.count > 3 ? 2 : 1);
         columns: (itemsSource.count > 3
-            ? (itemsSource.count / 2 + itemsSource.count % 2)
-            : itemsSource.count);
+            ? ((itemsSource.count + 1) / 2) : itemsSource.count);
 
         spacing: 16;
 
         Repeater
         {
             id: itemsSource;
-            model: context.createSystemsModel();
+            model: QnSystemsModel {}
 
             delegate: Loader
             {

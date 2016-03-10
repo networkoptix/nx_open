@@ -22,6 +22,8 @@ namespace
         static const auto kWelcomeScreenSource = lit("qrc:/src/qml/WelcomeScreen.qml");
         static const auto kContextVariableName = lit("context");
 
+        qmlRegisterType<QnSystemsModel>("Networkoptix", 1, 0, "QnSystemsModel");
+
         const auto quickView = new QQuickView();
         quickView->rootContext()->setContextProperty(
             kContextVariableName, context);
@@ -38,14 +40,10 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject *parent)
     , m_widget(QWidget::createWindowContainer(createMainView(this)))
     , m_loginDialog()
     , m_visible(false)
-    , m_enabled(true)
+    , m_enabled(false)
 {
-    const GuardType guard(this);
-    const auto idChangedHandler = [this, guard](const QnUuid &id)
+    const auto idChangedHandler = [this](const QnUuid &id)
     {
-        if (!guard)
-            return;
-
         // We could be just reconnecting if remoteGuid is null.
         // So, just hide screen when it is not
         if (!qnCommon->remoteGUID().isNull())
@@ -54,9 +52,16 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject *parent)
 
     connect(qnCommon, &QnCommonModule::remoteIdChanged
         , this, idChangedHandler);
-
     connect(action(QnActions::DisconnectAction), &QAction::triggered
         , this, &QnWorkbenchWelcomeScreen::showScreen);
+
+    connect(this, &QnWorkbenchWelcomeScreen::visibleChanged, this, [this]()
+    {
+        context()->action(QnActions::EscapeHotkeyAction)->setEnabled(!m_visible);
+
+        if (isVisible())
+            enableScreen();
+    });
 
     setVisible(true);
 }
@@ -81,10 +86,6 @@ void QnWorkbenchWelcomeScreen::setVisible(bool isVisible)
 
     m_visible = isVisible;
 
-    if (m_visible)
-        setEnabled(true);
-
-    context()->action(QnActions::EscapeHotkeyAction)->setEnabled(!m_visible);
     emit visibleChanged();
 }
 
@@ -100,12 +101,6 @@ void QnWorkbenchWelcomeScreen::setEnabled(bool isEnabled)
 
     m_enabled = isEnabled;
     emit enabledChanged();
-}
-
-QObject *QnWorkbenchWelcomeScreen::createSystemsModel()
-{
-    enum { kMaxTilesCount = 8 };
-    return (new QnSystemsModel(kMaxTilesCount, this));
 }
 
 void QnWorkbenchWelcomeScreen::connectToAnotherSystem()

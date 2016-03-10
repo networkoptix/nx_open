@@ -33,7 +33,7 @@ private:
     SystemsHash::iterator getSystemItByServer(const QnUuid &serverId);
 
 private:
-    typedef QHash<QnUuid, SystemsHash::iterator> ServerToSystemHash;
+    typedef QHash<QnUuid, QString> ServerToSystemHash;
 
     SystemsHash m_systems;
     ServerToSystemHash m_serverToSystem;

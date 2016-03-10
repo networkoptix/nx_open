@@ -7,8 +7,8 @@ Rectangle
     property string systemName;
     property Component areaDelegate;
 
-    width: 280;
-    height: 96;
+    implicitWidth: 280;
+    implicitHeight: 96;
 
     color: palette.button;  // TODO: setup color
 

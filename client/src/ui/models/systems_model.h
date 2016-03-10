@@ -5,8 +5,7 @@
 
 #include <utils/common/connective.h>
 #include <network/system_description.h>
-
-class QnConnectionsHolder;
+#include <utils/common/connections_holder.h>
 
 class QnSystemsModel : public Connective<QAbstractListModel>
 {
@@ -14,8 +13,7 @@ class QnSystemsModel : public Connective<QAbstractListModel>
     typedef Connective<QAbstractListModel> base_type;
 
 public:
-    QnSystemsModel(int maxCount
-        , QObject *parent = nullptr);
+    QnSystemsModel(QObject *parent = nullptr);
 
     virtual ~QnSystemsModel();
 
@@ -43,12 +41,11 @@ private:
         , QnServerFields fields);
 
 private:
-    typedef QScopedPointer<QnConnectionsHolder> QnConnectionsHolderPtr;
     typedef std::function<bool(const InternalSystemDataPtr &first
         , const InternalSystemDataPtr &second)> LessPred;
 
     const int m_maxCount;
-    const QnConnectionsHolderPtr m_connectionsHolder;
     const LessPred m_lessPred;
+    QnDisconnectHelper m_connections;
     InternalList m_internalData;
 };

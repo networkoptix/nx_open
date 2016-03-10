@@ -35,8 +35,6 @@ public: // Properties
     void setEnabled(bool isEnabled);
 
 public slots:
-    QObject *createSystemsModel();
-
     void connectToAnotherSystem();
 
     void tryHideScreen();

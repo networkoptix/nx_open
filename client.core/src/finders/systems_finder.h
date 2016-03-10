@@ -25,7 +25,7 @@ public: //overrides
 
 private:
     typedef QMap<QnAbstractSystemsFinder *
-        , QnConnectionsHolder::Pointer> SystemsFinderList;
+        , QnDisconnectHelperPtr> SystemsFinderList;
 
     SystemsFinderList m_finders;
 };
