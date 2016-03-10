@@ -26,6 +26,26 @@ qt5_add_resources(RESOURCE_FILES ${PROJECT_BINARY_DIR}/${PROJECT_SHORTNAME}.qrc)
 find_package(Qt5Network REQUIRED)
 find_package(Qt5Concurrent REQUIRED)
 
+MACRO(ADD_MSVC_PRECOMPILED_HEADER PrecompiledHeader PrecompiledSource SourcesVar)
+  IF(MSVC)
+    GET_FILENAME_COMPONENT(PrecompiledBasename ${PrecompiledHeader} NAME_WE)
+    SET(PrecompiledBinary "$(IntDir)$(TargetName).pch")
+    SET(Sources ${${SourcesVar}})
+    
+    SET_SOURCE_FILES_PROPERTIES(${Sources}
+                                PROPERTIES COMPILE_FLAGS "/Yu\"${PrecompiledHeader}\" /FI\"${PrecompiledHeader}\" /Fp\"${PrecompiledBinary}\""
+                                           OBJECT_DEPENDS "${PrecompiledBinary}")  
+    SET_SOURCE_FILES_PROPERTIES(${PrecompiledSource}
+                                PROPERTIES COMPILE_FLAGS "/Yc\"${PrecompiledHeader}\" /Fp\"${PrecompiledBinary}\""
+                                           OBJECT_OUTPUTS "${PrecompiledBinary}")                                           
+    # Add precompiled header to SourcesVar
+    LIST(APPEND ${SourcesVar} ${PrecompiledSource})
+  ENDIF(MSVC)
+ENDMACRO(ADD_MSVC_PRECOMPILED_HEADER)
+ADD_MSVC_PRECOMPILED_HEADER("StdAfx.h" "StdAfx.cpp" CPP_FILES)
+
+message ("${CPP_FILES}")
+
 add_library(${PROJECT_SHORTNAME} STATIC
   ${UI_HEADERS}
   ${CPP_FILES}
@@ -34,5 +54,5 @@ add_library(${PROJECT_SHORTNAME} STATIC
 target_link_libraries(${PROJECT_SHORTNAME}
   Qt5::Core Qt5::Network Qt5::Concurrent common
 )
-set_target_properties(${PROJECT_SHORTNAME} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "src/stdafx.h")
-cotire(${PROJECT_SHORTNAME})
+#set_target_properties(${PROJECT_SHORTNAME} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "src/stdafx.h")
+#cotire(${PROJECT_SHORTNAME})

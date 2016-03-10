@@ -13,9 +13,16 @@ if (WIN32 AND NOT CMAKE_INSTALL_PREFIX)
   set(CMAKE_INSTALL_PREFIX dist CACHE STRING "Install path prefix.")
 endif()
  
-project(nx_audio)
-set(PROJECT_SHORTNAME "nx_audio")
-set(PROJECT_LONGNAME "${nxtool.company.name} Audio Library")
+project(nx_network)
+set(PROJECT_SHORTNAME "nx_network")
+set(PROJECT_LONGNAME "${nxtool.company.name} Network Library")
+
+remove_definitions(-D_CONSOLE
+                -DNX_NETWORK_API=__declspec\(dllimport\)
+                )
+add_definitions(-D_CONSOLE
+                -DNX_NETWORK_API=__declspec\(dllexport\)
+                )                
 
 find_sources(src)
 process_resources()
@@ -23,13 +30,21 @@ add_translations(translations)
 qt5_wrap_ui(UI_HEADERS ${UI_FILES})
 qt5_add_resources(RESOURCE_FILES ${PROJECT_BINARY_DIR}/${PROJECT_SHORTNAME}.qrc)
 
+find_package(Qt5Gui REQUIRED)
+find_package(Qt5Network REQUIRED)
+find_package(Qt5Xml REQUIRED)
+find_package(Qt5XmlPatterns REQUIRED)
+find_package(Qt5Sql REQUIRED)
+find_package(Qt5Concurrent REQUIRED)
+find_package(Qt5Multimedia REQUIRED)
+
 add_library(${PROJECT_SHORTNAME} STATIC
   ${UI_HEADERS}
   ${CPP_FILES}
   ${RESOURCE_FILES}
 )
 target_link_libraries(${PROJECT_SHORTNAME}
-  Qt5::Core common
+  Qt5::Core common Qt5::Gui Qt5::Network Ws2_32.lib DbgHelp.lib sigar.lib odbccp32.lib
 )
 set_target_properties(${PROJECT_SHORTNAME} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "src/stdafx.h")
 cotire(${PROJECT_SHORTNAME})

@@ -10,6 +10,7 @@ set(incrementalVersion 0)
 # Global CMake options
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
+#set(CMAKE_AUTOMOC_MOC_OPTIONS "-bstdafx.h" "-fstdafx.h")
 set(CMAKE_AUTOUIC ON)
 
 if(NOT customization)
@@ -140,6 +141,7 @@ include_directories($ENV{environment}/boost_1_56_0
                     ${CMAKE_SOURCE_DIR}/common_libs/nx_streaming/src
                     ${CMAKE_SOURCE_DIR}/common_libs/nx_media/src
                     ${CMAKE_SOURCE_DIR}/common_libs/nx_audio/src
+                    ${CMAKE_SOURCE_DIR}/common_libs/udt/src                    
                     $ENV{environment}/qt5-custom
                     $ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}/include/QtZlib
                     $ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}/include/QtCore/${qt.version}/QtCore
