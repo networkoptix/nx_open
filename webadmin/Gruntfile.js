@@ -19,6 +19,8 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-protractor-webdriver');
     grunt.loadNpmTasks('grunt-protractor-runner');
     grunt.loadNpmTasks('grunt-wiredep');
+    grunt.loadNpmTasks('grunt-zip-directories');
+
 
 
     // Define the configuration for all the tasks
@@ -153,6 +155,15 @@ module.exports = function (grunt) {
                 {context: '/media/',    host: '10.1.5.126', port: 7001},
                 {context: '/proxy/',    host: '10.1.5.126', port: 7001}/**/
 
+
+                // Sasha Pats
+                {context: '/api/',      host: '10.0.3.37', port: 7000},
+                 {context: '/ec2/',      host: '10.0.3.37', port: 7000},
+                 {context: '/hls/',      host: '10.0.3.37', port: 7000},
+                 {context: '/media/',    host: '10.0.3.37', port: 7000},
+                 {context: '/proxy/',    host: '10.0.3.37', port: 7000}/**/
+
+
                 // Olya - external
                 /*{context: '/api/',      host: '95.31.136.2', port: 7011},
                 {context: '/ec2/',      host: '95.31.136.2', port: 7011},
@@ -168,7 +179,7 @@ module.exports = function (grunt) {
                 {context: '/proxy/',    host: '10.0.2.169', port: 7011}/**/
 
                 // Nx1 Cloud 3.0
-                {context: '/api/',      host: '10.0.3.65', port: 7001},
+                /*{context: '/api/',      host: '10.0.3.65', port: 7001},
                 {context: '/ec2/',      host: '10.0.3.65', port: 7001},
                 {context: '/hls/',      host: '10.0.3.65', port: 7001},
                 {context: '/media/',    host: '10.0.3.65', port: 7001},
@@ -324,7 +335,18 @@ module.exports = function (grunt) {
                 files:[
                     {
                         dot: true,
-                        src: '<%= yeoman.dist %>/../../mediaserver_core/maven/bin-resources/additional-resources/static/*'
+                        src: '<%= yeoman.app %>/../static'
+                    }
+                ],
+                options: {
+                    force: true
+                }
+            },
+            zip:{
+                files:[
+                    {
+                        dot: true,
+                        src: '<%= yeoman.app %>/../external.zip'
                     }
                 ],
                 options: {
@@ -351,7 +373,7 @@ module.exports = function (grunt) {
         },
 
         // Automatically inject Bower components into the app
-       
+
         // Compiles Sass to CSS and generates necessary files if requested
         compass: {
             options: {
@@ -545,8 +567,19 @@ module.exports = function (grunt) {
                 expand: true,
                 nonull:true,
                 cwd: '<%= yeoman.app %>/../dist',
-                dest: '../mediaserver_core/maven/bin-resources/additional-resources/static/',
+                dest: '<%= yeoman.app %>/../static/',
                 src: '**'
+            }
+        },
+        compress: {
+            external: {
+                options: {
+                    archive: '<%= yeoman.app %>/../external.zip',
+                    mode: 'zip'
+                },
+                files: [
+                    { src: '<%= yeoman.app %>/../static' }
+                ]
             }
         },
 
@@ -671,8 +704,10 @@ module.exports = function (grunt) {
 
     grunt.registerTask('publish', [
         'build',
-        'clean:publish',
-        'copy:publish'
+        'clean:zip',
+        'copy:publish',
+        'compress:external',
+        'clean:publish'
     ]);
 
 
