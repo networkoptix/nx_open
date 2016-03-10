@@ -23,18 +23,18 @@ bool recursiveClean(const QString &path);
 template<qint64 From, qint64 To>
 qint64 genRandomNumber()
 {
-    static std::random_device rd;
-    static std::mt19937 gen(rd());
-    static std::uniform_int_distribution<qint64> dist(From, To);
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<qint64> dist(From, To);
 
     return dist(gen);
 }
 
 void generateCameraUid(QByteArray *camUid, size_t n)
 {
-    static std::random_device rd;
-    static std::mt19937 gen(rd());
-    static std::uniform_int_distribution<int> dist(65, 90);
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<int> dist(65, 90);
 
     for (size_t i = 0; i < n; i++)
         camUid->append(dist(gen));
@@ -247,9 +247,9 @@ public:
 
     TestChunk generateAddOperation()
     {   
-        static std::random_device rd;
-        static std::mt19937 gen(rd());
-        static std::uniform_int_distribution<qint64> dist(0, m_catalogs.size() - 1);
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<qint64> dist(0, m_catalogs.size() - 1);
 
         Catalog *catalog = &m_catalogs[dist(gen)];
         TestFileOperation fileOp = generateFileOperation(0);
@@ -718,11 +718,11 @@ TEST(MediaDb_test, StorageDB)
 
     QnMutex mutex;
     std::vector<std::thread> threads;
-    TestChunkManager tcm(12);
+    TestChunkManager tcm(128);
     
     auto writerFunc = [&mutex, &sdb, &tcm]
     {
-        for (int i = 0; i < 5000; ++i)
+        for (int i = 0; i < 500; ++i)
         {
             int diceRoll = genRandomNumber<0, 10>();
             switch (diceRoll)
@@ -755,13 +755,13 @@ TEST(MediaDb_test, StorageDB)
                 }
                 break;
             }
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
         }
     };
 
     auto readerFunc = [&mutex, &tcm, &sdb]
     {
-        for (size_t i = 0; i < 10; ++i)
+        for (size_t i = 0; i < 5; ++i)
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(1000));
             QnMutexLocker lk(&mutex);
@@ -803,7 +803,7 @@ TEST(MediaDb_test, StorageDB)
         }
     };
 
-    for (size_t i = 0; i < 1; ++i)
+    for (size_t i = 0; i < 3; ++i)
         threads.push_back(std::thread(writerFunc));
 
     threads.push_back(std::thread(readerFunc));
