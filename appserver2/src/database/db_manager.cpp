@@ -3735,55 +3735,29 @@ ErrorCode QnDbManager::doQuery(const ApiStoredFilePath& dumpFilePath, qint64& du
 // ApiFullInfo
 ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& dummy, ApiFullInfoData& data)
 {
-    ErrorCode err;
+    ErrorCode status;
 
-    if ((err = doQueryNoLock(dummy, data.resourceTypes)) != ErrorCode::ok)
-        return err;
+    auto db_load = [this, dummy, &status](auto &target) {
+        status = doQueryNoLock(dummy, target);
+        return status == ErrorCode::ok;
+    };
 
-    if ((err = doQueryNoLock(dummy, data.servers)) != ErrorCode::ok)
-        return err;
-
-    if ((err = doQueryNoLock(dummy, data.serversUserAttributesList)) != ErrorCode::ok)
-        return err;
-
-    if ((err = doQueryNoLock(dummy, data.cameras)) != ErrorCode::ok)
-        return err;
-
-    if ((err = doQueryNoLock(dummy, data.cameraUserAttributesList)) != ErrorCode::ok)
-        return err;
-
-    if ((err = doQueryNoLock(dummy, data.users)) != ErrorCode::ok)
-        return err;
-
-    if ((err = doQueryNoLock(dummy, data.layouts)) != ErrorCode::ok)
-        return err;
-
-    if ((err = doQueryNoLock(dummy, data.videowalls)) != ErrorCode::ok)
-        return err;
-
-    if ((err = doQueryNoLock(dummy, data.webPages)) != ErrorCode::ok)
-        return err;
-
-    if ((err = doQueryNoLock(dummy, data.rules)) != ErrorCode::ok)
-        return err;
-
-    if ((err = doQueryNoLock(dummy, data.cameraHistory)) != ErrorCode::ok)
-        return err;
-
-    if ((err = doQueryNoLock(dummy, data.licenses)) != ErrorCode::ok)
-        return err;
-
-    if ((err = doQueryNoLock(dummy, data.discoveryData)) != ErrorCode::ok)
-        return err;
-
-    if ((err = doQueryNoLock(dummy, data.allProperties)) != ErrorCode::ok)
-        return err;
-
-    if ((err = doQueryNoLock(dummy, data.storages)) != ErrorCode::ok)
-        return err;
-
-    if ((err = doQueryNoLock(dummy, data.resStatusList)) != ErrorCode::ok)
-        return err;
+    if (!db_load(data.resourceTypes))               return status;
+    if (!db_load(data.servers))                     return status;
+    if (!db_load(data.serversUserAttributesList))   return status;
+    if (!db_load(data.cameras))                     return status;
+    if (!db_load(data.cameraUserAttributesList))    return status;
+    if (!db_load(data.users))                       return status;
+    if (!db_load(data.layouts))                     return status;
+    if (!db_load(data.videowalls))                  return status;
+    if (!db_load(data.webPages))                    return status;
+    if (!db_load(data.rules))                       return status;
+    if (!db_load(data.cameraHistory))               return status;
+    if (!db_load(data.licenses))                    return status;
+    if (!db_load(data.discoveryData))               return status;
+    if (!db_load(data.allProperties))               return status;
+    if (!db_load(data.storages))                    return status;
+    if (!db_load(data.resStatusList))               return status;
 
     return ErrorCode::ok;
 }
