@@ -42,9 +42,7 @@ MACRO(ADD_MSVC_PRECOMPILED_HEADER PrecompiledHeader PrecompiledSource SourcesVar
     LIST(APPEND ${SourcesVar} ${PrecompiledSource})
   ENDIF(MSVC)
 ENDMACRO(ADD_MSVC_PRECOMPILED_HEADER)
-ADD_MSVC_PRECOMPILED_HEADER("StdAfx.h" "StdAfx.cpp" CPP_FILES)
-
-message ("${CPP_FILES}")
+ADD_MSVC_PRECOMPILED_HEADER("StdAfx.h" "${PROJECT_SOURCE_DIR}/src/StdAfx.cpp" CPP_FILES)
 
 add_library(${PROJECT_SHORTNAME} STATIC
   ${UI_HEADERS}

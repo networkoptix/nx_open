@@ -10,7 +10,7 @@ set(incrementalVersion 0)
 # Global CMake options
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
-#set(CMAKE_AUTOMOC_MOC_OPTIONS "-bstdafx.h" "-fstdafx.h")
+set(CMAKE_AUTOMOC_MOC_OPTIONS "-bstdafx.h")
 set(CMAKE_AUTOUIC ON)
 
 if(NOT customization)

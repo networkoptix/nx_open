@@ -17,8 +17,6 @@ project(common_libs)
 set(PROJECT_SHORTNAME "common_libs")
 set(PROJECT_LONGNAME "${nxtool.company.name} Common Libraries")
 
-message("${CMAKE_BINARY_DIR}/common")
-
 add_definitions(-D_CONSOLE
                 )
 
