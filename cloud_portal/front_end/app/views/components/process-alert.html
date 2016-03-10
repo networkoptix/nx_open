@@ -9,10 +9,6 @@
            dismiss-on-timeout="{{alertTimeout}}"
            close="closeAlert('error');" ><span ng-bind-html="errorPrefix + ' ' + process.errorMessage"></span></uib-alert>
 
-<uib-alert type="warning"
+<uib-alert type="warning" class="alert-top"
            ng-if="processMessage && process.processing && !shown.process"
         ><span ng-bind-html="processMessage"></span></uib-alert>
-
-<uib-alert type="info"
-           ng-if="introMessage && !process.processing && !process.success && !process.error && !shown.intro"
-        ><span ng-bind-html="introMessage"></span></uib-alert>

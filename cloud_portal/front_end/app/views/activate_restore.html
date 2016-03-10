@@ -9,8 +9,7 @@
 
     <div ng-if="reactivating">
         <h1>Confirm your account</h1>
-        <process-alert process="reactivate"
-                       intro-message="'You are going to confirm your account. Please, enter your account email.'"
+        <process-alert process="reactivate" alert-timeout="0"
                        success-message="'Confirmation link was send to your email. Check it to continue.'"
                        error-prefix="'Couldn\'t send confirmation email:'"></process-alert>
         <form name="reactivateAccount" class="form-horizontal" ng-if="!reactivate.success" novalidate>
@@ -40,11 +39,10 @@
 
     <div ng-if="restoring">
         <h1>Restore password</h1>
-        <process-alert process="restore"
-                       intro-message="'You are going to restore your password. Please, enter your account email.'"
+        <process-alert process="restore" alert-timeout="0"
                        success-message="'Confirmation link was send to your email. Check it for creating a new password'"
                        error-prefix="'Couldn\'t send confirmation email:'"></process-alert>
-        <form name="restorePassword" class="form-horizontal" ng-if="!restore.success" novalidate>
+        <form name="restorePassword" class="form-horizontal" novalidate>
             <div class="form-group" validate-field>
                 <label for="email"  class="col-sm-4 control-label">Email address</label>
                 <div class="col-sm-4">
@@ -70,8 +68,7 @@
     </div>
     <div ng-if="data.restoreCode">
         <h1>Set new password</h1>
-        <process-alert process="change"
-                       intro-message="'Please, enter new password for your account.'"
+        <process-alert process="change" alert-timeout="0"
                        success-message="'Password successfully saved'"
                        error-prefix="'Couldn\'t save new password:'"></process-alert>
 
