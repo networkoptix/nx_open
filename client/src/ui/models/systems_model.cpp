@@ -3,8 +3,8 @@
 
 #include <utils/math/math.h>
 #include <utils/common/app_info.h>
-#include <utils/common/generic_guard.h>
 #include <utils/common/software_version.h>
+#include <nx/utils/raii_guard.h>
 #include <nx/utils/disconnect_helper.h>
 #include <finders/systems_finder.h>
 
@@ -247,11 +247,10 @@ void QnSystemsModel::addSystem(const QnSystemDescriptionPtr &systemDescription)
         const auto endInserRowsCallback = [this]() 
             { endInsertRows(); };
 
-        /*
         const auto insertionGuard = (emitInsertSignal ?  
             QnRaiiGuard::create(beginInsertRowsCallback, endInserRowsCallback)
             : QnRaiiGuard::createEmpty());
-            */
+
         m_internalData.insert(insertPos, data);
     }
 
