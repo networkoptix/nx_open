@@ -66,7 +66,7 @@ namespace ec2
     int QnResourceManager<T>::getKvPairs( const QnUuid &resourceId, impl::GetKvPairsHandlerPtr handler )
     {
         const int reqID = generateRequestID();
-        
+
         auto queryDoneHandler = [reqID, handler, resourceId]( ErrorCode errorCode, const ApiResourceParamWithRefDataList& params) {
             ApiResourceParamWithRefDataList outData;
             if( errorCode == ErrorCode::ok )
@@ -93,21 +93,6 @@ namespace ec2
             ( ApiCommand::getStatusList, resourceId, queryDoneHandler );
         return reqID;
     }
-
-    /*
-    template<class T>
-    int QnResourceManager<T>::setResourceDisabled( const QnUuid& resourceId, bool disabled, impl::SetResourceDisabledHandlerPtr handler )
-    {
-        const int reqID = generateRequestID();
-
-        //performing request
-        auto tran = prepareTransaction( ApiCommand::setResourceDisabled, resourceId, disabled );
-        using namespace std::placeholders;
-        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SetResourceDisabledHandler::done ), handler, reqID, _1, resourceId));
-        return reqID;
-    }
-    */
-
 
     template<class T>
     int QnResourceManager<T>::save(const ec2::ApiResourceParamWithRefDataList& kvPairs, impl::SaveKvPairsHandlerPtr handler )
@@ -146,7 +131,7 @@ namespace ec2
         m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1 ) );
         return reqID;
     }
-    
+
     template<class T>
     int QnResourceManager<T>::remove( const QVector<QnUuid>& idList, impl::SimpleHandlerPtr handler )
     {
