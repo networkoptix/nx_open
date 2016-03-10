@@ -10,19 +10,10 @@ namespace ec2
     class QnUserNotificationManager: public AbstractUserManager
     {
     public:
-        QnUserNotificationManager( ) {}
+        QnUserNotificationManager( );
 
-        void triggerNotification( const QnTransaction<ApiUserData>& tran )
-        {
-            assert(tran.command == ApiCommand::saveUser);
-            emit addedOrUpdated(tran.params);
-        }
-
-        void triggerNotification( const QnTransaction<ApiIdData>& tran )
-        {
-            assert(tran.command == ApiCommand::removeUser);
-            emit removed(tran.params.id);
-        }
+        void triggerNotification( const QnTransaction<ApiUserData>& tran );
+        void triggerNotification( const QnTransaction<ApiIdData>& tran );
     };
 
 

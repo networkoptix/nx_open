@@ -10,26 +10,11 @@ namespace ec2
     class QnLayoutNotificationManager: public AbstractLayoutManager
     {
     public:
-        QnLayoutNotificationManager( ) {}
+        QnLayoutNotificationManager( );
 
-        void triggerNotification( const QnTransaction<ApiIdData>& tran )
-        {
-            assert(tran.command == ApiCommand::removeLayout);
-            emit removed( QnUuid(tran.params.id) );
-        }
-
-        void triggerNotification( const QnTransaction<ApiLayoutData>& tran )
-        {
-            assert(tran.command == ApiCommand::saveLayout);
-            emit addedOrUpdated(tran.params);
-        }
-
-        void triggerNotification( const QnTransaction<ApiLayoutDataList>& tran )
-        {
-            assert(tran.command == ApiCommand::saveLayouts);
-            for(const ApiLayoutData& layout: tran.params)
-                emit addedOrUpdated(layout);
-        }
+        void triggerNotification( const QnTransaction<ApiIdData>& tran );
+        void triggerNotification( const QnTransaction<ApiLayoutData>& tran );
+        void triggerNotification( const QnTransaction<ApiLayoutDataList>& tran );
     };
 
 

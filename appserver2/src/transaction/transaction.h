@@ -88,8 +88,8 @@ namespace ec2
 
             /* Layout resource */
             getLayouts                  = 600,  /*< ApiLayoutDataList */
-            saveLayout                  = 601,  /*< ApiLayoutDataList */
-            saveLayouts                 = 602,  /*< ApiLayoutData */
+            saveLayout                  = 601,  /*< ApiLayoutData */
+            saveLayouts                 = 602,  /*< ApiLayoutDataList */
             removeLayout                = 603,  /*< ApiIdData */
 
             /* Videowall resource */

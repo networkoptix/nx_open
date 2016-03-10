@@ -5,6 +5,22 @@
 
 namespace ec2
 {
+    QnUserNotificationManager::QnUserNotificationManager()
+    {}
+
+    void QnUserNotificationManager::triggerNotification(const QnTransaction<ApiUserData>& tran)
+    {
+        assert(tran.command == ApiCommand::saveUser);
+        emit addedOrUpdated(tran.params);
+    }
+
+    void QnUserNotificationManager::triggerNotification(const QnTransaction<ApiIdData>& tran)
+    {
+        assert(tran.command == ApiCommand::removeUser);
+        emit removed(tran.params.id);
+    }
+
+
     template<class QueryProcessorType>
     QnUserManager<QueryProcessorType>::QnUserManager( QueryProcessorType* const queryProcessor)
     :
@@ -65,8 +81,8 @@ namespace ec2
         });
     }
 
-    template<class T>
-    int QnUserManager<T>::save( const ec2::ApiUserData& user, const QString& newPassword, impl::SimpleHandlerPtr handler )
+    template<class QueryProcessorType>
+    int QnUserManager<QueryProcessorType>::save( const ec2::ApiUserData& user, const QString& newPassword, impl::SimpleHandlerPtr handler )
     {
         Q_ASSERT_X(!user.id.isNull(), Q_FUNC_INFO, "User id must be set before saving");
 
@@ -76,8 +92,8 @@ namespace ec2
         return reqID;
     }
 
-    template<class T>
-    int QnUserManager<T>::remove( const QnUuid& id, impl::SimpleHandlerPtr handler )
+    template<class QueryProcessorType>
+    int QnUserManager<QueryProcessorType>::remove( const QnUuid& id, impl::SimpleHandlerPtr handler )
     {
         const int reqID = generateRequestID();
         auto tran = prepareTransaction( ApiCommand::removeUser, id );
@@ -88,14 +104,14 @@ namespace ec2
         return reqID;
     }
 
-    template<class T>
-    QnTransaction<ApiUserData> QnUserManager<T>::prepareTransaction( ApiCommand::Value command, const ec2::ApiUserData& user )
+    template<class QueryProcessorType>
+    QnTransaction<ApiUserData> QnUserManager<QueryProcessorType>::prepareTransaction( ApiCommand::Value command, const ec2::ApiUserData& user )
     {
         return QnTransaction<ApiUserData>(command, user);
     }
 
-    template<class T>
-    QnTransaction<ApiIdData> QnUserManager<T>::prepareTransaction( ApiCommand::Value command, const QnUuid& id )
+    template<class QueryProcessorType>
+    QnTransaction<ApiIdData> QnUserManager<QueryProcessorType>::prepareTransaction( ApiCommand::Value command, const QnUuid& id )
     {
         QnTransaction<ApiIdData> tran(command);
         tran.params.id = id;
@@ -104,5 +120,4 @@ namespace ec2
 
     template class QnUserManager<ServerQueryProcessor>;
     template class QnUserManager<FixedUrlClientQueryProcessor>;
-
 }
