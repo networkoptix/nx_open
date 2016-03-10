@@ -23,18 +23,18 @@ bool recursiveClean(const QString &path);
 template<qint64 From, qint64 To>
 qint64 genRandomNumber()
 {
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<qint64> dist(From, To);
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    static std::uniform_int_distribution<qint64> dist(From, To);
 
     return dist(gen);
 }
 
 void generateCameraUid(QByteArray *camUid, size_t n)
 {
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<int> dist(65, 90);
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    static std::uniform_int_distribution<int> dist(65, 90);
 
     for (size_t i = 0; i < n; i++)
         camUid->append(dist(gen));
@@ -571,6 +571,7 @@ TEST(MediaDb_test, DbFileTruncate)
         // we've read all except the very last record
         ASSERT_TRUE(readRecords == tdm.dataVector.size() - 1) << readRecords;
     }
+    recursiveClean(workDirPath);
 }
 
 TEST(MediaDb_test, ReadWrite_MT)
