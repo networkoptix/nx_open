@@ -6,7 +6,7 @@
 #include <core/resource/resource_fwd.h>
 #include <api/helpers/thumbnail_request_data.h>
 #include <utils/common/id.h>
-#include <utils/common/singleton.h>
+#include <nx/utils/singleton.h>
 #include <nx/utils/thread/mutex.h>
 #include <camera/thumbnail_cache_base.h>
 

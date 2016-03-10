@@ -2,7 +2,7 @@
 
 #include <QtCore/QObject>
 #include <nx/utils/thread/mutex.h>
-#include <utils/common/singleton.h>
+#include <nx/utils/singleton.h>
 
 class QQuickWindow;
 
