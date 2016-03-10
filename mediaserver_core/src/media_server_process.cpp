@@ -1236,6 +1236,21 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
     }
 
     {
+        //loading webpages
+        ec2::ApiWebPageDataList webpages;
+        while ((rez = ec2Connection->getWebPageManager()->getWebPagesSync(&webpages)) != ec2::ErrorCode::ok)
+        {
+            qDebug() << "QnMain::run(): Can't get webpages. Reason: " << ec2::toString(rez);
+            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+            if (m_needStop)
+                return;
+        }
+
+        for (const auto &webpage : webpages)
+            messageProcessor->updateResource(webpage);
+    }
+
+    {
         //loading business rules
         QnBusinessEventRuleList rules;
         while( (rez = ec2Connection->getBusinessEventManager()->getBusinessRulesSync(&rules)) != ec2::ErrorCode::ok )
