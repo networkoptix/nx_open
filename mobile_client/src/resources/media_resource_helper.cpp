@@ -94,6 +94,11 @@ namespace
         return !(flags & (Qn::SF_ArmServer | Qn::SF_Edge));
     }
 
+    qint64 fixedPosition(qint64 pos)
+    {
+        return pos < 0 ? DATETIME_NOW : pos;
+    }
+
 } // anonymous namespace
 
 QnMediaResourceHelper::QnMediaResourceHelper(QObject *parent)
@@ -483,7 +488,8 @@ void QnMediaResourceHelper::updateFinalTimestamp()
     }
 
     QnTimePeriod period;
-    qnCameraHistoryPool->getMediaServerOnTime(m_camera, m_position, &period);
+    qnCameraHistoryPool->getMediaServerOnTime(
+            m_camera, fixedPosition(m_position), &period);
 
     setFinalTimestamp(period.isValid() && !period.isInfinite() ? period.endTimeMs() : -1);
 }
@@ -503,7 +509,8 @@ QnMediaServerResourcePtr QnMediaResourceHelper::serverAtCurrentPosition() const
     if (position != -1)
         position = m_chunkProvider->closestChunkStartMs(position, true);
 
-    return qnCameraHistoryPool->getMediaServerOnTime(m_camera, position);
+    return qnCameraHistoryPool->getMediaServerOnTime(
+                m_camera, fixedPosition(position));
 }
 
 QnMediaResourceHelper::Protocol QnMediaResourceHelper::protocol() const
@@ -656,9 +663,7 @@ void QnMediaResourceHelper::updateCurrentStream()
     QnTimePeriod period;
     QnMediaServerResourcePtr server =
             qnCameraHistoryPool->getMediaServerOnTime(
-                    m_camera,
-                    m_position < 0 ? DATETIME_NOW : m_position,
-                    &period);
+                    m_camera, fixedPosition(m_position), &period);
     if (!server)
         return;
 
