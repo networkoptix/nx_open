@@ -647,12 +647,24 @@ void QnMediaResourceHelper::updateMediaStreams()
         }
     }
 
-    if (mjpegSupported && !nativeSupported)
-        m_nativeProtocol = Mjpeg;
-    else
-        m_nativeProtocol = nativeStreamProtocol;
+    Protocol nativeProtocol = m_nativeProtocol;
 
-    updateCurrentStream();
+    if (mjpegSupported && !nativeSupported)
+        nativeProtocol = Mjpeg;
+    else
+        nativeProtocol = nativeStreamProtocol;
+
+    bool needUpdateUrl = m_url.isEmpty();
+
+    if (m_nativeProtocol != nativeProtocol)
+    {
+        m_nativeProtocol = nativeProtocol;
+        if (!m_useTranscoding)
+            needUpdateUrl = true;
+    }
+
+    if (needUpdateUrl)
+        updateCurrentStream();
 }
 
 void QnMediaResourceHelper::updateCurrentStream()
