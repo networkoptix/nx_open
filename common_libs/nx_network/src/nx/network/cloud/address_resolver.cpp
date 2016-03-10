@@ -429,7 +429,12 @@ void AddressResolver::mediatorResolve(HaInfoIterator info, QnMutexLockerBase* lk
             }
 
             info->second.setMediatorEntries(std::move(entries));
-            guards = grabHandlers( SystemError::noError, info, &lk );
+            guards = grabHandlers(
+                resultCode == nx::hpm::api::ResultCode::ok
+                    ? SystemError::noError
+                    : SystemError::hostUnreach, //TODO #ak correct error translation
+                info,
+                &lk);
         });
 }
 
