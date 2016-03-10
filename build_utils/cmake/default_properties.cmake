@@ -8,8 +8,10 @@ set (project.artifactId "${PROJECT_SHORTNAME}")
 set (client.mediafolder.name "${product.name} Media")
 set (CMAKE_PREFIX_PATH "$ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}")
 
-execute_process(COMMAND hg id -i OUTPUT_VARIABLE changeSet)
-string(REPLACE "\n" "" changeSet ${changeSet})
+execute_process(COMMAND hg id -i
+                WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+                OUTPUT_VARIABLE changeSet)
+string(STRIP ${changeSet} changeSet)
 
 set(parsedVersion.majorVersion ${majorVersion})
 set(parsedVersion.minorVersion ${minorVersion})
