@@ -9,7 +9,7 @@ angular.module('cloudApp').directive('processAlert', function () {
                 errorPrefix:'=',
                 successMessage:'=',
                 processMessage:'=',
-                alertTimeout:'='
+                alertTimeout:'@'
             },
             link:function(scope,element,attrs){
                 scope.attrs = attrs;
@@ -18,11 +18,12 @@ angular.module('cloudApp').directive('processAlert', function () {
                 if(typeof(scope.alertTimeout)=='undefined') {
                     scope.alertTimeout = Config.alertTimeout;
                 }
-                if(scope.alertTimeout === 0){
+
+                if(scope.alertTimeout === 0 || scope.alertTimeout === '0'){
                     scope.alertTimeout = 365*24*3600*1000; // long enough )
                 }
+
                 scope.closeAlert = function(type){
-                    console.log("close alert", type, Config.alertTimeout);
                     scope.shown[type] = true;
                 };
 

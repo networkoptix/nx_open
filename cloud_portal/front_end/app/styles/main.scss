@@ -222,9 +222,10 @@ a .product-name:after {
   display: inline-block;
 }
 
+
 .alert-top{
   position:fixed;
-  top: 30px;
+  top: 34px;
   left:50%;
   transform: translateX(-50%);
   min-width: 600px;
@@ -250,3 +251,11 @@ a .product-name:after {
   }
 }
 
+
+
+@media (min-width: $screen-sm-min) {
+  // Automatically set modal's width for larger viewports
+  .modal-dialog .alert-top {
+    top: -74px;
+  }
+}
