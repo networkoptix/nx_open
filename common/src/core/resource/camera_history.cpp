@@ -175,19 +175,22 @@ QnCameraHistoryPool::StartResult QnCameraHistoryPool::updateCameraHistoryAsync(c
     request.format = Qn::UbjsonFormat;
     request.resList << camera;
 
-    QnMutexLocker lock(&m_mutex);
-    using namespace std::placeholders;
-    auto handle = server->restConnection()->cameraHistoryAsync(request, [this, callback] (bool success, rest::Handle id, const ec2::ApiCameraHistoryDataList &periods)
     {
-        at_cameraPrepared(success, id, periods, callback);
-    });
-    bool started = handle > 0;
-    if (started)
-        m_asyncRunningRequests.insert(camera->getId(), handle);
+        QnMutexLocker lock(&m_mutex);
+        QPointer<QnCameraHistoryPool> guard(this);
+        auto handle = server->restConnection()->cameraHistoryAsync(request, [this, callback, guard](bool success, rest::Handle id, const ec2::ApiCameraHistoryDataList &periods)
+        {
+            if (!guard)
+                return;
+            at_cameraPrepared(success, id, periods, callback);
+        });
 
-    lock.unlock();
+        bool started = handle > 0;
+        if (started)
+            m_asyncRunningRequests.insert(camera->getId(), handle);
 
-    return started ? StartResult::started : StartResult::failed;
+        return started ? StartResult::started : StartResult::failed;
+    }
 }
 
 void QnCameraHistoryPool::at_cameraPrepared(bool success, const rest::Handle& requestId, const ec2::ApiCameraHistoryDataList &periods, callbackFunction callback)
