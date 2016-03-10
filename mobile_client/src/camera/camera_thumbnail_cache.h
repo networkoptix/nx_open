@@ -7,7 +7,7 @@
 #include <api/helpers/thumbnail_request_data.h>
 #include <utils/common/id.h>
 #include <utils/common/singleton.h>
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 #include <camera/thumbnail_cache_base.h>
 
 class QnCameraThumbnailCache : public QObject, public QnThumbnailCacheBase, public Singleton<QnCameraThumbnailCache>
