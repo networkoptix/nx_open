@@ -241,15 +241,15 @@ angular.module('webadminApp')
             },
 
             detachServer:function(){
-                var defer = $q.defer();
+                /*var defer = $q.defer();
                 defer.resolve(true);
                 return defer.promise;
-
+                */
                 // TODO: wait for https://networkoptix.atlassian.net/browse/VMS-2081
-                // return wrapPost(proxy + '/api/detachServer');
+                return wrapPost(proxy + '/api/detachServer');
             },
             setupCloudSystem:function(systemName, systemId, authKey){
-                var defer = $q.defer();
+                /*var defer = $q.defer();
                 function errorHandler(error){
                     defer.reject(error);
                 }
@@ -262,27 +262,26 @@ angular.module('webadminApp')
                             }, errorHandler);
                     }, errorHandler);
                 return defer.promise;
-
+                */
                 // TODO: wait for https://networkoptix.atlassian.net/browse/VMS-2081
-                /* return wrapPost(proxy + '/api/setupCloudSystem',{
+                return wrapPost(proxy + '/api/setupCloudSystem',{
                     systemName: systemName,
                     systemId: systemId,
                     authKey: authKey
                 });
-                */
             },
 
             setupLocalSystem:function(systemName, adminAccount, adminPassword){
 
-                return this.changeSystem(systemName, adminAccount, adminPassword);
+                //return this.changeSystem(systemName, adminAccount, adminPassword);
 
                 // TODO: wait for https://networkoptix.atlassian.net/browse/VMS-2081
-                /* return wrapPost(proxy + '/api/setupLocalSystem',{
+                return wrapPost(proxy + '/api/setupLocalSystem',{
                     systemName: systemName,
                     adminAccount: adminAccount,
                     adminPassword: adminPassword
                 });
-                */
+
             },
 
 
