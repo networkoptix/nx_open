@@ -35,7 +35,7 @@
         Custom##REQUEST_NAME##Handler( TargetType* target, HandlerType func, Qt::ConnectionType connectionType = Qt::AutoConnection ) {         \
             QObject::connect( static_cast<AppServerSignaller*>(this), &AppServerSignaller::on##REQUEST_NAME##Done, target, func, connectionType); \
         }                                                                               \
-        virtual void done(int reqID, const FIRST_ARG_TYPE& val1 ) override { emit##REQUEST_NAME##Done( reqID, val1); }; \
+        virtual void done(int reqID, const FIRST_ARG_TYPE& val1 ) override { on##REQUEST_NAME##Done( reqID, val1); }; \
     };
 
 
@@ -55,7 +55,7 @@
         virtual void done( \
             int reqID, \
             const FIRST_ARG_TYPE& val1, \
-            const SECOND_ARG_TYPE& val2 ) override { emit##REQUEST_NAME##Done( reqID, val1, val2); }; \
+            const SECOND_ARG_TYPE& val2 ) override { on##REQUEST_NAME##Done( reqID, val1, val2); }; \
     };
 
 
@@ -76,7 +76,7 @@
             int reqID, \
             const FIRST_ARG_TYPE& val1, \
             const SECOND_ARG_TYPE& val2, \
-            const THIRD_ARG_TYPE& val3 ) override { emit##REQUEST_NAME##Done( reqID, val1, val2, val3); }; \
+            const THIRD_ARG_TYPE& val3 ) override { on##REQUEST_NAME##Done( reqID, val1, val2, val3); }; \
     };
 
 
@@ -149,43 +149,9 @@ namespace ec2
         };
 
 
-        class AppServerSignaller
-        :
-            public QObject
+        class AppServerSignaller: public QObject
         {
             Q_OBJECT
-
-        public:
-            void emitSimpleDone                 (int reqID, const ec2::ErrorCode p1 ) { emit onSimpleDone( reqID, p1); }
-            void emitGetResourceTypesDone       (int reqID, const ec2::ErrorCode p1, const QnResourceTypeList& p2 ) { emit onGetResourceTypesDone( reqID, p1, p2); }
-            void emitSetResourceStatusDone      (int reqID, const ec2::ErrorCode p1, const QnUuid& p2 ) { emit onSetResourceStatusDone( reqID, p1, p2); }
-            void emitSaveResourceDone           (int reqID, const ec2::ErrorCode p1, const QnResourcePtr& p2 ) { emit onSaveResourceDone( reqID, p1, p2); }
-            void emitGetResourcesDone           (int reqID, const ec2::ErrorCode p1, const QnResourceList& p2 ) { emit onGetResourcesDone( reqID, p1, p2); }
-            void emitGetResourceDone            (int reqID, const ec2::ErrorCode p1, const QnResourcePtr& p2 ) { emit onGetResourceDone( reqID, p1, p2); }
-            void emitGetKvPairsDone             (int reqID, const ec2::ErrorCode p1, const ApiResourceParamWithRefDataList& p2 ) { emit onGetKvPairsDone( reqID, p1, p2); }
-            void emitGetStatusListDone          (int reqID, const ec2::ErrorCode p1, const ApiResourceStatusDataList& p2 ) { emit onGetStatusListDone( reqID, p1, p2); }
-            void emitSaveKvPairsDone            (int reqID, const ec2::ErrorCode p1, const ApiResourceParamWithRefDataList& p2 ) { emit onSaveKvPairsDone( reqID, p1, p2); }
-            void emitSaveServerDone             (int reqID, const ec2::ErrorCode p1, const QnMediaServerResourcePtr& p2) { emit onSaveServerDone( reqID, p1, p2); }
-            void emitSaveBusinessRuleDone       (int reqID, const ec2::ErrorCode p1, const QnBusinessEventRulePtr& p2) { emit onSaveBusinessRuleDone( reqID, p1, p2); }
-            void emitGetServersDone             (int reqID, const ec2::ErrorCode p1, const QnMediaServerResourceList& p2 ) { emit onGetServersDone( reqID, p1, p2); }
-            void emitGetServerUserAttributesDone(int reqID, const ec2::ErrorCode p1, const QnMediaServerUserAttributesList& p2 ) { emit onGetServerUserAttributesDone( reqID, p1, p2); }
-            void emitGetStoragesDone            (int reqID, const ec2::ErrorCode p1, const QnResourceList& p2 ) { emit onGetStoragesDone( reqID, p1, p2); }
-            void emitGetCamerasDone             (int reqID, const ec2::ErrorCode p1, const ec2::ApiCameraDataList& p2 ) { emit onGetCamerasDone( reqID, p1, p2); }
-            void emitGetCameraUserAttributesDone(int reqID, const ec2::ErrorCode p1, const QnCameraUserAttributesList& p2 ) { emit onGetCameraUserAttributesDone( reqID, p1, p2); }
-            void emitGetCamerasHistoryDone      (int reqID, const ec2::ErrorCode p1, const ApiServerFootageDataList& p2 ) { emit onGetCamerasHistoryDone( reqID, p1, p2); }
-            void emitGetUsersDone               (int reqID, const ec2::ErrorCode p1, const ec2::ApiUserDataList& p2 ) { emit onGetUsersDone( reqID, p1, p2); }
-            void emitGetBusinessRulesDone       (int reqID, const ec2::ErrorCode p1, const QnBusinessEventRuleList& p2 ) { emit onGetBusinessRulesDone( reqID, p1, p2); }
-            void emitGetLicensesDone            (int reqID, const ec2::ErrorCode p1, const QnLicenseList& p2 ) { emit onGetLicensesDone( reqID, p1, p2); }
-            void emitGetLayoutsDone             (int reqID, const ec2::ErrorCode p1, const ec2::ApiLayoutDataList& p2 ) { emit onGetLayoutsDone( reqID, p1, p2); }
-            void emitGetStoredFileDone          (int reqID, const ec2::ErrorCode p1, const QByteArray& p2 ) { emit onGetStoredFileDone( reqID, p1, p2); }
-            void emitListDirectoryDone          (int reqID, const ec2::ErrorCode p1, const QStringList& p2 ) { emit onListDirectoryDone( reqID, p1, p2); }
-            void emitCurrentTimeDone            (int reqID, const ec2::ErrorCode p1, const qint64& p2 ) { emit onCurrentTimeDone( reqID, p1, p2); }
-            void emitDumpDatabaseDone           (int reqID, const ec2::ErrorCode p1, const ec2::ApiDatabaseDumpData& p2 ) { emit onDumpDatabaseDone( reqID, p1, p2); }
-            void emitGetDiscoveryDataDone       (int reqID, const ec2::ErrorCode p1, const ApiDiscoveryDataList& p2 ) { emit onGetDiscoveryDataDone( reqID, p1, p2); }
-            void emitTestConnectionDone         (int reqID, const ec2::ErrorCode p1, const QnConnectionInfo& p2 ) { emit onTestConnectionDone( reqID, p1, p2); }
-            void emitConnectDone                (int reqID, const ec2::ErrorCode p1, const AbstractECConnectionPtr &p2 ) { emit onConnectDone( reqID, p1, p2); }
-            void emitGetVideowallsDone          (int reqID, const ec2::ErrorCode p1, const ec2::ApiVideowallDataList& p2 ) { emit onGetVideowallsDone( reqID, p1, p2); }
-            void emitGetWebPagesDone            (int reqID, const ec2::ErrorCode p1, const ec2::ApiWebPageDataList& p2 ) { emit onGetWebPagesDone( reqID, p1, p2); }
 
         signals:
             void onSimpleDone                   (int reqID, const ec2::ErrorCode);
