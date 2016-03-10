@@ -1,5 +1,5 @@
 
-#include "connections_holder.h"
+#include "disconnect_helper.h"
 
 QnDisconnectHelperPtr QnDisconnectHelper::create()
 {

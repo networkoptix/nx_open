@@ -1,5 +1,5 @@
 
-#include "generic_guard.h"
+#include "raii_guard.h"
 
 QnRaiiGuardPtr QnRaiiGuard::create(const Handler &creationHandler
     , const Handler &destructionHandler)

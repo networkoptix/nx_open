@@ -5,7 +5,7 @@
 
 #include <utils/common/connective.h>
 #include <network/system_description.h>
-#include <utils/common/connections_holder.h>
+#include <nx/utils/disconnect_helper.h>
 
 class QnSystemsModel : public Connective<QAbstractListModel>
 {

@@ -2,7 +2,7 @@
 #pragma once
 
 #include <nx/utils/singleton.h>
-#include <utils/common/connections_holder.h>
+#include <nx/utils/disconnect_helper.h>
 #include <finders/abstract_systems_finder.h>
 
 class ConnectionsHolder;

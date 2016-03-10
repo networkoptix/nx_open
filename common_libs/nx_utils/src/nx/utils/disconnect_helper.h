@@ -2,12 +2,13 @@
 #pragma once
 
 #include <QtCore/QObject>
+#include <QtCore/QSharedPointer>
 
 class QnDisconnectHelper;
 typedef QSharedPointer<QnDisconnectHelper> QnDisconnectHelperPtr;
 
 /// @brief Disconnects all added connections on destruction
-class QnDisconnectHelper
+class NX_UTILS_API QnDisconnectHelper
 {
 public:
     static QnDisconnectHelperPtr create();
@@ -24,5 +25,5 @@ private:
     ConnectionsList m_connections;
 };
 
-QnDisconnectHelper& operator << (QnDisconnectHelper &target
+NX_UTILS_API QnDisconnectHelper& operator << (QnDisconnectHelper &target
     , const QMetaObject::Connection &connection);

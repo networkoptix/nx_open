@@ -2,11 +2,12 @@
 #pragma once
 
 #include <functional>
+#include <QtCore/QSharedPointer>
 
 class QnRaiiGuard;
-typedef std::shared_ptr<QnRaiiGuard> QnRaiiGuardPtr;
+typedef QSharedPointer<QnRaiiGuard> QnRaiiGuardPtr;
 
-class QnRaiiGuard
+class NX_UTILS_API QnRaiiGuard
 {
 public:
     typedef std::function<void ()> Handler;
@@ -23,5 +24,4 @@ public:
 
 private:
     const Handler m_destructionHandler;
-
 };
