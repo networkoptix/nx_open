@@ -3,13 +3,8 @@
 #include <string>
 #include "storage_db.h"
 
-#include <QtSql/QSqlQuery>
-#include <QtSql/QSqlError>
-
-#include <core/resource/storage_plugin_factory.h>
 #include <plugins/storage/file_storage/file_storage_resource.h>
 
-#include <utils/serialization/sql.h>
 #include <nx/utils/log/log.h>
 #include "utils/common/util.h"
 
@@ -86,7 +81,6 @@ bool QnStorageDb::deleteRecords(const QString& cameraUniqueId,
                                 QnServer::ChunksCatalog catalog,
                                 qint64 startTimeMs)
 {
-    QnMutexLocker lk(&m_modeMutex);
     return deleteRecordsUnsafe(cameraUniqueId, catalog, startTimeMs);
 }
 
@@ -114,7 +108,7 @@ bool QnStorageDb::deleteRecordsUnsafe(const QString& cameraUniqueId,
     mediaFileOp.setStartTime(startTimeMs);
     mediaFileOp.setRecordType(nx::media_db::RecordType::FileOperationDelete);
 
-    assert(m_dbHelper.getMode() == nx::media_db::Mode::Write);
+    //NX_ASSERT(m_dbHelper.getMode() == nx::media_db::Mode::Write);
     m_dbHelper.writeRecordAsync(mediaFileOp);
 
     {
@@ -133,7 +127,6 @@ bool QnStorageDb::addRecord(const QString& cameraUniqueId,
                             QnServer::ChunksCatalog catalog,
                             const DeviceFileCatalog::Chunk& chunk)
 {
-    QnMutexLocker lk(&m_modeMutex);
     return addRecordUnsafe(cameraUniqueId, catalog, chunk);
 }
 
@@ -164,7 +157,7 @@ bool QnStorageDb::addRecordUnsafe(const QString& cameraUniqueId,
     mediaFileOp.setStartTime(chunk.startTimeMs);
     mediaFileOp.setTimeZone(chunk.timeZone);
 
-    assert(m_dbHelper.getMode() == nx::media_db::Mode::Write);
+    //NX_ASSERT(m_dbHelper.getMode() == nx::media_db::Mode::Write);
     m_dbHelper.writeRecordAsync(mediaFileOp);
 
     {
@@ -184,7 +177,6 @@ bool QnStorageDb::replaceChunks(const QString& cameraUniqueId,
                                 const std::deque<DeviceFileCatalog::Chunk>& chunks)
 {
     bool result = true;
-    QnMutexLocker lk(&m_modeMutex);
     bool delResult = deleteRecordsUnsafe(cameraUniqueId, catalog, -1);
 
     for (const auto &chunk : chunks)
@@ -288,7 +280,6 @@ bool QnStorageDb::startDbFile()
 
 QVector<DeviceFileCatalogPtr> QnStorageDb::loadChunksFileCatalog() 
 {
-    QnMutexLocker lk(&m_modeMutex);
     m_readData.clear();
     m_dbHelper.setMode(nx::media_db::Mode::Read);
 
@@ -304,7 +295,7 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadChunksFileCatalog()
         return QVector<DeviceFileCatalogPtr>();
     }
 
-    assert(m_dbHelper.getDevice());
+    NX_ASSERT(m_dbHelper.getDevice());
 
     if ((!m_dbHelper.getDevice() || !m_ioDevice->isOpen()))
     {

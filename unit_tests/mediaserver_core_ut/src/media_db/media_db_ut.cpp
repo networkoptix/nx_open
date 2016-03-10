@@ -730,16 +730,22 @@ TEST(MediaDb_test, StorageDB)
             {
             case 0:
                 {
-                    QnMutexLocker lk(&mutex);
-                    auto p = tcm.generateReplaceOperation(genRandomNumber<10, 100>());
+                    std::pair<TestChunkManager::Catalog, std::deque<DeviceFileCatalog::Chunk>> p;
+                    {
+                        QnMutexLocker lk(&mutex);
+                        p = tcm.generateReplaceOperation(genRandomNumber<10, 100>());
+                    }
                     sdb.replaceChunks(p.first.cameraUniqueId, p.first.quality, p.second);
                 }
             break;
             case 1:
             case 2:
                 {
-                    QnMutexLocker lk(&mutex);
-                    auto *chunk = tcm.generateRemoveOperation();
+                    TestChunkManager::TestChunk *chunk;
+                    {
+                        QnMutexLocker lk(&mutex);
+                        chunk = tcm.generateRemoveOperation();
+                    }
                     if (chunk)
                         sdb.deleteRecords(chunk->catalog->cameraUniqueId,
                                           chunk->catalog->quality,
@@ -748,59 +754,29 @@ TEST(MediaDb_test, StorageDB)
                 break;
             default:
                 {
-                    QnMutexLocker lk(&mutex);
-                    auto chunk = tcm.generateAddOperation();
+                    TestChunkManager::TestChunk chunk;
+                    {
+                        QnMutexLocker lk(&mutex);
+                        chunk = tcm.generateAddOperation();
+                    }
                     sdb.addRecord(chunk.catalog->cameraUniqueId,
                                   chunk.catalog->quality,
                                   chunk.chunk);
                 }
                 break;
             }
-            std::this_thread::sleep_for(std::chrono::milliseconds(5));
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
     };
 
-    auto readerFunc = [&mutex, &tcm, &sdb]
+    QVector<DeviceFileCatalogPtr> dbChunkCatalogs;
+    auto readerFunc = [&dbChunkCatalogs, &mutex, &tcm, &sdb]
     {
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
         for (size_t i = 0; i < 5; ++i)
         {
-            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-            QnMutexLocker lk(&mutex);
-            auto dbChunkCatalogs = sdb.loadFullFileCatalog();
-
-            for (auto catalogIt = dbChunkCatalogs.cbegin(); 
-                 catalogIt != dbChunkCatalogs.cend();
-                 ++catalogIt)
-            {
-                for (auto chunkIt = (*catalogIt)->getChunks().cbegin();
-                     chunkIt != (*catalogIt)->getChunks().cend();
-                     ++chunkIt)
-                {
-                    TestChunkManager::TestChunkCont::iterator tcmIt = 
-                        std::find_if(tcm.get().begin(), 
-                                     tcm.get().end(),
-                                     [catalogIt, chunkIt](const TestChunkManager::TestChunk &tc)
-                                     {
-                                         return tc.catalog->cameraUniqueId == (*catalogIt)->cameraUniqueId() &&
-                                                tc.catalog->quality == (*catalogIt)->getCatalog() &&
-                                                !tc.isVisited && !tc.isDeleted && tc.chunk == *chunkIt;
-                                     });
-                    bool tcmChunkFound = tcmIt != tcm.get().end();
-                    EXPECT_TRUE(tcmChunkFound);
-                    if (tcmChunkFound)
-                        tcmIt->isVisited = true;
-                }
-            }
-
-            bool allVisited = std::none_of(tcm.get().begin(), tcm.get().end(), 
-                                           [](const TestChunkManager::TestChunk &tc) 
-                                           {
-                                               return !tc.isDeleted && !tc.isVisited; 
-                                           });
-            ASSERT_EQ(allVisited, true);
-
-            for (auto tcmIt = tcm.get().begin(); tcmIt != tcm.get().end(); ++tcmIt)
-                tcmIt->isVisited = false;
+            dbChunkCatalogs = sdb.loadFullFileCatalog();
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
     };
 
@@ -811,6 +787,39 @@ TEST(MediaDb_test, StorageDB)
 
     for (auto &t : threads)
         t.join();
+
+    dbChunkCatalogs = sdb.loadFullFileCatalog();
+
+    for (auto catalogIt = dbChunkCatalogs.cbegin(); 
+         catalogIt != dbChunkCatalogs.cend();
+         ++catalogIt)
+    {
+        for (auto chunkIt = (*catalogIt)->getChunks().cbegin();
+             chunkIt != (*catalogIt)->getChunks().cend();
+             ++chunkIt)
+        {
+            TestChunkManager::TestChunkCont::iterator tcmIt = 
+                std::find_if(tcm.get().begin(), 
+                             tcm.get().end(),
+                             [catalogIt, chunkIt](const TestChunkManager::TestChunk &tc)
+                             {
+                                 return tc.catalog->cameraUniqueId == (*catalogIt)->cameraUniqueId() &&
+                                        tc.catalog->quality == (*catalogIt)->getCatalog() &&
+                                        !tc.isVisited && !tc.isDeleted && tc.chunk == *chunkIt;
+                             });
+            bool tcmChunkFound = tcmIt != tcm.get().end();
+            ASSERT_TRUE(tcmChunkFound);
+            if (tcmChunkFound)
+                tcmIt->isVisited = true;
+        }
+    }
+
+    bool allVisited = std::none_of(tcm.get().begin(), tcm.get().end(), 
+                                   [](const TestChunkManager::TestChunk &tc) 
+                                   {
+                                       return !tc.isDeleted && !tc.isVisited; 
+                                   });
+    ASSERT_EQ(allVisited, true);
 
     recursiveClean(workDirPath);
 }

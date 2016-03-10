@@ -1,7 +1,7 @@
 #ifndef __MEDIA_DB_H__
 #define __MEDIA_DB_H__
 
-#include <queue>
+#include <deque>
 #include <thread>
 #include <cmath>
 
@@ -180,7 +180,7 @@ public:
 
 class DbHelper
 {
-    typedef std::queue<WriteRecordType> WriteQueue;
+    typedef std::deque<WriteRecordType> WriteQueue;
 public:
     DbHelper(DbHelperHandler *const handler);
     ~DbHelper();

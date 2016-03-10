@@ -1,9 +1,12 @@
+#include <algorithm>
 #include "media_db.h"
 
 namespace nx
 {
 namespace media_db
 {
+
+const size_t kMaxWriteQueueSize = 10000;
 
 namespace
 {
@@ -168,9 +171,22 @@ Error DbHelper::writeRecordAsync(const WriteRecordType &record)
 {
     {
         QnMutexLocker lk(&m_mutex);
+        if (m_writeQueue.size() > kMaxWriteQueueSize)
+        {   // copy only camera operations.
+            // have to sacrifice chunks at this point.
+            WriteQueue tmpQueue;
+            std::copy_if(m_writeQueue.begin(), m_writeQueue.end(), 
+                         std::back_inserter(tmpQueue),
+                         [](const WriteRecordType &r)
+                         {
+                             return (bool)boost::get<CameraOperation>(&r);
+                         });
+            m_writeQueue = std::move(tmpQueue);
+        }
+        if (m_writeQueue.size() < kMaxWriteQueueSize)
+            m_writeQueue.push_back(record);
         if (m_mode == Mode::Read)
             return Error::WrongMode;
-        m_writeQueue.push(record);
     }
     m_cond.wakeAll();
     return Error::NoError;
@@ -185,10 +201,13 @@ void DbHelper::reset()
 void DbHelper::setMode(Mode mode)
 {
     QnMutexLocker lk(&m_mutex);
-    m_mode = mode;
-    m_stream.resetStatus();
-    while (!m_writeQueue.empty())
+    if (mode == m_mode)
+        return;
+    while (!m_writeQueue.empty() && mode == Mode::Read)
         m_writerDoneCond.wait(lk.mutex());
+
+    m_stream.resetStatus();
+    m_mode = mode;
 }
 
 Mode DbHelper::getMode() const
@@ -205,7 +224,7 @@ void DbHelper::startWriter()
             while (1)
             {
                 QnMutexLocker lk(&m_mutex);
-                while (m_writeQueue.empty() && !m_needStop)
+                while ((m_writeQueue.empty() || m_mode == Mode::Read) && !m_needStop)
                     m_cond.wait(lk.mutex());
                 
                 if (m_needStop)
@@ -214,7 +233,7 @@ void DbHelper::startWriter()
                 while (!m_writeQueue.empty())
                 {
                     auto record = m_writeQueue.front();
-                    m_writeQueue.pop();
+                    m_writeQueue.pop_front();
 
                     Error error;
                     RecordVisitor vis(&m_stream, &error);
