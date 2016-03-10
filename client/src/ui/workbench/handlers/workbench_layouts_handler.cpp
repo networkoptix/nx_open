@@ -43,14 +43,14 @@ QnWorkbenchLayoutsHandler::QnWorkbenchLayoutsHandler(QObject *parent) :
     m_workbenchStateDelegate(new QnBasicWorkbenchStateDelegate<QnWorkbenchLayoutsHandler>(this)),
     m_closingLayouts(false)
 {
-    connect(action(Qn::NewUserLayoutAction),                &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_newUserLayoutAction_triggered);
-    connect(action(Qn::SaveLayoutAction),                   &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_saveLayoutAction_triggered);
-    connect(action(Qn::SaveLayoutAsAction),                 &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_saveLayoutAsAction_triggered);
-    connect(action(Qn::SaveLayoutForCurrentUserAsAction),   &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_saveLayoutForCurrentUserAsAction_triggered);
-    connect(action(Qn::SaveCurrentLayoutAction),            &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_saveCurrentLayoutAction_triggered);
-    connect(action(Qn::SaveCurrentLayoutAsAction),          &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_saveCurrentLayoutAsAction_triggered);
-    connect(action(Qn::CloseLayoutAction),                  &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_closeLayoutAction_triggered);
-    connect(action(Qn::CloseAllButThisLayoutAction),        &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_closeAllButThisLayoutAction_triggered);
+    connect(action(QnActions::NewUserLayoutAction),                &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_newUserLayoutAction_triggered);
+    connect(action(QnActions::SaveLayoutAction),                   &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_saveLayoutAction_triggered);
+    connect(action(QnActions::SaveLayoutAsAction),                 &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_saveLayoutAsAction_triggered);
+    connect(action(QnActions::SaveLayoutForCurrentUserAsAction),   &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_saveLayoutForCurrentUserAsAction_triggered);
+    connect(action(QnActions::SaveCurrentLayoutAction),            &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_saveCurrentLayoutAction_triggered);
+    connect(action(QnActions::SaveCurrentLayoutAsAction),          &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_saveCurrentLayoutAsAction_triggered);
+    connect(action(QnActions::CloseLayoutAction),                  &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_closeLayoutAction_triggered);
+    connect(action(QnActions::CloseAllButThisLayoutAction),        &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_closeAllButThisLayoutAction_triggered);
 
     /* We're using queued connection here as modifying a field in its change notification handler may lead to problems. */
     connect(workbench(),                             &QnWorkbench::layoutsChanged,  this,   &QnWorkbenchLayoutsHandler::at_workbench_layoutsChanged, Qt::QueuedConnection);
@@ -553,7 +553,7 @@ void QnWorkbenchLayoutsHandler::at_newUserLayoutAction_triggered() {
 
     snapshotManager()->save(layout, this, SLOT(at_layouts_saved(int, const QnResourceList &, int)));
 
-    menu()->trigger(Qn::OpenSingleLayoutAction, QnActionParameters(layout));
+    menu()->trigger(QnActions::OpenSingleLayoutAction, QnActionParameters(layout));
 }
 
 void QnWorkbenchLayoutsHandler::at_saveLayoutAction_triggered() {
@@ -610,7 +610,7 @@ void QnWorkbenchLayoutsHandler::at_workbench_layoutsChanged() {
     if(!workbench()->layouts().empty())
         return;
 
-    menu()->trigger(Qn::OpenNewTabAction);
+    menu()->trigger(QnActions::OpenNewTabAction);
 }
 
 void QnWorkbenchLayoutsHandler::at_layouts_saved(int status, const QnResourceList &resources, int handle) {

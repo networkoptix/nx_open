@@ -178,9 +178,18 @@ bool QnPhysicalCameraResource::saveBitrateIfNeeded( const CameraBitrateInfo& bit
         const auto time = QDateTime::fromString(bitrateInfo.timestamp, Qt::ISODate);
         const auto lastTime = QDateTime::fromString(it->timestamp, Qt::ISODate);
 
+        // Generally update should not happen more often than once per
+        // UPDATE_BITRATE_TIMEOUT_DAYS
         if (lastTime.isValid() && lastTime < time &&
             lastTime.addDays(UPDATE_BITRATE_TIMEOUT_DAYS) > time)
+        {
+            // If camera got configured we shell update anyway
+            bool isGotConfigured = bitrateInfo.isConfigured &&
+                it->isConfigured != bitrateInfo.isConfigured;
+
+            if (!isGotConfigured)
                 return false;
+        }
 
         // override old data
         *it = bitrateInfo;

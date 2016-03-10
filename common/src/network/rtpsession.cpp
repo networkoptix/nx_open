@@ -171,7 +171,6 @@ QMap<QString, QPair<QSharedPointer<QnRtspTimeHelper::CamSyncInfo>, int> > QnRtsp
 
 QnRtspTimeHelper::QnRtspTimeHelper(const QString& resId)
 :
-    m_lastTime(AV_NOPTS_VALUE),
     m_localStartTime(0),
     m_rtcpReportTimeDiff(INT_MAX),
     m_resId(resId)
@@ -349,22 +348,12 @@ qint64 QnRtspTimeHelper::getUsecTime(quint32 rtpTime, const RtspStatistic& stati
                 m_lastWarnTime = currentUsecTime;
             }
             reset();
-            if (localTimeChanged)
-                m_lastTime = AV_NOPTS_VALUE;
             return getUsecTime(rtpTime, statistics, frequency, false);
         }
         else {
             if (gotInvalidTime)
                 resultInSecs = localTimeInSecs;
-            //m_lastResultInSec = resultInSecs;
             qint64 rez = resultInSecs * 1000000ll;
-            // check for negative time if camera timings is inaccurate
-            if (m_lastTime != (qint64)AV_NOPTS_VALUE && rez <= m_lastTime)
-                rez = m_lastTime + MIN_FRAME_DURATION;
-            m_lastTime = rez;
-
-            //qDebug() << "rtspTime=" << QDateTime::fromMSecsSinceEpoch(rez/1000).toString(QLatin1String("hh:mm:ss.zzz")) << "localtime=" << QDateTime::currentDateTime().toString(QLatin1String("hh:mm:ss.zzz"));
-
             return rez;
         }
     }
@@ -656,7 +645,7 @@ CameraDiagnostics::Result RTPSession::open(const QString& url, qint64 startTime)
         targetAddress = m_proxyAddr;
         destinationPort = m_proxyPort;
     }
-    if( !m_tcpSock->connect(targetAddress, destinationPort) )
+    if( !m_tcpSock->connect(targetAddress, destinationPort, TCP_CONNECT_TIMEOUT) )
         return CameraDiagnostics::CannotOpenCameraMediaPortResult(url, destinationPort);
 
     m_tcpSock->setNoDelay(true);

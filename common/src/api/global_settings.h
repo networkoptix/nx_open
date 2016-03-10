@@ -44,6 +44,9 @@ public:
     bool isServerAutoDiscoveryEnabled() const;
     void setServerAutoDiscoveryEnabled(bool enabled);
 
+    bool isCrossdomainXmlEnabled() const;
+    void setCrossdomainXmlEnabled(bool enabled);
+
     QnEmailSettings emailSettings() const;
     void setEmailSettings(const QnEmailSettings &settings);
 
@@ -76,6 +79,7 @@ public:
     void setServerDiscoveryPingTimeout(std::chrono::seconds newInterval) const;
 
     std::chrono::seconds serverDiscoveryAliveCheckTimeout() const;
+    bool isTimeSynchronizationEnabled() const;
 
     bool arecontRtspEnabled() const;
     void setArecontRtspEnabled(bool newVal) const;
@@ -112,7 +116,9 @@ private:
     QnResourcePropertyAdaptor<bool> *m_auditTrailEnabledAdaptor;
     QnResourcePropertyAdaptor<QString> *m_disabledVendorsAdaptor;
     QnResourcePropertyAdaptor<bool> *m_serverAutoDiscoveryEnabledAdaptor;
+    QnResourcePropertyAdaptor<bool> *m_crossdomainXmlEnabledAdaptor;
     QnResourcePropertyAdaptor<bool> *m_updateNotificationsEnabledAdaptor;
+    QnResourcePropertyAdaptor<bool> *m_timeSynchronizationEnabledAdaptor;
     QnResourcePropertyAdaptor<Qn::CameraBackupQualities> *m_backupQualitiesAdaptor;
     QnResourcePropertyAdaptor<bool> *m_backupNewCamerasByDefaultAdaptor;
     QnResourcePropertyAdaptor<QnOptionalBool> *m_statisticsAllowedAdaptor;

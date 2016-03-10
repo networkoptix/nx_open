@@ -25,6 +25,14 @@ QnRuntimeInfoManager::QnRuntimeInfoManager(QObject* parent):
     connect( QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::connectionClosed,   this, [this]{
         m_items->setItems(QnPeerRuntimeInfoList() << localInfo());
     });
+
+    /* Client updates running instance guid on each connect to server */
+    connect(qnCommon, &QnCommonModule::runningInstanceGUIDChanged, this, [this]()
+    {
+        ec2::ApiRuntimeData item = localInfo().data;
+        item.peer.instanceId = qnCommon->runningInstanceGUID();
+        updateLocalItem(item);
+    }, Qt::DirectConnection);
 }
 
 const QnThreadsafeItemStorage<QnPeerRuntimeInfo> * QnRuntimeInfoManager::items() const {

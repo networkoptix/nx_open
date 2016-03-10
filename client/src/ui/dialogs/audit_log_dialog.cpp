@@ -950,11 +950,11 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
     layout->setLocalRange(period);
 
     resourcePool()->addResource(layout);
-    menu()->trigger(Qn::OpenSingleLayoutAction, layout);
+    menu()->trigger(QnActions::OpenSingleLayoutAction, layout);
 
 }
 
-void QnAuditLogDialog::triggerAction(const QnAuditRecord* record, Qn::ActionId ActionId)
+void QnAuditLogDialog::triggerAction(const QnAuditRecord* record, QnActions::IDType ActionId)
 {
     QnResourceList resList;
     for (const auto& id: record->resources) {
@@ -984,11 +984,11 @@ void QnAuditLogDialog::at_itemPressed(const QModelIndex& index)
     if (record->isPlaybackType())
         processPlaybackAction(record);
     else if (record->eventType == Qn::AR_UserUpdate)
-        triggerAction(record, Qn::UserSettingsAction);
+        triggerAction(record, QnActions::UserSettingsAction);
     else if (record->eventType == Qn::AR_ServerUpdate)
-        triggerAction(record, Qn::ServerSettingsAction);
+        triggerAction(record, QnActions::ServerSettingsAction);
     else if (record->eventType == Qn::AR_CameraUpdate || record->eventType == Qn::AR_CameraInsert)
-        triggerAction(record, Qn::CameraSettingsAction);
+        triggerAction(record, QnActions::CameraSettingsAction);
 
     if (isMaximized())
         showNormal();

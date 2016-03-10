@@ -74,6 +74,7 @@ QnPage {
         id: camerasList
         anchors.fill: parent
         anchors.topMargin: offlineWarning.height
+        animationsEnabled: !loadingDummy.visible
     }
 
     Rectangle {
@@ -148,6 +149,12 @@ QnPage {
                 font.pixelSize: sp(32)
                 color: QnTheme.loadingText
             }
+        }
+
+        onVisibleChanged:
+        {
+            if (!visible)
+                mainWindow.unlockScreenOrientation()
         }
     }
 

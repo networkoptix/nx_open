@@ -142,7 +142,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
     connect(ui->eventComboBox,      QnComboboxCurrentIndexChanged,      this,   &QnEventLogDialog::updateData);
     connect(ui->actionComboBox,     QnComboboxCurrentIndexChanged,      this,   &QnEventLogDialog::updateData);
     connect(ui->refreshButton,      &QAbstractButton::clicked,          this,   &QnEventLogDialog::updateData);
-    connect(ui->eventRulesButton,   &QAbstractButton::clicked,          this->context()->action(Qn::BusinessEventsAction), &QAction::trigger);
+    connect(ui->eventRulesButton,   &QAbstractButton::clicked,          this->context()->action(QnActions::BusinessEventsAction), &QAction::trigger);
 
     connect(ui->cameraButton,       &QAbstractButton::clicked,          this,   &QnEventLogDialog::at_cameraButton_clicked);
     connect(ui->gridEvents,         &QTableView::clicked,               this,   &QnEventLogDialog::at_eventsGrid_clicked);
@@ -387,7 +387,7 @@ void QnEventLogDialog::at_eventsGrid_clicked(const QModelIndex& idx)
         QnActionParameters params(resources);
         params.setArgument(Qn::ItemTimeRole, pos);
 
-        context()->menu()->trigger(Qn::OpenInNewLayoutAction, params);
+        context()->menu()->trigger(QnActions::OpenInNewLayoutAction, params);
 
         if (isMaximized())
             showNormal();

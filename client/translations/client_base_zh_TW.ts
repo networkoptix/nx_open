@@ -319,10 +319,6 @@ to view more bookmarks</source>
         <translation>隱藏 FPS</translation>
     </message>
     <message>
-        <source>Ctrl+Alt+F</source>
-        <translation>Ctrl + Alt + F</translation>
-    </message>
-    <message>
         <source>Drop Resources</source>
         <translation>丟棄資源</translation>
     </message>
@@ -339,24 +335,12 @@ to view more bookmarks</source>
         <translation>下一佈局</translation>
     </message>
     <message>
-        <source>Ctrl+Tab</source>
-        <translation>Ctrl+Tab</translation>
-    </message>
-    <message>
         <source>Previous Layout</source>
         <translation>前一佈局</translation>
     </message>
     <message>
-        <source>Ctrl+Shift+Tab</source>
-        <translation>Ctrl+Shift+Tab</translation>
-    </message>
-    <message>
         <source>Select All</source>
         <translation>選擇全部</translation>
-    </message>
-    <message>
-        <source>Ctrl+A</source>
-        <translation>Ctrl+A</translation>
     </message>
     <message>
         <source>Selection Changed</source>
@@ -369,10 +353,6 @@ to view more bookmarks</source>
     <message>
         <source>Go to Freespace Mode</source>
         <translation>切換至自由空間模式</translation>
-    </message>
-    <message>
-        <source>F11</source>
-        <translation>F11</translation>
     </message>
     <message>
         <source>Help</source>
@@ -403,16 +383,8 @@ to view more bookmarks</source>
         <translation>主選單</translation>
     </message>
     <message>
-        <source>Alt+Space</source>
-        <translation>Alt+Space</translation>
-    </message>
-    <message>
         <source>Connect to Server...</source>
         <translation>連線至伺服器...</translation>
-    </message>
-    <message>
-        <source>Ctrl+Shift+C</source>
-        <translation>Ctrl+Shift+C</translation>
     </message>
     <message>
         <source>Logout</source>
@@ -425,10 +397,6 @@ to view more bookmarks</source>
     <message>
         <source>Stop Panic Recording</source>
         <translation>停止緊急錄影</translation>
-    </message>
-    <message>
-        <source>Ctrl+P</source>
-        <translation>Ctrl+P</translation>
     </message>
     <message>
         <source>New...</source>
@@ -451,20 +419,12 @@ to view more bookmarks</source>
         <translation>新增頁籤</translation>
     </message>
     <message>
-        <source>Ctrl+T</source>
-        <translation>Ctrl+T</translation>
-    </message>
-    <message>
         <source>Window</source>
         <translation>視窗</translation>
     </message>
     <message>
         <source>New Window</source>
         <translation>新開視窗</translation>
-    </message>
-    <message>
-        <source>Ctrl+N</source>
-        <translation>Ctrl+N</translation>
     </message>
     <message>
         <source>User...</source>
@@ -495,10 +455,6 @@ to view more bookmarks</source>
         <translation>檔案...</translation>
     </message>
     <message>
-        <source>Ctrl+O</source>
-        <translation>Ctrl+O</translation>
-    </message>
-    <message>
         <source>Layout(s)...</source>
         <translation>佈局...</translation>
     </message>
@@ -511,16 +467,8 @@ to view more bookmarks</source>
         <translation>儲存目前佈局</translation>
     </message>
     <message>
-        <source>Ctrl+S</source>
-        <translation>Ctrl+S</translation>
-    </message>
-    <message>
         <source>Save Current Layout As...</source>
         <translation>另存目前佈局為…</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+S</source>
-        <translation>Ctrl + Alt + S</translation>
     </message>
     <message>
         <source>Save Video Wall View</source>
@@ -535,14 +483,6 @@ to view more bookmarks</source>
         <translation>停止螢幕擷取錄影</translation>
     </message>
     <message>
-        <source>Alt+R</source>
-        <translation>Alt+R</translation>
-    </message>
-    <message>
-        <source>Esc</source>
-        <translation>Esc</translation>
-    </message>
-    <message>
         <source>Stop current action</source>
         <translation>停止目前動作</translation>
     </message>
@@ -553,18 +493,6 @@ to view more bookmarks</source>
     <message>
         <source>Exit Fullscreen</source>
         <translation>離開全螢幕</translation>
-    </message>
-    <message>
-        <source>Ctrl+F</source>
-        <translation>Ctrl+F</translation>
-    </message>
-    <message>
-        <source>Alt+Enter</source>
-        <translation>Alt+Enter</translation>
-    </message>
-    <message>
-        <source>Alt+Return</source>
-        <translation>Alt+Return</translation>
     </message>
     <message>
         <source>Minimize</source>
@@ -595,18 +523,6 @@ to view more bookmarks</source>
         <translation>開啟網頁用戶端…</translation>
     </message>
     <message>
-        <source>Ctrl+E</source>
-        <translation>Ctrl+E</translation>
-    </message>
-    <message>
-        <source>Ctrl+L</source>
-        <translation>Ctrl+L</translation>
-    </message>
-    <message>
-        <source>Ctrl+M</source>
-        <translation>Ctrl+M</translation>
-    </message>
-    <message>
         <source>How-to Videos and FAQ...</source>
         <translation>教學影片及常見問題...</translation>
     </message>
@@ -615,16 +531,8 @@ to view more bookmarks</source>
         <translation>關於...</translation>
     </message>
     <message>
-        <source>F1</source>
-        <translation>F1</translation>
-    </message>
-    <message>
         <source>Exit</source>
-        <translation>Exit</translation>
-    </message>
-    <message>
-        <source>Alt+F4</source>
-        <translation>Alt+F4</translation>
+        <translation>退出</translation>
     </message>
     <message>
         <source>Merge to Currently Connected System...</source>
@@ -635,20 +543,12 @@ to view more bookmarks</source>
         <translation>關閉</translation>
     </message>
     <message>
-        <source>Ctrl+W</source>
-        <translation>Ctrl+W</translation>
-    </message>
-    <message>
         <source>Close All But This</source>
         <translation>關閉其他畫面</translation>
     </message>
     <message>
         <source>Open in Layout</source>
         <translation>在佈局內開啟</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+D</source>
-        <translation>Ctrl+Alt+D</translation>
     </message>
     <message>
         <source>Delayed Open Video Wall</source>
@@ -665,10 +565,6 @@ to view more bookmarks</source>
     <message>
         <source>System Administration...</source>
         <translation>系統管理...</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+A</source>
-        <translation>Ctrl+Alt+A</translation>
     </message>
     <message>
         <source>System Update...</source>
@@ -719,14 +615,6 @@ to view more bookmarks</source>
         <translation>開啟檔案所在目錄</translation>
     </message>
     <message>
-        <source>Ctrl+Enter</source>
-        <translation>Ctrl+Enter</translation>
-    </message>
-    <message>
-        <source>Ctrl+Return</source>
-        <translation>Ctrl+Return</translation>
-    </message>
-    <message>
         <source>Identify</source>
         <translation>識別</translation>
     </message>
@@ -771,24 +659,12 @@ to view more bookmarks</source>
         <translation>最大化項目</translation>
     </message>
     <message>
-        <source>Enter</source>
-        <translation>進入</translation>
-    </message>
-    <message>
-        <source>Return</source>
-        <translation>返回</translation>
-    </message>
-    <message>
         <source>Restore Item</source>
         <translation>返回項目</translation>
     </message>
     <message>
         <source>Show Info</source>
         <translation>顯示資訊</translation>
-    </message>
-    <message>
-        <source>Alt+I</source>
-        <translation>Alt+I</translation>
     </message>
     <message>
         <source>Hide Info</source>
@@ -855,10 +731,6 @@ to view more bookmarks</source>
         <translation>顯示位移</translation>
     </message>
     <message>
-        <source>Alt+G</source>
-        <translation>Alt+G</translation>
-    </message>
-    <message>
         <source>Hide Motion/Smart Search</source>
         <translation>隱藏位移 / 智慧搜尋</translation>
     </message>
@@ -879,24 +751,12 @@ to view more bookmarks</source>
         <translation>檢查檔案浮水印</translation>
     </message>
     <message>
-        <source>Alt+C</source>
-        <translation>Alt+C</translation>
-    </message>
-    <message>
         <source>Take Screenshot</source>
         <translation>螢幕擷取</translation>
     </message>
     <message>
-        <source>Alt+S</source>
-        <translation>Alt+S</translation>
-    </message>
-    <message>
         <source>Image Enhancement...</source>
         <translation>影像強化...</translation>
-    </message>
-    <message>
-        <source>Alt+J</source>
-        <translation>Alt+J</translation>
     </message>
     <message>
         <source>Create Zoom Window</source>
@@ -927,24 +787,12 @@ to view more bookmarks</source>
         <translation>從佈局移除</translation>
     </message>
     <message>
-        <source>Del</source>
-        <translation>刪除</translation>
-    </message>
-    <message>
-        <source>Ctrl+Shift+S</source>
-        <translation>Ctrl+Shift+S</translation>
-    </message>
-    <message>
         <source>Delete</source>
         <translation>刪除</translation>
     </message>
     <message>
         <source>Rename</source>
         <translation>重新命名</translation>
-    </message>
-    <message>
-        <source>F2</source>
-        <translation>F2</translation>
     </message>
     <message>
         <source>Delete from Disk</source>
@@ -1015,24 +863,12 @@ to view more bookmarks</source>
         <translation>停止輪跳</translation>
     </message>
     <message>
-        <source>Alt+T</source>
-        <translation>Alt+T</translation>
-    </message>
-    <message>
         <source>Mark Selection Start</source>
         <translation>標記此處為開始</translation>
     </message>
     <message>
-        <source>[</source>
-        <translation>[</translation>
-    </message>
-    <message>
         <source>Mark Selection End</source>
         <translation>標記此處為結束</translation>
-    </message>
-    <message>
-        <source>]</source>
-        <translation>]</translation>
     </message>
     <message>
         <source>Clear Selection</source>
@@ -1063,50 +899,6 @@ to view more bookmarks</source>
         <translation>預覽搜尋...</translation>
     </message>
     <message>
-        <source>Ctrl+Alt+Shift++</source>
-        <translation>Ctrl+Alt+Shift+ +</translation>
-    </message>
-    <message>
-        <source>Increment Debug Counter</source>
-        <translation>增量除錯計數器</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift+-</source>
-        <translation>Ctrl+Alt+Shift+ -</translation>
-    </message>
-    <message>
-        <source>Decrement Debug Counter</source>
-        <translation>減量除錯計數器</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift+R</source>
-        <translation>Ctrl+Alt+Shift+ R</translation>
-    </message>
-    <message>
-        <source>Show Resource Pool</source>
-        <translation>顯示資源集區</translation>
-    </message>
-    <message>
-        <source>Calibrate PTZ</source>
-        <translation>校正 PTZ</translation>
-    </message>
-    <message>
-        <source>Get PTZ Position</source>
-        <translation>取得PTZ位置</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift+D</source>
-        <translation>Ctrl+Alt+Shift+D</translation>
-    </message>
-    <message>
-        <source>Debug Control Panel</source>
-        <translation>除錯 (DEBUG) 控制台面板</translation>
-    </message>
-    <message>
-        <source>Space</source>
-        <translation>空白鍵</translation>
-    </message>
-    <message>
         <source>Play</source>
         <translation>播放</translation>
     </message>
@@ -1115,72 +907,36 @@ to view more bookmarks</source>
         <translation>暫停</translation>
     </message>
     <message>
-        <source>Ctrl+Left</source>
-        <translation>Ctrl+Left</translation>
-    </message>
-    <message>
         <source>Previous Frame</source>
         <translation>上一圖框</translation>
-    </message>
-    <message>
-        <source>Ctrl+Right</source>
-        <translation>Ctrl+Righ</translation>
     </message>
     <message>
         <source>Next Frame</source>
         <translation>下一圖框</translation>
     </message>
     <message>
-        <source>Z</source>
-        <translation>Z</translation>
-    </message>
-    <message>
         <source>To Start</source>
         <translation>到起始點</translation>
-    </message>
-    <message>
-        <source>X</source>
-        <translation>X</translation>
     </message>
     <message>
         <source>To End</source>
         <translation>到結束點</translation>
     </message>
     <message>
-        <source>Ctrl+Up</source>
-        <translation>Ctrl+Up</translation>
-    </message>
-    <message>
         <source>Volume Down</source>
         <translation>降低音量</translation>
-    </message>
-    <message>
-        <source>Ctrl+Down</source>
-        <translation>Ctrl+Down</translation>
     </message>
     <message>
         <source>Volume Up</source>
         <translation>提升音量</translation>
     </message>
     <message>
-        <source>M</source>
-        <translation>M</translation>
-    </message>
-    <message>
         <source>Toggle Mute</source>
         <translation>靜音模式切換</translation>
     </message>
     <message>
-        <source>L</source>
-        <translation>L</translation>
-    </message>
-    <message>
         <source>Jump to Live</source>
         <translation>切換為即時畫面</translation>
-    </message>
-    <message>
-        <source>S</source>
-        <translation>S</translation>
     </message>
     <message>
         <source>Synchronize Streams</source>
@@ -1245,10 +1001,6 @@ to view more bookmarks</source>
     <message>
         <source>Unpin Notifications</source>
         <translation>不固定顯示通知</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+T</source>
-        <translation>Ctrl+Alt+T</translation>
     </message>
     <message>
         <source>Disable Background Animation</source>
@@ -1377,10 +1129,6 @@ to view more bookmarks</source>
     <message>
         <source>Cameras to Backup...</source>
         <translation>要備份的攝影機...</translation>
-    </message>
-    <message>
-        <source>Ctrl+B</source>
-        <translation>Ctrl+B</translation>
     </message>
     <message>
         <source>Show Bookmarks</source>
@@ -1957,9 +1705,11 @@ to view more bookmarks</source>
         <source>Source camera</source>
         <translation>來源攝影機</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Source and %n more cameras</source>
-        <translation>來源與 %n 個攝影機</translation>
+        <translation>
+            <numerusform>來源與 %n 個攝影機</numerusform>
+        </translation>
     </message>
     <message>
         <source>N/A</source>
@@ -5035,17 +4785,23 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>&lt;All My I/O Modules&gt;</source>
         <translation>&lt;任何 我的 I/O 模組&gt;</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n device(s)&gt;</source>
-        <translation>&lt;%n 個裝置&gt;</translation>
+        <translation>
+            <numerusform>&lt;%n 個裝置&gt;</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n camera(s)&gt;</source>
-        <translation>&lt;%n 支攝影機&gt;</translation>
+        <translation>
+            <numerusform>&lt;%n 支攝影機&gt;</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n I/O module(s)&gt;</source>
-        <translation>&lt;%n 個 I/O 模組&gt;</translation>
+        <translation>
+            <numerusform>&lt;%n 個 I/O 模組&gt;</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -5800,13 +5556,17 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Notice: Only further recording will be backed up. Backup process will ignore existing footage.</source>
         <translation>注意: 只有在這之後的錄影會被備份. 備份程序將忽略已存在之錄影資料.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n Camera(s)</source>
-        <translation>%n 支攝影機</translation>
+        <translation>
+            <numerusform>%n 支攝影機</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n Device(s)</source>
-        <translation>%n 個裝置</translation>
+        <translation>
+            <numerusform>%n 個裝置</numerusform>
+        </translation>
     </message>
     <message>
         <source>Backup is finished</source>
@@ -6844,9 +6604,11 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Press %1 to search bookmarks</source>
         <translation>按下 %1 以搜尋書籤</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Are you sure you want to delete these %n bookmarks?</source>
-        <translation>是否確定要刪除這 %n 個書籤?</translation>
+        <translation>
+            <numerusform>是否確定要刪除這 %n 個書籤?</numerusform>
+        </translation>
     </message>
 </context>
 <context>

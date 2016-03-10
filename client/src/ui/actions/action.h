@@ -36,7 +36,7 @@ public:
      * \param id                        Identifier of this action.
      * \param parent                    Context-aware parent of this action.
      */
-    QnAction(Qn::ActionId id, QObject *parent = NULL);
+    QnAction(QnActions::IDType id, QObject *parent = NULL);
 
     /**
      * Virtual destructor.
@@ -46,7 +46,7 @@ public:
     /**
      * \returns                         Identifier of this action.
      */
-    Qn::ActionId id() const {
+    QnActions::IDType id() const {
         return m_id;
     }
 
@@ -225,7 +225,7 @@ private:
         Qn::Permissions forbidden;
     };
 
-    const Qn::ActionId m_id;
+    const QnActions::IDType m_id;
     Qn::ActionFlags m_flags;
     QnActionTypes::ClientModes m_mode;
     QHash<int, Permissions> m_permissions;

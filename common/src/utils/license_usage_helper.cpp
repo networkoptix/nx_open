@@ -268,17 +268,34 @@ QString QnLicenseUsageHelper::activationMessage(const QJsonObject& errorMessage)
     QString messageId = errorMessage.value(lit("messageId")).toString();
     QString message = errorMessage.value(lit("message")).toString();
 
-    if(messageId == lit("DatabaseError")) {
+    if (messageId == lit("DatabaseError"))
+    {
         message = tr("There was a problem activating your license key. A database error occurred.");  //TODO: Feature #3629 case J
-    } else if(messageId == lit("InvalidData")) {
+    }
+    else if (messageId == lit("InvalidData"))
+    {
         message = tr("There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.");
-    } else if(messageId == lit("InvalidKey")) {
+    }
+    else if (messageId == lit("InvalidKey"))
+    {
         message = tr("The license key you have entered is invalid. Please check that license key is entered correctly. "
             "If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.");
-    } else if(messageId == lit("InvalidBrand")) {
+    }
+    else if (messageId == lit("InvalidBrand"))
+    {
         message = tr("You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.");
-    } else if(messageId == lit("AlreadyActivated")) {
+    }
+    else if (messageId == lit("AlreadyActivated"))
+    {
+        //TODO: #GDM #2.6 #tr get rid of this insane templating
         message = tr("This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.");
+
+        QVariantMap arguments = errorMessage.value(lit("arguments")).toObject().toVariantMap();
+        QString hwid = arguments.value(lit("hwid")).toString();
+        message.replace(lit("{{hwid}}"), hwid);
+
+        QString time = arguments.value(lit("time")).toString();
+        message.replace(lit("{{time}}"), time);
     }
 
     return message;

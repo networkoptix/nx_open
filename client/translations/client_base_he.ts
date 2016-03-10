@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="he" sourcelanguage="en">
+<TS version="2.1" language="he" sourcelanguage="en">
 <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
@@ -328,14 +328,6 @@ to view more bookmarks</source>
         <translation>הסתר פריימים לשניה</translation>
     </message>
     <message>
-        <source>Ctrl+Alt+F</source>
-        <translation>Ctrl+Alt+F</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+D</source>
-        <translation>Ctrl+Alt+D</translation>
-    </message>
-    <message>
         <source>Drop Resources</source>
         <translation>שחרר משאבים</translation>
     </message>
@@ -360,24 +352,12 @@ to view more bookmarks</source>
         <translation>הפריסה הבאה</translation>
     </message>
     <message>
-        <source>Ctrl+Tab</source>
-        <translation>Ctrl+Tab</translation>
-    </message>
-    <message>
         <source>Previous Layout</source>
         <translation>הפריסה הקודמת</translation>
     </message>
     <message>
-        <source>Ctrl+Shift+Tab</source>
-        <translation>Ctrl+Shift+Tab</translation>
-    </message>
-    <message>
         <source>Select All</source>
         <translation>בחר הכל</translation>
-    </message>
-    <message>
-        <source>Ctrl+A</source>
-        <translation>Ctrl+A</translation>
     </message>
     <message>
         <source>Selection Changed</source>
@@ -394,10 +374,6 @@ to view more bookmarks</source>
     <message>
         <source>Go to Freespace Mode</source>
         <translation>עבור למצב &quot;שטח פנוי&quot;</translation>
-    </message>
-    <message>
-        <source>F11</source>
-        <translation>F11</translation>
     </message>
     <message>
         <source>Help</source>
@@ -448,16 +424,8 @@ to view more bookmarks</source>
         <translation>תפריט ראשי</translation>
     </message>
     <message>
-        <source>Alt+Space</source>
-        <translation>Alt+Space</translation>
-    </message>
-    <message>
         <source>Connect to Server...</source>
         <translation>התחבר לשרת...</translation>
-    </message>
-    <message>
-        <source>Ctrl+Shift+C</source>
-        <translation>Ctrl+Shift+C</translation>
     </message>
     <message>
         <source>Logout</source>
@@ -470,10 +438,6 @@ to view more bookmarks</source>
     <message>
         <source>Stop Panic Recording</source>
         <translation>הפסק הקלטת מצוקה</translation>
-    </message>
-    <message>
-        <source>Ctrl+P</source>
-        <translation>Ctrl +P</translation>
     </message>
     <message>
         <source>New...</source>
@@ -496,20 +460,12 @@ to view more bookmarks</source>
         <translation>כרטיסיה חדשה</translation>
     </message>
     <message>
-        <source>Ctrl+T</source>
-        <translation>Ctrl +T</translation>
-    </message>
-    <message>
         <source>Window</source>
         <translation>חלון</translation>
     </message>
     <message>
         <source>New Window</source>
         <translation>חלון חדש</translation>
-    </message>
-    <message>
-        <source>Ctrl+N</source>
-        <translation>Ctrl +N</translation>
     </message>
     <message>
         <source>User...</source>
@@ -540,10 +496,6 @@ to view more bookmarks</source>
         <translation>קובץ/קבצים...</translation>
     </message>
     <message>
-        <source>Ctrl+O</source>
-        <translation>Ctrl+O</translation>
-    </message>
-    <message>
         <source>Layout(s)...</source>
         <translation>פריסה/פריסות...</translation>
     </message>
@@ -556,20 +508,8 @@ to view more bookmarks</source>
         <translation>שמור פריסה נוכחית</translation>
     </message>
     <message>
-        <source>Ctrl+S</source>
-        <translation>Ctrl +S</translation>
-    </message>
-    <message>
         <source>Save Current Layout As...</source>
         <translation>שמור פריסה נוכחית כ...</translation>
-    </message>
-    <message>
-        <source>Ctrl+Shift+S</source>
-        <translation>Ctrl+Shift+S</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+S</source>
-        <translation>Ctrl+Alt+S</translation>
     </message>
     <message>
         <source>Save Video Wall View</source>
@@ -582,14 +522,6 @@ to view more bookmarks</source>
     <message>
         <source>Stop Screen Recording</source>
         <translation>הפסק הקלטת מסך</translation>
-    </message>
-    <message>
-        <source>Alt+R</source>
-        <translation>Alt+R</translation>
-    </message>
-    <message>
-        <source>Esc</source>
-        <translation>יציאה</translation>
     </message>
     <message>
         <source>Stop current action</source>
@@ -616,18 +548,6 @@ to view more bookmarks</source>
         <translation>שחזר</translation>
     </message>
     <message>
-        <source>Alt+Enter</source>
-        <translation>Alt+Enter</translation>
-    </message>
-    <message>
-        <source>Alt+Return</source>
-        <translation>Alt+Return</translation>
-    </message>
-    <message>
-        <source>Ctrl+F</source>
-        <translation>Ctrl+F</translation>
-    </message>
-    <message>
         <source>Show Message</source>
         <translation>הצג הודעה</translation>
     </message>
@@ -652,10 +572,6 @@ to view more bookmarks</source>
         <translation>ניהול המערכת...</translation>
     </message>
     <message>
-        <source>Ctrl+Alt+A</source>
-        <translation>Ctrl+Alt+A</translation>
-    </message>
-    <message>
         <source>Open Web Client...</source>
         <translation>פתח קליינט אינטרנט...</translation>
     </message>
@@ -676,18 +592,6 @@ to view more bookmarks</source>
         <translation>נתיב ביקורת...</translation>
     </message>
     <message>
-        <source>Ctrl+E</source>
-        <translation>Ctrl +E</translation>
-    </message>
-    <message>
-        <source>Ctrl+L</source>
-        <translation>Ctrl +L</translation>
-    </message>
-    <message>
-        <source>Ctrl+M</source>
-        <translation>Ctrl +M</translation>
-    </message>
-    <message>
         <source>Merge Systems...</source>
         <translation>מזג מערכות...</translation>
     </message>
@@ -700,16 +604,8 @@ to view more bookmarks</source>
         <translation>אודות...</translation>
     </message>
     <message>
-        <source>F1</source>
-        <translation>F1</translation>
-    </message>
-    <message>
         <source>Exit</source>
         <translation>יציאה</translation>
-    </message>
-    <message>
-        <source>Alt+F4</source>
-        <translation>Alt+F4</translation>
     </message>
     <message>
         <source>Server...</source>
@@ -752,14 +648,6 @@ to view more bookmarks</source>
         <translation>פתח את התיקיה המכילה</translation>
     </message>
     <message>
-        <source>Ctrl+Enter</source>
-        <translation>Ctrl +Enter</translation>
-    </message>
-    <message>
-        <source>Ctrl+Return</source>
-        <translation>Ctrl+Return</translation>
-    </message>
-    <message>
         <source>Identify</source>
         <translation>זהה</translation>
     </message>
@@ -781,10 +669,6 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Delete</source>
-        <translation>מחק</translation>
-    </message>
-    <message>
-        <source>Del</source>
         <translation>מחק</translation>
     </message>
     <message>
@@ -812,24 +696,12 @@ to view more bookmarks</source>
         <translation>הגדל פריט</translation>
     </message>
     <message>
-        <source>Enter</source>
-        <translation>הכנס</translation>
-    </message>
-    <message>
-        <source>Return</source>
-        <translation>חזור</translation>
-    </message>
-    <message>
         <source>Restore Item</source>
         <translation>שחזר פריט</translation>
     </message>
     <message>
         <source>Show Info</source>
         <translation>הצג מידע</translation>
-    </message>
-    <message>
-        <source>Alt+I</source>
-        <translation>Alt+I</translation>
     </message>
     <message>
         <source>Hide Info</source>
@@ -884,10 +756,6 @@ to view more bookmarks</source>
         <translation>הצג תנועה</translation>
     </message>
     <message>
-        <source>Alt+G</source>
-        <translation>Alt+G</translation>
-    </message>
-    <message>
         <source>Hide Motion/Smart Search</source>
         <translation>הסתר חיפוש חכם/תנועה</translation>
     </message>
@@ -908,24 +776,12 @@ to view more bookmarks</source>
         <translation>בדוק סימן מים בקובץ</translation>
     </message>
     <message>
-        <source>Alt+C</source>
-        <translation>Alt+C</translation>
-    </message>
-    <message>
         <source>Take Screenshot</source>
         <translation>צילום מסך</translation>
     </message>
     <message>
-        <source>Alt+S</source>
-        <translation>Alt+S</translation>
-    </message>
-    <message>
         <source>Image Enhancement...</source>
         <translation>שיפורי תמונה...</translation>
-    </message>
-    <message>
-        <source>Alt+J</source>
-        <translation>Alt+J</translation>
     </message>
     <message>
         <source>Create Zoom Window</source>
@@ -958,10 +814,6 @@ to view more bookmarks</source>
     <message>
         <source>Rename</source>
         <translation>שנה שם</translation>
-    </message>
-    <message>
-        <source>F2</source>
-        <translation>F2</translation>
     </message>
     <message>
         <source>Delete from Disk</source>
@@ -1040,16 +892,8 @@ to view more bookmarks</source>
         <translation>עצור סיור</translation>
     </message>
     <message>
-        <source>Alt+T</source>
-        <translation>Alt+T</translation>
-    </message>
-    <message>
         <source>Close</source>
         <translation>סגור</translation>
-    </message>
-    <message>
-        <source>Ctrl+W</source>
-        <translation>Ctrl+W</translation>
     </message>
     <message>
         <source>Close All But This</source>
@@ -1061,16 +905,8 @@ to view more bookmarks</source>
         <translation>סמן את תחילת הבחירה</translation>
     </message>
     <message>
-        <source>[</source>
-        <translation>[</translation>
-    </message>
-    <message>
         <source>Mark Selection End</source>
         <translation>סמן את סיום הבחירה</translation>
-    </message>
-    <message>
-        <source>]</source>
-        <translation>]</translation>
     </message>
     <message>
         <source>Clear Selection</source>
@@ -1101,50 +937,6 @@ to view more bookmarks</source>
         <translation>חיפוש ויזואלי...</translation>
     </message>
     <message>
-        <source>Ctrl+Alt+Shift++</source>
-        <translation>Ctrl+Alt+Shift++</translation>
-    </message>
-    <message>
-        <source>Increment Debug Counter</source>
-        <translation>הגדל מונה איתור באגים</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift+-</source>
-        <translation>Ctrl+Alt+Shift+-</translation>
-    </message>
-    <message>
-        <source>Decrement Debug Counter</source>
-        <translation>הקטן מונה איתור באגים</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift+R</source>
-        <translation>Ctrl+Alt+Shift+R</translation>
-    </message>
-    <message>
-        <source>Show Resource Pool</source>
-        <translation>הצג מאגר משאבים</translation>
-    </message>
-    <message>
-        <source>Calibrate PTZ</source>
-        <translation>כייל את המצלמה הממונעת</translation>
-    </message>
-    <message>
-        <source>Get PTZ Position</source>
-        <translation>קבל את מיקום המצלמה הממונעת</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift+D</source>
-        <translation>Ctrl+Alt+Shift+D</translation>
-    </message>
-    <message>
-        <source>Debug Control Panel</source>
-        <translation>לוח הבקרה של איתור הבאגים</translation>
-    </message>
-    <message>
-        <source>Space</source>
-        <translation>רווח</translation>
-    </message>
-    <message>
         <source>Play</source>
         <translation>הפעל</translation>
     </message>
@@ -1153,72 +945,36 @@ to view more bookmarks</source>
         <translation>השהה</translation>
     </message>
     <message>
-        <source>Ctrl+Left</source>
-        <translation>חץ שמאלי +Ctrl</translation>
-    </message>
-    <message>
         <source>Previous Frame</source>
         <translation>פריים קודם</translation>
-    </message>
-    <message>
-        <source>Ctrl+Right</source>
-        <translation>חץ ימני+Ctrl</translation>
     </message>
     <message>
         <source>Next Frame</source>
         <translation>פריים הבא</translation>
     </message>
     <message>
-        <source>Z</source>
-        <translation>Z</translation>
-    </message>
-    <message>
         <source>To Start</source>
         <translation>להתחלה</translation>
-    </message>
-    <message>
-        <source>X</source>
-        <translation>X</translation>
     </message>
     <message>
         <source>To End</source>
         <translation>לסוף</translation>
     </message>
     <message>
-        <source>Ctrl+Up</source>
-        <translation>חץ עליון+Ctrl</translation>
-    </message>
-    <message>
         <source>Volume Down</source>
         <translation>הנמך עוצמת שמע</translation>
-    </message>
-    <message>
-        <source>Ctrl+Down</source>
-        <translation>חץ תחתון+Ctrl</translation>
     </message>
     <message>
         <source>Volume Up</source>
         <translation>הגבהה עוצמת שמע</translation>
     </message>
     <message>
-        <source>M</source>
-        <translation>M</translation>
-    </message>
-    <message>
         <source>Toggle Mute</source>
         <translation>הפעל/כבה השתקה</translation>
     </message>
     <message>
-        <source>L</source>
-        <translation>L</translation>
-    </message>
-    <message>
         <source>Jump to Live</source>
         <translation>עבור לשידור חי</translation>
-    </message>
-    <message>
-        <source>S</source>
-        <translation>S</translation>
     </message>
     <message>
         <source>Synchronize Streams</source>
@@ -1283,10 +1039,6 @@ to view more bookmarks</source>
     <message>
         <source>Unpin Notifications</source>
         <translation>הפרד התראות</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+T</source>
-        <translation>Ctrl+Alt+T</translation>
     </message>
     <message>
         <source>Disable Background Animation</source>
@@ -1388,10 +1140,6 @@ to view more bookmarks</source>
     <message>
         <source>Cameras to Backup...</source>
         <translation>מצלמה לגיבוי...</translation>
-    </message>
-    <message>
-        <source>Ctrl+B</source>
-        <translation></translation>
     </message>
     <message>
         <source>Show Bookmarks</source>
@@ -1978,9 +1726,12 @@ to view more bookmarks</source>
         <source>Source camera</source>
         <translation>מצלמת מקור</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Source and %n more cameras</source>
-        <translation>מקור ו %n מצלמות נוספות</translation>
+        <translation type="unfinished">
+            <numerusform>מקור ו %n מצלמות נוספות</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>N/A</source>
@@ -5094,17 +4845,26 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>&lt;All My I/O Modules&gt;</source>
         <translation>&lt;כל מודולי הקלט/פלט שלי&gt;</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n device(s)&gt;</source>
-        <translation>&lt;%n התקנים&gt;</translation>
+        <translation type="unfinished">
+            <numerusform>&lt;%n התקנים&gt;</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n camera(s)&gt;</source>
-        <translation>&lt;%n מצלמות&gt;</translation>
+        <translation type="unfinished">
+            <numerusform>&lt;%n מצלמות&gt;</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n I/O module(s)&gt;</source>
-        <translation>&lt;%n מודולי קלט/פלט&gt;</translation>
+        <translation type="unfinished">
+            <numerusform>&lt;%n מודולי קלט/פלט&gt;</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -5865,13 +5625,19 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Notice: Only further recording will be backed up. Backup process will ignore existing footage.</source>
         <translation>שים לב: רק הקלטות עתידיות יגובו. תהליך הגיבוי יתעלם מהקלטות נוכחיות.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n Camera(s)</source>
-        <translation>%n מצלמות</translation>
+        <translation type="unfinished">
+            <numerusform>%n מצלמות</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n Device(s)</source>
-        <translation>%n התקנים</translation>
+        <translation type="unfinished">
+            <numerusform>%n התקנים</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Backup is finished</source>
@@ -6932,9 +6698,12 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Press %1 to search bookmarks</source>
         <translation>לחץ על %1 לחיפוש סימניות</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Are you sure you want to delete these %n bookmarks?</source>
-        <translation>האם למחוק את %n הסימניות?</translation>
+        <translation type="unfinished">
+            <numerusform>האם למחוק את %n הסימניות?</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>

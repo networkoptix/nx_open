@@ -22,7 +22,6 @@
 #include "utils/common/synctime.h"
 #include "api/runtime_info_manager.h"
 
-
 QnCommonModule::QnCommonModule(QObject *parent): QObject(parent) {
     Q_INIT_RESOURCE(common);
     m_cloudMode = false;

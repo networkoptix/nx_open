@@ -118,7 +118,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->softwareMotionButton,   SIGNAL(clicked(bool)),                  this,   SLOT(at_motionTypeChanged()));
     connect(ui->sensitivitySlider,      SIGNAL(valueChanged(int)),              this,   SLOT(updateMotionWidgetSensitivity()));
     connect(ui->resetMotionRegionsButton,   &QPushButton::clicked,              this,   &QnSingleCameraSettingsWidget::at_resetMotionRegionsButton_clicked);
-    connect(ui->pingButton,                 &QPushButton::clicked,              this,   [this]{menu()->trigger(Qn::PingAction, QnActionParameters(m_camera));});
+    connect(ui->pingButton,                 &QPushButton::clicked,              this,   [this]{menu()->trigger(QnActions::PingAction, QnActionParameters(m_camera));});
 
     connect(ui->licensingWidget,         &QnLicensesProposeWidget::changed,      this,   &QnSingleCameraSettingsWidget::at_dbDataChanged);
     connect(ui->licensingWidget,         &QnLicensesProposeWidget::changed,      this,   [this] {

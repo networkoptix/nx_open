@@ -200,5 +200,6 @@
                     default_value = "12"/>
             </params>
         </resource>                
+        <resource name = "AXISM7011" public = "AXIS_ENCODER"/>        
     </oem>
 </resources>

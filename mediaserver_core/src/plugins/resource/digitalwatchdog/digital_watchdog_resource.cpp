@@ -32,6 +32,11 @@ QnDigitalWatchdogResource::~QnDigitalWatchdogResource()
 {
 }
 
+CLSimpleHTTPClient QnDigitalWatchdogResource::httpClient() const
+{
+    return CLSimpleHTTPClient(getHostAddress(), HTTP_PORT, getNetworkTimeout(), getAuth());
+}
+
 bool QnDigitalWatchdogResource::isDualStreamingEnabled(bool& unauth)
 {
     if (m_appStopping)

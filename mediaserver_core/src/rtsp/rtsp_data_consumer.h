@@ -62,6 +62,7 @@ public:
     void setMultiChannelVideo(bool value);
     void setUseUTCTime(bool value);
     void setAllowAdaptiveStreaming(bool value);
+    void setResource(const QnResourcePtr& resource);
 protected:
     //QnMediaContextPtr getGeneratedContext(CodecID compressionType);
     virtual bool processData(const QnAbstractDataPacketPtr& data);
@@ -77,6 +78,8 @@ protected:
     void sendMetadata(const QByteArray& metadata);
     void getEdgePackets(qint64& firstVTime, qint64& lastVTime, bool checkLQ) const;
     QByteArray getRangeHeaderIfChanged();
+    void cleanupQueueToPos(int lastIndex, int ch);
+    void setNeedKeyData();
 private:
     //QMap<CodecID, QnMediaContextPtr> m_generatedContext;
     bool m_gotLivePacket;
@@ -128,5 +131,7 @@ private:
     int m_framesSinceRangeCheck;
     qint64 m_prevStartTime;
     qint64 m_prevEndTime;
+    int m_videoChannels;
+    bool m_needKeyData[CL_MAX_CHANNELS];
 };
 #endif // __RTSP_DATA_CONSUMER_H__

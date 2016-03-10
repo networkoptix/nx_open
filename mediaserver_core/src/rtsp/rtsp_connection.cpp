@@ -47,6 +47,7 @@
 #include "media_server/settings.h"
 #include "streaming/streaming_params.h"
 #include "media_server/settings.h"
+#include <utils/common/log.h>
 
 class QnTcpListener;
 
@@ -389,14 +390,52 @@ void QnRtspConnectionProcessor::initResponse(int code, const QString& message)
 void QnRtspConnectionProcessor::generateSessionId()
 {
     Q_D(QnRtspConnectionProcessor);
-    d->sessionId = QString::number((long) d->socket.data());
+    d->sessionId = QString::number((unsigned long) d->socket.data());
     d->sessionId += QString::number(rand());
 }
 
 
-void QnRtspConnectionProcessor::sendResponse(int code)
+void QnRtspConnectionProcessor::sendResponse(int httpStatusCode, const QByteArray& contentType)
 {
-    QnTCPConnectionProcessor::sendResponse(code, "application/sdp", "", "", true);
+    Q_D(QnTCPConnectionProcessor);
+
+    d->response.statusLine.version = d->request.requestLine.version;
+    d->response.statusLine.statusCode = httpStatusCode;
+    d->response.statusLine.reasonPhrase = 
+        nx_http::StatusCode::toString((nx_http::StatusCode::Value)httpStatusCode);
+
+    nx_http::insertOrReplaceHeader(
+        &d->response.headers,
+        nx_http::HttpHeader("Server", nx_http::serverString()));
+    nx_http::insertOrReplaceHeader(
+        &d->response.headers,
+        nx_http::HttpHeader("Date", dateTimeToHTTPFormat(QDateTime::currentDateTime())));
+
+    if (!contentType.isEmpty())
+        nx_http::insertOrReplaceHeader(
+            &d->response.headers,
+            nx_http::HttpHeader("Content-Type", contentType));
+    if (!d->response.messageBody.isEmpty())
+        nx_http::insertOrReplaceHeader(
+            &d->response.headers,
+            nx_http::HttpHeader(
+                "Content-Length",
+                QByteArray::number(d->response.messageBody.size())));
+
+    const QByteArray response = d->response.toString();
+
+    NX_LOG(lit("Server response to %1:\n%2").
+        arg(d->socket->getForeignAddress().address.toString()).
+        arg(QString::fromLatin1(response)),
+        cl_logDEBUG1);
+
+    NX_LOG(QnLog::HTTP_LOG_INDEX,
+        lit("Sending response to %1:\n%2\n-------------------\n\n\n").
+        arg(d->socket->getForeignAddress().toString()).
+        arg(QString::fromLatin1(response)), cl_logDEBUG1);
+
+    QnMutexLocker lock(&d->sockMutex);
+    sendData(response.constData(), response.size());
 }
 
 int QnRtspConnectionProcessor::getMetadataChannelNum() const
@@ -937,6 +976,8 @@ void QnRtspConnectionProcessor::createDataProvider()
 
     if (!d->dataProcessor) {
         d->dataProcessor = new QnRtspDataConsumer(this);
+        if (d->mediaRes)
+            d->dataProcessor->setResource(d->mediaRes->toResourcePtr());
         d->dataProcessor->pauseNetwork();
         int speed = 1;  //real time
         if( d->useProprietaryFormat )
@@ -1357,6 +1398,7 @@ void QnRtspConnectionProcessor::processRequest()
         generateSessionId();
     int code = CODE_OK;
     initResponse();
+    QByteArray contentType;
     if (method == "OPTIONS")
     {
         d->response.headers.insert( std::make_pair("Public", "DESCRIBE, SETUP, TEARDOWN, PLAY, PAUSE, GET_PARAMETER, SET_PARAMETER") );
@@ -1364,6 +1406,7 @@ void QnRtspConnectionProcessor::processRequest()
     else if (method == "DESCRIBE")
     {
         code = composeDescribe();
+        contentType = "application/sdp";
     }
     else if (method == "SETUP")
     {
@@ -1384,12 +1427,14 @@ void QnRtspConnectionProcessor::processRequest()
     else if (method == "GET_PARAMETER")
     {
         code = composeGetParameter();
+        contentType = "text/parameters";
     }
     else if (method == "SET_PARAMETER")
     {
         code = composeSetParameter();
+        contentType = "text/parameters";
     }
-    sendResponse(code);
+    sendResponse(code, contentType);
     if (d->dataProcessor)
         d->dataProcessor->resumeNetwork();
 }
@@ -1431,7 +1476,7 @@ void QnRtspConnectionProcessor::run()
         {
             if(qnAuthHelper->authenticate(d->request, d->response) != Qn::Auth_OK)
             {
-                sendResponse(CODE_AUTH_REQUIRED);
+                sendResponse(CODE_AUTH_REQUIRED, QByteArray());
                 if (readRequest()) 
                     parseRequest();
                 else {

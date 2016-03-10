@@ -143,6 +143,7 @@
 #include <rest/handlers/camera_history_rest_handler.h>
 #include <rest/handlers/multiserver_bookmarks_rest_handler.h>
 #include <rest/handlers/multiserver_thumbnail_rest_handler.h>
+#include <rest/handlers/multiserver_statistics_rest_handler.h>
 #include <rest/server/rest_connection_processor.h>
 #include <rest/handlers/get_hardware_info_rest_handler.h>
 #include <rest/handlers/system_settings_handler.h>
@@ -1406,8 +1407,8 @@ void MediaServerProcess::at_cameraIPConflict(const QHostAddress& host, const QSt
 bool MediaServerProcess::initTcpListener()
 {
     m_httpModManager.reset( new nx_http::HttpModManager() );
-    m_httpModManager->addUrlRewriteExact( lit( "/crossdomain.xml" ), lit( "/static/crossdomain.xml" ) );
     m_autoRequestForwarder.reset( new QnAutoRequestForwarder() );
+    m_autoRequestForwarder->addPathToIgnore(lit("/ec2/*"));
     m_httpModManager->addCustomRequestMod( std::bind(
         &QnAutoRequestForwarder::processRequest,
         m_autoRequestForwarder.get(),
@@ -1469,6 +1470,7 @@ bool MediaServerProcess::initTcpListener()
 
     //TODO: #rvasilenko this url is used in 3 different places. Where can we store it? Static member of QnThumbnailRequestData? New common module?
     QnRestProcessorPool::instance()->registerHandler("ec2/cameraThumbnail", new QnMultiserverThumbnailRestHandler("ec2/cameraThumbnail"));
+    QnRestProcessorPool::instance()->registerHandler("ec2/statistics", new QnMultiserverStatisticsRestHandler("ec2/statistics"));
 #ifdef ENABLE_ACTI
     QnActiResource::setEventPort(rtspPort);
     QnRestProcessorPool::instance()->registerHandler("api/camera_event", new QnActiEventRestHandler());  //used to receive event from acti camera. TODO: remove this from api
@@ -2187,6 +2189,9 @@ void MediaServerProcess::run()
     //CLDeviceSearcher::instance()->addDeviceServer(&IQEyeDeviceServer::instance());
 
     loadResourcesFromECS(messageProcessor.data());
+    if (QnGlobalSettings::instance()->isCrossdomainXmlEnabled())
+        m_httpModManager->addUrlRewriteExact( lit( "/crossdomain.xml" ), lit( "/static/crossdomain.xml" ) );
+
     if (QnUserResourcePtr adminUser = qnResPool->getAdministrator())
     {
         qnCommon->updateModuleInformation();
@@ -2196,9 +2201,11 @@ void MediaServerProcess::run()
         typedef ec2::Ec2StaticticsReporter stats;
         bool adminParamsChanged = false;
 
+        // TODO: #ynikitenkov fix to use qnGlobalSettings in 2.6
         // TODO: fix, when VS supports init lists:
         //       for (const auto& param : { stats::SR_TIME_CYCLE, stats::SR_SERVER_API })
-        const QString* statParams[] = { &stats::SR_TIME_CYCLE, &stats::SR_SERVER_API };
+        const QString* statParams[] = { &stats::SR_TIME_CYCLE, &stats::SR_SERVER_API
+            , &QnMultiserverStatisticsRestHandler::kSettingsUrlParam };
         for (auto it = &statParams[0]; it != &statParams[sizeof(statParams)/sizeof(statParams[0])]; ++it)
         {
             const QString& param = **it;

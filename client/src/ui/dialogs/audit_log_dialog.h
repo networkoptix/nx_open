@@ -97,7 +97,7 @@ private:
     QnAuditRecordRefList filterChildDataByCameras(const QnAuditRecordRefList& checkedRows);
     void setupFilterCheckbox(QCheckBox* checkbox, const QColor& color, Qn::AuditRecordTypes filteredTypes);
     void processPlaybackAction(const QnAuditRecord* record);
-    void triggerAction(const QnAuditRecord* record, Qn::ActionId ActionId);
+    void triggerAction(const QnAuditRecord* record, QnActions::IDType ActionId);
     QnAuditRecordRefList applyFilter();
     QSize calcButtonSize() const;
     void setupSessionsGrid();

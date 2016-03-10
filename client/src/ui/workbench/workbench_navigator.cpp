@@ -61,12 +61,11 @@ extern "C"
 #include <ui/widgets/day_time_widget.h>
 
 #include <ui/workbench/watchers/timeline_bookmarks_watcher.h>
-#include <ui/workbench/watchers/workbench_items_watcher.h>
 
 #include "extensions/workbench_stream_synchronizer.h"
 #include "watchers/workbench_server_time_watcher.h"
 #include "watchers/workbench_user_inactivity_watcher.h"
-#include "watchers/workbench_bookmark_tags_watcher.h"
+
 #include "workbench.h"
 #include "workbench_display.h"
 #include "workbench_context.h"
@@ -335,18 +334,6 @@ bool QnWorkbenchNavigator::bookmarksModeEnabled() const {
     return m_timeSlider->isBookmarksVisible();
 }
 
-void QnWorkbenchNavigator::updateArchiveState(QnWorkbenchItem *item)
-{
-    if (hasArchive())
-        updateHasArchiveState();
-}
-
-void QnWorkbenchNavigator::onShowItem(QnWorkbenchItem *item)
-{
-    if (!hasArchive())
-        updateHasArchiveState();
-}
-
 void QnWorkbenchNavigator::setBookmarksModeEnabled(bool enabled)
 {
     if (bookmarksModeEnabled() == enabled)
@@ -364,12 +351,6 @@ void QnWorkbenchNavigator::initialize() {
     Q_ASSERT_X(isValid(), Q_FUNC_INFO, "we should definitely be valid here");
     if (!isValid())
         return;
-
-    const auto itemsWatcher = context()->instance<QnWorkbenchItemsWatcher>();
-    connect(itemsWatcher, &QnWorkbenchItemsWatcher::itemShown
-        , this, &QnWorkbenchNavigator::onShowItem);
-    connect(itemsWatcher, &QnWorkbenchItemsWatcher::itemHidden
-        , this, &QnWorkbenchNavigator::updateArchiveState);
 
     connect(workbench(), &QnWorkbench::currentLayoutChanged
         , this, &QnWorkbenchNavigator::updateSliderOptions);
@@ -1529,7 +1510,7 @@ void QnWorkbenchNavigator::setAutoPaused(bool autoPaused) {
     }
 
     m_autoPaused = autoPaused;
-    action(Qn::PlayPauseAction)->setEnabled(!m_autoPaused); /* Prevent special UI reaction on space key*/
+    action(QnActions::PlayPauseAction)->setEnabled(!m_autoPaused); /* Prevent special UI reaction on space key*/
 }
 
 // -------------------------------------------------------------------------- //
@@ -1584,9 +1565,9 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
 
     /* Add slider-local actions to the menu. */
     bool selectionEditable = m_timeSlider->options() & QnTimeSlider::SelectionEditable;
-    manager->redirectAction(menu.data(), Qn::StartTimeSelectionAction,  selectionEditable ? m_startSelectionAction : NULL);
-    manager->redirectAction(menu.data(), Qn::EndTimeSelectionAction,    selectionEditable ? m_endSelectionAction : NULL);
-    manager->redirectAction(menu.data(), Qn::ClearTimeSelectionAction,  selectionEditable ? m_clearSelectionAction : NULL);
+    manager->redirectAction(menu.data(), QnActions::StartTimeSelectionAction,  selectionEditable ? m_startSelectionAction : NULL);
+    manager->redirectAction(menu.data(), QnActions::EndTimeSelectionAction,    selectionEditable ? m_endSelectionAction : NULL);
+    manager->redirectAction(menu.data(), QnActions::ClearTimeSelectionAction,  selectionEditable ? m_clearSelectionAction : NULL);
 
     /* Run menu. */
     QAction *action = menu->exec(screenPos);
@@ -1600,7 +1581,7 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
         m_timeSlider->setSelectionValid(true);
     } else if(action == m_clearSelectionAction) {
         m_timeSlider->setSelectionValid(false);
-    } else if (action == context()->action(Qn::ZoomToTimeSelectionAction)) {
+    } else if (action == context()->action(QnActions::ZoomToTimeSelectionAction)) {
         if(!m_timeSlider->isSelectionValid())
             return;
 
@@ -1755,10 +1736,15 @@ void QnWorkbenchNavigator::at_display_widgetChanged(Qn::ItemRole role) {
 }
 
 void QnWorkbenchNavigator::at_display_widgetAdded(QnResourceWidget *widget) {
-    if(widget->resource()->flags() & Qn::sync) {
-        if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget)){
+    if(widget->resource()->flags() & Qn::sync)
+    {
+        if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
+        {
             addSyncedWidget(mediaWidget);
             connect(mediaWidget, SIGNAL(motionSelectionChanged()), this, SLOT(at_widget_motionSelectionChanged()));
+
+            if (!hasArchive())
+                updateHasArchiveState();
         }
     }
 
@@ -1772,8 +1758,14 @@ void QnWorkbenchNavigator::at_display_widgetAboutToBeRemoved(QnResourceWidget *w
     disconnect(widget->resource(), NULL, this, NULL);
 
     if(widget->resource()->flags() & Qn::sync)
+    {
         if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
+        {
             removeSyncedWidget(mediaWidget);
+            if (hasArchive())
+                updateHasArchiveState();
+        }
+    }
 }
 
 void QnWorkbenchNavigator::at_widget_motionSelectionChanged() {

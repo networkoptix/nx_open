@@ -58,7 +58,8 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* 
     m_isMultiserverAllowed(true),
     m_playNowModeAllowed(true),
     m_reader(reader),
-    m_frameCnt(0)
+    m_frameCnt(0),
+    m_runtimeId(qnCommon->runningInstanceGUID())
 {
     m_footageUpToDate.test_and_set();
     m_rtpDataBuffer = new quint8[MAX_RTP_BUFFER_SIZE];
@@ -260,14 +261,15 @@ bool QnRtspClientArchiveDelegate::openInternal() {
     const bool isOpened = m_rtspSession.open(getUrl(m_camera, m_server), m_lastSeekTime).errorCode == CameraDiagnostics::ErrorCode::noError;
     if (isOpened)
     {
-        if (m_isMultiserverAllowed)
-            checkMinTimeFromOtherServer(m_camera);
-
         qint64 endTime = m_position;
         if (m_forcedEndTime)
             endTime = m_forcedEndTime;
 
         m_rtspSession.play(m_position, endTime, m_rtspSession.getScale());
+
+        if (m_isMultiserverAllowed)
+            checkMinTimeFromOtherServer(m_camera);
+
         RTPSession::TrackMap trackInfo =  m_rtspSession.getTrackInfo();
         if (!trackInfo.isEmpty())
             setRtpData(trackInfo[0]->ioDevice);
@@ -845,7 +847,7 @@ void QnRtspClientArchiveDelegate::setupRtspSession(const QnVirtualCameraResource
 
     if (!m_auth.videowall.isNull())
         session->setAdditionAttribute(Qn::VIDEOWALL_GUID_HEADER_NAME, m_auth.videowall.toString().toUtf8());
-    session->setAdditionAttribute(Qn::EC2_RUNTIME_GUID_HEADER_NAME, qnCommon->runningInstanceGUID().toByteArray());
+    session->setAdditionAttribute(Qn::EC2_RUNTIME_GUID_HEADER_NAME, m_runtimeId.toByteArray());
     session->setAdditionAttribute(Qn::EC2_INTERNAL_RTP_FORMAT, "1" );
 
 
@@ -864,4 +866,9 @@ void QnRtspClientArchiveDelegate::setPlayNowModeAllowed(bool value)
     m_playNowModeAllowed = value;
     if (!value)
         m_rtspSession.setUsePredefinedTracks(0);
+}
+
+bool QnRtspClientArchiveDelegate::hasVideo() const
+{
+    return m_camera && m_camera->hasVideo(nullptr);
 }

@@ -59,6 +59,7 @@
 #define QN_ARM_BOX                      "${box}"
 #define QN_IOS_PLAYBUTTON_TINT          "${ios.playButton.tint}"
 #define QN_IOS_SHARED_GROUP_ID          "${ios.group_identifier}"
+#define QN_IOS_NEW_APP_APPSTORE_ID      "${ios.new_app_appstore_id}"
 #define NX_EC_EC2_PROTO_VERSION         ${nxec.ec2ProtoVersion}
 
 #define QN_AX_CLASS_ID                  "${ax.classId}"

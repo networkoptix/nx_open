@@ -54,6 +54,7 @@ QnVideowallScreenWidget::QnVideowallScreenWidget(QnWorkbenchContext *context, Qn
 
     setOption(QnResourceWidget::WindowRotationForbidden, true);
     setInfoVisible(true, false);
+    updateInfoText();
 }
 
 QnVideowallScreenWidget::~QnVideowallScreenWidget() {

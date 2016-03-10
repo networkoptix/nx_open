@@ -1,18 +1,25 @@
-#ifndef QN_USER_PERMISSIONS_H
-#define QN_USER_PERMISSIONS_H
 
+#pragma once
+
+#ifdef __cplusplus  // For safe iOS build
+#include <utils/common/model_functions_fwd.h>
+#endif
+
+// TODO: #ynikitenkov Add serialization using metaobject
 #ifndef QN_NO_NAMESPACES
 namespace Qn {
 #endif
 
     /**
-     * Flags describing the actions permitted for the user to do with the 
+     * Flags describing the actions permitted for the user to do with the
      * selected resource.
      */
     enum Permission {
         /* Generic permissions. */
+        NoPermissions                           = 0x00000000,
+
         ReadPermission                          = 0x00010000,   /**< Generic read access. Having this access right doesn't necessary mean that all information is readable. */
-        WritePermission                         = 0x00020000,   /**< Generic write access. Having this access right doesn't necessary mean that all information is writable. */ 
+        WritePermission                         = 0x00020000,   /**< Generic write access. Having this access right doesn't necessary mean that all information is writable. */
         SavePermission                          = 0x00040000,   /**< Generic save access. Entity can be saved to the server. */
         RemovePermission                        = 0x00080000,   /**< Generic delete permission. */
         ReadWriteSavePermission                 = ReadPermission | WritePermission | SavePermission,
@@ -22,7 +29,7 @@ namespace Qn {
         AddRemoveItemsPermission                = 0x00100000,   /**< Permission to add or remove items from a layout. */
         EditLayoutSettingsPermission            = 0x00200000,   /**< Permission to setup layout background or set locked flag. */
         FullLayoutPermissions                   = ReadWriteSavePermission | WriteNamePermission | RemovePermission | AddRemoveItemsPermission | EditLayoutSettingsPermission,
-        
+
         /* User-specific permissions. */
         WritePasswordPermission                 = 0x02000000,   /**< Permission to edit associated password. */
         WriteAccessRightsPermission             = 0x04000000,   /**< Permission to edit access rights. */
@@ -40,7 +47,7 @@ namespace Qn {
         GlobalEditProtectedUserPermission       = 0x00000001,   /**< Root, can edit admins. */
         GlobalProtectedPermission               = 0x00000002,   /**< Admin, can edit other non-admins. */
         GlobalEditLayoutsPermission             = 0x00000004,   /**< Can create and edit layouts. */
-        GlobalEditUsersPermission               = 0x00000008,   /**< Can create and edit users. */        
+        GlobalEditUsersPermission               = 0x00000008,   /**< Can create and edit users. */
         GlobalEditServersPermissions            = 0x00000020,   /**< Can edit server settings. */
         GlobalViewLivePermission                = 0x00000080,   /**< Can view live stream of available cameras. */
         GlobalViewArchivePermission             = 0x00000100,   /**< Can view archives of available cameras. */
@@ -48,7 +55,7 @@ namespace Qn {
         GlobalEditCamerasPermission             = 0x00000400,   /**< Can edit camera settings. */
         GlobalPtzControlPermission              = 0x00000800,   /**< Can change camera's PTZ state. */
         GlobalEditVideoWallPermission           = 0x00002000,   /**< Can create and edit videowalls */
-        
+
         /* Deprecated permissions. */
         GlobalPanicPermission                   = 0x00001000,   /**< Deprecated. Can trigger panic recording. */
         DeprecatedEditCamerasPermission         = 0x00000010,   /**< Can edit camera settings and change camera's PTZ state. */
@@ -61,12 +68,15 @@ namespace Qn {
         GlobalAdminPermissions                  = GlobalAdvancedViewerPermissions   | GlobalEditLayoutsPermission | GlobalEditUsersPermission |
                                                     GlobalProtectedPermission | GlobalEditServersPermissions | GlobalPanicPermission | GlobalEditVideoWallPermission,
         GlobalOwnerPermissions                  = GlobalAdminPermissions            | GlobalEditProtectedUserPermission,
-            
+
         AllPermissions                          = 0xFFFFFFFF
     };
+
+#ifdef __cplusplus
+    Q_DECLARE_FLAGS(Permissions, Permission)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(Permissions)
+#endif
 
 #ifndef QN_NO_NAMESPACES
 } // namespace Qn
 #endif
-
-#endif //QN_USER_PERMISSIONS_H

@@ -342,7 +342,10 @@ QnCameraBookmarkTagList QnCameraBookmarkTag::mergeCameraBookmarkTags(const QnMul
 
 
 bool QnCameraBookmark::isValid() const {
-    return !isNull() && !cameraId.isEmpty() && durationMs > 0;
+    return !isNull()
+        && !name.isEmpty()
+        && !cameraId.isEmpty()
+        && durationMs > 0;
 }
 
 bool operator<(const QnCameraBookmark &first, const QnCameraBookmark &other) {

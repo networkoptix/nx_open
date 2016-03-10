@@ -17,6 +17,7 @@
 #include <QtZlib/zlib.h>
 #endif
 
+#include <api/global_settings.h>
 #include <api/runtime_info_manager.h>
 
 #include <common/common_module.h>
@@ -325,7 +326,7 @@ namespace ec2
         quint64 checkSystemTimeTaskID = 0;
         {
             QnMutexLocker lk( &m_mutex );
-            m_terminated = false;
+            m_terminated = true;
 
             broadcastSysTimeTaskID = m_broadcastSysTimeTaskID;
             m_broadcastSysTimeTaskID = 0;
@@ -817,6 +818,15 @@ namespace ec2
         auto peerIter = m_peersToSendTimeSyncTo.find( peerID );
         if( peerIter == m_peersToSendTimeSyncTo.end() )
             return;
+
+        if (!QnGlobalSettings::instance()->isTimeSynchronizationEnabled())
+        {
+            peerIter->second.syncTimerID = TimerManager::instance()->addTimer(
+                std::bind(&TimeSynchronizationManager::synchronizeWithPeer, this, peerID),
+                TIME_SYNC_SEND_TIMEOUT_SEC * MILLIS_PER_SEC);
+            return;
+        }
+
         QUrl targetUrl;
         targetUrl.setScheme( lit("http") );
         targetUrl.setHost( peerIter->second.peerAddress.address.toString() );

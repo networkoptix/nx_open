@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="de" sourcelanguage="en">
+<TS version="2.1" language="de" sourcelanguage="en">
 <context>
     <name>AboutDialog</name>
     <message>
@@ -1014,21 +1014,6 @@
     </message>
     <message>
         <location/>
-        <source>Ctrl+E</source>
-        <translation>Strg+E</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Ctrl+L</source>
-        <translation>Strg+L</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Ctrl+M</source>
-        <translation>Strg+M</translation>
-    </message>
-    <message>
-        <location/>
         <source>System Settings</source>
         <translation>Systemeinstellungen</translation>
     </message>
@@ -1041,11 +1026,6 @@
         <location/>
         <source>System Backup and Restore</source>
         <translation>System Backup und Wiederherstellung</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Ctrl+B</source>
-        <translation>Strg+B</translation>
     </message>
     <message>
         <location/>
@@ -1076,11 +1056,6 @@
         <location/>
         <source>&amp;Bookmarks...</source>
         <translation>&amp;Lesezeichen...</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Bookmarks List (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+B&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Öffne Lesezeichenliste (&lt;span style=&quot; font-weight:600;&quot;&gt;Strg+B&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>

@@ -163,7 +163,7 @@ void QnDatabaseManagementWidget::at_restoreButton_clicked() {
         QMessageBox::information(this,
                                  tr("Information"),
                                  tr("Database was successfully restored from file '%1'. Media server will be restarted.").arg(fileName));
-        menu()->trigger(Qn::ReconnectAction);
+        menu()->trigger(QnActions::ReconnectAction);
     } else {
         NX_LOG( lit("Failed to restore Server database from file '%1'. %2").arg(fileName).arg(ec2::toString(errorCode)), cl_logERROR );
         QMessageBox::critical(this, tr("Error"), tr("An error has occurred while restoring the database from file '%1'.")

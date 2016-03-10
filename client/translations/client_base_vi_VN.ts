@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="vi_VN" sourcelanguage="en_US">
+<TS version="2.1" language="vi_VN" sourcelanguage="en_US">
 <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
@@ -320,10 +320,6 @@ to view more bookmarks</source>
         <translation>giấu FPS</translation>
     </message>
     <message>
-        <source>Ctrl+Alt+F</source>
-        <translation>Ctrl + Alt + F</translation>
-    </message>
-    <message>
         <source>Drop Resources</source>
         <translation>Tài Discard</translation>
     </message>
@@ -340,24 +336,12 @@ to view more bookmarks</source>
         <translation>việc bố trí tiếp theo</translation>
     </message>
     <message>
-        <source>Ctrl+Tab</source>
-        <translation>Ctrl+Tab</translation>
-    </message>
-    <message>
         <source>Previous Layout</source>
         <translation>cựu bố trí</translation>
     </message>
     <message>
-        <source>Ctrl+Shift+Tab</source>
-        <translation>Ctrl+Shift+Tab</translation>
-    </message>
-    <message>
         <source>Select All</source>
         <translation>chọn tất cả</translation>
-    </message>
-    <message>
-        <source>Ctrl+A</source>
-        <translation>Ctrl+A</translation>
     </message>
     <message>
         <source>Selection Changed</source>
@@ -370,10 +354,6 @@ to view more bookmarks</source>
     <message>
         <source>Go to Freespace Mode</source>
         <translation>Chuyển sang chế độ không gian miễn phí</translation>
-    </message>
-    <message>
-        <source>F11</source>
-        <translation>F11</translation>
     </message>
     <message>
         <source>Help</source>
@@ -404,16 +384,8 @@ to view more bookmarks</source>
         <translation>menu chính</translation>
     </message>
     <message>
-        <source>Alt+Space</source>
-        <translation>Alt+Space</translation>
-    </message>
-    <message>
         <source>Connect to Server...</source>
         <translation>Kết nối đến máy chủ...</translation>
-    </message>
-    <message>
-        <source>Ctrl+Shift+C</source>
-        <translation>Ctrl+Shift+C</translation>
     </message>
     <message>
         <source>Logout</source>
@@ -426,10 +398,6 @@ to view more bookmarks</source>
     <message>
         <source>Stop Panic Recording</source>
         <translation>Dừng khẩn cấp video</translation>
-    </message>
-    <message>
-        <source>Ctrl+P</source>
-        <translation>Ctrl+P</translation>
     </message>
     <message>
         <source>New...</source>
@@ -452,20 +420,12 @@ to view more bookmarks</source>
         <translation>Tab thêm</translation>
     </message>
     <message>
-        <source>Ctrl+T</source>
-        <translation>Ctrl+T</translation>
-    </message>
-    <message>
         <source>Window</source>
         <translation>cửa sổ</translation>
     </message>
     <message>
         <source>New Window</source>
         <translation>Cửa sổ mới được mở ra</translation>
-    </message>
-    <message>
-        <source>Ctrl+N</source>
-        <translation>Ctrl+N</translation>
     </message>
     <message>
         <source>User...</source>
@@ -496,10 +456,6 @@ to view more bookmarks</source>
         <translation>văn khố...</translation>
     </message>
     <message>
-        <source>Ctrl+O</source>
-        <translation>Ctrl+O</translation>
-    </message>
-    <message>
         <source>Layout(s)...</source>
         <translation>layout...</translation>
     </message>
@@ -512,20 +468,8 @@ to view more bookmarks</source>
         <translation>Lưu lại giao diện hiện tại</translation>
     </message>
     <message>
-        <source>Ctrl+S</source>
-        <translation>Ctrl+S</translation>
-    </message>
-    <message>
         <source>Save Current Layout As...</source>
         <translation>Lưu lại giao diện hiện tại…</translation>
-    </message>
-    <message>
-        <source>Ctrl+Shift+S</source>
-        <translation>Ctrl+Shift+S</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+S</source>
-        <translation>Ctrl + Alt + S</translation>
     </message>
     <message>
         <source>Save Video Wall View</source>
@@ -540,14 +484,6 @@ to view more bookmarks</source>
         <translation>Dừng Screen Video Capture</translation>
     </message>
     <message>
-        <source>Alt+R</source>
-        <translation>Alt+R</translation>
-    </message>
-    <message>
-        <source>Esc</source>
-        <translation>Esc</translation>
-    </message>
-    <message>
         <source>Stop current action</source>
         <translation>Ngừng các hành động hiện tại</translation>
     </message>
@@ -558,18 +494,6 @@ to view more bookmarks</source>
     <message>
         <source>Exit Fullscreen</source>
         <translation>Để lại toàn màn hình</translation>
-    </message>
-    <message>
-        <source>Ctrl+F</source>
-        <translation>Ctrl+F</translation>
-    </message>
-    <message>
-        <source>Alt+Enter</source>
-        <translation>Alt+Enter</translation>
-    </message>
-    <message>
-        <source>Alt+Return</source>
-        <translation>Alt+Return</translation>
     </message>
     <message>
         <source>Minimize</source>
@@ -600,18 +524,6 @@ to view more bookmarks</source>
         <translation>Mở một khách hàng web…</translation>
     </message>
     <message>
-        <source>Ctrl+E</source>
-        <translation>Ctrl+E</translation>
-    </message>
-    <message>
-        <source>Ctrl+L</source>
-        <translation>Ctrl+L</translation>
-    </message>
-    <message>
-        <source>Ctrl+M</source>
-        <translation>Ctrl+M</translation>
-    </message>
-    <message>
         <source>How-to Videos and FAQ...</source>
         <translation>Hỏi đáp về video và giảng dạy...</translation>
     </message>
@@ -620,24 +532,12 @@ to view more bookmarks</source>
         <translation>đối với...</translation>
     </message>
     <message>
-        <source>F1</source>
-        <translation>F1</translation>
-    </message>
-    <message>
         <source>Exit</source>
         <translation>Exit</translation>
     </message>
     <message>
-        <source>Alt+F4</source>
-        <translation>Alt+F4</translation>
-    </message>
-    <message>
         <source>Close</source>
         <translation>đóng cửa</translation>
-    </message>
-    <message>
-        <source>Ctrl+W</source>
-        <translation>Ctrl+W</translation>
     </message>
     <message>
         <source>Close All But This</source>
@@ -646,10 +546,6 @@ to view more bookmarks</source>
     <message>
         <source>Open in Layout</source>
         <translation>Bật trong cách bố trí</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+D</source>
-        <translation>Ctrl+Alt+D</translation>
     </message>
     <message>
         <source>Delayed Open Video Wall</source>
@@ -666,10 +562,6 @@ to view more bookmarks</source>
     <message>
         <source>System Administration...</source>
         <translation>quản trị hệ thống ...</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+A</source>
-        <translation>Ctrl+Alt+A</translation>
     </message>
     <message>
         <source>System Update...</source>
@@ -720,14 +612,6 @@ to view more bookmarks</source>
         <translation>Mở thư mục tập tin</translation>
     </message>
     <message>
-        <source>Ctrl+Enter</source>
-        <translation>Ctrl+Enter</translation>
-    </message>
-    <message>
-        <source>Ctrl+Return</source>
-        <translation>Ctrl+Return</translation>
-    </message>
-    <message>
         <source>Identify</source>
         <translation>Xác định</translation>
     </message>
@@ -772,24 +656,12 @@ to view more bookmarks</source>
         <translation>Tối đa hóa dự án</translation>
     </message>
     <message>
-        <source>Enter</source>
-        <translation>vào</translation>
-    </message>
-    <message>
-        <source>Return</source>
-        <translation>trở về</translation>
-    </message>
-    <message>
         <source>Restore Item</source>
         <translation>trở lại với dự án</translation>
     </message>
     <message>
         <source>Show Info</source>
         <translation>Thông tin hiển thị</translation>
-    </message>
-    <message>
-        <source>Alt+I</source>
-        <translation>Alt+I</translation>
     </message>
     <message>
         <source>Hide Info</source>
@@ -856,10 +728,6 @@ to view more bookmarks</source>
         <translation>Display chuyển</translation>
     </message>
     <message>
-        <source>Alt+G</source>
-        <translation>Alt+G</translation>
-    </message>
-    <message>
         <source>Hide Motion/Smart Search</source>
         <translation>Hide chuyển / Wisdom Tìm kiếm</translation>
     </message>
@@ -880,24 +748,12 @@ to view more bookmarks</source>
         <translation>Kiểm tra các tập tin watermark</translation>
     </message>
     <message>
-        <source>Alt+C</source>
-        <translation>Alt+C</translation>
-    </message>
-    <message>
         <source>Take Screenshot</source>
         <translation>Screen Capture</translation>
     </message>
     <message>
-        <source>Alt+S</source>
-        <translation>Alt+S</translation>
-    </message>
-    <message>
         <source>Image Enhancement...</source>
         <translation>image Enhancement...</translation>
-    </message>
-    <message>
-        <source>Alt+J</source>
-        <translation>Alt+J</translation>
     </message>
     <message>
         <source>Create Zoom Window</source>
@@ -928,20 +784,12 @@ to view more bookmarks</source>
         <translation>Gỡ bỏ khỏi bố trí</translation>
     </message>
     <message>
-        <source>Del</source>
-        <translation>xóa bỏ</translation>
-    </message>
-    <message>
         <source>Delete</source>
         <translation>xóa bỏ</translation>
     </message>
     <message>
         <source>Rename</source>
         <translation>đổi tên</translation>
-    </message>
-    <message>
-        <source>F2</source>
-        <translation>F2</translation>
     </message>
     <message>
         <source>Delete from Disk</source>
@@ -1016,24 +864,12 @@ to view more bookmarks</source>
         <translation>Ngừng nhảy vòng</translation>
     </message>
     <message>
-        <source>Alt+T</source>
-        <translation>Alt+T</translation>
-    </message>
-    <message>
         <source>Mark Selection Start</source>
         <translation>Chọn đánh dấu sự khởi đầu</translation>
     </message>
     <message>
-        <source>[</source>
-        <translation>[</translation>
-    </message>
-    <message>
         <source>Mark Selection End</source>
         <translation>End của các marker chọn lọc</translation>
-    </message>
-    <message>
-        <source>]</source>
-        <translation>]</translation>
     </message>
     <message>
         <source>Clear Selection</source>
@@ -1064,50 +900,6 @@ to view more bookmarks</source>
         <translation>Preview Tìm kiếm...</translation>
     </message>
     <message>
-        <source>Ctrl+Alt+Shift++</source>
-        <translation>Ctrl+Alt+Shift+ +</translation>
-    </message>
-    <message>
-        <source>Increment Debug Counter</source>
-        <translation>Quầy gỡ lỗi gia tăng</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift+-</source>
-        <translation>Ctrl+Alt+Shift+ -</translation>
-    </message>
-    <message>
-        <source>Decrement Debug Counter</source>
-        <translation>Giảm debug counter</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift+R</source>
-        <translation>Ctrl+Alt+Shift+ R</translation>
-    </message>
-    <message>
-        <source>Show Resource Pool</source>
-        <translation>Hồ bơi tài nguyên hiển thị</translation>
-    </message>
-    <message>
-        <source>Calibrate PTZ</source>
-        <translation>Correction PTZ</translation>
-    </message>
-    <message>
-        <source>Get PTZ Position</source>
-        <translation>Có được vị trí PTZ</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift+D</source>
-        <translation>Ctrl+Alt+Shift+D</translation>
-    </message>
-    <message>
-        <source>Debug Control Panel</source>
-        <translation>debug (DEBUG) giao diện điều khiển bảng điều khiển</translation>
-    </message>
-    <message>
-        <source>Space</source>
-        <translation>Spacebar</translation>
-    </message>
-    <message>
         <source>Play</source>
         <translation>Broadcast</translation>
     </message>
@@ -1116,72 +908,36 @@ to view more bookmarks</source>
         <translation>giờ nghĩ giảo lao</translation>
     </message>
     <message>
-        <source>Ctrl+Left</source>
-        <translation>Ctrl+Left</translation>
-    </message>
-    <message>
         <source>Previous Frame</source>
         <translation>Trên một khung</translation>
-    </message>
-    <message>
-        <source>Ctrl+Right</source>
-        <translation>Ctrl+Righ</translation>
     </message>
     <message>
         <source>Next Frame</source>
         <translation>Các khung hình tiếp theo</translation>
     </message>
     <message>
-        <source>Z</source>
-        <translation>Z</translation>
-    </message>
-    <message>
         <source>To Start</source>
         <translation>đến điểm khởi</translation>
-    </message>
-    <message>
-        <source>X</source>
-        <translation>X</translation>
     </message>
     <message>
         <source>To End</source>
         <translation>Để một điểm kết thúc</translation>
     </message>
     <message>
-        <source>Ctrl+Up</source>
-        <translation>Ctrl+Up</translation>
-    </message>
-    <message>
         <source>Volume Down</source>
         <translation>volume Down</translation>
-    </message>
-    <message>
-        <source>Ctrl+Down</source>
-        <translation>Ctrl+Down</translation>
     </message>
     <message>
         <source>Volume Up</source>
         <translation>tăng cường khối lượng</translation>
     </message>
     <message>
-        <source>M</source>
-        <translation>M</translation>
-    </message>
-    <message>
         <source>Toggle Mute</source>
         <translation>Chuyển chế độ im lặng</translation>
     </message>
     <message>
-        <source>L</source>
-        <translation>L</translation>
-    </message>
-    <message>
         <source>Jump to Live</source>
         <translation>Chuyển sang hình ảnh thời gian thực</translation>
-    </message>
-    <message>
-        <source>S</source>
-        <translation>S</translation>
     </message>
     <message>
         <source>Synchronize Streams</source>
@@ -1246,10 +1002,6 @@ to view more bookmarks</source>
     <message>
         <source>Unpin Notifications</source>
         <translation>Hiển thị một thông báo là không cố định</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+T</source>
-        <translation>Ctrl+Alt+T</translation>
     </message>
     <message>
         <source>Disable Background Animation</source>
@@ -1378,10 +1130,6 @@ to view more bookmarks</source>
     <message>
         <source>Cameras to Backup...</source>
         <translation>Máy ảnh để sao lưu ...</translation>
-    </message>
-    <message>
-        <source>Ctrl+B</source>
-        <translation>Ctrl+B</translation>
     </message>
     <message>
         <source>Show Bookmarks</source>
@@ -1958,9 +1706,11 @@ to view more bookmarks</source>
         <source>Source camera</source>
         <translation>máy ảnh nguồn</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Source and %n more cameras</source>
-        <translation>Nguồn và %n máy ảnh hơn</translation>
+        <translation type="unfinished">
+            <numerusform>Nguồn và %n máy ảnh hơn</numerusform>
+        </translation>
     </message>
     <message>
         <source>N/A</source>
@@ -5036,17 +4786,23 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
         <source>&lt;All My I/O Modules&gt;</source>
         <translation>&lt;Tất cả Mỹ I / O module&gt;</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n device(s)&gt;</source>
-        <translation>&lt;%n thiết bị&gt;</translation>
+        <translation type="unfinished">
+            <numerusform>&lt;%n thiết bị&gt;</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n camera(s)&gt;</source>
-        <translation>&lt;%n camera(s)&gt;</translation>
+        <translation type="unfinished">
+            <numerusform>&lt;%n camera(s)&gt;</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n I/O module(s)&gt;</source>
-        <translation>&lt;%n I/O module(s)&gt;</translation>
+        <translation type="unfinished">
+            <numerusform>&lt;%n I/O module(s)&gt;</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -5801,13 +5557,17 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
         <source>Notice: Only further recording will be backed up. Backup process will ignore existing footage.</source>
         <translation>Chú ý: Chỉ ghi thêm sẽ được sao lưu. Quá trình sao lưu sẽ bỏ qua cảnh hiện tại.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n Camera(s)</source>
-        <translation>%n Máy ảnh</translation>
+        <translation type="unfinished">
+            <numerusform>%n Máy ảnh</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n Device(s)</source>
-        <translation>%n Thiết bị</translation>
+        <translation type="unfinished">
+            <numerusform>%n Thiết bị</numerusform>
+        </translation>
     </message>
     <message>
         <source>Backup is finished</source>
@@ -6845,9 +6605,11 @@ Nếu bạn muốn vô hiệu hóa tính năng này bạn có thể làm như v�
         <source>Press %1 to search bookmarks</source>
         <translation>Bấm %1 vào bookmark tìm kiếm</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Are you sure you want to delete these %n bookmarks?</source>
-        <translation>Bạn có chắc chắn muốn xóa những %n dấu không?</translation>
+        <translation type="unfinished">
+            <numerusform>Bạn có chắc chắn muốn xóa những %n dấu không?</numerusform>
+        </translation>
     </message>
 </context>
 <context>

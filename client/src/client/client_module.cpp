@@ -42,6 +42,11 @@
 #include <utils/common/command_line_parser.h>
 #include <utils/common/synctime.h>
 
+#include <statistics/statistics_manager.h>
+#include <statistics/storage/statistics_file_storage.h>
+#include <statistics/settings/statistics_settings_watcher.h>
+#include <ui/statistics/modules/controls_statistics_module.h>
+
 #include "version.h"
 
 namespace
@@ -61,17 +66,39 @@ namespace
             translation = translationManager->loadTranslation(settings->translationPath());
 
         /* Check if qnSettings value is invalid. */
-        if (translation.isEmpty()) 
+        if (translation.isEmpty())
             translation = translationManager->defaultTranslation();
 
         translationManager->installTranslation(translation);
         return std::move(translationManager);
     }
+
+    void initializeStatisticsManager(QnCommonModule *commonModule)
+    {
+        const auto statManager = commonModule->instance<QnStatisticsManager>();
+
+        statManager->setClientId(qnSettings->pcUuid());
+        statManager->setStorage(QnStatisticsStoragePtr(new QnStatisticsFileStorage()));
+        statManager->setSettings(QnStatisticsSettingsPtr(new QnStatisticsSettingsWatcher()));
+
+        static const QScopedPointer<QnControlsStatisticsModule> controlsStatisticsModule(
+            new QnControlsStatisticsModule());
+
+        statManager->registerStatisticsModule(lit("controls"), controlsStatisticsModule.data());
+
+        QObject::connect(QnClientMessageProcessor::instance(), &QnClientMessageProcessor::connectionClosed
+            , statManager, &QnStatisticsManager::saveCurrentStatistics);
+        QObject::connect(QnClientMessageProcessor::instance(), &QnClientMessageProcessor::connectionOpened
+            , statManager, &QnStatisticsManager::resetStatistics);
+        QObject::connect(QnClientMessageProcessor::instance(), &QnClientMessageProcessor::initialResourcesReceived
+            , statManager, &QnStatisticsManager::sendStatistics);
+
+    }
 }
 
 QnClientModule::QnClientModule(const QnStartupParameters &startupParams
     , QObject *parent)
-    : QObject(parent) 
+    : QObject(parent)
 {
     Q_INIT_RESOURCE(client);
     Q_INIT_RESOURCE(appserver2);
@@ -81,11 +108,11 @@ QnClientModule::QnClientModule(const QnStartupParameters &startupParams
     /* Set up application parameters so that QSettings know where to look for settings. */
     QApplication::setOrganizationName(QnAppInfo::organizationName());
     QApplication::setApplicationName(lit(QN_APPLICATION_NAME));
-    QApplication::setApplicationDisplayName(lit(QN_APPLICATION_DISPLAY_NAME));    
+    QApplication::setApplicationDisplayName(lit(QN_APPLICATION_DISPLAY_NAME));
     if (QApplication::applicationVersion().isEmpty())
         QApplication::setApplicationVersion(QnAppInfo::applicationVersion());
     QApplication::setStartDragDistance(20);
- 
+
     /* We don't want changes in desktop color settings to mess up our custom style. */
     QApplication::setDesktopSettingsAware(false);
 
@@ -105,7 +132,7 @@ QnClientModule::QnClientModule(const QnStartupParameters &startupParams
     common->store<QnClientSettings>(clientSettings.take());
 
     auto clientInstanceManager = new QnClientInstanceManager(); /* Depends on QnClientSettings */
-    common->store<QnClientInstanceManager>(clientInstanceManager); 
+    common->store<QnClientInstanceManager>(clientInstanceManager);
     common->setModuleGUID(clientInstanceManager->instanceGuid());
 
     common->store<QnGlobals>(new QnGlobals());
@@ -126,6 +153,8 @@ QnClientModule::QnClientModule(const QnStartupParameters &startupParams
     common->store<QnCameraBookmarksManager>(new QnCameraBookmarksManager());
     common->store<QnServerStorageManager>(new QnServerStorageManager());
 
+    initializeStatisticsManager(common);
+
 #ifdef Q_OS_WIN
     win32_exception::setCreateFullCrashDump(qnSettings->createFullCrashDump());
 #endif
@@ -142,6 +171,5 @@ QnClientModule::~QnClientModule() {
     QApplication::setOrganizationName(QString());
     QApplication::setApplicationName(QString());
     QApplication::setApplicationDisplayName(QString());
-    QApplication::setApplicationVersion(QString());     
+    QApplication::setApplicationVersion(QString());
 }
-

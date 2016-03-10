@@ -95,7 +95,7 @@ void QnWorkbenchContextAware::afterContextInitialized() {
     //do nothing
 }
 
-QAction *QnWorkbenchContextAware::action(const Qn::ActionId id) const {
+QAction *QnWorkbenchContextAware::action(const QnActions::IDType id) const {
     Q_ASSERT_X(m_initialized, Q_FUNC_INFO, "Initialization failed");
     return context()->action(id);
 }

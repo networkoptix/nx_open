@@ -139,9 +139,12 @@
                             <arguments>
                                 <argument>-jar</argument>
                                 <argument>${environment.dir}/bin/apidoctool.jar</argument>
-                                <argument>-code-to-xml</argument>                                
+                                <argument>code-to-xml</argument>
+                                <argument>-vms-path</argument>
                                 <argument>${root.dir}</argument>
+                                <argument>-template-xml</argument>
                                 <argument>${root.dir}/mediaserver_core/api/api_template.xml</argument>                                
+                                <argument>-output-xml</argument>
                                 <argument>${project.build.directory}/additional-resources/static/api.xml</argument>
                             </arguments>
                         </configuration>

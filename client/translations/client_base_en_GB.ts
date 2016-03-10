@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="en_US" sourcelanguage="en">
+<TS version="2.1" language="en_US" sourcelanguage="en">
 <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
@@ -198,11 +198,13 @@ to view more bookmarks</source>
         <source>%n millisecond(s)</source>
         <translation>
             <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n second(s)</source>
         <translation>
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -210,11 +212,13 @@ to view more bookmarks</source>
         <source>%n minute(s)</source>
         <translation>
             <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n hour(s)</source>
         <translation>
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -222,11 +226,13 @@ to view more bookmarks</source>
         <source>%n day(s)</source>
         <translation>
             <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n week(s)</source>
         <translation>
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -234,11 +240,13 @@ to view more bookmarks</source>
         <source>%n month(s)</source>
         <translation>
             <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n year(s)</source>
         <translation>
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -319,14 +327,6 @@ to view more bookmarks</source>
         <translation></translation>
     </message>
     <message>
-        <source>Ctrl+Alt+F</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+D</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Drop Resources</source>
         <translation></translation>
     </message>
@@ -347,23 +347,11 @@ to view more bookmarks</source>
         <translation></translation>
     </message>
     <message>
-        <source>Ctrl+Tab</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Previous Layout</source>
         <translation></translation>
     </message>
     <message>
-        <source>Ctrl+Shift+Tab</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Select All</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Ctrl+A</source>
         <translation></translation>
     </message>
     <message>
@@ -380,10 +368,6 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Go to Freespace Mode</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>F11</source>
         <translation></translation>
     </message>
     <message>
@@ -427,15 +411,7 @@ to view more bookmarks</source>
         <translation></translation>
     </message>
     <message>
-        <source>Alt+Space</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Connect to Server...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Ctrl+Shift+C</source>
         <translation></translation>
     </message>
     <message>
@@ -448,10 +424,6 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Stop Panic Recording</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Ctrl+P</source>
         <translation></translation>
     </message>
     <message>
@@ -475,19 +447,11 @@ to view more bookmarks</source>
         <translation></translation>
     </message>
     <message>
-        <source>Ctrl+T</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Window</source>
         <translation></translation>
     </message>
     <message>
         <source>New Window</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Ctrl+N</source>
         <translation></translation>
     </message>
     <message>
@@ -519,10 +483,6 @@ to view more bookmarks</source>
         <translation></translation>
     </message>
     <message>
-        <source>Ctrl+O</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Layout(s)...</source>
         <translation></translation>
     </message>
@@ -535,15 +495,7 @@ to view more bookmarks</source>
         <translation></translation>
     </message>
     <message>
-        <source>Ctrl+S</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Save Current Layout As...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+S</source>
         <translation></translation>
     </message>
     <message>
@@ -556,14 +508,6 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Stop Screen Recording</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Alt+R</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Esc</source>
         <translation></translation>
     </message>
     <message>
@@ -591,22 +535,6 @@ to view more bookmarks</source>
         <translation></translation>
     </message>
     <message>
-        <source>Ctrl+F</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Alt+Enter</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Ctrl+Shift+S</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Alt+Return</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Show Message</source>
         <translation></translation>
     </message>
@@ -627,10 +555,6 @@ to view more bookmarks</source>
         <translation></translation>
     </message>
     <message>
-        <source>Ctrl+Alt+A</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Open Web Client...</source>
         <translation></translation>
     </message>
@@ -640,18 +564,6 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Local Settings...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Ctrl+E</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Ctrl+L</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Ctrl+M</source>
         <translation></translation>
     </message>
     <message>
@@ -667,15 +579,7 @@ to view more bookmarks</source>
         <translation></translation>
     </message>
     <message>
-        <source>F1</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Exit</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Alt+F4</source>
         <translation></translation>
     </message>
     <message>
@@ -719,14 +623,6 @@ to view more bookmarks</source>
         <translation></translation>
     </message>
     <message>
-        <source>Ctrl+Enter</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Ctrl+Return</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Identify</source>
         <translation></translation>
     </message>
@@ -748,10 +644,6 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Delete</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Del</source>
         <translation></translation>
     </message>
     <message>
@@ -779,23 +671,11 @@ to view more bookmarks</source>
         <translation>Maximise Item</translation>
     </message>
     <message>
-        <source>Enter</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Return</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Restore Item</source>
         <translation></translation>
     </message>
     <message>
         <source>Show Info</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Alt+I</source>
         <translation></translation>
     </message>
     <message>
@@ -851,10 +731,6 @@ to view more bookmarks</source>
         <translation></translation>
     </message>
     <message>
-        <source>Alt+G</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Hide Motion/Smart Search</source>
         <translation></translation>
     </message>
@@ -875,23 +751,11 @@ to view more bookmarks</source>
         <translation></translation>
     </message>
     <message>
-        <source>Alt+C</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Take Screenshot</source>
         <translation></translation>
     </message>
     <message>
-        <source>Alt+S</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Image Enhancement...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Alt+J</source>
         <translation></translation>
     </message>
     <message>
@@ -924,10 +788,6 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Rename</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>F2</source>
         <translation></translation>
     </message>
     <message>
@@ -1003,15 +863,7 @@ to view more bookmarks</source>
         <translation></translation>
     </message>
     <message>
-        <source>Alt+T</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Close</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Ctrl+W</source>
         <translation></translation>
     </message>
     <message>
@@ -1023,15 +875,7 @@ to view more bookmarks</source>
         <translation></translation>
     </message>
     <message>
-        <source>[</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Mark Selection End</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>]</source>
         <translation></translation>
     </message>
     <message>
@@ -1063,50 +907,6 @@ to view more bookmarks</source>
         <translation></translation>
     </message>
     <message>
-        <source>Ctrl+Alt+Shift++</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Increment Debug Counter</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift+-</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Decrement Debug Counter</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift+R</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Show Resource Pool</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Calibrate PTZ</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Get PTZ Position</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift+D</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Debug Control Panel</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Space</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Play</source>
         <translation></translation>
     </message>
@@ -1115,15 +915,7 @@ to view more bookmarks</source>
         <translation></translation>
     </message>
     <message>
-        <source>Ctrl+Left</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Previous Frame</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Ctrl+Right</source>
         <translation></translation>
     </message>
     <message>
@@ -1131,15 +923,7 @@ to view more bookmarks</source>
         <translation></translation>
     </message>
     <message>
-        <source>Z</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>To Start</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>X</source>
         <translation></translation>
     </message>
     <message>
@@ -1147,15 +931,7 @@ to view more bookmarks</source>
         <translation></translation>
     </message>
     <message>
-        <source>Ctrl+Up</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Volume Down</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Ctrl+Down</source>
         <translation></translation>
     </message>
     <message>
@@ -1163,23 +939,11 @@ to view more bookmarks</source>
         <translation></translation>
     </message>
     <message>
-        <source>M</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Toggle Mute</source>
         <translation></translation>
     </message>
     <message>
-        <source>L</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Jump to Live</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>S</source>
         <translation></translation>
     </message>
     <message>
@@ -1244,10 +1008,6 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Unpin Notifications</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+T</source>
         <translation></translation>
     </message>
     <message>
@@ -1376,10 +1136,6 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Cameras to Backup...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Ctrl+B</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1661,6 +1417,7 @@ to view more bookmarks</source>
         <source>%n action(s)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -1820,11 +1577,13 @@ to view more bookmarks</source>
         <source>%1 of %n devices</source>
         <translation type="unfinished">
             <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%1 of %n cameras</source>
         <translation type="unfinished">
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -1847,6 +1606,7 @@ to view more bookmarks</source>
     <message numerus="yes">
         <source>%1 of %n I/O modules</source>
         <translation type="unfinished">
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -1963,9 +1723,12 @@ to view more bookmarks</source>
         <source>Source camera</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Source and %n more cameras</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>N/A</source>
@@ -2201,11 +1964,13 @@ to view more bookmarks</source>
         <source>%n devices added successfully.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Error while adding %n devices.</source>
         <translation type="unfinished">
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -2224,6 +1989,7 @@ to view more bookmarks</source>
     <message numerus="yes">
         <source>%n devices found</source>
         <translation type="unfinished">
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -2392,11 +2158,13 @@ to view more bookmarks</source>
         <source>%n devices found</source>
         <translation type="unfinished">
             <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n cameras found</source>
         <translation type="unfinished">
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -2411,6 +2179,7 @@ to view more bookmarks</source>
     <message numerus="yes">
         <source>%n I/O modules found</source>
         <translation type="unfinished">
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -2474,6 +2243,7 @@ to view more bookmarks</source>
     <message numerus="yes">
         <source>Recording or motion detection is disabled for %1</source>
         <translation>
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -2622,11 +2392,13 @@ to view more bookmarks</source>
         <source>Apply changes to the following %n devices?</source>
         <translation type="unfinished">
             <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Apply changes to the following %n cameras?</source>
         <translation type="unfinished">
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -2661,6 +2433,7 @@ to view more bookmarks</source>
     <message numerus="yes">
         <source>Apply changes to the following %n I/O modules?</source>
         <translation type="unfinished">
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -3052,11 +2825,13 @@ to view more bookmarks</source>
         <source>Event log for period from %1 to %2 - %n event(s) found</source>
         <translation>
             <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Event log for %1 - %n event(s) found</source>
         <translation>
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -3131,6 +2906,7 @@ to view more bookmarks</source>
         <source>%1 (%n times)</source>
         <comment>%1 is description of event. Will be replaced in runtime</comment>
         <translation type="unfinished">
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -3545,6 +3321,7 @@ to view more bookmarks</source>
         <source>Test completed successfully: %n users found.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
 </context>
@@ -3752,11 +3529,13 @@ to view more bookmarks</source>
         <source>At least %n %2 are required</source>
         <translation type="unfinished">
             <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n %2 are currently in use</source>
         <translation type="unfinished">
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -3877,11 +3656,13 @@ to view more bookmarks</source>
         <source>Use analog licenses to view these %n cameras</source>
         <translation type="unfinished">
             <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Use licenses for selected %n devices</source>
         <translation type="unfinished">
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -3889,11 +3670,13 @@ to view more bookmarks</source>
         <source>Use licenses for selected %n cameras</source>
         <translation type="unfinished">
             <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Use licenses for selected %n I/O modules</source>
         <translation type="unfinished">
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -4580,6 +4363,7 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>This preset will be activated after %n minutes of inactivity</source>
         <translation>
             <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -4698,6 +4482,7 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>%n seconds</source>
         <translation>
             <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -4764,11 +4549,13 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>%n years</source>
         <translation type="unfinished">
             <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n months</source>
         <translation type="unfinished">
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -4776,11 +4563,13 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>%n days</source>
         <translation type="unfinished">
             <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n hours</source>
         <translation type="unfinished">
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -4820,11 +4609,13 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Total %n devices</source>
         <translation type="unfinished">
             <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Total %n cameras</source>
         <translation type="unfinished">
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -4859,6 +4650,7 @@ If you understand this and would like to proceed please click Merge to continue.
     <message numerus="yes">
         <source>Total %n I/O modules</source>
         <translation type="unfinished">
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -5046,17 +4838,26 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>&lt;All My I/O Modules&gt;</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n device(s)&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n camera(s)&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n I/O module(s)&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -5430,6 +5231,7 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Authentication failed for %n servers:</source>
         <translation type="unfinished">
             <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -5478,6 +5280,7 @@ If you understand this and would like to proceed please click Merge to continue.
     <message numerus="yes">
         <source>%n User(s)</source>
         <translation type="unfinished">
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -5814,13 +5617,19 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Notice: Only further recording will be backed up. Backup process will ignore existing footage.</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n Camera(s)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n Device(s)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Backup is finished</source>
@@ -6278,6 +6087,7 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>%n of %1 additional email addresses are invalid</source>
         <translation>
             <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -6288,11 +6098,13 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>%n User(s)</source>
         <translation>
             <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%1, %n additional</source>
         <translation>
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -6716,11 +6528,13 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Cannot move these %n devices to server %1. Server is unresponsive.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Cannot move these %n cameras to server %1. Server is unresponsive.</source>
         <translation type="unfinished">
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -6728,11 +6542,13 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Server %1 is unable to find and access these %n devices. Are you sure you would like to move them?</source>
         <translation type="unfinished">
             <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Server %1 is unable to find and access these %n cameras. Are you sure you would like to move them?</source>
         <translation type="unfinished">
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -6740,11 +6556,13 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Are you sure you want to permanently delete these %n files?</source>
         <translation type="unfinished">
             <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Are you sure you want to remove these %n items from layout?</source>
         <translation type="unfinished">
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -6752,11 +6570,13 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>These %n devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
         <translation type="unfinished">
             <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>These %n cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
         <translation type="unfinished">
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -6764,11 +6584,13 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>%n of these devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
         <translation type="unfinished">
             <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n of these cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
         <translation type="unfinished">
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -6776,11 +6598,13 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Do you really want to delete the following %n devices?</source>
         <translation type="unfinished">
             <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Do you really want to delete the following %n cameras?</source>
         <translation type="unfinished">
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -6788,11 +6612,13 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Do you really want to delete the following %n items?</source>
         <translation type="unfinished">
             <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Cannot move these %n I/O modules to server %1. Server is unresponsive.</source>
         <translation type="unfinished">
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -6800,11 +6626,13 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Server %1 is unable to find and access these %n I/O modules. Are you sure you would like to move them?</source>
         <translation type="unfinished">
             <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>These %n I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
         <translation type="unfinished">
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -6812,11 +6640,13 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>%n of these I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
         <translation type="unfinished">
             <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Do you really want to delete the following %n I/O modules?</source>
         <translation type="unfinished">
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -6859,9 +6689,12 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Press %1 to search bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Are you sure you want to delete these %n bookmarks?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -7230,6 +7063,7 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Could not save the following %n layout(s) to Server.</source>
         <translation>
             <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -7336,12 +7170,13 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>The following %n items are not saved.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Could not save the following %n items to Server.</source>
         <translation type="unfinished">
-            <numerusform>Could not save the follwing %n items to server.</numerusform>
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -7353,11 +7188,13 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>The following %n items are not deleted.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Could not delete the following %n items from Server.</source>
         <translation type="unfinished">
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -7475,7 +7312,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Update is strongly recommended.</source>
-        <translation>Update is recommended.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Release Notes</source>
@@ -7487,19 +7324,19 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>New version %1 is available.</source>
-        <translation type="unfinished">A newer version is available.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>A newer version is available.</source>
-        <translation type="unfinished">A newer version is available.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Update is recommended.</source>
-        <translation type="unfinished">Update is recommended.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Do not notify me again about this update.</source>
-        <translation type="unfinished">Do not notify me again about this update.</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7540,6 +7377,7 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Are you sure you want to permanently delete these %n item(s)?</source>
         <translation>
             <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -7569,6 +7407,7 @@ If you understand this and would like to proceed please click Merge to continue.
     <message numerus="yes">
         <source>Are you sure you want to permanently delete these %n matrices?</source>
         <translation>
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -7620,6 +7459,7 @@ If you understand this and would like to proceed please click Merge to continue.
     <message numerus="yes">
         <source>%n items</source>
         <translation type="unfinished">
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>

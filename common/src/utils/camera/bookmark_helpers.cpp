@@ -34,7 +34,7 @@ bool helpers::isTimeWindowChanged(qint64 firstStartTimeMs
     , qint64 minStep)
 {
     return (isChangedEnough(firstStartTimeMs, secondStartTimeMs, minStep)
-        && isChangedEnough(firstEndTimeMs, secondEndTimeMs, minStep));
+        || isChangedEnough(firstEndTimeMs, secondEndTimeMs, minStep));
 }
 
 QnTimePeriod helpers::extendTimeWindow(qint64 startTimeMs

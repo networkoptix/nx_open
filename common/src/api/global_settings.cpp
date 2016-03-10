@@ -46,10 +46,12 @@ namespace {
     const QString nameSignature(lit("emailSignature"));
     const QString nameSupportEmail(lit("emailSupportEmail"));
     const QString nameUpdateNotificationsEnabled(lit("updateNotificationsEnabled"));
+    const QString nameTimeSynchronizationEnabled(lit("timeSynchronizationEnabled"));
     const QString nameServerAutoDiscoveryEnabled(lit("serverAutoDiscoveryEnabled"));
     const QString nameBackupQualities(lit("backupQualities"));
     const QString nameBackupNewCamerasByDefault(lit("backupNewCamerasByDefault"));
     const QString nameStatisticsAllowed(lit("statisticsAllowed"));
+	const QString nameCrossdomainEnabled(lit("crossdomainEnabled"));
 
     const QString ldapUri(lit("ldapUri"));
     const QString ldapAdminDn(lit("ldapAdminDn"));
@@ -161,6 +163,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors() {
     m_backupQualitiesAdaptor = new QnLexicalResourcePropertyAdaptor<Qn::CameraBackupQualities>(nameBackupQualities, Qn::CameraBackup_Both, this);
     m_backupNewCamerasByDefaultAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameBackupNewCamerasByDefault, false, this);
     m_statisticsAllowedAdaptor = new QnLexicalResourcePropertyAdaptor<QnOptionalBool>(nameStatisticsAllowed, QnOptionalBool(), this);
+	m_crossdomainXmlEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameCrossdomainEnabled, true, this);	
 
     QList<QnAbstractResourcePropertyAdaptor*> ec2Adaptors;
     m_ec2ConnectionKeepAliveTimeoutAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
@@ -183,6 +186,11 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors() {
         kServerDiscoveryPingTimeoutDefault,
         this);
     ec2Adaptors << m_serverDiscoveryPingTimeout;
+    m_timeSynchronizationEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
+        nameTimeSynchronizationEnabled,
+        true,
+        this);
+    ec2Adaptors << m_timeSynchronizationEnabledAdaptor;
 
     for(auto adaptor: ec2Adaptors)
         connect(
@@ -212,6 +220,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors() {
         << m_backupQualitiesAdaptor
         << m_backupNewCamerasByDefaultAdaptor
         << m_statisticsAllowedAdaptor
+		<< m_crossdomainXmlEnabledAdaptor
         << ec2Adaptors
         << m_arecontRtspEnabled
         ;
@@ -255,6 +264,14 @@ bool QnGlobalSettings::isServerAutoDiscoveryEnabled() const {
 
 void QnGlobalSettings::setServerAutoDiscoveryEnabled(bool enabled) {
     m_serverAutoDiscoveryEnabledAdaptor->setValue(enabled);
+}
+
+bool QnGlobalSettings::isCrossdomainXmlEnabled() const {
+    return m_crossdomainXmlEnabledAdaptor->value();
+}
+
+void QnGlobalSettings::setCrossdomainXmlEnabled(bool enabled) {
+    m_crossdomainXmlEnabledAdaptor->setValue(enabled);
 }
 
 void QnGlobalSettings::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
@@ -427,6 +444,10 @@ void QnGlobalSettings::setServerDiscoveryPingTimeout(std::chrono::seconds newInt
 std::chrono::seconds QnGlobalSettings::serverDiscoveryAliveCheckTimeout() const
 {
     return connectionKeepAliveTimeout() * 3;   //3 is here to keep same values as before by default
+}
+
+bool QnGlobalSettings::isTimeSynchronizationEnabled() const {
+    return m_timeSynchronizationEnabledAdaptor->value();
 }
 
 bool QnGlobalSettings::arecontRtspEnabled() const

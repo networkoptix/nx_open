@@ -167,11 +167,11 @@ void QnCameraSettingsDialog::buttonBoxClicked(QDialogButtonBox::StandardButton b
 }
 
 void QnCameraSettingsDialog::at_diagnoseButton_clicked() {
-    menu()->trigger(Qn::CameraIssuesAction, m_settingsWidget->cameras());
+    menu()->trigger(QnActions::CameraIssuesAction, m_settingsWidget->cameras());
 }
 
 void QnCameraSettingsDialog::at_rulesButton_clicked() {
-    menu()->trigger(Qn::CameraBusinessRulesAction, m_settingsWidget->cameras());
+    menu()->trigger(QnActions::CameraBusinessRulesAction, m_settingsWidget->cameras());
 }
 
 void QnCameraSettingsDialog::updateReadOnly() {
@@ -297,7 +297,7 @@ void QnCameraSettingsDialog::saveCameras(const QnVirtualCameraResourceList &came
 
 void QnCameraSettingsDialog::at_openButton_clicked() {
     QnVirtualCameraResourceList cameras = m_settingsWidget->cameras();
-    menu()->trigger(Qn::OpenInNewLayoutAction, cameras);
+    menu()->trigger(QnActions::OpenInNewLayoutAction, cameras);
     m_settingsWidget->setCameras(cameras);
     retranslateUi();
 }

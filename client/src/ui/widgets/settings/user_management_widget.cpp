@@ -175,7 +175,7 @@ void QnUserManagementWidget::openLdapSettings() {
 }
 
 void QnUserManagementWidget::createUser() {
-    menu()->triggerIfPossible(Qn::NewUserAction); //TODO: #GDM correctly set parent widget
+    menu()->triggerIfPossible(QnActions::NewUserAction); //TODO: #GDM correctly set parent widget
 }
 
 void QnUserManagementWidget::fetchUsers() {
@@ -210,7 +210,7 @@ void QnUserManagementWidget::at_usersTable_activated(const QModelIndex &index) {
     if (!user)
         return;
 
-    menu()->trigger(Qn::UserSettingsAction, QnActionParameters(user));
+    menu()->trigger(QnActions::UserSettingsAction, QnActionParameters(user));
 }
 
 void QnUserManagementWidget::at_usersTable_clicked(const QModelIndex &index) {
@@ -264,7 +264,7 @@ void QnUserManagementWidget::deleteSelected() {
     if (usersToDelete.isEmpty())
         return;
 
-    menu()->trigger(Qn::RemoveFromServerAction, usersToDelete);
+    menu()->trigger(QnActions::RemoveFromServerAction, usersToDelete);
 }
 
 

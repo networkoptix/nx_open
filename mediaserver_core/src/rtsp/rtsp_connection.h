@@ -82,7 +82,7 @@ private:
     void parseRequest();
     void initResponse(int code = 200, const QString& message = "OK");
     void generateSessionId();
-    void sendResponse(int code);
+    void sendResponse(int code, const QByteArray& contentType);
 
     int numOfVideoChannels();
     int composeDescribe();

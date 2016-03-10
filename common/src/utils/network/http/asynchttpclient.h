@@ -28,7 +28,7 @@ namespace nx_http
     //!Http client. All operations are done asynchronously
     /*!
         It is strongly recommended to connect to signals using Qt::DirectConnection and slot MUST NOT use blocking calls.
-        
+
         \note To get new instance use AsyncHttpClient::create
         \note This class methods are not thread-safe
         \note All signals are emitted from io::AIOService threads
@@ -206,7 +206,7 @@ namespace nx_http
         */
         void someMessageBodyAvailable( nx_http::AsyncHttpClientPtr );
         /*!
-            Emitted when http request is done with any result (successfully executed request and received message body, 
+            Emitted when http request is done with any result (successfully executed request and received message body,
             received response with error code, connection terminated unexpectedly).
             To get result code use method \a response()
             \note Some message body can still be stored in internal buffer. To read it, call \a AsyncHttpClient::fetchMessageBodyBuffer
@@ -408,6 +408,26 @@ namespace nx_http
         const QUrl& url,
         std::function<void(SystemError::ErrorCode, int, nx_http::StringType, nx_http::BufferType)> completionHandler,
         nx_http::AsyncHttpClientPtr httpClientCaptured);
+
+    typedef std::function<void (SystemError::ErrorCode, int httpStatus)> UploadCompletionHandler;
+
+    // Uploads specified data using POST
+    bool uploadDataAsync(const QUrl &url
+        , const QByteArray &data
+        , const QByteArray &contentType
+        , const nx_http::HttpHeaders &extraHeaders
+        , const UploadCompletionHandler &callback
+        , const AsyncHttpClient::AuthType authType = AsyncHttpClient::authBasicAndDigest
+        , const QString &user = QString()
+        , const QString &password = QString());
+
+    SystemError::ErrorCode uploadDataSync(const QUrl &url
+        , const QByteArray &data
+        , const QByteArray &contentType
+        , const QString &user
+        , const QString &password
+        , const AsyncHttpClient::AuthType authType = AsyncHttpClient::authBasicAndDigest
+        , nx_http::StatusCode::Value *httpCode = nullptr);
 }
 
 #endif  //ASYNCHTTPCLIENT_H

@@ -25,6 +25,8 @@ public:
 
     void loadData(const QnCameraBookmark &bookmark);
     void submitData(QnCameraBookmark &bookmark) const;
+
+    virtual void accept() override;
 private:
     QScopedPointer<Ui::QnCameraBookmarkDialog> ui;
 };

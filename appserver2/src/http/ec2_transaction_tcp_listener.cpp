@@ -85,7 +85,7 @@ void QnTransactionTcpProcessor::run()
     }
 
     d->response.headers.emplace(
-        "Keep-Alive",
+        Qn::EC2_CONNECTION_TIMEOUT_HEADER_NAME,
         nx_http::header::KeepAlive(
             QnGlobalSettings::instance()->connectionKeepAliveTimeout()).toString());
 
@@ -188,7 +188,7 @@ void QnTransactionTcpProcessor::run()
         }
 
         d->response.headers.emplace(
-            "Keep-Alive",
+            Qn::EC2_CONNECTION_TIMEOUT_HEADER_NAME,
             nx_http::header::KeepAlive(
                 QnGlobalSettings::instance()->connectionKeepAliveTimeout()).toString());
     }
@@ -228,7 +228,7 @@ void QnTransactionTcpProcessor::run()
         fail = true; // accept only allowed peers
 
     d->chunkedMode = false;
-    d->response.headers.emplace( "Connection", "close" );
+    //d->response.headers.emplace( "Connection", "close" );
     if( fail )
     {
         QnTransactionTransport::connectingCanceled(remoteGuid, false);
@@ -250,7 +250,7 @@ void QnTransactionTcpProcessor::run()
 
         QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(
             connectionGuid,
-            std::move(d->socket),
+            d->socket,
             requestedConnectionType,
             remotePeer,
             remoteSystemIdentityTime,

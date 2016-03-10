@@ -128,6 +128,8 @@ void QnMjpegSessionPrivate::decodeFrame(const QByteArray &data, qint64 timestamp
 
     QnMjpegSession::FrameData frameData;
     frameData.image = decompressJpegImage(data.data(), data.size());
+    if (frameData.image.isNull())
+        return;
     frameData.timestamp = timestampMs;
     frameData.presentationTime = presentationTime;
 
@@ -440,8 +442,7 @@ QnMjpegSessionPrivate::ParseResult QnMjpegSessionPrivate::parseBody() {
 
     parserState = ParseBoundary;
     int framePresentationTimeMSec = previousFrameTimestampUSec > 0 ? (frameTimestampUSec - previousFrameTimestampUSec) / 1000 : 0;
-    if (framePresentationTimeMSec > MAX_FRAME_DURATION)
-        framePresentationTimeMSec = MAX_FRAME_DURATION;
+    framePresentationTimeMSec = qBound(0, framePresentationTimeMSec, static_cast<int>(MAX_FRAME_DURATION));
 
     if (!previousFrameData.isEmpty())
         decodeFrame(previousFrameData, previousFrameTimestampUSec / 1000, framePresentationTimeMSec);

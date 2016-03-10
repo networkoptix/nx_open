@@ -95,6 +95,14 @@ bool HostAddressResolver::resolveAddressSync( const QString& hostName, HostAddre
 
     addrinfo* resolvedAddressInfo = nullptr;
     int status = getaddrinfo(hostName.toLatin1(), 0, &hints, &resolvedAddressInfo);
+
+    if (status == EAI_BADFLAGS)
+    {
+        // if the lookup failed with AI_ALL, try again without it
+        hints.ai_flags = 0;
+        status = getaddrinfo(hostName.toLatin1(), 0, &hints, &resolvedAddressInfo);
+    }
+
     if (status != 0)
     {
         SystemError::setLastErrorCode( status );

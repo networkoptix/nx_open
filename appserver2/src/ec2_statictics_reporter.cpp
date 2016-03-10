@@ -41,20 +41,20 @@ namespace ec2
         qlonglong secs;
         bool ok(true);
 
-        if (str.endsWith(lit("m"), Qt::CaseInsensitive)) 
+        if (str.endsWith(lit("m"), Qt::CaseInsensitive))
             secs = str.left(str.length() - 1).toLongLong(&ok) * 60; // minute
         else
-        if (str.endsWith(lit("h"), Qt::CaseInsensitive)) 
+        if (str.endsWith(lit("h"), Qt::CaseInsensitive))
             secs = str.left(str.length() - 1).toLongLong(&ok) * 60 * 60; // hour
-        else 
-        if (str.endsWith(lit("d"), Qt::CaseInsensitive)) 
+        else
+        if (str.endsWith(lit("d"), Qt::CaseInsensitive))
             secs = str.left(str.length() - 1).toLongLong(&ok) * 60 * 60 * 24; // day
         else
-        if (str.endsWith(lit("M"), Qt::CaseInsensitive)) 
+        if (str.endsWith(lit("M"), Qt::CaseInsensitive))
             secs = str.left(str.length() - 1).toLongLong(&ok) * 60 * 60 * 24 * 30; // month
         else
             secs = str.toLongLong(&ok); // seconds
-        
+
         return (ok && secs) ? static_cast<uint>(secs) : defaultValue;
     }
 
@@ -93,7 +93,7 @@ namespace ec2
 
         dbManager_queryOrReturn(ApiMediaServerDataExList, mediaservers);
         for (auto& ms : mediaservers) outData->mediaservers.push_back(std::move(ms));
-            
+
         dbManager_queryOrReturn(ApiCameraDataExList, cameras);
         for (ApiCameraDataEx& cam : cameras)
             if (cam.typeId != m_desktopCameraTypeId)
@@ -113,7 +113,7 @@ namespace ec2
 
         dbManager_queryOrReturn(ApiBusinessRuleDataList, bRules);
         for (auto& br : bRules) outData->businessRules.push_back(std::move(br));
-        
+
         if ((res = dbManager->doQuery(nullptr, outData->layouts)) != ErrorCode::ok)
             return res;
 
@@ -201,7 +201,7 @@ namespace ec2
         {   /* Security check */
             const auto admin = qnResPool->getAdministrator();
             Q_ASSERT_X(admin, Q_FUNC_INFO, "Administrator must exist here");
-            if (!admin) 
+            if (!admin)
                 return;
         }
 
@@ -213,7 +213,7 @@ namespace ec2
             setupTimer();
             return;
         }
-        
+
         const QDateTime now = qnSyncTime->currentDateTime().toUTC();
         const QDateTime lastTime = QDateTime::fromString(m_admin->getProperty(SR_LAST_TIME), Qt::ISODate);
         if (!lastTime.isValid())
@@ -232,7 +232,7 @@ namespace ec2
             const auto minDelay = timeCycle * MIN_DELAY_RATIO / 100;
             const auto rndDelay = timeCycle * (static_cast<uint>(qrand()) % RND_DELAY_RATIO) / 100;
             m_plannedReportTime = (lastTime.isValid() ? lastTime : now).addSecs(minDelay + rndDelay);
-            
+
             NX_LOG(lit("Ec2StaticticsReporter: Last report was at %1, the next planned for %2")
                    .arg(lastTime.isValid() ? lastTime.toString(Qt::ISODate) : lit("NEWER"))
                    .arg(m_plannedReportTime->toString(Qt::ISODate)), cl_logINFO);
@@ -312,7 +312,7 @@ namespace ec2
             m_timerCycle = TIMER_CYCLE;
             NX_LOG(lit("Ec2StaticticsReporter: Statistics report successfully sent to %1")
                    .arg(httpClient->url().toString()), cl_logINFO);
-            
+
             const auto now = qnSyncTime->currentDateTime().toUTC();
             m_plannedReportTime = boost::none;
 

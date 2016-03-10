@@ -50,10 +50,10 @@ QnAboutDialog::QnAboutDialog(QWidget *parent):
 
     setHelpTopic(this, Qn::About_Help);
 
-    if(menu()->canTrigger(Qn::ShowcaseAction)) {
+    if(menu()->canTrigger(QnActions::ShowcaseAction)) {
         QPushButton* showcaseButton = new QPushButton(this);
-        showcaseButton->setText(action(Qn::ShowcaseAction)->text());
-        connect(showcaseButton, &QPushButton::clicked, action(Qn::ShowcaseAction), &QAction::trigger);
+        showcaseButton->setText(action(QnActions::ShowcaseAction)->text());
+        connect(showcaseButton, &QPushButton::clicked, action(QnActions::ShowcaseAction), &QAction::trigger);
         ui->buttonBox->addButton(showcaseButton, QDialogButtonBox::HelpRole);
     }
 

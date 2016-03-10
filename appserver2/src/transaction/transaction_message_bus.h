@@ -94,7 +94,7 @@ namespace ec2
             QnMutexLocker lock( &m_mutex );
             if (m_connections.isEmpty())
                 return;
-            QnTransactionTransportHeader ttHeader(connectedServerPeers() << m_localPeer.id, dstPeers);
+            QnTransactionTransportHeader ttHeader(connectedServerPeers() << qnCommon->moduleGUID(), dstPeers);
             ttHeader.fillSequence();
             sendTransactionInternal(tran, ttHeader);
         }
@@ -271,7 +271,7 @@ namespace ec2
         void emitRemotePeerUnauthorized(const QnUuid& id);
     private:
         /** Info about us. */
-        ApiPeerData m_localPeer;
+        Qn::PeerType m_localPeerType;
 
         //QScopedPointer<QnBinaryTransactionSerializer> m_binaryTranSerializer;
         QScopedPointer<QnJsonTransactionSerializer> m_jsonTranSerializer;

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="de" sourcelanguage="en">
+<TS version="2.1" language="de" sourcelanguage="en">
 <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
@@ -329,14 +329,6 @@ um mehr Lesezeichen zu sehen</translation>
         <translation>FPS ausblenden</translation>
     </message>
     <message>
-        <source>Ctrl+Alt+F</source>
-        <translation>Strg+Alt+F</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+D</source>
-        <translation>Strg+Alt+D</translation>
-    </message>
-    <message>
         <source>Drop Resources</source>
         <translation>Ressourcen ablegen</translation>
     </message>
@@ -357,24 +349,12 @@ um mehr Lesezeichen zu sehen</translation>
         <translation>Nächstes Layout</translation>
     </message>
     <message>
-        <source>Ctrl+Tab</source>
-        <translation>Strg+Tab</translation>
-    </message>
-    <message>
         <source>Previous Layout</source>
         <translation>Vorheriges Layout</translation>
     </message>
     <message>
-        <source>Ctrl+Shift+Tab</source>
-        <translation>Strg+Shift+Tab</translation>
-    </message>
-    <message>
         <source>Select All</source>
         <translation>Alle auswählen</translation>
-    </message>
-    <message>
-        <source>Ctrl+A</source>
-        <translation>Strg+A</translation>
     </message>
     <message>
         <source>Selection Changed</source>
@@ -391,10 +371,6 @@ um mehr Lesezeichen zu sehen</translation>
     <message>
         <source>Go to Freespace Mode</source>
         <translation>In Freespace Modus schalten</translation>
-    </message>
-    <message>
-        <source>F11</source>
-        <translation>F11</translation>
     </message>
     <message>
         <source>Help</source>
@@ -437,16 +413,8 @@ um mehr Lesezeichen zu sehen</translation>
         <translation>Hauptmenü</translation>
     </message>
     <message>
-        <source>Alt+Space</source>
-        <translation>Alt+Leertaste</translation>
-    </message>
-    <message>
         <source>Connect to Server...</source>
         <translation>Mit Server verbinden...</translation>
-    </message>
-    <message>
-        <source>Ctrl+Shift+C</source>
-        <translation>Strg+Shift+C</translation>
     </message>
     <message>
         <source>Logout</source>
@@ -459,10 +427,6 @@ um mehr Lesezeichen zu sehen</translation>
     <message>
         <source>Stop Panic Recording</source>
         <translation>Panik-Aufnahme anhalten</translation>
-    </message>
-    <message>
-        <source>Ctrl+P</source>
-        <translation>Strg+P</translation>
     </message>
     <message>
         <source>New...</source>
@@ -485,20 +449,12 @@ um mehr Lesezeichen zu sehen</translation>
         <translation>Neuer Tab</translation>
     </message>
     <message>
-        <source>Ctrl+T</source>
-        <translation>Strg+T</translation>
-    </message>
-    <message>
         <source>Window</source>
         <translation>Fenster</translation>
     </message>
     <message>
         <source>New Window</source>
         <translation>Neues Fenster</translation>
-    </message>
-    <message>
-        <source>Ctrl+N</source>
-        <translation>Strg+N</translation>
     </message>
     <message>
         <source>User...</source>
@@ -529,10 +485,6 @@ um mehr Lesezeichen zu sehen</translation>
         <translation>Datei(en)...</translation>
     </message>
     <message>
-        <source>Ctrl+O</source>
-        <translation>Strg+O</translation>
-    </message>
-    <message>
         <source>Layout(s)...</source>
         <translation>Layout(s)...</translation>
     </message>
@@ -545,16 +497,8 @@ um mehr Lesezeichen zu sehen</translation>
         <translation>Aktuelles Layout speichern</translation>
     </message>
     <message>
-        <source>Ctrl+S</source>
-        <translation>Strg+S</translation>
-    </message>
-    <message>
         <source>Save Current Layout As...</source>
         <translation>Aktuelles Layout speichern als...</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+S</source>
-        <translation>Strg+Alt+S</translation>
     </message>
     <message>
         <source>Save Video Wall View</source>
@@ -567,14 +511,6 @@ um mehr Lesezeichen zu sehen</translation>
     <message>
         <source>Stop Screen Recording</source>
         <translation>Bildschirmaufnahme beenden</translation>
-    </message>
-    <message>
-        <source>Alt+R</source>
-        <translation>Alt+R</translation>
-    </message>
-    <message>
-        <source>Esc</source>
-        <translation>Esc</translation>
     </message>
     <message>
         <source>Stop current action</source>
@@ -601,18 +537,6 @@ um mehr Lesezeichen zu sehen</translation>
         <translation></translation>
     </message>
     <message>
-        <source>Ctrl+F</source>
-        <translation>Strg+F</translation>
-    </message>
-    <message>
-        <source>Alt+Enter</source>
-        <translation>Alt+Enter</translation>
-    </message>
-    <message>
-        <source>Alt+Return</source>
-        <translation>Alt+Return</translation>
-    </message>
-    <message>
         <source>Show Message</source>
         <translation>Nachricht anzeigen</translation>
     </message>
@@ -633,10 +557,6 @@ um mehr Lesezeichen zu sehen</translation>
         <translation>System Administration...</translation>
     </message>
     <message>
-        <source>Ctrl+Alt+A</source>
-        <translation>Strg+Alt+A</translation>
-    </message>
-    <message>
         <source>Open Web Client...</source>
         <translation>Web Client öffnen...</translation>
     </message>
@@ -647,18 +567,6 @@ um mehr Lesezeichen zu sehen</translation>
     <message>
         <source>Local Settings...</source>
         <translation>Lokale Einstellungen...</translation>
-    </message>
-    <message>
-        <source>Ctrl+E</source>
-        <translation>Strg+E</translation>
-    </message>
-    <message>
-        <source>Ctrl+L</source>
-        <translation>Strg+L</translation>
-    </message>
-    <message>
-        <source>Ctrl+M</source>
-        <translation>Strg+M</translation>
     </message>
     <message>
         <source>Merge Systems...</source>
@@ -673,16 +581,8 @@ um mehr Lesezeichen zu sehen</translation>
         <translation>Über...</translation>
     </message>
     <message>
-        <source>F1</source>
-        <translation>F1</translation>
-    </message>
-    <message>
         <source>Exit</source>
         <translation>Beenden</translation>
-    </message>
-    <message>
-        <source>Alt+F4</source>
-        <translation>Alt+F4</translation>
     </message>
     <message>
         <source>Server...</source>
@@ -725,14 +625,6 @@ um mehr Lesezeichen zu sehen</translation>
         <translation>Enthaltene Ordner öffnen</translation>
     </message>
     <message>
-        <source>Ctrl+Enter</source>
-        <translation>Strg+Enter</translation>
-    </message>
-    <message>
-        <source>Ctrl+Return</source>
-        <translation>Strg+Return</translation>
-    </message>
-    <message>
         <source>Identify</source>
         <translation>Identifiziere</translation>
     </message>
@@ -755,10 +647,6 @@ um mehr Lesezeichen zu sehen</translation>
     <message>
         <source>Delete</source>
         <translation>Löschen</translation>
-    </message>
-    <message>
-        <source>Del</source>
-        <translation>Del</translation>
     </message>
     <message>
         <source>Update Layout</source>
@@ -785,24 +673,12 @@ um mehr Lesezeichen zu sehen</translation>
         <translation>Objekt maximieren</translation>
     </message>
     <message>
-        <source>Enter</source>
-        <translation>Enter</translation>
-    </message>
-    <message>
-        <source>Return</source>
-        <translation>Return</translation>
-    </message>
-    <message>
         <source>Restore Item</source>
         <translation>Objekt wiederherstellen</translation>
     </message>
     <message>
         <source>Show Info</source>
         <translation>Info anzeigen</translation>
-    </message>
-    <message>
-        <source>Alt+I</source>
-        <translation>Alt+I</translation>
     </message>
     <message>
         <source>Hide Info</source>
@@ -857,10 +733,6 @@ um mehr Lesezeichen zu sehen</translation>
         <translation>Motion anzeigen</translation>
     </message>
     <message>
-        <source>Alt+G</source>
-        <translation>Alt+G</translation>
-    </message>
-    <message>
         <source>Hide Motion/Smart Search</source>
         <translation>Motion-Erkennbereich ausblenden</translation>
     </message>
@@ -881,24 +753,12 @@ um mehr Lesezeichen zu sehen</translation>
         <translation>Datei-Wasserzeichen prüfen</translation>
     </message>
     <message>
-        <source>Alt+C</source>
-        <translation>Alt+C</translation>
-    </message>
-    <message>
         <source>Take Screenshot</source>
         <translation>Screenshot erstellen</translation>
     </message>
     <message>
-        <source>Alt+S</source>
-        <translation>Alt+S</translation>
-    </message>
-    <message>
         <source>Image Enhancement...</source>
         <translation>Bildverbesserung...</translation>
-    </message>
-    <message>
-        <source>Alt+J</source>
-        <translation>Alt+J</translation>
     </message>
     <message>
         <source>Create Zoom Window</source>
@@ -931,10 +791,6 @@ um mehr Lesezeichen zu sehen</translation>
     <message>
         <source>Rename</source>
         <translation>Umbenennen</translation>
-    </message>
-    <message>
-        <source>F2</source>
-        <translation>F2</translation>
     </message>
     <message>
         <source>Delete from Disk</source>
@@ -1005,16 +861,8 @@ um mehr Lesezeichen zu sehen</translation>
         <translation>Kamerafahrt stoppen</translation>
     </message>
     <message>
-        <source>Alt+T</source>
-        <translation>Alt+T</translation>
-    </message>
-    <message>
         <source>Close</source>
         <translation>Schliessen</translation>
-    </message>
-    <message>
-        <source>Ctrl+W</source>
-        <translation>Strg+W</translation>
     </message>
     <message>
         <source>Close All But This</source>
@@ -1025,16 +873,8 @@ um mehr Lesezeichen zu sehen</translation>
         <translation>Auswahl als Start markieren</translation>
     </message>
     <message>
-        <source>[</source>
-        <translation>[</translation>
-    </message>
-    <message>
         <source>Mark Selection End</source>
         <translation>Auswahl als Ende markieren</translation>
-    </message>
-    <message>
-        <source>]</source>
-        <translation>]</translation>
     </message>
     <message>
         <source>Clear Selection</source>
@@ -1065,50 +905,6 @@ um mehr Lesezeichen zu sehen</translation>
         <translation>Vorschau-Suche...</translation>
     </message>
     <message>
-        <source>Ctrl+Alt+Shift++</source>
-        <translation>Strg+Alt+Shift++</translation>
-    </message>
-    <message>
-        <source>Increment Debug Counter</source>
-        <translation>Debug-Zähler erhöhen</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift+-</source>
-        <translation>Strg+Alt+Shift+-</translation>
-    </message>
-    <message>
-        <source>Decrement Debug Counter</source>
-        <translation>Debug-Zähler verringern</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift+R</source>
-        <translation>Strg+Alt+Shift+R</translation>
-    </message>
-    <message>
-        <source>Show Resource Pool</source>
-        <translation>Zeige Ressourcenpool</translation>
-    </message>
-    <message>
-        <source>Calibrate PTZ</source>
-        <translation>PTZ kalibrieren</translation>
-    </message>
-    <message>
-        <source>Get PTZ Position</source>
-        <translation>PTZ Position abfragen</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift+D</source>
-        <translation>Strg+Alt+Shift+D</translation>
-    </message>
-    <message>
-        <source>Debug Control Panel</source>
-        <translation>Debug Control Panel</translation>
-    </message>
-    <message>
-        <source>Space</source>
-        <translation>Leerzeichen</translation>
-    </message>
-    <message>
         <source>Play</source>
         <translation>Abspielen</translation>
     </message>
@@ -1117,72 +913,36 @@ um mehr Lesezeichen zu sehen</translation>
         <translation>Pause</translation>
     </message>
     <message>
-        <source>Ctrl+Left</source>
-        <translation>Strg+Links</translation>
-    </message>
-    <message>
         <source>Previous Frame</source>
         <translation>Vorheriges Bild</translation>
-    </message>
-    <message>
-        <source>Ctrl+Right</source>
-        <translation>Strg+Rechts</translation>
     </message>
     <message>
         <source>Next Frame</source>
         <translation>Nächstes Bild</translation>
     </message>
     <message>
-        <source>Z</source>
-        <translation>Z</translation>
-    </message>
-    <message>
         <source>To Start</source>
         <translation>An den Anfang</translation>
-    </message>
-    <message>
-        <source>X</source>
-        <translation>X</translation>
     </message>
     <message>
         <source>To End</source>
         <translation>An den Schluß</translation>
     </message>
     <message>
-        <source>Ctrl+Up</source>
-        <translation>Strg+Oben</translation>
-    </message>
-    <message>
         <source>Volume Down</source>
         <translation>Lautstärke reduzieren</translation>
-    </message>
-    <message>
-        <source>Ctrl+Down</source>
-        <translation>Strg+Unten</translation>
     </message>
     <message>
         <source>Volume Up</source>
         <translation>Lautstärke anheben</translation>
     </message>
     <message>
-        <source>M</source>
-        <translation>M</translation>
-    </message>
-    <message>
         <source>Toggle Mute</source>
         <translation>Stummschaltung</translation>
     </message>
     <message>
-        <source>L</source>
-        <translation>L</translation>
-    </message>
-    <message>
         <source>Jump to Live</source>
         <translation>Auf Live schalten</translation>
-    </message>
-    <message>
-        <source>S</source>
-        <translation>S</translation>
     </message>
     <message>
         <source>Synchronize Streams</source>
@@ -1249,20 +1009,12 @@ um mehr Lesezeichen zu sehen</translation>
         <translation>Nachrichten abkoppeln</translation>
     </message>
     <message>
-        <source>Ctrl+Alt+T</source>
-        <translation>Strg+Alt+T</translation>
-    </message>
-    <message>
         <source>Disable Background Animation</source>
         <translation>Hintergrundanimation deaktivieren</translation>
     </message>
     <message>
         <source>Enable Background Animation</source>
         <translation>Hintergrundanimation aktivieren</translation>
-    </message>
-    <message>
-        <source>Ctrl+Shift+S</source>
-        <translation>STRG+Shift+S</translation>
     </message>
     <message>
         <source>Merge to Currently Connected System...</source>
@@ -1387,10 +1139,6 @@ um mehr Lesezeichen zu sehen</translation>
     <message>
         <source>Cameras to Backup...</source>
         <translation>Kameras sichern...</translation>
-    </message>
-    <message>
-        <source>Ctrl+B</source>
-        <translation>STRG+B</translation>
     </message>
     <message>
         <source>Show Bookmarks</source>
@@ -1977,9 +1725,12 @@ um mehr Lesezeichen zu sehen</translation>
         <source>Source camera</source>
         <translation>Quell-Kamera</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Source and %n more cameras</source>
-        <translation>Quell-Kamera und %n weitere Kameras</translation>
+        <translation type="unfinished">
+            <numerusform>Quell-Kamera und %n weitere Kameras</numerusform>
+            <numerusform>Quell-Kamera und %n weitere Kameras</numerusform>
+        </translation>
     </message>
     <message>
         <source>N/A</source>
@@ -5095,17 +4846,26 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
         <source>&lt;All My I/O Modules&gt;</source>
         <translation>&lt;Alle meine I/O Module&gt;</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n device(s)&gt;</source>
-        <translation>&lt;%n Gerät(e)&gt;</translation>
+        <translation type="unfinished">
+            <numerusform>&lt;%n Gerät(e)&gt;</numerusform>
+            <numerusform>&lt;%n Gerät(e)&gt;</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n camera(s)&gt;</source>
-        <translation>&lt;%n Kamera(s)&gt;</translation>
+        <translation type="unfinished">
+            <numerusform>&lt;%n Kamera(s)&gt;</numerusform>
+            <numerusform>&lt;%n Kamera(s)&gt;</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n I/O module(s)&gt;</source>
-        <translation>&lt;%n I/O Modul(e)&gt;</translation>
+        <translation type="unfinished">
+            <numerusform>&lt;%n I/O Modul(e)&gt;</numerusform>
+            <numerusform>&lt;%n I/O Modul(e)&gt;</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -5867,13 +5627,19 @@ Die bereitgestellten Parameter sind nicht gültig. Ein Test konnte nicht ausgef�
         <source>Notice: Only further recording will be backed up. Backup process will ignore existing footage.</source>
         <translation>Hinweis: Nur neuere Aufnahmen werden gesichert. Der Sicherungsprozess wird vorhandene Aufnahmen ignorieren.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n Camera(s)</source>
-        <translation>%n Kamera(s)</translation>
+        <translation type="unfinished">
+            <numerusform>%n Kamera(s)</numerusform>
+            <numerusform>%n Kamera(s)</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n Device(s)</source>
-        <translation>%n Gerät(e)</translation>
+        <translation type="unfinished">
+            <numerusform>%n Gerät(e)</numerusform>
+            <numerusform>%n Gerät(e)</numerusform>
+        </translation>
     </message>
     <message>
         <source>Backup is finished</source>
@@ -6935,9 +6701,12 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
         <source>Press %1 to search bookmarks</source>
         <translation>Drücken Sie %1, um nach Lesezeichen zu suchen</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Are you sure you want to delete these %n bookmarks?</source>
-        <translation>Sind Sie sicher, dass Sie die %n Lesezeichen löschen wollen?</translation>
+        <translation type="unfinished">
+            <numerusform>Sind Sie sicher, dass Sie die %n Lesezeichen löschen wollen?</numerusform>
+            <numerusform>Sind Sie sicher, dass Sie die %n Lesezeichen löschen wollen?</numerusform>
+        </translation>
     </message>
 </context>
 <context>

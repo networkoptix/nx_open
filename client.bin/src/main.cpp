@@ -465,9 +465,10 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     /* Create workbench context. */
     QScopedPointer<QnWorkbenchContext> context(new QnWorkbenchContext(qnResPool));
+
     context->instance<QnFglrxFullScreen>(); /* Init fglrx workaround. */
 
-    Qn::ActionId effectiveMaximizeActionId = Qn::FullscreenAction;
+    QnActions::IDType effectiveMaximizeActionId = QnActions::FullscreenAction;
 #ifdef Q_OS_LINUX
     /* In Ubuntu its launcher is configured to be shown when a non-fullscreen window has appeared.
      * In our case it means that launcher overlaps our fullscreen window when the user opens any dialogs.
@@ -478,9 +479,9 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
      * we just disable fullscreen for unity-3d desktop session.
      */
     if (QnX11LauncherWorkaround::isUnity3DSession())
-        effectiveMaximizeActionId = Qn::MaximizeAction;
+        effectiveMaximizeActionId = QnActions::MaximizeAction;
 #endif
-    context->menu()->registerAlias(Qn::EffectiveMaximizeAction, effectiveMaximizeActionId);
+    context->menu()->registerAlias(QnActions::EffectiveMaximizeAction, effectiveMaximizeActionId);
 
     /* Create main window. */
     Qt::WindowFlags flags = qnRuntime->isVideoWallMode()
@@ -501,12 +502,12 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     mainWindow->show();
     if (!startupParams.fullScreenDisabled)
-        context->action(Qn::EffectiveMaximizeAction)->trigger();
+        context->action(QnActions::EffectiveMaximizeAction)->trigger();
     else
         mainWindow->updateDecorationsState();
 
     if(startupParams.versionMismatchCheckDisabled)
-        context->action(Qn::VersionMismatchMessageAction)->setVisible(false); // TODO: #Elric need a better mechanism for this
+        context->action(QnActions::VersionMismatchMessageAction)->setVisible(false); // TODO: #Elric need a better mechanism for this
 
     /* Process input files. */
     bool haveInputFiles = false;
@@ -537,11 +538,11 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     if (!startupParams.allowMultipleClientInstances &&
         !qnRuntime->isDevMode() &&
         QnAppInfo::beta())
-        context->action(Qn::BetaVersionMessageAction)->trigger();
+        context->action(QnActions::BetaVersionMessageAction)->trigger();
 
 #ifdef _DEBUG
     /* Show FPS in debug. */
-    context->menu()->trigger(Qn::ShowFpsAction);
+    context->menu()->trigger(QnActions::ShowFpsAction);
 #endif
 
     /************************************************************************/
@@ -578,7 +579,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     if (!startupParams.customUri.isEmpty()) {
         /* Set authentication parameters from uri. */
         QUrl appServerUrl = QUrl::fromUserInput(startupParams.customUri);
-        context->menu()->trigger(Qn::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, appServerUrl));
+        context->menu()->trigger(QnActions::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, appServerUrl));
     }
     /* If no input files were supplied --- open connection settings dialog.
      * Do not try to connect in the following cases:
@@ -596,21 +597,21 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
             }
             appServerUrl.setUserName(startupParams.videoWallGuid.toString());
         }
-        context->menu()->trigger(Qn::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, appServerUrl));
+        context->menu()->trigger(QnActions::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, appServerUrl));
     }
 
     if (!startupParams.videoWallGuid.isNull()) {
-        context->menu()->trigger(Qn::DelayedOpenVideoWallItemAction, QnActionParameters()
+        context->menu()->trigger(QnActions::DelayedOpenVideoWallItemAction, QnActionParameters()
                              .withArgument(Qn::VideoWallGuidRole, startupParams.videoWallGuid)
                              .withArgument(Qn::VideoWallItemGuidRole, startupParams.videoWallItemGuid));
     } else if(!startupParams.delayedDrop.isEmpty()) { /* Drop resources if needed. */
         Q_ASSERT(startupParams.instantDrop.isEmpty());
 
         QByteArray data = QByteArray::fromBase64(startupParams.delayedDrop.toLatin1());
-        context->menu()->trigger(Qn::DelayedDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedDataRole, data));
+        context->menu()->trigger(QnActions::DelayedDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedDataRole, data));
     } else if (!startupParams.instantDrop.isEmpty()){
         QByteArray data = QByteArray::fromBase64(startupParams.instantDrop.toLatin1());
-        context->menu()->trigger(Qn::InstantDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedDataRole, data));
+        context->menu()->trigger(QnActions::InstantDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedDataRole, data));
     }
 
     result = application->exec();

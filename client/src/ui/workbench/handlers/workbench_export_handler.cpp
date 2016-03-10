@@ -85,8 +85,8 @@ QnWorkbenchExportHandler::QnWorkbenchExportHandler(QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent)
 {
-    connect(action(Qn::ExportTimeSelectionAction), &QAction::triggered, this,   &QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered);
-    connect(action(Qn::ExportLayoutAction),        &QAction::triggered, this,   &QnWorkbenchExportHandler::at_exportLayoutAction_triggered);
+    connect(action(QnActions::ExportTimeSelectionAction), &QAction::triggered, this,   &QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered);
+    connect(action(QnActions::ExportLayoutAction),        &QAction::triggered, this,   &QnWorkbenchExportHandler::at_exportLayoutAction_triggered);
 }
 
 QString QnWorkbenchExportHandler::binaryFilterName() const {

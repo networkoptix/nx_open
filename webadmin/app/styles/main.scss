@@ -127,11 +127,17 @@ body {
     position: fixed;
   }
 }
-/* sidebar */
-.bs-docs-sidebar {
-  padding-left: 20px;
-  margin-top: 20px;
-  margin-bottom: 20px;
+
+/* help section*/
+.scroll-wrapper{
+  height:100%;
+  position:absolute;
+  top:0;
+  padding-top:57px;
+}
+.scroll-container{
+  height:100%;
+  overflow:auto;
 }
 
 /* all links */

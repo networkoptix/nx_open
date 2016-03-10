@@ -19,7 +19,16 @@
 #include <utils/media/audio_player.h>
 #include <utils/image_provider.h>
 
-namespace {
+#include <utils/common/model_functions.h>
+
+namespace
+{
+    QString getFullAlias(const QString &postfix)
+    {
+        static const auto kNotificationWidgetAlias = lit("notification_widget");
+        return lit("%1_%2").arg(kNotificationWidgetAlias, postfix);
+    };
+
     const char *actionIndexPropertyName = "_qn_actionIndex";
 
     const qreal margin = 4.0;
@@ -44,7 +53,8 @@ QnNotificationToolTipWidget::QnNotificationToolTipWidget(QGraphicsItem *parent):
     m_textLabel->setWordWrap(true);
     setPaletteColor(m_textLabel, QPalette::Window, Qt::transparent);
 
-    QnImageButtonWidget *closeButton = new QnImageButtonWidget(this);
+    QnImageButtonWidget *closeButton = new QnImageButtonWidget(
+        getFullAlias(lit("close")), this);
     closeButton->setCached(true);
     closeButton->setToolTip(lit("%1 (<b>%2</b>)").arg(tr("Close")).arg(tr("Right Click")));
     closeButton->setIcon(qnSkin->icon("titlebar/exit.png")); // TODO: #dklychkov
@@ -270,12 +280,13 @@ void QnNotificationWidget::setGeometry(const QRectF &geometry) {
         updateOverlayGeometry();
 }
 
-void QnNotificationWidget::addActionButton(const QIcon &icon, const QString &tooltip, Qn::ActionId actionId,
+void QnNotificationWidget::addActionButton(const QIcon &icon, const QString &tooltip, QnActions::IDType actionId,
                                          const QnActionParameters &parameters, bool defaultAction)
 {
     qreal buttonSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, NULL, NULL);
 
-    QnImageButtonWidget *button = new QnImageButtonWidget(this);
+    QnImageButtonWidget *button = new QnImageButtonWidget(
+        getFullAlias(QnLexical::serialized(actionId)), this);
 
     button->setIcon(icon);
     button->setToolTip(tooltip);

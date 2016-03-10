@@ -100,7 +100,7 @@ private:
     QNetworkAccessManager *m_accessManager;
     mutable QnMutex m_accessManagerMutex;
     static QAtomicInt s_handle;
-    
+
     QScopedPointer<QThread> m_thread;
     QHash<QNetworkReply*, AsyncRequestInfo> m_handleInProgress;
 

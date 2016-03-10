@@ -86,7 +86,7 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject *parent /* = 0*/):
         /* Reload all dialogs and dependent data. */
         context()->instance<QnWorkbenchStateManager>()->forcedUpdate();
 
-        menu()->triggerIfPossible(Qn::AllowStatisticsReportMessageAction);
+        menu()->triggerIfPossible(QnActions::AllowStatisticsReportMessageAction);
 
         /* Collect and send crash dumps if allowed */
         m_crashReporter.scanAndReportAsync(qnSettings->rawSettings());
@@ -101,7 +101,7 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject *parent /* = 0*/):
         if(!watcher->hasMismatches())
             return;
 
-        menu()->triggerIfPossible(Qn::VersionMismatchMessageAction);
+        menu()->triggerIfPossible(QnActions::VersionMismatchMessageAction);
     });
 
     QnWorkbenchUserWatcher* userWatcher = context()->instance<QnWorkbenchUserWatcher>();
@@ -113,12 +113,12 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject *parent /* = 0*/):
         qnRuntimeInfoManager->updateLocalItem(localInfo);
     });
 
-    connect(action(Qn::ConnectAction),              &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::at_connectAction_triggered);
-    connect(action(Qn::ReconnectAction),            &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::at_reconnectAction_triggered);
-    connect(action(Qn::DisconnectAction),           &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::at_disconnectAction_triggered);
+    connect(action(QnActions::ConnectAction),              &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::at_connectAction_triggered);
+    connect(action(QnActions::ReconnectAction),            &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::at_reconnectAction_triggered);
+    connect(action(QnActions::DisconnectAction),           &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::at_disconnectAction_triggered);
 
-    connect(action(Qn::OpenLoginDialogAction),      &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::showLoginDialog);
-    connect(action(Qn::BeforeExitAction),           &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::at_beforeExitAction_triggered);
+    connect(action(QnActions::OpenLoginDialogAction),      &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::showLoginDialog);
+    connect(action(QnActions::BeforeExitAction),           &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::at_beforeExitAction_triggered);
 
     context()->instance<QnAppServerNotificationCache>();
 }
@@ -137,8 +137,8 @@ QnLoginDialog * QnWorkbenchConnectHandler::loginDialog() const {
 }
 
 void QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened() {
-    action(Qn::OpenLoginDialogAction)->setIcon(qnSkin->icon("titlebar/connected.png"));
-    action(Qn::OpenLoginDialogAction)->setText(tr("Connect to Another Server...")); // TODO: #GDM #Common use conditional texts?
+    action(QnActions::OpenLoginDialogAction)->setIcon(qnSkin->icon("titlebar/connected.png"));
+    action(QnActions::OpenLoginDialogAction)->setText(tr("Connect to Another Server...")); // TODO: #GDM #Common use conditional texts?
 
     hideMessageBox();
 
@@ -193,6 +193,8 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered() {
     if (connected() && !disconnectFromServer(force))
         return;
 
+    qnCommon->updateRunningInstanceGuid();
+
     QnActionParameters parameters = menu()->currentParameters(sender());
     QUrl url = parameters.argument(Qn::UrlRole, QUrl());
 
@@ -201,7 +203,7 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered() {
         if (qnRuntime->isActiveXMode()) {
             if (connectToServer(url, true) != ec2::ErrorCode::ok) {
                 QnGraphicsMessageBox::information(tr("Could not connect to server..."), 1000 * 60 * 60 * 24);
-                menu()->trigger(Qn::ExitAction);
+                menu()->trigger(QnActions::ExitAction);
             }
         } else
         /* Videowall item */
@@ -209,7 +211,7 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered() {
             //TODO: #GDM #High videowall should try indefinitely
             if (connectToServer(url, true) != ec2::ErrorCode::ok) {
                 QnGraphicsMessageBox* incompatibleMessageBox = QnGraphicsMessageBox::informationTicking(tr("Could not connect to server. Closing in %1..."), videowallCloseTimeoutMSec);
-                connect(incompatibleMessageBox, &QnGraphicsMessageBox::finished, action(Qn::ExitAction), &QAction::trigger);
+                connect(incompatibleMessageBox, &QnGraphicsMessageBox::finished, action(QnActions::ExitAction), &QAction::trigger);
             }
         }
         else
@@ -271,8 +273,6 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
             return ec2::ErrorCode::ok;
     }
 
-    qnCommon->updateRunningInstanceGuid();
-
     /* Hiding message box from previous connect. */
     hideMessageBox();
 
@@ -330,7 +330,7 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
     case QnConnectionDiagnosticsHelper::Result::Success:
         break;
     case QnConnectionDiagnosticsHelper::Result::RestartRequested:
-        menu()->trigger(Qn::DelayedForcedExitAction);
+        menu()->trigger(QnActions::DelayedForcedExitAction);
         return ec2::ErrorCode::ok; // to avoid cycle
     default:    //error
         return errCode == ec2::ErrorCode::ok
@@ -408,8 +408,8 @@ void QnWorkbenchConnectHandler::clearConnection() {
     /* Get ready for the next connection. */
     m_readyForConnection = true;
 
-    action(Qn::OpenLoginDialogAction)->setIcon(qnSkin->icon("titlebar/disconnected.png"));
-    action(Qn::OpenLoginDialogAction)->setText(tr("Connect to Server..."));
+    action(QnActions::OpenLoginDialogAction)->setIcon(qnSkin->icon("titlebar/disconnected.png"));
+    action(QnActions::OpenLoginDialogAction)->setText(tr("Connect to Server..."));
 
     /* Remove all remote resources. */
     const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(Qn::remote);

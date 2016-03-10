@@ -335,14 +335,6 @@ to view more bookmarks</source>
         <translation>Ukryj FPS</translation>
     </message>
     <message>
-        <source>Ctrl+Alt+F</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+D</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Drop Resources</source>
         <translation>Upuść</translation>
     </message>
@@ -363,24 +355,12 @@ to view more bookmarks</source>
         <translation>Następny układ</translation>
     </message>
     <message>
-        <source>Ctrl+Tab</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Previous Layout</source>
         <translation>Poprzedni układ</translation>
     </message>
     <message>
-        <source>Ctrl+Shift+Tab</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Select All</source>
         <translation>Zaznacz wszystko</translation>
-    </message>
-    <message>
-        <source>Ctrl+A</source>
-        <translation></translation>
     </message>
     <message>
         <source>Selection Changed</source>
@@ -397,10 +377,6 @@ to view more bookmarks</source>
     <message>
         <source>Go to Freespace Mode</source>
         <translation>Przejdź do trybu Freespace</translation>
-    </message>
-    <message>
-        <source>F11</source>
-        <translation>F11</translation>
     </message>
     <message>
         <source>Help</source>
@@ -443,16 +419,8 @@ to view more bookmarks</source>
         <translation>Menu główne</translation>
     </message>
     <message>
-        <source>Alt+Space</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Connect to Server...</source>
         <translation>Połącz z serwerem...</translation>
-    </message>
-    <message>
-        <source>Ctrl+Shift+C</source>
-        <translation></translation>
     </message>
     <message>
         <source>Logout</source>
@@ -465,10 +433,6 @@ to view more bookmarks</source>
     <message>
         <source>Stop Panic Recording</source>
         <translation>Zatrzymaj tryb nagrywania paniki</translation>
-    </message>
-    <message>
-        <source>Ctrl+P</source>
-        <translation></translation>
     </message>
     <message>
         <source>New...</source>
@@ -491,20 +455,12 @@ to view more bookmarks</source>
         <translation>Nowa zakładka</translation>
     </message>
     <message>
-        <source>Ctrl+T</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Window</source>
         <translation>Okno</translation>
     </message>
     <message>
         <source>New Window</source>
         <translation>Nowe okno</translation>
-    </message>
-    <message>
-        <source>Ctrl+N</source>
-        <translation></translation>
     </message>
     <message>
         <source>User...</source>
@@ -535,10 +491,6 @@ to view more bookmarks</source>
         <translation>Plik(i)...</translation>
     </message>
     <message>
-        <source>Ctrl+O</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Layout(s)...</source>
         <translation>Układ(y)...</translation>
     </message>
@@ -551,20 +503,8 @@ to view more bookmarks</source>
         <translation>Zapisz bieżący układ</translation>
     </message>
     <message>
-        <source>Ctrl+S</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Save Current Layout As...</source>
         <translation>Zapisz bieżący układ jako...</translation>
-    </message>
-    <message>
-        <source>Ctrl+Shift+S</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+S</source>
-        <translation></translation>
     </message>
     <message>
         <source>Save Video Wall View</source>
@@ -577,14 +517,6 @@ to view more bookmarks</source>
     <message>
         <source>Stop Screen Recording</source>
         <translation>Zatrzymaj nagrywanie ekranu</translation>
-    </message>
-    <message>
-        <source>Alt+R</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Esc</source>
-        <translation>Esc</translation>
     </message>
     <message>
         <source>Stop current action</source>
@@ -611,18 +543,6 @@ to view more bookmarks</source>
         <translation>Przywróć w dół</translation>
     </message>
     <message>
-        <source>Alt+Enter</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Alt+Return</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Ctrl+F</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Show Message</source>
         <translation>Pokaż wiadomość</translation>
     </message>
@@ -643,10 +563,6 @@ to view more bookmarks</source>
         <translation>Administracja systemem...</translation>
     </message>
     <message>
-        <source>Ctrl+Alt+A</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Open Web Client...</source>
         <translation>Otwórz klienta web...</translation>
     </message>
@@ -657,18 +573,6 @@ to view more bookmarks</source>
     <message>
         <source>Local Settings...</source>
         <translation>Ustawienia lokalne...</translation>
-    </message>
-    <message>
-        <source>Ctrl+E</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Ctrl+L</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Ctrl+M</source>
-        <translation></translation>
     </message>
     <message>
         <source>Merge Systems...</source>
@@ -683,16 +587,8 @@ to view more bookmarks</source>
         <translation>O...</translation>
     </message>
     <message>
-        <source>F1</source>
-        <translation>F1</translation>
-    </message>
-    <message>
         <source>Exit</source>
         <translation>Wyjście</translation>
-    </message>
-    <message>
-        <source>Alt+F4</source>
-        <translation></translation>
     </message>
     <message>
         <source>Server...</source>
@@ -735,14 +631,6 @@ to view more bookmarks</source>
         <translation>Otwórz folder zawierający</translation>
     </message>
     <message>
-        <source>Ctrl+Enter</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Ctrl+Return</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Identify</source>
         <translation>Identyfikacja</translation>
     </message>
@@ -765,10 +653,6 @@ to view more bookmarks</source>
     <message>
         <source>Delete</source>
         <translation>Usuń</translation>
-    </message>
-    <message>
-        <source>Del</source>
-        <translation>Del</translation>
     </message>
     <message>
         <source>Update Layout</source>
@@ -795,24 +679,12 @@ to view more bookmarks</source>
         <translation>Maksymalizuj element</translation>
     </message>
     <message>
-        <source>Enter</source>
-        <translation>Enter</translation>
-    </message>
-    <message>
-        <source>Return</source>
-        <translation>Powrót</translation>
-    </message>
-    <message>
         <source>Restore Item</source>
         <translation>Przywróć element</translation>
     </message>
     <message>
         <source>Show Info</source>
         <translation>Pokaż Informacje</translation>
-    </message>
-    <message>
-        <source>Alt+I</source>
-        <translation></translation>
     </message>
     <message>
         <source>Hide Info</source>
@@ -867,10 +739,6 @@ to view more bookmarks</source>
         <translation>Pokaż ruch</translation>
     </message>
     <message>
-        <source>Alt+G</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Hide Motion/Smart Search</source>
         <translation>Ukryj Ruch/Inteligentne przeszukiwanie</translation>
     </message>
@@ -891,24 +759,12 @@ to view more bookmarks</source>
         <translation>Sprawdź znak wodny pliku</translation>
     </message>
     <message>
-        <source>Alt+C</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Take Screenshot</source>
         <translation>Zrób zrzut ekranu</translation>
     </message>
     <message>
-        <source>Alt+S</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Image Enhancement...</source>
         <translation>Regulacja Wyświetlania...</translation>
-    </message>
-    <message>
-        <source>Alt+J</source>
-        <translation></translation>
     </message>
     <message>
         <source>Create Zoom Window</source>
@@ -941,10 +797,6 @@ to view more bookmarks</source>
     <message>
         <source>Rename</source>
         <translation>Zmień nazwę</translation>
-    </message>
-    <message>
-        <source>F2</source>
-        <translation>F2</translation>
     </message>
     <message>
         <source>Delete from Disk</source>
@@ -1019,16 +871,8 @@ to view more bookmarks</source>
         <translation>Zatrzymaj trasę</translation>
     </message>
     <message>
-        <source>Alt+T</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Close</source>
         <translation>Zamknij</translation>
-    </message>
-    <message>
-        <source>Ctrl+W</source>
-        <translation>Ctrl+W</translation>
     </message>
     <message>
         <source>Close All But This</source>
@@ -1039,16 +883,8 @@ to view more bookmarks</source>
         <translation>Zaznacz początek</translation>
     </message>
     <message>
-        <source>[</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Mark Selection End</source>
         <translation>Zaznacz koniec</translation>
-    </message>
-    <message>
-        <source>]</source>
-        <translation></translation>
     </message>
     <message>
         <source>Clear Selection</source>
@@ -1079,50 +915,6 @@ to view more bookmarks</source>
         <translation>Przeszukiwanie na podglądzie...</translation>
     </message>
     <message>
-        <source>Ctrl+Alt+Shift++</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Increment Debug Counter</source>
-        <translation>Wzrost licznika Debug</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift+-</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Decrement Debug Counter</source>
-        <translation>Obniżenie licznika Debug</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift+R</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Show Resource Pool</source>
-        <translation>Pokaż zasoby</translation>
-    </message>
-    <message>
-        <source>Calibrate PTZ</source>
-        <translation>Kalibracja PTZ</translation>
-    </message>
-    <message>
-        <source>Get PTZ Position</source>
-        <translation>Pobierz pozycję PTZ</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift+D</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Debug Control Panel</source>
-        <translation>Panel kontrolny Debug</translation>
-    </message>
-    <message>
-        <source>Space</source>
-        <translation>Przestrzeń</translation>
-    </message>
-    <message>
         <source>Play</source>
         <translation>Włącz</translation>
     </message>
@@ -1131,72 +923,36 @@ to view more bookmarks</source>
         <translation>Pauza</translation>
     </message>
     <message>
-        <source>Ctrl+Left</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Previous Frame</source>
         <translation>Poprzednia klatka</translation>
-    </message>
-    <message>
-        <source>Ctrl+Right</source>
-        <translation></translation>
     </message>
     <message>
         <source>Next Frame</source>
         <translation>Następna klatka</translation>
     </message>
     <message>
-        <source>Z</source>
-        <translation>Z</translation>
-    </message>
-    <message>
         <source>To Start</source>
         <translation>Zacznij</translation>
-    </message>
-    <message>
-        <source>X</source>
-        <translation>X</translation>
     </message>
     <message>
         <source>To End</source>
         <translation>Zatrzymaj</translation>
     </message>
     <message>
-        <source>Ctrl+Up</source>
-        <translation>Ctrl+Up</translation>
-    </message>
-    <message>
         <source>Volume Down</source>
         <translation>Ścisz</translation>
-    </message>
-    <message>
-        <source>Ctrl+Down</source>
-        <translation></translation>
     </message>
     <message>
         <source>Volume Up</source>
         <translation>Podgłoś</translation>
     </message>
     <message>
-        <source>M</source>
-        <translation>M</translation>
-    </message>
-    <message>
         <source>Toggle Mute</source>
         <translation>Przełącz wyciszenie</translation>
     </message>
     <message>
-        <source>L</source>
-        <translation>L</translation>
-    </message>
-    <message>
         <source>Jump to Live</source>
         <translation>Skocz do Na Żywo</translation>
-    </message>
-    <message>
-        <source>S</source>
-        <translation>S</translation>
     </message>
     <message>
         <source>Synchronize Streams</source>
@@ -1261,10 +1017,6 @@ to view more bookmarks</source>
     <message>
         <source>Unpin Notifications</source>
         <translation>Odłącz powiadomienia</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+T</source>
-        <translation></translation>
     </message>
     <message>
         <source>Disable Background Animation</source>
@@ -1392,10 +1144,6 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Cameras to Backup...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Ctrl+B</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1994,9 +1742,13 @@ to view more bookmarks</source>
         <source>Source camera</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Source and %n more cameras</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>N/A</source>
@@ -5144,17 +4896,29 @@ Jeśli rozumiesz i chcesz kontynuować wciśnij  Połącz  aby kontynuować.</tr
         <source>&lt;All My I/O Modules&gt;</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n device(s)&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n camera(s)&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n I/O module(s)&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -5920,13 +5684,21 @@ Jeśli rozumiesz i chcesz kontynuować wciśnij  Połącz  aby kontynuować.</tr
         <source>Notice: Only further recording will be backed up. Backup process will ignore existing footage.</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n Camera(s)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n Device(s)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Backup is finished</source>
@@ -7010,9 +6782,13 @@ Jeśli chcesz wyłączyć tę funkcję zrób to w oknie Ustawienia systemowe.</t
         <source>Press %1 to search bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Are you sure you want to delete these %n bookmarks?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>

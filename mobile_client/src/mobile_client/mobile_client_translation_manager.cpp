@@ -5,8 +5,8 @@
 QnMobileClientTranslationManager::QnMobileClientTranslationManager(QObject *parent) :
     base_type(parent)
 {
-    addPrefix(lit("base"));
-    addPrefix(lit("qml"));
+    addPrefix(lit("mobile_client_base"));
+    addPrefix(lit("mobile_client_qml"));
 }
 
 QnMobileClientTranslationManager::~QnMobileClientTranslationManager()
@@ -15,7 +15,7 @@ QnMobileClientTranslationManager::~QnMobileClientTranslationManager()
 
 void QnMobileClientTranslationManager::updateTranslation()
 {
-    QString localeName = QLocale().name();
+    QString localeName = QLocale::system().name();
     QString langName = localeName.split(L'_').first();
 
     QnTranslation bestTranslation;

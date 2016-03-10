@@ -63,6 +63,7 @@ public:
     Q_INVOKABLE bool getDeviceIsPhone() const;
 
     Q_INVOKABLE void setKeepScreenOn(bool keepScreenOn);
+    Q_INVOKABLE void setScreenOrientation(Qt::ScreenOrientation orientation);
 
 signals:
     /* Dummy signals to prevent non-NOTIFYable warnings */
