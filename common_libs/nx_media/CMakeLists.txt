@@ -18,6 +18,7 @@ set(PROJECT_SHORTNAME "nx_media")
 set(PROJECT_LONGNAME "${nxtool.company.name} Multimedia Library")
 
 find_sources(src)
+ADD_MSVC_PRECOMPILED_HEADER("StdAfx.h" "${PROJECT_SOURCE_DIR}/src/StdAfx.cpp" CPP_FILES)
 process_resources()
 add_translations(translations)
 qt5_wrap_ui(UI_HEADERS ${UI_FILES})
@@ -35,5 +36,3 @@ add_library(${PROJECT_SHORTNAME} STATIC
 target_link_libraries(${PROJECT_SHORTNAME}
   Qt5::Core Qt5::Gui Qt5::OpenGL Qt5::Multimedia common
 )
-set_target_properties(${PROJECT_SHORTNAME} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "src/stdafx.h")
-cotire(${PROJECT_SHORTNAME})

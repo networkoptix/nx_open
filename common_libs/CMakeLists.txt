@@ -22,9 +22,9 @@ add_definitions(-D_CONSOLE
 
 add_module(
     NAMES
-        #nx_audio
+        nx_audio
         nx_email
-        #nx_media
-        #nx_network
+        nx_media
+        nx_network
     STATUS_SHORT_NAMES
 )

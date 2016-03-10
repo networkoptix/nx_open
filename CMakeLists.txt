@@ -130,9 +130,8 @@ include(precompiled_header)
 
 include_directories($ENV{environment}/boost_1_56_0
                     ${CMAKE_SOURCE_DIR}/common/src
-                    ${CMAKE_SOURCE_DIR}/cpp/maven/bin-resources
                     $ENV{environment}/include
-                    #$ENV{environment}/include/ffmpeg-misc-headers-win32
+                    $ENV{environment}/include/ffmpeg-misc-headers-win32
                     $ENV{environment}/include/glext
                     $ENV{environment}/qt5-custom
                     ${CMAKE_SOURCE_DIR}/common_libs/nx_utils/src
@@ -187,8 +186,8 @@ find_package(Qt5LinguistTools)
                     
 add_module(
     NAMES
-        #nxtool
-        #common
+        nxtool
+        common
         common_libs
     STATUS_SHORT_NAMES
 )
