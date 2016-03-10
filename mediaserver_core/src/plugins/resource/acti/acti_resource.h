@@ -131,8 +131,8 @@ private:
     void parseCameraParametersResponse(const QByteArray& response, QnCameraAdvancedParamValueList& result) const;
     void parseCameraParametersResponse(const QByteArray& response, QMap<QString, QString>& result) const;
 
-    void convertParamValueToDeviceFormat(QString& paramValue, const QnCameraAdvancedParameter& param) const;
-    void convertParamValueFromDeviceFormat(QString& paramValue, const QnCameraAdvancedParameter& param) const;
+    QString convertParamValueToDeviceFormat(const QString& paramValue, const QnCameraAdvancedParameter& param) const;
+    QString convertParamValueFromDeviceFormat(const QString& paramValue, const QnCameraAdvancedParameter& param) const;
     QString getParamGroup(const QnCameraAdvancedParameter& param) const;
     QString getParamCmd(const QnCameraAdvancedParameter& param) const;
 
@@ -153,7 +153,7 @@ private:
 
     QMap<QString, QString> resolveQueries(QMap<QString, QnCameraAdvancedParamQueryInfo>& queries) const;
 
-    void getParamsByMask(const QString& paramValue, const QString& mask, QMap<QString, QString>& result) const;
+    void extractParamValues(const QString& paramValue, const QString& mask, QMap<QString, QString>& result) const;
     QString fillMissingParams(const QString& unresolvedTemplate, const QString& valueFromCamera) const;
 
 
