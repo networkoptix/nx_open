@@ -16,17 +16,13 @@
 #include <core/resource/videowall_resource.h>
 #include <core/resource/webpage_resource.h>
 
-#include <nx_ec/data/api_camera_data.h>
-#include <nx_ec/data/api_user_data.h>
-#include <nx_ec/data/api_videowall_data.h>
-#include <nx_ec/data/api_layout_data.h>
-#include <nx_ec/data/api_webpage_data.h>
 #include <nx_ec/data/api_conversion_functions.h>
 
 #include <nx_ec/managers/abstract_user_manager.h>
 #include <nx_ec/managers/abstract_layout_manager.h>
 #include <nx_ec/managers/abstract_videowall_manager.h>
 #include <nx_ec/managers/abstract_webpage_manager.h>
+#include <nx_ec/managers/abstract_camera_manager.h>
 
 QnResourcesChangesManager::QnResourcesChangesManager(QObject* parent /*= nullptr*/):
     base_type(parent)
@@ -95,7 +91,8 @@ void QnResourcesChangesManager::saveCameras(const QnVirtualCameraResourceList &c
 
 void QnResourcesChangesManager::saveCamerasBatch(const QnVirtualCameraResourceList &cameras,
                                                  BatchChangesFunction applyChanges,
-                                                 RollbackFunction rollback) {
+                                                 RollbackFunction rollback)
+{
     if (!applyChanges)
         return;
 
@@ -104,7 +101,8 @@ void QnResourcesChangesManager::saveCamerasBatch(const QnVirtualCameraResourceLi
     QPointer<QnCameraUserAttributePool> pool(QnCameraUserAttributePool::instance());
 
     QList<QnCameraUserAttributes> backup;
-    for(const QnCameraUserAttributesPtr& cameraAttrs: pool->getAttributesList(idList)) {
+    for(const QnCameraUserAttributesPtr& cameraAttrs: pool->getAttributesList(idList))
+    {
         QnCameraUserAttributePool::ScopedLock userAttributesLock( pool, cameraAttrs->cameraID );
         backup << *(*userAttributesLock);
     }
@@ -118,7 +116,10 @@ void QnResourcesChangesManager::saveCamerasBatch(const QnVirtualCameraResourceLi
     if (!connection)
         return;
 
-   connection->getCameraManager()->saveUserAttributes(changes, this,
+    ec2::ApiCameraAttributesDataList apiAttributes;
+    fromResourceListToApi(changes, apiAttributes);
+
+    connection->getCameraManager()->saveUserAttributes(apiAttributes, this,
         [this, cameras, pool, backup, sessionGuid, rollback]( int reqID, ec2::ErrorCode errorCode )
     {
         Q_UNUSED(reqID);
@@ -167,7 +168,10 @@ void QnResourcesChangesManager::saveCamerasBatch(const QnVirtualCameraResourceLi
      if (!connection)
          return;
 
-     connection->getCameraManager()->save(cameras, this, [this, cameras, sessionGuid, backup]( int reqID, ec2::ErrorCode errorCode ) {
+     ec2::ApiCameraDataList apiCameras;
+     ec2::fromResourceListToApi(cameras, apiCameras);
+
+     connection->getCameraManager()->save(apiCameras, this, [this, cameras, sessionGuid, backup]( int reqID, ec2::ErrorCode errorCode ) {
          Q_UNUSED(reqID);
 
          /* Check if all OK */

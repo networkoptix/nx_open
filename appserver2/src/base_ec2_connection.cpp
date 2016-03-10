@@ -18,27 +18,27 @@
 
 namespace ec2
 {
-    template<class T>
-    BaseEc2Connection<T>::BaseEc2Connection(
-        T* queryProcessor,
+    template<class QueryProcessorType>
+    BaseEc2Connection<QueryProcessorType>::BaseEc2Connection(
+        QueryProcessorType* queryProcessor,
         const ResourceContext& resCtx )
     :
         m_queryProcessor( queryProcessor ),
         m_resCtx( resCtx ),
-        m_licenseManager( new QnLicenseManager<T>(m_queryProcessor) ),
-        m_resourceManager( new QnResourceManager<T>(m_queryProcessor, resCtx) ),
-        m_mediaServerManager( new QnMediaServerManager<T>(m_queryProcessor, resCtx) ),
-        m_cameraManager( new QnCameraManager<T>(m_queryProcessor, resCtx) ),
-        m_userManager( new QnUserManager<T>(m_queryProcessor) ),
-        m_businessEventManager( new QnBusinessEventManager<T>(m_queryProcessor) ),
-        m_layoutManager( new QnLayoutManager<T>(m_queryProcessor) ),
-        m_videowallManager( new QnVideowallManager<T>(m_queryProcessor) ),
-        m_webPageManager ( new QnWebPageManager<T>(m_queryProcessor) ),
-        m_storedFileManager( new QnStoredFileManager<T>(m_queryProcessor) ),
-        m_updatesManager( new QnUpdatesManager<T>(m_queryProcessor) ),
-        m_miscManager( new QnMiscManager<T>(m_queryProcessor) ),
-        m_discoveryManager( new QnDiscoveryManager<T>(m_queryProcessor) ),
-        m_timeManager( new QnTimeManager<T>(m_queryProcessor) )
+        m_licenseManager( new QnLicenseManager<QueryProcessorType>(m_queryProcessor) ),
+        m_resourceManager( new QnResourceManager<QueryProcessorType>(m_queryProcessor, resCtx) ),
+        m_mediaServerManager( new QnMediaServerManager<QueryProcessorType>(m_queryProcessor, resCtx) ),
+        m_cameraManager( new QnCameraManager<QueryProcessorType>(m_queryProcessor) ),
+        m_userManager( new QnUserManager<QueryProcessorType>(m_queryProcessor) ),
+        m_businessEventManager( new QnBusinessEventManager<QueryProcessorType>(m_queryProcessor) ),
+        m_layoutManager( new QnLayoutManager<QueryProcessorType>(m_queryProcessor) ),
+        m_videowallManager( new QnVideowallManager<QueryProcessorType>(m_queryProcessor) ),
+        m_webPageManager ( new QnWebPageManager<QueryProcessorType>(m_queryProcessor) ),
+        m_storedFileManager( new QnStoredFileManager<QueryProcessorType>(m_queryProcessor) ),
+        m_updatesManager( new QnUpdatesManager<QueryProcessorType>(m_queryProcessor) ),
+        m_miscManager( new QnMiscManager<QueryProcessorType>(m_queryProcessor) ),
+        m_discoveryManager( new QnDiscoveryManager<QueryProcessorType>(m_queryProcessor) ),
+        m_timeManager( new QnTimeManager<QueryProcessorType>(m_queryProcessor) )
     {
         m_notificationManager.reset(
             new ECConnectionNotificationManager(
@@ -61,110 +61,110 @@ namespace ec2
         m_auditManager.reset(new ECConnectionAuditManager(this));
     }
 
-    template<class T>
-    BaseEc2Connection<T>::~BaseEc2Connection()
+    template<class QueryProcessorType>
+    BaseEc2Connection<QueryProcessorType>::~BaseEc2Connection()
     {}
 
-    template<class T>
-    void BaseEc2Connection<T>::startReceivingNotifications() {
-        connect(QnTransactionMessageBus::instance(),    &QnTransactionMessageBus::peerFound,                this,   &BaseEc2Connection<T>::remotePeerFound,         Qt::DirectConnection);
-        connect(QnTransactionMessageBus::instance(),    &QnTransactionMessageBus::peerLost,                 this,   &BaseEc2Connection<T>::remotePeerLost,          Qt::DirectConnection);
-        connect(QnTransactionMessageBus::instance(),    &QnTransactionMessageBus::remotePeerUnauthorized,   this,   &BaseEc2Connection<T>::remotePeerUnauthorized,  Qt::DirectConnection);
+    template<class QueryProcessorType>
+    void BaseEc2Connection<QueryProcessorType>::startReceivingNotifications() {
+        connect(QnTransactionMessageBus::instance(),    &QnTransactionMessageBus::peerFound,                this,   &BaseEc2Connection<QueryProcessorType>::remotePeerFound,         Qt::DirectConnection);
+        connect(QnTransactionMessageBus::instance(),    &QnTransactionMessageBus::peerLost,                 this,   &BaseEc2Connection<QueryProcessorType>::remotePeerLost,          Qt::DirectConnection);
+        connect(QnTransactionMessageBus::instance(),    &QnTransactionMessageBus::remotePeerUnauthorized,   this,   &BaseEc2Connection<QueryProcessorType>::remotePeerUnauthorized,  Qt::DirectConnection);
         QnTransactionMessageBus::instance()->start();
     }
 
-    template<class T>
-    void BaseEc2Connection<T>::stopReceivingNotifications() {
+    template<class QueryProcessorType>
+    void BaseEc2Connection<QueryProcessorType>::stopReceivingNotifications() {
         QnTransactionMessageBus::instance()->disconnectAndJoin( this );
         QnTransactionMessageBus::instance()->stop();
     }
 
-    template<class T>
-    AbstractResourceManagerPtr BaseEc2Connection<T>::getResourceManager()
+    template<class QueryProcessorType>
+    AbstractResourceManagerPtr BaseEc2Connection<QueryProcessorType>::getResourceManager()
     {
         return m_resourceManager;
     }
 
-    template<class T>
-    AbstractMediaServerManagerPtr BaseEc2Connection<T>::getMediaServerManager()
+    template<class QueryProcessorType>
+    AbstractMediaServerManagerPtr BaseEc2Connection<QueryProcessorType>::getMediaServerManager()
     {
         return m_mediaServerManager;
     }
 
-    template<class T>
-    AbstractCameraManagerPtr BaseEc2Connection<T>::getCameraManager()
+    template<class QueryProcessorType>
+    AbstractCameraManagerPtr BaseEc2Connection<QueryProcessorType>::getCameraManager()
     {
         return m_cameraManager;
     }
 
-    template<class T>
-    AbstractLicenseManagerPtr BaseEc2Connection<T>::getLicenseManager()
+    template<class QueryProcessorType>
+    AbstractLicenseManagerPtr BaseEc2Connection<QueryProcessorType>::getLicenseManager()
     {
         return m_licenseManager;
     }
 
-    template<class T>
-    AbstractBusinessEventManagerPtr BaseEc2Connection<T>::getBusinessEventManager()
+    template<class QueryProcessorType>
+    AbstractBusinessEventManagerPtr BaseEc2Connection<QueryProcessorType>::getBusinessEventManager()
     {
         return m_businessEventManager;
     }
 
-    template<class T>
-    AbstractUserManagerPtr BaseEc2Connection<T>::getUserManager()
+    template<class QueryProcessorType>
+    AbstractUserManagerPtr BaseEc2Connection<QueryProcessorType>::getUserManager()
     {
         return m_userManager;
     }
 
-    template<class T>
-    AbstractLayoutManagerPtr BaseEc2Connection<T>::getLayoutManager()
+    template<class QueryProcessorType>
+    AbstractLayoutManagerPtr BaseEc2Connection<QueryProcessorType>::getLayoutManager()
     {
         return m_layoutManager;
     }
 
-    template<class T>
-    AbstractVideowallManagerPtr BaseEc2Connection<T>::getVideowallManager()
+    template<class QueryProcessorType>
+    AbstractVideowallManagerPtr BaseEc2Connection<QueryProcessorType>::getVideowallManager()
     {
         return m_videowallManager;
     }
 
-    template<class T>
-    AbstractWebPageManagerPtr BaseEc2Connection<T>::getWebPageManager()
+    template<class QueryProcessorType>
+    AbstractWebPageManagerPtr BaseEc2Connection<QueryProcessorType>::getWebPageManager()
     {
         return m_webPageManager;
     }
 
-    template<class T>
-    AbstractStoredFileManagerPtr BaseEc2Connection<T>::getStoredFileManager()
+    template<class QueryProcessorType>
+    AbstractStoredFileManagerPtr BaseEc2Connection<QueryProcessorType>::getStoredFileManager()
     {
         return m_storedFileManager;
     }
 
-    template<class T>
-    AbstractUpdatesManagerPtr BaseEc2Connection<T>::getUpdatesManager()
+    template<class QueryProcessorType>
+    AbstractUpdatesManagerPtr BaseEc2Connection<QueryProcessorType>::getUpdatesManager()
     {
         return m_updatesManager;
     }
 
-    template<class T>
-    AbstractMiscManagerPtr BaseEc2Connection<T>::getMiscManager()
+    template<class QueryProcessorType>
+    AbstractMiscManagerPtr BaseEc2Connection<QueryProcessorType>::getMiscManager()
     {
         return m_miscManager;
     }
 
-    template<class T>
-    AbstractDiscoveryManagerPtr BaseEc2Connection<T>::getDiscoveryManager()
+    template<class QueryProcessorType>
+    AbstractDiscoveryManagerPtr BaseEc2Connection<QueryProcessorType>::getDiscoveryManager()
     {
         return m_discoveryManager;
     }
 
-    template<class T>
-    AbstractTimeManagerPtr BaseEc2Connection<T>::getTimeManager()
+    template<class QueryProcessorType>
+    AbstractTimeManagerPtr BaseEc2Connection<QueryProcessorType>::getTimeManager()
     {
         return m_timeManager;
     }
 
-    template<class T>
-    int BaseEc2Connection<T>::dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler )
+    template<class QueryProcessorType>
+    int BaseEc2Connection<QueryProcessorType>::dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler )
     {
         const int reqID = generateRequestID();
 
@@ -179,8 +179,8 @@ namespace ec2
         return reqID;
     }
 
-    template<class T>
-    int BaseEc2Connection<T>::dumpDatabaseToFileAsync( const QString& dumpFilePath, impl::SimpleHandlerPtr handler )
+    template<class QueryProcessorType>
+    int BaseEc2Connection<QueryProcessorType>::dumpDatabaseToFileAsync( const QString& dumpFilePath, impl::SimpleHandlerPtr handler )
     {
         const int reqID = generateRequestID();
 
@@ -196,8 +196,8 @@ namespace ec2
         return reqID;
     }
 
-    template<class T>
-    int BaseEc2Connection<T>::restoreDatabaseAsync( const ec2::ApiDatabaseDumpData& data, impl::SimpleHandlerPtr handler )
+    template<class QueryProcessorType>
+    int BaseEc2Connection<QueryProcessorType>::restoreDatabaseAsync( const ec2::ApiDatabaseDumpData& data, impl::SimpleHandlerPtr handler )
     {
         const int reqID = generateRequestID();
 
@@ -211,8 +211,8 @@ namespace ec2
         return reqID;
     }
 
-    template<class T>
-    void BaseEc2Connection<T>::addRemotePeer(const QUrl& _url)
+    template<class QueryProcessorType>
+    void BaseEc2Connection<QueryProcessorType>::addRemotePeer(const QUrl& _url)
     {
         QUrl url(_url);
         url.setPath("/ec2/events");
@@ -221,8 +221,8 @@ namespace ec2
         QnTransactionMessageBus::instance()->addConnectionToPeer(url);
     }
 
-    template<class T>
-    void BaseEc2Connection<T>::deleteRemotePeer(const QUrl& _url)
+    template<class QueryProcessorType>
+    void BaseEc2Connection<QueryProcessorType>::deleteRemotePeer(const QUrl& _url)
     {
         QUrl url(_url);
         url.setPath("/ec2/events");
@@ -232,28 +232,28 @@ namespace ec2
     }
 
 
-    template<class T>
-    void ec2::BaseEc2Connection<T>::sendRuntimeData(const ec2::ApiRuntimeData &data)
+    template<class QueryProcessorType>
+    void ec2::BaseEc2Connection<QueryProcessorType>::sendRuntimeData(const ec2::ApiRuntimeData &data)
     {
         ec2::QnTransaction<ec2::ApiRuntimeData> tran(ec2::ApiCommand::runtimeInfoChanged);
         tran.params = data;
         qnTransactionBus->sendTransaction(tran);
     }
 
-    template<class T>
-    qint64 ec2::BaseEc2Connection<T>::getTransactionLogTime() const {
+    template<class QueryProcessorType>
+    qint64 ec2::BaseEc2Connection<QueryProcessorType>::getTransactionLogTime() const {
         return transactionLog ? transactionLog->getTransactionLogTime() : -1;
     }
 
-    template<class T>
-    void ec2::BaseEc2Connection<T>::setTransactionLogTime(qint64 value)
+    template<class QueryProcessorType>
+    void ec2::BaseEc2Connection<QueryProcessorType>::setTransactionLogTime(qint64 value)
     {
         if (transactionLog)
             transactionLog->setTransactionLogTime(value);
     }
 
-    template<class T>
-    QnUuid ec2::BaseEc2Connection<T>::routeToPeerVia(const QnUuid& dstPeer, int* distance) const
+    template<class QueryProcessorType>
+    QnUuid ec2::BaseEc2Connection<QueryProcessorType>::routeToPeerVia(const QnUuid& dstPeer, int* distance) const
     {
         return qnTransactionBus ? qnTransactionBus->routeToPeerVia(dstPeer, distance) : QnUuid();
     }

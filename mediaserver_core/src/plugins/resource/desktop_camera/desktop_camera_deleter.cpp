@@ -10,6 +10,7 @@
 #include <core/resource/layout_resource.h>
 
 #include <nx_ec/managers/abstract_layout_manager.h>
+#include <nx_ec/managers/abstract_camera_manager.h>
 
 namespace {
     const int timeout = 60*1000;    //check once a minute

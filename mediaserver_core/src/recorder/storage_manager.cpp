@@ -15,6 +15,8 @@
 #include <core/resource/camera_history.h>
 #include "api/app_server_connection.h"
 
+#include <nx_ec/managers/abstract_camera_manager.h>
+
 #include <recorder/server_stream_recorder.h>
 #include <recorder/recording_manager.h>
 #include <recorder/schedule_sync.h>
@@ -1125,9 +1127,7 @@ void QnStorageManager::updateCameraHistory()
         QnAppServerConnectionFactory::getConnection2();
 
     ec2::ErrorCode errCode =
-        appServerConnection->getCameraManager()
-                           ->setCamerasWithArchiveSync(qnCommon->moduleGUID(),
-                                                       archivedListNew);
+        appServerConnection->getCameraManager()->setServerFootageDataSync(qnCommon->moduleGUID(), archivedListNew);
 
     if (errCode != ec2::ErrorCode::ok) {
         qCritical() << "ECS server error during execute method addCameraHistoryItem: "
@@ -1478,7 +1478,7 @@ bool QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
     while (toDelete > 0)
     {
         if (QnResource::isStopping())
-        {   // Return true to mark this storage as succesfully cleaned since 
+        {   // Return true to mark this storage as succesfully cleaned since
             // we don't want this storage to be added in clear-again list when
             // server is going to stop.
             return true;

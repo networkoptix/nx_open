@@ -69,6 +69,7 @@
 #include <nx_ec/managers/abstract_layout_manager.h>
 #include <nx_ec/managers/abstract_videowall_manager.h>
 #include <nx_ec/managers/abstract_webpage_manager.h>
+#include <nx_ec/managers/abstract_camera_manager.h>
 
 #include <platform/platform_abstraction.h>
 
@@ -1132,10 +1133,10 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
 
     {
         // read camera list
-        QnVirtualCameraResourceList cameras;
+        ec2::ApiCameraDataList cameras;
         while ((rez = ec2Connection->getCameraManager()->getCamerasSync(QnUuid(), &cameras)) != ec2::ErrorCode::ok)
         {
-            NX_LOG( lit("QnMain::run(): Can't get cameras. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1 );
+            NX_LOG(lit("QnMain::run(): Can't get cameras. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1);
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
             if (m_needStop)
                 return;
@@ -1145,46 +1146,49 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
         ec2::ApiCameraAttributesDataList cameraUserAttributesList;
         while ((rez = ec2Connection->getCameraManager()->getUserAttributesSync(QnUuid(), &cameraUserAttributesList)) != ec2::ErrorCode::ok)
         {
-            NX_LOG( lit("QnMain::run(): Can't get camera user attributes list. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1 );
+            NX_LOG(lit("QnMain::run(): Can't get camera user attributes list. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1);
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
             if (m_needStop)
                 return;
         }
-        messageProcessor->resetCameraUserAttributesList( cameraUserAttributesList );
+        messageProcessor->resetCameraUserAttributesList(cameraUserAttributesList);
 
         // read properties dictionary
         ec2::ApiResourceParamWithRefDataList kvPairs;
         while ((rez = ec2Connection->getResourceManager()->getKvPairsSync(QnUuid(), &kvPairs)) != ec2::ErrorCode::ok)
         {
-            NX_LOG( lit("QnMain::run(): Can't get properties dictionary. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1 );
+            NX_LOG(lit("QnMain::run(): Can't get properties dictionary. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1);
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
             if (m_needStop)
                 return;
         }
-        messageProcessor->resetPropertyList( kvPairs );
+        messageProcessor->resetPropertyList(kvPairs);
 
+        /* Properties and attributes must be read before processing cameras because of getAuth() method */
         QnManualCameraInfoMap manualCameras;
-        for(const QnSecurityCamResourcePtr &camera: cameras) {
+        for (const auto &camera : cameras)
+        {
             messageProcessor->updateResource(camera);
-            if (camera->isManuallyAdded()) {
-                QnResourceTypePtr resType = qnResTypePool->getResourceType(camera->getTypeId());
-                manualCameras.insert(camera->getUrl(), QnManualCameraInfo(QUrl(camera->getUrl()), camera->getAuth(), resType->getName()));
+            if (camera.manuallyAdded)
+            {
+                QnResourceTypePtr resType = qnResTypePool->getResourceType(camera.typeId);
+                manualCameras.insert(camera.url,
+                    QnManualCameraInfo(QUrl(camera.url), QnNetworkResource::getResourceAuth(camera.id, camera.typeId), resType->getName()));
             }
         }
         QnResourceDiscoveryManager::instance()->registerManualCameras(manualCameras);
-
     }
 
     {
-        ec2::ApiServerFootageDataList cameraHistoryList;
-        while (( rez = ec2Connection->getCameraManager()->getCamerasWithArchiveListSync(&cameraHistoryList)) != ec2::ErrorCode::ok)
+        ec2::ApiServerFootageDataList serverFootageData;
+        while (( rez = ec2Connection->getCameraManager()->getServerFootageDataSync(&serverFootageData)) != ec2::ErrorCode::ok)
         {
             qDebug() << "QnMain::run(): Can't get cameras history. Reason: " << ec2::toString(rez);
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
             if (m_needStop)
                 return;
         }
-        qnCameraHistoryPool->resetServerFootageData(cameraHistoryList);
+        qnCameraHistoryPool->resetServerFootageData(serverFootageData);
     }
 
     {

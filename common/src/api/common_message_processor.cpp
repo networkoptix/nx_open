@@ -5,12 +5,12 @@
 #include <nx_ec/managers/abstract_layout_manager.h>
 #include <nx_ec/managers/abstract_videowall_manager.h>
 #include <nx_ec/managers/abstract_webpage_manager.h>
+#include <nx_ec/managers/abstract_camera_manager.h>
 
 #include <nx_ec/data/api_full_info_data.h>
 #include <nx_ec/data/api_discovery_data.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/data/api_media_server_data.h>
-#include <nx_ec/data/api_camera_data.h>
 #include <nx_ec/data/api_camera_attributes_data.h>
 #include <nx_ec/data/api_resource_type_data.h>
 #include <nx_ec/data/api_license_data.h>
@@ -92,11 +92,11 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     connect(mediaServerManager, &ec2::AbstractMediaServerManager::userAttributesRemoved, this, &QnCommonMessageProcessor::on_mediaServerUserAttributesRemoved );
 
     auto cameraManager = connection->getCameraManager();
-    connect(cameraManager, &ec2::AbstractCameraManager::cameraAddedOrUpdated,       this, [this](const QnVirtualCameraResourcePtr &camera){updateResource(camera);});
+    connect(cameraManager, &ec2::AbstractCameraManager::addedOrUpdated,             this, on_resourceUpdated);
     connect(cameraManager, &ec2::AbstractCameraManager::userAttributesChanged,      this, &QnCommonMessageProcessor::on_cameraUserAttributesChanged );
     connect(cameraManager, &ec2::AbstractCameraManager::userAttributesRemoved,      this, &QnCommonMessageProcessor::on_cameraUserAttributesRemoved );
     connect(cameraManager, &ec2::AbstractCameraManager::cameraHistoryChanged,       this, &QnCommonMessageProcessor::on_cameraHistoryChanged );
-    connect(cameraManager, &ec2::AbstractCameraManager::cameraRemoved,              this, &QnCommonMessageProcessor::on_resourceRemoved );
+    connect(cameraManager, &ec2::AbstractCameraManager::removed,                    this, &QnCommonMessageProcessor::on_resourceRemoved );
 
     auto userManager = connection->getUserManager();
     connect(userManager, &ec2::AbstractUserManager::addedOrUpdated,                 this, on_resourceUpdated);
@@ -249,8 +249,11 @@ void QnCommonMessageProcessor::on_resourceRemoved( const QnUuid& resourceId )
         removeResourceIgnored(resourceId);
 }
 
-void QnCommonMessageProcessor::on_cameraUserAttributesChanged(const QnCameraUserAttributesPtr& userAttributes)
+void QnCommonMessageProcessor::on_cameraUserAttributesChanged(const ec2::ApiCameraAttributesData& attrs)
 {
+    QnCameraUserAttributesPtr userAttributes(new QnCameraUserAttributes());
+    fromApiToResource(attrs, userAttributes);
+
     QSet<QByteArray> modifiedFields;
     {
         QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), userAttributes->cameraID );
@@ -364,7 +367,6 @@ void QnCommonMessageProcessor::resetResources(const ec2::ApiFullInfoData& fullDa
     QnResourceFactory* factory = getResourceFactory();
 
     fromApiToResourceList(fullData.servers, resources);
-    fromApiToResourceList(fullData.cameras, resources, factory);
     fromApiToResourceList(fullData.storages, resources, factory);
 
     /* Store all remote resources id to clean them if they are not in the list anymore. */
@@ -392,6 +394,7 @@ void QnCommonMessageProcessor::resetResources(const ec2::ApiFullInfoData& fullDa
         remoteResources.remove(resource->getId());
     }
     updateResources(fullData.users);
+    updateResources(fullData.cameras);
     updateResources(fullData.layouts);
     updateResources(fullData.videowalls);
     updateResources(fullData.webPages);
@@ -570,4 +573,17 @@ void QnCommonMessageProcessor::updateResource(const ec2::ApiWebPageData& webpage
     QnWebPageResourcePtr qnWebpage(new QnWebPageResource());
     fromApiToResource(webpage, qnWebpage);
     updateResource(qnWebpage);
+}
+
+void QnCommonMessageProcessor::updateResource(const ec2::ApiCameraData& camera)
+{
+    QnVirtualCameraResourcePtr qnCamera = getResourceFactory()->createResource(camera.typeId,
+            QnResourceParams(camera.id, camera.url, camera.vendor))
+        .dynamicCast<QnVirtualCameraResource>();
+    Q_ASSERT_X(qnCamera, Q_FUNC_INFO, QByteArray("Unknown resource type:") + camera.typeId.toByteArray());
+    if (qnCamera)
+    {
+        fromApiToResource(camera, qnCamera);
+        updateResource(qnCamera);
+    }
 }
