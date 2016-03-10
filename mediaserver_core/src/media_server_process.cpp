@@ -1134,7 +1134,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
     {
         // read camera list
         ec2::ApiCameraDataList cameras;
-        while ((rez = ec2Connection->getCameraManager()->getCamerasSync(QnUuid(), &cameras)) != ec2::ErrorCode::ok)
+        while ((rez = ec2Connection->getCameraManager()->getCamerasSync(&cameras)) != ec2::ErrorCode::ok)
         {
             NX_LOG(lit("QnMain::run(): Can't get cameras. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1);
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
@@ -1144,7 +1144,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
 
         //reading camera attributes
         ec2::ApiCameraAttributesDataList cameraUserAttributesList;
-        while ((rez = ec2Connection->getCameraManager()->getUserAttributesSync(QnUuid(), &cameraUserAttributesList)) != ec2::ErrorCode::ok)
+        while ((rez = ec2Connection->getCameraManager()->getUserAttributesSync(&cameraUserAttributesList)) != ec2::ErrorCode::ok)
         {
             NX_LOG(lit("QnMain::run(): Can't get camera user attributes list. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1);
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);

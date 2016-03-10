@@ -1050,7 +1050,7 @@ namespace ec2
             }
 
             ec2::ApiCameraDataExList cameras;
-            if (dbManager->doQuery(QnUuid(), cameras) != ErrorCode::ok) {
+            if (dbManager->doQuery(nullptr, cameras) != ErrorCode::ok) {
                 qWarning() << "Can't execute query for sync with client peer!";
                 return false;
             }

@@ -23,17 +23,17 @@ namespace ec2
         \param handler Functor with params: (ErrorCode, const ec2::ApiCameraDataList& cameras)
         */
         template<class TargetType, class HandlerType>
-        int getCameras(const QnUuid& mediaServerId, TargetType* target, HandlerType handler)
+        int getCameras(TargetType* target, HandlerType handler)
         {
-            return getCameras(mediaServerId, std::static_pointer_cast<impl::GetCamerasHandler>(
+            return getCameras(std::static_pointer_cast<impl::GetCamerasHandler>(
                 std::make_shared<impl::CustomGetCamerasHandler<TargetType, HandlerType>>(target, handler)));
         }
 
-        ErrorCode getCamerasSync(const QnUuid& mediaServerId, ec2::ApiCameraDataList* const cameraList)
+        ErrorCode getCamerasSync(ec2::ApiCameraDataList* const cameraList)
         {
-            return impl::doSyncCall<impl::GetCamerasHandler>([this, mediaServerId](impl::GetCamerasHandlerPtr handler)
+            return impl::doSyncCall<impl::GetCamerasHandler>([this](impl::GetCamerasHandlerPtr handler)
             {
-                this->getCameras(mediaServerId, handler);
+                this->getCameras(handler);
             }, cameraList);
         }
 
@@ -115,17 +115,17 @@ namespace ec2
         \param handler Functor with params: (ErrorCode, const QnCameraUserAttributesList& cameraUserAttributesList)
         */
         template<class TargetType, class HandlerType>
-        int getUserAttributes(const QnUuid& cameraId, TargetType* target, HandlerType handler)
+        int getUserAttributes(TargetType* target, HandlerType handler)
         {
-            return getUserAttributes(cameraId, std::static_pointer_cast<impl::GetCameraUserAttributesHandler>(
+            return getUserAttributes(std::static_pointer_cast<impl::GetCameraUserAttributesHandler>(
                 std::make_shared<impl::CustomGetCameraUserAttributesHandler<TargetType, HandlerType>>(target, handler)));
         }
 
-        ErrorCode getUserAttributesSync(const QnUuid& cameraId, ec2::ApiCameraAttributesDataList* const attributesList)
+        ErrorCode getUserAttributesSync(ec2::ApiCameraAttributesDataList* const attributesList)
         {
-            return impl::doSyncCall<impl::GetCameraUserAttributesHandler>([this, cameraId](impl::GetCameraUserAttributesHandlerPtr handler)
+            return impl::doSyncCall<impl::GetCameraUserAttributesHandler>([this](impl::GetCameraUserAttributesHandlerPtr handler)
             {
-                this->getUserAttributes(cameraId, handler);
+                this->getUserAttributes(handler);
             }, attributesList);
         }
 
@@ -157,7 +157,7 @@ namespace ec2
         void userAttributesRemoved(const QnUuid& id);
 
     protected:
-        virtual int getCameras(const QnUuid& mediaServerId, impl::GetCamerasHandlerPtr handler) = 0;
+        virtual int getCameras(impl::GetCamerasHandlerPtr handler) = 0;
         virtual int addCamera(const ec2::ApiCameraData& camera, impl::SimpleHandlerPtr handler) = 0;
         virtual int save(const ec2::ApiCameraDataList& cameras, impl::SimpleHandlerPtr handler) = 0;
         virtual int remove(const QnUuid& id, impl::SimpleHandlerPtr handler) = 0;
@@ -165,7 +165,7 @@ namespace ec2
         virtual int setServerFootageData(const QnUuid& serverGuid, const std::vector<QnUuid>& cameras, impl::SimpleHandlerPtr handler) = 0;
         virtual int getServerFootageData(impl::GetCamerasHistoryHandlerPtr handler) = 0;
         virtual int saveUserAttributes(const ec2::ApiCameraAttributesDataList& cameras, impl::SimpleHandlerPtr handler) = 0;
-        virtual int getUserAttributes(const QnUuid& serverId, impl::GetCameraUserAttributesHandlerPtr handler) = 0;
+        virtual int getUserAttributes(impl::GetCameraUserAttributesHandlerPtr handler) = 0;
     };
 
 }

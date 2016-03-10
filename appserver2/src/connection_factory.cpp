@@ -286,7 +286,7 @@ namespace ec2
         //AbstractCameraManager::save
         registerUpdateFuncHandler<ApiCameraDataList>(p, ApiCommand::saveCameras);
         //AbstractCameraManager::getCameras
-        registerGetFuncHandler<QnUuid, ApiCameraDataList>(p, ApiCommand::getCameras);
+        registerGetFuncHandler<std::nullptr_t, ApiCameraDataList>(p, ApiCommand::getCameras);
 
         //AbstractCameraManager::saveUserAttributes
         registerUpdateFuncHandler<ApiCameraAttributesDataList>(p, ApiCommand::saveCameraUserAttributesList);
@@ -392,7 +392,6 @@ namespace ec2
         /**%apidoc GET /ec2/getCameraUserAttributes
          * Read additional camera attributes.
          * %// TODO: This function is named inconsistently - should end with 'List'.
-         * %// TODO: Not published param[opt] id Server unique Id.
          * %param[default] format
          * %return List of additional camera attributes objects for all cameras in the requested format.
          *     %param cameraID Camera unique id.
@@ -486,7 +485,7 @@ namespace ec2
          *         %value CameraBackup_Default A default value is used for backup options.
          * %// AbstractCameraManager::getUserAttributes
          */
-        registerGetFuncHandler<QnUuid, ApiCameraAttributesDataList>(p, ApiCommand::getCameraUserAttributes);
+        registerGetFuncHandler<std::nullptr_t, ApiCameraAttributesDataList>(p, ApiCommand::getCameraUserAttributes);
 
         //AbstractCameraManager::addCameraHistoryItem
         registerUpdateFuncHandler<ApiServerFootageData>(p, ApiCommand::addCameraHistoryItem);
@@ -620,7 +619,7 @@ namespace ec2
          *     %param addParams List of additional parameters for camera. This list can contain such information as full ONVIF url, camera maximum fps e.t.c
          * %// AbstractCameraManager::getCamerasEx
          */
-        registerGetFuncHandler<QnUuid, ApiCameraDataExList>(p, ApiCommand::getCamerasEx);
+        registerGetFuncHandler<std::nullptr_t, ApiCameraDataExList>(p, ApiCommand::getCamerasEx);
 
         /**%apidoc GET /ec2/getStorages
          * Read the list of current storages.

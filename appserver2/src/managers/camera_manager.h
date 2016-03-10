@@ -8,58 +8,25 @@ namespace ec2
     class QnCameraNotificationManager: public AbstractCameraManager
     {
     public:
-        QnCameraNotificationManager() {}
+        QnCameraNotificationManager();
 
-        void triggerNotification( const QnTransaction<ApiCameraData>& tran )
-        {
-            assert( tran.command == ApiCommand::saveCamera);
-            emit addedOrUpdated(tran.params);
-        }
-
-        void triggerNotification( const QnTransaction<ApiCameraDataList>& tran )
-        {
-            assert( tran.command == ApiCommand::saveCameras );
-            for(const ApiCameraData& camera: tran.params)
-            {
-                emit addedOrUpdated(camera);
-            }
-        }
-
-        void triggerNotification( const QnTransaction<ApiCameraAttributesData>& tran ) {
-            assert( tran.command == ApiCommand::saveCameraUserAttributes );
-            emit userAttributesChanged(tran.params);
-        }
-
-        void triggerNotification( const QnTransaction<ApiCameraAttributesDataList>& tran ) {
-            assert( tran.command == ApiCommand::saveCameraUserAttributesList );
-            for(const ApiCameraAttributesData& attrs: tran.params)
-                emit userAttributesChanged(attrs);
-        }
-
-        void triggerNotification( const QnTransaction<ApiIdData>& tran )
-        {
-            assert( tran.command == ApiCommand::removeCamera );
-            emit removed( tran.params.id );
-        }
-
-        void triggerNotification( const QnTransaction<ApiServerFootageData>& tran )
-        {
-            if (tran.command == ApiCommand::addCameraHistoryItem)
-                emit cameraHistoryChanged( tran.params);
-        }
+        void triggerNotification(const QnTransaction<ApiCameraData>& tran);
+        void triggerNotification(const QnTransaction<ApiCameraDataList>& tran);
+        void triggerNotification(const QnTransaction<ApiCameraAttributesData>& tran);
+        void triggerNotification(const QnTransaction<ApiCameraAttributesDataList>& tran);
+        void triggerNotification(const QnTransaction<ApiIdData>& tran);
+        void triggerNotification(const QnTransaction<ApiServerFootageData>& tran);
     };
-
-
 
 
     template<class QueryProcessorType>
     class QnCameraManager: public QnCameraNotificationManager
     {
     public:
-        QnCameraManager( QueryProcessorType* const queryProcessor );
+        QnCameraManager(QueryProcessorType* const queryProcessor);
 
         //!Implementation of AbstractCameraManager::getCameras
-        virtual int getCameras(const QnUuid& mediaServerId, impl::GetCamerasHandlerPtr handler) override;
+        virtual int getCameras(impl::GetCamerasHandlerPtr handler) override;
         //!Implementation of AbstractCameraManager::addCamera
         virtual int addCamera(const ec2::ApiCameraData&, impl::SimpleHandlerPtr handler) override;
         //!Implementation of AbstractCameraManager::save
@@ -68,21 +35,21 @@ namespace ec2
         virtual int remove(const QnUuid& id, impl::SimpleHandlerPtr handler) override;
 
         //!Implementation of AbstractCameraManager::ApiServerFootageData
-        virtual int setServerFootageData(const QnUuid& serverGuid, const std::vector<QnUuid>& cameras, impl::SimpleHandlerPtr handler ) override;
+        virtual int setServerFootageData(const QnUuid& serverGuid, const std::vector<QnUuid>& cameras, impl::SimpleHandlerPtr handler) override;
         //!Implementation of AbstractCameraManager::getCameraHistoryList
-        virtual int getServerFootageData( impl::GetCamerasHistoryHandlerPtr handler ) override;
+        virtual int getServerFootageData(impl::GetCamerasHistoryHandlerPtr handler) override;
         //!Implementation of AbstractCameraManager::saveUserAttributes
-        virtual int saveUserAttributes( const ec2::ApiCameraAttributesDataList& cameraAttributes, impl::SimpleHandlerPtr handler ) override;
+        virtual int saveUserAttributes(const ec2::ApiCameraAttributesDataList& cameraAttributes, impl::SimpleHandlerPtr handler) override;
         //!Implementation of AbstractCameraManager::getUserAttributes
-        virtual int getUserAttributes( const QnUuid& serverId, impl::GetCameraUserAttributesHandlerPtr handler ) override;
+        virtual int getUserAttributes(impl::GetCameraUserAttributesHandlerPtr handler) override;
 
     private:
         QueryProcessorType* const m_queryProcessor;
 
-        QnTransaction<ApiCameraData> prepareTransaction( ApiCommand::Value cmd, const ec2::ApiCameraData& camera);
-        QnTransaction<ApiCameraDataList> prepareTransaction( ApiCommand::Value cmd, const ec2::ApiCameraDataList& cameras );
+        QnTransaction<ApiCameraData> prepareTransaction(ApiCommand::Value cmd, const ec2::ApiCameraData& camera);
+        QnTransaction<ApiCameraDataList> prepareTransaction(ApiCommand::Value cmd, const ec2::ApiCameraDataList& cameras);
 
         QnTransaction<ApiCameraAttributesDataList> prepareTransaction(ApiCommand::Value cmd, const ec2::ApiCameraAttributesDataList& cameraAttributesList);
-        QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value command, const QnUuid& id );
+        QnTransaction<ApiIdData> prepareTransaction(ApiCommand::Value command, const QnUuid& id);
     };
 }
