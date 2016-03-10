@@ -15,11 +15,9 @@ NEW DEVICE SUPPORT
     Hikvision DS-6704HFI 4 Channel Video Server
 
 IMPROVEMENTS
-?    Alarm inputs are not discovered from OnCam 360 camera's - VISTA-75
     Implemented "Advanced" Settings for DWC-BVI2IR cameras - VMS-415
     Better support of ISD Panzilla cameras - VMS-1465, VMS-936, VMS-1351
     Vista VK2-1080XVRDPTPMF camera now mapped for advanced PTZ - VISTA-76
-    PTZ improvements for camera ACTi PTZ Dome I98 - VISTA-80
     Arecont RTSP camera support implemented - VMS-1166
     Digital I/O support for Arecont cameras implemented - VMS-1343
     Added "Connect" button to the "Connection Test" dialog - VMS-263
@@ -38,9 +36,11 @@ IMPROVEMENTS
     Server SSL can now be disabled
     API documentation is improved and extended
     Continual general Server improvements based on anonymous usage and crash statistics - VMS-1529, VMS-1491, VMS-1239
+    Storage usage optimizations and improvements
 
 BUG FIXES
     Server on Nx1 sometimes crashed on generic event. Fixed.
+    Transcoded http-stream didn't have audio track - VMS-2124    
     Digital I/O could not be programmed for Honeywell cameras. Fixed. - VMS-1479
     Digital I/O could not be programmed for Sony cameras with latest firmware. Fixed. - VMS-1348
     AV20175DN firmware update re-ordered sensors. Fixed. - VMS-1192
