@@ -102,7 +102,6 @@ QnMediaResourceHelper::QnMediaResourceHelper(QObject *parent)
     , m_finalTimestamp(-1)
     , m_resolution(0)
     , m_nativeStreamIndex(1)
-    , m_transcodingSupported(true)
     , m_useTranscoding(true)
     , m_transcodingProtocol(transcodingProtocol)
     , m_nativeProtocol(nativeStreamProtocol)
@@ -659,7 +658,7 @@ void QnMediaResourceHelper::updateCurrentStream()
     if (!server)
         return;
 
-    bool useTranscoding = m_transcodingSupported && transcodingSupportedForServer(server);
+    bool useTranscoding = transcodingSupportedForServer(server);
 
     if (m_useTranscoding != useTranscoding)
     {
@@ -696,9 +695,6 @@ void QnMediaResourceHelper::updateStardardResolutions()
         if (resolution <= maxResolution)
             m_standardResolutions.append(resolution);
     }
-
-    if (!m_transcodingSupported)
-        return;
 
     maxResolution = m_standardResolutions.last();
 
