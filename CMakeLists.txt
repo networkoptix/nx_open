@@ -142,6 +142,7 @@ include_directories($ENV{environment}/boost_1_56_0
                     ${CMAKE_SOURCE_DIR}/common_libs/nx_audio/src
                     ${CMAKE_SOURCE_DIR}/common_libs/udt/src                    
                     $ENV{environment}/qt5-custom
+                    $ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}/include
                     $ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}/include/QtZlib
                     $ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}/include/QtCore/${qt.version}/QtCore
                     $ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}/include/QtCore/${qt.version}
@@ -186,8 +187,9 @@ find_package(Qt5LinguistTools)
                     
 add_module(
     NAMES
-        nxtool
-        common
-        common_libs
+        #nxtool
+        #common
+        #common_libs
+        appserver2
     STATUS_SHORT_NAMES
 )
