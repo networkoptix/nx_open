@@ -1873,9 +1873,6 @@ void MediaServerProcess::run()
 
     MediaServerStatusWatcher mediaServerStatusWatcher;
 
-    ec2::ResourceContext resCtx(
-        QnResourceDiscoveryManager::instance(),
-        qnResPool);
     //passing settings
     std::map<QString, QVariant> confParams;
     for( const auto& paramName: MSSettings::roSettings()->allKeys() )
@@ -1884,7 +1881,6 @@ void MediaServerProcess::run()
             confParams.emplace( paramName, MSSettings::roSettings()->value( paramName ) );
     }
     ec2ConnectionFactory->setConfParams(std::move(confParams));
-    ec2ConnectionFactory->setContext(resCtx);
     ec2::AbstractECConnectionPtr ec2Connection;
     QnConnectionInfo connectInfo;
 

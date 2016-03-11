@@ -66,7 +66,7 @@ namespace ec2
         QnDbManager();
         virtual ~QnDbManager();
 
-        bool init(QnResourceFactory* factory, const QUrl& dbUrl);
+        bool init(const QUrl& dbUrl);
         bool isInitialized() const;
 
         template <class T>
@@ -560,7 +560,6 @@ namespace ec2
         bool isTranAllowed(const QnAbstractTransaction& tran) const;
 
     private:
-        QnResourceFactory* m_resourceFactory;
         QnUuid m_storageTypeId;
         QnUuid m_serverTypeId;
         QnUuid m_cameraTypeId;
@@ -571,7 +570,7 @@ namespace ec2
         QnUuid m_dbInstanceId;
         bool m_initialized;
         /*
-        * Database for static or very rare modified data. Be carefull! It's not supported DB transactions for static DB
+        * Database for static or very rare modified data. Be careful! It's not supported DB transactions for static DB
         * So, only atomic SQL updates are allowed. m_mutexStatic is used for createDB only. Common mutex/transaction is sharing for both DB
         */
         QSqlDatabase m_sdbStatic;

@@ -439,9 +439,9 @@ namespace ec2
         if (m_usedTimeSyncInfo.timePriorityKey.flags & Qn::TF_peerTimeSetByUser)
             result.syncTimeFlags |= Qn::TF_peerTimeSetByUser;
 
-        if (m_resCtx.pool)
+        if (qnResPool)
         {
-            const auto allServers = m_resCtx.pool->getAllServers(Qn::AnyStatus);
+            const auto allServers = qnResPool->getAllServers(Qn::AnyStatus);
             for (const auto& server: allServers)
             {
                 const auto guidStr = server->getId().toByteArray();
@@ -644,12 +644,6 @@ namespace ec2
             rttMillis ? rttMillis.get() : MAX_DESIRED_TIME_DRIFT_MS);
         if (m_localTimePriorityKey.toUInt64() != localTimePriorityBak)
             handleLocalTimePriorityKeyChange(&lk);
-    }
-
-    void TimeSynchronizationManager::setContext(const ResourceContext& resCtx)
-    {
-        QnMutexLocker lk(&m_mutex);
-        m_resCtx = resCtx;
     }
 
     void TimeSynchronizationManager::remotePeerTimeSyncUpdate(

@@ -20,13 +20,11 @@ namespace ec2
 {
     template<class QueryProcessorType>
     BaseEc2Connection<QueryProcessorType>::BaseEc2Connection(
-        QueryProcessorType* queryProcessor,
-        const ResourceContext& resCtx )
+        QueryProcessorType* queryProcessor)
     :
         m_queryProcessor( queryProcessor ),
-        m_resCtx( resCtx ),
         m_licenseManager( new QnLicenseManager<QueryProcessorType>(m_queryProcessor) ),
-        m_resourceManager( new QnResourceManager<QueryProcessorType>(m_queryProcessor, resCtx) ),
+        m_resourceManager( new QnResourceManager<QueryProcessorType>(m_queryProcessor) ),
         m_mediaServerManager( new QnMediaServerManager<QueryProcessorType>(m_queryProcessor) ),
         m_cameraManager( new QnCameraManager<QueryProcessorType>(m_queryProcessor) ),
         m_userManager( new QnUserManager<QueryProcessorType>(m_queryProcessor) ),
@@ -42,7 +40,6 @@ namespace ec2
     {
         m_notificationManager.reset(
             new ECConnectionNotificationManager(
-                m_resCtx,
                 this,
                 m_licenseManager.get(),
                 m_resourceManager.get(),

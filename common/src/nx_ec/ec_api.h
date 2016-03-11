@@ -184,7 +184,6 @@ namespace ec2
 
     signals:
         void statusChanged( const QnUuid& resourceId, Qn::ResourceStatus status );
-        //void disabledChanged( const QnUuid& resourceId, bool disabled );
         void resourceChanged( const QnResourcePtr& resource );
         void resourceParamChanged( const ApiResourceParamWithRefData& param );
         void resourceRemoved( const QnUuid& resourceId );
@@ -193,20 +192,13 @@ namespace ec2
         virtual int getResourceTypes( impl::GetResourceTypesHandlerPtr handler ) = 0;
         virtual int setResourceStatus( const QnUuid& resourceId, Qn::ResourceStatus status, impl::SetResourceStatusHandlerPtr handler ) = 0;
         virtual int setResourceStatusLocal( const QnUuid& resourceId, Qn::ResourceStatus status, impl::SetResourceStatusHandlerPtr handler ) = 0;
-        //virtual int setResourceDisabled( const QnUuid& resourceId, bool disabled, impl::SetResourceDisabledHandlerPtr handler ) = 0;
         virtual int getKvPairs( const QnUuid &resourceId, impl::GetKvPairsHandlerPtr handler ) = 0;
         virtual int getStatusList( const QnUuid &resourceId, impl::GetStatusListHandlerPtr handler ) = 0;
-        //virtual int save( const QnResourcePtr &resource, impl::SaveResourceHandlerPtr handler ) = 0;
         virtual int save(const ec2::ApiResourceParamWithRefDataList& kvPairs, impl::SaveKvPairsHandlerPtr handler ) = 0;
         virtual int removeParams(const ec2::ApiResourceParamWithRefDataList& kvPairs, impl::SaveKvPairsHandlerPtr handler ) = 0;
         virtual int remove( const QnUuid& resource, impl::SimpleHandlerPtr handler ) = 0;
         virtual int remove( const QVector<QnUuid>& resourceList, impl::SimpleHandlerPtr handler ) = 0;
     };
-
-
-
-
-
 
 
     /*!
@@ -690,29 +682,6 @@ namespace ec2
         virtual int restoreDatabaseAsync( const ec2::ApiDatabaseDumpData& data, impl::SimpleHandlerPtr handler ) = 0;
     };
 
-
-    struct ResourceContext
-    {
-        QnResourceFactory* resFactory;
-        QnResourcePool* pool;
-
-        ResourceContext()
-        :
-            resFactory( nullptr ),
-            pool( nullptr )
-        {
-        }
-        ResourceContext(
-            QnResourceFactory* _resFactory,
-            QnResourcePool* _pool
-            )
-        :
-            resFactory( _resFactory ),
-            pool( _pool )
-        {
-        }
-    };
-
     /*!
         \note All methods are asynchronous if other not specified
     */
@@ -750,7 +719,6 @@ namespace ec2
 
         virtual void registerRestHandlers( QnRestProcessorPool* const restProcessorPool ) = 0;
         virtual void registerTransactionListener(QnHttpConnectionListener* httpConnectionListener) = 0;
-        virtual void setContext( const ResourceContext& resCtx ) = 0;
         virtual void setConfParams( std::map<QString, QVariant> confParams ) = 0;
 
         /**

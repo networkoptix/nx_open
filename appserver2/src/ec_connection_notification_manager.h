@@ -34,7 +34,6 @@ namespace ec2
     {
     public:
         ECConnectionNotificationManager(
-            const ResourceContext& resCtx,
             AbstractECConnection* ecConnection,
             QnLicenseNotificationManager* licenseManager,
             QnResourceNotificationManager* resourceManager,
@@ -121,7 +120,6 @@ namespace ec2
 
         void databaseReplaceRequired();
     private:
-        ResourceContext m_resCtx;
         AbstractECConnection* m_ecConnection;
         QnLicenseNotificationManager* m_licenseManager;
         QnResourceNotificationManager* m_resourceManager;

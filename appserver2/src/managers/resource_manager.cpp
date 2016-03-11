@@ -14,9 +14,9 @@
 namespace ec2
 {
     template<class T>
-    QnResourceManager<T>::QnResourceManager( T* const queryProcessor, const ResourceContext& resCtx)
+    QnResourceManager<T>::QnResourceManager( T* const queryProcessor)
     :
-        QnResourceNotificationManager( resCtx ),
+        QnResourceNotificationManager(),
         m_queryProcessor( queryProcessor )
     {
     }
@@ -169,25 +169,6 @@ namespace ec2
     {
         QnTransaction<ApiIdData> tran(command);
         tran.params.id = id;
-        return tran;
-    }
-
-    /*
-    template<class T>
-    QnTransaction<ApiSetResourceDisabledData> QnResourceManager<T>::prepareTransaction( ApiCommand::Value command, const QnUuid& id, bool disabled )
-    {
-        QnTransaction<ApiSetResourceDisabledData> tran(command, true);
-        tran.params.id = id;
-        tran.params.disabled = disabled;
-        return tran;
-    }
-    */
-
-    template<class T>
-    QnTransaction<ApiResourceData> QnResourceManager<T>::prepareTransaction( ApiCommand::Value command, const QnResourcePtr& resource )
-    {
-        QnTransaction<ApiResourceData> tran(command);
-        fromResourceToApi(resource, tran.params);
         return tran;
     }
 

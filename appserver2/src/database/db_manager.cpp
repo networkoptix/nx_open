@@ -340,10 +340,8 @@ bool createCorruptedDbBackup(const QString& dbFileName)
     return true;
 }
 
-bool QnDbManager::init(QnResourceFactory* factory, const QUrl& dbUrl)
+bool QnDbManager::init(const QUrl& dbUrl)
 {
-    m_resourceFactory = factory;
-
     const QString dbFilePath = dbUrl.toLocalFile();
     const QString dbFilePathStatic = QUrlQuery(dbUrl.query()).queryItemValue("staticdb_path");
 

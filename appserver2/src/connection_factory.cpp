@@ -151,8 +151,6 @@ namespace ec2
          */
         registerGetFuncHandler<std::nullptr_t, ApiResourceTypeDataList>(p, ApiCommand::getResourceTypes);
 
-        //AbstractResourceManager::getResource
-        //registerGetFuncHandler<std::nullptr_t, ApiResourceData>(p, ApiCommand::getResource);
         //AbstractResourceManager::setResourceStatus
         registerUpdateFuncHandler<ApiResourceStatusData>(p, ApiCommand::setResourceStatus);
 
@@ -1037,12 +1035,6 @@ namespace ec2
         //    new QnRestTransactionReceiver());
     }
 
-    void Ec2DirectConnectionFactory::setContext( const ResourceContext& resCtx )
-    {
-        m_resCtx = resCtx;
-        m_timeSynchronizationManager->setContext(m_resCtx);
-    }
-
     void Ec2DirectConnectionFactory::setConfParams( std::map<QString, QVariant> confParams )
     {
         m_settingsInstance.loadParams( std::move( confParams ) );
@@ -1060,7 +1052,7 @@ namespace ec2
         {
             QnMutexLocker lk( &m_mutex );
             if( !m_directConnection ) {
-                m_directConnection.reset( new Ec2DirectConnection( &m_serverQueryProcessor, m_resCtx, connectionInfo, url ) );
+                m_directConnection.reset( new Ec2DirectConnection( &m_serverQueryProcessor, connectionInfo, url ) );
                 if( !m_directConnection->initialized() )
                 {
                     connectionInitializationResult = ec2::ErrorCode::dbError;
@@ -1227,7 +1219,6 @@ namespace ec2
 
         AbstractECConnectionPtr connection(new RemoteEC2Connection(
             std::make_shared<FixedUrlClientQueryProcessor>(&m_remoteQueryProcessor, connectionInfoCopy.ecUrl),
-            m_resCtx,
             connectionInfoCopy));
         handler->done(
             reqID,

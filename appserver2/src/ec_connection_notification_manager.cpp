@@ -22,7 +22,7 @@
 
 namespace ec2
 {
-    ECConnectionNotificationManager::ECConnectionNotificationManager(const ResourceContext& resCtx,
+    ECConnectionNotificationManager::ECConnectionNotificationManager(
         AbstractECConnection* ecConnection,
         QnLicenseNotificationManager* licenseManager,
         QnResourceNotificationManager* resourceManager,
@@ -38,7 +38,6 @@ namespace ec2
         QnMiscNotificationManager *miscManager,
         QnDiscoveryNotificationManager *discoveryManager)
     :
-        m_resCtx( resCtx ),
         m_ecConnection( ecConnection ),
         m_licenseManager( licenseManager ),
         m_resourceManager( resourceManager ),
