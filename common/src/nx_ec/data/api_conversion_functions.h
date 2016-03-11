@@ -24,8 +24,6 @@ namespace ec2 {
 
     void fromApiToResource(const ApiCameraData &src, QnVirtualCameraResourcePtr &dst);
     void fromResourceToApi(const QnVirtualCameraResourcePtr &src, ApiCameraData &dst);
-    void fromApiToResourceList(const ApiCameraDataList &src, QnResourceList &dst, QnResourceFactory *factory);
-    void fromApiToResourceList(const ApiCameraDataList &src, QnVirtualCameraResourceList &dst, QnResourceFactory *factory);
     void fromResourceListToApi(const QnVirtualCameraResourceList &src, ApiCameraDataList &dst);
 
     void fromResourceToApi(const QnScheduleTask &src, ApiScheduleTaskData &dst);
@@ -73,10 +71,6 @@ namespace ec2 {
 
     void fromResourceToApi(const QnResourcePtr &src, ApiResourceData &dst);
     void fromApiToResource(const ApiResourceData &src, QnResource* dst);
-    void fromApiToResourceList(const ApiResourceDataList &src, QnResourceList &dst, QnResourceFactory *factory);
-
-    void fromResourceListToApi(const ec2::ApiResourceParamDataList &src, ApiResourceParamDataList &dst);
-    void fromApiToResourceList(const ApiResourceParamDataList &src, ec2::ApiResourceParamDataList &dst);
 
     void fromApiToResource(const ApiResourceTypeData &src, QnResourceTypePtr &dst);
     void fromApiToResourceList(const ApiResourceTypeDataList &src, QnResourceTypeList &dst);
@@ -85,7 +79,6 @@ namespace ec2 {
     void fromResourceToApi(const QnUserResourcePtr &resource, ApiUserData &data);
     void fromApiToResourceList(const ApiUserDataList &src, QnResourceList &dst);
     void fromApiToResourceList(const ApiUserDataList &src, QnUserResourceList &dst);
-    void fromApiToResourceList(const ApiStorageDataList &src, QnResourceList &dst, QnResourceFactory *factory);
 
     void fromApiToResource(const ApiVideowallData &src, QnVideoWallResourcePtr &dst);
     void fromResourceToApi(const QnVideoWallResourcePtr &src, ApiVideowallData &dst);

@@ -181,26 +181,6 @@ void fromResourceToApi(const QnVirtualCameraResourcePtr &src, ApiCameraData &dst
     dst.vendor = src->getVendor();
 }
 
-template<class List>
-void fromApiToResourceList(const ApiCameraDataList &src, List &dst, QnResourceFactory *factory, const overload_tag &) {
-    dst.reserve(dst.size() + (int)src.size());
-    for(const ApiCameraData &srcCamera: src) {
-        QnVirtualCameraResourcePtr dstCamera = factory->createResource(srcCamera.typeId, QnResourceParams(srcCamera.id, srcCamera.url, srcCamera.vendor)).dynamicCast<QnVirtualCameraResource>();
-        if (dstCamera) {
-            fromApiToResource(srcCamera, dstCamera);
-            dst.push_back(dstCamera);
-        }
-    }
-}
-
-void fromApiToResourceList(const ApiCameraDataList &src, QnResourceList &dst, QnResourceFactory *factory) {
-    fromApiToResourceList(src, dst, factory, overload_tag());
-}
-
-void fromApiToResourceList(const ApiCameraDataList &src, QnVirtualCameraResourceList &dst, QnResourceFactory *factory) {
-    fromApiToResourceList(src, dst, factory, overload_tag());
-}
-
 void fromResourceListToApi(const QnVirtualCameraResourceList &src, ApiCameraDataList &dst) {
     dst.reserve(dst.size() + src.size());
     for(const QnVirtualCameraResourcePtr &srcCamera: src) {
@@ -682,22 +662,6 @@ void fromApiToResource(const ApiResourceData &src, QnResource* dst) {
     //dst->setStatus(src.status, true);
 }
 
-void fromApiToResourceList(const ApiResourceDataList &src, QnResourceList &dst, QnResourceFactory *factory) {
-    dst.reserve(dst.size() + (int)src.size());
-    for(const ApiResourceData &srcResource: src) {
-        dst.push_back(factory->createResource(srcResource.typeId, QnResourceParams(srcResource.id, srcResource.url, QString())));
-        fromApiToResource(srcResource, dst.back().data());
-    }
-}
-
-void fromResourceListToApi(const ec2::ApiResourceParamDataList &src, ApiResourceParamDataList &dst) {
-    dst = src;
-}
-
-void fromApiToResourceList(const ApiResourceParamDataList &src, ec2::ApiResourceParamDataList &dst) {
-    dst = src;
-}
-
 void fromApiToResource(const ApiResourceTypeData &src, QnResourceTypePtr &dst) {
     dst->setId(src.id);
     dst->setName(src.name);
@@ -758,18 +722,6 @@ void fromApiToResourceList(const ApiUserDataList &src, List &dst, const overload
         QnUserResourcePtr dstUser(new QnUserResource());
         fromApiToResource(srcUser, dstUser);
         dst.push_back(std::move(dstUser));
-    }
-}
-
-void fromApiToResourceList(const ApiStorageDataList &src, QnResourceList &dst, QnResourceFactory *factory) {
-    dst.reserve(dst.size() + (int)src.size());
-    auto resTypeId = qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kStorageTypeId);
-    for(const ApiStorageData &srcStorage: src)
-    {
-        QnStorageResourcePtr dstStorage = factory->createResource(resTypeId,
-                                                  QnResourceParams(srcStorage.id, srcStorage.url, QString())).dynamicCast<QnStorageResource>();
-        fromApiToResource(srcStorage, dstStorage);
-        dst.push_back(std::move(dstStorage));
     }
 }
 

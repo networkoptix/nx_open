@@ -362,13 +362,6 @@ void QnCommonMessageProcessor::resetResourceTypes(const ec2::ApiResourceTypeData
 
 void QnCommonMessageProcessor::resetResources(const ec2::ApiFullInfoData& fullData)
 {
-    QnResourceList resources;
-
-    QnResourceFactory* factory = getResourceFactory();
-
-    fromApiToResourceList(fullData.servers, resources);
-    fromApiToResourceList(fullData.storages, resources, factory);
-
     /* Store all remote resources id to clean them if they are not in the list anymore. */
     QHash<QnUuid, QnResourcePtr> remoteResources;
     for (const QnResourcePtr &resource: qnResPool->getResourcesWithFlag(Qn::remote))
@@ -385,19 +378,13 @@ void QnCommonMessageProcessor::resetResources(const ec2::ApiFullInfoData& fullDa
 
     /* Packet adding. */
     qnResPool->beginTran();
-    for (const QnResourcePtr& resource: resources)
-    {
-        /* Update existing. */
-        updateResource(resource);
-
-        /* And keep them from removing. */
-        remoteResources.remove(resource->getId());
-    }
     updateResources(fullData.users);
     updateResources(fullData.cameras);
     updateResources(fullData.layouts);
     updateResources(fullData.videowalls);
     updateResources(fullData.webPages);
+    updateResources(fullData.servers);
+    updateResources(fullData.storages);
 
     qnResPool->commit();
 
