@@ -6,9 +6,7 @@ angular.module('cloudApp').run(function($http,$templateCache) {
         $http.get('views/share.html', {cache: $templateCache});
     })
     .factory('dialogs', function ($http, $uibModal, $q, $location) {
-        function openDialog(title, template, url, content, hasFooter, cancellable, params, closable, actionLabel, buttonType){
-
-            //scope.inline = typeof($location.search().inline) != 'undefined';
+        function openDialog(settings ){
 
             function isInline(){
                 return typeof($location.search().inline) != 'undefined';
@@ -16,27 +14,28 @@ angular.module('cloudApp').run(function($http,$templateCache) {
 
             // Check 401 against offline
             var modalInstance = $uibModal.open({
+                size: settings.size || 'sm',
                 controller: 'DialogCtrl',
                 templateUrl: 'views/components/dialog.html',
                 animation: !isInline(),
                 keyboard:false,
-                backdrop:cancellable?true:'static',
+                backdrop:settings.cancellable?true:'static',
                 resolve: {
                     settings:function(){
                         return {
-                            title:title,
-                            template: template,
-                            hasFooter: hasFooter,
-                            content:content,
-                            cancellable: cancellable,
-                            params: params,
-                            actionLabel: actionLabel || L.dialogs.okButton,
-                            closable: closable || cancellable,
-                            buttonClass: buttonType? 'btn-'+ buttonType : 'btn-primary'
+                            title:settings.title,
+                            template: settings.template,
+                            hasFooter: settings.hasFooter,
+                            content:settings.content,
+                            cancellable: settings.cancellable,
+                            params: settings.params,
+                            actionLabel: settings.actionLabel || L.dialogs.okButton,
+                            closable: settings.closable || settings.cancellable,
+                            buttonClass: settings.buttonType? 'btn-'+ settings.buttonType : 'btn-primary'
                         };
                     },
                     params:function(){
-                        return params;
+                        return settings.params;
                     }
                 }
             });
@@ -73,13 +72,33 @@ angular.module('cloudApp').run(function($http,$templateCache) {
 
         return {
             alert:function(message, title){
-                return openDialog(title, null, null, message, true, true, null, true).result;
+                return openDialog({
+                    title:title,
+                    content: message,
+                    hasFooter: true,
+                    cancellable:true,
+                    closable:true}).result;
             },
             confirm:function(message, title, actionLabel, actionType){
-                return openDialog(title, null, null, message, true, false, null, false, actionLabel, actionType).result;
+                //title, template, url, content, hasFooter, cancellable, params, closable, actionLabel, buttonType, size
+                return openDialog({
+                    title: title,
+                    content:message,
+                    hasFooter: true,
+                    cancellable:false,
+                    closable: false,
+                    actionLabel:actionLabel,
+                    buttonType:actionType
+                }).result;
             },
             login:function(force){
-                return openDialog(L.dialogs.loginTitle, 'views/login.html', 'login', null, false, !force, null, true).result;
+                return openDialog({
+                    title: L.dialogs.loginTitle,
+                    template: 'views/login.html',
+                    url: 'login',
+                    hasFooter: false,
+                    cancellable: !force,
+                    closable:true}).result;
             },
             share:function(systemId, isOwner, share){
                 var url = 'share';
@@ -88,10 +107,17 @@ angular.module('cloudApp').run(function($http,$templateCache) {
                     url += '/' + share.accountEmail;
                     title = L.sharing.editShareTitle;
                 }
-                return openDialog(title, 'views/share.html', url, null, false, true,{
-                    systemId: systemId,
-                    share: share,
-                    isOwner: isOwner
+                return openDialog({
+                    title:title,
+                    template: 'views/share.html',
+                    url: url,
+                    hasFooter: false,
+                    cancellable:true,
+                    params: {
+                        systemId: systemId,
+                        share: share,
+                        isOwner: isOwner
+                    }
                 }).result;
             }
         };
