@@ -5,7 +5,7 @@
             <div class="form-group" validate-field>
                 <label for="email">Account</label>
 
-                <input ng-if="!lockEmail" type="email" class="form-control" ng-model="share.accountEmail" id="email" name="email"
+                <input ng-hide="lockEmail" type="email" class="form-control" ng-model="share.accountEmail" id="email" name="email"
                        ng-pattern="Config.emailRegex" maxlength="255"
                        required autofocus>
 
