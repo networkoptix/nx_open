@@ -46,6 +46,8 @@ public:
     bool start();
     nx::hpm::api::ResultCode registerOnMediator();
     nx::String serverId() const;
+    /** returns serverId.systemId */
+    nx::String fullName() const;
     /** Server endpoint */
     SocketAddress endpoint() const;
 

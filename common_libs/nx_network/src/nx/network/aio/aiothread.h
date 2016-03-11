@@ -22,10 +22,11 @@
 
 #include "aioeventhandler.h"
 #include "pollset.h"
+#include "unified_pollset.h"
 #include "../detail/socket_sequence.h"
 #include "../system_socket.h"
 #include "../udt/udt_socket.h"
-#include "../udt/udt_pollset.h"
+//#include "../udt/udt_pollset.h"
 
 
 namespace nx {
@@ -131,7 +132,7 @@ public:
         aio::EventType eventToWatch,
         AIOEventHandler<SocketType>* const eventHandler,
         std::chrono::milliseconds timeoutMs = std::chrono::milliseconds(),
-        std::function<void()> socketAddedToPollHandler = std::function<void()>() )
+        nx::utils::MoveOnlyFunc<void()> socketAddedToPollHandler = nx::utils::MoveOnlyFunc<void()>() )
     {
         QnMutexLocker lk(&m_impl->mutex);
 
@@ -146,7 +147,7 @@ public:
             eventHandler,
             timeoutMs.count(),
             nullptr,
-            socketAddedToPollHandler));
+            std::move(socketAddedToPollHandler)));
         if (eventToWatch == aio::etRead)
             ++m_impl->newReadMonitorTaskCount;
         else if (eventToWatch == aio::etWrite)
@@ -176,7 +177,7 @@ public:
 
         //if socket is marked for removal, not adding task
         void* userData = sock->impl()->eventTypeToUserData[eventToWatch];
-        assert(userData != nullptr);  //socket is not polled, but someone wants to change timeout
+        NX_ASSERT(userData != nullptr);  //socket is not polled, but someone wants to change timeout
         if (static_cast<AIOEventHandlingDataHolder<SocketType>*>(userData)->data->markedForRemoval.load(std::memory_order_relaxed) > 0)
             return;   //socket marked for removal, ignoring timeout change (like, cancelling it right now)
 
@@ -204,7 +205,7 @@ public:
         SocketType* const sock,
         aio::EventType eventType,
         bool waitForRunningHandlerCompletion,
-        std::function<void()> pollingStoppedHandler = std::function<void()>())
+        nx::utils::MoveOnlyFunc<void()> pollingStoppedHandler = nx::utils::MoveOnlyFunc<void()>())
     {
         QnMutexLocker lk(&m_impl->mutex);
 
@@ -213,7 +214,7 @@ public:
             return;    //ignoring task
 
         void*& userData = sock->impl()->eventTypeToUserData[eventType];
-        Q_ASSERT(userData != NULL);   //socket is not polled. assert?
+        NX_ASSERT(userData != NULL);   //socket is not polled. NX_ASSERT?
         std::shared_ptr<AIOEventHandlingData<SocketType>> handlingData = static_cast<AIOEventHandlingDataHolder<SocketType>*>(userData)->data;
         if (handlingData->markedForRemoval.load(std::memory_order_relaxed) > 0)
             return;   //socket already marked for removal
@@ -462,7 +463,7 @@ public:
         unsigned int timeout;
         std::atomic<int>* taskCompletionEvent;
         nx::utils::MoveOnlyFunc<void()> postHandler;
-        std::function<void()> taskCompletionHandler;
+        nx::utils::MoveOnlyFunc<void()> taskCompletionHandler;
 
         /*!
             \param taskCompletionEvent if not NULL, set to 1 after processing task
@@ -474,7 +475,7 @@ public:
             AIOEventHandler<SocketType>* const _eventHandler,
             unsigned int _timeout = 0,
             std::atomic<int>* const _taskCompletionEvent = nullptr,
-            std::function<void()> _taskCompletionHandler = std::function<void()>())
+            nx::utils::MoveOnlyFunc<void()> _taskCompletionHandler = nx::utils::MoveOnlyFunc<void()>())
         :
             type(_type),
             socket(_socket),
@@ -483,7 +484,7 @@ public:
             eventHandler(_eventHandler),
             timeout(_timeout),
             taskCompletionEvent(_taskCompletionEvent),
-            taskCompletionHandler(_taskCompletionHandler)
+            taskCompletionHandler(std::move(_taskCompletionHandler))
         {
         }
     };
@@ -655,8 +656,8 @@ public:
 
                 case TaskType::tCallFunc:
                 {
-                    assert(task.postHandler);
-                    assert(!task.taskCompletionEvent && !task.taskCompletionHandler);
+                    NX_ASSERT(task.postHandler);
+                    NX_ASSERT(!task.taskCompletionEvent && !task.taskCompletionHandler);
                     postedCalls.push_back(std::move(task));
                     //this task differs from every else in a way that it is not processed here, 
                         //just moved to another container. TODO #ak is it really needed to move to another container?
@@ -683,7 +684,7 @@ public:
                 }
 
                 default:
-                    assert(false);
+                    NX_ASSERT(false);
             }
             if (task.taskCompletionEvent)
                 task.taskCompletionEvent->store(1, std::memory_order_relaxed);
@@ -781,7 +782,7 @@ public:
                     continue;   //event handler changed, cannot ignore task
                                 //cancelling remove task
                 void* userData = sock->impl()->eventTypeToUserData[eventType];
-                Q_ASSERT(userData);
+                NX_ASSERT(userData);
                 static_cast<AIOEventHandlingDataHolder<SocketType>*>(userData)->data->timeout = newTimeoutMS;
                 static_cast<AIOEventHandlingDataHolder<SocketType>*>(userData)->data->markedForRemoval.store(0);
 
@@ -802,7 +803,7 @@ public:
                 {
                     if (it->socket == sock && it->eventType == eventType)
                     {
-                        assert(it->type == TaskType::tChangingTimeout);
+                        NX_ASSERT(it->type == TaskType::tChangingTimeout);
                         it = pollSetModificationQueue.erase(it);
                     }
                 }
@@ -1064,8 +1065,8 @@ private:
 namespace socket_to_pollset_static_map
 {
 template<class SocketType> struct get {};
-template<> struct get<Pollable> { typedef PollSet value; };
-template<> struct get<UdtSocket> { typedef UdtPollSet value; };
+template<> struct get<Pollable> { typedef UnifiedPollSet value; };
+//template<> struct get<UdtSocket> { typedef UdtPollSet value; };
 }
 
 class AbstractAioThread

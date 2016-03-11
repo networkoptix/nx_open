@@ -8,7 +8,7 @@ extern "C" {
 } // extern "C"
 
 #include <utils/media/ffmpeg_helper.h>
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include "aligned_mem_video_buffer.h"
 
@@ -88,7 +88,7 @@ void FfmpegVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr&
 {
     if (!frame)
         return;
-    
+
     auto codec = avcodec_find_decoder(frame->compressionType);
     codecContext = avcodec_alloc_context3(codec);
     if (frame->context)

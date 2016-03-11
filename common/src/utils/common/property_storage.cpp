@@ -320,7 +320,7 @@ void QnPropertyStorage::unlock() const {
 }
 
 void QnPropertyStorage::notify(int id) const {
-    assert(m_lockDepth > 0);
+    NX_ASSERT(m_lockDepth > 0);
 
     m_pendingNotifications.insert(id);
 }

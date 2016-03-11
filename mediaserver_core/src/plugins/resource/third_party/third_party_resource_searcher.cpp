@@ -82,7 +82,7 @@ QnResourcePtr ThirdPartyResourceSearcher::createResource( const QnUuid &resource
     if( !discoveryManager )
         return QnThirdPartyResourcePtr();
 
-    Q_ASSERT( discoveryManager->getRef() );
+    NX_ASSERT( discoveryManager->getRef() );
     //NOTE not calling discoveryManager->createCameraManager here because we do not know camera parameters (model, firmware, even uid), 
         //so just instanciating QnThirdPartyResource
     result = QnThirdPartyResourcePtr( new QnThirdPartyResource( cameraInfo, nullptr, *discoveryManager ) );

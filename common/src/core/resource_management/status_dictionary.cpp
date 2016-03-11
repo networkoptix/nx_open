@@ -1,5 +1,7 @@
 #include "status_dictionary.h"
 
+#include <nx/utils/log/assert.h>
+
 QnResourceStatusDictionary::QnResourceStatusDictionary(QObject *parent):
     QObject(parent)
 {
@@ -15,7 +17,7 @@ Qn::ResourceStatus QnResourceStatusDictionary::value(const QnUuid& resourceId) c
 
 void QnResourceStatusDictionary::setValue(const QnUuid& resourceId, Qn::ResourceStatus status)
 {
-    assert(!resourceId.isNull());
+    NX_ASSERT(!resourceId.isNull());
     QnMutexLocker lock( &m_mutex );
     m_items[resourceId] = status;
 }

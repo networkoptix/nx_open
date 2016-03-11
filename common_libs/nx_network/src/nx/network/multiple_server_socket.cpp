@@ -50,7 +50,7 @@ MultipleServerSocket::~MultipleServerSocket()
             }                                           \
                                                         \
             if (first)                                  \
-                Q_ASSERT_X(*first == *value,            \
+                NX_ASSERT(*first == *value,            \
                     Q_FUNC_INFO, QString("%1 != %2")    \
                         .arg(*first).arg(*value)        \
                         .toStdString().c_str());        \
@@ -70,7 +70,7 @@ SocketAddress MultipleServerSocket::getLocalAddress() const
     {
         const auto value = socket->getLocalAddress();
         if (first)
-            Q_ASSERT(*first == value);
+            NX_ASSERT(*first == value);
         else
             first = value;
     }
@@ -144,7 +144,7 @@ bool MultipleServerSocket::getLastError(SystemError::ErrorCode* errorCode) const
 
 AbstractSocket::SOCKET_HANDLE MultipleServerSocket::handle() const
 {
-    Q_ASSERT(false);
+    NX_ASSERT(false);
     return (AbstractSocket::SOCKET_HANDLE)(-1);
 }
 
@@ -213,7 +213,7 @@ void MultipleServerSocket::acceptAsync(
 {
     dispatch([this, handler]()
     {
-        Q_ASSERT_X(!m_acceptHandler, Q_FUNC_INFO, "concurrent accept call");
+        NX_ASSERT(!m_acceptHandler, Q_FUNC_INFO, "concurrent accept call");
         m_acceptHandler = std::move(handler);
 
         if (m_recvTmeout)
@@ -296,7 +296,7 @@ void MultipleServerSocket::accepted(
 
     std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)> handler;
     std::swap(handler, m_acceptHandler);
-    Q_ASSERT_X(handler, Q_FUNC_INFO, "acceptAsync was not canceled in time");
+    NX_ASSERT(handler, Q_FUNC_INFO, "acceptAsync was not canceled in time");
 
     // TODO: #mux This is not efficient to cancel accepts on every accepted event
     //            (in most cases handler will call accept again).

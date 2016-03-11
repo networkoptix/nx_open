@@ -40,18 +40,16 @@ public:
 	static void init();	/** Should be called before any socket use */
 	static void deinit();  /** Should be called when sockets are not needed any more */
 
-	typedef std::unique_ptr< int, decltype( deinit ) > Guard;
-	static Guard initGuard();
-
 	class InitGuard
 	{
 	public:
 		InitGuard() { init(); }
 		~InitGuard() { deinit(); }
 
-	private:
-		InitGuard( const InitGuard& );
-		//InitGuard& oprator=( const InitGuard& );
+        InitGuard( const InitGuard& ) = delete;
+        InitGuard( InitGuard&& ) = delete;
+        InitGuard& operator=( const InitGuard& ) = delete;
+        InitGuard& operator=( InitGuard&& ) = delete;
 	};
 
 private:

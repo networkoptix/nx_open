@@ -184,8 +184,8 @@ SoapWrapper<T>::SoapWrapper(const std::string& endpoint, const QString& login, c
     m_passwd(passwd),
     m_invoked(false)
 {
-    //Q_ASSERT(!endpoint.empty());
-    Q_ASSERT_X(!endpoint.empty(), Q_FUNC_INFO, "Onvif URL is empty!!! It is debug only check.");
+    //NX_ASSERT(!endpoint.empty());
+    NX_ASSERT(!endpoint.empty(), Q_FUNC_INFO, "Onvif URL is empty!!! It is debug only check.");
     m_endpoint = new char[endpoint.size() + 1];
     strcpy(m_endpoint, endpoint.c_str());
     m_endpoint[endpoint.size()] = '\0';

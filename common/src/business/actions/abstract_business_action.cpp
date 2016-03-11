@@ -54,7 +54,7 @@ namespace QnBusiness {
             return true;
 
         default:
-            Q_ASSERT_X(false, Q_FUNC_INFO, "All action types must be handled.");
+            NX_ASSERT(false, Q_FUNC_INFO, "All action types must be handled.");
             return false;
         }
     }
@@ -81,7 +81,7 @@ namespace QnBusiness {
             return true;
 
         default:
-            Q_ASSERT_X(false, Q_FUNC_INFO, "All action types must be handled.");
+            NX_ASSERT(false, Q_FUNC_INFO, "All action types must be handled.");
             break;
         }
         return false;
@@ -179,7 +179,7 @@ const QVector<QnUuid>& QnAbstractBusinessAction::getResources() const {
 
 QVector<QnUuid> QnAbstractBusinessAction::getSourceResources() const
 {
-    Q_ASSERT_X(m_params.useSource, Q_FUNC_INFO, "Method should be called only when corresponding parameter is set.");
+    NX_ASSERT(m_params.useSource, Q_FUNC_INFO, "Method should be called only when corresponding parameter is set.");
     QVector<QnUuid> result;
     result << m_runtimeParams.eventResourceId;
     for (const QnUuid &extra: m_runtimeParams.metadata.cameraRefs)

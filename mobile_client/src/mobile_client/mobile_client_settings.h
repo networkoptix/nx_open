@@ -2,7 +2,7 @@
 #define MOBILE_CLIENT_SETTINGS_H
 
 #include <utils/common/property_storage.h>
-#include <utils/common/singleton.h>
+#include <nx/utils/singleton.h>
 #include <mobile_client/mobile_client_meta_types.h>
 
 class QnMobileClientSettings : public QnPropertyStorage, public Singleton<QnMobileClientSettings> {

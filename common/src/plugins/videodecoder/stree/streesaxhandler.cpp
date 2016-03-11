@@ -243,7 +243,7 @@ namespace stree
             case MatchType::presence:
                 return std::make_unique<ResPresenceNode>( matchResID );
             default:
-                Q_ASSERT(false);
+                NX_ASSERT(false);
                 return NULL;
         }
     }
@@ -263,7 +263,7 @@ namespace stree
             case MatchType::presence:
                 return std::make_unique<ResPresenceNode>(matchResID);
             default:
-                Q_ASSERT(false);
+                NX_ASSERT(false);
                 return NULL;
         }
     }

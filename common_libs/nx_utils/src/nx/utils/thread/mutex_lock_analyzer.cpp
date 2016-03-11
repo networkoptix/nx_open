@@ -252,7 +252,7 @@ void MutexLockAnalyzer::afterMutexLocked( const MutexLockKey& mutexLockPosition 
 
         NX_LOG( deadLockMsg, cl_logALWAYS );
         std::cerr<<deadLockMsg.toStdString()<<std::endl;
-        //assert( false );
+        //NX_ASSERT( false );
         return;
     }
 
@@ -318,7 +318,7 @@ void MutexLockAnalyzer::afterMutexLocked( const MutexLockKey& mutexLockPosition 
 
             NX_LOG( deadLockMsg, cl_logALWAYS );
             std::cerr<<deadLockMsg.toStdString()<<std::endl;
-            //assert( false );
+            //NX_ASSERT( false );
         }
     }
 
@@ -343,7 +343,7 @@ void MutexLockAnalyzer::beforeMutexUnlocked( const MutexLockKey& mutexLockPositi
     if (threadContext.currentLockPath.empty())
     {
         lk.unlock();
-        assert( false );
+        NX_ASSERT( false );
         lk.relock();
     }
     if( threadContext.currentLockPath.front().lockRecursionDepth > 0 )
@@ -354,7 +354,7 @@ void MutexLockAnalyzer::beforeMutexUnlocked( const MutexLockKey& mutexLockPositi
     if (mutexLockPosition != threadContext.currentLockPath.front())
     {
         lk.unlock();
-        assert( false );
+        NX_ASSERT( false );
         lk.relock();
     }
     threadContext.currentLockPath.pop_front();
@@ -386,7 +386,7 @@ QString MutexLockAnalyzer::pathToString( const std::list<LockGraphEdgeData>& edg
     {
         const LockGraphEdgeData& edge = *it;
 
-        assert( !edge.lockPositions.empty() );
+        NX_ASSERT( !edge.lockPositions.empty() );
         //selecting which lockPositions element to use
         const LockGraphEdgeData::TwoMutexLockData& lockData = *edge.lockPositions.cbegin();
 

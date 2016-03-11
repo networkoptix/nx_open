@@ -64,7 +64,7 @@ QnLexicalSerializer *QnAbstractConnection::serializer() const {
 }
 
 void QnAbstractConnection::setSerializer(QnLexicalSerializer *serializer) {
-    assert(serializer->type() == QMetaType::Int);
+    NX_ASSERT(serializer->type() == QMetaType::Int);
 
     m_serializer.reset(serializer);
 }
@@ -79,7 +79,7 @@ int QnAbstractConnection::sendAsyncRequest(int operation, int object, const QnRe
     if (!isReady())
         return -1;
 
-    Q_ASSERT_X(QnSessionManager::instance(), Q_FUNC_INFO, "Session manager object must exist here");
+    NX_ASSERT(QnSessionManager::instance(), Q_FUNC_INFO, "Session manager object must exist here");
     if (!QnSessionManager::instance())
         return -1;
 
@@ -135,7 +135,7 @@ int QnAbstractConnection::sendAsyncPostRequest(int object, const QnRequestParamL
 }
 
 int QnAbstractConnection::sendSyncRequest(int operation, int object, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, QVariant *reply) {
-    Q_ASSERT_X(QnSessionManager::instance(), Q_FUNC_INFO, "Session manager object must exist here");
+    NX_ASSERT(QnSessionManager::instance(), Q_FUNC_INFO, "Session manager object must exist here");
     if (!QnSessionManager::instance())
         return -1;
 

@@ -49,6 +49,7 @@ public:
 
     int id() const;
     void setLocalAddress(SocketAddress addr);
+    SocketAddress getLocalAddress() const;
     void start();
 
     size_t totalBytesSent() const;
@@ -94,6 +95,8 @@ public:
     RandomDataTcpServer(const QByteArray& dataToSend);
     virtual ~RandomDataTcpServer();
 
+    void setServerSocket(std::unique_ptr<AbstractStreamServerSocket> serverSock);
+
     virtual void pleaseStop() override;
     virtual void join() override;
 
@@ -123,15 +126,20 @@ class NX_NETWORK_API ConnectionsGenerator
     public QnJoinable
 {
 public:
+    /**
+        @param maxTotalConnections If zero, then no limit on total connection number
+    */
     ConnectionsGenerator(
         const SocketAddress& remoteAddress,
         size_t maxSimultaneousConnectionsCount,
-        size_t bytesToSendThrough );
+        size_t bytesToSendThrough,
+        size_t maxTotalConnections = 0);
     virtual ~ConnectionsGenerator();
 
     virtual void pleaseStop() override;
     virtual void join() override;
 
+    void setOnFinishedHandler(nx::utils::MoveOnlyFunc<void()> func);
     void enableErrorEmulation(int errorPercent);
     void setLocalAddress(SocketAddress addr);
     void start();
@@ -146,6 +154,7 @@ private:
     const SocketAddress m_remoteAddress;
     size_t m_maxSimultaneousConnectionsCount;
     const size_t m_bytesToSendThrough;
+    const size_t m_maxTotalConnections;
     ConnectionsContainer m_connections;
     bool m_terminated;
     std::mutex m_mutex;
@@ -158,21 +167,28 @@ private:
     std::uniform_int_distribution<int> m_errorEmulationDistribution;
     int m_errorEmulationPercent;
     boost::optional<SocketAddress> m_localAddress;
+    nx::utils::MoveOnlyFunc<void()> m_onFinishedHandler;
 
     void onConnectionFinished( int id, ConnectionsContainer::iterator connectionIter );
+    void addNewConnections();
 };
 
-/** \class TCPSocket modification which randomly connects to different ports
- *  according to @param kShift */
+/**
+ * A TCPSocket modification which randomly connects to different ports according to @p kShift.
+ */
 template<quint16 kShift>
 class MultipleClientSocketTester
-    : public TCPSocket
+:
+    public TCPSocket
 {
 public:
     MultipleClientSocketTester()
-        : TCPSocket() {}
+    :
+        TCPSocket()
+    {
+    }
 
-    bool connect(const SocketAddress& address, unsigned int timeout ) override
+    bool connect(const SocketAddress& address, unsigned int timeout) override
     {
         return TCPSocket::connect(modifyAddress(address), timeout);
     }
@@ -189,8 +205,10 @@ private:
     {
         static quint16 modifier = 0;
         if (m_address == SocketAddress())
+        {
             m_address = SocketAddress(
                 address.address, address.port + (modifier++ % kShift));
+        }
 
         return m_address;
     }
@@ -198,8 +216,8 @@ private:
     SocketAddress m_address;
 };
 
-}   //test
-}   //network
-}   //nx
+} // namespace test
+} // namespace network
+} // namespace nx
 
 #endif  //SOCKET_TEST_HELPER_H

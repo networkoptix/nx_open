@@ -52,7 +52,7 @@ public:
     }
 
     int checkError(const char *expression, int status) const {
-        assert(expression);
+        NX_ASSERT(expression);
 
         if(status == SIGAR_OK)
             return status;

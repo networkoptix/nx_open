@@ -887,7 +887,7 @@ bool OnvifResourceSearcherWsdd::readProbeMatches( const QnInterfaceAndAddr& ifac
         return false;
     ProbeContext& ctx = *it->second;
 
-    Q_ASSERT( ctx.soapWsddProxy.soap );
+    NX_ASSERT( ctx.soapWsddProxy.soap );
 
     //Receiving all ProbeMatches. Timeout = 500 ms, as written in ONVIF spec
     for( ;; )

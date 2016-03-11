@@ -373,7 +373,7 @@ bool QnTCPConnectionProcessor::readSingleRequest()
         //due to bug in QnTCPConnectionProcessor::readRequest() d->clientRequest
         //    can contain multiple interleaved requests.
         //    Have to parse them!
-        assert( d->interleavedMessageData.isEmpty() );
+        NX_ASSERT( d->interleavedMessageData.isEmpty() );
         d->interleavedMessageData = d->clientRequest;    //no copying here!
         d->clientRequest.clear();
         d->interleavedMessageDataPos = 0;

@@ -109,7 +109,7 @@ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnUuid *target) {
 }
 
 void serialize(QnJsonContext *, const QFont &, QJsonValue *) {
-    assert(false); /* Won't need for now. */ // TODO: #Elric
+    NX_ASSERT(false); /* Won't need for now. */ // TODO: #Elric
 }
 
 bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QFont *target) {
@@ -142,7 +142,7 @@ void testValue(const TYPE &value) {                                 \
     QString result = QString::fromUtf8(json);                       \
     TYPE newValue;                                                  \
     QJson::deserialize(result.toUtf8(), &newValue);                 \
-    Q_ASSERT(value == newValue);                                    \
+    NX_ASSERT(value == newValue);                                    \
 }
 
 TEST_VALUE(QSize)
@@ -168,7 +168,7 @@ void testRegion(int len) {
     QJson::serialize(region, &json);
     QRegion newValue;
     QJson::deserialize(json, &newValue);
-    Q_ASSERT(region == newValue);
+    NX_ASSERT(region == newValue);
 }
 
 void qnJsonFunctionsUnitTest() {

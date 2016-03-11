@@ -31,12 +31,13 @@ public:
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
 
     /** Establish new connection.
+    * \param timeout zero - no timeout
     * \param socketAttributes attribute values to apply to a newly-created socket
     * \note This method is re-enterable. So, it can be called in
     *        different threads simultaneously */
     void establishNewConnection(
         const AddressEntry& targetHostAddress,
-        boost::optional<std::chrono::milliseconds> timeout,
+        std::chrono::milliseconds timeout,
         SocketAttributes socketAttributes,
         OutgoingTunnel::NewConnectionHandler handler);
 

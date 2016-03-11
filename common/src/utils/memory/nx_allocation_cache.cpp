@@ -6,6 +6,7 @@
 #include "nx_allocation_cache.h"
 
 #include <algorithm>
+#include <nx/utils/log/assert.h>
 
 //#define DEBUG_OUTPUT
 
@@ -56,7 +57,7 @@ void* NxBufferCache::getBuffer( size_t size )
         (it->size < (size + (size / MAX_PERCENT) * m_maxBufferSizeExcessPercent)) )
     {
         //found it
-        assert( it->size >= size );
+        NX_ASSERT( it->size >= size );
         void* ptr = it->ptr;
         m_totalCacheSize -= it->size;
 #ifdef DEBUG_OUTPUT
@@ -113,7 +114,7 @@ void NxBufferCache::cleanCacheIfNeeded()
 {
     while( m_totalCacheSize > m_maxUnusedMemoryToCache )
     {
-        assert( !m_freeBuffers.empty() );
+        NX_ASSERT( !m_freeBuffers.empty() );
 
         //erasing oldest buffer first
         auto oldestElemIter = std::min_element(

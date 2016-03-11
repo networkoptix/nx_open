@@ -26,7 +26,7 @@
 namespace nx {
 namespace network {
 
-typedef nx::network::PollableImpl PollableSystemSocketImpl;
+typedef CommonSocketImpl PollableSystemSocketImpl;
 
 namespace aio {
 template<class SocketType> class BaseAsyncSocketImplHelper;
@@ -326,6 +326,8 @@ public:
         std::function<void(
             SystemError::ErrorCode,
             AbstractStreamSocket*)> handler) override;
+
+    AbstractStreamSocket* systemAccept();
 
 private:
     bool setListen(int queueLen);

@@ -444,7 +444,7 @@ QnStorageManager *DeviceFileCatalog::getMyStorageMan() const
     else if (m_storagePool == QnServer::StoragePool::Backup)
         return qnBackupStorageMan;
     else {
-        Q_ASSERT(0);
+        NX_ASSERT(0);
         return nullptr;
     }
 }
@@ -649,14 +649,14 @@ QnServer::ChunksCatalog DeviceFileCatalog::getRole() const
 
 void DeviceFileCatalog::addRecord(const Chunk& chunk)
 {
-    Q_ASSERT(chunk.durationMs < 1000 * 1000);
+    NX_ASSERT(chunk.durationMs < 1000 * 1000);
 
     QnMutexLocker lock( &m_mutex );
 
     ChunkMap::iterator itr = qUpperBound(m_chunks.begin(), m_chunks.end(), chunk.startTimeMs);
     if( itr != m_chunks.end() )
     {
-        itr = m_chunks.insert(itr, chunk);  //triggers assert if itr == end()
+        itr = m_chunks.insert(itr, chunk);  //triggers NX_ASSERT if itr == end()
     }
     else
     {
@@ -701,7 +701,7 @@ qint64 DeviceFileCatalog::lastChunkStartTime() const
 
 DeviceFileCatalog::Chunk DeviceFileCatalog::updateDuration(int durationMs, qint64 fileSize, bool indexWithDuration)
 {
-    Q_ASSERT(durationMs < 1000 * 1000);
+    NX_ASSERT(durationMs < 1000 * 1000);
     QnMutexLocker lock( &m_mutex );
     //m_chunks.last().durationMs = durationMs;
     auto itr = qLowerBound(m_chunks.begin(), m_chunks.end(), m_recordingChunkTime);
@@ -1149,7 +1149,7 @@ QnRecordingStatsData DeviceFileCatalog::getStatistics(qint64 bitrateAnalizePerio
     bitrateStats.recordedSecs /= 1000; // msec to sec
     if (bitrateStats.recordedBytes > 0 && bitrateStats.recordedSecs > 0)
         result.averageBitrate = bitrateStats.recordedBytes / (qreal) bitrateStats.recordedSecs;
-    Q_ASSERT(result.averageBitrate >= 0);
+    NX_ASSERT(result.averageBitrate >= 0);
     return result;
 }
 

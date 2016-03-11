@@ -2,6 +2,7 @@
 #include "utils/common/synctime.h"
 #include "utils/common/util.h"
 #include "api/global_settings.h"
+#include <nx/utils/log/assert.h>
 
 static QnAuditManager* m_globalInstance = 0;
 
@@ -56,7 +57,7 @@ QnAuditManager::QnAuditManager()
         }
     );
 
-    assert( m_globalInstance == nullptr );
+    NX_ASSERT( m_globalInstance == nullptr );
     m_globalInstance = this;
     connect(&m_timer, &QTimer::timeout, this, &QnAuditManager::at_timer);
     m_timer.start(1000 * 5);

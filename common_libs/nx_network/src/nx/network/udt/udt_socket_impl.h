@@ -14,7 +14,7 @@ namespace network {
 
 class UDTSocketImpl
 :
-    public CommonSocketImpl<UdtSocket>
+    public CommonSocketImpl
 {
 public:
     UDTSOCKET udtHandle;
@@ -23,6 +23,7 @@ public:
     :
         udtHandle(_udtHandle)
     {
+        isUdtSocket = true;
     }
 };
 

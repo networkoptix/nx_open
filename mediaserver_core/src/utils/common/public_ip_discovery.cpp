@@ -30,7 +30,7 @@ QString stage(int value) {
     case 2: return "Secondary";
     case 3: return "Found";
     default:
-        Q_ASSERT(false);
+        NX_ASSERT(false);
         return QString();
     }
 }
@@ -55,7 +55,7 @@ QnPublicIPDiscovery::QnPublicIPDiscovery():
     PRINT_DEBUG("Primary urls: " + m_primaryUrls.join("; "));
     PRINT_DEBUG("Secondary urls: " + m_secondaryUrls.join("; "));
 
-    Q_ASSERT_X(!m_primaryUrls.isEmpty(), Q_FUNC_INFO, "Server should have at least one public IP url");
+    NX_ASSERT(!m_primaryUrls.isEmpty(), Q_FUNC_INFO, "Server should have at least one public IP url");
 }
 
 void QnPublicIPDiscovery::update() {

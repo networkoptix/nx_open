@@ -143,7 +143,7 @@ qint64 QnServerUpdateTool::addUpdateFileChunkSync(const QString &updateId, const
     case NoReply:
         return UnknownError;
     default:
-        Q_ASSERT_X(reply >= 0, Q_FUNC_INFO, "wrong reply code");
+        NX_ASSERT(reply >= 0, Q_FUNC_INFO, "wrong reply code");
         if (reply >= 0)
             return reply;
         return UnknownError;
@@ -170,7 +170,7 @@ void QnServerUpdateTool::addUpdateFileChunkAsync(const QString &updateId, const 
         sendReply(ec2::AbstractUpdatesManager::UnknownError);
         break;
     default:
-        Q_ASSERT_X(reply >= 0, Q_FUNC_INFO, "wrong reply code");
+        NX_ASSERT(reply >= 0, Q_FUNC_INFO, "wrong reply code");
         if (reply >= 0) {
             /* we work with files < 500 MB, so int type is ok */
             sendReply(static_cast<int>(reply));

@@ -15,7 +15,7 @@ std::pair< quint16, PortMapper::Protocol > tcpPort( quint16 port )
 }
 
 template<typename T>
-class SyncQueue
+class TestSyncQueue
 {
 public:
     void push( const T& item )
@@ -43,7 +43,7 @@ private:
     std::queue< T > m_queue;
 };
 
-static SocketAddress popAddress( SyncQueue< SocketAddress >* queue7001 )
+static SocketAddress popAddress( TestSyncQueue< SocketAddress >* queue7001 )
 {
     auto address = queue7001->pop();
     if( address.address == HostAddress() ) // external IP is not resolved yet
@@ -60,7 +60,7 @@ TEST( UpnpPortMapper, NormalUsage )
     AsyncClientMock& clientMock = portMapper.clientMock();
 
     // Map 7001 and 80
-    SyncQueue< SocketAddress > queue7001;
+    TestSyncQueue< SocketAddress > queue7001;
     EXPECT_TRUE( portMapper.enableMapping( 7001, PortMapper::Protocol::TCP,
                  [&]( SocketAddress info )
                  { queue7001.push( info ); } ) );
@@ -73,7 +73,7 @@ TEST( UpnpPortMapper, NormalUsage )
     EXPECT_EQ( addr7001.first, tcpPort( map7001.port ) );
     EXPECT_EQ( addr7001.second.first.toString(), lit( "192.168.0.10:7001" ) );
 
-    SyncQueue< SocketAddress > queue80;
+    TestSyncQueue< SocketAddress > queue80;
     EXPECT_TRUE( portMapper.enableMapping( 80, PortMapper::Protocol::TCP,
                  [&]( SocketAddress info )
                  { queue80.push( info ); } ) );
@@ -107,7 +107,7 @@ TEST( UpnpPortMapper, ReuseExisting )
         std::make_pair( SocketAddress( lit( "192.168.0.10" ), 7001 ), QString() ) ) ) );
     EXPECT_EQ( clientMock.mappingsCount(), 1 );
 
-    SyncQueue< SocketAddress > queue7001;
+    TestSyncQueue< SocketAddress > queue7001;
     EXPECT_TRUE( portMapper.enableMapping( 7001, PortMapper::Protocol::TCP,
                  [&]( SocketAddress info )
                  { queue7001.push( std::move( info ) ); } ) );
@@ -129,7 +129,7 @@ TEST( UpnpPortMapper, CheckMappings )
     AsyncClientMock& clientMock = portMapper.clientMock();
 
     // Map 7001
-    SyncQueue< SocketAddress > queue7001;
+    TestSyncQueue< SocketAddress > queue7001;
     EXPECT_TRUE( portMapper.enableMapping( 7001, PortMapper::Protocol::TCP,
                  [&]( SocketAddress info )
                  { queue7001.push( std::move(info) ); } ) );

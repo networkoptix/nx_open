@@ -14,7 +14,7 @@ void deserialize_field(const QVariant &value, std::vector<QnUuid> *target)
 {
     QByteArray tmp;
     deserialize_field(value, &tmp);
-    Q_ASSERT(tmp.size() % 16 == 0);
+    NX_ASSERT(tmp.size() % 16 == 0);
     const char* data = tmp.data();
     const char* dataEnd = data + tmp.size();
     for(; data < dataEnd; data += 16)

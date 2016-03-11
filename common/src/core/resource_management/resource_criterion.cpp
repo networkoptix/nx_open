@@ -117,13 +117,13 @@ bool QnResourceCriterion::isGroup() const {
 }
 
 QnResourceCriterionGroup &QnResourceCriterion::asGroup() {
-    assert(isGroup());
+    NX_ASSERT(isGroup());
 
     return static_cast<QnResourceCriterionGroup &>(*this);
 }
 
 const QnResourceCriterionGroup &QnResourceCriterion::asGroup() const {
-    assert(isGroup());
+    NX_ASSERT(isGroup());
 
     return static_cast<const QnResourceCriterionGroup &>(*this);
 }
@@ -324,14 +324,14 @@ QnResourceCriterionGroup::QnResourceCriterionGroup(Operation matchOperation, Ope
 }
 
 void QnResourceCriterionGroup::addCriterion(const QnResourceCriterion &criterion) {
-    assert(targetValue().userType() == qn_criterionListMetaTypeId);
+    NX_ASSERT(targetValue().userType() == qn_criterionListMetaTypeId);
 
     QnResourceCriterionList *d = static_cast<QnResourceCriterionList *>(targetValueData());
     d->push_front(criterion);
 }
 
 bool QnResourceCriterionGroup::removeCriterion(const QnResourceCriterion &criterion) {
-    assert(targetValue().userType() == qn_criterionListMetaTypeId);
+    NX_ASSERT(targetValue().userType() == qn_criterionListMetaTypeId);
 
     QnResourceCriterionList *d = static_cast<QnResourceCriterionList *>(targetValueData());
     return d->removeOne(criterion);
@@ -342,7 +342,7 @@ void QnResourceCriterionGroup::clear() {
 }
 
 const QnResourceCriterionList &QnResourceCriterionGroup::criteria() const {
-    assert(targetValue().userType() == qn_criterionListMetaTypeId);
+    NX_ASSERT(targetValue().userType() == qn_criterionListMetaTypeId);
 
     return *static_cast<const QnResourceCriterionList *>(targetValueData());
 }
@@ -356,7 +356,7 @@ int QnResourceCriterionGroup::size() const {
 }
 
 void QnResourceCriterionGroup::setCriteria(const QnResourceCriterionList &criteria) {
-    assert(targetValue().userType() == qn_criterionListMetaTypeId);
+    NX_ASSERT(targetValue().userType() == qn_criterionListMetaTypeId);
 
     setTargetValue(QVariant::fromValue<QnResourceCriterionList>(criteria));
 }

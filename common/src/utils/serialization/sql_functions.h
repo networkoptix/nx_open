@@ -10,7 +10,7 @@
 #include "enum.h"
 
 // TODO: #Elric enumz!
-// TODO: #Elric #EC2 static assert for enum size.
+// TODO: #Elric #EC2 static NX_ASSERT for enum size.
 
 namespace QnSqlDetail {
     template<class T>

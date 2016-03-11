@@ -54,7 +54,7 @@ QString Tunnel::stateToString(State state)
 //
 //            default:
 //                // Probably just log the ERROR
-//                Q_ASSERT_X(false, Q_FUNC_INFO, "Unsupported CloudConnectType value!");
+//                NX_ASSERT(false, Q_FUNC_INFO, "Unsupported CloudConnectType value!");
 //        };
 //
 //        if (connector)
@@ -68,13 +68,13 @@ QString Tunnel::stateToString(State state)
 void Tunnel::setStateHandler(std::function<void(State)> handler)
 {
     QnMutexLocker lock(&m_mutex);
-    Q_ASSERT_X(!m_stateHandler, Q_FUNC_INFO, "State handler is already set");
+    NX_ASSERT(!m_stateHandler, Q_FUNC_INFO, "State handler is already set");
     m_stateHandler = std::move(handler);
 }
 
 void Tunnel::changeState(State state, QnMutexLockerBase* lock)
 {
-    Q_ASSERT_X(m_state <= state, Q_FUNC_INFO,
+    NX_ASSERT(m_state <= state, Q_FUNC_INFO,
         lm("State is not supposed to downgrade from %1 to %2")
         .arg(stateToString(m_state)).arg(stateToString(state))
         .toStdString().c_str());

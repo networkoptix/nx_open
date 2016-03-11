@@ -161,6 +161,31 @@ TEST_F(CloudStreamSocketTest, simple_socket_test)
         serverAddress,
         SocketAddress(tempHostName));
 
+    //testing that socket is not used anymore after shutdown call
+    for (int i = 0; i < 3; ++i)
+    {
+        for (int j = 0; j < 10; ++j)
+        {
+            nx::Buffer buf;
+            buf.reserve(128);
+
+            CloudStreamSocket sock;
+            if (i == 0)
+                sock.connectAsync(
+                    SocketAddress(tempHostName),
+                    [](SystemError::ErrorCode) {});
+            else if (i == 1)
+                sock.readSomeAsync(
+                    &buf,
+                    [](SystemError::ErrorCode, size_t) {});
+            else if (i == 2)
+                sock.sendAsync(
+                    buf,
+                    [](SystemError::ErrorCode, size_t) {});
+            sock.shutdown();
+        }
+    }
+
     nx::network::SocketGlobals::addressResolver().removeFixedAddress(
         tempHostName,
         serverAddress);

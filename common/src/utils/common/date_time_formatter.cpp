@@ -5,13 +5,15 @@
 #include <QtCore/QDateTime>
 #include <QtCore/QDebug>
 
+#include <nx/utils/log/assert.h>
+
 /* Contents copied from Qt and modified for our needs. */
 
 static QString qt_readEscapedFormatString(const QString &format, int *idx)
 {
     int &i = *idx;
 
-    Q_ASSERT(format.at(i) == QLatin1Char('\''));
+    NX_ASSERT(format.at(i) == QLatin1Char('\''));
     ++i;
     if (i == format.size())
         return QString();
@@ -119,7 +121,7 @@ QString QnDateTimeFormatter::dateTimeToString(const QString &format,
                                              const QTime *time,
                                              const QLocale *q)
 {
-    Q_ASSERT(date || time);
+    NX_ASSERT(date || time);
     if ((date && !date->isValid()) || (time && !time->isValid()))
         return QString();
     

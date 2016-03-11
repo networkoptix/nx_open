@@ -16,7 +16,7 @@ namespace cdb {
 
 TEST_F(CdbFunctionalTest, system_unbind)
 {
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     api::AccountData account1;
     std::string account1Password;
@@ -118,7 +118,7 @@ TEST_F(CdbFunctionalTest, system_unbind)
 
 TEST_F(CdbFunctionalTest, system_get)
 {
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     api::AccountData account1;
     std::string account1Password;
@@ -202,7 +202,7 @@ TEST_F(CdbFunctionalTest, system_get)
 
 TEST_F(CdbFunctionalTest, system_activation)
 {
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     api::AccountData account1;
     std::string account1Password;

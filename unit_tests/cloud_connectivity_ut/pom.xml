@@ -17,6 +17,7 @@
     <name>cloud_connectivity unit tests</name>
 
     <properties>
+        <guid>${cloud_connectivity_ut.guid}</guid>
         <product.title>cloud_connectivity unit tests</product.title>
         <!--Global libs-->
         <qt.libs>core network concurrent xml xmlpatterns sql multimedia</qt.libs>
@@ -24,7 +25,7 @@
         <global.libs>-lcommon -lnx_utils -lnx_network -lnx_streaming -ludt -lcloud_db_client -lconnection_mediator</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm Wldap32.lib</windows.oslibs>
-        <linux.oslibs>-lavcodec -lavformat -lavutil -lfaac </linux.oslibs>
+        <linux.oslibs>-lavcodec -lavformat -lavutil -lfaac -lmp3lame -lswscale</linux.oslibs>
         <linux.arm.oslibs></linux.arm.oslibs>
         <windows.oslibs.release></windows.oslibs.release>
         <windows.oslibs.debug></windows.oslibs.debug>
@@ -46,6 +47,14 @@
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/common_libs/nx_network/pom.xml</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>libconnection_mediator</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/nx_cloud/libconnection_mediator/pom.xml</systemPath>
         </dependency>
     </dependencies>
 

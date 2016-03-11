@@ -66,6 +66,7 @@ private:
     std::vector<char*> m_args;
     std::unique_ptr<MediatorProcessPublic> m_mediatorInstance;
     std::future<int> m_mediatorProcessFuture;
+    std::promise<bool /*result*/> m_mediatorStartedPromise;
     //MediatorConnector m_mediatorConnector;
     LocalCloudDataProvider m_cloudDataProvider;
 };

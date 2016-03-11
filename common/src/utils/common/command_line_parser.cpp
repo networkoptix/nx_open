@@ -6,6 +6,7 @@
 #include <QtCore/QStringList>
 
 #include <utils/common/warnings.h>
+#include <nx/utils/log/assert.h>
 
 namespace {
     const QString uriDelimiter(lit("://"));
@@ -188,7 +189,7 @@ bool QnCommandLineParser::parse(int &argc, char **argv, QTextStream *errorStream
 
         /* Write value out if needed. */
         if(parameter.target() && parameter.metaType() && result) {
-            assert(value.userType() == parameter.type());
+            NX_ASSERT(value.userType() == parameter.type());
 
             parameter.metaType()->construct(parameter.target(), value.data());
         }
@@ -243,4 +244,28 @@ void parseCmdArgs(
                 curParamIter->second = QString::fromUtf8(arg);
         }
     }
+}
+
+bool readArg(
+    const std::multimap<QString, QString>& args,
+    const QString& name,
+    QString* const value)
+{
+    auto iter = args.find(name);
+    if (iter == args.end())
+        return false;
+    *value = iter->second;
+    return true;
+}
+
+bool readArg(
+    const std::multimap<QString, QString>& args,
+    const QString& name,
+    int* const value)
+{
+    QString strValue;
+    if (!readArg(args, name, &strValue))
+        return false;
+    *value = strValue.toInt();
+    return true;
 }

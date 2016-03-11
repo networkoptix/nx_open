@@ -41,18 +41,29 @@ PeerRegistrator::PeerRegistrator(
             } ) &&
 
         dispatcher->registerRequestProcessor(
-            stun::cc::methods::resolve,
+            stun::cc::methods::resolveDomain,
             [this](const ConnectionStrongRef& connection, stun::Message message)
             {
                 processRequestWithOutput(
-                    &PeerRegistrator::resolve,
+                    &PeerRegistrator::resolveDomain,
+                    this,
+                    std::move(connection),
+                    std::move(message));
+            });
+
+        dispatcher->registerRequestProcessor(
+            stun::cc::methods::resolvePeer,
+            [this](const ConnectionStrongRef& connection, stun::Message message)
+            {
+                processRequestWithOutput(
+                    &PeerRegistrator::resolvePeer,
                     this,
                     std::move(connection),
                     std::move(message));
             });
 
     // TODO: NX_LOG
-    Q_ASSERT_X(result, Q_FUNC_INFO, "Could not register one of processors");
+    NX_ASSERT(result, Q_FUNC_INFO, "Could not register one of processors");
 }
 
 void PeerRegistrator::bind(
@@ -136,26 +147,58 @@ void PeerRegistrator::listen(
     completionHandler(api::ResultCode::ok);
 }
 
-void PeerRegistrator::resolve(
+void PeerRegistrator::resolveDomain(
     const ConnectionStrongRef& connection,
-    api::ResolveRequest requestData,
-    stun::Message /*message*/,
-    std::function<void(api::ResultCode, api::ResolveResponse)> completionHandler)
+    api::ResolveDomainRequest requestData,
+    stun::Message /*requestMessage*/,
+    std::function<void(
+        api::ResultCode, api::ResolveDomainResponse)> completionHandler)
+{
+    const auto peers = m_listeningPeerPool->findPeersBySystemId(
+                requestData.domainName);
+    if (peers.empty())
+    {
+        NX_LOGX(lm("Could not resolve domain %1. client address: %2")
+            .arg(requestData.domainName)
+            .arg(connection->getSourceAddress().toString()), cl_logDEBUG2);
+
+        return completionHandler(
+            api::ResultCode::notFound,
+            api::ResolveDomainResponse());
+    }
+
+    api::ResolveDomainResponse responseData;
+    for (const auto& peer : peers)
+        responseData.hostNames.push_back(peer.hostName());
+
+    NX_LOGX(lm("Successfully resolved domain %1 (requested from %2), hostNames=%3")
+        .arg(requestData.domainName).arg(connection->getSourceAddress().toString())
+        .arg(containerString(peers)), cl_logDEBUG2);
+
+    completionHandler(api::ResultCode::ok, std::move(responseData));
+}
+
+void PeerRegistrator::resolvePeer(
+    const ConnectionStrongRef& connection,
+    api::ResolvePeerRequest requestData,
+    stun::Message /*requestMessage*/,
+    std::function<void(
+        api::ResultCode, api::ResolvePeerResponse)> completionHandler)
 {
     auto peerDataLocker = m_listeningPeerPool->findAndLockPeerDataByHostName(
         requestData.hostName);
     if (!static_cast<bool>(peerDataLocker))
     {
         NX_LOGX(lm("Could not resolve host %1. client address: %2")
-            .arg(requestData.hostName).arg(connection->getSourceAddress().toString()),
-            cl_logDEBUG2);
+            .arg(requestData.hostName)
+            .arg(connection->getSourceAddress().toString()), cl_logDEBUG2);
 
         return completionHandler(
             api::ResultCode::notFound,
-            api::ResolveResponse());
+            api::ResolvePeerResponse());
     }
 
-    api::ResolveResponse responseData;
+    api::ResolvePeerResponse responseData;
 
     if (!peerDataLocker->value().endpoints.empty())
         responseData.endpoints = peerDataLocker->value().endpoints;
@@ -170,7 +213,6 @@ void PeerRegistrator::resolve(
         cl_logDEBUG2);
 
     completionHandler(api::ResultCode::ok, std::move(responseData));
-
 }
 
 } // namespace hpm

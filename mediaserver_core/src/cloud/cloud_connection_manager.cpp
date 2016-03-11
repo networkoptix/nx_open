@@ -84,7 +84,7 @@ void CloudConnectionManager::atAdminPropertyChanged(
     const QString& /*key*/)
 {
     auto user = res.dynamicCast<QnUserResource>();
-    assert(user);
+    NX_ASSERT(user);
 
     const auto cloudSystemID = user->getProperty(Qn::CLOUD_SYSTEM_ID);
     const auto cloudAuthKey = user->getProperty(Qn::CLOUD_SYSTEM_AUTH_KEY);

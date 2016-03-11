@@ -29,6 +29,7 @@
     <properties>
         <!-- Project GUIDs (c++/qt only) -->
         <common.guid>{7f2f48c9-e466-45d9-a9a0-1dcfb486f6cb}</common.guid>
+        <cloud_connect_test_util.guid>{931F412E-DCC2-426B-93CD-1F551CA69D93}</cloud_connect_test_util.guid>
         <nx_email.guid>{0034cf9a-0454-475d-9b54-87d4b4a6b65b}</nx_email.guid>
         <nx_streaming.guid>{3c0acd3f-d641-4690-a7c5-129cb4bea938}</nx_streaming.guid>
         <nx_media.guid>{3fbafa12-f3a7-4fd2-bafc-256427399a56}</nx_media.guid>
@@ -61,9 +62,11 @@
         <ftpstorageplugin.guid>{f6c9f457-910c-4c0d-bb67-b4f752a8664e}</ftpstorageplugin.guid>
         <storage_plugin_test_client.guid>{83e8bbad-6976-45da-bdd7-baf8f17fc71c}</storage_plugin_test_client.guid>
         <common_ut.guid>{2f2d9175-70c1-404d-82e3-5e797b92263c}</common_ut.guid>
+        <cloud_connectivity_ut.guid>{f568398b-8ca3-44cc-9707-d1f63b2aa1c6}</cloud_connectivity_ut.guid>
+        <nx_network_ut.guid>{f7dfa168-fa41-4d4a-b475-e785acb4ff45}</nx_network_ut.guid>
         <libcloud_db.guid>{BBA5BB95-B669-42C4-8074-EE0E361C094E}></libcloud_db.guid>
         <cloud_db.guid>{44ADCF67-21B0-403D-A771-C138B11CDB83}></cloud_db.guid>
-        <connection_mediator.guid>{B16E0ED9-9ED1-48DB-B85E-D285838340BB}</connection_mediator.guid>
+        <connection_mediator.guid>{f568398b-8ca3-44cc-9707-d1f63b2aa1c6}</connection_mediator.guid>
         <libconnection_mediator.guid>{109DCEE1-AADA-4C88-9FE4-8521525EF7FF}</libconnection_mediator.guid>
 
         <!-- Components' Naming -->
@@ -424,6 +427,7 @@
                 <module>common_libs/nx_audio</module>
                 <module>nx_cloud/cloud_db</module>
                 <module>nx_cloud/connection_mediator</module>
+                <module>nx_cloud/cloud_connect_test_util</module>
                 <module>nx_cloud/libcloud_db</module>
                 <module>nx_cloud/libconnection_mediator</module>
             </modules>
@@ -443,7 +447,7 @@
                 <python.virtualenv>virtualenv.exe</python.virtualenv>
                 <buildenv.script>get_buildenv_2.6.bat</buildenv.script>
                 <platform>windows</platform>
-                <box>windows</box>
+                <box>none</box>
                 <compiler>msvc2015u1</compiler>
                 <arch>x64</arch>
                 <force_x86>false</force_x86>
@@ -557,6 +561,7 @@
             <properties>
                 <platform>linux</platform>
                 <qt.spec>linux-g++</qt.spec>
+                <qt.path>artifacts/qt/${qt.version}/${platform}/${arch}/${box}/${build.configuration}</qt.path>
                 <qt.classifier>${platform}-${arch}-${build.configuration}</qt.classifier>
             </properties>
             <modules>

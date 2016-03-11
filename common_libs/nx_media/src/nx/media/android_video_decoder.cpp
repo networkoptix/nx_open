@@ -1,5 +1,7 @@
 #include "android_video_decoder.h"
 
+#if defined(Q_OS_ANDROID)
+
 #include <deque>
 
 #include <QtGui/QOpenGLContext>
@@ -13,10 +15,8 @@
 #include <QCache>
 #include <QMap>
 
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 #include <utils/media/h264_utils.h>
-
-#if defined(Q_OS_ANDROID)
 
 #include <QAndroidJniObject>
 #include <QAndroidJniEnvironment>

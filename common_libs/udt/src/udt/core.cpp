@@ -208,8 +208,9 @@ CUDT::~CUDT()
 
 void CUDT::setOpt(UDTOpt optName, const void* optval, int)
 {
-   if (m_bBroken || m_bClosing)
-      throw CUDTException(2, 1, 0);
+   //NOTE socket options can be set even if remote side has closed connection
+   //if (m_bBroken || m_bClosing)
+   //   throw CUDTException(2, 1, 0);
 
    CGuard cg(m_ConnectionLock);
    CGuard sendguard(m_SendLock);
@@ -2011,13 +2012,12 @@ void CUDT::processCtrl(CPacket& ctrlpkt)
       }
 
       // protect packet retransmission
-      CGuard::enterCS(m_AckLock);
+      CGuard ackLocker(m_AckLock);
 
       int offset = CSeqNo::seqoff(m_iSndLastDataAck, ack);
       if (offset <= 0)
       {
          // discard it if it is a repeated ACK
-         CGuard::leaveCS(m_AckLock);
          break;
       }
 
@@ -2033,7 +2033,7 @@ void CUDT::processCtrl(CPacket& ctrlpkt)
       m_iSndLastDataAck = ack;
       m_pSndLossList->remove(CSeqNo::decseq(m_iSndLastDataAck));
 
-      CGuard::leaveCS(m_AckLock);
+      ackLocker.unlock();
 
       #ifndef _WIN32
          pthread_mutex_lock(&m_SendBlockLock);
@@ -2618,8 +2618,6 @@ void CUDT::checkTimers(bool forceAck)
          // app can call any UDT API to learn the connection_broken error
          s_UDTUnited.m_EPoll.update_events(m_SocketID, m_sPollID, UDT_EPOLL_IN | UDT_EPOLL_OUT | UDT_EPOLL_ERR, true);
 
-         CTimer::triggerEvent();
-
          return;
       }
 
@@ -2653,35 +2651,40 @@ void CUDT::checkTimers(bool forceAck)
    }
 }
 
-void CUDT::addEPoll(const int eid)
+void CUDT::addEPoll(const int eid, int eventsToReport)
 {
-   CGuard::enterCS(s_UDTUnited.m_EPoll.m_EPollLock);
-   m_sPollID.insert(eid);
-   CGuard::leaveCS(s_UDTUnited.m_EPoll.m_EPollLock);
+    {
+        CGuard lk(s_UDTUnited.m_EPoll.m_EPollLock);
+        m_sPollID.insert(eid);
+    }
 
-   if (!m_bConnected || m_bBroken || m_bClosing)
-      return;
+    if (m_bConnected && !m_bBroken && !m_bClosing)
+    {
+        if (((UDT_STREAM == m_iSockType) && (m_pRcvBuffer->getRcvDataSize() > 0)) ||
+            ((UDT_DGRAM == m_iSockType) && (m_pRcvBuffer->getRcvMsgNum() > 0)))
+        {
+            eventsToReport |= UDT_EPOLL_IN;
+        }
+        if (m_iSndBufSize > m_pSndBuffer->getCurrBufSize())
+        {
+            eventsToReport |= UDT_EPOLL_OUT;
+        }
+    }
 
-   if (((UDT_STREAM == m_iSockType) && (m_pRcvBuffer->getRcvDataSize() > 0)) ||
-      ((UDT_DGRAM == m_iSockType) && (m_pRcvBuffer->getRcvMsgNum() > 0)))
-   {
-      s_UDTUnited.m_EPoll.update_events(m_SocketID, m_sPollID, UDT_EPOLL_IN, true);
-   }
-   if (m_iSndBufSize > m_pSndBuffer->getCurrBufSize())
-   {
-      s_UDTUnited.m_EPoll.update_events(m_SocketID, m_sPollID, UDT_EPOLL_OUT, true);
-   }
+    if (eventsToReport != 0)
+        s_UDTUnited.m_EPoll.update_events(m_SocketID, m_sPollID, eventsToReport, true);
 }
 
 void CUDT::removeEPoll(const int eid)
 {
-   // clear IO events notifications;
-   // since this happens after the epoll ID has been removed, they cannot be set again
-   set<int> remove;
-   remove.insert(eid);
-   s_UDTUnited.m_EPoll.update_events(m_SocketID, remove, UDT_EPOLL_IN | UDT_EPOLL_OUT, false);
+    // clear IO events notifications;
+    // since this happens after the epoll ID has been removed, they cannot be set again
+    set<int> remove;
+    remove.insert(eid);
+    s_UDTUnited.m_EPoll.update_events(m_SocketID, remove, UDT_EPOLL_IN | UDT_EPOLL_OUT, false);
 
-   CGuard::enterCS(s_UDTUnited.m_EPoll.m_EPollLock);
-   m_sPollID.erase(eid);
-   CGuard::leaveCS(s_UDTUnited.m_EPoll.m_EPollLock);
+    {
+        CGuard lk(s_UDTUnited.m_EPoll.m_EPollLock);
+        m_sPollID.erase(eid);
+    }
 }

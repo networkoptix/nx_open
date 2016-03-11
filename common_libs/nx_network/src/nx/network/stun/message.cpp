@@ -4,10 +4,13 @@
 ***********************************************************/
 
 #include "message.h"
-#include "message_parser.h"
-#include "message_serializer.h"
+
+#include <random>
 
 #include <openssl/hmac.h>
+
+#include "message_parser.h"
+#include "message_serializer.h"
 
 
 static const size_t DEFAULT_BUFFER_SIZE = 4 * 1024;
@@ -64,10 +67,22 @@ Header& Header::operator=(Header&& rhs)
     return *this;
 }
 
+namespace {
+std::random_device randomForBufferGeneration;
+std::mutex randomForBufferGenerationMutex;
+}
+
 static Buffer randomBuffer( int size )
 {
     Buffer id( size, 0 );
-    std::generate( id.begin(), id.end(), qrand );
+
+    std::unique_lock<std::mutex> lk(randomForBufferGenerationMutex);
+    std::uniform_int_distribution<int> dist(
+        std::numeric_limits<char>::min(),
+        std::numeric_limits<char>::max());
+    std::generate(
+        id.begin(), id.end(),
+        [&dist] { return dist(randomForBufferGeneration); });
     return id;
 }
 
@@ -210,7 +225,7 @@ static Buffer hmacSha1( const String& key, const Message* message )
     serializer.setMessage(message);
     if (serializer.serialize(&buffer, &bytes) != nx_api::SerializerState::done)
     {
-        Q_ASSERT(false);
+        NX_ASSERT(false);
     }
 
     return hmacSha1( key, buffer );
@@ -224,7 +239,7 @@ void Message::insertIntegrity( const String& userName, const String& key )
         attrs::MessageIntegrity::SIZE, 0 ) );
 
     const auto hmac = hmacSha1( key, this );
-    Q_ASSERT( hmac.size() == attrs::MessageIntegrity::SIZE );
+    NX_ASSERT( hmac.size() == attrs::MessageIntegrity::SIZE );
     newAttribute< attrs::MessageIntegrity >( hmac );
 }
 

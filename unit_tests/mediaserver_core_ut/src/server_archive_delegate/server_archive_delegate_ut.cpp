@@ -100,7 +100,7 @@ public:
             const TimePeriod &second = tp1 == first ? tp2 : tp1;
 
             // merge only overlapping periods
-            assert(first.startTimeMs + first.durationMs > second.startTimeMs);
+            NX_ASSERT(first.startTimeMs + first.durationMs > second.startTimeMs);
             TimePeriod ret;
             ret.startTimeMs = first.startTimeMs;
             ret.durationMs =
@@ -459,7 +459,7 @@ static int lockmgr(void **mtx, enum AVLockOp op)
 
 static void ffmpegInit()
 {
-    av_register_all();
+    avcodec_register_all();
 
     if(av_lockmgr_register(lockmgr) != 0)
     {
