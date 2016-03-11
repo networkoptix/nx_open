@@ -149,6 +149,8 @@ private:
     std::map<QByteArray, UPNPDescriptionCacheItem> m_upnpDescCache;
     bool m_terminated;
     QElapsedTimer m_cacheTimer;
+    std::shared_ptr<AbstractDatagramSocket> m_receiveSocket;
+    nx::Buffer m_receiveBuffer;
 
     //!Implementation of \a TimerEventHandler::onTimer
     virtual void onTimer( const quint64& timerID ) override;

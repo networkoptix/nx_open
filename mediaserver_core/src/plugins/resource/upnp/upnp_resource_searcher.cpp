@@ -18,62 +18,6 @@ static const int TCP_TIMEOUT = 3000;
 static const int CACHE_TIME_TIME = 1000 * 60 * 5;
 static const int GROUP_PORT = 1900;
 
-//!Partial parser for SSDP description xml (UPnP(TM) Device Architecture 1.1, 2.3)
-class UpnpDeviceDescriptionSaxHandler
-:
-    public QXmlDefaultHandler
-{
-    UpnpDeviceInfo m_deviceInfo;
-    QString m_currentElementName;
-public:
-    virtual bool startDocument()
-    {
-        return true;
-    }
-
-    virtual bool startElement( const QString& /*namespaceURI*/, const QString& /*localName*/, const QString& qName, const QXmlAttributes& /*atts*/ )
-    {
-        m_currentElementName = qName;
-        return true;
-    }
-
-    virtual bool characters( const QString& ch )
-    {
-        if( m_currentElementName == QLatin1String("friendlyName") )
-            m_deviceInfo.friendlyName = ch;
-        else if( m_currentElementName == QLatin1String("manufacturer") )
-            m_deviceInfo.manufacturer = ch;
-        else if( m_currentElementName == QLatin1String("modelName") )
-            m_deviceInfo.modelName = ch;
-        else if( m_currentElementName == QLatin1String("serialNumber") )
-            m_deviceInfo.serialNumber = ch;
-        else if( m_currentElementName == QLatin1String("presentationURL") )
-            m_deviceInfo.presentationUrl = ch;
-
-        return true;
-    }
-
-    virtual bool endElement( const QString& /*namespaceURI*/, const QString& /*localName*/, const QString& /*qName*/ )
-    {
-        m_currentElementName.clear();
-        return true;
-    }
-
-    virtual bool endDocument()
-    {
-        return true;
-    }
-
-    /*
-    QString friendlyName() const { return m_friendlyName; }
-    QString manufacturer() const { return m_manufacturer; }
-    QString modelName() const { return m_modelName; }
-    QString serialNumber() const { return m_serialNumber; }
-    QString presentationUrl() const { return m_presentationUrl; }
-    */
-    UpnpDeviceInfo deviceInfo() const { return m_deviceInfo; }
-};
-
 
 // ====================================================================
 QnUpnpResourceSearcher::QnUpnpResourceSearcher():
@@ -96,11 +40,9 @@ AbstractDatagramSocket* QnUpnpResourceSearcher::sockByName(const QnInterfaceAndA
     {
         UDPSocket* udpSock = new UDPSocket();
         udpSock->setReuseAddrFlag(true);
+        udpSock->setRecvBufferSize(1024*1024);
         udpSock->bind( SocketAddress( HostAddress::anyHost, GROUP_PORT ) );
-        
-        for (const QnInterfaceAndAddr& iface: getAllIPv4Interfaces()) {
-            udpSock->joinGroup(groupAddress.toString(), iface.address.toString());
-        }
+        udpSock->joinGroup(groupAddress.toString(), HostAddress::anyHost.toString());
         m_receiveSocket = udpSock;
     }
 
@@ -114,12 +56,11 @@ AbstractDatagramSocket* QnUpnpResourceSearcher::sockByName(const QnInterfaceAndA
         //if (!sock->bindToInterface(iface))
         if( !sock->bind( SocketAddress( iface.address.toString() ) ) ||
             !sock->setMulticastIF( localAddress ) ||
-            !sock->setRecvBufferSize( 1024 * 512 ) )
+            !sock->setRecvBufferSize( 0 ) )
         {
             return 0;
         }
 
-        
 
         /*
         if (!sock->joinGroup(groupAddress.toString(), iface.address.toString()))
@@ -276,7 +217,6 @@ QnResourceList QnUpnpResourceSearcher::findResources(void)
         data.append("Request-ID: uuid:f81d4fae-7dec-11d0-a765-00a0c91e6bf6\r\n");
         sock->sendTo(data.data(), data.size(), groupAddress.toString(), GROUP_PORT);
         */
-        processSocket(sock, processedUuid, result);
     }
     if (m_receiveSocket)
         processSocket(m_receiveSocket, processedUuid, result);

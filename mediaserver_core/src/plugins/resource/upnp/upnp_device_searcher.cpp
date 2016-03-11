@@ -295,6 +295,30 @@ void UPNPDeviceSearcher::dispatchDiscoverPackets()
 
 std::shared_ptr<AbstractDatagramSocket> UPNPDeviceSearcher::getSockByIntf( const QnInterfaceAndAddr& iface )
 {
+    using namespace std::placeholders;
+
+    {
+        QnMutexLocker lk( &m_mutex );
+        if (!m_receiveSocket)
+        {
+            m_receiveBuffer.reserve(READ_BUF_CAPACITY);
+
+            auto udpSock = make_shared<UDPSocket>();
+            udpSock->setReuseAddrFlag(true);
+            udpSock->setRecvBufferSize(MAX_UPNP_RESPONSE_PACKET_SIZE);
+            udpSock->bind( SocketAddress( HostAddress::anyHost, GROUP_PORT ) );
+            udpSock->joinGroup( groupAddress.toString(), HostAddress::anyHost.toString() );
+            udpSock->readSomeAsync(
+                &m_receiveBuffer,
+                std::bind(
+                    &UPNPDeviceSearcher::onSomeBytesRead,
+                    this,
+                    udpSock.get(), _1, &m_receiveBuffer, _2 ) );
+
+            m_receiveSocket = udpSock;
+        }
+    }
+
     const QString& localAddress = iface.address.toString();
 
     pair<map<QString, SocketReadCtx>::iterator, bool> p;
@@ -308,16 +332,12 @@ std::shared_ptr<AbstractDatagramSocket> UPNPDeviceSearcher::getSockByIntf( const
     //creating new socket
     std::shared_ptr<UDPSocket> sock( new UDPSocket() );
 
-    using namespace std::placeholders;
-
     p.first->second.sock = sock;
     p.first->second.buf.reserve( READ_BUF_CAPACITY );
     if( !sock->setReuseAddrFlag( true ) ||
-        !sock->bind( SocketAddress(localAddress, GROUP_PORT) ) ||
-        !sock->joinGroup( groupAddress.toString(), iface.address.toString() ) ||
+        !sock->bind( SocketAddress( localAddress ) ) ||
         !sock->setMulticastIF( localAddress ) ||
-        !sock->setRecvBufferSize( MAX_UPNP_RESPONSE_PACKET_SIZE ) ||
-        !sock->readSomeAsync( &p.first->second.buf, std::bind( &UPNPDeviceSearcher::onSomeBytesRead, this, sock.get(), _1, &p.first->second.buf, _2 ) ) )
+        !sock->setRecvBufferSize( 0 ) )
     {
         QnMutexLocker lk( &m_mutex );
         m_socketList.erase( p.first );

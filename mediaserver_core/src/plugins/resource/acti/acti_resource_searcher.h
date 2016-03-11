@@ -9,7 +9,7 @@
 
 class QnMacAddress;
 
-class QnActiResourceSearcher : public QObject, public QnUpnpResourceSearcher
+class QnActiResourceSearcher : public QObject, public QnUpnpResourceSearcherAsync
 {
     Q_OBJECT
 
@@ -31,7 +31,6 @@ protected:
         const HostAddress& host,
         const UpnpDeviceInfo& devInfo,
         const QByteArray& xmlDevInfo,
-        const QAuthenticator &auth,
         QnResourceList& result) override;
 
 private:
@@ -59,6 +58,12 @@ private:
         const UpnpDeviceInfo& devInfo,
         const QnMacAddress& mac,
         const QAuthenticator &auth,
+        QnResourceList& result );
+
+    void processDeviceXml(
+        const QByteArray& foundDeviceDescription,
+        const HostAddress& host,
+        const HostAddress& sender,
         QnResourceList& result );
 
 private slots:
