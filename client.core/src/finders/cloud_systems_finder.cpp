@@ -46,7 +46,7 @@ void QnCloudSystemsFinder::onCloudStatusChanged(QnCloudStatusWatcher::Status sta
     case QnCloudStatusWatcher::Unauthorized:
     case QnCloudStatusWatcher::Offline:
 //        setCloudSystems(QnCloudSystemList());
-        break;  
+        break;
     }
 }
 
@@ -67,7 +67,7 @@ void QnCloudSystemsFinder::setCloudSystems(const QnCloudSystemList &systems)
 
     {
         const QnMutexLocker lock(&m_mutex);
-        
+
         const auto oldIds = m_systems.keys().toSet();
         const auto addedIds = IdsSet(newIds).subtract(oldIds);
 
@@ -80,21 +80,21 @@ void QnCloudSystemsFinder::setCloudSystems(const QnCloudSystemList &systems)
                 emit systemDiscovered(system);
         }
     }
-    
+
     for (const auto removedId : removedIds)
         emit systemLost(removedId);
 }
 
 void QnCloudSystemsFinder::onCloudError(QnCloudStatusWatcher::ErrorCode error)
 {
-    // TODO: #ynikitenkov handle errors. Now it is assumed that systems are reset 
+    // TODO: #ynikitenkov handle errors. Now it is assumed that systems are reset
     // if any error automatically
 }
 
 void QnCloudSystemsFinder::onSystemDiscovered(const QnSystemDescriptionPtr &system)
 {
-    typedef std::vector<HostAddress> HostAddressVector;
-    
+  /*  typedef std::vector<HostAddress> HostAddressVector;
+
     auto &resolver = nx::network::SocketGlobals::addressResolver();
 
     const QPointer<QnCloudSystemsFinder> guard(this);
@@ -113,6 +113,7 @@ void QnCloudSystemsFinder::onSystemDiscovered(const QnSystemDescriptionPtr &syst
 
     const auto cloudHost = HostAddress(id.toString());
     resolver.resolveDomain(cloudHost, resolvedHandler);
+    */
 }
 
 
