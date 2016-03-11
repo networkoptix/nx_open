@@ -12,7 +12,7 @@ Item
 
     MouseArea
     {
-        anchors.fill: parent;
+        anchors.fill: areaLoader;
         onClicked: { thisComponent.isMasked = !thisComponent.isMasked; }
     }
 

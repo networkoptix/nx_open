@@ -13,6 +13,12 @@ Rectangle
 
     SystemPalette { id: palette; }
 
+    MouseArea
+    {
+        anchors.fill: parent;
+        onClicked: grid.watcher.resetCurrentItem();
+    }
+
     Grid
     {
         id: grid;
@@ -40,6 +46,7 @@ Rectangle
             {
                 id: tileLoader;
 
+                z: (item ? item.z : 0);
                 Component
                 {
                     id: localSystemTile;

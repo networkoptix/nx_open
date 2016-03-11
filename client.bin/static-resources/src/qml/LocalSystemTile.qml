@@ -15,7 +15,7 @@ BaseTile
         onIsSomeoneActiveChanged:
         {
             if (isSomeoneActive)
-                thisComponent.isExpanded = true;
+                isExpanded = true;
         }
     }
 
@@ -48,8 +48,33 @@ BaseTile
 
     expandedAreaDelegate: Column
     {
+        spacing: 8;
+
         anchors.left: (parent ? parent.left : undefined);
         anchors.right: (parent ? parent.right : undefined);
+
+        Text
+        {
+            text: qsTr("Password");
+        }
+
+        TextField
+        {
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+
+        }
+
+        CheckBox
+        {
+            text: qsTr("Save password");
+        }
+
+        CheckBox
+        {
+            enabled: false;
+            text: qsTr("Auto-login");
+        }
 
         Button
         {

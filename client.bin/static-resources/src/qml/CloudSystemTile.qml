@@ -2,7 +2,7 @@ import QtQuick 2.5;
 
 BaseTile
 {
-    id: thisComponenet;
+    id: thisComponent;
 
     property string userName;
 
@@ -18,8 +18,8 @@ BaseTile
             anchors.leftMargin: 4;
 
             text: userName;
-            color: thisComponenet.textColor;
-            font.pixelSize: thisComponenet.fontPixelSize;
+            color: thisComponent.textColor;
+            font.pixelSize: thisComponent.fontPixelSize;
         }
 
         Rectangle
