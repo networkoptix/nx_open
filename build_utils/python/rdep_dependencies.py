@@ -101,12 +101,16 @@ def get_package_for_configuration(target, package, target_dir, debug):
     installation_marker = (package if not debug else package + "-debug") + rdep.PACKAGE_CONFIG_NAME
     description_file = os.path.join(target_dir, installation_marker)
     installed = os.path.isfile(description_file)
+    if installed:
+        location = rdep.locate_package(REPOSITORY_PATH, target, package)
+        if not location:
+            installed = False
 
     if not installed:
         print "Fetching package {0} for {1}".format(package, configuration_name(debug))
         rdep.fetch_packages(REPOSITORY_PATH, SYNC_URL, target, [ package ], debug)
+        location = rdep.locate_package(REPOSITORY_PATH, target, package)
 
-    location = rdep.locate_package(REPOSITORY_PATH, target, package)
     if not location:
         print "Could not locate {0}".format(package)
         return False
