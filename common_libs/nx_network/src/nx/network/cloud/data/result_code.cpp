@@ -29,6 +29,12 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(ResultCode,
     (ResultCode::badTransport, "badTransport")
     )
 
+QString toString(const ResultCode& code)
+{
+    QString string;
+    serialize(code, &string);
+    return string;
+}
 
 ResultCode fromStunErrorToResultCode(
     const nx::stun::attrs::ErrorDescription& errorDescription)

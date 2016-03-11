@@ -24,8 +24,8 @@
         <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lswresample -lpostproc</ffmpeg.libs>
         <global.libs>-lcommon -lnx_utils -lnx_network -lnx_streaming -ludt -lcloud_db_client -lconnection_mediator</global.libs>
         <!--Specific os libs used-->
-        <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm ssleay32.lib libeay32.lib Wldap32.lib</windows.oslibs>
-        <linux.oslibs>-lavcodec -lavformat -lavutil -lquazip -lfaac -lssl -lcrypto</linux.oslibs>
+        <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm Wldap32.lib</windows.oslibs>
+        <linux.oslibs>-lavcodec -lavformat -lavutil -lfaac -lmp3lame -lswscale</linux.oslibs>
         <linux.arm.oslibs></linux.arm.oslibs>
         <windows.oslibs.release></windows.oslibs.release>
         <windows.oslibs.debug></windows.oslibs.debug>
@@ -36,6 +36,7 @@
         <windows.defines>_VARIADIC_MAX=10</windows.defines>
         <linux.defines/>
         <mac.defines/>
+        <rdep.packages>openssl quazip</rdep.packages>
     </properties>
 
     <dependencies>
@@ -46,6 +47,14 @@
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/common_libs/nx_network/pom.xml</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>libconnection_mediator</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/nx_cloud/libconnection_mediator/pom.xml</systemPath>
         </dependency>
     </dependencies>
 

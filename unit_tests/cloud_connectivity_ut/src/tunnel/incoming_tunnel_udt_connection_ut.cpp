@@ -22,7 +22,7 @@ class IncomingTunnelUdtConnectionTest
 protected:
     void SetUp() override
     {
-        SyncQueue<SystemError::ErrorCode> results;
+        TestSyncQueue<SystemError::ErrorCode> results;
 
         auto tmpSocket = makeSocket(true);
         NX_ASSERT(tmpSocket->setSendTimeout(0));
@@ -107,10 +107,10 @@ protected:
 
     SocketAddress connectionAddress;
     std::unique_ptr<IncomingTunnelUdtConnection> connection;
-    SyncQueue<SystemError::ErrorCode> acceptResults;
+    TestSyncQueue<SystemError::ErrorCode> acceptResults;
 
     std::unique_ptr<UdtStreamSocket> freeSocket;
-    SyncQueue<SystemError::ErrorCode> connectResults;
+    TestSyncQueue<SystemError::ErrorCode> connectResults;
 
     QnMutex m_mutex;
     std::vector<std::unique_ptr<AbstractStreamSocket>> acceptedSockets;

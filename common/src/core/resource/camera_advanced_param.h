@@ -29,25 +29,11 @@ public:
     bool differsFrom(const QnCameraAdvancedParamValueMap &other) const;
 };
 
-struct QnCameraAdvancedAgregateParameterInfo
+struct QnCameraAdvancedParamQueryInfo
 {
-    QString agregateId;
-    QString componentId;
-    unsigned int componentPosition;
+    QString group;
+    QString cmd;
 };
-
-inline uint qHash(const QnCameraAdvancedAgregateParameterInfo& info, uint seed = 0)
-{
-    return qHash(info.agregateId, seed^0xa03f)^
-            qHash(info.componentId, seed^0xa03f);
-}
-
-inline bool operator == (QnCameraAdvancedAgregateParameterInfo const& f, QnCameraAdvancedAgregateParameterInfo const& s)
-{
-    return f.agregateId == s.agregateId &&
-            f.componentId == s.componentId &&
-            f.componentPosition == s.componentPosition;
-}
 
 struct QnCameraAdvancedParameter {
     enum class DataType {

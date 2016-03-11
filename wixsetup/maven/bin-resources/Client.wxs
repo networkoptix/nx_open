@@ -46,12 +46,6 @@
                         </Shortcut>
                     </Component>                            
 
-                    <Directory Id="styles" Name="styles">
-                        <Component Id="bespin">
-                            <File Id="bespin$(var.suffix).dll" Name="bespin$(var.suffix).dll" Source="$(var.SourceDir)\styles\bespin$(var.suffix).dll" DiskId="2"/>
-                        </Component>
-                    </Directory>
-
                     <Directory Id="ImageFormats" Name="imageformats">
                     </Directory>    
 
@@ -176,15 +170,8 @@
                 <File Id="ClientQt5Sql$(var.suffix).dll" Name="Qt5Sql$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Sql$(var.suffix).dll" DiskId="7"  />                
             </Component>
 			<Component>
-                <File Id="ClientQt5Sensors$(var.suffix).dll" Name="Qt5Sensors$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Sensors$(var.suffix).dll" DiskId="7"  />                
-            </Component>            
-			<Component>
-                <File Id="ClientQt5Positioning$(var.suffix).dll" Name="Qt5Positioning$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Positioning$(var.suffix).dll" DiskId="7"  />                
-            </Component>            
-			<Component>
                 <File Id="ClientQt5WebChannel$(var.suffix).dll" Name="Qt5WebChannel$(var.suffix).dll" Source="$(var.SourceDir)\Qt5WebChannel$(var.suffix).dll" DiskId="7"  />                
             </Component>            
-
             <Component>
                 <File Id="ClientQt5PrintSupport$(var.suffix).dll" Name="Qt5PrintSupport$(var.suffix).dll" Source="$(var.SourceDir)\Qt5PrintSupport$(var.suffix).dll" DiskId="7"  />                
             </Component>             
@@ -227,17 +214,11 @@
             <Component>
                 <File Id="Clientquazip.dll" Name="quazip.dll" Source="$(var.SourceDir)\quazip.dll" DiskId="10" />                
             </Component>
-            <Component>
-                <File Id="Clientzlibwapi.dll" Name="zlibwapi.dll" Source="$(var.SourceDir)\zlibwapi.dll" DiskId="10"  />                
-            </Component>                                           
         </ComponentGroup>
 
         <ComponentGroup Id="ClientOpenAL" Directory="$(var.clientDirId)">
             <Component>
                 <File Id="OpenAL32.dll" Name="OpenAL32.dll" Source="$(var.SourceDir)\OpenAL32.dll" DiskId="10"/>
-            </Component>
-            <Component>
-                <File Id="wrap_oal.dll" Name="wrap_oal.dll" Source="$(var.SourceDir)\wrap_oal.dll" DiskId="10"/>
             </Component>
         </ComponentGroup>
 
@@ -302,7 +283,6 @@
             <ComponentGroupRef Id="ClientOpenSSL" />
             <ComponentRef Id="ClientSigar"/>        
             <ComponentRef Id="ClientVsRedistributable"/>
-            <ComponentRef Id="bespin" />         
         </Feature>
     </Fragment>
 </Wix>

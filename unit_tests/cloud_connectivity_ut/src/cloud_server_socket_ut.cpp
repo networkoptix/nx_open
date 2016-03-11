@@ -195,7 +195,7 @@ TEST(CloudServerSocketBaseTcpTest, OpenTunnelOnIndication)
 
     std::vector<CloudServerSocket::AcceptorMaker> acceptorMakers;
     acceptorMakers.push_back(
-        [](hpm::api::ConnectionRequestedEvent& event)
+        [](hpm::api::ConnectionRequestedEvent&)
         {
             return std::make_unique<FakeTcpTunnelAcceptor>(
                 network::test::kServerAddress);
@@ -298,7 +298,7 @@ protected:
         std::thread thread(
             [this, clientCount]()
             {
-                for (int i = 0; i < clientCount; ++i)
+                for (size_t i = 0; i < clientCount; ++i)
                     for (auto it = m_peerAddresses.begin();
                         it != m_peerAddresses.end(); ++it)
                             connectClient(it);
@@ -378,7 +378,8 @@ protected:
                 SystemError::ErrorCode code, size_t size)
             {
                 if (code != SystemError::noError ||
-                    size != network::test::kTestMessage.size())
+                    size != static_cast<size_t>(
+                        network::test::kTestMessage.size()))
                 {
                     return retryOnClient(
                         socket,
@@ -416,7 +417,7 @@ protected:
     {
         const auto kTotalConnects = kThreadCount * kClientCount * kPeerCount;
         Counters totalCounters;
-        for (int i = 0; i < kTotalConnects; ++i)
+        for (size_t i = 0; i < kTotalConnects; ++i)
         {
             const auto c = m_connectedResutls.pop();
             totalCounters.indications += c.indications;
@@ -438,7 +439,7 @@ protected:
     std::map<String, SocketAddress> m_peerAddresses;
     std::shared_ptr<network::test::StunAsyncClientMock> m_stunClient;
     std::unique_ptr<AbstractStreamServerSocket> m_server;
-    SyncQueue<Counters> m_connectedResutls;
+    TestSyncQueue<Counters> m_connectedResutls;
     std::vector<std::thread> m_threads;
 
     QnMutex m_mutex;
@@ -453,7 +454,7 @@ TEST_F(CloudServerSocketStressTcpTest, SingleThread)
 
 TEST_F(CloudServerSocketStressTcpTest, MultiThread)
 {
-    for (int i = 0; i < kThreadCount; ++i)
+    for (size_t i = 0; i < kThreadCount; ++i)
         startClientThread(kClientCount);
 }
 

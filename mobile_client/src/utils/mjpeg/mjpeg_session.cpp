@@ -8,8 +8,8 @@
 
 #include <utils/common/delayed.h>
 #include <utils/common/util.h>
-#include <utils/thread/mutex.h>
-#include <utils/thread/wait_condition.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/wait_condition.h>
 #include <nx/media/jpeg.h>
 
 namespace {

@@ -134,6 +134,9 @@
 #include <rest/handlers/ifconfig_rest_handler.h>
 #include <rest/handlers/settime_rest_handler.h>
 #include <rest/handlers/configure_rest_handler.h>
+#include <rest/handlers/detach_rest_handler.h>
+#include <rest/handlers/setup_local_rest_handler.h>
+#include <rest/handlers/setup_cloud_rest_handler.h>
 #include <rest/handlers/merge_systems_rest_handler.h>
 #include <rest/handlers/current_user_rest_handler.h>
 #include <rest/handlers/backup_db_rest_handler.h>
@@ -243,13 +246,9 @@ static const quint64 DEFAULT_LOG_ARCHIVE_SIZE = 25;
 //static const quint64 DEFAULT_MSG_LOG_ARCHIVE_SIZE = 5;
 static const unsigned int APP_SERVER_REQUEST_ERROR_TIMEOUT_MS = 5500;
 static const QString REMOVE_DB_PARAM_NAME(lit("removeDbOnStartup"));
-static const QByteArray SYSTEM_IDENTITY_TIME("sysIdTime");
 static const QByteArray AUTH_KEY("authKey");
 static const QByteArray APPSERVER_PASSWORD("appserverPassword");
 static const QByteArray LOW_PRIORITY_ADMIN_PASSWORD("lowPriorityPassword");
-static const QByteArray SYSTEM_NAME_KEY("systemName");
-static const QByteArray PREV_SYSTEM_NAME_KEY("prevSystemName");
-static const QByteArray AUTO_GEN_SYSTEM_NAME("__auto__");
 
 class MediaServerProcess;
 static MediaServerProcess* serviceMainInstance = 0;
@@ -637,7 +636,7 @@ QnStorageResourceList updateStorages(QnMediaServerResourcePtr mServer)
 void setServerNameAndUrls(QnMediaServerResourcePtr server, const QString& myAddress, int port)
 {
     if (server->getName().isEmpty())
-        server->setName(QString("Server ") + myAddress);
+        server->setName(QString("Server ") + getMacFromPrimaryIF());
 
     server->setUrl(QString("rtsp://%1:%2").arg(myAddress).arg(port));
     server->setApiUrl(QString("http://%1:%2").arg(myAddress).arg(port));
@@ -905,7 +904,7 @@ void MediaServerProcess::at_systemIdentityTimeChanged(qint64 value, const QnUuid
     if (isStopping())
         return;
 
-    MSSettings::roSettings()->setValue(SYSTEM_IDENTITY_TIME, value);
+    setSysIdTime(value);
     if (sender != qnCommon->moduleGUID()) {
         MSSettings::roSettings()->setValue(REMOVE_DB_PARAM_NAME, "1");
         saveAdminPswdHash();
@@ -1513,6 +1512,9 @@ bool MediaServerProcess::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/settime", new QnSetTimeRestHandler(), RestPermissions::adminOnly );
     QnRestProcessorPool::instance()->registerHandler("api/moduleInformationAuthenticated", new QnModuleInformationRestHandler() );
     QnRestProcessorPool::instance()->registerHandler("api/configure", new QnConfigureRestHandler(), RestPermissions::adminOnly);
+    QnRestProcessorPool::instance()->registerHandler("api/detachFromSystem", new QnDetachFromSystemRestHandler(), RestPermissions::adminOnly);
+    QnRestProcessorPool::instance()->registerHandler("api/setupLocalSystem", new QnSetupLocalSystemRestHandler(), RestPermissions::adminOnly);
+    QnRestProcessorPool::instance()->registerHandler("api/setupCloudSystem", new QnSetupCloudSystemRestHandler(), RestPermissions::adminOnly);
     QnRestProcessorPool::instance()->registerHandler("api/mergeSystems", new QnMergeSystemsRestHandler(), RestPermissions::adminOnly);
     QnRestProcessorPool::instance()->registerHandler("api/backupDatabase", new QnBackupDbRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/discoveredPeers", new QnDiscoveredPeersRestHandler());
@@ -1767,31 +1769,28 @@ void MediaServerProcess::run()
     if (!m_publicAddress.isNull())
         serverFlags |= Qn::SF_HasPublicIP;
 
+    nx::SystemName systemName;
+    systemName.loadFromConfig();
 
     // If system name has been changed, reset 'database restore time' variable
-    QString systemName = settings->value(SYSTEM_NAME_KEY).toString();
-    QString prevSystemName = settings->value(PREV_SYSTEM_NAME_KEY).toString();
-    if (systemName != prevSystemName) {
-        if (!prevSystemName.isEmpty())
-            settings->setValue(SYSTEM_IDENTITY_TIME, QString());
-        settings->setValue(PREV_SYSTEM_NAME_KEY, systemName);
+    if (systemName.value() != systemName.prevValue())
+    {
+        if (!systemName.prevValue().isEmpty())
+            setSysIdTime(0);
+        systemName.saveToConfig(); //< update prevValue
     }
 
-#ifdef __arm__
-    if (systemName.isEmpty()) {
-        systemName = QString(lit("%1system_%2")).arg(QString::fromLatin1(AUTO_GEN_SYSTEM_NAME)).arg(getMacFromPrimaryIF());
-        settings->setValue(SYSTEM_NAME_KEY, systemName);
+    if (systemName.value().isEmpty())
+    {
+        systemName.resetToDefault();
+        setSysIdTime(0);
     }
-#endif
-    if (systemName.startsWith(AUTO_GEN_SYSTEM_NAME)) {
+    if (systemName.isDefault())
         serverFlags |= Qn::SF_AutoSystemName;
-        systemName = systemName.mid(AUTO_GEN_SYSTEM_NAME.length());
-    }
 
-    qnCommon->setLocalSystemName(systemName);
+    qnCommon->setLocalSystemName(systemName.value());
 
-    qint64 systemIdentityTime = MSSettings::roSettings()->value(SYSTEM_IDENTITY_TIME).toLongLong();
-    qnCommon->setSystemIdentityTime(systemIdentityTime, qnCommon->moduleGUID());
+    qnCommon->setSystemIdentityTime(getSysIdTime(), qnCommon->moduleGUID());
     qnCommon->setLocalPeerType(Qn::PT_Server);
     connect(qnCommon, &QnCommonModule::systemIdentityTimeChanged, this, &MediaServerProcess::at_systemIdentityTimeChanged, Qt::QueuedConnection);
 
@@ -1864,7 +1863,9 @@ void MediaServerProcess::run()
     MSSettings::roSettings()->sync();
     if (MSSettings::roSettings()->value(PENDING_SWITCH_TO_CLUSTER_MODE).toString() == "yes") {
         NX_LOG( QString::fromLatin1("Switching to cluster mode and restarting..."), cl_logWARNING );
-        MSSettings::roSettings()->setValue(SYSTEM_NAME_KEY, connectInfo.systemName);
+        nx::SystemName systemName(connectInfo.systemName);
+        systemName.saveToConfig();
+        setSysIdTime(0);
         MSSettings::roSettings()->remove("appserverHost");
         MSSettings::roSettings()->remove("appserverLogin");
         MSSettings::roSettings()->setValue(APPSERVER_PASSWORD, "");
@@ -2314,21 +2315,23 @@ void MediaServerProcess::run()
 
         hostSystemPasswordSynchronizer->syncLocalHostRootPasswordWithAdminIfNeeded( adminUser );
 
-        typedef ec2::Ec2StaticticsReporter stats;
         bool adminParamsChanged = false;
 
-        // TODO: fix, when VS supports init lists:
-        //       for (const auto& param : { stats::SR_TIME_CYCLE, ... })
-        const QString* statParams[] = {
-            &stats::SR_TIME_CYCLE, &stats::SR_SERVER_API,
-            &Qn::CLOUD_SYSTEM_ID, &Qn::CLOUD_SYSTEM_AUTH_KEY };
-        for (auto it = &statParams[0]; it != &statParams[sizeof(statParams)/sizeof(statParams[0])]; ++it)
+        /* List of global setting, that can be overridden in server local config (e.g. by installer) */
+        QStringList replaceableParameters {
+            ec2::Ec2StaticticsReporter::SR_TIME_CYCLE,
+            ec2::Ec2StaticticsReporter::SR_SERVER_API,
+            Qn::CLOUD_SYSTEM_ID,
+            Qn::CLOUD_SYSTEM_AUTH_KEY,
+            QnMultiserverStatisticsRestHandler::kSettingsUrlParam};
+
+        for (const QString& key: replaceableParameters)
         {
-            const QString& param = **it;
-            const QString val = MSSettings::roSettings()->value(param, lit("")).toString();
-            if (adminUser->setProperty(param, val, QnResource::NO_ALLOW_EMPTY))
+            const QString value = MSSettings::roSettings()->value(key).toString();
+            // TODO: #ynikitenkov fix to use qnGlobalSettings in 2.6
+            if (adminUser->setProperty(key, value, QnResource::NO_ALLOW_EMPTY))
             {
-                MSSettings::roSettings()->remove(param);
+                MSSettings::roSettings()->remove(key);
                 adminParamsChanged = true;
             }
         }

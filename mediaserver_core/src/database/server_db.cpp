@@ -242,7 +242,7 @@ namespace
         switch(filter.orderBy.column)
         {
         case Qn::BookmarkName:
-            return kOrderByTemplate.arg(lit("name"), order);
+            return kOrderByTemplate.arg(lit("book.name"), order);
         case Qn::BookmarkStartTime:
             return kOrderByTemplate.arg(lit("startTimeMs"), order);
         case Qn::BookmarkDuration:
@@ -880,34 +880,40 @@ bool QnServerDb::getBookmarks(const QnVirtualCameraResourceList &cameras
 
     const auto limit = getBookmarksQueryLimit(filter);
 
-    QString queryStr = QString("SELECT \
-                     book.guid as guid, \
-                     book.start_time as startTimeMs, \
-                     book.duration as durationMs, \
-                     book.start_time + book.duration as endTimeMs, \
-                     book.name as name, \
-                     book.description as description, \
-                     book.timeout as timeout, \
-                     book.unique_id as cameraId, \
-                     group_concat(tag.name) as tags \
-                     FROM bookmarks book \
-                     LEFT JOIN bookmark_tags tag \
-                     ON book.guid = tag.bookmark_guid \
-                     %1 %2 %3"
-                     ).arg(filterText
-                     , "GROUP BY guid, startTimeMs, durationMs, endTimeMs, name, description, timeout, cameraId"
-                     , createBookmarksFilterSortPart(filter)) ;
+    QString queryStr = QString(
+        R"(
+            SELECT
+            book.guid as guid,
+            book.name as name,
+            book.start_time as startTimeMs,
+            book.duration as durationMs,
+            book.start_time + book.duration as endTimeMs,
+            book.description as description,
+            book.timeout as timeout,
+            book.unique_id as cameraId,
+            group_concat(tag.name) as tags
+            FROM bookmarks book
+            LEFT JOIN bookmark_tags tag
+            ON book.guid = tag.bookmark_guid
+            %1 %2 %3
+        )"
+            ).arg(filterText
+                , "GROUP BY guid, startTimeMs, durationMs, endTimeMs, book.name, description, timeout, cameraId"
+                , createBookmarksFilterSortPart(filter));
 
     {
         QnWriteLocker lock(&m_mutex);
         QSqlQuery query(m_sdb);
         query.setForwardOnly(true);
-        query.prepare(queryStr);
+        if (!prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+            return false;
 
-        auto checkedBind = [&query, &bindings](const QString &placeholder, const QVariant &value) {
+        auto checkedBind = [&query, &bindings](const QString &placeholder, const QVariant &value)
+        {
             if (!bindings.contains(placeholder))
                 return;
             query.bindValue(placeholder, value);
+            bindings.removeAll(placeholder);
         };
 
         index = 0;
@@ -933,6 +939,7 @@ bool QnServerDb::getBookmarks(const QnVirtualCameraResourceList &cameras
 
         checkedBind(":text", getFilterValue(filter.text));
 
+        Q_ASSERT_X(bindings.isEmpty(), Q_FUNC_INFO, "all bindings must be substituted");
         if (!execSQLQuery(&query, Q_FUNC_INFO))
             return false;
 

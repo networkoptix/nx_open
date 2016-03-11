@@ -21,17 +21,17 @@ namespace cloud {
 
 enum class AddressType
 {
-    kUnknown,
-    kLocal, //!< Address for direct simple connection
-    kCloud, //!< Address that requires mediator (e.g. hole punching)
+    unknown,
+    direct, //!< Address for direct simple connection
+    cloud, //!< Address that requires mediator (e.g. hole punching)
 };
 
 QString toString(const AddressType& type);
 
 enum class AddressAttributeType
 {
-    kUnknown,
-    kPort, //!< NX peer port
+    unknown,
+    port, //!< NX peer port
 };
 
 enum class CloudConnectType
@@ -60,7 +60,7 @@ struct NX_NETWORK_API AddressEntry
     std::vector<AddressAttribute> attributes;
 
     AddressEntry(
-        AddressType type_ = AddressType::kUnknown,
+        AddressType type_ = AddressType::unknown,
         HostAddress host_ = HostAddress());
 
     AddressEntry(const SocketAddress& address);
@@ -100,6 +100,8 @@ public:
         const HostAddress& hostName, const SocketAddress& hostAddress);
 
     typedef std::pair<HostAddress, AddressType> TypedAddres;
+
+    static QString toString(const TypedAddres& address);
 
     //!Resolves domain address to the list of subdomains
     /*!

@@ -112,7 +112,7 @@ public:
     void sendMessage(
         SocketAddress destinationEndpoint,
         const MessageType& message,
-        std::function<void(
+        utils::MoveOnlyFunc<void(
             SystemError::ErrorCode /*sysErrorCode*/,
             SocketAddress /*resolvedTargetAddress*/)> completionHandler)
     {
@@ -125,12 +125,14 @@ public:
         NX_ASSERT(messageSerializer.serialize(&serializedMessage, &bytesWritten) ==
                 nx_api::SerializerState::done);
 
-        m_socket->dispatch(std::bind(
-            &self_type::sendMessageInternal,
-            this,
-            std::move(destinationEndpoint),
-            std::move(serializedMessage),
-            std::move(completionHandler)));
+        m_socket->dispatch(
+            [this, endpoint = std::move(destinationEndpoint),
+                   message = std::move(serializedMessage),
+                   handler = std::move(completionHandler)]() mutable
+        {
+            sendMessageInternal(
+                std::move(endpoint), std::move(message), std::move(handler));
+        });
     }
 
     const std::unique_ptr<network::UDPSocket>& socket()
@@ -157,14 +159,15 @@ private:
     {
         SocketAddress destinationEndpoint;
         nx::Buffer serializedMessage;
-        std::function<void(
+        utils::MoveOnlyFunc<void(
             SystemError::ErrorCode,
             SocketAddress resolvedTargetAddress)> completionHandler;
 
         OutgoingMessageContext(
             SocketAddress _destinationEndpoint,
             nx::Buffer _serializedMessage,
-            std::function<void(SystemError::ErrorCode, SocketAddress)> _completionHandler)
+            utils::MoveOnlyFunc<void(
+                SystemError::ErrorCode, SocketAddress)> _completionHandler)
         :   
             destinationEndpoint(std::move(_destinationEndpoint)),
             serializedMessage(std::move(_serializedMessage)),
@@ -246,14 +249,15 @@ private:
     void sendMessageInternal(
         SocketAddress destinationEndpoint,
         nx::Buffer serializedMessage,
-        std::function<void(SystemError::ErrorCode, SocketAddress)> completionHandler)
+        utils::MoveOnlyFunc<void(
+            SystemError::ErrorCode, SocketAddress)> completionHandler)
     {
         OutgoingMessageContext msgCtx(
             std::move(destinationEndpoint),
             std::move(serializedMessage),
             std::move(completionHandler));
 
-        m_sendQueue.emplace_back(std::move(msgCtx));
+        m_sendQueue.push_back(std::move(msgCtx));
         if (m_sendQueue.size() == 1)
             sendOutNextMessage();
     }

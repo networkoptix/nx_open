@@ -1,0 +1,19 @@
+﻿{{#aggregated}}
+<div class="content">
+    <div class="callout">
+        <p> {{timestamp}} 重複IP検出 {{cameraConflictAddress}}:</p>
+        <table class="details">
+            <tr>
+                <th>番号</th>
+                <th>物理ID</th>
+            </tr>
+            {{#cameraConflicts}}
+                <tr>
+                    <td>{{number}}</td>
+                    <td>{{mac}}</td>
+                </tr>
+            {{/cameraConflicts}}
+        </table>
+    </div>
+</div>
+{{/aggregated}}

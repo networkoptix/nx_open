@@ -245,3 +245,27 @@ void parseCmdArgs(
         }
     }
 }
+
+bool readArg(
+    const std::multimap<QString, QString>& args,
+    const QString& name,
+    QString* const value)
+{
+    auto iter = args.find(name);
+    if (iter == args.end())
+        return false;
+    *value = iter->second;
+    return true;
+}
+
+bool readArg(
+    const std::multimap<QString, QString>& args,
+    const QString& name,
+    int* const value)
+{
+    QString strValue;
+    if (!readArg(args, name, &strValue))
+        return false;
+    *value = strValue.toInt();
+    return true;
+}

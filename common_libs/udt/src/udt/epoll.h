@@ -161,7 +161,7 @@ public: // for CUDT to acknowledge IO status
       // Returned value:
       //    0 if success, otherwise an error number
 
-   int update_events(const UDTSOCKET& uid, std::set<int>& eids, int events, bool enable);
+   int update_events(const UDTSOCKET& uid, const std::set<int>& eids, int events, bool enable);
 
 private:
    int m_iIDSeed;                            // seed to generate a new ID

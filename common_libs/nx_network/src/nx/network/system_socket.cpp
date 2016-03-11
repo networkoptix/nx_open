@@ -708,8 +708,9 @@ bool CommunicatingSocket<InterfaceToImplement>::connect( const SocketAddress& re
             continue;
         }
 
-        if( (sockPollfd.revents & POLLOUT) == 0 )
+        if ((sockPollfd.revents & POLLERR) || !(sockPollfd.revents & POLLOUT))
             iSelRet = 0;
+
         break;
     }
 #endif

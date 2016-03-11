@@ -120,6 +120,8 @@ SocketAddress TestConnection::getLocalAddress() const
     return m_socket->getLocalAddress();
 }
 
+const std::chrono::milliseconds kDefaultSendTimeout(7000);
+
 void TestConnection::start()
 {
     std::unique_lock<std::mutex> lk(m_mutex);
@@ -128,6 +130,7 @@ void TestConnection::start()
         return startIO();
 
     if (!m_socket->setNonBlockingMode(true) || 
+        !m_socket->setSendTimeout(kDefaultSendTimeout.count()) ||
         (m_localAddress && !m_socket->bind(*m_localAddress)))
     {
         return m_socket->post(std::bind(
@@ -287,6 +290,12 @@ RandomDataTcpServer::~RandomDataTcpServer()
     join();
 }
 
+void RandomDataTcpServer::setServerSocket(
+    std::unique_ptr<AbstractStreamServerSocket> serverSock)
+{
+    m_serverSocket = std::move(serverSock);
+}
+
 void RandomDataTcpServer::pleaseStop()
 {
 }
@@ -304,7 +313,8 @@ void RandomDataTcpServer::join()
 
 bool RandomDataTcpServer::start()
 {
-    m_serverSocket = SocketFactory::createStreamServerSocket();
+    if (!m_serverSocket)
+        m_serverSocket = SocketFactory::createStreamServerSocket();
     if( !m_serverSocket->bind(m_localAddress) ||
         !m_serverSocket->listen() )
     {
@@ -378,11 +388,13 @@ void RandomDataTcpServer::onConnectionDone(
 ConnectionsGenerator::ConnectionsGenerator(
     const SocketAddress& remoteAddress,
     size_t maxSimultaneousConnectionsCount,
-    size_t bytesToSendThrough )
+    size_t bytesToSendThrough,
+    size_t maxTotalConnections)
 :
     m_remoteAddress( remoteAddress ),
     m_maxSimultaneousConnectionsCount( maxSimultaneousConnectionsCount ),
     m_bytesToSendThrough( bytesToSendThrough ),
+    m_maxTotalConnections( maxTotalConnections ),
     m_terminated( false ),
     m_totalBytesSent( 0 ),
     m_totalBytesReceived( 0 ),
@@ -428,6 +440,12 @@ void ConnectionsGenerator::enableErrorEmulation(int errorPercent)
     m_errorEmulationPercent = errorPercent;
 }
 
+void ConnectionsGenerator::setOnFinishedHandler(
+    nx::utils::MoveOnlyFunc<void()> func)
+{
+    m_onFinishedHandler = std::move(func);
+}
+
 void ConnectionsGenerator::setLocalAddress(SocketAddress addr)
 {
     m_localAddress = std::move(addr);
@@ -468,9 +486,11 @@ size_t ConnectionsGenerator::totalBytesReceived() const
     return m_totalBytesReceived;
 }
 
-void ConnectionsGenerator::onConnectionFinished(int id, ConnectionsContainer::iterator connectionIter)
+void ConnectionsGenerator::onConnectionFinished(
+    int id,
+    ConnectionsContainer::iterator connectionIter)
 {
-    std::unique_lock<std::mutex> lk( m_mutex );
+    std::unique_lock<std::mutex> lk(m_mutex);
 
     {
         std::unique_lock<std::mutex> lk(mtx1);
@@ -479,37 +499,53 @@ void ConnectionsGenerator::onConnectionFinished(int id, ConnectionsContainer::it
 
     //if( !m_finishedConnectionsIDs.insert( id ).second )
     //    int x = 0;
-    if( *connectionIter )
+    if (*connectionIter)
     {
         m_totalBytesSent += connectionIter->get()->totalBytesSent();
         m_totalBytesReceived += connectionIter->get()->totalBytesReceived();
     }
-    m_connections.erase( connectionIter );
-    if( m_terminated )
+    m_connections.erase(connectionIter);
+    if (m_terminated)
         return;
 
-    while( m_connections.size() < m_maxSimultaneousConnectionsCount )
+    if (m_totalConnectionsEstablished == 0 ||   //no limit
+        m_totalConnectionsEstablished < m_maxTotalConnections)
     {
-        m_connections.push_back( std::unique_ptr<TestConnection>() );
-        std::unique_ptr<TestConnection> connection( new TestConnection(
+        addNewConnections();
+    }
+    else if (m_connections.empty())
+    {
+        if (m_onFinishedHandler)
+        {
+            auto handler = std::move(m_onFinishedHandler);
+            handler();
+        }
+    }
+}
+
+void ConnectionsGenerator::addNewConnections()
+{
+    while (m_connections.size() < m_maxSimultaneousConnectionsCount)
+    {
+        m_connections.push_back(std::unique_ptr<TestConnection>());
+        std::unique_ptr<TestConnection> connection(new TestConnection(
             m_remoteAddress,
             m_bytesToSendThrough,
             std::bind(&ConnectionsGenerator::onConnectionFinished, this,
-                      std::placeholders::_1, std::prev(m_connections.end())) ) );
-        m_connections.back().swap( connection );
-        const bool emulatingError = 
+                std::placeholders::_1, std::prev(m_connections.end()))));
+        m_connections.back().swap(connection);
+        const bool emulatingError =
             m_errorEmulationPercent > 0 &&
             m_errorEmulationDistribution(m_randomEngine) < m_errorEmulationPercent;
         if (emulatingError)
         {
             const SystemError::ErrorCode osErrorCode = SystemError::getLastOSErrorCode();
-            std::cerr<<"Failed to start test connection. "<<SystemError::toString(osErrorCode).toStdString()<<std::endl;
+            std::cerr << "Failed to start test connection. " << SystemError::toString(osErrorCode).toStdString() << std::endl;
             //if (!m_finishedConnectionsIDs.insert(m_connections.back()->id()).second)
             //    int x = 0;
             //ignoring error for now
             auto connection = std::move(m_connections.back());
             m_connections.pop_back();
-            lk.unlock();
             return;
         }
 

@@ -21,7 +21,7 @@ class StreamSocketWrapperTest
 protected:
     void SetUp() override
     {
-        nx::SyncQueue<SystemError::ErrorCode> events;
+        nx::TestSyncQueue<SystemError::ErrorCode> events;
 
         server = std::make_unique<TCPServerSocket>();
         ASSERT_TRUE(server->setReuseAddrFlag(true));
@@ -59,7 +59,7 @@ protected:
     }
 
     void sendTestMessageAsync(
-        AbstractStreamSocket* socket, nx::SyncQueue<SystemError::ErrorCode>& events)
+        AbstractStreamSocket* socket, nx::TestSyncQueue<SystemError::ErrorCode>& events)
     {
         socket->sendAsync(kTestMessage, [&events](
             SystemError::ErrorCode c, size_t s)
@@ -70,7 +70,7 @@ protected:
     }
 
     void readTestMessageAsync(
-        AbstractStreamSocket* socket, nx::SyncQueue<SystemError::ErrorCode>& events)
+        AbstractStreamSocket* socket, nx::TestSyncQueue<SystemError::ErrorCode>& events)
     {
         buffer.resize(0);
         buffer.reserve(kTestMessage.size() + 1);
@@ -90,7 +90,7 @@ protected:
 
 TEST_F(StreamSocketWrapperTest, Empty)
 {
-    nx::SyncQueue< SystemError::ErrorCode > events;
+    nx::TestSyncQueue< SystemError::ErrorCode > events;
     readTestMessageAsync(client.get(), events);
     sendTestMessageAsync(accepted.get(), events);
 
@@ -100,7 +100,7 @@ TEST_F(StreamSocketWrapperTest, Empty)
 
 TEST_F(StreamSocketWrapperTest, Async)
 {
-    nx::SyncQueue< SystemError::ErrorCode > events;
+    nx::TestSyncQueue< SystemError::ErrorCode > events;
 
     client = std::make_unique<StreamSocketWrapper>(std::move(client));
     ASSERT_TRUE(client->setNonBlockingMode(true));
@@ -116,7 +116,7 @@ TEST_F(StreamSocketWrapperTest, Async)
 
 TEST_F(StreamSocketWrapperTest, SyncAsync)
 {
-    nx::SyncQueue< SystemError::ErrorCode > events;
+    nx::TestSyncQueue< SystemError::ErrorCode > events;
 
     client = std::make_unique<StreamSocketWrapper>(std::move(client));
     ASSERT_TRUE(client->setNonBlockingMode(true));

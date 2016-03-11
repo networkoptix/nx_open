@@ -62,10 +62,10 @@
         <!-- ATTENTION!!! -lestbase should be the LATEST in the list!!! Required for Linux -->
         <global.libs>-lcommon -lnx_streaming -lappserver2</global.libs>
         <!--Specific os libs used-->
-        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -lssleay32 -llibeay32</windows.oslibs>
+        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm</windows.oslibs>
         <windows.oslibs.release/>
         <windows.oslibs.debug/>
-        <linux.oslibs>-lssl -lcrypto</linux.oslibs>
+        <linux.oslibs></linux.oslibs>
         <mac.oslibs>-framework IOKit -framework CoreServices</mac.oslibs>
         <!--Global defines-->
         <global.defines>CL_FORCE_LOGO</global.defines>
@@ -75,6 +75,7 @@
         <mac.defines/>
         <android.defines/>
         <ios.defines/>
+        <rdep.packages>openssl</rdep.packages>
     </properties>
     
     <profiles>

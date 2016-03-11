@@ -32,7 +32,7 @@ AsyncClient::AsyncClient(Timeouts timeouts):
     m_timeouts(timeouts),
     m_useSsl(false),
     m_state(State::disconnected),
-    m_timerSocket(SocketFactory::createStreamSocket())
+    m_timer(new nx::network::aio::Timer())
 {
 }
 
@@ -40,12 +40,12 @@ AsyncClient::~AsyncClient()
 {
     std::unique_ptr< AbstractStreamSocket > connectingSocket;
     std::unique_ptr< BaseConnectionType > baseConnection;
-    std::unique_ptr< AbstractCommunicatingSocket > timerSocket;
+    std::unique_ptr< nx::network::aio::Timer > timer;
     {
         QnMutexLocker lock( &m_mutex );
         connectingSocket = std::move( m_connectingSocket );
 		baseConnection = std::move( m_baseConnection );
-        timerSocket = std::move( m_timerSocket );
+        timer = std::move( m_timer );
         m_state = State::terminated;
     }
 
@@ -55,7 +55,7 @@ AsyncClient::~AsyncClient()
     if( connectingSocket )
         connectingSocket->pleaseStopSync();
 
-    timerSocket->pleaseStopSync();
+    timer->pleaseStopSync();
 }
 
 void AsyncClient::connect(SocketAddress endpoint, bool useSsl)
@@ -211,11 +211,13 @@ void AsyncClient::closeConnectionImpl(
     lock->relock();
 
     if( m_state != State::terminated )
-        m_timerSocket->registerTimer( m_timeouts.reconnect, [this]()
-        {
-            QnMutexLocker lock( &m_mutex );
-            openConnectionImpl( &lock );
-        });
+        m_timer->start(
+            std::chrono::milliseconds(m_timeouts.reconnect),
+            [this]
+            {
+                QnMutexLocker lock( &m_mutex );
+                openConnectionImpl( &lock );
+            });
 }
 
 void AsyncClient::dispatchRequestsInQueue(QnMutexLockerBase* lock)

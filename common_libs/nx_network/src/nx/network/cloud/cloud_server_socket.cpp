@@ -1,4 +1,7 @@
+
 #include "cloud_server_socket.h"
+
+#include <future>
 
 #include <nx/network/socket_global.h>
 #include <nx/network/stream_socket_wrapper.h>
@@ -247,6 +250,45 @@ void CloudServerSocket::acceptAsync(
     }
 
     acceptAsyncInternal(std::move(handler));
+}
+
+bool CloudServerSocket::registerOnMediatorSync()
+{
+    if (m_listenIssued)
+        return true;
+
+    const auto cloudCredentials =
+        SocketGlobals::mediatorConnector().getSystemCredentials();
+    if (!cloudCredentials)
+    {
+        SystemError::setLastErrorCode(SystemError::invalidData);
+        return false;
+    }
+
+    nx::hpm::api::ListenRequest listenRequestData;
+    listenRequestData.systemId = cloudCredentials->systemId;
+    listenRequestData.serverId = cloudCredentials->serverId;
+
+    std::promise<nx::hpm::api::ResultCode> listenCompletedPromise;
+    m_mediatorConnection->listen(
+        std::move(listenRequestData),
+        [&listenCompletedPromise](nx::hpm::api::ResultCode resultCode)
+        {
+            listenCompletedPromise.set_value(resultCode);
+        });
+    auto listenCompletedFuture = listenCompletedPromise.get_future();
+    listenCompletedFuture.wait();
+    const auto resultCode = listenCompletedFuture.get();
+
+    if (resultCode == nx::hpm::api::ResultCode::ok)
+    {
+        m_listenIssued = true;
+        return true;
+    }
+
+    //TODO #ak set appropriate error code
+    SystemError::setLastErrorCode(SystemError::invalidData);
+    return false;
 }
 
 void CloudServerSocket::initTunnelPool(int queueLen)

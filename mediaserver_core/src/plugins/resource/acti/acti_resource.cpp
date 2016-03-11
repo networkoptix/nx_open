@@ -743,198 +743,293 @@ bool QnActiResource::setParamPhysical(const QString& id, const QString& value)
 
 bool QnActiResource::getParamsPhysical(const QSet<QString> &idList, QnCameraAdvancedParamValueList &result)
 {
-    QMap<QString, QSet<QnCameraAdvancedAgregateParameterInfo> > agregates;
-    QMap<QString, QString> queries;
+    bool success = true;
+    const auto params = getParamsByIds(idList);
+    const auto queries = buildGetParamsQueries(params);
+    const auto queriesResults = executeParamsQueries(queries, success);
+    parseParamsQueriesResult(queriesResults, params, result);
 
-    for(auto paramId: idList){
-
-        auto param = m_advancedParameters.getParameterById(paramId);
-
-        if(!param.isValid() || param.dataType == QnCameraAdvancedParameter::DataType::Button)
-            continue;
-
-        auto group = getParameterGroup(param);
-
-        if(!queries.contains(group))
-            queries[group] = lit("");
-
-        if(isComponentOfAgregate(param))
-        {
-            auto agregateInfo = getAgregateInfo(param);
-            if(!agregates.contains(agregateInfo.agregateId))
-                queries[group] += agregateInfo.agregateId + lit("&");
-
-            agregates[agregateInfo.agregateId]
-                .insert(agregateInfo);
-        }
-        else
-        {
-            queries[group] += param.id + lit("&");
-        }
-    }
-
-    for(const auto& q: queries.keys())
-    {
-        CLHttpStatus status;
-        auto response = makeActiRequest(q, queries[q], status, true);
-
-        QnCameraAdvancedParamValueList params;
-        parseCameraParametersResponse(response, params);
-
-        for(auto& param: params)
-        {
-            if(agregates.contains(param.id))
-            {
-                for(const auto& agreagteInfo: agregates[param.id])
-                {
-                    result.append(
-                        QnCameraAdvancedParamValue(
-                            agreagteInfo.componentId,
-                            getNthParameterInAgregateValue(
-                                param.value,
-                                agreagteInfo.componentPosition)));
-                }
-            }
-            else
-            {
-                convertParamValueToInternal(
-                    param.value,
-                    m_advancedParameters.getParameterById(param.id));
-                result.append(param);
-            }
-        }
-
-
-    }
-    return true;
+    return result.size() == idList.size();
 }
 
 bool QnActiResource::setParamsPhysical(const QnCameraAdvancedParamValueList &values, QnCameraAdvancedParamValueList &result)
 {
-    CLHttpStatus status;
-    QString button;
-
-    //Aggregate parameter, set of components info
-    QMap<QString, QSet<QnCameraAdvancedAgregateParameterInfo> > agregates;
-
-    //Original values of agregate parameters (id, value)
-    QMap<QString, QString> agregateValues;
-
-    //Queries to retreive agreagate values (group, query)
-    QMap<QString, QString> agregateQueries;
-
-    //Queries to set all needed stuff (group, query)
-    QMap<QString, QString> queries;
-
-
+    bool success;
+    QSet<QString> idList;
 
     for(const auto& value: values)
+        idList.insert(value.id);
+
+    const auto params = getParamsByIds(idList);
+    const auto queries = buildSetParamsQueries(values);
+    const auto queriesResults = executeParamsQueries(queries, success);
+    parseParamsQueriesResult(queriesResults, params, result);
+
+    const auto maintenanceQueries = buildMaintenanceQueries(values);
+    if(!maintenanceQueries.empty())
     {
-        auto param = m_advancedParameters.getParameterById(value.id);
-
-        if(param.dataType == QnCameraAdvancedParameter::DataType::Button)
-        {
-            button = param.id;
-            continue;
-        }
-
-        auto paramId = value.id;
-        auto paramValue = value.value;
-        auto group = getParameterGroup(param);
-
-        if(!queries.contains(group))
-            queries[group] = lit("");
-
-        if(isComponentOfAgregate(param))
-        {
-            auto agregateInfo = getAgregateInfo(param);
-            if(!agregateQueries.contains(group))
-                agregateQueries[group] = lit("");
-
-            if(!agregates.contains(agregateInfo.agregateId))
-                agregateQueries[group] += agregateInfo.agregateId + lit("&");
-
-            agregateValues[agregateInfo.componentId] = paramValue;
-            agregates[agregateInfo.agregateId].insert(agregateInfo);
-        }
-        else
-        {
-            convertParamValueFromInternal(paramValue, param);
-            queries[group] += paramId + lit("=") + paramValue + lit("&");
-        }
+        executeParamsQueries(maintenanceQueries, success);
+        return success;
     }
 
-    for(const auto& q: agregateQueries.keys())
-    {
-        auto response = makeActiRequest(q, agregateQueries[q], status, true);
-        QnCameraAdvancedParamValueList params;
-        parseCameraParametersResponse(response, params);
-
-        for(auto& parsed: params)
-        {
-            QString paramId;
-            for(const auto& agregateInfo: agregates[parsed.id])
-            {
-                setNthParameterInAgregateValue(
-                    parsed.value,
-                    agregateValues[agregateInfo.componentId],
-                    agregateInfo.componentPosition);
-                paramId = agregateInfo.componentId;
-            }
-
-            auto param = m_advancedParameters.getParameterById(paramId);
-            auto group = getParameterGroup(param);
-
-            queries[group] += parsed.id + lit("=") + parsed.value + lit("&");
-        }
-    }
-
-    for(const auto& q: queries.keys())
-    {
-        auto response = makeActiRequest(
-            q,
-            queries[q],
-            status,
-            true);
-
-        QnCameraAdvancedParamValueList params;
-        parseCameraParametersResponse(response, params);
-
-        for(const auto& param: params)
-        {
-            if(agregates.contains(param.id))
-            {
-                for(const auto& agregate: agregates[param.id])
-                {
-                    result.append(QnCameraAdvancedParamValue(
-                        agregate.componentId,
-                        getNthParameterInAgregateValue(
-                            param.value,
-                            agregate.componentPosition)));
-                }
-            }
-            else
-                result.append(param);
-
-        }
-    }
-
-    if(!button.isEmpty())
-    {
-        auto response = makeActiRequest(CAMERA_PARAMETER_GROUP_SYSTEM, button, status);
-        return true;
-    }
     return result.size() == values.size();
 }
 
-QString QnActiResource::getParameterGroup(const QnCameraAdvancedParameter &param) const
+/*
+ * Operations with maintenance params should be performed when every other param is already changed.
+ * Also maintenance params must not get into queries that obtain param values.
+ */
+bool QnActiResource::isMaintenanceParam(const QnCameraAdvancedParameter &param) const
 {
-    return param.readCmd.isEmpty() ? CAMERA_PARAMETER_GROUP_DEFAULT : param.readCmd;
+    return param.dataType == QnCameraAdvancedParameter::DataType::Button;
 }
 
-bool QnActiResource::isComponentOfAgregate(const QnCameraAdvancedParameter &param) const
+QList<QnCameraAdvancedParameter> QnActiResource::getParamsByIds(const QSet<QString>& idList) const
 {
-    return param.writeCmd.split('=').size() > 1;
+    QList<QnCameraAdvancedParameter> params;
+    for(const auto& id: idList)
+    {
+        auto param = m_advancedParameters.getParameterById(id);
+        params.append(param);
+    }
+    return  params;
+}
+
+QMap<QString, QnCameraAdvancedParameter> QnActiResource::getParamsMap(const QSet<QString> &idList) const
+{
+    QMap<QString, QnCameraAdvancedParameter> params;
+    for(const auto& id: idList)
+        params[id] = m_advancedParameters.getParameterById(id);
+
+    return  params;
+}
+
+/*
+ * Replaces placeholders in param query with actual values retrieved from camera.
+ * Needed when user changes not all params in agregate parameter.
+ * Example: WB_GAIN=127,%WB_R_GAIN becomes WB_GAIN=127,245
+ */
+QMap<QString, QString> QnActiResource::resolveQueries(QMap<QString, QnCameraAdvancedParamQueryInfo> &queries) const
+{
+    CLHttpStatus status;
+    QMap<QString, QString> setQueries;
+    QMap<QString, QString> queriesToResolve;
+
+    for(const auto& agregate: queries.keys())
+        if(queries[agregate].cmd.indexOf('%') != -1)
+            queriesToResolve[queries[agregate].group] += agregate + lit("&");
+
+    QMap<QString, QString> respParams;
+    for(const auto& group: queriesToResolve.keys())
+    {
+        auto response = makeActiRequest(group, queriesToResolve[group], status, true);
+        parseCameraParametersResponse(response, respParams);
+    }
+
+    for(const auto& agregateName : respParams.keys())
+        queries[agregateName].cmd = fillMissingParams(
+            queries[agregateName].cmd,
+            respParams[agregateName]);
+
+    for(const auto& agregate: queries.keys())
+        setQueries[queries[agregate].group] += agregate + lit("=") + queries[agregate].cmd + lit("&");
+
+    return setQueries;
+}
+
+/*
+ * Used by resolveQueries function. Performs opertaions with parameter strings
+ */
+QString QnActiResource::fillMissingParams(const QString &unresolvedTemplate, const QString &valueFromCamera) const
+{
+    auto templateValues = unresolvedTemplate.split(",");
+    auto cameraValues = valueFromCamera.split(",");
+
+    for(size_t i = 0; i < templateValues.size(); i++)
+    {
+        if(i >= cameraValues.size())
+            break;
+        else if(templateValues.at(i).startsWith("%"))
+            templateValues[i] = cameraValues.at(i);
+    }
+
+    return templateValues.join(',');
+}
+
+QMap<QString, QString> QnActiResource::buildGetParamsQueries(const QList<QnCameraAdvancedParameter> &params) const
+{
+    QSet<QString> agregates;
+    QMap<QString, QString> queries;
+
+    for(const auto& param: params)
+    {
+        if(param.dataType == QnCameraAdvancedParameter::DataType::Button)
+            continue;
+
+        auto group = getParamGroup(param);
+        auto cmd = getParamCmd(param);
+
+        auto split = cmd.split('=');
+        if(split.size() > 1 && !agregates.contains(split[0]))
+        {
+            queries[group] += split[0] + lit("&");
+            agregates.insert(split[0]);
+        }
+    }
+
+    return queries;
+}
+
+QMap<QString, QString> QnActiResource::buildSetParamsQueries(const QnCameraAdvancedParamValueList &values) const
+{
+    QMap<QString, QString> paramToAgregate;
+    QMap<QString, QString> paramToValue;
+    QMap<QString, QnCameraAdvancedParamQueryInfo> agregateToCmd;
+
+    for(const auto& val: values)
+        paramToValue[val.id] = val.value;
+
+    const auto paramsMap = getParamsMap(paramToValue.keys().toSet());
+
+    for(const auto& id: paramsMap.keys())
+    {
+        if(isMaintenanceParam(paramsMap[id]))
+        {
+            paramToValue.remove(id);
+            continue;
+        }
+
+        auto split = getParamCmd(paramsMap[id]).split('=');
+
+        if(split.size() < 2)
+            continue;
+
+        auto agregate = split[0].trimmed();
+        auto args = split[1].trimmed();
+
+        paramToAgregate[id] = agregate;
+
+        QnCameraAdvancedParamQueryInfo info;
+        info.group = getParamGroup(paramsMap[id]);
+        info.cmd = args;
+        agregateToCmd[agregate] = info;
+    }
+
+    for(const auto& paramId: paramToValue.keys())
+    {
+        auto agregate = paramToAgregate[paramId];
+        paramToValue[paramId] = convertParamValueToDeviceFormat( paramToValue[paramId], paramsMap[paramId]);
+        agregateToCmd[agregate].cmd = agregateToCmd[agregate].cmd
+            .replace(lit("%") + paramId, paramToValue[paramId]);
+    }
+    return resolveQueries(agregateToCmd);
+}
+
+QMap<QString, QString> QnActiResource::buildMaintenanceQueries(const QnCameraAdvancedParamValueList &values) const
+{
+    QSet<QString> paramsIds;
+    QMap<QString, QString> queries;
+    for(const auto& val: values)
+        paramsIds.insert(val.id);
+
+    auto params = getParamsByIds(paramsIds);
+
+    for(const auto& param: params)
+        if(isMaintenanceParam(param))
+            queries[getParamGroup(param)] += param.id + lit("&");
+
+    return queries;
+}
+
+/*
+ * Executes the queries, parses the response and returns map (paramName => paramValue).
+ * paramName and paramValue are raw strings that we got from camera (no parsing of agregate params).
+ */
+QMap<QString, QString> QnActiResource::executeParamsQueries(const QMap<QString, QString>& queries, bool& isSuccessful) const
+{
+    CLHttpStatus status;
+    QMap<QString, QString> result;
+    isSuccessful = true;
+    for(const auto& q: queries.keys())
+    {
+        auto response = makeActiRequest(q, queries[q], status, true);
+        if(status != CL_HTTP_SUCCESS)
+            isSuccessful = false;
+        parseCameraParametersResponse(response, result);
+    }
+
+    return result;
+}
+
+/*
+ * Retrieves needed params from queries result and put them  to the list.
+ * This function performs parsing of agregate params.
+ */
+void QnActiResource::parseParamsQueriesResult(
+    const QMap<QString, QString> &queriesResult,
+    const QList<QnCameraAdvancedParameter> &params,
+    QnCameraAdvancedParamValueList &result) const
+{
+
+    QMap<QString, QString> parsed;
+    for(const auto& param: params)
+    {
+        auto cmd = getParamCmd(param);
+        if(!parsed.contains(param.id))
+        {
+            auto split = cmd.split("=");
+
+            if(split.size() != 2)
+                continue;
+
+            auto mainParam = split[0].trimmed();
+            auto mask = split[1].trimmed();
+            if(queriesResult.contains(mainParam))
+                extractParamValues(queriesResult[mainParam], mask, parsed);
+        }
+
+        if(parsed.contains(param.id))
+        {
+            parsed[param.id] = convertParamValueFromDeviceFormat(parsed[param.id], param);
+            result.append(QnCameraAdvancedParamValue(param.id, parsed[param.id]));
+        }
+    }
+}
+
+
+QString QnActiResource::getParamCmd(const QnCameraAdvancedParameter &param) const
+{
+    return param.writeCmd.isEmpty() ?
+        param.id + lit("=%") + param.id :
+        param.writeCmd;
+
+}
+
+/*
+ * Extracts params from real string from camera with given mask.
+ * Example: paramValue = "1,2,3", mask="%param1,%param2".
+ * Two items will be added to map: param1 => "1" , param2 => "2,3"
+ */
+void QnActiResource::extractParamValues(const QString &paramValue, const QString &mask, QMap<QString, QString>& result) const
+{
+
+    const auto paramNames = mask.split(',');
+    const auto paramValues = paramValue.split(',');
+    const auto paramCount = paramNames.size();
+
+    for(size_t i = 0; i < paramCount; i++)
+    {
+        auto name = paramNames.at(i).mid(1);
+        if(i < paramCount - 1)
+            result[name] = paramValues.at(i);
+        else
+            result[name] = paramValues.mid(i).join(',');
+    }
+}
+
+QString QnActiResource::getParamGroup(const QnCameraAdvancedParameter &param) const
+{
+    return param.readCmd.isEmpty() ? CAMERA_PARAMETER_GROUP_DEFAULT : param.readCmd;
 }
 
 bool QnActiResource::parseParameter(const QString& paramStr, QnCameraAdvancedParamValue& value) const
@@ -956,7 +1051,7 @@ bool QnActiResource::parseParameter(const QString& paramStr, QnCameraAdvancedPar
     return success;
 }
 
-bool QnActiResource::parseCameraParametersResponse(const QByteArray& response, QnCameraAdvancedParamValueList& result) const
+void QnActiResource::parseCameraParametersResponse(const QByteArray& response, QnCameraAdvancedParamValueList& result) const
 {
     auto lines = response.split('\n');
     for(const auto& line: lines)
@@ -967,77 +1062,48 @@ bool QnActiResource::parseCameraParametersResponse(const QByteArray& response, Q
         if(parseParameter(line, param))
             result.append(param);
     }
-
-    return true;
 }
 
-void QnActiResource::convertParamValueFromInternal(QString &paramValue, const QnCameraAdvancedParameter &param) const
+void QnActiResource::parseCameraParametersResponse(const QByteArray& response, QMap<QString, QString>& result) const
 {
-    if(param.dataType == QnCameraAdvancedParameter::DataType::Enumeration)
+    auto lines = response.split('\n');
+    for(const auto& line: lines)
     {
-        paramValue = param.toInternalRange(paramValue);
-        if(param.writeCmd == lit("comma_separated"))
-            paramValue = paramValue.replace('|', ',');
+        if(line.startsWith("ERROR:"))
+            continue;
+        QnCameraAdvancedParamValue param;
+        if(parseParameter(line, param))
+            result[param.id] = param.value;
+    }
+}
+
+QString QnActiResource::convertParamValueToDeviceFormat(const QString &paramValue, const QnCameraAdvancedParameter &param) const
+{
+    auto tmp = paramValue;
+
+    if(param.dataType == QnCameraAdvancedParameter::DataType::Enumeration)
+        tmp = param.toInternalRange(paramValue).replace('|', ',');
+    else if(param.dataType == QnCameraAdvancedParameter::DataType::Bool)
+        tmp = (paramValue == lit("true") ?  lit("1") : lit("0"));
+
+    return tmp;
+}
+
+QString QnActiResource::convertParamValueFromDeviceFormat(const QString &paramValue, const QnCameraAdvancedParameter &param) const
+{
+    QString tmp = paramValue;
+    if(param.dataType == QnCameraAdvancedParameter::DataType::Enumeration )
+    {
+        tmp = tmp.replace(',', '|');
+        tmp = param.fromInternalRange(
+            param.fromInternalRange(tmp).isEmpty() ? paramValue : tmp);
     }
     else if(param.dataType == QnCameraAdvancedParameter::DataType::Bool)
-        paramValue = paramValue == lit("true") ?  lit("1") : lit("0");
-}
-
-void QnActiResource::convertParamValueToInternal(QString &paramValue, const QnCameraAdvancedParameter &param) const
-{
-    if(param.dataType == QnCameraAdvancedParameter::DataType::Enumeration)
     {
-        paramValue = param.toInternalRange(paramValue);
-        if(param.writeCmd == lit("comma_separated"))
-            paramValue = paramValue.replace(',', '|');
-    }
-    else if(param.dataType == QnCameraAdvancedParameter::DataType::Bool)
-        paramValue = paramValue == lit("1") ?  lit("true") : lit("false");
-}
-
-QString QnActiResource::getNthParameterInAgregateValue(const QString &agregateValue, const int& paramPosition) const
-{
-    QString res;
-    auto split = agregateValue.split(',');
-    if(paramPosition < split.size())
-        res = split[paramPosition];
-
-    return res;
-}
-
-bool QnActiResource::setNthParameterInAgregateValue(QString& agregateValue, const QString& paramValue, const int& paramPosition) const
-{
-    bool success = false;
-    auto split = agregateValue.split(',');
-    if(paramPosition < split.size())
-    {
-        split[paramPosition] = paramValue;
-        agregateValue = split.join(lit(","));
-        success = true;
+        tmp = (paramValue == lit("1") ?  lit("true") : lit("false"));
     }
 
-    return success;
-}
-
-QnCameraAdvancedAgregateParameterInfo QnActiResource::getAgregateInfo(const QnCameraAdvancedParameter &param) const
-{
-    QnCameraAdvancedAgregateParameterInfo info;
-    if(!param.writeCmd.isEmpty())
-    {
-        auto split = param.writeCmd.split('=');
-        if(split.size() == 2)
-        {
-            info.agregateId = split[0];
-
-            split = split[1].split('-');
-            if(split.size() == 2)
-            {
-                info.componentId = split[0];
-                info.componentPosition = split[1].toInt();
-            }
-        }
-    }
-    return info;
+    return tmp;
 }
 
 bool QnActiResource::loadAdvancedParametersTemplateFromFile(QnCameraAdvancedParams& params, const QString& templateFilename)
@@ -1081,58 +1147,36 @@ QString QnActiResource::getAdvancedParametersTemplate() const
 
 QSet<QString> QnActiResource::calculateSupportedAdvancedParameters(const QnCameraAdvancedParams &allParams) const
 {
-
-    QSet<QString> supported;
-    QMap<QString, QSet<QString> > agregates;
+    QList<QnCameraAdvancedParameter> paramsList;
+    QSet<QString> result;
     auto paramIds = allParams.allParameterIds();
+    bool success = true;
 
-    QMap<QString, QString> queries;
-    CLHttpStatus status;
-
-    for(const auto& paramId: paramIds)
+    for(const auto& id: paramIds)
     {
-        auto param = allParams.getParameterById(paramId);
-        if(param.dataType == QnCameraAdvancedParameter::DataType::Button)\
-        {
-            supported.insert(param.id);
-            continue;
-        }
+        auto param = allParams.getParameterById(id);
+        paramsList.append(param);
+        if(param.dataType == QnCameraAdvancedParameter::DataType::Button)
+            result.insert(param.id);
+    }
 
-        auto group = getParameterGroup(param);
+    auto queries = buildGetParamsQueries(paramsList);
+    auto queriesResult = executeParamsQueries(queries, success);
 
-        if(!queries.contains(group))
-            queries[group] = lit("");
-
-        if(isComponentOfAgregate(param))
-        {
-            auto agregateInfo = getAgregateInfo(param);
-            if(!agregates.contains(agregateInfo.agregateId))
-            {
-                agregates[agregateInfo.agregateId] = QSet<QString>();
-                queries[group] += agregateInfo.agregateId + "&";
-            }
-            agregates[agregateInfo.agregateId].insert(agregateInfo.componentId);
-
-        }
+    for(const auto& param: paramsList)
+    {
+        if(queriesResult.contains(param.id))
+            result.insert(param.id);
         else
-            queries[group] += param.id + "&";
-
+        {
+            auto cmd = getParamCmd(param);
+            auto agregate = cmd.split('=')[0];
+            if(queriesResult.contains(agregate))
+                result.insert(param.id);
+        }
     }
 
-    for(const auto& q: queries.keys())
-    {
-        auto response = makeActiRequest(q, queries[q], status, true);
-        QnCameraAdvancedParamValueList params;
-        parseCameraParametersResponse(response, params);
-        for(const auto& param: params)
-            if(agregates.contains(param.id))
-                for(const auto& componentOfAgregate: agregates[param.id])
-                    supported.insert(componentOfAgregate);
-            else
-                supported.insert(param.id);
-    }
-
-    return supported;
+    return result;
 }
 
 #endif // #ifdef ENABLE_ACTI

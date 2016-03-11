@@ -21,6 +21,7 @@ namespace style
     const QSize Metrics::kSwitchSize(dp(30), dp(15));
 
     const char *Properties::kHoveredRowProperty = "_qn_hoveredRow";
+    const char *Properties::kAccentStyleProperty = "_qn_accentStyle";
 
     qreal dpr(qreal value)
     {

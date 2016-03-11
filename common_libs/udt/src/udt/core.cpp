@@ -2618,8 +2618,6 @@ void CUDT::checkTimers(bool forceAck)
          // app can call any UDT API to learn the connection_broken error
          s_UDTUnited.m_EPoll.update_events(m_SocketID, m_sPollID, UDT_EPOLL_IN | UDT_EPOLL_OUT | UDT_EPOLL_ERR, true);
 
-         CTimer::triggerEvent();
-
          return;
       }
 

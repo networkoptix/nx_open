@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <random>
 #include <thread>
 
 #include <nx/network/cloud/tunnel/udp_hole_punching_acceptor.h>
@@ -19,6 +20,7 @@ const String kRemotePeerId("SomePeerId");
 const String kConnectionSessionId("SomeSessionId");
 const std::chrono::milliseconds kSocketTimeout(2000);
 const std::chrono::milliseconds kUdpRetryTimeout(500);
+const size_t kPleaseStopRunCount(10);
 
 class DummyCloudSystemCredentialsProvider
 :
@@ -67,6 +69,9 @@ protected:
 
     void createAndStartAcceptor(size_t socketsToAccept)
     {
+        if (mediatorConnection)
+            mediatorConnection->pleaseStopSync();
+
         mediatorConnection.reset(new hpm::api::MediatorServerTcpConnection(
             stunClientMock, &dummyCloudSystemCredentialsProvider));
 
@@ -211,10 +216,10 @@ protected:
 
     bool isUdpServerEnabled;
     size_t connectionRequests;
-    SyncQueue<SystemError::ErrorCode> connectResults;
+    TestSyncQueue<SystemError::ErrorCode> connectResults;
     std::vector<std::unique_ptr<AbstractStreamSocket>> connectSockets;
 
-    SyncQueue<SystemError::ErrorCode> acceptResults;
+    TestSyncQueue<SystemError::ErrorCode> acceptResults;
     std::unique_ptr<AbstractIncomingTunnelConnection> tunnelConnection;
     std::vector<std::unique_ptr<AbstractStreamSocket>> acceptedSockets;
 };
@@ -241,13 +246,22 @@ TEST_F(UdpHolePunchingTunnelAcceptorTest, UdtConnectTimeout)
     ASSERT_EQ(acceptResults.pop(), SystemError::timedOut); // connection
 }
 
-TEST_F(UdpHolePunchingTunnelAcceptorTest, UdtConnectPleaseStop)
+TEST_F(UdpHolePunchingTunnelAcceptorTest, ConnectPleaseStop)
 {
-    createAndStartAcceptor(1);
-    std::this_thread::sleep_for(kUdpRetryTimeout);
-    tunnelAcceptor->pleaseStopSync();
-    tunnelAcceptor.reset();
-    ASSERT_TRUE(acceptResults.isEmpty());
+    std::random_device device;
+    std::mt19937 generator(device());
+    std::uniform_int_distribution<int64_t> distribution(0, kUdpRetryTimeout.count() * 2);
+    for (size_t i = 0; i < kPleaseStopRunCount; ++i)
+    {
+        const auto delay = distribution(generator);
+        NX_LOG(lm("== %1 == delay: %2 ms").arg(i).arg(delay), cl_logALWAYS);
+
+        createAndStartAcceptor(1);
+        std::this_thread::sleep_for(std::chrono::milliseconds(delay));
+        tunnelAcceptor->pleaseStopSync();
+        tunnelAcceptor.reset();
+        ASSERT_TRUE(acceptResults.isEmpty());
+    }
 }
 
 TEST_F(UdpHolePunchingTunnelAcceptorTest, SingleUdtConnect)

@@ -22,6 +22,7 @@ public:
         String authKey;
         bool mediatorEnabled;
 
+        System();
         System(
             String authKey_,
             bool mediatorEnabled_ = false);

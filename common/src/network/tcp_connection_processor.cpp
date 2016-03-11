@@ -11,7 +11,6 @@
 
 #include "tcp_listener.h"
 #include "tcp_connection_priv.h"
-#include "err.h"
 
 #ifndef Q_OS_WIN
 #   include <netinet/tcp.h>

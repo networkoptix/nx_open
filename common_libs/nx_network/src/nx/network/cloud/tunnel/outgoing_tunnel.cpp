@@ -309,11 +309,10 @@ void OutgoingTunnel::onConnectorFinished(
         for (auto& connectRequest: m_connectHandlers)
         {
             using namespace std::placeholders;
-            auto handler = std::move(connectRequest.second.handler);
             m_connection->establishNewConnection(
                 connectRequest.second.timeout,   //TODO #ak recalculate timeout
                 std::move(connectRequest.second.socketAttributes),
-                [handler, this](    //TODO #ak #msvc2015 move to lambda
+                [handler = std::move(connectRequest.second.handler), this](
                     SystemError::ErrorCode errorCode,
                     std::unique_ptr<AbstractStreamSocket> socket,
                     bool tunnelStillValid)

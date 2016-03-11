@@ -17,7 +17,6 @@ MediatorConnector::MediatorConnector()
     , m_endpointFetcher(
         lit( "hpm" ),
         std::make_unique<nx::network::cloud::RandomEndpointSelector>() )
-    , m_timerSocket( SocketFactory::createStreamSocket() )
 {
 }
 
@@ -102,7 +101,7 @@ void MediatorConnector::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
         m_isTerminating = true;
     }
 
-    m_timerSocket->pleaseStop(std::move(handler));
+    m_timer.pleaseStop(std::move(handler));
 }
 
 boost::optional<SocketAddress> MediatorConnector::mediatorAddress() const
@@ -130,8 +129,7 @@ void MediatorConnector::fetchEndpoint()
 
             // retry after some delay
             if( !m_isTerminating )
-                m_timerSocket->registerTimer( RETRY_INTERVAL,
-                                              [ this ](){ fetchEndpoint(); } );
+                m_timer.start(RETRY_INTERVAL, [this](){ fetchEndpoint(); });
         }
         else
         {

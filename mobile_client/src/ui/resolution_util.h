@@ -3,7 +3,7 @@
 
 #include <QtCore/Qt>
 
-#include <utils/common/singleton.h>
+#include <nx/utils/singleton.h>
 
 class QnResolutionUtil : public Singleton<QnResolutionUtil> {
 public:

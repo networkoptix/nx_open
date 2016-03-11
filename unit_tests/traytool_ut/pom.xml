@@ -27,20 +27,11 @@
         <master.project.directory>traytool</master.project.directory>
         <!--Global libs-->      
         <qt.libs>core gui network xml xmlpatterns sql concurrent multimedia</qt.libs>
-        <global.libs>-ltraytool -lonvif -lquazip</global.libs>
-        <!--Specific os libs used-->
-        <!--<windows.oslibs>Ws2_32.lib DbgHelp.lib sigar.lib -lIphlpapi -lwinmm -lssleay32 -llibeay32</windows.oslibs>
-        <linux.oslibs>-lmp3lame -lssl -lcrypto -lsigar -lfaac -lvpx -lvorbisenc -lvorbis</linux.oslibs>
-        <linux.arm.oslibs>-lssl -lcrypto -lsigar</linux.arm.oslibs>
-        <windows.oslibs.release></windows.oslibs.release>
-        <windows.oslibs.debug></windows.oslibs.debug>                
-        <mac.oslibs>-lssl -lbz2 -framework IOKit -framework CoreServices -lsigar-universal64-macosx</mac.oslibs>-->
-        <!--Global defines-->
-        <!--<global.defines></global.defines>-->
-        <!--Specific os defines-->
+        <global.libs>-ltraytool -lonvif</global.libs>
         <windows.defines>EC2_LIB_API=__declspec(dllimport) _VARIADIC_MAX=10</windows.defines>
         <linux.defines/>
         <mac.defines/>  
         <path>${env.PATH}</path>
+        <rdep.packages>quazip</rdep.packages>
     </properties>
 </project>

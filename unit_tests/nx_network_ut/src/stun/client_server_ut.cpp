@@ -54,7 +54,7 @@ protected:
     SystemError::ErrorCode sendTestRequestSync()
     {
         Message request( Header( MessageClass::request, MethodType::bindingMethod ) );
-        SyncMultiQueue< SystemError::ErrorCode, Message > waiter;
+        TestSyncMultiQueue< SystemError::ErrorCode, Message > waiter;
         client->sendRequest( std::move( request ), waiter.pusher() );
         return waiter.pop().first;
     }
@@ -70,7 +70,7 @@ protected:
 
     SystemError::ErrorCode sendIndicationSync( int method )
     {
-        SyncQueue< SystemError::ErrorCode > sendWaiter;
+        TestSyncQueue< SystemError::ErrorCode > sendWaiter;
         const auto connection = server->connections.front();
         connection->sendMessage(
             Message( Header( MessageClass::indication, method ) ),
@@ -119,7 +119,7 @@ TEST_F( StunClientServerTest, RequestResponse )
     {
         Message request( Header( MessageClass::request, MethodType::bindingMethod ) );
 
-        SyncMultiQueue< SystemError::ErrorCode, Message > waiter;
+        TestSyncMultiQueue< SystemError::ErrorCode, Message > waiter;
         client->sendRequest( std::move( request ), waiter.pusher() );
 
         const auto result = waiter.pop();
@@ -141,7 +141,7 @@ TEST_F( StunClientServerTest, RequestResponse )
     {
         Message request( Header( MessageClass::request, 0xFFF /* unknown */ ) );
 
-        SyncMultiQueue< SystemError::ErrorCode, Message > waiter;
+        TestSyncMultiQueue< SystemError::ErrorCode, Message > waiter;
         client->sendRequest( std::move( request ), waiter.pusher() );
 
         const auto result = waiter.pop();
@@ -162,7 +162,7 @@ TEST_F( StunClientServerTest, Indications )
 {
     startServer();
 
-    SyncQueue< Message > recvWaiter;
+    TestSyncQueue< Message > recvWaiter;
     client->connect( address );
     client->setIndicationHandler( 0xAB, recvWaiter.pusher() );
     client->setIndicationHandler( 0xCD, recvWaiter.pusher() );
@@ -191,7 +191,7 @@ struct TestUser
         sendRequest( std::move( request ), responses.pusher() );
     }
 
-    SyncMultiQueue< SystemError::ErrorCode, Message > responses;
+    TestSyncMultiQueue< SystemError::ErrorCode, Message > responses;
 };
 
 static const size_t USER_COUNT = 3;

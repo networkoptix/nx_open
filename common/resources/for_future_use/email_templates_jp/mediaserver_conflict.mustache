@@ -1,0 +1,19 @@
+﻿{{#aggregated}}
+<div class="content">
+    <div class="callout">
+        <p>重複検知: {{timestamp}}</p>
+        <table class="details">
+            <tr>
+                <th>Number</th>
+                <th>ECS IP</th>
+            </tr>
+                {{#msConflicts}}
+                    <tr>
+                        <td>{{number}}</td>
+                        <td>{{ip}}</td>
+                    </tr>
+                {{/msConflicts}}
+        </table>
+    </div>
+</div>
+{{/aggregated}}

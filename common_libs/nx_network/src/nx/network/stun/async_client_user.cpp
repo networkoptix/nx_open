@@ -39,22 +39,17 @@ void AsyncClientUser::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 void AsyncClientUser::sendRequest(Message request,
                                   AbstractAsyncClient::RequestHandler handler)
 {
+    m_client->sendRequest(
+        std::move(request),
+        [this, self = shared_from_this(), handler = std::move(handler)](
+            SystemError::ErrorCode code, Message message) mutable
+        {
+            if (!self->startOperation())
+                return;
 
-
-    auto wrapper = [this](const std::shared_ptr<AsyncClientUser>& self,
-                      const AbstractAsyncClient::RequestHandler& handler,
-                      SystemError::ErrorCode code, Message message)
-    {
-        if (!self->startOperation())
-            return;
-
-        handler(code, std::move(message));
-        self->stopOperation();
-    };
-
-    using namespace std::placeholders;
-    m_client->sendRequest(std::move(request), std::bind(
-        std::move(wrapper), shared_from_this(), std::move(handler), _1, _2));
+            handler(code, std::move(message));
+            self->stopOperation();
+        });
 }
 
 bool AsyncClientUser::setIndicationHandler(int method,

@@ -18,7 +18,7 @@ static const QString DEFAULT_LOGIN(QLatin1String("admin"));
 static const QString DEFAULT_PASSWORD(QLatin1String("123456"));
 static const QString NX_VENDOR(QLatin1String("Network Optix"));
 static const QString DEFAULT_NX_LOGIN(QLatin1String("admin"));
-static const QString DEFAULT_NX_PASSWORD(QLatin1String("123456"));
+static const QString DEFAULT_NX_PASSWORD(QLatin1String("nxwitness"));
 static const QString NX_DEVICE_NAME_PARAMETER_NAME(QLatin1String("nxDeviceName"));
 static const QString NX_DEVICE_MODEL_PARAMETER_NAME(QLatin1String("nxDeviceModel"));
 static const int ACTI_DEVICEXML_PORT = 49152;
@@ -268,11 +268,10 @@ void QnActiResourceSearcher::createResource(
     resource->setTypeId(m_resTypeId);
 
     if(isNx)
-    {
-        auto data = getNxDataByActiModel(devInfo.modelName);
+    {    
         resource->setVendor(NX_VENDOR);
-        resource->setName(data["name"]);
-        resource->setModel(data["model"]);
+        resource->setName(resourceData.value<QString>(NX_DEVICE_NAME_PARAMETER_NAME));
+        resource->setModel(resourceData.value<QString>(NX_DEVICE_MODEL_PARAMETER_NAME));
     }
     else
     {
@@ -294,19 +293,7 @@ void QnActiResourceSearcher::createResource(
         defaultAuth.setPassword(defaultPassword);
         resource->setDefaultAuth(defaultAuth);
     }
-
     result << resource;
-}
-
-QMap<QString, QString> QnActiResourceSearcher::getNxDataByActiModel(const QString &model) const
-{
-    QMap<QString, QString> data;
-    QnResourceData resourceData = qnCommon->dataPool()->data(manufacture(), model);
-
-    data["name"] = resourceData.value<QString>(NX_DEVICE_NAME_PARAMETER_NAME);
-    data["model"] = resourceData.value<QString>(NX_DEVICE_MODEL_PARAMETER_NAME);
-
-    return data;
 }
 
 bool QnActiResourceSearcher::isNxDevice(const nx_upnp::DeviceInfo& devInfo) const

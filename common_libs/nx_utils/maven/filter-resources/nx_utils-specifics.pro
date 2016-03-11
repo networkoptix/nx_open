@@ -1,6 +1,8 @@
 TEMPLATE = lib
 CONFIG += console
 
+QT -= gui
+
 win* {
     DEFINES += NX_UTILS_API=__declspec(dllexport)
 }

@@ -30,20 +30,21 @@
         <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc</ffmpeg.libs>
         <!--Global libs-->
         <!-- Disabled msvs 2015 libs> -lFestival -lestools -leststring -lestbase/!-->
-        <global.libs>-lcommon -lappserver2 -lclient.core -lclient -lquazip</global.libs>
+        <global.libs>-lcommon -lappserver2 -lclient.core -lclient</global.libs>
         <!--Specific os libs used-->
-        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lOle32 -lwinmm -ld3d9 -lopenal32 -lssleay32 -llibeay32 -lsigar</windows.oslibs>
+        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lOle32 -lwinmm -ld3d9 -lopenal32 -lsigar</windows.oslibs>
         <windows.oslibs.release/>
         <windows.oslibs.debug/>
 
-        <linux.oslibs>-lcrypto -lz</linux.oslibs>
+        <linux.oslibs> -lz</linux.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices -framework OpenAL</mac.oslibs>
         <!--Global defines-->
         <global.defines/>
         <!--Specific os defines-->
         <windows.defines/>
         <linux.defines/>
-        <mac.defines/>          
+        <mac.defines/>
+        <rdep.packages>openssl quazip</rdep.packages>
     </properties>
 
     <dependencies>
