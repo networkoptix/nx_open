@@ -20,6 +20,7 @@
 #include "settings.h"
 #include "nx_ec/data/api_conversion_functions.h"
 #include "nx_ec/data/api_connection_data.h"
+#include <nx_ec/managers/abstract_server_manager.h>
 #include "api/app_server_connection.h"
 #include "network/router.h"
 #include <network/module_finder.h>
@@ -59,8 +60,7 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource)
 
             if (ownData != newData)
             {
-                QnMediaServerResourcePtr savedServer;
-                QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->saveSync(ownMediaServer, &savedServer);
+                QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->saveSync(ownData);
                 return;
             }
 
@@ -234,13 +234,18 @@ void QnServerMessageProcessor::removeResourceIgnored(const QnUuid& resourceId)
     QnStorageResourcePtr storage = qnResPool->getResourceById<QnStorageResource>(resourceId);
     bool isOwnServer = (mServer && mServer->getId() == qnCommon->moduleGUID());
     bool isOwnStorage = (storage && storage->getParentId() == qnCommon->moduleGUID());
-    if (isOwnServer) {
-        QnMediaServerResourcePtr savedServer;
-        QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->saveSync(mServer, &savedServer);
-        QnAppServerConnectionFactory::getConnection2()->getResourceManager()->setResourceStatusLocalSync(mServer->getId(), Qn::Online);
+    if (isOwnServer)
+    {
+        ec2::ApiMediaServerData apiServer;
+        ec2::fromResourceToApi(mServer, apiServer);
+        QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->saveSync(apiServer);
+        QnAppServerConnectionFactory::getConnection2()->getResourceManager()->setResourceStatusLocalSync(apiServer.id, Qn::Online);
     }
-    else if (isOwnStorage && !storage->isExternal() && storage->isWritable()) {
-        QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->saveStoragesSync(QnStorageResourceList() << storage);
+    else if (isOwnStorage && !storage->isExternal() && storage->isWritable())
+    {
+        ec2::ApiStorageDataList apiStorages;
+        fromResourceListToApi(QnStorageResourceList() << storage, apiStorages);
+        QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->saveStoragesSync(apiStorages);
     }
 }
 

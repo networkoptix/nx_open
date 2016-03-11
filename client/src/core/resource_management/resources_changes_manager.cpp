@@ -23,6 +23,7 @@
 #include <nx_ec/managers/abstract_videowall_manager.h>
 #include <nx_ec/managers/abstract_webpage_manager.h>
 #include <nx_ec/managers/abstract_camera_manager.h>
+#include <nx_ec/managers/abstract_server_manager.h>
 
 QnResourcesChangesManager::QnResourcesChangesManager(QObject* parent /*= nullptr*/):
     base_type(parent)
@@ -214,7 +215,8 @@ void QnResourcesChangesManager::saveServers(const QnMediaServerResourceList &ser
 
 void QnResourcesChangesManager::saveServersBatch(const QnMediaServerResourceList &servers,
                                                  BatchChangesFunction applyChanges,
-                                                 RollbackFunction rollback) {
+                                                 RollbackFunction rollback)
+{
     if (!applyChanges)
         return;
 
@@ -237,7 +239,10 @@ void QnResourcesChangesManager::saveServersBatch(const QnMediaServerResourceList
     if (!connection)
         return;
 
-    connection->getMediaServerManager()->saveUserAttributes(changes, this,
+    ec2::ApiMediaServerUserAttributesDataList attributes;
+    fromResourceListToApi(changes, attributes);
+
+    connection->getMediaServerManager()->saveUserAttributes(attributes, this,
         [this, servers, pool, backup, sessionGuid, rollback]( int reqID, ec2::ErrorCode errorCode )
     {
         Q_UNUSED(reqID);

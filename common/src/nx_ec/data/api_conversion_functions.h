@@ -10,6 +10,8 @@
 #include <utils/email/email_fwd.h>
 #include <utils/common/ldap_fwd.h>
 
+class SocketAddress;
+
 namespace ec2 {
 
     void fromApiToResource(const ApiBusinessRuleData &src, QnBusinessEventRulePtr &dst);
@@ -58,7 +60,7 @@ namespace ec2 {
 
     void fromResourceToApi(const QnStorageResourcePtr &src, ApiStorageData &dst);
     void fromApiToResource(const ApiStorageData &src, QnStorageResourcePtr &dst);
-    void fromResourceToApi(const QnStorageResourceList &src, ApiStorageDataList &dst);
+    void fromResourceListToApi(const QnStorageResourceList &src, ApiStorageDataList &dst);
 
     void fromResourceToApi(const QnMediaServerResourcePtr& src, ApiMediaServerData &dst);
     void fromApiToResource(const ApiMediaServerData &src, QnMediaServerResourcePtr &dst);
@@ -98,6 +100,7 @@ namespace ec2 {
     void fromApiToResourceList(const ApiWebPageDataList &src, QnResourceList &dst);
     void fromApiToResourceList(const ApiWebPageDataList &src, QnWebPageResourceList &dst);
 
+    void deserializeNetAddrList(const QString& source, QList<SocketAddress>& target);
 } // namespace ec2
 
 #endif // QN_API_CONVERSION_FUNCTIONS_H

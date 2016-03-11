@@ -6,42 +6,40 @@
 #include <nx_ec/managers/abstract_videowall_manager.h>
 #include <nx_ec/managers/abstract_webpage_manager.h>
 #include <nx_ec/managers/abstract_camera_manager.h>
+#include <nx_ec/managers/abstract_server_manager.h>
 
 #include <nx_ec/data/api_full_info_data.h>
 #include <nx_ec/data/api_discovery_data.h>
 #include <nx_ec/data/api_conversion_functions.h>
-#include <nx_ec/data/api_media_server_data.h>
-#include <nx_ec/data/api_camera_attributes_data.h>
 #include <nx_ec/data/api_resource_type_data.h>
 #include <nx_ec/data/api_license_data.h>
 #include <nx_ec/data/api_business_rule_data.h>
 
 #include <api/app_server_connection.h>
 
+#include <core/resource_management/resource_pool.h>
+#include <core/resource_management/server_additional_addresses_dictionary.h>
+#include <core/resource_management/resource_properties.h>
+#include <core/resource_management/status_dictionary.h>
+#include <core/resource/camera_history.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/webpage_resource.h>
-
-#include <business/business_event_rule.h>
-
-#include <core/resource_management/resource_pool.h>
-#include <core/resource_management/server_additional_addresses_dictionary.h>
 #include <core/resource/camera_user_attribute_pool.h>
 #include <core/resource/media_server_user_attributes.h>
 #include <core/resource/storage_resource.h>
+
+#include <business/business_event_rule.h>
 
 #include "common/common_module.h"
 #include "utils/common/synctime.h"
 #include <nx/network/socket_common.h>
 #include "runtime_info_manager.h"
 #include <utils/common/app_info.h>
-#include "nx_ec/data/api_resource_data.h"
-#include "core/resource_management/resource_properties.h"
-#include "core/resource_management/status_dictionary.h"
-#include "core/resource/camera_history.h"
+
 
 QnCommonMessageProcessor::QnCommonMessageProcessor(QObject *parent) :
     base_type(parent)
@@ -84,8 +82,8 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     connect(resourceManager, &ec2::AbstractResourceManager::resourceRemoved,        this, &QnCommonMessageProcessor::on_resourceRemoved );
 
     auto mediaServerManager = connection->getMediaServerManager();
-    connect(mediaServerManager, &ec2::AbstractMediaServerManager::addedOrUpdated,   this, [this](const QnMediaServerResourcePtr &server){updateResource(server);});
-    connect(mediaServerManager, &ec2::AbstractMediaServerManager::storageChanged,   this, [this](const QnStorageResourcePtr &storage){updateResource(storage);});
+    connect(mediaServerManager, &ec2::AbstractMediaServerManager::addedOrUpdated,   this, on_resourceUpdated);
+    connect(mediaServerManager, &ec2::AbstractMediaServerManager::storageChanged,   this, on_resourceUpdated);
     connect(mediaServerManager, &ec2::AbstractMediaServerManager::removed,          this, &QnCommonMessageProcessor::on_resourceRemoved );
     connect(mediaServerManager, &ec2::AbstractMediaServerManager::storageRemoved,   this, &QnCommonMessageProcessor::on_resourceRemoved );
     connect(mediaServerManager, &ec2::AbstractMediaServerManager::userAttributesChanged, this, &QnCommonMessageProcessor::on_mediaServerUserAttributesChanged );
@@ -278,8 +276,11 @@ void QnCommonMessageProcessor::on_cameraUserAttributesRemoved(const QnUuid& came
         res->emitModificationSignals( modifiedFields );
 }
 
-void QnCommonMessageProcessor::on_mediaServerUserAttributesChanged(const QnMediaServerUserAttributesPtr& userAttributes)
+void QnCommonMessageProcessor::on_mediaServerUserAttributesChanged(const ec2::ApiMediaServerUserAttributesData& attrs)
 {
+    QnMediaServerUserAttributesPtr userAttributes(new QnMediaServerUserAttributes());
+    fromApiToResource(attrs, userAttributes);
+
     QSet<QByteArray> modifiedFields;
     {
         QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), userAttributes->serverID );
@@ -585,5 +586,30 @@ void QnCommonMessageProcessor::updateResource(const ec2::ApiCameraData& camera)
     {
         fromApiToResource(camera, qnCamera);
         updateResource(qnCamera);
+    }
+}
+
+void QnCommonMessageProcessor::updateResource(const ec2::ApiMediaServerData& server)
+{
+    QnMediaServerResourcePtr qnServer(new QnMediaServerResource());
+    fromApiToResource(server, qnServer);
+    updateResource(qnServer);
+}
+
+void QnCommonMessageProcessor::updateResource(const ec2::ApiStorageData& storage)
+{
+    auto resTypeId = qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kStorageTypeId);
+    Q_ASSERT_X(!resTypeId.isNull(), Q_FUNC_INFO, "Invalid resource type pool state");
+    if (resTypeId.isNull())
+        return;
+
+    QnStorageResourcePtr qnStorage = getResourceFactory()->createResource(resTypeId,
+            QnResourceParams(storage.id, storage.url, QString()))
+        .dynamicCast<QnStorageResource>();
+    Q_ASSERT_X(qnStorage, Q_FUNC_INFO, "Invalid resource type pool state");
+    if (qnStorage)
+    {
+        fromApiToResource(storage, qnStorage);
+        updateResource(qnStorage);
     }
 }

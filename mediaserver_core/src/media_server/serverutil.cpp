@@ -8,7 +8,11 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <api/app_server_connection.h>
+
+#include <nx_ec/managers/abstract_server_manager.h>
+#include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/dummy_handler.h>
+
 #include <media_server/serverutil.h>
 #include <media_server/settings.h>
 #include <nx/utils/log/log.h>
@@ -30,7 +34,8 @@ QByteArray decodeAuthKey(const QByteArray& authKey) {
     }
 }
 
-QnUuid serverGuid() {
+QnUuid serverGuid()
+{
     static QnUuid guid;
 
     if (!guid.isNull())
@@ -82,7 +87,8 @@ bool backupDatabase() {
 }
 
 
-bool changeSystemName(const QString &systemName, qint64 sysIdTime, qint64 tranLogTime) {
+bool changeSystemName(const QString &systemName, qint64 sysIdTime, qint64 tranLogTime)
+{
     if (qnCommon->localSystemName() == systemName)
         return true;
 
@@ -98,7 +104,10 @@ bool changeSystemName(const QString &systemName, qint64 sysIdTime, qint64 tranLo
     server->setSystemName(systemName);
     server->setServerFlags(server->getServerFlags() & ~Qn::SF_AutoSystemName);
     QnAppServerConnectionFactory::getConnection2()->setTransactionLogTime(tranLogTime);
-    QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->save(server, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+
+    ec2::ApiMediaServerData apiServer;
+    fromResourceToApi(server, apiServer);
+    QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->save(apiServer, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 
     return true;
 }

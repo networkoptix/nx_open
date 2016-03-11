@@ -35,6 +35,8 @@ public:
     virtual void updateResource(const ec2::ApiVideowallData& videowall);
     virtual void updateResource(const ec2::ApiWebPageData& webpage);
     virtual void updateResource(const ec2::ApiCameraData& camera);
+    virtual void updateResource(const ec2::ApiMediaServerData& server);
+    virtual void updateResource(const ec2::ApiStorageData& storage);
 
     QMap<QnUuid, QnBusinessEventRulePtr> businessRules() const;
 
@@ -113,7 +115,7 @@ private slots:
     void on_cameraUserAttributesRemoved(const QnUuid& cameraID);
     void on_cameraHistoryChanged(const ec2::ApiServerFootageData &cameraHistory);
 
-    void on_mediaServerUserAttributesChanged(const QnMediaServerUserAttributesPtr& userAttributes);
+    void on_mediaServerUserAttributesChanged(const ec2::ApiMediaServerUserAttributesData& userAttributes);
     void on_mediaServerUserAttributesRemoved(const QnUuid& serverID);
 
     void on_businessEventRemoved(const QnUuid &id);

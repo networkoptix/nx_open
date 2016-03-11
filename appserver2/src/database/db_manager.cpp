@@ -3245,14 +3245,10 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraDataEx
 // ----------- getServers --------------------
 
 
-ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiMediaServerDataList& serverList)
+ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiMediaServerDataList& serverList)
 {
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
-    QString filterStr;
-    if (!mServerId.isNull()) {
-        filterStr = QString("WHERE r.guid = %1").arg(guidToSqlString(mServerId));
-    }
 
     query.prepare(QString("\
         SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url, \
@@ -3260,8 +3256,8 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiMediaServerData
         s.flags, s.system_name as systemName \
         FROM vms_resource r \
         LEFT JOIN vms_resource_status rs on rs.guid = r.guid \
-        JOIN vms_server s on s.resource_ptr_id = r.id %1 ORDER BY r.guid\
-    ").arg(filterStr));
+        JOIN vms_server s on s.resource_ptr_id = r.id ORDER BY r.guid\
+    "));
 
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
@@ -3273,12 +3269,12 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiMediaServerData
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiMediaServerDataExList& serverExList)
+ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiMediaServerDataExList& serverExList)
 {
     {
         //fetching server data
         ApiMediaServerDataList serverList;
-        ErrorCode result = doQueryNoLock( mServerId, serverList );
+        ErrorCode result = doQueryNoLock(nullptr, serverList);
         if( result != ErrorCode::ok )
             return result;
 
@@ -3291,7 +3287,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiMediaServerData
     {
         //fetching server attributes
         ApiMediaServerUserAttributesDataList serverAttrsList;
-        ErrorCode result = doQueryNoLock( mServerId, serverAttrsList );
+        ErrorCode result = doQueryNoLock(nullptr, serverAttrsList );
         if( result != ErrorCode::ok )
             return result;
 
@@ -3311,7 +3307,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiMediaServerData
 
     //fetching storages
     ApiStorageDataList storages;
-    ErrorCode result = doQueryNoLock( mServerId, storages );
+    ErrorCode result = doQueryNoLock(nullptr, storages );
     if( result != ErrorCode::ok )
         return result;
     //merging storages
@@ -3319,8 +3315,6 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiMediaServerData
 
     //reading properties
     QnQueryFilter filter;
-    if( !mServerId.isNull() )
-        filter.fields.insert( RES_ID_FIELD, QVariant::fromValue(mServerId) );
     filter.fields.insert( RES_TYPE_FIELD, RES_TYPE_MSERVER );
     ApiResourceParamWithRefDataList params;
     result = fetchResourceParams( filter, params );
@@ -3330,7 +3324,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiMediaServerData
 
     //reading status info
     ApiResourceStatusDataList statusList;
-    result = doQueryNoLock( mServerId, statusList );
+    result = doQueryNoLock( nullptr, statusList );
     if( result != ErrorCode::ok )
         return result;
 

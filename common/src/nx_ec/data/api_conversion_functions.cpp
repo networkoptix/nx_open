@@ -515,21 +515,18 @@ void fromApiToResourceList(const ApiLicenseDataList &src, QnLicenseList &dst) {
     }
 }
 
-
-static void deserializeNetAddrList(QList<SocketAddress>& netAddrList,
-                                   const QString& netAddrListString) {
-    QStringList addListStrings = netAddrListString.split(QLatin1Char(';'));
-    std::transform(addListStrings.begin(), addListStrings.end(), \
-                   std::back_inserter(netAddrList),
-                   [](const QString &address) { return SocketAddress(address); });
+void deserializeNetAddrList(const QString& source, QList<SocketAddress>& target)
+{
+    for (const auto &addr : source.split(L';'))
+        target.push_back(addr);
 }
 
-static QString serializeNetAddrList(const QList<SocketAddress>& netAddrList) {
-    QStringList addListStrings;
-    std::transform(netAddrList.begin(), netAddrList.end(),
-                   std::back_inserter(addListStrings),
-                   std::mem_fun_ref(&SocketAddress::toString));
-    return addListStrings.join(QLatin1String(";"));
+static QString serializeNetAddrList(const QList<SocketAddress>& netAddrList)
+{
+    QStringList result;
+    for (const auto &addr : netAddrList)
+        result << addr.toString();
+    return result.join(L';');
 }
 
 void fromResourceToApi(const QnStorageResourcePtr &src, ApiStorageData &dst) {
@@ -541,7 +538,7 @@ void fromResourceToApi(const QnStorageResourcePtr &src, ApiStorageData &dst) {
     dst.isBackup = src->isBackup();
 }
 
-void fromResourceToApi(const QnStorageResourceList &src, ApiStorageDataList &dst)
+void fromResourceListToApi(const QnStorageResourceList &src, ApiStorageDataList &dst)
 {
     for(const QnStorageResourcePtr& storage: src)
     {
@@ -577,7 +574,7 @@ void fromApiToResource(const ApiMediaServerData &src, QnMediaServerResourcePtr &
     fromApiToResource(static_cast<const ApiResourceData &>(src), dst.data());
 
     QList<SocketAddress> resNetAddrList;
-    deserializeNetAddrList(resNetAddrList, src.networkAddresses);
+    deserializeNetAddrList(src.networkAddresses, resNetAddrList);
 
     dst->setApiUrl(src.apiUrl);
     dst->setNetAddrList(resNetAddrList);

@@ -1,8 +1,6 @@
 #pragma once
 
 #include <transaction/transaction.h>
-
-#include <nx_ec/data/api_user_data.h>
 #include <nx_ec/managers/abstract_user_manager.h>
 
 namespace ec2

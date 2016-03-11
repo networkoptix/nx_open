@@ -315,6 +315,9 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<ec2::ApiWebPageData>("ec2::ApiWebPageData");
     qRegisterMetaType<ec2::ApiCameraData>("ec2::ApiCameraData");
     qRegisterMetaType<ec2::ApiCameraAttributesData>("ec2::ApiCameraAttributesData");
+    qRegisterMetaType<ec2::ApiMediaServerData>("ec2::ApiMediaServerData");
+    qRegisterMetaType<ec2::ApiMediaServerUserAttributesData>("ec2::ApiMediaServerUserAttributesData");
+    qRegisterMetaType<ec2::ApiStorageData>("ec2::ApiStorageData");
 
     qRegisterMetaType<QnUuid>();
     qRegisterMetaTypeStreamOperators<QnUuid>();

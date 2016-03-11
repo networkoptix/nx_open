@@ -5,6 +5,7 @@
 #include <nx_ec/data/api_user_data.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/managers/abstract_user_manager.h>
+#include <nx_ec/managers/abstract_server_manager.h>
 
 #include "transaction/transaction_message_bus.h"
 #include "api/app_server_connection.h"
@@ -26,8 +27,10 @@
 #include "settings.h"
 
 
-namespace {
-    enum Result {
+namespace
+{
+    enum Result
+    {
         ResultOk,
         ResultFail,
         ResultSkip
@@ -224,7 +227,8 @@ int QnConfigureRestHandler::changeAdminPassword(
     return ResultOk;
 }
 
-int QnConfigureRestHandler::changePort(int port) {
+int QnConfigureRestHandler::changePort(int port)
+{
     if (port == 0 || port == MSSettings::roSettings()->value(nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT).toInt())
         return ResultSkip;
 
@@ -245,14 +249,16 @@ int QnConfigureRestHandler::changePort(int port) {
             return ResultFail;
     }
 
-    QnMediaServerResourcePtr savedServer;
     QUrl url = server->getUrl();
     url.setPort(port);
     server->setUrl(url.toString());
     url = server->getApiUrl();
     url.setPort(port);
     server->setApiUrl(url.toString());
-    if (QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->saveSync(server, &savedServer) != ec2::ErrorCode::ok)
+
+    ec2::ApiMediaServerData apiServer;
+    ec2::fromResourceToApi(server, apiServer);
+    if (QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->saveSync(apiServer) != ec2::ErrorCode::ok)
         return ResultFail;
 
 

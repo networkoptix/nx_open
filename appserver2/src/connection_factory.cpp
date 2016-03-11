@@ -192,7 +192,7 @@ namespace ec2
         registerGetFuncHandler<QnUuid, ApiResourceStatusDataList>(p, ApiCommand::getStatusList);
 
         //AbstractMediaServerManager::getServers
-        registerGetFuncHandler<QnUuid, ApiMediaServerDataList>(p, ApiCommand::getMediaServers);
+        registerGetFuncHandler<std::nullptr_t, ApiMediaServerDataList>(p, ApiCommand::getMediaServers);
         //AbstractMediaServerManager::save
         registerUpdateFuncHandler<ApiMediaServerData>(p, ApiCommand::saveMediaServer);
 
@@ -245,7 +245,7 @@ namespace ec2
          * %return Return object in requested format
          * %// AbstractMediaServerManager::getServersEx
          */
-        registerGetFuncHandler<QnUuid, ApiMediaServerDataExList>(p, ApiCommand::getMediaServersEx);
+        registerGetFuncHandler<std::nullptr_t, ApiMediaServerDataExList>(p, ApiCommand::getMediaServersEx);
 
         registerUpdateFuncHandler<ApiStorageDataList>(p, ApiCommand::saveStorages);
 

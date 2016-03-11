@@ -189,33 +189,33 @@ QList<SocketAddress> QnMediaServerResource::getNetAddrList() const
 void QnMediaServerResource::setAdditionalUrls(const QList<QUrl> &urls)
 {
     QnUuid id = getId();
-    QList<QUrl> oldUrls = QnServerAdditionalAddressesDictionary::instance()->additionalUrls(id);
+    QList<QUrl> oldUrls = qnServerAdditionalAddressesDictionary->additionalUrls(id);
     if (oldUrls == urls)
         return;
 
-    QnServerAdditionalAddressesDictionary::instance()->setAdditionalUrls(id, urls);
+    qnServerAdditionalAddressesDictionary->setAdditionalUrls(id, urls);
     emit auxUrlsChanged(::toSharedPointer(this));
 }
 
 QList<QUrl> QnMediaServerResource::getAdditionalUrls() const
 {
-    return QnServerAdditionalAddressesDictionary::instance()->additionalUrls(getId());
+    return qnServerAdditionalAddressesDictionary->additionalUrls(getId());
 }
 
 void QnMediaServerResource::setIgnoredUrls(const QList<QUrl> &urls)
 {
     QnUuid id = getId();
-    QList<QUrl> oldUrls = QnServerAdditionalAddressesDictionary::instance()->ignoredUrls(id);
+    QList<QUrl> oldUrls = qnServerAdditionalAddressesDictionary->ignoredUrls(id);
     if (oldUrls == urls)
         return;
 
-    QnServerAdditionalAddressesDictionary::instance()->setIgnoredUrls(id, urls);
+    qnServerAdditionalAddressesDictionary->setIgnoredUrls(id, urls);
     emit auxUrlsChanged(::toSharedPointer(this));
 }
 
 QList<QUrl> QnMediaServerResource::getIgnoredUrls() const
 {
-    return QnServerAdditionalAddressesDictionary::instance()->ignoredUrls(getId());
+    return qnServerAdditionalAddressesDictionary->ignoredUrls(getId());
 }
 
 quint16 QnMediaServerResource::getPort() const {
