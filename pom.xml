@@ -561,8 +561,6 @@
             <properties>
                 <platform>linux</platform>
                 <qt.spec>linux-g++</qt.spec>
-                <qt.path>artifacts/qt/${qt.version}/${platform}/${arch}/${box}/${build.configuration}</qt.path>
-                <qt.classifier>${platform}-${arch}-${build.configuration}</qt.classifier>
             </properties>
             <modules>
                 <!--<module>plugins/xvbadecoder</module>-->
