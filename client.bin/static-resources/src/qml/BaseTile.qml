@@ -18,7 +18,11 @@ Rectangle
     implicitWidth: 280;
     implicitHeight: 96;
 
+    height: Math.max(loadersColumn.y + loadersColumn.height, 96);
+
     color: palette.button;  // TODO: setup color
+
+    onIsExpandedChanged: x = 0;
 
     MouseArea
     {
@@ -62,33 +66,36 @@ Rectangle
         onClicked: { toggle(); }
     }
 
-    Loader
+    Column
     {
-        id: centralAreaLoader;
+        id: loadersColumn;
 
         anchors.left: parent.left;
         anchors.right: parent.right;
         anchors.top: systemNameText.bottom;
-        anchors.bottom: expandedAreaLoader.top;
-
-        anchors.leftMargin: 12;
-        anchors.rightMargin: 16;
-        sourceComponent: thisComponent.centralAreaDelegate;
-    }
-
-    Loader
-    {
-        id: expandedAreaLoader;
-
-        anchors.left: parent.left;
-        anchors.right: parent.right;
-        anchors.top: centralAreaLoader.bottom;
-        anchors.bottom: parent.bottom;
 
         anchors.leftMargin: 12;
         anchors.rightMargin: 16;
 
-        sourceComponent: (thisComponenet.isExpanded
-            ? thisComponent.expandedAreaDelegate :  undefined);
+        Loader
+        {
+            id: centralAreaLoader;
+
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+
+            sourceComponent: thisComponent.centralAreaDelegate;
+        }
+
+        Loader
+        {
+            id: expandedAreaLoader;
+
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+
+            visible: thisComponent.isExpanded;
+            sourceComponent: thisComponent.expandedAreaDelegate;
+        }
     }
 }

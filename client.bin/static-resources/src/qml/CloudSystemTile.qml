@@ -6,17 +6,15 @@ BaseTile
 
     property string userName;
 
-    centralAreaDelegate: Item
+    centralAreaDelegate: Column
     {
         Text
         {
             id: login;
 
-            anchors.top: parent.top;
             anchors.left: parent.left;
             anchors.right: parent.right;
 
-            anchors.topMargin: 2;
             anchors.leftMargin: 4;
 
             text: userName;
@@ -29,9 +27,6 @@ BaseTile
             id: cloudIndicator;
 
             anchors.left: parent.left;
-            anchors.bottom: parent.bottom;
-
-            anchors.bottomMargin: 8;
 
             width: 24;
             height: width;

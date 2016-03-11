@@ -1,4 +1,5 @@
 import QtQuick 2.5;
+import QtQuick.Controls 1.2;
 
 BaseTile
 {
@@ -26,13 +27,8 @@ BaseTile
 
     centralAreaDelegate: Column
     {
-        anchors.top: (parent ? parent.top : undefined);
         anchors.left: (parent ? parent.left : undefined);
         anchors.right: (parent ? parent.right : undefined);
-        anchors.bottom: (parent ? parent.bottom : undefined);
-
-        anchors.topMargin: 12;
-        anchors.bottomMargin: 16;
 
         InfoItem
         {
@@ -49,4 +45,29 @@ BaseTile
             Component.onCompleted: activeItemSelector.addItem(this);
         }
     }
+
+    expandedAreaDelegate: Column
+    {
+        anchors.left: (parent ? parent.left : undefined);
+        anchors.right: (parent ? parent.right : undefined);
+
+        Button
+        {
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+
+            text: qsTr("Connect");
+        }
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
