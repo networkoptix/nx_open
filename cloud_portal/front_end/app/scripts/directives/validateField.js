@@ -18,7 +18,7 @@ angular.module('cloudApp')
                 scope.$watch(scopeName + '.$valid',updateValidity);
                 scope.$watch(scopeName + '.$touched',updateValidity);
 
-                input.on('focus',function(){
+                input.on('keypress',function(){
                     scope[formName][fieldName].$setUntouched();
                     scope.$apply();
                 });

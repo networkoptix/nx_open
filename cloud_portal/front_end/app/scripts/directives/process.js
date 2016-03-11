@@ -32,7 +32,7 @@ angular.module('cloudApp').directive('processAlert', function () {
                 });
             }
         };
-    }).directive('processButton', function () {
+    }).directive('processButton', ['$timeout',function ($timeout) {
         return {
             restrict: 'E',
             templateUrl: 'views/components/process-button.html',
@@ -55,11 +55,19 @@ angular.module('cloudApp').directive('processAlert', function () {
                         })
                     });
                 }
+
+                function setFocusToInvalid(form){
+                    $timeout(function() {
+                        $("[name='" + form.$name + "']").find('.ng-invalid:visible:first').focus();
+                    });
+                }
+
                 scope.attrs = attrs;
                 scope.checkForm = function(){
                     if(scope.form && !scope.form.$valid){
-                        //Set the forum touched
+                        //Set the form touched
                         touchForm(scope.form);
+                        setFocusToInvalid(scope.form);
                         return false;
                     }else{
                         scope.process.run();
@@ -68,7 +76,7 @@ angular.module('cloudApp').directive('processAlert', function () {
 
             }
         };
-    }).directive('processLoading',function(){
+    }]).directive('processLoading',function(){
         return {
             restrict: 'A',
             scope:{
