@@ -29,7 +29,7 @@ describe('Login suite', function () {
         expect(p.htmlBody.getText()).toContain('Register to be happy');
     });
 
-    it("should allow to log in with existing credentials and to log out", function () {
+    it("should register user with correct credentials", function () {
         p.getByLink();
 
         p.firstNameInput.sendKeys(p.userFirstNameRandom);
@@ -48,4 +48,59 @@ describe('Login suite', function () {
         expect(p.firstNameInput.isPresent()).toBe(false);
     });
 
+
+    it("should not allow to register without email, password, I agree", function () {
+        p.getByLink();
+        expect("test").toBe("written");
+    });
+    it("should not allow to register without email, password, I agree", function () {
+        p.getByLink();
+        expect("test").toBe("written");
+    });
+    it("should not allow to register without email, password, I agree", function () {
+        p.getByLink();
+        expect("test").toBe("written");
+    });
+    it("should not allow to register without email, password, I agree", function () {
+        p.getByLink();
+        expect("test").toBe("written");
+    });
+
+    it("should not allow to register with email in non-email format", function () {
+        p.getByLink();
+        expect("test").toBe("written");
+    });
+
+    it("should not allow to register with password with cyrillic symbols", function () {
+        p.getByLink();
+        expect("test").toBe("written");
+    });
+    it("should not allow to register with password with tm symbols", function () {
+        p.getByLink();
+        expect("test").toBe("written");
+    });
+    
+    it("should show warnings about password strength", function () {
+        p.getByLink();
+        expect("test").toBe("written");
+    });
+
+    it("should show warnings about password strength", function () {
+        p.getByLink();
+        expect("test").toBe("written");
+    });
+
+    it("should open Terms and conditions in a new page", function () {
+        p.getByLink();
+        expect("test").toBe("written");
+    });
+    it("should actally show Terms and conditions", function () {
+        p.getByLink();
+        expect("test").toBe("written");
+    });
+
+    it("should not allow registration with existing email and show error", function () {
+        p.getByLink();
+        expect("test").toBe("written");
+    });
 });
