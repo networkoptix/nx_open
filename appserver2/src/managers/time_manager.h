@@ -57,8 +57,6 @@
 
 namespace ec2
 {
-    struct ResourceContext;
-
     /*!
         \note \a sequence has less priority than \a TimeSynchronizationManager::peerIsServer and \a TimeSynchronizationManager::peerTimeSynchronizedWithInternetServer flags
     */

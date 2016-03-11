@@ -30,6 +30,11 @@ void QnMobileClientMessageProcessor::updateResource(const QnResourcePtr &resourc
         updateMainServerApiUrl();
 }
 
+QnResourceFactory* QnMobileClientMessageProcessor::getResourceFactory()
+{
+    return QnMobileClientCameraFactory::instance();
+}
+
 void QnMobileClientMessageProcessor::updateMainServerApiUrl() {
     QnMediaServerResourcePtr server = qnCommon->currentServer();
     if (!server)

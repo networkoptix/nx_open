@@ -52,7 +52,6 @@ QnAxClientModule::QnAxClientModule(QObject *parent)
     QApplication::setStyle(style);
 
     auto ec2ConnectionFactory = getConnectionFactory(Qn::PT_DesktopClient);
-    ec2ConnectionFactory->setContext(ec2::ResourceContext(QnClientResourceFactory::instance(), qnResPool));
     QnAppServerConnectionFactory::setEC2ConnectionFactory(ec2ConnectionFactory);
     qnCommon->store<ec2::AbstractECConnectionFactory>(ec2ConnectionFactory);
 

@@ -9,8 +9,6 @@ class QString;
 class QnUuid;
 
 namespace ec2 {
-    struct ResourceContext; // TODO: #Elric move this out?
-
     struct ApiData;
 
     struct ApiBusinessActionData;

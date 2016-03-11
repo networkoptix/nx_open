@@ -45,11 +45,5 @@ namespace ec2
 
     private:
         QueryProcessorType* const m_queryProcessor;
-
-        QnTransaction<ApiCameraData> prepareTransaction(ApiCommand::Value cmd, const ec2::ApiCameraData& camera);
-        QnTransaction<ApiCameraDataList> prepareTransaction(ApiCommand::Value cmd, const ec2::ApiCameraDataList& cameras);
-
-        QnTransaction<ApiCameraAttributesDataList> prepareTransaction(ApiCommand::Value cmd, const ec2::ApiCameraAttributesDataList& cameraAttributesList);
-        QnTransaction<ApiIdData> prepareTransaction(ApiCommand::Value command, const QnUuid& id);
     };
 }

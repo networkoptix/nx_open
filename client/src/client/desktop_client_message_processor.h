@@ -20,7 +20,9 @@ protected:
     virtual void connectToConnection(const ec2::AbstractECConnectionPtr &connection) override;
     virtual void disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection) override;
 
+protected:
     virtual QnResourceFactory* getResourceFactory() const override;
+
 private slots:
     void at_gotInitialDiscoveredServers(const ec2::ApiDiscoveredServerDataList &discoveredServers);
 

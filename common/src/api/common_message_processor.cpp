@@ -567,9 +567,14 @@ void QnCommonMessageProcessor::updateResource(const ec2::ApiCameraData& camera)
     QnVirtualCameraResourcePtr qnCamera = getResourceFactory()->createResource(camera.typeId,
             QnResourceParams(camera.id, camera.url, camera.vendor))
         .dynamicCast<QnVirtualCameraResource>();
+
     Q_ASSERT_X(qnCamera, Q_FUNC_INFO, QByteArray("Unknown resource type:") + camera.typeId.toByteArray());
     if (qnCamera)
     {
+        Q_ASSERT_X(camera.id == QnVirtualCameraResource::uniqueIdToId(qnCamera->getUniqueId()),
+            Q_FUNC_INFO,
+            "You must fill camera ID as md5 hash of unique id");
+
         fromApiToResource(camera, qnCamera);
         updateResource(qnCamera);
     }
