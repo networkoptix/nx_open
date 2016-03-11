@@ -1,3 +1,5 @@
+#include <nx/network/socket_global.h>
+
 #include <QtGui/QGuiApplication>
 #include <QtGui/QScreen>
 #include <QtQml/QQmlEngine>
@@ -33,6 +35,7 @@
 #include <nx/media/ffmpeg_video_decoder.h>
 #include <nx/media/ffmpeg_audio_decoder.h>
 #include <nx/media/jpeg_decoder.h>
+
 
 #if defined(Q_OS_ANDROID)
 #include <nx/media/android_video_decoder.h>
@@ -162,9 +165,11 @@ void initLog() {
     QnLog::initLog(lit("INFO"));
 }
 
-int main(int argc, char *argv[]) {
-    QGuiApplication application(argc, argv);
+int main(int argc, char *argv[]) 
+{
 
+    QGuiApplication application(argc, argv);
+    nx::network::SocketGlobals::InitGuard sgGuard;
     initLog();
 
     QnMobileClientModule mobile_client;
