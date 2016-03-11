@@ -18,16 +18,6 @@ namespace ec2
     public:
         QnResourceNotificationManager() {}
 
-        void triggerNotification( const QnTransaction<ApiResourceData>& tran )
-        {
-            QnResourcePtr resource( new QnResource() );
-            fromApiToResource(tran.params, resource.data());
-            QnResourcePtr existResource = qnResPool->getResourceById(tran.params.id);
-            if (existResource)
-                resource->setFlags(existResource->flags());
-            emit resourceChanged( std::move(resource ));
-        }
-
         void triggerNotification( const QnTransaction<ApiResourceStatusData>& tran ) {
             emit statusChanged( QnUuid(tran.params.id), tran.params.status );
         }

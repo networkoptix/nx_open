@@ -184,7 +184,6 @@ namespace ec2
 
     signals:
         void statusChanged( const QnUuid& resourceId, Qn::ResourceStatus status );
-        void resourceChanged( const QnResourcePtr& resource );
         void resourceParamChanged( const ApiResourceParamWithRefData& param );
         void resourceRemoved( const QnUuid& resourceId );
 

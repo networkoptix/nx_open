@@ -133,7 +133,6 @@ namespace ec2
         case ApiCommand::getFullInfo:           return handleTransactionParams<ApiFullInfoData>         (serializedTransaction, serializationSupport, transaction, function, fastFunction);
         case ApiCommand::setResourceStatus:     return handleTransactionParams<ApiResourceStatusData>(serializedTransaction, serializationSupport, transaction, function, fastFunction);
         case ApiCommand::setResourceParam:      return handleTransactionParams<ApiResourceParamWithRefData>   (serializedTransaction, serializationSupport, transaction, function, fastFunction);
-        case ApiCommand::saveResource:          return handleTransactionParams<ApiResourceData>         (serializedTransaction, serializationSupport, transaction, function, fastFunction);
         case ApiCommand::saveCamera:            return handleTransactionParams<ApiCameraData>           (serializedTransaction, serializationSupport, transaction, function, fastFunction);
         case ApiCommand::saveCameras:           return handleTransactionParams<ApiCameraDataList>       (serializedTransaction, serializationSupport, transaction, function, fastFunction);
         case ApiCommand::saveCameraUserAttributes:

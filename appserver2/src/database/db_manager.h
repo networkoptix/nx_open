@@ -276,7 +276,6 @@ namespace ec2
         ErrorCode executeTransactionInternal(const QnTransaction<ApiServerFootageData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiStoredFileData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiStoredFilePath> &tran);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiResourceData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiBusinessRuleData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiUserData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiResetBusinessRuleData>& /*tran*/) {
@@ -447,13 +446,11 @@ namespace ec2
         ErrorCode deleteTableRecord(const qint32& internalId, const QString& tableName, const QString& fieldName);
 
         ErrorCode insertOrReplaceResource(const ApiResourceData& data, qint32* internalId);
-        //ErrorCode insertOrReplaceResource(const ApiResourceData& data);
         ErrorCode deleteRecordFromResourceTable(const qint32 id);
         ErrorCode removeObject(const ApiObjectInfo& apiObject);
 
         ErrorCode insertAddParam(const ApiResourceParamWithRefData& param);
         ErrorCode fetchResourceParams( const QnQueryFilter& filter, ApiResourceParamWithRefDataList& params );
-        //ErrorCode deleteAddParams(qint32 resourceId);
 
         ErrorCode saveCamera(const ApiCameraData& params);
         ErrorCode insertOrReplaceCamera(const ApiCameraData& data, qint32 internalId);
@@ -467,10 +464,8 @@ namespace ec2
 
         ErrorCode insertOrReplaceMediaServer(const ApiMediaServerData& data, qint32 internalId);
         ErrorCode insertOrReplaceMediaServerUserAttributes(const ApiMediaServerUserAttributesData& attrs);
-        //ErrorCode updateStorages(const ApiMediaServerData&);
         ErrorCode removeServer(const QnUuid& guid);
         ErrorCode removeMediaServerUserAttributes(const QnUuid& guid);
-        //ErrorCode removeStoragesByServer(const QnUuid& serverGUID);
 
         ErrorCode removeLayout(const QnUuid& id);
         ErrorCode removeLayoutInternal(const QnUuid& id, const qint32 &internalId);

@@ -66,7 +66,6 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiStorageDataList>& tran );
         void triggerNotification( const QnTransaction<ApiMediaServerUserAttributesData>& tran );
         void triggerNotification( const QnTransaction<ApiMediaServerUserAttributesDataList>& tran );
-        void triggerNotification( const QnTransaction<ApiResourceData>& tran );
         void triggerNotification( const QnTransaction<ApiResourceStatusData>& tran );
         void triggerNotification( const QnTransaction<ApiLicenseOverflowData>& tran );
         void triggerNotification( const QnTransaction<ApiResourceParamWithRefData>& tran );

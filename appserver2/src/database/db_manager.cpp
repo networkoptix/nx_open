@@ -2031,12 +2031,6 @@ ErrorCode QnDbManager::saveCameraUserAttributes( const ApiCameraAttributesData& 
     return updateCameraSchedule(attrs.scheduleTasks, internalId);
 }
 
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiResourceData>& tran)
-{
-    qint32 internalId;
-    return insertOrReplaceResource(tran.params, &internalId);
-}
-
 ErrorCode QnDbManager::insertBRuleResource(const QString& tableName, const QnUuid& ruleGuid, const QnUuid& resourceGuid)
 {
     QSqlQuery query(m_sdb);
