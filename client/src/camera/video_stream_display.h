@@ -165,6 +165,8 @@ private:
     bool getLastDecodedFrame( QnAbstractVideoDecoder* dec, QSharedPointer<CLVideoDecoderOutput>* const outFrame );
 
     void calcSampleAR(QSharedPointer<CLVideoDecoderOutput> outFrame, QnAbstractVideoDecoder* dec);
+
+    bool downscaleFrame(const CLVideoDecoderOutputPtr& src, const CLVideoDecoderOutputPtr& dst, QnFrameScaler::DownscaleFactor scaleFactor, PixelFormat pixFmt);
 };
 
 #endif //QN_VIDEO_STREAM_DISPLAY_H
