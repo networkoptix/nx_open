@@ -25,19 +25,9 @@ Rectangle
 
         spacing: 16;
 
-        property var currentExpandedItem: undefined;
-        function setExpandedItem(item)
+        property QtObject watcher: SingleActiveItemSelector
         {
-            var isExpanded = item.isExpanded;
-            if (isExpanded)
-            {
-                if (currentExpandedItem)
-                    currentExpandedItem.isExpanded = false;
-
-                currentExpandedItem = item;
-            }
-            else
-                currentExpandedItem = undefined;
+            variableName: "isExpanded";
         }
 
         Repeater
@@ -77,11 +67,7 @@ Rectangle
                 sourceComponent: (model.isCloudSystem
                     ? cloudSystemTile : localSystemTile);
 
-                Connections
-                {
-                    target: tileLoader.item;
-                    onIsExpandedChanged: { grid.setExpandedItem(tileLoader.item); }
-                }
+                onLoaded: grid.watcher.addItem(tileLoader.item);
             }
         }
     }

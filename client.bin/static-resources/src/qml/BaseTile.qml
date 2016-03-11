@@ -6,7 +6,7 @@ Rectangle
     id: thisComponent;
 
     property string systemName;
-    property Component collapsedAreaDelegate;
+    property Component centralAreaDelegate;
     property Component expandedAreaDelegate;
     property bool isExpanded: false;
 
@@ -19,6 +19,14 @@ Rectangle
     implicitHeight: 96;
 
     color: palette.button;  // TODO: setup color
+
+    MouseArea
+    {
+        anchors.fill: parent;
+
+        visible: !thisComponent.isExpanded;
+        onClicked: { toggle(); }
+    }
 
     Text
     {
@@ -56,25 +64,31 @@ Rectangle
 
     Loader
     {
-        id: loader;
+        id: centralAreaLoader;
 
         anchors.left: parent.left;
         anchors.right: parent.right;
         anchors.top: systemNameText.bottom;
+        anchors.bottom: expandedAreaLoader.top;
+
+        anchors.leftMargin: 12;
+        anchors.rightMargin: 16;
+        sourceComponent: thisComponent.centralAreaDelegate;
+    }
+
+    Loader
+    {
+        id: expandedAreaLoader;
+
+        anchors.left: parent.left;
+        anchors.right: parent.right;
+        anchors.top: centralAreaLoader.bottom;
         anchors.bottom: parent.bottom;
 
         anchors.leftMargin: 12;
         anchors.rightMargin: 16;
-        sourceComponent: (thisComponent.isExpanded ?
-            thisComponent.expandedAreaDelegate
-            : thisComponent.collapsedAreaDelegate);
-    }
 
-    MouseArea
-    {
-        anchors.fill: parent;
-
-        visible: !thisComponent.isExpanded;
-        onClicked: { toggle(); }
+        sourceComponent: (thisComponenet.isExpanded
+            ? thisComponent.expandedAreaDelegate :  undefined);
     }
 }

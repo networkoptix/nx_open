@@ -6,7 +6,7 @@ BaseTile
 
     property string userName;
 
-    collapsedAreaDelegate: Item
+    centralAreaDelegate: Item
     {
         Text
         {

@@ -2,60 +2,51 @@ import QtQuick 2.5;
 
 BaseTile
 {
-    id: thisComponenet;
+    id: thisComponent;
 
     property string host;
     property string userName;
     property bool isComaptible;
 
-    collapsedAreaDelegate: Grid
+    property QtObject activeItemSelector: SingleActiveItemSelector
     {
-        rows: 2;
-        columns: 2;
+        variableName: "isMasked";
+        onIsSomeoneActiveChanged:
+        {
+            if (isSomeoneActive)
+                thisComponent.isExpanded = true;
+        }
+    }
 
-        rowSpacing: 2;
-        columnSpacing: 4;
+    onIsExpandedChanged:
+    {
+        if (!isExpanded)
+            activeItemSelector.resetCurrentItem();
+    }
 
-        anchors.top: parent.top;
-        anchors.left: parent.left;
-        anchors.right: parent.right;
-        anchors.bottom: parent.bottom;
+    centralAreaDelegate: Column
+    {
+        anchors.top: (parent ? parent.top : undefined);
+        anchors.left: (parent ? parent.left : undefined);
+        anchors.right: (parent ? parent.right : undefined);
+        anchors.bottom: (parent ? parent.bottom : undefined);
 
         anchors.topMargin: 12;
         anchors.bottomMargin: 16;
 
-        Rectangle
+        InfoItem
         {
-            id: hostImage;
-            width: 16; height: 16; color: (thisComponenet.isComaptible ? "green" : "red");
+            text: thisComponent.host;
+            iconUrl: (isComaptible ? "non_empty_url" : "");// TODO: change to proper url
+
+            Component.onCompleted: activeItemSelector.addItem(this);    // TODO: add ActiveWatchable qml component?
         }
 
-        Text
+        InfoItem
         {
-            id: hostText;
+            text: thisComponent.userName;
 
-            text: thisComponenet.host;
-            color: thisComponenet.textColor;
-            font.pixelSize: thisComponenet.fontPixelSize;
-        }
-
-        Rectangle
-        {
-            id: userImage;
-            width: 16; height: 16; color: "white";
-        }
-
-        Text
-        {
-            id: userNameText;
-
-            text: thisComponenet.userName;
-            color: thisComponenet.textColor;
-            font.pixelSize: thisComponenet.fontPixelSize;
+            Component.onCompleted: activeItemSelector.addItem(this);
         }
     }
-
-    // TODO setup fonts
-    readonly property int fontPixelSize: 12;
-    readonly property color textColor: "white";
 }
