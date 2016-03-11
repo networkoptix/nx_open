@@ -117,7 +117,6 @@ private:
     QSize m_screenSize;
     int m_nativeStreamIndex;
     QMap<int, QString> m_nativeResolutions;
-    bool m_transcodingSupported;
     bool m_useTranscoding;
     Protocol m_transcodingProtocol;
     Protocol m_nativeProtocol;
