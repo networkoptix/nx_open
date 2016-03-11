@@ -23,11 +23,11 @@
         <global.libs>-lnx_utils -lnx_streaming -ludt</global.libs>
         <ffmpeg.libs/>
         <!--Specific os libs used-->
-        <windows.oslibs>-lcommon -lws2_32 DbgHelp.lib -lIphlpapi -lOle32 -lsigar -lSecur32 -lwinmm</windows.oslibs>
+        <windows.oslibs>-lcommon -lws2_32 DbgHelp.lib -lIphlpapi -lOle32  -lSecur32 -lwinmm</windows.oslibs>
         <windows.oslibs.release/>
         <windows.oslibs.debug/>
-        <linux.oslibs>-lsigar -lswscale</linux.oslibs>
-        <mac.oslibs>-framework IOKit -framework CoreFoundation  -lz -framework QtConcurrent -lsigar-universal64-macosx</mac.oslibs>
+        <linux.oslibs>-lswscale</linux.oslibs>
+        <mac.oslibs>-framework IOKit -framework CoreFoundation  -lz -framework QtConcurrent</mac.oslibs>
         <android.oslibs>-lz</android.oslibs>
         <!--Global defines-->
         <global.defines/>
