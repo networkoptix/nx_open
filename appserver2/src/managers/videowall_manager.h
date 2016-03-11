@@ -13,8 +13,8 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiVideowallData>& tran );
         void triggerNotification( const QnTransaction<ApiIdData>& tran );
         void triggerNotification(const QnTransaction<ApiVideowallControlMessageData>& tran);
-
     };
+
 
     template<class QueryProcessorType>
     class QnVideowallManager: public QnVideowallNotificationManager
@@ -31,9 +31,5 @@ namespace ec2
 
     private:
         QueryProcessorType* const m_queryProcessor;
-
-        QnTransaction<ApiVideowallData> prepareTransaction(ApiCommand::Value command, const ec2::ApiVideowallData& videowall);
-        QnTransaction<ApiIdData> prepareTransaction(ApiCommand::Value command, const QnUuid& id);
-        QnTransaction<ApiVideowallControlMessageData> prepareTransaction(ApiCommand::Value command, const ec2::ApiVideowallControlMessageData& message);
     };
 }

@@ -87,7 +87,7 @@ namespace ec2
         Q_ASSERT_X(!user.id.isNull(), Q_FUNC_INFO, "User id must be set before saving");
 
         const int reqID = generateRequestID();
-        auto tran = prepareTransaction( ApiCommand::saveUser, user);
+        QnTransaction<ApiUserData> tran(ApiCommand::saveUser, user);
         callSaveUserAsync( m_queryProcessor, tran, handler, reqID, user, newPassword);
         return reqID;
     }
@@ -96,26 +96,12 @@ namespace ec2
     int QnUserManager<QueryProcessorType>::remove( const QnUuid& id, impl::SimpleHandlerPtr handler )
     {
         const int reqID = generateRequestID();
-        auto tran = prepareTransaction( ApiCommand::removeUser, id );
+        QnTransaction<ApiIdData> tran(ApiCommand::removeUser, id);
         m_queryProcessor->processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
         {
             handler->done(reqID, errorCode);
         });
         return reqID;
-    }
-
-    template<class QueryProcessorType>
-    QnTransaction<ApiUserData> QnUserManager<QueryProcessorType>::prepareTransaction( ApiCommand::Value command, const ec2::ApiUserData& user )
-    {
-        return QnTransaction<ApiUserData>(command, user);
-    }
-
-    template<class QueryProcessorType>
-    QnTransaction<ApiIdData> QnUserManager<QueryProcessorType>::prepareTransaction( ApiCommand::Value command, const QnUuid& id )
-    {
-        QnTransaction<ApiIdData> tran(command);
-        tran.params.id = id;
-        return tran;
     }
 
     template class QnUserManager<ServerQueryProcessor>;

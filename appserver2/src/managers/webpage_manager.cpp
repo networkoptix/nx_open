@@ -43,7 +43,7 @@ namespace ec2
     int QnWebPageManager<QueryProcessorType>::save( const ec2::ApiWebPageData& webpage, impl::SimpleHandlerPtr handler )
     {
         const int reqID = generateRequestID();
-        auto tran = prepareTransaction(ApiCommand::saveWebPage, webpage);
+        QnTransaction<ApiWebPageData> tran(ApiCommand::saveWebPage, webpage);
         m_queryProcessor->processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
         {
             handler->done(reqID, errorCode);
@@ -55,26 +55,12 @@ namespace ec2
     int QnWebPageManager<QueryProcessorType>::remove( const QnUuid& id, impl::SimpleHandlerPtr handler )
     {
         const int reqID = generateRequestID();
-        auto tran = prepareTransaction(ApiCommand::removeWebPage, id);
+        QnTransaction<ApiIdData> tran(ApiCommand::removeWebPage, id);
         m_queryProcessor->processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
         {
             handler->done(reqID, errorCode);
         });
         return reqID;
-    }
-
-    template<class QueryProcessorType>
-    QnTransaction<ApiWebPageData> QnWebPageManager<QueryProcessorType>::prepareTransaction(ApiCommand::Value command, const ec2::ApiWebPageData& webpage)
-    {
-        return QnTransaction<ApiWebPageData>(command, webpage);
-    }
-
-    template<class QueryProcessorType>
-    QnTransaction<ApiIdData> QnWebPageManager<QueryProcessorType>::prepareTransaction(ApiCommand::Value command, const QnUuid &id)
-    {
-        QnTransaction<ApiIdData> tran(command);
-        tran.params.id = id;
-        return tran;
     }
 
     template class QnWebPageManager<ServerQueryProcessor>;

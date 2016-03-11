@@ -27,8 +27,5 @@ namespace ec2
 
     private:
         QueryProcessorType* const m_queryProcessor;
-
-        QnTransaction<ApiUserData> prepareTransaction( ApiCommand::Value command, const ec2::ApiUserData& user);
-        QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value command, const QnUuid& resource );
     };
 }

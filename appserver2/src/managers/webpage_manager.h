@@ -14,6 +14,7 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiIdData>& tran );
     };
 
+
     template<class QueryProcessorType>
     class QnWebPageManager: public QnWebPageNotificationManager
     {
@@ -27,8 +28,5 @@ namespace ec2
 
     private:
         QueryProcessorType* const m_queryProcessor;
-
-        QnTransaction<ApiWebPageData> prepareTransaction(ApiCommand::Value command, const ec2::ApiWebPageData& webpage);
-        QnTransaction<ApiIdData> prepareTransaction(ApiCommand::Value command, const QnUuid& id);
     };
 }

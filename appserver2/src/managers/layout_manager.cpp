@@ -54,7 +54,7 @@ namespace ec2
     int QnLayoutManager<QueryProcessorType>::save(const ec2::ApiLayoutData& layout, impl::SimpleHandlerPtr handler)
     {
         const int reqID = generateRequestID();
-        auto tran = prepareTransaction(ApiCommand::saveLayout, layout );
+        QnTransaction<ApiLayoutData> tran(ApiCommand::saveLayout, layout );
         m_queryProcessor->processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
         {
             handler->done(reqID, errorCode);
@@ -66,26 +66,12 @@ namespace ec2
     int QnLayoutManager<QueryProcessorType>::remove( const QnUuid& id, impl::SimpleHandlerPtr handler )
     {
         const int reqID = generateRequestID();
-        auto tran = prepareTransaction( ApiCommand::removeLayout, id );
+        QnTransaction<ApiIdData> tran( ApiCommand::removeLayout, id );
         m_queryProcessor->processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
         {
             handler->done(reqID, errorCode);
         });
         return reqID;
-    }
-
-    template<class T>
-    QnTransaction<ApiIdData> QnLayoutManager<T>::prepareTransaction( ApiCommand::Value command, const QnUuid& id )
-    {
-        QnTransaction<ApiIdData> tran(command);
-        tran.params.id = id;
-        return tran;
-    }
-
-    template<class T>
-    QnTransaction<ApiLayoutData> QnLayoutManager<T>::prepareTransaction( ApiCommand::Value command, const ec2::ApiLayoutData& layout )
-    {
-        return QnTransaction<ApiLayoutData>(command, layout);
     }
 
     template class QnLayoutManager<FixedUrlClientQueryProcessor>;
