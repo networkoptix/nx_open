@@ -8,7 +8,7 @@ BaseTile
     property string userName;
     property bool isComaptible;
 
-    areaDelegate: Grid
+    collapsedAreaDelegate: Grid
     {
         rows: 2;
         columns: 2;

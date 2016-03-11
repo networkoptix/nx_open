@@ -15,6 +15,8 @@ Rectangle
 
     Grid
     {
+        id: grid;
+
         anchors.centerIn: parent;
 
         rows: (itemsSource.count > 3 ? 2 : 1);
@@ -23,13 +25,31 @@ Rectangle
 
         spacing: 16;
 
+        property var currentExpandedItem: undefined;
+        function setExpandedItem(item)
+        {
+            var isExpanded = item.isExpanded;
+            if (isExpanded)
+            {
+                if (currentExpandedItem)
+                    currentExpandedItem.isExpanded = false;
+
+                currentExpandedItem = item;
+            }
+            else
+                currentExpandedItem = undefined;
+        }
+
         Repeater
         {
             id: itemsSource;
+
             model: QnSystemsModel {}
 
             delegate: Loader
             {
+                id: tileLoader;
+
                 Component
                 {
                     id: localSystemTile;
@@ -56,6 +76,12 @@ Rectangle
 
                 sourceComponent: (model.isCloudSystem
                     ? cloudSystemTile : localSystemTile);
+
+                Connections
+                {
+                    target: tileLoader.item;
+                    onIsExpandedChanged: { grid.setExpandedItem(tileLoader.item); }
+                }
             }
         }
     }
