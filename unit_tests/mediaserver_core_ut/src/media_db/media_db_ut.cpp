@@ -808,7 +808,7 @@ TEST(MediaDb_test, StorageDB)
                                         !tc.isVisited && !tc.isDeleted && tc.chunk == *chunkIt;
                              });
             bool tcmChunkFound = tcmIt != tcm.get().end();
-            ASSERT_TRUE(tcmChunkFound);
+            EXPECT_TRUE(tcmChunkFound);
             if (tcmChunkFound)
                 tcmIt->isVisited = true;
         }
