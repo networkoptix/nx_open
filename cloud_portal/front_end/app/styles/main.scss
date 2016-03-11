@@ -216,6 +216,13 @@ footer {
   margin: 16px 0;
 }
 
+
+@media (max-width: $grid-float-breakpoint-max) {
+  .navbar-collapse .vertical-bar{
+    display: none;
+  }
+}
+
 /* add beta-symbol after product name everywhere */
 .product-name:after{
   content: "(\03B2)";
@@ -261,8 +268,6 @@ a .product-name:after {
     }
   }
 }
-
-
 
 @media (min-width: $screen-sm-min) {
   // Automatically set modal's width for larger viewports

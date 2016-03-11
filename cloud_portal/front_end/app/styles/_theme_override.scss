@@ -34,6 +34,23 @@ $font-size-a-bit-large:   ceil($font-size-base * 1.15); //~16px - we just need 1
   font-size: $font-size-large;
 }
 
+@media (max-width: $grid-float-breakpoint-max) {
+  .navbar-collapse{
+    .nav > li > a {
+      padding: 6px 8px;
+    }
+    .nav > li > .btn-wrapper {
+      padding: 4px 8px;
+      width: 100%;
+      a {
+        width: 100%;
+      }
+    }
+    .navbar-nav {
+      margin: 0px;
+    }
+  }
+}
 .nav .dropdown-menu > li > a{
   padding: 6px 16px;
   font-size: $font-size-base;
@@ -101,8 +118,10 @@ h1>.label{
     text-align: left;
   }
 
-  .modal-dialog {
-    width: 400px;
+  @media (min-width: $grid-float-breakpoint) {
+    .modal-dialog {
+      width: 400px;
+    }
   }
 
   .modal-header .close{
