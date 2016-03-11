@@ -1,6 +1,7 @@
 #include "delayed.h"
 
 #include <QtCore/QTimer>
+#include <nx/utils/log/assert.h>
 
 namespace
 {
@@ -9,7 +10,7 @@ namespace
         , QThread *targetThread
         , QObject *parent)
     {
-        Q_ASSERT_X(!(targetThread && parent), Q_FUNC_INFO, "Invalid thread and parent parameters");
+        NX_ASSERT(!(targetThread && parent), Q_FUNC_INFO, "Invalid thread and parent parameters");
 
         QTimer *timer = new QTimer(parent);
         timer->setInterval(delayMs);

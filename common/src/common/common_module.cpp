@@ -147,7 +147,7 @@ QnModuleInformation QnCommonModule::moduleInformation() const
 void QnCommonModule::loadResourceData(QnResourceDataPool *dataPool, const QString &fileName, bool required) {
     bool loaded = QFile::exists(fileName) && dataPool->load(fileName);
 
-    Q_ASSERT_X(!required || loaded, Q_FUNC_INFO, "Can't parse resource_data.json file!");  /* Getting an assert here? Something is wrong with resource data json file. */
+    NX_ASSERT(!required || loaded, Q_FUNC_INFO, "Can't parse resource_data.json file!");  /* Getting an NX_ASSERT here? Something is wrong with resource data json file. */
 }
 
 void QnCommonModule::updateModuleInformation() {

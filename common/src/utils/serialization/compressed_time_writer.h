@@ -72,7 +72,7 @@ private:
     
     void encodeUnsignedNumber(qint64 value)
     {
-        assert(value >= 0 && value < 0x1000000000000ll);
+        NX_ASSERT(value >= 0 && value < 0x1000000000000ll);
         if (value < 0x4000ll)
             saveField(value, 0, 2);
         else if (value < 0x400000ll)
@@ -90,7 +90,7 @@ private:
          
     void encodeSignedNumber(qint64 value)
     {
-        assert(value >= -800000000000ll && value < 0x800000000000ll);
+        NX_ASSERT(value >= -800000000000ll && value < 0x800000000000ll);
         if (value < 0x2000ll && value >= -0x2000ll)
             saveField(value + 0x2000ll, 0, 2);
         else if (value < 0x200000ll && value >= -0x200000ll)

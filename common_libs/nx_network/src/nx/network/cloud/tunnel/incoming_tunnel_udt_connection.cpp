@@ -52,7 +52,7 @@ void IncomingTunnelUdtConnection::accept(std::function<void(
     SystemError::ErrorCode,
     std::unique_ptr<AbstractStreamSocket>)> handler)
 {
-    Q_ASSERT_X(!m_acceptHandler, Q_FUNC_INFO, "Concurent accept");
+    NX_ASSERT(!m_acceptHandler, Q_FUNC_INFO, "Concurent accept");
     m_connectionSocket->post(
         [this, handler = std::move(handler)]()
         {
@@ -118,10 +118,14 @@ void IncomingTunnelUdtConnection::readRequest()
     m_connectionBuffer.resize(0);
     m_connectionSocket->readSomeAsync(
         &m_connectionBuffer,
-        [this](SystemError::ErrorCode code, size_t)
+        [this](SystemError::ErrorCode code, size_t bytesRead)
         {
+            NX_ASSERT(code != SystemError::timedOut);
             if (code != SystemError::noError)
                 return connectionSocketError(code);
+
+            if (bytesRead == 0)
+                return connectionSocketError(SystemError::connectionReset);
 
             m_lastKeepAlive = std::chrono::system_clock::now();
             size_t processed = 0;

@@ -141,6 +141,7 @@ nxcip::StreamReader* MediaEncoder::getLiveStreamReader()
 
 int MediaEncoder::getAudioFormat( nxcip::AudioFormat* audioFormat ) const
 {
+    static_cast<void>( audioFormat );
     return nxcip::NX_UNSUPPORTED_CODEC;
 }
 

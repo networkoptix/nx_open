@@ -114,7 +114,7 @@ void QnMediaServerResource::atResourceChanged()
 
 QString QnMediaServerResource::getUniqueId() const
 {
-    assert(!getId().isNull());
+    NX_ASSERT(!getId().isNull());
     return QLatin1String("Server ") + getId().toString();
 }
 
@@ -490,7 +490,7 @@ QnModuleInformation QnMediaServerResource::getModuleInformation() const {
 }
 
 void QnMediaServerResource::setFakeServerModuleInformation(const QnModuleInformationWithAddresses &moduleInformation) {
-    Q_ASSERT_X(isFakeServer(toSharedPointer()), Q_FUNC_INFO, "Only fake servers should be set this way");
+    NX_ASSERT(isFakeServer(toSharedPointer()), Q_FUNC_INFO, "Only fake servers should be set this way");
 
     QList<SocketAddress> addressList;
     for (const QString &address: moduleInformation.remoteAddresses)
@@ -553,7 +553,7 @@ void QnMediaServerResource::setStatus(Qn::ResourceStatus newStatus, bool silence
         {
             QnMutexLocker lock( &m_mutex );
             m_statusTimer.restart();
-            Q_ASSERT_X(newStatus == Qn::Incompatible || newStatus == Qn::Unauthorized || m_originalGuid.isNull(),
+            NX_ASSERT(newStatus == Qn::Incompatible || newStatus == Qn::Unauthorized || m_originalGuid.isNull(),
                        Q_FUNC_INFO,
                        "Incompatible servers should not take any status but incompatible or unauthorized");
         }

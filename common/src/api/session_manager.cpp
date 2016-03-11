@@ -60,7 +60,7 @@ QnSessionManager::QnSessionManager(QObject *parent):
     connect(this, SIGNAL(aboutToBeStarted()), this, SLOT(at_aboutToBeStarted()));
 
     m_thread->setObjectName( QLatin1String("QnSessionManagerThread") ); /* Name will be shown in debugger. */
-    Q_ASSERT(parent == 0);
+    NX_ASSERT(parent == 0);
     this->moveToThread(m_thread.data());
 
     m_thread->start();
@@ -112,7 +112,7 @@ void QnSessionManager::at_replyReceived(QNetworkReply * reply)
 }
 
 QnSessionManager *QnSessionManager::instance() {
-    Q_ASSERT_X(qnCommon->instance<QnSessionManager>(), Q_FUNC_INFO, "Make sure session manager exists");
+    NX_ASSERT(qnCommon->instance<QnSessionManager>(), Q_FUNC_INFO, "Make sure session manager exists");
     return qnCommon->instance<QnSessionManager>();
 }
 
@@ -191,7 +191,7 @@ void QnSessionManager::at_SyncRequestFinished(const QnHTTPRawResponse& response,
 {
     QnMutexLocker lock( &m_syncReplyMutex );
     QnSessionManagerSyncReply* reply = m_syncReplyInProgress.value(handle);
-    Q_ASSERT(reply);
+    NX_ASSERT(reply);
     if (reply)
         reply->requestFinished(response, handle);
 }
@@ -220,7 +220,7 @@ int QnSessionManager::sendSyncPostRequest(const QUrl& url, const QString &object
 int QnSessionManager::sendAsyncRequest(int operation, const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, QObject *target, const char *slot, Qt::ConnectionType connectionType) 
 {
     //if you want receive response make sure you have event loop in calling thread
-    Q_ASSERT( qnHasEventLoop(QThread::currentThread()) || (!target) );
+    NX_ASSERT( qnHasEventLoop(QThread::currentThread()) || (!target) );
     if( !qnHasEventLoop(QThread::currentThread()) && target )
     {
         NX_LOG( QString::fromLatin1("QnSessionManager::sendAsyncRequest. No event loop in current thread, "
@@ -276,7 +276,7 @@ int QnSessionManager::sendAsyncDeleteRequest(const QUrl& url, const QString &obj
 // QnSessionManager :: handlers
 // -------------------------------------------------------------------------- //
 void QnSessionManager::at_aboutToBeStarted() {
-    Q_ASSERT(QThread::currentThread() == this->thread());
+    NX_ASSERT(QThread::currentThread() == this->thread());
 
     QnMutexLocker locker( &m_accessManagerMutex );
     if (m_accessManager)
@@ -292,7 +292,7 @@ void QnSessionManager::at_aboutToBeStarted() {
 }
 
 void QnSessionManager::at_aboutToBeStopped() {
-    Q_ASSERT(QThread::currentThread() == this->thread());
+    NX_ASSERT(QThread::currentThread() == this->thread());
 
     QnMutexLocker locker( &m_accessManagerMutex );
     if (!m_accessManager)
@@ -339,7 +339,7 @@ void QnSessionManager::at_authenticationRequired(QNetworkReply* reply, QAuthenti
 void QnSessionManager::at_asyncRequestQueued(int operation, AsyncRequestInfo reqInfo, const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, 
                                              const QnRequestParamList &params, const QByteArray& data) 
 {
-    Q_ASSERT(QThread::currentThread() == this->thread());
+    NX_ASSERT(QThread::currentThread() == this->thread());
 
     {
         QnMutexLocker lock( &m_accessManagerMutex );

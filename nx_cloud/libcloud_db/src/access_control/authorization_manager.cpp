@@ -104,7 +104,7 @@ bool AuthorizationManager::authorize(
     if (auto authorized = resProxy.take())
         return authorized.get();
     //no "autorized" attr has been set. This is actually error in authorization rules xml
-    Q_ASSERT(false);
+    NX_ASSERT(false);
     NX_LOG(lit("No \"authorized\" attribute has been set by authorization tree traversal"), cl_logWARNING);
     return false;
 }

@@ -146,7 +146,7 @@ namespace aux
         {
             // Generally, third-party storages aren't supposed to
             // support truncating.
-            assert(false);
+            NX_ASSERT(false);
             return false;
         }
 

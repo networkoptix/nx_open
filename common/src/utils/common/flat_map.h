@@ -2,6 +2,7 @@
 #define QN_FLAT_MAP_H
 
 #include <cassert>
+#include <nx/utils/log/assert.h>
 
 #include <vector>
 #include <type_traits> /* For std::is_empty and std::is_unsigned. */
@@ -35,7 +36,7 @@ namespace QnFlatMapDetail {
 
     template<class Container, class Key, class Factory>
     inline typename Container::value_type safe_value(const Container &list, const Key &key, const Factory &factory) {
-        assert(key >= 0);
+        NX_ASSERT(key >= 0);
 
         if(key >= static_cast<Key>(list.size()))
             return factory();
@@ -45,7 +46,7 @@ namespace QnFlatMapDetail {
 
     template<class Container, class Key, class Factory>
     inline typename Container::value_type &safe_reference(Container &list, const Key &key, const Factory &factory) {
-        assert(key >= 0);
+        NX_ASSERT(key >= 0);
 
         while(key >= static_cast<Key>(list.size()))
             list.push_back(factory());

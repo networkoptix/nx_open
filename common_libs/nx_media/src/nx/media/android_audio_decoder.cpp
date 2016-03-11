@@ -1,5 +1,7 @@
 #include "android_audio_decoder.h"
 
+#if defined(Q_OS_ANDROID)
+
 #include <deque>
 
 #include <QtGui/QOpenGLContext>
@@ -12,9 +14,7 @@
 #include <QtOpenGL/QtOpenGL>
 #include <QMap>
 
-#include <utils/thread/mutex.h>
-
-#if defined(Q_OS_ANDROID)
+#include <nx/utils/thread/mutex.h>
 
 #include <QAndroidJniObject>
 #include <QAndroidJniEnvironment>

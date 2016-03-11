@@ -52,7 +52,7 @@ namespace QJson {
 
     template<class T>
     void serialize(QnJsonContext *ctx, const T &value, QJsonValueRef *target) {
-        assert(target);
+        NX_ASSERT(target);
 
         QJsonValue jsonValue;
         QnSerialization::serialize(ctx, value, &jsonValue);
@@ -61,7 +61,7 @@ namespace QJson {
 
     template<class T>
     void serialize(QnJsonContext *ctx, const T &value, const QString &key, QJsonObject *target) {
-        assert(target);
+        NX_ASSERT(target);
 
         QJsonValueRef jsonValue = (*target)[key];
         QJson::serialize(ctx, value, &jsonValue);
@@ -76,7 +76,7 @@ namespace QJson {
      */
     template<class T>
     void serialize(QnJsonContext *ctx, const T &value, QByteArray *target) {
-        assert(target);
+        NX_ASSERT(target);
 
         QJsonValue jsonValue;
         QJson::serialize(ctx, value, &jsonValue);
@@ -156,7 +156,7 @@ namespace QJson {
      */
     template<class T>
     bool deserialize(QnJsonContext *ctx, const QByteArray &value, T *target) {
-        assert(target);
+        NX_ASSERT(target);
 
         QJsonValue jsonValue;
         if(!QJsonDetail::deserialize_json(value, &jsonValue))

@@ -452,9 +452,9 @@ void QnStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int stre
     for (size_t i = 0; i < m_recordingContextVector.size(); ++i)
     {
         AVStream* stream = m_recordingContextVector[i].formatCtx->streams[streamIndex];
-        Q_ASSERT(stream->time_base.num && stream->time_base.den);
+        NX_ASSERT(stream->time_base.num && stream->time_base.den);
 
-        Q_ASSERT(md->timestamp >= 0);
+        NX_ASSERT(md->timestamp >= 0);
 
         AVPacket avPkt;
         av_init_packet(&avPkt);
@@ -536,8 +536,8 @@ void QnStreamRecorder::endOfRun()
 bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& mediaData)
 {
     m_mediaProvider = dynamic_cast<QnAbstractMediaStreamDataProvider*> (mediaData->dataProvider);
-    Q_ASSERT(m_mediaProvider);
-    //Q_ASSERT(mediaData->flags & AV_PKT_FLAG_KEY);
+    NX_ASSERT(m_mediaProvider);
+    //NX_ASSERT(mediaData->flags & AV_PKT_FLAG_KEY);
 
     m_endDateTime = m_startDateTime = mediaData->timestamp;
 
@@ -938,7 +938,7 @@ bool QnStreamRecorder::saveMotion(const QnConstMetaDataV1Ptr& motion)
 
 void QnStreamRecorder::getStoragesAndFileNames(QnAbstractMediaStreamDataProvider* provider)
 {
-    assert(!m_recordingContextVector.empty());  // if you are here check that you've called 
+    NX_ASSERT(!m_recordingContextVector.empty());  // if you are here check that you've called 
     Q_UNUSED(provider);                         // addRecordingContext() before.
 }
 

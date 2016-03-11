@@ -8,6 +8,7 @@
 #include <utils/common/stoppable.h>
 
 #include "abstract_tunnel_connector.h"
+#include "nx/network/aio/timer.h"
 #include "nx/network/system_socket.h"
 #include "tunnel.h"
 
@@ -41,11 +42,12 @@ public:
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
     /** Establish new connection.
-    * \param socketAttributes attribute values to apply to a newly-created socket
+    * @param timeout Zero means no timeout
+    * @param socketAttributes attribute values to apply to a newly-created socket
     * \note This method is re-enterable. So, it can be called in
     *        different threads simultaneously */
     void establishNewConnection(
-        boost::optional<std::chrono::milliseconds> timeout,
+        std::chrono::milliseconds timeout,
         SocketAttributes socketAttributes,
         NewConnectionHandler handler);
     /** same as above, but no timeout */
@@ -57,7 +59,8 @@ private:
     struct ConnectionRequestData
     {
         SocketAttributes socketAttributes;
-        boost::optional<std::chrono::milliseconds> timeout;
+        /** zero - no timeout */
+        std::chrono::milliseconds timeout;
         NewConnectionHandler handler;
     };
 
@@ -68,7 +71,7 @@ private:
         ConnectionRequestData> m_connectHandlers;
     std::map<CloudConnectType, std::unique_ptr<AbstractTunnelConnector>> m_connectors;
     //TODO #ak replace with aio timer when it is available
-    UDPSocket m_aioThreadBinder;
+    aio::Timer m_timer;
     bool m_terminated;
     boost::optional<std::chrono::steady_clock::time_point> m_timerTargetClock;
     int m_counter;

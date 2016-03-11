@@ -53,7 +53,7 @@ public:
     void addServer()
     {
         m_udpServers.emplace_back(std::make_unique<UDPServer>(m_messageDispatcher));
-        assert(m_udpServers.back()->listen());
+        NX_ASSERT(m_udpServers.back()->listen());
     }
 
     /** returns endpoint of any server */
@@ -302,7 +302,7 @@ TEST_F(StunUDP, client_cancellation)
             SystemError::ErrorCode errorCode,
             nx::stun::Message /*response*/)
         {
-            assert(errorCode == SystemError::interrupted);
+            NX_ASSERT(errorCode == SystemError::interrupted);
             ++errorsReported;
         };
 

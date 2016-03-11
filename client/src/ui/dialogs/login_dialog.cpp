@@ -50,6 +50,7 @@
 
 #include "compatibility.h"
 #include <utils/common/app_info.h>
+#include <ui/style/custom_style.h>
 
 namespace {
     void setEnabled(const QObjectList &objects, QObject *exclude, bool enabled) {
@@ -104,6 +105,8 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
     m_renderingWidget(NULL)
 {
     ui->setupUi(this);
+
+    setAccentStyle(ui->buttonBox->button(QDialogButtonBox::Ok));
 
     setWindowTitle(tr("Connect to Server..."));
     setHelpTopic(this, Qn::Login_Help);

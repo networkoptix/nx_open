@@ -63,7 +63,7 @@ namespace nx_http
                     //}
                     //else
                     //{
-                    //    Q_ASSERT( data.size()-offset >= m_startBoundaryLine.size() );
+                    //    NX_ASSERT( data.size()-offset >= m_startBoundaryLine.size() );
                     //    if( data.mid(offset) == m_startBoundaryLine )
                     //        m_state = readingHeaders;
                     //    offset += m_startBoundaryLine.size();

@@ -41,11 +41,11 @@ TEST_F(MediatorFunctionalTest, udp_transport)
     for (int i = 0; i < system1Servers.size(); ++i)
     {
         //sending resolve request
-        api::ResolveRequest request(system1Servers[i]->serverId() + "." + system1.id);
+        api::ResolvePeerRequest request(system1Servers[i]->serverId() + "." + system1.id);
         nx::stun::Message requestMessage(
             stun::Header(
                 nx::stun::MessageClass::request,
-                nx::stun::cc::methods::resolve));
+                nx::stun::cc::methods::resolvePeer));
         request.serialize(&requestMessage);
         messageSerializer.setMessage(&requestMessage);
         nx::Buffer sendBuffer;
@@ -66,7 +66,7 @@ TEST_F(MediatorFunctionalTest, udp_transport)
         messageParser.setMessage(&responseMessage);
         size_t bytesParsed = 0;
         ASSERT_EQ(nx_api::ParserState::done, messageParser.parse(recvBuffer, &bytesParsed));
-        api::ResolveResponse responseData;
+        api::ResolvePeerResponse responseData;
         ASSERT_TRUE(responseData.parse(responseMessage));
 
         //checking response

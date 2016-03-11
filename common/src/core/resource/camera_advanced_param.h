@@ -29,6 +29,12 @@ public:
     bool differsFrom(const QnCameraAdvancedParamValueMap &other) const;
 };
 
+struct QnCameraAdvancedParamQueryInfo
+{
+    QString group;
+    QString cmd;
+};
+
 struct QnCameraAdvancedParameter {
     enum class DataType {
         None,

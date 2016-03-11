@@ -7,12 +7,14 @@
 #include <utils/common/systemerror.h>
 
 #include <nx/network/socket.h>
+#include <nx/network/socket_global.h>
 
 // ------------------------ QnTcpListenerPrivate ---------------------------
 
 class QnTcpListenerPrivate
 {
 public:
+    nx::network::SocketGlobals::InitGuard socketGlobalsInitGuard;
     AbstractStreamServerSocket* serverSocket;
     QList<QnLongRunnable*> connections;
     QByteArray authDigest;

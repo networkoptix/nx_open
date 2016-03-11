@@ -24,12 +24,12 @@ OutgoingTunnel::OutgoingTunnel(AddressEntry targetPeerAddress)
     m_terminated(false),
     m_counter(0)
 {
-    m_aioThreadBinder.getAioThread();   //binds to aio thread
+    m_timer.getAioThread();   //binds to aio thread
 }
 
 OutgoingTunnel::~OutgoingTunnel()
 {
-    assert(m_terminated);
+    NX_ASSERT(m_terminated);
 }
 
 void OutgoingTunnel::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
@@ -43,7 +43,7 @@ void OutgoingTunnel::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
         BarrierHandler barrier(
             [this, handler = std::move(handler)]() mutable
             {
-                m_aioThreadBinder.post(
+                m_timer.post(
                     [this, handler = std::move(handler)]() mutable
                     {
                         connectorsTerminated(std::move(handler));
@@ -85,10 +85,10 @@ void OutgoingTunnel::connectorsTerminatedNonSafe(
 void OutgoingTunnel::connectionTerminated(
     nx::utils::MoveOnlyFunc<void()> pleaseStopCompletionHandler)
 {
-    m_aioThreadBinder.post(
+    m_timer.post(
         [this, handler = std::move(pleaseStopCompletionHandler)]() mutable
         {
-            m_aioThreadBinder.pleaseStopSync();
+            m_timer.pleaseStopSync();
             {
                 //waiting for OutgoingTunnel::pleaseStop still running in another thread to return
                 QnMutexLocker lk(&m_mutex);
@@ -98,12 +98,12 @@ void OutgoingTunnel::connectionTerminated(
 }
 
 void OutgoingTunnel::establishNewConnection(
-    boost::optional<std::chrono::milliseconds> timeout,
+    std::chrono::milliseconds timeout,
     SocketAttributes socketAttributes,
     NewConnectionHandler handler)
 {
     QnMutexLocker lk(&m_mutex);
-    assert(!m_terminated);
+    NX_ASSERT(!m_terminated);
 
     switch(m_state)
     {
@@ -128,7 +128,7 @@ void OutgoingTunnel::establishNewConnection(
 
         case State::kClosed:
             lk.unlock();
-            m_aioThreadBinder.post(
+            m_timer.post(
                 std::bind(handler, SystemError::connectionReset, nullptr));
             break;
 
@@ -139,25 +139,25 @@ void OutgoingTunnel::establishNewConnection(
         {
             //saving handler for later use
             const auto timeoutTimePoint =
-                timeout
-                ? std::chrono::steady_clock::now() + timeout.get()
+                timeout > std::chrono::milliseconds::zero()
+                ? std::chrono::steady_clock::now() + timeout
                 : std::chrono::steady_clock::time_point::max();
             ConnectionRequestData data;
             data.socketAttributes = std::move(socketAttributes);
-            data.timeout = std::move(timeout);
+            data.timeout = timeout;
             data.handler = std::move(handler);
             m_connectHandlers.emplace(timeoutTimePoint, std::move(data));
 
-            m_aioThreadBinder.post(std::bind(&OutgoingTunnel::updateTimerIfNeeded, this));
+            m_timer.post(std::bind(&OutgoingTunnel::updateTimerIfNeeded, this));
             break;
         }
 
         default:
-            Q_ASSERT_X(
+            NX_ASSERT(
                 false,
                 Q_FUNC_INFO,
-                lm("Unexpected state %1").
-                    arg(stateToString(m_state)).toStdString().c_str());
+                lm("Unexpected state %1")
+                    .arg(stateToString(m_state)).toStdString().c_str());
             break;
     }
 }
@@ -167,7 +167,7 @@ void OutgoingTunnel::establishNewConnection(
     NewConnectionHandler handler)
 {
     establishNewConnection(
-        boost::none,
+        std::chrono::milliseconds::zero(),
         std::move(socketAttributes),
         std::move(handler));
 }
@@ -186,13 +186,15 @@ void OutgoingTunnel::updateTimerIfNeededNonSafe(
         (!m_timerTargetClock || *m_timerTargetClock > m_connectHandlers.begin()->first))
     {
         //cancelling current timer
-        m_aioThreadBinder.cancelIOSync(aio::etTimedOut);
+        m_timer.cancelSync();
 
         //starting new timer
         m_timerTargetClock = m_connectHandlers.begin()->first;
-        assert(m_connectHandlers.begin()->first > curTime);
-        const auto timeout = m_connectHandlers.begin()->first - curTime;
-        m_aioThreadBinder.registerTimer(
+        const auto timeout =
+            m_connectHandlers.begin()->first > curTime
+            ? (m_connectHandlers.begin()->first - curTime)
+            : std::chrono::milliseconds::zero();    //timeout has already expired
+        m_timer.start(
             std::chrono::duration_cast<std::chrono::milliseconds>(timeout),
             std::bind(&OutgoingTunnel::onTimer, this));
     }
@@ -241,7 +243,7 @@ void OutgoingTunnel::onConnectFinished(
 
 void OutgoingTunnel::onTunnelClosed()
 {
-    m_aioThreadBinder.dispatch(
+    m_timer.dispatch(
         [this]()
         {
             std::function<void(State)> tunnelClosedHandler;
@@ -268,7 +270,7 @@ void OutgoingTunnel::startAsyncTunnelConnect(QnMutexLockerBase* const /*locker*/
                 SystemError::ErrorCode errorCode,
                 std::unique_ptr<AbstractOutgoingTunnelConnection> connection)
             {
-                m_aioThreadBinder.post(
+                m_timer.post(
                     [this, connectorType, errorCode, connection = move(connection)]() mutable
                     {
                         onConnectorFinished(
@@ -307,11 +309,10 @@ void OutgoingTunnel::onConnectorFinished(
         for (auto& connectRequest: m_connectHandlers)
         {
             using namespace std::placeholders;
-            auto handler = std::move(connectRequest.second.handler);
             m_connection->establishNewConnection(
-                std::move(connectRequest.second.timeout),   //TODO #ak recalculate timeout
+                connectRequest.second.timeout,   //TODO #ak recalculate timeout
                 std::move(connectRequest.second.socketAttributes),
-                [handler, this](    //TODO #ak #msvc2015 move to lambda
+                [handler = std::move(connectRequest.second.handler), this](
                     SystemError::ErrorCode errorCode,
                     std::unique_ptr<AbstractStreamSocket> socket,
                     bool tunnelStillValid)

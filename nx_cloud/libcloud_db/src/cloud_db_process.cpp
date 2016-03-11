@@ -22,6 +22,7 @@
 #include <nx/utils/log/log.h>
 #include <utils/common/systemerror.h>
 #include <utils/db/db_structure_updater.h>
+#include <utils/common/guard.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/http/server/http_message_dispatcher.h>
 
@@ -84,8 +85,22 @@ void CloudDBProcess::pleaseStop()
         application()->quit();
 }
 
+void CloudDBProcess::setOnStartedEventHandler(
+    nx::utils::MoveOnlyFunc<void(bool /*result*/)> handler)
+{
+    m_startedEventHandler = std::move(handler);
+}
+
 int CloudDBProcess::executeApplication()
 {
+    bool processStartResult = false;
+    auto triggerOnStartedEventHandlerGuard = makeScopedGuard(
+        [this, &processStartResult]
+        {
+            if (m_startedEventHandler)
+                m_startedEventHandler(processStartResult);
+        });
+
     try
     {
         //reading settings
@@ -188,11 +203,14 @@ int CloudDBProcess::executeApplication()
         NX_LOG( lit( "%1 has been started" ).arg(QN_APPLICATION_NAME), cl_logALWAYS );
         std::cout << QN_APPLICATION_NAME <<" has been started" << std::endl;
 
-        //TODO #ak remove qt event loop
-        //application's main loop
+        processStartResult = true;
+        triggerOnStartedEventHandlerGuard.fire();
 
         //starting timer to check for m_terminated again after event loop start
         m_timerID = application()->startTimer(0);
+
+        //TODO #ak remove qt event loop
+        //application's main loop
         const int result = application()->exec();
     
         return result;

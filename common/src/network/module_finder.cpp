@@ -466,7 +466,7 @@ void QnModuleFinder::at_timer_timeout()
 void QnModuleFinder::at_server_auxUrlsChanged(const QnResourcePtr &resource)
 {
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-    Q_ASSERT_X(!server.isNull(), Q_FUNC_INFO, "server resource is expected");
+    NX_ASSERT(!server.isNull(), Q_FUNC_INFO, "server resource is expected");
     if (!server)
         return;
 

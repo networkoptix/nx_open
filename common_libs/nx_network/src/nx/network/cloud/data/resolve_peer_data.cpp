@@ -1,9 +1,4 @@
-/**********************************************************
-* Dec 22, 2015
-* akolesnikov
-***********************************************************/
-
-#include "resolve_data.h"
+#include "resolve_peer_data.h"
 
 #include <nx/network/stun/cc/custom_stun.h>
 
@@ -12,41 +7,41 @@ namespace nx {
 namespace hpm {
 namespace api {
 
-ResolveRequest::ResolveRequest()
+ResolvePeerRequest::ResolvePeerRequest()
 {
 }
 
-ResolveRequest::ResolveRequest(nx::String _hostName)
+ResolvePeerRequest::ResolvePeerRequest(nx::String _hostName)
 :
     hostName(std::move(_hostName))
 {
 }
 
-void ResolveRequest::serialize(nx::stun::Message* const message)
+void ResolvePeerRequest::serialize(nx::stun::Message* const message)
 {
     message->newAttribute<stun::cc::attrs::HostName>(hostName);
 }
 
-bool ResolveRequest::parse(const nx::stun::Message& message)
+bool ResolvePeerRequest::parse(const nx::stun::Message& message)
 {
     return readStringAttributeValue<stun::cc::attrs::HostName>(message, &hostName);
 }
 
 
-ResolveResponse::ResolveResponse()
+ResolvePeerResponse::ResolvePeerResponse()
 :
     connectionMethods(0)
 {
 }
 
-void ResolveResponse::serialize(nx::stun::Message* const message)
+void ResolvePeerResponse::serialize(nx::stun::Message* const message)
 {
     message->newAttribute< stun::cc::attrs::PublicEndpointList >(std::move(endpoints));
     message->newAttribute< stun::cc::attrs::ConnectionMethods >(
         nx::String::number(static_cast<qulonglong>(connectionMethods)));
 }
 
-bool ResolveResponse::parse(const nx::stun::Message& message)
+bool ResolvePeerResponse::parse(const nx::stun::Message& message)
 {
     if (!readAttributeValue<stun::cc::attrs::PublicEndpointList>(message, &endpoints))
         return false;

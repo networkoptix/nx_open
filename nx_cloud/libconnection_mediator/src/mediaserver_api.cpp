@@ -22,7 +22,7 @@ MediaserverApiBase::MediaserverApiBase( AbstractCloudDataProvider* cloudData,
                 { ping(std::move(connection), std::move(message)); });
 
     // TODO: NX_LOG
-    Q_ASSERT_X( result, Q_FUNC_INFO, "Could not register ping processor" );
+    NX_ASSERT( result, Q_FUNC_INFO, "Could not register ping processor" );
 }
 
 struct PingCollector

@@ -36,7 +36,7 @@ int QnAbstractStreamDataProvider::processorsCount() const
 
 void QnAbstractStreamDataProvider::addDataProcessor(QnAbstractDataReceptor* dp)
 {
-    Q_ASSERT(dp);
+    NX_ASSERT(dp);
     QnMutexLocker mutex( &m_mutex );
 
     if (!m_dataprocessors.contains(dp))

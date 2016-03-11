@@ -66,46 +66,56 @@ void CdbFunctionalTest::start()
     std::promise<void> cdbInstantiatedCreatedPromise;
     auto cdbInstantiatedCreatedFuture = cdbInstantiatedCreatedPromise.get_future();
 
+    m_cdbStartedPromise = std::make_unique<std::promise<bool>>();
+
     m_cdbProcessFuture = std::async(
         std::launch::async,
         [this, &cdbInstantiatedCreatedPromise]()->int {
             m_cdbInstance = std::make_unique<nx::cdb::CloudDBProcessPublic>(
                 static_cast<int>(m_args.size()), m_args.data());
+            m_cdbInstance->setOnStartedEventHandler(
+                [this](bool result)
+                {
+                    m_cdbStartedPromise->set_value(result);
+                });
             cdbInstantiatedCreatedPromise.set_value();
             return m_cdbInstance->exec();
         });
     cdbInstantiatedCreatedFuture.wait();
 }
 
-void CdbFunctionalTest::startAndWaitUntilStarted()
+bool CdbFunctionalTest::startAndWaitUntilStarted()
 {
     start();
-    waitUntilStarted();
+    return waitUntilStarted();
 }
 
-void CdbFunctionalTest::waitUntilStarted()
+bool CdbFunctionalTest::waitUntilStarted()
 {
-    static const std::chrono::seconds CDB_INITIALIZED_MAX_WAIT_TIME(15);
+    static const std::chrono::seconds initializedMaxWaitTime(15);
 
-    const auto endClock = std::chrono::steady_clock::now() + CDB_INITIALIZED_MAX_WAIT_TIME;
-    for (;;)
+    auto cdbStartedFuture = m_cdbStartedPromise->get_future();
+    if (cdbStartedFuture.wait_for(initializedMaxWaitTime) !=
+        std::future_status::ready)
     {
-        ASSERT_TRUE(std::chrono::steady_clock::now() < endClock);
-
-        ASSERT_NE(
-            std::future_status::ready,
-            m_cdbProcessFuture.wait_for(std::chrono::seconds(0)));
-
-        auto connection = m_connectionFactory->createConnection("", "");
-        api::ResultCode result = api::ResultCode::ok;
-        std::tie(result, m_moduleInfo) = makeSyncCall<api::ResultCode, api::ModuleInfo>(
-            std::bind(
-                &nx::cdb::api::Connection::ping,
-                connection.get(),
-                std::placeholders::_1));
-        if (result == api::ResultCode::ok)
-            break;
+        return false;
     }
+
+    if (!cdbStartedFuture.get())
+        return false;
+
+    //retrieving module info
+    auto connection = m_connectionFactory->createConnection("", "");
+    api::ResultCode result = api::ResultCode::ok;
+    std::tie(result, m_moduleInfo) = makeSyncCall<api::ResultCode, api::ModuleInfo>(
+        std::bind(
+            &nx::cdb::api::Connection::ping,
+            connection.get(),
+            std::placeholders::_1));
+    if (result != api::ResultCode::ok)
+        return false;
+
+    return true;
 }
 
 void CdbFunctionalTest::stop()
@@ -115,11 +125,11 @@ void CdbFunctionalTest::stop()
     m_cdbInstance.reset();
 }
 
-void CdbFunctionalTest::restart()
+bool CdbFunctionalTest::restart()
 {
     stop();
     start();
-    waitUntilStarted();
+    return waitUntilStarted();
 }
 
 void CdbFunctionalTest::addArg(const char* arg)
@@ -161,6 +171,8 @@ api::ResultCode CdbFunctionalTest::addAccount(
         ss << rand();
         *password = ss.str();
     }
+
+    assert(!moduleInfo().realm.empty());
 
     if (accountData->fullName.empty())
         accountData->fullName = "Account " + accountData->email + " full name";
@@ -260,7 +272,7 @@ api::ResultCode CdbFunctionalTest::addActivatedAccount(
     if (resCode != api::ResultCode::ok)
         return resCode;
 
-    assert(accountData->email == email);
+    NX_ASSERT(accountData->email == email);
 
     resCode = getAccount(
         accountData->email,

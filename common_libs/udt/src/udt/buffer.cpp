@@ -154,9 +154,10 @@ void CSndBuffer::addBuffer(const char* data, int len, int ttl, bool order)
    }
    m_pLastBlock = s;
 
-   CGuard::enterCS(m_BufLock);
-   m_iCount += size;
-   CGuard::leaveCS(m_BufLock);
+   {
+       CGuard lk(m_BufLock);
+       m_iCount += size;
+   }
 
    m_iNextMsgNo ++;
    if (m_iNextMsgNo == CMsgNo::m_iMaxMsgNo)
@@ -203,9 +204,10 @@ int CSndBuffer::addBufferFromFile(fstream& ifs, int len)
    }
    m_pLastBlock = s;
 
-   CGuard::enterCS(m_BufLock);
-   m_iCount += size;
-   CGuard::leaveCS(m_BufLock);
+   {
+       CGuard lk(m_BufLock);
+       m_iCount += size;
+   }
 
    m_iNextMsgNo ++;
    if (m_iNextMsgNo == CMsgNo::m_iMaxMsgNo)

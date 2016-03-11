@@ -4,6 +4,7 @@
 
 #include "videodecoderplugintypes.h"
 
+#include <nx/utils/log/assert.h>
 
 namespace DecoderParameter
 {
@@ -198,7 +199,7 @@ bool MediaStreamParameterSumContainer::getAsVariant( int resID, QVariant* const 
                     *value = QVariant( value->value<qulonglong>() + val2.value<qulonglong>() );
                     break;
                 default:
-                    Q_ASSERT( false );
+                    NX_ASSERT( false );
             }
             return true;
         }

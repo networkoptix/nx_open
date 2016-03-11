@@ -4,6 +4,7 @@
 #include <nx/streaming/av_codec_media_context.h>
 #include <nx/streaming/basic_media_context.h>
 #include <nx/streaming/media_context_serializable_data.h>
+#include <nx/utils/log/assert.h>
 #include <utils/media/ffmpeg_helper.h>
 #include <utils/media/av_codec_helper.h>
 
@@ -223,7 +224,7 @@ TEST(QnMediaDataPacket, main)
 
     AVCodecContext* avCodecContextFromBasic =
         avcodec_alloc_context3(nullptr);
-    assert(avCodecContextFromBasic);
+    NX_ASSERT(avCodecContextFromBasic);
 
     QnFfmpegHelper::mediaContextToAvCodecContext(
         avCodecContextFromBasic, basicMediaContext);

@@ -520,7 +520,7 @@ QString getMacByIP(const QHostAddress& ip, bool net)
 
 QHostAddress getGatewayOfIf( const QString& ip )
 {
-    Q_ASSERT( false );
+    NX_ASSERT( false );
     return QHostAddress();
 }
 

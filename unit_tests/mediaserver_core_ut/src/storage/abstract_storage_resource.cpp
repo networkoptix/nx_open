@@ -329,32 +329,32 @@ public:
     }
 
     virtual float getAvarageWritingUsage() const override {
-        assert(0);
+        NX_ASSERT(0);
         return 0.0;
     }
 
     virtual QnAbstractStorageResource::FileInfoList getFileList(const QString&) override {
-        assert(0);
+        NX_ASSERT(0);
         return QnAbstractStorageResource::FileInfoList();
     }
 
     virtual qint64 getFileSize(const QString&) const override {
-        assert(0);
+        NX_ASSERT(0);
         return 0;
     }
 
     virtual bool removeFile(const QString&) override {
-        assert(0);
+        NX_ASSERT(0);
         return true;
     }
 
     virtual bool removeDir(const QString&) override {
-        assert(0);
+        NX_ASSERT(0);
         return true;
     }
 
     virtual bool renameFile(const QString&, const QString&) override {
-        assert(0);
+        NX_ASSERT(0);
         return true;
     }
 
@@ -363,22 +363,22 @@ public:
     }
 
     virtual bool isDirExists(const QString&) override {
-        assert(0);
+        NX_ASSERT(0);
         return true;
     }
 
     virtual qint64 getFreeSpace() override {
-        assert(0);
+        NX_ASSERT(0);
         return 0;
     }
 
     virtual int getCapabilities() const override {
-        assert(0);
+        NX_ASSERT(0);
         return 0;
     }
 
     virtual bool isAvailable() const override {
-        assert(0);
+        NX_ASSERT(0);
         return true;
     }
 

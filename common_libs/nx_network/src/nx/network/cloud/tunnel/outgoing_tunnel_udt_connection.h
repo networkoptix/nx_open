@@ -75,7 +75,7 @@ public:
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
 
     virtual void establishNewConnection(
-        boost::optional<std::chrono::milliseconds> timeout,
+        std::chrono::milliseconds timeout,
         SocketAttributes socketAttributes,
         OnNewConnectionHandler handler) override;
 
@@ -96,6 +96,7 @@ private:
     };
 
     const nx::String m_connectionId;
+    const SocketAddress m_localPunchedAddress;
     const SocketAddress m_remoteHostAddress;
     nx::utils::AtomicUniquePtr<ConnectionType> m_controlConnection;
     const UdpHolePunchingTimeouts m_timeouts;
@@ -108,7 +109,7 @@ private:
 
     void proceedWithConnection(
         UdtStreamSocket* connectionPtr,
-        boost::optional<std::chrono::milliseconds> timeout);
+        std::chrono::milliseconds timeout);
     void onConnectCompleted(
         UdtStreamSocket* connectionPtr,
         SystemError::ErrorCode errorCode);

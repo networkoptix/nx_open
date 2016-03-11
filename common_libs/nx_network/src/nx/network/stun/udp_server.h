@@ -51,7 +51,7 @@ public:
     void sendMessage(
         SocketAddress destinationEndpoint,
         const Message& message,
-        std::function<void(SystemError::ErrorCode)> completionHandler);
+        utils::MoveOnlyFunc<void(SystemError::ErrorCode)> completionHandler);
     const std::unique_ptr<network::UDPSocket>& socket();
 
 private:

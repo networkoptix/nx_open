@@ -450,7 +450,7 @@ private: // for UDP multiplexer
 
 private: // for epoll
    std::set<int> m_sPollID;                     // set of epoll ID to trigger
-   void addEPoll(const int eid);
+   void addEPoll(const int eid, int eventsToReport);
    void removeEPoll(const int eid);
 };
 

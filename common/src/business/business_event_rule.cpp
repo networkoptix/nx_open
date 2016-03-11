@@ -217,7 +217,7 @@ void QnBusinessEventRule::removeResource(const QnUuid& resId)
 QnBusinessEventRuleList QnBusinessEventRule::getDefaultRules()
 {
     QnResourcePtr admin = qnResPool->getResourceById(QnUuid("99cbc715-539b-4bfe-856f-799b45b69b1e"));
-    Q_ASSERT(admin);
+    NX_ASSERT(admin);
     QnBusinessEventRuleList result;
     result << QnBusinessEventRulePtr(new QnBusinessEventRule(1,  30,    "{ \"userGroup\" : 0 }",  0, QnBusiness::ShowPopupAction,   QnBusiness::CameraDisconnectEvent));
     result << QnBusinessEventRulePtr(new QnBusinessEventRule(2,  30,    QByteArray(),             0, QnBusiness::ShowPopupAction,   QnBusiness::StorageFailureEvent));

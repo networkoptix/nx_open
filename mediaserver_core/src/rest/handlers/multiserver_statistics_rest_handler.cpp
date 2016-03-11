@@ -388,7 +388,7 @@ int SendStatisticsActionHandler::executePost(const QnRequestParamList& params
     const bool correctJson = QJson::deserialize<QnMetricHashesList>(
         body, &request.metricsList);
 
-    Q_ASSERT_X(correctJson, Q_FUNC_INFO, "Incorect json with mertics received!");
+    NX_ASSERT(correctJson, Q_FUNC_INFO, "Incorect json with mertics received!");
     if (!correctJson)
         return nx_http::StatusCode::invalidParameter;
 

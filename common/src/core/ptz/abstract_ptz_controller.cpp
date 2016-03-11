@@ -89,7 +89,7 @@ bool QnAbstractPtzController::supports(Qn::PtzCommand command) {
         return true;
 
     default:                                
-        assert(false); 
+        NX_ASSERT(false); 
         return false; /* We should never get here. */
     }
 }

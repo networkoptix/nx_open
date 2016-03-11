@@ -1,10 +1,7 @@
-/**********************************************************
-* 11 feb 2015
-* akolesnikov
-***********************************************************/
-
 #ifndef NX_MUTEX_H
 #define NX_MUTEX_H
+
+#include <nx/utils/log/assert.h>
 
 #ifdef USE_OWN_MUTEX
 
@@ -140,13 +137,13 @@ public:
 
     void relock()
     {
-        Q_ASSERT(!m_locked);
+        NX_ASSERT(!m_locked);
         m_mutex->lock();
         m_locked = true;
     }
     void unlock()
     {
-        Q_ASSERT(m_locked);
+        NX_ASSERT(m_locked);
         m_mutex->unlock();
         m_locked = false;
     }

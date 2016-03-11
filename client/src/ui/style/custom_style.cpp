@@ -4,6 +4,7 @@
 
 #include <ui/style/generic_palette.h>
 #include <ui/style/nx_style.h>
+#include <ui/style/helper.h>
 #include <ui/common/palette.h>
 #include <ui/style/globals.h>
 
@@ -21,12 +22,7 @@ QString setWarningStyleHtml( const QString &source ) {
     return lit("<font color=\"%1\">%2</font>").arg(qnGlobals->errorTextColor().name(), source);
 }
 
-void setAccentStyle(QPushButton *button)
+void setAccentStyle(QAbstractButton *button, bool accent)
 {
-    if (QnNxStyle *style = QnNxStyle::instance())
-    {
-        QColor color = style->mainColor(QnNxStyle::Colors::kBlue);
-        setPaletteColor(button, QPalette::Active, QPalette::Button, color);
-        setPaletteColor(button, QPalette::Inactive, QPalette::Button, color);
-    }
+    button->setProperty(style::Properties::kAccentStyleProperty, accent);
 }

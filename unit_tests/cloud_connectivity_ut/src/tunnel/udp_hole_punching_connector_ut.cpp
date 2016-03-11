@@ -153,6 +153,8 @@ TEST_F(UdpHolePunchingTunnelConnector, general)
 
     ASSERT_EQ(SystemError::noError, connectResult.errorCode);
     ASSERT_NE(nullptr, connectResult.connection);
+
+    connectResult.connection->pleaseStopSync();
 }
 
 TEST_F(UdpHolePunchingTunnelConnector, timeout)
@@ -226,7 +228,6 @@ TEST_F(UdpHolePunchingTunnelConnector, cancellation)
         cloud::UdpHolePunchingTunnelConnector connector(
             SocketAddress((server->serverId() + "." + system.id).constData()));
 
-        auto t1 = std::chrono::steady_clock::now();
         connector.connect(
             std::chrono::milliseconds::zero(),
             [](

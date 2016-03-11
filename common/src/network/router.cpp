@@ -41,7 +41,7 @@ QnRoute QnRouter::routeTo(const QnUuid &id)
 			
         result.gatewayId = qnCommon->remoteGUID(); // proxy via current server to the other/incompatible system (client side only)
         result.addr = m_moduleFinder->primaryAddress(result.gatewayId);
-        Q_ASSERT_X(!result.addr.isNull(), Q_FUNC_INFO, "QnRouter: no primary interface found for current EC.");
+        NX_ASSERT(!result.addr.isNull(), Q_FUNC_INFO, "QnRouter: no primary interface found for current EC.");
 		// todo: add distance for camera route
         return result;
     }

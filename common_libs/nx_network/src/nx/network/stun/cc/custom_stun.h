@@ -35,8 +35,11 @@ namespace methods
         /** server uses this request to confirm its willingness to proceed with cloud connection */
         connectionAck,
 
+        /** Returns host name list included in domain */
+        resolveDomain,
+
         /** Returns host's public address list and suitable connections methods */
-        resolve,
+        resolvePeer,
 
         /** Initiate connection to some mediaserver
          *  Request: \class PeerId, \class HostName, \class ConnectionId
@@ -95,12 +98,13 @@ namespace attrs
         connectionId,
 
         hostName = stun::attrs::userDefined + 0x200,
+        hostNameList,
         publicEndpointList,
         tcpHpEndpointList,
         udtHpEndpointList,
         connectionMethods,
 
-        udpHolePunchingResultCode,
+        udpHolePunchingResultCode = stun::attrs::userDefined + 0x400,
         systemErrorCode,
     };
 
@@ -205,6 +209,21 @@ namespace attrs
         static const AttributeType TYPE = udtHpEndpointList;
         UdtHpEndpointList( const std::list< SocketAddress >& endpoints )
             : EndpointList( TYPE, endpoints ) {}
+    };
+
+
+    /** Base class for string list based attributes */
+    struct NX_NETWORK_API StringList : StringAttribute
+    {
+        StringList( int type, const std::vector< String >& strings );
+        std::vector< String > get() const;
+    };
+
+    struct NX_NETWORK_API HostNameList : StringList
+    {
+        static const AttributeType TYPE = hostNameList;
+        HostNameList( const std::vector< String >& hostNames )
+            : StringList( TYPE, hostNames ) {}
     };
 }
 

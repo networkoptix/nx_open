@@ -227,7 +227,7 @@ private:
         //serializing request
         m_state = sendingRequest;
         (m_syncWrapper.get()->*m_syncFunc)(m_request, m_response);
-        assert( !m_serializedRequest.isEmpty() );
+        NX_ASSERT( !m_serializedRequest.isEmpty() );
         m_syncWrapper->getProxy()->soap->socket = SOAP_INVALID_SOCKET;
         m_syncWrapper->getProxy()->soap->master = SOAP_INVALID_SOCKET;
         soap_destroy( m_syncWrapper->getProxy()->soap );
@@ -251,7 +251,7 @@ private:
             return m_resultHandler( SOAP_FAULT );
         }
 
-        assert( bytesSent == m_serializedRequest.size() );
+        NX_ASSERT( bytesSent == m_serializedRequest.size() );
         m_state = receivingResponse;
 
         m_responseBuffer.reserve( READ_BUF_SIZE );
@@ -272,7 +272,7 @@ private:
         static const int MIN_SOCKET_READ_SIZE = 4096;
         static const int READ_BUFFER_GROW_STEP = 4096;
 
-        assert( m_state == receivingResponse );
+        NX_ASSERT( m_state == receivingResponse );
 
         if( errorCode || bytesRead == 0 )
         {

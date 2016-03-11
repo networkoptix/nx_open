@@ -93,7 +93,7 @@ void UDPHolePunchingConnectionInitiationFsm::onConnectionAckRequest(
 {
     m_timer.dispatch([this, connection, request, completionHandler]() mutable  //TODO #msvc2015 move to lambda
     {
-        assert(m_connectResponseSender);
+        NX_ASSERT(m_connectResponseSender);
 
         if (connection->transportProtocol() == nx::network::TransportProtocol::udp)
             request.udpEndpointList.push_front(connection->getSourceAddress());
@@ -146,7 +146,7 @@ void UDPHolePunchingConnectionInitiationFsm::done(api::ResultCode result)
 {
     if (m_state < State::waitingConnectionResult)
     {
-        Q_ASSERT(result != api::ResultCode::ok);
+        NX_ASSERT(result != api::ResultCode::ok);
         auto connectResponseSender = std::move(m_connectResponseSender);
         connectResponseSender(
             result,
