@@ -24,6 +24,7 @@ CloudStreamSocket::CloudStreamSocket()
     m_recvPromisePtr(nullptr),
     m_sendPromisePtr(nullptr)
 {
+    //TODO #ak user MUST be able to bind this object to any aio thread
     //getAioThread binds to an aio thread
     m_socketAttributes.aioThread = m_aioThreadBinder->getAioThread();
 }

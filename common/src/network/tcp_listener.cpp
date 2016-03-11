@@ -82,8 +82,8 @@ QnTcpListener::~QnTcpListener()
     Q_D(QnTcpListener);
     stop();
 
-    d->serverSocket->close();
-    delete d->serverSocket;
+    destroyServerSocket(d->serverSocket);
+    d->serverSocket = nullptr;
     delete d_ptr;
 }
 
@@ -91,10 +91,11 @@ bool QnTcpListener::bindToLocalAddress()
 {
     Q_D(QnTcpListener);
 
-    d->serverSocket = SocketFactory::createStreamServerSocket(d->useSSL).release();
-    if( !d->serverSocket->setReuseAddrFlag( true ) ||
-        !d->serverSocket->bind( SocketAddress( d->serverAddress.toString(), d->localPort ) ) ||
-        !d->serverSocket->listen() )
+    const SocketAddress localAddress(d->serverAddress.toString(), d->localPort);
+    d->serverSocket = createAndPrepareSocket(
+        d->useSSL,
+        localAddress);
+    if (!d->serverSocket)
     {
         const SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
         NX_LOG(lit("TCPListener (%1:%2). Initial bind failed: %3 (%4)").arg(d->serverAddress.toString()).arg(d->localPort).
@@ -104,13 +105,33 @@ bool QnTcpListener::bindToLocalAddress()
         return false;
     }
 
-    NX_LOG(lit("Server started at %1:%2").arg(d->serverAddress.toString()).arg(d->localPort), cl_logINFO);
+    NX_LOG(lit("Server started at %1").arg(localAddress.toString()), cl_logINFO);
     return true;
 }
 
 void QnTcpListener::doPeriodicTasks()
 {
     removeDisconnectedConnections();
+}
+
+AbstractStreamServerSocket* QnTcpListener::createAndPrepareSocket(
+    bool sslNeeded,
+    const SocketAddress& localAddress)
+{
+    auto serverSocket = SocketFactory::createStreamServerSocket(sslNeeded);
+    if (!serverSocket->setReuseAddrFlag(true) ||
+        !serverSocket->bind(localAddress) ||
+        !serverSocket->listen())
+    {
+        return nullptr;
+    }
+
+    return serverSocket.release();
+}
+
+void QnTcpListener::destroyServerSocket(AbstractStreamServerSocket* serverSocket)
+{
+    delete serverSocket;
 }
 
 void QnTcpListener::removeDisconnectedConnections()
@@ -233,7 +254,8 @@ void QnTcpListener::run()
                 d->localPort.store(d->newPort);
                 NX_LOG( lit("TCPListener (%1:%2). Switching port to: %3").arg(d->serverAddress.toString()).arg(oldPort).arg(d->localPort), cl_logINFO );
                 //removeAllConnections();
-                delete d->serverSocket;
+                destroyServerSocket(d->serverSocket);
+                d->serverSocket = nullptr;
                 if( !bindToLocalAddress() )
                 {
                     QThread::msleep(1000);

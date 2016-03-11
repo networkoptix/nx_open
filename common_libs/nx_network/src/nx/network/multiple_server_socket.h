@@ -1,9 +1,13 @@
 #ifndef NX_NETWORK_MULTIPLE_SERVER_SOCKET_H
 #define NX_NETWORK_MULTIPLE_SERVER_SOCKET_H
 
-#include "system_socket.h"
-#include <utils/common/cpp14.h>
 #include <queue>
+
+#include <utils/common/cpp14.h>
+
+#include "nx/network/aio/timer.h"
+#include "system_socket.h"
+
 
 namespace nx {
 namespace network {
@@ -85,7 +89,7 @@ protected:
     unsigned int m_recvTmeout;
     mutable SystemError::ErrorCode m_lastError;
     bool* m_terminated;
-    std::unique_ptr<AbstractCommunicatingSocket> m_timerSocket;
+    aio::Timer m_timerSocket;
     std::vector<ServerSocketHandle> m_serverSockets;
     std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)> m_acceptHandler;
 };

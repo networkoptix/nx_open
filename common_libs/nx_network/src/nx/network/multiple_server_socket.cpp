@@ -12,7 +12,6 @@ MultipleServerSocket::MultipleServerSocket()
     : m_nonBlockingMode(false)
     , m_recvTmeout(0)
     , m_terminated(nullptr)
-    , m_timerSocket(new TCPSocket())
 {
 }
 
@@ -150,12 +149,12 @@ AbstractSocket::SOCKET_HANDLE MultipleServerSocket::handle() const
 
 aio::AbstractAioThread* MultipleServerSocket::getAioThread()
 {
-    return m_timerSocket->getAioThread();
+    return m_timerSocket.getAioThread();
 }
 
 void MultipleServerSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
-    m_timerSocket->bindToAioThread(aioThread);
+    m_timerSocket.bindToAioThread(aioThread);
     for (auto& socket : m_serverSockets)
         socket->bindToAioThread(aioThread);
 }
@@ -192,19 +191,19 @@ AbstractStreamSocket* MultipleServerSocket::accept()
 void MultipleServerSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
     nx::BarrierHandler barrier(std::move(handler));
-    m_timerSocket->pleaseStop(barrier.fork());
+    m_timerSocket.pleaseStop(barrier.fork());
     for (auto& socket : m_serverSockets)
         socket->pleaseStop(barrier.fork());
 }
 
 void MultipleServerSocket::post(nx::utils::MoveOnlyFunc<void()> handler)
 {
-    m_timerSocket->post(std::move(handler));
+    m_timerSocket.post(std::move(handler));
 }
 
 void MultipleServerSocket::dispatch(nx::utils::MoveOnlyFunc<void()> handler)
 {
-    m_timerSocket->dispatch(std::move(handler));
+    m_timerSocket.dispatch(std::move(handler));
 }
 
 void MultipleServerSocket::acceptAsync(
@@ -217,9 +216,11 @@ void MultipleServerSocket::acceptAsync(
         m_acceptHandler = std::move(handler);
 
         if (m_recvTmeout)
-            m_timerSocket->registerTimer(m_recvTmeout, std::bind(
-                &MultipleServerSocket::accepted, this,
-                nullptr, SystemError::timedOut, nullptr));
+            m_timerSocket.start(
+                std::chrono::milliseconds(m_recvTmeout),
+                std::bind(
+                    &MultipleServerSocket::accepted, this,
+                    nullptr, SystemError::timedOut, nullptr));
 
         for (auto& socket : m_serverSockets)
             if (!socket.isAccepting)
@@ -264,22 +265,37 @@ void MultipleServerSocket::ServerSocketHandle::stopAccepting()
 }
 
 bool MultipleServerSocket::addSocket(
-        std::unique_ptr<AbstractStreamServerSocket> socket)
+    std::unique_ptr<AbstractStreamServerSocket> socket)
 {
-    // all internal sockets are used in non blocking mode while
-    // interface allows both
     if (!socket->setNonBlockingMode(true))
         return false;
 
-    socket->bindToAioThread(m_timerSocket->getAioThread());
-    m_serverSockets.push_back(ServerSocketHandle(std::move(socket)));
+    post(
+        [this, socket = std::move(socket)]() mutable
+        {
+            // all internal sockets are used in non blocking mode while
+            // interface allows both
+
+            socket->bindToAioThread(m_timerSocket.getAioThread());
+            m_serverSockets.push_back(ServerSocketHandle(std::move(socket)));
+
+            m_timerSocket.start(
+                std::chrono::milliseconds::zero(),
+                std::bind(
+                    &MultipleServerSocket::accepted, this,
+                    nullptr, SystemError::timedOut, nullptr));  //TODO #ak use interrupted error code
+        });
     return true;
 }
 
 void MultipleServerSocket::accepted(
-        ServerSocketHandle* source, SystemError::ErrorCode code,
-        AbstractStreamSocket* rawSocket)
+    ServerSocketHandle* source,
+    SystemError::ErrorCode code,
+    AbstractStreamSocket* rawSocket)
 {
+    //TODO #ak on receiving interrupted error code, 
+        //acceptAsync again without reporting result to the user
+
     std::unique_ptr<AbstractStreamSocket> socket(rawSocket);
     if (socket)
         socket->setNonBlockingMode(m_nonBlockingMode);
@@ -291,7 +307,7 @@ void MultipleServerSocket::accepted(
     if (source)
     {
         source->isAccepting = false;
-        m_timerSocket->pleaseStopSync(); // will not block, we are in IO thread
+        m_timerSocket.cancelSync(); // will not block, we are in IO thread
     }
 
     std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)> handler;
