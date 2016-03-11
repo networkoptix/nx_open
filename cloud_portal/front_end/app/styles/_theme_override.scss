@@ -118,12 +118,6 @@ h1>.label{
     text-align: left;
   }
 
-  @media (min-width: $grid-float-breakpoint) {
-    .modal-dialog {
-      width: 400px;
-    }
-  }
-
   .modal-header .close{
     position: absolute;
     right: 0;
@@ -138,6 +132,14 @@ h1>.label{
 
   .help-block{ /* Do not jump modal size when help block changes (help-block is below the input)*/
     min-height:40px;
+  }
+}
+
+
+@media (min-width: $dialog-sm-float-breakpoint) {
+  .modal-sm {
+    width: $modal-sm;
+    margin: 108px auto;
   }
 }
 

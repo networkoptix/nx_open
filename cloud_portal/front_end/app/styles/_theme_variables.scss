@@ -83,6 +83,8 @@ $jumbotron-bg:              transparent;
 
 $grid-gutter-width:       16px;
 
+$modal-sm:                  400px;
+
 $modal-backdrop-bg:         $dark9;
 $modal-backdrop-opacity:    0.1;
 $modal-content-bg:          $light1;
@@ -125,4 +127,5 @@ $table-cell-padding:          5px 16px 6px 16px;
 $link-color:                  $brand_d2;
 $link-hover-color:            $brand_core;
 
-$grid-float-breakpoint:       434px;
+$grid-float-breakpoint:       600px;
+$dialog-sm-float-breakpoint:     434px;
