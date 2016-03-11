@@ -672,6 +672,7 @@
                 <openssl.version>1.0.0j</openssl.version>
                 <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
                 <modification>isd</modification>
+                <rdep.target>isd</rdep.target>
             </properties>
             <modules>
                 <module>plugins/isd_native_plugin</module>
@@ -699,6 +700,7 @@
                 <openssl.version>1.0.1f</openssl.version>
                 <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
                 <modification>isd_s2</modification>
+                <rdep.target>isd_s2</rdep.target>
             </properties>
             <modules>
                 <module>plugins/isd_native_plugin</module>
@@ -725,6 +727,7 @@
                 <openssl.version>1.0.0j</openssl.version>
                 <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
                 <modification>rpi</modification>
+                <rdep.target>rpi</rdep.target>
             </properties>
             <modules>
                 <!--<module>plugins/rpi_cam</module>-->
@@ -753,6 +756,7 @@
                 <openssl.version>1.0.0j</openssl.version>
                 <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
                 <modification>bpi</modification>
+                <rdep.target>bpi</rdep.target>
             </properties>
             <modules>
                 <!-- Banana pie uses same distro as rpi -->
@@ -780,6 +784,7 @@
                 <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
                 <modification>bananapi</modification>
                 <qt.classifier>${platform}-${arch}-bpi</qt.classifier>
+                <rdep.target>bpi</rdep.target>
             </properties>
             <modules>
                 <!-- Banana pie uses same distro as rpi -->
@@ -927,6 +932,7 @@
                 <openssl.version>1.0.2d</openssl.version>
                 <additional.defines>DISABLE_FFMPEG</additional.defines>
                 <compile.option1/>
+                <rdep.target>android</rdep.target>
             </properties>
         </profile>
         <profile>
@@ -975,6 +981,7 @@
                 <profile.classifier>${platform}-${arch}</profile.classifier>
                 <openssl.version>1.0.1i</openssl.version>
                 <compile.option1/>
+                <rdep.target>ios</rdep.target>
             </properties>
         </profile>
     </profiles>

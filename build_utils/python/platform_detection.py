@@ -6,7 +6,7 @@ supported_targets = [
     "windows-x86",
     "linux-x64",
     "linux-x86",
-    "macos-x64",
+    "macosx-x64",
     "rpi",
     "bpi",
     "isd",
