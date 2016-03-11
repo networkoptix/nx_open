@@ -111,6 +111,10 @@ h1>.label{
     top: 0;
     width:40px;
     height:40px;
+
+    &:hover{
+      background-color: $light2;
+    }
   }
 
   .help-block{ /* Do not jump modal size when help block changes (help-block is below the input)*/
@@ -136,7 +140,7 @@ h1>.label{
 }
 
 .panel > .table, .panel > .table-responsive {
-  margin-bottom: 10px;
+  margin-bottom: 16px;
 }
 
 .jumbotron {
@@ -261,4 +265,12 @@ label {
 
 .form-control-static{
   min-height:32px;
+}
+
+
+.table{
+  th{
+    text-transform: uppercase;
+    font-size: 13px;
+  }
 }

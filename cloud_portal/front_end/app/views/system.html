@@ -14,10 +14,11 @@
         <div class="col-sm-6">
             <div class="pull-right-sm">
                 <div class="btn-group">
-                    <button class="btn btn-default" ng-click="delete()">
-                        <span class="glyphicon glyphicon-trash"></span> Remove</button>
                     <button class="btn btn-default" ng-click="share()" ng-if="system.info.sharingPermissions.length">
                         <span class="glyphicon glyphicon-share"></span> Share</button>
+
+                    <button class="btn btn-default" ng-click="delete()">
+                        <span class="glyphicon glyphicon-trash"></span> Remove</button>
                 </div>&nbsp;
                 <button class="btn btn-default" ng-click="open(null)"
                         ng-disabled="system.info.status!=Config.systemStatuses.onlineStatus">Open in Nx Witness</button>
@@ -89,8 +90,10 @@
                             <td>{{user.accountEmail}}</td>
                             <td>{{L.accessRoles[user.accessRole].label || user.accessRole}}</td>
                             <td><a href='' class="hover-visible" ng-if="user.accountEmail != account.email && user.accessRole!=Config.accessRoles.owner"
+                                   title="Edit permissions"
                                    ng-click="editShare(user)"><span class="glyphicon glyphicon-pencil"></span></a></td>
                             <td><a href='' class="hover-visible" ng-if="user.accessRole!=Config.accessRoles.owner"
+                                   title="Delete"
                                    ng-click="unshare(user)"><span class="glyphicon glyphicon-remove"></span></a></td>
                         </tr>
                         </tbody>

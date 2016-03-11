@@ -19,14 +19,25 @@ footer {
   bottom: 0;
   width: 100%;
   /* Set the fixed height of the footer here */
-  height: 60px;
+  height: 48px;
   border-top: 1px solid $common-border-color;
   padding-bottom: 2px;
-}
 
-footer .nav > li > a{
-  font-size: $font-size-base;
-  padding:$font-size-base;
+
+  .nav > li > a{
+    font-size: $font-size-small;
+    padding: 10px;
+    color:  $light12;
+    &:hover{
+      color:$light16;
+    }
+  }
+  .navbar-right > li > a{
+    color:$light8;
+    &:hover{
+      color:$light12;
+    }
+  }
 }
 
 

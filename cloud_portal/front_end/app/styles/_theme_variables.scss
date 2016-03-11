@@ -46,7 +46,7 @@ $modal-content-border-color:  transparent;
 
 $font-size-base:          14px;
 $font-size-large:         15px; // ceil($font-size-base * 1.15); // ~16px
-$font-size-small:         ceil($font-size-base * 0.85); // ~12px
+$font-size-small:         13px;
 
 $font-size-h1:            ceil($font-size-base * 1.57); // ~22px
 $font-size-h2:            ceil($font-size-base * 1.42); // ~20px
@@ -119,3 +119,8 @@ $state-warning-border:           darken(adjust-hue($state-warning-bg, -10), 5%) 
 $state-info-text:              $blue14;
 $state-info-bg:                lighten($blue8, 20%);
 $state-info-border:            $blue10;
+
+$table-bg-hover:              $light2;
+$table-cell-padding:          5px 16px 6px 16px;
+$link-color:                  $brand_d2;
+$link-hover-color:            $brand_core;
