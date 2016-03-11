@@ -4,86 +4,86 @@ describe('Login suite', function () {
 
     var p = new LoginPage();
 
-    // it("should open login dialog in anonimous state", function () {
-    //     p.get();
-    //     expect((p.dialogLoginButton).isDisplayed()).toBe(true);
-    // });
+    it("should open login dialog in anonimous state", function () {
+        p.get();
+        expect((p.dialogLoginButton).isDisplayed()).toBe(true);
+    });
 
-    // it("should close login dialog after clicking on background", function () {
-    //     p.get();
-    //     expect((p.dialogLoginButton).isDisplayed()).toBe(true);
+    it("should close login dialog after clicking on background", function () {
+        p.get();
+        expect((p.dialogLoginButton).isDisplayed()).toBe(true);
 
-    //     p.loginDialogBackground.click(); // click on login dialog background to close it
-    //     expect((p.loginDialog).isPresent()).toBe(false);
-    // });
+        p.loginDialogBackground.click(); // click on login dialog background to close it
+        expect((p.loginDialog).isPresent()).toBe(false);
+    });
 
-    // it("should allow to log in with existing credentials and to log out", function () {
-    //     p.get();
+    it("should allow to log in with existing credentials and to log out", function () {
+        p.get();
 
-    //     p.emailInput.sendKeys(p.userEmail1);
-    //     p.passwordInput.sendKeys(p.userPassword);
-    //     p.dialogLoginButton.click();
+        p.emailInput.sendKeys(p.userEmail1);
+        p.passwordInput.sendKeys(p.userPassword);
+        p.dialogLoginButton.click();
 
-    //     browser.sleep(2000); // such a shame, but I can't solve it right now
-    //     // Check that element that is visible only for authorized user is displayed on page
-    //     expect(p.loginSuccessElement.isDisplayed()).toBe(true);
+        browser.sleep(2000); // such a shame, but I can't solve it right now
+        // Check that element that is visible only for authorized user is displayed on page
+        expect(p.loginSuccessElement.isDisplayed()).toBe(true);
 
-    //     // Log out
-    //     p.userAccountDropdownToggle.click();
-    //     p.userLogoutLink.click();
-    //     browser.sleep(500);
+        // Log out
+        p.userAccountDropdownToggle.click();
+        p.userLogoutLink.click();
+        browser.sleep(500);
 
-    //     // Check that element that is visible only for authorized user is NOT displayed on page
-    //     expect(p.loginSuccessElement.isDisplayed()).toBe(false);
-    // });
+        // Check that element that is visible only for authorized user is NOT displayed on page
+        expect(p.loginSuccessElement.isDisplayed()).toBe(false);
+    });
 
-    // it("should go to Systems after login; then log out", function () {
-    //     p.get();
+    it("should go to Systems after login; then log out", function () {
+        p.get();
 
-    //     p.emailInput.sendKeys(p.userEmail1);
-    //     p.passwordInput.sendKeys(p.userPassword);
-    //     p.dialogLoginButton.click();
+        p.emailInput.sendKeys(p.userEmail1);
+        p.passwordInput.sendKeys(p.userPassword);
+        p.dialogLoginButton.click();
 
-    //     browser.sleep(2000); // such a shame, but I can't solve it right now
+        browser.sleep(2000); // such a shame, but I can't solve it right now
 
-    //     // Check that element that user is on page Systems
-    //     expect(browser.getCurrentUrl()).toContain('systems');
-    //     expect(p.htmlBody.getText()).toContain('Systems');
+        // Check that element that user is on page Systems
+        expect(browser.getCurrentUrl()).toContain('systems');
+        expect(p.htmlBody.getText()).toContain('Systems');
 
-    //     // Log out
-    //     p.userAccountDropdownToggle.click();
-    //     p.userLogoutLink.click();
-    //     browser.sleep(500);
+        // Log out
+        p.userAccountDropdownToggle.click();
+        p.userLogoutLink.click();
+        browser.sleep(500);
 
-    //     // Check that element that is visible only for authorized user is NOT displayed on page
-    //     expect(p.loginSuccessElement.isDisplayed()).toBe(false);
-    // });
+        // Check that element that is visible only for authorized user is NOT displayed on page
+        expect(p.loginSuccessElement.isDisplayed()).toBe(false);
+    });
 
-    // it("should show user's email and menu in top right corner; then log out", function () {
-    //     p.get();
+    it("should show user's email and menu in top right corner; then log out", function () {
+        p.get();
 
-    //     var email = p.userEmail1;
+        var email = p.userEmail1;
 
-    //     p.emailInput.sendKeys(email);
-    //     p.passwordInput.sendKeys(p.userPassword);
-    //     p.dialogLoginButton.click();
+        p.emailInput.sendKeys(email);
+        p.passwordInput.sendKeys(p.userPassword);
+        p.dialogLoginButton.click();
 
-    //     browser.sleep(2000); // such a shame, but I can't solve it right now
+        browser.sleep(2000); // such a shame, but I can't solve it right now
 
-    //     // Check that element that user is on page Systems
-    //     expect(p.userAccountDropdownToggle.getText()).toContain(email);
+        // Check that element that user is on page Systems
+        expect(p.userAccountDropdownToggle.getText()).toContain(email);
 
-    //     // Log out
-    //     p.userAccountDropdownToggle.click();
-    //     expect(p.userAccountDropdownMenu.getText()).toContain('Account Settings');
-    //     expect(p.userAccountDropdownMenu.getText()).toContain('Change Password');
-    //     expect(p.userAccountDropdownMenu.getText()).toContain('Logout');
-    //     p.userLogoutLink.click();
-    //     browser.sleep(500);
+        // Log out
+        p.userAccountDropdownToggle.click();
+        expect(p.userAccountDropdownMenu.getText()).toContain('Account Settings');
+        expect(p.userAccountDropdownMenu.getText()).toContain('Change Password');
+        expect(p.userAccountDropdownMenu.getText()).toContain('Logout');
+        p.userLogoutLink.click();
+        browser.sleep(500);
 
-    //     // Check that element that is visible only for authorized user is NOT displayed on page
-    //     expect(p.loginSuccessElement.isDisplayed()).toBe(false);
-    // });
+        // Check that element that is visible only for authorized user is NOT displayed on page
+        expect(p.loginSuccessElement.isDisplayed()).toBe(false);
+    });
 
     it("should not log in with wrong email", function () {
         p.get();
