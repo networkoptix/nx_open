@@ -19,9 +19,12 @@ RSYNC = [ "rsync", "--archive", "--delete" ]
 if detect_platform() == "windows":
     RSYNC.append("--chmod=ugo=rwx")
 
+DEFAULT_SYNC_URL = "rsync://enk.me/buildenv/rdep/packages"
+
 verbose = False
 
-script_dir = os.path.dirname(os.path.abspath(__file__))
+def is_relative_to(path, parent):
+    return path.startswith(parent)
 
 def verbose_message(message):
     if verbose:
@@ -30,9 +33,7 @@ def verbose_message(message):
 def verbose_rsync(command):
     verbose_message("Executing rsync:\n{0}".format(" ".join(command)))
 
-def find_root(file_name):
-    path = script_dir
-
+def find_root(path, file_name):
     while not os.path.isfile(os.path.join(path, file_name)):
         nextpath = os.path.dirname(path)
         if path == nextpath:
@@ -43,11 +44,13 @@ def find_root(file_name):
     return path
 
 def get_repository_root():
-    root = find_root(ROOT_CONFIG_NAME)
+    root = find_root(os.getcwd(), ROOT_CONFIG_NAME)
     if not root:
-        root = os.getenv("NX_REPOSITORY", "")
-    if not root:
-        root = os.path.join(script_dir, 'packages')
+        root = os.getenv("NX_REPOSITORY")
+        if root:
+            root = os.path.abspath(root)
+            if root.endswith("/"):
+                root = root[:-1]
     return root
 
 def get_sync_url(path):
@@ -77,6 +80,23 @@ def detect_repository():
         exit(1)
 
     return root, url
+
+def detect_package_and_target(root, path):
+    if not is_relative_to(path, root):
+        return None, None
+
+    path, package = os.path.split(path)
+    path, target = os.path.split(path)
+
+    while path != root and target:
+        package = target
+        path, target = os.path.split(path)
+
+    if path == root:
+        if target in supported_targets and package:
+            return target, package
+
+    return None, None
 
 def init_repository(path, url):
     if not os.path.isdir(path):
@@ -120,7 +140,8 @@ def update_package_timestamp(path, timestamp = None):
         timestamp = time.time()
 
     config = ConfigParser.ConfigParser()
-    config.read(file_name)
+    if os.path.isfile(file_name):
+        config.read(file_name)
 
     if not config.has_section("General"):
         config.add_section("General")
@@ -289,7 +310,8 @@ def upload_packages(root, url, target, packages, debug = False):
         if not upload_package(root, url, target, package_name):
             success = False
 
-    print "Uploaded successfully"
+    if success:
+        print "Uploaded successfully"
     return success
 
 def package_config_path(path):
@@ -348,7 +370,7 @@ def main():
     parser.add_argument("-u", "--upload",       help="Upload package to the repository.",   action="store_true")
     parser.add_argument("-v", "--verbose",      help="Additional debug output.",            action="store_true")
     parser.add_argument("--print-path",         help="Print package dir and exit.",         action="store_true")
-    parser.add_argument("--init", metavar="URL", help="Init repository in the current dir with the specified URL.", default="rsync://enk.me/buildenv/rdep/packages")
+    parser.add_argument("--init", metavar="URL", help="Init repository in the current dir with the specified URL.")
     parser.add_argument("packages", nargs='*',  help="Packages to sync.",   default="")
 
     args = parser.parse_args()
@@ -366,17 +388,11 @@ def main():
         exit(1)
 
     packages = args.packages
-    if not packages:
-        path = find_root(PACKAGE_CONFIG_NAME)
-        if path:
-            package = os.path.basename(path)
-
-            path = os.path.dirname(path)
-            auto_target = os.path.basename(path)
-
-            if detect_target in supported_targets and package:
-                packages = [ package ]
-                target = auto_target
+    if root and not packages:
+        detected_target, package = detect_package_and_target(root, os.getcwd())
+        if detected_target and package:
+            target = detected_target
+            packages = [ package ]
 
     if args.verbose:
         global verbose
