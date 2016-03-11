@@ -14,7 +14,7 @@
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/mobile_client_camera_factory.h"
 #include "utils/common/app_info.h"
-#include "utils/common/log.h"
+#include "nx/utils/log/log.h"
 #include "utils/settings_migration.h"
 
 #include "context/context.h"
