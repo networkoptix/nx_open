@@ -8,6 +8,7 @@
 #include <set>
 #include <array>
 #include <boost/bimap.hpp>
+#include <random>
 
 #include <QElapsedTimer>
 
@@ -74,6 +75,7 @@ private:
     bool vacuum();
     bool checkDataConsistency(const UuidToCatalogs &readDataCopy) const;
     bool startDbFile();
+    int getCameraIdHash(const QString &cameraUniqueId);
 
 private:
     QnStorageResourcePtr m_storage;
@@ -91,6 +93,9 @@ private:
 
     nx::media_db::Error m_lastWriteError;
     nx::media_db::Error m_lastReadError;
+
+    std::random_device m_rd;
+    std::mt19937 m_gen;
 };
 
 typedef std::shared_ptr<QnStorageDb> QnStorageDbPtr;

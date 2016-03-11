@@ -2040,7 +2040,10 @@ bool QnStorageManager::fileFinished(int durationMs, const QString& fileName, QnA
         return false;
     QnStorageDbPtr sdb = qnStorageDbPool->getSDB(storage);
     if (sdb)
+    {
+        QnMutexLocker lk(&m_mutexCatalog);
         sdb->addRecord(cameraUniqueId, DeviceFileCatalog::catalogByPrefix(quality), catalog->updateDuration(durationMs, fileSize, renameOK));
+    }
     return true;
 }
 
@@ -2073,6 +2076,7 @@ bool QnStorageManager::fileStarted(const qint64& startDateMs, int timeZone, cons
         -1,
         (qint16) timeZone
     );
+    QnMutexLocker lk(&m_mutexCatalog);
     catalog->addRecord(chunk);
     catalog->setLastSyncTime(startDateMs);
     return true;

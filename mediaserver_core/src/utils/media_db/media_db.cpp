@@ -1,12 +1,13 @@
 #include <algorithm>
 #include "media_db.h"
+#include <nx/utils/log/log.h>
 
 namespace nx
 {
 namespace media_db
 {
 
-const size_t kMaxWriteQueueSize = 10000;
+const size_t kMaxWriteQueueSize = 1000;
 
 namespace
 {
@@ -172,21 +173,10 @@ Error DbHelper::writeRecordAsync(const WriteRecordType &record)
     {
         QnMutexLocker lk(&m_mutex);
         if (m_writeQueue.size() > kMaxWriteQueueSize)
-        {   // copy only camera operations.
-            // have to sacrifice chunks at this point.
-            WriteQueue tmpQueue;
-            std::copy_if(m_writeQueue.begin(), m_writeQueue.end(), 
-                         std::back_inserter(tmpQueue),
-                         [](const WriteRecordType &r)
-                         {
-                             return (bool)boost::get<CameraOperation>(&r);
-                         });
-            m_writeQueue = std::move(tmpQueue);
-        }
-        if (m_writeQueue.size() < kMaxWriteQueueSize)
-            m_writeQueue.push_back(record);
-        if (m_mode == Mode::Read)
-            return Error::WrongMode;
+            NX_LOG(lit("%1 DB write queue overflowed. Waiting while it becomes empty...").arg(Q_FUNC_INFO), cl_logWARNING);
+        while (m_writeQueue.size() > kMaxWriteQueueSize)
+            m_writerDoneCond.wait(lk.mutex());
+        m_writeQueue.push_back(record);
     }
     m_cond.wakeAll();
     return Error::NoError;
@@ -208,6 +198,7 @@ void DbHelper::setMode(Mode mode)
 
     m_stream.resetStatus();
     m_mode = mode;
+    m_cond.wakeAll();
 }
 
 Mode DbHelper::getMode() const

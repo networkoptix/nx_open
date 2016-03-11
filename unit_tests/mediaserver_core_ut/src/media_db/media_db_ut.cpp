@@ -730,22 +730,18 @@ TEST(MediaDb_test, StorageDB)
             {
             case 0:
                 {
+                    QnMutexLocker lk(&mutex);
                     std::pair<TestChunkManager::Catalog, std::deque<DeviceFileCatalog::Chunk>> p;
-                    {
-                        QnMutexLocker lk(&mutex);
-                        p = tcm.generateReplaceOperation(genRandomNumber<10, 100>());
-                    }
+                    p = tcm.generateReplaceOperation(genRandomNumber<10, 100>());
                     sdb.replaceChunks(p.first.cameraUniqueId, p.first.quality, p.second);
                 }
             break;
             case 1:
             case 2:
                 {
+                    QnMutexLocker lk(&mutex);
                     TestChunkManager::TestChunk *chunk;
-                    {
-                        QnMutexLocker lk(&mutex);
-                        chunk = tcm.generateRemoveOperation();
-                    }
+                    chunk = tcm.generateRemoveOperation();
                     if (chunk)
                         sdb.deleteRecords(chunk->catalog->cameraUniqueId,
                                           chunk->catalog->quality,
@@ -754,18 +750,16 @@ TEST(MediaDb_test, StorageDB)
                 break;
             default:
                 {
+                    QnMutexLocker lk(&mutex);
                     TestChunkManager::TestChunk chunk;
-                    {
-                        QnMutexLocker lk(&mutex);
-                        chunk = tcm.generateAddOperation();
-                    }
+                    chunk = tcm.generateAddOperation();
                     sdb.addRecord(chunk.catalog->cameraUniqueId,
                                   chunk.catalog->quality,
                                   chunk.chunk);
                 }
                 break;
             }
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            std::this_thread::sleep_for(std::chrono::milliseconds(7));
         }
     };
 
@@ -808,7 +802,7 @@ TEST(MediaDb_test, StorageDB)
                                         !tc.isVisited && !tc.isDeleted && tc.chunk == *chunkIt;
                              });
             bool tcmChunkFound = tcmIt != tcm.get().end();
-            EXPECT_TRUE(tcmChunkFound);
+            ASSERT_TRUE(tcmChunkFound);
             if (tcmChunkFound)
                 tcmIt->isVisited = true;
         }
@@ -820,8 +814,6 @@ TEST(MediaDb_test, StorageDB)
                                        return !tc.isDeleted && !tc.isVisited; 
                                    });
     ASSERT_EQ(allVisited, true);
-
-    recursiveClean(workDirPath);
 }
 
 TEST(MediaDb_test, Cleanup)
