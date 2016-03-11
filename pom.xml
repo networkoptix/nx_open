@@ -126,7 +126,7 @@
 
         <libdir>${root.dir}/build_environment/target</libdir>
         <rdep.target>${platform}-${arch}</rdep.target>
-        <qt.path>rdep/packages/${rdep.target}/qt-${qt.version}</qt.path>
+        <qt.path>packages/${rdep.target}/qt-${qt.version}</qt.path>
         <qt.dir>${environment.dir}/${qt.path}</qt.dir>
          <!-- Can take values 'pdb', 'src' or both ('pdb, src')  -->
         <qt.debug></qt.debug>
@@ -561,8 +561,6 @@
             <properties>
                 <platform>linux</platform>
                 <qt.spec>linux-g++</qt.spec>
-                <qt.path>artifacts/qt/${qt.version}/${platform}/${arch}/${box}/${build.configuration}</qt.path>
-                <qt.classifier>${platform}-${arch}-${build.configuration}</qt.classifier>
             </properties>
             <modules>
                 <!--<module>plugins/xvbadecoder</module>-->
@@ -578,7 +576,6 @@
             </activation>
             <properties>
                 <additional.compiler>clang</additional.compiler>
-                <qt.classifier>${platform}-${arch}</qt.classifier>
                 <python.executable>python</python.executable>
                 <python.virtualenv>virtualenv</python.virtualenv>
             </properties>
@@ -647,7 +644,6 @@
             <properties>
                 <build.suffix>${box}-${arch}</build.suffix>
                 <qt.spec>linux-arm-gnueabi-g++</qt.spec>
-                <qt.classifier>${platform}-${arch}-${box}</qt.classifier>
                 <compile.option1/>
                 <libdir>${root.dir}/build_environment/target-${box}</libdir>
             </properties>
@@ -677,6 +673,7 @@
                 <openssl.version>1.0.0j</openssl.version>
                 <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
                 <modification>isd</modification>
+                <rdep.target>isd</rdep.target>
             </properties>
             <modules>
                 <module>plugins/isd_native_plugin</module>
@@ -704,6 +701,7 @@
                 <openssl.version>1.0.1f</openssl.version>
                 <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
                 <modification>isd_s2</modification>
+                <rdep.target>isd_s2</rdep.target>
             </properties>
             <modules>
                 <module>plugins/isd_native_plugin</module>
@@ -730,6 +728,7 @@
                 <openssl.version>1.0.0j</openssl.version>
                 <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
                 <modification>rpi</modification>
+                <rdep.target>rpi</rdep.target>
             </properties>
             <modules>
                 <!--<module>plugins/rpi_cam</module>-->
@@ -758,6 +757,7 @@
                 <openssl.version>1.0.0j</openssl.version>
                 <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
                 <modification>bpi</modification>
+                <rdep.target>bpi</rdep.target>
             </properties>
             <modules>
                 <!-- Banana pie uses same distro as rpi -->
@@ -784,7 +784,7 @@
                 <openssl.version>1.0.0j</openssl.version>
                 <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
                 <modification>bananapi</modification>
-                <qt.classifier>${platform}-${arch}-bpi</qt.classifier>
+                <rdep.target>bpi</rdep.target>
             </properties>
             <modules>
                 <!-- Banana pie uses same distro as rpi -->
@@ -920,7 +920,6 @@
                 <toolchain.version>android</toolchain.version>
                 <qt.version>5.5.1</qt.version>
                 <qt.spec>android-g++</qt.spec>
-                <qt.classifier>${platform}-${arch}</qt.classifier>
                 <libdir>${root.dir}/build_environment/target</libdir>
                 <compiler>gcc</compiler>
                 <additional.compiler>gcc</additional.compiler>
@@ -932,6 +931,7 @@
                 <openssl.version>1.0.2d</openssl.version>
                 <additional.defines>DISABLE_FFMPEG</additional.defines>
                 <compile.option1/>
+                <rdep.target>android</rdep.target>
             </properties>
         </profile>
         <profile>
@@ -947,7 +947,6 @@
                 </file>
             </activation>
             <properties>
-                <qt.classifier>${platform}-${arch}-release</qt.classifier>
                 <additional.compiler>${compiler}</additional.compiler>
             </properties>
         </profile>
@@ -973,13 +972,13 @@
                 <platform>ios</platform>
                 <toolchain.version>ios</toolchain.version>
                 <qt.spec>macx-ios-clang</qt.spec>
-                <qt.classifier>${platform}-${arch}</qt.classifier>
                 <libdir>${root.dir}/build_environment/target</libdir>
                 <compiler>clang</compiler>
                 <additional.compiler>clang</additional.compiler>
                 <profile.classifier>${platform}-${arch}</profile.classifier>
                 <openssl.version>1.0.1i</openssl.version>
                 <compile.option1/>
+                <rdep.target>ios</rdep.target>
             </properties>
         </profile>
     </profiles>
