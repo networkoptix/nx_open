@@ -9,7 +9,7 @@ angular.module('cloudApp').directive('processAlert', function () {
                 errorPrefix:'=',
                 successMessage:'=',
                 processMessage:'=',
-                alertTimeout:'='
+                alertTimeout:'@'
             },
             link:function(scope,element,attrs){
                 scope.attrs = attrs;
@@ -18,11 +18,12 @@ angular.module('cloudApp').directive('processAlert', function () {
                 if(typeof(scope.alertTimeout)=='undefined') {
                     scope.alertTimeout = Config.alertTimeout;
                 }
-                if(scope.alertTimeout === 0){
+
+                if(scope.alertTimeout === 0 || scope.alertTimeout === '0'){
                     scope.alertTimeout = 365*24*3600*1000; // long enough )
                 }
+
                 scope.closeAlert = function(type){
-                    console.log("close alert", type, Config.alertTimeout);
                     scope.shown[type] = true;
                 };
 
@@ -31,7 +32,7 @@ angular.module('cloudApp').directive('processAlert', function () {
                 });
             }
         };
-    }).directive('processButton', function () {
+    }).directive('processButton', ['$timeout',function ($timeout) {
         return {
             restrict: 'E',
             templateUrl: 'views/components/process-button.html',
@@ -54,11 +55,19 @@ angular.module('cloudApp').directive('processAlert', function () {
                         })
                     });
                 }
+
+                function setFocusToInvalid(form){
+                    $timeout(function() {
+                        $("[name='" + form.$name + "']").find('.ng-invalid:visible:first').focus();
+                    });
+                }
+
                 scope.attrs = attrs;
                 scope.checkForm = function(){
                     if(scope.form && !scope.form.$valid){
-                        //Set the forum touched
+                        //Set the form touched
                         touchForm(scope.form);
+                        setFocusToInvalid(scope.form);
                         return false;
                     }else{
                         scope.process.run();
@@ -67,7 +76,7 @@ angular.module('cloudApp').directive('processAlert', function () {
 
             }
         };
-    }).directive('processLoading',function(){
+    }]).directive('processLoading',function(){
         return {
             restrict: 'A',
             scope:{
