@@ -33,7 +33,7 @@ add_library(${PROJECT_SHORTNAME} STATIC
   ${RESOURCE_FILES}
 )
 target_link_libraries(${PROJECT_SHORTNAME}
-  Qt5::Core Qt5::Network Qt5::Concurrent common
+  Qt5::Core Qt5::Network Qt5::Concurrent
 )
 #set_target_properties(${PROJECT_SHORTNAME} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "src/stdafx.h")
 #cotire(${PROJECT_SHORTNAME})

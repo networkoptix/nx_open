@@ -30,5 +30,5 @@ add_library(${PROJECT_SHORTNAME} STATIC
   ${RESOURCE_FILES}
 )
 target_link_libraries(${PROJECT_SHORTNAME}
-  Qt5::Core common
+  Qt5::Core
 )

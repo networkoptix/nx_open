@@ -64,6 +64,7 @@ build_environment/x64
 build_environment/arm
 build-jom
 build-vs
+build-ninja
 common_libs/nx_streaming/arm
 
 build_environment/maven/filter-resources/current_config

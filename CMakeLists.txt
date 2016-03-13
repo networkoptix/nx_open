@@ -7,6 +7,9 @@ set(majorVersion 2)
 set(minorVersion 6)
 set(incrementalVersion 0)
 
+project(vms)
+set(PROJECT_SHORTNAME "vms")
+
 # Global CMake options
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
@@ -41,6 +44,9 @@ if(WIN32)
         message(STATUS "Added parallel build arguments to CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
     endif()
 endif()
+
+message("---- Building for: ${CMAKE_VS_PLATFORM_NAME}")
+
 set (openal.version "1.16")
 set (directx.version "JUN2010")
 set (festival.version "2.1")
@@ -130,7 +136,6 @@ include(precompiled_header)
 
 include_directories($ENV{environment}/boost_1_56_0
                     ${CMAKE_SOURCE_DIR}/common/src
-                    $ENV{environment}/include
                     $ENV{environment}/include/ffmpeg-misc-headers-win32
                     $ENV{environment}/include/glext
                     $ENV{environment}/qt5-custom
@@ -141,7 +146,6 @@ include_directories($ENV{environment}/boost_1_56_0
                     ${CMAKE_SOURCE_DIR}/common_libs/nx_media/src
                     ${CMAKE_SOURCE_DIR}/common_libs/nx_audio/src
                     ${CMAKE_SOURCE_DIR}/common_libs/udt/src                    
-                    $ENV{environment}/qt5-custom
                     $ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}/include
                     $ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}/include/QtZlib
                     $ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}/include/QtCore/${qt.version}/QtCore
@@ -187,9 +191,10 @@ find_package(Qt5LinguistTools)
                     
 add_module(
     NAMES
-        #nxtool
-        #common
-        #common_libs
+        nxtool
+        common
+        common_libs
         appserver2
+        applauncher
     STATUS_SHORT_NAMES
 )

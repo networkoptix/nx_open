@@ -41,10 +41,11 @@ qt5_add_resources(RESOURCE_FILES ${PROJECT_BINARY_DIR}/${PROJECT_SHORTNAME}.qrc)
 add_library(${PROJECT_SHORTNAME} STATIC
   ${UI_HEADERS}
   ${CPP_FILES}
+  ${HEADER_FILES}
   ${RESOURCE_FILES}
 )
 target_link_libraries(${PROJECT_SHORTNAME}
-  Qt5::Core Qt5::Gui Qt5::Network Ws2_32.lib glu32.lib opengl32.lib odbccp32.lib
+  nx_utils nx_streaming Qt5::Core Qt5::Gui Qt5::Network Qt5::Xml Qt5::XmlPatterns Qt5::Sql Qt5::Concurrent Qt5::Multimedia ws2_32 Iphlpapi Ole32 sigar Secur32 avcodec avdevice avfilter avformat avutil swscale postproc
 )
 
 if (UNIX)
