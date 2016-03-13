@@ -12,7 +12,7 @@ endif()
 if (WIN32 AND NOT CMAKE_INSTALL_PREFIX)
   set(CMAKE_INSTALL_PREFIX dist CACHE STRING "Install path prefix.")
 endif()
- 
+
 project(nx_network)
 set(PROJECT_SHORTNAME "nx_network")
 set(PROJECT_LONGNAME "${nxtool.company.name} Network Library")
@@ -22,7 +22,7 @@ remove_definitions(-D_CONSOLE
                 )
 add_definitions(-D_CONSOLE
                 -DNX_NETWORK_API=__declspec\(dllexport\)
-                )                
+                )
 
 find_sources(src)
 ADD_MSVC_PRECOMPILED_HEADER("StdAfx.h" "${PROJECT_SOURCE_DIR}/src/StdAfx.cpp" CPP_FILES)
@@ -39,7 +39,7 @@ find_package(Qt5Sql REQUIRED)
 find_package(Qt5Concurrent REQUIRED)
 find_package(Qt5Multimedia REQUIRED)
 
-add_library(${PROJECT_SHORTNAME} SHARED
+add_library(${PROJECT_SHORTNAME} ${DEFAULT_LIBRARY_TYPE}
   ${UI_HEADERS}
   ${CPP_FILES}
   ${RESOURCE_FILES}

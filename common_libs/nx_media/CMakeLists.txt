@@ -12,7 +12,7 @@ endif()
 if (WIN32 AND NOT CMAKE_INSTALL_PREFIX)
   set(CMAKE_INSTALL_PREFIX dist CACHE STRING "Install path prefix.")
 endif()
- 
+
 project(nx_media)
 set(PROJECT_SHORTNAME "nx_media")
 set(PROJECT_LONGNAME "${nxtool.company.name} Multimedia Library")
@@ -28,7 +28,7 @@ find_package(Qt5Gui REQUIRED)
 find_package(Qt5OpenGL REQUIRED)
 find_package(Qt5Multimedia REQUIRED)
 
-add_library(${PROJECT_SHORTNAME} STATIC
+add_library(${PROJECT_SHORTNAME} ${DEFAULT_LIBRARY_TYPE}
   ${UI_HEADERS}
   ${CPP_FILES}
   ${RESOURCE_FILES}

@@ -37,8 +37,8 @@ process_resources()
 add_translations(translations)
 qt5_wrap_ui(UI_HEADERS ${UI_FILES})
 qt5_add_resources(RESOURCE_FILES ${PROJECT_BINARY_DIR}/${PROJECT_SHORTNAME}.qrc)
-                 
-add_library(${PROJECT_SHORTNAME} STATIC
+
+add_library(${PROJECT_SHORTNAME} ${DEFAULT_LIBRARY_TYPE}
   ${UI_HEADERS}
   ${CPP_FILES}
   ${HEADER_FILES}
@@ -49,9 +49,9 @@ target_link_libraries(${PROJECT_SHORTNAME}
 )
 
 if (UNIX)
-  install(TARGETS ${PROJECT_SHORTNAME}
-          RUNTIME DESTINATION bin)
+    install(TARGETS ${PROJECT_SHORTNAME}
+            LIBRARY DESTINATION lib)
 elseif (WIN32)
-  install(TARGETS ${PROJECT_SHORTNAME}
-          DESTINATION .)
+    install(TARGETS ${PROJECT_SHORTNAME}
+            DESTINATION .)
 endif()

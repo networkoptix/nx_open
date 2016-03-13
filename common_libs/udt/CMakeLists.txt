@@ -12,7 +12,7 @@ endif()
 if (WIN32 AND NOT CMAKE_INSTALL_PREFIX)
   set(CMAKE_INSTALL_PREFIX dist CACHE STRING "Install path prefix.")
 endif()
- 
+
 project(udt)
 set(PROJECT_SHORTNAME "udt")
 set(PROJECT_LONGNAME "${nxtool.company.name} UDP-based Data Transfer Library")
@@ -22,7 +22,7 @@ remove_definitions(-D_CONSOLE
                 )
 add_definitions(-D_CONSOLE
                 -DUDT_API=__declspec\(dllexport\)
-                )                
+                )
 #include_directories (${include_directories} src $ENV{environment}/include)
                 
 find_sources(src)
@@ -32,7 +32,7 @@ add_translations(translations)
 qt5_wrap_ui(UI_HEADERS ${UI_FILES})
 qt5_add_resources(RESOURCE_FILES ${PROJECT_BINARY_DIR}/${PROJECT_SHORTNAME}.qrc)
 
-add_library(${PROJECT_SHORTNAME} SHARED
+add_library(${PROJECT_SHORTNAME} ${DEFAULT_LIBRARY_TYPE}
   ${UI_HEADERS}
   ${CPP_FILES}
   ${RESOURCE_FILES}
