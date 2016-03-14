@@ -1,61 +1,98 @@
 import QtQuick 2.5;
+import QtQuick.Controls 1.2;
 
 BaseTile
 {
-    id: thisComponenet;
+    id: thisComponent;
 
     property string host;
     property string userName;
     property bool isComaptible;
 
-    areaDelegate: Grid
+    property QtObject activeItemSelector: SingleActiveItemSelector
     {
-        rows: 2;
-        columns: 2;
-
-        rowSpacing: 2;
-        columnSpacing: 4;
-
-        anchors.top: parent.top;
-        anchors.left: parent.left;
-        anchors.right: parent.right;
-        anchors.bottom: parent.bottom;
-
-        anchors.topMargin: 12;
-        anchors.bottomMargin: 16;
-
-        Rectangle
+        variableName: "isMasked";
+        onIsSomeoneActiveChanged:
         {
-            id: hostImage;
-            width: 16; height: 16; color: (thisComponenet.isComaptible ? "green" : "red");
-        }
-
-        Text
-        {
-            id: hostText;
-
-            text: thisComponenet.host;
-            color: thisComponenet.textColor;
-            font.pixelSize: thisComponenet.fontPixelSize;
-        }
-
-        Rectangle
-        {
-            id: userImage;
-            width: 16; height: 16; color: "white";
-        }
-
-        Text
-        {
-            id: userNameText;
-
-            text: thisComponenet.userName;
-            color: thisComponenet.textColor;
-            font.pixelSize: thisComponenet.fontPixelSize;
+            if (isSomeoneActive)
+                isExpanded = true;
         }
     }
 
-    // TODO setup fonts
-    readonly property int fontPixelSize: 12;
-    readonly property color textColor: "white";
+    onIsExpandedChanged:
+    {
+        if (!isExpanded)
+            activeItemSelector.resetCurrentItem();
+    }
+
+    centralAreaDelegate: Column
+    {
+        anchors.left: (parent ? parent.left : undefined);
+        anchors.right: (parent ? parent.right : undefined);
+
+        InfoItem
+        {
+            text: thisComponent.host;
+            iconUrl: (isComaptible ? "non_empty_url" : "");// TODO: change to proper url
+
+            Component.onCompleted: activeItemSelector.addItem(this);    // TODO: add ActiveWatchable qml component?
+        }
+
+        InfoItem
+        {
+            text: thisComponent.userName;
+
+            Component.onCompleted: activeItemSelector.addItem(this);
+        }
+    }
+
+    expandedAreaDelegate: Column
+    {
+        spacing: 8;
+
+        anchors.left: (parent ? parent.left : undefined);
+        anchors.right: (parent ? parent.right : undefined);
+
+        Text
+        {
+            text: qsTr("Password");
+        }
+
+        TextField
+        {
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+
+        }
+
+        CheckBox
+        {
+            text: qsTr("Save password");
+        }
+
+        CheckBox
+        {
+            enabled: false;
+            text: qsTr("Auto-login");
+        }
+
+        Button
+        {
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+
+            text: qsTr("Connect");
+        }
+    }
 }
+
+
+
+
+
+
+
+
+
+
+

@@ -12,7 +12,7 @@ endif()
 if (WIN32 AND NOT CMAKE_INSTALL_PREFIX)
   set(CMAKE_INSTALL_PREFIX dist CACHE STRING "Install path prefix.")
 endif()
- 
+
 project(nx_utils)
 set(PROJECT_SHORTNAME "nx_utils")
 set(PROJECT_LONGNAME "${nxtool.company.name} Utilities Library")
@@ -22,7 +22,7 @@ remove_definitions(-D_CONSOLE
                 )
 add_definitions(-D_CONSOLE
                 -DNX_UTILS_API=__declspec\(dllexport\)
-                )    
+                )
 
 find_sources(src)
 ADD_MSVC_PRECOMPILED_HEADER("StdAfx.h" "${PROJECT_SOURCE_DIR}/src/StdAfx.cpp" CPP_FILES)
@@ -31,7 +31,7 @@ add_translations(translations)
 qt5_wrap_ui(UI_HEADERS ${UI_FILES})
 qt5_add_resources(RESOURCE_FILES ${PROJECT_BINARY_DIR}/${PROJECT_SHORTNAME}.qrc)
 
-add_library(${PROJECT_SHORTNAME} STATIC
+add_library(${PROJECT_SHORTNAME} ${DEFAULT_LIBRARY_TYPE}
   ${UI_HEADERS}
   ${CPP_FILES}
   ${RESOURCE_FILES}

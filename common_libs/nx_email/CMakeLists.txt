@@ -12,7 +12,7 @@ endif()
 if (WIN32 AND NOT CMAKE_INSTALL_PREFIX)
   set(CMAKE_INSTALL_PREFIX dist CACHE STRING "Install path prefix.")
 endif()
- 
+
 project(nx_email)
 set(PROJECT_SHORTNAME "nx_email")
 set(PROJECT_LONGNAME "${nxtool.company.name} E-Mail Library")
@@ -27,7 +27,7 @@ qt5_add_resources(RESOURCE_FILES ${PROJECT_BINARY_DIR}/${PROJECT_SHORTNAME}.qrc)
 find_package(Qt5Network REQUIRED)
 find_package(Qt5Concurrent REQUIRED)
 
-add_library(${PROJECT_SHORTNAME} STATIC
+add_library(${PROJECT_SHORTNAME} ${DEFAULT_LIBRARY_TYPE}
   ${UI_HEADERS}
   ${CPP_FILES}
   ${RESOURCE_FILES}

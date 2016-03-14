@@ -13,8 +13,16 @@ Rectangle
 
     SystemPalette { id: palette; }
 
+    MouseArea
+    {
+        anchors.fill: parent;
+        onClicked: grid.watcher.resetCurrentItem();
+    }
+
     Grid
     {
+        id: grid;
+
         anchors.centerIn: parent;
 
         rows: (itemsSource.count > 3 ? 2 : 1);
@@ -23,13 +31,22 @@ Rectangle
 
         spacing: 16;
 
+        property QtObject watcher: SingleActiveItemSelector
+        {
+            variableName: "isExpanded";
+        }
+
         Repeater
         {
             id: itemsSource;
+
             model: QnSystemsModel {}
 
             delegate: Loader
             {
+                id: tileLoader;
+
+                z: (item ? item.z : 0);
                 Component
                 {
                     id: localSystemTile;
@@ -56,6 +73,8 @@ Rectangle
 
                 sourceComponent: (model.isCloudSystem
                     ? cloudSystemTile : localSystemTile);
+
+                onLoaded: grid.watcher.addItem(tileLoader.item);
             }
         }
     }

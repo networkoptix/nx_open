@@ -2,26 +2,24 @@ import QtQuick 2.5;
 
 BaseTile
 {
-    id: thisComponenet;
+    id: thisComponent;
 
     property string userName;
 
-    areaDelegate: Item
+    centralAreaDelegate: Column
     {
         Text
         {
             id: login;
 
-            anchors.top: parent.top;
             anchors.left: parent.left;
             anchors.right: parent.right;
 
-            anchors.topMargin: 2;
             anchors.leftMargin: 4;
 
             text: userName;
-            color: thisComponenet.textColor;
-            font.pixelSize: thisComponenet.fontPixelSize;
+            color: thisComponent.textColor;
+            font.pixelSize: thisComponent.fontPixelSize;
         }
 
         Rectangle
@@ -29,9 +27,6 @@ BaseTile
             id: cloudIndicator;
 
             anchors.left: parent.left;
-            anchors.bottom: parent.bottom;
-
-            anchors.bottomMargin: 8;
 
             width: 24;
             height: width;
