@@ -75,14 +75,16 @@ describe('Login suite', function () {
         p.dialogCloseButton.click();
     });
 
-    it("should allow to log in with existing email in uppercase", function () {
+    it("should not allow to log in with existing email in uppercase", function () {
         p.get();
 
         p.emailInput.sendKeys(p.userEmail1.toUpperCase());
         p.passwordInput.sendKeys(p.userPassword);
-        p.login();
-        // browser.pause();
-        p.logout();
+        p.dialogLoginButton.click();
+
+        p.catchLoginIncorrectAlert(p.loginIncorrectAlert);
+
+        p.dialogCloseButton.click();
     });
 
     it("should not log in with wrong password", function () {
@@ -160,10 +162,11 @@ describe('Login suite', function () {
         p.emailInput.sendKeys('vert546 464w6345');
         p.rememberCheckbox.click(); // blur email field
         p.checkEmailInvalid();
-        expect(this.passwordInputWrap.getAttribute('class')).not.toContain('has-error'); // since pasword is not touched, field shoud show no error
+        expect(p.passwordInputWrap.getAttribute('class')).not.toContain('has-error'); // since pasword is not touched, field shoud show no error
 
 
         p.passwordInput.click(); // click on pasword and leave it empty
+        p.rememberCheckbox.click(); // blur password field
         p.checkPasswordMissing();
 
         p.dialogCloseButton.click();
