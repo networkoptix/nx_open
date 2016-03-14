@@ -39,6 +39,7 @@
 
 #include <ui/dialogs/ptz_manage_dialog.h>
 
+#include <ui/workbench/workbench_welcome_screen.h>
 #include <ui/workbench/handlers/workbench_action_handler.h>
 #include <ui/workbench/handlers/workbench_bookmarks_handler.h>
 #include <ui/workbench/handlers/workbench_connect_handler.h>
@@ -169,6 +170,8 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     ),
     QnWorkbenchContextAware(context),
     m_controller(0),
+    m_currentPageHolder(new QStackedWidget()),
+    m_welcomeScreenVisible(true),
     m_titleVisible(true),
     m_skipDoubleClick(false),
     m_dwm(NULL),
@@ -232,6 +235,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     display()->setLightMode(qnSettings->lightMode());
     display()->setScene(m_scene.data());
     display()->setView(m_view.data());
+    
     if (qnRuntime->isVideoWallMode())
         display()->setNormalMarginFlags(0);
     else
@@ -281,6 +285,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     context->instance<QnTimelineBookmarksWatcher>();
     context->instance<QnWorkbenchServerPortWatcher>();
     context->instance<QnCurrentUserAvailableCamerasWatcher>();
+    auto welcomeScreen = context->instance<QnWorkbenchWelcomeScreen>();
 
     /* Set up watchers. */
     context->instance<QnWorkbenchUserInactivityWatcher>()->setMainWindow(this);
@@ -342,6 +347,11 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     connect(m_tabBar,             &QnLayoutTabBar::tabCloseRequested,     this,    &QnMainWindow::skipDoubleClick);
     connect(m_tabBar,             &QnLayoutTabBar::currentChanged,        this,    &QnMainWindow::skipDoubleClick);
 
+    connect(welcomeScreen, &QnWorkbenchWelcomeScreen::visibleChanged, this
+        , [this, welcomeScreen]()
+    {
+        setWelcomeScreenVisible(welcomeScreen->isVisible());
+    });
 
     /* Tab bar layout. To snap tab bar to graphics view. */
     QWidget *tabBarWidget = new QWidget(this);
@@ -385,10 +395,11 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_titleLayout->addLayout(m_windowButtonsLayout);
 
     /* Layouts. */
+    
     m_viewLayout = new QVBoxLayout();
     m_viewLayout->setContentsMargins(0, 0, 0, 0);
     m_viewLayout->setSpacing(0);
-    m_viewLayout->addWidget(m_view.data());
+    m_viewLayout->addWidget(m_currentPageHolder);
 
     m_globalLayout = new QVBoxLayout();
     m_globalLayout->setContentsMargins(0, 0, 0, 0);
@@ -396,11 +407,15 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_globalLayout->addLayout(m_titleLayout);
     m_globalLayout->addLayout(m_viewLayout);
     m_globalLayout->setStretchFactor(m_viewLayout, 0x1000);
+
     setLayout(m_globalLayout);
 
+ //   m_currentPageHolder->addWidget(new QWidget());
+    m_currentPageHolder->addWidget(m_view.data());
+    m_currentPageHolder->addWidget(welcomeScreen->widget());
 
     /* Post-initialize. */
-    updateDwmState();
+    updateWidgetsVisibility();
 #ifdef Q_OS_MACX
     setOptions(WindowButtonsVisible);
 #else
@@ -435,21 +450,59 @@ QWidget *QnMainWindow::viewport() const {
     return m_view->viewport();
 }
 
-void QnMainWindow::setTitleVisible(bool visible) {
+bool QnMainWindow::isTitleVisible() const
+{
+    return m_titleVisible || m_welcomeScreenVisible;
+}
+
+void QnMainWindow::updateWidgetsVisibility()
+{
+    const auto updateTitleBarVisibility = [this](bool visible)
+    {
+        if (visible) 
+        {
+            m_globalLayout->insertLayout(0, m_titleLayout);
+            setVisibleRecursively(m_titleLayout, true);
+            return;
+        }
+
+        m_globalLayout->takeAt(0);
+        m_titleLayout->setParent(NULL);
+        setVisibleRecursively(m_titleLayout, false);
+    };
+
+    const auto updateWelcomeScreenVisibility = 
+        [this](bool welcomeScreenIsVisible)
+    {
+        enum { kSceneIndex, kWelcomePageIndex };
+        m_currentPageHolder->setCurrentIndex(welcomeScreenIsVisible 
+            ? kWelcomePageIndex : kSceneIndex);
+    };
+
+    // Always show title bar for welcome screen (it does not matter if it is fullscreen)
+
+    updateTitleBarVisibility(isTitleVisible());
+    updateWelcomeScreenVisibility(m_welcomeScreenVisible);
+    updateDwmState();
+}
+
+void QnMainWindow::setWelcomeScreenVisible(bool visible)
+{
+    if (m_welcomeScreenVisible == visible)
+        return;
+
+    m_welcomeScreenVisible = visible;
+    updateWidgetsVisibility();
+}
+
+void QnMainWindow::setTitleVisible(bool visible) 
+{
     if(m_titleVisible == visible)
         return;
 
     m_titleVisible = visible;
-    if(visible) {
-        m_globalLayout->insertLayout(0, m_titleLayout);
-        setVisibleRecursively(m_titleLayout, true);
-    } else {
-        m_globalLayout->takeAt(0);
-        m_titleLayout->setParent(NULL);
-        setVisibleRecursively(m_titleLayout, false);
-    }
 
-    updateDwmState();
+    updateWidgetsVisibility();
 }
 
 void QnMainWindow::setWindowButtonsVisible(bool visible) {
@@ -570,7 +623,7 @@ void QnMainWindow::minimize() {
 }
 
 void QnMainWindow::toggleTitleVisibility() {
-    setTitleVisible(!isTitleVisible());
+    setTitleVisible(!m_titleVisible);
 }
 
 bool QnMainWindow::handleMessage(const QString &message) {
@@ -599,6 +652,7 @@ void QnMainWindow::setOptions(Options options) {
 }
 
 void QnMainWindow::updateDecorationsState() {
+    return;
 #ifdef Q_OS_MACX
     bool fullScreen = mac_isFullscreen((void*)winId());
 #else
@@ -624,6 +678,7 @@ void QnMainWindow::updateDecorationsState() {
 }
 
 void QnMainWindow::updateDwmState() {
+    return;
     if(isFullScreen()) {
         /* Full screen mode. */
         m_drawCustomFrame = false;
@@ -859,7 +914,7 @@ bool QnMainWindow::nativeEvent(const QByteArray &eventType, void *message, long 
 }
 
 Qt::WindowFrameSection QnMainWindow::windowFrameSectionAt(const QPoint &pos) const {
-    if(isFullScreen())
+    if(isFullScreen() && !isTitleVisible())
         return Qt::NoSection;
 
     Qt::WindowFrameSection result = Qn::toNaturalQtFrameSection(Qn::calculateRectangularFrameSections(rect(), QnGeometry::eroded(rect(), m_frameMargins), QRect(pos, pos)));

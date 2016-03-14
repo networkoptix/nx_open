@@ -11,7 +11,7 @@ import "../controls"
 import ".."
 
 QnPage {
-    id: videoPlayer
+    id: videoPage
 
     title: mainWindow.currentSystemName
 
@@ -165,7 +165,7 @@ QnPage {
             if (!d.videoNavigation.paused)
                 player.play()
         }
-        onHidden: videoPlayer.forceActiveFocus()
+        onHidden: videoPage.forceActiveFocus()
     }
 
     QnScalableVideo {
@@ -243,6 +243,9 @@ QnPage {
                 font.pixelSize: sp(32)
                 font.weight: Font.Normal
 
+                wrapMode: Text.WordWrap
+                width: videoPage.width
+
                 anchors.horizontalCenter: parent.horizontalCenter
 
                 text: {
@@ -275,7 +278,7 @@ QnPage {
 
     QnMediaPlayer {
         id: player
-        resourceId: videoPlayer.resourceId
+        resourceId: videoPage.resourceId
 
         onPlayingChanged: {
             if (playing)
@@ -290,7 +293,7 @@ QnPage {
 
     QnCameraAccessRightsHelper {
         id: accessRightsHelper
-        resourceId: videoPlayer.resourceId
+        resourceId: videoPage.resourceId
     }
 
     Loader {

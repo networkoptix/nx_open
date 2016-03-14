@@ -264,7 +264,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(QnActions::EscapeHotkeyAction),                     SIGNAL(triggered()),    this,   SLOT(at_escapeHotkeyAction_triggered()));
     connect(action(QnActions::MessageBoxAction),                       SIGNAL(triggered()),    this,   SLOT(at_messageBoxAction_triggered()));
     connect(action(QnActions::BrowseUrlAction),                        SIGNAL(triggered()),    this,   SLOT(at_browseUrlAction_triggered()));
-    connect(action(QnActions::VersionMismatchMessageAction),           SIGNAL(triggered()),    this,   SLOT(at_versionMismatchMessageAction_triggered()));
+    connect(action(QnActions::VersionMismatchMessageAction),           &QAction::triggered,    this,   &QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered);
     connect(action(QnActions::BetaVersionMessageAction),               SIGNAL(triggered()),    this,   SLOT(at_betaVersionMessageAction_triggered()));
     connect(action(QnActions::AllowStatisticsReportMessageAction),     &QAction::triggered,    this,   [this] { checkIfStatisticsReportAllowed(); });
 
@@ -2336,6 +2336,9 @@ void QnWorkbenchActionHandler::at_browseUrlAction_triggered() {
 
 void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
     if (qnCommon->isReadOnly())
+        return;
+
+    if (qnRuntime->ignoreVersionMismatch())
         return;
 
     QnWorkbenchVersionMismatchWatcher *watcher = context()->instance<QnWorkbenchVersionMismatchWatcher>();

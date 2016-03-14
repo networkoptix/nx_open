@@ -1,1 +1,0 @@
-Place QT resources used for all customizations here
