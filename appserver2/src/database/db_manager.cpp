@@ -481,7 +481,7 @@ bool QnDbManager::init(const QUrl& dbUrl)
 
     QSqlQuery queryAdminUser( m_sdb );
     queryAdminUser.setForwardOnly( true );
-    queryAdminUser.prepare( "SELECT r.guid, r.id FROM vms_resource r JOIN auth_user u on u.id = r.id and r.name = 'admin'" );
+    queryAdminUser.prepare( "SELECT r.guid, r.id FROM vms_resource r JOIN auth_user u on u.id = r.id and r.name = 'admin'" ); //TODO: #GDM check owner permission instead
     if( !queryAdminUser.exec() )
     {
         Q_ASSERT( false );
@@ -589,30 +589,41 @@ bool QnDbManager::init(const QUrl& dbUrl)
     }
 
     // Set admin user's password
-    ApiUserDataList users;
-    ErrorCode errCode = doQueryNoLock( m_adminUserID, users );
-    if( errCode != ErrorCode::ok )
+    QnUserResourcePtr userResource;
     {
-        return false;
-    }
+        ApiUserDataList users;
+        ErrorCode errCode = doQueryNoLock(nullptr, users);
+        if (errCode != ErrorCode::ok)
+            return false;
 
-    if( users.empty() )
-    {
-        return false;
+        if (users.empty())
+            return false;
+
+        auto iter = std::find_if(users.cbegin(), users.cend(), [this](const ec2::ApiUserData& user)
+        {
+            return user.id == m_adminUserID;
+        });
+
+        NX_ASSERT(iter != users.cend(), Q_FUNC_INFO, "Admin must exist");
+        if (iter == users.cend())
+            return false;
+
+        userResource.reset(new QnUserResource());
+        fromApiToResource(*iter, userResource);
+        NX_ASSERT(userResource->isAdmin(), Q_FUNC_INFO, "Admin must be admin as it is found by name");
     }
 
     QByteArray md5Password;
     QByteArray digestPassword;
     qnCommon->adminPasswordData(&md5Password, &digestPassword);
     QString defaultAdminPassword = qnCommon->defaultAdminPassword();
-    if( (users[0].hash.isEmpty() || m_dbJustCreated) && defaultAdminPassword.isEmpty() ) {
+    if( (userResource->getHash().isEmpty() || m_dbJustCreated) && defaultAdminPassword.isEmpty() ) {
         defaultAdminPassword = lit("admin");
         if (m_dbJustCreated)
             qnCommon->setUseLowPriorityAdminPasswordHach(true);
     }
 
-    QnUserResourcePtr userResource( new QnUserResource() );
-    fromApiToResource( users[0], userResource );
+
     bool updateUserResource = false;
     if( !defaultAdminPassword.isEmpty() )
     {
@@ -3386,12 +3397,8 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiServerFootag
 }
 
 //getUsers
-ErrorCode QnDbManager::doQueryNoLock(const QnUuid& userId, ApiUserDataList& userList)
+ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiUserDataList& userList)
 {
-    QString filterStr;
-    if (!userId.isNull())
-        filterStr = QString("WHERE r.guid = %1").arg(guidToSqlString(userId));
-
     //digest = md5('%s:%s:%s' % (self.user.username.lower(), 'NetworkOptix', password)).hexdigest()
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
@@ -3402,9 +3409,8 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& userId, ApiUserDataList& user
         FROM vms_resource r \
         JOIN auth_user u  on u.id = r.id\
         JOIN vms_userprofile p on p.user_id = u.id\
-        %1\
         ORDER BY r.guid\
-    ").arg(filterStr));
+    "));
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
         return ErrorCode::dbError;
