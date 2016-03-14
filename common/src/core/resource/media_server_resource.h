@@ -1,8 +1,6 @@
-#ifndef QN_MEDIA_SERVER_RESOURCE_H
-#define QN_MEDIA_SERVER_RESOURCE_H
+#pragma once
 
 #include <QtCore/QElapsedTimer>
-#include <QtNetwork/QHostAddress>
 
 #include <api/media_server_connection.h>
 
@@ -11,7 +9,6 @@
 #include <utils/common/system_information.h>
 
 #include <core/resource/resource.h>
-#include <core/resource/resource_factory.h>
 
 #include "api/server_rest_connection_fwd.h"
 
@@ -106,7 +103,7 @@ public:
     static bool isHiddenServer(const QnResourcePtr &resource);
 
     /** Original GUID is set for incompatible servers when their getGuid() getter returns a fake GUID.
-     * This allows us to hold temporary fake server dublicates in the resource pool.
+     * This allows us to hold temporary fake server duplicates in the resource pool.
      */
     QnUuid getOriginalGuid() const;
     /** Set original GUID. No signals emmited after this method because the original GUID should not be changed after resource creation. */
@@ -117,11 +114,13 @@ public:
     qint64 currentStatusTime() const;
 
     void beforeDestroy();
+
 private slots:
     void onNewResource(const QnResourcePtr &resource);
     void onRemoveResource(const QnResourcePtr &resource);
     void atResourceChanged();
     void at_propertyChanged(const QnResourcePtr & /*res*/, const QString & key);
+
 signals:
     void portChanged(const QnResourcePtr &resource);
     void apiUrlChanged(const QnResourcePtr &resource);
@@ -158,5 +157,3 @@ private:
 
 Q_DECLARE_METATYPE(QnMediaServerResourcePtr);
 Q_DECLARE_METATYPE(QnMediaServerResourceList);
-
-#endif // QN_MEDIA_SERVER_RESOURCE_H

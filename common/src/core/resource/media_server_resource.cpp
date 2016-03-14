@@ -41,15 +41,6 @@ namespace {
     }
 }
 
-
-class QnMediaServerResourceGuard: public QObject {
-public:
-    QnMediaServerResourceGuard(const QnMediaServerResourcePtr &resource): m_resource(resource) {}
-
-private:
-    QnMediaServerResourcePtr m_resource;
-};
-
 QnMediaServerResource::QnMediaServerResource():
     m_serverFlags(Qn::SF_None),
     m_panicModeCache(

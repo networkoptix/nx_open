@@ -31,6 +31,7 @@
 #include <core/resource/camera_user_attribute_pool.h>
 #include <core/resource/media_server_user_attributes.h>
 #include <core/resource/storage_resource.h>
+#include <core/resource/resource_factory.h>
 
 #include <business/business_event_rule.h>
 
