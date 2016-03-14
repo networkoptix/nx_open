@@ -33,6 +33,7 @@
 #include <nx_ec/data/api_time_data.h>
 #include "nx_ec/data/api_conversion_functions.h"
 #include "nx_ec/data/api_client_info_data.h"
+#include <nx_ec/data/api_access_rights_data.h>
 #include "api/runtime_info_manager.h"
 #include <nx/utils/log/log.h>
 #include "nx_ec/data/api_camera_data_ex.h"
@@ -3450,6 +3451,27 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& userId, ApiUserDataList& user
 
     return ErrorCode::ok;
 }
+
+ec2::ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiAccessRightsDataList& accessRightsList)
+{
+    QSqlQuery query(m_sdb);
+    query.setForwardOnly(true);
+    query.prepare(R"(
+        SELECT user.guid as userId, resource.guid as resourceId
+        FROM vms_access_rights rights
+        JOIN vms_resource user on user.id = rights.user_ptr_id
+        JOIN vms_resource resource on resource.id = rights.resource_ptr_id
+        ORDER BY user.guid
+    )");
+
+    if (!execSQLQuery(&query, Q_FUNC_INFO))
+        return ErrorCode::dbError;
+
+    QnSql::fetch_many(query, &accessRightsList);
+
+    return ErrorCode::ok;
+}
+
 
 //getTransactionLog
 ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t&, ApiTransactionDataList& tranList)
