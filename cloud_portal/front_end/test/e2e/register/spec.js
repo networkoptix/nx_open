@@ -37,10 +37,7 @@ describe('Login suite', function () {
         p.emailInput.sendKeys(p.userEmailRandom);
         p.passwordInput.sendKeys(p.userPassword);
 
-        p.htmlBody.click(); // this should be added because of strange behaviour; could be removed later
         p.submitRegisterButton.click();
-
-        browser.sleep(500);
 
         p.catchregisterSuccessAlert(p.registerSuccessAlert);
 
@@ -65,12 +62,10 @@ describe('Login suite', function () {
         p.getByLink();
         expect("test").toBe("written");
     });
-
     it("should not allow to register with email in non-email format", function () {
         p.getByLink();
         expect("test").toBe("written");
     });
-
     it("should not allow to register with password with cyrillic symbols", function () {
         p.getByLink();
         expect("test").toBe("written");
@@ -78,18 +73,15 @@ describe('Login suite', function () {
     it("should not allow to register with password with tm symbols", function () {
         p.getByLink();
         expect("test").toBe("written");
-    });
-    
+    });  
     it("should show warnings about password strength", function () {
         p.getByLink();
         expect("test").toBe("written");
     });
-
     it("should show warnings about password strength", function () {
         p.getByLink();
         expect("test").toBe("written");
     });
-
     it("should open Terms and conditions in a new page", function () {
         p.getByLink();
         expect("test").toBe("written");
@@ -98,7 +90,6 @@ describe('Login suite', function () {
         p.getByLink();
         expect("test").toBe("written");
     });
-
     it("should not allow registration with existing email and show error", function () {
         p.getByLink();
         expect("test").toBe("written");

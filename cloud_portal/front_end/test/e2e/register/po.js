@@ -41,7 +41,7 @@ var LoginPage = function () {
     this.catchregisterSuccessAlert = function (registerSuccessAlert) {
         // Workaround due to Protractor bug with timeouts https://github.com/angular/protractor/issues/169
         // taken from here http://stackoverflow.com/questions/25062748/testing-the-contents-of-a-temporary-element-with-protractor
-        browser.sleep(500);
+        browser.sleep(1500);
         browser.ignoreSynchronization = true;
         expect(registerSuccessAlert.getText()).toContain('Your account was successfully registered. Please, check your email to confirm it');
         browser.sleep(500);
