@@ -10,6 +10,7 @@
 #include <api/app_server_connection.h>
 
 #include <nx_ec/managers/abstract_server_manager.h>
+#include <nx_ec/managers/abstract_user_manager.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/dummy_handler.h>
 
@@ -94,7 +95,7 @@ bool PasswordData::hasPassword() const
 {
     return
         !password.isEmpty() ||
-        !passwordHash.isEmpty() || 
+        !passwordHash.isEmpty() ||
         !passwordDigest.isEmpty();
 }
 
@@ -130,19 +131,24 @@ bool changeAdminPassword(PasswordData data)
         /* set new password */
         updatedAdmin->setPassword(data.password);
         updatedAdmin->generateHash();
-        QnUserResourceList updatedUsers;
-        if (QnAppServerConnectionFactory::getConnection2()->getUserManager()->saveSync(updatedAdmin, &updatedUsers) != ec2::ErrorCode::ok)
+
+        ec2::ApiUserData apiUser;
+        fromResourceToApi(updatedAdmin, apiUser);
+        if (QnAppServerConnectionFactory::getConnection2()->getUserManager()->saveSync(apiUser, data.password) != ec2::ErrorCode::ok)
             return false;
         updatedAdmin->setPassword(QString());
     }
-    else {
+    else
+    {
         updatedAdmin->setRealm(data.realm);
         updatedAdmin->setHash(data.passwordHash);
         updatedAdmin->setDigest(data.passwordDigest);
         if (!data.cryptSha512Hash.isEmpty())
             updatedAdmin->setCryptSha512Hash(data.cryptSha512Hash);
-        QnUserResourceList updatedUsers;
-        if (QnAppServerConnectionFactory::getConnection2()->getUserManager()->saveSync(updatedAdmin, &updatedUsers) != ec2::ErrorCode::ok)
+
+        ec2::ApiUserData apiUser;
+        fromResourceToApi(updatedAdmin, apiUser);
+        if (QnAppServerConnectionFactory::getConnection2()->getUserManager()->saveSync(apiUser) != ec2::ErrorCode::ok)
             return false;
     }
 
@@ -173,7 +179,7 @@ bool validatePasswordData(const PasswordData& passwordData, QString* errStr)
             *errStr = lit("All password hashes MUST be supplied all together along with realm");
         return false;
     }
-    
+
     if (!passwordData.password.isEmpty() && passwordData.oldPassword.isEmpty())
     {
         //these values MUST be all filled or all NOT filled
