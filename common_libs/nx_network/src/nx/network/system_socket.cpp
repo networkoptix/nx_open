@@ -837,7 +837,11 @@ void CommunicatingSocket<InterfaceToImplement>::connectAsync(
     const SocketAddress& addr,
     nx::utils::MoveOnlyFunc<void( SystemError::ErrorCode )> handler )
 {
-    return m_aioHelper->connectAsync( addr, std::move(handler) );
+    return m_aioHelper->connectAsync(addr, [handler = std::move(handler), this] (SystemError::ErrorCode code)
+    {
+        m_connected = (code == SystemError::noError);
+        handler(code);
+    });
 }
 
 template<typename InterfaceToImplement>

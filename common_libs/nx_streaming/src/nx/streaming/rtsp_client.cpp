@@ -624,7 +624,7 @@ CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTim
 
     if (m_tcpSock->isClosed())
     {
-        m_tcpSock->reopen();
+        m_tcpSock = SocketFactory::createStreamSocket();
         m_additionalReadBufferSize = 0;
     }
 
