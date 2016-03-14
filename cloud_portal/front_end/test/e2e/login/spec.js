@@ -154,6 +154,24 @@ describe('Login suite', function () {
         expect(p.loginSuccessElement.isDisplayed()).toBe(false);
     });
 
+    it("should show red outline if field is wrong/empty after blur", function () {
+        p.get();
+
+        p.emailInput.sendKeys('vert546 464w6345');
+        p.rememberCheckbox.click(); // blur email field
+        p.checkEmailInvalid();
+        expect(this.passwordInputWrap.getAttribute('class')).not.toContain('has-error'); // since pasword is not touched, field shoud show no error
+
+
+        p.passwordInput.click(); // click on pasword and leave it empty
+        p.checkPasswordMissing();
+
+        p.dialogCloseButton.click();
+
+        // Check that element that is visible only for authorized user is NOT displayed on page
+        expect(p.loginSuccessElement.isDisplayed()).toBe(false);
+    });
+
     it("should log in with Remember Me checkmark switched off", function () {
         p.get();
 
@@ -161,6 +179,7 @@ describe('Login suite', function () {
         p.passwordInput.sendKeys(p.userPassword);
 
         p.rememberCheckbox.click(); // Switch off Remember me functionality
+        expect(p.rememberCheckbox.isSelected()).toBe(false); // verify that it is really switched off
         expect(p.rememberCheckbox.getAttribute('class')).toContain('ng-empty'); // verify that it is really switched off
         expect(p.rememberCheckbox.getAttribute('class')).not.toContain('ng-not-empty'); // verify that it is really really switched off
 

@@ -22,20 +22,20 @@ var LoginPage = function () {
     this.emailInput = this.loginDialog.element(by.model('auth.email'));
     this.passwordInput = this.loginDialog.element(by.model('auth.password'));
     
+    this.emailInputWrap = this.emailInput.element(by.xpath('..'));
+    this.passwordInputWrap = this.passwordInput.element(by.xpath('..'));
+    
     this.checkPasswordMissing = function() {
-        this.passwordInputWrap = this.passwordInput.element(by.xpath('..'));
         expect(this.passwordInput.getAttribute('class')).toContain('ng-invalid-required');
         expect(this.passwordInputWrap.getAttribute('class')).toContain('has-error');
     }
 
     this.checkEmailMissing = function() {
-        this.emailInputWrap = this.emailInput.element(by.xpath('..'));
         expect(this.emailInput.getAttribute('class')).toContain('ng-invalid-required');
         expect(this.emailInputWrap.getAttribute('class')).toContain('has-error');
     }
 
     this.checkEmailInvalid = function() {
-        this.emailInputWrap = this.emailInput.element(by.xpath('..'));
         expect(this.emailInput.getAttribute('class')).toContain('ng-invalid');
         expect(this.emailInputWrap.getAttribute('class')).toContain('has-error');
     }
@@ -80,9 +80,23 @@ var LoginPage = function () {
     this.logout = function() {
         expect(this.userAccountDropdownToggle.isDisplayed()).toBe(true);
 
+        // this.userAccountDropdownToggle.isDisplayed().then(function(visible)
+        // {
+        //     if(visible){
+
+        //         this.userAccountDropdownToggle.click();
+        //         this.userLogoutLink.click();
+        //         browser.sleep(500); // such a shame, but I can't solve it right now
+
+        //         expect(this.loginSuccessElement.isDisplayed()).toBe(false);
+        //     }
+        // });
+
         this.userAccountDropdownToggle.click();
         this.userLogoutLink.click();
         browser.sleep(500); // such a shame, but I can't solve it right now
+
+        expect(this.loginSuccessElement.isDisplayed()).toBe(false);
 
         // Check that element that is visible only for authorized user is NOT displayed on page
         expect(this.loginSuccessElement.isDisplayed()).toBe(false);
