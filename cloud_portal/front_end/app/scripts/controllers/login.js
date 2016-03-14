@@ -15,6 +15,8 @@ angular.module('cloudApp')
         };
 
         $scope.close = function(){
+            $scope.session.email = $scope.auth.email;
+
             // TODO: We must replace this hack with something more angular-way,
             // but I can't figure out yet, how to implement dialog service and pass parameters to controllers
             // we need something like modalInstance
