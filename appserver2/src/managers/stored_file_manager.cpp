@@ -8,9 +8,9 @@
 namespace ec2
 {
     template<class QueryProcessorType>
-    QnStoredFileManager<QueryProcessorType>::QnStoredFileManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx )
+    QnStoredFileManager<QueryProcessorType>::QnStoredFileManager( QueryProcessorType* const queryProcessor)
     :
-        QnStoredFileNotificationManager( resCtx ),
+        QnStoredFileNotificationManager(),
         m_queryProcessor( queryProcessor )
     {
     }

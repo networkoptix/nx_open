@@ -30,10 +30,9 @@ void QnMobileClientMessageProcessor::updateResource(const QnResourcePtr &resourc
         updateMainServerApiUrl();
 }
 
-void QnMobileClientMessageProcessor::resetResources(const QnResourceList &resources) {
-    base_type::resetResources(resources);
-
-    updateMainServerApiUrl();
+QnResourceFactory* QnMobileClientMessageProcessor::getResourceFactory()
+{
+    return QnMobileClientCameraFactory::instance();
 }
 
 void QnMobileClientMessageProcessor::updateMainServerApiUrl() {

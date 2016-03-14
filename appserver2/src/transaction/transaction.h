@@ -39,16 +39,15 @@ namespace ec2
             openReverseConnection       = 102,  /**< ApiReverseConnectionData */
 
             /* Common resource */
-            saveResource                = 200,  /**< ApiResourceData */
             removeResource              = 201,  /**< ApiIdData */
             setResourceStatus           = 202,  /**< ApiResourceStatusData */
             getResourceParams           = 203,  /**< ApiResourceParamDataList */
             setResourceParams           = 204,  /**< ApiResourceParamWithRefDataList */
             getResourceTypes            = 205,  /**< ApiResourceTypeDataList*/
             getFullInfo                 = 206,  /**< ApiFullInfoData */
-            setResourceParam            = 208,   /**< ApiResourceParamWithRefData */
-            removeResourceParam         = 209,   /**< ApiResourceParamWithRefData */
-            removeResourceParams        = 210,   /**< ApiResourceParamWithRefDataList */
+            setResourceParam            = 208,   /*< ApiResourceParamWithRefData */
+            removeResourceParam         = 209,   /*< ApiResourceParamWithRefData */
+            removeResourceParams        = 210,   /*< ApiResourceParamWithRefDataList */
             getStatusList               = 211,  /**< ApiResourceStatusDataList */
             removeResources             = 212,  /**< ApiIdDataList */
 
@@ -89,8 +88,8 @@ namespace ec2
 
             /* Layout resource */
             getLayouts                  = 600,  /**< ApiLayoutDataList */
-            saveLayout                  = 601,  /**< ApiLayoutDataList */
-            saveLayouts                 = 602,  /**< ApiLayoutData */
+            saveLayout                  = 601,  /**< ApiLayoutData */
+            saveLayouts                 = 602,  /**< ApiLayoutDataList */
             removeLayout                = 603,  /**< ApiIdData */
 
             /* Videowall resource */

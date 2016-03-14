@@ -54,9 +54,10 @@ void QnWorkbenchSynchronizer::submit() {
     foreach(QnWorkbenchLayout *layout, workbench()->layouts()) {
         QnLayoutResourcePtr resource = layout->resource();
 
-        if(resource.isNull()) { 
+        if(resource.isNull())
+        {
             /* This actually is a newly created layout. */
-            resource = QnLayoutResourcePtr(new QnLayoutResource(qnResTypePool));
+            resource = QnLayoutResourcePtr(new QnLayoutResource());
             resource->setId(QnUuid::createUuid());
             resource->addFlags(Qn::local); // TODO: #Elric #EC2
 

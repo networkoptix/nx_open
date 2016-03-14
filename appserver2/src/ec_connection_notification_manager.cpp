@@ -22,7 +22,7 @@
 
 namespace ec2
 {
-    ECConnectionNotificationManager::ECConnectionNotificationManager(const ResourceContext& resCtx,
+    ECConnectionNotificationManager::ECConnectionNotificationManager(
         AbstractECConnection* ecConnection,
         QnLicenseNotificationManager* licenseManager,
         QnResourceNotificationManager* resourceManager,
@@ -38,7 +38,6 @@ namespace ec2
         QnMiscNotificationManager *miscManager,
         QnDiscoveryNotificationManager *discoveryManager)
     :
-        m_resCtx( resCtx ),
         m_ecConnection( ecConnection ),
         m_licenseManager( licenseManager ),
         m_resourceManager( resourceManager ),
@@ -182,10 +181,6 @@ namespace ec2
         m_mediaServerManager->triggerNotification( tran );
     }
 
-    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiResourceData>& tran ) {
-        m_resourceManager->triggerNotification( tran );
-    }
-
     void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiResourceStatusData>& tran ) {
         m_resourceManager->triggerNotification( tran );
     }
@@ -238,9 +233,7 @@ namespace ec2
     }
 
     void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiFullInfoData>& tran ) {
-        QnFullResourceData fullResData;
-        fromApiToResourceList(tran.params, fullResData, m_resCtx);
-        emit m_ecConnection->initNotification(fullResData);
+        emit m_ecConnection->initNotification(tran.params);
         for(const ApiDiscoveryData& data: tran.params.discoveryData)
             m_discoveryManager->triggerNotification(data);
     }

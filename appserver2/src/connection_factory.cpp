@@ -152,8 +152,6 @@ namespace ec2
          */
         registerGetFuncHandler<std::nullptr_t, ApiResourceTypeDataList>(p, ApiCommand::getResourceTypes);
 
-        //AbstractResourceManager::getResource
-        //registerGetFuncHandler<std::nullptr_t, ApiResourceData>(p, ApiCommand::getResource);
         //AbstractResourceManager::setResourceStatus
         registerUpdateFuncHandler<ApiResourceStatusData>(p, ApiCommand::setResourceStatus);
 
@@ -193,7 +191,7 @@ namespace ec2
         registerGetFuncHandler<QnUuid, ApiResourceStatusDataList>(p, ApiCommand::getStatusList);
 
         //AbstractMediaServerManager::getServers
-        registerGetFuncHandler<QnUuid, ApiMediaServerDataList>(p, ApiCommand::getMediaServers);
+        registerGetFuncHandler<std::nullptr_t, ApiMediaServerDataList>(p, ApiCommand::getMediaServers);
         //AbstractMediaServerManager::save
         registerUpdateFuncHandler<ApiMediaServerData>(p, ApiCommand::saveMediaServer);
 
@@ -246,7 +244,7 @@ namespace ec2
          * %return Return object in requested format
          * %// AbstractMediaServerManager::getServersEx
          */
-        registerGetFuncHandler<QnUuid, ApiMediaServerDataExList>(p, ApiCommand::getMediaServersEx);
+        registerGetFuncHandler<std::nullptr_t, ApiMediaServerDataExList>(p, ApiCommand::getMediaServersEx);
 
         registerUpdateFuncHandler<ApiStorageDataList>(p, ApiCommand::saveStorages);
 
@@ -287,7 +285,7 @@ namespace ec2
         //AbstractCameraManager::save
         registerUpdateFuncHandler<ApiCameraDataList>(p, ApiCommand::saveCameras);
         //AbstractCameraManager::getCameras
-        registerGetFuncHandler<QnUuid, ApiCameraDataList>(p, ApiCommand::getCameras);
+        registerGetFuncHandler<std::nullptr_t, ApiCameraDataList>(p, ApiCommand::getCameras);
 
         //AbstractCameraManager::saveUserAttributes
         registerUpdateFuncHandler<ApiCameraAttributesDataList>(p, ApiCommand::saveCameraUserAttributesList);
@@ -393,7 +391,6 @@ namespace ec2
         /**%apidoc GET /ec2/getCameraUserAttributes
          * Read additional camera attributes.
          * %// TODO: This function is named inconsistently - should end with 'List'.
-         * %// TODO: Not published param[opt] id Server unique Id.
          * %param[default] format
          * %return List of additional camera attributes objects for all cameras in the requested format.
          *     %param cameraID Camera unique id.
@@ -487,7 +484,7 @@ namespace ec2
          *         %value CameraBackup_Default A default value is used for backup options.
          * %// AbstractCameraManager::getUserAttributes
          */
-        registerGetFuncHandler<QnUuid, ApiCameraAttributesDataList>(p, ApiCommand::getCameraUserAttributes);
+        registerGetFuncHandler<std::nullptr_t, ApiCameraAttributesDataList>(p, ApiCommand::getCameraUserAttributes);
 
         //AbstractCameraManager::addCameraHistoryItem
         registerUpdateFuncHandler<ApiServerFootageData>(p, ApiCommand::addCameraHistoryItem);
@@ -621,7 +618,7 @@ namespace ec2
          *     %param addParams List of additional parameters for camera. This list can contain such information as full ONVIF url, camera maximum fps e.t.c
          * %// AbstractCameraManager::getCamerasEx
          */
-        registerGetFuncHandler<QnUuid, ApiCameraDataExList>(p, ApiCommand::getCamerasEx);
+        registerGetFuncHandler<std::nullptr_t, ApiCameraDataExList>(p, ApiCommand::getCamerasEx);
 
         /**%apidoc GET /ec2/getStorages
          * Read the list of current storages.
@@ -1041,12 +1038,6 @@ namespace ec2
         //    new QnRestTransactionReceiver());
     }
 
-    void Ec2DirectConnectionFactory::setContext( const ResourceContext& resCtx )
-    {
-        m_resCtx = resCtx;
-        m_timeSynchronizationManager->setContext(m_resCtx);
-    }
-
     void Ec2DirectConnectionFactory::setConfParams( std::map<QString, QVariant> confParams )
     {
         m_settingsInstance.loadParams( std::move( confParams ) );
@@ -1064,7 +1055,7 @@ namespace ec2
         {
             QnMutexLocker lk( &m_mutex );
             if( !m_directConnection ) {
-                m_directConnection.reset( new Ec2DirectConnection( &m_serverQueryProcessor, m_resCtx, connectionInfo, url ) );
+                m_directConnection.reset( new Ec2DirectConnection( &m_serverQueryProcessor, connectionInfo, url ) );
                 if( !m_directConnection->initialized() )
                 {
                     connectionInitializationResult = ec2::ErrorCode::dbError;
@@ -1231,7 +1222,6 @@ namespace ec2
 
         AbstractECConnectionPtr connection(new RemoteEC2Connection(
             std::make_shared<FixedUrlClientQueryProcessor>(&m_remoteQueryProcessor, connectionInfoCopy.ecUrl),
-            m_resCtx,
             connectionInfoCopy));
         handler->done(
             reqID,

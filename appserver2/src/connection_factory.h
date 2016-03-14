@@ -41,19 +41,17 @@ namespace ec2
         //!Implementation of AbstractECConnectionFactory::testConnectionAsync
         virtual int testConnectionAsync( const QUrl& addr, impl::TestConnectionHandlerPtr handler ) override;
         //!Implementation of AbstractECConnectionFactory::connectAsync
-        virtual int connectAsync( const QUrl& addr, const ApiClientInfoData& clientInfo, 
+        virtual int connectAsync( const QUrl& addr, const ApiClientInfoData& clientInfo,
                                   impl::ConnectHandlerPtr handler ) override;
 
         virtual void registerRestHandlers( QnRestProcessorPool* const restProcessorPool ) override;
         virtual void registerTransactionListener(QnHttpConnectionListener* httpConnectionListener) override;
-        virtual void setContext( const ResourceContext& resCtx ) override;
         virtual void setConfParams( std::map<QString, QVariant> confParams ) override;
 
     private:
         ServerQueryProcessor m_serverQueryProcessor;
         ClientQueryProcessor m_remoteQueryProcessor;
         QnMutex m_mutex;
-        ResourceContext m_resCtx;
         Settings m_settingsInstance;
         std::unique_ptr<QnDbManager> m_dbManager;
         std::unique_ptr<TimeSynchronizationManager> m_timeSynchronizationManager;
@@ -65,7 +63,7 @@ namespace ec2
         bool m_sslEnabled;
 
         int establishDirectConnection(const QUrl& url, impl::ConnectHandlerPtr handler);
-        int establishConnectionToRemoteServer( const QUrl& addr, impl::ConnectHandlerPtr handler, 
+        int establishConnectionToRemoteServer( const QUrl& addr, impl::ConnectHandlerPtr handler,
                                                const ApiClientInfoData& clientInfo );
         template<class Handler>
         void connectToOldEC( const QUrl& ecURL, Handler completionFunc );

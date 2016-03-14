@@ -16,16 +16,7 @@ namespace ec2
         public AbstractResourceManager
     {
     public:
-        QnResourceNotificationManager( const ResourceContext& resCtx ) : m_resCtx( resCtx ) {}
-
-        void triggerNotification( const QnTransaction<ApiResourceData>& tran ) {
-            QnResourcePtr resource( new QnResource() );
-            fromApiToResource(tran.params, resource.data());
-            QnResourcePtr existResource = m_resCtx.pool->getResourceById(tran.params.id);
-            if (existResource)
-                resource->setFlags(existResource->flags());
-            emit resourceChanged( std::move(resource ));
-        }
+        QnResourceNotificationManager() {}
 
         void triggerNotification( const QnTransaction<ApiResourceStatusData>& tran ) {
             emit statusChanged( QnUuid(tran.params.id), tran.params.status );
@@ -34,12 +25,6 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiLicenseOverflowData>& /*tran*/ ) {
             // nothing to do
         }
-
-        /*
-        void triggerNotification( const QnTransaction<ApiSetResourceDisabledData>& tran ) {
-            emit disabledChanged( QnUuid(tran.params.id), tran.params.disabled );
-        }
-        */
 
         void triggerNotification( const QnTransaction<ApiResourceParamWithRefData>& tran ) {
             emit resourceParamChanged(tran.params );
@@ -58,9 +43,6 @@ namespace ec2
             for(const ApiIdData& id: tran.params)
                 emit resourceRemoved( id.id );
         }
-
-    protected:
-        ResourceContext m_resCtx;
     };
 
 
@@ -72,7 +54,7 @@ namespace ec2
         public QnResourceNotificationManager
     {
     public:
-        QnResourceManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx );
+        QnResourceManager( QueryProcessorType* const queryProcessor);
 
         //!Implementation of AbstractResourceManager::getResourceTypes
         virtual int getResourceTypes( impl::GetResourceTypesHandlerPtr handler ) override;
@@ -87,23 +69,19 @@ namespace ec2
         virtual int getStatusList( const QnUuid &resourceId, impl::GetStatusListHandlerPtr handler ) override;
 
         //!Implementation of AbstractResourceManager::save
-        //virtual int save( const QnResourcePtr &resource, impl::SaveResourceHandlerPtr handler ) override;
-        //!Implementation of AbstractResourceManager::save
         virtual int save(const ec2::ApiResourceParamWithRefDataList& kvPairs, impl::SaveKvPairsHandlerPtr handler ) override;
         //!Implementation of AbstractResourceManager::removeParams
         virtual int removeParams(const ec2::ApiResourceParamWithRefDataList& kvPairs, impl::SaveKvPairsHandlerPtr handler ) override;
         //!Implementation of AbstractResourceManager::remove
         virtual int remove( const QnUuid& id, impl::SimpleHandlerPtr handler ) override;
         virtual int remove( const QVector<QnUuid>& idList, impl::SimpleHandlerPtr handler ) override;
-        
+
     private:
         QueryProcessorType* const m_queryProcessor;
 
         QnTransaction<ApiResourceStatusData> prepareTransaction( ApiCommand::Value cmd, const QnUuid& id, Qn::ResourceStatus status);
-        //QnTransaction<ApiSetResourceDisabledData> prepareTransaction( ApiCommand::Value command, const QnUuid& id, bool disabled );
         QnTransaction<ApiResourceParamWithRefDataList> prepareTransaction(ApiCommand::Value cmd, const ec2::ApiResourceParamWithRefDataList& kvPairs);
         QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value cmd, const QnUuid& id);
-        QnTransaction<ApiResourceData> prepareTransaction( ApiCommand::Value command, const QnResourcePtr& resource );
     };
 }
 

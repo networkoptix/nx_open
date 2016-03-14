@@ -39,7 +39,7 @@ private slots:
 
     void at_workbench_layoutsChanged();
 
-    void at_layouts_saved(int status, const QnResourceList &resources, int handle);
+
 
 private:
     void saveLayout(const QnLayoutResourcePtr &layout);
@@ -70,6 +70,7 @@ private:
     bool closeLayouts(const QnLayoutResourceList &resources, bool waitForReply = false, bool force = false);
     bool closeLayouts(const QnWorkbenchLayoutList &layouts, bool waitForReply = false, bool force = false);
 
+    void at_layout_saved(bool success, const QnLayoutResourcePtr &layout);
 private:
     QScopedPointer<QnWorkbenchStateDelegate> m_workbenchStateDelegate;
 
