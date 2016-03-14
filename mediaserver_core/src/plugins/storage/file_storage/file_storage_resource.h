@@ -79,6 +79,7 @@ private:
 
     void setLocalPathSafe(const QString &path) const;
     QString getLocalPathSafe() const;
+    bool isValid() const;
 
 public:
     // Try to remove old temporary dirs if any.
@@ -87,8 +88,6 @@ public:
     static void removeOldDirs();
 
 private:
-    // used for 'virtual' storage bitrate. If storage has more free space, increase 'virtual' storage bitrate for full storage space filling
-    mutable bool m_dirty;
     mutable bool m_valid;
 
 private:

@@ -444,7 +444,7 @@ QnStorageResourcePtr createStorage(const QnUuid& serverId, const QString& path)
 
     auto spaceLimit = QnFileStorageResource::calcSpaceLimit(path);
     storage->setSpaceLimit(spaceLimit);
-    storage->setUsedForWriting(storage->isWritable());
+    storage->setUsedForWriting(storage->isAvailable() && storage->isWritable());
 
     QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName("Storage");
     Q_ASSERT(resType);
