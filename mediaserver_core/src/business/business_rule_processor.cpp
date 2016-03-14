@@ -112,7 +112,7 @@ void QnBusinessRuleProcessor::doProxyAction(const QnAbstractBusinessActionPtr& a
             actionData.resourceIds.clear();
             actionData.resourceIds.push_back(res->getId());
         }
-        ec2::fromApiToResource(actionData, actionToSend, qnResPool);
+        ec2::fromApiToResource(actionData, actionToSend);
 
         qnBusinessMessageBus->deliveryBusinessAction(actionToSend, routeToServer->getId());
     }

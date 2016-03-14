@@ -16,30 +16,6 @@ class QnWorkbenchContext;
 class QnWorkbenchLayoutSnapshotStorage;
 class QnWorkbenchLayoutSnapshotManager;
 
-class QnWorkbenchLayoutReplyProcessor: public QnAbstractReplyProcessor {
-    Q_OBJECT
-
-public:
-    QnWorkbenchLayoutReplyProcessor(QnWorkbenchLayoutSnapshotManager *manager, const QnLayoutResourceList &resources):
-        QnAbstractReplyProcessor(0),
-        m_manager(manager),
-        m_resources(resources)
-    {}
-
-public slots:
-    void processReply( int reqID, ec2::ErrorCode errorCode );
-
-signals:
-    void finished(int status, const QnResourceList &resources, int handle, const QString &errorString);
-
-private:
-    friend class QnAbstractReplyProcessor;
-
-    QPointer<QnWorkbenchLayoutSnapshotManager> m_manager;
-    QnLayoutResourceList m_resources;
-};
-
-
 /**
  * This class maintains a storage of layout snapshots and tracks the state of
  * each layout.
@@ -54,9 +30,8 @@ public:
     QnWorkbenchLayoutSnapshotManager(QObject *parent = NULL);
     virtual ~QnWorkbenchLayoutSnapshotManager();
 
-    int save(const QnLayoutResourcePtr &resource, QObject *object, const char *slot);
-    int save(const QnLayoutResourceList &resources, QObject *object, const char *slot);
-    int save(const QnLayoutResourceList &resources, QnWorkbenchLayoutReplyProcessor *replyProcessor);
+    typedef std::function<void(bool, const QnLayoutResourcePtr &)>  SaveLayoutResultFunction;
+    bool save(const QnLayoutResourcePtr &resource, SaveLayoutResultFunction callback);
 
     void store(const QnLayoutResourcePtr &resource);
     void restore(const QnLayoutResourcePtr &resource);
@@ -65,21 +40,19 @@ public:
     Qn::ResourceSavingFlags flags(QnWorkbenchLayout *layout) const;
     void setFlags(const QnLayoutResourcePtr &resource, Qn::ResourceSavingFlags flags);
 
-    bool isChanged(const QnLayoutResourcePtr &resource) const {
-        return flags(resource) & Qn::ResourceIsChanged;
+    bool isChanged(const QnLayoutResourcePtr &resource) const
+    {
+        return flags(resource).testFlag(Qn::ResourceIsChanged);
     }
 
-    bool isLocal(const QnLayoutResourcePtr &resource) const {
-        return flags(resource) & Qn::ResourceIsLocal;
-    }
-
-    bool isBeingSaved(const QnLayoutResourcePtr &resource) const {
-        return flags(resource) & Qn::ResourceIsBeingSaved;
+    bool isLocal(const QnLayoutResourcePtr &resource) const
+    {
+        return flags(resource).testFlag(Qn::ResourceIsLocal);
     }
 
     bool isSaveable(const QnLayoutResourcePtr &resource) const {
         Qn::ResourceSavingFlags flags = this->flags(resource);
-        if(flags & Qn::ResourceIsBeingSaved)
+        if(flags.testFlag(Qn::ResourceIsBeingSaved))
             return false;
 
         if(flags & (Qn::ResourceIsLocal | Qn::ResourceIsChanged))
@@ -105,7 +78,6 @@ protected:
     Qn::ResourceSavingFlags defaultFlags(const QnLayoutResourcePtr &resource) const;
 
 protected slots:
-    void processReply(int status, const QnLayoutResourceList &resources, int handle);
 
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);

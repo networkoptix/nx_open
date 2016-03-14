@@ -13,6 +13,10 @@ namespace ec2
     {
         QnUuid serverGuid;
         std::vector<QnUuid> archivedCameras;
+
+        ApiServerFootageData() {}
+        ApiServerFootageData(const QnUuid& serverGuid, const std::vector<QnUuid>& archivedCameras) :
+            serverGuid(serverGuid), archivedCameras(archivedCameras) {}
     };
     #define ApiServerFootageData_Fields (serverGuid)(archivedCameras)
 

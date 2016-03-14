@@ -131,10 +131,6 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource)
     }
 }
 
-void QnClientMessageProcessor::resetResources(const QnResourceList& resources) {
-    QnCommonMessageProcessor::resetResources(resources);
-}
-
 void QnClientMessageProcessor::handleRemotePeerFound(const ec2::ApiPeerAliveData &data) {
     base_type::handleRemotePeerFound(data);
     if (qnCommon->remoteGUID().isNull()) {
@@ -193,7 +189,7 @@ void QnClientMessageProcessor::at_systemNameChangeRequested(const QString &syste
     qnCommon->setLocalSystemName(systemName);
 }
 
-void QnClientMessageProcessor::onGotInitialNotification(const ec2::QnFullResourceData& fullData)
+void QnClientMessageProcessor::onGotInitialNotification(const ec2::ApiFullInfoData& fullData)
 {
     QnCommonMessageProcessor::onGotInitialNotification(fullData);
     m_status.setState(QnConnectionState::Ready);

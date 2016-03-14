@@ -55,7 +55,7 @@ void QnWaitCompatibleServersPeerTask::at_timer_timeout() {
 }
 
 void QnWaitCompatibleServersPeerTask::finishTask(int errorCode) {
-    qnResPool->disconnect(this);
+    disconnect(qnResPool, nullptr, this, nullptr);
     m_timer->stop();
     finish(errorCode);
 }

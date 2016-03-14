@@ -1,13 +1,19 @@
-#ifndef ASPECT_RATIO_H
-#define ASPECT_RATIO_H
+#pragma once
 
 class QnAspectRatio
 {
 public:
-    QnAspectRatio(int width = 1, int height = 1);
+    QnAspectRatio();
+    QnAspectRatio(int width, int height);
+
+    bool isValid() const;
+
+    int width() const;
+    int height() const;
 
     float toFloat() const;
-    QString toString(const QString &fmt = lit("%1:%2")) const;
+    QString toString() const;
+    QString toString(const QString &format) const;
 
     static QList<QnAspectRatio> standardRatios();
     static QnAspectRatio closestStandardRatio(float aspectRatio);
@@ -21,4 +27,4 @@ private:
     int m_height;
 };
 
-#endif // ASPECT_RATIO_H
+Q_DECLARE_METATYPE(QnAspectRatio)

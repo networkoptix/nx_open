@@ -42,6 +42,7 @@ public:
     void setDefaultAuth(const QString &user, const QString &password);
     void setDefaultAuth(const QAuthenticator &auth);
 
+    static QAuthenticator getResourceAuth(const QnUuid &resourceId, const QnUuid &resourceTypeId);
     QAuthenticator getAuth() const;
 
     // if reader will find out that authentication is requred => setAuthenticated(false) must be called

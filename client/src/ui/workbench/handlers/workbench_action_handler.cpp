@@ -1371,7 +1371,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     const int matrixWidth = qMax(1, qRound(std::sqrt(displayAspectRatio * itemCount / desiredCellAspectRatio)));
 
     /* Construct and add a new layout. */
-    QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
+    QnLayoutResourcePtr layout(new QnLayoutResource());
     layout->setId(QnUuid::createUuid());
     layout->setName(tr("Preview Search for %1").arg(resource->getName()));
     if(context()->user())
@@ -1919,7 +1919,6 @@ void QnWorkbenchActionHandler::at_newUserAction_triggered() {
     } while (!validateResourceName(user, user->getName()));
 
     user->setId(QnUuid::createUuid());
-    user->setTypeByName(lit("User"));
 
     qnResourcesChangesManager->saveUser(user, [](const QnUserResourcePtr &){});
     user->setPassword(QString()); // forget the password now
