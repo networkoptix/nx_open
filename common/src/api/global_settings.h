@@ -70,6 +70,9 @@ public:
     QDateTime statisticsReportLastTime() const;
     void setStatisticsReportLastTime(const QDateTime& value);
 
+    int statisticsReportLastNumber() const;
+    void setStatisticsReportLastNumber(int value);
+
     /** How often should we send statistics in human-readable format like '2d', '30m', etc. */
     QString statisticsReportTimeCycle() const;
     void setStatisticsReportTimeCycle(const QString& value);
@@ -146,6 +149,7 @@ private:
     // set of statistics settings adaptors
     QnResourcePropertyAdaptor<QnOptionalBool> *m_statisticsAllowedAdaptor;
     QnResourcePropertyAdaptor<QString> *m_statisticsReportLastTimeAdaptor;
+    QnResourcePropertyAdaptor<int> *m_statisticsReportLastNumberAdaptor;
     QnResourcePropertyAdaptor<QString> *m_statisticsReportTimeCycleAdaptor;
     QnResourcePropertyAdaptor<QnUuid> *m_systemIdAdaptor;
     QnResourcePropertyAdaptor<QString> *m_systemNameForIdAdaptor;

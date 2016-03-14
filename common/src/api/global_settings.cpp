@@ -55,6 +55,7 @@ namespace {
 
     const QString kNameStatisticsAllowed(lit("statisticsAllowed"));
     const QString kNameStatisticsReportLastTime(lit("statisticsReportLastTime"));
+    const QString kNameStatisticsReportLastNumber(lit("statisticsReportLastNumber"));
     const QString kNameStatisticsReportTimeCycle(lit("statisticsReportTimeCycle"));
     const QString kNameSystemId(lit("systemId"));
     const QString kNameSystemNameForId(lit("systemNameForId"));
@@ -167,6 +168,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initStaticticsAdaptors()
 {
     m_statisticsAllowedAdaptor = new QnLexicalResourcePropertyAdaptor<QnOptionalBool>(kNameStatisticsAllowed, QnOptionalBool(), this);
     m_statisticsReportLastTimeAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameStatisticsReportLastTime, QString(), this);
+    m_statisticsReportLastNumberAdaptor = new QnLexicalResourcePropertyAdaptor<int>(kNameStatisticsReportLastNumber, 0, this);
     m_statisticsReportTimeCycleAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameStatisticsReportTimeCycle, QString(), this);
     m_systemIdAdaptor = new QnLexicalResourcePropertyAdaptor<QnUuid>(kNameSystemId, QnUuid(), this);
     m_systemNameForIdAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameSystemNameForId, QString(), this);
@@ -178,6 +180,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initStaticticsAdaptors()
     result
         << m_statisticsAllowedAdaptor
         << m_statisticsReportLastTimeAdaptor
+        << m_statisticsReportLastNumberAdaptor
         << m_statisticsReportTimeCycleAdaptor
         << m_systemIdAdaptor
         << m_systemNameForIdAdaptor
@@ -444,6 +447,16 @@ QDateTime QnGlobalSettings::statisticsReportLastTime() const
 void QnGlobalSettings::setStatisticsReportLastTime(const QDateTime& value)
 {
     m_statisticsReportLastTimeAdaptor->setValue(value.toString(Qt::ISODate));
+}
+
+int QnGlobalSettings::statisticsReportLastNumber() const
+{
+    return m_statisticsReportLastNumberAdaptor->value();
+}
+
+void QnGlobalSettings::setStatisticsReportLastNumber(int value)
+{
+    m_statisticsReportLastNumberAdaptor->setValue(value);
 }
 
 QString QnGlobalSettings::statisticsReportTimeCycle() const
