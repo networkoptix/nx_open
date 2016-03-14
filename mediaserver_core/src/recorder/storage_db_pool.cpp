@@ -58,9 +58,6 @@ namespace
 
         if (storage->getCapabilities() & QnAbstractStorageResource::DBReady)
         {
-            //if (auto fileStorage = storage.dynamicCast<QnFileStorageResource>())
-            //    *dbDirectory = fileStorage->getLocalPath(); // todo: need refactor it
-            //else
             *dbDirectory = storageUrl;
             return true;
         }

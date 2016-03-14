@@ -407,9 +407,11 @@ bool QnStorageDb::vacuumInternal()
         tmpDbHelper.writeRecordAsync(camOp);
     }
 
+    static const size_t kCatalogsCount = 2;
+
     for (auto it = m_readData.cbegin(); it != m_readData.cend(); ++it)
     {
-        for (size_t i = 0; i < 2; ++i)
+        for (size_t i = 0; i < kCatalogsCount; ++i)
         {
             for (auto chunkIt = it->second[i].cbegin(); chunkIt != it->second[i].cend(); ++chunkIt)
             {
@@ -489,7 +491,7 @@ bool QnStorageDb::checkDataConsistency(const UuidToCatalogs &readDataCopy) const
         auto otherIt = m_readData.find(it->first);
         if (otherIt == m_readData.cend())
         {
-            if (it->second[0].size() != 0 || it->second[1].size() != 0)
+            if (!it->second[0].empty() || !it->second[1].empty())
                 return false;
             else
                 continue;

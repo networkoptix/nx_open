@@ -94,7 +94,7 @@ QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode o
         ).toInt();;
 
 #ifdef Q_OS_WIN
-        if ((openMode & QIODevice::ReadOnly) && (openMode & QIODevice::WriteOnly))
+        if ((openMode & QIODevice::ReadWrite) == QIODevice::ReadWrite) 
             systemFlags = 0;
         else if (MSSettings::roSettings()->value(nx_ms_conf::DISABLE_DIRECT_IO).toInt() != 1)
             systemFlags = FILE_FLAG_NO_BUFFERING;
