@@ -13,28 +13,19 @@ describe('Login suite', function () {
         p.get();
         expect((p.dialogLoginButton).isDisplayed()).toBe(true);
 
-        p.loginDialogBackground.click(); // click on login dialog background to close it
+        p.loginDialogBackground.click(); // click on login dialog overlay to close it
         expect((p.loginDialog).isPresent()).toBe(false);
     });
 
     it("should allow to log in with existing credentials and to log out", function () {
+        
+        browser.ignoreSynchronization = false;
         p.get();
 
         p.emailInput.sendKeys(p.userEmail1);
         p.passwordInput.sendKeys(p.userPassword);
-        p.dialogLoginButton.click();
-
-        browser.sleep(2000); // such a shame, but I can't solve it right now
-        // Check that element that is visible only for authorized user is displayed on page
-        expect(p.loginSuccessElement.isDisplayed()).toBe(true);
-
-        // Log out
-        p.userAccountDropdownToggle.click();
-        p.userLogoutLink.click();
-        browser.sleep(500);
-
-        // Check that element that is visible only for authorized user is NOT displayed on page
-        expect(p.loginSuccessElement.isDisplayed()).toBe(false);
+        p.login();
+        p.logout();
     });
 
     it("should go to Systems after login; then log out", function () {
@@ -42,21 +33,13 @@ describe('Login suite', function () {
 
         p.emailInput.sendKeys(p.userEmail1);
         p.passwordInput.sendKeys(p.userPassword);
-        p.dialogLoginButton.click();
-
-        browser.sleep(2000); // such a shame, but I can't solve it right now
+        p.login();
 
         // Check that element that user is on page Systems
         expect(browser.getCurrentUrl()).toContain('systems');
         expect(p.htmlBody.getText()).toContain('Systems');
 
-        // Log out
-        p.userAccountDropdownToggle.click();
-        p.userLogoutLink.click();
-        browser.sleep(500);
-
-        // Check that element that is visible only for authorized user is NOT displayed on page
-        expect(p.loginSuccessElement.isDisplayed()).toBe(false);
+        p.logout();
     });
 
     it("should show user's email and menu in top right corner; then log out", function () {
@@ -66,23 +49,18 @@ describe('Login suite', function () {
 
         p.emailInput.sendKeys(email);
         p.passwordInput.sendKeys(p.userPassword);
-        p.dialogLoginButton.click();
-
-        browser.sleep(2000); // such a shame, but I can't solve it right now
+        p.login();
 
         // Check that element that user is on page Systems
         expect(p.userAccountDropdownToggle.getText()).toContain(email);
 
-        // Log out
         p.userAccountDropdownToggle.click();
         expect(p.userAccountDropdownMenu.getText()).toContain('Account Settings');
         expect(p.userAccountDropdownMenu.getText()).toContain('Change Password');
         expect(p.userAccountDropdownMenu.getText()).toContain('Logout');
-        p.userLogoutLink.click();
-        browser.sleep(500);
+        p.userAccountDropdownToggle.click();
 
-        // Check that element that is visible only for authorized user is NOT displayed on page
-        expect(p.loginSuccessElement.isDisplayed()).toBe(false);
+        p.logout();
     });
 
     it("should not log in with wrong email", function () {
@@ -97,16 +75,14 @@ describe('Login suite', function () {
         p.dialogCloseButton.click();
     });
 
-    it("should not allow to log in with existing email in uppercase", function () {
+    it("should allow to log in with existing email in uppercase", function () {
         p.get();
 
         p.emailInput.sendKeys(p.userEmail1.toUpperCase());
         p.passwordInput.sendKeys(p.userPassword);
-        p.dialogLoginButton.click();
-
-        p.catchLoginIncorrectAlert(p.loginIncorrectAlert);
-
-        p.dialogCloseButton.click();
+        p.login();
+        // browser.pause();
+        p.logout();
     });
 
     it("should not log in with wrong password", function () {
@@ -127,7 +103,7 @@ describe('Login suite', function () {
         p.emailInput.sendKeys(p.userEmail1);
         p.dialogLoginButton.click();
 
-        expect(p.passwordInput.getAttribute('class')).toContain('ng-invalid-required');
+        p.checkPasswordMissing();
 
         p.dialogCloseButton.click();
 
@@ -141,7 +117,7 @@ describe('Login suite', function () {
         p.passwordInput.sendKeys(p.userPassword);
         p.dialogLoginButton.click();
 
-        expect(p.emailInput.getAttribute('class')).toContain('ng-invalid-required');
+        p.checkEmailMissing();
 
         p.dialogCloseButton.click();
 
@@ -154,15 +130,14 @@ describe('Login suite', function () {
 
         p.dialogLoginButton.click();
 
-        expect(p.passwordInput.getAttribute('class')).toContain('ng-invalid-required');
-        expect(p.emailInput.getAttribute('class')).toContain('ng-invalid-required');
+        p.checkPasswordMissing();
+        p.checkEmailMissing();
 
         p.dialogCloseButton.click();
 
         // Check that element that is visible only for authorized user is NOT displayed on page
         expect(p.loginSuccessElement.isDisplayed()).toBe(false);
     });
-
 
     it("should not log in with email in non-email format but with password", function () {
         p.get();
@@ -171,7 +146,7 @@ describe('Login suite', function () {
         p.passwordInput.sendKeys(p.userPassword);
         p.dialogLoginButton.click();
 
-        expect(p.emailInput.getAttribute('class')).toContain('ng-invalid-email');
+        p.checkEmailInvalid();
 
         p.dialogCloseButton.click();
 
@@ -185,24 +160,12 @@ describe('Login suite', function () {
         p.emailInput.sendKeys(p.userEmail2);
         p.passwordInput.sendKeys(p.userPassword);
 
-        p.remembermeCheckbox.click(); // Switch off Remember me functionality
-        expect(p.remembermeCheckbox.getAttribute('class')).toContain('ng-empty'); // verify that it is really switched off
-        expect(p.remembermeCheckbox.getAttribute('class')).not.toContain('ng-not-empty'); // verify that it is really really switched off
+        p.rememberCheckbox.click(); // Switch off Remember me functionality
+        expect(p.rememberCheckbox.getAttribute('class')).toContain('ng-empty'); // verify that it is really switched off
+        expect(p.rememberCheckbox.getAttribute('class')).not.toContain('ng-not-empty'); // verify that it is really really switched off
 
-        p.dialogLoginButton.click();
-
-        browser.sleep(2000); // such a shame, but I can't solve it right now
-
-        // Check that element that is visible only for authorized user is displayed on page
-        expect(p.loginSuccessElement.isDisplayed()).toBe(true);
-
-        // Log out
-        p.userAccountDropdownToggle.click();
-        p.userLogoutLink.click();
-        browser.sleep(500);
-
-        // Check that element that is visible only for authorized user is NOT displayed on page
-        expect(p.loginSuccessElement.isDisplayed()).toBe(false);
+        p.login();
+        p.logout();
     });
 
     it("should test I forgot pasword link", function () {
