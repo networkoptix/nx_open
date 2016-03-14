@@ -318,6 +318,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<ec2::ApiMediaServerData>("ec2::ApiMediaServerData");
     qRegisterMetaType<ec2::ApiMediaServerUserAttributesData>("ec2::ApiMediaServerUserAttributesData");
     qRegisterMetaType<ec2::ApiStorageData>("ec2::ApiStorageData");
+    qRegisterMetaType<ec2::ApiResourceParamWithRefDataList>("ec2::ApiResourceParamWithRefDataList");
 
     qRegisterMetaType<QnUuid>();
     qRegisterMetaTypeStreamOperators<QnUuid>();
