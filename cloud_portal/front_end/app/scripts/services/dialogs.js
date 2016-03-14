@@ -12,8 +12,11 @@ angular.module('cloudApp').run(function($http,$templateCache) {
                 return typeof($location.search().inline) != 'undefined';
             }
 
+            var modalInstance = null;
+            settings.params = settings.params || {};
+            settings.params.getModalInstance = function(){return modalInstance;};
             // Check 401 against offline
-            var modalInstance = $uibModal.open({
+            modalInstance = $uibModal.open({
                 size: settings.size || 'sm',
                 controller: 'DialogCtrl',
                 templateUrl: 'views/components/dialog.html',
@@ -39,6 +42,7 @@ angular.module('cloudApp').run(function($http,$templateCache) {
                     }
                 }
             });
+
 
             /*
 
