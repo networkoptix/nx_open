@@ -188,15 +188,6 @@ void ffmpegInit()
     QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("file"), QnQtFileStorageResource::instance, true);
     QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("qtfile"), QnQtFileStorageResource::instance);
     QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("layout"), QnLayoutFileStorageResource::instance);
-    //QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("memory"), QnLayoutFileStorageResource::instance);
-
-    /*
-    extern URLProtocol ufile_protocol;
-    av_register_protocol2(&ufile_protocol, sizeof(ufile_protocol));
-
-    extern URLProtocol qtufile_protocol;
-    av_register_protocol2(&qtufile_protocol, sizeof(qtufile_protocol));
-    */
 }
 
 /** Initialize log. */
@@ -306,6 +297,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     qnRuntime->setSoftwareYuv(startupParams.softwareYuv);
     qnRuntime->setShowFullInfo(startupParams.showFullInfo);
+    qnRuntime->setIgnoreVersionMismatch(startupParams.ignoreVersionMismatch);
 
     if (!startupParams.engineVersion.isEmpty()) {
         QnSoftwareVersion version(startupParams.engineVersion);
@@ -324,7 +316,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         qnRuntime->setVideoWallMode(true);
         startupParams.allowMultipleClientInstances= true;
         startupParams.fullScreenDisabled = true;
-        startupParams.versionMismatchCheckDisabled = true;
+        qnRuntime->setIgnoreVersionMismatch(true);
         qnRuntime->setLightModeOverride(Qn::LightModeVideoWall);
 
         logFileNameSuffix = startupParams.videoWallItemGuid.isNull()
@@ -515,9 +507,11 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     mainWindow->setAttribute(Qt::WA_QuitOnClose);
     application->setActivationWindow(mainWindow.data());
 
-    if (startupParams.screen != QnStartupParameters::kInvalidScreen) {
+    if (startupParams.screen != QnStartupParameters::kInvalidScreen)
+    {
         QDesktopWidget *desktop = qApp->desktop();
-        if (startupParams.screen >= 0 && startupParams.screen < desktop->screenCount()) {
+        if (startupParams.screen >= 0 && startupParams.screen < desktop->screenCount())
+        {
             QPoint screenDelta = mainWindow->pos() - desktop->screenGeometry(mainWindow.data()).topLeft();
             mainWindow->move(desktop->screenGeometry(startupParams.screen).topLeft() + screenDelta);
         }
@@ -528,9 +522,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         context->action(QnActions::EffectiveMaximizeAction)->trigger();
     else
         mainWindow->updateDecorationsState();
-
-    if(startupParams.versionMismatchCheckDisabled)
-        context->action(QnActions::VersionMismatchMessageAction)->setVisible(false); // TODO: #Elric need a better mechanism for this
 
     /* Process input files. */
     bool haveInputFiles = false;
@@ -693,7 +684,7 @@ int main(int argc, char **argv)
 
     QScopedPointer<QtSingleApplication> application(new QtSingleApplication(argc, argv));
 
-    // this is neccessary to prevent crashes when we want use QDesktopWidget from the non-main thread before any window has been created
+    // this is necessary to prevent crashes when we want use QDesktopWidget from the non-main thread before any window has been created
     qApp->desktop();
 
     //adding exe dir to plugin search path
