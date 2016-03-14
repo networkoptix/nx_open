@@ -1,6 +1,7 @@
 #include "aspect_ratio.h"
 
-namespace {
+namespace
+{
     const QList<QnAspectRatio> standardRatios =
             QList<QnAspectRatio>()
                 << QnAspectRatio(4, 3)
@@ -10,30 +11,61 @@ namespace {
                 << QnAspectRatio(9, 16);
 }
 
-QnAspectRatio::QnAspectRatio(int width, int height) :
-    m_width(width),
-    m_height(height)
+QnAspectRatio::QnAspectRatio()
+    : m_width(0)
+    , m_height(0)
 {}
 
-float QnAspectRatio::toFloat() const {
+QnAspectRatio::QnAspectRatio(int width, int height)
+    : m_width(width)
+    , m_height(height)
+{}
+
+bool QnAspectRatio::isValid() const
+{
+    return m_width > 0 && m_height > 0;
+}
+
+int QnAspectRatio::width() const
+{
+    return m_width;
+}
+
+int QnAspectRatio::height() const
+{
+    return m_height;
+}
+
+float QnAspectRatio::toFloat() const
+{
     return static_cast<float>(m_width) / m_height;
 }
 
-QString QnAspectRatio::toString(const QString &fmt) const {
-    return fmt.arg(m_width).arg(m_height);
+QString QnAspectRatio::toString() const
+{
+    return toString(lit("%1:%2"));
 }
 
-QList<QnAspectRatio> QnAspectRatio::standardRatios() {
+QString QnAspectRatio::toString(const QString &format) const
+{
+    return format.arg(m_width).arg(m_height);
+}
+
+QList<QnAspectRatio> QnAspectRatio::standardRatios()
+{
     return ::standardRatios;
 }
 
-QnAspectRatio QnAspectRatio::closestStandardRatio(float aspectRatio) {
+QnAspectRatio QnAspectRatio::closestStandardRatio(float aspectRatio)
+{
     QnAspectRatio closest = ::standardRatios.first();
     qreal diff = qAbs(aspectRatio - ::standardRatios.first().toFloat());
 
-    foreach (const QnAspectRatio &ratio, ::standardRatios) {
+    foreach (const QnAspectRatio &ratio, ::standardRatios)
+    {
         qreal d = qAbs(aspectRatio - ratio.toFloat());
-        if (d < diff) {
+        if (d < diff)
+        {
             diff = d;
             closest = ratio;
         }
@@ -42,12 +74,14 @@ QnAspectRatio QnAspectRatio::closestStandardRatio(float aspectRatio) {
     return closest;
 }
 
-bool QnAspectRatio::isRotated90(qreal angle) {
+bool QnAspectRatio::isRotated90(qreal angle)
+{
     while (angle > 180)
         angle -= 180;
     return qAbs(90 - qAbs(angle)) < 45;
 }
 
-bool QnAspectRatio::operator ==(const QnAspectRatio &other) const {
+bool QnAspectRatio::operator ==(const QnAspectRatio &other) const
+{
     return m_width == other.m_width && m_height == other.m_height;
 }
