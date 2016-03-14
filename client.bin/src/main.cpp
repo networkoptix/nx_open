@@ -278,12 +278,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     PluginManager pluginManager;
 
-    auto enforceSocketType = startupParams.enforceSocketType.toLower();
-    if( enforceSocketType == lit("tcp") )
-        SocketFactory::enforceStreamSocketType( SocketFactory::SocketType::Tcp );
-    else
-    if( enforceSocketType == lit("udt") )
-        SocketFactory::enforceStreamSocketType( SocketFactory::SocketType::Udt );
+    if (!startupParams.enforceSocketType.isEmpty())
+        SocketFactory::enforceStreamSocketType(startupParams.enforceSocketType);
 
     if (!startupParams.enforceMediatorEndpoint.isEmpty())
         nx::network::SocketGlobals::mediatorConnector().mockupAddress(
