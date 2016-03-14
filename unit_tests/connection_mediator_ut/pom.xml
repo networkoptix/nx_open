@@ -23,7 +23,7 @@
         <global.libs>-lcommon -lnx_utils -lnx_streaming -lnx_network -ludt -lcloud_db_client -lconnection_mediator</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>Ws2_32.lib DbgHelp.lib Winmm.lib Iphlpapi.lib</windows.oslibs>
-        <linux.oslibs>-lavcodec -lavformat -lavutil -lfaac</linux.oslibs>
+        <linux.oslibs>-lavcodec -lavformat -lavutil -lfaac -lswscale -lmp3lame</linux.oslibs>
         <linux.arm.oslibs></linux.arm.oslibs>
         <windows.oslibs.release></windows.oslibs.release>
         <windows.oslibs.debug></windows.oslibs.debug>

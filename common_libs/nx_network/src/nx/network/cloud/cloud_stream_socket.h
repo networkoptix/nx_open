@@ -101,8 +101,9 @@ private:
     /** Used to tie this to aio thread.
     //TODO #ak replace with aio thread timer */
     std::unique_ptr<AbstractDatagramSocket> m_aioThreadBinder;
-    std::atomic<std::promise<std::pair<SystemError::ErrorCode, size_t>>*> m_recvPromisePtr;
-    std::atomic<std::promise<std::pair<SystemError::ErrorCode, size_t>>*> m_sendPromisePtr;
+    typedef std::promise<std::pair<SystemError::ErrorCode, size_t>>* SocketResultPrimisePtr;
+    std::atomic<SocketResultPrimisePtr> m_recvPromisePtr;
+    std::atomic<SocketResultPrimisePtr> m_sendPromisePtr;
 };
 
 } // namespace cloud

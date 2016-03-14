@@ -164,7 +164,7 @@ void fromApiToResource(const ApiCameraData &src, QnVirtualCameraResourcePtr &dst
     dst->setStatusFlags(src.statusFlags);
 
     dst->setVendor(src.vendor);
-    Q_ASSERT(dst->getId() == QnVirtualCameraResource::uniqueIdToId(dst->getUniqueId()));
+    NX_ASSERT(dst->getId() == QnVirtualCameraResource::uniqueIdToId(dst->getUniqueId()));
 }
 
 
@@ -639,8 +639,8 @@ void fromResourceListToApi(const QnMediaServerUserAttributesList& src, ApiMediaS
 ////////////////////////////////////////////////////////////
 
 void fromResourceToApi(const QnResourcePtr &src, ApiResourceData &dst) {
-    Q_ASSERT(!src->getId().isNull());
-    Q_ASSERT(!src->getTypeId().isNull());
+    NX_ASSERT(!src->getId().isNull());
+    NX_ASSERT(!src->getTypeId().isNull());
 
     dst.id = src->getId();
     dst.typeId = src->getTypeId();

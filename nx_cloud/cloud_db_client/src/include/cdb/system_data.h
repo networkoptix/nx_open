@@ -139,6 +139,8 @@ class SystemSharingEx
     public SystemSharing
 {
 public:
+    SystemSharingEx() {}
+
     std::string fullName;
 
     bool operator==(const SystemSharingEx& rhs) const

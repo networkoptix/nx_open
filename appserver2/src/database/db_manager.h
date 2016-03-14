@@ -226,6 +226,9 @@ namespace ec2
         //getUserList
         ErrorCode doQueryNoLock(const QnUuid& userId, ApiUserDataList& userList);
 
+        //getAccessRights
+        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiAccessRightsDataList& accessRightsList);
+
         //getVideowallList
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiVideowallDataList& videowallList);
 

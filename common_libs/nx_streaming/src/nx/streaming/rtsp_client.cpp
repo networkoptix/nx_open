@@ -624,7 +624,7 @@ CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTim
 
     if (m_tcpSock->isClosed())
     {
-        m_tcpSock->reopen();
+        m_tcpSock = SocketFactory::createStreamSocket();
         m_additionalReadBufferSize = 0;
     }
 
@@ -1305,7 +1305,7 @@ int QnRtspClient::buildClientRTCPReport(quint8* dstBuffer, int bufferLen)
 {
     QByteArray esDescr("netoptix");
 
-    Q_ASSERT(bufferLen >= 20 + esDescr.size());
+    NX_ASSERT(bufferLen >= 20 + esDescr.size());
 
     quint8* curBuffer = dstBuffer;
     *curBuffer++ = (RtpHeader::RTP_VERSION << 6);

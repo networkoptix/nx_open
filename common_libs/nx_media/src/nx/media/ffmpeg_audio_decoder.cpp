@@ -8,7 +8,7 @@ extern "C" {
 } // extern "C"
 
 #include <utils/media/ffmpeg_helper.h>
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 namespace nx {
 namespace media {

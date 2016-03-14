@@ -159,7 +159,7 @@ protected:
         switch( dataFormat )
         {
             case Qn::UrlQueryFormat:
-                assert( false );
+                NX_ASSERT( false );
                 return true;
 
             case Qn::JsonFormat:

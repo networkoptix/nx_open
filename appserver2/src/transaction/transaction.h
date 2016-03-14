@@ -25,152 +25,153 @@ namespace ec2
             NotDefined                  = 0,
 
             /* System */
-            tranSyncRequest             = 1,    /*< ApiSyncRequestData */
-            tranSyncResponse            = 2,    /*< QnTranStateResponse */
-            lockRequest                 = 3,    /*< ApiLockData */
-            lockResponse                = 4,    /*< ApiLockData */
-            unlockRequest               = 5,    /*< ApiLockData */
-            peerAliveInfo               = 6,    /*< ApiPeerAliveData */
-            tranSyncDone                = 7,    /*< ApiTranSyncDoneData */
+            tranSyncRequest             = 1,    /**< ApiSyncRequestData */
+            tranSyncResponse            = 2,    /**< QnTranStateResponse */
+            lockRequest                 = 3,    /**< ApiLockData */
+            lockResponse                = 4,    /**< ApiLockData */
+            unlockRequest               = 5,    /**< ApiLockData */
+            peerAliveInfo               = 6,    /**< ApiPeerAliveData */
+            tranSyncDone                = 7,    /**< ApiTranSyncDoneData */
 
             /* Connection */
-            testConnection              = 100,  /*< ApiLoginData */
-            connect                     = 101,  /*< ApiLoginData */
-            openReverseConnection       = 102,  /*< ApiReverseConnectionData */
+            testConnection              = 100,  /**< ApiLoginData */
+            connect                     = 101,  /**< ApiLoginData */
+            openReverseConnection       = 102,  /**< ApiReverseConnectionData */
 
             /* Common resource */
-            removeResource              = 201,  /*< ApiIdData */
-            setResourceStatus           = 202,  /*< ApiResourceStatusData */
-            getResourceParams           = 203,  /*< ApiResourceParamDataList */
-            setResourceParams           = 204,  /*< ApiResourceParamWithRefDataList */
-            getResourceTypes            = 205,  /*< ApiResourceTypeDataList*/
-            getFullInfo                 = 206,  /*< ApiFullInfoData */
-            setResourceParam            = 208,  /*< ApiResourceParamWithRefData */
-            removeResourceParam         = 209,  /*< ApiResourceParamWithRefData */
-            removeResourceParams        = 210,  /*< ApiResourceParamWithRefDataList */
-            getStatusList               = 211,  /*< ApiResourceStatusDataList */
-            removeResources             = 212,  /*< ApiIdDataList */
+            removeResource              = 201,  /**< ApiIdData */
+            setResourceStatus           = 202,  /**< ApiResourceStatusData */
+            getResourceParams           = 203,  /**< ApiResourceParamDataList */
+            setResourceParams           = 204,  /**< ApiResourceParamWithRefDataList */
+            getResourceTypes            = 205,  /**< ApiResourceTypeDataList*/
+            getFullInfo                 = 206,  /**< ApiFullInfoData */
+            setResourceParam            = 208,   /*< ApiResourceParamWithRefData */
+            removeResourceParam         = 209,   /*< ApiResourceParamWithRefData */
+            removeResourceParams        = 210,   /*< ApiResourceParamWithRefDataList */
+            getStatusList               = 211,  /**< ApiResourceStatusDataList */
+            removeResources             = 212,  /**< ApiIdDataList */
 
             /* Camera resource */
-            getCameras                  = 300,  /*< ApiCameraDataList */
-            saveCamera                  = 301,  /*< ApiCameraData */
-            saveCameras                 = 302,  /*< ApiCameraDataList */
-            removeCamera                = 303,  /*< ApiIdData */
-            getCameraHistoryItems       = 304,  /*< ApiServerFootageDataList */
-            addCameraHistoryItem        = 305,  /*< ApiServerFootageData */
-            removeCameraHistoryItem     = 309,  /*< ApiServerFootageData */
-            saveCameraUserAttributes    = 310,  /*< ApiCameraAttributesData */
-            saveCameraUserAttributesList= 311,  /*< ApiCameraAttributesDataList */
-            getCameraUserAttributes     = 312,  /*< ApiCameraAttributesDataList */
-            getCamerasEx                = 313,  /*< ApiCameraDataExList */
+            getCameras                  = 300,  /**< ApiCameraDataList */
+            saveCamera                  = 301,  /**< ApiCameraData */
+            saveCameras                 = 302,  /**< ApiCameraDataList */
+            removeCamera                = 303,  /**< ApiIdData */
+            getCameraHistoryItems       = 304,  /**< ApiServerFootageDataList */
+            addCameraHistoryItem        = 305,  /**< ApiServerFootageData */
+            removeCameraHistoryItem     = 309,  /**< ApiServerFootageData */
+            saveCameraUserAttributes    = 310,  /**< ApiCameraAttributesData */
+            saveCameraUserAttributesList= 311,  /**< ApiCameraAttributesDataList */
+            getCameraUserAttributes     = 312,  /**< ApiCameraAttributesDataList */
+            getCamerasEx                = 313,  /**< ApiCameraDataExList */
 
 
             /* MediaServer resource */
-            getMediaServers             = 400,  /*< ApiMediaServerDataList */
-            saveMediaServer             = 401,  /*< ApiMediaServerData */
-            removeMediaServer           = 402,  /*< ApiIdData */
-            saveServerUserAttributes    = 403,  /*< QnMediaServerUserAttributesList */
-            saveServerUserAttributesList= 404,  /*< QnMediaServerUserAttributesList */
-            getServerUserAttributes     = 405,  /*< ApiIdData, QnMediaServerUserAttributesList */
-            removeServerUserAttributes  = 406,  /*< ApiIdData */
-            saveStorage                 = 407,  /*< ApiStorageData */
-            saveStorages                = 408,  /*< ApiStorageDataList */
-            removeStorage               = 409,  /*< ApiIdData */
-            removeStorages              = 410,  /*< QList<ApiIdData> */
-            getMediaServersEx           = 411,  /*< ApiMediaServerDataExList */
-            getStorages                 = 412,  /*< ApiStorageDataList */
+            getMediaServers             = 400,  /**< ApiMediaServerDataList */
+            saveMediaServer             = 401,  /**< ApiMediaServerData */
+            removeMediaServer           = 402,  /**< ApiIdData */
+            saveServerUserAttributes    = 403,  /**< QnMediaServerUserAttributesList */
+            saveServerUserAttributesList= 404,  /**< QnMediaServerUserAttributesList */
+            getServerUserAttributes     = 405,  /**< ApiIdData, QnMediaServerUserAttributesList */
+            removeServerUserAttributes  = 406,  /**< ApiIdData */
+            saveStorage                 = 407,  /**< ApiStorageData */
+            saveStorages                = 408,  /**< ApiStorageDataList */
+            removeStorage               = 409,  /**< ApiIdData */
+            removeStorages              = 410,  /**< QList<ApiIdData> */
+            getMediaServersEx           = 411,  /**< ApiMediaServerDataExList */
+            getStorages                 = 412,  /**< ApiStorageDataList */
 
             /* User resource */
-            getUsers                    = 500,  /*< ApiUserDataList */
-            saveUser                    = 501,  /*< ApiUserData */
-            removeUser                  = 502,  /*< ApiIdData */
+            getUsers                    = 500,  /**< ApiUserDataList */
+            saveUser                    = 501,  /**< ApiUserData */
+            removeUser                  = 502,  /**< ApiIdData */
+            getAccessRights             = 503,  /**< ApiAccessRightsDataList */
 
             /* Layout resource */
-            getLayouts                  = 600,  /*< ApiLayoutDataList */
-            saveLayout                  = 601,  /*< ApiLayoutData */
-            saveLayouts                 = 602,  /*< ApiLayoutDataList */
-            removeLayout                = 603,  /*< ApiIdData */
+            getLayouts                  = 600,  /**< ApiLayoutDataList */
+            saveLayout                  = 601,  /**< ApiLayoutData */
+            saveLayouts                 = 602,  /**< ApiLayoutDataList */
+            removeLayout                = 603,  /**< ApiIdData */
 
             /* Videowall resource */
-            getVideowalls               = 700,  /*< ApiVideowallDataList */
-            saveVideowall               = 701,  /*< ApiVideowallData */
-            removeVideowall             = 702,  /*< ApiIdData */
-            videowallControl            = 703,  /*< ApiVideowallControlMessageData */
+            getVideowalls               = 700,  /**< ApiVideowallDataList */
+            saveVideowall               = 701,  /**< ApiVideowallData */
+            removeVideowall             = 702,  /**< ApiIdData */
+            videowallControl            = 703,  /**< ApiVideowallControlMessageData */
 
             /* Business rules */
-            getBusinessRules            = 800,  /*< ApiBusinessRuleDataList */
-            saveBusinessRule            = 801,  /*< ApiBusinessRuleData */
-            removeBusinessRule          = 802,  /*< ApiIdData */
-            resetBusinessRules          = 803,  /*< ApiResetBusinessRuleData */
-            broadcastBusinessAction     = 804,  /*< ApiBusinessActionData */
-            execBusinessAction          = 805,  /*< ApiBusinessActionData */
+            getBusinessRules            = 800,  /**< ApiBusinessRuleDataList */
+            saveBusinessRule            = 801,  /**< ApiBusinessRuleData */
+            removeBusinessRule          = 802,  /**< ApiIdData */
+            resetBusinessRules          = 803,  /**< ApiResetBusinessRuleData */
+            broadcastBusinessAction     = 804,  /**< ApiBusinessActionData */
+            execBusinessAction          = 805,  /**< ApiBusinessActionData */
 
             /* Stored files */
-            listDirectory               = 900,  /*< ApiStoredDirContents */
-            getStoredFile               = 901,  /*< ApiStoredFileData */
-            addStoredFile               = 902,  /*< ApiStoredFileData */
-            updateStoredFile            = 903,  /*< ApiStoredFileData */
-            removeStoredFile            = 904,  /*< ApiStoredFilePath */
-            getStoredFiles              = 905,  /*< ApiStoredFileDataList */
+            listDirectory               = 900,  /**< ApiStoredDirContents */
+            getStoredFile               = 901,  /**< ApiStoredFileData */
+            addStoredFile               = 902,  /**< ApiStoredFileData */
+            updateStoredFile            = 903,  /**< ApiStoredFileData */
+            removeStoredFile            = 904,  /**< ApiStoredFilePath */
+            getStoredFiles              = 905,  /**< ApiStoredFileDataList */
 
             /* Licenses */
-            getLicenses                 = 1000, /*< ApiLicenseDataList */
-            addLicense                  = 1001, /*< ApiLicenseData */
-            addLicenses                 = 1002, /*< ApiLicenseDataList */
-            removeLicense               = 1003, /*< ApiLicenseData */
+            getLicenses                 = 1000, /**< ApiLicenseDataList */
+            addLicense                  = 1001, /**< ApiLicenseData */
+            addLicenses                 = 1002, /**< ApiLicenseDataList */
+            removeLicense               = 1003, /**< ApiLicenseData */
 
             /* Email */
-            testEmailSettings           = 1100, /*< ApiEmailSettingsData */
-            sendEmail                   = 1101, /*< ApiEmailData */
+            testEmailSettings           = 1100, /**< ApiEmailSettingsData */
+            sendEmail                   = 1101, /**< ApiEmailData */
 
             /* Auto-updates */
-            uploadUpdate                = 1200, /*< ApiUpdateUploadData */
-            uploadUpdateResponce        = 1201, /*< ApiUpdateUploadResponceData */
-            installUpdate               = 1202, /*< ApiUpdateInstallData  */
+            uploadUpdate                = 1200, /**< ApiUpdateUploadData */
+            uploadUpdateResponce        = 1201, /**< ApiUpdateUploadResponceData */
+            installUpdate               = 1202, /**< ApiUpdateInstallData  */
 
             /* Module information */
-            discoveredServerChanged     = 1301, /*< ApiDiscoveredServerData */
-            discoveredServersList       = 1302, /*< ApiDiscoveredServerDataList */
+            discoveredServerChanged     = 1301, /**< ApiDiscoveredServerData */
+            discoveredServersList       = 1302, /**< ApiDiscoveredServerDataList */
 
             /* Discovery */
-            discoverPeer                = 1401, /*< ApiDiscoveryData */
-            addDiscoveryInformation     = 1402, /*< ApiDiscoveryData*/
-            removeDiscoveryInformation  = 1403, /*< ApiDiscoveryData*/
-            getDiscoveryData            = 1404, /*< ApiDiscoveryDataList */
+            discoverPeer                = 1401, /**< ApiDiscoveryData */
+            addDiscoveryInformation     = 1402, /**< ApiDiscoveryData*/
+            removeDiscoveryInformation  = 1403, /**< ApiDiscoveryData*/
+            getDiscoveryData            = 1404, /**< ApiDiscoveryDataList */
 
             /* WebPage resource */
-            getWebPages                 = 1500,  /*< ApiWebPageDataList */
-            saveWebPage                 = 1501,  /*< ApiWebPageData */
-            removeWebPage               = 1502,  /*< ApiIdData */
+            getWebPages                 = 1500,  /**< ApiWebPageDataList */
+            saveWebPage                 = 1501,  /**< ApiWebPageData */
+            removeWebPage               = 1502,  /**< ApiIdData */
 
             /* Misc */
-            forcePrimaryTimeServer      = 2001,  /*< ApiIdData */
-            broadcastPeerSystemTime     = 2002,  /*< ApiPeerSystemTimeData*/
-            getCurrentTime              = 2003,  /*< ApiTimeData */
-            changeSystemName            = 2004,  /*< ApiSystemNameData */
-            getKnownPeersSystemTime     = 2005,  /*< ApiPeerSystemTimeDataList */
-            markLicenseOverflow         = 2006,  /*< ApiLicenseOverflowData */
-            getSettings                 = 2007,  /*< ApiResourceParamDataList */
+            forcePrimaryTimeServer      = 2001,  /**< ApiIdData */
+            broadcastPeerSystemTime     = 2002,  /**< ApiPeerSystemTimeData*/
+            getCurrentTime              = 2003,  /**< ApiTimeData */
+            changeSystemName            = 2004,  /**< ApiSystemNameData */
+            getKnownPeersSystemTime     = 2005,  /**< ApiPeerSystemTimeDataList */
+            markLicenseOverflow         = 2006,  /**< ApiLicenseOverflowData */
+            getSettings                 = 2007,  /**< ApiResourceParamDataList */
 
             /* Client information */
-            getClientInfos              = 4001,  /*< ApiClientInfoDataList */
-            saveClientInfo              = 4002,  /*< ApiClientInfoData */
+            getClientInfos              = 4001,  /**< ApiClientInfoDataList */
+            saveClientInfo              = 4002,  /**< ApiClientInfoData */
 
             /* Statistics */
-            getStatisticsReport         = 5001,  /*< ApiSystemStatistics */
-            triggerStatisticsReport     = 5002,  /*< ApiStatisticsServerInfo */
+            getStatisticsReport         = 5001,  /**< ApiSystemStatistics */
+            triggerStatisticsReport     = 5002,  /**< ApiStatisticsServerInfo */
 
-            //getHelp                     = 9003,  /*< ApiHelpGroupDataList */
-			runtimeInfoChanged          = 9004,  /*< ApiRuntimeData */
-            dumpDatabase                = 9005,  /*< ApiDatabaseDumpData */
-            restoreDatabase             = 9006,  /*< ApiDatabaseDumpData */
-            updatePersistentSequence    = 9009,  /*< ApiUpdateSequenceData*/
-            dumpDatabaseToFile          = 9010,  /*< ApiStoredFilePath, size_t (dump size) */
+            //getHelp                     = 9003,  /**< ApiHelpGroupDataList */
+			runtimeInfoChanged          = 9004,  /**< ApiRuntimeData */
+            dumpDatabase                = 9005,  /**< ApiDatabaseDumpData */
+            restoreDatabase             = 9006,  /**< ApiDatabaseDumpData */
+            updatePersistentSequence    = 9009,  /**< ApiUpdateSequenceData*/
+            dumpDatabaseToFile          = 9010,  /**< ApiStoredFilePath, size_t (dump size) */
 
-            getTransactionLog           = 10000,  /*< QnAbstractTransactionList*/
+            getTransactionLog           = 10000,  /**< QnAbstractTransactionList*/
 
             /* Ldap */
-            testLdapSettings            = 11001, /*< QnLdapSettings */
+            testLdapSettings            = 11001, /**< QnLdapSettings */
 
             maxTransactionValue         = 65535
         };

@@ -237,14 +237,14 @@ public:
     // Call this function to roll a dice. If the probability hits,
     // the function returns true, otherwise it return false.
     bool Roll( float probability ) {
-        Q_ASSERT( probability >= 0.0f && probability <= 1.0f );
+        NX_ASSERT( probability >= 0.0f && probability <= 1.0f );
         std::uniform_real_distribution<> distr(0.0,1.0);
         if( distr(engine_) > probability ) return false;
         return true;
     }
     // Generate Random integer
     int RandomRange( int min , int max ) {
-        Q_ASSERT( min <= max );
+        NX_ASSERT( min <= max );
         std::uniform_int_distribution<int> distr(min,max);
         return distr(engine_);
     }
@@ -326,7 +326,7 @@ private:
             failed_connection_size_++;
             --connected_socket_size_;
         } else {
-            Q_ASSERT( bytes_transferred == conn->buffer.size() );
+            NX_ASSERT( bytes_transferred == conn->buffer.size() );
             sleep_list_.Enqueue( conn.release() );
         }
     }
@@ -380,7 +380,7 @@ private:
             return 1.0f;
         else {
             int left = maximum_allowed_concurrent_connection_ - connected_socket_size_;
-            Q_ASSERT( left>=0 );
+            NX_ASSERT( left>=0 );
             const float lower_bound = 0.7f;
             return lower_bound + (left/half_max)*(1.0f-lower_bound);
         }
@@ -531,7 +531,7 @@ bool CommandLineParser::ParseCommandLine() {
 }
 
 bool CommandLineParser::ParseServerConfig( ServerConfig* config ) {
-    Q_ASSERT(IsServer());
+    NX_ASSERT(IsServer());
     if( !parser_.isSet(QLatin1String("addr")) ||
         !parser_.isSet(QLatin1String("port")) ) {
             std::cout<<parser_.helpText().toLatin1().constData()<<std::endl;

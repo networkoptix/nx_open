@@ -36,6 +36,7 @@ bool CloudStreamSocket::bind(const SocketAddress& localAddress)
 {
     //TODO #ak just ignoring for now. 
         //Usually, we do not care about exact port on tcp client socket
+    static_cast<void>(localAddress);
     return true;
 }
 
@@ -64,24 +65,30 @@ bool CloudStreamSocket::isClosed() const
 void CloudStreamSocket::shutdown()
 {
     //interrupting blocking calls
+    std::promise<void> stoppedPromise;
     pleaseStop(
-        [this](){
-            if (m_recvPromisePtr.load())
-            {
-                m_recvPromisePtr.load()->set_value(
-                    std::make_pair(SystemError::interrupted, 0));
-                m_recvPromisePtr.store(nullptr);
-            }
+        [this, &stoppedPromise]()
+        {
+            SocketResultPrimisePtr sendPromive(0);
+            SocketResultPrimisePtr recvPromise(0);
 
-            if (m_sendPromisePtr.load())
-            {
-                m_sendPromisePtr.load()->set_value(
-                    std::make_pair(SystemError::interrupted, 0));
-                m_sendPromisePtr.store(nullptr);
-            }
+            m_sendPromisePtr.exchange(sendPromive);
+            m_sendPromisePtr.exchange(recvPromise);
+            
+            const auto interrupted = std::make_pair(SystemError::interrupted, 0);
+
+            if (sendPromive)
+                sendPromive->set_value(interrupted);
+            if (recvPromise)
+                recvPromise->set_value(interrupted);
+
+            stoppedPromise.set_value();
         });
+
     if (m_socketDelegate)
         m_socketDelegate->shutdown();
+
+    stoppedPromise.get_future().wait();
 }
 
 AbstractSocket::SOCKET_HANDLE CloudStreamSocket::handle() const
@@ -105,18 +112,19 @@ bool CloudStreamSocket::connect(
     const SocketAddress& remoteAddress,
     unsigned int timeoutMillis)
 {
-    std::promise<SystemError::ErrorCode> promise;
+    std::promise<std::pair<SystemError::ErrorCode, size_t>> promise;
+    m_sendPromisePtr.store(&promise);
     connectAsync(
         remoteAddress,
         [this, &promise](SystemError::ErrorCode code)
         {
             //to ensure that socket is not used by aio sub-system anymore, we use post
             m_aioThreadBinder->post([code, &promise](){
-                promise.set_value(code);
+                promise.set_value(std::make_pair(code, 0));
             });
         });
-
-    auto result = promise.get_future().get();
+    
+    auto result = promise.get_future().get().first;
     if (result != SystemError::noError)
     {
         SystemError::setLastErrorCode(result);
@@ -143,7 +151,7 @@ int CloudStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
         memcpy(static_cast<char*>(buffer) + totallyRead, tmpBuffer.data(), lastRead);
         totallyRead += lastRead;
     }
-    while ((flags & MSG_WAITALL) && (totallyRead < bufferLen));
+    while ((flags & MSG_WAITALL) && (totallyRead < static_cast<int>(bufferLen)));
 
     return totallyRead;
 }
@@ -198,25 +206,33 @@ void CloudStreamSocket::cancelIOAsync(
     aio::EventType eventType,
     nx::utils::MoveOnlyFunc<void()> handler)
 {
-    if (eventType == aio::etWrite || eventType == aio::etNone)
+    auto finalHandler = [this, eventType, handler = move(handler)]() mutable
     {
-        m_asyncConnectGuard->terminate(); // breaks outgoing connects
-        nx::network::SocketGlobals::addressResolver().cancel(this);
-    }
+        if (m_socketDelegate)
+        {
+            NX_ASSERT(m_aioThreadBinder->getAioThread() == m_socketDelegate->getAioThread());
+        }
 
-    if (m_socketDelegate)
-    {
-        assert(m_aioThreadBinder->getAioThread() == m_socketDelegate->getAioThread());
-    }
-
-    m_aioThreadBinder->cancelIOAsync(
-        eventType,
-        [this, eventType, handler = move(handler)]() mutable
+        m_aioThreadBinder->cancelIOAsync(
+            eventType,
+            [this, eventType, handler = move(handler)]() mutable
         {
             if (m_socketDelegate)
                 m_socketDelegate->cancelIOSync(eventType);
             handler();
         });
+    };
+
+    if (eventType == aio::etWrite || eventType == aio::etNone)
+    {
+        m_asyncConnectGuard->terminate(); // breaks outgoing connects
+        nx::network::SocketGlobals::addressResolver().cancel(
+            this, std::move(finalHandler));
+    }
+    else
+    {
+        finalHandler();
+    }
 }
 
 void CloudStreamSocket::cancelIOSync(aio::EventType eventType)
@@ -334,7 +350,7 @@ bool CloudStreamSocket::startAsyncConnect(
     const AddressEntry& dnsEntry = dnsEntries[0];
     switch (dnsEntry.type)
     {
-        case AddressType::regular:
+        case AddressType::direct:
             //using tcp connection
             m_socketDelegate.reset(new TCPSocket(true));
             setDelegate(m_socketDelegate.get());
@@ -342,7 +358,7 @@ bool CloudStreamSocket::startAsyncConnect(
                 return false;
             for (const auto& attr: dnsEntry.attributes)
             {
-                if (attr.type == AddressAttributeType::nxApiPort)
+                if (attr.type == AddressAttributeType::port)
                     port = static_cast<quint16>(attr.value);
             }
             m_socketDelegate->connectAsync(
@@ -353,10 +369,6 @@ bool CloudStreamSocket::startAsyncConnect(
         case AddressType::cloud:
         case AddressType::unknown:  //if peer is unknown, trying to establish cloud connect
         {
-            unsigned int sockSendTimeout = 0;
-            if (!getSendTimeout(&sockSendTimeout))
-                return false;
-
             //establishing cloud connect
             unsigned int sendTimeoutMillis = 0;
             if (!getSendTimeout(&sendTimeoutMillis))
@@ -377,10 +389,11 @@ bool CloudStreamSocket::startAsyncConnect(
                         errorCode,
                         std::move(cloudConnection));
                 });
+            return true;
         }
 
         default:
-            assert(false);
+            NX_ASSERT(false);
             SystemError::setLastErrorCode(SystemError::hostUnreach);
             return false;
     }
@@ -418,13 +431,13 @@ void CloudStreamSocket::onCloudConnectDone(
 {
     if (errorCode == SystemError::noError)
     {
+        NX_ASSERT(cloudConnection->getAioThread() == m_aioThreadBinder->getAioThread());
         m_socketDelegate = std::move(cloudConnection);
-        assert(cloudConnection->getAioThread() == m_aioThreadBinder->getAioThread());
         setDelegate(m_socketDelegate.get());
     }
     else
     {
-        assert(!cloudConnection);
+        NX_ASSERT(!cloudConnection);
     }
     auto userHandler = std::move(m_connectHandler);
     userHandler(errorCode);  //this object can be freed in handler, so using local variable for handler

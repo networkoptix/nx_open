@@ -309,7 +309,7 @@ void QnNetworkResource::getDevicesBasicInfo(QnResourceMap& lst, int threads)
 
 QnUuid QnNetworkResource::uniqueIdToId(const QString& uniqId)
 {
-    Q_ASSERT(!uniqId.isEmpty());
+    NX_ASSERT(!uniqId.isEmpty());
     QCryptographicHash md5(QCryptographicHash::Md5);
     md5.addData(uniqId.toUtf8());
     QnUuid id = QnUuid::fromRfc4122(md5.result());

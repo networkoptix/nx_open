@@ -120,14 +120,15 @@ public:
 
     SocketAddress();
     ~SocketAddress();
-    SocketAddress( HostAddress _address, quint16 _port );
-    SocketAddress( const QString& str );
-    SocketAddress( const char* str );
+    SocketAddress(HostAddress _address, quint16 _port);
+    SocketAddress(const QString& str);
+    SocketAddress(const QByteArray& utf8Str);
+    SocketAddress(const char* str);
 
     QString toString() const;
-    bool operator==( const SocketAddress& rhs ) const;
-    bool operator!=( const SocketAddress& rhs ) const;
-    bool operator<( const SocketAddress& rhs ) const;
+    bool operator==(const SocketAddress& rhs) const;
+    bool operator!=(const SocketAddress& rhs) const;
+    bool operator<(const SocketAddress& rhs) const;
     bool isNull() const;
 
 private:

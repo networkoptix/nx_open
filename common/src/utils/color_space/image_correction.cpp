@@ -49,7 +49,7 @@ void ImageCorrectionResult::analyseImage(const quint8* yPlane, int width, int he
         return;
     }
 
-    Q_ASSERT(stride % 4 == 0);
+    NX_ASSERT(stride % 4 == 0);
 
     int left = qPower2Floor(srcRect.left()*width, 4);
     int right = qPower2Floor(srcRect.right()*width, 4);

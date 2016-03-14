@@ -18,7 +18,7 @@
 
 const auto checkConstantsEquality = []()
 {
-    assert((AV_NOPTS_VALUE == DATETIME_INVALID) && "DATETIME_INVALID must be equal to AV_NOPTS_VALUE.");
+    NX_ASSERT((AV_NOPTS_VALUE == DATETIME_INVALID) && "DATETIME_INVALID must be equal to AV_NOPTS_VALUE.");
     return true;
 }();
 
@@ -73,6 +73,8 @@ QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
     m_timer.start();
     QnMutexLocker lock( &m_allConsumersMutex );
     m_allConsumers << this;
+    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
+        m_needKeyData[i] = false;
 }
 
 void QnRtspDataConsumer::setResource(const QnResourcePtr& resource)
@@ -149,7 +151,7 @@ bool QnRtspDataConsumer::isMediaTimingsSlow() const
     QnMutexLocker lock( &m_liveTimingControlMtx );
     if (m_lastLiveTime == (qint64)AV_NOPTS_VALUE)
         return false;
-    Q_ASSERT(m_firstLiveTime != (qint64)AV_NOPTS_VALUE);
+    NX_ASSERT(m_firstLiveTime != (qint64)AV_NOPTS_VALUE);
     //qint64 elapsed = m_liveTimer.elapsed()*1000;
     bool rez = m_lastLiveTime - m_firstLiveTime < m_liveTimer.elapsed()*1000;
 
@@ -310,7 +312,8 @@ void QnRtspDataConsumer::setLiveMode(bool value)
 void QnRtspDataConsumer::setLiveQuality(MediaQuality liveQuality)
 {
     QnMutexLocker lock( &m_qualityChangeMutex );
-    m_newLiveQuality = liveQuality;
+    if (m_liveQuality != liveQuality)
+        m_newLiveQuality = liveQuality;
 }
 
 /*
@@ -372,7 +375,7 @@ void QnRtspDataConsumer::createDataPacketTCP(QnByteArray& sendBuffer, QnAbstract
             QnFfmpegHelper::serializeCodecContext(currentContext->ctx(), &codecCtxData);
             buildRtspTcpHeader(rtpTcpChannel, ssrc + 1, codecCtxData.size(), true, 0, RTP_FFMPEG_GENERIC_CODE); // ssrc+1 - switch data subchannel to context subchannel
             sendBuffer.write(m_rtspTcpHeader, rtpHeaderSize);
-            Q_ASSERT(!codecCtxData.isEmpty());
+            NX_ASSERT(!codecCtxData.isEmpty());
             m_owner->bufferData(codecCtxData);
         }
     }
@@ -438,7 +441,7 @@ void QnRtspDataConsumer::createDataPacketTCP(QnByteArray& sendBuffer, QnAbstract
 
 void QnRtspDataConsumer::setStreamingSpeed(int speed)
 {
-    Q_ASSERT( speed > 0 );
+    NX_ASSERT( speed > 0 );
     m_streamingSpeed = speed <= 0 ? 1 : speed;
 }
 
@@ -477,7 +480,7 @@ void QnRtspDataConsumer::sendMetadata(const QByteArray& metadata)
             m_owner->sendBuffer(m_sendBuffer);
         }
         else  if (metadataTrack->mediaSocket) {
-            Q_ASSERT(m_sendBuffer.size() > 4 && m_sendBuffer.size() < 16384);
+            NX_ASSERT(m_sendBuffer.size() > 4 && m_sendBuffer.size() < 16384);
             metadataTrack->mediaSocket->send(m_sendBuffer.data()+4, m_sendBuffer.size()-4);
         }
 
@@ -505,6 +508,12 @@ QByteArray QnRtspDataConsumer::getRangeHeaderIfChanged()
     }
 };
 
+void QnRtspDataConsumer::setNeedKeyData()
+{
+    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
+        m_needKeyData[i] = true;
+}
+
 bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData)
 {
     QnConstAbstractDataPacketPtr data = nonConstData;
@@ -515,12 +524,12 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     //msleep(500);
 
     QnConstAbstractMediaDataPtr media = std::dynamic_pointer_cast<const QnAbstractMediaData>(data);
-    if (!media)
+    if (!media || media->channelNumber > CL_MAX_CHANNELS)
         return true;
 
     if( (m_streamingSpeed != MAX_STREAMING_SPEED) && (m_streamingSpeed != 1) )
     {
-        Q_ASSERT( !media->flags.testFlag(QnAbstractMediaData::MediaFlags_LIVE) );
+        NX_ASSERT( !media->flags.testFlag(QnAbstractMediaData::MediaFlags_LIVE) );
         //TODO #ak changing packet's timestamp. It is OK for archive, but generally unsafe.
             //Introduce safe solution
         if( !media->flags.testFlag(QnAbstractMediaData::MediaFlags_LIVE) )
@@ -528,30 +537,42 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     }
 
     bool isLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
-    const QnMetaDataV1* metadata = dynamic_cast<const QnMetaDataV1*>(data.get());
-    if (metadata == 0)
+    bool isVideo = media->dataType == QnAbstractMediaData::VIDEO;
+    bool isAudio = media->dataType == QnAbstractMediaData::AUDIO;
+    if (isVideo || isAudio)
     {
         bool isKeyFrame = media->flags & AV_PKT_FLAG_KEY;
         bool isSecondaryProvider = media->flags & QnAbstractMediaData::MediaFlags_LowQuality;
         {
             QnMutexLocker lock( &m_qualityChangeMutex );
-            if (isKeyFrame && m_newLiveQuality != MEDIA_Quality_None)
+            if (isKeyFrame && isVideo && m_newLiveQuality != MEDIA_Quality_None)
             {
                 if (m_newLiveQuality == MEDIA_Quality_Low && isSecondaryProvider) {
                     setLiveQualityInternal(MEDIA_Quality_Low); // slow network. Reduce quality
                     m_newLiveQuality = MEDIA_Quality_None;
+                    setNeedKeyData();
                 }
                 else if ((m_newLiveQuality == MEDIA_Quality_High || m_newLiveQuality == MEDIA_Quality_ForceHigh) && !isSecondaryProvider) {
                     setLiveQualityInternal(m_newLiveQuality);
                     m_newLiveQuality = MEDIA_Quality_None;
+                    setNeedKeyData();
                 }
             }
         }
-        if (isLive) {
+        if (isLive) 
+        {
             if (m_liveQuality != MEDIA_Quality_Low && isSecondaryProvider)
                 return true; // data for other live quality stream
             else if (m_liveQuality == MEDIA_Quality_Low && !isSecondaryProvider)
                 return true; // data for other live quality stream
+
+            if (isVideo)
+            {
+                if (isKeyFrame)
+                    m_needKeyData[media->channelNumber] = false;
+                else if (!isKeyFrame && m_needKeyData[media->channelNumber])
+                    return true; // wait for I frame for this channel
+            }
         }
     }
 
@@ -655,7 +676,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
             m_owner->sendBuffer(m_sendBuffer);
         }
         else {
-            Q_ASSERT(m_sendBuffer.size() > 4 && m_sendBuffer.size() < 16384);
+            NX_ASSERT(m_sendBuffer.size() > 4 && m_sendBuffer.size() < 16384);
             AbstractDatagramSocket* mediaSocket = isRtcp ? trackInfo->rtcpSocket : trackInfo->mediaSocket;
             mediaSocket->send(m_sendBuffer.data()+4, m_sendBuffer.size()-4);
         }

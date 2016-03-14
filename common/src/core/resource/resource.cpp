@@ -241,7 +241,7 @@ bool QnResource::emitDynamicSignal(const char *signal, void **arguments)
 
 void QnResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields)
 {
-    Q_ASSERT(getId() == other->getId() || getUniqueId() == other->getUniqueId()); // unique id MUST be the same
+    NX_ASSERT(getId() == other->getId() || getUniqueId() == other->getUniqueId()); // unique id MUST be the same
 
     m_typeId = other->m_typeId;
     m_lastDiscoveredTime = other->m_lastDiscoveredTime;
@@ -282,7 +282,7 @@ void QnResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modif
 
 void QnResource::update(const QnResourcePtr& other, bool silenceMode) {
     /*
-    Q_ASSERT_X(other->metaObject()->className() == this->metaObject()->className(),
+    NX_ASSERT(other->metaObject()->className() == this->metaObject()->className(),
         Q_FUNC_INFO,
         "Trying to update " + QByteArray(this->metaObject()->className()) + " with " + QByteArray(other->metaObject()->className()));
     */
@@ -869,7 +869,7 @@ bool QnResource::setProperty(const QString &key, const QString &value, PropertyO
         }
     }
 
-    Q_ASSERT(!getId().isNull());
+    NX_ASSERT(!getId().isNull());
     bool isModified = propertyDictionary->setValue(getId(), key, value, markDirty, replaceIfExists);
     if (isModified)
         emitPropertyChanged(key);
@@ -931,13 +931,13 @@ void QnResource::stopCommandProc()
 }
 
 void QnResource::addCommandToProc(const QnResourceCommandPtr& command) {
-    Q_ASSERT_X(qnResourceCommandProcessorInitialized, Q_FUNC_INFO, "Processor is not started");
+    NX_ASSERT(qnResourceCommandProcessorInitialized, Q_FUNC_INFO, "Processor is not started");
     if (qnResourceCommandProcessorInitialized)
         QnResourceCommandProcessor_instance()->putData(command);
 }
 
 int QnResource::commandProcQueueSize() {
-    Q_ASSERT_X(qnResourceCommandProcessorInitialized, Q_FUNC_INFO, "Processor is not started");
+    NX_ASSERT(qnResourceCommandProcessorInitialized, Q_FUNC_INFO, "Processor is not started");
     if (qnResourceCommandProcessorInitialized)
         return QnResourceCommandProcessor_instance()->queueSize();
     return 0;
@@ -1081,7 +1081,7 @@ bool QnResource::isInitialized() const
 void QnResource::setUniqId(const QString& value)
 {
     Q_UNUSED(value)
-    Q_ASSERT_X(false, Q_FUNC_INFO, "Not implemented");
+    NX_ASSERT(false, Q_FUNC_INFO, "Not implemented");
 }
 
 Qn::PtzCapabilities QnResource::getPtzCapabilities() const

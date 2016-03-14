@@ -23,6 +23,7 @@
 #include "nx_ec/data/api_resource_type_data.h"
 #include "nx_ec/data/api_camera_data_ex.h"
 #include "nx_ec/data/api_camera_history_data.h"
+#include <nx_ec/data/api_access_rights_data.h>
 #include "remote_ec_connection.h"
 #include "rest/ec2_base_query_http_handler.h"
 #include "rest/ec2_update_http_handler.h"
@@ -675,6 +676,8 @@ namespace ec2
          * %// AbstractUserManager::getUsers
          */
         registerGetFuncHandler<std::nullptr_t, ApiUserDataList>(p, ApiCommand::getUsers);
+
+        registerGetFuncHandler<std::nullptr_t, ApiAccessRightsDataList>(p, ApiCommand::getAccessRights);
 
         /**%apidoc POST /ec2/saveUser
          * <p>

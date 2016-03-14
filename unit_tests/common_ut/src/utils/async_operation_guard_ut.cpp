@@ -42,7 +42,7 @@ public:
 
 private:
     std::thread m_thread;
-    SyncQueue<std::function<void()>> m_tasks;
+    TestSyncQueue<std::function<void()>> m_tasks;
 };
 
 class AsyncOperationGuardTest
@@ -69,7 +69,7 @@ public:
 
 private:
     AsyncRunner* m_runner;
-    SyncQueue<bool> m_completeQueue;
+    TestSyncQueue<bool> m_completeQueue;
     AsyncOperationGuard m_operationGuard;
 };
 

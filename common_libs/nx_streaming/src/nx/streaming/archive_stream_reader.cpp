@@ -633,7 +633,7 @@ begin_label:
             if (m_eof || (m_currentTime == 0 && m_bottomIFrameTime > 0 && m_topIFrameTime >= m_bottomIFrameTime))
             {
                 // seek from EOF to BOF occured
-                //Q_ASSERT(m_topIFrameTime != DATETIME_NOW);
+                //NX_ASSERT(m_topIFrameTime != DATETIME_NOW);
                 setCurrentTime(m_topIFrameTime);
                 m_eof = false;
             }
@@ -716,7 +716,7 @@ begin_label:
                         internalJumpTo(seekTime);
                         m_bofReached = (seekTime == m_delegate->startTime()) || m_topIFrameTime > seekTime;
                         m_lastGopSeekTime = m_topIFrameTime; //seekTime;
-                        //Q_ASSERT(m_lastGopSeekTime < DATETIME_NOW/2000ll);
+                        //NX_ASSERT(m_lastGopSeekTime < DATETIME_NOW/2000ll);
                         m_topIFrameTime = tmpVal;
                         //return getNextData();
                         goto begin_label;
@@ -1247,7 +1247,7 @@ QnConstMediaContextPtr QnArchiveStreamReader::getCodecContext() const
 
 qint64 QnArchiveStreamReader::startTime() const
 {
-    Q_ASSERT(m_delegate);
+    NX_ASSERT(m_delegate);
     QnTimePeriod p;
     {
         QnMutexLocker lock( &m_playbackMaskSync );
@@ -1261,7 +1261,7 @@ qint64 QnArchiveStreamReader::startTime() const
 
 qint64 QnArchiveStreamReader::endTime() const
 {
-    Q_ASSERT(m_delegate);
+    NX_ASSERT(m_delegate);
     QnTimePeriod p;
     {
         QnMutexLocker lock( &m_playbackMaskSync );

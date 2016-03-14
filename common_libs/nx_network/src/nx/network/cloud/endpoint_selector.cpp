@@ -21,7 +21,7 @@ void RandomEndpointSelector::selectBestEndpont(
     std::uniform_int_distribution<std::vector<SocketAddress>::size_type>
         uniformDist(0, endpoints.size()-1);
 
-    assert(!endpoints.empty());
+    NX_ASSERT(!endpoints.empty());
     handler(
         nx_http::StatusCode::ok,
         endpoints[uniformDist(e1)]);

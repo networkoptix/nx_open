@@ -112,7 +112,7 @@ public:
     void sendMessage(
         SocketAddress destinationEndpoint,
         const MessageType& message,
-        std::function<void(
+        utils::MoveOnlyFunc<void(
             SystemError::ErrorCode /*sysErrorCode*/,
             SocketAddress /*resolvedTargetAddress*/)> completionHandler)
     {
@@ -122,15 +122,17 @@ public:
         serializedMessage.reserve(nx::network::kTypicalMtuSize);
         messageSerializer.setMessage(&message);
         size_t bytesWritten = 0;
-        assert(messageSerializer.serialize(&serializedMessage, &bytesWritten) ==
+        NX_ASSERT(messageSerializer.serialize(&serializedMessage, &bytesWritten) ==
                 nx_api::SerializerState::done);
 
-        m_socket->dispatch(std::bind(
-            &self_type::sendMessageInternal,
-            this,
-            std::move(destinationEndpoint),
-            std::move(serializedMessage),
-            std::move(completionHandler)));
+        m_socket->dispatch(
+            [this, endpoint = std::move(destinationEndpoint),
+                   message = std::move(serializedMessage),
+                   handler = std::move(completionHandler)]() mutable
+        {
+            sendMessageInternal(
+                std::move(endpoint), std::move(message), std::move(handler));
+        });
     }
 
     const std::unique_ptr<network::UDPSocket>& socket()
@@ -147,7 +149,7 @@ public:
     {
         if (m_terminationFlag)
             *m_terminationFlag = true;
-        //we MUST be in aio thread. TODO #ak add assert for aio thread
+        //we MUST be in aio thread. TODO #ak add NX_ASSERT for aio thread
         m_socket->cancelIOSync(aio::etNone); 
         return std::move(m_socket);
     }
@@ -157,14 +159,15 @@ private:
     {
         SocketAddress destinationEndpoint;
         nx::Buffer serializedMessage;
-        std::function<void(
+        utils::MoveOnlyFunc<void(
             SystemError::ErrorCode,
             SocketAddress resolvedTargetAddress)> completionHandler;
 
         OutgoingMessageContext(
             SocketAddress _destinationEndpoint,
             nx::Buffer _serializedMessage,
-            std::function<void(SystemError::ErrorCode, SocketAddress)> _completionHandler)
+            utils::MoveOnlyFunc<void(
+                SystemError::ErrorCode, SocketAddress)> _completionHandler)
         :   
             destinationEndpoint(std::move(_destinationEndpoint)),
             serializedMessage(std::move(_serializedMessage)),
@@ -246,14 +249,15 @@ private:
     void sendMessageInternal(
         SocketAddress destinationEndpoint,
         nx::Buffer serializedMessage,
-        std::function<void(SystemError::ErrorCode, SocketAddress)> completionHandler)
+        utils::MoveOnlyFunc<void(
+            SystemError::ErrorCode, SocketAddress)> completionHandler)
     {
         OutgoingMessageContext msgCtx(
             std::move(destinationEndpoint),
             std::move(serializedMessage),
             std::move(completionHandler));
 
-        m_sendQueue.emplace_back(std::move(msgCtx));
+        m_sendQueue.push_back(std::move(msgCtx));
         if (m_sendQueue.size() == 1)
             sendOutNextMessage();
     }
@@ -274,7 +278,7 @@ private:
         SocketAddress resolvedTargetAddress,
         size_t bytesSent)
     {
-        assert(!m_sendQueue.empty());
+        NX_ASSERT(!m_sendQueue.empty());
         if (errorCode != SystemError::noError)
         {
             NX_LOGX(lm("Failed to send message destinationEndpoint %1. %2").
@@ -283,7 +287,7 @@ private:
         }
         else
         {
-            assert(bytesSent == m_sendQueue.front().serializedMessage.size());
+            NX_ASSERT(bytesSent == m_sendQueue.front().serializedMessage.size());
         }
 
         if (m_sendQueue.front().completionHandler)

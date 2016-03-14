@@ -8,7 +8,8 @@
 #include <functional>
 
 #include <nx/network/cloud/data/listen_data.h>
-#include <nx/network/cloud/data/resolve_data.h>
+#include <nx/network/cloud/data/resolve_domain_data.h>
+#include <nx/network/cloud/data/resolve_peer_data.h>
 #include <nx/network/cloud/data/result_code.h>
 #include <utils/serialization/lexical.h>
 
@@ -40,16 +41,26 @@ public:
     void bind(
         const ConnectionStrongRef& connection,
         stun::Message requestMessage);
+
     void listen(
         const ConnectionStrongRef& connection,
         api::ListenRequest requestData,
         stun::Message requestMessage,
         std::function<void(api::ResultCode)> completionHandler);
-    void resolve(
+
+    void resolveDomain(
         const ConnectionStrongRef& connection,
-        api::ResolveRequest request,
+        api::ResolveDomainRequest requestData,
         stun::Message requestMessage,
-        std::function<void(api::ResultCode, api::ResolveResponse)> completionHandler);
+        std::function<void(
+            api::ResultCode, api::ResolveDomainResponse)> completionHandler);
+
+    void resolvePeer(
+        const ConnectionStrongRef& connection,
+        api::ResolvePeerRequest requestData,
+        stun::Message requestMessage,
+        std::function<void(
+            api::ResultCode, api::ResolvePeerResponse)> completionHandler);
 
 private:
     ListeningPeerPool* const m_listeningPeerPool;

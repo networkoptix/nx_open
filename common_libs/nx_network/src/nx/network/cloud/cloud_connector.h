@@ -44,7 +44,7 @@ public:
         Handler&& completionHandler )
     {
         auto tunnel = TunnelPool::instance()->getTunnelToHost( targetHost );
-        assert( tunnel );
+        NX_ASSERT( tunnel );
         return tunnel->connect( std::forward<Handler>(completionHandler) );
     }
 };

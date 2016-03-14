@@ -23,6 +23,12 @@ MediatorProcessPublic::~MediatorProcessPublic()
     m_impl = nullptr;
 }
 
+void MediatorProcessPublic::setOnStartedEventHandler(
+    nx::utils::MoveOnlyFunc<void(bool)> handler)
+{
+    m_impl->setOnStartedEventHandler(std::move(handler));
+}
+
 void MediatorProcessPublic::pleaseStop()
 {
     m_impl->pleaseStop();

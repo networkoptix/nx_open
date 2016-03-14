@@ -264,13 +264,6 @@
                 </os>
             </activation>
             <dependencies>
-                <!--<dependency>
-                    <groupId>com.digia</groupId>
-                    <version>${qt.version}</version>
-                    <artifactId>qt</artifactId>
-                    <type>tar.gz</type>
-                    <classifier>${qt.classifier}${compile.options}</classifier>
-                </dependency>-->
                 <dependency>
                     <groupId>org</groupId>
                     <artifactId>festival</artifactId>

@@ -569,10 +569,10 @@ void QnCommonMessageProcessor::updateResource(const ec2::ApiCameraData& camera)
             QnResourceParams(camera.id, camera.url, camera.vendor))
         .dynamicCast<QnVirtualCameraResource>();
 
-    Q_ASSERT_X(qnCamera, Q_FUNC_INFO, QByteArray("Unknown resource type:") + camera.typeId.toByteArray());
+    NX_ASSERT(qnCamera, Q_FUNC_INFO, QByteArray("Unknown resource type:") + camera.typeId.toByteArray());
     if (qnCamera)
     {
-        Q_ASSERT_X(camera.id == QnVirtualCameraResource::uniqueIdToId(qnCamera->getUniqueId()),
+        NX_ASSERT(camera.id == QnVirtualCameraResource::uniqueIdToId(qnCamera->getUniqueId()),
             Q_FUNC_INFO,
             "You must fill camera ID as md5 hash of unique id");
 
@@ -591,14 +591,14 @@ void QnCommonMessageProcessor::updateResource(const ec2::ApiMediaServerData& ser
 void QnCommonMessageProcessor::updateResource(const ec2::ApiStorageData& storage)
 {
     auto resTypeId = qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kStorageTypeId);
-    Q_ASSERT_X(!resTypeId.isNull(), Q_FUNC_INFO, "Invalid resource type pool state");
+    NX_ASSERT(!resTypeId.isNull(), Q_FUNC_INFO, "Invalid resource type pool state");
     if (resTypeId.isNull())
         return;
 
     QnStorageResourcePtr qnStorage = getResourceFactory()->createResource(resTypeId,
             QnResourceParams(storage.id, storage.url, QString()))
         .dynamicCast<QnStorageResource>();
-    Q_ASSERT_X(qnStorage, Q_FUNC_INFO, "Invalid resource type pool state");
+    NX_ASSERT(qnStorage, Q_FUNC_INFO, "Invalid resource type pool state");
     if (qnStorage)
     {
         fromApiToResource(storage, qnStorage);

@@ -354,7 +354,7 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
             return;
         }
 
-        item.primaryAddress = SocketAddress();
+        updatePrimaryAddress(item, SocketAddress());
 
         lk.unlock();
 
@@ -374,7 +374,7 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
 
         if (item.moduleInformation.port != moduleInformation.port) {
             QnMutexLocker lk(&m_itemsMutex);
-            item.primaryAddress = SocketAddress();
+            updatePrimaryAddress(item, SocketAddress());
             lk.unlock();
 
             foreach (const SocketAddress &address, item.addresses) {
@@ -390,8 +390,11 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
         QnMutexLocker lk(&m_itemsMutex);
 
         item.moduleInformation = moduleInformation;
+        if (moduleInformation.id != item.moduleInformation.id)
+            int iI = 0;
+
         if (item.primaryAddress.port == 0 && !ignoredAddress)
-            item.primaryAddress = address;
+            updatePrimaryAddress(item, address);
 
         SocketAddress addressToSend = item.primaryAddress;
         item.status = calculateModuleStatus(item.moduleInformation, item.status);
@@ -419,7 +422,7 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
     const auto cloudModuleId = moduleInformation.cloudId();
     if (count < item.addresses.size()) {
         if (!ignoredAddress && isBetterAddress(address.address, item.primaryAddress.address)) {
-            item.primaryAddress = address;
+            updatePrimaryAddress(item, address);
             Qn::ResourceStatus status = item.status;
 
             lk.unlock();
@@ -466,7 +469,7 @@ void QnModuleFinder::at_timer_timeout()
 void QnModuleFinder::at_server_auxUrlsChanged(const QnResourcePtr &resource)
 {
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-    Q_ASSERT_X(!server.isNull(), Q_FUNC_INFO, "server resource is expected");
+    NX_ASSERT(!server.isNull(), Q_FUNC_INFO, "server resource is expected");
     if (!server)
         return;
 
@@ -500,8 +503,9 @@ void QnModuleFinder::removeAddress(const SocketAddress &address, bool holdItem, 
 
     bool alreadyLost = it->primaryAddress.isNull();
 
-    if (it->primaryAddress == address) {
-        it->primaryAddress = pickPrimaryAddress(it->addresses, ignoredUrls);
+    if (it->primaryAddress == address) 
+    {
+        updatePrimaryAddress(*it, pickPrimaryAddress(it->addresses, ignoredUrls));
         alreadyLost = it->primaryAddress.isNull();
 
         SocketAddress addressToSend = it->primaryAddress;
@@ -605,10 +609,20 @@ void QnModuleFinder::removeModule(const QnUuid &id)
         addresses.append(it->primaryAddress);
     }
 
-    for (const SocketAddress &address: addresses)
+    for (const SocketAddress &address : addresses)
     {
         NX_LOG(lit("QnModuleFinder::removeModule(%1). Removing address %2")
             .arg(id.toString()).arg(address.toString()), cl_logDEBUG1);
         removeAddress(address, false);
     }
+}
+
+void QnModuleFinder::updatePrimaryAddress(ModuleItem &item
+    , const SocketAddress &address)
+{
+    if (item.primaryAddress == address)
+        return;
+
+    item.primaryAddress = address;
+    emit modulePrimaryAddressChanged(item.moduleInformation, address);
 }

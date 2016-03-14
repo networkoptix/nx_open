@@ -344,7 +344,7 @@ public:
                 }
             }
 
-            assert(qnBackupStorageMan->scheduleSync());
+            NX_ASSERT(qnBackupStorageMan->scheduleSync());
             qnBackupStorageMan->scheduleSync()->updateLastSyncChunk();
         }
     }
@@ -402,18 +402,18 @@ QnStorageManager::QnStorageManager(QnServer::StoragePool role):
 {
     m_storageDbPoolRef = qnStorageDbPool->create();
 
-    Q_ASSERT(m_role == QnServer::StoragePool::Normal || m_role == QnServer::StoragePool::Backup);
+    NX_ASSERT(m_role == QnServer::StoragePool::Normal || m_role == QnServer::StoragePool::Backup);
     m_storageWarnTimer.restart();
     m_testStorageThread = new TestStorageThread(this);
 
     if (m_role == QnServer::StoragePool::Normal)
     {
-        assert( QnNormalStorageManager_instance == nullptr );
+        NX_ASSERT( QnNormalStorageManager_instance == nullptr );
         QnNormalStorageManager_instance = this;
     }
     else if (m_role == QnServer::StoragePool::Backup)
     {
-        assert( QnBackupStorageManager_instance == nullptr );
+        NX_ASSERT( QnBackupStorageManager_instance == nullptr );
         QnBackupStorageManager_instance = this;
     }
 
@@ -566,7 +566,7 @@ bool QnStorageManager::needToStopMediaScan() const
 
 void QnStorageManager::setRebuildInfo(const QnStorageScanData& data)
 {
-    Q_ASSERT_X(data.totalProgress < 1.01, Q_FUNC_INFO, "invalid progress");
+    NX_ASSERT(data.totalProgress < 1.01, Q_FUNC_INFO, "invalid progress");
     QnMutexLocker lock( &m_rebuildStateMtx );
     m_archiveRebuildInfo = data;
 }
@@ -1019,13 +1019,13 @@ QnRecordingStatsData QnStorageManager::mergeStatsFromCatalogs(qint64 bitrateAnal
         }
 
         qint64 nextTime = qMin(nextHiTime, nextLowTime);
-        Q_ASSERT(nextTime >= currentTime);
+        NX_ASSERT(nextTime >= currentTime);
         qint64 blockDuration = nextTime - currentTime;
 
         if (hasHi)
         {
             qreal persentUsage = blockDuration / (qreal) itrHiLeft->durationMs;
-            Q_ASSERT(qBetween(0.0, persentUsage, 1.000001));
+            NX_ASSERT(qBetween(0.0, persentUsage, 1.000001));
             auto storage = storageRoot(itrHiLeft->storageIndex);
             result.recordedBytes += itrHiLeft->getFileSize() * persentUsage;
             if (storage)
@@ -1041,7 +1041,7 @@ QnRecordingStatsData QnStorageManager::mergeStatsFromCatalogs(qint64 bitrateAnal
         if (hasLow)
         {
             qreal persentUsage = blockDuration / (qreal) itrLowLeft->durationMs;
-            Q_ASSERT(qBetween(0.0, persentUsage, 1.000001));
+            NX_ASSERT(qBetween(0.0, persentUsage, 1.000001));
             auto storage = storageRoot(itrLowLeft->storageIndex);
             result.recordedBytes += itrLowLeft->getFileSize() * persentUsage;
             if (storage)
@@ -1069,7 +1069,7 @@ QnRecordingStatsData QnStorageManager::mergeStatsFromCatalogs(qint64 bitrateAnal
     bitrateStats.recordedSecs /= 1000; // msec to sec
     if (bitrateStats.recordedBytes > 0 && bitrateStats.recordedSecs > 0)
         result.averageBitrate = bitrateStats.recordedBytes / (qreal) bitrateStats.recordedSecs;
-    Q_ASSERT(result.averageBitrate >= 0);
+    NX_ASSERT(result.averageBitrate >= 0);
     return result;
 }
 
@@ -1504,12 +1504,6 @@ bool QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
                     deleteRecordsToTime(altCatalog, minTime);
                 else
                     deleteRecordsToTime(altCatalog, DATETIME_NOW);
-                if (catalog->isEmpty() && altCatalog->isEmpty())
-                    break; // nothing to delete
-            }
-            else {
-                if (catalog->isEmpty())
-                    break; // nothing to delete
             }
         }
         else
@@ -1839,7 +1833,7 @@ QString QnStorageManager::getFileName(const qint64& dateTime, qint16 timeZone, c
         }
         return QString();
     }
-    Q_ASSERT(camera != 0);
+    NX_ASSERT(camera != 0);
     QString base = closeDirPath(storage->getUrl());
     QString separator = getPathSeparator(base);
 
@@ -1847,7 +1841,7 @@ QString QnStorageManager::getFileName(const qint64& dateTime, qint16 timeZone, c
         base += prefix + separator;
     base += camera->getPhysicalId();
 
-    Q_ASSERT(!camera->getPhysicalId().isEmpty());
+    NX_ASSERT(!camera->getPhysicalId().isEmpty());
     QString text = base + separator + dateTimeStr(dateTime, timeZone, separator);
 
     return text + QString::number(dateTime);

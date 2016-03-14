@@ -147,11 +147,11 @@ struct QnEmailAttachmentData {
             imagePath = lit(":/skin/email_attachments/server.png");
             break;
         default:
-            Q_ASSERT_X(false, Q_FUNC_INFO, "All cases must be implemented.");
+            NX_ASSERT(false, Q_FUNC_INFO, "All cases must be implemented.");
             break;
         }
 
-        Q_ASSERT_X(!templatePath.isEmpty() && !imageName.isEmpty() && !imagePath.isEmpty(), Q_FUNC_INFO, "Template path must be filled");
+        NX_ASSERT(!templatePath.isEmpty() && !imageName.isEmpty() && !imagePath.isEmpty(), Q_FUNC_INFO, "Template path must be filled");
     }
 
     QString templatePath;
@@ -257,9 +257,9 @@ bool QnMServerBusinessRuleProcessor::executePtzAction(const QnAbstractBusinessAc
 
 bool QnMServerBusinessRuleProcessor::executeRecordingAction(const QnRecordingBusinessActionPtr& action)
 {
-    Q_ASSERT(action);
+    NX_ASSERT(action);
     auto camera = qnResPool->getResourceById<QnSecurityCamResource>(action->getParams().actionResourceId);
-    //Q_ASSERT(camera);
+    //NX_ASSERT(camera);
     bool rez = false;
     if (camera) {
         // todo: if camera is offline function return false. Need some tries on timer event
@@ -278,7 +278,7 @@ bool QnMServerBusinessRuleProcessor::executeRecordingAction(const QnRecordingBus
 
 bool QnMServerBusinessRuleProcessor::executeBookmarkAction(const QnAbstractBusinessActionPtr &action)
 {
-    Q_ASSERT(action);
+    NX_ASSERT(action);
     auto camera = qnResPool->getResourceById<QnSecurityCamResource>(action->getParams().actionResourceId);
     if (!camera)
         return false;
@@ -369,7 +369,7 @@ QByteArray QnMServerBusinessRuleProcessor::getEventScreenshotEncoded(const QnUui
 
 bool QnMServerBusinessRuleProcessor::sendMailInternal( const QnSendMailBusinessActionPtr& action, int aggregatedResCount )
 {
-    Q_ASSERT( action );
+    NX_ASSERT( action );
 
     QStringList log;
     QStringList recipients;

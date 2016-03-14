@@ -166,5 +166,20 @@ boost::optional<ListeningPeerPool::ConstDataLocker>
         std::move(peerIter));
 }
 
+std::vector<MediaserverData> ListeningPeerPool::findPeersBySystemId(
+    const nx::String& systemId) const
+{
+    std::vector<MediaserverData> foundPeers;
+
+    QnMutexLocker lk(&m_mutex);
+    for (auto it = m_peers.lower_bound(MediaserverData(systemId));
+         it != m_peers.end() && it->first.systemId == systemId; ++it)
+    {
+        foundPeers.push_back(it->first);
+    }
+
+    return std::move(foundPeers);
+}
+
 }   //hpm
 }   //nx

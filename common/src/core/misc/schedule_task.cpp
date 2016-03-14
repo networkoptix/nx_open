@@ -19,18 +19,18 @@ int QnScheduleTask::startTimeMs() const
 
 int QnScheduleTask::getHour() const 
 { 
-    Q_ASSERT(m_data.m_startTime < 24*3600);
+    NX_ASSERT(m_data.m_startTime < 24*3600);
     return m_data.m_startTime/3600; 
 }
 
 int QnScheduleTask::getMinute() const 
 { 
-    Q_ASSERT(m_data.m_startTime < 24*3600);
+    NX_ASSERT(m_data.m_startTime < 24*3600);
     return (m_data.m_startTime - getHour()*3600) / 60; 
 }
 
 int QnScheduleTask::getSecond() const 
 { 
-    Q_ASSERT(m_data.m_startTime < 24*3600);
+    NX_ASSERT(m_data.m_startTime < 24*3600);
     return m_data.m_startTime % 60; 
 }

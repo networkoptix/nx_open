@@ -42,8 +42,11 @@ written by
 #define __UDT_API_H__
 
 
+#include <condition_variable>
 #include <map>
+#include <mutex>
 #include <vector>
+
 #include "udt.h"
 #include "packet.h"
 #include "queue.h"
@@ -57,6 +60,9 @@ class CUDTSocket
 public:
    CUDTSocket();
    ~CUDTSocket();
+
+   void addEPoll(const int eid);
+   void removeEPoll(const int eid);
 
    UDTSTATUS m_Status;                       // current socket state
 
@@ -77,8 +83,8 @@ public:
    std::set<UDTSOCKET>* m_pQueuedSockets;    // set of connections waiting for accept()
    std::set<UDTSOCKET>* m_pAcceptSockets;    // set of accept()ed connections
 
-   pthread_cond_t m_AcceptCond;              // used to block "accept" call
-   pthread_mutex_t m_AcceptLock;             // mutex associated to m_AcceptCond
+   std::condition_variable m_AcceptCond;     // used to block "accept" call
+   std::mutex m_AcceptLock;                  // mutex associated to m_AcceptCond
 
    unsigned int m_uiBackLog;                 // maximum number of connections in queue
 

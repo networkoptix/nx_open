@@ -369,7 +369,7 @@ QnTourPtzExecutor::QnTourPtzExecutor(const QnPtzControllerPtr &controller):
 
 QnTourPtzExecutor::~QnTourPtzExecutor() {
     /* If this object is run in a separate thread, then it must be deleted with deleteLater(). */
-    assert(QThread::currentThread() == thread()); 
+    NX_ASSERT(QThread::currentThread() == thread()); 
 }
 
 void QnTourPtzExecutor::startTour(const QnPtzTour &tour) {

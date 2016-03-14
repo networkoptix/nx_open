@@ -36,7 +36,7 @@ namespace QnFusionRestHandlerDetail
             result = QnXml::serialized(outputData, lit("reply"));
             break;
         default:
-            assert(0);
+            NX_ASSERT(0);
         }
         contentType = Qn::serializationFormatToHttpContentType(format);
     }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <utils/common/singleton.h>
+#include <nx/utils/singleton.h>
 
 class QnMainWindow;
 class QnWorkbenchContext;

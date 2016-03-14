@@ -14,7 +14,7 @@ namespace network {
 
 Pollable::Pollable(
     AbstractSocket::SOCKET_HANDLE fd,
-    std::unique_ptr<PollableImpl> impl )
+    std::unique_ptr<CommonSocketImpl> impl )
 :
     m_fd( fd ),
     m_impl( std::move(impl) ),
@@ -22,7 +22,7 @@ Pollable::Pollable(
     m_writeTimeoutMS( 0 )
 {
     if( !m_impl )
-        m_impl.reset( new PollableImpl() );
+        m_impl.reset( new CommonSocketImpl() );
 }
 
 AbstractSocket::SOCKET_HANDLE Pollable::handle() const
@@ -49,12 +49,12 @@ bool Pollable::getSendTimeout( unsigned int* millis ) const
     return true;
 }
 
-PollableImpl* Pollable::impl()
+CommonSocketImpl* Pollable::impl()
 {
     return m_impl.get();
 }
 
-const PollableImpl* Pollable::impl() const
+const CommonSocketImpl* Pollable::impl() const
 {
     return m_impl.get();
 }

@@ -31,6 +31,9 @@ public:
         /** Always display full info on cameras. */
         SHOW_FULL_INFO,
 
+        /** Do not notify users if servers have different versions. */
+        IGNORE_VERSION_MISMATCH,
+
         VARIABLE_COUNT
     };
 
@@ -48,6 +51,7 @@ private:
         QN_DECLARE_RW_PROPERTY(bool,                        isVideoWallMode,        setVideoWallMode,           VIDEO_WALL_MODE,            false)
         QN_DECLARE_RW_PROPERTY(bool,                        isActiveXMode,          setActiveXMode,             ACTIVE_X_MODE,              false)
         QN_DECLARE_RW_PROPERTY(bool,                        showFullInfo,           setShowFullInfo,            SHOW_FULL_INFO,             false)
+        QN_DECLARE_RW_PROPERTY(bool,                        ignoreVersionMismatch,  setIgnoreVersionMismatch,   IGNORE_VERSION_MISMATCH,    false)
     QN_END_PROPERTY_STORAGE()
 
 };

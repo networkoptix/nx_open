@@ -29,6 +29,7 @@ namespace ec2
         /** Collects \class ApiSystemStatistics and sends it to the statistics server */
         ErrorCode triggerStatisticsReport(std::nullptr_t, ApiStatisticsServerInfo* const outData);
 
+        static const QString SR_LAST_NUMBER;
         // server information
         static const QString DEFAULT_SERVER_API;
         static const QString AUTH_USER;

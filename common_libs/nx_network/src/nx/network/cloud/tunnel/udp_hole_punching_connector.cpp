@@ -34,7 +34,7 @@ UdpHolePunchingTunnelConnector::UdpHolePunchingTunnelConnector(
             : *nx::network::SocketGlobals::mediatorConnector().mediatorAddress())),   //UdpHolePunchingTunnelConnector MUST not be created if mediator address is unknown
     m_done(false)
 {
-    assert(nx::network::SocketGlobals::mediatorConnector().mediatorAddress());
+    NX_ASSERT(nx::network::SocketGlobals::mediatorConnector().mediatorAddress());
 
     m_mediatorUdpClient->socket()->bindToAioThread(m_timer.getAioThread());
 }

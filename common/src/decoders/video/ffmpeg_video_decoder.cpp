@@ -30,7 +30,7 @@ struct FffmpegLog
     {
         Q_UNUSED(level)
             Q_UNUSED(ptr)
-            Q_ASSERT(fmt && "NULL Pointer");
+            NX_ASSERT(fmt && "NULL Pointer");
 
         if (!fmt) {
             return;
@@ -225,9 +225,9 @@ void QnFfmpegVideoDecoder::openDecoder(const QnConstCompressedVideoDataPtr& data
     if (avcodec_open2(m_context, m_codec, NULL) < 0)
     {
         m_codec = 0;
-        Q_ASSERT_X(1, Q_FUNC_INFO, "Can't open decoder");
+        NX_ASSERT(1, Q_FUNC_INFO, "Can't open decoder");
     }
-    //Q_ASSERT(m_context->codec);
+    //NX_ASSERT(m_context->codec);
 
 //    avpicture_fill((AVPicture *)picture, m_buffer, PIX_FMT_YUV420P, c->width, c->height);
 }

@@ -8,6 +8,7 @@
 #include <utils/common/systemerror.h>
 #include <utils/common/warnings.h>
 #include <nx/network/ssl_socket.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 
@@ -24,7 +25,6 @@
 
 #include "aio/async_socket_helper.h"
 #include "compat_poll.h"
-#include <nx/utils/log/log.h>
 
 
 #ifdef Q_OS_WIN
@@ -708,8 +708,9 @@ bool CommunicatingSocket<InterfaceToImplement>::connect( const SocketAddress& re
             continue;
         }
 
-        if( (sockPollfd.revents & POLLOUT) == 0 )
+        if ((sockPollfd.revents & POLLERR) || !(sockPollfd.revents & POLLOUT))
             iSelRet = 0;
+
         break;
     }
 #endif
@@ -801,7 +802,7 @@ template<typename InterfaceToImplement>
 void CommunicatingSocket<InterfaceToImplement>::close()
 {
     //checking that socket is not registered in aio
-    assert( !nx::network::SocketGlobals::aioService().isSocketBeingWatched( static_cast<Pollable*>(this) ) );
+    NX_ASSERT( !nx::network::SocketGlobals::aioService().isSocketBeingWatched( static_cast<Pollable*>(this) ) );
 
     m_connected = false;
     Socket<InterfaceToImplement>::close();
@@ -836,7 +837,11 @@ void CommunicatingSocket<InterfaceToImplement>::connectAsync(
     const SocketAddress& addr,
     nx::utils::MoveOnlyFunc<void( SystemError::ErrorCode )> handler )
 {
-    return m_aioHelper->connectAsync( addr, std::move(handler) );
+    return m_aioHelper->connectAsync(addr, [handler = std::move(handler), this] (SystemError::ErrorCode code)
+    {
+        m_connected = (code == SystemError::noError);
+        handler(code);
+    });
 }
 
 template<typename InterfaceToImplement>
@@ -861,7 +866,7 @@ void CommunicatingSocket<InterfaceToImplement>::registerTimer(
     nx::utils::MoveOnlyFunc<void()> handler )
 {
     //currently, aio considers 0 timeout as no timeout and will NOT call handler
-    Q_ASSERT(timeoutMs > std::chrono::milliseconds(0));
+    NX_ASSERT(timeoutMs > std::chrono::milliseconds(0));
     if (timeoutMs == std::chrono::milliseconds(0))
         timeoutMs = std::chrono::milliseconds(1);  //handler of zero timer will NOT be called
     return m_aioHelper->registerTimer(timeoutMs, std::move(handler));
@@ -1216,14 +1221,12 @@ class TCPServerSocketPrivate
 {
 public:
     int socketHandle;
-    aio::AsyncServerSocketHelper<Pollable> asyncServerSocketHelper;
+    aio::AsyncServerSocketHelper<TCPServerSocket> asyncServerSocketHelper;
 
-    TCPServerSocketPrivate(
-        Socket<AbstractStreamServerSocket>* sock,
-        AbstractStreamServerSocket* abstractSock)
+    TCPServerSocketPrivate(TCPServerSocket* sock)
     :
         socketHandle( -1 ),
-        asyncServerSocketHelper(sock, abstractSock)
+        asyncServerSocketHelper(sock)
     {
     }
 
@@ -1256,7 +1259,7 @@ TCPServerSocket::TCPServerSocket()
     base_type(
         SOCK_STREAM,
         IPPROTO_TCP,
-        new TCPServerSocketPrivate( this, this ) )
+        new TCPServerSocketPrivate(this))
 {
     static_cast<TCPServerSocketPrivate*>(impl())->socketHandle = handle();
 }
@@ -1264,7 +1267,7 @@ TCPServerSocket::TCPServerSocket()
 TCPServerSocket::~TCPServerSocket()
 {
     //checking that socket is not registered in aio
-    Q_ASSERT_X(
+    NX_ASSERT(
         !nx::network::SocketGlobals::aioService().isSocketBeingWatched(static_cast<Pollable*>(this)),
         Q_FUNC_INFO,
         "You MUST cancel running async socket operation before deleting socket if you delete socket from non-aio thread (2)");
@@ -1312,17 +1315,22 @@ void TCPServerSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandl
 //!Implementation of AbstractStreamServerSocket::accept
 AbstractStreamSocket* TCPServerSocket::accept()
 {
+    return systemAccept();
+}
+
+AbstractStreamSocket* TCPServerSocket::systemAccept()
+{
     TCPServerSocketPrivate* d = static_cast<TCPServerSocketPrivate*>(impl());
 
     unsigned int recvTimeoutMs = 0;
-    if( !getRecvTimeout( &recvTimeoutMs ) )
+    if (!getRecvTimeout(&recvTimeoutMs))
         return nullptr;
 
     bool nonBlockingMode = false;
-    if( !getNonBlockingMode(&nonBlockingMode) )
+    if (!getNonBlockingMode(&nonBlockingMode))
         return nullptr;
 
-    return d->accept( recvTimeoutMs, nonBlockingMode );
+    return d->accept(recvTimeoutMs, nonBlockingMode);
 }
 
 bool TCPServerSocket::setListen(int queueLen)

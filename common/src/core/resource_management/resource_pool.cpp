@@ -72,8 +72,8 @@ void QnResourcePool::addResources(const QnResourceList &resources)
 
     for (const QnResourcePtr &resource: resources)
     {
-        assert(resource->toSharedPointer()); /* Getting an assert here? Did you forget to use QnSharedResourcePointer? */
-        assert(!resource->getId().isNull());
+        NX_ASSERT(resource->toSharedPointer()); /* Getting an NX_ASSERT here? Did you forget to use QnSharedResourcePointer? */
+        NX_ASSERT(!resource->getId().isNull());
 
         if(resource->resourcePool() != NULL)
             qnWarning("Given resource '%1' is already in the pool.", resource->metaObject()->className());

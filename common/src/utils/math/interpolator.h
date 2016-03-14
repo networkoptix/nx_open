@@ -54,7 +54,7 @@ public:
     }
 
     void setExtrapolationMode(Qn::ExtrapolationMode extrapolationMode) {
-        assert(extrapolationMode == Qn::ConstantExtrapolation || extrapolationMode == Qn::LinearExtrapolation || extrapolationMode == Qn::PeriodicExtrapolation);
+        NX_ASSERT(extrapolationMode == Qn::ConstantExtrapolation || extrapolationMode == Qn::LinearExtrapolation || extrapolationMode == Qn::PeriodicExtrapolation);
 
         m_extrapolationMode = extrapolationMode;
     }
@@ -95,7 +95,7 @@ protected:
         case Qn::PeriodicExtrapolation:
             return extrapolatePeriodic(x);
         default:
-            assert(false);
+            NX_ASSERT(false);
             return 0.0;
         }
     }
@@ -112,7 +112,7 @@ protected:
         case Qn::PeriodicExtrapolation:
             return extrapolatePeriodic(x);
         default:
-            assert(false);
+            NX_ASSERT(false);
             return 0.0;
         }
     }

@@ -4,6 +4,8 @@
 #include <nx/utils/timermanager.h>
 
 #include "mediator_connections.h"
+#include "nx/network/aio/timer.h"
+
 
 namespace nx {
 namespace network {
@@ -38,7 +40,7 @@ private:
     std::list< SocketAddress > m_pingedAddresses;
     std::list< SocketAddress > m_publishedAddresses;
 
-    std::unique_ptr< AbstractStreamSocket > m_timerSocket;
+    nx::network::aio::Timer m_timer;
     std::shared_ptr< hpm::api::MediatorServerTcpConnection > m_mediatorConnection;
 };
 

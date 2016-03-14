@@ -154,7 +154,7 @@ bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dat
         }
 
         if (m_nextDataPacket) {
-            assert( m_nextDataPacketBuffer );
+            NX_ASSERT( m_nextDataPacketBuffer );
             m_nextDataPacketBuffer->write((const char*)payload, dataSize);
         }
 

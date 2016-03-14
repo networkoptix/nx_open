@@ -1,5 +1,7 @@
 #include "av_codec_helper.h"
 
+#include <nx/utils/log/assert.h>
+
 static const char* codecIdToLiteral(CodecID codecId)
 {
     switch (codecId)
@@ -324,7 +326,7 @@ static const char* codecIdToLiteral(CodecID codecId)
         case CODEC_ID_NONE: return "";
 
         default:
-            Q_ASSERT_X(false, Q_FUNC_INFO, "Unregistered enum CodecID value.");
+            NX_ASSERT(false, Q_FUNC_INFO, "Unregistered enum CodecID value.");
             return "";
     }
 }

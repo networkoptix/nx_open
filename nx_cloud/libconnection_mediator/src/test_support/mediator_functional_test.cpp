@@ -69,6 +69,11 @@ void MediatorFunctionalTest::start()
         [this, &mediatorInstantiatedCreatedPromise]()->int {
             m_mediatorInstance = std::make_unique<nx::hpm::MediatorProcessPublic>(
                 static_cast<int>(m_args.size()), m_args.data());
+            m_mediatorInstance->setOnStartedEventHandler(
+                [this](bool result)
+                {
+                    m_mediatorStartedPromise.set_value(result);
+                });
             mediatorInstantiatedCreatedPromise.set_value();
             return m_mediatorInstance->exec();
         });
@@ -83,25 +88,16 @@ bool MediatorFunctionalTest::startAndWaitUntilStarted()
 
 bool MediatorFunctionalTest::waitUntilStarted()
 {
-    static const std::chrono::seconds INITIALIZED_MAX_WAIT_TIME(15);
+    static const std::chrono::seconds initializedMaxWaitTime(15);
 
-    const auto endClock = std::chrono::steady_clock::now() + INITIALIZED_MAX_WAIT_TIME;
-    for (;;)
-    {
-        if (std::chrono::steady_clock::now() >= endClock)
-            return false;
-        if (m_mediatorProcessFuture.wait_for(std::chrono::seconds(0)) ==
+    auto mediatorStartedFuture = m_mediatorStartedPromise.get_future();
+    if (mediatorStartedFuture.wait_for(initializedMaxWaitTime) != 
             std::future_status::ready)
-        {
-            return false;
-        }
-
-        auto socket = SocketFactory::createStreamSocket(false, SocketFactory::NatTraversalType::nttDisabled);
-        if (socket->connect(endpoint(), INITIALIZED_MAX_WAIT_TIME/5))
-            break;
+    {
+        return false;
     }
 
-    return true;
+    return mediatorStartedFuture.get();
 }
 
 void MediatorFunctionalTest::stop()

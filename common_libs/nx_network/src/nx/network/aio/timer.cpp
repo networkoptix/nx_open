@@ -14,6 +14,11 @@ void Timer::start(
     std::chrono::milliseconds timeout,
     nx::utils::MoveOnlyFunc<void()> timerFunc)
 {
+    //TODO #ak UDPSocket::registerTimer currently does not support zero timeouts, 
+        //so using following hack
+    if (timeout == std::chrono::milliseconds::zero())
+        timeout = std::chrono::milliseconds(1); 
+
     UDPSocket::registerTimer(timeout, std::move(timerFunc));
     m_timeout = timeout;
     m_timerStartClock = std::chrono::steady_clock::now();

@@ -492,7 +492,7 @@ Qn::AuthResult QnAuthHelper::doBasicAuth(
     nx_http::Response& response,
     QnUuid* authUserId)
 {
-    assert(authorization.authScheme == nx_http::header::AuthScheme::basic);
+    NX_ASSERT(authorization.authScheme == nx_http::header::AuthScheme::basic);
 
     Qn::AuthResult errCode = Qn::Auth_WrongLogin;
 

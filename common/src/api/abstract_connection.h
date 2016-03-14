@@ -142,7 +142,7 @@ protected:
 
     template<class T>
     int sendSyncRequest(int operation, int object, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, T *reply) {
-        assert(reply);
+        NX_ASSERT(reply);
 
         QVariant replyVariant;
         int status = sendSyncRequest(operation, object, headers, params, data, &replyVariant);

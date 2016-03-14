@@ -1,0 +1,410 @@
+#!/usr/bin/env python
+
+import argparse
+import os
+import time
+import ConfigParser
+import subprocess
+import shutil
+import tempfile
+import posixpath
+
+from platform_detection import *
+
+ROOT_CONFIG_NAME = ".rdep"
+PACKAGE_CONFIG_NAME = ".rdpack"
+ANY_KEYWORD = "any"
+DEBUG_SUFFIX = "-debug"
+RSYNC = [ "rsync", "--archive", "--delete" ]
+if detect_platform() == "windows":
+    RSYNC.append("--chmod=ugo=rwx")
+
+DEFAULT_SYNC_URL = "rsync://enk.me/buildenv/rdep/packages"
+
+verbose = False
+
+def is_relative_to(path, parent):
+    return path.startswith(parent)
+
+def verbose_message(message):
+    if verbose:
+        print message
+
+def verbose_rsync(command):
+    verbose_message("Executing rsync:\n{0}".format(" ".join(command)))
+
+def find_root(path, file_name):
+    while not os.path.isfile(os.path.join(path, file_name)):
+        nextpath = os.path.dirname(path)
+        if path == nextpath:
+            return None
+        else:
+            path = nextpath
+
+    return path
+
+def get_repository_root():
+    root = find_root(os.getcwd(), ROOT_CONFIG_NAME)
+    if not root:
+        root = os.getenv("NX_REPOSITORY")
+        if root:
+            root = os.path.abspath(root)
+            if root.endswith("/"):
+                root = root[:-1]
+    return root
+
+def get_sync_url(path):
+    config_file = os.path.join(path, ROOT_CONFIG_NAME)
+    if not os.path.isfile(config_file):
+        return None
+
+    config = ConfigParser.ConfigParser()
+    config.read(config_file)
+    if not config.has_option("General", "url"):
+        return None
+
+    return config.get("General", "url")
+
+def check_repository(path):
+    return bool(get_sync_url(path))
+
+def detect_repository():
+    root = get_repository_root()
+    if not root:
+        print "Could not find repository root"
+        exit(1)
+
+    url = get_sync_url(root)
+    if not url:
+        print "Could not find sync url for {0}".format(root)
+        exit(1)
+
+    return root, url
+
+def detect_package_and_target(root, path):
+    if not is_relative_to(path, root):
+        return None, None
+
+    path, package = os.path.split(path)
+    path, target = os.path.split(path)
+
+    while path != root and target:
+        package = target
+        path, target = os.path.split(path)
+
+    if path == root:
+        if target in supported_targets and package:
+            return target, package
+
+    return None, None
+
+def init_repository(path, url):
+    if not os.path.isdir(path):
+        print "Directory does not exists: {0}".format(path)
+        return False
+
+    try:
+        with open(os.path.join(path, ROOT_CONFIG_NAME), "w") as config_file:
+            config = ConfigParser.ConfigParser()
+            config.add_section("General")
+            config.set("General", "url", url)
+            config.write(config_file)
+    except:
+        print "Could not init repository at {0}".format(path)
+        return False
+
+    print "Initialized repository at {0}".format(path)
+    print "The repository will use URL = {0}".format(url)
+
+    return True
+
+def get_timestamp_from_package_config(file_name):
+    if not os.path.isfile(file_name):
+        return None
+
+    config = ConfigParser.ConfigParser()
+    config.read(file_name)
+
+    if not config.has_option("General", "time"):
+        return None
+
+    return config.getint("General", "time")
+
+def get_package_timestamp(path):
+    return get_timestamp_from_package_config(os.path.join(path, PACKAGE_CONFIG_NAME))
+
+def update_package_timestamp(path, timestamp = None):
+    file_name = os.path.join(path, PACKAGE_CONFIG_NAME)
+
+    if timestamp == None:
+        timestamp = time.time()
+
+    config = ConfigParser.ConfigParser()
+    if os.path.isfile(file_name):
+        config.read(file_name)
+
+    if not config.has_section("General"):
+        config.add_section("General")
+
+    config.set("General", "time", int(timestamp))
+
+    with open(file_name, "w") as file:
+        config.write(file)
+
+SYNC_NOT_FOUND = 0
+SYNC_FAILED = 1
+SYNC_SUCCESS = 2
+
+# Workaround against rsync bug: all paths with semicolon are counted as remote, so 'rsync rsync://server/path c:\test\path' won't work on windows
+def posix_path(path):
+    if len(path) > 1 and path[1] == ':':
+        drive_letter = path[0].lower()
+        return "/cygdrive/{0}{1}".format(drive_letter, path[2:].replace("\\", "/"))
+
+    return path
+
+def fetch_package_config(url, file_name):
+    command = list(RSYNC)
+    command.append(url)
+    command.append(posix_path(file_name))
+
+    verbose_rsync(command)
+
+    with open(os.devnull, "w") as fnull:
+        return subprocess.call(command, stderr = fnull) == 0
+
+    return False
+
+def try_sync(root, url, target, package, force):
+    src = posixpath.join(url, target, package)
+    dst = os.path.join(root, target, package)
+
+    verbose_message("root {0}\nurl {1}\ntarget {2}\npackage {3}\nsrc {4}\ndst {5}".format(root, url, target, package, src, dst))
+
+    config_file = tempfile.mktemp()
+    if not fetch_package_config(posixpath.join(src, PACKAGE_CONFIG_NAME), config_file):
+        return SYNC_NOT_FOUND
+
+    newtime = get_timestamp_from_package_config(config_file)
+    if newtime == None:
+        os.remove(config_file)
+        return SYNC_NOT_FOUND
+
+    time = get_package_timestamp(dst)
+    if newtime == time and not force:
+        os.remove(config_file)
+        return SYNC_SUCCESS
+
+    if not os.path.isdir(dst):
+        os.makedirs(dst)
+
+    command = list(RSYNC)
+    command.append("--progress")
+    command.append("--exclude")
+    command.append(PACKAGE_CONFIG_NAME)
+    command.append(src + "/")
+    command.append(posix_path(dst))
+
+    verbose_rsync(command)
+
+    if subprocess.call(command) != 0:
+        os.remove(config_file)
+        return SYNC_FAILED
+
+    verbose_message("Moving {0} to {1}".format(config_file, os.path.join(dst, PACKAGE_CONFIG_NAME)))
+    shutil.move(config_file, os.path.join(dst, PACKAGE_CONFIG_NAME))
+
+    return SYNC_SUCCESS
+
+def sync_package(root, url, target, package, debug, force):
+    print "Synching {0}...".format(package)
+
+    ret = try_sync(root, url, target, package, force)
+    if ret == SYNC_NOT_FOUND:
+        path = os.path.join(root, target, package)
+        if os.path.isdir(path):
+            print "Removing local {0}".format(path)
+            shutil.rmtree(path)
+
+        target = ANY_KEYWORD
+
+        ret = try_sync(root, url, target, package, force)
+        if ret == SYNC_NOT_FOUND:
+            path = os.path.join(root, target, package)
+            if os.path.isdir(path):
+                print "Removing local {0}".format(path)
+                shutil.rmtree(path)
+
+            print "Could not find {0}".format(package)
+            return False
+
+    if ret == SYNC_FAILED:
+        print "Sync failed for {0}".format(package)
+        return False
+
+    if debug:
+        ret = try_sync(root, url, target, package + DEBUG_SUFFIX, force)
+
+        if ret == SYNC_NOT_FOUND:
+            path = os.path.join(root, target, package + DEBUG_SUFFIX)
+            if os.path.isdir(path):
+                print "Removing local {0}".format(path)
+                shutil.rmtree(path)
+        elif ret == SYNC_FAILED:
+            print "Sync failed for {0}".format(package + DEBUG_SUFFIX)
+            return False
+
+    print "Done {0}".format(package)
+    return True
+
+def sync_packages(root, url, target, packages, debug, force):
+    success = True
+
+    for package in packages:
+        if not sync_package(root, url, target, package, debug, force):
+            success = False
+
+    return success
+
+def upload_package(root, url, target, package):
+    print "Uploading {0}...".format(package)
+
+    remote = posixpath.join(url, target, package)
+    local = os.path.join(root, target, package)
+
+    update_package_timestamp(local)
+
+    command = list(RSYNC)
+    command.append("--exclude")
+    command.append(PACKAGE_CONFIG_NAME)
+    command.append(posix_path(local) + "/")
+    command.append(remote)
+
+    if subprocess.call(command) != 0:
+        print "Could not upload {0}".format(package)
+        return False
+
+    command = list(RSYNC)
+    command.append(posix_path(os.path.join(local, PACKAGE_CONFIG_NAME)))
+    command.append(remote)
+
+    if subprocess.call(command) != 0:
+        print "Could not upload {0}".format(package)
+        return False
+
+    print "Done {0}".format(package)
+    return True
+
+def upload_packages(root, url, target, packages, debug = False):
+    success = True
+
+    if not packages:
+        print "No packages to upload"
+        return True
+
+    for package in packages:
+        package_name = package + DEBUG_SUFFIX if debug else package
+        if not upload_package(root, url, target, package_name):
+            success = False
+
+    if success:
+        print "Uploaded successfully"
+    return success
+
+def package_config_path(path):
+    return os.path.join(path, PACKAGE_CONFIG_NAME)
+
+def locate_package(root, target, package, debug = False):
+    if debug:
+        path = os.path.join(root, target, package + DEBUG_SUFFIX)
+        if os.path.exists(package_config_path(path)):
+            return path
+
+    path = os.path.join(root, target, package)
+    if os.path.exists(package_config_path(path)):
+        return path
+
+    any_target = ANY_KEYWORD
+
+    if debug:
+        path = os.path.join(root, any_target, package + DEBUG_SUFFIX)
+        if os.path.exists(package_config_path(path)):
+            return path
+
+    path = os.path.join(root, any_target, package)
+    if os.path.exists(package_config_path(path)):
+        return path
+
+    return None
+
+def fetch_packages(root, url, target, packages, debug = False, force = False):
+    print "Ready to work on {0}".format(target)
+    print "Repository root dir: {0}".format(root)
+
+    if not packages:
+        print "No packages to sync"
+        return False
+
+    if not sync_packages(root, url, target, packages, debug, force):
+        return False
+
+    return True
+
+def print_path(root, target, packages, debug):
+    if not packages or len(packages) != 1:
+        exit(1)
+
+    path = locate_package(root, target, packages[0], debug)
+    if not path:
+        exit(1)
+    print(path)
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-t", "--target",       help="Target classifier.",  default=detect_target())
+    parser.add_argument("-d", "--debug",        help="Sync debug version.",                 action="store_true")
+    parser.add_argument("-f", "--force",        help="Force sync.",                         action="store_true")
+    parser.add_argument("-u", "--upload",       help="Upload package to the repository.",   action="store_true")
+    parser.add_argument("-v", "--verbose",      help="Additional debug output.",            action="store_true")
+    parser.add_argument("--print-path",         help="Print package dir and exit.",         action="store_true")
+    parser.add_argument("--init", metavar="URL", help="Init repository in the current dir with the specified URL.")
+    parser.add_argument("packages", nargs='*',  help="Packages to sync.",   default="")
+
+    args = parser.parse_args()
+
+    if args.init:
+        success = init_repository(os.getcwd(), args.init)
+        exit(0 if success else 1)
+
+    root, url = detect_repository()
+
+    target = args.target
+    if not target in supported_targets and target != ANY_KEYWORD:
+        print "Unsupported target {0}".format(target)
+        print "Supported targets:\n{0}".format("\n".join(supported_targets))
+        exit(1)
+
+    packages = args.packages
+    if root and not packages:
+        detected_target, package = detect_package_and_target(root, os.getcwd())
+        if detected_target and package:
+            target = detected_target
+            packages = [ package ]
+
+    if args.verbose:
+        global verbose
+        verbose = True
+
+    success = True
+
+    if args.print_path:
+        success = print_path(root, target, packages, args.debug)
+    elif args.upload:
+        success = upload_packages(root, url, target, packages, args.debug)
+    else:
+        success = fetch_packages(root, url, target, packages, args.debug, args.force)
+
+    exit(0 if success else 1)
+
+if __name__ == "__main__":
+    main()

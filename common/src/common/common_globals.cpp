@@ -1,4 +1,5 @@
 #include "common_globals.h"
+#include <nx/utils/log/assert.h>
 
 
 namespace Qn
@@ -22,7 +23,7 @@ namespace Qn
             case UrlQueryFormat:
                 return "application/x-url-query";
             default:
-                assert(false);
+                NX_ASSERT(false);
                 return "unsupported";
         }
     }

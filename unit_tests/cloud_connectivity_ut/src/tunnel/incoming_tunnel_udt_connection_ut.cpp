@@ -12,6 +12,8 @@ namespace test {
 
 static const size_t kTestConnections = 10;
 static const auto kConnectionId = QnUuid().createUuid().toSimpleString();
+static const std::chrono::milliseconds kSocketTimeout(1000);
+static const std::chrono::milliseconds kMaxKeepAliveInterval(3000);
 
 class IncomingTunnelUdtConnectionTest
 :
@@ -20,10 +22,11 @@ class IncomingTunnelUdtConnectionTest
 protected:
     void SetUp() override
     {
-        SyncQueue<SystemError::ErrorCode> results;
+        TestSyncQueue<SystemError::ErrorCode> results;
 
         auto tmpSocket = makeSocket(true);
-        Q_ASSERT(tmpSocket->setRecvTimeout(0));
+        NX_ASSERT(tmpSocket->setSendTimeout(0));
+        NX_ASSERT(tmpSocket->setRecvTimeout(0));
         connectionAddress = tmpSocket->getLocalAddress();
 
         freeSocket = makeSocket(true);
@@ -35,18 +38,18 @@ protected:
 
         connection = std::make_unique<IncomingTunnelUdtConnection>(
              kConnectionId.toUtf8(), std::move(tmpSocket));
-        connection->setMaxKeepAliveInterval(std::chrono::seconds(1));
+        connection->setMaxKeepAliveInterval(kMaxKeepAliveInterval);
         acceptForever();
     }
 
     std::unique_ptr<UdtStreamSocket> makeSocket(bool randevous = false)
     {
         auto socket = std::make_unique<UdtStreamSocket>();
-        Q_ASSERT(socket->setRendezvous(randevous));
-        Q_ASSERT(socket->setSendTimeout(1000));
-        Q_ASSERT(socket->setRecvTimeout(1000));
-        Q_ASSERT(socket->setNonBlockingMode(true));
-        Q_ASSERT(socket->bind(SocketAddress(HostAddress::localhost, 0)));
+        NX_ASSERT(socket->setRendezvous(randevous));
+        NX_ASSERT(socket->setSendTimeout(kSocketTimeout.count()));
+        NX_ASSERT(socket->setRecvTimeout(kSocketTimeout.count()));
+        NX_ASSERT(socket->setNonBlockingMode(true));
+        NX_ASSERT(socket->bind(SocketAddress(HostAddress::localhost, 0)));
         return std::move(socket);
     }
 
@@ -78,13 +81,12 @@ protected:
             connectionAddress,
             [this, count](SystemError::ErrorCode code)
             {
-                connectResults.push(code);
+                NX_LOGX(lm("Connect result: %1")
+                    .arg(SystemError::toString(code)), cl_logDEBUG2);
 
+                connectResults.push(code);
                 if (code == SystemError::noError)
                     runConnectingSockets(count - 1);
-                else
-                    NX_LOG(lm("Connect error: %1")
-                        .arg(SystemError::toString(code)), cl_logDEBUG1);
             });
 
         QnMutexLocker lock(&m_mutex);
@@ -105,10 +107,10 @@ protected:
 
     SocketAddress connectionAddress;
     std::unique_ptr<IncomingTunnelUdtConnection> connection;
-    SyncQueue<SystemError::ErrorCode> acceptResults;
+    TestSyncQueue<SystemError::ErrorCode> acceptResults;
 
     std::unique_ptr<UdtStreamSocket> freeSocket;
-    SyncQueue<SystemError::ErrorCode> connectResults;
+    TestSyncQueue<SystemError::ErrorCode> connectResults;
 
     QnMutex m_mutex;
     std::vector<std::unique_ptr<AbstractStreamSocket>> acceptedSockets;
@@ -239,7 +241,7 @@ TEST_F(IncomingTunnelUdtConnectionTest, PleaseStopOnRun)
                 for (;;)
                 {
                     auto socket = std::make_unique<UdtStreamSocket>();
-                    Q_ASSERT(socket->setSendTimeout(1000));
+                    NX_ASSERT(socket->setSendTimeout(kSocketTimeout.count()));
                     if (!socket->connect(connectionAddress))
                         return;
                 }

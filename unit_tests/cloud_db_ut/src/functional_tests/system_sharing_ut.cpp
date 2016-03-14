@@ -14,7 +14,7 @@ namespace cdb {
 TEST_F(CdbFunctionalTest, system_sharing_getCloudUsers)
 {
     //waiting for cloud_db initialization
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     api::AccountData account1;
     std::string account1Password;
@@ -199,7 +199,7 @@ TEST_F(CdbFunctionalTest, system_sharing_getCloudUsers)
 TEST_F(CdbFunctionalTest, system_sharing_maintenance)
 {
     //waiting for cloud_db initialization
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     //creating two accounts
     api::AccountData account1;
@@ -516,7 +516,7 @@ TEST_F(CdbFunctionalTest, system_sharing_maintenance)
 TEST_F(CdbFunctionalTest, system_sharing_maintenance2)
 {
     //waiting for cloud_db initialization
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     //creating two accounts
     api::AccountData account1;
@@ -583,7 +583,7 @@ TEST_F(CdbFunctionalTest, system_sharing_maintenance2)
 TEST_F(CdbFunctionalTest, system_sharing_owner)
 {
     //waiting for cloud_db initialization
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     //creating account
     api::AccountData account1;
@@ -669,7 +669,7 @@ TEST_F(CdbFunctionalTest, system_sharing_owner)
 TEST_F(CdbFunctionalTest, system_sharing_remove_system)
 {
     //waiting for cloud_db initialization
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     //creating two accounts
     api::AccountData account1;
@@ -756,7 +756,7 @@ TEST_F(CdbFunctionalTest, system_sharing_remove_system)
 TEST_F(CdbFunctionalTest, system_sharing_get_access_role_list)
 {
     //waiting for cloud_db initialization
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     api::AccountData account1;
     std::string account1Password;
@@ -913,7 +913,7 @@ TEST_F(CdbFunctionalTest, system_sharing_get_access_role_list)
 TEST_F(CdbFunctionalTest, system_sharing_remove_sharing_unknown_account)
 {
     //waiting for cloud_db initialization
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     //creating two accounts
     api::AccountData account1;
@@ -942,7 +942,7 @@ TEST_F(CdbFunctionalTest, system_sharing_remove_sharing_unknown_account)
 TEST_F(CdbFunctionalTest, DISABLED_system_sharing_remove_sharing_unknown_system)
 {
     //waiting for cloud_db initialization
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     //creating two accounts
     api::AccountData account1;

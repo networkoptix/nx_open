@@ -20,6 +20,7 @@
 #include <QtCore/QTextStream>
 
 #include <common/common_globals.h>
+#include <nx/utils/log/assert.h>
 
 using namespace Mustache;
 
@@ -324,8 +325,8 @@ QString Renderer::render(const QString& _template, int startPos, int endPos, Con
 
 void Renderer::setError(const QString& error, int pos)
 {
-    Q_ASSERT(!error.isEmpty());
-    Q_ASSERT(pos >= 0);
+    NX_ASSERT(!error.isEmpty());
+    NX_ASSERT(pos >= 0);
 
     m_error = error;
     m_errorPos = pos;

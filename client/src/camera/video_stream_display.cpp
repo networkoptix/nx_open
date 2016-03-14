@@ -344,12 +344,8 @@ QSharedPointer<CLVideoDecoderOutput> QnVideoStreamDisplay::flush(QnFrameScaler::
         if( !(dec->getDecoderCaps() & QnAbstractVideoDecoder::decodedPictureScaling) )
         {
             PixelFormat pixFmt = dec->GetPixelFormat();
-            if (QnGLRenderer::isPixelFormatSupported(pixFmt) && CLVideoDecoderOutput::isPixelFormatSupported(pixFmt) && scaleFactor <= QnFrameScaler::factor_8)
-                QnFrameScaler::downscale(tmpFrame.data(), outFrame.data(), scaleFactor); // fast scaler
-            else {
-                if (!rescaleFrame(*(tmpFrame.data()), *outFrame, tmpFrame->width / scaleFactor, tmpFrame->height / scaleFactor)) // universal scaler
-                    { /* do nothing. */ } // TODO: #Elric wtf?
-            }
+            if (!downscaleFrame(tmpFrame, outFrame, scaleFactor, pixFmt))
+                continue;
         }
         foreach(QnAbstractRenderer* render, m_renderList)
             render->draw(outFrame);
@@ -530,9 +526,12 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
     if ((data->flags & AV_REVERSE_BLOCK_START) && m_decodeMode != QnAbstractVideoDecoder::DecodeMode_Fastest)
     {
         QnWritableCompressedVideoDataPtr emptyData(new QnWritableCompressedVideoData(1,0));
-        QSharedPointer<CLVideoDecoderOutput> tmpOutFrame( new CLVideoDecoderOutput() );
-        while (dec->decode(emptyData, &tmpOutFrame)) 
+        while (dec->decode(emptyData, &m_tmpFrame)) 
         {
+            QSharedPointer<CLVideoDecoderOutput> tmpOutFrame( new CLVideoDecoderOutput() );
+            if (!downscaleFrame(m_tmpFrame, tmpOutFrame, scaleFactor, pixFmt))
+                continue;
+
             tmpOutFrame->channel = data->channelNumber;
             tmpOutFrame->flags |= QnAbstractMediaData::MediaFlags_Reverse;
             if (data->flags & QnAbstractMediaData::MediaFlags_LowQuality)
@@ -541,7 +540,6 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
             m_reverseQueue.enqueue(tmpOutFrame);
             m_reverseSizeInBytes += avpicture_get_size((PixelFormat)tmpOutFrame->format, tmpOutFrame->width, tmpOutFrame->height);
             checkQueueOverflow(dec);
-            tmpOutFrame = QSharedPointer<CLVideoDecoderOutput>( new CLVideoDecoderOutput() );
         }
         m_flushedBeforeReverseStart = true;
         reorderPrevFrames();
@@ -638,16 +636,8 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
         }
         else if( !(dec->getDecoderCaps() & QnAbstractVideoDecoder::decodedPictureScaling) )
         {
-            if (QnGLRenderer::isPixelFormatSupported(pixFmt) &&
-                CLVideoDecoderOutput::isPixelFormatSupported(pixFmt) && 
-                scaleFactor <= QnFrameScaler::factor_8 )
-            {
-                QnFrameScaler::downscale(m_tmpFrame.data(), outFrame.data(), scaleFactor); // fast scaler
-            }
-            else {
-                if (!rescaleFrame(*m_tmpFrame, *outFrame, m_tmpFrame->width / scaleFactor, m_tmpFrame->height / scaleFactor)) // universal scaler
-                    return Status_Displayed;
-            }
+            if (!downscaleFrame(m_tmpFrame, outFrame, scaleFactor, pixFmt))
+                return Status_Displayed;
         }
         else
         {
@@ -682,6 +672,23 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
         return Status_Displayed;
     else
         return Status_Buffered;
+}
+
+bool QnVideoStreamDisplay::downscaleFrame(const CLVideoDecoderOutputPtr& src, const CLVideoDecoderOutputPtr& dst, QnFrameScaler::DownscaleFactor scaleFactor, PixelFormat pixFmt)
+{
+    if (QnGLRenderer::isPixelFormatSupported(pixFmt) && CLVideoDecoderOutput::isPixelFormatSupported(pixFmt) && scaleFactor <= QnFrameScaler::factor_8)
+        QnFrameScaler::downscale(src.data(), dst.data(), scaleFactor); // fast scaler
+    else {
+        if (!rescaleFrame(*(src.data()), *dst, src->width / scaleFactor, src->height / scaleFactor)) // universal scaler
+            return false;
+    }
+    dst->pkt_dts = src->pkt_dts;
+    dst->pkt_pts = src->pkt_pts;
+    dst->metadata = src->metadata;
+    dst->flags = src->flags;
+    dst->channel = src->channel;
+
+    return true;
 }
 
 QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::flushFrame(int channel, QnFrameScaler::DownscaleFactor force_factor)
@@ -721,14 +728,8 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::flushFrame(int ch
     }
 
     PixelFormat pixFmt = dec->GetPixelFormat();
-    if (QnGLRenderer::isPixelFormatSupported(pixFmt) && CLVideoDecoderOutput::isPixelFormatSupported(pixFmt) && scaleFactor <= QnFrameScaler::factor_8)
-        QnFrameScaler::downscale(m_tmpFrame.data(), outFrame.data(), scaleFactor); // fast scaler
-    else {
-        if (!rescaleFrame(*(m_tmpFrame.data()), *outFrame, m_tmpFrame->width / scaleFactor, m_tmpFrame->height / scaleFactor)) // universal scaler
-            return Status_Displayed;
-    }
-    outFrame->pkt_dts = m_tmpFrame->pkt_dts;
-    outFrame->metadata = m_tmpFrame->metadata;
+    if (!downscaleFrame(m_tmpFrame, outFrame, scaleFactor, pixFmt))
+        return Status_Displayed;
 
     calcSampleAR(outFrame, dec);
 

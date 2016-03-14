@@ -16,8 +16,15 @@ static qint32 ffmpegReadPacket(void *opaque, quint8* buf, int size)
     Q_UNUSED(opaque)
     Q_UNUSED(buf)
     Q_UNUSED(size)
-    Q_ASSERT_X(false, Q_FUNC_INFO, "This class for streaming encoding! This function call MUST not exists!");
+    NX_ASSERT(false, Q_FUNC_INFO, "This class for streaming encoding! This function call MUST not exists!");
     return 0;
+}
+
+bool QnFfmpegTranscoder::isCodecSupported(CodecID id) const
+{
+    if (!m_formatCtx || !m_formatCtx->oformat)
+        return false;
+    return avformat_query_codec(m_formatCtx->oformat, id, FF_COMPLIANCE_NORMAL) == 1;
 }
 
 static qint32 ffmpegWritePacket(void *opaque, quint8* buf, int size)
@@ -36,7 +43,7 @@ static int64_t ffmpegSeek(void* opaque, int64_t pos, int whence)
     Q_UNUSED(opaque)
     Q_UNUSED(pos)
     Q_UNUSED(whence)
-    //Q_ASSERT_X(false, Q_FUNC_INFO, "This class for streaming encoding! This function call MUST not exists!");
+    //NX_ASSERT(false, Q_FUNC_INFO, "This class for streaming encoding! This function call MUST not exists!");
     QnFfmpegTranscoder* transcoder = reinterpret_cast<QnFfmpegTranscoder*> (opaque);
     transcoder->setInMiddleOfStream(!(pos == 0 && whence == SEEK_END));
     return 0;
@@ -277,7 +284,7 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
 
     if (m_audioCodec != CODEC_ID_NONE)
     {
-        //Q_ASSERT_X(false, Q_FUNC_INFO, "Not implemented! Under construction!!!");
+        //NX_ASSERT(false, Q_FUNC_INFO, "Not implemented! Under construction!!!");
 
         AVStream* audioStream = avformat_new_stream(m_formatCtx, nullptr);
         if (audioStream == 0)

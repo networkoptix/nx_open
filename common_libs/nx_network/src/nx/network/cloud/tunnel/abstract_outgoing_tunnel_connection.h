@@ -36,11 +36,12 @@ public:
     virtual ~AbstractOutgoingTunnelConnection() {}
 
     /**
+        @param timeout zero - no timeout
         \note Actual implementation MUST support connect request pipelining but 
             does not have to be neither thread-safe nor reenterable
     */
     virtual void establishNewConnection(
-        boost::optional<std::chrono::milliseconds> timeout,
+        std::chrono::milliseconds timeout,
         SocketAttributes socketAttributes,
         OnNewConnectionHandler handler) = 0;
 };

@@ -132,7 +132,7 @@ QnResourcePtr QnResourceDiscoveryManager::createResource(const QnUuid &resourceT
     if (resourceTypeId == qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kStorageTypeId))
     {
         result = QnResourcePtr(QnStoragePluginFactory::instance()->createStorage(params.url));
-        assert(result); //storage can not be null
+        NX_ASSERT(result); //storage can not be null
     }
     else
     {
@@ -631,7 +631,7 @@ void QnResourceDiscoveryManager::dtsAssignment()
             if (!vcRes)
                 continue;
 
-            Q_ASSERT(unit.factory!=0);
+            NX_ASSERT(unit.factory!=0);
 
 #ifdef ENABLE_DATA_PROVIDERS
             vcRes->lockDTSFactory();
