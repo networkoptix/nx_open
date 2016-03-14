@@ -1,21 +1,15 @@
 #pragma once
 
-#include <core/resource/resource_fwd.h>
+#include <transaction/transaction.h>
 
-#include "nx_ec/data/api_media_server_data.h"
-#include "nx_ec/data/api_conversion_functions.h"
-#include "nx_ec/ec_api.h"
-#include "transaction/transaction.h"
-
+#include <nx_ec/managers/abstract_server_manager.h>
 
 namespace ec2
 {
-    class QnMediaServerNotificationManager
-    :
-        public AbstractMediaServerManager
+    class QnMediaServerNotificationManager: public AbstractMediaServerManager
     {
     public:
-        QnMediaServerNotificationManager( const ResourceContext& resCtx );
+        QnMediaServerNotificationManager();
 
         void triggerNotification( const QnTransaction<ApiMediaServerData>& tran );
 
@@ -30,31 +24,26 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiMediaServerUserAttributesData>& tran );
 
         void triggerNotification( const QnTransaction<ApiMediaServerUserAttributesDataList>& tran );
-
-    protected:
-        ResourceContext m_resCtx;
     };
 
 
 
     template<class QueryProcessorType>
-    class QnMediaServerManager
-    :
-        public QnMediaServerNotificationManager
+    class QnMediaServerManager: public QnMediaServerNotificationManager
     {
     public:
-        QnMediaServerManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx );
+        QnMediaServerManager( QueryProcessorType* const queryProcessor);
 
         //!Implementation of QnMediaServerManager::getServers
-        virtual int getServers( const QnUuid& mediaServerId,  impl::GetServersHandlerPtr handler ) override;
+        virtual int getServers(impl::GetServersHandlerPtr handler) override;
         //!Implementation of QnMediaServerManager::saveServer
-        virtual int save( const QnMediaServerResourcePtr&, impl::SaveServerHandlerPtr handler ) override;
+        virtual int save( const ec2::ApiMediaServerData&, impl::SimpleHandlerPtr handler ) override;
         //!Implementation of QnMediaServerManager::remove
         virtual int remove( const QnUuid& id, impl::SimpleHandlerPtr handler ) override;
         //!Implementation of QnMediaServerManager::saveUserAttributes
-        virtual int saveUserAttributes( const QnMediaServerUserAttributesList& serverAttrs, impl::SimpleHandlerPtr handler ) override;
+        virtual int saveUserAttributes( const ec2::ApiMediaServerUserAttributesDataList& serverAttrs, impl::SimpleHandlerPtr handler ) override;
         //!Implementation of QnMediaServerManager::saveStorages
-        virtual int saveStorages( const QnStorageResourceList& storages, impl::SimpleHandlerPtr handler ) override;
+        virtual int saveStorages( const ec2::ApiStorageDataList& storages, impl::SimpleHandlerPtr handler ) override;
         //!Implementation of QnMediaServerManager::removeStorages
         virtual int removeStorages( const ApiIdDataList& storages, impl::SimpleHandlerPtr handler ) override;
         //!Implementation of QnMediaServerManager::getUserAttributes
@@ -64,8 +53,5 @@ namespace ec2
 
     private:
         QueryProcessorType* const m_queryProcessor;
-
-        QnTransaction<ApiMediaServerData> prepareTransaction( ApiCommand::Value command, const QnMediaServerResourcePtr& resource );
-        QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value command, const QnUuid& id );
     };
 }

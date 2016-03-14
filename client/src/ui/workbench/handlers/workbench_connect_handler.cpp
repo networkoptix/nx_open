@@ -102,7 +102,7 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject *parent /* = 0*/):
         if(!watcher->hasMismatches())
             return;
 
-        menu()->triggerIfPossible(QnActions::VersionMismatchMessageAction);
+        menu()->trigger(QnActions::VersionMismatchMessageAction);
     });
 
     QnWorkbenchUserWatcher* userWatcher = context()->instance<QnWorkbenchUserWatcher>();
@@ -124,7 +124,7 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject *parent /* = 0*/):
     context()->instance<QnAppServerNotificationCache>();
 }
 
-QnWorkbenchConnectHandler::~QnWorkbenchConnectHandler() 
+QnWorkbenchConnectHandler::~QnWorkbenchConnectHandler()
 {}
 
 ec2::AbstractECConnectionPtr QnWorkbenchConnectHandler::connection2() const {

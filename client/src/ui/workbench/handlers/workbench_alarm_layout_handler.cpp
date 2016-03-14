@@ -46,7 +46,7 @@ namespace {
         Q_DECLARE_TR_FUNCTIONS(QnAlarmLayoutResource)
     public:
         QnAlarmLayoutResource():
-            QnLayoutResource(qnResTypePool)
+            QnLayoutResource()
         {
             Q_ASSERT_X(qnResPool->getResources<QnAlarmLayoutResource>().isEmpty(), Q_FUNC_INFO, "The Alarm Layout must exist in a single instance");
 

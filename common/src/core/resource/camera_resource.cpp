@@ -2,15 +2,17 @@
 
 #include <QtCore/QUrlQuery>
 
+#include <api/app_server_connection.h>
+#include <core/resource_management/resource_properties.h>
+#include <core/resource/param.h>
+
+#include <nx_ec/data/api_camera_data.h>
+#include <nx_ec/data/api_conversion_functions.h>
+#include <nx_ec/managers/abstract_camera_manager.h>
+
 #include <utils/common/model_functions.h>
 #include <utils/common/util.h>
 #include <utils/math/math.h>
-
-#include <api/app_server_connection.h>
-#include "nx_ec/dummy_handler.h"
-#include "nx_ec/data/api_resource_data.h"
-#include "../resource_management/resource_properties.h"
-#include "param.h"
 
 static const float MAX_EPS = 0.01f;
 static const int MAX_ISSUE_CNT = 3; // max camera issues during a period.
@@ -35,7 +37,7 @@ QString QnVirtualCameraResource::toSearchString() const
     return result;
 }
 
-QnPhysicalCameraResource::QnPhysicalCameraResource(): 
+QnPhysicalCameraResource::QnPhysicalCameraResource():
     QnVirtualCameraResource(),
     m_channelNumber(0)
 {
@@ -407,19 +409,19 @@ bool QnVirtualCameraResource::isForcedAudioSupported() const {
 }
 
 void QnVirtualCameraResource::forceEnableAudio()
-{ 
+{
 	if (isForcedAudioSupported())
         return;
     setProperty(Qn::FORCED_IS_AUDIO_SUPPORTED_PARAM_NAME, 1);
-    saveParams(); 
+    saveParams();
 }
 
 void QnVirtualCameraResource::forceDisableAudio()
-{ 
+{
     if (!isForcedAudioSupported())
         return;
     setProperty(Qn::FORCED_IS_AUDIO_SUPPORTED_PARAM_NAME, QString(lit("0")));
-    saveParams(); 
+    saveParams();
 }
 
 void QnVirtualCameraResource::saveParams()
@@ -434,8 +436,11 @@ void QnVirtualCameraResource::saveParamsAsync()
 
 int QnVirtualCameraResource::saveAsync()
 {
+    ec2::ApiCameraData apiCamera;
+    fromResourceToApi(toSharedPointer(this), apiCamera);
+
     ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
-    return conn->getCameraManager()->addCamera(::toSharedPointer(this), this, []{});
+    return conn->getCameraManager()->addCamera(apiCamera, this, []{});
 }
 
 void QnVirtualCameraResource::issueOccured() {
@@ -446,7 +451,7 @@ void QnVirtualCameraResource::issueOccured() {
         m_issueCounter++;
         tooManyIssues = m_issueCounter >= MAX_ISSUE_CNT;
         m_lastIssueTimer.restart();
-    }  
+    }
     if (tooManyIssues && !hasStatusFlags(Qn::CSF_HasIssuesFlag)) {
         addStatusFlags(Qn::CSF_HasIssuesFlag);
         saveAsync();
@@ -457,7 +462,7 @@ void QnVirtualCameraResource::cleanCameraIssues() {
     {
         /* Check if no issues occurred during last check period. */
         QnMutexLocker lock( &m_mutex );
-        if (!m_lastIssueTimer.hasExpired(issuesTimeoutMs())) 
+        if (!m_lastIssueTimer.hasExpired(issuesTimeoutMs()))
             return;
         m_issueCounter = 0;
     }

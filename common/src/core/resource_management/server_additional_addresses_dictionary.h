@@ -1,5 +1,4 @@
-#ifndef QNSERVERADDITIONALADDRESSESDICTIONARY_H
-#define QNSERVERADDITIONALADDRESSESDICTIONARY_H
+#pragma once
 
 #include <nx/utils/singleton.h>
 #include <nx/utils/thread/mutex.h>
@@ -10,7 +9,7 @@ class QnServerAdditionalAddressesDictionary: public QObject, public Singleton<Qn
     Q_OBJECT
 public:
     QnServerAdditionalAddressesDictionary(QObject *parent = NULL);
-    
+
     QList<QUrl> additionalUrls(const QnUuid &serverId) const;
     QList<QUrl> ignoredUrls(const QnUuid &serverId) const;
     void setAdditionalUrls(const QnUuid &serverId, const QList<QUrl> &additionalUrls);
@@ -27,4 +26,4 @@ private:
     mutable QnMutex m_mutex;
 };
 
-#endif // QNSERVERADDITIONALADDRESSESDICTIONARY_H
+#define qnServerAdditionalAddressesDictionary QnServerAdditionalAddressesDictionary::instance()

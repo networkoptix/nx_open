@@ -1,3 +1,5 @@
+#include <nx/network/socket_global.h>
+
 #include <QtGui/QGuiApplication>
 #include <QtGui/QScreen>
 #include <QtQml/QQmlEngine>
@@ -14,7 +16,7 @@
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/mobile_client_camera_factory.h"
 #include "utils/common/app_info.h"
-#include "utils/common/log.h"
+#include "nx/utils/log/log.h"
 #include "utils/settings_migration.h"
 
 #include "context/context.h"
@@ -33,6 +35,7 @@
 #include <nx/media/ffmpeg_video_decoder.h>
 #include <nx/media/ffmpeg_audio_decoder.h>
 #include <nx/media/jpeg_decoder.h>
+
 
 #if defined(Q_OS_ANDROID)
 #include <nx/media/android_video_decoder.h>
@@ -134,11 +137,7 @@ int runApplication(QGuiApplication *application) {
     qsrand(time(NULL));
 
     std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory(Qn::PT_MobileClient)); // TODO: #dklychkov check connection type
-    ec2::ResourceContext resourceContext(
-        QnMobileClientCameraFactory::instance(),
-        qnResPool,
-        qnResTypePool);
-    ec2ConnectionFactory->setContext(resourceContext);
+
     QnAppServerConnectionFactory::setEC2ConnectionFactory(ec2ConnectionFactory.get());
 
     ec2::ApiRuntimeData runtimeData;
@@ -162,9 +161,11 @@ void initLog() {
     QnLog::initLog(lit("INFO"));
 }
 
-int main(int argc, char *argv[]) {
-    QGuiApplication application(argc, argv);
+int main(int argc, char *argv[]) 
+{
 
+    QGuiApplication application(argc, argv);
+    nx::network::SocketGlobals::InitGuard sgGuard;
     initLog();
 
     QnMobileClientModule mobile_client;

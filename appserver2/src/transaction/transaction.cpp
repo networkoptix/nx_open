@@ -45,7 +45,6 @@ namespace ec2
             REGISTER_COMMAND(getResourceParams),
             REGISTER_COMMAND(getStatusList),
             REGISTER_COMMAND(removeResources),
-            REGISTER_COMMAND(saveResource),
             REGISTER_COMMAND(removeResource),
             REGISTER_COMMAND(getFullInfo),
 
@@ -192,7 +191,7 @@ namespace ec2
 
         bool isPersistent( Value val )
         {
-            return  val == saveResource   ||
+            return
                 val == removeResource  ||
                 val == removeResources  ||
                 val == setResourceStatus ||

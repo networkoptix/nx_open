@@ -14,7 +14,7 @@ namespace ec2
         public AbstractStoredFileManager
     {
     public:
-        QnStoredFileNotificationManager( const ResourceContext& resCtx ) : m_resCtx( resCtx ) {}
+        QnStoredFileNotificationManager() {}
 
         void triggerNotification( const QnTransaction<ApiStoredFileData>& tran )
         {
@@ -31,9 +31,6 @@ namespace ec2
             assert( tran.command == ApiCommand::removeStoredFile );
             emit removed( tran.params.path );
         }
-
-    private:
-        const ResourceContext m_resCtx;
     };
 
 
@@ -43,7 +40,7 @@ namespace ec2
         public QnStoredFileNotificationManager
     {
     public:
-        QnStoredFileManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx );
+        QnStoredFileManager( QueryProcessorType* const queryProcessor);
 
         virtual int getStoredFile( const QString& filename, impl::GetStoredFileHandlerPtr handler ) override;
         virtual int addStoredFile( const QString& filename, const QByteArray& data, impl::SimpleHandlerPtr handler ) override;

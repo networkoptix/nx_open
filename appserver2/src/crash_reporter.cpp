@@ -83,10 +83,10 @@ CrashReporter::~CrashReporter()
 bool CrashReporter::scanAndReport(QSettings* settings)
 {
     const auto admin = qnResPool->getAdministrator();
-    if (!admin) 
+    if (!admin)
         return false;
 
-    
+
     if (!qnGlobalSettings->isStatisticsAllowed())
     {
         NX_LOGX(lit("Automatic report system is disabled"), cl_logINFO);
@@ -105,7 +105,7 @@ bool CrashReporter::scanAndReport(QSettings* settings)
         return false;
     }
 
-    const QString configApi = admin->getProperty(Ec2StaticticsReporter::SR_SERVER_API);
+    const QString configApi = qnGlobalSettings->statisticsReportServerApi();
     const QString serverApi = configApi.isEmpty() ? Ec2StaticticsReporter::DEFAULT_SERVER_API : configApi;
     const QUrl url = lit("%1/%2").arg(serverApi).arg(SERVER_API_COMMAND);
 

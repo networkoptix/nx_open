@@ -69,7 +69,7 @@ QnLayoutExportTool::QnLayoutExportTool(const QnLayoutResourcePtr &layout,
     m_stopped(false),
     m_currentCamera(0)
 {
-    m_layout.reset(new QnLayoutResource(qnResTypePool));
+    m_layout.reset(new QnLayoutResource());
     m_layout->setId(layout->getId()); //before update() uuid's must be the same
     m_layout->update(layout);
 
@@ -399,7 +399,7 @@ bool QnLayoutExportTool::exportMediaResource(const QnMediaResourcePtr& resource)
 void QnLayoutExportTool::at_camera_exportFinished(
     const QnStreamRecorder::ErrorStruct &status,
     const QString                       &filename
-) 
+)
 {
     Q_UNUSED(filename)
     if (status.lastError != QnClientVideoCamera::NoError) {

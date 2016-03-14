@@ -215,7 +215,7 @@ void QnDesktopCameraConnection::pleaseStop()
         if (processor)
             processor->pleaseStop();
         if (connection)
-            connection->getSocket()->close();
+            connection->getSocket()->shutdown();
     }
 
     QnLongRunnable::pleaseStop();

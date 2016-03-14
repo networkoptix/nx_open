@@ -66,7 +66,7 @@ namespace ec2
         QnDbManager();
         virtual ~QnDbManager();
 
-        bool init(QnResourceFactory* factory, const QUrl& dbUrl);
+        bool init(const QUrl& dbUrl);
         bool isInitialized() const;
 
         template <class T>
@@ -200,7 +200,7 @@ namespace ec2
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiResourceTypeDataList& resourceTypeList);
 
         //getCameras
-        ErrorCode doQueryNoLock(const QnUuid& mServerId, ApiCameraDataList& cameraList);
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraDataList& cameraList);
 
         //getStorages
         ErrorCode doQueryNoLock(const QnUuid& mServerId, ApiStorageDataList& cameraList);
@@ -209,22 +209,25 @@ namespace ec2
         ErrorCode doQueryNoLock(const QnUuid& resId, ApiResourceStatusDataList& statusList);
 
         //getCameraUserAttributes
-        ErrorCode doQueryNoLock(const QnUuid& serverId, ApiCameraAttributesDataList& cameraUserAttributesList);
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraAttributesDataList& cameraUserAttributesList);
 
         //getCamerasEx
-        ErrorCode doQueryNoLock(const QnUuid& serverId, ApiCameraDataExList& cameraList);
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraDataExList& cameraList);
 
         //getServers
-        ErrorCode doQueryNoLock(const QnUuid& mServerId, ApiMediaServerDataList& serverList);
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiMediaServerDataList& serverList);
 
         //getServersEx
-        ErrorCode doQueryNoLock(const QnUuid& mServerId, ApiMediaServerDataExList& cameraList);
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiMediaServerDataExList& serverList);
 
         //getCameraServerItems
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiServerFootageDataList& historyList);
 
         //getUserList
-        ErrorCode doQueryNoLock(const QnUuid& userId, ApiUserDataList& userList);
+        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiUserDataList& userList);
+
+        //getAccessRights
+        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiAccessRightsDataList& accessRightsList);
 
         //getVideowallList
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiVideowallDataList& videowallList);
@@ -276,7 +279,6 @@ namespace ec2
         ErrorCode executeTransactionInternal(const QnTransaction<ApiServerFootageData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiStoredFileData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiStoredFilePath> &tran);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiResourceData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiBusinessRuleData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiUserData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiResetBusinessRuleData>& /*tran*/) {
@@ -447,13 +449,11 @@ namespace ec2
         ErrorCode deleteTableRecord(const qint32& internalId, const QString& tableName, const QString& fieldName);
 
         ErrorCode insertOrReplaceResource(const ApiResourceData& data, qint32* internalId);
-        //ErrorCode insertOrReplaceResource(const ApiResourceData& data);
         ErrorCode deleteRecordFromResourceTable(const qint32 id);
         ErrorCode removeObject(const ApiObjectInfo& apiObject);
 
         ErrorCode insertAddParam(const ApiResourceParamWithRefData& param);
         ErrorCode fetchResourceParams( const QnQueryFilter& filter, ApiResourceParamWithRefDataList& params );
-        //ErrorCode deleteAddParams(qint32 resourceId);
 
         ErrorCode saveCamera(const ApiCameraData& params);
         ErrorCode insertOrReplaceCamera(const ApiCameraData& data, qint32 internalId);
@@ -467,10 +467,8 @@ namespace ec2
 
         ErrorCode insertOrReplaceMediaServer(const ApiMediaServerData& data, qint32 internalId);
         ErrorCode insertOrReplaceMediaServerUserAttributes(const ApiMediaServerUserAttributesData& attrs);
-        //ErrorCode updateStorages(const ApiMediaServerData&);
         ErrorCode removeServer(const QnUuid& guid);
         ErrorCode removeMediaServerUserAttributes(const QnUuid& guid);
-        //ErrorCode removeStoragesByServer(const QnUuid& serverGUID);
 
         ErrorCode removeLayout(const QnUuid& id);
         ErrorCode removeLayoutInternal(const QnUuid& id, const qint32 &internalId);
@@ -547,7 +545,7 @@ namespace ec2
 
         ErrorCode addCameraHistory(const ApiServerFootageData& params);
         ErrorCode removeCameraHistory(const QnUuid& serverId);
-        ErrorCode getScheduleTasks(const QnUuid& serverId, std::vector<ApiScheduleTaskWithRefData>& scheduleTaskList);
+        ErrorCode getScheduleTasks(std::vector<ApiScheduleTaskWithRefData>& scheduleTaskList);
         void addResourceTypesFromXML(ApiResourceTypeDataList& data);
         void loadResourceTypeXML(const QString& fileName, ApiResourceTypeDataList& data);
         bool removeServerStatusFromTransactionLog();
@@ -560,7 +558,6 @@ namespace ec2
         bool isTranAllowed(const QnAbstractTransaction& tran) const;
 
     private:
-        QnResourceFactory* m_resourceFactory;
         QnUuid m_storageTypeId;
         QnUuid m_serverTypeId;
         QnUuid m_cameraTypeId;
@@ -571,7 +568,7 @@ namespace ec2
         QnUuid m_dbInstanceId;
         bool m_initialized;
         /*
-        * Database for static or very rare modified data. Be carefull! It's not supported DB transactions for static DB
+        * Database for static or very rare modified data. Be careful! It's not supported DB transactions for static DB
         * So, only atomic SQL updates are allowed. m_mutexStatic is used for createDB only. Common mutex/transaction is sharing for both DB
         */
         QSqlDatabase m_sdbStatic;
