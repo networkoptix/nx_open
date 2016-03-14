@@ -31,7 +31,7 @@ add_translations(translations)
 qt5_wrap_ui(UI_HEADERS ${UI_FILES})
 qt5_add_resources(RESOURCE_FILES ${PROJECT_BINARY_DIR}/${PROJECT_SHORTNAME}.qrc)
 
-add_library(${PROJECT_SHORTNAME} ${DEFAULT_LIBRARY_TYPE}
+add_library(${PROJECT_SHORTNAME} SHARED
   ${UI_HEADERS}
   ${CPP_FILES}
   ${RESOURCE_FILES}

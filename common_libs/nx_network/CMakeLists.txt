@@ -39,7 +39,7 @@ find_package(Qt5Sql REQUIRED)
 find_package(Qt5Concurrent REQUIRED)
 find_package(Qt5Multimedia REQUIRED)
 
-add_library(${PROJECT_SHORTNAME} ${DEFAULT_LIBRARY_TYPE}
+add_library(${PROJECT_SHORTNAME} SHARED
   ${UI_HEADERS}
   ${CPP_FILES}
   ${RESOURCE_FILES}
