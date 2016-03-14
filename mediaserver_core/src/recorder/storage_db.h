@@ -106,6 +106,7 @@ private:
     std::chrono::system_clock::time_point m_vacuumTimePoint;
     std::thread m_vacuumThread;
     std::atomic<bool> m_vacuumThreadRunning;
+    mutable QnMutex m_vacuumMutex;
 };
 
 typedef std::shared_ptr<QnStorageDb> QnStorageDbPtr;

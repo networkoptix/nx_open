@@ -152,6 +152,9 @@ void QnStorageDb::startVacuumAsync(Callback callback)
         return;
     }
 
+    if (m_vacuumThread.joinable())
+        m_vacuumThread.join();
+
     m_vacuumThread = std::thread([this, callback] 
                                  { 
                                      m_vacuumThreadRunning = true;
@@ -164,19 +167,29 @@ bool QnStorageDb::addRecord(const QString& cameraUniqueId,
                             QnServer::ChunksCatalog catalog, 
                             const DeviceFileCatalog::Chunk& chunk)
 {
-    auto timeSinceLastVacuum = 
-        std::chrono::duration_cast<std::chrono::seconds>
-            (std::chrono::system_clock::now() - m_vacuumTimePoint);
+    {
+        QnMutexLocker lk(&m_vacuumMutex);
+        auto timeSinceLastVacuum =
+            std::chrono::duration_cast<std::chrono::seconds>
+                (std::chrono::system_clock::now() - m_vacuumTimePoint);
 
-    if (timeSinceLastVacuum > kVacuumInterval)
-        startVacuumAsync(
-            [](bool result) { 
-            if (result) {
-                NX_LOG(lit("Sheduled vacuum media DB on storage %1 successfull"), cl_logDEBUG1);
-            } else {
-                NX_LOG(lit("Sheduled vacuum media DB on storage %1 failed"), cl_logWARNING);
-            }
-        });
+        if (timeSinceLastVacuum > kVacuumInterval)
+        {
+            m_vacuumTimePoint = std::chrono::system_clock::now();
+            startVacuumAsync(
+                [](bool result)
+                {
+                    if (result)
+                    {
+                        NX_LOG(lit("Sheduled vacuum media DB on storage %1 successfull"), cl_logDEBUG1);
+                    } 
+                    else
+                    {
+                        NX_LOG(lit("Sheduled vacuum media DB on storage %1 failed"), cl_logWARNING);
+                    }
+                });
+        }
+    }
 
     nx::media_db::MediaFileOperation mediaFileOp;
     mediaFileOp.setCameraId(getCameraIdHash(cameraUniqueId));
