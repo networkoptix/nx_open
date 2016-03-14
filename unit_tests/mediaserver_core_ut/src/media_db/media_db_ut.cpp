@@ -769,7 +769,7 @@ TEST(MediaDb_test, StorageDB)
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
         for (size_t i = 0; i < 5; ++i)
         {
-            dbChunkCatalogs = sdb.loadFullFileCatalog();
+            sdb.loadFullFileCatalog();
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
     };

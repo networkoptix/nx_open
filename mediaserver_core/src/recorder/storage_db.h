@@ -7,8 +7,10 @@
 #include <map>
 #include <set>
 #include <array>
-#include <boost/bimap.hpp>
 #include <random>
+#include <chrono>
+#include <atomic>
+#include <boost/bimap.hpp>
 
 #include <QElapsedTimer>
 
@@ -72,16 +74,20 @@ private:
     // returns cameraId (hash for cameraUniqueId)
     int fillCameraOp(nx::media_db::CameraOperation &cameraOp, const QString &cameraUniqueId);
     QVector<DeviceFileCatalogPtr> buildReadResult() const;
-    bool vacuum();
     bool checkDataConsistency(const UuidToCatalogs &readDataCopy) const;
     bool startDbFile();
     int getCameraIdHash(const QString &cameraUniqueId);
+    bool vacuumInternal();
+    bool vacuum(QVector<DeviceFileCatalogPtr> *data = nullptr);
+
+    template<typename Callback>
+    void startVacuumAsync(Callback callback);
 
 private:
     QnStorageResourcePtr m_storage;
     int m_storageIndex;
     mutable QnMutex m_syncMutex;
-    mutable QnMutex m_modeMutex;
+    mutable QnMutex m_readMutex;
     mutable QnMutex m_errorMutex;
 
     nx::media_db::DbHelper m_dbHelper;
@@ -96,6 +102,10 @@ private:
 
     std::random_device m_rd;
     std::mt19937 m_gen;
+
+    std::chrono::system_clock::time_point m_vacuumTimePoint;
+    std::thread m_vacuumThread;
+    std::atomic<bool> m_vacuumThreadRunning;
 };
 
 typedef std::shared_ptr<QnStorageDb> QnStorageDbPtr;

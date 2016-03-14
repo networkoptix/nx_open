@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <string>
 #include "storage_db.h"
+#include <boost/scope_exit.hpp>
 
 #include <plugins/storage/file_storage/file_storage_resource.h>
 
@@ -12,6 +13,7 @@ const uint8_t kDbVersion = 1;
 
 namespace
 {
+const std::chrono::seconds kVacuumInterval(3600 * 24);
 
 class VacuumHandler : public nx::media_db::DbHelperHandler
 {
@@ -59,12 +61,16 @@ QnStorageDb::QnStorageDb(const QnStorageResourcePtr& s, int storageIndex):
     m_ioDevice(nullptr),
     m_lastReadError(nx::media_db::Error::NoError),
     m_lastWriteError(nx::media_db::Error::NoError),
-    m_gen(m_rd())
+    m_gen(m_rd()),
+    m_vacuumTimePoint(std::chrono::system_clock::now()),
+    m_vacuumThreadRunning(false)
 {
 }
 
 QnStorageDb::~QnStorageDb()
 {
+    if (m_vacuumThread.joinable())
+        m_vacuumThread.join();
 }
 
 int QnStorageDb::fillCameraOp(nx::media_db::CameraOperation &cameraOp,
@@ -94,8 +100,8 @@ int QnStorageDb::getCameraIdHash(const QString &cameraUniqueId)
 
             while (existHashIdIt != m_uuidToHash.right.end())
             {
-                std::uniform_int_distribution<qint64> dist(-(INT_MAX), INT_MAX);
-                cameraId = qHash(cameraId, dist(m_gen));
+                std::uniform_int_distribution<uint16_t> dist(0, std::numeric_limits<uint16_t>::max());
+                cameraId = dist(m_gen);
                 existHashIdIt = m_uuidToHash.right.find(cameraId);
             }
 
@@ -137,10 +143,41 @@ bool QnStorageDb::deleteRecords(const QString& cameraUniqueId,
     return true;
 }
 
+template<typename Callback>
+void QnStorageDb::startVacuumAsync(Callback callback)
+{
+    if (m_vacuumThreadRunning)
+    {
+        callback(false);
+        return;
+    }
+
+    m_vacuumThread = std::thread([this, callback] 
+                                 { 
+                                     m_vacuumThreadRunning = true;
+                                     callback(vacuum());
+                                     m_vacuumThreadRunning = false; 
+                                 });
+}
+
 bool QnStorageDb::addRecord(const QString& cameraUniqueId,
                             QnServer::ChunksCatalog catalog, 
                             const DeviceFileCatalog::Chunk& chunk)
 {
+    auto timeSinceLastVacuum = 
+        std::chrono::duration_cast<std::chrono::seconds>
+            (std::chrono::system_clock::now() - m_vacuumTimePoint);
+
+    if (timeSinceLastVacuum > kVacuumInterval)
+        startVacuumAsync(
+            [](bool result) { 
+            if (result) {
+                NX_LOG(lit("Sheduled vacuum media DB on storage %1 successfull"), cl_logDEBUG1);
+            } else {
+                NX_LOG(lit("Sheduled vacuum media DB on storage %1 failed"), cl_logWARNING);
+            }
+        });
+
     nx::media_db::MediaFileOperation mediaFileOp;
     mediaFileOp.setCameraId(getCameraIdHash(cameraUniqueId));
     mediaFileOp.setCatalog(catalog);
@@ -218,8 +255,6 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadFullFileCatalog()
     QVector<DeviceFileCatalogPtr> result;
     result << loadChunksFileCatalog();
 
-    m_dbHelper.setMode(nx::media_db::Mode::Write);
-
     addCatalogFromMediaFolder(lit("hi_quality"), QnServer::HiQualityCatalog, result);
     addCatalogFromMediaFolder(lit("low_quality"), QnServer::LowQualityCatalog, result);
 
@@ -279,22 +314,37 @@ bool QnStorageDb::startDbFile()
     return true;
 }
 
-QVector<DeviceFileCatalogPtr> QnStorageDb::loadChunksFileCatalog() 
+QVector<DeviceFileCatalogPtr> QnStorageDb::loadChunksFileCatalog()
 {
+    QVector<DeviceFileCatalogPtr> result;
+    vacuum(&result);
+    return result;
+}
+
+bool QnStorageDb::vacuum(QVector<DeviceFileCatalogPtr> *data) 
+{
+    QnMutexLocker lk(&m_readMutex);
+
+    BOOST_SCOPE_EXIT(this_)
+    {
+        this_->m_dbHelper.setMode(nx::media_db::Mode::Write);
+    }
+    BOOST_SCOPE_EXIT_END
+
     m_readData.clear();
     m_dbHelper.setMode(nx::media_db::Mode::Read);
 
     if (!resetIoDevice())
     {
         startDbFile();
-        return QVector<DeviceFileCatalogPtr>();
+        return false;
     }
 
     if (m_dbHelper.readFileHeader(&m_dbVersion) != nx::media_db::Error::NoError)
     {
         NX_LOG(lit("%1 read DB header failed").arg(Q_FUNC_INFO), cl_logWARNING);
         startDbFile();
-        return QVector<DeviceFileCatalogPtr>();
+        return false;
     }
 
     NX_ASSERT(m_dbHelper.getDevice());
@@ -303,7 +353,7 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadChunksFileCatalog()
     {
         NX_LOG(lit("%1 DB file open error").arg(Q_FUNC_INFO), cl_logWARNING);
         startDbFile();
-        return QVector<DeviceFileCatalogPtr>();
+        return false;
     }
 
     nx::media_db::Error error;
@@ -313,13 +363,16 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadChunksFileCatalog()
         m_lastReadError = error;
     }
 
-    if (!vacuum() && !startDbFile())
-        return QVector<DeviceFileCatalogPtr>();
+    if (!vacuumInternal() && !startDbFile())
+        return false;
 
-    return buildReadResult();
+    if (data)
+        *data = buildReadResult();
+
+    return true;
 }
 
-bool QnStorageDb::vacuum()
+bool QnStorageDb::vacuumInternal()
 {
     QString tmpDbFileName = m_dbFileName + ".tmp";
     std::unique_ptr<QIODevice> tmpFile(m_storage->open(tmpDbFileName,
