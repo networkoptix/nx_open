@@ -67,23 +67,24 @@ void CloudStreamSocket::shutdown()
     //interrupting blocking calls
     std::promise<void> stoppedPromise;
     pleaseStop(
-        [this, &stoppedPromise](){
-            if (m_recvPromisePtr.load())
-            {
-                m_recvPromisePtr.load()->set_value(
-                    std::make_pair(SystemError::interrupted, 0));
-                m_recvPromisePtr.store(nullptr);
-            }
+        [this, &stoppedPromise]()
+        {
+            SocketResultPrimisePtr sendPromive(0);
+            SocketResultPrimisePtr recvPromise(0);
 
-            if (m_sendPromisePtr.load())
-            {
-                m_sendPromisePtr.load()->set_value(
-                    std::make_pair(SystemError::interrupted, 0));
-                m_sendPromisePtr.store(nullptr);
-            }
+            m_sendPromisePtr.exchange(sendPromive);
+            m_sendPromisePtr.exchange(recvPromise);
+            
+            const auto interrupted = std::make_pair(SystemError::interrupted, 0);
+
+            if (sendPromive)
+                sendPromive->set_value(interrupted);
+            if (recvPromise)
+                recvPromise->set_value(interrupted);
 
             stoppedPromise.set_value();
         });
+
     if (m_socketDelegate)
         m_socketDelegate->shutdown();
 
@@ -111,18 +112,19 @@ bool CloudStreamSocket::connect(
     const SocketAddress& remoteAddress,
     unsigned int timeoutMillis)
 {
-    std::promise<SystemError::ErrorCode> promise;
+    std::promise<std::pair<SystemError::ErrorCode, size_t>> promise;
+    m_sendPromisePtr.store(&promise);
     connectAsync(
         remoteAddress,
         [this, &promise](SystemError::ErrorCode code)
         {
             //to ensure that socket is not used by aio sub-system anymore, we use post
             m_aioThreadBinder->post([code, &promise](){
-                promise.set_value(code);
+                promise.set_value(std::make_pair(code, 0));
             });
         });
-
-    auto result = promise.get_future().get();
+    
+    auto result = promise.get_future().get().first;
     if (result != SystemError::noError)
     {
         SystemError::setLastErrorCode(result);
@@ -204,25 +206,33 @@ void CloudStreamSocket::cancelIOAsync(
     aio::EventType eventType,
     nx::utils::MoveOnlyFunc<void()> handler)
 {
-    if (eventType == aio::etWrite || eventType == aio::etNone)
+    auto finalHandler = [this, eventType, handler = move(handler)]() mutable
     {
-        m_asyncConnectGuard->terminate(); // breaks outgoing connects
-        nx::network::SocketGlobals::addressResolver().cancel(this);
-    }
+        if (m_socketDelegate)
+        {
+            NX_ASSERT(m_aioThreadBinder->getAioThread() == m_socketDelegate->getAioThread());
+        }
 
-    if (m_socketDelegate)
-    {
-        NX_ASSERT(m_aioThreadBinder->getAioThread() == m_socketDelegate->getAioThread());
-    }
-
-    m_aioThreadBinder->cancelIOAsync(
-        eventType,
-        [this, eventType, handler = move(handler)]() mutable
+        m_aioThreadBinder->cancelIOAsync(
+            eventType,
+            [this, eventType, handler = move(handler)]() mutable
         {
             if (m_socketDelegate)
                 m_socketDelegate->cancelIOSync(eventType);
             handler();
         });
+    };
+
+    if (eventType == aio::etWrite || eventType == aio::etNone)
+    {
+        m_asyncConnectGuard->terminate(); // breaks outgoing connects
+        nx::network::SocketGlobals::addressResolver().cancel(
+            this, std::move(finalHandler));
+    }
+    else
+    {
+        finalHandler();
+    }
 }
 
 void CloudStreamSocket::cancelIOSync(aio::EventType eventType)
