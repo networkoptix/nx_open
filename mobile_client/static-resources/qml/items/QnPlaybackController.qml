@@ -157,8 +157,10 @@ Item {
 
             antialiasing: true
 
-            width: parent.width
+            anchors.centerIn: parent
+            anchors.alignWhenCentered: false
 
+            width: parent.width
             height: width
             radius: width / 2
             border.width: dp(2)
@@ -170,7 +172,6 @@ Item {
             id: preloader
 
             anchors.centerIn: circle
-            anchors.alignWhenCentered: false
             width: circle.width - dp(6)
             height: circle.height - dp(6)
             color: QnTheme.playPause

@@ -1,6 +1,8 @@
 
 #include "statistics_manager.h"
 
+#include <QtCore/QTimer>
+
 #include <utils/common/model_functions.h>
 #include <common/common_module.h>
 #include <api/global_settings.h>
@@ -114,12 +116,18 @@ namespace
 
 QnStatisticsManager::QnStatisticsManager(QObject *parent)
     : base_type(parent)
+    , m_updateSettingsTimer(new QTimer())
     , m_clientId()
     , m_handle()
     , m_settings()
     , m_storage()
     , m_modules()
-{}
+{
+    enum { kUpdatePeriodMs = 4 * 60 * 60 * 1000 };  // every 4 hours
+    m_updateSettingsTimer->setSingleShot(false);
+    m_updateSettingsTimer->setInterval(kUpdatePeriodMs);
+    m_updateSettingsTimer->start();
+}
 
 QnStatisticsManager::~QnStatisticsManager()
 {}
@@ -128,10 +136,7 @@ bool QnStatisticsManager::registerStatisticsModule(const QString &alias
     ,  QnAbstractStatisticsModule *module)
 {
     if (m_modules.contains(alias))
-    {
-       // NX_ASSERT(false, Q_FUNC_INFO, "Module has been registered already!");
         return false;
-    }
 
     m_modules.insert(alias, ModulePtr(module));
 
@@ -164,15 +169,37 @@ void QnStatisticsManager::setStorage(QnStatisticsStoragePtr storage)
 void QnStatisticsManager::setSettings(QnStatisticsSettingsPtr settings)
 {
     if (m_settings)
+    {
         disconnect(m_settings.get(), nullptr, this, nullptr);
+        disconnect(m_updateSettingsTimer, nullptr, this, nullptr);
+    }
 
     m_settings = std::move(settings);
+    if (!m_settings)
+        return;
+
+    connect(m_updateSettingsTimer, &QTimer::timeout, m_settings.get(), [this]()
+    {
+        if (qnGlobalSettings->isStatisticsAllowed() && m_settings)
+            m_settings->updateSettings();
+    });
+
+    connect(m_settings.get(), &QnAbstractStatisticsSettingsLoader::settingsAvailableChanged
+        , this, [this]()
+    {
+        if (m_settings->settingsAvailable())
+            sendStatistics();
+
+        m_updateSettingsTimer->start();
+    });
+
+    if (!qnGlobalSettings->isStatisticsAllowed())
+        return;
 
     if (m_settings->settingsAvailable())
         sendStatistics();
-
-    connect(m_settings.get(), &QnAbstractStatisticsSettingsLoader::settingsAvailableChanged
-        , this, &QnStatisticsManager::sendStatistics);
+    else
+        m_settings->updateSettings();
 }
 
 QnStatisticValuesHash QnStatisticsManager::getValues() const
@@ -199,9 +226,14 @@ QnStatisticValuesHash QnStatisticsManager::getValues() const
 void QnStatisticsManager::sendStatistics()
 {
     if (!m_settings || !m_storage || m_handle
-        || !m_settings->settingsAvailable()
         || !qnGlobalSettings->isStatisticsAllowed())
     {
+        return;
+    }
+
+    if (!m_settings->settingsAvailable())
+    {
+        m_settings->updateSettings();
         return;
     }
 

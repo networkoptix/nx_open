@@ -62,6 +62,7 @@ public:
     QnCloudSystemList cloudSystems() const;
 
 signals:
+    void loginChanged();
     void statusChanged(Status status);
     void cloudSystemsChanged(const QnCloudSystemList &cloudSystems);
     void error(ErrorCode errorCode);

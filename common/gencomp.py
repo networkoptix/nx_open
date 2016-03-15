@@ -68,8 +68,9 @@ if __name__ == '__main__':
     handlers = {'python': gencomp_py, 'c++': gencomp_cpp, 'objc': gencomp_objc}
     parser = argparse.ArgumentParser()
     parser.add_argument('lang', choices=['python', 'c++', 'objc'])
+    parser.add_argument('outfile', type=argparse.FileType('w'), default=sys.stdout)
     args = parser.parse_args()
-    handlers[args.lang](sys.stdout)
+    handlers[args.lang](args.outfile)
     
     #gencomp_objc(sys.stdout)
 #    gencomp_cpp(open('build/compatibility.cpp'))

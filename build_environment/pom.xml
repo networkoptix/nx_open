@@ -19,7 +19,7 @@
         <root.dir>${basedir}/..</root.dir>
         <!-- Change it to true to skip buildenv synchronization (can save time)-->
         <rsync.skip>false</rsync.skip>
-    <donotrebuild>false</donotrebuild>
+        <donotrebuild>false</donotrebuild>
     </properties>
 
     <dependencies>
@@ -109,11 +109,7 @@
                                         <chmod file="${environment.dir}/${buildenv.script}" perm="755"/>
                                         <exec dir="${environment.dir}" executable="${environment.dir}/${buildenv.script}" failifexecutionfails="true">
                                             <arg line="${arch} ${toolchain.version} noqt4 qt542"/>
-                                        </exec>
-                                        <chmod file="${project.build.directory}/update_artifacts.${script.extension}" perm="755"/>
-                                        <exec dir="${environment.dir}" executable="${project.build.directory}/update_artifacts.${script.extension}" failifexecutionfails="true">
-                                            <arg line=""/>
-                                        </exec>                                        
+                                        </exec>                                     
                                     </target>
                                     <skip>${rsync.skip}</skip>
                                 </configuration>
@@ -194,27 +190,6 @@
                     <type>tar.gz</type>
                     <classifier>${platform}-x64</classifier>
                 </dependency>
-                <!-- <dependency>
-                    <groupId>com.digia</groupId>
-                    <version>${qt.version}</version>
-                    <artifactId>qt</artifactId>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-x86${compile.options}</classifier>
-                </dependency>
-                <dependency>
-                    <groupId>com.digia</groupId>
-                    <version>${qt.version}</version>
-                    <artifactId>qt</artifactId>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-x64${compile.options}</classifier>
-                </dependency> -->
-                <dependency>
-                    <groupId>org.openssl</groupId>
-                    <artifactId>openssl</artifactId>
-                    <version>${openssl.version}</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>
                 <dependency>
                     <groupId>com.creativelabs</groupId>
                     <artifactId>openal</artifactId>
@@ -272,13 +247,6 @@
                     <classifier>${profile.classifier}-${compiler}</classifier>
                 </dependency>
                 <dependency>
-                    <groupId>net.sourceforge</groupId>
-                    <artifactId>quazip</artifactId>
-                    <version>${quazip.version}</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${arch}-${compiler}</classifier>
-                </dependency>
-                <dependency>
                     <groupId>org</groupId>
                     <artifactId>festival</artifactId>
                     <version>${festival.version}</version>
@@ -295,29 +263,6 @@
                     <family>unix</family>
                 </os>
             </activation>
-            <dependencies>
-                <!--<dependency>
-                    <groupId>com.digia</groupId>
-                    <version>${qt.version}</version>
-                    <artifactId>qt</artifactId>
-                    <type>tar.gz</type>
-                    <classifier>${qt.classifier}${compile.options}</classifier>
-                </dependency>-->
-                <dependency>
-                    <groupId>net.sourceforge</groupId>
-                    <artifactId>quazip</artifactId>
-                    <version>${quazip.version}</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>
-                <dependency>
-                    <groupId>org</groupId>
-                    <artifactId>festival</artifactId>
-                    <version>${festival.version}</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>
-            </dependencies>
         </profile>
         <profile>
             <id>unix-noarm</id>
@@ -346,6 +291,20 @@
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${compiler}</classifier>
                 </dependency>
+                <dependency>
+                    <groupId>org</groupId>
+                    <artifactId>festival</artifactId>
+                    <version>${festival.version}</version>
+                    <type>tar.gz</type>
+                    <classifier>${profile.classifier}-${compiler}</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>org</groupId>
+                    <artifactId>festival</artifactId>
+                    <version>${festival.version}</version>
+                    <type>tar.gz</type>
+                    <classifier>${profile.classifier}-${compiler}</classifier>
+                </dependency>
             </dependencies>
         </profile>
         <profile>
@@ -358,13 +317,6 @@
                 </property>
             </activation>
             <dependencies>
-                <dependency>
-                    <groupId>org.openssl</groupId>
-                    <artifactId>openssl</artifactId>
-                    <version>${openssl.version}</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>
                 <dependency>
                     <groupId>org.ffmpeg</groupId>
                     <artifactId>ffmpeg</artifactId>
@@ -435,13 +387,6 @@
                     <classifier>${profile.classifier}-${compiler}</classifier>
                 </dependency>
                 <dependency>
-                    <groupId>org.openssl</groupId>
-                    <artifactId>openssl</artifactId>
-                    <version>${openssl.version}</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>
-                <dependency>
                     <groupId>org.ffmpeg</groupId>
                     <artifactId>ffmpeg</artifactId>
                     <version>${ffmpeg.version}</version>
@@ -497,13 +442,6 @@
                     <groupId>org.cyrus</groupId>
                     <artifactId>sasl2</artifactId>
                     <version>${sasl2.version}</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>
-                <dependency>
-                    <groupId>org.openssl</groupId>
-                    <artifactId>openssl</artifactId>
-                    <version>${openssl.version}</version>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${compiler}</classifier>
                 </dependency>
@@ -621,13 +559,6 @@
                     <classifier>${profile.classifier}-${compiler}</classifier>
                 </dependency>
                 <dependency>
-                    <groupId>org.openssl</groupId>
-                    <artifactId>openssl</artifactId>
-                    <version>${openssl.version}</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>
-                <dependency>
                     <groupId>org.ffmpeg</groupId>
                     <artifactId>ffmpeg</artifactId>
                     <version>${ffmpeg.version}</version>
@@ -680,13 +611,6 @@
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${compiler}</classifier>
                 </dependency>                     
-                <dependency>
-                    <groupId>org.openssl</groupId>
-                    <artifactId>openssl</artifactId>
-                    <version>${openssl.version}</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>
                 <dependency>
                     <groupId>org.ffmpeg</groupId>
                     <artifactId>ffmpeg</artifactId>
@@ -764,16 +688,16 @@
             </activation>
             <dependencies>
                 <dependency>
-                    <groupId>org.openssl</groupId>
-                    <artifactId>openssl</artifactId>
-                    <version>${openssl.version}</version>
+                    <groupId>net.sourceforge</groupId>
+                    <artifactId>libjpeg-turbo</artifactId>
+                    <version>1.4.2-SNAPSHOT</version>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}</classifier>
                 </dependency>
                 <dependency>
-                    <groupId>net.sourceforge</groupId>
-                    <artifactId>libjpeg-turbo</artifactId>
-                    <version>1.4.2-SNAPSHOT</version>
+                    <groupId>com.creativelabs</groupId>
+                    <artifactId>openal</artifactId>
+                    <version>1.17.2-SNAPSHOT</version>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}</classifier>
                 </dependency>
@@ -792,13 +716,6 @@
                 </property>
             </activation>
             <dependencies>
-                <dependency>
-                    <groupId>org.openssl</groupId>
-                    <artifactId>openssl</artifactId>
-                    <version>${openssl.version}</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}</classifier>
-                </dependency>
                 <dependency>
                     <groupId>net.sourceforge</groupId>
                     <artifactId>libjpeg-turbo</artifactId>

@@ -88,8 +88,13 @@ QString QnCloudStatusWatcher::cloudLogin() const
 void QnCloudStatusWatcher::setCloudLogin(const QString &login)
 {
     Q_D(QnCloudStatusWatcher);
+
+    if (d->cloudLogin == login)
+        return;
+
     d->cloudLogin = login;
     d->updateConnection();
+    emit loginChanged();
 }
 
 QString QnCloudStatusWatcher::cloudPassword() const
@@ -223,7 +228,10 @@ void QnCloudStatusWatcherPrivate::updateConnection(bool initial)
     cloudConnection.reset();
 
     if (cloudLogin.isEmpty() || cloudPassword.isEmpty())
+    {
+        setCloudSystems(QnCloudSystemList());
         return;
+    }
 
     cloudConnection = connectionFactory->createConnection(cloudLogin.toStdString(), cloudPassword.toStdString());
 

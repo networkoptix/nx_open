@@ -109,7 +109,7 @@ class QnAbstractConnection: public Connective<QObject> {
     typedef Connective<QObject> base_type;
 
 public:
-    QnAbstractConnection(QObject *parent = NULL, QnResource* targetRes = nullptr);
+    QnAbstractConnection(QObject *parent = NULL, const QnResourcePtr& targetRes = QnResourcePtr());
     virtual ~QnAbstractConnection();
 
     QUrl url() const;
@@ -168,7 +168,7 @@ protected:
         return sendSyncGetRequest(object, QnRequestHeaderList(), params, reply);
     }
 
-    QnResource *targetResource() const;
+    QnResourcePtr targetResource() const;
     virtual bool isReady() const;
 
 private:
@@ -179,7 +179,7 @@ private:
     QScopedPointer<QnLexicalSerializer> m_serializer;
     QnRequestHeaderList m_extraHeaders;
     QnRequestParamList m_extraQueryParameters;
-    QnResource* m_targetRes;
+    QnResourcePtr m_targetRes;
 };
 
 

@@ -29,11 +29,11 @@
         <!--Global libs-->
         <qt.libs>core gui network opengl xml sql multimedia concurrent</qt.libs>       
         <!-- Disabled msvs 2015 libs> -lFestival -lestools -leststring -lestbase</!-->
-        <global.libs>-lcommon -lnx_network -lnx_streaming -lappserver2 -lclient -lquazip</global.libs>
+        <global.libs>-lcommon -lnx_utils -lnx_network -lnx_streaming -lappserver2 -lclient</global.libs>
         <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc</ffmpeg.libs>
         <!--Specific os libs used-->
-        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -ld3d9 -lopenal32 -lssleay32 -llibeay32 -lsigar Wldap32.lib</windows.oslibs>
-        <linux.oslibs>-lmp3lame -lssl -lcrypto -lz -lopenal -lX11 -lXfixes -lGL -lGLU -ltermcap -lsigar -lfaac -lXss</linux.oslibs>
+        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -ld3d9 -lopenal32 -lsigar Wldap32.lib</windows.oslibs>
+        <linux.oslibs>-lmp3lame -lz -lopenal -lX11 -lXfixes -lGL -lGLU -ltermcap -lsigar -lfaac -lXss</linux.oslibs>
         <mac.oslibs>-lbz2 -lz -framework IOKit -framework CoreServices -framework OpenAL -ltermcap -lsigar-universal64-macosx</mac.oslibs>
         <windows.oslibs.release></windows.oslibs.release>
         <windows.oslibs.debug></windows.oslibs.debug>
@@ -44,6 +44,7 @@
         <linux.defines/>
         <mac.defines/>
         <path>${env.PATH}</path>
+        <rdep.packages>openssl quazip festival-2.1</rdep.packages>
     </properties>
     <dependencies>
         <dependency>

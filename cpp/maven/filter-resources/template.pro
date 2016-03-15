@@ -9,7 +9,7 @@ VERSION = ${release.version}
 unix {
     VERSION = ${linux.release.version}
 }
-QT += ${qt.libs} core-private
+QT = ${qt.libs}
 ADDITIONAL_QT_INCLUDES=${environment.dir}/qt5-custom
 
 ## GLOBAL CONFIGURATIONS
@@ -43,7 +43,7 @@ CONFIG(debug, debug|release) {
     CONFIG += console
   }
   win* {
-    LIBS = ${windows.oslibs.debug}
+    LIBS += ${windows.oslibs.debug}
   } else {
     DEFINES += _DEBUG
   }
@@ -55,7 +55,7 @@ else {
   CONFIG += silent
   CONFIGURATION=release
   win* {
-    LIBS = ${windows.oslibs.release}
+    LIBS += ${windows.oslibs.release}
   }
 
   !win32 {
@@ -103,7 +103,16 @@ OBJECTS_DIR = ${project.build.directory}/build/$$CONFIGURATION/
 MOC_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
 UI_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
 RCC_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
-LIBS += -L$$OUTPUT_PATH/lib -L$$OUTPUT_PATH/lib/$$CONFIGURATION -L${qt.dir}/lib -L$$OUTPUT_PATH/bin/$$CONFIGURATION
+
+#temporary hardcode
+CONFIG(debug, debug|release) {
+    LIBS += -L${qt.dir}-debug/lib
+}
+else {
+    LIBS += -L${qt.dir}/lib
+}
+
+LIBS += -L$$OUTPUT_PATH/lib -L$$OUTPUT_PATH/lib/$$CONFIGURATION -L$$OUTPUT_PATH/bin/$$CONFIGURATION
 !win*:!mac {
     LIBS += -Wl,-rpath-link,${qt.dir}/lib
 }
@@ -265,7 +274,7 @@ macx {
   }
 
   contains(TEMPLATE, "lib") {
-    QMAKE_LFLAGS += -undefined dynamic_lookup 
+    QMAKE_LFLAGS += -undefined dynamic_lookup
   }
 }
 
@@ -293,7 +302,11 @@ ios {
 
 
 
-
+CONFIG(debug, debug|release) {
+  include(dependencies-debug.pri)
+} else {
+  include(dependencies.pri)
+}
 
 
 

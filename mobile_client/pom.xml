@@ -21,15 +21,15 @@
         <!--Global libs-->
         <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc</ffmpeg.libs>
         <qt.libs>core qml quick concurrent network sql multimedia xml</qt.libs>
-        <global.libs>-lappserver2 -lnx_streaming -lnx_media -lnx_audio -lcommon -lclient.core</global.libs>
+        <global.libs>-lclient.core -lnx_media -lnx_audio -lnx_streaming -lappserver2 -lnx_network -lcommon -lnx_utils</global.libs>
 
         <!--Specific os libs used-->
-        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -ld3d9 -lopenal32 -lssleay32 -llibeay32</windows.oslibs>
+        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -ld3d9 -lopenal32</windows.oslibs>
         <windows.oslibs.release/>
         <windows.oslibs.debug/>
-        <linux.oslibs>${ffmpeg.libs} -lssl -lcrypto -lmp3lame -lz -lopenal -lX11 -lXfixes -lGL -lGLU -ltermcap -lsigar -lfaac -lquazip</linux.oslibs>
-        <android.oslibs>-lssl -lcrypto -lturbojpeg</android.oslibs>
-        <ios.oslibs>-lssl -lcrypto -lturbojpeg</ios.oslibs>
+        <linux.oslibs>${ffmpeg.libs} -lmp3lame -lz -lopenal -lX11 -lXfixes -lGL -lGLU -ltermcap -lsigar -lfaac</linux.oslibs>
+        <android.oslibs>-lturbojpeg -lopenal</android.oslibs>
+        <ios.oslibs>-lturbojpeg</ios.oslibs>
         <!--Global defines-->
         <global.defines>CL_FORCE_LOGO</global.defines>
         <!--Specific os defines-->
@@ -38,6 +38,9 @@
         <mac.defines/>
         <android.defines/>
         <ios.defines/>
+        <rdep.packages>openssl</rdep.packages>
+        <rdep.windows.packages>quazip</rdep.windows.packages>
+        <rdep.linux.packages>quazip</rdep.linux.packages>
 
         <project.version.code>${buildNumber}</project.version.code>
         <project.version.name>${release.version}</project.version.name>

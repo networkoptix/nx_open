@@ -169,8 +169,7 @@ protected:
 
         if (media && !(media->flags & QnAbstractMediaData::MediaFlags_LIVE) && m_continuousTimestamps)
         {
-            if (m_lastMediaTime != (qint64)AV_NOPTS_VALUE && 
-                media->timestamp - m_lastMediaTime > MAX_FRAME_DURATION*1000 &&
+            if (m_lastMediaTime != (qint64)AV_NOPTS_VALUE && media->timestamp - m_lastMediaTime > MAX_FRAME_DURATION*1000 &&
                 media->timestamp != (qint64)AV_NOPTS_VALUE && media->timestamp != DATETIME_NOW)
             {
                 m_utcShift -= (media->timestamp - m_lastMediaTime) - 1000000/60;
@@ -180,8 +179,13 @@ protected:
         }
 
         QnByteArray result(CL_MEDIA_ALIGNMENT, 0);
+        bool isArchive = !(media->flags & QnAbstractMediaData::MediaFlags_LIVE);
 
-        QnByteArray* const resultPtr = (m_dataOutput.get() && m_dataOutput->packetsInQueue() > m_maxFramesToCacheBeforeDrop) ? NULL : &result;
+        QnByteArray* const resultPtr = 
+            (m_dataOutput.get() && 
+             !isArchive && // thin out only live frames
+             m_dataOutput->packetsInQueue() > m_maxFramesToCacheBeforeDrop) ? NULL : &result;
+
         if( !resultPtr )
         {
             NX_LOG( lit("Insufficient bandwidth to %1. Skipping frame...").
@@ -193,9 +197,7 @@ protected:
         if( errCode == 0 )
         {
             if( resultPtr && result.size() > 0 )
-            {
                 sendFrame(media->timestamp, result);
-            }
         }
         else
         {
@@ -211,7 +213,6 @@ private:
     QnProgressiveDownloadingConsumer* m_owner;
     bool m_standFrameDuration;
     qint64 m_lastMediaTime;
-    qint64 m_lastSentTime;
     qint64 m_utcShift;
     std::auto_ptr<CachedOutputStream> m_dataOutput;
     const unsigned int m_maxFramesToCacheBeforeDrop;
@@ -228,8 +229,6 @@ private:
     {
         //Preparing output packet. Have to do everything right here to avoid additional frame copying
         //TODO shared chunked buffer and socket::writev is wanted very much here
-//        NX_ASSERT(timestamp - m_lastSentTime < MAX_FRAME_DURATION * 1000);
-
         QByteArray outPacket;
         if (m_owner->getTranscoder()->getVideoCodecContext()->codec_id == CODEC_ID_MJPEG)
         {
@@ -284,8 +283,11 @@ private:
 
         //sending frame
         if (m_dataOutput.get())
-        {
-            m_dataOutput->postPacket(outPacket);
+        {   // Wait if bandwidth is not sufficient inside postPacket().
+            // This is to ensure that we will send every archive packet.
+            // This shouldn't affect live packets, as we thin them out above. 
+            // Refer to processData() for details.
+            m_dataOutput->postPacket(outPacket, m_maxFramesToCacheBeforeDrop);
             if (m_dataOutput->failed())
                 m_needStop = true;
         }
@@ -623,9 +625,6 @@ void QnProgressiveDownloadingConsumer::run()
         bool isUTCRequest = !decodedUrlQuery.queryItemValue("posonly").isNull();
         auto camera = qnCameraPool->getVideoCamera(resource);
 
-        //QnVirtualCameraResourcePtr camRes = resource.dynamicCast<QnVirtualCameraResource>();
-        //if (camRes && camRes->isAudioEnabled())
-        //    d->transcoder.setAudioCodec(CODEC_ID_VORBIS, QnTranscoder::TM_FfmpegTranscode);
         bool isLive = position.isEmpty() || position == "now";
 
         QnProgressiveDownloadingDataConsumer dataConsumer(
@@ -745,6 +744,10 @@ void QnProgressiveDownloadingConsumer::run()
             sendResponse(CODE_INTERNAL_ERROR, "plain/text");
             return;
         }
+
+        QnVirtualCameraResourcePtr camRes = resource.dynamicCast<QnVirtualCameraResource>();
+        if (camRes && camRes->isAudioEnabled() && d->transcoder.isCodecSupported(CODEC_ID_VORBIS))
+            d->transcoder.setAudioCodec(CODEC_ID_VORBIS, QnTranscoder::TM_FfmpegTranscode);
 
         dataProvider->addDataProcessor(&dataConsumer);
         d->chunkedMode = true;

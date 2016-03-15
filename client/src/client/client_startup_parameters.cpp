@@ -67,7 +67,7 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc
     addParserParam(commandLineParser, &result.vsyncDisabled, "--no-vsync");
 
     /* Runtime settings */
-    addParserParam(commandLineParser, &result.versionMismatchCheckDisabled, "--no-version-mismatch-check");
+    addParserParam(commandLineParser, &result.ignoreVersionMismatch, "--no-version-mismatch-check");
 
     /* Custom uri handling */
     addParserParam(commandLineParser, &result.customUri, lit("%1://").arg(QnAppInfo::applicationUriProtocol()).toUtf8().constData());
@@ -93,7 +93,7 @@ QnStartupParameters::QnStartupParameters()
 
     , allowMultipleClientInstances(false)
     , skipMediaFolderScan(false)
-    , versionMismatchCheckDisabled(false)
+    , ignoreVersionMismatch(false)
     , vsyncDisabled(false)
     , clientUpdateDisabled(false)
     , softwareYuv(false)

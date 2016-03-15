@@ -319,6 +319,16 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& nonConstData)
     return true;
 }
 
+void QnStreamRecorder::cleanFfmpegContexts()
+{
+    for (size_t i = 0; i < m_recordingContextVector.size(); ++i)
+    {
+        QnFfmpegHelper::closeFfmpegIOContext(m_recordingContextVector[i].formatCtx->pb);
+        m_recordingContextVector[i].formatCtx->pb = 0;
+        avformat_close_input(&m_recordingContextVector[i].formatCtx);
+    }
+}
+
 bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
 {
     if (md->dataType == QnAbstractMediaData::META_V1)
@@ -367,6 +377,9 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
         {
             if (!m_recordingContextVector.empty())
                 m_recordingFinished = true;
+
+            // clear formatCtx and ioCtx
+            cleanFfmpegContexts();
 
             if (m_stopOnWriteError)
             {

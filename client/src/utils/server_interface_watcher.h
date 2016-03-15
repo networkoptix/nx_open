@@ -16,6 +16,7 @@ public:
 private slots:
     void at_connectionChanged(const QnModuleInformation &moduleInformation);
     void at_resourcePool_statusChanged(const QnResourcePtr &resource);
+    void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
 
 private:
     void updatePriaryInterface(const QnMediaServerResourcePtr &server);

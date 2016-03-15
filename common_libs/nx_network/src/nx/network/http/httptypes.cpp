@@ -38,7 +38,7 @@ namespace nx_http
         HttpHeaders::const_iterator it = headers.find( headerName );
         return it == headers.end() ? StringType() : it->second;
     }
-    
+
     HttpHeaders::iterator insertOrReplaceHeader( HttpHeaders* const headers, const HttpHeader& newHeader )
     {
         HttpHeaders::iterator existingHeaderIter = headers->lower_bound( newHeader.first );
@@ -231,8 +231,10 @@ namespace nx_http
                     return StringType("Multiple Choices");
                 case moved:
                     return StringType("Moved");
-                case moved_permanently:
+                case movedPermanently:
                     return StringType("Moved Permanently");
+                case notModified:
+                    return StringType("Not Modified");
                 case badRequest:
                     return StringType("Bad Request");
                 case unauthorized:
@@ -548,7 +550,7 @@ namespace nx_http
 
         return BufferType();
     }
-        
+
 
     ////////////////////////////////////////////////////////////
     //// class Response
@@ -764,7 +766,7 @@ namespace nx_http
             }
         }
 
-        namespace 
+        namespace
         {
             std::vector<QnByteArrayConstRef> splitQuotedString( const QnByteArrayConstRef& src, char sep )
             {
@@ -838,7 +840,7 @@ namespace nx_http
                 return false;
             userid = decodedBuf.mid( 0, sepIndex );
             password = decodedBuf.mid( sepIndex+1 );
-            
+
             return true;
         }
 
@@ -888,7 +890,7 @@ namespace nx_http
                 case AuthScheme::basic:
                     basic = new BasicCredentials();
                     break;
-                
+
                 case AuthScheme::digest:
                     digest = new DigestCredentials();
                     break;
@@ -924,7 +926,7 @@ namespace nx_http
                     break;
             }
         }
-        
+
         Authorization::~Authorization()
         {
             clear();
@@ -991,7 +993,7 @@ namespace nx_http
                     delete basic;
                     basic = nullptr;
                     break;
-                
+
                 case AuthScheme::digest:
                     delete digest;
                     digest = nullptr;

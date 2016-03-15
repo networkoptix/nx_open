@@ -26,15 +26,20 @@ int main(int argc, char **argv)
 
     for (int i = 0; i < argc; ++i)
     {
+        static const std::string SOCKET("--enforce-socket=");
+        static const std::string LOG("--log=");
+
         std::string arg(argv[i]);
-        if (arg == "--enforce-socket=tcp")
-            SocketFactory::enforceStreamSocketType(SocketFactory::SocketType::Tcp);
+        if (arg.find(SOCKET) == 0)
+        {
+            SocketFactory::enforceStreamSocketType(
+                QString::fromStdString(arg.substr(SOCKET.length())));
+        }
         else
-        if (arg == "--enforce-socket=udt")
-            SocketFactory::enforceStreamSocketType(SocketFactory::SocketType::Udt);
-        else
-        if (arg.find("--log=") == 0)
-            QnLog::initLog(QString::fromStdString(arg.substr(6)));
+        if (arg.find(LOG) == 0)
+        {
+            QnLog::initLog(QString::fromStdString(arg.substr(LOG.length())));
+        }
     }
 
     return RUN_ALL_TESTS();

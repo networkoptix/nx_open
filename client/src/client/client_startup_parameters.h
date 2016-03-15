@@ -16,7 +16,7 @@ struct QnStartupParameters
 
     bool allowMultipleClientInstances;
     bool skipMediaFolderScan;
-    bool versionMismatchCheckDisabled;
+    bool ignoreVersionMismatch;
     bool vsyncDisabled;
     bool clientUpdateDisabled;
     bool softwareYuv;

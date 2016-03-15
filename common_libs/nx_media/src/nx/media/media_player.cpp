@@ -135,7 +135,6 @@ private:
     void presentNextFrameDelayed();
 
     void presentNextFrame();
-    qint64 getDelayForNextFrameMs(const QVideoFramePtr& frame);
     qint64 getDelayForNextFrameWithAudioMs(const QVideoFramePtr& frame);
     qint64 getDelayForNextFrameWithoutAudioMs(const QVideoFramePtr& frame);
     bool initDataProvider();
@@ -249,6 +248,9 @@ void PlayerPrivate::at_gotVideoFrame()
 
 void PlayerPrivate::presentNextFrameDelayed()
 {
+    if (!videoFrameToRender)
+        return;
+
     qint64 delayToRenderMs = 0;
     if (dataConsumer && dataConsumer->audioOutput())
     {
@@ -368,14 +370,6 @@ void PlayerPrivate::updateLiveBufferState(BufferState value)
         // Too much underflow/overflow issues. Extend live buffer.
         liveBufferMs = qMin(liveBufferMs * kBufferGrowStep, kMaxLiveBufferMs);
     }
-}
-
-qint64 PlayerPrivate::getDelayForNextFrameMs(const QVideoFramePtr& frame)
-{
-    if (dataConsumer->audioOutput())
-        return getDelayForNextFrameWithAudioMs(frame);
-    else
-        return getDelayForNextFrameWithoutAudioMs(frame);
 }
 
 qint64 PlayerPrivate::getDelayForNextFrameWithAudioMs(const QVideoFramePtr& frame)

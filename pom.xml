@@ -33,7 +33,7 @@
         <nx_email.guid>{0034cf9a-0454-475d-9b54-87d4b4a6b65b}</nx_email.guid>
         <nx_streaming.guid>{3c0acd3f-d641-4690-a7c5-129cb4bea938}</nx_streaming.guid>
         <nx_media.guid>{3fbafa12-f3a7-4fd2-bafc-256427399a56}</nx_media.guid>
-        <nx_network.guid>{3F980CF-4CDB-4C0C-8AF3-AF363E6BE12A}</nx_network.guid>
+        <nx_network.guid>{71fb3cab-00f4-41a3-af08-ae0a61b8c79e}</nx_network.guid>
         <nx_utils.guid>{81BDC343-5614-4C4D-90E8-147A024BEAF4}</nx_utils.guid>
         <udt.guid>{7f5cd83f-b59e-4020-b35b-de4edaf66233}</udt.guid>
         <cloud_db_client.guid>{0F7C2BCF-DA0B-4E2E-8F4B-564AE63FAD73}</cloud_db_client.guid>
@@ -100,7 +100,7 @@
 
         <!-- Build Defaults -->
         <license.environment>production</license.environment>
-        <build.configuration>release</build.configuration>
+        <build.configuration>debug</build.configuration>
         <buildNumber>0</buildNumber>
         <skip.sign>true</skip.sign>
         <box>none</box>
@@ -125,18 +125,19 @@
         <compiler.arguments />
 
         <libdir>${root.dir}/build_environment/target</libdir>
-        <qt.path>artifacts/qt/${qt.version}/${platform}/${arch}/${box}</qt.path>
+        <rdep.target>${platform}-${arch}</rdep.target>
+        <qt.path>packages/${rdep.target}/qt-${qt.version}</qt.path>
         <qt.dir>${environment.dir}/${qt.path}</qt.dir>
          <!-- Can take values 'pdb', 'src' or both ('pdb, src')  -->
         <qt.debug></qt.debug>
         <ClientHelpSourceDir>${environment.dir}/help/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}/${customization}</ClientHelpSourceDir>
-        <ClientVoxSourceDir>${environment.dir}/festival.vox/lib</ClientVoxSourceDir>
+        <ClientVoxSourceDir>${libdir}/${arch}/bin/release/vox</ClientVoxSourceDir>
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
         <unpack.skip>false</unpack.skip>
         <resources.phase>generate-sources</resources.phase>
         <qt.version>5.6.0</qt.version>
         <ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
-        <openssl.version>1.0.2e-SNAPSHOT</openssl.version>
+        <openssl.version>1.0.2e</openssl.version>
         <openldap.version>2.4.42-SNAPSHOT</openldap.version>
         <sasl2.version>2.1.26-SNAPSHOT</sasl2.version>
         <protobuf.version>2.6.0-SNAPSHOT</protobuf.version>
@@ -144,7 +145,7 @@
         <sigar.version>1.7-SNAPSHOT</sigar.version>
         <festival.version>2.4-SNAPSHOT</festival.version>
         <boost.version>1.56-SNAPSHOT</boost.version>
-        <quazip.version>0.7.1-SNAPSHOT</quazip.version>
+        <quazip.version>0.7.1</quazip.version>
 
         <!-- Set parent (parent.customization) and child (customization) customizations here -->
         <customization>default</customization>
@@ -159,16 +160,25 @@
         <qtlibs>
             Core, Network, Xml, Concurrent, Sql, Multimedia, OpenGL, Widgets, Gui, X11Extras,
             PrintSupport, MultimediaWidgets, Quick, MultimediaQuick_p, Qml,
-            XmlPatterns
+            XmlPatterns, XcbQpa
         </qtlibs>
         <additional.qtlibs/>
 
         <!--QT plugins used-->
         <qtplugins>
-            imageformats, platforms
+            imageformats, platforms, xcbglintegrations
         </qtplugins>
         <additional.qtplugins/>
 
+        <!-- List of commonly used RDep packages -->
+        <rdep.packages/>
+        <rdep.windows.packages/>
+        <rdep.linux.packages/>
+        <rdep.mac.packages/>
+        <rdep.android.packages/>
+        <rdep.ios.packages/>
+        
+        
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
@@ -551,8 +561,6 @@
             <properties>
                 <platform>linux</platform>
                 <qt.spec>linux-g++</qt.spec>
-                <qt.path>artifacts/qt/${qt.version}/${platform}/${arch}/${box}/${build.configuration}</qt.path>
-                <qt.classifier>${platform}-${arch}-${build.configuration}</qt.classifier>
             </properties>
             <modules>
                 <!--<module>plugins/xvbadecoder</module>-->
@@ -568,7 +576,6 @@
             </activation>
             <properties>
                 <additional.compiler>clang</additional.compiler>
-                <qt.classifier>${platform}-${arch}</qt.classifier>
                 <python.executable>python</python.executable>
                 <python.virtualenv>virtualenv</python.virtualenv>
             </properties>
@@ -637,7 +644,6 @@
             <properties>
                 <build.suffix>${box}-${arch}</build.suffix>
                 <qt.spec>linux-arm-gnueabi-g++</qt.spec>
-                <qt.classifier>${platform}-${arch}-${box}</qt.classifier>
                 <compile.option1/>
                 <libdir>${root.dir}/build_environment/target-${box}</libdir>
             </properties>
@@ -664,9 +670,10 @@
                 <toolchain.version>codesourcery-2014.05</toolchain.version>
                 <compiler>2011.09</compiler>
                 <qt.spec>linux-arm-gnueabi-g++-2014.05</qt.spec>
-                <openssl.version>1.0.0j-SNAPSHOT</openssl.version>
+                <openssl.version>1.0.0j</openssl.version>
                 <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
                 <modification>isd</modification>
+                <rdep.target>isd</rdep.target>
             </properties>
             <modules>
                 <module>plugins/isd_native_plugin</module>
@@ -691,9 +698,10 @@
                 <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
                 <toolchain.version>linaro-multilib-2013.09</toolchain.version>
                 <compiler>${toolchain.version}</compiler>
-                <openssl.version>1.0.1f-SNAPSHOT</openssl.version>
+                <openssl.version>1.0.1f</openssl.version>
                 <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
                 <modification>isd_s2</modification>
+                <rdep.target>isd_s2</rdep.target>
             </properties>
             <modules>
                 <module>plugins/isd_native_plugin</module>
@@ -717,9 +725,10 @@
             <properties>
                 <toolchain.version>rpi</toolchain.version>
                 <compiler>${toolchain.version}</compiler>
-                <openssl.version>1.0.0j-SNAPSHOT</openssl.version>
+                <openssl.version>1.0.0j</openssl.version>
                 <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
                 <modification>rpi</modification>
+                <rdep.target>rpi</rdep.target>
             </properties>
             <modules>
                 <!--<module>plugins/rpi_cam</module>-->
@@ -742,12 +751,13 @@
                 </property>
             </activation>
             <properties>
-                <quazip.version>0.7-SNAPSHOT</quazip.version>
+                <quazip.version>0.7</quazip.version>
                 <toolchain.version>rpi</toolchain.version>
                 <compiler>bpi</compiler>
-                <openssl.version>1.0.0j-SNAPSHOT</openssl.version>
+                <openssl.version>1.0.0j</openssl.version>
                 <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
                 <modification>bpi</modification>
+                <rdep.target>bpi</rdep.target>
             </properties>
             <modules>
                 <!-- Banana pie uses same distro as rpi -->
@@ -768,13 +778,13 @@
                 </property>
             </activation>
             <properties>
-                <quazip.version>0.7-SNAPSHOT</quazip.version>
+                <quazip.version>0.7</quazip.version>
                 <toolchain.version>rpi</toolchain.version>
                 <compiler>bpi</compiler>
-                <openssl.version>1.0.0j-SNAPSHOT</openssl.version>
+                <openssl.version>1.0.0j</openssl.version>
                 <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
                 <modification>bananapi</modification>
-                <qt.classifier>${platform}-${arch}-bpi</qt.classifier>
+                <rdep.target>bpi</rdep.target>
             </properties>
             <modules>
                 <!-- Banana pie uses same distro as rpi -->
@@ -880,7 +890,6 @@
                 </property>
             </activation>
             <properties>
-                <qt.version>5.6.0</qt.version>
                 <compile.options/>
                 <additional.qtplugins>audio</additional.qtplugins>
             </properties>
@@ -909,8 +918,8 @@
             <properties>
                 <platform>android</platform>
                 <toolchain.version>android</toolchain.version>
+                <qt.version>5.5.1</qt.version>
                 <qt.spec>android-g++</qt.spec>
-                <qt.classifier>${platform}-${arch}</qt.classifier>
                 <libdir>${root.dir}/build_environment/target</libdir>
                 <compiler>gcc</compiler>
                 <additional.compiler>gcc</additional.compiler>
@@ -919,9 +928,10 @@
                 <android.ndk>${environment.dir}/android/android-ndk</android.ndk>
                 <android.ndk.host>linux-x86_64</android.ndk.host>
                 <android.toolchain.version>4.8</android.toolchain.version>
-                <openssl.version>1.0.2d-SNAPSHOT</openssl.version>
+                <openssl.version>1.0.2d</openssl.version>
                 <additional.defines>DISABLE_FFMPEG</additional.defines>
                 <compile.option1/>
+                <rdep.target>android</rdep.target>
             </properties>
         </profile>
         <profile>
@@ -937,7 +947,6 @@
                 </file>
             </activation>
             <properties>
-                <qt.classifier>${platform}-${arch}-release</qt.classifier>
                 <additional.compiler>${compiler}</additional.compiler>
             </properties>
         </profile>
@@ -963,13 +972,13 @@
                 <platform>ios</platform>
                 <toolchain.version>ios</toolchain.version>
                 <qt.spec>macx-ios-clang</qt.spec>
-                <qt.classifier>${platform}-${arch}</qt.classifier>
                 <libdir>${root.dir}/build_environment/target</libdir>
                 <compiler>clang</compiler>
                 <additional.compiler>clang</additional.compiler>
                 <profile.classifier>${platform}-${arch}</profile.classifier>
-                <openssl.version>1.0.1i-SNAPSHOT</openssl.version>
+                <openssl.version>1.0.1i</openssl.version>
                 <compile.option1/>
+                <rdep.target>ios</rdep.target>
             </properties>
         </profile>
     </profiles>

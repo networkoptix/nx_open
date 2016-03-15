@@ -1,5 +1,7 @@
 #include "android_video_decoder.h"
 
+#if defined(Q_OS_ANDROID)
+
 #include <deque>
 
 #include <QtGui/QOpenGLContext>
@@ -13,10 +15,8 @@
 #include <QCache>
 #include <QMap>
 
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 #include <utils/media/h264_utils.h>
-
-#if defined(Q_OS_ANDROID)
 
 #include <QAndroidJniObject>
 #include <QAndroidJniEnvironment>
@@ -58,6 +58,16 @@ namespace {
             default:
                 return QString();
         }
+    }
+
+    void fillInputBuffer(JNIEnv *env, jobject thiz, jobject buffer, jlong srcDataPtr, jint dataSize, jint capacity)
+    {
+        Q_UNUSED(thiz);
+        void* bytes = env->GetDirectBufferAddress(buffer);
+        void* srcData = (void*) srcDataPtr;
+        if (capacity < dataSize)
+            qWarning() << "fillInputBuffer: capacity less then dataSize." << capacity << "<" << dataSize;
+        memcpy(bytes, srcData, qMin(dataSize, capacity));
     }
 }
 
@@ -113,12 +123,6 @@ private:
 // --------------------------------------------------------------------------------------------------
 
 
-void fillInputBuffer(JNIEnv *env, jobject thiz, jobject buffer, jlong srcDataPtr, jint dataSize)
-{
-    void* bytes = env->GetDirectBufferAddress(buffer);
-    void* srcData = (void*) srcDataPtr;
-    memcpy(bytes, srcData, dataSize);
-}
 
 // ------------------------- AndroidVideoDecoderPrivate -------------------------
 
@@ -130,7 +134,7 @@ public:
     AndroidVideoDecoderPrivate():
         frameNumber(0),
         initialized(false),
-        javaDecoder("com/networkoptix/nxwitness/media/QnMediaDecoder"),
+        javaDecoder("com/networkoptix/nxwitness/media/QnVideoDecoder"),
         program(nullptr)
     {
         registerNativeMethods();
@@ -164,7 +168,7 @@ public:
         using namespace std::placeholders;
 
         JNINativeMethod methods[] {
-            {"fillInputBuffer", "(Ljava/nio/ByteBuffer;JI)V", reinterpret_cast<void *>(nx::media::fillInputBuffer)}
+            {"fillInputBuffer", "(Ljava/nio/ByteBuffer;JII)V", reinterpret_cast<void *>(nx::media::fillInputBuffer)}
         };
 
         QAndroidJniEnvironment env;
@@ -363,7 +367,7 @@ bool AndroidVideoDecoder::isCompatible(const CodecID codec, const QSize& resolut
     if (!maxDecoderSize.contains(codec))
     {
         QAndroidJniObject jCodecName = QAndroidJniObject::fromString(codecMimeType);
-        QAndroidJniObject javaDecoder("com/networkoptix/nxwitness/media/QnMediaDecoder");
+        QAndroidJniObject javaDecoder("com/networkoptix/nxwitness/media/QnVideoDecoder");
         jint maxWidth = javaDecoder.callMethod<jint>("maxDecoderWidth", "(Ljava/lang/String;)I", jCodecName.object<jstring>());
         jint maxHeight = javaDecoder.callMethod<jint>("maxDecoderHeight", "(Ljava/lang/String;)I", jCodecName.object<jstring>());
         QSize size(maxWidth, maxHeight);

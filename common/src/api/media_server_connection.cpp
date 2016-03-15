@@ -310,7 +310,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
 // -------------------------------------------------------------------------- //
 // QnMediaServerConnection
 // -------------------------------------------------------------------------- //
-QnMediaServerConnection::QnMediaServerConnection(QnMediaServerResource* mserver, const QnUuid &videowallGuid, bool enableOfflineRequests, QObject *parent):
+QnMediaServerConnection::QnMediaServerConnection(const QnMediaServerResourcePtr& mserver, const QnUuid &videowallGuid, bool enableOfflineRequests, QObject *parent):
     base_type(parent, mserver),
     m_proxyPort(0),
     m_enableOfflineRequests(enableOfflineRequests)

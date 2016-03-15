@@ -24,6 +24,7 @@ public:
     ~QnFfmpegTranscoder();
 
     int setContainer(const QString& value);
+    bool isCodecSupported(CodecID id) const;
 
     AVCodecContext* getVideoCodecContext() const;
     AVCodecContext* getAudioCodecContext() const;

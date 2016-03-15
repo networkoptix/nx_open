@@ -5,6 +5,7 @@
 #include <nx/utils/thread/barrier_handler.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/stun/cc/custom_stun.h>
+#include <utils/serialization/lexical.h>
 
 static const auto DNS_CACHE_TIME = std::chrono::seconds(10);
 static const auto MEDIATOR_CACHE_TIME = std::chrono::minutes(1);
@@ -146,7 +147,7 @@ void AddressResolver::resolveDomain(
             nx::hpm::api::ResolveDomainResponse response)
         {
             NX_LOGX(lm("Domain %1 resolution on mediator result: %1")
-                .arg(domain.toString()).arg(nx::hpm::api::toString(resultCode)),
+                .arg(domain.toString()).arg(QnLexical::serialized(resultCode)),
                 cl_logDEBUG2);
 
             std::vector<TypedAddres> subdomains;

@@ -79,7 +79,8 @@ void QnCloudStatusPanelPrivate::updateUi()
 
     QnCloudStatusWatcher *cloudStatusWatcher = qnCommon->instance<QnCloudStatusWatcher>();
 
-    if (cloudStatusWatcher->status() == QnCloudStatusWatcher::LoggedOut)
+    const bool isLogged = (cloudStatusWatcher->status() == QnCloudStatusWatcher::Online);
+    if (!isLogged)
     {
         q->setText(tr("Login to cloud..."));
         q->setIcon(QIcon());
@@ -88,7 +89,7 @@ void QnCloudStatusPanelPrivate::updateUi()
     }
 
     // TODO: #dklychkov display status
-    if (cloudStatusWatcher->status() == QnCloudStatusWatcher::Online)
+    if (isLogged)
         q->setPalette(originalPalette);
     else
         setWarningStyle(q);
