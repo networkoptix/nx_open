@@ -1,13 +1,13 @@
 #include "api_statistics.h"
-#include "api_model_functions_impl.h"
-#include "core/resource/param.h"
 
-#include <utils/serialization/lexical.h>
+#include <core/resource/param.h>
 #include <core/resource/resource_type.h>
+
+#include <utils/common/model_functions.h>
 
 const static QString __CAMERA_EXCEPT_PARAMS[] = {
 	Qn::CAMERA_CREDENTIALS_PARAM_NAME,
-    Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME, 
+    Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME,
 //     Qn::CAMERA_SETTINGS_ID_PARAM_NAME,
 //     Qn::PHYSICAL_CAMERA_SETTINGS_XML_PARAM_NAME,
 	Qn::CAMERA_ADVANCED_PARAMETERS,

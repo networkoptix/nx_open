@@ -1,5 +1,6 @@
 #include "api_reverse_connection_data.h"
-#include "api_model_functions_impl.h"
+
+#include <utils/common/model_functions.h>
 
 namespace ec2 {
 
