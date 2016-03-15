@@ -146,7 +146,7 @@ static void calcHardwareId(QString &hardwareId, const QnHardwareInfo& hi, int ve
         hardwareId.clear();
     }
 
-    if (version == 4 && hi.mac.length() > 0)
+    if ((version == 4 || version == 5) && hi.mac.length() > 0)
         hardwareId += hi.mac;
 }
 
