@@ -35,6 +35,10 @@ public: // Properties
     void setEnabled(bool isEnabled);
 
 public slots:
+    void connectToServer(const QString &serverUrl
+        , const QString &userName
+        , const QString &password);
+
     void connectToAnotherSystem();
 
     void tryHideScreen();
