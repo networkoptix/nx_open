@@ -608,6 +608,7 @@ bool QnFileStorageResource::isAvailable() const
     // remount attempt in initOrUpdate()
     if (!m_writeCapCached)
         m_valid = false;
+        return false;
     m_cachedTotalSpace = getDiskTotalSpace(
         localPathCopy.isEmpty() ? getPath() : localPathCopy
     ); // update cached value periodically
