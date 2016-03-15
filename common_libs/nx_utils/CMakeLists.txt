@@ -1,5 +1,3 @@
-cmake_minimum_required(VERSION 3.0)
-
 # Default configuration values. These must be before the project command or
 # they won't work in Windows.
 # If no build type is specified, default to "Release"
