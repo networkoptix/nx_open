@@ -165,6 +165,7 @@ include_directories($ENV{environment}/boost_1_56_0
                     $ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}/include/QtQuick/${qt.version}
                     $ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}/include/QtQuick
                     $ENV{environment}/artifacts/openal/${openal.version}/include
+                    $ENV{environment}/artifacts/openssl/${openssl.version}/include
                     $ENV{environment}/artifacts/openal/${openal.version}/include/AL
                     $ENV{environment}/artifacts/directx/${directx.version}/include
                     $ENV{environment}/artifacts/festival/${festival.version}/include
@@ -173,6 +174,7 @@ include_directories($ENV{environment}/boost_1_56_0
                     $ENV{environment}/artifacts/gtest/${gtest.version}/include
                     $ENV{environment}/artifacts/mfx/${mfx.version}/include
                     $ENV{environment}/artifacts/onvif/${onvif.version}/include
+                    $ENV{environment}/artifacts/quazip/${quazip.version}/include
                     $ENV{environment}/artifacts/sigar/${sigar.version}/include
                     $ENV{environment}/artifacts/vmax_integration/${vmax_integration.version}/include
                     )
@@ -180,6 +182,7 @@ include_directories($ENV{environment}/boost_1_56_0
 LINK_DIRECTORIES(${CMAKE_BINARY_DIR}/common
                 $ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}
                 $ENV{environment}/artifacts/openal/${openal.version}/${platform}/${box}/${arch}/lib/${configuration}
+                $ENV{environment}/artifacts/openssl/${openssl.version}/${platform}/${box}/${arch}/lib/${configuration}
                 $ENV{environment}/artifacts/directx/${directx.version}/${platform}/${box}/${arch}/lib/${configuration}
                 $ENV{environment}/artifacts/festival/${festival.version}/${platform}/${box}/${arch}/lib/${configuration}
                 $ENV{environment}/artifacts/ffmpeg/${ffmpeg.version}/${platform}/${box}/${arch}/lib/${configuration}
@@ -187,6 +190,7 @@ LINK_DIRECTORIES(${CMAKE_BINARY_DIR}/common
                 $ENV{environment}/artifacts/gtest/${gtest.version}/${platform}/${box}/${arch}/lib/${configuration}
                 $ENV{environment}/artifacts/mfx/${mfx.version}/${platform}/${box}/${arch}/lib/${configuration}
                 $ENV{environment}/artifacts/onvif/${onvif.version}/${platform}/${box}/${arch}/lib/${configuration}
+                $ENV{environment}/artifacts/quazip/${quazip.version}/${platform}/${box}/${arch}/lib/${configuration}
                 $ENV{environment}/artifacts/sigar/${sigar.version}/${platform}/${box}/${arch}/lib/${configuration}
                 $ENV{environment}/artifacts/vmax_integration/${vmax_integration.version}/${platform}/${box}/${arch}/lib/${configuration}
                 )
