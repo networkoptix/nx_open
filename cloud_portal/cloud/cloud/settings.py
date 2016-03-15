@@ -184,7 +184,7 @@ ADMINS = (('Evgeny', 'ebalashov@networkoptix.com'),)
 
 DEFAULT_FROM_EMAIL = 'service@networkoptix.com'
 SERVER_EMAIL = 'service@networkoptix.com'
-EMAIL_SUBJECT_PREFIX = '[CLOUD_PORTAL]'
+EMAIL_SUBJECT_PREFIX = '[CLOUD_PORTAL] '
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'service@networkoptix.com'
 EMAIL_HOST_PASSWORD = 'kbnUk06boqBkwU'
