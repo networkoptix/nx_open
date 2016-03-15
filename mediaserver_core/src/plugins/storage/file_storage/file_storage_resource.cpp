@@ -607,11 +607,13 @@ bool QnFileStorageResource::isAvailable() const
     // write check fail is a cause to set dirty to true, thus enabling
     // remount attempt in initOrUpdate()
     if (!m_writeCapCached)
+    {
         m_valid = false;
         return false;
-    m_cachedTotalSpace = getDiskTotalSpace(
-        localPathCopy.isEmpty() ? getPath() : localPathCopy
-    ); // update cached value periodically
+    }
+    m_cachedTotalSpace = getDiskTotalSpace(localPathCopy.isEmpty() ? 
+                                           getPath() : 
+                                           localPathCopy); // update cached value periodically
     return *m_writeCapCached;
 }
 
