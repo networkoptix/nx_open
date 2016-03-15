@@ -4,7 +4,7 @@ describe('Login suite', function () {
 
     var p = new LoginPage();
 
-    it("should open login dialog in anonimous state", function () {
+    it("should open login dialog in anonymous state", function () {
         p.get();
         expect((p.dialogLoginButton).isDisplayed()).toBe(true);
     });
