@@ -57,7 +57,7 @@ set (gtest.version "1.7.0")
 set (mfx.version "2012-R2")
 set (onvif.version "2.1.2-io")
 set (openssl.version "1.0.2e")
-set (quazip.version "0.6.2")
+set (quazip.version "0.7.1")
 set (sigar.version "1.7")
 set (vmax_integration.version "2.1")
 set (qt.version 5.6.0)
@@ -140,6 +140,8 @@ include(add_translations)
 include(process_rc)
 include(process_resources)
 include(precompiled_header)
+include(python_exec)
+include(external_dependencies)
 
 include_directories($ENV{environment}/boost_1_56_0
                     ${CMAKE_SOURCE_DIR}/common/src
@@ -170,8 +172,6 @@ include_directories($ENV{environment}/boost_1_56_0
                     $ENV{environment}/artifacts/gtest/${gtest.version}/include
                     $ENV{environment}/artifacts/mfx/${mfx.version}/include
                     $ENV{environment}/artifacts/onvif/${onvif.version}/include
-                    $ENV{environment}/artifacts/openssl/${openssl.version}/include
-                    $ENV{environment}/artifacts/quazip/${quazip.version}/include
                     $ENV{environment}/artifacts/sigar/${sigar.version}/include
                     $ENV{environment}/artifacts/vmax_integration/${vmax_integration.version}/include
                     )
@@ -186,8 +186,6 @@ LINK_DIRECTORIES(${CMAKE_BINARY_DIR}/common
                 $ENV{environment}/artifacts/gtest/${gtest.version}/${platform}/${box}/${arch}/lib/${configuration}
                 $ENV{environment}/artifacts/mfx/${mfx.version}/${platform}/${box}/${arch}/lib/${configuration}
                 $ENV{environment}/artifacts/onvif/${onvif.version}/${platform}/${box}/${arch}/lib/${configuration}
-                $ENV{environment}/artifacts/openssl/${openssl.version}/${platform}/${box}/${arch}/lib/${configuration}
-                $ENV{environment}/artifacts/quazip/${quazip.version}/${platform}/${box}/${arch}/lib/${configuration}
                 $ENV{environment}/artifacts/sigar/${sigar.version}/${platform}/${box}/${arch}/lib/${configuration}
                 $ENV{environment}/artifacts/vmax_integration/${vmax_integration.version}/${platform}/${box}/${arch}/lib/${configuration}
                 )
