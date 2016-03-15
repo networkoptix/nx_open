@@ -4,30 +4,30 @@ describe('Login suite', function () {
 
     var p = new LoginPage();
 
-    // it("should open register page in anonimous state by clicking Register button on top right corner", function () {
-    //     p.getHomePage();
+    it("should open register page in anonimous state by clicking Register button on top right corner", function () {
+        p.getHomePage();
 
-    //     p.openRegisterButton.click();
+        p.openRegisterButton.click();
 
-    //     expect(browser.getCurrentUrl()).toContain('register');
-    //     expect(p.htmlBody.getText()).toContain('Register to be happy');
-    // });
+        expect(browser.getCurrentUrl()).toContain('register');
+        expect(p.htmlBody.getText()).toContain('Register to be happy');
+    });
 
-    // it("should open register page in anonimous state by clicking Register button on homepage", function () {
-    //     p.getHomePage();
+    it("should open register page in anonimous state by clicking Register button on homepage", function () {
+        p.getHomePage();
 
-    //     p.openRegisterButtonAdv.click();
+        p.openRegisterButtonAdv.click();
 
-    //     expect(browser.getCurrentUrl()).toContain('register');
-    //     expect(p.htmlBody.getText()).toContain('Register to be happy');
-    // });
+        expect(browser.getCurrentUrl()).toContain('register');
+        expect(p.htmlBody.getText()).toContain('Register to be happy');
+    });
 
-    // it("should open register page in anonimous state", function () {
-    //     p.getByLink();
+    it("should open register page in anonimous state", function () {
+        p.getByLink();
 
-    //     expect(browser.getCurrentUrl()).toContain('register');
-    //     expect(p.htmlBody.getText()).toContain('Register to be happy');
-    // });
+        expect(browser.getCurrentUrl()).toContain('register');
+        expect(p.htmlBody.getText()).toContain('Register to be happy');
+    });
 
     it("should register user with correct credentials", function () {
         p.getByLink();
@@ -87,32 +87,73 @@ describe('Login suite', function () {
         p.checkInputInvalid(p.emailInput, p.invalidClass);
     });
 
-    // it("should not allow to register with password with cyrillic symbols", function () {
-    //     p.getByLink();
-    //     expect("test").toBe("written");
-    // });
-    // it("should not allow to register with password with tm symbols", function () {
-    //     p.getByLink();
-    //     expect("test").toBe("written");
-    // });  
-    // it("should show warnings about password strength", function () {
-    //     p.getByLink();
-    //     expect("test").toBe("written");
-    // });
-    // it("should show warnings about password strength", function () {
-    //     p.getByLink();
-    //     expect("test").toBe("written");
-    // });
-    // it("should open Terms and conditions in a new page", function () {
-    //     p.getByLink();
-    //     expect("test").toBe("written");
-    // });
-    // it("should actally show Terms and conditions", function () {
-    //     p.getByLink();
-    //     expect("test").toBe("written");
-    // });
-    // it("should not allow registration with existing email and show error", function () {
-    //     p.getByLink();
-    //     expect("test").toBe("written");
-    // });
+    it("should not allow to register with password with cyrillic symbols", function () {
+        p.getByLink();
+
+        p.firstNameInput.sendKeys(p.userFirstNameRandom);
+        p.lastNameInput.sendKeys(p.userLastName);
+        p.emailInput.sendKeys(p.userEmailRandom);
+        p.passwordInput.sendKeys('йцукефыва123');
+
+        p.submitRegisterButton.click();
+
+        p.checkPasswordInvalid(p.invalidClass);
+    });
+
+    it("should not allow to register with password with tm symbols", function () {
+        p.getByLink();
+        expect("test").toBe("written");
+    });
+
+    it("should show warnings about password strength", function () {
+        p.getByLink();
+
+        p.passwordInput.sendKeys('qwe');
+        p.checkPasswordWarning(p.passwordWeak);
+
+        p.passwordInput.clear();
+        p.passwordInput.sendKeys('qwerty');
+        p.checkPasswordWarning(p.passwordCommon);
+        p.passwordInput.clear();
+        p.passwordInput.sendKeys('password');
+        p.checkPasswordWarning(p.passwordCommon);
+        p.passwordInput.clear();
+        p.passwordInput.sendKeys('12345678');
+        p.checkPasswordWarning(p.passwordCommon);
+
+        p.passwordInput.clear();
+        p.passwordInput.sendKeys('asdoiu');
+        p.checkPasswordWarning(p.passwordFair);
+
+        p.passwordInput.clear();
+        p.passwordInput.sendKeys('asdoiu2Q#');
+        p.checkPasswordWarning(p.passwordGood);
+    });
+
+    it("should open Terms and conditions in a new page", function () {
+        p.getByLink();
+        p.termsConditions.click();
+
+        // Switch to just opened new tab
+        browser.getAllWindowHandles().then(function (handles) {
+            var newWindowHandle = handles[1];
+            browser.switchTo().window(newWindowHandle).then(function () {
+                expect(browser.getCurrentUrl()).toContain('static/eula'); // Check that url is correct
+                expect(p.htmlBody.getText()).toContain('Terms and conditions'); // Check that it is Terms and conditions page
+            });
+        });
+    });
+
+    it("should not allow registration with existing email and show error", function () {
+        p.getByLink();
+
+        p.firstNameInput.sendKeys(p.userFirstNameRandom);
+        p.lastNameInput.sendKeys(p.userLastName);
+        p.emailInput.sendKeys(p.userEmailExisting);
+        p.passwordInput.sendKeys(p.userPassword);
+
+        p.submitRegisterButton.click();
+
+        p.checkEmailExists();
+    });
 });

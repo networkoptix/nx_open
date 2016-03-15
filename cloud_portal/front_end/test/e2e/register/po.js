@@ -21,6 +21,7 @@ var LoginPage = function () {
 
     var randomNumber = Math.floor((Math.random() * 100)+10); // Random number between 10 and 100
     this.userEmailRandom = 'ekorneeva+' + randomNumber + '@networkoptix.com'; // valid email with random number between 10 and 100
+    this.userEmailExisting = 'ekorneeva+1@networkoptix.com'; // valid existing email
     this.userFirstNameRandom = 'TestFirstName' + randomNumber;
     this.userLastName = 'TestLastName';
     this.userPassword = 'qweasd123';
@@ -33,7 +34,6 @@ var LoginPage = function () {
     this.emailInput = element(by.model('account.email'));
     this.passwordGroup = element(by.model('account.password'));
     this.passwordInput = this.passwordGroup.element(by.css('input[type=password]'));
-
 
     this.submitRegisterButton = element(by.css('[form=registerForm]')).element(by.buttonText('Register'));
 
@@ -56,6 +56,7 @@ var LoginPage = function () {
 
     this.invalidClassRequired = 'ng-invalid-required';
     this.invalidClass = 'ng-invalid';
+    this.invalidClassExists = 'ng-invalid-already-exists';
 
     this.checkInputInvalid = function(field, invalidClass) {
         expect(field.getAttribute('class')).toContain(invalidClass);
@@ -76,6 +77,24 @@ var LoginPage = function () {
         expect(this.passwordInput.getAttribute('class')).not.toContain(invalidClass);
         expect(this.passwordGroup.$('.form-group').getAttribute('class')).not.toContain('has-error');
     }
+
+    this.checkEmailExists = function() {
+        this.checkInputInvalid(this.emailInput, this.invalidClassExists);
+        expect(this.fieldWrap(this.emailInput).$('.help-block').getText()).toContain('Email is already registered in portal');
+    }
+
+    this.passwordControlContainer = this.passwordGroup.element(by.css('.help-block'));
+    this.passwordWeak = { class:'label-danger', text:'too short', title: 'Password must contain at least 6 characters' };
+    this.passwordCommon = { class:'label-danger', text:'too common', title: 'This password is in top most popular passwords in the world' };
+    this.passwordFair = { class:'label-warning', text:'fair', title: 'Use numbers, symbols in different case and special symbols to make your password stronger' };
+    this.passwordGood = { class:'label-success', text:'good', title: '' };
+
+    this.checkPasswordWarning = function(strength) {
+        expect(this.passwordControlContainer.element(by.css('.label')).getAttribute('class')).toContain(strength.class);
+        expect(this.passwordControlContainer.element(by.css('.label')).getText()).toContain(strength.text);
+    }
+
+    this.termsConditions = element(by.linkText('Terms and Conditions'));
 };
 
 module.exports = LoginPage;
