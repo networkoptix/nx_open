@@ -12,11 +12,13 @@ endif()
 if (WIN32 AND NOT CMAKE_INSTALL_PREFIX)
   set(CMAKE_INSTALL_PREFIX dist CACHE STRING "Install path prefix.")
 endif()
-              
+
 project(applauncher)
 set(PROJECT_SHORTNAME "applauncher")
 set(PROJECT_LONGNAME "${nxtool.company.name} Application Launcher")
-set(WINDOWS_RES_FILE ${PROJECT_BINARY_DIR}/${PROJECT_SHORTNAME}.obj)
+if(WIN32)
+    set(WINDOWS_RES_FILE ${PROJECT_BINARY_DIR}/${PROJECT_SHORTNAME}.obj)
+endif()
 include(default_project_properties)
 
 # Additional Include Directories
