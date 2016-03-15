@@ -128,7 +128,7 @@ bool QnUuid::operator>(const QnUuid& other) const
     return m_uuid > other.m_uuid;
 }
 
-QnUuid QnUuid::fromRfc4122( const QByteArray& bytes )
+QnUuid QnUuid::fromRfc4122(const QByteArray& bytes)
 {
     QnUuid _uuid;
     _uuid.m_uuid = QUuid::fromRfc4122( bytes );

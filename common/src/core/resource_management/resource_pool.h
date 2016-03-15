@@ -148,7 +148,6 @@ public:
     QnResourceList getResourcesWithTypeId(QnUuid id) const;
 
     QnResourcePtr getIncompatibleResourceById(const QnUuid &id, bool useCompatible = false) const;
-    QnResourcePtr getIncompatibleResourceByUniqueId(const QString &uid) const;
     QnResourceList getAllIncompatibleResources() const;
 
     template<class Cond>

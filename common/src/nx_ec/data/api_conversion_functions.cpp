@@ -362,7 +362,7 @@ void fromApiToResource(const ApiLayoutItemData &src, QnLayoutItemData &dst) {
 }
 
 void fromResourceToApi(const QnLayoutItemData &src, ApiLayoutItemData &dst) {
-    dst.id = src.uuid.toByteArray();
+    dst.id = src.uuid;
     dst.flags = src.flags;
     dst.left = src.combinedGeometry.topLeft().x();
     dst.top = src.combinedGeometry.topLeft().y();
@@ -375,7 +375,7 @@ void fromResourceToApi(const QnLayoutItemData &src, ApiLayoutItemData &dst) {
     dst.zoomTop = src.zoomRect.topLeft().y();
     dst.zoomRight = src.zoomRect.bottomRight().x();
     dst.zoomBottom = src.zoomRect.bottomRight().y();
-    dst.zoomTargetId = src.zoomTargetUuid.toByteArray();
+    dst.zoomTargetId = src.zoomTargetUuid;
     dst.contrastParams = src.contrastParams.serialize();
     dst.dewarpingParams = QJson::serialized(src.dewarpingParams);
     dst.displayInfo = src.displayInfo;

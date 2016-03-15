@@ -2325,12 +2325,12 @@ void MediaServerProcess::run()
 
     auto updateCloudProperties = [this](const QnUserResourcePtr& admin)
     {
-        auto cloudSystemId = admin->getProperty(Qn::CLOUD_SYSTEM_ID);
+        QnUuid cloudSystemId = QnUuid::fromStringSafe(admin->getProperty(Qn::CLOUD_SYSTEM_ID));
         auto cloudAuthKey = admin->getProperty(Qn::CLOUD_SYSTEM_AUTH_KEY);
-        if (!cloudSystemId.isEmpty() && !cloudAuthKey.isEmpty())
+        if (!cloudSystemId.isNull() && !cloudAuthKey.isEmpty())
         {
             nx::hpm::api::SystemCredentials credentials(
-                QnUuid(cloudSystemId).toSimpleString().toUtf8(),
+                cloudSystemId.toSimpleString().toUtf8(),
                 qnCommon->moduleGUID().toSimpleString().toUtf8(),
                 cloudAuthKey.toUtf8());
 

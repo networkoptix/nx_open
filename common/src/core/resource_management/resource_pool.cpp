@@ -562,11 +562,6 @@ QnResourcePtr QnResourcePool::getIncompatibleResourceById(const QnUuid &id, bool
     return QnResourcePtr();
 }
 
-QnResourcePtr QnResourcePool::getIncompatibleResourceByUniqueId(const QString &uid) const {
-    QnMutexLocker locker( &m_resourcesMtx );
-    return m_incompatibleResources.value(uid);
-}
-
 QnResourceList QnResourcePool::getAllIncompatibleResources() const {
     QnMutexLocker locker( &m_resourcesMtx );
     return m_incompatibleResources.values();
