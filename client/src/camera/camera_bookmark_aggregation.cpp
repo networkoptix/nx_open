@@ -12,7 +12,7 @@ bool QnCameraBookmarkAggregation::addBookmark(const QnCameraBookmark &bookmark)
 {
 #ifdef _DEBUG
     /* C++ asserts are required for unit tests to work correctly. */
-    assert(!bookmark.isNull());
+    NX_ASSERT(!bookmark.isNull());
 #endif
     QN_LOG_TIME(Q_FUNC_INFO);
 
@@ -39,7 +39,7 @@ bool QnCameraBookmarkAggregation::addBookmark(const QnCameraBookmark &bookmark)
 
         auto oldIt = std::find_if(m_bookmarkList.begin(), m_bookmarkList.end(), predicate);
 
-        Q_ASSERT(oldIt != m_bookmarkList.end());
+        NX_ASSERT(oldIt != m_bookmarkList.end());
         if (oldIt != m_bookmarkList.end())
         {
             if (oldIt < it)
@@ -88,7 +88,7 @@ bool QnCameraBookmarkAggregation::removeBookmark(const QnUuid &bookmarkId)
         return bookmark.guid == bookmarkId;
     });
 
-    Q_ASSERT_X(it != m_bookmarkList.end(), Q_FUNC_INFO, "Bookmark should be present in both id set and list");
+    NX_ASSERT(it != m_bookmarkList.end(), Q_FUNC_INFO, "Bookmark should be present in both id set and list");
     if (it == m_bookmarkList.end())
         return false;
 

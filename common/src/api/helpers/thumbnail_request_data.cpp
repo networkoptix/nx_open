@@ -87,7 +87,7 @@ QnRequestParamList QnThumbnailRequestData::toParams() const
 {
     QnRequestParamList result = QnMultiserverRequestData::toParams();
 
-    result.insert(cameraIdKey,      QnLexical::serialized(camera ? camera->getId() : QString()));
+    result.insert(cameraIdKey,      QnLexical::serialized(camera ? camera->getId().toString() : QString()));
     result.insert(timeKey,          isSpecialTimeValue(msecSinceEpoch)
         ? kLatestTimeValue
         : QnLexical::serialized(msecSinceEpoch));

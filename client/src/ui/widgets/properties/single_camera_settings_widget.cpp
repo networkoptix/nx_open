@@ -558,13 +558,13 @@ void QnSingleCameraSettingsWidget::setHasDbChanges(bool hasChanges) {
 }
 
 void QnSingleCameraSettingsWidget::disconnectFromMotionWidget() {
-    assert(m_motionWidget);
+    NX_ASSERT(m_motionWidget);
 
     disconnect(m_motionWidget, NULL, this, NULL);
 }
 
 void QnSingleCameraSettingsWidget::connectToMotionWidget() {
-    assert(m_motionWidget);
+    NX_ASSERT(m_motionWidget);
 
     connect(m_motionWidget, SIGNAL(motionRegionListChanged()), this, SLOT(at_dbDataChanged()), Qt::UniqueConnection);
     connect(m_motionWidget, SIGNAL(motionRegionListChanged()), this, SLOT(at_motionRegionListChanged()), Qt::UniqueConnection);
@@ -730,7 +730,7 @@ int QnSingleCameraSettingsWidget::tabIndex(Qn::CameraSettingsTab tab) const {
     case Qn::ExpertCameraSettingsTab:
         return ui->tabWidget->indexOf(ui->expertTab);
     default:
-        Q_ASSERT_X(false, Q_FUNC_INFO, "Should never get here");
+        NX_ASSERT(false, Q_FUNC_INFO, "Should never get here");
         break;
     }
     return -1;

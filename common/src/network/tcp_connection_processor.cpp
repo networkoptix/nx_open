@@ -510,15 +510,17 @@ QnAuthSession QnTCPConnectionProcessor::authSession() const
     else if (!nx_http::getHeaderValue( d->request.headers,  Qn::VIDEOWALL_GUID_HEADER_NAME).isEmpty())
         result.userName = lit("Video wall");
 
-    result.id = nx_http::getHeaderValue(d->request.headers, Qn::EC2_RUNTIME_GUID_HEADER_NAME);
+    result.id = QnUuid::fromStringSafe(nx_http::getHeaderValue(d->request.headers, Qn::EC2_RUNTIME_GUID_HEADER_NAME));
     if (result.id.isNull())
-        result.id = d->request.getCookieValue(Qn::EC2_RUNTIME_GUID_HEADER_NAME);
+        result.id = QnUuid::fromStringSafe(d->request.getCookieValue(Qn::EC2_RUNTIME_GUID_HEADER_NAME));
     const QUrlQuery query(d->request.requestLine.url.query());
     if (result.id.isNull())
-        result.id = query.queryItemValue(QLatin1String(Qn::EC2_RUNTIME_GUID_HEADER_NAME));
-    if (result.id.isNull()) {
+        result.id = QnUuid::fromStringSafe(query.queryItemValue(QLatin1String(Qn::EC2_RUNTIME_GUID_HEADER_NAME)));
+    if (result.id.isNull())
+    {
         QByteArray nonce = d->request.getCookieValue("auth");
-        if (!nonce.isEmpty()) {
+        if (!nonce.isEmpty())
+        {
             QCryptographicHash md5Hash( QCryptographicHash::Md5 );
             md5Hash.addData( nonce );
             result.id = QnUuid::fromRfc4122(md5Hash.result());

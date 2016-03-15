@@ -6,7 +6,6 @@
 namespace ec2
 {
     enum class ErrorCode;
-    struct QnFullResourceData; // TODO: #Elric move these out?
     struct QnPeerTimeInfo;
     typedef QList<QnPeerTimeInfo> QnPeerTimeInfoList;
 

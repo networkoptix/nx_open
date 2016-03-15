@@ -420,6 +420,10 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
     item.addresses.insert(address);
     m_idByAddress[address] = moduleInformation.id;
     const auto cloudModuleId = moduleInformation.cloudId();
+    if (!cloudModuleId.isEmpty())
+        nx::network::SocketGlobals::addressResolver().addFixedAddress(
+            cloudModuleId, address);
+
     if (count < item.addresses.size()) {
         if (!ignoredAddress && isBetterAddress(address.address, item.primaryAddress.address)) {
             updatePrimaryAddress(item, address);
@@ -437,10 +441,6 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
                .arg(moduleInformation.id.toString()).arg(address.toString()), cl_logDEBUG1);
 
         emit moduleAddressFound(moduleInformation, address);
-
-        if (!cloudModuleId.isEmpty())
-            nx::network::SocketGlobals::addressResolver().addFixedAddress(
-               cloudModuleId, address);
     }
 }
 

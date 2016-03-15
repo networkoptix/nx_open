@@ -237,7 +237,7 @@ void QnResourcePoolModel::removeNode(QnResourcePoolModelNode *node) {
     case Qn::SystemNode:
         break;  //nothing special
     default:
-        Q_ASSERT_X(false, Q_FUNC_INFO, "should never get here");
+        NX_ASSERT(false, Q_FUNC_INFO, "should never get here");
     }
 
     deleteNode(node);
@@ -252,7 +252,7 @@ void QnResourcePoolModel::removeNode(Qn::NodeType nodeType, const QnUuid &uuid, 
 }
 
 void QnResourcePoolModel::deleteNode(QnResourcePoolModelNode *node) {
-    Q_ASSERT(m_allNodes.contains(node));
+    NX_ASSERT(m_allNodes.contains(node));
     m_allNodes.removeOne(node);
     foreach (QnResourcePoolModelNode* existing, m_allNodes)
         if (existing->parent() == node)
@@ -262,7 +262,7 @@ void QnResourcePoolModel::deleteNode(QnResourcePoolModelNode *node) {
 }
 
 QnResourcePoolModelNode *QnResourcePoolModel::expectedParent(QnResourcePoolModelNode *node) {
-    assert(node->type() == Qn::ResourceNode || node->type() == Qn::EdgeNode);
+    NX_ASSERT(node->type() == Qn::ResourceNode || node->type() == Qn::EdgeNode);
 
     if(!node->resource())
         return m_rootNodes[Qn::BastardNode];
@@ -613,7 +613,7 @@ Qt::DropActions QnResourcePoolModel::supportedDropActions() const {
 // QnResourcePoolModel :: handlers
 // -------------------------------------------------------------------------- //
 void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource) {
-    Q_ASSERT(resource);
+    NX_ASSERT(resource);
     if (!resource)
         return;
 
@@ -718,7 +718,7 @@ void QnResourcePoolModel::at_resPool_resourceRemoved(const QnResourcePtr &resour
 
     m_itemNodesByResource.remove(resource);
     m_recorderHashByResource.remove(resource);
-    Q_ASSERT(!m_resourceNodeByResource.contains(resource));
+    NX_ASSERT(!m_resourceNodeByResource.contains(resource));
 
     if (QnWebPageResourcePtr webPage = resource.dynamicCast<QnWebPageResource>())
         m_rootNodes[Qn::WebPagesNode]->update();
@@ -799,7 +799,7 @@ void QnResourcePoolModel::at_layout_itemAdded(const QnLayoutResourcePtr &layout,
     } else {
         resource = resourcePool()->getResourceByUniqueId(item.resource.path);
     }
-    //Q_ASSERT(resource);   //too many strange situations with invalid resources in layout items
+    //NX_ASSERT(resource);   //too many strange situations with invalid resources in layout items
 
     node->setResource(resource);
     node->setParent(parentNode);
@@ -845,7 +845,7 @@ void QnResourcePoolModel::at_videoWall_matrixRemoved(const QnVideoWallResourcePt
 
 void QnResourcePoolModel::at_camera_groupNameChanged(const QnResourcePtr &resource) {
     QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
-    Q_ASSERT(camera);
+    NX_ASSERT(camera);
     if (!camera)
         return;
 
@@ -862,7 +862,7 @@ void QnResourcePoolModel::at_camera_groupNameChanged(const QnResourcePtr &resour
 
 void QnResourcePoolModel::at_server_systemNameChanged(const QnResourcePtr &resource) {
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-    Q_ASSERT(server);
+    NX_ASSERT(server);
     if (!server)
         return;
 

@@ -272,7 +272,7 @@ void QnVideoStreamDisplay::checkQueueOverflow(QnAbstractVideoDecoder* dec)
         else {
             index = maxStart + maxInterval/2;
         }
-        Q_ASSERT( m_reverseQueue[index]->data[0] || m_reverseQueue[index]->picData );
+        NX_ASSERT( m_reverseQueue[index]->data[0] || m_reverseQueue[index]->picData );
         m_reverseSizeInBytes -= avpicture_get_size((PixelFormat) m_reverseQueue[index]->format, m_reverseQueue[index]->width, m_reverseQueue[index]->height);
         m_reverseQueue[index]->reallocate(0,0,0);
     }
@@ -751,7 +751,7 @@ bool QnVideoStreamDisplay::processDecodedFrame(QnAbstractVideoDecoder* dec, cons
     {
         if (enableFrameQueue) 
         {
-            Q_ASSERT(!outFrame->isExternalData());
+            NX_ASSERT(!outFrame->isExternalData());
             if (m_bufferedFrameDisplayer)
             {
                 bool wasWaiting = m_bufferedFrameDisplayer->addFrame(outFrame);

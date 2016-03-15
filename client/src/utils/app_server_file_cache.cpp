@@ -59,7 +59,7 @@ QnAppServerFileCache::~QnAppServerFileCache() {
 
 QString QnAppServerFileCache::getFullPath(const QString &filename) const {
     auto connectionState = qnClientMessageProcessor->connectionState();
-    Q_ASSERT_X(connectionState != QnConnectionState::Disconnected || connectionState == QnConnectionState::Invalid,
+    NX_ASSERT(connectionState != QnConnectionState::Disconnected || connectionState == QnConnectionState::Invalid,
         Q_FUNC_INFO, "Method should be called only when we are know the target system. Current state is " + QnConnectionStateUtils::toString(connectionState).toUtf8());
 
     /* Avoid empty folder name and collisions with our folders such as 'log'. */

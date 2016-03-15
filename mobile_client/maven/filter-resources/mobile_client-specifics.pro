@@ -15,7 +15,8 @@ INCLUDEPATH += \
 
 
 unix: !ios {
-    QMAKE_LFLAGS += "-Wl,-rpath-link,${libdir}/lib/$$CONFIGURATION/"
+    LIBS += "-Wl,-rpath-link,${libdir}/lib/$$CONFIGURATION/"
+    LIBS += "-Wl,-rpath-link,$$OPENSSL_DIR/lib"
 }
 
 android {

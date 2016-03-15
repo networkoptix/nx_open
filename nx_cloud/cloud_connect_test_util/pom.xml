@@ -21,19 +21,20 @@
         <product.title>${company.name} Cloud Connect Testing Utility</product.title>
         <!--Global libs-->
         <qt.libs>core concurrent xml</qt.libs>
-        <global.libs>-lcommon -lnx_streaming -lnx_network -lnx_utils -ludt -lquazip</global.libs>
+        <global.libs>-lcommon -lnx_streaming -lnx_network -lnx_utils -ludt</global.libs>
         <!--Specific os libs used-->
-        <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm ssleay32.lib libeay32.lib</windows.oslibs>
+        <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm</windows.oslibs>
         <windows.oslibs.release/>
         <windows.oslibs.debug/>
-        <linux.oslibs>-lssl -lcrypto -lavcodec -lavformat -lavutil -lfaac -lmp3lame -lswscale</linux.oslibs>
-        <mac.oslibs>-lssl -lcrypto -lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
+        <linux.oslibs>-lavcodec -lavformat -lavutil -lfaac -lmp3lame -lswscale</linux.oslibs>
+        <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
         <!--Global defines-->
         <global.defines/>
         <!--Specific os defines-->
         <windows.defines/>
         <linux.defines/>
         <mac.defines/>
+        <rdep.packages>openssl quazip</rdep.packages>
     </properties>
 
     <dependencies>

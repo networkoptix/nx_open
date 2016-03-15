@@ -3,7 +3,6 @@
 
 #include <QtCore/QDateTime>
 
-#include <core/resource/resource_fwd.h>
 #include <nx/utils/timermanager.h>
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/utils/thread/mutex.h>
@@ -19,7 +18,7 @@ namespace ec2
     {
     public:
         /** Collects and reports statistics in automatic mode (by internal timer) */
-        Ec2StaticticsReporter(const AbstractUserManagerPtr& userManager,
+        Ec2StaticticsReporter(
                               const AbstractResourceManagerPtr& resourceManager,
                               const AbstractMediaServerManagerPtr& msManager);
         ~Ec2StaticticsReporter();
@@ -30,20 +29,11 @@ namespace ec2
         /** Collects \class ApiSystemStatistics and sends it to the statistics server */
         ErrorCode triggerStatisticsReport(std::nullptr_t, ApiStatisticsServerInfo* const outData);
 
-        // text strings
-        static const QString SR_LAST_TIME;
-        static const QString SR_LAST_NUMBER;
-        static const QString SR_TIME_CYCLE;
-        static const QString SR_SERVER_API;
-        static const QString SYSTEM_ID;
-        static const QString SYSTEM_NAME_FOR_ID;
-
         // server information
         static const QString DEFAULT_SERVER_API;
         static const QString AUTH_USER;
         static const QString AUTH_PASSWORD;
 
-        static QnUserResourcePtr getAdmin(const AbstractUserManagerPtr& manager);
         static QnUuid getDesktopCameraTypeId(const AbstractResourceManagerPtr& manager);
 
     private:
@@ -58,7 +48,6 @@ namespace ec2
         void finishReport(nx_http::AsyncHttpClientPtr httpClient);
 
     private:
-        QnUserResourcePtr m_admin;
         QnUuid m_desktopCameraTypeId;
         AbstractMediaServerManagerPtr m_msManager;
 

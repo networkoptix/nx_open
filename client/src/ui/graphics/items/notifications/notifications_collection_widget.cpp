@@ -314,7 +314,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
     if (!camera && QnBusiness::isSourceCameraRequired(eventType))
     {
-        Q_ASSERT_X(false, Q_FUNC_INFO, "Event has occurred without its camera");
+        NX_ASSERT(false, Q_FUNC_INFO, "Event has occurred without its camera");
         NX_LOG(lit("Event %1 has occurred without its camera").arg(eventType), cl_logWARNING);
         return;
     }
@@ -322,7 +322,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
     if (!server && QnBusiness::isSourceServerRequired(eventType))
     {
-        Q_ASSERT_X(false, Q_FUNC_INFO, "Event has occurred without its server");
+        NX_ASSERT(false, Q_FUNC_INFO, "Event has occurred without its server");
         NX_LOG(lit("Event %1 has occurred without its server").arg(eventType), cl_logWARNING);
         return;
     }
@@ -588,7 +588,7 @@ QIcon QnNotificationsCollectionWidget::iconForAction( const QnAbstractBusinessAc
 
 void QnNotificationsCollectionWidget::showSystemHealthMessage( QnSystemHealth::MessageType message, const QVariant& params ) {
     QString messageText = QnSystemHealthStringsHelper::messageName(message);
-    Q_ASSERT_X(!messageText.isEmpty(), Q_FUNC_INFO, "Undefined system health message ");
+    NX_ASSERT(!messageText.isEmpty(), Q_FUNC_INFO, "Undefined system health message ");
     if (messageText.isEmpty())
         return;
 
@@ -687,7 +687,7 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage( QnSystemHealth::M
         );
         break;
     default:
-        Q_ASSERT_X(false, Q_FUNC_INFO, "Undefined system health message ");
+        NX_ASSERT(false, Q_FUNC_INFO, "Undefined system health message ");
         break;
     }
 

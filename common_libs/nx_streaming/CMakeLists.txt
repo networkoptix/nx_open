@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.11)
+cmake_minimum_required(VERSION 3.0)
 
 # Default configuration values. These must be before the project command or
 # they won't work in Windows.
@@ -33,7 +33,7 @@ add_library(${PROJECT_SHORTNAME} ${DEFAULT_LIBRARY_TYPE}
   ${RESOURCE_FILES}
 )
 target_link_libraries(${PROJECT_SHORTNAME}
-  Qt5::Core Qt5::Network Qt5::Concurrent common
+  Qt5::Core Qt5::Network Qt5::Concurrent
 )
 #set_target_properties(${PROJECT_SHORTNAME} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "src/stdafx.h")
 #cotire(${PROJECT_SHORTNAME})

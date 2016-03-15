@@ -265,7 +265,7 @@ public:
     }
 
     QnActionBuilder condition(QnActionCondition *condition) {
-        assert(m_action->condition() == NULL);
+        NX_ASSERT(m_action->condition() == NULL);
 
         m_action->setCondition(condition);
 
@@ -273,7 +273,7 @@ public:
     }
 
     QnActionBuilder condition(const QnResourceCriterion &criterion, Qn::MatchMode matchMode = Qn::All) {
-        assert(m_action->condition() == NULL);
+        NX_ASSERT(m_action->condition() == NULL);
 
         m_action->setCondition(new QnResourceActionCondition(criterion, matchMode, m_action));
 
@@ -2026,7 +2026,7 @@ QMenu* QnActionManager::integrateMenu(QMenu *menu, const QnActionParameters &par
     if (!menu)
         return NULL;
 
-    Q_ASSERT(!m_parametersByMenu.contains(menu));
+    NX_ASSERT(!m_parametersByMenu.contains(menu));
     m_parametersByMenu[menu] = parameters;
     menu->installEventFilter(this);
 

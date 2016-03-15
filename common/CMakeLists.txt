@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.11)
+cmake_minimum_required(VERSION 3.0)
 
 # Default configuration values. These must be before the project command or
 # they won't work in Windows.
@@ -38,13 +38,50 @@ add_translations(translations)
 qt5_wrap_ui(UI_HEADERS ${UI_FILES})
 qt5_add_resources(RESOURCE_FILES ${PROJECT_BINARY_DIR}/${PROJECT_SHORTNAME}.qrc)
 
-add_library(${PROJECT_SHORTNAME} ${DEFAULT_LIBRARY_TYPE}
-  ${UI_HEADERS}
-  ${CPP_FILES}
-  ${RESOURCE_FILES}
+#get_external_dependencies(openssl quazip)
+
+#if(${CMAKE_BUILD_TYPE} MATCHES Debug)
+#    include(${CMAKE_CURRENT_BINARY_DIR}/dependencies-debug.cmake)
+#else()
+#    include(${CMAKE_CURRENT_BINARY_DIR}/dependencies.cmake)
+#endif()
+
+include_directories(${OPENSSL_INCLUDE}
+                    ${QUAZIP_INCLUDE}
 )
+
+add_library(${PROJECT_SHORTNAME} ${DEFAULT_LIBRARY_TYPE}
+            ${UI_HEADERS}
+            ${CPP_FILES}
+            ${HEADER_FILES}
+            ${RESOURCE_FILES}
+)
+
 target_link_libraries(${PROJECT_SHORTNAME}
-  Qt5::Core Qt5::Gui Qt5::Network Ws2_32.lib glu32.lib opengl32.lib odbccp32.lib
+                      nx_utils
+                      nx_streaming
+                      Qt5::Core
+                      Qt5::Gui
+                      Qt5::Network
+                      Qt5::Xml
+                      Qt5::XmlPatterns
+                      Qt5::Sql
+                      Qt5::Concurrent
+                      Qt5::Multimedia
+                      ws2_32
+                      Iphlpapi
+                      Ole32
+                      sigar
+                      Secur32
+                      avcodec
+                      avdevice
+                      avfilter
+                      avformat
+                      avutil
+                      swscale
+                      postproc
+                      ${OPENSSL_LIB}
+                      ${QUAZIP_LIB}
 )
 
 if (UNIX)

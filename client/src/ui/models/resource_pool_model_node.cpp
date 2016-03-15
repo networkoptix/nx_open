@@ -34,7 +34,7 @@ QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, Qn:
     m_modified(false),
     m_checked(Qt::Unchecked)
 {
-    assert(type == Qn::LocalNode ||
+    NX_ASSERT(type == Qn::LocalNode ||
            type == Qn::ServersNode ||
            type == Qn::OtherSystemsNode ||
            type == Qn::UsersNode ||
@@ -106,8 +106,8 @@ QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, con
     m_modified(false),
     m_checked(Qt::Unchecked)
 {
-    assert(model != NULL);
-    assert(nodeType == Qn::ResourceNode ||
+    NX_ASSERT(model != NULL);
+    NX_ASSERT(nodeType == Qn::ResourceNode ||
            nodeType == Qn::EdgeNode);
 
     setResource(resource);
@@ -129,7 +129,7 @@ QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, con
     m_modified(false),
     m_checked(Qt::Unchecked)
 {
-    assert(model != NULL);
+    NX_ASSERT(model != NULL);
 
     m_editable.checked = false;
 }
@@ -156,7 +156,7 @@ void QnResourcePoolModelNode::clear() {
 }
 
 void QnResourcePoolModelNode::setResource(const QnResourcePtr &resource) {
-    assert(
+    NX_ASSERT(
         m_type == Qn::ItemNode ||
         m_type == Qn::ResourceNode ||
         m_type == Qn::VideoWallItemNode ||
@@ -374,7 +374,7 @@ bool QnResourcePoolModelNode::calculateBastard() const {
         return !m_model->accessController()->hasGlobalPermissions(Qn::GlobalEditServersPermissions);
 
     default:
-        Q_ASSERT("Should never get here");
+        NX_ASSERT("Should never get here");
         return false;
     }
 }
@@ -434,7 +434,7 @@ void QnResourcePoolModelNode::setParent(QnResourcePoolModelNode *parent) {
 }
 
 QModelIndex QnResourcePoolModelNode::index(int col) {
-    assert(isValid()); /* Only valid nodes have indices. */
+    NX_ASSERT(isValid()); /* Only valid nodes have indices. */
 
     if(m_parent == NULL)
         return QModelIndex(); /* That's root node. */
@@ -443,8 +443,8 @@ QModelIndex QnResourcePoolModelNode::index(int col) {
 }
 
 QModelIndex QnResourcePoolModelNode::index(int row, int col) {
-    assert(isValid()); /* Only valid nodes have indices. */
-    assert(m_parent != NULL && row == m_parent->m_children.indexOf(this));
+    NX_ASSERT(isValid()); /* Only valid nodes have indices. */
+    NX_ASSERT(m_parent != NULL && row == m_parent->m_children.indexOf(this));
 
     return m_model->createIndex(row, col, this);
 }
@@ -644,7 +644,7 @@ void QnResourcePoolModelNode::setModified(bool modified) {
 }
 
 void QnResourcePoolModelNode::removeChildInternal(QnResourcePoolModelNode *child) {
-    assert(child->parent() == this);
+    NX_ASSERT(child->parent() == this);
 
     if(isValid() && !isBastard()) {
         QModelIndex index = this->index(Qn::NameColumn);
@@ -669,7 +669,7 @@ void QnResourcePoolModelNode::removeChildInternal(QnResourcePoolModelNode *child
 }
 
 void QnResourcePoolModelNode::addChildInternal(QnResourcePoolModelNode *child) {
-    assert(child->parent() == this);
+    NX_ASSERT(child->parent() == this);
 
     if(isValid() && !isBastard()) {
         QModelIndex index = this->index(Qn::NameColumn);

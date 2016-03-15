@@ -19,7 +19,7 @@ void QnCheckbox::autoCleanTristate(QCheckBox* checkbox)
 
 void QnCheckbox::cleanTristate() {
     auto checkbox = qobject_cast<QCheckBox*>(sender());
-    Q_ASSERT_X(checkbox, Q_FUNC_INFO, "Checkbox must be present");
+    NX_ASSERT(checkbox, Q_FUNC_INFO, "Checkbox must be present");
     if (!checkbox)
         return;
 

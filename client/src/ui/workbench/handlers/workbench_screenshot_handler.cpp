@@ -594,7 +594,7 @@ void QnWorkbenchScreenshotHandler::takeScreenshot(QnMediaResourceWidget *widget,
         localParameters.rotationAngle = 0;
     } else {
         QnVirtualCameraResourcePtr camera = widget->resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
-        Q_ASSERT_X(camera, Q_FUNC_INFO, "Camera must exist here");
+        NX_ASSERT(camera, Q_FUNC_INFO, "Camera must exist here");
         if (camera)
             imageProvider = new QnSingleThumbnailLoader(camera, localParameters.utcTimestampMsec, 0);
         else

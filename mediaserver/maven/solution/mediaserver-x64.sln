@@ -92,7 +92,7 @@ Global
 		${udt.guid}.Debug|x64.ActiveCfg = Debug|x64
 		${udt.guid}.Debug|x64.Build.0 = Debug|x64
 		${udt.guid}.Release|x64.ActiveCfg = Release|x64
-		${udt.guid}.Release|x64.Build.0 = Release|x64        
+		${udt.guid}.Release|x64.Build.0 = Release|x64		
 		${nx_utils.guid}.Debug|x64.ActiveCfg = Debug|x64
 		${nx_utils.guid}.Debug|x64.Build.0 = Debug|x64
 		${nx_utils.guid}.Release|x64.ActiveCfg = Release|x64

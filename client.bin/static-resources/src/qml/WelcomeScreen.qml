@@ -57,6 +57,8 @@ Rectangle
                         host: model.host;
                         userName: model.userName;
                         isComaptible: model.isCompatible;
+
+//                        onConnectClicked: context.connectToServer(serverUrl, userName, password);
                     }
                 }
 
@@ -67,7 +69,6 @@ Rectangle
                     CloudSystemTile
                     {
                         systemName: model.systemName;
-
                     }
                 }
 

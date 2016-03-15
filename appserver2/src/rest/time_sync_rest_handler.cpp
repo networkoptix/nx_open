@@ -42,7 +42,7 @@ int QnTimeSyncRestHandler::executeGet(
                 rttMillis = sockInfo.rttVar;
         }
         TimeSynchronizationManager::instance()->processTimeSyncInfoHeader(
-            peerGuid->second,
+            QnUuid::fromStringSafe(peerGuid->second),
             timeSyncHeaderIter->second,
             rttMillis);
     }

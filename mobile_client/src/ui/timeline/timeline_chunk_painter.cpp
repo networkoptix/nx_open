@@ -43,7 +43,7 @@ void QnTimelineChunkPainter::start(qint64 startPos, const QRectF &rect, int chun
 }
 
 void QnTimelineChunkPainter::paintChunk(qint64 length, Qn::TimePeriodContent content) {
-    Q_ASSERT(length >= 0);
+    NX_ASSERT(length >= 0);
 
     if (length < 0)
         return;

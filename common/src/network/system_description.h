@@ -42,7 +42,9 @@ public:
     typedef QList<QnModuleInformation> ServersList;
     ServersList servers() const;
     
-    void addServer(const QnModuleInformation &serverInfo);
+    enum { kDefaultPriority = 0};
+    void addServer(const QnModuleInformation &serverInfo
+        , int priority = kDefaultPriority);
 
     bool containsServer(const QnUuid &serverId) const;
 
@@ -73,11 +75,13 @@ private:
 private:
     typedef QHash<QnUuid, QnModuleInformation> ServerInfoHash;
     typedef QHash<QnUuid, SocketAddress> PrimaryAddressHash;
+    typedef QMultiMap<int, QnUuid> PrioritiesMap;
 
     const QnUuid m_id;
     const QString m_systemName;
     const bool m_isCloudSystem;
     ServerInfoHash m_servers;
+    PrioritiesMap m_prioritized;
     PrimaryAddressHash m_primaryAddresses;
 
 

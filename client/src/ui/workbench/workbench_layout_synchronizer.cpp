@@ -89,7 +89,7 @@ void QnWorkbenchLayoutSynchronizer::clearResource() {
 }
 
 void QnWorkbenchLayoutSynchronizer::initialize() {
-    assert(m_layout != NULL && !m_resource.isNull());
+    NX_ASSERT(m_layout != NULL && !m_resource.isNull());
 
     qn_synchronizerByLayoutResource()->insert(m_resource.data(), this);
     m_layout->setProperty(layoutSynchronizerPropertyName, QVariant::fromValue<QnWorkbenchLayoutSynchronizer *>(this));
@@ -113,7 +113,7 @@ void QnWorkbenchLayoutSynchronizer::initialize() {
 }
 
 void QnWorkbenchLayoutSynchronizer::deinitialize() {
-    assert(m_layout != NULL && !m_resource.isNull());
+    NX_ASSERT(m_layout != NULL && !m_resource.isNull());
 
     submitPendingItems();
 

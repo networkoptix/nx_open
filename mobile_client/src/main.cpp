@@ -137,11 +137,7 @@ int runApplication(QGuiApplication *application) {
     qsrand(time(NULL));
 
     std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory(Qn::PT_MobileClient)); // TODO: #dklychkov check connection type
-    ec2::ResourceContext resourceContext(
-        QnMobileClientCameraFactory::instance(),
-        qnResPool,
-        qnResTypePool);
-    ec2ConnectionFactory->setContext(resourceContext);
+
     QnAppServerConnectionFactory::setEC2ConnectionFactory(ec2ConnectionFactory.get());
 
     ec2::ApiRuntimeData runtimeData;

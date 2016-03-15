@@ -43,7 +43,7 @@ void QnWorkbenchResourcesSettingsHandler::at_serverSettingsAction_triggered() {
         return !QnMediaServerResource::isFakeServer(server);
     });
 
-    Q_ASSERT_X(servers.size() == 1, Q_FUNC_INFO, "Invalid action condition");
+    NX_ASSERT(servers.size() == 1, Q_FUNC_INFO, "Invalid action condition");
     if(servers.isEmpty())
         return;
 

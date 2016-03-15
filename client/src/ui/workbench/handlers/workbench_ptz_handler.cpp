@@ -242,7 +242,7 @@ void QnWorkbenchPtzHandler::at_ptzManageAction_triggered() {
         return;
 
     QnPtzManageDialog* dialog = QnPtzManageDialog::instance();
-    assert(dialog);
+    NX_ASSERT(dialog);
 
     if (dialog->isVisible() && !dialog->tryClose(false))
         return;

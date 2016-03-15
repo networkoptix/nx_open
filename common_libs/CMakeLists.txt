@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.11)
+cmake_minimum_required(VERSION 3.0)
 
 # Default configuration values. These must be before the project command or
 # they won't work in Windows.
@@ -22,12 +22,12 @@ add_definitions(-D_CONSOLE
 
 add_module(
     NAMES
-        #nx_audio
-        #nx_email
-        #nx_media
-        #nx_network
-        #nx_streaming
+        nx_audio
+        nx_email
+        nx_media
+        nx_network
+        nx_streaming
         nx_utils
-        #udt
+        udt
     STATUS_SHORT_NAMES
 )

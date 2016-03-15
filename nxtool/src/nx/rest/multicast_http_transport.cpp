@@ -404,7 +404,7 @@ QUuid MulticastHttpTransport::addRequest(const multicastHttp::Request& request,
 void MulticastHttpTransport::putPacketToTransport(TransportConnection& transportConnection, const Packet& packet)
 {
     QByteArray encodedData = packet.serialize();
-    Q_ASSERT(encodedData.size() <= Packet::MAX_DATAGRAM_SIZE);
+    NX_ASSERT(encodedData.size() <= Packet::MAX_DATAGRAM_SIZE);
     for (int i = 0; i < SEND_RETRY_COUNT; ++i) 
     {
         for (auto& socket: m_sendSockets)

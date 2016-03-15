@@ -20,7 +20,7 @@ QnExternalBusinessEventRestHandler::QnExternalBusinessEventRestHandler()
 int QnExternalBusinessEventRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*)
 {
     Q_UNUSED(path)
-    
+
     QnBusinessEventParameters businessParams;
     QString errStr;
     QnBusiness::EventState eventState = QnBusiness::UndefinedState;
@@ -36,7 +36,7 @@ int QnExternalBusinessEventRestHandler::executeGet(const QString &path, const Qn
     if (params.contains("timestamp"))
         businessParams.eventTimestampUsec = parseDateTime(params["timestamp"]);
     if (params.contains("eventResourceId"))
-        businessParams.eventResourceId = params["eventResourceId"];
+        businessParams.eventResourceId = QnUuid::fromStringSafe(params["eventResourceId"]);
     if (params.contains("state")) {
         eventState = QnLexical::deserialized<QnBusiness::EventState>(params["state"], QnBusiness::EventState(), &ok);
         if (!ok) {
@@ -66,7 +66,7 @@ int QnExternalBusinessEventRestHandler::executeGet(const QString &path, const Qn
             return CODE_OK;
         }
     }
-    
+
     if (businessParams.eventTimestampUsec == 0)
         businessParams.eventTimestampUsec = qnSyncTime->currentUSecsSinceEpoch();
     businessParams.sourceServerId = qnCommon->moduleGUID();

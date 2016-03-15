@@ -89,7 +89,7 @@ bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
             else if (d->authenticatedOnce)
                 retryThreshold = 2; // Allow two more try if password just changed (QT client need it because of password cache)
             if (retryCount >= retryThreshold && !logReported && authResult != Qn::Auth_WrongInternalLogin)
-            {   
+            {
                 logReported = true;
                 auto session = authSession();
                 session.id = QnUuid::createUuid();
@@ -112,7 +112,7 @@ bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
             if (++retryCount > MAX_AUTH_RETRY_COUNT) {
                 return false;
             }
-            while (t.elapsed() < AUTH_TIMEOUT && d->socket->isConnected()) 
+            while (t.elapsed() < AUTH_TIMEOUT && d->socket->isConnected())
             {
                 if (readRequest()) {
                     parseRequest();
@@ -152,7 +152,7 @@ void QnUniversalRequestProcessor::run()
             break;
         }
 
-        if (ready) 
+        if (ready)
         {
             t.restart();
             parseRequest();
@@ -190,7 +190,7 @@ bool QnUniversalRequestProcessor::processRequest()
 {
     Q_D(QnUniversalRequestProcessor);
 
-    QnMutexLocker lock( &d->mutex ); 
+    QnMutexLocker lock( &d->mutex );
     if (auto handler = d->owner->findHandler(d->protocol, d->request))
         d->processor = handler(d->socket, d->owner);
     else
@@ -201,7 +201,7 @@ bool QnUniversalRequestProcessor::processRequest()
         copyClientRequestTo(*d->processor);
         if (d->processor->isTakeSockOwnership())
             d->socket.clear(); // some of handlers have addition thread and depend of socket destructor. We should clear socket immediately to prevent race condition
-        d->processor->execute(d->mutex); 
+        d->processor->execute(d->mutex);
         if (!d->processor->isTakeSockOwnership())
             d->processor->releaseSocket();
         else
@@ -247,7 +247,7 @@ bool QnUniversalRequestProcessor::isProxyForCamera(const nx_http::Request& reque
         desiredCameraGuid = request.getCookieValue(Qn::CAMERA_GUID_HEADER_NAME);
     }
     if (!desiredCameraGuid.isEmpty()) {
-        QnResourcePtr camera = qnResPool->getResourceById(desiredCameraGuid);
+        QnResourcePtr camera = qnResPool->getResourceById(QnUuid::fromStringSafe(desiredCameraGuid));
         return camera != 0;
     }
 

@@ -1,7 +1,7 @@
 MACRO(ADD_MSVC_PRECOMPILED_HEADER PrecompiledHeader PrecompiledSource SourcesVar)
   IF(MSVC)
     GET_FILENAME_COMPONENT(PrecompiledBasename ${PrecompiledHeader} NAME_WE)
-    SET(PrecompiledBinary "$(IntDir)$(TargetName).pch")
+    SET(PrecompiledBinary "${PROJECT_BINARY_DIR}/${PROJECT_SHORTNAME}.pch")
     SET(Sources ${${SourcesVar}})
     
     SET_SOURCE_FILES_PROPERTIES(${Sources}

@@ -133,7 +133,7 @@ RestClient::ResultCode RestClient::Impl::convertHttpClientRequestResult(
         case HttpClient::RequestResult::kUnauthorized: return ResultCode::kUnauthorized;
         case HttpClient::RequestResult::kUnspecified: return ResultCode::kUnspecified;
         default:
-            assert(false);
+            NX_ASSERT(false);
             return ResultCode::kUnspecified;
     }
 }
@@ -285,7 +285,7 @@ void RestClient::sendGet(const Request &request)
             m_impl->sendMulticastGet(request);
             break;
         default:
-            Q_ASSERT(false);
+            NX_ASSERT(false);
     }
 }
 
@@ -301,7 +301,7 @@ void RestClient::sendPost(const Request &request
             m_impl->sendMulticastPost(request, data);
             break;
         default:
-            Q_ASSERT(false);
+            NX_ASSERT(false);
     }
 }
 

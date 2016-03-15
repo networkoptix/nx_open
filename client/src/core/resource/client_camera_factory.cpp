@@ -4,13 +4,13 @@
 #include <core/resource/client_storage_resource.h>
 #include <core/resource/client_camera.h>
 
-QnResourcePtr QnClientCameraFactory::createResource(const QnUuid &resourceTypeId, const QnResourceParams &) {
+QnResourcePtr QnClientResourceFactory::createResource(const QnUuid &resourceTypeId, const QnResourceParams &) {
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
 
     if (resourceType.isNull())
         return QnResourcePtr();
 
-    if (resourceType->getName() == QLatin1String("Storage"))
+    if (resourceTypeId == qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kStorageTypeId))
     {
         QnClientStorageResourcePtr result(new QnClientStorageResource());
         result->setActive(true);

@@ -45,7 +45,7 @@ SyncHttpClient::~SyncHttpClient()
 
 QNetworkReply::NetworkError SyncHttpClient::get( const QNetworkRequest& request )
 {
-    Q_ASSERT( QThread::currentThread() != m_networkAccessManager->thread() );
+    NX_ASSERT( QThread::currentThread() != m_networkAccessManager->thread() );
 
     QNetworkRequest requestCopy( request );
     QUrl requestUrlCopy = requestCopy.url();

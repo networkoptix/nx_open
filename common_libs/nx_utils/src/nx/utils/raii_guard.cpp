@@ -7,6 +7,11 @@ QnRaiiGuardPtr QnRaiiGuard::create(const Handler &creationHandler
     return QnRaiiGuardPtr(new QnRaiiGuard(creationHandler, destructionHandler));
 }
 
+QnRaiiGuardPtr QnRaiiGuard::createDestructable(const Handler &destructionHandler)
+{
+    return QnRaiiGuardPtr(new QnRaiiGuard(Handler(), destructionHandler));
+}
+
 QnRaiiGuardPtr QnRaiiGuard::createEmpty()
 {
     return QnRaiiGuardPtr();

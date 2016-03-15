@@ -9,6 +9,10 @@ BaseTile
     property string userName;
     property bool isComaptible;
 
+//    property alias selectedUserName: userNameTextEdit.text;
+//    property alias selectedPassword: passwordTextField.text;
+    signal onConnectClicked;
+
     property QtObject activeItemSelector: SingleActiveItemSelector
     {
         variableName: "isMasked";
@@ -40,7 +44,8 @@ BaseTile
 
         InfoItem
         {
-            text: thisComponent.userName;
+            id: userNameTextEdit;
+            text: "user";//thisComponent.userName;
 
             Component.onCompleted: activeItemSelector.addItem(this);
         }
@@ -60,6 +65,7 @@ BaseTile
 
         TextField
         {
+            id: passwordTextField;
             anchors.left: parent.left;
             anchors.right: parent.right;
 
@@ -82,6 +88,8 @@ BaseTile
             anchors.right: parent.right;
 
             text: qsTr("Connect");
+
+            onClicked: thisComponent.onConnectClicked();
         }
     }
 }

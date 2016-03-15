@@ -85,7 +85,7 @@ QnCameraBookmarksManagerPrivate::QueryInfo::QueryInfo()
     , requestTimer()
     , requestId(invalidRequestId)
 {
-    Q_ASSERT_X(false, Q_FUNC_INFO, "This functions is not to be used directly");
+    NX_ASSERT(false, Q_FUNC_INFO, "This functions is not to be used directly");
 }
 
 QnCameraBookmarksManagerPrivate::QueryInfo::QueryInfo(const QnCameraBookmarksQueryPtr &query)
@@ -173,7 +173,7 @@ int QnCameraBookmarksManagerPrivate::getBookmarksAsync(const QnVirtualCameraReso
 
 void QnCameraBookmarksManagerPrivate::addCameraBookmark(const QnCameraBookmark &bookmark, OperationCallbackType callback)
 {
-    Q_ASSERT_X(bookmark.isValid(), Q_FUNC_INFO, "Invalid bookmark must not be added");
+    NX_ASSERT(bookmark.isValid(), Q_FUNC_INFO, "Invalid bookmark must not be added");
     if (!bookmark.isValid())
         return;
 
@@ -197,7 +197,7 @@ void QnCameraBookmarksManagerPrivate::addCameraBookmark(const QnCameraBookmark &
 
 void QnCameraBookmarksManagerPrivate::updateCameraBookmark(const QnCameraBookmark &bookmark, OperationCallbackType callback)
 {
-    Q_ASSERT_X(bookmark.isValid(), Q_FUNC_INFO, "Invalid bookmark must not be added");
+    NX_ASSERT(bookmark.isValid(), Q_FUNC_INFO, "Invalid bookmark must not be added");
     if (!bookmark.isValid())
         return;
 
@@ -247,13 +247,13 @@ void QnCameraBookmarksManagerPrivate::clearCache() {
 }
 
 bool QnCameraBookmarksManagerPrivate::isQueryUpdateRequired(const QUuid &queryId) {
-    Q_ASSERT_X(m_queries.contains(queryId), Q_FUNC_INFO, "Query should be registered");
+    NX_ASSERT(m_queries.contains(queryId), Q_FUNC_INFO, "Query should be registered");
     if (!m_queries.contains(queryId))
         return false;
 
     const QueryInfo info = m_queries[queryId];
     QnCameraBookmarksQueryPtr query = info.queryRef.toStrongRef();
-    Q_ASSERT_X(query, Q_FUNC_INFO, "Interface does not allow query to be null");
+    NX_ASSERT(query, Q_FUNC_INFO, "Interface does not allow query to be null");
 
     switch (info.state) {
     case QueryInfo::QueryState::Invalid:
@@ -266,7 +266,7 @@ bool QnCameraBookmarksManagerPrivate::isQueryUpdateRequired(const QUuid &queryId
         return false;
         //(query->filter().endTimeMs > qnSyncTime->currentMSecsSinceEpoch()) && info.requestTimer.hasExpired(updateLiveBookmarksTimeoutMs);
     default:
-        Q_ASSERT_X(false, Q_FUNC_INFO, "Should never get here");
+        NX_ASSERT(false, Q_FUNC_INFO, "Should never get here");
         break;
     }
     return false;
@@ -281,7 +281,7 @@ void QnCameraBookmarksManagerPrivate::checkQueriesUpdate() {
 
         const QueryInfo info = m_queries[queryId];
         QnCameraBookmarksQueryPtr query = info.queryRef.toStrongRef();
-        Q_ASSERT_X(query, Q_FUNC_INFO, "Interface does not allow query to be null");
+        NX_ASSERT(query, Q_FUNC_INFO, "Interface does not allow query to be null");
         if (!query)
             continue;
 
@@ -290,8 +290,8 @@ void QnCameraBookmarksManagerPrivate::checkQueriesUpdate() {
 }
 
 void QnCameraBookmarksManagerPrivate::registerQuery(const QnCameraBookmarksQueryPtr &query) {
-    Q_ASSERT_X(query, Q_FUNC_INFO, "Interface does not allow query to be null");
-    Q_ASSERT_X(!m_queries.contains(query->id()), Q_FUNC_INFO, "Query should be registered and unregistered only once");
+    NX_ASSERT(query, Q_FUNC_INFO, "Interface does not allow query to be null");
+    NX_ASSERT(!m_queries.contains(query->id()), Q_FUNC_INFO, "Query should be registered and unregistered only once");
 
     /* Do not store shared pointer in the functor so it can be safely unregistered. */
     QUuid queryId = query->id();
@@ -305,12 +305,12 @@ void QnCameraBookmarksManagerPrivate::registerQuery(const QnCameraBookmarksQuery
 }
 
 void QnCameraBookmarksManagerPrivate::unregisterQuery(const QUuid &queryId) {
-    Q_ASSERT_X(m_queries.contains(queryId), Q_FUNC_INFO, "Query should be registered and unregistered only once");
+    NX_ASSERT(m_queries.contains(queryId), Q_FUNC_INFO, "Query should be registered and unregistered only once");
     m_queries.remove(queryId);
 }
 
 QnCameraBookmarkList QnCameraBookmarksManagerPrivate::cachedBookmarks(const QnCameraBookmarksQueryPtr &query) const {
-    Q_ASSERT_X(query, Q_FUNC_INFO, "Interface does not allow query to be null");
+    NX_ASSERT(query, Q_FUNC_INFO, "Interface does not allow query to be null");
     QN_LOG_TIME(Q_FUNC_INFO);
 
     /* Check if we have already cached query result. */
@@ -321,7 +321,7 @@ QnCameraBookmarkList QnCameraBookmarksManagerPrivate::cachedBookmarks(const QnCa
 }
 
 void QnCameraBookmarksManagerPrivate::executeQueryRemoteAsync(const QnCameraBookmarksQueryPtr &query, BookmarksCallbackType callback) {
-    Q_ASSERT_X(query, Q_FUNC_INFO, "Interface does not allow query to be null");
+    NX_ASSERT(query, Q_FUNC_INFO, "Interface does not allow query to be null");
     if (!query) {
         executeCallbackDelayed(callback);
         return;
@@ -330,7 +330,7 @@ void QnCameraBookmarksManagerPrivate::executeQueryRemoteAsync(const QnCameraBook
     /* Do not store shared pointer here so it can be safely unregistered in the process. */
     QUuid queryId = query->id();
 
-    Q_ASSERT_X(m_queries.contains(queryId), Q_FUNC_INFO, "Query must be registered");
+    NX_ASSERT(m_queries.contains(queryId), Q_FUNC_INFO, "Query must be registered");
     if (!m_queries.contains(queryId)) {
         executeCallbackDelayed(callback);
         return;
@@ -382,12 +382,12 @@ void QnCameraBookmarksManagerPrivate::updateQueryCache(const QUuid &queryId, con
 {
     QN_LOG_TIME(Q_FUNC_INFO);
 
-    Q_ASSERT_X(m_queries.contains(queryId), Q_FUNC_INFO, "Query must be registered");
+    NX_ASSERT(m_queries.contains(queryId), Q_FUNC_INFO, "Query must be registered");
     if (!m_queries.contains(queryId))
         return;
 
     QnCameraBookmarksQueryPtr query = m_queries[queryId].queryRef.toStrongRef();
-    Q_ASSERT_X(query, Q_FUNC_INFO, "Interface does not allow query to be null");
+    NX_ASSERT(query, Q_FUNC_INFO, "Interface does not allow query to be null");
     if (!query)
         return;
 
@@ -432,7 +432,7 @@ void QnCameraBookmarksManagerPrivate::addUpdatePendingBookmark(const QnCameraBoo
 
     for (QueryInfo &info: m_queries) {
         QnCameraBookmarksQueryPtr query = info.queryRef.toStrongRef();
-        Q_ASSERT_X(query, Q_FUNC_INFO, "Interface does not allow query to be null");
+        NX_ASSERT(query, Q_FUNC_INFO, "Interface does not allow query to be null");
         if (!query)
             continue;
 
@@ -455,7 +455,7 @@ void QnCameraBookmarksManagerPrivate::addRemovePendingBookmark(const QnUuid &boo
 
     for (QueryInfo &info: m_queries) {
         QnCameraBookmarksQueryPtr query = info.queryRef.toStrongRef();
-        Q_ASSERT_X(query, Q_FUNC_INFO, "Interface does not allow query to be null");
+        NX_ASSERT(query, Q_FUNC_INFO, "Interface does not allow query to be null");
         if (!query)
             continue;
 

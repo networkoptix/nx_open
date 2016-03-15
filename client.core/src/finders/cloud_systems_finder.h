@@ -1,10 +1,16 @@
 
 #pragma once
 
+#include <functional>
+
 #include <nx/utils/thread/mutex.h>
+#include <nx_ec/impl/ec_api_impl.h>
 #include <utils/common/connective.h>
 #include <finders/abstract_systems_finder.h>
 #include <watchers/cloud_status_watcher.h>
+
+class QTimer;
+struct QnConnectionInfo;
 
 class QnCloudSystemsFinder : public Connective<QnAbstractSystemsFinder>
 {
@@ -26,10 +32,18 @@ private:
 
     void onCloudError(QnCloudStatusWatcher::ErrorCode error);
 
-    void onSystemDiscovered(const QnSystemDescriptionPtr &system);
+    void updateSystem(const QnUuid &systemId);
+
+    void updateSystems();
 
 private:
+    typedef QScopedPointer<QTimer> QTimerPtr;
     typedef QHash<QnUuid, QnSystemDescriptionPtr> SystemsHash;
+    typedef QHash<int, QnUuid> RequestIdToSystemHash;
+
+    const QTimerPtr m_updateSystemsTimer;
     mutable QnMutex m_mutex;
+
     SystemsHash m_systems;
+    RequestIdToSystemHash m_requestToSystem;
 };

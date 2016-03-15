@@ -1291,7 +1291,7 @@ void rtu::ServersSelectionModel::Impl::changeServer(const BaseServerInfo &baseIn
 bool rtu::ServersSelectionModel::Impl::findServer(const QUuid &id
     , ItemSearchInfo *searchInfo)
 {
-    assert(searchInfo != nullptr);
+    NX_ASSERT(searchInfo != nullptr);
 
     int rowIndex = 0;
     for(auto itSystem = m_systems.begin(); itSystem != m_systems.end(); ++itSystem)
@@ -1325,7 +1325,7 @@ void rtu::ServersSelectionModel::Impl::setLockedState(const IDsVector &ids
         ServerModelInfo &modelInfo = *searchInfo.serverInfoIterator;
         if (locked == modelInfo.locked)
         {
-            Q_ASSERT_X(false, Q_FUNC_INFO, "Invalid lock state");
+            NX_ASSERT(false, Q_FUNC_INFO, "Invalid lock state");
             continue;
         }
 
@@ -1334,7 +1334,7 @@ void rtu::ServersSelectionModel::Impl::setLockedState(const IDsVector &ids
 
         if (!locked && modelInfo.removeRequestsCounter > 0)
         {
-            Q_ASSERT_X(modelInfo.removeRequestsCounter == 1, Q_FUNC_INFO    /// removeRequestsCounter is int type. It is to find out if any 
+            NX_ASSERT(modelInfo.removeRequestsCounter == 1, Q_FUNC_INFO    /// removeRequestsCounter is int type. It is to find out if any 
                 , "wrong removeRequestsCounter is greater than 1");         /// logic error about addition and deletion servers presences.
                                                                             /// Appropriate values are 0 or 1 only!
 
@@ -1555,7 +1555,7 @@ void rtu::ServersSelectionModel::addServer(const BaseServerInfo &baseInfo)
     ItemSearchInfo searchInfo;
     if (m_impl->findServer(baseInfo.id, &searchInfo))
     {
-        Q_ASSERT_X(searchInfo.serverInfoIterator->locked
+        NX_ASSERT(searchInfo.serverInfoIterator->locked
             , Q_FUNC_INFO, "Server should be locked in this situation");
         if (searchInfo.serverInfoIterator->locked)
             --searchInfo.serverInfoIterator->removeRequestsCounter;

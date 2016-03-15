@@ -103,7 +103,7 @@ Qt::KeyboardModifiers MotionSelectionInstrument::multiSelectionModifiers() const
 }
 
 void MotionSelectionInstrument::installedNotify() {
-    assert(selectionItem() == NULL);
+    NX_ASSERT(selectionItem() == NULL);
 
     ensureSelectionItem();
 
