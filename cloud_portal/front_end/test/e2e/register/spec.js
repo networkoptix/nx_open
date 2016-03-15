@@ -4,7 +4,7 @@ describe('Login suite', function () {
 
     var p = new LoginPage();
 
-    it("should open register page in anonimous state by clicking Register button on top right corner", function () {
+    it("should open register page in anonymous state by clicking Register button on top right corner", function () {
         p.getHomePage();
 
         p.openRegisterButton.click();
@@ -13,7 +13,7 @@ describe('Login suite', function () {
         expect(p.htmlBody.getText()).toContain('Register to be happy');
     });
 
-    it("should open register page in anonimous state by clicking Register button on homepage", function () {
+    it("should open register page in anonymous state by clicking Register button on homepage", function () {
         p.getHomePage();
 
         p.openRegisterButtonAdv.click();
@@ -22,7 +22,7 @@ describe('Login suite', function () {
         expect(p.htmlBody.getText()).toContain('Register to be happy');
     });
 
-    it("should open register page in anonimous state", function () {
+    it("should open register page in anonymous state", function () {
         p.getByLink();
 
         expect(browser.getCurrentUrl()).toContain('register');
