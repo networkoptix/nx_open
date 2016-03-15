@@ -8,11 +8,17 @@ Item
     property string systemName;
     property Component centralAreaDelegate;
     property Component expandedAreaDelegate;
-    property bool isExpanded: false;
+    property bool correctTile: true;
+    property bool isExpanded: isExpandedPrivate && correctTile;
+
+    property alias centralArea: centralAreaLoader.item;
+    property alias expandedArea: expandedAreaLoader.item;
+
+    property bool isExpandedPrivate: false;
 
     function toggle()
     {
-        thisComponent.isExpanded = !thisComponent.isExpanded;
+        thisComponent.isExpandedPrivate = !thisComponent.isExpandedPrivate;
     }
 
     implicitWidth: 280;

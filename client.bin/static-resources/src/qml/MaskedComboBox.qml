@@ -5,13 +5,16 @@ MaskedItem
 {
     id: thisComponent;
 
-//    property string value: area.currentText;
+    property var model;
+
     height: area.height;
 
     maskedAreaDelegate: ComboBox
     {
         id: comboBox;
 
+        textRole: "display";
+        model: thisComponent.model;
         width: thisComponent.width;
     }
 }

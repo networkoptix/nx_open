@@ -7,19 +7,25 @@ BaseTile
 
     property string host;
     property string userName;
-    property bool isComaptible;
 
-//    property alias selectedUserName: userNameTextEdit.text;
-//    property alias selectedPassword: passwordTextField.text;
-    signal onConnectClicked;
+    property var knownUsersModel;
+    property var knownHostsModel;
+
+    // Properties
+    property string selectedUser: (centralArea ? centralArea.userName : "");
+    property string selectedHost: (centralArea ? centralArea.host : "");
+    property string selectedPassword: (expandedArea ? expandedArea.password : "");
+
+    signal connectClicked;
 
     property QtObject activeItemSelector: SingleActiveItemSelector
     {
         variableName: "isMasked";
+        writeVariableName: "isMaskedPrivate";
         onIsSomeoneActiveChanged:
         {
             if (isSomeoneActive)
-                isExpanded = true;
+                isExpandedPrivate = true;
         }
     }
 
@@ -31,21 +37,33 @@ BaseTile
 
     centralAreaDelegate: Column
     {
+        property alias host: hostChooseItem.text;
+        property alias userName: userChooseItem.text;
+
         anchors.left: (parent ? parent.left : undefined);
         anchors.right: (parent ? parent.right : undefined);
 
         InfoItem
         {
-            text: thisComponent.host;
-            iconUrl: (isComaptible ? "non_empty_url" : "");// TODO: change to proper url
+            id: hostChooseItem;
 
-            Component.onCompleted: activeItemSelector.addItem(this);    // TODO: add ActiveWatchable qml component?
+            isAvailable: thisComponent.correctTile;
+
+            text: thisComponent.host;
+            model: thisComponent.knownHostsModel;
+            iconUrl: (thisComponent.correctTile ? "non_empty_url" : "");// TODO: change to proper url
+
+            Component.onCompleted: activeItemSelector.addItem(this);
         }
 
         InfoItem
         {
-            id: userNameTextEdit;
-            text: "user";//thisComponent.userName;
+            id: userChooseItem;
+
+            isAvailable: thisComponent.correctTile;
+
+            text: thisComponent.userName;
+            model: thisComponent.knownUsersModel;
 
             Component.onCompleted: activeItemSelector.addItem(this);
         }
@@ -53,6 +71,8 @@ BaseTile
 
     expandedAreaDelegate: Column
     {
+        property alias password: passwordTextField.text;
+
         spacing: 8;
 
         anchors.left: (parent ? parent.left : undefined);
@@ -89,7 +109,7 @@ BaseTile
 
             text: qsTr("Connect");
 
-            onClicked: thisComponent.onConnectClicked();
+            onClicked: thisComponent.connectClicked();
         }
     }
 }

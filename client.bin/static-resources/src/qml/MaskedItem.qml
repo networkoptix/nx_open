@@ -4,7 +4,10 @@ Item
 {
     id: thisComponent;
 
-    property bool isMasked: false;
+    property bool isMasked: isAvailable && isMaskedPrivate;
+    property bool isAvailable: true;
+    property bool isMaskedPrivate;
+
     property Component maskedAreaDelegate;
     property Component areaDelegate;
 
@@ -13,7 +16,7 @@ Item
     MouseArea
     {
         anchors.fill: areaLoader;
-        onClicked: { thisComponent.isMasked = !thisComponent.isMasked; }
+        onClicked: { thisComponent.isMaskedPrivate = !thisComponent.isMaskedPrivate; }
     }
 
     Loader

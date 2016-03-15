@@ -34,6 +34,7 @@ Rectangle
         property QtObject watcher: SingleActiveItemSelector
         {
             variableName: "isExpanded";
+            writeVariableName: "isExpandedPrivate";
         }
 
         Repeater
@@ -56,9 +57,15 @@ Rectangle
                         systemName: model.systemName;
                         host: model.host;
                         userName: model.userName;
-                        isComaptible: model.isCompatible;
+                        correctTile: model.isCompatible;
+                        knownUsersModel: model.lastUsersModel;
+                        knownHostsModel: model.hostsModel;
 
-//                        onConnectClicked: context.connectToServer(serverUrl, userName, password);
+                        onConnectClicked:
+                        {
+                            console.log(selectedHost, ":", selectedUser, ":", selectedPassword);
+                            context.connectToServer(selectedHost, selectedUser, selectedPassword);
+                        }
                     }
                 }
 
