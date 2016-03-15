@@ -1,6 +1,6 @@
 'use strict';
 
-var LoginPage = function () {
+var RegisterPage = function () {
 
     this.getHomePage = function () {
         browser.get('/');
@@ -97,4 +97,4 @@ var LoginPage = function () {
     this.termsConditions = element(by.linkText('Terms and Conditions'));
 };
 
-module.exports = LoginPage;
+module.exports = RegisterPage;

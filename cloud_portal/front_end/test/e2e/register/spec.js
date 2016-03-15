@@ -1,8 +1,8 @@
 'use strict';
-var LoginPage = require('./po.js');
-describe('Login suite', function () {
+var RegisterPage = require('./po.js');
+describe('Registration suite', function () {
 
-    var p = new LoginPage();
+    var p = new RegisterPage();
 
     it("should open register page in anonymous state by clicking Register button on top right corner", function () {
         p.getHomePage();
