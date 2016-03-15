@@ -308,6 +308,7 @@ void QnCommonMetaTypes::initialize() {
 
     qRegisterMetaType<ec2::ApiFullInfoData>("ec2::ApiFullInfoData");
     qRegisterMetaType<ec2::ApiUserData>("ec2::ApiUserData");
+    qRegisterMetaType<ec2::ApiAccessRightsData>("ec2::ApiAccessRightsData");
     qRegisterMetaType<ec2::ApiLayoutData>("ec2::ApiLayoutData");
     qRegisterMetaType<ec2::ApiLayoutItemData>("ec2::ApiLayoutItemData");
     qRegisterMetaType<ec2::ApiVideowallData>("ec2::ApiVideowallData");

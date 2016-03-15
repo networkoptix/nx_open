@@ -87,8 +87,9 @@ protected:
     void resetResourceTypes(const ec2::ApiResourceTypeDataList& resTypes);
     void resetResources(const ec2::ApiFullInfoData& fullData);
     void resetLicenses(const ec2::ApiLicenseDataList& licenses);
-    void resetCamerasWithArchiveList(const ec2::ApiServerFootageDataList &cameraHistoryList);
+    void resetCamerasWithArchiveList(const ec2::ApiServerFootageDataList& cameraHistoryList);
     void resetTime();
+    void resetAccessRights(const ec2::ApiAccessRightsDataList& accessRights);
 
     virtual bool canRemoveResource(const QnUuid& resourceId);
     virtual void removeResourceIgnored(const QnUuid& resourceId);

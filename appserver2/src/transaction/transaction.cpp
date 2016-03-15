@@ -77,6 +77,7 @@ namespace ec2
             REGISTER_COMMAND(saveUser),
             REGISTER_COMMAND(getUsers),
             REGISTER_COMMAND(removeUser),
+            REGISTER_COMMAND(getAccessRights),
 
             REGISTER_COMMAND(saveBusinessRule),
             REGISTER_COMMAND(removeBusinessRule),
