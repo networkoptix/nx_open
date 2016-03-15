@@ -27,6 +27,7 @@ namespace
         , IsCompatibleRoleId
         , IsCompatibleVersionRoleId
         , IsCorrectCustomizationRoleId
+        , IsRecentlyConnectedRoleId
 
         // For local systems 
         , HostRoleId
@@ -49,7 +50,8 @@ namespace
         result.insert(IsCompatibleRoleId, "isCompatible");
         result.insert(IsCompatibleVersionRoleId, "isCompatibleVersion");
         result.insert(IsCorrectCustomizationRoleId, "isCorrectCustomization");
-
+        result.insert(IsRecentlyConnectedRoleId, "isRecentlyConnected");
+        
         result.insert(HostRoleId, "host");
         result.insert(HostsModelRoleId, "hostsModel");
         result.insert(LastUsersModelRoleId, "lastUsersModel");
@@ -102,18 +104,6 @@ namespace
             );
     }
 
-    QString getSystemHost(const QnSystemDescriptionPtr &sysemDescription)
-    {        
-        const auto servers = sysemDescription->servers();
-        if (servers.isEmpty())
-            return QString();
-
-        const auto serverId = servers.first().id;
-        const auto primaryAddress =
-            sysemDescription->getServerPrimaryAddress(serverId);
-        return primaryAddress.toString();
-    }
-
     template<typename DataType, typename ResultType>
     ResultType getLessSystemPred()
     {
@@ -142,16 +132,17 @@ namespace
 
     QStringList extractHosts(const QnSystemDescriptionPtr &system)
     {
-        static const auto kHostTemplate = lit("%1:%2");
-
         QStringList result;
         for (const auto info: system->servers())
-        {
-            const auto port = QString::number(info.port);
-            const auto addr = system->getServerPrimaryAddress(info.id).toString();
-            result.append(kHostTemplate.arg(addr, port));
-        }
+            result.append(system->getServerPrimaryAddress(info.id).toString());
         return result;
+    }
+
+
+    QString getSystemHost(const QnSystemDescriptionPtr &sysemDescription)
+    {
+        const auto hosts = extractHosts(sysemDescription);
+        return (hosts.isEmpty() ? QString() : hosts.front());
     }
 
 }
@@ -219,7 +210,7 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
     case SystemNameRoleId:
         return systemDescription->name();
     case UserRoleId:
-        return lit("Some user name <replace me>");
+        return lit("Fake Admin <replace me>");
     case LastUsersModelRoleId:
         return QVariant::fromValue(createStringListModel(QStringList() 
             << lit("admin") << lit("someUser")));
@@ -231,6 +222,8 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
         return isCompatibleSystem(systemDescription);
     case IsCorrectCustomizationRoleId:
         return isCorrectCustomization(systemDescription);
+    case IsRecentlyConnectedRoleId:
+        return false;   // TODO add according count of recent connections and its availability now
     case IsCompatibleVersionRoleId:
         return isCompatibleVersion(systemDescription);
     case HostRoleId:

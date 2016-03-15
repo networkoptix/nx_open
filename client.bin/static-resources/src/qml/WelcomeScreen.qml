@@ -55,6 +55,8 @@ Rectangle
                     LocalSystemTile
                     {
                         systemName: model.systemName;
+                        isRecentlyConnected: model.isRecentlyConnected;
+
                         host: model.host;
                         userName: model.userName;
                         correctTile: model.isCompatible;

@@ -12,7 +12,21 @@ BaseTile
     property var knownHostsModel;
 
     // Properties
-    property string selectedUser: (centralArea ? centralArea.userName : "");
+    property string selectedUser:
+    {
+        if (isRecentlyConnected)
+        {
+            if (centralArea)
+                return centralArea.userName;
+        }
+        else if (expandedArea)
+        {
+            return expandedArea.login;
+        }
+        else
+            return "";
+    }
+
     property string selectedHost: (centralArea ? centralArea.host : "");
     property string selectedPassword: (expandedArea ? expandedArea.password : "");
 
@@ -37,8 +51,8 @@ BaseTile
 
     centralAreaDelegate: Column
     {
-        property alias host: hostChooseItem.text;
-        property alias userName: userChooseItem.text;
+        property alias host: hostChooseItem.value;
+        property alias userName: userChooseItem.value;
 
         anchors.left: (parent ? parent.left : undefined);
         anchors.right: (parent ? parent.right : undefined);
@@ -49,7 +63,7 @@ BaseTile
 
             isAvailable: thisComponent.correctTile;
 
-            text: thisComponent.host;
+            value: thisComponent.host;
             model: thisComponent.knownHostsModel;
             iconUrl: (thisComponent.correctTile ? "non_empty_url" : "");// TODO: change to proper url
 
@@ -62,15 +76,18 @@ BaseTile
 
             isAvailable: thisComponent.correctTile;
 
-            text: thisComponent.userName;
+            value: thisComponent.userName;
             model: thisComponent.knownUsersModel;
 
             Component.onCompleted: activeItemSelector.addItem(this);
+
+            visible: thisComponent.isRecentlyConnected;
         }
     }
 
     expandedAreaDelegate: Column
     {
+        property alias login: loginTextField.text;
         property alias password: passwordTextField.text;
 
         spacing: 8;
@@ -80,15 +97,27 @@ BaseTile
 
         Text
         {
+            visible: !thisComponent.isRecentlyConnected;
+            text: qsTr("Login");
+        }
+
+        TextField
+        {
+            id: loginTextField;
+
+            visible: !thisComponent.isRecentlyConnected;
+            width: parent.width;
+        }
+
+        Text
+        {
             text: qsTr("Password");
         }
 
         TextField
         {
             id: passwordTextField;
-            anchors.left: parent.left;
-            anchors.right: parent.right;
-
+            width: parent.width;
         }
 
         CheckBox

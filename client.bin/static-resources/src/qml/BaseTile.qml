@@ -6,6 +6,8 @@ Item
     id: thisComponent;
 
     property string systemName;
+    property bool isRecentlyConnected;
+
     property Component centralAreaDelegate;
     property Component expandedAreaDelegate;
     property bool correctTile: true;

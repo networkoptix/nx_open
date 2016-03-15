@@ -16,5 +16,7 @@ MaskedItem
         textRole: "display";
         model: thisComponent.model;
         width: thisComponent.width;
+
+        onCurrentTextChanged: { thisComponent.value = currentText; }
     }
 }

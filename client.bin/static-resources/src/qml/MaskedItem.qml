@@ -4,6 +4,8 @@ Item
 {
     id: thisComponent;
 
+    property string value;
+
     property bool isMasked: isAvailable && isMaskedPrivate;
     property bool isAvailable: true;
     property bool isMaskedPrivate;
