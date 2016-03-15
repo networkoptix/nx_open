@@ -219,6 +219,7 @@
         <ComponentGroup Id="ClientOpenAL" Directory="$(var.clientDirId)">
             <Component>
                 <File Id="OpenAL32.dll" Name="OpenAL32.dll" Source="$(var.SourceDir)\OpenAL32.dll" DiskId="10"/>
+            </Component>
         </ComponentGroup>
 
         <ComponentGroup Id="ClientOpenSSL" Directory="$(var.clientDirId)">
