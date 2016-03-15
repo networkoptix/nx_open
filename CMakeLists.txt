@@ -46,6 +46,22 @@ if(WIN32)
     endif()
 endif()
 
+set(CMAKE_MODULE_PATH
+    ${CMAKE_MODULE_PATH}
+    ${PROJECT_SOURCE_DIR}/build_utils/cmake
+)
+
+include(default_properties)
+include(add_module)
+include(cotire)
+include(find_sources)
+include(add_translations)
+include(process_rc)
+include(process_resources)
+include(precompiled_header)
+include(python_exec)
+include(external_dependencies)
+
 message("---- Building for: ${CMAKE_VS_PLATFORM_NAME}")
 
 set (openal.version "1.16")
@@ -63,7 +79,16 @@ set (vmax_integration.version "2.1")
 set (qt.version 5.6.0)
 set (boost.version 1.56.0)
 
-set(CMAKE_PREFIX_PATH "$ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}")
+get_external_dependencies(qt boost)
+
+if(${CMAKE_BUILD_TYPE} MATCHES Debug)
+    include(${CMAKE_CURRENT_BINARY_DIR}/dependencies-debug.cmake)
+else()
+    include(${CMAKE_CURRENT_BINARY_DIR}/dependencies.cmake)
+endif()
+
+set(CMAKE_PREFIX_PATH ${QT_DIR})
+
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release CACHE STRING
         "Debug Release RelWithDebInfo"
@@ -115,17 +140,6 @@ add_definitions(-DUSE_NX_HTTP
                 -DUDT_API=__declspec\(dllimport\)
                 )
 
-# Install to "dist" directory in Windows for testing and as a staging directory
-# for the installer.
-if(WIN32 AND NOT CMAKE_INSTALL_PREFIX)
-    set(CMAKE_INSTALL_PREFIX dist CACHE STRING "Install path prefix.")
-endif()
-
-set(CMAKE_MODULE_PATH
-    ${CMAKE_MODULE_PATH}
-    ${PROJECT_SOURCE_DIR}/build_utils/cmake
-)
-
 if(WIN32)
     set(DEFAULT_LIBRARY_TYPE STATIC)
 else()
@@ -144,7 +158,7 @@ include(precompiled_header)
 include(python_exec)
 include(external_dependencies)
 
-include_directories($ENV{environment}/boost_1_56_0
+include_directories(${BOOST_INCLUDE}
                     ${CMAKE_SOURCE_DIR}/common/src
                     $ENV{environment}/include/ffmpeg-misc-headers-win32
                     $ENV{environment}/include/glext
@@ -180,7 +194,6 @@ include_directories($ENV{environment}/boost_1_56_0
                     )
 
 LINK_DIRECTORIES(${CMAKE_BINARY_DIR}/common
-                $ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}
                 $ENV{environment}/artifacts/openal/${openal.version}/${platform}/${box}/${arch}/lib/${configuration}
                 $ENV{environment}/artifacts/openssl/${openssl.version}/${platform}/${box}/${arch}/lib/${configuration}
                 $ENV{environment}/artifacts/directx/${directx.version}/${platform}/${box}/${arch}/lib/${configuration}
