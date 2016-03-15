@@ -44,13 +44,16 @@ const std::vector<CloudServerSocket::AcceptorMaker>
     CloudServerSocket::kDefaultAcceptorMakers = defaultAcceptorMakers();
 
 CloudServerSocket::CloudServerSocket(
-        std::shared_ptr<hpm::api::MediatorServerTcpConnection> mediatorConnection,
-        std::vector<AcceptorMaker> acceptorMakers)
-    : m_mediatorConnection(mediatorConnection)
-    , m_acceptorMakers(acceptorMakers)
-    , m_terminated(false)
-    , m_ioThreadSocket(new TCPSocket)
-    , m_listenIssued(false)
+    std::shared_ptr<hpm::api::MediatorServerTcpConnection> mediatorConnection,
+    nx::network::RetryPolicy mediatorRegistrationRetryPolicy,
+    std::vector<AcceptorMaker> acceptorMakers)
+:
+    m_mediatorConnection(mediatorConnection),
+    m_mediatorRegistrationRetryPolicy(std::move(mediatorRegistrationRetryPolicy)),
+    m_acceptorMakers(acceptorMakers),
+    m_terminated(false),
+    m_ioThreadSocket(new TCPSocket),
+    m_listenIssued(false)
 {
     // TODO: #mu default values for m_socketAttributes shall match default
     //           system vales: think how to implement this...
@@ -230,6 +233,8 @@ void CloudServerSocket::acceptAsync(
 {
     if (!m_listenIssued)
     {
+        //TODO #ak use m_mediatorRegistrationRetryPolicy
+
         m_listenIssued = true;
         const auto cloudCredentials =
             SocketGlobals::mediatorConnector().getSystemCredentials();
@@ -348,6 +353,8 @@ void CloudServerSocket::onListenRequestCompleted(
     }
     else
     {
+        //TODO #ak should retry if failed since system registration data
+            //can be propagated to mediator with some delay
         NX_LOGX(lm("Listen request has failed: %1")
             .arg(QnLexical::serialized(resultCode)), cl_logINFO);
         handler(SystemError::invalidData, nullptr);

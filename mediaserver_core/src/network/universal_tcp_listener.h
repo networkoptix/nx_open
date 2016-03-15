@@ -7,16 +7,20 @@
 #include <nx/utils/thread/mutex.h>
 
 
+class CloudConnectionManager;
+
 class QnUniversalTcpListener
 :
     public QnHttpConnectionListener
 {
 public:
     QnUniversalTcpListener(
+        const CloudConnectionManager& cloudConnectionManager,
         const QHostAddress& address,
         int port,
         int maxConnections,
         bool useSsl);
+    ~QnUniversalTcpListener();
         
     void addProxySenderConnections(const SocketAddress& proxyUrl, int size);
 
@@ -29,15 +33,14 @@ protected:
     virtual void destroyServerSocket(AbstractStreamServerSocket* serverSocket) override;
     
 private:
+    const CloudConnectionManager& m_cloudConnectionManager;
     std::unique_ptr<nx::network::MultipleServerSocket> m_multipleServerSocket;
     QnMutex m_mutex;
     bool m_boundToCloud;
     nx::hpm::api::SystemCredentials m_cloudCredentials;
 
     void onCloudBindingStatusChanged(
-        bool isBound,
-        const QString& cloudSystemId,
-        const QString& cloudAuthenticationKey);
+        boost::optional<nx::hpm::api::SystemCredentials> cloudCredentials);
     void updateCloudConnectState(QnMutexLockerBase* const lk);
 };
 

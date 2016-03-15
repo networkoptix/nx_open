@@ -15,10 +15,8 @@ namespace network {
 class NX_NETWORK_API MultipleServerSocket
     : public AbstractStreamServerSocket
 {
-protected:
-    MultipleServerSocket();
-
 public:
+    MultipleServerSocket();
     ~MultipleServerSocket();
 
     //TODO #muskov does not compile on msvc2012
@@ -67,6 +65,11 @@ public:
         std::function<void(SystemError::ErrorCode,
                            AbstractStreamSocket*)> handler) override;
 
+    /** These methods can be called concurrently with \a accept */
+    bool addSocket(std::unique_ptr<AbstractStreamServerSocket> socket);
+    void removeSocket(size_t pos);
+    size_t count() const;
+
 protected:
     struct NX_NETWORK_API ServerSocketHandle
     {
@@ -80,7 +83,6 @@ protected:
         void stopAccepting();
     };
 
-    bool addSocket(std::unique_ptr<AbstractStreamServerSocket> socket);
     void accepted(ServerSocketHandle* source, SystemError::ErrorCode code,
                   AbstractStreamSocket* socket);
 

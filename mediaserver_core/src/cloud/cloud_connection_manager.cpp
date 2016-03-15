@@ -5,6 +5,7 @@
 
 #include "cloud_connection_manager.h"
 
+#include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
 
@@ -39,6 +40,20 @@ CloudConnectionManager::CloudConnectionManager()
 CloudConnectionManager::~CloudConnectionManager()
 {
    directDisconnectAll();
+}
+
+boost::optional<nx::hpm::api::SystemCredentials> 
+    CloudConnectionManager::getSystemCredentials() const
+{
+    QnMutexLocker lk(&m_mutex);
+    if (m_cloudSystemID.isEmpty() || m_cloudAuthKey.isEmpty())
+        return boost::none;
+
+    nx::hpm::api::SystemCredentials cloudCredentials;
+    cloudCredentials.systemId = m_cloudSystemID.toUtf8();
+    cloudCredentials.serverId = qnCommon->moduleGUID().toByteArray();
+    cloudCredentials.key = m_cloudAuthKey.toUtf8();
+    return cloudCredentials;
 }
 
 bool CloudConnectionManager::bindedToCloud() const

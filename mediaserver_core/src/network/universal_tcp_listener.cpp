@@ -2,13 +2,19 @@
 #include "universal_tcp_listener.h"
 
 #include <common/common_module.h>
+#include <nx/network/cloud/cloud_server_socket.h>
+#include <nx/network/retry_timer.h>
+#include <nx/network/socket_global.h>
+#include <nx/network/stun/async_client.h>
 #include <nx/utils/log/log.h>
 
-#include "universal_request_processor.h"
+#include "cloud/cloud_connection_manager.h"
 #include "proxy_sender_connection_processor.h"
+#include "universal_request_processor.h"
 
 
 QnUniversalTcpListener::QnUniversalTcpListener(
+    const CloudConnectionManager& cloudConnectionManager,
     const QHostAddress& address,
     int port,
     int maxConnections,
@@ -19,12 +25,28 @@ QnUniversalTcpListener::QnUniversalTcpListener(
         port,
         maxConnections,
         useSsl),
+    m_cloudConnectionManager(cloudConnectionManager),
     m_boundToCloud(false)
 {
-    m_cloudCredentials.serverId = ...;
+    m_cloudCredentials.serverId = qnCommon->moduleGUID().toByteArray();
+    Qn::directConnect(
+        &cloudConnectionManager, &CloudConnectionManager::cloudBindingStatusChanged,
+        this,
+        [this, &cloudConnectionManager](bool bindedToCloud)
+        {
+            onCloudBindingStatusChanged(cloudConnectionManager.getSystemCredentials());
+        });
+    onCloudBindingStatusChanged(cloudConnectionManager.getSystemCredentials());
 }
 
-void QnUniversalTcpListener::addProxySenderConnections(const SocketAddress& proxyUrl, int size)
+QnUniversalTcpListener::~QnUniversalTcpListener()
+{
+    directDisconnectAll();
+}
+
+void QnUniversalTcpListener::addProxySenderConnections(
+    const SocketAddress& proxyUrl,
+    int size)
 {
     if (m_needStop)
         return;
@@ -34,13 +56,15 @@ void QnUniversalTcpListener::addProxySenderConnections(const SocketAddress& prox
 
     for (int i = 0; i < size; ++i)
     {
-        auto connect = new QnProxySenderConnection(proxyUrl, qnCommon->moduleGUID(), this);
+        auto connect = new QnProxySenderConnection(
+            proxyUrl, qnCommon->moduleGUID(), this);
         connect->start();
         addOwnership(connect);
     }
 }
 
-QnTCPConnectionProcessor* QnUniversalTcpListener::createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket)
+QnTCPConnectionProcessor* QnUniversalTcpListener::createRequestProcessor(
+    QSharedPointer<AbstractStreamSocket> clientSocket)
 {
     return new QnUniversalRequestProcessor(clientSocket, this, needAuth());
 }
@@ -77,15 +101,15 @@ void QnUniversalTcpListener::destroyServerSocket(
 }
 
 void QnUniversalTcpListener::onCloudBindingStatusChanged(
-    bool isBound,
-    const QString& cloudSystemId,
-    const QString& cloudAuthenticationKey)
+    boost::optional<nx::hpm::api::SystemCredentials> cloudCredentials)
 {
     QnMutexLocker lk(&m_mutex);
 
+    const bool isBound = static_cast<bool>(cloudCredentials);
     const bool newCredentialsAreTheSame = 
-        m_cloudCredentials.systemId == cloudSystemId.toUtf8() &&
-        m_cloudCredentials.key == cloudAuthenticationKey.toUtf8();
+        cloudCredentials
+        ? (m_cloudCredentials == *cloudCredentials)
+        : false;
 
     if (m_boundToCloud == isBound &&
         (!m_boundToCloud || newCredentialsAreTheSame))
@@ -102,31 +126,38 @@ void QnUniversalTcpListener::onCloudBindingStatusChanged(
     }
 
     m_boundToCloud = isBound;
-    m_cloudCredentials.systemId = cloudSystemId.toUtf8();
-    m_cloudCredentials.key = cloudAuthenticationKey.toUtf8();
+    if (cloudCredentials)
+        m_cloudCredentials = *cloudCredentials;
     updateCloudConnectState(&lk);
 }
 
 void QnUniversalTcpListener::updateCloudConnectState(
-    QnMutexLockerBase* const lk)
+    QnMutexLockerBase* const /*lk*/)
 {
     if (!m_multipleServerSocket)
         return;
 
     if (m_boundToCloud)
     {
-        NX_ASSERT(m_multipleServerSocket->size() == 1);
+        NX_ASSERT(m_multipleServerSocket->count() == 1);
 
-        auto cloudServerSocket = std::make_unique<CloudServerSocket>();
-        cloudServerSocket->setCloudCredentials(m_cloudCredentials);
-        //TODO #ak should not fail on first error, but try to restore...
-            //E.g., system binding data can be propagated to mediator with some delay
-        cloudServerSocket->listen();
+        nx::network::RetryPolicy registrationOnMediatorRetryPolicy;
+        registrationOnMediatorRetryPolicy.setMaxRetryCount(
+            nx::network::RetryPolicy::kInfiniteRetries);
+
+        nx::network::SocketGlobals::mediatorConnector().setSystemCredentials(
+            m_cloudCredentials);
+
+        auto cloudServerSocket =
+            std::make_unique<nx::network::cloud::CloudServerSocket>(
+                nx::network::SocketGlobals::mediatorConnector().systemConnection(),
+                std::move(registrationOnMediatorRetryPolicy));
+        cloudServerSocket->listen(0);
         m_multipleServerSocket->addSocket(std::move(cloudServerSocket));
     }
     else
     {
-        if (m_multipleServerSocket->size() == 2)
-            m_multipleServerSocket->removeSocket(1);
+        NX_ASSERT(m_multipleServerSocket->count() == 2);
+        m_multipleServerSocket->removeSocket(1);
     }
 }

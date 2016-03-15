@@ -4,7 +4,9 @@
 #include <nx/network/abstract_socket.h>
 #include <nx/network/cloud/mediator_connections.h>
 #include <nx/network/cloud/tunnel/incoming_tunnel_pool.h>
+#include <nx/network/retry_timer.h>
 #include <nx/network/socket_attributes_cache.h>
+
 
 namespace nx {
 namespace network {
@@ -28,6 +30,8 @@ public:
 
     CloudServerSocket(
         std::shared_ptr<hpm::api::MediatorServerTcpConnection> mediatorConnection,
+        nx::network::RetryPolicy mediatorRegistrationRetryPolicy 
+            = nx::network::RetryPolicy(),
         std::vector<AcceptorMaker> acceptorMakers = kDefaultAcceptorMakers);
 
     ~CloudServerSocket();
@@ -74,6 +78,7 @@ protected:
                            AbstractStreamSocket*)> handler);
 
     std::shared_ptr<hpm::api::MediatorServerTcpConnection> m_mediatorConnection;
+    nx::network::RetryPolicy m_mediatorRegistrationRetryPolicy;
     const std::vector<AcceptorMaker> m_acceptorMakers;
 
     QnMutex m_mutex;

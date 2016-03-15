@@ -270,6 +270,8 @@ bool MultipleServerSocket::addSocket(
     if (!socket->setNonBlockingMode(true))
         return false;
 
+    //TODO #ak socket count MUST be updated without delay
+
     post(
         [this, socket = std::move(socket)]() mutable
         {
@@ -286,6 +288,17 @@ bool MultipleServerSocket::addSocket(
                     nullptr, SystemError::timedOut, nullptr));  //TODO #ak use interrupted error code
         });
     return true;
+}
+
+void MultipleServerSocket::removeSocket(size_t pos)
+{
+    //TODO #ak
+}
+
+size_t MultipleServerSocket::count() const
+{
+    //TODO #ak
+    return m_serverSockets.size();
 }
 
 void MultipleServerSocket::accepted(
