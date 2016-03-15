@@ -13,7 +13,7 @@ namespace {
 
 //static QnDesktopResource* instance = 0;
 
-QnDesktopResource::QnDesktopResource(QGLWidget* mainWindow): QnAbstractArchiveResource() 
+QnDesktopResource::QnDesktopResource(QGLWidget* mainWindow): QnAbstractArchiveResource()
 {
     m_mainWidget = mainWindow;
     addFlags(Qn::local_live_cam | Qn::desktop_camera);
@@ -38,7 +38,7 @@ QString QnDesktopResource::toString() const {
     return getUniqueId();
 }
 
-QnAbstractStreamDataProvider* QnDesktopResource::createDataProviderInternal(Qn::ConnectionRole /*role*/) 
+QnAbstractStreamDataProvider* QnDesktopResource::createDataProviderInternal(Qn::ConnectionRole /*role*/)
 {
     QnMutexLocker lock( &m_dpMutex );
 
@@ -53,7 +53,7 @@ QnAbstractStreamDataProvider* QnDesktopResource::createDataProviderInternal(Qn::
 
 void QnDesktopResource::createSharedDataProvider()
 {
-    if (m_desktopDataProvider) 
+    if (m_desktopDataProvider)
     {
         if (m_desktopDataProvider->readyToStop())
             delete m_desktopDataProvider; // stop and destroy old instance
@@ -111,7 +111,8 @@ void QnDesktopResource::addConnection(const QnMediaServerResourcePtr &server)
 
 void QnDesktopResource::removeConnection(const QnMediaServerResourcePtr &server)
 {
-    m_connectionPool.remove(server->getId());
+    //TODO: #GDM #High #2.6 #IMPLEMENT ME when socket will be repaired
+   // m_connectionPool.remove(server->getId());
 }
 
 static QSharedPointer<QnEmptyResourceAudioLayout> emptyAudioLayout( new QnEmptyResourceAudioLayout() );
