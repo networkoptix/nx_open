@@ -209,12 +209,28 @@ QnObject {
     QnMediaResourceHelper {
         id: resourceHelper
 
+        property bool resetWhenProtocolChanged: false
+
+        property bool protocolHasChanged: false
+
         screenSize: Qt.size(mainWindow.width, mainWindow.height)
         resourceId: player.resourceId
 
         onMediaUrlChanged: {
             d.firstPlay = true
             console.log("Media URL changed: " + mediaUrl)
+
+            if (protocolHasChanged)
+            {
+                protocolHasChanged = false
+                stop()
+                play(d.position)
+            }
+        }
+
+        onProtocolChanged: {
+            if (resetWhenProtocolChanged)
+                protocolHasChanged = true
         }
     }
 
@@ -292,6 +308,8 @@ QnObject {
         timelinePositionRequest(d.position)
         d.updateTimeline = true
 
+        resourceHelper.resetWhenProtocolChanged = false
+
         if (d.position == -1 && resourceHelper.position == -1) {
             if (!d.firstPlay)
                 resourceHelper.updateUrl()
@@ -307,6 +325,8 @@ QnObject {
         d.prevPlayerPosition = 0
         d.mediaPlayer.play()
         failureTimer.updateTimer()
+
+        resourceHelper.resetWhenProtocolChanged = true
 
         d.dirty = false
     }
