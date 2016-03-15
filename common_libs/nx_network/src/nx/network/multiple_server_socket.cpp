@@ -173,10 +173,11 @@ AbstractStreamSocket* MultipleServerSocket::accept()
     }
 
     std::promise<std::pair<SystemError::ErrorCode, AbstractStreamSocket*>> promise;
-    acceptAsync([&](SystemError::ErrorCode code, AbstractStreamSocket* socket)
-    {
-        promise.set_value(std::make_pair(code, socket));
-    });
+    acceptAsync(
+        [&](SystemError::ErrorCode code, AbstractStreamSocket* socket)
+        {
+            promise.set_value(std::make_pair(code, socket));
+        });
 
     const auto result = promise.get_future().get();
     if (result.first != SystemError::noError)
@@ -242,13 +243,6 @@ MultipleServerSocket::ServerSocketHandle::ServerSocketHandle(
 {
 }
 
-MultipleServerSocket::ServerSocketHandle::ServerSocketHandle(
-        MultipleServerSocket::ServerSocketHandle&& right)
-    : socket(std::move(right.socket))
-    , isAccepting(std::move(right.isAccepting))
-{
-}
-
 AbstractStreamServerSocket*
     MultipleServerSocket::ServerSocketHandle::operator->() const
 {
@@ -270,10 +264,11 @@ bool MultipleServerSocket::addSocket(
     if (!socket->setNonBlockingMode(true))
         return false;
 
-    //TODO #ak socket count MUST be updated without delay
+    //NOTE socket count MUST be updated without delay
 
-    post(
-        [this, socket = std::move(socket)]() mutable
+    std::promise<void> socketAddedPromise;
+    dispatch(
+        [this, &socketAddedPromise, socket = std::move(socket)]() mutable
         {
             // all internal sockets are used in non blocking mode while
             // interface allows both
@@ -286,18 +281,29 @@ bool MultipleServerSocket::addSocket(
                 std::bind(
                     &MultipleServerSocket::accepted, this,
                     nullptr, SystemError::timedOut, nullptr));  //TODO #ak use interrupted error code
+            socketAddedPromise.set_value();
         });
+    socketAddedPromise.get_future().wait();
     return true;
 }
 
 void MultipleServerSocket::removeSocket(size_t pos)
 {
-    //TODO #ak
+    std::promise<void> socketRemovedPromise;
+    dispatch(
+        [this, &socketRemovedPromise, pos]()
+        {
+            auto serverSocketContext = std::move(m_serverSockets[pos]);
+            m_serverSockets.erase(m_serverSockets.begin()+pos);
+            serverSocketContext.socket->pleaseStopSync();
+
+            socketRemovedPromise.set_value();
+        });
+    socketRemovedPromise.get_future().wait();
 }
 
 size_t MultipleServerSocket::count() const
 {
-    //TODO #ak
     return m_serverSockets.size();
 }
 

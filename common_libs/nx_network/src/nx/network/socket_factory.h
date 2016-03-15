@@ -17,6 +17,13 @@
 class NX_NETWORK_API SocketFactory
 {
 public:
+    enum class SocketType
+    {
+        cloud,    ///< production mode
+        tcp,        ///< \class TcpSocket and \class TcpServerSocket
+        udt,        ///< \class UdtSocket and \class UdtServerSocket
+    };
+
     enum class NatTraversalType
     {
         nttAuto,
@@ -44,13 +51,6 @@ public:
     static std::unique_ptr< AbstractStreamServerSocket > createStreamServerSocket(
         bool sslRequired = false,
         NatTraversalType natTraversalRequired = NatTraversalType::nttAuto );
-
-    enum class SocketType
-    {
-        cloud,    ///< production mode
-        tcp,        ///< \class TcpSocket and \class TcpServerSocket
-        udt,        ///< \class UdtSocket and \class UdtServerSocket
-    };
 
     static QString toString( SocketType type );
     static SocketType stringToSocketType( QString type );

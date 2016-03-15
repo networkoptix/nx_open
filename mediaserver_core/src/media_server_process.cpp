@@ -1463,7 +1463,8 @@ void MediaServerProcess::at_cameraIPConflict(const QHostAddress& host, const QSt
 }
 
 
-bool MediaServerProcess::initTcpListener()
+bool MediaServerProcess::initTcpListener(
+    const CloudConnectionManager& cloudConnectionManager)
 {
     m_httpModManager.reset( new nx_http::HttpModManager() );
     m_autoRequestForwarder.reset( new QnAutoRequestForwarder() );
@@ -1547,6 +1548,7 @@ bool MediaServerProcess::initTcpListener()
 #endif
 
     m_universalTcpListener = new QnUniversalTcpListener(
+        cloudConnectionManager,
         QHostAddress::Any,
         rtspPort,
         QnTcpListener::DEFAULT_MAX_CONNECTIONS,
@@ -1962,7 +1964,7 @@ void MediaServerProcess::run()
         new StreamingChunkTranscoder( StreamingChunkTranscoder::fBeginOfRangeInclusive ) );
     std::unique_ptr<nx_hls::HLSSessionPool> hlsSessionPool( new nx_hls::HLSSessionPool() );
 
-    if( !initTcpListener() )
+    if (!initTcpListener(cloudConnectionManager))
     {
         qCritical() << "Failed to bind to local port. Terminating...";
         QCoreApplication::quit();

@@ -65,7 +65,9 @@ public:
         std::function<void(SystemError::ErrorCode,
                            AbstractStreamSocket*)> handler) override;
 
-    /** These methods can be called concurrently with \a accept */
+    /** These methods can be called concurrently with \a accept.
+        \note Blocks until completion
+    */
     bool addSocket(std::unique_ptr<AbstractStreamServerSocket> socket);
     void removeSocket(size_t pos);
     size_t count() const;
@@ -77,7 +79,8 @@ protected:
         bool isAccepting;
 
         ServerSocketHandle(std::unique_ptr<AbstractStreamServerSocket> socket_);
-        ServerSocketHandle(ServerSocketHandle&&);
+        ServerSocketHandle(ServerSocketHandle&&) = default;
+        ServerSocketHandle& operator=(ServerSocketHandle&&) = default;
 
         AbstractStreamServerSocket* operator->() const;
         void stopAccepting();
