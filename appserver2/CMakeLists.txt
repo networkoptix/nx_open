@@ -20,14 +20,7 @@ set(PROJECT_SHORTNAME "appserver2")
 set(PROJECT_LONGNAME "${nxtool.company.name} New Enterprise Controller")
 
 # Additional Include Directories
-include_directories (${include_directories} src)
-
-remove_definitions(-D_CONSOLE
-                -DNX_NETWORK_API=__declspec\(dllimport\)
-                )
-add_definitions(-D_CONSOLE
-                -DNX_NETWORK_API=__declspec\(dllexport\)
-                )                
+include_directories (${include_directories} src)        
 
 find_sources(src)
 ADD_MSVC_PRECOMPILED_HEADER("StdAfx.h" "${PROJECT_SOURCE_DIR}/src/StdAfx.cpp" CPP_FILES)
