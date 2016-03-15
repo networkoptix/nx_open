@@ -10,7 +10,7 @@
 #include <business/business_fwd.h>
 
 #include "nx_ec/ec_api.h"
-#include "nx_ec/data/api_server_alive_data.h"
+#include "nx_ec/data/api_peer_alive_data.h"
 #include "nx_ec/data/api_runtime_data.h"
 
 #include <nx/utils/singleton.h>
@@ -87,8 +87,9 @@ protected:
     void resetResourceTypes(const ec2::ApiResourceTypeDataList& resTypes);
     void resetResources(const ec2::ApiFullInfoData& fullData);
     void resetLicenses(const ec2::ApiLicenseDataList& licenses);
-    void resetCamerasWithArchiveList(const ec2::ApiServerFootageDataList &cameraHistoryList);
+    void resetCamerasWithArchiveList(const ec2::ApiServerFootageDataList& cameraHistoryList);
     void resetTime();
+    void resetAccessRights(const ec2::ApiAccessRightsDataList& accessRights);
 
     virtual bool canRemoveResource(const QnUuid& resourceId);
     virtual void removeResourceIgnored(const QnUuid& resourceId);

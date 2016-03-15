@@ -20,18 +20,21 @@
 #include <QMetaType>
 
 
-//!This class added to minimise creation/destruction of QByteArray and QString
+//!This class added to minimize creation/destruction of QByteArray and QString
 class NX_UTILS_API QnUuid
 {
 public:
     static const size_t RFC4122_SIZE = 16;
 
     QnUuid();
-    QnUuid( const char* text );
-    QnUuid( const QString& text );
-    QnUuid( const QByteArray& text );
-    QnUuid( const std::string& text );
-    explicit QnUuid( const QUuid &uuid );
+    QnUuid(const QnUuid& other) = default;
+    QnUuid(QnUuid&& other) = default;
+
+    explicit QnUuid( const char* text );
+    explicit QnUuid( const QString& text );
+    explicit QnUuid( const QByteArray& text );
+    explicit QnUuid( const std::string& text );
+    QnUuid( const QUuid &uuid );
 
     const QUuid& getQUuid() const;
 
@@ -47,6 +50,9 @@ public:
     bool operator==( const QnUuid& other ) const;
     bool operator<( const QnUuid& other ) const;
     bool operator>( const QnUuid& other ) const;
+
+    QnUuid& operator=(const QnUuid& other) = default;
+    QnUuid& operator=(QnUuid&& other) = default;
 
     static QnUuid fromRfc4122( const QByteArray& bytes );
     static QnUuid fromHardwareId( const QString& hwid );

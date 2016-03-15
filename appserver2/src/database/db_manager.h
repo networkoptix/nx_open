@@ -540,6 +540,9 @@ namespace ec2
         template <class ObjectType, class ObjectListType>
         bool fillTransactionLogInternal(ApiCommand::Value command);
 
+        template <class ObjectListType>
+        bool queryObjects(ObjectListType& objects);
+
         virtual bool beforeInstallUpdate(const QString& updateName) override;
         virtual bool afterInstallUpdate(const QString& updateName) override;
 

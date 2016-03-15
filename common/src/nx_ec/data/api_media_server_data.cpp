@@ -1,7 +1,8 @@
 #include "api_media_server_data.h"
-#include "api_model_functions_impl.h"
 
 #include <core/resource/server_backup_schedule.h>
+
+#include <utils/common/model_functions.h>
 
 namespace ec2 {
 
@@ -40,8 +41,8 @@ namespace ec2 {
         QN_FUSION_DEFINE_FUNCTIONS(ApiMediaServerUserAttributesData, (eq))
 
 
-    ApiMediaServerUserAttributesData::ApiMediaServerUserAttributesData(): 
-        maxCameras(0), 
+    ApiMediaServerUserAttributesData::ApiMediaServerUserAttributesData():
+        maxCameras(0),
         allowAutoRedundancy(false),
         backupType(Qn::Backup_Manual),
         backupDaysOfTheWeek(backup::AllDays),

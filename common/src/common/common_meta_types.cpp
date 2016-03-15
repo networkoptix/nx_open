@@ -88,7 +88,7 @@
 #include <nx_ec/data/api_layout_data.h>
 #include <nx_ec/data/api_camera_data.h>
 #include <nx_ec/data/api_business_rule_data.h>
-
+#include <nx_ec/data/api_access_rights_data.h>
 
 #include "api/model/api_ioport_data.h"
 #include "api/model/recording_stats_reply.h"
@@ -308,6 +308,7 @@ void QnCommonMetaTypes::initialize() {
 
     qRegisterMetaType<ec2::ApiFullInfoData>("ec2::ApiFullInfoData");
     qRegisterMetaType<ec2::ApiUserData>("ec2::ApiUserData");
+    qRegisterMetaType<ec2::ApiAccessRightsData>("ec2::ApiAccessRightsData");
     qRegisterMetaType<ec2::ApiLayoutData>("ec2::ApiLayoutData");
     qRegisterMetaType<ec2::ApiLayoutItemData>("ec2::ApiLayoutItemData");
     qRegisterMetaType<ec2::ApiVideowallData>("ec2::ApiVideowallData");
@@ -318,6 +319,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<ec2::ApiMediaServerData>("ec2::ApiMediaServerData");
     qRegisterMetaType<ec2::ApiMediaServerUserAttributesData>("ec2::ApiMediaServerUserAttributesData");
     qRegisterMetaType<ec2::ApiStorageData>("ec2::ApiStorageData");
+    qRegisterMetaType<ec2::ApiResourceParamWithRefDataList>("ec2::ApiResourceParamWithRefDataList");
 
     qRegisterMetaType<QnUuid>();
     qRegisterMetaTypeStreamOperators<QnUuid>();

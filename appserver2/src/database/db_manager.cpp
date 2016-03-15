@@ -691,12 +691,46 @@ bool QnDbManager::init(const QUrl& dbUrl)
     return true;
 }
 
+template <>
+bool QnDbManager::queryObjects<ApiMediaServerUserAttributesDataList>(ApiMediaServerUserAttributesDataList& objects)
+{
+    ErrorCode errCode = doQueryNoLock(QnUuid(), objects);
+    return errCode == ErrorCode::ok;
+}
+
+template <>
+bool QnDbManager::queryObjects<ApiClientInfoDataList>(ApiClientInfoDataList& objects)
+{
+    ErrorCode errCode = doQueryNoLock(QnUuid(), objects);
+    return errCode == ErrorCode::ok;
+}
+
+template <>
+bool QnDbManager::queryObjects<ApiStorageDataList>(ApiStorageDataList& objects)
+{
+    ErrorCode errCode = doQueryNoLock(QnUuid(), objects);
+    return errCode == ErrorCode::ok;
+}
+
+template <>
+bool QnDbManager::queryObjects<ApiResourceParamWithRefDataList>(ApiResourceParamWithRefDataList& objects)
+{
+    ErrorCode errCode = doQueryNoLock(QnUuid(), objects);
+    return errCode == ErrorCode::ok;
+}
+
+template <class ObjectListType>
+bool QnDbManager::queryObjects(ObjectListType& objects)
+{
+    ErrorCode errCode = doQueryNoLock(nullptr, objects);
+    return errCode == ErrorCode::ok;
+}
+
 template <class ObjectType, class ObjectListType>
 bool QnDbManager::fillTransactionLogInternal(ApiCommand::Value command)
 {
     ObjectListType objects;
-    ErrorCode errCode = doQueryNoLock(nullptr, objects);
-    if (errCode != ErrorCode::ok)
+    if (!queryObjects<ObjectListType>(objects))
         return false;
 
     for(const ObjectType& object: objects)
@@ -733,9 +767,6 @@ bool QnDbManager::resyncTransactionLog()
 
     if (!fillTransactionLogInternal<ApiLicenseData, ApiLicenseDataList>(ApiCommand::addLicense))
         return false;
-
-    //if (!fillTransactionLogInternal<ApiServerFootageData, ApiServerFootageDataList>(ApiCommand::addCameraHistoryItem))
-    //    return false;
 
     if (!fillTransactionLogInternal<ApiStoredFileData, ApiStoredFileDataList>(ApiCommand::addStoredFile))
         return false;
@@ -3291,7 +3322,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiMediaServerD
     {
         //fetching server attributes
         ApiMediaServerUserAttributesDataList serverAttrsList;
-        ErrorCode result = doQueryNoLock(nullptr, serverAttrsList );
+        ErrorCode result = doQueryNoLock(QnUuid(), serverAttrsList );
         if( result != ErrorCode::ok )
             return result;
 
@@ -3311,7 +3342,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiMediaServerD
 
     //fetching storages
     ApiStorageDataList storages;
-    ErrorCode result = doQueryNoLock(nullptr, storages );
+    ErrorCode result = doQueryNoLock(QnUuid(), storages );
     if( result != ErrorCode::ok )
         return result;
     //merging storages
@@ -3328,7 +3359,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiMediaServerD
 
     //reading status info
     ApiResourceStatusDataList statusList;
-    result = doQueryNoLock( nullptr, statusList );
+    result = doQueryNoLock( QnUuid(), statusList );
     if( result != ErrorCode::ok )
         return result;
 
@@ -3756,9 +3787,14 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& dummy, ApiFullInfoData& da
         return status == ErrorCode::ok;
     };
 
+    auto db_load_uuid = [this, &status](auto &target) {
+        status = doQueryNoLock(QnUuid(), target);
+        return status == ErrorCode::ok;
+    };
+
     if (!db_load(data.resourceTypes))               return status;
     if (!db_load(data.servers))                     return status;
-    if (!db_load(data.serversUserAttributesList))   return status;
+    if (!db_load_uuid(data.serversUserAttributesList))   return status;
     if (!db_load(data.cameras))                     return status;
     if (!db_load(data.cameraUserAttributesList))    return status;
     if (!db_load(data.users))                       return status;
@@ -3769,9 +3805,10 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& dummy, ApiFullInfoData& da
     if (!db_load(data.cameraHistory))               return status;
     if (!db_load(data.licenses))                    return status;
     if (!db_load(data.discoveryData))               return status;
-    if (!db_load(data.allProperties))               return status;
-    if (!db_load(data.storages))                    return status;
-    if (!db_load(data.resStatusList))               return status;
+    if (!db_load_uuid(data.allProperties))          return status;
+    if (!db_load_uuid(data.storages))               return status;
+    if (!db_load_uuid(data.resStatusList))          return status;
+    if (!db_load(data.accessRights))                return status;
 
     return ErrorCode::ok;
 }

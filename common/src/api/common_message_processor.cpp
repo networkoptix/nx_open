@@ -14,6 +14,7 @@
 #include <nx_ec/data/api_resource_type_data.h>
 #include <nx_ec/data/api_license_data.h>
 #include <nx_ec/data/api_business_rule_data.h>
+#include <nx_ec/data/api_access_rights_data.h>
 
 #include <api/app_server_connection.h>
 
@@ -21,6 +22,7 @@
 #include <core/resource_management/server_additional_addresses_dictionary.h>
 #include <core/resource_management/resource_properties.h>
 #include <core/resource_management/status_dictionary.h>
+#include <core/resource_management/resource_access_manager.h>
 #include <core/resource/camera_history.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
@@ -433,6 +435,11 @@ void QnCommonMessageProcessor::resetTime()
     });
 }
 
+void QnCommonMessageProcessor::resetAccessRights(const ec2::ApiAccessRightsDataList& accessRights)
+{
+    qnResourceAccessManager->reset(accessRights);
+}
+
 bool QnCommonMessageProcessor::canRemoveResource(const QnUuid &)
 {
     return true;
@@ -520,6 +527,7 @@ void QnCommonMessageProcessor::onGotInitialNotification(const ec2::ApiFullInfoDa
     resetPropertyList(fullData.allProperties);
     resetCamerasWithArchiveList(fullData.cameraHistory);
     resetStatusList(fullData.resStatusList);
+    resetAccessRights(fullData.accessRights);
 
     resetLicenses(fullData.licenses);
     resetTime();
