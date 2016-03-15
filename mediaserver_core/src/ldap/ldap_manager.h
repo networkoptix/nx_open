@@ -35,7 +35,6 @@ public:
     Qn::AuthResult realm(QString* realm) const;
 
     Qn::AuthResult authenticateWithDigest(const QString &login, const QString &ha1);
-    Qn::LdapResult testSettings2(const QnLdapSettings& settings);
 
 private:
     mutable QMap<QString, QString> m_realmCache;

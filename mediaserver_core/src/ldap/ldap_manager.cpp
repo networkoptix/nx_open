@@ -550,23 +550,6 @@ Qn::LdapResult QnLdapManager::fetchUsers(QnLdapUsers &users) {
     return fetchUsers(users, settings);
 }
 
-Qn::LdapResult QnLdapManager::testSettings2(const QnLdapSettings& settings) {
-    LdapSession session(settings);
-    if (!session.connect())
-    {
-        NX_LOG( QString::fromLatin1("QnLdapManager::testSettings: connect(): %1").arg(session.lastErrorString()), cl_logWARNING );
-        return translateErrorCode(session.lastErrorCode());
-    }
-
-    if (!session.testSettings())
-    {
-        NX_LOG( QString::fromLatin1("QnLdapManager::testSettings: testSettings(): %1").arg(session.lastErrorString()), cl_logWARNING );
-        return translateErrorCode(session.lastErrorCode());
-    }
-
-    return Qn::Ldap_NoError;
-}
-
 Qn::AuthResult QnLdapManager::authenticateWithDigest(const QString &login, const QString &digest) {
     QnLdapSettings settings = QnGlobalSettings::instance()->ldapSettings();
     LdapSession session(settings);
