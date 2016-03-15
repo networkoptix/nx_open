@@ -647,6 +647,7 @@ bool QnFileStorageResource::isAvailable() const
     {
         QnMutexLocker lk(&m_mutex);
         m_valid = false;
+        return false;
     }
     m_cachedTotalSpace = getDiskTotalSpace(
         localPathCopy.isEmpty() ? getPath() : localPathCopy
