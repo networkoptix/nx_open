@@ -79,8 +79,6 @@ private:
 
     void setLocalPathSafe(const QString &path) const;
     QString getLocalPathSafe() const;
-    bool isValid() const;
-
 public:
     // Try to remove old temporary dirs if any.
     // This could happen if server crashed and ~FileStorageResource
@@ -88,10 +86,10 @@ public:
     static void removeOldDirs();
 
 private:
-    mutable bool m_valid;
+    mutable std::atomic<bool> m_valid;
 
 private:
-    mutable QnMutex     m_mutexPermission;
+    mutable QnMutex     m_mutexCheckStorage;
     mutable int         m_capabilities;
     mutable QString     m_localPath;
 
