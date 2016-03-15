@@ -134,6 +134,7 @@ h1>.label{
 
   .help-block{ /* Do not jump modal size when help block changes (help-block is below the input)*/
     min-height:40px;
+    background-color: $modal-content-bg;
   }
 }
 
