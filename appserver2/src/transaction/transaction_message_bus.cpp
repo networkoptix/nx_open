@@ -23,8 +23,9 @@
 #include "nx_ec/data/api_resource_data.h"
 #include "nx_ec/data/api_resource_type_data.h"
 #include "nx_ec/data/api_reverse_connection_data.h"
-#include "nx_ec/data/api_server_alive_data.h"
+#include "nx_ec/data/api_peer_alive_data.h"
 #include "nx_ec/data/api_discovery_data.h"
+#include <nx_ec/data/api_access_rights_data.h>
 
 #include "transaction/runtime_transaction_log.h"
 #include <transaction/transaction_transport.h>
@@ -133,7 +134,6 @@ namespace ec2
         case ApiCommand::getFullInfo:           return handleTransactionParams<ApiFullInfoData>         (serializedTransaction, serializationSupport, transaction, function, fastFunction);
         case ApiCommand::setResourceStatus:     return handleTransactionParams<ApiResourceStatusData>(serializedTransaction, serializationSupport, transaction, function, fastFunction);
         case ApiCommand::setResourceParam:      return handleTransactionParams<ApiResourceParamWithRefData>   (serializedTransaction, serializationSupport, transaction, function, fastFunction);
-        case ApiCommand::saveResource:          return handleTransactionParams<ApiResourceData>         (serializedTransaction, serializationSupport, transaction, function, fastFunction);
         case ApiCommand::saveCamera:            return handleTransactionParams<ApiCameraData>           (serializedTransaction, serializationSupport, transaction, function, fastFunction);
         case ApiCommand::saveCameras:           return handleTransactionParams<ApiCameraDataList>       (serializedTransaction, serializationSupport, transaction, function, fastFunction);
         case ApiCommand::saveCameraUserAttributes:
@@ -1050,7 +1050,7 @@ namespace ec2
             }
 
             ec2::ApiCameraDataExList cameras;
-            if (dbManager->doQuery(QnUuid(), cameras) != ErrorCode::ok) {
+            if (dbManager->doQuery(nullptr, cameras) != ErrorCode::ok) {
                 qWarning() << "Can't execute query for sync with client peer!";
                 return false;
             }

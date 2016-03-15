@@ -1,13 +1,29 @@
 
 #include "cloud_systems_finder.h"
 
-#include <common/common_module.h>
+#include <QtCore/QTimer>
+
+#include <utils/common/delayed.h>
+#include <utils/common/model_functions.h>
+#include <nx/utils/raii_guard.h>
 #include <nx/network/socket_global.h>
+#include <common/common_module.h>
+#include <nx/network/http/asynchttpclient.h>
+
+namespace
+{
+    enum 
+    {
+        kCloudSystemsRefreshPeriod = 10 * 1000          // 10 seconds
+    };
+}
 
 QnCloudSystemsFinder::QnCloudSystemsFinder(QObject *parent)
     : base_type(parent)
+    , m_updateSystemsTimer(new QTimer(this))
     , m_mutex()
     , m_systems()
+    , m_requestToSystem()
 {
     const auto cloudWatcher = qnCommon->instance<QnCloudStatusWatcher>();
     NX_ASSERT(cloudWatcher, Q_FUNC_INFO, "Cloud watcher is not ready");
@@ -18,8 +34,11 @@ QnCloudSystemsFinder::QnCloudSystemsFinder(QObject *parent)
         , this, &QnCloudSystemsFinder::setCloudSystems);
     connect(cloudWatcher, &QnCloudStatusWatcher::error
         , this, &QnCloudSystemsFinder::onCloudError);
-    connect(this, &QnAbstractSystemsFinder::systemDiscovered
-        , this, &QnCloudSystemsFinder::onSystemDiscovered);
+
+    connect(m_updateSystemsTimer, &QTimer::timeout
+        , this, &QnCloudSystemsFinder::updateSystems);
+    m_updateSystemsTimer->setInterval(kCloudSystemsRefreshPeriod);
+    m_updateSystemsTimer->start();
 }
 
 QnCloudSystemsFinder::~QnCloudSystemsFinder()
@@ -52,7 +71,6 @@ void QnCloudSystemsFinder::onCloudStatusChanged(QnCloudStatusWatcher::Status sta
 
 void QnCloudSystemsFinder::setCloudSystems(const QnCloudSystemList &systems)
 {
-    // TODO: add sync
     SystemsHash updatedSystems;
     for (const auto system : systems)
     {
@@ -77,7 +95,10 @@ void QnCloudSystemsFinder::setCloudSystems(const QnCloudSystemList &systems)
         for (const auto system : m_systems)
         {
             if (addedIds.contains(system->id()))
+            {
+                updateSystem(system->id());
                 emit systemDiscovered(system);
+            }
         }
     }
 
@@ -91,29 +112,69 @@ void QnCloudSystemsFinder::onCloudError(QnCloudStatusWatcher::ErrorCode error)
     // if any error automatically
 }
 
-void QnCloudSystemsFinder::onSystemDiscovered(const QnSystemDescriptionPtr &system)
+void QnCloudSystemsFinder::updateSystem(const QnUuid &systemId)
 {
-  /*  typedef std::vector<HostAddress> HostAddressVector;
+    using namespace nx::network;
+    typedef std::vector<cloud::AddressResolver::TypedAddres> AddressVector;
 
     auto &resolver = nx::network::SocketGlobals::addressResolver();
-
     const QPointer<QnCloudSystemsFinder> guard(this);
-    const auto id = system->id();
-    const auto resolvedHandler = [this, guard, id](const HostAddressVector &hosts)
+    const auto resolvedHandler = [this, guard, systemId](const AddressVector &hosts)
     {
         if (!guard)
             return;
 
-        const auto it = m_systems.find(id);
-        if (it == m_systems.end())
-            return;
+        {
+            const QnMutexLocker lock(&m_mutex);
+            const auto it = m_systems.find(systemId);
+            if (it == m_systems.end())
+                return;
+        }
 
-        int i = 0;
+        for (const auto &host : hosts)
+        {
+            static const auto kModuleInformationTemplate
+                = lit("http://%1:0/api/moduleInformation");
+            const auto apiUrl = QUrl(kModuleInformationTemplate.arg(host.first.toString()));
+
+            const QPointer<QnCloudSystemsFinder> guard(this);
+            const auto onModuleInformationCompleted = [this, guard, systemId]
+                (SystemError::ErrorCode errorCode, int httpCode, nx_http::BufferType buffer)
+            {
+                enum { kHttpSuccess = 200 };
+                if (!guard || (errorCode != SystemError::noError)
+                    || (httpCode != kHttpSuccess))
+                {
+                    return;
+                }
+
+                QnModuleInformation moduleInformation;
+                if (!QJson::deserialize(buffer, &moduleInformation))
+                    return;
+
+                const QnMutexLocker lock(&m_mutex);
+                const auto it = m_systems.find(systemId);
+                if (it == m_systems.end())
+                    return;
+
+                const auto systemDescription = it.value();
+                if (systemDescription->containsServer(moduleInformation.id))
+                    systemDescription->updateServer(moduleInformation);
+                else
+                    systemDescription->addServer(moduleInformation);
+            };
+
+            nx_http::downloadFileAsync(apiUrl, onModuleInformationCompleted);
+        }
     };
 
-    const auto cloudHost = HostAddress(id.toString());
+    const auto cloudHost = HostAddress(systemId.toSimpleString());
     resolver.resolveDomain(cloudHost, resolvedHandler);
-    */
 }
 
-
+void QnCloudSystemsFinder::updateSystems()
+{
+    const QnMutexLocker lock(&m_mutex);
+    for (const auto systemId : m_systems.keys())
+        updateSystem(systemId);
+}

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.11)
+cmake_minimum_required(VERSION 3.0)
 
 # Default configuration values. These must be before the project command or
 # they won't work in Windows.
@@ -39,11 +39,11 @@ find_package(Qt5Sql REQUIRED)
 find_package(Qt5Concurrent REQUIRED)
 find_package(Qt5Multimedia REQUIRED)
 
-add_library(${PROJECT_SHORTNAME} ${DEFAULT_LIBRARY_TYPE}
+add_library(${PROJECT_SHORTNAME} SHARED
   ${UI_HEADERS}
   ${CPP_FILES}
   ${RESOURCE_FILES}
 )
 target_link_libraries(${PROJECT_SHORTNAME}
-  Qt5::Core common Qt5::Gui Qt5::Network Ws2_32.lib DbgHelp.lib sigar.lib odbccp32.lib
+  common nx_utils nx_email udt Qt5::Core libeay32.lib ssleay32.lib Qt5::Gui Qt5::Network Ws2_32.lib DbgHelp.lib sigar.lib odbccp32.lib
 )

@@ -19,9 +19,9 @@ QnClientStorageResourcePtr QnClientStorageResource::newStorage( const QnMediaSer
 
     QnClientStorageResourcePtr storage(new QnClientStorageResource());
 
-    QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName(lit("Storage"));
-    if (resType)
-        storage->setTypeId(resType->getId());
+    auto resTypeId = qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kStorageTypeId);
+    if (!resTypeId.isNull())
+        storage->setTypeId(resTypeId);
 
     if (parentServer) {
         storage->setParentId(parentServer->getId());

@@ -51,7 +51,7 @@ namespace ec2
             auditRecord.resources.push_back(value.serverID);
         qnAuditManager->addAuditRecord(auditRecord);
     }
-    
+
     void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value command,  const ApiUserDataList& params, const QnAuthSession& authInfo)
     {
         Q_UNUSED(command);
@@ -75,7 +75,7 @@ namespace ec2
         QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_BEventUpdate);
         auditRecord.resources.push_back(params.id);
         QnBusinessEventRulePtr bRule(new QnBusinessEventRule());
-        fromApiToResource(params, bRule, 0);
+        fromApiToResource(params, bRule);
         auditRecord.addParam("description", QnBusinessStringsHelper::bruleDescriptionText(bRule).toUtf8());
 
         qnAuditManager->addAuditRecord(auditRecord);
@@ -97,7 +97,7 @@ namespace ec2
         if (!adminUser)
             return;
         QnUuid adminId = adminUser->getId();
-        if (param.resourceId == adminId) 
+        if (param.resourceId == adminId)
             qnAuditManager->notifySettingsChanged(authInfo, param.name);
     }
 
@@ -107,7 +107,7 @@ namespace ec2
         for (const ApiResourceParamWithRefData& param: params)
             addAuditRecord(command, param, authInfo);
     }
-    
+
     void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value command,  const ApiIdData& params, const QnAuthSession& authInfo)
     {
         Qn::AuditRecordType eventType = Qn::AR_NotDefined;
@@ -120,7 +120,7 @@ namespace ec2
             case ApiCommand::removeMediaServer:
             case ApiCommand::removeUser:
             {
-                if (QnResourcePtr res = qnResPool->getResourceById(params.id)) 
+                if (QnResourcePtr res = qnResPool->getResourceById(params.id))
                 {
                     description = res->getName();
                     if (res.dynamicCast<QnUserResource>())
@@ -141,7 +141,7 @@ namespace ec2
                 auto msgProc = QnCommonMessageProcessor::instance();
                 if (msgProc) {
                     QnBusinessEventRulePtr bRule = msgProc->businessRules().value(params.id);
-                    if (bRule) 
+                    if (bRule)
                         description = QnBusinessStringsHelper::bruleDescriptionText(bRule);
                 }
                 break;
@@ -166,7 +166,7 @@ namespace ec2
         for (const ApiIdData& param: params)
             addAuditRecord(command, param, authInfo);
     }
-    
+
     void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value command,  const ApiResetBusinessRuleData& params, const QnAuthSession& authInfo)
     {
         Q_UNUSED(command);

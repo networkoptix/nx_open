@@ -10,8 +10,6 @@
 
 namespace ec2
 {
-
-
     struct ApiPeerAliveData: ApiData
     {
         ApiPeerAliveData(): isAlive(false) {}

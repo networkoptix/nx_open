@@ -64,6 +64,13 @@
 #include <nx_ec/ec2_lib.h>
 #include <nx_ec/ec_api.h>
 #include <nx_ec/ec_proto_version.h>
+#include <nx_ec/data/api_user_data.h>
+#include <nx_ec/managers/abstract_user_manager.h>
+#include <nx_ec/managers/abstract_layout_manager.h>
+#include <nx_ec/managers/abstract_videowall_manager.h>
+#include <nx_ec/managers/abstract_webpage_manager.h>
+#include <nx_ec/managers/abstract_camera_manager.h>
+#include <nx_ec/managers/abstract_server_manager.h>
 
 #include <platform/platform_abstraction.h>
 
@@ -554,7 +561,7 @@ QnStorageResourceList getSmallStorages(const QnStorageResourceList& storages)
 }
 
 
-QnStorageResourceList createStorages(const QnMediaServerResourcePtr mServer)
+QnStorageResourceList createStorages(const QnMediaServerResourcePtr& mServer)
 {
     QnStorageResourceList storages;
     //bool isBigStorageExist = false;
@@ -644,11 +651,11 @@ void setServerNameAndUrls(QnMediaServerResourcePtr server, const QString& myAddr
 
 QnMediaServerResourcePtr MediaServerProcess::findServer(ec2::AbstractECConnectionPtr ec2Connection)
 {
-    QnMediaServerResourceList servers;
+    ec2::ApiMediaServerDataList servers;
 
-    while (servers.isEmpty() && !needToStop())
+    while (servers.empty() && !needToStop())
     {
-        ec2::ErrorCode rez = ec2Connection->getMediaServerManager()->getServersSync(QnUuid(), &servers);
+        ec2::ErrorCode rez = ec2Connection->getMediaServerManager()->getServersSync(&servers);
         if( rez == ec2::ErrorCode::ok )
             break;
 
@@ -656,21 +663,27 @@ QnMediaServerResourcePtr MediaServerProcess::findServer(ec2::AbstractECConnectio
         QnSleep::msleep(1000);
     }
 
-    for(const QnMediaServerResourcePtr& server: servers)
+    for(const auto& server: servers)
     {
-        if (server->getId() == serverGuid())
-            return server;
+        if (server.id == serverGuid())
+        {
+            QnMediaServerResourcePtr qnServer(new QnMediaServerResource());
+            fromApiToResource(server, qnServer);
+            return qnServer;
+        }
     }
 
     return QnMediaServerResourcePtr();
 }
 
-QnMediaServerResourcePtr registerServer(ec2::AbstractECConnectionPtr ec2Connection, QnMediaServerResourcePtr serverPtr, bool isNewServerInstance)
+QnMediaServerResourcePtr registerServer(ec2::AbstractECConnectionPtr ec2Connection, const QnMediaServerResourcePtr &server, bool isNewServerInstance)
 {
-    QnMediaServerResourcePtr savedServer;
-    serverPtr->setStatus(Qn::Online, true);
+    server->setStatus(Qn::Online, true);
 
-    ec2::ErrorCode rez = ec2Connection->getMediaServerManager()->saveSync(serverPtr, &savedServer);
+    ec2::ApiMediaServerData apiServer;
+    fromResourceToApi(server, apiServer);
+
+    ec2::ErrorCode rez = ec2Connection->getMediaServerManager()->saveSync(apiServer);
     if (rez != ec2::ErrorCode::ok)
     {
         qWarning() << "registerServer(): Call to registerServer failed. Reason: " << ec2::toString(rez);
@@ -678,34 +691,38 @@ QnMediaServerResourcePtr registerServer(ec2::AbstractECConnectionPtr ec2Connecti
     }
 
     if (!isNewServerInstance)
-        return savedServer;
+        return server;
 
     // insert server user attributes if defined
     QString dir = MSSettings::roSettings()->value("staticDataDir", getDataDirectory()).toString();
     QFile f(closeDirPath(dir) + lit("server_settings.json"));
     if (!f.open(QFile::ReadOnly))
-        return savedServer;
+        return server;
     QByteArray data = f.readAll();
     ec2::ApiMediaServerUserAttributesData userAttrsData;
     if (!QJson::deserialize(data, &userAttrsData))
-        return savedServer;
-    userAttrsData.serverID = savedServer->getId();
-    auto defaultServerAttrs = QnMediaServerUserAttributesPtr(new QnMediaServerUserAttributes());
-    fromApiToResource(userAttrsData, defaultServerAttrs);
-    rez =  QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->saveUserAttributesSync(QnMediaServerUserAttributesList() << defaultServerAttrs);
+        return server;
+    userAttrsData.serverID = server->getId();
+
+    ec2::ApiMediaServerUserAttributesDataList attrsList;
+    attrsList.push_back(userAttrsData);
+    rez =  QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->saveUserAttributesSync(attrsList);
     if (rez != ec2::ErrorCode::ok)
     {
         qWarning() << "registerServer(): Call to registerServer failed. Reason: " << ec2::toString(rez);
         return QnMediaServerResourcePtr();
     }
 
-    return savedServer;
+    return server;
 }
 
 void MediaServerProcess::saveStorages(ec2::AbstractECConnectionPtr ec2Connection, const QnStorageResourceList& storages)
 {
+    ec2::ApiStorageDataList apiStorages;
+    fromResourceListToApi(storages, apiStorages);
+
     ec2::ErrorCode rez;
-    while((rez = ec2Connection->getMediaServerManager()->saveStoragesSync(storages)) != ec2::ErrorCode::ok && !needToStop())
+    while((rez = ec2Connection->getMediaServerManager()->saveStoragesSync(apiStorages)) != ec2::ErrorCode::ok && !needToStop())
     {
         qWarning() << "updateStorages(): Call to change server's storages failed. Reason: " << ec2::toString(rez);
         QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
@@ -1032,8 +1049,9 @@ void MediaServerProcess::updateAddressesList()
                              newAddress.address.toString(), newAddress.port);
     }
 
-    QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()
-            ->save(m_mediaServer, this, &MediaServerProcess::at_serverSaved);
+    ec2::ApiMediaServerData server;
+    fromResourceToApi(m_mediaServer, server);
+    QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->save(server, this, &MediaServerProcess::at_serverSaved);
 
     nx::network::SocketGlobals::addressPublisher().updateAddresses(std::list<SocketAddress>(
         serverAddresses.begin(), serverAddresses.end()));
@@ -1047,8 +1065,8 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
 
     {
         //reading servers list
-        QnMediaServerResourceList mediaServerList;
-        while( ec2Connection->getMediaServerManager()->getServersSync(QnUuid(), &mediaServerList) != ec2::ErrorCode::ok )
+        ec2::ApiMediaServerDataList mediaServerList;
+        while( ec2Connection->getMediaServerManager()->getServersSync(&mediaServerList) != ec2::ErrorCode::ok )
         {
             NX_LOG( lit("QnMain::run(). Can't get servers."), cl_logERROR );
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
@@ -1067,15 +1085,19 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
 
         QMultiHash<QnUuid, QUrl> additionalAddressesById;
         QMultiHash<QnUuid, QUrl> ignoredAddressesById;
-        for (const ec2::ApiDiscoveryData &data: discoveryDataList) {
+        for (const ec2::ApiDiscoveryData &data: discoveryDataList)
+        {
             additionalAddressesById.insert(data.id, data.url);
             if (data.ignore)
                 ignoredAddressesById.insert(data.id, data.url);
         }
 
-        for(const QnMediaServerResourcePtr &mediaServer: mediaServerList) {
-            QList<SocketAddress> addresses = mediaServer->getNetAddrList();
-            QList<QUrl> additionalAddresses = additionalAddressesById.values(mediaServer->getId());
+        for(const auto &mediaServer: mediaServerList)
+        {
+            QList<SocketAddress> addresses;
+            ec2::deserializeNetAddrList(mediaServer.networkAddresses, addresses);
+
+            QList<QUrl> additionalAddresses = additionalAddressesById.values(mediaServer.id);
             for (auto it = additionalAddresses.begin(); it != additionalAddresses.end(); /* no inc */) {
                 const SocketAddress addr(it->host(), it->port());
                 if (it->port() == -1 && addresses.contains(addr))
@@ -1083,8 +1105,8 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
                 else
                     ++it;
             }
-            mediaServer->setAdditionalUrls(additionalAddresses);
-            mediaServer->setIgnoredUrls(ignoredAddressesById.values(mediaServer->getId()));
+            qnServerAdditionalAddressesDictionary->setAdditionalUrls(mediaServer.id, additionalAddresses);
+            qnServerAdditionalAddressesDictionary->setIgnoredUrls(mediaServer.id, ignoredAddressesById.values(mediaServer.id));
             messageProcessor->updateResource(mediaServer);
         }
 
@@ -1100,7 +1122,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
         messageProcessor->resetStatusList( statusList );
 
         //reading server attributes
-        QnMediaServerUserAttributesList mediaServerUserAttributesList;
+        ec2::ApiMediaServerUserAttributesDataList mediaServerUserAttributesList;
         while ((rez = ec2Connection->getMediaServerManager()->getUserAttributesSync(QnUuid(), &mediaServerUserAttributesList)) != ec2::ErrorCode::ok)
         {
             NX_LOG( lit("QnMain::run(): Can't get server user attributes list. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1 );
@@ -1111,7 +1133,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
         messageProcessor->resetServerUserAttributesList( mediaServerUserAttributesList );
 
         //read server's storages
-        QnResourceList storages;
+        ec2::ApiStorageDataList storages;
         while ((rez = ec2Connection->getMediaServerManager()->getStoragesSync(QnUuid(), &storages)) != ec2::ErrorCode::ok)
         {
             NX_LOG( lit("QnMain::run(): Can't get storage list. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1 );
@@ -1119,72 +1141,75 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
             if (m_needStop)
                 return;
         }
-        for(const QnResourcePtr& storage: storages)
+        for(const auto& storage: storages)
             messageProcessor->updateResource( storage );
     }
 
 
     {
         // read camera list
-        QnVirtualCameraResourceList cameras;
-        while ((rez = ec2Connection->getCameraManager()->getCamerasSync(QnUuid(), &cameras)) != ec2::ErrorCode::ok)
+        ec2::ApiCameraDataList cameras;
+        while ((rez = ec2Connection->getCameraManager()->getCamerasSync(&cameras)) != ec2::ErrorCode::ok)
         {
-            NX_LOG( lit("QnMain::run(): Can't get cameras. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1 );
+            NX_LOG(lit("QnMain::run(): Can't get cameras. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1);
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
             if (m_needStop)
                 return;
         }
 
         //reading camera attributes
-        QnCameraUserAttributesList cameraUserAttributesList;
-        while ((rez = ec2Connection->getCameraManager()->getUserAttributesSync(QnUuid(), &cameraUserAttributesList)) != ec2::ErrorCode::ok)
+        ec2::ApiCameraAttributesDataList cameraUserAttributesList;
+        while ((rez = ec2Connection->getCameraManager()->getUserAttributesSync(&cameraUserAttributesList)) != ec2::ErrorCode::ok)
         {
-            NX_LOG( lit("QnMain::run(): Can't get camera user attributes list. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1 );
+            NX_LOG(lit("QnMain::run(): Can't get camera user attributes list. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1);
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
             if (m_needStop)
                 return;
         }
-        messageProcessor->resetCameraUserAttributesList( cameraUserAttributesList );
+        messageProcessor->resetCameraUserAttributesList(cameraUserAttributesList);
 
         // read properties dictionary
         ec2::ApiResourceParamWithRefDataList kvPairs;
         while ((rez = ec2Connection->getResourceManager()->getKvPairsSync(QnUuid(), &kvPairs)) != ec2::ErrorCode::ok)
         {
-            NX_LOG( lit("QnMain::run(): Can't get properties dictionary. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1 );
+            NX_LOG(lit("QnMain::run(): Can't get properties dictionary. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1);
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
             if (m_needStop)
                 return;
         }
-        messageProcessor->resetPropertyList( kvPairs );
+        messageProcessor->resetPropertyList(kvPairs);
 
+        /* Properties and attributes must be read before processing cameras because of getAuth() method */
         QnManualCameraInfoMap manualCameras;
-        for(const QnSecurityCamResourcePtr &camera: cameras) {
+        for (const auto &camera : cameras)
+        {
             messageProcessor->updateResource(camera);
-            if (camera->isManuallyAdded()) {
-                QnResourceTypePtr resType = qnResTypePool->getResourceType(camera->getTypeId());
-                manualCameras.insert(camera->getUrl(), QnManualCameraInfo(QUrl(camera->getUrl()), camera->getAuth(), resType->getName()));
+            if (camera.manuallyAdded)
+            {
+                QnResourceTypePtr resType = qnResTypePool->getResourceType(camera.typeId);
+                manualCameras.insert(camera.url,
+                    QnManualCameraInfo(QUrl(camera.url), QnNetworkResource::getResourceAuth(camera.id, camera.typeId), resType->getName()));
             }
         }
         QnResourceDiscoveryManager::instance()->registerManualCameras(manualCameras);
-
     }
 
     {
-        ec2::ApiServerFootageDataList cameraHistoryList;
-        while (( rez = ec2Connection->getCameraManager()->getCamerasWithArchiveListSync(&cameraHistoryList)) != ec2::ErrorCode::ok)
+        ec2::ApiServerFootageDataList serverFootageData;
+        while (( rez = ec2Connection->getCameraManager()->getServerFootageDataSync(&serverFootageData)) != ec2::ErrorCode::ok)
         {
             qDebug() << "QnMain::run(): Can't get cameras history. Reason: " << ec2::toString(rez);
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
             if (m_needStop)
                 return;
         }
-        qnCameraHistoryPool->resetServerFootageData(cameraHistoryList);
+        qnCameraHistoryPool->resetServerFootageData(serverFootageData);
     }
 
     {
         //loading users
-        QnUserResourceList users;
-        while(( rez = ec2Connection->getUserManager()->getUsersSync(QnUuid(), &users))  != ec2::ErrorCode::ok)
+        ec2::ApiUserDataList users;
+        while(( rez = ec2Connection->getUserManager()->getUsersSync(&users))  != ec2::ErrorCode::ok)
         {
             qDebug() << "QnMain::run(): Can't get users. Reason: " << ec2::toString(rez);
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
@@ -1192,7 +1217,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
                 return;
         }
 
-        for(const QnUserResourcePtr &user: users)
+        for(const auto &user: users)
             messageProcessor->updateResource(user);
 
         /* Here the admin user must exist, global settings also. */
@@ -1201,7 +1226,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
 
     {
         //loading videowalls
-        QnVideoWallResourceList videowalls;
+        ec2::ApiVideowallDataList videowalls;
         while(( rez = ec2Connection->getVideowallManager()->getVideowallsSync(&videowalls))  != ec2::ErrorCode::ok)
         {
             qDebug() << "QnMain::run(): Can't get videowalls. Reason: " << ec2::toString(rez);
@@ -1210,13 +1235,13 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
                 return;
         }
 
-        for(const QnVideoWallResourcePtr &videowall: videowalls)
+        for (const ec2::ApiVideowallData& videowall: videowalls)
             messageProcessor->updateResource(videowall);
     }
 
     {
         //loading layouts
-        QnLayoutResourceList layouts;
+        ec2::ApiLayoutDataList layouts;
         while(( rez = ec2Connection->getLayoutManager()->getLayoutsSync(&layouts))  != ec2::ErrorCode::ok)
         {
             qDebug() << "QnMain::run(): Can't get layouts. Reason: " << ec2::toString(rez);
@@ -1227,6 +1252,21 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
 
         for(const auto &layout: layouts)
             messageProcessor->updateResource(layout);
+    }
+
+    {
+        //loading webpages
+        ec2::ApiWebPageDataList webpages;
+        while ((rez = ec2Connection->getWebPageManager()->getWebPagesSync(&webpages)) != ec2::ErrorCode::ok)
+        {
+            qDebug() << "QnMain::run(): Can't get webpages. Reason: " << ec2::toString(rez);
+            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+            if (m_needStop)
+                return;
+        }
+
+        for (const auto &webpage : webpages)
+            messageProcessor->updateResource(webpage);
     }
 
     {
@@ -1275,7 +1315,8 @@ void MediaServerProcess::updateStatisticsAllowedSettings() {
             return;
     }
 
-    auto setValue = [this](bool value) {
+    auto setValue = [this](bool value)
+    {
         qnGlobalSettings->setStatisticsAllowed(value);
         qnGlobalSettings->synchronizeNow();
     };
@@ -1285,16 +1326,20 @@ void MediaServerProcess::updateStatisticsAllowedSettings() {
 
     /* Value set by installer has the greatest priority */
     const auto confStats = MSSettings::roSettings()->value(statisticsReportAllowed);
-    if (!confStats.isNull()) {
-        if (confStats.toString() != lit("")) {
+    if (!confStats.isNull())
+    {
+        if (confStats.toString() != lit(""))
+        {
             setValue(confStats.toBool());
             /* Cleanup installer value. */
             MSSettings::roSettings()->setValue(statisticsReportAllowed, lit(""));
             MSSettings::roSettings()->sync();
         }
-    } else
+    }
+    else
     /* If user didn't make the decision in the current version, check if he made it in the previous version */
-    if (!qnGlobalSettings->isStatisticsAllowedDefined() && m_mediaServer && m_mediaServer->hasProperty(statisticsReportAllowed)) {
+    if (!qnGlobalSettings->isStatisticsAllowedDefined() && m_mediaServer && m_mediaServer->hasProperty(statisticsReportAllowed))
+    {
         bool value;
         if (QnLexical::deserialize(m_mediaServer->getProperty(statisticsReportAllowed), &value))
             setValue(value);
@@ -1316,16 +1361,21 @@ void MediaServerProcess::at_updatePublicAddress(const QHostAddress& publicIP)
     at_localInterfacesChanged();
 
     QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
-    if (server) {
+    if (server)
+    {
         Qn::ServerFlags serverFlags = server->getServerFlags();
         if (m_publicAddress.isNull())
             serverFlags &= ~Qn::SF_HasPublicIP;
         else
             serverFlags |= Qn::SF_HasPublicIP;
-        if (serverFlags != server->getServerFlags()) {
+        if (serverFlags != server->getServerFlags())
+        {
             server->setServerFlags(serverFlags);
             ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
-            ec2Connection->getMediaServerManager()->save(server, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+
+            ec2::ApiMediaServerData apiServer;
+            fromResourceToApi(server, apiServer);
+            ec2Connection->getMediaServerManager()->save(apiServer, this, [] {});
         }
 
         if (server->setProperty(Qn::PUBLIC_IP, m_publicAddress.toString(), QnResource::NO_ALLOW_EMPTY))
@@ -1822,10 +1872,6 @@ void MediaServerProcess::run()
 
     MediaServerStatusWatcher mediaServerStatusWatcher;
 
-    ec2::ResourceContext resCtx(
-        QnResourceDiscoveryManager::instance(),
-        qnResPool,
-        qnResTypePool );
     //passing settings
     std::map<QString, QVariant> confParams;
     for( const auto& paramName: MSSettings::roSettings()->allKeys() )
@@ -1834,7 +1880,6 @@ void MediaServerProcess::run()
             confParams.emplace( paramName, MSSettings::roSettings()->value( paramName ) );
     }
     ec2ConnectionFactory->setConfParams(std::move(confParams));
-    ec2ConnectionFactory->setContext(resCtx);
     ec2::AbstractECConnectionPtr ec2Connection;
     QnConnectionInfo connectInfo;
 
@@ -1984,7 +2029,7 @@ void MediaServerProcess::run()
         QnMediaServerResourcePtr server = findServer(ec2Connection);
 
         if (!server) {
-            server = QnMediaServerResourcePtr(new QnMediaServerResource(qnResTypePool));
+            server = QnMediaServerResourcePtr(new QnMediaServerResource());
             server->setId(serverGuid());
             server->setMaxCameras(DEFAULT_MAX_CAMERAS);
             isNewServerInstance = true;
@@ -2280,12 +2325,12 @@ void MediaServerProcess::run()
 
     auto updateCloudProperties = [this](const QnUserResourcePtr& admin)
     {
-        auto cloudSystemId = admin->getProperty(Qn::CLOUD_SYSTEM_ID);
+        QnUuid cloudSystemId = QnUuid::fromStringSafe(admin->getProperty(Qn::CLOUD_SYSTEM_ID));
         auto cloudAuthKey = admin->getProperty(Qn::CLOUD_SYSTEM_AUTH_KEY);
-        if (!cloudSystemId.isEmpty() && !cloudAuthKey.isEmpty())
+        if (!cloudSystemId.isNull() && !cloudAuthKey.isEmpty())
         {
             nx::hpm::api::SystemCredentials credentials(
-                QnUuid(cloudSystemId).toSimpleString().toUtf8(),
+                cloudSystemId.toSimpleString().toUtf8(),
                 qnCommon->moduleGUID().toSimpleString().toUtf8(),
                 cloudAuthKey.toUtf8());
 
@@ -2310,6 +2355,25 @@ void MediaServerProcess::run()
     if (QnGlobalSettings::instance()->isCrossdomainXmlEnabled())
         m_httpModManager->addUrlRewriteExact( lit( "/crossdomain.xml" ), lit( "/static/crossdomain.xml" ) );
 
+    //TODO: #GDM #2.6 take keys from one place
+    {
+        const QString statisticsReportTimeCycleKey(lit("statisticsReportTimeCycle"));
+        const QString value = MSSettings::roSettings()->value(statisticsReportTimeCycleKey).toString();
+        if (!value.isEmpty())
+            qnGlobalSettings->setStatisticsReportTimeCycle(value);
+        MSSettings::roSettings()->remove(statisticsReportTimeCycleKey);
+    }
+
+    {
+        const QString statisticsReportServerApiKey(lit("statisticsReportServerApi"));
+        const QString value = MSSettings::roSettings()->value(statisticsReportServerApiKey).toString();
+        if (!value.isEmpty())
+            qnGlobalSettings->setStatisticsReportServerApi(value);
+        MSSettings::roSettings()->remove(statisticsReportServerApiKey);
+    }
+
+    qnGlobalSettings->synchronizeNow();
+
     if (QnUserResourcePtr adminUser = qnResPool->getAdministrator())
     {
         qnCommon->updateModuleInformation();
@@ -2320,8 +2384,6 @@ void MediaServerProcess::run()
 
         /* List of global setting, that can be overridden in server local config (e.g. by installer) */
         QStringList replaceableParameters {
-            ec2::Ec2StaticticsReporter::SR_TIME_CYCLE,
-            ec2::Ec2StaticticsReporter::SR_SERVER_API,
             Qn::CLOUD_SYSTEM_ID,
             Qn::CLOUD_SYSTEM_AUTH_KEY,
             QnMultiserverStatisticsRestHandler::kSettingsUrlParam};
@@ -2589,22 +2651,20 @@ void MediaServerProcess::at_emptyDigestDetected(const QnUserResourcePtr& user, c
     const ec2::AbstractECConnectionPtr& appServerConnection = QnAppServerConnectionFactory::getConnection2();
     if (user->getDigest().isEmpty() && !m_updateUserRequests.contains(user->getId()))
     {
-        user->setPassword(password);
         user->setName(login);
+        user->setPassword(password);
         user->generateHash();
-        m_updateUserRequests << user->getId();
-        appServerConnection->getUserManager()->save(
-            user, this,
-            [this, user]( int /*reqID*/, ec2::ErrorCode errorCode )
-            {
-                if (errorCode == ec2::ErrorCode::ok) {
-                    ec2::ApiUserData userData;
-                    fromResourceToApi(user, userData);
-                    user->setDigest(userData.digest);
-                    user->setCryptSha512Hash(userData.cryptSha512Hash);
-                }
-                m_updateUserRequests.remove(user->getId());
-            } );
+
+        ec2::ApiUserData userData;
+        fromResourceToApi(user, userData);
+
+        QnUuid userId = user->getId();
+        m_updateUserRequests << userId;
+        appServerConnection->getUserManager()->save(userData, password, this, [this, userId]( int reqID, ec2::ErrorCode errorCode )
+        {
+            QN_UNUSED(reqID, errorCode);
+            m_updateUserRequests.remove(userId);
+        } );
     }
 }
 

@@ -15,6 +15,8 @@ public:
     static QnRaiiGuardPtr create(const Handler &creationHandler
         , const Handler &destructionHandler);
 
+    static QnRaiiGuardPtr createDestructable(const Handler &destructionHandler);
+
     static QnRaiiGuardPtr createEmpty();
 
     explicit QnRaiiGuard(const Handler &creationHandler

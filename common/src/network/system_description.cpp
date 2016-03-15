@@ -40,6 +40,7 @@ QnSystemDescription::QnSystemDescription(const QnUuid &systemId
     , m_systemName(systemName)
     , m_isCloudSystem(isCloudSystem)
     , m_servers()
+    , m_prioritized()
     , m_primaryAddresses()
 {}
 
@@ -63,10 +64,18 @@ bool QnSystemDescription::isCloudSystem() const
 
 QnSystemDescription::ServersList QnSystemDescription::servers() const
 {
-    return m_servers.values();
+    ServersList result;
+    for (const auto id: m_prioritized)
+    {
+        const auto it = m_servers.find(id);
+        if (it != m_servers.end())
+            result.append(it.value());
+    }
+    return result;
 }
 
-void QnSystemDescription::addServer(const QnModuleInformation &serverInfo)
+void QnSystemDescription::addServer(const QnModuleInformation &serverInfo
+    , int priority)
 {
     const bool containsServer = m_servers.contains(serverInfo.id);
     NX_ASSERT(!containsServer, Q_FUNC_INFO
@@ -78,6 +87,7 @@ void QnSystemDescription::addServer(const QnModuleInformation &serverInfo)
         return;
     }
 
+    m_prioritized.insertMulti(priority, serverInfo.id);
     m_servers.insert(serverInfo.id, serverInfo);
     emit serverAdded(serverInfo.id);
 }
@@ -120,6 +130,13 @@ void QnSystemDescription::removeServer(const QnUuid &serverId)
         , "System does not contain specified server");
     if (!containsServer)
         return;
+
+    const auto priorityPred = [serverId](const QnUuid &id)
+        { return (serverId == id); };
+    const auto it = std::find_if(m_prioritized.begin()
+        , m_prioritized.end(), priorityPred);
+    if (it != m_prioritized.end())
+        m_prioritized.erase(it);
 
     m_primaryAddresses.remove(serverId);
     const bool removedCount = m_servers.remove(serverId);

@@ -14,13 +14,13 @@ namespace ec2
         public AbstractBusinessEventManager
     {
     public:
-        QnBusinessEventNotificationManager( const ResourceContext& resCtx ) : m_resCtx( resCtx ) {}
+        QnBusinessEventNotificationManager() {}
 
         void triggerNotification( const QnTransaction<ApiBusinessActionData>& tran )
         {
             NX_ASSERT( tran.command == ApiCommand::broadcastBusinessAction || tran.command == ApiCommand::execBusinessAction);
             QnAbstractBusinessActionPtr businessAction;
-            fromApiToResource(tran.params, businessAction, m_resCtx.pool);
+            fromApiToResource(tran.params, businessAction);
             businessAction->setReceivedFromRemoteHost(true);
             if (tran.command == ApiCommand::broadcastBusinessAction)
                 emit gotBroadcastAction( businessAction );
@@ -38,20 +38,15 @@ namespace ec2
         {
             NX_ASSERT( tran.command == ApiCommand::saveBusinessRule);
             QnBusinessEventRulePtr businessRule( new QnBusinessEventRule() );
-            fromApiToResource(tran.params, businessRule, m_resCtx.pool);
+            fromApiToResource(tran.params, businessRule);
             emit addedOrUpdated( businessRule );
         }
 
         void triggerNotification( const QnTransaction<ApiResetBusinessRuleData>& tran )
         {
             NX_ASSERT( tran.command == ApiCommand::resetBusinessRules);
-            QnBusinessEventRuleList rules;
-            fromApiToResourceList(tran.params.defaultRules, rules, m_resCtx.pool);
-            emit businessRuleReset( rules );
+            emit businessRuleReset(tran.params.defaultRules);
         }
-
-    protected:
-        ResourceContext m_resCtx;
     };
 
 
@@ -63,7 +58,7 @@ namespace ec2
         public QnBusinessEventNotificationManager
     {
     public:
-        QnBusinessEventManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx );
+        QnBusinessEventManager( QueryProcessorType* const queryProcessor );
 
         virtual int getBusinessRules( impl::GetBusinessRulesHandlerPtr handler ) override;
 

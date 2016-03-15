@@ -162,7 +162,7 @@ namespace ec2
 
         if (sequence != right.sequence)
         {
-            //taking into account sequence overflow. it should be same as "sequence < right.sequence" 
+            //taking into account sequence overflow. it should be same as "sequence < right.sequence"
                 //but with respect to sequence overflow
             return ((quint16)(right.sequence - sequence)) <
                    (std::numeric_limits<decltype(sequence)>::max() / 2);
@@ -173,7 +173,7 @@ namespace ec2
             flags > right.flags ? false :
             seed < right.seed;
     }
-    
+
     bool TimePriorityKey::operator<=( const TimePriorityKey& right ) const
     {
         return !(*this > right);
@@ -188,7 +188,7 @@ namespace ec2
     {
         return ((quint64)sequence << 48) | ((quint64)flags << 32) | seed;
     }
-    
+
     void TimePriorityKey::fromUInt64( quint64 val )
     {
         sequence = (quint16)(val >> 48);
@@ -221,7 +221,7 @@ namespace ec2
         result.resize( (int)strlen( result.data() ) );
         return result;
     }
-    
+
     bool TimeSyncInfo::fromString( const QByteArray& str )
     {
         int curSepPos = 0;
@@ -383,7 +383,7 @@ namespace ec2
             m_localTimePriorityKey );
 
         if (QnDbManager::instance())
-            connect( QnDbManager::instance(), &QnDbManager::initialized, 
+            connect( QnDbManager::instance(), &QnDbManager::initialized,
                  this, &TimeSynchronizationManager::onDbManagerInitialized,
                  Qt::DirectConnection );
         connect( QnTransactionMessageBus::instance(), &QnTransactionMessageBus::newDirectConnectionEstablished,
@@ -438,10 +438,10 @@ namespace ec2
             result.syncTimeFlags |= Qn::TF_peerTimeSynchronizedWithInternetServer;
         if (m_usedTimeSyncInfo.timePriorityKey.flags & Qn::TF_peerTimeSetByUser)
             result.syncTimeFlags |= Qn::TF_peerTimeSetByUser;
-        
-        if (m_resCtx.pool)
+
+        if (qnResPool)
         {
-            const auto allServers = m_resCtx.pool->getResources<QnMediaServerResource>();
+            const auto allServers = qnResPool->getAllServers(Qn::AnyStatus);
             for (const auto& server: allServers)
             {
                 const auto guidStr = server->getId().toByteArray();
@@ -473,7 +473,7 @@ namespace ec2
                 //local peer is selected by user as primary time server
                 const bool synchronizingByCurrentServer = m_usedTimeSyncInfo.timePriorityKey == m_localTimePriorityKey;
                 m_localTimePriorityKey.flags |= Qn::TF_peerTimeSetByUser;
-                //incrementing sequence 
+                //incrementing sequence
                 m_localTimePriorityKey.sequence = m_usedTimeSyncInfo.timePriorityKey.sequence + 1;
                 //"select primary time server" means "take its local time", so resetting internet synchronization flag
                 m_localTimePriorityKey.flags &= ~Qn::TF_peerTimeSynchronizedWithInternetServer;
@@ -481,7 +481,7 @@ namespace ec2
                 {
                     //using current server time info
                     const qint64 elapsed = m_monotonicClock.elapsed();
-                    //selection of peer as primary time server means it's local system time is to be used as synchronized time 
+                    //selection of peer as primary time server means it's local system time is to be used as synchronized time
                         //in case of internet connection absence
                     m_usedTimeSyncInfo = TimeSyncInfo(
                         elapsed,
@@ -646,12 +646,6 @@ namespace ec2
             handleLocalTimePriorityKeyChange(&lk);
     }
 
-    void TimeSynchronizationManager::setContext(const ResourceContext& resCtx)
-    {
-        QnMutexLocker lk(&m_mutex);
-        m_resCtx = resCtx;
-    }
-
     void TimeSynchronizationManager::remotePeerTimeSyncUpdate(
         QnMutexLockerBase* const lock,
         const QnUuid& remotePeerID,
@@ -708,10 +702,10 @@ namespace ec2
         m_usedTimeSyncInfo = TimeSyncInfo(
             localMonotonicClock,
             remotePeerSyncTime,
-            remotePeerTimePriorityKey ); 
+            remotePeerTimePriorityKey );
         if( needAdjustClockDueToLargeDrift )
         {
-            const auto isTimeSynchronizedByThisServer = 
+            const auto isTimeSynchronizedByThisServer =
                 m_localTimePriorityKey.seed == m_usedTimeSyncInfo.timePriorityKey.seed;
             ++m_usedTimeSyncInfo.timePriorityKey.sequence;   //for case if synchronizing because of time drift
             if (isTimeSynchronizedByThisServer)
@@ -804,7 +798,7 @@ namespace ec2
         timerID = std::move(peerIter->second.syncTimerID);
         httpClient = std::move(peerIter->second.httpClient);
         m_peersToSendTimeSyncTo.erase( peerIter );
-        
+
         //timerID and httpClient will be destroyed after mutex unlock
     }
 
@@ -970,8 +964,8 @@ namespace ec2
             (m_usedTimeSyncInfo.timePriorityKey.flags & Qn::TF_peerTimeSynchronizedWithInternetServer) > 0 ||
             (m_localTimePriorityKey.flags & Qn::TF_peerTimeSynchronizedWithInternetServer) > 0 )
         {
-            //we know nothing about other peers. 
-            //Or we have time taken from the Internet, which means someone has connection to the Internet, 
+            //we know nothing about other peers.
+            //Or we have time taken from the Internet, which means someone has connection to the Internet,
                 //so no sense to ask user to select primary time server
             return;
         }
@@ -1119,20 +1113,20 @@ namespace ec2
 
     qint64 TimeSynchronizationManager::getSyncTimeNonSafe() const
     {
-        return m_usedTimeSyncInfo.syncTime + m_monotonicClock.elapsed() - m_usedTimeSyncInfo.monotonicClockValue; 
+        return m_usedTimeSyncInfo.syncTime + m_monotonicClock.elapsed() - m_usedTimeSyncInfo.monotonicClockValue;
     }
 
     void TimeSynchronizationManager::onDbManagerInitialized()
     {
         QByteArray timePriorityStr;
-        const bool timePriorityStrLoadResult = 
+        const bool timePriorityStrLoadResult =
             QnDbManager::instance()->readMiscParam(
                 LOCAL_TIME_PRIORITY_KEY_PARAM_NAME,
                 &timePriorityStr);
 
         qint64 restoredTimeDelta = 0;
         TimePriorityKey restoredPriorityKey;
-        const bool loadSyncTimeResult = 
+        const bool loadSyncTimeResult =
             loadSyncTime(
                 QnDbManager::instance(),
                 &restoredTimeDelta,
@@ -1288,7 +1282,7 @@ namespace ec2
         const qint64 curSysTime = QDateTime::currentMSecsSinceEpoch();
         if (qAbs(getSyncTime() - curSysTime) > SYSTEM_TIME_CHANGE_CHECK_PERIOD_MS)
         {
-            //local OS time has been changed. If system time is set 
+            //local OS time has been changed. If system time is set
             //by local host time then updating system time
             if (m_usedTimeSyncInfo.timePriorityKey == m_localTimePriorityKey &&
                 !(m_localTimePriorityKey.flags & Qn::TF_peerTimeSynchronizedWithInternetServer))

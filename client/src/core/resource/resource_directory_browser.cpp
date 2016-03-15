@@ -144,8 +144,8 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
         return QnLayoutResourcePtr();
     QByteArray layoutData = layoutFile->readAll();
     layoutFile.reset();
-    
-    QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
+
+    QnLayoutResourcePtr layout(new QnLayoutResource());
     ec2::ApiLayoutData apiLayout;
     if (!QJson::deserialize(layoutData, &apiLayout)) {
         QnProto::Message<ec2::ApiLayoutData> apiLayoutMessage;
@@ -155,7 +155,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
             apiLayout = apiLayoutMessage.data;
         }
     }
-        
+
     fromApiToResource(apiLayout, layout);
 
     QnLayoutItemDataList orderedItems;
@@ -222,7 +222,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
 
     QScopedPointer<QIODevice> itemNamesIO(layoutStorage.open(lit("item_names.txt"), QIODevice::ReadOnly));
     QTextStream itemNames(itemNamesIO.data());
-    
+
     QScopedPointer<QIODevice> itemTimeZonesIO(layoutStorage.open(lit("item_timezones.txt"), QIODevice::ReadOnly));
     QTextStream itemTimeZones(itemTimeZonesIO.data());
 

@@ -8,7 +8,12 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <api/app_server_connection.h>
+
+#include <nx_ec/managers/abstract_server_manager.h>
+#include <nx_ec/managers/abstract_user_manager.h>
+#include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/dummy_handler.h>
+
 #include <media_server/serverutil.h>
 #include <media_server/settings.h>
 #include <nx/utils/log/log.h>
@@ -44,7 +49,8 @@ QByteArray decodeAuthKey(const QByteArray& authKey) {
     }
 }
 
-QnUuid serverGuid() {
+QnUuid serverGuid()
+{
     static QnUuid guid;
 
     if (!guid.isNull())
@@ -89,7 +95,7 @@ bool PasswordData::hasPassword() const
 {
     return
         !password.isEmpty() ||
-        !passwordHash.isEmpty() || 
+        !passwordHash.isEmpty() ||
         !passwordDigest.isEmpty();
 }
 
@@ -125,19 +131,24 @@ bool changeAdminPassword(PasswordData data)
         /* set new password */
         updatedAdmin->setPassword(data.password);
         updatedAdmin->generateHash();
-        QnUserResourceList updatedUsers;
-        if (QnAppServerConnectionFactory::getConnection2()->getUserManager()->saveSync(updatedAdmin, &updatedUsers) != ec2::ErrorCode::ok)
+
+        ec2::ApiUserData apiUser;
+        fromResourceToApi(updatedAdmin, apiUser);
+        if (QnAppServerConnectionFactory::getConnection2()->getUserManager()->saveSync(apiUser, data.password) != ec2::ErrorCode::ok)
             return false;
         updatedAdmin->setPassword(QString());
     }
-    else {
+    else
+    {
         updatedAdmin->setRealm(data.realm);
         updatedAdmin->setHash(data.passwordHash);
         updatedAdmin->setDigest(data.passwordDigest);
         if (!data.cryptSha512Hash.isEmpty())
             updatedAdmin->setCryptSha512Hash(data.cryptSha512Hash);
-        QnUserResourceList updatedUsers;
-        if (QnAppServerConnectionFactory::getConnection2()->getUserManager()->saveSync(updatedAdmin, &updatedUsers) != ec2::ErrorCode::ok)
+
+        ec2::ApiUserData apiUser;
+        fromResourceToApi(updatedAdmin, apiUser);
+        if (QnAppServerConnectionFactory::getConnection2()->getUserManager()->saveSync(apiUser) != ec2::ErrorCode::ok)
             return false;
     }
 
@@ -168,7 +179,7 @@ bool validatePasswordData(const PasswordData& passwordData, QString* errStr)
             *errStr = lit("All password hashes MUST be supplied all together along with realm");
         return false;
     }
-    
+
     if (!passwordData.password.isEmpty() && passwordData.oldPassword.isEmpty())
     {
         //these values MUST be all filled or all NOT filled
@@ -221,7 +232,10 @@ bool changeSystemName(nx::SystemName systemName, qint64 sysIdTime, qint64 tranLo
     else
         server->setServerFlags(server->getServerFlags() & ~Qn::SF_AutoSystemName);
     QnAppServerConnectionFactory::getConnection2()->setTransactionLogTime(tranLogTime);
-    QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->save(server, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+
+    ec2::ApiMediaServerData apiServer;
+    fromResourceToApi(server, apiServer);
+    QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->save(apiServer, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 
     return true;
 }

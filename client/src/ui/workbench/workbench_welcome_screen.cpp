@@ -103,6 +103,13 @@ void QnWorkbenchWelcomeScreen::setEnabled(bool isEnabled)
     emit enabledChanged();
 }
 
+void QnWorkbenchWelcomeScreen::connectToServer(const QString &serverUrl
+    , const QString &userName
+    , const QString &password)
+{
+    // TODO: implement me
+}
+
 void QnWorkbenchWelcomeScreen::connectToAnotherSystem()
 {
     bool wasEmpty = (m_loginDialog == nullptr);

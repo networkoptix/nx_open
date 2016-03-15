@@ -34,9 +34,9 @@ bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemRegistrationData* const s
     {
         return false;
     }
-    systemData->name = 
+    systemData->name =
         urlQuery.queryItemValue(SystemRegistrationData_name_field).toStdString();
-    systemData->customization = 
+    systemData->customization =
         urlQuery.queryItemValue(SystemRegistrationData_customization_field).toStdString();
     return true;
 }
@@ -82,9 +82,9 @@ bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemSharing* const systemShar
         return false;
     }
 
-    systemSharing->systemID = 
+    systemSharing->systemID =
         QnUuid::fromStringSafe(urlQuery.queryItemValue(SystemSharing_systemID_field));
-    systemSharing->accountEmail = 
+    systemSharing->accountEmail =
         urlQuery.queryItemValue(SystemSharing_accountEmail_field).toStdString();
     bool success = false;
     systemSharing->accessRole = QnLexical::deserialized<api::SystemAccessRole>(
@@ -128,7 +128,7 @@ bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemID* const systemID)
 {
     if (!urlQuery.hasQueryItem(SystemID_systemID_field))
         return false;
-    systemID->systemID = urlQuery.queryItemValue(SystemID_systemID_field);
+    systemID->systemID = QnUuid::fromStringSafe(urlQuery.queryItemValue(SystemID_systemID_field));
     return true;
 }
 

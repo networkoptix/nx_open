@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.11)
+cmake_minimum_required(VERSION 3.0)
 
 # Default configuration values. These must be before the project command or
 # they won't work in Windows.
@@ -7,10 +7,14 @@ set(majorVersion 2)
 set(minorVersion 6)
 set(incrementalVersion 0)
 
+project(vms)
+set(PROJECT_SHORTNAME "vms")
+
 # Global CMake options
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOMOC_MOC_OPTIONS "-bstdafx.h")
+set(AUTOGEN_TARGETS_FOLDER ${PROJECT_BINARY_DIR}/generated)
 set(CMAKE_AUTOUIC ON)
 
 if(NOT customization)
@@ -41,6 +45,9 @@ if(WIN32)
         message(STATUS "Added parallel build arguments to CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
     endif()
 endif()
+
+message("---- Building for: ${CMAKE_VS_PLATFORM_NAME}")
+
 set (openal.version "1.16")
 set (directx.version "JUN2010")
 set (festival.version "2.1")
@@ -50,7 +57,7 @@ set (gtest.version "1.7.0")
 set (mfx.version "2012-R2")
 set (onvif.version "2.1.2-io")
 set (openssl.version "1.0.2e")
-set (quazip.version "0.6.2")
+set (quazip.version "0.7.1")
 set (sigar.version "1.7")
 set (vmax_integration.version "2.1")
 set (qt.version 5.6.0)
@@ -132,11 +139,13 @@ include(find_sources)
 include(add_translations)
 include(process_rc)
 include(process_resources)
+include(qt_custom)
 include(precompiled_header)
+include(python_exec)
+include(external_dependencies)
 
 include_directories($ENV{environment}/boost_1_56_0
                     ${CMAKE_SOURCE_DIR}/common/src
-                    $ENV{environment}/include
                     $ENV{environment}/include/ffmpeg-misc-headers-win32
                     $ENV{environment}/include/glext
                     $ENV{environment}/qt5-custom
@@ -147,7 +156,6 @@ include_directories($ENV{environment}/boost_1_56_0
                     ${CMAKE_SOURCE_DIR}/common_libs/nx_media/src
                     ${CMAKE_SOURCE_DIR}/common_libs/nx_audio/src
                     ${CMAKE_SOURCE_DIR}/common_libs/udt/src
-                    $ENV{environment}/qt5-custom
                     $ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}/include
                     $ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}/include/QtZlib
                     $ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}/include/QtCore/${qt.version}/QtCore
@@ -157,6 +165,7 @@ include_directories($ENV{environment}/boost_1_56_0
                     $ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}/include/QtQuick/${qt.version}
                     $ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}/include/QtQuick
                     $ENV{environment}/artifacts/openal/${openal.version}/include
+                    $ENV{environment}/artifacts/openssl/${openssl.version}/include
                     $ENV{environment}/artifacts/openal/${openal.version}/include/AL
                     $ENV{environment}/artifacts/directx/${directx.version}/include
                     $ENV{environment}/artifacts/festival/${festival.version}/include
@@ -165,7 +174,6 @@ include_directories($ENV{environment}/boost_1_56_0
                     $ENV{environment}/artifacts/gtest/${gtest.version}/include
                     $ENV{environment}/artifacts/mfx/${mfx.version}/include
                     $ENV{environment}/artifacts/onvif/${onvif.version}/include
-                    $ENV{environment}/artifacts/openssl/${openssl.version}/include
                     $ENV{environment}/artifacts/quazip/${quazip.version}/include
                     $ENV{environment}/artifacts/sigar/${sigar.version}/include
                     $ENV{environment}/artifacts/vmax_integration/${vmax_integration.version}/include
@@ -174,6 +182,7 @@ include_directories($ENV{environment}/boost_1_56_0
 LINK_DIRECTORIES(${CMAKE_BINARY_DIR}/common
                 $ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}
                 $ENV{environment}/artifacts/openal/${openal.version}/${platform}/${box}/${arch}/lib/${configuration}
+                $ENV{environment}/artifacts/openssl/${openssl.version}/${platform}/${box}/${arch}/lib/${configuration}
                 $ENV{environment}/artifacts/directx/${directx.version}/${platform}/${box}/${arch}/lib/${configuration}
                 $ENV{environment}/artifacts/festival/${festival.version}/${platform}/${box}/${arch}/lib/${configuration}
                 $ENV{environment}/artifacts/ffmpeg/${ffmpeg.version}/${platform}/${box}/${arch}/lib/${configuration}
@@ -181,7 +190,6 @@ LINK_DIRECTORIES(${CMAKE_BINARY_DIR}/common
                 $ENV{environment}/artifacts/gtest/${gtest.version}/${platform}/${box}/${arch}/lib/${configuration}
                 $ENV{environment}/artifacts/mfx/${mfx.version}/${platform}/${box}/${arch}/lib/${configuration}
                 $ENV{environment}/artifacts/onvif/${onvif.version}/${platform}/${box}/${arch}/lib/${configuration}
-                $ENV{environment}/artifacts/openssl/${openssl.version}/${platform}/${box}/${arch}/lib/${configuration}
                 $ENV{environment}/artifacts/quazip/${quazip.version}/${platform}/${box}/${arch}/lib/${configuration}
                 $ENV{environment}/artifacts/sigar/${sigar.version}/${platform}/${box}/${arch}/lib/${configuration}
                 $ENV{environment}/artifacts/vmax_integration/${vmax_integration.version}/${platform}/${box}/${arch}/lib/${configuration}
@@ -193,9 +201,10 @@ find_package(Qt5LinguistTools)
 
 add_module(
     NAMES
-        #nxtool
-        #common
-        #common_libs
+        nxtool
+        common
+        common_libs
         appserver2
+        applauncher
     STATUS_SHORT_NAMES
 )
