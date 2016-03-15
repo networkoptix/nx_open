@@ -2,6 +2,7 @@
 
 import os
 import rdep_dependencies
+import platform_detection
 
 #TODO: This needs a better place
 DEPENDENCY_VERSIONS = {
@@ -35,15 +36,17 @@ def get_versioned_package_name(package):
 def get_packages(target):
     packages = """${rdep.packages}"""
 
-    if target.startswith("windows"):
+    target_platform = platform_detection.get_platform_for_target(target)
+
+    if target_platform == "windows":
         packages += """ ${rdep.windows.packages}"""
-    elif target.startswith("linux"):
+    elif target_platform == "linux":
         packages += """ ${rdep.linux.packages}"""
-    elif target.startswith("macos"):
+    elif target_platform == "macos":
         packages += """ ${rdep.mac.packages}"""
-    elif target.startswith("android"):
+    elif target_platform == "android":
         packages += """ ${rdep.android.packages}"""
-    elif target.startswith("ios"):
+    elif target_platform == "ios":
         packages += """ ${rdep.ios.packages}"""
 
     if '{' in packages:
