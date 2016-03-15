@@ -10,6 +10,9 @@ $font-size-a-bit-large:   ceil($font-size-base * 1.15); //~16px - we just need 1
   box-shadow: 0 1px 2px transparentize($dark15,0.9);
 }
 
+.navbar{
+  box-shadow: 0 6px 10px $light3;
+}
 .navbar-brand{
   padding:0;
   font-size: $font-size-h3;
@@ -90,7 +93,6 @@ h3{
   margin-bottom: ( $line-height-computed / 4 );
   font-weight: normal;
 }
-
 h1>.label{
   font-size:60%;
   vertical-align: 33%;

@@ -10,11 +10,11 @@
             <button class="btn btn-default" ng-click="openClient(null)">Open Nx Witness</button>
         </div>
 
-        <div ng-repeat="system in systems" class="col-xs-12	col-sm-6 col-lg-4 ">
+        <div ng-repeat="system in systems" class="col-xs-12	col-sm-6 col-lg-4 system-button">
             <div class="panel panel-default hoverable">
-                <div class="panel-body system-button" ng-click="openSystem(system)">
+                <div class="panel-body" ng-click="openSystem(system)">
                     <h2>{{system.name}}</h2>
-                    <small><b>{{getSystemOwnerName(system)}}</b></small><br/>
+                    <span class="system-owner">{{getSystemOwnerName(system)}}</span>
 
                     <span ng-if="system.status!=Config.systemStatuses.onlineStatus" class="label"
                           ng-class="Config.systemStatuses[system.status].style || Config.systemStatuses.default.style">
