@@ -1,6 +1,4 @@
 syntax: glob
-core
-syntax: glob
 ecs.db-shm
 ecs.db-wal
 *.cache
