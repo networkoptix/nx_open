@@ -304,7 +304,7 @@ void AggregationSurface::ensureUploadedToOGL( const QRect& rect, qreal opacity )
             ensurePBOInitialized( emptyPictureBuf, lineSizes[i]*h[i] );
             d->glBindBufferARB( GL_PIXEL_UNPACK_BUFFER_ARB, emptyPictureBuf->pboID() );
             //GLvoid* pboData = d->glMapBufferARB( GL_PIXEL_UNPACK_BUFFER_ARB, GL_WRITE_ONLY_ARB );
-            //Q_ASSERT( pboData );
+            //NX_ASSERT( pboData );
             ////memcpy( pboData, planes[i], lineSizes[i]*h[i] );
             //memcpy_sse4_stream_stream( (__m128i*)pboData, (__m128i*)planes[i], lineSizes[i]*h[i] );
             //d->glUnmapBufferARB( GL_PIXEL_UNPACK_BUFFER_ARB );
@@ -317,7 +317,7 @@ void AggregationSurface::ensureUploadedToOGL( const QRect& rect, qreal opacity )
 
             glBindTexture( GL_TEXTURE_2D, texture->id() );
 
-            Q_ASSERT( m_buffers[i].pitch >= qPower2Ceil(r_w[i],ROUND_COEFF) );
+            NX_ASSERT( m_buffers[i].pitch >= qPower2Ceil(r_w[i],ROUND_COEFF) );
 
             #ifndef USE_PBO
                 loadImageData(texture->textureSize().width(),texture->textureSize().height(),m_buffers[i].pitch,h[i],1,GL_LUMINANCE,m_buffers[i].buffer.data());
@@ -460,8 +460,8 @@ const std::vector<GLuint>& AggregationSurface::glTextures() const
 
 void AggregationSurface::uploadData( const QRect& destRect, uint8_t* planes[], int lineSizes[] )
 {
-    Q_ASSERT( destRect.bottomRight().x() < m_fullRect.width() );
-    Q_ASSERT( destRect.bottomRight().y() < m_fullRect.height() );
+    NX_ASSERT( destRect.bottomRight().x() < m_fullRect.width() );
+    NX_ASSERT( destRect.bottomRight().y() < m_fullRect.height() );
 
     QnMutexLocker uploadLock( &m_uploadMutex );
 
@@ -661,7 +661,7 @@ QSharedPointer<AggregationSurfaceRect> AggregationSurfacePool::takeSurfaceRect(
     QSharedPointer<AggregationSurface> newSurface( new AggregationSurface( format, surfaceSize ) );
     m_surfaces.insert( std::make_pair( std::make_pair( glContext, format ), newSurface ) );
     const QRect& lockedRect = newSurface->findAndLockRect( requiredEmptySize );
-    Q_ASSERT( !lockedRect.isNull() );
+    NX_ASSERT( !lockedRect.isNull() );
 
     return QSharedPointer<AggregationSurfaceRect>( new AggregationSurfaceRect( newSurface, lockedRect ) );
 }

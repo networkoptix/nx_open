@@ -62,7 +62,7 @@ void QnLicensesUsageWidget::init(QnLicenseUsageHelper* helper) {
 void QnLicensesUsageWidget::loadData(QnLicenseUsageHelper* helper) {
     foreach (Qn::LicenseType lt, helper->licenseTypes()) {
         QnLicenseUsageWidgetRow* row = dynamic_cast<QnLicenseUsageWidgetRow*>(m_rows[lt]);
-        Q_ASSERT(row);
+        NX_ASSERT(row);
         QString licenseText = helper->getUsageText(lt);
         row->setVisible(!licenseText.isEmpty());
         if (licenseText.isEmpty())

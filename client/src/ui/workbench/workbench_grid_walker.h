@@ -28,7 +28,7 @@ public:
      * \returns                         Current position.
      */
     QPoint next() {
-        assert(hasNext());
+        NX_ASSERT(hasNext());
 
         QPoint result = m_pos;
         m_pos += m_delta;
@@ -53,7 +53,7 @@ public:
      * \param border                    Border to expand iteration region into.
      */
     void expand(Qn::Border border) {
-        assert(!hasNext());
+        NX_ASSERT(!hasNext());
 
         switch(border) {
         case Qn::LeftBorder:

@@ -448,7 +448,7 @@ void QnServerStorageManager::at_storageSpaceReply( int status, const QnStorageSp
          * They will be deleted on storageRemoved transaction.
          */
         QnClientStorageResourcePtr clientStorage = storage.dynamicCast<QnClientStorageResource>();
-        Q_ASSERT_X(clientStorage, Q_FUNC_INFO, "Only client storage intances must exist on the client side.");
+        NX_ASSERT(clientStorage, Q_FUNC_INFO, "Only client storage intances must exist on the client side.");
         if (clientStorage && clientStorage->isActive())
             continue;
 

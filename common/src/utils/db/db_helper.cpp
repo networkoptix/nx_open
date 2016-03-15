@@ -114,7 +114,7 @@ bool QnDbHelper::execSQLQuery(QSqlQuery *query, const char* details) {
     if (!query->exec())
     {
         qWarning() << details << query->lastError().text();
-        Q_ASSERT_X(false, details, "Unable to execute SQL query");
+        NX_ASSERT(false, details, "Unable to execute SQL query");
         return false;
     }
     return true;
@@ -125,7 +125,7 @@ bool QnDbHelper::prepareSQLQuery(QSqlQuery *query, const QString &queryStr, cons
     if (!query->prepare(queryStr))
     {
         qWarning() << details << query->lastError().text();
-        Q_ASSERT_X(false, details, "Unable to prepare SQL query");
+        NX_ASSERT(false, details, "Unable to prepare SQL query");
         return false;
     }
     return true;

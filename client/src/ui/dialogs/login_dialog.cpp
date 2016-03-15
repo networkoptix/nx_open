@@ -112,7 +112,7 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
     setHelpTopic(this, Qn::Login_Help);
 
     QHBoxLayout* bbLayout = dynamic_cast<QHBoxLayout*>(ui->buttonBox->layout());
-    Q_ASSERT(bbLayout);
+    NX_ASSERT(bbLayout);
     if (bbLayout) {
         QLabel* versionLabel = new QLabel(ui->buttonBox);
         versionLabel->setText(tr("Version %1").arg(QnAppInfo::applicationVersion()));

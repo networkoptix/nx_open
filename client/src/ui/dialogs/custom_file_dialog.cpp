@@ -69,7 +69,7 @@ void QnCustomFileDialog::addLineEdit(const QString &label, QString *value) {
 
 void QnCustomFileDialog::addWidget(const QString &label, QWidget *widget, QnAbstractWidgetControlDelegate *delegate) {
     QGridLayout *layout = customizedLayout();
-    assert(layout);
+    NX_ASSERT(layout);
 
     int row = layout->rowCount();
     if(label.isEmpty()) {

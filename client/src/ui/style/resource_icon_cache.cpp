@@ -87,7 +87,7 @@ QIcon QnResourceIconCache::icon(Key key, bool unchecked) {
     QIcon icon = m_cache.value(key & TypeMask);
     QIcon overlay = m_cache.value(key & StatusMask);
     if(!icon.isNull() && !overlay.isNull()) {
-        Q_ASSERT_X(false, Q_FUNC_INFO, "All icons should be pre-generated.");
+        NX_ASSERT(false, Q_FUNC_INFO, "All icons should be pre-generated.");
 
         QPixmap pixmap = icon.pixmap(icon.actualSize(QSize(1024, 1024)));
         {

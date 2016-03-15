@@ -100,7 +100,7 @@ Qn::ResourceSavingFlags QnWorkbenchLayoutSnapshotManager::flags(QnWorkbenchLayou
 void QnWorkbenchLayoutSnapshotManager::setFlags(const QnLayoutResourcePtr &resource, Qn::ResourceSavingFlags flags) {
 
     if (flags.testFlag(Qn::ResourceIsBeingSaved))
-        Q_ASSERT_X(accessController()->hasPermissions(resource, Qn::SavePermission), Q_FUNC_INFO, "Saving unsaveable resource");
+        NX_ASSERT(accessController()->hasPermissions(resource, Qn::SavePermission), Q_FUNC_INFO, "Saving unsaveable resource");
 
     QHash<QnLayoutResourcePtr, Qn::ResourceSavingFlags>::iterator pos = m_flagsByLayout.find(resource);
     if(pos == m_flagsByLayout.end()) {

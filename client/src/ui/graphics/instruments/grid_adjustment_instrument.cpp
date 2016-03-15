@@ -18,7 +18,7 @@ GridAdjustmentInstrument::GridAdjustmentInstrument(QnWorkbench *workbench, QObje
     m_speed(1.0, 1.0),
     m_maxSpacing(1.0, 1.0)
 {
-    assert(workbench != NULL);
+    NX_ASSERT(workbench != NULL);
 }
 
 GridAdjustmentInstrument::~GridAdjustmentInstrument() {

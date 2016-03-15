@@ -205,7 +205,7 @@ bool InstallationProcess::writeInstallationSummary()
 
 void InstallationProcess::onHttpDone( nx_http::AsyncHttpClientPtr httpClient )
 {
-    assert( m_httpClient == httpClient );
+    NX_ASSERT( m_httpClient == httpClient );
 
     auto scopedExitFunc = [this](InstallationProcess* /*pThis*/)
     {
@@ -249,7 +249,7 @@ void InstallationProcess::onHttpDone( nx_http::AsyncHttpClientPtr httpClient )
 
     QBuffer xmlFile( &msgBody );
     if( !xmlFile.open( QIODevice::ReadOnly ) )
-        assert( false );
+        NX_ASSERT( false );
     QXmlInputSource input( &xmlFile );
     if( !reader.parse( &input ) )
     {

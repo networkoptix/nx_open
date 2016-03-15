@@ -322,7 +322,7 @@ void QnWorkbenchDisplay::setView(QnGraphicsView *view) {
 }
 
 void QnWorkbenchDisplay::deinitSceneView() {
-    assert(m_scene && m_view);
+    NX_ASSERT(m_scene && m_view);
 
     /* Deinit view. */
     m_instrumentManager->unregisterView(m_view);
@@ -373,7 +373,7 @@ QGLWidget *QnWorkbenchDisplay::newGlWidget(QWidget *parent, Qt::WindowFlags wind
 }
 
 void QnWorkbenchDisplay::initSceneView() {
-    assert(m_scene && m_view);
+    NX_ASSERT(m_scene && m_view);
 
     /* Init scene. */
     m_instrumentManager->registerScene(m_scene);
@@ -489,7 +489,7 @@ void QnWorkbenchDisplay::initSceneView() {
 }
 
 void QnWorkbenchDisplay::initBoundingInstrument() {
-    assert(m_view != NULL);
+    NX_ASSERT(m_view != NULL);
 
     m_boundingInstrument->setSizeEnforced(m_view, true);
     m_boundingInstrument->setPositionEnforced(m_view, true);
@@ -593,7 +593,7 @@ QnResourceWidget *QnWorkbenchDisplay::zoomTargetWidget(QnResourceWidget *widget)
 }
 
 void QnWorkbenchDisplay::ensureRaisedConeItem(QnResourceWidget *widget) {
-    Q_ASSERT_X(canShowLayoutBackground(), Q_FUNC_INFO, "This item is only used when layout background is active");
+    NX_ASSERT(canShowLayoutBackground(), Q_FUNC_INFO, "This item is only used when layout background is active");
     QnGridRaisedConeItem* item = raisedConeItem(widget);
     if (item->scene() == m_scene)
         return;
@@ -1029,7 +1029,7 @@ bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
 
     QnResourceWidget *widget = this->widget(item);
     if(widget == NULL) {
-        assert(!destroyItem);
+        NX_ASSERT(!destroyItem);
         return false; /* The widget wasn't created. */
     }
 
@@ -1221,7 +1221,7 @@ Qn::ItemLayer QnWorkbenchDisplay::shadowLayer(Qn::ItemLayer itemLayer) const {
 }
 
 Qn::ItemLayer QnWorkbenchDisplay::synchronizedLayer(QnResourceWidget *widget) const {
-    assert(widget != NULL);
+    NX_ASSERT(widget != NULL);
 
     if(widget == m_widgetByRole[Qn::ZoomedRole]) {
         return Qn::ZoomedLayer;

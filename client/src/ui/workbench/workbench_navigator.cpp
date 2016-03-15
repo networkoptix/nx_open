@@ -350,7 +350,7 @@ bool QnWorkbenchNavigator::isValid() {
 }
 
 void QnWorkbenchNavigator::initialize() {
-    Q_ASSERT_X(isValid(), Q_FUNC_INFO, "we should definitely be valid here");
+    NX_ASSERT(isValid(), Q_FUNC_INFO, "we should definitely be valid here");
     if (!isValid())
         return;
 
@@ -409,7 +409,7 @@ void QnWorkbenchNavigator::initialize() {
 }
 
 void QnWorkbenchNavigator::deinitialize() {
-    Q_ASSERT_X(isValid(), Q_FUNC_INFO, "we should definitely be valid here");
+    NX_ASSERT(isValid(), Q_FUNC_INFO, "we should definitely be valid here");
     if (!isValid())
         return;
 

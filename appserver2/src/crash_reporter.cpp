@@ -225,7 +225,7 @@ void ReportData::finishReport(nx_http::AsyncHttpClientPtr httpClient)
         QFile::remove(crash.absoluteFilePath());
 
     QnMutexLocker lock(&m_host.m_mutex);
-    Q_ASSERT(!m_host.m_activeHttpClient || m_host.m_activeHttpClient == httpClient);
+    NX_ASSERT(!m_host.m_activeHttpClient || m_host.m_activeHttpClient == httpClient);
     m_host.m_activeHttpClient.reset();
 }
 

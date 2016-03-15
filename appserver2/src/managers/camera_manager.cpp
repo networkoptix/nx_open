@@ -29,7 +29,7 @@ namespace ec2
 
         //preparing output data 
         QnVirtualCameraResourceList cameraList;
-        Q_ASSERT_X(
+        NX_ASSERT(
             resource->getId() == QnVirtualCameraResource::uniqueIdToId( resource->getUniqueId() ),
             Q_FUNC_INFO,
             "You must fill camera ID as md5 hash of unique id" );
@@ -100,7 +100,7 @@ namespace ec2
         for(const QnVirtualCameraResourcePtr& camera: cameras)
         {
             if (camera->getId().isNull()) {
-                Q_ASSERT_X(0, "Only update operation is supported", Q_FUNC_INFO);
+                NX_ASSERT(0, "Only update operation is supported", Q_FUNC_INFO);
                 return INVALID_REQ_ID;
             }
             cameraList.push_back( camera );

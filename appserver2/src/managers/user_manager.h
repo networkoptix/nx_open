@@ -20,7 +20,7 @@ namespace ec2
 
         void triggerNotification( const QnTransaction<ApiUserData>& tran )
         {
-            assert( tran.command == ApiCommand::saveUser);
+            NX_ASSERT( tran.command == ApiCommand::saveUser);
             QnUserResourcePtr userResource(new QnUserResource());
             fromApiToResource(tran.params, userResource);
             emit addedOrUpdated( userResource );
@@ -28,7 +28,7 @@ namespace ec2
 
         void triggerNotification( const QnTransaction<ApiIdData>& tran )
         {
-            assert( tran.command == ApiCommand::removeUser );
+            NX_ASSERT( tran.command == ApiCommand::removeUser );
             emit removed( QnUuid(tran.params.id) );
         }
 

@@ -10,7 +10,7 @@ QnCloudSystemsFinder::QnCloudSystemsFinder(QObject *parent)
     , m_systems()
 {
     const auto cloudWatcher = qnCommon->instance<QnCloudStatusWatcher>();
-    Q_ASSERT_X(cloudWatcher, Q_FUNC_INFO, "Cloud watcher is not ready");
+    NX_ASSERT(cloudWatcher, Q_FUNC_INFO, "Cloud watcher is not ready");
 
     connect(cloudWatcher, &QnCloudStatusWatcher::statusChanged
         , this, &QnCloudSystemsFinder::onCloudStatusChanged);

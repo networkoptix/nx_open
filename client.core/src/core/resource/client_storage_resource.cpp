@@ -15,7 +15,7 @@ QnClientStorageResource::QnClientStorageResource()
 }
 
 QnClientStorageResourcePtr QnClientStorageResource::newStorage( const QnMediaServerResourcePtr &parentServer, const QString &url ) {
-    Q_ASSERT_X(parentServer, Q_FUNC_INFO, "Server must exist here");
+    NX_ASSERT(parentServer, Q_FUNC_INFO, "Server must exist here");
 
     QnClientStorageResourcePtr storage(new QnClientStorageResource());
 
@@ -84,55 +84,55 @@ void QnClientStorageResource::setActive(bool value)
 
 QIODevice* QnClientStorageResource::open(const QString&, QIODevice::OpenMode)
 {
-    assert(false);
+    NX_ASSERT(false);
     return NULL;
 }
 
 bool QnClientStorageResource::isAvailable() const
 {
-    assert(false);
+    NX_ASSERT(false);
     return 0;
 }
 
 QnAbstractStorageResource::FileInfoList QnClientStorageResource::getFileList(const QString&)
 {
-    assert(false);
+    NX_ASSERT(false);
     return QnAbstractStorageResource::FileInfoList();
 }
 
 qint64 QnClientStorageResource::getFileSize(const QString&) const
 {
-    assert(false);
+    NX_ASSERT(false);
     return 0;
 }
 
 bool QnClientStorageResource::removeFile(const QString&)
 {
-    assert(false);
+    NX_ASSERT(false);
     return false;
 }
 
 bool QnClientStorageResource::removeDir(const QString&)
 {
-    assert(false);
+    NX_ASSERT(false);
     return false;
 }
 
 bool QnClientStorageResource::renameFile(const QString&, const QString&)
 {
-    assert(false);
+    NX_ASSERT(false);
     return false;
 }
 
 bool QnClientStorageResource::isFileExists(const QString&)
 {
-    assert(false);
+    NX_ASSERT(false);
     return false;
 }
 
 bool QnClientStorageResource::isDirExists(const QString&)
 {
-    assert(false);
+    NX_ASSERT(false);
     return false;
 }
 

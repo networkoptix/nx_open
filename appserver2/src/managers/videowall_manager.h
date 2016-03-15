@@ -20,7 +20,7 @@ namespace ec2
 
         void triggerNotification( const QnTransaction<ApiVideowallData>& tran )
         {
-            assert( tran.command == ApiCommand::saveVideowall);
+            NX_ASSERT( tran.command == ApiCommand::saveVideowall);
             QnVideoWallResourcePtr VideoWallResource(new QnVideoWallResource());
             fromApiToResource(tran.params, VideoWallResource);
             emit addedOrUpdated( VideoWallResource );
@@ -28,12 +28,12 @@ namespace ec2
 
         void triggerNotification( const QnTransaction<ApiIdData>& tran )
         {
-            assert( tran.command == ApiCommand::removeVideowall );
+            NX_ASSERT( tran.command == ApiCommand::removeVideowall );
             emit removed( QnUuid(tran.params.id) );
         }
 
         void triggerNotification(const QnTransaction<ApiVideowallControlMessageData>& tran) {
-            assert(tran.command == ApiCommand::videowallControl);
+            NX_ASSERT(tran.command == ApiCommand::videowallControl);
             QnVideoWallControlMessage message;
             fromApiToResource(tran.params, message);
             emit controlMessage(message);

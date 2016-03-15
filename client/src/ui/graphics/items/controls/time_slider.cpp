@@ -294,7 +294,7 @@ public:
         m_pendingLength(0),
         m_pendingPosition(0)
     {
-        assert(m_painter && m_slider);
+        NX_ASSERT(m_painter && m_slider);
 
         const QnTimeSliderColors &colors = slider->colors();
 
@@ -320,7 +320,7 @@ public:
     }
 
     void paintChunk(qint64 length, Qn::TimePeriodContent content) {
-        assert(length >= 0);
+        NX_ASSERT(length >= 0);
 
         if(m_pendingLength > 0 && m_pendingLength + length > m_minChunkLength) {
             qint64 delta = m_minChunkLength - m_pendingLength;

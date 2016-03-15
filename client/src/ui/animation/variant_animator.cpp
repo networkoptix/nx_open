@@ -151,7 +151,7 @@ void VariantAnimator::setTargetValue(const QVariant &targetValue) {
 }
 
 void VariantAnimator::setInternalTypeInternal(int newInternalType) {
-    assert(newInternalType >= 0);
+    NX_ASSERT(newInternalType >= 0);
 
     if(m_internalType == newInternalType)
         return;

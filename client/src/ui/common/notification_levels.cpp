@@ -51,7 +51,7 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(const QnAbstractBusiness
         return Value::CriticalNotification;
 
     default:                                        
-        Q_ASSERT_X(false, Q_FUNC_INFO, "All enum values must be handled");
+        NX_ASSERT(false, Q_FUNC_INFO, "All enum values must be handled");
         return Value::NoNotification;
     }
 }
@@ -76,7 +76,7 @@ QColor QnNotificationLevel::notificationColor(Value level) {
     case Value::CriticalNotification:  return qnGlobals->notificationColorCritical();
     case Value::SystemNotification:    return qnGlobals->notificationColorSystem();
     default:
-        Q_ASSERT_X(false, Q_FUNC_INFO, "All enum values must be handled");
+        NX_ASSERT(false, Q_FUNC_INFO, "All enum values must be handled");
         break;        
     }
     return QColor();

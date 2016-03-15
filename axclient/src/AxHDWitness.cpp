@@ -129,7 +129,7 @@ bool AxHDWitness::event(QEvent *event) {
 }
 
 void AxHDWitness::initialize() {
-    Q_ASSERT_X(!m_isInitialized, Q_FUNC_INFO, "Double initialization");
+    NX_ASSERT(!m_isInitialized, Q_FUNC_INFO, "Double initialization");
     if (m_isInitialized)
         return;
    
@@ -142,7 +142,7 @@ void AxHDWitness::initialize() {
 }
 
 void AxHDWitness::finalize() {
-    Q_ASSERT_X(m_isInitialized, Q_FUNC_INFO, "Double finalization");
+    NX_ASSERT(m_isInitialized, Q_FUNC_INFO, "Double finalization");
     if (!m_isInitialized) 
         return;
     

@@ -289,7 +289,7 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
 
     } // while(true)
 
-    Q_ASSERT(false);    //should never get here
+    NX_ASSERT(false);    //should never get here
     return Result::IncompatibleVersion; //just in case
 }
 
@@ -384,7 +384,7 @@ QString QnConnectionDiagnosticsHelper::resultToString(Result value) {
     case QnConnectionDiagnosticsHelper::Result::ServerError:
         return lit("ServerError");
     default:
-        Q_ASSERT_X(false, Q_FUNC_INFO, "Should never get here");
+        NX_ASSERT(false, Q_FUNC_INFO, "Should never get here");
         break;
     }
     return QString();
@@ -399,7 +399,7 @@ QString QnConnectionDiagnosticsHelper::strings(ErrorStrings id) {
     case ErrorStrings::UnableConnect:
         return tr("Unable to connect to the server");
     default:
-        Q_ASSERT_X(false, Q_FUNC_INFO, "Should never get here");
+        NX_ASSERT(false, Q_FUNC_INFO, "Should never get here");
         break;
     }
     return QString();

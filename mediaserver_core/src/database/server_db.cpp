@@ -939,7 +939,7 @@ bool QnServerDb::getBookmarks(const QnVirtualCameraResourceList &cameras
 
         checkedBind(":text", getFilterValue(filter.text));
 
-        Q_ASSERT_X(bindings.isEmpty(), Q_FUNC_INFO, "all bindings must be substituted");
+        NX_ASSERT(bindings.isEmpty(), Q_FUNC_INFO, "all bindings must be substituted");
         if (!execSQLQuery(&query, Q_FUNC_INFO))
             return false;
 

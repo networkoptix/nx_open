@@ -166,7 +166,7 @@ namespace ec2
 
     void QnMediaServerNotificationManager::triggerNotification( const QnTransaction<ApiMediaServerUserAttributesDataList>& tran )
     {
-        assert( tran.command == ApiCommand::saveServerUserAttributesList );
+        NX_ASSERT( tran.command == ApiCommand::saveServerUserAttributesList );
         for(const ApiMediaServerUserAttributesData& attrs: tran.params) 
         {
             QnMediaServerUserAttributesPtr serverAttrs( new QnMediaServerUserAttributes() );
@@ -177,7 +177,7 @@ namespace ec2
 
     void QnMediaServerNotificationManager::triggerNotification( const QnTransaction<ApiMediaServerUserAttributesData>& tran )
     {
-        assert( tran.command == ApiCommand::saveServerUserAttributes );
+        NX_ASSERT( tran.command == ApiCommand::saveServerUserAttributes );
         QnMediaServerUserAttributesPtr serverAttrs( new QnMediaServerUserAttributes() );
         fromApiToResource( tran.params, serverAttrs );
         emit userAttributesChanged( serverAttrs );
@@ -190,7 +190,7 @@ namespace ec2
                 emit storageRemoved( idData.id );
         }
         else
-            Q_ASSERT_X(0, "Invalid transaction", Q_FUNC_INFO);
+            NX_ASSERT(0, "Invalid transaction", Q_FUNC_INFO);
     }
 
     void QnMediaServerNotificationManager::triggerNotification( const QnTransaction<ApiIdData>& tran )
@@ -200,7 +200,7 @@ namespace ec2
         else if( tran.command == ApiCommand::removeStorage)
             emit storageRemoved( QnUuid(tran.params.id) );
         else
-            Q_ASSERT_X(0, "Invalid transaction", Q_FUNC_INFO);
+            NX_ASSERT(0, "Invalid transaction", Q_FUNC_INFO);
     }
 
     void QnMediaServerNotificationManager::triggerNotification( const QnTransaction<ApiStorageDataList>& tran )
@@ -218,7 +218,7 @@ namespace ec2
 
     void QnMediaServerNotificationManager::triggerNotification( const QnTransaction<ApiStorageData>& tran )
     {
-        assert( tran.command == ApiCommand::saveStorage);
+        NX_ASSERT( tran.command == ApiCommand::saveStorage);
 
         QnResourceTypePtr resType = m_resCtx.resTypePool->getResourceTypeByName(lit("Storage"));
         if (!resType)
@@ -232,7 +232,7 @@ namespace ec2
 
     void QnMediaServerNotificationManager::triggerNotification( const QnTransaction<ApiMediaServerData>& tran )
     {
-        assert( tran.command == ApiCommand::saveMediaServer);
+        NX_ASSERT( tran.command == ApiCommand::saveMediaServer);
         QnMediaServerResourcePtr mserverRes(new QnMediaServerResource(m_resCtx.resTypePool));
         fromApiToResource(tran.params, mserverRes, m_resCtx);
         emit addedOrUpdated( std::move(mserverRes ));

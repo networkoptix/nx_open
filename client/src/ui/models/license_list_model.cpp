@@ -71,7 +71,7 @@ QString QnLicenseListModel::columnTitle(Column column) {
     case LicenseStatusColumn:   return tr("Status");
     case ServerColumn:          return tr("Server");        
     default:
-        assert(false);
+        NX_ASSERT(false);
         return QString();
     }
 }
@@ -151,7 +151,7 @@ QStandardItem *QnLicenseListModel::createItem(Column column, const QnLicensePtr 
         }
         break;
     default:
-        assert(false);
+        NX_ASSERT(false);
     }
 
     if (!qnLicensePool->isLicenseValid(license))

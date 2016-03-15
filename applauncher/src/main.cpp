@@ -296,7 +296,7 @@ int doInstallation(
             break;
 
         default:
-            assert( false );
+            NX_ASSERT( false );
     }
 
     return 0;

@@ -22,13 +22,13 @@ namespace ec2
 
         void triggerNotification( const QnTransaction<ApiIdData>& tran )
         {
-            assert( tran.command == ApiCommand::removeLayout );
+            NX_ASSERT( tran.command == ApiCommand::removeLayout );
             emit removed( QnUuid(tran.params.id) );
         }
 
         void triggerNotification( const QnTransaction<ApiLayoutData>& tran )
         {
-            assert( tran.command == ApiCommand::saveLayout);
+            NX_ASSERT( tran.command == ApiCommand::saveLayout);
             QnLayoutResourcePtr layoutResource(new QnLayoutResource(m_resCtx.resTypePool));
             fromApiToResource(tran.params, layoutResource);
             emit addedOrUpdated( layoutResource );
@@ -36,7 +36,7 @@ namespace ec2
 
         void triggerNotification( const QnTransaction<ApiLayoutDataList>& tran )
         {
-            assert(tran.command == ApiCommand::saveLayouts );
+            NX_ASSERT(tran.command == ApiCommand::saveLayouts );
             for(const ApiLayoutData& layout: tran.params) 
             {
                 QnLayoutResourcePtr layoutResource(new QnLayoutResource(m_resCtx.resTypePool));

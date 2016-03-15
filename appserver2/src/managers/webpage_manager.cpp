@@ -24,7 +24,7 @@ namespace ec2
 
     void QnWebPageNotificationManager::triggerNotification(const QnTransaction<ApiWebPageData> &tran)
     {
-        assert(tran.command == ApiCommand::saveWebPage);
+        NX_ASSERT(tran.command == ApiCommand::saveWebPage);
         QnWebPageResourcePtr webPage(new QnWebPageResource());
         fromApiToResource(tran.params, webPage);
         emit addedOrUpdated( webPage );
@@ -32,7 +32,7 @@ namespace ec2
 
     void QnWebPageNotificationManager::triggerNotification(const QnTransaction<ApiIdData> &tran)
     {
-        assert(tran.command == ApiCommand::removeWebPage );
+        NX_ASSERT(tran.command == ApiCommand::removeWebPage );
         emit removed( QnUuid(tran.params.id) );
     }
 

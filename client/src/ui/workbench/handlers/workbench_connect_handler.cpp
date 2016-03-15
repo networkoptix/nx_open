@@ -263,7 +263,7 @@ bool QnWorkbenchConnectHandler::connected() const {
 
 ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerUrl, bool silent) {
     if (!silent) {
-        Q_ASSERT(!connected());
+        NX_ASSERT(!connected());
         if (connected())
             return ec2::ErrorCode::ok;
     }

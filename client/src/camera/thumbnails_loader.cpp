@@ -73,7 +73,7 @@ QnThumbnailsLoader::QnThumbnailsLoader(const QnMediaResourcePtr &resource, QnThu
     m_generation(0),
     m_cachedAspectRatio(0.0)
 {
-    Q_ASSERT_X(supportedResource(resource), Q_FUNC_INFO, "Loaders must not be created for unsupported resources");
+    NX_ASSERT(supportedResource(resource), Q_FUNC_INFO, "Loaders must not be created for unsupported resources");
 
     if (!supportedResource(resource))
         return;
@@ -368,7 +368,7 @@ void QnThumbnailsLoader::enqueueForProcessingLocked(qint64 startTime, qint64 end
 }
 
 void QnThumbnailsLoader::run() {
-    assert(QThread::currentThread() == this); /* This function is supposed to be run from thumbnail rendering thread only. */
+    NX_ASSERT(QThread::currentThread() == this); /* This function is supposed to be run from thumbnail rendering thread only. */
 
     m_helper = new QnThumbnailsLoaderHelper(this);
     connect(this, SIGNAL(processingRequested()), m_helper, SLOT(process()), Qt::QueuedConnection);

@@ -169,7 +169,7 @@ void QnMediaResourceHelper::setResourceId(const QString &id)
     connect(m_camera, &QnResource::propertyChanged, this,
             [this](const QnResourcePtr &resource, const QString &key)
             {
-                Q_ASSERT(m_camera == resource);
+                NX_ASSERT(m_camera == resource);
                 if (m_camera != resource)
                     return;
 

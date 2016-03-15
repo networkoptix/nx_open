@@ -23,11 +23,11 @@ namespace ec2
 
         void triggerNotification( const QnTransaction<ApiCameraData>& tran )
         {
-            assert( tran.command == ApiCommand::saveCamera);
+            NX_ASSERT( tran.command == ApiCommand::saveCamera);
             QnVirtualCameraResourcePtr cameraRes = m_resCtx.resFactory->createResource(
                 tran.params.typeId,
                 QnResourceParams(tran.params.id, tran.params.url, tran.params.vendor) ).dynamicCast<QnVirtualCameraResource>();
-            Q_ASSERT_X(cameraRes, Q_FUNC_INFO, QByteArray("Unknown resource type:") + tran.params.typeId.toByteArray());
+            NX_ASSERT(cameraRes, Q_FUNC_INFO, QByteArray("Unknown resource type:") + tran.params.typeId.toByteArray());
             if (cameraRes) {
                 fromApiToResource(tran.params, cameraRes);
                 emit cameraAddedOrUpdated( std::move(cameraRes ));
@@ -36,27 +36,27 @@ namespace ec2
 
         void triggerNotification( const QnTransaction<ApiCameraDataList>& tran )
         {
-            assert( tran.command == ApiCommand::saveCameras );
+            NX_ASSERT( tran.command == ApiCommand::saveCameras );
             for(const ApiCameraData& camera: tran.params) 
             {
                 QnVirtualCameraResourcePtr cameraRes = m_resCtx.resFactory->createResource(
                     camera.typeId,
                     QnResourceParams(camera.id, camera.url, camera.vendor) ).dynamicCast<QnVirtualCameraResource>();
-                assert( cameraRes );
+                NX_ASSERT( cameraRes );
                 fromApiToResource(camera, cameraRes);
                 emit cameraAddedOrUpdated( std::move(cameraRes) );
             }
         }
 
         void triggerNotification( const QnTransaction<ApiCameraAttributesData>& tran ) {
-            assert( tran.command == ApiCommand::saveCameraUserAttributes );
+            NX_ASSERT( tran.command == ApiCommand::saveCameraUserAttributes );
             QnCameraUserAttributesPtr cameraAttrs( new QnCameraUserAttributes() );
             fromApiToResource( tran.params, cameraAttrs );
             emit userAttributesChanged( std::move(cameraAttrs) );
         }
 
         void triggerNotification( const QnTransaction<ApiCameraAttributesDataList>& tran ) {
-            assert( tran.command == ApiCommand::saveCameraUserAttributesList );
+            NX_ASSERT( tran.command == ApiCommand::saveCameraUserAttributesList );
             for(const ApiCameraAttributesData& attrs: tran.params) 
             {
                 QnCameraUserAttributesPtr cameraAttrs( new QnCameraUserAttributes() );
@@ -67,7 +67,7 @@ namespace ec2
 
         void triggerNotification( const QnTransaction<ApiIdData>& tran )
         {
-            assert( tran.command == ApiCommand::removeCamera );
+            NX_ASSERT( tran.command == ApiCommand::removeCamera );
             emit cameraRemoved( QnUuid(tran.params.id) );
         }
 

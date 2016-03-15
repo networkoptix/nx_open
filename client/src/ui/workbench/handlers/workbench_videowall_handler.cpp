@@ -601,7 +601,7 @@ void QnWorkbenchVideoWallHandler::closeInstanceDelayed() {
 }
 
 void QnWorkbenchVideoWallHandler::sendMessage(QnVideoWallControlMessage message, bool cached) {
-    Q_ASSERT(m_controlMode.active);
+    NX_ASSERT(m_controlMode.active);
 
     if (cached) {
         m_controlMode.cachedMessages << message;
@@ -1408,7 +1408,7 @@ void QnWorkbenchVideoWallHandler::at_renameAction_triggered() {
         break;
     }
 
-    Q_ASSERT_X(valid, Q_FUNC_INFO, "Data should correspond to action profile.");
+    NX_ASSERT(valid, Q_FUNC_INFO, "Data should correspond to action profile.");
     if (!valid)
         return;
 
@@ -1631,7 +1631,7 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered() {
     }
 
     QnLayoutResourcePtr targetLayout = constructLayout(targetResources);
-    Q_ASSERT_X(targetLayout, Q_FUNC_INFO, "function must always return valid layout");
+    NX_ASSERT(targetLayout, Q_FUNC_INFO, "function must always return valid layout");
     if (!targetLayout)
         return;
 
@@ -2370,7 +2370,7 @@ bool QnWorkbenchVideoWallHandler::saveReviewLayout( QnWorkbenchLayout *layout, s
 }
 
 void QnWorkbenchVideoWallHandler::setItemOnline(const QnUuid &instanceGuid, bool online) {
-    Q_ASSERT(!instanceGuid.isNull());
+    NX_ASSERT(!instanceGuid.isNull());
 
     QnVideoWallItemIndex index = qnResPool->getVideoWallItemByUuid(instanceGuid);
     if (index.isNull())

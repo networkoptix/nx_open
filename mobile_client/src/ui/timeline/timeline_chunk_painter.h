@@ -16,7 +16,7 @@ public:
         m_pendingLength(0),
         m_pendingPosition(0)
     {
-        Q_ASSERT(m_geometry);
+        NX_ASSERT(m_geometry);
         m_color[Qn::RecordingContent] = Qt::darkGreen;
         m_color[Qn::MotionContent] = Qt::red;
         m_color[Qn::TimePeriodContentCount] = Qt ::transparent;

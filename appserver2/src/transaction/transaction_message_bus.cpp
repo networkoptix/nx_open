@@ -206,7 +206,7 @@ namespace ec2
         case ApiCommand::restoreDatabase: return true;
         default:
             qWarning() << "Transaction type " << transaction.command << " is not implemented for delivery! Implement me!";
-            Q_ASSERT_X(0, Q_FUNC_INFO, "Transaction type is not implemented for delivery! Implement me!");
+            NX_ASSERT(0, Q_FUNC_INFO, "Transaction type is not implemented for delivery! Implement me!");
             return false;
         }
     }
@@ -297,7 +297,7 @@ namespace ec2
         m_aliveSendTimer.invalidate();
         m_currentTimeTimer.restart();
 
-        assert( m_globalInstance == nullptr );
+        NX_ASSERT( m_globalInstance == nullptr );
         m_globalInstance = this;
         connect(m_runtimeTransactionLog.get(), &QnRuntimeTransactionLog::runtimeDataUpdated, this, &QnTransactionMessageBus::at_runtimeDataUpdated);
         m_relativeTimer.restart();
@@ -309,14 +309,14 @@ namespace ec2
 
     void QnTransactionMessageBus::start()
     {
-        Q_ASSERT(!m_thread->isRunning());
+        NX_ASSERT(!m_thread->isRunning());
         if (!m_thread->isRunning())
             m_thread->start();
     }
 
     void QnTransactionMessageBus::stop()
     {
-        Q_ASSERT(m_thread->isRunning());
+        NX_ASSERT(m_thread->isRunning());
         dropConnections();
 
         /* Connections in the 'Error' state will be closed via queued connection and after that removed via deleteLater() */
@@ -387,7 +387,7 @@ namespace ec2
             QnTranState runtimeState;
             QList<QnTransaction<ApiRuntimeData>> result;
             m_runtimeTransactionLog->getTransactionsAfter(runtimeState, result);
-            Q_ASSERT(result.size() == 1 && result[0].peerID == qnCommon->moduleGUID());
+            NX_ASSERT(result.size() == 1 && result[0].peerID == qnCommon->moduleGUID());
         }
 #endif
 
@@ -474,7 +474,7 @@ namespace ec2
                 QnTransaction<ApiPeerAliveData> tran(ApiCommand::peerAliveInfo);
                 tran.params = aliveData;
                 tran.params.isAlive = true;
-                Q_ASSERT(!aliveData.peer.instanceId.isNull());
+                NX_ASSERT(!aliveData.peer.instanceId.isNull());
             int delay = aliveData.peer.id == qnCommon->moduleGUID() ? 0 : rand() % (ALIVE_RESEND_TIMEOUT_MAX - ALIVE_RESEND_TIMEOUT_MIN) + ALIVE_RESEND_TIMEOUT_MIN;
             addDelayedAliveTran(std::move(tran), delay);
                 return false; // ignore peer offline transaction
@@ -547,12 +547,12 @@ namespace ec2
 
     void QnTransactionMessageBus::onGotServerAliveInfo(const QnTransaction<ApiPeerAliveData> &tran, QnTransactionTransport* transport, const QnTransactionTransportHeader& ttHeader)
     {
-        Q_ASSERT(tran.peerID != qnCommon->moduleGUID());
+        NX_ASSERT(tran.peerID != qnCommon->moduleGUID());
         if (!gotAliveData(tran.params, transport, &ttHeader))
             return; // ignore offline alive tran and resend online tran instead
 
         QnTransaction<ApiPeerAliveData> modifiedTran(tran);
-        Q_ASSERT(!modifiedTran.params.peer.instanceId.isNull());
+        NX_ASSERT(!modifiedTran.params.peer.instanceId.isNull());
         modifiedTran.params.persistentState.values.clear(); // do not proxy persistent state to other peers. this checking required for directly connected peers only
         modifiedTran.params.runtimeState.values.clear();
         proxyTransaction(tran, ttHeader);
@@ -598,7 +598,7 @@ namespace ec2
             return;
         }
 
-        Q_ASSERT(transportHeader.processedPeers.contains(sender->remotePeer().id));
+        NX_ASSERT(transportHeader.processedPeers.contains(sender->remotePeer().id));
 
         using namespace std::placeholders;
         if( !handleTransaction(
@@ -641,7 +641,7 @@ namespace ec2
 
     template <class T>
     void QnTransactionMessageBus::sendTransactionToTransport(const QnTransaction<T> &tran, QnTransactionTransport* transport, const QnTransactionTransportHeader &transportHeader) {
-        Q_ASSERT(!tran.isLocal);
+        NX_ASSERT(!tran.isLocal);
         transport->sendTransaction(tran, transportHeader);
     }
 
@@ -762,7 +762,7 @@ namespace ec2
 
             if (!cond) {
                 NX_LOG( QnLog::EC2_TRAN_LOG, printTransaction("Got unexpected transaction", tran, transportHeader, sender), cl_logDEBUG1);
-                Q_ASSERT_X( cond, Q_FUNC_INFO, "Invalid transaction sequence, queued connetion" );
+                NX_ASSERT( cond, Q_FUNC_INFO, "Invalid transaction sequence, queued connetion" );
             }
         }
 #endif
@@ -895,7 +895,7 @@ namespace ec2
             if (transportHeader.processedPeers.contains(transport->remotePeer().id) || !transport->isReadyToSend(tran.command))
                 continue;
 
-            //Q_ASSERT(transport->remotePeer().id != tran.peerID);
+            //NX_ASSERT(transport->remotePeer().id != tran.peerID);
             transport->sendTransaction(tran, newHeader);
             proxyList << transport->remotePeer().id;
         }
@@ -940,8 +940,8 @@ namespace ec2
             printTranState(tran.params.persistentState);
             NX_LOG( QnLog::EC2_TRAN_LOG, lit("exist %1 new transactions").arg(serializedTransactions.size()), cl_logDEBUG1);
 
-            assert( m_connections.contains(sender->remotePeer().id) );
-            assert( sender->getState() >= QnTransactionTransport::ReadyForStreaming );
+            NX_ASSERT( m_connections.contains(sender->remotePeer().id) );
+            NX_ASSERT( sender->getState() >= QnTransactionTransport::ReadyForStreaming );
             QnTransaction<QnTranStateResponse> tranSyncResponse(ApiCommand::tranSyncResponse);
             tranSyncResponse.params.result = 0;
             sender->sendTransaction(tranSyncResponse, ttUnicast);
@@ -981,7 +981,7 @@ namespace ec2
     void QnTransactionMessageBus::queueSyncRequest(QnTransactionTransport* transport)
     {
         // send sync request
-        Q_ASSERT(!transport->isSyncInProgress());
+        NX_ASSERT(!transport->isSyncInProgress());
         transport->setReadSync(false);
         transport->setSyncDone(false);
 
@@ -1135,7 +1135,7 @@ namespace ec2
         {
             QnTransaction<ApiPeerAliveData> tran(ApiCommand::peerAliveInfo);
             tran.params = aliveData;
-            Q_ASSERT(!tran.params.peer.instanceId.isNull());
+            NX_ASSERT(!tran.params.peer.instanceId.isNull());
             if (isAlive && transactionLog && peer.id == qnCommon->moduleGUID()) {
                 tran.params.persistentState = transactionLog->getTransactionsState();
                 tran.params.runtimeState = m_runtimeTransactionLog->getTransactionsState();
@@ -1230,7 +1230,7 @@ namespace ec2
                 for (int i = 0; i < m_connectingConnections.size(); ++i)
                 {
                     if (m_connectingConnections[i] == transport) {
-                        Q_ASSERT(!m_connections.contains(transport->remotePeer().id));
+                        NX_ASSERT(!m_connections.contains(transport->remotePeer().id));
                         m_connections[transport->remotePeer().id] = m_connectingConnections[i];
                         emit newDirectConnectionEstablished( m_connectingConnections[i] );
                         m_connectingConnections.removeAt(i);
@@ -1238,7 +1238,7 @@ namespace ec2
                         break;
                     }
                 }
-                Q_ASSERT(found);
+                NX_ASSERT(found);
                 removeTTSequenceForPeer(transport->remotePeer().id);
 
                 if (ApiPeerData::isServer(m_localPeerType) && transport->remoteIdentityTime() > qnCommon->systemIdentityTime() )
@@ -1490,7 +1490,7 @@ namespace ec2
         QnMutexLocker lock(&m_mutex);
         transport->moveToThread(thread());
         m_connectingConnections << transport;
-        Q_ASSERT(!m_connections.contains(remotePeer.id));
+        NX_ASSERT(!m_connections.contains(remotePeer.id));
     }
 
     bool QnTransactionMessageBus::moveConnectionToReadyForStreaming(const QnUuid& connectionGuid)
@@ -1767,15 +1767,15 @@ namespace ec2
 
     void QnTransactionMessageBus::setHandler(ECConnectionNotificationManager* handler) {
         QnMutexLocker lock( &m_mutex );
-        Q_ASSERT(!m_thread->isRunning());
-        Q_ASSERT_X(m_handler == NULL, Q_FUNC_INFO, "Previous handler must be removed at this time");
+        NX_ASSERT(!m_thread->isRunning());
+        NX_ASSERT(m_handler == NULL, Q_FUNC_INFO, "Previous handler must be removed at this time");
         m_handler = handler;
     }
 
 	void QnTransactionMessageBus::removeHandler(ECConnectionNotificationManager* handler) {
     	QnMutexLocker lock(&m_mutex);
-	    Q_ASSERT(!m_thread->isRunning());
-    	Q_ASSERT_X(m_handler == handler, Q_FUNC_INFO, "We must remove only current handler");
+	    NX_ASSERT(!m_thread->isRunning());
+    	NX_ASSERT(m_handler == handler, Q_FUNC_INFO, "We must remove only current handler");
 	    if( m_handler == handler )
     	    m_handler = nullptr;
 	}

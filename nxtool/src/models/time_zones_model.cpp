@@ -93,7 +93,7 @@ private:
             standardTimeOffset(standardTimeOffset)
         {
             ids.append(id);
-            Q_ASSERT_X(!id.isEmpty(), Q_FUNC_INFO, "IANA id should not be empty here.");
+            NX_ASSERT(!id.isEmpty(), Q_FUNC_INFO, "IANA id should not be empty here.");
         }
 
         QByteArray primaryId() const {
@@ -303,7 +303,7 @@ bool rtu::TimeZonesModel::isValidValue(int index)
 
 int rtu::TimeZonesModel::rowCount(const QModelIndex &parent /*= QModelIndex()*/) const {
     /* This model do not have sub-rows. */
-    Q_ASSERT_X(!parent.isValid(), Q_FUNC_INFO, "Only null index should come here.");
+    NX_ASSERT(!parent.isValid(), Q_FUNC_INFO, "Only null index should come here.");
     if (parent.isValid())
         return 0;
     return m_impl->rowCount();

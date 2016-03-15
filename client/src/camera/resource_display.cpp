@@ -22,7 +22,7 @@ QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *par
     m_started(false),
     m_counter(0)
 {
-    assert(!resource.isNull());
+    NX_ASSERT(!resource.isNull());
 
     m_mediaResource = resource.dynamicCast<QnMediaResource>();
 
