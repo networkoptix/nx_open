@@ -115,7 +115,7 @@ def get_package_for_configuration(target, package, target_dir, debug):
         print "Could not locate {0}".format(package)
         return False
 
-    deps_file = os.path.join(location, package + ".pri")
+    deps_file = os.path.join(location, package + get_deps_file_suffix())
     if not os.path.isfile(deps_file):
         deps_file = locate_deps_file(location)
     if deps_file and os.path.isfile(deps_file):
