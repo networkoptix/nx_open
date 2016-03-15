@@ -88,7 +88,7 @@
 #include <nx_ec/data/api_layout_data.h>
 #include <nx_ec/data/api_camera_data.h>
 #include <nx_ec/data/api_business_rule_data.h>
-
+#include <nx_ec/data/api_access_rights_data.h>
 
 #include "api/model/api_ioport_data.h"
 #include "api/model/recording_stats_reply.h"

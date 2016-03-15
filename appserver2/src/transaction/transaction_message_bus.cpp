@@ -23,7 +23,7 @@
 #include "nx_ec/data/api_resource_data.h"
 #include "nx_ec/data/api_resource_type_data.h"
 #include "nx_ec/data/api_reverse_connection_data.h"
-#include "nx_ec/data/api_server_alive_data.h"
+#include "nx_ec/data/api_peer_alive_data.h"
 #include "nx_ec/data/api_discovery_data.h"
 
 #include "transaction/runtime_transaction_log.h"
