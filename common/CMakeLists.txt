@@ -38,13 +38,13 @@ add_translations(translations)
 qt5_wrap_ui(UI_HEADERS ${UI_FILES})
 qt5_add_resources(RESOURCE_FILES ${PROJECT_BINARY_DIR}/${PROJECT_SHORTNAME}.qrc)
 
-#get_external_dependencies(openssl quazip)
+get_external_dependencies(openssl quazip)
 
-#if(${CMAKE_BUILD_TYPE} MATCHES Debug)
-#    include(${CMAKE_CURRENT_BINARY_DIR}/dependencies-debug.cmake)
-#else()
-#    include(${CMAKE_CURRENT_BINARY_DIR}/dependencies.cmake)
-#endif()
+if(${CMAKE_BUILD_TYPE} MATCHES Debug)
+   include(${CMAKE_CURRENT_BINARY_DIR}/dependencies-debug.cmake)
+else()
+   include(${CMAKE_CURRENT_BINARY_DIR}/dependencies.cmake)
+endif()
 
 include_directories(${OPENSSL_INCLUDE}
                     ${QUAZIP_INCLUDE}

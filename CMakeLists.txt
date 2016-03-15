@@ -46,6 +46,22 @@ if(WIN32)
     endif()
 endif()
 
+if(WIN32)
+    set(TARGET_TYPE "windows-${arch}")
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+    if(NOT box OR ${box} MATCHES "none")
+        set(TARGET_TYPE "linux-${arch}")
+    else()
+        set(TARGET_TYPE ${box})
+    endif()
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+    set(TARGET_TYPE "macosx-x64")
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "Android")
+    set(TARGET_TYPE "android-arm")
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "iOS")
+    set(TARGET_TYPE "ios")
+endif()
+
 set(CMAKE_MODULE_PATH
     ${CMAKE_MODULE_PATH}
     ${PROJECT_SOURCE_DIR}/build_utils/cmake
