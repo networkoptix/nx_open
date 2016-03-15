@@ -65,6 +65,8 @@ endif()
 set(CMAKE_MODULE_PATH
     ${CMAKE_MODULE_PATH}
     ${PROJECT_SOURCE_DIR}/build_utils/cmake
+    ${PROJECT_SOURCE_DIR}/customization
+    ${PROJECT_SOURCE_DIR}/customization/${customization}
 )
 
 include(default_properties)

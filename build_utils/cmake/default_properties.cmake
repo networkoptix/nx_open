@@ -1,5 +1,5 @@
-add_subdirectory(${CMAKE_SOURCE_DIR}/customization customization)
-add_subdirectory(${CMAKE_SOURCE_DIR}/customization/${customization} customization/${customization})
+include(default-values)
+include(customization)
 
 set (release.version "${majorVersion}.${minorVersion}.${incrementalVersion}")
 set (linux.release.version "${majorVersion}.${minorVersion}.${incrementalVersion}")
