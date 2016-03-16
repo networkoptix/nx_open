@@ -60,6 +60,26 @@ namespace {
 
     const char* checkBoxCheckedProperty("checkboxChecked");
     const char* checkBoxFilterProperty("checkboxFilter");
+
+    int calcHeaderHeight(QHeaderView* header)
+    {
+        // otherwise use the contents
+        QStyleOptionHeader opt;
+
+        opt.initFrom(header);
+        opt.state = QStyle::State_None | QStyle::State_Raised;
+        opt.orientation = Qt::Horizontal;
+        opt.state |= QStyle::State_Horizontal;
+        opt.state |= QStyle::State_Enabled;
+        opt.section = 0;
+
+        QFont fnt = header->font();
+        fnt.setBold(true);
+        opt.fontMetrics = QFontMetrics(fnt);
+        QSize size = header->style()->sizeFromContents(QStyle::CT_HeaderSection, &opt, QSize(), header);
+
+        return size.height();
+    }
 }
 
 // --------------------------- QnAuditDetailItemDelegate ------------------------
@@ -566,26 +586,6 @@ void QnAuditLogDialog::at_updateDetailModel()
         QnAuditRecord * const record = data.value<QnAuditRecord *>();
         m_detailModel->setDetail(record, false);
     }
-}
-
-int calcHeaderHeight(QHeaderView* header)
-{
-    // otherwise use the contents
-    QStyleOptionHeader opt;
-
-    opt.initFrom(header);
-    opt.state = QStyle::State_None | QStyle::State_Raised;
-    opt.orientation = Qt::Horizontal;
-    opt.state |= QStyle::State_Horizontal;
-    opt.state |= QStyle::State_Enabled;
-    opt.section = 0;
-
-    QFont fnt = header->font();
-    fnt.setBold(true);
-    opt.fontMetrics = QFontMetrics(fnt);
-    QSize size = header->style()->sizeFromContents(QStyle::CT_HeaderSection, &opt, QSize(), header);
-
-    return size.height();
 }
 
 void QnAuditLogDialog::at_updateCheckboxes()
