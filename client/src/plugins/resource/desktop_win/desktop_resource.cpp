@@ -11,8 +11,6 @@ namespace {
     const QnUuid desktopResourceUuid(lit("{B3B2235F-D279-4d28-9012-00DE1002A61D}"));
 }
 
-//static QnDesktopResource* instance = 0;
-
 QnDesktopResource::QnDesktopResource(QGLWidget* mainWindow): QnAbstractArchiveResource()
 {
     m_mainWidget = mainWindow;
@@ -23,15 +21,11 @@ QnDesktopResource::QnDesktopResource(QGLWidget* mainWindow): QnAbstractArchiveRe
     setUrl(name);
     m_desktopDataProvider = 0;
     setId(desktopResourceUuid); // only one desktop resource is allowed)
-  //  setDisabled(true);
-    //NX_ASSERT(instance == 0, "Only one instance of desktop camera now allowed!", Q_FUNC_INFO);
-    //instance = this;
 }
 
 QnDesktopResource::~QnDesktopResource()
 {
     delete m_desktopDataProvider;
-    //instance = 0;
 }
 
 QString QnDesktopResource::toString() const {
@@ -111,8 +105,7 @@ void QnDesktopResource::addConnection(const QnMediaServerResourcePtr &server)
 
 void QnDesktopResource::removeConnection(const QnMediaServerResourcePtr &server)
 {
-    //TODO: #GDM #High #2.6 #IMPLEMENT ME when socket will be repaired
-   // m_connectionPool.remove(server->getId());
+    m_connectionPool.remove(server->getId());
 }
 
 static QSharedPointer<QnEmptyResourceAudioLayout> emptyAudioLayout( new QnEmptyResourceAudioLayout() );
