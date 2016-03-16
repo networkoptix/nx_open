@@ -21,12 +21,12 @@ public:
 
     ec2::ErrorCode connectToServer(const QUrl &appServerUrl, bool silent = false);
 
+    bool disconnectFromServer(bool force);
+
 protected:
     ec2::AbstractECConnectionPtr connection2() const;
     
     bool connected() const;
-
-    bool disconnectFromServer(bool force);
 
     void hideMessageBox();
     void showWelcomeScreen();
