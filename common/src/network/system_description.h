@@ -25,15 +25,15 @@ class QnSystemDescription : public QObject
     typedef QObject base_type;
 
 public:
-    static QnSystemDescriptionPtr createLocalSystem(const QnUuid &systemId
+    static QnSystemDescriptionPtr createLocalSystem(const QString &systemId
         , const QString &systemName);
 
-    static QnSystemDescriptionPtr createCloudSystem(const QnUuid &systemId
+    static QnSystemDescriptionPtr createCloudSystem(const QString &systemId
         , const QString &systemName);
 
     virtual ~QnSystemDescription();
 
-    QnUuid id() const;
+    QString id() const;
 
     QString name() const;
 
@@ -68,7 +68,7 @@ signals:
         , QnServerFields flags);
 
 private:
-    QnSystemDescription(const QnUuid &systemId
+    QnSystemDescription(const QString &systemId
         , const QString &systemName
         , const bool isCloudSystem);
 
@@ -77,7 +77,7 @@ private:
     typedef QHash<QnUuid, SocketAddress> PrimaryAddressHash;
     typedef QMultiMap<int, QnUuid> PrioritiesMap;
 
-    const QnUuid m_id;
+    const QString m_id;
     const QString m_systemName;
     const bool m_isCloudSystem;
     ServerInfoHash m_servers;
