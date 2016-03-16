@@ -3782,33 +3782,30 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& dummy, ApiFullInfoData& da
 {
     ErrorCode status;
 
-    auto db_load = [this, dummy, &status](auto &target) {
-        status = doQueryNoLock(dummy, target);
-        return status == ErrorCode::ok;
-    };
+#define db_load(target)      { ErrorCode status = doQueryNoLock(dummy, target);     if (status != ErrorCode::ok) return status; }
+#define db_load_uuid(target) { ErrorCode status = doQueryNoLock(QnUuid(), target);  if (status != ErrorCode::ok) return status; }
 
-    auto db_load_uuid = [this, &status](auto &target) {
-        status = doQueryNoLock(QnUuid(), target);
-        return status == ErrorCode::ok;
-    };
+    db_load(data.resourceTypes);
 
-    if (!db_load(data.resourceTypes))               return status;
-    if (!db_load(data.servers))                     return status;
-    if (!db_load_uuid(data.serversUserAttributesList))   return status;
-    if (!db_load(data.cameras))                     return status;
-    if (!db_load(data.cameraUserAttributesList))    return status;
-    if (!db_load(data.users))                       return status;
-    if (!db_load(data.layouts))                     return status;
-    if (!db_load(data.videowalls))                  return status;
-    if (!db_load(data.webPages))                    return status;
-    if (!db_load(data.rules))                       return status;
-    if (!db_load(data.cameraHistory))               return status;
-    if (!db_load(data.licenses))                    return status;
-    if (!db_load(data.discoveryData))               return status;
-    if (!db_load_uuid(data.allProperties))          return status;
-    if (!db_load_uuid(data.storages))               return status;
-    if (!db_load_uuid(data.resStatusList))          return status;
-    if (!db_load(data.accessRights))                return status;
+    db_load(data.servers);
+    db_load_uuid(data.serversUserAttributesList);
+    db_load(data.cameras);
+    db_load(data.cameraUserAttributesList);
+    db_load(data.users);
+    db_load(data.layouts);
+    db_load(data.videowalls);
+    db_load(data.webPages);
+    db_load(data.rules);
+    db_load(data.cameraHistory);
+    db_load(data.licenses);
+    db_load(data.discoveryData);
+    db_load_uuid(data.allProperties);
+    db_load_uuid(data.storages);
+    db_load_uuid(data.resStatusList);
+    db_load(data.accessRights);
+
+#undef db_load_uuid
+#undef db_load
 
     return ErrorCode::ok;
 }
