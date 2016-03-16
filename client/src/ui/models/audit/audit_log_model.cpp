@@ -516,7 +516,7 @@ QString QnAuditLogModel::textData(const Column& column,const QnAuditRecord* data
         if (data->rangeEndSec)
             return formatDuration(data->rangeEndSec - data->rangeStartSec);
         else
-            return formatDuration(0);
+            return QString();
     case UserNameColumn:
         return data->authSession.userName;
     case UserHostColumn:
