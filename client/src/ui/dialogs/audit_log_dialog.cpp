@@ -585,11 +585,6 @@ int calcHeaderHeight(QHeaderView* header)
     opt.fontMetrics = QFontMetrics(fnt);
     QSize size = header->style()->sizeFromContents(QStyle::CT_HeaderSection, &opt, QSize(), header);
 
-    if (header->isSortIndicatorShown())
-    {
-        int margin = header->style()->pixelMetric(QStyle::PM_HeaderMargin, &opt, header);
-        size.setHeight(size.height() +  margin);
-    }
     return size.height();
 }
 
