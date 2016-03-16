@@ -476,7 +476,7 @@ TEST(ServerArchiveDelegate_playback_test, Main)
     if (!qnCommon) {
         commonModule = std::unique_ptr<QnCommonModule>(new QnCommonModule);
     }
-    commonModule->setModuleGUID("{A680980C-70D1-4545-A5E5-72D89E33648B}");
+    commonModule->setModuleGUID(QnUuid("{A680980C-70D1-4545-A5E5-72D89E33648B}"));
 
     std::unique_ptr<QnStorageManager> normalStorageManager;
     if (!qnNormalStorageMan) {

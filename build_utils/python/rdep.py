@@ -8,6 +8,7 @@ import subprocess
 import shutil
 import tempfile
 import posixpath
+import distutils.spawn
 
 from platform_detection import *
 
@@ -15,9 +16,13 @@ ROOT_CONFIG_NAME = ".rdep"
 PACKAGE_CONFIG_NAME = ".rdpack"
 ANY_KEYWORD = "any"
 DEBUG_SUFFIX = "-debug"
-RSYNC = [ "rsync", "--archive", "--delete" ]
+RSYNC = [ "rsync" ]
 if detect_platform() == "windows":
+    if not distutils.spawn.find_executable("rsync"):
+        RSYNC = [os.path.join(os.getenv("environment"), "rsync-win32", "rsync.exe")]
     RSYNC.append("--chmod=ugo=rwx")
+RSYNC += [ "--archive", "--delete" ]
+print RSYNC
 
 DEFAULT_SYNC_URL = "rsync://enk.me/buildenv/rdep/packages"
 

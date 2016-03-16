@@ -40,6 +40,8 @@ private:
         , const QnUuid &serverId
         , QnServerFields fields);
 
+    QStringListModel *createStringListModel(const QStringList &data) const;
+
 private:
     typedef std::function<bool(const InternalSystemDataPtr &first
         , const InternalSystemDataPtr &second)> LessPred;

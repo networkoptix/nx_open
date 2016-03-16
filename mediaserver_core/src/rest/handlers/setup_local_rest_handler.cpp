@@ -1,9 +1,34 @@
 #include "setup_local_rest_handler.h"
 
 #include <nx/network/http/httptypes.h>
-#include "media_server/serverutil.h"
+#include <media_server/serverutil.h>
 
-int QnSetupLocalSystemRestHandler::executeGet(const QString &, const QnRequestParams & params, QnJsonRestResult &result, const QnRestConnectionProcessor*)
+namespace
+{
+    static const QString kDefaultAdminPassword(QLatin1String("admin"));
+}
+
+struct SetupLocalSystemData: public PasswordData
+{
+    QString systemName;
+};
+
+#define SetupLocalSystemData_Fields PasswordData_Fields (systemName)
+
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (SetupLocalSystemData),
+    (json),
+    _Fields,
+    (optional, true));
+
+
+int QnSetupLocalSystemRestHandler::executePost(
+    const QString &path,
+    const QnRequestParams&,
+    const QByteArray &body,
+    QnJsonRestResult &result,
+    const QnRestConnectionProcessor*)
 {
     nx::SystemName systemName;
     systemName.loadFromConfig();
@@ -14,31 +39,33 @@ int QnSetupLocalSystemRestHandler::executeGet(const QString &, const QnRequestPa
     }
 
     QString errStr;
-    PasswordData passwordData(params);
-    if (!validatePasswordData(passwordData, &errStr))
+    SetupLocalSystemData data = QJson::deserialized<SetupLocalSystemData>(body);
+    if (data.oldPassword.isEmpty())
+        data.oldPassword = kDefaultAdminPassword;
+
+    if (!validatePasswordData(data, &errStr))
     {
         result.setError(QnJsonRestResult::CantProcessRequest, errStr);
         return nx_http::StatusCode::ok;
     }
-    if (!passwordData.hasPassword())
+    if (!data.hasPassword())
     {
         result.setError(QnJsonRestResult::MissingParameter, "Password or password digest MUST be provided");
         return nx_http::StatusCode::ok;
     }
 
-    QString newSystemName = params.value(lit("systemName"));
-    if (newSystemName.isEmpty())
+    if (data.systemName.isEmpty())
     {
         result.setError(QnJsonRestResult::MissingParameter, lit("Parameter 'systemName' must be provided."));
         return nx_http::StatusCode::ok;
     }
 
-    if (!changeAdminPassword(passwordData)) {
+    if (!changeAdminPassword(data)) {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("Internal server error. Can't change password."));
         return nx_http::StatusCode::ok;
     }
 
-    if (!changeSystemName(newSystemName, 0, 0))
+    if (!changeSystemName(data.systemName, 0, 0))
     {
         result.setError(QnRestResult::CantProcessRequest, lit("Internal server error. Can't change system name."));
         return nx_http::StatusCode::internalServerError;

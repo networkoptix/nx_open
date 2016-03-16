@@ -11,13 +11,13 @@ namespace api = nx::mediaserver::api;
 namespace
 {
     enum { kInvalidIndex = -1 };
-    
+
     const QByteArray utcIanaTemplate = "UTC";
     const QByteArray gmtIanaTemplate = "GMT";
     const QString utcKeyword = "Universal";
 
     const QList<QByteArray> utcAliases = [] {
-        return QList<QByteArray>() 
+        return QList<QByteArray>()
             << "Etc/GMT"
             << "Etc/GMT+0"
             << "Etc/UCT"
@@ -31,18 +31,18 @@ namespace
             << "UCT"
             << "Universal";
     }();
-    
+
     bool isDeprecatedTimeZone(const QByteArray &zoneIanaId) {
-        return 
+        return
                zoneIanaId.contains(utcIanaTemplate)     // UTC+03:00
             || zoneIanaId.contains(gmtIanaTemplate)     // Etc/GMT+3
             ;
-    }  
-  
+    }
+
     const QByteArray kDiffTimeZonesId = "<Different>";
     const QByteArray kUnknownTimeZoneId = "<Unknown>";
-  
-    
+
+
     QByteArray selectionTimeZoneId(const api::ServerInfoPtrContainer &servers)
     {
         if (servers.empty() || !servers.first()->hasExtraInfo())
@@ -63,17 +63,17 @@ class rtu::TimeZonesModel::Impl
 public:
     Impl(rtu::TimeZonesModel *owner
         , const api::ServerInfoPtrContainer &selectedServers);
-    
+
     Impl(rtu::TimeZonesModel *owner
         , const Impl &other);
 
     virtual ~Impl();
-    
+
 public:
     bool isValidValue(int index);
-    
+
     int initIndex() const;
-    
+
     int currentTimeZoneIndex() const;
 
     int rowCount() const;
@@ -84,7 +84,7 @@ public:
     int timeZoneIndexById(const QByteArray &id) const;
 
 private:
-    void initTimeZones();  
+    void initTimeZones();
 
 private:
     struct TzInfo {
@@ -93,7 +93,7 @@ private:
             standardTimeOffset(standardTimeOffset)
         {
             ids.append(id);
-            NX_ASSERT(!id.isEmpty(), Q_FUNC_INFO, "IANA id should not be empty here.");
+            Q_ASSERT_X(!id.isEmpty(), Q_FUNC_INFO, "IANA id should not be empty here.");
         }
 
         QByteArray primaryId() const {
@@ -101,7 +101,7 @@ private:
         }
 
         QString displayName;
-        int standardTimeOffset;        
+        int standardTimeOffset;
         QList<QByteArray> ids;
     };
 
@@ -150,7 +150,7 @@ bool rtu::TimeZonesModel::Impl::isValidValue(int index)
 {
     if ((index >= m_timeZones.size()) || (index < 0))
         return false;
-    
+
     const auto &value = m_timeZones[index];
     return ((value.primaryId() != kUnknownTimeZoneId) && (value.primaryId() != kDiffTimeZonesId));
 }
@@ -279,7 +279,7 @@ rtu::TimeZonesModel::TimeZonesModel(const api::ServerInfoPtrContainer &selectedS
     , m_helper(CREATE_MODEL_CHANGE_HELPER(this))
     , m_impl(new Impl(this, selectedServers))
 {
-    
+
 }
 
 rtu::TimeZonesModel::~TimeZonesModel()
@@ -303,7 +303,7 @@ bool rtu::TimeZonesModel::isValidValue(int index)
 
 int rtu::TimeZonesModel::rowCount(const QModelIndex &parent /*= QModelIndex()*/) const {
     /* This model do not have sub-rows. */
-    NX_ASSERT(!parent.isValid(), Q_FUNC_INFO, "Only null index should come here.");
+    Q_ASSERT_X(!parent.isValid(), Q_FUNC_INFO, "Only null index should come here.");
     if (parent.isValid())
         return 0;
     return m_impl->rowCount();

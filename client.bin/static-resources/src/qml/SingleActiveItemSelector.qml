@@ -6,6 +6,7 @@ QtObject
 
     property bool isSomeoneActive: (currentItem !== null);
     property string variableName;
+    property string writeVariableName: variableName;
     property string signalName: variableToSignalName(variableName);
 
     // Impl properties
@@ -26,7 +27,7 @@ QtObject
         if (!item || item[variableName])
         {
             if (currentItem)
-                currentItem[variableName] = false;
+                currentItem[writeVariableName] = false;
 
             currentItem = item;
         }

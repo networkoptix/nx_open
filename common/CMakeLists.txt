@@ -1,18 +1,3 @@
-cmake_minimum_required(VERSION 3.0)
-
-# Default configuration values. These must be before the project command or
-# they won't work in Windows.
-# If no build type is specified, default to "Release"
-
-if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE Release CACHE STRING "Release Debug RelWithDebInfo" FORCE)
-endif()
-# Install to "dist" directory in Windows for testing and as a staging directory
-# for the installer.
-if (WIN32 AND NOT CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX dist CACHE STRING "Install path prefix.")
-endif()
-
 project(common)
 set(PROJECT_SHORTNAME "common")
 set(PROJECT_LONGNAME "${company.name} Common Library")
@@ -38,13 +23,13 @@ add_translations(translations)
 qt5_wrap_ui(UI_HEADERS ${UI_FILES})
 qt5_add_resources(RESOURCE_FILES ${PROJECT_BINARY_DIR}/${PROJECT_SHORTNAME}.qrc)
 
-#get_external_dependencies(openssl quazip)
+get_external_dependencies(openssl quazip)
 
-#if(${CMAKE_BUILD_TYPE} MATCHES Debug)
-#    include(${CMAKE_CURRENT_BINARY_DIR}/dependencies-debug.cmake)
-#else()
-#    include(${CMAKE_CURRENT_BINARY_DIR}/dependencies.cmake)
-#endif()
+if(${CMAKE_BUILD_TYPE} MATCHES Debug)
+   include(${CMAKE_CURRENT_BINARY_DIR}/dependencies-debug.cmake)
+else()
+   include(${CMAKE_CURRENT_BINARY_DIR}/dependencies.cmake)
+endif()
 
 include_directories(${OPENSSL_INCLUDE}
                     ${QUAZIP_INCLUDE}

@@ -37,7 +37,7 @@ QnVirtualCameraResourcePtr QnResourcePoolScaffold::addCamera(Qn::LicenseType cam
 
 QnVirtualCameraResourceList QnResourcePoolScaffold::addCameras(Qn::LicenseType cameraType /*= Qn::LC_Professional*/, int count /*= 1*/, bool licenseRequired /*= true*/) {
     if (m_resPool->getAllServers(Qn::AnyStatus).isEmpty()) {
-        QnMediaServerResourcePtr server(new QnMediaServerResource(qnResTypePool));
+        QnMediaServerResourcePtr server(new QnMediaServerResource());
         server->setId(QnUuid::createUuid());
         server->setStatus(Qn::Online, true);
         m_resPool->addResource(server);

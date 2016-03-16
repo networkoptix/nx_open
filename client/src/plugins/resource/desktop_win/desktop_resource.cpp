@@ -11,9 +11,7 @@ namespace {
     const QnUuid desktopResourceUuid(lit("{B3B2235F-D279-4d28-9012-00DE1002A61D}"));
 }
 
-//static QnDesktopResource* instance = 0;
-
-QnDesktopResource::QnDesktopResource(QGLWidget* mainWindow): QnAbstractArchiveResource() 
+QnDesktopResource::QnDesktopResource(QGLWidget* mainWindow): QnAbstractArchiveResource()
 {
     m_mainWidget = mainWindow;
     addFlags(Qn::local_live_cam | Qn::desktop_camera);
@@ -23,22 +21,18 @@ QnDesktopResource::QnDesktopResource(QGLWidget* mainWindow): QnAbstractArchiveRe
     setUrl(name);
     m_desktopDataProvider = 0;
     setId(desktopResourceUuid); // only one desktop resource is allowed)
-  //  setDisabled(true);
-    //NX_ASSERT(instance == 0, "Only one instance of desktop camera now allowed!", Q_FUNC_INFO);
-    //instance = this;
 }
 
 QnDesktopResource::~QnDesktopResource()
 {
     delete m_desktopDataProvider;
-    //instance = 0;
 }
 
 QString QnDesktopResource::toString() const {
     return getUniqueId();
 }
 
-QnAbstractStreamDataProvider* QnDesktopResource::createDataProviderInternal(Qn::ConnectionRole /*role*/) 
+QnAbstractStreamDataProvider* QnDesktopResource::createDataProviderInternal(Qn::ConnectionRole /*role*/)
 {
     QnMutexLocker lock( &m_dpMutex );
 
@@ -53,7 +47,7 @@ QnAbstractStreamDataProvider* QnDesktopResource::createDataProviderInternal(Qn::
 
 void QnDesktopResource::createSharedDataProvider()
 {
-    if (m_desktopDataProvider) 
+    if (m_desktopDataProvider)
     {
         if (m_desktopDataProvider->readyToStop())
             delete m_desktopDataProvider; // stop and destroy old instance

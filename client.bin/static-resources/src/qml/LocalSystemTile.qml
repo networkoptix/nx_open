@@ -7,19 +7,39 @@ BaseTile
 
     property string host;
     property string userName;
-    property bool isComaptible;
 
-//    property alias selectedUserName: userNameTextEdit.text;
-//    property alias selectedPassword: passwordTextField.text;
-    signal onConnectClicked;
+    property var knownUsersModel;
+    property var knownHostsModel;
+
+    // Properties
+    property string selectedUser:
+    {
+        if (isRecentlyConnected)
+        {
+            if (centralArea)
+                return centralArea.userName;
+        }
+        else if (expandedArea)
+        {
+            return expandedArea.login;
+        }
+        else
+            return "";
+    }
+
+    property string selectedHost: (centralArea ? centralArea.host : "");
+    property string selectedPassword: (expandedArea ? expandedArea.password : "");
+
+    signal connectClicked;
 
     property QtObject activeItemSelector: SingleActiveItemSelector
     {
         variableName: "isMasked";
+        writeVariableName: "isMaskedPrivate";
         onIsSomeoneActiveChanged:
         {
             if (isSomeoneActive)
-                isExpanded = true;
+                isExpandedPrivate = true;
         }
     }
 
@@ -31,32 +51,63 @@ BaseTile
 
     centralAreaDelegate: Column
     {
+        property alias host: hostChooseItem.value;
+        property alias userName: userChooseItem.value;
+
         anchors.left: (parent ? parent.left : undefined);
         anchors.right: (parent ? parent.right : undefined);
 
         InfoItem
         {
-            text: thisComponent.host;
-            iconUrl: (isComaptible ? "non_empty_url" : "");// TODO: change to proper url
+            id: hostChooseItem;
 
-            Component.onCompleted: activeItemSelector.addItem(this);    // TODO: add ActiveWatchable qml component?
+            isAvailable: thisComponent.correctTile;
+
+            value: thisComponent.host;
+            model: thisComponent.knownHostsModel;
+            iconUrl: (thisComponent.correctTile ? "non_empty_url" : "");// TODO: change to proper url
+
+            Component.onCompleted: activeItemSelector.addItem(this);
         }
 
         InfoItem
         {
-            id: userNameTextEdit;
-            text: "user";//thisComponent.userName;
+            id: userChooseItem;
+
+            isAvailable: thisComponent.correctTile;
+
+            value: thisComponent.userName;
+            model: thisComponent.knownUsersModel;
 
             Component.onCompleted: activeItemSelector.addItem(this);
+
+            visible: thisComponent.isRecentlyConnected;
         }
     }
 
     expandedAreaDelegate: Column
     {
+        property alias login: loginTextField.text;
+        property alias password: passwordTextField.text;
+
         spacing: 8;
 
         anchors.left: (parent ? parent.left : undefined);
         anchors.right: (parent ? parent.right : undefined);
+
+        Text
+        {
+            visible: !thisComponent.isRecentlyConnected;
+            text: qsTr("Login");
+        }
+
+        TextField
+        {
+            id: loginTextField;
+
+            visible: !thisComponent.isRecentlyConnected;
+            width: parent.width;
+        }
 
         Text
         {
@@ -66,9 +117,7 @@ BaseTile
         TextField
         {
             id: passwordTextField;
-            anchors.left: parent.left;
-            anchors.right: parent.right;
-
+            width: parent.width;
         }
 
         CheckBox
@@ -89,7 +138,7 @@ BaseTile
 
             text: qsTr("Connect");
 
-            onClicked: thisComponent.onConnectClicked();
+            onClicked: thisComponent.connectClicked();
         }
     }
 }
