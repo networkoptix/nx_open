@@ -207,7 +207,7 @@ namespace
                         }
                     }
                     else
-                        NX_ASSERT(false, Q_FUNC_INFO, "Interface name not found!");
+                        Q_ASSERT_X(false, Q_FUNC_INFO, "Interface name not found!");
                 }
             }
         }
@@ -1296,7 +1296,7 @@ void rtu::ApplyChangesTask::Impl::addIpChangeRequests()
 
     /// Now, there are servers with single interface only in m_serverCache
 
-    NX_ASSERT(updateInfos->size() == 1, Q_FUNC_INFO, "Multiple interfaces changes on severals servers");
+    Q_ASSERT_X(updateInfos->size() == 1, Q_FUNC_INFO, "Multiple interfaces changes on severals servers");
 
     const auto &updateInfo = updateInfos->front();
 
@@ -1304,8 +1304,8 @@ void rtu::ApplyChangesTask::Impl::addIpChangeRequests()
     for (int i = 0; i != m_serversCache.size(); ++i)
     {
         auto &cacheInfo = m_serversCache[i];
-        NX_ASSERT(cacheInfo.second.interfaces.size() == 1, Q_FUNC_INFO
-            , "Can't apply changese on several servers with multiple or empty interfaces");
+        Q_ASSERT_X(cacheInfo.second.interfaces.size() == 1, Q_FUNC_INFO
+            , "Can't apply changes on several servers with multiple or empty interfaces");
 
         if (cacheInfo.second.interfaces.empty())
             continue;

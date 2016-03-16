@@ -184,13 +184,13 @@ bool ServerInfo::hasExtraInfo() const
 
 const ExtraServerInfo &ServerInfo::extraInfo() const
 {
-    NX_ASSERT(!m_extra.isNull());
+    Q_ASSERT(!m_extra.isNull());
     return *m_extra;
 }
 
 ExtraServerInfo &ServerInfo::writableExtraInfo()
 {
-    NX_ASSERT(!m_extra.isNull());
+    Q_ASSERT(!m_extra.isNull());
     return *m_extra;
 }
 
