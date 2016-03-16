@@ -4,6 +4,7 @@
 #include <map>
 #include <memory>
 #include <set>
+#include <chrono>
 
 #include <boost/optional.hpp>
 
@@ -21,6 +22,7 @@
 #include <sys/statvfs.h>
 
 #include <utils/common/log.h>
+#include <utils/common/concurrent.h>
 #include <utils/fs/dir.h>
 
 static const int BYTES_PER_MB = 1024*1024;
@@ -574,23 +576,33 @@ static QList<QnPlatformMonitor::PartitionSpace> readPartitionsAndSizes()
 
 QList<QnPlatformMonitor::PartitionSpace> QnLinuxMonitor::totalPartitionSpaceInfo()
 {
+    QnMutexLocker syncLk(&m_partitionsInfo.syncMutex);
     std::chrono::milliseconds waitTimeout = m_partitionsInfo.started ?
                                             std::chrono::milliseconds(200) :
                                             std::chrono::milliseconds(2000);
 
-    if (!m_partitionsInfo.started || m_partitionsInfo.done.wait_for(waitTimeout) == std::future_status::ready)
+    if (!m_partitionsInfo.started || m_partitionsInfo.done.isFinished())
     {
         if (!m_partitionsInfo.started)
             m_partitionsInfo.started = true;
 
-        m_partitionsInfo.done = std::async(std::launch::async,
-                                           [this]
-                                           {
-                                               auto partitions = readPartitionsAndSizes();
-                                               QnMutexLocker lk(&m_partitionsInfo.mutex);
-                                               m_partitionsInfo.info = std::move(partitions);
-                                           });
-        m_partitionsInfo.done.wait_for(waitTimeout);
+        m_partitionsInfo.done = QtConcurrent::run([this]
+                                                  {
+                                                      auto partitions = readPartitionsAndSizes();
+                                                      QnMutexLocker lk(&m_partitionsInfo.mutex);
+                                                      m_partitionsInfo.info = std::move(partitions);
+                                                  });
+        auto start = std::chrono::steady_clock::now();
+        while (1)
+        {
+            auto now = std::chrono::steady_clock::now();
+            if (std::chrono::duration_cast<std::chrono::milliseconds>(now - start) > waitTimeout)
+                break;
+
+            if (m_partitionsInfo.done.isFinished())
+                break;
+            QThread::msleep(2);
+        }
     }
 
     QnMutexLocker lk(&m_partitionsInfo.mutex);
