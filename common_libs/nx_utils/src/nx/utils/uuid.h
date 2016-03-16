@@ -30,11 +30,11 @@ public:
     QnUuid(const QnUuid& other) = default;
     QnUuid(QnUuid&& other) = default;
 
-    explicit QnUuid( const char* text );
-    explicit QnUuid( const QString& text );
-    explicit QnUuid( const QByteArray& text );
-    explicit QnUuid( const std::string& text );
-    QnUuid( const QUuid &uuid );
+    explicit QnUuid(const char* text);
+    explicit QnUuid(const QString& text);
+    explicit QnUuid(const QByteArray& text);
+    explicit QnUuid(const std::string& text);
+    QnUuid(const QUuid& uuid);
 
     const QUuid& getQUuid() const;
 
