@@ -312,8 +312,9 @@ void QnAuditItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem &
         button.iconSize = QSize(BTN_ICON_SIZE, BTN_ICON_SIZE);
         button.state = option.state;
 
-        button.rect.setTopLeft(option.rect.topLeft() + QPoint(4, 4));
-        button.rect.setSize(m_playBottonSize);
+        //ToDo: #vkutin : implement good button behavior and determine what visual design we want
+        // For now, position button to cover entire cell area
+        button.rect = option.rect.adjusted(0,0,1,1);
         QApplication::style()->drawControl(QStyle::CE_PushButton, &button, painter);
         break;
     }
