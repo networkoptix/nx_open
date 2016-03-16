@@ -197,18 +197,30 @@ bool QnFileStorageResource::checkDBCap() const
     // let's not create media DB there
     if (!getLocalPathSafe().isEmpty())
         return false;
-    
+
+    {
+        QnMutexLocker lk(&m_mutex);
+        if (m_dbReady.is_initialized())
+            return *m_dbReady;
+    }
+
     // Same for mounted by hand remote storages (NAS)
     QList<QnPlatformMonitor::PartitionSpace> partitions =
         qnPlatform->monitor()->QnPlatformMonitor::totalPartitionSpaceInfo(
             QnPlatformMonitor::NetworkPartition );
 
+    bool dbReady = true;
     for(const QnPlatformMonitor::PartitionSpace& partition: partitions)
     {
         if(getPath().startsWith(partition.path))
-            return false;
+            dbReady = false;
     }
-    return true;
+
+    {
+        QnMutexLocker lk(&m_mutex);
+        m_dbReady = dbReady;
+        return dbReady;
+    }
 #endif
 }
 
@@ -611,8 +623,8 @@ bool QnFileStorageResource::isAvailable() const
         m_valid = false;
         return false;
     }
-    m_cachedTotalSpace = getDiskTotalSpace(localPathCopy.isEmpty() ? 
-                                           getPath() : 
+    m_cachedTotalSpace = getDiskTotalSpace(localPathCopy.isEmpty() ?
+                                           getPath() :
                                            localPathCopy); // update cached value periodically
     return *m_writeCapCached;
 }

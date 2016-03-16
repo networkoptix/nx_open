@@ -1,13 +1,26 @@
 #ifndef QN_LINUX_MONITOR_H
 #define QN_LINUX_MONITOR_H
 
+#include <future>
+#include <boost/optional.hpp>
 #include "sigar_monitor.h"
+#include <utils/common/systemerror.h>
+#include <utils/thread/mutex.h>
 
 class QnLinuxMonitorPrivate;
 
 class QnLinuxMonitor: public QnSigarMonitor {
     Q_OBJECT
     typedef QnSigarMonitor base_type;
+
+    struct PartitionsFutureInfo
+    {
+        bool started;
+        QnMutex mutex;
+        std::future<void> done;
+        QList<PartitionSpace> info;
+        PartitionsFutureInfo() : started(false) {}
+    };
 
 public:
     QnLinuxMonitor(QObject *parent = NULL);
@@ -22,6 +35,7 @@ public:
 private:
     Q_DECLARE_PRIVATE(QnLinuxMonitor);
     QScopedPointer<QnLinuxMonitorPrivate> d_ptr;
+    PartitionsFutureInfo m_partitionsInfo;
 };
 
 #endif // QN_LINUX_MONITOR_H

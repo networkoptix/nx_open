@@ -87,6 +87,7 @@ public:
 
 private:
     mutable std::atomic<bool> m_valid;
+    mutable boost::optional<bool> m_dbReady;
 
 private:
     mutable QnMutex     m_mutexCheckStorage;
