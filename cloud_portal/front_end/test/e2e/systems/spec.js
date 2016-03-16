@@ -4,10 +4,20 @@ describe('Systems list suite', function () {
 
     var p = new SystemsListPage();
 
+    beforeAll(function() {
+        p.getHomePage();
+        p.login();
+    });
+
     it("should show list of Systems", function () {
         p.get();
-        expect("test").toBe("written");
+
+        expect(browser.getCurrentUrl()).toContain('systems');
+        expect(p.htmlBody.getText()).toContain('Systems');
+
+        expect(p.systemsList.first().isDisplayed()).toBe(true);
     });
+
     it("should show Open in NX client button for every online system", function () {
         p.get();
         expect("test").toBe("written");
