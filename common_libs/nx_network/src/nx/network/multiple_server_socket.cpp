@@ -172,6 +172,9 @@ AbstractStreamSocket* MultipleServerSocket::accept()
         return nullptr;
     }
 
+    //if (m_serverSockets.size() == 1)
+    //    return m_serverSockets[0]->accept();
+
     std::promise<std::pair<SystemError::ErrorCode, AbstractStreamSocket*>> promise;
     acceptAsync(
         [&](SystemError::ErrorCode code, AbstractStreamSocket* socket)
@@ -208,10 +211,11 @@ void MultipleServerSocket::dispatch(nx::utils::MoveOnlyFunc<void()> handler)
 }
 
 void MultipleServerSocket::acceptAsync(
-    std::function<void(SystemError::ErrorCode,
-                       AbstractStreamSocket*)> handler)
+    nx::utils::MoveOnlyFunc<void(
+        SystemError::ErrorCode,
+        AbstractStreamSocket*)> handler)
 {
-    dispatch([this, handler]()
+    dispatch([this, handler = std::move(handler)]() mutable
     {
         NX_ASSERT(!m_acceptHandler, Q_FUNC_INFO, "concurrent accept call");
         m_acceptHandler = std::move(handler);
@@ -236,6 +240,33 @@ void MultipleServerSocket::acceptAsync(
     });
 }
 
+void MultipleServerSocket::cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler)
+{
+    post(
+        [this, handler = std::move(handler)]() mutable
+        {
+            for (auto& socketContext: m_serverSockets)
+                socketContext.stopAccepting();
+            m_acceptHandler = nullptr;
+            handler();
+        });
+}
+
+void MultipleServerSocket::cancelIOSync()
+{
+    std::promise<void> ioCancelledPromise;
+    //TODO #ak deal with copy-paste
+    dispatch(
+        [this, &ioCancelledPromise]() mutable
+        {
+            for (auto& socketContext: m_serverSockets)
+                socketContext.stopAccepting();
+            m_acceptHandler = nullptr;
+            ioCancelledPromise.set_value();
+        });
+    ioCancelledPromise.get_future().wait();
+}
+
 MultipleServerSocket::ServerSocketHandle::ServerSocketHandle(
         std::unique_ptr<AbstractStreamServerSocket> socket_)
     : socket(std::move(socket_))
@@ -255,7 +286,7 @@ void MultipleServerSocket::ServerSocketHandle::stopAccepting()
         return;
 
     isAccepting = false;
-    socket->pleaseStopSync();
+    socket->cancelIOSync();
 }
 
 bool MultipleServerSocket::addSocket(
@@ -276,11 +307,12 @@ bool MultipleServerSocket::addSocket(
             socket->bindToAioThread(m_timerSocket.getAioThread());
             m_serverSockets.push_back(ServerSocketHandle(std::move(socket)));
 
-            m_timerSocket.start(
-                std::chrono::milliseconds::zero(),
-                std::bind(
-                    &MultipleServerSocket::accepted, this,
-                    nullptr, SystemError::timedOut, nullptr));  //TODO #ak use interrupted error code
+            if (m_acceptHandler)
+                m_timerSocket.start(
+                    std::chrono::milliseconds::zero(),
+                    std::bind(
+                        &MultipleServerSocket::accepted, this,
+                        nullptr, SystemError::timedOut, nullptr));  //TODO #ak use interrupted error code
             socketAddedPromise.set_value();
         });
     socketAddedPromise.get_future().wait();
@@ -316,8 +348,6 @@ void MultipleServerSocket::accepted(
         //acceptAsync again without reporting result to the user
 
     std::unique_ptr<AbstractStreamSocket> socket(rawSocket);
-    if (socket)
-        socket->setNonBlockingMode(m_nonBlockingMode);
 
     NX_LOGX(lm("accepted %1 (%2) from %3")
             .arg(rawSocket).arg(SystemError::toString(code)).arg(source),
@@ -329,8 +359,8 @@ void MultipleServerSocket::accepted(
         m_timerSocket.cancelSync(); // will not block, we are in IO thread
     }
 
-    std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)> handler;
-    std::swap(handler, m_acceptHandler);
+    auto handler = std::move(m_acceptHandler);
+    m_acceptHandler = nullptr;
     NX_ASSERT(handler, Q_FUNC_INFO, "acceptAsync was not canceled in time");
 
     // TODO: #mux This is not efficient to cancel accepts on every accepted event
@@ -340,8 +370,8 @@ void MultipleServerSocket::accepted(
     //            Consider using condition variables!
 
     NX_LOGX(lm("cancel all other accepts"), cl_logDEBUG2);
-    for (auto& socket : m_serverSockets)
-        socket.stopAccepting();
+    for (auto& socketContext : m_serverSockets)
+        socketContext.stopAccepting();
 
     handler(code, socket.release());
 }

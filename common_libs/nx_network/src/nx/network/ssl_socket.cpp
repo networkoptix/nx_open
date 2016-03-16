@@ -1635,7 +1635,7 @@ void SSLServerSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 }
 
 void SSLServerSocket::acceptAsync(
-    std::function<void(
+    nx::utils::MoveOnlyFunc<void(
         SystemError::ErrorCode,
         AbstractStreamSocket*)> handler)
 {
@@ -1645,6 +1645,16 @@ void SSLServerSocket::acceptAsync(
         std::bind(&SSLServerSocket::connectionAccepted, this, _1, _2));
 }
     
+void SSLServerSocket::cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler)
+{
+    m_delegateSocket->cancelIOAsync(std::move(handler));
+}
+
+void SSLServerSocket::cancelIOSync()
+{
+    m_delegateSocket->cancelIOSync();
+}
+
 void SSLServerSocket::connectionAccepted(SystemError::ErrorCode errorCode, AbstractStreamSocket* newSocket)
 {
     if( newSocket )

@@ -32,7 +32,7 @@ QnUniversalTcpListener::QnUniversalTcpListener(
     Qn::directConnect(
         &cloudConnectionManager, &CloudConnectionManager::cloudBindingStatusChanged,
         this,
-        [this, &cloudConnectionManager](bool bindedToCloud)
+        [this, &cloudConnectionManager](bool /*bindedToCloud*/)
         {
             onCloudBindingStatusChanged(cloudConnectionManager.getSystemCredentials());
         });
@@ -41,6 +41,7 @@ QnUniversalTcpListener::QnUniversalTcpListener(
 
 QnUniversalTcpListener::~QnUniversalTcpListener()
 {
+    stop();
     directDisconnectAll();
 }
 
@@ -86,7 +87,8 @@ AbstractStreamServerSocket* QnUniversalTcpListener::createAndPrepareSocket(
         return nullptr;
     m_multipleServerSocket = std::move(multipleServerSocket);
 
-    updateCloudConnectState(&lk);
+    if (m_boundToCloud)
+        updateCloudConnectState(&lk);
 
     return m_multipleServerSocket.get();
 }
@@ -97,6 +99,7 @@ void QnUniversalTcpListener::destroyServerSocket(
     QnMutexLocker lk(&m_mutex);
 
     NX_ASSERT(m_multipleServerSocket.get() == serverSocket);
+    m_multipleServerSocket->pleaseStopSync();
     m_multipleServerSocket.reset();
 }
 
@@ -144,9 +147,6 @@ void QnUniversalTcpListener::updateCloudConnectState(
         nx::network::RetryPolicy registrationOnMediatorRetryPolicy;
         registrationOnMediatorRetryPolicy.setMaxRetryCount(
             nx::network::RetryPolicy::kInfiniteRetries);
-
-        nx::network::SocketGlobals::mediatorConnector().setSystemCredentials(
-            m_cloudCredentials);
 
         auto cloudServerSocket =
             std::make_unique<nx::network::cloud::CloudServerSocket>(

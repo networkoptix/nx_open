@@ -61,9 +61,14 @@ public:
     void dispatch(nx::utils::MoveOnlyFunc<void()> handler) override;
 
     //!Implementation of AbstractStreamServerSocket::acceptAsync
-    void acceptAsync(
-        std::function<void(SystemError::ErrorCode,
-                           AbstractStreamSocket*)> handler) override;
+    virtual void acceptAsync(
+        nx::utils::MoveOnlyFunc<void(
+            SystemError::ErrorCode,
+            AbstractStreamSocket*)> handler) override;
+    //!Implementation of AbstractStreamServerSocket::cancelIOAsync
+    virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler) override;
+    //!Implementation of AbstractStreamServerSocket::cancelIOSync
+    virtual void cancelIOSync() override;
 
     /** These methods can be called concurrently with \a accept.
         \note Blocks until completion
@@ -96,7 +101,9 @@ protected:
     bool* m_terminated;
     aio::Timer m_timerSocket;
     std::vector<ServerSocketHandle> m_serverSockets;
-    std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)> m_acceptHandler;
+    nx::utils::MoveOnlyFunc<void(
+        SystemError::ErrorCode,
+        AbstractStreamSocket*)> m_acceptHandler;
 };
 
 template<typename S1, typename S2/*, typename*/>

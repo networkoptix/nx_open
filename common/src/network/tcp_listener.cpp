@@ -82,10 +82,12 @@ QnTcpListener::~QnTcpListener()
     Q_D(QnTcpListener);
     stop();
 
-    destroyServerSocket(d->serverSocket);
-    d->serverSocket = nullptr;
+    NX_ASSERT(d->serverSocket == nullptr);
+
     delete d_ptr;
 }
+
+static const int kSocketAcceptTimeoutMs = 250;
 
 bool QnTcpListener::bindToLocalAddress()
 {
@@ -95,7 +97,8 @@ bool QnTcpListener::bindToLocalAddress()
     d->serverSocket = createAndPrepareSocket(
         d->useSSL,
         localAddress);
-    if (!d->serverSocket)
+    if (!d->serverSocket ||
+        !d->serverSocket->setRecvTimeout(kSocketAcceptTimeoutMs))
     {
         const SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
         NX_LOG(lit("TCPListener (%1:%2). Initial bind failed: %3 (%4)").arg(d->serverAddress.toString()).arg(d->localPort).
@@ -191,7 +194,8 @@ void QnTcpListener::pleaseStop()
 
     Q_D(QnTcpListener);
     qWarning() << "QnTcpListener::pleaseStop() called";
-    d->serverSocket->close();
+    if (d->serverSocket)
+        d->serverSocket->close();
 }
 
 void QnTcpListener::removeAllConnections()
@@ -310,6 +314,9 @@ void QnTcpListener::run()
         }
         NX_LOG( lit("TCPListener (%1:%2). Removing all connections before stop").arg(d->serverAddress.toString()).arg(d->localPort), cl_logWARNING );
         removeAllConnections();
+
+        destroyServerSocket(d->serverSocket);
+        d->serverSocket = nullptr;
     }
     catch( const std::exception& e )
     {

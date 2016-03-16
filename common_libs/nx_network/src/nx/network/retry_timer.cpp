@@ -89,10 +89,22 @@ void RetryTimer::bindToAioThread(aio::AbstractAioThread* aioThread)
     m_timer.bindToAioThread(aioThread);
 }
 
+void RetryTimer::post(nx::utils::MoveOnlyFunc<void()> func)
+{
+    m_timer.post(std::move(func));
+}
+
+void RetryTimer::dispatch(nx::utils::MoveOnlyFunc<void()> func)
+{
+    m_timer.dispatch(std::move(func));
+}
+
 bool RetryTimer::scheduleNextTry(nx::utils::MoveOnlyFunc<void()> doAnotherTryFunc)
 {
     //TODO #ak
-    return false;
+
+    m_timer.start(m_retryPolicy.initialDelay(), std::move(doAnotherTryFunc));
+    return true;
 }
 
 }   //network

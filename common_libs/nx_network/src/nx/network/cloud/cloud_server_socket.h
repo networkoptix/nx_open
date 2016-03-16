@@ -59,36 +59,53 @@ public:
     void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
     //!Implementation of AbstractStreamServerSocket::acceptAsync
-    void acceptAsync(
-        std::function<void(SystemError::ErrorCode,
-                           AbstractStreamSocket*)> handler) override;
+    virtual void acceptAsync(
+        nx::utils::MoveOnlyFunc<void(
+            SystemError::ErrorCode,
+            AbstractStreamSocket*)> handler) override;
+    //!Implementation of AbstractStreamServerSocket::cancelIOAsync
+    virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler) override;
+    //!Implementation of AbstractStreamServerSocket::cancelIOSync
+    virtual void cancelIOSync() override;
 
     /** Invokes listen on mediator */
     bool registerOnMediatorSync();
 
 protected:
+    enum class State
+    {
+        init,
+        readyToListen,
+        registeringOnMediator,
+        listening
+    };
+
     void initTunnelPool(int queueLen);
     void startAcceptor(std::unique_ptr<AbstractTunnelAcceptor> acceptor);
-    void onListenRequestCompleted(
-        nx::hpm::api::ResultCode resultCode,
-        std::function<void(SystemError::ErrorCode code,
-                           AbstractStreamSocket*)> handler);
+    void onListenRequestCompleted(nx::hpm::api::ResultCode resultCode);
     void acceptAsyncInternal(
-        std::function<void(SystemError::ErrorCode code,
-                           AbstractStreamSocket*)> handler);
+        nx::utils::MoveOnlyFunc<void(
+            SystemError::ErrorCode code,
+            AbstractStreamSocket*)> handler);
+    void issueRegistrationRequest();
+    void onConnectionRequested(
+        hpm::api::ConnectionRequestedEvent event);
 
     std::shared_ptr<hpm::api::MediatorServerTcpConnection> m_mediatorConnection;
-    nx::network::RetryPolicy m_mediatorRegistrationRetryPolicy;
+    nx::network::RetryTimer m_mediatorRegistrationRetryTimer;
     const std::vector<AcceptorMaker> m_acceptorMakers;
+    int m_acceptQueueLen;
 
+    State m_state;
     QnMutex m_mutex;
     bool m_terminated;
     std::vector<std::unique_ptr<AbstractTunnelAcceptor>> m_acceptors;
     std::unique_ptr<IncomingTunnelPool> m_tunnelPool;
     mutable SystemError::ErrorCode m_lastError;
-    std::unique_ptr<AbstractCommunicatingSocket> m_ioThreadSocket;
     std::unique_ptr<AbstractStreamSocket> m_acceptedSocket;
-    bool m_listenIssued;
+    nx::utils::MoveOnlyFunc<void(
+        SystemError::ErrorCode code,
+        AbstractStreamSocket*)> m_savedAcceptHandler;
 };
 
 } // namespace cloud

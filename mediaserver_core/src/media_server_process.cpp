@@ -2325,34 +2325,6 @@ void MediaServerProcess::run()
             MSSettings::roSettings()->value(MEDIATOR_ADDRESS_UPDATE).toString(),
             nx::network::cloud::MediatorAddressPublisher::DEFAULT_UPDATE_INTERVAL));
 
-    auto updateCloudProperties = [this](const QnUserResourcePtr& admin)
-    {
-        QnUuid cloudSystemId = QnUuid::fromStringSafe(admin->getProperty(Qn::CLOUD_SYSTEM_ID));
-        auto cloudAuthKey = admin->getProperty(Qn::CLOUD_SYSTEM_AUTH_KEY);
-        if (!cloudSystemId.isNull() && !cloudAuthKey.isEmpty())
-        {
-            nx::hpm::api::SystemCredentials credentials(
-                cloudSystemId.toSimpleString().toUtf8(),
-                qnCommon->moduleGUID().toSimpleString().toUtf8(),
-                cloudAuthKey.toUtf8());
-
-            nx::network::SocketGlobals::mediatorConnector()
-                    .setSystemCredentials(std::move(credentials));
-        }
-        else
-        {
-            nx::network::SocketGlobals::mediatorConnector()
-                    .setSystemCredentials(boost::none);
-        }
-
-        QnModuleInformation info = qnCommon->moduleInformation();
-        if (info.cloudSystemId != cloudSystemId)
-        {
-            info.cloudSystemId = cloudSystemId;
-            qnCommon->setModuleInformation(info);
-        }
-    };
-
     loadResourcesFromECS(messageProcessor.data());
     if (QnGlobalSettings::instance()->isCrossdomainXmlEnabled())
         m_httpModManager->addUrlRewriteExact( lit( "/crossdomain.xml" ), lit( "/static/crossdomain.xml" ) );
@@ -2406,13 +2378,7 @@ void MediaServerProcess::run()
             propertyDictionary->saveParams(adminUser->getId());
             MSSettings::roSettings()->sync();
         }
-
-        updateCloudProperties(adminUser);
     }
-
-    connect(&cloudConnectionManager,
-            &CloudConnectionManager::cloudBindingStatusChanged,
-            [=](bool) { updateCloudProperties(qnResPool->getAdministrator()); });
 
     QnStorageResourceList storagesToRemove = getSmallStorages(m_mediaServer->getStorages());
     if (!storagesToRemove.isEmpty()) {
@@ -3001,6 +2967,8 @@ int MediaServerProcess::main(int argc, char* argv[])
     if ( !enforcedMediatorEndpoint.isEmpty() )
         nx::network::SocketGlobals::mediatorConnector().mockupAddress(
                     enforcedMediatorEndpoint );
+
+    nx::network::SocketGlobals::mediatorConnector().enable(true);
 
     if( showVersion )
     {
