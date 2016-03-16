@@ -1,6 +1,6 @@
 import QtQuick 2.5;
 import QtQuick.Controls 1.2;
-import Networkoptix 1.0;
+import NetworkOptix.Qml 1.0;
 
 Rectangle
 {
@@ -44,9 +44,16 @@ Rectangle
 
         anchors.centerIn: parent;
 
-        rows: (itemsSource.count > 3 ? 2 : 1);
-        columns: (itemsSource.count > 3
+        readonly property int horizontalOffset: 40;
+        readonly property int tileWidth: 280;
+        property int maxColumns: ((parent.width - 2 * horizontalOffset) / tileWidth)
+        property int desiredColumns:(itemsSource.count > 3
             ? ((itemsSource.count + 1) / 2) : itemsSource.count);
+
+        rows: (itemsSource.count > 3 ? 2 : 1);
+        columns: Math.min(desiredColumns, maxColumns);
+
+        Component.onCompleted: console.log("+++", maxColumns)
 
         spacing: 16;
 
@@ -74,12 +81,11 @@ Rectangle
                     LocalSystemTile
                     {
                         systemName: model.systemName;
-                        isRecentlyConnected: model.isRecentlyConnected;
+                        isRecentlyConnected: (knownUsersModel ? knownUsersModel.hasConnections : false);
 
                         host: model.host;
-                        userName: model.userName;
                         correctTile: model.isCompatible;
-                        knownUsersModel: model.lastUsersModel;
+                        knownUsersModel: QnLastSystemConnectionsData { systemName: model.systemName; }
                         knownHostsModel: model.hostsModel;
 
                         onConnectClicked:

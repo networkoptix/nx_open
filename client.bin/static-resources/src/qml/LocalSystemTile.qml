@@ -5,8 +5,6 @@ BaseTile
 {
     id: thisComponent;
 
-    property string userName;
-
     property var knownUsersModel;
     property var knownHostsModel;
 
@@ -76,6 +74,7 @@ BaseTile
             value: thisComponent.userName;
             model: thisComponent.knownUsersModel;
 
+            comboBoxTextRole: "userName";
             Component.onCompleted: activeItemSelector.addItem(this);
 
             visible: thisComponent.isRecentlyConnected;

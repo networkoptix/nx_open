@@ -26,6 +26,7 @@
 #include <client/client_instance_manager.h>
 #include <client/desktop_client_message_processor.h>
 
+#include <core/core_settings.h>
 #include <core/ptz/client_ptz_controller_pool.h>
 #include <core/resource/client_camera_factory.h>
 #include <core/resource_management/resource_pool.h>
@@ -93,7 +94,6 @@ namespace
             , statManager, &QnStatisticsManager::resetStatistics);
         QObject::connect(QnClientMessageProcessor::instance(), &QnClientMessageProcessor::initialResourcesReceived
             , statManager, &QnStatisticsManager::sendStatistics);
-
     }
 }
 
@@ -129,6 +129,7 @@ QnClientModule::QnClientModule(const QnStartupParameters &startupParams
     QnCommonModule *common = new QnCommonModule(this);
 
     common->store<QnTranslationManager>(translationManager.release());
+    common->store<QnCoreSettings>(new QnCoreSettings());
     common->store<QnClientRuntimeSettings>(new QnClientRuntimeSettings());
     common->store<QnClientSettings>(clientSettings.take());
 

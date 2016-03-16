@@ -6,6 +6,7 @@ MaskedItem
     id: thisComponent;
 
     property var model;
+    property string comboBoxTextRole: "display";
 
     height: area.height;
 
@@ -13,7 +14,7 @@ MaskedItem
     {
         id: comboBox;
 
-        textRole: "display";
+        textRole: thisComponent.comboBoxTextRole;
         model: thisComponent.model;
         width: thisComponent.width;
 

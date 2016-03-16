@@ -11,10 +11,12 @@
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
 #include <ui/models/systems_model.h>
+#include <ui/models/last_system_users_model.h>
 #include <ui/workbench/workbench_context.h>
 
 #include <ui/dialogs/login_dialog.h>
 #include <ui/dialogs/non_modal_dialog_constructor.h>
+
 
 namespace
 {
@@ -25,7 +27,8 @@ namespace
         static const auto kWelcomeScreenSource = lit("qrc:/src/qml/WelcomeScreen.qml");
         static const auto kContextVariableName = lit("context");
 
-        qmlRegisterType<QnSystemsModel>("Networkoptix", 1, 0, "QnSystemsModel");
+        qmlRegisterType<QnSystemsModel>("NetworkOptix.Qml", 1, 0, "QnSystemsModel");
+        qmlRegisterType<QnLastSystemUsersModel>("NetworkOptix.Qml", 1, 0, "QnLastSystemConnectionsData");
 
         const auto quickView = new QQuickView();
         quickView->rootContext()->setContextProperty(
