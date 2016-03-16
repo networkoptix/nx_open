@@ -162,10 +162,10 @@ describe('Login suite', function () {
         p.emailInput.sendKeys('vert546 464w6345');
         p.rememberCheckbox.click(); // blur email field
         p.checkEmailInvalid();
-        expect(p.passwordInputWrap.getAttribute('class')).not.toContain('has-error'); // since pasword is not touched, field shoud show no error
+        expect(p.passwordInputWrap.getAttribute('class')).not.toContain('has-error'); // since password is not touched, field shoud show no error
 
 
-        p.passwordInput.click(); // click on pasword and leave it empty
+        p.passwordInput.click(); // click on password and leave it empty
         p.rememberCheckbox.click(); // blur password field
         p.checkPasswordMissing();
 
@@ -190,7 +190,7 @@ describe('Login suite', function () {
         p.logout();
     });
 
-    it("should test I forgot pasword link", function () {
+    it("should test I forgot password link", function () {
         p.get();
 
         var currentEmail = p.userEmail1;
@@ -207,10 +207,10 @@ describe('Login suite', function () {
         expect(p.restoreEmailInput.getAttribute('value')).toContain(currentEmail);
     });
 
-    it("should test I forgot pasword link without attempt to log in first", function () {
+    it("should test I forgot password link without attempt to log in first", function () {
         p.get();
 
-        var currentEmail = p.userEmail2; // keep it different from previous case "should test I forgot pasword link" !!!
+        var currentEmail = p.userEmail2; // keep it different from previous case "should test I forgot password link" !!!
         p.emailInput.sendKeys(currentEmail);
 
         p.iForgotPasswordLink.click();

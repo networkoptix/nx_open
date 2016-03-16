@@ -1,8 +1,8 @@
 'use strict';
-var LoginPage = require('./po.js');
-describe('Login suite', function () {
+var RegisterPage = require('./po.js');
+describe('Registration suite', function () {
 
-    var p = new LoginPage();
+    var p = new RegisterPage();
 
     it("should open register page in anonymous state by clicking Register button on top right corner", function () {
         p.getHomePage();
@@ -32,9 +32,57 @@ describe('Login suite', function () {
     it("should register user with correct credentials", function () {
         p.getByLink();
 
-        p.firstNameInput.sendKeys(p.userFirstNameRandom);
+        p.firstNameInput.sendKeys(p.userFirstName);
         p.lastNameInput.sendKeys(p.userLastName);
-        p.emailInput.sendKeys(p.userEmailRandom);
+        p.emailInput.sendKeys(p.getRandomEmail());
+        p.passwordInput.sendKeys(p.userPassword);
+
+        p.submitRegisterButton.click();
+
+        p.catchRegisterSuccessAlert(p.registerSuccessAlert);
+
+        // Check that registration form element is NOT displayed on page
+        expect(p.firstNameInput.isPresent()).toBe(false);
+    });
+
+    it("should register user with cyrillic First and Last names and correct credentials", function () {
+        p.getByLink();
+
+        p.firstNameInput.sendKeys(p.userNameCyrillic);
+        p.lastNameInput.sendKeys(p.userNameCyrillic);
+        p.emailInput.sendKeys(p.getRandomEmail());
+        p.passwordInput.sendKeys(p.userPassword);
+
+        p.submitRegisterButton.click();
+
+        p.catchRegisterSuccessAlert(p.registerSuccessAlert);
+
+        // Check that registration form element is NOT displayed on page
+        expect(p.firstNameInput.isPresent()).toBe(false);
+    });
+
+    it("should register user with smile symbols in First and Last name fields and correct credentials", function () {
+        p.getByLink();
+
+        p.firstNameInput.sendKeys(p.userNameSmile);
+        p.lastNameInput.sendKeys(p.userNameSmile);
+        p.emailInput.sendKeys(p.getRandomEmail());
+        p.passwordInput.sendKeys(p.userPassword);
+
+        p.submitRegisterButton.click();
+
+        p.catchRegisterSuccessAlert(p.registerSuccessAlert);
+
+        // Check that registration form element is NOT displayed on page
+        expect(p.firstNameInput.isPresent()).toBe(false);
+    });
+
+    it("should register user with hieroglyphic symbols in First and Last name fields and correct credentials", function () {
+        p.getByLink();
+
+        p.firstNameInput.sendKeys(p.userNameHierog);
+        p.lastNameInput.sendKeys(p.userNameHierog);
+        p.emailInput.sendKeys(p.getRandomEmail());
         p.passwordInput.sendKeys(p.userPassword);
 
         p.submitRegisterButton.click();
@@ -59,7 +107,7 @@ describe('Login suite', function () {
     it("should not allow to register without email", function () {
         p.getByLink();
 
-        p.firstNameInput.sendKeys(p.userFirstNameRandom);
+        p.firstNameInput.sendKeys(p.userFirstName);
         p.lastNameInput.sendKeys(p.userLastName);
         p.passwordInput.sendKeys(p.userPassword);
 
@@ -77,7 +125,7 @@ describe('Login suite', function () {
     it("should not allow to register with email in non-email format", function () {
         p.getByLink();
 
-        p.firstNameInput.sendKeys(p.userFirstNameRandom);
+        p.firstNameInput.sendKeys(p.userFirstName);
         p.lastNameInput.sendKeys(p.userLastName);
         p.emailInput.sendKeys('vert546 464w6345');
         p.passwordInput.sendKeys(p.userPassword);
@@ -90,10 +138,36 @@ describe('Login suite', function () {
     it("should not allow to register with password with cyrillic symbols", function () {
         p.getByLink();
 
-        p.firstNameInput.sendKeys(p.userFirstNameRandom);
+        p.firstNameInput.sendKeys(p.userFirstName);
         p.lastNameInput.sendKeys(p.userLastName);
-        p.emailInput.sendKeys(p.userEmailRandom);
-        p.passwordInput.sendKeys('йцукефыва123');
+        p.emailInput.sendKeys(p.getRandomEmail());
+        p.passwordInput.sendKeys(p.userPasswordCyrillic);
+
+        p.submitRegisterButton.click();
+
+        p.checkPasswordInvalid(p.invalidClass);
+    });
+
+    it("should not allow to register with password with smile symbols", function () {
+        p.getByLink();
+
+        p.firstNameInput.sendKeys(p.userFirstName);
+        p.lastNameInput.sendKeys(p.userLastName);
+        p.emailInput.sendKeys(p.getRandomEmail());
+        p.passwordInput.sendKeys(p.userPasswordSmile);
+
+        p.submitRegisterButton.click();
+
+        p.checkPasswordInvalid(p.invalidClass);
+    });
+
+    it("should not allow to register with password with hieroglyphic symbols", function () {
+        p.getByLink();
+
+        p.firstNameInput.sendKeys(p.userFirstName);
+        p.lastNameInput.sendKeys(p.userLastName);
+        p.emailInput.sendKeys(p.getRandomEmail());
+        p.passwordInput.sendKeys(p.userPasswordHierog);
 
         p.submitRegisterButton.click();
 
@@ -147,7 +221,7 @@ describe('Login suite', function () {
     it("should not allow registration with existing email and show error", function () {
         p.getByLink();
 
-        p.firstNameInput.sendKeys(p.userFirstNameRandom);
+        p.firstNameInput.sendKeys(p.userFirstName);
         p.lastNameInput.sendKeys(p.userLastName);
         p.emailInput.sendKeys(p.userEmailExisting);
         p.passwordInput.sendKeys(p.userPassword);

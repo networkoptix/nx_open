@@ -1,6 +1,6 @@
 'use strict';
 
-var LoginPage = function () {
+var RegisterPage = function () {
 
     this.getHomePage = function () {
         browser.get('/');
@@ -19,12 +19,23 @@ var LoginPage = function () {
         browser.waitForAngular();
     };
 
-    var randomNumber = Math.floor((Math.random() * 100)+10); // Random number between 10 and 100
-    this.userEmailRandom = 'ekorneeva+' + randomNumber + '@networkoptix.com'; // valid email with random number between 10 and 100
+    // Get valid email with random number between 100 and 1000
+    this.getRandomEmail = function() {
+        var randomNumber = Math.floor((Math.random() * 1000)+100); // Random number between 100 and 1000
+        return 'ekorneeva+' + randomNumber + '@networkoptix.com';
+    }
     this.userEmailExisting = 'ekorneeva+1@networkoptix.com'; // valid existing email
-    this.userFirstNameRandom = 'TestFirstName' + randomNumber;
+    this.userFirstName = 'TestFirstName';
     this.userLastName = 'TestLastName';
     this.userPassword = 'qweasd123';
+
+    this.userNameCyrillic = 'Кенгшщзх';
+    this.userNameSmile = '☠☿☂⊗⅓∠∩λ℘웃♞⊀☻★';
+    this.userNameHierog = '您都可以享受源源不絕的好禮及優惠';
+
+    this.userPasswordCyrillic = 'йцуфывячс';
+    this.userPasswordSmile = '☠☿☂⊗⅓∠∩λ℘웃♞⊀☻★';
+    this.userPasswordHierog = '您都可以享受源源不絕的好禮及優惠';
 
     this.openRegisterButton = element(by.linkText('Register'));
     this.openRegisterButtonAdv = element(by.linkText('Register immediately!')); // Register button on home page
@@ -97,4 +108,4 @@ var LoginPage = function () {
     this.termsConditions = element(by.linkText('Terms and Conditions'));
 };
 
-module.exports = LoginPage;
+module.exports = RegisterPage;
