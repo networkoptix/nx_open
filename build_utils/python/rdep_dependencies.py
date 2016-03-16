@@ -95,6 +95,8 @@ def get_deps_file(debug = False):
 
 def append_deps(deps_file, debug = False):
     with open(get_deps_file(debug), "a") as file:
+        if GENERATE_CMAKE_DEPS:
+            deps_file = deps_file.replace("\\", "/")
         file.write("include({0})\n".format(deps_file))
 
 def get_package_for_configuration(target, package, target_dir, debug):

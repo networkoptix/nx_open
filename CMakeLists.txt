@@ -46,6 +46,40 @@ if(WIN32)
     endif()
 endif()
 
+if(WIN32)
+    set(TARGET_TYPE "windows-${arch}")
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+    if(NOT box OR ${box} MATCHES "none")
+        set(TARGET_TYPE "linux-${arch}")
+    else()
+        set(TARGET_TYPE ${box})
+    endif()
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+    set(TARGET_TYPE "macosx-x64")
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "Android")
+    set(TARGET_TYPE "android-arm")
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "iOS")
+    set(TARGET_TYPE "ios")
+endif()
+
+set(CMAKE_MODULE_PATH
+    ${CMAKE_MODULE_PATH}
+    ${PROJECT_SOURCE_DIR}/build_utils/cmake
+    ${PROJECT_SOURCE_DIR}/customization
+    ${PROJECT_SOURCE_DIR}/customization/${customization}
+)
+
+include(default_properties)
+include(add_module)
+include(cotire)
+include(find_sources)
+include(add_translations)
+include(process_rc)
+include(process_resources)
+include(precompiled_header)
+include(python_exec)
+include(external_dependencies)
+
 message("---- Building for: ${CMAKE_VS_PLATFORM_NAME}")
 
 set (openal.version "1.16")
@@ -63,7 +97,16 @@ set (vmax_integration.version "2.1")
 set (qt.version 5.6.0)
 set (boost.version 1.56.0)
 
-set(CMAKE_PREFIX_PATH "$ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}")
+get_external_dependencies(qt boost)
+
+if(${CMAKE_BUILD_TYPE} MATCHES Debug)
+    include(${CMAKE_CURRENT_BINARY_DIR}/dependencies-debug.cmake)
+else()
+    include(${CMAKE_CURRENT_BINARY_DIR}/dependencies.cmake)
+endif()
+
+set(CMAKE_PREFIX_PATH ${QT_DIR})
+
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release CACHE STRING
         "Debug Release RelWithDebInfo"
@@ -115,17 +158,6 @@ add_definitions(-DUSE_NX_HTTP
                 -DUDT_API=__declspec\(dllimport\)
                 )
 
-# Install to "dist" directory in Windows for testing and as a staging directory
-# for the installer.
-if(WIN32 AND NOT CMAKE_INSTALL_PREFIX)
-    set(CMAKE_INSTALL_PREFIX dist CACHE STRING "Install path prefix.")
-endif()
-
-set(CMAKE_MODULE_PATH
-    ${CMAKE_MODULE_PATH}
-    ${PROJECT_SOURCE_DIR}/build_utils/cmake
-)
-
 if(WIN32)
     set(DEFAULT_LIBRARY_TYPE STATIC)
 else()
@@ -144,7 +176,7 @@ include(precompiled_header)
 include(python_exec)
 include(external_dependencies)
 
-include_directories($ENV{environment}/boost_1_56_0
+include_directories(${BOOST_INCLUDE}
                     ${CMAKE_SOURCE_DIR}/common/src
                     $ENV{environment}/include/ffmpeg-misc-headers-win32
                     $ENV{environment}/include/glext
@@ -165,7 +197,6 @@ include_directories($ENV{environment}/boost_1_56_0
                     $ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}/include/QtQuick/${qt.version}
                     $ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}/include/QtQuick
                     $ENV{environment}/artifacts/openal/${openal.version}/include
-                    $ENV{environment}/artifacts/openssl/${openssl.version}/include
                     $ENV{environment}/artifacts/openal/${openal.version}/include/AL
                     $ENV{environment}/artifacts/directx/${directx.version}/include
                     $ENV{environment}/artifacts/festival/${festival.version}/include
@@ -174,15 +205,12 @@ include_directories($ENV{environment}/boost_1_56_0
                     $ENV{environment}/artifacts/gtest/${gtest.version}/include
                     $ENV{environment}/artifacts/mfx/${mfx.version}/include
                     $ENV{environment}/artifacts/onvif/${onvif.version}/include
-                    $ENV{environment}/artifacts/quazip/${quazip.version}/include
                     $ENV{environment}/artifacts/sigar/${sigar.version}/include
                     $ENV{environment}/artifacts/vmax_integration/${vmax_integration.version}/include
                     )
 
 LINK_DIRECTORIES(${CMAKE_BINARY_DIR}/common
-                $ENV{environment}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}
                 $ENV{environment}/artifacts/openal/${openal.version}/${platform}/${box}/${arch}/lib/${configuration}
-                $ENV{environment}/artifacts/openssl/${openssl.version}/${platform}/${box}/${arch}/lib/${configuration}
                 $ENV{environment}/artifacts/directx/${directx.version}/${platform}/${box}/${arch}/lib/${configuration}
                 $ENV{environment}/artifacts/festival/${festival.version}/${platform}/${box}/${arch}/lib/${configuration}
                 $ENV{environment}/artifacts/ffmpeg/${ffmpeg.version}/${platform}/${box}/${arch}/lib/${configuration}
@@ -190,7 +218,6 @@ LINK_DIRECTORIES(${CMAKE_BINARY_DIR}/common
                 $ENV{environment}/artifacts/gtest/${gtest.version}/${platform}/${box}/${arch}/lib/${configuration}
                 $ENV{environment}/artifacts/mfx/${mfx.version}/${platform}/${box}/${arch}/lib/${configuration}
                 $ENV{environment}/artifacts/onvif/${onvif.version}/${platform}/${box}/${arch}/lib/${configuration}
-                $ENV{environment}/artifacts/quazip/${quazip.version}/${platform}/${box}/${arch}/lib/${configuration}
                 $ENV{environment}/artifacts/sigar/${sigar.version}/${platform}/${box}/${arch}/lib/${configuration}
                 $ENV{environment}/artifacts/vmax_integration/${vmax_integration.version}/${platform}/${box}/${arch}/lib/${configuration}
                 )

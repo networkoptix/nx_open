@@ -4,7 +4,6 @@ MaskedComboBox
 {
     id: thisComponent;
 
-    property string text;
     property string iconUrl;
 
     anchors.left: parent.left;
@@ -12,20 +11,27 @@ MaskedComboBox
 
     areaDelegate: Row
     {
+        property alias areaText: textItem.text;
         Rectangle
         {
             // TODO: change to image
-            id: hostImage;
+            id: imageItem;
             width: 16; height: 16; color: (thisComponent.iconUrl.length ? "green" : "red");
         }
 
         Text
         {
-            id: hostText;
+            id: textItem;
 
-            text: thisComponent.text;
             color: thisComponent.textColor;
             font.pixelSize: thisComponent.fontPixelSize;
+
+            Binding
+            {
+                property: "text";
+                target: textItem;
+                value: thisComponent.value;
+            }
         }
     }
 

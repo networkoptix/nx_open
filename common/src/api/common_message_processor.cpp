@@ -68,10 +68,14 @@ void QnCommonMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
 
 void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnectionPtr &connection)
 {
+    /* //TODO: #GDM #c++14 re-enable when generic lambdas will be supported
     auto on_resourceUpdated = [this](const auto& resource)
     {
         updateResource(resource);
     };
+    */
+
+#define on_resourceUpdated(Type) static_cast<void (QnCommonMessageProcessor::*)(const Type&)>(&QnCommonMessageProcessor::updateResource)
 
     connect(connection, &ec2::AbstractECConnection::remotePeerFound,                this, &QnCommonMessageProcessor::on_remotePeerFound );
     connect(connection, &ec2::AbstractECConnection::remotePeerLost,                 this, &QnCommonMessageProcessor::on_remotePeerLost );
@@ -84,35 +88,35 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     connect(resourceManager, &ec2::AbstractResourceManager::resourceRemoved,        this, &QnCommonMessageProcessor::on_resourceRemoved );
 
     auto mediaServerManager = connection->getMediaServerManager();
-    connect(mediaServerManager, &ec2::AbstractMediaServerManager::addedOrUpdated,   this, on_resourceUpdated);
-    connect(mediaServerManager, &ec2::AbstractMediaServerManager::storageChanged,   this, on_resourceUpdated);
+    connect(mediaServerManager, &ec2::AbstractMediaServerManager::addedOrUpdated,   this, on_resourceUpdated(ec2::ApiMediaServerData));
+    connect(mediaServerManager, &ec2::AbstractMediaServerManager::storageChanged,   this, on_resourceUpdated(ec2::ApiStorageData));
     connect(mediaServerManager, &ec2::AbstractMediaServerManager::removed,          this, &QnCommonMessageProcessor::on_resourceRemoved );
     connect(mediaServerManager, &ec2::AbstractMediaServerManager::storageRemoved,   this, &QnCommonMessageProcessor::on_resourceRemoved );
     connect(mediaServerManager, &ec2::AbstractMediaServerManager::userAttributesChanged, this, &QnCommonMessageProcessor::on_mediaServerUserAttributesChanged );
     connect(mediaServerManager, &ec2::AbstractMediaServerManager::userAttributesRemoved, this, &QnCommonMessageProcessor::on_mediaServerUserAttributesRemoved );
 
     auto cameraManager = connection->getCameraManager();
-    connect(cameraManager, &ec2::AbstractCameraManager::addedOrUpdated,             this, on_resourceUpdated);
+    connect(cameraManager, &ec2::AbstractCameraManager::addedOrUpdated,             this, on_resourceUpdated(ec2::ApiCameraData));
     connect(cameraManager, &ec2::AbstractCameraManager::userAttributesChanged,      this, &QnCommonMessageProcessor::on_cameraUserAttributesChanged );
     connect(cameraManager, &ec2::AbstractCameraManager::userAttributesRemoved,      this, &QnCommonMessageProcessor::on_cameraUserAttributesRemoved );
     connect(cameraManager, &ec2::AbstractCameraManager::cameraHistoryChanged,       this, &QnCommonMessageProcessor::on_cameraHistoryChanged );
     connect(cameraManager, &ec2::AbstractCameraManager::removed,                    this, &QnCommonMessageProcessor::on_resourceRemoved );
 
     auto userManager = connection->getUserManager();
-    connect(userManager, &ec2::AbstractUserManager::addedOrUpdated,                 this, on_resourceUpdated);
+    connect(userManager, &ec2::AbstractUserManager::addedOrUpdated,                 this, on_resourceUpdated(ec2::ApiUserData));
     connect(userManager, &ec2::AbstractUserManager::removed,                        this, &QnCommonMessageProcessor::on_resourceRemoved );
 
     auto layoutManager = connection->getLayoutManager();
-    connect(layoutManager, &ec2::AbstractLayoutManager::addedOrUpdated,             this, on_resourceUpdated);
+    connect(layoutManager, &ec2::AbstractLayoutManager::addedOrUpdated,             this, on_resourceUpdated(ec2::ApiLayoutData));
     connect(layoutManager, &ec2::AbstractLayoutManager::removed,                    this, &QnCommonMessageProcessor::on_resourceRemoved );
 
     auto videowallManager = connection->getVideowallManager();
-    connect(videowallManager, &ec2::AbstractVideowallManager::addedOrUpdated,       this, on_resourceUpdated);
+    connect(videowallManager, &ec2::AbstractVideowallManager::addedOrUpdated,       this, on_resourceUpdated(ec2::ApiVideowallData));
     connect(videowallManager, &ec2::AbstractVideowallManager::removed,              this, &QnCommonMessageProcessor::on_resourceRemoved );
     connect(videowallManager, &ec2::AbstractVideowallManager::controlMessage,       this, &QnCommonMessageProcessor::videowallControlMessageReceived );
 
     auto webPageManager = connection->getWebPageManager();
-    connect(webPageManager, &ec2::AbstractWebPageManager::addedOrUpdated,           this, on_resourceUpdated);
+    connect(webPageManager, &ec2::AbstractWebPageManager::addedOrUpdated,           this, on_resourceUpdated(ec2::ApiWebPageData));
     connect(webPageManager, &ec2::AbstractWebPageManager::removed,                  this, &QnCommonMessageProcessor::on_resourceRemoved );
 
     auto licenseManager = connection->getLicenseManager();
@@ -140,6 +144,8 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     auto discoveryManager = connection->getDiscoveryManager();
     connect(discoveryManager, &ec2::AbstractDiscoveryManager::discoveryInformationChanged, this, &QnCommonMessageProcessor::on_gotDiscoveryData );
     connect(discoveryManager, &ec2::AbstractDiscoveryManager::discoveredServerChanged, this, &QnCommonMessageProcessor::discoveredServerChanged);
+
+#undef on_resourceUpdated
 }
 
 void QnCommonMessageProcessor::disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection)
@@ -370,6 +376,7 @@ void QnCommonMessageProcessor::resetResources(const ec2::ApiFullInfoData& fullDa
     for (const QnResourcePtr &resource: qnResPool->getResourcesWithFlag(Qn::remote))
         remoteResources.insert(resource->getId(), resource);
 
+    /* //TODO: #GDM #c++14 re-enable when generic lambdas will be supported
     auto updateResources = [this, &remoteResources](const auto& source)
     {
         for (const auto& resource : source)
@@ -378,9 +385,13 @@ void QnCommonMessageProcessor::resetResources(const ec2::ApiFullInfoData& fullDa
             remoteResources.remove(resource.id);
         }
     };
+    */
+
+#define updateResources(source) { for (const auto& resource : source) { updateResource(resource); remoteResources.remove(resource.id); } }
 
     /* Packet adding. */
     qnResPool->beginTran();
+
     updateResources(fullData.users);
     updateResources(fullData.cameras);
     updateResources(fullData.layouts);
@@ -390,6 +401,8 @@ void QnCommonMessageProcessor::resetResources(const ec2::ApiFullInfoData& fullDa
     updateResources(fullData.storages);
 
     qnResPool->commit();
+
+#undef updateResources
 
     /* Remove absent resources. */
     for (const QnResourcePtr& resource: remoteResources)

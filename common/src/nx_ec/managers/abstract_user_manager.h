@@ -23,7 +23,7 @@ namespace ec2
         template<class TargetType, class HandlerType>
         int getUsers(TargetType* target, HandlerType handler)
         {
-            return getUsers(userId, std::static_pointer_cast<impl::GetUsersHandler>(
+            return getUsers(std::static_pointer_cast<impl::GetUsersHandler>(
                 std::make_shared<impl::CustomGetUsersHandler<TargetType, HandlerType>>(target, handler)));
         }
 
