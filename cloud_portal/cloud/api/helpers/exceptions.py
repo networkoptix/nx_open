@@ -102,6 +102,11 @@ class APIException(Exception):
                 'errorData': self.error_data
             }, status=self.status_code)
 
+    def need_to_log(self):
+        return self.error_code not in (ErrorCodes.not_authorized,
+                                       ErrorCodes.not_found,
+                                       ErrorCodes.account_exists)
+
 
 class APIInternalException(APIException):
     # 500 error - internal server error
@@ -223,6 +228,7 @@ def handle_exceptions(func):
             request_data = request_data.dict()
 
         if isinstance(error, APIException):
+            error_text = error.error_text
             error_formatted = 'Status: {0}\nMessage: {1}\nError code: {2}\nError data: {3}'.\
                               format(error.status_code,
                                      error.error_text,
@@ -230,16 +236,18 @@ def handle_exceptions(func):
                                      json.dumps(error.error_data, indent=4, separators=(',', ': '))
                                      )
         else:
+            error_text = 'unknown'
             error_formatted = 'Unexpected error'
 
-        error_formatted = '\n{0}\nPortal URL: {1}\nUser: {2}\nUser IP:{3}\nRequest: {4}\n{5}\nCall Stack: \n{6}'.\
+        error_formatted = '\n{0}:{7}\nPortal URL: {1}\nUser: {2}\nUser IP:{3}\nRequest: {4}\n{5}\nCall Stack: \n{6}'.\
             format(error.__class__.__name__,
                    page_url,
                    user_name,
                    ip,
                    request_data,
                    error_formatted,
-                   traceback.format_exc()
+                   traceback.format_exc(),
+                   error_text
                    )
 
         logger.error(error_formatted)
@@ -254,7 +262,7 @@ def handle_exceptions(func):
             return data
         except APIException as error:
             # Do not log not_authorized errors
-            if error.error_code != ErrorCodes.not_authorized:
+            if error.need_to_log():
                 log_error(args[0], error)
 
             return error.response()

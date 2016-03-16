@@ -45,16 +45,15 @@ $modal-content-border-color:  transparent;
 
 
 $font-size-base:          14px;
-$font-size-large:         15px; // ceil($font-size-base * 1.15); // ~16px
+$font-size-large:         15px;
 $font-size-small:         13px;
 
-$font-size-h1:            ceil($font-size-base * 1.57); // ~22px
-$font-size-h2:            ceil($font-size-base * 1.42); // ~20px
-
-$font-size-h3:            ceil($font-size-base * 1.3);  // ~18px
-$font-size-h4:            16px; // ~16px
-$font-size-h5:            $font-size-base;
-$font-size-h6:            ceil($font-size-base * 0.85); // ~12px
+$font-size-h1:            22px;
+$font-size-h2:            20px;
+$font-size-h3:            18px;
+$font-size-h4:            16px;
+$font-size-h5:            $font-size-base; // 14px
+$font-size-h6:            12px;
 
 $btn-font-weight:         bold;
 $headings-font-weight:    lighter;
@@ -103,6 +102,8 @@ $state-success-border:           $green1;
 
 
 $state-danger-text:       $error;
+$label-danger-bg:         $error;
+$label-default-bg:        $light8;
 
 /*
 $state-danger-bg:                $red2;
@@ -112,6 +113,7 @@ $state-danger-border:            $red1;
 $alert-danger-bg:              $red2;
 $alert-danger-border:          $red1;
 $alert-danger-text:            $red3;
+
 
 
 $state-warning-text:             #8a6d3b !default;
@@ -129,3 +131,5 @@ $link-hover-color:            $brand_core;
 
 $grid-float-breakpoint:       600px;
 $dialog-sm-float-breakpoint:     434px;
+
+$panel-body-padding:    16px;

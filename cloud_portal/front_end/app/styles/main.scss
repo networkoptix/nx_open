@@ -185,15 +185,31 @@ footer {
     display: none;
 }
 
-
-
+.system-owner{
+  font-size: $font-size-h6;
+  line-height:16px;
+  font-weight: bold;
+  display: block;
+  margin-bottom:12px;
+}
+.system-button{
+  max-width:280px;
+}
+.system-button h2{
+  line-height: 24px;
+  margin-bottom: 2px;
+}
 .system-button .label {
-  line-height: 18px;
-  font-size: 85%;
   display: inline-block;
   vertical-align: bottom;
-  margin-top: 10px;
-  height: 24px;
+
+  height: 20px;
+  margin-top: 12px;
+  line-height: 14px;
+  border-radius: $border-radius-small;
+
+  font-weight: normal;
+  font-size: $font-size-h6;
 }
 
 .btn-wrapper {

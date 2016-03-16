@@ -4,6 +4,7 @@
 angular.module('cloudApp').run(function($http,$templateCache) {
         $http.get('views/login.html', {cache: $templateCache});
         $http.get('views/share.html', {cache: $templateCache});
+        $http.get('views/components/dialog.html', {cache: $templateCache});
     })
     .factory('dialogs', function ($http, $uibModal, $q, $location) {
         function openDialog(settings ){
