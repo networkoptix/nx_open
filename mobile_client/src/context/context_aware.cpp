@@ -30,13 +30,13 @@ QnContext *QnContextAware::context() const {
 
     /* Try to get the context from the QML engine. */
     const QObject *object = dynamic_cast<const QObject *>(this);
-    assert(object);
+    NX_ASSERT(object);
 
     QQmlContext *qmlContext = QtQml::qmlContext(object);
-    assert(qmlContext);
+    NX_ASSERT(qmlContext);
 
     QnContext *result = qmlContext->contextProperty(lit("context")).value<QnContext *>();
-    assert(result);
+    NX_ASSERT(result);
 
     m_context = result;
     return result;

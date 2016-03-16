@@ -433,7 +433,7 @@ UdtSocket::~UdtSocket()
 
     //TODO #ak if socket is destroyed in its aio thread, it can cleanup here
 
-    assert(!nx::network::SocketGlobals::aioService()
+    NX_ASSERT(!nx::network::SocketGlobals::aioService()
         .isSocketBeingWatched(static_cast<Pollable*>(this)));
 }
 

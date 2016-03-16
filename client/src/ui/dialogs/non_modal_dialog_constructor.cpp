@@ -20,12 +20,12 @@ void QnShowDialogHelper::show(QWidget* dialog, const QRect &targetGeometry) {
 }
 
 QPoint QnShowDialogHelper::calculatePosition(QWidget* dialog) {
-    Q_ASSERT(dialog->parentWidget());
+    NX_ASSERT(dialog->parentWidget());
     if (!dialog->parentWidget())
         return QPoint();
 
     QWidget* w = dialog->parentWidget()->window();
-    Q_ASSERT(w);
+    NX_ASSERT(w);
     if (!w)
         return QPoint();
 

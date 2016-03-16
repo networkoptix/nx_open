@@ -106,7 +106,7 @@ void QnLookAndFeelPreferencesWidget::loadDataToUi() {
     }
 
     if (m_oldLanguage < 0) {
-        Q_ASSERT_X(defaultLanguageIndex >= 0, Q_FUNC_INFO, "default language must definitely be present in translations");
+        NX_ASSERT(defaultLanguageIndex >= 0, Q_FUNC_INFO, "default language must definitely be present in translations");
         m_oldLanguage = std::max(defaultLanguageIndex, 0);
     }
 

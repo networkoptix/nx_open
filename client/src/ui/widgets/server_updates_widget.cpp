@@ -522,7 +522,7 @@ void QnServerUpdatesWidget::checkForUpdatesInternet(bool autoSwitch, bool autoSt
             setWarningStyle(&detailPalette);
             break;
         default:
-            Q_ASSERT(false);    //should never get here
+            NX_ASSERT(false);    //should never get here
         }
 
         if (autoSwitch && result.result == QnCheckForUpdateResult::InternetProblem)
@@ -608,7 +608,7 @@ void QnServerUpdatesWidget::checkForUpdatesLocal() {
             setWarningStyle(&detailPalette);
             break;
         default:
-            Q_ASSERT(false);    //should never get here
+            NX_ASSERT(false);    //should never get here
         }
 
         ui->localDetailLabel->setText(detail);

@@ -89,7 +89,7 @@ namespace ec2
         {
             if (camera.id.isNull())
             {
-                Q_ASSERT_X(0, "Only update operation is supported", Q_FUNC_INFO);
+                NX_ASSERT(0, "Only update operation is supported", Q_FUNC_INFO);
                 return INVALID_REQ_ID;
             }
         }

@@ -31,7 +31,7 @@ public:
     }
     
     void setSplashType(SplashType splashType) {
-        assert(splashType == Circular || splashType == Rectangular || splashType == Invalid);
+        NX_ASSERT(splashType == Circular || splashType == Rectangular || splashType == Invalid);
 
         m_splashType = splashType;
     }

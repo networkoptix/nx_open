@@ -163,7 +163,7 @@ QnSystemsModel::QnSystemsModel(QObject *parent)
     , m_connections()
     , m_internalData()
 {
-    Q_ASSERT_X(qnSystemsFinder, Q_FUNC_INFO, "Systems finder is null!");
+    NX_ASSERT(qnSystemsFinder, Q_FUNC_INFO, "Systems finder is null!");
     
     const auto discoveredConnection = 
         connect(qnSystemsFinder, &QnAbstractSystemsFinder::systemDiscovered

@@ -10,8 +10,8 @@
 #include <core/resource/user_resource.h>
 #include <network/tcp_connection_priv.h>
 #include <utils/common/sync_call.h>
-#include <utils/serialization/json.h>
 
+#include <utils/common/model_functions.h>
 
 int QnSaveCloudSystemCredentialsHandler::executePost(
     const QString& /*path*/,
@@ -20,9 +20,16 @@ int QnSaveCloudSystemCredentialsHandler::executePost(
     QnJsonRestResult& result,
     const QnRestConnectionProcessor*)
 {
+    const CloudCredentialsData data = QJson::deserialized<CloudCredentialsData>(body);
+    return execute(data, result);
+}
+
+int QnSaveCloudSystemCredentialsHandler::execute(
+    const CloudCredentialsData& data,
+    QnJsonRestResult& result)
+{
     const auto admin = qnResPool->getAdministrator();
 
-    const CloudCredentialsData data = QJson::deserialized<CloudCredentialsData>(body);
     if (data.reset)
     {
         //setting cloud credentials to empty string

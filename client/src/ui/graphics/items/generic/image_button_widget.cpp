@@ -566,7 +566,7 @@ bool QnImageButtonWidget::isDynamic() const {
 void QnImageButtonWidget::setDynamic(bool value) {
     if (m_dynamic == value)
         return;
-    Q_ASSERT(!m_initialized);   //This parameter should be set once before the first painting
+    NX_ASSERT(!m_initialized);   //This parameter should be set once before the first painting
     m_dynamic = value;
 }
 

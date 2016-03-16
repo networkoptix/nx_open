@@ -74,7 +74,7 @@ RDirSyncher::RDirSyncher(
     m_eventReceiver( eventReceiver ),
     m_state( sInit )
 {
-    assert( !m_mirrors.empty() );
+    NX_ASSERT( !m_mirrors.empty() );
     m_currentMirror = m_mirrors.front();
 }
 
@@ -215,7 +215,7 @@ void RDirSyncher::operationDone( const std::shared_ptr<detail::RDirSynchronizati
     if( opIter == m_runningOperations.end() )
     {
         //TODO: unknown operation. What's the whooy?
-        assert( false );
+        NX_ASSERT( false );
         return;
     }
 
@@ -253,13 +253,13 @@ void RDirSyncher::operationDone( const std::shared_ptr<detail::RDirSynchronizati
             }
 
             default:
-                assert( false );
+                NX_ASSERT( false );
         }
 
         if( m_syncTasks.empty() )
         {
             //if no task to do - success
-            assert( m_runningOperations.empty() );
+            NX_ASSERT( m_runningOperations.empty() );
             m_state = sSucceeded;
             if( m_eventReceiver )
                 eventsToTrigger.push_back( allocEventTrigger( std::bind(&EventReceiver::finished, m_eventReceiver, shared_from_this(), true) ) );
@@ -343,7 +343,7 @@ void RDirSyncher::startOperations( std::list<RSyncEventTrigger*>& eventsToTrigge
                 return;
 
             default:
-                assert( false );
+                NX_ASSERT( false );
                 break;
         }
     }
@@ -351,7 +351,7 @@ void RDirSyncher::startOperations( std::list<RSyncEventTrigger*>& eventsToTrigge
 
 RDirSyncher::OperationStartResult RDirSyncher::startNextOperation( std::shared_ptr<detail::RDirSynchronizationOperation>* const newOperationRef )
 {
-    assert( !m_syncTasks.empty() );
+    NX_ASSERT( !m_syncTasks.empty() );
 
     auto taskToStartIter = std::find_if( m_syncTasks.begin(), m_syncTasks.end(), [](const SynchronizationTask& task){ return !task.running; } );
     if( taskToStartIter == m_syncTasks.end() )
@@ -392,7 +392,7 @@ RDirSyncher::OperationStartResult RDirSyncher::startNextOperation( std::shared_p
         }
 
         default:
-            assert( false );
+            NX_ASSERT( false );
             return OperationStartResult::failure;
     }
 

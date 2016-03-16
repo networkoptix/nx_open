@@ -7,7 +7,7 @@ QnDirectSystemsFinder::QnDirectSystemsFinder(QObject *parent)
     : base_type(parent)
 {
     const auto moduleFinder = QnModuleFinder::instance();
-    Q_ASSERT_X(moduleFinder, Q_FUNC_INFO, "Module finder does not exist");
+    NX_ASSERT(moduleFinder, Q_FUNC_INFO, "Module finder does not exist");
     if (!moduleFinder)
         return;
 
@@ -67,7 +67,7 @@ void QnDirectSystemsFinder::removeServer(const QnModuleInformation &moduleInform
 {
     const auto systemIt = getSystemItByServer(moduleInformation.id);
     const auto serverIsInKnownSystem = (systemIt != m_systems.end());
-    Q_ASSERT_X(serverIsInKnownSystem, Q_FUNC_INFO, "Server is not known");
+    NX_ASSERT(serverIsInKnownSystem, Q_FUNC_INFO, "Server is not known");
     if (!serverIsInKnownSystem)
         return;
 
@@ -88,7 +88,7 @@ void QnDirectSystemsFinder::updateServer(const SystemsHash::iterator systemIt
     , const QnModuleInformation &moduleInformation)
 {
     const bool serverIsInKnownSystem = (systemIt != m_systems.end());
-    Q_ASSERT_X(serverIsInKnownSystem, Q_FUNC_INFO, "Server is not known");
+    NX_ASSERT(serverIsInKnownSystem, Q_FUNC_INFO, "Server is not known");
     if (!serverIsInKnownSystem)
         return;
 
@@ -101,7 +101,7 @@ void QnDirectSystemsFinder::updatePrimaryAddress(const QnModuleInformation &modu
 {
     const auto systemIt = getSystemItByServer(moduleInformation.id);
     const bool serverIsInKnownSystem = (systemIt != m_systems.end());
-    Q_ASSERT_X(serverIsInKnownSystem, Q_FUNC_INFO, "Server is not known");
+    NX_ASSERT(serverIsInKnownSystem, Q_FUNC_INFO, "Server is not known");
     if (!serverIsInKnownSystem)
         return;
 

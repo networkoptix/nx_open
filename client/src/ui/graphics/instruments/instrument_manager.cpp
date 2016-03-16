@@ -81,7 +81,7 @@ void InstrumentManagerPrivate::removeSyncedViewport(QWidget *viewport) {
 }
 
 void InstrumentManagerPrivate::destroyed(SceneEventFilterItem *item) {
-    assert(filterItem == item);
+    NX_ASSERT(filterItem == item);
 
     /* Old filter item is already half-destroyed. */
     filterItem = NULL;
@@ -138,7 +138,7 @@ void InstrumentManagerPrivate::uninstallInstrumentInternal(Instrument *instrumen
 }
 
 void InstrumentManagerPrivate::registerSceneInternal(QGraphicsScene *newScene) {
-    assert(scene == NULL && newScene != NULL);
+    NX_ASSERT(scene == NULL && newScene != NULL);
 
     /* Update scene and filter item. */
     scene = newScene;
@@ -165,7 +165,7 @@ void InstrumentManagerPrivate::registerSceneInternal(QGraphicsScene *newScene) {
 }
 
 void InstrumentManagerPrivate::unregisterSceneInternal() {
-    assert(scene != NULL);
+    NX_ASSERT(scene != NULL);
 
     /* First remove event filter. */
     scene->removeEventFilter(sceneDispatcher);
@@ -594,7 +594,7 @@ AnimationTimer *InstrumentManager::animationTimer(QGraphicsScene *scene) {
 }
 
 void InstallationMode::insertInstrument(Instrument *instrument, InstallationMode::Mode mode, Instrument *reference, QList<Instrument *> *target) {
-    assert(instrument != NULL && target != NULL);
+    NX_ASSERT(instrument != NULL && target != NULL);
 
     /* Note that event processing goes from the last element in the list to the first.
      * This is why we do push_front on InstallLast. Don't be surprised. */

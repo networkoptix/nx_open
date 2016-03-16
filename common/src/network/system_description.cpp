@@ -78,7 +78,7 @@ void QnSystemDescription::addServer(const QnModuleInformation &serverInfo
     , int priority)
 {
     const bool containsServer = m_servers.contains(serverInfo.id);
-    Q_ASSERT_X(!containsServer, Q_FUNC_INFO
+    NX_ASSERT(!containsServer, Q_FUNC_INFO
         , "System contains specified server");
 
     if (containsServer)
@@ -99,7 +99,7 @@ bool QnSystemDescription::containsServer(const QnUuid &serverId) const
 
 QnModuleInformation QnSystemDescription::getServer(const QnUuid &serverId) const
 {
-    Q_ASSERT_X(m_servers.contains(serverId), Q_FUNC_INFO
+    NX_ASSERT(m_servers.contains(serverId), Q_FUNC_INFO
         , "System does not contain specified server");
     return m_servers.value(serverId);
 }
@@ -108,7 +108,7 @@ void QnSystemDescription::updateServer(const QnModuleInformation &serverInfo)
 {
     const auto it = m_servers.find(serverInfo.id);
     const bool containsServer = (it != m_servers.end());
-    Q_ASSERT_X(containsServer, Q_FUNC_INFO
+    NX_ASSERT(containsServer, Q_FUNC_INFO
         , "System does not contain specified server");
 
     if (!containsServer)
@@ -126,7 +126,7 @@ void QnSystemDescription::updateServer(const QnModuleInformation &serverInfo)
 void QnSystemDescription::removeServer(const QnUuid &serverId)
 {
     const bool containsServer = m_servers.contains(serverId);
-    Q_ASSERT_X(containsServer, Q_FUNC_INFO
+    NX_ASSERT(containsServer, Q_FUNC_INFO
         , "System does not contain specified server");
     if (!containsServer)
         return;
@@ -149,7 +149,7 @@ void QnSystemDescription::setPrimaryAddress(const QnUuid &serverId
 {
     const bool containsServer = m_servers.contains(serverId);
     
-    Q_ASSERT_X(containsServer, Q_FUNC_INFO
+    NX_ASSERT(containsServer, Q_FUNC_INFO
         , "System does not contain specified server");
     
     if (!containsServer)
@@ -167,7 +167,7 @@ void QnSystemDescription::setPrimaryAddress(const QnUuid &serverId
 
 SocketAddress QnSystemDescription::getServerPrimaryAddress(const QnUuid &serverId) const
 {
-    Q_ASSERT_X(m_servers.contains(serverId), Q_FUNC_INFO
+    NX_ASSERT(m_servers.contains(serverId), Q_FUNC_INFO
         , "System does not contain specified server");
 
     return m_primaryAddresses.value(serverId);

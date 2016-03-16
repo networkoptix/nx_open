@@ -250,10 +250,10 @@ public:
     /**
      *   Construct a TCP socket with no connection
      */
-    TCPSocket( bool natTraversal = true );
+    explicit TCPSocket( bool natTraversal = true );
 
     //!User by \a TCPServerSocket class
-    TCPSocket( int newConnSD );
+    explicit TCPSocket( int newConnSD );
     virtual ~TCPSocket();
 
     TCPSocket(const TCPSocket&) = delete;

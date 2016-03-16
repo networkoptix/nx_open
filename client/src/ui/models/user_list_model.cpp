@@ -366,8 +366,8 @@ bool QnSortedUserListModel::lessThan(const QModelIndex &left, const QModelIndex 
     QnUserResourcePtr leftUser = left.data(Qn::UserResourceRole).value<QnUserResourcePtr>();
     QnUserResourcePtr rightUser = right.data(Qn::UserResourceRole).value<QnUserResourcePtr>();
 
-    Q_ASSERT(leftUser);
-    Q_ASSERT(rightUser);
+    NX_ASSERT(leftUser);
+    NX_ASSERT(rightUser);
 
     if (!rightUser)
         return true;

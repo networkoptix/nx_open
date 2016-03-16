@@ -51,7 +51,7 @@ QnAxClientWindow::~QnAxClientWindow() {
 }
 
 void QnAxClientWindow::show() {
-    Q_ASSERT_X(m_parentWidget, Q_FUNC_INFO, "Parent widget must be set");
+    NX_ASSERT(m_parentWidget, Q_FUNC_INFO, "Parent widget must be set");
 
     if(!m_mainWindow) {
         createMainWindow();
@@ -213,7 +213,7 @@ void QnAxClientWindow::slidePanelsOut() {
 }
 
 void QnAxClientWindow::createMainWindow() {
-    Q_ASSERT_X(m_mainWindow == NULL, Q_FUNC_INFO, "Double initialization");
+    NX_ASSERT(m_mainWindow == NULL, Q_FUNC_INFO, "Double initialization");
 
     m_context.reset(new QnWorkbenchContext(qnResPool));
     m_context->instance<QnFglrxFullScreen>();

@@ -32,21 +32,7 @@ bool readCmdArguments(int argc, char **argv)
 
     const auto enforceSocketTypeIter = args.find("enforce-socket");
     if (enforceSocketTypeIter != args.end())
-    {
-        if (enforceSocketTypeIter->second == "tcp")
-        {
-            SocketFactory::enforceStreamSocketType(SocketFactory::SocketType::Tcp);
-        }
-        else if (enforceSocketTypeIter->second == "udt")
-        {
-            SocketFactory::enforceStreamSocketType(SocketFactory::SocketType::Udt);
-        }
-        else
-        {
-            std::cerr << "Bad value for --enforce-socket= argument. Use tcp or udt" << std::endl;
-            return false;
-        }
-    }
+        SocketFactory::enforceStreamSocketType(enforceSocketTypeIter->second);
 
     //testing whether any logging argument is given...
     const auto anyLogArgIter = args.lower_bound("log");

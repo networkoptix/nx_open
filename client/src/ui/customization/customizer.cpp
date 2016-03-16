@@ -195,7 +195,7 @@ bool deserialize(QnJsonContext *, const QJsonValue &value, QnCustomizationData *
 }
 
 void serialize(QnJsonContext *, const QnCustomizationData &, QJsonValue *) {
-    assert(false); /* We'll never get here. */ 
+    NX_ASSERT(false); /* We'll never get here. */ 
 }
 
 

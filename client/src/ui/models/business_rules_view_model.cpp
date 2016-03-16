@@ -201,7 +201,7 @@ int QnBusinessRulesViewModel::createRule() {
 }
 
 void QnBusinessRulesViewModel::addOrUpdateRule(const QnBusinessEventRulePtr &rule) {
-    Q_ASSERT_X(rule, Q_FUNC_INFO, "Rule must exist");
+    NX_ASSERT(rule, Q_FUNC_INFO, "Rule must exist");
     if (!rule)
         return;
 

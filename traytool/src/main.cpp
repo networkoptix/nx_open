@@ -27,7 +27,7 @@ void initTranslations() {
     if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QJsonObject jsonObject;
         if(!QJson::deserialize(file.readAll(), &jsonObject)) {
-            Q_ASSERT_X(false, Q_FUNC_INFO, "Settings file could not be parsed!");
+            NX_ASSERT(false, Q_FUNC_INFO, "Settings file could not be parsed!");
         } else {
             QJsonObject settingsObject = jsonObject.value(lit("settings")).toObject();
             defaultTranslation = settingsObject.value(lit("translationPath")).toString();

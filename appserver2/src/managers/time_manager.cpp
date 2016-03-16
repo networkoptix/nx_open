@@ -631,7 +631,7 @@ namespace ec2
         if( !remotePeerTimeSyncInfo.fromString( serializedTimeSync ) )
             return;
 
-        Q_ASSERT( remotePeerTimeSyncInfo.timePriorityKey.seed > 0 );
+        NX_ASSERT( remotePeerTimeSyncInfo.timePriorityKey.seed > 0 );
 
         QnMutexLocker lk( &m_mutex );
         const auto localTimePriorityBak = m_localTimePriorityKey.toUInt64();
@@ -654,7 +654,7 @@ namespace ec2
         const TimePriorityKey& remotePeerTimePriorityKey,
         const qint64 timeErrorEstimation )
     {
-        Q_ASSERT( remotePeerTimePriorityKey.seed > 0 );
+        NX_ASSERT( remotePeerTimePriorityKey.seed > 0 );
 
         NX_LOGX(lm("Received sync time update from peer %1, peer's sync time (%2), "
                 "peer's time priority key 0x%3. Local peer id %4, used priority key 0x%5").
@@ -827,7 +827,7 @@ namespace ec2
         targetUrl.setPort( peerIter->second.peerAddress.port );
         targetUrl.setPath( lit("/") + QnTimeSyncRestHandler::PATH );
 
-        Q_ASSERT( !peerIter->second.httpClient );
+        NX_ASSERT( !peerIter->second.httpClient );
         clientPtr = nx_http::AsyncHttpClient::create();
         using namespace std::placeholders;
         const auto requestSendClock = m_monotonicClock.elapsed();
@@ -906,7 +906,7 @@ namespace ec2
         auto peerIter = m_peersToSendTimeSyncTo.find( peerID );
         if( peerIter == m_peersToSendTimeSyncTo.end() )
             return;
-        Q_ASSERT( !peerIter->second.syncTimerID );
+        NX_ASSERT( !peerIter->second.syncTimerID );
         peerIter->second.httpClient.reset();
         //scheduling next synchronization
         if( m_terminated )
@@ -1078,7 +1078,7 @@ namespace ec2
 
     void TimeSynchronizationManager::addInternetTimeSynchronizationTask()
     {
-        Q_ASSERT( m_internetSynchronizationTaskID == 0 );
+        NX_ASSERT( m_internetSynchronizationTaskID == 0 );
 
         if( m_terminated )
             return;

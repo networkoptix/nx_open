@@ -18,7 +18,7 @@ namespace ec2
 
         void triggerNotification( const QnTransaction<ApiBusinessActionData>& tran )
         {
-            assert( tran.command == ApiCommand::broadcastBusinessAction || tran.command == ApiCommand::execBusinessAction);
+            NX_ASSERT( tran.command == ApiCommand::broadcastBusinessAction || tran.command == ApiCommand::execBusinessAction);
             QnAbstractBusinessActionPtr businessAction;
             fromApiToResource(tran.params, businessAction);
             businessAction->setReceivedFromRemoteHost(true);
@@ -30,13 +30,13 @@ namespace ec2
 
         void triggerNotification( const QnTransaction<ApiIdData>& tran )
         {
-            assert( tran.command == ApiCommand::removeBusinessRule );
+            NX_ASSERT( tran.command == ApiCommand::removeBusinessRule );
             emit removed( QnUuid(tran.params.id) );
         }
 
         void triggerNotification( const QnTransaction<ApiBusinessRuleData>& tran )
         {
-            assert( tran.command == ApiCommand::saveBusinessRule);
+            NX_ASSERT( tran.command == ApiCommand::saveBusinessRule);
             QnBusinessEventRulePtr businessRule( new QnBusinessEventRule() );
             fromApiToResource(tran.params, businessRule);
             emit addedOrUpdated( businessRule );
@@ -44,7 +44,7 @@ namespace ec2
 
         void triggerNotification( const QnTransaction<ApiResetBusinessRuleData>& tran )
         {
-            assert( tran.command == ApiCommand::resetBusinessRules);
+            NX_ASSERT( tran.command == ApiCommand::resetBusinessRules);
             emit businessRuleReset(tran.params.defaultRules);
         }
     };

@@ -41,7 +41,7 @@ QnStatisticValuesHash QnUsersStatisticsModule::values() const
     QnStatisticValuesHash result;
 
     const auto availableUsers = qnResPool->getResources<QnUserResource>();
-    Q_ASSERT_X(!availableUsers.isEmpty(), Q_FUNC_INFO, "Can't gather metrics for empty users list");
+    NX_ASSERT(!availableUsers.isEmpty(), Q_FUNC_INFO, "Can't gather metrics for empty users list");
 
     // Adds number of each permission
     typedef QHash<QString, int> PermissionCountHash;
@@ -66,7 +66,7 @@ QnStatisticValuesHash QnUsersStatisticsModule::values() const
 
     // Adds current user permissions metric
     const auto currentUser = context()->user();
-    Q_ASSERT_X(currentUser, Q_FUNC_INFO, "There is no current user!");
+    NX_ASSERT(currentUser, Q_FUNC_INFO, "There is no current user!");
     if (!currentUser)
         return result;
 

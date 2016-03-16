@@ -5,9 +5,8 @@
 #include <utils/fusion/fusion_fwd.h>
 
 
-class CloudCredentialsData
+struct CloudCredentialsData
 {
-public:
     /** if \a true, credentials are set to empty string */
     bool reset;
     QString cloudSystemId;

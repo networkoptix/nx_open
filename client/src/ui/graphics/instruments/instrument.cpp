@@ -169,7 +169,7 @@ void Instrument::ensureUninstalled() {
 }
 
 QGraphicsView *Instrument::view(QWidget *viewport) {
-    assert(viewport != NULL);
+    NX_ASSERT(viewport != NULL);
 
     return checked_cast<QGraphicsView *>(viewport->parent());
 }
@@ -199,7 +199,7 @@ QList<QGraphicsItem *> Instrument::items(QGraphicsView *view, const QPointF &sce
 }
 
 QList<QGraphicsItem *> Instrument::items(const QGraphicsSceneMouseEvent *event) const {
-    assert(event != NULL);
+    NX_ASSERT(event != NULL);
 
     if (m_scene == NULL) {
         if (!isInstalled()) {
@@ -275,7 +275,7 @@ void Instrument::recursiveDisable() {
 }
 
 void Instrument::sendInstalledNotifications(bool installed) {
-    assert(isInstalled()); /* Must be actually installed. */
+    NX_ASSERT(isInstalled()); /* Must be actually installed. */
 
     if(installed) {
         installedNotify();

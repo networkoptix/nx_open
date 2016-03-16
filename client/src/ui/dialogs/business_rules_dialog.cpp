@@ -97,7 +97,7 @@ namespace {
                 return true;
 
             QModelIndex idx = sourceModel()->index(source_row, 0, source_parent);
-            Q_ASSERT_X(idx.isValid(), Q_FUNC_INFO, "index must be valid here");
+            NX_ASSERT(idx.isValid(), Q_FUNC_INFO, "index must be valid here");
             if (!idx.isValid())
                 return false;
 

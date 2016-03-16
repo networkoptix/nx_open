@@ -3,9 +3,25 @@
 #include <nx/network/http/httptypes.h>
 #include "media_server/serverutil.h"
 #include "save_cloud_system_credentials.h"
+#include <api/model/cloud_credentials_data.h>
 
-int QnSetupCloudSystemRestHandler::executeGet(const QString&, const QnRequestParams & params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner)
+struct SetupRemoveSystemData : public CloudCredentialsData
 {
+    QString systemName;
+};
+
+#define SetupRemoveSystemData_Fields CloudCredentialsData_Fields (systemName)
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (SetupRemoveSystemData),
+    (json),
+    _Fields,
+    (optional, true));
+
+int QnSetupCloudSystemRestHandler::executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor*)
+{
+    const SetupRemoveSystemData data = QJson::deserialized<SetupRemoveSystemData>(body);
+
     nx::SystemName systemName;
     systemName.loadFromConfig();
     if (!systemName.isDefault())
@@ -14,7 +30,7 @@ int QnSetupCloudSystemRestHandler::executeGet(const QString&, const QnRequestPar
         return nx_http::StatusCode::ok;
     }
 
-    QString newSystemName = params.value(lit("systemName"));
+    QString newSystemName = data.systemName;
     if (newSystemName.isEmpty())
     {
         result.setError(QnJsonRestResult::MissingParameter, lit("Parameter 'systemName' must be provided."));
@@ -28,5 +44,5 @@ int QnSetupCloudSystemRestHandler::executeGet(const QString&, const QnRequestPar
     }
 
     QnSaveCloudSystemCredentialsHandler subHundler;
-    return subHundler.executeGet(QString(), params, result, owner);
+    return subHundler.execute(data, result);
 }

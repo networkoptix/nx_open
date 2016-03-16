@@ -231,7 +231,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
     for (int i = 0; i < items.size(); ++i) {
         QnLayoutItemData& item = items[i];
         QString path = item.resource.path;
-        Q_ASSERT_X(!path.isEmpty(), Q_FUNC_INFO, "Resource path should not be empty. Exported file is not valid.");
+        NX_ASSERT(!path.isEmpty(), Q_FUNC_INFO, "Resource path should not be empty. Exported file is not valid.");
         if (!path.endsWith(lit(".mkv")))
             path += lit(".mkv");
         item.resource.path = QnLayoutFileStorageResource::updateNovParent(xfile, path);
@@ -263,7 +263,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
             QString normMotionName = path.mid(path.lastIndexOf(L'?')+1);
             QScopedPointer<QIODevice> motionIO(layoutStorage.open(lit("motion%1_%2.bin").arg(channel).arg(QFileInfo(normMotionName).completeBaseName()), QIODevice::ReadOnly));
             if (motionIO) {
-                Q_ASSERT(motionIO->size() % sizeof(QnMetaDataV1Light) == 0);
+                NX_ASSERT(motionIO->size() % sizeof(QnMetaDataV1Light) == 0);
                 QnMetaDataLightVector motionData;
                 int motionDataSize = motionIO->size() / sizeof(QnMetaDataV1Light);
                 if (motionDataSize > 0) {

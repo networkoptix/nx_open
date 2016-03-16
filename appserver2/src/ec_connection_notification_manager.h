@@ -102,19 +102,19 @@ namespace ec2
         void triggerNotification(const QnTransaction<ApiUpdateSequenceData> &/*tran*/) { /* nothing to do */ }
 
         void triggerNotification(const QnTransaction<ApiLockData> &/*tran*/) {
-            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a system transaction!"); // we MUSTN'T be here
+            NX_ASSERT(0, Q_FUNC_INFO, "This is a system transaction!"); // we MUSTN'T be here
         }
         void triggerNotification(const QnTransaction<ApiPeerAliveData> &/*tran*/)  {
-            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a system transaction!"); // we MUSTN'T be here
+            NX_ASSERT(0, Q_FUNC_INFO, "This is a system transaction!"); // we MUSTN'T be here
         }
         void triggerNotification(const QnTransaction<ApiSyncRequestData> &/*tran*/)  {
-            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a system transaction!"); // we MUSTN'T be here
+            NX_ASSERT(0, Q_FUNC_INFO, "This is a system transaction!"); // we MUSTN'T be here
         }
         void triggerNotification(const QnTransaction<QnTranStateResponse> &/*tran*/) {
-            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a system transaction!"); // we MUSTN'T be here
+            NX_ASSERT(0, Q_FUNC_INFO, "This is a system transaction!"); // we MUSTN'T be here
         }
         void triggerNotification(const QnTransaction<ApiTranSyncDoneData> &/*tran*/) {
-            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a system transaction!"); // we MUSTN'T be here
+            NX_ASSERT(0, Q_FUNC_INFO, "This is a system transaction!"); // we MUSTN'T be here
         }
 
         void databaseReplaceRequired();

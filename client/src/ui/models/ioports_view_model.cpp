@@ -244,7 +244,7 @@ QString QnIOPortsViewModel::portTypeToString(Qn::IOPortType portType) const {
     case Qn::PT_Output:
         return tr("Output", "IO Port Type");
     default:
-        Q_ASSERT_X(false, Q_FUNC_INFO, "Should never get here");
+        NX_ASSERT(false, Q_FUNC_INFO, "Should never get here");
         break;
     }
     return tr("Invalid", "IO Port Type");
@@ -258,7 +258,7 @@ QString QnIOPortsViewModel::stateToString(Qn::IODefaultState state) const {
     case Qn::IO_GroundedCircuit:
         return tr("Grounded circuit", "IO Port State");
     default:
-        Q_ASSERT_X(false, Q_FUNC_INFO, "Should never get here");
+        NX_ASSERT(false, Q_FUNC_INFO, "Should never get here");
         break;
     }
     return tr("Invalid state", "IO Port State");

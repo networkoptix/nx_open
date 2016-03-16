@@ -100,7 +100,7 @@ void QnGenericTabbedDialog::addPage(int key, QnAbstractPreferencesWidget *page, 
     if (!m_tabWidget)
         initializeTabWidget();
 
-    Q_ASSERT_X(m_tabWidget, Q_FUNC_INFO, "tab widget must exist here");
+    NX_ASSERT(m_tabWidget, Q_FUNC_INFO, "tab widget must exist here");
     if (!m_tabWidget) 
         return;
 
@@ -124,7 +124,7 @@ void QnGenericTabbedDialog::addPage(int key, QnAbstractPreferencesWidget *page, 
 
 
 void QnGenericTabbedDialog::setPageEnabled(int key, bool enabled) {
-    Q_ASSERT_X(m_tabWidget, Q_FUNC_INFO, "tab widget must exist here");
+    NX_ASSERT(m_tabWidget, Q_FUNC_INFO, "tab widget must exist here");
 
     if (!m_tabWidget) 
         return;

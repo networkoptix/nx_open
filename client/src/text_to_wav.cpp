@@ -134,7 +134,7 @@ namespace
         int data_size, data_int;
         short data_short;
 
-        Q_ASSERT(sample_type != st_schar);
+        NX_ASSERT(sample_type != st_schar);
      //   if (sample_type == st_schar)
      //     {
         //EST_warning("RIFF format: Signed 8-bit not allowed by this file format");

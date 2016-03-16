@@ -23,12 +23,12 @@ namespace ec2
             else if( tran.command == ApiCommand::updateStoredFile )
                 emit updated( tran.params.path );
             else
-                assert( false );
+                NX_ASSERT( false );
         }
 
         void triggerNotification( const QnTransaction<ApiStoredFilePath>& tran )
         {
-            assert( tran.command == ApiCommand::removeStoredFile );
+            NX_ASSERT( tran.command == ApiCommand::removeStoredFile );
             emit removed( tran.params.path );
         }
     };

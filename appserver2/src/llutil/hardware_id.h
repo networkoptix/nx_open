@@ -13,7 +13,7 @@ class QSettings;
 
 namespace LLUtil {
 
-const int LATEST_HWID_VERSION = 4;
+const int LATEST_HWID_VERSION = 5;
 
 const QnHardwareInfo &getHardwareInfo();
 QString getHardwareId(int version, bool guidCompatibility, QSettings *settings);

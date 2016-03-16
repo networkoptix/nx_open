@@ -429,7 +429,7 @@ int QnMultipleCameraSettingsWidget::tabIndex(Qn::CameraSettingsTab tab) const {
     case Qn::ExpertCameraSettingsTab:
         return ui->tabWidget->indexOf(ui->expertTab);
     default:
-        Q_ASSERT_X(false, Q_FUNC_INFO, "Should never get here");
+        NX_ASSERT(false, Q_FUNC_INFO, "Should never get here");
         break;
     }
     return -1;
