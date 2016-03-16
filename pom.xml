@@ -441,7 +441,7 @@
             </activation>
             <properties>
                 <environment.dir>${env.ENVIRONMENT}</environment.dir>
-                <init.python.dir>${environment.dir}/python/${arch}</init.python.dir>
+                <init.python.dir>${environment.dir}/python/x64</init.python.dir>
                 <python.dir>${libdir}/${arch}/python/scripts</python.dir>
                 <python.executable>python.exe</python.executable>
                 <python.virtualenv>virtualenv.exe</python.virtualenv>
