@@ -375,7 +375,7 @@ int QnTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnBy
         m_firstTime = media->timestamp;
 
     bool doTranscoding = true;
-    static const size_t kMaxDelayedQueueSize = 100;
+    static const size_t kMaxDelayedQueueSize = 30;
 
     if (!m_initialized)
     {
