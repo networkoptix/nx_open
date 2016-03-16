@@ -176,7 +176,7 @@ TEST_F(CdbFunctionalTest, system_sharing_getCloudUsers)
     {
         std::vector<api::SystemSharingEx> sharings;
         ASSERT_EQ(
-            getSystemSharings(account2.email, account2Password, system1.id.toStdString(), &sharings),
+            getSystemSharings(account2.email, account2Password, system1.id, &sharings),
             api::ResultCode::forbidden);
     }
 
@@ -185,7 +185,7 @@ TEST_F(CdbFunctionalTest, system_sharing_getCloudUsers)
         std::vector<api::SystemSharingEx> sharings;
         ASSERT_EQ(
             api::ResultCode::ok,
-            getSystemSharings(account2.email, account2Password, system2.id.toStdString(), &sharings));
+            getSystemSharings(account2.email, account2Password, system2.id, &sharings));
         ASSERT_EQ(sharings.size(), 2);
         ASSERT_EQ(
             accountAccessRoleForSystem(sharings, account1.email, system2.id),
@@ -726,7 +726,7 @@ TEST_F(CdbFunctionalTest, system_sharing_remove_system)
     //removing system
     ASSERT_EQ(
         api::ResultCode::ok,
-        unbindSystem(account1.email, account1Password, system1.id.toStdString()));
+        unbindSystem(account1.email, account1Password, system1.id));
 
     for (int i = 0; i < 2; ++i)
     {
@@ -848,7 +848,7 @@ TEST_F(CdbFunctionalTest, system_sharing_get_access_role_list)
             std::set<api::SystemAccessRole> accessRoles;
             ASSERT_EQ(
                 api::ResultCode::ok,
-                getAccessRoleList(account1.email, account1Password, system1.id.toStdString(), &accessRoles));
+                getAccessRoleList(account1.email, account1Password, system1.id, &accessRoles));
             ASSERT_EQ(6, accessRoles.size());
             ASSERT_TRUE(accessRoles.find(api::SystemAccessRole::localAdmin) != accessRoles.end());
             ASSERT_TRUE(accessRoles.find(api::SystemAccessRole::cloudAdmin) != accessRoles.end());
@@ -869,7 +869,7 @@ TEST_F(CdbFunctionalTest, system_sharing_get_access_role_list)
             std::set<api::SystemAccessRole> accessRoles;
             ASSERT_EQ(
                 api::ResultCode::ok,
-                getAccessRoleList(account2.email, account2Password, system1.id.toStdString(), &accessRoles));
+                getAccessRoleList(account2.email, account2Password, system1.id, &accessRoles));
             ASSERT_EQ(5, accessRoles.size());
             ASSERT_TRUE(accessRoles.find(api::SystemAccessRole::localAdmin) != accessRoles.end());
             ASSERT_TRUE(accessRoles.find(api::SystemAccessRole::cloudAdmin) != accessRoles.end());
@@ -882,7 +882,7 @@ TEST_F(CdbFunctionalTest, system_sharing_get_access_role_list)
             std::set<api::SystemAccessRole> accessRoles;
             ASSERT_EQ(
                 api::ResultCode::ok,
-                getAccessRoleList(account3.email, account3Password, system1.id.toStdString(), &accessRoles));
+                getAccessRoleList(account3.email, account3Password, system1.id, &accessRoles));
             ASSERT_EQ(1, accessRoles.size());
             ASSERT_TRUE(accessRoles.find(api::SystemAccessRole::maintenance) != accessRoles.end());
         }
@@ -891,21 +891,21 @@ TEST_F(CdbFunctionalTest, system_sharing_get_access_role_list)
             std::set<api::SystemAccessRole> accessRoles;
             ASSERT_EQ(
                 api::ResultCode::forbidden,
-                getAccessRoleList(account4.email, account4Password, system1.id.toStdString(), &accessRoles));
+                getAccessRoleList(account4.email, account4Password, system1.id, &accessRoles));
         }
 
         {
             std::set<api::SystemAccessRole> accessRoles;
             ASSERT_EQ(
                 api::ResultCode::forbidden,
-                getAccessRoleList(account5.email, account5Password, system1.id.toStdString(), &accessRoles));
+                getAccessRoleList(account5.email, account5Password, system1.id, &accessRoles));
         }
 
         {
             std::set<api::SystemAccessRole> accessRoles;
             ASSERT_EQ(
                 api::ResultCode::forbidden,
-                getAccessRoleList(account6.email, account6Password, system1.id.toStdString(), &accessRoles));
+                getAccessRoleList(account6.email, account6Password, system1.id, &accessRoles));
         }
     }
 }
