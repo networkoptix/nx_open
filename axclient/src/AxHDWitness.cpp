@@ -18,6 +18,8 @@
 #include <core/resource/camera_resource.h>
 
 #include <utils/common/waiting_for_qthread_to_empty_event_queue.h>
+#include <utils/common/app_info.h>
+
 #include <nx/utils/log/log.h>
 
 static QtMessageHandler defaultMsgHandler = 0;

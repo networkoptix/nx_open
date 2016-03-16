@@ -1,5 +1,3 @@
-#include <nx/network/socket_global.h>
-
 #include <QtGui/QGuiApplication>
 #include <QtGui/QScreen>
 #include <QtQml/QQmlEngine>
@@ -161,11 +159,10 @@ void initLog() {
     QnLog::initLog(lit("INFO"));
 }
 
-int main(int argc, char *argv[]) 
+int main(int argc, char *argv[])
 {
 
     QGuiApplication application(argc, argv);
-    nx::network::SocketGlobals::InitGuard sgGuard;
     initLog();
 
     QnMobileClientModule mobile_client;

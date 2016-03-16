@@ -21,7 +21,7 @@
 static const int MAX_CACHE_SIZE_BYTES = 1024 * 64;
 
 namespace {
-    
+
     const unsigned defaultPingTimeoutMs = 1000 * 5;
     const unsigned defaultKeepAliveMultiply = 5;
     const unsigned errorWaitTimeoutMs = 1000;
