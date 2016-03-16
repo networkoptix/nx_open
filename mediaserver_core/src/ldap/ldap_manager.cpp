@@ -254,7 +254,7 @@ bool LdapSession::connect()
 #elif defined(Q_OS_LINUX)
     if (ldap_initialize(&m_ld, QSTOCW(uri.toString())) != LDAP_SUCCESS)
     {
-        m_lastError = LdapErrorStr(LdapGetLastError());
+//        m_lastError = LdapErrorStr(LdapGetLastError());
         return false;
     }
 #endif
@@ -374,14 +374,14 @@ Qn::AuthResult LdapSession::authenticateWithDigest(const QString &login, const Q
     // The servresp will contain the digest-challange after the first call.
     berval *servresp = NULL;
     LDAP_RESULT res;
-    
+
     ldap_sasl_bind_s(m_ld, EMPTY_STR, DIGEST_MD5, &cred, NULL, NULL, &servresp);
     ldap_get_option(m_ld, LDAP_OPT_ERROR_NUMBER, &res);
     if (res != LDAP_SASL_BIND_IN_PROGRESS) {
         m_lastErrorCode = res;
         return Qn::Auth_ConnectError;
     }
-    
+
     QMap<QByteArray, QByteArray> responseDictionary;
     QByteArray initialResponse(servresp->bv_val, servresp->bv_len);
     for (QByteArray line : smartSplit(initialResponse, ',')) {
@@ -463,7 +463,7 @@ QString LdapSession::getRealm()
         m_lastErrorCode = res;
         return result;
     }
-    
+
     QMap<QByteArray, QByteArray> responseDictionary;
     QByteArray initialResponse(servresp->bv_val, servresp->bv_len);
     for (QByteArray line : smartSplit(initialResponse, ',')) {
