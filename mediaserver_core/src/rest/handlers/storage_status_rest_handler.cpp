@@ -29,15 +29,14 @@ int QnStorageStatusRestHandler::executeGet(const QString &, const QnRequestParam
 
     if (!storage) {
         storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(storageUrl, false));
-        if (!storage)
-            return CODE_INVALID_PARAMETER;
-
         qint64 spaceLimit = QnFileStorageResource::isLocal(storageUrl) ?
                             nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE :
                             QnFileStorageResource::kNasStorageLimit;
 
         storage->setUrl(storageUrl);
         storage->setSpaceLimit(spaceLimit);
+        if (!storage || !storage->isAvailable())
+            return CODE_INVALID_PARAMETER;
     }
 
     Q_ASSERT_X(storage, Q_FUNC_INFO, "Storage must exist here");
