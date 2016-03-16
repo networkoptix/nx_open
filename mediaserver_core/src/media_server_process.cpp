@@ -3014,12 +3014,8 @@ int MediaServerProcess::main(int argc, char* argv[])
     }
 
 
-    const auto enforceSocketTypeLower = enforceSocketType.toLower();
-    if( enforceSocketTypeLower == lit("tcp") )
-        SocketFactory::enforceStreamSocketType( SocketFactory::SocketType::Tcp );
-    else
-    if( enforceSocketTypeLower == lit("udt") )
-        SocketFactory::enforceStreamSocketType( SocketFactory::SocketType::Udt );
+    if (!enforceSocketType.isEmpty())
+        SocketFactory::enforceStreamSocketType(enforceSocketType);
 
     if( !configFilePath.isEmpty() )
         MSSettings::initializeROSettingsFromConfFile( configFilePath );

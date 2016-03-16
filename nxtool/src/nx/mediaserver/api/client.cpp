@@ -136,7 +136,7 @@ static Client::ResultCode convertRestClientRequestResult(
         case RestClient::ResultCode::kUnauthorized: return Client::ResultCode::kUnauthorized;
         case RestClient::ResultCode::kUnspecified: return Client::ResultCode::kUnspecified;
         default:
-            assert(false);
+            NX_ASSERT(false);
             return Client::ResultCode::kUnspecified;
     }
 }
@@ -387,7 +387,7 @@ static RestClient::Request makeRequest(
             httpAccessMethod = RestClient::HttpAccessMethod::kUdp;
             break;
         default:
-            Q_ASSERT(false);
+            NX_ASSERT(false);
             httpAccessMethod = RestClient::HttpAccessMethod::kTcp;
     }
 
@@ -418,7 +418,7 @@ void Client::acceptNewHttpAccessMethod(
             // Nothing to be done.
             return;
         default:
-            Q_ASSERT(false);
+            NX_ASSERT(false);
             return;
     }
 
@@ -611,7 +611,7 @@ void Client::checkAuth(const BaseServerInfoPtr& baseInfo,
 bool Client::parseModuleInformationReply(const QJsonObject &reply
     , BaseServerInfo *baseInfo)
 {
-    assert(baseInfo);
+    NX_ASSERT(baseInfo);
 
     const QStringList &keys = reply.keys();
     for (const auto &key: keys)

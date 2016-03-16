@@ -74,7 +74,7 @@ void QnWorkbenchUpdateWatcher::stop()
 
 void QnWorkbenchUpdateWatcher::at_checker_updateAvailable(const QnUpdateInfo &info)
 {
-    Q_ASSERT_X(!info.currentRelease.isNull(), Q_FUNC_INFO, "Notification must be valid");
+    NX_ASSERT(!info.currentRelease.isNull(), Q_FUNC_INFO, "Notification must be valid");
 
     if (info.currentRelease.isNull())
         return;

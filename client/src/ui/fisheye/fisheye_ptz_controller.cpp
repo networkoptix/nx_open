@@ -57,7 +57,7 @@ qreal QnFisheyePtzController::customAR() const {
 
 QnFisheyePtzController::~QnFisheyePtzController() {
     /* We must be deleted from our thread because of the renderer access below. */
-    assert(thread() == QThread::currentThread());
+    NX_ASSERT(thread() == QThread::currentThread());
 
     if (m_renderer)
         m_renderer->setFisheyeController(0);

@@ -228,13 +228,13 @@ void QnWorkbench::setCurrentLayout(QnWorkbenchLayout *layout) {
 }
 
 QnWorkbenchItem *QnWorkbench::item(Qn::ItemRole role) {
-    Q_ASSERT(role >= 0 && role < Qn::ItemRoleCount);
+    NX_ASSERT(role >= 0 && role < Qn::ItemRoleCount);
 
     return m_itemByRole[role];
 }
 
 void QnWorkbench::setItem(Qn::ItemRole role, QnWorkbenchItem *item) {
-    Q_ASSERT(role >= 0 && role < Qn::ItemRoleCount);
+    NX_ASSERT(role >= 0 && role < Qn::ItemRoleCount);
 
     if(m_itemByRole[role] == item)
         return;

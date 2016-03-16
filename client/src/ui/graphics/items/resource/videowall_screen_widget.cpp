@@ -165,7 +165,7 @@ void QnVideowallScreenWidget::updateLayout(bool force) {
     if (m_items.size() > 1 || (m_items.size() == 1 && partOfScreen(m_items.first().screenSnaps))) {
         foreach (const QnVideoWallItem &item, m_items) {
             QnVideowallItemWidget *itemWidget = createItem(item.uuid);
-            assert(QnScreenSnap::snapsPerScreen() == 2);    //in other case layout should be reimplemented
+            NX_ASSERT(QnScreenSnap::snapsPerScreen() == 2);    //in other case layout should be reimplemented
 
             if (item.screenSnaps.left().snapIndex == 0)
                 m_mainLayout->addAnchor(itemWidget, Qt::AnchorLeft, m_mainLayout, Qt::AnchorLeft);

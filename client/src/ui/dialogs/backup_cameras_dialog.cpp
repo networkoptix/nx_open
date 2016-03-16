@@ -137,7 +137,7 @@ namespace {
 
         bool checkFrame(QWidget* parent)
         {
-            Q_ASSERT_X(parent && parent->layout(), Q_FUNC_INFO, "Invalid delegate frame");
+            NX_ASSERT(parent && parent->layout(), Q_FUNC_INFO, "Invalid delegate frame");
             if (!parent || !parent->layout())
                 return false;
 

@@ -370,7 +370,7 @@ Qt::WindowFrameSection Qn::rotateSection(Qt::WindowFrameSection section, qreal r
                                                           << Qt::BottomLeftSection;
 
     int index = sections.indexOf(section);
-    assert(index >= 0);
+    NX_ASSERT(index >= 0);
     index = (index + n45) % sections.size();
     return sections[index];
 }

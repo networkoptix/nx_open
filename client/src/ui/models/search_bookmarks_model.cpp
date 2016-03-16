@@ -40,7 +40,7 @@ namespace
             case QnSearchBookmarksModel::kCamera:
                 return Qn::BookmarkCameraName;
             default:
-                Q_ASSERT_X(false, Q_FUNC_INFO, "Wrong column");
+                NX_ASSERT(false, Q_FUNC_INFO, "Wrong column");
                 return Qn::BookmarkStartTime;
             }
         }();
@@ -274,7 +274,7 @@ int QnSearchBookmarksModel::sortFieldToColumn(Qn::BookmarkSortField field)
     case Qn::BookmarkCameraName:
         return Column::kCamera;
     default:
-        Q_ASSERT_X(false, Q_FUNC_INFO, "Unhandled field");
+        NX_ASSERT(false, Q_FUNC_INFO, "Unhandled field");
         break;
     }
     return kInvalidSortingColumn;

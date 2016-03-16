@@ -1628,7 +1628,7 @@ bool QnWorkbenchActionHandler::validateResourceName(const QnResourcePtr &resourc
         return true;
 
     /* Resource cannot have both of these flags at once. */
-    Q_ASSERT(checkedFlags == Qn::user || checkedFlags == Qn::videowall);
+    NX_ASSERT(checkedFlags == Qn::user || checkedFlags == Qn::videowall);
 
     foreach (const QnResourcePtr &resource, qnResPool->getResources()) {
         if (!resource->hasFlags(checkedFlags))
@@ -1747,7 +1747,7 @@ void QnWorkbenchActionHandler::at_renameAction_triggered()
     }
     else
     {
-        Q_ASSERT_X(false, Q_FUNC_INFO, "Invalid resource type to rename");
+        NX_ASSERT(false, Q_FUNC_INFO, "Invalid resource type to rename");
     }
 }
 

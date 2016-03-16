@@ -85,7 +85,7 @@ nxcip::AudioFormat AudioStreamReader::getAudioFormat() const
 
 void AudioStreamReader::eventTriggered( Pollable* pollable, aio::EventType eventType ) throw()
 {
-    assert( m_pollable.get() == pollable );
+    NX_ASSERT( m_pollable.get() == pollable );
 
     if( eventType == aio::etRead )
     {

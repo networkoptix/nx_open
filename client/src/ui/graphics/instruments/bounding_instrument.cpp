@@ -254,7 +254,7 @@ public:
     }
 
     void tick(qint64 time) {
-        assert(m_view != NULL);
+        NX_ASSERT(m_view != NULL);
 
         qint64 dtMSec = time - m_lastTickTime;
         qreal dt = dtMSec / 1000.0;
@@ -387,7 +387,7 @@ public:
 
 protected:
     void updateParameters() {
-        assert(m_view != NULL);
+        NX_ASSERT(m_view != NULL);
 
         m_sceneToViewport = m_view->viewportTransform();
         m_viewportToScene = m_sceneToViewport.inverted();
@@ -415,7 +415,7 @@ protected:
     }
 
     void updateSceneRect() {
-        assert(m_view != NULL);
+        NX_ASSERT(m_view != NULL);
 
         QRectF sceneRect = m_positionBounds;
 
@@ -576,7 +576,7 @@ void BoundingInstrument::enabledNotify() {
 bool BoundingInstrument::registeredNotify(QGraphicsView *view) {
     ViewData *&d = m_data[view];
 
-    assert(d == NULL);
+    NX_ASSERT(d == NULL);
 
     d = new ViewData(*m_data[NULL]);
     d->setView(view);
@@ -587,7 +587,7 @@ bool BoundingInstrument::registeredNotify(QGraphicsView *view) {
 void BoundingInstrument::unregisteredNotify(QGraphicsView *view) {
     ViewData *d = m_data.take(view);
     
-    assert(d != NULL);
+    NX_ASSERT(d != NULL);
 
     delete d;
 }

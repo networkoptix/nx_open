@@ -37,8 +37,6 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ResultCode)
 //not using QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES here since it does not support declspec
 void NX_NETWORK_API serialize(const ResultCode&, QString*);
 
-QString NX_NETWORK_API toString(const ResultCode& code);
-
 ResultCode NX_NETWORK_API fromStunErrorToResultCode(
     const nx::stun::attrs::ErrorDescription& errorDescription);
 int NX_NETWORK_API resultCodeToStunErrorCode(ResultCode resultCode);

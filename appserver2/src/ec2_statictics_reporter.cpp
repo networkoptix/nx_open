@@ -40,7 +40,7 @@ namespace ec2
         , m_timerDisabled(false)
         , m_timerId(boost::none)
     {
-        Q_ASSERT(MAX_DELAY_RATIO <= 100);
+        NX_ASSERT(MAX_DELAY_RATIO <= 100);
         setupTimer();
     }
 
@@ -155,7 +155,7 @@ namespace ec2
     {
         {   /* Security check */
             const auto admin = qnResPool->getAdministrator();
-            Q_ASSERT_X(admin, Q_FUNC_INFO, "Administrator must exist here");
+            NX_ASSERT(admin, Q_FUNC_INFO, "Administrator must exist here");
             if (!admin)
                 return;
         }

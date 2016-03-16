@@ -57,7 +57,7 @@ void QnClientConnectionStatus::setState(QnConnectionState state) {
 
 void QnClientConnectionStatus::warn(const QString &message) const {
 #ifdef STRICT_STATE_CONTROL
-    Q_ASSERT_X(false, Q_FUNC_INFO, message.toUtf8());
+    NX_ASSERT(false, Q_FUNC_INFO, message.toUtf8());
 #else
     qWarning() << message;
 #endif

@@ -1512,7 +1512,7 @@ QnMediaResourceWidget::ResourceStates QnMediaResourceWidget::getResourceStates()
 }
 
 void QnMediaResourceWidget::updateIoModuleVisibility(bool animate) {
-    Q_ASSERT_X(m_camera && m_camera->hasFlags(Qn::io_module) && m_ioLicenceStatusHelper
+    NX_ASSERT(m_camera && m_camera->hasFlags(Qn::io_module) && m_ioLicenceStatusHelper
         , Q_FUNC_INFO, "updateIoModuleVisibility should be called only for I/O modules");
 
     if (!m_camera || !m_camera->hasFlags(Qn::io_module) || !m_ioLicenceStatusHelper)
@@ -1550,7 +1550,7 @@ void QnMediaResourceWidget::updateOverlayButton() {
             }
         } else if (overlay == Qn::IoModuleDisabledOverlay) {
 
-            Q_ASSERT_X(m_ioLicenceStatusHelper, Q_FUNC_INFO, "Query I/O status overlay for resource widget which is not containing I/O module");
+            NX_ASSERT(m_ioLicenceStatusHelper, Q_FUNC_INFO, "Query I/O status overlay for resource widget which is not containing I/O module");
 
             if (!m_ioLicenceStatusHelper)
                 return;
@@ -1577,7 +1577,7 @@ void QnMediaResourceWidget::at_statusOverlayWidget_diagnosticsRequested() {
 }
 
 void QnMediaResourceWidget::at_statusOverlayWidget_ioEnableRequested() {
-    Q_ASSERT_X(m_ioLicenceStatusHelper, Q_FUNC_INFO
+    NX_ASSERT(m_ioLicenceStatusHelper, Q_FUNC_INFO
         , "at_statusOverlayWidget_ioEnableRequested could not be processed for non-I/O modules");
 
     if (!m_ioLicenceStatusHelper)

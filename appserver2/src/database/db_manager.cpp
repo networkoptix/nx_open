@@ -92,7 +92,7 @@ void assertSorted(std::vector<T> &data, QnUuid Field::*idField) {
     QByteArray prev = (data[0].*idField).toRfc4122();
     for (size_t i = 1; i < data.size(); ++i) {
         QByteArray next = (data[i].*idField).toRfc4122();
-        assert(next >= prev);
+        NX_ASSERT(next >= prev);
         prev = next;
     }
 #else
@@ -115,7 +115,7 @@ void mergeIdListData(QSqlQuery& query, std::vector<MainData>& data, std::vector<
     QSqlRecord rec = query.record();
     int idIdx = rec.indexOf("id");
     int parentIdIdx = rec.indexOf("parentId");
-    assert(idIdx >=0 && parentIdIdx >= 0);
+    NX_ASSERT(idIdx >=0 && parentIdIdx >= 0);
 
     bool eof = true;
     QnUuid id, parentId;
@@ -126,7 +126,7 @@ void mergeIdListData(QSqlQuery& query, std::vector<MainData>& data, std::vector<
         if (eof)
             return;
         idRfc = query.value(idIdx).toByteArray();
-        assert(idRfc == id.toRfc4122() || idRfc > id.toRfc4122());
+        NX_ASSERT(idRfc == id.toRfc4122() || idRfc > id.toRfc4122());
         id = QnUuid::fromRfc4122(idRfc);
         parentId = QnUuid::fromRfc4122(query.value(parentIdIdx).toByteArray());
     };
@@ -260,7 +260,7 @@ QnUuid QnDbManager::getType(const QString& typeName)
     query.bindValue(0, typeName);
     if( !query.exec() )
     {
-        Q_ASSERT(false);
+        NX_ASSERT(false);
     }
     if (query.next())
         return QnUuid::fromRfc4122(query.value("guid").toByteArray());
@@ -484,7 +484,7 @@ bool QnDbManager::init(const QUrl& dbUrl)
     queryAdminUser.prepare( "SELECT r.guid, r.id FROM vms_resource r JOIN auth_user u on u.id = r.id and r.name = 'admin'" ); //TODO: #GDM check owner permission instead
     if( !queryAdminUser.exec() )
     {
-        Q_ASSERT( false );
+        NX_ASSERT( false );
     }
     if( queryAdminUser.next() )
     {
@@ -499,7 +499,7 @@ bool QnDbManager::init(const QUrl& dbUrl)
     if( !queryServers.exec() )
     {
         qWarning() << Q_FUNC_INFO << __LINE__ << queryServers.lastError();
-        Q_ASSERT( false );
+        NX_ASSERT( false );
         return false;
     }
 
@@ -668,7 +668,7 @@ bool QnDbManager::init(const QUrl& dbUrl)
         queryCameras.bindValue(1, qnCommon->moduleGUID().toRfc4122());
     if (!queryCameras.exec()) {
         qWarning() << Q_FUNC_INFO << __LINE__ << queryCameras.lastError();
-        Q_ASSERT( 0 );
+        NX_ASSERT( 0 );
         return false;
     }
     while( queryCameras.next() )
@@ -1664,7 +1664,7 @@ ErrorCode QnDbManager::insertOrReplaceResource(const ApiResourceData& data, qint
 {
     *internalId = getResourceInternalId(data.id);
 
-    //Q_ASSERT_X(data.status == Qn::NotDefined, Q_FUNC_INFO, "Status MUST be unchanged for resource modification. Use setStatus instead to modify it!");
+    //NX_ASSERT(data.status == Qn::NotDefined, Q_FUNC_INFO, "Status MUST be unchanged for resource modification. Use setStatus instead to modify it!");
 
     QSqlQuery query(m_sdb);
     if (*internalId) {
@@ -2469,7 +2469,7 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiServerF
     if (tran.command == ApiCommand::addCameraHistoryItem)
         return addCameraHistory(tran.params);
     else {
-        Q_ASSERT(1);
+        NX_ASSERT(1);
         return ErrorCode::unsupported;
     }
 }
@@ -2615,13 +2615,13 @@ ErrorCode QnDbManager::removeLayoutInternal(const QnUuid& id, const qint32 &inte
 }
 
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiStoredFileData>& tran) {
-    assert( tran.command == ApiCommand::addStoredFile || tran.command == ApiCommand::updateStoredFile );
+    NX_ASSERT( tran.command == ApiCommand::addStoredFile || tran.command == ApiCommand::updateStoredFile );
     return insertOrReplaceStoredFile(tran.params.path, tran.params.data);
 }
 
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiStoredFilePath>& tran)
 {
-    assert(tran.command == ApiCommand::removeStoredFile);
+    NX_ASSERT(tran.command == ApiCommand::removeStoredFile);
 
     QSqlQuery query(m_sdb);
     query.prepare("DELETE FROM vms_storedFiles WHERE path = :path");
@@ -2706,7 +2706,7 @@ ApiOjectType QnDbManager::getObjectTypeNoLock(const QnUuid& objectId)
         return ApiObject_WebPage;
     else
     {
-        Q_ASSERT_X(0, "Unknown object type", Q_FUNC_INFO);
+        NX_ASSERT(0, "Unknown object type", Q_FUNC_INFO);
         return ApiObject_NotDefined;
     }
 }
@@ -2734,7 +2734,7 @@ ApiObjectInfoList QnDbManager::getNestedObjectsNoLock(const ApiObjectInfo& paren
             query.bindValue(":objType", (int)ApiObject_Layout);
             break;
         default:
-            //Q_ASSERT_X(0, "Not implemented!", Q_FUNC_INFO);
+            //NX_ASSERT(0, "Not implemented!", Q_FUNC_INFO);
             return result;
     }
     query.bindValue(":guid", parentObject.id.toRfc4122());
@@ -2766,7 +2766,7 @@ ApiObjectInfoList QnDbManager::getObjectsNoLock(const ApiOjectType& objectType)
         query.prepare("SELECT guid from vms_businessrule");
         break;
     default:
-        Q_ASSERT_X(0, "Not implemented!", Q_FUNC_INFO);
+        NX_ASSERT(0, "Not implemented!", Q_FUNC_INFO);
         return result;
     }
     if (!query.exec()) {
@@ -2889,7 +2889,7 @@ ErrorCode QnDbManager::removeObject(const ApiObjectInfo& apiObject)
         break;
     default:
         qWarning() << "Remove operation is not implemented for object type" << apiObject.type;
-        Q_ASSERT_X(0, "Remove operation is not implemented for command", Q_FUNC_INFO);
+        NX_ASSERT(0, "Remove operation is not implemented for command", Q_FUNC_INFO);
         return ErrorCode::unsupported;
     }
 
@@ -2915,7 +2915,7 @@ void QnDbManager::loadResourceTypeXML(const QString& fileName, ApiResourceTypeDa
     QXmlInputSource xmlSrc( &xmlData );
     if(!reader.parse( &xmlSrc )) {
         qWarning() << "Can't parse XML file " << fileName << "with additional resource types. Check XML file syntax.";
-        Q_ASSERT_X(0, Q_FUNC_INFO, "Can't parse XML file");
+        NX_ASSERT(0, Q_FUNC_INFO, "Can't parse XML file");
     }
 }
 
@@ -3864,7 +3864,7 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiLicense
     else if (tran.command == ApiCommand::removeLicense)
         return removeLicense(tran.params);
     else {
-        Q_ASSERT_X(1, Q_FUNC_INFO, "Unexpected command!");
+        NX_ASSERT(1, Q_FUNC_INFO, "Unexpected command!");
         return ErrorCode::notImplemented;
     }
 }

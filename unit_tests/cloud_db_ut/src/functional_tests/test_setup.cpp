@@ -172,7 +172,7 @@ api::ResultCode CdbFunctionalTest::addAccount(
         *password = ss.str();
     }
 
-    assert(!moduleInfo().realm.empty());
+    NX_ASSERT(!moduleInfo().realm.empty());
 
     if (accountData->fullName.empty())
         accountData->fullName = "Account " + accountData->email + " full name";

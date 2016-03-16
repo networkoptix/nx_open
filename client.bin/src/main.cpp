@@ -278,12 +278,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     PluginManager pluginManager;
 
-    auto enforceSocketType = startupParams.enforceSocketType.toLower();
-    if( enforceSocketType == lit("tcp") )
-        SocketFactory::enforceStreamSocketType( SocketFactory::SocketType::Tcp );
-    else
-    if( enforceSocketType == lit("udt") )
-        SocketFactory::enforceStreamSocketType( SocketFactory::SocketType::Udt );
+    if (!startupParams.enforceSocketType.isEmpty())
+        SocketFactory::enforceStreamSocketType(startupParams.enforceSocketType);
 
     if (!startupParams.enforceMediatorEndpoint.isEmpty())
         nx::network::SocketGlobals::mediatorConnector().mockupAddress(
@@ -600,7 +596,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         /* Set authentication parameters from command line. */
         QUrl appServerUrl = QUrl::fromUserInput(startupParams.authenticationString);
         if (!startupParams.videoWallGuid.isNull()) {
-            Q_ASSERT(appServerUrl.isValid());
+            NX_ASSERT(appServerUrl.isValid());
             if (!appServerUrl.isValid()) {
                 return -1;
             }
@@ -614,7 +610,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
                              .withArgument(Qn::VideoWallGuidRole, startupParams.videoWallGuid)
                              .withArgument(Qn::VideoWallItemGuidRole, startupParams.videoWallItemGuid));
     } else if(!startupParams.delayedDrop.isEmpty()) { /* Drop resources if needed. */
-        Q_ASSERT(startupParams.instantDrop.isEmpty());
+        NX_ASSERT(startupParams.instantDrop.isEmpty());
 
         QByteArray data = QByteArray::fromBase64(startupParams.delayedDrop.toLatin1());
         context->menu()->trigger(QnActions::DelayedDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedDataRole, data));

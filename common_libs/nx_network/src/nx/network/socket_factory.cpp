@@ -26,11 +26,7 @@ static std::unique_ptr< AbstractStreamSocket > streamSocket(
 {
     switch( socketType )
     {
-        case SocketFactory::SocketType::Default:
-            //TODO: #mux NattStreamSocket when it's ready
-            // fall into TCP for now
-
-        case SocketFactory::SocketType::Tcp:
+        case SocketFactory::SocketType::cloud:
             switch( nttType )
             {
                 case SocketFactory::NatTraversalType::nttAuto:
@@ -44,7 +40,21 @@ static std::unique_ptr< AbstractStreamSocket > streamSocket(
                     return nullptr;
             }
 
-        case SocketFactory::SocketType::Udt:
+        case SocketFactory::SocketType::tcp:
+            switch( nttType )
+            {
+                case SocketFactory::NatTraversalType::nttAuto:
+                case SocketFactory::NatTraversalType::nttEnabled:
+                    return std::make_unique< TCPSocket >( true );
+
+                case SocketFactory::NatTraversalType::nttDisabled:
+                    return std::make_unique< TCPSocket >( false );
+
+                default:
+                    return nullptr;
+            }
+
+        case SocketFactory::SocketType::udt:
             switch( nttType )
             {
                 case SocketFactory::NatTraversalType::nttAuto:
@@ -92,14 +102,14 @@ static std::unique_ptr< AbstractStreamServerSocket > streamServerSocket(
     static_cast< void >( nttType );
     switch( socketType )
     {
-        case SocketFactory::SocketType::Default:
-            //TODO: #mux NattStreamSocket when it's ready
-            // fall into TCP for now
+        case SocketFactory::SocketType::cloud:
+            // TODO #mux: uncomment when works properly
+            // return std::make_unique< cloud::CloudServerSocket >();
 
-        case SocketFactory::SocketType::Tcp:
+        case SocketFactory::SocketType::tcp:
             return std::make_unique< TCPServerSocket >();
 
-        case SocketFactory::SocketType::Udt:
+        case SocketFactory::SocketType::udt:
             return std::make_unique< UdtStreamServerSocket >();
 
         default:
@@ -125,24 +135,45 @@ std::unique_ptr< AbstractStreamServerSocket > SocketFactory::createStreamServerS
     return std::move( result );
 }
 
-void SocketFactory::enforceStreamSocketType( SocketType type )
+
+QString SocketFactory::toString( SocketType type )
 {
-    QString typeStr;
-    switch (type)
+    switch ( type )
     {
-        case SocketType::Default:   typeStr = lit( "Default" ); break;
-        case SocketType::Tcp:       typeStr = lit( "TCP" );     break;
-        case SocketType::Udt:       typeStr = lit( "UDT" );     break;
+        case SocketType::cloud: return lit( "cloud" );
+        case SocketType::tcp: return lit( "tcp" );
+        case SocketType::udt: return lit( "udt" );
     }
 
+    NX_ASSERT( false, lm("Unrecognized socket type: ").arg(static_cast<int>(type)) );
+    return QString();
+}
+
+SocketFactory::SocketType SocketFactory::stringToSocketType( QString type )
+{
+    if( type.toLower() == lit("cloud") ) return SocketType::cloud;
+    if( type.toLower() == lit("tcp") ) return SocketType::tcp;
+    if( type.toLower() == lit("udt") ) return SocketType::udt;
+
+    NX_ASSERT( false, lm("Unrecognized socket type: ").arg(type) );
+    return SocketType::cloud;
+}
+
+void SocketFactory::enforceStreamSocketType( SocketType type )
+{
     s_enforcedStreamSocketType = type;
     qWarning() << ">>> SocketFactory::enforceStreamSocketType("
-               << typeStr << ") <<<";
+               << toString( type ) << ") <<<";
+}
+
+void SocketFactory::enforceStreamSocketType( QString type )
+{
+    enforceStreamSocketType( stringToSocketType( type ) );
 }
 
 bool SocketFactory::isStreamSocketTypeEnforced()
 {
-    return s_enforcedStreamSocketType != SocketType::Default;
+    return s_enforcedStreamSocketType != SocketType::cloud;
 }
 
 SocketFactory::CreateStreamSocketFuncType 
@@ -163,6 +194,7 @@ SocketFactory::CreateStreamServerSocketFuncType
     return bak;
 }
 
+// TODO: Change to Cloud when avaliable
 std::atomic< SocketFactory::SocketType >
     SocketFactory::s_enforcedStreamSocketType(
-        SocketFactory::SocketType::Default );
+        SocketFactory::SocketType::tcp );

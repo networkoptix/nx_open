@@ -10,13 +10,13 @@ namespace ec2
 
     void QnWebPageNotificationManager::triggerNotification(const QnTransaction<ApiWebPageData> &tran)
     {
-        assert(tran.command == ApiCommand::saveWebPage);
+        NX_ASSERT(tran.command == ApiCommand::saveWebPage);
         emit addedOrUpdated(tran.params);
     }
 
     void QnWebPageNotificationManager::triggerNotification(const QnTransaction<ApiIdData> &tran)
     {
-        assert(tran.command == ApiCommand::removeWebPage );
+        NX_ASSERT(tran.command == ApiCommand::removeWebPage );
         emit removed( QnUuid(tran.params.id) );
     }
 

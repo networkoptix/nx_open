@@ -109,7 +109,7 @@ int QnTimelineZoomLevel::tickCount(qint64 start, qint64 end) const {
     case Years:
         return qMax((endDate.year() - startDate.year()) / static_cast<int>(interval), 1);
     default:
-        Q_ASSERT(0);
+        NX_ASSERT(0);
     }
     return 0;
 }

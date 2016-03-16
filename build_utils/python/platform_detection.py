@@ -35,3 +35,19 @@ def detect_arch():
 
 def detect_target():
     return detect_platform() + "-" + detect_arch()
+
+def get_platform_for_target(target):
+    if target.startswith("windows"):
+        return "windows"
+    elif target.startswith("linux"):
+        return "linux"
+    elif target.startswith("macos"):
+        return "macos"
+    elif target in [ "rpi", "bpi", "isd", "isd_s2" ]:
+        return "linux"
+    elif target.startswith("android"):
+        return "android"
+    elif target == "ios":
+        return "ios"
+    else:
+        return None

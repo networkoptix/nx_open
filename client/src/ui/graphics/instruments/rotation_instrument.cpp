@@ -243,7 +243,7 @@ void RotationInstrument::setRotationItemZValue(qreal rotationItemZValue) {
 }
 
 void RotationInstrument::installedNotify() {
-    assert(rotationItem() == NULL);
+    NX_ASSERT(rotationItem() == NULL);
 
     m_rotationItem = new RotationItem();
     rotationItem()->setParent(this); /* Just to feel totally safe. Note that this is a parent in QObject sense. */

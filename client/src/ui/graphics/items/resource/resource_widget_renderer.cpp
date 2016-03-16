@@ -16,7 +16,7 @@ QnResourceWidgetRenderer::QnResourceWidgetRenderer(QObject* parent, QGLContext* 
     m_screenshotInterface(0),
     m_panoFactor(1)
 {
-    Q_ASSERT( context != NULL );
+    NX_ASSERT( context != NULL );
 
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
         m_displayRect[i] = QRectF(0, 0, 1, 1);
@@ -46,7 +46,7 @@ void QnResourceWidgetRenderer::setChannelCount(int channelCount)
     if( !channelCount )
         return;
 
-    Q_ASSERT( m_glContext != NULL );
+    NX_ASSERT( m_glContext != NULL );
     m_glContext->makeCurrent();
 
     for (int i = channelCount; (uint)i < m_channelRenderers.size(); ++i)
