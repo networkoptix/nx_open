@@ -376,6 +376,7 @@ void QnCommonMessageProcessor::resetResources(const ec2::ApiFullInfoData& fullDa
     for (const QnResourcePtr &resource: qnResPool->getResourcesWithFlag(Qn::remote))
         remoteResources.insert(resource->getId(), resource);
 
+    /* //TODO: #GDM #c++14 re-enable when generic lambdas will be supported
     auto updateResources = [this, &remoteResources](const auto& source)
     {
         for (const auto& resource : source)
@@ -384,9 +385,13 @@ void QnCommonMessageProcessor::resetResources(const ec2::ApiFullInfoData& fullDa
             remoteResources.remove(resource.id);
         }
     };
+    */
+
+#define updateResources(source) { for (const auto& resource : source) { updateResource(resource); remoteResources.remove(resource.id); } }
 
     /* Packet adding. */
     qnResPool->beginTran();
+
     updateResources(fullData.users);
     updateResources(fullData.cameras);
     updateResources(fullData.layouts);
@@ -396,6 +401,8 @@ void QnCommonMessageProcessor::resetResources(const ec2::ApiFullInfoData& fullDa
     updateResources(fullData.storages);
 
     qnResPool->commit();
+
+#undef updateResources
 
     /* Remove absent resources. */
     for (const QnResourcePtr& resource: remoteResources)
