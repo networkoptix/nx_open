@@ -1,7 +1,8 @@
 #ifndef QN_LINUX_MONITOR_H
 #define QN_LINUX_MONITOR_H
 
-#include <future>
+#include <QFuture>
+#include <QtConcurrent>
 #include <boost/optional.hpp>
 #include "sigar_monitor.h"
 #include <utils/common/systemerror.h>
@@ -17,7 +18,8 @@ class QnLinuxMonitor: public QnSigarMonitor {
     {
         bool started;
         QnMutex mutex;
-        std::future<void> done;
+        QnMutex syncMutex;
+        QFuture<void> done;
         QList<PartitionSpace> info;
         PartitionsFutureInfo() : started(false) {}
     };

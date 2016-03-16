@@ -375,6 +375,8 @@ int QnTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnBy
         m_firstTime = media->timestamp;
 
     bool doTranscoding = true;
+    static const size_t kMaxDelayedQueueSize = 30;
+
     if (!m_initialized)
     {
         if (media->dataType == QnAbstractMediaData::VIDEO)
@@ -382,10 +384,16 @@ int QnTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnBy
         else
             m_delayedAudioQueue << std::dynamic_pointer_cast<const QnCompressedAudioData> (media);
         doTranscoding = false;
-        if (m_videoCodec != CODEC_ID_NONE && m_delayedVideoQueue.isEmpty())
+        if (m_videoCodec != CODEC_ID_NONE && m_delayedVideoQueue.isEmpty()
+                                          && m_delayedAudioQueue.size() < kMaxDelayedQueueSize)
+        {
             return 0; // not ready to init
-        if (m_audioCodec != CODEC_ID_NONE && m_delayedAudioQueue.isEmpty())
+        }
+        if (m_audioCodec != CODEC_ID_NONE && m_delayedAudioQueue.isEmpty()
+                                          && m_delayedVideoQueue.size() < kMaxDelayedQueueSize)
+        {
             return 0; // not ready to init
+        }
         int rez = open(m_delayedVideoQueue.isEmpty() ? QnConstCompressedVideoDataPtr() : m_delayedVideoQueue.first(), 
                        m_delayedAudioQueue.isEmpty() ? QnConstCompressedAudioDataPtr() : m_delayedAudioQueue.first());
         if (rez != 0)
