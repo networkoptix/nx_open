@@ -29,6 +29,14 @@ CloudUserAuthenticator::CloudUserAuthenticator(
     m_cdbNonceFetcher(cdbNonceFetcher)
 {
     m_monotonicClock.restart();
+    Qn::directConnect(
+        CloudConnectionManager::instance(), &CloudConnectionManager::cloudBindingStatusChanged,
+        this, &CloudUserAuthenticator::cloudBindingStatusChanged);
+}
+
+CloudUserAuthenticator::~CloudUserAuthenticator()
+{
+    directDisconnectAll();
 }
 
 QnResourcePtr CloudUserAuthenticator::findResByName(const QByteArray& nxUserName) const
@@ -133,6 +141,12 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorize(
         responseHeaders,
         method,
         authorizationHeader);
+}
+
+void CloudUserAuthenticator::clear()
+{
+    QnMutexLocker lk(&m_mutex);
+    m_authorizationCache.clear();
 }
 
 bool CloudUserAuthenticator::isValidCloudUserName(const nx_http::StringType& userName) const
@@ -299,4 +313,9 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorizeWithC
     {
         return std::make_tuple(Qn::Auth_WrongPassword, std::move(localUser));
     }
+}
+
+void CloudUserAuthenticator::cloudBindingStatusChanged(bool bindedToCloud)
+{
+    clear();
 }

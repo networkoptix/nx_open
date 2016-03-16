@@ -17,6 +17,7 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
+#include <utils/common/safe_direct_connection.h>
 
 #include "abstract_user_data_provider.h"
 
@@ -26,7 +27,8 @@ class CdbNonceFetcher;
 //!Add support for authentication using cloud account credentials
 class CloudUserAuthenticator
 :
-    public AbstractUserDataProvider
+    public AbstractUserDataProvider,
+    public Qn::EnableSafeDirectConnection
 {
 public:
     /*!
@@ -35,6 +37,7 @@ public:
     CloudUserAuthenticator(
         std::unique_ptr<AbstractUserDataProvider> defaultAuthenticator,
         const CdbNonceFetcher& cdbNonceFetcher);
+    ~CloudUserAuthenticator();
 
     virtual QnResourcePtr findResByName(const QByteArray& nxUserName) const override;
     virtual Qn::AuthResult authorize(
@@ -46,6 +49,8 @@ public:
         const nx_http::Method::ValueType& method,
         const nx_http::header::Authorization& authorizationHeader,
         nx_http::HttpHeaders* const responseHeaders) override;
+
+    void clear();
 
 private:
     struct CloudAuthenticationData
@@ -91,6 +96,9 @@ private:
         nx_http::HttpHeaders* const responseHeaders,
         const nx_http::Method::ValueType& method,
         const nx_http::header::Authorization& authorizationHeader) const;
+
+private slots:
+    void cloudBindingStatusChanged(bool bindedToCloud);
 };
 
 #endif  //NX_MS_CLOUD_USER_AUTHENTICATOR_H
