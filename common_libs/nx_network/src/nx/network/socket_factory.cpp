@@ -26,8 +26,8 @@ static std::unique_ptr< AbstractStreamSocket > defaultStreamSocketFactoryFunc(
             {
                 case SocketFactory::NatTraversalType::nttAuto:
                 case SocketFactory::NatTraversalType::nttEnabled:
-                    return std::make_unique< TCPSocket >(false);
-                    //return std::make_unique< cloud::CloudStreamSocket >();
+                    //return std::make_unique< TCPSocket >(false);
+                    return std::make_unique< cloud::CloudStreamSocket >();
 
                 case SocketFactory::NatTraversalType::nttDisabled:
                     return std::make_unique< TCPSocket >( false );
