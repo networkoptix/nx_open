@@ -17,7 +17,7 @@ class QnDesktopCameraDataConsumer: public QnAbstractDataConsumer
 {
 public:
     QnDesktopCameraDataConsumer(QnDesktopCameraConnectionProcessor* owner):
-        QnAbstractDataConsumer(20), 
+        QnAbstractDataConsumer(20),
         m_sequence(0),
         m_owner(owner)
     {
@@ -63,8 +63,8 @@ protected:
             AVRational time_base = {1, (int) m_serializers[streamIndex].getFrequency() };
             qint64 packetTime = av_rescale_q(packet->timestamp, r, time_base);
 
-            QnRtspEncoder::buildRTPHeader(sendBuffer.data(), m_serializers[streamIndex].getSSRC(), m_serializers[streamIndex].getRtpMarker(), 
-                           packetTime, m_serializers[streamIndex].getPayloadtype(), m_sequence++); 
+            QnRtspEncoder::buildRTPHeader(sendBuffer.data(), m_serializers[streamIndex].getSSRC(), m_serializers[streamIndex].getRtpMarker(),
+                           packetTime, m_serializers[streamIndex].getPayloadtype(), m_sequence++);
             m_owner->sendData(sendBuffer);
             sendBuffer.clear();
         }

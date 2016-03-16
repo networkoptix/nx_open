@@ -129,7 +129,7 @@ void HttpClient::Impl::sendPost(const QUrl &url
 
 void HttpClient::Impl::setupTimeout(QNetworkReply *reply, qint64 timeoutMs) 
 {
-    NX_ASSERT(timeoutMs > 0);
+    Q_ASSERT(timeoutMs > 0);
     if (timeoutMs <= 0)
         return; //< No timeout - wait forever.
 

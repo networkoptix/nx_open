@@ -103,11 +103,18 @@ void QnWorkbenchWelcomeScreen::setEnabled(bool isEnabled)
     emit enabledChanged();
 }
 
+#include <ui/workbench/handlers/workbench_connect_handler.h>
+
 void QnWorkbenchWelcomeScreen::connectToServer(const QString &serverUrl
     , const QString &userName
     , const QString &password)
 {
-    // TODO: implement me
+    const auto connectHandler = context()->instance<QnWorkbenchConnectHandler>();
+    QUrl url = QUrl::fromUserInput(serverUrl);
+    url.setScheme(lit("http"));
+    url.setPassword(password);
+    url.setUserName(userName);
+    connectHandler->connectToServer(url);
 }
 
 void QnWorkbenchWelcomeScreen::connectToAnotherSystem()

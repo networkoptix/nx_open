@@ -155,6 +155,12 @@ void QnSystemDescription::setPrimaryAddress(const QnUuid &serverId
     if (!containsServer)
         return;
 
+    const auto it = m_primaryAddresses.find(serverId);
+    const bool changed = ((it == m_primaryAddresses.end())
+        || (it.value() != address));
+
+    if (!changed)
+        return;
     m_primaryAddresses[serverId] = address;
     emit serverChanged(serverId, QnServerField::PrimaryAddressField);
 }

@@ -3,9 +3,7 @@ function(get_package_version package result)
 endfunction()
 
 function(get_external_dependencies)
-    set(target "linux-x64")
-
-    set(args --target ${target}
+    set(args --target ${TARGET_TYPE}
              --target-dir ${CMAKE_BINARY_DIR}/target
              --deps-file cmake)
     if(NOT CMAKE_BUILD_TYPE MATCHES Release)
