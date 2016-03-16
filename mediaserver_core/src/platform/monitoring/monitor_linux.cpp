@@ -574,7 +574,9 @@ static QList<QnPlatformMonitor::PartitionSpace> readPartitionsAndSizes()
 
 QList<QnPlatformMonitor::PartitionSpace> QnLinuxMonitor::totalPartitionSpaceInfo()
 {
-    const std::chrono::milliseconds waitTimeout(100);
+    std::chrono::milliseconds waitTimeout = m_partitionsInfo.started ?
+                                            std::chrono::milliseconds(200) :
+                                            std::chrono::milliseconds(2000);
 
     if (!m_partitionsInfo.started || m_partitionsInfo.done.wait_for(waitTimeout) == std::future_status::ready)
     {
