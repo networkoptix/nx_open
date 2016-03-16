@@ -3,6 +3,8 @@
 
 #include <core/resource/resource_fwd.h>
 #include <utils/common/request_param.h>
+#include <utils/common/model_functions_fwd.h>
+#include <utils/fusion/fusion_fwd.h>
 
 // TODO: #Elric this belongs together with server_settings
 
@@ -59,6 +61,13 @@ struct PasswordData
     QByteArray cryptSha512Hash;
     QString oldPassword;
 };
+
+#define PasswordData_Fields (password)(realm)(passwordHash)(passwordDigest)(cryptSha512Hash)(oldPassword)
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (PasswordData),
+    (json));
+
 
 bool changeAdminPassword(PasswordData data);
 bool validatePasswordData(const PasswordData& passwordData, QString* errStr);

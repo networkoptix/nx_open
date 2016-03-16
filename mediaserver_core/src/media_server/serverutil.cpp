@@ -26,6 +26,7 @@
 #include <core/resource/user_resource.h>
 #include <server/host_system_password_synchronizer.h>
 
+#include <utils/common/model_functions.h>
 
 namespace
 {
@@ -80,6 +81,12 @@ QString getDataDirectory()
     return dataDirList.isEmpty() ? QString() : dataDirList[0];
 #endif
 }
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (PasswordData),
+    (json),
+    _Fields,
+    (optional, true));
 
 PasswordData::PasswordData(const QnRequestParams &params)
 {
