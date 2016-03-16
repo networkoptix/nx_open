@@ -7,6 +7,7 @@
 
 #include <nx/network/cloud/cloud_server_socket.h>
 #include <nx/network/cloud/cloud_stream_socket.h>
+#include <nx/network/http/httpclient.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/test_support/socket_test_helper.h>
 
@@ -14,9 +15,10 @@
 #include <utils/common/string.h>
 
 
-void printHelp();
+void printHelp(int argc, char* argv[]);
 int runInListenMode(const std::multimap<QString, QString>& args);
 int runInConnectMode(const std::multimap<QString, QString>& args);
+int runInHttpClientMode(const std::multimap<QString, QString>& args);
 
 int main(int argc, char* argv[])
 {
@@ -24,7 +26,7 @@ int main(int argc, char* argv[])
     parseCmdArgs(argc, argv, &args);
     if (args.find("help") != args.end())
     {
-        printHelp();
+        printHelp(argc, argv);
         return 0;
     }
 
@@ -37,8 +39,11 @@ int main(int argc, char* argv[])
     if (args.find("connect") != args.end())
         return runInConnectMode(args);
 
+    if (args.find("http-client") != args.end())
+        return runInHttpClientMode(args);
+
     std::cerr<<"error. Unknown mode"<<std::endl;
-    printHelp();
+    printHelp(argc, argv);
 
     return 0;
 }
@@ -162,7 +167,32 @@ int runInConnectMode(const std::multimap<QString, QString>& args)
     return 0;
 }
 
-void printHelp()
+int runInHttpClientMode(const std::multimap<QString, QString>& args)
+{
+    QString urlStr;
+    if (!readArg(args, "url", &urlStr))
+    {
+        std::cerr << "error. Required parameter \"url\" is missing" << std::endl;
+        return 1;
+    }
+
+    nx::network::SocketGlobals::mediatorConnector().enable(true);
+
+    nx_http::HttpClient client;
+    if (!client.doGet(urlStr) || !client.response())
+    {
+        std::cerr<<"No response has been received"<<std::endl;
+        return 1;
+    }
+
+    std::cout<<"Received response:\n\n"
+        << client.response()->toString().toStdString()
+        <<"\n";
+
+    return 0;
+}
+
+void printHelp(int argc, char* argv[])
 {
     std::cout << 
         "\n"
@@ -180,6 +210,10 @@ void printHelp()
         "  --max-concurrent-connections={10}\n"
         "  --bytes-to-send={100000}         This number of bytes is sent to the target\n"
         "                                   before connection termination\n"
+        "\n"
+        "Http client mode:\n"
+        "  --http-client                    Enable Http client mode\n"
+        "  --url={http url}                 Url to trigger\n"
         "\n"
         << std::endl;
 }
