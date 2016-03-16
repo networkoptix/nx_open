@@ -28,7 +28,23 @@ struct QnInterfaceAndAddr
     QHostAddress address;
     QHostAddress netMask;
     QNetworkInterface netIf;
+
+
 };
+
+inline bool operator ==(const QnInterfaceAndAddr& lhs, const QnInterfaceAndAddr& rhs)
+{
+    return  lhs.name == rhs.name
+        && lhs.address == rhs.address
+        && lhs.netMask == rhs.netMask;
+}
+
+inline uint qHash(const QnInterfaceAndAddr& iface, uint seed=0)
+{
+    return  qHash(iface.name, seed^0xa03f)
+        + qHash(iface.address, seed^0x17a317a3)
+        + qHash(iface.netMask, seed^0x17a317a3);
+}
 
 QN_EXPORT QString MACToString(const unsigned char *mac);
 

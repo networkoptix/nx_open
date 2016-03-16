@@ -258,10 +258,8 @@ void QnPlISDResourceSearcher::processPacket(
     if (!devInfo.manufacturer.toUpper().startsWith(manufacture()))
         return;
 
-
-
     QnMacAddress cameraMAC(devInfo.serialNumber);
-    QnNetworkResourcePtr existingRes = qnResPool->getNetResourceByPhysicalId( lit("ISD_") + devInfo.serialNumber );
+    QnNetworkResourcePtr existingRes = qnResPool->getResourceByMacAddress( devInfo.serialNumber );
     QAuthenticator cameraAuth;
     cameraAuth.setUser(DEFAULT_ISD_USERNAME);
     cameraAuth.setPassword(DEFAULT_ISD_PASSWORD);
@@ -300,7 +298,6 @@ void QnPlISDResourceSearcher::createResource(
     resource->setModel(devInfo.modelName);
     resource->setUrl(devInfo.presentationUrl);
     resource->setMAC(mac);
-    resource->setPhysicalId( lit("ISD_") + devInfo.serialNumber );
 
     if (!auth.isNull()) {
         resource->setDefaultAuth(auth);

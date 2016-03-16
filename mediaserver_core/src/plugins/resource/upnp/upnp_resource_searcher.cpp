@@ -42,7 +42,8 @@ AbstractDatagramSocket* QnUpnpResourceSearcher::sockByName(const QnInterfaceAndA
         udpSock->setReuseAddrFlag(true);
         udpSock->setRecvBufferSize(1024*1024);
         udpSock->bind( SocketAddress( HostAddress::anyHost, GROUP_PORT ) );
-        udpSock->joinGroup(groupAddress.toString(), HostAddress::anyHost.toString());
+        for(const auto& iface: getAllIPv4Interfaces())
+            udpSock->joinGroup(groupAddress.toString(), iface.address.toString());
         m_receiveSocket = udpSock;
     }
 
@@ -56,7 +57,7 @@ AbstractDatagramSocket* QnUpnpResourceSearcher::sockByName(const QnInterfaceAndA
         //if (!sock->bindToInterface(iface))
         if( !sock->bind( SocketAddress( iface.address.toString() ) ) ||
             !sock->setMulticastIF( localAddress ) ||
-            !sock->setRecvBufferSize( 0 ) )
+            !sock->setRecvBufferSize( 1024 * 512 ) )
         {
             return 0;
         }
@@ -202,12 +203,15 @@ QnResourceList QnUpnpResourceSearcher::findResources(void)
 
         QByteArray data;
 
-        data.append("M-SEARCH * HTTP/1.1\r\n");
-        //data.append("Host: 192.168.0.150:1900\r\n");
-        data.append("Host: ").append(sock->getLocalAddress().toString()).append("\r\n");
-        data.append(lit("ST:urn:schemas-upnp-org:device:%1 Server:1\r\n").arg(QnAppInfo::organizationName()));
-        data.append("Man:\"ssdp:discover\"\r\n");
-        data.append("MX:3\r\n\r\n");
+        data.append(lit("M-SEARCH * HTTP/1.1\r\n"));
+        data.append(lit("HOST: "))
+            .append(groupAddress.toString())
+            .append(lit(":"))
+            .append(QString::number(GROUP_PORT))
+            .append(lit("\r\n"));
+        data.append(lit("MAN: \"ssdp:discover\"\r\n"));
+        data.append(lit("MX: 3\r\n"));
+        data.append(lit("ST: ssdp:all\r\n\r\n"));
         sock->sendTo(data.data(), data.size(), groupAddress.toString(), GROUP_PORT);
 
         /*
@@ -217,6 +221,7 @@ QnResourceList QnUpnpResourceSearcher::findResources(void)
         data.append("Request-ID: uuid:f81d4fae-7dec-11d0-a765-00a0c91e6bf6\r\n");
         sock->sendTo(data.data(), data.size(), groupAddress.toString(), GROUP_PORT);
         */
+        processSocket(sock, processedUuid, result);
     }
     if (m_receiveSocket)
         processSocket(m_receiveSocket, processedUuid, result);

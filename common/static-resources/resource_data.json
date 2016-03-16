@@ -19,6 +19,46 @@
     "data": [
         {
             "keys": [
+                "Network Optix|Nx-Cube-0512A"
+            ],
+            "advancedParametersTemplate": "nx-cube.xml"
+        },
+        {
+            "keys": [
+                "Network Optix|Nx-Dome-05924"
+            ],
+            "advancedParametersTemplate": "nx-dome.xml"
+        },
+        {
+            "keys": [
+               "Network Optix|Nx-Fisheye-05925"
+            ],
+            "advancedParametersTemplate": "nx-fisheye.xml"
+        },
+        {
+            "keys": [
+                "ACTI|E12A"
+            ],
+            "nxDeviceName": "Nx-Cube",
+            "nxDeviceModel": "Nx-Cube-0512A"
+        },
+        {
+            "keys": [
+                "ACTI|E924"
+            ],
+            "nxDeviceName": "Nx-Dome",
+            "nxDeviceModel": "Nx-Dome-05924"
+        },
+        {
+            "keys": [
+                "ACTI|E925"
+            ],
+            "nxDeviceName": "Nx-Fisheye",
+            "nxDeviceModel": "Nx-Fisheye-05925"
+        },
+
+        {
+            "keys": [
                 "VISTA|*",
                 "DW|*"
             ],

@@ -16,6 +16,11 @@ extern QString getValueFromString(const QString& line);
 
 static const QString DEFAULT_LOGIN(QLatin1String("admin"));
 static const QString DEFAULT_PASSWORD(QLatin1String("123456"));
+static const QString NX_VENDOR(QLatin1String("Network Optix"));
+static const QString DEFAULT_NX_LOGIN(QLatin1String("admin"));
+static const QString DEFAULT_NX_PASSWORD(QLatin1String("nxwitness"));
+static const QString NX_DEVICE_NAME_PARAMETER_NAME(QLatin1String("nxDeviceName"));
+static const QString NX_DEVICE_MODEL_PARAMETER_NAME(QLatin1String("nxDeviceModel"));
 static const int ACTI_DEVICEXML_PORT = 49152;
 static const int CACHE_UPDATE_TIME = 60 * 1000;
 
@@ -55,7 +60,10 @@ QnResourceList QnActiResourceSearcher::findResources(void)
                 continue;
             if (response.contains("AXIS"))
                 continue;
-            QByteArray response = getDeviceXml(QString(QLatin1String("http://%1:%2/devicedesc.xml")).arg(removeAddress).arg(ACTI_DEVICEXML_PORT)); // async request
+            QByteArray response = getDeviceXml(
+                    QString(QLatin1String("http://%1:%2/devicedesc.xml"))
+                        .arg(removeAddress)
+                        .arg(ACTI_DEVICEXML_PORT)); // async request
             //QByteArray response = getDeviceXml(QString(QLatin1String("http://%1:%2")).arg(removeAddress).arg(80)); // test request
             processDeviceXml(response, removeAddress, removeAddress, result);
             processedUuid << uuidStr;
@@ -219,21 +227,27 @@ void QnActiResourceSearcher::processPacket(
     const QByteArray& /*xmlDevInfo*/,
     QnResourceList& result )
 {
-    if (!devInfo.manufacturer.toUpper().startsWith(manufacture()))
+    const bool isNx = isNxDevice(devInfo);
+    if (!devInfo.manufacturer.toUpper().startsWith(manufacture()) && !isNx)
         return;
 
+    UpnpDeviceInfo realDevInfo(devInfo);
     QnMacAddress cameraMAC;
     QnNetworkResourcePtr existingRes = qnResPool->getNetResourceByPhysicalId( serialNumberToPhysicalID(devInfo.serialNumber) );
     QAuthenticator cameraAuth;
-    cameraAuth.setUser(DEFAULT_LOGIN);
-    cameraAuth.setPassword(DEFAULT_PASSWORD);
+    const QString defaultLogin = isNx ? DEFAULT_NX_LOGIN : DEFAULT_LOGIN;
+    const QString defaultPassword = isNx ? DEFAULT_NX_PASSWORD : DEFAULT_PASSWORD;
+
+    cameraAuth.setUser(defaultLogin);
+    cameraAuth.setPassword(defaultPassword);
+
     if( existingRes )
     {
         cameraMAC = existingRes->getMAC();
         cameraAuth = existingRes->getAuth();
     }
 
-    if( cameraMAC.isNull() )
+    if( cameraMAC.isNull() || isNx )
     {
         QByteArray serverReport;
         CLHttpStatus status = QnActiResource::makeActiRequest(
@@ -242,14 +256,15 @@ void QnActiResourceSearcher::processPacket(
         {
             QMap<QByteArray, QByteArray> report = QnActiResource::parseSystemInfo(serverReport);
             cameraMAC = QnMacAddress(report.value("mac address"));
-        }
-        else
-        {
-            return;
+            if(isNx)
+            {
+                realDevInfo.friendlyName = NX_VENDOR;
+                realDevInfo.modelName = report.value("model number");
+            }
         }
     }
 
-    createResource( devInfo, cameraMAC, cameraAuth, result );
+    createResource( realDevInfo, cameraMAC, cameraAuth, result );
 }
 
 void QnActiResourceSearcher::createResource(
@@ -261,16 +276,28 @@ void QnActiResourceSearcher::createResource(
     if (m_resTypeId.isNull())
         return;
 
+    const bool isNx = isNxDevice(devInfo);
+
     QnResourceData resourceData = qnCommon->dataPool()->data(manufacture(), devInfo.modelName);
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
         return; // model forced by ONVIF
 
-
-    QnActiResourcePtr resource( new QnActiResource() );
+    QnActiResourcePtr resource( new QnActiResource() );    
 
     resource->setTypeId(m_resTypeId);
-    resource->setName(QString(QLatin1String("ACTi-")) + devInfo.modelName);
-    resource->setModel(devInfo.modelName);
+
+    if(isNx)
+    {    
+        resource->setVendor(NX_VENDOR);
+        resource->setName(resourceData.value<QString>(NX_DEVICE_NAME_PARAMETER_NAME));
+        resource->setModel(resourceData.value<QString>(NX_DEVICE_MODEL_PARAMETER_NAME));
+    }
+    else
+    {
+        resource->setName(QString(QLatin1String("ACTi-")) + devInfo.modelName);
+        resource->setModel(devInfo.modelName);
+    }
+
     resource->setUrl(devInfo.presentationUrl);
     resource->setMAC(mac);
     resource->setPhysicalId( serialNumberToPhysicalID(devInfo.serialNumber) );
@@ -279,12 +306,20 @@ void QnActiResourceSearcher::createResource(
         resource->setDefaultAuth(auth);
     } else {
         QAuthenticator defaultAuth;
-        defaultAuth.setUser(DEFAULT_LOGIN);
-        defaultAuth.setPassword(DEFAULT_PASSWORD);
+        const QString defaultLogin = isNx ? DEFAULT_NX_LOGIN : DEFAULT_LOGIN;
+        const QString defaultPassword = isNx ? DEFAULT_NX_PASSWORD : DEFAULT_PASSWORD;
+        defaultAuth.setUser(defaultLogin);
+        defaultAuth.setPassword(defaultPassword);
         resource->setDefaultAuth(defaultAuth);
     }
 
     result << resource;
+}
+
+bool QnActiResourceSearcher::isNxDevice(const UpnpDeviceInfo& devInfo) const
+{
+    return devInfo.manufacturer.toLower().trimmed() == NX_VENDOR.toLower() ||
+        devInfo.friendlyName.toLower().trimmed() == NX_VENDOR.toLower();
 }
 
 #endif // #ifdef ENABLE_ACTI
