@@ -60,6 +60,26 @@ namespace {
 
     const char* checkBoxCheckedProperty("checkboxChecked");
     const char* checkBoxFilterProperty("checkboxFilter");
+
+    int calcHeaderHeight(QHeaderView* header)
+    {
+        // otherwise use the contents
+        QStyleOptionHeader opt;
+
+        opt.initFrom(header);
+        opt.state = QStyle::State_None | QStyle::State_Raised;
+        opt.orientation = Qt::Horizontal;
+        opt.state |= QStyle::State_Horizontal;
+        opt.state |= QStyle::State_Enabled;
+        opt.section = 0;
+
+        QFont fnt = header->font();
+        fnt.setBold(true);
+        opt.fontMetrics = QFontMetrics(fnt);
+        QSize size = header->style()->sizeFromContents(QStyle::CT_HeaderSection, &opt, QSize(), header);
+
+        return size.height();
+    }
 }
 
 // --------------------------- QnAuditDetailItemDelegate ------------------------
@@ -292,8 +312,9 @@ void QnAuditItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem &
         button.iconSize = QSize(BTN_ICON_SIZE, BTN_ICON_SIZE);
         button.state = option.state;
 
-        button.rect.setTopLeft(option.rect.topLeft() + QPoint(4, 4));
-        button.rect.setSize(m_playBottonSize);
+        //ToDo: #vkutin : implement good button behavior and determine what visual design we want
+        // For now, position button to cover entire cell area
+        button.rect = option.rect.adjusted(0,0,1,1);
         QApplication::style()->drawControl(QStyle::CE_PushButton, &button, painter);
         break;
     }
@@ -566,31 +587,6 @@ void QnAuditLogDialog::at_updateDetailModel()
         QnAuditRecord * const record = data.value<QnAuditRecord *>();
         m_detailModel->setDetail(record, false);
     }
-}
-
-int calcHeaderHeight(QHeaderView* header)
-{
-    // otherwise use the contents
-    QStyleOptionHeader opt;
-
-    opt.initFrom(header);
-    opt.state = QStyle::State_None | QStyle::State_Raised;
-    opt.orientation = Qt::Horizontal;
-    opt.state |= QStyle::State_Horizontal;
-    opt.state |= QStyle::State_Enabled;
-    opt.section = 0;
-
-    QFont fnt = header->font();
-    fnt.setBold(true);
-    opt.fontMetrics = QFontMetrics(fnt);
-    QSize size = header->style()->sizeFromContents(QStyle::CT_HeaderSection, &opt, QSize(), header);
-
-    if (header->isSortIndicatorShown())
-    {
-        int margin = header->style()->pixelMetric(QStyle::PM_HeaderMargin, &opt, header);
-        size.setHeight(size.height() +  margin);
-    }
-    return size.height();
 }
 
 void QnAuditLogDialog::at_updateCheckboxes()

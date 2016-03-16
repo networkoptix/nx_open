@@ -38,6 +38,9 @@ QnWorkbenchCloudHandler::QnWorkbenchCloudHandler(QObject *parent)
     connect(action(QnActions::LogoutFromCloud),        &QAction::triggered,    d,  &QnWorkbenchCloudHandlerPrivate::at_logoutFromCloudAction_triggered);
     connect(action(QnActions::OpenCloudMainUrl),       &QAction::triggered,    d,  &QnWorkbenchCloudHandlerPrivate::at_openCloudMainUrlAction_triggered);
     connect(action(QnActions::OpenCloudManagementUrl), &QAction::triggered,    d,  &QnWorkbenchCloudHandlerPrivate::at_openCloudManagementUrlAction_triggered);
+
+    connect(action(QnActions::OpenCloudRegisterUrl), &QAction::triggered, this,
+        []() { QDesktopServices::openUrl(QnCloudUrlHelper::createAccountUrl()); });
 }
 
 QnWorkbenchCloudHandler::~QnWorkbenchCloudHandler()

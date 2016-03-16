@@ -19,6 +19,25 @@ Rectangle
         onClicked: grid.watcher.resetCurrentItem();
     }
 
+    CloudPanel
+    {
+        id: cloudPanel;
+
+        anchors.bottom: grid.top;
+        anchors.horizontalCenter: parent.horizontalCenter;
+
+        userName: context.cloudUserName;
+        loggedIn: context.isLoggedInToCloud;
+
+
+        onLoginToCloud: context.loginToCloud();
+        onCreateAccount: context.createAccount();
+
+        onManageAccount: context.manageCloudAccount();
+        onLogout: context.logoutFromCloud();
+
+    }
+
     Grid
     {
         id: grid;
@@ -66,7 +85,7 @@ Rectangle
                         onConnectClicked:
                         {
                             console.log(selectedHost, ":", selectedUser, ":", selectedPassword);
-                            context.connectToServer(selectedHost, selectedUser, selectedPassword);
+                            context.connectToLocalSystem(selectedHost, selectedUser, selectedPassword);
                         }
                     }
                 }
@@ -78,6 +97,12 @@ Rectangle
                     CloudSystemTile
                     {
                         systemName: model.systemName;
+                        host: model.host;
+                        onConnectClicked:
+                        {
+                            console.log("---", model.host);
+                            context.connectToCloudSystem(model.host);
+                        }
                     }
                 }
 

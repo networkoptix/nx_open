@@ -41,7 +41,7 @@ QnSystemDescription::QnSystemDescription(const QnUuid &systemId
     , m_isCloudSystem(isCloudSystem)
     , m_servers()
     , m_prioritized()
-    , m_primaryAddresses()
+    , m_hosts()
 {}
 
 QnSystemDescription::~QnSystemDescription()
@@ -138,14 +138,14 @@ void QnSystemDescription::removeServer(const QnUuid &serverId)
     if (it != m_prioritized.end())
         m_prioritized.erase(it);
 
-    m_primaryAddresses.remove(serverId);
+    m_hosts.remove(serverId);
     const bool removedCount = m_servers.remove(serverId);
     if (removedCount)
         emit serverRemoved(serverId);
 }
 
-void QnSystemDescription::setPrimaryAddress(const QnUuid &serverId
-    , const SocketAddress &address)
+void QnSystemDescription::setServerHost(const QnUuid &serverId
+    , const QString &host)
 {
     const bool containsServer = m_servers.contains(serverId);
     
@@ -155,20 +155,20 @@ void QnSystemDescription::setPrimaryAddress(const QnUuid &serverId
     if (!containsServer)
         return;
 
-    const auto it = m_primaryAddresses.find(serverId);
-    const bool changed = ((it == m_primaryAddresses.end())
-        || (it.value() != address));
+    const auto it = m_hosts.find(serverId);
+    const bool changed = ((it == m_hosts.end())
+        || (it.value() != host));
 
     if (!changed)
         return;
-    m_primaryAddresses[serverId] = address;
-    emit serverChanged(serverId, QnServerField::PrimaryAddressField);
+    m_hosts[serverId] = host;
+    emit serverChanged(serverId, QnServerField::HostField);
 }
 
-SocketAddress QnSystemDescription::getServerPrimaryAddress(const QnUuid &serverId) const
+QString QnSystemDescription::getServerHost(const QnUuid &serverId) const
 {
     NX_ASSERT(m_servers.contains(serverId), Q_FUNC_INFO
         , "System does not contain specified server");
 
-    return m_primaryAddresses.value(serverId);
+    return m_hosts.value(serverId);
 }

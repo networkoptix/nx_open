@@ -1,6 +1,7 @@
 #pragma once
 
 #include <nx/utils/singleton.h>
+#include <nx/utils/uuid.h>
 
 class QnMainWindow;
 class QnWorkbenchContext;
@@ -31,15 +32,15 @@ public:
     qint64 currentTimeUsec() const;
     void setCurrentTimeUsec(qint64 timeUsec);
 
-    void addResourcesToLayout(const QStringList &uniqueIds, qint64 timeStampMs);
-    void removeFromCurrentLayout(const QString &uniqueId);
+    void addResourcesToLayout(const QList<QnUuid>& uniqueIds, qint64 timeStampMs);
+    void removeFromCurrentLayout(const QnUuid& uniqueId);
 
     void reconnect(const QString &url);
 
     void maximizeItem(const QString &uniqueId);
     void unmaximizeItem(const QString &uniqueId);
 
-    void slidePanelsOut();        
+    void slidePanelsOut();
 
 signals:
     void connected();
