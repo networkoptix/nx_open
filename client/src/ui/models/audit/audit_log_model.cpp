@@ -469,9 +469,9 @@ QString QnAuditLogModel::htmlData(const Column& column,const QnAuditRecord* data
         return textData(column, data);
 }
 
-
 QString QnAuditLogModel::makeSearchPattern(const QnAuditRecord* record) const {
-    Column columnsToFilter[] = 
+    //ToDo: #vkutin Do we really want TimestampColumn, EndTimestampColumn, DurationColumn here?
+    Column columnsToFilter[] =
     {
         TimestampColumn,
         EndTimestampColumn,
@@ -479,22 +479,24 @@ QString QnAuditLogModel::makeSearchPattern(const QnAuditRecord* record) const {
         UserNameColumn,
         UserHostColumn,
         EventTypeColumn,
-        DescriptionColumn,
-        PlayButtonColumn
+        DescriptionColumn
     };
     QString result;
-    for(const auto& column: columnsToFilter)
+    for (const auto& column : columnsToFilter)
         result += searchData(column, record);
     return result;
 }
 
 QString QnAuditLogModel::searchData(const Column& column, const QnAuditRecord* data) const {
-    QString result = textData(column, data);
     if (column == DescriptionColumn && (data->isPlaybackType() || data->eventType == Qn::AR_CameraUpdate || data->eventType == Qn::AR_CameraInsert))
-        result += getResourcesString(data->resources); // text description doesn't contain resources for that types, but their names need for search
-    return result;
-}
+    {
+        //ToDo: #vkutin Resource strings contain names in form "Name (IP)", however we want just raw Name and IP without round brackets for search string.
+        // Name itself can contain brackets. Need to discuss how to strip brackets ( pass optional format to global getFullResourceName()? ) and implement something.
+        return getResourcesString(data->resources);
+    }
 
+    return textData(column, data);
+}
 
 QString QnAuditLogModel::textData(const Column& column,const QnAuditRecord* data) const {
     switch(column) {
