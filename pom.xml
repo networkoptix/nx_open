@@ -462,8 +462,25 @@
                 <unix>false</unix>
                 <script.extension>bat</script.extension>
                 <global.windows.defines>ENABLE_VMAX</global.windows.defines>
+                <machine.type>X64</machine.type>
             </properties>
         </profile>
+        <profile>
+            <id>windows-x86</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                    <arch>x86</arch>
+                </os>
+                <property>
+                    <name>arch</name>
+                    <value>x86</value>
+                </property>
+            </activation>
+            <properties>
+                <machine.type>X86</machine.type>
+            </properties>
+        </profile>        
         <profile>
             <id>windows-nomobile</id>
             <activation>
