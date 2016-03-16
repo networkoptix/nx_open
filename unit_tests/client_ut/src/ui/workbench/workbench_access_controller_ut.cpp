@@ -58,7 +58,7 @@ protected:
     }
 
     QnLayoutResourcePtr createLayout(Qn::ResourceFlags flags, bool locked = false, bool userCanEdit = true, const QnUuid &parentId = QnUuid()) {
-        QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
+        QnLayoutResourcePtr layout(new QnLayoutResource());
         layout->setId(QnUuid::createUuid());
         layout->addFlags(flags);
         layout->setLocked(locked);

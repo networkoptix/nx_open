@@ -27,8 +27,8 @@ public:
     static const size_t RFC4122_SIZE = 16;
 
     QnUuid();
-    QnUuid(const QnUuid& other) = default;
-    QnUuid(QnUuid&& other) = default;
+    QnUuid(const QnUuid&) = default;
+    QnUuid(QnUuid&&) = default;
 
     explicit QnUuid(const char* text);
     explicit QnUuid(const QString& text);
@@ -51,8 +51,8 @@ public:
     bool operator<( const QnUuid& other ) const;
     bool operator>( const QnUuid& other ) const;
 
-    QnUuid& operator=(const QnUuid& other) = default;
-    QnUuid& operator=(QnUuid&& other) = default;
+    QnUuid& operator=(const QnUuid&) = default;
+    QnUuid& operator=(QnUuid&&) = default;
 
     static QnUuid fromRfc4122( const QByteArray& bytes );
     static QnUuid fromHardwareId( const QString& hwid );

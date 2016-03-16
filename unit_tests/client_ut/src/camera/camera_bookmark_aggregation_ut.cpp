@@ -2,6 +2,8 @@
 
 #include <camera/camera_bookmark_aggregation.h>
 
+#include <nx/utils/log/log.h>
+
 namespace
 {
     const qint64 kDefaultBookmarkDurationMs = 60 * 1000;
