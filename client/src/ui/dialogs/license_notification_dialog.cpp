@@ -10,9 +10,10 @@ QnLicenseNotificationDialog::QnLicenseNotificationDialog(QWidget *parent, Qt::Wi
     base_type(parent, windowFlags),
     ui(new Ui::LicenseNotificationDialog)
 {
-    ui->setupUi(this);
-
+    /* (!) Scrollbar must be created before setupUi for correct deletion order */
     QnSnappedScrollBar *scrollBar = new QnSnappedScrollBar(this);
+
+    ui->setupUi(this);
     ui->treeView->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
     QList<QnLicenseListModel::Column> columns;
