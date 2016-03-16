@@ -9,9 +9,9 @@
 #include <watchers/cloud_status_watcher.h>
 
 #include <ui/actions/actions.h>
+#include <ui/actions/action_manager.h>
 #include <ui/models/systems_model.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/handlers/workbench_connect_handler.h>
 
 #include <ui/dialogs/login_dialog.h>
 #include <ui/dialogs/non_modal_dialog_constructor.h>
@@ -40,12 +40,21 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject *parent)
     : base_type(parent)
     , QnWorkbenchContextAware(parent)
 
+    , m_cloudWatcher(qnCommon->instance<QnCloudStatusWatcher>())
     , m_widget(QWidget::createWindowContainer(createMainView(this)))
     , m_loginDialog()
     , m_visible(false)
     , m_enabled(false)
 {
-    const auto idChangedHandler = [this](const QnUuid &id)
+    NX_CRITICAL(m_cloudWatcher, Q_FUNC_INFO, "Cloud watcher does not exist");
+    connect(m_cloudWatcher, &QnCloudStatusWatcher::loginChanged
+        , this, &QnWorkbenchWelcomeScreen::cloudUserNameChanged);
+    connect(m_cloudWatcher, &QnCloudStatusWatcher::statusChanged
+        , this, &QnWorkbenchWelcomeScreen::isLoggedInToCloudChanged);
+
+    //
+
+    const auto idChangedHandler = [this](const QnUuid & /* id */)
     {
         // We could be just reconnecting if remoteGuid is null.
         // So, just hide screen when it is not
@@ -106,31 +115,39 @@ void QnWorkbenchWelcomeScreen::setEnabled(bool isEnabled)
     emit enabledChanged();
 }
 
+QString QnWorkbenchWelcomeScreen::cloudUserName() const
+{
+    return m_cloudWatcher->cloudLogin();
+}
+
+bool QnWorkbenchWelcomeScreen::isLoggedInToCloud() const
+{
+    return (m_cloudWatcher->status() == QnCloudStatusWatcher::Online);
+}
+
 void QnWorkbenchWelcomeScreen::connectToLocalSystem(const QString &serverUrl
     , const QString &userName
     , const QString &password)
 {
-    const auto connectHandler = context()->instance<QnWorkbenchConnectHandler>();
-    connectHandler->disconnectFromServer(true);
-
     QUrl url = QUrl::fromUserInput(serverUrl);
     url.setScheme(lit("http"));
     if (!password.isEmpty())
         url.setPassword(password);
     if (!userName.isEmpty())
         url.setUserName(userName);
-    connectHandler->connectToServer(url);
+
+    menu()->trigger(QnActions::ConnectAction
+        , QnActionParameters().withArgument(Qn::UrlRole, url));
 }
 
 void QnWorkbenchWelcomeScreen::connectToCloudSystem(const QString &serverUrl)
 {
-    const auto cloudWatcher = qnCommon->instance<QnCloudStatusWatcher>();
-    if (!cloudWatcher || cloudWatcher->status() != QnCloudStatusWatcher::Online)
+    if (!isLoggedInToCloud())
         return;
 
-    connectToLocalSystem(serverUrl, cloudWatcher->cloudLogin(), cloudWatcher->cloudPassword());
+    connectToLocalSystem(serverUrl, m_cloudWatcher->cloudLogin()
+        , m_cloudWatcher->cloudPassword());
 }
-
 
 void QnWorkbenchWelcomeScreen::connectToAnotherSystem()
 {
@@ -146,6 +163,26 @@ void QnWorkbenchWelcomeScreen::connectToAnotherSystem()
 
     dialogConstructor.resetGeometry();
     setEnabled(false);
+}
+
+void QnWorkbenchWelcomeScreen::logoutFromCloud()
+{
+    menu()->trigger(QnActions::LogoutFromCloud);
+}
+
+void QnWorkbenchWelcomeScreen::manageCloudAccount()
+{
+    menu()->trigger(QnActions::OpenCloudManagementUrl);
+}
+
+void QnWorkbenchWelcomeScreen::loginToCloud()
+{
+    menu()->trigger(QnActions::LoginToCLoud);
+}
+
+void QnWorkbenchWelcomeScreen::createAccount()
+{
+    menu()->trigger(QnActions::OpenCloudRegisterUrl);
 }
 
 void QnWorkbenchWelcomeScreen::tryHideScreen()

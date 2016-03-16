@@ -8,15 +8,19 @@
 
 class QQuickView;
 class QnLoginDialog;
+class QnCloudStatusWatcher;
 
 class QnWorkbenchWelcomeScreen : public Connective<QObject>
     , public QnWorkbenchContextAware
 {
     Q_OBJECT
+    typedef Connective<QObject> base_type;
+    
     Q_PROPERTY(bool isVisible READ isVisible WRITE setVisible NOTIFY visibleChanged)
     Q_PROPERTY(bool isEnabled READ isEnabled WRITE setEnabled NOTIFY enabledChanged);
-
-    typedef Connective<QObject> base_type;
+    
+    Q_PROPERTY(QString cloudUserName READ cloudUserName NOTIFY cloudUserNameChanged);
+    Q_PROPERTY(bool isLoggedInToCloud READ isLoggedInToCloud NOTIFY isLoggedInToCloudChanged)
 
 public:
     QnWorkbenchWelcomeScreen(QObject *parent);
@@ -34,6 +38,10 @@ public: // Properties
 
     void setEnabled(bool isEnabled);
 
+    QString cloudUserName() const;
+
+    bool isLoggedInToCloud() const;
+
 public slots:
     void connectToLocalSystem(const QString &serverUrl
         , const QString &userName
@@ -43,12 +51,24 @@ public slots:
 
     void connectToAnotherSystem();
 
+    void logoutFromCloud();
+
+    void manageCloudAccount();
+
+    void loginToCloud();
+
+    void createAccount();
+
     void tryHideScreen();
 
 signals:
     void visibleChanged();
     
     void enabledChanged();
+
+    void cloudUserNameChanged();
+
+    void isLoggedInToCloudChanged();
 
 private:
     void showScreen();
@@ -59,8 +79,12 @@ private:
 private:
     typedef QPointer<QWidget> WidgetPtr;
     typedef QPointer<QnLoginDialog> LoginDialogPtr;
+    typedef QPointer<QnCloudStatusWatcher> CloudStatusWatcherPtr;
+    
+    const CloudStatusWatcherPtr m_cloudWatcher;
 
     const WidgetPtr m_widget;
+    
     LoginDialogPtr m_loginDialog;
 
     bool m_visible;

@@ -19,11 +19,11 @@ public:
     explicit QnWorkbenchConnectHandler(QObject *parent = 0);
     ~QnWorkbenchConnectHandler();
 
+protected:
     ec2::ErrorCode connectToServer(const QUrl &appServerUrl, bool silent = false);
 
     bool disconnectFromServer(bool force);
 
-protected:
     ec2::AbstractECConnectionPtr connection2() const;
     
     bool connected() const;

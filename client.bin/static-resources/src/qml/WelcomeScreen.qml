@@ -13,18 +13,29 @@ Rectangle
 
     SystemPalette { id: palette; }
 
+    MouseArea
+    {
+        anchors.fill: parent;
+        onClicked: grid.watcher.resetCurrentItem();
+    }
+
     CloudPanel
     {
         id: cloudPanel;
 
         anchors.bottom: grid.top;
-        ancrhos.horizontalCenter: parent.horizontalCenter;
-    }
+        anchors.horizontalCenter: parent.horizontalCenter;
 
-    MouseArea
-    {
-        anchors.fill: parent;
-        onClicked: grid.watcher.resetCurrentItem();
+        userName: context.cloudUserName;
+        loggedIn: context.isLoggedInToCloud;
+
+
+        onLoginToCloud: context.loginToCloud();
+        onCreateAccount: context.createAccount();
+
+        onManageAccount: context.manageCloudAccount();
+        onLogout: context.logoutFromCloud();
+
     }
 
     Grid
