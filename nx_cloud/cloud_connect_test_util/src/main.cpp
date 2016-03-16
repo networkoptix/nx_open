@@ -198,7 +198,7 @@ void printHelp(int argc, char* argv[])
         "\n"
         "Listen mode:\n"
         "  --listen                         Enable listen mode\n"
-        "  --cloud-credentials={system_id}:{authentication_key}"
+        "  --cloud-credentials={system_id}:{authentication_key}\n"
         "                                   Specify credentials to use to connect to mediator\n"
         "  --server-id={server_id}          Id used when registering on mediator\n"
         "\n"

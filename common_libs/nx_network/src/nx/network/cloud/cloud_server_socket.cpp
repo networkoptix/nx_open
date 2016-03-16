@@ -51,9 +51,9 @@ CloudServerSocket::CloudServerSocket(
     m_mediatorConnection(mediatorConnection),
     m_mediatorRegistrationRetryTimer(std::move(mediatorRegistrationRetryPolicy)),
     m_acceptorMakers(acceptorMakers),
+    m_acceptQueueLen(128),
     m_state(State::init),
-    m_terminated(false),
-    m_acceptQueueLen(128)
+    m_terminated(false)
 {
     // TODO: #mu default values for m_socketAttributes shall match default
     //           system vales: think how to implement this...
