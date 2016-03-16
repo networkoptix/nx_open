@@ -13,6 +13,14 @@ Rectangle
 
     SystemPalette { id: palette; }
 
+    CloudPanel
+    {
+        id: cloudPanel;
+
+        anchors.bottom: grid.top;
+        ancrhos.horizontalCenter: parent.horizontalCenter;
+    }
+
     MouseArea
     {
         anchors.fill: parent;

@@ -6,9 +6,12 @@
 
 #include <common/common_module.h>
 
+#include <watchers/cloud_status_watcher.h>
+
 #include <ui/actions/actions.h>
 #include <ui/models/systems_model.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/handlers/workbench_connect_handler.h>
 
 #include <ui/dialogs/login_dialog.h>
 #include <ui/dialogs/non_modal_dialog_constructor.h>
@@ -103,8 +106,6 @@ void QnWorkbenchWelcomeScreen::setEnabled(bool isEnabled)
     emit enabledChanged();
 }
 
-#include <ui/workbench/handlers/workbench_connect_handler.h>
-
 void QnWorkbenchWelcomeScreen::connectToLocalSystem(const QString &serverUrl
     , const QString &userName
     , const QString &password)
@@ -120,8 +121,6 @@ void QnWorkbenchWelcomeScreen::connectToLocalSystem(const QString &serverUrl
         url.setUserName(userName);
     connectHandler->connectToServer(url);
 }
-
-#include <watchers/cloud_status_watcher.h>
 
 void QnWorkbenchWelcomeScreen::connectToCloudSystem(const QString &serverUrl)
 {
