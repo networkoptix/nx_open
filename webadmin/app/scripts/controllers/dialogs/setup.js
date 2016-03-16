@@ -52,10 +52,10 @@ angular.module('webadminApp')
 
             mediaserver.systemCloudInfo().then(function(data){
                 $scope.settings.cloudSystemID = data.cloudSystemID;
-                $scope.settings.cloudLogin = data.cloudAccountName;
+                $scope.settings.cloudEmail = data.cloudAccountName;
                 $scope.next('cloudSuccess');
             },function(){
-                mediaserver.getSettings().then(function (r) {
+                mediaserver.getSettings(true).then(function (r) {
                     $scope.serverInfo = r.data.reply;
 
                     if(debugMode || $scope.serverInfo.serverFlags.includes(Config.newServerFlag)) {
@@ -69,7 +69,7 @@ angular.module('webadminApp')
         }
 
         function updateCredentials(login,password){
-            mediaserver.login(login,password).then(checkMySystem,
+            mediaserver.login(login, password).then(checkMySystem,
                 function(error){
                     console.error(error);
                 });
@@ -216,7 +216,10 @@ angular.module('webadminApp')
             cloudAPI.connect( $scope.settings.systemName, $scope.settings.cloudEmail, $scope.settings.cloudPassword).then(
                 function(message){
                     //2. Save settings to local server
-                    mediaserver.setupCloudSystem($scope.settings.systemName, message.data.systemId, message.data.authKey).then(function(){
+                    mediaserver.setupCloudSystem($scope.settings.systemName,
+                        message.data.id,
+                        message.data.authKey,
+                        $scope.settings.cloudEmail).then(function(){
                         updateCredentials( $scope.settings.cloudEmail, $scope.settings.cloudPassword);
                     },errorHandler);
                 }, cloudErrorHandler);
@@ -239,14 +242,14 @@ angular.module('webadminApp')
                 $scope.next('localSuccess');
                 return;
             }
-            mediaserver.setupCloudSystem($scope.settings.systemName, $scope.settings.localLogin, $scope.settings.localPassword).then(function(r){
+            mediaserver.setupLocalSystem($scope.settings.systemName, $scope.settings.localLogin, $scope.settings.localPassword).then(function(r){
                 if(r.data.error!=='0') {
                     offlineErrorHandler(r);
                     return;
                 }
                 updateCredentials( $scope.settings.localLogin, $scope.settings.localPassword);
             },function(error){
-                offlineErrorHandler(error);;
+                offlineErrorHandler(error);
             });
         }
 
@@ -255,7 +258,6 @@ angular.module('webadminApp')
             return $scope.step == step;
         };
         $scope.finish = function(){
-            $scope.next('start');
             if(nativeClientObject) {
                 window.close();
             }else{
@@ -288,7 +290,7 @@ angular.module('webadminApp')
         };
 
         function required(val){
-            return val && (!val.trim || val.trim() != '');
+            return !!val && (!val.trim || val.trim() != '');
         }
 
 
@@ -315,7 +317,7 @@ angular.module('webadminApp')
                 back: 'cloudIntro',
                 next: connectToCloud,
                 valid: function(){
-                    return required($scope.settings.cloudEmail)
+                    return required($scope.settings.cloudEmail) &&
                         required($scope.settings.cloudPassword);
                 }
             },
@@ -345,7 +347,8 @@ angular.module('webadminApp')
                 valid: function(){
                     return required($scope.settings.localLogin) &&
                         required($scope.settings.localPassword) &&
-                        required($scope.settings.localPasswordConfirmation);
+                        required($scope.settings.localPasswordConfirmation) &&
+                        $scope.settings.localPassword === $scope.settings.localPasswordConfirmation;
                 }
             },
             localSuccess:{

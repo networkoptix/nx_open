@@ -231,6 +231,7 @@ angular.module('webadminApp')
                     var cloudAccount = _.find(allSettings, function (setting) {
                         return setting.name === 'cloudAccountName';
                     });
+                    cloudAccount = cloudAccount ? cloudAccount.value : '';
 
                     deferred.resolve({
                         cloudSystemID:cloudSystemID,
@@ -240,48 +241,26 @@ angular.module('webadminApp')
                 return deferred.promise;
             },
 
-            detachServer:function(){
-                /*var defer = $q.defer();
-                defer.resolve(true);
-                return defer.promise;
-                */
-                // TODO: wait for https://networkoptix.atlassian.net/browse/VMS-2081
-                return wrapPost(proxy + '/api/detachServer');
+            detachFromSystem:function(oldPassword){
+                return wrapPost(proxy + '/api/detachFromSystem',{
+                    oldPassword:oldPassword
+                });
             },
-            setupCloudSystem:function(systemName, systemId, authKey){
-                /*var defer = $q.defer();
-                function errorHandler(error){
-                    defer.reject(error);
-                }
-                var self = this;
-                this.changeSystemName(systemName).then(
-                    function(message){
-                        self.saveCloudSystemCredentials(message.data.systemId, message.data.authKey).
-                            then(function(result){
-                                defer.resolve(result);
-                            }, errorHandler);
-                    }, errorHandler);
-                return defer.promise;
-                */
-                // TODO: wait for https://networkoptix.atlassian.net/browse/VMS-2081
+            setupCloudSystem:function(systemName, systemId, authKey, cloudAccountName){
                 return wrapPost(proxy + '/api/setupCloudSystem',{
                     systemName: systemName,
-                    systemId: systemId,
-                    authKey: authKey
+                    cloudSystemID: systemId,
+                    cloudAuthKey: authKey,
+                    cloudAccountName: cloudAccountName
                 });
             },
 
             setupLocalSystem:function(systemName, adminAccount, adminPassword){
-
-                //return this.changeSystem(systemName, adminAccount, adminPassword);
-
-                // TODO: wait for https://networkoptix.atlassian.net/browse/VMS-2081
                 return wrapPost(proxy + '/api/setupLocalSystem',{
                     systemName: systemName,
                     adminAccount: adminAccount,
-                    adminPassword: adminPassword
+                    password: adminPassword
                 });
-
             },
 
 
@@ -353,6 +332,8 @@ angular.module('webadminApp')
             logLevel:function(logId,level){
                 return wrapGet(proxy + '/api/logLevel?id=' + logId + (level?'&value=' + level:''));
             },
+
+
             systemSettings:function(setParams){
                 //return;
                 if(!setParams) {
@@ -369,10 +350,13 @@ angular.module('webadminApp')
             getSystemSettings:function(){
                 return wrapGet(proxy + '/ec2/getSettings');
             },
-            saveCloudSystemCredentials: function( cloudSystemId, cloudAuthKey){
+
+
+            saveCloudSystemCredentials: function( cloudSystemId, cloudAuthKey, cloudAccountName){
                 return wrapPost(proxy + '/api/saveCloudSystemCredentials',{
                     cloudSystemID:cloudSystemId,
-                    cloudAuthKey:cloudAuthKey
+                    cloudAuthKey:cloudAuthKey,
+                    cloudAccountName: cloudAccountName
                 });
             },
             clearCloudSystemCredentials: function(){

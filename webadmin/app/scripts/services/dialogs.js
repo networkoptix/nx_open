@@ -2,7 +2,7 @@
 
 angular.module('webadminApp')
     .factory('dialogs', function ($http, $modal, $q, $location) {
-        function openDialog(title, template, url, content, hasFooter, cancellable, params, closable, actionLabel, buttonType){
+        function openDialog(settings){
 
             //scope.inline = typeof($location.search().inline) != 'undefined';
 
@@ -16,23 +16,24 @@ angular.module('webadminApp')
                 templateUrl: 'views/components/dialog.html',
                 animation: !isInline(),
                 keyboard:false,
-                backdrop:cancellable?true:'static',
+                backdrop:settings.cancellable?true:'static',
                 resolve: {
                     settings:function(){
                         return {
-                            title:title,
-                            template: template,
-                            hasFooter: hasFooter,
-                            content:content,
-                            cancellable: cancellable,
-                            params: params,
-                            actionLabel: actionLabel || L.dialogs.okButton,
-                            closable: closable || cancellable,
-                            buttonClass: buttonType? 'btn-'+ buttonType : 'btn-primary'
+                            title:settings.title,
+                            template: settings.template,
+                            hasFooter: settings.hasFooter,
+                            content:settings.content,
+                            cancellable: settings.cancellable,
+                            params: settings.params,
+                            actionLabel: settings.actionLabel || L.dialogs.okButton,
+                            closable: settings.closable || settings.cancellable,
+                            buttonClass: settings.buttonType? 'btn-'+ settings.buttonType : 'btn-primary',
+                            needOldPassword:settings.needOldPassword
                         };
                     },
                     params:function(){
-                        return params;
+                        return settings.params;
                     }
                 }
             });
@@ -66,11 +67,38 @@ angular.module('webadminApp')
         }
 
         return {
+            //title, template, url, content, hasFooter, cancellable, params, closable, actionLabel, buttonType
             alert:function(message, title){
-                return openDialog(title, null, null, message, true, true, null, true).result;
+                return openDialog({
+                    title:title,
+                    content:message,
+                    hasFooter:true,
+                    cancellable:true,
+                    closable:true
+                }).result;
             },
             confirm:function(message, title, actionLabel, actionType){
-                return openDialog(title, null, null, message, true, false, null, false, actionLabel, actionType).result;
+                return openDialog({
+                    title:title,
+                    content:message,
+                    hasFooter:true,
+                    cancellable:false,
+                    closable:false,
+                    actionLabel:actionLabel,
+                    actionType:actionType
+                }).result;
+            },
+            confirmWithPassword:function(message, title, actionLabel, actionType){
+                return openDialog({
+                    title:title,
+                    content:message,
+                    hasFooter:true,
+                    cancellable:false,
+                    closable:false,
+                    needOldPassword: true,
+                    actionLabel:actionLabel,
+                    actionType:actionType
+                }).result;
             }
         };
     }).controller("DialogCtrl",function($scope, $modalInstance,settings){
@@ -81,7 +109,7 @@ angular.module('webadminApp')
         };
 
         $scope.ok = function(){
-            $modalInstance.close('ok');
+            $modalInstance.close( $scope.settings.oldPassword || 'ok');
         };
 
         $scope.cancel = function(){

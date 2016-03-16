@@ -5,7 +5,7 @@ var Config = {
 
     defaultLogin: 'admin',
     defaultPassword: 'admin',
-    newServerFlag: 'SF_NewServer',
+    newServerFlag: 'SF_AutoSystemName',
 
     globalEditServersPermissions:0x00000020 ,
     globalViewArchivePermission:0x00000100,

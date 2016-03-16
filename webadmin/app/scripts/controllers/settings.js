@@ -44,8 +44,10 @@ angular.module('webadminApp')
 
         $scope.openDisconnectDialog = function () {
             //1. confirm detach
-            dialogs.confirm('This server will be disconnected from old server and turned into new one').then(function(){
-                mediaserver.detachServer().then(function(){
+            dialogs.confirmWithPassword(null,
+                'This server will be disconnected from old server and turned into a new one',
+                'Create New System').then(function(oldPassword){
+                mediaserver.detachFromSystem(oldPassword).then(function(){
                     //2. throw him to master
                     $location.path('/setup');
                     window.location.reload();
