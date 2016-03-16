@@ -133,8 +133,12 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, con
         return QList<QnResourcePtr>(); // model forced by ONVIF
 
     QnPlIsdResourcePtr resource ( new QnPlIsdResource() );
+    auto isDW = resourceData.value<bool>("isDW");
+    vendor = isDW ? lit("Digital Watchdog") : vendor;
+    name = isDW ? name : lit("ISD-") + name;
 
     resource->setTypeId(rt);
+    resource->setVendor(vendor);
     resource->setName(name);
     resource->setModel(name);
     resource->setMAC(QnMacAddress(mac));
@@ -291,10 +295,14 @@ void QnPlISDResourceSearcher::createResource(
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
         return; // model forced by ONVIF
 
+    auto isDW = resourceData.value<bool>("isDW");
+    auto vendor = isDW ? lit("Digital Watchdog") : lit("ISD");
+    auto name = isDW ? devInfo.modelName : lit("ISD-") + devInfo.modelName;
     QnPlIsdResourcePtr resource( new QnPlIsdResource() );
 
     resource->setTypeId(rt);
-    resource->setName(lit("ISD-") + devInfo.modelName);
+    resource->setVendor(vendor);
+    resource->setName(name);
     resource->setModel(devInfo.modelName);
     resource->setUrl(devInfo.presentationUrl);
     resource->setMAC(mac);
