@@ -104,7 +104,7 @@ def get_package_for_configuration(target, package, target_dir, debug):
     description_file = os.path.join(target_dir, installation_marker)
     installed = os.path.isfile(description_file)
     if installed:
-        location = rdep.locate_package(REPOSITORY_PATH, target, package)
+        location = rdep.locate_package(REPOSITORY_PATH, target, package, debug)
         if not location:
             installed = False
 
