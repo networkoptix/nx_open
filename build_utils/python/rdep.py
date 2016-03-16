@@ -19,9 +19,10 @@ DEBUG_SUFFIX = "-debug"
 RSYNC = [ "rsync" ]
 if detect_platform() == "windows":
     if not distutils.spawn.find_executable("rsync"):
-        RSYNC = os.path.join(os.getenv("environment"), "rsync-win32", "rsync.exe")
+        RSYNC = [os.path.join(os.getenv("environment"), "rsync-win32", "rsync.exe")]
     RSYNC.append("--chmod=ugo=rwx")
 RSYNC += [ "--archive", "--delete" ]
+print RSYNC
 
 DEFAULT_SYNC_URL = "rsync://enk.me/buildenv/rdep/packages"
 
