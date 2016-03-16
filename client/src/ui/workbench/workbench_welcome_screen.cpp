@@ -105,17 +105,33 @@ void QnWorkbenchWelcomeScreen::setEnabled(bool isEnabled)
 
 #include <ui/workbench/handlers/workbench_connect_handler.h>
 
-void QnWorkbenchWelcomeScreen::connectToServer(const QString &serverUrl
+void QnWorkbenchWelcomeScreen::connectToLocalSystem(const QString &serverUrl
     , const QString &userName
     , const QString &password)
 {
     const auto connectHandler = context()->instance<QnWorkbenchConnectHandler>();
+    connectHandler->disconnectFromServer(true);
+
     QUrl url = QUrl::fromUserInput(serverUrl);
     url.setScheme(lit("http"));
-    url.setPassword(password);
-    url.setUserName(userName);
+    if (!password.isEmpty())
+        url.setPassword(password);
+    if (!userName.isEmpty())
+        url.setUserName(userName);
     connectHandler->connectToServer(url);
 }
+
+#include <watchers/cloud_status_watcher.h>
+
+void QnWorkbenchWelcomeScreen::connectToCloudSystem(const QString &serverUrl)
+{
+    const auto cloudWatcher = qnCommon->instance<QnCloudStatusWatcher>();
+    if (!cloudWatcher || cloudWatcher->status() != QnCloudStatusWatcher::Online)
+        return;
+
+    connectToLocalSystem(serverUrl, cloudWatcher->cloudLogin(), cloudWatcher->cloudPassword());
+}
+
 
 void QnWorkbenchWelcomeScreen::connectToAnotherSystem()
 {

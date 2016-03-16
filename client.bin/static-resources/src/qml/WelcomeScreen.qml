@@ -66,7 +66,7 @@ Rectangle
                         onConnectClicked:
                         {
                             console.log(selectedHost, ":", selectedUser, ":", selectedPassword);
-                            context.connectToServer(selectedHost, selectedUser, selectedPassword);
+                            context.connectToLocalSystem(selectedHost, selectedUser, selectedPassword);
                         }
                     }
                 }
@@ -78,6 +78,12 @@ Rectangle
                     CloudSystemTile
                     {
                         systemName: model.systemName;
+                        host: model.host;
+                        onConnectClicked:
+                        {
+                            console.log("---", model.host);
+                            context.connectToCloudSystem(model.host);
+                        }
                     }
                 }
 

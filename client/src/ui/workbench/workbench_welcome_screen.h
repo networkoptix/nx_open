@@ -35,9 +35,11 @@ public: // Properties
     void setEnabled(bool isEnabled);
 
 public slots:
-    void connectToServer(const QString &serverUrl
+    void connectToLocalSystem(const QString &serverUrl
         , const QString &userName
         , const QString &password);
+
+    void connectToCloudSystem(const QString &serverUrl);
 
     void connectToAnotherSystem();
 
