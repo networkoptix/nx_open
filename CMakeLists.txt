@@ -233,5 +233,6 @@ add_module(
         common_libs
         appserver2
         applauncher
+        traytool
     STATUS_SHORT_NAMES
 )
