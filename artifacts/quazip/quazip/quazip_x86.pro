@@ -3,14 +3,10 @@ TARGET = quazip
 INCLUDEPATH += .
 QT -= gui
 
+INCLUDEPATH += ..\..\..\buildenv\packages\windows-x86\qt-5.6.0\include\QtZlib
+
 # This one handles dllimport/dllexport directives.
 DEFINES += QUAZIP_BUILD
-
-LIBS += -Lc:/develop/buildenv/artifacts/qt/5.6.0/windows/x86/lib
-
-INCLUDEPATH += c:/develop/buildenv/artifacts/qt/5.6.0/windows/x86/include 
-INCLUDEPATH += c:/develop/buildenv/artifacts/qt/5.6.0/windows/x86/include/QtCore 
-INCLUDEPATH += c:/develop/buildenv/artifacts/qt/5.6.0/windows/x86/include/QtZlib
 
 # Input
 HEADERS += crypt.h \
