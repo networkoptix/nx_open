@@ -163,7 +163,7 @@ angular.module('cloudApp')
                 });
             },
             disconnect:function(systemId){
-                return $http.post(apiBase + '/systems/delete', {
+                return $http.post(apiBase + '/systems/disconnect', {
                     system_id: systemId
                 });
             },
