@@ -127,8 +127,8 @@ angular.module('webadminApp')
                 //ipCookie('response',auth_digest, { path: '/' });
                 //ipCookie('username',login, { path: '/' });
 
-                // Check auth again
-                return this.getUser(true);
+                // Check auth again - without catching errors
+                return $http.get(proxy + '/api/getCurrentUser');
             },
             url:function(){
                 return proxy;

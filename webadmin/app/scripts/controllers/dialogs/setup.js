@@ -69,10 +69,7 @@ angular.module('webadminApp')
         }
 
         function updateCredentials(login,password){
-            mediaserver.login(login, password).then(checkMySystem,
-                function(error){
-                    console.error(error);
-                });
+            return mediaserver.login(login, password).then(checkMySystem);
         }
 
 
@@ -182,7 +179,7 @@ angular.module('webadminApp')
                     remoteErrorHandler(r);
                     return;
                 }
-                updateCredentials( $scope.settings.remoteLogin, $scope.settings.remotePassword);
+                updateCredentials( $scope.settings.remoteLogin, $scope.settings.remotePassword).catch(remoteErrorHandler);
             },remoteErrorHandler);
         }
 
@@ -220,7 +217,7 @@ angular.module('webadminApp')
                         message.data.id,
                         message.data.authKey,
                         $scope.settings.cloudEmail).then(function(){
-                        updateCredentials( $scope.settings.cloudEmail, $scope.settings.cloudPassword);
+                        updateCredentials( $scope.settings.cloudEmail, $scope.settings.cloudPassword).catch(cloudErrorHandler);
                     },errorHandler);
                 }, cloudErrorHandler);
         }
@@ -247,10 +244,8 @@ angular.module('webadminApp')
                     offlineErrorHandler(r);
                     return;
                 }
-                updateCredentials( $scope.settings.localLogin, $scope.settings.localPassword);
-            },function(error){
-                offlineErrorHandler(error);
-            });
+                updateCredentials( $scope.settings.localLogin, $scope.settings.localPassword).catch(offlineErrorHandler);
+            },offlineErrorHandler);
         }
 
         /* Common wizard functions */
