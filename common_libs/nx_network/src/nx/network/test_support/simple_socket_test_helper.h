@@ -371,40 +371,49 @@ void shutdownSocket(
     const SocketAddress& endpointToBindTo = kServerAddress,
     const SocketAddress& endpointToConnectTo = kServerAddress)
 {
-    std::promise<void> promise;
-    auto server = serverMaker();
-    std::thread serverThread(
-        syncSocketServerMainFunc<decltype(server)>,
-        endpointToBindTo,
-        boost::none,
-        1,
-        serverMaker(),
-        &promise);
+    for (int i = 0; i < 29; ++i)
+    {
+        std::promise<void> promise;
+        auto server = serverMaker();
+        std::thread serverThread(
+            syncSocketServerMainFunc<decltype(server)>,
+            endpointToBindTo,
+            boost::none,
+            1,
+            serverMaker(),
+            &promise);
 
-    promise.get_future().wait();
+        promise.get_future().wait();
 
-    auto client = clientMaker();
-    ASSERT_TRUE(client->setRecvTimeout(10 * 1000));   //10 seconds
-    EXPECT_TRUE(client->connect(endpointToConnectTo, kTestTimeout.count()));
-    std::atomic<bool> recvExited(false);
-    std::thread clientThread(
-        [&client, &recvExited]()
+        auto client = clientMaker();
+        ASSERT_TRUE(client->setRecvTimeout(10 * 1000));   //10 seconds
+
+        std::promise<void> recvExitedPromise;
+        std::thread clientThread(
+            [&client, &recvExitedPromise, &endpointToConnectTo]()
+            {
+                nx::Buffer readBuffer;
+                readBuffer.resize(4096);
+                client->connect(endpointToConnectTo, kTestTimeout.count());
+                client->recv(readBuffer.data(), readBuffer.size(), 0);
+                recvExitedPromise.set_value();
+            });
+
+        //shutting down socket
+        //if (i == 0)
         {
-            nx::Buffer readBuffer;
-            readBuffer.resize(4096);
-            client->recv(readBuffer.data(), readBuffer.size(), 0);
-            recvExited = true;
-        });
+            //giving client thread some time to call client->recv
+            std::this_thread::sleep_for(std::chrono::milliseconds(rand() % 1000));
+            //testing that shutdown interrupts recv call
+            client->shutdown();
+        }
+        ASSERT_EQ(
+            std::future_status::ready,
+            recvExitedPromise.get_future().wait_for(std::chrono::seconds(1)));
 
-    //giving client thread some time to start
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    //shutting down socket
-    client->shutdown();
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    ASSERT_TRUE(recvExited.load());
-
-    serverThread.join();
-    clientThread.join();
+        serverThread.join();
+        clientThread.join();
+    }
 }
 
 namespace {
