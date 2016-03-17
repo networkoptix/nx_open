@@ -51,7 +51,6 @@ describe('Login suite', function () {
         p.passwordInput.sendKeys(p.userPassword);
         p.login();
 
-        // Check that element that user is on page Systems
         expect(p.userAccountDropdownToggle.getText()).toContain(email);
 
         p.userAccountDropdownToggle.click();

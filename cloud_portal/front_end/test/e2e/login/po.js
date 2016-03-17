@@ -96,8 +96,6 @@ var LoginPage = function () {
         this.userLogoutLink.click();
         browser.sleep(500); // such a shame, but I can't solve it right now
 
-        expect(this.loginSuccessElement.isDisplayed()).toBe(false);
-
         // Check that element that is visible only for authorized user is NOT displayed on page
         expect(this.loginSuccessElement.isDisplayed()).toBe(false);
     }
