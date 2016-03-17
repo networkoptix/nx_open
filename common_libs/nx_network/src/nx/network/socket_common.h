@@ -86,6 +86,7 @@ public:
     QString toString() const;
     //!Returns \a true if address is resolved. I.e., it's ip address is known
     bool isResolved() const;
+    bool isLocalIp() const;
 
     HostAddress& operator=( const HostAddress& rhs );
     HostAddress& operator=( HostAddress&& rhs );

@@ -56,6 +56,7 @@ namespace rest
         Handle saveCloudSystemCredentials(
             const QString &cloudSystemID,
             const QString &cloudAuthKey,
+            const QString &cloudAccountName,
             Result<EmptyResponseType>::type callback,
             QThread *targetThread = nullptr);
 

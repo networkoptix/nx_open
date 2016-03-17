@@ -266,9 +266,6 @@ void QnLinkToCloudDialogPrivate::at_bindFinished(
         return;
     }
 
-    admin->setProperty(Qn::CLOUD_ACCOUNT_NAME, q->ui->accountLineEdit->text());
-    propertyDictionary->saveParamsAsync(admin->getId());
-
     auto handleReply = [this](bool success, rest::Handle handleId, rest::ServerConnection::EmptyResponseType)
     {
         Q_UNUSED(handleId)
@@ -282,6 +279,7 @@ void QnLinkToCloudDialogPrivate::at_bindFinished(
     connection->saveCloudSystemCredentials(
         QString::fromStdString(systemData.id),
         QString::fromStdString(systemData.authKey),
+        q->ui->accountLineEdit->text(),
         handleReply,
         q->thread());
 }

@@ -46,6 +46,8 @@ namespace nx
 */
 bool changeSystemName(nx::SystemName systemName, qint64 sysIdTime, qint64 tranLogTime);
 
+/** Remove could specific params from administrator properties */
+bool resetCloudParams();
 
 struct PasswordData
 {

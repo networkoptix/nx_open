@@ -150,7 +150,7 @@ void AddressResolver::resolveDomain(
                 .arg(domain.toString()).arg(QnLexical::serialized(resultCode)),
                 cl_logDEBUG2);
 
-            std::vector<TypedAddres> subdomains;
+            std::vector<TypedAddres> result;
             const auto suffix = lit(".") + domain.toString();
             {
                 // TODO: #mux Think about better representation to increase performance
@@ -159,17 +159,20 @@ void AddressResolver::resolveDomain(
                     if (info.first.toString().endsWith(suffix) &&
                         !info.second.fixedEntries.empty())
                     {
-                        subdomains.emplace_back(info.first, AddressType::direct);
+                        result.emplace_back(info.first, AddressType::direct);
                     }
             }
 
             for (const auto& host : response.hostNames)
-                subdomains.emplace_back(HostAddress(host), AddressType::cloud);
+            {
+                HostAddress address(QString::fromUtf8(host));
+                result.emplace_back(std::move(address), AddressType::cloud);
+            }
 
             NX_LOGX(lm("Domain %1 is resolvet to: %2")
-                .arg(domain.toString()).container(subdomains), cl_logDEBUG1);
+                .arg(domain.toString()).container(result), cl_logDEBUG1);
 
-            handler(std::move(subdomains));
+            handler(std::move(result));
         });
 }
 
