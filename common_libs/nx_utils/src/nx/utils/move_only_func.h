@@ -99,6 +99,12 @@ public:
         return *this;
     }
 
+    MoveOnlyFunc& operator=(std::nullptr_t val)
+    {
+        std::function<F>::operator=(val);
+        return *this;
+    }
+
     using std::function<F>::operator();
     using std::function<F>::operator bool;
 };

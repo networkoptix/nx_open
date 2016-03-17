@@ -5,8 +5,11 @@
 
 #include "cloud_connection_manager.h"
 
+#include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
+
+#include <nx/network/socket_global.h>
 
 #include "media_server/settings.h"
 
@@ -39,6 +42,20 @@ CloudConnectionManager::CloudConnectionManager()
 CloudConnectionManager::~CloudConnectionManager()
 {
    directDisconnectAll();
+}
+
+boost::optional<nx::hpm::api::SystemCredentials> 
+    CloudConnectionManager::getSystemCredentials() const
+{
+    QnMutexLocker lk(&m_mutex);
+    if (m_cloudSystemID.isEmpty() || m_cloudAuthKey.isEmpty())
+        return boost::none;
+
+    nx::hpm::api::SystemCredentials cloudCredentials;
+    cloudCredentials.systemId = m_cloudSystemID.toUtf8();
+    cloudCredentials.serverId = qnCommon->moduleGUID().toByteArray();
+    cloudCredentials.key = m_cloudAuthKey.toUtf8();
+    return cloudCredentials;
 }
 
 bool CloudConnectionManager::bindedToCloud() const
@@ -86,20 +103,44 @@ void CloudConnectionManager::atAdminPropertyChanged(
     auto user = res.dynamicCast<QnUserResource>();
     NX_ASSERT(user);
 
-    const auto cloudSystemID = user->getProperty(Qn::CLOUD_SYSTEM_ID);
+    const auto cloudSystemId = user->getProperty(Qn::CLOUD_SYSTEM_ID);
     const auto cloudAuthKey = user->getProperty(Qn::CLOUD_SYSTEM_AUTH_KEY);
 
     QnMutexLocker lk(&m_mutex);
-    if (cloudSystemID == m_cloudSystemID &&
+    if (cloudSystemId == m_cloudSystemID &&
         cloudAuthKey == m_cloudAuthKey)
     {
         return;
     }
 
-    m_cloudSystemID = cloudSystemID;
+    m_cloudSystemID = cloudSystemId;
     m_cloudAuthKey = cloudAuthKey;
     const bool bindedToCloud = !m_cloudSystemID.isEmpty() && !m_cloudAuthKey.isEmpty();
 
     lk.unlock();
+
+    QnModuleInformation info = qnCommon->moduleInformation();
+    if (info.cloudSystemId != QnUuid::fromStringSafe(cloudSystemId))
+    {
+        info.cloudSystemId = QnUuid::fromStringSafe(cloudSystemId);
+        qnCommon->setModuleInformation(info);
+    }
+
+    if (bindedToCloud)
+    {
+        nx::hpm::api::SystemCredentials credentials(
+            cloudSystemId.toUtf8(),
+            qnCommon->moduleGUID().toSimpleString().toUtf8(),
+            cloudAuthKey.toUtf8());
+
+        nx::network::SocketGlobals::mediatorConnector()
+            .setSystemCredentials(std::move(credentials));
+    }
+    else
+    {
+        nx::network::SocketGlobals::mediatorConnector()
+            .setSystemCredentials(boost::none);
+    }
+
     emit cloudBindingStatusChanged(bindedToCloud);
 }

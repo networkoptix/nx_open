@@ -172,24 +172,29 @@ public:
     ///////// Implementation of AbstractStreamServerSocket methods
     //////////////////////////////////////////////////////////////////////
 
-    //!Implementation of SSLServerSocket::listen
+    //!Implementation of AbstractStreamServerSocket::listen
     virtual bool listen( int queueLen ) override;
-    //!Implementation of SSLServerSocket::accept
+    //!Implementation of AbstractStreamServerSocket::accept
     virtual AbstractStreamSocket* accept() override;
     //!Implementation of QnStoppable::pleaseStop
     virtual void pleaseStop(nx::utils::MoveOnlyFunc< void() > handler) override;
 
-protected:
-    //!Implementation of SSLServerSocket::acceptAsync
+    //!Implementation of AbstractStreamServerSocket::acceptAsync
     virtual void acceptAsync(
-        std::function<void(
+        nx::utils::MoveOnlyFunc<void(
             SystemError::ErrorCode,
             AbstractStreamSocket*)> handler) override;
+    //!Implementation of AbstractStreamServerSocket::cancelIOAsync
+    virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler) override;
+    //!Implementation of AbstractStreamServerSocket::cancelIOSync
+    virtual void cancelIOSync() override;
 
 private:
     const bool m_allowNonSecureConnect;
     std::unique_ptr<AbstractStreamServerSocket> m_delegateSocket;
-    std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)> m_acceptHandler;
+    nx::utils::MoveOnlyFunc<void(
+        SystemError::ErrorCode,
+        AbstractStreamSocket*)> m_acceptHandler;
 
     void connectionAccepted(SystemError::ErrorCode errorCode, AbstractStreamSocket* newSocket);
 };

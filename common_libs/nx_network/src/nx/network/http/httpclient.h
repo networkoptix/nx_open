@@ -42,6 +42,7 @@ namespace nx_http
 
         /*!
             Returns on receiving response
+            \return \a true if response has been received
         */
         bool doGet( const QUrl& url );
         bool doPost(

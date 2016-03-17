@@ -27,7 +27,7 @@ public: // overrides
 private:
     void addSystem(const QnSystemDescriptionPtr &systemDescription);
 
-    void removeSystem(const QnUuid &systemId);
+    void removeSystem(const QString &systemId);
 
     struct InternalSystemData;
     typedef QSharedPointer<InternalSystemData> InternalSystemDataPtr;

@@ -25,6 +25,7 @@
 #include <utils/crypt/linux_passwd_crypt.h>
 #include <core/resource/user_resource.h>
 #include <server/host_system_password_synchronizer.h>
+#include <core/resource_management/resource_properties.h>
 
 #include <utils/common/model_functions.h>
 
@@ -245,6 +246,19 @@ bool changeSystemName(nx::SystemName systemName, qint64 sysIdTime, qint64 tranLo
     QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->save(apiServer, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 
     return true;
+}
+
+bool resetCloudParams()
+{
+    const auto admin = qnResPool->getAdministrator();
+    if (!admin)
+        return false;
+
+    //setting cloud credentials to empty string
+    admin->setProperty(Qn::CLOUD_SYSTEM_ID, QString());
+    admin->setProperty(Qn::CLOUD_SYSTEM_AUTH_KEY, QString());
+    admin->setProperty(Qn::CLOUD_ACCOUNT_NAME, QString());
+    return propertyDictionary->saveParams(admin->getId());
 }
 
 qint64 getSysIdTime()

@@ -8,7 +8,7 @@
 
 struct QnCloudSystem
 {
-    QnUuid id;
+    QString id;
     QString name;
     std::string authKey;
 

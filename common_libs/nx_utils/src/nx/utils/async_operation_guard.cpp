@@ -14,7 +14,8 @@ AsyncOperationGuard::~AsyncOperationGuard()
 }
 
 AsyncOperationGuard::SharedGuard::SharedGuard()
-    : m_terminated(false)
+    : m_mutex(QnMutex::Recursive)
+    , m_terminated(false)
 {
 }
 
