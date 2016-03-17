@@ -167,8 +167,6 @@ void QnToolTipSlider::updateToolTipPosition() {
     initStyleOption(&opt);
     QRect handleRect = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle, NULL);
 
-    //ToDo: #vkutin
-    // Currently a tooltip near screen edge can be clipped. Need to implement logic to reposition tooltip while keeping balloon tail centered on required position.
     qreal x = positionFromValue(sliderPosition()).x() + handleRect.width() / 2.0;
     qreal y = 0;
 
