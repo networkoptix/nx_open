@@ -79,7 +79,6 @@ private:
 
     void setLocalPathSafe(const QString &path) const;
     QString getLocalPathSafe() const;
-
 public:
     // Try to remove old temporary dirs if any.
     // This could happen if server crashed and ~FileStorageResource
@@ -87,12 +86,11 @@ public:
     static void removeOldDirs();
 
 private:
-    // used for 'virtual' storage bitrate. If storage has more free space, increase 'virtual' storage bitrate for full storage space filling
-    mutable bool m_dirty;
-    mutable bool m_valid;
+    mutable std::atomic<bool> m_valid;
+    mutable boost::optional<bool> m_dbReady;
 
 private:
-    mutable QnMutex     m_mutexPermission;
+    mutable QnMutex     m_mutexCheckStorage;
     mutable int         m_capabilities;
     mutable QString     m_localPath;
 
