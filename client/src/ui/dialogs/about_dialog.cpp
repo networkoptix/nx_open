@@ -102,7 +102,7 @@ QString QnAboutDialog::connectedServers() const
         if (!resource)
             continue;
 
-        QString server = lit("%1: v%3").arg(getFullResourceName(resource, true)).arg(data.version.toString()) + lit("<br/>");
+        QString server = lit("%1: v%2<br/>").arg(getFullResourceName(resource, true)).arg(data.version.toString());
 
         bool updateRequested = QnWorkbenchVersionMismatchWatcher::versionMismatches(data.version, latestMsVersion, true);
 
