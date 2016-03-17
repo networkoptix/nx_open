@@ -261,7 +261,7 @@ TEST_F(CdbFunctionalTest, system_sharing_maintenance)
 
     restart();
 
-    //account1: trying to modify (change access rights) sharing to account2 
+    //account1: trying to modify (change access rights) sharing to account2
     //(failure: maintenance sharing cannot be updated)
     ASSERT_EQ(
         api::ResultCode::forbidden,
@@ -272,7 +272,7 @@ TEST_F(CdbFunctionalTest, system_sharing_maintenance)
             account2.email,
             api::SystemAccessRole::viewer));
 
-    //account1: trying to remove sharing to account2 
+    //account1: trying to remove sharing to account2
     //(failure: maintenance sharing cannot be removed)
     ASSERT_EQ(
         api::ResultCode::forbidden,
@@ -283,7 +283,7 @@ TEST_F(CdbFunctionalTest, system_sharing_maintenance)
             account2.email,
             api::SystemAccessRole::none));
 
-    //account2: trying to modify sharing to account2 
+    //account2: trying to modify sharing to account2
     //(failure: integrator cannot modify its sharing, only remove)
     ASSERT_EQ(
         api::ResultCode::forbidden,
@@ -322,7 +322,7 @@ TEST_F(CdbFunctionalTest, system_sharing_maintenance)
             account1.email,
             api::SystemAccessRole::none));
 
-    //account2: trying to remove sharing to account2 
+    //account2: trying to remove sharing to account2
     //(success: itegrator removed sharing to itself)
     ASSERT_EQ(
         api::ResultCode::ok,
@@ -684,7 +684,7 @@ TEST_F(CdbFunctionalTest, system_sharing_remove_system)
         api::ResultCode::ok,
         bindRandomSystem(account1.email, account1Password, &system1));
 
-    //sharing system 
+    //sharing system
     api::AccountData account2;
     std::string account2Password;
     ASSERT_EQ(
@@ -770,7 +770,7 @@ TEST_F(CdbFunctionalTest, system_sharing_get_access_role_list)
         api::ResultCode::ok,
         bindRandomSystem(account1.email, account1Password, &system1));
 
-    //sharing system 
+    //sharing system
     api::AccountData account2;
     std::string account2Password;
     ASSERT_EQ(
@@ -963,7 +963,7 @@ TEST_F(CdbFunctionalTest, DISABLED_system_sharing_remove_sharing_unknown_system)
         updateSystemSharing(
             account1.email,
             account1Password,
-            "unknown_system_id",
+            QnUuid::createUuid(),   /* Let assume we can never have system with random id. */
             "unknown_account_name",
             api::SystemAccessRole::none));
 

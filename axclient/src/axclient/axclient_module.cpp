@@ -48,8 +48,7 @@ QnAxClientModule::QnAxClientModule(QObject *parent)
     m_customizer.reset(new QnCustomizer(customization));
     m_customizer->customize(qnGlobals);
 
-    auto *style = QnSkin::newStyle();
-    QApplication::setStyle(style);
+    QApplication::setStyle(m_skin->newStyle(m_customizer->genericPalette()));
 
     auto ec2ConnectionFactory = getConnectionFactory(Qn::PT_DesktopClient);
     QnAppServerConnectionFactory::setEC2ConnectionFactory(ec2ConnectionFactory);

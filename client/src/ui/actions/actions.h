@@ -1075,6 +1075,11 @@ public:
         LogoutFromCloud,
 
         /**
+        * Opens cloud portal in the browser at register page.
+        */
+        OpenCloudRegisterUrl,
+
+        /**
          * Opens cloud portal in the browser.
          */
         OpenCloudMainUrl,

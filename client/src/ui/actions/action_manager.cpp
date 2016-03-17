@@ -937,6 +937,10 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::NoTarget).
         text(tr("Manage account..."));
 
+    factory(QnActions::OpenCloudRegisterUrl).
+        flags(Qn::NoTarget).
+        text(tr("Create account..."));
+
     factory().
         flags(Qn::Main).
         separator();

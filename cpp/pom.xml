@@ -249,6 +249,15 @@
                                             <value><![CDATA[<ProjectGuid>\${guid}]]></value>
                                         </replacement>
 
+                                        <!-- Adding target machine for x86 -->
+                                        <replacement>
+                                            <xpath>//Project/ItemDefinitionGroup</xpath>
+                                            <token><![CDATA[</Lib>]]></token>
+                                            <value><![CDATA[
+      <TargetMachine>Machine${machine.type}</TargetMachine>
+    </Lib>]]></value>
+                                        </replacement>                                        
+                                        
                                         <!-- Disabling moc preprocessor steps, since we do it with jom -->
                                         <replacement>
                                             <xpath>//Project/ItemGroup/CustomBuild[contains(@Include,'.h')]</xpath>

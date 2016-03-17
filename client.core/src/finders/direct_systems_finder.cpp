@@ -105,8 +105,8 @@ void QnDirectSystemsFinder::updatePrimaryAddress(const QnModuleInformation &modu
     if (!serverIsInKnownSystem)
         return;
 
-    const auto serverDescrption = systemIt.value();
-    serverDescrption->setPrimaryAddress(moduleInformation.id, address);
+    const auto systemDescription = systemIt.value();
+    systemDescription->setServerHost(moduleInformation.id, address.toString());
 }
 
 QnDirectSystemsFinder::SystemsHash::iterator

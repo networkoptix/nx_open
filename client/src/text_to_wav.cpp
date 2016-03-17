@@ -3,10 +3,10 @@
 
 #include <memory>
 
-#include <festival.h>
+#include <festival/festival.h>
+#include <festival/EST_wave_aux.h>
 
 #include <utils/common/app_info.h>
-#include <EST_wave_aux.h>
 
 #include "text_to_wav.h"
 

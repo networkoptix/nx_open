@@ -139,7 +139,7 @@ void QnCloudSystemsFinder::updateSystem(const QString &systemId)
             const auto apiUrl = QUrl(kModuleInformationTemplate.arg(host.first.toString()));
 
             const QPointer<QnCloudSystemsFinder> guard(this);
-            const auto onModuleInformationCompleted = [this, guard, systemId]
+            const auto onModuleInformationCompleted = [this, guard, systemId, host]
                 (SystemError::ErrorCode errorCode, int httpCode, nx_http::BufferType buffer)
             {
                 enum { kHttpSuccess = 200 };
@@ -162,7 +162,11 @@ void QnCloudSystemsFinder::updateSystem(const QString &systemId)
                 if (systemDescription->containsServer(moduleInformation.id))
                     systemDescription->updateServer(moduleInformation);
                 else
-                    systemDescription->addServer(moduleInformation);
+                    systemDescription->addServer(moduleInformation
+                        , static_cast<int>(host.second));
+
+                systemDescription->setServerHost(moduleInformation.id
+                    , host.first.toString());
             };
 
             nx_http::downloadFileAsync(apiUrl, onModuleInformationCompleted);

@@ -1,4 +1,5 @@
 import QtQuick 2.5;
+import QtQuick.Controls 1.2;
 
 BaseTile
 {
@@ -33,6 +34,12 @@ BaseTile
 
             color: "lightblue";
         }
+    }
+
+    expandedAreaDelegate: Button
+    {
+        text: qsTr("Connect");
+        onClicked: { thisComponent.connectClicked(); }
     }
 
     // TODO setup fonts

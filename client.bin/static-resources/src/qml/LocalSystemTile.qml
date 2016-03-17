@@ -5,7 +5,6 @@ BaseTile
 {
     id: thisComponent;
 
-    property string host;
     property string userName;
 
     property var knownUsersModel;
@@ -29,8 +28,6 @@ BaseTile
 
     property string selectedHost: (centralArea ? centralArea.host : "");
     property string selectedPassword: (expandedArea ? expandedArea.password : "");
-
-    signal connectClicked;
 
     property QtObject activeItemSelector: SingleActiveItemSelector
     {

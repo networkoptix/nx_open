@@ -6,6 +6,7 @@ Item
     id: thisComponent;
 
     property string systemName;
+    property string host;
     property bool isRecentlyConnected;
 
     property Component centralAreaDelegate;
@@ -17,6 +18,8 @@ Item
     property alias expandedArea: expandedAreaLoader.item;
 
     property bool isExpandedPrivate: false;
+
+    signal connectClicked();
 
     function toggle()
     {

@@ -15,7 +15,7 @@ enum class QnServerField
     NoField                 = 0x0
     , NameField             = 0x1
     , SystemNameField       = 0x2
-    , PrimaryAddressField   = 0x4
+    , HostField   = 0x4
 };
 Q_DECLARE_FLAGS(QnServerFields, QnServerField)
 
@@ -54,10 +54,10 @@ public:
 
     void removeServer(const QnUuid &serverId);
 
-    void setPrimaryAddress(const QnUuid &serverId
-        , const SocketAddress &address);
+    void setServerHost(const QnUuid &serverId
+        , const QString &host);
 
-    SocketAddress getServerPrimaryAddress(const QnUuid &serverId) const;
+    QString getServerHost(const QnUuid &serverId) const;
 
 signals:
     void serverAdded(const QnUuid &serverId);
@@ -74,7 +74,7 @@ private:
 
 private:
     typedef QHash<QnUuid, QnModuleInformation> ServerInfoHash;
-    typedef QHash<QnUuid, SocketAddress> PrimaryAddressHash;
+    typedef QHash<QnUuid, QString> HostsHash;
     typedef QMultiMap<int, QnUuid> PrioritiesMap;
 
     const QString m_id;
@@ -82,7 +82,7 @@ private:
     const bool m_isCloudSystem;
     ServerInfoHash m_servers;
     PrioritiesMap m_prioritized;
-    PrimaryAddressHash m_primaryAddresses;
+    HostsHash m_hosts;
 
 
 };
