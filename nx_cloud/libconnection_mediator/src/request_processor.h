@@ -59,10 +59,11 @@ public:
 
 protected:
 
-    /** Returns mediaserver data from \a request,
-     *  sends \fn errorResponse in case of failure */
-    boost::optional< MediaserverData > getMediaserverData(
-            ConnectionStrongRef connection, stun::Message& request );
+    /** Returns mediaserver data from \a request */
+    api::ResultCode getMediaserverData(
+        stun::Message& request,
+        MediaserverData* const foundData,
+        nx::String* errorMessage);
 
 private:
     AbstractCloudDataProvider* m_cloudData;
