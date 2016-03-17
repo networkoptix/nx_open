@@ -17,6 +17,8 @@ INCLUDEPATH +=  ${qt.dir}/include/QtWidgets/$$QT_VERSION/ \
                 ${root.dir}/client.core/src/ \
                 ${root.dir}/client/src/
 
+LIBS += $$FESTIVAL_LIB
+
 include($$ADDITIONAL_QT_INCLUDES/qtsingleapplication/src/qtsingleapplication.pri)
 
 mac {
