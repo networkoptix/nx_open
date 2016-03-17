@@ -10,8 +10,10 @@
 #include "version.h"
 #include "server/server_globals.h"
 
-QnMediaServerModule::QnMediaServerModule(QObject *parent):
-    QObject(parent) 
+#include <nx/network/socket_global.h>
+
+QnMediaServerModule::QnMediaServerModule(const QString& enforcedMediatorEndpoint, QObject *parent):
+    QObject(parent)
 {
     Q_INIT_RESOURCE(mediaserver_core);
     Q_INIT_RESOURCE(mediaserver_core_additional);
@@ -27,6 +29,10 @@ QnMediaServerModule::QnMediaServerModule(QObject *parent):
 
     m_common = new QnCommonModule(this);
     initServerMetaTypes();
+
+    if (!enforcedMediatorEndpoint.isEmpty())
+        nx::network::SocketGlobals::mediatorConnector().mockupAddress(enforcedMediatorEndpoint);
+    nx::network::SocketGlobals::mediatorConnector().enable(true);
 }
 
 QnMediaServerModule::~QnMediaServerModule() {
