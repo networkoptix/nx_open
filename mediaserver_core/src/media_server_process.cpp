@@ -1409,8 +1409,12 @@ void MediaServerProcess::at_portMappingChanged(QString address)
         NX_LOGX(lit("New external address %1 has been mapped")
                 .arg(address), cl_logALWAYS)
 
-        m_forwardedAddresses[mappedAddress.address] = mappedAddress.port;
-        updateAddressesList();
+        auto it = m_forwardedAddresses.emplace(mappedAddress.address, 0).first;
+        if (it->second != mappedAddress.port)
+        {
+            it->second = mappedAddress.port;
+            updateAddressesList();
+        }
     }
     else
     {
@@ -1645,6 +1649,46 @@ void MediaServerProcess::saveAdminPswdHash()
         MSSettings::roSettings()->setValue(ADMIN_PSWD_HASH, admin->getHash());
         MSSettings::roSettings()->setValue(ADMIN_PSWD_DIGEST, admin->getDigest());
     }
+}
+
+std::unique_ptr<nx_upnp::PortMapper> MediaServerProcess::initializeUpnpPortMapper()
+{
+    auto mapper = std::make_unique<nx_upnp::PortMapper>();
+
+    const auto configValue = MSSettings::roSettings()->value(
+        QnGlobalSettings::kNameUpnpPortMappingEnabled);
+
+    if (!configValue.isNull())
+    {
+        // config value prevail
+        mapper->setIsEnabled(configValue.toBool());
+    }
+    else
+    {
+        // otherwise it's controlled by qnGlobalSettings
+        auto updateEnabled = [mapper = mapper.get()]()
+        {
+            mapper->setIsEnabled(qnGlobalSettings->isUpnpPortMappingEnabled());
+        };
+
+        updateEnabled();
+        connect(
+            qnGlobalSettings, &QnGlobalSettings::upnpPortMappingEnabledChanged,
+            std::move(updateEnabled));
+    }
+
+    mapper->enableMapping(
+        m_mediaServer->getPort(), nx_upnp::PortMapper::Protocol::TCP,
+        [this](SocketAddress address)
+        {
+            const auto result = QMetaObject::invokeMethod(
+                this, "at_portMappingChanged", Qt::AutoConnection,
+                Q_ARG(QString, address.toString()));
+
+            NX_ASSERT(result, "Could not call at_portMappingChanged(...)");
+        });
+
+    return mapper;
 }
 
 QHostAddress MediaServerProcess::getPublicAddress()
@@ -2226,18 +2270,6 @@ void MediaServerProcess::run()
     std::unique_ptr<nx_upnp::DeviceSearcher> upnpDeviceSearcher(new nx_upnp::DeviceSearcher());
     std::unique_ptr<QnMdnsListener> mdnsListener(new QnMdnsListener());
 
-    nx_upnp::PortMapper upnpPortMapper;
-    upnpPortMapper.enableMapping(m_mediaServer->getPort(),
-                                 nx_upnp::PortMapper::Protocol::TCP,
-                                 [this](SocketAddress address)
-    {
-        const auto result = QMetaObject::invokeMethod(
-            this, "at_portMappingChanged", Qt::AutoConnection,
-            Q_ARG(QString, address.toString()));
-
-        NX_ASSERT(result, Q_FUNC_INFO, "Could not call at_portMappingChanged(...)");
-    });
-
     std::unique_ptr<QnAppserverResourceProcessor> serverResourceProcessor( new QnAppserverResourceProcessor(m_mediaServer->getId()) );
     serverResourceProcessor->moveToThread( mserverResourceDiscoveryManager.get() );
     QnResourceDiscoveryManager::instance()->setResourceProcessor(serverResourceProcessor.get());
@@ -2334,6 +2366,8 @@ void MediaServerProcess::run()
     loadResourcesFromECS(messageProcessor.data());
     if (QnGlobalSettings::instance()->isCrossdomainXmlEnabled())
         m_httpModManager->addUrlRewriteExact( lit( "/crossdomain.xml" ), lit( "/static/crossdomain.xml" ) );
+
+    auto upnpPortMapper = initializeUpnpPortMapper();
 
     //TODO: #GDM #2.6 take keys from one place
     {
