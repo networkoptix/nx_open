@@ -1758,7 +1758,7 @@ QSize QnNxStyle::sizeFromContents(
     case CT_SpinBox:
     {
         /* QDateTimeEdit uses CT_SpinBox style with combo (!) box subcontrols, so we have to handle this case separately: */
-        if (const QDateTimeEdit *dateTime = qobject_cast<const QDateTimeEdit *>(widget))
+        if (qobject_cast<const QDateTimeEdit *>(widget))
         {
             const QStyleOptionSpinBox *spinBox = qstyleoption_cast<const QStyleOptionSpinBox *>(option);
             if (spinBox && spinBox->subControls.testFlag(SC_ComboBoxArrow))
