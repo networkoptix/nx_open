@@ -963,7 +963,7 @@ TEST_F(CdbFunctionalTest, DISABLED_system_sharing_remove_sharing_unknown_system)
         updateSystemSharing(
             account1.email,
             account1Password,
-            QnUuid::createUuid(),   /* Let assume we can never have system with random id. */
+            QnUuid::createUuid().toString().toStdString(),   /* Let assume we can never have system with random id. */
             "unknown_account_name",
             api::SystemAccessRole::none));
 
