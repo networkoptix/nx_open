@@ -35,7 +35,7 @@
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
         <linux.defines/>
         <mac.defines/>
-        <rdep.packages>openssl quazip festival</rdep.packages>
+        <rdep.packages>openssl quazip festival festival-vox</rdep.packages>
     </properties>
 
     <dependencies>

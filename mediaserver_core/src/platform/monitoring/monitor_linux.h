@@ -6,7 +6,7 @@
 #include <boost/optional.hpp>
 #include "sigar_monitor.h"
 #include <utils/common/systemerror.h>
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 class QnLinuxMonitorPrivate;
 
