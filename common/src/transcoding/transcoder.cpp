@@ -377,7 +377,7 @@ int QnTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnBy
         m_firstTime = media->timestamp;
 
     bool doTranscoding = true;
-    static const size_t kMaxDelayedQueueSize = 30;
+    static const size_t kMaxDelayedQueueSize = 60;
 
     if (!m_initialized)
     {
@@ -410,24 +410,10 @@ int QnTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnBy
             m_initializedAudio = true;
     }
 
-    if (media->dataType == QnAbstractMediaData::AUDIO && !m_initializedAudio)
+    if ((media->dataType == QnAbstractMediaData::AUDIO && !m_initializedAudio) ||
+        (media->dataType == QnAbstractMediaData::VIDEO && !m_initializedVideo))
     {
-        int rez = open(QnCompressedVideoDataPtr(),
-                       std::dynamic_pointer_cast<const QnCompressedAudioData>(media));
-        if (rez != 0)
-            return rez;
-
-        m_initializedAudio = true;
-    }
-
-    if (media->dataType == QnAbstractMediaData::VIDEO && !m_initializedVideo)
-    {
-        int rez = open(std::dynamic_pointer_cast<const QnCompressedVideoData>(media),
-                       QnCompressedAudioDataPtr());
-        if (rez != 0)
-            return rez;
-
-        m_initializedVideo = true;
+        return OperationResult::Success;
     }
 
     if( result )
