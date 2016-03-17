@@ -28,8 +28,9 @@ CdbNonceFetcher::CdbNonceFetcher(std::unique_ptr<AbstractNonceProvider> defaultG
 {
     m_monotonicClock.restart();
 
-    connect(CloudConnectionManager::instance(), &CloudConnectionManager::cloudBindingStatusChanged,
-            this, &CdbNonceFetcher::cloudBindingStatusChanged);
+    Qn::directConnect(
+        CloudConnectionManager::instance(), &CloudConnectionManager::cloudBindingStatusChanged,
+        this, &CdbNonceFetcher::cloudBindingStatusChanged);
     m_timerID = TimerManager::instance()->addTimer(
         std::bind(&CdbNonceFetcher::fetchCdbNonceAsync, this),
         0);
@@ -37,6 +38,8 @@ CdbNonceFetcher::CdbNonceFetcher(std::unique_ptr<AbstractNonceProvider> defaultG
 
 CdbNonceFetcher::~CdbNonceFetcher()
 {
+    directDisconnectAll();
+
     QnMutexLocker lk(&m_mutex);
     auto connection = std::move(m_connection);
     auto timerID = std::move(m_timerID);

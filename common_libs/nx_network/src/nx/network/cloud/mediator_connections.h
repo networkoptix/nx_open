@@ -161,7 +161,7 @@ public:
     {
         if (m_connector)
             if (auto credentials = m_connector->getSystemCredentials())
-                return credentials->systemId + String(".") + credentials->serverId;
+                return credentials->serverId + String(".") + credentials->systemId;
 
         return String();
     }

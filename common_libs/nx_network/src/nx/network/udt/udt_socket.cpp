@@ -835,7 +835,7 @@ AbstractStreamSocket* UdtStreamServerSocket::accept()
 }
 
 void UdtStreamServerSocket::acceptAsync(
-    std::function<void(
+    nx::utils::MoveOnlyFunc<void(
         SystemError::ErrorCode,
         AbstractStreamSocket*)> handler)
 {
@@ -856,6 +856,16 @@ void UdtStreamServerSocket::acceptAsync(
             }
             handler(errorCode, socket);
         });
+}
+
+void UdtStreamServerSocket::cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler)
+{
+    m_aioHelper->cancelIOAsync(std::move(handler));
+}
+
+void UdtStreamServerSocket::cancelIOSync()
+{
+    m_aioHelper->cancelIOSync();
 }
 
 void UdtStreamServerSocket::pleaseStop( 

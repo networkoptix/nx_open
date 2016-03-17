@@ -148,6 +148,28 @@ UPDATE access_role SET description='localAdmin' WHERE id=4;                 \
 UPDATE access_role SET description='cloudAdmin' WHERE id=5;                 \
 ";
 
+static const char kChangeSystemIdTypeToString[] = "                         \
+CREATE TABLE system_new(                                                    \
+    id                  VARCHAR(32) NOT NULL PRIMARY KEY,                   \
+    name                TEXT NOT NULL,                                      \
+    auth_key            TEXT NOT NULL,                                      \
+    owner_account_id    BLOB(16) NOT NULL,                                  \
+    status_code         INTEGER NOT NULL,                                   \
+    customization       VARCHAR(255),                                       \
+    FOREIGN KEY(owner_account_id) REFERENCES account(id) ON DELETE CASCADE, \
+    FOREIGN KEY(status_code) REFERENCES system_status(code)                 \
+);                                                                          \
+                                                                            \
+INSERT INTO system_new(                                                     \
+    id, name, auth_key, owner_account_id, status_code, customization)       \
+SELECT                                                                      \
+    hex(id), name, auth_key, owner_account_id, status_code, customization   \
+FROM system;                                                                \
+                                                                            \
+DROP TABLE system;                                                          \
+ALTER TABLE system_new RENAME TO system;                                    \
+";
+
 }   //db
 }   //cdb
 }   //nx

@@ -414,7 +414,7 @@ api::ResultCode CdbFunctionalTest::getSystem(
 api::ResultCode CdbFunctionalTest::shareSystem(
     const std::string& email,
     const std::string& password,
-    const QnUuid& systemID,
+    const std::string& systemID,
     const std::string& accountEmail,
     api::SystemAccessRole accessRole)
 {
@@ -440,7 +440,7 @@ api::ResultCode CdbFunctionalTest::shareSystem(
 api::ResultCode CdbFunctionalTest::updateSystemSharing(
     const std::string& email,
     const std::string& password,
-    const QnUuid& systemID,
+    const std::string& systemID,
     const std::string& accountEmail,
     api::SystemAccessRole newAccessRole)
 {
@@ -573,7 +573,7 @@ api::ResultCode CdbFunctionalTest::ping(
 const api::SystemSharingEx& CdbFunctionalTest::findSharing(
     const std::vector<api::SystemSharingEx>& sharings,
     const std::string& accountEmail,
-    const QnUuid& systemID) const
+    const std::string& systemID) const
 {
     static const api::SystemSharingEx kDummySharing;
 
@@ -589,7 +589,7 @@ const api::SystemSharingEx& CdbFunctionalTest::findSharing(
 api::SystemAccessRole CdbFunctionalTest::accountAccessRoleForSystem(
     const std::vector<api::SystemSharingEx>& sharings,
     const std::string& accountEmail,
-    const QnUuid& systemID) const
+    const std::string& systemID) const
 {
     return findSharing(sharings, accountEmail, systemID).accessRole;
 }

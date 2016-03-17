@@ -15,7 +15,8 @@ namespace cloud {
 
 OutgoingTunnelPool::OutgoingTunnelPool()
 :
-    m_terminated(false)
+    m_terminated(false),
+    m_stopping(false)
 {
 }
 
@@ -26,8 +27,9 @@ OutgoingTunnelPool::~OutgoingTunnelPool()
 
 void OutgoingTunnelPool::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
-    //stopping all tunnels. Assuming noone calls establishNewConnection anymore
+    //stopping all tunnels. Assuming no one calls establishNewConnection anymore
     QnMutexLocker lock(&m_mutex);
+    m_stopping = true;
     nx::BarrierHandler tunnelsStoppedFuture(
         [this, completionHandler = move(completionHandler)]() mutable
         {
@@ -69,30 +71,51 @@ const std::unique_ptr<OutgoingTunnel>& OutgoingTunnelPool::getTunnel(
     auto tunnel = std::make_unique<OutgoingTunnel>(targetHostAddress);
     const auto tunnelIter = iterAndInsertionResult.first;
     tunnel->setStateHandler(
-        [this, tunnelIter](Tunnel::State state)
+        [this, tunnelPtr = tunnel.get()](Tunnel::State state)
         {
             if (state != Tunnel::State::kClosed)
                 return;
             //tunnel supports deleting in "tunnel closed" handler
-            removeTunnel(tunnelIter);
+            onTunnelClosed(tunnelPtr);
         });
 
     iterAndInsertionResult.first->second = std::move(tunnel);
     return iterAndInsertionResult.first->second;
 }
 
-void OutgoingTunnelPool::removeTunnel(TunnelDictionary::iterator tunnelIter)
+void OutgoingTunnelPool::onTunnelClosed(OutgoingTunnel* tunnelPtr)
 {
-    QnMutexLocker lock(&m_mutex);
+    QnMutexLocker lk(&m_mutex);
+    TunnelDictionary::iterator tunnelIter = m_pool.end();
+    for (auto it = m_pool.begin(); it != m_pool.end(); ++it)
+    {
+        if (it->second.get() == tunnelPtr)
+        {
+            tunnelIter = it;
+            break;
+        }
+    }
+
+    if (m_stopping)
+        return; //tunnel is being cancelled?
+
     NX_LOGX(lm("Removing tunnel to host %1").arg(tunnelIter->first), cl_logDEBUG1);
+    auto tunnel = std::move(tunnelIter->second);
     m_pool.erase(tunnelIter);
+    m_aioThreadBinder.post(
+        [tunnel = std::move(tunnel)]() mutable { tunnel.reset(); });
 }
 
 void OutgoingTunnelPool::tunnelsStopped(
     nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
-    m_terminated = true;
-    completionHandler();
+    m_aioThreadBinder.post(
+        [this, completionHandler = std::move(completionHandler)]
+        {
+            m_terminated = true;
+            m_aioThreadBinder.pleaseStopSync();
+            completionHandler();
+        });
 }
 
 } // namespace cloud

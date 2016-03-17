@@ -346,9 +346,7 @@ TEST_F(OutgoingTunnelTest, general)
             {
                 if (!connectorWillSucceed)
                     ASSERT_EQ(
-                        i == 0
-                            ? SystemError::connectionRefused
-                            : SystemError::connectionReset, //tunnel signals broken connection
+                        SystemError::connectionRefused,
                         result.first);
                 else if (!connectionWillSucceed)
                     ASSERT_EQ(SystemError::connectionReset, result.first);
@@ -409,16 +407,8 @@ TEST_F(OutgoingTunnelTest, singleShotConnection)
 
             const auto result = connectedPromise.get_future().get();
 
-            if (i == 0)
-            {
-                ASSERT_EQ(SystemError::connectionRefused, result.first);
-                ASSERT_EQ(nullptr, result.second);
-            }
-            else
-            {
-                ASSERT_EQ(SystemError::connectionReset, result.first);
-                ASSERT_EQ(nullptr, result.second);
-            }
+            ASSERT_EQ(SystemError::connectionRefused, result.first);
+            ASSERT_EQ(nullptr, result.second);
         }
 
         tunnel.pleaseStopSync();
@@ -669,6 +659,58 @@ TEST_F(OutgoingTunnelTest, connectTimeout2)
         connectionTimeout - (connectionContext.endTime - connectionContext.startTime));
 
     tunnel.pleaseStopSync();
+}
+
+TEST_F(OutgoingTunnelTest, pool)
+{
+    OutgoingTunnelPool tunnelPool;
+
+    AddressEntry addressEntry("nx_test.com:12345");
+
+    std::promise<std::chrono::milliseconds> tunnelConnectionInvokedPromise;
+
+    setConnectorFactoryFunc(
+        [/*connectorTimeout,*/ &tunnelConnectionInvokedPromise](
+            const AddressEntry& targetAddress) -> ConnectorFactory::CloudConnectors
+        {
+            ConnectorFactory::CloudConnectors connectors;
+            connectors.emplace(
+                CloudConnectType::kUdtHp,
+                std::make_unique<DummyConnector>(
+                    targetAddress,
+                    false,
+                    false,
+                    false));
+            return connectors;
+        });
+
+    const size_t connectionCount = 1000;
+    std::vector<ConnectionContext> connectionContexts(connectionCount);
+    for (auto& connectionContext: connectionContexts)
+    {
+        tunnelPool.establishNewConnection(
+            addressEntry,
+            std::chrono::milliseconds::zero(),
+            SocketAttributes(),
+            [&connectionContext](
+                SystemError::ErrorCode errorCode,
+                std::unique_ptr<AbstractStreamSocket> socket)
+            {
+                connectionContext.completionPromise.set_value(
+                    std::make_pair(errorCode, std::move(socket)));
+            });
+    }
+
+    for (auto& connectionContext : connectionContexts)
+    {
+        const auto result = connectionContext.completionPromise.get_future().get();
+        ASSERT_TRUE(
+            result.first == SystemError::connectionRefused ||
+            result.first == SystemError::interrupted);
+        ASSERT_EQ(nullptr, result.second);
+    }
+
+    tunnelPool.pleaseStopSync();
 }
 
 } // namespace cloud

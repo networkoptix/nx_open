@@ -74,11 +74,12 @@ void QnCloudSystemsFinder::setCloudSystems(const QnCloudSystemList &systems)
     SystemsHash updatedSystems;
     for (const auto system : systems)
     {
-        updatedSystems.insert(system.id
-            , QnSystemDescription::createCloudSystem(system.id, system.name));
+        updatedSystems.insert(
+            system.id,
+            QnSystemDescription::createCloudSystem(system.id, system.name));
     }
 
-    typedef QSet<QnUuid> IdsSet;
+    typedef QSet<QString> IdsSet;
 
     const auto newIds = updatedSystems.keys().toSet();
     IdsSet removedIds;
@@ -112,7 +113,7 @@ void QnCloudSystemsFinder::onCloudError(QnCloudStatusWatcher::ErrorCode error)
     // if any error automatically
 }
 
-void QnCloudSystemsFinder::updateSystem(const QnUuid &systemId)
+void QnCloudSystemsFinder::updateSystem(const QString &systemId)
 {
     using namespace nx::network;
     typedef std::vector<cloud::AddressResolver::TypedAddres> AddressVector;
@@ -172,7 +173,7 @@ void QnCloudSystemsFinder::updateSystem(const QnUuid &systemId)
         }
     };
 
-    const auto cloudHost = HostAddress(systemId.toSimpleString());
+    const auto cloudHost = HostAddress(systemId);
     resolver.resolveDomain(cloudHost, resolvedHandler);
 }
 

@@ -27,8 +27,12 @@ public:
 
     /** Calls @param handler as soon as any socket is avaliable */
     void getNextSocketAsync(
-        std::function<void(std::unique_ptr<AbstractStreamSocket>)> handler,
+        nx::utils::MoveOnlyFunc<void(std::unique_ptr<AbstractStreamSocket>)> handler,
         boost::optional<unsigned int> timeout);
+    /** Cancels \a IncomingTunnelPool::getNextSocketAsync call.
+        \note Does not block
+    */
+    void cancelAccept();
 
     /** Cancels all operations in progress */
     void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
@@ -43,7 +47,7 @@ private:
     bool m_terminated;
     std::set<std::shared_ptr<AbstractIncomingTunnelConnection>> m_pool;
     std::unique_ptr<AbstractCommunicatingSocket> m_ioThreadSocket;
-    std::function<void(std::unique_ptr<AbstractStreamSocket>)> m_acceptHandler;
+    nx::utils::MoveOnlyFunc<void(std::unique_ptr<AbstractStreamSocket>)> m_acceptHandler;
     std::deque<std::unique_ptr<AbstractStreamSocket>> m_acceptedSockets;
 };
 

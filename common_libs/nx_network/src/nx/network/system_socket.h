@@ -323,9 +323,11 @@ public:
 
     //!Implementation of AbstractStreamServerSocket::acceptAsync
     virtual void acceptAsync(
-        std::function<void(
+        nx::utils::MoveOnlyFunc<void(
             SystemError::ErrorCode,
             AbstractStreamSocket*)> handler) override;
+    virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler) override;
+    virtual void cancelIOSync() override;
 
     AbstractStreamSocket* systemAccept();
 

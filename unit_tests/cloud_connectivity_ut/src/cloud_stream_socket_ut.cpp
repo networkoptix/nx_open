@@ -123,6 +123,17 @@ TEST_F(CloudStreamSocketTest, multiple_connections_random_data)
         serverAddress);
 }
 
+const auto createServerSocketFunc = 
+    []() -> std::unique_ptr<AbstractStreamServerSocket>
+    {
+        return SocketFactory::createStreamServerSocket();
+    };
+const auto createClientSocketFunc =
+    []() -> std::unique_ptr<CloudStreamSocket>
+    {
+        return std::make_unique<CloudStreamSocket>();
+    };
+
 TEST_F(CloudStreamSocketTest, simple_socket_test)
 {
     const char* tempHostName = "bla.bla";
@@ -131,17 +142,6 @@ TEST_F(CloudStreamSocketTest, simple_socket_test)
     nx::network::SocketGlobals::addressResolver().addFixedAddress(
         tempHostName,
         serverAddress);
-
-    const auto createServerSocketFunc = 
-        []() -> std::unique_ptr<AbstractStreamServerSocket>
-        {
-            return SocketFactory::createStreamServerSocket();
-        };
-    const auto createClientSocketFunc =
-        []() -> std::unique_ptr<CloudStreamSocket>
-        {
-            return std::make_unique<CloudStreamSocket>();
-        };
 
     test::socketSimpleSync(
         createServerSocketFunc,
@@ -155,36 +155,25 @@ TEST_F(CloudStreamSocketTest, simple_socket_test)
         serverAddress,
         SocketAddress(tempHostName));
 
+    nx::network::SocketGlobals::addressResolver().removeFixedAddress(
+        tempHostName,
+        serverAddress);
+}
+
+TEST_F(CloudStreamSocketTest, shutdown)
+{
+    const char* tempHostName = "bla.bla";
+    SocketAddress serverAddress(HostAddress::localhost, 20000 + (rand() % 32000));
+
+    nx::network::SocketGlobals::addressResolver().addFixedAddress(
+        tempHostName,
+        serverAddress);
+
     test::shutdownSocket(
         createServerSocketFunc,
         createClientSocketFunc,
         serverAddress,
         SocketAddress(tempHostName));
-
-    //testing that socket is not used anymore after shutdown call
-    for (int i = 0; i < 3; ++i)
-    {
-        for (int j = 0; j < 10; ++j)
-        {
-            nx::Buffer buf;
-            buf.reserve(128);
-
-            CloudStreamSocket sock;
-            if (i == 0)
-                sock.connectAsync(
-                    SocketAddress(tempHostName),
-                    [](SystemError::ErrorCode) {});
-            else if (i == 1)
-                sock.readSomeAsync(
-                    &buf,
-                    [](SystemError::ErrorCode, size_t) {});
-            else if (i == 2)
-                sock.sendAsync(
-                    buf,
-                    [](SystemError::ErrorCode, size_t) {});
-            sock.shutdown();
-        }
-    }
 
     nx::network::SocketGlobals::addressResolver().removeFixedAddress(
         tempHostName,

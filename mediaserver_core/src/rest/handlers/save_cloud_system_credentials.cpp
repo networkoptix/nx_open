@@ -10,6 +10,7 @@
 #include <core/resource/user_resource.h>
 #include <network/tcp_connection_priv.h>
 #include <utils/common/sync_call.h>
+#include <media_server/serverutil.h>
 
 #include <utils/common/model_functions.h>
 
@@ -29,35 +30,30 @@ int QnSaveCloudSystemCredentialsHandler::execute(
     QnJsonRestResult& result)
 {
     const auto admin = qnResPool->getAdministrator();
-
     if (data.reset)
     {
-        //setting cloud credentials to empty string
-        admin->setProperty(Qn::CLOUD_SYSTEM_ID, QString());
-        admin->setProperty(Qn::CLOUD_SYSTEM_AUTH_KEY, QString());
-        admin->setProperty(Qn::CLOUD_ACCOUNT_NAME, QString());
-        if (propertyDictionary->saveParams(admin->getId()))
-        {
-            result.setError(QnJsonRestResult::NoError);
-        }
-        else
-        {
+        if (!resetCloudParams())
             result.setError(
                 QnJsonRestResult::CantProcessRequest,
                 lit("Failed to save cloud credentials to local DB"));
-        }
         return CODE_OK;
     }
 
-    if (data.cloudSystemId.isEmpty())
+    if (data.cloudSystemID.isEmpty())
     {
         result.setError(QnJsonRestResult::MissingParameter, Qn::CLOUD_SYSTEM_ID);
         return CODE_OK;
     }
 
-    if (data.cloudAuthenticationKey.isEmpty())
+    if (data.cloudAuthKey.isEmpty())
     {
         result.setError(QnJsonRestResult::MissingParameter, Qn::CLOUD_SYSTEM_AUTH_KEY);
+        return CODE_OK;
+    }
+    
+    if (data.cloudAccountName.isEmpty())
+    {
+        result.setError(QnJsonRestResult::MissingParameter, Qn::CLOUD_ACCOUNT_NAME);
         return CODE_OK;
     }
 
@@ -70,8 +66,9 @@ int QnSaveCloudSystemCredentialsHandler::execute(
         return CODE_OK;
     }
 
-    admin->setProperty(Qn::CLOUD_SYSTEM_ID, data.cloudSystemId);
-    admin->setProperty(Qn::CLOUD_SYSTEM_AUTH_KEY, data.cloudAuthenticationKey);
+    admin->setProperty(Qn::CLOUD_SYSTEM_ID, data.cloudSystemID);
+    admin->setProperty(Qn::CLOUD_SYSTEM_AUTH_KEY, data.cloudAuthKey);
+    admin->setProperty(Qn::CLOUD_ACCOUNT_NAME, data.cloudAccountName);
 
     if (!propertyDictionary->saveParams(admin->getId()))
     {
@@ -92,8 +89,8 @@ int QnSaveCloudSystemCredentialsHandler::execute(
         decltype(&destroyConnectionFactory)
     > cloudConnectionFactory(createConnectionFactory(), &destroyConnectionFactory);
     auto cloudConnection = cloudConnectionFactory->createConnection(
-        data.cloudSystemId.toStdString(),
-        data.cloudAuthenticationKey.toStdString());
+        data.cloudSystemID.toStdString(),
+        data.cloudAuthKey.toStdString());
     nx::cdb::api::ResultCode cdbResultCode = nx::cdb::api::ResultCode::ok;
     nx::cdb::api::NonceData nonceData;
     std::tie(cdbResultCode, nonceData) =

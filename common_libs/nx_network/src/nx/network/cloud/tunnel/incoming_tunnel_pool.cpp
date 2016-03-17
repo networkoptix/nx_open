@@ -43,7 +43,7 @@ std::unique_ptr<AbstractStreamSocket> IncomingTunnelPool::getNextSocketIfAny()
 }
 
 void IncomingTunnelPool::getNextSocketAsync(
-    std::function<void(std::unique_ptr<AbstractStreamSocket>)> handler,
+    nx::utils::MoveOnlyFunc<void(std::unique_ptr<AbstractStreamSocket>)> handler,
     boost::optional<unsigned int> timeout)
 {
     QnMutexLocker lock(&m_mutex);
@@ -62,6 +62,12 @@ void IncomingTunnelPool::getNextSocketAsync(
     if (timeout && *timeout != 0)
         m_ioThreadSocket->registerTimer(
             *timeout, [this](){ callAcceptHandler(true); });
+}
+
+void IncomingTunnelPool::cancelAccept()
+{
+    QnMutexLocker lock(&m_mutex);
+    m_acceptHandler = nullptr;
 }
 
 void IncomingTunnelPool::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)

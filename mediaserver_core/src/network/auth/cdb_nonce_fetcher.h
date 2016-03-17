@@ -21,6 +21,7 @@
 #include <nx/utils/timermanager.h>
 #include <nx/network/http/httptypes.h>
 #include <nx/utils/thread/mutex.h>
+#include <utils/common/safe_direct_connection.h>
 
 #include "abstract_nonce_provider.h"
 
@@ -32,7 +33,8 @@
 class CdbNonceFetcher
 :
     public AbstractNonceProvider,
-    public QObject
+    public QObject,
+    public Qn::EnableSafeDirectConnection
 {
 public:
     /*!

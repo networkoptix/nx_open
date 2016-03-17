@@ -21,6 +21,7 @@ Pollable::Pollable(
     m_readTimeoutMS( 0 ),
     m_writeTimeoutMS( 0 )
 {
+    SocketGlobals::check();
     if( !m_impl )
         m_impl.reset( new CommonSocketImpl() );
 }

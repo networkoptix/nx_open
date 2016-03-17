@@ -12,6 +12,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <utils/common/stoppable.h>
 
+#include "nx/network/aio/timer.h"
 #include "nx/network/cloud/address_resolver.h"
 #include "outgoing_tunnel.h"
 
@@ -47,10 +48,12 @@ private:
     QnMutex m_mutex;
     TunnelDictionary m_pool;
     bool m_terminated;
+    bool m_stopping;
+    aio::Timer m_aioThreadBinder;
 
     const std::unique_ptr<OutgoingTunnel>& 
         getTunnel(const AddressEntry& targetHostAddress);
-    void removeTunnel(TunnelDictionary::iterator tunnelIter);
+    void onTunnelClosed(OutgoingTunnel* tunnelPtr);
     void tunnelsStopped(nx::utils::MoveOnlyFunc<void()> completionHandler);
 };
 

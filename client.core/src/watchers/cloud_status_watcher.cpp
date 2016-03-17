@@ -23,7 +23,7 @@ namespace
                 continue;
 
             QnCloudSystem system;
-            system.id = systemData.id;
+            system.id = QString::fromStdString(systemData.id);
             system.name = QString::fromStdString(systemData.name);
             system.authKey = systemData.authKey;
             result.append(system);
