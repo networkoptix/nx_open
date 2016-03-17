@@ -491,10 +491,14 @@ QString QnAuditLogModel::searchData(const Column& column, const QnAuditRecord* d
     if (column == DescriptionColumn && (data->isPlaybackType() || data->eventType == Qn::AR_CameraUpdate || data->eventType == Qn::AR_CameraInsert))
     {
         QString result;
-        for (const auto& res : data->resources)
+        for (const auto& resId : data->resources)
         {
-            result += qnResPool->getResourceById(res)->toSearchString();
-            result += lit(" ");
+            QnResourcePtr res = qnResPool->getResourceById(resId);
+            if (res)
+            {
+                result += res->toSearchString();
+                result += lit(" ");
+            }
         }
 
         return result;
