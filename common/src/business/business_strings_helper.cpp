@@ -178,6 +178,12 @@ QString QnBusinessStringsHelper::eventAtResources(const QnBusinessEventParameter
     return lit("Multiple %1 events have occured").arg(eventName(params.eventType));
 }
 
+QString QnBusinessStringsHelper::getResoureNameFromParams(const QnBusinessEventParameters& params, bool useIp)
+{
+    QString result = getFullResourceName(eventSource(params), useIp);
+    return result.isNull() ? params.resourceName : result;
+}
+
 QString QnBusinessStringsHelper::eventDescription(const QnAbstractBusinessActionPtr& action, const QnBusinessAggregationInfo &aggregationInfo, bool useIp, bool useHtml) {
 
     QString delimiter = useHtml
@@ -190,9 +196,7 @@ QString QnBusinessStringsHelper::eventDescription(const QnAbstractBusinessAction
     QString result;
     result += tr("Event: %1").arg(eventName(eventType));
 
-    QString sourceText = getFullResourceName(eventSource(params), useIp);
-    if (sourceText.isNull())
-        sourceText = params.resourceName;
+    QString sourceText = getResoureNameFromParams(params, useIp);
     if (!sourceText.isEmpty()) {
         result += delimiter;
         result += tr("Source: %1").arg(sourceText);
