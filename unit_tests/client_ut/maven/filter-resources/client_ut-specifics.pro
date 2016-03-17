@@ -11,3 +11,5 @@ include( ${libdir}/gtest.pri )
 }
 
 INCLUDEPATH += ${root.dir}/client/src
+
+LIBS += $$FESTIVAL_LIB
