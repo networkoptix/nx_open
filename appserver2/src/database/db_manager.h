@@ -200,7 +200,7 @@ namespace ec2
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiResourceTypeDataList& resourceTypeList);
 
         //getCameras
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraDataList& cameraList);
+        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiCameraDataList& cameraList);
 
         //getStorages
         ErrorCode doQueryNoLock(const QnUuid& mServerId, ApiStorageDataList& cameraList);
@@ -209,16 +209,16 @@ namespace ec2
         ErrorCode doQueryNoLock(const QnUuid& resId, ApiResourceStatusDataList& statusList);
 
         //getCameraUserAttributes
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraAttributesDataList& cameraUserAttributesList);
+        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiCameraAttributesDataList& cameraUserAttributesList);
 
         //getCamerasEx
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraDataExList& cameraList);
+        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiCameraDataExList& cameraList);
 
         //getServers
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiMediaServerDataList& serverList);
+        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiMediaServerDataList& serverList);
 
         //getServersEx
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiMediaServerDataExList& serverList);
+        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiMediaServerDataExList& serverList);
 
         //getCameraServerItems
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiServerFootageDataList& historyList);
