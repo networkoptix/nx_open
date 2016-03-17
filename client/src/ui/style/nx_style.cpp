@@ -10,6 +10,7 @@
 #include <QComboBox>
 #include <QSpinBox>
 #include <QCheckBox>
+#include <QDateTimeEdit>
 #include <QRadioButton>
 #include <QMenu>
 #include <QDialogButtonBox>
@@ -1753,6 +1754,24 @@ QSize QnNxStyle::sizeFromContents(
 
     case CT_LineEdit:
         return QSize(size.width(), qMax(size.height(), Metrics::kButtonHeight));
+
+    case CT_SpinBox:
+    {
+        /* QDateTimeEdit uses CT_SpinBox style with combo (!) box subcontrols, so we have to handle this case separately: */
+        if (const QDateTimeEdit *dateTime = qobject_cast<const QDateTimeEdit *>(widget))
+        {
+            const QStyleOptionSpinBox *spinBox = qstyleoption_cast<const QStyleOptionSpinBox *>(option);
+            if (spinBox && spinBox->subControls.testFlag(SC_ComboBoxArrow))
+            {
+                int hMargin = pixelMetric(PM_ButtonMargin, option, widget);
+                int height = qMax(size.height(), Metrics::kButtonHeight);
+                int width = qMax(Metrics::kMinimumButtonWidth, size.width() + hMargin + height);
+                return QSize(width, height);
+            }
+        }
+        /* Default processing for normal spin boxes: */
+        break;
+    }
 
     case CT_ComboBox:
     {
