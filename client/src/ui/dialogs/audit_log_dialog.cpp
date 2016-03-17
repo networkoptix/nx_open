@@ -63,14 +63,10 @@ namespace {
 
     int calcHeaderHeight(QHeaderView* header)
     {
-        // otherwise use the contents
         QStyleOptionHeader opt;
-
         opt.initFrom(header);
-        opt.state = QStyle::State_None | QStyle::State_Raised;
+        opt.state = QStyle::State_Raised | QStyle::State_Horizontal | QStyle::State_Enabled;
         opt.orientation = Qt::Horizontal;
-        opt.state |= QStyle::State_Horizontal;
-        opt.state |= QStyle::State_Enabled;
         opt.section = 0;
 
         QFont fnt = header->font();

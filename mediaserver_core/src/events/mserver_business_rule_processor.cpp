@@ -435,7 +435,7 @@ void QnMServerBusinessRuleProcessor::sendEmailAsync(QnSendMailBusinessActionPtr 
 
     contextMap[tpCaption] = action->getRuntimeParams().caption;
     contextMap[tpDescription] = action->getRuntimeParams().description;
-    contextMap[tpSource] = action->getRuntimeParams().resourceName;
+    contextMap[tpSource] = QnBusinessStringsHelper::getResoureNameFromParams(action->getRuntimeParams());
 
     QString messageBody;
     renderTemplateFromFile(attachmentData.templatePath, contextMap, &messageBody);
@@ -528,7 +528,7 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDescriptionMap(const QnAbstrac
 
     contextMap[tpProductName] = QnAppInfo::productNameLong();
     contextMap[tpEvent] = QnBusinessStringsHelper::eventName(eventType);
-    contextMap[tpSource] = getFullResourceName(QnBusinessStringsHelper::eventSource(params), useIp);
+    contextMap[tpSource] = QnBusinessStringsHelper::getResoureNameFromParams(params, useIp);
     if (eventType == QnBusiness::CameraMotionEvent)
     {
         auto camRes = qnResPool->getResourceById<QnVirtualCameraResource>( action->getRuntimeParams().eventResourceId);
@@ -651,18 +651,18 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDetailsMap(
 
     switch (params.eventType) {
     case CameraDisconnectEvent: {
-        detailsMap[tpSource] = getFullResourceName(QnBusinessStringsHelper::eventSource(params), useIp);
+        detailsMap[tpSource] =  QnBusinessStringsHelper::getResoureNameFromParams(params, useIp);
         break;
-                                }
+    }
 
     case CameraInputEvent: {
         detailsMap[tpInputPort] = params.inputPortId;
         break;
-                           }
+    }
 
     case NetworkIssueEvent:
         {
-            detailsMap[tpSource] = getFullResourceName(QnBusinessStringsHelper::eventSource(params), useIp);
+            detailsMap[tpSource] = QnBusinessStringsHelper::getResoureNameFromParams(params, useIp);
             detailsMap[tpReason] = QnBusinessStringsHelper::eventReason(params);
             break;
         }

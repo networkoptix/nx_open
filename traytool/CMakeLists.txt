@@ -1,6 +1,6 @@
-project(applauncher)
-set(PROJECT_SHORTNAME "applauncher")
-set(PROJECT_LONGNAME "${nxtool.company.name} Application Launcher")
+project(traytool)
+set(PROJECT_SHORTNAME "traytool")
+set(PROJECT_LONGNAME "${nxtool.company.name} Tray Utility")
 if(WIN32)
     set(WINDOWS_RES_FILE ${PROJECT_BINARY_DIR}/${PROJECT_SHORTNAME}.obj)
 endif()
@@ -11,17 +11,16 @@ include_directories (${include_directories} src)
 
 # Configure Qt
 find_package(Qt5Gui REQUIRED)
-find_package(Qt5Network REQUIRED)
-find_package(Qt5Xml REQUIRED)
 
 find_sources(src)
-add_qtsinglecoreapplication()
+add_qtsingleapplication()
 ADD_MSVC_PRECOMPILED_HEADER("StdAfx.h" "${PROJECT_SOURCE_DIR}/src/StdAfx.cpp" CPP_FILES)
 process_rc()
 process_resources()
 add_translations(translations)
 qt5_wrap_ui(UI_HEADERS ${UI_FILES})
-qt5_add_resources(RESOURCE_FILES ${PROJECT_BINARY_DIR}/${PROJECT_SHORTNAME}.qrc)  
+qt5_add_resources(RESOURCE_FILES ${PROJECT_BINARY_DIR}/${PROJECT_SHORTNAME}.qrc)
+  
 
 add_executable(${PROJECT_SHORTNAME} WIN32
   ${UI_HEADERS}
@@ -30,7 +29,7 @@ add_executable(${PROJECT_SHORTNAME} WIN32
   ${WINDOWS_RES_FILE}
 )
 target_link_libraries(${PROJECT_SHORTNAME}
-  Qt5::Core Qt5::Gui Qt5::Network Qt5::Xml quazip common nx_utils nx_network nx_streaming udt DbgHelp.lib Ws2_32.lib Iphlpapi.lib Winmm.lib
+  Qt5::Core Qt5::Gui Qt5::Widgets quazip common nx_utils nx_network DbgHelp.lib Ws2_32.lib Iphlpapi.lib Winmm.lib
 )
 #set_target_properties(${PROJECT_SHORTNAME} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "src/stdafx.h")
 #cotire(${PROJECT_SHORTNAME})

@@ -14,16 +14,17 @@ function(add_qtsingleapplication)
 get_filename_component(qtsingleapplication.cpp ${QT_CUSTOM_DIR}/qtsingleapplication/src/qtsingleapplication.cpp ABSOLUTE)
 get_filename_component(qtlocalpeer.cpp ${QT_CUSTOM_DIR}/qtsingleapplication/src/qtlocalpeer.cpp ABSOLUTE)
   SET(CPP_FILES 
-     ${CPP_FILES} 
+      ${CPP_FILES} 
       ${qtlocalpeer.cpp}
       ${qtsingleapplication.cpp}
+      PARENT_SCOPE
      )
   include_directories (${include_directories} ${QT_CUSTOM_DIR}/qtsingleapplication/src $ENV{environment}/qt5-custom/qtsingleapplication/src)  
 endfunction()
 function(add_qtservice)
 get_filename_component(qtservice.cpp ${QT_CUSTOM_DIR}/qtsingleapplication/src/qtservice.cpp ABSOLUTE)
   SET(CPP_FILES 
-     ${CPP_FILES} 
+      ${CPP_FILES} 
       ${qtservice.cpp}
      )
   if(WIN32)

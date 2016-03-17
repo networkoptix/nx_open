@@ -203,7 +203,7 @@ int QnFfmpegTranscoder::setContainer(const QString& container)
 
 int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const QnConstCompressedAudioDataPtr& audio)
 {
-    if (m_videoCodec != CODEC_ID_NONE)
+    if (video && m_videoCodec != CODEC_ID_NONE)
     {
         AVStream* videoStream = avformat_new_stream(m_formatCtx, nullptr);
         if (videoStream == 0)
@@ -277,12 +277,12 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
         videoStream->first_dts = 0;
     }
 
-    if (m_aTranscoder && !m_aTranscoder->open(audio))
+    if (audio && m_aTranscoder && !m_aTranscoder->open(audio))
     {
         m_audioCodec = CODEC_ID_NONE; // can't open transcoder. disable audio
     }
 
-    if (m_audioCodec != CODEC_ID_NONE)
+    if (audio && m_audioCodec != CODEC_ID_NONE)
     {
         //NX_ASSERT(false, Q_FUNC_INFO, "Not implemented! Under construction!!!");
 

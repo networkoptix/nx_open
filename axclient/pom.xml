@@ -25,8 +25,7 @@
         <qt.libs>core gui network opengl xml xmlpatterns sql multimedia concurrent webkit webkitwidgets qml quick</qt.libs>
         <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc</ffmpeg.libs>
         <!--Global libs-->
-        <!-- Disabled msvs 2015 libs> -lFestival -lestools -leststring -lestbase/!-->
-        <global.libs>-lcommon -lnx_utils -lnx_network -lnx_streaming -lnx_audio -lappserver2 -lclient.core -lclient -lcloud_db_client -lFestival -lestools -leststring -lestbase</global.libs>
+        <global.libs>-lcommon -lnx_utils -lnx_network -lnx_streaming -lnx_audio -lappserver2 -lclient.core -lclient -lcloud_db_client</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lOle32 -lwinmm -ld3d9 -lopenal32 -lsigar</windows.oslibs>
         <windows.oslibs.release/>
@@ -35,7 +34,7 @@
         <global.defines/>
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
         
-        <rdep.packages>openssl quazip</rdep.packages>
+        <rdep.packages>openssl quazip festival</rdep.packages>
     </properties>
 
 <dependencies>
