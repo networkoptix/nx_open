@@ -55,7 +55,6 @@ CONFIG(debug, debug|release) {
   }
 }
 else {
-  CONFIG += silent
   CONFIGURATION=release
   win* {
     LIBS += ${windows.oslibs.release}
