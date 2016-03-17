@@ -50,8 +50,7 @@ namespace {
     const QString kNameServerAutoDiscoveryEnabled(lit("serverAutoDiscoveryEnabled"));
     const QString kNameBackupQualities(lit("backupQualities"));
     const QString kNameBackupNewCamerasByDefault(lit("backupNewCamerasByDefault"));
-	const QString kNameCrossdomainEnabled(lit("crossdomainEnabled"));
-
+    const QString kNameCrossdomainEnabled(lit("crossdomainEnabled"));
 
     const QString kNameStatisticsAllowed(lit("statisticsAllowed"));
     const QString kNameStatisticsReportLastTime(lit("statisticsReportLastTime"));
@@ -238,6 +237,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
     m_backupQualitiesAdaptor = new QnLexicalResourcePropertyAdaptor<Qn::CameraBackupQualities>(kNameBackupQualities, Qn::CameraBackup_Both, this);
     m_backupNewCamerasByDefaultAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameBackupNewCamerasByDefault, false, this);
 	m_crossdomainXmlEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameCrossdomainEnabled, true, this);
+    m_upnpPortMappingEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameUpnpPortMappingEnabled, true, this);
 
     m_arecontRtspEnabled = new QnLexicalResourcePropertyAdaptor<bool>(
         kArecontRtspEnabled,
@@ -249,6 +249,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
     connect(m_cameraSettingsOptimizationAdaptor,    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::cameraSettingsOptimizationChanged,   Qt::QueuedConnection);
     connect(m_serverAutoDiscoveryEnabledAdaptor,    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::serverAutoDiscoveryChanged,          Qt::QueuedConnection);
     connect(m_updateNotificationsEnabledAdaptor,    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::updateNotificationsChanged,          Qt::QueuedConnection);
+    connect(m_upnpPortMappingEnabledAdaptor,        &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::upnpPortMappingEnabledChanged,          Qt::QueuedConnection);
 
     QnGlobalSettings::AdaptorList result;
     result
@@ -260,6 +261,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_backupQualitiesAdaptor
         << m_backupNewCamerasByDefaultAdaptor
 		<< m_crossdomainXmlEnabledAdaptor
+        << m_upnpPortMappingEnabledAdaptor
         << m_arecontRtspEnabled
         ;
 
@@ -467,6 +469,18 @@ QString QnGlobalSettings::statisticsReportTimeCycle() const
 void QnGlobalSettings::setStatisticsReportTimeCycle(const QString& value)
 {
     m_statisticsReportTimeCycleAdaptor->setValue(value);
+}
+
+const QString QnGlobalSettings::kNameUpnpPortMappingEnabled(lit("upnpPortMappingEnabled"));
+
+bool QnGlobalSettings::isUpnpPortMappingEnabled() const
+{
+    return m_upnpPortMappingEnabledAdaptor->value();
+}
+
+void QnGlobalSettings::setUpnpPortMappingEnabled(bool value)
+{
+    m_upnpPortMappingEnabledAdaptor->setValue(value);
 }
 
 QnUuid QnGlobalSettings::systemId() const
