@@ -21,6 +21,7 @@ Item
     {
         anchors.fill: (isMasked ? maskedAreaLoader : areaLoader);
         onClicked: { thisComponent.isMaskedPrivate = !thisComponent.isMaskedPrivate; }
+        acceptedButtons: (isAvailable ? Qt.AllButtons : Qt.NoButton);
     }
 
     Loader

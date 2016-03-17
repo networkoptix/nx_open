@@ -5,13 +5,16 @@ MaskedComboBox
     id: thisComponent;
 
     property string iconUrl;
+    property color textColor;
+    property font textFont;
 
     anchors.left: parent.left;
     anchors.right: parent.right;
 
     areaDelegate: Row
     {
-        property alias areaText: textItem.text;
+        spacing: 4;
+
         Rectangle
         {
             // TODO: change to image
@@ -24,7 +27,7 @@ MaskedComboBox
             id: textItem;
 
             color: thisComponent.textColor;
-            font.pixelSize: thisComponent.fontPixelSize;
+            font: thisComponent.textFont;
 
             Binding
             {
@@ -34,8 +37,4 @@ MaskedComboBox
             }
         }
     }
-
-    // TODO setup fonts
-    readonly property int fontPixelSize: 12;
-    readonly property color textColor: "white";
 }

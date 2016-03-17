@@ -124,6 +124,13 @@ void QnNxStyle::setGenericPalette(const QnGenericPalette &palette)
     d->palette = palette;
 }
 
+const QnGenericPalette &QnNxStyle::genericPalette() const
+{
+    Q_D(const QnNxStyle);
+    return d->palette;
+}
+
+
 QnPaletteColor QnNxStyle::findColor(const QColor &color) const
 {
     Q_D(const QnNxStyle);

@@ -1,6 +1,7 @@
 import QtQuick 2.5;
 import QtQuick.Controls 1.2;
 
+import "."
 Item
 {
     id: thisComponent;
@@ -50,8 +51,12 @@ Item
         y: (thisComponent.isExpanded ? (parent.parent.parent.height - height) / 2 - parent.parent.y : 0);
         width: parent.width;
         height: (thisComponent.isExpanded ? loadersColumn.y + loadersColumn.height : parent.height);
+        radius: 2;
 
-        color: palette.button;  // TODO: setup color
+        readonly property color standardColor: Style.colors.custom.systemTile.background;
+        readonly property color hoveredColor: Style.lighterColor(standardColor);
+        readonly property bool isHovered: (!thisComponent.isExpanded && hoverIndicator.containsMouse);
+        color: (isHovered ? hoveredColor : standardColor);
 
         Text
         {
@@ -66,9 +71,10 @@ Item
             anchors.topMargin: 12;
 
             text: systemName;
-            // TODO: setup color and font
-            color: palette.windowText;
-            font.pixelSize: 20;
+
+            color: Style.colors.custom.systemTile.systemNameText;
+            font: Style.fonts.systemTile.systemName;
+            renderType: Text.NativeRendering;
         }
 
         Button
@@ -118,6 +124,17 @@ Item
                 visible: thisComponent.isExpanded;
                 sourceComponent: thisComponent.expandedAreaDelegate;
             }
+        }
+
+
+        MouseArea
+        {
+            id: hoverIndicator;
+
+            anchors.fill: parent;
+
+            acceptedButtons: Qt.NoButton;
+            hoverEnabled: true;
         }
     }
 }

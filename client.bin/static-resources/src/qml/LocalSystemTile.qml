@@ -1,5 +1,7 @@
-import QtQuick 2.5;
+import QtQuick 2.6;
 import QtQuick.Controls 1.2;
+
+import "."
 
 BaseTile
 {
@@ -49,6 +51,8 @@ BaseTile
         property alias host: hostChooseItem.value;
         property alias userName: userChooseItem.value;
 
+        topPadding: 12;
+        spacing: 2;
         anchors.left: (parent ? parent.left : undefined);
         anchors.right: (parent ? parent.right : undefined);
 
@@ -56,11 +60,13 @@ BaseTile
         {
             id: hostChooseItem;
 
-            isAvailable: thisComponent.correctTile;
+            isAvailable: thisComponent.correctTile && thisComponent.isExpanded;
 
-            value: thisComponent.host;
             model: thisComponent.knownHostsModel;
             iconUrl: (thisComponent.correctTile ? "non_empty_url" : "");// TODO: change to proper url
+
+            textColor: Style.colors.windowText;
+            textFont: Style.fonts.systemTile.info;
 
             Component.onCompleted: activeItemSelector.addItem(this);
         }
@@ -69,15 +75,16 @@ BaseTile
         {
             id: userChooseItem;
 
-            isAvailable: thisComponent.correctTile;
-
-            value: thisComponent.userName;
-            model: thisComponent.knownUsersModel;
-
-            comboBoxTextRole: "userName";
-            Component.onCompleted: activeItemSelector.addItem(this);
-
             visible: thisComponent.isRecentlyConnected;
+            isAvailable: thisComponent.correctTile && thisComponent.isExpanded;
+
+            model: thisComponent.knownUsersModel;
+            comboBoxTextRole: "userName";
+
+            textColor: Style.colors.windowText;
+            textFont: Style.fonts.systemTile.info;
+
+            Component.onCompleted: activeItemSelector.addItem(this);
         }
     }
 
@@ -86,45 +93,58 @@ BaseTile
         property alias login: loginTextField.text;
         property alias password: passwordTextField.text;
 
-        spacing: 8;
+        topPadding: 16;
+        bottomPadding: 16;
+        spacing: 16;
 
         anchors.left: (parent ? parent.left : undefined);
         anchors.right: (parent ? parent.right : undefined);
 
-        Text
+        Column
         {
-            visible: !thisComponent.isRecentlyConnected;
-            text: qsTr("Login");
-        }
-
-        TextField
-        {
-            id: loginTextField;
-
-            visible: !thisComponent.isRecentlyConnected;
             width: parent.width;
-        }
 
-        Text
-        {
-            text: qsTr("Password");
-        }
+            spacing: 8;
+            Text
+            {
+                visible: !thisComponent.isRecentlyConnected;
+                text: qsTr("Login");
 
-        TextField
-        {
-            id: passwordTextField;
-            width: parent.width;
-        }
+                font: Style.label.font;
+                color: Style.label.color;
+            }
 
-        CheckBox
-        {
-            text: qsTr("Save password");
-        }
+            TextField
+            {
+                id: loginTextField;
 
-        CheckBox
-        {
-            enabled: false;
-            text: qsTr("Auto-login");
+                visible: !thisComponent.isRecentlyConnected;
+                width: parent.width;
+            }
+
+            Text
+            {
+                text: qsTr("Password");
+                font: Style.label.font;
+                color: Style.label.color;
+            }
+
+            TextField
+            {
+                id: passwordTextField;
+                width: parent.width;
+            }
+
+            CheckBox
+            {
+                text: qsTr("Save password");
+            }
+
+            CheckBox
+            {
+                enabled: false;
+                text: qsTr("Auto-login");
+            }
         }
 
         Button

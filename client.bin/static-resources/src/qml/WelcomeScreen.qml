@@ -2,16 +2,17 @@ import QtQuick 2.5;
 import QtQuick.Controls 1.2;
 import NetworkOptix.Qml 1.0;
 
+import "."
+
 Rectangle
 {
     id: thisComponent;
 
     anchors.fill: parent;
-    color: palette.window;
+    color: Style.colors.window;
+
     enabled: context.isEnabled;
     focus: true;
-
-    SystemPalette { id: palette; }
 
     MouseArea
     {
@@ -53,8 +54,6 @@ Rectangle
         rows: (itemsSource.count > 3 ? 2 : 1);
         columns: Math.min(desiredColumns, maxColumns);
 
-        Component.onCompleted: console.log("+++", maxColumns)
-
         spacing: 16;
 
         property QtObject watcher: SingleActiveItemSelector
@@ -83,7 +82,6 @@ Rectangle
                         systemName: model.systemName;
                         isRecentlyConnected: (knownUsersModel ? knownUsersModel.hasConnections : false);
 
-                        host: model.host;
                         correctTile: model.isCompatible;
                         knownUsersModel: QnLastSystemConnectionsData { systemName: model.systemName; }
                         knownHostsModel: model.hostsModel;

@@ -28,7 +28,6 @@ namespace
         , IsCorrectCustomizationRoleId
 
         // For local systems 
-        , HostRoleId
         , HostsModelRoleId
         , LastPasswordsModelRoleId
 
@@ -49,7 +48,6 @@ namespace
         result.insert(IsCompatibleVersionRoleId, "isCompatibleVersion");
         result.insert(IsCorrectCustomizationRoleId, "isCorrectCustomization");
         
-        result.insert(HostRoleId, "host");
         result.insert(HostsModelRoleId, "hostsModel");
         result.insert(LastPasswordsModelRoleId, "lastPasswordsModel");
 
@@ -133,13 +131,6 @@ namespace
             result.append(system->getServerHost(info.id));
         return result;
     }
-
-
-    QString getSystemHost(const QnSystemDescriptionPtr &sysemDescription)
-    {
-        const auto hosts = extractHosts(sysemDescription);
-        return (hosts.isEmpty() ? QString() : hosts.front());
-    }
 }
 
 ///
@@ -216,8 +207,6 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
         return isCorrectCustomization(systemDescription);
     case IsCompatibleVersionRoleId:
         return isCompatibleVersion(systemDescription);
-    case HostRoleId:
-        return getSystemHost(systemDescription);
     case HostsModelRoleId:
         return QVariant::fromValue(createStringListModel(
             extractHosts(systemDescription)));
@@ -345,7 +334,6 @@ void QnSystemsModel::serverChanged(const QnSystemDescriptionPtr &systemDescripti
             emit dataChanged(modelIndex, modelIndex, QVector<int>(1, role));
     };
 
-    testFlag(QnServerField::HostField, HostRoleId);
     testFlag(QnServerField::HostField, HostsModelRoleId); // TODO: emit in model
 }
 

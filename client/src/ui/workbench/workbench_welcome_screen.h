@@ -5,6 +5,7 @@
 
 #include <utils/common/connective.h>
 #include <ui/workbench/workbench_context_aware.h>
+#include <ui/style/generic_palette.h>
 
 class QQuickView;
 class QnLoginDialog;
@@ -61,6 +62,16 @@ public slots:
 
     void tryHideScreen();
 
+public slots:
+    QColor getPaletteColor(const QString &group
+        , int index);
+
+    QColor getDarkerColor(const QColor &color
+        , int offset = 1);
+
+    QColor getLighterColor(const QColor &color
+        , int offset = 1);
+
 signals:
     void visibleChanged();
     
@@ -82,7 +93,7 @@ private:
     typedef QPointer<QnCloudStatusWatcher> CloudStatusWatcherPtr;
     
     const CloudStatusWatcherPtr m_cloudWatcher;
-
+    const QnGenericPalette m_palette;
     const WidgetPtr m_widget;
     
     LoginDialogPtr m_loginDialog;
