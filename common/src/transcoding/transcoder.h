@@ -261,6 +261,8 @@ private:
     bool m_packetizedMode;
     QnImageFilterHelper m_extraTranscodeParams;
     bool m_useRealTimeOptimization;
+    bool m_initializedAudio;
+    bool m_initializedVideo;
 };
 
 typedef QSharedPointer<QnTranscoder> QnTranscoderPtr;
