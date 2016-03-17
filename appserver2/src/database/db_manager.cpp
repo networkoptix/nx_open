@@ -482,15 +482,14 @@ bool QnDbManager::init(const QUrl& dbUrl)
     QSqlQuery queryAdminUser( m_sdb );
     queryAdminUser.setForwardOnly( true );
     queryAdminUser.prepare( "SELECT r.guid, r.id FROM vms_resource r JOIN auth_user u on u.id = r.id and r.name = 'admin'" ); //TODO: #GDM check owner permission instead
-    if( !queryAdminUser.exec() )
-    {
-        NX_ASSERT( false );
-    }
-    if( queryAdminUser.next() )
+    execSQLQuery(&queryAdminUser, Q_FUNC_INFO);
+    if (queryAdminUser.next())
     {
         m_adminUserID = QnUuid::fromRfc4122( queryAdminUser.value( 0 ).toByteArray() );
         m_adminUserInternalID = queryAdminUser.value( 1 ).toInt();
     }
+    NX_CRITICAL(!m_adminUserID.isNull());
+
 
     QSqlQuery queryServers(m_sdb);
     queryServers.prepare("UPDATE vms_resource_status set status = ? WHERE guid in (select guid from vms_resource where xtype_guid = ?)"); // todo: only mserver without DB?

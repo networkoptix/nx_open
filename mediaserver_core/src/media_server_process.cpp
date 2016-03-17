@@ -1145,9 +1145,11 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
         for(const auto& storage: storages)
         {
             messageProcessor->updateResource( storage );
+
             // initialize storage immediately in sync mode
-			// todo: remove this call. Need refactor
-            //storage.dynamicCast<QnStorageResource>()->isAvailable();
+            //TODO: #rvasilenko remove this call. Need refactor
+            if (QnStorageResourcePtr qnStorage = qnResPool->getResourceById(storage.id).dynamicCast<QnStorageResource>())
+                qnStorage->isAvailable();
         }
     }
 
@@ -2657,11 +2659,16 @@ public:
         m_overrideVersion = version;
     }
 
+    void setEnforcedMediatorEndpoint(const QString& enforcedMediatorEndpoint)
+    {
+        m_enforcedMediatorEndpoint = enforcedMediatorEndpoint;
+    }
+
 protected:
     virtual int executeApplication() override {
         QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
         QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
-        QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule());
+        QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule(m_enforcedMediatorEndpoint));
 
         if (!m_overrideVersion.isNull())
             qnCommon->setEngineVersion(m_overrideVersion);
@@ -2853,6 +2860,7 @@ private:
     char **m_argv;
     QScopedPointer<MediaServerProcess> m_main;
     QnSoftwareVersion m_overrideVersion;
+    QString m_enforcedMediatorEndpoint;
 };
 
 void stopServer(int /*signal*/)
@@ -2956,7 +2964,7 @@ int MediaServerProcess::main(int argc, char* argv[])
     commandLineParser.addParameter(&enforceSocketType, "--enforce-socket", NULL,
         lit("Enforces stream socket type (TCP, UDT)"), QString());
     commandLineParser.addParameter(&enforcedMediatorEndpoint, "--enforce-mediator", NULL,
-        lit("Enforces mediatror address"), QString());
+        lit("Enforces mediator address"), QString());
 
     #ifdef __linux__
         commandLineParser.addParameter(&disableCrashHandler, "--disable-crash-handler", NULL,
@@ -2969,12 +2977,6 @@ int MediaServerProcess::main(int argc, char* argv[])
         if( !disableCrashHandler )
             linux_exception::installCrashSignalHandler();
     #endif
-
-    if ( !enforcedMediatorEndpoint.isEmpty() )
-        nx::network::SocketGlobals::mediatorConnector().mockupAddress(
-                    enforcedMediatorEndpoint );
-
-    nx::network::SocketGlobals::mediatorConnector().enable(true);
 
     if( showVersion )
     {
@@ -3007,6 +3009,8 @@ int MediaServerProcess::main(int argc, char* argv[])
             service.setOverrideVersion(version);
         }
     }
+
+    service.setEnforcedMediatorEndpoint(enforcedMediatorEndpoint);
 
     int res = service.exec();
     if (restartFlag && res == 0)
