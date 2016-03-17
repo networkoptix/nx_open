@@ -85,7 +85,7 @@ Handle ServerConnection::saveCloudSystemCredentials(
     QThread* targetThread)
 {
     CloudCredentialsData data;
-    data.cloudAuthKey = cloudSystemID;
+    data.cloudSystemID = cloudSystemID;
     data.cloudAuthKey = cloudAuthKey;
     data.cloudAccountName = cloudAccountName;
     
