@@ -1,11 +1,4 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <!--
-    Example pom for delegating maven goals to msbuild so it builds the "solution"
- 
-    A solution can be a group of projects, but here we only have one.
-    It should also be possible to have one maven project per solution project, 
-    and have a parent pom to deletegate the build.
-  -->
     <parent>
         <artifactId>cpp</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
@@ -18,16 +11,16 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>appserver2</artifactId>
     <packaging>pom</packaging>
-    <name>HD Witness New Enterprise Controller</name>    
+    <name>Nx Witness AppServer2 Library</name>    
 
     <properties>
         <guid>${appserver2.guid}</guid>
         <product.title>${appserver2.name}</product.title>  
         <!--Global libs-->		
         <template>lib</template>
-        <qt.libs>core network xml sql concurrent</qt.libs>
+        <qt.libs>core gui network xml sql concurrent</qt.libs>
         <ffmpeg.libs></ffmpeg.libs>
-        <global.libs>-lcommon -lnx_streaming</global.libs>
+        <global.libs>-lcommon -lnx_streaming -lnx_network -lnx_utils</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm</windows.oslibs>
         <linux.oslibs></linux.oslibs>
