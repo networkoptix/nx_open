@@ -11,7 +11,14 @@ var Config = {
     redirectUnauthorised:'/', // Page for redirecting all unauthorised users by default
 
     systemStatuses:{
-        onlineStatus: 'online',
+        onlineStatus: 'activated',
+        sortOrder:[
+            'online',
+            'offline',
+            'activated',
+            'unavailable',
+            'notActivated'
+        ],
         default: {
             style: 'label-default'
         },

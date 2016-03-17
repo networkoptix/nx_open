@@ -193,7 +193,9 @@ footer {
   margin-bottom:12px;
 }
 .system-button{
+  user-select: none;
   max-width:280px;
+  cursor: pointer;
 }
 .system-button h2{
   line-height: 24px;

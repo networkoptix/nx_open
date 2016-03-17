@@ -79,6 +79,7 @@ var L = {
         editShareConfirmButton: 'Save'
     },
     system:{
+        yourSystem: 'Your system',
         confirmDisconnect: "You are going to completely disconnect your system from the cloud. Are you sure?",
         confirmDisconnectTitle: "Disconnect system?",
         confirmDisconnectAction: "Disconnect",
