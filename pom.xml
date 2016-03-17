@@ -143,7 +143,7 @@
         <protobuf.version>2.6.0-SNAPSHOT</protobuf.version>
         <onvif.version>2.1.2-io-SNAPSHOT</onvif.version>
         <sigar.version>1.7-SNAPSHOT</sigar.version>
-        <festival.version>2.4-SNAPSHOT</festival.version>
+        <festival.version>2.4</festival.version>
         <boost.version>1.56-SNAPSHOT</boost.version>
         <quazip.version>0.7.1</quazip.version>
 
@@ -564,7 +564,7 @@
                 <unix>true</unix>
                 <windows>false</windows>
                 <script.extension>sh</script.extension>
-                <festival.version>2.1-SNAPSHOT</festival.version>
+                <festival.version>2.1</festival.version>
             </properties>
         </profile>
         <profile>
