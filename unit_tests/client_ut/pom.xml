@@ -38,7 +38,7 @@
         <linux.defines/>
         <mac.defines/>
         <path>${env.PATH}</path>
-        <rdep.packages>openssl quazip festival</rdep.packages>
+        <rdep.packages>openssl quazip festival festival-vox</rdep.packages>
     </properties>
     <dependencies>
         <dependency>
