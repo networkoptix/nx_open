@@ -14,6 +14,8 @@ INCLUDEPATH +=  ${qt.dir}/include/QtWidgets/$$QT_VERSION/ \
                 ${root.dir}/client.core/src/ \
                 ${root.dir}/client/src/
               
+LIBS += $$FESTIVAL_LIB
+
 CONFIG(debug, debug|release) {
   QMAKE_POST_LINK = ..\${arch}\post.bat debug ${arch};
 }
