@@ -82,8 +82,7 @@ bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemSharing* const systemShar
         return false;
     }
 
-    systemSharing->systemID =
-        QnUuid::fromStringSafe(urlQuery.queryItemValue(SystemSharing_systemID_field));
+    systemSharing->systemID = urlQuery.queryItemValue(SystemSharing_systemID_field).toStdString();
     systemSharing->accountEmail =
         urlQuery.queryItemValue(SystemSharing_accountEmail_field).toStdString();
     bool success = false;
@@ -98,7 +97,7 @@ void serializeToUrlQuery(const SystemSharing& data, QUrlQuery* const urlQuery)
 {
     urlQuery->addQueryItem(
         SystemSharing_systemID_field,
-        data.systemID.toString());
+        QString::fromStdString(data.systemID));
     urlQuery->addQueryItem(
         SystemSharing_accountEmail_field,
         QString::fromStdString(data.accountEmail));
@@ -118,7 +117,7 @@ SystemID::SystemID()
 
 SystemID::SystemID(std::string systemIDStr)
 :
-    systemID(QnUuid::fromStringSafe(QByteArray(systemIDStr.c_str())))
+    systemID(std::move(systemIDStr))
 {
 }
 
@@ -128,13 +127,15 @@ bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemID* const systemID)
 {
     if (!urlQuery.hasQueryItem(SystemID_systemID_field))
         return false;
-    systemID->systemID = QnUuid::fromStringSafe(urlQuery.queryItemValue(SystemID_systemID_field));
+    systemID->systemID = urlQuery.queryItemValue(SystemID_systemID_field).toStdString();
     return true;
 }
 
 void serializeToUrlQuery(const SystemID& data, QUrlQuery* const urlQuery)
 {
-    urlQuery->addQueryItem(SystemID_systemID_field, data.systemID.toString());
+    urlQuery->addQueryItem(
+        SystemID_systemID_field,
+        QString::fromStdString(data.systemID));
 }
 
 

@@ -289,7 +289,7 @@ void QnSystemsModel::addSystem(const QnSystemDescriptionPtr &systemDescription)
     }
 }
 
-void QnSystemsModel::removeSystem(const QnUuid &systemId)
+void QnSystemsModel::removeSystem(const QString &systemId)
 {
     const auto removeIt = std::find_if(m_internalData.begin()
         , m_internalData.end(), [systemId](const InternalSystemDataPtr &value)

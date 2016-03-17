@@ -168,7 +168,7 @@ void CloudDataProvider::updateSystemsAsync()
             m_systemCache.clear();
             for( auto& sys : systems.systems )
                 m_systemCache.emplace(
-                    sys.id.toSimpleString().toUtf8(),
+                    sys.id.c_str(),
                     System( String( sys.authKey.c_str() ),
                                     sys.cloudConnectionSubscriptionStatus ) );
 

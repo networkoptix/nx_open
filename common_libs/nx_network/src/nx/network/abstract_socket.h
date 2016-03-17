@@ -453,9 +453,16 @@ public:
             \endcode
             \a newConnection is NULL, if errorCode is not SystemError::noError
     */
-    virtual void acceptAsync(std::function<void(
-        SystemError::ErrorCode,
-        AbstractStreamSocket*)> handler) = 0;
+    virtual void acceptAsync(
+        nx::utils::MoveOnlyFunc<void(
+            SystemError::ErrorCode,
+            AbstractStreamSocket*)> handler) = 0;
+    /** Cancel active \a AbstractStreamServerSocket::acceptAsync */
+    virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler) = 0;
+    /** Cancel active \a AbstractStreamServerSocket::acceptAsync waiting for completion.
+        \note If called within socket's aio thread, then does not block
+    */
+    virtual void cancelIOSync() = 0;
 };
 
 static const QString BROADCAST_ADDRESS(QLatin1String("255.255.255.255"));

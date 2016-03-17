@@ -22,5 +22,5 @@ public:
 signals:
     void systemDiscovered(const QnSystemDescriptionPtr &system);
 
-    void systemLost(const QnUuid &id);
+    void systemLost(const QString &id);
 };

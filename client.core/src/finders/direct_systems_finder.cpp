@@ -43,7 +43,7 @@ void QnDirectSystemsFinder::addServer(const QnModuleInformation &moduleInformati
     const auto createNewSystem = (itSystem == m_systems.end());
     if (createNewSystem)
     {
-        const auto localSystemId = QnUuid::createUuid();
+        const auto localSystemId = QnUuid::createUuid().toString();
         const auto systemDescription = QnSystemDescription::createLocalSystem(
             localSystemId, moduleInformation.systemName);
 

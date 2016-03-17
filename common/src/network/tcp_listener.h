@@ -56,6 +56,15 @@ protected:
     virtual void run();
     virtual QnTCPConnectionProcessor* createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket) = 0;
     virtual void doPeriodicTasks();
+    /** Called to create server socket.
+        This method is supposed to bind socket to \a localAddress and call \a listen
+        \note If \a nullptr has been returned, system error code is set to proper error
+    */
+    virtual AbstractStreamServerSocket* createAndPrepareSocket(
+        bool sslNeeded,
+        const SocketAddress& localAddress);
+    virtual void destroyServerSocket(AbstractStreamServerSocket* serverSocket);
+
 private:
     void removeDisconnectedConnections();
     void removeAllConnections();

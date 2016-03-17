@@ -19,21 +19,21 @@ namespace
 #undef EXTRACT_CHANGE_FLAG
 }
 
-QnSystemDescriptionPtr QnSystemDescription::createLocalSystem(const QnUuid &systemId
+QnSystemDescriptionPtr QnSystemDescription::createLocalSystem(const QString &systemId
     , const QString &systemName)
 {
     return QnSystemDescriptionPtr(
         new QnSystemDescription(systemId, systemName, false));
 }
 
-QnSystemDescriptionPtr QnSystemDescription::createCloudSystem(const QnUuid &systemId
+QnSystemDescriptionPtr QnSystemDescription::createCloudSystem(const QString &systemId
     , const QString &systemName)
 {
     return QnSystemDescriptionPtr(
         new QnSystemDescription(systemId, systemName, true));
 }
 
-QnSystemDescription::QnSystemDescription(const QnUuid &systemId
+QnSystemDescription::QnSystemDescription(const QString &systemId
     , const QString &systemName
     , const bool isCloudSystem)
     : m_id(systemId)
@@ -47,7 +47,7 @@ QnSystemDescription::QnSystemDescription(const QnUuid &systemId
 QnSystemDescription::~QnSystemDescription()
 {}
 
-QnUuid QnSystemDescription::id() const
+QString QnSystemDescription::id() const
 {
     return m_id;
 }

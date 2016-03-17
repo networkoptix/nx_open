@@ -32,14 +32,14 @@ private:
 
     void onCloudError(QnCloudStatusWatcher::ErrorCode error);
 
-    void updateSystem(const QnUuid &systemId);
+    void updateSystem(const QString &systemId);
 
     void updateSystems();
 
 private:
     typedef QScopedPointer<QTimer> QTimerPtr;
-    typedef QHash<QnUuid, QnSystemDescriptionPtr> SystemsHash;
-    typedef QHash<int, QnUuid> RequestIdToSystemHash;
+    typedef QHash<QString, QnSystemDescriptionPtr> SystemsHash;
+    typedef QHash<int, QString> RequestIdToSystemHash;
 
     const QTimerPtr m_updateSystemsTimer;
     mutable QnMutex m_mutex;

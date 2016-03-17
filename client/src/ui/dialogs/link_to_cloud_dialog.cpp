@@ -276,7 +276,10 @@ void QnLinkToCloudDialogPrivate::at_bindFinished(
             showFailure(tr("Cannot save information to database"));
     };
 
-    connection->saveCloudSystemCredentials(systemData.id.toString(), QString::fromStdString(systemData.authKey),
-                                           q->ui->accountLineEdit->text(),
-                                           handleReply, q->thread());
+    connection->saveCloudSystemCredentials(
+        QString::fromStdString(systemData.id),
+        QString::fromStdString(systemData.authKey),
+        q->ui->accountLineEdit->text(),
+        handleReply,
+        q->thread());
 }
