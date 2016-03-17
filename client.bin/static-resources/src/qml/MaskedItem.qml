@@ -13,20 +13,29 @@ Item
     property Component maskedAreaDelegate;
     property Component areaDelegate;
 
-    property alias area: areaLoader.item;
+    property var area: (isMasked ? maskedAreaLoader.item : areaLoader.item);
+
+    height: area.height;
 
     MouseArea
     {
-        anchors.fill: areaLoader;
+        anchors.fill: (isMasked ? maskedAreaLoader : areaLoader);
         onClicked: { thisComponent.isMaskedPrivate = !thisComponent.isMaskedPrivate; }
+    }
+
+    Loader
+    {
+        id: maskedAreaLoader;
+
+        visible: isMasked;
+        sourceComponent: thisComponent.maskedAreaDelegate;
     }
 
     Loader
     {
         id: areaLoader;
 
-        sourceComponent: (thisComponent.isMasked
-            ? thisComponent.maskedAreaDelegate
-            : thisComponent.areaDelegate);
+        visible: !isMasked;
+        sourceComponent: thisComponent.areaDelegate;
     }
 }

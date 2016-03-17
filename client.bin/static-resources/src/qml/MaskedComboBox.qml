@@ -8,8 +8,6 @@ MaskedItem
     property var model;
     property string comboBoxTextRole: "display";
 
-    height: area.height;
-
     maskedAreaDelegate: ComboBox
     {
         id: comboBox;
