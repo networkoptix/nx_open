@@ -1903,6 +1903,8 @@ int QnNxStyle::styleHint(
         return Qt::AlignRight | Qt::AlignVCenter;
     case SH_FocusFrame_AboveWidget:
         return 1;
+    case SH_DialogButtonLayout:
+        return QDialogButtonBox::KdeLayout;
     default:
         break;
     }
