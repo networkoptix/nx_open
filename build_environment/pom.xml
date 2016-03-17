@@ -246,13 +246,6 @@
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${compiler}</classifier>
                 </dependency>
-                <dependency>
-                    <groupId>org</groupId>
-                    <artifactId>festival</artifactId>
-                    <version>${festival.version}</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${arch}-${compiler}</classifier>
-                </dependency>
             </dependencies>
         </profile>
         <profile>
@@ -288,20 +281,6 @@
                     <groupId>com.google</groupId>
                     <artifactId>gmock</artifactId>
                     <version>1.7.0-SNAPSHOT</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>
-                <dependency>
-                    <groupId>org</groupId>
-                    <artifactId>festival</artifactId>
-                    <version>${festival.version}</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>
-                <dependency>
-                    <groupId>org</groupId>
-                    <artifactId>festival</artifactId>
-                    <version>${festival.version}</version>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${compiler}</classifier>
                 </dependency>

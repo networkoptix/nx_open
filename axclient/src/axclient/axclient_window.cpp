@@ -60,11 +60,11 @@ void QnAxClientWindow::show() {
         mainLayout->addWidget(m_mainWindow.data());
         m_parentWidget->setLayout(mainLayout);
     }
-    
+
     executeDelayed([this] {
         m_context->action(QnActions::FullscreenAction)->setChecked(true);
 /*        m_mainWindow->showFullScreen(); */
-    });   
+    });
 }
 
 void QnAxClientWindow::jumpToLive() {
@@ -120,19 +120,21 @@ qint64 QnAxClientWindow::currentTimeUsec() const {
 
 void QnAxClientWindow::setCurrentTimeUsec(qint64 timeUsec) {
     if (m_context)
-        m_context->navigator()->setPosition(timeUsec); 
+        m_context->navigator()->setPosition(timeUsec);
 }
 
-void QnAxClientWindow::addResourcesToLayout(const QStringList &uniqueIds, qint64 timeStampMs) {
+void QnAxClientWindow::addResourcesToLayout(const QList<QnUuid> &uniqueIds, qint64 timeStampMs)
+{
     if (!m_context || !m_context->user())
         return;
 
     QnResourceList resources;
-    for(const QString &id: uniqueIds) {
+    for(const auto& id: uniqueIds)
+    {
         QnResourcePtr resource = qnResPool->getResourceById(id);
         if(resource)
             resources << resource;
-    } 
+    }
 
     if (resources.isEmpty())
         return;
@@ -147,12 +149,12 @@ void QnAxClientWindow::addResourcesToLayout(const QStringList &uniqueIds, qint64
         period.durationMs = displayWindowLengthMs;
     }
 
-    QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
+    QnLayoutResourcePtr layout(new QnLayoutResource());
     layout->setId(QnUuid::createUuid());
     layout->setParentId(m_context->user()->getId());
     layout->setCellSpacing(0, 0);
     layout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, timeStampMs, 1.0)));
-    qnResPool->addResource(layout);  
+    qnResPool->addResource(layout);
 
     QnWorkbenchLayout *wlayout = new QnWorkbenchLayout(layout, this);
     m_context->workbench()->addLayout(wlayout);
@@ -173,7 +175,8 @@ void QnAxClientWindow::addResourcesToLayout(const QStringList &uniqueIds, qint64
     timeSlider->setWindow(period.startTimeMs, period.endTimeMs(), false);
 }
 
-void QnAxClientWindow::removeFromCurrentLayout(const QString &uniqueId) {
+void QnAxClientWindow::removeFromCurrentLayout(const QnUuid& uniqueId)
+{
     if (!m_context)
         return;
 

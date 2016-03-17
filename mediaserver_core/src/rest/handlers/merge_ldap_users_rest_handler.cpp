@@ -28,9 +28,10 @@ int QnMergeLdapUsersRestHandler::executePost(const QString &path, const QnReques
 
     QnLdapManager *ldapManager = QnLdapManager::instance();
     QnLdapUsers ldapUsers;
-    if (!ldapManager->fetchUsers(ldapUsers))
-    {
-        result.setError(QnRestResult::CantProcessRequest, lit("Can't authenticate"));
+    Qn::LdapResult ldapResult = ldapManager->fetchUsers(ldapUsers);
+    if (ldapResult != Qn::Ldap_NoError)
+	{
+        result.setError(QnRestResult::CantProcessRequest, QnLdapManager::errorMessage(ldapResult));
         return nx_http::StatusCode::ok;
     }
 

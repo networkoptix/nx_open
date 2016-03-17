@@ -124,12 +124,13 @@ extern "C"
 #include <network/router.h>
 #include <api/network_proxy_factory.h>
 #include <utils/server_interface_watcher.h>
-#include <nx/network/socket_global.h>
 
 #ifdef Q_OS_MAC
 #include "ui/workaround/mac_utils.h"
 #endif
 #include "api/runtime_info_manager.h"
+
+#include <nx/network/socket_global.h>
 #include <nx/utils/timermanager.h>
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
@@ -654,8 +655,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
 int main(int argc, char **argv)
 {
-	nx::network::SocketGlobals::InitGuard sgGuard;
-
 #ifdef Q_WS_X11
     XInitThreads();
 #endif

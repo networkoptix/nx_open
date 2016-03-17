@@ -134,7 +134,7 @@ namespace
     {
         QStringList result;
         for (const auto info: system->servers())
-            result.append(system->getServerPrimaryAddress(info.id).toString());
+            result.append(system->getServerHost(info.id));
         return result;
     }
 
@@ -355,8 +355,8 @@ void QnSystemsModel::serverChanged(const QnSystemDescriptionPtr &systemDescripti
             emit dataChanged(modelIndex, modelIndex, QVector<int>(1, role));
     };
 
-    testFlag(QnServerField::PrimaryAddressField, HostRoleId);
-    testFlag(QnServerField::PrimaryAddressField, HostsModelRoleId); // TODO: emit in model
+    testFlag(QnServerField::HostField, HostRoleId);
+    testFlag(QnServerField::HostField, HostsModelRoleId); // TODO: emit in model
 }
 
 

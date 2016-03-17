@@ -78,7 +78,6 @@
         <!--Global libs-->
         <qt.libs>core gui network opengl xml sql multimedia concurrent webkit webkitwidgets</qt.libs>
         <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc</ffmpeg.libs>
-        <!-- ATTENTION!!! -lestbase should be the LATEST in the list!!! Required for Linux -->
         <global.libs>-lcommon -lnx_network -lnx_streaming -lnx_audio -lappserver2 -lclient.core -ludt -lcloud_db_client</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -ld3d9 -lopenal32 -lsigar</windows.oslibs>
@@ -93,7 +92,7 @@
         <linux.defines/>
         <mac.defines/>
         <buildLib>sharedlib</buildLib>
-        <rdep.packages>openssl quazip</rdep.packages>
+        <rdep.packages>openssl quazip festival</rdep.packages>
     </properties>
     <profiles>
         <profile>
