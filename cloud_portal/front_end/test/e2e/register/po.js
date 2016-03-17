@@ -2,6 +2,11 @@
 
 var RegisterPage = function () {
 
+    var PasswordFieldSuite = require('../password_check.js');
+    this.passwordField = new PasswordFieldSuite();
+
+    this.url = '/#/register';
+
     this.getHomePage = function () {
         browser.get('/');
         browser.waitForAngular();
@@ -14,8 +19,8 @@ var RegisterPage = function () {
         this.openRegisterButton.click();
     };
 
-    this.getByLink = function () {
-        browser.get('/#/register');
+    this.getByUrl = function () {
+        browser.get(this.url);
         browser.waitForAngular();
     };
 
@@ -43,10 +48,10 @@ var RegisterPage = function () {
     this.firstNameInput = element(by.model('account.firstName'));
     this.lastNameInput = element(by.model('account.lastName'));
     this.emailInput = element(by.model('account.email'));
-    this.passwordGroup = element(by.model('account.password'));
+    this.passwordGroup = element(by.css('password-input'));
     this.passwordInput = this.passwordGroup.element(by.css('input[type=password]'));
 
-    this.submitRegisterButton = element(by.css('[form=registerForm]')).element(by.buttonText('Register'));
+    this.submitButton = element(by.css('[form=registerForm]')).element(by.buttonText('Register'));
 
     this.htmlBody = element(by.css('body'));
 
@@ -69,40 +74,38 @@ var RegisterPage = function () {
     this.invalidClass = 'ng-invalid';
     this.invalidClassExists = 'ng-invalid-already-exists';
 
-    this.checkInputInvalid = function(field, invalidClass) {
+    this.checkInputInvalid = function (field, invalidClass) {
         expect(field.getAttribute('class')).toContain(invalidClass);
         expect(this.fieldWrap(field).getAttribute('class')).toContain('has-error');
     }
 
-    this.checkPasswordInvalid = function(invalidClass) {
+    this.checkPasswordInvalid = function (invalidClass) {
         expect(this.passwordInput.getAttribute('class')).toContain(invalidClass);
         expect(this.passwordGroup.$('.form-group').getAttribute('class')).toContain('has-error');
     }
 
-    this.checkInputValid = function(field, invalidClass) {
+    this.checkInputValid = function (field, invalidClass) {
         expect(field.getAttribute('class')).not.toContain(invalidClass);
         expect(this.fieldWrap(field).getAttribute('class')).not.toContain('has-error');
     }
 
-    this.checkPasswordValid = function(invalidClass) {
+    this.checkPasswordValid = function (invalidClass) {
         expect(this.passwordInput.getAttribute('class')).not.toContain(invalidClass);
         expect(this.passwordGroup.$('.form-group').getAttribute('class')).not.toContain('has-error');
     }
 
-    this.checkEmailExists = function() {
+    this.checkEmailExists = function () {
         this.checkInputInvalid(this.emailInput, this.invalidClassExists);
         expect(this.fieldWrap(this.emailInput).$('.help-block').getText()).toContain('Email is already registered in portal');
     }
 
     this.passwordControlContainer = this.passwordGroup.element(by.css('.help-block'));
-    this.passwordWeak = { class:'label-danger', text:'too short', title: 'Password must contain at least 6 characters' };
-    this.passwordCommon = { class:'label-danger', text:'too common', title: 'This password is in top most popular passwords in the world' };
-    this.passwordFair = { class:'label-warning', text:'fair', title: 'Use numbers, symbols in different case and special symbols to make your password stronger' };
-    this.passwordGood = { class:'label-success', text:'good', title: '' };
 
-    this.checkPasswordWarning = function(strength) {
-        expect(this.passwordControlContainer.element(by.css('.label')).getAttribute('class')).toContain(strength.class);
-        expect(this.passwordControlContainer.element(by.css('.label')).getText()).toContain(strength.text);
+
+    this.prepareToPasswordCheck = function () {
+        this.firstNameInput.sendKeys(this.userFirstName);
+        this.lastNameInput.sendKeys(this.userLastName);
+        this.emailInput.sendKeys(this.getRandomEmail());
     }
 
     this.termsConditions = element(by.linkText('Terms and Conditions'));
