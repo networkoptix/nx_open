@@ -148,8 +148,12 @@ UPDATE access_role SET description='localAdmin' WHERE id=4;                 \
 UPDATE access_role SET description='cloudAdmin' WHERE id=5;                 \
 ";
 
-static const char kChangeSystemIdTypeToString[] = "                         \
-CREATE TABLE system_new(                                                    \
+static const char kChangeSystemIdTypeToString[] = 
+"                                                                           \
+ALTER TABLE system_to_account RENAME TO system_to_account_old;              \
+ALTER TABLE system RENAME TO system_old;                                    \
+                                                                            \
+CREATE TABLE system(                                                        \
     id                  VARCHAR(32) NOT NULL PRIMARY KEY,                   \
     name                TEXT NOT NULL,                                      \
     auth_key            TEXT NOT NULL,                                      \
@@ -160,14 +164,37 @@ CREATE TABLE system_new(                                                    \
     FOREIGN KEY(status_code) REFERENCES system_status(code)                 \
 );                                                                          \
                                                                             \
-INSERT INTO system_new(                                                     \
+CREATE TABLE system_to_account (                                            \
+    account_id          BLOB(16) NOT NULL,                                  \
+    system_id           VARCHAR(32) NOT NULL,                               \
+    access_role_id      INTEGER NOT NULL,                                   \
+    FOREIGN KEY( account_id ) REFERENCES account( id ) ON DELETE CASCADE,   \
+    FOREIGN KEY( system_id ) REFERENCES system( id ) ON DELETE CASCADE,     \
+    FOREIGN KEY( access_role_id ) REFERENCES access_role( id )              \
+);                                                                          \
+                                                                            \
+INSERT INTO system(                                                         \
     id, name, auth_key, owner_account_id, status_code, customization)       \
 SELECT                                                                      \
     hex(id), name, auth_key, owner_account_id, status_code, customization   \
-FROM system;                                                                \
+FROM system_old;                                                            \
                                                                             \
-DROP TABLE system;                                                          \
-ALTER TABLE system_new RENAME TO system;                                    \
+INSERT INTO system_to_account(account_id, system_id, access_role_id)        \
+                      SELECT account_id, hex(system_id), access_role_id     \
+                      FROM system_to_account_old;                           \
+                                                                            \
+DELETE FROM system_to_account_old;                                          \
+DELETE FROM system_old;                                                     \
+";
+
+static const char kChangeSystemIdTypeToString_2111[] =
+"                                                                           \
+DROP INDEX system_to_account_primary;                                       \
+DROP TABLE system_to_account_old;                                           \
+DROP TABLE system_old;                                                      \
+                                                                            \
+CREATE UNIQUE INDEX system_to_account_primary                               \
+ON system_to_account(account_id, system_id);                                \
 ";
 
 }   //db
