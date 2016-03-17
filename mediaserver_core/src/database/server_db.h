@@ -30,6 +30,7 @@ class QnServerDb :
     Q_OBJECT
 public:
     QnServerDb();
+    virtual ~QnServerDb();
 
     virtual QnDbTransaction* getTransaction() override;
 
@@ -85,6 +86,7 @@ protected:
     bool addOrUpdateBookmark(const QnCameraBookmark &bookmark);
     void updateBookmarkCount();
 private:
+    void setPeriodicCommitTimer();
     bool createDatabase();
     bool cleanupEvents();
     bool migrateBusinessParamsUnderTransaction();
@@ -102,6 +104,7 @@ private:
     qint64 m_eventKeepPeriod;
     QnDbTransaction m_tran;
     std::function<void(size_t)> m_updateBookmarkCount;
+    quint64 m_periodiCommitTimerId;
 };
 
 #define qnServerDb QnServerDb::instance()

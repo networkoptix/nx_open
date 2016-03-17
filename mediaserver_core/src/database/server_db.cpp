@@ -19,9 +19,11 @@
 
 #include <media_server/settings.h>
 
-#include <utils/common/synctime.h>
-#include <utils/common/util.h>
+#include <utils/common/log.h>
 #include <utils/common/model_functions.h>
+#include <utils/common/synctime.h>
+#include <utils/common/timermanager.h>
+#include <utils/common/util.h>
 
 namespace
 {
@@ -278,14 +280,17 @@ namespace
         }
     };
 }
-static const qint64 CLEANUP_INTERVAL = 1000000ll * 3600;
-static const qint64 DEFAULT_EVENT_KEEP_PERIOD = 1000000ll * 3600 * 24 * 30; // 30 days
+
+static const qint64 CLEANUP_INTERVAL_USEC = 1000000ll * 3600;
+static const qint64 DEFAULT_EVENT_KEEP_PERIOD_USEC = 1000000ll * 3600 * 24 * 30; // 30 days
+static const qint64 PERIODIC_COMMIT_TIMEOUT_MSEC = 1000ll * 15; // 15 seconds
 
 QnServerDb::QnServerDb():
     m_lastCleanuptime(0),
     m_auditCleanuptime(0),
-    m_eventKeepPeriod(DEFAULT_EVENT_KEEP_PERIOD),
-    m_tran(m_sdb, m_mutex)
+    m_eventKeepPeriod(DEFAULT_EVENT_KEEP_PERIOD_USEC),
+    m_tran(m_sdb, m_mutex),
+    m_periodiCommitTimerId(0)
 {
     const QString fileName = closeDirPath(MSSettings::roSettings()->value( "eventsDBFilePath", getDataDirectory()).toString())
         + QString(lit("mserver.sqlite"));
@@ -298,6 +303,19 @@ QnServerDb::QnServerDb():
     else {
         qWarning() << "can't initialize sqlLite database! Actions log is not created!";
     }
+
+    setPeriodicCommitTimer();
+}
+
+QnServerDb::~QnServerDb()
+{
+    quint64 timer(0);
+    {
+        QnWriteLocker lk(&m_mutex);
+        std::swap(timer, m_periodiCommitTimerId); // break timer cycle
+    }
+
+    TimerManager::instance()->joinAndDeleteTimer(timer);
 }
 
 QnServerDb::QnDbTransaction* QnServerDb::getTransaction() {
@@ -307,6 +325,28 @@ QnServerDb::QnDbTransaction* QnServerDb::getTransaction() {
 void QnServerDb::setEventLogPeriod(qint64 periodUsec)
 {
     m_eventKeepPeriod = periodUsec;
+}
+
+void QnServerDb::setPeriodicCommitTimer()
+{
+    m_periodiCommitTimerId = TimerManager::instance()->addTimer(
+        [this](quint64)
+        {
+            {
+                QnDbTransactionLocker tran(getTransaction());
+                if (!tran.commit())
+                {
+                    NX_LOG(lit(
+                        "QnServerDb: Could not commit transaction by timer"),
+                        cl_logWARNING);
+                }
+            }
+
+            QnWriteLocker lk(&m_mutex);
+            if (m_periodiCommitTimerId)
+                setPeriodicCommitTimer();
+        },
+        PERIODIC_COMMIT_TIMEOUT_MSEC);
 }
 
 bool QnServerDb::createDatabase()
@@ -470,7 +510,7 @@ bool QnServerDb::cleanupEvents()
     bool rez = true;
 
     qint64 currentTime = qnSyncTime->currentUSecsSinceEpoch();
-    if (currentTime - m_lastCleanuptime > CLEANUP_INTERVAL)
+    if (currentTime - m_lastCleanuptime > CLEANUP_INTERVAL_USEC)
     {
         m_lastCleanuptime = currentTime;
         QSqlQuery delQuery(m_sdb);
@@ -578,7 +618,7 @@ bool QnServerDb::cleanupAuditLog()
     bool rez = true;
 
     qint64 currentTime = qnSyncTime->currentUSecsSinceEpoch();
-    if (currentTime - m_auditCleanuptime > CLEANUP_INTERVAL)
+    if (currentTime - m_auditCleanuptime > CLEANUP_INTERVAL_USEC)
     {
         m_auditCleanuptime = currentTime;
         QSqlQuery delQuery(m_sdb);
@@ -1022,7 +1062,7 @@ bool QnServerDb::addOrUpdateBookmark( const QnCameraBookmark &bookmark) {
     if (!bookmark.isValid())
         return false;
 
-    QnDbTransactionLocker tran(getTransaction());
+    QnWriteLocker lk(&m_mutex);
 
     int docId = 0;
     {
@@ -1086,7 +1126,7 @@ bool QnServerDb::addOrUpdateBookmark( const QnCameraBookmark &bookmark) {
             return false;
     }
 
-    return tran.commit();
+    return true;
 }
 
 void QnServerDb::updateBookmarkCount()
@@ -1193,11 +1233,12 @@ bool QnServerDb::deleteBookmark(const QnUuid &bookmarkId) {
 bool QnServerDb::setLastBackupTime(QnServer::StoragePool pool, const QnUuid& cameraId,
                                    QnServer::ChunksCatalog catalog, qint64 timestampMs)
 {
-    QnDbTransactionLocker tran(getTransaction());
+    QnWriteLocker lk(&m_mutex);
     {
         QSqlQuery updQuery(m_sdb);
         updQuery.prepare("INSERT OR REPLACE INTO last_backup_time (pool, camera_id, catalog, timestamp) \
                          VALUES (:pool, :camera_id, :catalog, :timestamp)");
+
         updQuery.addBindValue((int) pool);
         updQuery.addBindValue(QnSql::serialized_field(cameraId));
         updQuery.addBindValue((int) catalog);
@@ -1208,7 +1249,7 @@ bool QnServerDb::setLastBackupTime(QnServer::StoragePool pool, const QnUuid& cam
         }
     }
 
-    return tran.commit();
+    return true;
 }
 
 qint64 QnServerDb::getLastBackupTime(QnServer::StoragePool pool, const QnUuid& cameraId,
