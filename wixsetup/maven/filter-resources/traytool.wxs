@@ -24,6 +24,12 @@
              </Directory>
         </DirectoryRef>
 
+        <ComponentGroup Id="TrayToolLibs" Directory="${customization}TrayToolDir">
+            <Component>
+                <File Id="TrayToolUtilsLib" Name="nx_utils.dll" Source="$(var.SourceDir)/nx_utils.dll" DiskId="3" />
+            </Component>
+        </ComponentGroup>        
+        
         <ComponentGroup Id="TrayToolQTLibraries" Directory="${customization}TrayToolDir">
             <Component>
                 <File Id="TrayToolQt5Core$(var.suffix).dll" Name="Qt5Core$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Core$(var.suffix).dll"  />       
