@@ -30,7 +30,7 @@ angular.module('webadminApp')
 
         /* Funсtions for external calls (open links) */
         $scope.createAccount = function(event){
-            if(nativeClientObject) {
+            if(nativeClientObject && nativeClientObject.openUrlInBrowser) {
                 nativeClientObject.openUrlInBrowser(Config.cloud.portalRegisterUrl);
             }else{
                 window.open(Config.cloud.portalRegisterUrl);
@@ -39,7 +39,7 @@ angular.module('webadminApp')
         };
         $scope.portalUrl = Config.cloud.portalUrl;
         $scope.learnMore = function($event){
-            if(nativeClientObject) {
+            if(nativeClientObject && nativeClientObject.openUrlInBrowser) {
                 nativeClientObject.openUrlInBrowser($scope.portalUrl);
                 $event.preventDefault();
             }
@@ -48,6 +48,15 @@ angular.module('webadminApp')
 
         /* Common helpers: error handling, check current system, error handler */
         function checkMySystem(user){
+            if( nativeClientObject && nativeClientObject.updateCredentials &&
+                ($scope.activeLogin != Config.defaultLogin ||
+                $scope.activePassword != Config.defaultPassword)){
+                nativeClientObject.updateCredentials ($scope.activeLogin, $scope.activePassword, $scope.cloudCreds);
+            }
+
+            $scope.activeLogin = login;
+            $scope.activePassword = password;
+
             $scope.settings.localLogin = user.name || Config.defaultLogin;
 
             mediaserver.systemCloudInfo().then(function(data){
@@ -68,7 +77,10 @@ angular.module('webadminApp')
 
         }
 
-        function updateCredentials(login,password){
+        function updateCredentials(login, password, isCloud){
+            $scope.activeLogin = login;
+            $scope.activePassword = password;
+            $scope.cloudCreds = isCloud;
             return mediaserver.login(login, password).then(checkMySystem);
         }
 
@@ -217,7 +229,7 @@ angular.module('webadminApp')
                         message.data.id,
                         message.data.authKey,
                         $scope.settings.cloudEmail).then(function(){
-                        updateCredentials( $scope.settings.cloudEmail, $scope.settings.cloudPassword).catch(cloudErrorHandler);
+                        updateCredentials( $scope.settings.cloudEmail, $scope.settings.cloudPassword, true ).catch(cloudErrorHandler);
                     },errorHandler);
                 }, cloudErrorHandler);
         }
@@ -244,7 +256,7 @@ angular.module('webadminApp')
                     offlineErrorHandler(r);
                     return;
                 }
-                updateCredentials( $scope.settings.localLogin, $scope.settings.localPassword).catch(offlineErrorHandler);
+                updateCredentials( $scope.settings.localLogin, $scope.settings.localPassword, false).catch(offlineErrorHandler);
             },offlineErrorHandler);
         }
 
@@ -358,7 +370,7 @@ angular.module('webadminApp')
         /* initiate wizard */
 
         mediaserver.getUser().then(checkMySystem,function(){
-            updateCredentials(Config.defaultLogin,Config.defaultPassword);
+            updateCredentials(Config.defaultLogin, Config.defaultPassword, false);
         });
         //
     });
