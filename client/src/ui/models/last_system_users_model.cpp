@@ -46,7 +46,7 @@ public:
     ~LastUsersManager();
 
     void addModel(const ModelPtr &model);
-    
+
     void removeModel(const ModelPtr &model);
 
 private:
@@ -81,7 +81,7 @@ QnLastSystemUsersModel::LastUsersManager::LastUsersManager()
 
     connect(qnCoreSettings, &QnCoreSettings::valueChanged
         , this, coreSettingsHandler);
-    
+
     updateModelsData();
 }
 
@@ -233,7 +233,7 @@ void QnLastSystemUsersModel::updateData(const UserPasswordPairList &newData)
         {
             const int startIndex = m_data.size();
             const int finishIndex = newData.size() - 1;
-            
+
             beginInsertRows(QModelIndex(), startIndex, finishIndex);
             const auto endInsertRowsGuard = QnRaiiGuard::createDestructable(
                 [this]() { endInsertRows(); });
