@@ -444,7 +444,7 @@ QnStorageResourcePtr createStorage(const QnUuid& serverId, const QString& path)
 
     auto spaceLimit = QnFileStorageResource::calcSpaceLimit(path);
     storage->setSpaceLimit(spaceLimit);
-    storage->setUsedForWriting(storage->isAvailable() && storage->isWritable());
+    storage->setUsedForWriting(storage->initOrUpdate() && storage->isWritable());
 
     QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName("Storage");
     Q_ASSERT(resType);
@@ -1074,7 +1074,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
             messageProcessor->updateResource( storage );
             // initialize storage immediately in sync mode
 			// todo: remove this call. Need refactor
-            storage.dynamicCast<QnStorageResource>()->isAvailable();
+            storage.dynamicCast<QnStorageResource>()->initOrUpdate();
         }
     }
 
