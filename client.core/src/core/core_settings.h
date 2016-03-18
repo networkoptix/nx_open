@@ -7,6 +7,7 @@
 
 class QSettings;
 
+//TODO: #ynikitenkov move to client_core subdirectory and rename to QnClientCoreSettings
 class QnCoreSettings : public QnPropertyStorage
     , public Singleton<QnCoreSettings>
 {

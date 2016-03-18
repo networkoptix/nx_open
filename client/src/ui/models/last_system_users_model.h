@@ -2,6 +2,10 @@
 
 #include <QtCore/QAbstractListModel>
 
+
+typedef QPair<QString, QString> UserPasswordPair;
+typedef QList<UserPasswordPair> UserPasswordPairList;
+
 class QnLastSystemUsersModel : public QAbstractListModel
 {
     Q_OBJECT
@@ -29,20 +33,12 @@ public: // overrides
 
     QHash<int, QByteArray> roleNames() const;
 
+    void updateData(const UserPasswordPairList &newData);
 signals:
     void systemNameChanged();
 
     void hasConnectionsChanged();
 
-private:
-    class LastUsersManager;
-    static LastUsersManager &instance();
-
-private:
-    typedef QPair<QString, QString> UserPasswordPair;
-    typedef QList<UserPasswordPair> UserPasswordPairList;
-
-    void updateData(const UserPasswordPairList &newData);
 
 private:
     QString m_systemName;

@@ -25,6 +25,7 @@
 #include <client/client_translation_manager.h>
 #include <client/client_instance_manager.h>
 #include <client/desktop_client_message_processor.h>
+#include <client/client_recent_connections_manager.h>
 
 #include <core/core_settings.h>
 #include <core/ptz/client_ptz_controller_pool.h>
@@ -154,6 +155,7 @@ QnClientModule::QnClientModule(const QnStartupParameters &startupParams
     common->store<QnResourcesChangesManager>(new QnResourcesChangesManager());
     common->store<QnCameraBookmarksManager>(new QnCameraBookmarksManager());
     common->store<QnServerStorageManager>(new QnServerStorageManager());
+    common->store<QnClientRecentConnectionsManager>(new QnClientRecentConnectionsManager());
 
     initializeStatisticsManager(common);
 

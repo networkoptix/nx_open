@@ -1,19 +1,15 @@
-
 #include "last_system_users_model.h"
 
-#include <utils/math/math.h>
+#include <client/client_recent_connections_manager.h>
+
 #include <core/core_settings.h>
 #include <core/system_connection_data.h>
+
 #include <nx/utils/raii_guard.h>
+#include <utils/math/math.h>
 
 namespace
 {
-    typedef QPointer<QnLastSystemUsersModel> ModelPtr;
-    int qHash(const ModelPtr &model)
-    {
-        return qHash(model.data());
-    }
-
     enum RoleId
     {
         FirstRoleId = Qt::UserRole + 1
@@ -34,170 +30,17 @@ namespace
     }();
 }
 
-//
-
-class QnLastSystemUsersModel::LastUsersManager : public QObject
-{
-    typedef QObject base_type;
-
-public:
-    LastUsersManager();
-
-    ~LastUsersManager();
-
-    void addModel(const ModelPtr &model);
-
-    void removeModel(const ModelPtr &model);
-
-private:
-    void updateModelBinding(const ModelPtr &model);
-
-    void updateModelsData();
-
-
-private:
-    typedef QSet<ModelPtr> UnboundModelsSet;
-    typedef QHash<QString, ModelPtr> BoundModelsHash;
-    typedef QHash<QString, UserPasswordPairList> DataCache;
-
-    UnboundModelsSet m_unbound;
-    BoundModelsHash m_bound;
-    DataCache m_dataCache;
-};
-
-QnLastSystemUsersModel::LastUsersManager::LastUsersManager()
-    : base_type()
-    , m_unbound()
-    , m_bound()
-    , m_dataCache()
-{
-    NX_ASSERT(qnCoreSettings, Q_FUNC_INFO, "Core settings are empty");
-
-    const auto coreSettingsHandler = [this](int id)
-    {
-        if (id == QnCoreSettings::LastSystemConnections)
-            updateModelsData();
-    };
-
-    connect(qnCoreSettings, &QnCoreSettings::valueChanged
-        , this, coreSettingsHandler);
-
-    updateModelsData();
-}
-
-QnLastSystemUsersModel::LastUsersManager::~LastUsersManager()
-{
-}
-
-void QnLastSystemUsersModel::LastUsersManager::addModel(const ModelPtr &model)
-{
-    connect(model.data(), &QnLastSystemUsersModel::systemNameChanged
-        , this, [this, model]()
-    {
-        updateModelBinding(model);
-    });
-
-    const auto systemName = model->systemName();
-    m_unbound.insert(model);
-    if (!systemName.isEmpty())
-        updateModelBinding(model);
-}
-
-void QnLastSystemUsersModel::LastUsersManager::removeModel(const ModelPtr &model)
-{
-    if (m_unbound.remove(model))
-        return;
-
-    const auto systemName = model->systemName();
-    const auto it = m_bound.find(systemName);
-    const bool isFound = (it != m_bound.end());
-
-    NX_ASSERT(isFound, Q_FUNC_INFO, "Model has not been found");
-    if (!isFound)
-        return;
-
-    m_bound.erase(it);
-}
-
-void QnLastSystemUsersModel::LastUsersManager::updateModelBinding(
-    const ModelPtr &model)
-{
-    const bool isCorrectSystemName = !model->systemName().isEmpty();
-    NX_ASSERT(isCorrectSystemName, Q_FUNC_INFO
-        , "System name for model can't be empty");
-    if (!isCorrectSystemName)
-        return;
-
-    const auto itUnbound = m_unbound.find(model);
-    const bool isUnbound = (itUnbound != m_unbound.end());
-    NX_ASSERT(isUnbound, Q_FUNC_INFO, "Model is not unbound");
-
-    const auto systemName = model->systemName();
-    if (isUnbound)
-    {
-        m_unbound.erase(itUnbound);
-    }
-    else
-    {
-        const auto it = std::find_if(m_bound.begin(), m_bound.end()
-            , [model](const ModelPtr &modelValue)
-        {
-            return (model == modelValue);
-        });
-
-        const bool isBoundAlready = (it != m_bound.end());
-        NX_ASSERT(!isBoundAlready, Q_FUNC_INFO, "Model is bound");
-        if (isBoundAlready)
-            return;
-
-        const bool modelWithSameSystem =
-            (m_bound.find(systemName) != m_bound.end());
-        NX_ASSERT(!modelWithSameSystem, Q_FUNC_INFO
-            , "Model with the same system name exists");
-
-        if (modelWithSameSystem)
-            return;
-    }
-
-    m_bound.insert(systemName, model);
-    model->updateData(m_dataCache.value(systemName));
-}
-
-void QnLastSystemUsersModel::LastUsersManager::updateModelsData()
-{
-    m_dataCache.clear();
-    const auto lastConnectionsData = qnCoreSettings->lastSystemConnections();
-    for (const auto connectionDesc : lastConnectionsData)
-    {
-        m_dataCache[connectionDesc.systemName].append(UserPasswordPair(
-            connectionDesc.userName, connectionDesc.password));
-    }
-    for (const auto boundModel : m_bound)
-    {
-        const auto systemName = boundModel->systemName();
-        boundModel->updateData(m_dataCache.value(systemName));
-    }
-}
-
-//
-
 QnLastSystemUsersModel::QnLastSystemUsersModel(QObject *parent)
     : base_type(parent)
     , m_systemName()
     , m_data()
 {
-    instance().addModel(this);
+    QnClientRecentConnectionsManager::instance()->addModel(this);
 }
 
 QnLastSystemUsersModel::~QnLastSystemUsersModel()
 {
-    instance().removeModel(this);
-}
-
-QnLastSystemUsersModel::LastUsersManager &QnLastSystemUsersModel::instance()
-{
-    static LastUsersManager inst;
-    return inst;
+    QnClientRecentConnectionsManager::instance()->removeModel(this);
 }
 
 QString QnLastSystemUsersModel::systemName() const
