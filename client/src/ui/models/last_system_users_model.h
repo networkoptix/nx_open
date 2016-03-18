@@ -1,12 +1,13 @@
-
 #pragma once
 
 #include <QtCore/QAbstractListModel>
 
-class QnLastSystemUsersModel : public QAbstractListModel
+#include <utils/common/connective.h>
+
+class QnLastSystemUsersModel : public Connective<QAbstractListModel>
 {
     Q_OBJECT
-    typedef QAbstractListModel base_type;
+    typedef Connective<QAbstractListModel> base_type;
 
     Q_PROPERTY(QString systemName READ systemName WRITE setSystemName NOTIFY systemNameChanged)
     Q_PROPERTY(bool hasConnections READ hasConnections NOTIFY hasConnectionsChanged)
