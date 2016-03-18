@@ -1340,6 +1340,8 @@ AbstractStreamSocket* TCPServerSocket::systemAccept()
         return nullptr;
 
     auto* acceptedSocket = d->accept(recvTimeoutMs, nonBlockingMode);
+    if (!acceptedSocket)
+        return nullptr;
 #ifdef _WIN32
     if (!nonBlockingMode)
         return acceptedSocket;

@@ -60,6 +60,8 @@ public:
     //!0 means no timeout
     unsigned int timeout;
     qint64 updatedPeriodicTaskClock;
+    /** clock when timer will be triggered. 0 - no clock */
+    qint64 nextTimeoutClock;
 
     AIOEventHandlingData(AIOEventHandler<SocketType>* _eventHandler)
     :
@@ -67,7 +69,8 @@ public:
         markedForRemoval(0),
         eventHandler(_eventHandler),
         timeout(0),
-        updatedPeriodicTaskClock(0)
+        updatedPeriodicTaskClock(0),
+        nextTimeoutClock(0)
     {
     }
 };
@@ -170,16 +173,16 @@ public:
         QnMutexLocker lk(&m_impl->mutex);
         //TODO #ak looks like copy-paste of previous method. Remove copy-paste nahuy!!!
 
-        //this task does not cancel any other task. TODO #ak maybe it should cancel another timeout change?
-        ////checking queue for reverse task for \a sock
-        //if( m_impl->removeReverseTask( sock, eventToWatch, TaskType::tAdding, eventHandler, timeoutMs ) )
-        //    return true;    //ignoring task
+        //removing other timeouts from queue
+        //m_impl->removeReverseTask(
+        //    sock, aio::etTimedOut, TaskType::tRemoving, nullptr, 0);
 
-        //if socket is marked for removal, not adding task
-        void* userData = sock->impl()->eventTypeToUserData[eventToWatch];
-        NX_ASSERT(userData != nullptr);  //socket is not polled, but someone wants to change timeout
-        if (static_cast<AIOEventHandlingDataHolder<SocketType>*>(userData)->data->markedForRemoval.load(std::memory_order_relaxed) > 0)
-            return;   //socket marked for removal, ignoring timeout change (like, cancelling it right now)
+        //if socket is marked for removal, not adding task 
+        //TODO #ak is it needed?
+        //void* userData = sock->impl()->eventTypeToUserData[eventToWatch];
+        //NX_ASSERT(userData != nullptr);  //socket is not polled, but someone wants to change timeout
+        //if (static_cast<AIOEventHandlingDataHolder<SocketType>*>(userData)->data->markedForRemoval.load(std::memory_order_relaxed) > 0)
+        //    return;   //socket marked for removal, ignoring timeout change (like, cancelling it right now)
 
         m_impl->pollSetModificationQueue.push_back(typename AIOThreadImplType::SocketAddRemoveTask(
             TaskType::tChangingTimeout,
@@ -630,19 +633,45 @@ public:
                 case TaskType::tChangingTimeout:
                 {
                     void* userData = task.socket->impl()->eventTypeToUserData[task.eventType];
-                    AIOEventHandlingDataHolder<SocketType>* handlingData = reinterpret_cast<AIOEventHandlingDataHolder<SocketType>*>(userData);
+                    AIOEventHandlingDataHolder<SocketType>* handlingData =
+                        reinterpret_cast<AIOEventHandlingDataHolder<SocketType>*>(userData);
                     //NOTE we are in aio thread currently
                     if (task.timeout > 0)
                     {
                         //adding/updating periodic task
                         if (handlingData->data->timeout > 0)
-                            handlingData->data->updatedPeriodicTaskClock = getSystemTimerVal() + task.timeout;  //updating existing task
+                        {
+                            //updating existing task
+                            const auto newClock = getSystemTimerVal() + task.timeout;
+                            if (handlingData->data->nextTimeoutClock == 0)
+                            {
+                                handlingData->data->updatedPeriodicTaskClock = newClock;
+                            }
+                            else
+                            {
+                                //replacing timer record in periodicTasksByClock
+                                for (auto it = periodicTasksByClock.lower_bound(handlingData->data->nextTimeoutClock);
+                                      it != periodicTasksByClock.end() && it->first == handlingData->data->nextTimeoutClock;
+                                      ++it)
+                                {
+                                    if (it->second.socket == task.socket)
+                                    {
+                                        periodicTasksByClock.erase(it);
+                                        addPeriodicTaskNonSafe(
+                                            newClock, handlingData->data, task.socket, task.eventType);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
                         else
+                        {
                             addPeriodicTask(
                                 getSystemTimerVal() + task.timeout,
                                 handlingData->data,
                                 task.socket,
                                 task.eventType);
+                        }
                     }
                     else if (handlingData->data->timeout > 0)  //&& timeout == 0
                         handlingData->data->updatedPeriodicTaskClock = -1;  //cancelling existing periodic task (there must be one)
@@ -895,6 +924,7 @@ public:
 
             //no need to lock mutex, since data is removed in this thread only
             std::shared_ptr<AIOEventHandlingData<SocketType>> handlingData = periodicTaskData.data; //TODO #ak do we really need to copy shared_ptr here?
+            handlingData->nextTimeoutClock = 0;
             ++handlingData->beingProcessed;
             //TODO #ak atomic fence is required here (to avoid reordering)
             //TODO #ak add some auto pointer for handlingData->beingProcessed
@@ -979,6 +1009,7 @@ public:
         SocketType* _socket,
         aio::EventType eventType)
     {
+        handlingData->nextTimeoutClock = taskClock;
         periodicTasksByClock.insert(std::make_pair(
             taskClock,
             PeriodicTaskData(handlingData, _socket, eventType)));
