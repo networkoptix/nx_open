@@ -23,8 +23,16 @@ angular.module('cloudApp')
                 return res;
             },
             redirectAuthorised:function(){
-                get().then(function(account){
+                get().then(function(){
                     $location.path(Config.redirectAuthorised);
+                });
+            },
+            logoutAuthorised:function(){
+                get().then(function(){
+                    cloudApi.logout().then(function(){
+                        scope.session.password = ''; // TODO: get rid of password in session storage
+                        window.location.reload();
+                    });
                 });
             }
         }

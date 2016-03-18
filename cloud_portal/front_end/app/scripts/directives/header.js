@@ -5,7 +5,7 @@ angular.module('cloudApp')
         return {
             restrict: 'E',
             templateUrl: 'views/components/header.html',
-            link:function(scope,element,attrs){
+            link:function(scope/*,element,attrs*/){
                 scope.session = $sessionStorage;
 
                 scope.inline = typeof($location.search().inline) != 'undefined';
@@ -18,11 +18,7 @@ angular.module('cloudApp')
                     dialogs.login();
                 };
                 scope.logout = function(){
-                    cloudApi.logout().then(function(){
-                        scope.session.password = ''; // TODO: get rid of password in session storage
-                        $location.path('/',false);
-                        window.location.reload();
-                    });
+                    account.logoutAuthorised();
                 };
 
                 account.get().then(function(account){

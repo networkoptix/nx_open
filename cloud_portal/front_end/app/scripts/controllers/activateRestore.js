@@ -14,12 +14,16 @@ angular.module('cloudApp')
             activateCode: $routeParams.activateCode
         };
 
-        if(!$scope.data.activateCode){
-            account.redirectAuthorised();
-        }
-
         $scope.reactivating = $routeParams.reactivating;
         $scope.restoring = $routeParams.restoring;
+
+        if($scope.reactivating){
+            account.redirectAuthorised();
+        }
+        if($scope.data.restoreCode){
+            account.logoutAuthorised();
+        }
+
 
         $scope.change = process.init(function(){
             return cloudApi.restorePassword($scope.data.restoreCode, $scope.data.newPassword);

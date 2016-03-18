@@ -3,7 +3,7 @@
 angular.module('cloudApp')
     .controller('LoginCtrl', function ($scope, cloudApi, process, $location, $sessionStorage, $routeParams, account) {
 
-        account.redirectAuthorised();
+        account.logoutAuthorised();
 
         $scope.Config = Config;
         $scope.session = $sessionStorage;
