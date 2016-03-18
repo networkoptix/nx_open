@@ -135,6 +135,9 @@ void QnMjpegSessionPrivate::decodeFrame(const QByteArray &data, qint64 timestamp
 
     {
         QnMutexLocker lock(&mutex);
+        if (state != QnMjpegSession::Playing)
+            return;
+
         if (!lastFrame.isNull())
             lastFrameReleased.wait(&mutex);
 
