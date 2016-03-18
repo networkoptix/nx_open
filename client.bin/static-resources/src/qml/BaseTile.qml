@@ -8,6 +8,7 @@ Item
 {
     id: thisComponent;
 
+    property Item visualParent;
     property string systemName;
     property string host;
     property bool isRecentlyConnected;
@@ -15,7 +16,14 @@ Item
     property Component centralAreaDelegate;
     property Component expandedAreaDelegate;
     property bool correctTile: true;
-    property bool isExpanded: isExpandedPrivate && correctTile;
+    property bool isExpanded;
+
+    Binding
+    {
+        target: thisComponent;
+        property: "isExpanded";
+        value: isExpandedPrivate && correctTile;
+    }
 
     property alias centralArea: centralAreaLoader.item;
     property alias expandedArea: expandedAreaLoader.item;
@@ -32,22 +40,16 @@ Item
     implicitWidth: 280;
     implicitHeight: 96;
 
-    z: isExpanded ? 1 : 0
-
-    MouseArea
-    {
-        anchors.fill: parent;
-        onClicked: { toggle(); }
-    }
-
-    Rectangle
+    Item
     {        
         id: tileHolder;
 
+        property Item realParent: thisComponent;
+        parent: (isExpanded ? visualParent : realParent);
 
         DropShadow
         {
-            anchors.fill: parent;
+            anchors.fill: tileArea;
 
             visible: thisComponent.isExpanded;
             radius: Style.custom.systemTile.shadowRadius;
@@ -56,11 +58,26 @@ Item
             source: tileArea;
         }
 
-        x: (thisComponent.isExpanded ? (parent.parent.parent.width - width) / 2 - parent.parent.x : 0);
-        y: (thisComponent.isExpanded ? (parent.parent.parent.height - height) / 2 - parent.parent.y : 0);
-        width: parent.width;
-        height: (thisComponent.isExpanded ? loadersColumn.y + loadersColumn.height : parent.height);
-        radius: 2;
+        x: (thisComponent.isExpanded ? (visualParent.width - width) / 2 : 0);
+        y: (thisComponent.isExpanded ? (visualParent.height - height) / 2: 0);
+
+        MouseArea
+        {
+            id: toggleMouseArea;
+
+            x: (thisComponent.isExpanded ? -parent.x : 0);
+            y: (thisComponent.isExpanded ? -parent.y : 0);
+            width: tileHolder.parent.width;
+            height: tileHolder.parent.height;
+
+            hoverEnabled: true;
+            onClicked: { toggle(); }
+        }
+
+        width: thisComponent.width;
+        height: (thisComponent.isExpanded
+            ? loadersColumn.y + loadersColumn.height
+            : thisComponent.height);
 
         Rectangle
         {
@@ -72,6 +89,7 @@ Item
             color: (isHovered ? hoveredColor : standardColor);
 
             anchors.fill: parent;
+            radius: 2;
 
             MouseArea
             {
@@ -114,7 +132,7 @@ Item
                 anchors.right: parent.right;
                 anchors.top: parent.top;
 
-                text: "x";
+                text: "X";
 
                 onClicked: { toggle(); }
             }
