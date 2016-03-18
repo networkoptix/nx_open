@@ -1,5 +1,7 @@
 #include "timeline_zoom_level.h"
 
+#include <nx/utils/log/assert.h>
+
 int QnTimelineZoomLevel::maxMonthLength = 0;
 
 bool QnTimelineZoomLevel::testTick(qint64 tick) const {

@@ -195,7 +195,7 @@ bool QnMjpegSessionPrivate::connect()
 
     reply = networkAccessManager->get(QNetworkRequest(url));
     reply->ignoreSslErrors();
-    reply->setReadBufferSize(maxHttpBufferSize);
+    reply->setReadBufferSize(kMaxHttpBufferSize);
 
     QObject::connect(
 		reply, &QNetworkReply::readyRead, this, &QnMjpegSessionPrivate::at_reply_readyRead);
