@@ -8,6 +8,10 @@ describe('Account suite', function () {
         p.loginLogout.login(p.userEmail, p.userPassword);
     });
 
+    afterAll(function() {
+        p.loginLogout.logout();
+    });
+
     it("should display dropdown in right top corner: Account settings, Change password, Logout", function () {
         p.get(p.homePageUrl);
         expect(p.userAccountDropdownToggle.getText()).toContain(p.userEmail);
