@@ -114,7 +114,11 @@ void QnMjpegPlayerPrivate::processFrame() {
         return;
 
     if (frameQueue.isEmpty())
-        return;
+    {
+        enqueueNextFrame();
+        if (frameQueue.isEmpty())
+            return;
+    }
 
     QnMjpegSession::FrameData frameData = frameQueue.dequeue();
 
