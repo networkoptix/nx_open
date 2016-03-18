@@ -444,7 +444,7 @@ QnStorageResourcePtr createStorage(const QnUuid& serverId, const QString& path)
 
     auto spaceLimit = QnFileStorageResource::calcSpaceLimit(path);
     storage->setSpaceLimit(spaceLimit);
-    storage->setUsedForWriting(storage->isWritable());
+    storage->setUsedForWriting(storage->initOrUpdate() && storage->isWritable());
 
     QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName("Storage");
     Q_ASSERT(resType);
@@ -558,6 +558,7 @@ QnStorageResourceList createStorages(const QnMediaServerResourcePtr mServer)
     {
         if (!mServer->getStorageByUrl(folderPath).isNull())
             continue;
+        // Create new storage because of new partition found that missing in the database
         QnStorageResourcePtr storage = createStorage(mServer->getId(), folderPath);
         const qint64 totalSpace = storage->getTotalSpace();
         if (totalSpace == QnStorageResource::kUnknownSize || totalSpace < storage->getSpaceLimit())
@@ -1069,7 +1070,12 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
                 return;
         }
         for(const QnResourcePtr& storage: storages)
+        {
             messageProcessor->updateResource( storage );
+            // initialize storage immediately in sync mode
+			// todo: remove this call. Need refactor
+            storage.dynamicCast<QnStorageResource>()->initOrUpdate();
+        }
     }
 
 

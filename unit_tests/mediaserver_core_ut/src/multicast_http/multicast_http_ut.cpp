@@ -15,8 +15,12 @@
 
 namespace
 {
-    const QByteArray UT_SERVER_GUID("{9DBF7579-3235-4910-A66C-0EB5DE8C443B}");
     const int MT_REQUESTS = 10;
+
+    QUuid getServerGuid()
+    {
+        return QUuid(MSSettings::roSettings()->value(lit("serverGuid")).toString());
+    }
 
 }
 
@@ -85,7 +89,7 @@ public:
     {
         QnMulticast::Request request;
         request.method = lit("GET");
-        request.serverId = QUuid(UT_SERVER_GUID);
+        request.serverId = getServerGuid();
         request.url = QUrl(lit("api/moduleInformation"));
         request.auth.setUser(lit("admin"));
         request.auth.setPassword(lit("admin"));
@@ -109,7 +113,7 @@ public:
     {
         QnMulticast::Request request;
         request.method = lit("GET");
-        request.serverId = QUuid(UT_SERVER_GUID);
+        request.serverId = getServerGuid();
         request.url = QUrl(lit("api/showLog"));
         request.auth.setUser(lit("admin"));
         request.auth.setPassword(lit("12345"));
@@ -163,7 +167,7 @@ public:
     {
         QnMulticast::Request request;
         request.method = lit("GET");
-        request.serverId = QUuid(UT_SERVER_GUID);
+        request.serverId = getServerGuid();
         request.url = QUrl(lit("api/configure?password=%1&oldPassword=%2").arg(newPassword).arg(oldPassword));
         request.auth.setUser(lit("admin"));
         request.auth.setPassword(oldPassword);
@@ -196,7 +200,7 @@ public:
         m_requests = 0;
         QnMulticast::Request request1;
         request1.method = lit("GET");
-        request1.serverId = QUuid(UT_SERVER_GUID);
+        request1.serverId = getServerGuid();
         request1.url = QUrl(lit("api/moduleInformation"));
         request1.auth.setUser(lit("admin"));
         request1.auth.setPassword(lit("admin"));
@@ -273,10 +277,14 @@ TEST(MulticastHttpTest, main)
     QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
     QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
     QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule());
-    MSSettings::roSettings()->setValue(lit("serverGuid"), UT_SERVER_GUID);
+    MSSettings::roSettings()->setValue(lit("serverGuid"), QnUuid::createUuid().toString());
     MSSettings::roSettings()->setValue(lit("removeDbOnStartup"), lit("1"));
-    QString eventsDbName = MSSettings::roSettings()->value( "eventsDBFilePath", closeDirPath(getDataDirectory()) + QString(lit("mserver.sqlite")) ).toString();
-    QFile::remove(eventsDbName);
+    QString dbDir = MSSettings::roSettings()->value( "eventsDBFilePath", closeDirPath(getDataDirectory())).toString();
+    QFile::remove(dbDir + lit("mserver.sqlite"));
+    QFile::remove(dbDir + lit("ecs.sqlite"));
+    QFile::remove(dbDir + lit("ecs.sqlite-shm"));
+    QFile::remove(dbDir + lit("ecs.sqlite-wal"));
+    QFile::remove(dbDir + lit("ecs_static.sqlite"));
     MSSettings::roSettings()->setValue(lit("systemName"), QnUuid::createUuid().toString()); // random value
     MSSettings::roSettings()->setValue(lit("port"), 0);
     MediaServerProcess mserverProcessor(argc, argv);

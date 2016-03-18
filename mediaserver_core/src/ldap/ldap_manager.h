@@ -10,8 +10,16 @@
 #include <utils/thread/mutex.h>
 #include "common/common_globals.h"
 
-
 class QnLdapManagerPrivate;
+
+namespace Qn {
+    enum LdapResult {
+        Ldap_NoError = 0,
+        Ldap_SizeLimit,
+        Ldap_InvalidCredentials,
+        Ldap_Other = 100
+    };
+}
 
 class QnLdapManager : public Singleton<QnLdapManager> {
 public:
@@ -19,13 +27,14 @@ public:
     QnLdapManager();
     ~QnLdapManager();
 
-    bool fetchUsers(QnLdapUsers &users, const QnLdapSettings& settings);
-    bool fetchUsers(QnLdapUsers &users);
+    static QString errorMessage(Qn::LdapResult ldapResult);
+
+    Qn::LdapResult fetchUsers(QnLdapUsers &users, const QnLdapSettings& settings);
+    Qn::LdapResult fetchUsers(QnLdapUsers &users);
 
     Qn::AuthResult realm(QString* realm) const;
 
     Qn::AuthResult authenticateWithDigest(const QString &login, const QString &ha1);
-    bool testSettings(const QnLdapSettings& settings);
 
 private:
     mutable QMap<QString, QString> m_realmCache;

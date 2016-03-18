@@ -324,9 +324,12 @@ void QnStreamRecorder::cleanFfmpegContexts()
 {
     for (size_t i = 0; i < m_recordingContextVector.size(); ++i)
     {
-        QnFfmpegHelper::closeFfmpegIOContext(m_recordingContextVector[i].formatCtx->pb);
-        m_recordingContextVector[i].formatCtx->pb = 0;
-        avformat_close_input(&m_recordingContextVector[i].formatCtx);
+        if (m_recordingContextVector[i].formatCtx)
+        {
+            QnFfmpegHelper::closeFfmpegIOContext(m_recordingContextVector[i].formatCtx->pb);
+            m_recordingContextVector[i].formatCtx->pb = 0;
+            avformat_close_input(&m_recordingContextVector[i].formatCtx);
+        }
     }
 }
 
