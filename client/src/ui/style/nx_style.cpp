@@ -1743,19 +1743,19 @@ int QnNxStyle::pixelMetric(
         return dp(16);
 
     case PM_ScrollBarExtent:
-        return 8;
+        return dp(8);
     case PM_ScrollBarSliderMin:
-        return 8;
+        return dp(8);
 
     case PM_SplitterWidth:
         return dp(1);
 
     case PM_TabBarTabHSpace:
     case PM_TabBarTabVSpace:
-        return 9;
+        return dp(9);
 
     case PM_ToolBarIconSize:
-        return 18;
+        return dp(18);
 
     default:
         break;
