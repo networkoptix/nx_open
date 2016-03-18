@@ -91,7 +91,7 @@ QnLastSystemUsersModel::LastUsersManager::~LastUsersManager()
 
 void QnLastSystemUsersModel::LastUsersManager::addModel(const ModelPtr &model)
 {
-    connect(model, &QnLastSystemUsersModel::systemNameChanged
+    connect(model.data(), &QnLastSystemUsersModel::systemNameChanged
         , this, [this, model]()
     {
         updateModelBinding(model);
