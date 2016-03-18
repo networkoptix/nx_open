@@ -102,6 +102,11 @@ namespace nx_http
         m_reconnectTries = reconnectTries;
     }
 
+    void HttpClient::setSendTimeoutMs( unsigned int sendTimeoutMs )
+    {
+        m_sendTimeoutMs = sendTimeoutMs;
+    }
+
     void HttpClient::setMessageBodyReadTimeoutMs( unsigned int messageBodyReadTimeoutMs )
     {
         m_messageBodyReadTimeoutMs = messageBodyReadTimeoutMs;
@@ -154,6 +159,8 @@ namespace nx_http
                 m_asyncHttpClient->setSubsequentReconnectTries(m_subsequentReconnectTries.get());
             if (m_reconnectTries)
                 m_asyncHttpClient->setTotalReconnectTries(m_reconnectTries.get());
+            if (m_sendTimeoutMs)
+                m_asyncHttpClient->setSendTimeoutMs(m_sendTimeoutMs.get());
             if (m_messageBodyReadTimeoutMs)
                 m_asyncHttpClient->setMessageBodyReadTimeoutMs(m_messageBodyReadTimeoutMs.get());
             if (m_userAgent)

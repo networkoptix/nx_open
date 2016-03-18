@@ -101,6 +101,7 @@ def append_deps(deps_file, debug = False):
 
 def get_package_for_configuration(target, package, target_dir, debug):
     installation_marker = (package if not debug else package + "-debug") + rdep.PACKAGE_CONFIG_NAME
+    print installation_marker
     description_file = os.path.join(target_dir, installation_marker)
     installed = os.path.isfile(description_file)
     if installed:
@@ -112,6 +113,7 @@ def get_package_for_configuration(target, package, target_dir, debug):
         print "Fetching package {0} for {1}".format(package, configuration_name(debug))
         rdep.fetch_packages(REPOSITORY_PATH, SYNC_URL, target, [ package ], debug)
         location = rdep.locate_package(REPOSITORY_PATH, target, package, debug)
+        print location
 
     if not location:
         print "Could not locate {0}".format(package)
@@ -128,6 +130,7 @@ def get_package_for_configuration(target, package, target_dir, debug):
         install_dependency(location, target_dir, debug)
 
         shutil.copy(os.path.join(location, rdep.PACKAGE_CONFIG_NAME), description_file)
+        print (os.path.join(location, rdep.PACKAGE_CONFIG_NAME), description_file)
 
     return True
 
@@ -157,7 +160,8 @@ def get_dependencies(target, packages, target_dir, debug = False, deps_file = "q
         if not rdep.init_repository(REPOSITORY_PATH, SYNC_URL):
             exit(1)
 
-    SYNC_URL = rdep.get_sync_url(REPOSITORY_PATH)
+    #SYNC_URL = rdep.get_sync_url(REPOSITORY_PATH)
+    print SYNC_URL
 
     # Clear dependenciy files
     for debug in [ False, True ]:

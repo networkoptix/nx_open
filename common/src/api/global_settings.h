@@ -77,6 +77,10 @@ public:
     QString statisticsReportTimeCycle() const;
     void setStatisticsReportTimeCycle(const QString& value);
 
+    static const QString kNameUpnpPortMappingEnabled;
+    bool isUpnpPortMappingEnabled() const;
+    void setUpnpPortMappingEnabled(bool value);
+
     /** System id for the statistics server */
     QnUuid systemId() const;
     void setSystemId(const QnUuid &value);
@@ -121,6 +125,7 @@ signals:
     void ldapSettingsChanged();
     void statisticsAllowedChanged();
     void updateNotificationsChanged();
+    void upnpPortMappingEnabledChanged();
     void ec2ConnectionSettingsChanged();
 
 private:
@@ -151,6 +156,7 @@ private:
     QnResourcePropertyAdaptor<QString> *m_statisticsReportLastTimeAdaptor;
     QnResourcePropertyAdaptor<int> *m_statisticsReportLastNumberAdaptor;
     QnResourcePropertyAdaptor<QString> *m_statisticsReportTimeCycleAdaptor;
+    QnResourcePropertyAdaptor<bool> *m_upnpPortMappingEnabledAdaptor;
     QnResourcePropertyAdaptor<QnUuid> *m_systemIdAdaptor;
     QnResourcePropertyAdaptor<QString> *m_systemNameForIdAdaptor;
     QnResourcePropertyAdaptor<QString> *m_statisticsReportServerApiAdaptor;

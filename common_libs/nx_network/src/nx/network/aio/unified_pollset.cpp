@@ -55,7 +55,8 @@ public:
 
     ~ConstIteratorImpl()
     {
-        NX_ASSERT(pollSet->m_iterators.erase(this) == 1);
+        const int elementsRemoved = pollSet->m_iterators.erase(this);
+        NX_ASSERT(elementsRemoved == 1);
     }
 };
 

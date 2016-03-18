@@ -1,17 +1,18 @@
 import QtQuick 2.5;
 import QtQuick.Controls 1.2;
-import Networkoptix 1.0;
+import NetworkOptix.Qml 1.0;
+
+import "."
 
 Rectangle
 {
     id: thisComponent;
 
     anchors.fill: parent;
-    color: palette.window;
+    color: Style.colors.window;
+
     enabled: context.isEnabled;
     focus: true;
-
-    SystemPalette { id: palette; }
 
     MouseArea
     {
@@ -23,7 +24,7 @@ Rectangle
     {
         id: cloudPanel;
 
-        anchors.bottom: grid.top;
+        y: ((grid.y - height) / 2)
         anchors.horizontalCenter: parent.horizontalCenter;
 
         userName: context.cloudUserName;
@@ -35,7 +36,6 @@ Rectangle
 
         onManageAccount: context.manageCloudAccount();
         onLogout: context.logoutFromCloud();
-
     }
 
     Grid
@@ -44,9 +44,14 @@ Rectangle
 
         anchors.centerIn: parent;
 
-        rows: (itemsSource.count > 3 ? 2 : 1);
-        columns: (itemsSource.count > 3
+        readonly property int horizontalOffset: 40;
+        readonly property int tileWidth: 280;
+        property int maxColumns: ((parent.width - 2 * horizontalOffset) / tileWidth)
+        property int desiredColumns:(itemsSource.count > 3
             ? ((itemsSource.count + 1) / 2) : itemsSource.count);
+
+        rows: (itemsSource.count > 3 ? 2 : 1);
+        columns: Math.min(desiredColumns, maxColumns);
 
         spacing: 16;
 
@@ -74,12 +79,10 @@ Rectangle
                     LocalSystemTile
                     {
                         systemName: model.systemName;
-                        isRecentlyConnected: model.isRecentlyConnected;
+                        isRecentlyConnected: (knownUsersModel ? knownUsersModel.hasConnections : false);
 
-                        host: model.host;
-                        userName: model.userName;
                         correctTile: model.isCompatible;
-                        knownUsersModel: model.lastUsersModel;
+                        knownUsersModel: QnLastSystemConnectionsData { systemName: model.systemName; }
                         knownHostsModel: model.hostsModel;
 
                         onConnectClicked:
@@ -114,7 +117,7 @@ Rectangle
         }
     }
 
-    Button
+    NxButton
     {
         y: (parent.height + height) / 2 + 168 ; // 168 is a magic const by design
         anchors.horizontalCenter: parent.horizontalCenter;

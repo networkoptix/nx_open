@@ -20,6 +20,7 @@ namespace nx_upnp {
 PortMapper::PortMapper( quint64 checkMappingsInterval,
                         const QString& description, const QString& device )
     : SearchAutoHandler( device )
+    , m_isEnabled( true )
     , m_upnpClient( new AsyncClient() )
     , m_description( description )
     , m_checkMappingsInterval( checkMappingsInterval )
@@ -40,7 +41,7 @@ PortMapper::~PortMapper()
     m_upnpClient.reset();
 }
 
-const quint64 PortMapper::DEFAULT_CHECK_MAPPINGS_INTERVAL = 10 * 60 * 1000; // 10 min
+const quint64 PortMapper::DEFAULT_CHECK_MAPPINGS_INTERVAL = 10 * 60  * 1000; // 10 min
 
 bool PortMapper::enableMapping( quint16 port, Protocol protocol,
                                 std::function< void( SocketAddress ) > callback )
@@ -51,31 +52,32 @@ bool PortMapper::enableMapping( quint16 port, Protocol protocol,
     if( !m_mapRequests.emplace( std::move( portId ), std::move( callback ) ).second )
         return false; // port already mapped
 
-    // ask to map this port on all known devices
-    for( auto& device : m_devices )
-        ensureMapping( device.second, port, protocol );
+    if( m_isEnabled )
+    {
+        // ask to map this port on all known devices
+        for( auto& device : m_devices )
+            ensureMapping( device.second, port, protocol );
+    }
 
     return true;
 }
 
 bool PortMapper::disableMapping( quint16 port, Protocol protocol )
 {
-    QnMutexLocker lock( &m_mutex );
-    const auto it = m_mapRequests.find( PortId( port, protocol ) );
-    if( it == m_mapRequests.end() )
+    QnMutexLocker lock(&m_mutex);
+    const auto it = m_mapRequests.find(PortId(port, protocol));
+    if(it == m_mapRequests.end())
         return false;
 
-    for( auto& device : m_devices )
-    {
-        const auto mapping = device.second.mapped.find( it->first );
-        if( mapping != device.second.mapped.end() )
-            m_upnpClient->deleteMapping(
-                device.second.url, mapping->second, mapping->first.protocol,
-                []( bool ){ /* TODO: think what can we do */ } );
-    }
-
-    m_mapRequests.erase( it );
+    removeMapping(it->first);
+    m_mapRequests.erase(it);
     return true;
+}
+
+void PortMapper::setIsEnabled( bool isEnabled )
+{
+    QnMutexLocker lock( &m_mutex );
+    m_isEnabled = isEnabled;
 }
 
 PortMapper::FailCounter::FailCounter()
@@ -151,17 +153,40 @@ bool PortMapper::searchForMappers( const HostAddress& localAddress,
 
 void PortMapper::onTimer( const quint64& /*timerID*/ )
 {
-    QnMutexLocker lock( &m_mutex );
-    for( auto& device : m_devices )
+    QnMutexLocker lock(&m_mutex);
+    if (m_isEnabled)
     {
-        updateExternalIp( device.second );
-        for( const auto& mapping : device.second.mapped )
-            checkMapping( device.second, mapping.first.port,
-                          mapping.second, mapping.first.protocol );
+        for (auto& device : m_devices)
+        {
+            updateExternalIp(device.second);
+            for (const auto& request : m_mapRequests)
+            {
+                const auto it = device.second.mapped.find(request.first);
+                if (it != device.second.mapped.end())
+                {
+                    checkMapping(
+                        device.second, it->first.port,
+                        it->second, it->first.protocol);
+                }
+                else
+                {
+                    const auto& portId = request.first;
+                    ensureMapping(device.second, portId.port, portId.protocol);
+                }
+            }
+        }
+    }
+    else
+    {
+        for (const auto& request : m_mapRequests)
+            removeMapping(request.first);
     }
 
-    if( m_timerId )
-        m_timerId = TimerManager::instance()->addTimer( this, m_checkMappingsInterval );
+    if (m_timerId)
+    {
+        m_timerId = TimerManager::instance()->addTimer(
+            this, m_checkMappingsInterval);
+    }
 }
 
 void PortMapper::addNewDevice( const HostAddress& localAddress,
@@ -175,13 +200,47 @@ void PortMapper::addNewDevice( const HostAddress& localAddress,
     newDevice.internalIp = localAddress;
     newDevice.url = url;
 
-    updateExternalIp( newDevice );
-    for( const auto map : m_mapRequests )
-        ensureMapping( newDevice, map.first.port, map.first.protocol );
+    if( m_isEnabled )
+    {
+        updateExternalIp( newDevice );
+        for( const auto map : m_mapRequests )
+            ensureMapping( newDevice, map.first.port, map.first.protocol );
+    }
 
     NX_LOGX( lit( "New device %1 ( %2 ) has been found on %3" )
              .arg( url.toString() )
              .arg( serial ).arg( localAddress.toString() ), cl_logDEBUG2 );
+}
+
+void PortMapper::removeMapping( PortId portId )
+{
+    for (auto& device: m_devices)
+    {
+        const auto mapping = device.second.mapped.find(portId);
+        if (mapping != device.second.mapped.end())
+        {
+            m_upnpClient->deleteMapping(
+                device.second.url, mapping->second, mapping->first.protocol,
+                [this, &device, mapping, portId](bool success)
+                {
+                    if (!success)
+                        return;
+
+                    QnMutexLocker lk(&m_mutex);
+                    device.second.mapped.erase(mapping);
+
+                    const auto request = m_mapRequests.find(portId);
+                    if (request == m_mapRequests.end())
+                        return;
+
+                    SocketAddress address(device.second.externalIp, 0);
+                    const auto callback = request->second;
+
+                    lk.unlock();
+                    return callback(std::move(address));
+                });
+        }
+    }
 }
 
 void PortMapper::updateExternalIp( Device& device )
@@ -212,46 +271,45 @@ void PortMapper::updateExternalIp( Device& device )
     });
 }
 
-// TODO: reduse the size of method
 void PortMapper::checkMapping( Device& device, quint16 inPort, quint16 exPort,
                                Protocol protocol )
 {
-    if( !device.failCounter.isOk() )
+    if(!device.failCounter.isOk())
         return;
 
     m_upnpClient->getMapping(
         device.url, exPort, protocol,
-        [ this, &device, inPort, exPort, protocol ]( AsyncClient::MappingInfo info )
-    {
-        QnMutexLocker lk( &m_mutex );
-        device.failCounter.success();
-
-        if( info.internalPort == inPort &&
-            info.externalPort == exPort &&
-            info.protocol == protocol &&
-            info.internalIp == device.internalIp )
+        [this, &device, inPort, exPort, protocol](AsyncClient::MappingInfo info)
         {
-            return; // all ok
-        }
+            QnMutexLocker lk( &m_mutex );
+            device.failCounter.success();
 
-        // save and report, that mapping has gone
-        device.mapped.erase( device.mapped.find( PortId( inPort, protocol ) ) );
-        const auto request = m_mapRequests.find( PortId( inPort, protocol ) );
-        if( request == m_mapRequests.end() )
-        {
-            // no need to provide this mapping any longer
-            return;
-        }
+            bool stillMapped = (
+                info.internalPort == inPort &&
+                info.externalPort == exPort &&
+                info.protocol == protocol &&
+                info.internalIp == device.internalIp);
 
-        SocketAddress invalid( device.externalIp, 0 );
-        const auto callback = request->second;
+            PortId portId(inPort, protocol);
+            if (!stillMapped)
+                device.mapped.erase(device.mapped.find(portId));
 
-        // try to map over again (in case of router reboot)
-        ensureMapping( device, inPort, protocol );
+            const auto request = m_mapRequests.find(portId);
+            if(request == m_mapRequests.end())
+            {
+                // no need to provide this mapping any longer
+                return;
+            }
 
-        lk.unlock();
-        callback( invalid );
-    } );
+            SocketAddress address(device.externalIp, stillMapped ? exPort : 0);
+            const auto callback = request->second;
+
+            if (!stillMapped)
+                ensureMapping(device, inPort, protocol);
+
+            lk.unlock();
+            return callback(std::move(address));
+        });
 }
 
 // TODO: reduse the size of method

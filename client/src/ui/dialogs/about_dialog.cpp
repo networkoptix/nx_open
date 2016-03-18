@@ -15,6 +15,7 @@
 #include <api/app_server_connection.h>
 #include <api/global_settings.h>
 
+#include <core/resource/resource_name.h>
 #include "core/resource/resource_type.h"
 #include "core/resource_management/resource_pool.h"
 #include <core/resource/media_server_resource.h>
@@ -80,7 +81,8 @@ void QnAboutDialog::changeEvent(QEvent *event)
         retranslateUi();
 }
 
-QString QnAboutDialog::connectedServers() const {
+QString QnAboutDialog::connectedServers() const
+{
     QnWorkbenchVersionMismatchWatcher *watcher = context()->instance<QnWorkbenchVersionMismatchWatcher>();
 
     QnSoftwareVersion latestVersion = watcher->latestVersion();
@@ -91,15 +93,16 @@ QString QnAboutDialog::connectedServers() const {
         latestMsVersion = latestVersion;
 
     QString servers;
-    foreach(const QnAppInfoMismatchData &data, watcher->mismatchData()) {
+    foreach(const QnAppInfoMismatchData &data, watcher->mismatchData())
+    {
         if (data.component != Qn::ServerComponent)
             continue;
 
         QnMediaServerResourcePtr resource = data.resource.dynamicCast<QnMediaServerResource>();
-        if(!resource)
+        if (!resource)
             continue;
 
-        QString server = tr("Server at %2: v%1").arg(data.version.toString()).arg(QUrl(resource->getUrl()).host()) + lit("<br/>");
+        QString server = lit("%1: v%2<br/>").arg(getFullResourceName(resource, true)).arg(data.version.toString());
 
         bool updateRequested = QnWorkbenchVersionMismatchWatcher::versionMismatches(data.version, latestMsVersion, true);
 

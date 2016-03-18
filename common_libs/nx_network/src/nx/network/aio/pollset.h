@@ -8,6 +8,8 @@
 
 #include <cstddef>
 
+#include "event_type.h"
+
 
 namespace nx {
 namespace network {
@@ -18,22 +20,6 @@ namespace aio {
 
     class PollSetImpl;
     class ConstIteratorImpl;
-
-    enum EventType
-    {
-        etNone = 0,
-        etRead = 1,
-        etWrite = 2,
-        //!Error occured on socket. Output only event. To get socket error code use \a Socket::getLastError
-        etError = 4,
-        //!Used for periodic operations and for socket timers
-        etTimedOut = 8,
-        etReadTimedOut = etRead | etTimedOut,
-        etWriteTimedOut = etWrite | etTimedOut,
-        etMax = 9
-    };
-
-    const char* toString( EventType eventType );
 
     static const int INFINITE_TIMEOUT = -1;
 

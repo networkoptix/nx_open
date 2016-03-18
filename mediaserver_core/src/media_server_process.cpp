@@ -1145,9 +1145,11 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
         for(const auto& storage: storages)
         {
             messageProcessor->updateResource( storage );
+
             // initialize storage immediately in sync mode
-			// todo: remove this call. Need refactor
-            //storage.dynamicCast<QnStorageResource>()->isAvailable();
+            //TODO: #rvasilenko remove this call. Need refactor
+            if (QnStorageResourcePtr qnStorage = qnResPool->getResourceById(storage.id).dynamicCast<QnStorageResource>())
+                qnStorage->isAvailable();
         }
     }
 
@@ -1409,8 +1411,12 @@ void MediaServerProcess::at_portMappingChanged(QString address)
         NX_LOGX(lit("New external address %1 has been mapped")
                 .arg(address), cl_logALWAYS)
 
-        m_forwardedAddresses[mappedAddress.address] = mappedAddress.port;
-        updateAddressesList();
+        auto it = m_forwardedAddresses.emplace(mappedAddress.address, 0).first;
+        if (it->second != mappedAddress.port)
+        {
+            it->second = mappedAddress.port;
+            updateAddressesList();
+        }
     }
     else
     {
@@ -1645,6 +1651,46 @@ void MediaServerProcess::saveAdminPswdHash()
         MSSettings::roSettings()->setValue(ADMIN_PSWD_HASH, admin->getHash());
         MSSettings::roSettings()->setValue(ADMIN_PSWD_DIGEST, admin->getDigest());
     }
+}
+
+std::unique_ptr<nx_upnp::PortMapper> MediaServerProcess::initializeUpnpPortMapper()
+{
+    auto mapper = std::make_unique<nx_upnp::PortMapper>();
+
+    const auto configValue = MSSettings::roSettings()->value(
+        QnGlobalSettings::kNameUpnpPortMappingEnabled);
+
+    if (!configValue.isNull())
+    {
+        // config value prevail
+        mapper->setIsEnabled(configValue.toBool());
+    }
+    else
+    {
+        // otherwise it's controlled by qnGlobalSettings
+        auto updateEnabled = [mapper = mapper.get()]()
+        {
+            mapper->setIsEnabled(qnGlobalSettings->isUpnpPortMappingEnabled());
+        };
+
+        updateEnabled();
+        connect(
+            qnGlobalSettings, &QnGlobalSettings::upnpPortMappingEnabledChanged,
+            std::move(updateEnabled));
+    }
+
+    mapper->enableMapping(
+        m_mediaServer->getPort(), nx_upnp::PortMapper::Protocol::TCP,
+        [this](SocketAddress address)
+        {
+            const auto result = QMetaObject::invokeMethod(
+                this, "at_portMappingChanged", Qt::AutoConnection,
+                Q_ARG(QString, address.toString()));
+
+            NX_ASSERT(result, "Could not call at_portMappingChanged(...)");
+        });
+
+    return mapper;
 }
 
 QHostAddress MediaServerProcess::getPublicAddress()
@@ -2226,18 +2272,6 @@ void MediaServerProcess::run()
     std::unique_ptr<nx_upnp::DeviceSearcher> upnpDeviceSearcher(new nx_upnp::DeviceSearcher());
     std::unique_ptr<QnMdnsListener> mdnsListener(new QnMdnsListener());
 
-    nx_upnp::PortMapper upnpPortMapper;
-    upnpPortMapper.enableMapping(m_mediaServer->getPort(),
-                                 nx_upnp::PortMapper::Protocol::TCP,
-                                 [this](SocketAddress address)
-    {
-        const auto result = QMetaObject::invokeMethod(
-            this, "at_portMappingChanged", Qt::AutoConnection,
-            Q_ARG(QString, address.toString()));
-
-        NX_ASSERT(result, Q_FUNC_INFO, "Could not call at_portMappingChanged(...)");
-    });
-
     std::unique_ptr<QnAppserverResourceProcessor> serverResourceProcessor( new QnAppserverResourceProcessor(m_mediaServer->getId()) );
     serverResourceProcessor->moveToThread( mserverResourceDiscoveryManager.get() );
     QnResourceDiscoveryManager::instance()->setResourceProcessor(serverResourceProcessor.get());
@@ -2334,6 +2368,8 @@ void MediaServerProcess::run()
     loadResourcesFromECS(messageProcessor.data());
     if (QnGlobalSettings::instance()->isCrossdomainXmlEnabled())
         m_httpModManager->addUrlRewriteExact( lit( "/crossdomain.xml" ), lit( "/static/crossdomain.xml" ) );
+
+    auto upnpPortMapper = initializeUpnpPortMapper();
 
     //TODO: #GDM #2.6 take keys from one place
     {
@@ -2657,11 +2693,16 @@ public:
         m_overrideVersion = version;
     }
 
+    void setEnforcedMediatorEndpoint(const QString& enforcedMediatorEndpoint)
+    {
+        m_enforcedMediatorEndpoint = enforcedMediatorEndpoint;
+    }
+
 protected:
     virtual int executeApplication() override {
         QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
         QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
-        QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule());
+        QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule(m_enforcedMediatorEndpoint));
 
         if (!m_overrideVersion.isNull())
             qnCommon->setEngineVersion(m_overrideVersion);
@@ -2853,6 +2894,7 @@ private:
     char **m_argv;
     QScopedPointer<MediaServerProcess> m_main;
     QnSoftwareVersion m_overrideVersion;
+    QString m_enforcedMediatorEndpoint;
 };
 
 void stopServer(int /*signal*/)
@@ -2956,7 +2998,7 @@ int MediaServerProcess::main(int argc, char* argv[])
     commandLineParser.addParameter(&enforceSocketType, "--enforce-socket", NULL,
         lit("Enforces stream socket type (TCP, UDT)"), QString());
     commandLineParser.addParameter(&enforcedMediatorEndpoint, "--enforce-mediator", NULL,
-        lit("Enforces mediatror address"), QString());
+        lit("Enforces mediator address"), QString());
 
     #ifdef __linux__
         commandLineParser.addParameter(&disableCrashHandler, "--disable-crash-handler", NULL,
@@ -2969,12 +3011,6 @@ int MediaServerProcess::main(int argc, char* argv[])
         if( !disableCrashHandler )
             linux_exception::installCrashSignalHandler();
     #endif
-
-    if ( !enforcedMediatorEndpoint.isEmpty() )
-        nx::network::SocketGlobals::mediatorConnector().mockupAddress(
-                    enforcedMediatorEndpoint );
-
-    nx::network::SocketGlobals::mediatorConnector().enable(true);
 
     if( showVersion )
     {
@@ -3007,6 +3043,8 @@ int MediaServerProcess::main(int argc, char* argv[])
             service.setOverrideVersion(version);
         }
     }
+
+    service.setEnforcedMediatorEndpoint(enforcedMediatorEndpoint);
 
     int res = service.exec();
     if (restartFlag && res == 0)

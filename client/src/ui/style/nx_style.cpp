@@ -10,6 +10,7 @@
 #include <QComboBox>
 #include <QSpinBox>
 #include <QCheckBox>
+#include <QDateTimeEdit>
 #include <QRadioButton>
 #include <QMenu>
 #include <QDialogButtonBox>
@@ -122,6 +123,13 @@ void QnNxStyle::setGenericPalette(const QnGenericPalette &palette)
     Q_D(QnNxStyle);
     d->palette = palette;
 }
+
+const QnGenericPalette &QnNxStyle::genericPalette() const
+{
+    Q_D(const QnNxStyle);
+    return d->palette;
+}
+
 
 QnPaletteColor QnNxStyle::findColor(const QColor &color) const
 {
@@ -1754,6 +1762,24 @@ QSize QnNxStyle::sizeFromContents(
     case CT_LineEdit:
         return QSize(size.width(), qMax(size.height(), Metrics::kButtonHeight));
 
+    case CT_SpinBox:
+    {
+        /* QDateTimeEdit uses CT_SpinBox style with combo (!) box subcontrols, so we have to handle this case separately: */
+        if (qobject_cast<const QDateTimeEdit *>(widget))
+        {
+            const QStyleOptionSpinBox *spinBox = qstyleoption_cast<const QStyleOptionSpinBox *>(option);
+            if (spinBox && spinBox->subControls.testFlag(SC_ComboBoxArrow))
+            {
+                int hMargin = pixelMetric(PM_ButtonMargin, option, widget);
+                int height = qMax(size.height(), Metrics::kButtonHeight);
+                int width = qMax(Metrics::kMinimumButtonWidth, size.width() + hMargin + height);
+                return QSize(width, height);
+            }
+        }
+        /* Default processing for normal spin boxes: */
+        break;
+    }
+
     case CT_ComboBox:
     {
         bool hasArrow = false;
@@ -1884,6 +1910,8 @@ int QnNxStyle::styleHint(
         return Qt::AlignRight | Qt::AlignVCenter;
     case SH_FocusFrame_AboveWidget:
         return 1;
+    case SH_DialogButtonLayout:
+        return QDialogButtonBox::KdeLayout;
     default:
         break;
     }

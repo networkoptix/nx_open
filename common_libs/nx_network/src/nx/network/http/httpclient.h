@@ -65,6 +65,9 @@ namespace nx_http
         void setSubsequentReconnectTries( int reconnectTries );
         //!See \a AsyncHttpClient::setTotalReconnectTries
         void setTotalReconnectTries( int reconnectTries );
+
+        //!See \a AsyncHttpClient::setSendTimeoutMs
+        void setSendTimeoutMs( unsigned int sendTimeoutMs );
         //!See \a AsyncHttpClient::setMessageBodyReadTimeoutMs
         void setMessageBodyReadTimeoutMs( unsigned int messageBodyReadTimeoutMs );
         void setUserAgent( const QString& userAgent );
@@ -81,6 +84,7 @@ namespace nx_http
         std::vector<std::pair<StringType, StringType>> m_additionalHeaders;
         boost::optional<int> m_subsequentReconnectTries;
         boost::optional<int> m_reconnectTries;
+        boost::optional<unsigned int> m_sendTimeoutMs;
         boost::optional<unsigned int> m_messageBodyReadTimeoutMs;
         boost::optional<QString> m_userAgent;
         boost::optional<QString> m_userName;

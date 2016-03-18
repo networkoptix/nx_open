@@ -24,7 +24,7 @@
         <guid>${common.guid}</guid>
         <!--Global libs-->
         <template>lib</template>
-        <qt.libs>core gui network xml xmlpatterns sql concurrent multimedia</qt.libs>
+        <qt.libs>core core-private gui network xml xmlpatterns sql concurrent multimedia</qt.libs>
         <global.libs></global.libs>
         <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc</ffmpeg.libs>
         <!--Specific os libs used-->

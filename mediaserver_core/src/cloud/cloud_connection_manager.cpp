@@ -120,9 +120,9 @@ void CloudConnectionManager::atAdminPropertyChanged(
     lk.unlock();
 
     QnModuleInformation info = qnCommon->moduleInformation();
-    if (info.cloudSystemId != QnUuid::fromStringSafe(cloudSystemId))
+    if (info.cloudSystemId != cloudSystemId)
     {
-        info.cloudSystemId = QnUuid::fromStringSafe(cloudSystemId);
+        info.cloudSystemId = cloudSystemId;
         qnCommon->setModuleInformation(info);
     }
 

@@ -17,7 +17,7 @@ public:
     virtual void updateResource(const QnResourcePtr &resource) override;
 
 protected:
-    virtual QnResourceFactory* getResourceFactory() override;
+    virtual QnResourceFactory* getResourceFactory() const override;
 
 private:
     void updateMainServerApiUrl();

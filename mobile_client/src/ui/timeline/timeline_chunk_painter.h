@@ -5,7 +5,8 @@
 #include <QtQuick/QSGGeometry>
 #include <QtGui/QColor>
 
-#include "recording/time_period.h"
+#include <nx/utils/log/assert.h>
+#include <recording/time_period.h>
 
 class QnTimelineChunkPainter {
 public:

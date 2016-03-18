@@ -67,7 +67,9 @@
         <nx_network_ut.guid>{f7dfa168-fa41-4d4a-b475-e785acb4ff45}</nx_network_ut.guid>
         <libcloud_db.guid>{BBA5BB95-B669-42C4-8074-EE0E361C094E}></libcloud_db.guid>
         <cloud_db.guid>{44ADCF67-21B0-403D-A771-C138B11CDB83}></cloud_db.guid>
+        <cloud_db_ut.guid>{626088EE-4911-4676-9152-F49BA62E1729}</cloud_db_ut.guid>
         <connection_mediator.guid>{f568398b-8ca3-44cc-9707-d1f63b2aa1c6}</connection_mediator.guid>
+        <connection_mediator_ut.guid>{85C18AB2-22ED-450B-BF13-3792189C771F}</connection_mediator_ut.guid>
         <libconnection_mediator.guid>{109DCEE1-AADA-4C88-9FE4-8521525EF7FF}</libconnection_mediator.guid>
 
         <!-- Components' Naming -->
@@ -498,7 +500,7 @@
                 <module>traytool</module>
                 <!-- Vmaxproxy  module is disabled because we use already built version of vmax (vs2008 + qt4). We do so because vmaxproxy doesn't work if has been built on vs2012 -->
                 <!--<module>vmaxproxy</module>  -->
-                <module>nxtool</module>
+                <!--<module>nxtool</module>-->
                 <module>wixsetup</module>
             </modules>
         </profile>
@@ -776,6 +778,7 @@
                 <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
                 <modification>bpi</modification>
                 <rdep.target>bpi</rdep.target>
+                <qt.spec/>
             </properties>
             <modules>
                 <!-- Banana pie uses same distro as rpi -->

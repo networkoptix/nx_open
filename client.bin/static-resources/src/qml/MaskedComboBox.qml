@@ -6,16 +6,17 @@ MaskedItem
     id: thisComponent;
 
     property var model;
-
-    height: area.height;
+    property string comboBoxTextRole: "display";
+    property bool isEditableComboBox: false;
 
     maskedAreaDelegate: ComboBox
     {
         id: comboBox;
 
-        textRole: "display";
+        textRole: thisComponent.comboBoxTextRole;
         model: thisComponent.model;
         width: thisComponent.width;
+        editable: thisComponent.isEditableComboBox;
 
         onCurrentTextChanged: { thisComponent.value = currentText; }
     }

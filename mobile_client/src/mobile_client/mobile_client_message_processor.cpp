@@ -1,6 +1,7 @@
 #include "mobile_client_message_processor.h"
 
 #include <core/resource/resource.h>
+#include <core/resource/mobile_client_camera_factory.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <api/app_server_connection.h>
@@ -30,7 +31,7 @@ void QnMobileClientMessageProcessor::updateResource(const QnResourcePtr &resourc
         updateMainServerApiUrl();
 }
 
-QnResourceFactory* QnMobileClientMessageProcessor::getResourceFactory()
+QnResourceFactory* QnMobileClientMessageProcessor::getResourceFactory() const
 {
     return QnMobileClientCameraFactory::instance();
 }
