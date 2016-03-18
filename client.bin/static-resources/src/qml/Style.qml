@@ -40,6 +40,8 @@ QtObject
         property QtObject systemTile: QtObject
         {
             readonly property real systemNameLabelHeight: 24;
+            readonly property real shadowRadius: 24;
+            readonly property int shadowSamples: 24;
         }
     }
 

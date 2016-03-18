@@ -1,5 +1,6 @@
 import QtQuick 2.5;
 import QtQuick.Controls 1.2;
+import QtGraphicalEffects 1.0;
 
 import "."
 
@@ -41,15 +42,18 @@ Item
 
     Rectangle
     {        
-        MouseArea
-        {
-            id: hoverIndicator;
+        id: tileHolder;
 
+
+        DropShadow
+        {
             anchors.fill: parent;
 
-            acceptedButtons: (thisComponent.isExpanded
-                ? Qt.AllButtons :Qt.NoButton);
-            hoverEnabled: true;
+            visible: thisComponent.isExpanded;
+            radius: Style.custom.systemTile.shadowRadius;
+            samples: Style.custom.systemTile.shadowSamples;
+            color: Style.colors.shadow;
+            source: tileArea;
         }
 
         x: (thisComponent.isExpanded ? (parent.parent.parent.width - width) / 2 - parent.parent.x : 0);
@@ -58,76 +62,94 @@ Item
         height: (thisComponent.isExpanded ? loadersColumn.y + loadersColumn.height : parent.height);
         radius: 2;
 
-        readonly property color standardColor: Style.colors.custom.systemTile.background;
-        readonly property color hoveredColor: Style.lighterColor(standardColor);
-        readonly property bool isHovered: (!thisComponent.isExpanded && hoverIndicator.containsMouse);
-        color: (isHovered ? hoveredColor : standardColor);
-
-        NxLabel
+        Rectangle
         {
-            id: systemNameText;
+            id: tileArea;
 
-            anchors.left: parent.left;
-            anchors.right: parent.left;
-            anchors.top: parent.top;
+            readonly property color standardColor: Style.colors.custom.systemTile.background;
+            readonly property color hoveredColor: Style.lighterColor(standardColor);
+            readonly property bool isHovered: (!thisComponent.isExpanded && hoverIndicator.containsMouse);
+            color: (isHovered ? hoveredColor : standardColor);
 
-            anchors.leftMargin: 16;
-            anchors.rightMargin: anchors.leftMargin;
-            anchors.topMargin: 12;
+            anchors.fill: parent;
 
-            text: systemName;
-
-            height: Style.custom.systemTile.systemNameLabelHeight;
-            color: Style.colors.custom.systemTile.systemNameText;
-            font: Style.fonts.systemTile.systemName;
-        }
-
-        Button
-        {
-            id: collapseTileButton;
-
-            width: 40;
-            height: 40;
-
-            visible: thisComponent.isExpanded;
-            anchors.right: parent.right;
-            anchors.top: parent.top;
-
-            text: "x";
-
-            onClicked: { toggle(); }
-        }
-
-        Column
-        {
-            id: loadersColumn;
-
-            anchors.left: parent.left;
-            anchors.right: parent.right;
-            anchors.top: systemNameText.bottom;
-
-            anchors.leftMargin: 12;
-            anchors.rightMargin: 16;
-
-            Loader
+            MouseArea
             {
-                id: centralAreaLoader;
+                id: hoverIndicator;
 
-                anchors.left: parent.left;
-                anchors.right: parent.right;
+                anchors.fill: parent;
 
-                sourceComponent: thisComponent.centralAreaDelegate;
+                acceptedButtons: (thisComponent.isExpanded
+                    ? Qt.AllButtons :Qt.NoButton);
+                hoverEnabled: true;
             }
 
-            Loader
+            NxLabel
             {
-                id: expandedAreaLoader;
+                id: systemNameText;
+
+                anchors.left: parent.left;
+                anchors.right: parent.left;
+                anchors.top: parent.top;
+
+                anchors.leftMargin: 16;
+                anchors.rightMargin: anchors.leftMargin;
+                anchors.topMargin: 12;
+
+                text: systemName;
+
+                height: Style.custom.systemTile.systemNameLabelHeight;
+                color: Style.colors.custom.systemTile.systemNameText;
+                font: Style.fonts.systemTile.systemName;
+            }
+
+            Button
+            {
+                id: collapseTileButton;
+
+                width: 40;
+                height: 40;
+
+                visible: thisComponent.isExpanded;
+                anchors.right: parent.right;
+                anchors.top: parent.top;
+
+                text: "x";
+
+                onClicked: { toggle(); }
+            }
+
+            Column
+            {
+                id: loadersColumn;
 
                 anchors.left: parent.left;
                 anchors.right: parent.right;
+                anchors.top: systemNameText.bottom;
 
-                visible: thisComponent.isExpanded;
-                sourceComponent: thisComponent.expandedAreaDelegate;
+                anchors.leftMargin: 12;
+                anchors.rightMargin: 16;
+
+                Loader
+                {
+                    id: centralAreaLoader;
+
+                    anchors.left: parent.left;
+                    anchors.right: parent.right;
+
+                    sourceComponent: thisComponent.centralAreaDelegate;
+                }
+
+                Loader
+                {
+                    id: expandedAreaLoader;
+
+                    anchors.left: parent.left;
+                    anchors.right: parent.right;
+
+                    visible: thisComponent.isExpanded;
+                    sourceComponent: thisComponent.expandedAreaDelegate;
+                }
             }
         }
     }
