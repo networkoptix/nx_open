@@ -21,12 +21,17 @@ QtObject
         return context.getLighterColor(color, offset);
     }
 
+    function colorWithAlpha(color, alpha)
+    {
+        return context.colorWithAlpha(color, alpha);
+    }
+
     //
 
     property QtObject label: QtObject
     {
         readonly property real height: 16;
-        readonly property font font: Qt.font({ pixelSize: 12, weight: Font.Normal});
+        readonly property font font: Qt.font({ pixelSize: 13, weight: Font.Normal});
         readonly property color color: colors.windowText;
     }
 
@@ -36,6 +41,12 @@ QtObject
     {
         readonly property color window: context.getPaletteColor("dark", 3);
         readonly property color windowText: context.getPaletteColor("light", 1);
+        readonly property color shadow: context.getPaletteColor("dark", 4);
+        readonly property color text: context.getPaletteColor("light", 13);
+        readonly property color buttonTtext: text;
+        readonly property color midlight: context.getPaletteColor("dark", 12);
+
+        readonly property color brand: context.getPaletteColor("brand", 0);
 
         property QtObject custom: QtObject
         {

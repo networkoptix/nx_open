@@ -2,6 +2,7 @@ import QtQuick 2.5;
 import QtQuick.Controls 1.2;
 
 import "."
+
 Item
 {
     id: thisComponent;
@@ -35,16 +36,20 @@ Item
     MouseArea
     {
         anchors.fill: parent;
-        visible: !thisComponent.isExpanded;
         onClicked: { toggle(); }
     }
 
     Rectangle
-    {
+    {        
         MouseArea
         {
+            id: hoverIndicator;
+
             anchors.fill: parent;
-            visible: thisComponent.isExpanded;
+
+            acceptedButtons: (thisComponent.isExpanded
+                ? Qt.AllButtons :Qt.NoButton);
+            hoverEnabled: true;
         }
 
         x: (thisComponent.isExpanded ? (parent.parent.parent.width - width) / 2 - parent.parent.x : 0);
@@ -58,7 +63,7 @@ Item
         readonly property bool isHovered: (!thisComponent.isExpanded && hoverIndicator.containsMouse);
         color: (isHovered ? hoveredColor : standardColor);
 
-        Text
+        NxLabel
         {
             id: systemNameText;
 
@@ -74,7 +79,6 @@ Item
 
             color: Style.colors.custom.systemTile.systemNameText;
             font: Style.fonts.systemTile.systemName;
-            renderType: Text.NativeRendering;
         }
 
         Button
@@ -124,17 +128,6 @@ Item
                 visible: thisComponent.isExpanded;
                 sourceComponent: thisComponent.expandedAreaDelegate;
             }
-        }
-
-
-        MouseArea
-        {
-            id: hoverIndicator;
-
-            anchors.fill: parent;
-
-            acceptedButtons: Qt.NoButton;
-            hoverEnabled: true;
         }
     }
 }

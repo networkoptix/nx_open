@@ -63,10 +63,8 @@ BaseTile
             isAvailable: thisComponent.correctTile && thisComponent.isExpanded;
 
             model: thisComponent.knownHostsModel;
-            iconUrl: (thisComponent.correctTile ? "non_empty_url" : "");// TODO: change to proper url
-
-            textColor: Style.colors.windowText;
-            textFont: Style.fonts.systemTile.info;
+            iconUrl: "qrc:/skin/welcome_page/server.png";   // TODO: add ecosystem class for hovered icons
+            hoveredIconUrl: "qrc:/skin/welcome_page/server_hover.png";
 
             Component.onCompleted: activeItemSelector.addItem(this);
         }
@@ -79,10 +77,9 @@ BaseTile
             isAvailable: thisComponent.correctTile && thisComponent.isExpanded;
 
             model: thisComponent.knownUsersModel;
+            iconUrl: "qrc:/skin/welcome_page/user.png";
+            hoveredIconUrl: "qrc:/skin/welcome_page/user_hover.png";
             comboBoxTextRole: "userName";
-
-            textColor: Style.colors.windowText;
-            textFont: Style.fonts.systemTile.info;
 
             Component.onCompleted: activeItemSelector.addItem(this);
         }
@@ -105,16 +102,13 @@ BaseTile
             width: parent.width;
 
             spacing: 8;
-            Text
+            NxLabel
             {
                 visible: !thisComponent.isRecentlyConnected;
                 text: qsTr("Login");
-
-                font: Style.label.font;
-                color: Style.label.color;
             }
 
-            TextField
+            NxTextEdit
             {
                 id: loginTextField;
 
@@ -122,14 +116,12 @@ BaseTile
                 width: parent.width;
             }
 
-            Text
+            NxLabel
             {
                 text: qsTr("Password");
-                font: Style.label.font;
-                color: Style.label.color;
             }
 
-            TextField
+            NxTextEdit
             {
                 id: passwordTextField;
                 width: parent.width;

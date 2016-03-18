@@ -24,7 +24,7 @@ Rectangle
     {
         id: cloudPanel;
 
-        anchors.bottom: grid.top;
+        y: ((grid.y - height) / 2)
         anchors.horizontalCenter: parent.horizontalCenter;
 
         userName: context.cloudUserName;
@@ -36,7 +36,6 @@ Rectangle
 
         onManageAccount: context.manageCloudAccount();
         onLogout: context.logoutFromCloud();
-
     }
 
     Grid

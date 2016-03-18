@@ -225,6 +225,12 @@ QColor QnWorkbenchWelcomeScreen::getLighterColor(const QColor &color
     return paletteColor.lighter(offset);
 }
 
+QColor QnWorkbenchWelcomeScreen::colorWithAlpha(QColor color
+    , qreal alpha)
+{
+    color.setAlphaF(alpha);
+    return color;
+}
 //
 
 void QnWorkbenchWelcomeScreen::enableScreen()
