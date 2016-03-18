@@ -10,33 +10,33 @@ namespace ec2
 
     void QnCameraNotificationManager::triggerNotification(const QnTransaction<ApiCameraData>& tran)
     {
-        assert(tran.command == ApiCommand::saveCamera);
+        NX_ASSERT(tran.command == ApiCommand::saveCamera);
         emit addedOrUpdated(tran.params);
     }
 
     void QnCameraNotificationManager::triggerNotification(const QnTransaction<ApiCameraDataList>& tran)
     {
-        assert(tran.command == ApiCommand::saveCameras);
+        NX_ASSERT(tran.command == ApiCommand::saveCameras);
         for (const ApiCameraData& camera : tran.params)
             emit addedOrUpdated(camera);
     }
 
     void QnCameraNotificationManager::triggerNotification(const QnTransaction<ApiCameraAttributesData>& tran)
     {
-        assert(tran.command == ApiCommand::saveCameraUserAttributes);
+        NX_ASSERT(tran.command == ApiCommand::saveCameraUserAttributes);
         emit userAttributesChanged(tran.params);
     }
 
     void QnCameraNotificationManager::triggerNotification(const QnTransaction<ApiCameraAttributesDataList>& tran)
     {
-        assert(tran.command == ApiCommand::saveCameraUserAttributesList);
+        NX_ASSERT(tran.command == ApiCommand::saveCameraUserAttributesList);
         for (const ApiCameraAttributesData& attrs : tran.params)
             emit userAttributesChanged(attrs);
     }
 
     void QnCameraNotificationManager::triggerNotification(const QnTransaction<ApiIdData>& tran)
     {
-        assert(tran.command == ApiCommand::removeCamera);
+        NX_ASSERT(tran.command == ApiCommand::removeCamera);
         emit removed(tran.params.id);
     }
 

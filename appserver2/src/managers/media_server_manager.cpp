@@ -10,20 +10,20 @@ namespace ec2
 
     void QnMediaServerNotificationManager::triggerNotification(const QnTransaction<ApiMediaServerUserAttributesDataList>& tran)
     {
-        assert(tran.command == ApiCommand::saveServerUserAttributesList);
+        NX_ASSERT(tran.command == ApiCommand::saveServerUserAttributesList);
         for (const ec2::ApiMediaServerUserAttributesData& attrs: tran.params)
             emit userAttributesChanged(attrs);
     }
 
     void QnMediaServerNotificationManager::triggerNotification(const QnTransaction<ApiMediaServerUserAttributesData>& tran)
     {
-        assert(tran.command == ApiCommand::saveServerUserAttributes);
+        NX_ASSERT(tran.command == ApiCommand::saveServerUserAttributes);
         emit userAttributesChanged(tran.params);
     }
 
     void QnMediaServerNotificationManager::triggerNotification(const QnTransaction<ApiIdDataList>& tran)
     {
-        assert(tran.command == ApiCommand::removeStorages);
+        NX_ASSERT(tran.command == ApiCommand::removeStorages);
         for (const ApiIdData& idData : tran.params)
             emit storageRemoved(idData.id);
     }
@@ -35,7 +35,7 @@ namespace ec2
         else if (tran.command == ApiCommand::removeStorage)
             emit storageRemoved(tran.params.id);
         else
-            Q_ASSERT_X(0, "Invalid transaction", Q_FUNC_INFO);
+            NX_ASSERT(0, "Invalid transaction", Q_FUNC_INFO);
     }
 
     void QnMediaServerNotificationManager::triggerNotification(const QnTransaction<ApiStorageDataList>& tran)
@@ -46,13 +46,13 @@ namespace ec2
 
     void QnMediaServerNotificationManager::triggerNotification(const QnTransaction<ApiStorageData>& tran)
     {
-        assert(tran.command == ApiCommand::saveStorage);
+        NX_ASSERT(tran.command == ApiCommand::saveStorage);
         emit storageChanged(tran.params);
     }
 
     void QnMediaServerNotificationManager::triggerNotification(const QnTransaction<ApiMediaServerData>& tran)
     {
-        assert(tran.command == ApiCommand::saveMediaServer);
+        NX_ASSERT(tran.command == ApiCommand::saveMediaServer);
         emit addedOrUpdated(tran.params);
     }
 

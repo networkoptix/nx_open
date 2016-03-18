@@ -110,7 +110,7 @@ void QnNetworkResource::setDefaultAuth(const QAuthenticator &auth)
 QAuthenticator QnNetworkResource::getResourceAuth(const QnUuid &resourceId, const QnUuid &resourceTypeId)
 {
     //TODO: #GDM think about code duplication
-    Q_ASSERT_X(!resourceId.isNull() && !resourceTypeId.isNull(), Q_FUNC_INFO, "Invalid input, reading from local data is requred");
+    NX_ASSERT(!resourceId.isNull() && !resourceTypeId.isNull(), Q_FUNC_INFO, "Invalid input, reading from local data is requred");
     QString value = getResourceProperty(Qn::CAMERA_CREDENTIALS_PARAM_NAME, resourceId, resourceTypeId);
     if (value.isNull())
         value = getResourceProperty(Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME, resourceId, resourceTypeId);
