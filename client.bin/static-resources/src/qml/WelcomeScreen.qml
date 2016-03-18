@@ -117,7 +117,7 @@ Rectangle
         }
     }
 
-    Button
+    NxButton
     {
         y: (parent.height + height) / 2 + 168 ; // 168 is a magic const by design
         anchors.horizontalCenter: parent.horizontalCenter;

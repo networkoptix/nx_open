@@ -144,6 +144,7 @@ BaseTile
             anchors.left: parent.left;
             anchors.right: parent.right;
 
+            isAccentButton: true;
             text: qsTr("Connect");
 
             onClicked: thisComponent.connectClicked();

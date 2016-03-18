@@ -15,7 +15,8 @@ Button
     height: 28;
 
     activeFocusOnTab: true;
-    opacity: (enabled ? 1.0 : 0.3);
+    opacity: (enabled ? 1.0
+        : (isAccentButton ? 0.2 : 0.3));
 
     style: nxButtonStyle;
 
@@ -25,15 +26,23 @@ Button
 
         ButtonStyle
         {
+            readonly property color pressDependentBkg: (control.isAccentButton
+                ? (control.pressed ? Style.darkerColor(Style.colors.brand) : Style.colors.brand)
+                : Style.colors.button);
+
+            readonly property color hoveredBkg: Style.lighterColor(
+                (control.isAccentButton ? Style.colors.brand : Style.colors.button));
+
             background: Rectangle
             {
                 color: (control.hovered && !control.pressed
-                    ? Style.lighterColor(Style.colors.button)
-                    : Style.colors.button);
+                    ? hoveredBkg : pressDependentBkg);
 
                 radius: 2;
 
-                border.color: Style.darkerColor(Style.colors.brand, 4);
+                border.color: (control.isAccentButton
+                    ? Style.lighterColor(Style.colors.brand, 2) // TODO: add L4 colro - now it is only 2
+                    : Style.darkerColor(Style.colors.brand, 4));
                 border.width: (control.focus ? 1 : 0);
 
                 Rectangle
@@ -46,7 +55,9 @@ Button
                     width: parent.width - 2 * x;
                     anchors.top: parent.top;
                     anchors.topMargin: (control.focus ? 1 : 0);
-                    color: Style.darkerColor(Style.colors.button, 2);
+                    color: (control.isAccentButton
+                        ? Style.darkerColor(Style.colors.brand, 3)
+                        : Style.darkerColor(Style.colors.button, 2));
                 }
 
                 Rectangle
@@ -59,7 +70,9 @@ Button
                     width: parent.width - 2 * x;
                     anchors.bottom: parent.bottom;
                     anchors.bottomMargin: (control.focus ? 1 : 0);
-                    color: Style.darkerColor(Style.colors.button, control.hovered ? 1 : 2);
+                    color: (control.isAccentButton
+                        ? Style.darkerColor(Style.colors.brand, 3)
+                        : Style.darkerColor(Style.colors.button, control.hovered ? 1 : 2));
                 }
             }
 
@@ -73,7 +86,9 @@ Button
                 verticalAlignment: Qt.AlignVCenter;
                 text: control.text;
                 font: Qt.font({ pixelSize: 13, weight: Font.Medium });
-                color: Style.colors.buttonText;
+                color: (control.isAccentButton
+                    ? Style.colors.brandContrast
+                    : Style.colors.buttonText);
             }
         }
     }

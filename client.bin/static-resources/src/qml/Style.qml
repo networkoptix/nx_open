@@ -56,7 +56,7 @@ QtObject
         readonly property color button: context.getPaletteColor("dark", 10);
 
         readonly property color brand: context.getPaletteColor("brand", 4);
-
+        readonly property color brandContrast: "white";//TODO: how to access brand_contrast color?
 
         readonly property color error: "red";
 
