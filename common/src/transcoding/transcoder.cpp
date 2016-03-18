@@ -179,11 +179,11 @@ QnTranscoder::QnTranscoder():
     m_internalBuffer(CL_MEDIA_ALIGNMENT, 1024*1024),
     m_firstTime(AV_NOPTS_VALUE),
     m_initialized(false),
+    m_initializedAudio(false),
+    m_initializedVideo(false),
     m_eofCounter(0),
     m_packetizedMode(false),
-    m_useRealTimeOptimization(false),
-    m_initializedAudio(false),
-    m_initializedVideo(false)
+    m_useRealTimeOptimization(false)
 {
     QThread::currentThread()->setPriority(QThread::LowPriority); 
 }
@@ -400,18 +400,6 @@ int QnTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnBy
                        m_delayedAudioQueue.isEmpty() ? QnConstCompressedAudioDataPtr() : m_delayedAudioQueue.first());
         if (rez != 0)
             return rez;
-
-        m_initialized = true;
-
-        if (!m_delayedVideoQueue.isEmpty())
-            m_initializedVideo = true;
-        else
-            m_vTranscoder.reset();
-
-        if (!m_delayedAudioQueue.isEmpty())
-            m_initializedAudio = true;
-        else
-            m_aTranscoder.reset();
     }
 
     if ((media->dataType == QnAbstractMediaData::AUDIO && !m_initializedAudio) ||

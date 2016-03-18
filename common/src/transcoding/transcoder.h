@@ -253,6 +253,9 @@ protected:
     qint64 m_firstTime;
 protected:
     bool m_initialized;
+    bool m_initializedAudio;
+    bool m_initializedVideo;
+
 private:
     QString m_lastErrMessage;
     QQueue<QnConstCompressedVideoDataPtr> m_delayedVideoQueue;
@@ -261,8 +264,6 @@ private:
     bool m_packetizedMode;
     QnImageFilterHelper m_extraTranscodeParams;
     bool m_useRealTimeOptimization;
-    bool m_initializedAudio;
-    bool m_initializedVideo;
 };
 
 typedef QSharedPointer<QnTranscoder> QnTranscoderPtr;
