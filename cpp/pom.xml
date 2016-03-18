@@ -198,6 +198,8 @@
                                     <arguments>
                                         <argument>${root.dir}/build_utils/python/patch_vcproj.py</argument>
                                         <argument>${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj</argument>
+                                        <argument>--arch</argument>
+                                        <argument>${arch}</argument>
                                     </arguments>
                                 </configuration>
                             </execution>
@@ -228,17 +230,6 @@
                                             <value>
                                                 <![CDATA[</RootNamespace>
     <TargetName>${project.artifactId}</TargetName>]]></value>
-                                        </replacement>
-                                        <replacement>
-                                            <token>
-                                                <![CDATA[<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">]]></token>
-                                            <value>
-                                                <![CDATA[<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <ItemDefinitionGroup>
-    <Link>
-      <SubSystem Condition="'%(Link.SubSystem)'=='' Or '%(Link.SubSystem)'=='NotSet'">Windows</SubSystem>
-    </Link>
-  </ItemDefinitionGroup>]]></value>
                                         </replacement>
                                         <replacement>
                                             <token>
@@ -280,30 +271,8 @@
     </Lib>]]></value>
                                         </replacement>                                        
 
-                                        <!-- Adding moc preprocessor steps with jom -->
-                                        <replacement>
-                                            <xpath>//Project/ItemDefinitionGroup[not(@*)]</xpath>
-                                            <token><![CDATA[</Link>]]></token>
-                                            <value><![CDATA[
-    </Link>
-    <PreBuildEvent>
-      <Command>\$\(ProjectDir\)../${arch}/build_moc.bat \$\(ProjectDir\)../${arch} \$\(Configuration\)</Command>
-    </PreBuildEvent>
-                                            ]]></value>
-                                        </replacement>
+                                        
 
-                                        <!-- Cleaning moc files -->
-                                        <replacement>
-                                            <!-- <xpath>//Project/ItemDefinitionGroup[not(@*)]</xpath> -->
-                                            <token><![CDATA[<ItemDefinitionGroup>]]></token>
-                                            <value><![CDATA[
-  <Target Name="BeforeClean">
-    <Message Text="Cleaning moc generated files"/>
-    <Exec Command="del \$\(ProjectDir\)..\\\$\(Platform\)\\build\\${arch}\\generated\\moc_*.* /F /Q" />
-  </Target>
-  <ItemDefinitionGroup>
-                                            ]]></value>
-                                        </replacement>
 
                                         <!-- Enabling SEH exceptions for crash stack dump -->
                                         <replacement>
