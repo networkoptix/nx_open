@@ -11,7 +11,7 @@ TextField
 {
     height: 28;
 
-    property bool error;
+    property bool error; // TODO: improve logic: autoreset error when text changing
 
     opacity: (enabled ? 1.0 : 0.3);
 
@@ -40,7 +40,9 @@ TextField
                 border.width: 1;
                 border.color:
                 {
-                    if (readOnly)
+                    if (control.error)
+                        return Style.colors.error; // TODO: improve when specification will be ready
+                    if (control.readOnly)
                         return Style.colorWithAlpha(Style.colors.shadow, 0.4);
                     if (control.focus && !control.activeFocus)
                         return Style.colors.brand;

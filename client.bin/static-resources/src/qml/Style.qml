@@ -48,6 +48,9 @@ QtObject
 
         readonly property color brand: context.getPaletteColor("brand", 0);
 
+
+        readonly property color error: "red";
+
         property QtObject custom: QtObject
         {
             property QtObject systemTile: QtObject
