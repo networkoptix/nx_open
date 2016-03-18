@@ -405,9 +405,13 @@ int QnTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnBy
 
         if (!m_delayedVideoQueue.isEmpty())
             m_initializedVideo = true;
+        else
+            m_vTranscoder.reset();
 
         if (!m_delayedAudioQueue.isEmpty())
             m_initializedAudio = true;
+        else
+            m_aTranscoder.reset();
     }
 
     if ((media->dataType == QnAbstractMediaData::AUDIO && !m_initializedAudio) ||
