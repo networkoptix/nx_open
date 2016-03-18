@@ -258,7 +258,7 @@ ErrorCode QnTransactionLog::saveToDB(const QnAbstractTransaction& tran, const Qn
     if (updateHistoryItr == m_updateHistory.end())
         updateHistoryItr = m_updateHistory.insert(hash, UpdateHistoryData());
 
-    assert ((tran.persistentInfo.timestamp > updateHistoryItr.value().timestamp) ||
+    NX_ASSERT ((tran.persistentInfo.timestamp > updateHistoryItr.value().timestamp) ||
             (tran.persistentInfo.timestamp == updateHistoryItr.value().timestamp && !(key < updateHistoryItr.value().updatedBy)));
 
     updateHistoryItr.value().timestamp = tran.persistentInfo.timestamp;

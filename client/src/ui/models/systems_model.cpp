@@ -7,11 +7,10 @@
 #include <nx/utils/raii_guard.h>
 #include <nx/utils/disconnect_helper.h>
 #include <finders/systems_finder.h>
+#include <core/core_settings.h>
 
 namespace
 {
-    typedef QHash<int, QByteArray> RoleNames;
-
     enum { kMaxTilesCount = 8 };
 
     enum RoleId
@@ -27,18 +26,16 @@ namespace
         , IsCompatibleRoleId
         , IsCompatibleVersionRoleId
         , IsCorrectCustomizationRoleId
-        , IsRecentlyConnectedRoleId
 
         // For local systems 
-        , HostRoleId
         , HostsModelRoleId
-        , LastUsersModelRoleId
         , LastPasswordsModelRoleId
 
         
         , RolesCount
     };
 
+    typedef QHash<int, QByteArray> RoleNames;
     const auto kRoleNames = []() -> RoleNames
     {
         RoleNames result;
@@ -50,11 +47,8 @@ namespace
         result.insert(IsCompatibleRoleId, "isCompatible");
         result.insert(IsCompatibleVersionRoleId, "isCompatibleVersion");
         result.insert(IsCorrectCustomizationRoleId, "isCorrectCustomization");
-        result.insert(IsRecentlyConnectedRoleId, "isRecentlyConnected");
         
-        result.insert(HostRoleId, "host");
         result.insert(HostsModelRoleId, "hostsModel");
-        result.insert(LastUsersModelRoleId, "lastUsersModel");
         result.insert(LastPasswordsModelRoleId, "lastPasswordsModel");
 
         return result;
@@ -137,14 +131,6 @@ namespace
             result.append(system->getServerHost(info.id));
         return result;
     }
-
-
-    QString getSystemHost(const QnSystemDescriptionPtr &sysemDescription)
-    {
-        const auto hosts = extractHosts(sysemDescription);
-        return (hosts.isEmpty() ? QString() : hosts.front());
-    }
-
 }
 
 ///
@@ -192,7 +178,7 @@ int QnSystemsModel::rowCount(const QModelIndex &parent) const
 
 QStringListModel *QnSystemsModel::createStringListModel(const QStringList &data) const
 {
-    return (new QStringListModel(data));
+    return (new QStringListModel(data)); // TODO: remove me
 }
 
 QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
@@ -211,9 +197,6 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
         return systemDescription->name();
     case UserRoleId:
         return lit("Fake Admin <replace me>");
-    case LastUsersModelRoleId:
-        return QVariant::fromValue(createStringListModel(QStringList() 
-            << lit("admin") << lit("someUser")));
     case LastPasswordsModelRoleId:
         return QVariant();  // TODO
     case IsCloudSystemRoleId:
@@ -222,12 +205,8 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
         return isCompatibleSystem(systemDescription);
     case IsCorrectCustomizationRoleId:
         return isCorrectCustomization(systemDescription);
-    case IsRecentlyConnectedRoleId:
-        return false;   // TODO add according count of recent connections and its availability now
     case IsCompatibleVersionRoleId:
         return isCompatibleVersion(systemDescription);
-    case HostRoleId:
-        return getSystemHost(systemDescription);
     case HostsModelRoleId:
         return QVariant::fromValue(createStringListModel(
             extractHosts(systemDescription)));
@@ -355,7 +334,6 @@ void QnSystemsModel::serverChanged(const QnSystemDescriptionPtr &systemDescripti
             emit dataChanged(modelIndex, modelIndex, QVector<int>(1, role));
     };
 
-    testFlag(QnServerField::HostField, HostRoleId);
     testFlag(QnServerField::HostField, HostsModelRoleId); // TODO: emit in model
 }
 

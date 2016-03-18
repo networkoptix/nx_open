@@ -11,8 +11,9 @@
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
 #include <ui/models/systems_model.h>
+#include <ui/models/last_system_users_model.h>
 #include <ui/workbench/workbench_context.h>
-
+#include <ui/style/nx_style.h>
 #include <ui/dialogs/login_dialog.h>
 #include <ui/dialogs/non_modal_dialog_constructor.h>
 
@@ -25,7 +26,8 @@ namespace
         static const auto kWelcomeScreenSource = lit("qrc:/src/qml/WelcomeScreen.qml");
         static const auto kContextVariableName = lit("context");
 
-        qmlRegisterType<QnSystemsModel>("Networkoptix", 1, 0, "QnSystemsModel");
+        qmlRegisterType<QnSystemsModel>("NetworkOptix.Qml", 1, 0, "QnSystemsModel");
+        qmlRegisterType<QnLastSystemUsersModel>("NetworkOptix.Qml", 1, 0, "QnLastSystemConnectionsData");
 
         const auto quickView = new QQuickView();
         quickView->rootContext()->setContextProperty(
@@ -34,6 +36,15 @@ namespace
 
         return quickView;
     }
+
+    QnGenericPalette extractPalette()
+    {
+        const auto proxy = dynamic_cast<QProxyStyle *>(qApp->style());
+        NX_ASSERT(proxy, Q_FUNC_INFO, "Invalid application style");
+        const auto style = dynamic_cast<QnNxStyle *>(proxy ? proxy->baseStyle() : nullptr);
+        NX_ASSERT(style, Q_FUNC_INFO, "Style of application is not NX");
+        return (style ? style->genericPalette() : QnGenericPalette());
+    }
 }
 
 QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject *parent)
@@ -41,6 +52,7 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject *parent)
     , QnWorkbenchContextAware(parent)
 
     , m_cloudWatcher(qnCommon->instance<QnCloudStatusWatcher>())
+    , m_palette(extractPalette())
     , m_widget(QWidget::createWindowContainer(createMainView(this)))
     , m_loginDialog()
     , m_visible(false)
@@ -190,6 +202,36 @@ void QnWorkbenchWelcomeScreen::tryHideScreen()
     if (!qnCommon->remoteGUID().isNull())
         setVisible(false);
 }
+
+//
+
+QColor QnWorkbenchWelcomeScreen::getPaletteColor(const QString &group
+    , int index)
+{
+    return m_palette.color(group, index);
+}
+
+QColor QnWorkbenchWelcomeScreen::getDarkerColor(const QColor &color
+    , int offset)
+{
+    const auto paletteColor = m_palette.color(color);
+    return paletteColor.darker(offset);
+}
+
+QColor QnWorkbenchWelcomeScreen::getLighterColor(const QColor &color
+    , int offset)
+{
+    const auto paletteColor = m_palette.color(color);
+    return paletteColor.lighter(offset);
+}
+
+QColor QnWorkbenchWelcomeScreen::colorWithAlpha(QColor color
+    , qreal alpha)
+{
+    color.setAlphaF(alpha);
+    return color;
+}
+//
 
 void QnWorkbenchWelcomeScreen::enableScreen()
 {

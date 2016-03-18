@@ -18,7 +18,7 @@
         <product.title>${appserver2.name}</product.title>  
         <!--Global libs-->		
         <template>lib</template>
-        <qt.libs>core gui network xml sql concurrent</qt.libs>
+        <qt.libs>core core-private gui network xml sql concurrent</qt.libs>
         <ffmpeg.libs></ffmpeg.libs>
         <global.libs>-lcommon -lnx_streaming -lnx_network -lnx_utils</global.libs>
         <!--Specific os libs used-->
@@ -137,6 +137,22 @@
                 </dependency>           
             </dependencies>
         </profile>        
+
+        <profile>
+            <id>bpi</id>
+            <activation>
+                <os>
+                    <family>linux</family>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>bpi</value>
+                </property>
+            </activation>
+            <properties>
+                <rdep.packages>openssl opengl-es-mali</rdep.packages>
+            </properties>
+        </profile>
     </profiles>
 
 </project>

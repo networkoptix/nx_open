@@ -1,41 +1,64 @@
 import QtQuick 2.5;
 
+import "."
+
 MaskedComboBox
 {
     id: thisComponent;
 
     property string iconUrl;
+    property string hoveredIconUrl;
 
     anchors.left: parent.left;
     anchors.right: parent.right;
 
-    areaDelegate: Row
+    isEditableComboBox: true;
+
+    areaDelegate: Item
     {
-        property alias areaText: textItem.text;
-        Rectangle
+        width: row.width;
+        height: row.height;
+
+        Row
         {
-            // TODO: change to image
-            id: imageItem;
-            width: 16; height: 16; color: (thisComponent.iconUrl.length ? "green" : "red");
-        }
+            id: row;
+            spacing: 4;
 
-        Text
-        {
-            id: textItem;
-
-            color: thisComponent.textColor;
-            font.pixelSize: thisComponent.fontPixelSize;
-
-            Binding
+            Image
             {
-                property: "text";
-                target: textItem;
-                value: thisComponent.value;
+                id: imageItem;
+
+                width: 16;
+                height: 16;
+                source: (hoverArea.containsMouse ? hoveredIconUrl : iconUrl);
+            }
+
+            NxLabel
+            {
+                id: textItem;
+
+                color: (hoverArea.containsMouse
+                    ? Style.lighterColor(defaultColor, 2) : defaultColor);
+                font: Style.fonts.systemTile.info;
+
+                Binding
+                {
+                    property: "text";
+                    target: textItem;
+                    value: thisComponent.value;
+                }
             }
         }
-    }
 
-    // TODO setup fonts
-    readonly property int fontPixelSize: 12;
-    readonly property color textColor: "white";
+        MouseArea
+        {
+            id: hoverArea;
+
+            anchors.fill: parent;
+            visible: thisComponent.isAvailable;
+
+            hoverEnabled: true;
+            acceptedButtons: Qt.NoButton;
+        }
+    }
 }

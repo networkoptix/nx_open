@@ -1,5 +1,6 @@
 #include "mobile_client_roles.h"
 
+#include <nx/utils/log/assert.h>
 
 QByteArray Qn::roleName(int role) {
     switch (role) {

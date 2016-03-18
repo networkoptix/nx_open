@@ -10,13 +10,13 @@ namespace ec2
 
     void QnUserNotificationManager::triggerNotification(const QnTransaction<ApiUserData>& tran)
     {
-        assert(tran.command == ApiCommand::saveUser);
+        NX_ASSERT(tran.command == ApiCommand::saveUser);
         emit addedOrUpdated(tran.params);
     }
 
     void QnUserNotificationManager::triggerNotification(const QnTransaction<ApiIdData>& tran)
     {
-        assert(tran.command == ApiCommand::removeUser);
+        NX_ASSERT(tran.command == ApiCommand::removeUser);
         emit removed(tran.params.id);
     }
 
@@ -84,7 +84,7 @@ namespace ec2
     template<class QueryProcessorType>
     int QnUserManager<QueryProcessorType>::save( const ec2::ApiUserData& user, const QString& newPassword, impl::SimpleHandlerPtr handler )
     {
-        Q_ASSERT_X(!user.id.isNull(), Q_FUNC_INFO, "User id must be set before saving");
+        NX_ASSERT(!user.id.isNull(), Q_FUNC_INFO, "User id must be set before saving");
 
         const int reqID = generateRequestID();
         QnTransaction<ApiUserData> tran(ApiCommand::saveUser, user);

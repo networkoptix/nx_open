@@ -182,6 +182,30 @@
             <build>
                 <plugins>
                     <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>1.1.1</version>
+                        <executions>
+                            <execution>
+                                <!-- Fixing qmake-generated msvc2015 project files. -->
+                                <id>patch-vcproj-file</id>
+                                <phase>process-resources</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>${init.python.dir}/${python.executable}</executable>
+                                    <arguments>
+                                        <argument>${root.dir}/build_utils/python/patch_vcproj.py</argument>
+                                        <argument>${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj</argument>
+                                        <argument>--arch</argument>
+                                        <argument>${arch}</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
                         <groupId>com.google.code.maven-replacer-plugin</groupId>
                         <artifactId>replacer</artifactId>
                         <version>1.5.2</version>
@@ -206,17 +230,6 @@
                                             <value>
                                                 <![CDATA[</RootNamespace>
     <TargetName>${project.artifactId}</TargetName>]]></value>
-                                        </replacement>
-                                        <replacement>
-                                            <token>
-                                                <![CDATA[<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">]]></token>
-                                            <value>
-                                                <![CDATA[<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <ItemDefinitionGroup>
-    <Link>
-      <SubSystem Condition="'%(Link.SubSystem)'=='' Or '%(Link.SubSystem)'=='NotSet'">Windows</SubSystem>
-    </Link>
-  </ItemDefinitionGroup>]]></value>
                                         </replacement>
                                         <replacement>
                                             <token>
@@ -257,41 +270,9 @@
       <TargetMachine>Machine${machine.type}</TargetMachine>
     </Lib>]]></value>
                                         </replacement>                                        
+
                                         
-                                        <!-- Disabling moc preprocessor steps, since we do it with jom -->
-                                        <replacement>
-                                            <xpath>//Project/ItemGroup/CustomBuild[contains(@Include,'.h')]</xpath>
-                                            <token><![CDATA[</CustomBuild>]]></token>
-                                            <value><![CDATA[
-      <ExcludedFromBuild>true</ExcludedFromBuild>
-    </CustomBuild>
-                                            ]]></value>
-                                        </replacement>
 
-                                        <!-- Adding moc preprocessor steps with jom -->
-                                        <replacement>
-                                            <xpath>//Project/ItemDefinitionGroup[not(@*)]</xpath>
-                                            <token><![CDATA[</Link>]]></token>
-                                            <value><![CDATA[
-    </Link>
-    <PreBuildEvent>
-      <Command>\$\(ProjectDir\)../${arch}/build_moc.bat \$\(ProjectDir\)../${arch} \$\(Configuration\)</Command>
-    </PreBuildEvent>
-                                            ]]></value>
-                                        </replacement>
-
-                                        <!-- Cleaning moc files -->
-                                        <replacement>
-                                            <!-- <xpath>//Project/ItemDefinitionGroup[not(@*)]</xpath> -->
-                                            <token><![CDATA[<ItemDefinitionGroup>]]></token>
-                                            <value><![CDATA[
-  <Target Name="BeforeClean">
-    <Message Text="Cleaning moc generated files"/>
-    <Exec Command="del \$\(ProjectDir\)..\\\$\(Platform\)\\build\\${arch}\\generated\\moc_*.* /F /Q" />
-  </Target>
-  <ItemDefinitionGroup>
-                                            ]]></value>
-                                        </replacement>
 
                                         <!-- Enabling SEH exceptions for crash stack dump -->
                                         <replacement>
@@ -301,34 +282,6 @@
                                                 <![CDATA[<ExceptionHandling>Async</ExceptionHandling>]]></value>
                                         </replacement>
 
-                                    </replacements>
-                                    <skip>${replace.skip}</skip>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>fix-makefile-QMAKE-SUCKS!!!!!!!!!!</id>
-                                <phase>process-resources</phase>
-                                <goals>
-                                    <goal>replace</goal>
-                                </goals>
-                                <configuration>
-                                    <encoding>utf-8</encoding>
-                                    <unescape>no</unescape>
-                                    <ignoreErrors>true</ignoreErrors>
-                                    <file>${project.build.directory}/Makefile.${build.configuration}</file>
-                                    <replacements>
-                                        <replacement>
-                                            <token><![CDATA[@echo compiling \$< && cl]]></token>
-                                            <value>cl</value>
-                                        </replacement>
-                                        <replacement>
-                                            <token><![CDATA[@echo linking \$@ && link]]></token>
-                                            <value>link</value>
-                                        </replacement>
-                                        <replacement>
-                                            <token>${project.artifactId}${parsedVersion.majorVersion}</token>
-                                            <value>${project.artifactId}</value>
-                                        </replacement>
                                     </replacements>
                                     <skip>${replace.skip}</skip>
                                 </configuration>

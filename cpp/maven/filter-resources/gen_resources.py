@@ -162,5 +162,8 @@ if __name__ == '__main__':
             execute([r'${qt.dir}/bin/qmake', '-spec', '${qt.spec}', '-tp', 'vc', '-o', r'${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj', output_pro_file])
             execute([r'${qt.dir}/bin/qmake', '-spec', '${qt.spec}', r'CONFIG+=${build.configuration}', '-o', r'${project.build.directory}/Makefile', output_pro_file])
         else:
-            os.system('export DYLD_FRAMEWORK_PATH=%s && export LD_LIBRARY_PATH=%s && ${qt.dir}/bin/qmake -spec ${qt.spec} CONFIG+=${build.configuration} -o ${project.build.directory}/Makefile.${build.configuration} %s' % (ldpath, ldpath, output_pro_file))
+            qt_spec = "${qt.spec}"
+            if qt_spec:
+                qt_spec = "-spec {0}".format(qt_spec)
+            os.system('export DYLD_FRAMEWORK_PATH=%s && export LD_LIBRARY_PATH=%s && ${qt.dir}/bin/qmake %s CONFIG+=${build.configuration} -o ${project.build.directory}/Makefile.${build.configuration} %s' % (ldpath, ldpath, qt_spec,  output_pro_file))
 
