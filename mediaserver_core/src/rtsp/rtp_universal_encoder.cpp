@@ -649,10 +649,7 @@ QnUniversalRtpEncoder::QnUniversalRtpEncoder(QnConstAbstractMediaDataPtr media,
         m_isOpened = false;
         qWarning() << "Video transcoding is disabled in the server settings. Feature unavailable.";
     }
-    else if (m_isVideo)
-        m_isOpened = m_transcoder.open(std::dynamic_pointer_cast<const QnCompressedVideoData>(media), QnConstCompressedAudioDataPtr()) == 0;
-    else
-        m_isOpened = m_transcoder.open(QnConstCompressedVideoDataPtr(), std::dynamic_pointer_cast<const QnCompressedAudioData>(media)) == 0;
+    m_isOpened = m_transcoder.transcodePacket(media, nullptr) == QnTranscoder::Success;
 }
 
 QByteArray QnUniversalRtpEncoder::getAdditionSDP( const std::map<QString, QString>& streamParams )
