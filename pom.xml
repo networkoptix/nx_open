@@ -776,6 +776,7 @@
                 <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
                 <modification>bpi</modification>
                 <rdep.target>bpi</rdep.target>
+                <qt.spec/>
             </properties>
             <modules>
                 <!-- Banana pie uses same distro as rpi -->

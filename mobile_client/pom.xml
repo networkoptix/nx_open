@@ -241,8 +241,8 @@
                 </property>
             </activation>
             <properties>
-                <rdep.linux.packages>quazip opengl-es-mali</rdep.linux.packages>
-                <linux.oslibs>${ffmpeg.libs} -lz -lopenal</linux.oslibs>
+                <rdep.linux.packages>quazip opengl-es-mali openal</rdep.linux.packages>
+                <linux.oslibs>${ffmpeg.libs} -lz</linux.oslibs>
             </properties>
         </profile>
     </profiles>

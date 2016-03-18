@@ -137,6 +137,22 @@
                 </dependency>           
             </dependencies>
         </profile>        
+
+        <profile>
+            <id>bpi</id>
+            <activation>
+                <os>
+                    <family>linux</family>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>bpi</value>
+                </property>
+            </activation>
+            <properties>
+                <rdep.packages>openssl opengl-es-mali</rdep.packages>
+            </properties>
+        </profile>
     </profiles>
 
 </project>
