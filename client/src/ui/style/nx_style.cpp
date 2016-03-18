@@ -1495,8 +1495,7 @@ QRect QnNxStyle::subControlRect(
                 break;
 
             case SC_ScrollBarGroove:
-                if (widget)
-                    rect = widget->rect();
+                rect = scrollBar->rect;
                 break;
 
             case SC_ScrollBarSlider:
