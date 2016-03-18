@@ -280,16 +280,6 @@
     </Lib>]]></value>
                                         </replacement>                                        
 
-                                        <!-- Disabling moc preprocessor steps, since we do it with jom -->
-                                        <replacement>
-                                            <xpath>//Project/ItemGroup/CustomBuild[contains(@Include,'.h')]</xpath>
-                                            <token><![CDATA[</CustomBuild>]]></token>
-                                            <value><![CDATA[
-      <ExcludedFromBuild>true</ExcludedFromBuild>
-    </CustomBuild>
-                                            ]]></value>
-                                        </replacement>
-
                                         <!-- Adding moc preprocessor steps with jom -->
                                         <replacement>
                                             <xpath>//Project/ItemDefinitionGroup[not(@*)]</xpath>
