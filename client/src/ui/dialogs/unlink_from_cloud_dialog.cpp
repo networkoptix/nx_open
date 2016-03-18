@@ -51,20 +51,17 @@ QnUnlinkFromCloudDialog::~QnUnlinkFromCloudDialog()
 {
 }
 
-void QnUnlinkFromCloudDialog::done(int result)
+void QnUnlinkFromCloudDialog::accept()
 {
-    if (result == QDialogButtonBox::Ok)
-    {
-        Q_D(QnUnlinkFromCloudDialog);
+    Q_D(QnUnlinkFromCloudDialog);
 
-        if (!d->unlinkedSuccessfully)
-        {
-            d->unbindSystem();
-            return;
-        }
+    if (!d->unlinkedSuccessfully)
+    {
+        d->unbindSystem();
+        return;
     }
 
-    base_type::done(result);
+    base_type::accept();
 }
 
 QnUnlinkFromCloudDialogPrivate::QnUnlinkFromCloudDialogPrivate(QnUnlinkFromCloudDialog *parent)
