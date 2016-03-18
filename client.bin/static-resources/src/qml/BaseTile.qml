@@ -1,6 +1,8 @@
 import QtQuick 2.5;
 import QtQuick.Controls 1.2;
 
+import "."
+
 Item
 {
     id: thisComponent;
@@ -34,26 +36,34 @@ Item
     MouseArea
     {
         anchors.fill: parent;
-        visible: !thisComponent.isExpanded;
         onClicked: { toggle(); }
     }
 
     Rectangle
-    {
+    {        
         MouseArea
         {
+            id: hoverIndicator;
+
             anchors.fill: parent;
-            visible: thisComponent.isExpanded;
+
+            acceptedButtons: (thisComponent.isExpanded
+                ? Qt.AllButtons :Qt.NoButton);
+            hoverEnabled: true;
         }
 
         x: (thisComponent.isExpanded ? (parent.parent.parent.width - width) / 2 - parent.parent.x : 0);
         y: (thisComponent.isExpanded ? (parent.parent.parent.height - height) / 2 - parent.parent.y : 0);
         width: parent.width;
         height: (thisComponent.isExpanded ? loadersColumn.y + loadersColumn.height : parent.height);
+        radius: 2;
 
-        color: palette.button;  // TODO: setup color
+        readonly property color standardColor: Style.colors.custom.systemTile.background;
+        readonly property color hoveredColor: Style.lighterColor(standardColor);
+        readonly property bool isHovered: (!thisComponent.isExpanded && hoverIndicator.containsMouse);
+        color: (isHovered ? hoveredColor : standardColor);
 
-        Text
+        NxLabel
         {
             id: systemNameText;
 
@@ -66,9 +76,10 @@ Item
             anchors.topMargin: 12;
 
             text: systemName;
-            // TODO: setup color and font
-            color: palette.windowText;
-            font.pixelSize: 20;
+
+            height: Style.custom.systemTile.systemNameLabelHeight;
+            color: Style.colors.custom.systemTile.systemNameText;
+            font: Style.fonts.systemTile.systemName;
         }
 
         Button

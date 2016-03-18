@@ -810,7 +810,6 @@ QString QnResource::getProperty(const QString &key) const
         QnMutexLocker lk( &m_mutex );
         if( m_id.isNull() )
         {
-            //Q_ASSERT_X(false, Q_FUNC_INFO, "How can we read properties from invalid resource? And whats with m_typeId in this case? Ask #GDM if you get this assert.");
             auto itr =  m_locallySavedProperties.find(key);
             if (itr != m_locallySavedProperties.end())
                 value = itr->second.value;
@@ -824,7 +823,7 @@ QString QnResource::getProperty(const QString &key) const
     if (value.isNull())
     {
         // find default value in resourceType
-        QnMutexLocker lk(&m_mutex); //TODO: #GDM ask #rvasilenko why there were not mutex here while we are checking m_typeId
+        QnMutexLocker lk(&m_mutex);
         QnResourceTypePtr resType = qnResTypePool->getResourceType(m_typeId);
         if (resType)
             return resType->defaultValue(key);
@@ -835,7 +834,7 @@ QString QnResource::getProperty(const QString &key) const
 QString QnResource::getResourceProperty(const QString& key, const QnUuid &resourceId, const QnUuid &resourceTypeId)
 {
     //TODO: #GDM think about code duplication
-    Q_ASSERT_X(!resourceId.isNull() && !resourceTypeId.isNull(), Q_FUNC_INFO, "Invalid input, reading from local data is requred.");
+    NX_ASSERT(!resourceId.isNull() && !resourceTypeId.isNull(), Q_FUNC_INFO, "Invalid input, reading from local data is requred.");
 
     QString value = propertyDictionary->value(resourceId, key);
     if (value.isNull())
@@ -860,7 +859,6 @@ bool QnResource::setProperty(const QString &key, const QString &value, PropertyO
         QnMutexLocker lk( &m_mutex );
         if( m_id.isNull() )
         {
-            //Q_ASSERT_X(false, Q_FUNC_INFO, "This looks like invalid behavior, refactor is required. Ask #GDM if you get this assert.");
             //saving property to some internal dictionary. Will apply to global dictionary when id is known
             m_locallySavedProperties[key] = LocalPropertyValue( value, markDirty, replaceIfExists );
 

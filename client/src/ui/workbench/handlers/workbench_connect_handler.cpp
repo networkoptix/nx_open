@@ -25,6 +25,8 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <core/resource_management/status_dictionary.h>
+#include <core/core_settings.h>
+#include <core/resource/media_server_resource.h>
 
 #include <nx_ec/ec_proto_version.h>
 #include <llutil/hardware_id.h>
@@ -66,12 +68,27 @@
 
 #include "compatibility.h"
 
-namespace {
+namespace 
+{
     const int videowallReconnectTimeoutMSec = 5000;
     const int videowallCloseTimeoutMSec = 10000;
 
     const int maxReconnectTimeout = 10*1000;                // 10 seconds
     const int maxVideowallReconnectTimeout = 96*60*60*1000; // 4 days
+
+    void storeConnection(const QUrl &url)
+    {
+        auto lastConnections = qnCoreSettings->lastSystemConnections();
+        // TODO: #ynikitenkov remove outdated connection data
+        // TODO: #ynikitenkov remove same pars of system name \user name
+
+        const auto server = qnCommon->currentServer();
+        const QnSystemConnectionData connectionInfo =
+        { server->getSystemName(), url.userName(), url.password() };
+
+        lastConnections.append(connectionInfo);
+        qnCoreSettings->setLastSystemConnections(lastConnections);
+    }
 }
 
 QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject *parent /* = 0*/):
@@ -357,6 +374,9 @@ bool QnWorkbenchConnectHandler::disconnectFromServer(bool force) {
     if (!force) {
         QnGlobalSettings::instance()->synchronizeNow();
         qnSettings->setLastUsedConnection(QnConnectionData());
+
+        storeConnection(QnAppServerConnectionFactory::url());
+
     }
 
     hideMessageBox();

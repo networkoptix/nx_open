@@ -54,10 +54,6 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = NU
     connect(context(), &QnWorkbenchContext::userChanged, this, [this]() { m_hintDisplayed = false; });
 }
 
-ec2::AbstractECConnectionPtr QnWorkbenchBookmarksHandler::connection() const {
-    return QnAppServerConnectionFactory::getConnection2();
-}
-
 void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
     QnVirtualCameraResourcePtr camera = parameters.resource().dynamicCast<QnVirtualCameraResource>();

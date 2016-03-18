@@ -32,6 +32,8 @@ public:
     QnNxStyle();
 
     void setGenericPalette(const QnGenericPalette &palette);
+    const QnGenericPalette &genericPalette() const;
+
 
     QnPaletteColor findColor(const QColor &color) const;
     QnPaletteColor mainColor(Colors::Palette palette) const;

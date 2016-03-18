@@ -10,19 +10,19 @@ namespace ec2
 
     void QnVideowallNotificationManager::triggerNotification(const QnTransaction<ApiVideowallData>& tran)
     {
-        assert(tran.command == ApiCommand::saveVideowall);
+        NX_ASSERT(tran.command == ApiCommand::saveVideowall);
         emit addedOrUpdated(tran.params);
     }
 
     void QnVideowallNotificationManager::triggerNotification(const QnTransaction<ApiIdData>& tran)
     {
-        assert(tran.command == ApiCommand::removeVideowall);
+        NX_ASSERT(tran.command == ApiCommand::removeVideowall);
         emit removed(tran.params.id);
     }
 
     void QnVideowallNotificationManager::triggerNotification(const QnTransaction<ApiVideowallControlMessageData>& tran)
     {
-        assert(tran.command == ApiCommand::videowallControl);
+        NX_ASSERT(tran.command == ApiCommand::videowallControl);
         emit controlMessage(tran.params);
     }
 
