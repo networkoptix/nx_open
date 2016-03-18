@@ -77,6 +77,7 @@ Item
 
             text: systemName;
 
+            height: Style.custom.systemTile.systemNameLabelHeight;
             color: Style.colors.custom.systemTile.systemNameText;
             font: Style.fonts.systemTile.systemName;
         }

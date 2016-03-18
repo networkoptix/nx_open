@@ -4,7 +4,6 @@ import QtQuick.Controls.Styles 1.4;
 
 import "."
 
-// TODO: ? paddings 8px left/right
 // TODO: left\right icons\btns implementation
 
 TextField
@@ -45,7 +44,7 @@ TextField
                     if (control.readOnly)
                         return Style.colorWithAlpha(Style.colors.shadow, 0.4);
                     if (control.focus && !control.activeFocus)
-                        return Style.colors.brand;
+                        return Style.darkerColor(Style.colors.brand, 4);
 
                     return Style.darkerColor(color);
                 }
@@ -56,7 +55,9 @@ TextField
 
                     visible: (!control.readOnly && control.activeFocus)
                     anchors.top: parent.top;
-                    height: 2;
+                    height: 1;
+                    x: 1;
+                    width: parent.width - 2 * x;
                     color: Style.darkerColor(Style.colors.shadow, 3);
                 }
 
@@ -66,7 +67,9 @@ TextField
 
                     visible: (!control.readOnly && control.activeFocus)
                     anchors.right: parent.right;
-                    width: 2;
+                    width: 1;
+                    y: 1;
+                    height: parent.height - 2 * y;
                     color: Style.darkerColor(Style.colors.shadow, 3);
                 }
             }

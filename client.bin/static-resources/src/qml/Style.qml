@@ -35,6 +35,14 @@ QtObject
         readonly property color color: colors.windowText;
     }
 
+    property QtObject custom: QtObject
+    {
+        property QtObject systemTile: QtObject
+        {
+            readonly property real systemNameLabelHeight: 24;
+        }
+    }
+
     //
 
     property QtObject colors: QtObject
@@ -43,10 +51,11 @@ QtObject
         readonly property color windowText: context.getPaletteColor("light", 1);
         readonly property color shadow: context.getPaletteColor("dark", 4);
         readonly property color text: context.getPaletteColor("light", 13);
-        readonly property color buttonTtext: text;
+        readonly property color buttonText: text;
         readonly property color midlight: context.getPaletteColor("dark", 12);
+        readonly property color button: context.getPaletteColor("dark", 10);
 
-        readonly property color brand: context.getPaletteColor("brand", 0);
+        readonly property color brand: context.getPaletteColor("brand", 4);
 
 
         readonly property color error: "red";

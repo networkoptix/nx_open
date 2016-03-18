@@ -51,7 +51,7 @@ BaseTile
         property alias host: hostChooseItem.value;
         property alias userName: userChooseItem.value;
 
-        topPadding: 12;
+        topPadding: 12; // TODO: paddings do not work??
         spacing: 2;
         anchors.left: (parent ? parent.left : undefined);
         anchors.right: (parent ? parent.right : undefined);
@@ -139,7 +139,7 @@ BaseTile
             }
         }
 
-        Button
+        NxButton
         {
             anchors.left: parent.left;
             anchors.right: parent.right;
