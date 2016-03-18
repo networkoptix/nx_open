@@ -1,6 +1,8 @@
 'use strict';
 
 var SystemsListPage = function () {
+    var LoginLogout = require('../login_logout.js');
+    this.loginLogout = new LoginLogout();
 
     this.getHomePage = function () {
         browser.get('/');
@@ -14,27 +16,8 @@ var SystemsListPage = function () {
 
     this.htmlBody = element(by.css('body'));
 
-    this.login = function() {
-        var userEmail = 'ekorneeva+1@networkoptix.com';
-        var userPassword = 'qweasd123';
-
-        var loginButton = element(by.linkText('Login'));
-        var loginDialog = element(by.css('.modal-dialog'));
-        var emailInput = loginDialog.element(by.model('auth.email'));
-        var passwordInput = loginDialog.element(by.model('auth.password'));
-        var dialogLoginButton = loginDialog.element(by.buttonText('Login'));
-
-        loginButton.click();
-
-        emailInput.sendKeys(userEmail);
-        passwordInput.sendKeys(userPassword);
-
-        dialogLoginButton.click();
-        browser.sleep(2000); // such a shame, but I can't solve it right now
-
-        // Check that element that is visible only for authorized user is displayed on page
-        expect(element.all(by.css('.auth-visible')).first().isDisplayed()).toBe(true);
-    }
+    this.userEmail = 'ekorneeva+1@networkoptix.com';
+    this.userPassword = 'qweasd123';
 
     this.systemsList = element.all(by.repeater('system in systems'));
 };
