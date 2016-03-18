@@ -5,20 +5,15 @@ var AccountPage = function () {
     var PasswordFieldSuite = require('../password_check.js');
     this.passwordField = new PasswordFieldSuite();
 
+    var LoginLogout = require('../login_logout.js');
+    this.loginLogout = new LoginLogout();
+
+    this.accountUrl = '/#/account';
     this.passwordUrl = '/#/account/password';
+    this.homePageUrl = '/';
 
-    this.getHomePage = function () {
-        browser.get('/');
-        browser.waitForAngular();
-    };
-
-    this.getByUrl = function () {
-        browser.get('/#/account');
-        browser.waitForAngular();
-    };
-
-    this.getPasswordByUrl = function () {
-        browser.get(this.passwordUrl);
+    this.get = function (url) {
+        browser.get(url);
         browser.waitForAngular();
     };
 
@@ -29,6 +24,8 @@ var AccountPage = function () {
 
     this.userEmail = 'ekorneeva+1@networkoptix.com';
     this.userPassword = 'qweasd123';
+    this.userPasswordNew = 'qweasd123qwe';
+    this.userPasswordWrong = 'qweqwe123';
 
     this.userFirstName = 'TestFirstName';
     this.userLastName = 'TestLastName';
@@ -43,39 +40,6 @@ var AccountPage = function () {
     this.logoutLink = this.userAccountDropdownMenu.element(by.linkText('Logout'));
     this.changePasswordLink = this.userAccountDropdownMenu.element(by.linkText('Change Password'));
 
-    this.loginSuccessElement = element.all(by.css('.auth-visible')).first(); // some element on page, that is only visible when user is authenticated
-
-    this.login = function() {
-
-        var loginButton = element(by.linkText('Login'));
-        var loginDialog = element(by.css('.modal-dialog'));
-        var emailInput = loginDialog.element(by.model('auth.email'));
-        var passwordInput = loginDialog.element(by.model('auth.password'));
-        var dialogLoginButton = loginDialog.element(by.buttonText('Login'));
-
-        loginButton.click();
-
-        emailInput.sendKeys(this.userEmail);
-        passwordInput.sendKeys(this.userPassword);
-
-        dialogLoginButton.click();
-        browser.sleep(2000); // such a shame, but I can't solve it right now
-
-        // Check that element that is visible only for authorized user is displayed on page
-        expect(this.loginSuccessElement.isDisplayed()).toBe(true);
-    };
-
-    this.logout = function() {
-        expect(this.userAccountDropdownToggle.isDisplayed()).toBe(true);
-
-        this.userAccountDropdownToggle.click();
-        this.logoutLink.click();
-        browser.sleep(500); // such a shame, but I can't solve it right now
-
-        // Check that element that is visible only for authorized user is NOT displayed on page
-        expect(this.loginSuccessElement.isDisplayed()).toBe(false);
-    }
-
     this.emailField = element(by.model('account.email'));
     this.firstNameInput = element(by.model('account.first_name'));
     this.lastNameInput = element(by.model('account.last_name'));
@@ -84,8 +48,8 @@ var AccountPage = function () {
     this.saveButton = element(by.css('[form=accountForm]')).element(by.buttonText('Save'));
 
     this.saveSuccessAlert = element(by.css('process-alert[process=save]')).element(by.css('.alert')); // alert with success message
-    this.passwordCahngeSuccessAlert = element(by.css('process-alert[process=changePassword]')).element(by.css('.alert')); // alert with success message
-    this.catchSuccessAlert = function (alertElement, message) {
+    this.passwordChangeAlert = element(by.css('process-alert[process=changePassword]')).element(by.css('.alert')); // alert with success message
+    this.catchAlert = function (alertElement, message) {
         // Workaround due to Protractor bug with timeouts https://github.com/angular/protractor/issues/169
         // taken from here http://stackoverflow.com/questions/25062748/testing-the-contents-of-a-temporary-element-with-protractor
         browser.sleep(1500);
@@ -107,8 +71,6 @@ var AccountPage = function () {
 
     this.passwordGroup = element(by.css('password-input'));
     this.passwordControlContainer = this.passwordGroup.element(by.css('.help-block'));
-
-
 };
 
 module.exports = AccountPage;

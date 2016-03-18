@@ -5,13 +5,11 @@ describe('Account suite', function () {
     var p = new AccountPage();
 
     beforeAll(function() {
-        p.getHomePage();
-        p.login();
+        p.loginLogout.login(p.userEmail, p.userPassword);
     });
 
     it("should display dropdown in right top corner: Account settings, Change password, Logout", function () {
-        p.getHomePage();
-
+        p.get(p.homePageUrl);
         expect(p.userAccountDropdownToggle.getText()).toContain(p.userEmail);
 
         p.userAccountDropdownToggle.click();
@@ -21,13 +19,13 @@ describe('Account suite', function () {
     });
 
     it("should allow to log out", function () {
-        p.getHomePage();
-        p.logout();
-        p.login();
+        p.get(p.homePageUrl);
+        p.loginLogout.logout();
+        p.loginLogout.login(p.userEmail, p.userPassword);
     });
 
     it("should show email, first name, last name, subscribe", function () {
-        p.getByUrl();
+        p.get(p.accountUrl);
         expect(p.emailField.getAttribute('value')).toContain(p.userEmail);
         expect(p.firstNameInput.isDisplayed()).toBe(true);
         expect(p.lastNameInput.isDisplayed()).toBe(true);
@@ -35,7 +33,7 @@ describe('Account suite', function () {
     });
 
     it("should allow to edit first name, last name, subscribe, and save it", function () {
-        p.getByUrl();
+        p.get(p.accountUrl);
 
         p.firstNameInput.clear();
         p.firstNameInput.sendKeys(p.userFirstName);
@@ -44,7 +42,7 @@ describe('Account suite', function () {
 
         p.saveButton.click();
 
-        p.catchSuccessAlert(p.saveSuccessAlert, 'Your account was successfully saved.');
+        p.catchAlert(p.saveSuccessAlert, 'Your account was successfully saved.');
 
         p.refresh();
 
@@ -53,7 +51,7 @@ describe('Account suite', function () {
     });
 
     it("should allow cyrillic First and Last names, and save it", function () {
-        p.getByUrl();
+        p.get(p.accountUrl);
 
         p.firstNameInput.clear();
         p.firstNameInput.sendKeys(p.userNameCyrillic);
@@ -62,7 +60,7 @@ describe('Account suite', function () {
 
         p.saveButton.click();
 
-        p.catchSuccessAlert(p.saveSuccessAlert, 'Your account was successfully saved.');
+        p.catchAlert(p.saveSuccessAlert, 'Your account was successfully saved.');
 
         p.refresh();
 
@@ -71,7 +69,7 @@ describe('Account suite', function () {
     });
 
     it("should allow smile symbols in First and Last name fields, and save it", function () {
-        p.getByUrl();
+        p.get(p.accountUrl);
 
         p.firstNameInput.clear();
         p.firstNameInput.sendKeys(p.userNameSmile);
@@ -80,7 +78,7 @@ describe('Account suite', function () {
 
         p.saveButton.click();
 
-        p.catchSuccessAlert(p.saveSuccessAlert, 'Your account was successfully saved.');
+        p.catchAlert(p.saveSuccessAlert, 'Your account was successfully saved.');
 
         p.refresh();
 
@@ -89,7 +87,7 @@ describe('Account suite', function () {
     });
 
     it("should allow hieroglyphic symbols in First and Last name fields, and save it", function () {
-        p.getByUrl();
+        p.get(p.accountUrl);
 
         p.firstNameInput.clear();
         p.firstNameInput.sendKeys(p.userNameHierog);
@@ -98,7 +96,7 @@ describe('Account suite', function () {
 
         p.saveButton.click();
 
-        p.catchSuccessAlert(p.saveSuccessAlert, 'Your account was successfully saved.');
+        p.catchAlert(p.saveSuccessAlert, 'Your account was successfully saved.');
 
         p.refresh();
 
@@ -107,7 +105,7 @@ describe('Account suite', function () {
     });
 
     it("should open change password page", function () {
-        p.getHomePage();
+        p.get(p.homePageUrl);
 
         expect(p.userAccountDropdownToggle.isDisplayed()).toBe(true);
 
@@ -118,33 +116,54 @@ describe('Account suite', function () {
         expect(p.htmlBody.getText()).toContain('Current password');
     });
 
+    p.passwordField.check(p, p.passwordUrl);
+
     it("should allow to change password (and change it back)", function () {
-        p.getPasswordByUrl();
+        p.get(p.passwordUrl);
 
         p.currentPasswordInput.sendKeys(p.userPassword);
+        p.passwordInput.sendKeys(p.userPasswordNew);
+        p.submitButton.click();
+
+        p.catchAlert(p.passwordChangeAlert, 'Your password was successfully changed.');
+
+        browser.refresh();
+
+        p.currentPasswordInput.sendKeys(p.userPasswordNew);
         p.passwordInput.sendKeys(p.userPassword);
         p.submitButton.click();
 
-        p.catchSuccessAlert(p.passwordCahngeSuccessAlert, 'Your password was successfully changed.');
+        p.catchAlert(p.passwordChangeAlert, 'Your password was successfully changed.');
     });
 
-    xit("should not allow to change password if old password is wrong", function () {
-        expect('test').toBe('written');
+    it("should save new password correctly (and change it back)", function () {
+        p.get(p.passwordUrl);
+        p.currentPasswordInput.sendKeys(p.userPassword);
+        p.passwordInput.sendKeys(p.userPasswordNew);
+        p.submitButton.click();
+        p.catchAlert(p.passwordChangeAlert, 'Your password was successfully changed.');
+
+        p.loginLogout.logout();
+        p.loginLogout.login(p.userEmail, p.userPasswordNew);
+
+        p.get(p.passwordUrl);
+        p.currentPasswordInput.sendKeys(p.userPasswordNew);
+        p.passwordInput.sendKeys(p.userPassword);
+        p.submitButton.click();
+        p.catchAlert(p.passwordChangeAlert, 'Your password was successfully changed.');
+    });
+
+    it("should not allow to change password if old password is wrong", function () {
+        p.get(p.passwordUrl);
+
+        p.currentPasswordInput.sendKeys(p.userPasswordWrong);
+        p.passwordInput.sendKeys(p.userPassword);
+        p.submitButton.click();
+
+        p.catchAlert(p.passwordChangeAlert, 'Couldn\'t change your password: Current password doesn\'t match');
     });
 
     xit("should not allow to change password if new password is the same as old password", function () {
-        expect('test').toBe('written');
-    });
-
-    p.passwordField.check(p, p.passwordUrl);
-
-    xit("should save new password correctly", function () {
-        expect('test').toBe('written');
-    });
-    xit("should do sth", function () {
-        expect('test').toBe('written');
-    });
-    xit("should do sth", function () {
         expect('test').toBe('written');
     });
 });
