@@ -45,9 +45,10 @@ void QnTimeScrollBar::setIndicatorPosition(qint64 indicatorPosition) {
     m_indicatorPosition = indicatorPosition;
 }
 
-void QnTimeScrollBar::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *widget) {
+void QnTimeScrollBar::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *widget)
+{
     sendPendingMouseMoves(widget);
-    
+
     QStyleOptionSlider opt;
     initStyleOption(&opt);
 
@@ -69,19 +70,17 @@ void QnTimeScrollBar::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
     antialiasingRollback.rollback();
 
     /* Draw indicator. */
-    if(m_indicatorPosition >= minimum() && indicatorPosition() <= maximum() + pageStep()) {
-        /* Calculate handle- and groove-relative indicator positions. */
+    if (m_indicatorPosition >= minimum() && m_indicatorPosition <= maximum() + pageStep())
+    {
+        /* Calculate handle-relative indicator position. */
         qint64 handleValue = qBound(0ll, m_indicatorPosition - sliderPosition(), pageStep());
-        qint64 grooveValue = m_indicatorPosition - handleValue;
 
-        /* Calculate handle- and groove-relative indicator offsets. */
-        qreal grooveOffset = positionFromValue(grooveValue).x();
+        /* Calculate handle-relative indicator pixel offset. */
         qreal handleOffset = GraphicsStyle::sliderPositionFromValue(0, pageStep(), handleValue, handleRect.width(), opt.upsideDown, true);
 
         /* Paint it. */
-        qreal x = handleOffset + grooveOffset;
         painter->setPen(QPen(m_colors.indicator, 0));
-        painter->drawLine(QPointF(x, opt.rect.top() + 1.0), QPointF(x, opt.rect.bottom())); /* + 1.0 is to deal with AA spilling the line outside the item's boundaries. */
+        painter->drawLine(QPointF(handleOffset, opt.rect.top() + 1.0), QPointF(handleOffset, opt.rect.bottom())); /* + 1.0 is to deal with AA spilling the line outside the item's boundaries. */
     }
 }
 

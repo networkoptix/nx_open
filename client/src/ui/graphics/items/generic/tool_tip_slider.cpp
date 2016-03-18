@@ -165,7 +165,7 @@ void QnToolTipSlider::updateToolTipPosition() {
 
     QStyleOptionSlider opt;
     initStyleOption(&opt);
-    QRect handleRect = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle, NULL);
+    QRect handleRect = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle, nullptr);
 
     qreal x = positionFromValue(sliderPosition()).x() + handleRect.width() / 2.0;
     qreal y = 0;
