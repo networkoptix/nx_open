@@ -222,7 +222,7 @@
             <ComponentRef Id='ServerConfiguration'/>
             <ComponentRef Id='ServerConfigurationStatisticsFlag'/>
             <ComponentRef Id='ServerConfigurationPassword'/>
-
+            <ComponentGroupRef Id="Vs2015crtComponent"/>
             <ComponentRef Id="ServerExecutable" />
             <ComponentGroupRef Id="ServerLibs"/>
             <ComponentGroupRef Id="ServerFFmpegLibraries"/>

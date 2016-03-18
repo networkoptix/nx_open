@@ -1,9 +1,8 @@
 <?xml version='1.0' encoding='windows-1252'?>
 <Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'
      xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
+    <?include BuildVars.wxi ?>
     <Fragment Id='FragmentClient'>
-        <?include BuildVars.wxi ?>
-
         <DirectoryRef Id="INSTALLDIR">
             <Directory Id="$(var.customization)ClientDir" Name="Client">
                 <Directory Id="$(var.customization)HelpDir" Name="help"/>                         
@@ -55,7 +54,7 @@
                     <Directory Id="Platforms" Name="platforms">
                     </Directory>                    
 
-                    <Directory Id="$ClientQml" Name="qml"/>
+                    <Directory Id="ClientQml" Name="qml"/>
                     <Directory Id="$(var.customization)VoxDir" Name="vox"/>                                
 
                     <Component Id="ClientExecutable">
@@ -277,6 +276,8 @@
             <ComponentGroupRef Id="ClientHelpComponent"/>
             <ComponentGroupRef Id="ClientVoxComponent"/>
             <ComponentGroupRef Id="ClientBgComponent"/>
+            <ComponentGroupRef Id="ClientQmlComponent"/>
+            <ComponentGroupRef Id="Vs2015crtComponent"/>
             <ComponentGroupRef Id="ClientLibs"/>
             <ComponentRef Id="ClientConfiguration" />
             <?if $(var.quicksync) = true ?>
