@@ -179,6 +179,7 @@ int runInHttpClientMode(const std::multimap<QString, QString>& args)
     nx::network::SocketGlobals::mediatorConnector().enable(true);
 
     nx_http::HttpClient client;
+    client.setSendTimeoutMs(15000);
     if (!client.doGet(urlStr) || !client.response())
     {
         std::cerr<<"No response has been received"<<std::endl;
