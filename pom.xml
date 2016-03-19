@@ -547,7 +547,6 @@
                 <qt.classifier>${platform}-${arch}-${build.configuration}</qt.classifier>
             </properties>
             <modules>
-                <module>plugins/it930x_plugin</module>
                 <!--<module>plugins/xvbadecoder</module>-->
             </modules>
         </profile>
@@ -604,6 +603,7 @@
                 </property>
             </activation>
             <modules>
+                <module>plugins/it930x_plugin</module>
                 <module>debsetup/client-deb</module>
                 <module>debsetup/mediaserver-deb</module>
             </modules>
