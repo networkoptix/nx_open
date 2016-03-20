@@ -10,6 +10,7 @@ import tempfile
 import posixpath
 import distutils.spawn
 
+from fsutil import copy_recursive
 from platform_detection import *
 
 ROOT_CONFIG_NAME = ".rdep"
@@ -22,7 +23,6 @@ if detect_platform() == "windows":
         RSYNC = [os.path.join(os.getenv("environment"), "rsync-win32", "rsync.exe")]
     RSYNC.append("--chmod=ugo=rwx")
 RSYNC += [ "--archive", "--delete" ]
-print RSYNC
 
 DEFAULT_SYNC_URL = "rsync://enk.me/buildenv/rdep/packages"
 
@@ -69,6 +69,9 @@ def get_sync_url(path):
         return None
 
     return config.get("General", "url")
+
+def package_config_path(path):
+    return os.path.join(path, PACKAGE_CONFIG_NAME)
 
 def check_repository(path):
     return bool(get_sync_url(path))
@@ -316,9 +319,6 @@ def upload_packages(root, url, target, packages, debug = False):
         print "Uploaded successfully"
     return success
 
-def package_config_path(path):
-    return os.path.join(path, PACKAGE_CONFIG_NAME)
-
 def locate_package(root, target, package, debug = False):
     if debug:
         path = os.path.join(root, target, package + DEBUG_SUFFIX)
@@ -364,6 +364,57 @@ def print_path(root, target, packages, debug):
         exit(1)
     print(path)
 
+#TODO: this parser functionality should be moved to RDep
+def get_copy_list(package_dir):
+    config = ConfigParser.ConfigParser()
+    config.read(os.path.join(package_dir, PACKAGE_CONFIG_NAME))
+
+    if not config.has_section("Copy"):
+        return { "bin": [ "bin/*" ], "lib": [ "lib/*.so*" ] }
+
+    result = {}
+    for key, value in config.items("Copy"):
+        result[key] = value.split()
+
+    return result
+
+def copy_package(root, target, package, destination, debug = False):
+    package_dir = locate_package(root, target, package, debug)
+    if not package_dir:
+        print "Could not locate package {0}".format(package)
+        return False
+
+    copy_list = get_copy_list(package_dir)
+
+    for dst, sources in copy_list.items():
+        if dst in [ "bin", "lib" ]:
+            dst = os.path.join(dst, "debug" if debug else "release")
+        dst_dir = os.path.join(destination, dst)
+
+        for src in sources:
+            src = os.path.join(package_dir, src)
+            print "Copying {0} to {1}".format(src, dst_dir)
+            if not os.path.isdir(dst_dir):
+                os.makedirs(dst_dir)
+            copy_recursive(src, dst_dir)
+
+    return True
+
+def copy_packages(root, target, packages, destination, debug = False):
+    success = True
+
+    if not packages:
+        print "No packages to copy"
+        return True
+
+    for package in packages:
+        if not copy_package(root, target, package, destination, debug):
+            success = False
+
+    if success:
+        print "Copied successfully"
+    return success
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-t", "--target",       help="Target classifier.",  default=detect_target())
@@ -372,6 +423,7 @@ def main():
     parser.add_argument("-u", "--upload",       help="Upload package to the repository.",   action="store_true")
     parser.add_argument("-v", "--verbose",      help="Additional debug output.",            action="store_true")
     parser.add_argument("--print-path",         help="Print package dir and exit.",         action="store_true")
+    parser.add_argument("--copy", metavar="DIR", help="Copy package resources")
     parser.add_argument("--init", metavar="URL", help="Init repository in the current dir with the specified URL.")
     parser.add_argument("packages", nargs='*',  help="Packages to sync.",   default="")
 
@@ -406,6 +458,8 @@ def main():
         success = print_path(root, target, packages, args.debug)
     elif args.upload:
         success = upload_packages(root, url, target, packages, args.debug)
+    elif args.copy:
+        success = copy_packages(root, target, packages, args.copy, args.debug)
     else:
         success = fetch_packages(root, url, target, packages, args.debug, args.force)
 
