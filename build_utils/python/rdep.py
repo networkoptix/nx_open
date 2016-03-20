@@ -364,7 +364,6 @@ def print_path(root, target, packages, debug):
         exit(1)
     print(path)
 
-#TODO: this parser functionality should be moved to RDep
 def get_copy_list(package_dir):
     config = ConfigParser.ConfigParser()
     config.read(os.path.join(package_dir, PACKAGE_CONFIG_NAME))
