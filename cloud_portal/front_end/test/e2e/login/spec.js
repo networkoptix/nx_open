@@ -69,7 +69,7 @@ describe('Login suite', function () {
         p.passwordInput.sendKeys(p.userPassword);
         p.dialogLoginButton.click();
 
-        p.catchLoginIncorrectAlert(p.loginIncorrectAlert);
+        p.helper.catchAlert(p.loginIncorrectAlert, 'Login or password are incorrect');
 
         p.dialogCloseButton.click();
     });
@@ -81,8 +81,7 @@ describe('Login suite', function () {
         p.passwordInput.sendKeys(p.userPassword);
         p.dialogLoginButton.click();
 
-        p.catchLoginIncorrectAlert(p.loginIncorrectAlert);
-
+        p.helper.catchAlert(p.loginIncorrectAlert, 'Login or password are incorrect');
         p.dialogCloseButton.click();
     });
 
@@ -93,7 +92,7 @@ describe('Login suite', function () {
         p.passwordInput.sendKeys(p.userPasswordWrong);
         p.dialogLoginButton.click();
 
-        p.catchLoginIncorrectAlert(p.loginIncorrectAlert);
+        p.helper.catchAlert(p.loginIncorrectAlert, 'Login or password are incorrect');
 
         p.dialogCloseButton.click();
     });
@@ -196,7 +195,7 @@ describe('Login suite', function () {
         p.emailInput.sendKeys(currentEmail);
         p.passwordInput.sendKeys(p.userPasswordWrong);
         p.dialogLoginButton.click();
-        p.catchLoginIncorrectAlert(p.loginIncorrectAlert);
+        p.helper.catchAlert(p.loginIncorrectAlert, 'Login or password are incorrect');
 
         p.iForgotPasswordLink.click();
 
@@ -220,28 +219,28 @@ describe('Login suite', function () {
         expect(p.restoreEmailInput.getAttribute('value')).toContain(currentEmail);
     });
 
-    it("should not log in and show error for inactivated user", function () {
+    xit("should not log in and show error for inactivated user", function () {
         expect("test").toBe("written");
     });
 
-    it("should log in with Remember Me checkmark switched on, close browser, open browser and enter same session", function () {
+    xit("should log in with Remember Me checkmark switched on, close browser, open browser and enter same session", function () {
         //TODO: check remember me function by closing browser instance and opening it again
         expect("test").toBe("written");
     });
 
-    it("should display password masked", function () {
+    xit("should display password masked", function () {
         expect("test").toBe("written with screenshot");
     });
 
-    it("should copy password masked", function () {
+    xit("should copy password masked", function () {
         expect("test").toBe("written with screenshot");
     });
 
-    it("should lock account after several failed attempts", function () {
+    xit("should lock account after several failed attempts", function () {
         expect("test").toBe("written");
     });
 
-    it("should not log in, if the user just logged out and pressed back button in browser", function () {
+    xit("should not log in, if the user just logged out and pressed back button in browser", function () {
         expect("test").toBe("written");
     });
 

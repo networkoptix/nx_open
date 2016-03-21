@@ -5,6 +5,9 @@ var RegisterPage = function () {
     var PasswordFieldSuite = require('../password_check.js');
     this.passwordField = new PasswordFieldSuite();
 
+    var Helper = require('../helper.js');
+    this.helper = new Helper();
+
     this.url = '/#/register';
 
     this.getHomePage = function () {
@@ -56,15 +59,6 @@ var RegisterPage = function () {
     this.htmlBody = element(by.css('body'));
 
     this.registerSuccessAlert = element(by.css('process-alert[process=register]')).element(by.css('.alert')); // alert with success message
-    this.catchRegisterSuccessAlert = function (registerSuccessAlert) {
-        // Workaround due to Protractor bug with timeouts https://github.com/angular/protractor/issues/169
-        // taken from here http://stackoverflow.com/questions/25062748/testing-the-contents-of-a-temporary-element-with-protractor
-        browser.sleep(1500);
-        browser.ignoreSynchronization = true;
-        expect(registerSuccessAlert.getText()).toContain('Your account was successfully registered. Please, check your email to confirm it');
-        browser.sleep(500);
-        browser.ignoreSynchronization = false;
-    }
 
     this.fieldWrap = function(field) {
         return field.element(by.xpath('../..'));

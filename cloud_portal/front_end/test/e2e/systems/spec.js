@@ -6,11 +6,11 @@ describe('Systems list suite', function () {
 
     beforeAll(function() {
         p.getHomePage();
-        p.loginLogout.login(p.userEmail, p.userPassword);
+        p.helper.login(p.userEmail, p.userPassword);
     });
 
     afterAll(function() {
-        p.loginLogout.logout();
+        p.helper.logout();
     });
 
     it("should show list of Systems", function () {

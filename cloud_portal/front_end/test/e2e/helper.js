@@ -1,6 +1,6 @@
 'use strict';
 
-var LoginLogout = function () {
+var Helper = function () {
 
     this.login = function(email, password) {
 
@@ -43,6 +43,16 @@ var LoginLogout = function () {
         // Check that element that is visible only for authorized user is NOT displayed on page
         expect(loginSuccessElement.isDisplayed()).toBe(false);
     };
+
+    this.catchAlert = function (alertElement, message) {
+        // Workaround due to Protractor bug with timeouts https://github.com/angular/protractor/issues/169
+        // taken from here http://stackoverflow.com/questions/25062748/testing-the-contents-of-a-temporary-element-with-protractor
+        browser.sleep(1500);
+        browser.ignoreSynchronization = true;
+        expect(alertElement.getText()).toContain(message);
+        browser.sleep(500);
+        browser.ignoreSynchronization = false;
+    }
 };
 
-module.exports = LoginLogout;
+module.exports = Helper;

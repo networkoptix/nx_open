@@ -2,6 +2,9 @@
 
 var LoginPage = function () {
 
+    var Helper = require('../helper.js');
+    this.helper = new Helper();
+
     this.get = function () {
         browser.get('/');
         browser.waitForAngular();
@@ -44,15 +47,6 @@ var LoginPage = function () {
     this.dialogCloseButton = this.loginDialog.all(by.css('button.close')).first();
 
     this.loginIncorrectAlert = element(by.css('process-alert[process=login]')).element(by.css('.alert')); // alert with eror message
-    this.catchLoginIncorrectAlert = function (loginIncorrectAlert) {
-        // Workaround due to Protractor bug with timeouts https://github.com/angular/protractor/issues/169
-        // taken from here http://stackoverflow.com/questions/25062748/testing-the-contents-of-a-temporary-element-with-protractor
-        browser.sleep(500);
-        browser.ignoreSynchronization = true;
-        expect(loginIncorrectAlert.getText()).toContain('Login or password are incorrect');
-        browser.sleep(500);
-        browser.ignoreSynchronization = false;
-    }
 
     this.loginSuccessElement = element.all(by.css('.auth-visible')).first(); // some element on page, that is only visible when user is authenticated
 

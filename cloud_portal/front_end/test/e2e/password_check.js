@@ -8,6 +8,7 @@ var PasswordFieldSuite = function () {
     self.userPasswordHierog = '您都可以享受源源不絕的好禮及優惠';
 
     self.passwordWeak = { class:'label-danger', text:'too short', title: 'Password must contain at least 6 characters' };
+    self.passwordIncorrect = { class:'label-danger', text:'incorrect', title: 'Use only latin letters, numbers and keyboard symbols' };
     self.passwordCommon = { class:'label-danger', text:'too common', title: 'This password is in top most popular passwords in the world' };
     self.passwordFair = { class:'label-warning', text:'fair', title: 'Use numbers, symbols in different case and special symbols to make your password stronger' };
     self.passwordGood = { class:'label-success', text:'good', title: '' };
@@ -30,6 +31,12 @@ var PasswordFieldSuite = function () {
             expect(pageObj.passwordControlContainer.element(by.css('.label')).getText()).toContain(strength.text);
         }
 
+        // Check that particular message does NOT appear
+        var checkNoPasswordWarning = function (strength) {
+            expect(pageObj.passwordControlContainer.element(by.css('.label')).getAttribute('class')).not.toContain(strength.class);
+            expect(pageObj.passwordControlContainer.element(by.css('.label')).getText()).not.toContain(strength.text);
+        }
+
         var notAllowPasswordWith = function (password) {
             browser.get(url);
 
@@ -44,11 +51,11 @@ var PasswordFieldSuite = function () {
             notAllowPasswordWith(self.userPasswordCyrillic);
         });
 
-        it("should not allow password with cyrillic symbols", function () {
+        it("should not allow password with smile symbols", function () {
             notAllowPasswordWith(self.userPasswordSmile);
         });
 
-        it("should not allow password with cyrillic symbols", function () {
+        it("should not allow password with hieroglyph symbols", function () {
             notAllowPasswordWith(self.userPasswordHierog);
         });
 
@@ -61,6 +68,10 @@ var PasswordFieldSuite = function () {
 
             pageObj.passwordInput.sendKeys('qwe');
             checkPasswordWarning(self.passwordWeak);
+
+            pageObj.passwordInput.clear();
+            pageObj.passwordInput.sendKeys('asdo iu2Q#');
+            checkPasswordWarning(self.passwordIncorrect);
 
             pageObj.passwordInput.clear();
             pageObj.passwordInput.sendKeys('qwerty');
@@ -79,6 +90,28 @@ var PasswordFieldSuite = function () {
             pageObj.passwordInput.clear();
             pageObj.passwordInput.sendKeys('asdoiu2Q#');
             checkPasswordWarning(self.passwordGood);
+        });
+
+        it("should show only 1 warning about strength at a time", function () {
+            browser.get(url);
+
+            pageObj.passwordInput.sendKeys('123qwe');
+            checkPasswordWarning(self.passwordCommon);
+
+            pageObj.passwordInput.sendKeys(protractor.Key.BACK_SPACE);
+            checkNoPasswordWarning(self.passwordCommon);
+            checkPasswordWarning(self.passwordWeak);
+        });
+
+        it("should not allow pasword with leading or trailing spaces", function () {
+            browser.get(url);
+
+            pageObj.passwordInput.sendKeys(' 123qwe');
+            checkPasswordWarning(self.passwordIncorrect);
+
+            pageObj.passwordInput.clear();
+            pageObj.passwordInput.sendKeys('123qwe ');
+            checkPasswordWarning(self.passwordIncorrect);
         });
     }
 };
