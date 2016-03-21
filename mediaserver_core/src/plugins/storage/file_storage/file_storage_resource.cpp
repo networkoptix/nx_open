@@ -143,7 +143,7 @@ QString QnFileStorageResource::getPath() const
         return QUrl(url).path();
 }
 
-bool QnFileStorageResource::initOrUpdate() const
+bool QnFileStorageResource::initOrUpdateInternal() const
 {
     QString url;
     bool valid;
@@ -539,13 +539,18 @@ qint64 QnFileStorageResource::getTotalSpace()
     if (!m_valid)
         return QnStorageResource::kUnknownSize;
 
-    QString localPathCopy = getLocalPathSafe();
-
-    QnMutexLocker locker (&m_writeTestMutex);
     if (m_cachedTotalSpace <= 0)
-        m_cachedTotalSpace = getDiskTotalSpace(
-            localPathCopy.isEmpty() ? getPath() : localPathCopy
-        );
+    {
+        QString localPathCopy = getLocalPathSafe();
+
+        QnMutexLocker locker (&m_writeTestMutex);
+        if (m_cachedTotalSpace <= 0)
+        {
+            m_cachedTotalSpace = getDiskTotalSpace(
+                localPathCopy.isEmpty() ? getPath() : localPathCopy);
+        }
+    }
+
     return m_cachedTotalSpace;
 }
 
@@ -597,7 +602,7 @@ bool QnFileStorageResource::testWriteCapInternal() const
     return file.open(QIODevice::WriteOnly);
 }
 
-bool QnFileStorageResource::isAvailable() const
+bool QnFileStorageResource::initOrUpdate() const
 {
     QString localPathCopy;
     {
@@ -605,7 +610,7 @@ bool QnFileStorageResource::isAvailable() const
         localPathCopy = m_localPath;
     }
 
-    if (!initOrUpdate())
+    if (!initOrUpdateInternal())
         return false;
 
     if (!isStorageDirMounted())

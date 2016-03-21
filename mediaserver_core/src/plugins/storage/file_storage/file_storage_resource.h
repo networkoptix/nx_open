@@ -41,7 +41,7 @@ public:
     virtual qint64 getTotalSpace() override;
 
     virtual int getCapabilities() const override;
-    virtual bool isAvailable() const override;
+    virtual bool initOrUpdate() const override;
 
     virtual void setUrl(const QString& url) override;
 
@@ -60,7 +60,7 @@ public:
 private:
     virtual QString getPath() const override;
     QString removeProtocolPrefix(const QString& url);
-    bool initOrUpdate() const;
+    bool initOrUpdateInternal() const;
     bool updatePermissions() const;
     bool checkWriteCap() const;
     bool isStorageDirMounted() const;
@@ -94,7 +94,7 @@ private:
     mutable int         m_capabilities;
     mutable QString     m_localPath;
 
-    mutable qint64      m_cachedTotalSpace;
+    mutable std::atomic<qint64> m_cachedTotalSpace;
     mutable boost::optional<bool> m_writeCapCached;
     mutable QnMutex      m_writeTestMutex;
 };

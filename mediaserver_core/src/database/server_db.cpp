@@ -963,7 +963,7 @@ bool QnServerDb::getBookmarks(const QnVirtualCameraResourceList &cameras
 }
 
 bool QnServerDb::addBookmark(const QnCameraBookmark &bookmark) {
-    auto result = addOrUpdateBookmark(bookmark);
+    auto result = addOrUpdateBookmark(bookmark, false);
     if (result)
         updateBookmarkCount();
 
@@ -978,7 +978,8 @@ bool QnServerDb::updateBookmark(const QnCameraBookmark &bookmark)
 
     if (!containsBookmark(bookmark.guid))
         return false;
-    return addOrUpdateBookmark(bookmark);
+
+    return addOrUpdateBookmark(bookmark, true);
 }
 
 bool QnServerDb::containsBookmark(const QnUuid &bookmarkId) const
@@ -1024,23 +1025,27 @@ QnCameraBookmarkTagList QnServerDb::getBookmarkTags(int limit) {
 }
 
 
-bool QnServerDb::addOrUpdateBookmark( const QnCameraBookmark &bookmark) {
+bool QnServerDb::addOrUpdateBookmark(const QnCameraBookmark &bookmark, bool isUpdate) {
     NX_ASSERT(bookmark.isValid(), Q_FUNC_INFO, "Invalid bookmark must not be stored in database");
     if (!bookmark.isValid())
         return false;
+
+    const QString insertOrReplace = isUpdate ? lit("REPLACE") : lit("INSERT");
 
     QnDbTransactionLocker tran(getTransaction());
 
     int docId = 0;
     {
         QSqlQuery insQuery(m_sdb);
-        insQuery.prepare("INSERT OR REPLACE INTO bookmarks ( \
-                         guid, unique_id, start_time, duration, \
-                         name, description, timeout \
-                         ) VALUES ( \
-                         :guid, :cameraId, :startTimeMs, :durationMs, \
-                         :name, :description, :timeout \
-                         )");
+        insQuery.prepare(
+            insertOrReplace + lit(" INTO bookmarks ( \
+                guid, unique_id, start_time, duration, \
+                name, description, timeout \
+            ) VALUES ( \
+                :guid, :cameraId, :startTimeMs, :durationMs, \
+                :name, :description, :timeout \
+            )"));
+
         QnSql::bind(bookmark, &insQuery);
         if (!execSQLQuery(&insQuery, Q_FUNC_INFO))
             return false;
@@ -1048,6 +1053,7 @@ bool QnServerDb::addOrUpdateBookmark( const QnCameraBookmark &bookmark) {
         docId = insQuery.lastInsertId().toInt();
     }
 
+    if (isUpdate)
     {
         QSqlQuery cleanTagQuery(m_sdb);
         cleanTagQuery.prepare("DELETE FROM bookmark_tags WHERE bookmark_guid = ?");
@@ -1084,7 +1090,13 @@ bool QnServerDb::addOrUpdateBookmark( const QnCameraBookmark &bookmark) {
 
     {
         QSqlQuery query(m_sdb);
-        query.prepare("INSERT OR REPLACE INTO fts_bookmarks (docid, name, description, tags) VALUES ( :docid, :name, :description, :tags )");
+        query.prepare(
+            insertOrReplace + lit(" INTO fts_bookmarks (\
+                docid, name, description, tags \
+            ) VALUES ( \
+                :docid, :name, :description, :tags \
+            )"));
+
         query.bindValue(":docid", docId);
         query.bindValue(":name", bookmark.name);
         query.bindValue(":description", bookmark.description);

@@ -364,7 +364,7 @@ public:
                 break;
 
             QnStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnStorageResource> (*itr);
-            Qn::ResourceStatus status = fileStorage->isAvailable() ? Qn::Online : Qn::Offline;
+            Qn::ResourceStatus status = fileStorage->initOrUpdate() ? Qn::Online : Qn::Offline;
             if (fileStorage->getStatus() != status)
                 m_owner->changeStorageStatus(fileStorage, status);
 
