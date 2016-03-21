@@ -9,7 +9,9 @@
 #include <cstring>
 #include <memory>
 
-#include "version.h"
+#include <QtCore/QString>
+
+#include <utils/common/app_info.h>
 
 #ifdef _WIN32
 static int strcasecmp(const char * str1, const char * str2) { return strcmpi(str1, str2); }
@@ -1631,17 +1633,21 @@ namespace nx_http
 #if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
 #   define PRODUCT_NAME_SUFFIX " Mobile"
 #else
-#   define PRODUCT_NAME_SUFFIX
+#   define PRODUCT_NAME_SUFFIX ""
 #endif
 
-    static const StringType defaultUserAgentString = QN_PRODUCT_NAME_LONG PRODUCT_NAME_SUFFIX "/" QN_APPLICATION_VERSION " (" QN_ORGANIZATION_NAME ") " COMMON_USER_AGENT;
+    static const StringType defaultUserAgentString = lit("%1%2/%3 (%4) %5").arg(
+        QnAppInfo::productNameLong(), PRODUCT_NAME_SUFFIX, QnAppInfo::applicationVersion(), QnAppInfo::organizationName(), COMMON_USER_AGENT
+        ).toUtf8();
 
     StringType userAgentString()
     {
         return defaultUserAgentString;
     }
 
-    static const StringType defaultServerString = QN_PRODUCT_NAME "/" QN_APPLICATION_VERSION " (" QN_ORGANIZATION_NAME ") " COMMON_SERVER;
+    static const StringType defaultServerString = lit("%1/%2 (%3) %4").arg(
+        QnAppInfo::productNameLong(), QnAppInfo::applicationVersion(), QnAppInfo::organizationName(), COMMON_SERVER
+        ).toUtf8();
 
     StringType serverString()
     {

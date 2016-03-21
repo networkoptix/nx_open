@@ -56,6 +56,15 @@
 #include <events/mserver_business_rule_processor.h>
 
 #include <media_server/media_server_module.h>
+#include <media_server/media_server_app_info.h>
+#include <media_server/mserver_status_watcher.h>
+#include <media_server/server_message_processor.h>
+#include <media_server/settings.h>
+#include <media_server/serverutil.h>
+#include <media_server/server_update_tool.h>
+#include <media_server/server_connector.h>
+#include <media_server/file_connection_processor.h>
+#include <media_server/resource_status_watcher.h>
 
 #include <motion/motion_helper.h>
 
@@ -181,12 +190,6 @@
 #include <nx/network/socket_global.h>
 #include <nx/network/cloud/mediator_connector.h>
 
-#include <media_server/mserver_status_watcher.h>
-#include <media_server/server_message_processor.h>
-#include <media_server/settings.h>
-#include <media_server/serverutil.h>
-#include <media_server/server_update_tool.h>
-#include <media_server/server_connector.h>
 #include <utils/common/app_info.h>
 #include <transcoding/ffmpeg_video_transcoder.h>
 
@@ -207,7 +210,6 @@
 #include "proxy/proxy_receiver_connection_processor.h"
 #include "proxy/proxy_connection.h"
 #include "compatibility.h"
-#include "media_server/file_connection_processor.h"
 #include "streaming/hls/hls_session_pool.h"
 #include "streaming/hls/hls_server.h"
 #include "streaming/streaming_chunk_transcoder.h"
@@ -215,12 +217,10 @@
 #include "api/runtime_info_manager.h"
 #include "rest/handlers/old_client_connect_rest_handler.h"
 #include "nx_ec/data/api_conversion_functions.h"
-#include "media_server/resource_status_watcher.h"
 #include "nx_ec/dummy_handler.h"
 #include "ec2_statictics_reporter.h"
 #include "server/host_system_password_synchronizer.h"
 
-#include "version.h"
 #include "core/resource_management/resource_properties.h"
 #include "network/universal_request_processor.h"
 #include "core/resource/camera_history.h"
@@ -2728,7 +2728,7 @@ protected:
         QtSingleCoreApplication *application = this->application();
 
         QCoreApplication::setOrganizationName(QnAppInfo::organizationName());
-        QCoreApplication::setApplicationName(lit(QN_APPLICATION_NAME));
+        QCoreApplication::setApplicationName(QnServerAppInfo::applicationName());
         if (QCoreApplication::applicationVersion().isEmpty())
             QCoreApplication::setApplicationVersion(QnAppInfo::applicationVersion());
 

@@ -67,6 +67,12 @@
 #define QN_AX_TYPELIB_ID                "${ax.typeLibId}"
 #define QN_AX_APP_ID                    "${ax.appId}"
 
-#define QN_CLOUD_MODULES_XML            "${cloud.modulesXmlUrl}"
-
 #define VER_LINUX_ORGANIZATION_NAME     "${deb.customization.company.name}"
+
+/* 
+ * Really, guys!
+ * 
+ * DO NOT USE THESE CONSTANTS IN YOUR CODE. 
+ * DO NOT ADD NEW CONSTANTS HERE.
+ *
+ */

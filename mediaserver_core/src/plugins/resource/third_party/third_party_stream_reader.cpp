@@ -13,9 +13,10 @@
 #include <plugins/resource/third_party/motion_data_picture.h>
 #include <plugins/resource/onvif/dataprovider/onvif_mjpeg.h>
 #include <network/multicodec_rtp_reader.h>
+
+#include <utils/common/app_info.h>
 #include <utils/media/ffmpeg_helper.h>
 #include <utils/media/frame_type_extractor.h>
-#include <version.h>
 
 #include "third_party_audio_data_packet.h"
 #include "third_party_video_data_packet.h"
@@ -79,7 +80,7 @@ ThirdPartyStreamReader::~ThirdPartyStreamReader()
     stop();
 }
 
-static int sensitivityToMask[10] = 
+static int sensitivityToMask[10] =
 {
     255, //  0
     26,
@@ -260,7 +261,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
         if( mediaUrl.scheme().toLower() == lit("rtsp") )
         {
             QnMulticodecRtpReader* rtspStreamReader = new QnMulticodecRtpReader( m_resource );
-            rtspStreamReader->setUserAgent(lit(QN_PRODUCT_NAME));
+            rtspStreamReader->setUserAgent(QnAppInfo::productName());
             rtspStreamReader->setRequest( mediaUrlStr );
             rtspStreamReader->setRole(role);
             m_builtinStreamReader.reset( rtspStreamReader );
@@ -322,7 +323,7 @@ void ThirdPartyStreamReader::pleaseStop()
     else if( m_builtinStreamReader )
     {
         QnStoppable* stoppable = dynamic_cast<QnStoppable*>(m_builtinStreamReader.get());
-        //TODO #ak preferred way to remove dynamic_cast from here and inherit QnAbstractMediaStreamProvider from QnStoppable. 
+        //TODO #ak preferred way to remove dynamic_cast from here and inherit QnAbstractMediaStreamProvider from QnStoppable.
             //But, this will require virtual inheritance since CLServerPushStreamReader (base of MJPEGStreamReader) indirectly inherits QnStoppable.
         if( stoppable )
             stoppable->pleaseStop();
