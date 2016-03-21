@@ -538,6 +538,27 @@ void socketSingleAioThread(
         each->pleaseStopSync();
 }
 
+template<typename ClientSocketMaker>
+void connectToBadAddress(const ClientSocketMaker& clientMaker)
+{
+    const std::chrono::seconds sendTimeout(1);
+
+    auto client = clientMaker();
+    ASSERT_TRUE(client->setNonBlockingMode(true));
+    ASSERT_TRUE(client->setSendTimeout(
+        std::chrono::duration_cast<std::chrono::milliseconds>(sendTimeout).count()));
+    std::promise<SystemError::ErrorCode> connectCompletedPromise;
+    client->connectAsync(
+        //SocketAddress(HostAddress::localhost, (rand() % 32000) + 4096),
+        SocketAddress("abdasdf:123"),
+        [&connectCompletedPromise](SystemError::ErrorCode errorCode)
+        {
+            connectCompletedPromise.set_value(errorCode);
+        });
+    const auto errorCode = connectCompletedPromise.get_future().get();
+    ASSERT_NE(SystemError::noError, errorCode);
+}
+
 template<typename ServerSocketMaker>
 void socketAcceptTimeoutSync(
     const ServerSocketMaker& serverMaker,
@@ -591,6 +612,8 @@ void socketAcceptTimeoutAsync(
         { nx::network::test::socketSingleAioThread(mkClient); }                 \
     Type(Name, Shutdown)                                                        \
         { nx::network::test::shutdownSocket(mkServer, mkClient); }              \
+    Type(Name, connectToBadAddress)                                                 \
+        { nx::network::test::connectToBadAddress(mkClient); }                 \
 
 #define NX_NETWORK_SERVER_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient)     \
     Type(Name, SimpleAcceptMixed)                                               \
