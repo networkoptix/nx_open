@@ -128,7 +128,6 @@ namespace ite
         m_blockAutoScan(false)
     {
         Instance = this;
-        m_rescanTimer.restart();
     }
 
     DiscoveryManager::~DiscoveryManager()
@@ -202,11 +201,12 @@ namespace ite
 
     int DiscoveryManager::findCameras(nxcip::CameraInfo * cameras, const char * opt)
     {
-        // refactor
-        if (m_needScan)
+        static const uint64_t kRescanTimeoutMs = 1000 * 120;
+        if (m_needScan || m_rescanTimer.elapsedMS() > kRescanTimeoutMs)
         {
             m_needScan = false;
             scan_2();
+            m_rescanTimer.restart();
         }
 
         int cameraCount = 0;
@@ -433,7 +433,8 @@ namespace ite
         std::vector<std::string> names;
         getRxDevNames(names);
 
-        for (size_t i = 0; i < names.size(); ++i) {
+        for (size_t i = 0; i < names.size(); ++i) 
+        {
             unsigned rxID = RxDevice::dev2id(names[i]);
             std::lock_guard<std::mutex> lk(m_mutex);
 
