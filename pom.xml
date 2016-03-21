@@ -165,6 +165,7 @@
         <!--QT plugins used-->
         <qtplugin1>imageformats</qtplugin1>
         <qtplugin2>platforms</qtplugin2>
+	<!-- Linux Only -->
         <qtplugin3/>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -542,6 +543,7 @@
                 </os>
             </activation>
             <properties>
+                <qtplugin3>platforminputcontexts</qtplugin3>
                 <platform>linux</platform>
                 <qt.spec>linux-g++</qt.spec>
                 <qt.classifier>${platform}-${arch}-${build.configuration}</qt.classifier>
