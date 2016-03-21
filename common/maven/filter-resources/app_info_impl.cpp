@@ -3,9 +3,6 @@
 //
 #include <utils/common/app_info.h>
 
-//unused variable, why was in required?
-#define QN_BUILDENV_PATH                "${environment.dir}"
-
 QString QnAppInfo::organizationName() {
     return QStringLiteral("${company.name}");
 }

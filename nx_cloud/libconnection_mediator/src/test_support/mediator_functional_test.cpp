@@ -245,7 +245,7 @@ std::vector<std::unique_ptr<MediaServerEmulator>>
 //            moduleInfo().realm.c_str(),
 //            password->c_str()).constData();
 //    if (accountData->customization.empty())
-//        accountData->customization = QN_CUSTOMIZATION_NAME;
+//        accountData->customization = QnAppInfo::customizationName();
 //
 //    auto connection = connectionFactory()->createConnection("", "");
 //
