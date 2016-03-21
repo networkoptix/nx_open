@@ -466,16 +466,20 @@ std::vector<Guard> AddressResolver::grabHandlers(
 
             it->second.inProgress = true;
             guards.push_back( Guard( [ = ]() {
+                auto resolveDataPair = std::move(*it);
+                {
+                    QnMutexLocker lk(&m_mutex);
+                    m_requests.erase(it);
+                }
+
                 auto code = entries.empty() ? lastErrorCode : SystemError::noError;
-                it->second.handler( code, std::move( entries ) );
+                resolveDataPair.second.handler( code, std::move( entries ) );
 
                 QnMutexLocker lk( &m_mutex );
                 NX_LOGX( lit( "Address %1 is resolved by request %2 to %3" )
                          .arg( info->first.toString() )
-                         .arg( reinterpret_cast< size_t >( it->first ) )
+                         .arg( reinterpret_cast< size_t >(resolveDataPair.first ) )
                          .arg( containerString( entries ) ), cl_logDEBUG2 );
-
-                m_requests.erase( it );
                 m_condition.wakeAll();
             } ) );
         }
