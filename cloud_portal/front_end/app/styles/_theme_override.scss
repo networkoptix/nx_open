@@ -9,6 +9,9 @@ $font-size-a-bit-large:   ceil($font-size-base * 1.15); //~16px - we just need 1
 .panel{
   box-shadow: 0 1px 2px transparentize($dark15,0.9);
 }
+.panel-heading {
+  border-bottom: none;
+}
 
 .navbar{
   box-shadow: 0 6px 10px $light3;
@@ -270,7 +273,6 @@ label {
   line-height:  16px;
   margin-bottom: 8px;
 }
-
 
 .radio,
 .checkbox {
