@@ -134,7 +134,7 @@ def get_timestamp_from_package_config(file_name):
     config.read(file_name)
 
     if not config.has_option("General", "time"):
-        return None
+        return 0
 
     return config.getint("General", "time")
 

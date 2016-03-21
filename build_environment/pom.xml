@@ -51,7 +51,7 @@
                                 <fileset>
                                     <directory>${project.build.directory}</directory>
                                     <includes>
-                                        <include>**/*.rdpack</include>
+                                        <include>.sync</include>
                                     </includes>
                                 </fileset>
                             </filesets>

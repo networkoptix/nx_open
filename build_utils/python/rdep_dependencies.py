@@ -16,8 +16,41 @@ if time.timezone == 28800:
     SYNC_URL = "rsync://la.hdw.mx/buildenv/rdep/packages"
 elif time.timezone == -10800:
     SYNC_URL = "rsync://enk.me/buildenv/rdep/packages"
+SYNC_FILE = ".sync"
+INSTALL_FILE = ".install"
 
 GENERATE_CMAKE_DEPS = False
+
+def get_package_timestamp(target_dir, package, install_time = False):
+    config_file = os.path.join(
+        target_dir, INSTALL_FILE if install_time else SYNC_FILE)
+    if not os.path.exists(config_file):
+        return None
+
+    config = ConfigParser.ConfigParser()
+    config.read(config_file)
+
+    if not config.has_option("General", package):
+        return None
+
+    return config.getint("General", package)
+
+def set_package_synctime(target_dir, package, timestamp, install_time = False):
+    config_file = os.path.join(
+        target_dir, INSTALL_FILE if install_time else SYNC_FILE)
+
+    config = ConfigParser.ConfigParser()
+
+    if os.path.isfile(config_file):
+        config.read(config_file)
+
+    if not config.has_section("General"):
+        config.add_section("General")
+
+    config.set("General", package, timestamp)
+
+    with open(config_file, "w") as file:
+        config.write(file)
 
 def configuration_name(debug):
     return "debug" if debug else "release"
@@ -53,22 +86,34 @@ def append_deps(deps_file, debug = False):
         file.write("include({0})\n".format(deps_file))
 
 def get_package_for_configuration(target, package, target_dir, debug):
-    installation_marker = (package if not debug else package + "-debug") + rdep.PACKAGE_CONFIG_NAME
-    description_file = os.path.join(target_dir, installation_marker)
-    installed = os.path.isfile(description_file)
-    if installed:
-        location = rdep.locate_package(REPOSITORY_PATH, target, package, debug)
-        if not location:
-            installed = False
+    full_name = package if not debug else package + "-debug"
 
-    if not installed:
+    synched = False
+    installed = False
+
+    sync_ts = get_package_timestamp(target_dir, full_name)
+    repo_ts = None
+
+    location = rdep.locate_package(REPOSITORY_PATH, target, package, debug)
+    if location and sync_ts != None:
+        repo_ts = rdep.get_package_timestamp(location)
+        if repo_ts != None:
+            synched = (repo_ts == sync_ts)
+
+    if not synched:
         print "Fetching package {0} for {1}".format(package, configuration_name(debug))
         rdep.fetch_packages(REPOSITORY_PATH, SYNC_URL, target, [ package ], debug)
         location = rdep.locate_package(REPOSITORY_PATH, target, package, debug)
+        repo_ts = rdep.get_package_timestamp(location)
+        set_package_synctime(target_dir, full_name, repo_ts)
 
     if not location:
         print "Could not locate {0}".format(package)
         return False
+
+    install_ts = get_package_timestamp(target_dir, full_name, install_time=True)
+    if install_ts != None and install_ts == repo_ts:
+        installed = True
 
     deps_file = os.path.join(location, package + get_deps_file_suffix())
     if not os.path.isfile(deps_file):
@@ -79,7 +124,7 @@ def get_package_for_configuration(target, package, target_dir, debug):
     if not installed:
         print "Copying package {0} into {1} for {2}".format(package, target_dir, configuration_name(debug))
         rdep.copy_package(REPOSITORY_PATH, target, package, target_dir, debug)
-        shutil.copy(os.path.join(location, rdep.PACKAGE_CONFIG_NAME), description_file)
+        set_package_synctime(target_dir, full_name, repo_ts, install_time=True)
 
     return True
 
@@ -104,6 +149,9 @@ def get_dependencies(target, packages, target_dir, debug = False, deps_file = "q
 
     if not os.path.isdir(REPOSITORY_PATH):
         os.makedirs(REPOSITORY_PATH)
+
+    if not os.path.isdir(target_dir):
+        os.makedirs(target_dir)
 
     if not rdep.check_repository(REPOSITORY_PATH):
         if not rdep.init_repository(REPOSITORY_PATH, SYNC_URL):
