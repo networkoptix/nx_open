@@ -32,19 +32,13 @@ Item
 
     function toggle()
     {
-        if (!correctTile || (tileHolder.state == "moving"))
-        {
-            tileHolder.state = "collapsed";
-            return;
-        }
-
-        var isCollapsed = (tileHolder.state == "collapsed");
-        tileHolder.state = "moving";
-        tileHolder.state = (isCollapsed ? "expanded" : "collapsed");
+        tileHolder.state = (!correctTile || (tileHolder.state == "expanded")
+            ? "collapsed" : "expanded");
     }
 
     implicitWidth: 280;
     implicitHeight: 96;
+    z: (transition.running ? 1 : 0)
 
     Item
     {        
@@ -54,17 +48,16 @@ Item
             + centralAreaLoader.height + expandedAreaLoader.height);
         width: thisComponent.width;
 
-        onStateChanged: console.log(state, "---")
         state: "collapsed";
         states:
         [
             State
             {
                 name: "collapsed";
-                PropertyChanges
+
+                ParentChange
                 {
                     target: tileHolder;
-
                     parent: thisComponent;
                     x: 0;
                     y: 0;
@@ -74,25 +67,11 @@ Item
 
             State
             {
-                name: "moving";
-                PropertyChanges
-                {
-                    target: tileHolder;
-
-                    parent: visualParent;
-                    x: thisComponent.mapToItem(visualParent, 0, 0).x;
-                    y: thisComponent.mapToItem(visualParent, 0, 0).y;
-                    height: thisComponent.height;
-                }
-            },
-
-            State
-            {
                 name: "expanded";
-                PropertyChanges
+
+                ParentChange
                 {
                     target: tileHolder;
-
                     parent: visualParent;
                     x: (visualParent.width - tileHolder.width) / 2;
                     y: (visualParent.height - expadedHeight) / 2;
@@ -101,46 +80,27 @@ Item
             }
         ]
 
-        transitions:
-        [
-            Transition
+        transitions: Transition
+        {
+            id: transition;
+            onRunningChanged: console.log("r: ", running)
+            ParentAnimation
             {
-                from: "expanded"; to: "moving";
-                //enabled: (tileHolder.state != "collapsed");
                 NumberAnimation
                 {
-                    properties:"x, y";
+                    properties: "x, y";
                     easing.type: Easing.InOutCubic;
-                    duration: 4000;
+                    duration: 400;
                 }
 
                 NumberAnimation
                 {
                     properties: "height";
                     easing.type: Easing.OutCubic;
-                    duration: 4000;
-                }
-            },
-
-            Transition
-            {
-                from: "moving"; to: "expanded";
-                //enabled: (tileHolder.state != "collapsed");
-                NumberAnimation
-                {
-                    properties:"x, y";
-                    easing.type: Easing.InOutCubic;
-                    duration: 4000;
-                }
-
-                NumberAnimation
-                {
-                    properties: "height";
-                    easing.type: Easing.OutCubic;
-                    duration: 4000;
+                    duration: 400;
                 }
             }
-        ]
+        }
 
         DropShadow
         {
@@ -255,7 +215,7 @@ Item
                     anchors.left: parent.left;
                     anchors.right: parent.right;
 
-                    visible: thisComponent.isExpanded;
+                    visible: (transition.running || isExpanded);
                     sourceComponent: thisComponent.expandedAreaDelegate;
                 }
             }
