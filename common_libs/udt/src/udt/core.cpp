@@ -982,6 +982,7 @@ void CUDT::close()
    }
    //else if (m_bConnecting)
    //{
+   if (m_pRcvQueue)
       m_pRcvQueue->removeConnector(m_SocketID);
    //}
 
