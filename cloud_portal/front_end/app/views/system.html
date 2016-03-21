@@ -13,13 +13,9 @@
         </div>
         <div class="col-sm-6">
             <div class="pull-right-sm">
-                <div class="btn-group">
-                    <button class="btn btn-default" ng-click="share()" ng-if="system.info.sharingPermissions.length">
-                        <span class="glyphicon glyphicon-share"></span> Share</button>
-
-                    <button class="btn btn-default" ng-click="delete()">
-                        <span class="glyphicon glyphicon-trash"></span> Remove</button>
-                </div>&nbsp;
+                <button class="btn btn-default" ng-click="share()" ng-if="system.info.sharingPermissions.length">
+                    <span class="glyphicon glyphicon-share"></span> Share</button>
+                &nbsp;
                 <button class="btn btn-default" ng-click="open(null)"
                         ng-disabled="system.info.status!=Config.systemStatuses.onlineStatus">Open in Nx Witness</button>
             </div>
