@@ -264,8 +264,17 @@ a .product-name:after {
   top: 34px;
   left:50%;
   transform: translateX(-50%);
-  min-width: 600px;
   z-index:1100;
+
+
+
+  @media (max-width: $screen-sm-max) {
+    min-width: 100%;
+  }
+
+  @media (min-width: $screen-sm-min) {
+    min-width: 600px;
+  }
 
 
  &.ng-animate {
