@@ -227,13 +227,13 @@ void QnSystrayWindow::mediaServerInfoUpdated(quint64 status) {
         }
 
         if (m_prevMediaServerStatus >= 0 && m_prevMediaServerStatus != SERVICE_STOPPED && !m_needStartMediaServer) {
-            showMessage(QnTraytoolAppInfo::applicationDisplayName(), tr("Media server has been stopped"));
+            showMessage(QnTraytoolAppInfo::applicationDisplayName(), tr("Server has been stopped"));
         }
     }
     else if (status == SERVICE_RUNNING)
     {
         if (m_prevMediaServerStatus >= 0 && m_prevMediaServerStatus != SERVICE_RUNNING) {
-            showMessage(QnTraytoolAppInfo::applicationDisplayName(), tr("Media server has been started"));
+            showMessage(QnTraytoolAppInfo::applicationDisplayName(), tr("Server has been started"));
         }
     }
     m_prevMediaServerStatus = status;
@@ -339,7 +339,7 @@ void QnSystrayWindow::at_mediaServerStopAction()
     if (!isServerInstalled())
         return;
 
-    if (QMessageBox::question(0, tr(""), tr("Media server will be stopped. Continue?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
+    if (QMessageBox::question(0, QnTraytoolAppInfo::applicationDisplayName(), tr("Server will be stopped. Continue?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
         StopServiceAsyncTask *stopTask = new StopServiceAsyncTask(m_mediaServerHandle);
         connect(stopTask, SIGNAL(finished()), this, SLOT(updateServiceInfo()), Qt::QueuedConnection);
         QThreadPool::globalInstance()->start(stopTask);
@@ -421,24 +421,24 @@ void QnSystrayWindow::createActions() {
     m_quitAction = new QAction(tr("&Quit"), this);
     connect(m_quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
 
-    m_showMediaServerLogAction = new QAction(tr("Show &Media Server Log"), this);
+    m_showMediaServerLogAction = new QAction(tr("Show Server Log"), this);
     m_showMediaServerLogAction->setObjectName(lit("showMediaServerLog"));
     m_actions.push_back(m_showMediaServerLogAction);
     connectElevatedAction(m_showMediaServerLogAction, SIGNAL(triggered()), this, SLOT(onShowMediaServerLogAction()));
 
-    m_mediaServerStartAction = new QAction(QString(tr("Start Media Server")), this);
+    m_mediaServerStartAction = new QAction(QString(tr("Start Server")), this);
     m_mediaServerStartAction->setObjectName(lit("startMediaServer"));
     m_actions.push_back(m_mediaServerStartAction);
     connectElevatedAction(m_mediaServerStartAction, SIGNAL(triggered()), this, SLOT(at_mediaServerStartAction()));
     m_mediaServerStartAction->setVisible(false);
 
-    m_mediaServerStopAction = new QAction(QString(tr("Stop Media Server")), this);
+    m_mediaServerStopAction = new QAction(QString(tr("Stop Server")), this);
     m_mediaServerStopAction->setObjectName(lit("stopMediaServer"));
     m_actions.push_back(m_mediaServerStopAction);
     connectElevatedAction(m_mediaServerStopAction, SIGNAL(triggered()), this, SLOT(at_mediaServerStopAction()));
     m_mediaServerStopAction->setVisible(false);
 
-    m_mediaServerWebAction = new QAction(QString(tr("Media Server Web Page")), this);
+    m_mediaServerWebAction = new QAction(QString(tr("Server Web Page")), this);
     m_mediaServerWebAction->setObjectName(lit("startMediaServer"));
     m_actions.push_back(m_mediaServerWebAction);
     QObject::connect(m_mediaServerWebAction, SIGNAL(triggered()), this, SLOT(at_mediaServerWebAction()));
@@ -451,7 +451,8 @@ void QnSystrayWindow::updateActions() {
     m_mediaServerWebAction->setEnabled(isServerInstalled());
 }
 
-void QnSystrayWindow::onShowMediaServerLogAction() {
+void QnSystrayWindow::onShowMediaServerLogAction()
+{
     if (!isServerInstalled())
         return;
 
@@ -472,7 +473,8 @@ QString QnSystrayWindow::nameByAction(QAction* action)
     return action->objectName();
 }
 
-void QnSystrayWindow::createTrayIcon() {
+void QnSystrayWindow::createTrayIcon()
+{
     QMenu* trayIconMenu = new QMenu(this);
 
     trayIconMenu->addAction(m_mediaServerWebAction);
@@ -493,7 +495,8 @@ void QnSystrayWindow::createTrayIcon() {
     m_trayIcon->show();
 }
 
-bool QnSystrayWindow::isServerInstalled() const {
+bool QnSystrayWindow::isServerInstalled() const
+{
     return m_mediaServerHandle != 0;
 }
 
