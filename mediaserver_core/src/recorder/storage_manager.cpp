@@ -1509,12 +1509,6 @@ bool QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
                     deleteRecordsToTime(altCatalog, minTime);
                 else
                     deleteRecordsToTime(altCatalog, DATETIME_NOW);
-                if (catalog->isEmpty() && altCatalog->isEmpty())
-                    break; // nothing to delete
-            }
-            else {
-                if (catalog->isEmpty())
-                    break; // nothing to delete
             }
         }
         else
