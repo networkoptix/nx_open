@@ -79,8 +79,8 @@ void CloudStreamSocket::shutdown()
     pleaseStop(
         [this, &stoppedPromise]()
         {
-            auto* sendPromise = m_sendPromisePtr.exchange(nullptr);
-            auto* recvPromise = m_recvPromisePtr.exchange(nullptr);
+            auto sendPromise = m_sendPromisePtr.exchange(nullptr);
+            auto recvPromise = m_recvPromisePtr.exchange(nullptr);
             
             const auto interrupted = std::make_pair(SystemError::interrupted, 0);
 
@@ -127,7 +127,7 @@ bool CloudStreamSocket::connect(
             SystemError::setLastErrorCode(SystemError::interrupted);
             return false;
         }
-        auto* oldPromisePtr = m_sendPromisePtr.exchange(&promise);
+        auto oldPromisePtr = m_sendPromisePtr.exchange(&promise);
         NX_ASSERT(oldPromisePtr == nullptr);
     }
 
@@ -137,7 +137,7 @@ bool CloudStreamSocket::connect(
         {
             //to ensure that socket is not used by aio sub-system anymore, we use post
             m_aioThreadBinder->post([this, code](){
-                auto* promisePtr = m_sendPromisePtr.exchange(nullptr);
+                auto promisePtr = m_sendPromisePtr.exchange(nullptr);
                 if (promisePtr)
                     promisePtr->set_value(std::make_pair(code, 0));
             });
@@ -186,7 +186,7 @@ int CloudStreamSocket::send(const void* buffer, unsigned int bufferLen)
             SystemError::setLastErrorCode(SystemError::interrupted);
             return -1;
         }
-        auto* oldPromisePtr = m_sendPromisePtr.exchange(&promise);
+        auto oldPromisePtr = m_sendPromisePtr.exchange(&promise);
         NX_ASSERT(oldPromisePtr == nullptr);
     }
 
@@ -200,7 +200,7 @@ int CloudStreamSocket::send(const void* buffer, unsigned int bufferLen)
             m_aioThreadBinder->post(
                 [this, code, size, &promise]()
                 {
-                    auto* promisePtr = m_sendPromisePtr.exchange(nullptr);
+                    auto promisePtr = m_sendPromisePtr.exchange(nullptr);
                     if (promisePtr)
                         promisePtr->set_value(std::make_pair(code, size));
                 });
@@ -443,7 +443,7 @@ int CloudStreamSocket::recvImpl(nx::Buffer* const buf)
             SystemError::setLastErrorCode(SystemError::interrupted);
             return -1;
         }
-        auto* oldPromisePtr = m_recvPromisePtr.exchange(&promise);
+        auto oldPromisePtr = m_recvPromisePtr.exchange(&promise);
         NX_ASSERT(oldPromisePtr == nullptr);
     }
 
@@ -454,7 +454,7 @@ int CloudStreamSocket::recvImpl(nx::Buffer* const buf)
             m_aioThreadBinder->post(
                 [this, code, size, &promise]()
                 {
-                    auto* promisePtr = m_recvPromisePtr.exchange(nullptr);
+                    auto promisePtr = m_recvPromisePtr.exchange(nullptr);
                     if (promisePtr)
                         promisePtr->set_value(std::make_pair(code, size));
                 });
