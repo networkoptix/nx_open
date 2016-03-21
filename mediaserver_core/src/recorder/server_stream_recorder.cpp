@@ -28,6 +28,8 @@
 #include "utils/common/util.h" /* For MAX_FRAME_DURATION, MIN_FRAME_DURATION. */
 
 static const int MOTION_PREBUFFER_SIZE = 8;
+static const float HIGH_DATA_LIMIT = 0.7;
+static const float LOW_DATA_LIMIT = 0.3;
 
 QnServerStreamRecorder::QnServerStreamRecorder(
     const QnResourcePtr                 &dev,
@@ -147,20 +149,16 @@ void QnServerStreamRecorder::putData(const QnAbstractDataPacketPtr& nonConstData
     if (!isRunning())
         return;
 
-    const bool halfQueueReached = m_queuedSize >= m_maxRecordQueueSizeBytes/2 || (size_t)m_dataQueue.size() >= m_maxRecordQueueSizeElements/2;
-    if (!m_rebuildBlocked && halfQueueReached)
+    bool isNotOwerflowed;
     {
-        m_rebuildBlocked = true;
-        DeviceFileCatalog::rebuildPause(this);
-    }
-    else if (m_rebuildBlocked && !halfQueueReached)
-    {
-        m_rebuildBlocked = false;
-        DeviceFileCatalog::rebuildResume(this);
+        QnMutexLocker lock(&m_queueSizeMutex);
+        isNotOwerflowed = m_queuedSize <= m_maxRecordQueueSizeBytes &&
+            (size_t)m_dataQueue.size() < m_maxRecordQueueSizeElements;
+
+        (void)(pauseRebuildIfHighData(&lock) || resumeRebuildIfLowData(&lock));
     }
 
-    bool rez = m_queuedSize <= m_maxRecordQueueSizeBytes && (size_t)m_dataQueue.size() < m_maxRecordQueueSizeElements;
-    if (!rez) 
+    if (!isNotOwerflowed)
     {
         if (!m_recordingContextVector.empty())
         {
@@ -185,8 +183,10 @@ void QnServerStreamRecorder::putData(const QnAbstractDataPacketPtr& nonConstData
         qWarning() << "HDD/SSD is slowing down recording for camera " << m_device->getUniqueId() << ". "<<m_dataQueue.size()<<" frames have been dropped!";
         markNeedKeyData();
         m_dataQueue.clear();
+
         QnMutexLocker lock( &m_queueSizeMutex );
         m_queuedSize = 0;
+        resumeRebuild(&lock);
         return;
     }
 
@@ -522,6 +522,7 @@ bool QnServerStreamRecorder::processData(const QnAbstractDataPacketPtr& data)
     {
         QnMutexLocker lock( &m_queueSizeMutex );
         m_queuedSize -= media->dataSize();
+        resumeRebuildIfLowData(&lock);
     }
 
     // for empty schedule we record all time
@@ -563,6 +564,44 @@ bool QnServerStreamRecorder::isRedundantSyncOn() const
 
     NX_ASSERT(m_catalog == QnServer::LowQualityCatalog, Q_FUNC_INFO, "Only two options are allowed");
     return cameraBackupQualities.testFlag(Qn::CameraBackup_LowQuality);
+}
+
+bool QnServerStreamRecorder::pauseRebuildIfHighData(QnMutexLockerBase* locker)
+{
+    if (!m_rebuildBlocked && (
+        (float)m_queuedSize > m_maxRecordQueueSizeBytes * HIGH_DATA_LIMIT ||
+        (float)m_dataQueue.size() > m_maxRecordQueueSizeElements * HIGH_DATA_LIMIT))
+    {
+        m_rebuildBlocked = true;
+        locker->unlock();
+        DeviceFileCatalog::rebuildPause(this);
+        return true;
+    }
+
+    return false;
+}
+
+bool QnServerStreamRecorder::resumeRebuildIfLowData(QnMutexLockerBase* locker)
+{
+    if (m_rebuildBlocked && (
+        (float)m_queuedSize < m_maxRecordQueueSizeBytes * LOW_DATA_LIMIT &&
+        (float)m_dataQueue.size() < m_maxRecordQueueSizeElements * LOW_DATA_LIMIT))
+    {
+        resumeRebuild(locker);
+        return true;
+    }
+
+    return false;
+}
+
+void QnServerStreamRecorder::resumeRebuild(QnMutexLockerBase* locker)
+{
+    if (m_rebuildBlocked)
+    {
+        m_rebuildBlocked = false;
+        locker->unlock();
+        DeviceFileCatalog::rebuildResume(this);
+    }
 }
 
 void QnServerStreamRecorder::getStoragesAndFileNames(QnAbstractMediaStreamDataProvider* provider)
@@ -656,14 +695,10 @@ void QnServerStreamRecorder::endOfRun()
     if(m_device->getStatus() == Qn::Recording)
         m_device->setStatus(Qn::Online);
 
-    if (m_rebuildBlocked) {
-        m_rebuildBlocked = false;
-        DeviceFileCatalog::rebuildResume(this);
-    }
-
     QnMutexLocker lock( &m_queueSizeMutex );
     m_dataQueue.clear();
     m_queuedSize = 0;
+    resumeRebuild(&lock);
 }
 
 void QnServerStreamRecorder::setDualStreamingHelper(const QnDualStreamingHelperPtr& helper)
