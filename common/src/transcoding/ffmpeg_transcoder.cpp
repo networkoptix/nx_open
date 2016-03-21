@@ -20,6 +20,13 @@ static qint32 ffmpegReadPacket(void *opaque, quint8* buf, int size)
     return 0;
 }
 
+bool QnFfmpegTranscoder::isCodecSupported(CodecID id) const
+{
+    if (!m_formatCtx || !m_formatCtx->oformat)
+        return false;
+    return avformat_query_codec(m_formatCtx->oformat, id, FF_COMPLIANCE_NORMAL) == 1;
+}
+
 static qint32 ffmpegWritePacket(void *opaque, quint8* buf, int size)
 {
     Q_UNUSED(opaque)
@@ -196,7 +203,7 @@ int QnFfmpegTranscoder::setContainer(const QString& container)
 
 int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const QnConstCompressedAudioDataPtr& audio)
 {
-    if (m_videoCodec != CODEC_ID_NONE)
+    if (video && m_videoCodec != CODEC_ID_NONE)
     {
         AVStream* videoStream = avformat_new_stream(m_formatCtx, nullptr);
         if (videoStream == 0)
@@ -269,12 +276,12 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
         videoStream->first_dts = 0;
     }
 
-    if (m_aTranscoder && !m_aTranscoder->open(audio))
+    if (audio && m_aTranscoder && !m_aTranscoder->open(audio))
     {
         m_audioCodec = CODEC_ID_NONE; // can't open transcoder. disable audio
     }
 
-    if (m_audioCodec != CODEC_ID_NONE)
+    if (audio && m_audioCodec != CODEC_ID_NONE)
     {
         //Q_ASSERT_X(false, Q_FUNC_INFO, "Not implemented! Under construction!!!");
 
@@ -332,6 +339,17 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
         NX_LOG(m_lastErrMessage, cl_logERROR);
         return -3;
     }
+
+    if (video)
+        m_initializedVideo = true;
+    else
+        m_vTranscoder.reset();
+
+    if (audio)
+        m_initializedAudio = true;
+    else
+        m_aTranscoder.reset();
+
     m_initialized = true;
     return 0;
 }
