@@ -342,6 +342,17 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
         NX_LOG(m_lastErrMessage, cl_logERROR);
         return -3;
     }
+
+    if (video)
+        m_initializedVideo = true;
+    else
+        m_vTranscoder.reset();
+
+    if (audio)
+        m_initializedAudio = true;
+    else
+        m_aTranscoder.reset();
+
     m_initialized = true;
     return 0;
 }

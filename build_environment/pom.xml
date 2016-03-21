@@ -51,7 +51,7 @@
                                 <fileset>
                                     <directory>${project.build.directory}</directory>
                                     <includes>
-                                        <include>**/*.rdpack</include>
+                                        <include>.sync</include>
                                     </includes>
                                 </fileset>
                             </filesets>
@@ -250,7 +250,7 @@
                 <dependency>
                     <groupId>com.microsoft</groupId>
                     <artifactId>redistributable</artifactId>
-                    <version>vs2015-SNAPSHOT</version>
+                    <version>vs2012-SNAPSHOT</version>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}</classifier>
                 </dependency>
