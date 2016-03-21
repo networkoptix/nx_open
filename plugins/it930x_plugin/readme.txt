@@ -1,1 +1,0 @@
-This plugin adds support of Pacidal DVB-T camera/receiver.
