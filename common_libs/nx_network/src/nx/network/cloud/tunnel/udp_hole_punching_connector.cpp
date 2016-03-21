@@ -220,25 +220,19 @@ void UdpHolePunchingTunnelConnector::onConnectResponse(
 
     m_mediatorUdpClient.reset();
 
+    udtConnection->bindToAioThread(m_timer.getAioThread());
     m_udtConnection = std::move(udtConnection);
     
     m_udtConnection->connectAsync(
         *m_targetHostUdpAddress,
         [this](SystemError::ErrorCode errorCode)
         {
-            //TODO #ak currently, regular and UDT sockets live in different aio threads.
-                //That's why we have to use all that posts here 
-                //to move execution to m_timer's aio thread
+            //need post here to be sure m_udtConnection can be safely removed from any thread
             m_udtConnection->post(
-                [this, errorCode]()
-                {
-                    //m_udtConnection can be safely removed by now
-                    //moving execution m_timer's aio thread
-                    m_timer.post(std::bind(
-                        &UdpHolePunchingTunnelConnector::onUdtConnectionEstablished,
-                        this,
-                        errorCode));
-                });
+                std::bind(
+                    &UdpHolePunchingTunnelConnector::onUdtConnectionEstablished,
+                    this,
+                    errorCode));
         });
 }
 
