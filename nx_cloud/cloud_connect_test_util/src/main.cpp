@@ -218,3 +218,8 @@ void printHelp(int argc, char* argv[])
         "\n"
         << std::endl;
 }
+
+
+//--http-client --url=http://admin:admin@server1.ffc8e5a2-a173-4b3d-8627-6ab73d6b234d/api/gettime
+//--connect --target=server1.ffc8e5a2-a173-4b3d-8627-6ab73d6b234d --max-concurrent-connections=1
+//--listen --server-id=server1 --cloud-credentials=ffc8e5a2-a173-4b3d-8627-6ab73d6b234d:bee7d48e-d05f-43ec-aac9-ba404d6a55e3
