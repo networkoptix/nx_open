@@ -22,19 +22,25 @@ Item
     {
         target: thisComponent;
         property: "isExpanded";
-        value: isExpandedPrivate && correctTile;
+        value: (tileHolder.state !== "collapsed") && correctTile;
     }
 
     property alias centralArea: centralAreaLoader.item;
     property alias expandedArea: expandedAreaLoader.item;
 
-    property bool isExpandedPrivate: false;
-
     signal connectClicked();
 
     function toggle()
     {
-        thisComponent.isExpandedPrivate = !thisComponent.isExpandedPrivate;
+        if (!correctTile || (tileHolder.state == "moving"))
+        {
+            tileHolder.state = "collapsed";
+            return;
+        }
+
+        var isCollapsed = (tileHolder.state == "collapsed");
+        tileHolder.state = "moving";
+        tileHolder.state = (isCollapsed ? "expanded" : "collapsed");
     }
 
     implicitWidth: 280;
@@ -44,14 +50,97 @@ Item
     {        
         id: tileHolder;
 
-        parent: (isExpanded ? visualParent : thisComponent);
-
-        x: (thisComponent.isExpanded ? (visualParent.width - width) / 2 : 0);
-        y: (thisComponent.isExpanded ? (visualParent.height - height) / 2: 0);
+        readonly property real expadedHeight: (loadersColumn.y
+            + centralAreaLoader.height + expandedAreaLoader.height);
         width: thisComponent.width;
-        height: (thisComponent.isExpanded
-            ? loadersColumn.y + loadersColumn.height
-            : thisComponent.height);
+
+        onStateChanged: console.log(state, "---")
+        state: "collapsed";
+        states:
+        [
+            State
+            {
+                name: "collapsed";
+                PropertyChanges
+                {
+                    target: tileHolder;
+
+                    parent: thisComponent;
+                    x: 0;
+                    y: 0;
+                    height: thisComponent.height;
+                }
+            },
+
+            State
+            {
+                name: "moving";
+                PropertyChanges
+                {
+                    target: tileHolder;
+
+                    parent: visualParent;
+                    x: thisComponent.mapToItem(visualParent, 0, 0).x;
+                    y: thisComponent.mapToItem(visualParent, 0, 0).y;
+                    height: thisComponent.height;
+                }
+            },
+
+            State
+            {
+                name: "expanded";
+                PropertyChanges
+                {
+                    target: tileHolder;
+
+                    parent: visualParent;
+                    x: (visualParent.width - tileHolder.width) / 2;
+                    y: (visualParent.height - expadedHeight) / 2;
+                    height: expadedHeight;
+                }
+            }
+        ]
+
+        transitions:
+        [
+            Transition
+            {
+                from: "expanded"; to: "moving";
+                //enabled: (tileHolder.state != "collapsed");
+                NumberAnimation
+                {
+                    properties:"x, y";
+                    easing.type: Easing.InOutCubic;
+                    duration: 4000;
+                }
+
+                NumberAnimation
+                {
+                    properties: "height";
+                    easing.type: Easing.OutCubic;
+                    duration: 4000;
+                }
+            },
+
+            Transition
+            {
+                from: "moving"; to: "expanded";
+                //enabled: (tileHolder.state != "collapsed");
+                NumberAnimation
+                {
+                    properties:"x, y";
+                    easing.type: Easing.InOutCubic;
+                    duration: 4000;
+                }
+
+                NumberAnimation
+                {
+                    properties: "height";
+                    easing.type: Easing.OutCubic;
+                    duration: 4000;
+                }
+            }
+        ]
 
         DropShadow
         {
@@ -84,7 +173,9 @@ Item
             readonly property color standardColor: Style.colors.custom.systemTile.background;
             readonly property color hoveredColor: Style.lighterColor(standardColor);
             readonly property bool isHovered: (!thisComponent.isExpanded && hoverIndicator.containsMouse);
-            color: (isHovered ? hoveredColor : standardColor);
+
+            clip: true;
+            color: (isHovered || isExpanded ? hoveredColor : standardColor);
 
             anchors.fill: parent;
             radius: 2;
@@ -155,6 +246,7 @@ Item
 
                     sourceComponent: thisComponent.centralAreaDelegate;
                 }
+
 
                 Loader
                 {
