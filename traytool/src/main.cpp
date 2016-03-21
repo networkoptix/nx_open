@@ -1,5 +1,3 @@
-#include "version.h"
-
 #include <QtSingleApplication>
 #include <QtWidgets/QMessageBox>
 #include <QtCore/QMetaType>
@@ -7,12 +5,17 @@
 #include <QtCore/QSettings>
 
 #include "systraywindow.h"
+#include <traytool_app_info.h>
+
+#include <utils/common/app_info.h>
+
 #include <translation/translation_manager.h>
 
 #include <utils/serialization/json_functions.h>
 
-void initTranslations() {
-    static const QString clientName(QString(lit(QN_ORGANIZATION_NAME)) + lit(" ") + lit(QN_PRODUCT_NAME) + lit(" Client"));
+void initTranslations()
+{
+    static const QString clientName(QnAppInfo::organizationName() + lit(" ") + QnAppInfo::productName() + lit(" Client"));
 
     Q_INIT_RESOURCE(common);
     Q_INIT_RESOURCE(traytool);
@@ -24,11 +27,15 @@ void initTranslations() {
 
     /* Load from internal resource. */
     QFile file(lit(":/globals.json"));
-    if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    if(file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
         QJsonObject jsonObject;
-        if(!QJson::deserialize(file.readAll(), &jsonObject)) {
+        if(!QJson::deserialize(file.readAll(), &jsonObject))
+        {
             NX_ASSERT(false, Q_FUNC_INFO, "Settings file could not be parsed!");
-        } else {
+        }
+        else
+        {
             QJsonObject settingsObject = jsonObject.value(lit("settings")).toObject();
             defaultTranslation = settingsObject.value(lit("translationPath")).toString();
         }
@@ -42,13 +49,13 @@ void initTranslations() {
 
 int main(int argc, char *argv[])
 {
-    QApplication::setOrganizationName(QLatin1String(QN_ORGANIZATION_NAME));
-    QApplication::setApplicationName(QLatin1String(QN_APPLICATION_NAME));
-    QApplication::setApplicationDisplayName(QLatin1String(QN_APPLICATION_DISPLAY_NAME));
-    QApplication::setApplicationVersion(QLatin1String(QN_APPLICATION_VERSION));
+    QApplication::setOrganizationName(QnAppInfo::organizationName());
+    QApplication::setApplicationName(QnTraytoolAppInfo::applicationName());
+    QApplication::setApplicationDisplayName(QnTraytoolAppInfo::applicationDisplayName());
+    QApplication::setApplicationVersion(QnAppInfo::applicationVersion());
 
     // Each user may have it's own traytool running.
-    QtSingleApplication app(QLatin1String(QN_ORGANIZATION_NAME) + QLatin1String(QN_APPLICATION_NAME), argc, argv);
+    QtSingleApplication app(QnAppInfo::organizationName() + QnTraytoolAppInfo::applicationName(), argc, argv);
     QApplication::setQuitOnLastWindowClosed(false);
 
     QDir::setCurrent(QApplication::applicationDirPath());
@@ -59,7 +66,8 @@ int main(int argc, char *argv[])
         app.sendMessage(lit("quit"));
 
         // Wait for app to finish + 100ms just in case (in may be still running after unlocking QSingleApplication lock file).
-        while (app.isRunning()) {
+        while (app.isRunning())
+        {
             Sleep(100);
         }
         Sleep(100);
@@ -86,7 +94,8 @@ int main(int argc, char *argv[])
 
     initTranslations();
 
-    if (!QSystemTrayIcon::isSystemTrayAvailable()) {
+    if (!QSystemTrayIcon::isSystemTrayAvailable())
+    {
         QMessageBox::critical(
             NULL,
             QObject::tr("System Tray"),
@@ -97,7 +106,7 @@ int main(int argc, char *argv[])
 
     QnSystrayWindow window;
 
-    QObject::connect(&app, SIGNAL(messageReceived(const QString &)), &window, SLOT(handleMessage(const QString &)));
+    QObject::connect(&app, &QtSingleApplication::messageReceived, &window, &QnSystrayWindow::handleMessage);
 
     if (!argument.isEmpty())
         window.executeAction(argument);

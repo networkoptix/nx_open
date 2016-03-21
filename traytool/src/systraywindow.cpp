@@ -10,8 +10,10 @@
 
 #include "systraywindow.h"
 
+#include <utils/common/app_info.h>
+#include <traytool_app_info.h>
+
 #include <shlobj.h>
-#include "version.h"
 
 #pragma comment(lib, "Shell32.lib") /* For IsUserAnAdmin. */
 #pragma comment(lib, "AdvApi32.lib") /* For ControlService and other handle-related functions. */
@@ -19,7 +21,7 @@
 
 #define USE_SINGLE_STREAMING_PORT
 
-static const QString MEDIA_SERVER_NAME(QString(lit(QN_ORGANIZATION_NAME)) + lit(" Media Server"));
+static const QString MEDIA_SERVER_NAME(QnAppInfo::organizationName() + lit(" Media Server"));
 
 static const int MESSAGE_DURATION = 3 * 1000;
 static const int DEFAUT_PROXY_PORT = 7009;
@@ -63,7 +65,7 @@ QnSystrayWindow::QnSystrayWindow()
 {
     m_mediaServerHandle = 0;
 
-    m_mediaServerServiceName = QString(lit(QN_CUSTOMIZATION_NAME)) + lit("MediaServer");
+    m_mediaServerServiceName = QnAppInfo::customizationName() + lit("MediaServer");
 
     m_mediaServerStartAction = 0;
     m_mediaServerStopAction = 0;
@@ -81,7 +83,7 @@ QnSystrayWindow::QnSystrayWindow()
 
     findServiceInfo();
 
-    setWindowTitle(lit(QN_APPLICATION_DISPLAY_NAME));
+    setWindowTitle(QnTraytoolAppInfo::applicationDisplayName());
 
     QTimer* findServicesTimer = new QTimer(this);
     connect(findServicesTimer, &QTimer::timeout, this, &QnSystrayWindow::findServiceInfo);
@@ -94,11 +96,8 @@ QnSystrayWindow::QnSystrayWindow()
 
 void QnSystrayWindow::handleMessage(const QString& message)
 {
-    if (message == lit("quit")) {
+    if (message == lit("quit"))
         qApp->quit();
-    } else if (message == lit("activate")) {
-        return;
-    }
 }
 
 QnSystrayWindow::~QnSystrayWindow()
@@ -152,8 +151,9 @@ void QnSystrayWindow::findServiceInfo() {
     if (m_mediaServerHandle == 0)
         m_mediaServerHandle = OpenService(m_scManager, (LPCWSTR) m_mediaServerServiceName.data(), SERVICE_QUERY_STATUS);
 
-    if (!isServerInstalled() && m_firstTimeToolTipError) {
-        showMessage(lit(QN_APPLICATION_DISPLAY_NAME), tr("No %1 services installed").arg(lit(QN_ORGANIZATION_NAME)));
+    if (!isServerInstalled() && m_firstTimeToolTipError)
+    {
+        showMessage(QnTraytoolAppInfo::applicationDisplayName(), tr("No %1 services installed").arg(QnAppInfo::organizationName()));
         m_firstTimeToolTipError = false;
     }
 
@@ -162,7 +162,8 @@ void QnSystrayWindow::findServiceInfo() {
 
 void QnSystrayWindow::closeEvent(QCloseEvent *event)
 {
-    if (m_trayIcon->isVisible()) {
+    if (m_trayIcon->isVisible())
+    {
         hide();
         event->ignore();
     }
@@ -170,7 +171,8 @@ void QnSystrayWindow::closeEvent(QCloseEvent *event)
 
 void QnSystrayWindow::iconActivated(QSystemTrayIcon::ActivationReason reason)
 {
-    switch (reason) {
+    switch (reason)
+    {
         case QSystemTrayIcon::DoubleClick:
         case QSystemTrayIcon::Trigger:
             m_trayIcon->contextMenu()->popup(QCursor::pos());
@@ -225,13 +227,13 @@ void QnSystrayWindow::mediaServerInfoUpdated(quint64 status) {
         }
 
         if (m_prevMediaServerStatus >= 0 && m_prevMediaServerStatus != SERVICE_STOPPED && !m_needStartMediaServer) {
-            showMessage(lit(QN_APPLICATION_DISPLAY_NAME), tr("Media server has been stopped"));
+            showMessage(QnTraytoolAppInfo::applicationDisplayName(), tr("Media server has been stopped"));
         }
     }
     else if (status == SERVICE_RUNNING)
     {
         if (m_prevMediaServerStatus >= 0 && m_prevMediaServerStatus != SERVICE_RUNNING) {
-            showMessage(lit(QN_APPLICATION_DISPLAY_NAME), tr("Media server has been started"));
+            showMessage(QnTraytoolAppInfo::applicationDisplayName(), tr("Media server has been started"));
         }
     }
     m_prevMediaServerStatus = status;
@@ -309,10 +311,12 @@ void QnSystrayWindow::updateServiceInfoInternal(SC_HANDLE handle, DWORD status, 
         break;
     }
 
-    if(action) {
+    if(action)
+    {
         const char *originalTitlePropertyName = "qn_orignalTitle";
         QString title = action->property(originalTitlePropertyName).toString();
-        if(title.isEmpty()) {
+        if(title.isEmpty())
+        {
             title = action->text();
             action->setProperty(originalTitlePropertyName, title);
         }
@@ -321,7 +325,8 @@ void QnSystrayWindow::updateServiceInfoInternal(SC_HANDLE handle, DWORD status, 
     }
 }
 
-void QnSystrayWindow::at_mediaServerStartAction() {
+void QnSystrayWindow::at_mediaServerStartAction()
+{
     if (!isServerInstalled())
         return;
 
@@ -329,7 +334,8 @@ void QnSystrayWindow::at_mediaServerStartAction() {
     updateServiceInfo();
 }
 
-void QnSystrayWindow::at_mediaServerStopAction() {
+void QnSystrayWindow::at_mediaServerStopAction()
+{
     if (!isServerInstalled())
         return;
 
@@ -342,7 +348,8 @@ void QnSystrayWindow::at_mediaServerStopAction() {
 
 }
 
-void QnSystrayWindow::at_mediaServerWebAction() {
+void QnSystrayWindow::at_mediaServerWebAction()
+{
     if (!isServerInstalled())
         return;
 
