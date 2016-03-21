@@ -24,8 +24,6 @@
 
 #include "local_cloud_data_provider.h"
 #include "socket_globals_holder.h"
-#include "version.h"
-
 
 namespace nx {
 namespace hpm {
@@ -91,7 +89,7 @@ bool MediatorFunctionalTest::waitUntilStarted()
     static const std::chrono::seconds initializedMaxWaitTime(15);
 
     auto mediatorStartedFuture = m_mediatorStartedPromise.get_future();
-    if (mediatorStartedFuture.wait_for(initializedMaxWaitTime) != 
+    if (mediatorStartedFuture.wait_for(initializedMaxWaitTime) !=
             std::future_status::ready)
     {
         return false;
@@ -125,7 +123,7 @@ SocketAddress MediatorFunctionalTest::endpoint() const
     return SocketAddress(HostAddress::localhost, m_port);
 }
 
-std::shared_ptr<nx::hpm::api::MediatorClientTcpConnection> 
+std::shared_ptr<nx::hpm::api::MediatorClientTcpConnection>
     MediatorFunctionalTest::clientConnection()
 {
     return network::SocketGlobals::mediatorConnector().clientConnection();
@@ -195,7 +193,7 @@ std::unique_ptr<MediaServerEmulator> MediatorFunctionalTest::addRandomServer(
     return server;
 }
 
-std::unique_ptr<MediaServerEmulator> 
+std::unique_ptr<MediaServerEmulator>
     MediatorFunctionalTest::addRandomServerNotRegisteredOnMediator(
         const AbstractCloudDataProvider::System& system)
 {
@@ -205,7 +203,7 @@ std::unique_ptr<MediaServerEmulator>
     return server;
 }
 
-std::vector<std::unique_ptr<MediaServerEmulator>> 
+std::vector<std::unique_ptr<MediaServerEmulator>>
     MediatorFunctionalTest::addRandomServers(
         const AbstractCloudDataProvider::System& system,
         size_t count)

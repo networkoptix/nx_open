@@ -17,11 +17,11 @@
 #include <cdb/account_manager.h>
 #include <utils/common/cpp14.h>
 #include <utils/common/sync_call.h>
+#include <utils/common/app_info.h>
 #include <nx/network/http/auth_tools.h>
 
 #include <libcloud_db/src/managers/email_manager.h>
 
-#include "version.h"
 #include "email_manager_mocked.h"
 
 
@@ -183,7 +183,7 @@ api::ResultCode CdbFunctionalTest::addAccount(
             moduleInfo().realm.c_str(),
             password->c_str()).constData();
     if (accountData->customization.empty())
-        accountData->customization = QN_CUSTOMIZATION_NAME;
+        accountData->customization = QnAppInfo::customizationName();
 
     auto connection = connectionFactory()->createConnection("", "");
 
@@ -598,7 +598,7 @@ api::SystemAccessRole CdbFunctionalTest::accountAccessRoleForSystem(
 namespace api {
     bool operator==(const api::AccountData& left, const api::AccountData& right)
     {
-        return 
+        return
             left.id == right.id &&
             left.email == right.email &&
             left.passwordHa1 == right.passwordHa1 &&
