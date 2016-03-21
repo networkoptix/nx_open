@@ -3,13 +3,14 @@
         <div class="modal-body">
             <process-alert process="sharing" ></process-alert>
             <div class="form-group" validate-field>
-                <label for="email">Email</label>
+                <label ng-if="lockEmail" for="lockedEmail">User</label>
+                <label ng-if="!lockEmail" for="email">Email</label>
 
                 <input ng-hide="lockEmail" type="email" class="form-control" ng-model="share.accountEmail" id="email" name="email"
                        ng-pattern="Config.emailRegex" maxlength="255"
                        required autofocus>
 
-                <input type="text"  ng-if="lockEmail" name="email"
+                <input type="text" ng-if="lockEmail" name="email" id="lockedEmail"
                        class="form-control" ng-value="formatUserName()" readonly>
             </div>
             <div class="form-group">
