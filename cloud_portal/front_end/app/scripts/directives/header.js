@@ -16,6 +16,9 @@ angular.module('cloudApp')
 
                 scope.isActive = function(val){
                     var currentPath = $location.path();
+                    if(currentPath.indexOf(val)<0){ // no match
+                        return false;
+                    }
                     var clearedPath = currentPath.replace(val,'');
 
                     console.log("isActive?",currentPath,clearedPath,clearedPath.split('?')[0].replace('/',''));
