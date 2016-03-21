@@ -98,7 +98,7 @@ angular.module('cloudApp').directive('processAlert', function () {
                             element.removeClass('hidden');
                             element.addClass('process-loading');
                             if(!element.children('.preloader').get(0)) {
-                                element.prepend('<div class="preloader"><img src="images/loader.gif"></div></div>');
+                                element.prepend('<div class="preloader"><img src="images/preloader.gif"></div>');
                             }
                             return;
                         }

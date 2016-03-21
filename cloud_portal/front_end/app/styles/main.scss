@@ -98,8 +98,7 @@ footer {
   border:none;
   box-shadow:none;
 }
-.no-access-panel,
-.process-loading>.preloader
+.no-access-panel
 {
   width:100%;
   height:100%;
@@ -115,9 +114,6 @@ footer {
   font-weight: lighter;
   color:    $gray-light;
   font-size: $font-size-h2;
-}
-
-.no-access-panel{
   display: table;
 }
 
@@ -135,24 +131,28 @@ footer {
 .process-loading>*{
     visibility:hidden;
 }
-.process-loading>.preloader {
-    display: block;
-    visibility: visible;
-    position:absolute;
 
-    line-height: 100%;
+
+.process-loading>.preloader {
+
+  display: block;
+  visibility: visible;
+  position:absolute;
+
+  width:100%;
+  height:100%;
+  min-height: 144px;
+  z-index:100;
+
+  padding-top:80px;
+
+  text-align: center;
+
+  background-color: $body-bg;
 }
 .process-loading>.preloader>img{
-
-    display: block;
-    position: absolute;
-    left: 50%;
-    top: 50%;
-
-    width:46px;
-    height:46px;
-    margin-left: -23px;
-    margin-top: -23px;
+    width:64px;
+    height:64px;
 }
 
 /* inline mode for portal: no header, dialogs behave like full-screen pages */
