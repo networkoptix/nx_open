@@ -361,7 +361,8 @@ bool UdtSocketImpl::SetSendTimeout( unsigned int ms ) {
     return ret == 0;
 }
 
-bool UdtSocketImpl::GetSendTimeout( unsigned int* millis ) const {
+bool UdtSocketImpl::GetSendTimeout(unsigned int* millis) const
+{
     NX_ASSERT(!IsClosed());
     int time;
     int len = sizeof(time);
@@ -373,13 +374,17 @@ bool UdtSocketImpl::GetSendTimeout( unsigned int* millis ) const {
     return ret == 0;
 }
 
-bool UdtSocketImpl::GetLastError( SystemError::ErrorCode* errorCode ) const {
+bool UdtSocketImpl::GetLastError(SystemError::ErrorCode* /*errorCode*/) const
+{
     NX_ASSERT(!IsClosed());
-    *errorCode = static_cast<SystemError::ErrorCode>(UDT::getlasterror().getErrno());
-    return true;
+    //*errorCode = static_cast<SystemError::ErrorCode>(UDT::getlasterror().getErrno());
+    //TODO #ak
+    SystemError::setLastErrorCode(SystemError::notImplemented);
+    return false;
 }
 
-AbstractSocket::SOCKET_HANDLE UdtSocketImpl::handle() const {
+AbstractSocket::SOCKET_HANDLE UdtSocketImpl::handle() const
+{
     NX_ASSERT(!IsClosed());
     NX_ASSERT(sizeof(UDTSOCKET) == sizeof(AbstractSocket::SOCKET_HANDLE));
     return *reinterpret_cast<const AbstractSocket::SOCKET_HANDLE*>(&udtHandle);
