@@ -11,11 +11,15 @@ namespace cloud {
 
 IncomingTunnelUdtConnection::IncomingTunnelUdtConnection(
     String connectionId,
-    std::unique_ptr<UdtStreamSocket> connectionSocket)
+    std::unique_ptr<UdtStreamSocket> connectionSocket,
+    std::chrono::milliseconds maxKeepAliveInterval)
 :
     AbstractIncomingTunnelConnection(std::move(connectionId)),
-    m_maxKeepAliveInterval(kHpUdtKeepAliveInterval * kHpUdtKeepAliveRetries),
-    m_lastKeepAlive(std::chrono::system_clock::now()),
+    m_maxKeepAliveInterval(
+        maxKeepAliveInterval == std::chrono::milliseconds::zero()
+        ? kHpUdtKeepAliveInterval * kHpUdtKeepAliveRetries
+        : maxKeepAliveInterval),
+    m_lastKeepAlive(std::chrono::steady_clock::now()),
     m_state(SystemError::noError),
     m_connectionSocket(std::move(connectionSocket)),
     m_serverSocket(new UdtStreamServerSocket)
@@ -42,17 +46,11 @@ IncomingTunnelUdtConnection::IncomingTunnelUdtConnection(
     }
 }
 
-void IncomingTunnelUdtConnection::setMaxKeepAliveInterval(
-    std::chrono::milliseconds interval)
-{
-    m_maxKeepAliveInterval = interval;
-}
-
 void IncomingTunnelUdtConnection::accept(std::function<void(
     SystemError::ErrorCode,
     std::unique_ptr<AbstractStreamSocket>)> handler)
 {
-    NX_ASSERT(!m_acceptHandler, Q_FUNC_INFO, "Concurent accept");
+    NX_ASSERT(!m_acceptHandler, Q_FUNC_INFO, "Concurrent accept");
     m_connectionSocket->post(
         [this, handler = std::move(handler)]()
         {
@@ -64,7 +62,7 @@ void IncomingTunnelUdtConnection::accept(std::function<void(
                 [this](SystemError::ErrorCode code,
                        AbstractStreamSocket* socket)
             {
-                m_lastKeepAlive = std::chrono::system_clock::now();
+                m_lastKeepAlive = std::chrono::steady_clock::now();
                 NX_LOGX(lm("Accepted %1 (%2)")
                     .arg(socket).arg(SystemError::toString(code)), cl_logDEBUG2);
 
@@ -99,7 +97,7 @@ void IncomingTunnelUdtConnection::pleaseStop(
 void IncomingTunnelUdtConnection::monitorKeepAlive()
 {
     using namespace std::chrono;
-    auto timePassed = system_clock::now() - m_lastKeepAlive;
+    auto timePassed = steady_clock::now() - m_lastKeepAlive;
     if (timePassed >= m_maxKeepAliveInterval)
         return connectionSocketError(SystemError::timedOut);
 
@@ -127,7 +125,7 @@ void IncomingTunnelUdtConnection::readRequest()
             if (bytesRead == 0)
                 return connectionSocketError(SystemError::connectionReset);
 
-            m_lastKeepAlive = std::chrono::system_clock::now();
+            m_lastKeepAlive = std::chrono::steady_clock::now();
             size_t processed = 0;
             switch(m_connectionParser.parse(
                 m_connectionBuffer, &processed))
@@ -177,7 +175,7 @@ void IncomingTunnelUdtConnection::writeResponse()
             if (code != SystemError::noError)
                 return connectionSocketError(code);
 
-            m_lastKeepAlive = std::chrono::system_clock::now();
+            m_lastKeepAlive = std::chrono::steady_clock::now();
             readConnectionRequest();
         });
 }
