@@ -433,9 +433,6 @@ UdtSocket::UdtSocket()
 
 UdtSocket::~UdtSocket()
 {
-    //delete m_impl;
-    //m_impl = nullptr;
-
     //TODO #ak if socket is destroyed in its aio thread, it can cleanup here
 
     NX_ASSERT(!nx::network::SocketGlobals::aioService()
@@ -480,26 +477,6 @@ bool UdtSocket::getSendTimeout(unsigned int* millis)
 {
     return m_impl->GetSendTimeout(millis);
 }
-
-//CommonSocketImpl<UdtSocket>* UdtSocket::impl()
-//{
-//    return m_impl;
-//}
-//
-//const CommonSocketImpl<UdtSocket>* UdtSocket::impl() const
-//{
-//    return m_impl;
-//}
-
-//aio::AbstractAioThread* UdtSocket::getAioThread()
-//{
-//    return nx::network::SocketGlobals::aioService().getSocketAioThread(this);
-//}
-//
-//void UdtSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
-//{
-//    nx::network::SocketGlobals::aioService().bindSocketToAioThread(this, aioThread);
-//}
 
 // =====================================================================
 // UdtStreamSocket implementation
