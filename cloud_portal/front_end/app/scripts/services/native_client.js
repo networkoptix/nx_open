@@ -5,7 +5,7 @@ angular.module('cloudApp')
         return {
             open:function(systemId){
 
-                var username = encodeURIComponent($scope.account.email);
+                var username = encodeURIComponent($sessionStorage.email);
                 var password = encodeURIComponent($sessionStorage.password);
                 var system   = systemId?systemId:'localhost:7000';
                 var protocol = Config.clientProtocol;
