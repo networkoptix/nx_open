@@ -17,7 +17,8 @@ IncomingTunnelUdtConnection::IncomingTunnelUdtConnection(
     AbstractIncomingTunnelConnection(std::move(connectionId)),
     m_maxKeepAliveInterval(
         maxKeepAliveInterval == std::chrono::milliseconds::zero()
-        ? kHpUdtKeepAliveInterval * kHpUdtKeepAliveRetries
+        ? std::chrono::duration_cast<std::chrono::milliseconds>(
+            kHpUdtKeepAliveInterval * kHpUdtKeepAliveRetries)
         : maxKeepAliveInterval),
     m_lastKeepAlive(std::chrono::steady_clock::now()),
     m_state(SystemError::noError),

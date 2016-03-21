@@ -69,7 +69,6 @@ const std::unique_ptr<OutgoingTunnel>& OutgoingTunnelPool::getTunnel(
         cl_logDEBUG1);
 
     auto tunnel = std::make_unique<OutgoingTunnel>(targetHostAddress);
-    const auto tunnelIter = iterAndInsertionResult.first;
     tunnel->setStateHandler(
         [this, tunnelPtr = tunnel.get()](Tunnel::State state)
         {
