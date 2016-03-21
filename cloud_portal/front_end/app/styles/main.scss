@@ -82,12 +82,14 @@ footer {
     box-shadow: 0px 2px 2px 0px transparentize(dark(15),0.8);
 }
 
-.hoverable .hover-visible{
+@media (min-width: $screen-sm-min) {
+  .hoverable .hover-visible {
     visibility: hidden;
-}
+  }
 
-.hoverable:hover .hover-visible{
+  .hoverable:hover .hover-visible {
     visibility: visible;
+  }
 }
 
 

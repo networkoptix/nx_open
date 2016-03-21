@@ -37,12 +37,13 @@ $panel-default-border:                    $common-border-color;
 $thumbnail-border:                        $common-border-color;
 $input-border:                            $common-border-color;
 $btn-default-border:                      $common-border-color;
+$navbar-default-border:                   $common-border-color;
 
 $table-border-color:          transparent;
 $modal-footer-border-color:   transparent;
 $modal-header-border-color:   transparent;
 $modal-content-border-color:  transparent;
-$panel-default-heading-bg:  transparent;
+$panel-default-heading-bg:    transparent;
 
 
 $font-size-base:          14px;
@@ -138,3 +139,6 @@ $panel-heading-padding: 16px;
 $panel-footer-padding: 16px;
 
 $navbar-default-link-active-bg: $navbar-default-bg;
+$navbar-padding-horizontal:   0;
+$navbar-padding-vertical:     0;
+$navbar-default-link-active-color: $brand_core;

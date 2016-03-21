@@ -23,6 +23,9 @@ angular.module('cloudApp').directive('processAlert', function () {
                     scope.alertTimeout = 365*24*3600*1000; // long enough )
                 }
 
+
+                scope.alertTimeout2 = scope.alertTimeout;
+
                 scope.closeAlert = function(type){
                     scope.shown[type] = true;
                 };

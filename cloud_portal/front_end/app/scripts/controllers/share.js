@@ -88,4 +88,8 @@ angular.module('cloudApp')
         }).then(function(){
             $scope.$parent.ok($scope.share);
         });
+
+        $scope.close = function(){
+            dialogs.closeMe($scope);
+        }
     });

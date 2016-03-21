@@ -1,7 +1,7 @@
 <div>
     <div ng-if="data.activateCode">
         <h1>Account activation</h1>
-        <process-alert process="activate"
+        <process-alert process="activate" alert-timeout="0"
                        process-message="'Activating account ...'"
                        success-message="'Your account was successfully activated.'"
                        error-prefix="'Couldn\'t activate your account:'"></process-alert>

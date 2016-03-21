@@ -14,6 +14,14 @@ angular.module('cloudApp')
                     $('body').addClass('inline-portal');
                 }
 
+                scope.isActive = function(val){
+                    var currentPath = $location.path();
+                    var clearedPath = currentPath.replace(val,'');
+
+                    console.log("isActive?",currentPath,clearedPath,clearedPath.split('?')[0].replace('/',''));
+
+                    return clearedPath.split('?')[0].replace('/','') === '';
+                };
                 scope.login = function(){
                     dialogs.login();
                 };

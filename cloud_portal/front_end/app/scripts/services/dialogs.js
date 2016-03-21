@@ -124,6 +124,21 @@ angular.module('cloudApp').run(function($http,$templateCache) {
                         isOwner: isOwner
                     }
                 }).result;
+            },
+            closeMe:function($scope){
+
+                // TODO: We must replace this hack with something more angular-way,
+                // but I can't figure out yet, how to implement dialog service and pass parameters to controllers
+                // we need something like modalInstance
+                function findSettings($scope){
+                    return $scope.settings || $scope.$parent && findSettings($scope.$parent) || null;
+                }
+
+                var dialogSettings = findSettings($scope);
+
+                if(dialogSettings && dialogSettings.params.getModalInstance){
+                    dialogSettings.params.getModalInstance().dismiss();
+                }
             }
         };
     }).controller("DialogCtrl",function($scope, $uibModalInstance,settings){

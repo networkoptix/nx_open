@@ -17,7 +17,6 @@ $font-size-a-bit-large:   ceil($font-size-base * 1.15); //~16px - we just need 1
   box-shadow: 0 6px 10px $light3;
 }
 .navbar-brand{
-  padding:0;
   font-size: $font-size-h3;
   margin-right:16px;
 }
@@ -34,6 +33,20 @@ $font-size-a-bit-large:   ceil($font-size-base * 1.15); //~16px - we just need 1
   font-size: $font-size-h3;
 }
 
+
+// Default navbar
+.navbar-default {
+  .navbar-nav > .active > a {
+    &,
+    &:hover,
+    &:focus {
+      border-bottom: 3px solid $brand_core;
+      padding-bottom: 13px;
+      cursor: default;
+      background-color: $navbar-default-bg !important;
+    }
+  }
+}
 .nav > li > a{
   padding: 16px;
   line-height: 24px;
@@ -120,6 +133,7 @@ h1>.label{
   }
 
   .modal-footer{
+    padding-top: 0;
     margin-top: 0;
     text-align: left;
   }
@@ -196,6 +210,16 @@ hr {
   }
 }
 
+.form-control:read-only:focus {
+  border-color: $input-border;
+}
+
+
+select.form-control{
+  -webkit-appearance: none;
+  background-color: transparent;
+}
+
 
 .btn{
   outline: none !important;;
@@ -240,11 +264,6 @@ hr {
     @include box-shadow(inset 0px 1px 0px 1px $brand_d2);
     outline: none;
   }
-}
-
-select.form-control{
-  -webkit-appearance: none;
-  background-color: transparent;
 }
 
 

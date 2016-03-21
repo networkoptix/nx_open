@@ -11,8 +11,10 @@
         <div class="navbar-collapse" uib-collapse="!isMenuExpanded">
             <ul class="nav navbar-nav">
                 <li class="vertical-bar"></li>
-                <li class="auth-hidden"><a href="#/static/about">About</a></li>
-                <li class="auth-visible"><a href="#/systems">Systems</a></li>
+                <li class="auth-hidden" ng-class="{active:isActive('/static/about')}"><a href="#/static/about">About</a></li>
+                <li class="auth-visible" ng-class="{active:isActive('/systems')}"><a href="#/systems">Systems</a></li>
+
+
             </ul>
             <ul class="nav navbar-nav navbar-right auth-hidden">
                 <li><span class="btn-wrapper"><a href="#/login" class="btn btn-default" ng-click="login();$event.preventDefault();">Login</a></span></li>

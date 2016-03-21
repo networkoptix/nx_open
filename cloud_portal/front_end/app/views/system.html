@@ -2,8 +2,7 @@
 <div class="auth-visible" process-loading="gettingSystem">
     <div class="row">
         <div class="col-sm-6">
-            <h1 ng-if="gettingSystem.success">
-                <a href="#/systems">Systems</a> > {{system.info.name}}
+            <h1 ng-if="gettingSystem.success">{{system.info.name}}
                 <span ng-if="system.info.status!=Config.systemStatuses.onlineStatus" class="label"
                       ng-class="Config.systemStatuses[system.info.status].style || Config.systemStatuses.default.style">
                       {{Config.systemStatuses[system.info.status].label||system.info.status}}</span>
@@ -93,10 +92,10 @@
                             <td>{{L.accessRoles[user.accessRole].label || user.accessRole}}</td>
                             <td><a href='' class="hover-visible" ng-if="user.accountEmail != account.email && user.accessRole!=Config.accessRoles.owner"
                                    title="Edit permissions"
-                                   ng-click="editShare(user)"><span class="glyphicon glyphicon-pencil"></span></a></td>
+                                   ng-click="editShare(user)"><span class="glyphicon glyphicon-pencil"></span><span class="hidden-sm"> Edit</span></span></a></td>
                             <td><a href='' class="hover-visible" ng-if="user.accessRole!=Config.accessRoles.owner"
                                    title="Delete"
-                                   ng-click="unshare(user)"><span class="glyphicon glyphicon-remove"></span></a></td>
+                                   ng-click="unshare(user)"><span class="glyphicon glyphicon-remove"></span><span class="hidden-sm"> Delete</span></a></td>
                         </tr>
                         </tbody>
                     </table>
