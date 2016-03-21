@@ -88,7 +88,7 @@ QIODevice* QnClientStorageResource::open(const QString&, QIODevice::OpenMode)
     return NULL;
 }
 
-bool QnClientStorageResource::isAvailable() const
+bool QnClientStorageResource::initOrUpdate() const
 {
     NX_ASSERT(false);
     return 0;

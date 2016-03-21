@@ -355,7 +355,7 @@ qint64 QnThirdPartyStorageResource::getTotalSpace()
     return totalSpace;
 }
 
-bool QnThirdPartyStorageResource::isAvailable() const
+bool QnThirdPartyStorageResource::initOrUpdate() const
 {
     if (!m_valid)
        return false;

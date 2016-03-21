@@ -146,6 +146,9 @@ void QnMjpegSessionPrivate::decodeFrame(
 
     {
         QnMutexLocker lock(&mutex);
+        if (state != QnMjpegSession::Playing)
+            return;
+
         if (!lastFrame.isNull())
             lastFrameReleased.wait(&mutex);
 

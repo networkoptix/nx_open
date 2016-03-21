@@ -35,7 +35,7 @@ int QnStorageStatusRestHandler::executeGet(const QString &, const QnRequestParam
 
         storage->setUrl(storageUrl);
         storage->setSpaceLimit(spaceLimit);
-        if (!storage || !storage->isAvailable())
+        if (!storage || !storage->initOrUpdate())
             return CODE_INVALID_PARAMETER;
     }
 

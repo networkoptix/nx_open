@@ -50,7 +50,7 @@ namespace {
 // -------------------------------------------------------------------------- //
 // QnNoptixStyle
 // -------------------------------------------------------------------------- //
-QnNoptixStyle::QnNoptixStyle(QStyle *style): 
+QnNoptixStyle::QnNoptixStyle(QStyle *style):
     base_type(style),
     m_hoverAnimator(new QnNoptixStyleAnimator(this)),
     m_rotationAnimator(new QnNoptixStyleAnimator(this)),
@@ -79,29 +79,11 @@ QPixmap QnNoptixStyle::generatedIconPixmap(QIcon::Mode iconMode, const QPixmap &
 #endif
         painter.drawPixmap(0, 0, pixmap);
         painter.end();
-        
+
         return QPixmap::fromImage(image);
     } else {
         return base_type::generatedIconPixmap(iconMode, pixmap, option);
     }
-}
-
-int QnNoptixStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWidget *widget) const {
-    switch(metric) {
-    case PM_ToolBarIconSize:
-        return 18;
-    case PM_SliderLength:
-        if(option && option->styleObject) {
-            int result = qvariant_cast<int>(option->styleObject->property(Qn::SliderLength), -1);
-            if(result >= 0)
-                return result;
-        }
-        break;
-    default:
-        break;
-    }
-
-    return base_type::pixelMetric(metric, option, widget);
 }
 
 void QnNoptixStyle::drawComplexControl(ComplexControl control, const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const {
@@ -197,7 +179,7 @@ void QnNoptixStyle::polish(QWidget *widget) {
 
     // TODO: #Elric #2.3 remove this line in 2.3, looks like it's not needed.
     if(QAbstractItemView *itemView = dynamic_cast<QAbstractItemView *>(widget)) {
-        itemView->setIconSize(QSize(18, 18)); 
+        itemView->setIconSize(QSize(18, 18));
 
         /* QWidget::scroll method has caching issues leading to some garbage drawn in the updated areas.
            As a workaround we force it to repaint all contents. */
@@ -232,17 +214,17 @@ bool QnNoptixStyle::drawMenuItemControl(const QStyleOption *option, QPainter *pa
     const QStyleOptionMenuItem *itemOption = qstyleoption_cast<const QStyleOptionMenuItem *>(option);
     if(!itemOption)
         return false;
-    
+
     const QMenu *menu = qobject_cast<const QMenu *>(widget);
-    if(!menu) 
+    if(!menu)
         return false;
 
-    /* There are cases when we want an action to be checkable, but do not want the checkbox displayed in the menu. 
+    /* There are cases when we want an action to be checkable, but do not want the checkbox displayed in the menu.
      * So we introduce an internal property for this. */
     QAction *action = menu->actionAt(option->rect.center());
-    if(!action || !action->property(Qn::HideCheckBoxInMenu).toBool()) 
+    if(!action || !action->property(Qn::HideCheckBoxInMenu).toBool())
         return false;
-    
+
     QStyleOptionMenuItem::CheckType checkType = itemOption->checkType;
     QStyleOptionMenuItem *localOption = const_cast<QStyleOptionMenuItem *>(itemOption);
     localOption->checkType = QStyleOptionMenuItem::NotCheckable;
@@ -264,7 +246,7 @@ bool QnNoptixStyle::drawItemViewItemControl(const QStyleOption *option, QPainter
     if(editor == NULL)
         return false;
 
-    /* If an editor is opened, don'h draw item's text. 
+    /* If an editor is opened, don'h draw item's text.
      * Editor's background may be transparent, and item text will shine through. */
 
     QStyleOptionViewItemV4 *localOption = const_cast<QStyleOptionViewItemV4 *>(itemOption);
@@ -324,7 +306,7 @@ bool QnNoptixStyle::drawPanelItemViewPrimitive(PrimitiveElement element, const Q
 
 bool QnNoptixStyle::drawToolButtonComplexControl(const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const {
     const QStyleOptionToolButton *buttonOption = qstyleoption_cast<const QStyleOptionToolButton *>(option);
-    if (!buttonOption) 
+    if (!buttonOption)
         return false;
 
     if (buttonOption->features & QStyleOptionToolButton::Arrow)
