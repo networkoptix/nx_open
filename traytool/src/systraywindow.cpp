@@ -72,7 +72,7 @@ QnSystrayWindow::QnSystrayWindow()
     m_scManager = 0;
     m_firstTimeToolTipError = true;
     m_needStartMediaServer = false;
-    
+
     m_prevMediaServerStatus = -1;
     m_lastMessageTimer.restart();
 
@@ -119,11 +119,11 @@ void QnSystrayWindow::executeAction(const QString &actionName)
 void QnSystrayWindow::findServiceInfo() {
     if (m_scManager == NULL)
         m_scManager = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS);
-    
+
     if (m_scManager == NULL)
         m_scManager = OpenSCManager(NULL, NULL, SC_MANAGER_CONNECT);
 
-    if (m_scManager == NULL) 
+    if (m_scManager == NULL)
     {
         int error = GetLastError();
         QString errorText;
@@ -146,7 +146,7 @@ void QnSystrayWindow::findServiceInfo() {
         }
         return;
     }
-    
+
     if (m_mediaServerHandle == 0)
         m_mediaServerHandle = OpenService(m_scManager, (LPCWSTR) m_mediaServerServiceName.data(), SERVICE_ALL_ACCESS);
     if (m_mediaServerHandle == 0)
@@ -198,7 +198,7 @@ void QnSystrayWindow::showMessage(const QString &title, const QString &msg, QSys
 void QnSystrayWindow::onDelayedMessage() {
     if (!m_delayedMessages.isEmpty()) {
         DelayedMessage msg = m_delayedMessages.dequeue();
-        showMessage(msg.title, msg.msg, msg.icon); 
+        showMessage(msg.title, msg.msg, msg.icon);
     }
 }
 
@@ -218,7 +218,7 @@ void QnSystrayWindow::mediaServerInfoUpdated(quint64 status) {
     updateServiceInfoInternal(m_mediaServerHandle, status, m_mediaServerStartAction, m_mediaServerStopAction);
     if (status == SERVICE_STOPPED)
     {
-        if (m_needStartMediaServer) 
+        if (m_needStartMediaServer)
         {
             m_needStartMediaServer = false;
             StartService(m_mediaServerHandle, 0, 0);
@@ -350,7 +350,7 @@ void QnSystrayWindow::at_mediaServerWebAction() {
     QDesktopServices::openUrl(QUrl(serverAdminUrl));
 }
 
-QnElevationChecker::QnElevationChecker(QObject* parent, QString actionName, QObject* target, const char* slot): 
+QnElevationChecker::QnElevationChecker(QObject* parent, QString actionName, QObject* target, const char* slot):
     QObject(parent),
     m_actionName(actionName),
     m_target(target),
@@ -479,7 +479,7 @@ void QnSystrayWindow::createTrayIcon() {
     trayIconMenu->addAction(m_quitAction);
 
     m_trayIcon = new QSystemTrayIcon(this);
-    m_trayIcon->setContextMenu(trayIconMenu);    
+    m_trayIcon->setContextMenu(trayIconMenu);
     m_trayIcon->setIcon(QIcon(lit(":/traytool.png")));
 
     connect(m_trayIcon, &QSystemTrayIcon::activated, this, &QnSystrayWindow::iconActivated);

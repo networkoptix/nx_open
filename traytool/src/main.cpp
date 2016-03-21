@@ -1,4 +1,4 @@
-#include "version.h"    
+#include "version.h"
 
 #include <QtSingleApplication>
 #include <QtWidgets/QMessageBox>
@@ -32,7 +32,7 @@ void initTranslations() {
             QJsonObject settingsObject = jsonObject.value(lit("settings")).toObject();
             defaultTranslation = settingsObject.value(lit("translationPath")).toString();
         }
-    }   
+    }
 
     QSettings clientSettings(QSettings::UserScope, qApp->organizationName(), clientName);
     QString translationPath = clientSettings.value(lit("translationPath"), defaultTranslation).toString();
@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
         // Wait for app to finish + 100ms just in case (in may be still running after unlocking QSingleApplication lock file).
         while (app.isRunning()) {
             Sleep(100);
-        } 
+        }
         Sleep(100);
 
         return 0;
@@ -88,8 +88,8 @@ int main(int argc, char *argv[])
 
     if (!QSystemTrayIcon::isSystemTrayAvailable()) {
         QMessageBox::critical(
-            NULL, 
-            QObject::tr("System Tray"), 
+            NULL,
+            QObject::tr("System Tray"),
             QObject::tr("There is no system tray on this system.") + L'\n' + QObject::tr("Application will now quit.")
             );
         return 1;
