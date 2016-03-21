@@ -102,8 +102,10 @@ void OutgoingTunnelPool::onTunnelClosed(OutgoingTunnel* tunnelPtr)
     NX_LOGX(lm("Removing tunnel to host %1").arg(tunnelIter->first), cl_logDEBUG1);
     auto tunnel = std::move(tunnelIter->second);
     m_pool.erase(tunnelIter);
-    m_aioThreadBinder.post(
-        [tunnel = std::move(tunnel)]() mutable { tunnel.reset(); });
+    //m_aioThreadBinder.post(
+    //    [tunnel = std::move(tunnel)]() mutable { tunnel.reset(); });
+    lk.unlock();
+    tunnel.reset();
 }
 
 void OutgoingTunnelPool::tunnelsStopped(

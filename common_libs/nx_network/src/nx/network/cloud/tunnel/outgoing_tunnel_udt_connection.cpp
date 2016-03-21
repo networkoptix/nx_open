@@ -5,6 +5,7 @@
 
 #include "outgoing_tunnel_udt_connection.h"
 
+#include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/barrier_handler.h>
 #include <utils/common/cpp14.h>
@@ -34,6 +35,7 @@ OutgoingTunnelUdtConnection::OutgoingTunnelUdtConnection(
     m_controlConnection->socket()->registerTimer(
         m_timeouts.maxConnectionInactivityPeriod(),
         std::bind(&OutgoingTunnelUdtConnection::onKeepAliveTimeout, this));
+    m_aioTimer.bindToAioThread(m_controlConnection->socket()->getAioThread());
 }
 
 OutgoingTunnelUdtConnection::OutgoingTunnelUdtConnection(
@@ -49,7 +51,8 @@ OutgoingTunnelUdtConnection::OutgoingTunnelUdtConnection(
 
 OutgoingTunnelUdtConnection::~OutgoingTunnelUdtConnection()
 {
-    NX_ASSERT(m_pleaseStopHasBeenCalled && m_pleaseStopCompleted);
+    //all internal sockets live in same aio thread, 
+        //so it is allowed to free OutgoingTunnelUdtConnection while in aio thread
 }
 
 void OutgoingTunnelUdtConnection::pleaseStop(
@@ -131,12 +134,18 @@ void OutgoingTunnelUdtConnection::establishNewConnection(
         return;
     }
 
+    //temporariliy binding new socket to the same aio thread to simplify code here
+    newConnection->bindToAioThread(m_aioTimer.getAioThread());
+
     QnMutexLocker lk(&m_mutex);
 
     auto connectionPtr = newConnection.get();
     m_ongoingConnections.emplace(
         connectionPtr,
-        ConnectionContext{std::move(newConnection), std::move(handler)});
+        ConnectionContext{
+            std::move(newConnection),
+            std::move(handler),
+            socketAttributes.aioThread ? *socketAttributes.aioThread : nullptr});
     
     //has to start connect and timer atomically, 
         //but this can be done from socket's aio thread only
@@ -199,14 +208,9 @@ void OutgoingTunnelUdtConnection::onConnectCompleted(
 
     //ensuring connectionPtr can be safely freed in any thread
     connectionPtr->post(
-        [this, connectionPtr, errorCode]()
-        {
-            //switching execution to m_aioTimer's thread
-            m_aioTimer.post(
-                std::bind(
-                    &OutgoingTunnelUdtConnection::reportConnectResult, this,
-                    connectionPtr, errorCode));
-        });
+        std::bind(
+            &OutgoingTunnelUdtConnection::reportConnectResult, this,
+            connectionPtr, errorCode));
 }
 
 void OutgoingTunnelUdtConnection::reportConnectResult(
@@ -223,6 +227,15 @@ void OutgoingTunnelUdtConnection::reportConnectResult(
     ConnectionContext connectionContext = std::move(connectionIter->second);
     m_ongoingConnections.erase(connectionIter);
     lk.unlock();
+
+    if (errorCode == SystemError::noError)
+    {
+        //binding to desired aio thread
+        connectionContext.connection->bindToAioThread(
+            connectionContext.aioThreadToUse
+                ? connectionContext.aioThreadToUse
+                : nx::network::SocketGlobals::aioService().getRandomAioThread());
+    }
 
     connectionContext.completionHandler(
         errorCode,
