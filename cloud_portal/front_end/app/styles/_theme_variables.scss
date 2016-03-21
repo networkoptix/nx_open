@@ -42,6 +42,7 @@ $table-border-color:          transparent;
 $modal-footer-border-color:   transparent;
 $modal-header-border-color:   transparent;
 $modal-content-border-color:  transparent;
+$panel-default-heading-bg:  transparent;
 
 
 $font-size-base:          14px;
@@ -133,5 +134,7 @@ $grid-float-breakpoint:       600px;
 $dialog-sm-float-breakpoint:     434px;
 
 $panel-body-padding:    16px;
+$panel-heading-padding: 16px;
+$panel-footer-padding: 16px;
 
 $navbar-default-link-active-bg: $navbar-default-bg;
