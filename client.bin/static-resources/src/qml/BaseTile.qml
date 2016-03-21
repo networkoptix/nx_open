@@ -44,8 +44,14 @@ Item
     {        
         id: tileHolder;
 
-        property Item realParent: thisComponent;
-        parent: (isExpanded ? visualParent : realParent);
+        parent: (isExpanded ? visualParent : thisComponent);
+
+        x: (thisComponent.isExpanded ? (visualParent.width - width) / 2 : 0);
+        y: (thisComponent.isExpanded ? (visualParent.height - height) / 2: 0);
+        width: thisComponent.width;
+        height: (thisComponent.isExpanded
+            ? loadersColumn.y + loadersColumn.height
+            : thisComponent.height);
 
         DropShadow
         {
@@ -57,9 +63,6 @@ Item
             color: Style.colors.shadow;
             source: tileArea;
         }
-
-        x: (thisComponent.isExpanded ? (visualParent.width - width) / 2 : 0);
-        y: (thisComponent.isExpanded ? (visualParent.height - height) / 2: 0);
 
         MouseArea
         {
@@ -73,11 +76,6 @@ Item
             hoverEnabled: true;
             onClicked: { toggle(); }
         }
-
-        width: thisComponent.width;
-        height: (thisComponent.isExpanded
-            ? loadersColumn.y + loadersColumn.height
-            : thisComponent.height);
 
         Rectangle
         {
