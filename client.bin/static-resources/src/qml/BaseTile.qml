@@ -83,7 +83,7 @@ Item
         transitions: Transition
         {
             id: transition;
-            onRunningChanged: console.log("r: ", running)
+
             ParentAnimation
             {
                 NumberAnimation
