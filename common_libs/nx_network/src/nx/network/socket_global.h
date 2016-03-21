@@ -57,6 +57,7 @@ private:
     SocketGlobals();
     ~SocketGlobals();
 
+    static QnMutex s_mutex;
     static std::atomic<int> s_counter;
     static SocketGlobals* s_instance;
 
