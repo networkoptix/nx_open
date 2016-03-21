@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <nx/network/socket_global.h>
 #include <nx/network/system_socket.h>
 #include <nx/network/cloud/cloud_server_socket.h>
 #include <nx/network/test_support/simple_socket_test_helper.h>
@@ -120,7 +121,12 @@ struct CloudServerSocketTcpTester
 :
     CloudServerSocket
 {
-    CloudServerSocketTcpTester(): CloudServerSocket(nullptr) {}
+    CloudServerSocketTcpTester()
+    :
+        CloudServerSocket(
+            nx::network::SocketGlobals::mediatorConnector().systemConnection())
+    {
+    }
 
     bool listen(int queueLen) override
     {
@@ -195,7 +201,7 @@ TEST(CloudServerSocketBaseTcpTest, OpenTunnelOnIndication)
 
     std::vector<CloudServerSocket::AcceptorMaker> acceptorMakers;
     acceptorMakers.push_back(
-        [](hpm::api::ConnectionRequestedEvent&)
+        [](hpm::api::ConnectionRequestedEvent)
         {
             return std::make_unique<FakeTcpTunnelAcceptor>(
                 network::test::kServerAddress);
@@ -240,6 +246,13 @@ class CloudServerSocketStressTcpTest
 protected:
     void SetUp() override
     {
+        //there must be cloud credentials if we use CloudServerSocket
+        nx::hpm::api::SystemCredentials systemCredentials;
+        systemCredentials.systemId = "system";
+        systemCredentials.key = "key";
+        SocketGlobals::mediatorConnector().setSystemCredentials(
+            std::move(systemCredentials));
+
         const auto addr = network::test::kServerAddress;
         for (size_t i = 0; i < kPeerCount; i++)
             m_peerAddresses.emplace(
@@ -253,7 +266,7 @@ protected:
 
         std::vector<CloudServerSocket::AcceptorMaker> acceptorMakers;
         acceptorMakers.push_back(
-            [this](hpm::api::ConnectionRequestedEvent& event)
+            [this](hpm::api::ConnectionRequestedEvent event)
             {
                 const auto it = m_peerAddresses.find(event.originatingPeerID);
                 NX_ASSERT(it != m_peerAddresses.end());
@@ -264,7 +277,7 @@ protected:
 
         m_server = std::make_unique<CloudServerSocket>(
             std::make_shared<hpm::api::MediatorServerTcpConnection>(
-                m_stunClient, nullptr),
+                m_stunClient, &SocketGlobals::mediatorConnector()),
             nx::network::RetryPolicy(),
             std::move(acceptorMakers));
         ASSERT_TRUE(m_server->setNonBlockingMode(true));

@@ -120,7 +120,7 @@ SocketAddress TestConnection::getLocalAddress() const
     return m_socket->getLocalAddress();
 }
 
-const std::chrono::milliseconds kDefaultSendTimeout(7000);
+const std::chrono::milliseconds kDefaultSendTimeout(17000);
 
 void TestConnection::start()
 {
