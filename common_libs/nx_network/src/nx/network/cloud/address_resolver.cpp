@@ -8,7 +8,7 @@
 #include <utils/serialization/lexical.h>
 
 static const auto DNS_CACHE_TIME = std::chrono::seconds(10);
-static const auto MEDIATOR_CACHE_TIME = std::chrono::minutes(1);
+static const auto MEDIATOR_CACHE_TIME = std::chrono::seconds(10);
 
 namespace nx {
 namespace network {

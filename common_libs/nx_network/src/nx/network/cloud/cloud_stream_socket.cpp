@@ -349,22 +349,27 @@ void CloudStreamSocket::onAddressResolved(
     SystemError::ErrorCode osErrorCode,
     std::vector<AddressEntry> dnsEntries)
 {
-    auto operationLock = sharedOperationGuard->lock();
-    if (!operationLock)
-        return; //operation has been cancelled
+    m_aioThreadBinder->post(
+        [sharedOperationGuard = std::move(sharedOperationGuard), remotePort,
+            osErrorCode, dnsEntries = std::move(dnsEntries), this]() mutable
+        {
+            auto operationLock = sharedOperationGuard->lock();
+            if (!operationLock)
+                return; //operation has been cancelled
 
-    if (osErrorCode != SystemError::noError)
-    {
-        auto connectHandlerBak = std::move(m_connectHandler);
-        connectHandlerBak(osErrorCode);
-        return;
-    }
+            if (osErrorCode != SystemError::noError)
+            {
+                auto connectHandlerBak = std::move(m_connectHandler);
+                connectHandlerBak(osErrorCode);
+                return;
+            }
 
-    if (!startAsyncConnect(std::move(dnsEntries), remotePort))
-    {
-        auto connectHandlerBak = std::move(m_connectHandler);
-        connectHandlerBak(SystemError::getLastOSErrorCode());
-    }
+            if (!startAsyncConnect(std::move(dnsEntries), remotePort))
+            {
+                auto connectHandlerBak = std::move(m_connectHandler);
+                connectHandlerBak(SystemError::getLastOSErrorCode());
+            }
+        });
 }
 
 bool CloudStreamSocket::startAsyncConnect(

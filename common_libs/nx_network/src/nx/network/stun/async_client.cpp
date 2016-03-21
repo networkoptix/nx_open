@@ -31,8 +31,7 @@ boost::optional< QString >
 AsyncClient::AsyncClient(Timeouts timeouts):
     m_timeouts(timeouts),
     m_useSsl(false),
-    m_state(State::disconnected),
-    m_timer(new nx::network::aio::Timer())
+    m_state(State::disconnected)
 {
 }
 
@@ -40,12 +39,10 @@ AsyncClient::~AsyncClient()
 {
     std::unique_ptr< AbstractStreamSocket > connectingSocket;
     std::unique_ptr< BaseConnectionType > baseConnection;
-    std::unique_ptr< nx::network::aio::Timer > timer;
     {
         QnMutexLocker lock( &m_mutex );
         connectingSocket = std::move( m_connectingSocket );
 		baseConnection = std::move( m_baseConnection );
-        timer = std::move( m_timer );
         m_state = State::terminated;
     }
 
@@ -55,7 +52,7 @@ AsyncClient::~AsyncClient()
     if( connectingSocket )
         connectingSocket->pleaseStopSync();
 
-    timer->pleaseStopSync();
+    m_timer.pleaseStopSync();
 }
 
 void AsyncClient::connect(SocketAddress endpoint, bool useSsl)
@@ -148,15 +145,19 @@ void AsyncClient::openConnectionImpl(QnMutexLockerBase* lock)
     if( !m_endpoint )
     {
         lock->unlock();
-        return onConnectionComplete( SystemError::notConnected );
+        m_timer.post(std::bind(
+            &AsyncClient::onConnectionComplete, this, SystemError::notConnected));
+        return;
     }
 
     switch( m_state )
     {
         case State::disconnected: {
             // estabilish new connection
-            m_connectingSocket = SocketFactory::createStreamSocket(
-                        m_useSsl, SocketFactory::NatTraversalType::nttDisabled );
+            m_connectingSocket = 
+                SocketFactory::createStreamSocket(
+                    m_useSsl, SocketFactory::NatTraversalType::nttDisabled );
+            m_connectingSocket->bindToAioThread(m_timer.getAioThread());
 
             auto onComplete = [ this ]( SystemError::ErrorCode code )
                 { onConnectionComplete( code ); };
@@ -211,7 +212,7 @@ void AsyncClient::closeConnectionImpl(
     lock->relock();
 
     if( m_state != State::terminated )
-        m_timer->start(
+        m_timer.start(
             std::chrono::milliseconds(m_timeouts.reconnect),
             [this]
             {
