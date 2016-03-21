@@ -81,7 +81,7 @@ private:
 
 extern Logger logger;
 
-#define NO_LOG 0
+#define NO_LOG 1
 #define ITE_LOG() if (NO_LOG) {} else logger
 
 #define FMT(...) [&] \
