@@ -42,5 +42,3 @@ win32 {
 # QMAKE_EXTRA_COMPILERS += idlc
 
 HEADERS += ${project.build.directory}/axclient/axclient_app_info.h
-
-SOURCES += ${project.build.directory}/axclient_app_info_impl.cpp

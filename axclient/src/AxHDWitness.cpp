@@ -14,6 +14,8 @@
 
 #include <common/systemexcept_win32.h>
 
+#include <client/client_app_info.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 
@@ -86,7 +88,7 @@ bool initializeLog() {
         return false;
 
     QnLog::initLog(QString());
-    cl_log.log(QnAxClientAppInfo::applicationDisplayName(), " started", cl_logALWAYS);
+    cl_log.log(QnClientAppInfo::applicationDisplayName(), " started", cl_logALWAYS);
     cl_log.log("Software version: ", QnAppInfo::applicationVersion(), cl_logALWAYS);
 
     return true;
