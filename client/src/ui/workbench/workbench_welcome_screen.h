@@ -42,6 +42,7 @@ public: // Properties
     void setPageSize(const QSize &size);
 
 public slots:
+    // TODO: $ynikitenkov add multiple urls one-by-one  handling
     void connectToLocalSystem(const QString &serverUrl
         , const QString &userName
         , const QString &password);
@@ -49,6 +50,8 @@ public slots:
     void connectToCloudSystem(const QString &serverUrl);
 
     void connectToAnotherSystem();
+
+    void setupFactorySystem(const QString &serverUrl);
 
     void logoutFromCloud();
 
