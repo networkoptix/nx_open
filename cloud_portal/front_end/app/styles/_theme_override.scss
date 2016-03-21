@@ -67,6 +67,7 @@ $font-size-a-bit-large:   ceil($font-size-base * 1.15); //~16px - we just need 1
 
 .navbar-nav > li > .dropdown-menu {
   min-width:100%;
+  border-top:none;
 }
 
 
@@ -301,4 +302,11 @@ label {
 
 .help-block{
   background-color: $body-bg;
+}
+
+.navbar-default .navbar-nav>li.open>a{
+  border: 1px solid $dropdown-border;
+  border-bottom: none;
+  padding:15px;
+  @include box-shadow(0 2px 4px transparentize($dark15,0.7));
 }
