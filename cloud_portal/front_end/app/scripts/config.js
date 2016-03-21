@@ -73,7 +73,7 @@ var Config = {
         ]
     },
 
-    emailRegex:'.+@.+\\..+', // Check only @ and . in the email
+    emailRegex:"^[-!#$%&'*+/=?^_`{}|~0-9A-Z]+(\.[-!#$%&'*+/=?^_`{}|~0-9A-Z]+)*@(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+[A-Z]{2,6}\.?$", // Check only @ and . in the email
     passwordRequirements:
     {
         minLength: 6,

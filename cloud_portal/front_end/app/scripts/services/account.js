@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudApp')
-    .factory('account', function (cloudApi, dialogs, $q, $location) {
+    .factory('account', function (cloudApi, dialogs, $q, $location, $sessionStorage) {
         function get(){
             var defer = $q.defer();
             cloudApi.account().then(function(account){
@@ -30,7 +30,7 @@ angular.module('cloudApp')
             logoutAuthorised:function(){
                 get().then(function(){
                     cloudApi.logout().then(function(){
-                        scope.session.password = ''; // TODO: get rid of password in session storage
+                        $sessionStorage.$reset(); // Clear session
                         window.location.reload();
                     });
                 });
