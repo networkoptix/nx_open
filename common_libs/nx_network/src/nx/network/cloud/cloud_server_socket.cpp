@@ -13,6 +13,10 @@ namespace nx {
 namespace network {
 namespace cloud {
 
+namespace {
+const int kDefaultAcceptQueueSize = 128;
+}
+
 static const std::vector<CloudServerSocket::AcceptorMaker> defaultAcceptorMakers()
 {
     std::vector<CloudServerSocket::AcceptorMaker> makers;
@@ -51,7 +55,7 @@ CloudServerSocket::CloudServerSocket(
     m_mediatorConnection(std::move(mediatorConnection)),
     m_mediatorRegistrationRetryTimer(std::move(mediatorRegistrationRetryPolicy)),
     m_acceptorMakers(acceptorMakers),
-    m_acceptQueueLen(128),
+    m_acceptQueueLen(kDefaultAcceptQueueSize),
     m_state(State::init),
     m_terminated(false)
 {
@@ -121,7 +125,7 @@ AbstractSocket::SOCKET_HANDLE CloudServerSocket::handle() const
 bool CloudServerSocket::listen(int queueLen)
 {
     //actual initialization is done with first accept call
-    m_acceptQueueLen = queueLen;
+    m_acceptQueueLen = queueLen != 0 ? queueLen : kDefaultAcceptQueueSize;
     return true;
 }
 
@@ -202,6 +206,7 @@ aio::AbstractAioThread* CloudServerSocket::getAioThread()
 
 void CloudServerSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
+    NX_ASSERT(!m_tunnelPool);
     m_mediatorRegistrationRetryTimer.bindToAioThread(aioThread);
 }
 
@@ -410,27 +415,19 @@ void CloudServerSocket::acceptAsyncInternal(
         [this, handler = std::move(handler)](
             std::unique_ptr<AbstractStreamSocket> socket) mutable
         {
-            NX_ASSERT(!m_acceptedSocket, Q_FUNC_INFO, "concurrently accepted socket");
+            //NX_ASSERT(!m_acceptedSocket, Q_FUNC_INFO, "concurrently accepted socket");
             NX_LOGX(lm("accepted socket %1").arg(socket), cl_logDEBUG2);
 
-            m_acceptedSocket = std::move(socket);
-            m_mediatorRegistrationRetryTimer.post(
-                [this, handler = std::move(handler)]
-                {
-                    auto socket = std::move(m_acceptedSocket);
-                    m_acceptedSocket = nullptr;
-
-                    if (socket)
-                    {
-                        NX_LOGX(lm("return socket %1").arg(socket), cl_logDEBUG2);
-                        handler(SystemError::noError, socket.release());
-                    }
-                    else
-                    {
-                        NX_LOGX(lm("accept timed out"), cl_logDEBUG2);
-                        handler(SystemError::timedOut, nullptr);
-                    }
-                });
+            if (socket)
+            {
+                NX_LOGX(lm("return socket %1").arg(socket), cl_logDEBUG2);
+                handler(SystemError::noError, socket.release());
+            }
+            else
+            {
+                NX_LOGX(lm("accept timed out"), cl_logDEBUG2);
+                handler(SystemError::timedOut, nullptr);
+            }
         },
         m_socketAttributes.recvTimeout);
 }
