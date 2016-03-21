@@ -35,6 +35,9 @@
             <div class="panel panel-default" ng-if="isOwner">
                 <div class="panel-body">
                     <h2>Your system</h2>
+                    <p></p>
+                    <button class="btn btn-default" ng-click="disconnect()">Disconnect from
+                        <span class="product-name">Nx Cloud</span></button>
                 </div>
             </div>
 
@@ -44,8 +47,11 @@
                     <h3>{{system.info.ownerFullName}}</h3>
                     <a ng-href="mailto:{{system.info.ownerAccountEmail}}">{{system.info.ownerAccountEmail}}</a>
                     <hr>
-                    Your permissions:<br>
-                    <b>{{L.accessRoles[system.info.accessRole].label || system.info.accessRole}}</b>
+                    <p>
+                        Your permissions:
+                        <b>{{L.accessRoles[system.info.accessRole].label || system.info.accessRole}}</b>
+                    </p>
+                    <button class="btn btn-default" ng-click="delete()">Remove from my Account</button>
                 </div>
             </div>
         </div>

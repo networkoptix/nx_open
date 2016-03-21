@@ -85,10 +85,7 @@ angular.module('cloudApp')
             });
         }
 
-        // Unbind or unshare from me
-        $scope.delete = function(){
-            //1. Determine, if I am the owner
-
+        $scope.disconnect = function(){
             if($scope.isOwner ){
 
                 // User is the owner. Deleting system means unbinding it and disconnecting all accounts
@@ -100,7 +97,10 @@ angular.module('cloudApp')
                         $scope.deletingSystem.run();
                     });
 
-            }else{
+            }
+        };
+        $scope.delete= function(){
+            if(!$scope.isOwner ){
                 // User is not owner. Deleting means he'll lose access to it
                 dialogs.confirm(L.system.confirmUnshareFromMe, L.system.confirmUnshareFromMeTitle, L.system.confirmUnshareFromMeAction, 'danger').
                     then(function(){
@@ -110,7 +110,6 @@ angular.module('cloudApp')
                         $scope.deletingSystem.run();
                     });
             }
-
         };
 
         $scope.share = function(){
