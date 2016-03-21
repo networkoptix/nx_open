@@ -44,9 +44,6 @@
 #include <QtGui/QOpenGLFunctions>
 #include "resource_allocator.h"
 
-
-#include "version.h"
-
 void initDecoders(QQuickWindow *window)
 {
     using namespace nx::media;

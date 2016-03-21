@@ -11,12 +11,12 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>mobile_client</artifactId>
     <packaging>pom</packaging>
-    <name>HD Witness Mobile Client</name>
+    <name>Nx Witness Mobile Client</name>
 
     <properties>
         <guid>${mobile_client.guid}</guid>
         <product.title>${mobile_client.name}</product.title>
-        <product.display.title>${client.display.name}</product.display.title>
+        <product.display.title>${mobile_client.display.name}</product.display.title>
         <template>app</template>
         <!--Global libs-->
         <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc</ffmpeg.libs>
