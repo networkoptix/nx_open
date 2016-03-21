@@ -33,11 +33,6 @@ BaseTile
     {
         variableName: "isMasked";
         writeVariableName: "isMaskedPrivate";
-        onIsSomeoneActiveChanged:
-        {
-            if (isSomeoneActive)
-                isExpandedPrivate = true;
-        }
     }
 
     onIsExpandedChanged:

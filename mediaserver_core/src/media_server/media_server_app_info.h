@@ -1,13 +1,10 @@
 #pragma once
 
-struct QnClientAppInfo
+struct QnServerAppInfo
 {
     /** History name, used as a key in windows registry, appdata folder, etc. */
     static QString applicationName();
 
     /** Real application name, visible to the user. */
     static QString applicationDisplayName();
-
-    /** Resource file id for videowall shortcut. */
-    static int videoWallIconId();
 };

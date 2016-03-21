@@ -1,4 +1,4 @@
-import QtQuick 2.5;
+import QtQuick 2.6;
 import QtQuick.Controls 1.2;
 import NetworkOptix.Qml 1.0;
 
@@ -8,23 +8,18 @@ Rectangle
 {
     id: thisComponent;
 
-    anchors.fill: parent;
     color: Style.colors.window;
 
-    enabled: context.isEnabled;
-    focus: true;
+    width: context.pageSize.width;
+    height: context.pageSize.height;
 
-    MouseArea
-    {
-        anchors.fill: parent;
-        onClicked: grid.watcher.resetCurrentItem();
-    }
+    focus: true;
 
     CloudPanel
     {
         id: cloudPanel;
 
-        y: ((grid.y - height) / 2)
+        y: ((grid.y - height) / 2);
         anchors.horizontalCenter: parent.horizontalCenter;
 
         userName: context.cloudUserName;
@@ -78,6 +73,8 @@ Rectangle
 
                     LocalSystemTile
                     {
+                        visualParent: thisComponent;
+
                         systemName: model.systemName;
                         isRecentlyConnected: (knownUsersModel ? knownUsersModel.hasConnections : false);
 
@@ -99,6 +96,8 @@ Rectangle
 
                     CloudSystemTile
                     {
+                        visualParent: thisComponent;
+
                         systemName: model.systemName;
                         host: model.host;
                         onConnectClicked:
@@ -112,7 +111,7 @@ Rectangle
                 sourceComponent: (model.isCloudSystem
                     ? cloudSystemTile : localSystemTile);
 
-                onLoaded: grid.watcher.addItem(tileLoader.item);
+                onLoaded: { grid.watcher.addItem(tileLoader.item); }
             }
         }
     }

@@ -20,7 +20,6 @@
 #include <utils/common/systemerror.h>
 
 #include "auth_tools.h"
-#include "version.h"
 
 //TODO: #ak persistent connection support
 //TODO: #ak MUST call cancelAsyncIO with 1st parameter set to false
@@ -954,7 +953,7 @@ namespace nx_http
             SystemError::ErrorCode osErrorCode,
             int statusCode,
             nx_http::StringType,
-            nx_http::BufferType msgBody ) 
+            nx_http::BufferType msgBody )
         {
             completionHandler(osErrorCode, statusCode, msgBody);
         };
