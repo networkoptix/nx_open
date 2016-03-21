@@ -10,6 +10,7 @@ CopyMediaServerProfile
 CopyAppServerProfile
 CopyAppServerNotificationFiles
 DeleteDatabaseFile
+DeleteRegistryKeys
 BackupDatabaseFile
 RestoreDatabaseFile
 CopyDatabaseFile

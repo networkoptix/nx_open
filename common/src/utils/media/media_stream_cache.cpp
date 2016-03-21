@@ -4,10 +4,10 @@
 
 #include "media_stream_cache.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <cstdlib>
 #include <algorithm>
-
-#include <QMutexLocker>
 
 //#define DEBUG_OUTPUT
 #ifdef DEBUG_OUTPUT
@@ -180,3 +180,5 @@ qint64 MediaStreamCache::inactivityPeriod() const
 {
     return m_sharedImpl->inactivityPeriod();
 }
+
+#endif // ENABLE_DATA_PROVIDERS

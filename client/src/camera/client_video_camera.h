@@ -8,15 +8,20 @@
 
 #include <recording/stream_recorder.h>
 
+#include <utils/common/connective.h>
+
 class QnlTimeSource;
 class QnStatistics;
 class QnResource;
 class QnAbstractArchiveReader;
+class QnTimePeriod;
 
-class QnClientVideoCamera : public QObject {
+class QnClientVideoCamera : public Connective<QObject> {
     Q_OBJECT
 
     Q_ENUMS(ClientVideoCameraError)
+
+    typedef Connective<QObject> base_type;
 public:
     enum ClientVideoCameraError {
         NoError = 0,
@@ -50,9 +55,7 @@ public:
 
     void setExternalTimeSource(QnlTimeSource* value) { m_extTimeSrc = value; }
 
-    // TODO: #Elric remove these
-    bool isVisible() const { return m_isVisible; }
-    void setVisible(bool value) { m_isVisible = value; }
+
 
     /*
     * Export motion stream to separate file
@@ -61,7 +64,8 @@ public:
     QSharedPointer<QBuffer> motionIODevice(int channel);
 
     //TODO: #GDM Refactor parameter set to the structure
-    void exportMediaPeriodToFile(qint64 startTime, qint64 endTime, const QString& fileName, const QString& format, 
+    void exportMediaPeriodToFile(const QnTimePeriod &timePeriod, 
+								 const QString& fileName, const QString& format, 
                                  QnStorageResourcePtr storage, QnStreamRecorder::Role role,
                                  qint64 serverTimeZoneMs,
                                  QnImageFilterHelper transcodeParams);
@@ -72,7 +76,7 @@ public:
     bool isDisplayStarted() const { return m_displayStarted; }
 signals:
     void exportProgress(int progress);
-    void exportFinished(int status, const QString &fileName);
+    void exportFinished(QnStreamRecorder::ErrorStruct reason, const QString &fileName);
     void exportStopped();
 
 public slots:
@@ -82,15 +86,14 @@ public slots:
 
     void stopExport();
 private:
-    mutable QMutex m_exportMutex;
+    mutable QnMutex m_exportMutex;
     QnMediaResourcePtr m_resource;
-    QnCamDisplay m_camdispay;
-    QnAbstractMediaStreamDataProvider* m_reader;
+    QnCamDisplay m_camdispay;   //TODO: #GDM refactor to scoped pointer
+    QPointer<QnAbstractMediaStreamDataProvider> m_reader;   //TODO: #GDM refactor to unique pointer or 'owner' template
 
-    QnlTimeSource* m_extTimeSrc;
-    bool m_isVisible;
-    QnStreamRecorder* m_exportRecorder;
-    QnAbstractArchiveReader* m_exportReader;
+    QnlTimeSource* m_extTimeSrc;    //TODO: #GDM refactor to weak pointer
+    QPointer<QnStreamRecorder> m_exportRecorder;
+    QPointer<QnAbstractArchiveReader> m_exportReader;
     QSharedPointer<QBuffer> m_motionFileList[CL_MAX_CHANNELS];
     bool m_displayStarted;
 };

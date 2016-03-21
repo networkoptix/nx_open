@@ -1,8 +1,10 @@
 #ifndef QN_SERIALIZATION_JSON_FUNCTIONS_H
 #define QN_SERIALIZATION_JSON_FUNCTIONS_H
 
+#include <chrono>
 #include <vector>
 #include <set>
+#include <string>
 #include <map>
 #include <limits>
 
@@ -25,6 +27,7 @@
 #include <QtGui/QVector4D>
 #include <QtGui/QFont>
 
+#include <common/common_globals.h>
 #include <utils/common/collection.h>
 #include <utils/common/latin1_array.h>
 
@@ -250,6 +253,38 @@ QN_DEFINE_DIRECT_JSON_SERIALIZATION_FUNCTIONS(QJsonArray,   Array,  toArray)
 QN_DEFINE_DIRECT_JSON_SERIALIZATION_FUNCTIONS(QJsonObject,  Object, toObject)
 #undef QN_DEFINE_DIRECT_JSON_SERIALIZATION_FUNCTIONS
 
+
+inline void serialize(QnJsonContext *, const std::string &value, QJsonValue *target) {
+    *target = QJsonValue(QString::fromStdString(value));
+}
+
+inline bool deserialize(QnJsonContext *, const QJsonValue &value, std::string *target) {
+    if(value.type() != QJsonValue::String)
+        return false;
+
+    *target = value.toString().toStdString();
+    return true;
+}
+
+
+#ifndef Q_MOC_RUN
+#define QN_DEFINE_JSON_CHRONO_SERIALIZATION_FUNCTIONS(TYPE)                                         \
+inline void serialize(QnJsonContext *, const std::chrono::TYPE &value, QJsonValue *target) {        \
+    *target = QJsonValue(QString::number(value.count()));                                           \
+}                                                                                                   \
+                                                                                                    \
+inline bool deserialize(QnJsonContext *, const QJsonValue &value, std::chrono::TYPE *target) {      \
+    if(value.type() != QJsonValue::String)                                                          \
+        return false;                                                                               \
+                                                                                                    \
+    *target = std::chrono::TYPE(value.toVariant().value<std::chrono::TYPE::rep>());                 \
+    return true;                                                                                    \
+}
+
+QN_DEFINE_JSON_CHRONO_SERIALIZATION_FUNCTIONS(seconds)
+QN_DEFINE_JSON_CHRONO_SERIALIZATION_FUNCTIONS(milliseconds)
+QN_DEFINE_JSON_CHRONO_SERIALIZATION_FUNCTIONS(microseconds)
+#endif
 
 #define QN_DEFINE_INTEGER_JSON_SERIALIZATION_FUNCTIONS(TYPE)                    \
 inline void serialize(QnJsonContext *ctx, const TYPE &value, QJsonValue *target) { \

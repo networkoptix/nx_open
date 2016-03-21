@@ -3,15 +3,20 @@
 #include "core/resource/param.h"
 
 #include <utils/serialization/lexical.h>
-
+#include <core/resource/resource_type.h>
 
 const static QString __CAMERA_EXCEPT_PARAMS[] = {
 	Qn::CAMERA_CREDENTIALS_PARAM_NAME,
     Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME, 
-    Qn::CAMERA_SETTINGS_ID_PARAM_NAME,
-    Qn::PHYSICAL_CAMERA_SETTINGS_XML_PARAM_NAME,
+//     Qn::CAMERA_SETTINGS_ID_PARAM_NAME,
+//     Qn::PHYSICAL_CAMERA_SETTINGS_XML_PARAM_NAME,
+	Qn::CAMERA_ADVANCED_PARAMETERS,
     QLatin1String("DeviceID"), QLatin1String("DeviceUrl"), // from plugin onvif
     QLatin1String("MediaUrl"),
+};
+
+const static QString __CAMERA_RESOURCE_PARAMS[] = {
+    Qn::MAX_FPS_PARAM_NAME,
 };
 
 // TODO: remove this hack when VISUAL STUDIO supports initializer lists
@@ -21,9 +26,9 @@ namespace ec2 {
 
     QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES( \
             (ApiCameraDataStatistics)(ApiStorageDataStatistics)(ApiMediaServerDataStatistics) \
-            (ApiLicenseStatistics)(ApiBusinessRuleStatistics) \
+            (ApiLicenseStatistics)(ApiBusinessRuleStatistics)(ApiUserDataStatistics) \
 			(ApiSystemStatistics)(ApiStatisticsServerInfo), \
-            (ubjson)(xml)(json)(sql_record)(csv_record), _Fields)
+            (ubjson)(xml)(json)(sql_record)(csv_record), _Fields, (optional, true))
 
     ApiCameraDataStatistics::ApiCameraDataStatistics() {}
 
@@ -43,10 +48,34 @@ namespace ec2 {
         
         addParams.erase(rm, addParams.end());
         addParams.push_back(ApiResourceParamData(defCred, isDefCred ? lit("true") : lit("false")));
+
+        // update resource defaults if not in addParams
+        for (const auto& param : RESOURCE_PARAMS)
+        {
+            if (!qnResTypePool)
+                return;
+
+            const auto it = std::find_if(
+                addParams.begin(), addParams.end(),
+                [&param](ApiResourceParamData& d) { return d.name == param; });
+
+            if (it != addParams.end() && !it->value.isEmpty() && it->value != lit("0"))
+                continue;
+
+            if (const auto type = qnResTypePool->getResourceType(typeId))
+            {
+                const auto value = type->defaultValue(param);
+                if (!value.isEmpty())
+                    addParams.push_back(ApiResourceParamData(param, value));
+            }
+        }
     }
 
     const std::set<QString> ApiCameraDataStatistics::EXCEPT_PARAMS(
             INIT_LIST(__CAMERA_EXCEPT_PARAMS));
+
+    const std::set<QString> ApiCameraDataStatistics::RESOURCE_PARAMS(
+            INIT_LIST(__CAMERA_RESOURCE_PARAMS));
 
     ApiStorageDataStatistics::ApiStorageDataStatistics() {}
 
@@ -59,8 +88,10 @@ namespace ec2 {
     ApiMediaServerDataStatistics::ApiMediaServerDataStatistics(ApiMediaServerDataEx&& data)
         : ApiMediaServerDataEx(std::move(data))
     {
-        for (auto s : ApiMediaServerDataEx::storages)
+        for (auto& s : ApiMediaServerDataEx::storages)
             storages.push_back(std::move(s));
+
+        ApiMediaServerDataEx::storages.clear();
     }
 
     ApiLicenseStatistics::ApiLicenseStatistics()
@@ -70,7 +101,7 @@ namespace ec2 {
         : cameraCount(0)
     {
         QMap<QString, QString> parsed;
-        for (auto value : data.licenseBlock.split('\n'))
+        for (const auto& value : data.licenseBlock.split('\n'))
         {
             auto pair = value.split('=');
             if (pair.size() == 2) 
@@ -91,5 +122,11 @@ namespace ec2 {
     ApiBusinessRuleStatistics::ApiBusinessRuleStatistics(ApiBusinessRuleData&& data)
         : ApiBusinessRuleData(std::move(data))
 	{}
+
+    ApiUserDataStatistics::ApiUserDataStatistics() {}
+
+    ApiUserDataStatistics::ApiUserDataStatistics(ApiUserData&& data)
+        : ApiUserData(std::move(data))
+    {}
 
 } // namespace ec2

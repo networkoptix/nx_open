@@ -2,6 +2,8 @@
 
 #include <QtGui/QPainter>
 
+#include <common/common_module.h>
+
 #include <utils/math/math.h>
 #include <utils/color_space/yuvconvert.h>
 #include <utils/threaded_image_loader.h>
@@ -106,12 +108,14 @@ QnGridBackgroundItem::QnGridBackgroundItem(QGraphicsItem *parent, QnWorkbenchCon
 
     connect(this->context()->instance<QnLocalFileCache>(),      &QnAppServerFileCache::fileDownloaded, this, imageLoaded);
     connect(this->context()->instance<QnAppServerImageCache>(), &QnAppServerFileCache::fileDownloaded, this, imageLoaded);
-    connect(this->context(), SIGNAL(userChanged(QnUserResourcePtr)), this, SLOT(at_context_userChanged()));
+    connect(qnCommon,   &QnCommonModule::remoteIdChanged,   this, &QnGridBackgroundItem::updateConnectedState);
 
     connect(qnSettings->notifier(QnClientSettings::BACKGROUND), &QnPropertyNotifier::valueChanged, this, &QnGridBackgroundItem::updateDefaultBackground);
 
     /* Don't disable this item here. When disabled, it starts accepting wheel events
      * (and probably other events too). Looks like a Qt bug. */
+
+    updateConnectedState();
 }
 
 QnGridBackgroundItem::~QnGridBackgroundItem() {
@@ -281,9 +285,9 @@ void QnGridBackgroundItem::updateGeometry() {
     setViewportRect(targetRect);
 }
 
-void QnGridBackgroundItem::at_context_userChanged() {
+void QnGridBackgroundItem::updateConnectedState() {
     Q_D(QnGridBackgroundItem);
-    d->connected = context()->user() != NULL;
+    d->connected = !qnCommon->remoteGUID().isNull();
     updateDisplay();
 }
 

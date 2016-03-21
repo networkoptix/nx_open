@@ -7,7 +7,7 @@
 #include <ui/common/fixed_rotation.h>
 #include <utils/common/forward.h>
 
-template<class Base> 
+template<class Base>
 class Overlayed;
 
 class QnViewportBoundWidget;
@@ -44,13 +44,14 @@ namespace detail {
         void removeOverlayWidget(QGraphicsWidget *widget);
 
         OverlayVisibility overlayWidgetVisibility(QGraphicsWidget *widget) const;
-        void setOverlayWidgetVisibility(QGraphicsWidget *widget, OverlayVisibility visibility);
+        void setOverlayWidgetVisibility(QGraphicsWidget *widget, OverlayVisibility visibility, bool animate = true);
         void updateOverlayWidgetsVisibility(bool animate = true);
 
         static void setOverlayWidgetVisible(QGraphicsWidget* widget, bool visible = true, bool animate = true);
+        static bool isOverlayWidgetVisible(QGraphicsWidget* widget);
     private:
         template<class Base>
-        friend class ::Overlayed; 
+        friend class ::Overlayed;
 
         void initOverlayed(QGraphicsWidget *widget);
 
@@ -66,6 +67,8 @@ namespace detail {
             QGraphicsWidget *childWidget;
             QnViewportBoundWidget *boundWidget;
             QnFixedRotationTransform *rotationTransform;
+
+            OverlayWidget();
         };
 
         QGraphicsWidget* m_widget;

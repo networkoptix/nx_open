@@ -12,12 +12,13 @@
 static const double MIN_FPS = 1.0 / 86400.0; //once per day
 static const double MAX_FPS = 30;
 
-MediaEncoder::MediaEncoder(
-    CameraManager* const cameraManager,
-    int encoderNumber )
+MediaEncoder::MediaEncoder(CameraManager* const cameraManager, 
+                           nxpl::TimeProvider *const timeProvider,
+                           int encoderNumber )
 :
     m_refManager( cameraManager->refManager() ),
     m_cameraManager( cameraManager ),
+    m_timeProvider( timeProvider ),
     m_encoderNumber( encoderNumber ),
     m_currentFps( MAX_FPS )
 {
@@ -129,6 +130,7 @@ nxcip::StreamReader* MediaEncoder::getLiveStreamReader()
     if( !m_streamReader.get() )
         m_streamReader.reset( new StreamReader(
             &m_refManager,
+            m_timeProvider,
             m_cameraManager->info(),
             m_currentFps,
             m_encoderNumber ) );

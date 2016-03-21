@@ -1,10 +1,16 @@
+
 #include "global_monitor.h"
+
+#ifdef __linux__
+#include <malloc.h>
+#include <stdio.h>
+#endif
 
 #include <QtCore/QBasicTimer>
 #include <QtCore/QCoreApplication>
 #include <QtCore/QElapsedTimer>
-#include <QtCore/QMutex>
-#include <QtCore/QMutexLocker>
+#include <utils/thread/mutex.h>
+#include <utils/thread/mutex.h>
 
 #include <utils/common/warnings.h>
 #include <utils/common/delete_later.h>
@@ -63,7 +69,7 @@ public:
     }
 
 private:
-    mutable QMutex mutex;
+    mutable QnMutex mutex;
 
     QnPlatformMonitor *base;
     qint64 updatePeriod;
@@ -125,14 +131,14 @@ QnGlobalMonitor::~QnGlobalMonitor() {
 
 qint64 QnGlobalMonitor::updatePeriod() const {
     Q_D(const QnGlobalMonitor);
-    QMutexLocker locker(&d->mutex);
+    QnMutexLocker locker( &d->mutex );
 
     return d->updatePeriod;
 }
 
 void QnGlobalMonitor::setUpdatePeriod(qint64 updatePeriod) {
     Q_D(QnGlobalMonitor);
-    QMutexLocker locker(&d->mutex);
+    QnMutexLocker locker( &d->mutex );
 
     if(d->updatePeriod == updatePeriod)
         return;
@@ -141,11 +147,11 @@ void QnGlobalMonitor::setUpdatePeriod(qint64 updatePeriod) {
     d->restartTimersLocked();
 }
 
-static const int STATISTICS_LOGGING_PERIOD_MS = 10 * 60 * 1000;
+static const int STATISTICS_LOGGING_PERIOD_MS = 100 * 60 * 1000;
 
 qreal QnGlobalMonitor::totalCpuUsage() {
     Q_D(QnGlobalMonitor);
-    QMutexLocker locker(&d->mutex);
+    QnMutexLocker locker( &d->mutex );
 
     d->requestCount++;
     d->stopped = false;
@@ -162,7 +168,7 @@ qreal QnGlobalMonitor::totalCpuUsage() {
 
 qreal QnGlobalMonitor::totalRamUsage() {
     Q_D(QnGlobalMonitor);
-    QMutexLocker locker(&d->mutex);
+    QnMutexLocker locker( &d->mutex );
 
     d->requestCount++;
     d->stopped = false;
@@ -179,7 +185,7 @@ qreal QnGlobalMonitor::totalRamUsage() {
 
 QList<QnPlatformMonitor::HddLoad> QnGlobalMonitor::totalHddLoad() {
     Q_D(QnGlobalMonitor);
-    QMutexLocker locker(&d->mutex);
+    QnMutexLocker locker( &d->mutex );
 
     d->requestCount++;
     d->stopped = false;
@@ -191,6 +197,16 @@ QList<QnPlatformMonitor::HddLoad> QnGlobalMonitor::totalHddLoad() {
         for( const HddLoad& hddLoad : d->totalHddLoad )
             NX_LOG(lit("    %1: %2%").arg(hddLoad.hdd.name).arg(hddLoad.load * 100, 0, 'f', 2), cl_logWARNING);
         d->prevHddUsageLoggingClock = d->upTimeTimer.elapsed();
+
+#ifdef __linux__
+        const size_t memStatBufSize = 64*1024;
+        std::vector<char> memStatBuf;
+        memStatBuf.resize(memStatBufSize);
+        FILE* memStatStr = fmemopen(memStatBuf.data(), memStatBufSize, "w");
+        malloc_info(0, memStatStr);
+        fclose(memStatStr);
+        NX_LOG(lit("MONITORING. malloc statistics: \n%1").arg(memStatBuf.data()), cl_logWARNING);
+#endif
     }
 
     return d->totalHddLoad;
@@ -198,7 +214,7 @@ QList<QnPlatformMonitor::HddLoad> QnGlobalMonitor::totalHddLoad() {
 
 QList<QnPlatformMonitor::NetworkLoad> QnGlobalMonitor::totalNetworkLoad() {
     Q_D(QnGlobalMonitor);
-    QMutexLocker locker(&d->mutex);
+    QnMutexLocker locker( &d->mutex );
 
     d->requestCount++;
     d->stopped = false;
@@ -218,14 +234,14 @@ QList<QnPlatformMonitor::NetworkLoad> QnGlobalMonitor::totalNetworkLoad() {
 
 QList<QnPlatformMonitor::PartitionSpace> QnGlobalMonitor::totalPartitionSpaceInfo() {
     Q_D(QnGlobalMonitor);
-    QMutexLocker locker(&d->mutex);
+    QnMutexLocker locker( &d->mutex );
 
     return d_func()->base->totalPartitionSpaceInfo();
 }
 
 QString QnGlobalMonitor::partitionByPath(const QString &path) {
     Q_D(QnGlobalMonitor);
-    QMutexLocker locker(&d->mutex);
+    QnMutexLocker locker( &d->mutex );
 
     return d_func()->base->partitionByPath(path);
 }
@@ -233,7 +249,7 @@ QString QnGlobalMonitor::partitionByPath(const QString &path) {
 void QnGlobalMonitor::timerEvent(QTimerEvent *event) {
     Q_D(QnGlobalMonitor);
 
-    QMutexLocker locker(&d->mutex);
+    QnMutexLocker locker( &d->mutex );
 
     if(event->timerId() == d->updateTimer.timerId()) {
         if(!d->stopped)

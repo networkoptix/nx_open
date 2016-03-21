@@ -14,6 +14,7 @@ public:
         ConsistencyError,
         UploadError,
         TimeoutError,
+        AuthenticationError,
         NoFreeSpaceError
     };
 

@@ -3,7 +3,7 @@
 
 #include <memory>
 #include <QtCore/QObject>
-#include <QtCore/QMutex>
+#include <utils/thread/mutex.h>
 
 #include "asynchttpclient.h"
 
@@ -27,7 +27,7 @@ private slots:
     void at_client_done(const nx_http::AsyncHttpClientPtr &client);
 
 private:
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
 
     nx_http::AsyncHttpClientPtr m_client;
 

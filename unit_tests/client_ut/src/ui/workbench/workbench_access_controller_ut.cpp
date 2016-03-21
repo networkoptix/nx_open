@@ -31,7 +31,7 @@ void PrintTo(const Qn::Permissions& val, ::std::ostream* os) {
 }
 
 class QnWorkbenchAccessControllerTest : public testing::Test {
-protected:  
+protected:
 
     // virtual void SetUp() will be called before each test is run.
     virtual void SetUp() {
@@ -73,7 +73,7 @@ protected:
     }
 
     void loginAs(Qn::Permissions globalPermissions) {
-        auto user = addUser(userName1, globalPermissions);  
+        auto user = addUser(userName1, globalPermissions);
         m_context->setUserName(userName1);
     }
 
@@ -98,9 +98,9 @@ protected:
 /** Initial test. Check if current user is set correctly. */
 TEST_F( QnWorkbenchAccessControllerTest, init )
 {
-    auto user = addUser(userName1, Qn::GlobalOwnerPermissions);  
+    auto user = addUser(userName1, Qn::GlobalOwnerPermissions);
     m_context->setUserName(userName1);
-    
+
     ASSERT_EQ(user, m_context->user());
 }
 
@@ -184,7 +184,7 @@ TEST_F( QnWorkbenchAccessControllerTest, checkLocalLayoutsUnlogged )
 {
     auto layout = createLayout(Qn::local);
     qnResPool->addResource(layout);
-    
+
     ASSERT_TRUE(m_context->snapshotManager()->isLocal(layout));
     ASSERT_TRUE(m_context->user().isNull());
 
@@ -206,12 +206,12 @@ TEST_F( QnWorkbenchAccessControllerTest, checkLocalLayoutsLoggedIn )
 {
     loginAs(Qn::GlobalLiveViewerPermissions);
 
-    
+
     auto layout = createLayout(Qn::local);
     qnResPool->addResource(layout);
 
     ASSERT_TRUE(m_context->snapshotManager()->isLocal(layout));
-         
+
     Qn::Permissions desired = Qn::FullLayoutPermissions;
     Qn::Permissions forbidden = Qn::RemovePermission;
     desired &= ~forbidden;
@@ -315,7 +315,7 @@ TEST_F( QnWorkbenchAccessControllerTest, checkLockedLocalLayoutsLoggedInSafeMode
 {
     loginAs(Qn::GlobalLiveViewerPermissions);
     qnCommon->setReadOnly(true);
-    
+
     auto layout = createLayout(Qn::local, true);
     qnResPool->addResource(layout);
 
@@ -333,7 +333,7 @@ TEST_F( QnWorkbenchAccessControllerTest, checkLockedLocalLayoutsAsAdminSafeMode 
 {
     loginAs(Qn::GlobalOwnerPermissions);
     qnCommon->setReadOnly(true);
-    
+
     auto layout = createLayout(Qn::local, true);
     qnResPool->addResource(layout);
 
@@ -370,7 +370,7 @@ TEST_F( QnWorkbenchAccessControllerTest, checkRemoteLayoutAsAdmin )
 TEST_F( QnWorkbenchAccessControllerTest, checkLockedRemoteLayoutAsAdmin )
 {
     loginAs(Qn::GlobalOwnerPermissions);
-    
+
     auto layout = createLayout(Qn::remote, true);
     qnResPool->addResource(layout);
 
@@ -388,7 +388,7 @@ TEST_F( QnWorkbenchAccessControllerTest, checkRemoteLayoutAsAdminSafeMode )
 {
     loginAs(Qn::GlobalOwnerPermissions);
     qnCommon->setReadOnly(true);
-    
+
     auto layout = createLayout(Qn::remote);
     qnResPool->addResource(layout);
 
@@ -406,7 +406,7 @@ TEST_F( QnWorkbenchAccessControllerTest, checkLockedRemoteLayoutAsAdminSafeMode 
 {
     loginAs(Qn::GlobalOwnerPermissions);
     qnCommon->setReadOnly(true);
-    
+
     auto layout = createLayout(Qn::remote, true);
     qnResPool->addResource(layout);
 
@@ -427,7 +427,7 @@ TEST_F( QnWorkbenchAccessControllerTest, checkLockedRemoteLayoutAsAdminSafeMode 
 TEST_F( QnWorkbenchAccessControllerTest, checkRemoteLayoutAsViewer )
 {
     loginAs(Qn::GlobalLiveViewerPermissions);
-    
+
     auto layout = createLayout(Qn::remote);
     qnResPool->addResource(layout);
 
@@ -517,7 +517,7 @@ TEST_F( QnWorkbenchAccessControllerTest, checkReadOnlyRemoteLayoutAsViewer )
 TEST_F( QnWorkbenchAccessControllerTest, checkReadOnlyLockedRemoteLayoutAsViewer )
 {
     loginAs(Qn::GlobalLiveViewerPermissions);
-    
+
     auto layout = createLayout(Qn::remote, true, false);
     qnResPool->addResource(layout);
 
@@ -535,7 +535,7 @@ TEST_F( QnWorkbenchAccessControllerTest, checkReadOnlyRemoteLayoutAsViewerSafeMo
 {
     loginAs(Qn::GlobalLiveViewerPermissions);
     qnCommon->setReadOnly(true);
-    
+
     auto layout = createLayout(Qn::remote, false, false);
     qnResPool->addResource(layout);
 

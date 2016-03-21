@@ -34,7 +34,7 @@ public:
     virtual QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode) override;
 
     virtual int getCapabilities() const override;
-    virtual bool isAvailable() const override;
+    virtual bool initOrUpdate() const override;
     virtual QnAbstractStorageResource::FileInfoList getFileList(const QString& dirName) override;
     qint64 getFileSize(const QString& url) const override;
     virtual bool removeFile(const QString& url) override;
@@ -99,8 +99,8 @@ private:
     friend class QnLayoutFile;
     QnLayoutFileIndex m_index;
     QSet<QnLayoutFile*> m_openedFiles;
-    QMutex m_fileSync;
-    static QMutex m_storageSync;
+    QnMutex m_fileSync;
+    static QnMutex m_storageSync;
     static QSet<QnLayoutFileStorageResource*> m_allStorages;
     qint64 m_novFileOffset;
 

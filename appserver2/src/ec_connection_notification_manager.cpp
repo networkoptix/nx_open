@@ -198,7 +198,7 @@ namespace ec2
         m_resourceManager->triggerNotification( tran );
     }
 
-    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiCameraServerItemData>& tran ) {
+    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiServerFootageData>& tran ) {
         return m_cameraManager->triggerNotification( tran );
     }
 
@@ -258,10 +258,6 @@ namespace ec2
         m_updatesManager->triggerNotification(tran);
     }
 
-    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiCameraBookmarkTagDataList>& tran ) {
-        m_cameraManager->triggerNotification(tran);
-    }
-
     void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiPeerSystemTimeData>& /*tran*/ ) {
         //#ak no notification needed in this case
     }
@@ -270,12 +266,12 @@ namespace ec2
         //#ak no notification needed in this case
     }
 
-    void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiModuleData> &tran) {
-        m_miscManager->triggerNotification(tran);
+    void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiDiscoveredServerData> &tran) {
+        m_discoveryManager->triggerNotification(tran);
     }
 
-    void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiModuleDataList> &tran) {
-        m_miscManager->triggerNotification(tran);
+    void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiDiscoveredServerDataList> &tran) {
+        m_discoveryManager->triggerNotification(tran);
     }
 
     void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiDiscoveryData> &tran) {

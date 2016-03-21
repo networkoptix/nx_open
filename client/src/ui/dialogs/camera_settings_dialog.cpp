@@ -36,7 +36,7 @@ QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
     m_buttonBox->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel | QDialogButtonBox::Apply);
     m_applyButton = m_buttonBox->button(QDialogButtonBox::Apply);
     m_okButton = m_buttonBox->button(QDialogButtonBox::Ok);
-    
+
     m_openButton = new QPushButton(tr("Open in New Tab"));
     m_buttonBox->addButton(m_openButton, QDialogButtonBox::HelpRole);
 
@@ -54,13 +54,13 @@ QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
 
     connect(m_settingsWidget,   &QnCameraSettingsWidget::hasChangesChanged,         this,   &QnCameraSettingsDialog::at_settingsWidget_hasChangesChanged);
     connect(m_settingsWidget,   &QnCameraSettingsWidget::modeChanged,               this,   &QnCameraSettingsDialog::at_settingsWidget_modeChanged);
-    
+
     connect(m_openButton,       &QPushButton::clicked,              this,   &QnCameraSettingsDialog::at_openButton_clicked);
     connect(m_diagnoseButton,   &QPushButton::clicked,              this,   &QnCameraSettingsDialog::at_diagnoseButton_clicked);
     connect(m_rulesButton,      &QPushButton::clicked,              this,   &QnCameraSettingsDialog::at_rulesButton_clicked);
 
     connect(m_settingsWidget,   &QnCameraSettingsWidget::resourcesChanged, this,   &QnCameraSettingsDialog::updateReadOnly);
-    
+
     connect(context(),          &QnWorkbenchContext::userChanged,          this,   &QnCameraSettingsDialog::updateReadOnly);
 
     auto selectionWatcher = new QnWorkbenchSelectionWatcher(this);
@@ -71,15 +71,15 @@ QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
         auto cameras = resources.filtered<QnVirtualCameraResource>();
         if (!cameras.isEmpty())
             setCameras(cameras);
-    });  
-
-    at_settingsWidget_hasChangesChanged();
-    retranslateUi();
+    });
 
     auto safeModeWatcher = new QnWorkbenchSafeModeWatcher(this);
     safeModeWatcher->addWarningLabel(m_buttonBox);
     safeModeWatcher->addControlledWidget(m_okButton, QnWorkbenchSafeModeWatcher::ControlMode::Disable);
     safeModeWatcher->addControlledWidget(m_applyButton, QnWorkbenchSafeModeWatcher::ControlMode::Disable);
+
+    at_settingsWidget_hasChangesChanged();
+    retranslateUi();
 }
 
 QnCameraSettingsDialog::~QnCameraSettingsDialog() {
@@ -91,19 +91,19 @@ void QnCameraSettingsDialog::retranslateUi() {
     const QString windowTitle = QnDeviceDependentStrings::getNameFromSet(QnCameraDeviceStringSet(
         tr("Device Settings"),          tr("Devices Settings"),
         tr("Camera Settings"),          tr("Cameras Settings"),
-        tr("IO Module Settings"),       tr("IO Modules Settings")
+        tr("I/O Module Settings"),       tr("I/O Modules Settings")
         ), cameras);
 
     const QString diagnosticsTitle = QnDeviceDependentStrings::getNameFromSet(QnCameraDeviceStringSet(
         tr("Device Diagnostics"),       tr("Devices Diagnostics"),
         tr("Camera Diagnostics"),       tr("Cameras Diagnostics"),
-        tr("IO Module Diagnostics"),    tr("IO Modules Diagnostics")
+        tr("I/O Module Diagnostics"),    tr("I/O Modules Diagnostics")
         ), cameras);
 
     const QString rulesTitle = QnDeviceDependentStrings::getNameFromSet(QnCameraDeviceStringSet(
         tr("Device Rules"),             tr("Devices Rules"),
         tr("Camera Rules"),             tr("Cameras Rules"),
-        tr("IO Module Rules"),          tr("IO Modules Rules")
+        tr("I/O Module Rules"),          tr("I/O Modules Rules")
         ), cameras);
 
     setWindowTitle(windowTitle);
@@ -139,7 +139,7 @@ void QnCameraSettingsDialog::reject() {
 // -------------------------------------------------------------------------- //
 void QnCameraSettingsDialog::at_settingsWidget_hasChangesChanged() {
     bool hasChanges = m_settingsWidget->hasDbChanges();
-    m_applyButton->setEnabled(hasChanges);
+    m_applyButton->setEnabled(hasChanges && !qnCommon->isReadOnly());
     m_settingsWidget->setExportScheduleButtonEnabled(!hasChanges);
 }
 
@@ -167,11 +167,11 @@ void QnCameraSettingsDialog::buttonBoxClicked(QDialogButtonBox::StandardButton b
 }
 
 void QnCameraSettingsDialog::at_diagnoseButton_clicked() {
-    menu()->trigger(Qn::CameraIssuesAction, m_settingsWidget->cameras());
+    menu()->trigger(QnActions::CameraIssuesAction, m_settingsWidget->cameras());
 }
 
 void QnCameraSettingsDialog::at_rulesButton_clicked() {
-    menu()->trigger(Qn::CameraBusinessRulesAction, m_settingsWidget->cameras());
+    menu()->trigger(QnActions::CameraBusinessRulesAction, m_settingsWidget->cameras());
 }
 
 void QnCameraSettingsDialog::updateReadOnly() {
@@ -181,7 +181,7 @@ void QnCameraSettingsDialog::updateReadOnly() {
 
 void QnCameraSettingsDialog::setCameras(const QnVirtualCameraResourceList &cameras, bool force /* = false*/) {
 
-    bool askConfirmation = 
+    bool askConfirmation =
            !force
         &&  isVisible()
         &&  m_settingsWidget->cameras() != cameras
@@ -192,9 +192,9 @@ void QnCameraSettingsDialog::setCameras(const QnVirtualCameraResourceList &camer
         auto unsavedCameras = m_settingsWidget->cameras();
 
         const QString askMessage = QnDeviceDependentStrings::getNameFromSet(QnCameraDeviceStringSet(
-            tr("Apply changes to the following %n devices?",    nullptr, unsavedCameras.size()),
-            tr("Apply changes to the following %n cameras?",    nullptr, unsavedCameras.size()),
-            tr("Apply changes to the following %n IO modules?", nullptr, unsavedCameras.size())
+            tr("Apply changes to the following %n devices?",     "", unsavedCameras.size()),
+            tr("Apply changes to the following %n cameras?",     "", unsavedCameras.size()),
+            tr("Apply changes to the following %n I/O modules?", "", unsavedCameras.size())
             ), unsavedCameras);
 
         QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
@@ -292,12 +292,12 @@ void QnCameraSettingsDialog::saveCameras(const QnVirtualCameraResourceList &came
         m_settingsWidget->updateFromResources();
     };
 
-    qnResourcesChangesManager->saveCamerasBatch(cameras, applyChanges, rollback);   
+    qnResourcesChangesManager->saveCamerasBatch(cameras, applyChanges, rollback);
 }
 
 void QnCameraSettingsDialog::at_openButton_clicked() {
     QnVirtualCameraResourceList cameras = m_settingsWidget->cameras();
-    menu()->trigger(Qn::OpenInNewLayoutAction, cameras);
+    menu()->trigger(QnActions::OpenInNewLayoutAction, cameras);
     m_settingsWidget->setCameras(cameras);
     retranslateUi();
 }

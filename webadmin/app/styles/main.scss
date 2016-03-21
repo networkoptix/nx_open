@@ -87,9 +87,9 @@ body {
 
 /* Responsive: Portrait tablets and up */
 @media screen and (min-width: 768px) {
-    .container {
+    /* .container {
         max-width: 800px;
-    }
+    } */
 
     /* Remove the padding we set earlier */
     .header,
@@ -127,11 +127,17 @@ body {
     position: fixed;
   }
 }
-/* sidebar */
-.bs-docs-sidebar {
-  padding-left: 20px;
-  margin-top: 20px;
-  margin-bottom: 20px;
+
+/* help section*/
+.scroll-wrapper{
+  height:100%;
+  position:absolute;
+  top:0;
+  padding-top:57px;
+}
+.scroll-container{
+  height:100%;
+  overflow:auto;
 }
 
 /* all links */
@@ -232,6 +238,7 @@ body {
   padding-top:7px;
   padding-left:13px;
   padding-bottom:7px;
+  white-space: nowrap;
   display:inline-block;
 }
 

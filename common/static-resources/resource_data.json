@@ -73,6 +73,12 @@
             ],
             "onvifPtzStopBroken": true
         },
+    	{
+            "keys": [
+                "ArecontVision|??05", "ArecontVision|?155"
+            ],
+            "isRTSPSupported": false
+    	},
         {
             "keys": [
                 "VIVOTEK|DM368", "VIVOTEK|FD8161", "VIVOTEK|FD8362E", "VIVOTEK|FD8361", "VIVOTEK|FD8136", 
@@ -103,14 +109,15 @@
                 "*|FW3471-PS-E",
                 "VISTA|VK2-ENCODER",
                 "*|DW-CP04", "*|DW-CP16",
-                "ACTI|I96"
+                "ACTI|I96","ACTI|I98"
             ],
             "ptzTraits": "EightWayPtz"
         },
         {
             "keys": [
                 "ACTI|V32",
-                "ACTi Corporation|V32"
+                "ACTi Corporation|V32",
+                "AXIS|Q6000-E"
             ],
             "forceONVIF": true
         },
@@ -118,12 +125,13 @@
             "keys": [
                 "ACTI|KCM3311","ACTI|KCM7211","ACTI|KCM5611","ACTI|KCM5311","Sony|SNC-EM600","Sony|SNC-CX600","Sony|SNC-DH120T",
                 "Sony|SNC-XM636",
-            "DW|DWC-MB421TIR","Win4NET Co., Ltd.|Clebo-BL20"
+            "DW|DWC-MB421TIR","Win4NET Co., Ltd.|Clebo-BL20","DW|DWC-MD421D"
             ],
             "ptzCapabilities": "ContinuousZoomCapability"
         },
         {
             "keys": [
+                "VISTA|VK2-1080XVRDIR3V9F",
                 "VISTA|VK2-1080VFD3V9F",
                 "VISTA|VK2-1080BIR3V9F",
                 "VISTA|VK2-720VZMI",
@@ -193,7 +201,7 @@
         },
     {
             "keys": [
-                "DW|DWC-MD421D","Win4NET Co., Ltd.|Clebo-FD20"
+                "Win4NET Co., Ltd.|Clebo-FD20"
             ],
             "ptzCapabilities": "ContinuousZoomCapability|ContinuousFocusCapability"
         },
@@ -202,6 +210,12 @@
                 "DW|DWC-PV2M4TIR","DW|DWC-PB2M4TIR", "DWC|DWC-PV2M4T", "DW|DWC-PV2M4T"
             ],
         "dw-http-ptz": true
+        },
+        {
+            "keys": [
+                "DW|DWC-BVI2IR"
+            ],
+            "dw-pravis-chipset": true
         },
         {
             "keys": [
@@ -920,6 +934,12 @@
             "keys": [
                 "MOOG|MOOG-EXO-HD", "MOOG|MOOG-EXO-HD|3.8.0.7"
             ]
+        },
+        {
+            "keys": [
+                "*Grandeye*|EVO-05NxD"
+            ],
+            "relayInputCountForced": 1
         },
         {
             "keys": [

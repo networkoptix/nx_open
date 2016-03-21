@@ -1,28 +1,32 @@
-#ifndef CLIENT_VIDEO_CAMERA_EXPORT_TOOL_H
-#define CLIENT_VIDEO_CAMERA_EXPORT_TOOL_H
+#pragma once
 
 #include <QtCore/QObject>
 
-#include <camera/client_video_camera.h>
+#include <core/resource/resource_fwd.h>
+
 #include <recording/time_period.h>
+#include <recording/stream_recorder.h>
+#include <transcoding/filters/filter_helper.h>
 
+#include <utils/common/connective.h>
 
-class QnClientVideoCameraExportTool : public QObject
+class QnClientVideoCamera;
+
+class QnClientVideoCameraExportTool : public Connective<QObject>
 {
     Q_OBJECT
+
+    typedef Connective<QObject> base_type;
 public:
     QnClientVideoCameraExportTool(
-            QnClientVideoCamera *camera,
+            const QnMediaResourcePtr &mediaResource,
             const QnTimePeriod &timePeriod,
             const QString &fileName,
-            Qn::Corner timestamps,
-            qint64 timeOffsetMs, qint64 serverTimeZoneMs,
-            QRectF sourceRect,
-            const ImageCorrectionParams &imageCorrectionParams,
-            const QnItemDewarpingParams &itemDewarpingParams,
-            int rotationAngle,
-            qreal customAR,
+            const QnImageFilterHelper &imageParameters,
+            qint64 serverTimeZoneMs,
             QObject *parent = 0);
+    virtual ~QnClientVideoCameraExportTool();
+
 
     /**
      * @brief start                             Start exporting.
@@ -61,25 +65,20 @@ signals:
     void finished(bool success, const QString &filename);
 
 private slots:
-    void at_camera_exportFinished(int status, const QString &filename);
+    void at_camera_exportFinished(
+        const QnStreamRecorder::ErrorStruct &status,
+        const QString                       &filename
+    );
     void at_camera_exportStopped();
 
 private:
     void finishExport(bool success);
 
 private:
-    QnClientVideoCamera *m_camera;
+    QScopedPointer<QnClientVideoCamera> m_camera;
     QnTimePeriod m_timePeriod;
     QString m_fileName;
-    Qn::Corner m_timestampPos;
-    int m_timeOffsetMs;
+    QnImageFilterHelper m_parameters;
     qint64 m_serverTimeZoneMs;
-    QRectF m_sourceRect;
-    ImageCorrectionParams m_imageCorrectionParams;
-    QnItemDewarpingParams m_itemDewarpingParams;
     int m_status;
-    int m_rotationAngle; // in degree
-    qreal m_customAR;
 };
-
-#endif // CLIENT_VIDEO_CAMERA_EXPORT_TOOL_H

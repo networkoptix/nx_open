@@ -13,9 +13,6 @@
 
 #include <utils/common/connective.h>
 
-struct QnStorageSpaceReply;
-struct QnStorageSpaceData;
-
 namespace Ui {
     class ServerSettingsWidget;
 }
@@ -29,8 +26,8 @@ public:
     virtual ~QnServerSettingsWidget();
 
     virtual bool hasChanges() const override;
-    virtual void updateFromSettings() override;
-    virtual void submitToSettings() override;
+    virtual void loadDataToUi() override;
+    virtual void applyChanges() override;
     virtual void retranslateUi() override;
 
     QnMediaServerResourcePtr server() const;
@@ -40,51 +37,22 @@ protected:
     void setReadOnlyInternal(bool readOnly) override;
 
 private:
-    void addTableItem(const QnStorageSpaceData &item);
-    void setTableItems(const QList<QnStorageSpaceData> &items);
-    QnStorageSpaceData tableItem(int row) const;
-    QList<QnStorageSpaceData> tableItems() const;
-
-    void setBottomLabelText(const QString &text);
-    QString bottomLabelText() const;
-    int dataRowCount() const;
-
-    void updateRebuildInfo();
-    void updateRebuildUi(const QnStorageScanData& reply);
     void updateFailoverLabel();
-    
+    void updateUrl();
     void updateReadOnly();
 
 private slots:
-    void at_tableBottomLabel_linkActivated();
-    void at_storagesTable_cellChanged(int row, int column);
-    void at_storagesTable_contextMenuEvent(QObject *watched, QEvent *event);
     void at_pingButton_clicked();
-    void at_rebuildButton_clicked();
-
-    void at_archiveRebuildReply(int status, const QnStorageScanData& reply, int);
-    void sendNextArchiveRequest();
-    
-
-    void sendStorageSpaceRequest();
-    void at_replyReceived(int status, const QnStorageSpaceReply &reply, int handle);
-
 private:
     QScopedPointer<Ui::ServerSettingsWidget> ui;
 
     QnMediaServerResourcePtr m_server;
-    QnStorageResourceList m_storages;
 
-    QList<QString> m_storageProtocols;
     QPointer<QLabel> m_tableBottomLabel;
-    QVector<bool> m_initialStorageCheckStates;
     QAction *m_removeAction;
 
-    bool m_hasStorageChanges;
     bool m_maxCamerasAdjusted;
 
-    QnStorageScanData m_rebuildState;
-    ec2::ApiIdDataList m_storagesToRemove;
     bool m_rebuildWasCanceled;
     QString m_initServerName;
 };

@@ -55,6 +55,7 @@ private:
     qint64 m_averageVideoTimePerFrame;
     qint64 m_encodedFrames;
     qint64 m_droppedFrames;
+
     bool m_useRealTimeOptimization;
 };
 

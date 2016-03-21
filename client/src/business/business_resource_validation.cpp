@@ -14,14 +14,15 @@ namespace {
         Q_DECLARE_TR_FUNCTIONS(QnBusinessResourceValidationStrings)
     public:
         static QString subsetCameras(int count, const QnVirtualCameraResourceList &total) {
+            const auto totalCount = total.size();
             return QnDeviceDependentStrings::getNameFromSet(
                 QnCameraDeviceStringSet(
-                    tr("%1 of %n devices"),
-                    tr("%1 of %n cameras"),
-                    tr("%1 of %n IO modules")
+                    tr("%1 of %n devices", "", totalCount),
+                    tr("%1 of %n cameras", "", totalCount),
+                    tr("%1 of %n I/O modules", "", totalCount)
                 ), total
             ).arg(count);
-        } 
+        }
 
         static QString anyCamera() {
             return QnDeviceDependentStrings::getDefaultNameFromSet(
@@ -32,8 +33,8 @@ namespace {
 
         static QString selectCamera() {
             return QnDeviceDependentStrings::getDefaultNameFromSet(
-                tr("<Select at least one device>"),
-                tr("<Select at least one camera>")
+                tr("Select at least one device"),
+                tr("Select at least one camera")
                 );
         }
     };
@@ -88,6 +89,24 @@ QString QnCameraOutputPolicy::getText(const QnResourceList &resources, const boo
     QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
     int invalid = invalidResourcesCount<QnCameraOutputPolicy>(cameras);
     return genericCameraText<QnCameraOutputPolicy>(cameras, detailed, tr("%1 have no output relays", "", invalid), invalid);
+}
+
+bool QnExecPtzPresetPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera) {
+    return  camera->hasPtzCapabilities(Qn::PresetsPtzCapability) || //|| camera->hasPtzCapabilities(Qn::VirtualPtzCapability);
+            camera->getDewarpingParams().enabled;
+}
+
+QString QnExecPtzPresetPolicy::getText(const QnResourceList &resources, const bool detailed) {
+
+    QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
+    if (cameras.size() != 1)
+        return tr("Select exactly one camera");
+
+    QnVirtualCameraResourcePtr camera = cameras.first();
+    if (!isResourceValid(camera))
+        return tr("%1 has no ptz presets").arg(getShortResourceName(camera));
+
+    return getShortResourceName(camera);
 }
 
 bool QnCameraMotionPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera) {

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="ja">
+<TS version="2.0" language="ja">
 <context>
     <name>CloseButton</name>
     <message>
@@ -282,7 +282,7 @@ Press ESC to cancel</source>
     </message>
     <message>
         <source>Unknown options: %1.</source>
-        <translation>は未知のオプション: %1</translation>
+        <translation>は未知のオプション: %1.</translation>
     </message>
     <message>
         <source>Missing value after &apos;%1&apos;.</source>
@@ -505,7 +505,7 @@ Press ESC to cancel</source>
     <name>QDialog</name>
     <message>
         <source>What&apos;s This?</source>
-        <translation>ヒント</translation>
+        <translation>ヒント?</translation>
     </message>
 </context>
 <context>
@@ -4251,7 +4251,7 @@ Please turn one of those options off.</source>
     </message>
     <message>
         <source>iTouch</source>
-        <translation type="unfinished"></translation>
+        <translation>iTouch</translation>
     </message>
     <message>
         <source>Logoff</source>
@@ -4271,7 +4271,7 @@ Please turn one of those options off.</source>
     </message>
     <message>
         <source>Menu PB</source>
-        <translation type="unfinished"></translation>
+        <translation>メニューPB</translation>
     </message>
     <message>
         <source>My Sites</source>
@@ -4311,11 +4311,11 @@ Please turn one of those options off.</source>
     </message>
     <message>
         <source>Rotation PB</source>
-        <translation type="unfinished"></translation>
+        <translation>回転 PB</translation>
     </message>
     <message>
         <source>Rotation KB</source>
-        <translation type="unfinished"></translation>
+        <translation>回転 KB</translation>
     </message>
     <message>
         <source>Save</source>
@@ -4431,7 +4431,7 @@ Please turn one of those options off.</source>
     </message>
     <message>
         <source>Audio Cycle Track</source>
-        <translation type="unfinished"></translation>
+        <translation>オーディオサイクルトラック</translation>
     </message>
     <message>
         <source>Time</source>
@@ -5550,7 +5550,7 @@ Please turn one of those options off.</source>
     <name>QWhatsThisAction</name>
     <message>
         <source>What&apos;s This?</source>
-        <translation>ヒント</translation>
+        <translation>ヒント?</translation>
     </message>
 </context>
 <context>

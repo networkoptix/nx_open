@@ -22,6 +22,7 @@ namespace {
 
 QnImageControlWidget::QnImageControlWidget(QWidget* parent /* = 0*/):
     QWidget(parent),
+    QnUpdatable(),
     ui(new Ui::ImageControlWidget)
     , m_readOnly(false)
 {
@@ -43,15 +44,27 @@ QnImageControlWidget::QnImageControlWidget(QWidget* parent /* = 0*/):
         ui->forceRotationComboBox->addItem(tr("%1 degrees").arg(degrees), degrees);
     ui->forceRotationComboBox->setCurrentIndex(0);
 
-    connect(ui->forceArCheckBox,        &QCheckBox::stateChanged,               this,   &QnImageControlWidget::changed);
-    connect(ui->forceArComboBox,        QnComboboxCurrentIndexChanged,          this,   &QnImageControlWidget::changed);
-    connect(ui->forceRotationCheckBox,  &QCheckBox::stateChanged,               this,   &QnImageControlWidget::changed);
-    connect(ui->forceRotationComboBox,  QnComboboxCurrentIndexChanged,          this,   &QnImageControlWidget::changed);
+    auto notifyAboutChanges = [this]
+    {
+        if (!isUpdating())
+            emit changed();
+    };
+
+    auto notifyAboutFisheyeChanges = [this]
+    {
+        if (!isUpdating())
+            emit fisheyeChanged();
+    };
+
+    connect(ui->forceArCheckBox,        &QCheckBox::stateChanged,               this,   notifyAboutChanges);
+    connect(ui->forceArComboBox,        QnComboboxCurrentIndexChanged,          this,   notifyAboutChanges);
+    connect(ui->forceRotationCheckBox,  &QCheckBox::stateChanged,               this,   notifyAboutChanges);
+    connect(ui->forceRotationComboBox,  QnComboboxCurrentIndexChanged,          this,   notifyAboutChanges);
 
     QnCheckbox::autoCleanTristate(ui->fisheyeCheckBox);
 
-    connect(ui->fisheyeCheckBox,        &QCheckBox::stateChanged,               this,   &QnImageControlWidget::changed);
-    connect(ui->fisheyeCheckBox,        &QCheckBox::stateChanged,               this,   &QnImageControlWidget::fisheyeChanged);
+    connect(ui->fisheyeCheckBox,        &QCheckBox::stateChanged,               this,   notifyAboutChanges);
+    connect(ui->fisheyeCheckBox,        &QCheckBox::stateChanged,               this,   notifyAboutFisheyeChanges);
 }
 
 QnImageControlWidget::~QnImageControlWidget()
@@ -60,8 +73,9 @@ QnImageControlWidget::~QnImageControlWidget()
 }
 
 void QnImageControlWidget::updateFromResources(const QnVirtualCameraResourceList &cameras) {
+    QnUpdatableGuard<QnImageControlWidget> guard(this);
     bool allCamerasHasVideo = boost::algorithm::all_of(cameras, [](const QnVirtualCameraResourcePtr &camera) {
-        return camera->hasVideo(0); 
+        return camera->hasVideo(0);
     });
     setVisible(allCamerasHasVideo);
 
@@ -75,7 +89,7 @@ void QnImageControlWidget::submitToResources(const QnVirtualCameraResourceList &
         return;
 
     bool allCamerasHasVideo = boost::algorithm::all_of(cameras, [](const QnVirtualCameraResourcePtr &camera) {
-        return camera->hasVideo(0); 
+        return camera->hasVideo(0);
     });
     if (!allCamerasHasVideo)
         return;
@@ -98,7 +112,7 @@ void QnImageControlWidget::submitToResources(const QnVirtualCameraResourceList &
         else if (clearAr)
             camera->clearCustomAspectRatio();
 
-        if(overrideRotation) 
+        if(overrideRotation)
             camera->setProperty(QnMediaResource::rotationKey(), QString::number(ui->forceRotationComboBox->currentData().toInt()));
         else if (clearRotation && camera->hasProperty(QnMediaResource::rotationKey()))
             camera->setProperty(QnMediaResource::rotationKey(), QString());
@@ -173,13 +187,13 @@ void QnImageControlWidget::updateRotationFromResources(const QnVirtualCameraReso
 }
 
 void QnImageControlWidget::updateFisheyeFromResources(const QnVirtualCameraResourceList &cameras) {
-    bool fisheye = cameras.empty() ? false : cameras.front()->getDewarpingParams().enabled;   
+    bool fisheye = cameras.empty() ? false : cameras.front()->getDewarpingParams().enabled;
     bool sameFisheye = std::all_of(cameras.cbegin(), cameras.cend(), [fisheye](const QnVirtualCameraResourcePtr &camera) {
         return fisheye == camera->getDewarpingParams().enabled;
     });
 
     ui->fisheyeCheckBox->setTristate(!sameFisheye);
-    ui->fisheyeCheckBox->setCheckState(sameFisheye 
+    ui->fisheyeCheckBox->setCheckState(sameFisheye
         ? fisheye
         ? Qt::Checked
         : Qt::Unchecked

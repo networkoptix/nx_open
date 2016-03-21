@@ -6,6 +6,7 @@
 #ifndef HTTPTYPES_H
 #define HTTPTYPES_H
 
+#include <chrono>
 #include <cstring>
 #include <functional>
 #include <map>
@@ -26,7 +27,7 @@
     Common structures, parsers/serializers, http client.
 
     All classes use QByteArray for representing http headers and their values for following reasons:\n
-        - HTTP headers are coded using 8-bit ASCII and since QString stores data as 16-bit chars we would need additional data 
+        - HTTP headers are coded using 8-bit ASCII and since QString stores data as 16-bit chars we would need additional data
             conversion/copying to serialize header data to buffer, ready to be passed to socket
         - QByteArray is compatible with QString
 */
@@ -96,7 +97,7 @@ namespace nx_http
         Searches first occurence of any element of \0-terminated string \a toSearch in \a count elements of \a str, starting with element \a offset
         \param toSearch \0-terminated string
         \param count number of characters of \a str to check, NOT a length of searchable characters string (\a toSearch)
-        \note following algorithms differ from stl analogue in following: they limit number of characters checked during search 
+        \note following algorithms differ from stl analogue in following: they limit number of characters checked during search
     */
     template<class Str>
         size_t find_first_of(
@@ -196,10 +197,10 @@ namespace nx_http
     namespace StatusCode
     {
         /*!
-            enum has name "Value" for unification purpose only. Real enumeration name is StatusCode (name of namespace). 
+            enum has name "Value" for unification purpose only. Real enumeration name is StatusCode (name of namespace).
             Enum is referred to as StatusCode::Value, if assign real name to enum it will be StatusCode::StatusCode.
             Namespace is used to associate enum with corresponding functions like toString() and fromString().
-            Namespace is required, since not all such functions can be put to global namespace. 
+            Namespace is required, since not all such functions can be put to global namespace.
             E.g. this namespace has convenience function toString( int httpStatusCode )
         */
         enum Value
@@ -209,6 +210,7 @@ namespace nx_http
             ok = 200,
             noContent = 204,
             partialContent = 206,
+            lastSuccessCode = 299,
             multipleChoices = 300,
             moved_permanently = 301,
             moved = 302,
@@ -220,6 +222,7 @@ namespace nx_http
             notAcceptable = 406,
             proxyAuthenticationRequired = 407,
             rangeNotSatisfiable = 416,
+            invalidParameter = 451,
             internalServerError = 500,
             notImplemented = 501,
             serviceUnavailable = 503
@@ -574,6 +577,21 @@ namespace nx_http
                 \note In case of parse error, contents of this object are undefined
             */
             bool parse( const nx_http::StringType& strValue );
+            StringType toString() const;
+        };
+
+        class KeepAlive
+        {
+        public:
+            std::chrono::seconds timeout;
+            boost::optional<int> max;
+
+            KeepAlive();
+            KeepAlive(
+                std::chrono::seconds _timeout,
+                boost::optional<int> _max = boost::none);
+
+            bool parse(const nx_http::StringType& strValue);
             StringType toString() const;
         };
     }

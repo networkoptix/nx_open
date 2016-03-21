@@ -12,8 +12,17 @@
 
 #include "security_cam_resource.h"
 
+#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
+#define CodecID int
+#define CODEC_ID_NONE 0
+#endif
 
 class QnAbstractDTSFactory;
+
+class CameraMediaStreams;
+class CameraMediaStreamInfo;
+class CameraBitrates;
+class CameraBitrateInfo;
 
 class QN_EXPORT QnVirtualCameraResource : public QnSecurityCamResource
 {
@@ -43,6 +52,8 @@ public:
 
     void issueOccured();
     void cleanCameraIssues();
+
+    CameraMediaStreams mediaStreams() const;
 protected:
 
 private:
@@ -56,11 +67,6 @@ const QSize EMPTY_RESOLUTION_PAIR(0, 0);
 const QSize SECONDARY_STREAM_DEFAULT_RESOLUTION(480, 316); // 316 is average between 272&360
 const QSize SECONDARY_STREAM_MAX_RESOLUTION(1024, 768);
 
-class CameraMediaStreams;
-class CameraMediaStreamInfo;
-class CameraBitrates;
-class CameraBitrateInfo;
-
 class QN_EXPORT QnPhysicalCameraResource : public QnVirtualCameraResource
 {
     Q_OBJECT
@@ -70,6 +76,7 @@ public:
     // the difference between desired and real is that camera can have multiple clients we do not know about or big exposure time
     int getPrimaryStreamRealFps() const;
 
+    float rawSuggestBitrateKbps(Qn::StreamQuality q, QSize resolution, int fps) const;
     virtual int suggestBitrateKbps(Qn::StreamQuality q, QSize resolution, int fps) const;
 
     virtual void setUrl(const QString &url) override;
@@ -80,12 +87,11 @@ public:
     */
     bool saveMediaStreamInfoIfNeeded( const CameraMediaStreamInfo& mediaStreamInfo );
     bool saveMediaStreamInfoIfNeeded( const CameraMediaStreams& streams );
-    CameraMediaStreams mediaStreams() const;
 
     /*!
      *  \return \a true if \param bitrateInfo.encoderIndex is not already saved
      */
-    bool saveBitrateIfNotExists( const CameraBitrateInfo& bitrateInfo );
+    bool saveBitrateIfNeeded( const CameraBitrateInfo& bitrateInfo );
 
     static float getResolutionAspectRatio(const QSize& resolution); // find resolution helper function
     static QSize getNearestResolution(const QSize& resolution, float aspectRatio, double maxResolutionSquare, const QList<QSize>& resolutionList, double* coeff = 0); // find resolution helper function
@@ -95,7 +101,7 @@ protected:
 private:
     void saveResolutionList( const CameraMediaStreams& supportedNativeStreams );
 private:
-    QMutex m_mediaStreamsMutex;
+    QnMutex m_mediaStreamsMutex;
     int m_channelNumber; // video/audio source number
 };
 
@@ -158,6 +164,7 @@ public:
 
     bool operator==( const CameraMediaStreamInfo& rhs ) const;
     bool operator!=( const CameraMediaStreamInfo& rhs ) const;
+    QSize getResolution() const;
 };
 #define CameraMediaStreamInfo_Fields (encoderIndex)(resolution)(transports)(transcodingRequired)(codec)(customStreamParams)
 
@@ -172,27 +179,41 @@ class CameraBitrateInfo
 {
 public:
     int encoderIndex;
+    QString timestamp;
+
+    float rawSuggestedBitrate;
     float suggestedBitrate;
     float actualBitrate;
-    int fps;
-    QString resolution;
 
-    CameraBitrateInfo(
-            int _encoderIndex = -1,
-            float _suggestedBitrate = 0,
-            float _actualBitrate = 0,
-            int _fps = 0,
-            const QSize& _resolution = QSize())
-    :
-        encoderIndex( _encoderIndex ),
-        suggestedBitrate( _suggestedBitrate ),
-        actualBitrate( _actualBitrate ),
-        fps( _fps ),
-        resolution( CameraMediaStreamInfo::resolutionToString( _resolution ) )
+    Qn::BitratePerGopType bitratePerGop;
+    float bitrateFactor;
+
+    int fps;
+    float actualFps;
+    float averageGopSize;
+    QString resolution;
+    int numberOfChannels;
+    bool isConfigured;
+
+    CameraBitrateInfo(int index = -1, QString time = QString())
+        : encoderIndex(index)
+        , timestamp(time)
+        , rawSuggestedBitrate(-1)
+        , suggestedBitrate(-1)
+        , actualBitrate(-1)
+        , bitratePerGop(Qn::BPG_None)
+        , bitrateFactor(-1)
+        , fps(-1)
+        , actualFps(-1)
+        , numberOfChannels(-1)
+        , isConfigured(false)
     {
     }
 };
-#define CameraBitrateInfo_Fields (encoderIndex)(suggestedBitrate)(actualBitrate)(fps)(resolution)
+#define CameraBitrateInfo_Fields (encoderIndex)(timestamp) \
+    (rawSuggestedBitrate)(suggestedBitrate)(actualBitrate) \
+    (bitratePerGop)(bitrateFactor) \
+    (fps)(actualFps)(averageGopSize)(resolution)(numberOfChannels)(isConfigured)
 
 class CameraBitrates
 {

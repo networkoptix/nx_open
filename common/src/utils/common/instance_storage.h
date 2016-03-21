@@ -1,6 +1,8 @@
 #ifndef QN_INSTANCE_STORAGE_H
 #define QN_INSTANCE_STORAGE_H
 
+#include <cassert>
+
 #include <type_traits>
 
 #include <QtCore/QObject>

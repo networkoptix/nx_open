@@ -5,7 +5,7 @@
 #include "desktop_camera_reader.h"
 #include "utils/common/sleep.h"
 #include "utils/common/log.h"
-#include "utils/network/tcp_connection_priv.h"
+#include "network/tcp_connection_priv.h"
 #include "desktop_camera_resource_searcher.h"
 #include "desktop_camera_resource.h"
 
@@ -117,7 +117,7 @@ QnAbstractMediaDataPtr QnDesktopCameraStreamReader::getNextData()
 
         int packetSize = (m_recvBuffer[2]<<8) + m_recvBuffer[3];
         quint8 streamIndex = m_recvBuffer[1];
-        Q_ASSERT(streamIndex <= 1);
+        //Q_ASSERT(streamIndex <= 1);
         bufferSize = 0;
         while (m_socket->isConnected() && bufferSize < packetSize)
         {
@@ -170,7 +170,7 @@ QnAbstractMediaDataPtr QnDesktopCameraStreamReader::getNextData()
         result->opaque = 0;
         if (result->dataType == QnAbstractMediaData::AUDIO && result->context && result->context->ctx() && !m_audioLayout)
         {
-            QMutexLocker lock(&m_audioLayoutMutex);
+            QnMutexLocker lock( &m_audioLayoutMutex );
             m_audioLayout.reset( new QnResourceCustomAudioLayout() );
             QnResourceAudioLayout::AudioTrack track(result->context, "");
             m_audioLayout->addAudioTrack(track);
@@ -186,7 +186,7 @@ void QnDesktopCameraStreamReader::pleaseReopenStream()
 
 QnConstResourceAudioLayoutPtr QnDesktopCameraStreamReader::getDPAudioLayout() const
 {
-    QMutexLocker lock(&m_audioLayoutMutex);
+    QnMutexLocker lock( &m_audioLayoutMutex );
     return m_audioLayout;
 }
 

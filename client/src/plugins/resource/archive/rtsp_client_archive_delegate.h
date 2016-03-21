@@ -1,9 +1,10 @@
 #ifndef __RTSP_CLIENT_ARCHIVE_DELEGATE_H
 #define __RTSP_CLIENT_ARCHIVE_DELEGATE_H
 
+#include <atomic>
 #include <utils/common/uuid.h>
-#include <utils/network/rtpsession.h>
-#include <utils/network/ffmpeg_rtp_parser.h>
+#include <network/rtpsession.h>
+#include <network/ffmpeg_rtp_parser.h>
 
 #include <core/resource/resource_media_layout.h>
 
@@ -55,15 +56,15 @@ public:
 
     void setAdditionalAttribute(const QByteArray& name, const QByteArray& value);
     virtual void setRange(qint64 startTime, qint64 endTime, qint64 frameStep) override;
+    virtual bool hasVideo() const override;
 
     void setMultiserverAllowed(bool value);
 
     void setPlayNowModeAllowed(bool value);
-
-    void checkMinTimeFromOtherServer(const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &server, qint64* result);
 signals:
     void dataDropped(QnArchiveStreamReader* reader);
 private:
+    void setRtpData(RTPIODevice* value);
     QnAbstractDataPacketPtr processFFmpegRtpPayload(quint8* data, int dataSize, int channelNum, qint64* parserPosition);
     void processMetadata(const quint8* data, int dataSize);
     bool openInternal();
@@ -74,13 +75,12 @@ private:
     QnMediaServerResourcePtr getNextMediaServerFromTime(const QnVirtualCameraResourcePtr &camera, qint64 time);
     QnAbstractMediaDataPtr getNextDataInternal();
     QString getUrl(const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &server = QnMediaServerResourcePtr()) const;
+    void checkGlobalTimeAsync(const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &server, qint64* result);
     void checkMinTimeFromOtherServer(const QnVirtualCameraResourcePtr &camera);
     void setupRtspSession(const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &server, RTPSession* session, bool usePredefinedTracks) const;
     void parseAudioSDP(const QList<QByteArray>& audioSDP);
-    void lockTime(qint64 value);
-    void unlockTime();
 private:
-    QMutex m_mutex;
+    QnMutex m_mutex;
     RTPSession m_rtspSession;
     RTPIODevice* m_rtpData;
     quint8* m_rtpDataBuffer;
@@ -104,7 +104,7 @@ private:
     qint64 m_lastMinTimeTime;
 
     QnTimePeriod m_serverTimePeriod;
-    qint64 m_globalMinArchiveTime; // min archive time between all servers
+    std::atomic<qint64> m_globalMinArchiveTime; // min archive time between all servers
 
     qint64 m_forcedEndTime;
     bool m_isMultiserverAllowed;
@@ -113,6 +113,8 @@ private:
     QnArchiveStreamReader* m_reader;
     int m_frameCnt;
     QnCustomResourceVideoLayoutPtr m_customVideoLayout;
+
+    QnUuid m_runtimeId;
     
     QMap<int, QnFfmpegRtpParserPtr> m_parsers;
     
@@ -121,8 +123,9 @@ private:
         QString password;
         QnUuid videowall;
     } m_auth;
-    mutable QMutex m_timeMutex;
-    qint64 m_lockedTime;
+    
+    std::atomic_flag m_footageUpToDate;
+    mutable QnMutex m_rtpDataMutex;
 };
 
 typedef QSharedPointer<QnRtspClientArchiveDelegate> QnRtspClientArchiveDelegatePtr;

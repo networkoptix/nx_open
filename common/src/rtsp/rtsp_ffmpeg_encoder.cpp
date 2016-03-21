@@ -3,13 +3,14 @@
 #ifdef ENABLE_DATA_PROVIDERS
 
 #include "core/datapacket/video_data_packet.h"
-#include "utils/network/ffmpeg_sdp.h"
-#include "utils/network/socket.h"
-#include "utils/media/ffmpeg_helper.h"
-#include "utils/common/util.h"
-#include "utils/network/rtpsession.h"
-#include "utils/network/rtp_stream_parser.h"
 
+#include "network/ffmpeg_sdp.h"
+#include "network/rtpsession.h"
+#include "network/rtp_stream_parser.h"
+
+#include "utils/common/util.h"
+#include "utils/media/ffmpeg_helper.h"
+#include "utils/network/socket.h"
 
 QnRtspFfmpegEncoder::QnRtspFfmpegEncoder(): 
     m_gotLivePacket(false),
@@ -114,7 +115,7 @@ bool QnRtspFfmpegEncoder::getNextPacket(QnByteArray& sendBuffer)
         //m_mutex.unlock();
 
         //buildRtspTcpHeader(rtpTcpChannel, ssrc, sendLen + ffHeaderSize, sendLen >= dataRest ? 1 : 0, media->timestamp, RTP_FFMPEG_GENERIC_CODE);
-        //QMutexLocker lock(&m_owner->getSockMutex());
+        //QnMutexLocker lock( &m_owner->getSockMutex() );
         //sendBuffer->write(m_rtspTcpHeader, sizeof(m_rtspTcpHeader));
         quint8 packetType = m_media->dataType;
         sendBuffer.write((const char*) &packetType, 1);
@@ -166,13 +167,7 @@ quint8 QnRtspFfmpegEncoder::getPayloadtype()
 
 QByteArray QnRtspFfmpegEncoder::getAdditionSDP( const std::map<QString, QString>& /*streamParams*/ )
 {
-    if (!m_codecCtxData.isEmpty()) {
-        QString result(lit("a=fmtp:%1 config=%2\r\n"));
-        return result.arg((int)getPayloadtype()).arg(QLatin1String(m_codecCtxData.toBase64())).toLatin1();
-    }
-    else {
-        return QByteArray();
-    }
+    return QByteArray();
 }
 
 QString QnRtspFfmpegEncoder::getName()
@@ -188,11 +183,6 @@ void QnRtspFfmpegEncoder::setLiveMarker(int value)
 void QnRtspFfmpegEncoder::setAdditionFlags(quint16 value)
 {
     m_additionFlags = value;
-}
-
-void QnRtspFfmpegEncoder::setCodecContext(QnMediaContextPtr context)
-{
-    QnFfmpegHelper::serializeCodecContext(context->ctx(), &m_codecCtxData);
 }
 
 #endif // ENABLE_DATA_PROVIDERS

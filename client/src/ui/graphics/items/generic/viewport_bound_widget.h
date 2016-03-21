@@ -1,5 +1,4 @@
-#ifndef QN_VIEWPORT_BOUND_WIDGET_H
-#define QN_VIEWPORT_BOUND_WIDGET_H
+#pragma once
 
 #include <ui/graphics/items/standard/graphics_widget.h>
 
@@ -16,7 +15,7 @@ class Instrument;
  * changes.
  */
 class QnViewportBoundWidget: public GraphicsWidget {
-    Q_OBJECT;
+    Q_OBJECT
 
     typedef GraphicsWidget base_type;
 
@@ -36,6 +35,9 @@ public:
 
     virtual void setGeometry(const QRectF &geometry) override;
 
+signals:
+    void scaleUpdated(QGraphicsView *view, qreal scale);
+
 protected:
     virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
@@ -49,6 +51,3 @@ private:
     QPointer<Instrument> m_instrument;
     QGraphicsScale *m_scale;
 };
-
-
-#endif // QN_VIEWPORT_BOUND_WIDGET_H

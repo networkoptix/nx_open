@@ -14,7 +14,7 @@ class QnImageFilterHelper
 public:
     QnImageFilterHelper();
 
-    void setVideoLayout(QnConstResourceVideoLayoutPtr layout); // tiled image filter
+    void setVideoLayout(const QnConstResourceVideoLayoutPtr &layout); // tiled image filter
     void setCustomAR(qreal customAR); // tiled image filter
     void setRotation(int angle); // rotate image filter
     void setSrcRect(const QRectF& cropRect); // crop image filter
@@ -23,9 +23,18 @@ public:
     void setTimeCorner(Qn::Corner corner, qint64 offset, qint64 timeMsec); // time image filter, time in milliseconds since epoch, zero time means take from frame
     void setCodec(CodecID codecID);
     
-    QList<QnAbstractImageFilterPtr> createFilterChain(const QSize& srcResolution) const;
+    const static QSize defaultResolutionLimit;
+
+    /** 
+     * Create filters for source image processing
+     * 
+     * \param srcResolution             Source video size
+     * \param srcResolution             Source video size
+     * \returns                         Filter chain to process video
+     */
+    QList<QnAbstractImageFilterPtr> createFilterChain(const QSize& srcResolution, const QSize& resolutionLimit = defaultResolutionLimit) const;
     bool isEmpty() const;
-private:
+
     QSize updatedResolution(const QList<QnAbstractImageFilterPtr>& filters, const QSize& srcResolution) const;
 private:
     QnConstResourceVideoLayoutPtr m_layout;

@@ -7,8 +7,8 @@
 #include <utils/common/request_param.h>
 #include <utils/common/uuid.h>
 #include <utils/common/ldap.h>
+#include <utils/common/optional.h>
 #include <utils/serialization/json_functions.h>
-#include <utils/network/multicast_module_finder.h>
 #include <utils/math/space_mapper.h>
 
 #include <api/model/storage_space_reply.h>
@@ -24,10 +24,12 @@
 #include <api/model/test_email_settings_reply.h>
 #include <api/model/configure_reply.h>
 #include <api/model/upload_update_reply.h>
+#include <api/model/backup_status_reply.h>
 #include <api/runtime_info_manager.h>
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource.h>
+#include <core/resource/camera_advanced_param.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_user_attributes.h>
 #include <core/resource/user_resource.h>
@@ -50,12 +52,15 @@
 
 #include <recording/time_period.h>
 #include <recording/time_period_list.h>
+#include <recording/stream_recorder.h>
 
 #include <core/misc/schedule_task.h>
 #include <core/ptz/ptz_mapper.h>
 #include <core/ptz/ptz_data.h>
 #include <core/ptz/media_dewarping_params.h>
 #include <core/ptz/item_dewarping_params.h>
+
+#include <core/datapacket/abstract_data_packet.h>
 
 #include <core/onvif/onvif_config_data.h>
 
@@ -66,6 +71,8 @@
 
 #include <licensing/license.h>
 
+#include <network/multicast_module_finder.h>
+
 #include <nx_ec/ec_api.h>
 #include <nx_ec/data/api_lock_data.h>
 #include <nx_ec/data/api_discovery_data.h>
@@ -74,6 +81,7 @@
 #include "api/model/api_ioport_data.h"
 #include "api/model/recording_stats_reply.h"
 #include "api/model/audit/audit_record.h"
+#include "health/system_health.h"
 
 namespace {
     volatile bool qn_commonMetaTypes_initialized = false;
@@ -82,7 +90,7 @@ namespace {
 QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::Corner)
 
 void QnCommonMetaTypes::initialize() {
-    /* Note that running the code twice is perfectly OK, 
+    /* Note that running the code twice is perfectly OK,
      * so we don't need heavyweight synchronization here. */
     if(qn_commonMetaTypes_initialized)
         return;
@@ -99,13 +107,14 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<SocketAddress>();
 
     //qRegisterMetaType<QnParam>();
-    
+
     qRegisterMetaType<QnResourceTypeList>();
     qRegisterMetaType<QnResourcePtr>();
     qRegisterMetaType<QnResourceList>();
     qRegisterMetaType<Qn::ResourceStatus>();
+    qRegisterMetaType<Qn::BitratePerGopType>();
     qRegisterMetaType<QnBusiness::EventReason>();
-    
+
     qRegisterMetaType<QnUserResourcePtr>();
     qRegisterMetaType<QnLayoutResourcePtr>();
     qRegisterMetaType<QnMediaServerResourcePtr>();
@@ -126,12 +135,11 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnMediaServerUserAttributesPtr>();
     qRegisterMetaType<QnMediaServerUserAttributesList>();
 
-    qRegisterMetaType<QnCameraHistoryList>();
-    qRegisterMetaType<QnCameraHistoryItemPtr>();
-
     qRegisterMetaType<QnCameraBookmark>();
     qRegisterMetaType<QnCameraBookmarkList>();
     qRegisterMetaType<QnCameraBookmarkTags>("QnCameraBookmarkTags");/* The underlying type is identical to QStringList. */
+    qRegisterMetaType<QnCameraBookmarkTag>();
+    qRegisterMetaType<QnCameraBookmarkTagList>();
 
     qRegisterMetaType<QnLicensePtr>();
     qRegisterMetaType<QnLicenseList>();
@@ -161,14 +169,14 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaTypeStreamOperators<QnSystemInformation>();
 
     qRegisterMetaType<TypeSpecificParamMap>();
-    qRegisterMetaType<QnStringBoolPairList>("QnStringBoolPairList");
-    qRegisterMetaType<QnStringBoolPairList>("QList<QPair<QString,bool> >");
-    qRegisterMetaType<QnStringVariantPairList>("QnStringVariantPairList");
-    qRegisterMetaType<QnStringVariantPairList>("QList<QPair<QString,QVariant> >");
+    qRegisterMetaType<QnCameraAdvancedParamValue>();
+	qRegisterMetaType<QnCameraAdvancedParamValueList>();
+
     qRegisterMetaType<QVector<int> >(); /* This one is used by QAbstractItemModel. */
 
 #ifdef ENABLE_DATA_PROVIDERS
     qRegisterMetaType<QnMetaDataV1Ptr>();
+    qRegisterMetaType<QnStreamRecorder::ErrorStruct>();
 #endif
 
     qRegisterMetaType<QnAbstractBusinessActionPtr>();
@@ -180,6 +188,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnAbstractDataPacketPtr>();
     qRegisterMetaType<QnConstAbstractDataPacketPtr>();
 
+    qRegisterMetaType<QnStorageSpaceData>();
     qRegisterMetaType<QnStorageSpaceReply>();
     qRegisterMetaType<QnStorageStatusReply>();
     qRegisterMetaType<QnStatisticsReply>();
@@ -187,6 +196,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnTestEmailSettingsReply>();
     qRegisterMetaType<QnCameraDiagnosticsReply>();
     qRegisterMetaType<QnStorageScanData>();
+    qRegisterMetaType<QnBackupStatusData>();
     qRegisterMetaType<QnManualCameraSearchReply>();
     qRegisterMetaType<QnServersReply>();
     qRegisterMetaType<QnStatisticsData>();
@@ -226,36 +236,70 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QList<QnModuleInformation>>();
     qRegisterMetaType<QList<QnModuleInformationWithAddresses>>();
 
-    qRegisterMetaType<Qn::CameraDataType>();
-
     qRegisterMetaType<QnConfigureReply>();
     qRegisterMetaType<QnUploadUpdateReply>();
 
     qRegisterMetaType<QnLdapUser>();
     qRegisterMetaType<QnLdapUsers>();
 
+    /*
+     * Following code requires full-scale refactor in the classes that uses signals with such parameters.
+     * MOC-generated code contains names, based on signal methods declaration. Example:
+     * ...
+     * class QnStreamRecorder:
+     * ...
+     * signals:
+     *     void recordingFinished(const ErrorStruct &status, const QString &fileName);
+     * ...
+     *
+     * This code will require metatype, registered as:
+     *    qRegisterMetaType<QnStreamRecorder::ErrorStruct>("ErrorStruct");
+     *
+     * Much more correct behavior is to change signal declaration to following:
+     * ...
+     * signals:
+     *     void recordingFinished(const QnStreamRecorder::ErrorStruct &status, const QString &fileName);
+     * ...
+     * and therefore we can use simple registration:
+     *    qRegisterMetaType<QnStreamRecorder::ErrorStruct>();
+     */
+
     qRegisterMetaType<ec2::ErrorCode>( "ErrorCode" );
     qRegisterMetaType<ec2::AbstractECConnectionPtr>( "AbstractECConnectionPtr" );
     qRegisterMetaType<ec2::QnFullResourceData>( "QnFullResourceData" );
     qRegisterMetaType<ec2::QnPeerTimeInfo>( "QnPeerTimeInfo" );
     qRegisterMetaType<ec2::QnPeerTimeInfoList>( "QnPeerTimeInfoList" );
-    qRegisterMetaType<ec2::ApiPeerAliveData>( "ApiPeerAliveData" ); 
-    qRegisterMetaType<ec2::ApiDiscoveryDataList>( "ApiDiscoveryDataList" ); 
-    qRegisterMetaType<ec2::ApiDiscoveryData>( "ApiDiscoveryData" ); 
+    qRegisterMetaType<ec2::ApiPeerAliveData>( "ApiPeerAliveData" );
+    qRegisterMetaType<ec2::ApiDiscoveryDataList>( "ApiDiscoveryDataList" );
+    qRegisterMetaType<ec2::ApiDiscoveryData>( "ApiDiscoveryData" );
+    qRegisterMetaType<ec2::ApiDiscoveredServerData>("ApiDiscoveredServerData");
+    qRegisterMetaType<ec2::ApiDiscoveredServerDataList>("ApiDiscoveredServerDataList");
     qRegisterMetaType<ec2::ApiReverseConnectionData>( "ApiReverseConnectionData" );
-    qRegisterMetaType<ec2::ApiRuntimeData>( "ApiRuntimeData" ); 
-    qRegisterMetaType<ec2::ApiDatabaseDumpData>( "ApiDatabaseDumpData" ); 
-    qRegisterMetaType<ec2::ApiLockData>( "ApiLockData" ); 
-    qRegisterMetaType<ec2::ApiResourceParamWithRefData>( "ApiResourceParamWithRefData" ); 
+    qRegisterMetaType<ec2::ApiRuntimeData>( "ApiRuntimeData" );
+    qRegisterMetaType<ec2::ApiDatabaseDumpData>( "ApiDatabaseDumpData" );
+    qRegisterMetaType<ec2::ApiLockData>( "ApiLockData" );
+    qRegisterMetaType<ec2::ApiResourceParamWithRefData>( "ApiResourceParamWithRefData" );
     qRegisterMetaType<ec2::ApiResourceParamWithRefDataList>("ApiResourceParamWithRefDataList");
 
     qRegisterMetaType<ec2::ApiResourceParamData>("ApiResourceParamData");
-    qRegisterMetaType<ec2::ApiResourceParamData>("ApiResourceParamDataList");
+    qRegisterMetaType<ec2::ApiResourceParamDataList>("ApiResourceParamDataList");
 
-    qRegisterMetaType<QnUuid>( "QnUuid" );
-    qRegisterMetaTypeStreamOperators<QnUuid>( "QnUuid" );
+    qRegisterMetaType<ec2::ApiServerFootageData>("ApiServerFootageData");
+    qRegisterMetaType<ec2::ApiServerFootageDataList>("ApiServerFootageDataList");
+    qRegisterMetaType<ec2::ApiCameraHistoryItemData>("ApiCameraHistoryItemData");
+    qRegisterMetaType<ec2::ApiCameraHistoryItemDataList>("ApiCameraHistoryItemDataList");
+    qRegisterMetaType<ec2::ApiCameraHistoryData>("ApiCameraHistoryData");
+    qRegisterMetaType<ec2::ApiCameraHistoryDataList>("ApiCameraHistoryDataList");
+    qRegisterMetaType<ec2::ApiCameraHistoryDataList>("ec2::ApiCameraHistoryDataList");
+
+    qRegisterMetaType<QnUuid>();
+    qRegisterMetaTypeStreamOperators<QnUuid>();
     qRegisterMetaType<QnRecordingStatsReply>();
     qRegisterMetaType<QnAuditRecordList>();
+
+    qRegisterMetaType<QnOptionalBool>();
+
+    qRegisterMetaType<QnSystemHealth::MessageType>("QnSystemHealth::MessageType");
 
     QnJsonSerializer::registerSerializer<QnPtzMapperPtr>();
     QnJsonSerializer::registerSerializer<Qn::PtzTraits>();

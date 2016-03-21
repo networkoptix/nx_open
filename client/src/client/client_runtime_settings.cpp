@@ -11,3 +11,8 @@ QnClientRuntimeSettings::~QnClientRuntimeSettings()
 {
 
 }
+
+bool QnClientRuntimeSettings::isDesktopMode() const
+{
+    return !isVideoWallMode() && !isActiveXMode();
+}

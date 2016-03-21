@@ -4,24 +4,24 @@
 #include <QUrl>
 #include <QUrlQuery>
 
+#include "api/app_server_connection.h"
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
+#include "core/resource/network_resource.h"
+#include "http/custom_headers.h"
+#include "media_server/server_message_processor.h"
+#include "network/router.h"
+#include "network/tcp_listener.h"
+#include "network/universal_tcp_listener.h"
+#include "proxy_connection_processor_p.h"
+#include "transaction/transaction_message_bus.h"
+
 #include <utils/common/log.h>
 #include <utils/common/string.h>
 #include <utils/common/systemerror.h>
 #include "utils/network/compat_poll.h"
-#include "utils/network/tcp_listener.h"
 #include "utils/network/socket.h"
-#include "utils/network/router.h"
-#include "network/universal_tcp_listener.h"
-#include "api/app_server_connection.h"
-#include "media_server/server_message_processor.h"
-#include "core/resource/network_resource.h"
-#include "transaction/transaction_message_bus.h"
-
-#include "proxy_connection_processor_p.h"
-#include "http/custom_headers.h"
 
 class QnTcpListener;
 static const int IO_TIMEOUT = 1000 * 1000;
@@ -31,20 +31,24 @@ static const int MAX_PROXY_TTL = 8;
 // ----------------------------- QnProxyConnectionProcessor ----------------------------
 
 QnProxyConnectionProcessor::QnProxyConnectionProcessor(
-        QSharedPointer<AbstractStreamSocket> socket, QnUniversalTcpListener* owner):
+    QSharedPointer<AbstractStreamSocket> socket,
+    QnHttpConnectionListener* owner)
+:
     QnTCPConnectionProcessor(new QnProxyConnectionProcessorPrivate, socket)
 {
     Q_D(QnProxyConnectionProcessor);
-    d->owner = owner;
+    d->owner = static_cast<QnUniversalTcpListener*>(owner);
 }
 
 QnProxyConnectionProcessor::QnProxyConnectionProcessor(
-        QnProxyConnectionProcessorPrivate* priv, QSharedPointer<AbstractStreamSocket> socket,
-        QnUniversalTcpListener* owner):
+    QnProxyConnectionProcessorPrivate* priv,
+    QSharedPointer<AbstractStreamSocket> socket,
+    QnHttpConnectionListener* owner)
+:
     QnTCPConnectionProcessor(priv, socket)
 {
     Q_D(QnProxyConnectionProcessor);
-    d->owner = owner;
+    d->owner = static_cast<QnUniversalTcpListener*>(owner);
 }
 
 

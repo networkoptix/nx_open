@@ -3,14 +3,10 @@
 
 #include <QtCore/QString>
 
-extern "C"
-{
-    #include <libavutil/rational.h>
-}
+#ifdef ENABLE_DATA_PROVIDERS
 
 #include "bitStream.h"
-#include "memory.h"
-
+#include <memory.h>
 
 static const int NOT_ENOUGHT_BUFFER = -1;
 
@@ -245,5 +241,7 @@ private:
 	int vc1_parse_frame_header(const VC1SequenceHeader& sequenceHdr);
 	int vc1_parse_frame_header_adv(const VC1SequenceHeader& sequenceHdr);
 };
+
+#endif //ENABLE_DATA_PROVIDERS
 
 #endif

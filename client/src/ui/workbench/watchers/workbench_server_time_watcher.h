@@ -1,54 +1,54 @@
-#ifndef QN_WORKBENCH_SERVER_TIME_WATCHER_H
-#define QN_WORKBENCH_SERVER_TIME_WATCHER_H
+#pragma once
 
 #include <QtCore/QObject>
 #include <QtCore/QHash>
-#include <QtCore/QBasicTimer>
 
 #include <core/resource/resource_fwd.h>
-#include <api/model/time_reply.h>
 
-#include <ui/workbench/workbench_context_aware.h>
+#include <utils/common/connective.h>
 
-class QnWorkbenchServerTimeWatcher: public QObject, public QnWorkbenchContextAware {
+struct QnTimeReply;
+
+class QnWorkbenchServerTimeWatcher: public Connective<QObject> {
     Q_OBJECT;
 
-    typedef QObject base_type;
+    typedef Connective<QObject> base_type;
 
 public:
     QnWorkbenchServerTimeWatcher(QObject *parent);
     virtual ~QnWorkbenchServerTimeWatcher();
 
+    /** Current utc offset on the given server. Depends on server local timezone. */
     qint64 utcOffset(const QnMediaServerResourcePtr &server, qint64 defaultValue = Qn::InvalidUtcOffset) const;
 
+    /** Utc offset for the given resource. Supports cameras (current parent server offset is used)
+     *  and exported files (offset is stored inside).
+     */
     qint64 utcOffset(const QnMediaResourcePtr &resource, qint64 defaultValue = Qn::InvalidUtcOffset) const;
+   
+    /** Offset value, used in gui elements. Depends on user time mode settings. */
+    qint64 displayOffset(const QnMediaResourcePtr &resource) const;
 
-    qint64 localOffset(const QnMediaServerResourcePtr &server, qint64 defaultValue = Qn::InvalidUtcOffset) const;
+    /** Current time on the given server. Really, sync time is used, but with correct utc offset. */
+    QDateTime serverTime(const QnMediaServerResourcePtr &server, qint64 msecsSinceEpoch) const;
 
-    qint64 localOffset(const QnMediaResourcePtr &resource, qint64 defaultValue = Qn::InvalidUtcOffset) const;
-
+    /** Time value, than takes into account user time mode settings. */
+    QDateTime displayTime(qint64 msecsSinceEpoch) const;
 signals:
-    void offsetsChanged();
-
-protected:
-    virtual void timerEvent(QTimerEvent *event) override;
+    void displayOffsetsChanged();
 
 private:
     void sendRequest(const QnMediaServerResourcePtr &server);
-
+   
+    qint64 localOffset(const QnMediaResourcePtr &resource, qint64 defaultValue = Qn::InvalidUtcOffset) const;
 private slots:
-    void at_server_apiUrlChanged(const QnResourcePtr &resource);
-    void at_resource_statusChanged(const QnResourcePtr &resource);
-
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
 
     void at_replyReceived(int status, const QnTimeReply &reply, int handle);
 
 private:
-    QBasicTimer m_timer;
+    QTimer* m_timer;
     QHash<int, QnMediaServerResourcePtr> m_resourceByHandle;
     QHash<QnMediaServerResourcePtr, qint64> m_utcOffsetByResource;
 };
-
-#endif // QN_WORKBENCH_SERVER_TIME_WATCHER_H

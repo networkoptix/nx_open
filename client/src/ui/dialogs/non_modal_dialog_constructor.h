@@ -22,7 +22,7 @@ public:
         m_targetGeometry(targetGeometry),
         m_sourceCount(sourceCount)
     {}
-    
+
     virtual bool eventFilter(QObject *watched, QEvent *event) override {
         if (m_targetWidget && event->type() == QEvent::Hide) {
             watched->removeEventFilter(this);   //avoid double call
@@ -32,7 +32,7 @@ public:
                 show(m_targetWidget.data(), m_targetGeometry);
                 deleteLater();
             }
-            
+
         }
 
         return QObject::eventFilter(watched, event);
@@ -51,38 +51,87 @@ private:
 
 /** Helper class to restore geometry of the persistent dialogs. */
 template<typename T>
-class QnNonModalDialogConstructor: public QnShowDialogHelper {
+class QnNonModalDialogConstructor: public QnShowDialogHelper
+{
+    typedef QnNonModalDialogConstructor<T> ThisType;
+
 public:
+    typedef QPointer<T> DialogType;
+    typedef std::function<T* ()> DialogCreationFunc;
+    QnNonModalDialogConstructor(DialogType &dialog
+        , const DialogCreationFunc &creator);
 
-    QnNonModalDialogConstructor<T>(QPointer<T> &dialog, QWidget* parent) :
-        m_dontFocus(true)
-    {
-        if (!dialog) {
-            dialog = new T(parent);
-        } else {
-            /* Dialog's show() method will reset the geometry, saving it to restore afterwards. */
-            m_targetGeometry = dialog->geometry();  
-        }
-        m_dialog = dialog;
-    }
+    QnNonModalDialogConstructor(DialogType &dialog
+        , QWidget *parent);
 
-    ~QnNonModalDialogConstructor() {
-        showNonModalDialog(m_dialog, m_targetGeometry, m_dontFocus);
-    }
+    ~QnNonModalDialogConstructor();
 
     /** Invalidate stored geometry so dialog will be displayed in the center of the screen. */
-    void resetGeometry() {
-        m_targetGeometry = QRect();
-    }
+    void resetGeometry();
 
-    void setDontFocus(bool f) {
-        m_dontFocus = f;
-    }
+    void setDontFocus(bool f);
+
+private:
+    /// should be used only from constructor!
+    DialogType createAndInitializeDialog(DialogType &output
+        , const DialogCreationFunc &creator);
 
 private:
     QRect m_targetGeometry;
-    QPointer<T> m_dialog;
+    DialogType m_dialog;
     bool m_dontFocus;
 };
+
+template<typename T>
+QPointer<T> QnNonModalDialogConstructor<T>::createAndInitializeDialog(DialogType &output
+    , const DialogCreationFunc &creator)
+{
+    if (!output)
+    {
+        output = creator();
+    }
+    else
+    {
+        /* Dialog's show() method will reset the geometry, saving it to restore afterwards. */
+        m_targetGeometry = output->geometry();
+    }
+    return output;
+}
+
+template<typename T>
+QnNonModalDialogConstructor<T>::QnNonModalDialogConstructor(DialogType &dialog
+    , const DialogCreationFunc &creator)
+    : m_targetGeometry()
+    , m_dialog(createAndInitializeDialog(dialog, creator))
+    , m_dontFocus(true)
+{
+}
+
+template<typename T>
+QnNonModalDialogConstructor<T>::QnNonModalDialogConstructor(DialogType &dialog
+    , QWidget* parent)
+    : m_targetGeometry()
+    , m_dialog(createAndInitializeDialog(dialog, [parent](){ return (new T(parent));}))
+    , m_dontFocus(true)
+{
+}
+
+template<typename T>
+QnNonModalDialogConstructor<T>::~QnNonModalDialogConstructor()
+{
+        showNonModalDialog(m_dialog, m_targetGeometry, m_dontFocus);
+}
+
+template<typename T>
+void QnNonModalDialogConstructor<T>::resetGeometry()
+{
+    m_targetGeometry = QRect();
+}
+
+template<typename T>
+void QnNonModalDialogConstructor<T>::setDontFocus(bool f)
+{
+    m_dontFocus = f;
+}
 
 #endif //QN_NON_MODAL_DIALOG_CONSTRUCTOR_H

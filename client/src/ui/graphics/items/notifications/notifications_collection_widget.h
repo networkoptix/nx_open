@@ -13,6 +13,7 @@
 #include <health/system_health.h>
 
 #include <ui/actions/action_parameters.h>
+#include <ui/common/notification_levels.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
@@ -22,6 +23,7 @@ class QnNotificationListWidget;
 class QnNotificationWidget;
 class QnParticleItem;
 class QnToolTipWidget;
+class QnCameraThumbnailManager;
 
 /**
  * An image button widget that displays thumbnail behind the button.
@@ -31,7 +33,8 @@ class QnBlinkingImageButtonWidget: public QnImageButtonWidget, public AnimationT
     typedef QnImageButtonWidget base_type;
 
 public:
-    QnBlinkingImageButtonWidget(QGraphicsItem *parent = NULL);
+    QnBlinkingImageButtonWidget(const QString &statisticsAlias
+        , QGraphicsItem *parent = NULL);
 
 public slots:
     void setNotificationCount(int count);
@@ -82,7 +85,7 @@ public:
     }
     void setBlinker(QnBlinkingImageButtonWidget *blinker);
 
-    Qn::NotificationLevel notificationLevel() const;
+    QnNotificationLevel::Value notificationLevel() const;
 
 signals:
     void visibleSizeChanged();
@@ -97,9 +100,8 @@ private:
     void hideAll();
     void updateBlinker();
 
-    void at_debugButton_clicked();
     void at_list_itemRemoved(QnNotificationWidget *item);
-    void at_item_actionTriggered(Qn::ActionId actionId, const QnActionParameters &parameters);
+    void at_item_actionTriggered(QnActions::IDType actionId, const QnActionParameters &parameters);
     void at_notificationCache_fileDownloaded(const QString& filename);
 
 private:
@@ -109,14 +111,17 @@ private:
      * @param resource                      Camera resource - thumbnail provider
      * @param msecSinceEpoch                Timestamp for the thumbnail, -1 means latest available
      */
-    void loadThumbnailForItem(QnNotificationWidget *item, const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &server, qint64 msecSinceEpoch = -1);
-    void loadThumbnailForItem(QnNotificationWidget *item, const QnVirtualCameraResourceList &cameraList, const QnMediaServerResourcePtr &server, qint64 msecSinceEpoch = -1);
+    void loadThumbnailForItem(QnNotificationWidget *item, const QnVirtualCameraResourcePtr &camera, qint64 msecSinceEpoch = -1);
+    void loadThumbnailForItem(QnNotificationWidget *item, const QnVirtualCameraResourceList &cameraList, qint64 msecSinceEpoch = -1);
 
-    QnNotificationWidget* findItem(QnSystemHealth::MessageType message, const QnResourcePtr &resource, bool useResource = true);
-    QnNotificationWidget* findItem(const QnUuid& businessRuleId, const QnResourcePtr &resource, bool useResource = true);
+    QnNotificationWidget* findItem(QnSystemHealth::MessageType message, const QnResourcePtr &resource);
+    QnNotificationWidget* findItem(const QnUuid& businessRuleId, const QnResourcePtr &resource);
+    QnNotificationWidget* findItem(const QnUuid& businessRuleId, std::function<bool(QnNotificationWidget* item)> filter);
 
+    QIcon iconForAction(const QnAbstractBusinessActionPtr& businessAction) const;
+
+    void cleanUpItem(QnNotificationWidget* item);
 private:
-    QnNotificationWidget* findItem(int businessRuleId, const QnResourcePtr &resource);
     QnNotificationListWidget *m_list;
     GraphicsWidget* m_headerWidget;
 
@@ -124,6 +129,7 @@ private:
     QMultiHash<QString, QnNotificationWidget*> m_itemsByLoadingSound;
     QMultiHash<QnUuid, QnNotificationWidget*> m_itemsByBusinessRuleId;
     QPointer<QnBlinkingImageButtonWidget> m_blinker;
+    QSharedPointer<QnCameraThumbnailManager> m_statusPixmapManager;
 };
 
 #endif // NOTIFICATIONS_COLLECTION_WIDGET_H

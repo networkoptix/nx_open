@@ -24,34 +24,45 @@ int QnBusiness::eventHelpId(QnBusiness::EventType type) {
         return Qn::EventsActions_MediaServerStarted_Help;
     case LicenseIssueEvent:
         return Qn::EventsActions_LicenseIssue_Help;
+    case BackupFinishedEvent:
+        return Qn::EventsActions_BackupFinished_Help;
     default:
+        if (type >= UserDefinedEvent)
+            return Qn::EventsActions_Generic_Help;
+
         return -1;
     }
 }
 
 int QnBusiness::actionHelpId(QnBusiness::ActionType type) {
     switch (type) {
-    case CameraOutputAction:
-    case CameraOutputOnceAction:
+    case QnBusiness::CameraOutputAction:
+    case QnBusiness::CameraOutputOnceAction:
         return Qn::EventsActions_CameraOutput_Help;
-    case CameraRecordingAction:
+    case QnBusiness::CameraRecordingAction:
         return Qn::EventsActions_StartRecording_Help;
-    case PanicRecordingAction:
+    case QnBusiness::PanicRecordingAction:
         return Qn::EventsActions_StartPanicRecording_Help;
-    case SendMailAction:
+    case QnBusiness::SendMailAction:
         return Qn::EventsActions_SendMail_Help;
-    case ShowPopupAction:
+    case QnBusiness::ShowPopupAction:
         return Qn::EventsActions_ShowNotification_Help;
-    case PlaySoundOnceAction:
+    case QnBusiness::PlaySoundOnceAction:
         return Qn::EventsActions_PlaySound_Help;
-    case PlaySoundAction:
+    case QnBusiness::PlaySoundAction:
         return Qn::EventsActions_PlaySoundRepeated_Help;
-    case SayTextAction:
+    case QnBusiness::SayTextAction:
         return Qn::EventsActions_Speech_Help;
-    case DiagnosticsAction:
+    case QnBusiness::DiagnosticsAction:
         return Qn::EventsActions_Diagnostics_Help;
-    case BookmarkAction:
-        return -1;
+    case QnBusiness::ShowOnAlarmLayoutAction:
+        return Qn::EventsActions_ShowOnAlarmLayout_Help;
+    case QnBusiness::BookmarkAction:
+        return Qn::EventsActions_Bookmark_Help;
+    case QnBusiness::ExecutePtzPresetAction:
+        return Qn::EventsActions_ExecutePtzPreset_Help;
+    case QnBusiness::ShowTextOverlayAction:
+        return Qn::EventsActions_ShowTextOverlay_Help;
     default:
         return -1;
     }

@@ -3,7 +3,7 @@
 
 #include <QtCore/QSet>
 #include <QtCore/QElapsedTimer>
-#include <QtCore/QMutex>
+#include <utils/thread/mutex.h>
 
 #include "transaction.h"
 #include "nx_ec/ec_api.h"
@@ -38,12 +38,14 @@ signals:
         * this signal is emitted
         */
         void runtimeDataUpdated(const QnTransaction<ApiRuntimeData>& data);
+private:
+        void clearOldRuntimeDataUnsafe(QnMutexLockerBase& lock, const QnTranStateKey& key);
 private slots:
         void at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo);
     private:
         QnTranState m_state;
         QMap<QnTranStateKey, ApiRuntimeData> m_data;
-        mutable QMutex m_mutex;
+        mutable QnMutex m_mutex;
     };
 };
 

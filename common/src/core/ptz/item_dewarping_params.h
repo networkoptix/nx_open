@@ -1,12 +1,11 @@
 #ifndef ITEM_DEWARPING_PARAMS_H
 #define ITEM_DEWARPING_PARAMS_H
 
+#include <cmath>
 #include <QtCore/QMetaType>
-
 #include <boost/operators.hpp>
 
 #include <utils/common/model_functions_fwd.h>
-#include <utils/math/defines.h>
 
 // TODO: #Elric doesn't really belong in this folder
 struct QnItemDewarpingParams: public boost::equality_comparable1<QnItemDewarpingParams> {

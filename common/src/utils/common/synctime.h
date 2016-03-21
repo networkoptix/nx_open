@@ -1,22 +1,30 @@
 #ifndef QN_SYNC_TIME_H
 #define QN_SYNC_TIME_H
 
+#include <atomic>
+
 #include <QtCore/QDateTime>
-#include <QtCore/QMutex>
+#include <utils/thread/mutex.h>
 #include <QtCore/QObject>
 
 #include <nx_ec/ec_api.h>
 
+#include <plugins/plugin_container_api.h>
 #include <utils/common/singleton.h>
 
 /** 
  * Time provider that is synchronized with Server.
  */
-class QnSyncTime: public QObject, public Singleton<QnSyncTime> {
+class QnSyncTime
+:
+    public QObject,
+    public Singleton<QnSyncTime>,
+    public nxpl::TimeProvider
+{
     Q_OBJECT;
 
 public:
-    QnSyncTime();
+    QnSyncTime(QObject *parent = NULL);
     virtual ~QnSyncTime();
 
     qint64 currentMSecsSinceEpoch();
@@ -24,6 +32,11 @@ public:
     QDateTime currentDateTime();
 
     void reset();
+
+    virtual unsigned int addRef() override;
+    virtual unsigned int releaseRef() override;
+    virtual void* queryInterface(const nxpl::NX_GUID& interfaceID) override;
+    virtual uint64_t millisSinceEpoch() const override;
 
 public slots:
     //!Sets new synchronized time to \a newTime
@@ -38,10 +51,11 @@ signals:
 private:
     QTime m_timer;
     qint64 m_lastReceivedTime;
-    QMutex m_mutex;
+    QnMutex m_mutex;
     qint64 m_lastWarnTime;
     qint64 m_lastLocalTime;
     bool m_syncTimeRequestIssued;
+    std::atomic<unsigned int> m_refCounter;
 
 private slots:
     //!Sets new synchronized time to \a newTime

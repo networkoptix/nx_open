@@ -2,7 +2,7 @@
 
 #include <common/common_module.h>
 #include <media_server/settings.h>
-#include "utils/network/tcp_connection_priv.h"
+#include "network/tcp_connection_priv.h"
 
 void restartServer(int restartTimeout);
 

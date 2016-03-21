@@ -10,7 +10,12 @@
 #include "api_client_info_data.h"
 #include "api_license_data.h"
 #include "api_business_rule_data.h"
+#include "api_layout_data.h"
+#include "api_user_data.h"
 
+// NOTE: structs with suffix 'Statistics' are only used to tell fusion which
+//       fields should be serialized for statistics (to cut out private data
+//       and keep report 100% anonimous)
 
 namespace std
 {
@@ -32,11 +37,12 @@ namespace ec2 {
         ApiCameraDataStatistics(ApiCameraDataEx&& data);
 
 		const static std::set<QString> EXCEPT_PARAMS;
+        const static std::set<QString> RESOURCE_PARAMS;
     };
 #define ApiCameraDataStatistics_Fields (id)(parentId)(status)(addParams) \
     (manuallyAdded)(model)(statusFlags)(vendor) \
     (scheduleEnabled)(motionType)(motionMask)(scheduleTasks)(audioEnabled)(secondaryStreamQuality) \
-        (controlEnabled)(dewarpingParams)(minArchiveDays)(maxArchiveDays)(preferedServerId)
+        (controlEnabled)(dewarpingParams)(minArchiveDays)(maxArchiveDays)(preferedServerId)(backupType)
 
     struct ApiStorageDataStatistics
         : ApiStorageData
@@ -44,7 +50,8 @@ namespace ec2 {
         ApiStorageDataStatistics();
         ApiStorageDataStatistics(ApiStorageData&& data);
     };
-#define ApiStorageDataStatistics_Fields (id)(parentId)(spaceLimit)(usedForWriting)(storageType)(addParams)
+#define ApiStorageDataStatistics_Fields (id)(parentId)(spaceLimit)(usedForWriting) \
+    (storageType)(isBackup)(addParams)
 
     struct ApiMediaServerDataStatistics
 		: ApiMediaServerDataEx
@@ -52,20 +59,22 @@ namespace ec2 {
         ApiMediaServerDataStatistics();
         ApiMediaServerDataStatistics(ApiMediaServerDataEx&& data);
 
+        // overrides ApiMediaServerDataEx::storages for fusion
         ApiStorageDataStatisticsList storages;
     };
 #define ApiMediaServerDataStatistics_Fields (id)(parentId)(status)(storages)(addParams) \
-    (flags)(not_used)(version)(systemInfo)(maxCameras)(allowAutoRedundancy)
+    (flags)(not_used)(version)(systemInfo)(maxCameras)(allowAutoRedundancy) \
+    (backupType)(backupDaysOfTheWeek)(backupStart)(backupDuration)(backupBitrate)
 
 	struct ApiLicenseStatistics
 	{
         ApiLicenseStatistics();
         ApiLicenseStatistics(const ApiLicenseData& data);
 
-        QString name, key, licenseType, version, brand, expiration;
+        QString name, key, licenseType, version, brand, expiration, validation;
         qint64 cameraCount;
 	};
-#define ApiLicenseStatistics_Fields (name)(key)(cameraCount)(licenseType)(version)(brand)(expiration)
+#define ApiLicenseStatistics_Fields (name)(key)(cameraCount)(licenseType)(version)(brand)(expiration)(validation)
 
 	struct ApiBusinessRuleStatistics
 		: ApiBusinessRuleData
@@ -76,6 +85,14 @@ namespace ec2 {
 #define ApiBusinessRuleStatistics_Fields (id)(eventType)(eventResourceIds)(eventCondition)(eventState) \
 	(actionType)(actionResourceIds)(actionParams)(aggregationPeriod)(disabled)(schedule)(system)
 
+    struct ApiUserDataStatistics
+        : ApiUserData
+    {
+        ApiUserDataStatistics();
+        ApiUserDataStatistics(ApiUserData&& data);
+    };
+#define ApiUserDataStatistics_Fields (id)(isAdmin)(permissions)(isLdap)(isEnabled)
+
     struct ApiSystemStatistics
     {
         QnUuid systemId;
@@ -85,8 +102,10 @@ namespace ec2 {
         ApiClientInfoDataList               clients;
         ApiLicenseStatisticsList            licenses;
         ApiMediaServerDataStatisticsList    mediaservers;
+        ApiLayoutDataList                   layouts;
+        ApiUserDataStatisticsList           users;
     };
-#define ApiSystemStatistics_Fields (systemId)(mediaservers)(cameras)(clients)(licenses)(businessRules)
+#define ApiSystemStatistics_Fields (systemId)(mediaservers)(cameras)(clients)(licenses)(businessRules)(layouts)(users)
 
     struct ApiStatisticsServerInfo
     {

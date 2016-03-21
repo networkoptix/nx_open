@@ -18,8 +18,6 @@
 #include <api/app_server_connection.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <mustache/mustache.h>
-
 #include <client/client_translation_manager.h>
 
 #include <ui/help/help_topic_accessor.h>
@@ -85,8 +83,16 @@ QnLicenseManagerWidget::~QnLicenseManagerWidget()
 {
 }
 
-void QnLicenseManagerWidget::updateFromSettings() {
+void QnLicenseManagerWidget::loadDataToUi() {
     updateLicenses();
+}
+
+bool QnLicenseManagerWidget::hasChanges() const {
+    return false;
+}
+
+void QnLicenseManagerWidget::applyChanges() {
+    /* This widget is read-only. */
 }
 
 void QnLicenseManagerWidget::updateLicenses() {

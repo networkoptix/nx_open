@@ -29,7 +29,7 @@ class QnImageButtonWidget: public Animated<Clickable<GraphicsWidget> > {
     Q_PROPERTY(bool checked READ isChecked WRITE setChecked NOTIFY toggled USER true)
     Q_PROPERTY(bool cached READ isCached WRITE setCached)
     Q_PROPERTY(qreal animationSpeed READ animationSpeed WRITE setAnimationSpeed)
-    Q_PROPERTY(QIcon icon READ icon WRITE setIcon)
+    Q_PROPERTY(QIcon icon READ icon WRITE setIcon NOTIFY iconChanged)
 
     typedef Animated<Clickable<GraphicsWidget> > base_type;
 
@@ -40,13 +40,15 @@ public:
         Pressed = 0x2,      /**< Button is pressed. This is the state that the button enters when a mouse button is pressed over it, and leaves when the mouse button is released. */
         Hovered = 0x4,      /**< Button is hovered over. */
         Disabled = 0x8,     /**< Button is disabled. */
-        MaxState = 0xF 
+        MaxState = 0xF
     };
     Q_DECLARE_FLAGS(StateFlags, StateFlag)
 
-    QnImageButtonWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0);
+    QnImageButtonWidget(const QString &statisticsAlias
+        , QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0);
+
     virtual ~QnImageButtonWidget();
-  
+
     QIcon icon() const;
     void setIcon(const QIcon &icon);
 
@@ -84,7 +86,7 @@ public:
     bool isDynamic() const;
     /**
      * Allow or forbid dynamic size changes in runtime.
-     * Must be set before first paint because used in the VAO generation. 
+     * Must be set before first paint because used in the VAO generation.
      */
     void setDynamic(bool value);
 public slots:
@@ -97,6 +99,7 @@ signals:
     void pressed();
     void released();
     void stateChanged();
+    void iconChanged();
 
 protected:
     virtual void clickedNotify(QGraphicsSceneMouseEvent *event) override;
@@ -164,6 +167,8 @@ private:
     QOpenGLBuffer m_textureBufferTransition;
 
     MarginsF m_imageMargins;
+
+    QIcon m_icon;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnImageButtonWidget::StateFlags)
@@ -176,7 +181,8 @@ class QnRotatingImageButtonWidget: public QnImageButtonWidget, public AnimationT
     Q_OBJECT
     typedef QnImageButtonWidget base_type;
 public:
-    QnRotatingImageButtonWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0);
+    QnRotatingImageButtonWidget(const QString &statisticsAlias
+        , QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0);
 
     qreal rotationSpeed() const {
         return m_rotationSpeed;

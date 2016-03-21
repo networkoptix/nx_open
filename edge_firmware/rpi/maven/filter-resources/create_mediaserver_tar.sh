@@ -19,7 +19,6 @@
 # }
 TOOLCHAIN_PREFIX=/usr/local/raspberrypi-tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian/bin/arm-linux-gnueabihf-
 
-
 CUSTOMIZATION=${deb.customization.company.name}
 PRODUCT_NAME=${product.name.short}
 MODULE_NAME=mediaserver
@@ -37,12 +36,14 @@ PACKAGE=$CUSTOMIZATION-$MODULE_NAME-$BOX_NAME-$VERSION
 PACKAGE_NAME=$PACKAGE$BETA.tar.gz
 UPDATE_NAME=server-update-$BOX_NAME-${arch}-$VERSION
 
-BUILD_DIR="/tmp/hdw_"$BOX_NAME"_build.tmp"
-DEBUG_DIR="/tmp/hdw_"$BOX_NAME"_build_debug.tmp"
+TEMP_DIR="`mktemp -d`"
+BUILD_DIR="$TEMP_DIR/hdw_"$BOX_NAME"_build_app.tmp"
+DEBUG_DIR="$TEMP_DIR/hdw_"$BOX_NAME"_build_debug.tmp"
 PREFIX_DIR=/opt/$CUSTOMIZATION
 
 BUILD_OUTPUT_DIR=${libdir}
-LIBS_DIR=$BUILD_OUTPUT_DIR/lib/release
+BINS_DIR=$BUILD_OUTPUT_DIR/bin/${build.configuration}
+LIBS_DIR=$BUILD_OUTPUT_DIR/lib/${build.configuration}
 
 STRIP=
 
@@ -65,6 +66,7 @@ libavfilter.so.2.77.100 \
 libavformat.so.54.6.100 \
 libavutil.so.51.54.100 \
 libcommon.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
+libnxemail.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
 libappserver2.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
 libmediaserver_core.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
 libpostproc.so.52.0.100 \
@@ -120,7 +122,7 @@ popd
 #copying bin
 mkdir -p $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/
 mkdir -p $DEBUG_DIR/$PREFIX_DIR/$MODULE_NAME/bin/
-cp $BUILD_OUTPUT_DIR/bin/release/mediaserver $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/
+cp $BINS_DIR/mediaserver $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/
 if [ ! -z "$STRIP" ]; then
   $TOOLCHAIN_PREFIX"objcopy" --only-keep-debug $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/mediaserver $DEBUG_DIR/$PREFIX_DIR/$MODULE_NAME/bin/mediaserver.debug
   $TOOLCHAIN_PREFIX"objcopy" --add-gnu-debuglink=$DEBUG_DIR/$PREFIX_DIR/$MODULE_NAME/bin/mediaserver.debug $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/mediaserver
@@ -129,10 +131,10 @@ fi
 
 
 #copying plugins
-if [ -e "$BUILD_OUTPUT_DIR/bin/release/plugins" ]; then
+if [ -e "$BINS_DIR/plugins" ]; then
   mkdir -p $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/plugins
   mkdir -p $DEBUG_DIR/$PREFIX_DIR/$MODULE_NAME/bin/plugins
-  cp $BUILD_OUTPUT_DIR/bin/release/plugins/*.* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/plugins/
+  cp $BINS_DIR/plugins/*.* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/plugins/
   for f in `ls $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/plugins/`
     do
       if [ ! -z "$STRIP" ]; then
@@ -153,7 +155,6 @@ cp -R ./opt $BUILD_DIR
 
 
 #additional platform specific files
-cp -R ./var $BUILD_DIR
 cp -R ./root $BUILD_DIR
 mkdir -p $BUILD_DIR/root/tools/nx
 cp ./opt/networkoptix/$MODULE_NAME/etc/mediaserver.conf $BUILD_DIR/root/tools/nx
@@ -161,14 +162,18 @@ if [ ! "$CUSTOMIZATION" == "networkoptix" ]; then
     mv -f $BUILD_DIR/etc/init.d/networkoptix-$MODULE_NAME $BUILD_DIR/etc/init.d/$CUSTOMIZATION-$MODULE_NAME
     cp -Rf $BUILD_DIR/opt/networkoptix/* $BUILD_DIR/opt/$CUSTOMIZATION
     rm -Rf $BUILD_DIR/opt/networkoptix/
-fi 
+fi
+
+if [[ "${box}" == "bpi" ]]; then
+    cp -f /usr/local/raspberrypi-tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian/arm-linux-gnueabihf/lib/libstdc++.s* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib
+fi
 
 chmod -R 755 $BUILD_DIR/etc/init.d
 chmod -R 755 $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/var/scripts
 
 #building package
 pushd $BUILD_DIR
-  tar czf $PACKAGE_NAME .$PREFIX_DIR ./etc ./root ./var
+  tar czf $PACKAGE_NAME .$PREFIX_DIR ./etc ./root
   cp $PACKAGE_NAME ${project.build.directory}
 popd
 
@@ -184,9 +189,12 @@ mv $PACKAGE_NAME ./zip
 mv update.* ./zip
 mv install.sh ./zip
 cd zip
+if [ ! -f $PACKAGE_NAME ]; then
+  echo "Distribution is not created! Exiting"
+  exit 1
+fi
 zip ./$UPDATE_NAME.zip ./*
 mv ./* ../
 cd ..
 rm -Rf zip
-rm -Rf $BUILD_DIR
-rm -Rf $DEBUG_DIR
+rm -Rf $TEMP_DIR

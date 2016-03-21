@@ -21,12 +21,12 @@ namespace Ui {
     class AuditLogDialog;
 }
 
-class QnAuditItemDelegate: public QStyledItemDelegate 
+class QnAuditItemDelegate: public QStyledItemDelegate, public QnWorkbenchContextAware
 {
     typedef QStyledItemDelegate base_type;
 
 public:
-    explicit QnAuditItemDelegate(QObject *parent = NULL): base_type(parent), m_defaultSectionHeight(0), m_widthHint(-1) {}
+    explicit QnAuditItemDelegate(QObject *parent = NULL);
     virtual void paint(QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index) const override;
 
     virtual QSize sizeHint(const QStyleOptionViewItem & option, const QModelIndex & index) const override;
@@ -97,7 +97,7 @@ private:
     QnAuditRecordRefList filterChildDataByCameras(const QnAuditRecordRefList& checkedRows);
     void setupFilterCheckbox(QCheckBox* checkbox, const QColor& color, Qn::AuditRecordTypes filteredTypes);
     void processPlaybackAction(const QnAuditRecord* record);
-    void triggerAction(const QnAuditRecord* record, Qn::ActionId ActionId);
+    void triggerAction(const QnAuditRecord* record, QnActions::IDType ActionId);
     QnAuditRecordRefList applyFilter();
     QSize calcButtonSize() const;
     void setupSessionsGrid();

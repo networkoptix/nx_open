@@ -45,7 +45,7 @@ public:
     * @brief Calculate common name for the target devices list.
     * @details Following rules are applied:
     * * If all devices are cameras - "%n Cameras";
-    * * If all devices are IO Modules - "%n IO Modules";
+    * * If all devices are I/O Modules - "%n I/O Modules";
     * * For mixed list "%n Devices" is used;
     * @param capitalize Should the word begin from the capital letter, default value is true.
     */

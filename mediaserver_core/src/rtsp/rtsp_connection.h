@@ -2,9 +2,9 @@
 #define __RTSP_CONNECTION_H_
 
 #include <QtNetwork/QHostAddress>
-#include <QtCore/QMutex>
-#include "utils/network/ffmpeg_sdp.h"
-#include "utils/network/tcp_connection_processor.h"
+#include <utils/thread/mutex.h>
+#include "network/ffmpeg_sdp.h"
+#include "network/tcp_connection_processor.h"
 #include <core/resource/resource_fwd.h>
 #include "core/datapacket/media_data_packet.h"
 #include "rtsp/rtsp_encoder.h"
@@ -38,7 +38,7 @@ struct RtspServerTrackInfo
     AbstractDatagramSocket* mediaSocket;
     AbstractDatagramSocket* rtcpSocket;
     QnRtspEncoderPtr encoder;
-    static QMutex m_createSocketMutex;
+    static QnMutex m_createSocketMutex;
 };
 typedef QSharedPointer<RtspServerTrackInfo> RtspServerTrackInfoPtr;
 typedef QMap<int, RtspServerTrackInfoPtr> ServerTrackInfoMap;
@@ -82,7 +82,7 @@ private:
     void parseRequest();
     void initResponse(int code = 200, const QString& message = "OK");
     void generateSessionId();
-    void sendResponse(int code);
+    void sendResponse(int code, const QByteArray& contentType);
 
     int numOfVideoChannels();
     int composeDescribe();

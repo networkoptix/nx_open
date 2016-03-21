@@ -4,9 +4,9 @@
 #include <QtCore/QVariantList>
 
 #include <utils/network/http/httptypes.h>
-#include "utils/network/tcp_connection_processor.h"
-#include "request_handler.h"
 
+#include "network/tcp_connection_processor.h"
+#include "request_handler.h"
 
 class QnRestProcessorPool
 :

@@ -33,8 +33,6 @@ QnGraphicsMessageBoxItem::QnGraphicsMessageBoxItem(QGraphicsItem *parent):
     m_layout->setSpacing(2.0);
     setLayout(m_layout);
     setAcceptedMouseButtons(Qt::NoButton);
-
-    setOpacity(0.8);
 }
 
 QnGraphicsMessageBoxItem::~QnGraphicsMessageBoxItem() {
@@ -81,9 +79,7 @@ QnGraphicsMessageBox::QnGraphicsMessageBox(QGraphicsItem *parent, const QString 
     font.setPixelSize(fontSize == 0 ? defaultFontSize : fontSize);
     setFont(font);
 
-    setTextColor(QColor(166, 166, 166));
-    setFrameColor(QColor(83, 83, 83));
-    setWindowColor(QColor(33, 33, 80));
+    setColors(QnGraphicsMessageBoxColors());
 
     setAcceptedMouseButtons(Qt::NoButton);
 
@@ -109,12 +105,18 @@ void QnGraphicsMessageBox::setText(const QString &text) {
     m_label->setText(text);
 }
 
-const QColor &QnGraphicsMessageBox::textColor() const {
-    return palette().color(QPalette::WindowText);
+QnGraphicsMessageBoxColors QnGraphicsMessageBox::colors() const
+{
+    return m_colors;
 }
 
-void QnGraphicsMessageBox::setTextColor(const QColor &textColor) {
-    setPaletteColor(this, QPalette::WindowText, textColor);
+void QnGraphicsMessageBox::setColors( const QnGraphicsMessageBoxColors &value )
+{
+    m_colors = value;
+
+    setPaletteColor(this, QPalette::WindowText, m_colors.text);
+    setFrameColor(m_colors.frame);
+    setWindowColor(m_colors.window);
 }
 
 int QnGraphicsMessageBox::timeout() const {
@@ -178,8 +180,4 @@ void QnGraphicsMessageBox::at_animationIn_finished() {
     connect(animator, &VariantAnimator::animationTick, this, &QnGraphicsMessageBox::tick);
     connect(animator, &VariantAnimator::finished, this, &QnGraphicsMessageBox::hideImmideately);
 }
-
-/*QSizeF QnGraphicsMessageBox::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const {
-    return base_type::sizeHint(which, constraint) + QSizeF(borderRadius * 2, borderRadius * 2);
-}*/
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="es" sourcelanguage="en">
+<TS version="2.1" language="es" sourcelanguage="en">
 <context>
     <name>Language</name>
     <message>
@@ -12,17 +12,6 @@
         <source>Locale Code</source>
         <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
         <translation>es</translation>
-    </message>
-</context>
-<context>
-    <name>QnActiResource</name>
-    <message>
-        <source>Output %1</source>
-        <translation>Salida %1</translation>
-    </message>
-    <message>
-        <source>Input %1</source>
-        <translation>Entrada %1</translation>
     </message>
 </context>
 <context>
@@ -231,10 +220,6 @@
         <translation>Ha ocurrido un evento desconocido</translation>
     </message>
     <message>
-        <source>Conflict Address: %1</source>
-        <translation>Dirección en conflicto: %1</translation>
-    </message>
-    <message>
         <source>Connection to server is lost.</source>
         <translation>Ha perdido la conexión con el servidor.</translation>
     </message>
@@ -256,10 +241,6 @@
     <message>
         <source>Caption: %1</source>
         <translation>Título: %1</translation>
-    </message>
-    <message>
-        <source>Input port: %1</source>
-        <translation>Puerto de la entrada: %1</translation>
     </message>
     <message>
         <source>MAC #%1: %2 </source>
@@ -343,10 +324,6 @@
         <translation>Se desconectó la cámara %1</translation>
     </message>
     <message>
-        <source>IO Module %1 was disconnected</source>
-        <translation>Módulo del IO %1 fue desconectado</translation>
-    </message>
-    <message>
         <source>Device IP Conflict at %1</source>
         <extracomment>Device IP Conflict at &lt;server_name&gt;</extracomment>
         <translation>Conflicto IP del dispositivo en %1</translation>
@@ -369,8 +346,76 @@
         <translation>Grabación de las cámaras está deshabilitado:</translation>
     </message>
     <message>
-        <source>Recording on IO modules is disabled:</source>
-        <translation>la grabación en IO módulos esta desactivado:</translation>
+        <source>Execute PTZ preset</source>
+        <translation>Ejecutar PTZ preestablecido</translation>
+    </message>
+    <message>
+        <source>Show text overlay</source>
+        <translation>Mostrar texto superpuesto</translation>
+    </message>
+    <message>
+        <source>Show on Alarm Layout</source>
+        <translation>Mostrar disposición de alarma</translation>
+    </message>
+    <message>
+        <source>Archive backup finished</source>
+        <translation>Archivo de copia de seguridad a acabado</translation>
+    </message>
+    <message>
+        <source>Server &apos;%1&apos; has finished an archive backup</source>
+        <translation>Servidor &apos;%1&apos; ha terminado la copia de seguridad de archivo</translation>
+    </message>
+    <message>
+        <source>Generic Event at %1</source>
+        <translation>Evento genérico %1</translation>
+    </message>
+    <message>
+        <source>Input Port: %1</source>
+        <translation>Puerto de entrada: %1</translation>
+    </message>
+    <message>
+        <source>Archive backup is successfully completed</source>
+        <translation>Copia de seguridad del archivo es completado con éxito</translation>
+    </message>
+    <message>
+        <source>I/O Module %1 was disconnected</source>
+        <translation>Módulo I / O %1 se desconecto</translation>
+    </message>
+    <message>
+        <source>Conflicting Address: %1</source>
+        <translation>Conflicto de dirección: %1</translation>
+    </message>
+    <message>
+        <source>Archive backup failed: No available backup storages with sufficient free space</source>
+        <translation>Archivo de copia de seguridad ha fallado: No hay depósitos de copia de seguridad disponibles con suficiente espacio libre</translation>
+    </message>
+    <message>
+        <source>Archive backup failed: Target storage failure</source>
+        <translation>Archivo de copia de seguridad ha fallado: fallo de almacenamiento de destino</translation>
+    </message>
+    <message>
+        <source>Archive backup failed: Source file open/read error</source>
+        <translation>Archivo de copia de seguridad ha fallado: Archivo fuente abierta / error de lectura</translation>
+    </message>
+    <message>
+        <source>Archive backup failed: Target file create/write error</source>
+        <translation>Archivo de copia de seguridad ha fallado: Archivo de destino crear error / escritura</translation>
+    </message>
+    <message>
+        <source>Archive backup failed: File catalog error</source>
+        <translation>Archivo de copia de seguridad ha fallado: Archivo de error catálogo</translation>
+    </message>
+    <message>
+        <source>Archive backup finished, but isn&apos;t fully completed because backup time is over. Data is backed up to %1</source>
+        <translation>La copia de seguridad del archivo a terminado, pero no se completa totalmente, porque el tiempo de copia de seguridad ha terminado. Los datos se copian al %1</translation>
+    </message>
+    <message>
+        <source>Archive backup is canceled by user. Data is backed up to %1</source>
+        <translation>Archivo de copia de seguridad es cancelado por el usuario. Los datos se copian al %1</translation>
+    </message>
+    <message>
+        <source>Recording on I/O modules is disabled:</source>
+        <translation>Grabación en módulos de la entrada-salida está deshabilitado:</translation>
     </message>
 </context>
 <context>
@@ -460,20 +505,12 @@
         <translation>Trate de reiniciar la cámara, a continuación, restaurar valores predeterminados de fábrica en la página web.</translation>
     </message>
     <message>
-        <source>Please try to reboot the IO module, then restore factory defaults on the web-page.</source>
-        <translation>Por favor, intente reiniciar el módulo IO, a continuación, restaurar valores predeterminados de fábrica en la página web.</translation>
-    </message>
-    <message>
         <source>Make sure the device is plugged into the network. Try to reboot the device.</source>
         <translation>Asegúrese de que el dispositivo está conectado a la red. Intentar reiniciar el dispositivo.</translation>
     </message>
     <message>
         <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
         <translation>Asegúrese de que la cámara esté conectada a la red. Intentar reiniciar la cámara.</translation>
-    </message>
-    <message>
-        <source>Make sure the IO module is plugged into the network. Try to reboot the IO module.</source>
-        <translation>Asegúrese de que el módulo IO es conectado a la red. Intentar reiniciar el módulo IO.</translation>
     </message>
     <message>
         <source>Make sure port %2 is accessible (e.g. forwarded).</source>
@@ -488,10 +525,6 @@
         <translation>No podía analizar la respuesta de la cámara. URL %1, el nombre %2 de solicitud.</translation>
     </message>
     <message>
-        <source>Could not parse IO module response. Url %1, request name %2.</source>
-        <translation>No podía analizar la respuesta del módulo del IO. URL %1, el nombre %2 de solicitud.</translation>
-    </message>
-    <message>
         <source>Not authorized. Url %1.</source>
         <translation>No autorizado. URL %1.</translation>
     </message>
@@ -504,20 +537,12 @@
         <translation>En primer lugar, tratar de activar la grabación (si está apagado) y disminuya fps en ajustes de la cámara.</translation>
     </message>
     <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in IO module settings.</source>
-        <translation>En primer lugar, trate de girar sobre la grabación (si está apagado) y disminuya la fps en ajustes del módulo de IO.</translation>
-    </message>
-    <message>
         <source>If it doesn&apos;t help, restore factory defaults on the device web-page.</source>
         <translation>Si no ayuda, restaurar valores predeterminados de fábrica en la página web del dispositivo.</translation>
     </message>
     <message>
         <source>If it doesn&apos;t help, restore factory defaults on the camera web-page.</source>
         <translation>Si no ayuda, restaurar valores predeterminados de fábrica en la página web de la cámara.</translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the IO module web-page.</source>
-        <translation>Si no ayuda, restaurar valores predeterminados de fábrica en la página del módulo IO.</translation>
     </message>
     <message>
         <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
@@ -528,20 +553,12 @@
         <translation>La solicitud de la cámara &quot;%1&quot; falló con el error &quot;%2&quot;.</translation>
     </message>
     <message>
-        <source>IO Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-        <translation>Solicitud de módulo IO &quot;%1&quot; falló con error &quot;%2&quot;.</translation>
-    </message>
-    <message>
         <source>Unknown device issue.</source>
         <translation>Problema del dispositivo desconocido.</translation>
     </message>
     <message>
         <source>Unknown camera issue.</source>
         <translation>Problema de cámara desconocido.</translation>
-    </message>
-    <message>
-        <source>Unknown IO module issue.</source>
-        <translation>El problema del módulo IO es deconocido.</translation>
     </message>
     <message>
         <source>Invalid data was received from the device %1.</source>
@@ -552,10 +569,6 @@
         <translation>Datos no válidos se recibieron de la cámara %1.</translation>
     </message>
     <message>
-        <source>Invalid data was received from the IO module %1.</source>
-        <translation>Datos no válidos se recibieron desde el módulo IO %1.</translation>
-    </message>
-    <message>
         <source>Too many media errors. Please open device issues dialog for more details.</source>
         <translation>Demasiados errores de los medios de comunicación. Por favor, abra el diálogo de temas de dispositivo para más detalles.</translation>
     </message>
@@ -564,20 +577,56 @@
         <translation>Demasiados errores de los medios de comunicación. Por favor abrir diálogo de temas de cámara para más detalles.</translation>
     </message>
     <message>
-        <source>Too many media errors. Please open IO module issues dialog for more details.</source>
-        <translation>Demasiados errores de los medios de comunicación. Por favor abrir cuadro de diálogo de temas del módulo de IO para más detalles.</translation>
+        <source>Camera plugin error. %1</source>
+        <translation>Error de complemento de la cámara. %1</translation>
     </message>
     <message>
-        <source>Device initialization process in progress.</source>
-        <translation>Proceso de inicialización del dispositivo en progreso.</translation>
+        <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
+        <translation>Intente reiniciar el módulo de E/S y, a continuación, restaurar los valores predeterminados de fábrica en la página web.</translation>
     </message>
     <message>
-        <source>Camera initialization process in progress.</source>
-        <translation>Proceso de inicialización de cámara en progreso.</translation>
+        <source>Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</source>
+        <translation>Asegúrese de que el módulo de E/S está conectado a la red. Intente reiniciar el módulo de E/S.</translation>
     </message>
     <message>
-        <source>IO Module initialization process in progress.</source>
-        <translation>La inicialización del Módulo del IO trata en el progreso.</translation>
+        <source>Could not parse I/O module response. Url %1, request name %2.</source>
+        <translation>No se pudo analizar la respuesta del módulo de E/S. La dirección URL %1, %2 el nombre de la solicitud.</translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in I/O module settings.</source>
+        <translation>En primer lugar, pruebe a activar la grabación (si está desactivado) y disminuir fps en los ajustes del módulo de E/S.</translation>
+    </message>
+    <message>
+        <source>If it doesn&apos;t help, restore factory defaults on the I/O module web-page.</source>
+        <translation>Si esto no ayuda, restaurar los valores predeterminados de fábrica en el módulo I/O página web.</translation>
+    </message>
+    <message>
+        <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
+        <translation>Módulo E/S pedir &quot;%1&quot; con el error &quot;%2&quot;.</translation>
+    </message>
+    <message>
+        <source>Unknown I/O module issue.</source>
+        <translation>Módulo de E/S es tema desconocido.</translation>
+    </message>
+    <message>
+        <source>Invalid data was received from the I/O module %1.</source>
+        <translation>Se recibieron datos no válidos desde el módulo de E/S %1.</translation>
+    </message>
+    <message>
+        <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
+        <translation>Demasiados errores de medios. Por favor, abra el módulo E/S cuestiones del diálogo para más detalles.</translation>
+    </message>
+    <message>
+        <source>Device initialization process is in progress.</source>
+        <translation>El proceso de inicialización del dispositivo está en progreso.</translation>
+    </message>
+    <message>
+        <source>Camera initialization process is in progress.</source>
+        <translation>La cámara está en proceso de inicialización.</translation>
+    </message>
+    <message>
+        <source>I/O Module initialization process is in progress.</source>
+        <translation>Módulo E/S está en proceso de inicialización.</translation>
     </message>
 </context>
 <context>
@@ -598,8 +647,8 @@
         <translation>No se pudo encontrar explorer.exe en la ruta para iniciar el Explorador de Windows.</translation>
     </message>
     <message>
-        <source>Launching file explorer failed.</source>
-        <translation>No se pudo iniciar el explorador de Windows.</translation>
+        <source>File explorer failed to open.</source>
+        <translation>Error al abrir el explorador de archivos.</translation>
     </message>
 </context>
 <context>
@@ -613,12 +662,12 @@
         <translation>No se pudo encontrar el codificador para codec %1.</translation>
     </message>
     <message>
-        <source>Could not initialise audio encoder.</source>
+        <source>Could not initialize audio encoder.</source>
         <translation>No se pudo inicializar el codificador de audio.</translation>
     </message>
     <message>
-        <source>Could not initialise audio decoder.</source>
-        <translation>No se pudo inicializar el decodificador de audio.</translation>
+        <source>Could not initialize audio decoder.</source>
+        <translation>no se pudo inicializar decodificador de audio.</translation>
     </message>
 </context>
 <context>
@@ -655,8 +704,8 @@
         <translation>No se pudo encontrar el codificador para codec %1.</translation>
     </message>
     <message>
-        <source>Could not initialise video encoder.</source>
-        <translation>No se pudo inicializar el codificador de video.</translation>
+        <source>Could not initialize video encoder.</source>
+        <translation>No se pudo inicializar el codificador de vídeo.</translation>
     </message>
 </context>
 <context>
@@ -805,14 +854,6 @@
         </translation>
     </message>
     <message>
-        <source>There was a problem activating your license key. Invalid data received. Please contact support team to report issue.</source>
-        <translation>Hubo un problema al activar su clave de licencia. Datos no válidos recibidos. Póngase en contacto con el equipo de asistencia para informar del asunto.</translation>
-    </message>
-    <message>
-        <source>There was a problem activating your license key. A database error has occurred.</source>
-        <translation>Hubo un problema al activar su clave de licencia. Error en la base de datos se ha producido.</translation>
-    </message>
-    <message>
         <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
         <translation>La clave de licencia que ha introducido no es válida. Compruebe por favor que la clave de licencia es introducida correctamente. Si el problema persiste, póngase en contacto con el equipo de asistencia para confirmar si la clave de licencia es válida o para obtener una clave de licencia válida.</translation>
     </message>
@@ -824,33 +865,20 @@
         <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
         <translation>Esta clave de licencia se ha activado anteriormente en el hardware id { {hwid}} { {tiempo} }. Póngase en contacto con el equipo de asistencia para obtener una clave de licencia válida.</translation>
     </message>
+    <message>
+        <source>There was a problem activating your license key. A database error occurred.</source>
+        <translation>Hubo un problema al activar su clave de licencia. Se produjo un error de base de datos.</translation>
+    </message>
+    <message>
+        <source>There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.</source>
+        <translation>Hubo un problema de activación de su clave de licencia. Se recibieron datos inválidos. Por favor, póngase en contacto con el equipo de apoyo para informar sobre el problema.</translation>
+    </message>
 </context>
 <context>
     <name>QnMediaServerResource</name>
     <message>
         <source>Server</source>
         <translation>Servidor</translation>
-    </message>
-</context>
-<context>
-    <name>QnNewDWPtzController</name>
-    <message>
-        <source>Preset #</source>
-        <translation>Predeterminado #</translation>
-    </message>
-</context>
-<context>
-    <name>QnPlAxisResource</name>
-    <message>
-        <source>Can&apos;t initialize IO port settings</source>
-        <translation>No se puede inicializar la configuración de los puertos IO</translation>
-    </message>
-</context>
-<context>
-    <name>QnPlOnvifResource</name>
-    <message>
-        <source>Otput %1</source>
-        <translation>Salida %1</translation>
     </message>
 </context>
 <context>
@@ -874,20 +902,6 @@
         <translation>
             <numerusform>%n Camaras</numerusform>
             <numerusform>%n Camaras</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n IO Module(s)</source>
-        <translation>
-            <numerusform>%n IO Modulos</numerusform>
-            <numerusform>%n IO Modulos</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n IO module(s)</source>
-        <translation>
-            <numerusform>%n IO Modulos</numerusform>
-            <numerusform>%n IO Modulos</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -921,22 +935,6 @@
         <translation>Camara</translation>
     </message>
     <message>
-        <source>IO Modules</source>
-        <translation>IO Modulos</translation>
-    </message>
-    <message>
-        <source>IO modules</source>
-        <translation> IO Modulos</translation>
-    </message>
-    <message>
-        <source>IO Module</source>
-        <translation> IO Modulo</translation>
-    </message>
-    <message>
-        <source>IO module</source>
-        <translation> IO Modulo</translation>
-    </message>
-    <message>
         <source>Devices</source>
         <translation>Dispositivos</translation>
     </message>
@@ -951,6 +949,37 @@
     <message>
         <source>device</source>
         <translation>Dispositivo</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n I/O Module(s)</source>
+        <translation>
+            <numerusform>%n I/O Modulos</numerusform>
+            <numerusform>%n I/O Modulos</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n I/O module(s)</source>
+        <translation>
+            <numerusform>%n I/O Modulos</numerusform>
+            <numerusform>%n I/O Modulos</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>I/O Modules</source>
+        <translatorcomment>I/O Modulos</translatorcomment>
+        <translation>I/O Modulos</translation>
+    </message>
+    <message>
+        <source>I/O modules</source>
+        <translation>I/O Modulos</translation>
+    </message>
+    <message>
+        <source>I/O Module</source>
+        <translation>I/O Modulo</translation>
+    </message>
+    <message>
+        <source>I/O module</source>
+        <translation>I/O Modulo</translation>
     </message>
 </context>
 <context>
@@ -1076,108 +1105,9 @@
         <source>Error during watermark generation for file &apos;%1&apos;.</source>
         <translation>Error durante la generación de la filigrana para el archivo &apos;%1&apos;.</translation>
     </message>
-</context>
-<context>
-    <name>QnSystemHealthStringsHelper</name>
     <message>
-        <source>No licenses</source>
-        <translation>No hay licencias</translation>
-    </message>
-    <message>
-        <source>Email address is not set</source>
-        <translation>Dirección de correo electrónico no está configurado</translation>
-    </message>
-    <message>
-        <source>Email server is not set</source>
-        <translation>Servidor de correo electrónico no está configurado</translation>
-    </message>
-    <message>
-        <source>Some users have not set their email addresses</source>
-        <translation>Algunos usuarios no han establecido sus direcciones de correo electrónico</translation>
-    </message>
-    <message>
-        <source>Connection to server lost</source>
-        <translation>Ha perdido la conexión con el servidor</translation>
-    </message>
-    <message>
-        <source>Error while sending email</source>
-        <translation>Error al enviar correo electrónico</translation>
-    </message>
-    <message>
-        <source>Email address is not set for user %1</source>
-        <translation>Dirección de correo electrónico no está configurado para el usuario %1</translation>
-    </message>
-    <message>
-        <source>Select server for others to synchronize time with</source>
-        <translation>Seleccione el servidor de los demás para sincronizar la hora con</translation>
-    </message>
-    <message>
-        <source>Rebuilding archive index is completed</source>
-        <translation>Reconstruir índices de archivo se ha completado</translation>
-    </message>
-    <message>
-        <source>Email address is not set.</source>
-        <translation>Dirección de correo electrónico no está configurado.</translation>
-    </message>
-    <message>
-        <source>You cannot receive system notifications via email.</source>
-        <translation>Usted no puede recibir notificaciones del sistema a través del correo electrónico.</translation>
-    </message>
-    <message>
-        <source>Email server is not set.</source>
-        <translation>Servidor de correo electrónico no está configurado.</translation>
-    </message>
-    <message>
-        <source>Some users have not set their email addresses.</source>
-        <translation>Algunos usuarios no han establecido sus direcciones de correo electrónico.</translation>
-    </message>
-    <message>
-        <source>They cannot receive system notifications via email.</source>
-        <translation>No pueden recibir notificaciones del sistema a través del correo electrónico.</translation>
-    </message>
-    <message>
-        <source>Storages are full on the following Server:</source>
-        <translation>Almacenes están llenos de los siguientes servidores:</translation>
-    </message>
-    <message>
-        <source>Storages are not configured on the following Server:</source>
-        <translation>Almacenes no están configurados en el servidor que se muestra a continuación:</translation>
-    </message>
-    <message>
-        <source>You have no licenses.</source>
-        <translation>No tiene licencias.</translation>
-    </message>
-    <message>
-        <source>You cannot record video from cameras.</source>
-        <translation>No es posible grabar video de las cámaras.</translation>
-    </message>
-    <message>
-        <source>Rebuilding archive index is completed on the following Server:</source>
-        <translation>La reconstrucción del índice del archivo es completada en el Servidor siguiente:</translation>
-    </message>
-    <message>
-        <source>Storage is full</source>
-        <translation>Almacenamientos están llenos</translation>
-    </message>
-    <message>
-        <source>Storage is not configured</source>
-        <translation>Almacenamientos no están configurados</translation>
-    </message>
-    <message>
-        <source>Server times are not synchronized and a common time could not be detected automatically.</source>
-        <translation>Tiempos de servidor no están sincronizados y un tiempo común no podría ser detectado automáticamente.</translation>
-    </message>
-    <message>
-        <source>System is in safe mode</source>
-        <translation>Sistema está en modo seguro</translation>
-    </message>
-    <message>
-        <source>The system is running in safe mode.</source>
-        <translation>El sistema se está ejecutando en modo seguro.</translation>
-    </message>
-    <message>
-        <source>Any configuration changes except license activation are impossible.</source>
-        <translation>Cualquier cambios de configuración son posibles menos la activación de la licencia.</translation>
+        <source>File write error. Not enough free space.</source>
+        <translation>Error al escribir archivo. No hay suficiente espacio libre.</translation>
     </message>
 </context>
 <context>
@@ -1208,17 +1138,6 @@
     </message>
 </context>
 <context>
-    <name>QnThirdPartyResource</name>
-    <message>
-        <source>Otput %1</source>
-        <translation>Salida %1</translation>
-    </message>
-    <message>
-        <source>Input %1</source>
-        <translation>Entrada %1</translation>
-    </message>
-</context>
-<context>
     <name>QnTranscoder</name>
     <message>
         <source>OpenCL transcoding is not implemented.</source>
@@ -1246,6 +1165,13 @@
     <message>
         <source>%1 (external)</source>
         <translation>%1 (externo)</translation>
+    </message>
+</context>
+<context>
+    <name>utils::QnCameraNamesWatcher</name>
+    <message>
+        <source>Removed camera</source>
+        <translation>cámara eliminada</translation>
     </message>
 </context>
 </TS>

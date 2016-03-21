@@ -51,10 +51,10 @@ QnVideowallScreenWidget::QnVideowallScreenWidget(QnWorkbenchContext *context, Qn
     updateItems();
     updateButtonsVisibility();
     updateTitleText();
-    updateInfoText();
 
     setOption(QnResourceWidget::WindowRotationForbidden, true);
     setInfoVisible(true, false);
+    updateInfoText();
 }
 
 QnVideowallScreenWidget::~QnVideowallScreenWidget() {
@@ -156,7 +156,7 @@ void QnVideowallScreenWidget::updateLayout(bool force) {
         return itemWidget;
     };
 
-    
+
     auto partOfScreen = [](const QnScreenSnaps &snaps) {
         return std::any_of(snaps.values.cbegin(), snaps.values.cend(), [](const QnScreenSnap &snap) {return snap.snapIndex > 0;});
     };
@@ -213,10 +213,10 @@ void QnVideowallScreenWidget::at_videoWall_itemChanged(const QnVideoWallResource
     if (oldItem.screenSnaps.screens() != item.screenSnaps.screens()) {
          // if there are more than one item on the widget, this one will be updated from outside
         if (m_items.size() == 1)
-            updateItems(); 
-        return; 
+            updateItems();
+        return;
     }
-    
+
     m_items[idx] = item;
     m_layoutUpdateRequired = (item.screenSnaps != oldItem.screenSnaps);
     update();
@@ -247,7 +247,7 @@ void QnVideowallScreenWidget::updateItems() {
 
     if (!m_items.isEmpty()) {
         QnVideoWallPcData pc = m_videowall->pcs()->getItem(m_items.first().pcUuid);
-        
+
         QRect totalDesktopGeometry;
         QSet<int> screens = m_items.first().screenSnaps.screens();
         foreach (const QnVideoWallPcData::PcScreen &screen, pc.screens) {

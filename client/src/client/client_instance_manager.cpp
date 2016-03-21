@@ -108,7 +108,7 @@ QnClientInstanceManager::QnClientInstanceManager(QObject *parent) :
             if (data[i].pid == 0) {
                 m_index = i;
                 data[i].pid = QCoreApplication::applicationPid();
-                m_instanceGuid = QnUuid::createUuidFromPool(pcUuid.getQUuid(), m_index);
+                m_instanceGuid = instanceGuidForIndex(m_index);
                 break;
             }
         }
@@ -137,6 +137,38 @@ QnUuid QnClientInstanceManager::instanceGuid() const {
     return m_instanceGuid;
 }
 
+
+QnUuid QnClientInstanceManager::instanceGuidForIndex(int index) const
+{
+    QnUuid pcUuid = qnSettings->pcUuid();
+    Q_ASSERT_X(!pcUuid.isNull(), Q_FUNC_INFO, "pcUuid must already be created in class constructor");
+    if (pcUuid.isNull()) {
+        pcUuid = QnUuid::createUuid();
+        qnSettings->setPcUuid(pcUuid);
+    }
+
+    return QnUuid::createUuidFromPool(pcUuid.getQUuid(), index);
+}
+
+
 bool QnClientInstanceManager::isValid() const {
     return m_index >= 0;
+}
+
+QList<int> QnClientInstanceManager::runningInstancesIndices() const
+{
+    QList<int> result;
+
+    QnSharedMemoryLocker lock(&m_sharedMemory);
+    if (!lock.isValid())
+        return result;
+
+    InstanceData *data = reinterpret_cast<InstanceData*>(m_sharedMemory.data());
+    for (int i = 0; i < maxClients; i++) {
+        if (data[i].pid == 0)
+            continue;
+        result << i;
+    }
+
+    return result;
 }

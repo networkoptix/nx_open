@@ -6,9 +6,9 @@
 #include <utils/common/synctime.h>
 #include <utils/network/http/auth_tools.h>
 
-
 static const int LDAP_PASSWORD_PROLONGATION_PERIOD_SEC = 5 * 60;
 static const int MSEC_PER_SEC = 1000;
+
 
 QnUserResource::QnUserResource():
     m_permissions(0),
@@ -39,14 +39,14 @@ QnUserResource::QnUserResource(const QnUserResource& right)
 
 QByteArray QnUserResource::getHash() const
 {
-    QMutexLocker locker(&m_mutex);
+    QnMutexLocker locker( &m_mutex );
     return m_hash;
 }
 
 void QnUserResource::setHash(const QByteArray& hash)
 {
     {
-        QMutexLocker locker(&m_mutex);
+        QnMutexLocker locker( &m_mutex );
         if (m_hash == hash)
             return;
         m_hash = hash;
@@ -56,14 +56,14 @@ void QnUserResource::setHash(const QByteArray& hash)
 
 QString QnUserResource::getPassword() const
 {
-    QMutexLocker locker(&m_mutex);
+    QnMutexLocker locker( &m_mutex );
     return m_password;
 }
 
 void QnUserResource::setPassword(const QString& password)
 {
     {
-        QMutexLocker locker(&m_mutex);
+        QnMutexLocker locker( &m_mutex );
         if (m_password == password)
             return;
         m_password = password;
@@ -95,7 +95,7 @@ void QnUserResource::generateHash() {
 }
 
 bool QnUserResource::checkPassword(const QString &password) {
-    QMutexLocker locker( &m_mutex );
+    QnMutexLocker locker( &m_mutex );
     
     if( !m_digest.isEmpty() )
     {
@@ -120,7 +120,7 @@ bool QnUserResource::checkPassword(const QString &password) {
 void QnUserResource::setDigest(const QByteArray& digest, bool isValidated)
 {
     {
-        QMutexLocker locker(&m_mutex);
+        QnMutexLocker locker( &m_mutex );
         if (m_digest == digest)
             return;
         if( m_isLdap )
@@ -136,14 +136,14 @@ void QnUserResource::setDigest(const QByteArray& digest, bool isValidated)
 
 QByteArray QnUserResource::getDigest() const
 {
-    QMutexLocker locker(&m_mutex);
+    QnMutexLocker locker( &m_mutex );
     return m_digest;
 }
 
 void QnUserResource::setCryptSha512Hash( const QByteArray& cryptSha512Hash )
 {
     {
-        QMutexLocker locker( &m_mutex );
+        QnMutexLocker locker( &m_mutex );
         if( m_cryptSha512Hash == cryptSha512Hash )
             return;
         m_cryptSha512Hash = cryptSha512Hash;
@@ -153,32 +153,32 @@ void QnUserResource::setCryptSha512Hash( const QByteArray& cryptSha512Hash )
 
 QByteArray QnUserResource::getCryptSha512Hash() const
 {
-    QMutexLocker locker( &m_mutex );
+    QnMutexLocker locker( &m_mutex );
     return m_cryptSha512Hash;
 }
 
 QString QnUserResource::getRealm() const
 {
-    QMutexLocker locker( &m_mutex );
+    QnMutexLocker locker( &m_mutex );
     return m_realm;
 }
 
 void QnUserResource::setRealm( const QString& realm )
 {
-    QMutexLocker locker( &m_mutex );
+    QnMutexLocker locker( &m_mutex );
     m_realm = realm;
 }
 
 quint64 QnUserResource::getPermissions() const
 {
-    QMutexLocker locker(&m_mutex);
+    QnMutexLocker locker( &m_mutex );
     return m_permissions;
 }
 
 void QnUserResource::setPermissions(quint64 permissions)
 {
     {
-        QMutexLocker locker(&m_mutex);
+        QnMutexLocker locker( &m_mutex );
         if (m_permissions == permissions)
             return;
         m_permissions = permissions;
@@ -188,14 +188,14 @@ void QnUserResource::setPermissions(quint64 permissions)
 
 bool QnUserResource::isAdmin() const
 {
-    QMutexLocker locker(&m_mutex);
+    QnMutexLocker locker( &m_mutex );
     return m_isAdmin;
 }
 
 void QnUserResource::setAdmin(bool isAdmin)
 {
     {
-        QMutexLocker locker(&m_mutex);
+        QnMutexLocker locker( &m_mutex );
         if (m_isAdmin == isAdmin)
             return;
         m_isAdmin = isAdmin;
@@ -205,13 +205,13 @@ void QnUserResource::setAdmin(bool isAdmin)
 
 bool QnUserResource::isLdap() const
 {
-    QMutexLocker locker(&m_mutex);
+    QnMutexLocker locker(&m_mutex);
     return m_isLdap;
 }
 
 void QnUserResource::setLdap(bool isLdap)
 {
-    QMutexLocker locker(&m_mutex);
+    QnMutexLocker locker(&m_mutex);
     if (m_isLdap == isLdap)
         return;
     m_isLdap = isLdap;
@@ -221,13 +221,13 @@ void QnUserResource::setLdap(bool isLdap)
 
 bool QnUserResource::isEnabled() const
 {
-    QMutexLocker locker(&m_mutex);
+    QnMutexLocker locker(&m_mutex);
     return m_isEnabled;
 }
 
 void QnUserResource::setEnabled(bool isEnabled)
 {
-    QMutexLocker locker(&m_mutex);
+    QnMutexLocker locker(&m_mutex);
     if (m_isEnabled == isEnabled)
         return;
     m_isEnabled = isEnabled;
@@ -236,14 +236,14 @@ void QnUserResource::setEnabled(bool isEnabled)
 
 QString QnUserResource::getEmail() const
 {
-    QMutexLocker locker(&m_mutex);
+    QnMutexLocker locker( &m_mutex );
     return m_email;
 }
 
 void QnUserResource::setEmail(const QString& email)
 {
     {
-        QMutexLocker locker(&m_mutex);
+        QnMutexLocker locker( &m_mutex );
         if (email.trimmed() == m_email)
             return;
         m_email = email.trimmed();
@@ -316,8 +316,17 @@ Qn::ResourceStatus QnUserResource::getStatus() const
 
 qint64 QnUserResource::passwordExpirationTimestamp() const
 {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     return m_passwordExpirationTimestamp;
+}
+
+void QnUserResource::prolongatePassword(qint64 value)
+{
+    QnMutexLocker lk( &m_mutex );
+    if (value == PasswordProlongationAuto)
+        m_passwordExpirationTimestamp = qnSyncTime->currentMSecsSinceEpoch() + LDAP_PASSWORD_PROLONGATION_PERIOD_SEC * MSEC_PER_SEC;
+    else
+        m_passwordExpirationTimestamp = value;
 }
 
 bool QnUserResource::passwordExpired() const
@@ -326,42 +335,4 @@ bool QnUserResource::passwordExpired() const
         return false;
 
     return passwordExpirationTimestamp() < qnSyncTime->currentMSecsSinceEpoch();
-}
-
-Qn::AuthResult QnUserResource::doPasswordProlongation()
-{
-    if( !isLdap() )
-        return Qn::Auth_OK;
-
-    QString name;
-    QString digest;
-    {
-        QMutexLocker lk( &m_mutex );
-        name = m_name;
-        digest = QLatin1String(m_digest);
-    }
-
-    auto errorCode = QnLdapManager::instance()->authenticateWithDigest( name, digest );
-    if( errorCode != Qn::Auth_OK ) {
-        if (!passwordExpired())
-            return Qn::Auth_OK;
-        else
-            return errorCode;
-    }
-
-    QMutexLocker lk( &m_mutex );
-    if( m_name != name || QLatin1String(m_digest) != digest )  //user data has been updated somehow while performing ldap request
-        return m_passwordExpirationTimestamp > qnSyncTime->currentMSecsSinceEpoch() ? Qn::Auth_OK : Qn::Auth_PasswordExpired;
-    m_passwordExpirationTimestamp =
-        qnSyncTime->currentMSecsSinceEpoch() +
-        LDAP_PASSWORD_PROLONGATION_PERIOD_SEC * MSEC_PER_SEC;
-    return Qn::Auth_OK;
-}
-
-Qn::AuthResult QnUserResource::checkDigestValidity( const QByteArray& digest )
-{
-    if( !isLdap() )
-        return Qn::Auth_OK;
-
-    return QnLdapManager::instance()->authenticateWithDigest( getName(), QLatin1String(digest) );
 }

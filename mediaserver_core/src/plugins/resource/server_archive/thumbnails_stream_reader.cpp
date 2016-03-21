@@ -46,7 +46,7 @@ QnThumbnailsStreamReader::~QnThumbnailsStreamReader()
 
 void QnThumbnailsStreamReader::setRange(qint64 startTime, qint64 endTime, qint64 frameStep, int cseq)
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     m_delegate->setRange(startTime, endTime, frameStep);
     m_cseq = cseq;
 }
@@ -97,7 +97,7 @@ void QnThumbnailsStreamReader::run()
         {
             setNeedKeyData();
             mFramesLost++;
-            m_stat[0].onData(0);
+            m_stat[0].onData(0, false);
             m_stat[0].onEvent(CL_STAT_FRAME_LOST);
 
             msleep(30);
@@ -128,8 +128,8 @@ void QnThumbnailsStreamReader::run()
         }
 
         if (videoData)
-            m_stat[videoData->channelNumber].onData(videoData->dataSize());
-
+            m_stat[videoData->channelNumber].onData(
+                videoData->dataSize(), videoData->flags & AV_PKT_FLAG_KEY);
 
         putData(data);
     }

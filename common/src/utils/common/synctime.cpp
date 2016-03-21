@@ -17,12 +17,14 @@ enum {
 // -------------------------------------------------------------------------- //
 // QnSyncTime
 // -------------------------------------------------------------------------- //
-QnSyncTime::QnSyncTime()
+QnSyncTime::QnSyncTime(QObject *parent)
 :
+    QObject(parent),
     m_lastReceivedTime( 0 ),
     m_lastWarnTime( 0 ),
     m_lastLocalTime( 0 ),
-    m_syncTimeRequestIssued( false )
+    m_syncTimeRequestIssued( false ),
+    m_refCounter( 1 )
 {
     reset();
 }
@@ -38,7 +40,7 @@ void QnSyncTime::updateTime(int /*reqID*/, ec2::ErrorCode errorCode, qint64 newT
         return;
     }
 
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     qint64 oldTime = m_lastReceivedTime + m_timer.elapsed();
     
     m_lastReceivedTime = newTime;
@@ -68,6 +70,36 @@ void QnSyncTime::reset()
     m_lastLocalTime = 0;
 }
 
+unsigned int QnSyncTime::addRef()
+{
+    return ++m_refCounter;
+}
+
+unsigned int QnSyncTime::releaseRef()
+{
+    return --m_refCounter;
+}
+
+void* QnSyncTime::queryInterface(const nxpl::NX_GUID& interfaceID)
+{
+    if (memcmp(&interfaceID, &nxpl::IID_TimeProvider, sizeof(nxpl::IID_TimeProvider)) == 0)
+    {
+        addRef();
+        return static_cast<nxpl::TimeProvider*>(this);
+    }
+    if (memcmp(&interfaceID, &nxpl::IID_PluginInterface, sizeof(nxpl::IID_PluginInterface)) == 0)
+    {
+        addRef();
+        return static_cast<nxpl::PluginInterface*>(this);
+    }
+    return NULL;
+}
+
+uint64_t QnSyncTime::millisSinceEpoch() const
+{
+    return const_cast<QnSyncTime*>(this)->currentMSecsSinceEpoch();
+}
+
 void QnSyncTime::updateTime(qint64 newTime)
 {
     updateTime( 0, ec2::ErrorCode::ok, newTime );
@@ -75,7 +107,7 @@ void QnSyncTime::updateTime(qint64 newTime)
 
 qint64 QnSyncTime::currentMSecsSinceEpoch()
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     const qint64 localTime = QDateTime::currentMSecsSinceEpoch();
     if (

@@ -8,7 +8,7 @@
 
 #include <memory>
 
-#include <QtCore/QMutex>
+#include <utils/thread/mutex.h>
 
 #include <utils/common/joinable.h>
 #include <utils/common/stoppable.h>
@@ -45,14 +45,14 @@ namespace ec2
                                   impl::ConnectHandlerPtr handler ) override;
 
         virtual void registerRestHandlers( QnRestProcessorPool* const restProcessorPool ) override;
-        virtual void registerTransactionListener( QnUniversalTcpListener* universalTcpListener ) override;
+        virtual void registerTransactionListener(QnHttpConnectionListener* httpConnectionListener) override;
         virtual void setContext( const ResourceContext& resCtx ) override;
         virtual void setConfParams( std::map<QString, QVariant> confParams ) override;
 
     private:
         ServerQueryProcessor m_serverQueryProcessor;
         ClientQueryProcessor m_remoteQueryProcessor;
-        QMutex m_mutex;
+        QnMutex m_mutex;
         ResourceContext m_resCtx;
         Settings m_settingsInstance;
         std::unique_ptr<QnDbManager> m_dbManager;

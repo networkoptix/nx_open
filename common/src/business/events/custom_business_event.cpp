@@ -8,21 +8,22 @@ QnCustomBusinessEvent::QnCustomBusinessEvent(QnBusiness::EventState toggleState,
                                              QString& resourceName, 
                                              const QString& caption, 
                                              const QString& description,
-                                             const QnEventMetaData& metadata):
+                                             QnEventMetaData metadata):
     base_type(QnBusiness::UserDefinedEvent, QnResourcePtr(), toggleState, timeStamp),
     m_resourceName(resourceName),
     m_caption(caption),
     m_description(description),
-    m_metadata(metadata)
+    m_metadata(std::move(metadata))
 {
     
 }
 
-bool QnCustomBusinessEvent::checkCondition(QnBusiness::EventState state, const QnBusinessEventParameters &params, QnBusiness::ActionType actionType) const {
-    bool stateOK =  state == QnBusiness::UndefinedState || state == getToggleState() || QnBusiness::hasToggleState(actionType);
-    if (!stateOK)
-        return false;
+bool QnCustomBusinessEvent::isEventStateMatched(QnBusiness::EventState state, QnBusiness::ActionType actionType) const {
+    return state == QnBusiness::UndefinedState || state == getToggleState() || QnBusiness::hasToggleState(actionType);
+}
 
+bool QnCustomBusinessEvent::checkEventParams(const QnBusinessEventParameters &params) const 
+{
     auto unquote = [](const QStringList& dataList) 
     {
         QStringList result;

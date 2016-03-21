@@ -18,6 +18,8 @@ namespace {
     enum {
         HOUR = 60 * 60 * 1000
     };
+
+    enum { kHeaderLabelMargin = 2 };
 }
 
 
@@ -113,7 +115,8 @@ QnDayTimeWidget::QnDayTimeWidget(QWidget *parent):
     connect(signalizer, SIGNAL(activated(QObject *, QEvent *)), this, SLOT(updateCurrentTime()));
 
     QHBoxLayout *headerLayout = new QHBoxLayout();
-    headerLayout->setContentsMargins(2, 2, 2, 2);
+    headerLayout->setContentsMargins(kHeaderLabelMargin, kHeaderLabelMargin
+        , kHeaderLabelMargin, kHeaderLabelMargin);
     headerLayout->addWidget(m_headerLabel, 0);
 
     QVBoxLayout *layout = new QVBoxLayout();
@@ -213,18 +216,13 @@ void QnDayTimeWidget::paintCell(QPainter *painter, const QRect &rect, const QTim
     if (period.startTimeMs - m_localOffset > m_currentTime)
         period = QnTimePeriod();
 
-    m_delegate->paintCell(
-        painter, 
-        palette(), 
-        rect, 
-        period, 
-        m_localOffset,
-        m_enabledPeriod, 
-        m_selectedPeriod, 
-        m_primaryPeriodStorage, 
-        m_secondaryPeriodStorage, 
-        time.toString(m_timeFormat)
-    );
+    const QnTimePeriod localPeriod(period.startTimeMs - m_localOffset, period.durationMs);
+    const bool isEnabled = m_enabledPeriod.intersects(localPeriod);
+    const bool isSelected = m_selectedPeriod.intersects(localPeriod);
+
+    m_delegate->paintCell(painter, rect, localPeriod, m_primaryPeriodStorage
+        , m_secondaryPeriodStorage, isEnabled, isSelected);
+    m_delegate->paintCellText(painter, palette(), rect, time.toString(m_timeFormat), isEnabled);
 }
 
 void QnDayTimeWidget::updateHeaderText() {
@@ -273,3 +271,8 @@ void QnDayTimeWidget::setLocalOffset(qint64 localOffset) {
     updateEnabled();
 }
 
+int QnDayTimeWidget::headerHeight() const
+{
+    enum { kVerticalMarginsCount = 2};  /// Upper and lower margins
+    return m_headerLabel->height() + kHeaderLabelMargin * kVerticalMarginsCount;
+}

@@ -8,7 +8,7 @@ QnCameraOutputBusinessAction::QnCameraOutputBusinessAction(bool instant, const Q
               : QnBusiness::CameraOutputAction, runtimeParams)
 {
     if (instant)
-        m_params.relayAutoResetTimeout = 30 * 1000; // default value for instant action
+        m_params.relayAutoResetTimeout = QnCameraOutputBusinessAction::kInstantActionAutoResetTimeoutMs; // default value for instant action
 }
 
 QString QnCameraOutputBusinessAction::getRelayOutputId() const {

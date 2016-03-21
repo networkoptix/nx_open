@@ -31,7 +31,7 @@ protected:
 
 private:
     /** Mutex that is used to synchronize access to private fields. */
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
 
     QnManualCameraSearchStatus::State m_state;
     bool m_singleAddressCheck;

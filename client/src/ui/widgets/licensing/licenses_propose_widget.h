@@ -3,6 +3,8 @@
 #include <QtWidgets/QWidget>
 
 #include <core/resource/resource_fwd.h>
+
+#include <ui/common/updatable.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 class QnLicenseUsageHelper;
@@ -11,7 +13,7 @@ namespace Ui {
     class LicensesProposeWidget;
 }
 
-class QnLicensesProposeWidget: public QWidget, public QnWorkbenchContextAware {
+class QnLicensesProposeWidget: public QWidget, public QnWorkbenchContextAware, public QnUpdatable {
     Q_OBJECT
 public:
     QnLicensesProposeWidget(QWidget *parent);
@@ -28,6 +30,7 @@ signals:
 
 protected:
     void afterContextInitialized() override;
+    virtual void afterUpdate() override;
 
 private:
     void updateLicenseText();

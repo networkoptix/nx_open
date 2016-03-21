@@ -15,17 +15,6 @@
     </message>
 </context>
 <context>
-    <name>QnActiResource</name>
-    <message>
-        <source>Output %1</source>
-        <translation>输出 %1</translation>
-    </message>
-    <message>
-        <source>Input %1</source>
-        <translation>输入 %1</translation>
-    </message>
-</context>
-<context>
     <name>QnBusinessStringsHelper</name>
     <message>
         <source>Motion on Camera</source>
@@ -233,10 +222,6 @@
         <translation>发生未知事件</translation>
     </message>
     <message>
-        <source>Conflict Address: %1</source>
-        <translation>冲突IP地址:: %1</translation>
-    </message>
-    <message>
         <source>Connection to server is lost.</source>
         <translation>无法连接到服务器</translation>
     </message>
@@ -257,10 +242,6 @@
     <message>
         <source>Caption: %1</source>
         <translation>容量: (%1)</translation>
-    </message>
-    <message>
-        <source>Input port: %1</source>
-        <translation>输入端口: (%1)</translation>
     </message>
     <message>
         <source>MAC #%1: %2 </source>
@@ -344,10 +325,6 @@
         <translation>摄像机 %1断开连接</translation>
     </message>
     <message>
-        <source>IO Module %1 was disconnected</source>
-        <translation>I/O设备 %1断开连接</translation>
-    </message>
-    <message>
         <source>Device IP Conflict at %1</source>
         <extracomment>Device IP Conflict at &lt;server_name&gt;</extracomment>
         <translation>设备IP冲突: %1</translation>
@@ -370,8 +347,76 @@
         <translation>摄像机录像无法启用:</translation>
     </message>
     <message>
-        <source>Recording on IO modules is disabled:</source>
-        <translation>I/O设备录像无法启用:</translation>
+        <source>Execute PTZ preset</source>
+        <translation>调用PTZ预置位</translation>
+    </message>
+    <message>
+        <source>Show text overlay</source>
+        <translation>显示文本覆盖</translation>
+    </message>
+    <message>
+        <source>Show on Alarm Layout</source>
+        <translation>显示报警视图</translation>
+    </message>
+    <message>
+        <source>Archive backup finished</source>
+        <translation>录像备份完成</translation>
+    </message>
+    <message>
+        <source>Server &apos;%1&apos; has finished an archive backup</source>
+        <translation>服务器 &apos;%1已完成录像备份</translation>
+    </message>
+    <message>
+        <source>Generic Event at %1</source>
+        <translation>通用事件在 %1</translation>
+    </message>
+    <message>
+        <source>Input Port: %1</source>
+        <translation>输入端口: %1</translation>
+    </message>
+    <message>
+        <source>Archive backup is successfully completed</source>
+        <translation>录像备份已完成</translation>
+    </message>
+    <message>
+        <source>I/O Module %1 was disconnected</source>
+        <translation>I/O模块 %1无法连接</translation>
+    </message>
+    <message>
+        <source>Conflicting Address: %1</source>
+        <translation>冲突地址: %1</translation>
+    </message>
+    <message>
+        <source>Archive backup failed: No available backup storages with sufficient free space</source>
+        <translation>录像备份失败:存储服务器上没有可用的空间</translation>
+    </message>
+    <message>
+        <source>Archive backup failed: Target storage failure</source>
+        <translation>录像备份失败:目标存储失败</translation>
+    </message>
+    <message>
+        <source>Archive backup failed: Source file open/read error</source>
+        <translation>录像备份失败:系统文件打开/读取错误</translation>
+    </message>
+    <message>
+        <source>Archive backup failed: Target file create/write error</source>
+        <translation>录像备份失败:目标文件创建写入错误</translation>
+    </message>
+    <message>
+        <source>Archive backup failed: File catalog error</source>
+        <translation>录像备份失败:文件目录错误</translation>
+    </message>
+    <message>
+        <source>Archive backup finished, but isn&apos;t fully completed because backup time is over. Data is backed up to %1</source>
+        <translation>录像备份结束,因备份超时备份未全部完成,数据备份至%1</translation>
+    </message>
+    <message>
+        <source>Archive backup is canceled by user. Data is backed up to %1</source>
+        <translation>录像备份已取消,数据保存至 %1</translation>
+    </message>
+    <message>
+        <source>Recording on I/O modules is disabled:</source>
+        <translation>I/O模块录像已无效:</translation>
     </message>
 </context>
 <context>
@@ -461,20 +506,12 @@
         <translation>请尝试重启摄像机,并通过网页恢复出厂设置.</translation>
     </message>
     <message>
-        <source>Please try to reboot the IO module, then restore factory defaults on the web-page.</source>
-        <translation>请尝试重启I/O设备,并通过设备网页恢复出厂设置.</translation>
-    </message>
-    <message>
         <source>Make sure the device is plugged into the network. Try to reboot the device.</source>
         <translation>请确认设备已接入网络,并重启设备.</translation>
     </message>
     <message>
         <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
         <translation>请确认摄像机已接入网络,并重启摄像机.</translation>
-    </message>
-    <message>
-        <source>Make sure the IO module is plugged into the network. Try to reboot the IO module.</source>
-        <translation>请确认I/O设备已接入网络,并重启I/O设备.</translation>
     </message>
     <message>
         <source>Make sure port %2 is accessible (e.g. forwarded).</source>
@@ -489,10 +526,6 @@
         <translation>摄像机无响应.URL: %1,请求名称 %2.</translation>
     </message>
     <message>
-        <source>Could not parse IO module response. Url %1, request name %2.</source>
-        <translation>I/O设备无响应.URL: %1,请求名称 %2.</translation>
-    </message>
-    <message>
         <source>Not authorized. Url %1.</source>
         <translation>无授权,URL: %1.</translation>
     </message>
@@ -505,20 +538,12 @@
         <translation>请尝试打开录像并且通过摄像机设置降低fps.</translation>
     </message>
     <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in IO module settings.</source>
-        <translation>请尝试打开录像并且通过I/O设置降低fps.</translation>
-    </message>
-    <message>
         <source>If it doesn&apos;t help, restore factory defaults on the device web-page.</source>
         <translation>请尝试通过网页恢复设备出厂设置.</translation>
     </message>
     <message>
         <source>If it doesn&apos;t help, restore factory defaults on the camera web-page.</source>
         <translation>请尝试通过网页恢复摄像机出厂设置.</translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the IO module web-page.</source>
-        <translation>请尝试通过网页恢复I/O设备出厂设置.</translation>
     </message>
     <message>
         <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
@@ -529,20 +554,12 @@
         <translation>摄像机请求 &quot;%1&quot;出现错误&quot;%2&quot;.</translation>
     </message>
     <message>
-        <source>IO Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-        <translation>I/O设备请求 &quot;%1&quot;出现错误&quot;%2&quot;.</translation>
-    </message>
-    <message>
         <source>Unknown device issue.</source>
         <translation>未知设备故障.</translation>
     </message>
     <message>
         <source>Unknown camera issue.</source>
         <translation>未知摄像机故障.</translation>
-    </message>
-    <message>
-        <source>Unknown IO module issue.</source>
-        <translation>未知I/O设备故障.</translation>
     </message>
     <message>
         <source>Invalid data was received from the device %1.</source>
@@ -553,10 +570,6 @@
         <translation>从摄像机 %1收到无效参数.</translation>
     </message>
     <message>
-        <source>Invalid data was received from the IO module %1.</source>
-        <translation>从I/O设备 %1收到无效参数.</translation>
-    </message>
-    <message>
         <source>Too many media errors. Please open device issues dialog for more details.</source>
         <translation>媒体流错误,请打开设备故障日志获取更多信息.</translation>
     </message>
@@ -565,20 +578,56 @@
         <translation>媒体流错误,请打开摄像机故障日志获取更多信息.</translation>
     </message>
     <message>
-        <source>Too many media errors. Please open IO module issues dialog for more details.</source>
-        <translation>媒体流错误,请打开I/O设备故障日志获取更多信息.</translation>
+        <source>Camera plugin error. %1</source>
+        <translation>摄像机插件错误. %1</translation>
     </message>
     <message>
-        <source>Device initialization process in progress.</source>
-        <translation>设备正在进行初始化.</translation>
+        <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
+        <translation>请重启I/O模块,再通过网页恢复设备默认出场设置.</translation>
     </message>
     <message>
-        <source>Camera initialization process in progress.</source>
-        <translation>摄像机正在进行初始化.</translation>
+        <source>Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</source>
+        <translation>请确保I/O模块已连接至网络,请重新启动I/O模块.</translation>
     </message>
     <message>
-        <source>IO Module initialization process in progress.</source>
-        <translation>I/O设备正在进行初始化.</translation>
+        <source>Could not parse I/O module response. Url %1, request name %2.</source>
+        <translation>无法获取I/O模块响应.URL  %1,请求名称 %2.</translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in I/O module settings.</source>
+        <translation>请开启录像并降低I/O模块fps的设置.</translation>
+    </message>
+    <message>
+        <source>If it doesn&apos;t help, restore factory defaults on the I/O module web-page.</source>
+        <translation>请通过I/O网页恢复设备出场设置.</translation>
+    </message>
+    <message>
+        <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
+        <translation>I/O模块请求 &quot;%1&quot;发生错误在&quot; %2&quot;.</translation>
+    </message>
+    <message>
+        <source>Unknown I/O module issue.</source>
+        <translation>I/O模块发生未知错误.</translation>
+    </message>
+    <message>
+        <source>Invalid data was received from the I/O module %1.</source>
+        <translation>从I/O模块 %1接收到无效数据.</translation>
+    </message>
+    <message>
+        <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
+        <translation>视频流错误,请打开I/O模块问题日志获取更多内容.</translation>
+    </message>
+    <message>
+        <source>Device initialization process is in progress.</source>
+        <translation>设备初始化进行中.</translation>
+    </message>
+    <message>
+        <source>Camera initialization process is in progress.</source>
+        <translation>摄像机初始化进行中.</translation>
+    </message>
+    <message>
+        <source>I/O Module initialization process is in progress.</source>
+        <translation>I/O模块初始化进行中.</translation>
     </message>
 </context>
 <context>
@@ -599,8 +648,8 @@
         <translation>启动Windows浏览器时无法找到explorer.exe。</translation>
     </message>
     <message>
-        <source>Launching file explorer failed.</source>
-        <translation>启动Windows浏览器失败</translation>
+        <source>File explorer failed to open.</source>
+        <translation>文件资源管理器打开失败.</translation>
     </message>
 </context>
 <context>
@@ -614,12 +663,12 @@
         <translation>%1无法发现音频编码器.</translation>
     </message>
     <message>
-        <source>Could not initialise audio encoder.</source>
+        <source>Could not initialize audio encoder.</source>
         <translation>无法初始化音频编码器.</translation>
     </message>
     <message>
-        <source>Could not initialise audio decoder.</source>
-        <translation>无法初始化音频解码器.</translation>
+        <source>Could not initialize audio decoder.</source>
+        <translation>无法初始化音频解码器。</translation>
     </message>
 </context>
 <context>
@@ -656,8 +705,8 @@
         <translation>%1无法发现音频编码器.</translation>
     </message>
     <message>
-        <source>Could not initialise video encoder.</source>
-        <translation>无法初始化视频编码器</translation>
+        <source>Could not initialize video encoder.</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -803,14 +852,6 @@
         </translation>
     </message>
     <message>
-        <source>There was a problem activating your license key. Invalid data received. Please contact support team to report issue.</source>
-        <translation>授权码出现问题，接收到无效数据，请联系技术支持报告此问题。</translation>
-    </message>
-    <message>
-        <source>There was a problem activating your license key. A database error has occurred.</source>
-        <translation>激活您的许可证密钥时，发生数据库错误。</translation>
-    </message>
-    <message>
         <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
         <translation>输入授权无效，请确认输入的授权是否正确。如果问题仍存在，请联系技术支持确认授权码是否有效或获取有效授权码。</translation>
     </message>
@@ -822,33 +863,20 @@
         <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
         <translation>此授权码已在 {{time}}激活过硬件ID{{hwid}} ，请联系技术支持获取有效的授权码。</translation>
     </message>
+    <message>
+        <source>There was a problem activating your license key. A database error occurred.</source>
+        <translation>激活授权许可时，发生数据库错误.</translation>
+    </message>
+    <message>
+        <source>There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.</source>
+        <translation>激活授权许可时发生错误,收到无效数据,请联系技术支持团队解决此问题.</translation>
+    </message>
 </context>
 <context>
     <name>QnMediaServerResource</name>
     <message>
         <source>Server</source>
         <translation>服务器</translation>
-    </message>
-</context>
-<context>
-    <name>QnNewDWPtzController</name>
-    <message>
-        <source>Preset #</source>
-        <translation>预置位 #</translation>
-    </message>
-</context>
-<context>
-    <name>QnPlAxisResource</name>
-    <message>
-        <source>Can&apos;t initialize IO port settings</source>
-        <translation>未能初始化IO端口设置</translation>
-    </message>
-</context>
-<context>
-    <name>QnPlOnvifResource</name>
-    <message>
-        <source>Otput %1</source>
-        <translation>输出 %1</translation>
     </message>
 </context>
 <context>
@@ -870,18 +898,6 @@
         <source>%n camera(s)</source>
         <translation>
             <numerusform>%n 摄像机</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n IO Module(s)</source>
-        <translation>
-            <numerusform>%n IO 模块</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n IO module(s)</source>
-        <translation>
-            <numerusform>%n IO 模块</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -913,22 +929,6 @@
         <translation>摄像机</translation>
     </message>
     <message>
-        <source>IO Modules</source>
-        <translation> IO 模块</translation>
-    </message>
-    <message>
-        <source>IO modules</source>
-        <translation> IO 模块</translation>
-    </message>
-    <message>
-        <source>IO Module</source>
-        <translation> IO 模块</translation>
-    </message>
-    <message>
-        <source>IO module</source>
-        <translation> IO 模块</translation>
-    </message>
-    <message>
         <source>Devices</source>
         <translation>设备</translation>
     </message>
@@ -943,6 +943,34 @@
     <message>
         <source>device</source>
         <translation>设备</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n I/O Module(s)</source>
+        <translation>
+            <numerusform>%n I/O 模块</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n I/O module(s)</source>
+        <translation>
+            <numerusform>%n I/O 模块</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>I/O Modules</source>
+        <translation>I/O 模块</translation>
+    </message>
+    <message>
+        <source>I/O modules</source>
+        <translation>I/O 模块</translation>
+    </message>
+    <message>
+        <source>I/O Module</source>
+        <translation>I/O模块</translation>
+    </message>
+    <message>
+        <source>I/O module</source>
+        <translation>I/O 模块</translation>
     </message>
 </context>
 <context>
@@ -1069,108 +1097,9 @@
         <source>Error during watermark generation for file &apos;%1&apos;.</source>
         <translation>为文件&apos;%1&apos;生成水印时发生错误。</translation>
     </message>
-</context>
-<context>
-    <name>QnSystemHealthStringsHelper</name>
     <message>
-        <source>No licenses</source>
-        <translation>无软件许可</translation>
-    </message>
-    <message>
-        <source>Email address is not set</source>
-        <translation>邮箱地址未设置</translation>
-    </message>
-    <message>
-        <source>Email server is not set</source>
-        <translation>邮件服务器未设置</translation>
-    </message>
-    <message>
-        <source>Some users have not set their email addresses</source>
-        <translation>部分用户未设置邮箱地址。</translation>
-    </message>
-    <message>
-        <source>Connection to server lost</source>
-        <translation>无法连接到服务器</translation>
-    </message>
-    <message>
-        <source>Error while sending email</source>
-        <translation>发送邮件错误</translation>
-    </message>
-    <message>
-        <source>Email address is not set for user %1</source>
-        <translation>未给用户 %1设置邮箱地址</translation>
-    </message>
-    <message>
-        <source>Select server for others to synchronize time with</source>
-        <translation>选择时间同步服务器</translation>
-    </message>
-    <message>
-        <source>Rebuilding archive index is completed</source>
-        <translation>重建录像索引完成</translation>
-    </message>
-    <message>
-        <source>Email address is not set.</source>
-        <translation>邮箱地址未设置.</translation>
-    </message>
-    <message>
-        <source>You cannot receive system notifications via email.</source>
-        <translation>将无法通过电子邮件接收系统通知.</translation>
-    </message>
-    <message>
-        <source>Email server is not set.</source>
-        <translation>邮件服务器未设置.</translation>
-    </message>
-    <message>
-        <source>Some users have not set their email addresses.</source>
-        <translation>用户未设置邮箱.</translation>
-    </message>
-    <message>
-        <source>They cannot receive system notifications via email.</source>
-        <translation>将无法通过邮件接收系统通知.</translation>
-    </message>
-    <message>
-        <source>Storages are full on the following Server:</source>
-        <translation>以下服务器的存储空间已满:</translation>
-    </message>
-    <message>
-        <source>Storages are not configured on the following Server:</source>
-        <translation>以下服务器未进行存储配置:</translation>
-    </message>
-    <message>
-        <source>You have no licenses.</source>
-        <translation>未获得授权许可.</translation>
-    </message>
-    <message>
-        <source>You cannot record video from cameras.</source>
-        <translation>无法对摄像机进行录像.</translation>
-    </message>
-    <message>
-        <source>Rebuilding archive index is completed on the following Server:</source>
-        <translation>以下服务器已完成录像索引重建:</translation>
-    </message>
-    <message>
-        <source>Storage is full</source>
-        <translation>存储空间已满</translation>
-    </message>
-    <message>
-        <source>Storage is not configured</source>
-        <translation>未设置存储空间</translation>
-    </message>
-    <message>
-        <source>Server times are not synchronized and a common time could not be detected automatically.</source>
-        <translation>服务器时间不同步,时间不能自动检测。</translation>
-    </message>
-    <message>
-        <source>System is in safe mode</source>
-        <translation>系统处于安全模式</translation>
-    </message>
-    <message>
-        <source>The system is running in safe mode.</source>
-        <translation>系统在安全模式下运行.</translation>
-    </message>
-    <message>
-        <source>Any configuration changes except license activation are impossible.</source>
-        <translation>任何配置更改无效，除了进行授权激活.</translation>
+        <source>File write error. Not enough free space.</source>
+        <translation>文件写入错误，没有足够空间.</translation>
     </message>
 </context>
 <context>
@@ -1201,17 +1130,6 @@
     </message>
 </context>
 <context>
-    <name>QnThirdPartyResource</name>
-    <message>
-        <source>Otput %1</source>
-        <translation>输出%1</translation>
-    </message>
-    <message>
-        <source>Input %1</source>
-        <translation>输入 %1</translation>
-    </message>
-</context>
-<context>
     <name>QnTranscoder</name>
     <message>
         <source>OpenCL transcoding is not implemented.</source>
@@ -1239,6 +1157,13 @@
     <message>
         <source>%1 (external)</source>
         <translation>%1 (外部)</translation>
+    </message>
+</context>
+<context>
+    <name>utils::QnCameraNamesWatcher</name>
+    <message>
+        <source>Removed camera</source>
+        <translation>移除摄像机</translation>
     </message>
 </context>
 </TS>

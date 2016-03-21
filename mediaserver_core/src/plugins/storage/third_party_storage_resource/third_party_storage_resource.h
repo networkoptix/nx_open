@@ -5,6 +5,7 @@
 
 #include "core/resource/storage_resource.h"
 #include "plugins/storage/third_party/third_party_storage.h"
+#include <utils/thread/mutex.h>
 
 class QnThirdPartyStorageResource
     : public QnStorageResource
@@ -50,7 +51,7 @@ public: // inherited interface overrides
     virtual int     getCapabilities() const override;    
     virtual qint64  getFreeSpace() override;
     virtual qint64  getTotalSpace() override;
-    virtual bool    isAvailable() const override;
+    virtual bool    initOrUpdate() const override;
     virtual bool    removeFile(const QString& url) override;
     virtual bool    removeDir(const QString& url) override;
     virtual bool    renameFile(const QString& oldName, const QString& newName) override;
@@ -69,7 +70,7 @@ private:
     );
 private:
     StoragePtrType                      m_storage;
-    mutable QMutex                      m_mutex;
+    mutable QnMutex                      m_mutex;
     bool                                m_valid;
 }; // QnThirdPartyStorageResource
 

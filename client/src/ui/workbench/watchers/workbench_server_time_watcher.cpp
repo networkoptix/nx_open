@@ -1,81 +1,124 @@
 #include "workbench_server_time_watcher.h"
 
-#include <utils/common/checked_cast.h>
+#include <api/media_server_connection.h>
+#include <api/model/time_reply.h>
+
+#include <client/client_settings.h>
+
+#include <common/common_module.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 
 #include <plugins/resource/avi/avi_resource.h>
 
-#include <api/media_server_connection.h>
+#include <utils/common/synctime.h>
 
-enum {
-    ServerTimeUpdatePeriod = 1000 * 60 * 2, /* 2 minutes. */
-};  
+namespace {
+    const int serverTimeUpdatePeriodMs = 1000 * 60 * 2; /* 2 minutes. */
+};
 
 
-QnWorkbenchServerTimeWatcher::QnWorkbenchServerTimeWatcher(QObject *parent):
-    QObject(parent),
-    QnWorkbenchContextAware(parent)
+QnWorkbenchServerTimeWatcher::QnWorkbenchServerTimeWatcher(QObject *parent)
+    : base_type(parent)
+    , m_timer(new QTimer(this))
 {
-    connect(resourcePool(), SIGNAL(resourceAdded(const QnResourcePtr &)),   this,   SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
-    connect(resourcePool(), SIGNAL(resourceRemoved(const QnResourcePtr &)), this,   SLOT(at_resourcePool_resourceRemoved(const QnResourcePtr &)));
+    connect(qnResPool, &QnResourcePool::resourceAdded,   this,   &QnWorkbenchServerTimeWatcher::at_resourcePool_resourceAdded);
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this,   &QnWorkbenchServerTimeWatcher::at_resourcePool_resourceRemoved);
 
-    foreach(const QnResourcePtr &resource, resourcePool()->getResources())
+    /* We need to process only servers. */
+    for(const QnResourcePtr &resource: qnResPool->getAllServers(Qn::AnyStatus))
         at_resourcePool_resourceAdded(resource);
 
-    m_timer.start(ServerTimeUpdatePeriod, this);
+    m_timer->setInterval(serverTimeUpdatePeriodMs);
+    m_timer->setSingleShot(false);
+    connect(m_timer, &QTimer::timeout, this, [this]
+    {
+        const auto onlineServers = qnResPool->getAllServers(Qn::Online);
+        for (const QnMediaServerResourcePtr &server: onlineServers)
+            sendRequest(server);
+    });
+    m_timer->start();
+
+    connect(qnSettings->notifier(QnClientSettings::TIME_MODE),  &QnPropertyNotifier::valueChanged,  this,   &QnWorkbenchServerTimeWatcher::displayOffsetsChanged);
+    connect(qnSyncTime,                                         &QnSyncTime::timeChanged,           this,   &QnWorkbenchServerTimeWatcher::displayOffsetsChanged);
 }
 
 QnWorkbenchServerTimeWatcher::~QnWorkbenchServerTimeWatcher() {
-    foreach(const QnResourcePtr &resource, resourcePool()->getResources())
-        at_resourcePool_resourceRemoved(resource);
-
-    disconnect(resourcePool(), NULL, this, NULL);
 }
 
 qint64 QnWorkbenchServerTimeWatcher::utcOffset(const QnMediaServerResourcePtr &server, qint64 defaultValue) const {
-    return m_utcOffsetByResource.value(server, defaultValue);
+    qint64 result = m_utcOffsetByResource.value(server, Qn::InvalidUtcOffset);
+    return result == Qn::InvalidUtcOffset
+        ? defaultValue
+        : result;
 }
 
 qint64 QnWorkbenchServerTimeWatcher::utcOffset(const QnMediaResourcePtr &resource, qint64 defaultValue) const {
     if(QnAviResourcePtr fileResource = resource.dynamicCast<QnAviResource>()) {
         qint64 result = fileResource->timeZoneOffset();
-        return result == Qn::InvalidUtcOffset ? defaultValue : result;
-    } else if(QnMediaServerResourcePtr server = resourcePool()->getResourceById<QnMediaServerResource>(resource->toResource()->getParentId())) {
-        return utcOffset(server, defaultValue);
-    } else {
-        return defaultValue;
+        if (result != Qn::InvalidUtcOffset)
+            Q_ASSERT_X(fileResource->hasFlags(Qn::utc), Q_FUNC_INFO, "Only utc resources should have offset.");
+        return result == Qn::InvalidUtcOffset
+            ? defaultValue
+            : result;
     }
+
+    if (QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(resource->toResource()->getParentId())) {
+        Q_ASSERT_X(resource->toResourcePtr()->hasFlags(Qn::utc), Q_FUNC_INFO, "Only utc resources should have offset.");
+        return utcOffset(server, defaultValue);
+    }
+
+    return defaultValue;
 }
 
-qint64 QnWorkbenchServerTimeWatcher::localOffset(const QnMediaServerResourcePtr &server, qint64 defaultValue) const {
-    // TODO: #Elric duplicate code.
-    qint64 utcOffset = this->utcOffset(server, Qn::InvalidUtcOffset);
-    if(utcOffset == Qn::InvalidUtcOffset)
-        return defaultValue;
-
-    QDateTime localDateTime = QDateTime::currentDateTime();
-    QDateTime utcDateTime = localDateTime.toUTC();
-    localDateTime.setTimeSpec(Qt::UTC);
-
-    return utcOffset - utcDateTime.msecsTo(localDateTime);
+qint64 QnWorkbenchServerTimeWatcher::displayOffset(const QnMediaResourcePtr &resource) const {
+    return qnSettings->timeMode() == Qn::ClientTimeMode
+         ? 0
+         : localOffset(resource, 0);
 }
+
+
+QDateTime QnWorkbenchServerTimeWatcher::serverTime(const QnMediaServerResourcePtr &server, qint64 msecsSinceEpoch) const {
+    qint64 utcOffsetMs = utcOffset(server);
+
+    QDateTime result;
+    if (utcOffsetMs != Qn::InvalidUtcOffset) {
+        result.setTimeSpec(Qt::OffsetFromUTC);
+        result.setUtcOffset(utcOffsetMs / 1000);
+        result.setMSecsSinceEpoch(msecsSinceEpoch);
+    } else {
+        result.setTimeSpec(Qt::UTC);
+        result.setMSecsSinceEpoch(msecsSinceEpoch);
+    }
+
+    return result;
+}
+
+
+QDateTime QnWorkbenchServerTimeWatcher::displayTime(qint64 msecsSinceEpoch) const {
+    if (qnSettings->timeMode() == Qn::ClientTimeMode)
+        return QDateTime::fromMSecsSinceEpoch(msecsSinceEpoch);
+
+    return serverTime(qnCommon->currentServer(), msecsSinceEpoch);
+}
+
 
 qint64 QnWorkbenchServerTimeWatcher::localOffset(const QnMediaResourcePtr &resource, qint64 defaultValue) const {
-    qint64 utcOffset = this->utcOffset(resource, Qn::InvalidUtcOffset);
-    if(utcOffset == Qn::InvalidUtcOffset)
+    qint64 utcOffsetMs = utcOffset(resource, Qn::InvalidUtcOffset);
+
+    if(utcOffsetMs == Qn::InvalidUtcOffset)
         return defaultValue;
 
     QDateTime localDateTime = QDateTime::currentDateTime();
     QDateTime utcDateTime = localDateTime.toUTC();
     localDateTime.setTimeSpec(Qt::UTC);
 
-    return utcOffset - utcDateTime.msecsTo(localDateTime);
+    return utcOffsetMs - utcDateTime.msecsTo(localDateTime);
 }
 
 void QnWorkbenchServerTimeWatcher::sendRequest(const QnMediaServerResourcePtr &server) {
-    if(server->getStatus() != Qn::Online)
+    if (server->getStatus() != Qn::Online || QnMediaServerResource::isFakeServer(server))
         return;
 
     int handle = server->apiConnection()->getTimeAsync(this, SLOT(at_replyReceived(int, const QnTimeReply &, int)));
@@ -86,23 +129,18 @@ void QnWorkbenchServerTimeWatcher::sendRequest(const QnMediaServerResourcePtr &s
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void QnWorkbenchServerTimeWatcher::timerEvent(QTimerEvent *event) {
-    if(event->timerId() == m_timer.timerId()) {
-        foreach(const QnMediaServerResourcePtr &server, resourcePool()->getResources<QnMediaServerResource>())
-            sendRequest(server);
-    } else {
-        base_type::timerEvent(event);
-    }
-}
-
 void QnWorkbenchServerTimeWatcher::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
     if (!server || QnMediaServerResource::isFakeServer(resource))
         return;
 
-    connect(server.data(), &QnMediaServerResource::apiUrlChanged, this, &QnWorkbenchServerTimeWatcher::at_server_apiUrlChanged);
-    connect(server.data(), &QnMediaServerResource::statusChanged, this, &QnWorkbenchServerTimeWatcher::at_resource_statusChanged);
-    sendRequest(server);
+    auto updateServer = [this, server]{ sendRequest(server); };
+
+    connect(server, &QnMediaServerResource::apiUrlChanged, this, updateServer);
+    connect(server, &QnMediaServerResource::statusChanged, this, updateServer);
+    m_utcOffsetByResource[server] = Qn::InvalidUtcOffset;
+
+    updateServer();
 }
 
 void QnWorkbenchServerTimeWatcher::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) {
@@ -111,28 +149,16 @@ void QnWorkbenchServerTimeWatcher::at_resourcePool_resourceRemoved(const QnResou
         return;
 
     m_utcOffsetByResource.remove(server);
-    disconnect(server.data(), NULL, this, NULL);
-}
-
-void QnWorkbenchServerTimeWatcher::at_server_apiUrlChanged(const QnResourcePtr &resource) {
-    QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-    sendRequest(server);
-}
-
-void QnWorkbenchServerTimeWatcher::at_resource_statusChanged(const QnResourcePtr &resource) {
-    if(QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
-        sendRequest(server);
+    disconnect(server, NULL, this, NULL);
 }
 
 void QnWorkbenchServerTimeWatcher::at_replyReceived(int status, const QnTimeReply &reply, int handle) {
-    Q_UNUSED(status);
-
-    QnMediaServerResourcePtr server = m_resourceByHandle.value(handle);
-    m_resourceByHandle.remove(handle);
+    QnMediaServerResourcePtr server = m_resourceByHandle.take(handle);
+    if (!m_utcOffsetByResource.contains(server))
+        return;
 
     if(status == 0) {
         m_utcOffsetByResource[server] = reply.timeZoneOffset;
-        emit offsetsChanged();
+        emit displayOffsetsChanged();
     }
 }
-

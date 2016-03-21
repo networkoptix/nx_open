@@ -28,8 +28,12 @@ class QnThumbnailsLoader;
 class QnTimeSliderPixmapCache;
 class QnTimeSliderChunkPainter;
 class QnTimePeriodList;
+class QnBookmarksViewer;
+class QnBookmarkMergeHelper;
 
-class QnTimeSlider: public Animated<QnToolTipSlider>, public HelpTopicQueryable, protected KineticProcessHandler, protected DragProcessHandler, protected AnimationTimerListener {
+class QnTimeSlider: public Animated<QnToolTipSlider>, public HelpTopicQueryable
+    , protected KineticProcessHandler, protected DragProcessHandler, protected AnimationTimerListener
+{
     Q_OBJECT
     Q_PROPERTY(qint64 windowStart READ windowStart WRITE setWindowStart)
     Q_PROPERTY(qint64 windowEnd READ windowEnd WRITE setWindowEnd)
@@ -39,15 +43,15 @@ class QnTimeSlider: public Animated<QnToolTipSlider>, public HelpTopicQueryable,
 
 public:
     enum Option {
-        /** 
-         * Whether window start should stick to slider's minimum value. 
+        /**
+         * Whether window start should stick to slider's minimum value.
          * If this flag is set and window starts at slider's minimum,
-         * window start will change when minimum is changed. 
+         * window start will change when minimum is changed.
          */
         StickToMinimum = 0x1,
 
-        /** 
-         * Whether window end should stick to slider's maximum value. 
+        /**
+         * Whether window end should stick to slider's maximum value.
          */
         StickToMaximum = 0x2,
 
@@ -56,17 +60,17 @@ public:
          */
         PreserveWindowSize = 0x4,
 
-        /** 
+        /**
          * Whether slider's tooltip is to be autoupdated using the provided
-         * tool tip format. 
+         * tool tip format.
          */
         UpdateToolTip = 0x8,
 
         /**
-         * Whether slider's value is considered to be a number of milliseconds that 
+         * Whether slider's value is considered to be a number of milliseconds that
          * have passed since 1970-01-01 00:00:00.000, Coordinated Universal Time.
-         * 
-         * If this flag is not set, slider's value is simply a number of 
+         *
+         * If this flag is not set, slider's value is simply a number of
          * milliseconds, with no connection to real dates.
          */
         UseUTC = 0x10,
@@ -96,7 +100,9 @@ public:
     };
     Q_DECLARE_FLAGS(Options, Option);
 
-    explicit QnTimeSlider(QGraphicsItem *parent = NULL);
+    explicit QnTimeSlider(QGraphicsItem *parent = NULL
+        , QGraphicsItem *tooltipParent = NULL);
+
     virtual ~QnTimeSlider();
 
     int lineCount() const;
@@ -113,9 +119,6 @@ public:
 
     QnTimePeriodList timePeriods(int line, Qn::TimePeriodContent type) const;
     void setTimePeriods(int line, Qn::TimePeriodContent type, const QnTimePeriodList &timePeriods);
-
-    QnCameraBookmarkList bookmarks() const;
-    void setBookmarks(const QnCameraBookmarkList &bookmarks);
 
     Options options() const;
     void setOptions(Options options);
@@ -182,7 +185,17 @@ public:
 
     virtual int helpTopicAt(const QPointF &pos) const override;
 
+    QnBookmarksViewer *bookmarksViewer();
+
+    typedef QSharedPointer<QnBookmarkMergeHelper> QnBookmarkMergeHelperPtr;
+    void setBookmarksHelper(const QnBookmarkMergeHelperPtr &helper);
+    bool isBookmarksVisible() const;
+    void setBookmarksVisible(bool bookmarksVisible);
+
+    qreal msecsPerPixel() const;
+
 signals:
+    void windowMoved();
     void windowChanged(qint64 windowStart, qint64 windowEnd);
     void selectionChanged(qint64 selectionStart, qint64 selectionEnd);
     void customContextMenuRequested(const QPointF &pos, const QPoint &screenPos);
@@ -190,6 +203,7 @@ signals:
     void selectionReleased();
     void thumbnailsVisibilityChanged();
     void thumbnailClicked();
+    void msecsPerPixelChanged();
 
 protected:
     virtual void sliderChange(SliderChange change) override;
@@ -284,7 +298,7 @@ private:
 
     bool scaleWindow(qreal factor, qint64 anchor);
 
-    void drawPeriodsBar(QPainter *painter, const QnTimePeriodList &recorded, const QnTimePeriodList &motion, const QnTimePeriodList &bookmarks, const QRectF &rect);
+    void drawPeriodsBar(QPainter *painter, const QnTimePeriodList &recorded, const QnTimePeriodList &motion, const QRectF &rect);
     void drawTickmarks(QPainter *painter, const QRectF &rect);
     void drawSolidBackground(QPainter *painter, const QRectF &rect);
     void drawMarker(QPainter *painter, qint64 pos, const QColor &color);
@@ -335,12 +349,18 @@ private:
 
     void generateProgressPatterns();
 
+    void processBoomarksHover(QGraphicsSceneHoverEvent *event);
+
+    void updateBookmarksViewerTimestamp();
+
+    QnBookmarksViewer *createBookmarksViewer();
+
 private:
     Q_DECLARE_PRIVATE(GraphicsSlider);
 
     friend class QnTimeSliderChunkPainter;
     friend class QnTimeSliderStepStorage;
-    
+
     QnTimeSliderColors m_colors;
 
     qint64 m_windowStart, m_windowEnd;
@@ -368,7 +388,6 @@ private:
     int m_lineCount;
     qreal m_totalLineStretch;
     QVector<LineData> m_lineData;
-    QnCameraBookmarkList m_bookmarks;
 
     QVector<QnTimeStep> m_steps;
     QVector<TimeStepData> m_stepData;
@@ -403,6 +422,13 @@ private:
     qint64 m_localOffset;
 
     QLocale m_locale;
+
+    QPointF m_currentRulerRectMousePos;
+    qreal m_lastLineBarValue;
+
+    QnBookmarksViewer *m_bookmarksViewer;
+    bool m_bookmarksVisible;
+    QnBookmarkMergeHelperPtr m_bookmarksHelper;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnTimeSlider::Options);

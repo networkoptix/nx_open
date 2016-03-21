@@ -3,9 +3,14 @@
 
 #include <QtWidgets/QLineEdit>
 
+class QTimer;
+
 class QnSearchLineEdit : public QWidget
 {
     Q_OBJECT
+
+    Q_PROPERTY(int textChangedSignalFilterMs READ textChangedSignalFilterMs WRITE setTextChangedSignalFilterMs)
+
 public:
     explicit QnSearchLineEdit(QWidget *parent = 0);
 
@@ -15,28 +20,34 @@ public:
 
     QVariant inputMethodQuery(Qt::InputMethodQuery property) const;
 
+    int textChangedSignalFilterMs() const;
+    void setTextChangedSignalFilterMs(int filterMs);
+
 signals:
-    void prevButtonClicked();
-    void nextButtonClicked();
     void textChanged(const QString &text);
-protected:
-    void focusInEvent(QFocusEvent *event);
-    void focusOutEvent(QFocusEvent *event);
-    void keyPressEvent(QKeyEvent *event);
-    void paintEvent(QPaintEvent *event);
-    void resizeEvent(QResizeEvent *event);
-    void inputMethodEvent(QInputMethodEvent *e);
-    bool event(QEvent *event);
+    void escKeyPressed();
+    void enterKeyPressed();
+    void enabledChanged();
 
 protected:
-    void updateGeometries();
+    void resizeEvent(QResizeEvent *event);
+    void focusInEvent(QFocusEvent *event) override;
+    void focusOutEvent(QFocusEvent *event) override;
+    void keyPressEvent(QKeyEvent *event) override;
+    void paintEvent(QPaintEvent *event) override;
+    void inputMethodEvent(QInputMethodEvent *e) override;
+    bool event(QEvent *event) override;
+    void changeEvent(QEvent *event);
+
+protected:
     void initStyleOption(QStyleOptionFrameV2 *option) const;
 
+private:
+    typedef QSharedPointer<QTimer> QTimerPtr;
+
     QLineEdit* m_lineEdit;
-    QLabel* m_occurencesLabel;
-    QAbstractButton *m_prevButton;
-    QAbstractButton *m_nextButton;
-    QAbstractButton *m_searchButton;
+    int m_textChangedSignalFilterMs;
+    QTimerPtr m_filterTimer;
 };
 
 #endif // SEARCH_LINE_EDIT_H

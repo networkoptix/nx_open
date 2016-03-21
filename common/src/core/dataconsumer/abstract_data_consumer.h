@@ -28,12 +28,15 @@ public:
     int maxQueueSize() const;
     virtual void setSingleShotMode(bool /*single*/) {}
 
-    virtual void setSpeed(float /*value*/) {}
     //virtual qint64 getDisplayedTime() const { return 0; }
     virtual bool isRealTimeSource() const { return false; }
 
 protected:
+
+    friend class QnArchiveStreamReader;
+
     void run();
+    virtual void setSpeed(float /*value*/) {}
     virtual bool processData(const QnAbstractDataPacketPtr& data) = 0;
     virtual void endOfRun();
 

@@ -21,16 +21,16 @@
 #include <utils/tz/tz.h>
 
 namespace {
-    QVector<int> textRoles = QVector<int>() 
-        << Qt::DisplayRole 
-        << Qt::StatusTipRole 
+    QVector<int> textRoles = QVector<int>()
+        << Qt::DisplayRole
+        << Qt::StatusTipRole
         << Qt::WhatsThisRole
         << Qt::AccessibleTextRole
         << Qt::AccessibleDescriptionRole
         << Qt::ToolTipRole;
 
     QVector<int> checkboxRoles = QVector<int>()
-        << Qt::DisplayRole 
+        << Qt::DisplayRole
         << Qt::CheckStateRole;
 }
 
@@ -41,8 +41,8 @@ namespace {
 #ifdef QN_TIME_SERVER_SELECTION_MODEL_DEBUG
 #define PRINT_DEBUG(MSG) qDebug() << MSG
 #else
-#define PRINT_DEBUG(MSG) 
-#endif 
+#define PRINT_DEBUG(MSG)
+#endif
 
 QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent /* = NULL*/):
     base_type(parent),
@@ -82,6 +82,7 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent /* = NULL
 
         beginInsertRows(QModelIndex(), m_items.size(), m_items.size());
         addItem(info);
+        updateFirstItemCheckbox();
         endInsertRows();
     });
 
@@ -96,7 +97,7 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent /* = NULL
         else if (info.uuid == m_selectedServer)
             setSelectedServer(QnUuid());
     });
-    
+
     /* Handle removing online server peers. */
     connect(QnRuntimeInfoManager::instance(),   &QnRuntimeInfoManager::runtimeInfoRemoved,  this,  [this](const QnPeerRuntimeInfo &info) {
         if (info.data.peer.peerType != Qn::PT_Server)
@@ -109,6 +110,7 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent /* = NULL
         PRINT_DEBUG("peer " + info.uuid.toByteArray() + " is removed");
         beginRemoveRows(QModelIndex(), idx, idx);
         m_items.removeAt(idx);
+        updateFirstItemCheckbox();
         endRemoveRows();
 
         if (m_selectedServer == info.uuid)
@@ -130,17 +132,12 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent /* = NULL
         updateColumn(Columns::OffsetColumn);
 
         emit dataChanged(
-            this->index(idx, Columns::NameColumn), 
+            this->index(idx, Columns::NameColumn),
             this->index(idx, Columns::NameColumn),
             textRoles);
     });
 
-    connect(qnSyncTime, &QnSyncTime::timeChanged, this, [this]{
-        updateColumn(Columns::TimeColumn);
-        updateColumn(Columns::OffsetColumn);
-    });
-
-    connect(context()->instance<QnWorkbenchServerTimeWatcher>(), &QnWorkbenchServerTimeWatcher::offsetsChanged, this, [this]{
+    connect(context()->instance<QnWorkbenchServerTimeWatcher>(), &QnWorkbenchServerTimeWatcher::displayOffsetsChanged, this, [this]{
         m_sameTimezoneValid = false;
         updateColumn(Columns::TimeColumn);
         updateColumn(Columns::OffsetColumn);
@@ -148,6 +145,15 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent /* = NULL
 
     /* Requesting initial time. */
     resetData(qnSyncTime->currentMSecsSinceEpoch());
+}
+
+void QnTimeServerSelectionModel::updateFirstItemCheckbox()
+{
+    if (m_items.empty())
+        return;
+
+    const auto firstServerIndex = index(0, CheckboxColumn);
+    dataChanged(firstServerIndex, firstServerIndex);  // Updates enable state of first server checkbox
 }
 
 int QnTimeServerSelectionModel::columnCount(const QModelIndex &parent) const {
@@ -211,26 +217,15 @@ QVariant QnTimeServerSelectionModel::data(const QModelIndex &index, int role) co
                   return tr("Synchronizing...");
 
               qint64 mSecsSinceEpoch = currentTime + item.offset;
-              QDateTime time;
               if (sameTimezone()) {
+                  QDateTime time;
                   time.setTimeSpec(Qt::LocalTime);
                   time.setMSecsSinceEpoch(mSecsSinceEpoch);
                   return time.toString(lit("yyyy-MM-dd HH:mm:ss"));
               } else {
-                  qint64 utcOffset = server 
-                      ? context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(server)
-                      : Qn::InvalidUtcOffset;
-
-                  if (utcOffset != Qn::InvalidUtcOffset) {
-                      time.setTimeSpec(Qt::OffsetFromUTC);
-                      time.setUtcOffset(utcOffset / 1000);
-                      time.setMSecsSinceEpoch(mSecsSinceEpoch);
-                  } else {
-                      time.setTimeSpec(Qt::UTC);
-                      time.setMSecsSinceEpoch(mSecsSinceEpoch);
-                  }
+                  QDateTime time = context()->instance<QnWorkbenchServerTimeWatcher>()->serverTime(server, mSecsSinceEpoch);
                   return time.toString(lit("yyyy-MM-dd HH:mm:ss t"));
-              } 
+              }
           }
           if (column == Columns::OffsetColumn) {
               if (!item.ready)
@@ -286,7 +281,12 @@ Qt::ItemFlags QnTimeServerSelectionModel::flags(const QModelIndex &index) const 
     Item item = m_items[index.row()];
 
     if (column == Columns::CheckboxColumn)
-        return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEditable;
+    {
+        static const Qt::ItemFlags kBaseCheckboxFlags =
+            (Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
+        const Qt::ItemFlag anotherFlags = (m_items.size() == 1 ? Qt::NoItemFlags : Qt::ItemIsEnabled);
+        return kBaseCheckboxFlags | anotherFlags;
+    }
 
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 }
@@ -346,7 +346,7 @@ void QnTimeServerSelectionModel::updateColumn(Columns column) {
     if (m_items.isEmpty())
         return;
 
-    QVector<int> roles = column == Columns::CheckboxColumn 
+    QVector<int> roles = column == Columns::CheckboxColumn
         ? checkboxRoles
         : textRoles;
 
@@ -375,15 +375,15 @@ bool QnTimeServerSelectionModel::sameTimezone() const {
         m_sameTimezone = calculateSameTimezone();
         m_sameTimezoneValid = true;
     }
-    return m_sameTimezone;  
+    return m_sameTimezone;
 }
 
 bool QnTimeServerSelectionModel::calculateSameTimezone() const {
     auto watcher = context()->instance<QnWorkbenchServerTimeWatcher>();
     qint64 localOffset = nx_tz::getLocalTimeZoneOffset(); /* In minutes. */
-    qint64 commonOffset = localOffset == -1 
+    qint64 commonOffset = localOffset == -1
         ? Qn::InvalidUtcOffset
-        : localOffset*60;   
+        : localOffset*60;
 
     foreach (const Item &item, m_items) {
         QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(item.peerId);

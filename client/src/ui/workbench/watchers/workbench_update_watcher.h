@@ -8,26 +8,27 @@
 
 class QnUpdateChecker;
 class QTimer;
+struct QnUpdateInfo;
 
-class QnWorkbenchUpdateWatcher: public QObject, public QnWorkbenchContextAware {
+class QnWorkbenchUpdateWatcher: public QObject, public QnWorkbenchContextAware
+{
     Q_OBJECT
 public:
     QnWorkbenchUpdateWatcher(QObject *parent = NULL);
     virtual ~QnWorkbenchUpdateWatcher();
 
-    QnSoftwareVersion latestVersion() const { return m_latestVersion; }
-
-public slots:
+public:
     void start();
     void stop();
 
-private slots:
-    void at_checker_updateAvailable(const QnSoftwareVersion &updateVersion, const QUrl &releaseNotesUrl);
+private:
+    void showUpdateNotification(const QnUpdateInfo &info);
 
+    void at_checker_updateAvailable(const QnUpdateInfo &info);
 private:
     QnUpdateChecker *m_checker;
     QTimer *m_timer;
-    QnSoftwareVersion m_latestVersion;
+    QnSoftwareVersion m_notifiedVersion;
 };
 
 #endif // QN_WORKBENCH_UPDATE_WATCHER_H

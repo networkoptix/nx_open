@@ -67,7 +67,7 @@ void QnCameraListDialog::setServer(const QnMediaServerResourcePtr &server) {
     m_model->setServer(server);
     // This fix is for the first time, the user open the camera list that doesn't see
     // the title of that dialog to indicate the camera numbers. I've noticed that the
-    // message/signal that invoke this updateWindowTitle slot will not be triggered 
+    // message/signal that invoke this updateWindowTitle slot will not be triggered
     // just by opening the dialog in the menu. This quick but not dirty fix just flush
     // window title whenever a serverResource is changed .
     updateWindowTitle();
@@ -87,7 +87,7 @@ void QnCameraListDialog::updateWindowTitleLater() {
 
 void QnCameraListDialog::updateWindowTitle() {
     m_pendingWindowTitleUpdate = false;
-    
+
     QnVirtualCameraResourceList cameras;
     for (int row = 0; row < m_resourceSearch->rowCount(); ++row) {
         QModelIndex index = m_resourceSearch->index(row, 0);
@@ -114,9 +114,9 @@ void QnCameraListDialog::updateWindowTitle() {
 
     const QString titleCamerasPart = QnDeviceDependentStrings::getNameFromSet(
         QnCameraDeviceStringSet(
-            tr("%n devices found",      nullptr, cameras.size()),
-            tr("%n cameras found",      nullptr, cameras.size()),
-            tr("%n IO modules found",   nullptr, cameras.size())
+            tr("%n devices found",      "", cameras.size()),
+            tr("%n cameras found",      "", cameras.size()),
+            tr("%n I/O modules found",  "", cameras.size())
         ),
         cameras
      );
@@ -142,7 +142,7 @@ void QnCameraListDialog::at_camerasView_doubleClicked(const QModelIndex &index) 
 
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
     if (resource)
-        context()->menu()->trigger(Qn::CameraSettingsAction, QnActionParameters(resource));
+        context()->menu()->trigger(QnActions::CameraSettingsAction, QnActionParameters(resource));
 }
 
 void QnCameraListDialog::at_camerasView_customContextMenuRequested(const QPoint &) {

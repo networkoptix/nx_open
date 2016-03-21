@@ -42,6 +42,10 @@ angular.module('webadminApp', [
             templateUrl: 'views/advanced.html',
             controller: 'AdvancedCtrl'
         })
+        .when('/debug', {
+            templateUrl: 'views/debug.html',
+            controller: 'DebugCtrl'
+        })
         .when('/webclient', {
             templateUrl: 'views/webclient.html',
             controller: 'WebclientCtrl',
@@ -72,7 +76,7 @@ angular.module('webadminApp', [
             controller: 'LogCtrl'
         })
         .otherwise({
-            redirectTo: '/settings'
+            redirectTo: '/view'
         });
 });
 

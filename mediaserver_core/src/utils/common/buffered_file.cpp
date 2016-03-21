@@ -19,6 +19,7 @@ extern "C"
 //TODO #ak make it system-dependent (it can depend on OS, FS type, FS settings)
 static const int SECTOR_SIZE = 32768;
 static const qint64 AVG_USAGE_AGGREGATE_TIME = 15 * 1000000ll; // aggregation time in usecs
+static const int DATA_PRIORITY_THRESHOLD = SECTOR_SIZE * 2;
 
 // -------------- QueueFileWriter ------------
 
@@ -34,15 +35,28 @@ QueueFileWriter::~QueueFileWriter()
     stop();
 }
 
-qint64 QueueFileWriter::write(QBufferedFile* file, const char * data, qint64 len)
+qint64 QueueFileWriter::writeRanges(QBufferedFile* file, std::vector<QnMediaCyclicBuffer::Range> ranges)
 {
     if (m_needStop)
         return -1;
 
-    FileBlockInfo fb(file, data, len);
-    QMutexLocker lock(&fb.mutex);
-    m_dataQueue.push(&fb);
+    FileBlockInfo fb(file);
+    fb.ranges = std::move(ranges);
+
+#if 1
+    QnMutexLocker lock(&fb.mutex);
+    putData(&fb);
     fb.condition.wait(&fb.mutex);
+#else
+    // use native NCQ
+    for (const auto& range: fb.ranges) {
+        auto writed = fb.file->writeUnbuffered(range.data, range.size);
+        if (writed == range.size)
+            fb.result += writed;
+        else
+            break;
+    }
+#endif
     return fb.result;
 }
 
@@ -55,7 +69,37 @@ void QueueFileWriter::removeOldWritingStatistics(qint64 currentTime)
     }
 }
 
-//#define MEASURE_WRITE_TIME
+void QueueFileWriter::putData(FileBlockInfo* fb)
+{
+    QnMutexLocker lock(&m_dataMutex);
+    m_dataQueue.push_back(fb);
+    m_dataWaitCond.wakeAll();
+}
+
+QueueFileWriter::FileBlockInfo* QueueFileWriter::popData()
+{
+    // pop block with size < DATA_PRIORITY_THRESHOLD at first
+
+    QnMutexLocker lock(&m_dataMutex);
+    while (m_dataQueue.empty() && !m_needStop)
+        m_dataWaitCond.wait(&m_dataMutex, 100);
+    
+    int minBlockSize = INT_MAX;
+    auto resultItr = m_dataQueue.end();
+    for (auto itr = m_dataQueue.begin(); itr != m_dataQueue.end(); ++itr) {
+        int dataSize = qMin(DATA_PRIORITY_THRESHOLD, (*itr)->dataSize());
+        if (dataSize < minBlockSize) {
+            minBlockSize = dataSize;
+            resultItr = itr;
+        }
+    }
+    if (resultItr == m_dataQueue.end())
+        return 0;
+    
+    FileBlockInfo* result = *resultItr;
+    m_dataQueue.erase(resultItr);
+    return result;
+}
 
 void QueueFileWriter::run()
 {
@@ -68,21 +112,27 @@ void QueueFileWriter::run()
     size_t bytesWrittenInPeriod = 0;
 #endif
 
-    FileBlockInfo* fileBlock;
     while (!m_needStop)
     {
-        if (m_dataQueue.pop(fileBlock, 100))
+        FileBlockInfo* fileBlock = popData();
+        if (fileBlock)
         {
             qint64 currentTime = getUsecTimer();
             {
-                QMutexLocker lock(&fileBlock->mutex);
+                QnMutexLocker lock(&fileBlock->mutex);
 #ifdef MEASURE_WRITE_TIME
                 writeTimeCalculationTimer.restart();
                 if( !totalTimeCalculationTimer.isValid() )
                     totalTimeCalculationTimer.restart();
                 //std::cout<<"Writing "<<fileBlock->len<<" bytes"<<std::endl;
 #endif
-                fileBlock->result = fileBlock->file->writeUnbuffered(fileBlock->data, fileBlock->len);
+                for (const auto& range: fileBlock->ranges) {
+                    auto writed = fileBlock->file->writeUnbuffered(range.data, range.size);
+                    if (writed == range.size)
+                        fileBlock->result += writed;
+                    else
+                        break;
+                }
 #ifdef MEASURE_WRITE_TIME
                 bytesWrittenInPeriod += fileBlock->result;
                 //std::cout<<"Written "<<fileBlock->result<<" bytes"<<std::endl;
@@ -92,7 +142,7 @@ void QueueFileWriter::run()
             }
             qint64 now = getUsecTimer();
 
-            QMutexLocker lock(&m_timingsMutex);
+            QnMutexLocker lock(&m_timingsMutex);
             removeOldWritingStatistics(currentTime);
             m_writeTime += now - currentTime;
             m_writeTimings << WriteTimingInfo(currentTime, now - currentTime);
@@ -110,9 +160,9 @@ void QueueFileWriter::run()
 #endif
     }
 
-    while (m_dataQueue.pop(fileBlock, 1))
+    while (FileBlockInfo* fileBlock = popData())
     {
-        QMutexLocker lock(&fileBlock->mutex);
+        QnMutexLocker lock(&fileBlock->mutex);
         fileBlock->result = -1;
         fileBlock->condition.wakeAll();
     }
@@ -131,14 +181,14 @@ QnWriterPool::~QnWriterPool()
 
 QnWriterPool::WritersMap QnWriterPool::getAllWriters()
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     return m_writers;
 }
 
 QueueFileWriter* QnWriterPool::getWriter(const QnUuid& writerPoolId)
 {
 
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     WritersMap::iterator itr = m_writers.find(writerPoolId);
     if (itr == m_writers.end())
         itr = m_writers.insert(writerPoolId, new QueueFileWriter());
@@ -202,16 +252,16 @@ void QBufferedFile::mergeBufferWithExistingData()
 
 int QBufferedFile::writeBuffer(int toWrite)
 {
-    qint64 totalWrited = 0;
-    for (const auto& range: m_cycleBuffer.fragmentedData(0, toWrite))
-    {
-        qint64 writed = m_queueWriter->write(this, range.data, range.size);
-        if (writed != range.size)
-            return totalWrited; // IO error
-        totalWrited += writed;
-        m_cycleBuffer.pop_front(range.size);
-    }
-    return totalWrited;
+    auto ranges = m_cycleBuffer.fragmentedData(0, toWrite);
+    toWrite = 0;
+    for (const auto& range: ranges)
+        toWrite += range.size;
+    
+    qint64 writed = m_queueWriter->writeRanges(this, std::move(ranges));
+    if (writed != toWrite)
+        return writed; // IO error
+    m_cycleBuffer.pop_front(toWrite);
+    return toWrite;
 }
 
 void QBufferedFile::flushBuffer()
@@ -241,38 +291,15 @@ void QBufferedFile::close()
 {
     if (m_fileEngine->isOpen())
     {
-        int bufferingWriteSize = 0;
-        if (m_cycleBuffer.size() > SECTOR_SIZE) 
-        {
-            // do not perform buffering write if data rest is small
-            if (m_isDirectIO) {
-                if (m_filePos % SECTOR_SIZE == 0)
-                    bufferingWriteSize = qPower2Floor((quint32) m_cycleBuffer.size(), SECTOR_SIZE);
-            }
-            else {
-                bufferingWriteSize = m_cycleBuffer.size(); 
-            }
-        }
-
-        if (bufferingWriteSize) {
-            m_fileEngine->seek(m_filePos);
-            int writed = writeBuffer(bufferingWriteSize);
-            if (writed > 0)
-                m_filePos += writed;
-        }
-
+        if (m_cycleBuffer.size() > 0)
+            flushBuffer();
+#if 1
         if (m_isDirectIO) {
             m_fileEngine->close();
-            m_fileEngine->open(QIODevice::ReadWrite, 0);
-        }
-
-        if (m_cycleBuffer.size() > 0) {
-            m_fileEngine->seek(m_filePos);
-            m_fileEngine->write(m_cycleBuffer.unfragmentedData(), m_cycleBuffer.size());
-        }
-        
-        if (m_isDirectIO)
+            m_fileEngine->open(QIODevice::WriteOnly, 0); // reopen without direct IO
             m_fileEngine->truncate(m_actualFileSize);
+        }
+#endif		
         m_fileEngine->close();
     }
     m_lastSeekPos = AV_NOPTS_VALUE;
@@ -431,7 +458,7 @@ void QBufferedFile::setSystemFlags(int systemFlags)
 
 float QueueFileWriter::getAvarageUsage()
 {
-    QMutexLocker lock(&m_timingsMutex);
+    QnMutexLocker lock(&m_timingsMutex);
     removeOldWritingStatistics(getUsecTimer());
     return m_writeTime / (float) AVG_USAGE_AGGREGATE_TIME;
 }

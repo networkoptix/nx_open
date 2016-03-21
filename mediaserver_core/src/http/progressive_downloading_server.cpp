@@ -12,9 +12,10 @@
 #include <utils/common/util.h>
 #include <utils/common/string.h>
 #include <utils/common/model_functions.h>
+#include <utils/common/adaptive_sleep.h>
 #include <utils/fs/file.h>
-#include <utils/network/tcp_connection_priv.h>
-#include <utils/network/tcp_listener.h>
+#include <network/tcp_connection_priv.h>
+#include <network/tcp_listener.h>
 
 #include "core/resource_management/resource_pool.h"
 #include "core/dataconsumer/abstract_data_consumer.h"
@@ -34,7 +35,6 @@
 #include "common/common_module.h"
 #include "audit/audit_manager.h"
 
-
 static const int CONNECTION_TIMEOUT = 1000 * 5;
 static const int MAX_QUEUE_SIZE = 30;
 
@@ -50,7 +50,8 @@ public:
         bool standFrameDuration,
         bool dropLateFrames,
         unsigned int maxFramesToCacheBeforeDrop,
-        bool liveMode)
+        bool liveMode,
+        bool continuousTimestamps)
     :
         QnAbstractDataConsumer(50),
         m_owner(owner),
@@ -63,6 +64,7 @@ public:
         m_lastRtTime( 0 ),
         m_endTimeUsec( AV_NOPTS_VALUE ),
         m_liveMode(liveMode),
+        m_continuousTimestamps(continuousTimestamps),
         m_needKeyData(false)
     {
         if( dropLateFrames )
@@ -165,7 +167,7 @@ protected:
         if (media && m_auditHandle)
             qnAuditManager->notifyPlaybackInProgress(m_auditHandle, media->timestamp);
 
-        if (media && !(media->flags & QnAbstractMediaData::MediaFlags_LIVE))
+        if (media && !(media->flags & QnAbstractMediaData::MediaFlags_LIVE) && m_continuousTimestamps)
         {
             if (m_lastMediaTime != (qint64)AV_NOPTS_VALUE && media->timestamp - m_lastMediaTime > MAX_FRAME_DURATION*1000 &&
                 media->timestamp != (qint64)AV_NOPTS_VALUE && media->timestamp != DATETIME_NOW)
@@ -177,8 +179,13 @@ protected:
         }
 
         QnByteArray result(CL_MEDIA_ALIGNMENT, 0);
+        bool isArchive = !(media->flags & QnAbstractMediaData::MediaFlags_LIVE);
 
-        QnByteArray* const resultPtr = (m_dataOutput.get() && m_dataOutput->packetsInQueue() > m_maxFramesToCacheBeforeDrop) ? NULL : &result;
+        QnByteArray* const resultPtr = 
+            (m_dataOutput.get() && 
+             !isArchive && // thin out only live frames
+             m_dataOutput->packetsInQueue() > m_maxFramesToCacheBeforeDrop) ? NULL : &result;
+
         if( !resultPtr )
         {
             NX_LOG( lit("Insufficient bandwidth to %1. Skipping frame...").
@@ -214,6 +221,7 @@ private:
     qint64 m_lastRtTime;
     qint64 m_endTimeUsec;
     bool m_liveMode;
+    bool m_continuousTimestamps;
     bool m_needKeyData;
     AuditHandle m_auditHandle;
 
@@ -275,8 +283,11 @@ private:
 
         //sending frame
         if (m_dataOutput.get())
-        {
-            m_dataOutput->postPacket(outPacket);
+        {   // Wait if bandwidth is not sufficient inside postPacket().
+            // This is to ensure that we will send every archive packet.
+            // This shouldn't affect live packets, as we thin them out above. 
+            // Refer to processData() for details.
+            m_dataOutput->postPacket(outPacket, m_maxFramesToCacheBeforeDrop);
             if (m_dataOutput->failed())
                 m_needStop = true;
         }
@@ -338,7 +349,7 @@ public:
     unsigned short foreignPort;
     bool terminated;
     quint64 killTimerID;
-    QMutex mutex;
+    QnMutex mutex;
 
     QnProgressiveDownloadingConsumerPrivate()
     :
@@ -354,6 +365,7 @@ static QAtomicInt QnProgressiveDownloadingConsumer_count = 0;
 static const QLatin1String DROP_LATE_FRAMES_PARAM_NAME( "dlf" );
 static const QLatin1String STAND_FRAME_DURATION_PARAM_NAME( "sfd" );
 static const QLatin1String RT_OPTIMIZATION_PARAM_NAME( "rt" ); // realtime transcode optimization
+static const QLatin1String CONTINUOUS_TIMESTAMPS_PARAM_NAME( "ct" );
 static const int MS_PER_SEC = 1000;
 
 QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* _owner):
@@ -393,7 +405,7 @@ QnProgressiveDownloadingConsumer::~QnProgressiveDownloadingConsumer()
 
     quint64 killTimerID = 0;
     {
-        QMutexLocker lk( &d->mutex );
+        QnMutexLocker lk( &d->mutex );
         killTimerID = d->killTimerID;
         d->killTimerID = 0;
     }
@@ -599,6 +611,8 @@ void QnProgressiveDownloadingConsumer::run()
             dropLateFrames = true;
         }
 
+        bool continuousTimestamps = decodedUrlQuery.queryItemValue(CONTINUOUS_TIMESTAMPS_PARAM_NAME) != lit("false");
+
         const bool standFrameDuration = decodedUrlQuery.hasQueryItem(STAND_FRAME_DURATION_PARAM_NAME);
         
         const bool rtOptimization = decodedUrlQuery.hasQueryItem(RT_OPTIMIZATION_PARAM_NAME);
@@ -611,9 +625,6 @@ void QnProgressiveDownloadingConsumer::run()
         bool isUTCRequest = !decodedUrlQuery.queryItemValue("posonly").isNull();
         auto camera = qnCameraPool->getVideoCamera(resource);
 
-        //QnVirtualCameraResourcePtr camRes = resource.dynamicCast<QnVirtualCameraResource>();
-        //if (camRes && camRes->isAudioEnabled())
-        //    d->transcoder.setAudioCodec(CODEC_ID_VORBIS, QnTranscoder::TM_FfmpegTranscode);
         bool isLive = position.isEmpty() || position == "now";
 
         QnProgressiveDownloadingDataConsumer dataConsumer(
@@ -621,7 +632,8 @@ void QnProgressiveDownloadingConsumer::run()
             standFrameDuration,
             dropLateFrames,
             maxFramesToCacheBeforeDrop,
-            isLive);
+            isLive,
+            continuousTimestamps);
 
         qint64 timeUSec = DATETIME_NOW;
         if (isLive)
@@ -733,6 +745,10 @@ void QnProgressiveDownloadingConsumer::run()
             return;
         }
 
+        QnVirtualCameraResourcePtr camRes = resource.dynamicCast<QnVirtualCameraResource>();
+        if (camRes && camRes->isAudioEnabled() && d->transcoder.isCodecSupported(CODEC_ID_VORBIS))
+            d->transcoder.setAudioCodec(CODEC_ID_VORBIS, QnTranscoder::TM_FfmpegTranscode);
+
         dataProvider->addDataProcessor(&dataConsumer);
         d->chunkedMode = true;
         d->response.headers.insert( std::make_pair("Cache-Control", "no-cache") );
@@ -770,7 +786,7 @@ void QnProgressiveDownloadingConsumer::onTimer( const quint64& /*timerID*/ )
 {
     Q_D(QnProgressiveDownloadingConsumer);
 
-    QMutexLocker lk( &d->mutex );
+    QnMutexLocker lk( &d->mutex );
     d->terminated = true;
     d->killTimerID = 0;
     pleaseStop();

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="th" sourcelanguage="en">
+<TS version="2.1" language="th" sourcelanguage="en">
 <context>
     <name>Language</name>
     <message>
@@ -12,17 +12,6 @@
         <source>Locale Code</source>
         <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
         <translation>th</translation>
-    </message>
-</context>
-<context>
-    <name>QnActiResource</name>
-    <message>
-        <source>Output %1</source>
-        <translation>เอาท์พุท %1</translation>
-    </message>
-    <message>
-        <source>Input %1</source>
-        <translation>อินพุท %1</translation>
     </message>
 </context>
 <context>
@@ -229,10 +218,6 @@
         <translation>เหตุการณ์ที่ไม่รู้จักได้เกิดขึ้น</translation>
     </message>
     <message>
-        <source>Conflict Address: %1</source>
-        <translation>ที่อยู่ขัดข้อง: %1</translation>
-    </message>
-    <message>
         <source>Connection to server is lost.</source>
         <translation>เชื่อมต่อกับเซิร์ฟเวอร์ขาดหายไป.</translation>
     </message>
@@ -253,10 +238,6 @@
     <message>
         <source>Caption: %1</source>
         <translation>คำอธิบาย:%1</translation>
-    </message>
-    <message>
-        <source>Input port: %1</source>
-        <translation>พอร์ตอินพุต:%1</translation>
     </message>
     <message>
         <source>MAC #%1: %2 </source>
@@ -340,10 +321,6 @@
         <translation>กล้อง %1 ถูกตัดการเชื่อมต่อ</translation>
     </message>
     <message>
-        <source>IO Module %1 was disconnected</source>
-        <translation>IO โมดูล %1 ถูกตัดการเชื่อมต่อ</translation>
-    </message>
-    <message>
         <source>Device IP Conflict at %1</source>
         <extracomment>Device IP Conflict at &lt;server_name&gt;</extracomment>
         <translation>ความขัดแย้ง IP อุปกรณ์ที่ %1</translation>
@@ -366,8 +343,76 @@
         <translation>บันทึกในกล้องถูกปิดใช้งาน:</translation>
     </message>
     <message>
-        <source>Recording on IO modules is disabled:</source>
-        <translation>บันทึกในโมดูล IO ถูกปิดใช้งาน:</translation>
+        <source>Execute PTZ preset</source>
+        <translation>ดำเนิน PTZ ที่ตั้งไว้</translation>
+    </message>
+    <message>
+        <source>Show text overlay</source>
+        <translation>แสดงการซ้อนทับข้อความ</translation>
+    </message>
+    <message>
+        <source>Show on Alarm Layout</source>
+        <translation>แสดงบนเค้าโครงการเตือนภัย</translation>
+    </message>
+    <message>
+        <source>Archive backup finished</source>
+        <translation>การสำรองข้อมูลเอกสารเก่าสำเร็จ</translation>
+    </message>
+    <message>
+        <source>Server &apos;%1&apos; has finished an archive backup</source>
+        <translation>เซิร์ฟเวอร์ &apos;%1&apos; ได้ทำการสำรองข้อมูลเสร็จสิ้น</translation>
+    </message>
+    <message>
+        <source>Generic Event at %1</source>
+        <translation>เหตุการณ์ทั่วไปที่ %1</translation>
+    </message>
+    <message>
+        <source>Input Port: %1</source>
+        <translation>พอร์ตอินพุต: %1</translation>
+    </message>
+    <message>
+        <source>Archive backup is successfully completed</source>
+        <translation>การสำรองข้อมูลที่เก็บเสร็จเรียบร้อยแล้ว</translation>
+    </message>
+    <message>
+        <source>I/O Module %1 was disconnected</source>
+        <translation>โมดูล I/O %1 ขาดการเชื่อมต่อ</translation>
+    </message>
+    <message>
+        <source>Conflicting Address: %1</source>
+        <translation>ที่อยู่ที่ขัดแย้งกัน: %1</translation>
+    </message>
+    <message>
+        <source>Archive backup failed: No available backup storages with sufficient free space</source>
+        <translation>การสำรองข้อมูลเอกสารเก่าล้มเหลว: ไม่มีการเก็บรักษาการสำรองข้อมูลที่สามารถใช้ได้กับพื้นที่ว่างเพียงพอ</translation>
+    </message>
+    <message>
+        <source>Archive backup failed: Target storage failure</source>
+        <translation>การสำรองข้อมูลเอกสารเก่าล้มเหลว: ความล้มเหลวในการจัดเก็บเป้าหมาย</translation>
+    </message>
+    <message>
+        <source>Archive backup failed: Source file open/read error</source>
+        <translation>การสำรองข้อมูลเอกสารเก่าล้มเหลว: ไฟล์ที่มาเปิด / อ่านข้อผิดพลาด</translation>
+    </message>
+    <message>
+        <source>Archive backup failed: Target file create/write error</source>
+        <translation>การสำรองข้อมูลเอกสารเก่าล้มเหลว: ไฟล์เป้าหมายสร้างข้อผิดพลาด</translation>
+    </message>
+    <message>
+        <source>Archive backup failed: File catalog error</source>
+        <translation>การสำรองข้อมูลเอกสารเก่าล้มเหลว: แคตตาล็อกไฟล์ผิดพลาด</translation>
+    </message>
+    <message>
+        <source>Archive backup finished, but isn&apos;t fully completed because backup time is over. Data is backed up to %1</source>
+        <translation>การสำรองข้อมูลเก็บถาวรเสร็จ แต่ไม่เสร็จสมบูรณ์เพราะเวลาการสำรองข้อมูลที่มีมากกว่า ข้อมูลจะถูกสำรองข้อมูลไปยัง %1</translation>
+    </message>
+    <message>
+        <source>Archive backup is canceled by user. Data is backed up to %1</source>
+        <translation>การสำรองข้อมูลเอกสารเก่าจะถูกยกเลิกโดยผู้ใช้ ข้อมูลจะถูกสำรองข้อมูลไปยัง %1</translation>
+    </message>
+    <message>
+        <source>Recording on I/O modules is disabled:</source>
+        <translation>การบันทึกลงบนโมดูล I/O ปิดการใช้งาน:</translation>
     </message>
 </context>
 <context>
@@ -457,20 +502,12 @@
         <translation>โปรดลองที่จะรีบูตกล้องแล้วคืนค่าเริ่มต้นจากโรงงานบนหน้าเว็บ.</translation>
     </message>
     <message>
-        <source>Please try to reboot the IO module, then restore factory defaults on the web-page.</source>
-        <translation>โปรดลองที่จะรีบูตโมดูล IO แล้วคืนค่าเริ่มต้นจากโรงงานบนหน้าเว็บ.</translation>
-    </message>
-    <message>
         <source>Make sure the device is plugged into the network. Try to reboot the device.</source>
         <translation>ตรวจสอบให้แน่ใจว่ามีการเสียบอุปกรณ์เข้าสู่เครือข่าย ลองที่จะรีบูตเครื่องอุปกรณ์.</translation>
     </message>
     <message>
         <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
         <translation>ตรวจสอบให้แน่ใจว่ามีการเสียบกล้องเข้าสู่เครือข่าย ลองที่จะรีบูตกล้อง.</translation>
-    </message>
-    <message>
-        <source>Make sure the IO module is plugged into the network. Try to reboot the IO module.</source>
-        <translation>ตรวจสอบให้แน่ใจว่ามีการเสียบโมดูล IO เข้าสู่เครือข่าย ลองที่จะรีบูตโมดูล IO.</translation>
     </message>
     <message>
         <source>Make sure port %2 is accessible (e.g. forwarded).</source>
@@ -485,10 +522,6 @@
         <translation>ไม่สามารถแยกการตอบสนองของกล้อง Url %1 ต้องการชื่อ %2.</translation>
     </message>
     <message>
-        <source>Could not parse IO module response. Url %1, request name %2.</source>
-        <translation>ไม่สามารถแยกการตอบสนองโมดูล IO Url %1 ต้องการชื่อ %2.</translation>
-    </message>
-    <message>
         <source>Not authorized. Url %1.</source>
         <translation>ไม่ได้รับอนุญาต Url %1.</translation>
     </message>
@@ -501,20 +534,12 @@
         <translation>ครั้งแรก ลองที่จะเปิดการบันทึกภาพ (ถ้ามันปิดอยู่) และลดเฟรมต่อวินาทีในการตั้งค่ากล้อง.</translation>
     </message>
     <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in IO module settings.</source>
-        <translation>ครั้งแรก ลองที่จะเปิดการบันทึกภาพ (ถ้ามันปิดอยู่) และลดเฟรมต่อวินาทีในการตั้งค่าโมดูล IO.</translation>
-    </message>
-    <message>
         <source>If it doesn&apos;t help, restore factory defaults on the device web-page.</source>
         <translation>ถ้ามันช่วยไม่ได้ เรียกคืนค่าเริ่มต้นจากโรงงานบนหน้าเว็บของอุปกรณ์.</translation>
     </message>
     <message>
         <source>If it doesn&apos;t help, restore factory defaults on the camera web-page.</source>
         <translation>ถ้ามันช่วยไม่ได้ เรียกคืนค่าเริ่มต้นจากโรงงานบนหน้าเว็บของกล้อง.</translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the IO module web-page.</source>
-        <translation>ถ้ามันช่วยไม่ได้ เรียกคืนค่าเริ่มต้นจากโรงงานบนหน้าเว็บของโมดูล IO.</translation>
     </message>
     <message>
         <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
@@ -525,20 +550,12 @@
         <translation>คำขอกล้อง &quot;%1&quot; ล้มเหลวด้วยข้อผิดพลาด &quot;%2&quot;.</translation>
     </message>
     <message>
-        <source>IO Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-        <translation>คำขอโมดูล IO &quot;%1&quot; ล้มเหลวด้วยข้อผิดพลาด &quot;%2&quot;.</translation>
-    </message>
-    <message>
         <source>Unknown device issue.</source>
         <translation>ไม่ระบุปัญหาของอุปกรณ์.</translation>
     </message>
     <message>
         <source>Unknown camera issue.</source>
         <translation>ไม่ระบุปัญหาของกล้อง.</translation>
-    </message>
-    <message>
-        <source>Unknown IO module issue.</source>
-        <translation>ไม่ระบุปัญหาโมดูล IO.</translation>
     </message>
     <message>
         <source>Invalid data was received from the device %1.</source>
@@ -549,10 +566,6 @@
         <translation>ข้อมูลไม่ถูกต้อง ได้รับจากกล้อง %1.</translation>
     </message>
     <message>
-        <source>Invalid data was received from the IO module %1.</source>
-        <translation>ข้อมูลไม่ถูกต้อง ได้รับจากโมดูล IO %1.</translation>
-    </message>
-    <message>
         <source>Too many media errors. Please open device issues dialog for more details.</source>
         <translation>ข้อผิดพลาดสื่อมากเกินไป กรุณาเปิดประเด็นโต้ตอบอุปกรณ์สำหรับรายละเอียดเพิ่มเติม.</translation>
     </message>
@@ -561,20 +574,56 @@
         <translation>ข้อผิดพลาดสื่อมากเกินไป กรุณาเปิดประเด็นโต้ตอบกล้องสำหรับรายละเอียดเพิ่มเติม.</translation>
     </message>
     <message>
-        <source>Too many media errors. Please open IO module issues dialog for more details.</source>
-        <translation>ข้อผิดพลาดสื่อมากเกินไป กรุณาเปิดประเด็นโต้ตอบโมดูล IO สำหรับรายละเอียดเพิ่มเติม.</translation>
+        <source>Camera plugin error. %1</source>
+        <translation>ข้อผิดพลาดปลั๊กอินกล้อง %1</translation>
     </message>
     <message>
-        <source>Device initialization process in progress.</source>
-        <translation>กระบวนการเริ่มต้นอุปกรณ์อยู่ในความคืบหน้า.</translation>
+        <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
+        <translation>โปรดลองรีบูตโมดูล I/O แล้วคืนค่าเริ่มต้นจากโรงงานบนหน้าเว็บ.</translation>
     </message>
     <message>
-        <source>Camera initialization process in progress.</source>
+        <source>Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</source>
+        <translation>ตรวจสอบให้แน่ใจว่าโมดูล I/O ต่อเข้ากับครือข่าย ลองที่จะรีบูตโมดูล I/O อีกครั้ง.</translation>
+    </message>
+    <message>
+        <source>Could not parse I/O module response. Url %1, request name %2.</source>
+        <translation>ไม่สามารถแยกวิเคราะห์ I/O โมดูลการตอบสนอง. Url %1, ขอชื่อ %2.</translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in I/O module settings.</source>
+        <translation>ครั้งแรกที่พยายามที่จะเปิดการบันทึกภาพ (ถ้าปิด) และลด FPS ในการตั้งค่าโมดูล I/O.</translation>
+    </message>
+    <message>
+        <source>If it doesn&apos;t help, restore factory defaults on the I/O module web-page.</source>
+        <translation>ถ้ามันช่วยไม่ได้ เรียกคืนค่าเริ่มต้นจากโรงงานบนหน้าเว็บของอุปกรณ์.</translation>
+    </message>
+    <message>
+        <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
+        <translation>โมดูล I/O ที่ต้องการ %1 ผิดพลาดกับ %2&apos;&apos;.</translation>
+    </message>
+    <message>
+        <source>Unknown I/O module issue.</source>
+        <translation>ไม่รู้จัก I/O ปัญหาโมดูล.</translation>
+    </message>
+    <message>
+        <source>Invalid data was received from the I/O module %1.</source>
+        <translation>ได้รับข้อมูลที่ไม่ถูกต้องจากโมดูล I/O %1.</translation>
+    </message>
+    <message>
+        <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
+        <translation>ข้อผิดพลาดของสื่อมากเกินไป โปรดเปิดประเด็นโมดูล I/O โต้ตอบสำหรับรายละเอียดเพิ่มเติม.</translation>
+    </message>
+    <message>
+        <source>Device initialization process is in progress.</source>
+        <translation>ขั้นตอนการเริ่มต้นอุปกรณ์ที่อยู่ในความคืบหน้า.</translation>
+    </message>
+    <message>
+        <source>Camera initialization process is in progress.</source>
         <translation>กระบวนการเริ่มต้นกล้องอยู่ในความคืบหน้า.</translation>
     </message>
     <message>
-        <source>IO Module initialization process in progress.</source>
-        <translation>กระบวนการเริ่มต้นโมดูล IO อยู่ในความคืบหน้า.</translation>
+        <source>I/O Module initialization process is in progress.</source>
+        <translation>โมดูล I/O เริ่มต้นกระบวนการในความคืบหน้า.</translation>
     </message>
 </context>
 <context>
@@ -595,8 +644,8 @@
         <translation>ไม่พบ explorer.exe ในเส้นทางที่จะเปิดตัว Windows Explorer.</translation>
     </message>
     <message>
-        <source>Launching file explorer failed.</source>
-        <translation>การเปิดตัว Windows Explorer ล้มเหลว.</translation>
+        <source>File explorer failed to open.</source>
+        <translation>explore ไฟล์ล้มเหลวในการเปิด.</translation>
     </message>
 </context>
 <context>
@@ -610,12 +659,12 @@
         <translation>ไม่พบการเข้ารหัสสำหรับตัวแปลงสัญญาณ %1.</translation>
     </message>
     <message>
-        <source>Could not initialise audio encoder.</source>
-        <translation>ไม่สามารถเริ่มต้นการเข้ารหัสเสียง.</translation>
+        <source>Could not initialize audio encoder.</source>
+        <translation>ไม่สามารถเริ่มต้น เข้ารหัส เสียง.</translation>
     </message>
     <message>
-        <source>Could not initialise audio decoder.</source>
-        <translation>ไม่สามารถเริ่มต้นการถอดรหัสเสียง.</translation>
+        <source>Could not initialize audio decoder.</source>
+        <translation>ไม่สามารถเริ่มต้น ถอดรหัส เสียง.</translation>
     </message>
 </context>
 <context>
@@ -652,8 +701,8 @@
         <translation>ไม่พบการเข้ารหัสสำหรับตัวแปลงสัญญาณ %1.</translation>
     </message>
     <message>
-        <source>Could not initialise video encoder.</source>
-        <translation>ไม่สามารถเริ่มต้นการเข้ารหัสวิดีโอ.</translation>
+        <source>Could not initialize video encoder.</source>
+        <translation>ไม่สามารถเริ่มต้น เข้ารหัส วีดีโอ.</translation>
     </message>
 </context>
 <context>
@@ -798,14 +847,6 @@
         </translation>
     </message>
     <message>
-        <source>There was a problem activating your license key. Invalid data received. Please contact support team to report issue.</source>
-        <translation>มีปัญหาในการเปิดใช้งานคีย์ใบอนุญาตของคุณ ได้รับข้อมูลไม่ถูกต้อง กรุณาติดต่อทีมสนับสนุนที่จะรายงานปัญหา.</translation>
-    </message>
-    <message>
-        <source>There was a problem activating your license key. A database error has occurred.</source>
-        <translation>มีปัญหาในการเปิดใช้งานคีย์ใบอนุญาตของคุณ ฐานข้อมูลเกิดข้อผิดพลาดขึ้น.</translation>
-    </message>
-    <message>
         <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
         <translation>คีย์ใบอนุญาตคุณป้อนไม่ถูกต้อง กรุณาตรวจสอบคีย์ใบอนุญาตที่ถูกต้อง หากปัญหายังคงอยู่โปรดติดต่อทีมสนับสนุนเพื่อยืนยันว่าคีย์ใบอนุญาตถูกต้องหรือที่จะได้รับคีย์ใบอนุญาตที่ถูกต้อง.</translation>
     </message>
@@ -817,33 +858,20 @@
         <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
         <translation>คีย์ใบอนุญาตนี้ได้รับการเปิดใช้งานก่อนหน้านี้ฮาร์ดแวร์ id {{hwid}} บน {{time}}.กรุณาติดต่อทีมสนับสนุนที่จะได้รับคีย์ใบอนุญาตที่ถูกต้อง.</translation>
     </message>
+    <message>
+        <source>There was a problem activating your license key. A database error occurred.</source>
+        <translation>มีปัญหาในการเปิดใช้งานคีย์ใบอนุญาตของคุณ มีข้อผิดพลาดเกิดขึ้นในฐานข้อมูล.</translation>
+    </message>
+    <message>
+        <source>There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.</source>
+        <translation>มีปัญหาในการเปิดใช้งานคีย์ใบอนุญาตของคุณ ได้รับข้อมูลไม่ถูกต้อง โปรดติดต่อทีมสนับสนุนเพื่อรายงานปัญหา.</translation>
+    </message>
 </context>
 <context>
     <name>QnMediaServerResource</name>
     <message>
         <source>Server</source>
         <translation>เซิร์ฟเวอร์</translation>
-    </message>
-</context>
-<context>
-    <name>QnNewDWPtzController</name>
-    <message>
-        <source>Preset #</source>
-        <translation>พรีเซ็ต #</translation>
-    </message>
-</context>
-<context>
-    <name>QnPlAxisResource</name>
-    <message>
-        <source>Can&apos;t initialize IO port settings</source>
-        <translation>ไม่สามารถเริ่มต้นการตั้งค่าพอร์ต IO</translation>
-    </message>
-</context>
-<context>
-    <name>QnPlOnvifResource</name>
-    <message>
-        <source>Otput %1</source>
-        <translation>เอาท์พุท %1</translation>
     </message>
 </context>
 <context>
@@ -865,18 +893,6 @@
         <source>%n camera(s)</source>
         <translation>
             <numerusform>%n กล้อง(s)</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n IO Module(s)</source>
-        <translation>
-            <numerusform>%n IO โมดูล(s)</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n IO module(s)</source>
-        <translation>
-            <numerusform>%n IO โมดูล(s)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -908,22 +924,6 @@
         <translation>กล้อง</translation>
     </message>
     <message>
-        <source>IO Modules</source>
-        <translation>IO โมดูล</translation>
-    </message>
-    <message>
-        <source>IO modules</source>
-        <translation>IO โมดูล</translation>
-    </message>
-    <message>
-        <source>IO Module</source>
-        <translation>IO โมดูล</translation>
-    </message>
-    <message>
-        <source>IO module</source>
-        <translation>IO โมดูล</translation>
-    </message>
-    <message>
         <source>Devices</source>
         <translation>อุุปกรณ์</translation>
     </message>
@@ -938,6 +938,34 @@
     <message>
         <source>device</source>
         <translation>อุุปกรณ์</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n I/O Module(s)</source>
+        <translation>
+            <numerusform>%n I/O โมดูล (s)</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n I/O module(s)</source>
+        <translation>
+            <numerusform>%n I/O โมดูล (s)</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>I/O Modules</source>
+        <translation>I/O โมดูล</translation>
+    </message>
+    <message>
+        <source>I/O modules</source>
+        <translation>I/O โมดูล</translation>
+    </message>
+    <message>
+        <source>I/O Module</source>
+        <translation>I/O โมดูล</translation>
+    </message>
+    <message>
+        <source>I/O module</source>
+        <translation>I/O โมดูล</translation>
     </message>
 </context>
 <context>
@@ -1063,108 +1091,9 @@
         <source>Error during watermark generation for file &apos;%1&apos;.</source>
         <translation>ข้อผิดพลาดในระหว่างการสร้างลายน้ำสำหรับไฟล์ &apos;%1&apos;.</translation>
     </message>
-</context>
-<context>
-    <name>QnSystemHealthStringsHelper</name>
     <message>
-        <source>Email address is not set</source>
-        <translation>ที่อยู่อีเมลไม่ได้ตั้งค่า</translation>
-    </message>
-    <message>
-        <source>No licenses</source>
-        <translation>ไม่มีใบอนุญาต</translation>
-    </message>
-    <message>
-        <source>Email server is not set</source>
-        <translation>เซิร์ฟเวอร์อีเมลไม่ได้ตั้งค่า</translation>
-    </message>
-    <message>
-        <source>Some users have not set their email addresses</source>
-        <translation>ผู้ใช้บางคนยังไม่ได้ตั้งที่อยู่อีเมล</translation>
-    </message>
-    <message>
-        <source>Connection to server lost</source>
-        <translation>การเชื่อมต่อกับเซิร์ฟเวอร์ขาดหาย</translation>
-    </message>
-    <message>
-        <source>Error while sending email</source>
-        <translation>เกิดข้อผิดพลาดในขณะที่ส่งอีเมล</translation>
-    </message>
-    <message>
-        <source>Email address is not set for user %1</source>
-        <translation>ที่อยู่อีเมลไม่ได้ตั้งค่าสำหรับการใช้งาน %1</translation>
-    </message>
-    <message>
-        <source>Select server for others to synchronize time with</source>
-        <translation>เลือกเซิร์ฟเวอร์สำหรับปรับเวลาให้ตรงกัน</translation>
-    </message>
-    <message>
-        <source>Rebuilding archive index is completed</source>
-        <translation>ดัชนีเก็บสร้างใหม่เป็นที่เรียบร้อยแล้ว</translation>
-    </message>
-    <message>
-        <source>Email address is not set.</source>
-        <translation>ที่อยู่อีเมลไม่ได้ตั้งค่า.</translation>
-    </message>
-    <message>
-        <source>You cannot receive system notifications via email.</source>
-        <translation>คุณไม่สามารถรับการแจ้งเตือนระบบผ่านทางอีเมล.</translation>
-    </message>
-    <message>
-        <source>Email server is not set.</source>
-        <translation>เซิร์ฟเวอร์อีเมลไม่ได้ตั้งค่า.</translation>
-    </message>
-    <message>
-        <source>Some users have not set their email addresses.</source>
-        <translation>ผู้ใช้บางคนยังไม่ได้ตั้งที่อยู่อีเมล.</translation>
-    </message>
-    <message>
-        <source>They cannot receive system notifications via email.</source>
-        <translation>พวกเขาไม่สามารถรับการแจ้งเตือนผ่านทางอีเมล.</translation>
-    </message>
-    <message>
-        <source>Storages are full on the following Server:</source>
-        <translation>พื้นที่หน่วยความจำเต็ม บนเซิร์ฟเวอร์ต่อไปนี้:</translation>
-    </message>
-    <message>
-        <source>Storages are not configured on the following Server:</source>
-        <translation>หน่วยความจำไม่ได้กำหนดค่าบนเซิร์ฟเวอร์ต่อไปนี้:</translation>
-    </message>
-    <message>
-        <source>You have no licenses.</source>
-        <translation>คุณไม่มีใบอนุญาต.</translation>
-    </message>
-    <message>
-        <source>You cannot record video from cameras.</source>
-        <translation>ท่านไม่สามารถบันทึกวิดีโอจากกล้องได้.</translation>
-    </message>
-    <message>
-        <source>Rebuilding archive index is completed on the following Server:</source>
-        <translation>ดัชนีเก็บสร้างใหม่เสร็จสมบูรณ์บนเซิร์ฟเวอร์ต่อไปนี้:</translation>
-    </message>
-    <message>
-        <source>Storage is full</source>
-        <translation>หน่วยความจำเต็ม</translation>
-    </message>
-    <message>
-        <source>Storage is not configured</source>
-        <translation>หน่วยความจำไม่ได้กำหนดค่า</translation>
-    </message>
-    <message>
-        <source>Server times are not synchronized and a common time could not be detected automatically.</source>
-        <translation>เวลาเซิร์ฟเวอร์ไม่ตรงกันและเวลาที่พบไม่สามารถตรวจพบโดยอัตโนมัติได้.</translation>
-    </message>
-    <message>
-        <source>System is in safe mode</source>
-        <translation>ระบบในเซฟโหมด</translation>
-    </message>
-    <message>
-        <source>The system is running in safe mode.</source>
-        <translation>ระบบจะทำงานในเซฟโหมด.</translation>
-    </message>
-    <message>
-        <source>Any configuration changes except license activation are impossible.</source>
-        <translation>เปลี่ยนแปลงการกำหนดค่าการเปิดใช้งานยกเว้นใบอนุญาตใด ๆ ที่เป็นไปไม่ได้.</translation>
+        <source>File write error. Not enough free space.</source>
+        <translation>ข้อผิดพลาดในการเขียนไฟล์ เนื้อที่ว่างไม่เพียงพอ.</translation>
     </message>
 </context>
 <context>
@@ -1195,17 +1124,6 @@
     </message>
 </context>
 <context>
-    <name>QnThirdPartyResource</name>
-    <message>
-        <source>Otput %1</source>
-        <translation>เอาท์พุท %1</translation>
-    </message>
-    <message>
-        <source>Input %1</source>
-        <translation>อินพุท %1</translation>
-    </message>
-</context>
-<context>
     <name>QnTranscoder</name>
     <message>
         <source>OpenCL transcoding is not implemented.</source>
@@ -1233,6 +1151,13 @@
     <message>
         <source>%1 (external)</source>
         <translation>%1 (ภายนอก)</translation>
+    </message>
+</context>
+<context>
+    <name>utils::QnCameraNamesWatcher</name>
+    <message>
+        <source>Removed camera</source>
+        <translation>ลบกล้องออก</translation>
     </message>
 </context>
 </TS>

@@ -18,7 +18,7 @@ copy /Y readme.txt %TARGET_DIR%\
 
 @rem Copying integration headers
 copy /Y ..\common\src\plugins\plugin_api.h %TARGET_DIR%\include\plugins\
-copy /Y ..\common\src\plugins\storage\third_party\third_party_storage.h %TARGET_DIR%\include\plugins\storage\third_party\
+copy /Y ..\mediaserver_core\src\plugins\storage\third_party\third_party_storage.h %TARGET_DIR%\include\plugins\storage\third_party\
 
 @rem Copying Ftp Storage plugin
 set PLUGIN_NAME=ftpstorageplugin

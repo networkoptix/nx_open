@@ -46,12 +46,6 @@ namespace QnMulticast
         QString m_userAgent;
     private:
         Request updateRequest(const Request& srcRequest);
-        QByteArray createHttpQueryAuthParam(const QString& userName,
-            const QString& password,
-            const QString& realm,
-            const QByteArray& method,
-            QByteArray nonce);
-        QByteArray createUserPasswordDigest(const QString& userName, const QString& password, const QString& realm);
         void updateAuthParams(const QUuid& serverId, const Response& response);
     };
 }

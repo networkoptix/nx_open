@@ -2,45 +2,61 @@
 
 #include <QtCore/QTimer>
 
-#include <core/resource/resource.h>
-#include <core/resource/network_resource.h>
+#include <api/helpers/thumbnail_request_data.h>
+#include <api/server_rest_connection.h>
+
+#include <common/common_module.h>
+
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 
+#include <utils/common/model_functions.h>
 #include <ui/style/skin.h>
 
 namespace {
-    QSize defaultThumbnailSize(0, 200);
+
+    const QSize kDefaultThumbnailSize(0, 200);
+
+    const int kUpdateThumbnailsPeriodMs = 10 * 1000;
+
+    const rest::Handle kInvalidHandle = 0;
 }
 
-QnCameraThumbnailManager::QnCameraThumbnailManager(QObject *parent) :
-    QObject(parent),
-    m_thumnailSize(0, 0)
+QnCameraThumbnailManager::ThumbnailData::ThumbnailData()
+    : status(None)
+    , loadingHandle(kInvalidHandle)
+{}
+
+
+QnCameraThumbnailManager::QnCameraThumbnailManager(QObject *parent)
+    : QObject(parent)
+    , m_thumnailSize(kDefaultThumbnailSize)
+    , m_refreshingTimer(new QTimer(this))
+
 {
-    m_refreshingTimer = new QTimer(this);
-    m_refreshingTimer->setInterval(10 * 1000);
+    m_refreshingTimer->setInterval(kUpdateThumbnailsPeriodMs);
 
     connect(m_refreshingTimer,      &QTimer::timeout,                                   this,   &QnCameraThumbnailManager::forceRefreshThumbnails);
-    connect(qnResPool,              &QnResourcePool::statusChanged,                     this,   &QnCameraThumbnailManager::at_resPool_statusChanged);    
+    connect(qnResPool,              &QnResourcePool::statusChanged,                     this,   &QnCameraThumbnailManager::at_resPool_statusChanged);
     connect(qnResPool,              &QnResourcePool::resourceRemoved,                   this,   &QnCameraThumbnailManager::at_resPool_resourceRemoved);
     connect(this,                   &QnCameraThumbnailManager::thumbnailReadyDelayed,   this,   &QnCameraThumbnailManager::thumbnailReady, Qt::QueuedConnection);
-    setThumbnailSize(defaultThumbnailSize);
 
     m_refreshingTimer->start();
+    updateStatusPixmaps();
 }
 
 QnCameraThumbnailManager::~QnCameraThumbnailManager() {}
 
-void QnCameraThumbnailManager::selectResource(const QnResourcePtr &resource) {
-    ThumbnailData& data = m_thumbnailByResource[resource];
+void QnCameraThumbnailManager::selectResource(const QnVirtualCameraResourcePtr &camera) {
+    ThumbnailData& data = m_thumbnailByCamera[camera];
     if (data.status == None || data.status == Refreshing) {
-        data.loadingHandle = loadThumbnailForResource(resource);
-        if (data.loadingHandle != 0) {
+        data.loadingHandle = loadThumbnailForCamera(camera);
+        if (data.loadingHandle != kInvalidHandle) {
             if (data.status != Refreshing)
                 data.status = Loading;
         } else {
-            data.status = NoSignal;
+            data.status = NoData;
         }
     }
 
@@ -50,7 +66,6 @@ void QnCameraThumbnailManager::selectResource(const QnResourcePtr &resource) {
         break;
     case Loading:
     case NoData:
-    case NoSignal:
         thumbnail = m_statusPixmaps[data.status];
         break;
     case Loaded:
@@ -58,12 +73,15 @@ void QnCameraThumbnailManager::selectResource(const QnResourcePtr &resource) {
         thumbnail = QPixmap::fromImage(data.thumbnail);
         break;
     }
-    emit thumbnailReadyDelayed(resource->getId(), thumbnail);
+    emit thumbnailReadyDelayed(camera->getId(), thumbnail);
 }
 
+QPixmap QnCameraThumbnailManager::statusPixmap( ThumbnailStatus status ) {
+    return m_statusPixmaps[status];
+}
 
 QPixmap QnCameraThumbnailManager::scaledPixmap(const QPixmap &pixmap) const {
-    Q_ASSERT(!m_thumnailSize.isNull());
+    /* Check if no scaling required. */
     if (m_thumnailSize.isNull())
         return pixmap;
 
@@ -74,87 +92,101 @@ QPixmap QnCameraThumbnailManager::scaledPixmap(const QPixmap &pixmap) const {
     return pixmap.scaled(m_thumnailSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 }
 
+void QnCameraThumbnailManager::updateStatusPixmaps()
+{
+    m_statusPixmaps.clear();
 
-void QnCameraThumbnailManager::setThumbnailSize(const QSize &size) {
+    m_statusPixmaps[Loading] = scaledPixmap(qnSkin->pixmap("events/thumb_loading.png"));
+    m_statusPixmaps[NoData] = scaledPixmap(qnSkin->pixmap("events/thumb_no_data.png"));
+}
+
+
+void QnCameraThumbnailManager::setThumbnailSize(const QSize &size)
+{
     if (m_thumnailSize == size)
         return;
 
     m_thumnailSize = size;
-    m_statusPixmaps.clear();
-    
-    m_statusPixmaps[Loading] = scaledPixmap(qnSkin->pixmap("events/thumb_loading.png"));
-    m_statusPixmaps[NoData] = scaledPixmap(qnSkin->pixmap("events/thumb_no_data.png"));
-    m_statusPixmaps[NoSignal] = scaledPixmap(qnSkin->pixmap("events/thumb_no_signal.png"));
+    updateStatusPixmaps();
 }
 
-int QnCameraThumbnailManager::loadThumbnailForResource(const QnResourcePtr &resource) {
-    QnNetworkResourcePtr networkResource = resource.dynamicCast<QnNetworkResource>();
-    if (!networkResource)
-        return 0;
+rest::Handle QnCameraThumbnailManager::loadThumbnailForCamera(const QnVirtualCameraResourcePtr &camera) {
 
-    QnMediaServerResourcePtr serverResource = qnResPool->getResourceById<QnMediaServerResource>(resource->getParentId());
-    if (!serverResource)
-        return 0;
+    if (!camera || !camera->hasVideo(nullptr))
+        return kInvalidHandle;
 
-    QnMediaServerConnectionPtr serverConnection = serverResource->apiConnection();
-    if (!serverConnection)
-        return 0;
+    QnThumbnailRequestData request;
+    request.camera = camera;
+    request.size = m_thumnailSize;
+    request.imageFormat = QnThumbnailRequestData::JpgFormat;
+    request.roundMethod = QnThumbnailRequestData::KeyFrameAfterMethod;
 
-    return serverConnection->getThumbnailAsync(
-                networkResource,
-                -1,
-                -1,
-                m_thumnailSize,
-                QLatin1String("jpg"),
-                QnMediaServerConnection::IFrameAfterTime,
-                this,
-                SLOT(at_thumbnailReceived(int, const QImage&, int)));
-}
+    if (!qnCommon->currentServer())
+        return kInvalidHandle;
 
-void QnCameraThumbnailManager::at_thumbnailReceived(int status, const QImage &thumbnail, int handle) {
-    foreach (QnResourcePtr resource, m_thumbnailByResource.keys()) {
-        ThumbnailData &data = m_thumbnailByResource[resource];
-        if (data.loadingHandle != handle)
-            continue;
+    QPointer<QnCameraThumbnailManager> guard(this);
+    return qnCommon->currentServer()->restConnection()->cameraThumbnailAsync(request,  [guard, this, request] (bool success, rest::Handle id, const QByteArray &imageData)
+    {
+        if (!guard)
+            return;
 
-        if (status == 0) {
-            data.thumbnail = thumbnail;
-            data.status = Loaded;
+        if (!m_thumbnailByCamera.contains(request.camera))
+            return;
+
+        ThumbnailData &data = m_thumbnailByCamera[request.camera];
+        if (data.loadingHandle != id)
+            return;
+
+        data.loadingHandle = kInvalidHandle;
+        data.status = NoData;
+
+        if (success && !imageData.isEmpty())
+        {
+            QByteArray imageFormat = QnLexical::serialized<QnThumbnailRequestData::ThumbnailFormat>(request.imageFormat).toUtf8();
+            data.thumbnail.loadFromData(imageData, imageFormat);
+            if (!data.thumbnail.isNull())
+                data.status = Loaded;
         }
-        else {
-            data.status = NoData;
-        }
-        data.loadingHandle = 0;
+
         QPixmap thumbnail = data.status == Loaded
-                ? QPixmap::fromImage(data.thumbnail)
-                : m_statusPixmaps[data.status];
-        emit thumbnailReady(resource->getId(), thumbnail);
-        break;
-    }
+            ? QPixmap::fromImage(data.thumbnail)
+            : m_statusPixmaps[data.status];
+
+        emit thumbnailReady(request.camera->getId(), thumbnail);
+    }, QThread::currentThread());
+
+
 }
 
 void QnCameraThumbnailManager::at_resPool_statusChanged(const QnResourcePtr &resource) {
-    if (!m_thumbnailByResource.contains(resource))
+    QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
+    if (!camera)
         return;
 
-     ThumbnailData &data = m_thumbnailByResource[resource];
-     if (!isUpdateRequired(resource, data.status))
+    if (!m_thumbnailByCamera.contains(camera))
+        return;
+
+     ThumbnailData &data = m_thumbnailByCamera[camera];
+     if (!isUpdateRequired(camera, data.status))
          return;
 
-     data.status = Refreshing;
-     data.loadingHandle = loadThumbnailForResource(resource);
+     data.loadingHandle = loadThumbnailForCamera(camera);
+     data.status = data.loadingHandle != kInvalidHandle
+         ? Refreshing
+         : NoData;
 }
 
 void QnCameraThumbnailManager::at_resPool_resourceRemoved(const QnResourcePtr &resource) {
-    m_thumbnailByResource.remove(resource);
+    if (QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>())
+        m_thumbnailByCamera.remove(camera);
 }
 
-bool QnCameraThumbnailManager::isUpdateRequired(const QnResourcePtr &resource, const ThumbnailStatus status) const {
-    switch (resource->getStatus()) {
+bool QnCameraThumbnailManager::isUpdateRequired(const QnVirtualCameraResourcePtr &camera, const ThumbnailStatus status) const {
+    switch (camera->getStatus()) {
     case Qn::Recording:
         return (status != Loading) && (status != Refreshing);
     case Qn::Online:
-        return (status == NoData) || (status == NoSignal);
+        return (status == NoData);
     default:
         break;
     }
@@ -162,11 +194,13 @@ bool QnCameraThumbnailManager::isUpdateRequired(const QnResourcePtr &resource, c
 }
 
 void QnCameraThumbnailManager::forceRefreshThumbnails() {
-    for (auto it = m_thumbnailByResource.begin(); it != m_thumbnailByResource.end(); ++it) {
+    for (auto it = m_thumbnailByCamera.begin(); it != m_thumbnailByCamera.end(); ++it) {
         if (!isUpdateRequired(it.key(), it->status))
             continue;
 
-        it->status = Refreshing;
-        it->loadingHandle = loadThumbnailForResource(it.key());
+        it->loadingHandle = loadThumbnailForCamera(it.key());
+        it->status = it->loadingHandle != kInvalidHandle
+            ? Refreshing
+            : NoData;
     }
 }

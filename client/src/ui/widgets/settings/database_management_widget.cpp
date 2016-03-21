@@ -32,7 +32,7 @@ QnDatabaseManagementWidget::QnDatabaseManagementWidget(QWidget *parent):
 {
     ui->setupUi(this);
     ui->labelWidget->setText(tr("You can create a backup for system configurations that can be restored in case of failure."));
-    
+
     setHelpTopic(this, Qn::SystemSettings_Server_Backup_Help);
 
     connect(ui->backupButton, SIGNAL(clicked()), this, SLOT(at_backupButton_clicked()));
@@ -70,7 +70,7 @@ void QnDatabaseManagementWidget::at_backupButton_clicked() {
         QMessageBox::critical(this, tr("Error"), tr("Could not open file '%1' for writing.").arg(fileName));
         return;
     }
-   
+
     //TODO: #GDM QnWorkbenchStateDependentDialog, QScopedPointer vs QObject-parent problem
     QScopedPointer<QnProgressDialog> dialog(new QnProgressDialog());
     dialog->setMinimum(0);
@@ -81,11 +81,11 @@ void QnDatabaseManagementWidget::at_backupButton_clicked() {
 
     ec2::ErrorCode errorCode;
     QByteArray databaseData;
-    auto dumpDatabaseHandler = 
+    auto dumpDatabaseHandler =
         [&dialog, &errorCode, &databaseData]( int /*reqID*/, ec2::ErrorCode _errorCode, const ec2::ApiDatabaseDumpData& dbData ) {
             errorCode = _errorCode;
             databaseData = dbData.data;
-            dialog->reset(); 
+            dialog->reset();
     };
     QnAppServerConnectionFactory::getConnection2()->dumpDatabaseAsync( dialog.data(), dumpDatabaseHandler );
     dialog->exec();
@@ -141,16 +141,16 @@ void QnDatabaseManagementWidget::at_restoreButton_clicked() {
     dialog->setModal(true);
 
     ec2::ErrorCode errorCode;
-    auto restoreDatabaseHandler = 
+    auto restoreDatabaseHandler =
         [&dialog, &errorCode]( int /*reqID*/, ec2::ErrorCode _errorCode ) {
             errorCode = _errorCode;
-            dialog->reset(); 
+            dialog->reset();
     };
     ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
     if (!conn) {
         QMessageBox::information(this,
             tr("Information"),
-            tr("You need to connect to a server prior to performing a backup."));
+            tr("You need to connect to a server prior to backup start."));
         return;
     }
 
@@ -163,7 +163,7 @@ void QnDatabaseManagementWidget::at_restoreButton_clicked() {
         QMessageBox::information(this,
                                  tr("Information"),
                                  tr("Database was successfully restored from file '%1'. Media server will be restarted.").arg(fileName));
-        menu()->trigger(Qn::ReconnectAction);
+        menu()->trigger(QnActions::ReconnectAction);
     } else {
         NX_LOG( lit("Failed to restore Server database from file '%1'. %2").arg(fileName).arg(ec2::toString(errorCode)), cl_logERROR );
         QMessageBox::critical(this, tr("Error"), tr("An error has occurred while restoring the database from file '%1'.")
@@ -173,4 +173,16 @@ void QnDatabaseManagementWidget::at_restoreButton_clicked() {
 
 void QnDatabaseManagementWidget::setReadOnlyInternal(bool readOnly) {
     ui->restoreButton->setEnabled(!readOnly);
+}
+
+void QnDatabaseManagementWidget::applyChanges() {
+    /* Widget is read-only */
+}
+
+void QnDatabaseManagementWidget::loadDataToUi() {
+    /* Widget is read-only */
+}
+
+bool QnDatabaseManagementWidget::hasChanges() const {
+    return false;
 }

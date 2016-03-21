@@ -81,26 +81,32 @@ QList<QnUuid> QnResourceType::allParentList() const
 
 void QnResourceType::addParamType(const QString& name, const QString& defaultValue)
 {
-    QMutexLocker _lock(&m_allParamTypeListCacheMutex); // in case of connect to anther app server 
+    QnMutexLocker lock( &m_allParamTypeListCacheMutex ); // in case of connect to anther app server 
     m_paramTypeList.insert(name, defaultValue);
 }
 
 bool QnResourceType::hasParam(const QString& name) const
 {
-    return paramTypeList().contains(name);
+    QnMutexLocker lock( &m_allParamTypeListCacheMutex );
+    return paramTypeListUnsafe().contains(name);
 }
 
 QString QnResourceType::defaultValue(const QString& key) const
 {
-    return paramTypeList().value(key);
+    QnMutexLocker lock( &m_allParamTypeListCacheMutex );
+    return paramTypeListUnsafe().value(key);
 }
 
-const ParamTypeMap& QnResourceType::paramTypeList() const
+const ParamTypeMap QnResourceType::paramTypeList() const
+{
+    QnMutexLocker lock( &m_allParamTypeListCacheMutex );
+    return paramTypeListUnsafe();
+}
+
+const ParamTypeMap& QnResourceType::paramTypeListUnsafe() const
 {
     if (m_allParamTypeListCache.isNull())
     {
-        QMutexLocker _lock(&m_allParamTypeListCacheMutex);
-
         if (!m_allParamTypeListCache.isNull())
             return *(m_allParamTypeListCache.data());
 
@@ -113,7 +119,7 @@ const ParamTypeMap& QnResourceType::paramTypeList() const
             }
 
             if (QnResourceTypePtr parent = qnResTypePool->getResourceType(parentId)) 
-            {
+            {   // Note. Copy below, should be thread safe.
                 ParamTypeMap parentData = parent->paramTypeList();
                 for(auto itr = parentData.begin(); itr != parentData.end(); ++itr) {
                     if (!allParamTypeListCache->contains(itr.key()))
@@ -141,7 +147,7 @@ QnResourceTypePool *QnResourceTypePool::instance()
 
 QnResourceTypePtr QnResourceTypePool::getResourceTypeByName(const QString& name) const
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     for(QnResourceTypeMap::const_iterator itr = m_resourceTypeMap.begin(); itr != m_resourceTypeMap.end(); ++itr)
     {
         if (itr.value()->getName() == name)
@@ -152,14 +158,14 @@ QnResourceTypePtr QnResourceTypePool::getResourceTypeByName(const QString& name)
 
 QnResourceTypePtr QnResourceTypePool::getResourceType(QnUuid id) const
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     QnResourceTypeMap::const_iterator itr = m_resourceTypeMap.find(id);
     return itr != m_resourceTypeMap.end() ? itr.value() : QnResourceTypePtr();
 }
 
 void QnResourceTypePool::replaceResourceTypeList(const QnResourceTypeList &resourceTypeList)
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     m_resourceTypeMap.clear();
 
@@ -169,13 +175,13 @@ void QnResourceTypePool::replaceResourceTypeList(const QnResourceTypeList &resou
 
 void QnResourceTypePool::addResourceType(QnResourceTypePtr resourceType)
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     m_resourceTypeMap.insert(resourceType->getId(), resourceType);
 }
 
 QnUuid QnResourceTypePool::getResourceTypeId(const QString& manufacture, const QString& name, bool showWarning) const
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     for(const QnResourceTypePtr& rt: m_resourceTypeMap)
     {
         if (rt->getManufacture()==manufacture && rt->getName().compare(name, Qt::CaseInsensitive) == 0)
@@ -203,7 +209,7 @@ QnUuid QnResourceTypePool::getFixedResourceTypeId(const QString& name) const {
 
 QnUuid QnResourceTypePool::getLikeResourceTypeId(const QString& manufacture, const QString& name) const
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     QnUuid result;
     int bestLen = -1;
     for(const QnResourceTypePtr& rt: m_resourceTypeMap)
@@ -226,20 +232,20 @@ QnUuid QnResourceTypePool::getLikeResourceTypeId(const QString& manufacture, con
 
 bool QnResourceTypePool::isEmpty() const
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     return m_resourceTypeMap.isEmpty();
 }
 
 QnResourceTypePool::QnResourceTypeMap QnResourceTypePool::getResourceTypeMap() const
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     return QnResourceTypeMap(m_resourceTypeMap);
 }
 
 QnResourceTypePtr QnResourceTypePool::desktopCameraResourceType() const {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     if (!m_desktopCamResourceType) 
     {
         for(auto itr = m_resourceTypeMap.begin(); itr != m_resourceTypeMap.end(); ++itr)

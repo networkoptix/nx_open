@@ -1,12 +1,11 @@
-#ifndef MERGE_SYSTEMS_TOOL_H
-#define MERGE_SYSTEMS_TOOL_H
+#pragma once
 
 #include <QtCore/QObject>
 #include <QtNetwork/QHostAddress>
 
 #include <core/resource/resource_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
-#include <utils/network/module_information.h>
+#include <network/module_information.h>
 
 class QnMergeSystemsTool : public QObject, public QnWorkbenchContextAware {
     Q_OBJECT
@@ -25,9 +24,9 @@ public:
 
     explicit QnMergeSystemsTool(QObject *parent = 0);
 
-    void pingSystem(const QUrl &url, const QString &user, const QString &password);
-    int mergeSystem(const QnMediaServerResourcePtr &proxy, const QUrl &url, const QString &user, const QString &password, bool ownSettings);
-    int configureIncompatibleServer(const QnMediaServerResourcePtr &proxy, const QUrl &url, const QString &user, const QString &password);
+    void pingSystem(const QUrl &url, const QString &password);
+    int mergeSystem(const QnMediaServerResourcePtr &proxy, const QUrl &url, const QString &password, bool ownSettings);
+    int configureIncompatibleServer(const QnMediaServerResourcePtr &proxy, const QUrl &url, const QString &password);
 
 signals:
     void systemFound(const QnModuleInformation &moduleInformation, const QnMediaServerResourcePtr &discoverer, int errorCode);
@@ -39,8 +38,5 @@ private slots:
 
 private:
     QHash<int, QnMediaServerResourcePtr> m_serverByRequestHandle;
-    QString m_password;
     QPair<ErrorCode, QnModuleInformation> m_foundModule;
 };
-
-#endif // MERGE_SYSTEMS_TOOL_H

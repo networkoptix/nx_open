@@ -7,6 +7,20 @@
 
 #include <utils/common/warnings.h>
 
+namespace
+{
+    const qreal kOverlayWidgetAnimationSpeed = 1.0;
+}
+
+detail::OverlayedBase::OverlayWidget::OverlayWidget()
+    : visibility(OverlayVisibility::Invisible)
+    , widget(nullptr)
+    , childWidget(nullptr)
+    , boundWidget(nullptr)
+    , rotationTransform(nullptr)
+{}
+
+
 void detail::OverlayedBase::initOverlayed(QGraphicsWidget *widget) {
     m_widget = widget;
     m_overlayVisible = false;
@@ -85,7 +99,8 @@ detail::OverlayedBase::OverlayVisibility detail::OverlayedBase::overlayWidgetVis
     return index == -1 ? Invisible : m_overlayWidgets[index].visibility;
 }
 
-void detail::OverlayedBase::setOverlayWidgetVisibility(QGraphicsWidget *widget, OverlayVisibility visibility) {
+void detail::OverlayedBase::setOverlayWidgetVisibility(QGraphicsWidget *widget, OverlayVisibility visibility, bool animate)
+{
     int index = overlayWidgetIndex(widget);
     if(index == -1)
         return;
@@ -94,14 +109,15 @@ void detail::OverlayedBase::setOverlayWidgetVisibility(QGraphicsWidget *widget, 
         return;
 
     m_overlayWidgets[index].visibility = visibility;
-    updateOverlayWidgetsVisibility();
+    updateOverlayWidgetsVisibility(animate);
 }
 
 bool detail::OverlayedBase::isOverlayVisible() const {
     return m_overlayVisible;
 }
 
-void detail::OverlayedBase::setOverlayVisible(bool visible, bool animate) {
+void detail::OverlayedBase::setOverlayVisible(bool visible, bool animate)
+{
     if (m_overlayVisible == visible)
         return;
 
@@ -109,47 +125,70 @@ void detail::OverlayedBase::setOverlayVisible(bool visible, bool animate) {
     updateOverlayWidgetsVisibility(animate);
 }
 
-void detail::OverlayedBase::updateOverlayWidgetsGeometry() {
-    foreach(const OverlayWidget &overlay, m_overlayWidgets) {
+void detail::OverlayedBase::updateOverlayWidgetsGeometry()
+{
+    for(const OverlayWidget &overlay: m_overlayWidgets)
+    {
         QSizeF size = m_widget->size();
 
-        if(overlay.rotationTransform) {
+        if (overlay.rotationTransform)
+        {
             overlay.rotationTransform->setAngle(m_overlayRotation);
 
             if(m_overlayRotation == Qn::Angle90 || m_overlayRotation == Qn::Angle270)
                 size.transpose();
         }
 
-        if(overlay.boundWidget) {
+        if (overlay.boundWidget)
             overlay.boundWidget->setFixedSize(size);
-        } else {
+        else
             overlay.widget->resize(size);
-        }
     }
 }
 
-void detail::OverlayedBase::updateOverlayWidgetsVisibility(bool animate) {
-    foreach(const OverlayWidget &overlay, m_overlayWidgets) {
-        if(overlay.visibility == UserVisible)
+void detail::OverlayedBase::updateOverlayWidgetsVisibility(bool animate)
+{
+    for(const OverlayWidget &overlay: m_overlayWidgets)
+    {
+        if (overlay.visibility == UserVisible)
             continue;
 
         bool visible = m_overlayVisible;
 
-        if(overlay.visibility == Invisible) {
+        if (overlay.visibility == Invisible)
             visible = false;
-        } else if(overlay.visibility == Visible) {
+        else if(overlay.visibility == Visible)
             visible = true;
-        } 
+
         setOverlayWidgetVisible(overlay.widget, visible, animate);
     }
 }
 
-void detail::OverlayedBase::setOverlayWidgetVisible(QGraphicsWidget* widget, bool visible /*= true*/, bool animate /*= true*/) {
+void detail::OverlayedBase::setOverlayWidgetVisible(QGraphicsWidget* widget, bool visible /*= true*/, bool animate /*= true*/)
+{
+    if (!widget)
+        return;
+
     qreal opacity = visible ? 1.0 : 0.0;
 
-    if(animate) {
-        opacityAnimator(widget, 1.0)->animateTo(opacity);
-    } else {
+    if(animate)
+        opacityAnimator(widget, kOverlayWidgetAnimationSpeed)->animateTo(opacity);
+    else
         widget->setOpacity(opacity);
+
+    Q_ASSERT_X(isOverlayWidgetVisible(widget) == visible, Q_FUNC_INFO, "Validate checking function");
+}
+
+bool detail::OverlayedBase::isOverlayWidgetVisible(QGraphicsWidget* widget)
+{
+    if (!widget)
+        return false;
+
+    if (hasOpacityAnimator(widget))
+    {
+        auto animator = opacityAnimator(widget, kOverlayWidgetAnimationSpeed);
+        if (animator->isRunning())
+            return !qFuzzyIsNull(animator->targetValue().toDouble());
     }
+    return !qFuzzyIsNull(widget->opacity());
 }

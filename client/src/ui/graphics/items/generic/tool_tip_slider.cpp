@@ -48,16 +48,6 @@ public:
 QnToolTipSlider::QnToolTipSlider(QGraphicsItem *parent):
     base_type(Qt::Horizontal, parent)
 {
-    init();
-}
-
-QnToolTipSlider::QnToolTipSlider(GraphicsSliderPrivate &dd, QGraphicsItem *parent):
-    base_type(dd, parent)
-{
-    init();
-}
-
-void QnToolTipSlider::init() {
     setOrientation(Qt::Horizontal);
 
     m_tooltipWidgetVisibility = 0.0;
@@ -74,14 +64,14 @@ void QnToolTipSlider::init() {
     registerAnimation(m_tooltipWidgetVisibilityAnimator);
 
     m_animationListener.reset(new QnToolTipSliderAnimationListener(this));
-    registerAnimation(m_animationListener.data());
+    registerAnimation(m_animationListener.data() );
 
     setToolTipItem(new QnStyledTooltipWidget(this));
     setAcceptHoverEvents(true);
 
     setFlag(ItemSendsScenePositionChanges, true);
 }
-
+  
 QnToolTipSlider::~QnToolTipSlider() {
     m_hideTimer.stop();
 }

@@ -9,7 +9,7 @@
 #include <mutex>
 
 #include <QtCore/QCryptographicHash>
-#include <QtCore/QMutexLocker>
+#include <utils/thread/mutex.h>
 
 #include <http/custom_headers.h>
 #include <utils/crypt/linux_passwd_crypt.h>
@@ -60,12 +60,17 @@ namespace nx_http
         terminate();
     }
 
+    AbstractStreamSocket* AsyncHttpClient::socket()
+    {
+        return m_socket.data();
+    }
+
     QSharedPointer<AbstractStreamSocket> AsyncHttpClient::takeSocket()
     {
         QSharedPointer<AbstractStreamSocket> result = m_socket;
 
         {
-            QMutexLocker lk( &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             m_terminated = true;
         }
         //after we set m_terminated to true with m_mutex locked socket event processing is stopped and m_socket cannot change its value
@@ -80,7 +85,7 @@ namespace nx_http
     void AsyncHttpClient::terminate()
     {
         {
-            QMutexLocker lk( &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             if( m_terminated )
                 return;
             m_terminated = true;
@@ -205,7 +210,7 @@ namespace nx_http
 
     quint64 AsyncHttpClient::totalBytesRead() const
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         return m_totalBytesRead;
     }
 
@@ -258,7 +263,7 @@ namespace nx_http
     {
         std::shared_ptr<AsyncHttpClient> sharedThis( shared_from_this() );
 
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         if( m_terminated )
             return;
 
@@ -303,7 +308,7 @@ namespace nx_http
     {
         std::shared_ptr<AsyncHttpClient> sharedThis( shared_from_this() );
 
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         if( m_terminated )
             return;
 
@@ -365,7 +370,7 @@ namespace nx_http
 
         std::shared_ptr<AsyncHttpClient> sharedThis( shared_from_this() );
 
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         if( m_terminated )
             return;
 
@@ -376,7 +381,7 @@ namespace nx_http
             if( reconnectIfAppropriate() )
                 return;
             NX_LOG(lit("Error reading (state %1) http response from %2. %3").arg( m_state ).arg( m_url.toString() ).arg( SystemError::toString( errorCode ) ), cl_logDEBUG1 );
-            m_state = 
+            m_state =
                 ((m_httpStreamReader.state() == HttpStreamReader::messageDone) &&
                     m_httpStreamReader.currentMessageNumber() == m_awaitedMessageNumber)
                 ? sDone
@@ -633,7 +638,7 @@ namespace nx_http
 
         m_state = sInit;
 
-        m_socket = QSharedPointer<AbstractStreamSocket>( SocketFactory::createStreamSocket(/*url.scheme() == lit("https")*/));
+        m_socket = QSharedPointer<AbstractStreamSocket>( SocketFactory::createStreamSocket(/*m_url.scheme() == lit("https")*/));
         m_connectionClosed = false;
         if( !m_socket->setNonBlockingMode( true ) ||
             !m_socket->setSendTimeout( m_sendTimeoutMs ) ||
@@ -775,6 +780,12 @@ namespace nx_http
         m_additionalHeaders.erase( key );
     }
 
+    void AsyncHttpClient::addRequestHeaders(const HttpHeaders& headers)
+    {
+        for (HttpHeaders::const_iterator itr = headers.begin(); itr != headers.end(); ++itr)
+            m_additionalHeaders.emplace( itr->first, itr->second);
+    }
+
     void AsyncHttpClient::serializeRequest()
     {
         m_requestBuffer.clear();
@@ -801,7 +812,6 @@ namespace nx_http
         md5HashCalc.addData( userPassword );
         return md5HashCalc.result().toHex();
     }
-
     QByteArray AsyncHttpClient::calcHa2(
         const QByteArray& method,
         const QByteArray& uri )
@@ -812,7 +822,6 @@ namespace nx_http
         md5HashCalc.addData( uri );
         return md5HashCalc.result().toHex();
     }
-
     QByteArray AsyncHttpClient::calcResponse(
         const QByteArray& ha1,
         const QByteArray& nonce,
@@ -826,7 +835,6 @@ namespace nx_http
         md5HashCalc.addData( ha2 );
         return md5HashCalc.result().toHex();
     }
-
     QByteArray AsyncHttpClient::calcResponseAuthInt(
         const QByteArray& ha1,
         const QByteArray& nonce,
@@ -849,7 +857,6 @@ namespace nx_http
         md5HashCalc.addData( ha2 );
         return md5HashCalc.result().toHex();
     }
-
     bool AsyncHttpClient::calcDigestResponse(
         const QByteArray& method,
         const QString& userName,
@@ -861,7 +868,6 @@ namespace nx_http
     {
         if( wwwAuthenticateHeader.authScheme != header::AuthScheme::digest )
             return false;
-
         //reading params
         QMap<BufferType, BufferType>::const_iterator nonceIter = wwwAuthenticateHeader.params.find("nonce");
         const BufferType nonce = nonceIter != wwwAuthenticateHeader.params.end() ? nonceIter.value() : BufferType();
@@ -869,10 +875,8 @@ namespace nx_http
         const BufferType realm = realmIter != wwwAuthenticateHeader.params.end() ? realmIter.value() : BufferType();
         QMap<BufferType, BufferType>::const_iterator qopIter = wwwAuthenticateHeader.params.find("qop");
         const BufferType qop = qopIter != wwwAuthenticateHeader.params.end() ? qopIter.value() : BufferType();
-
         if( qop.indexOf("auth-int") != -1 ) //TODO #ak qop can have value "auth,auth-int". That should be supported
             return false;   //qop=auth-int is not supported
-
         const BufferType& ha1 = predefinedHA1
             ? predefinedHA1.get()
             : calcHa1(
@@ -888,10 +892,8 @@ namespace nx_http
         digestAuthorizationHeader->addParam( "realm", realm );
         digestAuthorizationHeader->addParam( "nonce", nonce );
         digestAuthorizationHeader->addParam( "uri", url.path().toLatin1() );
-
         const BufferType nonceCount = "00000001";     //TODO #ak generate it
         const BufferType clientNonce = "0a4f113b";    //TODO #ak generate it
-
         QByteArray digestResponse;
         if( qop.isEmpty() )
         {
@@ -907,7 +909,6 @@ namespace nx_http
         digestAuthorizationHeader->addParam( "response", digestResponse );
         return true;
     }
-
     AsyncHttpClientPtr AsyncHttpClient::create()
     {
         return AsyncHttpClientPtr( std::shared_ptr<AsyncHttpClient>( new AsyncHttpClient() ) );
@@ -1114,21 +1115,42 @@ namespace nx_http
         const nx_http::HttpHeaders& extraHeaders,
         AsyncHttpClient::AuthType authType )
     {
-        nx_http::AsyncHttpClientPtr httpClientCaptured = nx_http::AsyncHttpClient::create();
-        httpClientCaptured->setAdditionalHeaders(extraHeaders);
-        httpClientCaptured->setAuthType(authType);
+        auto handler = [completionHandler](SystemError::ErrorCode osErrorCode, int statusCode, nx_http::StringType, nx_http::BufferType msgBody )
+        {
+            completionHandler(osErrorCode, statusCode, msgBody);
+        };
+        return downloadFileAsyncEx(url, handler, extraHeaders, authType);
+    }
 
+    bool downloadFileAsyncEx(
+        const QUrl& url,
+        std::function<void(SystemError::ErrorCode, int, nx_http::StringType, nx_http::BufferType)> completionHandler,
+        const nx_http::HttpHeaders& extraHeaders,
+        AsyncHttpClient::AuthType authType )
+    {
+        nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();
+        httpClient->setAdditionalHeaders(extraHeaders);
+        httpClient->setAuthType(authType);
+        return downloadFileAsyncEx(url, completionHandler, std::move(httpClient));
+    }
+
+    bool downloadFileAsyncEx(
+        const QUrl& url,
+        std::function<void(SystemError::ErrorCode, int, nx_http::StringType, nx_http::BufferType)> completionHandler,
+        nx_http::AsyncHttpClientPtr httpClientCaptured)
+    {
         auto requestCompletionFunc = [httpClientCaptured, completionHandler]
-            ( nx_http::AsyncHttpClientPtr httpClient ) mutable
+        ( nx_http::AsyncHttpClientPtr httpClient ) mutable
         {
             httpClientCaptured->disconnect( nullptr, (const char*)nullptr );
             httpClientCaptured.reset();
 
             if( httpClient->failed() )
                 return completionHandler(
-                    SystemError::connectionReset,
-                    nx_http::StatusCode::ok,
-                    nx_http::BufferType() );
+                SystemError::connectionReset,
+                nx_http::StatusCode::ok,
+                nx_http::StringType(),
+                nx_http::BufferType() );
 
             if( httpClient->response()->statusLine.statusCode != nx_http::StatusCode::ok &&
                 httpClient->response()->statusLine.statusCode != nx_http::StatusCode::partialContent )
@@ -1136,12 +1158,14 @@ namespace nx_http
                 return completionHandler(
                     SystemError::noError,
                     httpClient->response()->statusLine.statusCode,
-                    nx_http::BufferType() );
+                    nx_http::StringType(),
+                    nx_http::BufferType());
             }
 
-            completionHandler( 
+            completionHandler(
                 SystemError::noError,
                 httpClient->response()->statusLine.statusCode,
+                httpClient->contentType(),
                 httpClient->fetchMessageBodyBuffer() );
         };
         QObject::connect(
@@ -1187,4 +1211,98 @@ namespace nx_http
 
         return resultingErrorCode;
     }
+
+    bool uploadDataAsync(const QUrl &url
+        , const QByteArray &data
+        , const QByteArray &contentType
+        , const nx_http::HttpHeaders &extraHeaders
+        , const UploadCompletionHandler &callback
+        , const AsyncHttpClient::AuthType authType
+        , const QString &user
+        , const QString &password)
+    {
+        nx_http::AsyncHttpClientPtr httpClientHolder = nx_http::AsyncHttpClient::create();
+        httpClientHolder->setAdditionalHeaders(extraHeaders);
+        if (!user.isEmpty())
+            httpClientHolder->setUserName(user);
+        if (!password.isEmpty())
+            httpClientHolder->setUserPassword(password);
+
+        httpClientHolder->setAuthType(authType);
+
+        auto completionFunc = [callback, httpClientHolder]
+            (nx_http::AsyncHttpClientPtr httpClient) mutable
+        {
+            httpClientHolder->disconnect(nullptr, static_cast<const char *>(nullptr));
+            httpClientHolder.reset();
+
+            if( httpClient->failed() )
+                return callback(SystemError::connectionReset, nx_http::StatusCode::ok);
+
+            const auto response = httpClient->response();
+            const auto statusLine = response->statusLine;
+            if((statusLine.statusCode != nx_http::StatusCode::ok)
+                && (statusLine.statusCode != nx_http::StatusCode::partialContent))
+            {
+                return callback(SystemError::noError, statusLine.statusCode);
+            }
+
+            callback(SystemError::noError, statusLine.statusCode);
+        };
+
+        QObject::connect(httpClientHolder.get(), &nx_http::AsyncHttpClient::done,
+            httpClientHolder.get(), completionFunc, Qt::DirectConnection);
+
+        if( !httpClientHolder->doPost(url, contentType, data))
+        {
+            // To destroy http client
+            httpClientHolder->disconnect(nullptr, static_cast<const char *>(nullptr));
+            return false;
+        }
+        return true;
+    }
+
+    SystemError::ErrorCode uploadDataSync(const QUrl &url
+        , const QByteArray &data
+        , const QByteArray &contentType
+        , const QString &user
+        , const QString &password
+        , const AsyncHttpClient::AuthType authType
+        , nx_http::StatusCode::Value *httpCode)
+    {
+        bool done = false;
+        SystemError::ErrorCode result = SystemError::noError;
+        std::mutex mutex;
+        std::condition_variable waiter;
+
+
+        const auto callback = [&result, &mutex, &waiter, &done, httpCode]
+            (SystemError::ErrorCode errorCode, int statusCode)
+        {
+            result = errorCode;
+            if (httpCode)
+            {
+                *httpCode = (errorCode == SystemError::noError
+                    ? static_cast<nx_http::StatusCode::Value>(statusCode)
+                    : nx_http::StatusCode::internalServerError);
+            }
+
+            std::unique_lock<std::mutex> lk(mutex);
+            done = true;
+            waiter.notify_all();
+        };
+
+        const bool uploadStarted = uploadDataAsync(url, data, contentType
+            , nx_http::HttpHeaders(), callback, authType, user, password);
+
+        if(!uploadStarted)
+            return SystemError::getLastOSErrorCode();
+
+        std::unique_lock<std::mutex> guard(mutex);
+        while(!done)
+            waiter.wait(guard);
+
+        return result;
+    }
+
 }

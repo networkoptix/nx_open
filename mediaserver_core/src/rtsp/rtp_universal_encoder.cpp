@@ -1,5 +1,5 @@
 #include "rtp_universal_encoder.h"
-#include "utils/network/rtp_stream_parser.h"
+#include "network/rtp_stream_parser.h"
 #include "common/common_module.h"
 
 #include <core/resource/param.h>

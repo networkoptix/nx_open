@@ -41,14 +41,17 @@ public:
                                     bool useHtml);
 
     static QString eventDetailsWithTimestamp(const QnBusinessEventParameters &params, int aggregationCount, const QString& delimiter);
-    static QString eventDetails(const QnBusinessEventParameters &params, int aggregationCount, const QString& delimiter);
+    static QString eventDetails(const QnBusinessEventParameters &params, const QString& delimiter);
     static QString renderEventDetailsText(QVariantHash contextMap);
 
     //TODO: #vasilenko isPublic field is not used, why?
     static QString urlForCamera(const QnUuid& id, qint64 timestampUsec, bool isPublic);
 
     static QString toggleStateToString(QnBusiness::EventState state);
-    static QString eventTypeString(QnBusiness::EventType eventType, QnBusiness::EventState eventState, QnBusiness::ActionType actionType);
+    static QString eventTypeString(QnBusiness::EventType eventType,
+                                   QnBusiness::EventState eventState,
+                                   QnBusiness::ActionType actionType,
+                                   const QnBusinessActionParameters &actionParams);
     static QString bruleDescriptionText(const QnBusinessEventRulePtr& bRule);
     static QnResourcePtr eventSource(const QnBusinessEventParameters &params);
 
@@ -60,6 +63,8 @@ public:
 
     static QString eventTimestamp(const QnBusinessEventParameters &params, int aggregationCount);
     static QString eventTimestampShort(const QnBusinessEventParameters &params, int aggregationCount);
+
+    static QString getResoureNameFromParams(const QnBusinessEventParameters& params, bool useIp = false);
 };
 
 #endif // __BUSINESS_STRINGS_HELPER_H__

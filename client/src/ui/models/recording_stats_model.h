@@ -15,6 +15,8 @@ class QnSortedRecordingStatsModel: public QSortFilterProxyModel
 public:
     typedef QSortFilterProxyModel base_type;
     QnSortedRecordingStatsModel(QObject *parent = 0) : base_type(parent) {}
+
+    static const QString kForeignCameras;
 protected:
     virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
 };

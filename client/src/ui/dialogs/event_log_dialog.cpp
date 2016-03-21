@@ -6,8 +6,6 @@
 #include <QtWidgets/QMenu>
 #include <QtGui/QMouseEvent>
 
-#include <utils/common/event_processors.h>
-
 #include <core/resource/resource_name.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_resource.h>
@@ -27,7 +25,6 @@
 #include <ui/help/help_topics.h>
 #include <ui/dialogs/custom_file_dialog.h>
 #include <ui/dialogs/resource_selection_dialog.h>
-#include <ui/models/business_rule_view_model.h>
 #include <ui/models/event_log_model.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/skin.h>
@@ -36,8 +33,16 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
+#include <utils/common/event_processors.h>
+#include <utils/common/delayed.h>
+
 namespace {
     const int ProlongedActionRole = Qt::UserRole + 2;
+
+    const int kQueryTimeoutMs = 15000;
+
+    /* Really here can be any number, that is not equal to zero (success code). */
+    const int kTimeoutStatus = -1;
 }
 
 
@@ -137,7 +142,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
     connect(ui->eventComboBox,      QnComboboxCurrentIndexChanged,      this,   &QnEventLogDialog::updateData);
     connect(ui->actionComboBox,     QnComboboxCurrentIndexChanged,      this,   &QnEventLogDialog::updateData);
     connect(ui->refreshButton,      &QAbstractButton::clicked,          this,   &QnEventLogDialog::updateData);
-    connect(ui->eventRulesButton,   &QAbstractButton::clicked,          this->context()->action(Qn::BusinessEventsAction), &QAction::trigger);
+    connect(ui->eventRulesButton,   &QAbstractButton::clicked,          this->context()->action(QnActions::BusinessEventsAction), &QAction::trigger);
 
     connect(ui->cameraButton,       &QAbstractButton::clicked,          this,   &QnEventLogDialog::at_cameraButton_clicked);
     connect(ui->gridEvents,         &QTableView::clicked,               this,   &QnEventLogDialog::at_eventsGrid_clicked);
@@ -235,7 +240,7 @@ void QnEventLogDialog::updateData()
     }
 
     ui->dateEditFrom->setDateRange(QDate(2000,1,1), ui->dateEditTo->date());
-    ui->dateEditTo->setDateRange(ui->dateEditFrom->date(), QDateTime::currentDateTime().date());
+    ui->dateEditTo->setDateRange(ui->dateEditFrom->date(), QDateTime::currentDateTime().date().addMonths(1)); // 1 month forward should cover all local timezones diffs.
 
     m_updateDisabled = false;
     m_dirty = false;
@@ -247,21 +252,29 @@ void QnEventLogDialog::query(qint64 fromMsec, qint64 toMsec,
 {
     m_requests.clear();
     m_allEvents.clear();
+    QPointer<QnEventLogDialog> guard(this);
 
-
-    auto mediaServerList = qnResPool->getAllServers();
-    for (const QnMediaServerResourcePtr& mserver: mediaServerList)
+    const auto onlineServers = qnResPool->getAllServers(Qn::Online);
+    for(const QnMediaServerResourcePtr& mserver: onlineServers)
     {
-        if (mserver->getStatus() == Qn::Online)
+        int handle = mserver->apiConnection()->getEventLogAsync(
+            fromMsec, toMsec,
+            m_filterCameraList,
+            eventType,
+            actionType,
+            QnUuid(),
+            this, SLOT(at_gotEvents(int, const QnBusinessActionDataListPtr&, int)));
+
+        m_requests << handle;
+
+        executeDelayed([this, handle, guard]
         {
-            m_requests << mserver->apiConnection()->getEventLogAsync(
-                fromMsec, toMsec,
-                m_filterCameraList,
-                eventType,
-                actionType,
-                QnUuid(),
-                this, SLOT(at_gotEvents(int, const QnBusinessActionDataListPtr&, int)));
-        }
+            if (!guard)
+                return;
+
+            at_gotEvents(kTimeoutStatus, QnBusinessActionDataListPtr(), handle);
+
+        }, kQueryTimeoutMs);
     }
 }
 
@@ -269,11 +282,11 @@ void QnEventLogDialog::retranslateUi()
 {
     ui->retranslateUi(this);
 
-    const QString cameraButtonText = (m_filterCameraList.empty() 
+    const QString cameraButtonText = (m_filterCameraList.empty()
         ? QnDeviceDependentStrings::getDefaultNameFromSet(
             tr("<Any Device>"),
             tr("<Any Camera>")
-            )       
+            )
         : lit("<%1>").arg(QnDeviceDependentStrings::getNumericName(m_filterCameraList, false)));
 
     ui->cameraButton->setText(cameraButtonText);
@@ -325,7 +338,7 @@ void QnEventLogDialog::updateHeaderWidth()
             cache << targetText.mid(prevPos, targetText.length() - prevPos);
         }
     }
-    
+
     foreach(const QString& str, cache)
         w = qMax(w, fm.size(0, str).width());
 
@@ -337,33 +350,12 @@ void QnEventLogDialog::at_gotEvents(int httpStatus, const QnBusinessActionDataLi
     if (!m_requests.contains(requestNum))
         return;
     m_requests.remove(requestNum);
-    if (httpStatus == 0 && !events->empty())
+
+    if (httpStatus == 0 && events && !events->empty())
         m_allEvents << events;
-    if (m_requests.isEmpty()) {
+
+    if (m_requests.isEmpty())
         requestFinished();
-    }
-}
-
-bool QnEventLogDialog::isCameraMatched(QnBusinessRuleViewModel* ruleModel) const
-{
-    if (m_filterCameraList.isEmpty())
-        return true;
-    QnBusiness::EventType eventType = ruleModel->eventType();
-    if (!QnBusiness::requiresCameraResource(eventType))
-        return false;
-    if (ruleModel->eventResources().isEmpty())
-        return true;
-
-    for (int i = 0; i < m_filterCameraList.size(); ++i)
-    {
-        for (int j = 0; j < ruleModel->eventResources().size(); ++j)
-        {
-            if (m_filterCameraList[i]->getId() == ruleModel->eventResources()[j]->getId())
-                return true;
-        }
-    }
-
-    return false;
 }
 
 void QnEventLogDialog::requestFinished()
@@ -395,7 +387,7 @@ void QnEventLogDialog::at_eventsGrid_clicked(const QModelIndex& idx)
         QnActionParameters params(resources);
         params.setArgument(Qn::ItemTimeRole, pos);
 
-        context()->menu()->trigger(Qn::OpenInNewLayoutAction, params);
+        context()->menu()->trigger(QnActions::OpenInNewLayoutAction, params);
 
         if (isMaximized())
             showNormal();
@@ -567,7 +559,7 @@ void QnEventLogDialog::enableUpdateData()
 
 void QnEventLogDialog::setVisible(bool value)
 {
-    // TODO: #Elric use showEvent instead. 
+    // TODO: #Elric use showEvent instead.
 
     if (value && !isVisible())
         updateData();

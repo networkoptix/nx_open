@@ -1,5 +1,7 @@
 #include "frame_info.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <cstring>
 #include <cstdio>
 
@@ -508,3 +510,6 @@ CLVideoDecoderOutput* CLVideoDecoderOutput::rotated(int angle)
 
     return dstPict;
 }
+
+#endif // ENABLE_DATA_PROVIDERS
+

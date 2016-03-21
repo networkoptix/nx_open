@@ -47,6 +47,8 @@ protected:
     virtual bool eventFilter(QObject *o, QEvent *e) override;
     virtual void keyPressEvent(QKeyEvent *event) override;
 
+    virtual void showEvent(QShowEvent *event) override;
+
 public Q_SLOTS:
     virtual void accept() override;
     virtual void reject() override;
@@ -74,7 +76,7 @@ private slots:
     void updateControlButtons();
 
     void updateFilter();
-    
+
     void retranslateUi();
 
 private:
@@ -84,7 +86,7 @@ private:
 
     bool saveAll();
 
-    void deleteRule(QnBusinessRuleViewModel* ruleModel);
+    void deleteRule(const QnBusinessRuleViewModelPtr &ruleModel);
 
     bool advancedMode() const;
     void setAdvancedMode(bool value);

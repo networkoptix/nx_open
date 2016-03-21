@@ -14,6 +14,8 @@ class QnResourcePropertyDictionary: public QObject,
 {
     Q_OBJECT
 public:
+    QnResourcePropertyDictionary(QObject *parent = NULL);
+
     void saveParams(const QnUuid& resourceId);
     int saveParamsAsync(const QnUuid& resourceId);
     int saveParamsAsync(const QList<QnUuid>& resourceId);
@@ -42,8 +44,8 @@ private:
     QMap<QnUuid, QnResourcePropertyList> m_modifiedItems;
     //!Used to mark value as unsaved in case of ec2 request failure
     QMap<int, ec2::ApiResourceParamWithRefDataList> m_requestInProgress;
-    mutable QMutex m_mutex;
-    mutable QMutex m_requestMutex;
+    mutable QnMutex m_mutex;
+    mutable QnMutex m_requestMutex;
 };
 
 #define propertyDictionary QnResourcePropertyDictionary::instance()

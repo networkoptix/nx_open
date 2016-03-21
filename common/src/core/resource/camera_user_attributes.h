@@ -13,6 +13,7 @@
 
 #include <core/misc/schedule_task.h>
 #include <core/ptz/media_dewarping_params.h>
+#include <core/resource/resource_fwd.h>
 
 #include "motion_window.h"
 
@@ -39,8 +40,9 @@ public:
     //!User-given name of camera (can be different from resource name). This is name shown to the user
     QString name;
     QString groupName;
-    QnMediaDewarpingParams dewarpingParams;
-    Qn::FailoverPriority failoverPriority;
+    QnMediaDewarpingParams  dewarpingParams;
+    Qn::FailoverPriority    failoverPriority;
+    Qn::CameraBackupQualities   backupQualities;
 
     QnCameraUserAttributes();
 

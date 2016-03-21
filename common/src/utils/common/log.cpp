@@ -6,7 +6,7 @@
 #include <QtCore/QDateTime>
 #include <QtCore/QLocale>
 
-#ifdef Q_OS_LINUX
+#if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
 #   include <sys/types.h>
 #   include <linux/unistd.h>
 static pid_t gettid(void) { return syscall(__NR_gettid); }
@@ -92,7 +92,7 @@ public:
 
         const std::string& str = ostr.str();
         {
-            QMutexLocker mutx(&m_mutex);
+            QnMutexLocker mutx( &m_mutex );
             if (!m_file.isOpen()) {
 
                 switch (logLevel) {
@@ -120,7 +120,7 @@ public:
 
     QString syncCurrFileName() const
     {
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock( &m_mutex );
         return m_baseName + QLatin1String(".log");
     }
 
@@ -187,7 +187,7 @@ private:
 
     QFile m_file;
 
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
 };
 
 
@@ -208,7 +208,7 @@ public:
 
     QnLog* get( int logID )
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         QnLog*& log = m_logs[logID];
         if( !log )
             log = new QnLog();
@@ -217,19 +217,19 @@ public:
 
     bool exists( int logID )
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         return m_logs.find(logID) != m_logs.cend();
     }
 
     bool put( int logID, QnLog* log )
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         return m_logs.insert( std::make_pair( logID, log ) ).second;
     }
 
 private:
     std::map<int, QnLog*> m_logs;
-    QMutex m_mutex;
+    QnMutex m_mutex;
 };
 
 Q_GLOBAL_STATIC(QnLogs, qn_logsInstance);

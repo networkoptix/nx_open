@@ -133,7 +133,14 @@ angular.module('webadminApp')
                 }
                 this.getCurrentUser().then(function(result){
                     var isAdmin = result.data.reply.isAdmin || (result.data.reply.permissions & Config.globalEditServersPermissions);
-                    deferred.resolve({isAdmin:isAdmin,name:result.data.reply.name});
+
+                    var isOwner = result.data.reply.isAdmin ;
+
+                    deferred.resolve({
+                        isAdmin:isAdmin,
+                        isOwner:isOwner,
+                        name:result.data.reply.name
+                    });
                 });
                 return deferred.promise;
             },
@@ -206,6 +213,19 @@ angular.module('webadminApp')
             logLevel:function(logId,level){
                 return wrapGet(proxy + '/api/logLevel?id=' + logId + (level?'&value=' + level:''));
             },
+            systemSettings:function(setParams){
+                //return;
+                if(!setParams) {
+                    return wrapGet(proxy + '/api/systemSettings');
+                }else{
+                    var requestParams = [];
+                    for(var key in setParams){
+                        requestParams.push(key + '=' + setParams[key]);
+                    }
+
+                    return wrapGet(proxy + '/api/systemSettings?' + requestParams.join('&'));
+                }
+            },
             getRecords:function(serverUrl, physicalId, startTime, endTime, detail, limit, label, periodsType){
 
                 //console.log('getRecords',serverUrl,physicalId,startTime,endTime,detail,periodsType);
@@ -230,6 +250,7 @@ angular.module('webadminApp')
                 if( proxy == Config.demo){
                     serverUrl = proxy + '/';
                 }
+
                 //RecordedTimePeriods
                 return  wrapGet(serverUrl + 'ec2/recordedTimePeriods' +
                     '?' + (label||'') +
@@ -240,6 +261,19 @@ angular.module('webadminApp')
                     '&periodsType=' + periodsType +
                     (limit?'&limit=' + limit:'') +
                     '&flat&keepSmallChunks');
+            },
+            debugFunctionUrl:function(url,getParams){
+                var delimeter = url.indexOf('?')>=0? '&':'?';
+                return proxy + url + delimeter + $.param(getParams)
+            },
+            debugFunction:function(method,url,getParams,postParams){
+                switch(method){
+                    case "GET":
+                        return $http.get(this.debugFunctionUrl(url,getParams));
+                    case "POST":
+                        return $http.post(this.debugFunctionUrl(url,getParams), postParams);
+
+                }
             }
         };
     });

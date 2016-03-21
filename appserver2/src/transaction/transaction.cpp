@@ -60,9 +60,6 @@ namespace ec2
             REGISTER_COMMAND(getCameraUserAttributes),
             REGISTER_COMMAND(getCamerasEx),
 
-            REGISTER_COMMAND(addCameraBookmarkTags),
-            REGISTER_COMMAND(getCameraBookmarkTags),
-            REGISTER_COMMAND(removeCameraBookmarkTags),
             REGISTER_COMMAND(removeCameraHistoryItem),
 
             REGISTER_COMMAND(getMediaServers),
@@ -118,12 +115,8 @@ namespace ec2
             REGISTER_COMMAND(uploadUpdateResponce),
             REGISTER_COMMAND(installUpdate),
 
-            REGISTER_COMMAND(addCameraBookmarkTags),
-            REGISTER_COMMAND(getCameraBookmarkTags),
-            REGISTER_COMMAND(removeCameraBookmarkTags),
-
-            REGISTER_COMMAND(moduleInfo),
-            REGISTER_COMMAND(moduleInfoList),
+            REGISTER_COMMAND(discoveredServerChanged),
+            REGISTER_COMMAND(discoveredServersList),
 
             REGISTER_COMMAND(discoverPeer),
             REGISTER_COMMAND(addDiscoveryInformation),
@@ -210,8 +203,6 @@ namespace ec2
                 val == removeCamera ||
                 val == addCameraHistoryItem ||
                 val == removeCameraHistoryItem ||
-                val == addCameraBookmarkTags ||
-                val == removeCameraBookmarkTags ||
                 val == saveMediaServer ||
                 val == saveServerUserAttributes ||
                 val == saveServerUserAttributesList ||

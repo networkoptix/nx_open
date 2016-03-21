@@ -35,7 +35,7 @@ private:
     void clearActiveTour();
 
 private:
-    QMutex m_mutex;
+    QnMutex m_mutex;
     QnResourcePropertyAdaptor<QnPtzTourHash> *m_adaptor;
     QnPtzTour m_activeTour;
     QnTourPtzExecutor *m_executor;

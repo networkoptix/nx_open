@@ -310,6 +310,7 @@ void FWriteFile( HANDLE hFile , const char* fmt , ... ) {
     char pBuffer[1024];
     DWORD dwWritten;
     int iRet = vsprintf(pBuffer,fmt,vl);
+    va_end(vl);
     if( iRet <=0 )
         return;
     WriteFile(hFile,pBuffer,iRet,&dwWritten,NULL);

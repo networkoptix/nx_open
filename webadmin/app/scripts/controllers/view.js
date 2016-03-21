@@ -3,6 +3,11 @@
 angular.module('webadminApp').controller('ViewCtrl',
     function ($scope,$rootScope,$location,$routeParams,mediaserver,cameraRecords,$timeout,$q,$sessionStorage,$localStorage) {
 
+        var channels = {
+            Auto: 'lo',
+            High: 'hi',
+            Low: 'lo'
+        };
         $scope.session = $sessionStorage;
         $scope.storage = $localStorage;
         $scope.storage.serverStates = $scope.storage.serverStates || {};
@@ -19,6 +24,12 @@ angular.module('webadminApp').controller('ViewCtrl',
         $scope.activeCamera = null;
         $scope.searchCams = '';
 
+
+        mediaserver.systemSettings().then(function(r){
+            $scope.webclientDisabled = r.data.reply.settings.crossdomainEnabled == 'false' ;
+            console.log($scope.webclientDisabled, r.data.reply.settings.crossdomainEnabled);
+        });
+
         var isAdmin = false;
         var canViewLive = false;
         var canViewArchive = false;
@@ -30,9 +41,9 @@ angular.module('webadminApp').controller('ViewCtrl',
         $scope.activeResolution = 'Auto';
         // TODO: detect better resolution here?
         var transcodingResolutions = ['Auto', '1080p', '720p', '640p', '320p', '240p'];
-        var nativeResolutions = ['Auto', 'hi', 'lo'];
-        var onlyHiResolution =  ['Auto', 'hi'];
-        var onlyLoResolution =  ['Auto', 'lo'];
+        var nativeResolutions = ['Auto', 'High', 'Low'];
+        var onlyHiResolution =  ['Auto', 'High'];
+        var onlyLoResolution =  ['Auto', 'Low'];
 
         var reloadInterval = 5*1000;//30 seconds
         var quickReloadInterval = 3*1000;// 3 seconds if something was wrong
@@ -136,7 +147,8 @@ angular.module('webadminApp').controller('ViewCtrl',
             }
 
             //1. Does browser and server support webm?
-            if(!formatSupported('webm',false) || formatSupported('hls',true) && browserSupports('hls', false, true)){
+            if(!formatSupported('webm',false) || formatSupported('hls',true) && browserSupports('hls', false, true)
+                || Config.allowDebugMode && Config.debug.videoFormat == "flashls"){
                 $scope.iOSVideoTooLarge = false;
 
                 //1. collect resolutions with hls
@@ -152,11 +164,11 @@ angular.module('webadminApp').controller('ViewCtrl',
                     for (var i = 0; i < availableFormats.length; i++) {
                         if (availableFormats[i].encoderIndex == 0) {
                             if (!( window.jscd.os === 'iOS' && checkiOSResolution($scope.activeCamera) )) {
-                                streams.push('hi');
+                                streams.push('High');
                             }
                         }
                         if (availableFormats[i].encoderIndex == 1) {
-                            streams.push('lo');
+                            streams.push('Low');
                         }
                     }
                 }
@@ -248,12 +260,14 @@ angular.module('webadminApp').controller('ViewCtrl',
             var positionMedia = !live ? '&pos=' + (playing) : '';
 
             var resolution = $scope.activeResolution;
-            var resolutionHls = resolution === 'Auto'?'lo':resolution;
+            var resolutionHls = channels[resolution] || channels.Low;
+
 
             // Fix here!
-            if(resolutionHls === 'lo' && $scope.availableResolutions.indexOf('lo')<0){
-                resolutionHls = 'hi';
+            if(resolutionHls === channels.Low && $scope.availableResolutions.indexOf('Low')<0){
+                resolutionHls = channels.High;
             }
+
 
             $scope.acitveVideoSource = _.filter([
                 { src: ( serverUrl + '/hls/'   + cameraId + '.m3u8?'            + resolutionHls + positionMedia + authParam ), type: mimeTypes.hls, transport:'hls'},
@@ -263,7 +277,7 @@ angular.module('webadminApp').controller('ViewCtrl',
                 // { src: ( serverUrl + '/media/' + cameraId + '.mpjpeg?resolution=' + $scope.activeResolution + positionMedia + extParam ), type: mimeTypes.mjpeg , transport:'mjpeg'},
 
                 // Require plugin
-                { src: ( rtspUrl + '/' + cameraId + '?' + positionMedia + rstpAuthPararm  + '&stream=' + ($scope.activeResolution === 'lo'?1:0)), type: mimeTypes.rtsp, transport:'rtsp'}
+                { src: ( rtspUrl + '/' + cameraId + '?' + positionMedia + rstpAuthPararm  + '&stream=' + ($scope.activeResolution === 'Low'?1:0)), type: mimeTypes.rtsp, transport:'rtsp'}
             ],function(src){
                 return formatSupported(src.transport,false) && $scope.activeFormat === 'Auto'|| $scope.activeFormat === src.type;
             });

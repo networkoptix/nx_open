@@ -2,21 +2,23 @@
 #define QN_COMMON_MODULE_H
 
 #include <QtCore/QObject>
-#include <QtCore/QMutex>
-#include <QtCore/QMutexLocker>
+#include <utils/thread/mutex.h>
+#include <utils/thread/mutex.h>
+
+#include <core/resource/resource_fwd.h>
 
 #include <utils/common/singleton.h>
 #include <utils/common/instance_storage.h>
 #include <utils/common/software_version.h>
 #include <utils/common/uuid.h>
-#include <utils/network/module_information.h>
+#include "network/module_information.h"
 #include "nx_ec/data/api_runtime_data.h"
 
 class QnResourceDataPool;
 
 /**
  * Storage for common module's global state.
- * 
+ *
  * All singletons and initialization/deinitialization code goes here.
  */
 class QnCommonModule: public QObject, public QnInstanceStorage, public Singleton<QnCommonModule> {
@@ -30,7 +32,6 @@ public:
     using QnInstanceStorage::store;
 
     void bindModuleinformation(const QnMediaServerResourcePtr &server);
-    void bindModuleinformation(const QnUserResourcePtr &adminUser);
 
     QnResourceDataPool *dataPool() const {
         return m_dataPool;
@@ -55,6 +56,9 @@ public:
 
     void setRemoteGUID(const QnUuid& guid);
     QnUuid remoteGUID() const;
+
+    /** Server we are currently connected to. */
+    QnMediaServerResourcePtr currentServer() const;
 
     QUrl moduleUrl() const { return m_url; }
     void setModuleUlr(const QUrl& url) { m_url = url; }
@@ -106,6 +110,7 @@ signals:
     void moduleInformationChanged();
     void remoteIdChanged(const QnUuid &id);
     void systemIdentityTimeChanged(qint64 value, const QnUuid& sender);
+    void runningInstanceGUIDChanged();
 
 protected:
     static void loadResourceData(QnResourceDataPool *dataPool, const QString &fileName, bool required);
@@ -121,11 +126,11 @@ private:
     bool m_cloudMode;
     QnSoftwareVersion m_engineVersion;
     QnModuleInformation m_moduleInformation;
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     bool m_transcodingDisabled;
     QSet<QnUuid> m_allowedPeers;
     qint64 m_systemIdentityTime;
-    
+
     QByteArray m_adminPaswdHash;
     QByteArray m_adminPaswdDigest;
     bool m_lowPriorityAdminPassword;

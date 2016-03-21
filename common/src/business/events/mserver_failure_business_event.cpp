@@ -15,3 +15,8 @@ QnLicenseIssueBusinessEvent::QnLicenseIssueBusinessEvent(const QnResourcePtr& re
     base_type(QnBusiness::LicenseIssueEvent, resource, timeStamp, reasonCode, reasonText)
 {
 }
+
+QnBackupFinishedBusinessEvent::QnBackupFinishedBusinessEvent(const QnResourcePtr& resource, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString& reasonText):
+    base_type(QnBusiness::BackupFinishedEvent, resource, timeStamp, reasonCode, reasonText)
+{
+}

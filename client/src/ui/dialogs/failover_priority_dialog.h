@@ -20,6 +20,10 @@ public:
 
     const QnFailoverPriorityColors &colors() const;
     void setColors(const QnFailoverPriorityColors &colors);
+
+protected:
+    virtual void buttonBoxClicked(QDialogButtonBox::StandardButton button) override;
+
 private:
     void updatePriorityForSelectedCameras(Qn::FailoverPriority priority);
     

@@ -5,30 +5,36 @@
 #include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QMessageBox>
 
-#include "common/common_module.h"
-#include "core/resource_management/resource_pool.h"
-#include "core/resource/media_server_resource.h"
-#include "ui/common/ui_resource_name.h"
-#include "ui/style/warning_style.h"
-#include "ui/help/help_topics.h"
-#include "ui/help/help_topic_accessor.h"
-#include "utils/merge_systems_tool.h"
-#include "utils/common/util.h"
+#include <api/app_server_connection.h>
+#include <common/common_module.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/user_resource.h>
+#include <ui/common/ui_resource_name.h>
+#include <ui/style/warning_style.h>
+#include <ui/help/help_topics.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/actions/action_manager.h>
+#include <ui/workbench/watchers/workbench_user_watcher.h>
+#include <ui/workbench/workbench_context.h>
+#include <utils/merge_systems_tool.h>
+#include <utils/common/util.h>
 
 QnMergeSystemsDialog::QnMergeSystemsDialog(QWidget *parent) :
     base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::QnMergeSystemsDialog),
-    m_mergeTool(new QnMergeSystemsTool(this))
+    m_mergeTool(new QnMergeSystemsTool(this)),
+    m_successfullyFinished(false)
 {
     ui->setupUi(this);
 
     QStringList successMessage;
-    successMessage 
-        << tr("Success!") 
-        << QString() 
-        << QString() 
-        << tr("The system was configured successfully.") 
+    successMessage
+        << tr("Success!")
+        << QString()
+        << QString()
+        << tr("The system was configured successfully.")
         << tr("The servers from the remote system should appear in your system soon.");
     ui->successLabel->setText(successMessage.join(L'\n'));
 
@@ -37,6 +43,7 @@ QnMergeSystemsDialog::QnMergeSystemsDialog(QWidget *parent) :
     setWarningStyle(ui->errorLabel);
     m_mergeButton->hide();
     ui->buttonBox->button(QDialogButtonBox::Close)->hide();
+    ui->buttonBox->button(QDialogButtonBox::Ok)->hide();
 
     setHelpTopic(this, Qn::Systems_MergeSystems_Help);
 
@@ -59,6 +66,24 @@ QnMergeSystemsDialog::QnMergeSystemsDialog(QWidget *parent) :
 }
 
 QnMergeSystemsDialog::~QnMergeSystemsDialog() {}
+
+void QnMergeSystemsDialog::done(int result)
+{
+    base_type::done(result);
+
+    if (m_successfullyFinished && ui->remoteSystemRadioButton->isChecked())
+    {
+        m_successfullyFinished = false;
+
+        context()->instance<QnWorkbenchUserWatcher>()->setUserPassword(m_adminPassword);
+        QUrl url = QnAppServerConnectionFactory::url();
+        url.setPassword(m_adminPassword);
+        QnAppServerConnectionFactory::setUrl(url);
+
+        menu()->trigger(QnActions::ReconnectAction);
+        context()->instance<QnWorkbenchUserWatcher>()->setReconnectOnPasswordChange(true);
+    }
+}
 
 QUrl QnMergeSystemsDialog::url() const {
     /* filter unnecessary information from the URL */
@@ -125,10 +150,14 @@ void QnMergeSystemsDialog::at_urlComboBox_editingFinished() {
 }
 
 void QnMergeSystemsDialog::at_testConnectionButton_clicked() {
+    Q_ASSERT(context()->user()->isAdmin());
+    if (!context()->user()->isAdmin())
+        return;
+
     m_discoverer.clear();
     m_url.clear();
-    m_user.clear();
-    m_password.clear();
+    m_adminPassword.clear();
+    m_successfullyFinished = false;
     updateConfigurationBlock();
 
     QUrl url = QUrl::fromUserInput(ui->urlComboBox->currentText());
@@ -147,9 +176,8 @@ void QnMergeSystemsDialog::at_testConnectionButton_clicked() {
     }
 
     m_url = url;
-    m_user = lit("admin");
-    m_password = password;
-    m_mergeTool->pingSystem(m_url, m_user, m_password);
+    m_adminPassword = password;
+    m_mergeTool->pingSystem(m_url, m_adminPassword);
     ui->buttonBox->showProgress(tr("Testing..."));
 }
 
@@ -157,12 +185,17 @@ void QnMergeSystemsDialog::at_mergeButton_clicked() {
     if (!m_discoverer)
         return;
 
+    m_successfullyFinished = false;
+
     bool ownSettings = ui->currentSystemRadioButton->isChecked();
     ui->credentialsGroupBox->setEnabled(false);
     ui->configurationWidget->setEnabled(false);
     m_mergeButton->setEnabled(false);
 
-    m_mergeTool->mergeSystem(m_discoverer, m_url, m_user, m_password, ownSettings);
+    if (!ownSettings)
+        context()->instance<QnWorkbenchUserWatcher>()->setReconnectOnPasswordChange(false);
+
+    m_mergeTool->mergeSystem(m_discoverer, m_url, m_adminPassword, ownSettings);
     ui->buttonBox->showProgress(tr("Merging Systems..."));
 }
 
@@ -212,20 +245,35 @@ void QnMergeSystemsDialog::at_mergeTool_systemFound(const QnModuleInformation &m
     updateConfigurationBlock();
 }
 
-void QnMergeSystemsDialog::at_mergeTool_mergeFinished(int errorCode, const QnModuleInformation &moduleInformation) {
+void QnMergeSystemsDialog::at_mergeTool_mergeFinished(
+        int errorCode,
+        const QnModuleInformation &moduleInformation)
+{
+    Q_UNUSED(moduleInformation)
+
     ui->buttonBox->hideProgress();
     ui->credentialsGroupBox->setEnabled(true);
 
-    if (errorCode == QnMergeSystemsTool::NoError) {
+    if (errorCode == QnMergeSystemsTool::NoError)
+    {
         m_mergeButton->hide();
         ui->buttonBox->button(QDialogButtonBox::Cancel)->hide();
-        ui->buttonBox->button(QDialogButtonBox::Close)->show();
-        ui->buttonBox->button(QDialogButtonBox::Close)->setFocus();
-        ui->stackedWidget->setCurrentIndex(1);
-    } else {
+
+        const bool reconnectNeeded = ui->remoteSystemRadioButton->isChecked();
+        QDialogButtonBox::StandardButton closeButton = reconnectNeeded ? QDialogButtonBox::Ok : QDialogButtonBox::Close;
+        ui->buttonBox->button(closeButton)->show();
+        ui->buttonBox->button(closeButton)->setFocus();
+
+        ui->reconnectLabel->setVisible(reconnectNeeded);
+        ui->stackedWidget->setCurrentWidget(ui->finalPage);
+        m_successfullyFinished = true;
+    }
+    else
+    {
         QString message;
 
-        switch (errorCode) {
+        switch (errorCode)
+        {
         case QnMergeSystemsTool::AuthentificationError:
             message = tr("The password is invalid.");
             break;
@@ -252,6 +300,8 @@ void QnMergeSystemsDialog::at_mergeTool_mergeFinished(int errorCode, const QnMod
             message.prepend(lit("\n"));
 
         QMessageBox::critical(this, tr("Error"), tr("Cannot merge systems.") + message);
+
+        context()->instance<QnWorkbenchUserWatcher>()->setReconnectOnPasswordChange(true);
 
         updateConfigurationBlock();
     }

@@ -9,11 +9,11 @@
 #include <chrono>
 #include <map>
 
-#include <QMutex>
 #include <QString>
 #include <QVariant>
 
 #include <utils/common/singleton.h>
+#include <utils/thread/mutex.h>
 
 
 namespace ec2 {
@@ -29,20 +29,16 @@ public:
     size_t internetSyncTimePeriodSec(size_t defaultValue) const;
     size_t maxInternetTimeSyncRetryPeriodSec(size_t defaultValue) const;
 
-    //transaction connection
-    std::chrono::milliseconds connectionKeepAliveTimeout() const;
-    int keepAliveProbeCount() const;
-
     void loadParams( std::map<QString, QVariant> confParams );
 
 private:
     std::map<QString, QVariant> m_confParams;
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
 
     template<typename ValueType>
     ValueType value( const QString& name, ValueType defaultValue = ValueType() ) const
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 
         auto paramIter = m_confParams.find( name );
         if( paramIter == m_confParams.cend() )

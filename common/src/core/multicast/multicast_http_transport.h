@@ -1,13 +1,15 @@
 #pragma once
 
 #include <QElapsedTimer>
-#include <QUdpSocket>
+#include <QtNetwork/QUdpSocket>
 #include <QTimer>
 #include "multicast_http_fwd.h"
 #include <memory>
 #include <QCache>
-#include <QMutex>
 #include <QLinkedList>
+
+#include <utils/thread/mutex.h>
+
 
 namespace QnMulticast
 {
@@ -90,7 +92,7 @@ namespace QnMulticast
         RequestCallback m_requestCallback;
         std::unique_ptr<QTimer> m_timer;
         QCache<QUuid, char> m_processedRequests;
-        mutable QMutex m_mutex;
+        mutable QnMutex m_mutex;
         bool m_nextSendQueued;
         QElapsedTimer m_checkInterfacesTimer;
         QSet<QString> m_localAddressList;

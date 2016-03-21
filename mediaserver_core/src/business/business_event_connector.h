@@ -8,6 +8,8 @@
 
 #include <business/business_fwd.h>
 #include "business/business_event_parameters.h"
+#include <server/server_globals.h>
+#include "health/system_health.h"
 
 struct QnModuleInformation;
 
@@ -72,9 +74,11 @@ public slots:
 
     void at_NoStorages(const QnResourcePtr& resource);
 
-    void at_archiveRebuildFinished(const QnResourcePtr& resource);
+    void at_archiveRebuildFinished(const QnResourcePtr& resource, QnSystemHealth::MessageType msgType);
 
-    bool createEventFromParams(const QnBusinessEventParameters& params, QnBusiness::EventState eventState);
+    void at_archiveBackupFinished(const QnResourcePtr &resource, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString& reasonText);
+
+    bool createEventFromParams(const QnBusinessEventParameters& params, QnBusiness::EventState eventState, QString* errMessage = 0);
 private slots:
     void onNewResource(const QnResourcePtr &resource);
 };

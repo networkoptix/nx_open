@@ -7,10 +7,15 @@
 #include <QtGui/QVector3D>
 #include <QtGui/QRegion>
 
+#include <api/api_fwd.h>
+#include <api/helpers/request_helpers_fwd.h>
+#include <api/helpers/thumbnail_request_data.h> //for RoundMethod, delete when getImage... will be removed
+
+#include <common/common_globals.h>
+
 #include <utils/camera/camera_diagnostics.h>
 #include <utils/common/id.h>
 
-#include <api/api_fwd.h>
 #include <core/ptz/ptz_fwd.h>
 #include <utils/common/ldap_fwd.h>
 #include <core/resource/camera_bookmark_fwd.h>
@@ -19,20 +24,6 @@
 
 #include "abstract_connection.h"
 #include "model/manual_camera_seach_reply.h"
-
-// TODO: #MSAPI move to api/model or even to common_globals, 
-// add lexical serialization (see QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS)
-// 
-// Check serialization/deserialization in QnMediaServerConnection::doRebuildArchiveAsync
-// and in handler.
-// 
-// And name them sanely =)
-enum RebuildAction
-{
-    RebuildAction_ShowProgress,
-    RebuildAction_Start,
-    RebuildAction_Cancel
-};
 
 class QnMediaServerConnection: public QnAbstractConnection {
     Q_OBJECT
@@ -43,29 +34,22 @@ public:
     virtual ~QnMediaServerConnection();
 
     int getTimePeriodsAsync(
-        const QnNetworkResourceList &list,
-        qint64 startTimeMs, 
-        qint64 endTimeMs, 
-        qint64 detail, 
+        const QnVirtualCameraResourcePtr &camera,
+        qint64 startTimeMs,
+        qint64 endTimeMs,
+        qint64 detail,
         Qn::TimePeriodContent periodsType,
         const QString &filter,
-        QObject *target, 
+        QObject *target,
         const char *slot);
 
-    // TODO: #MSAPI 
-    // move to api/model or even to common_globals, 
-    // add lexical serialization (see QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS)
-    // 
-    // And name them sanely =)
-    enum RoundMethod { IFrameBeforeTime, Precise, IFrameAfterTime };
-
-    /** 
-     * Get \a camera thumbnail for specified time. 
-     * 
-     * Returns immediately. On request completion \a slot of object \a target 
+    /**
+     * Get \a camera thumbnail for specified time.
+     *
+     * Returns immediately. On request completion \a slot of object \a target
      * is called with signature <tt>(int status, QImage reply, int handle)</tt>.
      * Status is 0 in case of success, in other cases it holds error code.
-     * 
+     *
      * \param camera
      * \param timeUsec                  Requested time in usecs. Can be DATE_TIME_NOW for live video or -1 for request latest available image.
      * \param rotate                    image rotation in degree. -1 value: use default
@@ -76,15 +60,15 @@ public:
      * \param slot
      * \returns                         Request handle.
      */
-    int getThumbnailAsync(const QnNetworkResourcePtr &camera, qint64 timeUsec, int rotation, const QSize& size, const QString& imageFormat, RoundMethod method, QObject *target, const char *slot);
+    int getThumbnailAsync(const QnNetworkResourcePtr &camera, qint64 timeUsec, int rotation, const QSize& size, const QString& imageFormat, QnThumbnailRequestData::RoundMethod method, QObject *target, const char *slot);
 
-    /** 
+    /**
      * Check \a list of cameras for discovery. Return new list with contains only accessible cameras.
-     * 
-     * Returns immediately. On request completion \a slot of object \a target 
+     *
+     * Returns immediately. On request completion \a slot of object \a target
      * is called with signature <tt>(int status, QImage reply, int handle)</tt>.
      * Status is 0 in case of success, in other cases it holds error code.
-     * 
+     *
      * \param cameras
      * \param target
      * \param slot
@@ -92,54 +76,55 @@ public:
      */
     int checkCameraList(const QnNetworkResourceList &cameras, QObject *target, const char *slot);
 
-    /** 
-     * Get \a camera params. 
-     * 
-     * Returns immediately. On request completion \a slot of object \a target 
+    /**
+     * Get \a camera params.
+     *
+     * Returns immediately. On request completion \a slot of object \a target
      * is called with signature <tt>(int httpStatusCode, const QList<QPair<QString, QVariant> > &params)</tt>.
-     * \a status is 0 in case of success, in other cases it holds error code 
-     * 
+     * \a status is 0 in case of success, in other cases it holds error code
+     *
+	 * \param keys						List of parameter ids that are requested.
      * \returns                         Request handle.
      */
     int getParamsAsync(const QnNetworkResourcePtr &camera, const QStringList &keys, QObject *target, const char *slot);
 
-    /** 
-     * Get \a event log. 
-     * 
-     * Returns immediately. On request completion \a slot of object \a target 
+	/**
+     * Set \a camera params.
+     *
+     * Returns immediately. On request completion \a slot of object \a target is
+     * called with signature <tt>(int httpStatusCode, const QList<QPair<QString, bool> > &operationResult)</tt>
+     * \a status is 0 in case of success, in other cases it holds error code
+     *
+     * \returns                         Request handle.
+     */
+    int setParamsAsync(const QnNetworkResourcePtr &camera, const QnCameraAdvancedParamValueList &params, QObject *target, const char *slot);
+
+    /**
+     * Get \a event log.
+     *
+     * Returns immediately. On request completion \a slot of object \a target
      * is called with signature <tt>(int handle, int httpStatusCode, const QList<QnAbstractBusinessAction> &events)</tt>.
-     * \a status is 0 in case of success, in other cases it holds error code 
-     * 
+     * \a status is 0 in case of success, in other cases it holds error code
+     *
      * \param dateFrom                  Start timestamp in msec.
      * \param dateTo                    End timestamp in msec. Can be <tt>DATETIME_NOW</tt>.
      * \param cameras                   Filter events by camera. Optional.
      * \param businessRuleId            Filter events by specified business rule. Optional.
-     * 
+     *
      * \returns                         Request handle.
      */
     int getEventLogAsync(
-        qint64 dateFrom, 
-        qint64 dateTo, 
+        qint64 dateFrom,
+        qint64 dateTo,
         QnResourceList cameras,
-        QnBusiness::EventType eventType, 
+        QnBusiness::EventType eventType,
         QnBusiness::ActionType actionType,
-        QnUuid businessRuleId, 
-        QObject *target, 
+        QnUuid businessRuleId,
+        QObject *target,
         const char *slot);
 
-    /** 
-     * Set \a camera params.
-     * 
-     * Returns immediately. On request completion \a slot of object \a target is 
-     * called with signature <tt>(int httpStatusCode, const QList<QPair<QString, bool> > &operationResult)</tt>
-     * \a status is 0 in case of success, in other cases it holds error code
-     * 
-     * \returns                         Request handle.
-     */
-    int setParamsAsync(const QnNetworkResourcePtr &camera, const QnStringVariantPairList &params, QObject *target, const char *slot);
-
     /**
-     * \returns                         Request handle. 
+     * \returns                         Request handle.
      */
     int getStatisticsAsync(QObject *target, const char *slot);
 
@@ -175,7 +160,11 @@ public:
 
     int ptzGetDataAsync(const QnNetworkResourcePtr &camera, Qn::PtzDataFields query, QObject *target, const char *slot);
 
-    int getStorageSpaceAsync(QObject *target, const char *slot);
+    /*!
+        \param fastRequest          Request information about existing storages only. Getting full info may be quite slow.
+        \returns information about storages space.
+    */
+    int getStorageSpaceAsync(bool fastRequest, QObject *target, const char *slot);
 
     int getStorageStatusAsync(const QString &storageUrl, QObject *target, const char *slot);
 
@@ -201,30 +190,38 @@ public:
         \param slot Slot MUST have signature (int, QnStorageScanData, int)
         \returns Request handle. -1 In case of failure to start async request
      */
-    int doRebuildArchiveAsync(RebuildAction action, QObject *target, const char *slot);
+    int doRebuildArchiveAsync(Qn::RebuildAction action, bool isMainPool, QObject *target, const char *slot);
 
-    int addBookmarkAsync(const QnNetworkResourcePtr &camera, const QnCameraBookmark &bookmark, QObject *target, const char *slot);
-    int updateBookmarkAsync(const QnNetworkResourcePtr &camera, const QnCameraBookmark &bookmark, QObject *target, const char *slot);
-    int deleteBookmarkAsync(const QnNetworkResourcePtr &camera, const QnCameraBookmark &bookmark, QObject *target, const char *slot);
-    int getBookmarksAsync(const QnNetworkResourcePtr &camera, const QnCameraBookmarkSearchFilter &filter, QObject *target, const char *slot);
+    int backupControlActionAsync(Qn::BackupAction action, QObject *target, const char *slot);
+
+    int addBookmarkAsync(const QnCameraBookmark &bookmark, QObject *target, const char *slot);
+    int updateBookmarkAsync(const QnCameraBookmark &bookmark, QObject *target, const char *slot);
+    int deleteBookmarkAsync(const QnUuid &bookmarkId, QObject *target, const char *slot);
 
     int installUpdate(const QString &updateId, bool delayed, QObject *target, const char *slot);
     int uploadUpdateChunk(const QString &updateId, const QByteArray &data, qint64 offset, QObject *target, const char *slot);
 
     int restart(QObject *target, const char *slot);
 
-    int configureAsync(bool wholeSystem, const QString &systemName, const QString &password, const QByteArray &passwordHash, 
+    int configureAsync(bool wholeSystem, const QString &systemName, const QString &password, const QByteArray &passwordHash,
         const QByteArray &passwordDigest, const QByteArray &cryptSha512Hash, int port, QObject *target, const char *slot);
 
-    int pingSystemAsync(const QUrl &url, const QString &user, const QString &password, QObject *target, const char *slot);
+    int pingSystemAsync(const QUrl &url, const QString &password, QObject *target, const char *slot);
     int getRecordingStatisticsAsync(qint64 bitrateAnalizePeriodMs, QObject *target, const char *slot);
     int getAuditLogAsync(qint64 startTimeMs, qint64 endTimeMs, QObject *target, const char *slot);
-    int mergeSystemAsync(const QUrl &url, const QString &user, const QString &password, const QString &currentPassword, bool ownSettings, bool oneServer, bool ignoreIncompatible, QObject *target, const char *slot);
+    int mergeSystemAsync(const QUrl &url, const QString &password, const QString &currentPassword, bool ownSettings, bool oneServer, bool ignoreIncompatible, QObject *target, const char *slot);
 
     int testEmailSettingsAsync(const QnEmailSettings &settings, QObject *target, const char *slot);
     int testLdapSettingsAsync(const QnLdapSettings &settings, QObject *target, const char *slot);
 
     int modulesInformation(QObject *target, const char *slot);
+
+    int cameraHistory(const QnChunksRequestData &request, QObject *target, const char *slot);
+
+    int recordedTimePeriods(const QnChunksRequestData &request, QObject *target, const char *slot);
+    int getBookmarksAsync(const QnGetBookmarksRequestData &request, QObject *target, const char *slot);
+    int getBookmarkTagsAsync(const QnGetBookmarkTagsRequestData &request, QObject *target, const char *slot);
+
 protected:
     virtual QnAbstractReplyProcessor *newReplyProcessor(int object) override;
     virtual bool isReady() const override;

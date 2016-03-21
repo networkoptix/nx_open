@@ -4,10 +4,9 @@
 
 #include <core/resource/resource.h>
 
-#include "utils/network/tcp_connection_priv.h"
+#include "network/tcp_connection_priv.h"
 #include "core/resource_management/resource_pool.h"
 #include "utils/common/util.h"
-#include "api/serializer/serializer.h"
 #include "utils/common/synctime.h"
 #include <business/business_event_connector.h>
 #include <business/business_event_parameters.h>
@@ -25,17 +24,33 @@ int QnExternalBusinessEventRestHandler::executeGet(const QString &path, const Qn
     QnBusinessEventParameters businessParams;
     QString errStr;
     QnBusiness::EventState eventState = QnBusiness::UndefinedState;
+    bool ok;
 
-    if (params.contains("event_type"))
-        businessParams.eventType = QnLexical::deserialized<QnBusiness::EventType>(params["event_type"]);
+    if (params.contains("event_type")) {
+        businessParams.eventType = QnLexical::deserialized<QnBusiness::EventType>(params["event_type"], QnBusiness::EventType(), &ok);
+        if (!ok) {
+            result.setError(QnRestResult::InvalidParameter, "Invalid value for parameter 'event_type'.");
+            return CODE_OK;
+        }
+    }
     if (params.contains("timestamp"))
         businessParams.eventTimestampUsec = parseDateTime(params["timestamp"]);
     if (params.contains("eventResourceId"))
         businessParams.eventResourceId = params["eventResourceId"];
-    if (params.contains("state"))
-        eventState = QnLexical::deserialized<QnBusiness::EventState>(params["state"]);
-    if (params.contains("reasonCode"))
-        businessParams.reasonCode = QnLexical::deserialized<QnBusiness::EventReason>(params["reasonCode"]);
+    if (params.contains("state")) {
+        eventState = QnLexical::deserialized<QnBusiness::EventState>(params["state"], QnBusiness::EventState(), &ok);
+        if (!ok) {
+            result.setError(QnRestResult::InvalidParameter, "Invalid value for parameter 'state'.");
+            return CODE_OK;
+        }
+    }
+    if (params.contains("reasonCode")) {
+        businessParams.reasonCode = QnLexical::deserialized<QnBusiness::EventReason>(params["reasonCode"], QnBusiness::EventReason(), &ok);
+        if (!ok) {
+            result.setError(QnRestResult::InvalidParameter, "Invalid value for parameter 'reasonCode'.");
+            return CODE_OK;
+        }
+    }
     if (params.contains("inputPortId"))
         businessParams.inputPortId = params["inputPortId"];
     if (params.contains("source"))
@@ -44,8 +59,13 @@ int QnExternalBusinessEventRestHandler::executeGet(const QString &path, const Qn
         businessParams.caption = params["caption"];
     if (params.contains("description"))
         businessParams.description = params["description"];
-    if (params.contains("metadata"))
-        businessParams.metadata = QJson::deserialized<QnEventMetaData>(params["metadata"].toUtf8());
+    if (params.contains("metadata")) {
+        businessParams.metadata = QJson::deserialized<QnEventMetaData>(params["metadata"].toUtf8(), QnEventMetaData(), &ok);
+        if (!ok) {
+            result.setError(QnRestResult::InvalidParameter, "Invalid value for parameter 'metadata'. It should be a json object. See documentation for more details.");
+            return CODE_OK;
+        }
+    }
     
     if (businessParams.eventTimestampUsec == 0)
         businessParams.eventTimestampUsec = qnSyncTime->currentUSecsSinceEpoch();
@@ -54,8 +74,8 @@ int QnExternalBusinessEventRestHandler::executeGet(const QString &path, const Qn
     if (businessParams.eventType == QnBusiness::UndefinedEvent)
         businessParams.eventType = QnBusiness::UserDefinedEvent; // default value for type is 'CustomEvent'
 
-    if (!qnBusinessRuleConnector->createEventFromParams(businessParams, eventState))
-        result.setError(QnRestResult::InvalidParameter, "Invalid event parameters");
+    if (!qnBusinessRuleConnector->createEventFromParams(businessParams, eventState, &errStr))
+        result.setError(QnRestResult::InvalidParameter, errStr);
 
     return CODE_OK;
 }

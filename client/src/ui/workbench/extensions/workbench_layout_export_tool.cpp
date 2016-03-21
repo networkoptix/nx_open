@@ -1,13 +1,11 @@
 #include "workbench_layout_export_tool.h"
 
 #include <QtCore/QBuffer>
-
-#include <utils/common/model_functions.h>
-#include <utils/app_server_image_cache.h>
-#include <utils/local_file_cache.h>
+#include <QtCore/QEventLoop>
 
 #include <client/client_settings.h>
 
+#include <camera/camera_data_manager.h>
 #include <camera/loaders/caching_camera_data_loader.h>
 #include <camera/client_video_camera.h>
 
@@ -26,16 +24,32 @@
 #include <plugins/storage/file_storage/layout_storage_resource.h>
 #include <plugins/resource/avi/avi_resource.h>
 
-#include <recording/stream_recorder.h>
-
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
+
+#include <utils/common/model_functions.h>
+#include <utils/app_server_image_cache.h>
+#include <utils/local_file_cache.h>
 
 #ifdef Q_OS_WIN
 #   include <launcher/nov_launcher_win.h>
 #endif
+
+namespace {
+    const int retryTimes = 3;
+    const int retryDelayMs = 500;
+}
+
+QnLayoutExportTool::ItemInfo::ItemInfo()
+    : name()
+    , timezone(0)
+{}
+
+QnLayoutExportTool::ItemInfo::ItemInfo( const QString name, qint64 timezone )
+    : name(name)
+    , timezone(timezone)
+{}
 
 
 QnLayoutExportTool::QnLayoutExportTool(const QnLayoutResourcePtr &layout,
@@ -64,7 +78,8 @@ QnLayoutExportTool::QnLayoutExportTool(const QnLayoutResourcePtr &layout,
         m_layout->setId(QnUuid::createUuid());
 }
 
-bool QnLayoutExportTool::start() {
+
+bool QnLayoutExportTool::prepareStorage() {
     if (m_realFilename == QnLayoutFileStorageResource::removeProtocolPrefix(m_layout->getUrl())) {
         // can not override opened layout. save to tmp file, then rename
         m_realFilename += lit(".tmp");
@@ -90,22 +105,16 @@ bool QnLayoutExportTool::start() {
 
     m_storage = QnStorageResourcePtr(new QnLayoutFileStorageResource());
     m_storage->setUrl(fullName);
+    return true;
+}
 
-    QScopedPointer<QIODevice> itemNamesIO(m_storage->open(lit("item_names.txt"), QIODevice::WriteOnly));
-    if (itemNamesIO.isNull()) {
-        m_errorMessage = tr("Could not create output file %1.").arg(m_targetFilename);
-        emit finished(false, m_targetFilename);   //file is not created, finishExport() is not required
-        return false;
-    }
-
-    QTextStream itemNames(itemNamesIO.data());
-
-    QList<qint64> itemTimeZones;
+QnLayoutExportTool::ItemInfoList QnLayoutExportTool::prepareLayout() {
+    ItemInfoList result;
 
     QSet<QString> uniqIdList;
     QnLayoutItemDataMap items;
 
-    foreach (QnLayoutItemData item, m_layout->getItems()) {
+    for (const QnLayoutItemData &item: m_layout->getItems()) {
         QnResourcePtr resource = qnResPool->getResourceById(item.resource.id);
         if (!resource)
             resource = qnResPool->getResourceByUniqueId(item.resource.path);
@@ -113,78 +122,113 @@ bool QnLayoutExportTool::start() {
             continue;
 
         QnLayoutItemData localItem = item;
-        itemNames << resource->getName() << lit("\n");
-        QnMediaResourcePtr mediaRes = qSharedPointerDynamicCast<QnMediaResource>(resource);
-        if (mediaRes) {
-            QString uniqueId = mediaRes->toResource()->getUniqueId();
-            localItem.resource.id = mediaRes->toResource()->getId();
+
+        ItemInfo info(resource->getName(), Qn::InvalidUtcOffset);
+
+        if (QnMediaResourcePtr mediaRes = resource.dynamicCast<QnMediaResource>()) {
+            QString uniqueId = resource->getUniqueId();
+            localItem.resource.id = resource->getId();
             localItem.resource.path = uniqueId;
             if (!uniqIdList.contains(uniqueId)) {
                 m_resources << mediaRes;
                 uniqIdList << uniqueId;
             }
-            itemTimeZones << context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(mediaRes, Qn::InvalidUtcOffset);
+            info.timezone = context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(mediaRes, Qn::InvalidUtcOffset);
         }
-        else {
-            itemTimeZones << Qn::InvalidUtcOffset;
-        }
+
         items.insert(localItem.uuid, localItem);
+        result.append(info);
     }
     m_layout->setItems(items);
-
-    itemNames.flush();
-    itemNamesIO.reset();
-
-    QScopedPointer<QIODevice> itemTimezonesIO(m_storage->open(lit("item_timezones.txt"), QIODevice::WriteOnly));
-    QTextStream itemTimeZonesStream(itemTimezonesIO.data());
-    foreach(qint64 timeZone, itemTimeZones)
-        itemTimeZonesStream << timeZone << lit("\n");
-    itemTimeZonesStream.flush();
-    itemTimezonesIO.reset();
-
-    QByteArray layoutData;
-    ec2::ApiLayoutData layoutObject;
-    fromResourceToApi(m_layout, layoutObject);
-    QJson::serialize(layoutObject, &layoutData);
+    return result;
+}
 
 
-    QScopedPointer<QIODevice> layoutsFile(m_storage->open(lit("layout.pb"), QIODevice::WriteOnly));
-    layoutsFile->write(layoutData);
-    layoutsFile.reset();
+bool QnLayoutExportTool::exportMetadata(const QnLayoutExportTool::ItemInfoList &items) {
 
-    QScopedPointer<QIODevice> rangeFile(m_storage->open(lit("range.bin"), QIODevice::WriteOnly));
-    rangeFile->write(m_period.serialize());
-    rangeFile.reset();
+    /* Names of exported resources. */
+    {
+        QByteArray names;
+        QTextStream itemNames(&names, QIODevice::WriteOnly);
+        for (const ItemInfo &info: items)
+            itemNames << info.name << lit("\n");
+        itemNames.flush();
 
-    QScopedPointer<QIODevice> miscFile(m_storage->open(lit("misc.bin"), QIODevice::WriteOnly));
-    quint32 flags = m_readOnly ? QnLayoutFileStorageResource::ReadOnly : 0;
-    foreach (const QnMediaResourcePtr resource, m_resources) {
-        if (resource->toResource()->hasFlags(Qn::utc)) {
-            flags |= QnLayoutFileStorageResource::ContainsCameras;
-            break;
-        }
+        if (!writeData(lit("item_names.txt"), names))
+            return false;
     }
-    miscFile->write((const char*) &flags, sizeof(flags));
-    miscFile.reset();
 
-    QScopedPointer<QIODevice> uuidFile(m_storage->open(lit("uuid.bin"), QIODevice::WriteOnly));
-    uuidFile->write(m_layout->getId().toByteArray());
-    uuidFile.reset();
+    /* Timezones of exported resources. */
+    {
+        QByteArray timezones;
+        QTextStream itemTimeZonesStream(&timezones, QIODevice::WriteOnly);
+        for (const ItemInfo &info: items)
+            itemTimeZonesStream << info.timezone << lit("\n");
+        itemTimeZonesStream.flush();
 
-    foreach (const QnMediaResourcePtr resource, m_resources) {
+        if (!writeData(lit("item_timezones.txt"), timezones))
+            return false;
+    }
+
+    /* Layout items. */
+    {
+        QByteArray layoutData;
+        ec2::ApiLayoutData layoutObject;
+        fromResourceToApi(m_layout, layoutObject);
+        QJson::serialize(layoutObject, &layoutData);
+        /* Old name for compatibility issues. */
+        if (!writeData(lit("layout.pb"), layoutData))
+            return false;
+    }
+
+    /* Exported period. */
+    {
+        if (!writeData(lit("range.bin"), m_period.serialize()))
+            return false;
+    }
+
+    /* Additional flags. */
+    {
+        quint32 flags = m_readOnly ? QnLayoutFileStorageResource::ReadOnly : 0;
+        for (const QnMediaResourcePtr resource: m_resources) {
+            if (resource->toResource()->hasFlags(Qn::utc)) {
+                flags |= QnLayoutFileStorageResource::ContainsCameras;
+                break;
+            }
+        }
+
+        if (!tryAsync([this, flags] {
+            QScopedPointer<QIODevice> miscFile(m_storage->open(lit("misc.bin"), QIODevice::WriteOnly));
+            if (!miscFile)
+                return false;
+            miscFile->write((const char*) &flags, sizeof(flags));
+            return true;
+        } ))
+            return false;
+    }
+
+    /* Layout id. */
+    {
+        if (!writeData(lit("uuid.bin"), m_layout->getId().toByteArray()))
+            return false;
+    }
+
+    /* Chunks. */
+    for (const QnMediaResourcePtr &resource: m_resources) {
         QString uniqId = resource->toResource()->getUniqueId();
         uniqId = uniqId.mid(uniqId.lastIndexOf(L'?') + 1);
-        QnCachingCameraDataLoader* loader = navigator()->loader(resource->toResourcePtr());
-        if (loader) {
-            QScopedPointer<QIODevice> chunkFile(m_storage->open(lit("chunk_%1.bin").arg(QFileInfo(uniqId).completeBaseName()), QIODevice::WriteOnly));
-            QnTimePeriodList periods = loader->periods(Qn::RecordingContent).intersected(m_period);
-            QByteArray data;
-            periods.encode(data);
-            chunkFile->write(data);
-        }
+        QnCachingCameraDataLoader* loader = context()->instance<QnCameraDataManager>()->loader(resource);
+        if (!loader)
+            continue;
+        QnTimePeriodList periods = loader->periods(Qn::RecordingContent).intersected(m_period);
+        QByteArray data;
+        periods.encode(data);
+
+        if (!writeData(lit("chunk_%1.bin").arg(QFileInfo(uniqId).completeBaseName()), data))
+            return false;
     }
 
-
+    /* Layout background */
     if (!m_layout->backgroundImageFilename().isEmpty()) {
         bool exportedLayout = snapshotManager()->isFile(m_layout);  // we have changed background to an exported layout
         QScopedPointer<QnAppServerImageCache> cache;
@@ -195,12 +239,34 @@ bool QnLayoutExportTool::start() {
 
         QImage background(cache->getFullPath(m_layout->backgroundImageFilename()));
         if (!background.isNull()) {
-            QScopedPointer<QIODevice> imageFile(m_storage->open(m_layout->backgroundImageFilename(), QIODevice::WriteOnly));
-            background.save(imageFile.data(), "png");
+
+            if (!tryAsync([this, background] {
+                QScopedPointer<QIODevice> imageFile(m_storage->open(m_layout->backgroundImageFilename(), QIODevice::WriteOnly));
+                if (!imageFile)
+                    return false;
+                background.save(imageFile.data(), "png");
+                return true;
+            } ))
+                return false;
 
             QnLocalFileCache localCache;
             localCache.storeImageData(m_layout->backgroundImageFilename(), background);
         }
+    }
+
+    return true;
+}
+
+bool QnLayoutExportTool::start() {
+    if (!prepareStorage())
+        return false;
+
+    ItemInfoList items = prepareLayout();
+
+    if (!exportMetadata(items)) {
+        m_errorMessage = tr("Could not create output file %1...").arg(m_targetFilename);
+        emit finished(false, m_targetFilename);   //file is not created, finishExport() is not required
+        return false;
     }
 
     emit rangeChanged(0, m_resources.size() * 100);
@@ -211,7 +277,7 @@ bool QnLayoutExportTool::start() {
 void QnLayoutExportTool::stop() {
     m_stopped = true;
     m_resources.clear();
-    m_errorMessage = QString(); //supress error by manual cancelling
+    m_errorMessage = QString(); //suppress error by manual canceling
 
     if (m_currentCamera) {
         connect(m_currentCamera, SIGNAL(exportStopped()), this, SLOT(at_camera_exportStopped()));
@@ -263,7 +329,7 @@ void QnLayoutExportTool::finishExport(bool success) {
             QString oldUrl = m_layout->getUrl();
             QString newUrl = m_storage->getUrl();
 
-            foreach (const QnLayoutItemData &item, m_layout->getItems()) {
+            for (const QnLayoutItemData &item: m_layout->getItems()) {
                 QnAviResourcePtr aviRes = qnResPool->getResourceByUniqueId<QnAviResource>(item.resource.path);
                 if (aviRes)
                     qnResPool->updateUniqId(aviRes, QnLayoutFileStorageResource::updateNovParent(newUrl, item.resource.path));
@@ -278,6 +344,14 @@ void QnLayoutExportTool::finishExport(bool success) {
         }
         else {
             QnLayoutResourcePtr layout =  QnResourceDirectoryBrowser::layoutFromFile(m_storage->getUrl());
+            if (!layout) {
+                /* Something went wrong */
+                m_errorMessage = tr("Unknown error has occurred.");
+                QFile::remove(m_realFilename);
+                emit finished(false, m_targetFilename);
+                return;
+            }
+
             if (!resourcePool()->getResourceById(layout->getId())) {
                 layout->setStatus(Qn::Online);
                 resourcePool()->addResource(layout);
@@ -306,33 +380,30 @@ bool QnLayoutExportTool::exportMediaResource(const QnMediaResourcePtr& resource)
     QnStreamRecorder::Role role = QnStreamRecorder::Role_FileExport;
     if (resource->toResource()->hasFlags(Qn::utc))
         role = QnStreamRecorder::Role_FileExportWithEmptyContext;
-    QnLayoutItemData itemData = m_layout->getItem(resource->toResource()->getId());
 
-    int timeOffset = 0;
-    if(qnSettings->timeMode() == Qn::ServerTimeMode) {
-        // time difference between client and server
-        timeOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(resource, 0);
-    }
     qint64 serverTimeZone = context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(resource, Qn::InvalidUtcOffset);
-    qreal customAr = resource->customAspectRatio();
-    m_currentCamera->exportMediaPeriodToFile(m_period.startTimeMs * 1000ll,
-                                    (m_period.startTimeMs + m_period.durationMs) * 1000ll,
+
+    m_currentCamera->exportMediaPeriodToFile(m_period,
                                     uniqId,
                                     lit("mkv"),
                                     m_storage,
                                     role,
                                     serverTimeZone,
-                                    QnImageFilterHelper() // no transcode params
+                                    QnImageFilterHelper()
                                     );
 
     emit stageChanged(tr("Exporting to \"%1\"...").arg(QFileInfo(m_targetFilename).fileName()));
     return true;
 }
 
-void QnLayoutExportTool::at_camera_exportFinished(int status, const QString &filename) {
+void QnLayoutExportTool::at_camera_exportFinished(
+    const QnStreamRecorder::ErrorStruct &status,
+    const QString                       &filename
+) 
+{
     Q_UNUSED(filename)
-    if (status != QnClientVideoCamera::NoError) {
-        m_errorMessage = QnClientVideoCamera::errorString(status);
+    if (status.lastError != QnClientVideoCamera::NoError) {
+        m_errorMessage = QnClientVideoCamera::errorString(status.lastError);
         finishExport(false);
         return;
     }
@@ -353,25 +424,8 @@ void QnLayoutExportTool::at_camera_exportFinished(int status, const QString &fil
             QString uniqId = camera->resource()->toResource()->getUniqueId();
             uniqId = QFileInfo(uniqId.mid(uniqId.indexOf(L'?')+1)).completeBaseName(); // simplify name if export from existing layout
             QString motionFileName = lit("motion%1_%2.bin").arg(i).arg(uniqId);
-            QIODevice* device = m_storage->open(motionFileName , QIODevice::WriteOnly);
-
-            int retryCount = 0;
-            while (!device && retryCount < 3)
-            {
-                QEventLoop loop;
-                QTimer::singleShot(500, &loop, SLOT(quit()));
-                loop.exec();
-                device = m_storage->open(motionFileName , QIODevice::WriteOnly);
-                retryCount++;
-            }
-
-            if (!device) {
-                error = true;
-                continue; //need to close other buffers
-            }
-
-            device->write(motionFileBuffer->buffer());
-            device->close();
+            /* Other buffers must be closed even in case of error. */
+            writeData(motionFileName, motionFileBuffer->buffer());
         }
     }
 
@@ -385,7 +439,7 @@ void QnLayoutExportTool::at_camera_exportFinished(int status, const QString &fil
                 QnCameraDeviceStringSet(
                     tr("Could not export device %1."),
                     tr("Could not export camera %1."),
-                    tr("Could not export IO module %1.")
+                    tr("Could not export I/O module %1.")
                 ), camRes
             ).arg(getShortResourceName(camRes));
         finishExport(false);
@@ -404,3 +458,46 @@ void QnLayoutExportTool::at_camera_exportStopped() {
 void QnLayoutExportTool::at_camera_progressChanged(int progress) {
     emit valueChanged(m_offset * 100 + progress);
 }
+
+bool QnLayoutExportTool::tryAsync( std::function<bool()> handler ) {
+    if (!handler)
+        return false;
+
+    QPointer<QObject> guard(this);
+    int times = retryTimes;
+
+    while (times > 0) {
+        if (!guard)
+            return false;
+
+        if (handler())
+            return true;
+
+        times--;
+        if (times <= 0)
+            return false;
+
+        QScopedPointer<QTimer> timer(new QTimer());
+        timer->setSingleShot(true);
+        timer->setInterval(retryDelayMs);
+
+        QScopedPointer<QEventLoop> loop(new QEventLoop());
+        connect(timer.data(), &QTimer::timeout, loop.data(), &QEventLoop::quit);
+        timer->start();
+        loop->exec();
+    }
+
+    return false;
+}
+
+bool QnLayoutExportTool::writeData( const QString &fileName, const QByteArray &data ) {
+    return tryAsync([this, fileName, data] {
+        QScopedPointer<QIODevice> file(m_storage->open(fileName, QIODevice::WriteOnly));
+        if (!file)
+            return false;
+        file->write(data);
+        return true;
+    } );
+}
+
+

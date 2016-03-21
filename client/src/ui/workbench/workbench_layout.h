@@ -310,6 +310,11 @@ public:
      */
     void centralizeItems();
 
+    /**
+     * @brief isSearchLayout            Check if this layout is preview search layout
+     */
+    bool isSearchLayout() const;
+    
 signals:
     /**
      * This signal is emitted when this layout is about to be destroyed

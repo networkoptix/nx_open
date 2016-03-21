@@ -29,7 +29,7 @@ QnNotificationListWidget::QnNotificationListWidget(QGraphicsItem *parent, Qt::Wi
     m_hoverProcessor(new HoverFocusProcessor(this)),
     m_collapsedItemCountChanged(false),
     m_speedUp(1.0),
-    m_itemNotificationLevel(Qn::OtherNotification)
+    m_itemNotificationLevel(QnNotificationLevel::Value::OtherNotification)
 {
     registerAnimation(this);
     startListening();
@@ -40,7 +40,7 @@ QnNotificationListWidget::QnNotificationListWidget(QGraphicsItem *parent, Qt::Wi
     m_hoverProcessor->setHoverLeaveDelay(hoverLeaveTimeoutMSec);
 
     m_collapser.item = new QnNotificationWidget(this);
-    m_collapser.item->setNotificationLevel(Qn::OtherNotification);
+    m_collapser.item->setNotificationLevel(m_itemNotificationLevel);
     m_collapser.item->setMinimumSize(QSizeF(widgetWidth, collapserHeight));
     m_collapser.item->setMaximumSize(QSizeF(widgetWidth, collapserHeight));
     m_collapser.item->setOpacity(0.0);
@@ -216,7 +216,7 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
         ItemData* data = m_itemDataByItem[item];
         delete data;
 
-        int level = static_cast<int>(item->notificationLevel());
+        QnNotificationLevel::Value level = item->notificationLevel();
         if (level == m_itemNotificationLevel)
             itemNotificationLevelChange = true;
 
@@ -237,7 +237,7 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
             if (item->notificationLevel() > maxLevelItem->notificationLevel())
                 maxLevelItem = item;
         }
-        Qn::NotificationLevel level = maxLevelItem->notificationLevel();
+        QnNotificationLevel::Value level = maxLevelItem->notificationLevel();
         if (level != m_itemNotificationLevel) {
             m_itemNotificationLevel = level;
             emit notificationLevelChanged();
@@ -296,7 +296,7 @@ void QnNotificationListWidget::addItem(QnNotificationWidget *item, bool locked) 
     m_collapsedItemCountChanged = true;
     emit itemCountChanged();
 
-    Qn::NotificationLevel level = item->notificationLevel();
+    QnNotificationLevel::Value level = item->notificationLevel();
     if (level > m_itemNotificationLevel) {
         m_itemNotificationLevel = level;
         emit notificationLevelChanged();
@@ -306,6 +306,9 @@ void QnNotificationListWidget::addItem(QnNotificationWidget *item, bool locked) 
 }
 
 void QnNotificationListWidget::removeItem(QnNotificationWidget *item) {
+    if (!m_itemDataByItem.contains(item))
+        return;
+
     ItemData* data = m_itemDataByItem[item];
     if (data->isVisible())
         data->hide(m_speedUp);
@@ -334,7 +337,7 @@ int QnNotificationListWidget::itemCount() const {
     return m_items.size();
 }
 
-Qn::NotificationLevel QnNotificationListWidget::notificationLevel() const {
+QnNotificationLevel::Value QnNotificationListWidget::notificationLevel() const {
     return m_itemNotificationLevel;
 }
 

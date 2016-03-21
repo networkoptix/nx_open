@@ -8,7 +8,7 @@
 
 #include <map>
 
-#include <QtCore/QMutex>
+#include <utils/thread/mutex.h>
 
 #include "core/resource/storage_resource.h"
 
@@ -39,7 +39,7 @@ public:
     //!Implementation of QnStorageResource::getTotalSpace
     virtual qint64 getTotalSpace() override { return 0; }
     //!Implementation of QnStorageResource::isStorageAvailable
-    virtual bool isAvailable() const override { return true; }
+    virtual bool initOrUpdate() const override { return true; }
     //!Implementation of QnStorageResource::removeFile
     virtual bool removeFile( const QString& path ) override;
     //!Implementation of QnStorageResource::removeDir
@@ -66,7 +66,7 @@ public:
 
 private:
     std::map<QString, QIODevice*> m_urlToDevice;
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     int m_capabilities;
 };
 

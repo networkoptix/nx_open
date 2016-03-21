@@ -9,6 +9,7 @@
 #include <api/common_message_processor.h>
 #include <business/business_fwd.h>
 #include <core/resource/resource_fwd.h>
+#include <server/server_globals.h>
 
 #include "http/auto_request_forwarder.h"
 #include "http/progressive_downloading_server.h"
@@ -19,7 +20,7 @@
 #include "nx_ec/impl/ec_api_impl.h"
 #include "utils/common/public_ip_discovery.h"
 #include <utils/network/http/http_mod_manager.h>
-
+#include "health/system_health.h"
 
 class QnAppserverResourceProcessor;
 class QNetworkReply;
@@ -59,7 +60,8 @@ private slots:
     void at_cameraIPConflict(const QHostAddress& host, const QStringList& macAddrList);
     void at_storageManager_noStoragesAvailable();
     void at_storageManager_storageFailure(const QnResourcePtr& storage, QnBusiness::EventReason reason);
-    void at_storageManager_rebuildFinished();
+    void at_storageManager_rebuildFinished(QnSystemHealth::MessageType msgType);
+    void at_archiveBackupFinished(qint64 backedUpToMs, QnBusiness::EventReason code);
     void at_timer();
     void at_connectionOpened();
     void at_serverModuleConflict(const QnModuleInformation &moduleInformation, const SocketAddress &address);
@@ -82,6 +84,11 @@ private:
     void saveAdminPswdHash();
     bool isStopping() const;
 
+    /**
+     * Fix statistics allowed flag by value, set in the installer.
+     * Note that installer value will override the existing one.
+     */
+    void updateStatisticsAllowedSettings();
 private:
     int m_argc;
     char** m_argv;
@@ -95,12 +102,12 @@ private:
     QnMediaServerResourcePtr m_mediaServer;
     QSet<QnUuid> m_updateUserRequests;
     QHostAddress m_publicAddress;
-    QMutex m_mutex;
+    QnMutex m_mutex;
     std::unique_ptr<QnPublicIPDiscovery> m_ipDiscovery;
     std::unique_ptr<QTimer> m_updatePiblicIpTimer;
     quint64 m_dumpSystemResourceUsageTaskID;
     bool m_stopping;
-    mutable QMutex m_stopMutex;
+    mutable QnMutex m_stopMutex;
     std::unique_ptr<ec2::CrashReporter> m_crashReporter;
 };
 

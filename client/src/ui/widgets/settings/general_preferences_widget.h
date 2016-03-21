@@ -1,5 +1,4 @@
-#ifndef GENERAL_PREFERENCES_WIDGET_H
-#define GENERAL_PREFERENCES_WIDGET_H
+#pragma once
 
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
@@ -20,10 +19,11 @@ public:
     explicit QnGeneralPreferencesWidget(QWidget *parent = 0);
     ~QnGeneralPreferencesWidget();
 
-    virtual void submitToSettings() override;
-    virtual void updateFromSettings() override;
+    virtual void applyChanges() override;
+    virtual void loadDataToUi() override;
+    virtual bool hasChanges() const override;
 
-    virtual bool confirm() override;
+    virtual bool canApplyChanges() override;
 private slots:
     void at_browseMainMediaFolderButton_clicked();
     void at_addExtraMediaFolderButton_clicked();
@@ -38,5 +38,3 @@ private:
     bool m_oldDownmix;
     bool m_oldDoubleBuffering;
 };
-
-#endif // GENERAL_PREFERENCES_WIDGET_H

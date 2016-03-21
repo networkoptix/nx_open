@@ -9,10 +9,13 @@
 
 class QnTimePeriod;
 
-class QN_EXPORT QnTimePeriod {
+class QN_EXPORT QnTimePeriod
+{
 public:
 
     static const qint64 UnlimitedPeriod = -1;
+    static const qint64 kMaxTimeValue;
+    static const qint64 kMinTimeValue;
 
     /**
      * Constructs a null time period.
@@ -27,7 +30,10 @@ public:
      */
     QnTimePeriod(qint64 startTimeMs, qint64 durationMs);
 
-    bool operator==(const QnTimePeriod &other) const;
+    static QnTimePeriod fromInterval(qint64 startTimeMs
+        , qint64 endTimeMs);
+
+    QnTimePeriod& operator = (const QnTimePeriod &other);
 
     bool contains(qint64 timeMs) const;
     bool contains(const QnTimePeriod &timePeriod) const;
@@ -43,7 +49,7 @@ public:
     void clear();
 
     /**
-     * \returns                         Whether this is an empty period --- a 
+     * \returns                         Whether this is an empty period --- a
      *                                  period of zero length.
      */
     bool isEmpty() const;
@@ -51,19 +57,19 @@ public:
     qint64 endTimeMs() const;
 
     /**
-     * \returns                         Whether this is a null time period. 
+     * \returns                         Whether this is a null time period.
      */
     bool isNull() const;
-    
+
     /**
-     * \returns                         Whether this is a infinite time period. 
+     * \returns                         Whether this is a infinite time period.
      */
     bool isInfinite() const;
 
     bool isValid() const;
 
     /**
-     * \returns                         Infinite duration constant value (-1). 
+     * \returns                         Infinite duration constant value (-1).
      */
     static qint64 infiniteDuration();
 
@@ -83,13 +89,14 @@ public:
     /** Start time in milliseconds. */
     qint64 startTimeMs;
 
-    /** Duration in milliseconds. 
-     * 
-     * infiniteDuration() if duration is infinite or unknown. It may be the case if this time period 
+    /** Duration in milliseconds.
+     *
+     * infiniteDuration() if duration is infinite or unknown. It may be the case if this time period
      * represents a video chunk that is being recorded at the moment. */
     qint64 durationMs;
 };
 
+bool operator==(const QnTimePeriod &first, const QnTimePeriod &other);
 bool operator<(const QnTimePeriod &first, const QnTimePeriod &other);
 bool operator<(qint64 first, const QnTimePeriod &other);
 bool operator<(const QnTimePeriod &other, qint64 first);

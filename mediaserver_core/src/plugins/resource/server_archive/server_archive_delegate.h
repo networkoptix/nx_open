@@ -1,7 +1,7 @@
 #ifndef _SERVER_ARCHIVE_DELEGATE_H__
 #define _SERVER_ARCHIVE_DELEGATE_H__
 
-#include <QtCore/QMutex>
+#include <utils/thread/mutex.h>
 #include <QtGui/QRegion>
 
 #include "core/resource/resource_fwd.h"
@@ -39,25 +39,28 @@ public:
     virtual ArchiveChunkInfo getLastUsedChunkInfo() const override;
 
 private:
-    bool switchToChunk(const DeviceFileCatalog::Chunk newChunk, const DeviceFileCatalogPtr& newCatalog);
+    bool switchToChunk(const DeviceFileCatalog::TruncableChunk &newChunk, const DeviceFileCatalogPtr& newCatalog);
     qint64 seekInternal(qint64 time, bool findIFrame, bool recursive);
-    bool getNextChunk(DeviceFileCatalog::Chunk& chunk, DeviceFileCatalogPtr& chunkCatalog);
+    bool getNextChunk(DeviceFileCatalog::TruncableChunk& chunk, DeviceFileCatalogPtr& chunkCatalog);
     bool setQualityInternal(MediaQuality quality, bool fastSwitch, qint64 timeMs, bool recursive);
+    void setCatalogs() const;
 
     DeviceFileCatalog::Chunk findChunk(DeviceFileCatalogPtr catalog, qint64 time, DeviceFileCatalog::FindMethod findMethod);
 
 private:
+    typedef std::map<QnServer::StoragePool, DeviceFileCatalogPtr> PoolToCatalogMap;
+
     bool m_opened;
     QnResourcePtr m_resource;
     qint64 m_lastPacketTime;
     
     qint64 m_skipFramesToTime;
-    DeviceFileCatalogPtr m_catalogHi;
-    DeviceFileCatalogPtr m_catalogLow;
+    mutable PoolToCatalogMap m_catalogHi;
+    mutable PoolToCatalogMap m_catalogLow;
     //QnChunkSequence* m_chunkSequenceHi;
     //QnChunkSequence* m_chunkSequenceLow;
     DeviceFileCatalog::Chunk m_currentChunk;
-    DeviceFileCatalogPtr m_currentChunkCatalog;
+    PoolToCatalogMap m_currentChunkCatalog;
 
     QnAviArchiveDelegatePtr m_aviDelegate;
     QnAviResourcePtr m_fileRes;
@@ -85,7 +88,8 @@ private:
 
     ArchiveChunkInfo m_currentChunkInfo;
 
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
+    QnServer::ChunksCatalog m_lastChunkQuality;
 };
 
 typedef QSharedPointer<QnServerArchiveDelegate> QnServerArchiveDelegatePtr;

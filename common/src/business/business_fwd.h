@@ -1,5 +1,4 @@
-#ifndef QN_BUSINESS_FWD_H
-#define QN_BUSINESS_FWD_H
+#pragma once
 
 #include <vector>
 
@@ -7,6 +6,8 @@
 #include <QtCore/QMap>
 #include <QtCore/QMetaType>
 #include <QtCore/QSharedPointer>
+
+#include <common/common_globals.h>
 
 #include <utils/common/model_functions_fwd.h>
 
@@ -23,7 +24,6 @@ typedef QSharedPointer<QnPanicBusinessAction> QnPanicBusinessActionPtr;
 typedef QList<QnPanicBusinessAction> QnPanicBusinessActionList;
 
 class QnBusinessActionData;
-typedef std::vector<QnBusinessActionData> QnBusinessActionDataList;
 typedef std::vector<QnBusinessActionData> QnBusinessActionDataList;
 typedef QSharedPointer<QnBusinessActionDataList> QnBusinessActionDataListPtr;
 
@@ -59,7 +59,16 @@ public:
         StorageIoErrorReason,
         StorageTooSlowReason,
         StorageFullReason,
-        LicenseRemoved
+        LicenseRemoved,
+
+        BackupFailedNoBackupStorageError,
+        BackupFailedSourceStorageError,
+        BackupFailedSourceFileError,
+        BackupFailedTargetFileError,
+        BackupFailedChunkError,
+        BackupEndOfPeriod,
+        BackupDone,
+        BackupCancelled
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(EventReason)
 
@@ -102,9 +111,12 @@ public:
 
         /** Server started */
         ServerStartEvent = 9,
-        
+
         /** Not enough licenses */
         LicenseIssueEvent = 10,
+
+        /** Archive backup done */
+        BackupFinishedEvent = 11,
 
         /** System health message. */
         SystemHealthEvent = 500,
@@ -121,54 +133,72 @@ public:
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(EventType)
 
     enum ActionType {
-        UndefinedAction = 0,
+        UndefinedAction         = 0,
 
-        /** 
+        /**
          * Change camera output state.
          *
          * Parameters:
          * - relayOutputID (string, required)          - id of output to trigger.
          * - relayAutoResetTimeout (uint, optional)    - timeout (in milliseconds) to reset camera state back.
          */
-        CameraOutputAction = 1,
+        CameraOutputAction      = 1,
+        CameraOutputOnceAction  = 2,
 
-        CameraOutputOnceAction = 2,
-
-        BookmarkAction = 3,
+        BookmarkAction          = 3,
 
         /** Start camera recording. */
-        CameraRecordingAction = 4,
+        CameraRecordingAction   = 4,
 
         /** Activate panic recording mode. */
-        PanicRecordingAction = 5,
+        PanicRecordingAction    = 5,
 
-        /** 
-         * Send an email. This action can be executed from any endpoint. 
+        /**
+         * Send an email. This action can be executed from any endpoint.
          *
          * Parameters:
          * - emailAddress (string, required)
          */
-        SendMailAction = 6,
+        SendMailAction          = 6,
 
         /** Write a record to the server's log. */
-        DiagnosticsAction = 7,
+        DiagnosticsAction       = 7,
 
-        ShowPopupAction = 8,
+        ShowPopupAction         = 8,
 
         /**
          * Parameters:
          * - soundUrl (string, required)               - url of sound, contains path to sound on the Server.
          */
-        PlaySoundAction = 9,
-
-        PlaySoundOnceAction = 10,
+        PlaySoundAction         = 9,
+        PlaySoundOnceAction     = 10,
 
         /**
          * Parameters:
          * - sayText (string, required)                - text that will be provided to TTS engine.
          */
-        SayTextAction = 11,
+        SayTextAction           = 11,
 
+        /**
+         * Execute given PTZ preset.
+         * Parameters:
+         * (resourceId, presetId)
+         */
+        ExecutePtzPresetAction  = 12,
+
+        /**
+         * Show text overlay over the given camera(s).
+         * Parameters:
+         * - text (string, required)                    - text that will be displayed.
+         */
+        ShowTextOverlayAction   = 13,
+
+        /**
+         * Put the given camera(s) to the Alarm Layout.
+         * Parameters:
+         * - users                                      - list of users, which will receive this alarm notification
+         */
+        ShowOnAlarmLayoutAction = 14,
 
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ActionType)
@@ -188,5 +218,3 @@ public:
     (QnBusiness::UserGroup)\
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(QN_BUSINESS_ENUM_TYPES(QnBusiness::EventState), (metatype)(lexical))
-
-#endif // QN_BUSINESS_FWD_H

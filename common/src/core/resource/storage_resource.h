@@ -15,10 +15,14 @@ class QnStorageResource
     Q_PROPERTY(int maxStoreTime READ getMaxStoreTime WRITE setMaxStoreTime)
 
 public:
+    static const qint64 kNasStorageLimit;
+
     QnStorageResource();
     virtual ~QnStorageResource();
 
     virtual QString getUniqueId() const;
+
+    QnMediaServerResourcePtr getParentServer() const;
 
     void setStorageBitrateCoeff(float value);
     void setSpaceLimit(qint64 value);
@@ -32,6 +36,7 @@ public:
 
     void setUsedForWriting(bool isUsedForWriting);
     bool isUsedForWriting() const;
+
     virtual QString getPath() const;
     static QString urlToPath(const QString &url);
 
@@ -59,6 +64,15 @@ public:
 
     static QString toNativeDirPath(const QString &dirPath);
 
+    void setBackup(bool value);
+    bool isBackup() const;
+
+    void addWrited(qint64 value);
+    void resetWrited();
+    void setWritedCoeff(double value);
+    double calcUsageCoeff() const;
+
+    bool isWritable() const;
 signals:
     /*
      * Storage may emit archiveRangeChanged signal to inform server what some data in archive already deleted
@@ -66,6 +80,9 @@ signals:
      * @param newEndTime - Not used now, reserved for future use
      */
     void archiveRangeChanged(const QnStorageResourcePtr &resource, qint64 newStartTimeMs, qint64 newEndTimeMs);
+
+    void isUsedForWritingChanged(const QnResourcePtr &resource);
+    void isBackupChanged(const QnResourcePtr &resource);
 private:
     qint64 m_spaceLimit;
     int m_maxStoreTime; // in seconds
@@ -73,7 +90,10 @@ private:
     std::atomic<float> m_storageBitrateCoeff;
     QString m_storageType;
     QSet<QnAbstractMediaStreamDataProvider*> m_providers;
-    mutable QMutex m_bitrateMtx;
+    mutable QnMutex m_bitrateMtx;
+    bool    m_isBackup;
+    double  m_writed;
+    double  m_writedCoeff;
 };
 
 Q_DECLARE_METATYPE(QnStorageResourcePtr);

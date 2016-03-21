@@ -1,12 +1,22 @@
 #include "storage_resource.h"
 #include "core/dataprovider/media_streamdataprovider.h"
+
+#include <core/resource/media_server_resource.h>
+
 #include "utils/common/log.h"
+
+const qint64 QnStorageResource::kNasStorageLimit = 50LL * 1024 * 1024 * 1024; // 50 gb
 
 QnStorageResource::QnStorageResource():
     m_spaceLimit(0),
     m_maxStoreTime(0),
-    m_usedForWriting(false)
+    m_usedForWriting(false),
+    m_storageBitrateCoeff(0.0),
+    m_isBackup(false),
+    m_writed(0.0),
+    m_writedCoeff(1.0)
 {
+    addFlags(Qn::remote);
     setStatus(Qn::Offline);
 }
 
@@ -14,51 +24,60 @@ QnStorageResource::~QnStorageResource()
 {
 }
 
+QnMediaServerResourcePtr QnStorageResource::getParentServer() const {
+    return getParentResource().dynamicCast<QnMediaServerResource>();
+}
+
+
 void QnStorageResource::setSpaceLimit(qint64 value)
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     m_spaceLimit = value;
 }
 
 qint64 QnStorageResource::getSpaceLimit() const
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     return m_spaceLimit;
 }
 
 void QnStorageResource::setStorageType(const QString& type)
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     m_storageType = type;
 }
 
 QString QnStorageResource::getStorageType() const
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     return m_storageType;
 }
 
 void QnStorageResource::setMaxStoreTime(int timeInSeconds)
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     m_maxStoreTime = timeInSeconds;
 }
 
 int QnStorageResource::getMaxStoreTime() const
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     return m_maxStoreTime;
 }
 
-void QnStorageResource::setUsedForWriting(bool isUsedForWriting) 
-{
-    QMutexLocker lock(&m_mutex);
-    m_usedForWriting = isUsedForWriting;
+void QnStorageResource::setUsedForWriting(bool isUsedForWriting) {
+    {
+        QnMutexLocker lock(&m_mutex);
+        if (m_usedForWriting == isUsedForWriting)
+            return;
+        m_usedForWriting = isUsedForWriting;
+    }
+    emit isUsedForWritingChanged(::toSharedPointer(this));
 }
 
 bool QnStorageResource::isUsedForWriting() const 
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     return m_usedForWriting;
 }
 
@@ -71,7 +90,7 @@ QString QnStorageResource::getUniqueId() const
 float QnStorageResource::bitrate() const
 {
     float rez = 0;
-    QMutexLocker lock(&m_bitrateMtx);
+    QnMutexLocker lock(&m_bitrateMtx);
     for(const QnAbstractMediaStreamDataProvider* provider: m_providers)
         rez += provider->getBitrateMbps();
     return rez;
@@ -79,13 +98,13 @@ float QnStorageResource::bitrate() const
 
 void QnStorageResource::addBitrate(QnAbstractMediaStreamDataProvider* provider)
 {
-    QMutexLocker lock(&m_bitrateMtx);
+    QnMutexLocker lock(&m_bitrateMtx);
     m_providers << provider;
 }
 
 void QnStorageResource::releaseBitrate(QnAbstractMediaStreamDataProvider* provider)
 {
-    QMutexLocker lock(&m_bitrateMtx);
+    QnMutexLocker lock(&m_bitrateMtx);
     m_providers.remove(provider);
 }
 #endif
@@ -119,11 +138,19 @@ void QnStorageResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>
     Q_ASSERT(other->getParentId() == getParentId() && other->getUrl() == getUrl());
     QnResource::updateInner(other, modifiedFields);
 
-    QnStorageResourcePtr storage = other.dynamicCast<QnStorageResource>();
+    QnStorageResource* localOther = dynamic_cast<QnStorageResource*>(other.data());
+    if (localOther) {
+        if (m_usedForWriting != localOther->m_usedForWriting)
+            modifiedFields << "isUsedForWritingChanged";
+        m_usedForWriting = localOther->m_usedForWriting;
 
-    m_spaceLimit = storage->m_spaceLimit;
-    m_maxStoreTime = storage->m_maxStoreTime;
-    m_usedForWriting = storage->m_usedForWriting;
+        if (m_isBackup != localOther->m_isBackup)
+            modifiedFields << "isBackupChanged";
+        m_isBackup = localOther->m_isBackup;
+
+        m_spaceLimit = localOther->m_spaceLimit;
+        m_maxStoreTime = localOther->m_maxStoreTime;
+    }
 }
 
 void QnStorageResource::setUrl(const QString& value)
@@ -155,4 +182,48 @@ QString QnStorageResource::toNativeDirPath(const QString &dirPath)
     if(!result.endsWith(QDir::separator()))
         result.append(QDir::separator());
     return result;
+}
+
+void QnStorageResource::setBackup(bool value) {
+    {
+        QnMutexLocker lk(&m_mutex);
+        if (m_isBackup == value)
+            return;
+        m_isBackup = value;
+    }
+    emit isBackupChanged(::toSharedPointer(this));
+}
+
+bool QnStorageResource::isBackup() const 
+{ 
+    QnMutexLocker lk(&m_mutex);
+    return m_isBackup; 
+}
+
+void QnStorageResource::addWrited(qint64 value)
+{
+    QnMutexLocker lk(&m_mutex);
+    m_writed += static_cast<double>(value) / (1024 * 1024);
+}
+
+void QnStorageResource::resetWrited()
+{
+    QnMutexLocker lk(&m_mutex);
+    m_writed = 0.0;
+}
+
+void QnStorageResource::setWritedCoeff(double value)
+{
+    QnMutexLocker lk(&m_mutex);
+    m_writedCoeff = value;
+}
+
+double QnStorageResource::calcUsageCoeff() const
+{
+    QnMutexLocker lk(&m_mutex);
+    return m_writed / m_writedCoeff;
+}
+
+bool QnStorageResource::isWritable() const {
+    return (getCapabilities() & QnAbstractStorageResource::cap::WriteFile) == QnAbstractStorageResource::cap::WriteFile;
 }

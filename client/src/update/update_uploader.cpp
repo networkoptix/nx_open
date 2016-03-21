@@ -222,7 +222,20 @@ void QnUpdateUploader::at_restReply_finished(int status, const QnUploadUpdateRep
         return;
 
     if (status != 0) {
-        emit finished(UnknownError, QSet<QnUuid>() << server->getId());
+        ErrorCode errorCode = UnknownError;
+
+        switch (status) {
+        case QNetworkReply::AuthenticationRequiredError:
+            errorCode = AuthenticationError;
+            break;
+        case QNetworkReply::TimeoutError:
+            errorCode = TimeoutError;
+            break;
+        default:
+            break;
+        }
+
+        emit finished(errorCode, QSet<QnUuid>() << server->getId());
         return;
     }
 

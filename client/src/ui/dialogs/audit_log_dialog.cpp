@@ -42,9 +42,10 @@
 #include <ui/common/palette.h>
 #include "ui/style/globals.h"
 #include <ui/widgets/views/checkboxed_header_view.h>
-#include "ui/workbench/workbench_context_aware.h"
+#include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include "ui/workbench/extensions/workbench_stream_synchronizer.h"
+#include <ui/workbench/watchers/workbench_server_time_watcher.h>
 
 
 namespace {
@@ -52,7 +53,7 @@ namespace {
     const int BTN_ICON_SIZE = 16;
     static const int COLUMN_SPACING = 4;
     static const int MAX_DESCR_COL_LEN = 300;
-    
+
     enum MasterGridTabIndex {
         SessionTab,
         CameraTab
@@ -64,8 +65,15 @@ namespace {
 
 // --------------------------- QnAuditDetailItemDelegate ------------------------
 
-void QnAuditItemDelegate::setDefaultSectionHeight(int value) 
-{ 
+QnAuditItemDelegate::QnAuditItemDelegate(QObject *parent)
+    : base_type(parent)
+    , QnWorkbenchContextAware(parent)
+    , m_defaultSectionHeight(0)
+    , m_widthHint(-1)
+{}
+
+void QnAuditItemDelegate::setDefaultSectionHeight(int value)
+{
     m_defaultSectionHeight = value;
 }
 
@@ -104,9 +112,9 @@ QSize QnAuditItemDelegate::defaultSizeHint(const QStyleOptionViewItem & option, 
 QSize QnAuditItemDelegate::sizeHint(const QStyleOptionViewItem & option, const QModelIndex & index) const
 {
     static const QDateTime dateTimePattern = QDateTime::fromString(lit("2015-12-12T23:59:59"), Qt::ISODate);
-    static const QString dateTimeStr = dateTimePattern.toString(Qt::DefaultLocaleShortDate);
-    static const QString timeStr = dateTimePattern.time().toString(Qt::DefaultLocaleShortDate);
-    static const QString dateStr = dateTimePattern.date().toString(Qt::DefaultLocaleShortDate);
+    static const QString dateTimeStr = dateTimePattern.toString(Qt::SystemLocaleShortDate);
+    static const QString timeStr = dateTimePattern.time().toString(Qt::SystemLocaleShortDate);
+    static const QString dateStr = dateTimePattern.date().toString(Qt::SystemLocaleShortDate);
 
     QSize result;
     QnAuditLogModel::Column column = (QnAuditLogModel::Column) index.data(Qn::ColumnDataRole).toInt();
@@ -164,7 +172,7 @@ QSize QnAuditItemDelegate::sizeHint(const QStyleOptionViewItem & option, const Q
         QVariant value = index.data(Qt::SizeHintRole);
         if (value.isValid())
             result = qvariant_cast<QSize>(value);
-        else 
+        else
             result = defaultSizeHint(option, index);
         break;
     }
@@ -172,7 +180,7 @@ QSize QnAuditItemDelegate::sizeHint(const QStyleOptionViewItem & option, const Q
         result = defaultSizeHint(option, index);
     }
 
-    int extraSpaceForColumns[QnAuditLogModel::ColumnCount] = 
+    int extraSpaceForColumns[QnAuditLogModel::ColumnCount] =
     {
         0,                  //SelectRowColumn,
         COLUMN_SPACING+2,   //TimestampColumn,
@@ -198,10 +206,10 @@ void QnAuditItemDelegate::paintRichDateTime(QPainter * painter, const QStyleOpti
 {
     if (dateTimeSecs == 0)
         return;
-    QDateTime dateTime = QDateTime::fromMSecsSinceEpoch(dateTimeSecs * 1000ll);
-    QString dateStr = dateTime.date().toString(Qt::DefaultLocaleShortDate) + QString(lit(" "));
-    QString timeStr = dateTime.time().toString(Qt::DefaultLocaleShortDate);
-    
+    QDateTime dateTime = context()->instance<QnWorkbenchServerTimeWatcher>()->displayTime(dateTimeSecs * 1000ll);
+    QString dateStr = dateTime.date().toString(Qt::SystemLocaleShortDate) + L' ';
+    QString timeStr = dateTime.time().toString(Qt::SystemLocaleShortDate);
+
     QFontMetrics fm(option.font);
     int timeXOffset = fm.size(0, dateStr).width();
     painter->drawText(option.rect, Qt::AlignLeft | Qt::AlignVCenter, dateStr);
@@ -218,7 +226,7 @@ void QnAuditItemDelegate::paintRichDateTime(QPainter * painter, const QStyleOpti
 void QnAuditItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem & _option, const QModelIndex & index) const
 {
     QStyleOptionViewItem option = _option;
-    if (index.data(Qn::AlternateColorRole).toInt() > 0) 
+    if (index.data(Qn::AlternateColorRole).toInt() > 0)
     {
         const QWidget *widget = option.widget;
         QStyle *style = widget ? widget->style() : QApplication::style();
@@ -277,9 +285,9 @@ void QnAuditItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem &
         button.text = index.data(Qt::DisplayRole).toString();
         if (button.text.isEmpty())
             return base_type::paint(painter, option, index);
-        
+
         if (option.state & QStyle::State_MouseOver)
-            button.icon = index.data(Qn::DecorationHoveredRole).value<QIcon>(); 
+            button.icon = index.data(Qn::DecorationHoveredRole).value<QIcon>();
         else
             button.icon = index.data(Qt::DecorationRole).value<QIcon>();
         button.iconSize = QSize(BTN_ICON_SIZE, BTN_ICON_SIZE);
@@ -324,20 +332,20 @@ QnAuditRecordRefList QnAuditLogDialog::applyFilter()
     QStringList keywords = ui->filterLineEdit->text().split(lit(" "));
 
     Qn::AuditRecordTypes disabledTypes = Qn::AR_NotDefined;
-    for (const QCheckBox* checkBox: m_filterCheckboxes) 
+    for (const QCheckBox* checkBox: m_filterCheckboxes)
     {
-        if (!checkBox->isChecked()) 
+        if (!checkBox->isChecked())
             disabledTypes |= (Qn::AuditRecordTypes) checkBox->property(checkBoxFilterProperty).toInt();
     }
 
 
-    auto filter = [&keywords, &disabledTypes] (const QnAuditRecord& record) 
+    auto filter = [&keywords, &disabledTypes, this] (const QnAuditRecord& record)
     {
         if (disabledTypes & record.eventType)
             return false;
 
         bool matched = true;
-        QString wholeText = QnAuditLogModel::makeSearchPattern(&record);
+        QString wholeText = m_camerasModel->makeSearchPattern(&record);
         for (const auto& keyword: keywords) {
             if (!wholeText.contains(keyword, Qt::CaseInsensitive)) {
                 matched = false;
@@ -358,7 +366,7 @@ QnAuditRecordRefList QnAuditLogDialog::applyFilter()
 QnAuditRecordRefList QnAuditLogDialog::filterChildDataBySessions(const QnAuditRecordRefList& checkedRows)
 {
     QMap<QnUuid, int> selectedSessions;
-    for (const QnAuditRecord* record: checkedRows) 
+    for (const QnAuditRecord* record: checkedRows)
         selectedSessions.insert(record->authSession.id, record->rangeStartSec);
 
     QnAuditRecordRefList result;
@@ -379,7 +387,7 @@ QnAuditRecordRefList QnAuditLogDialog::filterChildDataByCameras(const QnAuditRec
         selectedCameras << record->resources[0];
 
     QnAuditRecordRefList result;
-    auto filter = [&selectedCameras] (const QnAuditRecord* record) 
+    auto filter = [&selectedCameras] (const QnAuditRecord* record)
     {
         for (const auto& id: record->resources) {
             if (selectedCameras.contains(id))
@@ -404,15 +412,15 @@ QList<QnAuditLogModel::Column> detailSessionColumns()
 {
     QList<QnAuditLogModel::Column> columns;
     columns
-        << QnAuditLogModel::DateColumn 
+        << QnAuditLogModel::DateColumn
         << QnAuditLogModel::TimeColumn
-        << QnAuditLogModel::UserNameColumn 
+        << QnAuditLogModel::UserNameColumn
         << QnAuditLogModel::UserHostColumn
         << QnAuditLogModel::EventTypeColumn
-        << QnAuditLogModel::DescriptionColumn 
+        << QnAuditLogModel::DescriptionColumn
         << QnAuditLogModel::PlayButtonColumn
         ;
-    
+
     return columns;
 }
 
@@ -483,7 +491,7 @@ void QnAuditLogDialog::at_currentTabChanged()
         Qn::AuditRecordTypes eventTypes =static_cast<Qn::AuditRecordTypes>(checkBox->property(checkBoxFilterProperty).toInt());
         bool allowed = allEnabled || (camerasTypes & eventTypes);
 
-        if (checkBox->isEnabled() == allowed) 
+        if (checkBox->isEnabled() == allowed)
             continue;
 
         checkBox->setEnabled(allowed);
@@ -506,7 +514,7 @@ void QnAuditLogDialog::at_filterChanged()
         QSet<QnUuid> filteredIdList;
         for (const QnAuditRecord* record: m_filteredData)
             filteredIdList << record->authSession.id;
-    
+
         QnAuditRecordRefList filteredSessions;
         for (auto& record: m_sessionData) {
             if (filteredIdList.contains(record.authSession.id))
@@ -646,7 +654,7 @@ void QnAuditLogDialog::at_masterGridSelectionChanged(const QItemSelection &selec
 void QnAuditLogDialog::setupSessionsGrid()
 {
     QList<QnAuditLogModel::Column> columns;
-    columns << 
+    columns <<
         QnAuditLogModel::SelectRowColumn <<
         QnAuditLogModel::TimestampColumn <<
         QnAuditLogModel::EndTimestampColumn <<
@@ -699,7 +707,7 @@ void QnAuditLogDialog::setupContextMenu(QTableView* gridMaster)
 void QnAuditLogDialog::setupCamerasGrid()
 {
     QList<QnAuditLogModel::Column> columns;
-    columns << 
+    columns <<
         QnAuditLogModel::SelectRowColumn <<
         QnAuditLogModel::CameraNameColumn <<
         QnAuditLogModel::CameraIpColumn <<
@@ -754,7 +762,7 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
     m_detailModel->setHeaderHeight(calcHeaderHeight(ui->gridDetails->horizontalHeader()));
 
     ui->gridDetails->horizontalHeader()->setMinimumSectionSize(48);
-    
+
     ui->gridDetails->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     ui->gridDetails->horizontalHeader()->setSectionResizeMode(detailColumns.indexOf(QnAuditLogModel::DescriptionColumn), QHeaderView::Stretch);
 
@@ -769,7 +777,7 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
     ui->dateEditFrom->setDate(dt);
     ui->dateEditTo->setDate(dt);
 
-    
+
     QnSingleEventSignalizer *mouseSignalizer = new QnSingleEventSignalizer(this);
     mouseSignalizer->setEventType(QEvent::MouseButtonRelease);
 
@@ -787,7 +795,7 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent):
     connect(ui->gridDetails,         &QTableView::clicked,               this,   &QnAuditLogDialog::at_eventsGrid_clicked);
 
     ui->mainGridLayout->activate();
-    
+
     ui->filterLineEdit->setPlaceholderText(tr("Search"));
     connect(ui->filterLineEdit, &QLineEdit::textChanged, this, &QnAuditLogDialog::at_filterChanged);
     connect(ui->tabWidget, &QTabWidget::currentChanged, this, &QnAuditLogDialog::at_currentTabChanged);
@@ -811,7 +819,7 @@ void QnAuditLogDialog::at_eventsGrid_clicked(const QModelIndex& index)
     bool showDetail = QnAuditLogModel::hasDetail(record);
     showDetail = !showDetail;
     QnAuditLogModel::setDetail(record, showDetail);
-    
+
     int height = ui->gridDetails->itemDelegate()->sizeHint(QStyleOptionViewItem(), index).height();
     ui->gridDetails->setRowHeight(index.row(), height);
 }
@@ -886,7 +894,7 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
     params.setArgument(Qn::ItemTimeRole, period.startTimeMs);
     if (period.durationMs > 0)
         params.setArgument(Qn::TimePeriodRole, period);
-    
+
 
     /* Construct and add a new layout. */
     QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
@@ -920,7 +928,7 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
 
     const int matrixWidth = qMax(1, qRound(std::sqrt(displayAspectRatio * resList.size() / desiredCellAspectRatio)));
 
-    for(int i = 0; i < resList.size(); i++) 
+    for(int i = 0; i < resList.size(); i++)
     {
         QnLayoutItemData item;
         item.uuid = QnUuid::createUuid();
@@ -930,9 +938,9 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
         item.dataByRole[Qn::ItemTimeRole] = period.startTimeMs;
 
         QString forcedRotation = resList[i]->getProperty(QnMediaResource::rotationKey());
-        if (!forcedRotation.isEmpty()) 
+        if (!forcedRotation.isEmpty())
             item.rotation = forcedRotation.toInt();
-        
+
         layout->addItem(item);
     }
 
@@ -942,11 +950,11 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
     layout->setLocalRange(period);
 
     resourcePool()->addResource(layout);
-    menu()->trigger(Qn::OpenSingleLayoutAction, layout);
+    menu()->trigger(QnActions::OpenSingleLayoutAction, layout);
 
 }
 
-void QnAuditLogDialog::triggerAction(const QnAuditRecord* record, Qn::ActionId ActionId)
+void QnAuditLogDialog::triggerAction(const QnAuditRecord* record, QnActions::IDType ActionId)
 {
     QnResourceList resList;
     for (const auto& id: record->resources) {
@@ -956,10 +964,10 @@ void QnAuditLogDialog::triggerAction(const QnAuditRecord* record, Qn::ActionId A
 
     QnActionParameters params(resList);
     if (resList.isEmpty()) {
-        QMessageBox::information(this, tr("Information"), tr("This resources already removed from the system"));
+        QMessageBox::information(this, tr("Information"), tr("This resources are already removed from the system"));
         return;
     }
-    
+
     params.setArgument(Qn::ItemTimeRole, record->rangeStartSec * 1000ll);
     context()->menu()->trigger(ActionId, params);
 }
@@ -976,11 +984,11 @@ void QnAuditLogDialog::at_itemPressed(const QModelIndex& index)
     if (record->isPlaybackType())
         processPlaybackAction(record);
     else if (record->eventType == Qn::AR_UserUpdate)
-        triggerAction(record, Qn::UserSettingsAction);
+        triggerAction(record, QnActions::UserSettingsAction);
     else if (record->eventType == Qn::AR_ServerUpdate)
-        triggerAction(record, Qn::ServerSettingsAction);
+        triggerAction(record, QnActions::ServerSettingsAction);
     else if (record->eventType == Qn::AR_CameraUpdate || record->eventType == Qn::AR_CameraInsert)
-        triggerAction(record, Qn::CameraSettingsAction);
+        triggerAction(record, QnActions::CameraSettingsAction);
 
     if (isMaximized())
         showNormal();
@@ -1012,7 +1020,7 @@ void QnAuditLogDialog::updateData()
     }
 
     ui->dateEditFrom->setDateRange(QDate(2000,1,1), ui->dateEditTo->date());
-    ui->dateEditTo->setDateRange(ui->dateEditFrom->date(), QDateTime::currentDateTime().date());
+    ui->dateEditTo->setDateRange(ui->dateEditFrom->date(), QDateTime::currentDateTime().date().addMonths(1)); // 1 month forward should cover all local timezones diffs.
 
     m_updateDisabled = false;
     m_dirty = false;
@@ -1024,22 +1032,18 @@ void QnAuditLogDialog::query(qint64 fromMsec, qint64 toMsec)
     m_camerasModel->clearData();
     m_detailModel->clearData();
     m_requests.clear();
-    
+
     m_allData.clear();
     m_sessionData.clear();
     m_cameraData.clear();
     m_filteredData.clear();
 
 
-    const auto mediaServerList = qnResPool->getAllServers();
-    foreach(const QnMediaServerResourcePtr& mserver, mediaServerList)
+    const auto onlineServers = qnResPool->getAllServers(Qn::Online);
+    for(const QnMediaServerResourcePtr& mserver: onlineServers)
     {
-        if (mserver->getStatus() == Qn::Online)
-        {
-            m_requests << mserver->apiConnection()->getAuditLogAsync(
-                fromMsec, toMsec,
-                this, SLOT(at_gotdata(int, const QnAuditRecordList&, int)));
-        }
+        m_requests << mserver->apiConnection()->getAuditLogAsync(
+            fromMsec, toMsec, this, SLOT(at_gotdata(int, const QnAuditRecordList&, int)));
     }
 }
 
@@ -1062,7 +1066,7 @@ void QnAuditLogDialog::makeSessionData()
     QMap<QnUuid, QnAuditRecord> processedLogins;
     for (const QnAuditRecord& record: m_allData)
     {
-        if (record.isLoginType()) 
+        if (record.isLoginType())
         {
             auto itr = processedLogins.find(record.authSession.id);
             if (itr == processedLogins.end())
@@ -1148,7 +1152,7 @@ void QnAuditLogDialog::at_sessionsGrid_customContextMenuRequested(const QPoint&)
     {
         QnResourcePtr resource = gridMaster->model()->data(idx, Qn::ResourceRole).value<QnResourcePtr>();
         QnActionManager *manager = context()->menu();
-       
+
         if (resource) {
             QnActionParameters parameters(resource);
             parameters.setArgument(Qn::NodeTypeRole, Qn::ResourceNode);
@@ -1236,7 +1240,7 @@ void QnAuditLogDialog::enableUpdateData()
 
 void QnAuditLogDialog::setVisible(bool value)
 {
-    // TODO: #Elric use showEvent instead. 
+    // TODO: #Elric use showEvent instead.
 
     if (value && !isVisible())
         updateData();

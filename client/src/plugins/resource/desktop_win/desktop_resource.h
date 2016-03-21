@@ -38,7 +38,7 @@ private:
 private:
     QGLWidget* m_mainWidget;
     QnDesktopDataProvider* m_desktopDataProvider;
-    QMutex m_dpMutex;
+    QnMutex m_dpMutex;
     QMap<QnUuid, QnDesktopCameraConnectionPtr> m_connectionPool;
 };
 

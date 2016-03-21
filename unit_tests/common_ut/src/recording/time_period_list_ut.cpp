@@ -55,9 +55,9 @@ TEST( QnTimePeriodsListTest, mergeBigData )
 
     const int mergingListsCount = 10;
 
-    QVector<QnTimePeriodList> lists;
+    std::vector<QnTimePeriodList> lists;
     for (int i = 0; i < mergingListsCount; ++i)
-        lists << QnTimePeriodList();
+        lists.push_back(QnTimePeriodList());
 
     QnTimePeriodList resultPeriods;
 
@@ -195,7 +195,10 @@ TEST( QnTimePeriodsListTest, unionByCombining )
     QnTimePeriodList resultList;
     resultList << QnTimePeriod(10, 25) << QnTimePeriod(40, QnTimePeriod::infiniteDuration());
 
-    QnTimePeriodList mergedList = QnTimePeriodList::mergeTimePeriods(QVector<QnTimePeriodList>() << sourceList << appendingList);
+    std::vector<QnTimePeriodList> periods;
+    periods.push_back(sourceList);
+    periods.push_back(appendingList);
+    QnTimePeriodList mergedList = QnTimePeriodList::mergeTimePeriods(periods);
     ASSERT_EQ(mergedList, resultList);
 
     QnTimePeriodList::unionTimePeriods(sourceList, appendingList);
@@ -211,7 +214,10 @@ TEST( QnTimePeriodsListTest, unionByCombiningSeveral )
     QnTimePeriodList appendingList;
     appendingList << QnTimePeriod(5, 30);
 
-    QnTimePeriodList resultList = QnTimePeriodList::mergeTimePeriods(QVector<QnTimePeriodList>() << sourceList << appendingList);
+    std::vector<QnTimePeriodList> periods;
+    periods.push_back(sourceList);
+    periods.push_back(appendingList);
+    QnTimePeriodList resultList = QnTimePeriodList::mergeTimePeriods(periods);
 
     QnTimePeriodList::unionTimePeriods(sourceList, appendingList);
 
@@ -227,7 +233,10 @@ TEST( QnTimePeriodsListTest, unionByLimits )
     QnTimePeriodList appendingList;
     appendingList << QnTimePeriod(10, 5)  << QnTimePeriod(30, 5) ;
 
-    QnTimePeriodList resultList = QnTimePeriodList::mergeTimePeriods(QVector<QnTimePeriodList>() << sourceList << appendingList);
+    std::vector<QnTimePeriodList> periods;
+    periods.push_back(sourceList);
+    periods.push_back(appendingList);
+    QnTimePeriodList resultList = QnTimePeriodList::mergeTimePeriods(periods);
 
     QnTimePeriodList::unionTimePeriods(sourceList, appendingList);
 
@@ -337,6 +346,41 @@ TEST( QnTimePeriodsListTest, overwriteTailByTrimAndAppend )
 
     QnTimePeriodList resultList;
     resultList << QnTimePeriod(10, 5) << QnTimePeriod(20, 5) << QnTimePeriod(30, 5) << QnTimePeriod(40, 10) << QnTimePeriod(55, QnTimePeriod::infiniteDuration());;
+
+    ASSERT_EQ(resultList, sourceList);
+}
+
+TEST( QnTimePeriodsListTest, includingPeriods )
+{
+    QnTimePeriodList sourceList;
+    for (int i = 10; i < 100; i += 10)
+        sourceList << QnTimePeriod(i, 5);
+    sourceList << QnTimePeriod(10, 5) << QnTimePeriod(22, 10) << QnTimePeriod(45, 4) << QnTimePeriod(56, 4) << QnTimePeriod(69, 150 - 69);
+
+    QnTimePeriodList testList;
+    for (const QnTimePeriod &period: sourceList)
+        testList.includeTimePeriod(period);
+
+    QnTimePeriodList resultList;
+    resultList << QnTimePeriod(10, 5) << QnTimePeriod(20, 15) << QnTimePeriod(40, 9) << QnTimePeriod(50, 5) << QnTimePeriod(56, 9) << QnTimePeriod(69, 150 - 69);
+
+    ASSERT_EQ(resultList, testList);
+}
+
+TEST( QnTimePeriodsListTest, excludingPeriods )
+{
+    QnTimePeriodList sourceList;
+    for (int i = 10; i < 150; i += 10)
+        sourceList << QnTimePeriod(i, 5);
+
+    QnTimePeriodList excludeList;
+    excludeList << QnTimePeriod(15, 6) << QnTimePeriod(24, 2) << QnTimePeriod(32, 10) << QnTimePeriod(52, 20) << QnTimePeriod(85, 5) << QnTimePeriod(100, 5) << QnTimePeriod(110, 35);
+
+    for (const QnTimePeriod &period: excludeList)
+        sourceList.excludeTimePeriod(period);
+
+    QnTimePeriodList resultList;
+    resultList << QnTimePeriod(10, 5) << QnTimePeriod(21, 3) << QnTimePeriod(30, 2) << QnTimePeriod(42, 3) << QnTimePeriod(50, 2) << QnTimePeriod(72, 3) << QnTimePeriod(80, 5) << QnTimePeriod(90, 5);
 
     ASSERT_EQ(resultList, sourceList);
 }

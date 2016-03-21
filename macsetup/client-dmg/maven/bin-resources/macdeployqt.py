@@ -53,7 +53,7 @@ def prepare(binary, sbindir, tlibdir):
 
     tresdir = join(os.path.dirname(tbindir), 'Resources')
 
-    shutil.copyfile(join(sbindir, 'clientexe'), binary)
+    shutil.copyfile(join(sbindir, 'client.bin'), binary)
     os.chmod(binary, 0755)
     yield binary
 

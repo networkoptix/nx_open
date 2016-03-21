@@ -3,14 +3,12 @@
 
 #include <algorithm> /* For std::find_if. */
 
+#include <QtNetwork/QNetworkReply>
 #include <QtCore/QList>
 #include <QtCore/QPair>
 #include <QtCore/QString>
 #include <QtCore/QMetaType>
 #include <utils/common/uuid.h>
-
-#include <QNetworkReply>
-
 
 class QnRequestParam: public QPair<QString, QString> {
     typedef QPair<QString, QString> base_type;

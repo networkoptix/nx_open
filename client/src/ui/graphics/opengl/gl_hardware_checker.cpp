@@ -27,13 +27,13 @@ bool QnGlHardwareChecker::checkCurrentContext(bool displayWarnings) {
         }
     }
 
-    /* Note that message will be shown in destructor, 
+    /* Note that message will be shown in destructor,
      * close to the event loop. */
     if(displayWarnings && !contextIsValid) {
         const QString title = tr("Important Performance Tip");
         QStringList messageParts;
         messageParts << tr("We have detected that your video card drivers may be not installed or are out of date.");
-        messageParts << tr("This could lead to client software malfunction including crash.");
+        messageParts << tr("This may result in client software issues (including unexpected crash).");
         messageParts << tr("Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.");
         QMessageBox::critical(NULL, title, messageParts.join(L'\n'), QMessageBox::Ok);
     }

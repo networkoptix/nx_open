@@ -7,7 +7,7 @@ if [[ "${beta}" == "true" ]]; then
   BETA="-beta" 
 fi 
 
-DISTRIB=$COMPANY_NAME-mediaserver-${release.version}.${buildNumber}-${arch}-${build.configuration}$BETA.deb
+DISTRIB=${installer.name}-mediaserver-${release.version}.${buildNumber}-${arch}-${build.configuration}$BETA.deb
 
 update () {
     export DEBIAN_FRONTEND=noninteractive

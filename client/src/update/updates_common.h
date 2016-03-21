@@ -3,6 +3,7 @@
 #include <utils/common/software_version.h>
 #include <utils/common/system_information.h>
 #include <utils/common/uuid.h>
+#include <core/resource/resource_fwd.h>
 
 
 struct QnCheckForUpdateResult {
@@ -38,12 +39,14 @@ struct QnUpdateResult {
         Successful,
         Cancelled,
         LockFailed,
+        AlreadyUpdated,
         DownloadingFailed,
         DownloadingFailed_NoFreeSpace,
         UploadingFailed,
         UploadingFailed_NoFreeSpace,
         UploadingFailed_Timeout,
         UploadingFailed_Offline,
+        UploadingFailed_AuthenticationFailed,
         ClientInstallationFailed,
         InstallationFailed,
         RestInstallationFailed
@@ -59,7 +62,7 @@ struct QnUpdateResult {
     QnSoftwareVersion targetVersion;
     bool clientInstallerRequired;
     bool protocolChanged;
-    QSet<QnUuid> failedPeers;
+    QnMediaServerResourceList failedServers;
 };
 Q_DECLARE_METATYPE(QnUpdateResult);
 

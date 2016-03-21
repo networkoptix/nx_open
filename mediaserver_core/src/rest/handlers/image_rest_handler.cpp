@@ -14,7 +14,7 @@ extern "C"
 
 #include <QtCore/QBuffer>
 
-#include "utils/network/tcp_connection_priv.h"
+#include "network/tcp_connection_priv.h"
 #include <utils/math/math.h>
 #include "core/resource/network_resource.h"
 #include <core/resource/camera_resource.h>
@@ -46,9 +46,8 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
     QString errStr;
     bool resParamFound = false;
     qint64 time = AV_NOPTS_VALUE;
-    QnGetImageHelper::RoundMethod roundMethod = QnGetImageHelper::IFrameBeforeTime;
+    QnThumbnailRequestData::RoundMethod roundMethod = QnThumbnailRequestData::KeyFrameBeforeMethod;
     QByteArray format("jpg");
-    QByteArray colorSpace("argb");
     QSize dstSize;
     int rotate = -1;
 
@@ -63,13 +62,13 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
         if (params[i].first == "res_id" || params[i].first == Qn::CAMERA_UNIQUE_ID_HEADER_NAME )
         {
             resParamFound = true;
-            res = qSharedPointerDynamicCast<QnVirtualCameraResource> (QnResourcePool::instance()->getNetResourceByPhysicalId(params[i].second));
+            res = qSharedPointerDynamicCast<QnVirtualCameraResource> (qnResPool->getNetResourceByPhysicalId(params[i].second));
             if (!res)
                 errStr = QString("Camera resource %1 not found").arg(params[i].second);
         }
         else if (params[i].first == "time") {
             if (params[i].second.toLower().trimmed() == "latest")
-                time = QnGetImageHelper::LATEST_IMAGE;
+                time = QnThumbnailRequestData::kLatestThumbnail;
             else
                 time = parseDateTime(params[i].second.toUtf8());
         }
@@ -77,19 +76,19 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
             rotate = params[i].second.toInt();
         }
         else if (params[i].first == "method") {
-            QString val = params[i].second.toLower().trimmed(); 
+            QString val = params[i].second.toLower().trimmed();
             if (val == lit("before"))
-                roundMethod = QnGetImageHelper::IFrameBeforeTime;
+                roundMethod = QnThumbnailRequestData::KeyFrameBeforeMethod;
             else if (val == lit("precise") || val == lit("exact")) {
 #               ifdef EDGE_SERVER
-                    roundMethod = QnGetImageHelper::IFrameBeforeTime;
+                    roundMethod = QnThumbnailRequestData::KeyFrameBeforeMethod;
                     qWarning() << "Get image performance hint: Ignore precise round method to reduce CPU usage";
 #               else
-                    roundMethod = QnGetImageHelper::Precise;
+                    roundMethod = QnThumbnailRequestData::PreciseMethod;
 #               endif
             }
             else if (val == lit("after"))
-                roundMethod = QnGetImageHelper::IFrameAfterTime;
+                roundMethod = QnThumbnailRequestData::KeyFrameAfterMethod;
         }
         else if (params[i].first == "format") {
             format = params[i].second.toUtf8();
@@ -97,10 +96,6 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
                 format = "jpeg";
             else if (format == "tif")
                 format = "tiff";
-        }
-        else if (params[i].first == "colorspace") 
-        {
-            colorSpace = params[i].second.toUtf8();
         }
         else if (params[i].first == "height")
             dstSize.setHeight(params[i].second.toInt());
@@ -153,7 +148,7 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
 
 }
 
-int QnImageRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& /*body*/, const QByteArray& /*srcBodyContentType*/, QByteArray& result, 
+int QnImageRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& /*body*/, const QByteArray& /*srcBodyContentType*/, QByteArray& result,
                                     QByteArray& contentType, const QnRestConnectionProcessor* owner)
 {
     return executeGet(path, params, result, contentType, owner);

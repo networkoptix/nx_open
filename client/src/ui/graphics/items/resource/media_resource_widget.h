@@ -5,10 +5,13 @@
 
 #include <QtGui/QStaticText>
 
+#include <camera/camera_bookmarks_manager_fwd.h>
+
 #include <core/resource/resource_fwd.h>
 
 #include <core/datapacket/media_data_packet.h> /* For QnMetaDataV1Ptr. */ // TODO: #Elric FWD!
 #include <core/resource/motion_window.h>
+#include <core/resource/camera_bookmark_fwd.h>
 
 #include <core/ptz/ptz_fwd.h>
 #include <core/ptz/item_dewarping_params.h>
@@ -16,12 +19,15 @@
 
 #include <client/client_globals.h>
 #include <camera/resource_display.h> // TODO: #Elric FWD!
+#include <utils/license_usage_helper.h>
 #include <utils/color_space/image_correction.h>
 
 class QnResourceDisplay;
 class QnResourceWidgetRenderer;
 class QnFisheyeHomePtzController;
+class QnCachingCameraDataLoader;
 class QnIoModuleOverlayWidget;
+class QnCompositeTextOverlay;
 
 class QnMediaResourceWidget: public QnResourceWidget {
     Q_OBJECT
@@ -106,7 +112,7 @@ public:
 
     /**
      * This function returns a PTZ controller associated with this widget.
-     * Note that this function never returns NULL. 
+     * Note that this function never returns NULL.
      *
      * \returns                         PTZ controller associated with this widget.
      */
@@ -118,11 +124,18 @@ public:
     virtual float visualAspectRatio() const;
     virtual float defaultVisualAspectRatio() const override;
 
+    /** Check if the widget has video. It can be absent in I/O Module, for example. */
+    bool hasVideo() const;
+
+    QnCompositeTextOverlay *compositeTextOverlay();
+
 signals:
     void motionSelectionChanged();
     void displayChanged();
     void fisheyeChanged();
     void dewarpingParamsChanged();
+    void colorsChanged();
+    void positionChanged(qint64 positionUtcMs);
 
 protected:
     virtual int helpTopicAt(const QPointF &pos) const override;
@@ -131,7 +144,8 @@ protected:
     virtual void channelScreenSizeChangedNotify() override;
     virtual void optionsChangedNotify(Options changedFlags) override;
 
-    virtual QString calculateInfoText() const override;
+    virtual QString calculateDetailsText() const override;
+    virtual QString calculatePositionText() const override;
     virtual QString calculateTitleText() const override;
     virtual Buttons calculateButtonsVisibility() const override;
     virtual QCursor calculateCursor() const override;
@@ -162,6 +176,8 @@ protected:
     void suspendHomePtzController();
     void resumeHomePtzController();
 
+    virtual void updateHud(bool animate);
+
 private slots:
     void at_resource_resourceChanged();
     void at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key);
@@ -184,6 +200,7 @@ private slots:
     void at_videoLayoutChanged();
 private:
     void setDisplay(const QnResourceDisplayPtr &display);
+    void createButtons();
 
     Q_SLOT void updateDisplay();
     Q_SLOT void updateAspectRatio();
@@ -194,6 +211,14 @@ private:
     Q_SLOT void updateCustomAspectRatio();
     Q_SLOT void updateIoModuleVisibility(bool animate);
     Q_SLOT void updateOverlayButton();
+
+    void updateCompositeOverlayMode();
+
+    qint64 getDisplayTimeUsec() const;
+    qint64 getUtcCurrentTimeUsec() const;
+    qint64 getUtcCurrentTimeMs() const;
+
+    void updateCurrentUtcPosMs();
 
 private:
     struct ResourceStates
@@ -250,8 +275,15 @@ private:
 
     QnMediaDewarpingParams m_dewarpingParams;
 
+    QnCompositeTextOverlay *m_compositeTextOverlay;
+
     QnIoModuleOverlayWidget *m_ioModuleOverlayWidget;
     bool m_ioCouldBeShown;
+
+    typedef QScopedPointer<QnSingleCamLicenceStatusHelper> QnSingleCamLicenceStatusHelperPtr;
+    QnSingleCamLicenceStatusHelperPtr m_ioLicenceStatusHelper;
+
+    qint64 m_posUtcMs;
 };
 
 Q_DECLARE_METATYPE(QnMediaResourceWidget *)

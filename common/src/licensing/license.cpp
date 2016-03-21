@@ -342,6 +342,14 @@ bool QnLicense::isValid(ErrorCode* errCode, ValidationMode mode) const
     return gotError(errCode, NoError);
 }
 
+QString QnLicense::validationInfo(ValidationMode mode) const {
+    ErrorCode code;
+    if (isValid(&code, mode))
+        return lit("Ok");
+
+    return errorMessage(code);
+}
+
 bool QnLicense::isValidEdgeLicense(ErrorCode* errCode, ValidationMode mode) const {
     for(const QnLicensePtr& license: qnLicensePool->getLicenses()) {
         // skip other license types and current license itself
@@ -579,7 +587,7 @@ class QnLicensePoolInstance: public QnLicensePool {};
 Q_GLOBAL_STATIC(QnLicensePoolInstance, qn_licensePool_instance)
 
 QnLicensePool::QnLicensePool(): 
-    m_mutex(QMutex::Recursive)
+    m_mutex(QnMutex::Recursive)
 {
     if (!qApp)
         return;
@@ -610,7 +618,7 @@ QnLicensePool *QnLicensePool::instance()
 
 QnLicenseList QnLicensePool::getLicenses() const
 {
-    QMutexLocker locker(&m_mutex);
+    QnMutexLocker locker( &m_mutex );
 
     return m_licenseDict.values();
 }
@@ -636,7 +644,7 @@ bool QnLicensePool::addLicense_i(const QnLicensePtr &license)
 
 void QnLicensePool::addLicense(const QnLicensePtr &license)
 {
-    QMutexLocker locker(&m_mutex);
+    QnMutexLocker locker( &m_mutex );
 
     if (addLicense_i(license))
         emit licensesChanged();
@@ -644,7 +652,7 @@ void QnLicensePool::addLicense(const QnLicensePtr &license)
 
 void QnLicensePool::removeLicense(const QnLicensePtr &license)
 {
-    QMutexLocker locker(&m_mutex);
+    QnMutexLocker locker( &m_mutex );
     m_licenseDict.remove(license->key());
     emit licensesChanged();
 }
@@ -663,7 +671,7 @@ bool QnLicensePool::addLicenses_i(const QnLicenseList &licenses)
 
 void QnLicensePool::addLicenses(const QnLicenseList &licenses)
 {
-    QMutexLocker locker(&m_mutex);
+    QnMutexLocker locker( &m_mutex );
 
     if (addLicenses_i(licenses))
         emit licensesChanged();
@@ -671,7 +679,7 @@ void QnLicensePool::addLicenses(const QnLicenseList &licenses)
 
 void QnLicensePool::replaceLicenses(const QnLicenseList &licenses)
 {
-    QMutexLocker locker(&m_mutex);
+    QnMutexLocker locker( &m_mutex );
 
     m_licenseDict.clear();
     addLicenses_i(licenses);
@@ -681,7 +689,7 @@ void QnLicensePool::replaceLicenses(const QnLicenseList &licenses)
 
 void QnLicensePool::reset()
 {
-    QMutexLocker locker(&m_mutex);
+    QnMutexLocker locker( &m_mutex );
 
     m_licenseDict = QnLicenseDict();
 
@@ -690,7 +698,7 @@ void QnLicensePool::reset()
 
 bool QnLicensePool::isEmpty() const
 {
-    QMutexLocker locker(&m_mutex);
+    QnMutexLocker locker( &m_mutex );
 
     return m_licenseDict.isEmpty();
 }

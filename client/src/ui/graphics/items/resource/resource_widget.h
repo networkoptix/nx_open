@@ -31,6 +31,8 @@ class QnWorkbenchItem;
 class QnStatusOverlayWidget;
 class QnImageButtonWidget;
 class QnImageButtonBar;
+class QnProxyLabel;
+class QnHtmlTextItem;
 
 class GraphicsLabel;
 
@@ -47,21 +49,24 @@ class QnResourceWidget: public Overlayed<Animated<Instrumented<Connective<Graphi
 
 public:
     enum Option {
-        DisplayActivity             = 0x0001,   /**< Whether the paused overlay icon should be displayed. */
-        DisplaySelection            = 0x0002,   /**< Whether selected / not selected state should be displayed. */
-        DisplayMotion               = 0x0004,   /**< Whether motion is to be displayed. */                              // TODO: #Elric this flag also handles smart search, separate!
-        DisplayButtons              = 0x0008,   /**< Whether item buttons are to be displayed. */
-        DisplayMotionSensitivity    = 0x0010,   /**< Whether a grid with motion region sensitivity is to be displayed. */
-        DisplayCrosshair            = 0x0020,   /**< Whether PTZ crosshair is to be displayed. */
-        DisplayInfo                 = 0x0040,   /**< Whether info panel is to be displayed. */
-        DisplayDewarped             = 0x0080,   /**< Whether the video is to be dewarped. */
+        DisplayActivity             = 0x00001,   /**< Whether the paused overlay icon should be displayed. */
+        DisplaySelection            = 0x00002,   /**< Whether selected / not selected state should be displayed. */
+        DisplayMotion               = 0x00004,   /**< Whether motion is to be displayed. */                              // TODO: #Elric this flag also handles smart search, separate!
+        //DisplayButtons              = 0x0008,   /**< Whether item buttons are to be displayed. */ supressed by InfoOverlaysForbidden
+        DisplayMotionSensitivity    = 0x00010,   /**< Whether a grid with motion region sensitivity is to be displayed. */
+        DisplayCrosshair            = 0x00020,   /**< Whether PTZ crosshair is to be displayed. */
+        DisplayInfo                 = 0x00040,   /**< Whether info panel is to be displayed. */
+        DisplayDewarped             = 0x00080,   /**< Whether the video is to be dewarped. */
 
-        ControlPtz                  = 0x0100,   /**< Whether PTZ state can be controlled with mouse. */
-        ControlZoomWindow           = 0x0200,   /**< Whether zoom windows can be created by dragging the mouse. */
+        ControlPtz                  = 0x00100,   /**< Whether PTZ state can be controlled with mouse. */
+        ControlZoomWindow           = 0x00200,   /**< Whether zoom windows can be created by dragging the mouse. */
 
-        WindowRotationForbidden     = 0x1000,
-        SyncPlayForbidden           = 0x2000,   /**< Whether SyncPlay is forbidden for this widget. */
-        InfoOverlaysForbidden       = 0x4000
+        WindowRotationForbidden     = 0x01000,
+        SyncPlayForbidden           = 0x02000,   /**< Whether SyncPlay is forbidden for this widget. */
+        InfoOverlaysForbidden       = 0x04000,
+
+        FullScreenMode              = 0x08000,
+        ActivityPresence            = 0x10000
     };
     Q_DECLARE_FLAGS(Options, Option)
 
@@ -86,6 +91,8 @@ public:
      */
     virtual ~QnResourceWidget();
 
+    void setBookmarksLabelText(const QString &text);
+
     /**
      * \returns                         Resource associated with this widget.
      */
@@ -102,7 +109,7 @@ public:
     QnConstResourceVideoLayoutPtr channelLayout() const {
         return m_channelsLayout;
     }
-    
+
     const QRectF &zoomRect() const;
     void setZoomRect(const QRectF &zoomRect);
     QnResourceWidget *zoomTargetWidget() const;
@@ -229,8 +236,8 @@ public:
 
     /**
      * Sets format of the title text.
-     * 
-     * If <tt>'\t'</tt> symbol is used in the text, it will be split in two parts 
+     *
+     * If <tt>'\t'</tt> symbol is used in the text, it will be split in two parts
      * at the position of this symbol, and these parts will be aligned to the sides of the title bar.
      *
      * If <tt>"%1"</tt> placeholder is used, it will be replaced with this widget's
@@ -239,22 +246,6 @@ public:
      * \param titleTextFormat           New title text for this window.
      */
     void setTitleTextFormat(const QString &titleTextFormat);
-
-    /**
-     * \returns                         Information text that is displayed in this widget's footer.
-     */
-    QString infoText();
-
-    /**
-     * \returns                         Format string of this widget's information text.
-     */
-    QString infoTextFormat() const;
-
-    /**
-     * \param infoTextFormat            New text to be displayed in this widget's footer. 
-     * \see setTitleTextFormat(const QString &)
-     */
-    void setInfoTextFormat(const QString &infoTextFormat);
 
     bool isInfoVisible() const;
     Q_SLOT void setInfoVisible(bool visible, bool animate = true);
@@ -294,7 +285,7 @@ protected:
     virtual void paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual Qn::RenderStatus paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) = 0;
     virtual void paintChannelForeground(QPainter *painter, int channel, const QRectF &rect);
-    
+
     void paintSelection(QPainter *painter, const QRectF &rect);
 
     virtual QSizeF constrainedSize(const QSizeF constraint, Qt::WindowFrameSection pinSection) const override;
@@ -309,7 +300,7 @@ protected:
     virtual bool isHovered() const;
 
     Qn::ResourceStatusOverlay statusOverlay() const;
-    void setStatusOverlay(Qn::ResourceStatusOverlay statusOverlay);
+    void setStatusOverlay(Qn::ResourceStatusOverlay statusOverlay, bool animate = true);
     Qn::ResourceStatusOverlay calculateStatusOverlay(int resourceStatus, bool hasVideo) const;
     virtual Qn::ResourceStatusOverlay calculateStatusOverlay() const;
     Q_SLOT void updateStatusOverlay();
@@ -317,8 +308,13 @@ protected:
     virtual QString calculateTitleText() const;
     Q_SLOT void updateTitleText();
 
-    virtual QString calculateInfoText() const;
-    Q_SLOT void updateInfoText();
+    virtual QString calculateDetailsText() const;
+    void updateDetailsText();
+
+    virtual QString calculatePositionText() const;
+    void updatePositionText();
+
+    void updateInfoText();
 
     virtual QCursor calculateCursor() const;
     Q_SLOT void updateCursor();
@@ -340,7 +336,7 @@ protected:
 
     void setChannelLayout(QnConstResourceVideoLayoutPtr channelLayout);
     virtual void channelLayoutChangedNotify() {}
-    
+
     virtual void optionsChangedNotify(Options changedFlags);
 
     int channelCount() const;
@@ -353,18 +349,25 @@ protected:
 
     float defaultAspectRatio() const;
 private:
+    void createButtons();
+    void createHeaderOverlay();
+    void createFooterOverlay();
+
     void setTitleTextInternal(const QString &titleText);
-    void setInfoTextInternal(const QString &infoText);
 
     void addInfoOverlay();
     void addMainOverlay();
+
+    void setupIconButton(QGraphicsLinearLayout *layout
+        , QnImageButtonWidget *button);
+
+    void insertIconButtonCopy(QGraphicsLinearLayout *layout);
 
     Q_SLOT void updateCheckedButtons();
 
     Q_SLOT void at_infoButton_toggled(bool toggled);
 
     Q_SLOT void at_buttonBar_checkedButtonsChanged();
-
 private:
     friend class QnWorkbenchDisplay;
 
@@ -403,8 +406,8 @@ private:
 
     QnResourceWidgetFrameColors m_frameColors;
 
-    QString m_titleTextFormat, m_infoTextFormat;
-    bool m_titleTextFormatHasPlaceholder, m_infoTextFormatHasPlaceholder;
+    QString m_titleTextFormat;
+    bool m_titleTextFormatHasPlaceholder;
 
     /* Widgets for overlaid stuff. */
 
@@ -412,25 +415,25 @@ private:
     QnImageButtonWidget *m_iconButton;
 
 
-
     QnStatusOverlayWidget *m_statusOverlayWidget;
 
     struct OverlayWidgets {
-        GraphicsWidget* infoOverlay;
-        GraphicsWidget* mainOverlay;
+        GraphicsWidget *cameraNameOnlyOverlay;
+        GraphicsLabel  *cameraNameOnlyLabel;
 
-        GraphicsLabel *mainNameLabel;
-        GraphicsLabel *mainExtrasLabel;
+        GraphicsWidget *cameraNameWithButtonsOverlay;
+        GraphicsLabel  *mainNameLabel;
+        GraphicsLabel  *mainExtrasLabel;
 
-        GraphicsLabel *mainDetailsLabel;
-        GraphicsLabel *mainTimeLabel;
+        GraphicsWidget *detailsOverlay;     /**< Overlay containing info item. */
+        QnHtmlTextItem *detailsItem;        /**< Detailed camera info (resolution, stream, etc). */
 
-        GraphicsLabel *infoNameLabel;
-        GraphicsLabel *infoTimeLabel;
+        GraphicsWidget *positionOverlay;    /**< Overlay containing position item. */
+        QnHtmlTextItem *positionItem;       /**< Current camera position. */
 
         OverlayWidgets();
     };
-    
+
     OverlayWidgets m_overlayWidgets;
 
     /** Whether aboutToBeDestroyed signal has already been emitted. */

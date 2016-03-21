@@ -12,7 +12,7 @@
 #include <core/resource/resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource/network_resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/videowall_resource.h>
 
@@ -115,7 +115,7 @@ void QnVideowallItemWidget::initInfoOverlay() {
     m_headerLabel->setAcceptedMouseButtons(0);
     m_headerLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
 
-    m_infoButton = new QnImageButtonWidget();
+    m_infoButton = new QnImageButtonWidget(lit("videowall_info"));
     m_infoButton->setIcon(qnSkin->icon("item/info.png"));
     m_infoButton->setCheckable(true);
     m_infoButton->setToolTip(tr("Information"));
@@ -226,8 +226,8 @@ void QnVideowallItemWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
 
         qreal xspace = m_layout->cellSpacing().width() * 0.5;
         qreal yspace = m_layout->cellSpacing().height() * 0.5;
-       
-        qreal cellAspectRatio = m_layout->hasCellAspectRatio() 
+
+        qreal cellAspectRatio = m_layout->hasCellAspectRatio()
             ? m_layout->cellAspectRatio()
             : qnGlobals->defaultLayoutCellAspectRatio();
 
@@ -356,7 +356,7 @@ void QnVideowallItemWidget::dropEvent(QGraphicsSceneDragDropEvent *event) {
     parameters.setArgument(Qn::VideoWallItemGuidRole, m_itemUuid);
     parameters.setArgument(Qn::KeyboardModifiersRole, event->modifiers());
 
-    menu()->trigger(Qn::DropOnVideoWallItemAction, parameters);
+    menu()->trigger(QnActions::DropOnVideoWallItemAction, parameters);
 
     event->acceptProposedAction();
 }
@@ -425,7 +425,7 @@ void QnVideowallItemWidget::at_doubleClicked(Qt::MouseButton button) {
         return;
 
     menu()->triggerIfPossible(
-        Qn::StartVideoWallControlAction,
+        QnActions::StartVideoWallControlAction,
         QnActionParameters(m_indices)
     );
 }
@@ -474,7 +474,7 @@ void QnVideowallItemWidget::updateStatusOverlay(Qn::ResourceStatusOverlay overla
 
     if(overlay == Qn::EmptyOverlay)
         opacityAnimator(m_statusOverlayWidget)->animateTo(0.0);
-    else 
+    else
         opacityAnimator(m_statusOverlayWidget)->animateTo(1.0);
 }
 
@@ -524,8 +524,9 @@ bool QnVideowallItemWidget::paintItem(QPainter *painter, const QRectF &paintRect
         return true;
     }
 
-    if (resource && (resource->flags() & Qn::live_cam) && resource.dynamicCast<QnNetworkResource>()) {
-        m_widget->m_thumbnailManager->selectResource(resource);
+    if (QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>())
+    {
+        m_widget->m_thumbnailManager->selectResource(camera);
         return false;
     }
 

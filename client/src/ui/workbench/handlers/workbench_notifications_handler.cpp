@@ -52,8 +52,8 @@ QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent
     connect(messageProcessor,   &QnCommonMessageProcessor::timeServerSelectionRequired,     this,   [this] {
         setSystemHealthEventVisible(QnSystemHealth::NoPrimaryTimeServer, true);
     });
-    connect( action( Qn::SelectTimeServerAction ), &QAction::triggered,                     this,   [this] {
-        setSystemHealthEventVisible( QnSystemHealth::NoPrimaryTimeServer, false ); 
+    connect( action(QnActions::SelectTimeServerAction), &QAction::triggered,                     this,   [this] {
+        setSystemHealthEventVisible( QnSystemHealth::NoPrimaryTimeServer, false );
     } );
 
     connect(qnSettings->notifier(QnClientSettings::POPUP_SYSTEM_HEALTH), &QnPropertyNotifier::valueChanged, this, &QnWorkbenchNotificationsHandler::at_settings_valueChanged);
@@ -69,10 +69,7 @@ void QnWorkbenchNotificationsHandler::clear() {
     emit cleared();
 }
 
-void QnWorkbenchNotificationsHandler::addBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
-//    if (businessAction->actionType() != QnBusiness::ShowPopup)
-//        return;
-
+void QnWorkbenchNotificationsHandler::addNotification(const QnAbstractBusinessActionPtr &businessAction) {
     //TODO: #GDM #Business check if camera is visible to us
     QnBusiness::UserGroup userGroup = businessAction->getParams().userGroup;
     if (userGroup == QnBusiness::AdminOnly
@@ -80,39 +77,55 @@ void QnWorkbenchNotificationsHandler::addBusinessAction(const QnAbstractBusiness
         return;
     }
 
+    if (businessAction->actionType() == QnBusiness::ShowOnAlarmLayoutAction) {
+        QnUserResourceList users = qnResPool->getResources<QnUserResource>(businessAction->getParams().additionalResources);
+        if (!users.isEmpty() && !users.contains(context()->user()))
+            return;
+    }
+
     QnBusinessEventParameters params = businessAction->getRuntimeParams();
     QnBusiness::EventType eventType = params.eventType;
 
     if (eventType >= QnBusiness::SystemHealthEvent && eventType <= QnBusiness::MaxSystemHealthEvent) {
         int healthMessage = eventType - QnBusiness::SystemHealthEvent;
-        QnUuid resourceId = params.eventResourceId;
-        QnResourcePtr resource = qnResPool->getResourceById(resourceId);
-        addSystemHealthEvent(QnSystemHealth::MessageType(healthMessage), resource);
+        addSystemHealthEvent(QnSystemHealth::MessageType(healthMessage), businessAction);
         return;
     }
 
     if (!context()->user())
         return;
 
-    const bool soundAction = businessAction->actionType() == QnBusiness::PlaySoundAction; // TODO: #GDM #Business also PlaySoundOnceAction?
-    if (!soundAction && !m_adaptor->isAllowed(eventType))
+    bool alwaysNotify = false;
+    switch (businessAction->actionType()) {
+    case QnBusiness::ShowOnAlarmLayoutAction:
+    case QnBusiness::PlaySoundAction:
+    //case QnBusiness::PlaySoundOnceAction: -- handled outside without notification
+        alwaysNotify = true;
+        break;
+
+    default:
+        break;
+    }
+
+    if (!alwaysNotify && !m_adaptor->isAllowed(eventType))
         return;
 
-    emit businessActionAdded(businessAction);
+    emit notificationAdded(businessAction);
 }
 
 void QnWorkbenchNotificationsHandler::addSystemHealthEvent(QnSystemHealth::MessageType message) {
-    addSystemHealthEvent(message, QnResourcePtr());
+    addSystemHealthEvent(message, QnAbstractBusinessActionPtr());
 }
 
-void QnWorkbenchNotificationsHandler::addSystemHealthEvent(QnSystemHealth::MessageType message, const QnResourcePtr& resource) {
+void QnWorkbenchNotificationsHandler::addSystemHealthEvent(QnSystemHealth::MessageType message, const QnAbstractBusinessActionPtr &businessAction)
+{
     if (message == QnSystemHealth::StoragesAreFull)
         return; //Bug #2308: Need to remove notification "Storages are full"
 
     if (!(qnSettings->popupSystemHealth() & (1ull << message)))
         return;
 
-    setSystemHealthEventVisible( message, resource, true );
+    setSystemHealthEventVisibleInternal( message, QVariant::fromValue( businessAction), true);
 }
 
 bool QnWorkbenchNotificationsHandler::adminOnlyMessage(QnSystemHealth::MessageType message) {
@@ -129,27 +142,35 @@ bool QnWorkbenchNotificationsHandler::adminOnlyMessage(QnSystemHealth::MessageTy
     case QnSystemHealth::StoragesNotConfigured:
     case QnSystemHealth::StoragesAreFull:
     case QnSystemHealth::ArchiveRebuildFinished:
+    case QnSystemHealth::ArchiveRebuildCanceled:
+    case QnSystemHealth::ArchiveFastScanFinished:
     case QnSystemHealth::NoPrimaryTimeServer:
     case QnSystemHealth::SystemIsReadOnly:
         return true;
 
     default:
         break;
-
     }
-    qnWarning("Unknown system health message");
-    return false;
+
+    Q_ASSERT_X(false, Q_FUNC_INFO, "Unknown system health message");
+    return true;
 }
 
 void QnWorkbenchNotificationsHandler::setSystemHealthEventVisible(QnSystemHealth::MessageType message, bool visible) {
     setSystemHealthEventVisibleInternal(message, QVariant(), visible);
 }
 
-void QnWorkbenchNotificationsHandler::setSystemHealthEventVisible(QnSystemHealth::MessageType message, const QnResourcePtr &resource, bool visible) {
-    setSystemHealthEventVisibleInternal( message, QVariant::fromValue( resource ), visible );
+void QnWorkbenchNotificationsHandler::setSystemHealthEventVisible(QnSystemHealth::MessageType message,
+                                                                  const QnResourcePtr &resource,
+                                                                  bool visible)
+{
+    setSystemHealthEventVisibleInternal( message, QVariant::fromValue( resource ), visible);
 }
 
-void QnWorkbenchNotificationsHandler::setSystemHealthEventVisibleInternal( QnSystemHealth::MessageType message, const QVariant& params, bool visible ) {
+void QnWorkbenchNotificationsHandler::setSystemHealthEventVisibleInternal( QnSystemHealth::MessageType message,
+                                                                          const QVariant& params,
+                                                                          bool visible)
+{
     bool canShow = true;
 
     bool connected = !qnCommon->remoteGUID().isNull();
@@ -168,6 +189,9 @@ void QnWorkbenchNotificationsHandler::setSystemHealthEventVisibleInternal( QnSys
             canShow = false;
     }
 
+    /* Some messages are not to be displayed to users. */
+    canShow &= (QnSystemHealth::isMessageVisible(message));
+
     /* Checking that we want to see this message */
     bool isAllowedByFilter = qnSettings->popupSystemHealth() & (1ull << message);
     canShow &= isAllowedByFilter;
@@ -182,7 +206,7 @@ void QnWorkbenchNotificationsHandler::at_context_userChanged() {
     m_adaptor->setResource(context()->user());
 
     checkAndAddSystemHealthMessage(QnSystemHealth::NoLicenses);
-    checkAndAddSystemHealthMessage(QnSystemHealth::SystemIsReadOnly);    
+    checkAndAddSystemHealthMessage(QnSystemHealth::SystemIsReadOnly);
 }
 
 void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHealth::MessageType message) {
@@ -217,6 +241,7 @@ void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHea
 
     case QnSystemHealth::StoragesNotConfigured:
     case QnSystemHealth::ArchiveRebuildFinished:
+    case QnSystemHealth::ArchiveRebuildCanceled:
         return;
 
     default:
@@ -256,8 +281,9 @@ void QnWorkbenchNotificationsHandler::at_eventManager_connectionClosed() {
 void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(const QnAbstractBusinessActionPtr &businessAction) {
     switch (businessAction->actionType()) {
     case QnBusiness::ShowPopupAction:
+    case QnBusiness::ShowOnAlarmLayoutAction:
     {
-        addBusinessAction(businessAction);
+        addNotification(businessAction);
         break;
     }
     case QnBusiness::PlaySoundOnceAction:
@@ -273,10 +299,10 @@ void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(const QnAbs
     {
         switch (businessAction->getToggleState()) {
         case QnBusiness::ActiveState:
-            addBusinessAction(businessAction);
+            addNotification(businessAction);
             break;
         case QnBusiness::InactiveState:
-            emit businessActionRemoved(businessAction);
+            emit notificationRemoved(businessAction);
             break;
         default:
             break;
@@ -296,18 +322,22 @@ void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(const QnAbs
 void QnWorkbenchNotificationsHandler::at_settings_valueChanged(int id) {
     if (id != QnClientSettings::POPUP_SYSTEM_HEALTH)
         return;
+
     quint64 filter = qnSettings->popupSystemHealth();
-    for (int i = 0; i < QnSystemHealth::MessageTypeCount; i++) {
+    for (int i = 0; i < QnSystemHealth::Count; i++) {
+        QnSystemHealth::MessageType messageType = static_cast<QnSystemHealth::MessageType>(i);
+        if (!QnSystemHealth::isMessageVisible(messageType))
+            continue;
+
         bool oldVisible = (m_popupSystemHealthFilter &  (1ull << i));
         bool newVisible = (filter &  (1ull << i));
         if (oldVisible == newVisible)
             continue;
 
-        QnSystemHealth::MessageType message = QnSystemHealth::MessageType(i);
         if (newVisible)
-            checkAndAddSystemHealthMessage(message);
+            checkAndAddSystemHealthMessage(messageType);
         else
-            setSystemHealthEventVisible(message, false);
+            setSystemHealthEventVisible(messageType, false);
     }
     m_popupSystemHealthFilter = filter;
 }

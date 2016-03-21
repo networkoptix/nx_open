@@ -17,12 +17,12 @@ namespace ec2
 
         QnBusiness::EventType eventType;
         std::vector<QnUuid>  eventResourceIds;
-        QByteArray eventCondition; 
+        QnLatin1Array eventCondition; 
         QnBusiness::EventState eventState;
 
         QnBusiness::ActionType actionType;
         std::vector<QnUuid> actionResourceIds;
-        QByteArray actionParams;
+        QnLatin1Array actionParams;
 
         qint32 aggregationPeriod; // msecs
         bool disabled;

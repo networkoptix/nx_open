@@ -97,7 +97,8 @@
         </Property>
 
         <Property Id="ALLOW_CAMERA_CHANGES" Secure="yes"/>
-        <Property Id="STATISTICS_REPORT_ALLOWED" Secure="yes" Value="1"/>
+
+        <Property Id="STATISTICS_REPORT_ALLOWED" Secure="yes"/>
    
         <Property Id="SERVER_LOGIN" Value="admin"/>
         <Property Id="SERVER_PASSWORD" Secure="yes"/>
@@ -110,10 +111,16 @@
 
         <!-- Custom actions -->
         <CustomAction Id="SetPreviousServerInstalled" BinaryKey="CustomActions.dll" DllEntry="SetPreviousServerInstalled" Execute="immediate" Return="check"/>
+        <SetProperty Action="SetStatisticsReportAllowed1" Id="STATISTICS_REPORT_ALLOWED" Value="1" After="SetPreviousServerInstalled" Sequence="ui">$(var.VmsInstalling)</SetProperty>
+
         <CustomAction Id="ResetPreselected" Property="Preselected" Value="" />
         <CustomAction Id="GenerateGuidsForServers" BinaryKey="CustomActions.dll" DllEntry="GenerateGuidsForServers"/>
         <CustomAction Id="FindConfiguredStorages" BinaryKey="CustomActions.dll" DllEntry="FindConfiguredStorages"/>
         <CustomAction Id="DeleteDatabaseFile" BinaryKey="CustomActions.dll" DllEntry="DeleteDatabaseFile" Execute="deferred" Impersonate="no"/>
+
+
+        <CustomAction Id="DeleteRegistryKeys_Cmd" Property="DeleteRegistryKeys" Value="$(var.ServerRegPath)" Execute="immediate" Impersonate="yes"/>
+        <CustomAction Id="DeleteRegistryKeys" BinaryKey="CustomActions.dll" DllEntry="DeleteRegistryKeys" Execute="deferred" Impersonate="no"/>
 
         <CustomAction Id="MissingFeature"  Error="At least one component should be selected"/>
 
@@ -226,7 +233,8 @@
 
             <Custom Action="DeleteDatabaseFile_Cmd" After="StopServices">REMOVE_DATABASE=1</Custom>
             <Custom Action="DeleteDatabaseFile" After="DeleteDatabaseFile_Cmd">REMOVE_DATABASE=1</Custom>
-
+            <Custom Action="DeleteRegistryKeys_Cmd" After="DeleteDatabaseFile">NOT $(var.VmsInstalling)</Custom>
+            <Custom Action="DeleteRegistryKeys" After="DeleteRegistryKeys_Cmd">NOT $(var.VmsInstalling)</Custom>
         </InstallExecuteSequence>
 
         <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
@@ -348,7 +356,7 @@
 
             <!-- WelcomeDlg -->
             <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="LicenseAgreementDlg"><![CDATA[ PREVIOUSSERVERINSTALLED <> "1" AND NOT LICENSE_ALREADY_ACCEPTED ]]></Publish>          
-            <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="MediaServerDlg"><![CDATA[ PREVIOUSSERVERINSTALLED <> "1" AND LICENSE_ALREADY_ACCEPTED ]]></Publish>          
+            <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="MediaServerDlg"><![CDATA[ PREVIOUSSERVERINSTALLED <> "1" AND LICENSE_ALREADY_ACCEPTED ]]></Publish>
             <Publish Dialog="WelcomeDlg" Control="Next" Property="ALLOW_CAMERA_CHANGES" Value="yes"><![CDATA[ PREVIOUSSERVERINSTALLED <> "1" AND LICENSE_ALREADY_ACCEPTED ]]></Publish>
             <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="UpgradeDlg">PREVIOUSSERVERINSTALLED = "1"</Publish>
 
@@ -374,6 +382,7 @@
 
             <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="4"><![CDATA[ $(var.IsSettingsValid) ]]></Publish>
             <Publish Dialog="MediaServerDlg" Control="Next" Property="ALLOW_CAMERA_CHANGES" Value="0" Order="4">ALLOW_CAMERA_CHANGES = ""</Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Property="STATISTICS_REPORT_ALLOWED" Value="0" Order="4">STATISTICS_REPORT_ALLOWED = ""</Publish>
 
             <Publish Dialog="MediaServerDlg" Control="Next" Property="PORT_DIALOG_BACK" Value="MediaServerDlg">1</Publish>
             <Publish Dialog="MediaServerDlg" Control="Next" Property="PORT_DIALOG_NEXT" Value="VerifyReadyDlg">1</Publish>

@@ -152,14 +152,12 @@ bool DummySocket::getConnectionStatistics( StreamSocketInfo* /*info*/ )
 }
 
 
-bool DummySocket::postImpl( std::function<void()>&& /*handler*/ )
+void DummySocket::postImpl( std::function<void()>&& /*handler*/ )
 {
-    return false;
 }
 
-bool DummySocket::dispatchImpl( std::function<void()>&& /*handler*/ )
+void DummySocket::dispatchImpl( std::function<void()>&& /*handler*/ )
 {
-    return false;
 }
 
 
@@ -202,6 +200,11 @@ BufferSocket::BufferSocket( const std::string& data )
 }
 
 void BufferSocket::close()
+{
+    m_isOpened = false;
+}
+
+void BufferSocket::shutdown()
 {
     m_isOpened = false;
 }

@@ -1,5 +1,7 @@
 #include "qtfile_storage_resource.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <QtCore/QDir>
 
 #include "utils/common/util.h"
@@ -86,7 +88,7 @@ qint64 QnQtFileStorageResource::getFileSize(const QString& url) const
 	return 0; // not implemented
 }
 
-bool QnQtFileStorageResource::isAvailable() const
+bool QnQtFileStorageResource::initOrUpdate() const
 {
     QString tmpDir = closeDirPath(getUrl()) + QLatin1String("tmp") + QString::number(qrand());
     QDir dir(tmpDir);
@@ -117,3 +119,5 @@ QnStorageResource* QnQtFileStorageResource::instance(const QString&)
 {
     return new QnQtFileStorageResource();
 }
+
+#endif //ENABLE_DATA_PROVIDERS

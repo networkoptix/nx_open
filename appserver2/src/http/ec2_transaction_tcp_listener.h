@@ -1,9 +1,9 @@
 #ifndef __EC2_TRANSACTION_SERVER_H__
 #define __EC2_TRANSACTION_SERVER_H__
 
-#include "utils/network/tcp_connection_processor.h"
 #include "core/dataconsumer/abstract_data_consumer.h"
-#include "utils/network/tcp_listener.h"
+#include "network/tcp_connection_processor.h"
+#include "network/tcp_listener.h"
 
 namespace ec2
 {

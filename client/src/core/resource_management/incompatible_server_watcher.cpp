@@ -6,85 +6,147 @@
 #include <utils/common/log.h>
 #include <common/common_module.h>
 
-namespace {
-
-    QnMediaServerResourcePtr makeResource(const QnModuleInformationWithAddresses &moduleInformation, Qn::ResourceStatus initialStatus) {
-        QnMediaServerResourcePtr server(new QnMediaServerResource(qnResTypePool));
-
-        server->setId(QnUuid::createUuid());
-        server->setStatus(initialStatus, true);
-        server->setOriginalGuid(moduleInformation.id);
-        server->setModuleInformation(moduleInformation);
-        return server;
-    }
-
-    bool isSuitable(const QnModuleInformation &moduleInformation) {
+namespace
+{
+    bool isSuitable(const QnModuleInformation &moduleInformation)
+    {
         return moduleInformation.version >= QnSoftwareVersion(2, 3, 0, 0);
     }
 
 } // anonymous namespace
 
+class QnIncompatibleServerWatcherPrivate : public QObject
+{
+    Q_DECLARE_PUBLIC(QnIncompatibleServerWatcher)
+    QnIncompatibleServerWatcher *q_ptr;
+
+public:
+    QnIncompatibleServerWatcherPrivate(QnIncompatibleServerWatcher *parent);
+
+    void at_resourcePool_statusChanged(const QnResourcePtr &resource);
+    void at_discoveredServerChanged(const ec2::ApiDiscoveredServerData &serverData);
+
+    void addResource(const ec2::ApiDiscoveredServerData &serverData);
+    void removeResource(const QnUuid &id);
+    QnUuid getFakeId(const QnUuid &realId) const;
+
+    QnMediaServerResourcePtr makeResource(const ec2::ApiDiscoveredServerData &serverData);
+
+public:
+    struct DiscoveredServerItem {
+        ec2::ApiDiscoveredServerData serverData;
+        bool keep;
+        bool removed;
+
+        DiscoveredServerItem() :
+            keep(false),
+            removed(false)
+        {}
+
+        DiscoveredServerItem(const ec2::ApiDiscoveredServerData &serverData) :
+            serverData(serverData),
+            keep(false),
+            removed(false)
+        {}
+    };
+
+    mutable QnMutex mutex;
+    QHash<QnUuid, QnUuid> fakeUuidByServerUuid;
+    QHash<QnUuid, QnUuid> serverUuidByFakeUuid;
+    QHash<QnUuid, DiscoveredServerItem> discoveredServerItemById;
+};
+
 QnIncompatibleServerWatcher::QnIncompatibleServerWatcher(QObject *parent) :
-    QObject(parent)
+    QObject(parent),
+    d_ptr(new QnIncompatibleServerWatcherPrivate(this))
 {
 }
 
-QnIncompatibleServerWatcher::~QnIncompatibleServerWatcher() {
+QnIncompatibleServerWatcher::~QnIncompatibleServerWatcher()
+{
     stop();
 }
 
-void QnIncompatibleServerWatcher::start() {
-    connect(QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::moduleChanged, this, &QnIncompatibleServerWatcher::at_moduleChanged);
-    connect(qnResPool,  &QnResourcePool::resourceAdded,     this,   &QnIncompatibleServerWatcher::at_resourcePool_resourceChanged);
-    connect(qnResPool,  &QnResourcePool::resourceChanged,   this,   &QnIncompatibleServerWatcher::at_resourcePool_resourceChanged);
-    connect(qnResPool,  &QnResourcePool::statusChanged,     this,   &QnIncompatibleServerWatcher::at_resourcePool_resourceChanged);
+void QnIncompatibleServerWatcher::start()
+{
+    Q_D(QnIncompatibleServerWatcher);
+
+    connect(QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::discoveredServerChanged,
+            d, &QnIncompatibleServerWatcherPrivate::at_discoveredServerChanged);
+
+    connect(qnResPool, &QnResourcePool::statusChanged,
+            d, &QnIncompatibleServerWatcherPrivate::at_resourcePool_statusChanged);
 }
 
-void QnIncompatibleServerWatcher::stop() {
+void QnIncompatibleServerWatcher::stop()
+{
+    Q_D(QnIncompatibleServerWatcher);
+
     if (QnCommonMessageProcessor::instance())
-        disconnect(QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::moduleChanged, this, &QnIncompatibleServerWatcher::at_moduleChanged);
-    disconnect(qnResPool, 0, this, 0);
+    {
+        disconnect(QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::discoveredServerChanged,
+                   d, &QnIncompatibleServerWatcherPrivate::at_discoveredServerChanged);
+    }
+    disconnect(qnResPool, 0, d, 0);
 
     QList<QnUuid> ids;
+
     {
-        QMutexLocker lock(&m_mutex);
-        ids = m_fakeUuidByServerUuid.values();
-        m_fakeUuidByServerUuid.clear();
-        m_serverUuidByFakeUuid.clear();
+        QnMutexLocker lock(&d->mutex);
+        ids = d->fakeUuidByServerUuid.values();
+        d->fakeUuidByServerUuid.clear();
+        d->serverUuidByFakeUuid.clear();
+        d->discoveredServerItemById.clear();
     }
 
-    for (const QnUuid &id: ids) {
+    for (const QnUuid &id: ids)
+    {
         QnResourcePtr resource = qnResPool->getIncompatibleResourceById(id, true);
         if (resource)
             qnResPool->removeResource(resource);
     }
 }
 
-void QnIncompatibleServerWatcher::keepServer(const QnUuid &id, bool keep) {
-    QMutexLocker lock(&m_mutex);
+void QnIncompatibleServerWatcher::keepServer(const QnUuid &id, bool keep)
+{
+    Q_D(QnIncompatibleServerWatcher);
 
-    auto it = m_moduleInformationById.find(id);
-    if (it == m_moduleInformationById.end())
+    QnMutexLocker lock(&d->mutex);
+
+    auto it = d->discoveredServerItemById.find(id);
+    if (it == d->discoveredServerItemById.end())
         return;
 
     it->keep = keep;
 
-    if (!it->removed)
-        return;
+    if (!keep && it->removed)
+    {
+        d->discoveredServerItemById.erase(it);
 
-    m_moduleInformationById.erase(it);
+        lock.unlock();
 
-    lock.unlock();
-
-    removeResource(getFakeId(id));
+        d->removeResource(d->getFakeId(id));
+    }
 }
 
-void QnIncompatibleServerWatcher::createModules(const QList<QnModuleInformationWithAddresses> &modules) {
-    for (const QnModuleInformationWithAddresses &moduleInformation: modules)
-        at_moduleChanged(moduleInformation, true);
+void QnIncompatibleServerWatcher::createInitialServers(
+        const ec2::ApiDiscoveredServerDataList &discoveredServers)
+{
+    Q_D(QnIncompatibleServerWatcher);
+
+    for (const ec2::ApiDiscoveredServerData &discoveredServer: discoveredServers)
+        d->at_discoveredServerChanged(discoveredServer);
 }
 
-void QnIncompatibleServerWatcher::at_resourcePool_resourceChanged(const QnResourcePtr &resource) {
+
+QnIncompatibleServerWatcherPrivate::QnIncompatibleServerWatcherPrivate(QnIncompatibleServerWatcher *parent) :
+    QObject(parent),
+    q_ptr(parent)
+{
+}
+
+void QnIncompatibleServerWatcherPrivate::at_resourcePool_statusChanged(const QnResourcePtr &resource)
+{
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
     if (!server)
         return;
@@ -92,115 +154,144 @@ void QnIncompatibleServerWatcher::at_resourcePool_resourceChanged(const QnResour
     QnUuid id = server->getId();
 
     {
-        QMutexLocker lock(&m_mutex);
-        if (m_serverUuidByFakeUuid.contains(id))
+        QnMutexLocker lock(&mutex);
+        if (serverUuidByFakeUuid.contains(id))
             return;
     }
 
     Qn::ResourceStatus status = server->getStatus();
-    if (status != Qn::Offline && server->getModuleInformation().isCompatibleToCurrentSystem()) {
+    if (status != Qn::Offline && server->getModuleInformation().isCompatibleToCurrentSystem())
+    {
         removeResource(getFakeId(id));
-    } else if (status == Qn::Offline) {
-        QMutexLocker lock(&m_mutex);
-        QnModuleInformationWithAddresses moduleInformation = m_moduleInformationById.value(id).moduleInformation;
-        lock.unlock();
-        if (!moduleInformation.id.isNull())
-            addResource(moduleInformation);
     }
-}
-
-void QnIncompatibleServerWatcher::at_moduleChanged(const QnModuleInformationWithAddresses &moduleInformation, bool isAlive) {
-    QMutexLocker lock(&m_mutex);
-    auto it = m_moduleInformationById.find(moduleInformation.id);
-
-    if (!isAlive) {
-        if (it == m_moduleInformationById.end())
-            return;
-
-        if (it->keep) {
-            it->removed = true;
-            return;
-        }
-
-        m_moduleInformationById.remove(moduleInformation.id);
-
-        lock.unlock();
-        removeResource(getFakeId(moduleInformation.id));
-    } else {
-        if (it != m_moduleInformationById.end()) {
-            it->removed = false;
-            it->moduleInformation = moduleInformation;
-        } else {
-            m_moduleInformationById.insert(moduleInformation.id, moduleInformation);
-        }
-
-        lock.unlock();
-        addResource(moduleInformation);
-    }
-}
-
-void QnIncompatibleServerWatcher::addResource(const QnModuleInformationWithAddresses &moduleInformation) {
-    bool compatible = moduleInformation.isCompatibleToCurrentSystem();
-    bool authorized = moduleInformation.authHash == qnCommon->moduleInformation().authHash;
-
-    QnUuid id = getFakeId(moduleInformation.id);
-
-    QnResourcePtr resource = qnResPool->getResourceById(moduleInformation.id);
-    if ((compatible && (authorized || resource)) || (resource && resource->getStatus() == Qn::Online)) {
-        removeResource(id);
-        return;
-    }
-
-    if (id.isNull()) {
-        // add a resource
-        if (!isSuitable(moduleInformation))
-            return;
-
-        QnMediaServerResourcePtr server = makeResource(moduleInformation, (compatible && !authorized) ? Qn::Unauthorized : Qn::Incompatible);
+    else if (status == Qn::Offline)
+    {
+        QnMutexLocker lock(&mutex);
+        auto it = discoveredServerItemById.find(id);
+        if (it != discoveredServerItemById.end())
         {
-            QMutexLocker lock(&m_mutex);
-            m_fakeUuidByServerUuid[moduleInformation.id] = server->getId();
-            m_serverUuidByFakeUuid[server->getId()] = moduleInformation.id;
+            lock.unlock();
+
+            if (it->serverData.status == Qn::Incompatible || it->serverData.status == Qn::Unauthorized)
+                addResource(it->serverData);
+        }
+    }
+}
+
+void QnIncompatibleServerWatcherPrivate::at_discoveredServerChanged(
+        const ec2::ApiDiscoveredServerData &serverData)
+{
+    QnMutexLocker lock(&mutex);
+    auto it = discoveredServerItemById.find(serverData.id);
+
+    switch (serverData.status)
+    {
+    case Qn::Online:
+    case Qn::Incompatible:
+    case Qn::Unauthorized:
+        if (it != discoveredServerItemById.end())
+        {
+            it->removed = false;
+            it->serverData = serverData;
+        }
+        else
+        {
+            discoveredServerItemById.insert(serverData.id, serverData);
+        }
+
+        lock.unlock();
+
+        if (serverData.status != Qn::Online)
+            addResource(serverData);
+        else
+            removeResource(serverData.id);
+        break;
+
+    default:
+        if (it == discoveredServerItemById.end())
+            break;
+
+        it->removed = true;
+
+        if (it->keep)
+            break;
+
+        discoveredServerItemById.remove(serverData.id);
+
+        lock.unlock();
+
+        removeResource(getFakeId(serverData.id));
+
+        break;
+    }
+}
+
+void QnIncompatibleServerWatcherPrivate::addResource(const ec2::ApiDiscoveredServerData &serverData)
+{
+    QnUuid id = getFakeId(serverData.id);
+
+    if (id.isNull())
+    {
+        // add a resource
+        if (!isSuitable(serverData))
+            return;
+
+        QnMediaServerResourcePtr server = makeResource(serverData);
+        {
+            QnMutexLocker lock(&mutex);
+            fakeUuidByServerUuid[serverData.id] = server->getId();
+            serverUuidByFakeUuid[server->getId()] = serverData.id;
         }
         qnResPool->addResource(server);
 
         NX_LOG(lit("QnIncompatibleServerWatcher: Add incompatible server %1 at %2 [%3]")
-            .arg(moduleInformation.id.toString())
-            .arg(moduleInformation.systemName)
-            .arg(QStringList(moduleInformation.remoteAddresses.toList()).join(lit(", "))),
+            .arg(serverData.id.toString())
+            .arg(serverData.systemName)
+            .arg(QStringList(serverData.remoteAddresses.toList()).join(lit(", "))),
             cl_logDEBUG1);
-    } else {
+    }
+    else
+    {
         // update the resource
-        QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
+        QnMediaServerResourcePtr server =
+                qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
+
         Q_ASSERT_X(server, "There must be a resource in the resource pool.", Q_FUNC_INFO);
+
         if (!server)
             return;
-        server->setModuleInformation(moduleInformation);
+
+        server->setFakeServerModuleInformation(serverData);
+        server->setStatus(serverData.status);
 
         NX_LOG(lit("QnIncompatibleServerWatcher: Update incompatible server %1 at %2 [%3]")
-            .arg(moduleInformation.id.toString())
-            .arg(moduleInformation.systemName)
-            .arg(QStringList(moduleInformation.remoteAddresses.toList()).join(lit(", "))),
+            .arg(serverData.id.toString())
+            .arg(serverData.systemName)
+            .arg(QStringList(serverData.remoteAddresses.toList()).join(lit(", "))),
             cl_logDEBUG1);
     }
 }
 
-void QnIncompatibleServerWatcher::removeResource(const QnUuid &id) {
+void QnIncompatibleServerWatcherPrivate::removeResource(const QnUuid &id)
+{
     if (id.isNull())
         return;
 
     QnUuid serverId;
     {
-        QMutexLocker lock(&m_mutex);
-        serverId = m_serverUuidByFakeUuid.take(id);
+        QnMutexLocker lock(&mutex);
+        serverId = serverUuidByFakeUuid.take(id);
         if (serverId.isNull())
             return;
 
-        m_fakeUuidByServerUuid.remove(serverId);
+        fakeUuidByServerUuid.remove(serverId);
     }
 
-    QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
-    if (server) {
+    QnMediaServerResourcePtr server =
+            qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
+
+    if (server)
+    {
         NX_LOG(lit("QnIncompatibleServerWatcher: Remove incompatible server %1 at %2")
             .arg(serverId.toString())
             .arg(server->getSystemName()),
@@ -210,7 +301,20 @@ void QnIncompatibleServerWatcher::removeResource(const QnUuid &id) {
     }
 }
 
-QnUuid QnIncompatibleServerWatcher::getFakeId(const QnUuid &realId) const {
-    QMutexLocker lock(&m_mutex);
-    return m_fakeUuidByServerUuid.value(realId);
+QnUuid QnIncompatibleServerWatcherPrivate::getFakeId(const QnUuid &realId) const
+{
+    QnMutexLocker lock(&mutex);
+    return fakeUuidByServerUuid.value(realId);
+}
+
+QnMediaServerResourcePtr QnIncompatibleServerWatcherPrivate::makeResource(
+        const ec2::ApiDiscoveredServerData &serverData)
+{
+    QnMediaServerResourcePtr server(new QnMediaServerResource(qnResTypePool));
+
+    server->setId(QnUuid::createUuid());
+    server->setStatus(serverData.status, true);
+    server->setOriginalGuid(serverData.id);
+    server->setFakeServerModuleInformation(serverData);
+    return server;
 }

@@ -41,12 +41,12 @@ public:
     virtual void setSendMotion(bool value) override;
 
     virtual ArchiveChunkInfo getLastUsedChunkInfo() const override;
-
+    virtual bool hasVideo() const override;
 protected:
     friend class QnArchiveSyncPlayWrapper;
     //void setPrebuffering(bool value);
 private:
-    //QMutex m_mutex;
+    //QnMutex m_mutex;
     //bool m_usePrebuffer;
     //QnAbstractMediaDataPtr m_nextData;
     QnAbstractArchiveReader* m_reader; 

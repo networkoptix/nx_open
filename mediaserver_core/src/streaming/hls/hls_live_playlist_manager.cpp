@@ -4,7 +4,7 @@
 
 #include "hls_live_playlist_manager.h"
 
-#include <QtCore/QMutexLocker>
+#include <utils/thread/mutex.h>
 
 #include <utils/common/log.h>
 #include <utils/common/synctime.h>
@@ -54,7 +54,7 @@ namespace nx_hls
         std::vector<AbstractPlaylistManager::ChunkData>* const chunkList,
         bool* const endOfStreamReached ) const
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 
         m_inactivityTimer.restart();
 
@@ -89,7 +89,7 @@ namespace nx_hls
 
     void HLSLivePlaylistManager::clear()
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         m_totalPlaylistDuration = 0;
         if( m_blockID != -1 )
         {
@@ -104,7 +104,7 @@ namespace nx_hls
 
     qint64 HLSLivePlaylistManager::inactivityPeriod() const
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         return m_inactivityTimer.elapsed();
     }
 
@@ -115,7 +115,7 @@ namespace nx_hls
 
     void HLSLivePlaylistManager::onKeyFrame( quint64 currentPacketTimestampUSec )
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 
         NX_LOG(lit("HLSLivePlaylistManager. got key frame %1").arg(currentPacketTimestampUSec), cl_logDEBUG2);
 

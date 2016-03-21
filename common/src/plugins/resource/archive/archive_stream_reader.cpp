@@ -2,7 +2,7 @@
 
 #ifdef ENABLE_ARCHIVE
 
-#include "stdint.h"
+#include <stdint.h>
 
 #include <core/resource/resource.h>
 
@@ -10,7 +10,9 @@
 #include "utils/media/externaltimesource.h"
 #include "utils/common/synctime.h"
 #include "core/resource/media_resource.h"
-
+#include "utils/common/sleep.h"
+#include <core/datapacket/video_data_packet.h>
+#include <utils/media/frame_type_extractor.h>
 
 // used in reverse mode.
 // seek by 1.5secs. It is prevents too fast seeks for short GOP, also some codecs has bagged seek function. Large step prevent seek
@@ -108,14 +110,14 @@ void QnArchiveStreamReader::nextFrame()
         return;
     }
     emit nextFrameOccured();
-    QMutexLocker lock(&m_jumpMtx);
+    QnMutexLocker lock( &m_jumpMtx );
     m_singleQuantProcessed = false;
     m_singleShowWaitCond.wakeAll();
 }
 
 void QnArchiveStreamReader::needMoreData()
 {
-    QMutexLocker lock(&m_jumpMtx);
+    QnMutexLocker lock( &m_jumpMtx );
     m_singleQuantProcessed = false;
     m_singleShowWaitCond.wakeAll();
 }
@@ -143,7 +145,7 @@ void QnArchiveStreamReader::resumeMedia()
         m_delegate->setSingleshotMode(false);
         m_singleShot = false;
         //resumeDataProcessors();
-        QMutexLocker lock(&m_jumpMtx);
+        QnMutexLocker lock( &m_jumpMtx );
         m_singleShowWaitCond.wakeAll();
     }
 }
@@ -157,7 +159,7 @@ void QnArchiveStreamReader::pauseMedia()
     if (!m_singleShot)
     {
         emit streamPaused();
-        QMutexLocker lock(&m_jumpMtx);
+        QnMutexLocker lock( &m_jumpMtx );
         m_singleShot = true;
         m_singleQuantProcessed = true;
         m_lastSkipTime = m_lastJumpTime = AV_NOPTS_VALUE;
@@ -174,22 +176,17 @@ bool QnArchiveStreamReader::isMediaPaused() const
 
 void QnArchiveStreamReader::setCurrentTime(qint64 value)
 {
-    QMutexLocker mutex(&m_jumpMtx);
+    QnMutexLocker mutex( &m_jumpMtx );
     m_currentTime = value;
 }
 
 qint64 QnArchiveStreamReader::currentTime() const
 {
-    QMutexLocker mutex(&m_jumpMtx);
+    QnMutexLocker mutex( &m_jumpMtx );
     if (m_skipFramesToTime)
         return m_skipFramesToTime;
     else
         return m_currentTime;
-}
-
-AVIOContext* QnArchiveStreamReader::getIOContext()
-{
-    return 0;
 }
 
 QString QnArchiveStreamReader::serializeLayout(const QnResourceVideoLayout* layout)
@@ -294,7 +291,7 @@ qint64 QnArchiveStreamReader::determineDisplayTime(bool reverseMode)
     qint64 rez = AV_NOPTS_VALUE;
     for (int i = 0; i < m_dataprocessors.size(); ++i)
     {
-        QMutexLocker mutex(&m_mutex);
+        QnMutexLocker mutex( &m_mutex );
         QnAbstractDataConsumer* dp = dynamic_cast<QnAbstractDataConsumer*>(m_dataprocessors.at(i));
         if( !dp )
             continue;
@@ -363,13 +360,28 @@ void QnArchiveStreamReader::startPaused(qint64 startTime)
     start();
 }
 
+bool QnArchiveStreamReader::isCompatiblePacketForMask(const QnAbstractMediaDataPtr& mediaData) const
+{
+    if (hasVideo())
+    {
+        if (mediaData->dataType != QnAbstractMediaData::VIDEO)
+            return false;
+    }
+    else 
+    {
+        if (mediaData->dataType != QnAbstractMediaData::AUDIO)
+            return false;
+    }
+    return !(mediaData->flags & QnAbstractMediaData::MediaFlags_LIVE);
+}
+
 QnAbstractMediaDataPtr QnArchiveStreamReader::getNextData()
 {
     while (!m_skippedMetadata.isEmpty())
         return m_skippedMetadata.dequeue();
 
     if (m_stopCond) {
-        QMutexLocker lock(&m_stopMutex);
+        QnMutexLocker lock( &m_stopMutex );
         m_delegate->close();
         while (m_stopCond && !needToStop())
             m_stopWaitCond.wait(&m_stopMutex);
@@ -381,14 +393,14 @@ QnAbstractMediaDataPtr QnArchiveStreamReader::getNextData()
     if (m_pausedStart)
     {
         m_pausedStart = false;
-        QMutexLocker mutex(&m_jumpMtx);
+        QnMutexLocker mutex( &m_jumpMtx );
         while (m_singleShot && m_singleQuantProcessed && !needToStop())
             m_singleShowWaitCond.wait(&m_jumpMtx);
     }
 
     // =================
     {
-        QMutexLocker mutex(&m_jumpMtx);
+        QnMutexLocker mutex( &m_jumpMtx );
         while (m_singleShot && m_skipFramesToTime == 0 && m_singleQuantProcessed && m_requiredJumpTime == qint64(AV_NOPTS_VALUE) && !needToStop())
             m_singleShowWaitCond.wait(&m_jumpMtx);
         //QnLongRunnable::pause();
@@ -794,7 +806,7 @@ begin_label:
     // Do not display archive in a future
     if (!(m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_UnsyncTime)) 
     {
-        if (videoData && !(videoData->flags & QnAbstractMediaData::MediaFlags_LIVE) && videoData->timestamp > qnSyncTime->currentUSecsSinceEpoch() && !reverseMode)
+        if (isCompatiblePacketForMask(m_currentData) && m_currentData->timestamp > qnSyncTime->currentUSecsSinceEpoch() && !reverseMode)
         {
             m_outOfPlaybackMask = true;
             return createEmptyPacket(reverseMode); // EOF reached
@@ -802,7 +814,7 @@ begin_label:
     }
 
     // ensure Pos At playback mask
-    if (!needToStop() && videoData && !(videoData->flags & QnAbstractMediaData::MediaFlags_Ignore) && !(videoData->flags & QnAbstractMediaData::MediaFlags_LIVE) 
+    if (!needToStop() && isCompatiblePacketForMask(m_currentData) && !(m_currentData->flags & QnAbstractMediaData::MediaFlags_Ignore)
         && m_nextData == 0) // check next data because of first current packet may be < required time (but next packet always > required time)
     {
         m_playbackMaskSync.lock();
@@ -844,7 +856,7 @@ begin_label:
     if (m_isStillImage)
         m_currentData->flags |= QnAbstractMediaData::MediaFlags_StillImage;
 
-    QMutexLocker mutex(&m_jumpMtx);
+    QnMutexLocker mutex( &m_jumpMtx );
     if (jumpTime != DATETIME_NOW)
         m_lastSkipTime = m_lastJumpTime = AV_NOPTS_VALUE; // allow duplicates jump to same position
 
@@ -992,14 +1004,14 @@ void QnArchiveStreamReader::pleaseStop()
 
 void QnArchiveStreamReader::setSkipFramesToTime(qint64 skipFramesToTime, bool keepLast)
 {
-    //QMutexLocker mutex(&m_jumpMtx);
+    //QnMutexLocker mutex( &m_jumpMtx );
     m_skipFramesToTime = skipFramesToTime;
     m_keepLastSkkipingFrame = keepLast;
 }
 
 bool QnArchiveStreamReader::isSkippingFrames() const
 {
-    QMutexLocker mutex(&m_jumpMtx);
+    QnMutexLocker mutex( &m_jumpMtx );
     return m_skipFramesToTime != 0 || m_tmpSkipFramesToTime != 0;
 }
 
@@ -1138,7 +1150,7 @@ bool QnArchiveStreamReader::setSendMotion(bool value)
 
 void QnArchiveStreamReader::setPlaybackRange(const QnTimePeriod& playbackRange)
 {
-    QMutexLocker lock(&m_playbackMaskSync);
+    QnMutexLocker lock( &m_playbackMaskSync );
     m_outOfPlaybackMask = false;
     m_playbackMaskHelper.setPlaybackRange(playbackRange);
 }
@@ -1150,14 +1162,14 @@ QnTimePeriod QnArchiveStreamReader::getPlaybackRange() const
 
 void QnArchiveStreamReader::setPlaybackMask(const QnTimePeriodList& playbackMask)
 {
-    QMutexLocker lock(&m_playbackMaskSync);
+    QnMutexLocker lock( &m_playbackMaskSync );
     m_outOfPlaybackMask = false;
     m_playbackMaskHelper.setPlaybackMask(playbackMask);
 }
 
 void QnArchiveStreamReader::onDelegateChangeQuality(MediaQuality quality)
 {
-    QMutexLocker lock(&m_jumpMtx);
+    QnMutexLocker lock( &m_jumpMtx );
     m_oldQuality = m_quality = quality;
     m_oldQualityFastSwitch = m_qualityFastSwitch = true;
 }
@@ -1207,7 +1219,7 @@ void QnArchiveStreamReader::setSpeed(double value, qint64 currentTimeHint)
         return;
     }
 
-    QMutexLocker mutex(&m_mutex);
+    QnMutexLocker mutex( &m_mutex );
     m_speed = value;
     for (int i = 0; i < m_dataprocessors.size(); ++i)
     {
@@ -1221,7 +1233,7 @@ void QnArchiveStreamReader::setSpeed(double value, qint64 currentTimeHint)
 
 double QnArchiveStreamReader::getSpeed() const
 {
-    QMutexLocker mutex(&m_mutex);
+    QnMutexLocker mutex( &m_mutex );
     return m_speed;
 }
 
@@ -1235,7 +1247,7 @@ qint64 QnArchiveStreamReader::startTime() const
     Q_ASSERT(m_delegate);
     QnTimePeriod p;
     {
-        QMutexLocker lock(&m_playbackMaskSync);
+        QnMutexLocker lock( &m_playbackMaskSync );
         p = m_playbackMaskHelper.getPlaybackRange();
     }
     if (p.isEmpty())
@@ -1249,7 +1261,7 @@ qint64 QnArchiveStreamReader::endTime() const
     Q_ASSERT(m_delegate);
     QnTimePeriod p;
     {
-        QMutexLocker lock(&m_playbackMaskSync);
+        QnMutexLocker lock( &m_playbackMaskSync );
         p = m_playbackMaskHelper.getPlaybackRange();
     }
     if (p.isEmpty())
@@ -1273,7 +1285,7 @@ void QnArchiveStreamReader::setGroupId(const QByteArray& guid)
 bool QnArchiveStreamReader::isPaused() const
 {
     if (getResource()->hasParam(lit("groupplay"))) {
-        QMutexLocker lock(&m_stopMutex);
+        QnMutexLocker lock(&m_stopMutex);
         return m_stopCond;
     }
     else {
@@ -1284,7 +1296,7 @@ bool QnArchiveStreamReader::isPaused() const
 void QnArchiveStreamReader::pause() 
 {
     if (getResource()->hasParam(lit("groupplay"))) {
-        QMutexLocker lock(&m_stopMutex);
+        QnMutexLocker lock( &m_stopMutex );
         m_delegate->beforeClose();
         m_stopCond = true; // for VMAX
     }
@@ -1296,7 +1308,7 @@ void QnArchiveStreamReader::pause()
 void QnArchiveStreamReader::resume() 
 {
     if (getResource()->hasParam(lit("groupplay"))) {
-        QMutexLocker lock(&m_stopMutex);
+        QnMutexLocker lock( &m_stopMutex );
         m_stopCond = false; // for VMAX
         m_stopWaitCond.wakeAll();
     }

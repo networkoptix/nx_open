@@ -3,7 +3,7 @@
 
 #include <QtCore/QList>
 #include <QtCore/QMap>
-#include <QtCore/QMutex>
+#include <utils/thread/mutex.h>
 #include <QtCore/QSharedPointer>
 
 #include "param.h"
@@ -39,7 +39,8 @@ public:
     void addParamType(const QString& name, const QString& defaultValue);
     bool hasParam(const QString& name) const;
 
-    const ParamTypeMap& paramTypeList() const;
+    const ParamTypeMap& paramTypeListUnsafe() const;
+    const ParamTypeMap paramTypeList() const;
 
     QString defaultValue(const QString& key) const;
 private:
@@ -51,7 +52,7 @@ private:
 
     ParamTypeMap m_paramTypeList;
 
-    mutable QMutex m_allParamTypeListCacheMutex;
+    mutable QnMutex m_allParamTypeListCacheMutex;
     mutable QSharedPointer<ParamTypeMap> m_allParamTypeListCache;
 
     mutable bool m_isCamera;
@@ -89,7 +90,7 @@ public:
 
     QnResourceTypePtr desktopCameraResourceType() const;
 private:
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     QnResourceTypeMap m_resourceTypeMap;
     mutable QnResourceTypePtr m_desktopCamResourceType;
 };

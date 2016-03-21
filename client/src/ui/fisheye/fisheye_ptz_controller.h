@@ -22,6 +22,7 @@ class QnFisheyePtzController: public QnBasicPtzController, public AnimationTimer
 
 public:
     QnFisheyePtzController(QnMediaResourceWidget *widget);
+    QnFisheyePtzController(const QnMediaResourcePtr& mediaRes);
     virtual ~QnFisheyePtzController();
 
     virtual Qn::PtzCapabilities getCapabilities() override;

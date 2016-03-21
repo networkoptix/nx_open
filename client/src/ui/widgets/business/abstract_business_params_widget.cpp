@@ -1,9 +1,9 @@
 #include "abstract_business_params_widget.h"
 
-QnAbstractBusinessParamsWidget::QnAbstractBusinessParamsWidget(QWidget *parent):
-    QWidget(parent),
-    m_updating(false),
-    m_model(NULL)
+QnAbstractBusinessParamsWidget::QnAbstractBusinessParamsWidget(QWidget *parent)
+    : base_type(parent)
+    , m_updating(false)
+    , m_model()
 {
 }
 
@@ -11,29 +11,27 @@ QnAbstractBusinessParamsWidget::~QnAbstractBusinessParamsWidget() {
 
 }
 
-QnBusinessRuleViewModel* QnAbstractBusinessParamsWidget::model() {
+QnBusinessRuleViewModelPtr QnAbstractBusinessParamsWidget::model() {
     return m_model;
 }
 
-void QnAbstractBusinessParamsWidget::setModel(QnBusinessRuleViewModel *model) {
+void QnAbstractBusinessParamsWidget::setModel(const QnBusinessRuleViewModelPtr &model) {
     if (m_model)
-        disconnect(m_model, 0, this, 0);
+        disconnect(m_model, nullptr, this, nullptr);
 
     m_model = model;
 
     if(!m_model)
         return;
 
-    connect(m_model, SIGNAL(dataChanged(QnBusinessRuleViewModel*,QnBusiness::Fields)),
-            this, SLOT(at_model_dataChanged(QnBusinessRuleViewModel*,QnBusiness::Fields)));
-    at_model_dataChanged(model, QnBusiness::AllFieldsMask);
+    connect(m_model, &QnBusinessRuleViewModel::dataChanged, this, &QnAbstractBusinessParamsWidget::at_model_dataChanged);
+    at_model_dataChanged(QnBusiness::AllFieldsMask);
 }
 
 void QnAbstractBusinessParamsWidget::updateTabOrder(QWidget *before, QWidget *after) {
     setTabOrder(before, after);
 }
 
-void QnAbstractBusinessParamsWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, QnBusiness::Fields fields) {
-    Q_UNUSED(model)
+void QnAbstractBusinessParamsWidget::at_model_dataChanged(QnBusiness::Fields fields) {
     Q_UNUSED(fields)
 }

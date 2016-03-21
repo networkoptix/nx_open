@@ -15,7 +15,7 @@
 #include <common/common_module.h>
 #include <utils/common/delete_later.h>
 #include <utils/common/log.h>
-#include <utils/network/router.h>
+#include <network/router.h>
 
 namespace {
     const int checkTimeout = 15 * 60 * 1000;
@@ -82,7 +82,7 @@ void QnInstallUpdatesPeerTask::doStart() {
         return;
     }
 
-    m_ecServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->remoteGUID());
+    m_ecServer = qnCommon->currentServer();
 
     connect(qnResPool, &QnResourcePool::resourceChanged, this, &QnInstallUpdatesPeerTask::at_resourceChanged);
 

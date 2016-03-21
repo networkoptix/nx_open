@@ -2,12 +2,12 @@
     <parent>
         <artifactId>hdwitness</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>2.4.1-SNAPSHOT</version>
+        <version>2.5.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>2.4.1-SNAPSHOT</version>
+    <version>2.5.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>unit_tests</artifactId>
     <packaging>pom</packaging>
@@ -23,6 +23,7 @@
         <module>common_ut</module>
         <module>mediaserver_core_ut</module>
         <module>client_ut</module>
+        <module>appserver2_ut</module>
     </modules>       
     <!-- The following section is to rebuild the required artifact as lib. As soon as everything will be built as lib, this may be deleted -->
 <!--    <profiles>

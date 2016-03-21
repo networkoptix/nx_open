@@ -89,7 +89,7 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent) :
     ui->tableView->horizontalHeader()->setVisible(true);
 
     ui->tableView->resizeColumnsToContents();
-    
+
     ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     ui->tableView->horizontalHeader()->setSectionResizeMode(QnPtzManageModel::DetailsColumn, QHeaderView::Stretch);
 
@@ -377,7 +377,7 @@ void QnPtzManageDialog::at_savePositionButton_clicked() {
         QMessageBox::critical(
             this,
             tr("Could not get position from camera."),
-            tr("An error has occurred while trying to get current position from camera %1.").arg(m_resource->getName()) + L'\n' 
+            tr("An error has occurred while trying to get the current position from camera %1.").arg(m_resource->getName()) + L'\n'
           + tr("Please wait for the camera to go online.")
             );
         return;
@@ -399,7 +399,7 @@ void QnPtzManageDialog::at_goToPositionButton_clicked() {
         QMessageBox::critical(
             this,
             tr("Could not set position for camera."),
-            tr("An error has occurred while trying to set current position for camera %1.").arg(m_resource->getName()) + L'\n' 
+            tr("An error has occurred while trying to set the current position for camera %1.").arg(m_resource->getName()) + L'\n'
           + tr("Please wait for the camera to go online.")
             );
         return;
@@ -440,7 +440,7 @@ void QnPtzManageDialog::at_startTourButton_clicked() {
         QMessageBox::critical(
             this,
             tr("Could not set position for camera."),
-            tr("An error has occurred while trying to set current position for camera %1.").arg(m_resource->getName()) + L'\n' 
+            tr("An error has occurred while trying to set the current position for camera %1.").arg(m_resource->getName()) + L'\n'
           + tr("Please wait for the camera to go online.")
             );
         return;
@@ -495,7 +495,7 @@ void QnPtzManageDialog::at_deleteButton_clicked() {
                 QDialogButtonBox::StandardButton button = QnCheckableMessageBox::warning(
                     this,
                     tr("Remove Preset"),
-                    tr("This preset is used in some tours.") + L'\n' 
+                    tr("This preset is used in some tours.") + L'\n'
                   + tr("These tours will become invalid if you remove it."),
                     tr("Do not show again."),
                     &ignorePresetIsInUse,
@@ -627,14 +627,14 @@ QnResourcePtr QnPtzManageDialog::resource() const {
 void QnPtzManageDialog::setResource(const QnResourcePtr &resource) {
     if (m_resource == resource)
         return;
-    
+
     if (m_resource)
         clear();
-    
+
     m_resource = resource;
     m_adaptor->setResource(resource);
 
-    setWindowTitle(tr("Manage PTZ for %1.").arg(getResourceName(m_resource)));
+    setWindowTitle(tr("Manage PTZ for %1...").arg(getResourceName(m_resource)));
 }
 
 bool QnPtzManageDialog::isModified() const {
@@ -684,11 +684,11 @@ bool QnPtzManageDialog::askToSaveChanges(bool cancelIsAllowed /* = true*/) {
         allowedButtons |= QnMessageBox::Cancel;
 
     QnMessageBox::StandardButton button = QnMessageBox::question(
-        this, 
+        this,
         0,
         tr("PTZ configuration has not been saved."),
         tr("Changes have not been saved. Would you like to save them?"),
-        allowedButtons, 
+        allowedButtons,
         QnMessageBox::Yes);
 
     switch (button) {

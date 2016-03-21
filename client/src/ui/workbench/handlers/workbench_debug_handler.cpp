@@ -24,14 +24,14 @@ public:
         QnWorkbenchContextAware(parent)
     {
         QVBoxLayout *layout = new QVBoxLayout();
-        layout->addWidget(newActionButton(Qn::DebugDecrementCounterAction));
-        layout->addWidget(newActionButton(Qn::DebugIncrementCounterAction));
-        layout->addWidget(newActionButton(Qn::DebugShowResourcePoolAction));
+        layout->addWidget(newActionButton(QnActions::DebugDecrementCounterAction));
+        layout->addWidget(newActionButton(QnActions::DebugIncrementCounterAction));
+        layout->addWidget(newActionButton(QnActions::DebugShowResourcePoolAction));
         setLayout(layout);
     }
 
 private:
-    QToolButton *newActionButton(Qn::ActionId actionId, QWidget *parent = NULL) {
+    QToolButton *newActionButton(QnActions::IDType actionId, QWidget *parent = NULL) {
         QToolButton *button = new QToolButton(parent);
         button->setDefaultAction(menu()->action(actionId));
         button->setToolButtonStyle(Qt::ToolButtonTextOnly);
@@ -47,10 +47,10 @@ QnWorkbenchDebugHandler::QnWorkbenchDebugHandler(QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent)
 {
-    connect(action(Qn::DebugControlPanelAction),                &QAction::triggered,    this,   &QnWorkbenchDebugHandler::at_debugControlPanelAction_triggered);
-    connect(action(Qn::DebugIncrementCounterAction),            &QAction::triggered,    this,   &QnWorkbenchDebugHandler::at_debugIncrementCounterAction_triggered);
-    connect(action(Qn::DebugDecrementCounterAction),            &QAction::triggered,    this,   &QnWorkbenchDebugHandler::at_debugDecrementCounterAction_triggered);
-    connect(action(Qn::DebugShowResourcePoolAction),            &QAction::triggered,    this,   &QnWorkbenchDebugHandler::at_debugShowResourcePoolAction_triggered);
+    connect(action(QnActions::DebugControlPanelAction),                &QAction::triggered,    this,   &QnWorkbenchDebugHandler::at_debugControlPanelAction_triggered);
+    connect(action(QnActions::DebugIncrementCounterAction),            &QAction::triggered,    this,   &QnWorkbenchDebugHandler::at_debugIncrementCounterAction_triggered);
+    connect(action(QnActions::DebugDecrementCounterAction),            &QAction::triggered,    this,   &QnWorkbenchDebugHandler::at_debugDecrementCounterAction_triggered);
+    connect(action(QnActions::DebugShowResourcePoolAction),            &QAction::triggered,    this,   &QnWorkbenchDebugHandler::at_debugShowResourcePoolAction_triggered);
 }
 
 void QnWorkbenchDebugHandler::at_debugControlPanelAction_triggered() {
@@ -72,9 +72,128 @@ void QnWorkbenchDebugHandler::at_debugIncrementCounterAction_triggered() {
     Q_UNUSED(showPalette);
 }
 
-void QnWorkbenchDebugHandler::at_debugDecrementCounterAction_triggered() {
+#include <common/common_module.h>
+#include <camera/camera_bookmarks_manager.h>
+#include <camera/camera_data_manager.h>
+#include <camera/loaders/caching_camera_data_loader.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/camera_resource.h>
+#include <ui/workbench/workbench_context.h>
+#include <utils/common/util.h>
+
+
+QStringList getRandomStrings(const QStringList &dict, int len, int multiplier) {
+
+    QStringList result;
+    int min = 1;
+    int max = dict.size() / multiplier;
+
+    for (int i = 0; i < len; ++i) {
+        int j = random(min, max);
+        result << dict[j * multiplier];
+    }
+
+    return result;
+}
+
+
+QString getRandomName(const QStringList &dict) {
+    return getRandomStrings(dict, 2, 109).join(L' ');
+}
+
+QString getRandomDescription(const QStringList &dict) {
+    return getRandomStrings(dict, 20, 7).join(L' ');
+}
+
+QnCameraBookmarkTags getRandomTags(const QStringList &dict) {
+    return getRandomStrings(dict, 6, 113).toSet();
+}
+
+qint64 move() {
+    return random(100000, 300000);
+}
+
+void QnWorkbenchDebugHandler::at_debugDecrementCounterAction_triggered()
+{
+#ifdef _DEBUG
     qnRuntime->setDebugCounter(qnRuntime->debugCounter() - 1);
     qDebug() << qnRuntime->debugCounter();
+
+    QList<qint64> steps;
+    steps << 1000 << 4000 << 16000 << 64000 << 256000;
+
+    QStringList dict;
+    QFile dictFile(lit("c:/sandbox/5000.dic"));
+    dictFile.open(QFile::ReadOnly);
+    QTextStream stream(&dictFile);
+    while (!stream.atEnd()) {
+        dict << stream.readLine();
+    }
+
+    int skip = 10;
+    int limit = 16000;
+    int counter = 0;
+
+    auto server = qnCommon->currentServer();
+    for (const QnVirtualCameraResourcePtr &camera: qnResPool->getAllCameras(server, true)) {
+        qDebug() << "Camera" << camera->getName();
+
+        QnCachingCameraDataLoader *loader = context()->instance<QnCameraDataManager>()->loader(camera, false);
+        if (!loader)
+            continue;
+
+        auto periods = loader->periods(Qn::RecordingContent);
+        for (const QnTimePeriod &period: periods) {
+            qDebug() << "period" << period;
+
+            qint64 start = period.startTimeMs;
+            qint64 end = period.isInfinite()
+                ? QDateTime::currentMSecsSinceEpoch()
+                : period.endTimeMs();
+
+            while (start < end) {
+                for (qint64 step: steps) {
+                    if (start + step > end)
+                        break;
+
+                    ++counter;
+                    if (counter < skip) {
+                        if (counter % 500 == 0)
+                            qDebug() << "skipping counter" << counter;
+                        continue;
+                    }
+                    if (counter > limit)
+                        return;
+
+                    QnCameraBookmark bookmark;
+                    bookmark.guid = QnUuid::createUuid();
+                    bookmark.startTimeMs = start;
+                    bookmark.durationMs = step;
+                    bookmark.name = getRandomName(dict);
+                    bookmark.description = getRandomDescription(dict);
+                    bookmark.tags = getRandomTags(dict);
+                    bookmark.cameraId = camera->getUniqueId();
+
+                    QDateTime startDt = QDateTime::fromMSecsSinceEpoch(start);
+                    bookmark.timeout = startDt.addMonths(6).toMSecsSinceEpoch() - start;
+                    qDebug() << "adding bookmark " << counter << QDateTime::fromMSecsSinceEpoch(start);
+
+                    qnCameraBookmarksManager->addCameraBookmark(bookmark, [this, start](bool success) {
+                        qDebug() << "bookmark added " << success << QDateTime::fromMSecsSinceEpoch(start);
+                    });
+
+                    if (counter % 10 == 0)
+                        qApp->processEvents();
+                }
+
+                start += move();
+            }
+
+        }
+
+
+    }
+#endif //_DEBUG
 }
 
 void QnWorkbenchDebugHandler::at_debugShowResourcePoolAction_triggered() {

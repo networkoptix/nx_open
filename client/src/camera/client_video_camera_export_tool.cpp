@@ -1,59 +1,48 @@
 #include "client_video_camera_export_tool.h"
+
 #include <core/resource/media_resource.h>
 
 #include <QtCore/QFileInfo>
 
+#include <camera/client_video_camera.h>
+
 QnClientVideoCameraExportTool::QnClientVideoCameraExportTool(
-        QnClientVideoCamera *camera,
+        const QnMediaResourcePtr &mediaResource,
         const QnTimePeriod &timePeriod,
         const QString &fileName,
-        Qn::Corner timestamps,
-        qint64 timeOffsetMs, qint64 serverTimeZoneMs,
-        QRectF sourceRect,
-        const ImageCorrectionParams &imageCorrectionParams,
-        const QnItemDewarpingParams &itemDewarpingParams,
-        int rotationAngle,
-        qreal customAR,
-        QObject *parent) :
-    QObject(parent),
-    m_camera(camera),
-    m_timePeriod(timePeriod),
-    m_fileName(fileName),
-    m_timestampPos(timestamps),
-    m_timeOffsetMs(timeOffsetMs),
-    m_serverTimeZoneMs(serverTimeZoneMs),
-    m_sourceRect(sourceRect),
-    m_imageCorrectionParams(imageCorrectionParams),
-    m_itemDewarpingParams(itemDewarpingParams),
-    m_status(QnClientVideoCamera::NoError),
-    m_rotationAngle(rotationAngle),
-    m_customAR(customAR)
+        const QnImageFilterHelper &imageParameters,
+        qint64 serverTimeZoneMs,
+        QObject *parent)
+
+    : base_type(parent)
+    , m_camera(new QnClientVideoCamera(mediaResource))
+    , m_timePeriod(timePeriod)
+    , m_fileName(fileName)
+    , m_parameters(imageParameters)
+    , m_serverTimeZoneMs(serverTimeZoneMs)
+    , m_status(QnClientVideoCamera::NoError)
 {
-    connect(camera,     &QnClientVideoCamera::exportProgress,   this,   &QnClientVideoCameraExportTool::valueChanged);
-    connect(camera,     &QnClientVideoCamera::exportFinished,   this,   &QnClientVideoCameraExportTool::at_camera_exportFinished);
-    connect(camera,     &QnClientVideoCamera::exportStopped,    this,   &QnClientVideoCameraExportTool::at_camera_exportStopped);
+    connect(m_camera,     &QnClientVideoCamera::exportProgress,   this,   &QnClientVideoCameraExportTool::valueChanged);
+    connect(m_camera,     &QnClientVideoCamera::exportFinished,   this,   &QnClientVideoCameraExportTool::at_camera_exportFinished);
+    connect(m_camera,     &QnClientVideoCamera::exportStopped,    this,   &QnClientVideoCameraExportTool::at_camera_exportStopped);
 }
+
+QnClientVideoCameraExportTool::~QnClientVideoCameraExportTool()
+{}
+
 
 void QnClientVideoCameraExportTool::start() {
     emit rangeChanged(0, 100);
     emit valueChanged(0);
 
-    QnImageFilterHelper transcodeParams;
-    transcodeParams.setSrcRect(m_sourceRect);
-    transcodeParams.setContrastParams(m_imageCorrectionParams);
-    transcodeParams.setDewarpingParams(m_camera->resource()->getDewarpingParams(), m_itemDewarpingParams);
-    transcodeParams.setRotation(m_rotationAngle);
-    transcodeParams.setCustomAR(m_customAR);
-    transcodeParams.setTimeCorner(m_timestampPos, m_timeOffsetMs, 0);
-    transcodeParams.setVideoLayout(m_camera->resource()->getVideoLayout());
-
     m_camera->exportMediaPeriodToFile(
-                m_timePeriod.startTimeMs * 1000ll, (m_timePeriod.startTimeMs + m_timePeriod.durationMs) * 1000ll,
-                m_fileName, QFileInfo(m_fileName).suffix(),
+                m_timePeriod,
+                m_fileName,
+                QFileInfo(m_fileName).suffix(),
                 QnStorageResourcePtr(),
                 QnStreamRecorder::Role_FileExport,
                 m_serverTimeZoneMs,
-                transcodeParams
+                m_parameters
                 );
 }
 
@@ -65,14 +54,17 @@ void QnClientVideoCameraExportTool::stop() {
     m_camera->stopExport();
 }
 
-void QnClientVideoCameraExportTool::at_camera_exportFinished(int status, const QString &filename) {
+void QnClientVideoCameraExportTool::at_camera_exportFinished(
+    const QnStreamRecorder::ErrorStruct &status,
+    const QString                       &filename
+) 
+{
     Q_UNUSED(filename)
-    m_status = status;
-    finishExport(status == QnClientVideoCamera::NoError);
+    m_status = status.lastError;
+    finishExport(status.lastError == QnClientVideoCamera::NoError);
 }
 
 void QnClientVideoCameraExportTool::at_camera_exportStopped() {
-    m_camera->deleteLater();
     finishExport(false);
 }
 

@@ -12,9 +12,13 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/resource_factory.h>
-#include <core/resource/storage_resource.h>
-#include "utils/network/http/asynchttpclient.h"
 
+#include "api/server_rest_connection_fwd.h"
+
+namespace nx_http {
+    class AsyncHttpClientPtr;
+}
+class SocketAddress;
 
 class QnMediaServerResource : public QnResource
 {
@@ -48,11 +52,18 @@ public:
 
     quint16 getPort() const;
 
+    /*
+    * Deprecated server rest connection
+    */
     QnMediaServerConnectionPtr apiConnection();
+
+    /*
+    * New server rest connection
+    */
+    rest::QnConnectionPtr restConnection();
 
     QnStorageResourceList getStorages() const;
     QnStorageResourcePtr getStorageByUrl(const QString& url) const;
-    //void setStorages(const QnAbstractStorageResourceList& storages);
 
     virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
 
@@ -64,13 +75,14 @@ public:
     Qn::ServerFlags getServerFlags() const;
     void setServerFlags(Qn::ServerFlags flags);
 
-    //virtual QnAbstractStreamDataProvider* createDataProviderInternal(Qn::ConnectionRole role);
-
     int getMaxCameras() const;
     void setMaxCameras(int value);
 
     void setRedundancy(bool value);
     bool isRedundancy() const;
+
+    QnServerBackupSchedule getBackupSchedule() const;
+    void setBackupSchedule(const QnServerBackupSchedule &value);
 
     QnSoftwareVersion getVersion() const;
     void setVersion(const QnSoftwareVersion& version);
@@ -82,7 +94,7 @@ public:
     void setSystemName(const QString &systemName);
 
     QnModuleInformation getModuleInformation() const;
-    void setModuleInformation(const QnModuleInformationWithAddresses &moduleInformation);
+    void setFakeServerModuleInformation(const QnModuleInformationWithAddresses &moduleInformation);
 
     QString getAuthKey() const;
     void setAuthKey(const QString& value);
@@ -111,6 +123,7 @@ private slots:
     void atResourceChanged();
     void at_propertyChanged(const QnResourcePtr & /*res*/, const QString & key);
 signals:
+    void portChanged(const QnResourcePtr &resource);
     void apiUrlChanged(const QnResourcePtr &resource);
     void serverFlagsChanged(const QnResourcePtr &resource);
     //! This signal is emmited when the set of additional URLs or ignored URLs has been changed.
@@ -118,14 +131,15 @@ signals:
     void versionChanged(const QnResourcePtr &resource);
     void systemNameChanged(const QnResourcePtr &resource);
     void redundancyChanged(const QnResourcePtr &resource);
+    void backupScheduleChanged(const QnResourcePtr &resource);
 private:
-    QnMediaServerConnectionPtr m_restConnection;
+    QnMediaServerConnectionPtr m_apiConnection; // deprecated
+    rest::QnConnectionPtr m_restConnection; // new one
     QString m_apiUrl;
     QList<QHostAddress> m_netAddrList;
     QList<QHostAddress> m_prevNetAddrList;
     QList<QUrl> m_additionalUrls;
     QList<QUrl> m_ignoredUrls;
-    //QnAbstractStorageResourceList m_storages;
     Qn::ServerFlags m_serverFlags;
     QnSoftwareVersion m_version;
     QnSystemInformation m_systemInfo;

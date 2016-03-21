@@ -23,7 +23,7 @@ namespace ec2
 
         template<class T>
         QByteArray serializedTransaction(const QnTransaction<T>& tran) {
-            QMutexLocker lock(&m_mutex);
+            QnMutexLocker lock( &m_mutex );
             Q_UNUSED(lock);
 
             // do not cache read-only transactions (they have sequence == 0)
@@ -38,7 +38,7 @@ namespace ec2
 
             QJsonObject tranObject;
             tranObject["tran"] = jsonTran;
-            
+
             QByteArray* result = new QByteArray();
             QJson::serialize(tranObject, result);
 
@@ -64,18 +64,7 @@ namespace ec2
             return QJson::serialized(tranObject);
         }
 
-        QByteArray serializedTransactionWithHeader(const QByteArray &serializedTran, const QnTransactionTransportHeader &header) {
-
-            QJsonValue jsonHeader;
-            QJson::serialize(header, &jsonHeader);
-            const QByteArray& serializedHeader = QJson::serialized(jsonHeader);
-
-            return 
-                "{\n"
-                    "\"header\": "+serializedHeader+",\n"
-                    "\"tran\": "+serializedTran+"\n"
-                "}";
-        }
+        QByteArray serializedTransactionWithHeader(const QByteArray &serializedTran, const QnTransactionTransportHeader &header);
 
         template<class T>
         QByteArray serializedTransactionWithoutHeader(const QnTransaction<T> &tran, const QnTransactionTransportHeader &header) {
@@ -83,29 +72,16 @@ namespace ec2
             return serializedTransaction(tran);
         }
 
-        QByteArray serializedTransactionWithoutHeader(const QByteArray &serializedTran, const QnTransactionTransportHeader &header) {
-            Q_UNUSED(header);    //header is really unused in json clients
-            return serializedTran;
-        }
+        QByteArray serializedTransactionWithoutHeader(const QByteArray &serializedTran, const QnTransactionTransportHeader &header);
 
         static bool deserializeTran(
             const quint8* chunkPayload,
             int len,
             QnTransactionTransportHeader& transportHeader,
-            QByteArray& tranData )
-        {
-            QByteArray srcData = QByteArray::fromRawData((const char*) chunkPayload, len);
-            QJsonObject tranObject;
-            if( !QJson::deserialize(srcData, &tranObject) )
-                return false;
-            if( !QJson::deserialize( tranObject["header"], &transportHeader ) )
-                return false;
-            tranData = QByteArray( (const char*)chunkPayload, len );
-            return true;
-        }
+            QByteArray& tranData );
 
     private:
-        mutable QMutex m_mutex;
+        mutable QnMutex m_mutex;
         QCache<QnAbstractTransaction::PersistentInfo, QByteArray> m_cache;
     };
 }

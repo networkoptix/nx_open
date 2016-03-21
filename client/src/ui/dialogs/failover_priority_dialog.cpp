@@ -1,8 +1,9 @@
 #include "failover_priority_dialog.h"
 
 #include <core/resource_management/resource_pool.h>
-#include <core/resource/camera_resource.h>
 #include <core/resource_management/resources_changes_manager.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/device_dependent_strings.h>
 
 #include <ui/common/palette.h>
 #include <ui/delegates/failover_priority_resource_model_delegate.h>
@@ -28,6 +29,8 @@ namespace {
 
             base_type(parent)
             , m_placeholder(nullptr)
+            , m_hintPage(nullptr)
+            , m_buttonsPage(nullptr)
             , m_callback(callback)
             , m_customColumnDelegate(customColumnDelegate)
         {}
@@ -44,8 +47,7 @@ namespace {
             m_placeholder = initPlacehoder(parent);
             parent->layout()->addWidget(m_placeholder);
 
-            QHBoxLayout* layout = new QHBoxLayout(m_placeholder);
-            m_placeholder->setLayout(layout);
+            QHBoxLayout* layout = new QHBoxLayout(m_buttonsPage);
 
             QLabel* label = new QLabel(tr("Set Priority:"), parent);
             layout->addWidget(label);
@@ -62,10 +64,13 @@ namespace {
         }
 
         virtual bool validate(const QnResourceList &selected) override {
-            bool visible = !selected.filtered<QnVirtualCameraResource>().isEmpty();
+            if (!m_placeholder)
+                return true;
 
-            if (m_placeholder)
-                m_placeholder->setVisible(visible);
+            bool visible = !selected.filtered<QnVirtualCameraResource>().isEmpty();
+            m_placeholder->setCurrentWidget(visible
+                ? m_buttonsPage
+                : m_hintPage);
             return true;
         }
 
@@ -103,16 +108,31 @@ namespace {
             return line;
         }
 
-        QWidget* initPlacehoder(QWidget* parent) {
-            QWidget* placeholder = new QWidget(parent);
+        QStackedWidget* initPlacehoder(QWidget* parent) {
+            QStackedWidget* placeholder = new QStackedWidget(parent);
             placeholder->setContentsMargins(0, 0, 0, 0);
             setPaletteColor(placeholder, QPalette::Window, qApp->palette().color(QPalette::Base));
             placeholder->setAutoFillBackground(true);
+
+            const QString hint = QnDeviceDependentStrings::getDefaultNameFromSet(
+                tr("Select devices to setup failover priority"),
+                tr("Select cameras to setup failover priority")
+                );
+
+            m_hintPage = new QLabel(hint, placeholder);
+            m_hintPage->setAlignment(Qt::AlignCenter);
+            placeholder->addWidget(m_hintPage);
+            m_buttonsPage = new QWidget(placeholder);
+            placeholder->addWidget(m_buttonsPage);
+
             return placeholder;
         }
 
     private:
-        QWidget* m_placeholder;
+        QStackedWidget* m_placeholder;
+        QLabel* m_hintPage;
+        QWidget* m_buttonsPage;
+
         ButtonCallback m_callback;
         QnResourcePoolModelCustomColumnDelegate* m_customColumnDelegate;
     };
@@ -178,14 +198,29 @@ void QnFailoverPriorityDialog::setColors(const QnFailoverPriorityColors &colors)
 
 
 void QnFailoverPriorityDialog::updatePriorityForSelectedCameras(Qn::FailoverPriority priority) {
-    auto modified = selectedResources().filtered<QnVirtualCameraResource>([priority](const QnVirtualCameraResourcePtr &camera) {
-        return camera->failoverPriority() != priority;
+    m_customColumnDelegate->forceCamerasPriority(selectedResources().filtered<QnVirtualCameraResource>(), priority);
+    setSelectedResources(QnResourceList());
+}
+
+void QnFailoverPriorityDialog::buttonBoxClicked( QDialogButtonBox::StandardButton button ) {
+    if (button != QDialogButtonBox::Ok)
+        return;
+
+    /* We should update default cameras to old value - what have user seen in the dialog. */
+    auto forced = m_customColumnDelegate->forcedCamerasPriorities();
+
+    /* Update all default cameras and all cameras that we have changed. */
+    auto modified = qnResPool->getAllCameras(QnResourcePtr(), true).filtered([this, &forced](const QnVirtualCameraResourcePtr &camera) {
+        return forced.contains(camera->getId());
     });
 
     if (modified.isEmpty())
         return;
 
-    qnResourcesChangesManager->saveCameras(modified, [priority](const QnVirtualCameraResourcePtr &camera) {
-        camera->setFailoverPriority(priority);
+    qnResourcesChangesManager->saveCameras(modified, [this, &forced](const QnVirtualCameraResourcePtr &camera) {
+        if (forced.contains(camera->getId()))
+            camera->setFailoverPriority(forced[camera->getId()]);
+        else
+            Q_ASSERT_X(false, Q_FUNC_INFO, "Should never get here");
     });
 }

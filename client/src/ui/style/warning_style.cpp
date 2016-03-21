@@ -12,3 +12,7 @@ void setWarningStyle(QPalette *palette) {
     palette->setColor(QPalette::WindowText, qnGlobals->errorTextColor());
     palette->setColor(QPalette::Text, qnGlobals->errorTextColor());
 }
+
+QString setWarningStyleHtml( const QString &source ) {
+    return lit("<font color=\"%1\">%2</font>").arg(qnGlobals->errorTextColor().name(), source);
+}

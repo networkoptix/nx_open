@@ -21,9 +21,11 @@
     <name>HD Witness Evidence camera integration plugin</name>	
 
     <properties>
-        <product.title>${axiscamplugin.name}</product.title>	
+        <guid>${evidence_plugin.guid}</guid>
+        <product.title>${evidence_plugin.name}</product.title>	
         <!--Global libs-->
         <qt.libs>core network xml</qt.libs>
+        <ffmpeg.libs></ffmpeg.libs>
         <global.libs/>
         <!--Specific os libs used-->
         <windows.oslibs/>

@@ -153,15 +153,6 @@ qint64 QnResourceDisplay::currentTimeUSec() const {
     //return m_archiveReader == NULL ? -1 : m_archiveReader->currentTime();
 }
 
-void QnResourceDisplay::setCurrentTimeUSec(qint64 usec) const {
-    if(m_archiveReader == NULL) {
-        qnWarning("Resource '%1' does not support changing current time.", resource()->getUniqueId());
-        return;
-    }
-
-    m_archiveReader->previousFrame(usec);
-}
-
 void QnResourceDisplay::start() {
     m_started = true;
 

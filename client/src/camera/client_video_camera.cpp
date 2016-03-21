@@ -11,6 +11,8 @@
 #include <plugins/resource/archive/archive_stream_reader.h>
 #include "http/custom_headers.h"
 
+#include <recording/time_period.h>
+
 QString QnClientVideoCamera::errorString(int errCode) {
     switch (errCode) {
     case NoError:
@@ -25,30 +27,29 @@ QString QnClientVideoCamera::errorString(int errCode) {
 }
 
 QnClientVideoCamera::QnClientVideoCamera(const QnMediaResourcePtr &resource, QnAbstractMediaStreamDataProvider* reader) :
+    base_type(nullptr),
     m_resource(resource),
     m_camdispay(resource, dynamic_cast<QnArchiveStreamReader*>(reader)),
     m_reader(reader),
     m_extTimeSrc(NULL),
-    m_isVisible(true),
-    m_exportRecorder(0),
-    m_exportReader(0),
+    m_exportRecorder(nullptr),
+    m_exportReader(nullptr),
     m_displayStarted(false)
 {
     if (m_reader) {
         m_reader->addDataProcessor(&m_camdispay);
-        if (dynamic_cast<QnAbstractArchiveReader*>(m_reader)) {
-            connect(m_reader, SIGNAL(streamPaused()), &m_camdispay, SLOT(onReaderPaused()), Qt::DirectConnection);
-            connect(m_reader, SIGNAL(streamResumed()), &m_camdispay, SLOT(onReaderResumed()), Qt::DirectConnection);
-            connect(m_reader, SIGNAL(prevFrameOccured()), &m_camdispay, SLOT(onPrevFrameOccured()), Qt::DirectConnection);
-            connect(m_reader, SIGNAL(nextFrameOccured()), &m_camdispay, SLOT(onNextFrameOccured()), Qt::DirectConnection);
-
-            connect(m_reader, SIGNAL(slowSourceHint()), &m_camdispay, SLOT(onSlowSourceHint()), Qt::DirectConnection);
-            connect(m_reader, SIGNAL(beforeJump(qint64)), &m_camdispay, SLOT(onBeforeJump(qint64)), Qt::DirectConnection);
-            connect(m_reader, SIGNAL(jumpOccured(qint64)), &m_camdispay, SLOT(onJumpOccured(qint64)), Qt::DirectConnection);
-            connect(m_reader, SIGNAL(jumpCanceled(qint64)), &m_camdispay, SLOT(onJumpCanceled(qint64)), Qt::DirectConnection);
-            connect(m_reader, SIGNAL(skipFramesTo(qint64)), &m_camdispay, SLOT(onSkippingFrames(qint64)), Qt::DirectConnection);
+        if (QnAbstractArchiveReader* archiveReader = dynamic_cast<QnAbstractArchiveReader*>(m_reader.data())) {
+            connect(archiveReader, &QnAbstractArchiveReader::streamPaused,       &m_camdispay, &QnCamDisplay::onReaderPaused,        Qt::DirectConnection);
+            connect(archiveReader, &QnAbstractArchiveReader::streamResumed,      &m_camdispay, &QnCamDisplay::onReaderResumed,       Qt::DirectConnection);
+            connect(archiveReader, &QnAbstractArchiveReader::prevFrameOccured,   &m_camdispay, &QnCamDisplay::onPrevFrameOccured,    Qt::DirectConnection);
+            connect(archiveReader, &QnAbstractArchiveReader::nextFrameOccured,   &m_camdispay, &QnCamDisplay::onNextFrameOccured,    Qt::DirectConnection);
+            connect(archiveReader, &QnAbstractArchiveReader::slowSourceHint,     &m_camdispay, &QnCamDisplay::onSlowSourceHint,      Qt::DirectConnection);
+            connect(archiveReader, &QnAbstractArchiveReader::beforeJump,         &m_camdispay, &QnCamDisplay::onBeforeJump,          Qt::DirectConnection);
+            connect(archiveReader, &QnAbstractArchiveReader::jumpOccured,        &m_camdispay, &QnCamDisplay::onJumpOccured,         Qt::DirectConnection);
+            connect(archiveReader, &QnAbstractArchiveReader::jumpCanceled,       &m_camdispay, &QnCamDisplay::onJumpCanceled,        Qt::DirectConnection);
+            connect(archiveReader, &QnAbstractArchiveReader::skipFramesTo,       &m_camdispay, &QnCamDisplay::onSkippingFrames,      Qt::DirectConnection);
         }
-    }    
+    }
 
 }
 
@@ -132,28 +133,48 @@ void QnClientVideoCamera::setLightCPUMode(QnAbstractVideoDecoder::DecodeMode val
     m_camdispay.setLightCPUMode(val);
 }
 
-void QnClientVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTime, const
-                                            QString& fileName, const QString& format, 
-                                            QnStorageResourcePtr storage, 
+void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod,
+												  const  QString& fileName, const QString& format,
+                                            QnStorageResourcePtr storage,
                                             QnStreamRecorder::Role role,
                                             qint64 serverTimeZoneMs,
                                             QnImageFilterHelper transcodeParams)
 {
-    if (startTime > endTime)
-        qSwap(startTime, endTime);
+    qint64 startTimeUs = timePeriod.startTimeMs * 1000ll;
+    Q_ASSERT_X(timePeriod.durationMs > 0, Q_FUNC_INFO, "Invalid time period, possibly LIVE is exported");
+    qint64 endTimeUs = timePeriod.durationMs > 0
+        ? timePeriod.endTimeMs() * 1000ll
+        : DATETIME_NOW;
 
-    QMutexLocker lock(&m_exportMutex);
-    if (m_exportRecorder == 0)
+    QnMutexLocker lock( &m_exportMutex );
+    if (!m_exportRecorder)
     {
         QnAbstractStreamDataProvider* tmpReader = m_resource->toResource()->createDataProvider(Qn::CR_Default);
         m_exportReader = dynamic_cast<QnAbstractArchiveReader*> (tmpReader);
         if (!m_exportReader)
         {
             delete tmpReader;
-            emit exportFinished(InvalidResourceType, fileName);
+            emit exportFinished(
+                QnStreamRecorder::ErrorStruct(
+                    InvalidResourceType,
+                    QnStorageResourcePtr()
+                ),
+                fileName
+            );
             return;
         }
-        connect(m_exportReader, SIGNAL(finished()), m_exportReader, SLOT(deleteLater()));
+
+        connect(m_exportReader, &QnAbstractArchiveReader::finished, this, [this]()
+        {
+            {
+                QnMutexLocker lock(&m_exportMutex);
+                m_exportReader.clear();
+            }
+
+            /* There is a possibility we have already cleared the smart pointer, e.g. in stopExport() method. */
+            sender()->deleteLater();
+        });
+
         m_exportReader->setCycleMode(false);
         QnRtspClientArchiveDelegate* rtspClient = dynamic_cast<QnRtspClientArchiveDelegate*> (m_exportReader->getArchiveDelegate());
         if (rtspClient) {
@@ -161,16 +182,28 @@ void QnClientVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTi
             // it is required for av_streams in output file - we should know all codec context immediately
             QnVirtualCameraResourcePtr camera = m_resource->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
             rtspClient->setCamera(camera);
-            rtspClient->setPlayNowModeAllowed(false); 
+            rtspClient->setPlayNowModeAllowed(false);
             rtspClient->setAdditionalAttribute(Qn::EC2_MEDIA_ROLE, "export");
         }
         if (role == QnStreamRecorder::Role_FileExport)
             m_exportReader->setQuality(MEDIA_Quality_ForceHigh, true); // for 'mkv' and 'avi' files
 
         m_exportRecorder = new QnStreamRecorder(m_resource->toResourcePtr());
-        connect(m_exportRecorder, SIGNAL(finished()), m_exportRecorder, SLOT(deleteLater()));
-        if (storage)
-            m_exportRecorder->setStorage(storage);
+
+
+        connect(m_exportRecorder, &QnStreamRecorder::finished, this, [this]()
+        {
+            {
+                QnMutexLocker lock(&m_exportMutex);
+                if (m_exportReader && m_exportRecorder)
+                    m_exportReader->removeDataProcessor(m_exportRecorder);
+                m_exportRecorder.clear();
+            }
+
+            /* There is a possibility we have already cleared the smart pointer, e.g. in stopExport() method. */
+            sender()->deleteLater();
+        });
+
 
         m_exportRecorder->setExtraTranscodeParams(transcodeParams);
 
@@ -189,15 +222,23 @@ void QnClientVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTi
     }
 
     m_exportRecorder->clearUnprocessedData();
-    m_exportRecorder->setEofDateTime(endTime);
-    m_exportRecorder->setFileName(fileName);
+    m_exportRecorder->setEofDateTime(endTimeUs);
+
+    if (storage)
+        m_exportRecorder->addRecordingContext(
+            fileName,
+            storage
+        );
+    else
+        m_exportRecorder->addRecordingContext(fileName);
+
     m_exportRecorder->setRole(role);
     m_exportRecorder->setServerTimeZoneMs(serverTimeZoneMs);
     m_exportRecorder->setContainer(format);
     m_exportRecorder->setNeedCalcSignature(true);
 
     m_exportReader->addDataProcessor(m_exportRecorder);
-    m_exportReader->jumpTo(startTime, startTime);
+    m_exportReader->jumpTo(startTimeUs, startTimeUs);
     m_exportReader->start();
     m_exportRecorder->start();
 }
@@ -206,7 +247,7 @@ void QnClientVideoCamera::stopExport() {
     if (m_exportReader) {
         if (m_exportRecorder)
             m_exportReader->removeDataProcessor(m_exportRecorder);
-        m_exportReader->pleaseStop();
+        m_exportReader->pleaseStop();  // it will be deleted in finished() signal handle
     }
     if (m_exportRecorder) {
         // clean signature flag; in other case file will be recreated on writing finish
@@ -214,11 +255,11 @@ void QnClientVideoCamera::stopExport() {
         m_exportRecorder->setNeedCalcSignature(false);
 
         connect(m_exportRecorder, SIGNAL(finished()), this, SIGNAL(exportStopped()));
-        m_exportRecorder->pleaseStop();
+        m_exportRecorder->pleaseStop(); // it will be deleted in finished() signal handle
     }
-    QMutexLocker lock(&m_exportMutex);
-    m_exportReader = 0;
-    m_exportRecorder = 0;
+    QnMutexLocker lock( &m_exportMutex );
+    m_exportReader.clear();
+    m_exportRecorder.clear();
 }
 
 void QnClientVideoCamera::setResource(QnMediaResourcePtr resource)
@@ -237,7 +278,7 @@ QSharedPointer<QBuffer> QnClientVideoCamera::motionIODevice(int channel) {
 
 QString QnClientVideoCamera::exportedFileName() const
 {
-    QMutexLocker lock(&m_exportMutex);
+    QnMutexLocker lock( &m_exportMutex );
     if (m_exportRecorder)
         return m_exportRecorder->fixedFileName();
     else

@@ -81,7 +81,7 @@ bool QnCheckForUpdatesPeerTask::needUpdate(const QnSoftwareVersion &version, con
 }
 
 void QnCheckForUpdatesPeerTask::checkUpdateCoverage() {
-    if (m_updateFiles.isEmpty()) {
+    if (m_updateFiles.isEmpty() && m_clientUpdateFile.isNull()) {
         finishTask(QnCheckForUpdateResult::BadUpdateFile);
         return;
     }

@@ -8,8 +8,7 @@ class QnImageProvider: public QObject {
     Q_OBJECT
 
 public:
-    QnImageProvider(QObject *parent = 0):
-        QObject(parent) {}
+    QnImageProvider(QObject *parent = 0): QObject(parent) {}
     virtual ~QnImageProvider() {}
 
     virtual QImage image() const = 0;

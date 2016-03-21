@@ -2,8 +2,20 @@
 
 #include <utils/common/model_functions.h>
 
-QnRestResult::QnRestResult(): 
-    error(NoError) 
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnRestResult::Error,
+                                          (QnRestResult::NoError,               "OK")
+                                          (QnRestResult::MissingParameter,      "Required parameter is missing")
+                                          (QnRestResult::InvalidParameter,      "Invalid parameter value")
+                                          (QnRestResult::CantProcessRequest,    "Internal server error")
+                                          (QnRestResult::Forbidden,             "Access denied")
+                                          );
+
+QN_FUSION_DEFINE_FUNCTIONS(QnRestResult::Error, (numeric))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnRestResult, (ubjson)(json)(xml)(csv_record), QnRestResult_Fields, (optional, true) )
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(QN_REST_RESULT_TYPES, (ubjson)(json), _Fields, (optional, true))
+
+QnRestResult::QnRestResult():
+    error(NoError)
 {}
 
 void QnRestResult::setError(Error errorValue, const QString &errorStringValue) {
@@ -15,7 +27,7 @@ QnJsonRestResult::QnJsonRestResult() :
     QnRestResult()
 {}
 
-QnJsonRestResult::QnJsonRestResult(const QnRestResult& base) : 
+QnJsonRestResult::QnJsonRestResult(const QnRestResult& base) :
     QnRestResult(base)
 {}
 
@@ -41,5 +53,3 @@ bool deserialize(QnUbjsonReader<QByteArray> *stream, QJsonValue *target) {
     return true;
 }
 
-QN_FUSION_DEFINE_FUNCTIONS(QnRestResult::Error, (numeric))
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(QN_REST_RESULT_TYPES, (ubjson)(json), _Fields, (optional, true))

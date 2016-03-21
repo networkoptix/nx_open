@@ -23,9 +23,8 @@
 #include <functional>
 #include <memory>
 
-#include <QtCore/QDateTime>
 #include <QtCore/QElapsedTimer>
-#include <QtCore/QMutexLocker>
+#include <utils/thread/mutex.h>
 #include <QtCore/QThread>
 
 #include <utils/common/log.h>
@@ -33,6 +32,7 @@
 
 #include "ilp_empty_packet.h"
 #include "motion_data_picture.h"
+#include "plugin.h"
 
 
 static const nxcip::UsecUTCTimestamp USEC_IN_MS = 1000;
@@ -40,11 +40,11 @@ static const nxcip::UsecUTCTimestamp USEC_IN_SEC = 1000*1000;
 static const nxcip::UsecUTCTimestamp NSEC_IN_USEC = 1000;
 static const int MAX_FRAME_SIZE = 4*1024*1024;
 
-StreamReader::StreamReader(
-    nxpt::CommonRefManager* const parentRefManager,
-    const nxcip::CameraInfo& cameraInfo,
-    float fps,
-    int encoderNumber )
+StreamReader::StreamReader(nxpt::CommonRefManager* const parentRefManager,
+                           nxpl::TimeProvider *const timeProvider,
+                           const nxcip::CameraInfo& cameraInfo,
+                           float fps,
+                           int encoderNumber )
 :
     m_refManager( parentRefManager ),
     m_cameraInfo( cameraInfo ),
@@ -55,8 +55,10 @@ StreamReader::StreamReader(
     m_prevFrameClock( -1 ),
     m_frameDurationMSec( 0 ),
     m_terminated( false ),
-    m_isInGetNextData( 0 )
+    m_isInGetNextData( 0 ),
+    m_timeProvider(timeProvider)
 {
+    assert(m_timeProvider);
     setFps( fps );
 
     using namespace std::placeholders;
@@ -68,6 +70,7 @@ StreamReader::StreamReader(
 StreamReader::~StreamReader()
 {
     assert( m_isInGetNextData == 0 );
+    m_timeProvider->releaseRef();
 }
 
 //!Implementation of nxpl::PluginInterface::queryInterface
@@ -110,7 +113,7 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
     bool httpClientHasBeenJustCreated = false;
     std::shared_ptr<nx_http::HttpClient> localHttpClientPtr;
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         if( !m_httpClient )
         {
             m_httpClient = std::make_shared<nx_http::HttpClient>();
@@ -161,7 +164,7 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
             {
                 const nx_http::BufferType& msgBodyBuf = localHttpClientPtr->fetchMessageBodyBuffer();
                 {
-                    QMutexLocker lk( &m_mutex );
+                    QnMutexLocker lk( &m_mutex );
                     if( m_terminated )
                     {
                         m_terminated = false;
@@ -188,7 +191,7 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
             {
                 m_multipartContentParser.processData( localHttpClientPtr->fetchMessageBodyBuffer() );
                 {
-                    QMutexLocker lk( &m_mutex );
+                    QnMutexLocker lk( &m_mutex );
                     if( m_terminated )
                     {
                         m_terminated = false;
@@ -208,7 +211,7 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
         return nxcip::NX_NO_ERROR;
     }
 
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     if( m_httpClient )
     {
         //reconnecting
@@ -220,7 +223,7 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
 
 void StreamReader::interrupt()
 {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     m_terminated = true;
     m_cond.wakeAll();
 
@@ -275,7 +278,7 @@ void StreamReader::gotJpegFrame( const nx_http::ConstBufferRefType& jpgFrame )
     m_videoPacket.reset( new ILPVideoPacket(
         &m_allocator,
         0,
-        QDateTime::currentMSecsSinceEpoch() * USEC_IN_MS,
+        m_timeProvider->millisSinceEpoch()  * USEC_IN_MS,
         nxcip::MediaDataPacket::fKeyPacket,
         0 ) );
     m_videoPacket->resizeBuffer( jpgFrame.size() );
@@ -285,14 +288,14 @@ void StreamReader::gotJpegFrame( const nx_http::ConstBufferRefType& jpgFrame )
 
 bool StreamReader::waitForNextFrameTime()
 {
-    const qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
+    const qint64 currentTime = m_timeProvider->millisSinceEpoch();
     if( m_prevFrameClock != -1 &&
         !((m_prevFrameClock > currentTime) || (currentTime - m_prevFrameClock > m_frameDurationMSec)) ) //system time changed
     {
         const qint64 msecToSleep = m_frameDurationMSec - (currentTime - m_prevFrameClock);
         if( msecToSleep > 0 )
         {
-            QMutexLocker lk( &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             QElapsedTimer monotonicTimer;
             monotonicTimer.start();
             qint64 msElapsed = monotonicTimer.elapsed();
@@ -309,6 +312,6 @@ bool StreamReader::waitForNextFrameTime()
             }
         }
     }
-    m_prevFrameClock = QDateTime::currentMSecsSinceEpoch();
+    m_prevFrameClock = m_timeProvider->millisSinceEpoch();
     return true;
 }

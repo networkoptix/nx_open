@@ -89,6 +89,10 @@ public:
         }
     }
 
+    bool isEmpty() const {
+        return addresses.isEmpty() && ignoredAddresses.isEmpty();
+    }
+
     static RoutingChange diff(const QSet<QUrl> &additionalUrlsA, const QSet<QUrl> &ignoredUrlsA,
                               const QSet<QUrl> &additionalUrlsB, const QSet<QUrl> &ignoredUrlsB)
     {
@@ -204,11 +208,12 @@ QnRoutingManagementWidget::QnRoutingManagementWidget(QWidget *parent) :
 
 QnRoutingManagementWidget::~QnRoutingManagementWidget() {}
 
-void QnRoutingManagementWidget::updateFromSettings() {
+void QnRoutingManagementWidget::loadDataToUi() {
     ui->warningLabel->hide();
+    updateModel();
 }
 
-void QnRoutingManagementWidget::submitToSettings() {
+void QnRoutingManagementWidget::applyChanges() {
     ui->warningLabel->hide();
     if (isReadOnly())
         return;
@@ -261,6 +266,15 @@ void QnRoutingManagementWidget::submitToSettings() {
     m_changes->changes.clear();
 }
 
+bool QnRoutingManagementWidget::hasChanges() const {
+    if (isReadOnly())
+        return false;
+
+    return boost::algorithm::any_of(m_changes->changes, [](const RoutingChange &change) {
+        return !change.isEmpty();
+    });
+}
+
 void QnRoutingManagementWidget::setReadOnlyInternal(bool readOnly) {
     using ::setReadOnly;
 
@@ -301,6 +315,8 @@ void QnRoutingManagementWidget::updateModel() {
 
     if (row < m_sortedServerAddressesModel->rowCount())
         ui->addressesView->setCurrentIndex(m_sortedServerAddressesModel->index(row, 0));
+
+    emit hasChangesChanged();
 }
 
 void QnRoutingManagementWidget::updateFromModel() {
@@ -317,6 +333,7 @@ void QnRoutingManagementWidget::updateFromModel() {
                                        additionalUrls, ignoredUrls,
                                        QSet<QUrl>::fromList(m_serverAddressesModel->manualAddressList()),
                                        m_serverAddressesModel->ignoredAddresses());
+    emit hasChangesChanged();
 }
 
 void QnRoutingManagementWidget::updateUi() {
@@ -344,7 +361,7 @@ void QnRoutingManagementWidget::at_addButton_clicked() {
 
 //    if (url.port() == m_server->getPort())
 //        url.setPort(-1);
-    // TODO: #dklychkov fix it in 2.4
+    // TODO: #dklychkov fix it in 3.0
     url.setPort(-1);
 
     QUrl explicitUrl = url;
@@ -358,6 +375,8 @@ void QnRoutingManagementWidget::at_addButton_clicked() {
     }
 
     m_serverAddressesModel->addAddress(explicitUrl);
+
+    updateFromModel();
 }
 
 void QnRoutingManagementWidget::at_removeButton_clicked() {
@@ -374,6 +393,8 @@ void QnRoutingManagementWidget::at_removeButton_clicked() {
 
     int row = qMin(m_sortedServerAddressesModel->rowCount() - 1, currentIndex.row());
     ui->addressesView->setCurrentIndex(m_sortedServerAddressesModel->index(row, 0));
+
+    updateFromModel();
 }
 
 void QnRoutingManagementWidget::at_serversView_currentIndexChanged(const QModelIndex &current, const QModelIndex &previous) {
@@ -405,9 +426,12 @@ void QnRoutingManagementWidget::at_serverAddressesModel_dataChanged(const QModel
     if (topLeft != bottomRight || topLeft.column() != QnServerAddressesModel::InUseColumn)
         return;
 
-    if (topLeft.data(Qt::CheckStateRole).toInt() == Qt::Unchecked) {
-        if (!m_serverAddressesModel->isManualAddress(topLeft))
-            ui->warningLabel->show();
+    updateFromModel();
+
+    if ((topLeft.data(Qt::CheckStateRole).toInt() == Qt::Unchecked) && (!m_serverAddressesModel->isManualAddress(topLeft))) {
+        ui->warningLabel->setVisible(hasChanges());
+    } else if (!hasChanges()) {
+        ui->warningLabel->setVisible(false);
     }
 }
 
@@ -424,7 +448,7 @@ void QnRoutingManagementWidget::reportUrlEditingError(int error) {
 
 void QnRoutingManagementWidget::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-    if (!server || server->getStatus() == Qn::Incompatible)
+    if (!server || QnMediaServerResource::isFakeServer(server))
         return;
 
     m_serverListModel->addResource(resource);
@@ -432,7 +456,7 @@ void QnRoutingManagementWidget::at_resourcePool_resourceAdded(const QnResourcePt
 
 void QnRoutingManagementWidget::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) {
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-    if (!server || server->getStatus() == Qn::Incompatible)
+    if (!server || QnMediaServerResource::isFakeServer(server))
         return;
 
     m_serverListModel->removeResource(resource);

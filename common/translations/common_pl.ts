@@ -15,17 +15,6 @@
     </message>
 </context>
 <context>
-    <name>QnActiResource</name>
-    <message>
-        <source>Output %1</source>
-        <translation>Wyjście %1</translation>
-    </message>
-    <message>
-        <source>Input %1</source>
-        <translation>Wejście %1</translation>
-    </message>
-</context>
-<context>
     <name>QnBusinessStringsHelper</name>
     <message>
         <source>Bookmark</source>
@@ -233,10 +222,6 @@
         <translation>Wystąpiło nienznane zdarzenie</translation>
     </message>
     <message>
-        <source>Conflict Address: %1</source>
-        <translation>Konflikt adresów: %1</translation>
-    </message>
-    <message>
         <source>Connection to server is lost.</source>
         <translation>Utracono połączenie do serwera.</translation>
     </message>
@@ -258,10 +243,6 @@
     </message>
     <message>
         <source>Caption: %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Input port: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -346,10 +327,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>IO Module %1 was disconnected</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Device IP Conflict at %1</source>
         <extracomment>Device IP Conflict at &lt;server_name&gt;</extracomment>
         <translation type="unfinished"></translation>
@@ -372,7 +349,75 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Recording on IO modules is disabled:</source>
+        <source>Execute PTZ preset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show text overlay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show on Alarm Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup finished</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server &apos;%1&apos; has finished an archive backup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Generic Event at %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input Port: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup is successfully completed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module %1 was disconnected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Conflicting Address: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup failed: No available backup storages with sufficient free space</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup failed: Target storage failure</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup failed: Source file open/read error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup failed: Target file create/write error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup failed: File catalog error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup finished, but isn&apos;t fully completed because backup time is over. Data is backed up to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup is canceled by user. Data is backed up to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording on I/O modules is disabled:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -463,19 +508,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Please try to reboot the IO module, then restore factory defaults on the web-page.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Make sure the device is plugged into the network. Try to reboot the device.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Make sure the IO module is plugged into the network. Try to reboot the IO module.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -491,10 +528,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Could not parse IO module response. Url %1, request name %2.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Not authorized. Url %1.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -507,19 +540,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in IO module settings.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>If it doesn&apos;t help, restore factory defaults on the device web-page.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>If it doesn&apos;t help, restore factory defaults on the camera web-page.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the IO module web-page.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -531,19 +556,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>IO Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Unknown device issue.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Unknown camera issue.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unknown IO module issue.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -555,10 +572,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Invalid data was received from the IO module %1.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Too many media errors. Please open device issues dialog for more details.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -567,19 +580,55 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Too many media errors. Please open IO module issues dialog for more details.</source>
+        <source>Camera plugin error. %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Device initialization process in progress.</source>
+        <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Camera initialization process in progress.</source>
+        <source>Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>IO Module initialization process in progress.</source>
+        <source>Could not parse I/O module response. Url %1, request name %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in I/O module settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If it doesn&apos;t help, restore factory defaults on the I/O module web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown I/O module issue.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid data was received from the I/O module %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device initialization process is in progress.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera initialization process is in progress.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module initialization process is in progress.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -601,8 +650,8 @@
         <translation>Nie można znaleźć explorer.exe w ścieżce Eksploratora Windows.</translation>
     </message>
     <message>
-        <source>Launching file explorer failed.</source>
-        <translation>Uruchomienie explorera plików nie powiodło się.</translation>
+        <source>File explorer failed to open.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -616,12 +665,12 @@
         <translation>Nie odnaleziono enkodera dla kodeka %1.</translation>
     </message>
     <message>
-        <source>Could not initialise audio encoder.</source>
-        <translation>Nie udało się zainicjować kodera audio.</translation>
+        <source>Could not initialize audio encoder.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Could not initialise audio decoder.</source>
-        <translation>Nie udało się zainicjować dekodera audio.</translation>
+        <source>Could not initialize audio decoder.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -658,8 +707,8 @@
         <translation>Nie odnaleziono enkodera dla kodeka %1.</translation>
     </message>
     <message>
-        <source>Could not initialise video encoder.</source>
-        <translation>Nie udało się zainicjować kodera wideo.</translation>
+        <source>Could not initialize video encoder.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -814,14 +863,6 @@
         </translation>
     </message>
     <message>
-        <source>There was a problem activating your license key. Invalid data received. Please contact support team to report issue.</source>
-        <translation>Wystąpił problem z aktywacją twojej licencji. Otrzymano błędne dane. Proszę skontaktuj się zpomocą techniczną.</translation>
-    </message>
-    <message>
-        <source>There was a problem activating your license key. A database error has occurred.</source>
-        <translation>Wystąpił problem z aktywacją twojej licencji. Błąd bazy danych.</translation>
-    </message>
-    <message>
         <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
         <translation>Wpisany klucz jest błędny. Sprawdź klucz i wpisz go poprawnie. Jeśli nadal problem występuje proszę skontaktuj się zpomocą techniczną.</translation>
     </message>
@@ -833,33 +874,20 @@
         <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
         <translation>Ten klucz licencji byłu już aktywowany na sprzęcie o numerze ID {{hwid}} w {{time}}. Proszę skontaktuj się zpomocą techniczną.</translation>
     </message>
+    <message>
+        <source>There was a problem activating your license key. A database error occurred.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnMediaServerResource</name>
     <message>
         <source>Server</source>
         <translation>Serwer</translation>
-    </message>
-</context>
-<context>
-    <name>QnNewDWPtzController</name>
-    <message>
-        <source>Preset #</source>
-        <translation>Preset #</translation>
-    </message>
-</context>
-<context>
-    <name>QnPlAxisResource</name>
-    <message>
-        <source>Can&apos;t initialize IO port settings</source>
-        <translation>Nie można zainicjować ustawień WE/WY</translation>
-    </message>
-</context>
-<context>
-    <name>QnPlOnvifResource</name>
-    <message>
-        <source>Otput %1</source>
-        <translation>Wyjście %1</translation>
     </message>
 </context>
 <context>
@@ -885,22 +913,6 @@
             <numerusform>%n kamera(y)</numerusform>
             <numerusform>%n kamera</numerusform>
             <numerusform>%n kamery</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n IO Module(s)</source>
-        <translation>
-            <numerusform>%n Moduł(y) WE/WY</numerusform>
-            <numerusform>%n Moduł WE/WY</numerusform>
-            <numerusform>%n Moduy WE/WY</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n IO module(s)</source>
-        <translation>
-            <numerusform>%n moduł(y) WE/WY</numerusform>
-            <numerusform>%n moduł WE/WY</numerusform>
-            <numerusform>%n moduły WE/WY</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -936,22 +948,6 @@
         <translation>kamera</translation>
     </message>
     <message>
-        <source>IO Modules</source>
-        <translation>Moduły WE/WY</translation>
-    </message>
-    <message>
-        <source>IO modules</source>
-        <translation>moduły WE/WY</translation>
-    </message>
-    <message>
-        <source>IO Module</source>
-        <translation>Moduł WE/WY</translation>
-    </message>
-    <message>
-        <source>IO module</source>
-        <translation>moduł WE/WY</translation>
-    </message>
-    <message>
         <source>Devices</source>
         <translation>Urządzenia</translation>
     </message>
@@ -966,6 +962,38 @@
     <message>
         <source>device</source>
         <translation>urządzenie</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n I/O Module(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n I/O module(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>I/O Modules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O modules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module</source>
+        <translation type="unfinished">Moduł WE/WY</translation>
+    </message>
+    <message>
+        <source>I/O module</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1091,107 +1119,8 @@
         <source>Error during watermark generation for file &apos;%1&apos;.</source>
         <translation>Błąd podczas tworzenia znaku wodnego dla pliku &apos;%1&apos;.</translation>
     </message>
-</context>
-<context>
-    <name>QnSystemHealthStringsHelper</name>
     <message>
-        <source>Email address is not set</source>
-        <translation>Adres E-mail nie jest ustawiony</translation>
-    </message>
-    <message>
-        <source>No licenses</source>
-        <translation>Brak licencji</translation>
-    </message>
-    <message>
-        <source>Email server is not set</source>
-        <translation>Serwer E-mail nie jest ustawiony</translation>
-    </message>
-    <message>
-        <source>Some users have not set their email addresses</source>
-        <translation>Niektórzy użytkownicy nie ustawili swoich adresów e-mail</translation>
-    </message>
-    <message>
-        <source>Connection to server lost</source>
-        <translation>Utracono połączenie z serwerem</translation>
-    </message>
-    <message>
-        <source>Select server for others to synchronize time with</source>
-        <translation>Wybierz serwer, do którego będzie synchronizowany czas</translation>
-    </message>
-    <message>
-        <source>Error while sending email</source>
-        <translation>Błąd podczas wysyłania e-maila</translation>
-    </message>
-    <message>
-        <source>Rebuilding archive index is completed</source>
-        <translation>Zakończono odbudowę indexu archiwum </translation>
-    </message>
-    <message>
-        <source>Email address is not set for user %1</source>
-        <translation>Adres E-mail nie jest ustawiony dla użytkownika %1</translation>
-    </message>
-    <message>
-        <source>Email address is not set.</source>
-        <translation>Adres E-mail nie jest ustawiony.</translation>
-    </message>
-    <message>
-        <source>You cannot receive system notifications via email.</source>
-        <translation>Nie możesz otrzymać powiadomień systemowych poprzez e-mail.</translation>
-    </message>
-    <message>
-        <source>Email server is not set.</source>
-        <translation>Serwer E-mail nie jest ustawiony.</translation>
-    </message>
-    <message>
-        <source>Some users have not set their email addresses.</source>
-        <translation>Niektórzy użytkownicy nie ustawili swoich adresów e-mail.</translation>
-    </message>
-    <message>
-        <source>They cannot receive system notifications via email.</source>
-        <translation>Oni nie  mogą otrzymać powiadomień systemowych poprzez e-mail.</translation>
-    </message>
-    <message>
-        <source>Storages are full on the following Server:</source>
-        <translation>Dyski są pełne na następującym serwerze:</translation>
-    </message>
-    <message>
-        <source>Storages are not configured on the following Server:</source>
-        <translation>Dyski nie są skonfigurowane  na następującym serwerze:</translation>
-    </message>
-    <message>
-        <source>You have no licenses.</source>
-        <translation>Nie posiadasz licecncji.</translation>
-    </message>
-    <message>
-        <source>You cannot record video from cameras.</source>
-        <translation>Nie moższ nagrywać obrazu z kamer.</translation>
-    </message>
-    <message>
-        <source>Rebuilding archive index is completed on the following Server:</source>
-        <translation>Zakończono odbudowę indexu archiwum na następującym serwerze:</translation>
-    </message>
-    <message>
-        <source>Storage is full</source>
-        <translation>Przestrzeń do zapisu jest pełna</translation>
-    </message>
-    <message>
-        <source>Storage is not configured</source>
-        <translation>Przestrzeń do zapisu nie jest skonfigurowana</translation>
-    </message>
-    <message>
-        <source>Server times are not synchronized and a common time could not be detected automatically.</source>
-        <translation>Czasy serwerów nie są zsynchronizowane, wspólny czas nie może być wykryty automatycznie.</translation>
-    </message>
-    <message>
-        <source>System is in safe mode</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The system is running in safe mode.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Any configuration changes except license activation are impossible.</source>
+        <source>File write error. Not enough free space.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1224,17 +1153,6 @@
     </message>
 </context>
 <context>
-    <name>QnThirdPartyResource</name>
-    <message>
-        <source>Otput %1</source>
-        <translation>Wyjście %1</translation>
-    </message>
-    <message>
-        <source>Input %1</source>
-        <translation>Wejście %1</translation>
-    </message>
-</context>
-<context>
     <name>QnTranscoder</name>
     <message>
         <source>OpenCL transcoding is not implemented.</source>
@@ -1262,6 +1180,13 @@
     <message>
         <source>%1 (external)</source>
         <translation>%1 (zewnętrzny)</translation>
+    </message>
+</context>
+<context>
+    <name>utils::QnCameraNamesWatcher</name>
+    <message>
+        <source>Removed camera</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

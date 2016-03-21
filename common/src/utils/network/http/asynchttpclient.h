@@ -9,9 +9,10 @@
 #include <map>
 #include <memory>
 
-#include <QtCore/QMutex>
+#include <utils/thread/mutex.h>
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
+#include <QtNetwork/QAuthenticator>
 #include <QSharedPointer>
 
 #include "utils/network/abstract_socket.h"
@@ -27,7 +28,7 @@ namespace nx_http
     //!Http client. All operations are done asynchronously
     /*!
         It is strongly recommended to connect to signals using Qt::DirectConnection and slot MUST NOT use blocking calls.
-        
+
         \note To get new instance use AsyncHttpClient::create
         \note This class methods are not thread-safe
         \note All signals are emitted from io::AIOService threads
@@ -140,9 +141,11 @@ namespace nx_http
         */
         void setMessageBodyReadTimeoutMs( unsigned int messageBodyReadTimeoutMs );
 
+        AbstractStreamSocket* socket();
         QSharedPointer<AbstractStreamSocket> takeSocket();
 
         void addAdditionalHeader( const StringType& key, const StringType& value );
+        void addRequestHeaders(const HttpHeaders& headers);
         void removeAdditionalHeader( const StringType& key );
         template<class HttpHeadersRef>
         void setAdditionalHeaders( HttpHeadersRef&& additionalHeaders )
@@ -203,7 +206,7 @@ namespace nx_http
         */
         void someMessageBodyAvailable( nx_http::AsyncHttpClientPtr );
         /*!
-            Emitted when http request is done with any result (successfully executed request and received message body, 
+            Emitted when http request is done with any result (successfully executed request and received message body,
             received response with error code, connection terminated unexpectedly).
             To get result code use method \a response()
             \note Some message body can still be stored in internal buffer. To read it, call \a AsyncHttpClient::fetchMessageBodyBuffer
@@ -228,7 +231,7 @@ namespace nx_http
         bool m_authorizationTried;
         bool m_ha1RecalcTried;
         bool m_terminated;
-        mutable QMutex m_mutex;
+        mutable QnMutex m_mutex;
         quint64 m_totalBytesRead;
         bool m_contentEncodingUsed;
         unsigned int m_sendTimeoutMs;
@@ -387,11 +390,44 @@ namespace nx_http
         std::function<void(SystemError::ErrorCode, int /*statusCode*/, nx_http::BufferType)> completionHandler,
         const nx_http::HttpHeaders& extraHeaders = nx_http::HttpHeaders(),
         AsyncHttpClient::AuthType authType = AsyncHttpClient::authBasicAndDigest );
+
     //!Calls previous function and waits for completion
     SystemError::ErrorCode downloadFileSync(
         const QUrl& url,
         int* const statusCode,
         nx_http::BufferType* const msgBody );
+
+    //!Same as downloadFileAsync but provide contentType at callback
+    bool downloadFileAsyncEx(
+        const QUrl& url,
+        std::function<void(SystemError::ErrorCode, int /*statusCode*/, nx_http::StringType /*contentType*/, nx_http::BufferType /*msgBody */)> completionHandler,
+        const nx_http::HttpHeaders& extraHeaders = nx_http::HttpHeaders(),
+        AsyncHttpClient::AuthType authType = AsyncHttpClient::authBasicAndDigest );
+
+    bool downloadFileAsyncEx(
+        const QUrl& url,
+        std::function<void(SystemError::ErrorCode, int, nx_http::StringType, nx_http::BufferType)> completionHandler,
+        nx_http::AsyncHttpClientPtr httpClientCaptured);
+
+    typedef std::function<void (SystemError::ErrorCode, int httpStatus)> UploadCompletionHandler;
+
+    // Uploads specified data using POST
+    bool uploadDataAsync(const QUrl &url
+        , const QByteArray &data
+        , const QByteArray &contentType
+        , const nx_http::HttpHeaders &extraHeaders
+        , const UploadCompletionHandler &callback
+        , const AsyncHttpClient::AuthType authType = AsyncHttpClient::authBasicAndDigest
+        , const QString &user = QString()
+        , const QString &password = QString());
+
+    SystemError::ErrorCode uploadDataSync(const QUrl &url
+        , const QByteArray &data
+        , const QByteArray &contentType
+        , const QString &user
+        , const QString &password
+        , const AsyncHttpClient::AuthType authType = AsyncHttpClient::authBasicAndDigest
+        , nx_http::StatusCode::Value *httpCode = nullptr);
 }
 
 #endif  //ASYNCHTTPCLIENT_H

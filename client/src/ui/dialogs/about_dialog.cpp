@@ -25,7 +25,7 @@
 #include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
-#include <ui/style/globals.h>
+#include <ui/style/warning_style.h>
 
 #include <utils/email/email.h>
 #include <utils/common/string.h>
@@ -42,7 +42,7 @@ namespace {
 
 } // anonymous namespace
 
-QnAboutDialog::QnAboutDialog(QWidget *parent): 
+QnAboutDialog::QnAboutDialog(QWidget *parent):
     base_type(parent, Qt::MSWindowsFixedSizeDialogHint),
     ui(new Ui::AboutDialog())
 {
@@ -50,10 +50,10 @@ QnAboutDialog::QnAboutDialog(QWidget *parent):
 
     setHelpTopic(this, Qn::About_Help);
 
-    if(menu()->canTrigger(Qn::ShowcaseAction)) {
+    if(menu()->canTrigger(QnActions::ShowcaseAction)) {
         QPushButton* showcaseButton = new QPushButton(this);
-        showcaseButton->setText(action(Qn::ShowcaseAction)->text());
-        connect(showcaseButton, &QPushButton::clicked, action(Qn::ShowcaseAction), &QAction::trigger);
+        showcaseButton->setText(action(QnActions::ShowcaseAction)->text());
+        connect(showcaseButton, &QPushButton::clicked, action(QnActions::ShowcaseAction), &QAction::trigger);
         ui->buttonBox->addButton(showcaseButton, QDialogButtonBox::HelpRole);
     }
 
@@ -96,15 +96,15 @@ QString QnAboutDialog::connectedServers() const {
             continue;
 
         QnMediaServerResourcePtr resource = data.resource.dynamicCast<QnMediaServerResource>();
-        if(!resource) 
+        if(!resource)
             continue;
-                      
+
         QString server = tr("Server at %2: v%1").arg(data.version.toString()).arg(QUrl(resource->getUrl()).host()) + lit("<br/>");
 
         bool updateRequested = QnWorkbenchVersionMismatchWatcher::versionMismatches(data.version, latestMsVersion, true);
 
         if (updateRequested)
-            server = QString(lit("<font color=\"%1\">%2</font>")).arg(qnGlobals->errorTextColor().name()).arg(server);
+            server = setWarningStyleHtml(server);
 
         servers += server;
     }
@@ -134,7 +134,7 @@ void QnAboutDialog::retranslateUi()
     QString servers = connectedServers();
     if (servers.isEmpty())
         servers = tr("Client is not connected to any server");
-    
+
     QString appName = lit("<b>%1%2 %3</b>")
         .arg(QnAppInfo::organizationName())
         .arg(lit("(tm)"))
@@ -160,7 +160,7 @@ void QnAboutDialog::retranslateUi()
 	gpu << lit("<b>%1</b>: %2.").arg(tr("OpenGL renderer")).arg(gl.renderer);
 	gpu << lit("<b>%1</b>: %2.").arg(tr("OpenGL vendor")).arg(gl.vendor);
     gpu << lit("<b>%1</b>: %2.").arg(tr("OpenGL max texture size")).arg(maxTextureSize);
-    
+
     const QString lineSeparator = lit("<br>\n");
 
     ui->versionLabel->setText(version.join(lineSeparator));
@@ -184,10 +184,10 @@ void QnAboutDialog::at_copyButton_clicked() {
     QClipboard *clipboard = QApplication::clipboard();
 
     clipboard->setText(
-         QTextDocumentFragment::fromHtml(ui->versionLabel->text()).toPlainText() + 
+         QTextDocumentFragment::fromHtml(ui->versionLabel->text()).toPlainText() +
          QLatin1String("\n") +
-         QTextDocumentFragment::fromHtml(ui->gpuLabel->text()).toPlainText() + 
-         QLatin1String("\n") + 
+         QTextDocumentFragment::fromHtml(ui->gpuLabel->text()).toPlainText() +
+         QLatin1String("\n") +
          QTextDocumentFragment::fromHtml(ui->serversLabel->text()).toPlainText()
     );
 }

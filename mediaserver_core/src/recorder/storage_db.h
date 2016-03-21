@@ -5,7 +5,7 @@
 
 #include <QElapsedTimer>
 
-#include <core/resource/camera_bookmark_fwd.h>
+
 #include <server/server_globals.h>
 
 #include "utils/db/db_helper.h"
@@ -46,27 +46,16 @@ public:
     bool flushRecords();
     QVector<DeviceFileCatalogPtr> loadFullFileCatalog();
 
-    void beforeDelete();
-    void afterDelete();
     bool replaceChunks(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog, const std::deque<DeviceFileCatalog::Chunk>& chunks);
-
-    bool removeCameraBookmarks(const QString& cameraUniqueId);
-    bool addOrUpdateCameraBookmark(const QnCameraBookmark &bookmark, const QString& cameraUniqueId);
-    bool deleteCameraBookmark(const QnCameraBookmark &bookmark);
-    bool getBookmarks(const QString& cameraUniqueId, const QnCameraBookmarkSearchFilter &filter, QnCameraBookmarkList &result);
-
 private:
     bool createDatabase();
 
     virtual QnDbTransaction* getTransaction() override;
     bool flushRecordsNoLock();
-    bool initializeBookmarksFtsTable();
-
     bool deleteRecordsInternal(const DeleteRecordInfo& delRecord);
     bool addRecordInternal(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog, const DeviceFileCatalog::Chunk& chunk);
 
     QVector<DeviceFileCatalogPtr> loadChunksFileCatalog();
-    QVector<DeviceFileCatalogPtr> loadBookmarksFileCatalog();
 
     void addCatalogFromMediaFolder(
         const QString&                  postfix, 
@@ -93,10 +82,9 @@ private:
         DeviceFileCatalog::Chunk chunk;
     };
 
-    mutable QMutex m_syncMutex;
+    mutable QnMutex m_syncMutex;
     QVector<DelayedData> m_delayedData;
     QVector<DeleteRecordInfo> m_recordsToDelete;
-    QMutex m_delMutex;
     QnDbTransaction m_tran;
     bool m_needReopenDB;
 };

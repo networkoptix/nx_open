@@ -7,6 +7,7 @@
 /// Cancels drag event before showing dialog.
 class QnDialog : public QDialog
 {
+    typedef QDialog base_type;
 public:
     QnDialog(QWidget * parent = nullptr, Qt::WindowFlags flags = 0);
 
@@ -15,4 +16,6 @@ public:
 
     /// @brief Shows dialog and cancels drag action to prevent hang on
     void show();
+
+    int exec();
 };

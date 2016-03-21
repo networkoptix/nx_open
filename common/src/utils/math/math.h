@@ -16,7 +16,6 @@
 #include <common/config.h>
 
 #include "fuzzy.h"
-#include "defines.h"
 
 namespace QnMathDetail {
     using ::qFuzzyIsNull;

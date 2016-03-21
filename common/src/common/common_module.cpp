@@ -11,10 +11,16 @@
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
-
+#include <core/resource/camera_history.h>
 #include <utils/common/product_features.h>
 #include <utils/common/timermanager.h>
-
+#include "core/resource/camera_user_attribute_pool.h"
+#include "core/resource/media_server_user_attributes.h"
+#include "core/resource_management/resource_properties.h"
+#include "core/resource_management/status_dictionary.h"
+#include "core/resource_management/server_additional_addresses_dictionary.h"
+#include "utils/common/synctime.h"
+#include "api/runtime_info_manager.h"
 
 QnCommonModule::QnCommonModule(QObject *parent): QObject(parent) {
     Q_INIT_RESOURCE(common);
@@ -22,7 +28,7 @@ QnCommonModule::QnCommonModule(QObject *parent): QObject(parent) {
     m_engineVersion = QnSoftwareVersion(QnAppInfo::engineVersion());
 
     QnCommonMetaTypes::initialize();
-    
+
     /* Init statics. */
     qnProductFeatures();
     store<TimerManager>(new TimerManager());
@@ -30,6 +36,15 @@ QnCommonModule::QnCommonModule(QObject *parent): QObject(parent) {
     m_dataPool = instance<QnResourceDataPool>();
     loadResourceData(m_dataPool, lit(":/resource_data.json"), true);
     loadResourceData(m_dataPool, QCoreApplication::applicationDirPath() + lit("/resource_data.json"), false);
+
+    instance<QnSyncTime>();
+    instance<QnCameraUserAttributePool>();
+    instance<QnMediaServerUserAttributesPool>();
+    instance<QnResourcePropertyDictionary>();
+    instance<QnResourceStatusDictionary>();
+    instance<QnServerAdditionalAddressesDictionary>();
+
+    instance<QnResourcePool>();
 
     /* Init members. */
     m_runUuid = QnUuid::createUuid();
@@ -49,14 +64,9 @@ void QnCommonModule::bindModuleinformation(const QnMediaServerResourcePtr &serve
     connect(server.data(),  &QnMediaServerResource::serverFlagsChanged,  this,   &QnCommonModule::updateModuleInformation);
 }
 
-void QnCommonModule::bindModuleinformation(const QnUserResourcePtr &adminUser) {
-    connect(adminUser.data(),   &QnUserResource::resourceChanged,   this,   &QnCommonModule::updateModuleInformation);
-    connect(adminUser.data(),   &QnUserResource::hashChanged,       this,   &QnCommonModule::updateModuleInformation);
-}
-
 void QnCommonModule::setRemoteGUID(const QnUuid &guid) {
     {
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock( &m_mutex );
         if (m_remoteUuid == guid)
             return;
         m_remoteUuid = guid;
@@ -65,17 +75,24 @@ void QnCommonModule::setRemoteGUID(const QnUuid &guid) {
 }
 
 QnUuid QnCommonModule::remoteGUID() const {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     return m_remoteUuid;
 }
 
+QnMediaServerResourcePtr QnCommonModule::currentServer() const {
+    QnUuid serverId = remoteGUID();
+    if (serverId.isNull())
+        return QnMediaServerResourcePtr();
+    return qnResPool->getResourceById(serverId).dynamicCast<QnMediaServerResource>();
+}
+
 QnSoftwareVersion QnCommonModule::engineVersion() const {
-    QMutexLocker lk(&m_mutex);
+    QnMutexLocker lk( &m_mutex );
     return m_engineVersion;
 }
 
 void QnCommonModule::setEngineVersion(const QnSoftwareVersion &version) {
-    QMutexLocker lk(&m_mutex);
+    QnMutexLocker lk( &m_mutex );
     m_engineVersion = version;
 }
 
@@ -106,7 +123,7 @@ void QnCommonModule::setModuleInformation(const QnModuleInformation &moduleInfor
     bool isSystemNameChanged = false;
     bool isReadOnlyChanged = false;
     {
-        QMutexLocker lk(&m_mutex);
+        QnMutexLocker lk( &m_mutex );
         if (m_moduleInformation == moduleInformation)
             return;
 
@@ -123,18 +140,18 @@ void QnCommonModule::setModuleInformation(const QnModuleInformation &moduleInfor
 
 QnModuleInformation QnCommonModule::moduleInformation() const
 {
-    QMutexLocker lk(&m_mutex);
+    QnMutexLocker lk( &m_mutex );
     return m_moduleInformation;
 }
 
 void QnCommonModule::loadResourceData(QnResourceDataPool *dataPool, const QString &fileName, bool required) {
     bool loaded = QFile::exists(fileName) && dataPool->load(fileName);
-    
+
     Q_ASSERT_X(!required || loaded, Q_FUNC_INFO, "Can't parse resource_data.json file!");  /* Getting an assert here? Something is wrong with resource data json file. */
 }
 
 void QnCommonModule::updateModuleInformation() {
-    QMutexLocker lk(&m_mutex);
+    QnMutexLocker lk( &m_mutex );
     QnModuleInformation moduleInformationCopy = m_moduleInformation;
     lk.unlock();
 
@@ -146,26 +163,18 @@ void QnCommonModule::updateModuleInformation() {
         moduleInformationCopy.serverFlags = moduleInformation.serverFlags;
     }
 
-    QnUserResourcePtr admin = qnResPool->getAdministrator();
-    if (admin) {
-        QCryptographicHash md5(QCryptographicHash::Md5);
-        md5.addData(admin->getDigest());
-        md5.addData(moduleInformationCopy.systemName.toUtf8());
-        moduleInformationCopy.authHash = md5.result();
-    }
-
     setModuleInformation(moduleInformationCopy);
 }
 
 void QnCommonModule::setSystemIdentityTime(qint64 value, const QnUuid& sender)
-{ 
-    m_systemIdentityTime = value; 
+{
+    m_systemIdentityTime = value;
     emit systemIdentityTimeChanged(value, sender);
 }
 
-qint64 QnCommonModule::systemIdentityTime() const 
-{ 
-    return m_systemIdentityTime; 
+qint64 QnCommonModule::systemIdentityTime() const
+{
+    return m_systemIdentityTime;
 }
 
 void QnCommonModule::setAdminPasswordData(const QByteArray& hash, const QByteArray& digest)
@@ -176,7 +185,7 @@ void QnCommonModule::setAdminPasswordData(const QByteArray& hash, const QByteArr
 
 void QnCommonModule::adminPasswordData(QByteArray* hash, QByteArray* digest) const
 {
-    *hash = m_adminPaswdHash;    
+    *hash = m_adminPaswdHash;
     *digest = m_adminPaswdDigest;
 }
 
@@ -191,15 +200,18 @@ bool QnCommonModule::useLowPriorityAdminPasswordHach() const
 }
 
 QnUuid QnCommonModule::runningInstanceGUID() const
-{ 
-    QMutexLocker lock(&m_mutex);
-    return m_runUuid; 
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_runUuid;
 }
 
 void QnCommonModule::updateRunningInstanceGuid()
 {
-    QMutexLocker lock(&m_mutex);
-    m_runUuid = QnUuid::createUuid();
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_runUuid = QnUuid::createUuid();
+    }
+    emit runningInstanceGUIDChanged();
 }
 
 void QnCommonModule::setLocalPeerType(Qn::PeerType peerType)

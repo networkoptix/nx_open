@@ -19,7 +19,12 @@ class QnServerStreamRecorder: public QnStreamRecorder
 {
     Q_OBJECT
 public:
-    QnServerStreamRecorder(const QnResourcePtr &dev, QnServer::ChunksCatalog catalog, QnAbstractMediaStreamDataProvider* mediaProvider);
+    QnServerStreamRecorder(
+        const QnResourcePtr                 &dev, 
+        QnServer::ChunksCatalog             catalog, 
+        QnAbstractMediaStreamDataProvider*  mediaProvider
+    );
+
     ~QnServerStreamRecorder();
 
     void updateCamera(const QnSecurityCamResourcePtr& cameraRes);
@@ -44,6 +49,7 @@ public:
 
     int getFRAfterThreshold() const;
     bool needConfigureProvider() const;
+
 signals:
     void fpsChanged(QnServerStreamRecorder* recorder, float value);
     void motionDetected(QnResourcePtr resource, bool value, qint64 time, QnConstAbstractDataPacketPtr motion);
@@ -58,7 +64,7 @@ protected:
 
     virtual void fileStarted(qint64 startTimeMs, int timeZone, const QString& fileName, QnAbstractMediaStreamDataProvider* provider) override;
     virtual void fileFinished(qint64 durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider, qint64 fileSize) override;
-    virtual QString fillFileName(QnAbstractMediaStreamDataProvider* provider) override;
+    virtual void getStoragesAndFileNames(QnAbstractMediaStreamDataProvider* provider) override;
     virtual bool canAcceptData() const;
     virtual void putData(const QnAbstractDataPacketPtr& data) override;
 
@@ -75,13 +81,17 @@ private:
     void writeRecentlyMotion(qint64 writeAfterTime);
     void keepRecentlyMotion(const QnConstAbstractMediaDataPtr& md);
     bool isPanicMode() const;
+    bool isRedundantSyncOn() const;
 private slots:
-    void at_recordingFinished(int status, const QString &filename);
+    void at_recordingFinished(
+        const ErrorStruct   &status,
+        const QString       &filename
+    );
     void at_camera_propertyChanged(const QnResourcePtr &, const QString &);
 private:
     const size_t m_maxRecordQueueSizeBytes;
     const size_t m_maxRecordQueueSizeElements;
-    mutable QMutex m_scheduleMutex;
+    mutable QnMutex m_scheduleMutex;
     QnScheduleTaskList m_schedule;
     QnTimePeriod m_lastSchedulePeriod;
     QnScheduleTask m_currentScheduleTask;
@@ -100,7 +110,7 @@ private:
     bool m_usedSpecialRecordingMode;
     bool m_lastMotionState; // true if motion in progress
     size_t m_queuedSize;
-    QMutex m_queueSizeMutex;
+    QnMutex m_queueSizeMutex;
     qint64 m_lastMediaTime;
     QQueue<QnConstAbstractMediaDataPtr> m_recentlyMotion;
     bool m_diskErrorWarned;

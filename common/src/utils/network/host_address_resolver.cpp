@@ -15,8 +15,6 @@
 #include <algorithm>
 #include <atomic>
 
-#include <QMutexLocker>
-
 
 HostAddressResolver::ResolveTask::ResolveTask(
     HostAddress _hostAddress,
@@ -61,7 +59,7 @@ HostAddressResolver* HostAddressResolver::instance()
 
 void HostAddressResolver::pleaseStop()
 {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     m_terminated = true;
     m_cond.wakeAll();
 }
@@ -71,7 +69,7 @@ bool HostAddressResolver::resolveAddressAsync(
     std::function<void (SystemError::ErrorCode, const HostAddress&)>&& completionHandler,
     RequestID reqID )
 {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     m_taskQueue.push_back( ResolveTask( addressToResolve, completionHandler, reqID, ++m_currentSequence ) );
     m_cond.wakeAll();
     return true;
@@ -97,6 +95,14 @@ bool HostAddressResolver::resolveAddressSync( const QString& hostName, HostAddre
 
     addrinfo* resolvedAddressInfo = nullptr;
     int status = getaddrinfo(hostName.toLatin1(), 0, &hints, &resolvedAddressInfo);
+
+    if (status == EAI_BADFLAGS)
+    {
+        // if the lookup failed with AI_ALL, try again without it
+        hints.ai_flags = 0;
+        status = getaddrinfo(hostName.toLatin1(), 0, &hints, &resolvedAddressInfo);
+    }
+
     if (status != 0)
     {
         SystemError::setLastErrorCode( status );
@@ -118,7 +124,7 @@ bool HostAddressResolver::isAddressResolved( const HostAddress& addr ) const
 
 void HostAddressResolver::cancel( RequestID reqID, bool waitForRunningHandlerCompletion )
 {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     //TODO #ak improve search complexity
     m_taskQueue.remove_if( [reqID]( const ResolveTask& task ){ return task.reqID == reqID; } );
     //we are waiting only for handler completion but not resolveAddressSync completion
@@ -128,7 +134,7 @@ void HostAddressResolver::cancel( RequestID reqID, bool waitForRunningHandlerCom
 
 bool HostAddressResolver::isRequestIDKnown( RequestID reqID ) const
 {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     //TODO #ak improve search complexity
     return m_runningTaskReqID == reqID ||
            std::find_if(
@@ -138,7 +144,7 @@ bool HostAddressResolver::isRequestIDKnown( RequestID reqID ) const
 
 void HostAddressResolver::run()
 {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     while( !m_terminated )
     {
         while( m_taskQueue.empty() && !m_terminated )

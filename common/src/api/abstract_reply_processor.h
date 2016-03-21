@@ -3,11 +3,15 @@
 
 #include <QtCore/QObject>
 
+#include <common/common_globals.h>
+
 #include <utils/common/request_param.h>
 
 #include <rest/server/json_rest_result.h>
 #include <utils/common/warnings.h>
+
 #include <utils/serialization/json.h>
+#include <utils/serialization/compressed_time.h>
 
 #include "abstract_connection.h"
 
@@ -141,6 +145,64 @@ protected:
         }
 
         emitFinished(derived, status, reply, handle, errorString);
+    }
+
+    template<class T, class Derived>
+    void processFusionReply(Derived *derived, const QnHTTPRawResponse &response, int handle) {
+        int status = response.status;
+        QString errorString = QString::fromUtf8(response.errorString);
+
+        T reply;
+        if(status == 0) {
+            Qn::SerializationFormat format = Qn::serializationFormatFromHttpContentType(response.headers.value("Content-Type"));
+            Q_ASSERT_X(format != Qn::UnsupportedFormat, Q_FUNC_INFO, "Invalid content-type header");
+            
+            switch (format) {
+            case Qn::JsonFormat:
+                {
+                    bool parsed = QJson::deserialize(response.data, &reply);
+                    if (!parsed) {
+                    #ifdef JSON_REPLY_DEBUG
+                        qnWarning("Error parsing JSON reply:\n%1\n\n", response.data);
+                    #endif
+                        status = 1;
+                    }
+                    break;
+                }
+                case Qn::UbjsonFormat:
+                {
+                    bool parsed = false;
+                    reply = QnUbjson::deserialized(response.data, reply, &parsed);
+                    if (!parsed)
+                        status = 1;
+                    break;
+                }
+                default:
+                {
+                    status = 2;
+                    break;
+                }
+            }
+        } else {
+#ifdef JSON_REPLY_DEBUG
+            qnWarning("Error processing request: %1.", response.errorString);
+#endif
+        }
+
+        emitFinished(derived, status, reply, handle, errorString);
+    }
+
+    template<class T, class Derived>
+    void processCompressedPeriodsReply(Derived *derived, const QnHTTPRawResponse &response, int handle) {
+        int status = response.status;
+        T reply;
+        if(status == 0) {
+            bool success = true;
+            reply = QnCompressedTime::deserialized(response.data, T(), &success);
+            if (!success)
+                status = 1;
+        } 
+        emitFinished(derived, status, reply, handle, QString::fromUtf8(response.errorString));
     }
 
 private:

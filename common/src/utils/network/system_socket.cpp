@@ -9,6 +9,8 @@
 #include <utils/common/systemerror.h>
 #include <utils/common/warnings.h>
 #include <utils/network/ssl_socket.h>
+#include <utils/thread/mutex.h>
+#include <utils/thread/wait_condition.h>
 
 #ifdef Q_OS_WIN
 #  include <ws2tcpip.h>
@@ -19,8 +21,6 @@
 #endif
 
 #include <QtCore/QElapsedTimer>
-#include <QtCore/QMutex>
-#include <QtCore/QWaitCondition>
 
 #include "aio/async_socket_helper.h"
 #include "compat_poll.h"
@@ -116,8 +116,7 @@ SocketAddress Socket::getLocalAddress() const
     return SocketAddress( addr.sin_addr, ntohs(addr.sin_port) );
 }
 
-//!Implementation of AbstractSocket::close
-void Socket::close()
+void Socket::shutdown()
 {
     if( m_fd == -1 )
         return;
@@ -127,6 +126,16 @@ void Socket::close()
 #else
     ::shutdown(m_fd, SHUT_RDWR);
 #endif
+}
+
+
+//!Implementation of AbstractSocket::close
+void Socket::close()
+{
+    shutdown();
+
+    if( m_fd == -1 )
+        return;
 
 #ifdef WIN32
     ::closesocket(m_fd);
@@ -294,14 +303,14 @@ bool Socket::getLastError( SystemError::ErrorCode* errorCode )
     return getsockopt(m_fd, SOL_SOCKET, SO_ERROR, reinterpret_cast<char*>(errorCode), &optLen) == 0;
 }
 
-bool Socket::postImpl( std::function<void()>&& handler )
+void Socket::postImpl( std::function<void()>&& handler )
 {
-    return m_baseAsyncHelper->post( std::move(handler) );
+    m_baseAsyncHelper->post( std::move(handler) );
 }
 
-bool Socket::dispatchImpl( std::function<void()>&& handler )
+void Socket::dispatchImpl( std::function<void()>&& handler )
 {
-    return m_baseAsyncHelper->dispatch( std::move(handler) );
+    m_baseAsyncHelper->dispatch( std::move(handler) );
 }
 
 unsigned short Socket::getLocalPort() const
@@ -410,7 +419,11 @@ bool Socket::fillAddr(
     memset(&hints, 0, sizeof(struct addrinfo));
     hints.ai_family = AF_INET;    /* Allow only IPv4 */
     hints.ai_socktype = 0; /* Any socket */
+#ifndef ANDROID
     hints.ai_flags = AI_ALL;    /* For wildcard IP address */
+#else
+    hints.ai_flags = AI_ADDRCONFIG;    /* AI_ALL isn't supported in getaddrinfo in adnroid */
+#endif
     hints.ai_protocol = 0;          /* Any protocol */
     hints.ai_canonname = NULL;
     hints.ai_addr = NULL;
@@ -742,11 +755,8 @@ void CommunicatingSocket::close()
 
 void CommunicatingSocket::shutdown()
 {
-#ifdef Q_OS_WIN
-    ::shutdown(m_fd, SD_BOTH);
-#else
-    ::shutdown(m_fd, SHUT_RDWR);
-#endif
+    m_connected = false;
+    Socket::shutdown();
 }
 
 void CommunicatingSocket::cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion )
@@ -1147,8 +1157,8 @@ void TCPServerSocket::terminateAsyncIO( bool waitForRunningHandlerCompletion )
     //TODO #ak add general implementation to Socket class and remove this method
     if (waitForRunningHandlerCompletion)
     {
-        QWaitCondition cond;
-        QMutex mtx;
+        QnWaitCondition cond;
+        QnMutex mtx;
         bool cancelled = false;
 
         m_implDelegate.dispatchImpl(
@@ -1161,12 +1171,12 @@ void TCPServerSocket::terminateAsyncIO( bool waitForRunningHandlerCompletion )
                 aio::AIOService::instance()->removeFromWatch(
                     static_cast<Pollable*>(&m_implDelegate), aio::etTimedOut, true);
                 
-                QMutexLocker lk(&mtx);
+                QnMutexLocker lk(&mtx);
                 cancelled = true;
                 cond.wakeAll();
             } );
 
-        QMutexLocker lk(&mtx);
+        QnMutexLocker lk(&mtx);
         while(!cancelled)
             cond.wait(lk.mutex());
     }

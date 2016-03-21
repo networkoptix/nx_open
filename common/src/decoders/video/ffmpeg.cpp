@@ -1,5 +1,7 @@
 #include "ffmpeg.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <QtCore/QThread>
 
 #include "utils/media/nalUnits.h"
@@ -238,8 +240,10 @@ void CLFFmpegVideoDecoder::resetDecoder(const QnConstCompressedVideoDataPtr& dat
     //openDecoder();
     //return;
 
-    if (m_passedContext && data->context->ctx())
+    if (m_passedContext && data->context && data->context->ctx()) {
+        m_codec = findCodec(data->context->ctx()->codec_id);
         avcodec_copy_context(m_passedContext, data->context->ctx());
+    }
     if (m_passedContext && m_passedContext->width > 8 && m_passedContext->height > 8 && m_currentWidth == -1)
     {
         m_currentWidth = m_passedContext->width;
@@ -340,6 +344,12 @@ void CLFFmpegVideoDecoder::forceMtDecoding(bool value)
 //The end of the input buffer buf should be set to 0 to ensure that no overreading happens for damaged MPEG streams.
 bool CLFFmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSharedPointer<CLVideoDecoderOutput>* const outFramePtr)
 {
+    if (data && m_codecId!= data->compressionType) {
+        if (m_codecId != CODEC_ID_NONE && data->context)
+            resetDecoder(data);
+        m_codecId = data->compressionType;
+    }
+
     CLVideoDecoderOutput* const outFrame = outFramePtr->data();
     AVFrame* copyFromFrame = m_frame;
     int got_picture = 0;
@@ -699,3 +709,5 @@ AVCodecContext* CLFFmpegVideoDecoder::getContext() const
 {
     return m_context;
 }
+
+#endif // ENABLE_DATA_PROVIDERS

@@ -8,16 +8,16 @@
 
 /**
  * \file
- * 
+ *
  * This header file contains common typedefs for different resource types.
- * 
+ *
  * It is to be included from headers that use these typedefs in declarations,
  * but don't need the definitions of the actual resource classes.
  */
 
 // TODO: #Elric move out?
 // <--
-class QnScheduleTask; 
+class QnScheduleTask;
 
 struct QnCameraHistoryItem;
 
@@ -35,8 +35,14 @@ class QnVideoWallControlMessage;
 
 class QnLayoutItemData;
 
+struct QnServerBackupSchedule;
+
 class QnResourceCommand;
 typedef std::shared_ptr<QnResourceCommand> QnResourceCommandPtr;
+
+struct QnCameraAdvancedParamValue;
+class QnCameraAdvancedParamValueMap;
+typedef QList<QnCameraAdvancedParamValue> QnCameraAdvancedParamValueList;
 
 // -->
 
@@ -55,7 +61,7 @@ typedef QList<QnResourceTypePtr> QnResourceTypeList;
 class QnVirtualCameraResource;
 typedef QnSharedResourcePointer<QnVirtualCameraResource> QnVirtualCameraResourcePtr;
 typedef QnSharedResourcePointerList<QnVirtualCameraResource> QnVirtualCameraResourceList;
-typedef QSharedPointer<QnVirtualCameraResourceList> QnVirtualCameraResourceListPtr; // TODO: #Elric remove?
+typedef QSet<QnVirtualCameraResourcePtr> QnVirtualCameraResourceSet;
 
 class QnPhysicalCameraResource;
 typedef QnSharedResourcePointer<QnPhysicalCameraResource> QnPhysicalCameraResourcePtr;
@@ -145,9 +151,9 @@ class QnPlIqResource;
 typedef QnSharedResourcePointer<QnPlIqResource> QnPlIqResourcePtr;
 typedef QnSharedResourcePointerList<QnPlIqResource> QnPlIqResourceList;
 
-class QnPlWatchDogResource;
-typedef QnSharedResourcePointer<QnPlWatchDogResource> QnPlWatchDogResourcePtr;
-typedef QnSharedResourcePointerList<QnPlWatchDogResource> QnPlWatchDogResourceList;
+class QnDigitalWatchdogResource;
+typedef QnSharedResourcePointer<QnDigitalWatchdogResource> QnDigitalWatchdogResourcePtr;
+typedef QnSharedResourcePointerList<QnDigitalWatchdogResource> QnDigitalWatchdogResourceList;
 
 class QnVistaResource;
 typedef QnSharedResourcePointer<QnVistaResource> QnVistaResourcePtr;

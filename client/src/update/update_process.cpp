@@ -96,8 +96,12 @@ void QnUpdateProcess::run() {
     QnUpdateResult result(m_updateResult);
     result.targetVersion = m_target.version;
     result.clientInstallerRequired = m_clientRequiresInstaller;
-    result.failedPeers = m_failedPeerIds;
     result.protocolChanged = m_protocolChanged;
+
+    for (const QnUuid &id: m_failedPeerIds) {
+        if (QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>())
+            result.failedServers.append(server);
+    }
 
     emit updateFinished(result);
 }
@@ -205,7 +209,15 @@ void QnUpdateProcess::setIncompatiblePeersStage(QnPeerUpdateStage stage) {
 }
 
 void QnUpdateProcess::at_checkForUpdatesTaskFinished(QnCheckForUpdatesPeerTask* task, const QnCheckForUpdateResult &result) {
-    if (result.result != QnCheckForUpdateResult::UpdateFound) {
+    switch (result.result)
+    {
+    case QnCheckForUpdateResult::UpdateFound:
+        break;
+    case QnCheckForUpdateResult::NoNewerVersion:
+        setAllPeersStage(QnPeerUpdateStage::Init);
+        finishUpdate(QnUpdateResult::AlreadyUpdated);
+        return;
+    default:
         setAllPeersStage(QnPeerUpdateStage::Init);
         finishUpdate(QnUpdateResult::DownloadingFailed);
         return;
@@ -500,6 +512,9 @@ void QnUpdateProcess::at_uploadTask_finished(int errorCode, const QSet<QnUuid> &
             break;
         case QnUploadUpdatesPeerTask::TimeoutError:
             finishUpdate(QnUpdateResult::UploadingFailed_Timeout);
+            break;
+        case QnUploadUpdatesPeerTask::AuthenticationError:
+            finishUpdate(QnUpdateResult::UploadingFailed_AuthenticationFailed);
             break;
         default:
             finishUpdate(QnUpdateResult::UploadingFailed);

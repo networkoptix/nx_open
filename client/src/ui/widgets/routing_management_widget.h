@@ -29,8 +29,9 @@ public:
     explicit QnRoutingManagementWidget(QWidget *parent = 0);
     ~QnRoutingManagementWidget();
 
-    virtual void updateFromSettings() override;
-    virtual void submitToSettings() override;
+    virtual void loadDataToUi() override;
+    virtual void applyChanges() override;
+    virtual bool hasChanges() const override;
 
 protected:
     virtual void setReadOnlyInternal(bool readOnly) override;

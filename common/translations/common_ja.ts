@@ -15,17 +15,6 @@
     </message>
 </context>
 <context>
-    <name>QnActiResource</name>
-    <message>
-        <source>Output %1</source>
-        <translation>出力 %1</translation>
-    </message>
-    <message>
-        <source>Input %1</source>
-        <translation>入力%1</translation>
-    </message>
-</context>
-<context>
     <name>QnBusinessStringsHelper</name>
     <message>
         <source>Motion on Camera</source>
@@ -229,10 +218,6 @@
         <translation>不明なイベント</translation>
     </message>
     <message>
-        <source>Conflict Address: %1</source>
-        <translation>競合アドレス: %1</translation>
-    </message>
-    <message>
         <source>Connection to server is lost.</source>
         <translation>サーバーとの接続ロスト.</translation>
     </message>
@@ -253,10 +238,6 @@
     <message>
         <source>Caption: %1</source>
         <translation>キャプション: %1</translation>
-    </message>
-    <message>
-        <source>Input port: %1</source>
-        <translation>入力ポート: %1</translation>
     </message>
     <message>
         <source>MAC #%1: %2 </source>
@@ -340,10 +321,6 @@
         <translation>カメラ %1 切断</translation>
     </message>
     <message>
-        <source>IO Module %1 was disconnected</source>
-        <translation>IOモジュール %1 切断</translation>
-    </message>
-    <message>
         <source>Device IP Conflict at %1</source>
         <extracomment>Device IP Conflict at &lt;server_name&gt;</extracomment>
         <translation>デバイスIPが %1 と重複</translation>
@@ -366,8 +343,76 @@
         <translation>カメラ録画無効:</translation>
     </message>
     <message>
-        <source>Recording on IO modules is disabled:</source>
-        <translation>IOモジュール録画無効:</translation>
+        <source>Execute PTZ preset</source>
+        <translation>PTZプリセット</translation>
+    </message>
+    <message>
+        <source>Show text overlay</source>
+        <translation>テキストオーバーレイ表示</translation>
+    </message>
+    <message>
+        <source>Show on Alarm Layout</source>
+        <translation>アラームレイアウト表示</translation>
+    </message>
+    <message>
+        <source>Archive backup finished</source>
+        <translation>アーカイブバックアップ終了</translation>
+    </message>
+    <message>
+        <source>Server &apos;%1&apos; has finished an archive backup</source>
+        <translation>サーバー &apos;%1&apos;アーカイブバックアップ終了</translation>
+    </message>
+    <message>
+        <source>Generic Event at %1</source>
+        <translation>一般的イベント  %1</translation>
+    </message>
+    <message>
+        <source>Input Port: %1</source>
+        <translation>入力ポート %1</translation>
+    </message>
+    <message>
+        <source>Archive backup is successfully completed</source>
+        <translation>アーカイブバックアップは正常に終了しました</translation>
+    </message>
+    <message>
+        <source>I/O Module %1 was disconnected</source>
+        <translation>IOモジュール %1 切断</translation>
+    </message>
+    <message>
+        <source>Conflicting Address: %1</source>
+        <translation>重複アドレス %1</translation>
+    </message>
+    <message>
+        <source>Archive backup failed: No available backup storages with sufficient free space</source>
+        <translation>アーカイブバックアップ失敗　空き容量が足りません</translation>
+    </message>
+    <message>
+        <source>Archive backup failed: Target storage failure</source>
+        <translation>アーカイブバックアップ失敗　ターゲットストレージエラー</translation>
+    </message>
+    <message>
+        <source>Archive backup failed: Source file open/read error</source>
+        <translation>アーカイブバックアップ失敗　ソースファイルの読込みエラー</translation>
+    </message>
+    <message>
+        <source>Archive backup failed: Target file create/write error</source>
+        <translation>アーカイブバックアップ失敗　ターゲットファイル書き込みエラー</translation>
+    </message>
+    <message>
+        <source>Archive backup failed: File catalog error</source>
+        <translation>アーカイブバックアップ失敗　ファイルカタログエラー</translation>
+    </message>
+    <message>
+        <source>Archive backup finished, but isn&apos;t fully completed because backup time is over. Data is backed up to %1</source>
+        <translation>アーカイブバックアップ終了しましたが時間超過の為に完全ではありまｓでん　データは %1 にバックアップされます</translation>
+    </message>
+    <message>
+        <source>Archive backup is canceled by user. Data is backed up to %1</source>
+        <translation>アーカイブバックアップはユーザーによってキャンセルされました　データは %1 にバックアップされます</translation>
+    </message>
+    <message>
+        <source>Recording on I/O modules is disabled:</source>
+        <translation>IOモジュールでの録画は無効です:</translation>
     </message>
 </context>
 <context>
@@ -457,20 +502,12 @@
         <translation>カメラ再起動後にWebページより工場出荷時にリストアしてください.</translation>
     </message>
     <message>
-        <source>Please try to reboot the IO module, then restore factory defaults on the web-page.</source>
-        <translation>カメラ再起動後にWebページより工場出荷時にリストアしてください.</translation>
-    </message>
-    <message>
         <source>Make sure the device is plugged into the network. Try to reboot the device.</source>
         <translation>デバイスがネットワークに接続されている事を確認して再起動を行ってください.</translation>
     </message>
     <message>
         <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
         <translation>カメラがネットワークに接続されている事を確認して再起動を行ってください.</translation>
-    </message>
-    <message>
-        <source>Make sure the IO module is plugged into the network. Try to reboot the IO module.</source>
-        <translation>IOモジュールがネットワークに接続されている事を確認して再起動を行ってください.</translation>
     </message>
     <message>
         <source>Make sure port %2 is accessible (e.g. forwarded).</source>
@@ -485,10 +522,6 @@
         <translation>カメラ応答がありません Url %1 リクエスト名 %2.</translation>
     </message>
     <message>
-        <source>Could not parse IO module response. Url %1, request name %2.</source>
-        <translation>IOモジュール応答がありません Url %1 リクエスト名 %2.</translation>
-    </message>
-    <message>
         <source>Not authorized. Url %1.</source>
         <translation>許可されないUrl %1.</translation>
     </message>
@@ -501,20 +534,12 @@
         <translation>録画を開始してカメラ設定のFPSを減らしてください.</translation>
     </message>
     <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in IO module settings.</source>
-        <translation>録画を開始してIOモジュール設定のFPSを減らしてください.</translation>
-    </message>
-    <message>
         <source>If it doesn&apos;t help, restore factory defaults on the device web-page.</source>
         <translation>解決しない場合はデバイスWebページより工場出荷時にリストアしてください.</translation>
     </message>
     <message>
         <source>If it doesn&apos;t help, restore factory defaults on the camera web-page.</source>
         <translation>解決しない場合はカメラWebページより工場出荷時にリストアしてください.</translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the IO module web-page.</source>
-        <translation>解決しない場合はIOモジュールWebページより工場出荷時にリストアしてください.</translation>
     </message>
     <message>
         <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
@@ -525,20 +550,12 @@
         <translation>カメラリクエスト &quot;%1&quot;がエラー&quot;%2 で失敗.　</translation>
     </message>
     <message>
-        <source>IO Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-        <translation>IOモジュールリクエスト &quot;%1&quot;がエラー&quot;%2 で失敗.　</translation>
-    </message>
-    <message>
         <source>Unknown device issue.</source>
         <translation>不明なデバイス障害.</translation>
     </message>
     <message>
         <source>Unknown camera issue.</source>
         <translation>不明なカメラ障害.</translation>
-    </message>
-    <message>
-        <source>Unknown IO module issue.</source>
-        <translation>不明なIOモジュール障害.</translation>
     </message>
     <message>
         <source>Invalid data was received from the device %1.</source>
@@ -549,10 +566,6 @@
         <translation>カメラ %1.より無効なデータ受信.</translation>
     </message>
     <message>
-        <source>Invalid data was received from the IO module %1.</source>
-        <translation>IOモジュール %1.より無効なデータ受信.</translation>
-    </message>
-    <message>
         <source>Too many media errors. Please open device issues dialog for more details.</source>
         <translation>メディアエラー発生 デバイス障害を開いて詳細を確認してください.</translation>
     </message>
@@ -561,19 +574,55 @@
         <translation>メディアエラー発生 カメラ障害を開いて詳細を確認してください.</translation>
     </message>
     <message>
-        <source>Too many media errors. Please open IO module issues dialog for more details.</source>
-        <translation>メディアエラー発生 IOモジュール障害を開いて詳細を確認してください.</translation>
+        <source>Camera plugin error. %1</source>
+        <translation>カメラプラグインエラー %1</translation>
     </message>
     <message>
-        <source>Device initialization process in progress.</source>
+        <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
+        <translation>IOモジュールを再起動してブラウザより初期設定に戻してください.</translation>
+    </message>
+    <message>
+        <source>Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</source>
+        <translation>IOモジュールがネットワークに接続されているか確認し　IOモジュールの再起動を行ってください.</translation>
+    </message>
+    <message>
+        <source>Could not parse I/O module response. Url %1, request name %2.</source>
+        <translation>IOモジュールの応答を解析できませんでした　Url %1,　リクエスト名 %2.</translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in I/O module settings.</source>
+        <translation>録画設定を行い（設定してない場合）IOモジュールのFPS設定を減らしてください.</translation>
+    </message>
+    <message>
+        <source>If it doesn&apos;t help, restore factory defaults on the I/O module web-page.</source>
+        <translation>解決しない場合はIOモジュールWebページより工場出荷時にリストアしてください.</translation>
+    </message>
+    <message>
+        <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
+        <translation>IOモジュールリクエスト &quot;%1&quot; はエラー &quot;%2&quot;.で失敗しました.</translation>
+    </message>
+    <message>
+        <source>Unknown I/O module issue.</source>
+        <translation>不明なIOモジュール障害.</translation>
+    </message>
+    <message>
+        <source>Invalid data was received from the I/O module %1.</source>
+        <translation>IOモジュール %1.より無効なデータを受信しました.</translation>
+    </message>
+    <message>
+        <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
+        <translation>メディアエラー発生　IOモジュール障害を開いて詳細を確認してください.　</translation>
+    </message>
+    <message>
+        <source>Device initialization process is in progress.</source>
         <translation>デバイスイニシャライズ中.</translation>
     </message>
     <message>
-        <source>Camera initialization process in progress.</source>
+        <source>Camera initialization process is in progress.</source>
         <translation>カメライニシャライズ中.</translation>
     </message>
     <message>
-        <source>IO Module initialization process in progress.</source>
+        <source>I/O Module initialization process is in progress.</source>
         <translation>IOモジュールイニシャライズ中.</translation>
     </message>
 </context>
@@ -595,8 +644,8 @@
         <translation>ウィンドウズエクスプローラを起動するパスにexplorer.exeを見つけることができませんでした.</translation>
     </message>
     <message>
-        <source>Launching file explorer failed.</source>
-        <translation>ウィンドウズエクスプローラーの軌道に失敗しました.</translation>
+        <source>File explorer failed to open.</source>
+        <translation>ファイルエクスプローラーが開けません.</translation>
     </message>
 </context>
 <context>
@@ -610,12 +659,12 @@
         <translation>コーデック%1のエンコーダーを見つけられません.</translation>
     </message>
     <message>
-        <source>Could not initialise audio encoder.</source>
-        <translation>音声エンコーダーを初期化出来ません..</translation>
+        <source>Could not initialize audio encoder.</source>
+        <translation>オーディオエンコーダーをイニシャライズできません.</translation>
     </message>
     <message>
-        <source>Could not initialise audio decoder.</source>
-        <translation>音声デコーダーを初期化出来ません.</translation>
+        <source>Could not initialize audio decoder.</source>
+        <translation>オーディオエンコーダーをイニシャライズできません.</translation>
     </message>
 </context>
 <context>
@@ -652,8 +701,8 @@
         <translation>コーデック%1のエンコーダーを見つけられません.</translation>
     </message>
     <message>
-        <source>Could not initialise video encoder.</source>
-        <translation>ビデオエンコーダーを初期化出来ません.</translation>
+        <source>Could not initialize video encoder.</source>
+        <translation>ビデオエンコーダーをイニシャライズできません.</translation>
     </message>
 </context>
 <context>
@@ -696,7 +745,7 @@
     </message>
     <message>
         <source>I/O Module</source>
-        <translation>I/Oモジュール</translation>
+        <translation>IOモジュール</translation>
     </message>
     <message>
         <source>Start</source>
@@ -736,7 +785,7 @@
     </message>
     <message>
         <source>I/O Module Licenses</source>
-        <translation>I/Oモジュールライセンス</translation>
+        <translation>IOモジュールライセンス</translation>
     </message>
     <message>
         <source>Start Licenses</source>
@@ -798,14 +847,6 @@
         </translation>
     </message>
     <message>
-        <source>There was a problem activating your license key. Invalid data received. Please contact support team to report issue.</source>
-        <translation>ライセンスキーのアクティベートエラー　サポート窓口にお問合せ下さい.</translation>
-    </message>
-    <message>
-        <source>There was a problem activating your license key. A database error has occurred.</source>
-        <translation>ライセンスキーのアクティベートエラー　データベースエラーが発生しました.</translation>
-    </message>
-    <message>
         <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
         <translation>無効なライセンスキーが入力されました　サポート窓口に問合せて正しいライセンスキーを入力してください.</translation>
     </message>
@@ -817,33 +858,20 @@
         <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
         <translation>このライセンスキーはハードウェアID {{hwid}}  {{time}} に既にアクティベートされています..</translation>
     </message>
+    <message>
+        <source>There was a problem activating your license key. A database error occurred.</source>
+        <translation>ライセンスアクティベートエラー　データベースエラー発生.</translation>
+    </message>
+    <message>
+        <source>There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.</source>
+        <translation>ライセンスキーのアクティベートエラー　サポート窓口にお問い合わせください.</translation>
+    </message>
 </context>
 <context>
     <name>QnMediaServerResource</name>
     <message>
         <source>Server</source>
         <translation>サーバー</translation>
-    </message>
-</context>
-<context>
-    <name>QnNewDWPtzController</name>
-    <message>
-        <source>Preset #</source>
-        <translation>プリセット#</translation>
-    </message>
-</context>
-<context>
-    <name>QnPlAxisResource</name>
-    <message>
-        <source>Can&apos;t initialize IO port settings</source>
-        <translation>IOポート設定をイニシャライズできません</translation>
-    </message>
-</context>
-<context>
-    <name>QnPlOnvifResource</name>
-    <message>
-        <source>Otput %1</source>
-        <translation>出力 %1</translation>
     </message>
 </context>
 <context>
@@ -865,18 +893,6 @@
         <source>%n camera(s)</source>
         <translation>
             <numerusform>%n カメラ</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n IO Module(s)</source>
-        <translation>
-            <numerusform>%n IOモジュール</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n IO module(s)</source>
-        <translation>
-            <numerusform>%n IOモジュール</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -908,22 +924,6 @@
         <translation>カメラ</translation>
     </message>
     <message>
-        <source>IO Modules</source>
-        <translation>IOモジュール</translation>
-    </message>
-    <message>
-        <source>IO modules</source>
-        <translation>IOモジュール</translation>
-    </message>
-    <message>
-        <source>IO Module</source>
-        <translation>IOモジュール</translation>
-    </message>
-    <message>
-        <source>IO module</source>
-        <translation>IOモジュール</translation>
-    </message>
-    <message>
         <source>Devices</source>
         <translation>デバイス</translation>
     </message>
@@ -938,6 +938,34 @@
     <message>
         <source>device</source>
         <translation>デバイス</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n I/O Module(s)</source>
+        <translation>
+            <numerusform>%n IOモジュール</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n I/O module(s)</source>
+        <translation>
+            <numerusform>%n IOモジュール</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>I/O Modules</source>
+        <translation>IOモジュール</translation>
+    </message>
+    <message>
+        <source>I/O modules</source>
+        <translation>IOモジュール</translation>
+    </message>
+    <message>
+        <source>I/O Module</source>
+        <translation>IOモジュール</translation>
+    </message>
+    <message>
+        <source>I/O module</source>
+        <translation>IOモジュール</translation>
     </message>
 </context>
 <context>
@@ -1063,108 +1091,9 @@
         <source>Error during watermark generation for file &apos;%1&apos;.</source>
         <translation>ファイル &apos;%1&apos;用の電子透かしの作成中にエラーが発生しました.</translation>
     </message>
-</context>
-<context>
-    <name>QnSystemHealthStringsHelper</name>
     <message>
-        <source>No licenses</source>
-        <translation>ライセンス無し</translation>
-    </message>
-    <message>
-        <source>Email address is not set</source>
-        <translation>Emailアドレスが設定されていません</translation>
-    </message>
-    <message>
-        <source>Email server is not set</source>
-        <translation>Emailサーバーが設定されていません</translation>
-    </message>
-    <message>
-        <source>Some users have not set their email addresses</source>
-        <translation>Emailアドレスが設定されていないユーザーがいます</translation>
-    </message>
-    <message>
-        <source>Connection to server lost</source>
-        <translation>サーバーとの通信切断</translation>
-    </message>
-    <message>
-        <source>Error while sending email</source>
-        <translation>メール送信中にエラーが発生しました</translation>
-    </message>
-    <message>
-        <source>Email address is not set for user %1</source>
-        <translation>ユーザー %1 にEmailアドレスが設定されていません</translation>
-    </message>
-    <message>
-        <source>Select server for others to synchronize time with</source>
-        <translation>時刻同期を行うサーバー</translation>
-    </message>
-    <message>
-        <source>Rebuilding archive index is completed</source>
-        <translation>アーカイブインデックスのリビルド終了</translation>
-    </message>
-    <message>
-        <source>Email address is not set.</source>
-        <translation>Emailアドレスが設定されていません.</translation>
-    </message>
-    <message>
-        <source>You cannot receive system notifications via email.</source>
-        <translation>Emailでのシステム通知を受信できません.</translation>
-    </message>
-    <message>
-        <source>Email server is not set.</source>
-        <translation>Emailサーバーが設定されていません.</translation>
-    </message>
-    <message>
-        <source>Some users have not set their email addresses.</source>
-        <translation>Emailアドレスが設定されていないユーザーがいます.</translation>
-    </message>
-    <message>
-        <source>They cannot receive system notifications via email.</source>
-        <translation>Emailでのシステム通知を受信できません.</translation>
-    </message>
-    <message>
-        <source>Storages are full on the following Server:</source>
-        <translation>ストレージが一杯のサーバー:</translation>
-    </message>
-    <message>
-        <source>Storages are not configured on the following Server:</source>
-        <translation>ストレージが設定されていないサーバー:</translation>
-    </message>
-    <message>
-        <source>You have no licenses.</source>
-        <translation>ライセンス無し.</translation>
-    </message>
-    <message>
-        <source>You cannot record video from cameras.</source>
-        <translation>カメラを録画できません.</translation>
-    </message>
-    <message>
-        <source>Rebuilding archive index is completed on the following Server:</source>
-        <translation>アーカイブインデックスリビルド終了サーバー:</translation>
-    </message>
-    <message>
-        <source>Storage is full</source>
-        <translation>ストレージが一杯です</translation>
-    </message>
-    <message>
-        <source>Storage is not configured</source>
-        <translation>ストレージが構成されていません</translation>
-    </message>
-    <message>
-        <source>Server times are not synchronized and a common time could not be detected automatically.</source>
-        <translation>サーバー時間が同期されていません.</translation>
-    </message>
-    <message>
-        <source>System is in safe mode</source>
-        <translation>セーフモード</translation>
-    </message>
-    <message>
-        <source>The system is running in safe mode.</source>
-        <translation>セーフモード.</translation>
-    </message>
-    <message>
-        <source>Any configuration changes except license activation are impossible.</source>
-        <translation>ライセンスアクティベートを除くすべてのコンフィグレーションが無効.</translation>
+        <source>File write error. Not enough free space.</source>
+        <translation>空き容量が十分でない為に書き込みエラー.</translation>
     </message>
 </context>
 <context>
@@ -1195,17 +1124,6 @@
     </message>
 </context>
 <context>
-    <name>QnThirdPartyResource</name>
-    <message>
-        <source>Otput %1</source>
-        <translation>出力 %1</translation>
-    </message>
-    <message>
-        <source>Input %1</source>
-        <translation>入力 %1</translation>
-    </message>
-</context>
-<context>
     <name>QnTranscoder</name>
     <message>
         <source>OpenCL transcoding is not implemented.</source>
@@ -1233,6 +1151,13 @@
     <message>
         <source>%1 (external)</source>
         <translation>%1 (外部)</translation>
+    </message>
+</context>
+<context>
+    <name>utils::QnCameraNamesWatcher</name>
+    <message>
+        <source>Removed camera</source>
+        <translation>カメラ削除</translation>
     </message>
 </context>
 </TS>

@@ -240,7 +240,7 @@ void QnDesktopFileEncoder::EncodedAudioInfo::gotData()
 {
     if (m_terminated)
         return;
-    QMutexLocker lock(&m_mtx);
+    QnMutexLocker lock( &m_mtx );
     if (m_buffers.isEmpty())
         return;
     WAVEHDR* data = m_buffers.front();
@@ -284,7 +284,7 @@ bool QnDesktopFileEncoder::EncodedAudioInfo::addBuffer()
 void QnDesktopFileEncoder::EncodedAudioInfo::stop()
 {
     m_terminated = true;
-    QMutexLocker lock(&m_mtx);
+    QnMutexLocker lock( &m_mtx );
     waveInReset(hWaveIn);
     waveInClose(hWaveIn);
     clearBuffers();
@@ -849,7 +849,7 @@ void QnDesktopFileEncoder::run()
     if (!m_capturingStopped)
         stopCapturing();
 
-    cl_log.log(QLatin1String("flushing video buffer"), cl_logALWAYS);
+    cl_log.log(QLatin1String("flushing video buffer"), cl_logDEBUG2);
     do {
     } while (processData(true) > 0); // flush buffers
 

@@ -35,7 +35,7 @@
 #endif
 
 
-// ffmpeg headers
+#ifdef ENABLE_DATA_PROVIDERS
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -49,11 +49,14 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+#endif // ENABLE_DATA_PROVIDERS
 
 
 #ifdef __cplusplus
 
+#ifdef ENABLE_DATA_PROVIDERS
 #include "utils/media/sse_helper.h"
+#endif
 
 /* STL headers. */
 #include <algorithm>
@@ -74,7 +77,7 @@ extern "C" {
 //#include <QtMultimedia/QAudioOutput>
 //#endif
 
-#include <QAuthenticator>
+#include <QtNetwork/QAuthenticator>
 #include <QtCore/QBuffer>
 #include <QtGui/QCloseEvent>
 #include <QtGui/QColor>
@@ -96,8 +99,7 @@ extern "C" {
 #include <QtCore/QList>
 #include <QtCore/QMap>
 #include <QtGui/QMouseEvent>
-#include <QtCore/QMutex>
-#include <QtCore/QMutexLocker>
+#include <utils/thread/mutex.h>
 #include <QtNetwork/QNetworkAddressEntry>
 #include <QtNetwork/QNetworkInterface>
 #include <QtCore/QObject>
@@ -107,7 +109,7 @@ extern "C" {
 #include <QtCore/QPair>
 #include <QtCore/QParallelAnimationGroup>
 #include <QtGui/QPixmap>
-#include <QPixmapCache>
+#include <QtGui/QPixmapCache>
 #include <QtCore/QPoint>
 #include <QtCore/QPointF>
 #include <QtCore/QPropertyAnimation>
@@ -127,7 +129,7 @@ extern "C" {
 #include <QtCore/QTime>
 #include <QtCore/QTimer>
 #include <QtNetwork/QUdpSocket>
-#include <QtCore/QWaitCondition>
+#include <utils/thread/wait_condition.h>
 #include <QtGui/QWheelEvent>
 #include <QtConcurrent/QtConcurrentMap>
 #include <QtCore/qmath.h>

@@ -14,6 +14,7 @@
 #include <ui/style/skin.h>
 #include <ui/graphics/items/standard/graphics_label.h>
 #include <ui/graphics/items/standard/graphics_pixmap.h>
+#include <ui/graphics/items/generic/masked_proxy_widget.h>
 
 namespace {
     const int reconnectDelay = 1000 * 5;
@@ -228,7 +229,10 @@ QGraphicsLayoutItem *QnIoModuleOverlayWidgetPrivate::createButton(QnIoModuleOver
     QObject::connect(button, &QPushButton::clicked, this, &QnIoModuleOverlayWidgetPrivate::at_buttonClicked);
 
     Q_Q(QnIoModuleOverlayWidget);
-    QGraphicsProxyWidget *buttonProxy = new QGraphicsProxyWidget(q);
+    QGraphicsProxyWidget *buttonProxy = new QnMaskedProxyWidget(q);
+    QPalette palette = button->palette();
+    palette.setColor(QPalette::Window, colors.buttonBackground);
+    button->setPalette(palette);
     buttonProxy->setWidget(button);
 
     return buttonProxy;

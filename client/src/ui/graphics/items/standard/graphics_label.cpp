@@ -8,6 +8,8 @@
 
 #include <ui/common/text_pixmap_cache.h>
 #include <ui/common/geometry.h>
+#include <ui/style/skin.h>
+#include <ui/workaround/sharp_pixmap_painting.h>
 
 // -------------------------------------------------------------------------- //
 // GraphicsLabelPrivate
@@ -17,15 +19,12 @@ void GraphicsLabelPrivate::init() {
 
     performanceHint = GraphicsLabel::NoCaching;
     alignment = Qt::AlignTop | Qt::AlignLeft;
-
-    pixmap = QPixmap();
-
     q->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred, QSizePolicy::Label));
 }
 
 void GraphicsLabelPrivate::updateSizeHint() {
     Q_Q(GraphicsLabel);
-    
+
     QRectF newRect;
     if (text.isEmpty()) {
         newRect = QRectF();
@@ -35,7 +34,7 @@ void GraphicsLabelPrivate::updateSizeHint() {
         newRect = metrics.boundingRect(QRectF(0.0, 0.0, 0.0, 0.0), Qt::AlignCenter, text);
         newRect.moveTopLeft(QPointF(0.0, 0.0)); /* Italicized fonts may result in negative left border. */
     }
-    
+
     if (!qFuzzyEquals(newRect, rect)) {
         rect = newRect;
 
@@ -71,14 +70,14 @@ QColor GraphicsLabelPrivate::textColor() const {
 // -------------------------------------------------------------------------- //
 // GraphicsLabel
 // -------------------------------------------------------------------------- //
-GraphicsLabel::GraphicsLabel(QGraphicsItem *parent, Qt::WindowFlags f): 
+GraphicsLabel::GraphicsLabel(QGraphicsItem *parent, Qt::WindowFlags f):
     GraphicsFrame(*new GraphicsLabelPrivate, parent, f)
 {
     Q_D(GraphicsLabel);
     d->init();
 }
 
-GraphicsLabel::GraphicsLabel(const QString &text, QGraphicsItem *parent, Qt::WindowFlags f): 
+GraphicsLabel::GraphicsLabel(const QString &text, QGraphicsItem *parent, Qt::WindowFlags f):
     GraphicsFrame(*new GraphicsLabelPrivate, parent, f)
 {
     Q_D(GraphicsLabel);
@@ -126,7 +125,7 @@ void GraphicsLabel::setAlignment(Qt::Alignment alignment) {
     update();
 }
 
-GraphicsLabel::PerformanceHint GraphicsLabel::performanceHint() const { 
+GraphicsLabel::PerformanceHint GraphicsLabel::performanceHint() const {
     return d_func()->performanceHint;
 }
 
@@ -182,29 +181,7 @@ void GraphicsLabel::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
         d->ensurePixmaps();
 
         QPointF position = QnGeometry::aligned(d->pixmap.size(), rect(), d->alignment).topLeft();
-
-        QTransform transform = painter->transform();
-
-        /* Hand-rolled check for translation transform, 
-         * with lower precision than standard QTransform::type. */
-        qreal eps = 0.0001;
-        if(
-            qAbs(transform.m11() - 1.0) < eps &&
-            qAbs(transform.m12()) < eps &&
-            qAbs(transform.m21()) < eps &&
-            qAbs(transform.m22() - 1.0) < eps &&
-            qAbs(transform.m13()) < eps &&
-            qAbs(transform.m23()) < eps &&
-            qAbs(transform.m33() - 1.0) < eps
-        ) {
-            /* Instead of messing with QPainter::SmoothPixmapTransform, 
-             * we simply adjust the transformation. */
-            painter->setTransform(QTransform(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, qRound(transform.m31() + position.x()), qRound(transform.m32() + position.y()), 1.0));
-            painter->drawPixmap(QPointF(), d->pixmap);
-            painter->setTransform(transform);
-        } else {
-            painter->drawPixmap(position, d->pixmap);
-        }
+        paintPixmapSharp(painter, d->pixmap, position);
     } else {
         QnScopedPainterPenRollback penRollback(painter, d->textColor());
         QnScopedPainterFontRollback fontRollback(painter, font());

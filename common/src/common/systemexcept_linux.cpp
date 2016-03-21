@@ -1,5 +1,9 @@
 #include "systemexcept_linux.h"
 
+#include <QtCore/qsystemdetection.h>
+
+#if (defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)) || defined(Q_OS_WINDOWS)
+
 #include <execinfo.h>
 #include <fcntl.h>
 #include <pwd.h>
@@ -253,3 +257,5 @@ std::string linux_exception::getCrashPattern()
     ss << getCrashPrefix() << "_*.*";
     return ss.str();
 }
+
+#endif

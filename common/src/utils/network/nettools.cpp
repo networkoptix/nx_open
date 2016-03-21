@@ -19,7 +19,9 @@
 #   include <arpa/inet.h>
 #   include <sys/socket.h>
 #   include <netdb.h>
-#   include <ifaddrs.h>
+#   ifndef Q_OS_ANDROID
+#      include <ifaddrs.h>
+#   endif
 #   include <unistd.h>
 #   include <net/if.h>
 #   include <sys/types.h>
@@ -31,13 +33,15 @@
 #   include <sys/sysctl.h>
 #   include <net/if.h>
 #   include <net/if_dl.h>
-#   include <net/route.h>
 #   include <netinet/in.h>
-#   include <netinet/if_ether.h>
 #   include <arpa/inet.h>
 #   include <err.h>
 #   include <stdio.h>
 #   include <stdlib.h>
+#   ifndef Q_OS_IOS
+#      include <net/route.h>
+#      include <netinet/if_ether.h>
+#   endif
 #endif
 
 /*
@@ -70,7 +74,7 @@ QnInterfaceAndAddrList getAllIPv4Interfaces(bool allowItfWithoutAddress)
     {
         QnInterfaceAndAddrList value;
         QElapsedTimer timer;
-        QMutex guard;
+        QnMutex guard;
     };
 
     enum { kCacheLinesCount = 2};
@@ -79,7 +83,7 @@ QnInterfaceAndAddrList getAllIPv4Interfaces(bool allowItfWithoutAddress)
     LocalCache &cache = caches[allowItfWithoutAddress ? 1 : 0];
     {
         // speed optimization
-        QMutexLocker lock(&cache.guard);
+        QnMutexLocker lock(&cache.guard);
         enum { kCacheTimeout = 5000 };
         if (!cache.value.isEmpty() && (cache.timer.elapsed() < kCacheTimeout))
             return cache.value;
@@ -151,7 +155,7 @@ QnInterfaceAndAddrList getAllIPv4Interfaces(bool allowItfWithoutAddress)
             result.append(QnInterfaceAndAddr(iface.name(), QHostAddress(), QHostAddress(), iface));
     }
 
-    QMutexLocker lock(&cache.guard);
+    QnMutexLocker lock(&cache.guard);
     cache.timer.restart();
     cache.value = result;
 
@@ -510,6 +514,12 @@ QString getMacByIP(const QHostAddress& ip, bool net)
 #elif defined(Q_OS_MAC)
 void removeARPrecord(const QHostAddress& /*ip*/) {}
 
+#ifdef Q_OS_IOS
+QString getMacByIP(const QHostAddress& ip, bool /*net*/) {
+    return QString();
+}
+#else
+
 #define ROUNDUP(a) ((a) > 0 ? (1 + (((a) - 1) | (sizeof(long) - 1))) : sizeof(long))
 
 QString getMacByIP(const QHostAddress& ip, bool /*net*/)
@@ -567,6 +577,8 @@ QString getMacByIP(const QHostAddress& ip, bool /*net*/)
 
     return QString();
 }
+#endif
+
 #else // Linux
 void removeARPrecord(const QHostAddress& ip) {Q_UNUSED(ip)}
 
@@ -634,7 +646,7 @@ bool isNewDiscoveryAddressBetter(
 
 int getFirstMacAddress(char  MAC_str[MAC_ADDR_LEN], char** host)
 {
-    memset(MAC_str, 0, sizeof(MAC_str));
+    memset(MAC_str, 0, MAC_ADDR_LEN);
     *host = 0;
     for (const auto& iface: QNetworkInterface::allInterfaces())
     {
@@ -750,7 +762,7 @@ int getMacFromPrimaryIF(char MAC_str[MAC_ADDR_LEN], char** host)
     if( hwIter == ifNameToLinkAddress.end() )
         return -1;	//ipv4 interface has no link-level address
 
-    strncpy( MAC_str, hwIter->second.c_str(), sizeof(MAC_str)-1 );
+    strncpy( MAC_str, hwIter->second.c_str(), MAC_ADDR_LEN-1 );
     if( host )
         *host = nullptr;
 

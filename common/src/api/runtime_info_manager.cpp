@@ -25,6 +25,14 @@ QnRuntimeInfoManager::QnRuntimeInfoManager(QObject* parent):
     connect( QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::connectionClosed,   this, [this]{
         m_items->setItems(QnPeerRuntimeInfoList() << localInfo());
     });
+
+    /* Client updates running instance guid on each connect to server */
+    connect(qnCommon, &QnCommonModule::runningInstanceGUIDChanged, this, [this]()
+    {
+        ec2::ApiRuntimeData item = localInfo().data;
+        item.peer.instanceId = qnCommon->runningInstanceGUID();
+        updateLocalItem(item);
+    }, Qt::DirectConnection);
 }
 
 const QnThreadsafeItemStorage<QnPeerRuntimeInfo> * QnRuntimeInfoManager::items() const {
@@ -75,7 +83,7 @@ bool QnRuntimeInfoManager::hasItem(const QnUuid& id)
 
 void QnRuntimeInfoManager::updateLocalItem(const QnPeerRuntimeInfo& value)
 {
-    QMutexLocker lock(&m_updateMutex);
+    QnMutexLocker lock( &m_updateMutex );
     Q_ASSERT(value.uuid == qnCommon->moduleGUID());
     QnPeerRuntimeInfo modifiedValue = value;
     if (m_items->hasItem(value.uuid)) {

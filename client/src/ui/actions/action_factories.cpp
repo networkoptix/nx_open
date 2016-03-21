@@ -29,7 +29,7 @@ QList<QAction *> QnOpenCurrentUserLayoutActionFactory::newActions(const QnAction
     QnLayoutResourceList layouts = resourcePool()->getResourcesWithParentId(QnUuid()).filtered<QnLayoutResource>(); /* Multi-videos will go here. */
     if(context()->user())
         layouts.append(resourcePool()->getResourcesWithParentId(context()->user()->getId()).filtered<QnLayoutResource>());
-    
+
     qSort(layouts.begin(), layouts.end(), [](const QnLayoutResourcePtr &l, const QnLayoutResourcePtr &r) {
         return naturalStringLess(l->getName(), r->getName());
     });
@@ -62,7 +62,7 @@ void QnOpenCurrentUserLayoutActionFactory::at_action_triggered() {
     if(!layout)
         return;
 
-    menu()->trigger(Qn::OpenSingleLayoutAction, layout);
+    menu()->trigger(QnActions::OpenSingleLayoutAction, layout);
 }
 
 
@@ -106,7 +106,7 @@ QList<QAction *> QnPtzPresetsToursActionFactory::newActions(const QnActionParame
         action->setData(QVariant::fromValue(
             QnActionParameters(parameters)
                 .withArgument(Qn::PtzObjectIdRole, preset.id)
-                .withArgument(Qn::ActionIdRole, static_cast<int>(Qn::PtzActivatePresetAction))
+                .withArgument(Qn::ActionIdRole, static_cast<int>(QnActions::PtzActivatePresetAction))
         ));
         connect(action, &QAction::triggered, this, &QnPtzPresetsToursActionFactory::at_action_triggered);
 
@@ -137,7 +137,7 @@ QList<QAction *> QnPtzPresetsToursActionFactory::newActions(const QnActionParame
         action->setData(QVariant::fromValue(
             QnActionParameters(parameters)
                 .withArgument(Qn::PtzObjectIdRole, tour.id)
-                .withArgument(Qn::ActionIdRole, static_cast<int>(Qn::PtzActivateTourAction))
+                .withArgument(Qn::ActionIdRole, static_cast<int>(QnActions::PtzActivateTourAction))
         ));
         connect(action, &QAction::triggered, this, &QnPtzPresetsToursActionFactory::at_action_triggered);
 
@@ -153,7 +153,8 @@ void QnPtzPresetsToursActionFactory::at_action_triggered() {
         return;
 
     QnActionParameters parameters = action->data().value<QnActionParameters>();
-    Qn::ActionId actionId = static_cast<Qn::ActionId>(parameters.argument<int>(Qn::ActionIdRole, Qn::NoAction));
+    QnActions::IDType actionId = static_cast<QnActions::IDType>(
+        parameters.argument<int>(Qn::ActionIdRole, QnActions::NoAction));
 
     context()->menu()->trigger(actionId, parameters);
 }
@@ -164,7 +165,7 @@ QMenu* QnEdgeNodeActionFactory::newMenu(const QnActionParameters &parameters, QW
     if (!edgeCamera || !QnMediaServerResource::isHiddenServer(edgeCamera->getParentResource()))
         return NULL;
 
-    return menu()->newMenu(Qn::NoAction, Qn::TreeScope, parentWidget, QnActionParameters(edgeCamera->getParentResource()));
+    return menu()->newMenu(QnActions::NoAction, Qn::TreeScope, parentWidget, QnActionParameters(edgeCamera->getParentResource()));
 }
 
 

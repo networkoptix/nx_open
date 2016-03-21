@@ -24,7 +24,7 @@ CLServerPushStreamReader::CLServerPushStreamReader(const QnResourcePtr& dev ):
 
 CameraDiagnostics::Result CLServerPushStreamReader::diagnoseMediaStreamConnection()
 {
-    QMutexLocker lk( &m_openStreamMutex );
+    QnMutexLocker lk( &m_openStreamMutex );
 
     const int openStreamCounter = m_openStreamCounter;
     while( openStreamCounter == m_openStreamCounter
@@ -55,6 +55,7 @@ bool CLServerPushStreamReader::isCameraControlRequired() const
 
 CameraDiagnostics::Result CLServerPushStreamReader::openStreamWithErrChecking(bool isControlRequired)
 {
+    onStreamReopen();
     m_FrameCnt = 0;
     bool isInitialized = m_resource->isInitialized();
     if (!isInitialized) {
@@ -69,7 +70,7 @@ CameraDiagnostics::Result CLServerPushStreamReader::openStreamWithErrChecking(bo
     }
 
     {
-        QMutexLocker lk( &m_openStreamMutex );
+        QnMutexLocker lk( &m_openStreamMutex );
         ++m_openStreamCounter;
         m_cond.wakeAll();
     }
@@ -84,7 +85,7 @@ CameraDiagnostics::Result CLServerPushStreamReader::openStreamWithErrChecking(bo
         if (isInitialized) 
 		{
             mFramesLost++;
-            m_stat[0].onData(0);
+            m_stat[0].onData(0, false);
             m_stat[0].onEvent(CL_STAT_FRAME_LOST);
 
             if (mFramesLost >= MAX_LOST_FRAME) // if we lost 2 frames => connection is lost for sure (2)
@@ -141,7 +142,7 @@ void CLServerPushStreamReader::run()
         {
             setNeedKeyData();
             mFramesLost++;
-            m_stat[0].onData(0);
+            m_stat[0].onData(0, false);
             m_stat[0].onEvent(CL_STAT_FRAME_LOST);
 
             if (mFramesLost == MAX_LOST_FRAME) // if we lost 2 frames => connection is lost for sure (2)
@@ -209,7 +210,10 @@ void CLServerPushStreamReader::run()
         QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(this);
         if (videoData)
         {
-            m_stat[videoData->channelNumber].onData(static_cast<unsigned int>(data->dataSize()));
+            m_stat[videoData->channelNumber].onData(
+                static_cast<unsigned int>(data->dataSize()),
+                videoData->flags & AV_PKT_FLAG_KEY);
+
             if (lp)
                 lp->onGotVideoFrame(videoData, m_currentLiveParams, m_openedWithStreamCtrl);
         }

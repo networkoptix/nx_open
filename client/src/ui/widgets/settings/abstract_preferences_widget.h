@@ -1,5 +1,4 @@
-#ifndef ABSTRACT_PREFERENCES_WIDGET_H
-#define ABSTRACT_PREFERENCES_WIDGET_H
+#pragma once
 
 #include <QtWidgets/QWidget>
 
@@ -11,40 +10,49 @@ public:
     explicit QnAbstractPreferencesWidget(QWidget *parent = 0);
 
     /**
-     * @brief submitToSettings                  Save widget elements' values to client settings.
-     */
-    virtual void submitToSettings();
-
-    /**
-     * @brief updateFromSettings                Read widget elements' values from client settings.
-     */
-    virtual void updateFromSettings();
-
-    /**
-     * @brief confirm                           Check that all values are correct so saving is possible.
-     * @return                                  False if saving should be aborted, true otherwise.
-     */
-    virtual bool confirm();
-
-    /**
-     * @brief discard                           Check that all values can be discarded safely.
-     * @return                                  False if discarding should be aborted, true otherwise.
-     */
-    virtual bool discard();
-
-    /**
      * @brief hasChanges                        Check if there are modified values.
+     *                                          This method must be implemented in derived classes.
      * @return                                  True if something is changed, false otherwise.
      */
-    virtual bool hasChanges() const;
+    virtual bool hasChanges() const = 0;
 
     /**
-     * @brief retranslateUi                     Update UI strings (if required).
+     * @brief updateFromSettings                Read widget elements' values from model data.
+     *                                          This method must be implemented in derived classes.
+     */
+    virtual void loadDataToUi() = 0;
+
+    /**
+     * @brief applyChanges                      Save widget elements' values to model data.
+     *                                          This method must be implemented in derived classes.
+     */
+    virtual void applyChanges() = 0;
+
+    /**
+     * @brief canApplyChanges                   Check that all values are correct so saving is possible.
+     *                                          This method is optional, usually it shouldn't be reimplemented.
+     * @return                                  False if saving should be aborted, true otherwise.
+     */
+    virtual bool canApplyChanges();
+
+    /**
+     * @brief canDiscardChanges                 Check that all values can be discarded safely.
+     *                                          This method is optional, usually it shouldn't be reimplemented.
+     * @return                                  False if discarding should be aborted, true otherwise.
+     */
+    virtual bool canDiscardChanges();
+
+    /**
+     * @brief retranslateUi                     Update ui strings (if required).
      */
     virtual void retranslateUi();
 
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);
+
+signals:
+    /** Signal is emitted whenever hasChanges() is changed. */
+    void hasChangesChanged();
 
 protected:
     virtual void setReadOnlyInternal(bool readOnly);
@@ -52,5 +60,3 @@ protected:
 private:
     bool m_readOnly;
 };
-
-#endif // ABSTRACT_PREFERENCES_WIDGET_H

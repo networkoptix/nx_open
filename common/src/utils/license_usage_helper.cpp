@@ -1,5 +1,7 @@
 #include "license_usage_helper.h"
 
+#ifdef ENABLE_SENDMAIL
+
 #include <numeric>
 #include <functional>
 
@@ -15,7 +17,6 @@
 
 #include <core/resource_management/resource_pool.h>
 #include "qjsonobject.h"
-#include "mustache/mustache.h"
 
 //#define QN_NO_LICENSE_CHECK
 
@@ -34,15 +35,15 @@ namespace {
 }
 
 /** Allow to use 'master' license type instead of 'child' type if there are not enough child licenses. */
-struct LicenseCompatibility 
+struct LicenseCompatibility
 {
     LicenseCompatibility(Qn::LicenseType master, Qn::LicenseType child): master(master), child(child) {}
     Qn::LicenseType master;
     Qn::LicenseType child;
 };
 
-/* Compatibility tree: 
- * Trial -> Edge -> Professional -> Analog -> (VMAX, AnalogEncoder) 
+/* Compatibility tree:
+ * Trial -> Edge -> Professional -> Analog -> (VMAX, AnalogEncoder)
  * Trial -> IO
  * Start -> Professional -> Analog -> (VMAX, AnalogEncoder)
  */
@@ -116,7 +117,7 @@ int QnLicenseUsageHelper::borrowLicenses(const LicenseCompatibility &compat, lic
 
     auto borrowLicenseFromClass = [] (int& srcUsed, int srcTotal, int& dstUsed, int dstTotal) {
         int borrowed = 0;
-        if (dstUsed > dstTotal) { 
+        if (dstUsed > dstTotal) {
             int donatorRest = srcTotal - srcUsed;
             if (donatorRest > 0) {
                 borrowed = qMin(donatorRest, dstUsed - dstTotal);
@@ -151,10 +152,10 @@ QString QnLicenseUsageHelper::getProposedUsageMsg() const {
 }
 
 QString QnLicenseUsageHelper::getRequiredText(Qn::LicenseType licenseType) const {
-    if (requiredLicenses(licenseType) > 0) 
+    if (requiredLicenses(licenseType) > 0)
         return tr("Activate %n more %2. ", "", requiredLicenses(licenseType)).arg(QnLicense::longDisplayName(licenseType));
 
-    if (isValid() && proposedLicenses(licenseType) > 0)        
+    if (isValid() && proposedLicenses(licenseType) > 0)
         return tr("%n more %2 will be used. ", "", proposedLicenses(licenseType)).arg(QnLicense::longDisplayName(licenseType));
 
     return QString();
@@ -182,7 +183,7 @@ void QnLicenseUsageHelper::updateCache() const {
 
     /* Used licenses without proposed cameras. */
     licensesArray basicUsedLicenses;
-    
+
 
     /* Borrowed licenses count without proposed cameras. */
     licensesArray basicBorrowedLicenses;
@@ -266,22 +267,38 @@ QList<Qn::LicenseType> QnLicenseUsageHelper::licenseTypes() const {
 QString QnLicenseUsageHelper::activationMessage(const QJsonObject& errorMessage) {
     QString messageId = errorMessage.value(lit("messageId")).toString();
     QString message = errorMessage.value(lit("message")).toString();
-    QVariantMap arguments = errorMessage.value(lit("arguments")).toObject().toVariantMap();
 
-    if(messageId == lit("DatabaseError")) {
-        message = tr("There was a problem activating your license key. A database error has occurred.");  //TODO: Feature #3629 case J
-    } else if(messageId == lit("InvalidData")) {
-        message = tr("There was a problem activating your license key. Invalid data received. Please contact support team to report issue.");
-    } else if(messageId == lit("InvalidKey")) {
+    if (messageId == lit("DatabaseError"))
+    {
+        message = tr("There was a problem activating your license key. A database error occurred.");  //TODO: Feature #3629 case J
+    }
+    else if (messageId == lit("InvalidData"))
+    {
+        message = tr("There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.");
+    }
+    else if (messageId == lit("InvalidKey"))
+    {
         message = tr("The license key you have entered is invalid. Please check that license key is entered correctly. "
             "If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.");
-    } else if(messageId == lit("InvalidBrand")) {
+    }
+    else if (messageId == lit("InvalidBrand"))
+    {
         message = tr("You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.");
-    } else if(messageId == lit("AlreadyActivated")) {
+    }
+    else if (messageId == lit("AlreadyActivated"))
+    {
+        //TODO: #GDM #2.6 #tr get rid of this insane templating
         message = tr("This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.");
+
+        QVariantMap arguments = errorMessage.value(lit("arguments")).toObject().toVariantMap();
+        QString hwid = arguments.value(lit("hwid")).toString();
+        message.replace(lit("{{hwid}}"), hwid);
+
+        QString time = arguments.value(lit("time")).toString();
+        message.replace(lit("{{time}}"), time);
     }
 
-    return Mustache::renderTemplate(message, arguments);
+    return message;
 }
 
 /************************************************************************/
@@ -341,29 +358,38 @@ void QnCamLicenseUsageWatcher::init(const QnVirtualCameraResourcePtr &camera) {
 /************************************************************************/
 /* QnCamLicenseUsageHelper                                              */
 /************************************************************************/
-QnCamLicenseUsageHelper::QnCamLicenseUsageHelper(QObject *parent):
+QnCamLicenseUsageHelper::QnCamLicenseUsageHelper(const QnCamLicenseUsageWatcherPtr &watcher
+    , QObject *parent):
     base_type(parent)
 {
-    init();
+    init(watcher);
 }
 
-QnCamLicenseUsageHelper::QnCamLicenseUsageHelper(const QnVirtualCameraResourceList &proposedCameras, bool proposedEnable, QObject *parent):
+QnCamLicenseUsageHelper::QnCamLicenseUsageHelper(const QnVirtualCameraResourceList &proposedCameras, bool proposedEnable
+    , const QnCamLicenseUsageWatcherPtr &watcher, QObject *parent):
     base_type(parent)
 {
-    init();
+    init(watcher);
     propose(proposedCameras, proposedEnable);
 }
 
-QnCamLicenseUsageHelper::QnCamLicenseUsageHelper(const QnVirtualCameraResourcePtr &proposedCamera, bool proposedEnable, QObject *parent):
+QnCamLicenseUsageHelper::QnCamLicenseUsageHelper(const QnVirtualCameraResourcePtr &proposedCamera, bool proposedEnable
+    , const QnCamLicenseUsageWatcherPtr &watcher, QObject *parent):
     base_type(parent)
 {
-    init();
+    init(watcher);
     propose(proposedCamera, proposedEnable);
 }
 
-void QnCamLicenseUsageHelper::init() {
-    QnCamLicenseUsageWatcher* usageWatcher = new QnCamLicenseUsageWatcher(this);
-    connect(usageWatcher, &QnCamLicenseUsageWatcher::licenseUsageChanged, this, &QnLicenseUsageHelper::invalidate);
+void QnCamLicenseUsageHelper::init(const QnCamLicenseUsageWatcherPtr &watcher) {
+    m_watcher = (watcher ? watcher
+        : QnCamLicenseUsageWatcherPtr(new QnCamLicenseUsageWatcher()));
+
+    connect(m_watcher, &QnCamLicenseUsageWatcher::licenseUsageChanged, this, [this]()
+    {
+        invalidate();
+        emit licenseUsageChanged();
+    });
 }
 
 void QnCamLicenseUsageHelper::propose(const QnVirtualCameraResourcePtr &proposedCamera, bool proposedEnable) {
@@ -382,11 +408,16 @@ void QnCamLicenseUsageHelper::propose(const QnVirtualCameraResourceList &propose
 }
 
 bool QnCamLicenseUsageHelper::isOverflowForCamera(const QnVirtualCameraResourcePtr &camera) {
-    bool requiresLicense = camera->isLicenseUsed();
+    return isOverflowForCamera(camera, camera->isLicenseUsed());
+}
+
+bool QnCamLicenseUsageHelper::isOverflowForCamera(const QnVirtualCameraResourcePtr &camera, bool cachedLicenceUsed) {
+    bool requiresLicense = false;
     requiresLicense &= !m_proposedToDisable.contains(camera);
     requiresLicense |= m_proposedToEnable.contains(camera);
     return requiresLicense && !isValid(camera->licenseType());
 }
+
 
 QList<Qn::LicenseType> QnCamLicenseUsageHelper::calculateLicenseTypes() const {
     return QList<Qn::LicenseType>()
@@ -406,12 +437,12 @@ void QnCamLicenseUsageHelper::calculateUsedLicenses(licensesArray& basicUsedLice
     boost::fill(basicUsedLicenses, 0);
     boost::fill(proposedToUse, 0);
 
-    for (const QnVirtualCameraResourcePtr &camera: qnResPool->getResources<QnVirtualCameraResource>()) 
+    for (const QnVirtualCameraResourcePtr &camera: qnResPool->getResources<QnVirtualCameraResource>())
     {
         QnResourcePtr server = camera->getParentResource();
         if (!server || server->getStatus() != Qn::Online)
             continue;
-        
+
         Qn::LicenseType lt = camera->licenseType();
         bool requiresLicense = camera->isLicenseUsed();
         if (requiresLicense)
@@ -423,6 +454,43 @@ void QnCamLicenseUsageHelper::calculateUsedLicenses(licensesArray& basicUsedLice
             proposedToUse[lt]++;
     }
 }
+
+//////////////////////////////////////////////////////////////////////////
+
+QnSingleCamLicenceStatusHelper::QnSingleCamLicenceStatusHelper(const QnVirtualCameraResourcePtr &camera)
+    : m_camera(camera)
+    , m_helper(camera
+        ? new QnCamLicenseUsageHelper(camera, true, QnCamLicenseUsageWatcherPtr(new QnCamLicenseUsageWatcher(camera)))
+        : nullptr)
+{
+    if (!camera)
+        return;
+
+    connect(m_helper, &QnCamLicenseUsageHelper::licenseUsageChanged
+        , this, &QnSingleCamLicenceStatusHelper::licenceStatusChanged);
+}
+
+QnSingleCamLicenceStatusHelper::~QnSingleCamLicenceStatusHelper()
+{
+    if (!m_camera)
+        return;
+
+    disconnect(m_camera, nullptr, this, nullptr);
+    disconnect(m_helper, nullptr, this, nullptr);
+}
+
+QnSingleCamLicenceStatusHelper::CameraLicenseStatus QnSingleCamLicenceStatusHelper::status()
+{
+    if (!m_camera)
+        return InvalidSource;
+
+    const bool isLicenceUsed = m_camera->isLicenseUsed();
+    if (m_helper->isOverflowForCamera(m_camera, isLicenceUsed))
+        return LicenseOverflow;
+
+    return (isLicenceUsed ? LicenseUsed : LicenseNotUsed);
+}
+
 
 /************************************************************************/
 /* QnVideoWallLicenseUsageWatcher                                       */
@@ -478,7 +546,7 @@ void QnVideoWallLicenseUsageHelper::calculateUsedLicenses(licensesArray& basicUs
 
     int usedScreens = 0;
     int controlSessions = 0;
-    for (const QnVideoWallResourcePtr &videowall: qnResPool->getResources<QnVideoWallResource>()) 
+    for (const QnVideoWallResourcePtr &videowall: qnResPool->getResources<QnVideoWallResource>())
     {
         /* Calculating total screens. */
         usedScreens += videowall->items()->getItems().size();
@@ -547,3 +615,5 @@ QnVideoWallLicenseUsageProposer::~QnVideoWallLicenseUsageProposer() {
         return;
     m_helper->propose(-m_count);
 }
+
+#endif //ENABLE_SENDMAIL

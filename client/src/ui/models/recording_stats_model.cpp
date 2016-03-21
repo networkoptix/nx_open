@@ -22,7 +22,11 @@ namespace {
 
     /* One additional row for footer. */
     const int footerRowsCount = 1;
+
+    const int kMaxNameLength = 30;
 }
+
+const QString QnSortedRecordingStatsModel::kForeignCameras(lit("C7139D2D-0CB2-424D-9C73-704C417B32F2"));
 
 bool QnSortedRecordingStatsModel::lessThan(const QModelIndex &left, const QModelIndex &right) const
 {
@@ -36,6 +40,15 @@ bool QnSortedRecordingStatsModel::lessThan(const QModelIndex &left, const QModel
             return isNulIDLeft < isNulIDRight; // keep footer without ID at the last place
         else
             return isNulIDLeft > isNulIDRight; // keep footer without ID at the last place
+    }
+
+    bool isForeignLeft = leftData.uniqueId == kForeignCameras;
+    bool isForeignRight = rightData.uniqueId == kForeignCameras;
+    if (isForeignLeft != isForeignRight) {
+        if (sortOrder() == Qt::AscendingOrder)
+            return isForeignLeft < isForeignRight;
+        else
+            return isForeignLeft > isForeignRight;
     }
 
     switch(left.column()) {
@@ -78,15 +91,23 @@ int QnRecordingStatsModel::columnCount(const QModelIndex &parent) const {
 
 QString QnRecordingStatsModel::displayData(const QModelIndex &index) const {
     const QnCamRecordingStatsData& value = m_data.at(index.row());
-    switch(index.column()) {
+    bool isForeign = (value.uniqueId == QnSortedRecordingStatsModel::kForeignCameras);
+    switch(index.column())
+    {
     case CameraNameColumn:
-        return getResourceName(qnResPool->getResourceByUniqueId(value.uniqueId));
+        {
+            QString foreignText = tr("<Cameras from other servers and removed cameras>");
+            int maxLength = qMax(foreignText.length(), kMaxNameLength); /* There is no need to limit name to be shorter than predefined string. */
+            return isForeign
+                ? foreignText
+                : elideString(getResourceName(qnResPool->getResourceByUniqueId(value.uniqueId)), maxLength);
+        }
     case BytesColumn:
         return formatBytesString(value.recordedBytes);
     case DurationColumn:
-        return formatDurationString(value);           
+        return isForeign ? QString() : formatDurationString(value);
     case BitrateColumn:
-        return formatBitrateString(value.averageBitrate);
+        return isForeign ? QString() : formatBitrateString(value.averageBitrate);
     default:
         return QString();
     }
@@ -101,12 +122,12 @@ QString QnRecordingStatsModel::footerDisplayData(const QModelIndex &index) const
             for (const QnCamRecordingStatsData &data: m_data)
                 if (QnVirtualCameraResourcePtr camera = qnResPool->getResourceByUniqueId<QnVirtualCameraResource>(data.uniqueId))
                     cameras << camera;
-            Q_ASSERT_X(cameras.size() == m_data.size(), Q_FUNC_INFO, "Make sure all cameras exist");
+            //Q_ASSERT_X(cameras.size() == m_data.size(), Q_FUNC_INFO, "Make sure all cameras exist");
             return QnDeviceDependentStrings::getNameFromSet(
                 QnCameraDeviceStringSet(
-                    tr("Total %n devices",      nullptr, cameras.size()),
-                    tr("Total %n cameras",      nullptr, cameras.size()),
-                    tr("Total %n IO modules",   nullptr, cameras.size())
+                    tr("Total %n devices",      "", cameras.size()),
+                    tr("Total %n cameras",      "", cameras.size()),
+                    tr("Total %n I/O modules",  "", cameras.size())
                 ), cameras
             );
         }
@@ -164,7 +185,7 @@ qreal QnRecordingStatsModel::chartData(const QModelIndex &index) const
     return qBound(0.0, result, 1.0);
 }
 
-QVariant QnRecordingStatsModel::footerData(const QModelIndex &index, int role) const 
+QVariant QnRecordingStatsModel::footerData(const QModelIndex &index, int role) const
 {
     switch(role) {
     case Qt::DisplayRole:
@@ -204,7 +225,7 @@ QString QnRecordingStatsModel::tooltipText(Columns column) const
                 tr("Storage space occupied by cameras")
                 );
         case DurationColumn:
-            return tr("Archived duration in calendar days between the first record and the current moment");
+            return tr("Archived duration in calendar days since the first recording");
         case BitrateColumn:
             return tr("Average bitrate for the recorded period");
         default:
@@ -213,7 +234,7 @@ QString QnRecordingStatsModel::tooltipText(Columns column) const
     return QString();
 }
 
-QVariant QnRecordingStatsModel::data(const QModelIndex &index, int role) const 
+QVariant QnRecordingStatsModel::data(const QModelIndex &index, int role) const
 {
     /* Check invalid indices. */
     if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
@@ -250,7 +271,7 @@ QVariant QnRecordingStatsModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-QVariant QnRecordingStatsModel::headerData(int section, Qt::Orientation orientation, int role) const 
+QVariant QnRecordingStatsModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if (orientation != Qt::Horizontal || section >= ColumnCount)
         return base_type::headerData(section, orientation, role);
@@ -310,7 +331,7 @@ QnFooterData QnRecordingStatsModel::calculateFooter(const QnRecordingStatsReply&
         maxValue.averageBitrate = qMax(maxValue.averageBitrate, value.averageBitrate);
         footer.bitrateSum += value.averageBitrate;
     }
-    
+
     footer.recordedBytes = summ.recordedBytes;
     footer.recordedSecs = summ.recordedSecs;
     footer.archiveDurationSecs = summ.archiveDurationSecs;
@@ -326,7 +347,7 @@ QString QnRecordingStatsModel::formatBitrateString(qint64 bitrate) const {
     return lit("-");
 }
 
-QString QnRecordingStatsModel::formatBytesString(qint64 bytes) const {   
+QString QnRecordingStatsModel::formatBytesString(qint64 bytes) const {
     if (bytes > BYTES_IN_TB)
         return tr("%1 Tb").arg(QString::number(bytes / BYTES_IN_TB, 'f', PREC));
     else
@@ -334,7 +355,7 @@ QString QnRecordingStatsModel::formatBytesString(qint64 bytes) const {
 }
 
 
-QString QnRecordingStatsModel::formatDurationString(const QnCamRecordingStatsData &data) const 
+QString QnRecordingStatsModel::formatDurationString(const QnCamRecordingStatsData &data) const
 {
     if (data.archiveDurationSecs == 0)
         return tr("empty");

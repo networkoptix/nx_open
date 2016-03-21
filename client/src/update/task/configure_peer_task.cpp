@@ -15,40 +15,38 @@ QnConfigurePeerTask::QnConfigurePeerTask(QObject *parent) :
     connect(m_mergeTool, &QnMergeSystemsTool::mergeFinished, this, &QnConfigurePeerTask::at_mergeTool_mergeFinished);
 }
 
-QString QnConfigurePeerTask::user() const {
-    return m_user;
+QString QnConfigurePeerTask::adminPassword() const
+{
+    return m_adminPassword;
 }
 
-void QnConfigurePeerTask::setUser(const QString &user) {
-    m_user = user;
+void QnConfigurePeerTask::setAdminPassword(const QString &password)
+{
+    m_adminPassword = password;
 }
 
-QString QnConfigurePeerTask::password() const {
-    return m_password;
-}
-
-void QnConfigurePeerTask::setPassword(const QString &password) {
-    m_password = password;
-}
-
-void QnConfigurePeerTask::doStart() {
+void QnConfigurePeerTask::doStart()
+{
     m_error = NoError;
     m_pendingPeers.clear();
 
-    foreach (const QnUuid &id, peers()) {
+    for (const QnUuid &id: peers())
+    {
         QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
-        if (!server) {
+        if (!server)
+        {
             m_failedPeers.insert(id);
             continue;
         }
 
         QnMediaServerResourcePtr ecServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->remoteGUID());
-        if (!ecServer) {
+        if (!ecServer)
+        {
             m_failedPeers.insert(id);
             continue;
         }
 
-        int handle = m_mergeTool->configureIncompatibleServer(ecServer, server->getApiUrl(), m_user, m_password);
+        int handle = m_mergeTool->configureIncompatibleServer(ecServer, server->getApiUrl(), m_adminPassword);
         m_pendingPeers.insert(id);
         m_peerIdByHandle[handle] = id;
     }
@@ -57,7 +55,8 @@ void QnConfigurePeerTask::doStart() {
         finish(m_failedPeers.isEmpty() ? NoError : UnknownError, m_failedPeers);
 }
 
-void QnConfigurePeerTask::at_mergeTool_mergeFinished(int errorCode, const QnModuleInformation &moduleInformation, int handle) {
+void QnConfigurePeerTask::at_mergeTool_mergeFinished(int errorCode, const QnModuleInformation &moduleInformation, int handle)
+{
     Q_UNUSED(moduleInformation)
 
     QnUuid id = m_peerIdByHandle.take(handle);
@@ -65,8 +64,10 @@ void QnConfigurePeerTask::at_mergeTool_mergeFinished(int errorCode, const QnModu
     if (id.isNull() || !m_pendingPeers.remove(id))
         return;
 
-    if (errorCode != QnMergeSystemsTool::NoError) {
-        switch (errorCode) {
+    if (errorCode != QnMergeSystemsTool::NoError)
+    {
+        switch (errorCode)
+        {
         case QnMergeSystemsTool::AuthentificationError:
             m_error = AuthentificationFailed;
             break;

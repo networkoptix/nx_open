@@ -1,12 +1,16 @@
-#ifndef INCOMPATIBLE_SERVER_WATCHER_H
-#define INCOMPATIBLE_SERVER_WATCHER_H
+#pragma once
 
 #include <QtCore/QObject>
-#include <core/resource/resource_fwd.h>
-#include <utils/common/uuid.h>
-#include <utils/network/module_information.h>
 
-class QnIncompatibleServerWatcher : public QObject {
+#include <core/resource/resource_fwd.h>
+#include <nx_ec/data/api_discovery_data.h>
+#include <utils/common/uuid.h>
+#include <network/module_information.h>
+
+class QnIncompatibleServerWatcherPrivate;
+
+class QnIncompatibleServerWatcher : public QObject
+{
     Q_OBJECT
 public:
     explicit QnIncompatibleServerWatcher(QObject *parent = 0);
@@ -23,38 +27,9 @@ public:
      */
     void keepServer(const QnUuid &id, bool keep);
 
-    void createModules(const QList<QnModuleInformationWithAddresses> &modules);
+    void createInitialServers(const ec2::ApiDiscoveredServerDataList &discoveredServers);
 
 private:
-    void at_resourcePool_resourceChanged(const QnResourcePtr &resource);
-    void at_moduleChanged(const QnModuleInformationWithAddresses &moduleInformation, bool isAlive);
-
-    void addResource(const QnModuleInformationWithAddresses &moduleInformation);
-    void removeResource(const QnUuid &id);
-    QnUuid getFakeId(const QnUuid &realId) const;
-
-private:
-    struct ModuleInformationItem {
-        QnModuleInformationWithAddresses moduleInformation;
-        bool keep;
-        bool removed;
-
-        ModuleInformationItem() :
-            keep(false),
-            removed(false)
-        {}
-
-        ModuleInformationItem(const QnModuleInformationWithAddresses &moduleInformation) :
-            moduleInformation(moduleInformation),
-            keep(false),
-            removed(false)
-        {}
-    };
-
-    mutable QMutex m_mutex;
-    QHash<QnUuid, QnUuid> m_fakeUuidByServerUuid;
-    QHash<QnUuid, QnUuid> m_serverUuidByFakeUuid;
-    QHash<QnUuid, ModuleInformationItem> m_moduleInformationById;
+    Q_DECLARE_PRIVATE(QnIncompatibleServerWatcher)
+    QScopedPointer<QnIncompatibleServerWatcherPrivate> d_ptr;
 };
-
-#endif // INCOMPATIBLE_SERVER_WATCHER_H

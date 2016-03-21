@@ -125,19 +125,18 @@ module.exports = function (grunt) {
                 {context: '/media/',    host: '192.168.56.101', port: 9000},
                 {context: '/proxy/',    host: '192.168.56.101',port: 9000}/**/
 
-                // Masha
-                /*{context: '/api/',      host: '10.0.3.27', port: 7001},
-                {context: '/ec2/',      host: '10.0.3.27', port: 7001},
-                {context: '/hls/',      host: '10.0.3.27', port: 7001},
-                {context: '/media/',    host: '10.0.3.27', port: 7001},
-                {context: '/proxy/',    host: '10.0.3.27', port: 7001}/**/
+                /*{context: '/api/',      host: '10.0.2.203', port: 7001},
+                {context: '/ec2/',      host: '10.0.2.203', port: 7001},
+                {context: '/hls/',      host: '10.0.2.203', port: 7001},
+                {context: '/media/',    host: '10.0.2.203', port: 7001},
+                {context: '/proxy/',    host: '10.0.2.203', port: 7001}/**/
 
                 // Sasha V
-                /*{context: '/api/',      host: '10.0.2.121', port: 7001},
-                {context: '/ec2/',      host: '10.0.2.121', port: 7001},
-                {context: '/hls/',      host: '10.0.2.121', port: 7001},
-                {context: '/media/',    host: '10.0.2.121', port: 7001},
-                {context: '/proxy/',    host: '10.0.2.121', port: 7001}/**/
+                /*{context: '/api/',      host: '10.0.3.43', port: 7001},
+                {context: '/ec2/',      host: '10.0.3.43', port: 7001},
+                {context: '/hls/',      host: '10.0.3.43', port: 7001},
+                {context: '/media/',    host: '10.0.3.43', port: 7001},
+                {context: '/proxy/',    host: '10.0.3.43', port: 7001}/**/
 
                 // Gdm
                 /*{context: '/api/',      host: '10.0.2.240', port: 7001},
@@ -161,15 +160,15 @@ module.exports = function (grunt) {
                 {context: '/media/',    host: '95.31.136.2', port: 7011},
                 {context: '/proxy/',    host: '95.31.136.2', port: 7011}/**/
 
-                // Olya
-                {context: '/api/',      host: '10.0.2.169', port: 7011},
+                // Regress
+                /*{context: '/api/',      host: '10.0.2.169', port: 7011},
                 {context: '/ec2/',      host: '10.0.2.169', port: 7011},
                 {context: '/hls/',      host: '10.0.2.169', port: 7011},
                 {context: '/media/',    host: '10.0.2.169', port: 7011},
                 {context: '/proxy/',    host: '10.0.2.169', port: 7011}/**/
 
                 // Sasha
-                /*{context: '/api/',      host: '10.0.2.119', port: 7042},
+                {context: '/api/',      host: '10.0.2.119', port: 7042},
                 {context: '/ec2/',      host: '10.0.2.119', port: 7042},
                 {context: '/hls/',      host: '10.0.2.119', port: 7042},
                 {context: '/media/',    host: '10.0.2.119', port: 7042},
@@ -183,11 +182,11 @@ module.exports = function (grunt) {
                 {context: '/proxy/',    host: '10.0.2.95', port: 7001}/**/
 
                 //Roman Vasilenko  port: 7003,7004,7005,2006
-                /*{context: '/api/',    host: '10.0.2.244', port: 7002},
-                {context: '/ec2/',      host: '10.0.2.244', port: 7002},
-                {context: '/hls/',      host: '10.0.2.244', port: 7002},
-                {context: '/media/',    host: '10.0.2.244', port: 7002},
-                {context: '/proxy/',    host: '10.0.2.244', port: 7002}/**/
+                /*{context: '/api/',      host: '10.0.2.232', port: 7001},
+                {context: '/ec2/',      host: '10.0.2.232', port: 7001},
+                {context: '/hls/',      host: '10.0.2.232', port: 7001},
+                {context: '/media/',    host: '10.0.2.232', port: 7001},
+                {context: '/proxy/',    host: '10.0.2.232', port: 7001}/**/
 
             ],
             livereload: {
@@ -315,7 +314,7 @@ module.exports = function (grunt) {
                 files:[
                     {
                         dot: true,
-                        src: '<%= yeoman.dist %>/../../mediaserver_core/maven/bin-resources/resources/static/*'
+                        src: '<%= yeoman.dist %>/../../mediaserver_core/maven/bin-resources/additional-resources/static/*'
                     }
                 ],
                 options: {
@@ -536,7 +535,7 @@ module.exports = function (grunt) {
                 expand: true,
                 nonull:true,
                 cwd: '<%= yeoman.app %>/../dist',
-                dest: '../mediaserver_core/maven/bin-resources/resources/static/',
+                dest: '../mediaserver_core/maven/bin-resources/additional-resources/static/',
                 src: '**'
             }
         },

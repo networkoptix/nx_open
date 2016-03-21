@@ -2,7 +2,7 @@
 
 #include <utils/serialization/json_functions.h>
 #include <utils/serialization/lexical.h>
-#include <utils/network/tcp_connection_priv.h>
+#include <network/tcp_connection_priv.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
@@ -16,7 +16,7 @@ static const int OLD_SEQUENCE_THRESHOLD = 1000 * 60 * 5;
 
 
 QMap<QString, QnPtzRestHandler::AsyncExecInfo> QnPtzRestHandler::m_workers;
-QMutex QnPtzRestHandler::m_asyncExecMutex;
+QnMutex QnPtzRestHandler::m_asyncExecMutex;
 
 void QnPtzRestHandler::cleanupOldSequence()
 {
@@ -33,7 +33,7 @@ void QnPtzRestHandler::cleanupOldSequence()
 
 bool QnPtzRestHandler::checkSequence(const QString& id, int sequence)
 {
-    QMutexLocker lock(&m_sequenceMutex);
+    QnMutexLocker lock( &m_sequenceMutex );
     cleanupOldSequence();
     if (id.isEmpty() || sequence == -1)
         return true; // do not check if empty
@@ -65,7 +65,7 @@ void QnPtzRestHandler::asyncExecutor(const QString& sequence, AsyncFunc function
 
 int QnPtzRestHandler::execCommandAsync(const QString& sequence, AsyncFunc function)
 {
-    QMutexLocker lock(&m_asyncExecMutex);
+    QnMutexLocker lock( &m_asyncExecMutex );
 
     if (m_workers[sequence].inProgress) {
         m_workers[sequence].nextCommand = function;

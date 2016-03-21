@@ -16,8 +16,8 @@ class QnGeneralSystemAdministrationWidget: public QnAbstractPreferencesWidget, p
 public:
     QnGeneralSystemAdministrationWidget(QWidget *parent = NULL);
 
-    virtual void updateFromSettings() override;
-    virtual void submitToSettings() override;
+    virtual void loadDataToUi() override;
+    virtual void applyChanges() override;
 
     virtual bool hasChanges() const override;
 

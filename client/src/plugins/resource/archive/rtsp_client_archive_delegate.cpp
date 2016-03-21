@@ -19,7 +19,6 @@ extern "C"
 #include <core/resource/camera_history.h>
 #include <core/resource/media_server_resource.h>
 
-#include <plugins/resource/server_camera/server_camera.h>
 #include <plugins/resource/archive/archive_stream_reader.h>
 
 #include <redass/redass_controller.h>
@@ -28,8 +27,8 @@ extern "C"
 #include <utils/common/sleep.h>
 #include <utils/common/synctime.h>
 #include <utils/media/ffmpeg_helper.h>
-#include <utils/network/rtp_stream_parser.h>
-#include <utils/network/ffmpeg_sdp.h>
+#include <network/rtp_stream_parser.h>
+#include <network/ffmpeg_sdp.h>
 #include <QtConcurrent/QtConcurrentFilter>
 #include "http/custom_headers.h"
 #include "common/common_module.h"
@@ -60,8 +59,9 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* 
     m_playNowModeAllowed(true),
     m_reader(reader),
     m_frameCnt(0),
-    m_lockedTime(AV_NOPTS_VALUE)
+    m_runtimeId(qnCommon->runningInstanceGUID())
 {
+    m_footageUpToDate.test_and_set();
     m_rtpDataBuffer = new quint8[MAX_RTP_BUFFER_SIZE];
     m_flags |= Flag_SlowSource;
     m_flags |= Flag_CanProcessNegativeSpeed;
@@ -75,6 +75,30 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* 
     m_auth.username = QnAppServerConnectionFactory::url().userName();
     m_auth.password = QnAppServerConnectionFactory::url().password();
     m_auth.videowall = QnAppServerConnectionFactory::videowallGuid();
+
+    connect(qnCameraHistoryPool, &QnCameraHistoryPool::cameraHistoryChanged, this, [this](const QnVirtualCameraResourcePtr &camera) {
+        /* Ignore camera history if fixed server is set. */
+        if (m_fixedServer || !m_isMultiserverAllowed)
+            return;
+
+        /* Ignore other cameras changes. */
+        if (camera != m_camera)
+            return;
+
+        if (m_server != getServerOnTime(m_position))
+            reopen();
+    });
+
+    connect(qnCameraHistoryPool, &QnCameraHistoryPool::cameraFootageChanged, this, [this](const QnVirtualCameraResourcePtr &camera) {
+        /* Ignore camera history if fixed server is set. */
+        if (m_fixedServer || !m_isMultiserverAllowed)
+            return;
+
+        /* Ignore other cameras changes. */
+        if (camera != m_camera)
+            return;
+        m_footageUpToDate.clear();
+    });
 }
 
 void QnRtspClientArchiveDelegate::setCamera(const QnVirtualCameraResourcePtr &camera)
@@ -102,10 +126,7 @@ QnMediaServerResourcePtr QnRtspClientArchiveDelegate::getNextMediaServerFromTime
         return QnMediaServerResourcePtr();
     if (m_fixedServer)
         return QnMediaServerResourcePtr();
-    QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(camera);
-    if (!history)
-        return QnMediaServerResourcePtr();
-    return history->getNextMediaServerAndPeriodOnTime(time, m_serverTimePeriod, m_rtspSession.getScale() >= 0);
+    return qnCameraHistoryPool->getNextMediaServerAndPeriodOnTime(camera, time, m_rtspSession.getScale() >= 0, &m_serverTimePeriod);
 }
 
 QString QnRtspClientArchiveDelegate::getUrl(const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &_server) const {
@@ -134,7 +155,7 @@ struct ArchiveTimeCheckInfo
     qint64* result;
 };
 
-void QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &server, qint64* result)
+void QnRtspClientArchiveDelegate::checkGlobalTimeAsync(const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &server, qint64* result)
 {
     RTPSession otherRtspSession;
     QnRtspClientArchiveDelegate::setupRtspSession(camera, server,  &otherRtspSession, false);
@@ -144,45 +165,40 @@ void QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(const QnVirtualCam
     qint64 startTime = otherRtspSession.startTime();
     if (startTime != qint64(AV_NOPTS_VALUE) && startTime != DATETIME_NOW)
     {
-        QMutexLocker lock(&m_timeMutex);
         if (startTime < *result || *result == qint64(AV_NOPTS_VALUE))
             *result = startTime;
     }
 }
 
-bool checkGlobalMinTime(const ArchiveTimeCheckInfo& checkInfo)
-{
-    checkInfo.owner->checkMinTimeFromOtherServer(checkInfo.camera, checkInfo.server, checkInfo.result);
-    return true;
-}
-
 void QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(const QnVirtualCameraResourcePtr &camera)
 {
     if (!camera) {
-        QMutexLocker lock(&m_timeMutex);
         m_globalMinArchiveTime = qint64(AV_NOPTS_VALUE);
         return;
     }
 
-    QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(camera);
-    if (!history) {
-        QMutexLocker lock(&m_timeMutex);
+    auto currentServer = qnResPool->getResourceById(camera->getParentId());
+    QnMediaServerResourceList mediaServerList = qnCameraHistoryPool->getCameraFootageData(camera, true);
+
+    /* Check if no archive available on any server. */
+    /* Or check if archive belong to the current server only */
+    if (mediaServerList.isEmpty() ||
+        mediaServerList.size() == 1 && mediaServerList[0] == currentServer)
+    {
         m_globalMinArchiveTime = qint64(AV_NOPTS_VALUE);
         return;
     }
 
-    QnServerHistoryMap mediaServerList = history->getOnlineTimePeriods();
     QList<ArchiveTimeCheckInfo> checkList;
     qint64 currentMinTime  = qint64(AV_NOPTS_VALUE);
     qint64 otherMinTime  = qint64(AV_NOPTS_VALUE);
-    for (const QnUuid &serverId: mediaServerList.values().toSet()) 
+    for (const auto &server: mediaServerList)
+        checkList << ArchiveTimeCheckInfo(camera, server, this, server == m_server ? &currentMinTime : &otherMinTime);
+    QtConcurrent::blockingFilter(checkList, [](const ArchiveTimeCheckInfo& checkInfo) 
     {
-        QnMediaServerResourcePtr server = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceById(serverId));
-        if (server)
-            checkList << ArchiveTimeCheckInfo(camera, server, this, server == m_server ? &currentMinTime : &otherMinTime);
-    }
-    QtConcurrent::blockingFilter(checkList, checkGlobalMinTime);
-    QMutexLocker lock(&m_timeMutex);
+            checkInfo.owner->checkGlobalTimeAsync(checkInfo.camera, checkInfo.server, checkInfo.result);
+            return true;
+    });
     if ((otherMinTime != qint64(AV_NOPTS_VALUE)) && (currentMinTime == qint64(AV_NOPTS_VALUE) || otherMinTime < currentMinTime))
         m_globalMinArchiveTime = otherMinTime;
     else
@@ -199,11 +215,7 @@ QnMediaServerResourcePtr QnRtspClientArchiveDelegate::getServerOnTime(qint64 tim
 
     qint64 timeMs = timeUsec / 1000;
 
-    QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(m_camera);
-    if (!history)
-        return currentServer;
-
-    QnMediaServerResourcePtr mediaServer = history->getMediaServerAndPeriodOnTime(timeMs, m_serverTimePeriod, false);
+    QnMediaServerResourcePtr mediaServer = qnCameraHistoryPool->getMediaServerOnTime(m_camera, timeMs, &m_serverTimePeriod);
     if (!mediaServer)
         return currentServer;
     
@@ -235,6 +247,7 @@ bool QnRtspClientArchiveDelegate::openInternal() {
     m_closing = false;
 
     m_customVideoLayout.reset();
+    m_globalMinArchiveTime = startTime(); // force current value to avoid flicker effect while current server is being changed
    
     if (!m_fixedServer) {
         m_server = getServerOnTime(m_position); // try to update server
@@ -247,26 +260,25 @@ bool QnRtspClientArchiveDelegate::openInternal() {
     }
 
     setupRtspSession(m_camera, m_server, &m_rtspSession, m_playNowModeAllowed);
-    m_rtpData = 0;
+    setRtpData(0);
 
     const bool isOpened = m_rtspSession.open(getUrl(m_camera, m_server), m_lastSeekTime).errorCode == CameraDiagnostics::ErrorCode::noError;
     if (isOpened)
     {
-        lockTime(startTime());
-        if (m_isMultiserverAllowed)
-            checkMinTimeFromOtherServer(m_camera);
-
         qint64 endTime = m_position;
         if (m_forcedEndTime)
             endTime = m_forcedEndTime;
 
         m_rtspSession.play(m_position, endTime, m_rtspSession.getScale());
+
+        if (m_isMultiserverAllowed)
+            checkMinTimeFromOtherServer(m_camera);
+
         RTPSession::TrackMap trackInfo =  m_rtspSession.getTrackInfo();
         if (!trackInfo.isEmpty())
-            m_rtpData = trackInfo[0]->ioDevice;
+            setRtpData(trackInfo[0]->ioDevice);
         if (!m_rtpData)
             m_rtspSession.stop();
-        unlockTime();
     }
     else {
         m_rtspSession.stop();
@@ -308,17 +320,24 @@ void QnRtspClientArchiveDelegate::parseAudioSDP(const QList<QByteArray>& audioSD
     }
 }
 
+void QnRtspClientArchiveDelegate::setRtpData(RTPIODevice* value)
+{
+    QnMutexLocker lock(&m_rtpDataMutex);
+    m_rtpData = value;
+}
+
 void QnRtspClientArchiveDelegate::beforeClose()
 {
     //m_waitBOF = false;
     m_closing = true;
+    QnMutexLocker lock(&m_rtpDataMutex);
     if (m_rtpData)
         m_rtpData->getMediaSocket()->close();
 }
 
 void QnRtspClientArchiveDelegate::close()
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     //m_waitBOF = false;
     m_rtspSession.stop();
     m_lastPacketFlags = -1;
@@ -328,24 +347,11 @@ void QnRtspClientArchiveDelegate::close()
     m_parsers.clear();
 }
 
-void QnRtspClientArchiveDelegate::lockTime(qint64 value)
-{
-    QMutexLocker lock(&m_timeMutex);
-    m_lockedTime = value;
-}
-
-void QnRtspClientArchiveDelegate::unlockTime()
-{
-    QMutexLocker lock(&m_timeMutex);
-    m_lockedTime = qint64(AV_NOPTS_VALUE);
-}
-
 qint64 QnRtspClientArchiveDelegate::startTime() const
 {
-    QMutexLocker lock(&m_timeMutex);
-    if(m_lockedTime != qint64(AV_NOPTS_VALUE))
-        return m_lockedTime;
-    qint64 result = m_globalMinArchiveTime != qint64(AV_NOPTS_VALUE) ? m_globalMinArchiveTime : m_rtspSession.startTime();
+    qint64 result = m_globalMinArchiveTime;
+    if (result == qint64(AV_NOPTS_VALUE))
+        result = m_rtspSession.startTime();
 
     if (result == DATETIME_NOW || result <= qnSyncTime->currentMSecsSinceEpoch()*1000)
         return result;
@@ -379,6 +385,11 @@ void QnRtspClientArchiveDelegate::reopen()
 
 QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
 {
+    if (!m_footageUpToDate.test_and_set()) {
+        if (m_isMultiserverAllowed)
+            checkMinTimeFromOtherServer(m_camera);
+    }
+
     QnAbstractMediaDataPtr result = getNextDataInternal();
     if (!result && !m_blockReopening)
         result = getNextDataInternal(); // try again in case of RTSP reconnect
@@ -681,7 +692,7 @@ void QnRtspClientArchiveDelegate::processMetadata(const quint8* data, int dataSi
 
 QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(quint8* data, int dataSize, int channelNum, qint64* parserPosition)
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     QnAbstractMediaDataPtr result;
 
@@ -840,7 +851,7 @@ void QnRtspClientArchiveDelegate::setupRtspSession(const QnVirtualCameraResource
 
     if (!m_auth.videowall.isNull())
         session->setAdditionAttribute(Qn::VIDEOWALL_GUID_HEADER_NAME, m_auth.videowall.toString().toUtf8());
-    session->setAdditionAttribute(Qn::EC2_RUNTIME_GUID_HEADER_NAME, qnCommon->runningInstanceGUID().toByteArray());
+    session->setAdditionAttribute(Qn::EC2_RUNTIME_GUID_HEADER_NAME, m_runtimeId.toByteArray());
     session->setAdditionAttribute(Qn::EC2_INTERNAL_RTP_FORMAT, "1" );
 
 
@@ -859,4 +870,9 @@ void QnRtspClientArchiveDelegate::setPlayNowModeAllowed(bool value)
     m_playNowModeAllowed = value;
     if (!value)
         m_rtspSession.setUsePredefinedTracks(0);
+}
+
+bool QnRtspClientArchiveDelegate::hasVideo() const
+{
+    return m_camera && m_camera->hasVideo(nullptr);
 }

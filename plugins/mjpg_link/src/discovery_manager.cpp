@@ -22,9 +22,11 @@
 #include "plugin.h"
 
 
-DiscoveryManager::DiscoveryManager()
+DiscoveryManager::DiscoveryManager(nxpt::CommonRefManager* const refManager, 
+                                   nxpl::TimeProvider *const timeProvider)
 :
-    m_refManager( HttpLinkPlugin::instance()->refManager() )
+    m_refManager( refManager ),
+    m_timeProvider( timeProvider )
 {
 }
 
@@ -121,7 +123,7 @@ int DiscoveryManager::fromUpnpData( const char* /*upnpXMLData*/, int /*upnpXMLDa
 
 nxcip::BaseCameraManager* DiscoveryManager::createCameraManager( const nxcip::CameraInfo& info )
 {
-    return new CameraManager( info );
+    return new CameraManager( info, m_timeProvider);
 }
 
 int DiscoveryManager::getReservedModelList( char** /*modelList*/, int* count )

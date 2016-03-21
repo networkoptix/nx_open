@@ -1,6 +1,8 @@
 #ifndef cl_ffmpeg_h2026
 #define cl_ffmpeg_h2026
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <QtGui/QImage>
 
 #include "abstractdecoder.h"
@@ -10,7 +12,7 @@
 #include "dxva/dxva.h"
 #endif
 #include "utils/media/ffmpeg_helper.h"
-
+#include "utils/media/frame_type_extractor.h"
 
 struct AVCodec;
 struct AVCodecContext;
@@ -116,5 +118,7 @@ private:
     qint64 m_prevTimestamp;
     bool m_spsFound;
 };
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif //cl_ffmpeg_h

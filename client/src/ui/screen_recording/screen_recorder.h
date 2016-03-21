@@ -4,6 +4,8 @@
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
 
+#include "recording/stream_recorder.h"
+
 class QGLWidget;
 class QnDesktopDataProviderWrapper;
 class QnStreamRecorder;
@@ -49,7 +51,10 @@ signals:
     void recordingFinished(const QString &recordedFileName);
     void error(const QString &errorMessage);
 private slots:
-    void at_recorder_recordingFinished(int status, const QString &filename);
+    void at_recorder_recordingFinished(
+        const QnStreamRecorder::ErrorStruct &status, 
+        const QString                       &filename
+    );
 private:
     void cleanupRecorder();
 private:

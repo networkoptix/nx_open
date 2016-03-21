@@ -1,5 +1,5 @@
-#ifndef PLUGIN_API_H
-#define PLUGIN_API_H
+#ifndef NX_PLUGIN_API_H
+#define NX_PLUGIN_API_H
 
 
 //!VMS dynamic plugin API (c++)
@@ -8,6 +8,10 @@
     - each plugin MUST export function of type \a nxpl::CreateNXPluginInstanceProc with name \a createNXPluginInstance with "C" linkage
     - each interface MUST inherit \a nxpl::PluginInterface
     - each interface has GUID (\a IID_{interface_name} const non-member of type \a nxpl::NX_GUID)
+
+    Reference counting rules:\n
+    - if method returns pointer to interface derived from nxpl::PluginInterface then nxpl::PluginInterface::addRef is called by that method
+        and nxpl::PluginInterface::releaseRef MUST be called by user to free up resources
 
     \note Use in multithreaded environment:\n
         - \a PluginInterface::releaseRef is not guaranteed to be called from thread that called \a PluginInterface::addRef, 
@@ -44,7 +48,7 @@ namespace nxpl
             \return If not NULL, returned pointer can be safely cast to type, defined by \a interfaceID
             \note This method increments reference counter
         */
-        virtual void* queryInterface( const NX_GUID& interfaceID ) = 0;
+        virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) = 0;
         //!Increment reference counter
         /*!
             \return new reference count
@@ -81,7 +85,7 @@ namespace nxpl
     };
 
     // {E53CF93D-61D3-4261-9D25-9B7B3F3A812B}
-    static const NX_GUID IID_Plugin = { 0xe5, 0x3c, 0xf9, 0x3d, 0x61, 0xd3, 0x42, 0x61, 0x9d, 0x25, 0x9b, 0x7b, 0x3f, 0x3a, 0x81, 0x2b };
+    static const NX_GUID IID_Plugin = { { 0xe5, 0x3c, 0xf9, 0x3d, 0x61, 0xd3, 0x42, 0x61, 0x9d, 0x25, 0x9b, 0x7b, 0x3f, 0x3a, 0x81, 0x2b } };
 
     //!Optional interface with general plugin functions (plugin name, plugin settings)
     /*!
@@ -107,8 +111,24 @@ namespace nxpl
         virtual void setSettings( const nxpl::Setting* settings, int count ) = 0;
     };
 
+    // {100AFC3E-CA63-47FB-9D5D-0440FC59F866}
+    static const NX_GUID IID_Plugin2 = { { 0x10, 0x0a, 0xfc, 0x3e, 0xca, 0x63, 0x47, 0xfb, 0x9d, 0x5d, 0x4, 0x40, 0xfc, 0x59, 0xf8, 0x66 } };
+
+    class Plugin2
+    :
+        public Plugin
+    {
+    public:
+        //!Provides plugin container reference to plugin
+        /*!
+            "Plugin container" is a process that loaded plugin.
+            This reference can be used to access some data and functionality of the container
+        */
+        virtual void setPluginContainer( nxpl::PluginInterface* pluginContainer ) = 0;
+    };
+
     //!Type of plugin entry-point function
     typedef PluginInterface* (*CreateNXPluginInstanceProc)();
 }
 
-#endif  //PLUGIN_API_H
+#endif  //NX_PLUGIN_API_H

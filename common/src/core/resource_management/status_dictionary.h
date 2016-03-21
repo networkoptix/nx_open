@@ -7,6 +7,8 @@ class QnResourceStatusDictionary: public QObject, public Singleton<QnResourceSta
 {
     Q_OBJECT
 public:
+    QnResourceStatusDictionary(QObject *parent = NULL);
+
     Qn::ResourceStatus value(const QnUuid& resourceId) const;
     void setValue(const QnUuid& resourceId, Qn::ResourceStatus status);
     void clear();
@@ -14,7 +16,7 @@ public:
     QMap<QnUuid, Qn::ResourceStatus> values() const;
 private:
     QMap<QnUuid, Qn::ResourceStatus> m_items;
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
 };
 
 #define qnStatusDictionary QnResourceStatusDictionary::instance()

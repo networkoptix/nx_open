@@ -48,6 +48,7 @@ public:
     virtual SocketAddress getLocalAddress() const override;
     virtual void close() override;
     virtual bool isClosed() const override;
+    virtual void shutdown() override;
     virtual bool setReuseAddrFlag( bool reuseAddr ) override;
     virtual bool getReuseAddrFlag( bool* val ) override;
     virtual bool setNonBlockingMode( bool val ) override;
@@ -65,9 +66,9 @@ public:
     virtual bool getLastError(SystemError::ErrorCode* errorCode) override;
     virtual SOCKET_HANDLE handle() const override;
     //!Implementation of AbstractSocket::postImpl
-    virtual bool postImpl( std::function<void()>&& handler ) override;
+    virtual void postImpl( std::function<void()>&& handler ) override;
     //!Implementation of AbstractSocket::dispatchImpl
-    virtual bool dispatchImpl( std::function<void()>&& handler ) override;
+    virtual void dispatchImpl( std::function<void()>&& handler ) override;
     //!Implementation of AbstractSocket::terminateAsyncIO
     virtual void terminateAsyncIO( bool waitForRunningHandlerCompletion ) override;
 
@@ -85,12 +86,13 @@ public:
     //!Implementation of AbstractCommunicatingSocket::cancelAsyncIO
     virtual void cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion ) override;
 
-    enum {
+protected:
+    enum IOMode
+    {
         ASYNC,
         SYNC
     };
 
-protected:
     friend int sock_read(BIO *b, char *out, int outl);
     friend int sock_write(BIO *b, const char *in, int inl);
 
@@ -111,8 +113,10 @@ private:
     // Async version
     int asyncRecvInternal( void* buffer , unsigned int bufferLen );
     int asyncSendInternal( const void* buffer , unsigned int bufferLen );
-    int mode() const;
+    IOMode readMode() const;
+    IOMode writeMode() const;
     void init();
+
 protected:
     Q_DECLARE_PRIVATE(QnSSLSocket);
     QnSSLSocketPrivate *d_ptr;

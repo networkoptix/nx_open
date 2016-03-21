@@ -15,17 +15,6 @@
     </message>
 </context>
 <context>
-    <name>QnActiResource</name>
-    <message>
-        <source>Output %1</source>
-        <translation>Đầu ra %1</translation>
-    </message>
-    <message>
-        <source>Input %1</source>
-        <translation>đầu vào %1</translation>
-    </message>
-</context>
-<context>
     <name>QnBusinessStringsHelper</name>
     <message>
         <source>Motion on Camera</source>
@@ -229,10 +218,6 @@
         <translation>Một sự kiện chưa biết</translation>
     </message>
     <message>
-        <source>Conflict Address: %1</source>
-        <translation>xung đột địa chỉ：%1</translation>
-    </message>
-    <message>
         <source>Connection to server is lost.</source>
         <translation>Kết nối đến máy chủ bị mất.</translation>
     </message>
@@ -253,10 +238,6 @@
     <message>
         <source>Caption: %1</source>
         <translation>Chú thích: %1</translation>
-    </message>
-    <message>
-        <source>Input port: %1</source>
-        <translation>Cổng đầu vào: %1</translation>
     </message>
     <message>
         <source>MAC #%1: %2 </source>
@@ -340,10 +321,6 @@
         <translation>Máy ảnh %1 đã được ngắt kết nối</translation>
     </message>
     <message>
-        <source>IO Module %1 was disconnected</source>
-        <translation>IO Mô-đun %1 đã được ngắt kết nối</translation>
-    </message>
-    <message>
         <source>Device IP Conflict at %1</source>
         <extracomment>Device IP Conflict at &lt;server_name&gt;</extracomment>
         <translation>Thiết bị IP xung đột tại %1</translation>
@@ -366,8 +343,76 @@
         <translation>Ghi âm trên máy ảnh bị vô hiệu hóa:</translation>
     </message>
     <message>
-        <source>Recording on IO modules is disabled:</source>
-        <translation>Ghi trên các module IO là người khuyết tật:</translation>
+        <source>Execute PTZ preset</source>
+        <translation>Thực PTZ cài sẵn</translation>
+    </message>
+    <message>
+        <source>Show text overlay</source>
+        <translation>Hiện lớp phủ văn bản</translation>
+    </message>
+    <message>
+        <source>Show on Alarm Layout</source>
+        <translation>Hiển thị trên diện cảnh báo</translation>
+    </message>
+    <message>
+        <source>Archive backup finished</source>
+        <translation>Lưu trữ bản sao lưu đã hoàn thành</translation>
+    </message>
+    <message>
+        <source>Server &apos;%1&apos; has finished an archive backup</source>
+        <translation>Server &apos;%1&apos; đã hoàn thành một bản sao lưu kho lưu trữ</translation>
+    </message>
+    <message>
+        <source>Generic Event at %1</source>
+        <translation>Sự kiện Generic %1</translation>
+    </message>
+    <message>
+        <source>Input Port: %1</source>
+        <translation>cổng đầu vào: %1</translation>
+    </message>
+    <message>
+        <source>Archive backup is successfully completed</source>
+        <translation>Lưu trữ bản sao lưu hoàn tất thành công</translation>
+    </message>
+    <message>
+        <source>I/O Module %1 was disconnected</source>
+        <translation>I / O Module %1 đã bị ngắt kết nối</translation>
+    </message>
+    <message>
+        <source>Conflicting Address: %1</source>
+        <translation>Mâu thuẫn Địa chỉ: %1</translation>
+    </message>
+    <message>
+        <source>Archive backup failed: No available backup storages with sufficient free space</source>
+        <translation>Lưu trữ bản sao lưu không: Không có kho sao lưu có sẵn với dung lượng trống đủ</translation>
+    </message>
+    <message>
+        <source>Archive backup failed: Target storage failure</source>
+        <translation>Lưu trữ bản sao lưu không: mục tiêu Lỗi lưu trữ</translation>
+    </message>
+    <message>
+        <source>Archive backup failed: Source file open/read error</source>
+        <translation>Lưu trữ bản sao lưu không: tập tin nguồn mở / đọc lỗi</translation>
+    </message>
+    <message>
+        <source>Archive backup failed: Target file create/write error</source>
+        <translation>Lưu trữ bản sao lưu không: tập tin mục tiêu tạo / ghi lỗi</translation>
+    </message>
+    <message>
+        <source>Archive backup failed: File catalog error</source>
+        <translation>Lưu trữ bản sao lưu không: Danh mục tập tin lỗi</translation>
+    </message>
+    <message>
+        <source>Archive backup finished, but isn&apos;t fully completed because backup time is over. Data is backed up to %1</source>
+        <translation>Lưu trữ bản sao lưu hoàn tất, nhưng không hoàn thành đầy đủ vì thời gian dự phòng là hơn. Dữ liệu được sao lưu vào %1</translation>
+    </message>
+    <message>
+        <source>Archive backup is canceled by user. Data is backed up to %1</source>
+        <translation>sao lưu kho lưu trữ được hủy bỏ bởi người dùng. Dữ liệu được sao lưu vào %1</translation>
+    </message>
+    <message>
+        <source>Recording on I/O modules is disabled:</source>
+        <translation>Ghi trên I / O module là người khuyết tật:</translation>
     </message>
 </context>
 <context>
@@ -457,20 +502,12 @@
         <translation>Hãy cố gắng để khởi động lại máy, sau đó khôi phục mặc định nhà máy trên các trang web.</translation>
     </message>
     <message>
-        <source>Please try to reboot the IO module, then restore factory defaults on the web-page.</source>
-        <translation>Hãy cố gắng để khởi động lại các module IO, sau đó khôi phục mặc định nhà máy trên các trang web.</translation>
-    </message>
-    <message>
         <source>Make sure the device is plugged into the network. Try to reboot the device.</source>
         <translation>Hãy chắc chắn rằng thiết bị được cắm vào mạng. Hãy thử khởi động lại thiết bị.</translation>
     </message>
     <message>
         <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
         <translation>Hãy chắc chắn rằng các camera được cắm vào mạng. Hãy thử khởi động lại máy ảnh.</translation>
-    </message>
-    <message>
-        <source>Make sure the IO module is plugged into the network. Try to reboot the IO module.</source>
-        <translation>Hãy chắc chắn rằng các mô-đun IO được cắm vào mạng. Hãy thử khởi động lại các module IO.</translation>
     </message>
     <message>
         <source>Make sure port %2 is accessible (e.g. forwarded).</source>
@@ -485,10 +522,6 @@
         <translation>Không thể phân tích ứng của máy ảnh. Url %1, yêu cầu tên %2.</translation>
     </message>
     <message>
-        <source>Could not parse IO module response. Url %1, request name %2.</source>
-        <translation>Không thể phân tích IO module đáp trả. Url %1, yêu cầu tên %2.</translation>
-    </message>
-    <message>
         <source>Not authorized. Url %1.</source>
         <translation>Không được cho phép. Url %1.</translation>
     </message>
@@ -501,20 +534,12 @@
         <translation>Đầu tiên, hãy thử bật ghi âm (nếu nó tắt) và giảm fps trong cài đặt camera.</translation>
     </message>
     <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in IO module settings.</source>
-        <translation>Đầu tiên, hãy thử bật ghi âm (nếu nó tắt) và giảm fps trong cài đặt mô-đun IO.</translation>
-    </message>
-    <message>
         <source>If it doesn&apos;t help, restore factory defaults on the device web-page.</source>
         <translation>Nếu nó không giúp, phục hồi mặc định nhà máy trên thiết bị web-page.</translation>
     </message>
     <message>
         <source>If it doesn&apos;t help, restore factory defaults on the camera web-page.</source>
         <translation>Nếu nó không giúp, phục hồi mặc định nhà máy trên máy ảnh web-page.</translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the IO module web-page.</source>
-        <translation>Nếu nó không giúp, phục hồi mặc định nhà máy trên các module web-page IO.</translation>
     </message>
     <message>
         <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
@@ -525,20 +550,12 @@
         <translation>Yêu cầu máy ảnh &quot;%1&quot; thất bại với lỗi &quot;%2&quot;.</translation>
     </message>
     <message>
-        <source>IO Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-        <translation>IO đun yêu cầu &quot;%1&quot; thất bại với lỗi &quot;%2&quot;.</translation>
-    </message>
-    <message>
         <source>Unknown device issue.</source>
         <translation>Không biết vấn đề thiết bị.</translation>
     </message>
     <message>
         <source>Unknown camera issue.</source>
         <translation>Không biết vấn đề camera.</translation>
-    </message>
-    <message>
-        <source>Unknown IO module issue.</source>
-        <translation>chưa biết IO mô-đun vấn đề.</translation>
     </message>
     <message>
         <source>Invalid data was received from the device %1.</source>
@@ -549,10 +566,6 @@
         <translation>Dữ liệu không hợp lệ đã nhận được từ các camera %1.</translation>
     </message>
     <message>
-        <source>Invalid data was received from the IO module %1.</source>
-        <translation>Dữ liệu không hợp lệ đã nhận được từ các mô-đun IO %1.</translation>
-    </message>
-    <message>
         <source>Too many media errors. Please open device issues dialog for more details.</source>
         <translation>Quá nhiều phương tiện truyền thông lỗi. Hãy mở những vấn đề thiết bị thoại để biết thêm chi tiết.</translation>
     </message>
@@ -561,20 +574,56 @@
         <translation>Quá nhiều phương tiện truyền thông lỗi. Hãy mở những vấn đề camera thoại để biết thêm chi tiết.</translation>
     </message>
     <message>
-        <source>Too many media errors. Please open IO module issues dialog for more details.</source>
-        <translation>Quá nhiều phương tiện truyền thông lỗi. Hãy mở IO vấn đề mô-đun thoại để biết thêm chi tiết.</translation>
+        <source>Camera plugin error. %1</source>
+        <translation>Máy ảnh Plugin lỗi. %1</translation>
     </message>
     <message>
-        <source>Device initialization process in progress.</source>
-        <translation>Thiết bị quá trình khởi tạo trong tiến trình.</translation>
+        <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
+        <translation>Hãy cố gắng để khởi động lại các  I / O module, sau đó khôi phục mặc định nhà máy trên các trang web.</translation>
     </message>
     <message>
-        <source>Camera initialization process in progress.</source>
-        <translation>Quá trình khởi tạo camera trong tiến trình.</translation>
+        <source>Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</source>
+        <translation>Hãy chắc chắn rằng các I / O module được cắm vào mạng. Hãy thử khởi động lại các I / O module.</translation>
     </message>
     <message>
-        <source>IO Module initialization process in progress.</source>
-        <translation>Quá trình khởi tạo IO Module trong tiến trình.</translation>
+        <source>Could not parse I/O module response. Url %1, request name %2.</source>
+        <translation>Không thể phân tích tôi phản ứng I / Omodule. Url %1, yêu cầu tên %2.</translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in I/O module settings.</source>
+        <translation>Đầu tiên, hãy thử bật ghi âm (nếu mình off) và giảm fps trong cài đặt I / O module tôi.</translation>
+    </message>
+    <message>
+        <source>If it doesn&apos;t help, restore factory defaults on the I/O module web-page.</source>
+        <translation>Đầu tiên, hãy thử bật ghi âm (nếu nó tắt) và giảm fps trong cài đặt I / O module tôi.</translation>
+    </message>
+    <message>
+        <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
+        <translation>I / O Module yêu cầu &quot;%1&quot; thất bại với lỗi &quot;%2&quot;.</translation>
+    </message>
+    <message>
+        <source>Unknown I/O module issue.</source>
+        <translation>Không biết I / O module vấn đề.</translation>
+    </message>
+    <message>
+        <source>Invalid data was received from the I/O module %1.</source>
+        <translation>dữ liệu không hợp lệ đã nhận được từ các I / O module %1.</translation>
+    </message>
+    <message>
+        <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
+        <translation>Quá nhiều lỗi phương tiện truyền thông. Hãy mở tôi vấn đề I / O module thoại để biết thêm chi tiết.</translation>
+    </message>
+    <message>
+        <source>Device initialization process is in progress.</source>
+        <translation>quá trình khởi tạo thiết bị được tiến hành.</translation>
+    </message>
+    <message>
+        <source>Camera initialization process is in progress.</source>
+        <translation>quá trình khởi tạo máy ảnh được tiến hành.</translation>
+    </message>
+    <message>
+        <source>I/O Module initialization process is in progress.</source>
+        <translation>I / O Module khởi tạo quá trình được tiến hành.</translation>
     </message>
 </context>
 <context>
@@ -595,8 +644,8 @@
         <translation>Không thể tìm thấy con đường thực hiện explorer.exe của Windows Explorer.</translation>
     </message>
     <message>
-        <source>Launching file explorer failed.</source>
-        <translation>thực hiện Windows Explorer thất bại.</translation>
+        <source>File explorer failed to open.</source>
+        <translation>Thám hiểm tập tin không mở.</translation>
     </message>
 </context>
 <context>
@@ -610,11 +659,11 @@
         <translation>không thể tìm thấy %1 Một bộ mã hóa để mã hóa.</translation>
     </message>
     <message>
-        <source>Could not initialise audio encoder.</source>
-        <translation>Không thể khởi tạo các bộ mã hóa giọng nói.</translation>
+        <source>Could not initialize audio encoder.</source>
+        <translation>Không thể khởi tạo bộ mã hóa âm thanh.</translation>
     </message>
     <message>
-        <source>Could not initialise audio decoder.</source>
+        <source>Could not initialize audio decoder.</source>
         <translation>Không thể khởi tạo bộ giải mã âm thanh.</translation>
     </message>
 </context>
@@ -652,7 +701,7 @@
         <translation>không thể tìm thấy %1 Một bộ mã hóa để mã hóa.</translation>
     </message>
     <message>
-        <source>Could not initialise video encoder.</source>
+        <source>Could not initialize video encoder.</source>
         <translation>Không thể khởi tạo bộ mã hóa video.</translation>
     </message>
 </context>
@@ -798,14 +847,6 @@
         </translation>
     </message>
     <message>
-        <source>There was a problem activating your license key. Invalid data received. Please contact support team to report issue.</source>
-        <translation>Có một vấn đề kích hoạt key bản quyền của bạn. Dữ liệu không hợp lệ nhận được. Hãy liên hệ với nhóm hỗ trợ để báo cáo vấn đề.</translation>
-    </message>
-    <message>
-        <source>There was a problem activating your license key. A database error has occurred.</source>
-        <translation>Có một vấn đề kích hoạt key bản quyền của bạn. Lỗi cơ sở dữ đã xảy ra.</translation>
-    </message>
-    <message>
         <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
         <translation>Key bản quyền mà bạn đã nhập không hợp lệ. Hãy kiểm tra xem key bản quyền được nhập chính xác. Nếu vấn đề vẫn tiếp tục, vui lòng liên hệ với nhóm hỗ trợ để xác nhận nếu key bản quyền là hợp lệ hoặc để có được một chìa khóa giấy phép hợp lệ.</translation>
     </message>
@@ -817,33 +858,20 @@
         <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
         <translation>Key bản quyền này trước đó đã được kích hoạt cho phần cứng id {{}} HWID vào {{}} thời gian. Hãy liên hệ với nhóm hỗ trợ để có được một chìa khóa giấy phép hợp lệ.</translation>
     </message>
+    <message>
+        <source>There was a problem activating your license key. A database error occurred.</source>
+        <translation>Có một vấn đề kích hoạt key bản quyền của bạn. xảy ra một lỗi cơ sở dữ liệu.</translation>
+    </message>
+    <message>
+        <source>There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.</source>
+        <translation>Có một vấn đề kích hoạt key bản quyền của bạn. dữ liệu không hợp lệ nhận được. Hãy liên hệ với nhóm hỗ trợ để báo cáo vấn đề.</translation>
+    </message>
 </context>
 <context>
     <name>QnMediaServerResource</name>
     <message>
         <source>Server</source>
         <translation>máy chủ</translation>
-    </message>
-</context>
-<context>
-    <name>QnNewDWPtzController</name>
-    <message>
-        <source>Preset #</source>
-        <translation>cài sẵn #</translation>
-    </message>
-</context>
-<context>
-    <name>QnPlAxisResource</name>
-    <message>
-        <source>Can&apos;t initialize IO port settings</source>
-        <translation>Không thể khởi tạo cài đặt cổng IO</translation>
-    </message>
-</context>
-<context>
-    <name>QnPlOnvifResource</name>
-    <message>
-        <source>Otput %1</source>
-        <translation>Đầu ra %1</translation>
     </message>
 </context>
 <context>
@@ -865,18 +893,6 @@
         <source>%n camera(s)</source>
         <translation>
             <numerusform>%n máy chụp hình</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n IO Module(s)</source>
-        <translation>
-            <numerusform>%n IO Module(s)</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n IO module(s)</source>
-        <translation>
-            <numerusform>%n IO module(s)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -908,22 +924,6 @@
         <translation>máy chụp hình</translation>
     </message>
     <message>
-        <source>IO Modules</source>
-        <translation>IO Modules</translation>
-    </message>
-    <message>
-        <source>IO modules</source>
-        <translation>IO modules</translation>
-    </message>
-    <message>
-        <source>IO Module</source>
-        <translation>IO Module</translation>
-    </message>
-    <message>
-        <source>IO module</source>
-        <translation>IO module</translation>
-    </message>
-    <message>
         <source>Devices</source>
         <translation>thiết bị</translation>
     </message>
@@ -938,6 +938,34 @@
     <message>
         <source>device</source>
         <translation>thiết bị</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n I/O Module(s)</source>
+        <translation>
+            <numerusform>%n I/O Module(s)</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n I/O module(s)</source>
+        <translation>
+            <numerusform>%n I/O module(s)</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>I/O Modules</source>
+        <translation>I/O Modules</translation>
+    </message>
+    <message>
+        <source>I/O modules</source>
+        <translation>I/O modules</translation>
+    </message>
+    <message>
+        <source>I/O Module</source>
+        <translation>I/O Module</translation>
+    </message>
+    <message>
+        <source>I/O module</source>
+        <translation>I/O module</translation>
     </message>
 </context>
 <context>
@@ -1063,108 +1091,9 @@
         <source>Error during watermark generation for file &apos;%1&apos;.</source>
         <translation>Lỗi trong hệ watermark cho tập tin %1.</translation>
     </message>
-</context>
-<context>
-    <name>QnSystemHealthStringsHelper</name>
     <message>
-        <source>No licenses</source>
-        <translation>Không có ủy quyền hợp lệ</translation>
-    </message>
-    <message>
-        <source>Email address is not set</source>
-        <translation>Địa chỉ email không được thiết lập</translation>
-    </message>
-    <message>
-        <source>Email server is not set</source>
-        <translation>Máy chủ email không được thiết lập</translation>
-    </message>
-    <message>
-        <source>Some users have not set their email addresses</source>
-        <translation>Một số người dùng đã không được thiết lập địa chỉ email của họ</translation>
-    </message>
-    <message>
-        <source>Connection to server lost</source>
-        <translation>Kết nối đến máy chủ bị mất</translation>
-    </message>
-    <message>
-        <source>Error while sending email</source>
-        <translation>Lỗi trong khi gửi email</translation>
-    </message>
-    <message>
-        <source>Email address is not set for user %1</source>
-        <translation>Địa chỉ email không được thiết lập cho người dùng %1</translation>
-    </message>
-    <message>
-        <source>Select server for others to synchronize time with</source>
-        <translation>Chọn máy chủ cho những người khác để đồng bộ thời gian với</translation>
-    </message>
-    <message>
-        <source>Rebuilding archive index is completed</source>
-        <translation>Xây dựng lại chỉ mục lưu trữ được hoàn thành</translation>
-    </message>
-    <message>
-        <source>Email address is not set.</source>
-        <translation>Địa chỉ email không được thiết lập.</translation>
-    </message>
-    <message>
-        <source>You cannot receive system notifications via email.</source>
-        <translation>Bạn không thể nhận được các thông báo hệ thống thông qua email.</translation>
-    </message>
-    <message>
-        <source>Email server is not set.</source>
-        <translation>Máy chủ email không được thiết lập.</translation>
-    </message>
-    <message>
-        <source>Some users have not set their email addresses.</source>
-        <translation>Một số người dùng đã không được thiết lập địa chỉ email của họ.</translation>
-    </message>
-    <message>
-        <source>They cannot receive system notifications via email.</source>
-        <translation>Họ không thể nhận được các thông báo hệ thống thông qua email.</translation>
-    </message>
-    <message>
-        <source>Storages are full on the following Server:</source>
-        <translation>Kho có đầy đủ trên máy chủ sau đây:</translation>
-    </message>
-    <message>
-        <source>Storages are not configured on the following Server:</source>
-        <translation>Kho không được cấu hình trên máy chủ sau đây:</translation>
-    </message>
-    <message>
-        <source>You have no licenses.</source>
-        <translation>Bạn không có giấy phép.</translation>
-    </message>
-    <message>
-        <source>You cannot record video from cameras.</source>
-        <translation>Bạn không có thể ghi lại video từ máy ảnh.</translation>
-    </message>
-    <message>
-        <source>Rebuilding archive index is completed on the following Server:</source>
-        <translation>Xây dựng lại chỉ mục lưu trữ được hoàn thành trên máy chủ sau đây:</translation>
-    </message>
-    <message>
-        <source>Storage is full</source>
-        <translation>Lưu trữ đầy</translation>
-    </message>
-    <message>
-        <source>Storage is not configured</source>
-        <translation>Thiết bị lưu trữ không được thiết lập</translation>
-    </message>
-    <message>
-        <source>Server times are not synchronized and a common time could not be detected automatically.</source>
-        <translation>Lần máy chủ không đồng bộ và một thời gian chung không thể được phát hiện tự động.</translation>
-    </message>
-    <message>
-        <source>System is in safe mode</source>
-        <translation>Hệ thống đang ở chế độ an toàn</translation>
-    </message>
-    <message>
-        <source>The system is running in safe mode.</source>
-        <translation>Hệ thống đang chạy trong chế độ an toàn.</translation>
-    </message>
-    <message>
-        <source>Any configuration changes except license activation are impossible.</source>
-        <translation>Bất kỳ thay đổi cấu hình, ngoại trừ kích hoạt giấy phép là không thể.</translation>
+        <source>File write error. Not enough free space.</source>
+        <translation>Nộp ghi lỗi. Không đủ không gian trống.</translation>
     </message>
 </context>
 <context>
@@ -1195,17 +1124,6 @@
     </message>
 </context>
 <context>
-    <name>QnThirdPartyResource</name>
-    <message>
-        <source>Otput %1</source>
-        <translation>Đầu ra %1</translation>
-    </message>
-    <message>
-        <source>Input %1</source>
-        <translation>đầu vào %1</translation>
-    </message>
-</context>
-<context>
     <name>QnTranscoder</name>
     <message>
         <source>OpenCL transcoding is not implemented.</source>
@@ -1233,6 +1151,13 @@
     <message>
         <source>%1 (external)</source>
         <translation>%1 (ngoài)</translation>
+    </message>
+</context>
+<context>
+    <name>utils::QnCameraNamesWatcher</name>
+    <message>
+        <source>Removed camera</source>
+        <translation>Di chuyển máy ảnh</translation>
     </message>
 </context>
 </TS>

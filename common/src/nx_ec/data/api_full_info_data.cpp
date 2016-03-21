@@ -5,7 +5,6 @@
 #include "api_user_data.h"
 #include "api_videowall_data.h"
 #include "api_update_data.h"
-#include "api_module_data.h"
 #include "api_discovery_data.h"
 #include "api_routing_data.h"
 #include "api_system_name_data.h"
@@ -19,13 +18,12 @@
 #include "api_business_rule_data.h"
 #include "api_camera_data.h"
 #include "api_camera_attributes_data.h"
-#include "api_camera_server_item_data.h"
-#include "api_camera_bookmark_data.h"
+#include "api_camera_history_data.h"
 #include "api_email_data.h"
 #include "api_layout_data.h"
 #include "api_peer_system_time_data.h"
 
 
 namespace ec2 {
-    QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((ApiFullInfoData), (ubjson)(xml)(json)(sql_record)(csv_record), _Fields)
+    QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((ApiFullInfoData), (ubjson)(xml)(json)(sql_record)(csv_record), _Fields, (optional, true))
 } // namespace ec2

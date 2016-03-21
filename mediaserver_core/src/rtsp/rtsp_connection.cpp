@@ -11,7 +11,7 @@
 #include "libavcodec/avcodec.h"
 
 #include "rtsp_connection.h"
-#include "utils/network/rtp_stream_parser.h"
+#include "network/rtp_stream_parser.h"
 #include "core/dataconsumer/abstract_data_consumer.h"
 #include "utils/media/ffmpeg_helper.h"
 #include "core/dataprovider/media_streamdataprovider.h"
@@ -20,11 +20,11 @@
 #include "plugins/resource/archive/archive_stream_reader.h"
 #include <utils/common/string.h>
 
-#include "utils/network/tcp_connection_priv.h"
+#include "network/tcp_connection_priv.h"
 #include "utils/network/rtsp/rtsp_types.h"
 #include "plugins/resource/archive/abstract_archive_delegate.h"
 #include "camera/camera_pool.h"
-#include "utils/network/rtpsession.h"
+#include "network/rtpsession.h"
 #include "recorder/recording_manager.h"
 #include "utils/common/util.h"
 #include "rtsp_data_consumer.h"
@@ -38,7 +38,7 @@
 #include "rtsp/rtsp_ffmpeg_encoder.h"
 #include "rtp_universal_encoder.h"
 #include "utils/common/synctime.h"
-#include "utils/network/tcp_listener.h"
+#include "network/tcp_listener.h"
 #include "network/authenticate_helper.h"
 #include <media_server/settings.h>
 #include <utils/common/model_functions.h>
@@ -47,6 +47,7 @@
 #include "media_server/settings.h"
 #include "streaming/streaming_params.h"
 #include "media_server/settings.h"
+#include <utils/common/log.h>
 
 class QnTcpListener;
 
@@ -63,7 +64,7 @@ enum Mode {Mode_Live, Mode_Archive, Mode_ThumbNails};
 static const int DEFAULT_RTSP_TIMEOUT = 60; // in seconds
 const QString RTSP_CLOCK_FORMAT(QLatin1String("yyyyMMddThhmmssZ"));
 
-QMutex RtspServerTrackInfo::m_createSocketMutex;
+QnMutex RtspServerTrackInfo::m_createSocketMutex;
 
 bool updatePort(AbstractDatagramSocket* &socket, int port)
 {
@@ -75,7 +76,7 @@ bool updatePort(AbstractDatagramSocket* &socket, int port)
 bool RtspServerTrackInfo::openServerSocket(const QString& peerAddress)
 {
     // try to find a couple of port, even for RTP, odd for RTCP
-    QMutexLocker lock(&m_createSocketMutex);
+    QnMutexLocker lock( &m_createSocketMutex );
     mediaSocket = SocketFactory::createDatagramSocket();
     rtcpSocket = SocketFactory::createDatagramSocket();
 
@@ -197,7 +198,7 @@ public:
     qint64 startTime; // time from last range header
     qint64 endTime;   // time from last range header
     double rtspScale; // RTSP playing speed (1 - normal speed, 0 - pause, >1 fast forward, <-1 fast back e. t.c.)
-    QMutex mutex;
+    QnMutex mutex;
     int lastPlayCSeq;
     MediaQuality quality;
     bool qualityFastSwitch;
@@ -389,14 +390,52 @@ void QnRtspConnectionProcessor::initResponse(int code, const QString& message)
 void QnRtspConnectionProcessor::generateSessionId()
 {
     Q_D(QnRtspConnectionProcessor);
-    d->sessionId = QString::number((long) d->socket.data());
+    d->sessionId = QString::number((unsigned long) d->socket.data());
     d->sessionId += QString::number(rand());
 }
 
 
-void QnRtspConnectionProcessor::sendResponse(int code)
+void QnRtspConnectionProcessor::sendResponse(int httpStatusCode, const QByteArray& contentType)
 {
-    QnTCPConnectionProcessor::sendResponse(code, "application/sdp", "", "", true);
+    Q_D(QnTCPConnectionProcessor);
+
+    d->response.statusLine.version = d->request.requestLine.version;
+    d->response.statusLine.statusCode = httpStatusCode;
+    d->response.statusLine.reasonPhrase = 
+        nx_http::StatusCode::toString((nx_http::StatusCode::Value)httpStatusCode);
+
+    nx_http::insertOrReplaceHeader(
+        &d->response.headers,
+        nx_http::HttpHeader("Server", nx_http::serverString()));
+    nx_http::insertOrReplaceHeader(
+        &d->response.headers,
+        nx_http::HttpHeader("Date", dateTimeToHTTPFormat(QDateTime::currentDateTime())));
+
+    if (!contentType.isEmpty())
+        nx_http::insertOrReplaceHeader(
+            &d->response.headers,
+            nx_http::HttpHeader("Content-Type", contentType));
+    if (!d->response.messageBody.isEmpty())
+        nx_http::insertOrReplaceHeader(
+            &d->response.headers,
+            nx_http::HttpHeader(
+                "Content-Length",
+                QByteArray::number(d->response.messageBody.size())));
+
+    const QByteArray response = d->response.toString();
+
+    NX_LOG(lit("Server response to %1:\n%2").
+        arg(d->socket->getForeignAddress().address.toString()).
+        arg(QString::fromLatin1(response)),
+        cl_logDEBUG1);
+
+    NX_LOG(QnLog::HTTP_LOG_INDEX,
+        lit("Sending response to %1:\n%2\n-------------------\n\n\n").
+        arg(d->socket->getForeignAddress().toString()).
+        arg(QString::fromLatin1(response)), cl_logDEBUG1);
+
+    QnMutexLocker lock(&d->sockMutex);
+    sendData(response.constData(), response.size());
 }
 
 int QnRtspConnectionProcessor::getMetadataChannelNum() const
@@ -697,13 +736,6 @@ int QnRtspConnectionProcessor::composeDescribe()
         {
             QnRtspFfmpegEncoder* ffmpegEncoder = new QnRtspFfmpegEncoder();
             encoder = QnRtspEncoderPtr(ffmpegEncoder);
-            if (i >= numVideo) 
-            {
-                QnConstAbstractMediaDataPtr media = getCameraData(i < numVideo ? QnAbstractMediaData::VIDEO : QnAbstractMediaData::AUDIO);
-                if (media)
-                    ffmpegEncoder->setCodecContext(media->context);
-            }
-
         }
         else {
             QnConstAbstractMediaDataPtr media = getCameraData(i < numVideo ? QnAbstractMediaData::VIDEO : QnAbstractMediaData::AUDIO);
@@ -908,7 +940,7 @@ void QnRtspConnectionProcessor::processRangeHeader()
 void QnRtspConnectionProcessor::at_camera_resourceChanged(const QnResourcePtr & /*resource*/)
 {
     Q_D(QnRtspConnectionProcessor);
-    QMutexLocker lock(&d->mutex);
+    QnMutexLocker lock( &d->mutex );
 
     QnVirtualCameraResourcePtr cameraResource = qSharedPointerDynamicCast<QnVirtualCameraResource>(d->mediaRes);
     if (cameraResource) {
@@ -926,7 +958,7 @@ void QnRtspConnectionProcessor::at_camera_parentIdChanged(const QnResourcePtr & 
 {
     Q_D(QnRtspConnectionProcessor);
 
-    QMutexLocker lock(&d->mutex);
+    QnMutexLocker lock( &d->mutex );
     if (d->mediaRes && d->mediaRes->toResource()->hasFlags(Qn::foreigner)) {
         m_needStop = true;
         d->socket->close();
@@ -944,6 +976,8 @@ void QnRtspConnectionProcessor::createDataProvider()
 
     if (!d->dataProcessor) {
         d->dataProcessor = new QnRtspDataConsumer(this);
+        if (d->mediaRes)
+            d->dataProcessor->setResource(d->mediaRes->toResourcePtr());
         d->dataProcessor->pauseNetwork();
         int speed = 1;  //real time
         if( d->useProprietaryFormat )
@@ -1165,7 +1199,7 @@ int QnRtspConnectionProcessor::composePlay()
     if (d->liveMode == Mode_Live) 
     {
         auto camera = qnCameraPool->getVideoCamera(getResource()->toResourcePtr());
-        QMutexLocker dataQueueLock(d->dataProcessor->dataQueueMutex());
+        QnMutexLocker dataQueueLock(d->dataProcessor->dataQueueMutex());
 
         int copySize = 0;
         if (!getResource()->toResource()->hasFlags(Qn::foreigner) && (status == Qn::Online || status == Qn::Recording)) {
@@ -1304,7 +1338,7 @@ int QnRtspConnectionProcessor::composeSetParameter()
             if (d->liveMode == Mode_Live)
             {
                 auto camera = qnCameraPool->getVideoCamera(getResource()->toResourcePtr());
-                QMutexLocker dataQueueLock(d->dataProcessor->dataQueueMutex());
+                QnMutexLocker dataQueueLock(d->dataProcessor->dataQueueMutex());
 
                 d->dataProcessor->setLiveQuality(d->quality);
 
@@ -1354,7 +1388,7 @@ int QnRtspConnectionProcessor::composeGetParameter()
 void QnRtspConnectionProcessor::processRequest()
 {
     Q_D(QnRtspConnectionProcessor);
-    QMutexLocker lock(&d->mutex);
+    QnMutexLocker lock( &d->mutex );
 
     if (d->dataProcessor)
         d->dataProcessor->pauseNetwork();
@@ -1364,6 +1398,7 @@ void QnRtspConnectionProcessor::processRequest()
         generateSessionId();
     int code = CODE_OK;
     initResponse();
+    QByteArray contentType;
     if (method == "OPTIONS")
     {
         d->response.headers.insert( std::make_pair("Public", "DESCRIBE, SETUP, TEARDOWN, PLAY, PAUSE, GET_PARAMETER, SET_PARAMETER") );
@@ -1371,6 +1406,7 @@ void QnRtspConnectionProcessor::processRequest()
     else if (method == "DESCRIBE")
     {
         code = composeDescribe();
+        contentType = "application/sdp";
     }
     else if (method == "SETUP")
     {
@@ -1391,12 +1427,14 @@ void QnRtspConnectionProcessor::processRequest()
     else if (method == "GET_PARAMETER")
     {
         code = composeGetParameter();
+        contentType = "text/parameters";
     }
     else if (method == "SET_PARAMETER")
     {
         code = composeSetParameter();
+        contentType = "text/parameters";
     }
-    sendResponse(code);
+    sendResponse(code, contentType);
     if (d->dataProcessor)
         d->dataProcessor->resumeNetwork();
 }
@@ -1438,7 +1476,7 @@ void QnRtspConnectionProcessor::run()
         {
             if(qnAuthHelper->authenticate(d->request, d->response) != Qn::Auth_OK)
             {
-                sendResponse(CODE_AUTH_REQUIRED);
+                sendResponse(CODE_AUTH_REQUIRED, QByteArray());
                 if (readRequest()) 
                     parseRequest();
                 else {

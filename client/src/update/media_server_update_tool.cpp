@@ -15,7 +15,7 @@
 #include <update/task/check_update_peer_task.h>
 
 #include <client/client_settings.h>
-#include <client/client_message_processor.h>
+#include <client/desktop_client_message_processor.h>
 
 #include <utils/common/app_info.h>
 
@@ -27,9 +27,12 @@ namespace {
     const bool defaultEnableClientUpdates = true;
     #endif
 
-    QnSoftwareVersion getCurrentVersion() {
+    QnSoftwareVersion getCurrentVersion()
+    {
         QnSoftwareVersion minimalVersion = qnCommon->engineVersion();
-        foreach (const QnMediaServerResourcePtr &server, qnResPool->getAllServers()) {
+        const auto allServers = qnResPool->getAllServers(Qn::AnyStatus);
+        for(const QnMediaServerResourcePtr &server: allServers)
+        {
             if (server->getVersion() < minimalVersion)
                 minimalVersion = server->getVersion();
         }
@@ -90,7 +93,7 @@ void QnMediaServerUpdateTool::setStage(QnFullUpdateStage stage) {
 }
 
 void QnMediaServerUpdateTool::setStageProgress(int progress) {
-    emit stageProgressChanged(m_stage, progress);    
+    emit stageProgressChanged(m_stage, progress);
 }
 
 
@@ -138,14 +141,14 @@ QnMediaServerResourceList QnMediaServerUpdateTool::actualTargets() const {
     }
 
     foreach (const QnMediaServerResourcePtr &server, qnResPool->getAllIncompatibleResources().filtered<QnMediaServerResource>()) {
-        if (server->getSystemName() == qnCommon->localSystemName() && server->getStatus() == Qn::Incompatible)
+        if (server->getSystemName() == qnCommon->localSystemName() && QnMediaServerResource::isFakeServer(server))
             result.append(server);
     }
     return result;
 }
 
 QSet<QnUuid> QnMediaServerUpdateTool::actualTargetIds() const {
-    QSet<QnUuid> targets;        
+    QSet<QnUuid> targets;
     foreach (const QnMediaServerResourcePtr &server, actualTargets())
         targets.insert(server->getId());
     return targets;
@@ -248,8 +251,10 @@ void QnMediaServerUpdateTool::startUpdate(const QnUpdateTarget &target) {
         return;
 
     QSet<QnUuid> incompatibleTargets;
+    bool clearTargetsWhenFinished = false;
 
     if (m_targets.isEmpty()) {
+        clearTargetsWhenFinished = true;
         setTargets(target.targets, defaultEnableClientUpdates);
         for (const QnUuid &id: target.targets) {
             QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id).dynamicCast<QnMediaServerResource>();
@@ -259,7 +264,7 @@ void QnMediaServerUpdateTool::startUpdate(const QnUpdateTarget &target) {
             if (realId.isNull())
                 continue;
             incompatibleTargets.insert(realId);
-            qnClientMessageProcessor->incompatibleServerWatcher()->keepServer(realId, true);
+            qnDesktopClientMessageProcessor->incompatibleServerWatcher()->keepServer(realId, true);
         }
     }
 
@@ -270,11 +275,13 @@ void QnMediaServerUpdateTool::startUpdate(const QnUpdateTarget &target) {
     connect(m_updateProcess, &QnUpdateProcess::peerStageProgressChanged,        this, &QnMediaServerUpdateTool::setPeerStageProgress);
     connect(m_updateProcess, &QnUpdateProcess::updateFinished,                  this, &QnMediaServerUpdateTool::finishUpdate);
     connect(m_updateProcess, &QnUpdateProcess::targetsChanged,                  this, &QnMediaServerUpdateTool::targetsChanged);
-    connect(m_updateProcess, &QThread::finished, this, [this, incompatibleTargets]{
+    connect(m_updateProcess, &QThread::finished, this, [this, incompatibleTargets, clearTargetsWhenFinished]() {
         m_updateProcess->deleteLater();
-        m_updateProcess = NULL;
+        m_updateProcess = nullptr;
         for (const QnUuid &id: incompatibleTargets)
-            qnClientMessageProcessor->incompatibleServerWatcher()->keepServer(id, false);
+            qnDesktopClientMessageProcessor->incompatibleServerWatcher()->keepServer(id, false);
+        if (clearTargetsWhenFinished)
+            setTargets(QSet<QnUuid>(), defaultEnableClientUpdates);
     });
 
     m_updateProcess->start();

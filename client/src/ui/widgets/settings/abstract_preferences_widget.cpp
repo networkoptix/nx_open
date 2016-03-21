@@ -5,23 +5,12 @@ QnAbstractPreferencesWidget::QnAbstractPreferencesWidget(QWidget *parent /*= 0*/
     , m_readOnly(false)
 {}
 
-void QnAbstractPreferencesWidget::submitToSettings() {
-}
-
-
-void QnAbstractPreferencesWidget::updateFromSettings() {
-}
-
-bool QnAbstractPreferencesWidget::confirm() {
+bool QnAbstractPreferencesWidget::canApplyChanges() {
     return true;
 }
 
-bool QnAbstractPreferencesWidget::discard() {
+bool QnAbstractPreferencesWidget::canDiscardChanges() {
     return true;
-}
-
-bool QnAbstractPreferencesWidget::hasChanges() const {
-    return false;
 }
 
 void QnAbstractPreferencesWidget::retranslateUi() {
@@ -39,6 +28,7 @@ void QnAbstractPreferencesWidget::setReadOnly(bool readOnly) {
 }
 
 void QnAbstractPreferencesWidget::setReadOnlyInternal(bool readOnly) {
+    Q_UNUSED(readOnly);
 }
 
 

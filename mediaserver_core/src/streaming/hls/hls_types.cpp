@@ -70,8 +70,8 @@ namespace nx_hls
                     "\r\n";
             playlistStr += "#EXTINF:"+QByteArray::number(chunks[i].duration, 'f', 3)+",\r\n";
             playlistStr += chunks[i].url.host().isEmpty()
-                ? chunks[i].url.path().toLatin1()+"?"+chunks[i].url.query().toLatin1()    //reporting only path if host not specified
-                : chunks[i].url.toString().toLatin1();
+                ? chunks[i].url.path().toLatin1()+"?"+chunks[i].url.query(QUrl::FullyEncoded).toLatin1()    //reporting only path if host not specified
+                : chunks[i].url.toString(QUrl::FullyEncoded).toLatin1();
             playlistStr += "\r\n";
         }
 
@@ -96,8 +96,8 @@ namespace nx_hls
                 str += "BANDWIDTH="+QByteArray::number(playlists[i].bandwidth.get());
             str += "\r\n";
             str += playlists[i].url.host().isEmpty()
-                ? playlists[i].url.path().toLatin1()+"?"+playlists[i].url.query().toLatin1()    //reporting only path if host not specified
-                : playlists[i].url.toString().toLatin1();
+                ? playlists[i].url.path().toLatin1()+"?"+playlists[i].url.query(QUrl::FullyEncoded).toLatin1()    //reporting only path if host not specified
+                : playlists[i].url.toString(QUrl::FullyEncoded).toLatin1();
             str += "\r\n";
         }
 

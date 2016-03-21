@@ -13,6 +13,9 @@ static bool isResourcesListValid(const QnResourceList &resources) {
     QnSharedResourcePointerList<ResourceType> filtered = resources.filtered<ResourceType>();
     if (filtered.isEmpty())
         return CheckingPolicy::emptyListIsValid();
+    else if (filtered.size() > 1 && !CheckingPolicy::multiChoiceListIsValid())
+        return false;
+
     foreach (const QnSharedResourcePointer<ResourceType> &resource, filtered)
         if (!CheckingPolicy::isResourceValid(resource))
             return false;
@@ -26,6 +29,7 @@ public:
     static bool isResourceValid(const QnVirtualCameraResourcePtr &camera);
     static QString getText(const QnResourceList &resources, const bool detailed = true);
     static inline bool emptyListIsValid() { return true; }
+    static bool multiChoiceListIsValid() { return true; }
 };
 
 class QnCameraOutputPolicy {
@@ -35,6 +39,17 @@ public:
     static bool isResourceValid(const QnVirtualCameraResourcePtr &camera);
     static QString getText(const QnResourceList &resources, const bool detailed = true);
     static inline bool emptyListIsValid() { return false; }
+    static bool multiChoiceListIsValid() { return true; }
+};
+
+class QnExecPtzPresetPolicy {
+    Q_DECLARE_TR_FUNCTIONS(QnExecPtzPresetPolicy)
+public:
+    typedef QnVirtualCameraResource resource_type;
+    static bool isResourceValid(const QnVirtualCameraResourcePtr &camera);
+    static QString getText(const QnResourceList &resources, const bool detailed = true);
+    static inline bool emptyListIsValid() { return false; }
+    static bool multiChoiceListIsValid() { return false; }
 };
 
 class QnCameraMotionPolicy {
@@ -44,6 +59,7 @@ public:
     static bool isResourceValid(const QnVirtualCameraResourcePtr &camera);
     static QString getText(const QnResourceList &resources, const bool detailed = true);
     static inline bool emptyListIsValid() { return true; }
+    static bool multiChoiceListIsValid() { return true; }
 };
 
 class QnCameraRecordingPolicy {
@@ -53,7 +69,10 @@ public:
     static bool isResourceValid(const QnVirtualCameraResourcePtr &camera);
     static QString getText(const QnResourceList &resources, const bool detailed = true);
     static inline bool emptyListIsValid() { return false; }
+    static bool multiChoiceListIsValid() { return true; }
 };
+
+typedef QnCameraRecordingPolicy QnBookmarkActionPolicy;
 
 class QnUserEmailPolicy {
     Q_DECLARE_TR_FUNCTIONS(QnUserEmailPolicy)
@@ -62,6 +81,7 @@ public:
     static bool isResourceValid(const QnUserResourcePtr &user);
     static QString getText(const QnResourceList &resources, const bool detailed = true, const QStringList &additional = QStringList());
     static inline bool emptyListIsValid() { return false; }
+    static bool multiChoiceListIsValid() { return true; }
 };
 
 #endif // BUSINESS_RESOURCE_VALIDATION_H

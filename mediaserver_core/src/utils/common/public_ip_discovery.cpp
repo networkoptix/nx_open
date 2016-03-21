@@ -14,7 +14,7 @@ namespace {
     const QString primaryUrlsList("http://www.mypublicip.com;http://checkip.eurodyndns.org");
     const QString secondaryUrlsList("http://networkoptix.com/myip");
     const int requestTimeoutMs = 4*1000;
-    const QRegExp iPRegExpr("[^a-zA-Z0-9\\.](([0-9]){1,3}\\.){3}([0-9]){1,3}[^a-zA-Z0-9\\.]");
+    const QLatin1String iPRegExprValue("[^a-zA-Z0-9\\.](([0-9]){1,3}\\.){3}([0-9]){1,3}[^a-zA-Z0-9\\.]");
 }
 
 #ifdef _DEBUG
@@ -29,7 +29,7 @@ QString stage(int value) {
     case 1: return "Primary";
     case 2: return "Secondary";
     case 3: return "Found";
-    default: 
+    default:
         Q_ASSERT(false);
         return QString();
     }
@@ -37,8 +37,8 @@ QString stage(int value) {
 
 #define PRINT_DEBUG(MSG) qDebug() << "PUBLIC_IP_DISCOVERY_DEBUG:" << MSG
 #else
-#define PRINT_DEBUG(MSG) 
-#endif 
+#define PRINT_DEBUG(MSG)
+#endif
 
 QnPublicIPDiscovery::QnPublicIPDiscovery():
     m_stage(Stage::Idle),
@@ -51,7 +51,7 @@ QnPublicIPDiscovery::QnPublicIPDiscovery():
         m_primaryUrls = m_secondaryUrls;
         m_secondaryUrls.clear();
     }
-    
+
     PRINT_DEBUG("Primary urls: " + m_primaryUrls.join("; "));
     PRINT_DEBUG("Secondary urls: " + m_secondaryUrls.join("; "));
 
@@ -81,7 +81,7 @@ void QnPublicIPDiscovery::waitForFinished() {
     /* If no public ip found from primary servers, send requests to secondary servers (if any). */
     if (m_stage == Stage::PrimaryUrlsRequesting)
         nextStage();
-    
+
 
     /* Give additional timeout for secondary servers. */
     if (m_stage == Stage::SecondaryUrlsRequesting) {
@@ -96,9 +96,12 @@ void QnPublicIPDiscovery::handleReply(const nx_http::AsyncHttpClientPtr& httpCli
     if( (httpClient->failed()) || (httpClient->response()->statusLine.statusCode != nx_http::StatusCode::ok) )
         return;
 
+    /* QRegExp class is not thread-safe. */
+    const QRegExp iPRegExpr(iPRegExprValue);
+
     /* Check if reply contents contain any ip address. */
     QByteArray response = QByteArray(" ") + httpClient->fetchMessageBodyBuffer() + QByteArray(" ");
-    int ipPos = iPRegExpr.indexIn(response);
+    int ipPos = iPRegExpr.indexIn(QString::fromUtf8(response));
     if (ipPos < 0)
         return;
 
@@ -117,7 +120,7 @@ void QnPublicIPDiscovery::handleReply(const nx_http::AsyncHttpClientPtr& httpCli
     }
 }
 
-void QnPublicIPDiscovery::sendRequest(const QString &url) 
+void QnPublicIPDiscovery::sendRequest(const QString &url)
 {
     nx_http::AsyncHttpClientPtr httpRequest = nx_http::AsyncHttpClient::create();
 

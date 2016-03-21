@@ -7,6 +7,10 @@
 
 #include <utils/common/warnings.h>
 
+namespace {
+    const QString uriDelimiter(lit("://"));
+};
+
 void QnCommandLineParameter::init(void *target, int type, const QString &longName, const QString &shortName, const QString &description, const QVariant &impliedValue) {
     m_target = target;
     m_type = type;
@@ -126,8 +130,15 @@ bool QnCommandLineParser::parse(int &argc, char **argv, QTextStream *errorStream
 
     while(pos < argc) {
         /* Extract name. */
-        QStringList paramInfo = QString(QLatin1String(argv[pos])).split(QLatin1Char('='));
+        QString argument = QString(QLatin1String(argv[pos]));
+        bool isUri = argument.contains(uriDelimiter);
+
+        QStringList paramInfo = isUri
+            ? argument.split(uriDelimiter)
+            : argument.split(L'=');
         QString name = paramInfo[0];
+        if (isUri)
+            name += uriDelimiter;   /* So the registering code looks much better. */
 
         int index = m_indexByName.value(name, -1);
         if(index == -1) {

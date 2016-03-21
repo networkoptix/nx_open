@@ -3,6 +3,7 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
+#include <atomic>
 #include <map>
 
 #include <QtCore/QElapsedTimer>
@@ -14,7 +15,7 @@
 #include "core/resource/resource_fwd.h"
 #include "media_streamdataprovider.h"
 #include <core/resource/resource_media_layout.h>
-
+#include <utils/common/safe_direct_connection.h>
 
 static const int  META_DATA_DURATION_MS = 300;
 static const int MIN_SECOND_STREAM_FPS = 2;
@@ -66,6 +67,8 @@ public:
     // I assume this function is called once per video frame 
     bool needMetaData(); 
 
+    void onStreamReopen();
+
     virtual void onGotVideoFrame(const QnCompressedVideoDataPtr& videoData,
                                  const QnLiveStreamParams& currentLiveParams,
                                  bool isCameraControlRequired);
@@ -104,7 +107,7 @@ protected:
     */
     virtual void onStreamResolutionChanged( int channelNumber, const QSize& picSize );
 protected:
-    mutable QMutex m_livemutex;
+    mutable QnMutex m_livemutex;
 private:
     float getDefaultFps() const;
 private:
@@ -119,7 +122,7 @@ private:
     size_t m_totalVideoFrames;
     size_t m_totalAudioFrames;
 
-    QMutex m_motionRoleMtx;
+    QnMutex m_motionRoleMtx;
     Qn::ConnectionRole m_softMotionRole;
     QString m_forcedMotionStream;
 #ifdef ENABLE_SOFTWARE_MOTION_DETECTION
@@ -127,7 +130,7 @@ private:
 #endif
     QSize m_videoResolutionByChannelNumber[CL_MAX_CHANNELS];
     int m_softMotionLastChannel;
-    QnConstResourceVideoLayoutPtr m_layout;
+    std::atomic<int> m_videoChannels;
     QnPhysicalCameraResourcePtr m_cameraRes;
     bool m_isPhysicalResource;
     simd128i *m_motionMaskBinData[CL_MAX_CHANNELS];
@@ -140,8 +143,9 @@ private:
         QSize* const newResolution,
         std::map<QString, QString>* const customStreamParams = nullptr );
     void saveMediaStreamParamsIfNeeded( const QnCompressedVideoDataPtr& videoData );
-    void saveBitrateIfNotExists( const QnCompressedVideoDataPtr& videoData,
-                                 const QnLiveStreamParams& liveParams );
+    void saveBitrateIfNeeded( const QnCompressedVideoDataPtr& videoData,
+                              const QnLiveStreamParams& liveParams,
+                              bool isCameraConfigured );
 
 private:
     QnAbstractVideoCamera* m_owner;

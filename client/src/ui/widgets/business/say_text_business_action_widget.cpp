@@ -42,14 +42,14 @@ void QnSayTextBusinessActionWidget::updateTabOrder(QWidget *before, QWidget *aft
     setTabOrder(ui->testButton,     after);
 }
 
-void QnSayTextBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, QnBusiness::Fields fields) {
-    if (!model || m_updating)
+void QnSayTextBusinessActionWidget::at_model_dataChanged(QnBusiness::Fields fields) {
+    if (!model() || m_updating)
         return;
 
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
     if (fields & QnBusiness::ActionParamsField)
-        ui->textEdit->setText(model->actionParams().sayText);
+        ui->textEdit->setText(model()->actionParams().sayText);
 }
 
 void QnSayTextBusinessActionWidget::paramsChanged() {

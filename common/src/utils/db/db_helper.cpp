@@ -1,13 +1,17 @@
 #include "db_helper.h"
-#include <QSqlQuery>
-#include <QSqlRecord>
+
+#include <QtCore/QCoreApplication>
+#include <QtCore/QFileInfo>
+
+#include <QtSql/QSqlQuery>
+#include <QtSql/QSqlRecord>
 #include <QFile>
-#include <QSqlError>
+#include <QtSql/QSqlError>
 #include "qcoreapplication.h"
 
 //TODO #AK QnDbTransaction is a bad name for this class since it actually lives beyond DB transaction 
     //and no concurrent transactions supported. Maybe QnDbConnection?
-QnDbHelper::QnDbTransaction::QnDbTransaction(QSqlDatabase& database, QReadWriteLock& mutex): 
+QnDbHelper::QnDbTransaction::QnDbTransaction(QSqlDatabase& database, QnReadWriteLock& mutex):
     m_database(database),
     m_mutex(mutex)
 {
@@ -42,7 +46,7 @@ bool QnDbHelper::QnDbTransaction::commit()
     if (rez)
         m_mutex.unlock();
     else
-        qWarning() << m_database.databaseName()<< ". Commit failed:" << m_database.lastError(); // do not unlock mutex. Rollback is expected
+        qWarning() << m_database.databaseName()<< ". Commit failed:" << m_database.lastError().text(); // do not unlock mutex. Rollback is expected
     return rez;
 }
 
@@ -62,6 +66,8 @@ QnDbHelper::QnDbTransactionLocker::~QnDbTransactionLocker()
 bool QnDbHelper::QnDbTransactionLocker::commit()
 {
     m_committed = m_tran->commit();
+    if (!m_committed)
+        qWarning() << m_tran->m_database.databaseName()<< ". Commit failed:" << m_tran->m_database.lastError().text();
     return m_committed;
 }
 
@@ -72,7 +78,7 @@ QnDbHelper::QnDbHelper()
 
 QnDbHelper::~QnDbHelper()
 {
-
+    removeDatabase();
 }
 
 QList<QByteArray> quotedSplit(const QByteArray& data)
@@ -99,18 +105,21 @@ QList<QByteArray> quotedSplit(const QByteArray& data)
     return result;
 }
 
-bool QnDbHelper::execSQLQuery(const QString& queryStr, QSqlDatabase& database)
-{
+bool QnDbHelper::execSQLQuery(const QString& queryStr, QSqlDatabase& database, const char* details) const {
     QSqlQuery query(database);
     query.prepare(queryStr);
-    bool rez = query.exec(queryStr);
-    if (!rez)
-        qWarning() << "Cant exec query:" << query.lastError();
-    return rez;
+    return execSQLQuery(&query, details);
 }
 
-bool QnDbHelper::execSQLFile(const QString& fileName, QSqlDatabase& database)
-{
+bool QnDbHelper::execSQLQuery(QSqlQuery *query, const char* details) const {
+    if (!query->exec()) {
+        qWarning() << details << query->lastError().text();
+        return false;
+    }
+    return true;
+}
+
+bool QnDbHelper::execSQLFile(const QString& fileName, QSqlDatabase& database) const {
     QFile file(fileName);
     if (!file.open(QFile::ReadOnly))
         return false;
@@ -158,8 +167,19 @@ bool QnDbHelper::isObjectExists(const QString& objectType, const QString& object
 
 void QnDbHelper::addDatabase(const QString& fileName, const QString& dbname)
 {
+    QFileInfo dirInfo(fileName);    
+    if (!QDir().mkpath(dirInfo.absoluteDir().path()))
+        qWarning() << "can't create folder for sqlLite database!\n" << fileName;
+    m_connectionName = dbname;
     m_sdb = QSqlDatabase::addDatabase(lit("QSQLITE"), dbname);
     m_sdb.setDatabaseName(fileName);
+}
+
+void QnDbHelper::removeDatabase()
+{
+    m_sdb = QSqlDatabase();
+    if (!m_connectionName.isEmpty())
+        QSqlDatabase::removeDatabase(m_connectionName);
 }
 
 bool QnDbHelper::applyUpdates(const QString &dirName) {

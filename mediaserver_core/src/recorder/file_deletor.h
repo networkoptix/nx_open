@@ -6,7 +6,7 @@
 #include <QtCore/QQueue>
 #include <QtCore/QFile>
 #include <QtCore/QString>
-#include <QtCore/QMutex>
+#include <utils/thread/mutex.h>
 #include <QtCore/QStringList>
 #include <QtCore/QThread>
 #include <QtCore/QTimer>
@@ -30,7 +30,7 @@ private:
     bool internalDeleteFile(const QString& fileName);
 private:
 
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     QString m_mediaRoot;
     QSet<QString> m_postponedFiles;
     QQueue<QString> m_newPostponedFiles;

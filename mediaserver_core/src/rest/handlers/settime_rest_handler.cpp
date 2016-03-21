@@ -4,7 +4,7 @@
 
 #include "settime_rest_handler.h"
 #include <api/app_server_connection.h>
-#include <utils/network/tcp_connection_priv.h>
+#include <network/tcp_connection_priv.h>
 #include "common/common_module.h"
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/media_server_resource.h"

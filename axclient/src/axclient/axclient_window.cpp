@@ -47,7 +47,7 @@ QnAxClientWindow::~QnAxClientWindow() {
     if (m_mainWindow)
         m_mainWindow.reset(nullptr);
     if (m_context)
-        m_context->menu()->trigger(Qn::BeforeExitAction);
+        m_context->menu()->trigger(QnActions::BeforeExitAction);
 }
 
 void QnAxClientWindow::show() {
@@ -62,7 +62,7 @@ void QnAxClientWindow::show() {
     }
     
     executeDelayed([this] {
-        m_context->action(Qn::FullscreenAction)->setChecked(true);
+        m_context->action(QnActions::FullscreenAction)->setChecked(true);
 /*        m_mainWindow->showFullScreen(); */
     });   
 }
@@ -115,7 +115,7 @@ void QnAxClientWindow::setSpeed(double speed) {
 }
 
 qint64 QnAxClientWindow::currentTimeUsec() const {
-    return m_context ? m_context->navigator()->position() : 0;
+    return m_context ? m_context->navigator()->positionUsec() : 0;
 }
 
 void QnAxClientWindow::setCurrentTimeUsec(qint64 timeUsec) {
@@ -158,7 +158,7 @@ void QnAxClientWindow::addResourcesToLayout(const QStringList &uniqueIds, qint64
     m_context->workbench()->addLayout(wlayout);
     m_context->workbench()->setCurrentLayout(wlayout);
 
-    m_context->menu()->trigger(Qn::OpenInCurrentLayoutAction, QnActionParameters(resources).withArgument(Qn::ItemTimeRole, timeStampMs));
+    m_context->menu()->trigger(QnActions::OpenInCurrentLayoutAction, QnActionParameters(resources).withArgument(Qn::ItemTimeRole, timeStampMs));
 
     for (QnWorkbenchItem *item: wlayout->items())
         item->setData(Qn::ItemSliderWindowRole, qVariantFromValue(period));
@@ -184,7 +184,7 @@ void QnAxClientWindow::removeFromCurrentLayout(const QString &uniqueId) {
 
 void QnAxClientWindow::reconnect(const QString &url) {
     if (m_context)
-        m_context->menu()->trigger(Qn::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, url) );
+        m_context->menu()->trigger(QnActions::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, url) );
 }
 
 void QnAxClientWindow::maximizeItem(const QString &uniqueId) {
@@ -194,7 +194,7 @@ void QnAxClientWindow::maximizeItem(const QString &uniqueId) {
     QSet<QnWorkbenchItem *> items = m_context->workbench()->currentLayout()->items(uniqueId);
     if(items.isEmpty())
         return;
-    m_context->menu()->trigger(Qn::MaximizeItemAction, m_context->display()->widget(*items.begin()));
+    m_context->menu()->trigger(QnActions::MaximizeItemAction, m_context->display()->widget(*items.begin()));
 }
 
 void QnAxClientWindow::unmaximizeItem(const QString &uniqueId) {
@@ -204,12 +204,12 @@ void QnAxClientWindow::unmaximizeItem(const QString &uniqueId) {
     QSet<QnWorkbenchItem *> items = m_context->workbench()->currentLayout()->items(uniqueId);
     if(items.isEmpty())
         return;
-    m_context->menu()->trigger(Qn::UnmaximizeItemAction, m_context->display()->widget(*items.begin()));
+    m_context->menu()->trigger(QnActions::UnmaximizeItemAction, m_context->display()->widget(*items.begin()));
 }
 
 void QnAxClientWindow::slidePanelsOut() {
     if (m_context)
-        m_context->menu()->trigger(Qn::MaximizeAction);
+        m_context->menu()->trigger(QnActions::MaximizeAction);
 }
 
 void QnAxClientWindow::createMainWindow() {
@@ -219,8 +219,8 @@ void QnAxClientWindow::createMainWindow() {
     m_context->instance<QnFglrxFullScreen>();
 
     //TODO: #GDM is it really needed here?
-    Qn::ActionId effectiveMaximizeActionId = Qn::FullscreenAction;
-    m_context->menu()->registerAlias(Qn::EffectiveMaximizeAction, effectiveMaximizeActionId);
+    QnActions::IDType effectiveMaximizeActionId = QnActions::FullscreenAction;
+    m_context->menu()->registerAlias(QnActions::EffectiveMaximizeAction, effectiveMaximizeActionId);
 
     m_mainWindow.reset(new QnMainWindow(m_context.data()));
     m_mainWindow->setOptions(m_mainWindow->options() & ~(QnMainWindow::TitleBarDraggable | QnMainWindow::WindowButtonsVisible));
@@ -230,11 +230,11 @@ void QnAxClientWindow::createMainWindow() {
 
 #ifdef _DEBUG
     /* Show FPS in debug. */
-    m_context->menu()->trigger(Qn::ShowFpsAction);
+    m_context->menu()->trigger(QnActions::ShowFpsAction);
 #endif
 
     connect(qnClientMessageProcessor, &QnCommonMessageProcessor::initialResourcesReceived,  this, &QnAxClientWindow::connected);
-    connect(m_context->action(Qn::ExitAction), &QAction::triggered,                         this, &QnAxClientWindow::disconnected);
+    connect(m_context->action(QnActions::ExitAction), &QAction::triggered,                         this, &QnAxClientWindow::disconnected);
 
 #ifdef QN_WAIT_FOR_DEBUGGER
     QMessageBox::information(m_mainWindow.data(), "Waiting...", "Waiting for debugger to be attached.");

@@ -1,7 +1,7 @@
 #include "mserver_conflict_business_event.h"
 
 #include "core/resource/resource.h"
-#include "utils/network/module_information.h"
+#include "network/module_information.h"
 
 QString QnCameraConflictList::encode() const {
     QString result;

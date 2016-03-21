@@ -1,5 +1,7 @@
 #include "ffmpeg_audio.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <cassert>
 
 #include "core/datapacket/audio_data_packet.h"
@@ -137,3 +139,5 @@ bool CLFFmpegAudioDecoder::decode(QnCompressedAudioDataPtr& data, QnByteArray& r
     result.finishWriting(outbuf_len);
     return true;
 }
+
+#endif // ENABLE_DATA_PROVIDERS

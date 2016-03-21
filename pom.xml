@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>2.4.1-SNAPSHOT</version>
+    <version>2.5.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>hdwitness</artifactId>
     <packaging>pom</packaging>
@@ -19,16 +19,54 @@
         </repository>
     </distributionManagement>
 
+    <repositories>
+        <repository>
+            <id>localrepository</id>
+            <url>file://${root.dir}</url>
+        </repository>
+    </repositories>    
+    
     <properties>
+        <!-- Project GUIDs (c++/qt only) -->
+        <common.guid>{7f2f48c9-e466-45d9-a9a0-1dcfb486f6cb}</common.guid>
+        <nxemail.guid>{0034cf9a-0454-475d-9b54-87d4b4a6b65b}</nxemail.guid>
+        <appserver2.guid>{16bb7b01-5096-4cee-93ae-b34b3153459f}</appserver2.guid>
+        <axiscamplugin.guid>{c27722d6-d3ae-41dc-9467-52d93f5b119a}</axiscamplugin.guid>
+        <evidence_plugin.guid>{061d1513-9a37-4d14-90f5-11d42d2d7827}</evidence_plugin.guid>
+        <genericrtspplugin.guid>{7fafaf1d-0d3d-42ea-aa11-4ffce0f170f9}</genericrtspplugin.guid>
+        <image_library_plugin.guid>{62b24237-9c9d-4900-b32d-aa678317b4ba}</image_library_plugin.guid>
+        <isd_native_plugin.guid>{9d3f6a6f-ec63-4269-bf34-cc1060f80e90}</isd_native_plugin.guid>
+        <it930x_plugin.guid>{2c75d1b9-a6f1-4aa6-9d7e-8c0e602bd8fd}</it930x_plugin.guid>
+        <mjpg_link.guid>{c8a846fd-d881-45d8-9f6c-c3e02eaf5763}</mjpg_link.guid>
+        <quicksyncdecoder.guid>{84ca6c5b-525e-438a-940c-50c14db49c66}</quicksyncdecoder.guid>
+        <rpi_cam.guid>{e9a0aea0-451a-497b-b5a2-ec649c9419c2}</rpi_cam.guid>
+        <xvbadecoder.guid>{9b453bd1-92cb-4235-a6d4-2d77879f76fa}</xvbadecoder.guid>
+        <mediaserver_core.guid>{821e5e4a-e882-4eec-aa02-71c9c1ff35b9}</mediaserver_core.guid>
+        <mediaserver.guid>{ee61c3cc-791c-4f9f-9917-9e7c9ce9e907}</mediaserver.guid>
+        <mobile_client.guid>{4d58c9a4-8dbe-480c-a974-634a7e2862ef}</mobile_client.guid>
+        <applauncher.guid>{75b8ee80-e089-4de2-b7a1-d1464a9b4351}</applauncher.guid>
+        <client.core.guid>{7b7822da-47c1-4758-a07f-c2edcfc63d66}</client.core.guid>
+        <client.bin.guid>{6de071a7-831c-43a1-88ae-ee9e12cd4050}</client.bin.guid>
+        <client.guid>{6a4121d4-b02f-4e35-b941-ca9a9a2efb69}</client.guid>
+        <axclient.guid>{d3f564c6-315b-426b-8ed3-890d91300374}</axclient.guid>
+        <traytool.guid>{e2bc6f17-8fc1-4aeb-b614-3fe2c74c41f6}</traytool.guid>
+        <nxtool.guid>{d78c3988-0459-4dce-a1dc-e70df990fa54}</nxtool.guid>
+        <ftpstorageplugin.guid>{f6c9f457-910c-4c0d-bb67-b4f752a8664e}</ftpstorageplugin.guid>
+        <storage_plugin_test_client.guid>{83e8bbad-6976-45da-bdd7-baf8f17fc71c}</storage_plugin_test_client.guid>
+        
+        <!-- Components' Naming -->
         <release.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</release.version>
+        <linux.release.version>${parsedVersion.majorVersion}${parsedVersion.minorVersion}${parsedVersion.incrementalVersion}</linux.release.version>
         <appserver.name>Enterprise Controller</appserver.name>
         <appserver2.name>${company.name} New Enterprise Controller</appserver2.name>
         <client.name>${company.name} ${product.name} Client</client.name>
+        <mobile_client.name>${company.name} ${product.name} Mobile Client</mobile_client.name>
         <client.display.name>${company.name} ${display.product.name} Client</client.display.name>
         <client.mediafolder.name>${product.name} Media</client.mediafolder.name>
         <applauncher.name>${product.name} Launcher</applauncher.name>
         <applauncher.display.name>${display.product.name} Launcher</applauncher.display.name>
         <axiscamplugin.name>${company.name} AXIS camera integration plugin</axiscamplugin.name>
+        <evidence_plugin.name>${company.name} Evidence integration plugin</evidence_plugin.name>
         <genericrtspplugin.name>${company.name} generic RTSP plugin</genericrtspplugin.name>
         <!--ftpstorageplugin.name>${company.name} Ftp storage plugin</ftpstorageplugin.name-->
         <mediaserver.name>${company.name} Media Server</mediaserver.name>
@@ -44,6 +82,8 @@
         <traytool.display.name>${display.product.name} Tray Assistant</traytool.display.name>
         <vmaxproxy.name>${company.name} VMax Proxy</vmaxproxy.name>
         <wixsetup.name>${company.name} ${display.product.name} Setup v.${release.version}</wixsetup.name>
+        
+        <!-- Build Defaults -->
         <license.environment>production</license.environment>
         <build.configuration>release</build.configuration>
         <buildNumber>0</buildNumber>
@@ -56,6 +96,8 @@
         <finalName>${deb.customization.company.name}-${final.artifact.name}-${release.version}.${buildNumber}-${build.suffix}-${build.configuration}-beta</finalName>
         <updateFeedUrl>${testUpdateFeedUrl}</updateFeedUrl>
         <mobile>false</mobile>
+        <newmobile></newmobile>
+        <ffmpeg.libs></ffmpeg.libs>
         <!-- compile.option1. See profile no-webkit -->
         <webkit>true</webkit>
         <!-- compile.option2. See profile angle  -->
@@ -70,13 +112,14 @@
         <compiler.arguments />
 
         <libdir>${root.dir}/build_environment/target</libdir>
-        <ClientHelpSourceDir>${environment.dir}/help/${release.version}/${customization}</ClientHelpSourceDir>
+        <ClientHelpSourceDir>${environment.dir}/help/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}/${customization}</ClientHelpSourceDir>
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
         <ClientVoxSourceDir>${environment.dir}/festival.vox/lib</ClientVoxSourceDir>
         <unpack.skip>false</unpack.skip>
         <resources.phase>generate-sources</resources.phase>
+        <qt.version>5.2.1-SNAPSHOT</qt.version>
         <ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
-        <openssl.version>1.0.0j-custom-SNAPSHOT</openssl.version>
+        <openssl.version>1.0.2e-SNAPSHOT</openssl.version>
         <openldap.version>2.4.42-SNAPSHOT</openldap.version>
         <sasl2.version>2.1.26-SNAPSHOT</sasl2.version>
         <protobuf.version>2.5.0-SNAPSHOT</protobuf.version>
@@ -294,7 +337,6 @@
             <modules>
                 <module>build_variables</module>
                 <module>common</module>
-                <!-- <module>hole_punching_mediator</module> -->
                 <module>appserver2</module>
                 <!-- <module>testcamera</module> -->
             </modules>
@@ -316,12 +358,16 @@
             </modules>
         </profile>
        <profile>
-            <id>nomac</id>
+            <id>nomac-nomobile</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <os>
                     <family>!mac</family>
                 </os>
+                <property>
+                    <name>newmobile</name>
+                    <value>!true</value>
+                </property>
             </activation>
             <modules>
                 <!--<module>plugins/axiscamplugin</module>-->
@@ -331,6 +377,7 @@
                 <!--module>storage_plugins/ftpstorageplugin</module-->
                 <module>plugins/image_library_plugin</module>
                 <module>plugins/mjpg_link</module>
+                <module>common_libs/nxemail</module>                
                 <module>mediaserver</module>
                 <module>mediaserver_core</module>
                 <!--<module>mediaproxy</module> -->
@@ -355,7 +402,8 @@
             <modules>
                 <module>applauncher</module>
                 <module>client</module>
-                <module>clientexe</module>
+                <module>client.core</module>
+                <module>client.bin</module>
             </modules>
         </profile>
         <profile>
@@ -366,12 +414,7 @@
                 </os>
             </activation>
             <modules>
-                <module>traytool</module>
-                <!-- Vmaxproxy  module is disabled because we use already built version of vmax (vs2008 + qt4). We do so because vmaxproxy doesn't work if has been built on vs2012 -->
-                <!--<module>vmaxproxy</module>  -->
-                <module>client</module>
-                <module>clientexe</module>
-                <module>wixsetup</module>
+                <module>client.core</module>
             </modules>
             <properties>
                 <qt.dir>${libdir}/${arch}</qt.dir>
@@ -402,6 +445,28 @@
                 <global.windows.defines>ENABLE_VMAX</global.windows.defines>
             </properties>
         </profile>
+        <profile>
+            <id>windows-nomobile</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+                <property>
+                    <name>newmobile</name>
+                    <value>!true</value>
+                </property>
+            </activation>
+            <modules>
+                <module>traytool</module>
+                <!-- Vmaxproxy  module is disabled because we use already built version of vmax (vs2008 + qt4). We do so because vmaxproxy doesn't work if has been built on vs2012 -->
+                <!--<module>vmaxproxy</module>  -->
+                <module>client</module>
+                <module>client.core</module>
+                <module>nxtool</module>
+                <module>client.bin</module>
+                <module>wixsetup</module>
+            </modules>
+        </profile>
         <!-- Paxton stuff can be built only on Windows x86 -->
         <profile>
             <id>paxton</id>
@@ -423,9 +488,6 @@
                 <module>plugins/nxcontrol</module>
                 <module>plugins/acs/paxton</module>
                 <module>plugins/acs/paxton-installer</module>
-                <!-- Uncomment this when 2.3.1_paxton is merged -->
-                <!-- <module>plugins/acs/paxton</module>
-                <module>plugins/acs/paxton-installer</module> -->
             </modules>
         </profile>
         <profile>
@@ -437,6 +499,10 @@
                 <file>
                     <missing>customization/${customization}/nxtool.skip</missing>
                 </file>
+                <property>
+                    <name>newmobile</name>
+                    <value>!true</value>
+                </property>
             </activation>
             <modules>
                 <module>nxtool</module>
@@ -485,19 +551,37 @@
                 <!--<module>plugins/xvbadecoder</module>-->
             </modules>
         </profile>
+
         <profile>
-            <id>macosx</id>
+            <id>mac_common</id>
             <activation>
                 <os>
                     <family>mac</family>
                 </os>
             </activation>
             <properties>
-                <platform>macosx</platform>
                 <additional.compiler>clang</additional.compiler>
+                <qt.classifier>${platform}-${arch}</qt.classifier>
+                <python.executable>python</python.executable>
+                <python.virtualenv>virtualenv</python.virtualenv>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>macosx</id>
+            <activation>
+                <os>
+                    <family>mac</family>
+                </os>
+                <property>
+                    <name>newmobile</name>
+                    <value>!true</value>
+                </property>
+            </activation>
+            <properties>
+                <platform>macosx</platform>
                 <arch>x64</arch>
                 <qt.spec>macx-clang-libc++</qt.spec>
-                <qt.classifier>${platform}-${arch}</qt.classifier>
                 <python.executable>python</python.executable>
                 <python.virtualenv>virtualenv</python.virtualenv>
             </properties>
@@ -568,8 +652,9 @@
             </activation>
             <properties>
                 <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
-                <toolchain.version>codesourcery-2013.11</toolchain.version>
+                <toolchain.version>codesourcery-2014.05</toolchain.version>
                 <compiler>2011.09</compiler>
+                <qt.spec>linux-arm-gnueabi-g++-2014.05</qt.spec>
                 <openssl.version>1.0.0j-SNAPSHOT</openssl.version>
                 <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
                 <modification>isd</modification>
@@ -660,7 +745,33 @@
                 <module>edge_firmware/rpi</module>
             </modules>
         </profile>
-
+        <profile>
+            <id>linux-arm-bananapi</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>bananapi</value>
+                </property>
+            </activation>
+            <properties>
+                <quazip.version>0.7-SNAPSHOT</quazip.version>
+                <toolchain.version>rpi</toolchain.version>
+                <compiler>bpi</compiler>
+                <openssl.version>1.0.0j-SNAPSHOT</openssl.version>
+                <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
+                <modification>bananapi</modification>
+                <qt.classifier>${platform}-${arch}-bpi</qt.classifier>
+            </properties>
+            <modules>
+                <!-- Banana pie uses same distro as rpi -->
+                <module>edge_firmware/rpi</module>
+            </modules>
+        </profile>        
         <profile>
             <id>linux-x64</id>
             <activation>
@@ -758,6 +869,106 @@
             </activation>
             <properties>
                 <compile.option2>-angle</compile.option2>
+            </properties>
+        </profile> 
+
+        <!-- Mobile client profiles -->
+        <profile>
+            <id>mobile-common</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>newmobile</name>
+                    <value>true</value>
+                </property>               
+            </activation>
+            <properties>
+                <qt.version>5.5.1-SNAPSHOT</qt.version>
+                <compile.options/>
+            </properties>            
+            <modules>
+                <module>client.core</module>
+                <module>mobile_client</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>mobile-android</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>box</name>
+                    <value>android</value>
+                </property>
+                <file>
+                    <missing>customization/${customization}/android.skip</missing>
+                </file>                
+            </activation>
+            <build>
+                <directory>target</directory>
+            </build>
+            <properties>
+                <platform>android</platform>
+                <toolchain.version>android</toolchain.version>
+                <qt.spec>android-g++</qt.spec>
+                <qt.classifier>${platform}-${arch}</qt.classifier>
+                <libdir>${root.dir}/build_environment/target</libdir>
+                <compiler>gcc</compiler>
+                <additional.compiler>gcc</additional.compiler>
+                <profile.classifier>${platform}-${arch}</profile.classifier>
+                <android.sdk>${environment.dir}/android/android-sdk</android.sdk>
+                <android.ndk>${environment.dir}/android/android-ndk</android.ndk>
+                <android.ndk.host>linux-x86_64</android.ndk.host>
+                <android.toolchain.version>4.8</android.toolchain.version>
+                <openssl.version>1.0.2d-SNAPSHOT</openssl.version>
+                <compile.option1/>
+            </properties>
+        </profile>
+        <profile>
+            <id>mobile-android-desktop</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>box</name>
+                    <value>android-desktop</value>
+                </property>
+                <file>
+                    <missing>customization/${customization}/mobile.skip</missing>
+                </file>                
+            </activation>
+            <properties>
+                <qt.classifier>${platform}-${arch}-release</qt.classifier>
+                <additional.compiler>${compiler}</additional.compiler>
+            </properties>
+        </profile>
+        <profile>
+            <id>mobile-ios</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>mac</family>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>ios</value>
+                </property>
+                <file>
+                    <missing>customization/${customization}/ios.skip</missing>
+                </file>                
+            </activation>
+            <build>
+                <directory>target</directory>
+            </build>
+            <properties>
+                <platform>ios</platform>
+                <toolchain.version>ios</toolchain.version>
+                <qt.spec>macx-ios-clang</qt.spec>
+                <qt.classifier>${platform}-${arch}</qt.classifier>
+                <libdir>${root.dir}/build_environment/target</libdir>
+                <compiler>clang</compiler>
+                <additional.compiler>clang</additional.compiler>
+                <profile.classifier>${platform}-${arch}</profile.classifier>
+                <openssl.version>1.0.1i-SNAPSHOT</openssl.version>
+                <compile.option1/>
             </properties>
         </profile>
     </profiles>

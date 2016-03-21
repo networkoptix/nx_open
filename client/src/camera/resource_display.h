@@ -96,11 +96,6 @@ public:
     qint64 currentTimeUSec() const;
 
     /**
-     * \param usec                      New current time for this display, in microseconds.
-     */
-    void setCurrentTimeUSec(qint64 usec) const;
-
-    /**
      * \returns                         Whether this display is paused. 
      */
     bool isPaused();

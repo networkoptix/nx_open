@@ -1,5 +1,7 @@
 #include "transcoder.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <utils/math/math.h>
 #include <core/resource/media_resource.h>
 
@@ -177,6 +179,8 @@ QnTranscoder::QnTranscoder():
     m_internalBuffer(CL_MEDIA_ALIGNMENT, 1024*1024),
     m_firstTime(AV_NOPTS_VALUE),
     m_initialized(false),
+    m_initializedAudio(false),
+    m_initializedVideo(false),
     m_eofCounter(0),
     m_packetizedMode(false),
     m_useRealTimeOptimization(false)
@@ -373,6 +377,8 @@ int QnTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnBy
         m_firstTime = media->timestamp;
 
     bool doTranscoding = true;
+    static const size_t kMaxDelayedQueueSize = 60;
+
     if (!m_initialized)
     {
         if (media->dataType == QnAbstractMediaData::VIDEO)
@@ -380,15 +386,26 @@ int QnTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnBy
         else
             m_delayedAudioQueue << std::dynamic_pointer_cast<const QnCompressedAudioData> (media);
         doTranscoding = false;
-        if (m_videoCodec != CODEC_ID_NONE && m_delayedVideoQueue.isEmpty())
+        if (m_videoCodec != CODEC_ID_NONE && m_delayedVideoQueue.isEmpty()
+                                          && m_delayedAudioQueue.size() < kMaxDelayedQueueSize)
+        {
             return 0; // not ready to init
-        if (m_audioCodec != CODEC_ID_NONE && m_delayedAudioQueue.isEmpty())
+        }
+        if (m_audioCodec != CODEC_ID_NONE && m_delayedAudioQueue.isEmpty()
+                                          && m_delayedVideoQueue.size() < kMaxDelayedQueueSize)
+        {
             return 0; // not ready to init
+        }
         int rez = open(m_delayedVideoQueue.isEmpty() ? QnConstCompressedVideoDataPtr() : m_delayedVideoQueue.first(), 
                        m_delayedAudioQueue.isEmpty() ? QnConstCompressedAudioDataPtr() : m_delayedAudioQueue.first());
         if (rez != 0)
             return rez;
-        m_initialized = true;
+    }
+
+    if ((media->dataType == QnAbstractMediaData::AUDIO && !m_initializedAudio) ||
+        (media->dataType == QnAbstractMediaData::VIDEO && !m_initializedVideo))
+    {
+        return OperationResult::Success;
     }
 
     if( result )
@@ -461,3 +478,6 @@ void QnTranscoder::setExtraTranscodeParams(const QnImageFilterHelper& extraParam
 {
     m_extraTranscodeParams = extraParams;
 }
+
+#endif // ENABLE_DATA_PROVIDERS
+

@@ -90,7 +90,7 @@ QnRecordingSettingsWidget::QnRecordingSettingsWidget(QWidget *parent) :
 QnRecordingSettingsWidget::~QnRecordingSettingsWidget() {
 }
 
-void QnRecordingSettingsWidget::updateFromSettings() {
+void QnRecordingSettingsWidget::loadDataToUi() {
     setCaptureMode(m_settings->captureMode());
     setDecoderQuality(m_settings->decoderQuality());
     setResolution(m_settings->resolution());
@@ -102,7 +102,7 @@ void QnRecordingSettingsWidget::updateFromSettings() {
     ui->recordingFolderLabel->setText(m_settings->recordingFolder());
 }
 
-void QnRecordingSettingsWidget::submitToSettings() 
+void QnRecordingSettingsWidget::applyChanges() 
 {
     bool isChanged = false;
     
@@ -149,6 +149,37 @@ void QnRecordingSettingsWidget::submitToSettings()
     if (isChanged)
         emit recordingSettingsChanged();
 }
+
+bool QnRecordingSettingsWidget::hasChanges() const {
+    //TODO: #GDM refactor and emit hasChangesChanged correctly
+
+    if (m_settings->captureMode() != captureMode())
+        return true;
+
+    if (m_settings->decoderQuality() != decoderQuality()) 
+        return true;
+
+    if (m_settings->resolution() != resolution()) 
+        return true;
+
+    if (m_settings->screen() != screen()) 
+        return true;
+
+    if (m_settings->primaryAudioDeviceName() != primaryAudioDeviceName()) 
+        return true;
+
+    if (m_settings->secondaryAudioDeviceName() != secondaryAudioDeviceName()) 
+        return true;
+
+    if (m_settings->captureCursor() != ui->captureCursorCheckBox->isChecked()) 
+        return true;
+
+    if (m_settings->recordingFolder() != ui->recordingFolderLabel->text()) 
+        return true;
+
+    return false;
+}
+
 
 Qn::CaptureMode QnRecordingSettingsWidget::captureMode() const
 {

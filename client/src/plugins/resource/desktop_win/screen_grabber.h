@@ -85,7 +85,7 @@ private:
     unsigned m_frameNum;
     int m_currentIndex;
 
-    static QMutex m_instanceMutex;
+    static QnMutex m_instanceMutex;
     static int m_aeroInstanceCounter;
     Qn::CaptureMode m_mode;
     int m_poolSize;
@@ -105,8 +105,8 @@ private:
     mutable std::auto_ptr<quint8> m_colorBits;
     mutable size_t m_colorBitsCapacity;
 
-    static QMutex m_guiWaitMutex;
-    QWaitCondition m_waitCond;
+    static QnMutex m_guiWaitMutex;
+    QnWaitCondition m_waitCond;
     bool m_needStop;
 };
 

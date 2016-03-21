@@ -94,7 +94,7 @@ void QnServerPtzControllerPool::at_controllerAboutToBeChanged(const QnResourcePt
     if(oldController) {
         QnPtzObject object;
         if(oldController->getActiveObject(&object) && object.type != Qn::InvalidPtzObject) {
-            QMutexLocker lock(&m_mutex);
+            QnMutexLocker lock(&m_mutex);
             activeObjectByResource.insert(resource, object);
         }
     }
@@ -107,7 +107,7 @@ void QnServerPtzControllerPool::at_controllerChanged(const QnResourcePtr &resour
 
     QnPtzObject object;
     {
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock(&m_mutex);
         object = activeObjectByResource.take(resource);
     }
     if(object.type != Qn::TourPtzObject)
@@ -116,7 +116,7 @@ void QnServerPtzControllerPool::at_controllerChanged(const QnResourcePtr &resour
     if(object.type == Qn::TourPtzObject)
         controller->activateTour(object.id);
     else if(object.type == Qn::PresetPtzObject)
-        controller->activatePreset(object.id, 1.0);
+        controller->activatePreset(object.id, QnAbstractPtzController::MaxPtzSpeed);
 
     qDebug() << "activate" << object.id << object.type;
 }

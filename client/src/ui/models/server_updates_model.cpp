@@ -75,7 +75,7 @@ QnServerUpdatesModel::QnServerUpdatesModel(QnMediaServerUpdateTool* tool, QObjec
         QModelIndex idx = index(peerId);
         if (!idx.isValid())
             return;
-        
+
         int displayStage = qMax(static_cast<int>(stage) - 1, 0);
         int value = (displayStage*100 + progress) / ( static_cast<int>(QnPeerUpdateStage::Count) - 1 );
 
@@ -169,14 +169,19 @@ void QnServerUpdatesModel::resetResourses() {
     qDeleteAll(m_items);
     m_items.clear();
 
-    for (const QnMediaServerResourcePtr &server: qnResPool->getAllServers())
+    const auto allServers = qnResPool->getAllServers(Qn::AnyStatus);
+    for (const QnMediaServerResourcePtr &server: allServers)
         m_items.append(new Item(server));
 
     const QString systemName = qnCommon->localSystemName();
-    for (const QnResourcePtr &resource: qnResPool->getAllIncompatibleResources()) {
+    for (const QnResourcePtr &resource: qnResPool->getAllIncompatibleResources())
+    {
         QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
         if (!server || server->getSystemName() != systemName)
             continue;
+
+        // Adds newly added to system server which is not authorized
+        // or with old protocol version
         m_items.append(new Item(server));
     }
 

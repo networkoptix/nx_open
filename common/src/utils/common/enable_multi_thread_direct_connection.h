@@ -6,9 +6,10 @@
 #ifndef ENABLE_MULTI_THREAD_DIRECT_CONNECTION_H
 #define ENABLE_MULTI_THREAD_DIRECT_CONNECTION_H
 
-#include <QtCore/QMutex>
 #include <QtCore/QObject>
-#include <QtCore/QWaitCondition>
+
+#include <utils/thread/mutex.h>
+#include <utils/thread/wait_condition.h>
 
 
 //!QObject's successors which allow using Qt::DirectConnection to connect object living in different thread should inherit this class
@@ -50,25 +51,26 @@ public:
     void disconnectAndJoin( QObject* receiver )
     {
         QObject::disconnect( static_cast<Derived*>(this), nullptr, receiver, nullptr );
-        QMutexLocker lk( &m_signalEmitMutex );  //waiting for signals to be emitted in other threads to be processed
+        //waiting for signals to be emitted in other threads to be processed
+        QnMutexLocker lk( &m_signalEmitMutex );
         while( m_ongoingCalls > 0 )
             m_cond.wait( lk.mutex() );
     }
 
 private:
-    mutable QMutex m_signalEmitMutex;
-    QWaitCondition m_cond;
+    mutable QnMutex m_signalEmitMutex;
+    QnWaitCondition m_cond;
     mutable size_t m_ongoingCalls;
 
     void beforeDirectCall()
     {
-        QMutexLocker lk( &m_signalEmitMutex );
+        QnMutexLocker lk( &m_signalEmitMutex );
         ++m_ongoingCalls;
     }
 
     void afterDirectCall()
     {
-        QMutexLocker lk( &m_signalEmitMutex );
+        QnMutexLocker lk( &m_signalEmitMutex );
         --m_ongoingCalls;
         m_cond.wakeAll();
     }

@@ -23,6 +23,7 @@
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/dialogs/event_log_dialog.h>
 #include <ui/dialogs/camera_list_dialog.h>
+#include <ui/dialogs/search_bookmarks_dialog.h>
 #include "ui/dialogs/audit_log_dialog.h"
 
 #include <utils/color_space/image_correction.h>
@@ -113,7 +114,7 @@ protected:
     QnWorkbenchNotificationsHandler* notificationsHandler() const;
 
 protected slots:
-   
+
     void submitDelayedDrops();
     void submitInstantDrop();
 
@@ -153,7 +154,7 @@ protected slots:
     void at_aboutAction_triggered();
     void at_businessEventsAction_triggered();
     void at_openBusinessRulesAction_triggered();
-    void at_businessEventsLogAction_triggered();
+    void at_openBookmarksSearchAction_triggered();
     void at_openBusinessLogAction_triggered();
     void at_openAuditLogAction_triggered();
     void at_cameraListAction_triggered();
@@ -166,7 +167,7 @@ protected slots:
     void at_preferencesSmtpTabAction_triggered();
     void at_preferencesNotificationTabAction_triggered();
     void at_userSettingsAction_triggered();
-    
+
     void at_mediaFileSettingsAction_triggered();
     void at_cameraIssuesAction_triggered();
     void at_cameraBusinessRulesAction_triggered();
@@ -229,6 +230,7 @@ private:
 
     void openLayoutSettingsDialog(const QnLayoutResourcePtr &layout);
     void openFailoverPriorityDialog();
+    void openBackupCamerasDialog();
 
     QnAdjustVideoDialog* adjustVideoDialog();
 
@@ -241,6 +243,9 @@ private:
     void deleteDialogs();
 
     void closeApplication(bool force = false);
+
+    qint64 getFirstBookmarkTimeMs();
+
 private:
     QPointer<QWidget> m_widget;
     QPointer<QMenu> m_mainMenu;
@@ -248,6 +253,7 @@ private:
 
     QPointer<QnBusinessRulesDialog> m_businessRulesDialog;
     QPointer<QnEventLogDialog> m_businessEventsLogDialog;
+	QPointer<QnSearchBookmarksDialog> m_searchBookmarksDialog;
     QPointer<QnAuditLogDialog> m_auditLogDialog;
     QPointer<QnCameraListDialog> m_cameraListDialog;
     QPointer<QnCameraAdditionDialog> m_cameraAdditionDialog;
@@ -267,7 +273,7 @@ private:
     QnStorageResourcePtr m_exportStorage;
 
     QTimer *m_tourTimer;
-    struct CameraMovingInfo 
+    struct CameraMovingInfo
     {
         CameraMovingInfo() {}
         CameraMovingInfo(const QnVirtualCameraResourceList& cameras, const QnMediaServerResourcePtr& dstServer): cameras(cameras), dstServer(dstServer) {}

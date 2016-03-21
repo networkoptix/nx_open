@@ -124,7 +124,7 @@ QnAviArchiveDelegate::QnAviArchiveDelegate():
     m_duration(AV_NOPTS_VALUE),
     m_ioContext(0),
     m_eofReached(false),
-    m_openMutex(QMutex::Recursive),
+    m_openMutex(QnMutex::Recursive),
     m_fastStreamFind(false),
     m_hasVideo(true),
     m_lastSeekTime(AV_NOPTS_VALUE)
@@ -161,13 +161,14 @@ qint64 QnAviArchiveDelegate::endTime() const
 
 QnMediaContextPtr QnAviArchiveDelegate::getCodecContext(AVStream* stream)
 {
-    if (stream->codec->codec_id == CODEC_ID_MJPEG)
-        return QnMediaContextPtr();
+    //if (stream->codec->codec_id == CODEC_ID_MJPEG)
+    //    return QnMediaContextPtr(new QnMediaContext(stream->codec));
 
     while (m_contexts.size() <= stream->index)
         m_contexts << QnMediaContextPtr(0);
 
-    if (m_contexts[stream->index] == 0 || m_contexts[stream->index]->ctx()->codec_id != stream->codec->codec_id)
+    if (m_contexts[stream->index] == 0 || 
+        m_contexts[stream->index]->ctx()->codec_id != stream->codec->codec_id)
     {
 	    m_contexts[stream->index] = QnMediaContextPtr(new QnMediaContext(stream->codec));
     }
@@ -223,8 +224,10 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
                     continue;
                 }
                 qint64 timestamp = packetTimestamp(packet);
-                if (!hasVideo() && m_lastSeekTime != AV_NOPTS_VALUE && timestamp < m_lastSeekTime)
+                if (!hasVideo() && m_lastSeekTime != AV_NOPTS_VALUE && timestamp < m_lastSeekTime) {
+                    av_free_packet(&packet);
                     continue; // seek is broken for audio only media streams
+                }
                 QnWritableCompressedAudioData* audioData = new QnWritableCompressedAudioData(CL_MEDIA_ALIGNMENT, packet.size, getCodecContext(stream));
                 //audioData->format.fromAvStream(stream->codec);
                 time_base = av_q2d(stream->time_base)*1e+6;
@@ -305,7 +308,7 @@ bool QnAviArchiveDelegate::reopen()
 
 bool QnAviArchiveDelegate::open(const QnResourcePtr &resource)
 {
-    QMutexLocker lock(&m_openMutex); // need refactor. Now open may be called from UI thread!!!
+    QnMutexLocker lock( &m_openMutex ); // need refactor. Now open may be called from UI thread!!!
 
     m_resource = resource;
     if (m_formatContext == 0)
@@ -416,9 +419,10 @@ QnConstResourceVideoLayoutPtr QnAviArchiveDelegate::getVideoLayout()
         if (sign && sign->value) {
             QList<QByteArray> tmp = QByteArray(sign->value).split(QnSignHelper::getSignPatternDelim());
             if (tmp.size() > 4) {
-                qint64 timeZoneOffset = tmp[4].trimmed().toLongLong();
+                bool deserialized = false;
+                qint64 timeZoneOffset = tmp[4].trimmed().toLongLong(&deserialized);
                 QnAviResourcePtr aviRes = m_resource.dynamicCast<QnAviResource>();
-                if (timeZoneOffset != Qn::InvalidUtcOffset && timeZoneOffset != -1 && aviRes)
+                if (deserialized && timeZoneOffset != Qn::InvalidUtcOffset && timeZoneOffset != -1 && aviRes)
                     aviRes->setTimeZoneOffset(timeZoneOffset);
             }
         }

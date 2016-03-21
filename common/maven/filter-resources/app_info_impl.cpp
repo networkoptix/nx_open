@@ -42,6 +42,10 @@ QString QnAppInfo::applicationCompiler() {
     return QStringLiteral("${additional.compiler}");
 }
 
+QString QnAppInfo::applicationUriProtocol() {
+    return QStringLiteral("${uri.protocol}");
+}
+
 QString QnAppInfo::engineVersion() {
     return QStringLiteral("${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}.${buildNumber}");
 }
@@ -166,4 +170,16 @@ bool QnAppInfo::freeLicenseIsTrial() {
 
 QString QnAppInfo::iosPlayButtonTint() {
     return QStringLiteral("${ios.playButton.tint}");
+}
+
+QString QnAppInfo::oldAndroidClientLink() {
+    return QStringLiteral("https://play.google.com/store/apps/details?id=${namespace.major}.${namespace.minor}.${namespace.additional}");
+}
+
+QString QnAppInfo::oldIosClientLink() {
+    return QStringLiteral("https://itunes.apple.com/ru/app/${ios.old_app_appstore_id}");
+}
+
+QString QnAppInfo::oldAndroidAppId() {
+    return QStringLiteral("${old.android.packagename}");
 }

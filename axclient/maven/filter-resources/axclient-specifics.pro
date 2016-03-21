@@ -11,6 +11,7 @@ INCLUDEPATH +=  ${qt.dir}/include/QtWidgets/$$QT_VERSION/ \
                 ${qt.dir}/include/QtGui/$$QT_VERSION/ \
                 ${qt.dir}/include/QtGui/$$QT_VERSION/QtGui/ \
                 ${root.dir}/appserver2/src/ \
+                ${root.dir}/client.core/src/ \
                 ${root.dir}/client/src/
               
 CONFIG(debug, debug|release) {

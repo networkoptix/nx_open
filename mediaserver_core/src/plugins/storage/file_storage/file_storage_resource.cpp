@@ -9,6 +9,7 @@
 #include "utils/common/buffered_file.h"
 #include "recorder/file_deletor.h"
 #include "utils/fs/file.h"
+#include <common/common_module.h>
 
 #ifndef _WIN32
 #   include <platform/monitoring/global_monitor.h>
@@ -21,7 +22,7 @@
 #include <media_server/settings.h>
 #include <recorder/storage_manager.h>
 
-#ifdef __linux__
+#ifndef _WIN32
 #   include <sys/mount.h>
 #   include <sys/types.h>
 #   include <sys/stat.h>
@@ -47,18 +48,31 @@
     const QString QnFileStorageResource::TO_SEP = lit("\\");
 #endif
 
+#ifdef __APPLE__
+static const auto MS_NODEV = MNT_NODEV;
+static const auto MS_NOSUID = MNT_NOSUID;
+static const auto MS_NOEXEC = MNT_NOEXEC;
+#endif
 
-namespace aux 
+
+namespace aux
 {
     QString genLocalPath(const QString &url, const QString &prefix = "/tmp/")
     {
         return prefix + NX_TEMP_FOLDER_NAME + QString::number(qHash(url), 16);
     }
+
+    QString passwordFromUrl(const QUrl &url)
+    {   // On some linux distribution (nx1) mount chokes on
+        // empty password. So let's give it a non-empty one.
+        QString password = url.password();
+        return password.isEmpty() ? "123" : password;
+    }
 }
 
 QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode openMode)
 {
-    if (!initOrUpdate())
+    if (!m_valid)
         return nullptr;
 
     QString fileName = removeProtocolPrefix(translateUrlToLocal(url));
@@ -67,33 +81,57 @@ QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode o
     int ffmpegBufferSize = 0;
 
     int systemFlags = 0;
-    if (openMode & QIODevice::WriteOnly) {
-        ioBlockSize = MSSettings::roSettings()->value( nx_ms_conf::IO_BLOCK_SIZE, nx_ms_conf::DEFAULT_IO_BLOCK_SIZE ).toInt();
-        ffmpegBufferSize = MSSettings::roSettings()->value( nx_ms_conf::FFMPEG_BUFFER_SIZE, nx_ms_conf::DEFAULT_FFMPEG_BUFFER_SIZE ).toInt();;
+    if (openMode & QIODevice::WriteOnly)
+    {
+        ioBlockSize = MSSettings::roSettings()->value(
+            nx_ms_conf::IO_BLOCK_SIZE,
+            nx_ms_conf::DEFAULT_IO_BLOCK_SIZE
+        ).toInt();
+
+        ffmpegBufferSize = MSSettings::roSettings()->value(
+            nx_ms_conf::FFMPEG_BUFFER_SIZE,
+            nx_ms_conf::DEFAULT_FFMPEG_BUFFER_SIZE
+        ).toInt();;
+
 #ifdef Q_OS_WIN
         if (MSSettings::roSettings()->value(nx_ms_conf::DISABLE_DIRECT_IO).toInt() != 1)
             systemFlags = FILE_FLAG_NO_BUFFERING;
 #endif
     }
-    
-    if (openMode & QIODevice::WriteOnly) 
+
+    /*
+    if (openMode & QIODevice::WriteOnly)
     {
         QDir dir;
         dir.mkpath(QnFile::absolutePath(fileName));
     }
+    */
 
     std::unique_ptr<QBufferedFile> rez(
         new QBufferedFile(
-            std::shared_ptr<IQnFile>(new QnFile(fileName)), 
-            ioBlockSize, 
+            std::shared_ptr<IQnFile>(new QnFile(fileName)),
+            ioBlockSize,
             ffmpegBufferSize,
             getId()
-        ) 
+        )
     );
     rez->setSystemFlags(systemFlags);
     if (!rez->open(openMode))
         return 0;
     return rez.release();
+}
+
+void QnFileStorageResource::setLocalPathSafe(const QString &path) const
+{
+    QnMutexLocker lk(&m_mutex);
+    m_localPath = path;
+}
+
+
+QString QnFileStorageResource::getLocalPathSafe() const
+{
+    QnMutexLocker lk(&m_mutex);
+    return m_localPath;
 }
 
 QString QnFileStorageResource::getPath() const
@@ -105,94 +143,110 @@ QString QnFileStorageResource::getPath() const
         return QUrl(url).path();
 }
 
-bool QnFileStorageResource::initOrUpdate() const
+bool QnFileStorageResource::initOrUpdateInternal() const
 {
-    QMutexLocker lock(&m_mutexPermission);
-    
-    if (getUrl().isEmpty())
-        return false;
-
-    if (m_dirty)
+    QString url;
+    bool valid;
     {
-        m_dirty = false;
-        if (getUrl().contains("://"))
-            m_valid = mountTmpDrive() == 0; // true if no error code
-        else
-            m_valid = true;
+        QnMutexLocker lock(&m_mutexCheckStorage);
+        url = getUrl();
+        if (url.isEmpty())
+            return false;
+        valid = m_valid;
     }
+
+    if (valid)
+        return true;
+    else if (url.contains("://"))
+        valid = mountTmpDrive() == 0; // true if no error code
+    else
+    {
+        QDir storageDir(url);
+        valid = storageDir.exists() ? true : storageDir.mkpath(url);
+    }
+
+    QnMutexLocker lock(&m_mutexCheckStorage);
+    if (getUrl() != url)
+        return false;
+    m_valid = valid;
     return m_valid;
 }
 
-
 bool QnFileStorageResource::checkWriteCap() const
 {
-    if (!initOrUpdate())
+    if (!m_valid)
         return false;
 
-    if(!isStorageDirMounted())
-        return false;
-    
     if (hasFlags(Qn::deprecated))
         return false;
-    
-    QString localDirPath = m_localPath.isEmpty() ? getPath() : m_localPath;
-    QDir dir(localDirPath);
-    
-    bool needRemoveDir = false;
-    if (!dir.exists())  {
-        if (!dir.mkpath(localDirPath))
-            return false;
-        needRemoveDir = true;
-    }
-    
-    QFile file(closeDirPath(localDirPath) + QString("tmp") + QString::number((unsigned) ((rand() << 16) + rand())));
-    bool result = file.open(QFile::WriteOnly);
-    if (result) {
-        file.close();
-        file.remove();
-    }
-    
-    if (needRemoveDir)
-        dir.remove(localDirPath);
-    
-    return result;
+
+    QnMutexLocker lock(&m_writeTestMutex);
+    if (!m_writeCapCached.is_initialized())
+        m_writeCapCached = testWriteCapInternal();
+    return *m_writeCapCached;
 }
 
 bool QnFileStorageResource::checkDBCap() const
 {
-    if (!initOrUpdate())
+    if (!m_valid)
         return false;
 #ifdef _WIN32
     return true;
 #else
-    if (!m_localPath.isEmpty())
+    // if storage is mounted via mediaserver (smb://...)
+    // let's not create media DB there
+    if (!getLocalPathSafe().isEmpty())
         return false;
 
-    QList<QnPlatformMonitor::PartitionSpace> partitions = 
+    {
+        QnMutexLocker lk(&m_mutex);
+        if (m_dbReady.is_initialized())
+            return *m_dbReady;
+    }
+
+    // Same for mounted by hand remote storages (NAS)
+    QList<QnPlatformMonitor::PartitionSpace> partitions =
         qnPlatform->monitor()->QnPlatformMonitor::totalPartitionSpaceInfo(
             QnPlatformMonitor::NetworkPartition );
 
+    bool dbReady = true;
     for(const QnPlatformMonitor::PartitionSpace& partition: partitions)
     {
         if(getPath().startsWith(partition.path))
-            return false;
+            dbReady = false;
     }
-    return true;
+
+    {
+        QnMutexLocker lk(&m_mutex);
+        m_dbReady = dbReady;
+        return dbReady;
+    }
 #endif
 }
 
 int QnFileStorageResource::getCapabilities() const
 {
-    if (!initOrUpdate())
+    if (!m_valid)
         return 0;
 
     if (checkDBCap())
+    {
+        QnMutexLocker lk(&m_mutex);
         m_capabilities |= QnAbstractStorageResource::cap::DBReady;
-    return m_capabilities | (checkWriteCap() ? QnAbstractStorageResource::cap::WriteFile : 0);
+    }
+
+    int writeCap = checkWriteCap() ? QnAbstractStorageResource::cap::WriteFile : 0;
+    {
+        QnMutexLocker lk(&m_mutex);
+        return m_capabilities | writeCap;
+    }
+    return 0;
 }
 
 QString QnFileStorageResource::translateUrlToLocal(const QString &url) const
 {
+    QnMutexLocker lk(&m_mutex);
+
     if (m_localPath.isEmpty())
         return url;
     else
@@ -210,6 +264,8 @@ QString QnFileStorageResource::translateUrlToLocal(const QString &url) const
 
 QString QnFileStorageResource::translateUrlToRemote(const QString &url) const
 {
+    QnMutexLocker lk(&m_mutex);
+
     if (m_localPath.isEmpty())
         return url;
     else
@@ -233,7 +289,11 @@ void QnFileStorageResource::removeOldDirs()
         if (entry.absoluteFilePath().indexOf(prefix) == -1)
             continue;
 
+#if __linux__
         int ecode = umount(entry.absoluteFilePath().toLatin1().constData());
+#elif __APPLE__
+        int ecode = unmount(entry.absoluteFilePath().toLatin1().constData(), 0);
+#endif
         if (ecode != 0)
         {
             bool safeToRemove = true;
@@ -280,35 +340,41 @@ int QnFileStorageResource::mountTmpDrive() const
     uncString.replace(lit("/"), lit("\\"));
 
     QString cifsOptionsString =
-        lit("username=%1,password=%2,unc=\\\\%3")
+        lit("sec=ntlm,username=%1,password=%2,unc=\\\\%3")
             .arg(url.userName())
-            .arg(url.password())
+            .arg(aux::passwordFromUrl(url))
             .arg(uncString);
 
-    QString srcString = lit("//") + url.host() + url.path();    
-    m_localPath = aux::genLocalPath(getUrl());
+    QString srcString = lit("//") + url.host() + url.path();
+    QString localPathCopy = aux::genLocalPath(getUrl());
 
-    umount(m_localPath.toLatin1().constData());
-    rmdir(m_localPath.toLatin1().constData());
+    setLocalPathSafe(localPathCopy);
+
+    umount(localPathCopy.toLatin1().constData());
+    rmdir(localPathCopy.toLatin1().constData());
 
     int retCode = mkdir(
-        m_localPath.toLatin1().constData(),
+        localPathCopy.toLatin1().constData(),
         S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH
     );
 
-    retCode = mount(        
+#if __linux__
+    retCode = mount(
         srcString.toLatin1().constData(),
-        m_localPath.toLatin1().constData(),
+        localPathCopy.toLatin1().constData(),
         "cifs",
         MS_NODEV | MS_NOEXEC | MS_NOSUID,
         cifsOptionsString.toLatin1().constData()
     );
+#elif __APPLE__
+#error "TODO BSD-style mount call"
+#endif
 
-    if (retCode == -1) 
+    if (retCode == -1)
     {
         qWarning()
             << "Mount SMB resource " << srcString
-            << " to local path " << m_localPath << " failed"
+            << " to local path " << localPathCopy << " failed"
             << " retCode: " << retCode << ", errno!: " << errno;
         return -1;
     }
@@ -320,16 +386,42 @@ bool QnFileStorageResource::updatePermissions() const
 {
     if (getUrl().startsWith("smb://"))
     {
-        QString userName = QUrl(getUrl()).userName().isEmpty() ? "guest" : QUrl(getUrl()).userName();
+        QString userName = QUrl(getUrl()).userName().isEmpty() ?
+                           "guest" :
+                            QUrl(getUrl()).userName();
+
         NETRESOURCE netRes;
         memset(&netRes, 0, sizeof(netRes));
         netRes.dwType = RESOURCETYPE_DISK;
+
         QUrl storageUrl(getUrl());
-        QString path = lit("\\\\") + storageUrl.host() + lit("\\") + storageUrl.path().mid((1));
+        QString path = lit("\\\\") + storageUrl.host() +
+                       lit("\\") + storageUrl.path().mid((1));
+
         netRes.lpRemoteName = (LPWSTR) path.constData();
+
         LPWSTR password = (LPWSTR) storageUrl.password().constData();
         LPWSTR user = (LPWSTR) userName.constData();
-        if (WNetUseConnection(0, &netRes, password, user, 0, 0, 0, 0) != NO_ERROR)
+
+        DWORD errCode = WNetUseConnection(
+            0,   // window handler, not used
+            &netRes,
+            password,
+            user,
+            0,   // connection flags, should work with just 0 though
+            0,
+            0,   // additional connection info buffer size
+            NULL // additional connection info buffer
+        );
+
+        if (errCode == ERROR_SESSION_CREDENTIAL_CONFLICT)
+        {   // That means that user has alreay used this network resource
+            // with different credentials set.
+            // If so we can attempt to just use this resource as local one.
+            return true;
+        }
+
+        if (errCode != NO_ERROR)
             return false;
     }
     return true;
@@ -341,31 +433,31 @@ int QnFileStorageResource::mountTmpDrive() const
     if (!storageUrl.isValid())
         return -1;
 
-    QString path = 
-        lit("\\\\") + 
-        storageUrl.host() + 
+    QString path =
+        lit("\\\\") +
+        storageUrl.host() +
         storageUrl.path().replace(lit("/"), lit("\\"));
 
     if (!updatePermissions())
         return -1;
 
-    m_localPath = path;
+    setLocalPathSafe(path);
+
     return 0;
 }
 #endif
 
 void QnFileStorageResource::setUrl(const QString& url)
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutexCheckStorage);
     QnStorageResource::setUrl(url);
-    m_dirty = true;
+    m_valid = false;
 }
 
-QnFileStorageResource::QnFileStorageResource(QnStorageManager *storageManager):
-    m_dirty(false),
+QnFileStorageResource::QnFileStorageResource():
     m_valid(false),
     m_capabilities(0),
-    m_storageManager(storageManager)
+    m_cachedTotalSpace(QnStorageResource::kSizeDetectionOmitted)
 {
     m_capabilities |= QnAbstractStorageResource::cap::RemoveFile;
     m_capabilities |= QnAbstractStorageResource::cap::ListFile;
@@ -374,10 +466,15 @@ QnFileStorageResource::QnFileStorageResource(QnStorageManager *storageManager):
 
 QnFileStorageResource::~QnFileStorageResource()
 {
+    QnMutexLocker lk(&m_mutex);
 #ifndef _WIN32
     if (!m_localPath.isEmpty())
     {
+#if __linux__
         umount(m_localPath.toLatin1().constData());
+#elif __APPLE__
+        unmount(m_localPath.toLatin1().constData(), 0);
+#endif
         rmdir(m_localPath.toLatin1().constData());
     }
 #endif
@@ -385,7 +482,7 @@ QnFileStorageResource::~QnFileStorageResource()
 
 bool QnFileStorageResource::removeFile(const QString& url)
 {
-    if (!initOrUpdate())
+    if (!m_valid)
         return false;
 
     qnFileDeletor->deleteFile(removeProtocolPrefix(translateUrlToLocal(url)));
@@ -394,7 +491,7 @@ bool QnFileStorageResource::removeFile(const QString& url)
 
 bool QnFileStorageResource::renameFile(const QString& oldName, const QString& newName)
 {
-    if (!initOrUpdate())
+    if (!m_valid)
         return false;
 
     return QFile::rename(translateUrlToLocal(oldName), translateUrlToLocal(newName));
@@ -403,7 +500,7 @@ bool QnFileStorageResource::renameFile(const QString& oldName, const QString& ne
 
 bool QnFileStorageResource::removeDir(const QString& url)
 {
-    if (!initOrUpdate())
+    if (!m_valid)
         return false;
 
     QDir dir;
@@ -412,7 +509,7 @@ bool QnFileStorageResource::removeDir(const QString& url)
 
 bool QnFileStorageResource::isDirExists(const QString& url)
 {
-    if (!initOrUpdate())
+    if (!m_valid)
         return false;
 
     QDir d(translateUrlToLocal(url));
@@ -421,7 +518,7 @@ bool QnFileStorageResource::isDirExists(const QString& url)
 
 bool QnFileStorageResource::isFileExists(const QString& url)
 {
-    if (!initOrUpdate())
+    if (!m_valid)
         return false;
 
     return QFile::exists(removeProtocolPrefix(translateUrlToLocal(url)));
@@ -429,41 +526,50 @@ bool QnFileStorageResource::isFileExists(const QString& url)
 
 qint64 QnFileStorageResource::getFreeSpace()
 {
-    if (!initOrUpdate())
-        return -1;
+    QString localPathCopy = getLocalPathSafe();
 
-    return getDiskFreeSpace(
-        m_localPath.isEmpty() ?
-        getPath() :
-        m_localPath
-    );
+    if (!m_valid)
+        return QnStorageResource::kUnknownSize;
+
+    return getDiskFreeSpace(localPathCopy.isEmpty() ?  getPath() : localPathCopy);
 }
 
 qint64 QnFileStorageResource::getTotalSpace()
 {
-    if (!initOrUpdate())
-        return -1;
+    if (!m_valid)
+        return QnStorageResource::kUnknownSize;
 
-    return getDiskTotalSpace(
-        m_localPath.isEmpty() ?
-        getPath() :
-        m_localPath
-    );
+    if (m_cachedTotalSpace <= 0)
+    {
+        QString localPathCopy = getLocalPathSafe();
+
+        QnMutexLocker locker (&m_writeTestMutex);
+        if (m_cachedTotalSpace <= 0)
+        {
+            m_cachedTotalSpace = getDiskTotalSpace(
+                localPathCopy.isEmpty() ? getPath() : localPathCopy);
+        }
+    }
+
+    return m_cachedTotalSpace;
 }
 
 QnAbstractStorageResource::FileInfoList QnFileStorageResource::getFileList(const QString& dirName)
 {
-    if (!initOrUpdate())
+    if (!m_valid)
         return QnAbstractStorageResource::FileInfoList();
 
+    QnAbstractStorageResource::FileInfoList ret;
+
     QDir dir(translateUrlToLocal(dirName));
+    if (!dir.exists())
+        return ret;
 
     QFileInfoList localList = dir.entryInfoList(
         QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot,
         QDir::DirsFirst
     );
 
-    QnAbstractStorageResource::FileInfoList ret;
 
     for (const QFileInfo &entry : localList)
     {
@@ -480,48 +586,52 @@ QnAbstractStorageResource::FileInfoList QnFileStorageResource::getFileList(const
 
 qint64 QnFileStorageResource::getFileSize(const QString& url) const
 {
-    if (!initOrUpdate())
+    if (!m_valid)
         return -1;
 
     return QnFile::getFileSize(translateUrlToLocal(url));
 }
 
-bool QnFileStorageResource::isAvailable() const 
+bool QnFileStorageResource::testWriteCapInternal() const
 {
-    if (!m_valid)
-        m_dirty = true;
+    QString fileName(lit("%1%2.tmp"));
+    QString localGuid = qnCommon->moduleGUID().toString();
+    localGuid = localGuid.mid(1, localGuid.length() - 2);
+    fileName = fileName.arg(closeDirPath(translateUrlToLocal(getPath()))).arg(localGuid);
+    QFile file(fileName);
+    return file.open(QIODevice::WriteOnly);
+}
 
-    if (!initOrUpdate())
-        return false;
-
-    if(!isStorageDirMounted())
-        return false;
-
-    QString tmpDir = closeDirPath(translateUrlToLocal(getPath())) + QString("tmp") + QString::number(rand());
-    QDir dir(tmpDir);
-    if (dir.exists()) {
-        dir.remove(tmpDir);
-        return true;
-    }
-    else {
-        if (dir.mkpath(tmpDir))
-        {
-            dir.rmdir(tmpDir);
-            return true;
-        }
-        else {
-#ifdef WIN32
-            if (::GetLastError() == ERROR_DISK_FULL)
-                return true;
-#else
-            if (errno == ENOSPC)
-                return true;
-#endif
-            return false;
-        }
+bool QnFileStorageResource::initOrUpdate() const
+{
+    QString localPathCopy;
+    {
+        QnMutexLocker lk(&m_mutex);
+        localPathCopy = m_localPath;
     }
 
-    return false;
+    if (!initOrUpdateInternal())
+        return false;
+
+    if (!isStorageDirMounted())
+    {
+        m_valid = false;
+        return false;
+    }
+
+    QnMutexLocker lock(&m_writeTestMutex);
+    m_writeCapCached = testWriteCapInternal(); // update cached value periodically
+    // write check fail is a cause to set dirty to true, thus enabling
+    // remount attempt in initOrUpdate()
+    if (!m_writeCapCached)
+    {
+        m_valid = false;
+        return false;
+    }
+    m_cachedTotalSpace = getDiskTotalSpace(localPathCopy.isEmpty() ?
+                                           getPath() :
+                                           localPathCopy); // update cached value periodically
+    return *m_writeCapCached;
 }
 
 QString QnFileStorageResource::removeProtocolPrefix(const QString& url)
@@ -532,10 +642,56 @@ QString QnFileStorageResource::removeProtocolPrefix(const QString& url)
 
 QnStorageResource* QnFileStorageResource::instance(const QString&)
 {
-    assert(QnStorageManager::instance());
-    QnStorageResource* storage = new QnFileStorageResource(QnStorageManager::instance());
-    storage->setSpaceLimit( MSSettings::roSettings()->value(nx_ms_conf::MIN_STORAGE_SPACE, nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE).toLongLong() );
+    QnStorageResource* storage = new QnFileStorageResource();
+    storage->setSpaceLimit(
+        MSSettings::roSettings()->value(
+            nx_ms_conf::MIN_STORAGE_SPACE,
+            nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE
+        ).toLongLong()
+    );
     return storage;
+}
+
+qint64 QnFileStorageResource::calcSpaceLimit(const QString &url)
+{
+    const qint64 defaultStorageSpaceLimit = MSSettings::roSettings()->value(
+        nx_ms_conf::MIN_STORAGE_SPACE,
+        nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE
+    ).toLongLong();
+
+    return QnFileStorageResource::isLocal(url) ?  defaultStorageSpaceLimit :
+                                                  QnStorageResource::kNasStorageLimit;
+}
+
+qint64 QnFileStorageResource::calcSpaceLimit(QnPlatformMonitor::PartitionType ptype)
+{
+    const qint64 defaultStorageSpaceLimit = MSSettings::roSettings()->value(
+        nx_ms_conf::MIN_STORAGE_SPACE,
+        nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE
+    ).toLongLong();
+
+    return ptype == QnPlatformMonitor::LocalDiskPartition ?
+           defaultStorageSpaceLimit :
+           QnStorageResource::kNasStorageLimit;
+}
+
+bool QnFileStorageResource::isLocal(const QString &url)
+{
+    if (url.contains(lit("://")))
+        return false;
+
+    auto platformMonitor = static_cast<QnPlatformMonitor*>(qnPlatform->monitor());
+
+    QList<QnPlatformMonitor::PartitionSpace> partitions =
+        platformMonitor->totalPartitionSpaceInfo(
+            QnPlatformMonitor::LocalDiskPartition
+        );
+
+    for (const auto &partition : partitions)
+        if (url.startsWith(partition.path))
+            return true;
+
+    return false;
 }
 
 float QnFileStorageResource::getAvarageWritingUsage() const
@@ -581,9 +737,12 @@ static bool readTabFile( const QString& filePath, QStringList* const mountPoints
     return true;
 }
 
+
 bool QnFileStorageResource::isStorageDirMounted() const
 {
-    if (!m_localPath.isEmpty()) // smb
+    QString localPathCopy = getLocalPathSafe();
+
+    if (!localPathCopy.isEmpty()) // smb
     {
         QUrl url(getUrl());
 
@@ -591,34 +750,33 @@ bool QnFileStorageResource::isStorageDirMounted() const
         uncString.replace(lit("/"), lit("\\"));
 
         QString cifsOptionsString =
-            lit("username=%1,password=%2,unc=\\\\%3")
+            lit("sec=ntlm,username=%1,password=%2,unc=\\\\%3")
                 .arg(url.userName())
-                .arg(url.password())
+                .arg(aux::passwordFromUrl(url))
                 .arg(uncString);
 
         QString srcString = lit("//") + url.host() + url.path();
 
-        auto badResultHandler = [this]()
+        auto badResultHandler = [this, &localPathCopy]()
         {   // Treat every unexpected test result the same way.
             // Cleanup attempt will be performed.
-            // Will try to unmount, remove local mount point directory 
-            // and set flag meaning that local path recreation 
+            // Will try to unmount, remove local mount point directory
+            // and set flag meaning that local path recreation
             // + remount is needed
-            umount(m_localPath.toLatin1().constData()); // directory may not exists, but this is Ok
-            rmdir(m_localPath.toLatin1().constData()); // same as above
-            m_dirty = true;
+            umount(localPathCopy.toLatin1().constData()); // directory may not exists, but this is Ok
+            rmdir(localPathCopy.toLatin1().constData()); // same as above
             return false;
         };
 
         // Check if local (mounted) storage path exists
-        DIR* dir = opendir(m_localPath.toLatin1().constData());
+        DIR* dir = opendir(localPathCopy.toLatin1().constData());
         if (dir)
             closedir(dir);
         else if (ENOENT == errno)
         {   // Directory does not exist.
             NX_LOG(
                 lit("[QnFileStorageResource::isStorageDirMounted] opendir() %1 failed, directory does not exists")
-                    .arg(m_localPath),
+                    .arg(localPathCopy),
                 cl_logDEBUG1
             );
             return badResultHandler();
@@ -627,21 +785,24 @@ bool QnFileStorageResource::isStorageDirMounted() const
         {   // opendir() failed for some other reason.
             NX_LOG(
                 lit("[QnFileStorageResource::isStorageDirMounted] opendir() %1 failed, errno = %2")
-                    .arg(m_localPath)
+                    .arg(localPathCopy)
                     .arg(errno),
                 cl_logDEBUG1
             );
             return badResultHandler();
         }
 
-        // Dir exists. Now check if it is mounted
+#if __linux__
         int retCode = mount(
             srcString.toLatin1().constData(),
-            m_localPath.toLatin1().constData(),
+            localPathCopy.toLatin1().constData(),
             "cifs",
             MS_NOSUID | MS_NODEV | MS_NOEXEC,
             cifsOptionsString.toLatin1().constData()
         );
+#elif __APPLE__
+#error "TODO BSD-style mount call"
+#endif
 
         int err = errno;
 

@@ -17,7 +17,7 @@ QnSendmailBusinessActionWidget::QnSendmailBusinessActionWidget(QWidget *parent) 
     ui->setupUi(this);
 
     connect(ui->emailLineEdit, SIGNAL(textChanged(QString)), this, SLOT(paramsChanged()));
-    connect(ui->settingsButton, &QPushButton::clicked, action(Qn::PreferencesSmtpTabAction), &QAction::trigger);
+    connect(ui->settingsButton, &QPushButton::clicked, action(QnActions::PreferencesSmtpTabAction), &QAction::trigger);
 }
 
 QnSendmailBusinessActionWidget::~QnSendmailBusinessActionWidget()
@@ -30,14 +30,14 @@ void QnSendmailBusinessActionWidget::updateTabOrder(QWidget *before, QWidget *af
     setTabOrder(ui->settingsButton, after);
 }
 
-void QnSendmailBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, QnBusiness::Fields fields) {
-    if (!model)
+void QnSendmailBusinessActionWidget::at_model_dataChanged(QnBusiness::Fields fields) {
+    if (!model())
         return;
 
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
     if (fields & QnBusiness::ActionParamsField) {
-        QString email = (model->actionParams().emailAddress);
+        QString email = (model()->actionParams().emailAddress);
         if (ui->emailLineEdit->text() != email)
             ui->emailLineEdit->setText(email);
     }

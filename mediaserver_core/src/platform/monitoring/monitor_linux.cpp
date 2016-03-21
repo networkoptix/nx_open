@@ -4,6 +4,7 @@
 #include <map>
 #include <memory>
 #include <set>
+#include <chrono>
 
 #include <boost/optional.hpp>
 
@@ -21,8 +22,8 @@
 #include <sys/statvfs.h>
 
 #include <utils/common/log.h>
-#include <utils/common/systemerror.h>
-
+#include <utils/common/concurrent.h>
+#include <utils/fs/dir.h>
 
 static const int BYTES_PER_MB = 1024*1024;
 //static const int NET_STAT_CALCULATION_PERIOD_SEC = 10;
@@ -210,7 +211,7 @@ public:
 
             unsigned int majorNumber = 0, minorNumber = 0, numBlocks = 0;
             char devName[MAX_LINE_LENGTH];
-            if(sscanf(line, "%u %u %u %s", &majorNumber, &minorNumber, &numBlocks, devName) != 4)  
+            if(sscanf(line, "%u %u %u %s", &majorNumber, &minorNumber, &numBlocks, devName) != 4)
                 continue; /* Skip unrecognized lines. */
 
             QString devNameString = QString::fromUtf8(devName);
@@ -325,7 +326,7 @@ protected:
                 //std::cout<<"Interface "<<interfaceName.toLatin1().constData()<<" (mac "<<ctx.macAddress.toString().toLatin1().constData()<<") statistics: "
                 //    "speed "<<ctx.bytesPerSecMax<<", rx_bytes "<<rx_bytes<<", tx_bytes "<<tx_bytes<<", "
                 //    "bytesPerSecIn "<<ctx.bytesPerSecIn<<", bytesPerSecOut "<<ctx.bytesPerSecOut<<"\n";
-                    
+
                 m_ifNameToStatistics[interfaceName] = ctx;
             }
         }
@@ -441,7 +442,7 @@ qreal QnLinuxMonitor::totalRamUsage()
     for( int i = 0; fgets(line, MAX_LINE_LENGTH, file.get()) != NULL; ++i )
     {
         const size_t length = strlen(line);
-        
+
         char* sepPos = strchr( line, ':' );
         if( sepPos == NULL )
             continue;
@@ -551,66 +552,59 @@ static QnPlatformMonitor::PartitionType fsNameToType( const QString& fsName )
 /*!
     \note If same device mounted to multiple points, returns mount point with shortest name
 */
-SystemError::ErrorCode readPartitionsAndSizes( QList<QnPlatformMonitor::PartitionSpace>* const partitionInfoList )
+static QList<QnPlatformMonitor::PartitionSpace> readPartitionsAndSizes()
 {
-    //map<device, <path, fs_name>>
-    std::map<QString, std::pair<QString, QString>> deviceToPath;
-    std::unique_ptr<FILE, decltype(&fclose)> file( fopen("/proc/mounts", "r"), fclose );
-    if( !file )
-        return SystemError::getLastOSErrorCode();
+    std::list<PartitionInfo> partitions;
+    QList<QnPlatformMonitor::PartitionSpace> result;
+    const auto errCode = readPartitions(&partitions);
 
-    char line[MAX_LINE_LENGTH];
-    for( int i = 0; fgets(line, MAX_LINE_LENGTH, file.get()) != NULL; ++i )
+    if (errCode != SystemError::noError)
+        return result;
+    for (const auto& data: partitions)
     {
-        if( i == 0 )
-            continue; /* Skip header. */
-
-        char cDevName[MAX_LINE_LENGTH];
-        char cPath[MAX_LINE_LENGTH];
-        char cFSName[MAX_LINE_LENGTH];
-        if( sscanf(line, "%s %s %s ", cDevName, cPath, cFSName) != 3 )
-            continue; /* Skip unrecognized lines. */
-
-        const QString& devName = QString::fromUtf8(cDevName);
-        const QString& path = QString::fromUtf8(cPath);
-        const QString& fsName = QString::fromUtf8(cFSName);
-
-        auto p = deviceToPath.emplace( devName, std::make_pair(path, fsName) );
-        if( !p.second )
-        {
-            //device has mutiple mount points
-            if( path.length() < p.first->second.first.length() )
-            {
-                p.first->second.first = path; //selecting shortest mount point
-                p.first->second.second = fsName;
-            }
-        }
-    }
-
-    for( auto deviceAndPath: deviceToPath )
-    {
-        struct statvfs64 vfsInfo;
-        memset( &vfsInfo, 0, sizeof(vfsInfo) );
-        if( statvfs64( deviceAndPath.second.first.toUtf8().constData(), &vfsInfo ) == -1 )
-            continue;
-
         QnPlatformMonitor::PartitionSpace partitionInfo;
-        partitionInfo.devName = deviceAndPath.first;
-        partitionInfo.path = deviceAndPath.second.first;
-        partitionInfo.type = fsNameToType( deviceAndPath.second.second );
-        partitionInfo.sizeBytes = (int64_t)vfsInfo.f_blocks * vfsInfo.f_frsize;
-        partitionInfo.freeBytes = (int64_t)vfsInfo.f_bfree * vfsInfo.f_bsize;
-        partitionInfoList->push_back( partitionInfo );
+        partitionInfo.devName = data.devName;
+        partitionInfo.path = data.path;
+        partitionInfo.type = fsNameToType(data.fsName);
+        partitionInfo.sizeBytes = data.sizeBytes;
+        partitionInfo.freeBytes = data.freeBytes;
+        result.push_back(partitionInfo);
     }
 
-    return SystemError::noError;
+    return result;
 }
-
-
 
 QList<QnPlatformMonitor::PartitionSpace> QnLinuxMonitor::totalPartitionSpaceInfo()
 {
-    QList<QnPlatformMonitor::PartitionSpace> partitions;
-    readPartitionsAndSizes( &partitions );
-    return partitions;
+    QnMutexLocker syncLk(&m_partitionsInfo.syncMutex);
+    std::chrono::milliseconds waitTimeout = m_partitionsInfo.started ?
+                                            std::chrono::milliseconds(200) :
+                                            std::chrono::milliseconds(2000);
+
+    if (!m_partitionsInfo.started || m_partitionsInfo.done.isFinished())
+    {
+        if (!m_partitionsInfo.started)
+            m_partitionsInfo.started = true;
+
+        m_partitionsInfo.done = QtConcurrent::run([this]
+                                                  {
+                                                      auto partitions = readPartitionsAndSizes();
+                                                      QnMutexLocker lk(&m_partitionsInfo.mutex);
+                                                      m_partitionsInfo.info = std::move(partitions);
+                                                  });
+        auto start = std::chrono::steady_clock::now();
+        while (1)
+        {
+            auto now = std::chrono::steady_clock::now();
+            if (std::chrono::duration_cast<std::chrono::milliseconds>(now - start) > waitTimeout)
+                break;
+
+            if (m_partitionsInfo.done.isFinished())
+                break;
+            QThread::msleep(2);
+        }
+    }
+
+    QnMutexLocker lk(&m_partitionsInfo.mutex);
+    return m_partitionsInfo.info;
 }

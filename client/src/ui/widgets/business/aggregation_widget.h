@@ -10,19 +10,25 @@ namespace Ui {
 class QnAggregationWidget : public QWidget
 {
     Q_OBJECT
-    
+
 public:
     explicit QnAggregationWidget(QWidget *parent = 0);
     ~QnAggregationWidget();
-    
+
     Q_SLOT void setValue(int secs);
     int value() const;
 
     void setShort(bool value);
 
     static int optimalWidth();
+
+    QWidget *lastTabItem();
+
 signals:
     void valueChanged();
+
+private:
+    void updateMinimumValue();
 
 private:
     QScopedPointer<Ui::AggregationWidget> ui;

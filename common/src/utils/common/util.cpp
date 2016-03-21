@@ -1,6 +1,6 @@
 #include "utils/common/util.h"
 
-#ifndef Q_OS_WIN
+#if !defined(Q_OS_WIN) && !defined(Q_OS_ANDROID)
 #   include <sys/statvfs.h>
 #   include <sys/time.h>
 #endif
@@ -142,7 +142,6 @@ QString getParentFolder(const QString& root)
     return newRoot.left(newRoot.lastIndexOf(QDir::separator())+1);
 }
 
-
 qint64 getDiskFreeSpace(const QString& root)
 {
     quint64 freeBytesAvailableToCaller = -1;
@@ -181,7 +180,17 @@ qint64 getDiskTotalSpace(const QString& root)
     return totalNumberOfBytes;
 };
 
-#else 
+#elif defined(Q_OS_ANDROID)
+
+qint64 getDiskFreeSpace(const QString& root) {
+    return 0; // TODO: #android
+}
+
+qint64 getDiskTotalSpace(const QString& root) {
+    return 0; // TODO: #android
+}
+
+#else
 
 //TODO #ak introduce single function for getting partition info 
     //and place platform-specific code in a single pace
@@ -234,8 +243,8 @@ quint64 getUsecTimer()
 
     static quint32 prevTics = 0;
     static quint64 cycleCount = 0;
-    static QMutex timeMutex;
-    QMutexLocker lock(&timeMutex);
+    static QnMutex timeMutex;
+    QnMutexLocker lock( &timeMutex );
     quint32 tics = (qint32) timeGetTime();
     if (tics < prevTics) 
         cycleCount+= 0x100000000ull;

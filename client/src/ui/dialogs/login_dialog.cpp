@@ -32,9 +32,10 @@
 #include <ui/help/help_topics.h>
 #include <ui/workaround/gl_widget_factory.h>
 
+#include <network/module_finder.h>
+#include <network/networkoptixmodulerevealcommon.h>
+
 #include <utils/applauncher_utils.h>
-#include <utils/network/module_finder.h>
-#include <utils/network/networkoptixmodulerevealcommon.h>
 #include <utils/common/url.h>
 
 #include "plugins/resource/avi/avi_resource.h"
@@ -46,7 +47,6 @@
 #include "ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h"
 
 #include <utils/connection_diagnostics_helper.h>
-
 
 #include "compatibility.h"
 #include <utils/common/app_info.h>
@@ -73,16 +73,16 @@ namespace {
 /* QnEcData                                                             */
 /************************************************************************/
 
-QnLoginDialog::QnEcData::QnEcData() : 
+QnLoginDialog::QnEcData::QnEcData() :
     protoVersion(0)
 {
 }
 
 bool QnLoginDialog::QnEcData::operator==(const QnEcData& other) const {
-    return 
-           id == other.id 
-        && url == other.url 
-        && version == other.version 
+    return
+           id == other.id
+        && url == other.url
+        && version == other.version
         && protoVersion == other.protoVersion
         && systemName == other.systemName
         ;
@@ -206,7 +206,6 @@ void QnLoginDialog::accept() {
 
     QString name = ui->connectionsComboBox->currentText();
 
-    qnCommon->updateRunningInstanceGuid();
     m_requestHandle = QnAppServerConnectionFactory::ec2ConnectionFactory()->testConnection(
         url,
         this,
@@ -221,11 +220,11 @@ void QnLoginDialog::accept() {
         QnConnectionDiagnosticsHelper::Result status = QnConnectionDiagnosticsHelper::validateConnection(connectionInfo, errorCode, url, this);
         switch (status) {
         case QnConnectionDiagnosticsHelper::Result::Success:
-            menu()->trigger(Qn::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, url));
+            menu()->trigger(QnActions::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, url));
             updateStoredConnections(url, name);
             break;
         case QnConnectionDiagnosticsHelper::Result::RestartRequested:
-            menu()->trigger(Qn::DelayedForcedExitAction);
+            menu()->trigger(QnActions::DelayedForcedExitAction);
             break; // to avoid cycle
         default:    //error
             return;
@@ -352,7 +351,7 @@ void QnLoginDialog::resetAutoFoundConnectionsModel() {
 }
 
 void QnLoginDialog::updateAcceptibility() {
-    bool acceptable = 
+    bool acceptable =
         !ui->passwordLineEdit->text().isEmpty() &&
         !ui->loginLineEdit->text().trimmed().isEmpty() &&
         !ui->hostnameLineEdit->text().trimmed().isEmpty() &&
@@ -414,7 +413,7 @@ void QnLoginDialog::at_connectionsComboBox_currentIndexChanged(const QModelIndex
     QUrl url = item == NULL ? QUrl() : item->data(Qn::UrlRole).toUrl();
     ui->hostnameLineEdit->setText(url.host());
     ui->portSpinBox->setValue(url.port());
-    ui->loginLineEdit->setText(url.userName().isEmpty() 
+    ui->loginLineEdit->setText(url.userName().isEmpty()
         ? lit("admin")  // 99% of users have only one login - admin
         : url.userName());
     ui->passwordLineEdit->setText(url.password());
@@ -427,15 +426,23 @@ void QnLoginDialog::at_testButton_clicked() {
     QUrl url = currentUrl();
 
     if (!url.isValid()) {
-        QMessageBox::warning(this, tr("Invalid Paramaters"), tr("The information you have entered is not valid."));
+        QMessageBox::warning(this, tr("Invalid Parameters"), tr("The information you have entered is not valid."));
         return;
     }
 
+    bool connectRequested = false;
+
     QScopedPointer<QnConnectionTestingDialog> dialog(new QnConnectionTestingDialog(this));
-    dialog->testEnterpriseController(url);
+    connect(dialog.data(), &QnConnectionTestingDialog::connectRequested, this, [&connectRequested] {
+        connectRequested = true;
+    });
+
+    dialog->testConnection(url);
     dialog->exec();
 
     updateFocus();
+    if (connectRequested)
+        accept();
 }
 
 void QnLoginDialog::at_saveButton_clicked() {
@@ -522,7 +529,7 @@ void QnLoginDialog::at_deleteButton_clicked() {
                              QMessageBox::Yes, QMessageBox::No) == QMessageBox::No)
         return;
 
-    
+
     connections.removeOne(name);
     qnSettings->setCustomConnections(connections);
     resetConnectionsModel();

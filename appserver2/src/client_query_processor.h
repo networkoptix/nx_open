@@ -9,8 +9,8 @@
 #include <map>
 
 #include <QtCore/QObject>
-#include <QtCore/QMutex>
-#include <QtCore/QMutexLocker>
+#include <utils/thread/mutex.h>
+#include <utils/thread/mutex.h>
 #include <QtCore/QUrlQuery>
 
 #include <api/app_server_connection.h>
@@ -28,6 +28,15 @@
 #include "http/custom_headers.h"
 #include "api/model/audit/auth_session.h"
 
+namespace {
+    Qn::SerializationFormat serializationFormatFromUrl(const QUrl &url, Qn::SerializationFormat defaultFormat = Qn::UbjsonFormat) {
+        Qn::SerializationFormat format = defaultFormat;
+        QString formatString = QUrlQuery(url).queryItemValue(lit("format"));
+        if (!formatString.isEmpty())
+            format = QnLexical::deserialized(formatString, defaultFormat);
+        return format;
+    }
+} // anonymous namespace
 
 namespace ec2
 {
@@ -43,7 +52,7 @@ namespace ec2
     public:
         virtual ~ClientQueryProcessor()
         {
-            QMutexLocker lk( &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             while( !m_runningHttpRequests.empty() )
             {
                 nx_http::AsyncHttpClientPtr httpClient = m_runningHttpRequests.begin()->first;
@@ -77,7 +86,7 @@ namespace ec2
             requestUrl.setPath( lit("/ec2/%1").arg(ApiCommand::toString(tran.command)) );
 
             QByteArray tranBuffer;
-            Qn::SerializationFormat format = Qn::UbjsonFormat; /*Qn::JsonFormat*/;
+            Qn::SerializationFormat format = serializationFormatFromUrl(ecBaseUrl);
             if( format == Qn::JsonFormat )
                 tranBuffer = QJson::serialized(tran);
             //else if( format == Qn::BnsFormat )
@@ -93,7 +102,7 @@ namespace ec2
 
             connect( httpClient.get(), &nx_http::AsyncHttpClient::done, this, &ClientQueryProcessor::onHttpDone, Qt::DirectConnection );
 
-            QMutexLocker lk( &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             if( !httpClient->doPost(requestUrl, Qn::serializationFormatToHttpContentType(format), tranBuffer) )
             {
                 QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( handler, ErrorCode::failure ) );
@@ -128,13 +137,14 @@ namespace ec2
 
             requestUrl.setPath( lit("/ec2/%1").arg(ApiCommand::toString(cmdCode)) );
             QUrlQuery query;
-            toUrlParams( input, &query );
-            query.addQueryItem("format", QnLexical::serialized(Qn::UbjsonFormat));
-            requestUrl.setQuery( query );
+            toUrlParams(input, &query);
+            Qn::SerializationFormat format = serializationFormatFromUrl(ecBaseUrl);
+            query.addQueryItem("format", QnLexical::serialized(format));
+            requestUrl.setQuery(query);
 
             connect( httpClient.get(), &nx_http::AsyncHttpClient::done, this, &ClientQueryProcessor::onHttpDone, Qt::DirectConnection );
 
-            QMutexLocker lk( &m_mutex );
+            QnMutexLocker lk( &m_mutex );
             if( !httpClient->doGet( requestUrl ) )
             {
                 QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( handler, ErrorCode::failure, OutputData() ) );
@@ -149,7 +159,7 @@ namespace ec2
         {
             std::function<void()> handler;
             {
-                QMutexLocker lk( &m_mutex );
+                QnMutexLocker lk( &m_mutex );
                 auto it = m_runningHttpRequests.find( httpClient );
                 assert( it != m_runningHttpRequests.end() );
                 handler = std::move(it->second);
@@ -161,7 +171,7 @@ namespace ec2
         }
 
     private:
-        QMutex m_mutex;
+        QnMutex m_mutex;
         std::map<nx_http::AsyncHttpClientPtr, std::function<void()> > m_runningHttpRequests;
 
         template<class OutputData, class HandlerType>

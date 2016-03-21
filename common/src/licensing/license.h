@@ -8,7 +8,7 @@
 #include <QtCore/QString>
 #include <QtCore/QList>
 #include <QtCore/QMap>
-#include <QtCore/QMutex>
+#include <utils/thread/mutex.h>
 #include <QtCore/QSet>
 #include <QtCore/QTextStream>
 #include <QTimer>
@@ -63,6 +63,7 @@ public:
      * Check if signature matches other fields, also check hardwareId and brand
      */
     virtual bool isValid(ErrorCode* errCode = 0, ValidationMode mode = VM_Regular) const;
+    QString validationInfo(ValidationMode mode = VM_Regular) const;
 
     static QString errorMessage(ErrorCode errCode);
 
@@ -213,7 +214,7 @@ private:
     bool addLicenses_i(const QnLicenseList &licenses);
 private:
     QMap<QByteArray, QnLicensePtr> m_licenseDict;
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     QTimer m_timer;
 };
 

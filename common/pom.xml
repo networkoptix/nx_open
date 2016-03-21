@@ -9,33 +9,38 @@
 	<parent>
 		<artifactId>cpp</artifactId>
 		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>2.4.1-SNAPSHOT</version>
+		<version>2.5.0-SNAPSHOT</version>
 		<relativePath>../cpp</relativePath>
 	</parent>
 
 	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>2.4.1-SNAPSHOT</version>
+	<version>2.5.0-SNAPSHOT</version>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>common</artifactId>
 	<packaging>pom</packaging>
 	<name>HD Witness Common Lib</name>
 
     <properties>
-        <release.version>${parsedVersion.majorVersion}${parsedVersion.minorVersion}${parsedVersion.incrementalVersion}</release.version>
+        <guid>${common.guid}</guid>
         <!--Global libs-->
-        <qt.libs>core gui network xml xmlpatterns sql concurrent multimedia</qt.libs>
         <template>lib</template>
-        <global.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc -lonvif -lquazip</global.libs>
+        <qt.libs>core gui network xml xmlpatterns sql concurrent multimedia</qt.libs>
+        <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc</ffmpeg.libs>
+        <template>lib</template>
+        <global.libs/>
         <!--Specific os libs used-->
-        <windows.oslibs>-lws2_32 -lIphlpapi -lOle32 -lsigar -lSecur32 -lWldap32</windows.oslibs>
-        <linux.oslibs>-lssl -lsigar -lldap</linux.oslibs>
-        <mac.oslibs>-framework IOKit -framework CoreFoundation -lcrypto -lssl -lz -framework QtConcurrent -lsigar-universal64-macosx -lldap</mac.oslibs>
+        <windows.oslibs>-lws2_32 -lIphlpapi -lOle32 -lsigar -lSecur32</windows.oslibs>
+        <linux.oslibs>-lssl -lsigar -lquazip</linux.oslibs>
+        <mac.oslibs>-framework IOKit -framework CoreFoundation -lcrypto -lssl -lz -framework QtConcurrent -lsigar-universal64-macosx -lquazip -lavcodec -lavdevice -lavfilter -lavformat -lavutil</mac.oslibs>
+        <android.oslibs>-lssl -lcrypto -lz</android.oslibs>
         <!--Global defines-->
         <global.defines/>
         <!--Specific os defines-->
         <windows.defines>_USING_V110_SDK71_</windows.defines>
         <linux.defines/>
         <mac.defines/>      
+        <android.defines/>
+        <ios.defines/>
     </properties>   
 
     <dependencies>
@@ -111,6 +116,32 @@
             </properties>
         </profile>
 
+        <profile>
+            <id>mobile-android</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>box</name>
+                    <value>android</value>
+                </property>
+            </activation>
+            <properties>
+                <buildLib>staticlib</buildLib>
+            </properties>
+        </profile>
+        <profile>
+            <id>mobile-ios</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>box</name>
+                    <value>ios</value>
+                </property>
+            </activation>
+            <properties>
+                <buildLib>staticlib</buildLib>
+            </properties>
+        </profile>
     </profiles>	
 
 </project>

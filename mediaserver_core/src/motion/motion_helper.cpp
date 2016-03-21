@@ -19,7 +19,7 @@ QnMotionHelper::QnMotionHelper()
 
 QnMotionHelper::~QnMotionHelper()
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     for(QnMotionArchive* writer: m_writers.values())
         delete writer;
     m_writers.clear();
@@ -27,7 +27,7 @@ QnMotionHelper::~QnMotionHelper()
 
 QnMotionArchive* QnMotionHelper::getArchive(const QnResourcePtr& res, int channel)
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     QnNetworkResourcePtr netres = qSharedPointerDynamicCast<QnNetworkResource>(res);
     if (!netres)
         return 0;
@@ -58,14 +58,14 @@ QnMotionArchiveConnectionPtr QnMotionHelper::createConnection(const QnResourcePt
 
 QnTimePeriodList QnMotionHelper::matchImage(const QList<QRegion>& regions, const QnResourcePtr& res, qint64 msStartTime, qint64 msEndTime, int detailLevel)
 {
-    QVector<QnTimePeriodList> data;
+    std::vector<QnTimePeriodList> data;
     matchImage( regions, res, msStartTime, msEndTime, detailLevel, &data );
     return QnTimePeriodList::mergeTimePeriods(data);
 }
 
 QnTimePeriodList QnMotionHelper::matchImage(const QList<QRegion>& regions, const QnResourceList& resList, qint64 msStartTime, qint64 msEndTime, int detailLevel)
 {
-    QVector<QnTimePeriodList> data;
+    std::vector<QnTimePeriodList> data;
     for(const QnResourcePtr& res: resList)
         matchImage( regions, res, msStartTime, msEndTime, detailLevel, &data );
     //NOTE could just call prev method instead of private one, but that will result in multiple QnTimePeriodList::mergeTimePeriods calls, which could worsen performance
@@ -78,20 +78,20 @@ void QnMotionHelper::matchImage(
     qint64 msStartTime,
     qint64 msEndTime,
     int detailLevel,
-    QVector<QnTimePeriodList>* const timePeriods )
+    std::vector<QnTimePeriodList>* const timePeriods )
 {
     for (int i = 0; i < regions.size(); ++i)
     {
         QnSecurityCamResource* securityCamRes = dynamic_cast<QnSecurityCamResource*>(res.data());
         if( securityCamRes && securityCamRes->isDtsBased() )
         {
-            *timePeriods << securityCamRes->getDtsTimePeriodsByMotionRegion( regions, msStartTime, msEndTime, detailLevel );
+            timePeriods->push_back(securityCamRes->getDtsTimePeriodsByMotionRegion( regions, msStartTime, msEndTime, detailLevel ));
         }
         else
         {
             QnMotionArchive* archive = getArchive(res, i);
             if (archive) 
-                *timePeriods << archive->matchPeriod(regions[i], msStartTime, msEndTime, detailLevel);
+                timePeriods->push_back(archive->matchPeriod(regions[i], msStartTime, msEndTime, detailLevel));
         }
     }
 }

@@ -26,4 +26,7 @@ cp -f /root/tools/uboot/*.txt $MNTBOOTPART
 umount $BOOTPART
 rm -Rf $MNTBOOTPART
 
+apt-get update
+apt-get install sudo nginx nginx-common nginx-full unzip --fix-missing -y
+
 exit 0

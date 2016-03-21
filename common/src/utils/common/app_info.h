@@ -16,6 +16,8 @@ struct QnAppInfo {
     static QString applicationPlatformModification();
     static QString applicationCompiler();
 
+    static QString applicationUriProtocol();
+
     static QString engineVersion();
     static QString ffmpegVersion();
     static QString sigarVersion();
@@ -52,6 +54,11 @@ struct QnAppInfo {
     static bool    freeLicenseIsTrial();
 
     static QString iosPlayButtonTint();
+
+    static QString oldAndroidClientLink();
+    static QString oldIosClientLink();
+
+    static QString oldAndroidAppId();
 
     // helpers:
 

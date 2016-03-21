@@ -2,6 +2,7 @@
 #define __BUFFERED_FILE_H__
 
 #include <memory>
+#include <list>
 
 #include <QtCore/QWaitCondition>
 #include <QtCore/QString>
@@ -21,7 +22,7 @@ public:
     virtual ~QueueFileWriter();
 
     // write all data in a row
-    qint64 write (QBufferedFile* file, const char * data, qint64 len);
+    qint64 writeRanges (QBufferedFile* file, std::vector<QnMediaCyclicBuffer::Range> range);
     
     /*
     * Returns storage usage in range [0..1]
@@ -34,22 +35,33 @@ private:
 private:
     struct FileBlockInfo
     {
-        FileBlockInfo(): file(0), data(0), len(0), result(0) {}
-        FileBlockInfo(QBufferedFile* _file, const char * _data, qint64 _len): file(_file), data(_data), len(_len), result(0) {}
+        FileBlockInfo(QBufferedFile* _file): file(_file) , result(0) {}
+        int dataSize() const {
+            int result = 0;
+            for (const auto& range: ranges)
+                result += range.size;
+            return result;
+        }
+
+
         QBufferedFile* file;
-        const char* data;
-        int len;
-        QMutex mutex;
-        QWaitCondition condition;
+        std::vector<QnMediaCyclicBuffer::Range> ranges;
+        QnMutex mutex;
+        QnWaitCondition condition;
         qint64 result;
     };
 
-    CLThreadQueue<FileBlockInfo*> m_dataQueue;
+    std::list<FileBlockInfo*> m_dataQueue;
+    QnMutex m_dataMutex;
+    QnWaitCondition m_dataWaitCond;
 
     typedef QPair<qint64, int> WriteTimingInfo;
     QQueue<WriteTimingInfo> m_writeTimings;
     int m_writeTime;
-    mutable QMutex m_timingsMutex;
+    mutable QnMutex m_timingsMutex;
+private:
+    void putData(FileBlockInfo* fb);
+    FileBlockInfo* popData();
 };
 
 class QnWriterPool
@@ -65,7 +77,7 @@ public:
     QueueFileWriter* getWriter(const QnUuid& writePoolId);
     WritersMap getAllWriters();
 private:
-    QMutex m_mutex;
+    QnMutex m_mutex;
     WritersMap m_writers;
 };
 

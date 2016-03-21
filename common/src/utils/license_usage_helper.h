@@ -1,6 +1,8 @@
 #ifndef LICENSE_USAGE_HELPER_H
 #define LICENSE_USAGE_HELPER_H
 
+#ifdef ENABLE_SENDMAIL
+
 #include <array>
 #include <core/resource/resource_fwd.h>
 #include <licensing/license.h>
@@ -92,6 +94,7 @@ public:
 
     /** Mark data as invalid and needs to be recalculated. */
     void invalidate();
+
 protected:
     virtual void calculateUsedLicenses(licensesArray& basicUsedLicenses, licensesArray& proposedToUse) const = 0;
     virtual int calculateOverflowLicenses(Qn::LicenseType licenseType, int borrowedLicenses) const;
@@ -131,27 +134,75 @@ private:
     void init(const QnVirtualCameraResourcePtr &camera);
 };
 
+typedef QSharedPointer<QnCamLicenseUsageWatcher> QnCamLicenseUsageWatcherPtr;
+
 class QnCamLicenseUsageHelper: public QnLicenseUsageHelper {
     Q_OBJECT
 
     typedef QnLicenseUsageHelper base_type;
 public:
-    QnCamLicenseUsageHelper(QObject *parent = NULL);
-    QnCamLicenseUsageHelper(const QnVirtualCameraResourceList &proposedCameras, bool proposedEnable, QObject *parent = NULL);
-    QnCamLicenseUsageHelper(const QnVirtualCameraResourcePtr &proposedCamera, bool proposedEnable, QObject *parent = NULL);
+    /*
+        Constructors. Each one uses specified watcher or create a new one if parameter is empty.
+        With empty watcher parameter creates instance which tracks all cameras.
+    */
 
+    QnCamLicenseUsageHelper(const QnCamLicenseUsageWatcherPtr &watcher = QnCamLicenseUsageWatcherPtr()
+        , QObject *parent = NULL);
+
+    QnCamLicenseUsageHelper(const QnVirtualCameraResourceList &proposedCameras, bool proposedEnable
+        , const QnCamLicenseUsageWatcherPtr &watcher = QnCamLicenseUsageWatcherPtr(), QObject *parent = NULL);
+
+    QnCamLicenseUsageHelper(const QnVirtualCameraResourcePtr &proposedCamera, bool proposedEnable
+        , const QnCamLicenseUsageWatcherPtr &watcher = QnCamLicenseUsageWatcherPtr(), QObject *parent = NULL);
+
+public:
     void propose(const QnVirtualCameraResourcePtr &proposedCamera, bool proposedEnable);
     void propose(const QnVirtualCameraResourceList &proposedCameras, bool proposedEnable);
     bool isOverflowForCamera(const QnVirtualCameraResourcePtr &camera);
+    bool isOverflowForCamera(const QnVirtualCameraResourcePtr &camera, bool cachedLicenceUsed);
+
+signals:
+    void licenseUsageChanged();
+
 protected:
     virtual QList<Qn::LicenseType> calculateLicenseTypes() const override;
     virtual void calculateUsedLicenses(licensesArray& basicUsedLicenses, licensesArray& proposedToUse) const override;
 
 private:
-    void init();
-
+    void init(const QnCamLicenseUsageWatcherPtr &watcher);
+    
+    QnCamLicenseUsageWatcherPtr m_watcher;
     QSet<QnVirtualCameraResourcePtr> m_proposedToEnable;
     QSet<QnVirtualCameraResourcePtr> m_proposedToDisable;
+};
+
+class QnSingleCamLicenceStatusHelper : public Connective<QObject>
+{
+    Q_OBJECT
+
+public:
+    enum CameraLicenseStatus 
+    {
+        InvalidSource
+        , LicenseNotUsed
+        , LicenseOverflow
+        , LicenseUsed
+    };
+
+    QnSingleCamLicenceStatusHelper(const QnVirtualCameraResourcePtr &camera);
+
+    virtual ~QnSingleCamLicenceStatusHelper();
+
+    CameraLicenseStatus status();
+
+signals:
+    void licenceStatusChanged();
+
+private:
+    typedef QScopedPointer<QnCamLicenseUsageHelper> QnCamLicenseUsageHelperPtr;
+
+    const QnVirtualCameraResourcePtr m_camera;
+    const QnCamLicenseUsageHelperPtr m_helper;
 };
 
 class QnVideoWallLicenseUsageWatcher: public QnLicenseUsageWatcher {
@@ -188,5 +239,7 @@ private:
     QPointer<QnVideoWallLicenseUsageHelper> m_helper;
     int m_count;
 };
+
+#endif //ENABLE_SENDMAIL
 
 #endif // LICENSE_USAGE_HELPER_H

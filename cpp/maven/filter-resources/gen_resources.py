@@ -53,7 +53,6 @@ def genqrc(qrcname, qrcprefix, pathes, exclusions, additions=''):
     for path in pathes:
         for root, dirs, files in os.walk(path):
             parent = root[len(path) + 1:]
-        
             for f in files:
                 if fileIsAllowed(f, exclusions):
                     print >> qrcfile, '<file alias="%s">%s</file>' % (os.path.join(parent, f), os.path.join(root, f))
@@ -105,11 +104,12 @@ def replace(file,searchExp,replaceExp):
             line = re.sub(r'%s', r'%s', line.rstrip() % (searchExp, replaceExp))
         sys.stdout.write(line)
 
-        
-
 def gen_includepath(file, path):      
     for dirs in os.walk(path).next()[1]:
-        print >> file, '\nINCLUDEPATH += %s/%s' % (path, dirs)
+        if(dirs.endswith('win32')):
+            print >> file, '\nwin*:INCLUDEPATH += %s/%s' % (path, dirs)
+        else:
+            print >> file, '\nINCLUDEPATH += %s/%s' % (path, dirs)
                     
 if __name__ == '__main__':
     if not os.path.exists('${project.build.directory}/build'):
@@ -120,17 +120,22 @@ if __name__ == '__main__':
 
     if os.path.exists(translations_dir):    
         for f in listdir(translations_dir):
-    	    for translation in translations:
+            for translation in translations:
                 if not translation:
                     continue
-    	        if f.endswith('_%s.ts' % translation):
-        	    if '${platform}' == 'windows':
-            	        os.system('${qt.dir}/bin/lrelease %s/%s -qm %s/%s.qm' % (translations_dir, f, translations_target_dir, os.path.splitext(f)[0]))
+                if f.endswith('_%s.ts' % translation):
+                    if '${platform}' == 'windows':
+                        os.system('${qt.dir}/bin/lrelease %s/%s -qm %s/%s.qm' % (translations_dir, f, translations_target_dir, os.path.splitext(f)[0]))
                     else:
-	                os.system('export DYLD_LIBRARY_PATH=%s && export LD_LIBRARY_PATH=%s && ${qt.dir}/bin/lrelease %s/%s -qm %s/%s.qm' % (ldpath, ldpath, translations_dir, f, translations_target_dir, os.path.splitext(f)[0]))
+                        os.system('export DYLD_LIBRARY_PATH=%s && export LD_LIBRARY_PATH=%s && ${qt.dir}/bin/lrelease %s/%s -qm %s/%s.qm' % (ldpath, ldpath, translations_dir, f, translations_target_dir, os.path.splitext(f)[0]))
   
     exceptions = ['vmsclient.png', '.ai', '.svg', '.profile']
-    genqrc('build/${project.artifactId}.qrc', '/', ['${project.build.directory}/resources','${project.basedir}/static-resources','${customization.dir}/icons'], exceptions)  
+    genqrc('build/${project.artifactId}.qrc', '/', ['${project.build.directory}/resources','${project.basedir}/static-resources','${customization.dir}/icons'], exceptions)
+    if os.path.exists('${project.build.directory}/additional-resources'):
+        genqrc('build/${project.artifactId}_additional.qrc', '/', ['${project.build.directory}/additional-resources'], exceptions)
+        pro_file = open('${project.artifactId}-specifics.pro', 'a')
+        print >> pro_file, 'RESOURCES += ${project.build.directory}/build/${project.artifactId}_additional.qrc'
+        pro_file.close()
     
     if os.path.exists(os.path.join(r'${project.build.directory}', template_file)):
         f = open(output_pro_file, "w")
@@ -171,7 +176,7 @@ if __name__ == '__main__':
             
             #if '${arch}' == 'x64' and '${force_x86}' == 'false':
             #    replace ('${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj', 'Win32', '${arch}')
-            #    replace ('${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj', 'Name="VCLibrarianTool"', 'Name="VCLibrarianTool" \n				AdditionalOptions="/MACHINE:x64"')
+            #    replace ('${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj', 'Name="VCLibrarianTool"', 'Name="VCLibrarianTool" \n                AdditionalOptions="/MACHINE:x64"')
             #print ('f++++++++++++++++++++++++++++++++++++++ Replacing +++++++++++++++++++++++++++++++++++++++')
             #replace ('${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj', '<None\s*Include=\"(.*)[\\/]{1}([\w\d_\-]+)\.([\w\d_\-]+)\".*/>', '''    <CustomBuild Include="$1/$2.$3"> \n
       #<AdditionalInputs>${libdir}/build/bin/protoc;$1/$2.$3</AdditionalInputs> \n

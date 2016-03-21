@@ -18,6 +18,7 @@
 #include "api_ioport_data.h"
 #include "audit/audit_record.h"
 #include "licensing/hardware_info.h"
+#include "backup_status_reply.h"
 
 #define QN_MS_API_DATA_TYPES \
     (QnCameraDiagnosticsReply)\
@@ -25,13 +26,11 @@
     (QnManualCameraSearchSingleCamera)\
     (QnManualCameraSearchReply)\
     (QnStorageSpaceReply)\
-    (QnStorageSpaceData)\
     (QnConnectionInfo)\
     (QnStorageStatusReply)\
     (QnStatisticsDataItem)\
     (QnStatisticsReply)\
     (QnTimeReply)\
-    (QnStorageScanData)\
     (QnTestEmailSettingsReply)\
     (QnCompatibilityItem)\
     (QnPingReply)\
@@ -41,8 +40,14 @@
     (QnRecordingStatsData)\
     (QnCamRecordingStatsData)\
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(QN_MS_API_DATA_TYPES, (ubjson)(xml)(json)(csv_record), _Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnIOPortData)(QnCameraPortsData)(QnIOStateData)(QnCameraIOStateData), (eq)(ubjson)(json), _Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnAuditRecord), (ubjson)(xml)(json)(csv_record)(eq)(sql_record), _Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnAuthSession), (ubjson)(xml)(json)(csv_record)(eq)(sql_record), _Fields)
+#define QN_MS_API_COMPARABLE_DATA_TYPES \
+    (QnStorageSpaceData)\
+    (QnStorageScanData)\
+    (QnBackupStatusData)\
 
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(QN_MS_API_DATA_TYPES, (ubjson)(xml)(json)(csv_record), _Fields, (optional, true))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnIOPortData)(QnCameraPortsData)(QnIOStateData)(QnCameraIOStateData), (eq)(ubjson)(json), _Fields, (optional, true))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnAuditRecord), (ubjson)(xml)(json)(csv_record)(eq)(sql_record), _Fields, (optional, true))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnAuthSession), (ubjson)(xml)(json)(csv_record)(eq)(sql_record), _Fields, (optional, true))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(QN_MS_API_COMPARABLE_DATA_TYPES, (ubjson)(xml)(json)(csv_record)(eq), _Fields, (optional, true))

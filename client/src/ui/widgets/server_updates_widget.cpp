@@ -70,7 +70,7 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     ui->tableView->setItemDelegateForColumn(QnServerUpdatesModel::VersionColumn, new QnUpdateStatusItemDelegate(ui->tableView));
 
     ui->tableView->horizontalHeader()->setSectionResizeMode(QnServerUpdatesModel::NameColumn, QHeaderView::Stretch);
-    ui->tableView->horizontalHeader()->setSectionResizeMode(QnServerUpdatesModel::VersionColumn, QHeaderView::ResizeToContents);   
+    ui->tableView->horizontalHeader()->setSectionResizeMode(QnServerUpdatesModel::VersionColumn, QHeaderView::ResizeToContents);
     ui->tableView->horizontalHeader()->setSectionsClickable(false);
     setPaletteColor(ui->tableView, QPalette::Highlight, Qt::transparent);
 
@@ -102,16 +102,18 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     ui->refreshButton->setIcon(qnSkin->icon("refresh.png"));
 
     connect(ui->browseFileButton,       &QPushButton::clicked,      this, [this] {
-        QString fileName = QnFileDialog::getOpenFileName(this, 
+        QString fileName = QnFileDialog::getOpenFileName(this,
             tr("Select Update File..."),
-            QString(), tr("Update Files (*.zip)"), 
+            QString(), tr("Update Files (*.zip)"),
             0,
             QnCustomFileDialog::fileDialogOptions());
-        if (fileName.isEmpty()) 
+        if (fileName.isEmpty())
             return;
         ui->filenameLineEdit->setText(fileName);
         checkForUpdatesLocal();
     });
+
+    connect(ui->updatesNotificationCheckbox,    &QCheckBox::stateChanged, this, &QnAbstractPreferencesWidget::hasChangesChanged);
 
     initSourceMenu();
     initLinkButtons();
@@ -163,6 +165,8 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
         ui->linkLineEdit->setText(m_updateTool->generateUpdatePackageUrl(m_targetVersion).toString());
     });
 
+    connect(qnGlobalSettings, &QnGlobalSettings::updateNotificationsChanged, this, &QnAbstractPreferencesWidget::loadDataToUi);
+
     at_tool_stageChanged(QnFullUpdateStage::Init);
     checkForUpdatesInternet(true);
 }
@@ -200,7 +204,7 @@ void QnServerUpdatesWidget::initSourceMenu() {
     connect(m_updateSourceActions[InternetSource], &QAction::triggered, this, [this] {
         if (!m_updateTool->idle())
             return;
-        
+
         ui->sourceWidget->setCurrentWidget(ui->internetPage);
         ui->sourceButton->setText(tr("Update from Internet"));
         checkForUpdatesInternet();
@@ -221,7 +225,7 @@ void QnServerUpdatesWidget::initLinkButtons() {
         qApp->clipboard()->setText(ui->linkLineEdit->text());
         QMessageBox::information(this, tr("Success"), tr("URL copied to clipboard."));
     });
- 
+
     connect(ui->linkLineEdit,           &QLineEdit::textChanged,    this, [this](const QString &text){
         ui->copyLinkButton->setEnabled(!text.isEmpty());
         ui->linkLineEdit->setCursorPosition(0);
@@ -284,21 +288,33 @@ QnMediaServerUpdateTool *QnServerUpdatesWidget::updateTool() const {
     return m_updateTool;
 }
 
-void QnServerUpdatesWidget::updateFromSettings() {
-    ui->updatesNotificationCheckbox->setChecked(QnGlobalSettings::instance()->isUpdateNotificationsEnabled());
+void QnServerUpdatesWidget::loadDataToUi() {
+    ui->updatesNotificationCheckbox->setChecked(qnGlobalSettings->isUpdateNotificationsEnabled());
 }
 
-bool QnServerUpdatesWidget::confirm() {
+void QnServerUpdatesWidget::applyChanges() {
+    qnGlobalSettings->setUpdateNotificationsEnabled(ui->updatesNotificationCheckbox->isChecked());
+}
+
+bool QnServerUpdatesWidget::hasChanges() const {
+    if (isReadOnly())
+        return false;
+
+    return qnGlobalSettings->isUpdateNotificationsEnabled() != ui->updatesNotificationCheckbox->isChecked();
+}
+
+bool QnServerUpdatesWidget::canApplyChanges() {
+    //TODO: #GDM now this prevents other tabs from saving their changes
     if (isUpdating()) {
         QMessageBox::information(this, tr("Information"), tr("Update is in process now."));
         return false;
     }
 
-    QnGlobalSettings::instance()->setUpdateNotificationsEnabled(ui->updatesNotificationCheckbox->isChecked());
     return true;
 }
 
-bool QnServerUpdatesWidget::discard() {
+bool QnServerUpdatesWidget::canDiscardChanges() {
+    //TODO: #GDM now this prevents other tabs from discarding their changes
     if(!cancelUpdate()) {
         QMessageBox::critical(this, tr("Error"), tr("Cannot cancel update at this state.") + L'\n' + tr("Please wait until update is finished"));
         return false;
@@ -332,15 +348,15 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult &result) {
                     }
                 }
 
-                QMessageBox::information(this, tr("Update Succeeded."), message);
+                QMessageBox::information(this, tr("Update Succeeded"), message);
 
                 bool unholdConnection = !clientUpdated || result.clientInstallerRequired || result.protocolChanged;
                 if (clientUpdated && !result.clientInstallerRequired) {
                     if (applauncher::restartClient(result.targetVersion) != applauncher::api::ResultType::ok) {
                         unholdConnection = true;
                         QMessageBox::critical(this,
-                            tr("Launcher process not found."),
-                            tr("Cannot restart the client.") + L'\n' 
+                            tr("Launcher process was not found."),
+                            tr("Cannot restart the client.") + L'\n'
                           + tr("Please close the application and start it again using the shortcut in the start menu."));
                     } else {
                         qApp->exit(0);
@@ -352,14 +368,17 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult &result) {
                     qnClientMessageProcessor->setHoldConnection(false);
 
                 if (result.protocolChanged)
-                    menu()->trigger(Qn::DisconnectAction, QnActionParameters().withArgument(Qn::ForceRole, true));
+                    menu()->trigger(QnActions::DisconnectAction, QnActionParameters().withArgument(Qn::ForceRole, true));
             }
             break;
         case QnUpdateResult::Cancelled:
-            QMessageBox::information(this, tr("Update Cancelled"), tr("Update has been cancelled."));
+            QMessageBox::information(this, tr("Update cancelled"), tr("Update has been cancelled."));
             break;
         case QnUpdateResult::LockFailed:
             QMessageBox::critical(this, tr("Update unsuccessful."), tr("Another user has already started an update."));
+            break;
+        case QnUpdateResult::AlreadyUpdated:
+            QMessageBox::information(this, tr("Update is not needed."), tr("All servers are already updated."));
             break;
         case QnUpdateResult::DownloadingFailed:
             QMessageBox::critical(this, tr("Update unsuccessful."), tr("Could not download updates."));
@@ -369,11 +388,11 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult &result) {
             break;
         case QnUpdateResult::UploadingFailed: {
             QString message = tr("Could not push updates to servers.");
-            if (!result.failedPeers.isEmpty()) {
+            if (!result.failedServers.isEmpty()) {
                 message += lit("\n");
-                message += tr("The problem is caused by %n servers:", "", result.failedPeers.size());
+                message += tr("The problem is caused by %n servers:", "", result.failedServers.size());
                 message += lit("\n");
-                message += serverNamesString(result.failedPeers);
+                message += serverNamesString(result.failedServers);
             }
             QMessageBox::critical(this, tr("Update unsuccessful."), message);
             break;
@@ -382,25 +401,33 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult &result) {
             QMessageBox::critical(this, tr("Update unsuccessful."),
                                   tr("Could not push updates to servers.") +
                                   lit("\n") +
-                                  tr("No free space left on %n servers:", "", result.failedPeers.size()) +
+                                  tr("No free space left on %n servers:", "", result.failedServers.size()) +
                                   lit("\n") +
-                                  serverNamesString(result.failedPeers));
+                                  serverNamesString(result.failedServers));
             break;
         case QnUpdateResult::UploadingFailed_Timeout:
             QMessageBox::critical(this, tr("Update unsuccessful."),
                                   tr("Could not push updates to servers.") +
                                   lit("\n") +
-                                  tr("%n servers are not responding:", "", result.failedPeers.size()) +
+                                  tr("%n servers are not responding:", "", result.failedServers.size()) +
                                   lit("\n") +
-                                  serverNamesString(result.failedPeers));
+                                  serverNamesString(result.failedServers));
             break;
         case QnUpdateResult::UploadingFailed_Offline:
             QMessageBox::critical(this, tr("Update unsuccessful."),
                                   tr("Could not push updates to servers.") +
                                   lit("\n") +
-                                  tr("%n servers have gone offline:", "", result.failedPeers.size()) +
+                                  tr("%n servers have gone offline:", "", result.failedServers.size()) +
                                   lit("\n") +
-                                  serverNamesString(result.failedPeers));
+                                  serverNamesString(result.failedServers));
+            break;
+        case QnUpdateResult::UploadingFailed_AuthenticationFailed:
+            QMessageBox::critical(this, tr("Update unsuccessful."),
+                                  tr("Could not push updates to servers.") +
+                                  lit("\n") +
+                                  tr("Authentication failed for %n servers:", "", result.failedServers.size()) +
+                                  lit("\n") +
+                                  serverNamesString(result.failedServers));
             break;
         case QnUpdateResult::ClientInstallationFailed:
             QMessageBox::critical(this, tr("Update unsuccessful."), tr("Could not install an update to the client."));
@@ -412,7 +439,9 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult &result) {
         }
     }
 
-    bool canUpdate = result.result != QnUpdateResult::Successful;
+    bool canUpdate = (result.result != QnUpdateResult::Successful) &&
+                     (result.result != QnUpdateResult::AlreadyUpdated);
+
     if (m_updateSourceActions[LocalSource]->isChecked())
         ui->localUpdateButton->setEnabled(canUpdate);
     else
@@ -472,23 +501,23 @@ void QnServerUpdatesWidget::checkForUpdatesInternet(bool autoSwitch, bool autoSt
             break;
         case QnCheckForUpdateResult::NoSuchBuild:
             status = displayVersion.toString();
-            detail = tr("No such build available on update server.");
+            detail = tr("No such build is available on update server.");
             setWarningStyle(&statusPalette);
             setWarningStyle(&detailPalette);
             break;
         case QnCheckForUpdateResult::ServerUpdateImpossible:
             status = displayVersion.toString();
-            detail = tr("Unable to begin update. An update for one or more servers not found.");
+            detail = tr("Unable to begin update. Updates for one or more servers were not found.");
             setWarningStyle(&detailPalette);
             break;
         case QnCheckForUpdateResult::ClientUpdateImpossible:
             status = displayVersion.toString();
-            detail = tr("Unable to begin update. An update for the client was not found.");
+            detail = tr("Unable to begin update. Client update was not found.");
             setWarningStyle(&detailPalette);
             break;
         case QnCheckForUpdateResult::DowngradeIsProhibited:
             status = displayVersion.toString();
-            detail = tr("Unable to begin update. Downgrade to the previous release is prohibited.");
+            detail = tr("Unable to begin update. Downgrade to any previous release is prohibited.");
             setWarningStyle(&statusPalette);
             setWarningStyle(&detailPalette);
             break;
@@ -498,7 +527,7 @@ void QnServerUpdatesWidget::checkForUpdatesInternet(bool autoSwitch, bool autoSt
 
         if (autoSwitch && result.result == QnCheckForUpdateResult::InternetProblem)
             m_updateSourceActions[LocalSource]->trigger();
-        
+
         m_releaseNotesUrl = result.releaseNotesUrl;
 
         ui->connectionProblemLabel->setVisible(result.result == QnCheckForUpdateResult::InternetProblem);
@@ -559,15 +588,15 @@ void QnServerUpdatesWidget::checkForUpdatesLocal() {
             detail = tr("All components in your system are up to date.");
             break;
         case QnCheckForUpdateResult::NoSuchBuild:
-            detail = tr("No such build available on update server.");
+            detail = tr("No such build is available on update server.");
             setWarningStyle(&detailPalette);
             break;
         case QnCheckForUpdateResult::ServerUpdateImpossible:
-            detail = tr("Unable to begin update. An update for one or more servers not found.");
+            detail = tr("Unable to begin update. Updates for one or more servers were not found.");
             setWarningStyle(&detailPalette);
             break;
         case QnCheckForUpdateResult::ClientUpdateImpossible:
-            detail = tr("Unable to begin update. An update for the client was not found.");
+            detail = tr("Unable to begin update. Client update was not found.");
             setWarningStyle(&detailPalette);
             break;
         case QnCheckForUpdateResult::BadUpdateFile:
@@ -680,14 +709,10 @@ void QnServerUpdatesWidget::at_tool_stageProgressChanged(QnFullUpdateStage stage
     ui->updateProgessBar->setFormat(status.arg(value));
 }
 
-QString QnServerUpdatesWidget::serverNamesString(const QSet<QnUuid> &serverIds) {
+QString QnServerUpdatesWidget::serverNamesString(const QnMediaServerResourceList &servers) {
     QString result;
 
-    for (const QnUuid &id: serverIds) {
-        QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(id);
-        if (!server)
-            continue;
-
+    for (const QnMediaServerResourcePtr &server: servers) {
         if (!result.isEmpty())
             result += lit("\n");
 

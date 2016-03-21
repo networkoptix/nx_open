@@ -9,21 +9,35 @@
 #include <utils/common/singleton.h>
 
 #include <utils/common/model_functions_fwd.h>
+
 #include <core/resource/general_attribute_pool.h>
 #include <core/resource/resource_fwd.h>
+#include <core/resource/server_backup_schedule.h>
 
+// todo: wtf. its duplicate to ApiMediaServerUserAttributesData. We removed such sheet during migration to 2.3.2, but it's a new one
 class QnMediaServerUserAttributes
 {
 public:
-    QnUuid serverID;
-    int maxCameras;
-    bool isRedundancyEnabled;
+    QnUuid  serverID;
+    int     maxCameras;
+    bool    isRedundancyEnabled;
     QString name;
 
+    QnServerBackupSchedule backupSchedule;
+
     QnMediaServerUserAttributes();
-    void assign( const QnMediaServerUserAttributes& right, QSet<QByteArray>* const modifiedFields );
+    void assign(
+        const QnMediaServerUserAttributes   &right, 
+        QSet<QByteArray>                    *const modifiedFields
+    );
 };
-#define QnMediaServerUserAttributes_Fields (serverID)(maxCameras)(isRedundancyEnabled)(name)
+#define QnMediaServerUserAttributes_Fields  \
+    (serverID)                              \
+    (maxCameras)                            \
+    (isRedundancyEnabled)                   \
+    (name)                                  \
+    (backupSchedule)                     \
+
 QN_FUSION_DECLARE_FUNCTIONS(QnMediaServerUserAttributes, (eq))
 
 Q_DECLARE_METATYPE(QnMediaServerUserAttributes)
@@ -39,7 +53,7 @@ class QnMediaServerUserAttributesPool
 {
     Q_OBJECT
 public:
-    QnMediaServerUserAttributesPool();
+    QnMediaServerUserAttributesPool(QObject *parent = NULL);
 
     QnMediaServerUserAttributesList getAttributesList( const QList<QnUuid>& idList );
 };

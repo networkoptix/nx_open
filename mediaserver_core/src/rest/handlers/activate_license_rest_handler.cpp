@@ -4,7 +4,7 @@
 #include <QtCore/QFile>
 
 #include "activate_license_rest_handler.h"
-#include <utils/network/tcp_connection_priv.h>
+#include <network/tcp_connection_priv.h>
 #include <utils/common/util.h>
 #include "nx_ec/data/api_runtime_data.h"
 #include "utils/network/simple_http_client.h"
@@ -39,7 +39,7 @@ CLHttpStatus QnActivateLicenseRestHandler::makeRequest(const QString& licenseKey
 
 #ifdef Q_OS_LINUX
     if( QnAppInfo::armBox() == "nx1" || QnAppInfo::armBox() == "bpi") {
-        QString mac = Nx1::getMac(); 
+        QString mac = Nx1::getMac();
         QString serial = Nx1::getSerial();
 
         if (!mac.isEmpty())
@@ -87,7 +87,7 @@ CLHttpStatus QnActivateLicenseRestHandler::makeRequest(const QString& licenseKey
     return result;
 }
 
-int QnActivateLicenseRestHandler::executeGet(const QString &, const QnRequestParams & requestParams, QnJsonRestResult &result, const QnRestConnectionProcessor*) 
+int QnActivateLicenseRestHandler::executeGet(const QString &, const QnRequestParams & requestParams, QnJsonRestResult &result, const QnRestConnectionProcessor*)
 {
     ec2::ApiDetailedLicenseData reply;
 
@@ -102,7 +102,7 @@ int QnActivateLicenseRestHandler::executeGet(const QString &, const QnRequestPar
     }
 
     QnLicensePtr license;
-    for (int i = 0; i < 2; ++i) 
+    for (int i = 0; i < 2; ++i)
     {
         QByteArray response;
         bool isCheckMode = (i == 0);
@@ -112,9 +112,9 @@ int QnActivateLicenseRestHandler::executeGet(const QString &, const QnRequestPar
             result.setError(QnJsonRestResult::CantProcessRequest, lit("Network error has occurred during license activation. Error code: %1").arg(errCode));
             return CODE_OK;
         }
-    
+
         QJsonObject errorMessage;
-        if (QJson::deserialize(response, &errorMessage)) 
+        if (QJson::deserialize(response, &errorMessage))
         {
             QString message = QnLicenseUsageHelper::activationMessage(errorMessage);
             result.setError(QnJsonRestResult::CantProcessRequest, lit("Can't activate license:  %1").arg(message));
@@ -126,12 +126,12 @@ int QnActivateLicenseRestHandler::executeGet(const QString &, const QnRequestPar
 
         license = QnLicense::readFromStream(is);
         QnLicense::ErrorCode licenseErrCode;
-        if (!license->isValid(&licenseErrCode, QnLicense::VM_CheckInfo)) 
+        if (!license->isValid(&licenseErrCode, QnLicense::VM_CheckInfo))
         {
             result.setError(QnJsonRestResult::CantProcessRequest, lit("Can't activate license:  %1").arg(QnLicense::errorMessage(licenseErrCode)));
             return CODE_OK;
         }
-    }    
+    }
 
     ec2::AbstractECConnectionPtr connect = QnAppServerConnectionFactory::getConnection2();
     QnLicenseList licenses;

@@ -34,8 +34,7 @@
 #include "media_server/settings.h"
 #include "streaming/streaming_chunk_cache.h"
 #include "streaming/streaming_params.h"
-#include "utils/network/tcp_connection_priv.h"
-
+#include "network/tcp_connection_priv.h"
 
 //TODO #ak if camera has hi stream only, than playlist request with no quality specified returns No Content, hi returns OK, lo returns Not Found
 
@@ -224,7 +223,7 @@ namespace nx_hls
         const QStringRef& shortFileName = fileName.mid( 0, extensionSepPos );
 
         //searching for requested resource
-        QnResourcePtr resource = QnResourcePool::instance()->getResourceByUniqueId( shortFileName.toString() );
+        QnResourcePtr resource = qnResPool->getResourceByUniqueId( shortFileName.toString() );
         if( !resource )
             resource = QnResourcePool::instance()->getResourceByMacAddress( shortFileName.toString() );
         if( !resource )
@@ -358,7 +357,7 @@ namespace nx_hls
             m_switchToChunkedTransfer = false;
         }
 
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         for( ;; )
         {
             //reading chunk data
@@ -955,7 +954,7 @@ namespace nx_hls
 
     void QnHttpLiveStreamingProcessor::chunkDataAvailable( StreamingChunkPtr /*chunk*/, quint64 /*newSizeBytes*/ )
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         m_cond.wakeAll();
     }
 

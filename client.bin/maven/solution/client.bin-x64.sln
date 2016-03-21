@@ -1,0 +1,62 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client.bin-x64", "src\client.bin-x64.vcxproj", "${client.bin.guid}"
+	ProjectSection(ProjectDependencies) = postProject
+		${appserver2.guid} = ${appserver2.guid}
+		${common.guid} = ${common.guid}
+		${client.guid} = ${client.guid}
+		${client.core.guid} = ${client.core.guid}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client-x64", "..\client\src\client-x64.vcxproj", "${client.guid}"
+	ProjectSection(ProjectDependencies) = postProject
+		${appserver2.guid} = ${appserver2.guid}
+		${common.guid} = ${common.guid}
+		${client.core.guid} = ${client.core.guid}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client.core-x64", "..\client.core\src\client.core-x64.vcxproj", "${client.core.guid}"
+	ProjectSection(ProjectDependencies) = postProject
+		${appserver2.guid} = ${appserver2.guid}
+		${common.guid} = ${common.guid}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "common-x64", "..\common\src\common-x64.vcxproj", "${common.guid}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "appserver2-x64", "..\appserver2\src\appserver2-x64.vcxproj", "${appserver2.guid}"
+	ProjectSection(ProjectDependencies) = postProject
+		${common.guid} = ${common.guid}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		${client.bin.guid}.Debug|x64.ActiveCfg = Debug|x64
+		${client.bin.guid}.Debug|x64.Build.0 = Debug|x64
+		${client.bin.guid}.Release|x64.ActiveCfg = Release|x64
+		${client.bin.guid}.Release|x64.Build.0 = Release|x64
+		${client.guid}.Debug|x64.ActiveCfg = Debug|x64
+		${client.guid}.Debug|x64.Build.0 = Debug|x64
+		${client.guid}.Release|x64.ActiveCfg = Release|x64
+		${client.guid}.Release|x64.Build.0 = Release|x64
+		${client.core.guid}.Debug|x64.ActiveCfg = Debug|x64
+		${client.core.guid}.Debug|x64.Build.0 = Debug|x64
+		${client.core.guid}.Release|x64.ActiveCfg = Release|x64
+		${client.core.guid}.Release|x64.Build.0 = Release|x64
+		${common.guid}.Debug|x64.ActiveCfg = Debug|x64
+		${common.guid}.Debug|x64.Build.0 = Debug|x64
+		${common.guid}.Release|x64.ActiveCfg = Release|x64
+		${common.guid}.Release|x64.Build.0 = Release|x64
+		${appserver2.guid}.Debug|x64.ActiveCfg = Debug|x64
+		${appserver2.guid}.Debug|x64.Build.0 = Debug|x64
+		${appserver2.guid}.Release|x64.ActiveCfg = Release|x64
+		${appserver2.guid}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

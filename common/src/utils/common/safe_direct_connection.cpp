@@ -47,7 +47,7 @@ namespace Qn
     void SafeDirectConnectionGlobalHelper::directDisconnectAll( const EnableSafeDirectConnection* receiver )
     {
         //waiting for all slots to return
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         std::map<EnableSafeDirectConnection::ID, ReceiverContext>::iterator it;
         for( ;; )
         {
@@ -68,7 +68,7 @@ namespace Qn
 
     bool SafeDirectConnectionGlobalHelper::isConnected( const EnableSafeDirectConnection* receiver ) const
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         return m_receivers.find( receiver->uniqueObjectSequence() ) != m_receivers.end();
     }
 
@@ -85,7 +85,7 @@ namespace Qn
         EnableSafeDirectConnection::ID receiver,
         QMetaObject::Connection connection )
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         m_receivers[receiver].connections.emplace_back( connection );
     }
 
@@ -93,7 +93,7 @@ namespace Qn
         const QObject* /*sender*/,
         EnableSafeDirectConnection::ID receiver )
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         auto it = m_receivers.find( receiver );
         if( it == m_receivers.end() || it->second.terminated )
             return false;
@@ -105,7 +105,7 @@ namespace Qn
         const QObject* /*sender*/,
         EnableSafeDirectConnection::ID receiver )
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         auto it = m_receivers.find( receiver );
         if( it == m_receivers.end() )
             return;

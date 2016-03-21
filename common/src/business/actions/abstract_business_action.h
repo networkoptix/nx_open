@@ -19,6 +19,11 @@ namespace QnBusiness
     bool requiresUserResource(ActionType actionType);
 
     bool hasToggleState(ActionType actionType);
+    bool canBeInstant(ActionType actionType);
+    bool supportsDuration(ActionType actionType);
+    bool allowsAggregation(ActionType actionType);
+
+    bool isActionProlonged(ActionType actionType, const QnBusinessActionParameters &parameters);
 
     QList<ActionType> allActions();
 }
@@ -35,7 +40,8 @@ protected:
 
 public:
     virtual ~QnAbstractBusinessAction();
-    QnBusiness::ActionType actionType() const { return m_actionType; }
+
+    QnBusiness::ActionType actionType() const;
 
     /**
      * Resource depend of action type.
@@ -45,6 +51,9 @@ public:
     void setResources(const QVector<QnUuid>& resources);
 
     const QVector<QnUuid>& getResources() const;
+
+    /** Source resource of the action (including custom for generic events). */
+    QVector<QnUuid> getSourceResources() const;
 
     void setParams(const QnBusinessActionParameters& params);
     const QnBusinessActionParameters& getParams() const;
@@ -66,7 +75,9 @@ public:
     void setAggregationCount(int value);
     int getAggregationCount() const;
 
-    /** Return action unique key for external outfit (port number for output action e.t.c). Do not count resourceId 
+    bool isProlonged() const;
+
+    /** Return action unique key for external outfit (port number for output action e.t.c). Do not count resourceId
      * This function help to share physical resources between actions
      * Do not used for instant actions
      */
@@ -98,7 +109,7 @@ public:
     QnBusiness::ActionType actionType;
     QnBusinessActionParameters actionParams;
     QnBusinessEventParameters eventParams;
-    QnUuid businessRuleId; 
+    QnUuid businessRuleId;
     int aggregationCount;
 
     int flags;

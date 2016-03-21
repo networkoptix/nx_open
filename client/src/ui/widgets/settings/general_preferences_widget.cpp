@@ -79,7 +79,7 @@ QnGeneralPreferencesWidget::~QnGeneralPreferencesWidget()
 {
 }
 
-void QnGeneralPreferencesWidget::submitToSettings() {
+void QnGeneralPreferencesWidget::applyChanges() {
     qnSettings->setMediaFolder(ui->mainMediaFolderLabel->text());
 
     QStringList extraMediaFolders;
@@ -97,7 +97,7 @@ void QnGeneralPreferencesWidget::submitToSettings() {
     qnSettings->setGLDoubleBuffer(ui->doubleBufferCheckbox->isChecked());
 }
 
-void QnGeneralPreferencesWidget::updateFromSettings() {
+void QnGeneralPreferencesWidget::loadDataToUi() {
     ui->mainMediaFolderLabel->setText(QDir::toNativeSeparators(qnSettings->mediaFolder()));
 
     ui->extraMediaFoldersList->clear();
@@ -117,7 +117,13 @@ void QnGeneralPreferencesWidget::updateFromSettings() {
     ui->doubleBufferCheckbox->setChecked(m_oldDoubleBuffering);
 }
 
-bool QnGeneralPreferencesWidget::confirm() {
+bool QnGeneralPreferencesWidget::hasChanges() const {
+    //TODO: #GDM implement me
+    return true;
+}
+
+bool QnGeneralPreferencesWidget::canApplyChanges() {
+    /* These changes can be applied only after reboot. */
     return m_oldDownmix == ui->downmixAudioCheckBox->isChecked()
         && m_oldDoubleBuffering == ui->doubleBufferCheckbox->isChecked();
 }

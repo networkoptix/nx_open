@@ -1,5 +1,4 @@
-#ifndef QN_WORKBENCH_LAYOUT_SNAPSHOT_MANAGER_H
-#define QN_WORKBENCH_LAYOUT_SNAPSHOT_MANAGER_H
+#pragma once
 
 #include <QtCore/QObject>
 
@@ -21,7 +20,7 @@ class QnWorkbenchLayoutReplyProcessor: public QnAbstractReplyProcessor {
     Q_OBJECT
 
 public:
-    QnWorkbenchLayoutReplyProcessor(QnWorkbenchLayoutSnapshotManager *manager, const QnLayoutResourceList &resources): 
+    QnWorkbenchLayoutReplyProcessor(QnWorkbenchLayoutSnapshotManager *manager, const QnLayoutResourceList &resources):
         QnAbstractReplyProcessor(0),
         m_manager(manager),
         m_resources(resources)
@@ -44,7 +43,7 @@ private:
 /**
  * This class maintains a storage of layout snapshots and tracks the state of
  * each layout.
- * 
+ *
  * It also provides some functions for layout and snapshot manipulation.
  */
 class QnWorkbenchLayoutSnapshotManager: public Connective<QObject>, public QnWorkbenchContextAware {
@@ -105,16 +104,14 @@ protected:
 
     Qn::ResourceSavingFlags defaultFlags(const QnLayoutResourcePtr &resource) const;
 
-    ec2::AbstractECConnectionPtr connection2() const;
-
 protected slots:
     void processReply(int status, const QnLayoutResourceList &resources, int handle);
 
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
-    void at_layout_storeRequested(const QnLayoutResourcePtr &resource);
     void at_layout_changed(const QnLayoutResourcePtr &resource);
-    void at_layout_changed(const QnResourcePtr &resource);
+    void at_layout_itemChanged(const QnLayoutResourcePtr &resource);
+    void at_resource_changed(const QnResourcePtr &resource);
 
 private:
     friend class QnWorkbenchLayoutReplyProcessor;
@@ -125,6 +122,3 @@ private:
     /** Layout to flags mapping. */
     QHash<QnLayoutResourcePtr, Qn::ResourceSavingFlags> m_flagsByLayout;
 };
-
-
-#endif // QN_WORKBENCH_LAYOUT_SNAPSHOT_MANAGER_H

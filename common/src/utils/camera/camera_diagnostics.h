@@ -72,6 +72,7 @@ namespace CameraDiagnostics
             badMediaStream,
             noMediaStream,
             cameraInitializationInProgress,
+            cameraPluginError,
             unknown
         };
 
@@ -163,7 +164,7 @@ namespace CameraDiagnostics
     class CameraResponseParseErrorResult : public Result
     {
     public:
-        CameraResponseParseErrorResult( const QString& requestedURL, const QString requestName ) : Result( ErrorCode::responseParseError, requestedURL, requestName ) {}
+        CameraResponseParseErrorResult( const QString& requestedURL, const QString &requestName ) : Result( ErrorCode::responseParseError, requestedURL, requestName ) {}
     };
 
     class NoMediaTrackResult : public Result
@@ -230,6 +231,12 @@ namespace CameraDiagnostics
     {
     public:
         ServerTerminatedResult() : Result( ErrorCode::serverTerminated ) {}
+    };
+
+    class CameraPluginErrorResult : public Result
+    {
+    public:
+        CameraPluginErrorResult( const QString& errorMessage ) : Result( ErrorCode::cameraPluginError, errorMessage ) {}
     };
 }
 

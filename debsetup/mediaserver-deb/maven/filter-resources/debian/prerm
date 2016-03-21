@@ -7,6 +7,13 @@ ${DEBIAN_SCRIPT_TRACE:+ echo "#42#DEBUG# RUNNING $0 $*" 1>&2 }
 
 COMPANY_NAME="${deb.customization.company.name}"
 
+BASE_DIR="/opt/$COMPANY_NAME/mediaserver"
+ETC_DIR="$BASE_DIR/etc"
+BIN_DIR="$BASE_DIR/bin"
+
+CONFIG_FILE="$ETC_DIR/mediaserver.conf"
+CFG_HELPER="$BIN_DIR/config_helper.py $CONFIG_FILE"
+
 # Automatically added by dh_installinit
 if [ -e "/etc/init/${deb.customization.company.name}-mediaserver.conf" ]; then
 	invoke-rc.d ${deb.customization.company.name}-mediaserver stop || exit $?
@@ -15,6 +22,8 @@ fi
 
 if [ $1 = "remove" ]
 then
+    $CFG_HELPER -d sysIdTime
+
     REMOVE="Remove the Database"
     KEEP="Keep current version"
     RESTORE="Restore version "

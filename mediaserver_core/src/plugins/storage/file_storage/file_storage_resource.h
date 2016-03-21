@@ -5,7 +5,7 @@
 #include <libavformat/avio.h>
 #include "core/resource/storage_resource.h"
 #include <utils/common/app_info.h>
-
+#include <platform/platform_abstraction.h>
 
 /*
 * QnFileStorageResource uses custom implemented IO access
@@ -21,7 +21,7 @@ private:
     static const QString FROM_SEP;
     static const QString TO_SEP;
 public:
-    QnFileStorageResource(QnStorageManager *storageManager);
+    QnFileStorageResource();
     ~QnFileStorageResource();
 
     static QnStorageResource* instance(const QString&);
@@ -41,7 +41,7 @@ public:
     virtual qint64 getTotalSpace() override;
 
     virtual int getCapabilities() const override;
-    virtual bool isAvailable() const override;
+    virtual bool initOrUpdate() const override;
 
     virtual void setUrl(const QString& url) override;
 
@@ -50,10 +50,17 @@ public:
         return m_localPath.isEmpty() ? getPath() : m_localPath;
     }
 
+    // true if storage is located on local disks
+    static bool isLocal(const QString &url);
+    // calculate space limit judging by storage URL
+    static qint64 calcSpaceLimit(const QString &url);
+    // calculate space limit judging by partition type
+    static qint64 calcSpaceLimit(QnPlatformMonitor::PartitionType ptype);
+
 private:
     virtual QString getPath() const override;
     QString removeProtocolPrefix(const QString& url);
-    bool initOrUpdate() const;
+    bool initOrUpdateInternal() const;
     bool updatePermissions() const;
     bool checkWriteCap() const;
     bool isStorageDirMounted() const;
@@ -68,7 +75,10 @@ private:
     // mounts network (smb) folder to temporary local path
     // returns not 0 if something went wrong, 0 otherwise
     int mountTmpDrive() const;
+    bool testWriteCapInternal() const;
 
+    void setLocalPathSafe(const QString &path) const;
+    QString getLocalPathSafe() const;
 public:
     // Try to remove old temporary dirs if any.
     // This could happen if server crashed and ~FileStorageResource
@@ -76,15 +86,17 @@ public:
     static void removeOldDirs();
 
 private:
-    // used for 'virtual' storage bitrate. If storage has more free space, increase 'virtual' storage bitrate for full storage space filling
-    mutable bool m_dirty;
-    mutable bool m_valid;
+    mutable std::atomic<bool> m_valid;
+    mutable boost::optional<bool> m_dbReady;
 
 private:
-    mutable QMutex      m_mutexPermission;
+    mutable QnMutex     m_mutexCheckStorage;
     mutable int         m_capabilities;
     mutable QString     m_localPath;
-    QnStorageManager    *m_storageManager;
+
+    mutable std::atomic<qint64> m_cachedTotalSpace;
+    mutable boost::optional<bool> m_writeCapCached;
+    mutable QnMutex      m_writeTestMutex;
 };
 typedef QSharedPointer<QnFileStorageResource> QnFileStorageResourcePtr;
 

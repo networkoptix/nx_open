@@ -4,7 +4,7 @@
 
 namespace
 {
-    void executeDelayedImpl(const Callback &callback
+    QTimer *executeDelayedImpl(const Callback &callback
         , int delayMs
         , QThread *targetThread
         , QObject *parent)
@@ -24,6 +24,8 @@ namespace
 
         /* Workaround for windows. QTimer cannot be started from a different thread in windows. */
         QMetaObject::invokeMethod(timer, "start", Qt::QueuedConnection);
+
+        return timer;
     }
 }
 
@@ -34,10 +36,10 @@ void executeDelayed(const Callback &callback
     executeDelayedImpl(callback, delayMs, targetThread, nullptr);
 }
 
-void executeDelayedParented(const Callback &callback
+QTimer *executeDelayedParented(const Callback &callback
     , int delayMs
     , QObject *parent)
 {
-    executeDelayedImpl(callback, delayMs, nullptr, parent);
+    return executeDelayedImpl(callback, delayMs, nullptr, parent);
 }
 

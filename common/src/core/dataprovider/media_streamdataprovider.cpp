@@ -7,6 +7,7 @@
 #include "core/datapacket/video_data_packet.h"
 #include "utils/common/sleep.h"
 #include "utils/common/util.h"
+#include "utils/common/log.h"
 #include "../resource/camera_resource.h"
 
 static const qint64 TIME_RESYNC_THRESHOLD = 1000000ll * 15;
@@ -35,7 +36,7 @@ QnAbstractMediaStreamDataProvider::~QnAbstractMediaStreamDataProvider()
 
 void QnAbstractMediaStreamDataProvider::setNeedKeyData()
 {
-    QMutexLocker mtx(&m_mutex);
+    QnMutexLocker mtx( &m_mutex );
 
     if (m_numberOfchannels==0)
         m_numberOfchannels = dynamic_cast<QnMediaResource*>(m_mediaResource.data())->getVideoLayout(this)->channelCount();
@@ -47,13 +48,13 @@ void QnAbstractMediaStreamDataProvider::setNeedKeyData()
 
 bool QnAbstractMediaStreamDataProvider::needKeyData(int channel) const
 {
-    QMutexLocker mtx(&m_mutex);
+    QnMutexLocker mtx( &m_mutex );
     return m_gotKeyFrame[channel]==0;
 }
 
 bool QnAbstractMediaStreamDataProvider::needKeyData() const
 {
-    QMutexLocker mtx(&m_mutex);
+    QnMutexLocker mtx( &m_mutex );
 
     if (m_numberOfchannels==0)
         m_numberOfchannels = dynamic_cast<QnMediaResource*>(m_mediaResource.data())->getVideoLayout(this)->channelCount();
@@ -91,7 +92,7 @@ bool QnAbstractMediaStreamDataProvider::afterGetData(const QnAbstractDataPacketP
     {
         setNeedKeyData();
         ++mFramesLost;
-        m_stat[0].onData(0);
+        m_stat[0].onData(0, false);
         m_stat[0].onEvent(CL_STAT_FRAME_LOST);
 
         if (mFramesLost == MAX_LOST_FRAME) // if we lost 2 frames => connection is lost for sure (2)
@@ -138,7 +139,9 @@ bool QnAbstractMediaStreamDataProvider::afterGetData(const QnAbstractDataPacketP
         data->dataProvider = this;
 
     if (videoData)
-        m_stat[videoData->channelNumber].onData(static_cast<unsigned int>(data->dataSize()));
+        m_stat[videoData->channelNumber].onData(
+            static_cast<unsigned int>(data->dataSize()),
+            videoData->flags & AV_PKT_FLAG_KEY);
 
     return true;
 
@@ -150,12 +153,36 @@ const QnStatistics* QnAbstractMediaStreamDataProvider::getStatistics(int channel
     return &m_stat[channel];
 }
 
+int QnAbstractMediaStreamDataProvider::getNumberOfChannels() const
+{
+    Q_ASSERT_X(m_numberOfchannels, Q_FUNC_INFO, "No channels?");
+    return m_numberOfchannels ? m_numberOfchannels : 1;
+}
+
 float QnAbstractMediaStreamDataProvider::getBitrateMbps() const
 {
     float rez = 0;
     for (int i = 0; i < m_numberOfchannels; ++i)
         rez += m_stat[i].getBitrateMbps();
     return rez;
+}
+
+float QnAbstractMediaStreamDataProvider::getFrameRate() const
+{
+    float rez = 0;
+    for (int i = 0; i < m_numberOfchannels; ++i)
+        rez += m_stat[i].getFrameRate();
+
+    return rez / getNumberOfChannels();
+}
+
+float QnAbstractMediaStreamDataProvider::getAverageGopSize() const
+{
+    float rez = 0;
+    for (int i = 0; i < m_numberOfchannels; ++i)
+        rez += m_stat[i].getAverageGopSize();
+
+    return rez / getNumberOfChannels();
 }
 
 void QnAbstractMediaStreamDataProvider::resetTimeCheck()
@@ -169,19 +196,30 @@ void QnAbstractMediaStreamDataProvider::checkTime(const QnAbstractMediaDataPtr& 
     if (m_isCamera && media && (media->dataType == QnAbstractMediaData::VIDEO || media->dataType == QnAbstractMediaData::AUDIO))
     {
         // correct packets timestamp if we have got several packets very fast
-
-        if (media->flags & (QnAbstractMediaData::MediaFlags_BOF | QnAbstractMediaData::MediaFlags_ReverseBlockStart)) {
+        int channel = media->channelNumber;
+        if (media->dataType == QnAbstractMediaData::AUDIO)
+            channel = CL_MAX_CHANNELS; //< use last vector element for audio timings control
+        if (media->flags & (QnAbstractMediaData::MediaFlags_BOF | QnAbstractMediaData::MediaFlags_ReverseBlockStart))
+        {
             resetTimeCheck();
         }
-        else if ((quint64)m_lastMediaTime[media->channelNumber] != AV_NOPTS_VALUE) {
-            qint64 timeDiff = media->timestamp - m_lastMediaTime[media->channelNumber];
+        else if ((quint64)m_lastMediaTime[channel] != AV_NOPTS_VALUE)
+        {
+            qint64 timeDiff = media->timestamp - m_lastMediaTime[channel];
             // if timeDiff < -N it may be time correction or dayling time change
             if (timeDiff >=-TIME_RESYNC_THRESHOLD  && timeDiff < MIN_FRAME_DURATION)
             {
-                media->timestamp = m_lastMediaTime[media->channelNumber] + MIN_FRAME_DURATION;
+                //most likely, timestamp reported by camera are not that good
+                NX_LOG(lit("Timestamp correction. ts diff %1, camera %2, %3 stream").
+                    arg(timeDiff).
+                    arg(m_mediaResource ? m_mediaResource->getName() : QString()).
+                    arg((media->flags & QnAbstractMediaData::MediaFlags_LowQuality) ? lit("low") : lit("high")),
+                    cl_logDEBUG1);
+
+                media->timestamp = m_lastMediaTime[channel] + MIN_FRAME_DURATION;
             }
         }
-        m_lastMediaTime[media->channelNumber] = media->timestamp;
+        m_lastMediaTime[channel] = media->timestamp;
     }
 }
 

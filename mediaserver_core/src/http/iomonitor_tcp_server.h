@@ -1,7 +1,7 @@
 #ifndef QN_IOMONITOR_REST_HANDLER_H
 #define QN_IOMONITOR_REST_HANDLER_H
 
-#include "utils/network/tcp_connection_processor.h"
+#include "network/tcp_connection_processor.h"
 #include "core/resource/resource_fwd.h"
 #include "api/model/api_ioport_data.h"
 

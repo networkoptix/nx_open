@@ -1,25 +1,16 @@
 #include "recording_status_helper.h"
 
-#include <core/resource/media_resource.h>
 #include <core/resource/camera_resource.h>
 
 #include <ui/style/skin.h>
-#include <ui/workbench/watchers/workbench_server_time_watcher.h>
-#include <ui/workbench/workbench_context.h>
-
 #include <utils/common/synctime.h>
 
-int QnRecordingStatusHelper::currentRecordingMode(QnWorkbenchContext *context, QnVirtualCameraResourcePtr camera)
-{
-    if(!camera)
+// TODO: #Elric this should be a resource parameter that is updated from the server.
+int QnRecordingStatusHelper::currentRecordingMode(const QnVirtualCameraResourcePtr &camera) {
+    if(!camera || camera->isScheduleDisabled())
         return Qn::RT_Never;
 
-    if (camera->isScheduleDisabled())
-        return Qn::RT_Never;
-
-    // TODO: #Elric this should be a resource parameter that is updated from the server.
-    QnMediaResourcePtr mediaRes = camera;
-    QDateTime dateTime = qnSyncTime->currentDateTime().addMSecs(context->instance<QnWorkbenchServerTimeWatcher>()->localOffset(mediaRes, 0));
+    QDateTime dateTime = qnSyncTime->currentDateTime();
     int dayOfWeek = dateTime.date().dayOfWeek();
     int seconds = QTime(0, 0, 0, 0).secsTo(dateTime.time());
 

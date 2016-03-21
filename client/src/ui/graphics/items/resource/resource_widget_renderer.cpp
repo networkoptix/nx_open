@@ -1,8 +1,6 @@
 
 #include "resource_widget_renderer.h"
 
-#include <QtCore/QMutexLocker>
-
 #include <camera/gl_renderer.h>
 #include <utils/common/warnings.h>
 #include <utils/common/performance.h>
@@ -172,6 +170,9 @@ bool QnResourceWidgetRenderer::isHardwareDecoderUsed(int channel) const
 
 QnMetaDataV1Ptr QnResourceWidgetRenderer::lastFrameMetadata(int channel) const
 {
+    if (m_channelRenderers.size() <= static_cast<size_t>(channel))
+        return QnMetaDataV1Ptr();
+
     const RenderingTools& ctx = m_channelRenderers[channel];
     return ctx.renderer ? ctx.renderer->lastFrameMetadata() : QnMetaDataV1Ptr();
 }
@@ -220,7 +221,7 @@ void QnResourceWidgetRenderer::setScreenshotInterface(ScreenshotInterface* value
 
 bool QnResourceWidgetRenderer::isEnabled(int channelNumber) const
 {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     return channelNumber < m_renderingEnabled.size() ? m_renderingEnabled[channelNumber] : false;
 }
 
@@ -233,7 +234,7 @@ void QnResourceWidgetRenderer::setEnabled(int channelNumber, bool enabled)
     if( !ctx.uploader )
         return;
 
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     m_renderingEnabled[channelNumber] = enabled;
     if( !enabled )
@@ -243,7 +244,7 @@ void QnResourceWidgetRenderer::setEnabled(int channelNumber, bool enabled)
 void QnResourceWidgetRenderer::draw(const QSharedPointer<CLVideoDecoderOutput>& image)
 {
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 
         if( !m_renderingEnabled[image->channel] )
             return;
@@ -297,13 +298,13 @@ void QnResourceWidgetRenderer::finishPostedFramesRender(int channel)
 }
 
 QSize QnResourceWidgetRenderer::sizeOnScreen(unsigned int /*channel*/) const {
-    QMutexLocker locker(&m_mutex);
+    QnMutexLocker locker( &m_mutex );
 
     return m_channelScreenSize;
 }
 
 void QnResourceWidgetRenderer::setChannelScreenSize(const QSize &screenSize) {
-    QMutexLocker locker(&m_mutex);
+    QnMutexLocker locker( &m_mutex );
 
     m_channelScreenSize = screenSize;
 }
@@ -313,7 +314,7 @@ bool QnResourceWidgetRenderer::constantDownscaleFactor() const {
 }
 
 QSize QnResourceWidgetRenderer::sourceSize() const {
-    QMutexLocker locker(&m_mutex);
+    QnMutexLocker locker( &m_mutex );
 
     //return QSize(m_sourceSize.width() * m_panoFactor, m_sourceSize.height());
     return QSize(m_sourceSize.width(), m_sourceSize.height());

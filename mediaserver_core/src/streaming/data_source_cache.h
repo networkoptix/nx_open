@@ -8,7 +8,7 @@
 #include <map>
 #include <memory>
 
-#include <QtCore/QMutex>
+#include <utils/thread/mutex.h>
 #include <QtCore/QSharedPointer>
 
 #include <core/dataprovider/abstract_ondemand_data_provider.h>
@@ -59,7 +59,7 @@ public:
     virtual void onTimer( const quint64& timerID ) override;
 
 private:
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     std::map<StreamingChunkCacheKey, std::pair<DataSourceContextPtr, quint64>> m_cachedDataProviders;
     std::map<quint64, StreamingChunkCacheKey> m_timers;
     bool m_terminated;

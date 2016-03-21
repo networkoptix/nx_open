@@ -1,6 +1,8 @@
 #include "crash_reporter.h"
 
 #include <api/app_server_connection.h>
+#include <api/global_settings.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
 
@@ -31,10 +33,11 @@ static QFileInfoList readCrashes(const QString& prefix = QString())
     #if defined( _WIN32 )
         const QDir crashDir(QString::fromStdString(win32_exception::getCrashDirectory()));
         const auto crashFilter = prefix + QString::fromStdString(win32_exception::getCrashPattern());
-    #elif defined ( __linux__ )
+    #elif defined (Q_OS_LINUX) && !defined(Q_OS_ANDROID)
         const QDir crashDir(QString::fromStdString(linux_exception::getCrashDirectory()));
         const auto crashFilter = prefix + QString::fromStdString(linux_exception::getCrashPattern());
     #else
+        Q_UNUSED(prefix)
         const QDir crashDir;
         const QString crashFilter;
         return QFileInfoList(); // do nothing. not implemented
@@ -57,7 +60,7 @@ CrashReporter::~CrashReporter()
 {
     boost::optional<qint64> timerId;
     {
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock(&m_mutex);
         m_terminated = true;
         timerId = m_timerId;
     }
@@ -72,7 +75,7 @@ CrashReporter::~CrashReporter()
     // cancel async IO
     nx_http::AsyncHttpClientPtr httpClient;
     {
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock(&m_mutex);
         std::swap(httpClient, m_activeHttpClient);
     }
 }
@@ -80,10 +83,11 @@ CrashReporter::~CrashReporter()
 bool CrashReporter::scanAndReport(QSettings* settings)
 {
     const auto admin = qnResPool->getAdministrator();
-    if (!admin) return false;
+    if (!admin) 
+        return false;
 
-    const auto msManager = QnAppServerConnectionFactory::getConnection2()->getMediaServerManager();
-    if (!Ec2StaticticsReporter::isAllowed(msManager))
+    
+    if (!qnGlobalSettings->isStatisticsAllowed())
     {
         NX_LOG(lit("CrashReporter::scanAndReport: Automatic report system is disabled"),
                cl_logINFO);
@@ -121,7 +125,9 @@ bool CrashReporter::scanAndReport(QSettings* settings)
 
 void CrashReporter::scanAndReportAsync(QSettings* settings)
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
+
+    // This function is not supposed to be called more then once per binary, but anyway:
     if (m_activeCollection.isInProgress())
     {
         NX_LOG(lit("CrashReporter::scanAndReportAsync: Previous report is in progress"),
@@ -144,7 +150,7 @@ void CrashReporter::scanAndReportByTimer(QSettings* settings)
 {
     scanAndReportAsync(settings);
 
-    QMutexLocker lk(&m_mutex);
+    QnMutexLocker lk(&m_mutex);
     if (!m_terminated)
         m_timerId = TimerManager::instance()->addTimer(
             std::bind(&CrashReporter::scanAndReportByTimer, this, settings), SCAN_TIMER_CYCLE);
@@ -172,7 +178,7 @@ bool CrashReporter::send(const QUrl& serverApi, const QFileInfo& crash, QSetting
     httpClient->setUserPassword(Ec2StaticticsReporter::AUTH_PASSWORD);
     httpClient->setAdditionalHeaders(report->makeHttpHeaders());
 
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     if (m_activeHttpClient)
     {
         NX_LOG(lit("CrashReporter::send: another report is in progress!"), cl_logWARNING);
@@ -227,7 +233,7 @@ void ReportData::finishReport(nx_http::AsyncHttpClientPtr httpClient)
     for (const auto& crash : allCrashes)
         QFile::remove(crash.absoluteFilePath());
 
-    QMutexLocker lock(&m_host.m_mutex);
+    QnMutexLocker lock(&m_host.m_mutex);
     Q_ASSERT(!m_host.m_activeHttpClient || m_host.m_activeHttpClient == httpClient);
     m_host.m_activeHttpClient.reset();
 }

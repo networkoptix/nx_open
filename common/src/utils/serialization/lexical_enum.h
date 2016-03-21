@@ -222,7 +222,7 @@ __VA_ARGS__ QnEnumLexicalSerializerData create_enum_lexical_serializer_data(cons
     BOOST_PP_VARIADIC_SEQ_FOR_EACH(QN_DEFINE_EXPLICIT_ENUM_LEXICAL_SERIALIZER_FACTORY_FUNCTION_STEP_I, ~, ELEMENTS) \
     data.setNumeric(QnLexical::is_numerically_serializable<ENUM>::value);       \
     data.setFlagged(QnSerialization::is_flags<ENUM>::value);                    \
-    return std::move(data);                                                     \
+    return data;                                                     \
 }
 
 #define QN_DEFINE_EXPLICIT_ENUM_LEXICAL_SERIALIZER_FACTORY_FUNCTION_STEP_I(R, DATA, ELEMENT) \
@@ -239,7 +239,7 @@ __VA_ARGS__ QnEnumLexicalSerializerData create_enum_lexical_serializer_data(cons
     data.load(&SCOPE::staticMetaObject, BOOST_PP_STRINGIZE(ENUM));              \
     data.setNumeric(QnLexical::is_numerically_serializable<SCOPE::ENUM>::value); \
     data.setFlagged(QnSerialization::is_flags<SCOPE::ENUM>::value);             \
-    return std::move(data);                                                     \
+    return data;                                                     \
 }
 
 

@@ -95,7 +95,7 @@
    <item>
     <widget class="QLabel" name="errorLabel">
      <property name="text">
-      <string>This license type requires higher software version.</string>
+      <string>This license type requires a higher software version.</string>
      </property>
     </widget>
    </item>

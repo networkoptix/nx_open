@@ -199,14 +199,14 @@ namespace aio
 
         PollSetType pollSet;
         //TODO #ak MUST remove this mutex from here
-        QMutex* const aioServiceMutex;
+        QnMutex* const aioServiceMutex;
         /*!
             \note This variable is accessed with \a aioServiceMutex locked
         */
         std::deque<SocketAddRemoveTask> pollSetModificationQueue;
         unsigned int newReadMonitorTaskCount;
         unsigned int newWriteMonitorTaskCount;
-        mutable QMutex mutex;
+        mutable QnMutex mutex;
         //TODO #ak get rid of map here to avoid undesired allocations
         std::multimap<qint64, PeriodicTaskData> periodicTasksByClock;
         //TODO #ak use cyclic array here to minimize allocations
@@ -216,7 +216,7 @@ namespace aio
         std::deque<SocketAddRemoveTask> postedCalls;
         std::atomic<int> processingPostedCalls;
 
-        AIOThreadImpl( QMutex* const _aioServiceMutex )
+        AIOThreadImpl( QnMutex* const _aioServiceMutex )
         :
             aioServiceMutex( _aioServiceMutex ),
             newReadMonitorTaskCount( 0 ),
@@ -237,7 +237,7 @@ namespace aio
             if( pollSetModificationQueue.empty() )
                 return;
 
-            QMutexLocker lk( aioServiceMutex );
+            QnMutexLocker lk( aioServiceMutex );
 
             for( typename std::deque<SocketAddRemoveTask>::iterator
                 it = pollSetModificationQueue.begin();
@@ -461,7 +461,7 @@ namespace aio
                     static_cast<AIOEventHandlingDataHolder<SocketType>*>(
                         socket->impl()->eventTypeToUserData[handlerToInvokeType])->data;
 
-                QMutexLocker lk( &mutex );
+                QnMutexLocker lk( &mutex );
                 ++handlingData->beingProcessed;
                 //TODO #ak possibly some atomic fence is required here
                 if( handlingData->markedForRemoval.load(std::memory_order_relaxed) > 0 ) //socket has been removed from watch
@@ -491,7 +491,7 @@ namespace aio
 
             for( ;; )
             {
-                QMutexLocker lk( &mutex );
+                QnMutexLocker lk( &mutex );
 
                 PeriodicTaskData periodicTaskData;
                 {
@@ -579,7 +579,7 @@ namespace aio
             SocketType* _socket,
             aio::EventType eventType )
         {
-            QMutexLocker lk( &mutex );
+            QnMutexLocker lk( &mutex );
             addPeriodicTaskNonSafe( taskClock, handlingData, _socket, eventType );
         }
 
@@ -627,7 +627,7 @@ namespace aio
 
 
     template<class SocketType>
-    AIOThread<SocketType>::AIOThread( QMutex* const aioServiceMutex ) //TODO: #ak give up using single aioServiceMutex for all aio threads
+    AIOThread<SocketType>::AIOThread( QnMutex* const aioServiceMutex ) //TODO: #ak give up using single aioServiceMutex for all aio threads
     :
         m_impl( new AIOThreadImplType( aioServiceMutex ) )
     {
@@ -798,7 +798,7 @@ namespace aio
     }
 
     template<class SocketType>
-    bool AIOThread<SocketType>::post( SocketType* const sock, std::function<void()>&& functor )
+    void AIOThread<SocketType>::post( SocketType* const sock, std::function<void()>&& functor )
     {
         m_impl->pollSetModificationQueue.push_back(
             typename AIOThreadImplType::PostAsyncCallTask(
@@ -807,21 +807,20 @@ namespace aio
         //if eventTriggered is lower on stack, socket will be added to pollset before the next poll call
         if( currentThreadSystemId() != systemThreadId() )
             m_impl->pollSet.interrupt();
-        return true;
     }
 
     template<class SocketType>
-    bool AIOThread<SocketType>::dispatch( SocketType* const sock, std::function<void()>&& functor )
+    void AIOThread<SocketType>::dispatch( SocketType* const sock, std::function<void()>&& functor )
     {
         if( currentThreadSystemId() == systemThreadId() )  //if called from this aio thread
         {
             m_impl->aioServiceMutex->unlock();
             functor();
             m_impl->aioServiceMutex->lock();
-            return true;
+            return;
         }
         //otherwise posting functor
-        return post( sock, std::move(functor) );
+        post( sock, std::move(functor) );
     }
 
     template<class SocketType>
@@ -901,7 +900,7 @@ namespace aio
             //taking clock of the next periodic task
             qint64 nextPeriodicEventClock = 0;
             {
-                QMutexLocker lk( &m_impl->mutex );
+                QnMutexLocker lk( &m_impl->mutex );
                 nextPeriodicEventClock = m_impl->periodicTasksByClock.empty() ? 0 : m_impl->periodicTasksByClock.cbegin()->first;
             }
 

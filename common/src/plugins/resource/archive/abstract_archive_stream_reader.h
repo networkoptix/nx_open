@@ -3,7 +3,7 @@
 
 #ifdef ENABLE_ARCHIVE
 
-#include <core/dataprovider/cpull_media_stream_provider.h>
+#include <core/dataprovider/media_streamdataprovider.h>
 
 #include "abstract_archive_delegate.h"
 #include "abstract_navigator.h"

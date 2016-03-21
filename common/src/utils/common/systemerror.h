@@ -30,6 +30,7 @@ namespace SystemError
     static const ErrorCode inProgress = WSAEWOULDBLOCK;
     static const ErrorCode timedOut = WSAETIMEDOUT;
     static const ErrorCode fileNotFound = ERROR_FILE_NOT_FOUND;
+    static const ErrorCode pathNotFound = ERROR_PATH_NOT_FOUND;
     static const ErrorCode connectionAbort = WSAECONNABORTED;
     static const ErrorCode connectionReset = WSAECONNRESET;
     static const ErrorCode hostNotFound = WSAHOST_NOT_FOUND;
@@ -45,6 +46,7 @@ namespace SystemError
     static const ErrorCode inProgress = EINPROGRESS;
     static const ErrorCode timedOut = ETIMEDOUT;
     static const ErrorCode fileNotFound = ENOENT;
+    static const ErrorCode pathNotFound = ENOENT;
     static const ErrorCode connectionAbort = ECONNABORTED;
     static const ErrorCode connectionReset = ECONNRESET;
     static const ErrorCode hostNotFound = EAI_NONAME;

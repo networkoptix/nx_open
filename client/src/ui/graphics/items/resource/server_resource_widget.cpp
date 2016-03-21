@@ -34,6 +34,8 @@
 #include <ui/workbench/workbench_item.h>
 
 #include <utils/license_usage_helper.h>
+#include <utils/common/string.h>
+#include <utils/common/qtimespan.h>
 
 namespace {
 
@@ -227,7 +229,7 @@ class LegendButtonWidget: public QnImageButtonWidget {
 
 public:
     LegendButtonWidget(const QString &text, const QColor &color, QGraphicsItem *parent = NULL):
-        base_type(parent, 0),
+        base_type(lit("server_resource_legend"), parent, 0),
         m_text(text),
         m_color(color)
     {
@@ -498,7 +500,7 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     addOverlays();
 
     /* Setup buttons */
-    QnImageButtonWidget *showLogButton = new QnImageButtonWidget();
+    QnImageButtonWidget *showLogButton = new QnImageButtonWidget(lit("server_widget_show_log"));
     showLogButton->setIcon(qnSkin->icon("item/log.png"));
     showLogButton->setCheckable(false);
     showLogButton->setProperty(Qn::NoBlockMotionSelection, true);
@@ -507,7 +509,7 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     connect(showLogButton, SIGNAL(clicked()), this, SLOT(at_showLogButton_clicked()));
     buttonBar()->addButton(ShowLogButton, showLogButton);
 
-    QnImageButtonWidget *checkIssuesButton = new QnImageButtonWidget();
+    QnImageButtonWidget *checkIssuesButton = new QnImageButtonWidget(lit("server_widget_check_issues"));
     checkIssuesButton->setIcon(qnSkin->icon("item/issues.png"));
     checkIssuesButton->setCheckable(false);
     checkIssuesButton->setProperty(Qn::NoBlockMotionSelection, true);
@@ -521,6 +523,7 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     updateButtonsVisibility();
     updateTitleText();
     //updateInfoOpacity();
+    updateInfoText();
     at_statistics_received();
 }
 
@@ -687,7 +690,7 @@ void QnServerResourceWidget::updateLegend() {
 
             data.button = newButton;
             data.bar->addButton(data.mask, data.button);
-            
+
         }
     }
 }
@@ -772,19 +775,18 @@ void QnServerResourceWidget::updateHud(bool animate /*= true*/) {
 
 
 QString QnServerResourceWidget::calculateTitleText() const {
-    QString name = getFullResourceName(m_resource, true);
+    enum {
+        kMaxNameLength = 30
+    };
+
+    QString name = elideString(getFullResourceName(m_resource, true), kMaxNameLength);
 
     qint64 uptimeMs = m_resource->getStatus() == Qn::Online
         ? m_manager->uptimeMs(m_resource)
         : 0;
-    if (uptimeMs > 0) {
-        int msInDay = 24 * 3600 * 1000;
-        return tr("%1 (up %n days, %2)", "", uptimeMs / msInDay)
-            .arg(name)
-            .arg(QTime(0, 0).addMSecs(uptimeMs % msInDay).toString(lit("hh:mm"))); // TODO: #TR #Elric this hh:mm is bad even in English...
-    } else {
-        return tr("%1").arg(name);
-    }
+    return uptimeMs > 0
+        ? tr("%1 (up %2)").arg(name, QTimeSpan(uptimeMs).toApproximateString())
+        : name;
 }
 
 QnResourceWidget::Buttons QnServerResourceWidget::calculateButtonsVisibility() const {
@@ -796,7 +798,7 @@ QnResourceWidget::Buttons QnServerResourceWidget::calculateButtonsVisibility() c
 }
 
 Qn::ResourceStatusOverlay QnServerResourceWidget::calculateStatusOverlay() const {
-    if (qnRuntime->isVideoWallMode() && !QnVideoWallLicenseUsageHelper().isValid()) 
+    if (qnRuntime->isVideoWallMode() && !QnVideoWallLicenseUsageHelper().isValid())
         return Qn::VideowallWithoutLicenseOverlay;
 
     auto status = m_resource->getStatus();
@@ -865,14 +867,14 @@ void QnServerResourceWidget::at_statistics_received() {
 }
 
 void QnServerResourceWidget::at_pingButton_clicked() {
-    menu()->trigger(Qn::PingAction, QnActionParameters(m_resource));
+    menu()->trigger(QnActions::PingAction, QnActionParameters(m_resource));
 }
 
 void QnServerResourceWidget::at_showLogButton_clicked() {
-    menu()->trigger(Qn::ServerLogsAction, QnActionParameters(m_resource));
+    menu()->trigger(QnActions::ServerLogsAction, QnActionParameters(m_resource));
 }
 
 void QnServerResourceWidget::at_checkIssuesButton_clicked() {
-    menu()->trigger(Qn::ServerIssuesAction, QnActionParameters(m_resource));
+    menu()->trigger(QnActions::ServerIssuesAction, QnActionParameters(m_resource));
 }
 

@@ -7,11 +7,17 @@
 
 #include <client/client_globals.h>
 
-namespace Qn {
+class QnActions
+{
+    Q_GADGET
+    Q_ENUMS(IDType)
+
+public:
     /**
      * Enum of all menu actions.
      */
-    enum ActionId {
+    enum IDType
+    {
         /* Actions that are not assigned to any menu. */
 
         /**
@@ -55,7 +61,7 @@ namespace Qn {
          */
         ShowFpsAction,
 
-        /** 
+        /**
          * Shows / hides debug overlay.
          */
         ShowDebugOverlayAction,
@@ -142,7 +148,7 @@ namespace Qn {
         MessageBoxAction,
 
         /**
-         * Displays version mismatch dialog, pulling mismatch data from 
+         * Displays version mismatch dialog, pulling mismatch data from
          * <tt>QnWorkbenchVersionMismatchWatcher</tt>. Displays nothing if there
          * is no mismatches.
          */
@@ -155,7 +161,7 @@ namespace Qn {
         BetaVersionMessageAction,
 
 
-        /** 
+        /**
          * Displays dialog asking about statistics reporting.
          */
         AllowStatisticsReportMessageAction,
@@ -186,6 +192,11 @@ namespace Qn {
          * Opens the Failover Priority dialog.
          */
         OpenFailoverPriorityAction,
+
+        /**
+         * Opens the Backup Cameras dialog.
+         */
+        OpenBackupCamerasAction,
 
         /**
          * Opens videowall control layouts for all items in the provided QnVideoWallItemIndexList.
@@ -330,12 +341,12 @@ namespace Qn {
          */
         ExitAction,
 
-        /** 
+        /**
          * Forcibly closes the client asynchronously.
          */
         DelayedForcedExitAction,
 
-        /** 
+        /**
          * Notifies all modules about client closing.
          */
         BeforeExitAction,
@@ -348,14 +359,21 @@ namespace Qn {
         WebClientAction,
 
         /**
+         * Opens web client in the default browser. Placed in submenu
+         * TODO: #ynikitenkov Add ability to add action both in submenu and context menu,
+         * now it is not available
+         */
+        WebClientActionSubMenu,
+
+        /**
          * Opens business events editing dialog.
          */
         BusinessEventsAction,
 
         /**
-         * Opens business events log dialog.
+         * Opens bookmarks dialog.
          */
-        BusinessEventsLogAction,
+        OpenBookmarksSearchAction,
 
         /**
          * Opens camera list dialog.
@@ -417,6 +435,11 @@ namespace Qn {
          * Opens selected resources in a new layout.
          */
         OpenInNewLayoutAction,
+
+        /**
+         * Opens selected resources in the Alarm Layout.
+         */
+        OpenInAlarmLayoutAction,
 
         /**
          * Opens selected resources in a new window.
@@ -820,8 +843,8 @@ namespace Qn {
          */
         IdentifyVideoWallAction,
 
-        /** 
-         * Save current videowall matrix. 
+        /**
+         * Save current videowall matrix.
          */
         SaveVideowallMatrixAction,
 
@@ -907,7 +930,7 @@ namespace Qn {
          */
         ExportLayoutAction,
 
-        /** 
+        /**
          * Bookmark selected range.
          */
         AddCameraBookmarkAction,
@@ -923,6 +946,11 @@ namespace Qn {
         RemoveCameraBookmarkAction,
 
         /**
+         * Batch bookmarks deleting.
+         */
+        RemoveBookmarksAction,
+
+        /**
          * Opens new layout for Quick Search.
          *
          * Parameters:
@@ -935,6 +963,11 @@ namespace Qn {
          * Shows/hides thumbnails.
          */
         ToggleThumbnailsAction,
+
+        /**
+         * Shows/hides bookmarks.
+         */
+        BookmarksModeAction,
 
         /**
          * Shows/hides calendar.
@@ -957,14 +990,21 @@ namespace Qn {
         PinTreeAction,
 
         /**
+         * Pins/unpins calendar and day/time view
+         */
+        PinCalendarAction,
+
+        /**
+         * Minimazes day/time view
+         */
+        MinimizeDayTimeViewAction,
+
+        /**
          * Shows/hides slider.
          */
         ToggleSliderAction,
 
-        /** 
-         * Shows/hides bookmarks search panel.
-         */
-        ToggleBookmarksSearchAction,
+        ToggleNotificationsAction,
 
         PinNotificationsAction,
 
@@ -1024,6 +1064,12 @@ namespace Qn {
         NoAction = -1
     };
 
+};
+
+QN_FUSION_DECLARE_FUNCTIONS(QnActions::IDType, (lexical)(metatype))
+
+namespace Qn
+{
     /**
      * Scope of an action.
      *
@@ -1041,6 +1087,7 @@ namespace Qn {
         NotificationsScope      = 0x00000020,
         ScopeMask               = 0x000000FF
     };
+
     Q_DECLARE_FLAGS(ActionScopes, ActionScope);
 
     /**
@@ -1161,8 +1208,6 @@ namespace QnActionTypes {
     };
     Q_DECLARE_FLAGS(ClientModes, ClientMode)
 }
-
-Q_DECLARE_METATYPE(Qn::ActionId);
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::ActionScopes);
 Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::ActionParameterTypes);

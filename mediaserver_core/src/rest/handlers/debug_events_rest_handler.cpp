@@ -8,6 +8,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 
+#include <utils/network/http/httptypes.h>
 #include <utils/common/synctime.h>
 
 int QnDebugEventsRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) {

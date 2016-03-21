@@ -5,7 +5,7 @@
 
 #include "cached_output_stream.h"
 
-#include <utils/network/tcp_connection_processor.h>
+#include <network/tcp_connection_processor.h>
 #include <utils/network/socket.h>
 
 
@@ -22,10 +22,19 @@ CachedOutputStream::~CachedOutputStream()
     stop();
 }
 
-void CachedOutputStream::postPacket( const QByteArray& data )
+void CachedOutputStream::postPacket(const QByteArray& data, int maxQueueSize)
 {
-    if( data.isEmpty() )
+    if (data.isEmpty())
         return;
+    if (maxQueueSize > -1 && m_packetsToSend.size() > maxQueueSize)
+    {
+        QnMutexLocker lk(&m_mutex);
+        while (m_packetsToSend.size() > maxQueueSize && !m_failed && !needToStop())
+            m_cond.wait(lk.mutex());
+
+        if (m_failed || needToStop())
+            return;
+    }
     m_packetsToSend.push( data );
 }
 
@@ -43,6 +52,7 @@ void CachedOutputStream::pleaseStop()
 {
     m_packetsToSend.push( QByteArray() );   //signaling thread that it is time to die
     QnLongRunnable::pleaseStop();
+    m_cond.wakeAll();
 }
 
 void CachedOutputStream::run()
@@ -60,5 +70,7 @@ void CachedOutputStream::run()
             m_failed = true;
             break;
         }
+        m_cond.wakeAll();
     }
+    m_cond.wakeAll();
 }

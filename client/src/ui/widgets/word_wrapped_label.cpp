@@ -5,6 +5,8 @@ QnWordWrappedLabel::QnWordWrappedLabel(QWidget *parent /* = 0*/):
     m_label(new QLabel(this))
 {
     m_label->setWordWrap(true);
+
+    connect(m_label, &QLabel::linkActivated, this, &QnWordWrappedLabel::linkActivated);
 }
 
 QLabel* QnWordWrappedLabel::label() const {
@@ -31,6 +33,19 @@ QString QnWordWrappedLabel::text() const {
 }
 
 void QnWordWrappedLabel::setText(const QString &value) {
+    if (text() == value)
+        return;
     m_label->setText(value);
+    updateGeometry();
+}
+
+Qt::TextFormat QnWordWrappedLabel::textFormat() const {
+    return m_label->textFormat();
+}
+
+void QnWordWrappedLabel::setTextFormat( Qt::TextFormat value ) {
+    if (textFormat() == value)
+        return;
+    m_label->setTextFormat(value);
     updateGeometry();
 }

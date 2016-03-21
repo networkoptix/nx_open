@@ -2,7 +2,7 @@
 
 #include "ifconfig_rest_handler.h"
 #include "utils/network/http/linesplitter.h"
-#include <utils/network/tcp_connection_priv.h>
+#include <network/tcp_connection_priv.h>
 #include <utils/common/model_functions.h>
 #include "common/common_module.h"
 #include "core/resource_management/resource_pool.h"

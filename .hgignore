@@ -29,6 +29,7 @@ ecs.db-wal
 compatibility_info.cpp
 *_tmp.py*
 donotrebuild
+vms.pro
 
 .DS_Store
 Debug
@@ -269,6 +270,7 @@ ios-client/deploy_index.html
 ios-client/Settings.bundle/Root.plist
 ios-client/HDWitness/HDWitness/HDWitness-Info.plist
 ios-client/HDWitness/HDWitness/HDWCompatibilityItems.m
+ios-client/HDWitness/HDWitness/NxWitness.entitlements
 ios-client/Podfile
 ios-client/Pods
 ios-client/HDWitness/Settings.bundle/Root.plist
@@ -329,8 +331,14 @@ webadmin/.sass-cache
 app/bower_components
 
 plugins/acs/Paxton/packages
-plugins/acs/Paxton/CustomProperties.cs
+
+plugins\acs\Paxton\CustomProperties.cs
 plugins/NxControl/NxControl.cs
+
+mobile_client/build-*
+mobile_client/x86
+mobile_client/x64
+mobile_client/arm
 
 statserver/.venv
 statserver/build

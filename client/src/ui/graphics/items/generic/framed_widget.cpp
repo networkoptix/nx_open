@@ -159,8 +159,15 @@ void FramedBase::paintFrame(QPainter *painter, const QRectF &rect) {
         QN_SCOPED_PAINTER_TRANSFORM_ROLLBACK(painter);
         
         painter->translate(frameRect.topLeft());
-        qreal sx = frameRect.width() / m_customFramePathBoundingRect.width();
-        qreal sy = frameRect.height() / m_customFramePathBoundingRect.height();
+        
+        const bool correctBoundWidth = !qFuzzyIsNull(m_customFramePathBoundingRect.width());
+        const bool correctBoundHeight = !qFuzzyIsNull(m_customFramePathBoundingRect.height());
+
+        static const qreal kDefaultScaleFactor = 1;
+        qreal sx = (correctBoundWidth ? frameRect.width() / m_customFramePathBoundingRect.width() 
+            : kDefaultScaleFactor);
+        qreal sy = (correctBoundHeight ? frameRect.height() / m_customFramePathBoundingRect.height() 
+            : kDefaultScaleFactor);
         painter->scale(sx, sy);
 
         painter->setPen(QPen(frameBrush(), m_frameWidth / ((sx + sy) / 2.0), m_frameStyle, Qt::SquareCap, Qt::MiterJoin));

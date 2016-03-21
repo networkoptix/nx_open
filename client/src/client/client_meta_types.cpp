@@ -17,6 +17,7 @@
 #include <ui/customization/pen_data.h>
 
 #include <update/updates_common.h>
+#include <update/update_info.h>
 
 #include <utils/color_space/image_correction.h>
 #include <utils/serialization/json_functions.h>
@@ -32,7 +33,7 @@ QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::TimeMode)
 QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::ClientSkin)
 
 void QnClientMetaTypes::initialize() {
-    /* Note that running the code twice is perfectly OK, 
+    /* Note that running the code twice is perfectly OK,
      * so we don't need heavyweight synchronization here. */
     if(qn_clientMetaTypes_initialized)
         return;
@@ -47,7 +48,7 @@ void QnClientMetaTypes::initialize() {
 
     qRegisterMetaType<Qn::NodeType>();
     qRegisterMetaType<Qn::ItemRole>();
-    qRegisterMetaType<QnThumbnail>();    
+    qRegisterMetaType<QnThumbnail>();
     qRegisterMetaType<QnWorkbenchState>();
     qRegisterMetaTypeStreamOperators<QnWorkbenchState>();
     qRegisterMetaType<QnWorkbenchStateHash>();
@@ -69,10 +70,12 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<Qn::ImageBehaviour>();
     qRegisterMetaTypeStreamOperators<Qn::ImageBehaviour>();
     qRegisterMetaType<ImageCorrectionParams>();
-    qRegisterMetaType<Qn::ActionId>();
+    qRegisterMetaType<QnActions::IDType>();
     qRegisterMetaType<QnActionParameters>();
     qRegisterMetaType<QnAspectRatioHash>();
     qRegisterMetaTypeStreamOperators<QnAspectRatioHash>();
+    qRegisterMetaType<QnUpdateInfo>();
+    qRegisterMetaTypeStreamOperators<QnUpdateInfo>();
 
     qRegisterMetaType<Qn::LightModeFlags>();
 
@@ -85,6 +88,7 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<QnTimeSliderColors>();
     qRegisterMetaType<QnTimeScrollBarColors>();
     qRegisterMetaType<QnBackgroundColors>();
+    qRegisterMetaType<QnBookmarkColors>();
     qRegisterMetaType<QnCalendarColors>();
     qRegisterMetaType<QnStatisticsColors>();
     qRegisterMetaType<QnIoModuleColors>();
@@ -92,6 +96,7 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<QnGridColors>();
     qRegisterMetaType<QnHistogramColors>();
     qRegisterMetaType<QnResourceWidgetFrameColors>();
+    qRegisterMetaType<QnCompositeTextOverlayColors>();
     qRegisterMetaType<QnPtzManageModelColors>();
     qRegisterMetaType<QnLicensesListModelColors>();
     qRegisterMetaType<QnRoutingManagementColors>();
@@ -100,7 +105,9 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<QnUserManagementColors>();
     qRegisterMetaType<QnVideowallManageWidgetColors>();
     qRegisterMetaType<QnServerUpdatesColors>();
+    qRegisterMetaType<QnBackupScheduleColors>();
     qRegisterMetaType<QnFailoverPriorityColors>();
+    qRegisterMetaType<QnGraphicsMessageBoxColors>();
 
     qRegisterMetaType<QnAbstractCameraDataPtr>();
 
@@ -109,6 +116,7 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<QnUpdateResult>();
     qRegisterMetaType<QnCheckForUpdateResult>();
 
+    QnJsonSerializer::registerSerializer<QnBookmarkColors>();
     QnJsonSerializer::registerSerializer<QnTimeSliderColors>();
     QnJsonSerializer::registerSerializer<QnTimeScrollBarColors>();
     QnJsonSerializer::registerSerializer<QnBackgroundColors>();
@@ -119,6 +127,7 @@ void QnClientMetaTypes::initialize() {
     QnJsonSerializer::registerSerializer<QnGridColors>();
     QnJsonSerializer::registerSerializer<QnHistogramColors>();
     QnJsonSerializer::registerSerializer<QnResourceWidgetFrameColors>();
+    QnJsonSerializer::registerSerializer<QnCompositeTextOverlayColors>();
     QnJsonSerializer::registerSerializer<QnPtzManageModelColors>();
     QnJsonSerializer::registerSerializer<QnLicensesListModelColors>();
     QnJsonSerializer::registerSerializer<QnRoutingManagementColors>();
@@ -127,7 +136,9 @@ void QnClientMetaTypes::initialize() {
     QnJsonSerializer::registerSerializer<QnUserManagementColors>();
     QnJsonSerializer::registerSerializer<QnVideowallManageWidgetColors>();
     QnJsonSerializer::registerSerializer<QnServerUpdatesColors>();
+    QnJsonSerializer::registerSerializer<QnBackupScheduleColors>();
     QnJsonSerializer::registerSerializer<QnFailoverPriorityColors>();
+    QnJsonSerializer::registerSerializer<QnGraphicsMessageBoxColors>();
 
     QnJsonSerializer::registerSerializer<Qn::ClientSkin>();
     QnJsonSerializer::registerSerializer<Qn::BackgroundAnimationMode>();

@@ -1,7 +1,8 @@
 #include "business_log2_rest_handler.h"
 
 #include <common/common_module.h>
-#include "events/events_db.h"
+#include <database/server_db.h>
+
 #include "recording/time_period.h"
 #include "rest/server/json_rest_result.h"
 #include "business/business_event_parameters.h"
@@ -61,7 +62,7 @@ int QnBusinessLog2RestHandler::executeGet(const QString& path, const QnRequestPa
     if (errStr.isEmpty())
     {
         outputData =
-            qnEventsDB->getActions(
+            qnServerDb->getActions(
                 period, 
                 resList,
                 eventType, 

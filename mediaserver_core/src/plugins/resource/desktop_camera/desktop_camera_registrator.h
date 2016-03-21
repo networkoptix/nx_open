@@ -3,7 +3,7 @@
 
 #ifdef ENABLE_DESKTOP_CAMERA
 
-#include "utils/network/tcp_connection_processor.h"
+#include "network/tcp_connection_processor.h"
 
 class QnDesktopCameraRegistratorPrivate;
 

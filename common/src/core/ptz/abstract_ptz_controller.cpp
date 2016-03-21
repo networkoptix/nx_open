@@ -4,6 +4,8 @@
 
 #include <core/resource/resource.h>
 
+const qreal QnAbstractPtzController::MaxPtzSpeed = 1.0;
+
 QnAbstractPtzController::QnAbstractPtzController(const QnResourcePtr &resource): 
     m_resource(resource) 
 {}

@@ -29,7 +29,7 @@ public:
     };
 
     enum Roles {
-        StageRole = Qn::LastItemDataRole + 1,
+        StageRole = Qn::RoleCount,
         ProgressRole
     };
 

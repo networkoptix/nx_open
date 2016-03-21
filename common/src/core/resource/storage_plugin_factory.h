@@ -2,6 +2,9 @@
 #define __STORAGE_PLUGIN_FACTORY_RESOURCE_H__
 
 #include <functional>
+
+#include <utils/thread/mutex.h>
+
 #include "storage_resource.h"
 
 class QnStoragePluginFactory
@@ -20,7 +23,7 @@ public:
 private:
     QHash<QString, StorageFactory> m_factoryByProtocol;
     StorageFactory m_defaultFactory;
-    QMutex m_mutex; // TODO: #vasilenko this mutex is not used, is it intentional?
+    QnMutex m_mutex; // TODO: #vasilenko this mutex is not used, is it intentional?
 };
 
 #endif // __STORAGE_PLUGIN_FACTORY_RESOURCE_H__

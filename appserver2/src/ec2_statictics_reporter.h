@@ -1,13 +1,15 @@
 #ifndef EC2_STATICTICS_REPORTER_H
 #define EC2_STATICTICS_REPORTER_H
 
-#include <QtCore/QMutex>
+#include <QtCore/QDateTime>
 
 #include <core/resource/resource_fwd.h>
 #include <utils/common/timermanager.h>
 #include <utils/network/http/asynchttpclient.h>
+#include <utils/thread/mutex.h>
 #include <nx_ec/ec_api.h>
 #include <nx_ec/data/api_statistics.h>
+
 
 namespace ec2
 {
@@ -40,16 +42,6 @@ namespace ec2
         static const QString AUTH_USER;
         static const QString AUTH_PASSWORD;
 
-        // helpers
-        /** Check if user has already made a decision about this system behavior. */
-        static bool isDefined(const QnMediaServerResourceList &servers);
-        /** Check if statistics reporting is allowed in this system. */
-        static bool isAllowed(const QnMediaServerResourceList &servers);
-        /** Check if statistics reporting is allowed in this system. */
-        static bool isAllowed(const AbstractMediaServerManagerPtr& msManager);
-        /** Set allowed value for the following servers. */
-        static void setAllowed(const QnMediaServerResourceList &servers, bool value);
-
         static QnUserResourcePtr getAdmin(const AbstractUserManagerPtr& manager);
         static QnUuid getDesktopCameraTypeId(const AbstractResourceManagerPtr& manager);
 
@@ -73,7 +65,7 @@ namespace ec2
         boost::optional<QDateTime> m_plannedReportTime;
         uint m_timerCycle;
 
-        QMutex m_mutex;
+        QnMutex m_mutex;
         bool m_timerDisabled;
         boost::optional<qint64> m_timerId;
     };

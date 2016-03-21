@@ -66,6 +66,9 @@ public:
     SocketAddress getLocalAddress() const;
     //!Implementation of AbstractSocket::close
     virtual void close();
+    //!Implementation of AbstractSocket::shutdown
+    virtual void shutdown();
+
     //!Implementation of AbstractSocket::isClosed
     bool isClosed() const;
     //!Implementation of AbstractSocket::setReuseAddrFlag
@@ -93,9 +96,9 @@ public:
     //!Implementation of Pollable::getLastError
     virtual bool getLastError( SystemError::ErrorCode* errorCode ) override;
     //!Implementation of AbstractSocket::postImpl
-    bool postImpl( std::function<void()>&& handler );
+    void postImpl( std::function<void()>&& handler );
     //!Implementation of AbstractSocket::dispatchImpl
-    bool dispatchImpl( std::function<void()>&& handler );
+    void dispatchImpl( std::function<void()>&& handler );
 
     /**
      *   Get the local port
@@ -194,8 +197,8 @@ public:
     void cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion );
 
 
-    void shutdown();
     virtual void close() override;
+    virtual void shutdown() override;
 
 private:
     AsyncSocketImplHelper<Pollable>* m_aioHelper;
@@ -249,6 +252,8 @@ public:
     virtual SocketAddress getLocalAddress() const override { return m_implDelegate.getLocalAddress(); }
     //!Implementation of AbstractSocket::close
     virtual void close() override { return m_implDelegate.close(); }
+    //!Implementation of AbstractSocket::shutdown
+    virtual void shutdown() override { return m_implDelegate.shutdown(); }
     //!Implementation of AbstractSocket::isClosed
     virtual bool isClosed() const override { return m_implDelegate.isClosed(); }
     //!Implementation of AbstractSocket::setReuseAddrFlag
@@ -282,9 +287,9 @@ public:
     //!Implementation of AbstractSocket::handle
     virtual AbstractSocket::SOCKET_HANDLE handle() const override { return m_implDelegate.handle(); }
     //!Implementation of AbstractSocket::postImpl
-    virtual bool postImpl( std::function<void()>&& handler ) override { return m_implDelegate.postImpl( std::move(handler) ); }
+    virtual void postImpl( std::function<void()>&& handler ) override { m_implDelegate.postImpl( std::move(handler) ); }
     //!Implementation of AbstractSocket::dispatchImpl
-    virtual bool dispatchImpl( std::function<void()>&& handler ) override { return m_implDelegate.dispatchImpl( std::move(handler) ); }
+    virtual void dispatchImpl( std::function<void()>&& handler ) override { m_implDelegate.dispatchImpl( std::move(handler) ); }
 
     AbstractSocketMethodsImplementorType* implementationDelegate() { return &m_implDelegate; }
     const AbstractSocketMethodsImplementorType* implementationDelegate() const { return &m_implDelegate; }

@@ -1,0 +1,225 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <artifactId>cpp</artifactId>
+        <groupId>com.networkoptix.hdwitness</groupId>
+        <version>2.5.0-SNAPSHOT</version>
+        <relativePath>../cpp</relativePath>
+    </parent>
+
+    <groupId>com.networkoptix.hdwitness</groupId>
+    <version>2.5.0-SNAPSHOT</version>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>mobile_client</artifactId>
+    <packaging>pom</packaging>
+    <name>HD Witness Mobile Client</name>
+
+    <properties>
+        <guid>${mobile_client.guid}</guid>
+        <product.title>${mobile_client.name}</product.title>
+        <product.display.title>${client.display.name}</product.display.title>
+        <template>app</template>
+        <!--Global libs-->
+        <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc</ffmpeg.libs>
+        <qt.libs>core qml quick concurrent network sql multimedia xml</qt.libs>
+        <global.libs>-lappserver2 -lcommon -lclient.core</global.libs>
+        <!--Specific os libs used-->
+        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -lDxErr -ld3d9 -lopenal32 -lssleay32 -llibeay32 -lsigar</windows.oslibs>
+        <windows.oslibs.release/>
+        <windows.oslibs.debug/>
+        <linux.oslibs>${ffmpeg.libs} -lssl -lcrypto -lFestival -lestools -leststring -lestbase -lmp3lame -lz -lopenal -lX11 -lXfixes -lGL -lGLU -ltermcap -lsigar -lfaac -lquazip</linux.oslibs>
+        <android.oslibs>-lssl -lcrypto -lturbojpeg</android.oslibs>
+        <ios.oslibs>-lssl -lcrypto -lturbojpeg</ios.oslibs>
+        <!--Global defines-->
+        <global.defines>CL_FORCE_LOGO</global.defines>
+        <!--Specific os defines-->
+        <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
+        <linux.defines/>
+        <mac.defines/>
+        <android.defines/>
+        <ios.defines/>
+
+        <project.version.code>${buildNumber}</project.version.code>
+        <project.version.name>${release.version}</project.version.name>
+        <provisioning_profile>${customization.dir}/mobile_client/ios/provisioning_profiles/testing.mobileprovision</provisioning_profile>
+        <provisioning_profile_id/>
+    </properties>   
+
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>client.core</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/client/pom.xml</systemPath>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>      
+            <plugin>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>2.5</version>
+                <executions>
+                    <execution>
+                        <id>auto-clean</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                        <configuration>
+                            <excludeDefaultDirectories>true</excludeDefaultDirectories>
+                            <filesets>
+                                <fileset>
+                                    <directory>${project.build.directory}</directory>
+                                    <includes>
+                                        <include>*.apk</include>
+                                        <include>*.ipa</include>
+                                    </includes>
+                                </fileset>                                                                  
+                            </filesets>
+                            <skip>${clean-skip}</skip>							
+                        </configuration>            
+                    </execution>
+                </executions>
+            </plugin>    
+        </plugins>    
+    </build>
+    
+    <profiles>
+        <profile>
+            <id>nobeta</id>
+            <activation>
+                <property>
+                    <name>beta</name>
+                    <value>false</value>
+                </property>
+            </activation>
+            <properties>
+                <provisioning_profile>${customization.dir}/mobile_client/ios/provisioning_profiles/production.mobileprovision</provisioning_profile>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>mobile-android</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>box</name>
+                    <value>android</value>
+                </property>
+            </activation>
+            <properties>
+                <buildLib>staticlib</buildLib>
+                <google.keystore>${customization.dir}/android-main/key.store</google.keystore>
+                <google.storepass>${android.storepass}</google.storepass>
+                <google.keypass>${android.keypass}</google.keypass>
+                <google.alias>${namespace.additional}</google.alias>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <!-- Workaround for androiddeployqt bug! It can't handle correctly paths containing "/../". -->
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>build-helper-maven-plugin</artifactId>
+                        <version>1.7</version>
+                        <executions>
+                            <execution>
+                                <id>regex-property</id>
+                                <goals>
+                                    <goal>regex-property</goal>
+                                </goals>
+                                <configuration>
+                                    <name>qt.plaindir</name>
+                                    <value>${basedir}</value>
+                                    <regex>(.*)/[^/]+^{0,1}</regex>
+                                    <replacement>$1/build_environment/target</replacement>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.7</version>
+                        <executions>
+                            <execution>
+                                <id>build-apk</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <target>
+                                        <chmod file="${project.build.directory}/deploy-android.sh" perm="755"/>
+                                        <exec dir="${project.build.directory}" executable="${project.build.directory}/deploy-android.sh" failifexecutionfails="true" />
+                                    </target>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>mobile-ios</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>mac</family>
+                </os>                
+                <property>
+                    <name>box</name>
+                    <value>ios</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.gmaven</groupId>
+                        <artifactId>gmaven-plugin</artifactId>
+                        <version>1.4</version>
+                        <executions>
+                            <execution>
+                                <phase>initialize</phase>
+                                <goals>
+                                    <goal>execute</goal>
+                                </goals>
+                                <configuration>
+                                    <properties>
+                                        <provisioning_script>/bin/sh ${root.dir}/util/get_provisioning_id.sh ${provisioning_profile}</provisioning_script>
+                                    </properties>
+                                    <source>
+                                        def command = project.properties.provisioning_script
+                                        def process = command.execute()
+                                        process.waitFor()
+                                        project.properties.provisioning_profile_id = process.in.text.trim()
+                                    </source>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.7</version>
+                        <executions>
+                            <execution>
+                                <id>build-ipa</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <target>
+                                        <chmod file="${project.build.directory}/deploy-ios.sh" perm="755"/>
+                                        <exec dir="${project.build.directory}" executable="${project.build.directory}/deploy-ios.sh" failifexecutionfails="true" />
+                                    </target>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>

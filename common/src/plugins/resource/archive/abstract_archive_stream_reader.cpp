@@ -8,9 +8,10 @@
 #include <recording/time_period.h>
 #include <recording/time_period_list.h>
 #include "core/resource/media_resource.h"
+#include "utils/common/sleep.h"
+#include <core/datapacket/video_data_packet.h>
 
-
-QnAbstractArchiveReader::QnAbstractArchiveReader(const QnResourcePtr& dev ) :
+QnAbstractArchiveReader::QnAbstractArchiveReader(const QnResourcePtr &dev):
     QnAbstractMediaStreamDataProvider(dev),
     m_cycleMode(true),
     m_needToSleep(0),
@@ -118,7 +119,7 @@ void QnAbstractArchiveReader::run()
         {
             setNeedKeyData();
             mFramesLost++;
-            m_stat[0].onData(0);
+            m_stat[0].onData(0, false);
             m_stat[0].onEvent(CL_STAT_FRAME_LOST);
 
             QnSleep::msleep(30);
@@ -135,7 +136,7 @@ void QnAbstractArchiveReader::run()
             continue;
         }
 
-        if (videoData && needKeyData())
+        if (videoData && needKeyData(videoData->channelNumber))
         {
             if (videoData->flags & AV_PKT_FLAG_KEY)
                 m_gotKeyFrame[videoData->channelNumber]++;
@@ -150,11 +151,14 @@ void QnAbstractArchiveReader::run()
         if (mediaRes && !mediaRes->hasVideo(this)) 
         {
             if (data)
-                m_stat[data->channelNumber].onData(static_cast<unsigned int>(data->dataSize()));
+                m_stat[data->channelNumber].onData(
+                    static_cast<unsigned int>(data->dataSize()), false);
         }
         else {
             if (videoData)
-                m_stat[data->channelNumber].onData(static_cast<unsigned int>(data->dataSize()));
+                m_stat[data->channelNumber].onData(
+                    static_cast<unsigned int>(data->dataSize()),
+                    videoData->flags & AV_PKT_FLAG_KEY);
         }
 
 

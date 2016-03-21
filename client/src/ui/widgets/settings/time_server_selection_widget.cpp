@@ -68,6 +68,8 @@ QnTimeServerSelectionWidget::QnTimeServerSelectionWidget(QWidget *parent /* = NU
 
     connect(qnSyncTime, &QnSyncTime::timeChanged, this, &QnTimeServerSelectionWidget::updateTime);
 
+    connect(m_model, &QnTimeServerSelectionModel::dataChanged, this, &QnAbstractPreferencesWidget::hasChangesChanged);
+
     QTimer* timer = new QTimer(this);
     timer->setInterval(1000);
     timer->setSingleShot(false);
@@ -80,12 +82,12 @@ QnTimeServerSelectionWidget::~QnTimeServerSelectionWidget() {
 }
 
 
-void QnTimeServerSelectionWidget::updateFromSettings() {
+void QnTimeServerSelectionWidget::loadDataToUi() {
     PRINT_DEBUG("provide selected server to model:");
     m_model->setSelectedServer(selectedServer());
 }
 
-void QnTimeServerSelectionWidget::submitToSettings() {
+void QnTimeServerSelectionWidget::applyChanges() {
     auto connection = QnAppServerConnectionFactory::getConnection2();
     if (!connection)
         return;

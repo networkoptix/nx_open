@@ -1,7 +1,7 @@
 #ifndef __BUSINESS_MESSAGE_BUS_H_
 #define __BUSINESS_MESSAGE_BUS_H_
 
-#include <QtCore/QMutex>
+#include <utils/thread/mutex.h>
 #include <QtCore/QMap>
 #include <QtCore/QUrl>
 #include <QtCore/QThread>
@@ -50,7 +50,7 @@ private slots:
     void at_DeliveryBusinessActionFinished( int handle, ec2::ErrorCode errorCode );
 
 private:
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     QMap<int, QnAbstractBusinessActionPtr> m_sendingActions;
 };
 

@@ -197,7 +197,7 @@ void QnThirdPartyStorageResource::openStorage(
     const StorageFactoryPtrType &sf
 )
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
 
     int ecode;
     nx_spl::Storage* spRaw = sf->createStorage(storageUrl, &ecode);
@@ -355,7 +355,7 @@ qint64 QnThirdPartyStorageResource::getTotalSpace()
     return totalSpace;
 }
 
-bool QnThirdPartyStorageResource::isAvailable() const
+bool QnThirdPartyStorageResource::initOrUpdate() const
 {
     if (!m_valid)
        return false;
@@ -418,7 +418,7 @@ QnThirdPartyStorageResource::getFileList(const QString& dirName)
     if (!m_valid)
         return QnAbstractStorageResource::FileInfoList();
 
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     int ecode;
     nx_spl::FileInfoIterator* fitRaw = m_storage->getFileIterator(
         urlToPath(dirName).toLatin1().constData(), 
@@ -479,7 +479,7 @@ bool QnThirdPartyStorageResource::isFileExists(const QString& url)
     if (!m_valid)
         return false;
 
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     int ecode;
     int result = m_storage->fileExists(
         urlToPath(url).toLatin1().constData(), 
@@ -495,7 +495,7 @@ bool QnThirdPartyStorageResource::isDirExists(const QString& url)
     if (!m_valid)
         return false;
 
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     int ecode;
     int result = m_storage->dirExists(
         urlToPath(url).toLatin1().constData(), 
@@ -511,7 +511,7 @@ qint64 QnThirdPartyStorageResource::getFileSize(const QString& url) const
     if (!m_valid)
         return 0;
 
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     int ecode;
     qint64 fsize = m_storage->fileSize(
         urlToPath(url).toLatin1().constData(), 

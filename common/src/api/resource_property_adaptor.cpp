@@ -21,15 +21,21 @@ namespace {
 
     Q_GLOBAL_STATIC_WITH_ARGS(QString, qn_resourcePropertyAdaptor_uniqueKey, createAdaptorKey())
 }
-#endif 
+#endif
 
 
 // -------------------------------------------------------------------------- //
 // QnAbstractResourcePropertyAdaptor
 // -------------------------------------------------------------------------- //
-QnAbstractResourcePropertyAdaptor::QnAbstractResourcePropertyAdaptor(const QString &key, QnAbstractResourcePropertyHandler *handler, QObject *parent):
+QnAbstractResourcePropertyAdaptor::QnAbstractResourcePropertyAdaptor(
+    const QString& key,
+    const QVariant& defaultValue,
+    QnAbstractResourcePropertyHandler *handler,
+    QObject* parent)
+:
     base_type(parent),
     m_key(key),
+    m_defaultValue(defaultValue),
     m_handler(handler),
     m_pendingSave(0)
 {
@@ -45,7 +51,7 @@ const QString &QnAbstractResourcePropertyAdaptor::key() const {
 }
 
 QnResourcePtr QnAbstractResourcePropertyAdaptor::resource() const {
-    QMutexLocker locker(&m_mutex);
+    QnMutexLocker locker( &m_mutex );
     return m_resource;
 }
 
@@ -53,14 +59,19 @@ void QnAbstractResourcePropertyAdaptor::setResource(const QnResourcePtr &resourc
     setResourceInternal(resource, true);
 }
 
-void QnAbstractResourcePropertyAdaptor::setResourceInternal(const QnResourcePtr &resource, bool notify) {
-    QString newSerializedValue = resource ? resource->getProperty(m_key) : defaultSerializedValue();
+void QnAbstractResourcePropertyAdaptor::setResourceInternal(const QnResourcePtr &resource, bool notify)
+{
+    QString newSerializedValue = resource
+        ? resource->getProperty(m_key)
+        : QString();
+    if (newSerializedValue.isEmpty())
+        newSerializedValue = defaultSerializedValue();
 
     bool changed;
     QnResourcePtr oldResource;
     QString oldSerializedValue;
     {
-        QMutexLocker locker(&m_mutex);
+        QnMutexLocker locker( &m_mutex );
 
         if(m_resource == resource)
             return;
@@ -72,7 +83,7 @@ void QnAbstractResourcePropertyAdaptor::setResourceInternal(const QnResourcePtr 
         }
 
         m_resource = resource;
-        
+
         if(m_resource)
             connect(resource, &QnResource::propertyChanged, this, &QnAbstractResourcePropertyAdaptor::at_resource_propertyChanged);
 
@@ -87,23 +98,30 @@ void QnAbstractResourcePropertyAdaptor::setResourceInternal(const QnResourcePtr 
 }
 
 QVariant QnAbstractResourcePropertyAdaptor::value() const {
-    QMutexLocker locker(&m_mutex);
-    return m_value;
+    QnMutexLocker locker( &m_mutex );
+    return m_value.isValid() ? m_value : m_defaultValue;
 }
 
 QString QnAbstractResourcePropertyAdaptor::serializedValue() const {
-    QMutexLocker locker(&m_mutex);
-    return m_serializedValue;
+    QnMutexLocker locker( &m_mutex );
+    return m_serializedValue.isEmpty() ? defaultSerializedValueLocked() : m_serializedValue;
 }
 
-QString QnAbstractResourcePropertyAdaptor::defaultSerializedValue() const {
+QString QnAbstractResourcePropertyAdaptor::defaultSerializedValue() const
+{
+    QnMutexLocker locker( &m_mutex );
+    return defaultSerializedValueLocked();
+}
+
+QString QnAbstractResourcePropertyAdaptor::defaultSerializedValueLocked() const
+{
     return QString();
 }
 
-void QnAbstractResourcePropertyAdaptor::setValue(const QVariant &value) {
+void QnAbstractResourcePropertyAdaptor::setValueInternal(const QVariant &value) {
     bool save = false;
     {
-        QMutexLocker locker(&m_mutex);
+        QnMutexLocker locker( &m_mutex );
 
         if(m_handler->equals(m_value, value))
             return;
@@ -125,7 +143,7 @@ void QnAbstractResourcePropertyAdaptor::setValue(const QVariant &value) {
 bool QnAbstractResourcePropertyAdaptor::testAndSetValue(const QVariant &expectedValue, const QVariant &newValue) {
     bool save = false;
     {
-        QMutexLocker locker(&m_mutex);
+        QnMutexLocker locker( &m_mutex );
 
         if(!m_handler->equals(m_value, expectedValue))
             return false;
@@ -150,7 +168,7 @@ bool QnAbstractResourcePropertyAdaptor::testAndSetValue(const QVariant &expected
 
 void QnAbstractResourcePropertyAdaptor::loadValue(const QString &serializedValue) {
     {
-        QMutexLocker locker(&m_mutex);
+        QnMutexLocker locker( &m_mutex );
         if(!loadValueLocked(serializedValue))
             return;
     }
@@ -159,10 +177,18 @@ void QnAbstractResourcePropertyAdaptor::loadValue(const QString &serializedValue
 }
 
 bool QnAbstractResourcePropertyAdaptor::loadValueLocked(const QString &serializedValue) {
-    if(m_serializedValue == serializedValue)
+    QString newSerializedValue = serializedValue.isEmpty()
+        ? defaultSerializedValueLocked()
+        : serializedValue;
+
+    QString actualSerializedValue = m_serializedValue.isEmpty()
+        ? defaultSerializedValueLocked()
+        : m_serializedValue;
+
+    if (actualSerializedValue == newSerializedValue)
         return false;
 
-    m_serializedValue = serializedValue;
+    m_serializedValue = newSerializedValue;
     if(m_serializedValue.isEmpty() || !m_handler->deserialize(m_serializedValue, &m_value))
         m_value = QVariant();
 
@@ -181,7 +207,7 @@ void QnAbstractResourcePropertyAdaptor::processSaveRequests() {
     QnResourcePtr resource;
     QString serializedValue;
     {
-        QMutexLocker locker(&m_mutex);
+        QnMutexLocker locker( &m_mutex );
         if(!m_resource)
             return;
 

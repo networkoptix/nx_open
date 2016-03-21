@@ -120,7 +120,7 @@ bool QnFfmpegVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
 
     if (avcodec_open2(m_encoderCtx, avCodec, 0) < 0)
     {
-        m_lastErrMessage = tr("Could not initialise video encoder.");
+        m_lastErrMessage = tr("Could not initialize video encoder.");
         return false;
     }
 
@@ -159,60 +159,61 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
     if (!decoder)
         decoder = m_videoDecoders[video->channelNumber] = new CLFFmpegVideoDecoder(video->compressionType, video, m_mtMode);
 
-    if (decoder->decode(video, &m_decodedVideoFrame)) 
-    {
-        m_decodedVideoFrame->channel = video->channelNumber;
-        CLVideoDecoderOutputPtr decodedFrame = m_decodedVideoFrame;
+    if (result)
+        *result = QnCompressedVideoDataPtr();
 
-        decodedFrame->pts = m_decodedVideoFrame->pkt_dts;
-        decodedFrame = processFilterChain(decodedFrame);
-
-        if (decodedFrame->width != m_resolution.width() || decodedFrame->height != m_resolution.height() || decodedFrame->format != PIX_FMT_YUV420P) 
-            decodedFrame = CLVideoDecoderOutputPtr(decodedFrame->scaled(m_resolution, PIX_FMT_YUV420P));
-
-        static AVRational r = {1, 1000000};
-        decodedFrame->pts  = av_rescale_q(decodedFrame->pts, r, m_encoderCtx->time_base);
-        if ((quint64)m_firstEncodedPts == AV_NOPTS_VALUE)
-            m_firstEncodedPts = decodedFrame->pts;
-
-        if( !result )
-            return 0;
-
-        // Improve performance by omitting frames to encode in case if encoding goes way too slow..
-        // TODO: #mu make mediaserver's config option and HTTP query option to disable feature
-        if (m_useRealTimeOptimization && m_encodedFrames > OPTIMIZATION_BEGIN_FRAME)
-        {   
-            // the more frames are dropped the lower limit is gonna be set
-            // (x + (x >> k)) is faster and more precise then (x * (1 + 0.5^k))
-            const auto& codingTime = m_averageCodingTimePerFrame;
-            if (codingTime + (codingTime >> m_droppedFrames) > m_averageVideoTimePerFrame)
-            {
-                ++m_droppedFrames;
-                return 0;
-            }
-        }
-
-        //TODO: #vasilenko avoid using deprecated methods
-        int encoded = avcodec_encode_video(m_encoderCtx, m_videoEncodingBuffer, MAX_VIDEO_FRAME, decodedFrame.data());
-        if (encoded < 0)
-            return -3;
-
-        QnWritableCompressedVideoData* resultVideoData = new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, encoded);
-        resultVideoData->timestamp = av_rescale_q(m_encoderCtx->coded_frame->pts, m_encoderCtx->time_base, r);
-        if(m_encoderCtx->coded_frame->key_frame)
-            resultVideoData->flags |= QnAbstractMediaData::MediaFlags_AVKey;
-        resultVideoData->m_data.write((const char*) m_videoEncodingBuffer, encoded); // todo: remove data copy here!
-        *result = QnCompressedVideoDataPtr(resultVideoData);
-        
-        ++m_encodedFrames;
-        m_droppedFrames = 0;
-        return 0;
-    }
-    else {
-        if( result )
-            *result = QnCompressedVideoDataPtr();
+    if (!decoder->decode(video, &m_decodedVideoFrame))
         return 0; // ignore decode error
+
+    if (video->flags.testFlag(QnAbstractMediaData::MediaFlags_Ignore))
+        return 0; // do not transcode ignored frames
+
+    m_decodedVideoFrame->channel = video->channelNumber;
+    CLVideoDecoderOutputPtr decodedFrame = m_decodedVideoFrame;
+
+    decodedFrame->pts = m_decodedVideoFrame->pkt_dts;
+    decodedFrame = processFilterChain(decodedFrame);
+
+    if (decodedFrame->width != m_resolution.width() || decodedFrame->height != m_resolution.height() || decodedFrame->format != PIX_FMT_YUV420P)
+        decodedFrame = CLVideoDecoderOutputPtr(decodedFrame->scaled(m_resolution, PIX_FMT_YUV420P));
+
+    static AVRational r = {1, 1000000};
+    decodedFrame->pts  = av_rescale_q(decodedFrame->pts, r, m_encoderCtx->time_base);
+    if ((quint64)m_firstEncodedPts == AV_NOPTS_VALUE)
+        m_firstEncodedPts = decodedFrame->pts;
+
+    if( !result )
+        return 0;
+
+    // Improve performance by omitting frames to encode in case if encoding goes way too slow..
+    // TODO: #mu make mediaserver's config option and HTTP query option to disable feature
+    if (m_useRealTimeOptimization && m_encodedFrames > OPTIMIZATION_BEGIN_FRAME)
+    {
+        // the more frames are dropped the lower limit is gonna be set
+        // (x + (x >> k)) is faster and more precise then (x * (1 + 0.5^k))
+        const auto& codingTime = m_averageCodingTimePerFrame;
+        if (codingTime + (codingTime >> m_droppedFrames) > m_averageVideoTimePerFrame)
+        {
+            ++m_droppedFrames;
+            return 0;
+        }
     }
+
+    //TODO: #vasilenko avoid using deprecated methods
+    int encoded = avcodec_encode_video(m_encoderCtx, m_videoEncodingBuffer, MAX_VIDEO_FRAME, decodedFrame.data());
+    if (encoded < 0)
+        return -3;
+
+    QnWritableCompressedVideoData* resultVideoData = new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, encoded);
+    resultVideoData->timestamp = av_rescale_q(m_encoderCtx->coded_frame->pts, m_encoderCtx->time_base, r);
+    if(m_encoderCtx->coded_frame->key_frame)
+        resultVideoData->flags |= QnAbstractMediaData::MediaFlags_AVKey;
+    resultVideoData->m_data.write((const char*) m_videoEncodingBuffer, encoded); // todo: remove data copy here!
+    *result = QnCompressedVideoDataPtr(resultVideoData);
+
+    ++m_encodedFrames;
+    m_droppedFrames = 0;
+    return 0;
 }
 
 AVCodecContext* QnFfmpegVideoTranscoder::getCodecContext()

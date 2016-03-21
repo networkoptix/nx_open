@@ -42,6 +42,15 @@ QnFisheyePtzController::QnFisheyePtzController(QnMediaResourceWidget *widget):
     updateLimits();
 }
 
+QnFisheyePtzController::QnFisheyePtzController(const QnMediaResourcePtr& mediaRes):
+    base_type(mediaRes->toResourcePtr()),
+    m_animationMode(NoAnimation),
+    m_mediaDewarpingParams(mediaRes->getDewarpingParams())
+{
+    updateCapabilities();
+    updateLimits();
+}
+
 qreal QnFisheyePtzController::customAR() const {
     return m_widget->resource()->customAspectRatio();
 }

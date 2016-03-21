@@ -6,23 +6,12 @@
     <message>
         <source>Language Name</source>
         <extracomment>Language name that will be displayed to user. Must not be empty.</extracomment>
-        <translation>Nyelv</translation>
+        <translation>Magyar</translation>
     </message>
     <message>
         <source>Locale Code</source>
         <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
         <translation>hu</translation>
-    </message>
-</context>
-<context>
-    <name>QnActiResource</name>
-    <message>
-        <source>Output %1</source>
-        <translation>%1 kimenet</translation>
-    </message>
-    <message>
-        <source>Input %1</source>
-        <translation>%1 bemenet</translation>
     </message>
 </context>
 <context>
@@ -209,10 +198,6 @@
         <translation>Ismeretlen esemény történt</translation>
     </message>
     <message>
-        <source>Conflict Address: %1</source>
-        <translation>Ütközés címe: %1</translation>
-    </message>
-    <message>
         <source>Connection to server is lost.</source>
         <translation>A kapcsolat a szerverrrel megszakadt.</translation>
     </message>
@@ -253,10 +238,6 @@
     <message>
         <source>Caption: %1</source>
         <translation>Felirat: %1</translation>
-    </message>
-    <message>
-        <source>Input port: %1</source>
-        <translation>Bemeneti port: %1</translation>
     </message>
     <message>
         <source>MAC #%1: %2 </source>
@@ -340,10 +321,6 @@
         <translation>%1 kamera szétkapcsolt</translation>
     </message>
     <message>
-        <source>IO Module %1 was disconnected</source>
-        <translation>%1 IO modul szétkapcsolt</translation>
-    </message>
-    <message>
         <source>Device IP Conflict at %1</source>
         <extracomment>Device IP Conflict at &lt;server_name&gt;</extracomment>
         <translation>Eszköz IP ütközés %1 szerveren</translation>
@@ -366,8 +343,76 @@
         <translation>Rögzítés a kamerán kikapcsolva:</translation>
     </message>
     <message>
-        <source>Recording on IO modules is disabled:</source>
-        <translation>Rögzítés az IO modulon kikapcsolva:</translation>
+        <source>Execute PTZ preset</source>
+        <translation>PTZ preset indítás</translation>
+    </message>
+    <message>
+        <source>Show text overlay</source>
+        <translation>Felirat fólia megjelenítése</translation>
+    </message>
+    <message>
+        <source>Show on Alarm Layout</source>
+        <translation>Megjelenítés a riasztás elrendezésen</translation>
+    </message>
+    <message>
+        <source>Archive backup finished</source>
+        <translation>Archív biztonsági mentés kész</translation>
+    </message>
+    <message>
+        <source>Server &apos;%1&apos; has finished an archive backup</source>
+        <translation>Archív boztonsági mentés &apos;%1&apos; szerveren kész</translation>
+    </message>
+    <message>
+        <source>Generic Event at %1</source>
+        <translation>%1 - általános esemény</translation>
+    </message>
+    <message>
+        <source>Input Port: %1</source>
+        <translation>Bemeneti port: %1</translation>
+    </message>
+    <message>
+        <source>Archive backup is successfully completed</source>
+        <translation>Archív biztonsági mentés sikeresen elkészült</translation>
+    </message>
+    <message>
+        <source>I/O Module %1 was disconnected</source>
+        <translation>%1 I/O modul szétkapcsolt</translation>
+    </message>
+    <message>
+        <source>Conflicting Address: %1</source>
+        <translation>Címütközés: %1</translation>
+    </message>
+    <message>
+        <source>Archive backup failed: No available backup storages with sufficient free space</source>
+        <translation>Archív biztonsági mentés sikertelen: nincs elég hely a megadott tárolón</translation>
+    </message>
+    <message>
+        <source>Archive backup failed: Target storage failure</source>
+        <translation>Archív biztonsági mentés sikertelen: céltároló hiba</translation>
+    </message>
+    <message>
+        <source>Archive backup failed: Source file open/read error</source>
+        <translation>Archív biztonsági mentés sikertelen: hiba a forrás fájl megnyitásakor</translation>
+    </message>
+    <message>
+        <source>Archive backup failed: Target file create/write error</source>
+        <translation>Archív biztonsági mentés sikertelen: Írási hiba a célfájlban</translation>
+    </message>
+    <message>
+        <source>Archive backup failed: File catalog error</source>
+        <translation>Archív biztonsági mentés sikertelen: fáljegyzék hiba</translation>
+    </message>
+    <message>
+        <source>Archive backup finished, but isn&apos;t fully completed because backup time is over. Data is backed up to %1</source>
+        <translation>Archív biztonsági mentés kész, de nem teljes mert a biztosnági mentésre szánt idő lejárt. Az adat lementve %1-ig</translation>
+    </message>
+    <message>
+        <source>Archive backup is canceled by user. Data is backed up to %1</source>
+        <translation>Archív biztonsági mentést a felhasználó megszakította. Az adat lementve %1-ig</translation>
+    </message>
+    <message>
+        <source>Recording on I/O modules is disabled:</source>
+        <translation>Rögzítés az I/O modulon kikapcsolva:</translation>
     </message>
 </context>
 <context>
@@ -457,20 +502,12 @@
         <translation>Kérem, próbálja meg úraindítani a kamerát, majd a weboldalán visszaállítani a gyári alapértelmezett beállításokra.</translation>
     </message>
     <message>
-        <source>Please try to reboot the IO module, then restore factory defaults on the web-page.</source>
-        <translation>Kérem, próbálja meg úraindítani az IO modult, majd a weboldalán visszaállítani a gyári alapértelmezett beállításokra.</translation>
-    </message>
-    <message>
         <source>Make sure the device is plugged into the network. Try to reboot the device.</source>
         <translation>Győződjön meg róla, hogy az eszköz csatlakoztatva van a hálózathoz. Próbálja meg újraindítani az eszközt.</translation>
     </message>
     <message>
         <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
         <translation>Győződjön meg róla, hogy akamera csatlakoztatva van a hálózathoz. Próbálja meg újraindítani a kamerát.</translation>
-    </message>
-    <message>
-        <source>Make sure the IO module is plugged into the network. Try to reboot the IO module.</source>
-        <translation>Győződjön meg róla, hogy az IO modul csatlakoztatva van a hálózathoz. Próbálja meg újraindítani az IO modult.</translation>
     </message>
     <message>
         <source>Make sure port %2 is accessible (e.g. forwarded).</source>
@@ -485,10 +522,6 @@
         <translation>Nem lehet értelmezni a kamera válaszát. %1 Url, %2 kérés név.</translation>
     </message>
     <message>
-        <source>Could not parse IO module response. Url %1, request name %2.</source>
-        <translation>Nem lehet értelmezni az IO modul válaszát. %1 Url, %2 kérés név.</translation>
-    </message>
-    <message>
         <source>Not authorized. Url %1.</source>
         <translation>Nem engedélyezett. %1 Url.</translation>
     </message>
@@ -501,20 +534,12 @@
         <translation>Először próbálja meg bekapcsolni a rögzítést (ha ki van kapcsolva) és csökkentse az fps-t a kamera beállításokban.</translation>
     </message>
     <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in IO module settings.</source>
-        <translation>Először próbálja meg bekapcsolni a rögzítést (ha ki van kapcsolva) és csökkentse az fps-t az IO modul beállításokban.</translation>
-    </message>
-    <message>
         <source>If it doesn&apos;t help, restore factory defaults on the device web-page.</source>
         <translation>Ha ez nem segített, állítsa vissza az eszköz weboldalán gyári alapértelmezett beállításokra.</translation>
     </message>
     <message>
         <source>If it doesn&apos;t help, restore factory defaults on the camera web-page.</source>
         <translation>Ha ez nem segített, állítsa vissza a kamera weboldalán gyári alapértelmezett beállításokra.</translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the IO module web-page.</source>
-        <translation>Ha ez nem segített, állítsa vissza az IO modul weboldalán gyári alapértelmezett beállításokra.</translation>
     </message>
     <message>
         <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
@@ -525,20 +550,12 @@
         <translation>%1 kamera kérés %2 hibával meghiúsult.</translation>
     </message>
     <message>
-        <source>IO Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-        <translation>%1 IO modul kérés %2 hibával meghiúsult.</translation>
-    </message>
-    <message>
         <source>Unknown device issue.</source>
         <translation>Ismeretlen eszköz probléma.</translation>
     </message>
     <message>
         <source>Unknown camera issue.</source>
         <translation>Ismeretlen kamera probléma.</translation>
-    </message>
-    <message>
-        <source>Unknown IO module issue.</source>
-        <translation>Ismeretlen IO modul probléma.</translation>
     </message>
     <message>
         <source>Invalid data was received from the device %1.</source>
@@ -549,10 +566,6 @@
         <translation>Érvénytelen adat érkezett %1 kamerától.</translation>
     </message>
     <message>
-        <source>Invalid data was received from the IO module %1.</source>
-        <translation>Érvénytelen adat érkezett %1 IO modultól.</translation>
-    </message>
-    <message>
         <source>Too many media errors. Please open device issues dialog for more details.</source>
         <translation>Ismeretlen media hiba. Kérem nyissa meg az eszköz probléma ablakot a további részletekért.</translation>
     </message>
@@ -561,20 +574,56 @@
         <translation>Ismeretlen media hiba. Kérem nyissa meg a kamera probléma ablakot a további részletekért.</translation>
     </message>
     <message>
-        <source>Too many media errors. Please open IO module issues dialog for more details.</source>
-        <translation>Ismeretlen media hiba. Kérem nyissa meg az IO modul probléma ablakot a további részletekért.</translation>
+        <source>Camera plugin error. %1</source>
+        <translation>Kamera plugin hiba. %1</translation>
     </message>
     <message>
-        <source>Device initialization process in progress.</source>
-        <translation>Eszköz indítás folyamatban.</translation>
+        <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
+        <translation>Indítsa újra az I/O modult, majd  állítsa vissza az I/O modul weboldalán gyári alapértelmezett beállításokat.</translation>
     </message>
     <message>
-        <source>Camera initialization process in progress.</source>
-        <translation>Kamera indítás folyamatban.</translation>
+        <source>Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</source>
+        <translation>Ellenőrizze, hogy az I/O modul csatlakoztatva van a rendszerre. Próbálja újraindítani az I/O modult.</translation>
     </message>
     <message>
-        <source>IO Module initialization process in progress.</source>
-        <translation>IO modul indítás folyamatban.</translation>
+        <source>Could not parse I/O module response. Url %1, request name %2.</source>
+        <translation>Az I/O modul  nem válaszol. URL: %1, név: %2.</translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in I/O module settings.</source>
+        <translation>Először kapcsolja be a rögzítést (ha még nincs), majd csökkentse a frame rátát az I/O modul beállításokban.</translation>
+    </message>
+    <message>
+        <source>If it doesn&apos;t help, restore factory defaults on the I/O module web-page.</source>
+        <translation>Ha ez nem segített, állítsa vissza az I/O modul weboldalán gyári alapértelmezett beállításokra.</translation>
+    </message>
+    <message>
+        <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
+        <translation>I/O modul kérés &quot;%1&quot; hiba, &quot;%2&quot; hibával.</translation>
+    </message>
+    <message>
+        <source>Unknown I/O module issue.</source>
+        <translation>Ismeretlen I/O modul probléma.</translation>
+    </message>
+    <message>
+        <source>Invalid data was received from the I/O module %1.</source>
+        <translation>Érvénytelen adat a(z) %1 I/O modultól.</translation>
+    </message>
+    <message>
+        <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
+        <translation>Túl sok média hiba. Nyissa meg az I/O modul beállításokat további információkért.</translation>
+    </message>
+    <message>
+        <source>Device initialization process is in progress.</source>
+        <translation>Eszközinicializálás folyamatban.</translation>
+    </message>
+    <message>
+        <source>Camera initialization process is in progress.</source>
+        <translation>Kamerainicializálás folyamatban.</translation>
+    </message>
+    <message>
+        <source>I/O Module initialization process is in progress.</source>
+        <translation>I/O modul inicializálás folyamatban.</translation>
     </message>
 </context>
 <context>
@@ -595,8 +644,8 @@
         <translation>Nem található az explorer.exe a Windows Explorer indításához.</translation>
     </message>
     <message>
-        <source>Launching file explorer failed.</source>
-        <translation>A Windows Explorer indítása sikertelen.</translation>
+        <source>File explorer failed to open.</source>
+        <translation>Fájlböngésző nem nyílt meg.</translation>
     </message>
 </context>
 <context>
@@ -610,12 +659,12 @@
         <translation>Nem található enkóder a %1 codec-hez.</translation>
     </message>
     <message>
-        <source>Could not initialise audio encoder.</source>
-        <translation>Nem lehet inicializálni az audio enkódert.</translation>
+        <source>Could not initialize audio encoder.</source>
+        <translation>Audió enkóder nem inicializálható.</translation>
     </message>
     <message>
-        <source>Could not initialise audio decoder.</source>
-        <translation>Nem lehet inicializálni az audio dekódert.</translation>
+        <source>Could not initialize audio decoder.</source>
+        <translation>Audió dekóder nem inicializálható.</translation>
     </message>
 </context>
 <context>
@@ -652,8 +701,8 @@
         <translation>Nem található enkóder a(z) %1 kodekhez.</translation>
     </message>
     <message>
-        <source>Could not initialise video encoder.</source>
-        <translation>Nem lehet inicializálni a video enkódert.</translation>
+        <source>Could not initialize video encoder.</source>
+        <translation>Videó  enkóder nem inicializálható.</translation>
     </message>
 </context>
 <context>
@@ -798,14 +847,6 @@
         </translation>
     </message>
     <message>
-        <source>There was a problem activating your license key. Invalid data received. Please contact support team to report issue.</source>
-        <translation>A licence kulcs aktiválásas közben probléma lépett fel. Érvénytelen adat érkezett. Kérem keresse fel a segítségnyújtó csapatot, hogy jelentse a problémát.</translation>
-    </message>
-    <message>
-        <source>There was a problem activating your license key. A database error has occurred.</source>
-        <translation>A licence kulcs aktiválásas közben probléma lépett fel. Adatbázis hiba történt.</translation>
-    </message>
-    <message>
         <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
         <translation>A megadott licence kulcs érvénytelen. Kérem ellenőrizze a megadott licence kulcs helyességét. Ha a probléma továbbra is fennáll, kérem keresse fel a segítségnyújtó csapatot, hogy megerősítsék a licence kulcs érvényességét vagy egy érvényes licence kulcs beszserzéséhez.</translation>
     </message>
@@ -817,33 +858,20 @@
         <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
         <translation>A licence kulcs előzőleg aktiválva lett a {{hwid}}hardver azonosítóval {{time}}. Kérem keresse fel a segítségnyújtó csapatot az érvényes licence kulcs beszerzéséhez.</translation>
     </message>
+    <message>
+        <source>There was a problem activating your license key. A database error occurred.</source>
+        <translation>Hiba a licenckulcs aktiválása során. Adatbázishiba történt.</translation>
+    </message>
+    <message>
+        <source>There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.</source>
+        <translation>Hiba a licenckulcs aktiválása során. Érvénytelen adat. Lépjen kapcsolatba a forgalmazóval.</translation>
+    </message>
 </context>
 <context>
     <name>QnMediaServerResource</name>
     <message>
         <source>Server</source>
         <translation>Szerver</translation>
-    </message>
-</context>
-<context>
-    <name>QnNewDWPtzController</name>
-    <message>
-        <source>Preset #</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>QnPlAxisResource</name>
-    <message>
-        <source>Can&apos;t initialize IO port settings</source>
-        <translation>Nem lehet az IO port beállításokat bekapcsolni</translation>
-    </message>
-</context>
-<context>
-    <name>QnPlOnvifResource</name>
-    <message>
-        <source>Otput %1</source>
-        <translation>%1 kimenet</translation>
     </message>
 </context>
 <context>
@@ -865,18 +893,6 @@
         <source>%n camera(s)</source>
         <translation>
             <numerusform>%n kamera</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n IO Module(s)</source>
-        <translation>
-            <numerusform>%n IO Modul</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n IO module(s)</source>
-        <translation>
-            <numerusform>%n IO modul</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -908,22 +924,6 @@
         <translation>kamera</translation>
     </message>
     <message>
-        <source>IO Modules</source>
-        <translation>IO Modulok</translation>
-    </message>
-    <message>
-        <source>IO modules</source>
-        <translation>IO modulok</translation>
-    </message>
-    <message>
-        <source>IO Module</source>
-        <translation>IO Modul</translation>
-    </message>
-    <message>
-        <source>IO module</source>
-        <translation>IO modul</translation>
-    </message>
-    <message>
         <source>Devices</source>
         <translation>Eszközök</translation>
     </message>
@@ -938,6 +938,34 @@
     <message>
         <source>device</source>
         <translation>eszköz</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n I/O Module(s)</source>
+        <translation>
+            <numerusform>%n I/O modul</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n I/O module(s)</source>
+        <translation>
+            <numerusform>%n I/O modul</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>I/O Modules</source>
+        <translation>I/O modulok</translation>
+    </message>
+    <message>
+        <source>I/O modules</source>
+        <translation>I/O modulok</translation>
+    </message>
+    <message>
+        <source>I/O Module</source>
+        <translation>I/O modul</translation>
+    </message>
+    <message>
+        <source>I/O module</source>
+        <translation>I/O modul</translation>
     </message>
 </context>
 <context>
@@ -1063,108 +1091,9 @@
         <source>Error during watermark generation for file &apos;%1&apos;.</source>
         <translation>Hiba a vízjel generálása közben a(z) %1 fájlhoz.</translation>
     </message>
-</context>
-<context>
-    <name>QnSystemHealthStringsHelper</name>
     <message>
-        <source>Email address is not set</source>
-        <translation>Nincs email cím beállítva</translation>
-    </message>
-    <message>
-        <source>No licenses</source>
-        <translation>Nincsenek licencek</translation>
-    </message>
-    <message>
-        <source>Email server is not set</source>
-        <translation>Nincs email szerver beállítva</translation>
-    </message>
-    <message>
-        <source>Some users have not set their email addresses</source>
-        <translation>Néhány felhasználó nem állította be az email címét</translation>
-    </message>
-    <message>
-        <source>Connection to server lost</source>
-        <translation>A kapcsolat a szerverrrel megszakadt</translation>
-    </message>
-    <message>
-        <source>Select server for others to synchronize time with</source>
-        <translation>Válasszon szervert az időszinkronizációhoz</translation>
-    </message>
-    <message>
-        <source>Error while sending email</source>
-        <translation>Hiba az email küldése közben</translation>
-    </message>
-    <message>
-        <source>Rebuilding archive index is completed</source>
-        <translation>Archív index újraépítése befejeződött</translation>
-    </message>
-    <message>
-        <source>Email address is not set for user %1</source>
-        <translation>Nincs email cím beállítva a(z) %1 felhasználóhoz</translation>
-    </message>
-    <message>
-        <source>Email address is not set.</source>
-        <translation>Nincs email cím beállítva.</translation>
-    </message>
-    <message>
-        <source>You cannot receive system notifications via email.</source>
-        <translation>Nem tud fogadni rendszer figyelmeztetéseket emailen keresztül.</translation>
-    </message>
-    <message>
-        <source>Email server is not set.</source>
-        <translation>Nincs email szerver beállítva.</translation>
-    </message>
-    <message>
-        <source>Some users have not set their email addresses.</source>
-        <translation>Néhány felhasználó nem állította be az email címét.</translation>
-    </message>
-    <message>
-        <source>They cannot receive system notifications via email.</source>
-        <translation>Nem tudnak fogadni rendszer figyelmeztetéseket emailen keresztül.</translation>
-    </message>
-    <message>
-        <source>Storages are full on the following Server:</source>
-        <translation>A tárhelyek beteltek a következő szerveren:</translation>
-    </message>
-    <message>
-        <source>Storages are not configured on the following Server:</source>
-        <translation>Tárhelyek nincsenek konfigurálva a következő szerveren:</translation>
-    </message>
-    <message>
-        <source>You have no licenses.</source>
-        <translation>Nincs licence.</translation>
-    </message>
-    <message>
-        <source>You cannot record video from cameras.</source>
-        <translation>Nem tud videot rögzíteni a kamerákról.</translation>
-    </message>
-    <message>
-        <source>Rebuilding archive index is completed on the following Server:</source>
-        <translation>Archív index újraépítése befejeződött a következő szerveren:</translation>
-    </message>
-    <message>
-        <source>Storage is full</source>
-        <translation>A tárhelyek beteltek</translation>
-    </message>
-    <message>
-        <source>Storage is not configured</source>
-        <translation>Tárhelyek nincsenek konfigurálva</translation>
-    </message>
-    <message>
-        <source>Server times are not synchronized and a common time could not be detected automatically.</source>
-        <translation>A szerver idő nincs szinkronizálva és a közös időt nem lehet auromatikusan detektálni.</translation>
-    </message>
-    <message>
-        <source>System is in safe mode</source>
-        <translation>A rendszer biztonsági módban van</translation>
-    </message>
-    <message>
-        <source>The system is running in safe mode.</source>
-        <translation>A rendszer biztonsági módban fut.</translation>
-    </message>
-    <message>
-        <source>Any configuration changes except license activation are impossible.</source>
-        <translation>Valamennyi beállítás megváltoztatása a licenc aktiválás kivételével nem lehetséges.</translation>
+        <source>File write error. Not enough free space.</source>
+        <translation>Íráshiba. Nincs elég tárhely.</translation>
     </message>
 </context>
 <context>
@@ -1195,17 +1124,6 @@
     </message>
 </context>
 <context>
-    <name>QnThirdPartyResource</name>
-    <message>
-        <source>Otput %1</source>
-        <translation>%1 kimenet</translation>
-    </message>
-    <message>
-        <source>Input %1</source>
-        <translation>%1 bemenet</translation>
-    </message>
-</context>
-<context>
     <name>QnTranscoder</name>
     <message>
         <source>OpenCL transcoding is not implemented.</source>
@@ -1233,6 +1151,13 @@
     <message>
         <source>%1 (external)</source>
         <translation>%1 (külső)</translation>
+    </message>
+</context>
+<context>
+    <name>utils::QnCameraNamesWatcher</name>
+    <message>
+        <source>Removed camera</source>
+        <translation>Eltávolított kamera</translation>
     </message>
 </context>
 </TS>

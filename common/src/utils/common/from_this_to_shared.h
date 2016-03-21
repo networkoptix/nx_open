@@ -35,6 +35,11 @@ private:
 
         m_weakPointer = pointer;
     }
+
+    void resetWeakPointer()
+    {
+        m_weakPointer.clear();
+    }
 };
 
 #endif  //FROM_THIS_TO_SHARED_H

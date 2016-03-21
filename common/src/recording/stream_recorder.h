@@ -35,6 +35,7 @@ class QnStreamRecorder : public QnAbstractDataConsumer, public QnResourceConsume
     Q_OBJECT
     Q_ENUMS(StreamRecorderError)
     Q_ENUMS(Role)
+
 public:
     // TODO: #Elric #enum
     enum Role {Role_ServerRecording, Role_FileExport, Role_FileExportWithEmptyContext};
@@ -47,8 +48,46 @@ public:
         AudioStreamAllocationError,
         InvalidAudioCodecError,
         IncompatibleCodecError,
+        FileWriteError,
 
         LastError
+    };
+
+    struct ErrorStruct
+    {
+        int                   lastError;
+        QnStorageResourcePtr  storage;
+
+        ErrorStruct(
+            int                         lastError,
+            const QnStorageResourcePtr  &storage
+        )
+            : lastError(lastError),
+              storage(storage)
+        {}
+
+        ErrorStruct()
+            : lastError(0),
+              storage(QnStorageResourcePtr())
+        {}
+    };
+
+    struct RecordingContext
+    {
+        QString                 fileName;
+        AVFormatContext         *formatCtx;
+        QnStorageResourcePtr    storage;
+        qint64                  totalWriteTimeNs;
+
+        RecordingContext(
+            const QString               &fname,
+            const QnStorageResourcePtr  &st
+        ) :
+            fileName(fname),
+            formatCtx(nullptr),
+            storage(st),
+            totalWriteTimeNs(0)
+        {}
     };
 
     static QString errorString(int errCode);
@@ -61,18 +100,24 @@ public:
     */
     void setTruncateInterval(int seconds);
 
-    void setFileName(const QString& fileName);
-    QString getFileName() const;
-    
+    void addRecordingContext(
+        const QString               &fileName,
+        const QnStorageResourcePtr  &storage
+    );
+
+    // Sets default file name and tries to get relevant
+    // storage.
+    bool addRecordingContext(const QString &fileName);
+
     /*
     * Export motion stream to separate file
     */
     void setMotionFileList(QSharedPointer<QBuffer> motionFileList[CL_MAX_CHANNELS]);
 
     void close();
-    
+
     qint64 duration() const  { return m_endDateTime - m_startDateTime; }
-    
+
     virtual bool processData(const QnAbstractDataPacketPtr& data) override;
 
     void setStartOffset(qint64 value);
@@ -93,13 +138,11 @@ public:
 #endif
 
     /*
-    * Return hash value 
+    * Return hash value
     */
     QByteArray getSignature() const;
 
     void setRole(Role role);
-
-    void setStorage(const QnStorageResourcePtr& storage);
 
     void setContainer(const QString& container);
     void setNeedReopen();
@@ -117,10 +160,11 @@ public:
     void setServerTimeZoneMs(qint64 value);
 
     void setExtraTranscodeParams(const QnImageFilterHelper& extraParams);
+
 signals:
     void recordingStarted();
     void recordingProgress(int progress);
-    void recordingFinished(int status, const QString &fileName);
+    void recordingFinished(const QnStreamRecorder::ErrorStruct &status, const QString &fileName);
 protected:
     virtual void endOfRun();
     bool initFfmpegContainer(const QnConstAbstractMediaDataPtr& mediaData);
@@ -138,36 +182,36 @@ protected:
     virtual void fileStarted(qint64 startTimeMs, int timeZone, const QString& fileName, QnAbstractMediaStreamDataProvider *provider) {
         Q_UNUSED(startTimeMs) Q_UNUSED(timeZone) Q_UNUSED(fileName) Q_UNUSED(provider)
     }
-    virtual QString fillFileName(QnAbstractMediaStreamDataProvider*);
+    virtual void getStoragesAndFileNames(QnAbstractMediaStreamDataProvider*);
 
     bool addSignatureFrame();
     void markNeedKeyData();
     virtual bool saveData(const QnConstAbstractMediaDataPtr& md);
     virtual void writeData(const QnConstAbstractMediaDataPtr& md, int streamIndex);
 private:
-    void updateSignatureAttr();
+    void updateSignatureAttr(size_t i);
     qint64 findNextIFrame(qint64 baseTime);
+    void cleanFfmpegContexts();
 protected:
     QnResourcePtr m_device;
     bool m_firstTime;
     bool m_gotKeyFrame[CL_MAX_CHANNELS];
     qint64 m_truncateInterval;
-    QString m_fixedFileName;
+    bool m_fixedFileName;
     qint64 m_endDateTime;
     qint64 m_startDateTime;
     bool m_stopOnWriteError;
-    QnStorageResourcePtr m_storage;
     int m_currentTimeZone;
+    std::vector<RecordingContext> m_recordingContextVector;
+
 private:
     bool m_waitEOF;
 
     bool m_forceDefaultCtx;
-    AVFormatContext* m_formatCtx;
     bool m_packetWrited;
-    int  m_lastError;
+    ErrorStruct m_lastError;
     qint64 m_currentChunkLen;
 
-    QString m_fileName;
     qint64 m_startOffset;
     int m_prebufferingUsec;
     QnUnsafeQueue<QnConstAbstractMediaDataPtr> m_prebuffer;
@@ -177,14 +221,13 @@ private:
     int m_lastProgress;
     bool m_needCalcSignature;
     QnAbstractMediaStreamDataProvider* m_mediaProvider;
-    
+
     QnCryptographicHash m_mdctx;
 #ifdef SIGN_FRAME_ENABLED
     QImage m_logo;
 #endif
     QString m_container;
-    QnCodecAudioFormat m_prevAudioFormat;
-    AVIOContext* m_ioContext;
+    boost::optional<QnCodecAudioFormat> m_prevAudioFormat;
     bool m_needReopen;
     bool m_isAudioPresent;
     QnConstCompressedVideoDataPtr m_lastIFrame;
@@ -203,6 +246,8 @@ private:
     Role m_role;
     QnImageFilterHelper m_extraTranscodeParams;
 };
+
+Q_DECLARE_METATYPE(QnStreamRecorder::ErrorStruct)
 
 #endif // ENABLE_DATA_PROVIDERS
 

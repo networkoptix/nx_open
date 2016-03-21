@@ -21,6 +21,7 @@ namespace Ui {
     class RecordingStatisticsWidget;
 }
 
+//TODO: rename to StorageAnalyticsWidget
 class QnRecordingStatisticsWidget: public Connective<QnAbstractPreferencesWidget>, public QnWorkbenchContextAware {
     Q_OBJECT
 
@@ -29,10 +30,16 @@ public:
     QnRecordingStatisticsWidget(QWidget* parent = 0);
     virtual ~QnRecordingStatisticsWidget();
 
-    virtual void updateFromSettings() override;
+    virtual void loadDataToUi() override;
+    virtual void applyChanges() override;
+    virtual bool hasChanges() const override;
 
     QnMediaServerResourcePtr server() const;
     void setServer(const QnMediaServerResourcePtr &server);
+
+    /** Clean 'forecast' state. */
+    void resetForecast();
+
 private:
     void updateData();
     void updateColors();
@@ -45,7 +52,7 @@ private slots:
     void at_exportAction_triggered();
     void at_mouseButtonRelease(QObject* sender, QEvent* event);
     void at_forecastParamsChanged();
-    
+
 
 private:
     void requestFinished();
@@ -53,14 +60,13 @@ private:
 
     /**
      * Get data from server
-     * 
+     *
      * \param fromMsec start date. UTC msecs
      * \param toMsec end date. UTC msecs. Can be DATETIME_NOW
      */
     void query(qint64 bitrateAnalizePeriodMs);
     qint64 sliderPositionToBytes(int value) const;
     int bytesToSliderPosition (qint64 value) const;
-    void updateColumnWidth();
 
 private:
     QScopedPointer<Ui::RecordingStatisticsWidget> ui;
@@ -71,6 +77,7 @@ private:
     QnRecordingStatsModel *m_forecastModel;
     QMap<int, QnUuid> m_requests;
 
+    bool m_updating;
     bool m_updateDisabled;
     bool m_dirty;
 
@@ -79,7 +86,6 @@ private:
     QAction *m_clipboardAction;
     Qt::MouseButton m_lastMouseButton;
     QnRecordingStatsReply m_allData;
-    QnRecordingStatsReply m_hiddenCameras;
 
     QVector<QnStorageSpaceData> m_availStorages;
 

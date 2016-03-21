@@ -66,7 +66,7 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget *parent)
     connect(ui->ldapSettingsButton,      &QPushButton::clicked,  this,  &QnUserManagementWidget::openLdapSettings);
     connect(ui->fetchButton,             &QPushButton::clicked,  this,  &QnUserManagementWidget::fetchUsers);
 
-    connect(qnCommon, &QnCommonModule::readOnlyChanged, this, &QnUserManagementWidget::updateFromSettings);
+    connect(qnCommon, &QnCommonModule::readOnlyChanged, this, &QnUserManagementWidget::loadDataToUi);
 
     updateFetchButton();
 
@@ -91,7 +91,7 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget *parent)
 QnUserManagementWidget::~QnUserManagementWidget() {
 }
 
-void QnUserManagementWidget::updateFromSettings() {
+void QnUserManagementWidget::loadDataToUi() {
     bool currentUserIsLdap = context()->user() && context()->user()->isLdap();
     ui->ldapSettingsButton->setVisible(!currentUserIsLdap);
     ui->fetchButton->setVisible(!currentUserIsLdap);
@@ -99,6 +99,14 @@ void QnUserManagementWidget::updateFromSettings() {
     ui->createUserButton->setEnabled(!qnCommon->isReadOnly());
     ui->fetchButton->setEnabled(!qnCommon->isReadOnly());
     updateSelection();
+}
+
+void QnUserManagementWidget::applyChanges() {
+    /* All changes are instant. */ 
+}
+
+bool QnUserManagementWidget::hasChanges() const {
+    return false;
 }
 
 void QnUserManagementWidget::updateSelection() {
@@ -167,7 +175,7 @@ void QnUserManagementWidget::openLdapSettings() {
 }
 
 void QnUserManagementWidget::createUser() {
-    menu()->triggerIfPossible(Qn::NewUserAction); //TODO: #GDM correctly set parent widget
+    menu()->triggerIfPossible(QnActions::NewUserAction); //TODO: #GDM correctly set parent widget
 }
 
 void QnUserManagementWidget::fetchUsers() {
@@ -202,7 +210,7 @@ void QnUserManagementWidget::at_usersTable_activated(const QModelIndex &index) {
     if (!user)
         return;
 
-    menu()->trigger(Qn::UserSettingsAction, QnActionParameters(user));
+    menu()->trigger(QnActions::UserSettingsAction, QnActionParameters(user));
 }
 
 void QnUserManagementWidget::at_usersTable_clicked(const QModelIndex &index) {
@@ -256,7 +264,7 @@ void QnUserManagementWidget::deleteSelected() {
     if (usersToDelete.isEmpty())
         return;
 
-    menu()->trigger(Qn::RemoveFromServerAction, usersToDelete);
+    menu()->trigger(QnActions::RemoveFromServerAction, usersToDelete);
 }
 
 

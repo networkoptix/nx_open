@@ -4,7 +4,6 @@
 #include <QtCore/QScopedPointer>
 
 #include <core/resource/camera_bookmark_fwd.h>
-
 #include <ui/dialogs/workbench_state_dependent_dialog.h>
 
 namespace Ui {
@@ -21,18 +20,15 @@ public:
     explicit QnCameraBookmarkDialog(QWidget *parent = 0);
     ~QnCameraBookmarkDialog();
 
-    QnCameraBookmarkTags tags() const;
-    void setTags(const QnCameraBookmarkTags &tags);
+    const QnCameraBookmarkTagList &tags() const;
+    void setTags(const QnCameraBookmarkTagList &tags);
 
     void loadData(const QnCameraBookmark &bookmark);
     void submitData(QnCameraBookmark &bookmark) const;
-private:
-    void updateTagsList();
 
+    virtual void accept() override;
 private:
     QScopedPointer<Ui::QnCameraBookmarkDialog> ui;
-    QnCameraBookmarkTags m_allTags;
-    QnCameraBookmarkTags m_selectedTags;
 };
 
 #endif // ADD_CAMERA_BOOKMARK_DIALOG_H

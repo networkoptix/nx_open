@@ -7,13 +7,18 @@
 #include <utils/common/model_functions.h>
 
 QnMediaServerUserAttributes::QnMediaServerUserAttributes()
-:
-    maxCameras(0),
-    isRedundancyEnabled(false)
+    : serverID()
+    , maxCameras(0)
+    , isRedundancyEnabled(false)
+    , name()
+    , backupSchedule()
 {
 }
 
-void QnMediaServerUserAttributes::assign( const QnMediaServerUserAttributes& right, QSet<QByteArray>* const modifiedFields )
+void QnMediaServerUserAttributes::assign(
+    const QnMediaServerUserAttributes   &right, 
+    QSet<QByteArray>                    *const modifiedFields
+)
 {
     if (isRedundancyEnabled != right.isRedundancyEnabled)
         modifiedFields->insert("redundancyChanged");
@@ -21,12 +26,16 @@ void QnMediaServerUserAttributes::assign( const QnMediaServerUserAttributes& rig
     if (name != right.name)
         modifiedFields->insert("nameChanged");
 
+    if (backupSchedule != right.backupSchedule)
+        modifiedFields->insert("backupScheduleChanged");
+
     *this = right;
 }
 
 
 
-QnMediaServerUserAttributesPool::QnMediaServerUserAttributesPool()
+QnMediaServerUserAttributesPool::QnMediaServerUserAttributesPool(QObject *parent):
+    QObject(parent)
 {
     setElementInitializer( []( const QnUuid& serverID, QnMediaServerUserAttributesPtr& userAttributes ){
         userAttributes = QnMediaServerUserAttributesPtr( new QnMediaServerUserAttributes() );

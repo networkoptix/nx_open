@@ -2,6 +2,7 @@
 
 #include <QtCore/QEvent>
 #include <QtCore/QMimeData>
+#include <QtCore/QTimer>
 
 #include <QtGui/QFocusEvent>
 #include <QtGui/QDrag>
@@ -16,104 +17,13 @@
 #include <QtWidgets/QStyleOptionFrameV2>
 
 #include <ui/common/palette.h>
+#include <utils/common/delayed.h>
 
-namespace {
-    /** Search icon on the left hand side */
-    class QnSearchButton : public QAbstractButton {
-    public:
-        QnSearchButton(QWidget *parent = 0): 
-            QAbstractButton(parent)
-        {
-            setObjectName(QLatin1String("QnSearchButton"));
-#ifndef QT_NO_CURSOR
-            setCursor(Qt::ArrowCursor);
-#endif //QT_NO_CURSOR
-            setFocusPolicy(Qt::NoFocus);
-        }
-
-        void paintEvent(QPaintEvent *event) {
-            Q_UNUSED(event);
-
-            int size = height(); //assuming height and width are equal
-            QPainterPath &path = m_pathCacheBySize[size];
-            if (path.isEmpty()) {
-                int radius = (size / 5) * 2;
-                QRect circle(size / 3 - 1, size / 4, radius, radius);
-                path.addEllipse(circle);
-
-                path.arcMoveTo(circle, 300);
-                QPointF c = path.currentPosition();
-                int diff = size / 7;
-                path.lineTo(qMin(width() - 2, (int)c.x() + diff), c.y() + diff);
-            }
-
-            QPainter painter(this);
-            painter.setRenderHint(QPainter::Antialiasing, true);
-            painter.setPen(QPen(Qt::darkGray, 2));  //TODO: #GDM #Bookmarks should we customize this?
-            painter.drawPath(path);                 //TODO: #GDM #Bookmarks should we cache pixmap?
-            painter.end();
-        }
-
-    private:
-        QMap<int, QPainterPath> m_pathCacheBySize;
-    };
-
-    /**
-    Clear button on the right hand side of the search widget.
-    */
-    class QnArrowButton : public QAbstractButton {
-    public:
-        QnArrowButton(bool left, QWidget *parent = 0):
-            QAbstractButton(parent),
-            m_left(left)
-        {
-            setCursor(Qt::ArrowCursor);
-        }
-
-        void paintEvent(QPaintEvent *event) {
-            Q_UNUSED(event);
-            QPainter painter(this);
-            int size = height(); //assuming height and width are equal
-
-            painter.setRenderHint(QPainter::Antialiasing, true);
-            painter.setBrush(isDown()
-                ? palette().color(QPalette::Dark)
-                : palette().color(QPalette::Mid));
-            //TODO: #GDM #Bookmarks should we customize this?
-            //TODO: #GDM #Bookmarks should we cache pixmap?
-
-            painter.setPen(painter.brush().color());
-
-            int offset = size / 5;
-            int center = size / 2;
-            int radius = size - offset * 2;
-            painter.drawEllipse(offset, offset, radius, radius);
-
-            painter.setPen(Qt::white);
-            int border = offset * 2;
-            int dx = size / 10;
-
-            if (m_left) {
-                painter.drawLine(center + dx, border, center - dx, center);
-                painter.drawLine(center + dx, size - border, center - dx, center);
-            } else {
-                painter.drawLine(center - dx, border, center + dx, center);
-                painter.drawLine(center - dx, size - border, center + dx, center);
-            }
-        }
-    private:
-        bool m_left;
-    };
-
-}
-
-QnSearchLineEdit::QnSearchLineEdit(QWidget *parent) :
-    QWidget(parent),
-    m_lineEdit(new QLineEdit(this)),
-    m_occurencesLabel(new QLabel(this)),
-    m_prevButton(new QnArrowButton(true, this)),
-    m_nextButton(new QnArrowButton(false, this)),
-    m_searchButton(new QnSearchButton(this))
+QnSearchLineEdit::QnSearchLineEdit(QWidget *parent)
+    : QWidget(parent)
+    , m_lineEdit(new QLineEdit(this))
+    , m_textChangedSignalFilterMs(0)
+    , m_filterTimer()
 {
     setFocusPolicy(m_lineEdit->focusPolicy());
     setAttribute(Qt::WA_InputMethodEnabled);
@@ -133,57 +43,29 @@ QnSearchLineEdit::QnSearchLineEdit(QWidget *parent) :
     clearPalette.setBrush(QPalette::Base, QBrush(Qt::transparent));
     m_lineEdit->setPalette(clearPalette);
     m_lineEdit->setPlaceholderText(tr("Search"));
-    connect(m_lineEdit, &QLineEdit::textChanged, this, &QnSearchLineEdit::textChanged);
+    connect(m_lineEdit, &QLineEdit::returnPressed, this, &QnSearchLineEdit::enterKeyPressed);
 
-    // prevButton
-    m_prevButton->setToolTip(tr("Previous"));
-    connect(m_prevButton, &QAbstractButton::clicked, this, &QnSearchLineEdit::prevButtonClicked);
+    connect(m_lineEdit, &QLineEdit::textChanged, this
+        , [this](const QString &text)
+    {
+        const auto emitTextChanged = [this, text]()
+        {
+            emit textChanged(text);
+            m_filterTimer.reset();
+        };
 
-    // nextButton
-    m_nextButton->setToolTip(tr("Next"));
-    connect(m_nextButton, &QAbstractButton::clicked, this, &QnSearchLineEdit::nextButtonClicked);
+        if (m_textChangedSignalFilterMs <= 0)
+        {
+            emitTextChanged();
+            return;
+        }
 
-    m_occurencesLabel->setText(lit("25/1920"));
-    m_occurencesLabel->setAutoFillBackground(true);
-    setPaletteColor(m_occurencesLabel, QPalette::Base, QColor(50, 127, 50));
-
+        m_filterTimer.reset(executeDelayedParented(
+            emitTextChanged, m_textChangedSignalFilterMs, this));
+    });
 
     QSizePolicy policy = sizePolicy();
     setSizePolicy(QSizePolicy::Preferred, policy.verticalPolicy());
-}
-
-void QnSearchLineEdit::resizeEvent(QResizeEvent *event) {
-    updateGeometries();
-    QWidget::resizeEvent(event);
-}
-
-void QnSearchLineEdit::updateGeometries() {
-
-    QStyleOptionFrameV2 panel;
-    initStyleOption(&panel);
-    QRect rect = style()->subElementRect(QStyle::SE_LineEditContents, &panel, this);
-
-    int height = rect.height();
-    int width = rect.width();
-
-    int buttonSize = height;
-    
-    // left edge
-    m_searchButton->setGeometry(rect.x(), rect.y(), buttonSize, buttonSize);
-
-    // rightmost
-    m_nextButton->setGeometry(width - buttonSize, 0, buttonSize, buttonSize);
-    
-    // to the left from "Next"
-    m_prevButton->setGeometry(m_nextButton->x() - buttonSize, 0, buttonSize, buttonSize);
-
-    int labelWidth = m_occurencesLabel->sizeHint().width();
-    int labelOffset = 2;
-
-    m_occurencesLabel->setGeometry(m_prevButton->x() - labelWidth, labelOffset, labelWidth, height - labelOffset*2);
-
-    m_lineEdit->setGeometry(m_searchButton->x() + buttonSize, 0, m_occurencesLabel->x() - buttonSize, height);
-    
 }
 
 void QnSearchLineEdit::initStyleOption(QStyleOptionFrameV2 *option) const
@@ -202,22 +84,37 @@ void QnSearchLineEdit::initStyleOption(QStyleOptionFrameV2 *option) const
     option->features = QStyleOptionFrameV2::None;
 }
 
-QSize QnSearchLineEdit::sizeHint() const {
+QSize QnSearchLineEdit::sizeHint() const
+{
     m_lineEdit->setFrame(true);
     QSize size = m_lineEdit->sizeHint();
     m_lineEdit->setFrame(false);
     return size;
 }
 
-void QnSearchLineEdit::focusInEvent(QFocusEvent *event) {
+void QnSearchLineEdit::resizeEvent(QResizeEvent *event)
+{
+    QWidget::resizeEvent(event);
+
+    QStyleOptionFrameV2 panel;
+    initStyleOption(&panel);
+    const auto rect = style()->subElementRect(QStyle::SE_LineEditContents, &panel, this);
+    m_lineEdit->setGeometry(rect);
+}
+
+void QnSearchLineEdit::focusInEvent(QFocusEvent *event)
+{
     m_lineEdit->event(event);
+    m_lineEdit->selectAll();
     QWidget::focusInEvent(event);
 }
 
-void QnSearchLineEdit::focusOutEvent(QFocusEvent *event) {
+void QnSearchLineEdit::focusOutEvent(QFocusEvent *event)
+{
     m_lineEdit->event(event);
 
-    if (m_lineEdit->completer()) {
+    if (m_lineEdit->completer())
+    {
         connect(m_lineEdit->completer(), SIGNAL(activated(QString)),
             m_lineEdit, SLOT(setText(QString)));
         connect(m_lineEdit->completer(), SIGNAL(highlighted(QString)),
@@ -226,17 +123,38 @@ void QnSearchLineEdit::focusOutEvent(QFocusEvent *event) {
     QWidget::focusOutEvent(event);
 }
 
-void QnSearchLineEdit::keyPressEvent(QKeyEvent *event) {
+void QnSearchLineEdit::keyPressEvent(QKeyEvent *event)
+{
     m_lineEdit->event(event);
+    if ((event->key() == Qt::Key_Enter) || (event->key() == Qt::Key_Return))
+        event->accept();
 }
 
-bool QnSearchLineEdit::event(QEvent *event) {
+void QnSearchLineEdit::changeEvent(QEvent *event)
+{
+    if (event->type() == QEvent::EnabledChange)
+        emit enabledChanged();
+}
+
+bool QnSearchLineEdit::event(QEvent *event)
+{
     if (event->type() == QEvent::ShortcutOverride)
-        return m_lineEdit->event(event);
+    {
+        QKeyEvent * const keyEvent = static_cast<QKeyEvent *>(event);
+        const bool result = m_lineEdit->event(event);
+        if (keyEvent->key() == Qt::Key_Escape)
+        {
+            emit escKeyPressed();
+            keyEvent->accept();
+        }
+        return result;
+    }
+
     return QWidget::event(event);
 }
 
-void QnSearchLineEdit::paintEvent(QPaintEvent *event) {
+void QnSearchLineEdit::paintEvent(QPaintEvent *event)
+{
     Q_UNUSED(event)
     QPainter p(this);
     QStyleOptionFrameV2 panel;
@@ -244,10 +162,22 @@ void QnSearchLineEdit::paintEvent(QPaintEvent *event) {
     style()->drawPrimitive(QStyle::PE_PanelLineEdit, &panel, &p, this);
 }
 
-QVariant QnSearchLineEdit::inputMethodQuery(Qt::InputMethodQuery property) const {
+QVariant QnSearchLineEdit::inputMethodQuery(Qt::InputMethodQuery property) const
+{
     return m_lineEdit->inputMethodQuery(property);
 }
 
-void QnSearchLineEdit::inputMethodEvent(QInputMethodEvent *e) {
+int QnSearchLineEdit::textChangedSignalFilterMs() const
+{
+    return m_textChangedSignalFilterMs;
+}
+
+void QnSearchLineEdit::setTextChangedSignalFilterMs(int filterMs)
+{
+    m_textChangedSignalFilterMs = filterMs;
+}
+
+void QnSearchLineEdit::inputMethodEvent(QInputMethodEvent *e)
+{
     m_lineEdit->event(e);
 }

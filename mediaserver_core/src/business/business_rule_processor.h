@@ -1,7 +1,7 @@
 #ifndef __BUSINESS_RULE_PROCESSOR_H_
 #define __BUSINESS_RULE_PROCESSOR_H_
 
-#include <QtCore/QMutex>
+#include <utils/thread/mutex.h>
 #include <QtCore/QTimer>
 #include <QtCore/QThread>
 #include <QtCore/QMultiMap>
@@ -129,7 +129,7 @@ protected slots:
     /*
     * Execute action physically. Return true if action success executed
     */
-    virtual bool executeActionInternal(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res);
+    virtual bool executeActionInternal(const QnAbstractBusinessActionPtr& action);
 private slots:
     void at_broadcastBusinessActionFinished(int handle, ec2::ErrorCode errorCode);
     void at_actionDelivered(const QnAbstractBusinessActionPtr& action);
@@ -145,8 +145,6 @@ private slots:
 
 
 protected:
-    virtual QByteArray getEventScreenshotEncoded(const QnUuid& id, qint64 timestampUsec, QSize dstSize) const;
-    
     bool containResource(const QnResourceList& resList, const QnUuid& resId) const;
     QnAbstractBusinessActionList matchActions(const QnAbstractBusinessEventPtr& bEvent);
     //QnBusinessMessageBus& getMessageBus() { return m_messageBus; }
@@ -161,59 +159,15 @@ protected:
 private:
     void at_businessRuleChanged_i(const QnBusinessEventRulePtr& bRule);
 
-    bool sendMail(const QnSendMailBusinessActionPtr& action );
-
     QnAbstractBusinessActionPtr processToggleAction(const QnAbstractBusinessEventPtr& bEvent, const QnBusinessEventRulePtr& rule);
     QnAbstractBusinessActionPtr processInstantAction(const QnAbstractBusinessEventPtr& bEvent, const QnBusinessEventRulePtr& rule);
     bool checkRuleCondition(const QnAbstractBusinessEventPtr& bEvent, const QnBusinessEventRulePtr& rule) const;
-    QString formatEmailList(const QStringList& value);
     bool needProxyAction(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res);
     void doProxyAction(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res);
     void executeAction(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res);
-    
-    QVariantHash eventDescriptionMap(const QnAbstractBusinessActionPtr& action, const QnBusinessAggregationInfo &aggregationInfo, QnEmailAttachmentList& attachments, bool useIp);
+protected:
+    mutable QnMutex m_mutex;
 private:
-    class SendEmailAggregationKey
-    {
-    public:
-        QnBusiness::EventType eventType;
-        QString recipients;
-
-        SendEmailAggregationKey()
-        :
-            eventType( QnBusiness::UndefinedEvent )
-        {
-        }
-
-        SendEmailAggregationKey(
-            QnBusiness::EventType _eventType,
-            QString _recipients )
-        :
-            eventType( _eventType ),
-            recipients( _recipients )
-        {
-        }
-
-        bool operator<( const SendEmailAggregationKey& right ) const
-        {
-            if( eventType < right.eventType )
-                return true;
-            if( right.eventType < eventType )
-                return false;
-            return recipients < right.recipients;
-        }
-    };
-
-    class SendEmailAggregationData
-    {
-    public:
-        QnSendMailBusinessActionPtr action;
-        quint64 periodicTaskID;
-        int eventCount;
-
-        SendEmailAggregationData() : periodicTaskID(0), eventCount(0) {}
-    };
-
     QList<QnBusinessEventRulePtr> m_rules;
     //QnBusinessMessageBus m_messageBus;
     static QnBusinessRuleProcessor* m_instance;
@@ -230,43 +184,22 @@ private:
      * @brief m_eventsInProgress         Stores events that are toggled and state is On
      */
     RunningRuleMap m_rulesInProgress;
-    QScopedPointer<EmailManagerImpl> m_emailManager;
 
 
     /**
-     * @brief match resources between event and rule
+     * @brief match resources between event and rule. 
+     * @return false if business rule isn't match to a source event
      */
     bool checkEventCondition(const QnAbstractBusinessEventPtr& bEvent, const QnBusinessEventRulePtr& rule);
 
     QMap<QString, QnProcessorAggregationInfo> m_aggregateActions; // aggregation counter for instant actions
     QMap<QString, int> m_actionInProgress;              // remove duplicates for long actions
-    mutable QMutex m_mutex;
     QTimer m_timer;
-    QMap<SendEmailAggregationKey, SendEmailAggregationData> m_aggregatedEmails;
 
     /*!
         \param isRuleAdded \a true - rule added, \a false - removed
     */
     void notifyResourcesAboutEventIfNeccessary( const QnBusinessEventRulePtr& businessRule, bool isRuleAdded );
-    void sendAggregationEmail( const SendEmailAggregationKey& aggregationKey );
-    bool sendMailInternal(const QnSendMailBusinessActionPtr& action, int aggregatedResCount );
-    void sendEmailAsync(const ec2::ApiEmailData& data);
-
-private:
-    static QVariantHash eventDetailsMap(
-        const QnAbstractBusinessActionPtr& action,
-        const QnInfoDetail& aggregationData,
-        bool useIp,
-        bool addSubAggregationData = true );
-
-    static QVariantList aggregatedEventDetailsMap(const QnAbstractBusinessActionPtr& action,
-        const QnBusinessAggregationInfo& aggregationInfo,
-        bool useIp);
-    static QVariantList aggregatedEventDetailsMap(
-        const QnAbstractBusinessActionPtr& action,
-        const QList<QnInfoDetail>& aggregationDetailList,
-        bool useIp );
-
 };
 
 #define qnBusinessRuleProcessor QnBusinessRuleProcessor::instance()

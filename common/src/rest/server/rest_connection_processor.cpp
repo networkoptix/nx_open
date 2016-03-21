@@ -4,10 +4,9 @@
 #include <QtCore/QRegExp>
 
 #include "rest_connection_processor.h"
-#include "utils/network/tcp_connection_priv.h"
-#include "utils/network/tcp_listener.h"
+#include "network/tcp_connection_priv.h"
+#include "network/tcp_listener.h"
 #include "request_handler.h"
-#include "network/authenticate_helper.h"
 #include "utils/gzip/gzip_compressor.h"
 #include "core/resource_management/resource_pool.h"
 #include <core/resource/user_resource.h>

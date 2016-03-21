@@ -5,8 +5,9 @@
 
 #include "http_transaction_receiver.h"
 
+#include <api/global_settings.h>
 #include <rest/server/rest_connection_processor.h>
-#include <utils/network/tcp_connection_priv.h>
+#include <network/tcp_connection_priv.h>
 
 #include "http/custom_headers.h"
 #include "transaction/transaction_message_bus.h"
@@ -100,8 +101,8 @@ namespace ec2
         initSystemThreadId();
 
         if( !d->socket->setRecvTimeout(
-                Settings::instance()->connectionKeepAliveTimeout().count() * 
-                Settings::instance()->keepAliveProbeCount()) ||
+                std::chrono::milliseconds(QnGlobalSettings::instance()->connectionKeepAliveTimeout()).count() * 
+                QnGlobalSettings::instance()->keepAliveProbeCount()) ||
             !d->socket->setNoDelay(true) )
         {
             const int osErrorCode = SystemError::getLastOSErrorCode();

@@ -16,7 +16,8 @@
 QnViewportBoundWidget::QnViewportBoundWidget(QGraphicsItem *parent):
     base_type(parent),
     m_fixedSize(QSizeF(0.0, 0.0)),
-    m_inUpdateScale(false)
+    m_inUpdateScale(false),
+    m_lastView(nullptr)
 {
     m_scale = new QGraphicsScale(this);
     QList<QGraphicsTransform *> transformations = this->transformations();
@@ -84,6 +85,8 @@ void QnViewportBoundWidget::updateScale(QGraphicsView *view) {
 
     m_scale->setXScale(scale);
     m_scale->setYScale(scale);
+
+    emit scaleUpdated(m_lastView, scale);
 }
 
 

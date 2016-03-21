@@ -54,7 +54,7 @@ public:
     }
 
     inline void destroy(pointer p) {
-        unused(p);
+        static_cast<void>(p);
         p->~value_type();
     }
 

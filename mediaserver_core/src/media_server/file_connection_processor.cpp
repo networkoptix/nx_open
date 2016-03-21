@@ -1,7 +1,7 @@
 #include <QCache>
 #include <QFileInfo>
 #include "file_connection_processor.h"
-#include "utils/network/tcp_connection_priv.h"
+#include "network/tcp_connection_priv.h"
 #include "utils/common/util.h"
 #include "media_server/serverutil.h"
 #include "utils/gzip/gzip_compressor.h"
@@ -19,7 +19,7 @@ struct CacheEntry
 
 
 static QCache<QString, CacheEntry> cachedFiles(CACHE_SIZE);
-static QMutex cacheMutex;
+static QnMutex cacheMutex;
 
 struct HttpContentTypes
 {
@@ -89,6 +89,8 @@ void QnFileConnectionProcessor::run()
 
     QUrl url = getDecodedUrl();
     QString path = url.path();
+    while (path.endsWith(QLatin1String("/")))
+        path.chop(1);
 
     int rez = CODE_OK;
     QByteArray contentType = "application/xml";
@@ -114,7 +116,7 @@ void QnFileConnectionProcessor::run()
 
     if (rez == CODE_OK)
     {
-        QMutexLocker lock(&cacheMutex);
+        QnMutexLocker lock( &cacheMutex );
 
         CacheEntry* cachedData = cachedFiles.object(path);
         if (cachedData && cachedData->lastModified == lastModified)

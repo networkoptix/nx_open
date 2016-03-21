@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>550</width>
-    <height>260</height>
+    <height>268</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -69,6 +69,9 @@
                 </property>
                 <property name="insertPolicy">
                  <enum>QComboBox::NoInsert</enum>
+                </property>
+                <property name="sizeAdjustPolicy">
+                 <enum>QComboBox::AdjustToMinimumContentsLength</enum>
                 </property>
                </widget>
               </item>
@@ -151,7 +154,7 @@
             <item>
              <widget class="QRadioButton" name="remoteSystemRadioButton">
               <property name="text">
-               <string notr="true">remote</string>
+               <string notr="true">re&amp;mote</string>
               </property>
              </widget>
             </item>
@@ -177,6 +180,22 @@
      </widget>
      <widget class="QWidget" name="finalPage">
       <layout class="QVBoxLayout" name="verticalLayout_6">
+       <property name="spacing">
+        <number>20</number>
+       </property>
+       <item>
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
        <item>
         <widget class="QLabel" name="successLabel">
          <property name="text">
@@ -190,6 +209,29 @@ The servers from the remote system should appear in your system soon.</string>
          </property>
         </widget>
        </item>
+       <item>
+        <widget class="QLabel" name="reconnectLabel">
+         <property name="text">
+          <string>You will be reconnected.</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
       </layout>
      </widget>
     </widget>
@@ -200,7 +242,7 @@ The servers from the remote system should appear in your system soon.</string>
       <enum>Qt::Horizontal</enum>
      </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Close</set>
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Close|QDialogButtonBox::Ok</set>
      </property>
     </widget>
    </item>
@@ -208,15 +250,15 @@ The servers from the remote system should appear in your system soon.</string>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QnDialogButtonBox</class>
-   <extends>QDialogButtonBox</extends>
-   <header location="global">ui/widgets/dialog_button_box.h</header>
-  </customwidget>
-  <customwidget>
    <class>QnWordWrappedLabel</class>
    <extends>QWidget</extends>
    <header location="global">ui/widgets/word_wrapped_label.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnDialogButtonBox</class>
+   <extends>QDialogButtonBox</extends>
+   <header location="global">ui/widgets/dialog_button_box.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

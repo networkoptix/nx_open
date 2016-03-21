@@ -240,18 +240,26 @@ void QnResourcesChangesManager::saveServersBatch(const QnMediaServerResourceList
             return;
 
         /* Restore attributes from backup. */
+        bool somethingWasChanged = false;
         for( const QnMediaServerUserAttributes& serverAttrs: backup ) {
             QSet<QByteArray> modifiedFields;
             {
                 QnMediaServerUserAttributesPool::ScopedLock userAttributesLock( pool, serverAttrs.serverID );
                 (*userAttributesLock)->assign( serverAttrs, &modifiedFields );
-            }            
-            if( const QnResourcePtr& res = qnResPool->getResourceById(serverAttrs.serverID) )   //it is OK if resource is missing
-                res->emitModificationSignals( modifiedFields );
+            }
+            if (!modifiedFields.isEmpty()) {
+                if( const QnResourcePtr& res = qnResPool->getResourceById(serverAttrs.serverID) )   //it is OK if resource is missing
+                    res->emitModificationSignals( modifiedFields );
+                somethingWasChanged = true;
+            }
         }
 
         if (rollback)
             rollback();
+
+        /* Silently die if nothing was changed. */
+        if (!somethingWasChanged)
+            return;
 
         emit saveChangesFailed(servers);
     });

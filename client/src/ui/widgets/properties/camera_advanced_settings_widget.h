@@ -3,7 +3,6 @@
 
 #include <QtWidgets/QWidget>
 
-#include <api/api_fwd.h>
 #include <core/resource/resource_fwd.h>
 
 #include <utils/common/connective.h>
@@ -13,9 +12,7 @@ namespace Ui {
 }
 
 class QNetworkReply;
-class CameraSettingsWidgetsTreeCreator;
 class CameraAdvancedSettingsWebPage;
-class CameraSetting;
 
 class QnCameraAdvancedSettingsWidget : public Connective<QWidget> {
     Q_OBJECT
@@ -25,37 +22,33 @@ public:
     QnCameraAdvancedSettingsWidget(QWidget* parent = 0);
     virtual ~QnCameraAdvancedSettingsWidget();
 
-    const QnVirtualCameraResourcePtr &camera() const;
+    QnVirtualCameraResourcePtr camera() const;
     void setCamera(const QnVirtualCameraResourcePtr &camera);
 
     void updateFromResource();
 
     void reloadData();
+
+    bool hasChanges() const;
+
+    void submitToResource();
+
+signals:
+    void hasChangesChanged();
+
+protected:
+    virtual void hideEvent(QHideEvent *event) override;
+
 private:
     void initWebView();
 
     void updatePage();
 
-    void clean();
-
-    void createWidgetsRecreator(const QString &paramId);
-    QnMediaServerConnectionPtr getServerConnection() const;
-
     void at_authenticationRequired(QNetworkReply* reply, QAuthenticator * authenticator);
     void at_proxyAuthenticationRequired ( const QNetworkProxy & , QAuthenticator * authenticator);
-
-    void at_advancedParamChanged(const CameraSetting& val);
-
-    void updateApplyingParamsLabel();
-
-private slots:
-    void at_advancedSettingsLoaded(int status, const QnStringVariantPairList &params, int handle);
-    void at_advancedParam_saved(int httpStatusCode, const QnStringBoolPairList& operationResult);
-
 private:
     enum class Page {
         Empty,
-        CannotLoad,
         Manual,
         Web
     };
@@ -64,12 +57,8 @@ private:
     QScopedPointer<Ui::CameraAdvancedSettingsWidget> ui;
     Page m_page;
     QnVirtualCameraResourcePtr m_camera;
-    QMutex m_cameraMutex;
-    CameraSettingsWidgetsTreeCreator* m_widgetsRecreator;
+    QnMutex m_cameraMutex;
     CameraAdvancedSettingsWebPage* m_cameraAdvancedSettingsWebPage;
-    QUrl m_lastCameraPageUrl;
-    int m_paramRequestHandle;
-    int m_applyingParamsCount;
 };
 
 #endif // QN_CAMERA_ADVANCED_SETTINGS_WIDGET_H

@@ -114,8 +114,8 @@ SignDialog::SignDialog(QnResourcePtr checkResource, QWidget *parent) :
     m_renderer = new QnResourceWidgetRenderer(0, m_glWindow->context());
     m_glWindow->setRenderer(m_renderer);
     m_camDispay->addVideoRenderer(1, m_renderer, true);
-    m_camDispay->setSpeed(1024*1024);
     m_reader->addDataProcessor(m_camDispay);
+    m_reader->setSpeed(1024*1024);
     m_reader->start();
     m_camDispay->start();
 }

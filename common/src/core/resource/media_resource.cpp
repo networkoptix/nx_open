@@ -5,6 +5,7 @@
 
 #include <utils/common/warnings.h>
 #include <utils/serialization/lexical.h>
+#include <utils/math/fuzzy.h>
 
 #include "camera_user_attribute_pool.h"
 #include "resource_media_layout.h"
@@ -107,13 +108,15 @@ QnConstResourceVideoLayoutPtr QnMediaResource::getDefaultVideoLayout()
 
 QnConstResourceVideoLayoutPtr QnMediaResource::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider) const
 {
-    QMutexLocker lock(&m_layoutMutex);
+    QnMutexLocker lock( &m_layoutMutex );
 
+#ifdef ENABLE_DATA_PROVIDERS
     if (dataProvider) {
         QnConstResourceVideoLayoutPtr providerLayout = dataProvider->getVideoLayout();
         if (providerLayout)
             return providerLayout;
     }
+#endif //ENABLE_DATA_PROVIDERS
 
     QString strVal = toResource()->getProperty(Qn::VIDEO_LAYOUT_PARAM_NAME);
     if (strVal.isEmpty())

@@ -73,7 +73,7 @@ void QnCameraDiagnosticsDialog::restart() {
     connect(m_tool, SIGNAL(diagnosticsDone(CameraDiagnostics::Step::Value, bool, QString)),
             this, SLOT(at_tool_diagnosticsDone()));
     m_tool->start();
-    
+
     m_started = true;
     m_finished = false;
 
@@ -95,29 +95,29 @@ void QnCameraDiagnosticsDialog::stop() {
 }
 
 void QnCameraDiagnosticsDialog::retranslateUi() {
-    
+
     ui->retranslateUi(this);
 
     if(!m_resource)
     {
         ui->titleLabel->clear();
         return;
-    } 
-    
+    }
+
     ui->titleLabel->setText(QnDeviceDependentStrings::getNameFromSet(
         QnCameraDeviceStringSet(
             tr("Diagnostics for device %1"),
             tr("Diagnostics for camera %1"),
-            tr("Diagnostics for IO module %1")
+            tr("Diagnostics for I/O module %1")
         ), m_resource)
     .arg(getResourceName(m_resource)));
 
-    
+
     setWindowTitle(QnDeviceDependentStrings::getNameFromSet(
         QnCameraDeviceStringSet(
             tr("Device Diagnostics"),
             tr("Camera Diagnostics"),
-            tr("IO Module Diagnostics")
+            tr("I/O Module Diagnostics")
         ) , m_resource));
 }
 
@@ -138,16 +138,16 @@ QString QnCameraDiagnosticsDialog::diagnosticsStepText(int stepType) {
             QnCameraDeviceStringSet(
                 tr("Confirming device is accessible."),
                 tr("Confirming camera is accessible."),
-                tr("Confirming IO module is accessible.")
+                tr("Confirming I/O module is accessible.")
             ), m_resource);
     case CameraDiagnostics::Step::mediaStreamAvailability:
         return QnDeviceDependentStrings::getNameFromSet(
             QnCameraDeviceStringSet(
                 tr("Confirming target device provides media stream."),
                 tr("Confirming target camera provides media stream."),
-                tr("Confirming target IO module provides media stream.")
+                tr("Confirming target I/O module provides media stream.")
             ), m_resource);
-    case CameraDiagnostics::Step::mediaStreamIntegrity: 
+    case CameraDiagnostics::Step::mediaStreamIntegrity:
         return tr("Evaluating media stream for errors.");
     default:
         return QString();
@@ -170,7 +170,7 @@ void QnCameraDiagnosticsDialog::at_tool_diagnosticsStepResult(CameraDiagnostics:
         message = tr("FAILED: %1").arg(errorMessage);
         color = qnGlobals->errorTextColor();
     }
-    
+
     QString text = QString(lit("<font color=\"%1\">%2</font>")).arg(color.name()).arg(message);
     ui->textEdit->append(text);
     ui->textEdit->append(lit("<br/>"));

@@ -41,8 +41,8 @@ void QnRecordingBusinessActionWidget::updateTabOrder(QWidget *before, QWidget *a
     setTabOrder(ui->afterSpinBox,       after);
 }
 
-void QnRecordingBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, QnBusiness::Fields fields) {
-    if (!model)
+void QnRecordingBusinessActionWidget::at_model_dataChanged(QnBusiness::Fields fields) {
+    if (!model())
         return;
 
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
@@ -50,7 +50,7 @@ void QnRecordingBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewMod
     int maxFps = 0;
 
     if (fields & QnBusiness::ActionResourcesField) {
-        QnVirtualCameraResourceList cameras = model->actionResources().filtered<QnVirtualCameraResource>();
+        QnVirtualCameraResourceList cameras = model()->actionResources().filtered<QnVirtualCameraResource>();
         foreach (const QnVirtualCameraResourcePtr &camera, cameras) {
             maxFps = maxFps == 0 ? camera->getMaxFps() : qMax(maxFps, camera->getMaxFps());
         }
@@ -64,7 +64,7 @@ void QnRecordingBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewMod
 
     if (fields & QnBusiness::ActionParamsField) {
 
-        QnBusinessActionParameters params = model->actionParams();
+        QnBusinessActionParameters params = model()->actionParams();
 
         int quality = ui->qualityComboBox->findData((int) params.streamQuality);
         if (quality >= 0)

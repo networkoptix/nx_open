@@ -1346,6 +1346,63 @@ namespace nx_http
             }
             return result;
         }
+
+
+        //////////////////////////////////////////////
+        //   Keep-Alive
+        //////////////////////////////////////////////
+
+        KeepAlive::KeepAlive()
+        :
+            timeout(0)
+        {
+        }
+
+        KeepAlive::KeepAlive(
+            std::chrono::seconds _timeout,
+            boost::optional<int> _max)
+        :
+            timeout(std::move(_timeout)),
+            max(std::move(_max))
+        {
+        }
+
+        bool KeepAlive::parse(const nx_http::StringType& strValue)
+        {
+            max.reset();
+
+            const auto params = strValue.split(',');
+            bool timeoutFound = false;
+            for (auto param: params)
+            {
+                param = param.trimmed();
+                const int sepPos = param.indexOf('=');
+                if (sepPos == -1)
+                    continue;
+                const auto paramName = ConstBufferRefType(param, 0, sepPos);
+                const auto paramValue = ConstBufferRefType(param, sepPos + 1).trimmed();
+
+                if (paramName == "timeout")
+                {
+                    timeout = std::chrono::seconds(paramValue.toUInt());
+                    timeoutFound = true;
+                }
+                else if(paramName == "max")
+                {
+                    max = paramValue.toUInt();
+                }
+            }
+
+            return timeoutFound;
+        }
+
+        StringType KeepAlive::toString() const
+        {
+            StringType result = "timeout="+StringType::number((unsigned int)timeout.count());
+            if (max)
+                result += ", max="+StringType::number(*max);
+            return result;
+        }
     }
 
 
@@ -1521,7 +1578,13 @@ namespace nx_http
 #   define COMMON_USER_AGENT "Mozilla/5.0"
 #endif
 
-    static const StringType defaultUserAgentString = QN_PRODUCT_NAME_LONG "/" QN_APPLICATION_VERSION " (" QN_ORGANIZATION_NAME ") " COMMON_USER_AGENT;
+#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
+#   define PRODUCT_NAME_SUFFIX " Mobile"
+#else
+#   define PRODUCT_NAME_SUFFIX
+#endif
+
+    static const StringType defaultUserAgentString = QN_PRODUCT_NAME_LONG PRODUCT_NAME_SUFFIX "/" QN_APPLICATION_VERSION " (" QN_ORGANIZATION_NAME ") " COMMON_USER_AGENT;
 
     StringType userAgentString()
     {

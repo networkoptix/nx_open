@@ -5,9 +5,9 @@
 #include <QtCore/QElapsedTimer>
 
 #include "core/dataconsumer/abstract_data_consumer.h"
-#include "utils/network/rtp_stream_parser.h"
+#include "network/rtp_stream_parser.h"
 #include "core/datapacket/abstract_data_packet.h"
-#include "utils/network/rtpsession.h"
+#include "network/rtpsession.h"
 #include "utils/media/externaltimesource.h"
 #include "rtsp/rtsp_ffmpeg_encoder.h"
 #include "utils/common/adaptive_sleep.h"
@@ -40,7 +40,7 @@ public:
     virtual bool canAcceptData() const;
     void setLiveMode(bool value);
     int copyLastGopFromCamera(QnVideoCameraPtr camera, bool usePrimaryStream, qint64 skipTime, quint32 cseq);
-    QMutex* dataQueueMutex();
+    QnMutex* dataQueueMutex();
     void setSingleShotMode(bool value);
 
     virtual qint64 getDisplayedTime() const;
@@ -62,6 +62,7 @@ public:
     void setMultiChannelVideo(bool value);
     void setUseUTCTime(bool value);
     void setAllowAdaptiveStreaming(bool value);
+    void setResource(const QnResourcePtr& resource);
 protected:
     //QnMediaContextPtr getGeneratedContext(CodecID compressionType);
     virtual bool processData(const QnAbstractDataPacketPtr& data);
@@ -77,6 +78,8 @@ protected:
     void sendMetadata(const QByteArray& metadata);
     void getEdgePackets(qint64& firstVTime, qint64& lastVTime, bool checkLQ) const;
     QByteArray getRangeHeaderIfChanged();
+    void cleanupQueueToPos(int lastIndex, int ch);
+    void setNeedKeyData();
 private:
     //QMap<CodecID, QnMediaContextPtr> m_generatedContext;
     bool m_gotLivePacket;
@@ -91,12 +94,12 @@ private:
     qint64 m_lastRtTime; // used for realtime streaming mode
     qint64 m_lastMediaTime; // same as m_lastSendTime, but show real timestamp for LIVE video (m_lastSendTime always returns DATETIME_NOW for live)
     //char m_rtpHeader[RtpHeader::RTP_HEADER_SIZE];
-    QMutex m_mutex;
-    QMutex m_qualityChangeMutex;
+    QnMutex m_mutex;
+    QnMutex m_qualityChangeMutex;
     int m_waitSCeq;
     bool m_liveMode;
     bool m_pauseNetwork;
-    QMutex m_dataQueueMtx;
+    QnMutex m_dataQueueMtx;
     bool m_singleShotMode;
     int m_packetSended;
     QnAbstractStreamDataProvider* m_prefferedProvider;
@@ -107,7 +110,7 @@ private:
 
     static QHash<QHostAddress, qint64> m_lastSwitchTime;
     static QSet<QnRtspDataConsumer*> m_allConsumers;
-    static QMutex m_allConsumersMutex;
+    static QnMutex m_allConsumersMutex;
     int m_streamingSpeed;
     bool m_multiChannelVideo;
     QnAdaptiveSleep m_adaptiveSleep;
@@ -117,7 +120,7 @@ private:
     qint64 m_firstLiveTime;
     qint64 m_lastLiveTime;
     QElapsedTimer m_liveTimer;
-    mutable QMutex m_liveTimingControlMtx;
+    mutable QnMutex m_liveTimingControlMtx;
     bool m_allowAdaptiveStreaming;
 
     QnByteArray m_sendBuffer;
@@ -128,5 +131,7 @@ private:
     int m_framesSinceRangeCheck;
     qint64 m_prevStartTime;
     qint64 m_prevEndTime;
+    int m_videoChannels;
+    bool m_needKeyData[CL_MAX_CHANNELS];
 };
 #endif // __RTSP_DATA_CONSUMER_H__

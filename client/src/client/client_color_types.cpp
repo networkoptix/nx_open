@@ -6,6 +6,7 @@
 #include <utils/serialization/json_functions.h>
 #include <utils/fusion/fusion_adaptor.h>
 #include <utils/math/math.h>
+#include <utils/common/model_functions.h>
 
 QnTimeSliderColors::QnTimeSliderColors() {
     tickmark = QColor(255, 255, 255, 255);
@@ -24,8 +25,11 @@ QnTimeSliderColors::QnTimeSliderColors() {
     pastMotion = QColor(255, 0, 0, 128);
     futureMotion = QColor(255, 0, 0, 64);
 
-    pastBookmark = QColor(0, 0, 255, 128);
-    futureBookmark = QColor(0, 0, 255, 64);
+    pastBookmark = QColor("#b21083dc");
+    futureBookmark = QColor("#b21083dc");
+
+    pastBookmarkBound = QColor("#1c8fe7");
+    futureBookmarkBound = QColor("#1c8fe7");
 
     separator = QColor(255, 255, 255, 64);
 
@@ -47,13 +51,16 @@ QnBackgroundColors::QnBackgroundColors() {
     panic = QColor(255, 0, 0, 255);
 }
 
-QnCalendarColors::QnCalendarColors() {
-    selection = QColor(0, 150, 255, 192);
-    primaryRecording = QColor(32, 128, 32, 255);
-    secondaryRecording = QColor(32, 255, 32, 255);
-    primaryMotion = QColor(128, 0, 0, 255);
-    secondaryMotion = QColor(255, 0, 0, 255);
-    separator = QColor(0, 0, 0, 255);
+QnCalendarColors::QnCalendarColors()
+    : selection(0, 150, 255, 192)
+    , primaryRecording(32, 128, 32, 255)
+    , secondaryRecording(32, 255, 32, 255)
+    , primaryBookmark(55, 117, 196, 255)
+    , secondaryBookmark(105, 164, 240, 255)
+    , primaryMotion(128, 0, 0, 255)
+    , secondaryMotion(255, 0, 0, 255)
+    , separator(0, 0, 0, 255)
+{
 }
 
 QnStatisticsColors::QnStatisticsColors() {
@@ -61,8 +68,8 @@ QnStatisticsColors::QnStatisticsColors() {
     frame = QColor(66, 140, 237);
     cpu = QColor(66, 140, 237);
     ram = QColor(219, 59, 169);
-    
-    hdds 
+
+    hdds
         << QColor(237, 237, 237)   // C: sda
         << QColor(237, 200, 66)    // D: sdb
         << QColor(103, 237, 66)    // E: sdc
@@ -73,7 +80,7 @@ QnStatisticsColors::QnStatisticsColors() {
         << QColor(255, 127, 127)
         << QColor(201, 0, 0);
 
-    network 
+    network
         << QColor(255, 52, 52)
         << QColor(240, 255, 52)
         << QColor(228, 52, 255)
@@ -82,6 +89,7 @@ QnStatisticsColors::QnStatisticsColors() {
 
 QnIoModuleColors::QnIoModuleColors() {
     idLabel = QColor(0x57, 0x57, 0x57);
+    buttonBackground = QColor("#1c1c1c");
 }
 
 QnScheduleGridColors::QnScheduleGridColors() {
@@ -122,6 +130,27 @@ QnResourceWidgetFrameColors::QnResourceWidgetFrameColors() {
     selected = QColor(64, 130, 180, 128);
 }
 
+QnBookmarkColors::QnBookmarkColors()
+    : tooltipBackground("#295E87")
+    , background("#b22e6996")
+    , text(Qt::white)
+    , buttonsSeparator("#3E6E93")
+    , bookmarksSeparatorTop("#154163")
+    , bookmarksSeparatorBottom("#3e6e93")
+    , tagBgNormal("#3E6E93")
+    , tagBgHovered("#547E9F")
+    , tagTextNormal("#D8E2E9")
+    , tagTextHovered("#ffffff")
+    , moreItemsText("#94AEC3")
+{
+}
+
+QnCompositeTextOverlayColors::QnCompositeTextOverlayColors()
+    : bookmarkColors()
+    , textOverlayItemColor(0, 0, 0, 128)
+{
+}
+
 QnLicensesListModelColors::QnLicensesListModelColors() {
     normal = QColor(255, 255, 255, 255);
     warning = QColor(Qt::yellow);
@@ -147,7 +176,7 @@ QnAuditLogColors::QnAuditLogColors() {
     updServer = QColor(0xdc, 0xb4, 0x28); //QColor(0x99, 0x49, 0x98);
     eventRules = QColor(0x9c, 0x6b, 0x50); //QColor(0x5d, 0x82, 0xbf);
     emailSettings = QColor(0xcb, 0xcb, 0xcb); //QColor(0x9c, 0x6b, 0x50);
-    
+
     chartColor = QColor(0x25, 0x92, 0xc3);
 }
 
@@ -180,6 +209,10 @@ QnServerUpdatesColors::QnServerUpdatesColors() {
     error = Qt::red;
 }
 
+QnBackupScheduleColors::QnBackupScheduleColors() {
+    weekEnd = QColor(0xff8080);
+}
+
 QnFailoverPriorityColors::QnFailoverPriorityColors() {
     never   = QColor(0x808080);
     low     = QColor(0x9eb236);
@@ -187,9 +220,18 @@ QnFailoverPriorityColors::QnFailoverPriorityColors() {
     high    = QColor(0xff5500);
 }
 
+
+QnGraphicsMessageBoxColors::QnGraphicsMessageBoxColors()
+{
+    text    = QColor(0xff, 0xff, 0xff, 0x99);
+    frame   = QColor(0x00, 0x7e, 0xd4, 0xff);
+    window  = QColor(0x00, 0x4b, 0x80, 0xcc);
+}
+
+
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     QN_CLIENT_COLOR_TYPES,
-    (json),
+    (json)(eq),
     _Fields,
     (optional, true)
-)
+);

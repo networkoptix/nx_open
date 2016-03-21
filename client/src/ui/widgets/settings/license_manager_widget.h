@@ -29,7 +29,9 @@ public:
     explicit QnLicenseManagerWidget(QWidget *parent = 0);
     virtual ~QnLicenseManagerWidget();
 
-    virtual void updateFromSettings() override;
+    virtual void loadDataToUi() override;
+    virtual bool hasChanges() const override;
+    virtual void applyChanges() override;
 
 private slots:
     void updateLicenses();

@@ -11,8 +11,13 @@ public:
     ~QnClientInstanceManager();
 
     int instanceIndex() const;
+
     QnUuid instanceGuid() const;
+    QnUuid instanceGuidForIndex(int index) const;
+
     bool isValid() const;
+
+    QList<int> runningInstancesIndices() const;
 private:
     mutable QSharedMemory m_sharedMemory;
     int m_index;

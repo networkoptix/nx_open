@@ -4,7 +4,7 @@
 #ifdef ENABLE_DATA_PROVIDERS
 
 #include <QtCore/QDateTime>
-#include <QtCore/QMutex>
+#include <utils/thread/mutex.h>
 
 #define CL_STATISTICS_WINDOW_MS 2000
 #define CL_STATISTICS_UPDATE_PERIOD_MS 700
@@ -41,10 +41,11 @@ public:
     void resetStatistics(); // resets statistics; and make it runing
     void stop(); // stops the statistic;
 
-    void onData(unsigned int datalen);// must be called then new data from cam arrived; if datalen==0 => timeout
+    void onData(unsigned int datalen, bool isKeyFrame);// must be called then new data from cam arrived; if datalen==0 => timeout
     float getBitrateMbps() const; // returns instant bitrate at megabits
     float getFrameRate() const;// returns instant framerate
     int getFrameSize() const;// returns average frame size in kb( based on getBitrate and getFrameRate)
+    float getAverageGopSize() const; // returns total frames count devided by key frames count
     float getavBitrate() const; // returns average bitrate
     float getavFrameRate() const;// returns average framerate
     unsigned long totalSecs() const; // how long statistics is assembled in seconds
@@ -65,10 +66,11 @@ public:
     // ========
 
 private:
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
 
     QDateTime m_startTime, m_stopTime;
     unsigned long m_frames;
+    unsigned long m_keyFrames;
     unsigned long long m_dataTotal;
 
     bool m_badsensor;

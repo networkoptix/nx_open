@@ -84,7 +84,7 @@ bool QnFfmpegAudioTranscoder::open(const QnMediaContextPtr& codecCtx)
 
     if (avcodec_open2(m_encoderCtx, avCodec, 0) < 0)
     {
-        m_lastErrMessage = tr("Could not initialise audio encoder.");
+        m_lastErrMessage = tr("Could not initialize audio encoder.");
         return false;
     }
 
@@ -93,7 +93,7 @@ bool QnFfmpegAudioTranscoder::open(const QnMediaContextPtr& codecCtx)
     avcodec_copy_context(m_decoderContext, codecCtx->ctx());
     if (avcodec_open2(m_decoderContext, avCodec, 0) < 0)
     {
-        m_lastErrMessage = tr("Could not initialise audio decoder.");
+        m_lastErrMessage = tr("Could not initialize audio decoder.");
         return false;
     }
     m_context = QnMediaContextPtr(new QnMediaContext(m_encoderCtx));
@@ -190,19 +190,23 @@ int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
     }
 
     if( !result )
+    {
+        m_decodedBufferSize = 0; //< we asked to skip input data
         return 0;
+    }
 
     int encoderFrameSize = m_encoderCtx->frame_size * sampleSize(m_encoderCtx->sample_fmt) * m_encoderCtx->channels;
-    if (m_decodedBufferSize < encoderFrameSize)
-        return 0;
 
     // TODO: #vasilenko avoid using deprecated methods
-    int encoded = avcodec_encode_audio(m_encoderCtx, m_audioEncodingBuffer, FF_MIN_BUFFER_SIZE, (const short*) m_decodedBuffer);
-    if (encoded < 0)
-        return -3;
-
-    memmove(m_decodedBuffer, m_decodedBuffer + encoderFrameSize, m_decodedBufferSize - encoderFrameSize);
-    m_decodedBufferSize -= encoderFrameSize;
+    int encoded = 0;
+    while (encoded == 0 && m_decodedBufferSize >= encoderFrameSize) 
+    {
+        encoded = avcodec_encode_audio(m_encoderCtx, m_audioEncodingBuffer, FF_MIN_BUFFER_SIZE, (const short*) m_decodedBuffer);
+        if (encoded < 0)
+            return -3; //< TODO: needs refactor. add enum with error codes
+        memmove(m_decodedBuffer, m_decodedBuffer + encoderFrameSize, m_decodedBufferSize - encoderFrameSize);
+        m_decodedBufferSize -= encoderFrameSize;
+    }
 
     if (encoded == 0)
         return 0;

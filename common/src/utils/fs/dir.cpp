@@ -8,7 +8,7 @@
 #include <map>
 #include <memory>
 
-#ifdef __linux__
+#if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
 #include <time.h>
 #include <signal.h>
 #include <errno.h>
@@ -22,7 +22,7 @@ static const size_t MAX_LINE_LENGTH = 512;
 SystemError::ErrorCode readPartitions(
     std::list<PartitionInfo>* const partitionInfoList)
 {
-#ifdef __linux__
+#if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
     //map<device, <path, fs_name>>
     std::map<QString, std::pair<QString, QString>> deviceToPath;
     std::unique_ptr<FILE, decltype(&fclose)> file(fopen("/proc/mounts", "r"), fclose);

@@ -29,7 +29,7 @@ void QnWorkbenchLayoutAspectRatioWatcher::at_renderWatcher_widgetChanged(QnResou
     if (!m_watchedLayout)
         return;
 
-    if (m_watchedLayout->items().size() > 1 && m_watchedLayout->hasCellAspectRatio())
+    if (m_watchedLayout->items().size() > 1)
         return;
 
     bool hasAspectRatio = widget->hasAspectRatio();

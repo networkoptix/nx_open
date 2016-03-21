@@ -15,34 +15,37 @@
     #include "common/systemexcept_win32.h"
 #endif
 
+#include <camera/camera_bookmarks_manager.h>
+
 #include <client/client_startup_parameters.h>
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_meta_types.h>
 #include <client/client_translation_manager.h>
-
-#include <redass/redass_controller.h>
-#include <client/client_message_processor.h>
 #include <client/client_instance_manager.h>
+#include <client/desktop_client_message_processor.h>
 
 #include <core/ptz/client_ptz_controller_pool.h>
-#include <core/resource/camera_user_attribute_pool.h>
-#include <core/resource/media_server_user_attributes.h>
+#include <core/resource/client_camera_factory.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_properties.h>
-#include <core/resource_management/status_dictionary.h>
-#include <core/resource_management/server_additional_addresses_dictionary.h>
 #include <core/resource_management/resources_changes_manager.h>
 
 #include <platform/platform_abstraction.h>
 
-#include <plugins/resource/server_camera/server_camera_factory.h>
+#include <redass/redass_controller.h>
+
+#include <server/server_storage_manager.h>
 
 #include <ui/style/globals.h>
 
 #include <utils/common/app_info.h>
 #include <utils/common/command_line_parser.h>
 #include <utils/common/synctime.h>
+
+#include <statistics/statistics_manager.h>
+#include <statistics/storage/statistics_file_storage.h>
+#include <statistics/settings/statistics_settings_watcher.h>
+#include <ui/statistics/modules/controls_statistics_module.h>
 
 #include "version.h"
 
@@ -63,17 +66,39 @@ namespace
             translation = translationManager->loadTranslation(settings->translationPath());
 
         /* Check if qnSettings value is invalid. */
-        if (translation.isEmpty()) 
+        if (translation.isEmpty())
             translation = translationManager->defaultTranslation();
 
         translationManager->installTranslation(translation);
         return std::move(translationManager);
     }
+
+    void initializeStatisticsManager(QnCommonModule *commonModule)
+    {
+        const auto statManager = commonModule->instance<QnStatisticsManager>();
+
+        statManager->setClientId(qnSettings->pcUuid());
+        statManager->setStorage(QnStatisticsStoragePtr(new QnStatisticsFileStorage()));
+        statManager->setSettings(QnStatisticsSettingsPtr(new QnStatisticsSettingsWatcher()));
+
+        static const QScopedPointer<QnControlsStatisticsModule> controlsStatisticsModule(
+            new QnControlsStatisticsModule());
+
+        statManager->registerStatisticsModule(lit("controls"), controlsStatisticsModule.data());
+
+        QObject::connect(QnClientMessageProcessor::instance(), &QnClientMessageProcessor::connectionClosed
+            , statManager, &QnStatisticsManager::saveCurrentStatistics);
+        QObject::connect(QnClientMessageProcessor::instance(), &QnClientMessageProcessor::connectionOpened
+            , statManager, &QnStatisticsManager::resetStatistics);
+        QObject::connect(QnClientMessageProcessor::instance(), &QnClientMessageProcessor::initialResourcesReceived
+            , statManager, &QnStatisticsManager::sendStatistics);
+
+    }
 }
 
 QnClientModule::QnClientModule(const QnStartupParameters &startupParams
     , QObject *parent)
-    : QObject(parent) 
+    : QObject(parent)
 {
     Q_INIT_RESOURCE(client);
     Q_INIT_RESOURCE(appserver2);
@@ -83,11 +108,11 @@ QnClientModule::QnClientModule(const QnStartupParameters &startupParams
     /* Set up application parameters so that QSettings know where to look for settings. */
     QApplication::setOrganizationName(QnAppInfo::organizationName());
     QApplication::setApplicationName(lit(QN_APPLICATION_NAME));
-    QApplication::setApplicationDisplayName(lit(QN_APPLICATION_DISPLAY_NAME));    
+    QApplication::setApplicationDisplayName(lit(QN_APPLICATION_DISPLAY_NAME));
     if (QApplication::applicationVersion().isEmpty())
         QApplication::setApplicationVersion(QnAppInfo::applicationVersion());
     QApplication::setStartDragDistance(20);
- 
+
     /* We don't want changes in desktop color settings to mess up our custom style. */
     QApplication::setDesktopSettingsAware(false);
 
@@ -107,32 +132,28 @@ QnClientModule::QnClientModule(const QnStartupParameters &startupParams
     common->store<QnClientSettings>(clientSettings.take());
 
     auto clientInstanceManager = new QnClientInstanceManager(); /* Depends on QnClientSettings */
-    common->store<QnClientInstanceManager>(clientInstanceManager); 
+    common->store<QnClientInstanceManager>(clientInstanceManager);
     common->setModuleGUID(clientInstanceManager->instanceGuid());
 
     common->store<QnGlobals>(new QnGlobals());
     common->store<QnSessionManager>(new QnSessionManager());
 
-    common->store<QnCameraUserAttributePool>(new QnCameraUserAttributePool());
-    common->store<QnMediaServerUserAttributesPool>(new QnMediaServerUserAttributesPool());
     common->store<QnRedAssController>(new QnRedAssController());
-
-    common->store<QnResourcePool>(new QnResourcePool());
-    common->store<QnSyncTime>(new QnSyncTime());
-
-    common->store<QnResourcePropertyDictionary>(new QnResourcePropertyDictionary());
-    common->store<QnResourceStatusDictionary>(new QnResourceStatusDictionary());
-    common->store<QnServerAdditionalAddressesDictionary>(new QnServerAdditionalAddressesDictionary());
 
     common->store<QnPlatformAbstraction>(new QnPlatformAbstraction());
     common->store<QnLongRunnablePool>(new QnLongRunnablePool());
     common->store<QnClientPtzControllerPool>(new QnClientPtzControllerPool());
     common->store<QnGlobalSettings>(new QnGlobalSettings());
-    common->store<QnClientMessageProcessor>(new QnClientMessageProcessor());
+    common->store<QnDesktopClientMessageProcessor>(new QnDesktopClientMessageProcessor());
+    common->store<QnCameraHistoryPool>(new QnCameraHistoryPool());
     common->store<QnRuntimeInfoManager>(new QnRuntimeInfoManager());
-    common->store<QnServerCameraFactory>(new QnServerCameraFactory());
+    common->store<QnClientCameraFactory>(new QnClientCameraFactory());
 
     common->store<QnResourcesChangesManager>(new QnResourcesChangesManager());
+    common->store<QnCameraBookmarksManager>(new QnCameraBookmarksManager());
+    common->store<QnServerStorageManager>(new QnServerStorageManager());
+
+    initializeStatisticsManager(common);
 
 #ifdef Q_OS_WIN
     win32_exception::setCreateFullCrashDump(qnSettings->createFullCrashDump());
@@ -141,7 +162,7 @@ QnClientModule::QnClientModule(const QnStartupParameters &startupParams
     //NOTE QNetworkProxyFactory::setApplicationProxyFactory takes ownership of object
     QNetworkProxyFactory::setApplicationProxyFactory(new QnNetworkProxyFactory());
 
-    QnAppServerConnectionFactory::setDefaultFactory(QnServerCameraFactory::instance());
+    QnAppServerConnectionFactory::setDefaultFactory(QnClientCameraFactory::instance());
 }
 
 QnClientModule::~QnClientModule() {
@@ -150,6 +171,5 @@ QnClientModule::~QnClientModule() {
     QApplication::setOrganizationName(QString());
     QApplication::setApplicationName(QString());
     QApplication::setApplicationDisplayName(QString());
-    QApplication::setApplicationVersion(QString());     
+    QApplication::setApplicationVersion(QString());
 }
-

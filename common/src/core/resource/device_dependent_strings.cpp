@@ -10,33 +10,33 @@ namespace {
     class QnResourceNameStrings {
         Q_DECLARE_TR_FUNCTIONS(QnResourceNameStrings)
     public:
-        static QString numericCameras(int count, bool capitalize) { 
-            return capitalize       ? tr("%n Camera(s)", 0, count)      : tr("%n camera(s)", 0, count); 
+        static QString numericCameras(int count, bool capitalize) {
+            return capitalize       ? tr("%n Camera(s)", 0, count)      : tr("%n camera(s)", 0, count);
         }
 
         static QString numericIoModules(int count, bool capitalize) {
-            return capitalize       ? tr("%n IO Module(s)", 0, count)   : tr("%n IO module(s)", 0, count); 
+            return capitalize       ? tr("%n I/O Module(s)", 0, count)  : tr("%n I/O module(s)", 0, count);
         }
 
-        static QString numericDevices(int count, bool capitalize) { 
-            return capitalize       ? tr("%n Device(s)", 0, count)      : tr("%n device(s)", 0, count); 
+        static QString numericDevices(int count, bool capitalize) {
+            return capitalize       ? tr("%n Device(s)", 0, count)      : tr("%n device(s)", 0, count);
         }
 
-        static QString defaultCameras(bool plural, bool capitalize) { 
+        static QString defaultCameras(bool plural, bool capitalize) {
             if (plural)
-                return capitalize   ? tr("Cameras")                     : tr("cameras"); 
-            return capitalize       ? tr("Camera")                      : tr("camera"); 
+                return capitalize   ? tr("Cameras")                     : tr("cameras");
+            return capitalize       ? tr("Camera")                      : tr("camera");
         }
 
-        static QString defaultIoModules(bool plural, bool capitalize) { 
+        static QString defaultIoModules(bool plural, bool capitalize) {
             if (plural)
-                return capitalize   ? tr("IO Modules")                  : tr("IO modules"); 
-            return capitalize       ? tr("IO Module")                   : tr("IO module"); 
+                return capitalize   ? tr("I/O Modules")                 : tr("I/O modules");
+            return capitalize       ? tr("I/O Module")                  : tr("I/O module");
         }
 
-        static QString defaultDevices(bool plural, bool capitalize) { 
+        static QString defaultDevices(bool plural, bool capitalize) {
             if (plural)
-                return capitalize   ? tr("Devices")                     : tr("devices"); 
+                return capitalize   ? tr("Devices")                     : tr("devices");
             return capitalize       ? tr("Device")                      : tr("device");
         }
 
@@ -44,7 +44,7 @@ namespace {
 
 
     QnCameraDeviceType calculateDeviceType(const QnVirtualCameraResourceList &devices) {
-        /* Quick check - if there are no io modules in the system at all. */
+        /* Quick check - if there are no i/o modules in the system at all. */
         if (!qnResPool || !qnResPool->containsIoModules())
             return QnCameraDeviceType::Camera;
 
@@ -88,7 +88,7 @@ QnCameraDeviceStringSet::QnCameraDeviceStringSet(const QString &mixedString, con
     setString(Camera, true, cameraString);
     setString(Camera, false, cameraString);
 
-    /* IO Module string can be absent in cases where we are selecting default names. */
+    /* I/O Module string can be absent in cases where we are selecting default names. */
     setString(IOModule, true, ioModuleString.isEmpty() ? lit("<invalid>") : ioModuleString);
     setString(IOModule, false, ioModuleString.isEmpty() ? lit("<invalid>") : ioModuleString);
 
@@ -96,11 +96,11 @@ QnCameraDeviceStringSet::QnCameraDeviceStringSet(const QString &mixedString, con
 }
 
 QnCameraDeviceStringSet::QnCameraDeviceStringSet(
-      const QString &mixedSigularString 
-    , const QString &mixedPluralString 
-    , const QString &cameraSigularString 
-    , const QString &cameraPluralString 
-    , const QString &ioModuleSigularString 
+      const QString &mixedSigularString
+    , const QString &mixedPluralString
+    , const QString &cameraSigularString
+    , const QString &cameraPluralString
+    , const QString &ioModuleSigularString
     , const QString &ioModulePluralString)
 {
     setString(Mixed,    false,  mixedSigularString);
@@ -162,7 +162,7 @@ QString QnDeviceDependentStrings::getNameFromSet(const QnCameraDeviceStringSet &
 
 QString QnDeviceDependentStrings::getNameFromSet(const QnCameraDeviceStringSet &set, const QnVirtualCameraResourcePtr &device) {
     return set.getString(
-        device 
+        device
         ? calculateDeviceType(QnVirtualCameraResourceList() << device)
         : calculateDefaultDeviceType()
     , false);

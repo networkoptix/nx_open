@@ -15,45 +15,6 @@ HTTPClient::HTTPClient(const QString& userAgent, const QUuid& localGuid):
 
 }
 
-QByteArray HTTPClient::createUserPasswordDigest(
-    const QString& userName,
-    const QString& password,
-    const QString& realm )
-{
-    QCryptographicHash md5(QCryptographicHash::Md5);
-    md5.addData(QStringLiteral("%1:%2:%3").arg(userName, realm, password).toLatin1());
-    return md5.result().toHex();
-}
-
-QByteArray HTTPClient::createHttpQueryAuthParam(
-    const QString& userName,
-    const QString& password,
-    const QString& realm,
-    const QByteArray& method,
-    QByteArray nonce )
-{
-    //calculating user digest
-    const QByteArray& ha1 = createUserPasswordDigest( userName.toLower(), password, realm );
-
-    //calculating "HA2"
-    QCryptographicHash md5Hash( QCryptographicHash::Md5 );
-    md5Hash.addData( method );
-    md5Hash.addData( ":" );
-    const QByteArray ha2Light = md5Hash.result().toHex();
-
-    //calculating auth digest
-    md5Hash.reset();
-    md5Hash.addData( ha1 );
-    md5Hash.addData( ":" );
-    md5Hash.addData( nonce );
-    md5Hash.addData( ":" );
-    md5Hash.addData( ha2Light );
-    const QByteArray& authDigest = md5Hash.result().toHex();
-
-    return (userName.toUtf8() + ":" + nonce + ":" + authDigest).toBase64();
-}
-
-
 Request HTTPClient::updateRequest(const Request& srcRequest)
 {
     Request request(srcRequest);

@@ -3,7 +3,7 @@
 #include "iflist_rest_handler.h"
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
-#include <utils/network/tcp_connection_priv.h>
+#include <network/tcp_connection_priv.h>
 #include <common/common_module.h>
 #include <utils/common/app_info.h>
 #include "utils/network/http/linesplitter.h"

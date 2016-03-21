@@ -11,7 +11,7 @@ protected:
                                     const QnResourcePtr& resource,
                                     qint64 timeStamp);
 public:
-    virtual bool checkCondition(QnBusiness::EventState state, const QnBusinessEventParameters &params, QnBusiness::ActionType actionType) const override;
+    virtual bool isEventStateMatched(QnBusiness::EventState state, QnBusiness::ActionType actionType) const override;
 };
 
 #endif // INSTANT_BUSINESS_EVENT_H

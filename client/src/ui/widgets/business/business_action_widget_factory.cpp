@@ -7,6 +7,10 @@
 #include <ui/widgets/business/popup_business_action_widget.h>
 #include <ui/widgets/business/play_sound_business_action_widget.h>
 #include <ui/widgets/business/say_text_business_action_widget.h>
+#include <ui/widgets/business/bookmark_business_action_widget.h>
+#include <ui/widgets/business/show_text_overlay_action_widget.h>
+#include <ui/widgets/business/show_on_alarm_layout_action_widget.h>
+#include <ui/widgets/business/ptz_preset_business_action_widget.h>
 
 QnAbstractBusinessParamsWidget* QnBusinessActionWidgetFactory::createWidget(QnBusiness::ActionType actionType, QWidget *parent) {
     switch (actionType) {
@@ -24,7 +28,17 @@ QnAbstractBusinessParamsWidget* QnBusinessActionWidgetFactory::createWidget(QnBu
         return new QnPlaySoundBusinessActionWidget(parent);
     case QnBusiness::SayTextAction:
         return new QnSayTextBusinessActionWidget(parent);
+    case QnBusiness::BookmarkAction:
+        return new QnBookmarkBusinessActionWidget(parent);
+    case QnBusiness::ExecutePtzPresetAction:
+        return new QnExecPtzPresetBusinessActionWidget(parent);
+    case QnBusiness::ShowTextOverlayAction:
+        return new QnShowTextOverlayActionWidget(parent);
+    case QnBusiness::ShowOnAlarmLayoutAction:
+        return new QnShowOnAlarmLayoutActionWidget(parent);
     default:
-        return new QnEmptyBusinessActionWidget(parent);
+        break;
     }
+
+    return new QnEmptyBusinessActionWidget(parent);
 }

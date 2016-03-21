@@ -24,13 +24,13 @@ public:
         QnCameraDeviceStringSet detailsRebootRestore(
             tr("Please try to reboot the device, then restore factory defaults on the web-page."),
             tr("Please try to reboot the camera, then restore factory defaults on the web-page."),
-            tr("Please try to reboot the IO module, then restore factory defaults on the web-page.")
+            tr("Please try to reboot the I/O module, then restore factory defaults on the web-page.")
             );
 
         QnCameraDeviceStringSet detailsPluggedReboot(
             tr("Make sure the device is plugged into the network. Try to reboot the device."),
             tr("Make sure the camera is plugged into the network. Try to reboot the camera."),
-            tr("Make sure the IO module is plugged into the network. Try to reboot the IO module.")
+            tr("Make sure the I/O module is plugged into the network. Try to reboot the I/O module.")
             );
 
         QString firmwareSupport = tr("Finally, try to update firmware. If the problem persists, please contact support.");
@@ -40,34 +40,34 @@ public:
         QStringList errorMessageParts;
         switch( val )
         {
-            case noError: 
+            case noError:
                 {
                     requiredParamCount = 0;
-                    errorMessageParts 
+                    errorMessageParts
                         << tr("OK");
                     break;
                 }
             case mediaServerUnavailable:
                 {
                     requiredParamCount = 1;
-                    errorMessageParts   
+                    errorMessageParts
                         << tr("Server %1 is not available.")
                         << tr("Check that Server is up and running.");
                     break;
                 }
-            case mediaServerBadResponse: 
+            case mediaServerBadResponse:
                 {
                     requiredParamCount = 2;
-                    errorMessageParts   
-                        << tr("Received bad response from Server %1: \"%2\".") 
+                    errorMessageParts
+                        << tr("Received bad response from Server %1: \"%2\".")
                         << tr("Check if Server is up and has the proper version.");
                     break;
                 }
             case cannotEstablishConnection:
                 {
                     requiredParamCount = 1;
-                    errorMessageParts   
-                        << tr("Cannot connect to http port %1.") 
+                    errorMessageParts
+                        << tr("Cannot connect to http port %1.")
                         << QnDeviceDependentStrings::getNameFromSet(detailsPluggedReboot, device);
                     break;
                 }
@@ -82,27 +82,27 @@ public:
             case connectionClosedUnexpectedly:
                 {
                     requiredParamCount = 2;
-                    errorMessageParts   
+                    errorMessageParts
                         << tr("Cannot open media url %1. Connection to port %2 was closed unexpectedly.")
                         << QnDeviceDependentStrings::getNameFromSet(detailsPluggedReboot, device);
                     break;
                 }
-            case responseParseError: 
+            case responseParseError:
                 {
                     requiredParamCount = 2;
                     QnCameraDeviceStringSet detailsBase(
                         tr("Could not parse device response. Url %1, request name %2."),
                         tr("Could not parse camera response. Url %1, request name %2."),
-                        tr("Could not parse IO module response. Url %1, request name %2.")
+                        tr("Could not parse I/O module response. Url %1, request name %2.")
                         );
 
-                    errorMessageParts   
+                    errorMessageParts
                         << QnDeviceDependentStrings::getNameFromSet(detailsBase, device)
                         << QnDeviceDependentStrings::getNameFromSet(detailsRebootRestore, device)
                         << firmwareSupport;
                     break;
                 }
-            case noMediaTrack: 
+            case noMediaTrack:
                 {
                     requiredParamCount = 1;
                     errorMessageParts   << tr("No supported media tracks at url %1.")
@@ -110,33 +110,33 @@ public:
                         << firmwareSupport;
                     break;
                 }
-            case notAuthorised: 
+            case notAuthorised:
                 {
                     requiredParamCount = 1;
                     errorMessageParts   << tr("Not authorized. Url %1.");
                     break;
                 }
-            case unsupportedProtocol: 
+            case unsupportedProtocol:
                 {
                     requiredParamCount = 2;
-                    errorMessageParts   
+                    errorMessageParts
                         << tr("Cannot open media url %1. Unsupported media protocol %2.")
                         << QnDeviceDependentStrings::getNameFromSet(detailsRebootRestore, device)
                         << firmwareSupport;
                     break;
                 }
-            case cannotConfigureMediaStream: 
+            case cannotConfigureMediaStream:
                 {
                     requiredParamCount = 1;
                     QnCameraDeviceStringSet detailsBase(
                         tr("First, try to turn on recording (if it's off) and decrease fps in device settings."),
                         tr("First, try to turn on recording (if it's off) and decrease fps in camera settings."),
-                        tr("First, try to turn on recording (if it's off) and decrease fps in IO module settings.")
+                        tr("First, try to turn on recording (if it's off) and decrease fps in I/O module settings.")
                         );
                     QnCameraDeviceStringSet detailsAdvanced(
                         tr("If it doesn't help, restore factory defaults on the device web-page."),
                         tr("If it doesn't help, restore factory defaults on the camera web-page."),
-                        tr("If it doesn't help, restore factory defaults on the IO module web-page.")
+                        tr("If it doesn't help, restore factory defaults on the I/O module web-page.")
                         );
 
                     errorMessageParts
@@ -146,13 +146,13 @@ public:
                         << firmwareSupport;
                     break;
                 }
-            case requestFailed: 
+            case requestFailed:
                 {
                     requiredParamCount = 2;
                     QnCameraDeviceStringSet detailsBase(
                         tr("Device request \"%1\" failed with error \"%2\"."),
                         tr("Camera request \"%1\" failed with error \"%2\"."),
-                        tr("IO Module request \"%1\" failed with error \"%2\".")
+                        tr("I/O Module request \"%1\" failed with error \"%2\".")
                         );
                     errorMessageParts
                         << QnDeviceDependentStrings::getNameFromSet(detailsBase, device)
@@ -160,44 +160,44 @@ public:
                         << firmwareSupport;
                     break;
                 }
-            case notImplemented: 
+            case notImplemented:
                 {
                     requiredParamCount = 0;
                     QnCameraDeviceStringSet details(
                         tr("Unknown device issue."),
                         tr("Unknown camera issue."),
-                        tr("Unknown IO module issue.")
+                        tr("Unknown I/O module issue.")
                         );
 
-                    errorMessageParts 
+                    errorMessageParts
                         << QnDeviceDependentStrings::getNameFromSet(details, device)
                         << tr("Please contact support.");
                     break;
                 }
-            case ioError: 
+            case ioError:
                 {
                     requiredParamCount = 1;
-                    errorMessageParts   
+                    errorMessageParts
                         << tr("An input/output error has occurred. OS message: \"%1\".")
                         << QnDeviceDependentStrings::getNameFromSet(detailsPluggedReboot, device);
                     break;
                 }
-            case serverTerminated: 
+            case serverTerminated:
                 {
                     requiredParamCount = 0;
                     errorMessageParts   << tr("Server has been stopped.");
                     break;
                 }
-            case cameraInvalidParams: 
+            case cameraInvalidParams:
                 {
                     requiredParamCount = 1;
                     QnCameraDeviceStringSet details(
                         tr("Invalid data was received from the device %1."),
                         tr("Invalid data was received from the camera %1."),
-                        tr("Invalid data was received from the IO module %1.")
+                        tr("Invalid data was received from the I/O module %1.")
                         );
 
-                    errorMessageParts 
+                    errorMessageParts
                         << QnDeviceDependentStrings::getNameFromSet(details, device);
                     break;
                 }
@@ -207,33 +207,39 @@ public:
                     QnCameraDeviceStringSet details(
                         tr("Too many media errors. Please open device issues dialog for more details."),
                         tr("Too many media errors. Please open camera issues dialog for more details."),
-                        tr("Too many media errors. Please open IO module issues dialog for more details.")
+                        tr("Too many media errors. Please open I/O module issues dialog for more details.")
                         );
 
-                    errorMessageParts 
+                    errorMessageParts
                         << QnDeviceDependentStrings::getNameFromSet(details, device);
                     break;
                 }
-            case noMediaStream: 
+            case noMediaStream:
                 {
                     requiredParamCount = 0;
-                    errorMessageParts 
+                    errorMessageParts
                         << tr("Media stream is opened but no media data was received.");
                     break;
                 }
-            case cameraInitializationInProgress: 
+            case cameraInitializationInProgress:
                 {
                     requiredParamCount = 0;
                     QnCameraDeviceStringSet details(
-                        tr("Device initialization process in progress."),
-                        tr("Camera initialization process in progress."),
-                        tr("IO Module initialization process in progress.")
+                        tr("Device initialization process is in progress."),
+                        tr("Camera initialization process is in progress."),
+                        tr("I/O Module initialization process is in progress.")
                         );
 
-                    errorMessageParts 
+                    errorMessageParts
                         << QnDeviceDependentStrings::getNameFromSet(details, device);
                     break;
-                }
+				}
+            case cameraPluginError:
+				{
+	                requiredParamCount = 1;
+    	            errorMessageParts   << tr("Camera plugin error. %1");
+					break;
+				}
             default:
             {
                 int nonEmptyParamCount = 0;
@@ -248,7 +254,7 @@ public:
                 errorMessageParts << tr("Unknown error. Please contact support.");
                 if( nonEmptyParamCount ) {
                     QString params = tr("Parameters:");
-                    
+
                     for( int i = 0; i < nonEmptyParamCount; ++i )
                     {
                         if( i > 0 )

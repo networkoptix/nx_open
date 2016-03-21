@@ -9,28 +9,29 @@
     <parent>
         <artifactId>cpp</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>2.4.1-SNAPSHOT</version>
+        <version>2.5.0-SNAPSHOT</version>
         <relativePath>../cpp</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>2.4.1-SNAPSHOT</version>
+    <version>2.5.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>mediaserver_core</artifactId>
     <packaging>pom</packaging>
     <name>HD Witness Media Server Core</name>
 
     <properties>
-        <release.version>${parsedVersion.majorVersion}${parsedVersion.minorVersion}${parsedVersion.incrementalVersion}</release.version>
+        <guid>${mediaserver_core.guid}</guid>
         <product.title>${mediaserver.name}</product.title>
         <product.display.title>${mediaserver.display.name}</product.display.title>
         <template>app</template>
         <!--Global libs-->
         <qt.libs>core network xml xmlpatterns sql concurrent multimedia</qt.libs>
-        <global.libs>-lcommon -lappserver2 -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lswresample -lpostproc -lonvif -lquazip</global.libs>
+        <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lswresample -lpostproc</ffmpeg.libs>
+        <global.libs>-lcommon -lappserver2 -lonvif -lquazip -lnxemail</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>Ws2_32.lib DbgHelp.lib sigar.lib -lIphlpapi -lwinmm -lssleay32 -llibeay32</windows.oslibs>
-        <linux.oslibs>-lmp3lame -lssl -lcrypto -lsigar -lfaac -lvpx -lvorbisenc -lvorbis -ldl</linux.oslibs>
+        <linux.oslibs>-lmp3lame -lssl -lcrypto -lsigar -lfaac -lvpx -lvorbisenc -lvorbis -ldl -lssl</linux.oslibs>
         <linux.arm.oslibs>-lssl -lcrypto -lsigar</linux.arm.oslibs>
         <windows.oslibs.release/>
         <windows.oslibs.debug/>
@@ -50,16 +51,17 @@
             <artifactId>nx_sdk</artifactId>
             <version>${project.version}</version>
             <type>zip</type>
-            <classifier>archive</classifier>
+            <scope>system</scope>
+            <systemPath>${root.dir}/nx_sdk/nx_sdk/vms-archive.zip</systemPath>            
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>nx_storage_sdk</artifactId>
             <version>${project.version}</version>
             <type>zip</type>
-            <classifier>archive</classifier>
+            <scope>system</scope>
+            <systemPath>${root.dir}/nx_storage_sdk/nx_storage_sdk/vms-archive.zip</systemPath>
         </dependency>
-
 
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -121,30 +123,34 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>2.6</version>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.1.1</version>
                 <executions>
-                    <execution>
-                        <id>copy-mediaserver-resources</id>
-                        <phase>${resources.phase}</phase>
+                     <execution>
+                        <id>gen-api-xml</id>
+                        <phase>generate-sources</phase>
                         <goals>
-                            <goal>copy-resources</goal>
+                            <goal>exec</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/resources/static</outputDirectory>
-                            <overwrite>true</overwrite>
-                            <resources>
-                                <resource>
-                                    <directory>${root.dir}/webadmin</directory>
-                                    <filtering>true</filtering>
-                                </resource>
-                            </resources>
+                            <executable>java</executable>
+                            <arguments>
+                                <argument>-jar</argument>
+                                <argument>${environment.dir}/bin/apidoctool.jar</argument>
+                                <argument>code-to-xml</argument>
+                                <argument>-vms-path</argument>
+                                <argument>${root.dir}</argument>
+                                <argument>-template-xml</argument>
+                                <argument>${root.dir}/mediaserver_core/api/api_template.xml</argument>                                
+                                <argument>-output-xml</argument>
+                                <argument>${project.build.directory}/additional-resources/static/api.xml</argument>
+                            </arguments>
                         </configuration>
-                    </execution>
+                    </execution>                 
                 </executions>
-            </plugin> -->
+            </plugin>
         </plugins>
     </build>
 

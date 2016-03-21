@@ -10,14 +10,14 @@
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_history.h>
-#include <core/resource/network_resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <http/custom_headers.h>
 #include <utils/common/log.h>
 #include <utils/common/string.h>
 #include <utils/fs/file.h>
 #include <utils/network/rtsp/rtsp_types.h>
-#include <utils/network/rtpsession.h>
+#include <network/rtpsession.h>
 
 #include "streaming/streaming_params.h"
 
@@ -26,6 +26,13 @@ static const qint64 USEC_PER_MS = 1000;
 
 void QnAutoRequestForwarder::processRequest( nx_http::Request* const request )
 {
+    const auto allowedMethods = m_restrictionList.getAllowedAuthMethods(*request);
+    //TODO #ak AuthMethod::videowall is used here to imply existing class 
+        //QnAuthMethodRestrictionList with no change, since release 2.5 is coming.
+        //Proper types will be introduced in 2.6
+    if (!(allowedMethods & AuthMethod::videowall))
+        return; //not processing url
+
     const QUrlQuery urlQuery( request->requestLine.url.query() );
 
     if( urlQuery.hasQueryItem( Qn::SERVER_GUID_HEADER_NAME ) ||
@@ -62,12 +69,11 @@ void QnAutoRequestForwarder::processRequest( nx_http::Request* const request )
             if( timestampMs != -1 )
             {
                 //searching server for timestamp
-                QnCameraHistoryPtr history =
-                    QnCameraHistoryPool::instance()->getCameraHistory( cameraRes );
-                if( history )
+                QnVirtualCameraResourcePtr virtualCameraRes = cameraRes.dynamicCast<QnVirtualCameraResource>();
+                if( virtualCameraRes )
                 {
                     QnMediaServerResourcePtr mediaServer = 
-                        history->getMediaServerOnTime( timestampMs, false );
+                        qnCameraHistoryPool->getMediaServerOnTimeSync( virtualCameraRes, timestampMs );
                     if( mediaServer )
                         serverRes = mediaServer;
                 }
@@ -85,6 +91,11 @@ void QnAutoRequestForwarder::processRequest( nx_http::Request* const request )
             Qn::SERVER_GUID_HEADER_NAME,
             serverRes->getId().toByteArray() );
     }
+}
+
+void QnAutoRequestForwarder::addPathToIgnore(const QString& pathWildcardMask)
+{
+    m_restrictionList.deny(pathWildcardMask, AuthMethod::videowall);
 }
 
 bool QnAutoRequestForwarder::findCameraGuid(

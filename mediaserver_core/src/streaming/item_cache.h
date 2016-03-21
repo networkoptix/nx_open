@@ -9,8 +9,8 @@
 #include <memory>
 
 #include <QCache>
-#include <QMutex>
-#include <QMutexLocker>
+
+#include <utils/thread/mutex.h>
 
 
 template<class KeyType, class CachedType>
@@ -77,7 +77,7 @@ public:
     */
     bool insert( const KeyType& key, const CachedType& item, unsigned int cost = 1 ) throw()
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         return insertNonSafe( key, item, cost );
     }
 
@@ -89,7 +89,7 @@ public:
     */
     bool get( const KeyType& key, CachedType* const item ) throw()
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 
         CacheItemData* itemData = m_cache.object( key );
         if( itemData )
@@ -120,7 +120,7 @@ public:
     */
     bool remove( const KeyType& key ) throw()
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 
         if( m_usedItems.find( key ) != m_usedItems.end() )
             return false;   //item exists and is used, cannot remove it
@@ -131,7 +131,7 @@ public:
 
     unsigned int totalCost() const throw()
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 
         return m_cache.totalCost() + m_usedItemsTotalCost;
     }
@@ -141,7 +141,7 @@ public:
     */
     bool takeForUse( const KeyType& key, CachedType* const item ) throw()
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 
         typename std::map<KeyType, CacheItemData*>::iterator usedItemIter = m_usedItems.find( key );
         if( usedItemIter != m_usedItems.end() )
@@ -194,7 +194,7 @@ public:
     */
     bool putBackUsedItem( const KeyType& key, const CachedType& /*item*/ ) throw()
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 
         typename std::map<KeyType, CacheItemData*>::iterator usedItemIter = m_usedItems.find( key );
         if( usedItemIter == m_usedItems.end() )
@@ -227,7 +227,7 @@ public:
 
     const std::unique_ptr<ItemProviderType>& itemProvider() const
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         return m_itemProvider;
     }
 
@@ -261,7 +261,7 @@ private:
     std::map<KeyType, CacheItemData*> m_usedItems;
     std::unique_ptr<ItemProviderType> m_itemProvider;
     qint64 m_usedItemsTotalCost;
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     const qint64 m_maxCost;
 
     bool insertNonSafe( const KeyType& key, const CachedType& item, unsigned int cost = 1 ) throw()

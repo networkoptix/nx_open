@@ -22,6 +22,7 @@ struct QnStartupParameters
     bool softwareYuv;
     bool forceLocalSettings;
     bool fullScreenDisabled;
+    bool showFullInfo;
 
     QString devModeKey;
     QString authenticationString;
@@ -35,4 +36,7 @@ struct QnStartupParameters
     QnUuid videoWallItemGuid;
     QString engineVersion;
     QString dynamicCustomizationPath;
+
+    /** Uri when the client was launched as uri handler. */
+    QString customUri;
 };

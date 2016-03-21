@@ -79,7 +79,7 @@ void QnSyncPlayArchiveDelegate::jumpTo (qint64 time)
 
 qint64 QnSyncPlayArchiveDelegate::seek (qint64 time, bool findIFrame)
 {
-    //QMutexLocker lock(&m_mutex);
+    //QnMutexLocker lock( &m_mutex );
     //m_nextData.clear();
     return m_ownerDelegate->seek(time, findIFrame);
 }
@@ -149,4 +149,9 @@ void QnSyncPlayArchiveDelegate::setSendMotion(bool value)
 QnAbstractArchiveDelegate::ArchiveChunkInfo QnSyncPlayArchiveDelegate::getLastUsedChunkInfo() const
 {
     return m_ownerDelegate->getLastUsedChunkInfo();
+}
+
+bool QnSyncPlayArchiveDelegate::hasVideo() const
+{
+    return m_ownerDelegate->hasVideo();
 }

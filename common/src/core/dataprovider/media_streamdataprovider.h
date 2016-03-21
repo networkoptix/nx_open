@@ -6,7 +6,6 @@
 #include <QtCore/QSharedPointer>
 #include "core/dataprovider/statistics.h"
 #include "abstract_streamdataprovider.h"
-#include "../datapacket/media_data_packet.h"
 #include "utils/camera/camera_diagnostics.h"
 
 class QnResourceVideoLayout;
@@ -24,9 +23,11 @@ public:
     explicit QnAbstractMediaStreamDataProvider( const QnResourcePtr& res );
     virtual ~QnAbstractMediaStreamDataProvider();
 
-
     const QnStatistics* getStatistics(int channel) const;
+    int getNumberOfChannels() const;
     float getBitrateMbps() const;
+    float getFrameRate() const;
+    float getAverageGopSize() const;
 
     virtual void setNeedKeyData();
     virtual bool needKeyData(int channel) const;
@@ -42,8 +43,8 @@ public:
     virtual CameraDiagnostics::Result diagnoseMediaStreamConnection();
 
     virtual bool hasThread() const { return true; }
-protected:
 
+protected:
     virtual void sleepIfNeeded() {}
 
     virtual void beforeRun();

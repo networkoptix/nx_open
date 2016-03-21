@@ -1,6 +1,6 @@
 #include "backup_db_rest_handler.h"
 
-#include "utils/network/tcp_connection_priv.h"
+#include "network/tcp_connection_priv.h"
 #include "media_server/serverutil.h"
 
 int QnBackupDbRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) 

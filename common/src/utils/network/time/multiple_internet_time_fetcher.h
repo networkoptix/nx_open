@@ -11,7 +11,7 @@
 #include <memory>
 #include <vector>
 
-#include <QtCore/QMutex>
+#include <utils/thread/mutex.h>
 
 
 //!Fetches time from multiple time fetchers. If all succeeded than returns mean value
@@ -58,7 +58,7 @@ private:
 
     qint64 m_maxDeviationMillis;
     std::vector<std::unique_ptr<TimeFetcherContext>> m_timeFetchers;
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     size_t m_awaitedAnswers;
     bool m_terminated;
     std::function<void(qint64, SystemError::ErrorCode)> m_handlerFunc;

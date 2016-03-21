@@ -19,7 +19,16 @@
 #include <utils/media/audio_player.h>
 #include <utils/image_provider.h>
 
-namespace {
+#include <utils/common/model_functions.h>
+
+namespace
+{
+    QString getFullAlias(const QString &postfix)
+    {
+        static const auto kNotificationWidgetAlias = lit("notification_widget");
+        return lit("%1_%2").arg(kNotificationWidgetAlias, postfix);
+    };
+
     const char *actionIndexPropertyName = "_qn_actionIndex";
 
     const qreal margin = 4.0;
@@ -44,7 +53,8 @@ QnNotificationToolTipWidget::QnNotificationToolTipWidget(QGraphicsItem *parent):
     m_textLabel->setWordWrap(true);
     setPaletteColor(m_textLabel, QPalette::Window, Qt::transparent);
 
-    QnImageButtonWidget *closeButton = new QnImageButtonWidget(this);
+    QnImageButtonWidget *closeButton = new QnImageButtonWidget(
+        getFullAlias(lit("close")), this);
     closeButton->setCached(true);
     closeButton->setToolTip(lit("%1 (<b>%2</b>)").arg(tr("Close")).arg(tr("Right Click")));
     closeButton->setIcon(qnSkin->icon("titlebar/exit.png")); // TODO: #dklychkov
@@ -72,16 +82,18 @@ void QnNotificationToolTipWidget::ensureThumbnail(QnImageProvider* provider) {
     m_thumbnailLabel->setAlignment(Qt::AlignCenter);
     m_thumbnailLabel->setClickableButtons(Qt::LeftButton | Qt::RightButton);
     setPaletteColor(m_thumbnailLabel, QPalette::Window, Qt::transparent);
-    m_layout->insertItem(0, m_thumbnailLabel);
+    m_layout->addItem(m_thumbnailLabel);
     connect(m_thumbnailLabel, SIGNAL(clicked(Qt::MouseButton)), this, SLOT(at_thumbnailLabel_clicked(Qt::MouseButton)));
 
     if (!provider->image().isNull()) {
         m_thumbnailLabel->setPixmap(QPixmap::fromImage(provider->image()));
     } else {
         m_thumbnailLabel->setPixmap(qnSkin->pixmap("events/thumb_loading.png"));
-        connect(provider, SIGNAL(imageChanged(const QImage &)), this, SLOT(at_provider_imageChanged(const QImage &)));
-        provider->loadAsync();
     }
+    connect(provider, &QnImageProvider::imageChanged, this, [this](const QImage &image) {
+        m_thumbnailLabel->setPixmap(QPixmap::fromImage(image));
+    });
+    provider->loadAsync();
 }
 
 QString QnNotificationToolTipWidget::text() const {
@@ -144,24 +156,17 @@ void QnNotificationToolTipWidget::at_thumbnailLabel_clicked(Qt::MouseButton butt
     }
 }
 
-void QnNotificationToolTipWidget::at_provider_imageChanged(const QImage &image) {
-    if (!m_thumbnailLabel)
-        return;
-    m_thumbnailLabel->setPixmap(QPixmap::fromImage(image));
-}
-
-
 // -------------------------------------------------------------------------- //
 // QnNotificationWidget
 // -------------------------------------------------------------------------- //
 QnNotificationWidget::QnNotificationWidget(QGraphicsItem *parent, Qt::WindowFlags flags) :
     base_type(parent, flags),
     m_defaultActionIdx(-1),
-    m_notificationLevel(Qn::OtherNotification),
+    m_notificationLevel(QnNotificationLevel::Value::OtherNotification),
     m_imageProvider(NULL),
     m_inToolTipPositionUpdate(false)
 {
-    m_color = QnNotificationLevels::notificationColor(m_notificationLevel);
+    m_color = QnNotificationLevel::notificationColor(m_notificationLevel);
 
     setClickableButtons(Qt::RightButton | Qt::LeftButton);
     setFrameColor(QColor(110, 110, 110, 128)); // TODO: Same as in workbench_ui. Unify?
@@ -242,16 +247,16 @@ void QnNotificationWidget::setSound(const QString &soundPath, bool loop) {
         AudioPlayer::playFileAsync(soundPath);
 }
 
-Qn::NotificationLevel QnNotificationWidget::notificationLevel() const {
+QnNotificationLevel::Value QnNotificationWidget::notificationLevel() const {
     return m_notificationLevel;
 }
 
-void QnNotificationWidget::setNotificationLevel(Qn::NotificationLevel notificationLevel) {
+void QnNotificationWidget::setNotificationLevel(QnNotificationLevel::Value notificationLevel) {
     if(m_notificationLevel == notificationLevel)
         return;
 
     m_notificationLevel = notificationLevel;
-    m_color = QnNotificationLevels::notificationColor(m_notificationLevel);
+    m_color = QnNotificationLevel::notificationColor(m_notificationLevel);
 
     updateOverlayColor();
 
@@ -275,12 +280,13 @@ void QnNotificationWidget::setGeometry(const QRectF &geometry) {
         updateOverlayGeometry();
 }
 
-void QnNotificationWidget::addActionButton(const QIcon &icon, const QString &tooltip, Qn::ActionId actionId,
+void QnNotificationWidget::addActionButton(const QIcon &icon, const QString &tooltip, QnActions::IDType actionId,
                                          const QnActionParameters &parameters, bool defaultAction)
 {
     qreal buttonSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, NULL, NULL);
 
-    QnImageButtonWidget *button = new QnImageButtonWidget(this);
+    QnImageButtonWidget *button = new QnImageButtonWidget(
+        getFullAlias(QnLexical::serialized(actionId)), this);
 
     button->setIcon(icon);
     button->setToolTip(tooltip);

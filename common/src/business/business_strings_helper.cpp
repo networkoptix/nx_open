@@ -33,8 +33,6 @@ namespace {
 QString QnBusinessStringsHelper::actionName(QnBusiness::ActionType value) {
     using namespace QnBusiness;
 
-    /* Do not use 'default' keyword! 
-     * Warning should be raised on unknown enumeration values. */
     switch(value) {
     case UndefinedAction:           return QString();
     case CameraOutputAction:        return QnDeviceDependentStrings::getDefaultNameFromSet(
@@ -57,8 +55,16 @@ QString QnBusinessStringsHelper::actionName(QnBusiness::ActionType value) {
     case PlaySoundAction:           return tr("Repeat sound");
     case PlaySoundOnceAction:       return tr("Play sound");
     case SayTextAction:             return tr("Speak");
-    default:                        return tr("Unknown (%1)").arg(static_cast<int>(value));
+    case ExecutePtzPresetAction:    return tr("Execute PTZ preset");
+    case ShowTextOverlayAction:     return tr("Show text overlay");
+    case ShowOnAlarmLayoutAction:   return tr("Show on Alarm Layout");
+
+    default:
+        break;
     }
+
+    Q_ASSERT_X(false, Q_FUNC_INFO, "All enumeration values must be handled here");
+    return tr("Unknown (%1)").arg(static_cast<int>(value));
 }
 
 QString QnBusinessStringsHelper::eventName(QnBusiness::EventType value) {
@@ -96,6 +102,7 @@ QString QnBusinessStringsHelper::eventName(QnBusiness::EventType value) {
     case ServerConflictEvent:   return tr("Server Conflict");
     case ServerStartEvent:      return tr("Server Started");
     case LicenseIssueEvent:     return tr("License Issue");
+    case BackupFinishedEvent:   return tr("Archive backup finished");
 
     case AnyServerEvent:        return tr("Any Server Issue");
     case AnyBusinessEvent:      return tr("Any Event");
@@ -119,7 +126,7 @@ QString QnBusinessStringsHelper::eventAtResource(const QnBusinessEventParameters
             QnCameraDeviceStringSet(
                 tr("Device %1 was disconnected"),
                 tr("Camera %1 was disconnected"),
-                tr("IO Module %1 was disconnected")
+                tr("I/O Module %1 was disconnected")
             ), camera
         ).arg(resourceName);
 
@@ -138,9 +145,9 @@ QString QnBusinessStringsHelper::eventAtResource(const QnBusinessEventParameters
     case ServerFailureEvent:
         return tr("Server \"%1\" Failure").arg(resourceName);
 
-    case CameraIpConflictEvent:       
+    case CameraIpConflictEvent:
         return QnDeviceDependentStrings::getDefaultNameFromSet(
-            //: Device IP Conflict at <server_name>
+    		//: Device IP Conflict at <server_name>
             tr("Device IP Conflict at %1"),
 
             //: Camera IP Conflict at <server_name>
@@ -154,9 +161,12 @@ QString QnBusinessStringsHelper::eventAtResource(const QnBusinessEventParameters
         return tr("Server \"%1\" Started").arg(resourceName);
     case LicenseIssueEvent:
         return tr("Server \'%1\' has a license problem").arg(resourceName);
+    case BackupFinishedEvent:
+        return tr("Server \'%1\' has finished an archive backup").arg(resourceName);
     case UserDefinedEvent:
-        return !params.caption.isEmpty() ? params.caption :
-               !params.description.isEmpty() ? params.description : resourceName;
+        return (!params.caption.isEmpty() ? params.caption
+            : (params.resourceName.isEmpty() ? tr("Generic Event")
+                : tr("Generic Event at %1").arg(params.resourceName)));
     default:
         break;
     }
@@ -166,6 +176,12 @@ QString QnBusinessStringsHelper::eventAtResource(const QnBusinessEventParameters
 QString QnBusinessStringsHelper::eventAtResources(const QnBusinessEventParameters &params, int /*resourceCount*/)
 {
     return lit("Multiple %1 events have occured").arg(eventName(params.eventType));
+}
+
+QString QnBusinessStringsHelper::getResoureNameFromParams(const QnBusinessEventParameters& params, bool useIp)
+{
+    QString result = getFullResourceName(eventSource(params), useIp);
+    return result.isNull() ? params.resourceName : result;
 }
 
 QString QnBusinessStringsHelper::eventDescription(const QnAbstractBusinessActionPtr& action, const QnBusinessAggregationInfo &aggregationInfo, bool useIp, bool useHtml) {
@@ -180,9 +196,7 @@ QString QnBusinessStringsHelper::eventDescription(const QnAbstractBusinessAction
     QString result;
     result += tr("Event: %1").arg(eventName(eventType));
 
-    QString sourceText = getFullResourceName(eventSource(params), useIp);
-    if (sourceText.isNull())
-        sourceText = params.resourceName;
+    QString sourceText = getResoureNameFromParams(params, useIp);
     if (!sourceText.isEmpty()) {
         result += delimiter;
         result += tr("Source: %1").arg(sourceText);
@@ -207,30 +221,30 @@ QString QnBusinessStringsHelper::eventDescription(const QnAbstractBusinessAction
 }
 
 QString QnBusinessStringsHelper::eventDetailsWithTimestamp(const QnBusinessEventParameters &params, int aggregationCount, const QString& delimiter) {
-    return eventTimestamp(params, aggregationCount) + delimiter + eventDetails(params, aggregationCount, delimiter);
+    return eventTimestamp(params, aggregationCount) + delimiter + eventDetails(params, delimiter);
 }
 
-QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &params, int aggregationCount, const QString& delimiter) {
+QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &params, const QString& delimiter) {
     using namespace QnBusiness;
 
-    Q_UNUSED(aggregationCount)
     QString result;
 
     switch (params.eventType) {
     case CameraInputEvent: {
-        result = tr("Input port: %1").arg(params.inputPortId);
+        result = tr("Input Port: %1").arg(params.inputPortId);
         break;
     }
     case StorageFailureEvent:
     case NetworkIssueEvent:
-    case ServerFailureEvent: 
+    case ServerFailureEvent:
     case LicenseIssueEvent:
+    case BackupFinishedEvent:
     {
         result += tr("Reason: %1").arg(eventReason(params));
         break;
     }
     case CameraIpConflictEvent: {
-        result += tr("Conflict Address: %1").arg(params.caption);
+        result += tr("Conflicting Address: %1").arg(params.caption);
         result += delimiter;
         int n = 0;
         for (const QString& mac: params.description.split(QnIPConflictBusinessEvent::Delimiter)) {
@@ -263,10 +277,10 @@ QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &p
         }
         break;
     }
-    case ServerStartEvent: 
+    case ServerStartEvent:
         break;
     case UserDefinedEvent:
-        result += !params.description.isEmpty() ? params.description : params.caption;
+        result += params.description;
         break;
     default:
         break;
@@ -306,14 +320,14 @@ QString QnBusinessStringsHelper::eventTimestamp(const QnBusinessEventParameters 
 
 QnResourcePtr QnBusinessStringsHelper::eventSource(const QnBusinessEventParameters &params) {
     QnUuid id = params.eventResourceId;
-    return !id.isNull() 
-        ? qnResPool->getResourceById(id) 
+    return !id.isNull()
+        ? qnResPool->getResourceById(id)
         : QnResourcePtr();
 }
 
 QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& params) {
     using namespace QnBusiness;
-    
+
     QString reasonParamsEncoded = params.description;
 
     QString result;
@@ -327,7 +341,7 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
         bool isPrimaryStream = QnNetworkIssueBusinessEvent::decodePrimaryStream(reasonParamsEncoded, true);
 
         QnVirtualCameraResourcePtr camera = eventSource(params).dynamicCast<QnVirtualCameraResource>();
-        if (!camera->hasVideo(nullptr))
+        if (camera && !camera->hasVideo(nullptr))
             result = tr("Connection to device was unexpectedly closed.");
         else if (isPrimaryStream)
             result = tr("Connection to camera (primary stream) was unexpectedly closed.");
@@ -366,18 +380,56 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
         result = tr("HDD/SSD disk %1 is full. Disk contains too much data that is not managed by VMS.").arg(storageUrl);
         break;
     }
+    case BackupFailedNoBackupStorageError: {
+        result = tr("Archive backup failed: No available backup storages with sufficient free space");
+        break;
+    }
+    case BackupFailedSourceStorageError: {
+        result = tr("Archive backup failed: Target storage failure");
+        break;
+    }
+    case BackupFailedSourceFileError: {
+        result = tr("Archive backup failed: Source file open/read error");
+        break;
+    }
+    case BackupFailedTargetFileError: {
+        result = tr("Archive backup failed: Target file create/write error");
+        break;
+    }
+    case BackupFailedChunkError: {
+        result = tr("Archive backup failed: File catalog error");
+        break;
+    }
+    case BackupEndOfPeriod: {
+        qint64 timeStampMs = params.description.toLongLong();
+        QDateTime dt = QDateTime::fromMSecsSinceEpoch(timeStampMs);
+        // todo: #gdm add server/client timezone conversion
+        result = tr("Archive backup finished, but isn't fully completed because backup time is over. Data is backed up to %1").arg(dt.toString(Qt::DefaultLocaleShortDate));
+    }
+    case BackupDone: {
+        result = tr("Archive backup is successfully completed");
+        break;
+    }
+    case BackupCancelled: {
+        qint64 timeStampMs = params.description.toLongLong();
+        QDateTime dt = QDateTime::fromMSecsSinceEpoch(timeStampMs);
+        // todo: #gdm add server/client timezone conversion
+        result = tr("Archive backup is canceled by user. Data is backed up to %1").arg(dt.toString(Qt::DefaultLocaleShortDate));
+        break;
+    }
+
     case LicenseRemoved: {
         QnVirtualCameraResourceList disabledCameras;
         for (const QString &id: reasonParamsEncoded.split(L';'))
-            if (const QnVirtualCameraResourcePtr &camera = qnResPool->getResourceById<QnVirtualCameraResource>(QnUuid(id))) 
+            if (const QnVirtualCameraResourcePtr &camera = qnResPool->getResourceById<QnVirtualCameraResource>(QnUuid(id)))
                 disabledCameras << camera;
         Q_ASSERT_X(!disabledCameras.isEmpty(), Q_FUNC_INFO, "At least one camera should be disabled on this event");
-       
+
         result = QnDeviceDependentStrings::getNameFromSet(
                 QnCameraDeviceStringSet(
                     tr("Recording on devices is disabled:"),
                     tr("Recording on cameras is disabled:"),
-                    tr("Recording on IO modules is disabled:")
+                    tr("Recording on I/O modules is disabled:")
                 ),
                 disabledCameras
             );
@@ -410,26 +462,26 @@ QString QnBusinessStringsHelper::aggregatedEventDetails(const QnAbstractBusiness
 }
 
 QString QnBusinessStringsHelper::urlForCamera(const QnUuid& id, qint64 timestampUsec, bool isPublic) {
-    QnNetworkResourcePtr res = !id.isNull() ? 
-                            qnResPool->getResourceById<QnNetworkResource>(id) : 
+    QnNetworkResourcePtr res = !id.isNull() ?
+                            qnResPool->getResourceById<QnNetworkResource>(id) :
                             QnNetworkResourcePtr();
-    if (!res)
+    if (id.isNull())
         return QString();
 
-    QnMediaServerResourcePtr mserverRes = res->getParentResource().dynamicCast<QnMediaServerResource>();
+    QnVirtualCameraResourcePtr camera = qnResPool->getResourceById<QnVirtualCameraResource>(id);
+    if (!camera)
+        return QString();
+
+    QnMediaServerResourcePtr mserverRes = camera->getParentServer();
     if (!mserverRes)
         return QString();
 
+	quint64 timeStampMs = timestampUsec / 1000;
+    QnMediaServerResourcePtr newServer = qnCameraHistoryPool->getMediaServerOnTime(camera, timeStampMs);
+    if (newServer)
+        mserverRes = newServer;
+
     QUrl appServerUrl = QnAppServerConnectionFactory::url();
-    quint64 timeStampMSec = timestampUsec / 1000;
-
-    QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(res);
-    if (history) {
-        QnMediaServerResourcePtr newServer = history->getMediaServerOnTime(timeStampMSec, false);
-        if (newServer)
-            mserverRes = newServer;
-    }
-
     if (appServerUrl.host().isEmpty() || resolveAddress(appServerUrl.host()) == QHostAddress::LocalHost) {
         appServerUrl = mserverRes->getApiUrl();
         if (isPublic) {
@@ -444,7 +496,7 @@ QString QnBusinessStringsHelper::urlForCamera(const QnUuid& id, qint64 timestamp
     }
 
     QString result(lit("http://%1:%2/static/index.html#/view/%3?time=%4"));
-    result = result.arg(appServerUrl.host()).arg(appServerUrl.port(80)).arg(res->getUniqueId()).arg(timeStampMSec);
+    result = result.arg(appServerUrl.host()).arg(appServerUrl.port(80)).arg(camera->getUniqueId()).arg(timeStampMs);
 
     return result;
 }
@@ -463,10 +515,14 @@ QString QnBusinessStringsHelper::toggleStateToString(QnBusiness::EventState stat
     return QString();
 }
 
-QString QnBusinessStringsHelper::eventTypeString(QnBusiness::EventType eventType, QnBusiness::EventState eventState, QnBusiness::ActionType actionType) 
+QString QnBusinessStringsHelper::eventTypeString(
+        QnBusiness::EventType eventType,
+        QnBusiness::EventState eventState,
+        QnBusiness::ActionType actionType,
+        const QnBusinessActionParameters &actionParams)
 {
     QString typeStr = QnBusinessStringsHelper::eventName(eventType);
-    if (QnBusiness::hasToggleState(actionType))
+    if (QnBusiness::isActionProlonged(actionType, actionParams))
         return tr("While %1").arg(typeStr);
     else
         return tr("On %1 %2").arg(typeStr).arg(toggleStateToString(eventState));
@@ -475,6 +531,6 @@ QString QnBusinessStringsHelper::eventTypeString(QnBusiness::EventType eventType
 
 QString QnBusinessStringsHelper::bruleDescriptionText(const QnBusinessEventRulePtr& bRule)
 {
-    QString eventString = eventTypeString(bRule->eventType(), bRule->eventState(), bRule->actionType());
+    QString eventString = eventTypeString(bRule->eventType(), bRule->eventState(), bRule->actionType(), bRule->actionParams());
     return tr("%1 --> %2").arg(eventString).arg(actionName(bRule->actionType()));
 }

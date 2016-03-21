@@ -29,7 +29,7 @@
 #include <ui/dialogs/custom_file_dialog.h>
 #include <ui/dialogs/progress_dialog.h>
 #include <ui/dialogs/workbench_state_dependent_dialog.h>
-
+#include <ui/dialogs/message_box.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
@@ -56,9 +56,9 @@ namespace {
 }
 
 QnScreenshotParameters::QnScreenshotParameters():
-    timestampMsec(0),
+    utcTimestampMsec(0),
     isUtc(false),
-    adjustedTimeMsec(0),
+    displayTimeMsec(0),
     filename(),
     timestampPosition(Qn::BottomRightCorner),
     itemDewarpingParams(),
@@ -70,10 +70,10 @@ QnScreenshotParameters::QnScreenshotParameters():
 {}
 
 QString QnScreenshotParameters::timeString() const {
-    if (timestampMsec == latestScreenshotTime)
+    if (utcTimestampMsec == latestScreenshotTime)
         return QDateTime::currentDateTime().toString(lit("hh.mm.ss"));
 
-    qint64 timeMSecs = adjustedTimeMsec;
+    qint64 timeMSecs = displayTimeMsec;
     if (isUtc)
         return datetimeSaveDialogSuggestion(QDateTime::fromMSecsSinceEpoch(timeMSecs));
     return QTime(0, 0, 0, 0).addMSecs(timeMSecs).toString(lit("hh.mm.ss"));
@@ -139,21 +139,21 @@ void QnScreenshotLoader::at_imageLoaded(const QImage &image) {
 // -------------------------------------------------------------------------- //
 // QnWorkbenchScreenshotHandler
 // -------------------------------------------------------------------------- //
-QnWorkbenchScreenshotHandler::QnWorkbenchScreenshotHandler(QObject *parent): 
-    QObject(parent), 
+QnWorkbenchScreenshotHandler::QnWorkbenchScreenshotHandler(QObject *parent):
+    QObject(parent),
     QnWorkbenchContextAware(parent),
     m_screenshotProgressDialog(0),
     m_progressShowTime(0),
     m_canceled(false)
 {
-    connect(action(Qn::TakeScreenshotAction), &QAction::triggered, this, &QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered);
+    connect(action(QnActions::TakeScreenshotAction), &QAction::triggered, this, &QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered);
 }
 
-QnImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(QnMediaResourceWidget *widget, const QnScreenshotParameters &parameters) const {
+QnImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(QnMediaResourceWidget *widget, const QnScreenshotParameters &parameters, bool forced) const {
     QnResourceDisplayPtr display = widget->display();
 
     QnConstResourceVideoLayoutPtr layout = display->videoLayout();
-    bool anyQuality = layout->channelCount() > 1;   // screenshots for panoramic cameras will be done locally
+    bool anyQuality = forced || layout->channelCount() > 1;   // screenshots for panoramic cameras will be done locally
 
     const QnMediaServerResourcePtr server = display->resource()->getParentResource().dynamicCast<QnMediaServerResource>();
     if (!server || (server->getServerFlags() & Qn::SF_Edge))
@@ -189,10 +189,7 @@ qint64 QnWorkbenchScreenshotHandler::screenshotTimeMSec(QnMediaResourceWidget *w
     if (!adjust)
         return timeMSec;
 
-    bool isUtc = widget->resource()->toResource()->flags() & Qn::utc;
-    qint64 localOffset = 0;
-    if(qnSettings->timeMode() == Qn::ServerTimeMode && isUtc)
-        localOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(widget->resource(), 0);
+    qint64 localOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->displayOffset(widget->resource());
 
     timeMSec += localOffset;
     return timeMSec;
@@ -224,7 +221,7 @@ void QnWorkbenchScreenshotHandler::takeDebugScreenshotsSet(QnMediaResourceWidget
             result += e;
         return result;
     };
-    
+
     int count = 1;
     int current = 0;
 
@@ -257,13 +254,13 @@ void QnWorkbenchScreenshotHandler::takeDebugScreenshotsSet(QnMediaResourceWidget
 
     typedef QPair<QString, Qn::Corner> crn_type;
     QList<crn_type> tsCorners;
-    tsCorners 
-        << crn_type(lit("_nots"), Qn::NoCorner) 
+    tsCorners
+        << crn_type(lit("_nots"), Qn::NoCorner)
         << crn_type(lit("_topLeft"), Qn::TopLeftCorner)
         << crn_type(lit("_topRight"), Qn::TopRightCorner)
         << crn_type(lit("_btmLeft"), Qn::BottomLeftCorner)
         << crn_type(lit("_btmRight"), Qn::BottomRightCorner);
-    count *= tsCorners.size();   
+    count *= tsCorners.size();
 
     QnResourceDisplayPtr display = widget->display();
 
@@ -276,16 +273,16 @@ void QnWorkbenchScreenshotHandler::takeDebugScreenshotsSet(QnMediaResourceWidget
     qint64 startTime = QDateTime::currentMSecsSinceEpoch();
 
     QnScreenshotParameters parameters;
-    {       
-        parameters.timestampMsec = screenshotTimeMSec(widget);
+    {
+        parameters.utcTimestampMsec = screenshotTimeMSec(widget);
         parameters.isUtc = widget->resource()->toResource()->flags() & Qn::utc;
-        parameters.adjustedTimeMsec = screenshotTimeMSec(widget, true);
+        parameters.displayTimeMsec = screenshotTimeMSec(widget, true);
         Key timeKey(keyStack, lit("_") + parameters.timeString());
-       
+
         parameters.itemDewarpingParams = widget->item()->dewarpingParams();
-        parameters.mediaDewarpingParams = widget->dewarpingParams();       
+        parameters.mediaDewarpingParams = widget->dewarpingParams();
         parameters.zoomRect = parameters.itemDewarpingParams.enabled ? QRectF() : widget->zoomRect();
-        
+
         for (const ImageCorrectionParams &imageCorr: imageCorrList) {
             Key imageCorrKey(keyStack, imageCorr.enabled ? lit("_enh") : QString());
             parameters.imageCorrectionParams = imageCorr;
@@ -314,7 +311,7 @@ void QnWorkbenchScreenshotHandler::takeDebugScreenshotsSet(QnMediaResourceWidget
                                 if (dialog->wasCanceled())
                                     return;
                                 takeScreenshot(widget, parameters);
-                                
+
                             }
                         }
                     }
@@ -325,7 +322,7 @@ void QnWorkbenchScreenshotHandler::takeDebugScreenshotsSet(QnMediaResourceWidget
 
     dialog->hide();
     qint64 endTime = QDateTime::currentMSecsSinceEpoch();
-    QMessageBox::information(mainWindow(), lit("Success"), lit("%1 screenshots done for %2 seconds").arg(count).arg((endTime - startTime) / 1000));
+    QnMessageBox::information(mainWindow(), lit("Success"), lit("%1 screenshots done for %2 seconds").arg(count).arg((endTime - startTime) / 1000));
 }
 
 
@@ -349,9 +346,9 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
     }
 
     QnScreenshotParameters parameters;
-    parameters.timestampMsec = screenshotTimeMSec(widget);
+    parameters.utcTimestampMsec = screenshotTimeMSec(widget);
     parameters.isUtc = widget->resource()->toResource()->flags() & Qn::utc;
-    parameters.adjustedTimeMsec = screenshotTimeMSec(widget, true);
+    parameters.displayTimeMsec = screenshotTimeMSec(widget, true);
     parameters.filename = filename;
     parameters.timestampPosition = qnSettings->timestampCorner();
     parameters.itemDewarpingParams = widget->item()->dewarpingParams();
@@ -428,7 +425,7 @@ bool QnWorkbenchScreenshotHandler::updateParametersFromDialog(QnScreenshotParame
             fileName += selectedExtension;
 
             if (QFile::exists(fileName)) {
-                QMessageBox::StandardButton button = QMessageBox::information(
+                QMessageBox::StandardButton button = QnMessageBox::information(
                     mainWindow(),
                     tr("Save As"),
                     tr("File '%1' already exists. Do you want to overwrite it?").arg(QFileInfo(fileName).fileName()),
@@ -486,9 +483,10 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
     QImage result = image;
 
     if (!result.isNull()) {
-        qint64 timeMsec = parameters.timestampMsec == latestScreenshotTime 
+        //TODO: #GDM looks like total mess
+        qint64 timeMsec = parameters.utcTimestampMsec == latestScreenshotTime
             ? QDateTime::currentMSecsSinceEpoch()
-            : parameters.adjustedTimeMsec;
+            : parameters.displayTimeMsec;
 
         QnImageFilterHelper transcodeParams;
         // Doing heavy filters only. This filters doesn't supported on server side for screenshots
@@ -501,7 +499,8 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
 
         if (!filters.isEmpty()) {
             QSharedPointer<CLVideoDecoderOutput> frame(new CLVideoDecoderOutput(result));
-            frame->pts = parameters.timestampMsec * 1000;
+            //TODO: #GDM how is this supposed to work with latestScreenshotTime?
+            frame->pts = parameters.utcTimestampMsec * 1000;
             for(auto filter: filters)
                 frame = filter->updateImage(frame);
             result = frame->toImage();
@@ -516,7 +515,7 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
         QMessageBox::critical(
             mainWindow(),
             tr("Could not save screenshot."),
-            tr("An error occured while saving screenshot '%1'.").arg(QFileInfo(filename).fileName())
+            tr("An error occurred while saving screenshot '%1'.").arg(QFileInfo(filename).fileName())
         );
         return;
     }
@@ -595,7 +594,19 @@ void QnWorkbenchScreenshotHandler::takeScreenshot(QnMediaResourceWidget *widget,
         localParameters.rotationAngle = 0;
     } else {
         QnVirtualCameraResourcePtr camera = widget->resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
-        imageProvider = new QnSingleThumbnailLoader(camera, camera->getParentResource().dynamicCast<QnMediaServerResource>(), localParameters.timestampMsec, 0);
+        Q_ASSERT_X(camera, Q_FUNC_INFO, "Camera must exist here");
+        if (camera)
+            imageProvider = new QnSingleThumbnailLoader(camera, localParameters.utcTimestampMsec, 0);
+        else
+            imageProvider = getLocalScreenshotProvider(widget, localParameters, true);
+    }
+
+    if (!imageProvider)
+    {
+        QnMessageBox::warning(mainWindow()
+            , tr("Error")
+            , tr("Error while taking screenshot"));
+        return;
     }
 
     QnScreenshotLoader* loader = new QnScreenshotLoader(localParameters, this);

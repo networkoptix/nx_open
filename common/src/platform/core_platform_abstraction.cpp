@@ -1,5 +1,7 @@
 #include "core_platform_abstraction.h"
 
+#ifndef QT_NO_PROCESS
+
 #include <QtCore/QCoreApplication>
 #include <QtCore/QProcess>
 
@@ -54,3 +56,5 @@ QnPlatformProcess *QnCorePlatformAbstraction::process(QProcess *source) const {
 
     return result;
 }
+
+#endif // QT_NO_PROCESS

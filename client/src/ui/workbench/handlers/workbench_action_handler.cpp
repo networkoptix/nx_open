@@ -15,12 +15,13 @@
 #include <QtGui/QImageWriter>
 
 #include <api/network_proxy_factory.h>
-#include <ec2_statictics_reporter.h>
+#include <api/global_settings.h>
 
 #include <business/business_action_parameters.h>
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
+#include <camera/camera_data_manager.h>
 
 #include <client/client_connection_data.h>
 #include <client/client_message_processor.h>
@@ -71,6 +72,7 @@
 #include <ui/dialogs/business_rules_dialog.h>
 #include <ui/dialogs/checkable_message_box.h>
 #include <ui/dialogs/failover_priority_dialog.h>
+#include <ui/dialogs/backup_cameras_dialog.h>
 #include <ui/dialogs/layout_settings_dialog.h>
 #include <ui/dialogs/custom_file_dialog.h>
 #include <ui/dialogs/file_dialog.h>
@@ -105,8 +107,8 @@
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/workbench_resource.h>
 #include <ui/workbench/workbench_access_controller.h>
-#include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_state_manager.h>
+#include <ui/workbench/workbench_navigator.h>
 
 #include <ui/workbench/handlers/workbench_layouts_handler.h>            //TODO: #GDM dependencies
 
@@ -117,6 +119,7 @@
 #include <ui/workbench/watchers/workbench_user_layout_count_watcher.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
+#include <ui/workbench/watchers/workbench_bookmarks_watcher.h>
 
 #include <utils/app_server_image_cache.h>
 
@@ -128,11 +131,12 @@
 #include <utils/common/event_processors.h>
 #include <utils/common/string.h>
 #include <utils/common/time.h>
-#include <utils/email/email.h>
 #include <utils/common/synctime.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/url.h>
+#include <utils/email/email.h>
 #include <utils/math/math.h>
+#include <utils/network/http/httptypes.h>
 #include <utils/aspect_ratio.h>
 #include <utils/screen_manager.h>
 
@@ -150,7 +154,7 @@
 #include "ui/dialogs/adjust_video_dialog.h"
 #include "ui/graphics/items/resource/resource_widget_renderer.h"
 #include "ui/widgets/palette_widget.h"
-#include "network/authenticate_helper.h"
+#include "network/authutil.h"
 
 namespace {
     const char* uploadingImageARPropertyName = "_qn_uploadingImageARPropertyName";
@@ -170,110 +174,112 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
 {
     connect(m_tourTimer,                                        SIGNAL(timeout()),                              this,   SLOT(at_tourTimer_timeout()));
     connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(at_context_userChanged(const QnUserResourcePtr &)), Qt::QueuedConnection);
-    
+
     connect(workbench(),                                        SIGNAL(itemChanged(Qn::ItemRole)),              this,   SLOT(at_workbench_itemChanged(Qn::ItemRole)));
     connect(workbench(),                                        SIGNAL(cellSpacingChanged()),                   this,   SLOT(at_workbench_cellSpacingChanged()));
     connect(workbench(),                                        SIGNAL(currentLayoutChanged()),                 this,   SLOT(at_workbench_currentLayoutChanged()));
 
-    connect(action(Qn::MainMenuAction),                         SIGNAL(triggered()),    this,   SLOT(at_mainMenuAction_triggered()));
-    connect(action(Qn::OpenCurrentUserLayoutMenu),              SIGNAL(triggered()),    this,   SLOT(at_openCurrentUserLayoutMenuAction_triggered()));
-    connect(action(Qn::ShowcaseAction),                         SIGNAL(triggered()),    this,   SLOT(at_showcaseAction_triggered()));
-    connect(action(Qn::AboutAction),                            SIGNAL(triggered()),    this,   SLOT(at_aboutAction_triggered()));
+    connect(action(QnActions::MainMenuAction),                         SIGNAL(triggered()),    this,   SLOT(at_mainMenuAction_triggered()));
+    connect(action(QnActions::OpenCurrentUserLayoutMenu),              SIGNAL(triggered()),    this,   SLOT(at_openCurrentUserLayoutMenuAction_triggered()));
+    connect(action(QnActions::ShowcaseAction),                         SIGNAL(triggered()),    this,   SLOT(at_showcaseAction_triggered()));
+    connect(action(QnActions::AboutAction),                            SIGNAL(triggered()),    this,   SLOT(at_aboutAction_triggered()));
     /* These actions may be activated via context menu. In this case the topmost event loop will be finishing and this somehow affects runModal method of NSSavePanel in MacOS.
      * File dialog execution will be failed. (see a comment in qcocoafiledialoghelper.mm)
      * To make dialogs work we're using queued connection here. */
-    connect(action(Qn::OpenFileAction),                         SIGNAL(triggered()),    this,   SLOT(at_openFileAction_triggered()));
-    connect(action(Qn::OpenLayoutAction),                       SIGNAL(triggered()),    this,   SLOT(at_openLayoutAction_triggered()));
-    connect(action(Qn::OpenFolderAction),                       SIGNAL(triggered()),    this,   SLOT(at_openFolderAction_triggered()));
-    
-    connect(action(Qn::PreferencesGeneralTabAction),            SIGNAL(triggered()),    this,   SLOT(at_preferencesGeneralTabAction_triggered()));
-    connect(action(Qn::PreferencesLicensesTabAction),           SIGNAL(triggered()),    this,   SLOT(at_preferencesLicensesTabAction_triggered()));
-    connect(action(Qn::PreferencesSmtpTabAction),               SIGNAL(triggered()),    this,   SLOT(at_preferencesSmtpTabAction_triggered()));
-    connect(action(Qn::PreferencesNotificationTabAction),       SIGNAL(triggered()),    this,   SLOT(at_preferencesNotificationTabAction_triggered()));
-    connect(action(Qn::BusinessEventsAction),                   SIGNAL(triggered()),    this,   SLOT(at_businessEventsAction_triggered()));
-    connect(action(Qn::OpenBusinessRulesAction),                SIGNAL(triggered()),    this,   SLOT(at_openBusinessRulesAction_triggered()));
-    connect(action(Qn::OpenFailoverPriorityAction),             &QAction::triggered,    this,   &QnWorkbenchActionHandler::openFailoverPriorityDialog);
-    connect(action(Qn::BusinessEventsLogAction),                SIGNAL(triggered()),    this,   SLOT(at_businessEventsLogAction_triggered()));
-    connect(action(Qn::OpenBusinessLogAction),                  SIGNAL(triggered()),    this,   SLOT(at_openBusinessLogAction_triggered()));
-    connect(action(Qn::OpenAuditLogAction),                     SIGNAL(triggered()),    this,   SLOT(at_openAuditLogAction_triggered()));
-    connect(action(Qn::CameraListAction),                       SIGNAL(triggered()),    this,   SLOT(at_cameraListAction_triggered()));
-    connect(action(Qn::CameraListByServerAction),               SIGNAL(triggered()),    this,   SLOT(at_cameraListAction_triggered()));
-    connect(action(Qn::WebClientAction),                        SIGNAL(triggered()),    this,   SLOT(at_webClientAction_triggered()));
-    connect(action(Qn::SystemAdministrationAction),             SIGNAL(triggered()),    this,   SLOT(at_systemAdministrationAction_triggered()));
-    connect(action(Qn::SystemUpdateAction),                     SIGNAL(triggered()),    this,   SLOT(at_systemUpdateAction_triggered()));
-    connect(action(Qn::UserManagementAction),                   SIGNAL(triggered()),    this,   SLOT(at_userManagementAction_triggered()));
-    connect(action(Qn::NextLayoutAction),                       SIGNAL(triggered()),    this,   SLOT(at_nextLayoutAction_triggered()));
-    connect(action(Qn::PreviousLayoutAction),                   SIGNAL(triggered()),    this,   SLOT(at_previousLayoutAction_triggered()));
-    connect(action(Qn::OpenInLayoutAction),                     SIGNAL(triggered()),    this,   SLOT(at_openInLayoutAction_triggered()));
-    connect(action(Qn::OpenInCurrentLayoutAction),              SIGNAL(triggered()),    this,   SLOT(at_openInCurrentLayoutAction_triggered()));
-    connect(action(Qn::OpenInNewLayoutAction),                  SIGNAL(triggered()),    this,   SLOT(at_openInNewLayoutAction_triggered()));
-    connect(action(Qn::OpenInNewWindowAction),                  SIGNAL(triggered()),    this,   SLOT(at_openInNewWindowAction_triggered()));
-    connect(action(Qn::OpenSingleLayoutAction),                 SIGNAL(triggered()),    this,   SLOT(at_openLayoutsAction_triggered()));
-    connect(action(Qn::OpenMultipleLayoutsAction),              SIGNAL(triggered()),    this,   SLOT(at_openLayoutsAction_triggered()));
-    connect(action(Qn::OpenAnyNumberOfLayoutsAction),           SIGNAL(triggered()),    this,   SLOT(at_openLayoutsAction_triggered()));
-    connect(action(Qn::OpenLayoutsInNewWindowAction),           SIGNAL(triggered()),    this,   SLOT(at_openLayoutsInNewWindowAction_triggered()));
-    connect(action(Qn::OpenCurrentLayoutInNewWindowAction),     SIGNAL(triggered()),    this,   SLOT(at_openCurrentLayoutInNewWindowAction_triggered()));
-    connect(action(Qn::OpenNewTabAction),                       SIGNAL(triggered()),    this,   SLOT(at_openNewTabAction_triggered()));
-    connect(action(Qn::OpenNewWindowAction),                    SIGNAL(triggered()),    this,   SLOT(at_openNewWindowAction_triggered()));
-    connect(action(Qn::UserSettingsAction),                     SIGNAL(triggered()),    this,   SLOT(at_userSettingsAction_triggered()));   
-    connect(action(Qn::MediaFileSettingsAction),                &QAction::triggered,    this,   &QnWorkbenchActionHandler::at_mediaFileSettingsAction_triggered);
-    connect(action(Qn::CameraIssuesAction),                     SIGNAL(triggered()),    this,   SLOT(at_cameraIssuesAction_triggered()));
-    connect(action(Qn::CameraBusinessRulesAction),              SIGNAL(triggered()),    this,   SLOT(at_cameraBusinessRulesAction_triggered()));
-    connect(action(Qn::CameraDiagnosticsAction),                SIGNAL(triggered()),    this,   SLOT(at_cameraDiagnosticsAction_triggered()));
-    connect(action(Qn::LayoutSettingsAction),                   SIGNAL(triggered()),    this,   SLOT(at_layoutSettingsAction_triggered()));
-    connect(action(Qn::CurrentLayoutSettingsAction),            SIGNAL(triggered()),    this,   SLOT(at_currentLayoutSettingsAction_triggered()));    
-    connect(action(Qn::ServerAddCameraManuallyAction),          SIGNAL(triggered()),    this,   SLOT(at_serverAddCameraManuallyAction_triggered()));    
-    connect(action(Qn::PingAction),                             SIGNAL(triggered()),    this,   SLOT(at_pingAction_triggered()));
-    connect(action(Qn::ServerLogsAction),                       SIGNAL(triggered()),    this,   SLOT(at_serverLogsAction_triggered()));
-    connect(action(Qn::ServerIssuesAction),                     SIGNAL(triggered()),    this,   SLOT(at_serverIssuesAction_triggered()));
-    connect(action(Qn::OpenInFolderAction),                     SIGNAL(triggered()),    this,   SLOT(at_openInFolderAction_triggered()));
-    connect(action(Qn::DeleteFromDiskAction),                   SIGNAL(triggered()),    this,   SLOT(at_deleteFromDiskAction_triggered()));
-    connect(action(Qn::RemoveLayoutItemAction),                 SIGNAL(triggered()),    this,   SLOT(at_removeLayoutItemAction_triggered()));
-    connect(action(Qn::RemoveFromServerAction),                 SIGNAL(triggered()),    this,   SLOT(at_removeFromServerAction_triggered()));
-    connect(action(Qn::NewUserAction),                          SIGNAL(triggered()),    this,   SLOT(at_newUserAction_triggered()));
-    connect(action(Qn::RenameResourceAction),                   SIGNAL(triggered()),    this,   SLOT(at_renameAction_triggered()));
-    connect(action(Qn::DropResourcesAction),                    SIGNAL(triggered()),    this,   SLOT(at_dropResourcesAction_triggered()));
-    connect(action(Qn::DelayedDropResourcesAction),             SIGNAL(triggered()),    this,   SLOT(at_delayedDropResourcesAction_triggered()));
-    connect(action(Qn::InstantDropResourcesAction),             SIGNAL(triggered()),    this,   SLOT(at_instantDropResourcesAction_triggered()));
-    connect(action(Qn::DropResourcesIntoNewLayoutAction),       SIGNAL(triggered()),    this,   SLOT(at_dropResourcesIntoNewLayoutAction_triggered()));
-    connect(action(Qn::MoveCameraAction),                       SIGNAL(triggered()),    this,   SLOT(at_moveCameraAction_triggered()));
-    connect(action(Qn::AdjustVideoAction),                      SIGNAL(triggered()),    this,   SLOT(at_adjustVideoAction_triggered()));
-    connect(action(Qn::ExitAction),                             &QAction::triggered,    this,   &QnWorkbenchActionHandler::closeApplication);
-    connect(action(Qn::ThumbnailsSearchAction),                 SIGNAL(triggered()),    this,   SLOT(at_thumbnailsSearchAction_triggered()));
-    connect(action(Qn::SetCurrentLayoutItemSpacing0Action),     SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing0Action_triggered()));
-    connect(action(Qn::SetCurrentLayoutItemSpacing10Action),    SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing10Action_triggered()));
-    connect(action(Qn::SetCurrentLayoutItemSpacing20Action),    SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing20Action_triggered()));
-    connect(action(Qn::SetCurrentLayoutItemSpacing30Action),    SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing30Action_triggered()));
-    connect(action(Qn::CreateZoomWindowAction),                 SIGNAL(triggered()),    this,   SLOT(at_createZoomWindowAction_triggered()));
-    connect(action(Qn::Rotate0Action),                          &QAction::triggered,    this,   [this] { rotateItems(0); });
-    connect(action(Qn::Rotate90Action),                         &QAction::triggered,    this,   [this] { rotateItems(90); });
-    connect(action(Qn::Rotate180Action),                        &QAction::triggered,    this,   [this] { rotateItems(180); });
-    connect(action(Qn::Rotate270Action),                        &QAction::triggered,    this,   [this] { rotateItems(270); });
-    connect(action(Qn::RadassAutoAction),                       &QAction::triggered,    this,   [this] { setResolutionMode(Qn::AutoResolution); });
-    connect(action(Qn::RadassLowAction),                        &QAction::triggered,    this,   [this] { setResolutionMode(Qn::LowResolution); });
-    connect(action(Qn::RadassHighAction),                       &QAction::triggered,    this,   [this] { setResolutionMode(Qn::HighResolution); });
-    connect(action(Qn::SetAsBackgroundAction),                  SIGNAL(triggered()),    this,   SLOT(at_setAsBackgroundAction_triggered()));
-    connect(action(Qn::WhatsThisAction),                        SIGNAL(triggered()),    this,   SLOT(at_whatsThisAction_triggered()));
-    connect(action(Qn::EscapeHotkeyAction),                     SIGNAL(triggered()),    this,   SLOT(at_escapeHotkeyAction_triggered()));
-    connect(action(Qn::MessageBoxAction),                       SIGNAL(triggered()),    this,   SLOT(at_messageBoxAction_triggered()));
-    connect(action(Qn::BrowseUrlAction),                        SIGNAL(triggered()),    this,   SLOT(at_browseUrlAction_triggered()));
-    connect(action(Qn::VersionMismatchMessageAction),           SIGNAL(triggered()),    this,   SLOT(at_versionMismatchMessageAction_triggered()));
-    connect(action(Qn::BetaVersionMessageAction),               SIGNAL(triggered()),    this,   SLOT(at_betaVersionMessageAction_triggered()));
-    connect(action(Qn::AllowStatisticsReportMessageAction),     &QAction::triggered,    this,   [this] { checkIfStatisticsReportAllowed(); });
+    connect(action(QnActions::OpenFileAction),                         SIGNAL(triggered()),    this,   SLOT(at_openFileAction_triggered()));
+    connect(action(QnActions::OpenLayoutAction),                       SIGNAL(triggered()),    this,   SLOT(at_openLayoutAction_triggered()));
+    connect(action(QnActions::OpenFolderAction),                       SIGNAL(triggered()),    this,   SLOT(at_openFolderAction_triggered()));
 
-    /* Qt::QueuedConnection is important! See QnPreferencesDialog::confirm() for details. */
-    connect(action(Qn::QueueAppRestartAction),                  SIGNAL(triggered()),    this,   SLOT(at_queueAppRestartAction_triggered()), Qt::QueuedConnection);
-    connect(action(Qn::SelectTimeServerAction),                 SIGNAL(triggered()),    this,   SLOT(at_selectTimeServerAction_triggered()));
+    connect(action(QnActions::PreferencesGeneralTabAction),            SIGNAL(triggered()),    this,   SLOT(at_preferencesGeneralTabAction_triggered()));
+    connect(action(QnActions::PreferencesLicensesTabAction),           SIGNAL(triggered()),    this,   SLOT(at_preferencesLicensesTabAction_triggered()));
+    connect(action(QnActions::PreferencesSmtpTabAction),               SIGNAL(triggered()),    this,   SLOT(at_preferencesSmtpTabAction_triggered()));
+    connect(action(QnActions::PreferencesNotificationTabAction),       SIGNAL(triggered()),    this,   SLOT(at_preferencesNotificationTabAction_triggered()));
+    connect(action(QnActions::BusinessEventsAction),                   SIGNAL(triggered()),    this,   SLOT(at_businessEventsAction_triggered()));
+    connect(action(QnActions::OpenBusinessRulesAction),                SIGNAL(triggered()),    this,   SLOT(at_openBusinessRulesAction_triggered()));
+    connect(action(QnActions::OpenFailoverPriorityAction),             &QAction::triggered,    this,   &QnWorkbenchActionHandler::openFailoverPriorityDialog);
+    connect(action(QnActions::OpenBackupCamerasAction),                &QAction::triggered,    this,   &QnWorkbenchActionHandler::openBackupCamerasDialog);
+    connect(action(QnActions::OpenBookmarksSearchAction),              SIGNAL(triggered()),    this,   SLOT(at_openBookmarksSearchAction_triggered()));
+    connect(action(QnActions::OpenBusinessLogAction),                  SIGNAL(triggered()),    this,   SLOT(at_openBusinessLogAction_triggered()));
+    connect(action(QnActions::OpenAuditLogAction),                     SIGNAL(triggered()),    this,   SLOT(at_openAuditLogAction_triggered()));
+    connect(action(QnActions::CameraListAction),                       SIGNAL(triggered()),    this,   SLOT(at_cameraListAction_triggered()));
+    connect(action(QnActions::CameraListByServerAction),               SIGNAL(triggered()),    this,   SLOT(at_cameraListAction_triggered()));
+    connect(action(QnActions::WebClientAction),                        SIGNAL(triggered()),    this,   SLOT(at_webClientAction_triggered()));
+    connect(action(QnActions::WebClientActionSubMenu),                 SIGNAL(triggered()),    this,   SLOT(at_webClientAction_triggered()));
+    connect(action(QnActions::SystemAdministrationAction),             SIGNAL(triggered()),    this,   SLOT(at_systemAdministrationAction_triggered()));
+    connect(action(QnActions::SystemUpdateAction),                     SIGNAL(triggered()),    this,   SLOT(at_systemUpdateAction_triggered()));
+    connect(action(QnActions::UserManagementAction),                   SIGNAL(triggered()),    this,   SLOT(at_userManagementAction_triggered()));
+    connect(action(QnActions::NextLayoutAction),                       SIGNAL(triggered()),    this,   SLOT(at_nextLayoutAction_triggered()));
+    connect(action(QnActions::PreviousLayoutAction),                   SIGNAL(triggered()),    this,   SLOT(at_previousLayoutAction_triggered()));
+    connect(action(QnActions::OpenInLayoutAction),                     SIGNAL(triggered()),    this,   SLOT(at_openInLayoutAction_triggered()));
+    connect(action(QnActions::OpenInCurrentLayoutAction),              SIGNAL(triggered()),    this,   SLOT(at_openInCurrentLayoutAction_triggered()));
+    connect(action(QnActions::OpenInNewLayoutAction),                  SIGNAL(triggered()),    this,   SLOT(at_openInNewLayoutAction_triggered()));
+    connect(action(QnActions::OpenInNewWindowAction),                  SIGNAL(triggered()),    this,   SLOT(at_openInNewWindowAction_triggered()));
+    connect(action(QnActions::OpenSingleLayoutAction),                 SIGNAL(triggered()),    this,   SLOT(at_openLayoutsAction_triggered()));
+    connect(action(QnActions::OpenMultipleLayoutsAction),              SIGNAL(triggered()),    this,   SLOT(at_openLayoutsAction_triggered()));
+    connect(action(QnActions::OpenAnyNumberOfLayoutsAction),           SIGNAL(triggered()),    this,   SLOT(at_openLayoutsAction_triggered()));
+    connect(action(QnActions::OpenLayoutsInNewWindowAction),           SIGNAL(triggered()),    this,   SLOT(at_openLayoutsInNewWindowAction_triggered()));
+    connect(action(QnActions::OpenCurrentLayoutInNewWindowAction),     SIGNAL(triggered()),    this,   SLOT(at_openCurrentLayoutInNewWindowAction_triggered()));
+    connect(action(QnActions::OpenNewTabAction),                       SIGNAL(triggered()),    this,   SLOT(at_openNewTabAction_triggered()));
+    connect(action(QnActions::OpenNewWindowAction),                    SIGNAL(triggered()),    this,   SLOT(at_openNewWindowAction_triggered()));
+    connect(action(QnActions::UserSettingsAction),                     SIGNAL(triggered()),    this,   SLOT(at_userSettingsAction_triggered()));
+    connect(action(QnActions::MediaFileSettingsAction),                &QAction::triggered,    this,   &QnWorkbenchActionHandler::at_mediaFileSettingsAction_triggered);
+    connect(action(QnActions::CameraIssuesAction),                     SIGNAL(triggered()),    this,   SLOT(at_cameraIssuesAction_triggered()));
+    connect(action(QnActions::CameraBusinessRulesAction),              SIGNAL(triggered()),    this,   SLOT(at_cameraBusinessRulesAction_triggered()));
+    connect(action(QnActions::CameraDiagnosticsAction),                SIGNAL(triggered()),    this,   SLOT(at_cameraDiagnosticsAction_triggered()));
+    connect(action(QnActions::LayoutSettingsAction),                   SIGNAL(triggered()),    this,   SLOT(at_layoutSettingsAction_triggered()));
+    connect(action(QnActions::CurrentLayoutSettingsAction),            SIGNAL(triggered()),    this,   SLOT(at_currentLayoutSettingsAction_triggered()));
+    connect(action(QnActions::ServerAddCameraManuallyAction),          SIGNAL(triggered()),    this,   SLOT(at_serverAddCameraManuallyAction_triggered()));
+    connect(action(QnActions::PingAction),                             SIGNAL(triggered()),    this,   SLOT(at_pingAction_triggered()));
+    connect(action(QnActions::ServerLogsAction),                       SIGNAL(triggered()),    this,   SLOT(at_serverLogsAction_triggered()));
+    connect(action(QnActions::ServerIssuesAction),                     SIGNAL(triggered()),    this,   SLOT(at_serverIssuesAction_triggered()));
+    connect(action(QnActions::OpenInFolderAction),                     SIGNAL(triggered()),    this,   SLOT(at_openInFolderAction_triggered()));
+    connect(action(QnActions::DeleteFromDiskAction),                   SIGNAL(triggered()),    this,   SLOT(at_deleteFromDiskAction_triggered()));
+    connect(action(QnActions::RemoveLayoutItemAction),                 SIGNAL(triggered()),    this,   SLOT(at_removeLayoutItemAction_triggered()));
+    connect(action(QnActions::RemoveFromServerAction),                 SIGNAL(triggered()),    this,   SLOT(at_removeFromServerAction_triggered()));
+    connect(action(QnActions::NewUserAction),                          SIGNAL(triggered()),    this,   SLOT(at_newUserAction_triggered()));
+    connect(action(QnActions::RenameResourceAction),                   SIGNAL(triggered()),    this,   SLOT(at_renameAction_triggered()));
+    connect(action(QnActions::DropResourcesAction),                    SIGNAL(triggered()),    this,   SLOT(at_dropResourcesAction_triggered()));
+    connect(action(QnActions::DelayedDropResourcesAction),             SIGNAL(triggered()),    this,   SLOT(at_delayedDropResourcesAction_triggered()));
+    connect(action(QnActions::InstantDropResourcesAction),             SIGNAL(triggered()),    this,   SLOT(at_instantDropResourcesAction_triggered()));
+    connect(action(QnActions::DropResourcesIntoNewLayoutAction),       SIGNAL(triggered()),    this,   SLOT(at_dropResourcesIntoNewLayoutAction_triggered()));
+    connect(action(QnActions::MoveCameraAction),                       SIGNAL(triggered()),    this,   SLOT(at_moveCameraAction_triggered()));
+    connect(action(QnActions::AdjustVideoAction),                      SIGNAL(triggered()),    this,   SLOT(at_adjustVideoAction_triggered()));
+    connect(action(QnActions::ExitAction),                             &QAction::triggered,    this,   &QnWorkbenchActionHandler::closeApplication);
+    connect(action(QnActions::ThumbnailsSearchAction),                 SIGNAL(triggered()),    this,   SLOT(at_thumbnailsSearchAction_triggered()));
+    connect(action(QnActions::SetCurrentLayoutItemSpacing0Action),     SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing0Action_triggered()));
+    connect(action(QnActions::SetCurrentLayoutItemSpacing10Action),    SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing10Action_triggered()));
+    connect(action(QnActions::SetCurrentLayoutItemSpacing20Action),    SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing20Action_triggered()));
+    connect(action(QnActions::SetCurrentLayoutItemSpacing30Action),    SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing30Action_triggered()));
+    connect(action(QnActions::CreateZoomWindowAction),                 SIGNAL(triggered()),    this,   SLOT(at_createZoomWindowAction_triggered()));
+    connect(action(QnActions::Rotate0Action),                          &QAction::triggered,    this,   [this] { rotateItems(0); });
+    connect(action(QnActions::Rotate90Action),                         &QAction::triggered,    this,   [this] { rotateItems(90); });
+    connect(action(QnActions::Rotate180Action),                        &QAction::triggered,    this,   [this] { rotateItems(180); });
+    connect(action(QnActions::Rotate270Action),                        &QAction::triggered,    this,   [this] { rotateItems(270); });
+    connect(action(QnActions::RadassAutoAction),                       &QAction::triggered,    this,   [this] { setResolutionMode(Qn::AutoResolution); });
+    connect(action(QnActions::RadassLowAction),                        &QAction::triggered,    this,   [this] { setResolutionMode(Qn::LowResolution); });
+    connect(action(QnActions::RadassHighAction),                       &QAction::triggered,    this,   [this] { setResolutionMode(Qn::HighResolution); });
+    connect(action(QnActions::SetAsBackgroundAction),                  SIGNAL(triggered()),    this,   SLOT(at_setAsBackgroundAction_triggered()));
+    connect(action(QnActions::WhatsThisAction),                        SIGNAL(triggered()),    this,   SLOT(at_whatsThisAction_triggered()));
+    connect(action(QnActions::EscapeHotkeyAction),                     SIGNAL(triggered()),    this,   SLOT(at_escapeHotkeyAction_triggered()));
+    connect(action(QnActions::MessageBoxAction),                       SIGNAL(triggered()),    this,   SLOT(at_messageBoxAction_triggered()));
+    connect(action(QnActions::BrowseUrlAction),                        SIGNAL(triggered()),    this,   SLOT(at_browseUrlAction_triggered()));
+    connect(action(QnActions::VersionMismatchMessageAction),           SIGNAL(triggered()),    this,   SLOT(at_versionMismatchMessageAction_triggered()));
+    connect(action(QnActions::BetaVersionMessageAction),               SIGNAL(triggered()),    this,   SLOT(at_betaVersionMessageAction_triggered()));
+    connect(action(QnActions::AllowStatisticsReportMessageAction),     &QAction::triggered,    this,   [this] { checkIfStatisticsReportAllowed(); });
 
-    connect(action(Qn::TogglePanicModeAction),                  SIGNAL(toggled(bool)),  this,   SLOT(at_togglePanicModeAction_toggled(bool)));
-    connect(action(Qn::ToggleTourModeAction),                   SIGNAL(toggled(bool)),  this,   SLOT(at_toggleTourAction_toggled(bool)));
+    /* Qt::QueuedConnection is important! See QnPreferencesDialog::canApplyChanges() for details. */
+    connect(action(QnActions::QueueAppRestartAction),                  SIGNAL(triggered()),    this,   SLOT(at_queueAppRestartAction_triggered()), Qt::QueuedConnection);
+    connect(action(QnActions::SelectTimeServerAction),                 SIGNAL(triggered()),    this,   SLOT(at_selectTimeServerAction_triggered()));
+
+    connect(action(QnActions::TogglePanicModeAction),                  SIGNAL(toggled(bool)),  this,   SLOT(at_togglePanicModeAction_toggled(bool)));
+    connect(action(QnActions::ToggleTourModeAction),                   SIGNAL(toggled(bool)),  this,   SLOT(at_toggleTourAction_toggled(bool)));
     //connect(context()->instance<QnWorkbenchPanicWatcher>(),     SIGNAL(panicModeChanged()), this, SLOT(at_panicWatcher_panicModeChanged()));
     connect(context()->instance<QnWorkbenchScheduleWatcher>(),  SIGNAL(scheduleEnabledChanged()),   this,   SLOT(at_scheduleWatcher_scheduleEnabledChanged()));
 
     /* Connect through lambda to handle forced parameter. */
-    connect(action(Qn::DelayedForcedExitAction),                &QAction::triggered,    this,   [this] {  closeApplication(true);    }, Qt::QueuedConnection);
+    connect(action(QnActions::DelayedForcedExitAction),                &QAction::triggered,    this,   [this] {  closeApplication(true);    }, Qt::QueuedConnection);
 
-    connect(action(Qn::BeforeExitAction),  &QAction::triggered, this, &QnWorkbenchActionHandler::at_beforeExitAction_triggered);
+    connect(action(QnActions::BeforeExitAction),  &QAction::triggered, this, &QnWorkbenchActionHandler::at_beforeExitAction_triggered);
 
     /* Run handlers that update state. */
     //at_panicWatcher_panicModeChanged();
@@ -341,13 +347,13 @@ void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, co
     data.flags = Qn::PendingGeometryAdjustment;
     data.zoomRect = params.zoomWindow;
     data.zoomTargetUuid = params.zoomUuid;
-    
+
     if (!qFuzzyIsNull(params.rotation)) {
         data.rotation = params.rotation;
     }
     else {
         QString forcedRotation = resource->getProperty(QnMediaResource::rotationKey());
-        if (!forcedRotation.isEmpty()) 
+        if (!forcedRotation.isEmpty())
             data.rotation = forcedRotation.toInt();
     }
     data.contrastParams = params.contrastParams;
@@ -484,9 +490,9 @@ void QnWorkbenchActionHandler::submitDelayedDrops() {
         QnLayoutResourceList layouts = resources.filtered<QnLayoutResource>();
         if (!layouts.isEmpty()){
             workbench()->clear();
-            menu()->trigger(Qn::OpenAnyNumberOfLayoutsAction, layouts);
+            menu()->trigger(QnActions::OpenAnyNumberOfLayoutsAction, layouts);
         } else {
-            menu()->trigger(Qn::OpenInCurrentLayoutAction, resources);
+            menu()->trigger(QnActions::OpenInCurrentLayoutAction, resources);
         }
     }
 
@@ -510,9 +516,9 @@ void QnWorkbenchActionHandler::submitInstantDrop() {
         QnLayoutResourceList layouts = resources.filtered<QnLayoutResource>();
         if (!layouts.isEmpty()){
             workbench()->clear();
-            menu()->trigger(Qn::OpenAnyNumberOfLayoutsAction, layouts);
+            menu()->trigger(QnActions::OpenAnyNumberOfLayoutsAction, layouts);
         } else {
-            menu()->trigger(Qn::OpenInCurrentLayoutAction, resources);
+            menu()->trigger(QnActions::OpenInCurrentLayoutAction, resources);
         }
     }
     m_instantDrops.clear();
@@ -525,17 +531,16 @@ void QnWorkbenchActionHandler::submitInstantDrop() {
 // -------------------------------------------------------------------------- //
 
 void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &user) {
-	if (!qnRuntime->isActiveXMode()) {
-		if (!user) {
-	        context()->instance<QnWorkbenchUpdateWatcher>()->stop();
-			return;
-		}
-
-		if (user->isAdmin())
+	if (qnRuntime->isDesktopMode())
+    {
+		if (user)
 	        context()->instance<QnWorkbenchUpdateWatcher>()->start();
-	    else
-			context()->instance<QnWorkbenchUpdateWatcher>()->stop();
+        else
+            context()->instance<QnWorkbenchUpdateWatcher>()->stop();
 	}
+
+    if (!user)
+        return;
 
     // we should not change state when using "Open in New Window"
     if (m_delayedDrops.isEmpty() && !qnRuntime->isVideoWallMode() && !qnRuntime->isActiveXMode()) {
@@ -567,7 +572,7 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
     }
 
     if(workbench()->layouts().empty())
-        menu()->trigger(Qn::OpenNewTabAction);
+        menu()->trigger(QnActions::OpenNewTabAction);
 
     submitDelayedDrops();
 }
@@ -576,17 +581,17 @@ void QnWorkbenchActionHandler::at_workbench_cellSpacingChanged() {
     qreal value = workbench()->currentLayout()->cellSpacing().width();
 
     if (qFuzzyCompare(0.0, value))
-        action(Qn::SetCurrentLayoutItemSpacing0Action)->setChecked(true);
+        action(QnActions::SetCurrentLayoutItemSpacing0Action)->setChecked(true);
     else if (qFuzzyCompare(0.2, value))
-        action(Qn::SetCurrentLayoutItemSpacing20Action)->setChecked(true);
+        action(QnActions::SetCurrentLayoutItemSpacing20Action)->setChecked(true);
     else if (qFuzzyCompare(0.3, value))
-        action(Qn::SetCurrentLayoutItemSpacing30Action)->setChecked(true);
+        action(QnActions::SetCurrentLayoutItemSpacing30Action)->setChecked(true);
     else
-        action(Qn::SetCurrentLayoutItemSpacing10Action)->setChecked(true); //default value
+        action(QnActions::SetCurrentLayoutItemSpacing10Action)->setChecked(true); //default value
 }
 
 void QnWorkbenchActionHandler::at_workbench_currentLayoutChanged() {
-    action(Qn::RadassAutoAction)->setChecked(true);
+    action(QnActions::RadassAutoAction)->setChecked(true);
     if (qnRedAssController)
         qnRedAssController->setMode(Qn::AutoResolution);
 }
@@ -594,20 +599,20 @@ void QnWorkbenchActionHandler::at_workbench_currentLayoutChanged() {
 void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
     m_mainMenu = menu()->newMenu(Qn::MainScope, mainWindow());
 
-    action(Qn::MainMenuAction)->setMenu(m_mainMenu.data());
+    action(QnActions::MainMenuAction)->setMenu(m_mainMenu.data());
 }
 
 void QnWorkbenchActionHandler::at_openCurrentUserLayoutMenuAction_triggered() {
     if (qnRuntime->isVideoWallMode() || qnRuntime->isActiveXMode())
         return;
 
-    m_currentUserLayoutsMenu = menu()->newMenu(Qn::OpenCurrentUserLayoutMenu, Qn::TitleBarScope);
+    m_currentUserLayoutsMenu = menu()->newMenu(QnActions::OpenCurrentUserLayoutMenu, Qn::TitleBarScope);
 
-    action(Qn::OpenCurrentUserLayoutMenu)->setMenu(m_currentUserLayoutsMenu.data());
+    action(QnActions::OpenCurrentUserLayoutMenu)->setMenu(m_currentUserLayoutsMenu.data());
 }
 
 void QnWorkbenchActionHandler::at_layoutCountWatcher_layoutCountChanged() {
-    action(Qn::OpenCurrentUserLayoutMenu)->setEnabled(context()->instance<QnWorkbenchUserLayoutCountWatcher>()->layoutCount() > 0);
+    action(QnActions::OpenCurrentUserLayoutMenu)->setEnabled(context()->instance<QnWorkbenchUserLayoutCountWatcher>()->layoutCount() > 0);
 }
 
 void QnWorkbenchActionHandler::at_nextLayoutAction_triggered() {
@@ -716,12 +721,12 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
 void QnWorkbenchActionHandler::at_openInCurrentLayoutAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
     parameters.setArgument(Qn::LayoutResourceRole, workbench()->currentLayout()->resource());
-    menu()->trigger(Qn::OpenInLayoutAction, parameters);
+    menu()->trigger(QnActions::OpenInLayoutAction, parameters);
 }
 
 void QnWorkbenchActionHandler::at_openInNewLayoutAction_triggered() {
-    menu()->trigger(Qn::OpenNewTabAction);
-    menu()->trigger(Qn::OpenInCurrentLayoutAction, menu()->currentParameters(sender()));
+    menu()->trigger(QnActions::OpenNewTabAction);
+    menu()->trigger(QnActions::OpenInCurrentLayoutAction, menu()->currentParameters(sender()));
 }
 
 void QnWorkbenchActionHandler::at_openInNewWindowAction_triggered() {
@@ -766,7 +771,7 @@ void QnWorkbenchActionHandler::at_openLayoutsInNewWindowAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_openCurrentLayoutInNewWindowAction_triggered() {
-    menu()->trigger(Qn::OpenLayoutsInNewWindowAction, workbench()->currentLayout()->resource());
+    menu()->trigger(QnActions::OpenLayoutsInNewWindowAction, workbench()->currentLayout()->resource());
 }
 
 void QnWorkbenchActionHandler::at_openNewTabAction_triggered() {
@@ -800,7 +805,7 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
                 QnCameraDeviceStringSet(
                     tr("Cannot move these %n devices to server %1. Server is unresponsive.", "", modifiedResources.size()),
                     tr("Cannot move these %n cameras to server %1. Server is unresponsive.", "", modifiedResources.size()),
-                    tr("Cannot move these %n IO modules to server %1. Server is unresponsive.", "", modifiedResources.size())
+                    tr("Cannot move these %n I/O modules to server %1. Server is unresponsive.", "", modifiedResources.size())
                 ),
                 modifiedResources
             ).arg(server->getName()),
@@ -830,7 +835,7 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
                 QnCameraDeviceStringSet(
                         tr("Server %1 is unable to find and access these %n devices. Are you sure you would like to move them?", "", errorResources.size()),
                         tr("Server %1 is unable to find and access these %n cameras. Are you sure you would like to move them?", "", errorResources.size()),
-                        tr("Server %1 is unable to find and access these %n IO modules. Are you sure you would like to move them?", "", errorResources.size())
+                        tr("Server %1 is unable to find and access these %n I/O modules. Are you sure you would like to move them?", "", errorResources.size())
                     ),
                     modifiedResources
                 ).arg(server->getName()),
@@ -898,8 +903,8 @@ void QnWorkbenchActionHandler::at_dropResourcesAction_triggered() {
 
     if (!resources.empty()) {
         parameters.setResources(resources);
-        if (menu()->canTrigger(Qn::OpenInCurrentLayoutAction, parameters)) {
-            menu()->trigger(Qn::OpenInCurrentLayoutAction, parameters);
+        if (menu()->canTrigger(QnActions::OpenInCurrentLayoutAction, parameters)) {
+            menu()->trigger(QnActions::OpenInCurrentLayoutAction, parameters);
         } else {
             QnLayoutResourcePtr layout = workbench()->currentLayout()->resource();
             if (layout->hasFlags(Qn::url | Qn::local | Qn::layout)) {
@@ -912,7 +917,7 @@ void QnWorkbenchActionHandler::at_dropResourcesAction_triggered() {
                         break;
                 }
                 if (hasLocal)
-                    QMessageBox::warning(mainWindow(), 
+                    QnMessageBox::warning(mainWindow(),
                                          tr("Cannot add item"),
                                          tr("Cannot add a local file to Multi-Video"));
             }
@@ -920,10 +925,10 @@ void QnWorkbenchActionHandler::at_dropResourcesAction_triggered() {
     }
 
     if(!layouts.empty())
-        menu()->trigger(Qn::OpenAnyNumberOfLayoutsAction, layouts);
+        menu()->trigger(QnActions::OpenAnyNumberOfLayoutsAction, layouts);
 
     if (!videowalls.empty())
-        menu()->trigger(Qn::OpenVideoWallsReviewAction, videowalls);
+        menu()->trigger(QnActions::OpenVideoWallsReviewAction, videowalls);
 }
 
 void QnWorkbenchActionHandler::at_dropResourcesIntoNewLayoutAction_triggered() {
@@ -933,9 +938,9 @@ void QnWorkbenchActionHandler::at_dropResourcesIntoNewLayoutAction_triggered() {
     QnVideoWallResourceList videowalls = parameters.resources().filtered<QnVideoWallResource>();
 
     if(layouts.empty() && (videowalls.size() != parameters.resources().size())) /* There are some media in the drop, open new layout. */
-        menu()->trigger(Qn::OpenNewTabAction);
+        menu()->trigger(QnActions::OpenNewTabAction);
 
-    menu()->trigger(Qn::DropResourcesAction, parameters);
+    menu()->trigger(QnActions::DropResourcesAction, parameters);
 }
 
 void QnWorkbenchActionHandler::at_delayedDropResourcesAction_triggered() {
@@ -981,7 +986,7 @@ void QnWorkbenchActionHandler::at_openFileAction_triggered() {
                                                        QnCustomFileDialog::fileDialogOptions());
 
     if (!files.isEmpty())
-        menu()->trigger(Qn::DropResourcesAction, addToResourcePool(files));
+        menu()->trigger(QnActions::DropResourcesAction, addToResourcePool(files));
 }
 
 void QnWorkbenchActionHandler::at_openLayoutAction_triggered() {
@@ -998,7 +1003,7 @@ void QnWorkbenchActionHandler::at_openLayoutAction_triggered() {
                                                      QnCustomFileDialog::fileDialogOptions());
 
     if(!fileName.isEmpty())
-        menu()->trigger(Qn::DropResourcesAction, addToResourcePool(fileName).filtered<QnLayoutResource>());
+        menu()->trigger(QnActions::DropResourcesAction, addToResourcePool(fileName).filtered<QnLayoutResource>());
 }
 
 void QnWorkbenchActionHandler::at_openFolderAction_triggered() {
@@ -1008,7 +1013,7 @@ void QnWorkbenchActionHandler::at_openFolderAction_triggered() {
                                                         QnCustomFileDialog::directoryDialogOptions());
 
     if(!dirName.isEmpty())
-        menu()->trigger(Qn::DropResourcesAction, addToResourcePool(dirName));
+        menu()->trigger(QnActions::DropResourcesAction, addToResourcePool(dirName));
 }
 
 void QnWorkbenchActionHandler::openLayoutSettingsDialog(const QnLayoutResourcePtr &layout) {
@@ -1036,6 +1041,12 @@ void QnWorkbenchActionHandler::openLayoutSettingsDialog(const QnLayoutResourcePt
 
 void QnWorkbenchActionHandler::openFailoverPriorityDialog() {
     QScopedPointer<QnFailoverPriorityDialog> dialog(new QnFailoverPriorityDialog(mainWindow()));
+    dialog->setWindowModality(Qt::ApplicationModal);
+    dialog->exec();
+}
+
+void QnWorkbenchActionHandler::openBackupCamerasDialog() {
+    QScopedPointer<QnBackupCamerasDialog> dialog(new QnBackupCamerasDialog(mainWindow()));
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
 }
@@ -1075,7 +1086,7 @@ void QnWorkbenchActionHandler::at_preferencesNotificationTabAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_businessEventsAction_triggered() {
-    menu()->trigger(Qn::OpenBusinessRulesAction);
+    menu()->trigger(QnActions::OpenBusinessRulesAction);
 }
 
 void QnWorkbenchActionHandler::at_openBusinessRulesAction_triggered() {
@@ -1098,7 +1109,7 @@ void QnWorkbenchActionHandler::at_webClientAction_triggered() {
     QnMediaServerResourcePtr server = parameters.resource().dynamicCast<QnMediaServerResource>();
     if (!server)
         /* If target server is not provided, open the server we are currently connected to. */
-        server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->remoteGUID());
+        server = qnCommon->currentServer();
 
     if (!server)
         return;
@@ -1127,8 +1138,44 @@ void QnWorkbenchActionHandler::at_userManagementAction_triggered() {
     systemAdministrationDialog()->setCurrentPage(QnSystemAdministrationDialog::UserManagement);
 }
 
-void QnWorkbenchActionHandler::at_businessEventsLogAction_triggered() {
-    menu()->trigger(Qn::OpenBusinessLogAction);
+qint64 QnWorkbenchActionHandler::getFirstBookmarkTimeMs()
+{
+    static const qint64 kOneDayOffsetMs = 60 * 60 * 24 * 1000;
+    static const qint64 kOneYearOffsetMs = kOneDayOffsetMs *  365;
+    const auto nowMs = qnSyncTime->currentMSecsSinceEpoch();
+    const auto bookmarksWatcher = context()->instance<QnWorkbenchBookmarksWatcher>();
+    const auto firstBookmarkUtcTimeMs = bookmarksWatcher->firstBookmarkUtcTimeMs();
+    const bool firstTimeIsNotKnown = (firstBookmarkUtcTimeMs == QnWorkbenchBookmarksWatcher::kUndefinedTime);
+    return (firstTimeIsNotKnown ? nowMs - kOneYearOffsetMs : firstBookmarkUtcTimeMs);
+}
+
+void QnWorkbenchActionHandler::at_openBookmarksSearchAction_triggered()
+{
+    const auto parameters = menu()->currentParameters(sender());
+
+    // If time window is specified then set it
+    const auto nowMs = qnSyncTime->currentMSecsSinceEpoch();
+
+    const auto filterText = (parameters.hasArgument(Qn::BookmarkTagRole)
+        ? parameters.argument(Qn::BookmarkTagRole).toString() : QString());
+
+    const auto timelineWindow = parameters.argument<QnTimePeriod>(Qn::ItemSliderWindowRole);
+    const auto endTimeMs = (timelineWindow.isValid()
+        ? (timelineWindow.isInfinite() ? nowMs : timelineWindow.endTimeMs()) : nowMs);
+
+    const auto startTimeMs(timelineWindow.isValid()
+        ? timelineWindow.startTimeMs : getFirstBookmarkTimeMs());
+
+    const auto dialogCreationFunction = [this, startTimeMs, endTimeMs, filterText]()
+    {
+        return new QnSearchBookmarksDialog(filterText, startTimeMs, endTimeMs, mainWindow());
+    };
+
+    const bool firstTime = m_searchBookmarksDialog.isNull();
+    const QnNonModalDialogConstructor<QnSearchBookmarksDialog> creator(m_searchBookmarksDialog, dialogCreationFunction);
+
+    if (!firstTime)
+        m_searchBookmarksDialog->setParameters(startTimeMs, endTimeMs, filterText);
 }
 
 void QnWorkbenchActionHandler::at_openBusinessLogAction_triggered() {
@@ -1176,8 +1223,8 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     if (!widget)
         return;
 
-    bool isSearchLayout = workbench()->currentLayout()->data().contains(Qn::LayoutSearchStateRole);
-    
+    bool isSearchLayout = workbench()->currentLayout()->isSearchLayout();
+
     QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
     QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::TimePeriodsRole);
 
@@ -1193,11 +1240,11 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     }
 
     /* Adjust for chunks. If they are provided, they MUST intersect with period */
-    if(!periods.isEmpty()) {
+    if(!periods.empty()) {
 
         QnTimePeriodList localPeriods = periods.intersected(period);
 
-        qint64 startDelta = localPeriods.first().startTimeMs - period.startTimeMs;
+        qint64 startDelta = localPeriods.begin()->startTimeMs - period.startTimeMs;
         if (startDelta > 0) { //user selected period before the first chunk
             period.startTimeMs += startDelta;
             period.durationMs -= startDelta;
@@ -1206,7 +1253,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
         qint64 endDelta = period.endTimeMs() - localPeriods.last().endTimeMs();
         if (endDelta > 0) { // user selected period after the last chunk
             period.durationMs -= endDelta;
-        }       
+        }
     }
 
 
@@ -1242,7 +1289,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     const qint64 maxItems = qnSettings->maxPreviewSearchItems();
 
     if(period.durationMs < steps[1]) {
-        QMessageBox::warning(mainWindow(), tr("Unable to perform preview search."), tr("Selected time period is too short to perform preview search. Please select a longer period."), QMessageBox::Ok);
+        QnMessageBox::warning(mainWindow(), tr("Unable to perform preview search."), tr("Selected time period is too short to perform preview search. Please select a longer period."), QMessageBox::Ok);
         return;
     }
 
@@ -1327,8 +1374,8 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
         QnTimePeriod localPeriod (time, step);
         QnTimePeriodList localPeriods = periods.intersected(localPeriod);
         qint64 localTime = time;
-        if (!localPeriods.isEmpty())
-            localTime = qMax(localTime, localPeriods.first().startTimeMs);
+        if (!localPeriods.empty())
+            localTime = qMax(localTime, localPeriods.begin()->startTimeMs);
 
         QnLayoutItemData item;
         item.flags = Qn::Pinned;
@@ -1360,7 +1407,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     layout->setLocalRange(period);
 
     resourcePool()->addResource(layout);
-    menu()->trigger(Qn::OpenSingleLayoutAction, layout);
+    menu()->trigger(QnActions::OpenSingleLayoutAction, layout);
 }
 
 void QnWorkbenchActionHandler::at_mediaFileSettingsAction_triggered() {
@@ -1377,7 +1424,7 @@ void QnWorkbenchActionHandler::at_mediaFileSettingsAction_triggered() {
         dialog.reset(new QnWorkbenchStateDependentDialog<QnMediaFileSettingsDialog>(mainWindow()));
     else
         dialog.reset(new QnMediaFileSettingsDialog(mainWindow()));
-    
+
     dialog->updateFromResource(media);
     if (dialog->exec()) {
         dialog->submitToResource(media);
@@ -1390,13 +1437,13 @@ void QnWorkbenchActionHandler::at_mediaFileSettingsAction_triggered() {
 
 void QnWorkbenchActionHandler::at_cameraIssuesAction_triggered()
 {
-    menu()->trigger(Qn::OpenBusinessLogAction,
+    menu()->trigger(QnActions::OpenBusinessLogAction,
                     menu()->currentParameters(sender())
                     .withArgument(Qn::EventTypeRole, QnBusiness::AnyCameraEvent));
 }
 
 void QnWorkbenchActionHandler::at_cameraBusinessRulesAction_triggered() {
-    menu()->trigger(Qn::OpenBusinessRulesAction,
+    menu()->trigger(QnActions::OpenBusinessRulesAction,
                     menu()->currentParameters(sender()));
 }
 
@@ -1426,10 +1473,10 @@ void QnWorkbenchActionHandler::at_serverAddCameraManuallyAction_triggered(){
         if (dialog->state() == QnCameraAdditionDialog::Searching
                 || dialog->state() == QnCameraAdditionDialog::Adding) {
 
-            int result = QMessageBox::warning(
+            int result = QnMessageBox::warning(
                         mainWindow(),
                         tr("Process in progress..."),
-                        tr("Device addition is already in progress."\
+                        tr("Device addition is already in progress. "
                            "Are you sure you want to cancel current process?"), //TODO: #GDM #Common show current process details
                         QMessageBox::Ok | QMessageBox::Cancel,
                         QMessageBox::Cancel
@@ -1456,10 +1503,11 @@ void QnWorkbenchActionHandler::at_serverLogsAction_triggered() {
     QString login = QnAppServerConnectionFactory::url().userName();
     QString password = QnAppServerConnectionFactory::url().password();
     QUrlQuery urlQuery(url);
+    auto nonce = QByteArray::number( qnSyncTime->currentUSecsSinceEpoch(), 16 );
     urlQuery.addQueryItem(
         lit("auth"),
-        QLatin1String(QnAuthHelper::createHttpQueryAuthParam(
-            login, password, server->realm(), nx_http::Method::GET)));
+        QLatin1String(createHttpQueryAuthParam(
+            login, password, server->realm(), nx_http::Method::GET, nonce)));
     urlQuery.addQueryItem(lit("lines"), QLatin1String("1000"));
     url.setQuery(urlQuery);
     url = QnNetworkProxyFactory::instance()->urlToResource(url, server);
@@ -1467,7 +1515,7 @@ void QnWorkbenchActionHandler::at_serverLogsAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_serverIssuesAction_triggered() {
-    menu()->trigger(Qn::OpenBusinessLogAction,
+    menu()->trigger(QnActions::OpenBusinessLogAction,
                     QnActionParameters().withArgument(Qn::EventTypeRole, QnBusiness::AnyServerEvent));
 }
 
@@ -1584,11 +1632,11 @@ bool QnWorkbenchActionHandler::validateResourceName(const QnResourcePtr &resourc
             ? tr("User already exists.")
             : tr("Video Wall already exists");
 
-        QString message = checkedFlags == Qn::user 
+        QString message = checkedFlags == Qn::user
             ? tr("User with the same name already exists")
             : tr("Video Wall with the same name already exists.");
 
-        QMessageBox::warning(
+        QnMessageBox::warning(
             mainWindow(),
             title,
             message
@@ -1600,7 +1648,8 @@ bool QnWorkbenchActionHandler::validateResourceName(const QnResourcePtr &resourc
 }
 
 
-void QnWorkbenchActionHandler::at_renameAction_triggered() {
+void QnWorkbenchActionHandler::at_renameAction_triggered()
+{
     QnActionParameters parameters = menu()->currentParameters(sender());
 
     QnResourcePtr resource;
@@ -1608,19 +1657,20 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
     Qn::NodeType nodeType = parameters.argument<Qn::NodeType>(Qn::NodeTypeRole, Qn::ResourceNode);
     switch (nodeType)
     {
-    case Qn::ResourceNode:
-    case Qn::EdgeNode:
-    case Qn::RecorderNode:
-        resource = parameters.resource();
-        break;
-    default:
-        break;
+        case Qn::ResourceNode:
+        case Qn::EdgeNode:
+        case Qn::RecorderNode:
+            resource = parameters.resource();
+            break;
+        default:
+            break;
     }
     if(!resource)
         return;
 
     QnVirtualCameraResourcePtr camera;
-    if (nodeType == Qn::RecorderNode) {
+    if (nodeType == Qn::RecorderNode)
+    {
         camera = resource.dynamicCast<QnVirtualCameraResource>();
         if (!camera)
             return;
@@ -1631,9 +1681,11 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
             ? camera->getGroupName()
             : resource->getName();
 
-    if(name.isEmpty()) {
+    if (name.isEmpty())
+    {
         bool ok = false;
-        do {
+        do
+        {
             name = QInputDialog::getText(mainWindow(),
                                          tr("Rename"),
                                          tr("Enter new name for the selected item:"),
@@ -1644,36 +1696,46 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
             if (!ok || name.isEmpty() || name == oldName)
                 return;
 
-        } while (!validateResourceName(resource, name));
+        }
+        while (!validateResourceName(resource, name));
     }
 
     if(name == oldName)
         return;
 
-    if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {
+    if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>())
+    {
         context()->instance<QnWorkbenchLayoutsHandler>()->renameLayout(layout, name);
-    } else if (nodeType == Qn::RecorderNode) {
+    }
+    else if (nodeType == Qn::RecorderNode)
+    {
         /* Recorder name should not be validated. */
         QString groupId = camera->getGroupId();
 
-        QnVirtualCameraResourceList modified = qnResPool->getResources().filtered<QnVirtualCameraResource>([groupId](const QnVirtualCameraResourcePtr &camera){
+        QnVirtualCameraResourceList modified = qnResPool->getResources().filtered<QnVirtualCameraResource>([groupId](const QnVirtualCameraResourcePtr &camera)
+        {
             return camera->getGroupId() == groupId;
         });
-        qnResourcesChangesManager->saveCameras(modified, [name](const QnVirtualCameraResourcePtr &camera) {
+        qnResourcesChangesManager->saveCameras(modified, [name](const QnVirtualCameraResourcePtr &camera)
+        {
             camera->setUserDefinedGroupName(name);
         });
-    } else {
-        if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>()) {
-            qnResourcesChangesManager->saveServer(server, [name](const QnMediaServerResourcePtr &server) {
-                server->setName(name);
-            });
-        }
-        
-        if (QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>()) {
-            qnResourcesChangesManager->saveCamera(camera, [name](const QnVirtualCameraResourcePtr &camera) {
-                camera->setName(name);
-            });
-        }
+    }
+    else if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
+    {
+        qnResourcesChangesManager->saveServer(server, [name](const QnMediaServerResourcePtr &server) { server->setName(name); });
+    }
+    else if (QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>())
+    {
+        qnResourcesChangesManager->saveCamera(camera, [name](const QnVirtualCameraResourcePtr &camera) { camera->setName(name); });
+    }
+    else if (QnVideoWallResourcePtr videowall = resource.dynamicCast<QnVideoWallResource>())
+    {
+        qnResourcesChangesManager->saveVideoWall(videowall, [name](const QnVideoWallResourcePtr &videowall) { videowall->setName(name); } );
+    }
+    else
+    {
+        Q_ASSERT_X(false, Q_FUNC_INFO, "Invalid resource type to rename");
     }
 }
 
@@ -1711,7 +1773,7 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
         /* These can be simply deleted from resource pool. */
         for (const QnLayoutResourcePtr &layout: localLayouts) {
             remoteResources.removeOne(layout);
-            qnResPool->removeResource(layout); 
+            qnResPool->removeResource(layout);
         }
 
         qnResourcesChangesManager->deleteResources(remoteResources);
@@ -1738,13 +1800,12 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
 
     QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
 
-    /* Check that we are deleting online auto-found cameras */ 
+    /* Check that we are deleting online auto-found cameras */
     QnVirtualCameraResourceList onlineAutoDiscoveredCameras = cameras.filtered([](const QnVirtualCameraResourcePtr &camera){
-        return camera->getStatus() != Qn::Offline 
+        return camera->getStatus() != Qn::Offline
             && !camera->isManuallyAdded();
     });
 
-    //TODO: #GDM #tr strings are really untranslatable. Also second and third sentences are always plural.
     QString question;
     /* First version of the dialog - if all resources are cameras and all of them are auto-discovered. */
     if (resources.size() == onlineAutoDiscoveredCameras.size()) {
@@ -1752,57 +1813,57 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
             QnDeviceDependentStrings::getNameFromSet(
                 QnCameraDeviceStringSet(
                     tr("These %n devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?",
-                        nullptr, onlineAutoDiscoveredCameras.size()),
+                        "", onlineAutoDiscoveredCameras.size()),
                     tr("These %n cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?",
-                        nullptr, onlineAutoDiscoveredCameras.size()),
-                    tr("These %n IO modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?",
-                        nullptr, onlineAutoDiscoveredCameras.size())
+                        "", onlineAutoDiscoveredCameras.size()),
+                    tr("These %n I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?",
+                        "", onlineAutoDiscoveredCameras.size())
                 ),
                 onlineAutoDiscoveredCameras
             );
     }
-    else 
+    else
     /* Second version - some cameras are auto-discovered, some not. */
     if (cameras.size() == resources.size() && !onlineAutoDiscoveredCameras.isEmpty()) {
         question =
             QnDeviceDependentStrings::getNameFromSet(
                 QnCameraDeviceStringSet(
                     tr("%n of these devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?",
-                        nullptr, onlineAutoDiscoveredCameras.size()),
+                        "", onlineAutoDiscoveredCameras.size()),
                     tr("%n of these cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?",
-                        nullptr, onlineAutoDiscoveredCameras.size()),
-                    tr("%n of these IO modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?",
-                        nullptr, onlineAutoDiscoveredCameras.size())
+                        "", onlineAutoDiscoveredCameras.size()),
+                    tr("%n of these I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?",
+                        "", onlineAutoDiscoveredCameras.size())
                 ),
                 cameras
             );
     }
     else
-    /* Third version - no auto-discovered cameras in the list. */        
+    /* Third version - no auto-discovered cameras in the list. */
     if (cameras.size() == resources.size()) {
         question =
             QnDeviceDependentStrings::getNameFromSet(
                 QnCameraDeviceStringSet(
                     tr("Do you really want to delete the following %n devices?",
-                        nullptr, cameras.size()),
+                        "", cameras.size()),
                     tr("Do you really want to delete the following %n cameras?",
-                        nullptr, cameras.size()),
-                    tr("Do you really want to delete the following %n IO modules?",
-                        nullptr, cameras.size())
+                        "", cameras.size()),
+                    tr("Do you really want to delete the following %n I/O modules?",
+                        "", cameras.size())
                 ),
                 cameras
             );
     }
     else
     /* Forth version - cameras and other items. */
-    {        
+    {
         question =
             tr("Do you really want to delete the following %n items?", "", resources.size());
     }
-    
+
     if (moreResourceToDelete.isEmpty())
         return;
-    
+
     int helpId = Qn::Empty_Help;
     for (const QnResourcePtr &resource: resources) {
         if (resource->hasFlags(Qn::live_cam)) {
@@ -1843,7 +1904,7 @@ void QnWorkbenchActionHandler::at_newUserAction_triggered() {
         if(!dialog->exec())
             return;
         dialog->submitToResource();
-    } while (!validateResourceName(user, user->getName())); 
+    } while (!validateResourceName(user, user->getName()));
 
     user->setId(QnUuid::createUuid());
     user->setTypeByName(lit("User"));
@@ -1857,7 +1918,7 @@ void QnWorkbenchActionHandler::closeApplication(bool force) {
     if (!context()->instance<QnWorkbenchStateManager>()->tryClose(force) && !force)
         return;
 
-    menu()->trigger(Qn::BeforeExitAction);
+    menu()->trigger(QnActions::BeforeExitAction);
     qApp->exit(0);
     applauncher::scheduleProcessKill( QCoreApplication::applicationPid(), PROCESS_TERMINATE_TIMEOUT );
 }
@@ -1923,7 +1984,7 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
         ((permissions & Qn::WriteEmailPermission) ? QnUserSettingsDialog::Editable : zero);
     emailFlags &= flags;
 
-    QnUserSettingsDialog::ElementFlags enabledFlags =  
+    QnUserSettingsDialog::ElementFlags enabledFlags =
         ((permissions & Qn::WriteAccessRightsPermission) ? QnUserSettingsDialog::Editable | QnUserSettingsDialog::Visible : zero);
     enabledFlags &= flags;
 
@@ -1949,7 +2010,7 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
 
     if (!(permissions & Qn::SavePermission))
         return;
-    
+
     qnResourcesChangesManager->saveUser(user, [&dialog](const QnUserResourcePtr &) {
         dialog->submitToResource();
     });
@@ -1961,7 +2022,7 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
 
     if (user != context()->user() || newPassword.isEmpty() || newPassword == currentPassword)
         return;
-    
+
 
     /* Password was changed. Change it in global settings and hope for the best. */
     QUrl url = QnAppServerConnectionFactory::url();
@@ -1976,8 +2037,8 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
     url.setUserName(user->getName());
 
     QnConnectionDataList savedConnections = qnSettings->customConnections();
-    if (!savedConnections.isEmpty() 
-        && !savedConnections.first().url.password().isEmpty() 
+    if (!savedConnections.isEmpty()
+        && !savedConnections.first().url.password().isEmpty()
         && qnUrlEqual(savedConnections.first().url, url))
     {
         QnConnectionData current = savedConnections.takeFirst();
@@ -2004,22 +2065,22 @@ void QnWorkbenchActionHandler::at_currentLayoutSettingsAction_triggered() {
 
 void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing0Action_triggered() {
     workbench()->currentLayout()->resource()->setCellSpacing(QSizeF(0.0, 0.0));
-    action(Qn::SetCurrentLayoutItemSpacing0Action)->setChecked(true);
+    action(QnActions::SetCurrentLayoutItemSpacing0Action)->setChecked(true);
 }
 
 void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing10Action_triggered() {
     workbench()->currentLayout()->resource()->setCellSpacing(QSizeF(0.1, 0.1));
-    action(Qn::SetCurrentLayoutItemSpacing10Action)->setChecked(true);
+    action(QnActions::SetCurrentLayoutItemSpacing10Action)->setChecked(true);
 }
 
 void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing20Action_triggered() {
     workbench()->currentLayout()->resource()->setCellSpacing(QSizeF(0.2, 0.2));
-    action(Qn::SetCurrentLayoutItemSpacing20Action)->setChecked(true);
+    action(QnActions::SetCurrentLayoutItemSpacing20Action)->setChecked(true);
 }
 
 void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing30Action_triggered() {
     workbench()->currentLayout()->resource()->setCellSpacing(QSizeF(0.3, 0.3));
-    action(Qn::SetCurrentLayoutItemSpacing30Action)->setChecked(true);
+    action(QnActions::SetCurrentLayoutItemSpacing30Action)->setChecked(true);
 }
 
 void QnWorkbenchActionHandler::at_createZoomWindowAction_triggered() {
@@ -2074,16 +2135,16 @@ void QnWorkbenchActionHandler::at_setAsBackgroundAction_triggered() {
     connect(cache, &QnAppServerImageCache::fileUploaded,   cache,              &QObject::deleteLater);
     connect(cache, &QnAppServerImageCache::fileUploaded,   this, [this, checkCondition](const QString &filename, QnAppServerFileCache::OperationResult status) {
         if (!checkCondition())
-            return;   
+            return;
 
         if (status == QnAppServerFileCache::OperationResult::sizeLimitExceeded) {
-            QMessageBox::warning(mainWindow(), tr("Error"), tr("Picture is too big. Maximum size is %1 Mb").arg(QnAppServerFileCache::maximumFileSize() / (1024*1024))
+            QnMessageBox::warning(mainWindow(), tr("Error"), tr("Picture is too big. Maximum size is %1 Mb").arg(QnAppServerFileCache::maximumFileSize() / (1024*1024))
                 );
             return;
         }
 
         if (status != QnAppServerFileCache::OperationResult::ok) {
-            QMessageBox::warning(mainWindow(), tr("Error"), tr("Error while uploading picture."));
+            QnMessageBox::warning(mainWindow(), tr("Error"), tr("Error while uploading picture."));
             return;
         }
 
@@ -2098,7 +2159,7 @@ void QnWorkbenchActionHandler::at_setAsBackgroundAction_triggered() {
 void QnWorkbenchActionHandler::setCurrentLayoutBackground(const QString &filename) {
     QnWorkbenchLayout* wlayout = workbench()->currentLayout();
     QnLayoutResourcePtr layout = wlayout->resource();
-    
+
     layout->setBackgroundImageFilename(filename);
     if (qFuzzyCompare(layout->backgroundOpacity(), 0.0))
         layout->setBackgroundOpacity(0.7);
@@ -2140,26 +2201,26 @@ void QnWorkbenchActionHandler::setCurrentLayoutBackground(const QString &filenam
 }
 
 void QnWorkbenchActionHandler::at_panicWatcher_panicModeChanged() {
-    action(Qn::TogglePanicModeAction)->setChecked(context()->instance<QnWorkbenchPanicWatcher>()->isPanicMode());
-    //if (!action(Qn::TogglePanicModeAction)->isChecked()) {
+    action(QnActions::TogglePanicModeAction)->setChecked(context()->instance<QnWorkbenchPanicWatcher>()->isPanicMode());
+    //if (!action(QnActions::TogglePanicModeAction)->isChecked()) {
 
-    bool enabled = 
+    bool enabled =
         context()->instance<QnWorkbenchScheduleWatcher>()->isScheduleEnabled() &&
         (accessController()->globalPermissions() & Qn::GlobalPanicPermission);
-    action(Qn::TogglePanicModeAction)->setEnabled(enabled);
+    action(QnActions::TogglePanicModeAction)->setEnabled(enabled);
 
     //}
 }
 
 void QnWorkbenchActionHandler::at_scheduleWatcher_scheduleEnabledChanged() {
     // TODO: #Elric totally evil copypasta and hacky workaround.
-    bool enabled = 
+    bool enabled =
         context()->instance<QnWorkbenchScheduleWatcher>()->isScheduleEnabled() &&
         (accessController()->globalPermissions() & Qn::GlobalPanicPermission);
 
-    action(Qn::TogglePanicModeAction)->setEnabled(enabled);
+    action(QnActions::TogglePanicModeAction)->setEnabled(enabled);
     if (!enabled)
-        action(Qn::TogglePanicModeAction)->setChecked(false);
+        action(QnActions::TogglePanicModeAction)->setChecked(false);
 }
 
 void QnWorkbenchActionHandler::at_togglePanicModeAction_toggled(bool checked) {
@@ -2201,7 +2262,7 @@ void QnWorkbenchActionHandler::at_tourTimer_timeout() {
     qSort(items.begin(), items.end(), ItemPositionCmp());
 
     if(items.empty()) {
-        action(Qn::ToggleTourModeAction)->setChecked(false);
+        action(QnActions::ToggleTourModeAction)->setChecked(false);
         return;
     }
 
@@ -2216,7 +2277,7 @@ void QnWorkbenchActionHandler::at_tourTimer_timeout() {
 
 void QnWorkbenchActionHandler::at_workbench_itemChanged(Qn::ItemRole role) {
     if(!workbench()->item(Qn::ZoomedRole))
-        action(Qn::ToggleTourModeAction)->setChecked(false);
+        action(QnActions::ToggleTourModeAction)->setChecked(false);
 
     if (role == Qn::CentralRole && adjustVideoDialog() && adjustVideoDialog()->isVisible())
     {
@@ -2228,7 +2289,7 @@ void QnWorkbenchActionHandler::at_workbench_itemChanged(Qn::ItemRole role) {
 }
 
 void QnWorkbenchActionHandler::at_whatsThisAction_triggered() {
-    if (QWhatsThis::inWhatsThisMode()) 
+    if (QWhatsThis::inWhatsThisMode())
         QWhatsThis::leaveWhatsThisMode();
     else
         QWhatsThis::enterWhatsThisMode();
@@ -2240,8 +2301,8 @@ void QnWorkbenchActionHandler::at_escapeHotkeyAction_triggered() {
         return;
     }
 
-    if (action(Qn::ToggleTourModeAction)->isChecked())
-        menu()->trigger(Qn::ToggleTourModeAction);
+    if (action(QnActions::ToggleTourModeAction)->isChecked())
+        menu()->trigger(QnActions::ToggleTourModeAction);
 }
 
 void QnWorkbenchActionHandler::at_messageBoxAction_triggered() {
@@ -2250,7 +2311,7 @@ void QnWorkbenchActionHandler::at_messageBoxAction_triggered() {
     if (text.isEmpty())
         text = title;
 
-    QMessageBox::information(mainWindow(), title, text);
+    QnMessageBox::information(mainWindow(), title, text);
 }
 
 void QnWorkbenchActionHandler::at_browseUrlAction_triggered() {
@@ -2302,8 +2363,8 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
             QnWorkbenchVersionMismatchWatcher::versionMismatches(data.version, latestMsVersion, true);
 
         if (updateRequested)
-            component = QString(lit("<font color=\"%1\">%2</font>")).arg(qnGlobals->errorTextColor().name()).arg(component);
-        
+            component = setWarningStyleHtml(component);
+
         messageParts << component;
     }
 
@@ -2323,14 +2384,14 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
 
     QPushButton *updateButton = messageBox->addButton(tr("Update..."), QMessageBox::HelpRole);
     connect(updateButton, &QPushButton::clicked, this, [this] {
-        menu()->trigger(Qn::SystemUpdateAction);
+        menu()->trigger(QnActions::SystemUpdateAction);
     }, Qt::QueuedConnection);
-    
+
     messageBox->exec();
 }
 
 void QnWorkbenchActionHandler::at_betaVersionMessageAction_triggered() {
-    QMessageBox::warning(mainWindow(),
+    QnMessageBox::warning(mainWindow(),
                          tr("Beta version %1").arg(QnAppInfo::applicationVersion()),
                          tr("This is a beta version of %1.")
                          .arg(qApp->applicationDisplayName()));
@@ -2344,8 +2405,8 @@ void QnWorkbenchActionHandler::checkIfStatisticsReportAllowed() {
     if (servers.isEmpty())
         return;
 
-    /* Check if user already made a decision. */
-    if (ec2::Ec2StaticticsReporter::isDefined(servers))
+    /* Check if user has already made a decision. */
+    if (qnGlobalSettings->isStatisticsAllowedDefined())
         return;
 
     /* User cannot disable statistics collecting, so don't make him sorrow. */
@@ -2359,15 +2420,15 @@ void QnWorkbenchActionHandler::checkIfStatisticsReportAllowed() {
     if (!atLeastOneServerHasInternetAccess)
         return;
 
-    QMessageBox::information(
+    QnMessageBox::information(
         mainWindow(),
-        tr("Anonymous Usage Statistics"),                                   
+        tr("Anonymous Usage Statistics"),
         tr("System sends anonymous usage and crash statistics to the software development team to help us improve your user experience.\n"
            "If you would like to disable this feature you can do so in the System Settings dialog.")
            );
 
-    ec2::Ec2StaticticsReporter::setAllowed(servers, true);
-    propertyDictionary->saveParamsAsync(idListFromResList(servers));
+    qnGlobalSettings->setStatisticsAllowed(true);
+    qnGlobalSettings->synchronizeNow();
 }
 
 
@@ -2393,12 +2454,12 @@ void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered() {
         QMessageBox::critical(
                     mainWindow(),
                     tr("Launcher process not found."),
-                    tr("Cannot restart the client.") + L'\n' 
+                    tr("Cannot restart the client.") + L'\n'
                   + tr("Please close the application and start it again using the shortcut in the start menu.")
                     );
         return;
     }
-    menu()->trigger(Qn::DelayedForcedExitAction);
+    menu()->trigger(QnActions::DelayedForcedExitAction);
 }
 
 void QnWorkbenchActionHandler::at_selectTimeServerAction_triggered() {

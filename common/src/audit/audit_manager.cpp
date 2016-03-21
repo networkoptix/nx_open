@@ -120,7 +120,7 @@ void QnAuditManager::at_connectionClosed(const QnAuthSession &data)
     if (!enabled())
         return;
 
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     auto itr = m_openedConnections.find(data.id);
     if (itr != m_openedConnections.end()) {
         AuditConnection& connection = itr.value();
@@ -136,7 +136,7 @@ AuditHandle QnAuditManager::notifyPlaybackStarted(const QnAuthSession& session, 
 
     // check for existing data
 
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     for (auto itr = m_alivePlaybackInfo.begin(); itr != m_alivePlaybackInfo.end(); ++itr)
     {
         CameraPlaybackInfo& pbInfo = *itr;
@@ -174,7 +174,7 @@ AuditHandle QnAuditManager::notifyPlaybackStarted(const QnAuthSession& session, 
 
 QnTimePeriod QnAuditManager::playbackRange(const AuditHandle& handle) const
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     if (!handle)
         return QnTimePeriod();
     auto itr = m_alivePlaybackInfo.find(*handle);
@@ -188,11 +188,11 @@ void QnAuditManager::notifyPlaybackInProgress(const AuditHandle& handle, qint64 
 {
     if (!enabled())
         return;
-    if (timestampUsec == DATETIME_NOW || timestampUsec == AV_NOPTS_VALUE || timestampUsec <= 0)
+    if (timestampUsec == DATETIME_NOW || timestampUsec == DATETIME_INVALID || timestampUsec <= 0)
         return;
 
     qint64 timestampMs = timestampUsec / 1000;
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     auto itr = m_alivePlaybackInfo.find(*handle);
     if (itr != m_alivePlaybackInfo.end())
     {
@@ -220,13 +220,13 @@ void QnAuditManager::notifySettingsChanged(const QnAuthSession& authInfo, const 
     info.paramName = paramName;
     info.session = authInfo;
     info.timeout.restart();
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     m_changedSettings << info;
 }
 
 void QnAuditManager::at_timer()
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
 
     for (auto itr = m_alivePlaybackInfo.begin(); itr != m_alivePlaybackInfo.end();)
     {
@@ -303,7 +303,7 @@ int QnAuditManager::addAuditRecord(const QnAuditRecord& record)
     if (!enabled())
         return -1;
 
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     if (m_sessionCleanupTimer.elapsed() > SESSION_CLEANUP_INTERVAL_MS)
     {
         m_sessionCleanupTimer.restart();
@@ -336,7 +336,7 @@ bool QnAuditManager::enabled() const
 
 void QnAuditManager::setEnabled(bool value)
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
 
     m_enabled = value;
     if (!m_enabled) {

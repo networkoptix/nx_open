@@ -5,7 +5,7 @@ FULL_COMPANY_NAME="${company.name}"
 FULL_PRODUCT_NAME="${company.name} ${product.name} Client.conf"
 FULL_APPLAUNCHER_NAME="${company.name} Launcher.conf"
 
-PACKAGENAME=$COMPANY_NAME-client
+PACKAGENAME=${installer.name}-client
 VERSION=${release.version}
 FULLVERSION=${release.version}.${buildNumber}
 MINORVERSION=${parsedVersion.majorVersion}.${parsedVersion.minorVersion}
@@ -62,7 +62,7 @@ mv -f debian/applauncher.conf $STAGE/etc/xdg/"$FULL_COMPANY_NAME"/"$FULL_APPLAUN
 mv -f usr/share/applications/icon.desktop usr/share/applications/${installer.name}.desktop
 
 # Copy client binary, old version libs
-cp -r $CLIENT_BIN_PATH/clientexe $BINSTAGE/client-bin
+cp -r $CLIENT_BIN_PATH/client.bin $BINSTAGE/client-bin
 cp -r $CLIENT_BIN_PATH/applauncher $BINSTAGE/applauncher-bin
 cp -r bin/applauncher $BINSTAGE
 

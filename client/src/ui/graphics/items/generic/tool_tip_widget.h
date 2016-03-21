@@ -89,6 +89,8 @@ public:
 
     virtual void setGeometry(const QRectF &rect) override;
 
+    void setRoundingRadius(qreal radius);
+
 signals:
     void tailPosChanged();
 
@@ -111,6 +113,7 @@ private:
 
     QPointF m_tailPos;
     qreal m_tailWidth;
+    qreal m_roundingRadius;
     bool m_autoSize;
 };
 

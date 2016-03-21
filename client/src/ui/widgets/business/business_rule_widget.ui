@@ -61,7 +61,7 @@
           <item>
            <widget class="QComboBox" name="eventTypeComboBox">
             <property name="maxVisibleItems">
-             <number>11</number>
+             <number>100</number>
             </property>
            </widget>
           </item>
@@ -227,6 +227,9 @@
               <height>0</height>
              </size>
             </property>
+            <property name="maxVisibleItems">
+             <number>100</number>
+            </property>
            </widget>
           </item>
          </layout>
@@ -345,8 +348,6 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="../../../../x64/build/client.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

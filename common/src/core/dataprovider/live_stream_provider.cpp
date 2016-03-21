@@ -8,7 +8,9 @@
 #include "utils/media/h264_utils.h"
 #include "utils/media/jpeg_utils.h"
 #include "utils/media/nalUnits.h"
-
+#include "utils/common/safe_direct_connection.h"
+#include "utils/common/synctime.h"
+#include "utils/common/log.h"
 
 static const int CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES = 1000;
 static const int PRIMARY_RESOLUTION_CHECK_TIMEOUT_MS = 10*1000;
@@ -33,13 +35,14 @@ bool QnLiveStreamParams::operator !=(const QnLiveStreamParams& rhs) { return !(*
 
 QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
     QnAbstractMediaStreamDataProvider(res),
-    m_livemutex(QMutex::Recursive),
+    m_livemutex(QnMutex::Recursive),
     m_qualityUpdatedAtLeastOnce(false),
     m_framesSinceLastMetaData(0),
     m_totalVideoFrames(0),
     m_totalAudioFrames(0),
     m_softMotionRole(Qn::CR_Default),
     m_softMotionLastChannel(0),
+    m_videoChannels(1),
     m_framesSincePrevMediaStreamCheck(CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES+1),
     m_owner(0)
 {
@@ -53,14 +56,21 @@ QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
 
     m_role = Qn::CR_LiveVideo;
     m_timeSinceLastMetaData.restart();
-    m_layout = QnConstResourceVideoLayoutPtr();
     m_cameraRes = res.dynamicCast<QnPhysicalCameraResource>();
     Q_ASSERT(m_cameraRes);
     m_prevCameraControlDisabled = m_cameraRes->isCameraControlDisabled();
-    m_layout = m_cameraRes->getVideoLayout();
+    m_videoChannels = m_cameraRes->getVideoLayout()->channelCount();
     m_isPhysicalResource = res.dynamicCast<QnPhysicalCameraResource>();
     m_resolutionCheckTimer.invalidate();
+
+    Qn::directConnect(res.data(), &QnResource::videoLayoutChanged, this, [this](const QnResourcePtr&) {
+        m_videoChannels = m_cameraRes->getVideoLayout()->channelCount();
+        QnMutexLocker mtx( &m_livemutex );
+        updateSoftwareMotion();
+    });
+
 }
+
 
 void QnLiveStreamProvider::setOwner(QnAbstractVideoCamera* owner)
 {
@@ -69,6 +79,7 @@ void QnLiveStreamProvider::setOwner(QnAbstractVideoCamera* owner)
 
 QnLiveStreamProvider::~QnLiveStreamProvider()
 {
+    directDisconnectAll();
     for (int i = 0; i < CL_MAX_CHANNELS; ++i) 
         qFreeAligned(m_motionMaskBinData[i]);
 }
@@ -77,7 +88,7 @@ void QnLiveStreamProvider::setRole(Qn::ConnectionRole role)
 {
     QnAbstractMediaStreamDataProvider::setRole(role);
 
-    QMutexLocker mtx(&m_livemutex);
+    QnMutexLocker mtx(&m_livemutex);
     updateSoftwareMotion();
 
     const auto oldParams = m_newLiveParams;
@@ -97,7 +108,7 @@ void QnLiveStreamProvider::setRole(Qn::ConnectionRole role)
 
 Qn::ConnectionRole QnLiveStreamProvider::getRole() const
 {
-    QMutexLocker mtx(&m_livemutex);
+    QnMutexLocker mtx( &m_livemutex );
     return m_role;
 }
 
@@ -117,7 +128,7 @@ void QnLiveStreamProvider::setCameraControlDisabled(bool value)
 void QnLiveStreamProvider::setSecondaryQuality(Qn::SecondStreamQuality  quality)
 {
     {
-        QMutexLocker mtx(&m_livemutex);
+        QnMutexLocker mtx( &m_livemutex );
         if (m_newLiveParams.secondaryQuality == quality)
             return; // same quality
         m_newLiveParams.secondaryQuality = quality;
@@ -144,7 +155,7 @@ void QnLiveStreamProvider::setSecondaryQuality(Qn::SecondStreamQuality  quality)
 void QnLiveStreamProvider::setQuality(Qn::StreamQuality q)
 {
     {
-        QMutexLocker mtx(&m_livemutex);
+        QnMutexLocker mtx( &m_livemutex );
         if (m_newLiveParams.quality == q && m_qualityUpdatedAtLeastOnce)
             return; // same quality
 
@@ -158,7 +169,7 @@ void QnLiveStreamProvider::setQuality(Qn::StreamQuality q)
 
 Qn::ConnectionRole QnLiveStreamProvider::roleForMotionEstimation()
 {
-    QMutexLocker lock(&m_motionRoleMtx);
+    QnMutexLocker lock( &m_motionRoleMtx );
 
     if (m_softMotionRole == Qn::CR_Default) 
     {
@@ -186,7 +197,7 @@ void QnLiveStreamProvider::updateSoftwareMotion()
 #ifdef ENABLE_SOFTWARE_MOTION_DETECTION
     if (m_cameraRes->getMotionType() == Qn::MT_SoftwareGrid && getRole() == roleForMotionEstimation())
     {
-        for (int i = 0; i < m_layout->channelCount(); ++i)
+        for (int i = 0; i < m_videoChannels; ++i)
         {
             QnMotionRegion region = m_cameraRes->getMotionRegion(i);
             m_motionEstimation[i].setMotionMask(region);
@@ -206,7 +217,7 @@ bool QnLiveStreamProvider::canChangeStatus() const
 void QnLiveStreamProvider::setFps(float f)
 {
     {
-        QMutexLocker mtx(&m_livemutex);
+        QnMutexLocker mtx( &m_livemutex );
 
         if (std::abs(m_newLiveParams.fps - f) < 0.1)
             return; // same fps?
@@ -239,7 +250,7 @@ float QnLiveStreamProvider::getDefaultFps() const
 
 bool QnLiveStreamProvider::isMaxFps() const
 {
-    QMutexLocker mtx(&m_livemutex);
+    QnMutexLocker mtx( &m_livemutex );
     return m_newLiveParams.fps >= m_cameraRes->getMaxFps()-0.1;
 }
 
@@ -251,7 +262,7 @@ bool QnLiveStreamProvider::needMetaData()
     {
 #ifdef ENABLE_SOFTWARE_MOTION_DETECTION
         if (getRole() == roleForMotionEstimation()) {
-            for (int i = 0; i < m_layout->channelCount(); ++i)
+            for (int i = 0; i < m_videoChannels; ++i)
             {
                 bool rez = m_motionEstimation[i].existsMetadata();
                 if (rez) {
@@ -278,6 +289,11 @@ bool QnLiveStreamProvider::needMetaData()
     return false; // not motion configured
 }
 
+void QnLiveStreamProvider::onStreamReopen()
+{
+    m_totalVideoFrames = 0;
+}
+
 void QnLiveStreamProvider::onGotVideoFrame(const QnCompressedVideoDataPtr& videoData,
                                            const QnLiveStreamParams& currentLiveParams,
                                            bool isCameraControlRequired)
@@ -286,8 +302,8 @@ void QnLiveStreamProvider::onGotVideoFrame(const QnCompressedVideoDataPtr& video
     m_framesSinceLastMetaData++;
 
     saveMediaStreamParamsIfNeeded(videoData);
-    if (isCameraControlRequired && m_totalVideoFrames == SAVE_BITRATE_FRAME)
-        saveBitrateIfNotExists(videoData, currentLiveParams);
+    if (m_totalVideoFrames && (m_totalVideoFrames % SAVE_BITRATE_FRAME) == 0)
+        saveBitrateIfNeeded(videoData, currentLiveParams, isCameraControlRequired);
 
 #ifdef ENABLE_SOFTWARE_MOTION_DETECTION
 
@@ -348,7 +364,7 @@ void QnLiveStreamProvider::onPrimaryFpsUpdated(int newFps)
     {
         newSecFps = qMin(m_cameraRes->desiredSecondStreamFps(), maxFps); //minimum between DESIRED_SECOND_STREAM_FPS and what is left;
         if (maxFps - newFps < 2 )
-            newSecFps = qMin(m_cameraRes->desiredSecondStreamFps()/2,MIN_SECOND_STREAM_FPS);
+            newSecFps = qMax(m_cameraRes->desiredSecondStreamFps()/2,MIN_SECOND_STREAM_FPS);
 
     }
     else if (sharingMethod == Qn::BasicFpsSharing)
@@ -366,7 +382,7 @@ void QnLiveStreamProvider::onPrimaryFpsUpdated(int newFps)
 
 QnLiveStreamParams QnLiveStreamProvider::getLiveParams()
 {
-    QMutexLocker lock(&m_livemutex);
+    QnMutexLocker lock(&m_livemutex);
     if (m_newLiveParams.fps == FPS_NOT_INITIALIZED)
         m_newLiveParams.fps = getDefaultFps();
     return m_newLiveParams;
@@ -412,7 +428,7 @@ bool QnLiveStreamProvider::hasRunningLiveProvider(QnNetworkResource* netRes)
 
 void QnLiveStreamProvider::startIfNotRunning()
 {
-    QMutexLocker mtx(&m_mutex);
+    QnMutexLocker mtx( &m_mutex );
     if (!isRunning())    
     {
         m_framesSincePrevMediaStreamCheck = CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES+1;
@@ -455,13 +471,13 @@ void QnLiveStreamProvider::updateStreamResolution( int channelNumber, const QSiz
     }
 
     m_softMotionRole = Qn::CR_Default;    //it will be auto-detected on the next frame
-    QMutexLocker mtx(&m_livemutex);
+    QnMutexLocker mtx( &m_livemutex );
     updateSoftwareMotion();
 }
 
 void QnLiveStreamProvider::updateSoftwareMotionStreamNum()
 {
-    QMutexLocker lock(&m_motionRoleMtx);
+    QnMutexLocker lock( &m_motionRoleMtx );
     m_softMotionRole = Qn::CR_Default;    //it will be auto-detected on the next frame
 }
 
@@ -527,20 +543,39 @@ void QnLiveStreamProvider::saveMediaStreamParamsIfNeeded( const QnCompressedVide
         m_cameraRes->saveParamsAsync();
 }
 
-void QnLiveStreamProvider::saveBitrateIfNotExists( const QnCompressedVideoDataPtr& videoData,
-                                                   const QnLiveStreamParams& liveParams )
+void QnLiveStreamProvider::saveBitrateIfNeeded( const QnCompressedVideoDataPtr& videoData,
+                                                const QnLiveStreamParams& liveParams,
+                                                bool isCameraConfigured )
 {
     QSize resoulution;
     std::map<QString, QString> customParams;
-    extractMediaStreamParams( videoData, &resoulution, &customParams );
+    extractMediaStreamParams(videoData, &resoulution, &customParams);
 
-    const auto actBitrate = getBitrateMbps();
-    const auto sugBitrate = static_cast<float>(m_cameraRes->suggestBitrateKbps(
-                liveParams.quality, resoulution, liveParams.fps )) / 1024;
+    auto now = qnSyncTime->currentDateTime().toUTC().toString(Qt::ISODate);
+    CameraBitrateInfo info(encoderIndex(), std::move(now));
 
-    CameraBitrateInfo bitrateInfo( encoderIndex(), sugBitrate, actBitrate, liveParams.fps, resoulution );
-    if( m_cameraRes->saveBitrateIfNotExists( bitrateInfo ) )
+    info.rawSuggestedBitrate = m_cameraRes->rawSuggestBitrateKbps(
+        liveParams.quality, resoulution, liveParams.fps) / 1024;
+    info.suggestedBitrate = static_cast<float>(m_cameraRes->suggestBitrateKbps(
+        liveParams.quality, resoulution, liveParams.fps)) / 1024;
+    info.actualBitrate = getBitrateMbps() / getNumberOfChannels();
+
+    info.bitratePerGop = m_cameraRes->bitratePerGopType();
+    info.bitrateFactor = 1; // TODO: #mux Pass actual value when avaliable [2.6]
+    info.numberOfChannels = getNumberOfChannels();
+
+    info.fps = liveParams.fps;
+    info.actualFps = getFrameRate();
+    info.averageGopSize = getAverageGopSize();
+    info.resolution = CameraMediaStreamInfo::resolutionToString(resoulution);
+    info.isConfigured = isCameraConfigured;
+
+    if (m_cameraRes->saveBitrateIfNeeded(info))
+    {
         m_cameraRes->saveParamsAsync();
+        NX_LOG(lm("QnLiveStreamProvider: bitrateInfo has been updated for %1 stream")
+                .arg(info.encoderIndex), cl_logINFO);
+    }
 }
 
 #endif // ENABLE_DATA_PROVIDERS

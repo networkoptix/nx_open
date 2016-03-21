@@ -4,17 +4,20 @@
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
 #include <QtCore/QStringList>
-#include <utils/common/uuid.h>
 #include <QtGui/QColor>
 
-#include <utils/common/property_storage.h>
-#include <utils/common/software_version.h>
-#include <utils/common/singleton.h>
+#include <common/common_meta_types.h>
 
 #include <client/client_globals.h>
 #include <client/client_connection_data.h>
 #include <client/client_model_types.h>
-#include <common/common_meta_types.h>
+
+#include <update/update_info.h>
+
+#include <utils/common/property_storage.h>
+#include <utils/common/software_version.h>
+#include <utils/common/singleton.h>
+#include <utils/common/uuid.h>
 
 class QSettings;
 
@@ -47,12 +50,21 @@ public:
         CUSTOM_CONNECTIONS,
 
         EXTRA_TRANSLATIONS_PATH,
-        TRANSLATION_PATH, 
+        TRANSLATION_PATH,
 
         EXTRA_PTZ_MAPPINGS_PATH,
 
+        /** Url for get to updates.json. */
         UPDATE_FEED_URL,
+
+        /** ??? //TODO: #dklychkov */
         ALTERNATIVE_UPDATE_SERVERS,
+
+        /** Latest known update info. */
+        LATEST_UPDATE_INFO,
+
+        /** Estimated update delivery date (in msecs since epoch). */
+        UPDATE_DELIVERY_DATE,
 
         /** Disable client updates. */
         NO_CLIENT_UPDATE,
@@ -77,6 +89,7 @@ public:
         TREE_PINNED,
         TREE_OPENED,
         TREE_WIDTH,
+        CALENDAR_PINNED,
         SLIDER_OPENED,
         TITLE_OPENED,
         NOTIFICATIONS_PINNED,
@@ -88,7 +101,7 @@ public:
         CLOCK_SECONDS,
 
         POPUP_SYSTEM_HEALTH,
-        
+
         AUTO_START,
 
         /** Auto-login to the last connected server. */
@@ -130,9 +143,6 @@ public:
 
         /** Unique id for this PC for videowall construction. */
         PC_UUID,
-
-        /** Flag that client is run in ActiveX library mode. */
-        ACTIVE_X_MODE,
 
         /** Full set of background options. */
         BACKGROUND,
@@ -190,9 +200,14 @@ private:
         QN_DECLARE_RW_PROPERTY(QString,                     extraTranslationsPath,  setExtraTranslationsPath,   EXTRA_TRANSLATIONS_PATH,    QLatin1String(""))
         QN_DECLARE_RW_PROPERTY(QString,                     extraPtzMappingsPath,   setExtraPtzMappingsPath,    EXTRA_PTZ_MAPPINGS_PATH,    QLatin1String(""))
         QN_DECLARE_RW_PROPERTY(QString,                     translationPath,        setTranslationPath,         TRANSLATION_PATH,           QLatin1String(":/translations/common_en_US.qm"))
+
+        /* Updates-related settings */
         QN_DECLARE_RW_PROPERTY(QString,                     updateFeedUrl,          setUpdateFeedUrl,           UPDATE_FEED_URL,            QString())
         QN_DECLARE_RW_PROPERTY(QVariantList,                alternativeUpdateServers,   setAlternativeUpdateServers,    ALTERNATIVE_UPDATE_SERVERS, QVariantList())
         QN_DECLARE_RW_PROPERTY(QnSoftwareVersion,           ignoredUpdateVersion,   setIgnoredUpdateVersion,    IGNORED_UPDATE_VERSION,     QnSoftwareVersion())
+        QN_DECLARE_RW_PROPERTY(QnUpdateInfo,                latestUpdateInfo,       setLatestUpdateInfo,        LATEST_UPDATE_INFO,         QnUpdateInfo())
+        QN_DECLARE_RW_PROPERTY(qint64,                      updateDeliveryDate,     setUpdateDeliveryDate,      UPDATE_DELIVERY_DATE,       0)
+
         QN_DECLARE_RW_PROPERTY(bool,                        ignoreUnsavedLayouts,   setIgnoreUnsavedLayouts,    IGNORE_UNSAVED_LAYOUTS,     false)
         QN_DECLARE_RW_PROPERTY(bool,                        isClientUpdateDisabled, setClientUpdateDisabled,    NO_CLIENT_UPDATE,           false)
         QN_DECLARE_RW_PROPERTY(QUrl,                        showcaseUrl,            setShowcaseUrl,             SHOWCASE_URL,               QUrl())
@@ -203,6 +218,7 @@ private:
         QN_DECLARE_RW_PROPERTY(Qn::TimeMode,                timeMode,               setTimeMode,                TIME_MODE,                  Qn::ServerTimeMode)
         QN_DECLARE_R_PROPERTY (bool,                        createFullCrashDump,                                CREATE_FULL_CRASH_DUMP,     false)
         QN_DECLARE_RW_PROPERTY(bool,                        isTreePinned,           setTreePinned,              TREE_PINNED,                true)
+        QN_DECLARE_RW_PROPERTY(bool,                        isCalendarPinned,       setCalendarPinned,          CALENDAR_PINNED,            false)
         QN_DECLARE_RW_PROPERTY(bool,                        isTreeOpened,           setTreeOpened,              TREE_OPENED,                true)
         QN_DECLARE_RW_PROPERTY(int,                         treeWidth,              setTreeWidth,               TREE_WIDTH,                 250)
         QN_DECLARE_RW_PROPERTY(bool,                        isSliderOpened,         setSliderOpened,            SLIDER_OPENED,              true)
@@ -225,11 +241,10 @@ private:
         QN_DECLARE_RW_PROPERTY(quint64,                     userIdleTimeoutMSecs,   setUserIdleTimeoutMSecs,    USER_IDLE_TIMEOUT_MSECS,    0)
         QN_DECLARE_RW_PROPERTY(bool,                        isPtzPresetInUseWarningDisabled,    setPtzPresetInUseWarningDisabled,   PTZ_PRESET_IN_USE_WARNING_DISABLED, false)
         QN_DECLARE_RW_PROPERTY(Qn::Corner,                  timestampCorner,        setTimestampCorner,         TIMESTAMP_CORNER,           Qn::BottomRightCorner)
-        QN_DECLARE_RW_PROPERTY(Qn::LightModeFlags,          lightMode,              setLightMode,               LIGHT_MODE,                 0) 
+        QN_DECLARE_RW_PROPERTY(Qn::LightModeFlags,          lightMode,              setLightMode,               LIGHT_MODE,                 0)
         QN_DECLARE_RW_PROPERTY(Qn::ClientSkin,              clientSkin,             setClientSkin,              CLIENT_SKIN,                Qn::DarkSkin)
         QN_DECLARE_RW_PROPERTY(QnClientBackground,          background,             setBackground,              BACKGROUND,                 QnClientBackground())
         QN_DECLARE_RW_PROPERTY(QnUuid,                      pcUuid,                 setPcUuid,                  PC_UUID,                    QnUuid())
-        QN_DECLARE_RW_PROPERTY(bool,                        isActiveXMode,          setActiveXMode,             ACTIVE_X_MODE,              false)
         QN_DECLARE_RW_PROPERTY(QList<QUrl>,                 knownServerUrls,        setKnownServerUrls,         KNOWN_SERVER_URLS,          QList<QUrl>())
         QN_DECLARE_RW_PROPERTY(QString,                     logLevel,               setLogLevel,                LOG_LEVEL,                  QLatin1String("none"))
         QN_DECLARE_RW_PROPERTY(QString,                     ec2TranLogLevel,        setEc2TranLogLevel,         EC2_TRAN_LOG_LEVEL,         QLatin1String("none"))

@@ -5,7 +5,7 @@
 
 #include "multiple_internet_time_fetcher.h"
 
-#include <QtCore/QMutexLocker>
+#include <utils/thread/mutex.h>
 
 #include <limits>
 
@@ -35,7 +35,7 @@ MultipleInternetTimeFetcher::~MultipleInternetTimeFetcher()
 
 void MultipleInternetTimeFetcher::pleaseStop()
 {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     m_terminated = true;
     for( std::unique_ptr<TimeFetcherContext>& ctx: m_timeFetchers )
         ctx->timeFetcher->pleaseStop();
@@ -45,7 +45,7 @@ void MultipleInternetTimeFetcher::join()
 {
     std::vector<std::unique_ptr<TimeFetcherContext>> timeFetchers;
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         m_timeFetchers.swap( timeFetchers );
     }
     for( std::unique_ptr<TimeFetcherContext>& ctx: timeFetchers )
@@ -56,7 +56,7 @@ bool MultipleInternetTimeFetcher::getTimeAsync( std::function<void(qint64, Syste
 {
     using namespace std::placeholders;
 
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     assert( !m_timeFetchers.empty() );
 
@@ -89,7 +89,7 @@ bool MultipleInternetTimeFetcher::getTimeAsync( std::function<void(qint64, Syste
 
 void MultipleInternetTimeFetcher::addTimeFetcher( std::unique_ptr<AbstractAccurateTimeFetcher> timeFetcher )
 {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     std::unique_ptr<TimeFetcherContext> ctx( new TimeFetcherContext() );
     ctx->timeFetcher = std::move( timeFetcher );
@@ -101,7 +101,7 @@ void MultipleInternetTimeFetcher::timeFetchingDone(
     qint64 utcMillis,
     SystemError::ErrorCode errorCode )
 {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     ctx->utcMillis = utcMillis;
     ctx->errorCode = errorCode;

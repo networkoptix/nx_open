@@ -5,7 +5,6 @@
 
 #include "aggregationsurface.h"
 
-#include <QtCore/QMutexLocker>
 
 //#define GL_GLEXT_PROTOTYPES 1
 //#ifdef Q_OS_MACX
@@ -263,14 +262,14 @@ AggregationSurface::AggregationSurface( PixelFormat format, const QSize& size )
 
 void AggregationSurface::ensureUploadedToOGL( const QRect& rect, qreal opacity )
 {
-    QMutexLocker uploadLock( &m_uploadMutex );  //TODO/IMPL avoid this lock
+    QnMutexLocker uploadLock( &m_uploadMutex );  //TODO/IMPL avoid this lock
 
     //TODO/IMPL it makes sense to load bounding rect of m_lockedSysMemBufferRegion for optimization
     const QRegion regionBeingLoaded = m_fullRect;
     QRegion lockedRegionBeingLoaded;
     size_t lockedRectCount = 0;
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         if( m_glMemRegion.contains( rect ) )
         {
             NX_LOG( lit("AggregationSurface(%1)::ensureUploadedToOGL. Requested region %2 is uploaded already. Total locked rects count %3, bounding rect %4").
@@ -453,7 +452,7 @@ void AggregationSurface::ensureUploadedToOGL( const QRect& rect, qreal opacity )
     }
 
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         //while we were loading some regions could be invalidated and/or locked
         m_glMemRegion = regionBeingLoaded - m_invalidatedRegion;
     }
@@ -472,11 +471,11 @@ void AggregationSurface::uploadData( const QRect& destRect, uint8_t* planes[], i
     Q_ASSERT( destRect.bottomRight().x() < m_fullRect.width() );
     Q_ASSERT( destRect.bottomRight().y() < m_fullRect.height() );
 
-    QMutexLocker uploadLock( &m_uploadMutex );
+    QnMutexLocker uploadLock( &m_uploadMutex );
 
 #ifndef PERFORMANCE_TEST
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         m_glMemRegion -= destRect;
         m_invalidatedRegion += destRect;
     }
@@ -503,7 +502,7 @@ void AggregationSurface::uploadData( const QRect& destRect, uint8_t* planes[], i
 
 bool AggregationSurface::lockRect( const QRect& rect )
 {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     //checking that rect is not locked
     const QRegion& invertedRegion = m_lockedSysMemBufferRegion.xored( QRect( QPoint(0, 0), surfaceSize ) );
@@ -526,7 +525,7 @@ QRect AggregationSurface::findAndLockRect( const QSize& requestedRectSize )
 #ifdef PERFORMANCE_TEST
     return QRect( QPoint(0, 0), requestedRectSize );
 #else
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     QRegion invertedRegion;
     //for( int i = 0; i < 1000; ++i )
@@ -568,7 +567,7 @@ void AggregationSurface::unlockRect( const QRect& rect )
 {
 #ifdef PERFORMANCE_TEST
 #else
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     m_lockedSysMemBufferRegion -= rect;
     totalLockedRectCount.deref();
     NX_LOG( lit("AggregationSurface::unlockRect. Unlocked rect %1. Total locked bounding rect %2, total locked rects %3").
@@ -647,7 +646,7 @@ QSharedPointer<AggregationSurfaceRect> AggregationSurfacePool::takeSurfaceRect(
     if( requiredEmptySize.isEmpty() || requiredEmptySize.isNull() || !requiredEmptySize.isValid() )
         return QSharedPointer<AggregationSurfaceRect>();
 
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     std::pair<AggregationSurfaceContainer::const_iterator, AggregationSurfaceContainer::const_iterator>
         surfacesRange = m_surfaces.equal_range( std::make_pair( glContext, format ) );
@@ -677,7 +676,7 @@ QSharedPointer<AggregationSurfaceRect> AggregationSurfacePool::takeSurfaceRect(
 
 void AggregationSurfacePool::removeSurfaces( GLContext* const /*glContext*/ )
 {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     //TODO/IMPL
 }
 

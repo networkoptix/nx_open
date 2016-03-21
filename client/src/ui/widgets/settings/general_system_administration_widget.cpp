@@ -33,21 +33,25 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
     setHelpTopic(ui->auditLogButton,        Qn::AuditTrail_Help);
     setHelpTopic(ui->eventLogButton,        Qn::EventLog_Help);
     setHelpTopic(ui->healthMonitorButton,   Qn::Administration_General_HealthMonitoring_Help);
+    setHelpTopic(ui->bookmarksButton,       Qn::Bookmarks_Usage_Help);
 
-    connect(ui->businessRulesButton,    &QPushButton::clicked,  this, [this] { menu()->trigger(Qn::OpenBusinessRulesAction); } );
-    connect(ui->cameraListButton,       &QPushButton::clicked, this, [this] { menu()->trigger(Qn::CameraListAction); } );
-    connect(ui->auditLogButton,         &QPushButton::clicked, this, [this] { menu()->trigger(Qn::OpenAuditLogAction); } );
-    connect(ui->eventLogButton,         &QPushButton::clicked, this, [this] { menu()->trigger(Qn::BusinessEventsLogAction); } );
-    connect(ui->healthMonitorButton,    &QPushButton::clicked, this, [this] { menu()->trigger(Qn::OpenInNewLayoutAction, qnResPool->getResourcesWithFlag(Qn::server)); } );
+    connect(ui->businessRulesButton,    &QPushButton::clicked,  this, [this] { menu()->trigger(QnActions::OpenBusinessRulesAction); } );
+    connect(ui->cameraListButton,       &QPushButton::clicked, this, [this] { menu()->trigger(QnActions::CameraListAction); } );
+    connect(ui->auditLogButton,         &QPushButton::clicked, this, [this] { menu()->trigger(QnActions::OpenAuditLogAction); } );
+    connect(ui->eventLogButton,         &QPushButton::clicked, this, [this] { menu()->trigger(QnActions::OpenBusinessLogAction); } );
+    connect(ui->healthMonitorButton,    &QPushButton::clicked, this, [this] { menu()->trigger(QnActions::OpenInNewLayoutAction, qnResPool->getResourcesWithFlag(Qn::server)); } );
+    connect(ui->bookmarksButton,      &QPushButton::clicked, this, [this] { menu()->trigger(QnActions::OpenBookmarksSearchAction); });
+
+    connect(ui->systemSettingsWidget, &QnAbstractPreferencesWidget::hasChangesChanged, this, &QnAbstractPreferencesWidget::hasChangesChanged);
 }
 
-void QnGeneralSystemAdministrationWidget::updateFromSettings() {
-    ui->systemSettingsWidget->updateFromSettings();
+void QnGeneralSystemAdministrationWidget::loadDataToUi() {
+    ui->systemSettingsWidget->loadDataToUi();
     ui->backupGroupBox->setVisible(isDatabaseBackupAvailable());
 }
 
-void QnGeneralSystemAdministrationWidget::submitToSettings() {
-    ui->systemSettingsWidget->submitToSettings();
+void QnGeneralSystemAdministrationWidget::applyChanges() {
+    ui->systemSettingsWidget->applyChanges();
 }
 
 bool QnGeneralSystemAdministrationWidget::hasChanges() const  {
@@ -55,7 +59,7 @@ bool QnGeneralSystemAdministrationWidget::hasChanges() const  {
 }
 
 void QnGeneralSystemAdministrationWidget::retranslateUi() {
-    auto shortcutString = [this](const Qn::ActionId actionId, const QString &baseString) -> QString {
+    auto shortcutString = [this](const QnActions::IDType actionId, const QString &baseString) -> QString {
         auto shortcut = action(actionId)->shortcut();
         if (shortcut.isEmpty())
             return baseString;
@@ -64,18 +68,18 @@ void QnGeneralSystemAdministrationWidget::retranslateUi() {
             .arg(shortcut.toString(QKeySequence::NativeText));
     };
 
-    ui->eventRulesLabel->setText(shortcutString(Qn::BusinessEventsAction, tr("Open Alarm/Event Rules Management...")));
-    ui->eventLogLabel->setText(shortcutString(Qn::BusinessEventsLogAction, tr("Open Event Log...")));
-
-    ui->cameraListLabel->setText(shortcutString(Qn::CameraListAction, QnDeviceDependentStrings::getDefaultNameFromSet(
-        tr("Open Devices List..."),
-        tr("Open Cameras List...")
+    ui->eventRulesLabel->setText(shortcutString(QnActions::BusinessEventsAction, tr("Open Alarm/Event Rules Management")));
+    ui->eventLogLabel->setText(shortcutString(QnActions::OpenBusinessLogAction, tr("Open Event Log")));
+    ui->bookmarksLabel->setText(shortcutString(QnActions::OpenBookmarksSearchAction, tr("Open Bookmarks List")));
+    ui->cameraListLabel->setText(shortcutString(QnActions::CameraListAction, QnDeviceDependentStrings::getDefaultNameFromSet(
+        tr("Open Devices List"),
+        tr("Open Cameras List")
         )));
-        
+
 
     ui->cameraListButton->setText(QnDeviceDependentStrings::getDefaultNameFromSet(
-        tr("Devices List"),
-        tr("Cameras List")
+        tr("Devices List..."),
+        tr("Cameras List...")
         ));
 
     ui->systemSettingsWidget->retranslateUi();
@@ -90,6 +94,7 @@ void QnGeneralSystemAdministrationWidget::resizeEvent(QResizeEvent *event) {
         << ui->cameraListButton
         << ui->auditLogButton
         << ui->eventLogButton
+        << ui->bookmarksButton
         << ui->healthMonitorButton;
 
     int maxWidht = (*std::max_element(buttons.cbegin(), buttons.cend(), [](QPushButton* l, QPushButton* r){

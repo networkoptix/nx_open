@@ -29,14 +29,14 @@ void QnPopupBusinessActionWidget::updateTabOrder(QWidget *before, QWidget *after
     setTabOrder(ui->settingsButton, after);
 }
 
-void QnPopupBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, QnBusiness::Fields fields) {
-    if (!model)
+void QnPopupBusinessActionWidget::at_model_dataChanged(QnBusiness::Fields fields) {
+    if (!model())
         return;
 
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
     if (fields & QnBusiness::ActionParamsField)
-        ui->adminsCheckBox->setChecked(model->actionParams().userGroup == QnBusiness::AdminOnly);
+        ui->adminsCheckBox->setChecked(model()->actionParams().userGroup == QnBusiness::AdminOnly);
 }
 
 void QnPopupBusinessActionWidget::paramsChanged() {
@@ -51,5 +51,5 @@ void QnPopupBusinessActionWidget::paramsChanged() {
 }
 
 void QnPopupBusinessActionWidget::at_settingsButton_clicked() {
-    menu()->trigger(Qn::PreferencesNotificationTabAction);
+    menu()->trigger(QnActions::PreferencesNotificationTabAction);
 }

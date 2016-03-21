@@ -9,7 +9,7 @@
 #include <queue>
 
 #include <QtCore/QByteArray>
-#include <QtCore/QMutex>
+#include <utils/thread/mutex.h>
 
 #include <utils/common/long_runnable.h>
 #include <utils/common/threadqueue.h>
@@ -29,7 +29,8 @@ public:
     CachedOutputStream( QnTCPConnectionProcessor* const tcpOutput );
     ~CachedOutputStream();
 
-    void postPacket( const QByteArray& data );
+    //! blocks if m_packetsToSend.size() > maxQueueSize
+    void postPacket(const QByteArray& data, int maxQueueSize = -1);
     bool failed() const;
     size_t packetsInQueue() const;
 
@@ -42,6 +43,8 @@ private:
     QnTCPConnectionProcessor* const m_tcpOutput;
     CLThreadQueue<QByteArray> m_packetsToSend;
     bool m_failed;
+    mutable QnMutex m_mutex;
+    QnWaitCondition m_cond;
 };
 
 #endif  //CACHED_OUTPUT_STREAM_H

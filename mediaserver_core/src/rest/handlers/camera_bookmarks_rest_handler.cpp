@@ -1,18 +1,12 @@
 #include "camera_bookmarks_rest_handler.h"
 
+#include <api/app_server_connection.h>
+
 #include <core/resource/camera_bookmark_fwd.h>
-#include <recorder/storage_manager.h>
+#include <database/server_db.h>
 
-#include <utils/network/tcp_connection_priv.h>
+#include <network/tcp_connection_priv.h>
 #include <utils/serialization/json_functions.h>
-
-int QnCameraBookmarksRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) 
-{
-    QString action = extractAction(path);
-    if (action == "get")
-        return getCameraBookmarksAction(params, result);
-    return CODE_NOT_FOUND;
-}
 
 int QnCameraBookmarksRestHandler::executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor*) 
 {
@@ -23,73 +17,53 @@ int QnCameraBookmarksRestHandler::executePost(const QString &path, const QnReque
         return updateCameraBookmarkAction(params, body, result);
     if (action == "delete")
         return deleteCameraBookmarkAction(params, body, result);
-    return CODE_NOT_FOUND;
+    return nx_http::StatusCode::notFound;
 }
 
 int QnCameraBookmarksRestHandler::addCameraBookmarkAction(const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result) { 
-    QString id = params.value("id");
-    QnCameraBookmark bookmark;
-    if (id.isEmpty() || !QJson::deserialize(body, &bookmark))
-        return CODE_INVALID_PARAMETER;
+    Q_UNUSED(params)
 
-    if (!qnStorageMan->addBookmark(id.toUtf8(), bookmark)) 
-        return CODE_INVALID_PARAMETER;
+    QnCameraBookmark bookmark;
+    if (!QJson::deserialize(body, &bookmark))
+        return nx_http::StatusCode::invalidParameter;
+
+    if (bookmark.cameraId.isEmpty())
+        return nx_http::StatusCode::invalidParameter;
+
+    if (!qnServerDb->addBookmark(bookmark))
+        return nx_http::StatusCode::invalidParameter;
 
     result.setReply(bookmark);
-    return CODE_OK;
+    return nx_http::StatusCode::ok;
 }
 
+int QnCameraBookmarksRestHandler::updateCameraBookmarkAction(const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result) { 
+    Q_UNUSED(params)
 
-int QnCameraBookmarksRestHandler::updateCameraBookmarkAction(const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result) {
-    QString id = params.value("id");
     QnCameraBookmark bookmark;
-    if (id.isEmpty() || !QJson::deserialize(body, &bookmark))
-        return CODE_INVALID_PARAMETER;
+    if (!QJson::deserialize(body, &bookmark))
+        return nx_http::StatusCode::invalidParameter;
 
-    if (!qnStorageMan->updateBookmark(id.toUtf8(), bookmark)) 
-        return CODE_INVALID_PARAMETER;
+    if (bookmark.cameraId.isEmpty())
+        return nx_http::StatusCode::invalidParameter;
+
+    if (!qnServerDb->updateBookmark(bookmark))
+        return nx_http::StatusCode::invalidParameter;
 
     result.setReply(bookmark);
-    return CODE_OK;
+    return nx_http::StatusCode::ok;
 }
 
-int QnCameraBookmarksRestHandler::deleteCameraBookmarkAction(const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result) {
-    QString id = params.value("id");
-    QnCameraBookmark bookmark;
-    if (id.isEmpty() || !QJson::deserialize(body, &bookmark))
-        return CODE_INVALID_PARAMETER;
+int QnCameraBookmarksRestHandler::deleteCameraBookmarkAction(const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result) {   
+    Q_UNUSED(body)
+    Q_UNUSED(result)
 
-    if (!qnStorageMan->deleteBookmark(id.toUtf8(), bookmark))
-        return CODE_INVALID_PARAMETER;
+    QnUuid bookmarkId = QnUuid::fromStringSafe(params.value(lit("id")));
+    if (bookmarkId.isNull())
+        return nx_http::StatusCode::invalidParameter;
 
-    result.setReply(bookmark);
-    return CODE_OK;
+    if (!qnServerDb->deleteBookmark(bookmarkId))
+        return nx_http::StatusCode::invalidParameter;
+
+    return nx_http::StatusCode::ok;
 }
-
-
-int QnCameraBookmarksRestHandler::getCameraBookmarksAction(const QnRequestParams & params, QnJsonRestResult & result) {
-    //TODO: #GDM #Bookmarks check time periods existence via qnStorageMan
-
-    QString id = params.value("id");
-    QnCameraBookmarkSearchFilter filter;
-    bool ok;
-    if (qint64 value = params["minDurationMs"].toLongLong(&ok))
-        if (ok) filter.minDurationMs = value;
-    if (qint64 value = params["minStartTimeMs"].toLongLong(&ok))
-        if (ok) filter.minStartTimeMs = value;
-    if (qint64 value = params["maxStartTimeMs"].toLongLong(&ok))
-        if (ok) filter.maxStartTimeMs = value;
-    filter.text = params["text"];
-
-    QnTimePeriod period(filter.minStartTimeMs, filter.maxStartTimeMs - filter.minStartTimeMs);
-    qDebug() << "bookmarks requested with resolution" << filter.minDurationMs << "for" << period;   //TODO: #GDM #Bookmarks remove when profiling will be finished
-
-    QnCameraBookmarkList bookmarks;
-    if (!qnStorageMan->getBookmarks(id.toUtf8(), filter, bookmarks))
-        return CODE_INVALID_PARAMETER;
-
-    result.setReply(bookmarks);
-    return CODE_OK;
-}
-
-

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="he" sourcelanguage="en">
+<TS version="2.1" language="he" sourcelanguage="en">
 <context>
     <name>Language</name>
     <message>
@@ -12,17 +12,6 @@
         <source>Locale Code</source>
         <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
         <translation>he</translation>
-    </message>
-</context>
-<context>
-    <name>QnActiResource</name>
-    <message>
-        <source>Output %1</source>
-        <translation>פלט %1</translation>
-    </message>
-    <message>
-        <source>Input %1</source>
-        <translation>קלט %1</translation>
     </message>
 </context>
 <context>
@@ -154,10 +143,6 @@
     <message>
         <source>Reason: %1</source>
         <translation>סיבה: %1</translation>
-    </message>
-    <message>
-        <source>Conflict Address: %1</source>
-        <translation>כתובת ההתנגשות: %1</translation>
     </message>
     <message>
         <source>Conflicting Server #%1: %2</source>
@@ -318,10 +303,6 @@
         <translation>מצלמה %1 נותקה</translation>
     </message>
     <message>
-        <source>IO Module %1 was disconnected</source>
-        <translation>התקן קלט פלט %1 נותק</translation>
-    </message>
-    <message>
         <source>Device IP Conflict at %1</source>
         <extracomment>Device IP Conflict at &lt;server_name&gt;</extracomment>
         <translation>קונפליקט כתובת רשת של התקן ב %1</translation>
@@ -334,10 +315,6 @@
     <message>
         <source>Caption: %1</source>
         <translation>כתובית: %1</translation>
-    </message>
-    <message>
-        <source>Input port: %1</source>
-        <translation>פורט כניסה: %1</translation>
     </message>
     <message>
         <source>MAC #%1: %2 </source>
@@ -369,8 +346,76 @@
         <translation>ההקלטה על המצלמות אינה מאופשרת:</translation>
     </message>
     <message>
-        <source>Recording on IO modules is disabled:</source>
-        <translation>ההקלטה על התקני קלט פלט אינה מאופשרת:</translation>
+        <source>Execute PTZ preset</source>
+        <translation>הפעל פריסט PTZ</translation>
+    </message>
+    <message>
+        <source>Show text overlay</source>
+        <translation>הצג שכבת טקסט</translation>
+    </message>
+    <message>
+        <source>Show on Alarm Layout</source>
+        <translation>הצג בפריסת אזעקה</translation>
+    </message>
+    <message>
+        <source>Archive backup finished</source>
+        <translation>גיבוי ארכיון הסתיים</translation>
+    </message>
+    <message>
+        <source>Server &apos;%1&apos; has finished an archive backup</source>
+        <translation>שרת  &apos;%1סיים את גיבוי הארכיון</translation>
+    </message>
+    <message>
+        <source>Generic Event at %1</source>
+        <translation>אירוע כללי ב %1</translation>
+    </message>
+    <message>
+        <source>Input Port: %1</source>
+        <translation>פורט כניסה: %1</translation>
+    </message>
+    <message>
+        <source>Archive backup is successfully completed</source>
+        <translation>גיבוי ארכיון הסתיים בהצלחה</translation>
+    </message>
+    <message>
+        <source>I/O Module %1 was disconnected</source>
+        <translation>מודול קלט/פלט %1 התנתק</translation>
+    </message>
+    <message>
+        <source>Conflicting Address: %1</source>
+        <translation>קונפליקט בכתובת: %1</translation>
+    </message>
+    <message>
+        <source>Archive backup failed: No available backup storages with sufficient free space</source>
+        <translation>גיבוי ארכיון נכשל: אין כונני איחסון זמינים עם מספיק מקום פנוי</translation>
+    </message>
+    <message>
+        <source>Archive backup failed: Target storage failure</source>
+        <translation>גיבוי ארכיון נכשל: שגיאה בכונן הגיבוי</translation>
+    </message>
+    <message>
+        <source>Archive backup failed: Source file open/read error</source>
+        <translation>גיבוי ארכיון נכשל: לא ניתן לפתוח את הקבצים לקריאה</translation>
+    </message>
+    <message>
+        <source>Archive backup failed: Target file create/write error</source>
+        <translation>גיבוי ארכיון נכשל: לא ניתן ליצור קבצים לכתיבה</translation>
+    </message>
+    <message>
+        <source>Archive backup failed: File catalog error</source>
+        <translation>גיבוי ארכיון נכשל: שגיאה בקטלוג הקבצים</translation>
+    </message>
+    <message>
+        <source>Archive backup finished, but isn&apos;t fully completed because backup time is over. Data is backed up to %1</source>
+        <translation>גיבוי הארכיון הסתיים, אבל לא באופן מלא מאחר וזמן סיום הגיבוי הגיע. המידע גובה ל %1</translation>
+    </message>
+    <message>
+        <source>Archive backup is canceled by user. Data is backed up to %1</source>
+        <translation>גיבוי ארכיון בוטל על ידי משתמש. המידע גובה ל %1</translation>
+    </message>
+    <message>
+        <source>Recording on I/O modules is disabled:</source>
+        <translation>הקלטה על מודולי קלט/פלט אינה מאופשרת:</translation>
     </message>
 </context>
 <context>
@@ -460,20 +505,12 @@
         <translation>נסה לאתחל את המצלמה ולהחזירה להגדרות ברירת מחדל בגישה מהדפדפן.</translation>
     </message>
     <message>
-        <source>Please try to reboot the IO module, then restore factory defaults on the web-page.</source>
-        <translation>נסה לאתחל את התקן הקלט פלט ולהחזירו להגדרות ברירת מחדל בגישה מהדפדפן.</translation>
-    </message>
-    <message>
         <source>Make sure the device is plugged into the network. Try to reboot the device.</source>
         <translation>וודא שההתקן מחובר לרשת. נסה לאתחלו.</translation>
     </message>
     <message>
         <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
         <translation>וודא שהמצלמה מחוברת לרשת. נסה לאתחלה.</translation>
-    </message>
-    <message>
-        <source>Make sure the IO module is plugged into the network. Try to reboot the IO module.</source>
-        <translation>וודא שהתקן הקלט פלט מחובר לרשת. נסה לאתחלו.</translation>
     </message>
     <message>
         <source>Make sure port %2 is accessible (e.g. forwarded).</source>
@@ -488,10 +525,6 @@
         <translation>לא ניתן לפענח את תגובתה של המצלמה.URL %1, שם מבוקש %2.</translation>
     </message>
     <message>
-        <source>Could not parse IO module response. Url %1, request name %2.</source>
-        <translation>לא ניתן לפענח את תגובתו של התקן הקלט פלט.URL %1, שם מבוקש %2.</translation>
-    </message>
-    <message>
         <source>Not authorized. Url %1.</source>
         <translation>לא מאושר. URL %1.</translation>
     </message>
@@ -504,20 +537,12 @@
         <translation>קודם כל נסה להפעיל הקלטה (במידה והיא כבויה) ולהוריד את מספר הפריימים לשניה בהגדרות המצלמה.</translation>
     </message>
     <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in IO module settings.</source>
-        <translation>קודם כל נסה להפעיל הקלטה (במידה והיא כבויה) ולהוריד את מספר הפריימים לשניה בהגדרות התקן הקלט פלט.</translation>
-    </message>
-    <message>
         <source>If it doesn&apos;t help, restore factory defaults on the device web-page.</source>
         <translation>במידה וזה לא עוזר, שחזר הגדרות ברירת מחדל בדף האינטרנט של ההתקן.</translation>
     </message>
     <message>
         <source>If it doesn&apos;t help, restore factory defaults on the camera web-page.</source>
         <translation>במידה וזה לא עוזר, שחזר הגדרות ברירת מחדל בדף האינטרנט של המצלמה.</translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the IO module web-page.</source>
-        <translation>במידה וזה לא עוזר, שחזר הגדרות ברירת מחדל בדף האינטרנט של התקן הקלט פלט.</translation>
     </message>
     <message>
         <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
@@ -528,20 +553,12 @@
         <translation>הבקשה של מצלמה &quot;%1&quot; נכשלה עם שגיאה &quot;%2&quot;.</translation>
     </message>
     <message>
-        <source>IO Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-        <translation>הבקשה של התקן קלט פלט &quot;%1&quot; נכשלה עם שגיאה &quot;%2&quot;.</translation>
-    </message>
-    <message>
         <source>Unknown device issue.</source>
         <translation>בעיית התקן לא ידועה.</translation>
     </message>
     <message>
         <source>Unknown camera issue.</source>
         <translation>בעיית מצלמה לא ידועה.</translation>
-    </message>
-    <message>
-        <source>Unknown IO module issue.</source>
-        <translation>בעיית התקן קלט פלט לא ידועה.</translation>
     </message>
     <message>
         <source>Invalid data was received from the device %1.</source>
@@ -552,10 +569,6 @@
         <translation>מידע לא תקין התקבל ממצלמה %1.</translation>
     </message>
     <message>
-        <source>Invalid data was received from the IO module %1.</source>
-        <translation>מידע לא תקין התקבל מהתקן קלט פלט %1.</translation>
-    </message>
-    <message>
         <source>Too many media errors. Please open device issues dialog for more details.</source>
         <translation>יותר מידי תקלות מדיה. פתח את חלון התקלות של ההתקן למידע נוסף.</translation>
     </message>
@@ -564,20 +577,56 @@
         <translation>יותר מידי תקלות מדיה. פתח את חלון התקלות של המצלמה למידע נוסף.</translation>
     </message>
     <message>
-        <source>Too many media errors. Please open IO module issues dialog for more details.</source>
-        <translation>יותר מידי תקלות מדיה. פתח את חלון התקלות של התקן הקלט פלט למידע נוסף.</translation>
+        <source>Camera plugin error. %1</source>
+        <translation>שגיאת חיבור מצלמה. %1</translation>
     </message>
     <message>
-        <source>Device initialization process in progress.</source>
-        <translation>תהליך אתחול ההתקן מתרחש כרגע.</translation>
+        <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
+        <translation>יש לנסות לאתחל את מודול הקלט/פלט, לאחר מכן להחזיר את הגדרות היצרן בדף האינטרנט.</translation>
     </message>
     <message>
-        <source>Camera initialization process in progress.</source>
-        <translation>תהליך אתחול המצלמה מתרחש כרגע.</translation>
+        <source>Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</source>
+        <translation>יש לוודא שמודול הקלט/פלט מחובר לרשת. נסה לאתחל את המודול.</translation>
     </message>
     <message>
-        <source>IO Module initialization process in progress.</source>
-        <translation>תהליך אתחול התקן קלט פלט מתרחש כרגע.</translation>
+        <source>Could not parse I/O module response. Url %1, request name %2.</source>
+        <translation>לא ניתן לנתח את תגובת מודול הקלט/פלט. Url %1 שם בקשה %2.</translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in I/O module settings.</source>
+        <translation>נסה תחילה, להפעיל הקלטה (אם היא כבויה) ולהוריד את קצב התמונות בהגדרות מודול הקלט/פלט.</translation>
+    </message>
+    <message>
+        <source>If it doesn&apos;t help, restore factory defaults on the I/O module web-page.</source>
+        <translation>במידה וזה אינו עוזר, החזר הגדרות יצרן בדף האינטרנט של מודול הקלט/פלט.</translation>
+    </message>
+    <message>
+        <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
+        <translation>בקשת מודול קלט/פלט &quot;%1&quot; נכשלה עם שגיאה &quot;%2&quot;.</translation>
+    </message>
+    <message>
+        <source>Unknown I/O module issue.</source>
+        <translation>שגיאת מודול קלט/פלט שאינה ידועה.</translation>
+    </message>
+    <message>
+        <source>Invalid data was received from the I/O module %1.</source>
+        <translation>מידע לא תקין התקבל ממודול קלט/פלט %1.</translation>
+    </message>
+    <message>
+        <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
+        <translation>יותר מידי שגיאות מדיה. למידע נוסף פתח את חלון תקלות מודול הקלט/פלט.</translation>
+    </message>
+    <message>
+        <source>Device initialization process is in progress.</source>
+        <translation>כעת מתבצע תהליך איתחול ההתקן.</translation>
+    </message>
+    <message>
+        <source>Camera initialization process is in progress.</source>
+        <translation>כעת מתבצע תהליך איתחול המצלמה.</translation>
+    </message>
+    <message>
+        <source>I/O Module initialization process is in progress.</source>
+        <translation>כעת מתבצע תהליך איתחול מודול הקלט/פלט.</translation>
     </message>
 </context>
 <context>
@@ -594,12 +643,12 @@
 <context>
     <name>QnEnvironment</name>
     <message>
-        <source>Launching file explorer failed.</source>
-        <translation>הפעלת סייר הקבצים נכשלה.</translation>
-    </message>
-    <message>
         <source>Could not find explorer.exe in path to launch Windows Explorer.</source>
         <translation>הקובץ explorer.exe המפעיל את סייר החלונות לא נמצא בנתיב.</translation>
+    </message>
+    <message>
+        <source>File explorer failed to open.</source>
+        <translation>כשלון בפתיחת סייר הקבצים.</translation>
     </message>
 </context>
 <context>
@@ -613,12 +662,12 @@
         <translation>לא נמצא מקודד לקודק %1.</translation>
     </message>
     <message>
-        <source>Could not initialise audio encoder.</source>
-        <translation>לא ניתן להפעיל את מקודד האודיו.</translation>
+        <source>Could not initialize audio encoder.</source>
+        <translation>לא ניתן לאתחל את מקודד האודיו.</translation>
     </message>
     <message>
-        <source>Could not initialise audio decoder.</source>
-        <translation>לא ניתן להפעיל את מפענח האודיו.</translation>
+        <source>Could not initialize audio decoder.</source>
+        <translation>לא ניתן לאתחל את מקודד האודיו.</translation>
     </message>
 </context>
 <context>
@@ -655,8 +704,8 @@
         <translation>לא נמצא מקודד לקודק %1.</translation>
     </message>
     <message>
-        <source>Could not initialise video encoder.</source>
-        <translation>לא ניתן להפעיל את מקודד הוידאו.</translation>
+        <source>Could not initialize video encoder.</source>
+        <translation>לא ניתן לאתחל את מקודד הוידאו.</translation>
     </message>
 </context>
 <context>
@@ -805,14 +854,6 @@
         </translation>
     </message>
     <message>
-        <source>There was a problem activating your license key. A database error has occurred.</source>
-        <translation>אירעה בעיה בהפעלת מפתח הרשיון שלך. התרחשה שגיאת מסד נתונים.</translation>
-    </message>
-    <message>
-        <source>There was a problem activating your license key. Invalid data received. Please contact support team to report issue.</source>
-        <translation>אירעה בעיה בהפעלת מפתח הרשיון שלך. התקבל מידע שגוי. אנא צור קשר עם קבוצת התמיכה על מנת לדווח על הבעיה.</translation>
-    </message>
-    <message>
         <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
         <translation>מפתח הרשיון שהכנסת שגוי. אנא בדוק שהזנת את המפתח כראוי. במידה והבעיה נמשכת, אנא צור קשר עם קבוצת התמיכה על מנת לוודא את תקינות המפתח או להשיג מפתח תקין.</translation>
     </message>
@@ -824,33 +865,20 @@
         <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
         <translation>מפתח הרשיון הופעל בעבר למזהה החומרה {{hwid}} ב{{time}}. אנא צור קשר עם קבוצת התמיכה על מנת להשיג מפתח רשיון תקין.</translation>
     </message>
+    <message>
+        <source>There was a problem activating your license key. A database error occurred.</source>
+        <translation>התרחשה שגיאה בזמן הפעלת מפתח הרשיון. שגיאת בסיס נתונים.</translation>
+    </message>
+    <message>
+        <source>There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.</source>
+        <translation>התרחשה שגיאה בזמן הפעלת מפתח הרשיון. מידע לא תקין התקבל. פנה למרכז התמיכה ודווח על התקלה.</translation>
+    </message>
 </context>
 <context>
     <name>QnMediaServerResource</name>
     <message>
         <source>Server</source>
         <translation>שרת</translation>
-    </message>
-</context>
-<context>
-    <name>QnNewDWPtzController</name>
-    <message>
-        <source>Preset #</source>
-        <translation>פריסט #</translation>
-    </message>
-</context>
-<context>
-    <name>QnPlAxisResource</name>
-    <message>
-        <source>Can&apos;t initialize IO port settings</source>
-        <translation>לא ניתן להפעיל את הגדרות יציאת הקלט/פלט</translation>
-    </message>
-</context>
-<context>
-    <name>QnPlOnvifResource</name>
-    <message>
-        <source>Otput %1</source>
-        <translation>פלט %1</translation>
     </message>
 </context>
 <context>
@@ -874,20 +902,6 @@
         <translation>
             <numerusform>מצלמה %n</numerusform>
             <numerusform>%n מצלמות</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n IO Module(s)</source>
-        <translation>
-            <numerusform>מודול קלט/פלט %n</numerusform>
-            <numerusform>%n מודולי קלט/פלט</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n IO module(s)</source>
-        <translation>
-            <numerusform>מודול קלט/פלט %n</numerusform>
-            <numerusform>%n מודולי קלט/פלט</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -921,22 +935,6 @@
         <translation>מצלמה</translation>
     </message>
     <message>
-        <source>IO Modules</source>
-        <translation>מודולי קלט/פלט</translation>
-    </message>
-    <message>
-        <source>IO modules</source>
-        <translation>מודולי קלט/פלט</translation>
-    </message>
-    <message>
-        <source>IO Module</source>
-        <translation>מודול קלט/פלט</translation>
-    </message>
-    <message>
-        <source>IO module</source>
-        <translation>מודול קלט/פלט</translation>
-    </message>
-    <message>
         <source>Devices</source>
         <translation>מכשירים</translation>
     </message>
@@ -951,6 +949,36 @@
     <message>
         <source>device</source>
         <translation>מכשיר</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n I/O Module(s)</source>
+        <translation>
+            <numerusform>מודול קלט/פלט אחד</numerusform>
+            <numerusform>%n מודולי קלט/פלט</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n I/O module(s)</source>
+        <translation>
+            <numerusform>מודול קלט/פלט אחד</numerusform>
+            <numerusform>%n מודולי קלט/פלט</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>I/O Modules</source>
+        <translation>מודולי קלט פלט</translation>
+    </message>
+    <message>
+        <source>I/O modules</source>
+        <translation>מודולי קלט פלט</translation>
+    </message>
+    <message>
+        <source>I/O Module</source>
+        <translation>מודול קלט/פלט</translation>
+    </message>
+    <message>
+        <source>I/O module</source>
+        <translation>מודול קלט/פלט</translation>
     </message>
 </context>
 <context>
@@ -1076,108 +1104,9 @@
         <source>Error during watermark generation for file &apos;%1&apos;.</source>
         <translation>אירעה שגיאה במהלך יצירת סימן מים לקובץ &apos;%1&apos;.</translation>
     </message>
-</context>
-<context>
-    <name>QnSystemHealthStringsHelper</name>
     <message>
-        <source>Email address is not set</source>
-        <translation>לא הוגדרה כתובת אימייל</translation>
-    </message>
-    <message>
-        <source>No licenses</source>
-        <translation>אין רשיונות</translation>
-    </message>
-    <message>
-        <source>Email server is not set</source>
-        <translation>לא הוגדר שרת אימייל</translation>
-    </message>
-    <message>
-        <source>Some users have not set their email addresses</source>
-        <translation>כמה משתמשים לא הגדירו את כתובת האימייל שלהם</translation>
-    </message>
-    <message>
-        <source>Connection to server lost</source>
-        <translation>החיבור לשרת אבד</translation>
-    </message>
-    <message>
-        <source>Select server for others to synchronize time with</source>
-        <translation>בחר שרת איתו האחרים יסנכרנו את הזמן</translation>
-    </message>
-    <message>
-        <source>Error while sending email</source>
-        <translation>אירעה שגיאה במהלך שליחת האימייל</translation>
-    </message>
-    <message>
-        <source>Storage is full</source>
-        <translation>האחסון מלא</translation>
-    </message>
-    <message>
-        <source>Storage is not configured</source>
-        <translation>תצורת האחסון אינה מוגדרת</translation>
-    </message>
-    <message>
-        <source>Rebuilding archive index is completed</source>
-        <translation>בניה מחדש של הארכיון הושלמה</translation>
-    </message>
-    <message>
-        <source>Email address is not set for user %1</source>
-        <translation>כתובת הדואר עבור משתמש %1 אינה מוגדרת</translation>
-    </message>
-    <message>
-        <source>Email address is not set.</source>
-        <translation>לא הוגדרה כתובת אימייל.</translation>
-    </message>
-    <message>
-        <source>You cannot receive system notifications via email.</source>
-        <translation>אינך יכול לקבל התראות מערכת דרך האימייל.</translation>
-    </message>
-    <message>
-        <source>Email server is not set.</source>
-        <translation>לא הוגדר שרת אימייל.</translation>
-    </message>
-    <message>
-        <source>Some users have not set their email addresses.</source>
-        <translation>כמה משתמשים לא הגדירו את כתובת האימייל שלהם.</translation>
-    </message>
-    <message>
-        <source>They cannot receive system notifications via email.</source>
-        <translation>הם אינם יכולים לקבל התראות מערכת דרך האימייל.</translation>
-    </message>
-    <message>
-        <source>Storages are full on the following Server:</source>
-        <translation>התקני האחסון בשרת הבא מלאים:</translation>
-    </message>
-    <message>
-        <source>Storages are not configured on the following Server:</source>
-        <translation>התצורה בהתקני האחסון בשרת הבא אינה מוגדרת:</translation>
-    </message>
-    <message>
-        <source>You have no licenses.</source>
-        <translation>אין לך רשיונות.</translation>
-    </message>
-    <message>
-        <source>You cannot record video from cameras.</source>
-        <translation>אינך יכול להקליט וידאו ממצלמות.</translation>
-    </message>
-    <message>
-        <source>Rebuilding archive index is completed on the following Server:</source>
-        <translation>בניה מחדש של הארכיון הושלמה בשרת הבא:</translation>
-    </message>
-    <message>
-        <source>Server times are not synchronized and a common time could not be detected automatically.</source>
-        <translation>הזמנים בשרתים אינם מסונכרנים ולא היה ניתן לזהות זמן משותף באופן אוטומטי.</translation>
-    </message>
-    <message>
-        <source>System is in safe mode</source>
-        <translation>המערכת במצב בטוח</translation>
-    </message>
-    <message>
-        <source>The system is running in safe mode.</source>
-        <translation>המערכת רצה במצב בטוח.</translation>
-    </message>
-    <message>
-        <source>Any configuration changes except license activation are impossible.</source>
-        <translation>לא ניתן לבצע שינויי הגדרות למעט הפעלת רישיון.</translation>
+        <source>File write error. Not enough free space.</source>
+        <translation>שגיאה בכתיבת קובץ.אין מספיק מקום פנוי.</translation>
     </message>
 </context>
 <context>
@@ -1205,17 +1134,6 @@
     <message>
         <source>Invalid Parameter</source>
         <translation>פרמטר לא תקין</translation>
-    </message>
-</context>
-<context>
-    <name>QnThirdPartyResource</name>
-    <message>
-        <source>Otput %1</source>
-        <translation>פלט %1</translation>
-    </message>
-    <message>
-        <source>Input %1</source>
-        <translation>קלט %1</translation>
     </message>
 </context>
 <context>
@@ -1247,6 +1165,13 @@
     <message>
         <source>%1 (external)</source>
         <translation>%1 (חיצוני)</translation>
+    </message>
+</context>
+<context>
+    <name>utils::QnCameraNamesWatcher</name>
+    <message>
+        <source>Removed camera</source>
+        <translation>מצלמה שהוסרה</translation>
     </message>
 </context>
 </TS>

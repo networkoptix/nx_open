@@ -2,9 +2,6 @@
 
 #include <QtCore/QCoreApplication>
 
-#include <core/resource/resource.h>
-#include <core/resource_management/resource_pool.h>
-
 #include <business/business_strings_helper.h>
 #include <utils/common/model_functions.h>
 
@@ -25,6 +22,9 @@ namespace QnBusiness {
         case CameraOutputOnceAction:
         case BookmarkAction:
         case CameraRecordingAction:
+        case ExecutePtzPresetAction:
+        case ShowTextOverlayAction:
+        case ShowOnAlarmLayoutAction:
             return true;
 
         default:
@@ -45,12 +45,16 @@ namespace QnBusiness {
         case PlaySoundOnceAction:
         case PlaySoundAction:
         case SayTextAction:
+        case ExecutePtzPresetAction:
+        case ShowTextOverlayAction:
+        case ShowOnAlarmLayoutAction:
             return false;
 
         case SendMailAction:
             return true;
 
         default:
+            Q_ASSERT_X(false, Q_FUNC_INFO, "All action types must be handled.");
             return false;
         }
     }
@@ -64,6 +68,8 @@ namespace QnBusiness {
         case ShowPopupAction:
         case PlaySoundOnceAction:
         case SayTextAction:
+        case ExecutePtzPresetAction:
+        case ShowOnAlarmLayoutAction:
             return false;
 
         case CameraOutputAction:
@@ -71,11 +77,57 @@ namespace QnBusiness {
         case PanicRecordingAction:
         case PlaySoundAction:
         case BookmarkAction:
+        case ShowTextOverlayAction:
             return true;
 
         default:
+            Q_ASSERT_X(false, Q_FUNC_INFO, "All action types must be handled.");
+            break;
+        }
+        return false;
+    }
+
+    bool canBeInstant(ActionType actionType) {
+        if (!hasToggleState(actionType))
+            return true;
+
+        return supportsDuration(actionType);
+    }
+
+    bool supportsDuration(ActionType actionType) {
+        switch (actionType) {
+        case BookmarkAction:
+        case ShowTextOverlayAction:
+            return true;
+        default:
             return false;
         }
+    }
+
+    bool allowsAggregation(ActionType actionType) {
+        switch (actionType) {
+        case BookmarkAction:
+        case ShowTextOverlayAction:
+            return false;
+        default:
+            return true;
+        }
+    }
+
+    bool isActionProlonged(ActionType actionType, const QnBusinessActionParameters &parameters) {
+        if (!hasToggleState(actionType))
+            return false;
+
+        switch (actionType) {
+        case BookmarkAction:
+        case ShowTextOverlayAction:
+            return parameters.durationMs <= 0;
+
+        default:
+            break;
+        }
+
+        return true;
     }
 
     QList<ActionType> allActions() {
@@ -83,7 +135,7 @@ namespace QnBusiness {
         result
             << CameraOutputAction
             << CameraOutputOnceAction
-            //<< BookmarkAction
+            << BookmarkAction
             << CameraRecordingAction
             << PanicRecordingAction
             << SendMailAction
@@ -91,14 +143,18 @@ namespace QnBusiness {
             << ShowPopupAction
             << PlaySoundAction
             << PlaySoundOnceAction
-            << SayTextAction;
+            << SayTextAction
+            << ExecutePtzPresetAction
+            << ShowTextOverlayAction
+            << ShowOnAlarmLayoutAction
+            ;
         return result;
     }
 }
 
 QnAbstractBusinessAction::QnAbstractBusinessAction(const QnBusiness::ActionType actionType, const QnBusinessEventParameters& runtimeParams):
     m_actionType(actionType),
-    m_toggleState(QnBusiness::UndefinedState), 
+    m_toggleState(QnBusiness::UndefinedState),
     m_receivedFromRemoteHost(false),
     m_runtimeParams(runtimeParams),
     m_aggregationCount(1)
@@ -109,12 +165,27 @@ QnAbstractBusinessAction::~QnAbstractBusinessAction()
 {
 }
 
+QnBusiness::ActionType QnAbstractBusinessAction::actionType() const {
+    return m_actionType;
+}
+
 void QnAbstractBusinessAction::setResources(const QVector<QnUuid>& resources) {
     m_resources = resources;
 }
 
 const QVector<QnUuid>& QnAbstractBusinessAction::getResources() const {
     return m_resources;
+}
+
+QVector<QnUuid> QnAbstractBusinessAction::getSourceResources() const
+{
+    Q_ASSERT_X(m_params.useSource, Q_FUNC_INFO, "Method should be called only when corresponding parameter is set.");
+    QVector<QnUuid> result;
+    result << m_runtimeParams.eventResourceId;
+    for (const QnUuid &extra: m_runtimeParams.metadata.cameraRefs)
+        if (!result.contains(extra))
+            result << extra;
+    return result;
 }
 
 void QnAbstractBusinessAction::setParams(const QnBusinessActionParameters& params) {
@@ -164,6 +235,10 @@ bool QnAbstractBusinessAction::isReceivedFromRemoteHost() const {
 int QnAbstractBusinessAction::getAggregationCount() const
 {
     return m_aggregationCount;
+}
+
+bool QnAbstractBusinessAction::isProlonged() const {
+    return QnBusiness::isActionProlonged(m_actionType, m_params);
 }
 
 void QnAbstractBusinessAction::setAggregationCount(int value)

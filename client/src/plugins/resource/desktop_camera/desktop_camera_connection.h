@@ -5,7 +5,7 @@
 #include "utils/common/long_runnable.h"
 #include "core/resource/resource_fwd.h"
 #include "utils/network/simple_http_client.h"
-#include "utils/network/tcp_connection_processor.h"
+#include "network/tcp_connection_processor.h"
 
 class QnDesktopResource;
 class QnTCPConnectionProcessor;
@@ -32,7 +32,7 @@ private:
     QnMediaServerResourcePtr m_server;
     CLSimpleHTTPClient* connection;
     QnDesktopCameraConnectionProcessor* processor;
-    QMutex m_mutex;
+    QnMutex m_mutex;
 };
 
 typedef QSharedPointer<QnDesktopCameraConnection> QnDesktopCameraConnectionPtr;

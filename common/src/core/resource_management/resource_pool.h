@@ -3,7 +3,7 @@
 
 #include <QtCore/QList>
 #include <QtCore/QHash>
-#include <QtCore/QMutex>
+#include <utils/thread/mutex.h>
 #include <QtCore/QObject>
 #include <utils/common/uuid.h>
 #include <QtNetwork/QHostAddress>
@@ -42,7 +42,7 @@ public:
         AllResources
     };
 
-    QnResourcePool();
+    QnResourcePool(QObject* parent = NULL);
     ~QnResourcePool();
 
     // this function will add or update existing resources
@@ -59,10 +59,12 @@ public:
     { removeResources(QnResourceList() << resource); }
 
     QnResourceList getResources() const;
+    QnResourceList getResources(const QVector<QnUuid>& idList) const;
+    QnResourceList getResources(const std::vector<QnUuid>& idList) const;
 
     template <class Resource>
     QnSharedResourcePointerList<Resource> getResources() const {
-        QMutexLocker locker(&m_resourcesMtx);
+        QnMutexLocker locker( &m_resourcesMtx );
         QnSharedResourcePointerList<Resource> result;
         for (const QnResourcePtr &resource : m_resources)
             if(QnSharedResourcePointer<Resource> derived = resource.template dynamicCast<Resource>())
@@ -72,7 +74,7 @@ public:
 
     template <class Resource>
     QnSharedResourcePointerList<Resource> getResources(const QVector<QnUuid>& idList) const {
-        QMutexLocker locker(&m_resourcesMtx);
+        QnMutexLocker locker( &m_resourcesMtx );
         QnSharedResourcePointerList<Resource> result;
         for (const auto& id: idList) {
             const auto itr = m_resources.find(id);
@@ -86,7 +88,7 @@ public:
 
     template <class Resource>
     QnSharedResourcePointerList<Resource> getResources(const std::vector<QnUuid>& idList) const {
-        QMutexLocker locker(&m_resourcesMtx);
+        QnMutexLocker locker(&m_resourcesMtx);
         QnSharedResourcePointerList<Resource> result;
         for (const auto& id: idList) {
             const auto itr = m_resources.find(id);
@@ -100,14 +102,14 @@ public:
 
     template <class Resource>
     QnSharedResourcePointer<Resource> getResourceByUniqueId(const QString &id) const {
-        QMutexLocker locker(&m_resourcesMtx);
+        QnMutexLocker locker(&m_resourcesMtx);
         auto itr = std::find_if( m_resources.begin(), m_resources.end(), [&id](const QnResourcePtr &resource) { return resource->getUniqueId() == id; });
         return itr != m_resources.end() ? itr.value().template dynamicCast<Resource>() : QnSharedResourcePointer<Resource>(NULL);
     }
 
     template <class Resource>
     QnSharedResourcePointer<Resource> getResourceById(const QnUuid &id) const {
-        QMutexLocker locker(&m_resourcesMtx);
+        QnMutexLocker locker(&m_resourcesMtx);
         auto itr = m_resources.find(id);
         return itr != m_resources.end() ? itr.value().template dynamicCast<Resource>() : QnSharedResourcePointer<Resource>(NULL);
     }
@@ -131,7 +133,10 @@ public:
     QnNetworkResourceList getAllNetResourceByHostAddress(const QString &hostAddress) const;
     QnNetworkResourceList getAllNetResourceByHostAddress(const QHostAddress &hostAddress) const;
     QnVirtualCameraResourceList getAllCameras(const QnResourcePtr &mServer, bool ignoreDesktopCameras = false) const;
-    QnMediaServerResourceList getAllServers() const;
+
+    // @note Never returns fake servers
+    QnMediaServerResourceList getAllServers(Qn::ResourceStatus status) const;
+
     QnResourceList getResourcesByParentId(const QnUuid& parentId) const;
 
     // returns list of resources with such flag
@@ -159,7 +164,7 @@ public:
      * @return                                  List of valid indices containing the videowall and items' uuid.
      */
     QnVideoWallItemIndexList getVideoWallItemsByUuid(const QList<QnUuid> &uuids) const;
-    
+
     /**
      * @brief getVideoWallMatrixByUuid          Find videowall matrix by uuid.
      * @param uuid                              Unique id of the matrix.
@@ -179,7 +184,7 @@ public:
     //!Empties all internal dictionaries. Needed for correct destruction order at application stop
     void clear();
 
-    /** Check if there is at least one IO Module in the system. */
+    /** Check if there is at least one I/O Module in the system. */
     bool containsIoModules() const;
 
     /** Check if layout was created automatically, e.g. by 'Push my screen' action.
@@ -211,8 +216,9 @@ private:
         QnMediaServerResourceList serversList;
     } m_cache;
 
-    mutable QMutex m_resourcesMtx;
+    mutable QnMutex m_resourcesMtx;
     bool m_tranInProgress;
+
     QnResourceList m_tmpResources;
     QHash<QnUuid, QnResourcePtr> m_resources;
     QHash<QnUuid, QnResourcePtr> m_incompatibleResources;
