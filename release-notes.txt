@@ -30,13 +30,13 @@ IMPROVEMENTS
     Added ability to sort Alarm/Event Rules by any column - VMS-1548
     Improved "Server Settings" and "System Administration" dialogs - now changes can be applied without closing dialog - VMS-1244, VMS-1180
     Storage Analytics improvement - storage utilized by deleted/moved out cameras is displayed separately - VMS-1569
+    Storage usage optimizations and improvements
     Improved time synchronization mechanism between Servers - VMS-1394, VMS-1149
     Improved error messages for some cases of push updates failure - VMS-1536
     "Free Storage Space" is increased from 5Gb to 50Gb for NAS - VMS-1707
     Server SSL can now be disabled
     API documentation is improved and extended
     Continual general Server improvements based on anonymous usage and crash statistics - VMS-1529, VMS-1491, VMS-1239
-    Storage usage optimizations and improvements
 
 BUG FIXES
     Server on Nx1 sometimes crashed on generic event. Fixed.
@@ -62,6 +62,7 @@ BUG FIXES
     Flag "Send usage statistics" check box was automatically checked after upgrade. Fixed. - VMS-1227
     Watching live video via Android Client wasn't logged in Audit Trail. Fixed. - VMS-555
     Export with Paxton Plugin has led to the crash. Fixed. - VISTA-72
+    Chinese input didn't work in Ubuntu Client. Fixed. - VMS-2207
 	
 
 -----------------------------------------------2.4.1.xxxx-----------------------------------------
