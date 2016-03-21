@@ -86,7 +86,7 @@ bool initializeLog() {
         return false;
 
     QnLog::initLog(QString());
-    cl_log.log(lit(QN_APPLICATION_NAME), " started", cl_logALWAYS);
+    cl_log.log(QnAxClientAppInfo::applicationDisplayName(), " started", cl_logALWAYS);
     cl_log.log("Software version: ", QnAppInfo::applicationVersion(), cl_logALWAYS);
 
     return true;
