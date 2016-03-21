@@ -410,7 +410,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
     setLayout(m_globalLayout);
 
- //   m_currentPageHolder->addWidget(new QWidget());
     m_currentPageHolder->addWidget(m_view.data());
     m_currentPageHolder->addWidget(welcomeScreen->widget());
 

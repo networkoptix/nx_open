@@ -1,6 +1,7 @@
 
 #include "workbench_welcome_screen.h"
 
+#include <QtQuickWidgets/QQuickWidget>
 #include <QtQuick/QQuickView>
 #include <QtQml/QQmlContext>
 
@@ -21,7 +22,7 @@ namespace
 {
     typedef QPointer<QnWorkbenchWelcomeScreen> GuardType;
 
-    QQuickView *createMainView(QObject *context)
+    QWidget *createMainView(QObject *context)
     {
         static const auto kWelcomeScreenSource = lit("qrc:/src/qml/WelcomeScreen.qml");
         static const auto kContextVariableName = lit("context");
@@ -29,12 +30,18 @@ namespace
         qmlRegisterType<QnSystemsModel>("NetworkOptix.Qml", 1, 0, "QnSystemsModel");
         qmlRegisterType<QnLastSystemUsersModel>("NetworkOptix.Qml", 1, 0, "QnLastSystemConnectionsData");
 
-        const auto quickView = new QQuickView();
-        quickView->rootContext()->setContextProperty(
+        const auto quickWidget = new QQuickWidget();
+        quickWidget->rootContext()->setContextProperty(
             kContextVariableName, context);
-        quickView->setSource(kWelcomeScreenSource);
+        quickWidget->setSource(kWelcomeScreenSource);
 
-        return quickView;
+        // Welcome screen holders prevents blinking of QML widget.
+        // Moreover, QQuickWidget can't be placed as direct child of 
+        // other widget - thus we use this "proxy" holder + layout
+        QWidget *welcomeScreenHolder = new QWidget();
+        QHBoxLayout *layout = new QHBoxLayout(welcomeScreenHolder);
+        layout->addWidget(quickWidget);
+        return welcomeScreenHolder;
     }
 
     QnGenericPalette extractPalette()
@@ -53,10 +60,9 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject *parent)
 
     , m_cloudWatcher(qnCommon->instance<QnCloudStatusWatcher>())
     , m_palette(extractPalette())
-    , m_widget(QWidget::createWindowContainer(createMainView(this)))
-    , m_loginDialog()
+    , m_widget(createMainView(this))
+    , m_pageSize(m_widget->size())
     , m_visible(false)
-    , m_enabled(false)
 {
     NX_CRITICAL(m_cloudWatcher, Q_FUNC_INFO, "Cloud watcher does not exist");
     connect(m_cloudWatcher, &QnCloudStatusWatcher::loginChanged
@@ -65,7 +71,7 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject *parent)
         , this, &QnWorkbenchWelcomeScreen::isLoggedInToCloudChanged);
 
     //
-
+    m_widget->installEventFilter(this);
     const auto idChangedHandler = [this](const QnUuid & /* id */)
     {
         // We could be just reconnecting if remoteGuid is null.
@@ -82,9 +88,6 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject *parent)
     connect(this, &QnWorkbenchWelcomeScreen::visibleChanged, this, [this]()
     {
         context()->action(QnActions::EscapeHotkeyAction)->setEnabled(!m_visible);
-
-        if (isVisible())
-            enableScreen();
     });
 
     setVisible(true);
@@ -113,20 +116,6 @@ void QnWorkbenchWelcomeScreen::setVisible(bool isVisible)
     emit visibleChanged();
 }
 
-bool QnWorkbenchWelcomeScreen::isEnabled() const
-{
-    return m_enabled;
-}
-
-void QnWorkbenchWelcomeScreen::setEnabled(bool isEnabled)
-{
-    if (m_enabled == isEnabled)
-        return;
-
-    m_enabled = isEnabled;
-    emit enabledChanged();
-}
-
 QString QnWorkbenchWelcomeScreen::cloudUserName() const
 {
     return m_cloudWatcher->cloudLogin();
@@ -135,6 +124,20 @@ QString QnWorkbenchWelcomeScreen::cloudUserName() const
 bool QnWorkbenchWelcomeScreen::isLoggedInToCloud() const
 {
     return (m_cloudWatcher->status() == QnCloudStatusWatcher::Online);
+}
+
+QSize QnWorkbenchWelcomeScreen::pageSize() const
+{
+    return m_pageSize;
+}
+
+void QnWorkbenchWelcomeScreen::setPageSize(const QSize &size)
+{
+    if (m_pageSize == size)
+        return;
+
+    m_pageSize = size;
+    emit pageSizeChanged();
 }
 
 void QnWorkbenchWelcomeScreen::connectToLocalSystem(const QString &serverUrl
@@ -163,18 +166,10 @@ void QnWorkbenchWelcomeScreen::connectToCloudSystem(const QString &serverUrl)
 
 void QnWorkbenchWelcomeScreen::connectToAnotherSystem()
 {
-    bool wasEmpty = (m_loginDialog == nullptr);
-    QnNonModalDialogConstructor<QnLoginDialog> dialogConstructor(
-        m_loginDialog, m_widget.data());
+    const QScopedPointer<QnLoginDialog> dialog(
+        new QnLoginDialog(context()->mainWindow()));
 
-    if (wasEmpty)
-    {
-        connect(m_loginDialog, &QDialog::finished
-            , this, &QnWorkbenchWelcomeScreen::enableScreen);
-    }
-
-    dialogConstructor.resetGeometry();
-    setEnabled(false);
+    dialog->exec();
 }
 
 void QnWorkbenchWelcomeScreen::logoutFromCloud()
@@ -231,14 +226,23 @@ QColor QnWorkbenchWelcomeScreen::colorWithAlpha(QColor color
     color.setAlphaF(alpha);
     return color;
 }
-//
-
-void QnWorkbenchWelcomeScreen::enableScreen()
-{
-    setEnabled(true);
-}
 
 void QnWorkbenchWelcomeScreen::showScreen()
 {
     setVisible(true);
+}
+
+bool QnWorkbenchWelcomeScreen::eventFilter(QObject *obj
+    , QEvent *event)
+{
+    switch(event->type())
+    {
+    case QEvent::Resize:
+        if (auto resizeEvent = dynamic_cast<QResizeEvent *>(event))
+            setPageSize(resizeEvent->size());
+        break;
+    }
+
+
+    return base_type::eventFilter(obj, event);
 }

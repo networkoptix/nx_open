@@ -8,10 +8,11 @@ Rectangle
 {
     id: thisComponent;
 
-    anchors.fill: parent;
     color: Style.colors.window;
 
-    enabled: context.isEnabled;
+    width: context.pageSize.width;
+    height: context.pageSize.height;
+
     focus: true;
 
     CloudPanel
