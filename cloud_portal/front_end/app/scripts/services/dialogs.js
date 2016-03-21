@@ -22,7 +22,7 @@ angular.module('cloudApp').run(function($http,$templateCache) {
                 controller: 'DialogCtrl',
                 templateUrl: 'views/components/dialog.html',
                 animation: !isInline(),
-                keyboard:false,
+                keyboard:settings.cancellable,
                 backdrop:settings.cancellable?true:'static',
                 resolve: {
                     settings:function(){
