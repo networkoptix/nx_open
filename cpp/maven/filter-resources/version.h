@@ -10,11 +10,9 @@
  * DO NOT ADD NEW CONSTANTS HERE.
  *
  * All projects that are depend on "common" should use <utils/common/app_info.h> instead.
- * The QN_APPLICATION_NAME should be read from QCoreApplication::applicationName().
  *
  * No new variables should be added here. The major part of the file will be wiped out asap.
  */
-#define QN_BETA                         "${beta}"
 #define QN_ORGANIZATION_NAME            "${company.name}"
 #define QN_APPLICATION_NAME             "${product.title}"
 #define QN_APPLICATION_DISPLAY_NAME     "${product.display.title}"
@@ -37,6 +35,7 @@
 #define QN_COMPANY_URL                  "${company.url}"
 #define QN_SUPPORT_MAIL_ADDRESS         "${company.support.address}"
 #define QN_SUPPORT_LINK                 "${company.support.link}"
+#define QN_BETA                         "${beta}"
 
 /* These are used in old ios client */
 #define QN_PRODUCT_NAME_LONG            "${display.product.name}"
