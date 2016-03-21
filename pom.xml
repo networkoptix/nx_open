@@ -580,6 +580,7 @@
             <properties>
                 <platform>linux</platform>
                 <qt.spec>linux-g++</qt.spec>
+                <additional.qtplugins>audio, platforminputcontexts</additional.qtplugins>
             </properties>
             <modules>
                 <!--<module>plugins/xvbadecoder</module>-->
