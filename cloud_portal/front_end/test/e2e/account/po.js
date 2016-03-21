@@ -5,8 +5,8 @@ var AccountPage = function () {
     var PasswordFieldSuite = require('../password_check.js');
     this.passwordField = new PasswordFieldSuite();
 
-    var LoginLogout = require('../login_logout.js');
-    this.loginLogout = new LoginLogout();
+    var Helper = require('../helper.js');
+    this.helper = new Helper();
 
     this.accountUrl = '/#/account';
     this.passwordUrl = '/#/account/password';
@@ -49,15 +49,6 @@ var AccountPage = function () {
 
     this.saveSuccessAlert = element(by.css('process-alert[process=save]')).element(by.css('.alert')); // alert with success message
     this.passwordChangeAlert = element(by.css('process-alert[process=changePassword]')).element(by.css('.alert')); // alert with success message
-    this.catchAlert = function (alertElement, message) {
-        // Workaround due to Protractor bug with timeouts https://github.com/angular/protractor/issues/169
-        // taken from here http://stackoverflow.com/questions/25062748/testing-the-contents-of-a-temporary-element-with-protractor
-        browser.sleep(1500);
-        browser.ignoreSynchronization = true;
-        expect(alertElement.getText()).toContain(message);
-        browser.sleep(500);
-        browser.ignoreSynchronization = false;
-    }
 
     this.htmlBody = element(by.css('body'));
 

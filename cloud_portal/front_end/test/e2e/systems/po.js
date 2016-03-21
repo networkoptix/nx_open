@@ -1,8 +1,8 @@
 'use strict';
 
 var SystemsListPage = function () {
-    var LoginLogout = require('../login_logout.js');
-    this.loginLogout = new LoginLogout();
+    var Helper = require('../helper.js');
+    this.helper = new Helper();
 
     this.getHomePage = function () {
         browser.get('/');

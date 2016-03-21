@@ -5,11 +5,11 @@ describe('Account suite', function () {
     var p = new AccountPage();
 
     beforeAll(function() {
-        p.loginLogout.login(p.userEmail, p.userPassword);
+        p.helper.login(p.userEmail, p.userPassword);
     });
 
     afterAll(function() {
-        p.loginLogout.logout();
+        p.helper.logout();
     });
 
     it("should display dropdown in right top corner: Account settings, Change password, Logout", function () {
@@ -24,8 +24,8 @@ describe('Account suite', function () {
 
     it("should allow to log out", function () {
         p.get(p.homePageUrl);
-        p.loginLogout.logout();
-        p.loginLogout.login(p.userEmail, p.userPassword);
+        p.helper.logout();
+        p.helper.login(p.userEmail, p.userPassword);
     });
 
     it("should show email, first name, last name, subscribe", function () {
@@ -46,7 +46,7 @@ describe('Account suite', function () {
 
         p.saveButton.click();
 
-        p.catchAlert(p.saveSuccessAlert, 'Your account was successfully saved.');
+        p.helper.catchAlert(p.saveSuccessAlert, 'Your account was successfully saved.');
 
         p.refresh();
 
@@ -64,7 +64,7 @@ describe('Account suite', function () {
 
         p.saveButton.click();
 
-        p.catchAlert(p.saveSuccessAlert, 'Your account was successfully saved.');
+        p.helper.catchAlert(p.saveSuccessAlert, 'Your account was successfully saved.');
 
         p.refresh();
 
@@ -82,7 +82,7 @@ describe('Account suite', function () {
 
         p.saveButton.click();
 
-        p.catchAlert(p.saveSuccessAlert, 'Your account was successfully saved.');
+        p.helper.catchAlert(p.saveSuccessAlert, 'Your account was successfully saved.');
 
         p.refresh();
 
@@ -100,7 +100,7 @@ describe('Account suite', function () {
 
         p.saveButton.click();
 
-        p.catchAlert(p.saveSuccessAlert, 'Your account was successfully saved.');
+        p.helper.catchAlert(p.saveSuccessAlert, 'Your account was successfully saved.');
 
         p.refresh();
 
@@ -129,7 +129,7 @@ describe('Account suite', function () {
         p.passwordInput.sendKeys(p.userPasswordNew);
         p.submitButton.click();
 
-        p.catchAlert(p.passwordChangeAlert, 'Your password was successfully changed.');
+        p.helper.catchAlert(p.passwordChangeAlert, 'Your password was successfully changed.');
 
         browser.refresh();
 
@@ -137,7 +137,7 @@ describe('Account suite', function () {
         p.passwordInput.sendKeys(p.userPassword);
         p.submitButton.click();
 
-        p.catchAlert(p.passwordChangeAlert, 'Your password was successfully changed.');
+        p.helper.catchAlert(p.passwordChangeAlert, 'Your password was successfully changed.');
     });
 
     it("should save new password correctly (and change it back)", function () {
@@ -145,16 +145,16 @@ describe('Account suite', function () {
         p.currentPasswordInput.sendKeys(p.userPassword);
         p.passwordInput.sendKeys(p.userPasswordNew);
         p.submitButton.click();
-        p.catchAlert(p.passwordChangeAlert, 'Your password was successfully changed.');
+        p.helper.catchAlert(p.passwordChangeAlert, 'Your password was successfully changed.');
 
-        p.loginLogout.logout();
-        p.loginLogout.login(p.userEmail, p.userPasswordNew);
+        p.helper.logout();
+        p.helper.login(p.userEmail, p.userPasswordNew);
 
         p.get(p.passwordUrl);
         p.currentPasswordInput.sendKeys(p.userPasswordNew);
         p.passwordInput.sendKeys(p.userPassword);
         p.submitButton.click();
-        p.catchAlert(p.passwordChangeAlert, 'Your password was successfully changed.');
+        p.helper.catchAlert(p.passwordChangeAlert, 'Your password was successfully changed.');
     });
 
     it("should not allow to change password if old password is wrong", function () {
@@ -164,7 +164,7 @@ describe('Account suite', function () {
         p.passwordInput.sendKeys(p.userPassword);
         p.submitButton.click();
 
-        p.catchAlert(p.passwordChangeAlert, 'Couldn\'t change your password: Current password doesn\'t match');
+        p.helper.catchAlert(p.passwordChangeAlert, 'Couldn\'t change your password: Current password doesn\'t match');
     });
 
     xit("should not allow to change password if new password is the same as old password", function () {

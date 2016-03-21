@@ -39,7 +39,7 @@ describe('Registration suite', function () {
 
         p.submitButton.click();
 
-        p.catchRegisterSuccessAlert(p.registerSuccessAlert);
+        p.helper.catchAlert(p.registerSuccessAlert, 'Your account was successfully registered. Please, check your email to confirm it');
 
         // Check that registration form element is NOT displayed on page
         expect(p.firstNameInput.isPresent()).toBe(false);
@@ -55,7 +55,7 @@ describe('Registration suite', function () {
 
         p.submitButton.click();
 
-        p.catchRegisterSuccessAlert(p.registerSuccessAlert);
+        p.helper.catchAlert(p.registerSuccessAlert, 'Your account was successfully registered. Please, check your email to confirm it');
 
         // Check that registration form element is NOT displayed on page
         expect(p.firstNameInput.isPresent()).toBe(false);
@@ -71,7 +71,7 @@ describe('Registration suite', function () {
 
         p.submitButton.click();
 
-        p.catchRegisterSuccessAlert(p.registerSuccessAlert);
+        p.helper.catchAlert(p.registerSuccessAlert, 'Your account was successfully registered. Please, check your email to confirm it');
 
         // Check that registration form element is NOT displayed on page
         expect(p.firstNameInput.isPresent()).toBe(false);
@@ -87,7 +87,7 @@ describe('Registration suite', function () {
 
         p.submitButton.click();
 
-        p.catchRegisterSuccessAlert(p.registerSuccessAlert);
+        p.helper.catchAlert(p.registerSuccessAlert, 'Your account was successfully registered. Please, check your email to confirm it');
 
         // Check that registration form element is NOT displayed on page
         expect(p.firstNameInput.isPresent()).toBe(false);
