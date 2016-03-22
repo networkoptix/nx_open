@@ -17,29 +17,24 @@ FocusScope
 
     property bool animationsEnabled: true
 
-    clip: true
-
     QnGridView
     {
         id: cameraGrid
 
         anchors.fill: parent
-        anchors.topMargin: spacing / 2
+        anchors.margins: spacing / 2
 
         focus: true
 
         readonly property real spacing: dp(8)
-
-        leftMargin: spacing / 2
-        rightMargin: spacing / 2
 
         model: QnCameraListModel
         {
             id: camerasModel
         }
 
-        cellWidth: (width - spacing) / 2
-        cellHeight: (height - spacing) / 2
+        cellWidth: width / 2
+        cellHeight: height / 2
 
         flow: GridView.FlowTopToBottom
         flickableDirection: Flickable.flickingHorizontally
