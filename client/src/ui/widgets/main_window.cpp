@@ -429,8 +429,6 @@ void QnMainWindow::updateWidgetsVisibility()
         }
 
         m_globalLayout->takeAt(0);
-
-        auto parent = m_titleLayout->parent();
         m_titleLayout->setParent(NULL);
         setVisibleRecursively(m_titleLayout, false);
     };
