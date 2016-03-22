@@ -114,7 +114,7 @@ void IncomingTunnelPool::acceptTunnel(
                 if (m_acceptedSockets.size() >= m_acceptLimit)
                 {
                     // TODO: #mux Stop accepting tunnel?
-                    //  wouldn't really help while we acceptiong other tunnels
+                    //  wouldn't really help while we accepting other tunnels
                     //  better to implement epoll like system with tunnels and
                     //  their connections
                     NX_LOGX(lm("sockets queue overflow: %1").arg(m_acceptLimit),
@@ -139,7 +139,7 @@ void IncomingTunnelPool::callAcceptHandler(bool timeout)
     m_ioThreadSocket->cancelIOSync(aio::etTimedOut);
 
     QnMutexLocker lock(&m_mutex);
-    if (!m_acceptHandler)
+    if (!m_acceptHandler || m_acceptedSockets.empty())
         return;
 
     const auto handler = std::move(m_acceptHandler);
