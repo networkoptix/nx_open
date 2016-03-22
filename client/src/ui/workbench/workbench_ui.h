@@ -180,7 +180,7 @@ protected:
     void updateSliderZoomButtonsGeometry();
 
     QRectF updatedTreeGeometry(const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry);
-    QRectF updatedNotificationsGeometry(const QRectF &notificationsGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry, const QRectF &calendarGeometry, const QRectF &dayTimeGeometry, qreal *maxHeight);
+    QRectF updatedNotificationsGeometry(const QRectF &notificationsGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry);
     QRectF updatedCalendarGeometry(const QRectF &sliderGeometry);
     QRectF updatedDayTimeWidgetGeometry(const QRectF &sliderGeometry, const QRectF &calendarGeometry);
     void updateActivityInstrumentState();
@@ -223,7 +223,7 @@ private slots:
 
     void updateCalendarVisibility(bool animate = true);
     void updateControlsVisibility(bool animate = true);
-    
+
     void updateTreeOpacityAnimated() { updateTreeOpacity(true); }
     void updateSliderOpacityAnimated() { updateSliderOpacity(true); }
     void updateTitleOpacityAnimated() { updateTitleOpacity(true); }

@@ -377,10 +377,11 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_mainMenuButton = newActionButton(action(QnActions::MainMenuAction), true, 1.5, Qn::MainWindow_TitleBar_MainMenu_Help);
     connect(action(QnActions::MainMenuAction), &QAction::triggered, this, &QnMainWindow::skipDoubleClick);
 
+    /*
     QWidget* titleWidget = new QWidget(this);
     setPaletteColor(titleWidget, QPalette::Window, QColor(0x212a2f));
     titleWidget->setAutoFillBackground(true);
-
+    */
     m_titleLayout = new QHBoxLayout();
     m_titleLayout->setContentsMargins(0, 0, 0, 0);
     m_titleLayout->setSpacing(2);
@@ -389,7 +390,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_titleLayout->addWidget(cloudPanel);
     m_titleLayout->addWidget(newActionButton(action(QnActions::OpenLoginDialogAction), false, 1.0, Qn::Login_Help));
     m_titleLayout->addLayout(m_windowButtonsLayout);
-    titleWidget->setLayout(m_titleLayout);
+    //titleWidget->setLayout(m_titleLayout);
 
     /* Layouts. */
 
@@ -401,7 +402,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_globalLayout = new QVBoxLayout();
     m_globalLayout->setContentsMargins(0, 0, 0, 0);
     m_globalLayout->setSpacing(0);
-    m_globalLayout->addWidget(titleWidget);
+    m_globalLayout->addLayout(m_titleLayout);
     m_globalLayout->addLayout(m_viewLayout);
     m_globalLayout->setStretchFactor(m_viewLayout, 0x1000);
 
@@ -463,6 +464,8 @@ void QnMainWindow::updateWidgetsVisibility()
         }
 
         m_globalLayout->takeAt(0);
+
+        auto parent = m_titleLayout->parent();
         m_titleLayout->setParent(NULL);
         setVisibleRecursively(m_titleLayout, false);
     };
@@ -618,10 +621,6 @@ void QnMainWindow::minimize() {
     showMinimized();
 }
 
-void QnMainWindow::toggleTitleVisibility() {
-    setTitleVisible(!m_titleVisible);
-}
-
 bool QnMainWindow::handleMessage(const QString &message) {
     const QStringList files = message.split(QLatin1Char('\n'), QString::SkipEmptyParts);
 
@@ -648,7 +647,6 @@ void QnMainWindow::setOptions(Options options) {
 }
 
 void QnMainWindow::updateDecorationsState() {
-    return;
 #ifdef Q_OS_MACX
     bool fullScreen = mac_isFullscreen((void*)winId());
 #else
@@ -671,16 +669,18 @@ void QnMainWindow::updateDecorationsState() {
     m_view->setLineWidth(windowTitleUsed ? 0 : 1);
 
     updateDwmState();
+    m_currentPageHolder->updateGeometry();
 }
 
 void QnMainWindow::updateDwmState() {
-    return;
-    if(isFullScreen()) {
+    if (isFullScreen())
+    {
         /* Full screen mode. */
         m_drawCustomFrame = false;
         m_frameMargins = QMargins(0, 0, 0, 0);
 
-        if(m_dwm->isSupported() && false) { // TODO: Disable DWM for now.
+        if (m_dwm->isSupported() && false)
+        { // TODO: Disable DWM for now.
             setAttribute(Qt::WA_NoSystemBackground, false);
             setAttribute(Qt::WA_TranslucentBackground, false);
 
@@ -690,7 +690,7 @@ void QnMainWindow::updateDwmState() {
         }
 
         /* Can't set to (0, 0, 0, 0) on Windows as in fullScreen mode context menu becomes invisible.
-         * Looks like Qt bug: http://bugreports.qt.nokia.com/browse/QTBUG-7556. */
+         * Looks like Qt bug: https://bugreports.qt.io/browse/QTBUG-7556 */
 #ifdef Q_OS_WIN
         setContentsMargins(0, 0, 0, 1);
 #else
@@ -699,7 +699,9 @@ void QnMainWindow::updateDwmState() {
 
         m_titleLayout->setContentsMargins(0, 0, 0, 0);
         m_viewLayout->setContentsMargins(0, 0, 0, 0);
-    } else if(m_dwm->isSupported() && m_dwm->isCompositionEnabled() && false) { // TODO: Disable DWM for now.
+    }
+    else if (m_dwm->isSupported() && m_dwm->isCompositionEnabled() && false)
+    { // TODO: Disable DWM for now.
         /* Windowed or maximized with aero glass. */
         m_drawCustomFrame = false;
         m_frameMargins = !isMaximized() ? m_dwm->themeFrameMargins() : QMargins(0, 0, 0, 0);
@@ -720,25 +722,29 @@ void QnMainWindow::updateDwmState() {
             m_frameMargins.right(),
             m_frameMargins.bottom()
         );
-    } else {
+    }
+    else
+    {
         /* Windowed or maximized without aero glass. */
-        /*m_drawCustomFrame = true;
-        m_frameMargins = !isMaximized() ? (m_dwm->isSupported() ? m_dwm->themeFrameMargins() : QMargins(8, 8, 8, 8)) : QMargins(0, 0, 0, 0);*/
 #ifdef Q_OS_LINUX
         // On linux window manager cannot disable titlebar leaving border in place. Thus we have to disable decorations completely and draw our own border.
-        if (isMaximized()) {
+        if (isMaximized())
+        {
             m_drawCustomFrame = false;
             m_frameMargins = QMargins(0, 0, 0, 0);
-        } else {
-        m_drawCustomFrame = true;
-        m_frameMargins = QMargins(2, 2, 2, 2);
+        }
+        else
+        {
+            m_drawCustomFrame = true;
+            m_frameMargins = QMargins(2, 2, 2, 2);
         }
 #else
         m_drawCustomFrame = false;
         m_frameMargins = QMargins(0, 0, 0, 0);
 #endif
 
-        if(m_dwm->isSupported() && false) { // TODO: Disable DWM for now.
+        if(m_dwm->isSupported() && false)
+        { // TODO: Disable DWM for now.
             setAttribute(Qt::WA_NoSystemBackground, false);
             setAttribute(Qt::WA_TranslucentBackground, false);
 

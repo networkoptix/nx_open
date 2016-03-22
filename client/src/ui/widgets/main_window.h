@@ -83,8 +83,6 @@ protected slots:
     void setFullScreen(bool fullScreen);
     void minimize();
 
-    void toggleTitleVisibility();
-
     void updateDwmState();
 
     void at_fileOpenSignalizer_activated(QObject *object, QEvent *event);
