@@ -63,6 +63,9 @@ BUG FIXES
     Watching live video via Android Client wasn't logged in Audit Trail. Fixed. - VMS-555
     Export with Paxton Plugin has led to the crash. Fixed. - VISTA-72
     Chinese input didn't work in Ubuntu Client. Fixed. - VMS-2207
+
+KNOWN ISSUES
+    Video from camera on Nx1 may not be opened in New Mobile Client on iOS9  
 	
 
 -----------------------------------------------2.4.1.xxxx-----------------------------------------
