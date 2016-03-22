@@ -223,14 +223,18 @@ TEST_F(SocketUdt, rendezvousConnect)
     const int maxSimultaneousConnections = 25;
     const std::chrono::seconds testDuration(3);
 
-    RandomDataTcpServer server(bytesToSendThroughConnection);
+    RandomDataTcpServer server(
+        TestTrafficLimitType::outgoing,
+        bytesToSendThroughConnection);
     server.setLocalAddress(acceptorSocket.getLocalAddress());
     ASSERT_TRUE(server.start());
 
     ConnectionsGenerator connectionsGenerator(
         SocketAddress(QString::fromLatin1("localhost"), server.addressBeingListened().port),
         maxSimultaneousConnections,
-        bytesToSendThroughConnection);
+        TestTrafficLimitType::outgoing,
+        bytesToSendThroughConnection,
+        ConnectionsGenerator::kInfiniteConnectionCount);
     connectionsGenerator.setLocalAddress(connectorSocket.getLocalAddress());
     connectionsGenerator.start();
 

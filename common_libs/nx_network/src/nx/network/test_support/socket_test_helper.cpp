@@ -29,13 +29,15 @@ namespace
 
 TestConnection::TestConnection(
     std::unique_ptr<AbstractStreamSocket> socket,
-    size_t bytesToSendThrough,
+    TestTrafficLimitType limitType,
+    size_t trafficLimit,
     std::function<void(int, TestConnection*, SystemError::ErrorCode)> handler )
 :
     m_socket( std::move( socket ) ),
-    m_bytesToSendThrough( bytesToSendThrough ),
+    m_limitType( limitType ),
+    m_trafficLimit( trafficLimit ),
     m_connected( true ),
-    m_handler( std::move(handler) ),
+    m_finishedEventHandler( std::move(handler) ),
     m_terminated( false ),
     m_totalBytesSent( 0 ),
     m_totalBytesReceived( 0 ),
@@ -50,16 +52,18 @@ TestConnection::TestConnection(
 
 TestConnection::TestConnection(
     const SocketAddress& remoteAddress,
-    size_t bytesToSendThrough,
+    TestTrafficLimitType limitType,
+    size_t trafficLimit,
     std::function<void(int, TestConnection*, SystemError::ErrorCode)> handler )
 :
     m_socket( SocketFactory::createStreamSocket() ),
-    m_bytesToSendThrough( bytesToSendThrough ),
+    m_limitType(limitType),
+    m_trafficLimit( trafficLimit ),
     m_connected( false ),
     m_remoteAddress(
         remoteAddress.address == HostAddress::anyHost ? HostAddress::localhost : remoteAddress.address,
         remoteAddress.port ),
-    m_handler( std::move(handler) ),
+    m_finishedEventHandler( std::move(handler) ),
     m_terminated( false ),
     m_totalBytesSent( 0 ),
     m_totalBytesReceived( 0 ),
@@ -169,7 +173,7 @@ void TestConnection::onConnected( int id, SystemError::ErrorCode errorCode )
     if( errorCode != SystemError::noError )
     {
         m_socket->pleaseStopSync();
-        auto handler = std::move( m_handler );
+        auto handler = std::move( m_finishedEventHandler );
         lk.unlock();
         return handler( id, this, errorCode );
     }
@@ -218,7 +222,7 @@ void TestConnection::onDataReceived(
     if( errorCode != SystemError::noError && errorCode != SystemError::timedOut )
     {
         m_socket->pleaseStopSync();
-        auto handler = std::move(m_handler);
+        auto handler = std::move(m_finishedEventHandler);
         lk.unlock();
         return handler( id, this, errorCode );
     }
@@ -226,6 +230,16 @@ void TestConnection::onDataReceived(
     m_totalBytesReceived += bytesRead;
     m_readBuffer.clear();
     m_readBuffer.reserve( READ_BUF_SIZE );
+
+    if (m_limitType == TestTrafficLimitType::incoming &&
+        m_totalBytesReceived >= m_trafficLimit)
+    {
+        m_socket->pleaseStopSync();
+        auto handler = std::move(m_finishedEventHandler);
+        lk.unlock();
+        handler(id, this, SystemError::getLastOSErrorCode());
+        return;
+    }
 
     using namespace std::placeholders;
     m_socket->readSomeAsync(
@@ -248,18 +262,19 @@ void TestConnection::onDataSent( int id, SystemError::ErrorCode errorCode, size_
     if( errorCode != SystemError::noError && errorCode != SystemError::timedOut )
     {
         m_socket->pleaseStopSync();
-        auto handler = std::move( m_handler );
+        auto handler = std::move( m_finishedEventHandler );
         lk.unlock();
         return handler( id, this, errorCode );
     }
 
     m_totalBytesSent += bytesWritten;
-    if( m_totalBytesSent >= m_bytesToSendThrough )
+    if (m_limitType == TestTrafficLimitType::outgoing &&
+        m_totalBytesSent >= m_trafficLimit)
     {
         m_socket->pleaseStopSync();
-        auto handler = std::move( m_handler );
+        auto handler = std::move( m_finishedEventHandler );
         lk.unlock();
-        handler( id, this, SystemError::getLastOSErrorCode() );
+        handler(id, this, SystemError::getLastOSErrorCode());
         return;
     }
 
@@ -278,9 +293,12 @@ void TestConnection::onDataSent( int id, SystemError::ErrorCode errorCode, size_
 ////////////////////////////////////////////////////////////
 //// class RandomDataTcpServer
 ////////////////////////////////////////////////////////////
-RandomDataTcpServer::RandomDataTcpServer( size_t bytesToSendThrough )
+RandomDataTcpServer::RandomDataTcpServer(
+    TestTrafficLimitType limitType,
+    size_t trafficLimit)
 :
-    m_bytesToSendThrough( bytesToSendThrough )
+    m_limitType(limitType),
+    m_trafficLimit(trafficLimit)
 {
 }
 
@@ -351,7 +369,8 @@ void RandomDataTcpServer::onNewConnection(
     {
         std::shared_ptr<TestConnection> testConnection( new TestConnection(
             std::unique_ptr<AbstractStreamSocket>(newConnection),
-            m_bytesToSendThrough,
+            m_limitType,
+            m_trafficLimit,
             std::bind(&RandomDataTcpServer::onConnectionDone, this, std::placeholders::_2 )));
         NX_LOGX(lm("Accepted connection %1. local address %2")
             .arg(testConnection.get()).arg(testConnection->getLocalAddress().toString()),
@@ -388,12 +407,14 @@ void RandomDataTcpServer::onConnectionDone(
 ConnectionsGenerator::ConnectionsGenerator(
     const SocketAddress& remoteAddress,
     size_t maxSimultaneousConnectionsCount,
-    size_t bytesToSendThrough,
+    TestTrafficLimitType limitType,
+    size_t trafficLimit,
     size_t maxTotalConnections)
 :
     m_remoteAddress( remoteAddress ),
     m_maxSimultaneousConnectionsCount( maxSimultaneousConnectionsCount ),
-    m_bytesToSendThrough( bytesToSendThrough ),
+    m_limitType( limitType ),
+    m_trafficLimit( trafficLimit ),
     m_maxTotalConnections( maxTotalConnections ),
     m_terminated( false ),
     m_totalBytesSent( 0 ),
@@ -460,7 +481,8 @@ void ConnectionsGenerator::start()
         m_connections.push_back( std::unique_ptr<TestConnection>() );
         std::unique_ptr<TestConnection> connection( new TestConnection(
             m_remoteAddress,
-            m_bytesToSendThrough,
+            m_limitType,
+            m_trafficLimit,
             std::bind(&ConnectionsGenerator::onConnectionFinished, this,
                       std::placeholders::_1, std::placeholders::_3,
                       std::prev(m_connections.end())) ) );
@@ -548,7 +570,8 @@ void ConnectionsGenerator::addNewConnections()
         m_connections.push_back(std::unique_ptr<TestConnection>());
         std::unique_ptr<TestConnection> connection(new TestConnection(
             m_remoteAddress,
-            m_bytesToSendThrough,
+            m_limitType,
+            m_trafficLimit,
             std::bind(&ConnectionsGenerator::onConnectionFinished, this,
                 std::placeholders::_1, std::placeholders::_3,
                 std::prev(m_connections.end()))));

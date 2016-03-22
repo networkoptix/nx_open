@@ -97,7 +97,9 @@ int runInListenMode(const std::multimap<QString, QString>& args)
     //TODO #ak RandomDataTcpServer does not fit well at the moment: 
         //should fit it to this tool's needs
 
-    test::RandomDataTcpServer server(1024*1024);
+    test::RandomDataTcpServer server(
+        test::TestTrafficLimitType::none,
+        0);
     server.setServerSocket(std::move(serverSock));
     if (!server.start())
     {
@@ -126,7 +128,7 @@ int runInListenMode(const std::multimap<QString, QString>& args)
 
 const int kDefaultTotalConnections = 100;
 const int kDefaultMaxConcurrentConnections = 1;
-const int kDefaultBytesToSend = 100000;
+const int kDefaultBytesToReceive = 1000000;
 
 int runInConnectMode(const std::multimap<QString, QString>& args)
 {
@@ -145,8 +147,14 @@ int runInConnectMode(const std::multimap<QString, QString>& args)
     int maxConcurrentConnections = kDefaultMaxConcurrentConnections;
     readArg(args, "max-concurrent-connections", &maxConcurrentConnections);
 
-    int bytesToSend = kDefaultBytesToSend;
-    readArg(args, "bytes-to-send", &bytesToSend);
+    nx::network::test::TestTrafficLimitType 
+        trafficLimitType = nx::network::test::TestTrafficLimitType::incoming;
+
+    int trafficLimit = kDefaultBytesToReceive;
+    readArg(args, "bytes-to-receive", &trafficLimit);
+
+    if (readArg(args, "bytes-to-send", &trafficLimit))
+        trafficLimitType = nx::network::test::TestTrafficLimitType::outgoing;
 
     SocketFactory::setCreateStreamSocketFunc(
         [](bool ssl, SocketFactory::NatTraversalType ntt)
@@ -159,7 +167,8 @@ int runInConnectMode(const std::multimap<QString, QString>& args)
     nx::network::test::ConnectionsGenerator connectionsGenerator(
         SocketAddress(target),
         maxConcurrentConnections,
-        bytesToSend,
+        trafficLimitType,
+        trafficLimit,
         totalConnections);
 
     std::promise<void> finishedPromise;
@@ -221,7 +230,7 @@ int runInHttpClientMode(const std::multimap<QString, QString>& args)
     return 0;
 }
 
-void printHelp(int argc, char* argv[])
+void printHelp(int /*argc*/, char* /*argv*/[])
 {
     std::cout << 
         "\n"
@@ -234,11 +243,12 @@ void printHelp(int argc, char* argv[])
         "Connect mode:\n"
         "  --connect                        Enable connect mode\n"
         "  --target={endpoint}              Regular or cloud address of server\n"
-        "  --total-connections={100}\n"
+        "  --total-connections={"<< kDefaultTotalConnections <<"}\n"
         "                                   Number of connections to try\n"
-        "  --max-concurrent-connections={10}\n"
-        "  --bytes-to-send={100000}         This number of bytes is sent to the target\n"
-        "                                   before connection termination\n"
+        "  --max-concurrent-connections={"<< kDefaultMaxConcurrentConnections <<"}\n"
+        "  --bytes-to-receive={"<< kDefaultBytesToReceive <<"}"
+        "                                   Bytes to receive before closing connection\n"
+        "  --bytes-to-send=                 Bytes to send before closing connection\n"
         "\n"
         "Http client mode:\n"
         "  --http-client                    Enable Http client mode\n"

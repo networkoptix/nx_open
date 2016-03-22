@@ -103,7 +103,9 @@ TEST_F(UdpHolePunching, loadTest)
     const int maxSimultaneousConnections = 25;
     const int bytesToSendThroughConnection = 1024 * 1024;
 
-    test::RandomDataTcpServer server(bytesToSendThroughConnection);
+    test::RandomDataTcpServer server(
+        test::TestTrafficLimitType::outgoing,
+        bytesToSendThroughConnection);
     server.setServerSocket(
         std::make_unique<CloudServerSocket>(
             SocketGlobals::mediatorConnector().systemConnection()));
@@ -112,7 +114,9 @@ TEST_F(UdpHolePunching, loadTest)
     test::ConnectionsGenerator connectionsGenerator(
         SocketAddress(QString::fromUtf8(m_server->fullName()), 0),
         maxSimultaneousConnections,
-        bytesToSendThroughConnection);
+        test::TestTrafficLimitType::outgoing,
+        bytesToSendThroughConnection,
+        test::ConnectionsGenerator::kInfiniteConnectionCount);
     connectionsGenerator.start();
 
     std::this_thread::sleep_for(testDuration);

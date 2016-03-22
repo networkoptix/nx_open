@@ -23,6 +23,13 @@ namespace nx {
 namespace network {
 namespace test {
 
+enum class TestTrafficLimitType
+{
+    none,
+    incoming,
+    outgoing
+};
+
 //!Reads/writes random data to/from connection
 class NX_NETWORK_API TestConnection
 :
@@ -34,14 +41,16 @@ public:
     */
     TestConnection(
         std::unique_ptr<AbstractStreamSocket> connection,
-        size_t bytesToSendThrough,
+        TestTrafficLimitType limitType,
+        size_t trafficLimit,
         std::function<void(int, TestConnection*, SystemError::ErrorCode)> handler );
     /*!
         \param handler to be called on connection closure or after \a bytesToSendThrough bytes have been sent
     */
     TestConnection(
         const SocketAddress& remoteAddress,
-        size_t bytesToSendThrough,
+        TestTrafficLimitType limitType,
+        size_t trafficLimit,
         std::function<void(int, TestConnection*, SystemError::ErrorCode)> handler );
     virtual ~TestConnection();
 
@@ -57,10 +66,12 @@ public:
 
 private:
     std::unique_ptr<AbstractStreamSocket> m_socket;
-    const size_t m_bytesToSendThrough;
+    const TestTrafficLimitType m_limitType;
+    const size_t m_trafficLimit;
     bool m_connected;
     SocketAddress m_remoteAddress;
-    const std::function<void(int, TestConnection*, SystemError::ErrorCode)> m_handler;
+    const std::function<void(int, TestConnection*, SystemError::ErrorCode)>
+        m_finishedEventHandler;
     nx::Buffer m_readBuffer;
     nx::Buffer m_outData;
     bool m_terminated;
@@ -90,7 +101,9 @@ class NX_NETWORK_API RandomDataTcpServer
     public QnJoinable
 {
 public:
-    RandomDataTcpServer(size_t randomBytesToSendThrough);
+    RandomDataTcpServer(
+        TestTrafficLimitType limitType,
+        size_t trafficLimit);
     /** In this mode it sends \a dataToSend through connection and closes connection */
     RandomDataTcpServer(const QByteArray& dataToSend);
     virtual ~RandomDataTcpServer();
@@ -107,7 +120,8 @@ public:
 
 private:
     std::unique_ptr<AbstractStreamServerSocket> m_serverSocket;
-    const size_t m_bytesToSendThrough;
+    const TestTrafficLimitType m_limitType;
+    const size_t m_trafficLimit;
     QnMutex m_mutex;
     std::list<std::shared_ptr<TestConnection>> m_acceptedConnections;
     SocketAddress m_localAddress;
@@ -126,14 +140,17 @@ class NX_NETWORK_API ConnectionsGenerator
     public QnJoinable
 {
 public:
+    static const size_t kInfiniteConnectionCount = 0;
+
     /**
         @param maxTotalConnections If zero, then no limit on total connection number
     */
     ConnectionsGenerator(
         const SocketAddress& remoteAddress,
         size_t maxSimultaneousConnectionsCount,
-        size_t bytesToSendThrough,
-        size_t maxTotalConnections = 0);
+        TestTrafficLimitType limitType,
+        size_t trafficLimit,
+        size_t maxTotalConnections);
     virtual ~ConnectionsGenerator();
 
     virtual void pleaseStop() override;
@@ -154,7 +171,8 @@ private:
 
     const SocketAddress m_remoteAddress;
     size_t m_maxSimultaneousConnectionsCount;
-    const size_t m_bytesToSendThrough;
+    const TestTrafficLimitType m_limitType;
+    const size_t m_trafficLimit;
     const size_t m_maxTotalConnections;
     ConnectionsContainer m_connections;
     bool m_terminated;
