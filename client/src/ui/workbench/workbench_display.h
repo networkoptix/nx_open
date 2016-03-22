@@ -51,7 +51,6 @@ class QnWorkbenchStreamSynchronizer;
 class QnToggle;
 class QnThumbnailsLoader;
 class QnThumbnail;
-class QnGradientBackgroundPainter;
 
 class QnClientVideoCamera;
 class QnCamDisplay;

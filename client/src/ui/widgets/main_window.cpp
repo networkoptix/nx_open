@@ -32,7 +32,6 @@
 #include <ui/actions/action_manager.h>
 #include <ui/graphics/view/graphics_view.h>
 #include <ui/graphics/view/graphics_scene.h>
-#include <ui/graphics/view/gradient_background_painter.h>
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>

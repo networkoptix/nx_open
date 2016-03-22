@@ -17,7 +17,6 @@ class QSpacerItem;
 class QToolButton;
 
 class QnActionManager;
-class QnGradientBackgroundPainter;
 class QnLayoutTabBar;
 class QnGraphicsView;
 class QnDwm;

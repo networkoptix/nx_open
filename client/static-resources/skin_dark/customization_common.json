@@ -176,13 +176,13 @@
 
     "QnMainWindow": {
         "palette": { "default": {
-            "window": "#000000"
+            "window": "dark4"
         }}
     },
     
     "QnNavigationItem": {
         "palette": { "default": { 
-            "window": "#000000" 
+            "window": "dark4" 
         }}
     },
 
@@ -239,7 +239,7 @@
             "default": {
                 "_": "Scene background color.",
             
-                "base": "black"
+                "base": "dark4"
             }
         }
     },

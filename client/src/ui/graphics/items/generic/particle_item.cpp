@@ -7,9 +7,9 @@
 #include <utils/math/fuzzy.h>
 
 QnParticleItem::QnParticleItem(QGraphicsItem *parent):
-    base_type(parent) 
+    base_type(parent)
 {
-    setColor(Qt::black);
+    setColor(Qt::blue);
 }
 
 QnParticleItem::~QnParticleItem() {

@@ -71,8 +71,6 @@
 
 #include <ui/graphics/opengl/gl_hardware_checker.h>
 
-#include <ui/graphics/view/gradient_background_painter.h>
-
 #include <ui/workaround/gl_widget_factory.h>
 #include <ui/workaround/gl_widget_workaround.h>
 
@@ -436,7 +434,7 @@ void QnWorkbenchDisplay::initSceneView() {
     m_curtainItem = new QnCurtainItem();
     m_scene->addItem(m_curtainItem.data());
     setLayer(m_curtainItem.data(), Qn::BackLayer);
-    m_curtainItem.data()->setColor(Qt::black);
+    m_curtainItem.data()->setColor(Qt::green);
     m_curtainAnimator->setCurtainItem(m_curtainItem.data());
 
     /* Set up grid. */
@@ -448,7 +446,8 @@ void QnWorkbenchDisplay::initSceneView() {
     m_gridItem.data()->setLineWidth(100.0);
     m_gridItem.data()->setMapper(workbench()->mapper());
 
-	if (canShowLayoutBackground()) {
+	if (canShowLayoutBackground())
+    {
 		m_gridBackgroundItem = new QnGridBackgroundItem(NULL, context());
 		m_scene->addItem(gridBackgroundItem());
 		setLayer(gridBackgroundItem(), Qn::EMappingLayer);
