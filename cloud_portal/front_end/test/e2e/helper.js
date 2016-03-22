@@ -49,6 +49,7 @@ var Helper = function () {
         // taken from here http://stackoverflow.com/questions/25062748/testing-the-contents-of-a-temporary-element-with-protractor
         browser.sleep(1500);
         browser.ignoreSynchronization = true;
+        expect(alertElement.isDisplayed()).toBe(true);
         expect(alertElement.getText()).toContain(message);
         browser.sleep(500);
         browser.ignoreSynchronization = false;
