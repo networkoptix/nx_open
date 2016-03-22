@@ -1752,54 +1752,48 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(
 )
 {
     QnStorageResourcePtr result;
-
-    struct StorageSpaceInfo {
-        QnStorageResourcePtr storage;
-        double usageCoeff;
-    };
-    std::vector<StorageSpaceInfo> storagesInfo;
-
     updateStorageStatistics();
 
     QSet<QnStorageResourcePtr> storages;
-    for (const auto& storage: getWritableStorages()) {
+    for (const auto& storage: getWritableStorages()) 
+    {
         if (pred(storage))
+        {
             storages << storage;
-    }
-
-    for (auto it = storages.cbegin(); it != storages.cend(); ++it) {
 #if 0
-        qWarning() << lit("Storage %1 usage coeff: %2")
-                        .arg((*it)->getUrl())
-                        .arg((*it)->calcUsageCoeff());
+            qWarning() << lit("Storage %1 usage coeff: %2")
+                .arg(storage->getUrl())
+                .arg(storage->calcUsageCoeff());
 #endif
-        StorageSpaceInfo tmp = {*it, (*it)->calcUsageCoeff()};
-        storagesInfo.push_back(tmp);
+        }
     }
 
-    if (!storagesInfo.empty()) 
+    if (!storages.empty()) 
     {
         double writedCoeffSum = 0.0;
-        for (auto &storageInfo : storagesInfo)
-            writedCoeffSum += storageInfo.storage->getWritedCoeff();
+        for (const auto &storage : storages)
+            writedCoeffSum += storage->getWritedCoeff();
 
         std::uniform_real_distribution<> writedDis(0, writedCoeffSum);
         double selectedStorageCoeff = writedDis(m_gen);
 
         double writedCoeffPartialSum = 0.0;
-        size_t resultIndex = 0;
-        
-        for (; resultIndex < storagesInfo.size(); ++resultIndex)
+        for (const auto &storage : storages)
         {
-            writedCoeffPartialSum += storagesInfo[resultIndex].storage->getWritedCoeff();
+            writedCoeffPartialSum += storage->getWritedCoeff();
             if (writedCoeffPartialSum >= selectedStorageCoeff)
+            {
+                result = storage;
                 break;
+            }
         }
-
-        if (resultIndex == storagesInfo.size())
-            resultIndex = storagesInfo.size() - 1;
-
-        result = storagesInfo[resultIndex].storage;
+        // just in case some rounding double issue we will return any storage
+        if (!result)
+            result = *storages.begin();
+#if 0
+        qWarning() << lit("Selected storage %1\n").arg(result->getUrl());
+#endif
+        return result;
     }
 
     auto hasFastScanned = [this]
@@ -1813,10 +1807,6 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(
         return false;
     };
 
-#if 0
-    if (result)
-        qWarning() << lit("Selected storage %1\n").arg(result->getUrl());
-#endif
 
     if (!result) {
         if (!m_warnSended && !hasFastScanned() && m_firstStoragesTestDone) {
