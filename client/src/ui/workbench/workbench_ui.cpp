@@ -105,6 +105,8 @@ namespace {
     const qreal kDefaultSizeMultiplier = 1.0;
     const int kDefaultHelpTopicId = -1;
 
+    const qreal kHeaderHeight = 30.0;
+
     QString aliasFromAction(QAction *action)
     {
         static const auto kUndefinedAlias = lit("undefined");
@@ -983,19 +985,25 @@ void QnWorkbenchUi::setTreeOpened(bool opened, bool animate, bool save) {
     static_cast<QnResizerWidget*>(m_treeResizerWidget)->setEnabled(opened);
 }
 
-QRectF QnWorkbenchUi::updatedTreeGeometry(const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry) {
+QRectF QnWorkbenchUi::updatedTreeGeometry(const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry)
+{
+
     QPointF pos(
         treeGeometry.x(),
-        ((!m_titleVisible || !m_titleUsed) && m_treeVisible) ? 30.0 : qMax(titleGeometry.bottom() + 30.0, 30.0)
+        ((!m_titleVisible || !m_titleUsed) && m_treeVisible) ? kHeaderHeight : qMax(titleGeometry.bottom() + kHeaderHeight, kHeaderHeight)
         );
+
     QSizeF size(
         treeGeometry.width(),
-        ((!m_sliderVisible && m_treeVisible) ? m_controlsWidgetRect.bottom() - 30.0 : qMin(sliderGeometry.y() - 30.0, m_controlsWidgetRect.bottom() - 30.0)) - pos.y()
+        ((!m_sliderVisible && m_treeVisible)
+            ? m_controlsWidgetRect.bottom() - pos.y()
+            : qMin(sliderGeometry.y(), m_controlsWidgetRect.bottom())) - pos.y()
         );
     return QRectF(pos, size);
 }
 
-void QnWorkbenchUi::updateTreeGeometry() {
+void QnWorkbenchUi::updateTreeGeometry()
+{
 	if (!m_treeItem)
 		return;
 
@@ -1623,12 +1631,12 @@ void QnWorkbenchUi::updateNotificationsOpacity(bool animate)
 QRectF QnWorkbenchUi::updatedNotificationsGeometry(const QRectF &notificationsGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry, const QRectF &calendarGeometry, const QRectF &dayTimeGeometry, qreal *maxHeight) {
     QPointF pos(
         notificationsGeometry.x(),
-        ((!m_titleVisible || !m_titleUsed) && m_notificationsVisible) ? 30.0 : qMax(titleGeometry.bottom() + 30.0, 30.0)
+        ((!m_titleVisible || !m_titleUsed) && m_notificationsVisible) ? kHeaderHeight : qMax(titleGeometry.bottom() + kHeaderHeight, kHeaderHeight)
         );
 
     *maxHeight = qMin(
-        m_sliderVisible ? sliderGeometry.y() - 30.0 : m_controlsWidgetRect.bottom() - 30.0,
-        m_calendarVisible ? qMin(calendarGeometry.y(), dayTimeGeometry.y()) - 30.0 : m_controlsWidgetRect.bottom() - 30.0
+        m_sliderVisible ? sliderGeometry.y() - kHeaderHeight : m_controlsWidgetRect.bottom() - kHeaderHeight,
+        m_calendarVisible ? qMin(calendarGeometry.y(), dayTimeGeometry.y()) - kHeaderHeight : m_controlsWidgetRect.bottom() - kHeaderHeight
         ) - pos.y();
     qreal preferredHeight = m_notificationsItem->preferredHeight();
     QSizeF size(notificationsGeometry.width(), qMin(*maxHeight, preferredHeight));
