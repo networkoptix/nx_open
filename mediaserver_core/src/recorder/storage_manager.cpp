@@ -38,7 +38,6 @@
 #include <chrono>
 #include <algorithm>
 #include <vector>
-#include <random>
 #include <array>
 #include <sstream>
 #include "database/server_db.h"
@@ -396,7 +395,8 @@ QnStorageManager::QnStorageManager(QnServer::StoragePool role):
     m_isWritableStorageAvail(false),
     m_rebuildCancelled(false),
     m_rebuildArchiveThread(0),
-    m_firstStoragesTestDone(false)
+    m_firstStoragesTestDone(false),
+    m_gen(m_rd())
 {
     m_storageDbPoolRef = qnStorageDbPool->create();
 
@@ -1769,7 +1769,7 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(
 
     for (auto it = storages.cbegin(); it != storages.cend(); ++it) {
 #if 0
-        qDebug() << lit("Storage %1 usage coeff: %2")
+        qWarning() << lit("Storage %1 usage coeff: %2")
                         .arg((*it)->getUrl())
                         .arg((*it)->calcUsageCoeff());
 #endif
@@ -1778,26 +1778,26 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(
             storagesInfo.push_back(tmp);
         }
     }
-    std::sort(storagesInfo.begin(), storagesInfo.end(),
-              [](const StorageSpaceInfo &s1, const StorageSpaceInfo &s2) {
-                  return s1.usageCoeff < s2.usageCoeff;
-              });
 
-    if (!storagesInfo.empty()) {
-        size_t lastIndex = 0;
-        for (size_t i = 1; i < storagesInfo.size(); ++i) {
-            if (std::abs(storagesInfo[i].usageCoeff - storagesInfo[0].usageCoeff) <
-                std::numeric_limits<double>::epsilon()
-                ) {
-                ++lastIndex;
-            } else {
+    if (!storagesInfo.empty()) 
+    {
+        std::uniform_real_distribution<> writedDis(0, 1.0);
+        double selectedStorageCoeff = writedDis(m_gen);
+
+        double writedCoeffPartialSum = 0.0;
+        size_t resultIndex = 0;
+        
+        for (; resultIndex < storagesInfo.size(); ++resultIndex)
+        {
+            writedCoeffPartialSum += storagesInfo[resultIndex].storage->getWritedCoeff();
+            if (writedCoeffPartialSum >= selectedStorageCoeff)
                 break;
-            }
         }
-        std::random_device rd;
-        std::mt19937 gen(rd());
-        std::uniform_int_distribution<> dis(0, lastIndex);
-        result = storagesInfo[dis(gen)].storage;
+
+        if (resultIndex == storagesInfo.size())
+            resultIndex = storagesInfo.size() - 1;
+
+        result = storagesInfo[resultIndex].storage;
     }
 
     auto hasFastScanned = [this]
@@ -1810,6 +1810,11 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(
         }
         return false;
     };
+
+#if 0
+    if (result)
+        qWarning() << lit("Selected storage %1\n").arg(result->getUrl());
+#endif
 
     if (!result) {
         if (!m_warnSended && !hasFastScanned() && m_firstStoragesTestDone) {
@@ -2020,7 +2025,6 @@ bool QnStorageManager::fileFinished(int durationMs, const QString& fileName, QnA
         return false;
     //if (storageIndex >= 0 && provider)
     //    storage->releaseBitrate(provider);
-    storage->addWrited(fileSize);
     bool renameOK = renameFileWithDuration(fileName, durationMs, storage);
     if (!renameOK)
         qDebug() << lit("File %1 rename failed").arg(fileName);
