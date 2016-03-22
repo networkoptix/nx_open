@@ -377,16 +377,19 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_mainMenuButton = newActionButton(action(QnActions::MainMenuAction), true, 1.5, Qn::MainWindow_TitleBar_MainMenu_Help);
     connect(action(QnActions::MainMenuAction), &QAction::triggered, this, &QnMainWindow::skipDoubleClick);
 
+    QWidget* titleWidget = new QWidget(this);
+    setPaletteColor(titleWidget, QPalette::Window, QColor(0x212a2f));
+    titleWidget->setAutoFillBackground(true);
+
     m_titleLayout = new QHBoxLayout();
     m_titleLayout->setContentsMargins(0, 0, 0, 0);
     m_titleLayout->setSpacing(2);
     m_titleLayout->addWidget(m_mainMenuButton);
     m_titleLayout->addWidget(tabBarWidget, 0x1000, Qt::AlignBottom);
     m_titleLayout->addWidget(cloudPanel);
-    if (QnScreenRecorder::isSupported())
-        m_titleLayout->addWidget(newActionButton(action(QnActions::ToggleScreenRecordingAction), false, 1.0, Qn::MainWindow_ScreenRecording_Help));
     m_titleLayout->addWidget(newActionButton(action(QnActions::OpenLoginDialogAction), false, 1.0, Qn::Login_Help));
     m_titleLayout->addLayout(m_windowButtonsLayout);
+    titleWidget->setLayout(m_titleLayout);
 
     /* Layouts. */
 
@@ -398,7 +401,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_globalLayout = new QVBoxLayout();
     m_globalLayout->setContentsMargins(0, 0, 0, 0);
     m_globalLayout->setSpacing(0);
-    m_globalLayout->addLayout(m_titleLayout);
+    m_globalLayout->addWidget(titleWidget);
     m_globalLayout->addLayout(m_viewLayout);
     m_globalLayout->setStretchFactor(m_viewLayout, 0x1000);
 

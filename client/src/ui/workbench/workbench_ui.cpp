@@ -235,27 +235,8 @@ namespace {
         }
     };
 
-    const qreal normalTreeOpacity = 0.85;
-    const qreal hoverTreeOpacity = 0.95;
-    const qreal normalTreeBackgroundOpacity = 0.5;
-    const qreal hoverTreeBackgroundOpacity = 1.0;
-
-    const qreal normalSliderOpacity = 0.5;
-    const qreal hoverSliderOpacity = 0.95;
-
-    const qreal normalTitleBackgroundOpacity = 0.5;
-    const qreal hoverTitleBackgroundOpacity = 0.95;
-
-    const qreal normalNotificationsOpacity = 0.85;
-    const qreal hoverNotificationsOpacity = 0.95;
-    const qreal normalNotificationsBackgroundOpacity = 0.5;
-    const qreal hoverNotificationsBackgroundOpacity = 1.0;
-
-    const qreal normalCalendarOpacity = 0.5;
-    const qreal hoverCalendarOpacity = 0.95;
-
-    const qreal opaque = 1.0;
-    const qreal hidden = 0.0;
+    const qreal kOpaque = 1.0;
+    const qreal kHidden = 0.0;
 
     const int hideConstrolsTimeoutMSec = 2000;
     const int closeConstrolsTimeoutMSec = 2000;
@@ -955,22 +936,10 @@ void QnWorkbenchUi::setTreeOpacity(qreal foregroundOpacity, qreal backgroundOpac
     m_treeResizerWidget->setVisible(!qFuzzyIsNull(foregroundOpacity));
 }
 
-void QnWorkbenchUi::updateTreeOpacity(bool animate) {
-    if (qnSettings->lightMode() & Qn::LightModeNoOpacity) {
-        qreal opacity = m_treeVisible ? opaque : hidden;
-        setTreeOpacity(opacity, opacity, false);
-        return;
-    }
-
-    if(!m_treeVisible) {
-        setTreeOpacity(0.0, 0.0, animate);
-    } else {
-        if(m_treeOpacityProcessor && m_treeOpacityProcessor->isHovered()) {
-            setTreeOpacity(hoverTreeOpacity, hoverTreeBackgroundOpacity, animate);
-        } else {
-            setTreeOpacity(normalTreeOpacity, normalTreeBackgroundOpacity, animate);
-        }
-    }
+void QnWorkbenchUi::updateTreeOpacity(bool animate)
+{
+    const qreal opacity = m_treeVisible ? kOpaque : kHidden;
+    setTreeOpacity(opacity, opacity, animate);
 }
 
 bool QnWorkbenchUi::isTreePinned() const {
@@ -1398,25 +1367,10 @@ void QnWorkbenchUi::setTitleOpacity(qreal foregroundOpacity, qreal backgroundOpa
     }
 }
 
-void QnWorkbenchUi::updateTitleOpacity(bool animate) {
-    if (!m_titleItem)
-        return;
-
-    if (qnSettings->lightMode() & Qn::LightModeNoOpacity) {
-        qreal opacity = m_titleVisible ? opaque : hidden;
-        setTitleOpacity(opacity, opacity, false);
-        return;
-    }
-
-    if(!m_titleVisible) {
-        setTitleOpacity(0.0, 0.0, animate);
-    } else {
-        if(m_titleOpacityProcessor->isHovered()) {
-            setTitleOpacity(1.0, hoverTitleBackgroundOpacity, animate);
-        } else {
-            setTitleOpacity(1.0, normalTitleBackgroundOpacity, animate);
-        }
-    }
+void QnWorkbenchUi::updateTitleOpacity(bool animate)
+{
+    const qreal opacity = m_titleVisible ? kOpaque : kHidden;
+    setTitleOpacity(opacity, opacity, animate);
 }
 
 void QnWorkbenchUi::at_titleItem_geometryChanged() {
@@ -1660,19 +1614,10 @@ void QnWorkbenchUi::setNotificationsOpacity(qreal foregroundOpacity, qreal backg
     }
 }
 
-void QnWorkbenchUi::updateNotificationsOpacity(bool animate) {
-    if (!m_notificationsItem)
-        return;
-
-    if(!m_notificationsVisible) {
-        setNotificationsOpacity(0.0, 0.0, animate);
-    } else {
-        if(m_notificationsOpacityProcessor->isHovered()) {
-            setNotificationsOpacity(hoverNotificationsOpacity, hoverNotificationsBackgroundOpacity, animate);
-        } else {
-            setNotificationsOpacity(normalNotificationsOpacity, normalNotificationsBackgroundOpacity, animate);
-        }
-    }
+void QnWorkbenchUi::updateNotificationsOpacity(bool animate)
+{
+    const qreal opacity = m_notificationsVisible ? kOpaque : kHidden;
+    setNotificationsOpacity(opacity, opacity, animate);
 }
 
 QRectF QnWorkbenchUi::updatedNotificationsGeometry(const QRectF &notificationsGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry, const QRectF &calendarGeometry, const QRectF &dayTimeGeometry, qreal *maxHeight) {
@@ -1977,22 +1922,10 @@ void QnWorkbenchUi::setDayTimeWidgetOpened(bool opened, bool animate) {
     }
 }
 
-void QnWorkbenchUi::updateCalendarOpacity(bool animate) {
-    if (qnSettings->lightMode() & Qn::LightModeNoOpacity) {
-        qreal opacity = m_calendarVisible ? opaque : hidden;
-        setCalendarOpacity(opacity, false);
-        return;
-    }
-
-    if(!m_calendarVisible) {
-        setCalendarOpacity(0.0, animate);
-    } else {
-        if(m_calendarOpacityProcessor->isHovered()) {
-            setCalendarOpacity(hoverCalendarOpacity, animate);
-        } else {
-            setCalendarOpacity(normalCalendarOpacity, animate);
-        }
-    }
+void QnWorkbenchUi::updateCalendarOpacity(bool animate)
+{
+    const qreal opacity = m_calendarVisible ? kOpaque : kHidden;
+    setCalendarOpacity(opacity, animate);
 }
 
 void QnWorkbenchUi::updateCalendarVisibility(bool animate) {
@@ -2284,26 +2217,16 @@ void QnWorkbenchUi::setSliderZoomButtonsOpacity(qreal opacity, bool animate) {
     }
 }
 
-void QnWorkbenchUi::updateSliderOpacity(bool animate) {
-    if (qnSettings->lightMode() & Qn::LightModeNoOpacity) {
-        qreal opacity = m_sliderVisible ? opaque : hidden;
-        setSliderOpacity(opacity, false);
-        setSliderZoomButtonsOpacity(opacity, false);
-        return;
-    }
+void QnWorkbenchUi::updateSliderOpacity(bool animate)
+{
+    const qreal opacity = m_sliderVisible ? kOpaque : kHidden;
+    setSliderOpacity(opacity, animate);
 
-    if(!m_sliderVisible) {
-        setSliderOpacity(0.0, animate);
-        setSliderZoomButtonsOpacity(0.0, animate);
-    } else {
-        if(m_sliderOpacityProcessor->isHovered()) {
-            setSliderOpacity(hoverSliderOpacity, animate);
-            setSliderZoomButtonsOpacity(hoverSliderOpacity, animate);
-        } else {
-            setSliderOpacity(normalSliderOpacity, animate);
-            setSliderZoomButtonsOpacity(0.0, animate);
-        }
-    }
+    const qreal buttonsOpacity = m_sliderVisible &&
+        m_sliderOpacityProcessor && m_sliderOpacityProcessor->isHovered()
+        ? kOpaque
+        : kHidden;
+    setSliderZoomButtonsOpacity(buttonsOpacity, animate);
 }
 
 void QnWorkbenchUi::updateSliderResizerGeometry() {

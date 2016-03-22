@@ -19,8 +19,8 @@ QnControlBackgroundWidget::QnControlBackgroundWidget(QGraphicsItem *parent):
     init(Qn::TopBorder);
 }
 
-QnControlBackgroundWidget::QnControlBackgroundWidget(Qn::Border gradientBorder, QGraphicsItem *parent): 
-    base_type(parent) 
+QnControlBackgroundWidget::QnControlBackgroundWidget(Qn::Border gradientBorder, QGraphicsItem *parent):
+    base_type(parent)
 {
     init(gradientBorder);
 }
@@ -28,7 +28,7 @@ QnControlBackgroundWidget::QnControlBackgroundWidget(Qn::Border gradientBorder, 
 void QnControlBackgroundWidget::init(Qn::Border gradientBorder) {
     m_gradientBorder = gradientBorder;
     m_colors << QColor(0, 0, 0, 255) << QColor(0, 0, 0, 64);
-    
+
     setFrameColor(QColor(110, 110, 110, 128));
     setFrameWidth(1.0);
 
@@ -77,6 +77,6 @@ void QnControlBackgroundWidget::updateWindowBrush() {
     gradient.setSpread(QGradient::RepeatSpread);
     for(int i = 0; i < m_colors.size(); i++)
         gradient.setColorAt(0.0 + 1.0 * i / (m_colors.size() - 1), m_colors[i]);
-    
+
     setWindowBrush(gradient);
 }
