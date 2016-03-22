@@ -1773,15 +1773,17 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(
                         .arg((*it)->getUrl())
                         .arg((*it)->calcUsageCoeff());
 #endif
-        if ((*it)->calcUsageCoeff() >= 0) {
-            StorageSpaceInfo tmp = {*it, (*it)->calcUsageCoeff()};
-            storagesInfo.push_back(tmp);
-        }
+        StorageSpaceInfo tmp = {*it, (*it)->calcUsageCoeff()};
+        storagesInfo.push_back(tmp);
     }
 
     if (!storagesInfo.empty()) 
     {
-        std::uniform_real_distribution<> writedDis(0, 1.0);
+        double writedCoeffSum = 0.0;
+        for (auto &storageInfo : storagesInfo)
+            writedCoeffSum += storageInfo.storage->getWritedCoeff();
+
+        std::uniform_real_distribution<> writedDis(0, writedCoeffSum);
         double selectedStorageCoeff = writedDis(m_gen);
 
         double writedCoeffPartialSum = 0.0;
