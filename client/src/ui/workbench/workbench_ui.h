@@ -88,10 +88,6 @@ public:
 
     void setFlags(Flags flags);
 
-    bool isWindowButtonsUsed() const {
-        return m_windowButtonsUsed;
-    }
-
     bool isTitleUsed() const {
         return m_titleUsed;
     }
@@ -145,7 +141,6 @@ public slots:
     void disableProxyUpdates() { setProxyUpdatesEnabled(false); }
 
     void setTitleUsed(bool titleUsed = true);
-    void setWindowButtonsUsed(bool windowButtonsUsed = true);
     void setFpsVisible(bool fpsVisible = true);
 
     void setTreeVisible(bool visible = true, bool animate = true);
@@ -310,8 +305,6 @@ private:
 
     bool m_dayTimeOpened;
 
-    bool m_windowButtonsUsed;
-
     bool m_ignoreClickEvent;
 
     bool m_inactive;
@@ -414,11 +407,6 @@ private:
     VariantAnimator *m_titleYAnimator;
 
     HoverFocusProcessor *m_titleOpacityProcessor;
-
-    QGraphicsLinearLayout *m_titleRightButtonsLayout;
-
-    QGraphicsWidget *m_windowButtonsWidget;
-
 
     /* Notifications window-related state. */
 

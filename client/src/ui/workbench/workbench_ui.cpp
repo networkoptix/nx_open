@@ -70,7 +70,7 @@
 #include <ui/widgets/resource_browser_widget.h>
 #include <ui/widgets/layout_tab_bar.h>
 #include <ui/widgets/main_window.h>
-#include <ui/widgets/cloud_status_panel.h>
+#include <ui/widgets/main_window_title_controls_widget.h>
 #include <ui/style/skin.h>
 #include <ui/style/noptix_style.h>
 #include <ui/workaround/qtbug_workaround.h>
@@ -277,7 +277,6 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_calendarOpened(false),
     m_calendarVisible(false),
     m_dayTimeOpened(false),
-    m_windowButtonsUsed(true),
     m_ignoreClickEvent(false),
     m_inactive(false),
     m_fpsItem(NULL),
@@ -325,8 +324,6 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_titleBackgroundItem(NULL),
     m_titleYAnimator(NULL),
     m_titleOpacityProcessor(NULL),
-    m_titleRightButtonsLayout(NULL),
-    m_windowButtonsWidget(NULL),
 
     m_notificationsBackgroundItem(NULL),
     m_notificationsItem(NULL),
@@ -517,25 +514,8 @@ void QnWorkbenchUi::setProxyUpdatesEnabled(bool updatesEnabled) {
 		m_treeItem->setUpdatesEnabled(updatesEnabled);
 }
 
-void QnWorkbenchUi::setWindowButtonsUsed(bool windowButtonsUsed) {
-    if(m_windowButtonsUsed == windowButtonsUsed)
-        return;
-
-    m_windowButtonsUsed = windowButtonsUsed;
-
-	if (!m_titleItem)
-		return;
-
-    if(m_windowButtonsUsed) {
-        m_titleRightButtonsLayout->addItem(m_windowButtonsWidget);
-        m_windowButtonsWidget->setVisible(true);
-    } else {
-        m_titleRightButtonsLayout->removeItem(m_windowButtonsWidget);
-        m_windowButtonsWidget->setVisible(false);
-    }
-}
-
-void QnWorkbenchUi::updateControlsVisibility(bool animate) {    // TODO
+void QnWorkbenchUi::updateControlsVisibility(bool animate)
+{    // TODO
     ensureAnimationAllowed(animate);
 
     if (qnRuntime->isVideoWallMode()) {
@@ -1409,8 +1389,12 @@ void QnWorkbenchUi::at_titleItem_contextMenuRequested(QObject *, QEvent *event) 
     menuEvent->setPos(pos);
 }
 
-void QnWorkbenchUi::createTitleWidget() {
-    m_titleBackgroundItem = new QnControlBackgroundWidget(Qn::TopBorder, m_controlsWidget);
+void QnWorkbenchUi::createTitleWidget()
+{
+    m_titleBackgroundItem = new QnFramedWidget(m_controlsWidget);
+    m_titleBackgroundItem->setWindowBrush(qApp->palette().color(QPalette::Normal, QPalette::Window));
+    m_titleBackgroundItem->setFrameShape(Qn::NoFrame);
+    m_titleBackgroundItem->setAutoFillBackground(true);
 
     m_titleItem = new QnClickableWidget(m_controlsWidget);
     m_titleItem->setPos(0.0, 0.0);
@@ -1452,21 +1436,8 @@ void QnWorkbenchUi::createTitleWidget() {
     setHelpTopic(tabBarWidget, Qn::MainWindow_TitleBar_Tabs_Help);
     tabBarWidget->setLayout(tabBarLayout);
 
-    QGraphicsLinearLayout * windowButtonsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
-    windowButtonsLayout->setContentsMargins(0, 0, 2, 0);
-    windowButtonsLayout->setSpacing(4);
-    windowButtonsLayout->addItem(newActionButton(action(QnActions::WhatsThisAction)));
-    windowButtonsLayout->addItem(newActionButton(action(QnActions::MinimizeAction)));
-    windowButtonsLayout->addItem(newActionButton(action(QnActions::EffectiveMaximizeAction)
-        , kDefaultSizeMultiplier, Qn::MainWindow_Fullscreen_Help));
-    windowButtonsLayout->addItem(newActionButton(action(QnActions::ExitAction)));
-
-    m_windowButtonsWidget = new GraphicsWidget();
-    m_windowButtonsWidget->setLayout(windowButtonsLayout);
-
-    QnCloudStatusPanel *cloudStatusPanel = new QnCloudStatusPanel(context());
-    QGraphicsProxyWidget *cloudStatusPanelProxy = new QnMaskedProxyWidget();
-    cloudStatusPanelProxy->setWidget(cloudStatusPanel);
+    QGraphicsProxyWidget* titleControlsWidget = new QGraphicsProxyWidget(m_controlsWidget);
+    titleControlsWidget->setWidget(new QnMainWindowTitleControlsWidget(nullptr, context()));
 
     QGraphicsLinearLayout *titleLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     titleLayout->setContentsMargins(0, 0, 0, 0);
@@ -1475,19 +1446,8 @@ void QnWorkbenchUi::createTitleWidget() {
     titleLayout->addItem(tabBarWidget);
     titleLayout->setAlignment(tabBarWidget, Qt::AlignBottom);
     titleLayout->setStretchFactor(tabBarWidget, 0x1000);
-    titleLayout->addItem(cloudStatusPanelProxy);
-    titleLayout->setAlignment(cloudStatusPanelProxy, Qt::AlignVCenter);
-    m_titleRightButtonsLayout = new QGraphicsLinearLayout();
-    m_titleRightButtonsLayout->setContentsMargins(0, 4, 0, 0);
-    if (QnScreenRecorder::isSupported())
-    {
-        m_titleRightButtonsLayout->addItem(newActionButton(action(QnActions::ToggleScreenRecordingAction)
-        , kDefaultSizeMultiplier, Qn::MainWindow_ScreenRecording_Help));
-    }
-    m_titleRightButtonsLayout->addItem(newActionButton(action(QnActions::OpenLoginDialogAction)
-        , kDefaultSizeMultiplier, Qn::Login_Help));
-    m_titleRightButtonsLayout->addItem(m_windowButtonsWidget);
-    titleLayout->addItem(m_titleRightButtonsLayout);
+    titleLayout->addItem(titleControlsWidget);
+
     m_titleItem->setLayout(titleLayout);
     titleLayout->activate(); /* So that it would set title's size. */
 

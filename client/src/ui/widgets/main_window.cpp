@@ -81,7 +81,7 @@
 #include <ui/workbench/workbench_resource.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 
-#include <ui/widgets/cloud_status_panel.h>
+#include <ui/widgets/main_window_title_controls_widget.h>
 
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
@@ -103,43 +103,21 @@
 
 namespace
 {
-    QToolButton *newActionButton(QAction *action, bool popup = false, qreal sizeMultiplier = 1.0, int helpTopicId = Qn::Empty_Help) {
-        QToolButton *button = new QToolButton();
-        button->setDefaultAction(action);
-
-        qreal aspectRatio = QnGeometry::aspectRatio(action->icon().actualSize(QSize(1024, 1024)));
-        int iconHeight = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, 0, button) * sizeMultiplier;
-        int iconWidth = iconHeight * aspectRatio;
-        button->setFixedSize(iconWidth, iconHeight);
-
-        button->setProperty(Qn::ToolButtonCheckedRotationSpeed, action->property(Qn::ToolButtonCheckedRotationSpeed));
-
-        if(popup) {
-            /* We want the button to activate the corresponding action so that menu is updated.
-             * However, menu buttons do not activate their corresponding actions as they do not receive release events.
-             * We work this around by making some hacky connections. */
-            button->setPopupMode(QToolButton::InstantPopup);
-
-            QObject::disconnect(button, SIGNAL(pressed()),  button,                     SLOT(_q_buttonPressed()));
-            QObject::connect(button,    SIGNAL(pressed()),  button->defaultAction(),    SLOT(trigger()));
-            QObject::connect(button,    SIGNAL(pressed()),  button,                     SLOT(_q_buttonPressed()));
+    void processWidgetsRecursively(QLayout *layout, std::function<void(QWidget*)> func)
+    {
+        for (int i = 0, count = layout->count(); i < count; i++)
+        {
+            QLayoutItem *item = layout->itemAt(i);
+            if (item->widget())
+                func(item->widget());
+            else if (item->layout())
+                processWidgetsRecursively(item->layout(), func);
         }
-
-        if(helpTopicId != Qn::Empty_Help)
-            setHelpTopic(button, helpTopicId);
-
-        return button;
     }
 
-    void setVisibleRecursively(QLayout *layout, bool visible) {
-        for(int i = 0, count = layout->count(); i < count; i++) {
-            QLayoutItem *item = layout->itemAt(i);
-            if(item->widget()) {
-                item->widget()->setVisible(visible);
-            } else if(item->layout()) {
-                setVisibleRecursively(item->layout(), visible);
-            }
-        }
+    void setVisibleRecursively(QLayout *layout, bool visible)
+    {
+        processWidgetsRecursively(layout, [visible](QWidget* w) {w->setVisible(visible); });
     }
 
     int minimalWindowWidth = 800;
@@ -356,41 +334,28 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     tabBarLayout->setSpacing(0);
     tabBarLayout->addWidget(m_tabBar);
     tabBarLayout->addSpacing(6);
-    tabBarLayout->addWidget(newActionButton(action(QnActions::OpenNewTabAction), false, 1.0, Qn::MainWindow_TitleBar_NewLayout_Help));
+    tabBarLayout->addWidget(QnMainWindowTitleControlsWidget::newActionButton(action(QnActions::OpenNewTabAction), false, 1.0, Qn::MainWindow_TitleBar_NewLayout_Help));
     tabBarLayout->addSpacing(6);
-    tabBarLayout->addWidget(newActionButton(action(QnActions::OpenCurrentUserLayoutMenu), true));
+    tabBarLayout->addWidget(QnMainWindowTitleControlsWidget::newActionButton(action(QnActions::OpenCurrentUserLayoutMenu), true));
     tabBarLayout->addStretch(0x1000);
-
-    QnCloudStatusPanel *cloudPanel = new QnCloudStatusPanel(context, this);
-
-    /* Layout for window buttons that can be removed from the title bar. */
-    m_windowButtonsLayout = new QHBoxLayout();
-    m_windowButtonsLayout->setContentsMargins(4, 0, 2, 0);
-    m_windowButtonsLayout->setSpacing(4);
-    m_windowButtonsLayout->addWidget(newActionButton(action(QnActions::WhatsThisAction), false, 1.0, Qn::MainWindow_ContextHelp_Help));
-    m_windowButtonsLayout->addWidget(newActionButton(action(QnActions::MinimizeAction)));
-    m_windowButtonsLayout->addWidget(newActionButton(action(QnActions::EffectiveMaximizeAction), false, 1.0, Qn::MainWindow_Fullscreen_Help));
-    m_windowButtonsLayout->addWidget(newActionButton(action(QnActions::ExitAction)));
 
     /* Title layout. We cannot create a widget for title bar since there appears to be
      * no way to make it transparent for non-client area windows messages. */
-    m_mainMenuButton = newActionButton(action(QnActions::MainMenuAction), true, 1.5, Qn::MainWindow_TitleBar_MainMenu_Help);
+    m_mainMenuButton = QnMainWindowTitleControlsWidget::newActionButton(action(QnActions::MainMenuAction), true, 1.5, Qn::MainWindow_TitleBar_MainMenu_Help);
     connect(action(QnActions::MainMenuAction), &QAction::triggered, this, &QnMainWindow::skipDoubleClick);
 
-    /*
-    QWidget* titleWidget = new QWidget(this);
-    setPaletteColor(titleWidget, QPalette::Window, QColor(0x212a2f));
-    titleWidget->setAutoFillBackground(true);
-    */
     m_titleLayout = new QHBoxLayout();
     m_titleLayout->setContentsMargins(0, 0, 0, 0);
-    m_titleLayout->setSpacing(2);
+    m_titleLayout->setSpacing(0);
     m_titleLayout->addWidget(m_mainMenuButton);
     m_titleLayout->addWidget(tabBarWidget, 0x1000, Qt::AlignBottom);
-    m_titleLayout->addWidget(cloudPanel);
-    m_titleLayout->addWidget(newActionButton(action(QnActions::OpenLoginDialogAction), false, 1.0, Qn::Login_Help));
-    m_titleLayout->addLayout(m_windowButtonsLayout);
-    //titleWidget->setLayout(m_titleLayout);
+    m_titleLayout->addWidget(new QnMainWindowTitleControlsWidget(this));
+
+    processWidgetsRecursively(m_titleLayout, [](QWidget* w)
+    {
+        setPaletteColor(w, QPalette::Window, qApp->palette().color(QPalette::Normal, QPalette::Window));
+        w->setAutoFillBackground(true);
+    });
 
     /* Layouts. */
 
@@ -414,9 +379,9 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     /* Post-initialize. */
     updateWidgetsVisibility();
 #ifdef Q_OS_MACX
-    setOptions(WindowButtonsVisible);
+    setOptions(Options());
 #else
-    setOptions(TitleBarDraggable | WindowButtonsVisible);
+    setOptions(TitleBarDraggable);
 #endif
 
     /* Open single tab. */
@@ -502,21 +467,6 @@ void QnMainWindow::setTitleVisible(bool visible)
     m_titleVisible = visible;
 
     updateWidgetsVisibility();
-}
-
-void QnMainWindow::setWindowButtonsVisible(bool visible) {
-    bool currentVisibility = m_windowButtonsLayout->parent() != NULL;
-    if(currentVisibility == visible)
-        return;
-
-    if(visible) {
-        m_titleLayout->addLayout(m_windowButtonsLayout);
-        setVisibleRecursively(m_windowButtonsLayout, true);
-    } else {
-        m_titleLayout->takeAt(m_titleLayout->count() - 1);
-        m_windowButtonsLayout->setParent(NULL);
-        setVisibleRecursively(m_windowButtonsLayout, false);
-    }
 }
 
 void QnMainWindow::setMaximized(bool maximized) {
@@ -641,9 +591,6 @@ void QnMainWindow::setOptions(Options options) {
         return;
 
     m_options = options;
-
-    setWindowButtonsVisible(m_options & WindowButtonsVisible);
-    m_ui->setWindowButtonsUsed(m_options & WindowButtonsVisible);
 }
 
 void QnMainWindow::updateDecorationsState() {

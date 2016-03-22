@@ -36,7 +36,6 @@ class QnMainWindow: public QnEmulatedFrameWidget, public QnWorkbenchContextAware
 public:
     enum Option {
         TitleBarDraggable = 0x1,    /**< Window can be moved by dragging the title bar. */
-        WindowButtonsVisible = 0x2, /**< Window has default title bar buttons. That is, close, maximize and minimize buttons. */
     };
     Q_DECLARE_FLAGS(Options, Option);
 
@@ -78,7 +77,6 @@ protected:
 protected slots:
     void setWelcomeScreenVisible(bool visible);
     void setTitleVisible(bool visible);
-    void setWindowButtonsVisible(bool visible);
     void setMaximized(bool maximized);
     void setFullScreen(bool fullScreen);
     void minimize();
@@ -112,7 +110,6 @@ private:
 
     QStackedWidget * const m_currentPageHolder;
     QBoxLayout *m_titleLayout;
-    QBoxLayout *m_windowButtonsLayout;
     QBoxLayout *m_viewLayout;
     QBoxLayout *m_globalLayout;
 
