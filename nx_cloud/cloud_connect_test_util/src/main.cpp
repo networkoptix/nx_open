@@ -120,8 +120,7 @@ int runInListenMode(const std::multimap<QString, QString>& args)
             break;
     }
 
-    server.pleaseStop();
-    server.join();
+    server.pleaseStopSync();
 
     return 0;
 }
