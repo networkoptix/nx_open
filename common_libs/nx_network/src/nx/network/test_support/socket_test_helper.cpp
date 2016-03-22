@@ -10,6 +10,8 @@
 
 #include <nx/utils/log/log.h>
 
+#include <utils/common/cpp14.h>
+
 
 namespace nx {
 namespace network {
