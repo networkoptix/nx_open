@@ -27,6 +27,7 @@ void QnDialog::show()
 
 int QnDialog::exec()
 {
-    cancelDrag(parentWidget());
+    if (parentWidget())
+        cancelDrag(parentWidget());
     return base_type::exec();
 }
