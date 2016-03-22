@@ -43,6 +43,7 @@ FocusScope
 
         flow: GridView.FlowTopToBottom
         flickableDirection: Flickable.flickingHorizontally
+        snapMode: GridView.SnapOneRow
 
         delegate: delegateComponent
         highlight: highlightComponent
