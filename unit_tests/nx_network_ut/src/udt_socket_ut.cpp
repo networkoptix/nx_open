@@ -230,7 +230,7 @@ TEST_F(SocketUdt, rendezvousConnect)
     ASSERT_TRUE(server.start());
 
     ConnectionsGenerator connectionsGenerator(
-        SocketAddress(QString::fromLatin1("localhost"), server.addressBeingListened().port),
+        SocketAddress(HostAddress::localhost, server.addressBeingListened().port),
         maxSimultaneousConnections,
         TestTrafficLimitType::outgoing,
         bytesToSendThroughConnection,
@@ -240,11 +240,8 @@ TEST_F(SocketUdt, rendezvousConnect)
 
     std::this_thread::sleep_for(testDuration);
 
-    connectionsGenerator.pleaseStop();
-    connectionsGenerator.join();
-
-    server.pleaseStop();
-    server.join();
+    connectionsGenerator.pleaseStopSync();
+    server.pleaseStopSync();
 
     ASSERT_GT(connectionsGenerator.totalConnectionsEstablished(), 0);
     ASSERT_GT(connectionsGenerator.totalBytesSent(), 0);

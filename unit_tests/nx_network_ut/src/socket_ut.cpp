@@ -123,25 +123,24 @@ TEST( Socket, AsyncOperationCancellation )
                     static const int BYTES_TO_SEND_THROUGH_CONNECTION = 1 * 1024;
 
                     RandomDataTcpServer server(
-                        TestTrafficLimitType::outgoing,
+                        TestTrafficLimitType::none,
                         BYTES_TO_SEND_THROUGH_CONNECTION);
                     ASSERT_TRUE(server.start());
 
                     ConnectionsGenerator connectionsGenerator(
                         SocketAddress(QString::fromLatin1("localhost"), server.addressBeingListened().port),
                         MAX_SIMULTANEOUS_CONNECTIONS,
-                        TestTrafficLimitType::outgoing,
+                        TestTrafficLimitType::incoming,
                         BYTES_TO_SEND_THROUGH_CONNECTION,
                         ConnectionsGenerator::kInfiniteConnectionCount);
                     connectionsGenerator.start();
 
                     std::this_thread::sleep_for(TEST_DURATION);
+                    ASSERT_GT(connectionsGenerator.totalBytesReceived(), 0);
+                    ASSERT_GT(connectionsGenerator.totalBytesSent(), 0);
 
-                    connectionsGenerator.pleaseStop();
-                    connectionsGenerator.join();
-
-                    server.pleaseStop();
-                    server.join();
+                    connectionsGenerator.pleaseStopSync();
+                    server.pleaseStopSync();
                 }
             });
     }

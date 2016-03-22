@@ -30,15 +30,12 @@ namespace
 TestConnection::TestConnection(
     std::unique_ptr<AbstractStreamSocket> socket,
     TestTrafficLimitType limitType,
-    size_t trafficLimit,
-    std::function<void(int, TestConnection*, SystemError::ErrorCode)> handler )
+    size_t trafficLimit)
 :
     m_socket( std::move( socket ) ),
     m_limitType( limitType ),
     m_trafficLimit( trafficLimit ),
     m_connected( true ),
-    m_finishedEventHandler( std::move(handler) ),
-    m_terminated( false ),
     m_totalBytesSent( 0 ),
     m_totalBytesReceived( 0 ),
     m_id( ++TestConnectionIDCounter ),
@@ -53,8 +50,7 @@ TestConnection::TestConnection(
 TestConnection::TestConnection(
     const SocketAddress& remoteAddress,
     TestTrafficLimitType limitType,
-    size_t trafficLimit,
-    std::function<void(int, TestConnection*, SystemError::ErrorCode)> handler )
+    size_t trafficLimit)
 :
     m_socket( SocketFactory::createStreamSocket() ),
     m_limitType(limitType),
@@ -63,8 +59,6 @@ TestConnection::TestConnection(
     m_remoteAddress(
         remoteAddress.address == HostAddress::anyHost ? HostAddress::localhost : remoteAddress.address,
         remoteAddress.port ),
-    m_finishedEventHandler( std::move(handler) ),
-    m_terminated( false ),
     m_totalBytesSent( 0 ),
     m_totalBytesReceived( 0 ),
     m_id( ++TestConnectionIDCounter ),
@@ -84,18 +78,9 @@ TestConnection::~TestConnection()
 {
     NX_LOGX(lm("accepted %1. Destroying...").arg(m_accepted), cl_logDEBUG1);
 
-    std::unique_ptr<AbstractStreamSocket> _socket;
-    {
-        std::unique_lock<std::mutex> lk( m_mutex );
-        m_terminated = true;
-        _socket = std::move(m_socket);
-    }
-    if( _socket )
-        _socket->pleaseStopSync();
-
     {
         std::unique_lock<std::mutex> lk(mtx1);
-        NX_ASSERT(terminatedSocketsIDs.emplace(m_id, _socket ? true : false).second);
+        NX_ASSERT(terminatedSocketsIDs.emplace(m_id, m_accepted).second);
     }
 #ifdef DEBUG_OUTPUT
     std::cout<<"TestConnection::~TestConnection. "<<m_id<<std::endl;
@@ -104,9 +89,14 @@ TestConnection::~TestConnection()
     --TestConnection_count;
 }
 
-void TestConnection::pleaseStop()
+void TestConnection::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
-    //TODO #ak
+    m_socket->pleaseStop(std::move(handler));
+}
+
+void TestConnection::pleaseStopSync()
+{
+    m_socket->pleaseStopSync();
 }
 
 int TestConnection::id() const
@@ -128,8 +118,6 @@ const std::chrono::milliseconds kDefaultSendTimeout(17000);
 
 void TestConnection::start()
 {
-    std::unique_lock<std::mutex> lk(m_mutex);
-
     if( m_connected )
         return startIO();
 
@@ -159,22 +147,23 @@ size_t TestConnection::totalBytesReceived() const
     return m_totalBytesReceived;
 }
 
+void TestConnection::setOnFinishedEventHandler(
+    nx::utils::MoveOnlyFunc<void(int, TestConnection*, SystemError::ErrorCode)> handler)
+{
+    m_finishedEventHandler = std::move(handler);
+}
+
 void TestConnection::onConnected( int id, SystemError::ErrorCode errorCode )
 {
-#ifdef DEBUG_OUTPUT
+//#ifdef DEBUG_OUTPUT
     std::cout<<"TestConnection::onConnected. "<<id<<std::endl;
-#endif
-
-    std::unique_lock<std::mutex> lk( m_mutex );
-
-    if( m_terminated )
-        return;
+//#endif
 
     if( errorCode != SystemError::noError )
     {
-        m_socket->pleaseStopSync();
+        if (!m_finishedEventHandler)
+            return;
         auto handler = std::move( m_finishedEventHandler );
-        lk.unlock();
         return handler( id, this, errorCode );
     }
 
@@ -216,14 +205,12 @@ void TestConnection::onDataReceived(
             .arg(m_accepted).arg(SystemError::toString(errorCode)), cl_logDEBUG1);
     }
 
-    std::unique_lock<std::mutex> lk( m_mutex );
-    if( m_terminated )
-        return;
-    if( errorCode != SystemError::noError && errorCode != SystemError::timedOut )
+    if( (errorCode != SystemError::noError && errorCode != SystemError::timedOut) ||
+        (errorCode == SystemError::noError && bytesRead == 0))  //connection closed by remote side
     {
-        m_socket->pleaseStopSync();
+        if (!m_finishedEventHandler)
+            return;
         auto handler = std::move(m_finishedEventHandler);
-        lk.unlock();
         return handler( id, this, errorCode );
     }
 
@@ -234,11 +221,10 @@ void TestConnection::onDataReceived(
     if (m_limitType == TestTrafficLimitType::incoming &&
         m_totalBytesReceived >= m_trafficLimit)
     {
-        m_socket->pleaseStopSync();
+        if (!m_finishedEventHandler)
+            return;
         auto handler = std::move(m_finishedEventHandler);
-        lk.unlock();
-        handler(id, this, SystemError::getLastOSErrorCode());
-        return;
+        return handler(id, this, SystemError::getLastOSErrorCode());
     }
 
     using namespace std::placeholders;
@@ -256,14 +242,11 @@ void TestConnection::onDataSent( int id, SystemError::ErrorCode errorCode, size_
             cl_logDEBUG1);
     }
 
-    std::unique_lock<std::mutex> lk( m_mutex );
-    if( m_terminated )
-        return;
     if( errorCode != SystemError::noError && errorCode != SystemError::timedOut )
     {
-        m_socket->pleaseStopSync();
+        if (!m_finishedEventHandler)
+            return;
         auto handler = std::move( m_finishedEventHandler );
-        lk.unlock();
         return handler( id, this, errorCode );
     }
 
@@ -271,11 +254,10 @@ void TestConnection::onDataSent( int id, SystemError::ErrorCode errorCode, size_
     if (m_limitType == TestTrafficLimitType::outgoing &&
         m_totalBytesSent >= m_trafficLimit)
     {
-        m_socket->pleaseStopSync();
+        if (!m_finishedEventHandler)
+            return;
         auto handler = std::move( m_finishedEventHandler );
-        lk.unlock();
-        handler(id, this, SystemError::getLastOSErrorCode());
-        return;
+        return handler(id, this, SystemError::getLastOSErrorCode());
     }
 
     using namespace std::placeholders;
@@ -298,14 +280,13 @@ RandomDataTcpServer::RandomDataTcpServer(
     size_t trafficLimit)
 :
     m_limitType(limitType),
-    m_trafficLimit(trafficLimit)
+    m_trafficLimit(trafficLimit),
+    m_totalConnectionsAccepted(0)
 {
 }
 
 RandomDataTcpServer::~RandomDataTcpServer()
 {
-    pleaseStop();
-    join();
 }
 
 void RandomDataTcpServer::setServerSocket(
@@ -314,19 +295,28 @@ void RandomDataTcpServer::setServerSocket(
     m_serverSocket = std::move(serverSock);
 }
 
-void RandomDataTcpServer::pleaseStop()
+void RandomDataTcpServer::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
-}
+    m_serverSocket->pleaseStop(
+        [this, handler = std::move(handler)]() mutable
+        {
+            QnMutexLocker lk(&m_mutex);
+            auto acceptedConnections = std::move(m_acceptedConnections);
+            lk.unlock();
 
-void RandomDataTcpServer::join()
-{
-    if( m_serverSocket )
-        m_serverSocket->pleaseStopSync();
-
-    QnMutexLocker lk(&m_mutex);
-    auto acceptedConnections = std::move(m_acceptedConnections);
-    lk.unlock();
-    acceptedConnections.clear();
+            BarrierHandler completionHandlerInvoker(std::move(handler));
+            for (auto& connection: acceptedConnections)
+            {
+                auto connectionPtr = connection.get();
+                connectionPtr->pleaseStop(
+                    [connection = std::move(connection),
+                        handler = completionHandlerInvoker.fork()]() mutable
+                    {
+                        connection.reset();
+                        handler();
+                    });
+            }
+        });
 }
 
 bool RandomDataTcpServer::start()
@@ -362,27 +352,30 @@ SocketAddress RandomDataTcpServer::addressBeingListened() const
 
 void RandomDataTcpServer::onNewConnection(
     SystemError::ErrorCode errorCode,
-    AbstractStreamSocket* newConnection )
+    AbstractStreamSocket* newConnection)
 {
+    using namespace std::placeholders;
+
     //ignoring errors for now
-    if( errorCode == SystemError::noError )
+    if (errorCode == SystemError::noError)
     {
-        std::shared_ptr<TestConnection> testConnection( new TestConnection(
+        auto testConnection = std::make_shared<TestConnection>(
             std::unique_ptr<AbstractStreamSocket>(newConnection),
             m_limitType,
-            m_trafficLimit,
-            std::bind(&RandomDataTcpServer::onConnectionDone, this, std::placeholders::_2 )));
+            m_trafficLimit);
+        testConnection->setOnFinishedEventHandler(
+            std::bind(&RandomDataTcpServer::onConnectionDone, this, _2));
         NX_LOGX(lm("Accepted connection %1. local address %2")
             .arg(testConnection.get()).arg(testConnection->getLocalAddress().toString()),
             cl_logDEBUG1);
-        testConnection->start();
         QnMutexLocker lk(&m_mutex);
+        testConnection->start();
         m_acceptedConnections.emplace_back(std::move(testConnection));
+        ++m_totalConnectionsAccepted;
     }
 
-    m_serverSocket->acceptAsync( std::bind(
-        &RandomDataTcpServer::onNewConnection, this,
-        std::placeholders::_1, std::placeholders::_2 ) );
+    m_serverSocket->acceptAsync(
+        std::bind(&RandomDataTcpServer::onNewConnection, this, _1, _2));
 }
 
 void RandomDataTcpServer::onConnectionDone(
@@ -428,30 +421,32 @@ ConnectionsGenerator::ConnectionsGenerator(
 
 ConnectionsGenerator::~ConnectionsGenerator()
 {
-    pleaseStop();
-    join();
 }
 
-void ConnectionsGenerator::pleaseStop()
+void ConnectionsGenerator::pleaseStop(
+    nx::utils::MoveOnlyFunc<void()> handler)
 {
     std::unique_lock<std::mutex> lk( m_mutex );
     m_terminated = true;
-}
-
-void ConnectionsGenerator::join()
-{
-    std::unique_lock<std::mutex> lk( m_mutex );
-    NX_ASSERT( m_terminated );
-    while( !m_connections.empty() )
+    auto connections = std::move(m_connections);
+    lk.unlock();
+    BarrierHandler allConnectionsStoppedFuture(std::move(handler));
+    for (auto& idAndConnection: connections)
     {
-        std::unique_ptr<TestConnection> connection = std::move(m_connections.front());
-        lk.unlock();
-        connection.reset();
-        lk.lock();
-        if( m_connections.empty() )
-            break;
-        if( !m_connections.front() )
-            m_connections.pop_front();
+        auto connectionPtr = idAndConnection.second.get();
+        connectionPtr->pleaseStop(
+            [this,
+                connection = std::move(idAndConnection.second),
+                handler = allConnectionsStoppedFuture.fork()]() mutable
+            {
+                {
+                    std::unique_lock<std::mutex> lk(m_mutex);
+                    m_totalBytesSent += connection->totalBytesSent();
+                    m_totalBytesReceived += connection->totalBytesReceived();
+                }
+                connection.reset();
+                handler();
+            });
     }
 }
 
@@ -478,19 +473,19 @@ void ConnectionsGenerator::start()
     {
         std::unique_lock<std::mutex> lk( m_mutex );
 
-        m_connections.push_back( std::unique_ptr<TestConnection>() );
-        std::unique_ptr<TestConnection> connection( new TestConnection(
-            m_remoteAddress,
-            m_limitType,
-            m_trafficLimit,
+        std::unique_ptr<TestConnection> connection(
+            new TestConnection(
+                m_remoteAddress,
+                m_limitType,
+                m_trafficLimit));
+        connection->setOnFinishedEventHandler(
             std::bind(&ConnectionsGenerator::onConnectionFinished, this,
-                      std::placeholders::_1, std::placeholders::_3,
-                      std::prev(m_connections.end())) ) );
-        m_connections.back().swap( connection );
+                std::placeholders::_1, std::placeholders::_3));
         if (m_localAddress)
-            m_connections.back()->setLocalAddress(*m_localAddress);
-        m_connections.back()->start();
+            connection->setLocalAddress(*m_localAddress);
+        connection->start();
         ++m_totalConnectionsEstablished;
+        m_connections.emplace(connection->id(), std::move(connection));
     }
 }
 
@@ -515,8 +510,8 @@ std::vector<SystemError::ErrorCode> ConnectionsGenerator::totalErrors() const
 }
 
 void ConnectionsGenerator::onConnectionFinished(
-    int id, SystemError::ErrorCode code,
-    ConnectionsContainer::iterator connectionIter)
+    int id,
+    SystemError::ErrorCode code)
 {
     if (code != SystemError::noError)
     {
@@ -537,21 +532,21 @@ void ConnectionsGenerator::onConnectionFinished(
         NX_ASSERT(terminatedSocketsIDs.find(id) == terminatedSocketsIDs.end());
     }
 
-    //if( !m_finishedConnectionsIDs.insert( id ).second )
-    //    int x = 0;
-    if (*connectionIter)
+    auto connectionIter = m_connections.find(id);
+    if (connectionIter != m_connections.end())
     {
-        m_totalBytesSent += connectionIter->get()->totalBytesSent();
-        m_totalBytesReceived += connectionIter->get()->totalBytesReceived();
+        //connection might have been removed by pleaseStop
+        m_totalBytesSent += connectionIter->second->totalBytesSent();
+        m_totalBytesReceived += connectionIter->second->totalBytesReceived();
+        m_connections.erase(connectionIter);
     }
-    m_connections.erase(connectionIter);
     if (m_terminated)
         return;
 
-    if (m_totalConnectionsEstablished == 0 ||   //no limit
+    if (m_maxTotalConnections == kInfiniteConnectionCount ||   //no limit
         m_totalConnectionsEstablished < m_maxTotalConnections)
     {
-        addNewConnections();
+        addNewConnections(&lk);
     }
     else if (m_connections.empty())
     {
@@ -563,19 +558,18 @@ void ConnectionsGenerator::onConnectionFinished(
     }
 }
 
-void ConnectionsGenerator::addNewConnections()
+void ConnectionsGenerator::addNewConnections(
+    std::unique_lock<std::mutex>* const /*lock*/)
 {
     while (m_connections.size() < m_maxSimultaneousConnectionsCount)
     {
-        m_connections.push_back(std::unique_ptr<TestConnection>());
-        std::unique_ptr<TestConnection> connection(new TestConnection(
+        auto connection = std::make_unique<TestConnection>(
             m_remoteAddress,
             m_limitType,
-            m_trafficLimit,
+            m_trafficLimit);
+        connection->setOnFinishedEventHandler(
             std::bind(&ConnectionsGenerator::onConnectionFinished, this,
-                std::placeholders::_1, std::placeholders::_3,
-                std::prev(m_connections.end()))));
-        m_connections.back().swap(connection);
+                std::placeholders::_1, std::placeholders::_3));
         const bool emulatingError =
             m_errorEmulationPercent > 0 &&
             m_errorEmulationDistribution(m_randomEngine) < m_errorEmulationPercent;
@@ -586,12 +580,11 @@ void ConnectionsGenerator::addNewConnections()
             //if (!m_finishedConnectionsIDs.insert(m_connections.back()->id()).second)
             //    int x = 0;
             //ignoring error for now
-            auto connection = std::move(m_connections.back());
-            m_connections.pop_back();
             return;
         }
 
-        m_connections.back()->start();
+        connection->start();
+        m_connections.emplace(connection->id(), std::move(connection));
         ++m_totalConnectionsEstablished;
     }
 }

@@ -33,7 +33,7 @@ enum class TestTrafficLimitType
 //!Reads/writes random data to/from connection
 class NX_NETWORK_API TestConnection
 :
-    public QnStoppable
+    public QnStoppableAsync
 {
 public:
     /*!
@@ -42,19 +42,18 @@ public:
     TestConnection(
         std::unique_ptr<AbstractStreamSocket> connection,
         TestTrafficLimitType limitType,
-        size_t trafficLimit,
-        std::function<void(int, TestConnection*, SystemError::ErrorCode)> handler );
+        size_t trafficLimit);
     /*!
         \param handler to be called on connection closure or after \a bytesToSendThrough bytes have been sent
     */
     TestConnection(
         const SocketAddress& remoteAddress,
         TestTrafficLimitType limitType,
-        size_t trafficLimit,
-        std::function<void(int, TestConnection*, SystemError::ErrorCode)> handler );
+        size_t trafficLimit);
     virtual ~TestConnection();
 
-    virtual void pleaseStop() override;
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
+    virtual void pleaseStopSync() override;
 
     int id() const;
     void setLocalAddress(SocketAddress addr);
@@ -64,23 +63,25 @@ public:
     size_t totalBytesSent() const;
     size_t totalBytesReceived() const;
 
+    void setOnFinishedEventHandler(
+        nx::utils::MoveOnlyFunc<void(int, TestConnection*, SystemError::ErrorCode)> handler);
+
 private:
     std::unique_ptr<AbstractStreamSocket> m_socket;
     const TestTrafficLimitType m_limitType;
     const size_t m_trafficLimit;
     bool m_connected;
     SocketAddress m_remoteAddress;
-    const std::function<void(int, TestConnection*, SystemError::ErrorCode)>
-        m_finishedEventHandler;
+    nx::utils::MoveOnlyFunc<
+        void(int, TestConnection*, SystemError::ErrorCode)
+    > m_finishedEventHandler;
     nx::Buffer m_readBuffer;
     nx::Buffer m_outData;
-    bool m_terminated;
-    std::mutex m_mutex;
     size_t m_totalBytesSent;
     size_t m_totalBytesReceived;
     int m_id;
     boost::optional<SocketAddress> m_localAddress;
-    bool m_accepted;
+    const bool m_accepted;
 
     void onConnected( int id, SystemError::ErrorCode );
     void startIO();
@@ -97,8 +98,7 @@ private:
 */
 class NX_NETWORK_API RandomDataTcpServer
 :
-    public QnStoppable,
-    public QnJoinable
+    public QnStoppableAsync
 {
 public:
     RandomDataTcpServer(
@@ -110,8 +110,7 @@ public:
 
     void setServerSocket(std::unique_ptr<AbstractStreamServerSocket> serverSock);
 
-    virtual void pleaseStop() override;
-    virtual void join() override;
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
     void setLocalAddress(SocketAddress addr);
     bool start();
@@ -125,6 +124,7 @@ private:
     QnMutex m_mutex;
     std::list<std::shared_ptr<TestConnection>> m_acceptedConnections;
     SocketAddress m_localAddress;
+    size_t m_totalConnectionsAccepted;
 
     void onNewConnection( SystemError::ErrorCode errorCode, AbstractStreamSocket* newConnection );
     void onConnectionDone( TestConnection* connection );
@@ -136,8 +136,7 @@ private:
 */
 class NX_NETWORK_API ConnectionsGenerator
 :
-    public QnStoppable,
-    public QnJoinable
+    public QnStoppableAsync
 {
 public:
     static const size_t kInfiniteConnectionCount = 0;
@@ -153,8 +152,7 @@ public:
         size_t maxTotalConnections);
     virtual ~ConnectionsGenerator();
 
-    virtual void pleaseStop() override;
-    virtual void join() override;
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
     void setOnFinishedHandler(nx::utils::MoveOnlyFunc<void()> func);
     void enableErrorEmulation(int errorPercent);
@@ -167,7 +165,8 @@ public:
     std::vector<SystemError::ErrorCode> totalErrors() const;
 
 private:
-    typedef std::list<std::unique_ptr<TestConnection>> ConnectionsContainer;
+    /** map<connection id, connection> */
+    typedef std::map<int, std::unique_ptr<TestConnection>> ConnectionsContainer;
 
     const SocketAddress m_remoteAddress;
     size_t m_maxSimultaneousConnectionsCount;
@@ -190,10 +189,10 @@ private:
     nx::utils::MoveOnlyFunc<void()> m_onFinishedHandler;
 
     void onConnectionFinished(
-        int id, SystemError::ErrorCode code,
-        ConnectionsContainer::iterator connectionIter );
+        int id,
+        SystemError::ErrorCode code);
 
-    void addNewConnections();
+    void addNewConnections(std::unique_lock<std::mutex>* const /*lock*/);
 };
 
 /**

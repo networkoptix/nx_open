@@ -118,11 +118,8 @@ TEST_F(CloudStreamSocketTest, multiple_connections_random_data)
 
     std::this_thread::sleep_for(testDuration);
 
-    connectionsGenerator.pleaseStop();
-    connectionsGenerator.join();
-
-    server.pleaseStop();
-    server.join();
+    connectionsGenerator.pleaseStopSync();
+    server.pleaseStopSync();
 
     nx::network::SocketGlobals::addressResolver().removeFixedAddress(
         tempHostName,
