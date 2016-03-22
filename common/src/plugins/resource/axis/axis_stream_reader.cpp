@@ -44,11 +44,11 @@ int QnAxisStreamReader::toAxisQuality(Qn::StreamQuality quality)
         case Qn::QualityLow:
             return 50;
         case Qn::QualityNormal:
-            return 30;
+            return 40;
         case Qn::QualityHigh:
-            return 20;
+            return 30;
         case Qn::QualityHighest:
-            return 15;
+            return 20;
         case Qn::QualityPreSet:
             return -1;
         default:
