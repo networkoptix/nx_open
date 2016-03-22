@@ -145,8 +145,8 @@ void PeerRegistrator::listen(
     peerDataLocker.value().connectionMethods |= api::ConnectionMethod::udpHolePunching;
 
     NX_LOGX(lit("Peer %1.%2 started to listen")
-        .arg(QString::fromUtf8(requestData.systemId))
-        .arg(QString::fromUtf8(requestData.serverId)),
+        .arg(QString::fromUtf8(requestData.serverId))
+        .arg(QString::fromUtf8(requestData.systemId)),
         cl_logDEBUG1);
 
     completionHandler(api::ResultCode::ok);

@@ -462,7 +462,8 @@ void ConnectionsGenerator::start()
             m_remoteAddress,
             m_bytesToSendThrough,
             std::bind(&ConnectionsGenerator::onConnectionFinished, this,
-                      std::placeholders::_1, std::prev(m_connections.end())) ) );
+                      std::placeholders::_1, std::placeholders::_3,
+                      std::prev(m_connections.end())) ) );
         m_connections.back().swap( connection );
         if (m_localAddress)
             m_connections.back()->setLocalAddress(*m_localAddress);
@@ -486,10 +487,27 @@ size_t ConnectionsGenerator::totalBytesReceived() const
     return m_totalBytesReceived;
 }
 
+std::vector<SystemError::ErrorCode> ConnectionsGenerator::totalErrors() const
+{
+    return m_errors;
+}
+
 void ConnectionsGenerator::onConnectionFinished(
-    int id,
+    int id, SystemError::ErrorCode code,
     ConnectionsContainer::iterator connectionIter)
 {
+    if (code != SystemError::noError)
+    {
+        m_errors.push_back(code);
+        if (m_errors.size() < 3)
+        {
+            std::cerr
+                << "onConnectionFinished: "
+                << SystemError::toString(code).toStdString()
+                << std::endl;
+        }
+    }
+
     std::unique_lock<std::mutex> lk(m_mutex);
 
     {
@@ -532,7 +550,8 @@ void ConnectionsGenerator::addNewConnections()
             m_remoteAddress,
             m_bytesToSendThrough,
             std::bind(&ConnectionsGenerator::onConnectionFinished, this,
-                std::placeholders::_1, std::prev(m_connections.end()))));
+                std::placeholders::_1, std::placeholders::_3,
+                std::prev(m_connections.end()))));
         m_connections.back().swap(connection);
         const bool emulatingError =
             m_errorEmulationPercent > 0 &&

@@ -502,7 +502,6 @@ namespace ec2
         /**%apidoc GET /ec2/getCamerasEx
          * Read camera list.
          * %param[default] format
-         * %param[opt] id Server unique Id
          * %return List of objects with camera information formatted in the requested format.
          *     %// From struct ApiResourceData:
          *     %param id Camera unique Id.

@@ -32,7 +32,15 @@ int main(int argc, char* argv[])
 
     nx::network::SocketGlobals::InitGuard socketGlobalsGuard;
 
-    //reading mode
+    // common options
+    const auto mediatorIt = args.find("enforce-mediator");
+    if (mediatorIt != args.end())
+    {
+        nx::network::SocketGlobals::mediatorConnector().
+            mockupAddress(mediatorIt->second);
+    }
+
+    // reading mode
     if (args.find("listen") != args.end())
         return runInListenMode(args);
 
@@ -140,6 +148,14 @@ int runInConnectMode(const std::multimap<QString, QString>& args)
     int bytesToSend = kDefaultBytesToSend;
     readArg(args, "bytes-to-send", &bytesToSend);
 
+    SocketFactory::setCreateStreamSocketFunc(
+        [](bool ssl, SocketFactory::NatTraversalType ntt)
+        {
+            static_cast<void>(ssl);
+            static_cast<void>(ntt);
+            return std::make_unique<nx::network::cloud::CloudStreamSocket>();
+        });
+
     nx::network::test::ConnectionsGenerator connectionsGenerator(
         SocketAddress(target),
         maxConcurrentConnections,
@@ -161,8 +177,9 @@ int runInConnectMode(const std::multimap<QString, QString>& args)
         "Total time: "<< testDuration.count() <<"s. "
         "Total connections: "<<connectionsGenerator.totalConnectionsEstablished()<<". "
         "Total bytes sent: "<<connectionsGenerator.totalBytesSent()<<". "
-        "Total bytes received: "<<connectionsGenerator.totalBytesReceived()<<
-        std::endl;
+        "Total bytes received: "<<connectionsGenerator.totalBytesReceived()<<". "
+        "Total errors: "<<connectionsGenerator.totalErrors().size()<<"."
+        <<std::endl;
 
     return 0;
 }
@@ -226,6 +243,9 @@ void printHelp(int argc, char* argv[])
         "Http client mode:\n"
         "  --http-client                    Enable Http client mode\n"
         "  --url={http url}                 Url to trigger\n"
+        "\n"
+        "Common options:\n"
+        "  --enforce-mediator={endpoint}   Enforces custom mediator address\n"
         "\n"
         << std::endl;
 }
