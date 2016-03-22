@@ -62,7 +62,7 @@ QnPage {
                 sideNavigation.enabled = true
             }
         }
-        visible: (pageStatus == Stack.Active || pageStatus == Stack.Activating)
+        visible: !liteMode && (pageStatus == Stack.Active || pageStatus == Stack.Activating)
         Keys.forwardTo: resourcesPage
 
         enabled: !d.serverOfflineWarningVisible && !loadingDummy.visible
