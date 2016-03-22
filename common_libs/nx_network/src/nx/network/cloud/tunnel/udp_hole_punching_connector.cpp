@@ -258,9 +258,16 @@ void UdpHolePunchingTunnelConnector::onUdtConnectionEstablished(
     //success!
     NX_LOGX(lm("session %2. Udp hole punching is a success!"), cl_logDEBUG2);
 
-    holePunchingDone(
-        api::UdpHolePunchingResultCode::ok,
-        SystemError::noError);
+    //introducing delay to give server some time to call accept
+    m_timer.cancelSync();
+    m_timer.start(
+        std::chrono::milliseconds(200),
+        [this]
+        {
+            holePunchingDone(
+                api::UdpHolePunchingResultCode::ok,
+                SystemError::noError);
+        });
 }
 
 void UdpHolePunchingTunnelConnector::onTimeout()
@@ -269,33 +276,15 @@ void UdpHolePunchingTunnelConnector::onTimeout()
         .arg(QnLexical::serialized(m_connectResultReport.resultCode)),
         cl_logDEBUG1);
 
-    if (!m_udtConnection)
+    if (m_udtConnection)
     {
-        holePunchingDone(
-            m_connectResultReport.resultCode,
-            SystemError::timedOut);
-        return;
+        //stopping UDT connection
+        m_udtConnection->cancelIOSync(aio::etWrite);
     }
 
-    //stopping UDT connection
-    m_udtConnection->post(
-        [this]()
-        {
-            //cancelling connect
-            m_udtConnection->cancelIOSync(aio::etWrite);
-
-            //TODO #ak remove this embedded post after switching to 
-                //the single aio thread pool
-            m_timer.post(
-                [this]()
-                {
-                    if (m_done)
-                        return;
-                    holePunchingDone(
-                        m_connectResultReport.resultCode,
-                        SystemError::timedOut);
-                });
-        });
+    holePunchingDone(
+        m_connectResultReport.resultCode,
+        SystemError::timedOut);
 }
 
 void UdpHolePunchingTunnelConnector::holePunchingDone(
