@@ -157,9 +157,9 @@ void TestConnection::setOnFinishedEventHandler(
 
 void TestConnection::onConnected( int id, SystemError::ErrorCode errorCode )
 {
-//#ifdef DEBUG_OUTPUT
+#ifdef DEBUG_OUTPUT
     std::cout<<"TestConnection::onConnected. "<<id<<std::endl;
-//#endif
+#endif
 
     if( errorCode != SystemError::noError )
     {
