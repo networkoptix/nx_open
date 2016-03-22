@@ -362,7 +362,7 @@ public:
                 break;
 
             QnStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnStorageResource> (*itr);
-            Qn::ResourceStatus status = fileStorage->isAvailable() ? Qn::Online : Qn::Offline;
+            Qn::ResourceStatus status = fileStorage->initOrUpdate() ? Qn::Online : Qn::Offline;
             if (fileStorage->getStatus() != status)
                 m_owner->changeStorageStatus(fileStorage, status);
 
@@ -658,8 +658,10 @@ void QnStorageManager::addStorage(const QnStorageResourcePtr &storage)
 {
     {
         int storageIndex = qnStorageDbPool->getStorageIndex(storage);
-        QnMutexLocker lock( &m_mutexStorages );
-        m_storagesStatisticsReady = false;
+        {
+            QnMutexLocker lock(&m_mutexStorages);
+            m_storagesStatisticsReady = false;
+        }
 
         NX_LOG(QString("Adding storage. Path: %1").arg(storage->getUrl()), cl_logINFO);
 
@@ -668,7 +670,10 @@ void QnStorageManager::addStorage(const QnStorageResourcePtr &storage)
         //if (oldStorage)
         //    storage->addWritedSpace(oldStorage->getWritedSpace());
         storage->setStatus(Qn::Offline); // we will check status after
-        m_storageRoots.insert(storageIndex, storage);
+        {
+            QnMutexLocker lk(&m_mutexStorages);
+            m_storageRoots.insert(storageIndex, storage);
+        }
         connect(storage.data(), SIGNAL(archiveRangeChanged(const QnStorageResourcePtr &, qint64, qint64)),
                 this, SLOT(at_archiveRangeChanged(const QnStorageResourcePtr &, qint64, qint64)), Qt::DirectConnection);
         qnStorageDbPool->getSDB(storage);
@@ -1696,9 +1701,11 @@ void QnStorageManager::stopAsyncTasks()
 
 void QnStorageManager::updateStorageStatistics()
 {
-    QnMutexLocker lock( &m_mutexStorages );
-    if (m_storagesStatisticsReady)
-        return;
+    {
+        QnMutexLocker lock(&m_mutexStorages);
+        if (m_storagesStatisticsReady)
+            return;
+    }
 
     QSet<QnStorageResourcePtr> storages = getWritableStorages();
     int64_t totalSpace = 0;
@@ -1710,19 +1717,13 @@ void QnStorageManager::updateStorageStatistics()
         QnStorageResourcePtr fileStorage =
             qSharedPointerDynamicCast<QnStorageResource> (*itr);
 
-        int64_t storageSpace = std::max(
-            int64_t(1),
-            static_cast<int64_t>(
-                fileStorage->getTotalSpace() -
-                fileStorage->getSpaceLimit()
-            )
-        );
+        int64_t storageSpace = std::max(int64_t(1),
+                                        static_cast<int64_t>(fileStorage->getTotalSpace() - 
+                                                             fileStorage->getSpaceLimit()));
         totalSpace += storageSpace;
     }
 
-    for (auto itr = storages.constBegin();
-         itr != storages.constEnd();
-         ++itr)
+    for (auto itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
     {
         QnStorageResourcePtr fileStorage =
             qSharedPointerDynamicCast<QnStorageResource> (*itr);
@@ -1738,8 +1739,11 @@ void QnStorageManager::updateStorageStatistics()
         fileStorage->setWritedCoeff((double)storageSpace / totalSpace);
     }
 
-    m_storagesStatisticsReady = true;
-    m_warnSended = false;
+    {
+        QnMutexLocker lk(&m_mutexStorages);
+        m_storagesStatisticsReady = true;
+        m_warnSended = false;
+    }
 }
 
 QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(

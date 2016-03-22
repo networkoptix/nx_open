@@ -135,6 +135,9 @@ void QnMjpegSessionPrivate::decodeFrame(const QByteArray &data, qint64 timestamp
 
     {
         QnMutexLocker lock(&mutex);
+        if (state != QnMjpegSession::Playing)
+            return;
+
         if (!lastFrame.isNull())
             lastFrameReleased.wait(&mutex);
 
@@ -182,6 +185,7 @@ bool QnMjpegSessionPrivate::connect() {
 
     reply = networkAccessManager->get(QNetworkRequest(url));
     reply->ignoreSslErrors();
+    reply->setReadBufferSize(maxHttpBufferSize);
 
     QObject::connect(reply, &QNetworkReply::readyRead, this, &QnMjpegSessionPrivate::at_reply_readyRead);
     QObject::connect(reply, &QNetworkReply::finished, this, &QnMjpegSessionPrivate::at_reply_finished);
