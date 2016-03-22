@@ -138,7 +138,6 @@ private:
     /** This field is used to restore geometry after switching to fullscreen and back. Do not used in MacOsX due to its fullscreen mode. */
     QRect m_storedGeometry;
 #endif
-    bool m_enableBackgroundAnimation;
 
     bool m_inFullscreenTransition;
 };

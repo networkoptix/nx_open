@@ -1025,11 +1025,6 @@ public:
         JumpToLiveAction,
         ToggleSyncAction,
 
-        /**
-         * Toggle the background animation.
-         */
-        ToggleBackgroundAnimationAction,
-
         /* Debug actions. */
 
         /**

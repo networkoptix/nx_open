@@ -176,7 +176,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_skipDoubleClick(false),
     m_dwm(NULL),
     m_drawCustomFrame(false),
-    m_enableBackgroundAnimation(true),
     m_inFullscreenTransition(false)
 {
 #ifdef Q_OS_MACX
@@ -235,14 +234,11 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     display()->setLightMode(qnSettings->lightMode());
     display()->setScene(m_scene.data());
     display()->setView(m_view.data());
-    
+
     if (qnRuntime->isVideoWallMode())
         display()->setNormalMarginFlags(0);
     else
         display()->setNormalMarginFlags(Qn::MarginsAffectSize | Qn::MarginsAffectPosition);
-
-    if (qnSettings->lightMode() & Qn::LightModeNoSceneBackground)
-        action(QnActions::ToggleBackgroundAnimationAction)->setDisabled(true);
 
     m_controller.reset(new QnWorkbenchController(this));
     if (qnRuntime->isVideoWallMode())
@@ -326,7 +322,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(QnActions::DebugDecrementCounterAction));
     addAction(action(QnActions::DebugShowResourcePoolAction));
     addAction(action(QnActions::DebugControlPanelAction));
-    addAction(action(QnActions::ToggleBackgroundAnimationAction));
     addAction(action(QnActions::SystemAdministrationAction));
 
     connect(action(QnActions::MaximizeAction),     SIGNAL(toggled(bool)),                          this,                                   SLOT(setMaximized(bool)));
@@ -395,7 +390,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_titleLayout->addLayout(m_windowButtonsLayout);
 
     /* Layouts. */
-    
+
     m_viewLayout = new QVBoxLayout();
     m_viewLayout->setContentsMargins(0, 0, 0, 0);
     m_viewLayout->setSpacing(0);
@@ -458,7 +453,7 @@ void QnMainWindow::updateWidgetsVisibility()
 {
     const auto updateTitleBarVisibility = [this](bool visible)
     {
-        if (visible) 
+        if (visible)
         {
             m_globalLayout->insertLayout(0, m_titleLayout);
             setVisibleRecursively(m_titleLayout, true);
@@ -470,11 +465,11 @@ void QnMainWindow::updateWidgetsVisibility()
         setVisibleRecursively(m_titleLayout, false);
     };
 
-    const auto updateWelcomeScreenVisibility = 
+    const auto updateWelcomeScreenVisibility =
         [this](bool welcomeScreenIsVisible)
     {
         enum { kSceneIndex, kWelcomePageIndex };
-        m_currentPageHolder->setCurrentIndex(welcomeScreenIsVisible 
+        m_currentPageHolder->setCurrentIndex(welcomeScreenIsVisible
             ? kWelcomePageIndex : kSceneIndex);
     };
 
@@ -494,7 +489,7 @@ void QnMainWindow::setWelcomeScreenVisible(bool visible)
     updateWidgetsVisibility();
 }
 
-void QnMainWindow::setTitleVisible(bool visible) 
+void QnMainWindow::setTitleVisible(bool visible)
 {
     if(m_titleVisible == visible)
         return;
