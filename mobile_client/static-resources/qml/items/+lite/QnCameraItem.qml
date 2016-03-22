@@ -159,7 +159,7 @@ Item {
 
         onTriggered: {
             interval = reloadDelay
-            cameraItem.thumbnailRefreshRequested
+            cameraItem.thumbnailRefreshRequested()
         }
 
         onRunningChanged: {
