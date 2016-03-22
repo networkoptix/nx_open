@@ -307,7 +307,8 @@ QnPage {
         Behavior on opacity { NumberAnimation { duration: 500; easing.type: Easing.OutCubic } }
 
         Component.onCompleted: {
-            sourceComponent = accessRightsHelper.canViewArchive ? navigationComponent : liveNavigationComponent
+            sourceComponent = !liteMode && accessRightsHelper.canViewArchive
+                    ? navigationComponent : liveNavigationComponent
             setKeepScreenOn(true)
         }
 
