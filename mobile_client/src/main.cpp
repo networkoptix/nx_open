@@ -119,9 +119,17 @@ int runUi(QGuiApplication *application) {
     QScopedPointer<QnTextureSizeHelper> textureSizeHelper(new QnTextureSizeHelper(mainWindow.data()));
 
 #if !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
-    if (mainWindow) {
-        mainWindow->setWidth(800);
-        mainWindow->setHeight(600);
+    if (mainWindow)
+    {
+        if (context.liteMode())
+        {
+            mainWindow->showFullScreen();
+        }
+        else
+        {
+            mainWindow->setWidth(800);
+            mainWindow->setHeight(600);
+        }
     }
 #endif
 
