@@ -27,8 +27,8 @@
         <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -ld3d9 -lopenal32</windows.oslibs>
         <windows.oslibs.release/>
         <windows.oslibs.debug/>
-        <!--linux.oslibs>${ffmpeg.libs} -lmp3lame -lz -lopenal -lX11 -lXfixes -lGL -lGLU -lsigar -lfaac</linux.oslibs-->
-        <linux.oslibs>${ffmpeg.libs} -lz -lopenal -lX11 -lXfixes -lGL -lGLU -lsigar -lfaac</linux.oslibs>
+        <!--linux.oslibs>${ffmpeg.libs} -lmp3lame -lz -lopenal -lX11 -lXfixes -lGL -lGLU -lfaac</linux.oslibs-->
+        <linux.oslibs>${ffmpeg.libs} -lz -lopenal -lX11 -lXfixes -lGL -lGLU -lfaac</linux.oslibs>
         <android.oslibs>-lturbojpeg -lopenal</android.oslibs>
         <ios.oslibs>-lturbojpeg</ios.oslibs>
         <!--Global defines-->
