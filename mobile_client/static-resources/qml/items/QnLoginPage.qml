@@ -129,7 +129,8 @@ QnPage {
                     selectionAllowed: false
                     inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
                     enabled: !connecting
-                    KeyNavigation.tab: loginField
+                    KeyNavigation.tab: liteMode ? portField : loginField
+                    KeyNavigation.down: KeyNavigation.tab
                     onAccepted: KeyNavigation.tab.forceActiveFocus()
                 }
 
@@ -144,6 +145,7 @@ QnPage {
                     validator: IntValidator { bottom: 0; top: 32767 }
                     enabled: !connecting
                     KeyNavigation.tab: loginField
+                    KeyNavigation.down: KeyNavigation.tab
                     onAccepted: KeyNavigation.tab.forceActiveFocus()
                 }
             }
@@ -161,6 +163,7 @@ QnPage {
                     inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase | Qt.ImhSensitiveData
                     enabled: !connecting
                     KeyNavigation.tab: passwordField
+                    KeyNavigation.down: KeyNavigation.tab
                     onAccepted: KeyNavigation.tab.forceActiveFocus()
                 }
 
@@ -175,7 +178,15 @@ QnPage {
                     selectionAllowed: false
                     inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase | Qt.ImhSensitiveData | Qt.ImhHiddenText
                     enabled: !connecting
-                    KeyNavigation.tab: hostField
+                    KeyNavigation.tab:
+                    {
+                        var item = discoveredSessionsLoader.item
+                        if (!item || item.sessionsRepeater.count == 0)
+                            return hostField
+
+                        return item.sessionsRepeater.itemAt(0)
+                    }
+                    KeyNavigation.down: KeyNavigation.tab
                     onAccepted: connect()
                     Component.onCompleted: {
                         if (Qt.platform.os == "android")
@@ -256,6 +267,9 @@ QnPage {
 
         Column {
             spacing: dp(1)
+            visible: discoveredSessionRepeater.count > 0
+
+            readonly property Item sessionsRepeater: discoveredSessionRepeater
 
             Text {
                 height: dp(40)
@@ -265,19 +279,39 @@ QnPage {
                 font.pixelSize: sp(16)
             }
 
-            Repeater {
+            Repeater
+            {
                 id: discoveredSessionRepeater
                 width: parent.width
 
-                model: QnDiscoveredSessionsModel {
+                model: QnDiscoveredSessionsModel
+                {
                     id: discoveredSessionsModel
                 }
 
-                QnDiscoveredSessionItem {
+                QnDiscoveredSessionItem
+                {
                     systemName: model.systemName
                     host: model.address
                     port: model.port
                     version: model.serverVersion
+                    KeyNavigation.tab:
+                    {
+                        var lastItem = index == (discoveredSessionRepeater.count - 1)
+                        return lastItem ? hostField : discoveredSessionRepeater.itemAt(index + 1)
+                    }
+                    KeyNavigation.down: KeyNavigation.tab
+
+                    Rectangle
+                    {
+                        anchors.fill: parent
+                        color: "transparent"
+                        border.color: QnTheme.listSelectionBorder
+                        border.width: dp(4)
+                        visible: parent.activeFocus
+                    }
+
+                    Keys.onReturnPressed: open()
                 }
             }
         }
@@ -288,9 +322,18 @@ QnPage {
     states: [
         State {
             name: "New"
-            PropertyChanges {
+            PropertyChanges
+            {
                 target: discoveredSessionsLoader
                 sourceComponent: discoveredSessionsList
+            }
+            StateChangeScript
+            {
+                script:
+                {
+                    if (liteMode)
+                        hostField.forceActiveFocus()
+                }
             }
         },
         State {
