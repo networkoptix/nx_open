@@ -4,6 +4,12 @@ describe('Registration suite', function () {
 
     var p = new RegisterPage();
 
+    p.alert.checkAlert(function(){
+        p.getByUrl();
+        p.prepareToAlertCheck();
+        p.alert.submitButton.click();
+    }, p.alert.alertMessages.registerSuccess, p.alert.alertTypes.success, true);
+
     it("should open register page in anonymous state by clicking Register button on top right corner", function () {
         p.getHomePage();
 
@@ -135,7 +141,7 @@ describe('Registration suite', function () {
         p.checkInputInvalid(p.emailInput, p.invalidClass);
     });
 
-    p.passwordField.check(p, p.url);
+     p.passwordField.check(p, p.url);
 
     it("should open Terms and conditions in a new page", function () {
         p.getByUrl();

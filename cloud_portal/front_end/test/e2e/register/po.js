@@ -8,6 +8,9 @@ var RegisterPage = function () {
     var Helper = require('../helper.js');
     this.helper = new Helper();
 
+    var AlertSuite = require('../alerts_check.js');
+    this.alert = new AlertSuite();
+
     this.url = '/#/register';
 
     this.getHomePage = function () {
@@ -100,6 +103,13 @@ var RegisterPage = function () {
         this.firstNameInput.sendKeys(this.userFirstName);
         this.lastNameInput.sendKeys(this.userLastName);
         this.emailInput.sendKeys(this.getRandomEmail());
+    }
+
+    this.prepareToAlertCheck = function () {
+        this.firstNameInput.sendKeys(this.userFirstName);
+        this.lastNameInput.sendKeys(this.userLastName);
+        this.emailInput.sendKeys(this.getRandomEmail());
+        this.passwordInput.sendKeys(this.userPassword);
     }
 
     this.termsConditions = element(by.linkText('Terms and Conditions'));

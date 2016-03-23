@@ -12,6 +12,11 @@ describe('Account suite', function () {
         p.helper.logout();
     });
 
+    p.alert.checkAlert(function(){
+        p.get(p.accountUrl);
+        p.alert.submitButton.click();
+    }, p.alert.alertMessages.accountSuccess, p.alert.alertTypes.success, true);
+
     it("should display dropdown in right top corner: Account settings, Change password, Logout", function () {
         p.get(p.homePageUrl);
         expect(p.userAccountDropdownToggle.getText()).toContain(p.userEmail);
@@ -119,7 +124,6 @@ describe('Account suite', function () {
         expect(browser.getCurrentUrl()).toContain('#/account/password');
         expect(p.htmlBody.getText()).toContain('Current password');
     });
-
     p.passwordField.check(p, p.passwordUrl);
 
     it("should allow to change password (and change it back)", function () {
@@ -156,6 +160,29 @@ describe('Account suite', function () {
         p.submitButton.click();
         p.helper.catchAlert(p.passwordChangeAlert, 'Your password was successfully changed.');
     });
+
+
+    p.alert.checkAlert(function(){
+        p.get(p.passwordUrl);
+        p.currentPasswordInput.sendKeys(p.userPasswordWrong);
+        p.passwordInput.sendKeys(p.userPasswordNew);
+
+        p.alert.submitButton.click();
+    }, p.alert.alertMessages.changePassWrongCurrent, p.alert.alertTypes.danger, true);
+
+    p.alert.checkAlert(function(){
+        p.get(p.passwordUrl);
+
+        p.currentPasswordInput.sendKeys(p.userPassword);
+        p.passwordInput.sendKeys(p.userPasswordNew);
+        p.alert.submitButton.click();
+
+        p.currentPasswordInput.clear();
+        p.currentPasswordInput.sendKeys(p.userPasswordNew);
+        p.passwordInput.clear();
+        p.passwordInput.sendKeys(p.userPassword);
+        p.alert.submitButton.click();
+    }, p.alert.alertMessages.changePassSuccess, p.alert.alertTypes.success, true);
 
     it("should not allow to change password if old password is wrong", function () {
         p.get(p.passwordUrl);
