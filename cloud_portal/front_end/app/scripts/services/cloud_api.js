@@ -5,9 +5,10 @@ angular.module('cloudApp')
 
         var apiBase = Config.apiBase;
 
+        var cachedResults = {};
+        var cacheReceived = {};
         function cacheGet(url, cacheForever){
-            var cachedResult = null;
-            var cacheReceived = 0;
+            cacheReceived[url] = 0;
             return function(command) {
 
                 var fromCache = command == 'fromCache';
@@ -18,34 +19,42 @@ angular.module('cloudApp')
                 var now = (new Date()).getTime();
 
                 //Check for cache availability
-                var cacheMiss = cachedResult === null || // clear cache miss
+                var haveValueInCache = typeof(cachedResults[url]) !== 'undeinfed';
+                var cacheMiss = !haveValueInCache || // clear cache miss
                     forceReload || // ignore cache
-                    !cacheForever && (now - cacheReceived) > Config.cacheTimeout; // outdated cache
+                    !cacheForever && (now - cacheReceived[url]) > Config.cacheTimeout; // outdated cache
 
 
                 if(clearCache){
-                    cachedResult = null;
-                    cacheReceived = 0;
+                    delete(cachedResults[url]);
+                    cacheReceived[url] = 0;
                     defer.resolve(null);
                 }else  if(fromCache || !cacheMiss){
-                    if(cachedResult !== null) {
-                        defer.resolve(cachedResult);
+                    if(haveValueInCache) {
+                        defer.resolve(cachedResults[url]);
                     }else{
-                        defer.reject(cachedResult);
+                        defer.reject(cachedResults[url]);
                     }
                 }else {
                     $http.get(url).then(function (response) {
-                        cachedResult = response;
-                        cacheReceived = now;
-                        defer.resolve(cachedResult);
+                        cachedResults[url] = response;
+                        cacheReceived[url] = now;
+                        defer.resolve(cachedResults[url]);
                     }, function (error) {
-                        cachedResult = null;
-                        cacheReceived = 0;
+                        delete(cachedResults[url]);
+                        cacheReceived[url] = 0;
                         defer.reject(error);
                     });
                 }
 
                 return defer.promise;
+            }
+        }
+
+        function clearCache(){
+            cachedResults = {};
+            for (var url in cacheReceived){
+                cacheReceived[url] = 0;
             }
         }
 
@@ -61,6 +70,7 @@ angular.module('cloudApp')
                 });
             },
             logout:function(){
+                clearCache();
                 return $http.post(apiBase + '/account/logout');
             },
             register:function(email,password,firstName,lastName,subscribe){

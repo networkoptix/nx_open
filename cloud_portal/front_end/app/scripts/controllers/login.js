@@ -5,6 +5,7 @@ angular.module('cloudApp')
 
         $scope.Config = Config;
         $scope.session = $sessionStorage;
+        var dialogSettings = dialogs.getSettings($scope);
 
         $scope.auth = {
             email: '',
@@ -24,6 +25,9 @@ angular.module('cloudApp')
         }).then(function(){
             if($scope.auth.password) { // TODO: This is dirty security hole, but I need this to make "Open in client" work
                 $scope.session.password = $scope.auth.password;
+            }
+            if(dialogSettings.params.redirect){
+                $location.path(Config.redirectAuthorised);
             }
             setTimeout(function(){
                 document.location.reload();

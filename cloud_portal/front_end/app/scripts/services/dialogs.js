@@ -96,14 +96,17 @@ angular.module('cloudApp').run(function($http,$templateCache) {
                     buttonType:actionType
                 }).result;
             },
-            login:function(force){
+            login:function(keepPage){
                 return openDialog({
                     title: L.dialogs.loginTitle,
                     template: 'views/login.html',
                     url: 'login',
                     hasFooter: false,
-                    cancellable: !force,
-                    closable:true}).result;
+                    cancellable: !keepPage,
+                    closable:true,
+                    params:{
+                        redirect: !keepPage
+                    }}).result;
             },
             share:function(systemId, isOwner, share){
                 var url = 'share';
@@ -139,6 +142,14 @@ angular.module('cloudApp').run(function($http,$templateCache) {
                 if(dialogSettings && dialogSettings.params.getModalInstance){
                     dialogSettings.params.getModalInstance().dismiss();
                 }
+            },
+            getSettings:function($scope){
+
+                // TODO: We must replace this hack with something more angular-way,
+                // but I can't figure out yet, how to implement dialog service and pass parameters to controllers
+                // we need something like modalInstance
+
+                return $scope.settings || $scope.$parent && this.getSettings($scope.$parent) || null;
             }
         };
     }).controller("DialogCtrl",function($scope, $uibModalInstance,settings){

@@ -29,13 +29,15 @@ angular.module('cloudApp')
             logout:function(){
                 cloudApi.logout().then(function(){
                     $sessionStorage.$reset(); // Clear session
-                    window.location.reload();
+                    $location.path(Config.redirectUnauthorised);
+                    setTimeout(function(){
+                        document.location.reload();
+                    });
                 });
             },
             logoutAuthorised:function(){
                 var self = this;
                 this.get().then(function(){
-                    console.log("logoutAuthorised");
                     self.logout();
                 });
             }

@@ -3,19 +3,11 @@
 angular.module('cloudApp')
     .controller('ShareCtrl', function ($scope, cloudApi, process, dialogs, $q, account) {
 
-
-        // TODO: We must replace this hack with something more angular-way,
-        // but I can't figure out yet, how to implement dialog service and pass parameters to controllers
-        // we need something like modalInstance
-        function findSettings($scope){
-            return $scope.settings || $scope.$parent && findSettings($scope.$parent) || null;
-        }
-
         $scope.Config = Config;
         $scope.L = L;
         $scope.buttonText = L.sharing.shareConfirmButton;
 
-        var dialogSettings = findSettings($scope);
+        var dialogSettings = dialogs.getSettings($scope);
 
         var systemId = dialogSettings.params.systemId;
 
