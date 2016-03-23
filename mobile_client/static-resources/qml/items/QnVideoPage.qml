@@ -379,11 +379,22 @@ QnPage {
 
     focus: true
 
-    Keys.onReleased: {
-        if (Main.keyIsBack(event.key)) {
-            if (Main.backPressed()) {
+    Keys.onReleased:
+    {
+        if (Main.keyIsBack(event.key))
+        {
+            if (Main.backPressed())
+            {
                 event.accepted = true
             }
         }
+    }
+
+    Keys.onReturnPressed:
+    {
+        if (!liteMode)
+            return
+
+        Main.backPressed()
     }
 }
