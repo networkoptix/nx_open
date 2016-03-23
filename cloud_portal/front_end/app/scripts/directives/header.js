@@ -27,7 +27,7 @@ angular.module('cloudApp')
                     dialogs.login();
                 };
                 scope.logout = function(){
-                    account.logoutAuthorised();
+                    account.logout();
                 };
 
                 account.get().then(function(account){

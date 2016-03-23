@@ -10,17 +10,13 @@ angular.module('cloudApp', [
     'ngStorage'
 ]).config(function ($routeProvider) {
     $routeProvider
-        .when('/login', {
-            templateUrl: 'views/login.html',
-            controller: 'LoginCtrl'
-        })
         .when('/register/:email', {
             templateUrl: 'views/register.html',
-            controller: 'LoginCtrl'
+            controller: 'RegisterCtrl'
         })
         .when('/register', {
             templateUrl: 'views/register.html',
-            controller: 'LoginCtrl'
+            controller: 'RegisterCtrl'
         })
         .when('/account/password', {
             templateUrl: 'views/account.html',
