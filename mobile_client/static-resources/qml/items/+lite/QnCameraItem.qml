@@ -1,9 +1,11 @@
 import QtQuick 2.4
 
 import com.networkoptix.qml 1.0
+import QtMultimedia 5.5
 
 import "../controls"
 import "../icons"
+import "../items"
 
 Item {
     id: cameraItem
@@ -11,6 +13,8 @@ Item {
     property alias text: label.text
     property string thumbnail
     property int status
+    property string resourceId
+    property bool useVideo: false
 
     signal clicked
     signal pressAndHold
@@ -54,6 +58,8 @@ Item {
                 sourceComponent: {
                     if (d.offline || d.unauthorized)
                         return thumbnailDummyComponent
+                    else if (useVideo)
+                        return videoComponent
                     else if (!cameraItem.thumbnail)
                         return thumbnailPreloaderComponent
                     else
@@ -135,6 +141,31 @@ Item {
             width: thumbnailContainer.width
             height: thumbnailContainer.height
             fillMode: Qt.KeepAspectRatio
+        }
+    }
+
+    Component
+    {
+        id: videoComponent
+
+        Item
+        {
+            width: thumbnailContainer.width
+            height: thumbnailContainer.height
+
+            VideoOutput
+            {
+                anchors.fill: parent
+                source: player
+            }
+
+            QnMediaPlayer
+            {
+                id: player
+
+                resourceId: cameraItem.resourceId
+                Component.onCompleted: playLive()
+            }
         }
     }
 
