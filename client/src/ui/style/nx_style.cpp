@@ -1605,7 +1605,7 @@ QRect QnNxStyle::subElementRect(
     case SE_TabWidgetTabBar:
         if (const QTabWidget *tabWidget = qobject_cast<const QTabWidget *>(widget))
         {
-            int hspace = pixelMetric(PM_TabBarTabHSpace, option, widget);
+            int hspace = pixelMetric(PM_TabBarTabHSpace, option, widget) / 2;
 
             QRect rect = base_type::subElementRect(subElement, option, widget);
 
@@ -1751,7 +1751,7 @@ int QnNxStyle::pixelMetric(
 
     case PM_TabBarTabHSpace:
     case PM_TabBarTabVSpace:
-        return dp(9);
+        return dp(20);
 
     case PM_ToolBarIconSize:
         return dp(18);
