@@ -74,8 +74,9 @@ Rectangle
 
                     FactorySystemTile
                     {
+                        property var hostsModel: QnSystemHostsModel { systemId: model.systemId}
                         visualParent: thisComponent;
-                        host: model.host;
+                        host: hostsModel.firstHost;
                         systemName: qsTr("New System");
 
                         onConnectClicked:
@@ -91,14 +92,18 @@ Rectangle
 
                     LocalSystemTile
                     {
+                        property var hostsModel: QnSystemHostsModel { systemId: model.systemId}
+                        property var knownUsersModelProp:
+                            QnLastSystemConnectionsData { systemName: model.systemName; }
+
                         visualParent: thisComponent;
 
                         systemName: model.systemName;
                         isRecentlyConnected: (knownUsersModel ? knownUsersModel.hasConnections : false);
 
                         allowExpanding: model.isCompatible;
-                        knownUsersModel: QnLastSystemConnectionsData { systemName: model.systemName; }
-                        knownHostsModel: model.hostsModel;
+                        knownUsersModel: knownUsersModelProp;
+                        knownHostsModel: hostsModel;
 
                         onConnectClicked:
                         {

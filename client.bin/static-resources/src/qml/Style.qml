@@ -67,7 +67,10 @@ QtObject
             property QtObject systemTile: QtObject
             {
                 readonly property color background: context.getPaletteColor("dark", 7);
-                readonly property color setupSystem: context.getPaletteColor("light", 5);   // Check me!
+                readonly property color setupSystem: context.getPaletteColor("light", 5);
+                readonly property color factorySystemBkg: context.getPaletteColor("dark", 9);
+                readonly property color factorySystemHovered: context.getPaletteColor("dark", 10);
+                readonly property color closeButtonBkg: context.getPaletteColor("dark", 9);
             }
         }
     }

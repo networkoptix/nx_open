@@ -147,7 +147,7 @@ void QnSystemDescription::removeServer(const QnUuid &serverId)
 }
 
 void QnSystemDescription::setServerHost(const QnUuid &serverId
-    , const QString &host)
+    , const QString &host) 
 {
     const bool containsServer = m_servers.contains(serverId);
     

@@ -18,6 +18,9 @@ Item
     property bool allowExpanding: true;
     property bool isExpanded;
 
+    property color standardColor: Style.colors.custom.systemTile.background;
+    property color hoveredColor: Style.lighterColor(standardColor);
+
     Binding
     {
         target: thisComponent;
@@ -40,7 +43,7 @@ Item
     implicitHeight: 96;
     z: (transition.running ? 100 : 0)
 
-    Item
+    FocusScope
     {
         id: tileHolder;
 
@@ -63,6 +66,24 @@ Item
                     y: 0;
                     height: thisComponent.height;
                 }
+
+                PropertyChanges
+                {
+                    target: collapseTileButton;
+                    opacity: 0;
+                }
+
+                PropertyChanges
+                {
+                    target: shadow;
+                    opacity: 0;
+                }
+
+                PropertyChanges
+                {
+                    target: expandedAreaLoader;
+                    opacity: 0;
+                }
             },
 
             State
@@ -76,6 +97,24 @@ Item
                     x: (visualParent.width - tileHolder.width) / 2;
                     y: (visualParent.height - expadedHeight) / 2;
                     height: expadedHeight;
+                }
+
+                PropertyChanges
+                {
+                    target: collapseTileButton;
+                    opacity: 1;
+                }
+
+                PropertyChanges
+                {
+                    target: shadow;
+                    opacity: 1;
+                }
+
+                PropertyChanges
+                {
+                    target: expandedAreaLoader;
+                    opacity: 1;
                 }
             }
         ]
@@ -100,10 +139,35 @@ Item
                     duration: 400;
                 }
             }
+            NumberAnimation
+            {
+                target: collapseTileButton;
+                properties: "opacity";
+                easing.type: Easing.OutCubic;
+                duration: 200;
+            }
+
+            NumberAnimation
+            {
+                target: shadow;
+                properties: "opacity";
+                easing.type: Easing.OutCubic;
+                duration: 400;
+            }
+
+            NumberAnimation
+            {
+                target: expandedAreaLoader;
+                properties: "opacity";
+                easing.type: Easing.OutCubic;
+                duration: 400;
+            }
         }
 
         DropShadow
         {
+            id: shadow;
+
             anchors.fill: tileArea;
 
             visible: thisComponent.isExpanded;
@@ -130,12 +194,11 @@ Item
         {
             id: tileArea;
 
-            readonly property color standardColor: Style.colors.custom.systemTile.background;
-            readonly property color hoveredColor: Style.lighterColor(standardColor);
             readonly property bool isHovered: (!thisComponent.isExpanded && hoverIndicator.containsMouse);
 
             clip: true;
-            color: (isHovered || isExpanded ? hoveredColor : standardColor);
+            color: (isHovered || isExpanded
+                ? thisComponent.hoveredColor : thisComponent.standardColor);
 
             anchors.fill: parent;
             radius: 2;
@@ -170,18 +233,20 @@ Item
                 font: Style.fonts.systemTile.systemName;
             }
 
-            Button
+            NxButton
             {
                 id: collapseTileButton;
 
                 width: 40;
                 height: 40;
 
-                visible: thisComponent.isExpanded;
+                visible: (opacity != 0);
                 anchors.right: parent.right;
                 anchors.top: parent.top;
 
-                text: "X";
+                iconUrl: "qrc:/skin/welcome_page/close.png";
+                bkgColor: tileArea.color;
+                hoveredColor: Style.colors.custom.systemTile.closeButtonBkg;
 
                 onClicked: { toggle(); }
             }
@@ -215,7 +280,7 @@ Item
                     anchors.left: parent.left;
                     anchors.right: parent.right;
 
-                    visible: (transition.running || isExpanded);
+                    visible: (opacity != 0);
                     sourceComponent: thisComponent.expandedAreaDelegate;
                 }
             }

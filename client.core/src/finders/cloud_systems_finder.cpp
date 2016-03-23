@@ -50,6 +50,24 @@ QnAbstractSystemsFinder::SystemDescriptionList QnCloudSystemsFinder::systems() c
     return m_systems.values();
 }
 
+QnSystemDescriptionPtr QnCloudSystemsFinder::getSystem(const QString &id) const
+{
+    const QnMutexLocker lock(&m_mutex);
+
+    const auto systemDescriptions = m_systems.values();
+    const auto predicate = [id](const QnSystemDescriptionPtr &desc)
+    {
+        return (desc->id() == id);
+    };
+
+    const auto it = std::find_if(systemDescriptions.begin()
+        , systemDescriptions.end(), predicate);
+
+    return (it == systemDescriptions.end()
+        ? QnSystemDescriptionPtr() : *it);
+}
+
+
 void QnCloudSystemsFinder::onCloudStatusChanged(QnCloudStatusWatcher::Status status)
 {
     switch (status)
@@ -74,9 +92,8 @@ void QnCloudSystemsFinder::setCloudSystems(const QnCloudSystemList &systems)
     SystemsHash updatedSystems;
     for (const auto system : systems)
     {
-        updatedSystems.insert(
-            system.id,
-            QnSystemDescription::createCloudSystem(system.id, system.name));
+        updatedSystems.insert(system.id
+            , QnSystemDescription::createCloudSystem(system.id, system.name));
     }
 
     typedef QSet<QString> IdsSet;

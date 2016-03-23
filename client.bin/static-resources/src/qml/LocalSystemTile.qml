@@ -109,6 +109,8 @@ BaseTile
 
                 visible: !thisComponent.isRecentlyConnected;
                 width: parent.width;
+
+                onAccepted: thisComponent.connectClicked();
             }
 
             NxLabel
@@ -121,6 +123,8 @@ BaseTile
                 id: passwordTextField;
                 width: parent.width;
                 echoMode: TextInput.Password;
+
+                onAccepted: thisComponent.connectClicked();
             }
 
             CheckBox

@@ -65,8 +65,6 @@ void QnClientRecentConnectionsManager::updateModelBinding(QnLastSystemUsersModel
 
     const auto itUnbound = m_unbound.find(model);
     const bool isUnbound = (itUnbound != m_unbound.end());
-    NX_ASSERT(isUnbound, Q_FUNC_INFO, "Model is not unbound");
-
     const auto systemName = model->systemName();
     if (isUnbound)
     {

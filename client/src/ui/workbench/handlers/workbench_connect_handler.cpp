@@ -80,13 +80,20 @@ namespace
     {
         auto lastConnections = qnCoreSettings->lastSystemConnections();
         // TODO: #ynikitenkov remove outdated connection data
-        // TODO: #ynikitenkov remove same pars of system name \user name
 
         const auto server = qnCommon->currentServer();
         const QnSystemConnectionData connectionInfo =
-        { server->getSystemName(), url.userName(), url.password() };
+            { server->getSystemName(), url.userName(), url.password() };
 
-        lastConnections.append(connectionInfo);
+        const auto newEnd = std::remove_if(lastConnections.begin(), lastConnections.end()
+            , [connectionInfo](const QnSystemConnectionData &connection)
+        {
+            return ((connection.systemName == connectionInfo.systemName)
+                && (connection.userName == connectionInfo.userName));
+        });
+
+        lastConnections.erase(newEnd, lastConnections.end());
+        lastConnections.prepend(connectionInfo);
         qnCoreSettings->setLastSystemConnections(lastConnections);
     }
 }
@@ -371,15 +378,16 @@ bool QnWorkbenchConnectHandler::disconnectFromServer(bool force) {
     if (!context()->instance<QnWorkbenchStateManager>()->tryClose(force))
         return false;
 
-    if (!force) {
-        qnGlobalSettings->synchronizeNow();
+    if (!force)
+        QnGlobalSettings::instance()->synchronizeNow();
         qnSettings->setLastUsedConnection(QnConnectionData());
-
-        storeConnection(QnAppServerConnectionFactory::url());
-
     }
 
-    hideMessageBox();
+    if (context()->user())
+    {
+        storeConnection(QnAppServerConnectionFactory::url());
+        hideMessageBox();
+    }
 
     //QnRouter::instance()->setEnforcedConnection(QnRoutePoint());
     QnClientMessageProcessor::instance()->init(NULL);

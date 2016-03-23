@@ -6,13 +6,17 @@ BaseTile
 {
     id: thisComponent;
 
+    standardColor: Style.colors.custom.systemTile.factorySystemBkg;
+    hoveredColor: Style.colors.custom.systemTile.factorySystemHovered;
+
     allowExpanding: false;
+
 
     centralAreaDelegate: Row
     {
         spacing: 4;
 
-        topPadding: 30; // Check me!
+        topPadding: 28; // Check me!
 
         Image
         {

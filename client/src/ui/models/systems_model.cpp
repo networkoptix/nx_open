@@ -18,7 +18,8 @@ namespace
         FirstRoleId = Qt::UserRole + 1
 
         , SystemNameRoleId = FirstRoleId
-        
+        , SystemIdRoleId
+
         , UserRoleId
         , LastPasswordRoleId
         
@@ -31,8 +32,6 @@ namespace
         , IsCorrectCustomizationRoleId
 
         // For local systems 
-        , HostRoleId
-        , HostsModelRoleId
         , LastPasswordsModelRoleId
 
         
@@ -44,6 +43,7 @@ namespace
     {
         RoleNames result;
         result.insert(SystemNameRoleId, "systemName");
+        result.insert(SystemIdRoleId, "systemId");
         result.insert(UserRoleId, "userName");
         result.insert(LastPasswordRoleId, "lastPassword");
         
@@ -55,8 +55,6 @@ namespace
         result.insert(IsCompatibleVersionRoleId, "isCompatibleVersion");
         result.insert(IsCorrectCustomizationRoleId, "isCorrectCustomization");
         
-        result.insert(HostRoleId, "host");
-        result.insert(HostsModelRoleId, "hostsModel");
         result.insert(LastPasswordsModelRoleId, "lastPasswordsModel");
 
         return result;
@@ -150,14 +148,6 @@ namespace
         };
         return lessPredicate;
     }
-
-    QStringList extractHosts(const QnSystemDescriptionPtr &system)
-    {
-        QStringList result;
-        for (const auto info: system->servers())
-            result.append(system->getServerHost(info.id));
-        return result;
-    }
 }
 
 ///
@@ -203,11 +193,6 @@ int QnSystemsModel::rowCount(const QModelIndex &parent) const
     return std::min(m_internalData.count(), m_maxCount);
 }
 
-QStringListModel *QnSystemsModel::createStringListModel(const QStringList &data) const
-{
-    return (new QStringListModel(data)); // TODO: remove me
-}
-
 QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid() || !qBetween<int>(FirstRoleId, role, RolesCount))
@@ -222,6 +207,8 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
     {
     case SystemNameRoleId:
         return systemDescription->name();
+    case SystemIdRoleId:
+        return systemDescription->id();
     case UserRoleId:
         return lit("Fake Admin <replace me>");
     case LastPasswordsModelRoleId:
@@ -238,14 +225,6 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
         return isCorrectCustomization(systemDescription);
     case IsCompatibleVersionRoleId:
         return isCompatibleVersion(systemDescription);
-    case HostRoleId:
-    {
-        const auto hosts = extractHosts(systemDescription);
-        return (hosts.isEmpty() ? QString() : hosts.front());
-    }
-    case HostsModelRoleId:
-        return QVariant::fromValue(createStringListModel(
-            extractHosts(systemDescription)));      // TODO: add handling of server discovery\lost
     default:
         return QVariant();
     }
@@ -353,6 +332,19 @@ QnSystemsModel::InternalList::iterator QnSystemsModel::getInternalDataIt(
     return (foundId == systemDescription->id() ? it : m_internalData.end());
 }
 
+void QnSystemsModel::serverAdded(const QnSystemDescriptionPtr &systemDescription
+    , const QnUuid &serverId)
+{
+    const auto dataIt = getInternalDataIt(systemDescription);
+    if (dataIt == m_internalData.end())
+        return;
+
+    const int row = (dataIt - m_internalData.begin());
+
+    const auto modelIndex = index(row);
+    dataChanged(modelIndex, modelIndex);
+}
+
 void QnSystemsModel::serverChanged(const QnSystemDescriptionPtr &systemDescription
     , const QnUuid &serverId
     , QnServerFields fields)
@@ -370,6 +362,6 @@ void QnSystemsModel::serverChanged(const QnSystemDescriptionPtr &systemDescripti
             emit dataChanged(modelIndex, modelIndex, QVector<int>(1, role));
     };
 
-    testFlag(QnServerField::HostField, HostsModelRoleId); // TODO: emit in model
     testFlag(QnServerField::FlagsField, IsFactorySystemRoleId);
+    testFlag(QnServerField::HostField, IsOnlineRoleId);
 }
