@@ -4,7 +4,6 @@
 #include <QtCore/QRegExp>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
-#include <QtWidgets/QMessageBox>
 
 #include <boost/algorithm/cxx11/any_of.hpp>
 

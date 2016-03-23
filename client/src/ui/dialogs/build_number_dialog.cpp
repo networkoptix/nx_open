@@ -1,7 +1,6 @@
 #include "build_number_dialog.h"
 #include "ui_build_number_dialog.h"
 
-#include <QtWidgets/QMessageBox>
 #include <QtWidgets/QPushButton>
 
 #include "utils/update/update_utils.h"

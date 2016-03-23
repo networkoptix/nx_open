@@ -2,7 +2,6 @@
 #include "ui_server_updates_widget.h"
 
 #include <QtGui/QDesktopServices>
-#include <QtWidgets/QMessageBox>
 #include <QtCore/QUrl>
 #include <QtCore/QUrlQuery>
 #include <QtCore/QTimer>

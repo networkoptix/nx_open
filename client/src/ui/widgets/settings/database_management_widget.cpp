@@ -1,7 +1,6 @@
 #include "database_management_widget.h"
 #include "ui_database_management_widget.h"
 
-#include <QtWidgets/QMessageBox>
 #include <QtCore/QFileInfo>
 
 #include <nx/utils/log/log.h>

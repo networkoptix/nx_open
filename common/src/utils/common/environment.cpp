@@ -7,9 +7,6 @@
 #include <QtCore/QDir>
 #include <QtCore/QUrl>
 #include <QtGui/QDesktopServices>
-#if defined(Q_OS_WIN)
-#include <QtWidgets/QMessageBox>
-#endif
 
 #include <utils/common/string.h>
 #include <utils/mac_utils.h>
@@ -55,7 +52,7 @@ void QnEnvironment::showInGraphicalShell(QWidget *parent, const QString &path) {
 #if defined(Q_OS_WIN)
     const QString explorer = searchInPath(QLatin1String("explorer.exe"));
     if (explorer.isEmpty()) {
-        QMessageBox::warning(parent,
+        QnMessageBox::warning(parent,
             tr("File explorer failed to open."),
             tr("Could not find explorer.exe in path to launch Windows Explorer."));
         return;

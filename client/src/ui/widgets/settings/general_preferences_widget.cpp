@@ -4,7 +4,6 @@
 #include <QtCore/QDir>
 #include <QtCore/QStandardPaths>
 #include <QtGui/QDesktopServices>
-#include <QtWidgets/QMessageBox>
 
 #include <client/client_settings.h>
 #include <client/client_globals.h>

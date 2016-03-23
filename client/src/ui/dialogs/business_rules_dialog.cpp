@@ -3,7 +3,6 @@
 
 #include <QtCore/QEvent>
 
-#include <QtWidgets/QMessageBox>
 #include <QtWidgets/QStyledItemDelegate>
 #include <QtWidgets/QItemEditorFactory>
 #include <QtWidgets/QComboBox>

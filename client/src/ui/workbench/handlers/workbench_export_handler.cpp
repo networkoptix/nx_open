@@ -1,6 +1,5 @@
 #include "workbench_export_handler.h"
 
-#include <QtWidgets/QMessageBox>
 #include <QtWidgets/QComboBox>
 
 #include <client/client_settings.h>

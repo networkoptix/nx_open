@@ -7,7 +7,6 @@
 
 #include <QtWidgets/QAction>
 #include <QtWidgets/QComboBox>
-#include <QtWidgets/QMessageBox>
 
 #include <camera/cam_display.h>
 #include <camera/single_thumbnail_loader.h>
