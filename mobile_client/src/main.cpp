@@ -17,8 +17,9 @@
 #include "nx/utils/log/log.h"
 #include "utils/settings_migration.h"
 
-#include "context/context.h"
-#include "mobile_client/mobile_client_module.h"
+#include <context/context.h>
+#include <mobile_client/mobile_client_module.h>
+#include <mobile_client/mobile_client_settings.h>
 
 #include "ui/color_theme.h"
 #include "ui/resolution_util.h"
@@ -43,9 +44,6 @@
 #include <QtGui/QOpenGLContext>
 #include <QtGui/QOpenGLFunctions>
 #include "resource_allocator.h"
-
-
-#include "version.h"
 
 void initDecoders(QQuickWindow *window)
 {
@@ -80,8 +78,17 @@ int runUi(QGuiApplication *application) {
     QnResolutionUtil::DensityClass densityClass = QnResolutionUtil::instance()->densityClass();
     qDebug() << "Starting with density class: " << QnResolutionUtil::densityName(densityClass);
 
+    QStringList selectors;
+    selectors.append(QnResolutionUtil::densityName(densityClass));
+
+    if (context.liteMode())
+    {
+        selectors.append(lit("lite"));
+        qWarning() << "Starting in lite mode";
+    }
+
     QFileSelector fileSelector;
-    fileSelector.setExtraSelectors(QStringList() << QnResolutionUtil::densityName(densityClass));
+    fileSelector.setExtraSelectors(selectors);
 
     QnIconProvider *iconProvider = new QnIconProvider(&fileSelector);
 
@@ -112,9 +119,17 @@ int runUi(QGuiApplication *application) {
     QScopedPointer<QnTextureSizeHelper> textureSizeHelper(new QnTextureSizeHelper(mainWindow.data()));
 
 #if !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
-    if (mainWindow) {
-        mainWindow->setWidth(480);
-        mainWindow->setHeight(800);
+    if (mainWindow)
+    {
+        if (context.liteMode())
+        {
+            mainWindow->showFullScreen();
+        }
+        else
+        {
+            mainWindow->setWidth(800);
+            mainWindow->setHeight(600);
+        }
     }
 #endif
 

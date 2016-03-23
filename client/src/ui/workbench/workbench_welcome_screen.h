@@ -6,9 +6,6 @@
 #include <utils/common/connective.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/style/generic_palette.h>
-
-class QQuickView;
-class QnLoginDialog;
 class QnCloudStatusWatcher;
 
 class QnWorkbenchWelcomeScreen : public Connective<QObject>
@@ -18,10 +15,11 @@ class QnWorkbenchWelcomeScreen : public Connective<QObject>
     typedef Connective<QObject> base_type;
     
     Q_PROPERTY(bool isVisible READ isVisible WRITE setVisible NOTIFY visibleChanged)
-    Q_PROPERTY(bool isEnabled READ isEnabled WRITE setEnabled NOTIFY enabledChanged);
     
     Q_PROPERTY(QString cloudUserName READ cloudUserName NOTIFY cloudUserNameChanged);
     Q_PROPERTY(bool isLoggedInToCloud READ isLoggedInToCloud NOTIFY isLoggedInToCloudChanged)
+
+    Q_PROPERTY(QSize pageSize READ pageSize WRITE setPageSize NOTIFY pageSizeChanged);
 
 public:
     QnWorkbenchWelcomeScreen(QObject *parent);
@@ -35,15 +33,16 @@ public: // Properties
 
     void setVisible(bool isVisible);
 
-    bool isEnabled() const;
-
-    void setEnabled(bool isEnabled);
-
     QString cloudUserName() const;
 
     bool isLoggedInToCloud() const;
 
+    QSize pageSize() const;
+
+    void setPageSize(const QSize &size);
+
 public slots:
+    // TODO: $ynikitenkov add multiple urls one-by-one  handling
     void connectToLocalSystem(const QString &serverUrl
         , const QString &userName
         , const QString &password);
@@ -51,6 +50,8 @@ public slots:
     void connectToCloudSystem(const QString &serverUrl);
 
     void connectToAnotherSystem();
+
+    void setupFactorySystem(const QString &serverUrl);
 
     void logoutFromCloud();
 
@@ -77,30 +78,31 @@ public slots:
 
 signals:
     void visibleChanged();
-    
-    void enabledChanged();
 
     void cloudUserNameChanged();
 
     void isLoggedInToCloudChanged();
 
+    void pageSizeChanged();
+
 private:
     void showScreen();
 
     void enableScreen();
-
+    
+private: // overrides
+    bool eventFilter(QObject *obj
+        , QEvent *event) override;
 
 private:
     typedef QPointer<QWidget> WidgetPtr;
-    typedef QPointer<QnLoginDialog> LoginDialogPtr;
     typedef QPointer<QnCloudStatusWatcher> CloudStatusWatcherPtr;
     
     const CloudStatusWatcherPtr m_cloudWatcher;
     const QnGenericPalette m_palette;
     const WidgetPtr m_widget;
+    QSize m_pageSize;
     
-    LoginDialogPtr m_loginDialog;
-
     bool m_visible;
     bool m_enabled;
 };

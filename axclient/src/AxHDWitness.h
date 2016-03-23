@@ -1,10 +1,10 @@
 #pragma once
 
-#include "version.h"
-
 #include <QtCore/QScopedPointer>
 
 #include <ActiveQt/QAxBindable>
+
+#include <axclient/axclient_app_info.h>
 
 class QnAxClientModule;
 class QnAxClientWindow;

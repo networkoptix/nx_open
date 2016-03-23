@@ -28,8 +28,6 @@
 #include "settings.h"
 #include "stree/cdb_ns.h"
 #include "temporary_account_password_manager.h"
-#include "version.h"
-
 
 namespace nx {
 namespace cdb {
@@ -81,7 +79,7 @@ void AccountManager::authenticateByName(
         }
     }
 
-    //NOTE currently, all authenticateByName are sync. 
+    //NOTE currently, all authenticateByName are sync.
     //  Changing it to async requires some HTTP authentication refactoring
 
     //authenticating by temporary password
@@ -135,7 +133,7 @@ void AccountManager::addAccount(
     m_dbManager->executeUpdate<data::AccountData, data::AccountConfirmationCode>(
         std::bind(&AccountManager::insertAccount, this, _1, _2, _3),
         std::move(accountData),
-        std::bind(&AccountManager::accountAdded, this, 
+        std::bind(&AccountManager::accountAdded, this,
                     m_startedAsyncCallsCounter.getScopedIncrement(),
                     requestSourceSecured,
                     _1, _2, _3, std::move(completionHandler)) );
@@ -359,7 +357,7 @@ db::DBResult AccountManager::insertAccount(
 
     //inserting account
     QSqlQuery insertAccountQuery( *connection );
-    insertAccountQuery.prepare( 
+    insertAccountQuery.prepare(
         "INSERT INTO account (id, email, password_ha1, full_name, customization, status_code) "
                     "VALUES  (:id, :email, :passwordHa1, :fullName, :customization, :statusCode)");
     QnSql::bind( accountData, &insertAccountQuery );
@@ -402,7 +400,7 @@ db::DBResult AccountManager::issueAccountActivationCode(
     if (fetchActivationCodesQuery.next())
     {
         //returning existing verification code
-        resultData->code = 
+        resultData->code =
             fetchActivationCodesQuery.
                 value(lit("verification_code")).toString().toStdString();
     }
@@ -411,7 +409,7 @@ db::DBResult AccountManager::issueAccountActivationCode(
         //inserting email verification code
         const auto emailVerificationCode = QnUuid::createUuid().toByteArray().toHex();
         QSqlQuery insertEmailVerificationQuery( *connection );
-        insertEmailVerificationQuery.prepare( 
+        insertEmailVerificationQuery.prepare(
             "INSERT INTO email_verification( account_id, verification_code, expiration_date ) "
                                    "VALUES ( (SELECT id FROM account WHERE email=?), ?, ? )" );
         insertEmailVerificationQuery.bindValue(
@@ -514,7 +512,7 @@ nx::db::DBResult AccountManager::verifyAccount(
         getAccountByVerificationCode.value(0)).toStdString();
 
     QSqlQuery removeVerificationCode( *connection );
-    removeVerificationCode.prepare( 
+    removeVerificationCode.prepare(
         "DELETE FROM email_verification WHERE verification_code LIKE :code" );
     QnSql::bind( verificationCode, &removeVerificationCode );
     if( !removeVerificationCode.exec() )
@@ -526,7 +524,7 @@ nx::db::DBResult AccountManager::verifyAccount(
     }
 
     QSqlQuery updateAccountStatus( *connection );
-    updateAccountStatus.prepare( 
+    updateAccountStatus.prepare(
         "UPDATE account SET status_code = ? WHERE email = ?" );
     updateAccountStatus.bindValue( 0, static_cast<int>(api::AccountStatus::activated) );
     updateAccountStatus.bindValue( 1, QnSql::serialized_field(accountEmail) );
@@ -573,7 +571,7 @@ nx::db::DBResult AccountManager::updateAccountInDB(
     NX_ASSERT(static_cast<bool>(accountData.passwordHa1) ||
            static_cast<bool>(accountData.fullName) ||
            static_cast<bool>(accountData.customization));
-    
+
     QSqlQuery updateAccountQuery( *connection );
     QStringList accountUpdateFieldsSql;
     if (accountData.passwordHa1)
@@ -613,7 +611,7 @@ nx::db::DBResult AccountManager::updateAccountInDB(
             arg(connection->lastError().text()), cl_logDEBUG1);
         return db::DBResult::ioError;
     }
-    
+
     return db::DBResult::ok;
 }
 
@@ -639,7 +637,7 @@ void AccountManager::accountUpdated(
                     account.statusCode = api::AccountStatus::activated;
             });
     }
-    
+
     completionHandler(fromDbResultCode(resultCode));
 }
 

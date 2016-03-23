@@ -4,13 +4,16 @@
 
 #include <ui/widgets/settings/abstract_preferences_widget.h>
 
-namespace Ui {
+namespace Ui
+{
     class SystemSettingsWidget;
 }
 
-class QnSystemSettingsWidget: public QnAbstractPreferencesWidget {
+class QnSystemSettingsWidget: public QnAbstractPreferencesWidget
+{
     Q_OBJECT
 
+    typedef QnAbstractPreferencesWidget base_type;
 public:
     QnSystemSettingsWidget(QWidget *parent = NULL);
     virtual ~QnSystemSettingsWidget();
@@ -23,6 +26,7 @@ public:
 
 protected:
     virtual void setReadOnlyInternal(bool readOnly) override;
+
 private:
     QScopedPointer<Ui::SystemSettingsWidget> ui;
 };

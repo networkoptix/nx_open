@@ -28,7 +28,6 @@
 #include <ui/graphics/items/overlays/buttons_overlay.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/opengl/gl_context_data.h>
-#include <ui/graphics/painters/radial_gradient_painter.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_context.h>
@@ -202,16 +201,6 @@ namespace {
             return first.deviceType > second.deviceType;
         return first.description.toLower() > second.description.toLower();
     }
-
-    class QnBackgroundGradientPainterFactory {
-    public:
-        QnRadialGradientPainter *operator()(const QGLContext *context) {
-            return new QnRadialGradientPainter(32, QColor(255, 255, 255, 255), QColor(255, 255, 255, 0), context);
-        }
-    };
-
-    typedef QnGlContextData<QnRadialGradientPainter, QnBackgroundGradientPainterFactory> QnBackgroundGradientPainterStorage;
-    Q_GLOBAL_STATIC(QnBackgroundGradientPainterStorage, qn_serverResourceWidget_backgroundGradientPainterStorage)
 
     const int legendImageSize = 20;
     const int legendFontSize = 20;

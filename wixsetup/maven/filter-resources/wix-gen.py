@@ -8,7 +8,7 @@ properties_dir='${root.dir}/wixsetup/${arch}'
 #    os.makedirs(properties_dir)
 #os.system("echo ${install.type}=${finalName}.msi >> %s/installer.properties " % properties_dir)
 
-generated_items = ['vs2015crt', 'clientqml', 'dbsync', 'help', 'vox', 'bg']
+generated_items = ['vs2015crt', 'qml', 'dbsync', 'help', 'vox', 'bg']
 
 if '${nxtool}' == 'true':
     generated_items += ['qtquickcontrols']

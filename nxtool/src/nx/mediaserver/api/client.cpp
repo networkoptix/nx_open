@@ -52,7 +52,7 @@ const QString kSysInfoTag = "systemInformation";
 const QString kCustomizationTag = "customization";
 
 const QString kUserAgent = QString("%1/%2")
-    .arg(QLatin1String(QN_APPLICATION_DISPLAY_NAME), 
+    .arg(QLatin1String(QN_APPLICATION_DISPLAY_NAME),
         QLatin1String(QN_APPLICATION_VERSION));
 
 const QString kAdminUserName = QStringLiteral("admin");

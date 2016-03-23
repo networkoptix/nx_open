@@ -6,6 +6,7 @@ import "../main.js" as Main
 import "../controls"
 
 Rectangle {
+    id: sessionItem
 
     property string systemName
     property string host
@@ -17,13 +18,9 @@ Rectangle {
     color: isCompatible ? QnTheme.sessionItemBackground : QnTheme.sessionItemBackgroundIncompatible
     radius: dp(2)
 
-    QnMaterialSurface {
-        onClicked: {
-            if (isCompatible)
-                Main.openDiscoveredSession(host, port, systemName)
-            else
-                oldClientOfferDialog.show()
-        }
+    QnMaterialSurface
+    {
+        onClicked: sessionItem.open()
     }
 
     Column {
@@ -69,5 +66,13 @@ Rectangle {
             verticalAlignment: Text.AlignVCenter
             visible: !isCompatible
         }
+    }
+
+    function open()
+    {
+        if (isCompatible)
+            Main.openDiscoveredSession(host, port, systemName)
+        else
+            oldClientOfferDialog.show()
     }
 }

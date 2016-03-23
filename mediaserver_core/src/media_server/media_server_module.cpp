@@ -7,7 +7,6 @@
 #include <soap/soapserver.h>
 #endif
 
-#include "version.h"
 #include "server/server_globals.h"
 
 #include <nx/network/socket_global.h>

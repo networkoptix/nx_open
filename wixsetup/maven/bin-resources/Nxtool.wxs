@@ -81,9 +81,19 @@
             </Component>
             <Component>            
                 <File Id="NxtoolQt5Widgets$(var.suffix).dll" Name="Qt5Widgets$(var.suffix).dll" Source="$(var.NxtoolSourceDir)\Qt5Widgets$(var.suffix).dll" DiskId="1"  />
-            </Component>             
+            </Component>         
+            <Component>
+                <File Id="nxtoolicudt53.dll" Name="icudt53.dll" Source="$(var.SourceDir)\icudt53.dll"  />                
+            </Component>                 
+            <Component>
+                <File Id="nxtoolicuin53.dll" Name="icuin53.dll" Source="$(var.SourceDir)\icuin53.dll"  />                
+            </Component>                 
+            <Component>
+                <File Id="nxtoolicuuc53.dll" Name="icuuc53.dll" Source="$(var.SourceDir)\icuuc53.dll"  />                
+            </Component>          
         </ComponentGroup>
-       
+        
+        <!-- BEGIN May be deleted when windeployqt works -->
         <ComponentGroup Id="QtQuickDialogsFiles" Directory="QtQuickDialogs">
             <Component>
                 <File Id="dialogplugin$(var.suffix).dll" Name="dialogplugin$(var.suffix).dll" Source="$(var.NxtoolSourceDir)\qml\QtQuick\Dialogs\dialogplugin$(var.suffix).dll" DiskId="1"/>
@@ -119,7 +129,11 @@
                 <File Id="qtquick2plugin_qmldir" Name="qmldir" Source="$(var.NxtoolSourceDir)\qml\QtQuick.2\qmldir" DiskId="1"/>
             </Component>          
         </ComponentGroup>           
+        <!-- END May be deleted when windeployqt works -->
         
+        <!-- Add this when windeployqt works -->
+        <!-- <Directory Id="NxtoolQml" Name="qml" /> -->
+                
         <ComponentGroup Id="Platforms" Directory="Platforms">
             <Component>
                 <File Id="qwindows$(var.suffix).dll" Name="qwindows.dll" Source="$(var.NxtoolSourceDir)\platforms\qwindows$(var.suffix).dll" DiskId="1" />

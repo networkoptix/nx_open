@@ -211,7 +211,6 @@ namespace
 static void initFestival()
 {
     //initializing festival engine
-    //sprintf( festivalVoxPath, "%s/festival.vox/lib/", QN_BUILDENV_PATH );
 #ifndef Q_OS_MAC
     sprintf( festivalVoxPath, "%s/vox/", QCoreApplication::applicationDirPath().toLatin1().constData() );
 #else

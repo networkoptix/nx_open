@@ -14,7 +14,8 @@
 #include <nx_ec/data/api_resource_data.h>
 
 
-namespace {
+namespace
+{
     QSet<QString> parseDisabledVendors(QString disabledVendors) {
         QStringList disabledVendorList;
         if (disabledVendors.contains(lit(";")))
@@ -89,6 +90,7 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
         << initLdapAdaptors()
         << initStaticticsAdaptors()
         << initConnectionAdaptors()
+        << initCloudAdaptors()
         << initMiscAdaptors()
         ;
 
@@ -207,11 +209,11 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initConnectionAdaptors()
         kEc2AliveUpdateIntervalDefault,
         this);
     ec2Adaptors << m_ec2AliveUpdateIntervalAdaptor;
-    m_serverDiscoveryPingTimeout = new QnLexicalResourcePropertyAdaptor<int>(
+    m_serverDiscoveryPingTimeoutAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         kServerDiscoveryPingTimeout,
         kServerDiscoveryPingTimeoutDefault,
         this);
-    ec2Adaptors << m_serverDiscoveryPingTimeout;
+    ec2Adaptors << m_serverDiscoveryPingTimeoutAdaptor;
     m_timeSynchronizationEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         kNameTimeSynchronizationEnabled,
         true,
@@ -227,6 +229,25 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initConnectionAdaptors()
     return ec2Adaptors;
 }
 
+QnGlobalSettings::AdaptorList QnGlobalSettings::initCloudAdaptors()
+{
+    m_cloudAccountNameAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameCloudAccountName, QString(), this);
+    m_cloudSystemIDAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameCloudSystemID, QString(), this);
+    m_cloudAuthKeyAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameCloudAuthKey, QString(), this);
+
+    QnGlobalSettings::AdaptorList result;
+    result
+        << m_cloudAccountNameAdaptor
+        << m_cloudSystemIDAdaptor
+        << m_cloudAuthKeyAdaptor
+        ;
+
+    for (QnAbstractResourcePropertyAdaptor* adaptor : result)
+        connect(adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged, this, &QnGlobalSettings::cloudSettingsChanged, Qt::QueuedConnection);
+
+    return result;
+}
+
 QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
 {
     m_disabledVendorsAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameDisabledVendors, QString(), this);
@@ -239,7 +260,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
 	m_crossdomainXmlEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameCrossdomainEnabled, true, this);
     m_upnpPortMappingEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameUpnpPortMappingEnabled, true, this);
 
-    m_arecontRtspEnabled = new QnLexicalResourcePropertyAdaptor<bool>(
+    m_arecontRtspEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         kArecontRtspEnabled,
         kArecontRtspEnabledDefault,
         this);
@@ -262,7 +283,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_backupNewCamerasByDefaultAdaptor
 		<< m_crossdomainXmlEnabledAdaptor
         << m_upnpPortMappingEnabledAdaptor
-        << m_arecontRtspEnabled
+        << m_arecontRtspEnabledAdaptor
         ;
 
     return result;
@@ -545,12 +566,12 @@ void QnGlobalSettings::setAliveUpdateInterval(std::chrono::seconds newInterval) 
 
 std::chrono::seconds QnGlobalSettings::serverDiscoveryPingTimeout() const
 {
-    return std::chrono::seconds(m_serverDiscoveryPingTimeout->value());
+    return std::chrono::seconds(m_serverDiscoveryPingTimeoutAdaptor->value());
 }
 
 void QnGlobalSettings::setServerDiscoveryPingTimeout(std::chrono::seconds newInterval) const
 {
-    m_serverDiscoveryPingTimeout->setValue(newInterval.count());
+    m_serverDiscoveryPingTimeoutAdaptor->setValue(newInterval.count());
 }
 
 std::chrono::seconds QnGlobalSettings::serverDiscoveryAliveCheckTimeout() const
@@ -562,14 +583,57 @@ bool QnGlobalSettings::isTimeSynchronizationEnabled() const {
     return m_timeSynchronizationEnabledAdaptor->value();
 }
 
+const QString QnGlobalSettings::kNameCloudAccountName(lit("cloudAccountName"));
+
+QString QnGlobalSettings::cloudAccountName() const
+{
+    return m_cloudAccountNameAdaptor->value();
+}
+
+void QnGlobalSettings::setCloudAccountName(const QString& value)
+{
+    m_cloudAccountNameAdaptor->setValue(value);
+}
+
+const QString QnGlobalSettings::kNameCloudSystemID(lit("cloudSystemID"));
+
+QString QnGlobalSettings::cloudSystemID() const
+{
+    return m_cloudSystemIDAdaptor->value();
+}
+
+void QnGlobalSettings::setCloudSystemID(const QString& value)
+{
+    m_cloudSystemIDAdaptor->setValue(value);
+}
+
+const QString QnGlobalSettings::kNameCloudAuthKey(lit("cloudAuthKey"));
+
+QString QnGlobalSettings::cloudAuthKey() const
+{
+    return m_cloudAuthKeyAdaptor->value();
+}
+
+void QnGlobalSettings::setCloudAuthKey(const QString& value)
+{
+    m_cloudAuthKeyAdaptor->setValue(value);
+}
+
+void QnGlobalSettings::resetCloudParams()
+{
+    setCloudAccountName(QString());
+    setCloudSystemID(QString());
+    setCloudAuthKey(QString());
+}
+
 bool QnGlobalSettings::arecontRtspEnabled() const
 {
-    return m_arecontRtspEnabled->value();
+    return m_arecontRtspEnabledAdaptor->value();
 }
 
 void QnGlobalSettings::setArecontRtspEnabled(bool newVal) const
 {
-    m_arecontRtspEnabled->setValue(newVal);
+    m_arecontRtspEnabledAdaptor->setValue(newVal);
 }
 
 const QList<QnAbstractResourcePropertyAdaptor*>& QnGlobalSettings::allSettings() const

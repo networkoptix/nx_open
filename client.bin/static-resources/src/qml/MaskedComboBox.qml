@@ -9,7 +9,7 @@ MaskedItem
     property string comboBoxTextRole: "display";
     property bool isEditableComboBox: false;
 
-    maskedAreaDelegate: ComboBox
+    maskedAreaDelegate: NxComboBox
     {
         id: comboBox;
 

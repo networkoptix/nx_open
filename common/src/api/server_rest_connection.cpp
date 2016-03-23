@@ -88,7 +88,7 @@ Handle ServerConnection::saveCloudSystemCredentials(
     data.cloudSystemID = cloudSystemID;
     data.cloudAuthKey = cloudAuthKey;
     data.cloudAccountName = cloudAccountName;
-    
+
     return executePost(
         lit("/api/saveCloudSystemCredentials"),
         QnRequestParamList(),

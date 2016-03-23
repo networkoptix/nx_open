@@ -8,7 +8,7 @@
 #include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 
-namespace 
+namespace
 {
     static const QString kSystemNameParamName(QLatin1String("systemName"));
 }
@@ -36,11 +36,13 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 
 int QnSetupCloudSystemRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*)
 {
+    Q_UNUSED(path);
     return execute(std::move(SetupRemoveSystemData(params)), result);
 }
 
 int QnSetupCloudSystemRestHandler::executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor*)
 {
+    QN_UNUSED(path, params);
     const SetupRemoveSystemData data = QJson::deserialized<SetupRemoveSystemData>(body);
     return execute(std::move(data), result);
 }
@@ -62,7 +64,7 @@ int QnSetupCloudSystemRestHandler::execute(SetupRemoveSystemData data, QnJsonRes
         return nx_http::StatusCode::ok;
     }
 
-    if (!qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID())) 
+    if (!qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID()))
     {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("Cannot find self server resource."));
         return nx_http::StatusCode::ok;

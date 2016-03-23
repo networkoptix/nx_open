@@ -25,6 +25,14 @@ function findRootChild(item, objectName) {
     return null
 }
 
+function isItemParentedBy(item, parent)
+{
+    var p = item.parent
+    while (p && p != parent)
+        p = p.parent
+    return p == parent
+}
+
 function isMobile() {
     return Qt.platform.os == "android" || Qt.platform.os == "ios" || Qt.platform.os == "winphone" || Qt.platform.os == "blackberry"
 }
@@ -185,15 +193,26 @@ function openSettings() {
     stackView.push(settingsPageComponent)
 }
 
-function backPressed() {
-    if (sideNavigation.open) {
+function backPressed()
+{
+    if (sideNavigation.open)
+    {
         sideNavigation.hide()
         return true
-    } else if (stackView.depth == 2 && stackView.currentItem.objectName == "newConnectionPage") {
+    }
+    else if (stackView.depth == 2 && stackView.currentItem.objectName == "newConnectionPage")
+    {
         // First stack item is always resources page.
         return false
-    } else if (stackView.depth >= 2) {
+    }
+    else if (stackView.depth >= 2)
+    {
         gotoMainScreen()
+        return true
+    }
+    else if (liteMode)
+    {
+        gotoNewSession()
         return true
     }
 
@@ -204,8 +223,26 @@ function keyIsBack(key) {
     if (key === Qt.Key_Back)
         return true
 
-//    if (key === Qt.Key_Backspace)
-//        return true
+    if (liteMode)
+    {
+        if (key == Qt.Key_Escape)
+            return true
+    }
 
     return false
+}
+
+function focusNextItem(item, forward)
+{
+    if (forward == undefined)
+        forward = true
+
+    var next = item.nextItemInFocusChain(forward)
+    if (next)
+        next.forceActiveFocus()
+}
+
+function focusPrevItem(item)
+{
+    focusNextItem(item, false)
 }

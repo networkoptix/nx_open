@@ -25,9 +25,9 @@ public:
     QPalette originalPalette;
 };
 
-QnCloudStatusPanel::QnCloudStatusPanel(QnWorkbenchContext *context, QWidget *parent)
+QnCloudStatusPanel::QnCloudStatusPanel(QWidget *parent)
     : base_type(parent)
-    , QnWorkbenchContextAware(context)
+    , QnWorkbenchContextAware(parent)
     , d_ptr(new QnCloudStatusPanelPrivate(this))
 {
     Q_D(QnCloudStatusPanel);
