@@ -136,37 +136,38 @@ QnPage {
             onClicked: Main.gotoMainScreen()
         }
 
-        QnIconButton {
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.right: parent.right
-            anchors.rightMargin: dp(8)
-            icon: "image://icon/more_vert.png"
-            onClicked: {
-                cameraMenu.updateGeometry(this)
-                cameraMenu.show()
-            }
-        }
+        // TODO: #dklychkov enable if we need the menu
+//        QnIconButton {
+//            anchors.verticalCenter: parent.verticalCenter
+//            anchors.right: parent.right
+//            anchors.rightMargin: dp(8)
+//            icon: "image://icon/more_vert.png"
+//            onClicked: {
+//                cameraMenu.updateGeometry(this)
+//                cameraMenu.show()
+//            }
+//        }
     }
 
-    QnCameraMenu {
-        id: cameraMenu
-        currentQuality: resourceHelper.resolution
-        onSelectQuality: qualityDialog.show()
-    }
+//    QnCameraMenu {
+//        id: cameraMenu
+//        currentQuality: resourceHelper.resolution
+//        onSelectQuality: qualityDialog.show()
+//    }
 
-    QnQualityDialog {
-        id: qualityDialog
-        resolutionList: resourceHelper.resolutions
-        currentResolution: resourceHelper.resolution
-        onQualityPicked: {
-            player.pause()
-            resourceHelper.resolution = resolution
-            player.seek(player.position)
-            if (!d.videoNavigation.paused)
-                player.play()
-        }
-        onHidden: videoPage.forceActiveFocus()
-    }
+//    QnQualityDialog {
+//        id: qualityDialog
+//        resolutionList: resourceHelper.resolutions
+//        currentResolution: resourceHelper.resolution
+//        onQualityPicked: {
+//            player.pause()
+//            resourceHelper.resolution = resolution
+//            player.seek(player.position)
+//            if (!d.videoNavigation.paused)
+//                player.play()
+//        }
+//        onHidden: videoPage.forceActiveFocus()
+//    }
 
     QnScalableVideo {
         id: video
