@@ -193,10 +193,13 @@ void MediatorProcess::initializeLogging(const conf::Settings& settings)
 
         QDir().mkpath(logDir);
         const QString& logFileName = logDir + lit("/log_file");
-        if (cl_log.create(logFileName, 1024 * 1024 * 10, 5, cl_logDEBUG1))
-            QnLog::initLog(settings.logging().logLevel);
-        else
-            std::wcerr << L"Failed to create log file " << logFileName.toStdWString() << std::endl;
+        if (!cl_log.create(logFileName, 1024 * 1024 * 10, 5, cl_logDEBUG1))
+        {
+            std::wcerr << L"Failed to create log file "
+                       << logFileName.toStdWString() << std::endl;
+        }
+
+        QnLog::initLog(settings.logging().logLevel);
         NX_LOG(lit("================================================================================="), cl_logALWAYS);
         NX_LOG(lit("%1 started").arg(QN_APPLICATION_NAME), cl_logALWAYS);
         NX_LOG(lit("Software version: %1").arg(QN_APPLICATION_VERSION), cl_logALWAYS);

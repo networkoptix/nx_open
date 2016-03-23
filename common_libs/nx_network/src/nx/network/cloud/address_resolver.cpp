@@ -146,7 +146,7 @@ void AddressResolver::resolveDomain(
             nx::hpm::api::ResultCode resultCode,
             nx::hpm::api::ResolveDomainResponse response)
         {
-            NX_LOGX(lm("Domain %1 resolution on mediator result: %1")
+            NX_LOGX(lm("Domain %1 resolution on mediator result: %2")
                 .arg(domain.toString()).arg(QnLexical::serialized(resultCode)),
                 cl_logDEBUG2);
 

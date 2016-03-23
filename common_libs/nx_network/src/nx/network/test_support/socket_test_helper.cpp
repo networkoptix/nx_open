@@ -163,6 +163,9 @@ void TestConnection::onConnected( int id, SystemError::ErrorCode errorCode )
 
     if( errorCode != SystemError::noError )
     {
+        NX_LOGX(lm("accepted %1. Receive error: %2")
+            .arg(m_accepted).arg(SystemError::toString(errorCode)), cl_logWARNING);
+
         if (!m_finishedEventHandler)
             return;
         auto handler = std::move( m_finishedEventHandler );
@@ -204,7 +207,7 @@ void TestConnection::onDataReceived(
     else
     {
         NX_LOGX(lm("accepted %1. Receive error: %2")
-            .arg(m_accepted).arg(SystemError::toString(errorCode)), cl_logDEBUG1);
+            .arg(m_accepted).arg(SystemError::toString(errorCode)), cl_logWARNING);
     }
 
     if( (errorCode != SystemError::noError && errorCode != SystemError::timedOut) ||
@@ -226,7 +229,7 @@ void TestConnection::onDataReceived(
         if (!m_finishedEventHandler)
             return;
         auto handler = std::move(m_finishedEventHandler);
-        return handler(id, this, SystemError::getLastOSErrorCode());
+        return handler(id, this, errorCode);
     }
 
     using namespace std::placeholders;
@@ -241,7 +244,7 @@ void TestConnection::onDataSent( int id, SystemError::ErrorCode errorCode, size_
     {
         NX_LOGX(lm("accepted %1. Send error: %2")
             .arg(m_accepted).arg(SystemError::toString(errorCode)),
-            cl_logDEBUG1);
+            cl_logWARNING);
     }
 
     if( errorCode != SystemError::noError && errorCode != SystemError::timedOut )
@@ -259,7 +262,7 @@ void TestConnection::onDataSent( int id, SystemError::ErrorCode errorCode, size_
         if (!m_finishedEventHandler)
             return;
         auto handler = std::move( m_finishedEventHandler );
-        return handler(id, this, SystemError::getLastOSErrorCode());
+        return handler(id, this, errorCode);
     }
 
     using namespace std::placeholders;

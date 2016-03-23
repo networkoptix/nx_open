@@ -123,18 +123,21 @@ void UdpHolePunchingTunnelAcceptor::connectionAckResult(
 
 void UdpHolePunchingTunnelAcceptor::initiateUdtConnection()
 {
-    NX_LOGX(lm("Initiate rendevous UDT connection from %1 to %2")
+    NX_LOGX(lm("Initiate rendevous UDT connection from %1 to %2, "
+        "connectionId=%3, remotePeerId=%4")
         .arg(m_udtConnectionSocket->getLocalAddress().toString())
-        .arg(m_peerAddress.toString()), cl_logDEBUG2);
+        .arg(m_peerAddress.toString())
+        .arg(m_connectionId).arg(m_remotePeerId), cl_logDEBUG2);
 
     m_udtConnectionSocket->connectAsync(
         m_peerAddress,
         [this](SystemError::ErrorCode code)
         {
-            NX_LOGX(lm("Randevous UDT connection from %1 to %2 result: %3")
+            NX_LOGX(lm("Randevous UDT connection from %1 to %2 result: %3, "
+                "connectionId=%4, remotePeerId=%5")
                 .arg(m_udtConnectionSocket->getLocalAddress().toString())
-                .arg(m_peerAddress.toString())
-                .arg(SystemError::toString(code)), cl_logDEBUG1);
+                .arg(m_peerAddress.toString()).arg(SystemError::toString(code))
+                .arg(m_connectionId).arg(m_remotePeerId), cl_logDEBUG1);
 
             if (code != SystemError::noError)
                 return executeAcceptHandler(code);

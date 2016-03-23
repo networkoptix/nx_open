@@ -72,11 +72,6 @@ void UdpHolePunchingTunnelConnector::connect(
         SystemError::ErrorCode errorCode,
         std::unique_ptr<AbstractOutgoingTunnelConnection>)> handler)
 {
-    NX_LOGX(lm("session %1. connecting to %2 with timeout %3")
-        .arg(m_connectSessionId).arg(m_targetHostAddress.host.toString())
-        .arg(timeout),
-        cl_logDEBUG2);
-
     if (!m_mediatorUdpClient->socket()->setReuseAddrFlag(true) ||
         !m_mediatorUdpClient->socket()->bind(
             SocketAddress(HostAddress::anyHost, 0)))
@@ -92,6 +87,11 @@ void UdpHolePunchingTunnelConnector::connect(
             });
         return;
     }
+
+    NX_LOGX(lm("session %1. connecting to %2 with timeout %3, from local port %4")
+        .arg(m_connectSessionId).arg(m_targetHostAddress.host.toString())
+        .arg(timeout).arg(m_mediatorUdpClient->socket()->getLocalAddress().port),
+        cl_logDEBUG2);
 
     if (timeout > std::chrono::milliseconds::zero())
     {
@@ -256,7 +256,9 @@ void UdpHolePunchingTunnelConnector::onUdtConnectionEstablished(
     }
     
     //success!
-    NX_LOGX(lm("session %2. Udp hole punching is a success!"), cl_logDEBUG2);
+    NX_LOGX(lm("session %1. Udp hole punching to %2 is a success!")
+        .arg(m_connectSessionId).arg(m_targetHostUdpAddress->toString()),
+         cl_logDEBUG2);
 
     //introducing delay to give server some time to call accept
     m_timer.cancelSync();

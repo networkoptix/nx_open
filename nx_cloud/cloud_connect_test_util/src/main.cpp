@@ -39,6 +39,9 @@ int main(int argc, char* argv[])
         nx::network::SocketGlobals::mediatorConnector().
             mockupAddress(mediatorIt->second);
     }
+    const auto logLevelIt = args.find("log-level");
+    if (logLevelIt != args.end())
+        QnLog::initLog(logLevelIt->second);
 
     // reading mode
     if (args.find("listen") != args.end())
@@ -254,7 +257,8 @@ void printHelp(int /*argc*/, char* /*argv*/[])
         "  --url={http url}                 Url to trigger\n"
         "\n"
         "Common options:\n"
-        "  --enforce-mediator={endpoint}   Enforces custom mediator address\n"
+        "  --enforce-mediator={endpoint}    Enforces custom mediator address\n"
+        "  --log-level={level}              Log level"
         "\n"
         << std::endl;
 }

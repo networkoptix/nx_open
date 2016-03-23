@@ -138,6 +138,11 @@ void HolePunchingProcessor::onConnectionAckRequest(
     stun::Message /*requestMessage*/,
     std::function<void(api::ResultCode)> completionHandler)
 {
+    NX_LOGX(lm("connect ack. from %1, connection id %3").
+        arg(connection->getSourceAddress().toString()).
+        arg(request.connectSessionId),
+        cl_logDEBUG2);
+
     QnMutexLocker lk(&m_mutex);
     auto connectionIter = m_activeConnectSessions.find(request.connectSessionId);
     if (connectionIter == m_activeConnectSessions.end())
