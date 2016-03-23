@@ -543,7 +543,6 @@
                 </os>
             </activation>
             <properties>
-                <qtplugin3>platforminputcontexts</qtplugin3>
                 <platform>linux</platform>
                 <qt.spec>linux-g++</qt.spec>
                 <qt.classifier>${platform}-${arch}-${build.configuration}</qt.classifier>
@@ -609,6 +608,7 @@
                 <module>debsetup/mediaserver-deb</module>
             </modules>
             <properties>
+                <qtplugin3>platforminputcontexts</qtplugin3>
                 <modification>ubuntu</modification>
             </properties>
         </profile>
