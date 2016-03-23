@@ -25,6 +25,8 @@ public:
     /** 500ms */
     static const std::chrono::milliseconds kDefaultInitialDelay;
     static const unsigned int kDefaultDelayMultiplier = 2;
+    /** 1 minute */
+    static const std::chrono::milliseconds kDefaultMaxDelay;
 
     RetryPolicy();
 
@@ -38,10 +40,15 @@ public:
     void setDelayMultiplier(unsigned int multiplier);
     unsigned int delayMultiplier() const;
 
+    /** \a std::chrono::milliseconds::zero is treated as no limit */
+    void setMaxDelay(std::chrono::milliseconds delay);
+    std::chrono::milliseconds maxDelay() const;
+
 private:
     unsigned int m_maxRetryCount;
     std::chrono::milliseconds m_initialDelay;
     unsigned int m_delayMultiplier;
+    std::chrono::milliseconds m_maxDelay;
 };
 
 namespace aio {
@@ -90,6 +97,9 @@ public:
 private:
     aio::Timer m_timer;
     const RetryPolicy m_retryPolicy;
+    std::chrono::milliseconds m_currentDelay;
+    std::chrono::milliseconds m_effectiveMaxDelay;
+    unsigned int m_triesMade;
 };
 
 }   //network
