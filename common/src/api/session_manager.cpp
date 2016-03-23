@@ -1,6 +1,7 @@
 
 #include "session_manager.h"
 
+#include <chrono>
 #include <iostream>
 
 #include <QtCore/QMetaEnum>
@@ -206,6 +207,10 @@ QUrl QnSessionManager::createApiUrl(const QUrl& baseUrl, const QString &objectNa
     return url;
 }
 
+const std::chrono::minutes kRequestSendTimeout(1);
+const std::chrono::minutes kResponseReadTimeout(1);
+const std::chrono::minutes kMessageBodyReadTimeout(10);
+
 int QnSessionManager::sendAsyncRequest(
     nx_http::Method::ValueType method,
     const QUrl& url,
@@ -215,8 +220,16 @@ int QnSessionManager::sendAsyncRequest(
     const QByteArray& msgBody,
     AsyncRequestInfo requestInfo)
 {
+    using namespace std::chrono;
+
     auto clientPtr = nx_http::AsyncHttpClient::create();
-    //TODO #ak set appropriate timeouts
+    //setting appropriate timeouts
+    clientPtr->setSendTimeoutMs(
+        duration_cast<milliseconds>(kRequestSendTimeout).count());
+    clientPtr->setResponseReadTimeoutMs(
+        duration_cast<milliseconds>(kResponseReadTimeout).count());
+    clientPtr->setMessageBodyReadTimeoutMs(
+        duration_cast<milliseconds>(kMessageBodyReadTimeout).count());
 
     const auto requestUrl = createApiUrl(url, objectName, params);
     const auto appServerUrl = QnAppServerConnectionFactory::url();
