@@ -93,6 +93,7 @@ QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(const QString &fi
     , m_allCamerasChoosen(true)
 
     , m_openInNewTabAction      (new QAction(action(QnActions::OpenInNewLayoutAction)->text(), this))
+    , m_editBookmarkAction      (new QAction(action(QnActions::EditCameraBookmarkAction)->text(), this))
     , m_exportBookmarkAction    (new QAction(tr("Export bookmark..."), this))
     , m_removeBookmarksAction   (new QAction(action(QnActions::RemoveBookmarksAction)->text(), this))
     , m_updatingNow(false)
@@ -142,23 +143,20 @@ QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(const QString &fi
     connect(m_ui->gridBookmarks, &QTableView::customContextMenuRequested
         , this, &QnSearchBookmarksDialogPrivate::customContextMenuRequested);
 
-    connect(m_ui->gridBookmarks, &QTableView::doubleClicked, this
-        , [this](const QModelIndex & /* index */)
-    {
-        openInNewLayoutHandler();
-    });
-
-    connect(m_openInNewTabAction, &QAction::triggered, this, &QnSearchBookmarksDialogPrivate::openInNewLayoutHandler);
-    connect(m_exportBookmarkAction, &QAction::triggered, this, &QnSearchBookmarksDialogPrivate::exportBookmarkHandler);
-    connect(m_removeBookmarksAction, &QAction::triggered, this, [this]
+    connect(m_ui->gridBookmarks, &QTableView::doubleClicked, this, [this](const QModelIndex & /* index */)
     {
         QnActionParameters params;
-        QnTimePeriod window;    //TODO: remove this variable requirement
+        QnTimePeriod window;
         if (!fillActionParameters(params, window))
             return;
 
-        menu()->triggerIfPossible(QnActions::RemoveBookmarksAction, params);
+        if (!menu()->canTrigger(QnActions::OpenInNewLayoutAction, params))
+            return;
+
+        openInNewLayout(params, window);
     });
+
+    /* Context menu actions are connected in customContextMenuRequested() */
 
     setParameters(filterText, utcStartTimeMs, utcFinishTimeMs);
 
@@ -290,16 +288,8 @@ bool QnSearchBookmarksDialogPrivate::fillActionParameters(QnActionParameters &pa
     return true;
 }
 
-void QnSearchBookmarksDialogPrivate::openInNewLayoutHandler()
+void QnSearchBookmarksDialogPrivate::openInNewLayout(const QnActionParameters &params, const QnTimePeriod &window)
 {
-    QnActionParameters params;
-    QnTimePeriod window;
-    if (!fillActionParameters(params, window))
-        return;
-
-    if (!menu()->canTrigger(QnActions::OpenInNewLayoutAction, params))
-        return;
-
     const auto setFirstLayoutItemPeriod = [this](const QnTimePeriod &window
         , Qn::ItemDataRole role)
     {
@@ -322,16 +312,6 @@ void QnSearchBookmarksDialogPrivate::openInNewLayoutHandler()
     setFirstLayoutItemPeriod(extendedWindow, Qn::ItemSliderWindowRole);
 
     menu()->trigger(QnActions::BookmarksModeAction);
-}
-
-void QnSearchBookmarksDialogPrivate::exportBookmarkHandler()
-{
-    QnActionParameters params;
-    QnTimePeriod window;
-    if (!fillActionParameters(params, window))
-        return;
-
-    menu()->triggerIfPossible(QnActions::ExportTimeSelectionAction, params);
 }
 
 void QnSearchBookmarksDialogPrivate::updateHeadersWidth()
@@ -448,32 +428,58 @@ bool QnSearchBookmarksDialogPrivate::currentUserHasAdminPrivileges()
     return accessController()->hasGlobalPermissions(Qn::GlobalAdminPermissions);
 }
 
-QMenu *QnSearchBookmarksDialogPrivate::createContextMenu(const QnActionParameters &params)
-{
-    auto result = new QMenu();
-
-    const auto addActionToMenu = [this, result, params] (QnActions::IDType id, QAction *action)
-    {
-        if (menu()->canTrigger(id, params))
-            result->addAction(action);
-    };
-
-    addActionToMenu(QnActions::OpenInNewLayoutAction, m_openInNewTabAction);
-    addActionToMenu(QnActions::ExportTimeSelectionAction, m_exportBookmarkAction);
-    addActionToMenu(QnActions::RemoveBookmarksAction, m_removeBookmarksAction);
-    return result;
-}
-
 void QnSearchBookmarksDialogPrivate::customContextMenuRequested()
 {
+    /* Fill action parameters: */
     QnActionParameters params;
     QnTimePeriod window;
     if (!fillActionParameters(params, window))
         return;
 
-    if (auto newMenu = createContextMenu(params))
+    /* Create menu object: */
+    if (auto newMenu = new QMenu())
     {
+        /* Add suitable actions: */
+        const auto addActionToMenu = [this, newMenu, params](QnActions::IDType id, QAction *action)
+        {
+            if (menu()->canTrigger(id, params))
+                newMenu->addAction(action);
+        };
+
+        addActionToMenu(QnActions::OpenInNewLayoutAction, m_openInNewTabAction);
+        addActionToMenu(QnActions::EditCameraBookmarkAction, m_editBookmarkAction);
+        addActionToMenu(QnActions::ExportTimeSelectionAction, m_exportBookmarkAction);
+        addActionToMenu(QnActions::RemoveBookmarksAction, m_removeBookmarksAction);
+
+        /* Connect action signal handlers: */
+        connect(m_openInNewTabAction, &QAction::triggered, this, [this, params, window]
+        {
+            openInNewLayout(params, window);
+        });
+
+        connect(m_editBookmarkAction, &QAction::triggered, this, [this, params]
+        {
+            menu()->triggerIfPossible(QnActions::EditCameraBookmarkAction, params);
+        });
+
+        connect(m_removeBookmarksAction, &QAction::triggered, this, [this, params]
+        {
+            menu()->triggerIfPossible(QnActions::RemoveBookmarksAction, params);
+        });
+
+        connect(m_exportBookmarkAction, &QAction::triggered, this, [this, params]
+        {
+            menu()->triggerIfPossible(QnActions::ExportTimeSelectionAction, params);
+        });
+
+        /* Execute popup menu: */
         newMenu->exec(QCursor::pos());
         newMenu->deleteLater();
+
+        /* Disconnect action signal handlers: */
+        m_openInNewTabAction->disconnect(this);
+        m_editBookmarkAction->disconnect(this);
+        m_removeBookmarksAction->disconnect(this);
+        m_exportBookmarkAction->disconnect(this);
     }
 }

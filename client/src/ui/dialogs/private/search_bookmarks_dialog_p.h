@@ -44,12 +44,7 @@ private:
 
     void customContextMenuRequested();
 
-    QMenu *createContextMenu(const QnActionParameters &params);
-
-private:
-    void openInNewLayoutHandler();
-
-    void exportBookmarkHandler();
+    void openInNewLayout(const QnActionParameters &params, const QnTimePeriod &window);
 
     bool fillActionParameters(QnActionParameters &params, QnTimePeriod &window);
 
@@ -67,6 +62,7 @@ private:
     bool m_allCamerasChoosen;
 
     QAction * const m_openInNewTabAction;
+    QAction * const m_editBookmarkAction;
     QAction * const m_exportBookmarkAction;
     QAction * const m_removeBookmarksAction;
     bool m_updatingNow;
