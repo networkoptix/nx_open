@@ -24,13 +24,13 @@ class CloudConnectionManager
     public Qn::EnableSafeDirectConnection,
     public nx::hpm::api::AbstractCloudSystemCredentialsProvider
 {
-    Q_OBJECT 
+    Q_OBJECT
 
 public:
     CloudConnectionManager();
     ~CloudConnectionManager();
 
-    virtual boost::optional<nx::hpm::api::SystemCredentials> 
+    virtual boost::optional<nx::hpm::api::SystemCredentials>
         getSystemCredentials() const override;
 
     bool bindedToCloud() const;
@@ -51,8 +51,7 @@ private:
     bool bindedToCloud(QnMutexLockerBase* const lk) const;
 
 private slots:
-    void atResourceAdded(const QnResourcePtr& res);
-    void atAdminPropertyChanged(const QnResourcePtr& res, const QString& key);
+    void cloudSettingsChanged();
 };
 
 #endif  //NX_MS_CLOUD_CONNECTION_MANAGER_H

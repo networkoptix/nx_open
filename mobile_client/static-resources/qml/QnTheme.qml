@@ -32,6 +32,7 @@ QtObject {
     property color listSubText
     property color listSeparator
     property color listDisabledText
+    property color listSelectionBorder
 
     property color sessionItemBackground
     property color sessionItemBackgroundActive
@@ -63,7 +64,6 @@ QtObject {
     property color cameraHiddenBackground
     property color cameraDummyBorder
     property color cameraShowButtonBackground
-    property color cameraSelection
 
     property color toastBackground
     property color toastText
@@ -116,6 +116,7 @@ QtObject {
         listSubText             = colorTheme.color("list.subText")
         listSeparator           = colorTheme.color("list.separator")
         listDisabledText        = colorTheme.color("list.disabledText")
+        listSelectionBorder     = colorTheme.color("list.selectionBorder")
         sessionItemBackground   = colorTheme.color("sessionItem.background")
         sessionItemBackgroundActive = colorTheme.color("sessionItem.backgroundActive")
         sessionItemBackgroundIncompatible = colorTheme.color("sessionItem.backgroundIncompatible")
@@ -142,7 +143,6 @@ QtObject {
         cameraHiddenBackground  = colorTheme.color("cameras.hiddenBackground")
         cameraDummyBorder       = colorTheme.color("cameras.dummyBorder")
         cameraShowButtonBackground = colorTheme.color("cameras.showButtonBackground")
-        cameraSelection         = colorTheme.color("cameras.selection")
         toastBackground         = colorTheme.color("toast.background")
         toastText               = colorTheme.color("toast.text")
         timelineText            = colorTheme.color("timeline.text")

@@ -107,6 +107,24 @@ public:
     std::chrono::seconds serverDiscoveryAliveCheckTimeout() const;
     bool isTimeSynchronizationEnabled() const;
 
+    // -- Cloud settings
+
+    static const QString kNameCloudAccountName;
+    QString cloudAccountName() const;
+    void setCloudAccountName(const QString& value);
+
+    static const QString kNameCloudSystemID;
+    QString cloudSystemID() const;
+    void setCloudSystemID(const QString& value);
+
+    static const QString kNameCloudAuthKey;
+    QString cloudAuthKey() const;
+    void setCloudAuthKey(const QString& value);
+
+    void resetCloudParams();
+
+    // -- Misc settings
+
     bool arecontRtspEnabled() const;
     void setArecontRtspEnabled(bool newVal) const;
 
@@ -127,6 +145,7 @@ signals:
     void updateNotificationsChanged();
     void upnpPortMappingEnabledChanged();
     void ec2ConnectionSettingsChanged();
+    void cloudSettingsChanged();
 
 private:
     typedef QList<QnAbstractResourcePropertyAdaptor*> AdaptorList;
@@ -135,6 +154,7 @@ private:
     AdaptorList initLdapAdaptors();
     AdaptorList initStaticticsAdaptors();
     AdaptorList initConnectionAdaptors();
+    AdaptorList initCloudAdaptors();
     AdaptorList initMiscAdaptors();
 
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
@@ -184,9 +204,15 @@ private:
     QnResourcePropertyAdaptor<int>* m_ec2ConnectionKeepAliveTimeoutAdaptor;
     QnResourcePropertyAdaptor<int>* m_ec2KeepAliveProbeCountAdaptor;
     QnResourcePropertyAdaptor<int>* m_ec2AliveUpdateIntervalAdaptor;
-    QnResourcePropertyAdaptor<int>* m_serverDiscoveryPingTimeout;
+    QnResourcePropertyAdaptor<int>* m_serverDiscoveryPingTimeoutAdaptor;
 
-    QnResourcePropertyAdaptor<bool>* m_arecontRtspEnabled;
+    // set of cloud adaptors
+    QnResourcePropertyAdaptor<QString>* m_cloudAccountNameAdaptor;
+    QnResourcePropertyAdaptor<QString>* m_cloudSystemIDAdaptor;
+    QnResourcePropertyAdaptor<QString>* m_cloudAuthKeyAdaptor;
+
+    // misc adaptors
+    QnResourcePropertyAdaptor<bool>* m_arecontRtspEnabledAdaptor;
 
     AdaptorList m_allAdaptors;
 

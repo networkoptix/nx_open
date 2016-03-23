@@ -216,12 +216,9 @@ QnPage {
                 event.accepted = true
             }
         }
-        else if (liteMode)
+        else if (event.key == Qt.Key_F2)
         {
-            if (event.key == Qt.Key_M)
-            {
-                sideNavigation.open = !sideNavigation.open
-            }
+            sideNavigation.open = !sideNavigation.open
         }
     }
 }

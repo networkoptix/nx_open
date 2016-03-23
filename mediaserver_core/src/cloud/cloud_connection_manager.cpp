@@ -5,9 +5,9 @@
 
 #include "cloud_connection_manager.h"
 
+#include <api/global_settings.h>
+
 #include <common/common_module.h>
-#include <core/resource_management/resource_pool.h>
-#include <core/resource/user_resource.h>
 
 #include <nx/network/socket_global.h>
 
@@ -32,11 +32,7 @@ CloudConnectionManager::CloudConnectionManager()
         }
     }
 
-    Qn::directConnect(
-        qnResPool, &QnResourcePool::resourceAdded,
-        this, &CloudConnectionManager::atResourceAdded);
-    if (const auto admin = qnResPool->getAdministrator())
-        atResourceAdded(admin);
+    Qn::directConnect(qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged, this, &CloudConnectionManager::cloudSettingsChanged);
 }
 
 CloudConnectionManager::~CloudConnectionManager()
@@ -44,7 +40,7 @@ CloudConnectionManager::~CloudConnectionManager()
    directDisconnectAll();
 }
 
-boost::optional<nx::hpm::api::SystemCredentials> 
+boost::optional<nx::hpm::api::SystemCredentials>
     CloudConnectionManager::getSystemCredentials() const
 {
     QnMutexLocker lk(&m_mutex);
@@ -84,27 +80,10 @@ bool CloudConnectionManager::bindedToCloud(QnMutexLockerBase* const /*lk*/) cons
     return !m_cloudSystemID.isEmpty() && !m_cloudAuthKey.isEmpty();
 }
 
-void CloudConnectionManager::atResourceAdded(const QnResourcePtr& res)
+void CloudConnectionManager::cloudSettingsChanged()
 {
-    auto user = res.dynamicCast<QnUserResource>();
-    if (!user || !user->isAdmin())
-        return;
-
-    Qn::directConnect(
-        user.data(), &QnResource::propertyChanged,
-        this, &CloudConnectionManager::atAdminPropertyChanged);
-    atAdminPropertyChanged(user, QString());
-}
-
-void CloudConnectionManager::atAdminPropertyChanged(
-    const QnResourcePtr& res,
-    const QString& /*key*/)
-{
-    auto user = res.dynamicCast<QnUserResource>();
-    NX_ASSERT(user);
-
-    const auto cloudSystemId = user->getProperty(Qn::CLOUD_SYSTEM_ID);
-    const auto cloudAuthKey = user->getProperty(Qn::CLOUD_SYSTEM_AUTH_KEY);
+    const auto cloudSystemId = qnGlobalSettings->cloudSystemID();
+    const auto cloudAuthKey = qnGlobalSettings->cloudAuthKey();
 
     QnMutexLocker lk(&m_mutex);
     if (cloudSystemId == m_cloudSystemID &&

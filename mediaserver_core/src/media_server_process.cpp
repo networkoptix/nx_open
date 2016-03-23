@@ -2388,6 +2388,20 @@ void MediaServerProcess::run()
         MSSettings::roSettings()->remove(statisticsReportServerApiKey);
     }
 
+    {
+        const QString value = MSSettings::roSettings()->value(QnGlobalSettings::kNameCloudSystemID).toString();
+        if (!value.isEmpty())
+            qnGlobalSettings->setCloudSystemID(value);
+        MSSettings::roSettings()->remove(QnGlobalSettings::kNameCloudSystemID);
+    }
+
+    {
+        const QString value = MSSettings::roSettings()->value(QnGlobalSettings::kNameCloudAuthKey).toString();
+        if (!value.isEmpty())
+            qnGlobalSettings->setCloudAuthKey(value);
+        MSSettings::roSettings()->remove(QnGlobalSettings::kNameCloudAuthKey);
+    }
+
     qnGlobalSettings->synchronizeNow();
 
     if (QnUserResourcePtr adminUser = qnResPool->getAdministrator())
@@ -2400,8 +2414,6 @@ void MediaServerProcess::run()
 
         /* List of global setting, that can be overridden in server local config (e.g. by installer) */
         QStringList replaceableParameters {
-            Qn::CLOUD_SYSTEM_ID,
-            Qn::CLOUD_SYSTEM_AUTH_KEY,
             QnMultiserverStatisticsRestHandler::kSettingsUrlParam};
 
         for (const QString& key: replaceableParameters)
@@ -2418,9 +2430,9 @@ void MediaServerProcess::run()
         if (adminParamsChanged)
         {
             propertyDictionary->saveParams(adminUser->getId());
-            MSSettings::roSettings()->sync();
         }
     }
+    MSSettings::roSettings()->sync();
 
     QnStorageResourceList storagesToRemove = getSmallStorages(m_mediaServer->getStorages());
     if (!storagesToRemove.isEmpty()) {

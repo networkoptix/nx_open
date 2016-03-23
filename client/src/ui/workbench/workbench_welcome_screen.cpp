@@ -17,6 +17,7 @@
 #include <ui/style/nx_style.h>
 #include <ui/dialogs/login_dialog.h>
 #include <ui/dialogs/non_modal_dialog_constructor.h>
+#include <ui/dialogs/setup_wizard_dialog.h>
 
 namespace
 {
@@ -36,7 +37,7 @@ namespace
         quickWidget->setSource(kWelcomeScreenSource);
 
         // Welcome screen holders prevents blinking of QML widget.
-        // Moreover, QQuickWidget can't be placed as direct child of 
+        // Moreover, QQuickWidget can't be placed as direct child of
         // other widget - thus we use this "proxy" holder + layout
         QWidget *welcomeScreenHolder = new QWidget();
         QHBoxLayout *layout = new QHBoxLayout(welcomeScreenHolder);
@@ -175,6 +176,8 @@ void QnWorkbenchWelcomeScreen::connectToAnotherSystem()
 void QnWorkbenchWelcomeScreen::setupFactorySystem(const QString &serverUrl)
 {
     qDebug() << "----------- Call wizard here " << serverUrl;
+    QScopedPointer<QnSetupWizardDialog> dialog(new QnSetupWizardDialog(mainWindow()));
+    dialog->exec();
 }
 
 void QnWorkbenchWelcomeScreen::logoutFromCloud()
