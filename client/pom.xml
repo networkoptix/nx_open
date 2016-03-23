@@ -92,7 +92,7 @@
         <linux.defines/>
         <mac.defines/>
         <buildLib>sharedlib</buildLib>
-        <rdep.packages>openssl quazip festival festival-vox</rdep.packages>
+        <rdep.packages>openssl quazip festival festival-vox roboto-ttf</rdep.packages>
     </properties>
     <profiles>
         <profile>

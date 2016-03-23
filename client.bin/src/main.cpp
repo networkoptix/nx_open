@@ -99,6 +99,7 @@ extern "C"
 #include "openal/qtvaudiodevice.h"
 #include "ui/workaround/fglrx_full_screen.h"
 #include "ui/workaround/qtbug_workaround.h"
+#include <ui/helpers/font_loader.h>
 
 #ifdef Q_OS_WIN
     #include "ui/workaround/iexplore_url_handler.h"
@@ -364,6 +365,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QScopedPointer<QnSkin> skin(new QnSkin(QStringList() << lit(":/skin") << customizationPath));
 #endif // ENABLE_DYNAMIC_CUSTOMIZATION
 
+    QnFontLoader::loadFonts();
 
 
 
