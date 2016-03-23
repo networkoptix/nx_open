@@ -8,7 +8,12 @@
 #include <QtCore/QPair>
 #include <QtCore/QString>
 #include <QtCore/QMetaType>
+
+#include <nx/network/http/httptypes.h>
 #include <nx/utils/uuid.h>
+
+#include <utils/common/systemerror.h>
+
 
 class QnRequestParam: public QPair<QString, QString> {
     typedef QPair<QString, QString> base_type;
@@ -86,23 +91,80 @@ struct QnHTTPRawResponse
 {
     QnHTTPRawResponse()
     :
-    status( QNetworkReply::NoError )
+        status( QNetworkReply::NoError )
     {
     }
 
-    QnHTTPRawResponse( QNetworkReply::NetworkError status, const QnReplyHeaderList &headers, const QByteArray &data, const QByteArray &errorString )
+    QnHTTPRawResponse(
+        SystemError::ErrorCode _sysErrorCode,
+        nx_http::Response _response,
+        QByteArray _msgBody)
     :
-        status(status),
-        headers(headers),
-        data(data),
-        errorString(errorString)
+        status(QNetworkReply::NoError),
+        sysErrorCode(_sysErrorCode),
+        response(std::move(_response)),
+        msgBody(std::move(_msgBody))
     {
+        if (sysErrorCode != SystemError::noError)
+        {
+            status = sysErrorCodeToNetworkError(sysErrorCode);
+            errorString = SystemError::toString(sysErrorCode).toLatin1();
+        }
+        else
+        {
+            status = httpStatusCodeToNetworkError(
+                static_cast<nx_http::StatusCode::Value>(response.statusLine.statusCode));
+            errorString = response.statusLine.reasonPhrase;
+        }
     }
 
+    SystemError::ErrorCode sysErrorCode;
     QNetworkReply::NetworkError status;
-    QnReplyHeaderList headers;
-    QByteArray data;
+    nx_http::Response response;
+    QByteArray msgBody;
     QByteArray errorString;
+
+private:
+    QNetworkReply::NetworkError sysErrorCodeToNetworkError(
+        SystemError::ErrorCode errorCode)
+    {
+        switch (errorCode)
+        {
+            case SystemError::noError:
+                return QNetworkReply::NoError;
+            case SystemError::connectionRefused:
+                return QNetworkReply::ConnectionRefusedError;
+            case SystemError::connectionReset:
+                return QNetworkReply::RemoteHostClosedError;
+            case SystemError::hostNotFound:
+                return QNetworkReply::HostNotFoundError;
+            case SystemError::timedOut:
+                return QNetworkReply::TimeoutError;
+            default:
+                return QNetworkReply::UnknownNetworkError;
+        }
+    }
+
+    QNetworkReply::NetworkError httpStatusCodeToNetworkError(
+        nx_http::StatusCode::Value statusCode)
+    {
+        if ((statusCode / 200) == (nx_http::StatusCode::ok / 200))
+            return QNetworkReply::NoError;
+
+        switch (statusCode)
+        {
+            case nx_http::StatusCode::unauthorized:
+                return QNetworkReply::ContentAccessDenied;
+            case nx_http::StatusCode::notFound:
+                return QNetworkReply::ContentNotFoundError;
+            case nx_http::StatusCode::internalServerError:
+                return QNetworkReply::InternalServerError;
+            case nx_http::StatusCode::serviceUnavailable:
+                return QNetworkReply::ServiceUnavailableError;
+            default:
+                return QNetworkReply::UnknownServerError;
+        }
+    }
 };
 
 Q_DECLARE_METATYPE(QnRequestParamList); /* Also works for QnRequestHeaderList. */

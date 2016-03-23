@@ -148,8 +148,8 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
 
         QnTimePeriodList reply;
         if(status == 0) {
-            if (response.data.startsWith("BIN")) {
-                reply.decode((const quint8*) response.data.constData() + 3, response.data.size() - 3);
+            if (response.msgBody.startsWith("BIN")) {
+                reply.decode((const quint8*) response.msgBody.constData() + 3, response.msgBody.size() - 3);
             } else {
                 qWarning() << "QnMediaServerConnection: unexpected message received.";
                 status = -1;
@@ -223,14 +223,14 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
     case EventLogObject: {
         QnBusinessActionDataListPtr events(new QnBusinessActionDataList);
         if (response.status == 0)
-            QnEventSerializer::deserialize(events, response.data);
+            QnEventSerializer::deserialize(events, response.msgBody);
         emitFinished(this, response.status, events, handle);
         break;
     }
     case ImageObject: {
         QImage image;
         if (response.status == 0)
-            image.loadFromData(response.data);
+            image.loadFromData(response.msgBody);
         emitFinished(this, response.status, image, handle);
         break;
     }
@@ -241,7 +241,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         processJsonReply<QnCameraDiagnosticsReply>(this, response, handle);
         break;
     case GetSystemNameObject:
-        emitFinished( this, response.status, QString::fromUtf8(response.data), handle );
+        emitFinished( this, response.status, QString::fromUtf8(response.msgBody), handle );
         break;
     case RebuildArchiveObject: {
         processJsonReply<QnStorageScanData>(this, response, handle);
@@ -320,20 +320,21 @@ QnMediaServerConnection::QnMediaServerConnection(const QnMediaServerResourcePtr&
 
     QnUuid guid = mserver->getOriginalGuid();
 
-    QnRequestHeaderList queryParameters;
+    QnRequestParamList queryParameters;
 	queryParameters.insert(QString::fromLatin1(Qn::SERVER_GUID_HEADER_NAME), mserver->getId().toString());
+    setExtraQueryParameters(std::move(queryParameters));
 
-    setExtraQueryParameters(queryParameters);
-
-    QnRequestHeaderList extraHeaders;
-	extraHeaders.insert(QString::fromLatin1(Qn::SERVER_GUID_HEADER_NAME), guid.isNull() ? mserver->getId().toString() : guid.toString());
+    nx_http::HttpHeaders extraHeaders;
+	extraHeaders.emplace(
+        Qn::SERVER_GUID_HEADER_NAME,
+        guid.isNull() ? mserver->getId().toByteArray() : guid.toByteArray());
 
     if (!videowallGuid.isNull())
-        extraHeaders.insert(QString::fromLatin1(Qn::VIDEOWALL_GUID_HEADER_NAME), videowallGuid.toString());
-    extraHeaders.insert(QString::fromLatin1(Qn::EC2_RUNTIME_GUID_HEADER_NAME), qnCommon->runningInstanceGUID().toString());
-    extraHeaders.insert(QString::fromLatin1(Qn::CUSTOM_USERNAME_HEADER_NAME), QnAppServerConnectionFactory::url().userName());
-	extraHeaders.insert(QString::fromLatin1("User-Agent"), QString::fromLatin1(nx_http::userAgentString()));
-    setExtraHeaders(extraHeaders);
+        extraHeaders.emplace(Qn::VIDEOWALL_GUID_HEADER_NAME, videowallGuid.toByteArray());
+    extraHeaders.emplace(Qn::EC2_RUNTIME_GUID_HEADER_NAME, qnCommon->runningInstanceGUID().toByteArray());
+    extraHeaders.emplace(Qn::CUSTOM_USERNAME_HEADER_NAME, QnAppServerConnectionFactory::url().userName().toUtf8());
+	extraHeaders.emplace("User-Agent", nx_http::userAgentString());
+    setExtraHeaders(std::move(extraHeaders));
 }
 
 QnMediaServerConnection::~QnMediaServerConnection() {
@@ -382,10 +383,10 @@ int QnMediaServerConnection::checkCameraList(const QnNetworkResourceList &camera
     for(const QnResourcePtr& c: cameras)
         camList.uniqueIdList << c->getUniqueId();
 
-    QnRequestHeaderList headers;
-    headers << QnRequestParam("content-type",   "application/json");
+    nx_http::HttpHeaders headers;
+    headers.emplace("Content-Type", "application/json");
 
-    return sendAsyncPostRequest(checkCamerasObject, headers, QnRequestParamList(), QJson::serialized(camList), QN_STRINGIZE_TYPE(QnCameraListReply), target, slot);
+    return sendAsyncPostRequest(checkCamerasObject, std::move(headers), QnRequestParamList(), QJson::serialized(camList), QN_STRINGIZE_TYPE(QnCameraListReply), target, slot);
 }
 
 int QnMediaServerConnection::getTimePeriodsAsync(const QnVirtualCameraResourcePtr &camera,
@@ -588,10 +589,10 @@ int QnMediaServerConnection::ptzCreateTourAsync(const QnNetworkResourcePtr &came
     params << QnRequestParam("command",          QnLexical::serialized(Qn::CreateTourPtzCommand));
     params << QnRequestParam("resourceId",      QnLexical::serialized(camera->getPhysicalId()));
 
-    QnRequestHeaderList headers;
-    headers << QnRequestParam("content-type",   "application/json");
+    nx_http::HttpHeaders headers;
+    headers.emplace("Content-Type", "application/json");
 
-    return sendAsyncPostRequest(PtzCreateTourObject, headers, params, QJson::serialized(tour), NULL, target, slot);
+    return sendAsyncPostRequest(PtzCreateTourObject, std::move(headers), params, QJson::serialized(tour), NULL, target, slot);
 }
 
 int QnMediaServerConnection::ptzRemoveTourAsync(const QnNetworkResourcePtr &camera, const QString &tourId, QObject *target, const char *slot) {
@@ -688,23 +689,26 @@ int QnMediaServerConnection::getSystemNameAsync( QObject* target, const char* sl
 
 int QnMediaServerConnection::testEmailSettingsAsync(const QnEmailSettings &settings, QObject *target, const char *slot)
 {
-    QnRequestHeaderList headers;
-    headers << QnRequestParam("content-type",   "application/json");
+    nx_http::HttpHeaders headers;
+    headers.emplace("Content-Type", "application/json");
+
     ec2::ApiEmailSettingsData data;
     ec2::fromResourceToApi(settings, data);
-    return sendAsyncPostRequest(TestEmailSettingsObject, headers, QnRequestParamList(), QJson::serialized(data), QN_STRINGIZE_TYPE(QnTestEmailSettingsReply), target, slot);
+    return sendAsyncPostRequest(TestEmailSettingsObject, std::move(headers), QnRequestParamList(), QJson::serialized(data), QN_STRINGIZE_TYPE(QnTestEmailSettingsReply), target, slot);
 }
 
 int QnMediaServerConnection::testLdapSettingsAsync(const QnLdapSettings &settings, QObject *target, const char *slot)
 {
-    QnRequestHeaderList headers;
-    headers << QnRequestParam("content-type",   "application/json");
-    return sendAsyncPostRequest(TestLdapSettingsObject, headers, QnRequestParamList(), QJson::serialized(settings), QN_STRINGIZE_TYPE(QnLdapUsers), target, slot);
+    nx_http::HttpHeaders headers;
+    headers.emplace("Content-Type", "application/json");
+    return sendAsyncPostRequest(TestLdapSettingsObject, std::move(headers), QnRequestParamList(), QJson::serialized(settings), QN_STRINGIZE_TYPE(QnLdapUsers), target, slot);
 }
 
 int QnMediaServerConnection::doCameraDiagnosticsStepAsync(
-    const QnUuid& cameraID, CameraDiagnostics::Step::Value previousStep,
-    QObject* target, const char* slot )
+    const QnUuid& cameraID,
+    CameraDiagnostics::Step::Value previousStep,
+    QObject* target,
+    const char* slot )
 {
     QnRequestParamList params;
     params << QnRequestParam("res_id",  cameraID);
@@ -786,10 +790,10 @@ int QnMediaServerConnection::uploadUpdateChunk(const QString &updateId, const QB
     params << QnRequestParam("updateId", updateId);
     params << QnRequestParam("offset", offset);
 
-    QnRequestHeaderList headers;
-    headers << QnRequestParam("content-type",   "text/xml");
+    nx_http::HttpHeaders headers;
+    headers.emplace("Content-Type", "text/xml");
 
-    return sendAsyncPostRequest(InstallUpdateObject, headers, params, data, QN_STRINGIZE_TYPE(QnUploadUpdateReply), target, slot);
+    return sendAsyncPostRequest(InstallUpdateObject, std::move(headers), params, data, QN_STRINGIZE_TYPE(QnUploadUpdateReply), target, slot);
 }
 
 int QnMediaServerConnection::restart(QObject *target, const char *slot) {

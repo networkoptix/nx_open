@@ -74,10 +74,10 @@ protected:
         T reply;
         if(status == 0) {
             QnJsonRestResult result;
-            bool jsonDeserialized = QJson::deserialize(response.data, &result);
+            bool jsonDeserialized = QJson::deserialize(response.msgBody, &result);
             if (!jsonDeserialized || (!result.reply.isNull() && !QJson::deserialize(result.reply, &reply))) {
 #ifdef JSON_REPLY_DEBUG
-                qnWarning("Error parsing JSON reply:\n%1\n\n", response.data);
+                qnWarning("Error parsing JSON reply:\n%1\n\n", response.msgBody);
 #endif
                 status = 1;
             }
@@ -99,11 +99,11 @@ protected:
 
         if (status == 0) {
             QnJsonRestResult result;
-            if (QJson::deserialize(response.data, &result)) {
+            if (QJson::deserialize(response.msgBody, &result)) {
                 errorString = result.errorString;
             } else {
 #ifdef JSON_REPLY_DEBUG
-                qnWarning("Error parsing JSON reply:\n%1\n\n", response.data);
+                qnWarning("Error parsing JSON reply:\n%1\n\n", response.msgBody);
 #endif
                 status = 1;
             }
@@ -125,14 +125,14 @@ protected:
         if(status == 0) {
             QnUbjsonRestResult result;
             bool deserialized = false;
-            result = QnUbjson::deserialized<QnUbjsonRestResult>(response.data, QnUbjsonRestResult(), &deserialized);
+            result = QnUbjson::deserialized<QnUbjsonRestResult>(response.msgBody, QnUbjsonRestResult(), &deserialized);
 
             if (deserialized && !result.reply.isNull())
                 reply = QnUbjson::deserialized<T>(result.reply, T(), &deserialized);
 
             if (!deserialized) {
 #ifdef JSON_REPLY_DEBUG
-                qnWarning("Error parsing JSON reply:\n%1\n\n", response.data);
+                qnWarning("Error parsing JSON reply:\n%1\n\n", response.msgBody);
 #endif
                 status = 1;
             }
@@ -154,16 +154,18 @@ protected:
 
         T reply;
         if(status == 0) {
-            Qn::SerializationFormat format = Qn::serializationFormatFromHttpContentType(response.headers.value("Content-Type"));
+            Qn::SerializationFormat format = 
+                Qn::serializationFormatFromHttpContentType(
+                    nx_http::getHeaderValue(response.response.headers, "Content-Type"));
             NX_ASSERT(format != Qn::UnsupportedFormat, Q_FUNC_INFO, "Invalid content-type header");
             
             switch (format) {
             case Qn::JsonFormat:
                 {
-                    bool parsed = QJson::deserialize(response.data, &reply);
+                    bool parsed = QJson::deserialize(response.msgBody, &reply);
                     if (!parsed) {
                     #ifdef JSON_REPLY_DEBUG
-                        qnWarning("Error parsing JSON reply:\n%1\n\n", response.data);
+                        qnWarning("Error parsing JSON reply:\n%1\n\n", response.msgBody);
                     #endif
                         status = 1;
                     }
@@ -172,7 +174,7 @@ protected:
                 case Qn::UbjsonFormat:
                 {
                     bool parsed = false;
-                    reply = QnUbjson::deserialized(response.data, reply, &parsed);
+                    reply = QnUbjson::deserialized(response.msgBody, reply, &parsed);
                     if (!parsed)
                         status = 1;
                     break;
@@ -198,7 +200,7 @@ protected:
         T reply;
         if(status == 0) {
             bool success = true;
-            reply = QnCompressedTime::deserialized(response.data, T(), &success);
+            reply = QnCompressedTime::deserialized(response.msgBody, T(), &success);
             if (!success)
                 status = 1;
         } 

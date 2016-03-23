@@ -249,7 +249,7 @@ namespace nx_http
 
     class NX_NETWORK_API Method
     {
-	public:
+    public:
         typedef StringType ValueType;
 
         static const StringType GET;
