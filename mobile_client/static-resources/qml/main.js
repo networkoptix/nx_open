@@ -25,6 +25,14 @@ function findRootChild(item, objectName) {
     return null
 }
 
+function isItemParentedBy(item, parent)
+{
+    var p = item.parent
+    while (p && p != parent)
+        p = p.parent
+    return p == parent
+}
+
 function isMobile() {
     return Qt.platform.os == "android" || Qt.platform.os == "ios" || Qt.platform.os == "winphone" || Qt.platform.os == "blackberry"
 }
@@ -240,10 +248,4 @@ function focusNextItem(item, forward)
 function focusPrevItem(item)
 {
     focusNextItem(item, false)
-}
-
-function ensureVisibleInFlickable(item, contentItem, flickable)
-{
-    var rect = item.mapToItem(contentItem, 0, 0, item.width, item.height)
-    flickable.ensureVisible(rect.x, rect.y, rect.width, rect.height)
 }

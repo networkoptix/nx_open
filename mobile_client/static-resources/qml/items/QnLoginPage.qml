@@ -136,7 +136,7 @@ QnPage {
                     onActiveFocusChanged:
                     {
                         if (activeFocus)
-                            Main.ensureVisibleInFlickable(this, content, flickable)
+                            flickable.ensureItemVisible(this)
                     }
                 }
 
@@ -157,7 +157,7 @@ QnPage {
                     onActiveFocusChanged:
                     {
                         if (activeFocus)
-                            Main.ensureVisibleInFlickable(this, content, flickable)
+                            flickable.ensureItemVisible(this)
                     }
                 }
             }
@@ -181,7 +181,7 @@ QnPage {
                     onActiveFocusChanged:
                     {
                         if (activeFocus)
-                            Main.ensureVisibleInFlickable(this, content, flickable)
+                            flickable.ensureItemVisible(this)
                     }
                 }
 
@@ -207,7 +207,7 @@ QnPage {
                     onActiveFocusChanged:
                     {
                         if (activeFocus)
-                            Main.ensureVisibleInFlickable(this, content, flickable)
+                            flickable.ensureItemVisible(this)
                     }
                 }
             }
@@ -330,7 +330,7 @@ QnPage {
                     onActiveFocusChanged:
                     {
                         if (activeFocus)
-                            Main.ensureVisibleInFlickable(this, content, flickable)
+                            flickable.ensureItemVisible(this)
                     }
                 }
             }

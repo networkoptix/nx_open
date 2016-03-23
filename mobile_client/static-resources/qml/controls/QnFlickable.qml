@@ -26,4 +26,13 @@ Flickable {
         contentX = cx
         contentY = cy
     }
+
+    function ensureItemVisible(item)
+    {
+        if (!Main.isItemParentedBy(item, contentItem))
+            return
+
+        var rect = item.mapToItem(contentItem, 0, 0, item.width, item.height)
+        ensureVisible(rect.x, rect.y, rect.width, rect.height)
+    }
 }
