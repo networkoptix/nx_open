@@ -10,7 +10,7 @@
     <div ng-if="reactivating">
         <h1>Confirm your account</h1>
         <process-alert process="reactivate" alert-timeout="0"
-                       success-message="'Confirmation link was send to your email. Check it to continue.'"
+                       success-message="'Confirmation link was sent to your email. Check it to continue.'"
                        error-prefix="'Couldn\'t send confirmation email:'"></process-alert>
         <form name="reactivateAccount" class="form-horizontal" ng-if="!reactivate.success" novalidate>
             <div class="form-group" validate-field>
@@ -40,7 +40,7 @@
     <div ng-if="restoring">
         <h1>Restore password</h1>
         <process-alert process="restore" alert-timeout="0"
-                       success-message="'Confirmation link was send to your email. Check it for creating a new password'"
+                       success-message="'Confirmation link was sent to your email. Check it for creating a new password'"
                        error-prefix="'Couldn\'t send confirmation email:'"></process-alert>
         <form name="restorePassword" class="form-horizontal" novalidate>
             <div class="form-group" validate-field>
