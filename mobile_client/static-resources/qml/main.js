@@ -225,12 +225,9 @@ function keyIsBack(key) {
 
     if (liteMode)
     {
-        if (key == Qt.Key_Escape || key == Qt.Key_Backspace)
+        if (key == Qt.Key_Escape)
             return true
     }
-
-//    if (key === Qt.Key_Backspace)
-//        return true
 
     return false
 }
