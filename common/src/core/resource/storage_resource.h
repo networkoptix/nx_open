@@ -70,6 +70,7 @@ public:
     void addWrited(qint64 value);
     void resetWrited();
     void setWritedCoeff(double value);
+    double getWritedCoeff() const;
     double calcUsageCoeff() const;
 
     bool isWritable() const;
