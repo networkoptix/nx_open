@@ -4,13 +4,18 @@ var AlertSuite = function () {
     var self = this;
     
     this.alertTypes = {danger: 'danger', success: 'success'};
+    this.alertMessages = {
+        loginDanger: 'Login or password are incorrect',
+        registerSuccess: 'Your account was successfully registered. Please, check your email to confirm it',
+        accountSuccess: ''
+    };
 
     this.submitButton = element(by.css('process-button')).element(by.css('button'));
     this.alert = element(by.css('process-alert')).element(by.css('.alert'));
     this.alertCloseButton = this.alert.element(by.css('button.close'));
 
     function waitAlert(){
-        browser.sleep(1500);
+        browser.sleep(1000);
         browser.ignoreSynchronization = true;
         expect(self.alert.isDisplayed()).toBe(true);
     }
@@ -25,6 +30,9 @@ var AlertSuite = function () {
         browser.sleep(1000);
 
         expect(self.alert.isPresent()).toBe(false);
+    }
+
+    function finishAlertCheck() {
         browser.ignoreSynchronization = false;
     }
 
@@ -51,6 +59,7 @@ var AlertSuite = function () {
                 callAlert();
                 waitAlert();
                 checkAlertTimeout(true);
+                finishAlertCheck();
             });
         } 
         else{
@@ -59,6 +68,7 @@ var AlertSuite = function () {
                 waitAlert();
                 checkAlertTimeout(false);
                 closeAlert();
+                finishAlertCheck();
             });
         }
     }
