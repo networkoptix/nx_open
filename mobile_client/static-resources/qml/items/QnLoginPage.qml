@@ -129,8 +129,9 @@ QnPage {
                     selectionAllowed: false
                     inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
                     enabled: !connecting
-                    KeyNavigation.tab: liteMode ? portField : loginField
-                    KeyNavigation.down: KeyNavigation.tab
+                    activeFocusOnTab: true
+                    Keys.onDownPressed: Main.focusNextItem(this)
+                    Keys.onUpPressed: Main.focusPrevItem(this)
                     onAccepted: KeyNavigation.tab.forceActiveFocus()
                 }
 
@@ -144,8 +145,9 @@ QnPage {
                     inputMethodHints: Qt.ImhDigitsOnly
                     validator: IntValidator { bottom: 0; top: 32767 }
                     enabled: !connecting
-                    KeyNavigation.tab: loginField
-                    KeyNavigation.down: KeyNavigation.tab
+                    activeFocusOnTab: liteMode
+                    Keys.onDownPressed: Main.focusNextItem(this)
+                    Keys.onUpPressed: Main.focusPrevItem(this)
                     onAccepted: KeyNavigation.tab.forceActiveFocus()
                 }
             }
@@ -162,8 +164,9 @@ QnPage {
                     selectionAllowed: false
                     inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase | Qt.ImhSensitiveData
                     enabled: !connecting
-                    KeyNavigation.tab: passwordField
-                    KeyNavigation.down: KeyNavigation.tab
+                    activeFocusOnTab: true
+                    Keys.onDownPressed: Main.focusNextItem(this)
+                    Keys.onUpPressed: Main.focusPrevItem(this)
                     onAccepted: KeyNavigation.tab.forceActiveFocus()
                 }
 
@@ -178,15 +181,9 @@ QnPage {
                     selectionAllowed: false
                     inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase | Qt.ImhSensitiveData | Qt.ImhHiddenText
                     enabled: !connecting
-                    KeyNavigation.tab:
-                    {
-                        var item = discoveredSessionsLoader.item
-                        if (!item || item.sessionsRepeater.count == 0)
-                            return hostField
-
-                        return item.sessionsRepeater.itemAt(0)
-                    }
-                    KeyNavigation.down: KeyNavigation.tab
+                    activeFocusOnTab: true
+                    Keys.onDownPressed: Main.focusNextItem(this)
+                    Keys.onUpPressed: Main.focusPrevItem(this)
                     onAccepted: connect()
                     Component.onCompleted: {
                         if (Qt.platform.os == "android")
@@ -295,12 +292,7 @@ QnPage {
                     host: model.address
                     port: model.port
                     version: model.serverVersion
-                    KeyNavigation.tab:
-                    {
-                        var lastItem = index == (discoveredSessionRepeater.count - 1)
-                        return lastItem ? hostField : discoveredSessionRepeater.itemAt(index + 1)
-                    }
-                    KeyNavigation.down: KeyNavigation.tab
+                    activeFocusOnTab: true
 
                     Rectangle
                     {
@@ -312,6 +304,8 @@ QnPage {
                     }
 
                     Keys.onReturnPressed: open()
+                    Keys.onDownPressed: Main.focusNextItem(this)
+                    Keys.onUpPressed: Main.focusPrevItem(this)
                 }
             }
         }
@@ -429,10 +423,16 @@ QnPage {
 
     focus: true
 
-    Keys.onReleased: {
-        if (Main.keyIsBack(event.key)) {
+    Keys.onReleased:
+    {
+        if (Main.keyIsBack(event.key))
+        {
             if (Main.backPressed())
                 event.accepted = true
+        }
+        else if (event.key == Qt.Key_F2)
+        {
+            sideNavigation.open = !sideNavigation.open
         }
     }
 }

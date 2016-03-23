@@ -226,3 +226,18 @@ function keyIsBack(key) {
 
     return false
 }
+
+function focusNextItem(item, forward)
+{
+    if (forward == undefined)
+        forward = true
+
+    var next = item.nextItemInFocusChain(forward)
+    if (next)
+        next.forceActiveFocus()
+}
+
+function focusPrevItem(item)
+{
+    focusNextItem(item, false)
+}
