@@ -45,13 +45,21 @@ FocusScope
 
         Component.onCompleted: forceActiveFocus()
 
-        keyNavigationWraps: true
         Keys.onReturnPressed:
         {
             if (!currentItem)
                 return
 
             currentItem.open()
+        }
+
+        Connections
+        {
+            target: connectionManager
+            onInitialResourcesReceived:
+            {
+                cameraGrid.currentIndex = 0
+            }
         }
     }
 
