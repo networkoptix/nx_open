@@ -7,7 +7,13 @@ var AlertSuite = function () {
     this.alertMessages = {
         loginDanger: 'Login or password are incorrect',
         registerSuccess: 'Your account was successfully registered. Please, check your email to confirm it',
-        accountSuccess: ''
+        accountSuccess: 'Your account was successfully saved.',
+        restorePassWrongEmail: '',
+        restorePassConfirmSent: '',
+        restorePassWrongCode: '',
+        restorePassSuccess: '',
+        changePassWrongCurrent: '',
+        changePassSuccess: ''
     };
 
     this.submitButton = element(by.css('process-button')).element(by.css('button'));
@@ -51,6 +57,7 @@ var AlertSuite = function () {
             waitAlert();
             checkAlertContent(message, type);
             closeAlert();
+            finishAlertCheck();
         });
 
         
