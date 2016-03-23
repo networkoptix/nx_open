@@ -8,7 +8,7 @@
 #include <map>
 #include <set>
 
-#include "pollset.h"
+#include "event_type.h"
 #include "nx/network/abstract_socket.h"
 #include "nx/network/system_socket.h"
 

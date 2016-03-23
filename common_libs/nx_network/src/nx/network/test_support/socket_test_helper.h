@@ -147,6 +147,7 @@ public:
     size_t totalConnectionsEstablished() const;
     size_t totalBytesSent() const;
     size_t totalBytesReceived() const;
+    std::vector<SystemError::ErrorCode> totalErrors() const;
 
 private:
     typedef std::list<std::unique_ptr<TestConnection>> ConnectionsContainer;
@@ -160,6 +161,7 @@ private:
     std::mutex m_mutex;
     size_t m_totalBytesSent;
     size_t m_totalBytesReceived;
+    std::vector<SystemError::ErrorCode> m_errors;
     size_t m_totalConnectionsEstablished;
     std::set<int> m_finishedConnectionsIDs;
     std::random_device m_randomDevice;
@@ -169,7 +171,10 @@ private:
     boost::optional<SocketAddress> m_localAddress;
     nx::utils::MoveOnlyFunc<void()> m_onFinishedHandler;
 
-    void onConnectionFinished( int id, ConnectionsContainer::iterator connectionIter );
+    void onConnectionFinished(
+        int id, SystemError::ErrorCode code,
+        ConnectionsContainer::iterator connectionIter );
+
     void addNewConnections();
 };
 

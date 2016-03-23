@@ -17,6 +17,7 @@
     <name>cloud_db unit tests</name>
 
     <properties>
+        <guid>${cloud_db_ut.guid}</guid>
         <product.title>cloud_db unit tests</product.title>
         <!--Global libs-->
         <qt.libs>core network xml concurrent sql multimedia</qt.libs>

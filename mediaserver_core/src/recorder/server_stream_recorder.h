@@ -82,6 +82,9 @@ private:
     void keepRecentlyMotion(const QnConstAbstractMediaDataPtr& md);
     bool isPanicMode() const;
     bool isRedundantSyncOn() const;
+    bool pauseRebuildIfHighData(QnMutexLockerBase* locker);
+    bool resumeRebuildIfLowData(QnMutexLockerBase* locker);
+    void resumeRebuild(QnMutexLockerBase* locker);
 private slots:
     void at_recordingFinished(
         const ErrorStruct   &status,

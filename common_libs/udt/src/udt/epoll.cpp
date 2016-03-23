@@ -328,10 +328,13 @@ int CEPoll::wait(const int eid, set<UDTSOCKET>* readfds, set<UDTSOCKET>* writefd
 
             //"select" has a limitation on the number of sockets
 
+            //TODO #ak remove limitation on select set size
             fd_set readfds;
             fd_set writefds;
+            fd_set exceptfds;
             FD_ZERO(&readfds);
             FD_ZERO(&writefds);
+            FD_ZERO(&exceptfds);
 
             for (map<SYSSOCKET, int>::const_iterator i = epollContext->m_sLocals.begin(); i != epollContext->m_sLocals.end(); ++i)
             {
@@ -339,12 +342,22 @@ int CEPoll::wait(const int eid, set<UDTSOCKET>* readfds, set<UDTSOCKET>* writefd
                     FD_SET(i->first, &readfds);
                 if (lwfds && (i->second & UDT_EPOLL_OUT) > 0)
                     FD_SET(i->first, &writefds);
+                //TODO #ak handle exceptfds
+                //FD_SET(i->first, &exceptfds);
             }
 
             timeval tv;
-            tv.tv_sec = 0;
-            tv.tv_usec = 0;
-            if (::select(0, &readfds, &writefds, NULL, &tv) > 0)
+            memset(&tv, 0, sizeof(tv));
+
+            const int eventCount = ::select(
+                0,
+                readfds.fd_count > 0 ? &readfds : NULL,
+                writefds.fd_count > 0 ? &writefds : NULL,
+                exceptfds.fd_count > 0 ? &exceptfds : NULL,
+                &tv);
+            if (eventCount < 0)
+                return -1;
+            if (eventCount > 0)
             {
                 //TODO #ak use win32-specific select features to get O(1) here
                 for (map<SYSSOCKET, int>::const_iterator i = epollContext->m_sLocals.begin(); i != epollContext->m_sLocals.end(); ++i)

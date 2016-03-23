@@ -138,6 +138,9 @@ void AsyncClient::closeConnection(
 		baseConnection = std::move( m_baseConnection );
     }
 
+    if (baseConnection)
+        baseConnection->pleaseStopSync();
+
     NX_ASSERT( !baseConnection || !connection ||
                 connection == baseConnection.get(),
                 Q_FUNC_INFO, "Incorrect closeConnection call" );

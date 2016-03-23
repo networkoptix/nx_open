@@ -1,10 +1,11 @@
+
 #include "mediaserver_api.h"
+
+#include <QJsonDocument>
 
 #include <api/model/ping_reply.h>
 #include <rest/server/json_rest_result.h>
 #include <nx/utils/log/log.h>
-
-#include <QJsonDocument>
 
 
 namespace nx {
@@ -42,55 +43,67 @@ struct PingCollector
 void MediaserverApiBase::ping( const ConnectionStrongRef& connection,
                              stun::Message message )
 {
-    if( const auto mediaserver = getMediaserverData( connection, message ) )
+    MediaserverData mediaserverData;
+    nx::String errorMessage;
+    const api::ResultCode resultCode =
+        getMediaserverData(message, &mediaserverData, &errorMessage);
+    if (resultCode != api::ResultCode::ok)
     {
-        const auto endpointsAttr =
-                message.getAttribute< stun::cc::attrs::PublicEndpointList >();
-        if( !endpointsAttr )
-        {
-            sendErrorResponse(
-                connection,
-                message.header,
-                api::ResultCode::badRequest,
-                stun::error::badRequest,
-                "Attribute PublicEndpointList is required" );
-            return;
-        }
-
-        const auto endpoints = endpointsAttr->get();
-        const auto collector = std::make_shared< PingCollector >( endpoints.size(), connection );
-        const auto& method = message.header.method;
-        const auto& transactionId = message.header.transactionId;
-        const auto onPinged = [ = ]( SocketAddress address, bool result )
-        {
-            QnMutexLocker lk( &collector->mutex );
-            if( result )
-                collector->endpoints.push_back( std::move( address ) );
-
-            if( --collector->expected )
-                return; // wait for others...
-
-            if( auto connection = collector->connection.lock() )
-            {
-                NX_LOGX( lit("Peer %1.%2 succesfully pinged %3")
-                        .arg( QString::fromUtf8( mediaserver->systemId ) )
-                        .arg( QString::fromUtf8( mediaserver->serverId ) )
-                        .arg( containerString( collector->endpoints ) ), cl_logDEBUG1 );
-
-                stun::Message response( stun::Header(
-                    stun::MessageClass::successResponse, method,
-                    std::move( transactionId ) ) );
-
-                response.newAttribute< stun::cc::attrs::PublicEndpointList >(
-                            collector->endpoints );
-
-                connection->sendMessage( std::move( response ) );
-            }
-        };
-
-        for( auto& ep : endpoints )
-            pingServer( ep, mediaserver->serverId, onPinged );
+        sendErrorResponse(
+            connection,
+            message.header,
+            resultCode,
+            api::resultCodeToStunErrorCode(resultCode),
+            errorMessage);
+        return;
     }
+
+    const auto endpointsAttr =
+            message.getAttribute< stun::cc::attrs::PublicEndpointList >();
+    if( !endpointsAttr )
+    {
+        sendErrorResponse(
+            connection,
+            message.header,
+            api::ResultCode::badRequest,
+            stun::error::badRequest,
+            "Attribute PublicEndpointList is required" );
+        return;
+    }
+
+    const auto endpoints = endpointsAttr->get();
+    const auto collector = std::make_shared< PingCollector >( endpoints.size(), connection );
+    const auto& method = message.header.method;
+    const auto& transactionId = message.header.transactionId;
+    const auto onPinged = [ = ]( SocketAddress address, bool result )
+    {
+        QnMutexLocker lk( &collector->mutex );
+        if( result )
+            collector->endpoints.push_back( std::move( address ) );
+
+        if( --collector->expected )
+            return; // wait for others...
+
+        if( auto connection = collector->connection.lock() )
+        {
+            NX_LOGX( lit("Peer %1.%2 succesfully pinged %3")
+                    .arg( QString::fromUtf8(mediaserverData.systemId ) )
+                    .arg( QString::fromUtf8(mediaserverData.serverId ) )
+                    .arg( containerString( collector->endpoints ) ), cl_logDEBUG1 );
+
+            stun::Message response( stun::Header(
+                stun::MessageClass::successResponse, method,
+                std::move( transactionId ) ) );
+
+            response.newAttribute< stun::cc::attrs::PublicEndpointList >(
+                        collector->endpoints );
+
+            connection->sendMessage( std::move( response ) );
+        }
+    };
+
+    for( auto& ep : endpoints )
+        pingServer( ep, mediaserverData.serverId, onPinged );
 }
 
 // impl

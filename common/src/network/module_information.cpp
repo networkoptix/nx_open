@@ -46,8 +46,8 @@ void QnModuleInformation::fixRuntimeId()
 
 QString QnModuleInformation::cloudId() const
 {
-    if (!cloudSystemId.isNull())
-        return id.toSimpleString() + lit(".") + cloudSystemId.toSimpleString();
+    if (!cloudSystemId.isEmpty())
+        return id.toSimpleString() + lit(".") + cloudSystemId;
 
     return QString();
 }
