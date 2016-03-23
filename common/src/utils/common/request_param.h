@@ -89,34 +89,11 @@ typedef QHash<QString, QString> QnRequestParams;
 
 struct QnHTTPRawResponse
 {
-    QnHTTPRawResponse()
-    :
-        status( QNetworkReply::NoError )
-    {
-    }
-
+    QnHTTPRawResponse();
     QnHTTPRawResponse(
         SystemError::ErrorCode _sysErrorCode,
         nx_http::Response _response,
-        QByteArray _msgBody)
-    :
-        status(QNetworkReply::NoError),
-        sysErrorCode(_sysErrorCode),
-        response(std::move(_response)),
-        msgBody(std::move(_msgBody))
-    {
-        if (sysErrorCode != SystemError::noError)
-        {
-            status = sysErrorCodeToNetworkError(sysErrorCode);
-            errorString = SystemError::toString(sysErrorCode).toLatin1();
-        }
-        else
-        {
-            status = httpStatusCodeToNetworkError(
-                static_cast<nx_http::StatusCode::Value>(response.statusLine.statusCode));
-            errorString = response.statusLine.reasonPhrase;
-        }
-    }
+        QByteArray _msgBody);
 
     SystemError::ErrorCode sysErrorCode;
     QNetworkReply::NetworkError status;
@@ -126,45 +103,9 @@ struct QnHTTPRawResponse
 
 private:
     QNetworkReply::NetworkError sysErrorCodeToNetworkError(
-        SystemError::ErrorCode errorCode)
-    {
-        switch (errorCode)
-        {
-            case SystemError::noError:
-                return QNetworkReply::NoError;
-            case SystemError::connectionRefused:
-                return QNetworkReply::ConnectionRefusedError;
-            case SystemError::connectionReset:
-                return QNetworkReply::RemoteHostClosedError;
-            case SystemError::hostNotFound:
-                return QNetworkReply::HostNotFoundError;
-            case SystemError::timedOut:
-                return QNetworkReply::TimeoutError;
-            default:
-                return QNetworkReply::UnknownNetworkError;
-        }
-    }
-
+        SystemError::ErrorCode errorCode);
     QNetworkReply::NetworkError httpStatusCodeToNetworkError(
-        nx_http::StatusCode::Value statusCode)
-    {
-        if ((statusCode / 200) == (nx_http::StatusCode::ok / 200))
-            return QNetworkReply::NoError;
-
-        switch (statusCode)
-        {
-            case nx_http::StatusCode::unauthorized:
-                return QNetworkReply::ContentAccessDenied;
-            case nx_http::StatusCode::notFound:
-                return QNetworkReply::ContentNotFoundError;
-            case nx_http::StatusCode::internalServerError:
-                return QNetworkReply::InternalServerError;
-            case nx_http::StatusCode::serviceUnavailable:
-                return QNetworkReply::ServiceUnavailableError;
-            default:
-                return QNetworkReply::UnknownServerError;
-        }
-    }
+        nx_http::StatusCode::Value statusCode);
 };
 
 Q_DECLARE_METATYPE(QnRequestParamList); /* Also works for QnRequestHeaderList. */
