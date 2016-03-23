@@ -12,8 +12,8 @@ var AlertSuite = function () {
         restorePassConfirmSent: '',
         restorePassWrongCode: '',
         restorePassSuccess: '',
-        changePassWrongCurrent: '',
-        changePassSuccess: ''
+        changePassWrongCurrent: 'Couldn\'t change your password: Current password doesn\'t match',
+        changePassSuccess: 'Your password was successfully changed.'
     };
 
     this.submitButton = element(by.css('process-button')).element(by.css('button'));
