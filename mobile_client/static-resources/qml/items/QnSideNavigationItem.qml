@@ -4,7 +4,8 @@ import com.networkoptix.qml 1.0
 
 import "../controls"
 
-Item {
+Item
+{
     id: sideNavigationItem
 
     property alias active: background.active
@@ -14,23 +15,44 @@ Item {
     width: parent.width
     height: dp(48)
 
-    Rectangle {
+    Rectangle
+    {
+        id: focusRectangle
+
+        visible: sideNavigationItem.activeFocus
+
+        anchors.fill: parent
+        color: QnTheme.sessionItemBackgroundActive
+
+        Rectangle
+        {
+            height: parent.height
+            width: dp(1)
+            color: QnTheme.sessionItemActiveMark
+        }
+    }
+
+    Rectangle
+    {
         id: background
 
         property bool active
 
-        anchors.fill: parent
-        color: active ? QnTheme.sessionItemBackgroundActive : QnTheme.sideNavigationBackground
+        visible: active
 
-        Rectangle {
+        anchors.fill: parent
+        color: QnTheme.sessionItemBackgroundActive
+
+        Rectangle
+        {
             height: parent.height
             width: dp(3)
             color: QnTheme.sessionItemActiveMark
-            visible: active
         }
     }
 
-    QnMaterialSurface {
+    QnMaterialSurface
+    {
         onClicked: sideNavigationItem.clicked()
     }
 }
