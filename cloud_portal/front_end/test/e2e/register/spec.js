@@ -8,7 +8,7 @@ describe('Registration suite', function () {
         p.getByUrl();
         p.prepareToAlertCheck();
         p.alert.submitButton.click();
-    }, 'Your account was successfully registered. Please, check your email to confirm it', p.alert.alertTypes.success, true);
+    }, p.alert.alertMessages.registerSuccess, p.alert.alertTypes.success, true);
 
     it("should open register page in anonymous state by clicking Register button on top right corner", function () {
         p.getHomePage();
