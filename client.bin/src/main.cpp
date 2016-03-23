@@ -365,7 +365,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QScopedPointer<QnSkin> skin(new QnSkin(QStringList() << lit(":/skin") << customizationPath));
 #endif // ENABLE_DYNAMIC_CUSTOMIZATION
 
-    QnFontLoader::loadFonts();
+    QnFontLoader::loadFonts(QDir(qApp->applicationDirPath()).absoluteFilePath(lit("fonts")));
 
 
 
