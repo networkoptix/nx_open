@@ -12,6 +12,11 @@ describe('Account suite', function () {
         p.helper.logout();
     });
 
+    p.alert.checkAlert(function(){
+        p.get(p.accountUrl);
+        p.alert.submitButton.click();
+    }, p.alert.alertMessages.accountSuccess, p.alert.alertTypes.success, true);
+
     it("should display dropdown in right top corner: Account settings, Change password, Logout", function () {
         p.get(p.homePageUrl);
         expect(p.userAccountDropdownToggle.getText()).toContain(p.userEmail);

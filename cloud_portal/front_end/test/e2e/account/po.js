@@ -8,6 +8,9 @@ var AccountPage = function () {
     var Helper = require('../helper.js');
     this.helper = new Helper();
 
+    var AlertSuite = require('../alerts_check.js');
+    this.alert = new AlertSuite();
+
     this.accountUrl = '/#/account';
     this.passwordUrl = '/#/account/password';
     this.homePageUrl = '/';
