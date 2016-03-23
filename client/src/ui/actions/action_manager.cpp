@@ -1913,15 +1913,6 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Notifications | Qn::NoTarget).
         text(tr("Pin Notifications")).
         toggledText(tr("Unpin Notifications"));
-
-    factory(QnActions::ToggleBackgroundAnimationAction).
-        flags(Qn::GlobalHotkey).
-        mode(QnActionTypes::DesktopMode).
-        shortcut(lit("Ctrl+Alt+T")).
-        text(tr("Disable Background Animation")).
-        toggledText(tr("Enable Background Animation")).
-        checked(true).
-        autoRepeat(false);
 }
 
 QnActionManager::~QnActionManager() {

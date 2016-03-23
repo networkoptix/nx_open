@@ -1,15 +1,22 @@
 import QtQuick 2.5;
 import QtQuick.Controls 1.2;
 
+import "."
+
 BaseTile
 {
     id: thisComponent;
 
     property string userName;
+    property bool isOnline;
+
+    allowExpanding: !isOnline;
 
     centralAreaDelegate: Column
     {
-        Text
+        spacing: 10; // TODO: check is bottom margin is 8px
+
+        NxLabel
         {
             id: login;
 
@@ -19,30 +26,29 @@ BaseTile
             anchors.leftMargin: 4;
 
             text: userName;
-            color: thisComponent.textColor;
-            font.pixelSize: thisComponent.fontPixelSize;
+            color: Style.colors.text;
+            font: Style.fonts.systemTile.info;
         }
 
-        Rectangle
+        Image
         {
-            id: cloudIndicator;
+            id: imageItem;
 
             anchors.left: parent.left;
 
             width: 24;
-            height: width;
-
-            color: "lightblue";
+            height: 24;
+            source: (isOnline
+                ? "qrc:/skin/welcome_page/cloud_online.png"
+                : "qrc:/skin/welcome_page/cloud_offline.png");
         }
     }
 
-    expandedAreaDelegate: Button
+    MouseArea
     {
-        text: qsTr("Connect");
-        onClicked: { thisComponent.connectClicked(); }
-    }
+        anchors.fill: parent;
 
-    // TODO setup fonts
-    readonly property int fontPixelSize: 12;
-    readonly property color textColor: "white";
+        visible: thisComponent.isOnline;
+        onClicked: thisComponent.connectClicked();
+    }
 }

@@ -98,16 +98,15 @@ public:
 
     void showMessage(const QString &title, const QString &msg, QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::Information);
 
+    void handleMessage(const QString& message);
 protected:
     virtual void closeEvent(QCloseEvent *event) override;
 
 private slots:
-    void handleMessage(const QString& message);
-    
     void onDelayedMessage();
 
     void iconActivated(QSystemTrayIcon::ActivationReason reason);
-    
+
 
     void at_mediaServerStartAction();
     void at_mediaServerStopAction();
@@ -140,7 +139,7 @@ private:
     SC_HANDLE m_scManager;
     SC_HANDLE m_mediaServerHandle;
 
-    QAction *m_showMediaServerLogAction;    
+    QAction *m_showMediaServerLogAction;
     QAction* m_mediaServerStartAction;
     QAction* m_mediaServerStopAction;
     QAction* m_mediaServerWebAction;

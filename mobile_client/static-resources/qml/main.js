@@ -185,15 +185,26 @@ function openSettings() {
     stackView.push(settingsPageComponent)
 }
 
-function backPressed() {
-    if (sideNavigation.open) {
+function backPressed()
+{
+    if (sideNavigation.open)
+    {
         sideNavigation.hide()
         return true
-    } else if (stackView.depth == 2 && stackView.currentItem.objectName == "newConnectionPage") {
+    }
+    else if (stackView.depth == 2 && stackView.currentItem.objectName == "newConnectionPage")
+    {
         // First stack item is always resources page.
         return false
-    } else if (stackView.depth >= 2) {
+    }
+    else if (stackView.depth >= 2)
+    {
         gotoMainScreen()
+        return true
+    }
+    else if (liteMode)
+    {
+        gotoNewSession()
         return true
     }
 
@@ -203,6 +214,12 @@ function backPressed() {
 function keyIsBack(key) {
     if (key === Qt.Key_Back)
         return true
+
+    if (liteMode)
+    {
+        if (key == Qt.Key_Escape || key == Qt.Key_Backspace)
+            return true
+    }
 
 //    if (key === Qt.Key_Backspace)
 //        return true

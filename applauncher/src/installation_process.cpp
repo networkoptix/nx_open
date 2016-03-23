@@ -15,8 +15,6 @@
 #include <nx/utils/log/log.h>
 
 #include "mirror_list_xml_parse_handler.h"
-#include "version.h"
-
 
 InstallationProcess::InstallationProcess(
     const QString& productName,
