@@ -4,7 +4,15 @@ describe('Login suite', function () {
 
     var p = new LoginPage();
 
+    p.alert.checkAlert(function(){
+        p.get();
+        p.emailInput.sendKeys(p.userEmailWrong);
+        p.passwordInput.sendKeys(p.userPassword);
+        p.alert.submitButton.click();
+    }, p.alert.alertMessages.loginDanger, p.alert.alertTypes.danger, true);
+
     it("should open login dialog in anonymous state", function () {
+        browser.sleep(1000);
         p.get();
         expect((p.dialogLoginButton).isDisplayed()).toBe(true);
     });

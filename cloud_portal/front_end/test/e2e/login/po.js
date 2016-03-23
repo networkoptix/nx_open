@@ -1,14 +1,18 @@
 'use strict';
 
-var LoginPage = function () {
+var LoginPage;
+LoginPage = function () {
 
     var Helper = require('../helper.js');
     this.helper = new Helper();
 
+    var AlertSuite = require('../alerts_check.js');
+    this.alert = new AlertSuite();
+
     this.get = function () {
         browser.get('/');
         browser.waitForAngular();
-
+        browser.sleep(500);
         this.loginButton.click();
     };
 
@@ -24,24 +28,24 @@ var LoginPage = function () {
 
     this.emailInput = this.loginDialog.element(by.model('auth.email'));
     this.passwordInput = this.loginDialog.element(by.model('auth.password'));
-    
+
     this.emailInputWrap = this.emailInput.element(by.xpath('..'));
     this.passwordInputWrap = this.passwordInput.element(by.xpath('..'));
-    
-    this.checkPasswordMissing = function() {
+
+    this.checkPasswordMissing = function () {
         expect(this.passwordInput.getAttribute('class')).toContain('ng-invalid-required');
         expect(this.passwordInputWrap.getAttribute('class')).toContain('has-error');
-    }
+    };
 
-    this.checkEmailMissing = function() {
+    this.checkEmailMissing = function () {
         expect(this.emailInput.getAttribute('class')).toContain('ng-invalid-required');
         expect(this.emailInputWrap.getAttribute('class')).toContain('has-error');
-    }
+    };
 
-    this.checkEmailInvalid = function() {
+    this.checkEmailInvalid = function () {
         expect(this.emailInput.getAttribute('class')).toContain('ng-invalid');
         expect(this.emailInputWrap.getAttribute('class')).toContain('has-error');
-    }
+    };
 
     this.dialogLoginButton = this.loginDialog.element(by.buttonText('Login'));
     this.dialogCloseButton = this.loginDialog.all(by.css('button.close')).first();
@@ -64,27 +68,15 @@ var LoginPage = function () {
 
     this.restoreEmailInput = element(by.model('data.email'));
 
-    this.login = function() {
+    this.login = function () {
         this.dialogLoginButton.click();
         browser.sleep(2000); // such a shame, but I can't solve it right now
 
         // Check that element that is visible only for authorized user is displayed on page
         expect(this.loginSuccessElement.isDisplayed()).toBe(true);
-    }
-    this.logout = function() {
+    };
+    this.logout = function () {
         expect(this.userAccountDropdownToggle.isDisplayed()).toBe(true);
-
-        // this.userAccountDropdownToggle.isDisplayed().then(function(visible)
-        // {
-        //     if(visible){
-
-        //         this.userAccountDropdownToggle.click();
-        //         this.userLogoutLink.click();
-        //         browser.sleep(500); // such a shame, but I can't solve it right now
-
-        //         expect(this.loginSuccessElement.isDisplayed()).toBe(false);
-        //     }
-        // });
 
         this.userAccountDropdownToggle.click();
         this.userLogoutLink.click();
@@ -92,21 +84,7 @@ var LoginPage = function () {
 
         // Check that element that is visible only for authorized user is NOT displayed on page
         expect(this.loginSuccessElement.isDisplayed()).toBe(false);
-    }
-
-    // this.wait = function(promise, timeout) {
-    //     while(timePassed < timeout && !checker()){
-    //         console.log("try" ,timePassed);
-    //         browser.sleep(Math.min(timePassed, 200));
-    //         timePassed += 200;
-    //     }
-    // }
-
-    // this.waitDisplay = function(element,timeout) {
-    //     return this.wait( function() {
-    //         return element.isDisplayed();
-    //     }, timeout);
-    // }
+    };
 };
 
 module.exports = LoginPage;
