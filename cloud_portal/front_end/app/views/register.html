@@ -36,16 +36,16 @@
             <label for="registerEmail"  class="col-sm-4 control-label">Email address</label>
             <div class="col-sm-4">
                 <input ng-hide="lockEmail" type="email" class="form-control" ng-model="account.email" id="registerEmail" maxlength="255"
-                       name="registerEmail" required autocomplete="off"  ng-pattern="Config.emailRegex"
+                       name="registerEmail" required autocomplete="off"  validate-email
                        ng-change="hideAlreadyExists()">
 
-                <input type="text"  ng-if="lockEmail"
+                <input type="text" ng-if="lockEmail"
                        class="form-control" ng-model="account.email" readonly>
             </div>
             <div class="col-sm-4">
                 <span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">Email is required.</span>
 
-                <span class="help-block" ng-if="registerForm.registerEmail.$touched && (registerForm.registerEmail.$error.email || registerForm.registerEmail.$error.pattern)">Please, enter a valid email.</span>
+                <span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">Please, enter a valid email.</span>
 
                 <span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">Email is already registered in portal</span>
             </div>

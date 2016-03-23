@@ -7,7 +7,7 @@
                 <label ng-if="!lockEmail" for="email">Email</label>
 
                 <input ng-hide="lockEmail" type="email" class="form-control" ng-model="share.accountEmail" id="email" name="email"
-                       ng-pattern="Config.emailRegex" maxlength="255"
+                       validate-email maxlength="255"
                        required autofocus>
 
                 <input type="text" ng-if="lockEmail" name="email" id="lockedEmail"

@@ -22,6 +22,13 @@ angular.module('cloudApp')
                     scope[formName][fieldName].$setUntouched();
                     scope.$apply();
                 });
+                input.on('keydown',function(){
+                    var key = event.keyCode || event.charCode;
+                    if( key == 8 || key == 46 ){
+                        scope[formName][fieldName].$setUntouched();
+                        scope.$apply();
+                    }
+                });
 
                 function updateValidity(){
                     var touched = scope[formName][fieldName].$touched;

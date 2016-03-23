@@ -16,7 +16,7 @@
             <div class="form-group" validate-field>
                 <label for="emailReactivate"  class="col-sm-4 control-label">Email address</label>
                 <div class="col-sm-4">
-                    <input type="email" class="form-control"  ng-pattern="Config.emailRegex"
+                    <input type="email" class="form-control"  validate-email
                            ng-model="data.email"
                            id="emailReactivate"
                            name="email" maxlength="255"
@@ -24,7 +24,7 @@
                 </div>
                 <div class="col-sm-4">
                     <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required">Email is required.</span>
-                    <span class="help-block" ng-if="reactivateAccount.email.$touched && (reactivateAccount.email.$error.email || reactivateAccount.email.$error.pattern)">Please, enter a valid email.</span>
+                    <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email">Please, enter a valid email.</span>
                 </div>
             </div>
             <div class="form-group">
@@ -46,7 +46,7 @@
             <div class="form-group" validate-field>
                 <label for="email"  class="col-sm-4 control-label">Email address</label>
                 <div class="col-sm-4">
-                    <input type="email" class="form-control"  ng-pattern="Config.emailRegex"
+                    <input type="email" class="form-control"  validate-email
                            ng-model="data.email"
                            id="email"
                            name="email" maxlength="255"
@@ -54,7 +54,7 @@
                 </div>
                 <div class="col-sm-4">
                     <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.required">Email is required.</span>
-                    <span class="help-block" ng-if="restorePassword.email.$touched && (restorePassword.email.$error.email || restorePassword.email.$error.pattern)">Please, enter a valid email.</span>
+                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.email">Please, enter a valid email.</span>
                 </div>
             </div>
             <div class="form-group">
