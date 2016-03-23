@@ -193,7 +193,7 @@
             </params>       
         </resource>  
         <resource name = "AXISP5514" public = "AXIS_COMMON"/>
-        <resource name = "AXISP5514" public = "AXISP5515"/>
+        <resource name = "AXISP5515" public = "AXISP5514"/>
         <resource name = "AXISM1125" public = "AXISM1124"/>
         <resource name = "AXISM3037" public = "AXISM3006">
             <params>
