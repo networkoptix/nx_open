@@ -133,6 +133,11 @@ QnPage {
                     Keys.onDownPressed: Main.focusNextItem(this)
                     Keys.onUpPressed: Main.focusPrevItem(this)
                     onAccepted: KeyNavigation.tab.forceActiveFocus()
+                    onActiveFocusChanged:
+                    {
+                        if (activeFocus)
+                            Main.ensureVisibleInFlickable(this, content, flickable)
+                    }
                 }
 
                 QnTextField {
@@ -149,6 +154,11 @@ QnPage {
                     Keys.onDownPressed: Main.focusNextItem(this)
                     Keys.onUpPressed: Main.focusPrevItem(this)
                     onAccepted: KeyNavigation.tab.forceActiveFocus()
+                    onActiveFocusChanged:
+                    {
+                        if (activeFocus)
+                            Main.ensureVisibleInFlickable(this, content, flickable)
+                    }
                 }
             }
 
@@ -168,6 +178,11 @@ QnPage {
                     Keys.onDownPressed: Main.focusNextItem(this)
                     Keys.onUpPressed: Main.focusPrevItem(this)
                     onAccepted: KeyNavigation.tab.forceActiveFocus()
+                    onActiveFocusChanged:
+                    {
+                        if (activeFocus)
+                            Main.ensureVisibleInFlickable(this, content, flickable)
+                    }
                 }
 
                 QnTextField {
@@ -188,6 +203,11 @@ QnPage {
                     Component.onCompleted: {
                         if (Qt.platform.os == "android")
                             passwordCharacter = "\u2022"
+                    }
+                    onActiveFocusChanged:
+                    {
+                        if (activeFocus)
+                            Main.ensureVisibleInFlickable(this, content, flickable)
                     }
                 }
             }
@@ -306,6 +326,12 @@ QnPage {
                     Keys.onReturnPressed: open()
                     Keys.onDownPressed: Main.focusNextItem(this)
                     Keys.onUpPressed: Main.focusPrevItem(this)
+
+                    onActiveFocusChanged:
+                    {
+                        if (activeFocus)
+                            Main.ensureVisibleInFlickable(this, content, flickable)
+                    }
                 }
             }
         }

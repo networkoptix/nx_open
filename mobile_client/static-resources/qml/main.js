@@ -241,3 +241,9 @@ function focusPrevItem(item)
 {
     focusNextItem(item, false)
 }
+
+function ensureVisibleInFlickable(item, contentItem, flickable)
+{
+    var rect = item.mapToItem(contentItem, 0, 0, item.width, item.height)
+    flickable.ensureVisible(rect.x, rect.y, rect.width, rect.height)
+}
