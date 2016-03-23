@@ -266,14 +266,14 @@ void QnLinkToCloudDialogPrivate::at_bindFinished(
         return;
     }
 
-    auto handleReply = [this](bool success, rest::Handle handleId, rest::ServerConnection::EmptyResponseType)
+    auto handleReply = [this](bool success, rest::Handle handleId, const QnRestResult& reply)
     {
         Q_UNUSED(handleId)
 
-        if (success)
+        if (success && reply.error == QnRestResult::NoError)
             showSuccess();
         else
-            showFailure(tr("Cannot save information to database"));
+            showFailure(reply.errorString);
     };
 
     connection->saveCloudSystemCredentials(

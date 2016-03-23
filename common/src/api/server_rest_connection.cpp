@@ -81,7 +81,7 @@ Handle ServerConnection::saveCloudSystemCredentials(
     const QString& cloudSystemID,
     const QString& cloudAuthKey,
     const QString &cloudAccountName,
-    Result<EmptyResponseType>::type callback,
+    Result<QnRestResult>::type callback,
     QThread* targetThread)
 {
     CloudCredentialsData data;
@@ -114,7 +114,8 @@ QUrl ServerConnection::prepareUrl(const QString& path, const QnRequestParamList&
 template <class T>
 T parseMessageBody(const Qn::SerializationFormat& format, const nx_http::BufferType& msgBody, bool* success)
 {
-    switch(format) {
+    switch(format)
+    {
     case Qn::JsonFormat:
         return QJson::deserialized(msgBody, T(), success);
     case Qn::UbjsonFormat:
@@ -163,7 +164,8 @@ Handle ServerConnection::executeRequest(const Request& request, REST_CALLBACK(Re
     {
         bool success = false;
         ResultType result;
-        if( osErrorCode == SystemError::noError && statusCode == nx_http::StatusCode::ok) {
+        if( osErrorCode == SystemError::noError && statusCode == nx_http::StatusCode::ok)
+        {
             Qn::SerializationFormat format = Qn::serializationFormatFromHttpContentType(contentType);
             result = parseMessageBody<ResultType>(format, msgBody, &success);
         }
