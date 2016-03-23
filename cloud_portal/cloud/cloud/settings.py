@@ -193,7 +193,7 @@ EMAIL_USE_TLS = True
 
 PASSWORD_REQUIREMENTS = {
     'minLength': 6,
-    'requiredRegex': re.compile("^[\x21-\x7E]+$"),
+    'requiredRegex': re.compile("^[\x20-\x7E]+$"),
     'commonList': 'static/scripts/commonPasswordsList.json'
 }
 with open(PASSWORD_REQUIREMENTS['commonList']) as data_file:
