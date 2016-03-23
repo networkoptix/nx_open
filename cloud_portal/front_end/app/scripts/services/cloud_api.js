@@ -19,7 +19,7 @@ angular.module('cloudApp')
                 var now = (new Date()).getTime();
 
                 //Check for cache availability
-                var haveValueInCache = typeof(cachedResults[url]) !== 'undeinfed';
+                var haveValueInCache = typeof(cachedResults[url]) !== 'undefined';
                 var cacheMiss = !haveValueInCache || // clear cache miss
                     forceReload || // ignore cache
                     !cacheForever && (now - cacheReceived[url]) > Config.cacheTimeout; // outdated cache
@@ -29,7 +29,7 @@ angular.module('cloudApp')
                     delete(cachedResults[url]);
                     cacheReceived[url] = 0;
                     defer.resolve(null);
-                }else  if(fromCache || !cacheMiss){
+                }else if(fromCache || !cacheMiss){
                     if(haveValueInCache) {
                         defer.resolve(cachedResults[url]);
                     }else{
