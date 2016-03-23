@@ -37,7 +37,7 @@ FocusScope
         cellHeight: height / 2
 
         flow: GridView.FlowTopToBottom
-        flickableDirection: Flickable.flickingHorizontally
+        flickableDirection: Flickable.HorizontalFlick
         snapMode: GridView.SnapOneRow
 
         delegate: delegateComponent
@@ -45,13 +45,21 @@ FocusScope
 
         Component.onCompleted: forceActiveFocus()
 
-        keyNavigationWraps: true
         Keys.onReturnPressed:
         {
             if (!currentItem)
                 return
 
             currentItem.open()
+        }
+
+        Connections
+        {
+            target: connectionManager
+            onInitialResourcesReceived:
+            {
+                cameraGrid.currentIndex = 0
+            }
         }
     }
 
@@ -70,7 +78,7 @@ FocusScope
                 anchors.fill: parent
 
                 color: "transparent"
-                border.color: QnTheme.cameraSelection
+                border.color: QnTheme.listSelectionBorder
                 border.width: dp(4)
             }
         }

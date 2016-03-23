@@ -1,5 +1,7 @@
 #include "setup_local_rest_handler.h"
 
+#include <api/global_settings.h>
+
 #include <nx/network/http/httptypes.h>
 #include <media_server/serverutil.h>
 
@@ -75,13 +77,18 @@ int QnSetupLocalSystemRestHandler::execute(SetupLocalSystemData data, QnJsonRest
         return nx_http::StatusCode::ok;
     }
 
-    if (!resetCloudParams())
+    qnGlobalSettings->resetCloudParams();
+    qnGlobalSettings->synchronizeNow();
+    //TODO: #GDM sync syncronizeNow with result
+    /*
+    if (!qnGlobalSettings->synchronizeNowSync())
     {
         result.setError(
             QnJsonRestResult::CantProcessRequest,
             lit("Failed to save cloud credentials to local DB"));
         return nx_http::StatusCode::ok;
     }
+    */
 
     if (data.systemName.isEmpty())
     {

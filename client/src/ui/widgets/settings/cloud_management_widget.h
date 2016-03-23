@@ -9,8 +9,6 @@ namespace Ui
     class CloudManagementWidget;
 }
 
-class QnCloudManagementWidgetPrivate;
-
 class QnCloudManagementWidget: public Connective<QnAbstractPreferencesWidget>, QnWorkbenchContextAware
 {
     Q_OBJECT
@@ -26,6 +24,4 @@ public:
 
 private:
     QScopedPointer<Ui::CloudManagementWidget> ui;
-    QScopedPointer<QnCloudManagementWidgetPrivate> d_ptr;
-    Q_DECLARE_PRIVATE(QnCloudManagementWidget)
 };

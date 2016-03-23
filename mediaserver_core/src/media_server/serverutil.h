@@ -24,7 +24,7 @@ namespace nx
     public:
         SystemName(const QString& value = QString());
         SystemName(const SystemName& other);
-        
+
         QString value() const;
         QString prevValue() const;
 
@@ -45,9 +45,6 @@ namespace nx
 * @param tranLogTime - move transaction time to position at least tranLogTime
 */
 bool changeSystemName(nx::SystemName systemName, qint64 sysIdTime, qint64 tranLogTime);
-
-/** Remove could specific params from administrator properties */
-bool resetCloudParams();
 
 struct PasswordData
 {

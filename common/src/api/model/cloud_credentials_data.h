@@ -9,10 +9,10 @@ struct CloudCredentialsData
 {
     /** if \a true, credentials are set to empty string */
     bool reset;
-    QString cloudSystemID; //< keep same name as the constant CLOUD_SYSTEM_ID
-    QString cloudAuthKey; //< keep same name as the constant CLOUD_SYSTEM_AUTH_KEY
-    QString cloudAccountName; //< keep same name as the constant CLOUD_ACCOUNT_NAME
-    
+    QString cloudSystemID; //< keep same name as the constant QnGlobalSettings::kNameCloudSystemID
+    QString cloudAuthKey; //< keep same name as the constant QnGlobalSettings::kNameCloudAuthKey
+    QString cloudAccountName; //< keep same name as the constant QnGlobalSetttings::kNameCloudAccountName
+
     CloudCredentialsData(const QnRequestParams& params);
 
     CloudCredentialsData()

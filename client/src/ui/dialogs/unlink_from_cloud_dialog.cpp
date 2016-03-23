@@ -1,9 +1,7 @@
 #include "unlink_from_cloud_dialog.h"
 
-#include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_properties.h>
-#include <core/resource/user_resource.h>
-#include <core/resource/param.h>
+#include <api/global_settings.h>
+
 #include <cdb/connection.h>
 
 #include <utils/common/delayed.h>
@@ -96,16 +94,14 @@ void QnUnlinkFromCloudDialogPrivate::unbindSystem()
 {
     lockUi(true);
 
-    QnUserResourcePtr adminUser = qnResPool->getAdministrator();
-
-    std::string systemId = adminUser->getProperty(Qn::CLOUD_SYSTEM_ID).toStdString();
+    std::string systemId = qnGlobalSettings->cloudSystemID().toStdString();
 
     cloudConnection = connectionFactory->createConnection(
             systemId,
-            adminUser->getProperty(Qn::CLOUD_SYSTEM_AUTH_KEY).toStdString());
+            qnGlobalSettings->cloudAuthKey().toStdString());
 
     cloudConnection->systemManager()->unbindSystem(
-            qnResPool->getAdministrator()->getProperty(Qn::CLOUD_SYSTEM_ID).toStdString(),
+            systemId,
             [this](api::ResultCode result)
     {
         Q_Q(QnUnlinkFromCloudDialog);
@@ -150,33 +146,26 @@ void QnUnlinkFromCloudDialogPrivate::at_unbindFinished(api::ResultCode result)
 
     Q_Q(QnUnlinkFromCloudDialog);
 
-    const auto admin = qnResPool->getAdministrator();
-    if (!admin)
-    {
-        q->reject();
-        return;
-    }
+    qnGlobalSettings->resetCloudParams();
+    qnGlobalSettings->synchronizeNow(); //TODO: #GDM callback and sync variant
 
-    admin->setProperty(Qn::CLOUD_SYSTEM_ID, QVariant());
-    admin->setProperty(Qn::CLOUD_SYSTEM_AUTH_KEY, QVariant());
-
-    int requestId = propertyDictionary->saveParamsAsync(admin->getId());
-    connect(propertyDictionary, &QnResourcePropertyDictionary::asyncSaveDone, this,
-            [this, requestId](int reqId, ec2::ErrorCode errorCode)
-            {
-                if (reqId != requestId)
-                    return;
-
-                disconnect(propertyDictionary, nullptr, this, nullptr);
-
-                if (errorCode != ec2::ErrorCode::ok)
-                {
-                    showFailure(tr("Can not remove settings from the database."));
-                    return;
-                }
-
-                unlinkedSuccessfully = true;
-                Q_Q(QnUnlinkFromCloudDialog);
-                q->accept();
-            });
+//     int requestId = propertyDictionary->saveParamsAsync(admin->getId());
+//     connect(propertyDictionary, &QnResourcePropertyDictionary::asyncSaveDone, this,
+//             [this, requestId](int reqId, ec2::ErrorCode errorCode)
+//             {
+//                 if (reqId != requestId)
+//                     return;
+//
+//                 disconnect(propertyDictionary, nullptr, this, nullptr);
+//
+//                 if (errorCode != ec2::ErrorCode::ok)
+//                 {
+//                     showFailure(tr("Can not remove settings from the database."));
+//                     return;
+//                 }
+//
+//                 unlinkedSuccessfully = true;
+//                 Q_Q(QnUnlinkFromCloudDialog);
+//                 q->accept();
+//             });
 }
