@@ -144,7 +144,7 @@
         <sasl2.version>2.1.26-SNAPSHOT</sasl2.version>
         <protobuf.version>2.6.0-SNAPSHOT</protobuf.version>
         <onvif.version>2.1.2-io-SNAPSHOT</onvif.version>
-        <sigar.version>1.7-SNAPSHOT</sigar.version>
+        <sigar.version>1.7</sigar.version>
         <festival.version>2.4</festival.version>
         <boost.version>1.56-SNAPSHOT</boost.version>
         <quazip.version>0.7.1</quazip.version>
