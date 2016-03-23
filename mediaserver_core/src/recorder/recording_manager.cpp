@@ -8,6 +8,8 @@
 #include <core/resource/camera_history.h>
 #include <core/resource_management/resource_pool.h>
 
+#include "api/app_server_connection.h"
+#include "api/global_settings.h"
 #include "recording/stream_recorder.h"
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "camera/camera_pool.h"
@@ -18,7 +20,6 @@
 #include "server_stream_recorder.h"
 #include <utils/common/log.h>
 #include "utils/common/synctime.h"
-#include "api/app_server_connection.h"
 #include "plugins/storage/dts/abstract_dts_reader_factory.h"
 #include <business/business_event_rule.h>
 #include <business/business_rule_processor.h>
@@ -219,6 +220,14 @@ void QnRecordingManager::updateCameraHistory(const QnResourcePtr& res)
     if (m_lockInProgress.find(name) != m_lockInProgress.end())
         return; // operation in progress
 
+    //updating camera history
+    if (QnGlobalSettings::instance()->takeCameraOwnershipWithoutLock())
+    {
+        //no need to lock distributed mutex
+        updateCameraHistoryNonSafe(netRes->getUniqueId(), currentTime);
+        return;
+    }
+
     ec2::QnDistributedMutex* mutex = ec2::QnDistributedMutexManager::instance()->createMutex(name);
     connect(mutex, &ec2::QnDistributedMutex::locked, this, &QnRecordingManager::at_historyMutexLocked, Qt::QueuedConnection);
     connect(mutex, &ec2::QnDistributedMutex::lockTimeout, this, &QnRecordingManager::at_historyMutexTimeout, Qt::QueuedConnection);
@@ -248,19 +257,24 @@ void QnRecordingManager::at_historyMutexLocked()
     const LockData& data = itr->second;
 
     if (mutex->checkUserData())
-    {
-        QnCameraHistoryItem cameraHistoryItem(data.cameraResource->getUniqueId(), data.currentTime, qnCommon->moduleGUID());
-
-        const ec2::AbstractECConnectionPtr& appServerConnection = QnAppServerConnectionFactory::getConnection2();
-        ec2::ErrorCode errCode = appServerConnection->getCameraManager()->addCameraHistoryItemSync(cameraHistoryItem);
-        if (errCode == ec2::ErrorCode::ok)
-            QnCameraHistoryPool::instance()->addCameraHistoryItem(cameraHistoryItem);
-        else
-            qCritical() << "ECS server error during execute method addCameraHistoryItem: " << ec2::toString(errCode);
-    }
+        updateCameraHistoryNonSafe(data.cameraResource->getUniqueId(), data.currentTime);
 
     mutex->unlock();
     m_lockInProgress.erase(mutex->name());
+}
+
+void QnRecordingManager::updateCameraHistoryNonSafe(
+    const QString uniqueCameraId,
+    qint64 currentTime)
+{
+    QnCameraHistoryItem cameraHistoryItem(uniqueCameraId, currentTime, qnCommon->moduleGUID());
+
+    const ec2::AbstractECConnectionPtr& appServerConnection = QnAppServerConnectionFactory::getConnection2();
+    ec2::ErrorCode errCode = appServerConnection->getCameraManager()->addCameraHistoryItemSync(cameraHistoryItem);
+    if (errCode == ec2::ErrorCode::ok)
+        QnCameraHistoryPool::instance()->addCameraHistoryItem(cameraHistoryItem);
+    else
+        qCritical() << "ECS server error during execute method addCameraHistoryItem: " << ec2::toString(errCode);
 }
 
 bool QnRecordingManager::startForcedRecording(const QnSecurityCamResourcePtr& camRes, Qn::StreamQuality quality, int fps, int beforeThreshold, int afterThreshold, int maxDuration)

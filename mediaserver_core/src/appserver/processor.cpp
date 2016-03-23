@@ -12,6 +12,7 @@
 #include <core/resource_management/resource_properties.h>
 
 #include "api/common_message_processor.h"
+#include "api/global_settings.h"
 #include "mutex/camera_data_handler.h"
 #include "mutex/distributed_mutex_manager.h"
 #include "nx_ec/data/api_camera_attributes_data.h"
@@ -21,6 +22,7 @@
 #include "core/resource/camera_user_attribute_pool.h"
 #include "utils/license_usage_helper.h"
 #include "media_server/settings.h"
+
 
 QnAppserverResourceProcessor::QnAppserverResourceProcessor(QnUuid serverId)
     : m_serverId(serverId)
@@ -94,7 +96,9 @@ void QnAppserverResourceProcessor::addNewCamera(const QnVirtualCameraResourcePtr
 {
     bool isOwnChangeParentId = cameraResource->hasFlags(Qn::parent_change) && cameraResource->preferedServerId() == qnCommon->moduleGUID(); // return camera back without mutex
     QnMediaServerResourcePtr ownServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
-    bool takeCameraWithoutLock = ownServer && (ownServer->getServerFlags() & Qn::SF_Edge) && !ownServer->isRedundancy();
+    const bool takeCameraWithoutLock =
+        (ownServer && (ownServer->getServerFlags() & Qn::SF_Edge) && !ownServer->isRedundancy()) ||
+        QnGlobalSettings::instance()->takeCameraOwnershipWithoutLock();
     if (!ec2::QnDistributedMutexManager::instance() || takeCameraWithoutLock || isOwnChangeParentId)
     {
         addNewCameraInternal(cameraResource);

@@ -63,6 +63,9 @@ namespace {
     const int kEc2AliveUpdateIntervalDefault = 60;
     const QString kServerDiscoveryPingTimeout(lit("serverDiscoveryPingTimeoutSec"));
     const int kServerDiscoveryPingTimeoutDefault = 60;
+
+    const QString kTakeCameraOwnershipWithoutLock(lit("takeCameraOwnershipWithoutLock"));
+    const int kTakeCameraOwnershipWithoutLockDefault = false;
 }
 
 QnGlobalSettings::QnGlobalSettings(QObject *parent): 
@@ -122,6 +125,11 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
         true,
         this);
     ec2Adaptors << m_timeSynchronizationEnabledAdaptor;
+    m_takeCameraOwnershipWithoutLock = new QnLexicalResourcePropertyAdaptor<bool>(
+        kTakeCameraOwnershipWithoutLock,
+        kTakeCameraOwnershipWithoutLockDefault,
+        this);
+    ec2Adaptors << m_takeCameraOwnershipWithoutLock;
 
     QList<QnAbstractResourcePropertyAdaptor*> emailAdaptors;
     emailAdaptors
@@ -369,8 +377,14 @@ std::chrono::seconds QnGlobalSettings::serverDiscoveryAliveCheckTimeout() const
     return connectionKeepAliveTimeout() * 3;   //3 is here to keep same values as before by default
 }
 
-bool QnGlobalSettings::isTimeSynchronizationEnabled() const {
+bool QnGlobalSettings::isTimeSynchronizationEnabled() const
+{
     return m_timeSynchronizationEnabledAdaptor->value();
+}
+
+bool QnGlobalSettings::takeCameraOwnershipWithoutLock() const
+{
+    return m_takeCameraOwnershipWithoutLock->value();
 }
 
 const QList<QnAbstractResourcePropertyAdaptor*>& QnGlobalSettings::allSettings() const

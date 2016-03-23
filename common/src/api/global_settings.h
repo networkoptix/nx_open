@@ -67,6 +67,7 @@ public:
 
     std::chrono::seconds serverDiscoveryAliveCheckTimeout() const;
     bool isTimeSynchronizationEnabled() const;
+    bool takeCameraOwnershipWithoutLock() const;
 
     /*!
         \a QnAbstractResourcePropertyAdaptor class methods are thread-safe
@@ -119,6 +120,7 @@ private:
     QnResourcePropertyAdaptor<int>* m_ec2KeepAliveProbeCountAdaptor;
     QnResourcePropertyAdaptor<int>* m_ec2AliveUpdateIntervalAdaptor;
     QnResourcePropertyAdaptor<int>* m_serverDiscoveryPingTimeout;
+    QnResourcePropertyAdaptor<bool>* m_takeCameraOwnershipWithoutLock;
 
     QList<QnAbstractResourcePropertyAdaptor*> m_allAdaptors;
 
