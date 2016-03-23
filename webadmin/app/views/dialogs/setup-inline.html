@@ -147,6 +147,8 @@
 </div>
 
 <div class="panel-footer">
+    <button class="btn btn-default" ng-if="activeStep.cancel"
+            ng-click="cancel()">Cancel</button>
     <button class="btn btn-default" ng-if="activeStep.back"
             ng-click="back()"><span class="glyphicon glyphicon-arrow-left"></span></button>
     <button class="btn btn-primary pull-right" ng-if="activeStep.next"

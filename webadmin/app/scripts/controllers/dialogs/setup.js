@@ -25,7 +25,7 @@ angular.module('webadminApp')
         $scope.serverAddress = window.location.host;
 
         var nativeClientObject = typeof(setupDialog)=='undefined'?null:setupDialog; // Qt registered object
-        var debugMode = !!nativeClientObject || $location.search().debug;
+        var debugMode = $location.search().debug;
 
 
         /* Funсtions for external calls (open links) */
@@ -53,9 +53,6 @@ angular.module('webadminApp')
                 $scope.activePassword != Config.defaultPassword)){
                 nativeClientObject.updateCredentials ($scope.activeLogin, $scope.activePassword, $scope.cloudCreds);
             }
-
-            $scope.activeLogin = login;
-            $scope.activePassword = password;
 
             $scope.settings.localLogin = user.name || Config.defaultLogin;
 
@@ -272,6 +269,14 @@ angular.module('webadminApp')
                 window.location.reload();
             }
         };
+        $scope.cancel = function(){
+            if(nativeClientObject) {
+                if(nativeClientObject.cancel){
+                    nativeClientObject.cancel();
+                }
+                window.close();
+            }
+        };
         $scope.back = function(){
             $scope.next($scope.activeStep.back);
         };
@@ -308,6 +313,7 @@ angular.module('webadminApp')
                 next:'start'
             },
             start:{
+                cancel: !!nativeClientObject || debugMode,
                 next: 'systemName'
             },
             systemName:{
