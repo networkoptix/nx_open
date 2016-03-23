@@ -70,7 +70,7 @@ FocusScope
                 anchors.fill: parent
 
                 color: "transparent"
-                border.color: QnTheme.cameraSelection
+                border.color: QnTheme.listSelectionBorder
                 border.width: dp(4)
             }
         }
