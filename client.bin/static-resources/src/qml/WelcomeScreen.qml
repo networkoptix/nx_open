@@ -1,4 +1,4 @@
-import QtQuick 2.5;
+import QtQuick 2.6;
 import QtQuick.Controls 1.2;
 import NetworkOptix.Qml 1.0;
 
@@ -8,23 +8,18 @@ Rectangle
 {
     id: thisComponent;
 
-    anchors.fill: parent;
     color: Style.colors.window;
 
-    enabled: context.isEnabled;
-    focus: true;
+    width: context.pageSize.width;
+    height: context.pageSize.height;
 
-    MouseArea
-    {
-        anchors.fill: parent;
-        onClicked: grid.watcher.resetCurrentItem();
-    }
+    focus: true;
 
     CloudPanel
     {
         id: cloudPanel;
 
-        y: ((grid.y - height) / 2)
+        y: ((grid.y - height) / 2);
         anchors.horizontalCenter: parent.horizontalCenter;
 
         userName: context.cloudUserName;
@@ -72,16 +67,36 @@ Rectangle
                 id: tileLoader;
 
                 z: (item ? item.z : 0);
+
+                Component
+                {
+                    id: factorySystemTile;
+
+                    FactorySystemTile
+                    {
+                        visualParent: thisComponent;
+                        host: model.host;
+                        systemName: qsTr("New System");
+
+                        onConnectClicked:
+                        {
+                            context.setupFactorySystem(model.host);
+                        }
+                    }
+                }
+
                 Component
                 {
                     id: localSystemTile;
 
                     LocalSystemTile
                     {
+                        visualParent: thisComponent;
+
                         systemName: model.systemName;
                         isRecentlyConnected: (knownUsersModel ? knownUsersModel.hasConnections : false);
 
-                        correctTile: model.isCompatible;
+                        allowExpanding: model.isCompatible;
                         knownUsersModel: QnLastSystemConnectionsData { systemName: model.systemName; }
                         knownHostsModel: model.hostsModel;
 
@@ -99,20 +114,21 @@ Rectangle
 
                     CloudSystemTile
                     {
+                        visualParent: thisComponent;
+
                         systemName: model.systemName;
-                        host: model.host;
+
                         onConnectClicked:
                         {
-                            console.log("---", model.host);
                             context.connectToCloudSystem(model.host);
                         }
                     }
                 }
 
-                sourceComponent: (model.isCloudSystem
-                    ? cloudSystemTile : localSystemTile);
+                sourceComponent: (model.isFactorySystem ? factorySystemTile
+                    : (model.isCloudSystem ? cloudSystemTile : localSystemTile));
 
-                onLoaded: grid.watcher.addItem(tileLoader.item);
+                onLoaded: { grid.watcher.addItem(tileLoader.item); }
             }
         }
     }

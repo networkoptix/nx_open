@@ -5,6 +5,7 @@
 
 #include <ui/graphics/items/generic/framed_widget.h>
 
+//TODO: #GDM probably this class in not required anymore
 class QnControlBackgroundWidget: public QnFramedWidget {
     Q_OBJECT
     Q_PROPERTY(QVector<QColor> colors READ colors WRITE setColors)

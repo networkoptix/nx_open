@@ -55,7 +55,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
 
     setAutoFillBackground(true);
 
-    setPaletteColor(this, QPalette::Window, Qt::black);
+    setPaletteColor(this, QPalette::Window, Qt::red);
 
     /* Create buttons. */
     m_jumpBackwardButton = newActionButton(QnActions::JumpToStartAction);

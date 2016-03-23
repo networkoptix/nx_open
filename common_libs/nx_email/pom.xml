@@ -13,6 +13,17 @@
     <packaging>pom</packaging>
     <name>Nx SMTP client</name>
 
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>common</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common/pom.xml</systemPath>
+        </dependency>
+    </dependencies>
+
     <properties>
         <guid>${nx_email.guid}</guid>
         <product.title>${company.name} nx_email</product.title>

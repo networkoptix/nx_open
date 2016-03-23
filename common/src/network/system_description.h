@@ -12,10 +12,11 @@ typedef QSharedPointer<QnSystemDescription> QnSystemDescriptionPtr;
 
 enum class QnServerField
 {
-    NoField                 = 0x0
-    , NameField             = 0x1
-    , SystemNameField       = 0x2
-    , HostField   = 0x4
+    NoField                 = 0x00
+    , NameField             = 0x01
+    , SystemNameField       = 0x02
+    , HostField             = 0x04
+    , FlagsField            = 0x08
 };
 Q_DECLARE_FLAGS(QnServerFields, QnServerField)
 

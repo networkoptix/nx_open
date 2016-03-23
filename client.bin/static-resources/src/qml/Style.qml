@@ -40,6 +40,8 @@ QtObject
         property QtObject systemTile: QtObject
         {
             readonly property real systemNameLabelHeight: 24;
+            readonly property real shadowRadius: 24;
+            readonly property int shadowSamples: 24;
         }
     }
 
@@ -65,7 +67,7 @@ QtObject
             property QtObject systemTile: QtObject
             {
                 readonly property color background: context.getPaletteColor("dark", 7);
-                readonly property color systemNameText: context.getPaletteColor("light", 13);
+                readonly property color setupSystem: context.getPaletteColor("light", 5);   // Check me!
             }
         }
     }
@@ -76,6 +78,7 @@ QtObject
         {
             readonly property font systemName: Qt.font({ pixelSize: 20, weight: Font.Light});
             readonly property font info: Qt.font({ pixelSize: 12, weight: Font.Normal})
+            readonly property font setupSystem: Qt.font({ pixelSize: 12, weight: Font.Normal});
         }
     }
 }

@@ -22,12 +22,16 @@ namespace
         , UserRoleId
         , LastPasswordRoleId
         
+        , IsFactorySystemRoleId
+        
         , IsCloudSystemRoleId
+        , IsOnlineRoleId
         , IsCompatibleRoleId
         , IsCompatibleVersionRoleId
         , IsCorrectCustomizationRoleId
 
         // For local systems 
+        , HostRoleId
         , HostsModelRoleId
         , LastPasswordsModelRoleId
 
@@ -43,11 +47,15 @@ namespace
         result.insert(UserRoleId, "userName");
         result.insert(LastPasswordRoleId, "lastPassword");
         
+        result.insert(IsFactorySystemRoleId, "isFactorySystem");
+        
         result.insert(IsCloudSystemRoleId, "isCloudSystem");
+        result.insert(IsOnlineRoleId, "isOnline");
         result.insert(IsCompatibleRoleId, "isCompatible");
         result.insert(IsCompatibleVersionRoleId, "isCompatibleVersion");
         result.insert(IsCorrectCustomizationRoleId, "isCorrectCustomization");
         
+        result.insert(HostRoleId, "host");
         result.insert(HostsModelRoleId, "hostsModel");
         result.insert(LastPasswordsModelRoleId, "lastPasswordsModel");
 
@@ -98,6 +106,22 @@ namespace
             );
     }
 
+    bool isFactorySystem(const QnSystemDescriptionPtr &sysemDescription)
+    {
+        const auto servers = sysemDescription->servers();
+        if (servers.isEmpty())
+            return false;
+
+        const auto predicate = [](const QnModuleInformation &serverInfo)
+        {
+            return serverInfo.serverFlags.testFlag(Qn::SF_AutoSystemName);
+        };
+
+        const bool isFactory = 
+            std::any_of(servers.begin(), servers.end(), predicate);
+        return isFactory;
+    }
+
     template<typename DataType, typename ResultType>
     ResultType getLessSystemPred()
     {
@@ -107,6 +131,9 @@ namespace
             const auto first = firstData->system;
             const auto second = secondData->system;
 
+            const bool firstIsFactorySystem = isFactorySystem(first);
+            const bool sameFactoryStatus = (firstIsFactorySystem
+                == isFactorySystem(second));
             const bool firstIsCloudSystem = first->isCloudSystem();
             const bool sameType = 
                 (firstIsCloudSystem == second->isCloudSystem());
@@ -199,17 +226,26 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
         return lit("Fake Admin <replace me>");
     case LastPasswordsModelRoleId:
         return QVariant();  // TODO
+    case IsFactorySystemRoleId:
+        return isFactorySystem(systemDescription);
     case IsCloudSystemRoleId:
         return systemDescription->isCloudSystem();
+    case IsOnlineRoleId:
+        return !systemDescription->servers().isEmpty();
     case IsCompatibleRoleId:
         return isCompatibleSystem(systemDescription);
     case IsCorrectCustomizationRoleId:
         return isCorrectCustomization(systemDescription);
     case IsCompatibleVersionRoleId:
         return isCompatibleVersion(systemDescription);
+    case HostRoleId:
+    {
+        const auto hosts = extractHosts(systemDescription);
+        return (hosts.isEmpty() ? QString() : hosts.front());
+    }
     case HostsModelRoleId:
         return QVariant::fromValue(createStringListModel(
-            extractHosts(systemDescription)));
+            extractHosts(systemDescription)));      // TODO: add handling of server discovery\lost
     default:
         return QVariant();
     }
@@ -335,6 +371,5 @@ void QnSystemsModel::serverChanged(const QnSystemDescriptionPtr &systemDescripti
     };
 
     testFlag(QnServerField::HostField, HostsModelRoleId); // TODO: emit in model
+    testFlag(QnServerField::FlagsField, IsFactorySystemRoleId);
 }
-
-

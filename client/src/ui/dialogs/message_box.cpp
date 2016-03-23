@@ -621,7 +621,8 @@ int QnMessageBox::exec()
     setWindowFlags(flags);
 
     /* We cannot cancel drag via modal dialog, let parent process it. */
-    cancelDrag(parentWidget());
+    if (parentWidget())
+        cancelDrag(parentWidget());
 
     adjustSize();
 

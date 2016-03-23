@@ -33,11 +33,6 @@ BaseTile
     {
         variableName: "isMasked";
         writeVariableName: "isMaskedPrivate";
-        onIsSomeoneActiveChanged:
-        {
-            if (isSomeoneActive)
-                isExpandedPrivate = true;
-        }
     }
 
     onIsExpandedChanged:
@@ -60,7 +55,7 @@ BaseTile
         {
             id: hostChooseItem;
 
-            isAvailable: thisComponent.correctTile && thisComponent.isExpanded;
+            isAvailable: thisComponent.allowExpanding && thisComponent.isExpanded;
 
             model: thisComponent.knownHostsModel;
             iconUrl: "qrc:/skin/welcome_page/server.png";   // TODO: add ecosystem class for hovered icons
@@ -74,7 +69,7 @@ BaseTile
             id: userChooseItem;
 
             visible: thisComponent.isRecentlyConnected;
-            isAvailable: thisComponent.correctTile && thisComponent.isExpanded;
+            isAvailable: thisComponent.allowExpanding && thisComponent.isExpanded;
 
             model: thisComponent.knownUsersModel;
             iconUrl: "qrc:/skin/welcome_page/user.png";
@@ -125,6 +120,7 @@ BaseTile
             {
                 id: passwordTextField;
                 width: parent.width;
+                echoMode: TextInput.Password;
             }
 
             CheckBox

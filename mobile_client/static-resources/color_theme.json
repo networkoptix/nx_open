@@ -127,7 +127,8 @@
         "hiddenText" :          "palette.base.color_15",
         "hiddenBackground" :    "palette.base.color_5",
         "dummyBorder" :         "palette.base.color_7",
-        "showButtonBackground" : "palette.base.color_7"
+        "showButtonBackground" : "palette.base.color_7",
+        "selection" :           "palette.contrast.color_5"
     },
 
     "toast" : {

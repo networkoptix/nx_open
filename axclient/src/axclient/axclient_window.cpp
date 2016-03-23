@@ -226,7 +226,7 @@ void QnAxClientWindow::createMainWindow() {
     m_context->menu()->registerAlias(QnActions::EffectiveMaximizeAction, effectiveMaximizeActionId);
 
     m_mainWindow.reset(new QnMainWindow(m_context.data()));
-    m_mainWindow->setOptions(m_mainWindow->options() & ~(QnMainWindow::TitleBarDraggable | QnMainWindow::WindowButtonsVisible));
+    m_mainWindow->setOptions(m_mainWindow->options() & ~(QnMainWindow::TitleBarDraggable));
 
     m_mainWindow->resize(100, 100);
     m_context->setMainWindow(m_mainWindow.data());
