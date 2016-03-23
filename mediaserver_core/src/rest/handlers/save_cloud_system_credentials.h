@@ -8,7 +8,7 @@
 
 #include "rest/server/json_rest_handler.h"
 
-class CloudCredentialsData;
+struct CloudCredentialsData;
 class QnSaveCloudSystemCredentialsHandler
 :
     public QnJsonRestHandler

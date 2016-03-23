@@ -8,6 +8,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <api/app_server_connection.h>
+#include <api/global_settings.h>
 
 #include <nx_ec/managers/abstract_server_manager.h>
 #include <nx_ec/managers/abstract_user_manager.h>
@@ -246,19 +247,6 @@ bool changeSystemName(nx::SystemName systemName, qint64 sysIdTime, qint64 tranLo
     QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->save(apiServer, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 
     return true;
-}
-
-bool resetCloudParams()
-{
-    const auto admin = qnResPool->getAdministrator();
-    if (!admin)
-        return false;
-
-    //setting cloud credentials to empty string
-    admin->setProperty(Qn::CLOUD_SYSTEM_ID, QString());
-    admin->setProperty(Qn::CLOUD_SYSTEM_AUTH_KEY, QString());
-    admin->setProperty(Qn::CLOUD_ACCOUNT_NAME, QString());
-    return propertyDictionary->saveParams(admin->getId());
 }
 
 qint64 getSysIdTime()
