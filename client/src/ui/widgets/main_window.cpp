@@ -32,7 +32,6 @@
 #include <ui/actions/action_manager.h>
 #include <ui/graphics/view/graphics_view.h>
 #include <ui/graphics/view/graphics_scene.h>
-#include <ui/graphics/view/gradient_background_painter.h>
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -82,7 +81,7 @@
 #include <ui/workbench/workbench_resource.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 
-#include <ui/widgets/cloud_status_panel.h>
+#include <ui/widgets/main_window_title_controls_widget.h>
 
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
@@ -104,43 +103,21 @@
 
 namespace
 {
-    QToolButton *newActionButton(QAction *action, bool popup = false, qreal sizeMultiplier = 1.0, int helpTopicId = Qn::Empty_Help) {
-        QToolButton *button = new QToolButton();
-        button->setDefaultAction(action);
-
-        qreal aspectRatio = QnGeometry::aspectRatio(action->icon().actualSize(QSize(1024, 1024)));
-        int iconHeight = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, 0, button) * sizeMultiplier;
-        int iconWidth = iconHeight * aspectRatio;
-        button->setFixedSize(iconWidth, iconHeight);
-
-        button->setProperty(Qn::ToolButtonCheckedRotationSpeed, action->property(Qn::ToolButtonCheckedRotationSpeed));
-
-        if(popup) {
-            /* We want the button to activate the corresponding action so that menu is updated.
-             * However, menu buttons do not activate their corresponding actions as they do not receive release events.
-             * We work this around by making some hacky connections. */
-            button->setPopupMode(QToolButton::InstantPopup);
-
-            QObject::disconnect(button, SIGNAL(pressed()),  button,                     SLOT(_q_buttonPressed()));
-            QObject::connect(button,    SIGNAL(pressed()),  button->defaultAction(),    SLOT(trigger()));
-            QObject::connect(button,    SIGNAL(pressed()),  button,                     SLOT(_q_buttonPressed()));
+    void processWidgetsRecursively(QLayout *layout, std::function<void(QWidget*)> func)
+    {
+        for (int i = 0, count = layout->count(); i < count; i++)
+        {
+            QLayoutItem *item = layout->itemAt(i);
+            if (item->widget())
+                func(item->widget());
+            else if (item->layout())
+                processWidgetsRecursively(item->layout(), func);
         }
-
-        if(helpTopicId != Qn::Empty_Help)
-            setHelpTopic(button, helpTopicId);
-
-        return button;
     }
 
-    void setVisibleRecursively(QLayout *layout, bool visible) {
-        for(int i = 0, count = layout->count(); i < count; i++) {
-            QLayoutItem *item = layout->itemAt(i);
-            if(item->widget()) {
-                item->widget()->setVisible(visible);
-            } else if(item->layout()) {
-                setVisibleRecursively(item->layout(), visible);
-            }
-        }
+    void setVisibleRecursively(QLayout *layout, bool visible)
+    {
+        processWidgetsRecursively(layout, [visible](QWidget* w) {w->setVisible(visible); });
     }
 
     int minimalWindowWidth = 800;
@@ -176,7 +153,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_skipDoubleClick(false),
     m_dwm(NULL),
     m_drawCustomFrame(false),
-    m_enableBackgroundAnimation(true),
     m_inFullscreenTransition(false)
 {
 #ifdef Q_OS_MACX
@@ -235,14 +211,11 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     display()->setLightMode(qnSettings->lightMode());
     display()->setScene(m_scene.data());
     display()->setView(m_view.data());
-    
+
     if (qnRuntime->isVideoWallMode())
         display()->setNormalMarginFlags(0);
     else
         display()->setNormalMarginFlags(Qn::MarginsAffectSize | Qn::MarginsAffectPosition);
-
-    if (qnSettings->lightMode() & Qn::LightModeNoSceneBackground)
-        action(QnActions::ToggleBackgroundAnimationAction)->setDisabled(true);
 
     m_controller.reset(new QnWorkbenchController(this));
     if (qnRuntime->isVideoWallMode())
@@ -326,7 +299,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(QnActions::DebugDecrementCounterAction));
     addAction(action(QnActions::DebugShowResourcePoolAction));
     addAction(action(QnActions::DebugControlPanelAction));
-    addAction(action(QnActions::ToggleBackgroundAnimationAction));
     addAction(action(QnActions::SystemAdministrationAction));
 
     connect(action(QnActions::MaximizeAction),     SIGNAL(toggled(bool)),                          this,                                   SLOT(setMaximized(bool)));
@@ -362,40 +334,31 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     tabBarLayout->setSpacing(0);
     tabBarLayout->addWidget(m_tabBar);
     tabBarLayout->addSpacing(6);
-    tabBarLayout->addWidget(newActionButton(action(QnActions::OpenNewTabAction), false, 1.0, Qn::MainWindow_TitleBar_NewLayout_Help));
+    tabBarLayout->addWidget(QnMainWindowTitleControlsWidget::newActionButton(action(QnActions::OpenNewTabAction), false, 1.0, Qn::MainWindow_TitleBar_NewLayout_Help));
     tabBarLayout->addSpacing(6);
-    tabBarLayout->addWidget(newActionButton(action(QnActions::OpenCurrentUserLayoutMenu), true));
+    tabBarLayout->addWidget(QnMainWindowTitleControlsWidget::newActionButton(action(QnActions::OpenCurrentUserLayoutMenu), true));
     tabBarLayout->addStretch(0x1000);
-
-    QnCloudStatusPanel *cloudPanel = new QnCloudStatusPanel(context, this);
-
-    /* Layout for window buttons that can be removed from the title bar. */
-    m_windowButtonsLayout = new QHBoxLayout();
-    m_windowButtonsLayout->setContentsMargins(4, 0, 2, 0);
-    m_windowButtonsLayout->setSpacing(4);
-    m_windowButtonsLayout->addWidget(newActionButton(action(QnActions::WhatsThisAction), false, 1.0, Qn::MainWindow_ContextHelp_Help));
-    m_windowButtonsLayout->addWidget(newActionButton(action(QnActions::MinimizeAction)));
-    m_windowButtonsLayout->addWidget(newActionButton(action(QnActions::EffectiveMaximizeAction), false, 1.0, Qn::MainWindow_Fullscreen_Help));
-    m_windowButtonsLayout->addWidget(newActionButton(action(QnActions::ExitAction)));
 
     /* Title layout. We cannot create a widget for title bar since there appears to be
      * no way to make it transparent for non-client area windows messages. */
-    m_mainMenuButton = newActionButton(action(QnActions::MainMenuAction), true, 1.5, Qn::MainWindow_TitleBar_MainMenu_Help);
+    m_mainMenuButton = QnMainWindowTitleControlsWidget::newActionButton(action(QnActions::MainMenuAction), true, 1.5, Qn::MainWindow_TitleBar_MainMenu_Help);
     connect(action(QnActions::MainMenuAction), &QAction::triggered, this, &QnMainWindow::skipDoubleClick);
 
     m_titleLayout = new QHBoxLayout();
     m_titleLayout->setContentsMargins(0, 0, 0, 0);
-    m_titleLayout->setSpacing(2);
+    m_titleLayout->setSpacing(0);
     m_titleLayout->addWidget(m_mainMenuButton);
     m_titleLayout->addWidget(tabBarWidget, 0x1000, Qt::AlignBottom);
-    m_titleLayout->addWidget(cloudPanel);
-    if (QnScreenRecorder::isSupported())
-        m_titleLayout->addWidget(newActionButton(action(QnActions::ToggleScreenRecordingAction), false, 1.0, Qn::MainWindow_ScreenRecording_Help));
-    m_titleLayout->addWidget(newActionButton(action(QnActions::OpenLoginDialogAction), false, 1.0, Qn::Login_Help));
-    m_titleLayout->addLayout(m_windowButtonsLayout);
+    m_titleLayout->addWidget(new QnMainWindowTitleControlsWidget(this));
+
+    processWidgetsRecursively(m_titleLayout, [](QWidget* w)
+    {
+        setPaletteColor(w, QPalette::Window, qApp->palette().color(QPalette::Normal, QPalette::Window));
+        w->setAutoFillBackground(true);
+    });
 
     /* Layouts. */
-    
+
     m_viewLayout = new QVBoxLayout();
     m_viewLayout->setContentsMargins(0, 0, 0, 0);
     m_viewLayout->setSpacing(0);
@@ -416,9 +379,9 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     /* Post-initialize. */
     updateWidgetsVisibility();
 #ifdef Q_OS_MACX
-    setOptions(WindowButtonsVisible);
+    setOptions(Options());
 #else
-    setOptions(TitleBarDraggable | WindowButtonsVisible);
+    setOptions(TitleBarDraggable);
 #endif
 
     /* Open single tab. */
@@ -458,7 +421,7 @@ void QnMainWindow::updateWidgetsVisibility()
 {
     const auto updateTitleBarVisibility = [this](bool visible)
     {
-        if (visible) 
+        if (visible)
         {
             m_globalLayout->insertLayout(0, m_titleLayout);
             setVisibleRecursively(m_titleLayout, true);
@@ -470,11 +433,11 @@ void QnMainWindow::updateWidgetsVisibility()
         setVisibleRecursively(m_titleLayout, false);
     };
 
-    const auto updateWelcomeScreenVisibility = 
+    const auto updateWelcomeScreenVisibility =
         [this](bool welcomeScreenIsVisible)
     {
         enum { kSceneIndex, kWelcomePageIndex };
-        m_currentPageHolder->setCurrentIndex(welcomeScreenIsVisible 
+        m_currentPageHolder->setCurrentIndex(welcomeScreenIsVisible
             ? kWelcomePageIndex : kSceneIndex);
     };
 
@@ -494,7 +457,7 @@ void QnMainWindow::setWelcomeScreenVisible(bool visible)
     updateWidgetsVisibility();
 }
 
-void QnMainWindow::setTitleVisible(bool visible) 
+void QnMainWindow::setTitleVisible(bool visible)
 {
     if(m_titleVisible == visible)
         return;
@@ -502,21 +465,6 @@ void QnMainWindow::setTitleVisible(bool visible)
     m_titleVisible = visible;
 
     updateWidgetsVisibility();
-}
-
-void QnMainWindow::setWindowButtonsVisible(bool visible) {
-    bool currentVisibility = m_windowButtonsLayout->parent() != NULL;
-    if(currentVisibility == visible)
-        return;
-
-    if(visible) {
-        m_titleLayout->addLayout(m_windowButtonsLayout);
-        setVisibleRecursively(m_windowButtonsLayout, true);
-    } else {
-        m_titleLayout->takeAt(m_titleLayout->count() - 1);
-        m_windowButtonsLayout->setParent(NULL);
-        setVisibleRecursively(m_windowButtonsLayout, false);
-    }
 }
 
 void QnMainWindow::setMaximized(bool maximized) {
@@ -621,10 +569,6 @@ void QnMainWindow::minimize() {
     showMinimized();
 }
 
-void QnMainWindow::toggleTitleVisibility() {
-    setTitleVisible(!m_titleVisible);
-}
-
 bool QnMainWindow::handleMessage(const QString &message) {
     const QStringList files = message.split(QLatin1Char('\n'), QString::SkipEmptyParts);
 
@@ -645,13 +589,9 @@ void QnMainWindow::setOptions(Options options) {
         return;
 
     m_options = options;
-
-    setWindowButtonsVisible(m_options & WindowButtonsVisible);
-    m_ui->setWindowButtonsUsed(m_options & WindowButtonsVisible);
 }
 
 void QnMainWindow::updateDecorationsState() {
-    return;
 #ifdef Q_OS_MACX
     bool fullScreen = mac_isFullscreen((void*)winId());
 #else
@@ -674,16 +614,18 @@ void QnMainWindow::updateDecorationsState() {
     m_view->setLineWidth(windowTitleUsed ? 0 : 1);
 
     updateDwmState();
+    m_currentPageHolder->updateGeometry();
 }
 
 void QnMainWindow::updateDwmState() {
-    return;
-    if(isFullScreen()) {
+    if (isFullScreen())
+    {
         /* Full screen mode. */
         m_drawCustomFrame = false;
         m_frameMargins = QMargins(0, 0, 0, 0);
 
-        if(m_dwm->isSupported() && false) { // TODO: Disable DWM for now.
+        if (m_dwm->isSupported() && false)
+        { // TODO: Disable DWM for now.
             setAttribute(Qt::WA_NoSystemBackground, false);
             setAttribute(Qt::WA_TranslucentBackground, false);
 
@@ -693,7 +635,7 @@ void QnMainWindow::updateDwmState() {
         }
 
         /* Can't set to (0, 0, 0, 0) on Windows as in fullScreen mode context menu becomes invisible.
-         * Looks like Qt bug: http://bugreports.qt.nokia.com/browse/QTBUG-7556. */
+         * Looks like Qt bug: https://bugreports.qt.io/browse/QTBUG-7556 */
 #ifdef Q_OS_WIN
         setContentsMargins(0, 0, 0, 1);
 #else
@@ -702,7 +644,9 @@ void QnMainWindow::updateDwmState() {
 
         m_titleLayout->setContentsMargins(0, 0, 0, 0);
         m_viewLayout->setContentsMargins(0, 0, 0, 0);
-    } else if(m_dwm->isSupported() && m_dwm->isCompositionEnabled() && false) { // TODO: Disable DWM for now.
+    }
+    else if (m_dwm->isSupported() && m_dwm->isCompositionEnabled() && false)
+    { // TODO: Disable DWM for now.
         /* Windowed or maximized with aero glass. */
         m_drawCustomFrame = false;
         m_frameMargins = !isMaximized() ? m_dwm->themeFrameMargins() : QMargins(0, 0, 0, 0);
@@ -723,25 +667,29 @@ void QnMainWindow::updateDwmState() {
             m_frameMargins.right(),
             m_frameMargins.bottom()
         );
-    } else {
+    }
+    else
+    {
         /* Windowed or maximized without aero glass. */
-        /*m_drawCustomFrame = true;
-        m_frameMargins = !isMaximized() ? (m_dwm->isSupported() ? m_dwm->themeFrameMargins() : QMargins(8, 8, 8, 8)) : QMargins(0, 0, 0, 0);*/
 #ifdef Q_OS_LINUX
         // On linux window manager cannot disable titlebar leaving border in place. Thus we have to disable decorations completely and draw our own border.
-        if (isMaximized()) {
+        if (isMaximized())
+        {
             m_drawCustomFrame = false;
             m_frameMargins = QMargins(0, 0, 0, 0);
-        } else {
-        m_drawCustomFrame = true;
-        m_frameMargins = QMargins(2, 2, 2, 2);
+        }
+        else
+        {
+            m_drawCustomFrame = true;
+            m_frameMargins = QMargins(2, 2, 2, 2);
         }
 #else
         m_drawCustomFrame = false;
         m_frameMargins = QMargins(0, 0, 0, 0);
 #endif
 
-        if(m_dwm->isSupported() && false) { // TODO: Disable DWM for now.
+        if(m_dwm->isSupported() && false)
+        { // TODO: Disable DWM for now.
             setAttribute(Qt::WA_NoSystemBackground, false);
             setAttribute(Qt::WA_TranslucentBackground, false);
 

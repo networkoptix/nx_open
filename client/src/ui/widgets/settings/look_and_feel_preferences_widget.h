@@ -29,22 +29,15 @@ public:
     virtual bool canApplyChanges() override;
     virtual bool canDiscardChanges() override;
 
-protected:
-    virtual bool event(QEvent *event) override;
-
 private:
     void setupLanguageUi();
     void setupSkinUi();
     void setupTimeModeUi();
     void setupBackgroundUi();
 
-    QColor animationCustomColor() const;
-    void updateAnimationCustomColor();
-
     void selectBackgroundImage();
 private:
     QScopedPointer<Ui::LookAndFeelPreferencesWidget> ui;
-    QScopedPointer<QColorDialog> m_colorDialog;
     bool m_updating;
 
     int m_oldLanguage;

@@ -88,10 +88,6 @@ public:
 
     void setFlags(Flags flags);
 
-    bool isWindowButtonsUsed() const {
-        return m_windowButtonsUsed;
-    }
-
     bool isTitleUsed() const {
         return m_titleUsed;
     }
@@ -145,7 +141,6 @@ public slots:
     void disableProxyUpdates() { setProxyUpdatesEnabled(false); }
 
     void setTitleUsed(bool titleUsed = true);
-    void setWindowButtonsUsed(bool windowButtonsUsed = true);
     void setFpsVisible(bool fpsVisible = true);
 
     void setTreeVisible(bool visible = true, bool animate = true);
@@ -180,7 +175,7 @@ protected:
     void updateSliderZoomButtonsGeometry();
 
     QRectF updatedTreeGeometry(const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry);
-    QRectF updatedNotificationsGeometry(const QRectF &notificationsGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry, const QRectF &calendarGeometry, const QRectF &dayTimeGeometry, qreal *maxHeight);
+    QRectF updatedNotificationsGeometry(const QRectF &notificationsGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry);
     QRectF updatedCalendarGeometry(const QRectF &sliderGeometry);
     QRectF updatedDayTimeWidgetGeometry(const QRectF &sliderGeometry, const QRectF &calendarGeometry);
     void updateActivityInstrumentState();
@@ -223,7 +218,7 @@ private slots:
 
     void updateCalendarVisibility(bool animate = true);
     void updateControlsVisibility(bool animate = true);
-    
+
     void updateTreeOpacityAnimated() { updateTreeOpacity(true); }
     void updateSliderOpacityAnimated() { updateSliderOpacity(true); }
     void updateTitleOpacityAnimated() { updateTitleOpacity(true); }
@@ -309,8 +304,6 @@ private:
     bool m_calendarVisible;
 
     bool m_dayTimeOpened;
-
-    bool m_windowButtonsUsed;
 
     bool m_ignoreClickEvent;
 
@@ -414,11 +407,6 @@ private:
     VariantAnimator *m_titleYAnimator;
 
     HoverFocusProcessor *m_titleOpacityProcessor;
-
-    QGraphicsLinearLayout *m_titleRightButtonsLayout;
-
-    QGraphicsWidget *m_windowButtonsWidget;
-
 
     /* Notifications window-related state. */
 

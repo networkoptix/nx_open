@@ -15,14 +15,14 @@ Item
 
     property Component centralAreaDelegate;
     property Component expandedAreaDelegate;
-    property bool correctTile: true;
+    property bool allowExpanding: true;
     property bool isExpanded;
 
     Binding
     {
         target: thisComponent;
         property: "isExpanded";
-        value: (tileHolder.state !== "collapsed") && correctTile;
+        value: (tileHolder.state !== "collapsed") && allowExpanding;
     }
 
     property alias centralArea: centralAreaLoader.item;
@@ -32,16 +32,16 @@ Item
 
     function toggle()
     {
-        tileHolder.state = (!correctTile || (tileHolder.state == "expanded")
+        tileHolder.state = (!allowExpanding || (tileHolder.state == "expanded")
             ? "collapsed" : "expanded");
     }
 
     implicitWidth: 280;
     implicitHeight: 96;
-    z: (transition.running ? 1 : 0)
+    z: (transition.running ? 100 : 0)
 
     Item
-    {        
+    {
         id: tileHolder;
 
         readonly property real expadedHeight: (loadersColumn.y
@@ -166,7 +166,7 @@ Item
                 text: systemName;
 
                 height: Style.custom.systemTile.systemNameLabelHeight;
-                color: Style.colors.custom.systemTile.systemNameText;
+                color: Style.colors.text;
                 font: Style.fonts.systemTile.systemName;
             }
 

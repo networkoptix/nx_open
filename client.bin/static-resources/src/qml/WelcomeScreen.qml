@@ -67,6 +67,24 @@ Rectangle
                 id: tileLoader;
 
                 z: (item ? item.z : 0);
+
+                Component
+                {
+                    id: factorySystemTile;
+
+                    FactorySystemTile
+                    {
+                        visualParent: thisComponent;
+                        host: model.host;
+                        systemName: qsTr("New System");
+
+                        onConnectClicked:
+                        {
+                            context.setupFactorySystem(model.host);
+                        }
+                    }
+                }
+
                 Component
                 {
                     id: localSystemTile;
@@ -78,7 +96,7 @@ Rectangle
                         systemName: model.systemName;
                         isRecentlyConnected: (knownUsersModel ? knownUsersModel.hasConnections : false);
 
-                        correctTile: model.isCompatible;
+                        allowExpanding: model.isCompatible;
                         knownUsersModel: QnLastSystemConnectionsData { systemName: model.systemName; }
                         knownHostsModel: model.hostsModel;
 
@@ -99,17 +117,16 @@ Rectangle
                         visualParent: thisComponent;
 
                         systemName: model.systemName;
-                        host: model.host;
+
                         onConnectClicked:
                         {
-                            console.log("---", model.host);
                             context.connectToCloudSystem(model.host);
                         }
                     }
                 }
 
-                sourceComponent: (model.isCloudSystem
-                    ? cloudSystemTile : localSystemTile);
+                sourceComponent: (model.isFactorySystem ? factorySystemTile
+                    : (model.isCloudSystem ? cloudSystemTile : localSystemTile));
 
                 onLoaded: { grid.watcher.addItem(tileLoader.item); }
             }

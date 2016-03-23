@@ -71,8 +71,6 @@
 
 #include <ui/graphics/opengl/gl_hardware_checker.h>
 
-#include <ui/graphics/view/gradient_background_painter.h>
-
 #include <ui/workaround/gl_widget_factory.h>
 #include <ui/workaround/gl_widget_workaround.h>
 
@@ -270,8 +268,6 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
 
     /* Set up defaults. */
     connect(this, SIGNAL(geometryAdjustmentRequested(QnWorkbenchItem *, bool)), this, SLOT(adjustGeometry(QnWorkbenchItem *, bool)), Qt::QueuedConnection);
-
-    connect(action(QnActions::ToggleBackgroundAnimationAction),   &QAction::toggled,  this,   &QnWorkbenchDisplay::toggleBackgroundAnimation);
 }
 
 QnWorkbenchDisplay::~QnWorkbenchDisplay() {
@@ -347,13 +343,6 @@ void QnWorkbenchDisplay::deinitSceneView() {
     /* Clear grid. */
     if(!m_gridItem.isNull())
         delete m_gridItem.data();
-
-    /* Clear background painter. */
-    if (!m_backgroundPainter.isNull()) {
-        m_view->uninstallLayerPainter(m_backgroundPainter.data());
-        delete m_backgroundPainter.data();
-    }
-
 
     /* Deinit workbench. */
     disconnect(workbench(), NULL, this, NULL);
@@ -445,7 +434,7 @@ void QnWorkbenchDisplay::initSceneView() {
     m_curtainItem = new QnCurtainItem();
     m_scene->addItem(m_curtainItem.data());
     setLayer(m_curtainItem.data(), Qn::BackLayer);
-    m_curtainItem.data()->setColor(Qt::black);
+    m_curtainItem.data()->setColor(Qt::green);
     m_curtainAnimator->setCurtainItem(m_curtainItem.data());
 
     /* Set up grid. */
@@ -457,20 +446,14 @@ void QnWorkbenchDisplay::initSceneView() {
     m_gridItem.data()->setLineWidth(100.0);
     m_gridItem.data()->setMapper(workbench()->mapper());
 
-	if (canShowLayoutBackground()) {
+	if (canShowLayoutBackground())
+    {
 		m_gridBackgroundItem = new QnGridBackgroundItem(NULL, context());
 		m_scene->addItem(gridBackgroundItem());
 		setLayer(gridBackgroundItem(), Qn::EMappingLayer);
 		gridBackgroundItem()->setOpacity(0.0);
 		gridBackgroundItem()->setMapper(workbench()->mapper());
 	}
-
-    /* Set up background */
-    if (!(m_lightMode & Qn::LightModeNoSceneBackground)) {
-        /* Never set QObject* parent in the QScopedPointer-stored objects if not sure in the descruction order. */
-        m_backgroundPainter = new QnGradientBackgroundPainter(qnSettings->background().animationPeriodSec, NULL, context());
-        m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
-    }
 
     /* Connect to context. */
     connect(workbench(),            SIGNAL(itemChanged(Qn::ItemRole)),              this,                   SLOT(at_workbench_itemChanged(Qn::ItemRole)));
@@ -512,15 +495,6 @@ QnCurtainAnimator* QnWorkbenchDisplay::curtainAnimator() const {
 QnGridBackgroundItem *QnWorkbenchDisplay::gridBackgroundItem() const {
     return m_gridBackgroundItem.data();
 }
-
-
-void QnWorkbenchDisplay::toggleBackgroundAnimation(bool enabled) {
-    if (!m_scene || !m_view || !m_backgroundPainter)
-        return;
-
-    m_backgroundPainter->setEnabled(enabled);
-}
-
 
 // -------------------------------------------------------------------------- //
 // QnWorkbenchDisplay :: item properties

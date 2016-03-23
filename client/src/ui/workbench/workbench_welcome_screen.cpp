@@ -172,6 +172,11 @@ void QnWorkbenchWelcomeScreen::connectToAnotherSystem()
     dialog->exec();
 }
 
+void QnWorkbenchWelcomeScreen::setupFactorySystem(const QString &serverUrl)
+{
+    qDebug() << "----------- Call wizard here " << serverUrl;
+}
+
 void QnWorkbenchWelcomeScreen::logoutFromCloud()
 {
     menu()->trigger(QnActions::LogoutFromCloud);

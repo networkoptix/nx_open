@@ -28,9 +28,9 @@
         <global.libs></global.libs>
         <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc</ffmpeg.libs>
         <!--Specific os libs used-->
-        <windows.oslibs>-lws2_32 -lIphlpapi -lOle32 -lsigar -lSecur32</windows.oslibs>
-        <linux.oslibs>-lsigar</linux.oslibs>
-        <mac.oslibs>-framework IOKit -framework CoreFoundation -lz -framework QtConcurrent -lsigar-universal64-macosx</mac.oslibs>
+        <windows.oslibs>-lws2_32 -lIphlpapi -lOle32 -lSecur32</windows.oslibs>
+        <linux.oslibs/>
+        <mac.oslibs>-framework IOKit -framework CoreFoundation -lz -framework QtConcurrent</mac.oslibs>
         <android.oslibs>-lz</android.oslibs>
         <!--Global defines-->
         <global.defines/>

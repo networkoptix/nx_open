@@ -63,6 +63,7 @@ QtObject {
     property color cameraHiddenBackground
     property color cameraDummyBorder
     property color cameraShowButtonBackground
+    property color cameraSelection
 
     property color toastBackground
     property color toastText
@@ -141,6 +142,7 @@ QtObject {
         cameraHiddenBackground  = colorTheme.color("cameras.hiddenBackground")
         cameraDummyBorder       = colorTheme.color("cameras.dummyBorder")
         cameraShowButtonBackground = colorTheme.color("cameras.showButtonBackground")
+        cameraSelection         = colorTheme.color("cameras.selection")
         toastBackground         = colorTheme.color("toast.background")
         toastText               = colorTheme.color("toast.text")
         timelineText            = colorTheme.color("timeline.text")
