@@ -432,7 +432,8 @@ QnPage {
         }
         else if (event.key == Qt.Key_F2)
         {
-            sideNavigation.open = !sideNavigation.open
+            if (state == "New")
+                sideNavigation.open = !sideNavigation.open
         }
     }
 }

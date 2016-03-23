@@ -153,6 +153,8 @@ QnNavigationDrawer {
 
     onOpenChanged:
     {
+        stackView.enabled = !open
+
         if (open)
         {
             var itemToFocus = undefined
@@ -174,7 +176,10 @@ QnNavigationDrawer {
 
             itemToFocus.forceActiveFocus()
         }
-        stackView.enabled = !open
+        else
+        {
+            stackView.forceActiveFocus()
+        }
     }
 
     Keys.onReleased:
