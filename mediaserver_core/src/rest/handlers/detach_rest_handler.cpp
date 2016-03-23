@@ -1,5 +1,6 @@
 #include "detach_rest_handler.h"
 
+#include <api/global_settings.h>
 #include <nx/network/http/httptypes.h>
 #include "media_server/serverutil.h"
 #include <core/resource_management/resource_pool.h>
@@ -46,13 +47,19 @@ int QnDetachFromSystemRestHandler::execute(PasswordData passwordData, QnJsonRest
         return nx_http::StatusCode::ok;
     }
 
-    if (!resetCloudParams())
+    qnGlobalSettings->resetCloudParams();
+    qnGlobalSettings->synchronizeNow();
+
+    //TODO: #GDM sync syncronizeNow with result
+    /*
+    if (!qnGlobalSettings->synchronizeNowSync())
     {
         result.setError(
             QnJsonRestResult::CantProcessRequest,
             lit("Failed to save cloud credentials to local DB"));
         return nx_http::StatusCode::ok;
     }
+    */
 
     nx::SystemName systemName;
     systemName.resetToDefault();

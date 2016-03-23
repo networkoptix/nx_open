@@ -7,6 +7,7 @@
 #include <watchers/cloud_status_watcher.h>
 #include <helpers/cloud_url_helper.h>
 #include <client/client_settings.h>
+
 #include <ui/actions/actions.h>
 #include <ui/dialogs/login_to_cloud_dialog.h>
 
