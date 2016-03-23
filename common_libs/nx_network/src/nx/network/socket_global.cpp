@@ -31,13 +31,15 @@ SocketGlobals::~SocketGlobals()
 
 void SocketGlobals::init()
 {
-	if( ++s_counter == 1 )
+    QnMutexLocker lock(&s_mutex);
+    if (++s_counter == 1) // first in
         s_instance = new SocketGlobals;
 }
 
 void SocketGlobals::deinit()
 {
-    if( --s_counter == 0 )
+    QnMutexLocker lock(&s_mutex);
+    if (--s_counter == 0) // last out
         delete s_instance;
 }
 
@@ -45,11 +47,12 @@ void SocketGlobals::check()
 {
     NX_CRITICAL(
         s_counter.load() != 0,
-        "SocketGlobals::InitGuard shell be initialized before using Sockets");
+        "SocketGlobals::InitGuard must be initialized before using Sockets");
 }
 
-std::atomic<int> SocketGlobals::s_counter( 0 );
-SocketGlobals* SocketGlobals::s_instance( nullptr );
+QnMutex SocketGlobals::s_mutex;
+std::atomic<int> SocketGlobals::s_counter(0);
+SocketGlobals* SocketGlobals::s_instance(nullptr);
 
 } // namespace network
 } // namespace nx

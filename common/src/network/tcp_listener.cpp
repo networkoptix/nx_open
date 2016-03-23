@@ -194,8 +194,6 @@ void QnTcpListener::pleaseStop()
 
     Q_D(QnTcpListener);
     qWarning() << "QnTcpListener::pleaseStop() called";
-    if (d->serverSocket)
-        d->serverSocket->close();
 }
 
 void QnTcpListener::removeAllConnections()

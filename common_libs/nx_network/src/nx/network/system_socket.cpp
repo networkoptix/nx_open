@@ -167,6 +167,9 @@ void Socket<InterfaceToImplement>::close()
     if( m_fd == -1 )
         return;
 
+    //checking that socket is not registered in aio
+    NX_ASSERT(!nx::network::SocketGlobals::aioService().isSocketBeingWatched(static_cast<Pollable*>(this)));
+
 #ifdef WIN32
     ::closesocket(m_fd);
 #else
@@ -798,9 +801,6 @@ bool CommunicatingSocket<InterfaceToImplement>::isConnected() const
 template<typename InterfaceToImplement>
 void CommunicatingSocket<InterfaceToImplement>::close()
 {
-    //checking that socket is not registered in aio
-    NX_ASSERT( !nx::network::SocketGlobals::aioService().isSocketBeingWatched( static_cast<Pollable*>(this) ) );
-
     m_connected = false;
     Socket<InterfaceToImplement>::close();
 }
@@ -1168,7 +1168,7 @@ static int acceptWithTimeout( int m_fd,
         ::SetLastError( errorCode );
         return -1;
     }
-    return ::accept( m_fd, NULL, NULL );
+    return ::accept(m_fd, NULL, NULL);
 #else
     struct pollfd sockPollfd;
     memset( &sockPollfd, 0, sizeof(sockPollfd) );
@@ -1340,6 +1340,8 @@ AbstractStreamSocket* TCPServerSocket::systemAccept()
         return nullptr;
 
     auto* acceptedSocket = d->accept(recvTimeoutMs, nonBlockingMode);
+    if (!acceptedSocket)
+        return nullptr;
 #ifdef _WIN32
     if (!nonBlockingMode)
         return acceptedSocket;

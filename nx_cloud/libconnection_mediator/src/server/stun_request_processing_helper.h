@@ -141,12 +141,12 @@ void processRequestWithNoOutput(
             std::move(input),
             request,
             [/*std::move*/ requestHeader, connection](api::ResultCode resultCode) mutable
-        {
-            fillAndSendResponse<ConnectionStrongRef, void>(
-                requestHeader,
-                connection,
-                resultCode);
-        });
+            {
+                fillAndSendResponse<ConnectionStrongRef, void>(
+                    requestHeader,
+                    connection,
+                    resultCode);
+            });
     }
     else
     {
@@ -157,16 +157,16 @@ void processRequestWithNoOutput(
             std::move(input),
             request,
             [/*std::move*/ requestHeader, weakConnectionRef](api::ResultCode resultCode) mutable
-        {
-            //connection can be removed at any moment
-            auto connectionStrongRef = weakConnectionRef.lock();
-            if (!connectionStrongRef)
-                return;
-            fillAndSendResponse<ConnectionStrongRef, void>(
-                requestHeader,
-                connectionStrongRef,
-                resultCode);
-        });
+            {
+                //connection can be removed at any moment
+                auto connectionStrongRef = weakConnectionRef.lock();
+                if (!connectionStrongRef)
+                    return;
+                fillAndSendResponse<ConnectionStrongRef, void>(
+                    requestHeader,
+                    connectionStrongRef,
+                    resultCode);
+            });
     }
 }
 
@@ -204,13 +204,13 @@ void processRequestWithOutput(
             [/*std::move*/ requestHeader, connection](
                 api::ResultCode resultCode,
                 OutputData outputData) mutable
-        {
-            fillAndSendResponse<ConnectionStrongRef, OutputData>(
-                requestHeader,
-                connection,
-                resultCode,
-                &outputData);
-        });
+            {
+                fillAndSendResponse<ConnectionStrongRef, OutputData>(
+                    requestHeader,
+                    connection,
+                    resultCode,
+                    &outputData);
+            });
     }
     else
     {
@@ -223,17 +223,17 @@ void processRequestWithOutput(
             [/*std::move*/ requestHeader, weakConnectionRef](
                 api::ResultCode resultCode,
                 OutputData outputData) mutable
-        {
-            //connection can be removed at any moment
-            auto connectionStrongRef = weakConnectionRef.lock();
-            if (!connectionStrongRef)
-                return;
-            fillAndSendResponse<ConnectionStrongRef, OutputData>(
-                requestHeader,
-                connectionStrongRef,
-                resultCode,
-                &outputData);
-        });
+            {
+                //connection can be removed at any moment
+                auto connectionStrongRef = weakConnectionRef.lock();
+                if (!connectionStrongRef)
+                    return;
+                fillAndSendResponse<ConnectionStrongRef, OutputData>(
+                    requestHeader,
+                    connectionStrongRef,
+                    resultCode,
+                    &outputData);
+            });
     }
 }
 

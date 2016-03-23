@@ -17,6 +17,8 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/mutex.h>
 
+#include "pollable.h"
+
 
 using namespace std;
 
@@ -24,7 +26,7 @@ namespace nx {
 namespace network {
 namespace aio {
 
-typedef AIOThread<Pollable> SystemAIOThread;
+typedef AIOThread SystemAIOThread;
 
 static std::atomic<AIOService*> AIOService_instance( nullptr );
 
@@ -131,7 +133,7 @@ QnMutex* AIOService::mutex() const
     return &m_mutex;
 }
 
-aio::AIOThread<Pollable>* AIOService::getSocketAioThread(Pollable* sock)
+aio::AIOThread* AIOService::getSocketAioThread(Pollable* sock)
 {
     QnMutexLocker lk(&m_mutex);
     return getSocketAioThread(&lk, sock);
@@ -139,9 +141,9 @@ aio::AIOThread<Pollable>* AIOService::getSocketAioThread(Pollable* sock)
 
 void AIOService::bindSocketToAioThread(Pollable* sock, AbstractAioThread* aioThread)
 {
-    const auto desired = static_cast<aio::AIOThread<Pollable>*>(aioThread);
+    const auto desired = static_cast<aio::AIOThread*>(aioThread);
 
-    aio::AIOThread<Pollable>* expected = nullptr;
+    aio::AIOThread* expected = nullptr;
     if (!sock->impl()->aioThread.compare_exchange_strong(expected, desired))
     {
         NX_ASSERT(
@@ -301,7 +303,7 @@ void AIOService::initializeAioThreadPool(
     }
 }
 
-aio::AIOThread<Pollable>* AIOService::getSocketAioThread(
+aio::AIOThread* AIOService::getSocketAioThread(
     QnMutexLockerBase* const lock,
     Pollable* sock)
 {
@@ -327,11 +329,11 @@ void AIOService::cancelPostedCallsNonSafe(
     lock->relock();
 }
 
-aio::AIOThread<Pollable>* AIOService::bindSocketToAioThread(
+aio::AIOThread* AIOService::bindSocketToAioThread(
     QnMutexLockerBase* const /*lock*/,
     Pollable* const sock)
 {
-    aio::AIOThread<Pollable>* threadToUse = nullptr;
+    aio::AIOThread* threadToUse = nullptr;
 
     //searching for a least-used thread, which is ready to accept
     for (auto
@@ -345,7 +347,7 @@ aio::AIOThread<Pollable>* AIOService::bindSocketToAioThread(
     }
 
     //assigning thread to socket once and for all
-    aio::AIOThread<Pollable>* expectedSocketThread = nullptr;
+    aio::AIOThread* expectedSocketThread = nullptr;
     if (!sock->impl()->aioThread.compare_exchange_strong(expectedSocketThread, threadToUse))
     {
         //if created new thread than just leaving it for future use

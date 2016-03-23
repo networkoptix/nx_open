@@ -78,21 +78,24 @@ void PeerRegistrator::bind(
             stun::error::badRequest,
             "Only tcp is allowed for bind request");
 
-    const auto mediaserverData = getMediaserverData(connection, requestMessage);
-    if (!static_cast<bool>(mediaserverData))
+    MediaserverData mediaserverData;
+    nx::String errorMessage;
+    const api::ResultCode resultCode = 
+        getMediaserverData(requestMessage, &mediaserverData, &errorMessage);
+    if (resultCode != api::ResultCode::ok)
     {
         sendErrorResponse(
             connection,
             requestMessage.header,
-            api::ResultCode::notAuthorized,
-            stun::error::badRequest,
-            "No mediaserver data in request");
+            resultCode,
+            api::resultCodeToStunErrorCode(resultCode),
+            errorMessage);
         return;
     }
 
     auto peerDataLocker = m_listeningPeerPool->insertAndLockPeerData(
         connection,
-        *mediaserverData);
+        mediaserverData);
     //TODO #ak if peer has already been bound with another connection, overwriting it...
     //peerDataLocker.value().peerConnection = connection;
     if (const auto attr = requestMessage.getAttribute< stun::cc::attrs::PublicEndpointList >())
@@ -101,8 +104,8 @@ void PeerRegistrator::bind(
         peerDataLocker.value().endpoints.clear();
 
     NX_LOGX(lit("Peer %2.%3 succesfully bound, endpoints=%4")
-        .arg(QString::fromUtf8(mediaserverData->systemId))
-        .arg(QString::fromUtf8(mediaserverData->serverId))
+        .arg(QString::fromUtf8(mediaserverData.systemId))
+        .arg(QString::fromUtf8(mediaserverData.serverId))
         .arg(containerString(peerDataLocker.value().endpoints)), cl_logDEBUG1);
 
     sendSuccessResponse(connection, requestMessage.header);
@@ -117,16 +120,18 @@ void PeerRegistrator::listen(
     if (connection->transportProtocol() != nx::network::TransportProtocol::tcp)
         return completionHandler(api::ResultCode::badTransport);    //Only tcp is allowed for listen request
 
-    //TODO #ak make authentication centralized
-    const auto mediaserverData = getMediaserverData(connection, requestMessage);
-    if (!static_cast<bool>(mediaserverData))
+    MediaserverData mediaserverData;
+    nx::String errorMessage;
+    const api::ResultCode resultCode =
+        getMediaserverData(requestMessage, &mediaserverData, &errorMessage);
+    if (resultCode != api::ResultCode::ok)
     {
         sendErrorResponse(
             connection,
             requestMessage.header,
-            api::ResultCode::notAuthorized,
-            stun::error::badRequest,
-            "Bad system credentials supplied");
+            resultCode,
+            api::resultCodeToStunErrorCode(resultCode),
+            errorMessage);
         return;
     }
 
@@ -140,8 +145,8 @@ void PeerRegistrator::listen(
     peerDataLocker.value().connectionMethods |= api::ConnectionMethod::udpHolePunching;
 
     NX_LOGX(lit("Peer %1.%2 started to listen")
-        .arg(QString::fromUtf8(requestData.systemId))
-        .arg(QString::fromUtf8(requestData.serverId)),
+        .arg(QString::fromUtf8(requestData.serverId))
+        .arg(QString::fromUtf8(requestData.systemId)),
         cl_logDEBUG1);
 
     completionHandler(api::ResultCode::ok);
