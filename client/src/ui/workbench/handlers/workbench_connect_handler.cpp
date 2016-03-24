@@ -379,6 +379,7 @@ bool QnWorkbenchConnectHandler::disconnectFromServer(bool force) {
         return false;
 
     if (!force)
+    {
         QnGlobalSettings::instance()->synchronizeNow();
         qnSettings->setLastUsedConnection(QnConnectionData());
     }
