@@ -32,9 +32,9 @@ var RegisterPage = function () {
 
     // Get valid email with random number between 100 and 1000
     this.getRandomEmail = function() {
-        var randomNumber = Math.floor((Math.random() * 1000)+100); // Random number between 100 and 1000
+        var randomNumber = Math.floor((Math.random() * 10000)+1000); // Random number between 1000 and 10000
         return 'ekorneeva+' + randomNumber + '@networkoptix.com';
-    }
+    };
     this.userEmailExisting = 'ekorneeva+1@networkoptix.com'; // valid existing email
     this.userFirstName = 'TestFirstName';
     this.userLastName = 'TestLastName';
@@ -62,10 +62,11 @@ var RegisterPage = function () {
     this.htmlBody = element(by.css('body'));
 
     this.registerSuccessAlert = element(by.css('process-alert[process=register]')).element(by.css('.alert')); // alert with success message
+    //this.alert = element(by.css('process-alert')).element(by.css('.alert')); // some alert
 
     this.fieldWrap = function(field) {
         return field.element(by.xpath('../..'));
-    }
+    };
 
     this.invalidClassRequired = 'ng-invalid-required';
     this.invalidClass = 'ng-invalid';
@@ -74,27 +75,27 @@ var RegisterPage = function () {
     this.checkInputInvalid = function (field, invalidClass) {
         expect(field.getAttribute('class')).toContain(invalidClass);
         expect(this.fieldWrap(field).getAttribute('class')).toContain('has-error');
-    }
+    };
 
     this.checkPasswordInvalid = function (invalidClass) {
         expect(this.passwordInput.getAttribute('class')).toContain(invalidClass);
         expect(this.passwordGroup.$('.form-group').getAttribute('class')).toContain('has-error');
-    }
+    };
 
     this.checkInputValid = function (field, invalidClass) {
         expect(field.getAttribute('class')).not.toContain(invalidClass);
         expect(this.fieldWrap(field).getAttribute('class')).not.toContain('has-error');
-    }
+    };
 
     this.checkPasswordValid = function (invalidClass) {
         expect(this.passwordInput.getAttribute('class')).not.toContain(invalidClass);
         expect(this.passwordGroup.$('.form-group').getAttribute('class')).not.toContain('has-error');
-    }
+    };
 
     this.checkEmailExists = function () {
         this.checkInputInvalid(this.emailInput, this.invalidClassExists);
         expect(this.fieldWrap(this.emailInput).$('.help-block').getText()).toContain('Email is already registered in portal');
-    }
+    };
 
     this.passwordControlContainer = this.passwordGroup.element(by.css('.help-block'));
 
@@ -103,16 +104,28 @@ var RegisterPage = function () {
         this.firstNameInput.sendKeys(this.userFirstName);
         this.lastNameInput.sendKeys(this.userLastName);
         this.emailInput.sendKeys(this.getRandomEmail());
-    }
+    };
 
     this.prepareToAlertCheck = function () {
         this.firstNameInput.sendKeys(this.userFirstName);
         this.lastNameInput.sendKeys(this.userLastName);
         this.emailInput.sendKeys(this.getRandomEmail());
         this.passwordInput.sendKeys(this.userPassword);
-    }
+    };
 
     this.termsConditions = element(by.linkText('Terms and Conditions'));
+
+    this.getLastEmail = function() {
+        var deferred = protractor.promise.defer();
+        console.log("Waiting for an email...");
+        browser.sleep(5000); // Wait for the email to come. Otherwise previous one is taken
+
+        notifier.on("mail", function(mail){
+            console.log("Email to: " + mail.headers.to);
+            deferred.fulfill(mail);
+        }).start();
+        return deferred.promise;
+    };
 };
 
 module.exports = RegisterPage;

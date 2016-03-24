@@ -1,15 +1,44 @@
 'use strict';
 var RegisterPage = require('./po.js');
 describe('Registration suite', function () {
-
     var p = new RegisterPage();
+
+
+
+    it("should activate registration with a registration code sent to an email", function () {
+        p.getByUrl();
+
+        var userEmail = p.getRandomEmail();
+        p.firstNameInput.sendKeys(p.userFirstName);
+        p.lastNameInput.sendKeys(p.userLastName);
+        p.emailInput.sendKeys(userEmail);
+        p.passwordInput.sendKeys(p.userPassword);
+
+        p.submitButton.click();
+
+        p.helper.catchAlert('Your account was successfully registered. Please, check your email to confirm it');
+
+        browser.controlFlow().wait(p.getLastEmail()).then(function (email) {
+            expect(email.subject).toContain("Confirm your account");
+            expect(email.headers.to).toEqual(userEmail);
+
+            // extract registration token from the link in the email message
+            var pattern = /\/static\/index.html#\/activate\/(\w+)/g;
+            var regCode = pattern.exec(email.html)[1];
+            console.log(regCode);
+            browser.get('/#/activate/' + regCode);
+
+            p.helper.catchAlert("Your account was successfully activated.");
+            browser.refresh();
+            p.helper.catchAlert("Couldn't activate your account: Wrong confirmation code");
+        });
+    });
 
     p.alert.checkAlert(function(){
         p.getByUrl();
         p.prepareToAlertCheck();
         p.alert.submitButton.click();
     }, p.alert.alertMessages.registerSuccess, p.alert.alertTypes.success, true);
-
     it("should open register page in anonymous state by clicking Register button on top right corner", function () {
         p.getHomePage();
 
@@ -34,7 +63,6 @@ describe('Registration suite', function () {
         expect(browser.getCurrentUrl()).toContain('register');
         expect(p.htmlBody.getText()).toContain('Register to be happy');
     });
-
     it("should register user with correct credentials", function () {
         p.getByUrl();
 
@@ -45,7 +73,7 @@ describe('Registration suite', function () {
 
         p.submitButton.click();
 
-        p.helper.catchAlert(p.registerSuccessAlert, 'Your account was successfully registered. Please, check your email to confirm it');
+        p.helper.catchAlert('Your account was successfully registered. Please, check your email to confirm it');
 
         // Check that registration form element is NOT displayed on page
         expect(p.firstNameInput.isPresent()).toBe(false);
@@ -61,7 +89,7 @@ describe('Registration suite', function () {
 
         p.submitButton.click();
 
-        p.helper.catchAlert(p.registerSuccessAlert, 'Your account was successfully registered. Please, check your email to confirm it');
+        p.helper.catchAlert('Your account was successfully registered. Please, check your email to confirm it');
 
         // Check that registration form element is NOT displayed on page
         expect(p.firstNameInput.isPresent()).toBe(false);
@@ -77,7 +105,7 @@ describe('Registration suite', function () {
 
         p.submitButton.click();
 
-        p.helper.catchAlert(p.registerSuccessAlert, 'Your account was successfully registered. Please, check your email to confirm it');
+        p.helper.catchAlert('Your account was successfully registered. Please, check your email to confirm it');
 
         // Check that registration form element is NOT displayed on page
         expect(p.firstNameInput.isPresent()).toBe(false);
@@ -93,7 +121,7 @@ describe('Registration suite', function () {
 
         p.submitButton.click();
 
-        p.helper.catchAlert(p.registerSuccessAlert, 'Your account was successfully registered. Please, check your email to confirm it');
+        p.helper.catchAlert('Your account was successfully registered. Please, check your email to confirm it');
 
         // Check that registration form element is NOT displayed on page
         expect(p.firstNameInput.isPresent()).toBe(false);
