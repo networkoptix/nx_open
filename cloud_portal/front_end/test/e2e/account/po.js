@@ -23,7 +23,7 @@ var AccountPage = function () {
     this.refresh = function () {
         browser.refresh();
         browser.waitForAngular();
-    }
+    };
 
     this.userEmail = 'ekorneeva+1@networkoptix.com';
     this.userPassword = 'qweasd123';

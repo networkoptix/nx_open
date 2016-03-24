@@ -77,7 +77,7 @@ describe('Login suite', function () {
         p.passwordInput.sendKeys(p.userPassword);
         p.dialogLoginButton.click();
 
-        p.helper.catchAlert(p.loginIncorrectAlert, 'Login or password are incorrect');
+        p.helper.catchAlert('Login or password are incorrect');
 
         p.dialogCloseButton.click();
     });
@@ -89,7 +89,7 @@ describe('Login suite', function () {
         p.passwordInput.sendKeys(p.userPassword);
         p.dialogLoginButton.click();
 
-        p.helper.catchAlert(p.loginIncorrectAlert, 'Login or password are incorrect');
+        p.helper.catchAlert('Login or password are incorrect');
         p.dialogCloseButton.click();
     });
 
@@ -100,7 +100,7 @@ describe('Login suite', function () {
         p.passwordInput.sendKeys(p.userPasswordWrong);
         p.dialogLoginButton.click();
 
-        p.helper.catchAlert(p.loginIncorrectAlert, 'Login or password are incorrect');
+        p.helper.catchAlert('Login or password are incorrect');
 
         p.dialogCloseButton.click();
     });
@@ -203,7 +203,7 @@ describe('Login suite', function () {
         p.emailInput.sendKeys(currentEmail);
         p.passwordInput.sendKeys(p.userPasswordWrong);
         p.dialogLoginButton.click();
-        p.helper.catchAlert(p.loginIncorrectAlert, 'Login or password are incorrect');
+        p.helper.catchAlert('Login or password are incorrect');
 
         p.iForgotPasswordLink.click();
 

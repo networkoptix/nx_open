@@ -44,7 +44,9 @@ var Helper = function () {
         expect(loginSuccessElement.isDisplayed()).toBe(false);
     };
 
-    this.catchAlert = function (alertElement, message) {
+    this.catchAlert = function (message) {
+        var alertElement = element(by.css('process-alert')).element(by.css('.alert'));
+
         // Workaround due to Protractor bug with timeouts https://github.com/angular/protractor/issues/169
         // taken from here http://stackoverflow.com/questions/25062748/testing-the-contents-of-a-temporary-element-with-protractor
         browser.sleep(1500);

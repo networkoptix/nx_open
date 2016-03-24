@@ -51,7 +51,7 @@ describe('Account suite', function () {
 
         p.saveButton.click();
 
-        p.helper.catchAlert(p.saveSuccessAlert, 'Your account was successfully saved.');
+        p.helper.catchAlert('Your account was successfully saved.');
 
         p.refresh();
 
@@ -69,7 +69,7 @@ describe('Account suite', function () {
 
         p.saveButton.click();
 
-        p.helper.catchAlert(p.saveSuccessAlert, 'Your account was successfully saved.');
+        p.helper.catchAlert('Your account was successfully saved.');
 
         p.refresh();
 
@@ -87,7 +87,7 @@ describe('Account suite', function () {
 
         p.saveButton.click();
 
-        p.helper.catchAlert(p.saveSuccessAlert, 'Your account was successfully saved.');
+        p.helper.catchAlert('Your account was successfully saved.');
 
         p.refresh();
 
@@ -105,7 +105,7 @@ describe('Account suite', function () {
 
         p.saveButton.click();
 
-        p.helper.catchAlert(p.saveSuccessAlert, 'Your account was successfully saved.');
+        p.helper.catchAlert('Your account was successfully saved.');
 
         p.refresh();
 
@@ -133,7 +133,7 @@ describe('Account suite', function () {
         p.passwordInput.sendKeys(p.userPasswordNew);
         p.submitButton.click();
 
-        p.helper.catchAlert(p.passwordChangeAlert, 'Your password was successfully changed.');
+        p.helper.catchAlert('Your password was successfully changed.');
 
         browser.refresh();
 
@@ -141,7 +141,7 @@ describe('Account suite', function () {
         p.passwordInput.sendKeys(p.userPassword);
         p.submitButton.click();
 
-        p.helper.catchAlert(p.passwordChangeAlert, 'Your password was successfully changed.');
+        p.helper.catchAlert('Your password was successfully changed.');
     });
 
     it("should save new password correctly (and change it back)", function () {
@@ -149,7 +149,7 @@ describe('Account suite', function () {
         p.currentPasswordInput.sendKeys(p.userPassword);
         p.passwordInput.sendKeys(p.userPasswordNew);
         p.submitButton.click();
-        p.helper.catchAlert(p.passwordChangeAlert, 'Your password was successfully changed.');
+        p.helper.catchAlert('Your password was successfully changed.');
 
         p.helper.logout();
         p.helper.login(p.userEmail, p.userPasswordNew);
@@ -158,7 +158,7 @@ describe('Account suite', function () {
         p.currentPasswordInput.sendKeys(p.userPasswordNew);
         p.passwordInput.sendKeys(p.userPassword);
         p.submitButton.click();
-        p.helper.catchAlert(p.passwordChangeAlert, 'Your password was successfully changed.');
+        p.helper.catchAlert('Your password was successfully changed.');
     });
 
 
@@ -191,7 +191,7 @@ describe('Account suite', function () {
         p.passwordInput.sendKeys(p.userPassword);
         p.submitButton.click();
 
-        p.helper.catchAlert(p.passwordChangeAlert, 'Couldn\'t change your password: Current password doesn\'t match');
+        p.helper.catchAlert('Couldn\'t change your password: Current password doesn\'t match');
     });
 
     xit("should not allow to change password if new password is the same as old password", function () {
