@@ -9,7 +9,7 @@ BaseTile
     standardColor: Style.colors.custom.systemTile.factorySystemBkg;
     hoveredColor: Style.colors.custom.systemTile.factorySystemHovered;
 
-    allowExpanding: false;
+    isExpandable: false;
 
 
     centralAreaDelegate: Row

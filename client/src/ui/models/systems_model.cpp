@@ -31,6 +31,9 @@ namespace
         , IsCompatibleVersionRoleId
         , IsCorrectCustomizationRoleId
 
+        , WrongVersionRoleId
+        , WrongCustomizationRoleId
+
         // For local systems 
         , LastPasswordsModelRoleId
 
@@ -54,46 +57,61 @@ namespace
         result.insert(IsCompatibleRoleId, "isCompatible");
         result.insert(IsCompatibleVersionRoleId, "isCompatibleVersion");
         result.insert(IsCorrectCustomizationRoleId, "isCorrectCustomization");
-        
+
+        result.insert(WrongVersionRoleId, "wrongVersion");
+        result.insert(WrongCustomizationRoleId, "wrongCustomization");
+
         result.insert(LastPasswordsModelRoleId, "lastPasswordsModel");
 
         return result;
     }();
 
-    bool isCorrectCustomization(const QnSystemDescriptionPtr &sysemDescription)
+    QString getIncompatibleCustomization(const QnSystemDescriptionPtr &sysemDescription)
     {
         const auto servers = sysemDescription->servers();
         if (servers.isEmpty())
-            return true;
+            return QString();
 
         const auto customization = QnAppInfo::customizationName();
         const auto predicate = [customization](const QnModuleInformation &serverInfo)
         {
             // TODO: improve me https://networkoptix.atlassian.net/browse/VMS-2163
-            return (customization == serverInfo.customization);
+            return (customization != serverInfo.customization);
         };
 
-        const bool hasCorrectCustomization = 
-            std::any_of(servers.begin(), servers.end(), predicate);
-        return hasCorrectCustomization;
+        const auto incompatibleIt = 
+            std::find_if(servers.begin(), servers.end(), predicate);
+        return (incompatibleIt == servers.end() ? QString()
+            : incompatibleIt->customization);
     }
 
-    bool isCompatibleVersion(const QnSystemDescriptionPtr &sysemDescription)
+    bool isCorrectCustomization(const QnSystemDescriptionPtr &sysemDescription)
+    {
+        return getIncompatibleCustomization(sysemDescription).isEmpty();
+    }
+
+    QString getIncompatibleVersion(const QnSystemDescriptionPtr &sysemDescription)
     {
         const auto servers = sysemDescription->servers();
         if (servers.isEmpty())
-            return true;
+            return QString();
 
         const QnSoftwareVersion appVersion(QnAppInfo::applicationVersion());
         const auto predicate = [appVersion](const QnModuleInformation &serverInfo)
         {
             // TODO: improve me https://networkoptix.atlassian.net/browse/VMS-2166
-            return serverInfo.hasCompatibleVersion();
+            return !serverInfo.hasCompatibleVersion();
         };
 
-        const bool hasCorrectVersion = 
-            std::any_of(servers.begin(), servers.end(), predicate);
-        return hasCorrectVersion;
+        const auto incompatibleIt =
+            std::find_if(servers.begin(), servers.end(), predicate);
+        return (incompatibleIt == servers.end() ? QString() 
+            : incompatibleIt->version.toString(QnSoftwareVersion::BugfixFormat));
+    }
+
+    bool isCompatibleVersion(const QnSystemDescriptionPtr &sysemDescription)
+    {
+        return getIncompatibleVersion(sysemDescription).isEmpty();
     }
 
     bool isCompatibleSystem(const QnSystemDescriptionPtr &sysemDescription)
@@ -221,17 +239,18 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
     case IsCloudSystemRoleId:
         return systemDescription->isCloudSystem();
     case IsOnlineRoleId:
-    {
-        qDebug() << "--- is online: " << systemDescription->name()
-            << ":" <<!systemDescription->servers().isEmpty();
         return !systemDescription->servers().isEmpty();
-    }
     case IsCompatibleRoleId:
         return isCompatibleSystem(systemDescription);
     case IsCorrectCustomizationRoleId:
         return isCorrectCustomization(systemDescription);
     case IsCompatibleVersionRoleId:
         return isCompatibleVersion(systemDescription);
+    case WrongVersionRoleId:
+        return getIncompatibleVersion(systemDescription);
+    case WrongCustomizationRoleId:
+        return getIncompatibleCustomization(systemDescription);
+
     default:
         return QVariant();
     }

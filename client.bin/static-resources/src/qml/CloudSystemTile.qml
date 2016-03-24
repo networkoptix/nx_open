@@ -8,9 +8,9 @@ BaseTile
     id: thisComponent;
 
     property string userName;
-    property bool isOnline;
 
-    allowExpanding: !isOnline;
+    isExpandable: false;  // TODO: change when recent systems are ready
+    isAvailable: isOnline;
 
     centralAreaDelegate: Column
     {

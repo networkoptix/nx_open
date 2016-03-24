@@ -15,17 +15,33 @@ Item
 
     property Component centralAreaDelegate;
     property Component expandedAreaDelegate;
-    property bool allowExpanding: true;
+    property bool allowExpanding;
+
+    property string notAvailableLabelText: "";
+
+    property bool isAvailable: true;
+    property bool isExpandable: true;
+    property bool isOnline: false;
+    property bool isValidVersion: true;
+    property bool isValidCustomization: true;
+
     property bool isExpanded;
 
     property color standardColor: Style.colors.custom.systemTile.background;
     property color hoveredColor: Style.lighterColor(standardColor);
+    property color inactiveColor: Style.colors.shadow;
 
     Binding
     {
         target: thisComponent;
         property: "isExpanded";
         value: (tileHolder.state !== "collapsed") && allowExpanding;
+    }
+    Binding
+    {
+        target: thisComponent;
+        property: "allowExpanding";
+        value: isExpandable && isAvailable;
     }
 
     property alias centralArea: centralAreaLoader.item;
@@ -197,8 +213,15 @@ Item
             readonly property bool isHovered: (!thisComponent.isExpanded && hoverIndicator.containsMouse);
 
             clip: true;
-            color: (isHovered || isExpanded
-                ? thisComponent.hoveredColor : thisComponent.standardColor);
+            color:
+            {
+                if (!thisComponent.isAvailable)
+                    return thisComponent.inactiveColor;
+                if (isHovered || thisComponent.isExpanded)
+                    return thisComponent.hoveredColor;
+
+                return thisComponent.standardColor;
+            }
 
             anchors.fill: parent;
             radius: 2;
@@ -229,7 +252,8 @@ Item
                 text: systemName;
 
                 height: Style.custom.systemTile.systemNameLabelHeight;
-                color: Style.colors.text;
+                color: (thisComponent.isAvailable ? Style.colors.text
+                    : Style.colors.custom.systemTile.offlineText);
                 font: Style.fonts.systemTile.systemName;
             }
 
@@ -283,6 +307,27 @@ Item
                     visible: (opacity != 0);
                     sourceComponent: thisComponent.expandedAreaDelegate;
                 }
+            }
+
+            Indicator
+            {
+                id: errorLabel;
+
+                property bool isErrorIndicator: (!thisComponent.isValidCustomization
+                    || !thisComponent.isValidVersion);
+
+                anchors.right: parent.right;
+                anchors.bottom: parent.bottom;
+                anchors.rightMargin: 14;
+                anchors.bottomMargin: anchors.rightMargin;
+
+                visible: (!thisComponent.isAvailable
+                    && thisComponent.notAvailableLabelText.length);
+
+                text: thisComponent.notAvailableLabelText;
+                textColor: (isErrorIndicator ? Style.colors.shadow : Style.colors.windowText);
+                color: (isErrorIndicator ? Style.colors.red_main
+                    : Style.colors.custom.systemTile.offlineIndicatorBkg);
             }
         }
     }

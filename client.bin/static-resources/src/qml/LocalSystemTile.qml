@@ -57,10 +57,13 @@ BaseTile
 
             isAvailable: thisComponent.allowExpanding && thisComponent.isExpanded;
 
+            disabledLabelColor: Style.colors.custom.systemTile.offlineText;
+            enabled: thisComponent.allowExpanding;
+
             model: thisComponent.knownHostsModel;
             iconUrl: "qrc:/skin/welcome_page/server.png";   // TODO: add ecosystem class for hovered icons
             hoveredIconUrl: "qrc:/skin/welcome_page/server_hover.png";
-
+            //disabledIconUrl:  // TODO: add when ready
             Component.onCompleted: activeItemSelector.addItem(this);
         }
 
@@ -71,11 +74,15 @@ BaseTile
             visible: thisComponent.isRecentlyConnected;
             isAvailable: thisComponent.allowExpanding && thisComponent.isExpanded;
 
+            disabledLabelColor: Style.colors.custom.systemTile.offlineText;
+            enabled: thisComponent.allowExpanding;
+
             model: thisComponent.knownUsersModel;
             iconUrl: "qrc:/skin/welcome_page/user.png";
             hoveredIconUrl: "qrc:/skin/welcome_page/user_hover.png";
-            comboBoxTextRole: "userName";
+            //disabledIconUrl:  // TODO: add when ready
 
+            comboBoxTextRole: "userName";
             Component.onCompleted: activeItemSelector.addItem(this);
         }
     }

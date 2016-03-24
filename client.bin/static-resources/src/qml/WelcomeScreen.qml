@@ -101,7 +101,20 @@ Rectangle
                         systemName: model.systemName;
                         isRecentlyConnected: (knownUsersModel ? knownUsersModel.hasConnections : false);
 
-                        allowExpanding: model.isCompatible;
+                        isValidVersion: model.isCompatibleVersion;
+                        isValidCustomization: model.isCorrectCustomization;
+                        notAvailableLabelText:
+                        {
+                            if (!isValidVersion)
+                                return model.wrongVersion;
+                            else if (!isValidCustomization)
+                                return model.wrongCustomization;
+
+                            return "";
+                        }
+
+                        isExpandable: model.isCompatible;
+                        isAvailable: isExpandable;
                         knownUsersModel: knownUsersModelProp;
                         knownHostsModel: hostsModel;
 
@@ -124,12 +137,27 @@ Rectangle
                         visualParent: thisComponent;
                         systemName: model.systemName;
                         isOnline: !hostsModel.isEmpty;
+
+                        isValidVersion: model.isCompatibleVersion;
+                        isValidCustomization: model.isCorrectCustomization;
+
+                        notAvailableLabelText:
+                        {
+                            if (!isValidVersion)
+                                return model.wrongVersion;
+                            else if (!isValidCustomization)
+                                return model.wrongCustomization;
+                            else if (!isOnline)
+                                return "OFFLINE";
+
+                            return "";
+                        }
+
+
                         onConnectClicked:
                         {
                             context.connectToCloudSystem(hostsModel.firstHost);
                         }
-
-                        onIsOnlineChanged: console.log(systemName, ":", isOnline)
                     }
                 }
 

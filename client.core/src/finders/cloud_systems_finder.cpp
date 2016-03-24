@@ -154,7 +154,6 @@ void QnCloudSystemsFinder::updateSystemInternal(const QnSystemDescriptionPtr &sy
 
         for (const auto &host : hosts)
         {
-            qDebug() << host.first.toString();
             pingServerInternal(host.first.toString()
                 , static_cast<int>(host.second), systemId);
         }
@@ -200,15 +199,9 @@ void QnCloudSystemsFinder::pingServerInternal(const QString &host
 
         const auto systemDescription = it.value();
         if (systemDescription->containsServer(moduleInformation.id))
-        {
-            qDebug() << "Changing servers" << moduleInformation.id;
             systemDescription->updateServer(moduleInformation);
-        }
         else
-        {
-            qDebug() << "Adding server " << moduleInformation.id;
             systemDescription->addServer(moduleInformation, serverPriority);
-        }
 
         systemDescription->setServerHost(moduleInformation.id, host);
     };
@@ -226,8 +219,6 @@ void QnCloudSystemsFinder::checkOutdatedServersInternal(const QnSystemDescriptio
         if (elapsed > kCloudServerOutdateTimeoutMs)
             system->removeServer(serverId);
     }
-
-    qDebug() << "Systems after outdate: " << system->servers().size();
 }
 
 void QnCloudSystemsFinder::updateSystems()
