@@ -99,7 +99,7 @@ struct QnHTTPRawResponse
     QNetworkReply::NetworkError status;
     nx_http::Response response;
     QByteArray msgBody;
-    QByteArray errorString;
+    QString errorString;
 
 private:
     QNetworkReply::NetworkError sysErrorCodeToNetworkError(

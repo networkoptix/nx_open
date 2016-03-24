@@ -236,7 +236,8 @@ int QnSessionManager::sendAsyncRequest(
     clientPtr->setUserName(appServerUrl.userName());
     clientPtr->setUserPassword(appServerUrl.password());
 
-    const auto msgBodyContentType = nx_http::getHeaderValue(headers, "Content-Type");
+    const auto msgBodyContentType =
+        nx_http::getHeaderValue(headers, nx_http::header::kContentType);
     clientPtr->setAdditionalHeaders(std::move(headers));
 
     connect(
@@ -259,8 +260,8 @@ int QnSessionManager::sendAsyncRequest(
     }
     else
     {
-        NX_LOG(lit("Unknown HTTP operation '%1'.")
-            .arg(QString::fromLatin1(method)), cl_logWARNING);
+        NX_ASSERT(false, Q_FUNC_INFO,
+            lit("Unknown HTTP operation '%1'.").arg(QString::fromLatin1(method)));
         return -1;
     }
 

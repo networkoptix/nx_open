@@ -333,7 +333,7 @@ QnMediaServerConnection::QnMediaServerConnection(const QnMediaServerResourcePtr&
         extraHeaders.emplace(Qn::VIDEOWALL_GUID_HEADER_NAME, videowallGuid.toByteArray());
     extraHeaders.emplace(Qn::EC2_RUNTIME_GUID_HEADER_NAME, qnCommon->runningInstanceGUID().toByteArray());
     extraHeaders.emplace(Qn::CUSTOM_USERNAME_HEADER_NAME, QnAppServerConnectionFactory::url().userName().toUtf8());
-	extraHeaders.emplace("User-Agent", nx_http::userAgentString());
+	extraHeaders.emplace(nx_http::header::kUserAgent, nx_http::userAgentString());
     setExtraHeaders(std::move(extraHeaders));
 }
 
@@ -384,7 +384,7 @@ int QnMediaServerConnection::checkCameraList(const QnNetworkResourceList &camera
         camList.uniqueIdList << c->getUniqueId();
 
     nx_http::HttpHeaders headers;
-    headers.emplace("Content-Type", "application/json");
+    headers.emplace(nx_http::header::kContentType, "application/json");
 
     return sendAsyncPostRequest(checkCamerasObject, std::move(headers), QnRequestParamList(), QJson::serialized(camList), QN_STRINGIZE_TYPE(QnCameraListReply), target, slot);
 }
@@ -590,7 +590,7 @@ int QnMediaServerConnection::ptzCreateTourAsync(const QnNetworkResourcePtr &came
     params << QnRequestParam("resourceId",      QnLexical::serialized(camera->getPhysicalId()));
 
     nx_http::HttpHeaders headers;
-    headers.emplace("Content-Type", "application/json");
+    headers.emplace(nx_http::header::kContentType, "application/json");
 
     return sendAsyncPostRequest(PtzCreateTourObject, std::move(headers), params, QJson::serialized(tour), NULL, target, slot);
 }
@@ -690,7 +690,7 @@ int QnMediaServerConnection::getSystemNameAsync( QObject* target, const char* sl
 int QnMediaServerConnection::testEmailSettingsAsync(const QnEmailSettings &settings, QObject *target, const char *slot)
 {
     nx_http::HttpHeaders headers;
-    headers.emplace("Content-Type", "application/json");
+    headers.emplace(nx_http::header::kContentType, "application/json");
 
     ec2::ApiEmailSettingsData data;
     ec2::fromResourceToApi(settings, data);
@@ -700,7 +700,7 @@ int QnMediaServerConnection::testEmailSettingsAsync(const QnEmailSettings &setti
 int QnMediaServerConnection::testLdapSettingsAsync(const QnLdapSettings &settings, QObject *target, const char *slot)
 {
     nx_http::HttpHeaders headers;
-    headers.emplace("Content-Type", "application/json");
+    headers.emplace(nx_http::header::kContentType, "application/json");
     return sendAsyncPostRequest(TestLdapSettingsObject, std::move(headers), QnRequestParamList(), QJson::serialized(settings), QN_STRINGIZE_TYPE(QnLdapUsers), target, slot);
 }
 
@@ -791,7 +791,7 @@ int QnMediaServerConnection::uploadUpdateChunk(const QString &updateId, const QB
     params << QnRequestParam("offset", offset);
 
     nx_http::HttpHeaders headers;
-    headers.emplace("Content-Type", "text/xml");
+    headers.emplace(nx_http::header::kContentType, "text/xml");
 
     return sendAsyncPostRequest(InstallUpdateObject, std::move(headers), params, data, QN_STRINGIZE_TYPE(QnUploadUpdateReply), target, slot);
 }

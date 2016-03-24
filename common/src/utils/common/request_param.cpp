@@ -22,13 +22,13 @@ QnHTTPRawResponse::QnHTTPRawResponse(
     if (sysErrorCode != SystemError::noError)
     {
         status = sysErrorCodeToNetworkError(sysErrorCode);
-        errorString = SystemError::toString(sysErrorCode).toLatin1();
+        errorString = SystemError::toString(sysErrorCode);
     }
     else
     {
         status = httpStatusCodeToNetworkError(
             static_cast<nx_http::StatusCode::Value>(response.statusLine.statusCode));
-        errorString = response.statusLine.reasonPhrase;
+        errorString = QString::fromUtf8(response.statusLine.reasonPhrase);
     }
 }
 

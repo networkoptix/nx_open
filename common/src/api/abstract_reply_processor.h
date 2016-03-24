@@ -69,7 +69,7 @@ protected:
     template<class T, class Derived>
     void processJsonReply(Derived *derived, const QnHTTPRawResponse &response, int handle) {
         int status = response.status;
-        QString errorString = QString::fromUtf8(response.errorString);
+        QString errorString = response.errorString;
 
         T reply;
         if(status == 0) {
@@ -95,7 +95,7 @@ protected:
     template<class Derived>
     void processJsonReply(Derived *derived, const QnHTTPRawResponse &response, int handle) {
         int status = response.status;
-        QString errorString = QString::fromUtf8(response.errorString);
+        QString errorString = response.errorString;
 
         if (status == 0) {
             QnJsonRestResult result;
@@ -119,7 +119,7 @@ protected:
     template<class T, class Derived>
     void processUbjsonReply(Derived *derived, const QnHTTPRawResponse &response, int handle) {
         int status = response.status;
-        QString errorString = QString::fromUtf8(response.errorString);
+        QString errorString = response.errorString;
 
         T reply;
         if(status == 0) {
@@ -150,7 +150,7 @@ protected:
     template<class T, class Derived>
     void processFusionReply(Derived *derived, const QnHTTPRawResponse &response, int handle) {
         int status = response.status;
-        QString errorString = QString::fromUtf8(response.errorString);
+        QString errorString = response.errorString;
 
         T reply;
         if(status == 0) {
@@ -204,7 +204,7 @@ protected:
             if (!success)
                 status = 1;
         } 
-        emitFinished(derived, status, reply, handle, QString::fromUtf8(response.errorString));
+        emitFinished(derived, status, reply, handle, response.errorString);
     }
 
 private:
