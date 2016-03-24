@@ -375,8 +375,5 @@ angular.module('webadminApp')
 
         /* initiate wizard */
 
-        mediaserver.getUser().then(checkMySystem,function(){
-            updateCredentials(Config.defaultLogin, Config.defaultPassword, false);
-        });
-        //
+        updateCredentials(Config.defaultLogin, Config.defaultPassword, false);
     });

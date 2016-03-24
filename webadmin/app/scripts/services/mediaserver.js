@@ -93,42 +93,70 @@ angular.module('webadminApp')
             };
             return obj;
         }
+
+        function getNonce(){
+            var deferred = $q.defer();
+            function resolver(){
+                var realm = ipCookie('realm');
+                var nonce = ipCookie('nonce');
+                if(!realm || !nonce){
+                    return false;
+                }
+                deferred.resolve({
+                    realm: realm,
+                    nonce: nonce
+                });
+                return true;
+            }
+            if(!resolver()){
+                $http.get(proxy + '/api/getCurrentUser').then(resolver,resolver);
+            }
+            return deferred.promise;
+        }
         return {
             login:function(login,password){
                 // Calculate digest
-                var realm = ipCookie('realm');
-                var nonce = ipCookie('nonce');
+                var deferred = $q.defer();
+                getNonce().then(function(data){
+                    var realm = data.realm;
+                    var nonce = data.nonce;
 
-                var digest = md5(login + ':' + realm + ':' + password);
-                var method = md5('GET:');
-                var authDigest = md5(digest + ':' + nonce + ':' + method);
-                var auth = Base64.encode(login + ':' + nonce + ':' + authDigest);
+                    var digest = md5(login + ':' + realm + ':' + password);
+                    var method = md5('GET:');
+                    var authDigest = md5(digest + ':' + nonce + ':' + method);
+                    var auth = Base64.encode(login + ':' + nonce + ':' + authDigest);
 
-                /*
-                 console.log('debug auth - realm:',realm);
-                 console.log('debug auth - nonce:',nonce);
-                 console.log('debug auth - login:',login);
-                 console.log('debug auth - password:',$scope.user.password);
-                 console.log('debug auth - digest = md5(login:realm:password):',digest);
-                 console.log('debug auth - method:','GET:');
-                 console.log('debug auth - md5(method):',method);
-                 console.log('debug auth -  authDigest = md5(digest:nonce:md5(method)):',authDigest);
-                 console.log('debug auth -  auth = base64(login:nonce:authDigest):',auth);
-                 */
+                    /*
+                     console.log('debug auth - realm:',realm);
+                     console.log('debug auth - nonce:',nonce);
+                     console.log('debug auth - login:',login);
+                     console.log('debug auth - password:',$scope.user.password);
+                     console.log('debug auth - digest = md5(login:realm:password):',digest);
+                     console.log('debug auth - method:','GET:');
+                     console.log('debug auth - md5(method):',method);
+                     console.log('debug auth -  authDigest = md5(digest:nonce:md5(method)):',authDigest);
+                     console.log('debug auth -  auth = base64(login:nonce:authDigest):',auth);
+                     */
 
-                ipCookie('auth',auth, { path: '/' });
+                    ipCookie('auth',auth, { path: '/' });
 
-                var rtspmethod = md5('PLAY:');
-                var rtspDigest = md5(digest + ':' + nonce + ':' + rtspmethod);
-                var authRtsp = Base64.encode(login + ':' + nonce + ':' + rtspDigest);
-                ipCookie('auth_rtsp',authRtsp, { path: '/' });
+                    var rtspmethod = md5('PLAY:');
+                    var rtspDigest = md5(digest + ':' + nonce + ':' + rtspmethod);
+                    var authRtsp = Base64.encode(login + ':' + nonce + ':' + rtspDigest);
+                    ipCookie('auth_rtsp',authRtsp, { path: '/' });
 
-                //Old cookies:  // TODO: REMOVE THIS SECTION
-                //ipCookie('response',auth_digest, { path: '/' });
-                //ipCookie('username',login, { path: '/' });
+                    //Old cookies:  // TODO: REMOVE THIS SECTION
+                    //ipCookie('response',auth_digest, { path: '/' });
+                    //ipCookie('username',login, { path: '/' });
 
-                // Check auth again - without catching errors
-                return $http.get(proxy + '/api/getCurrentUser');
+                    // Check auth again - without catching errors
+                    return $http.get(proxy + '/api/getCurrentUser').then(function(data){
+                        deferred.resolve(data);
+                    },function(error){
+                        deferred.reject(error);
+                    });
+                });
+                return deferred.promise;
             },
             url:function(){
                 return proxy;
