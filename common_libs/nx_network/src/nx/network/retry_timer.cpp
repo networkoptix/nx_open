@@ -13,6 +13,9 @@ namespace network {
 //// class RetryPolicy
 ////////////////////////////////////////////////////////////
 
+const std::chrono::milliseconds RetryPolicy::kNoMaxDelay =
+    std::chrono::milliseconds::zero();
+
 const std::chrono::milliseconds RetryPolicy::kDefaultInitialDelay(500);
 const std::chrono::milliseconds RetryPolicy::kDefaultMaxDelay(std::chrono::minutes(1));
 
@@ -76,7 +79,7 @@ RetryTimer::RetryTimer(const RetryPolicy& policy)
     m_retryPolicy(policy),
     m_currentDelay(m_retryPolicy.initialDelay()),
     m_effectiveMaxDelay(
-        m_retryPolicy.maxDelay() == std::chrono::milliseconds::zero()
+        m_retryPolicy.maxDelay() == RetryPolicy::kNoMaxDelay
         ? std::chrono::milliseconds::max()
         : m_retryPolicy.maxDelay()),
     m_triesMade(0)
@@ -129,8 +132,13 @@ bool RetryTimer::scheduleNextTry(nx::utils::MoveOnlyFunc<void()> doAnotherTryFun
         (m_retryPolicy.delayMultiplier() > 0) &&
         (m_currentDelay < m_effectiveMaxDelay))
     {
-        //TODO #ak taking into account delay overflow
-        m_currentDelay *= m_retryPolicy.delayMultiplier();
+        auto newDelay = m_currentDelay * m_retryPolicy.delayMultiplier();
+        if (newDelay < m_currentDelay)
+        {
+            //overflow
+            newDelay = std::chrono::milliseconds::max();
+        }
+        m_currentDelay = newDelay;
         if (m_currentDelay > m_effectiveMaxDelay)
             m_currentDelay = m_effectiveMaxDelay;
     }
@@ -138,6 +146,11 @@ bool RetryTimer::scheduleNextTry(nx::utils::MoveOnlyFunc<void()> doAnotherTryFun
     ++m_triesMade;
     m_timer.start(m_currentDelay, std::move(doAnotherTryFunc));
     return true;
+}
+
+std::chrono::milliseconds RetryTimer::currentDelay() const
+{
+    return m_currentDelay;
 }
 
 }   //network
