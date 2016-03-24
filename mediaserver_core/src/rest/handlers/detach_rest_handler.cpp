@@ -48,10 +48,6 @@ int QnDetachFromSystemRestHandler::execute(PasswordData passwordData, QnJsonRest
     }
 
     qnGlobalSettings->resetCloudParams();
-    qnGlobalSettings->synchronizeNow();
-
-    //TODO: #GDM sync syncronizeNow with result
-    /*
     if (!qnGlobalSettings->synchronizeNowSync())
     {
         result.setError(
@@ -59,7 +55,6 @@ int QnDetachFromSystemRestHandler::execute(PasswordData passwordData, QnJsonRest
             lit("Failed to save cloud credentials to local DB"));
         return nx_http::StatusCode::ok;
     }
-    */
 
     nx::SystemName systemName;
     systemName.resetToDefault();

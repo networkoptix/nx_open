@@ -118,7 +118,7 @@ public:
     bool testAndSetValue(const QVariant &expectedValue, const QVariant &newValue);
     virtual void setValue(const QVariant& value) = 0;
 
-    void synchronizeNow();
+    void saveToResource();
 
 signals:
     void valueChanged();
@@ -140,7 +140,6 @@ private:
     void setResourceInternal(const QnResourcePtr &resource, bool notify);
 
     Q_SLOT void at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key);
-    Q_SLOT void at_connection_propertiesSaved(int, ec2::ErrorCode);
 
 private:
     const QString m_key;

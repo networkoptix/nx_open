@@ -52,6 +52,11 @@ namespace rest
             , QThread *targetThread = nullptr);
 
         /**
+        * Reset the cloud credentials.
+        */
+        Handle resetCloudSystemCredentials(Result<QnRestResult>::type callback, QThread *targetThread = nullptr);
+
+        /**
          * Save the credentials returned by cloud to the database.
          */
         Handle saveCloudSystemCredentials(

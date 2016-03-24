@@ -77,6 +77,22 @@ Handle ServerConnection::sendStatisticsAsync(const QnSendStatisticsRequestData &
         , kJsonContentType, data, callback, targetThread);
 }
 
+Handle ServerConnection::resetCloudSystemCredentials(
+    Result<QnRestResult>::type callback,
+    QThread* targetThread)
+{
+    CloudCredentialsData data;
+    data.reset = true;
+
+    return executePost(
+        lit("/api/saveCloudSystemCredentials"),
+        QnRequestParamList(),
+        Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+        QJson::serialized(std::move(data)),
+        callback,
+        targetThread);
+}
+
 Handle ServerConnection::saveCloudSystemCredentials(
     const QString& cloudSystemID,
     const QString& cloudAuthKey,

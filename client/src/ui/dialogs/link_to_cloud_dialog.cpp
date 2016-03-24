@@ -29,11 +29,8 @@ namespace
 
     rest::QnConnectionPtr getPublicServerConnection()
     {
-        for (const QnMediaServerResourcePtr server: qnResPool->getAllServers(Qn::AnyStatus))
+        for (const QnMediaServerResourcePtr server: qnResPool->getAllServers(Qn::Online))
         {
-            if (server->getStatus() != Qn::Online)
-                continue;
-
             if (!server->getServerFlags().testFlag(Qn::SF_HasPublicIP))
                 continue;
 
