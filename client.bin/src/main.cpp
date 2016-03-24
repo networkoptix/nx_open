@@ -461,7 +461,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     const QScopedPointer<QnSystemsFinder> systemsFinder(new QnSystemsFinder());
     const SystemsFinderPtr directSystemsFinder(new QnDirectSystemsFinder());
     const SystemsFinderPtr cloudSystemsFinder(new QnCloudSystemsFinder());
-   // systemsFinder->addSystemsFinder(directSystemsFinder.data());
+    systemsFinder->addSystemsFinder(directSystemsFinder.data());
     systemsFinder->addSystemsFinder(cloudSystemsFinder.data());
 
     QScopedPointer<QnRouter> router(new QnRouter(moduleFinder.data()));
