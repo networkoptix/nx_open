@@ -941,7 +941,6 @@
             <properties>
                 <platform>android</platform>
                 <toolchain.version>android</toolchain.version>
-                <qt.version>5.5.1</qt.version>
                 <qt.spec>android-g++</qt.spec>
                 <libdir>${root.dir}/build_environment/target</libdir>
                 <compiler>gcc</compiler>
@@ -954,7 +953,7 @@
                 <openssl.version>1.0.2d</openssl.version>
                 <additional.defines>DISABLE_FFMPEG</additional.defines>
                 <compile.option1/>
-                <rdep.target>android</rdep.target>
+                <rdep.target>android-${arch}</rdep.target>
             </properties>
         </profile>
         <profile>
