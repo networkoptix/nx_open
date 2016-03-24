@@ -9,6 +9,8 @@
 #include <api/helpers/request_helpers_fwd.h>
 #include <nx/network/http/asynchttpclient.h>
 
+#include <rest/server/json_rest_result.h>
+
 /*
 * New class for HTTP requests to mediaServer. It should be used instead of deprecated class QnMediaServerConnection.
 * It class can be used either for client and server side.
@@ -28,7 +30,6 @@ namespace rest
 
         template <typename ResultType>
         struct Result { typedef std::function<void (bool, Handle, ResultType)> type; };
-
 
         struct EmptyResponseType {};
         typedef Result<EmptyResponseType>::type PostCallback;   // use this type for POST requests without result data
@@ -51,13 +52,18 @@ namespace rest
             , QThread *targetThread = nullptr);
 
         /**
+        * Reset the cloud credentials.
+        */
+        Handle resetCloudSystemCredentials(Result<QnRestResult>::type callback, QThread *targetThread = nullptr);
+
+        /**
          * Save the credentials returned by cloud to the database.
          */
         Handle saveCloudSystemCredentials(
             const QString &cloudSystemID,
             const QString &cloudAuthKey,
             const QString &cloudAccountName,
-            Result<EmptyResponseType>::type callback,
+            Result<QnRestResult>::type callback,
             QThread *targetThread = nullptr);
 
         /**

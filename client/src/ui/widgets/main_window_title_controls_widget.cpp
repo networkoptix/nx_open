@@ -10,8 +10,10 @@ QnMainWindowTitleControlsWidget::QnMainWindowTitleControlsWidget(QWidget* parent
     base_type(parent),
     QnWorkbenchContextAware(parent, context)
 {
+    setFocusPolicy(Qt::NoFocus);
 
     QnCloudStatusPanel *cloudPanel = new QnCloudStatusPanel(this);
+    cloudPanel->setFocusPolicy(Qt::NoFocus);
 
     /* Layout for window buttons that can be removed from the title bar. */
     QHBoxLayout* layout = new QHBoxLayout();
@@ -36,6 +38,7 @@ QToolButton* QnMainWindowTitleControlsWidget::newActionButton(QAction *action, b
     int iconHeight = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, 0, button) * sizeMultiplier;
     int iconWidth = iconHeight * aspectRatio;
     button->setFixedSize(iconWidth, iconHeight);
+    button->setFocusPolicy(Qt::NoFocus);
 
     button->setProperty(Qn::ToolButtonCheckedRotationSpeed, action->property(Qn::ToolButtonCheckedRotationSpeed));
 

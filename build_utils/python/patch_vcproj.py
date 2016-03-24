@@ -102,7 +102,9 @@ def fix_qrc(root):
     for node in nodes:
         inputsNodes = node.findall("./ms:AdditionalInputs", namespaces_dict)
         for inputNode in inputsNodes:
-            node.remove(inputNode)
+            files = inputNode.text.split(';')
+            allowed = [f for f in files if not f.endswith('.png') and not f.endswith('.ico') and not f.endswith('.qm')]
+            inputNode.text = ';'.join(allowed)
 
 def patch_project(project):
     print "Patching {0}...".format(project)

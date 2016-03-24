@@ -114,15 +114,16 @@ void QnServerSettingsDialog::retranslateUi() {
     }
 }
 
-QMessageBox::StandardButton QnServerSettingsDialog::showConfirmationDialog() {
+QDialogButtonBox::StandardButton QnServerSettingsDialog::showConfirmationDialog() {
     NX_ASSERT(m_server, Q_FUNC_INFO, "Server must exist here");
 
-    return QMessageBox::question(this,
+    return QnMessageBox::question(
+        this,
         tr("Server not saved"),
         tr("Apply changes to server %1?")
         .arg(m_server
             ? m_server->getName()
             : QString()),
-        QMessageBox::Yes | QMessageBox::No,
-        QMessageBox::Yes);
+        QDialogButtonBox::Yes | QDialogButtonBox::No,
+        QDialogButtonBox::Yes);
 }

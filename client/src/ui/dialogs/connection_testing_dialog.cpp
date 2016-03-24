@@ -6,7 +6,6 @@
 #include <QtConcurrent/QtConcurrentRun>
 
 #include <QtWidgets/QDataWidgetMapper>
-#include <QtWidgets/QMessageBox>
 #include <QtWidgets/QPushButton>
 
 #include <api/session_manager.h>

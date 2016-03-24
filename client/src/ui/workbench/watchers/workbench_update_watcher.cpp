@@ -2,7 +2,6 @@
 
 #include <QtCore/QTimer>
 #include <QtWidgets/QAction>
-#include <QtWidgets/QMessageBox>
 #include <QtWidgets/QPushButton>
 #include <QtGui/QDesktopServices>
 
@@ -179,7 +178,7 @@ void QnWorkbenchUpdateWatcher::showUpdateNotification(const QnUpdateInfo &info)
     {
         actionMessage = tr("Please update %1 Client.").arg(QnAppInfo::productNameLong());
         messageBox.setStandardButtons(QDialogButtonBox::Ok);
-        messageBox.setIcon(QMessageBox::Information);
+        messageBox.setIcon(QnMessageBox::Information);
     }
 #endif
 

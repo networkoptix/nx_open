@@ -10,7 +10,7 @@ class QnSetupWizardDialog : public QDialog
     typedef QDialog base_type;
 
 public:
-    explicit QnSetupWizardDialog(QWidget *parent = nullptr);
+    explicit QnSetupWizardDialog(const QUrl& serverUrl,  QWidget *parent = nullptr);
     ~QnSetupWizardDialog();
 
     virtual int exec() override;

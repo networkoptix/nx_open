@@ -30,7 +30,7 @@ bool QnResourcePropertyDictionary::saveParams(const QnUuid& resourceId)
     //TODO: #GDM SafeMode
     ec2::ErrorCode rez = conn->getResourceManager()->saveSync(params, &outData);
 
-    if (rez != ec2::ErrorCode::ok) 
+    if (rez != ec2::ErrorCode::ok)
     {
         qCritical() << Q_FUNC_INFO << ": can't save resource params to Server. Resource physicalId: "
             << resourceId << ". Description: " << ec2::toString(rez);
@@ -57,7 +57,7 @@ int QnResourcePropertyDictionary::saveData(const ec2::ApiResourceParamWithRefDat
         return -1; // nothing to save
     ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
     QnMutexLocker lock( &m_requestMutex );
-    //TODO #ak m_requestInProgress is redundant here, data can be saved to 
+    //TODO #ak m_requestInProgress is redundant here, data can be saved to
         //functor to use instead of \a QnResourcePropertyDictionary::onRequestDone
     //TODO: #GDM SafeMode
     int requestId = conn->getResourceManager()->save(data, this, &QnResourcePropertyDictionary::onRequestDone);
@@ -82,7 +82,7 @@ int QnResourcePropertyDictionary::saveParamsAsync(const QList<QnUuid>& idList)
     {
         QnMutexLocker lock( &m_mutex );
         //TODO #vasilenko is it correct to mark property as saved before it has been actually saved to ec?
-        for(const QnUuid& resourceId: idList) 
+        for(const QnUuid& resourceId: idList)
             fromModifiedDataToSavedData(resourceId, data);
     }
     return saveData(std::move(data));
@@ -108,7 +108,7 @@ void QnResourcePropertyDictionary::onRequestDone( int reqID, ec2::ErrorCode erro
 void QnResourcePropertyDictionary::addToUnsavedParams(const ec2::ApiResourceParamWithRefDataList& params)
 {
     QnMutexLocker lock( &m_mutex );
-    for(const ec2::ApiResourceParamWithRefData& param: params) 
+    for(const ec2::ApiResourceParamWithRefData& param: params)
     {
         auto itr = m_modifiedItems.find(param.resourceId);
         if (itr == m_modifiedItems.end())
@@ -155,7 +155,7 @@ bool QnResourcePropertyDictionary::setValue(const QnUuid& resourceId, const QStr
     auto itr = m_items.find(resourceId);
     if (itr == m_items.end())
         itr = m_items.insert(resourceId, QnResourcePropertyList());
-    
+
     QnResourcePropertyList& properties = itr.value();
     auto itrValue = properties.find(key);
     if (itrValue == properties.end())

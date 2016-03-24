@@ -170,7 +170,7 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
             tr("Selected Server has a different version:") + L'\n'
             + versionDetails
             + tr("The other version of the Client is needed in order to establish the connection to this Server."),
-            QMessageBox::Ok
+            QDialogButtonBox::Ok
             );
         return Result::IncompatibleVersion;
     }
@@ -198,7 +198,7 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
                 tr("Selected Server has a different version:") + L'\n'
                 + versionDetails
                 + tr("The other version of the Client is needed in order to establish the connection to this Server."),
-                QMessageBox::Ok
+                QDialogButtonBox::Ok
                 );
 #endif
             return Result::IncompatibleVersion;

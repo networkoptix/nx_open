@@ -10,7 +10,6 @@
 #include <QtWidgets/QGraphicsLinearLayout>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QMenu>
-#include <QtWidgets/QMessageBox>
 #include <QtWidgets/QLabel>
 #include <QtCore/QPropertyAnimation>
 #include <QtCore/QFileInfo>

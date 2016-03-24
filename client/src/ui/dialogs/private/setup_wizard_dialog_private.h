@@ -18,4 +18,5 @@ public slots:
 
 public:
     QWebView *webView;
+    QUrl url;
 };

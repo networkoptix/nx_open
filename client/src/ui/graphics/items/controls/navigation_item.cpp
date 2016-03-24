@@ -4,7 +4,6 @@
 #include <QtCore/QCoreApplication>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QGraphicsLinearLayout>
-#include <QtWidgets/QMessageBox>
 #include <QtWidgets/QGraphicsProxyWidget>
 
 #include <nx/streaming/abstract_archive_stream_reader.h>

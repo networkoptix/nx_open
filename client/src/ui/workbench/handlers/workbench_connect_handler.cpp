@@ -68,7 +68,7 @@
 
 #include "compatibility.h"
 
-namespace 
+namespace
 {
     const int videowallReconnectTimeoutMSec = 5000;
     const int videowallCloseTimeoutMSec = 10000;
@@ -372,7 +372,7 @@ bool QnWorkbenchConnectHandler::disconnectFromServer(bool force) {
         return false;
 
     if (!force) {
-        QnGlobalSettings::instance()->synchronizeNow();
+        qnGlobalSettings->synchronizeNow();
         qnSettings->setLastUsedConnection(QnConnectionData());
 
         storeConnection(QnAppServerConnectionFactory::url());

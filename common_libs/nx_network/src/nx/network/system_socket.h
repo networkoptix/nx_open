@@ -228,9 +228,6 @@ public:
     virtual void close() override;
     virtual void shutdown() override;
 
-    //! Filters out \fn connect calls (DEBUG ONLY!)
-    static QList<QString> connectFilters;
-
 private:
     aio::AsyncSocketImplHelper<Pollable>* m_aioHelper;
     bool m_connected;
