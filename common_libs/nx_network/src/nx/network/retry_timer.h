@@ -21,10 +21,14 @@ class NX_NETWORK_API RetryPolicy
 public:
     static const unsigned int kInfiniteRetries = 
         std::numeric_limits<unsigned int>::max();
+    static const std::chrono::milliseconds kNoMaxDelay;
+
     static const unsigned int kDefaultMaxRetryCount = 7;
     /** 500ms */
     static const std::chrono::milliseconds kDefaultInitialDelay;
     static const unsigned int kDefaultDelayMultiplier = 2;
+    /** 1 minute */
+    static const std::chrono::milliseconds kDefaultMaxDelay;
 
     RetryPolicy();
 
@@ -38,10 +42,15 @@ public:
     void setDelayMultiplier(unsigned int multiplier);
     unsigned int delayMultiplier() const;
 
+    /** \a std::chrono::milliseconds::zero is treated as no limit */
+    void setMaxDelay(std::chrono::milliseconds delay);
+    std::chrono::milliseconds maxDelay() const;
+
 private:
     unsigned int m_maxRetryCount;
     std::chrono::milliseconds m_initialDelay;
     unsigned int m_delayMultiplier;
+    std::chrono::milliseconds m_maxDelay;
 };
 
 namespace aio {
@@ -58,7 +67,7 @@ public:
     virtual void dispatch(nx::utils::MoveOnlyFunc<void()> func) = 0;
 };
 
-}
+}   //aio
 
 /** Implements request retry policy, specified in STUN rfc.
     There are maximum N retries, delay between retries is increased by 
@@ -87,9 +96,14 @@ public:
     /** Returns \a false, if maximum retries have been done */
     bool scheduleNextTry(nx::utils::MoveOnlyFunc<void()> doAnotherTryFunc);
 
+    std::chrono::milliseconds currentDelay() const;
+
 private:
     aio::Timer m_timer;
     const RetryPolicy m_retryPolicy;
+    std::chrono::milliseconds m_currentDelay;
+    std::chrono::milliseconds m_effectiveMaxDelay;
+    unsigned int m_triesMade;
 };
 
 }   //network
