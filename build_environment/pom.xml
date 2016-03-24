@@ -54,6 +54,12 @@
                                         <include>.sync</include>
                                     </includes>
                                 </fileset>
+                                <fileset>
+                                    <directory>${project.build.directory}/${arch}</directory>
+                                    <includes>
+                                        <include>.sync</include>
+                                    </includes>
+                                </fileset>                                
                             </filesets>
                         </configuration>
                     </execution>
