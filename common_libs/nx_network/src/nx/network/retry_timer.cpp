@@ -92,7 +92,7 @@ RetryTimer::~RetryTimer()
 
 void RetryTimer::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
-    m_timer.cancelAsync(std::move(completionHandler));
+    m_timer.pleaseStop(std::move(completionHandler));
 }
 
 void RetryTimer::pleaseStopSync()
