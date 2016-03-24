@@ -14,8 +14,8 @@ QnHTTPRawResponse::QnHTTPRawResponse(
     nx_http::Response _response,
     QByteArray _msgBody)
 :
-    status(QNetworkReply::NoError),
     sysErrorCode(_sysErrorCode),
+    status(QNetworkReply::NoError),
     response(std::move(_response)),
     msgBody(std::move(_msgBody))
 {

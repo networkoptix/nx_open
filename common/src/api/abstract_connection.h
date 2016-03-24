@@ -144,7 +144,7 @@ protected:
         NX_ASSERT(reply);
 
         QVariant replyVariant;
-        int status = sendSyncRequest(operation, object, headers, params, data, &replyVariant);
+        int status = sendSyncRequest(method, object, std::move(headers), params, std::move(msgBody), &replyVariant);
 
         if (status)
             return status;
