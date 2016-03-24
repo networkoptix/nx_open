@@ -25,9 +25,16 @@ namespace test {
 
 enum class TestTrafficLimitType
 {
-    none,
-    incoming,
-    outgoing
+    none, // never quit
+    incoming, // quits when sends over limit
+    outgoing, // quits when recieves over limit
+};
+
+enum class TestTransmissionMode
+{
+    spam, // spams random data as fast as follible, recieves alweys
+    echo, // reads and sends the same data as avaliable
+    echoTest, // sends randome data and verifies if it comes back
 };
 
 //!Reads/writes random data to/from connection
@@ -62,6 +69,7 @@ public:
 
     size_t totalBytesSent() const;
     size_t totalBytesReceived() const;
+    bool isTaskComplete() const;
 
     void setOnFinishedEventHandler(
         nx::utils::MoveOnlyFunc<void(int, TestConnection*, SystemError::ErrorCode)> handler);
@@ -162,7 +170,8 @@ public:
     size_t totalConnectionsEstablished() const;
     size_t totalBytesSent() const;
     size_t totalBytesReceived() const;
-    std::vector<SystemError::ErrorCode> totalErrors() const;
+    size_t totalIncompleteTasks() const;
+    QString returnCodes() const;
 
 private:
     /** map<connection id, connection> */
@@ -178,7 +187,8 @@ private:
     std::mutex m_mutex;
     size_t m_totalBytesSent;
     size_t m_totalBytesReceived;
-    std::vector<SystemError::ErrorCode> m_errors;
+    size_t m_totalIncompleteTasks;
+    std::map<SystemError::ErrorCode, size_t> m_returnCodes;
     size_t m_totalConnectionsEstablished;
     std::set<int> m_finishedConnectionsIDs;
     std::random_device m_randomDevice;

@@ -189,7 +189,9 @@ int runInConnectMode(const std::multimap<QString, QString>& args)
         "Total connections: "<<connectionsGenerator.totalConnectionsEstablished()<<". "
         "Total bytes sent: "<<connectionsGenerator.totalBytesSent()<<". "
         "Total bytes received: "<<connectionsGenerator.totalBytesReceived()<<". "
-        "Total errors: "<<connectionsGenerator.totalErrors().size()<<"."
+        "Total incomplete tasks: "<<connectionsGenerator.totalIncompleteTasks()<<". "
+        <<std::endl<<
+        "report: "<<connectionsGenerator.returnCodes().toStdString()<<". "
         <<std::endl;
 
     return 0;
@@ -248,7 +250,7 @@ void printHelp(int /*argc*/, char* /*argv*/[])
         "  --total-connections={"<< kDefaultTotalConnections <<"}\n"
         "                                   Number of connections to try\n"
         "  --max-concurrent-connections={"<< kDefaultMaxConcurrentConnections <<"}\n"
-        "  --bytes-to-receive={"<< kDefaultBytesToReceive <<"}"
+        "  --bytes-to-receive={"<< kDefaultBytesToReceive <<"}\n"
         "                                   Bytes to receive before closing connection\n"
         "  --bytes-to-send=                 Bytes to send before closing connection\n"
         "\n"
@@ -271,3 +273,9 @@ void printHelp(int /*argc*/, char* /*argv*/[])
 //--http-client --url=http://admin:admin@1af3ebeb-c327-3665-40f1-fa4dba0df78f.ffc8e5a2-a173-4b3d-8627-6ab73d6b234d/api/gettime
 //--connect --target=server1.ffc8e5a2-a173-4b3d-8627-6ab73d6b234d --max-concurrent-connections=1
 //--listen --server-id=server1 --cloud-credentials=ffc8e5a2-a173-4b3d-8627-6ab73d6b234d:bee7d48e-d05f-43ec-aac9-ba404d6a55e3
+
+/** AK old PC mediator test:
+
+--enforce-mediator=10.0.2.41:3345 --listen --cloud-credentials=93e0467f-3145-41a8-8ebc-7f3c95e2ccf0:32cfaaf7-19fe-4bb2-a06d-4b6bac489757 --server-id=xxx
+--enforce-mediator=10.0.2.41:3345 --connect --target=xxx.93e0467f-3145-41a8-8ebc-7f3c95e2ccf0
+*/

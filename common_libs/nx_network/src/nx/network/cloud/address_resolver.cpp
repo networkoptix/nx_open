@@ -384,13 +384,6 @@ void AddressResolver::dnsResolve(HaInfoIterator info)
                      .arg( info->first.toString() )
                      .arg( hostAddress.toString() ), cl_logDEBUG1 );
         }
-        else
-        {
-            // count failure as unresolvable, better luck next time
-            NX_LOGX( lit( "Address %1 could not be resolved: %2" )
-                     .arg( info->first.toString() )
-                     .arg( SystemError::toString( code ) ), cl_logDEBUG1 );
-        }
 
         info->second.setDnsEntries( entries );
         guards = grabHandlers( code, info, &lk );
@@ -490,9 +483,13 @@ std::vector<Guard> AddressResolver::grabHandlers(
             ++req;
     }
 
-    NX_LOGX( lit( "There are %1 about to be notified: %2 is resolved to %3" )
-             .arg( guards.size() ).arg( info->first.toString() )
-             .arg( containerString( entries ) ), cl_logDEBUG1 );
+    if (guards.size())
+    {
+        NX_LOGX( lit( "There is(are) %1 about to be notified: %2 is resolved to %3" )
+                 .arg( guards.size() ).arg( info->first.toString() )
+                 .arg( containerString( entries ) ), cl_logDEBUG1 );
+    }
+
     return guards;
 }
 

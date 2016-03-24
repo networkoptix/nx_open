@@ -149,6 +149,20 @@ size_t TestConnection::totalBytesReceived() const
     return m_totalBytesReceived;
 }
 
+bool TestConnection::isTaskComplete() const
+{
+    switch (m_limitType) {
+        case TestTrafficLimitType::none:
+            return true;
+        case TestTrafficLimitType::incoming:
+            return m_totalBytesReceived >= m_trafficLimit;
+        case TestTrafficLimitType::outgoing:
+            return m_totalBytesSent >= m_trafficLimit;
+    }
+
+    return false;
+}
+
 void TestConnection::setOnFinishedEventHandler(
     nx::utils::MoveOnlyFunc<void(int, TestConnection*, SystemError::ErrorCode)> handler)
 {
@@ -188,7 +202,7 @@ void TestConnection::startIO()
     NX_LOGX(lm("accepted %1. Sending %2 bytes of data to %3")
         .arg(m_accepted).arg(m_outData.size())
         .arg(m_socket->getForeignAddress().toString()),
-        cl_logDEBUG1);
+        cl_logDEBUG2);
     m_socket->sendAsync(
         m_outData,
         std::bind(&TestConnection::onDataSent, this, m_id, _1, _2) );
@@ -202,7 +216,7 @@ void TestConnection::onDataReceived(
     if (errorCode == SystemError::noError)
     {
         NX_LOGX(lm("accepted %1. Received %2 bytes of data")
-            .arg(m_accepted).arg(bytesRead), cl_logDEBUG1);
+            .arg(m_accepted).arg(bytesRead), cl_logDEBUG2);
     }
     else
     {
@@ -240,15 +254,12 @@ void TestConnection::onDataReceived(
 
 void TestConnection::onDataSent( int id, SystemError::ErrorCode errorCode, size_t bytesWritten )
 {
-    if (errorCode != SystemError::noError)
+    if (errorCode != SystemError::noError && errorCode != SystemError::timedOut)
     {
         NX_LOGX(lm("accepted %1. Send error: %2")
             .arg(m_accepted).arg(SystemError::toString(errorCode)),
             cl_logWARNING);
-    }
 
-    if( errorCode != SystemError::noError && errorCode != SystemError::timedOut )
-    {
         if (!m_finishedEventHandler)
             return;
         auto handler = std::move( m_finishedEventHandler );
@@ -269,7 +280,7 @@ void TestConnection::onDataSent( int id, SystemError::ErrorCode errorCode, size_
     NX_LOGX(lm("accepted %1. Sending %2 bytes of data to %3")
         .arg(m_accepted).arg(m_outData.size())
         .arg(m_socket->getForeignAddress().toString()),
-        cl_logDEBUG1);
+        cl_logDEBUG2);
     m_socket->sendAsync(
         m_outData,
         std::bind(&TestConnection::onDataSent, this, m_id, _1, _2) );
@@ -417,6 +428,7 @@ ConnectionsGenerator::ConnectionsGenerator(
     m_terminated( false ),
     m_totalBytesSent( 0 ),
     m_totalBytesReceived( 0 ),
+    m_totalIncompleteTasks( 0 ),
     m_totalConnectionsEstablished( 0 ),
     m_randomEngine(m_randomDevice()),
     m_errorEmulationDistribution(1, 100),
@@ -448,6 +460,8 @@ void ConnectionsGenerator::pleaseStop(
                     std::unique_lock<std::mutex> lk(m_mutex);
                     m_totalBytesSent += connection->totalBytesSent();
                     m_totalBytesReceived += connection->totalBytesReceived();
+                    if (!connection->isTaskComplete())
+                        ++m_totalIncompleteTasks;
                 }
                 connection.reset();
                 handler();
@@ -509,28 +523,30 @@ size_t ConnectionsGenerator::totalBytesReceived() const
     return m_totalBytesReceived;
 }
 
-std::vector<SystemError::ErrorCode> ConnectionsGenerator::totalErrors() const
+size_t ConnectionsGenerator::totalIncompleteTasks() const
 {
-    return m_errors;
+    return m_totalIncompleteTasks;
+}
+
+QString ConnectionsGenerator::returnCodes() const
+{
+    QStringList descriptions;
+    for (const auto& error : m_returnCodes)
+        descriptions << lm("%2 [%1 time(s)]").arg(error.second)
+            .arg(SystemError::toString(error.first));
+
+    return descriptions.join(QLatin1Literal("; "));
 }
 
 void ConnectionsGenerator::onConnectionFinished(
     int id,
     SystemError::ErrorCode code)
 {
-    if (code != SystemError::noError)
-    {
-        m_errors.push_back(code);
-        if (m_errors.size() < 3)
-        {
-            std::cerr
-                << "onConnectionFinished: "
-                << SystemError::toString(code).toStdString()
-                << std::endl;
-        }
-    }
+    NX_LOGX(lm("Connection %1 has finished: %2")
+        .arg(id).arg(SystemError::toString(code)), cl_logDEBUG1);
 
     std::unique_lock<std::mutex> lk(m_mutex);
+    m_returnCodes.emplace(code, 0).first->second++;
 
     {
         std::unique_lock<std::mutex> lk(mtx1);
@@ -543,6 +559,8 @@ void ConnectionsGenerator::onConnectionFinished(
         //connection might have been removed by pleaseStop
         m_totalBytesSent += connectionIter->second->totalBytesSent();
         m_totalBytesReceived += connectionIter->second->totalBytesReceived();
+        if (!connectionIter->second->isTaskComplete())
+            ++m_totalIncompleteTasks;
         m_connections.erase(connectionIter);
     }
     if (m_terminated)
