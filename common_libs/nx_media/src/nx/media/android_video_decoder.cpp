@@ -17,11 +17,16 @@
 
 #include <nx/utils/thread/mutex.h>
 #include <utils/media/h264_utils.h>
+#include <utils/common/log.h>
 
 #include <QAndroidJniObject>
 #include <QAndroidJniEnvironment>
 
 #include "abstract_resource_allocator.h"
+
+
+#define USE_GUI_RENDERING
+#define USE_SHARED_CTX
 
 namespace nx {
 namespace media {
@@ -81,22 +86,24 @@ public:
     FboManager(const QSize& frameSize):
         m_frameSize(frameSize)
     {
-
     }
 
     FboPtr getFbo()
     {
-        for(const auto& fbo: m_data)
-        {
-            if (fbo.use_count() == 1)
-                return fbo; //< this object is free
-        }
-        FboPtr newFbo(new QOpenGLFramebufferObject(m_frameSize));
-        m_data.push_back(newFbo);
-        return newFbo;
+#ifdef USE_GUI_RENDERING
+        if (!m_fbo)
+            m_fbo = FboPtr(new QOpenGLFramebufferObject(m_frameSize));
+        return m_fbo;
+#else
+        return FboPtr(new QOpenGLFramebufferObject(m_frameSize));
+#endif
     }
 private:
+#ifdef USE_GUI_RENDERING
+    FboPtr m_fbo;
+#else
     std::vector<FboPtr> m_data;
+#endif
     QSize m_frameSize;
 };
 
@@ -105,19 +112,27 @@ private:
 class TextureBuffer: public QAbstractVideoBuffer
 {
 public:
-    TextureBuffer (const FboPtr& fbo):
+    TextureBuffer (const FboPtr& fbo, std::shared_ptr<AndroidVideoDecoderPrivate> owner):
         QAbstractVideoBuffer(GLTextureHandle),
-        m_fbo(fbo)
+        m_fbo(fbo),
+        m_owner(owner)
     {
+
+    }
+
+    ~TextureBuffer()
+    {
+
     }
 
     virtual MapMode mapMode() const override { return NotMapped;}
     virtual uchar *map(MapMode, int *, int *) override { return 0; }
     virtual void unmap() override {}
-    virtual QVariant handle() const override { return m_fbo->texture(); }
+    virtual QVariant handle() const override;
 
 private:
-    FboPtr m_fbo;
+    mutable FboPtr m_fbo;
+    std::weak_ptr<AndroidVideoDecoderPrivate> m_owner;
 };
 
 // --------------------------------------------------------------------------------------------------
@@ -126,7 +141,7 @@ private:
 
 // ------------------------- AndroidVideoDecoderPrivate -------------------------
 
-class AndroidVideoDecoderPrivate : public QObject
+class AndroidVideoDecoderPrivate: public QObject
 {
     Q_DECLARE_PUBLIC(AndroidVideoDecoder)
     AndroidVideoDecoder *q_ptr;
@@ -180,9 +195,8 @@ public:
         env->DeleteLocalRef(objectClass);
     }
 
-    void renderFrameToFbo();
-    FboPtr createGLResources();
-
+    FboPtr renderFrameToFbo();
+    void createGLResources();
 private:
     qint64 frameNumber;
     bool initialized;
@@ -191,31 +205,33 @@ private:
     QSize frameSize;
 
     std::unique_ptr<FboManager> fboManager;
-    FboPtr currentFbo;
     QOpenGLShaderProgram *program;
 
     typedef std::pair<int, qint64> PtsData;
     std::deque<PtsData> frameNumToPtsCache;
+
+    std::unique_ptr<QOpenGLContext> threadGlCtx;
+    std::unique_ptr<QOffscreenSurface> offscreenSurface;
 };
 
-void renderFrameToFbo(void* opaque)
+FboPtr AndroidVideoDecoderPrivate::renderFrameToFbo()
 {
-    AndroidVideoDecoderPrivate* d = static_cast<AndroidVideoDecoderPrivate*>(opaque);
-    d->renderFrameToFbo();
-}
+    QElapsedTimer tm;
+    tm.restart();
 
-void AndroidVideoDecoderPrivate::renderFrameToFbo()
-{
     QOpenGLFunctions *funcs = QOpenGLContext::currentContext()->functions();
 
-    currentFbo = createGLResources();
+    createGLResources();
+    FboPtr fbo = fboManager->getFbo();
+
     if (funcs->glGetError())
         qDebug() << "gl error: " << funcs->glGetString(funcs->glGetError());
+
+    auto t1 = tm.elapsed();
 
     updateTexImage();
-    if (funcs->glGetError())
-        qDebug() << "gl error: " << funcs->glGetString(funcs->glGetError());
 
+    auto t2 = tm.elapsed();
 
     // save current render states
     GLboolean stencilTestEnabled;
@@ -226,6 +242,11 @@ void AndroidVideoDecoderPrivate::renderFrameToFbo()
     glGetBooleanv(GL_DEPTH_TEST, &depthTestEnabled);
     glGetBooleanv(GL_SCISSOR_TEST, &scissorTestEnabled);
     glGetBooleanv(GL_BLEND, &blendEnabled);
+    //GLuint prevFbo = 0;
+    //funcs->glGetIntegerv(GL_FRAMEBUFFER_BINDING, (GLint *) &prevFbo);
+
+    if (funcs->glGetError())
+        qDebug() << "gl error: " << funcs->glGetString(funcs->glGetError());
 
     if (stencilTestEnabled)
         glDisable(GL_STENCIL_TEST);
@@ -236,7 +257,7 @@ void AndroidVideoDecoderPrivate::renderFrameToFbo()
     if (blendEnabled)
         glDisable(GL_BLEND);
 
-    currentFbo->bind();
+    fbo->bind();
 
     glViewport(0, 0, frameSize.width(), frameSize.height());
     if (funcs->glGetError())
@@ -270,9 +291,10 @@ void AndroidVideoDecoderPrivate::renderFrameToFbo()
     if (funcs->glGetError())
         qDebug() << "gl error: " << funcs->glGetString(funcs->glGetError());
 
-    currentFbo->release();
+    fbo->release();
 
     // restore render states
+    //funcs->glBindFramebuffer(GL_FRAMEBUFFER, prevFbo); // sets both READ and DRAW
     if (stencilTestEnabled)
         glEnable(GL_STENCIL_TEST);
     if (depthTestEnabled)
@@ -282,16 +304,28 @@ void AndroidVideoDecoderPrivate::renderFrameToFbo()
     if (blendEnabled)
         glEnable(GL_BLEND);
 
+    auto t3 = tm.elapsed();
+
+    if (threadGlCtx)
+    {
+        // we used decoder thread to render. flush everythink to the texture
+        glFlush();
+        glFinish();
+    }
+
+    auto t4 = tm.elapsed();
+    NX_LOG(lit("render t1=%1 t2=%2 t3=%3 t4=%4").arg(t1).arg(t2).arg(t3).arg(t4), cl_logINFO);
+
+    return fbo;
 }
 
-FboPtr AndroidVideoDecoderPrivate::createGLResources()
+void AndroidVideoDecoderPrivate::createGLResources()
 {
     QOpenGLContext *ctx = QOpenGLContext::currentContext();
     QOpenGLFunctions *funcs = ctx->functions();
 
     if (!fboManager)
         fboManager.reset(new FboManager(frameSize));
-    FboPtr fbo = fboManager->getFbo();
 
     if (!program)
     {
@@ -331,14 +365,13 @@ FboPtr AndroidVideoDecoderPrivate::createGLResources()
         if (funcs->glGetError())
             qDebug() << "gl error: " << funcs->glGetString(funcs->glGetError());
     }
-    return fbo;
 }
 
 // ---------------------- AndroidVideoDecoder ----------------------
 
 AndroidVideoDecoder::AndroidVideoDecoder():
     AbstractVideoDecoder(),
-    d_ptr(new AndroidVideoDecoderPrivate())
+    d(new AndroidVideoDecoderPrivate())
 
 {
 }
@@ -349,8 +382,30 @@ AndroidVideoDecoder::~AndroidVideoDecoder()
 
 void AndroidVideoDecoder::setAllocator(AbstractResourceAllocator* allocator)
 {
-    Q_D(AndroidVideoDecoder);
     d->allocator = allocator;
+
+#if defined(USE_SHARED_CTX) && !defined(USE_GUI_RENDERING)
+    QOpenGLContext* sharedContext = QOpenGLContext::globalShareContext();
+    if (sharedContext)
+    {
+        d->threadGlCtx.reset(new QOpenGLContext());
+        d->threadGlCtx->setShareContext(sharedContext);
+        d->threadGlCtx->setFormat(sharedContext->format());
+
+        if (d->threadGlCtx->create() && d->threadGlCtx->shareContext())
+        {
+            NX_LOG(lit("Using shared openGL ctx"), cl_logINFO);
+            d->offscreenSurface.reset(new QOffscreenSurface());
+            d->offscreenSurface->setFormat(d->threadGlCtx->format());
+            d->offscreenSurface->create();
+
+            d->threadGlCtx->makeCurrent(d->offscreenSurface.get());
+        }
+        else {
+            d->threadGlCtx.reset();
+        }
+    }
+#endif
 }
 
 bool AndroidVideoDecoder::isCompatible(const CodecID codec, const QSize& resolution)
@@ -380,8 +435,8 @@ bool AndroidVideoDecoder::isCompatible(const CodecID codec, const QSize& resolut
 
 int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QVideoFramePtr* result)
 {
-    Q_D(AndroidVideoDecoder);
-
+    QElapsedTimer tm;
+    tm.restart();
     if (!d->initialized)
     {
         if (!frame)
@@ -418,14 +473,27 @@ int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QVid
     if (outFrameNum <= 0)
         return outFrameNum;
 
+    auto time1 = tm.elapsed();
+
     // got frame
 
-    d->allocator->execAtGlThread(renderFrameToFbo, d);
-    if (!d->currentFbo)
-        return 0; //< can't decode now. skip frame
+    FboPtr fboToRender;
+#if defined(USE_GUI_RENDERING)
+#else
+    if (d->threadGlCtx)
+        fboToRender = d->renderFrameToFbo();
+    else
+        d->allocator->execAtGlThread([&fboToRender, this](void*)
+        {
+            fboToRender = d->renderFrameToFbo();
+        }, nullptr);
+#endif
 
-    QAbstractVideoBuffer* buffer = new TextureBuffer (std::move(d->currentFbo));
+    NX_LOG(lit("--got frame num %1 decode time1=%2 time2=%3").arg(outFrameNum).arg(time1).arg(tm.elapsed()), cl_logINFO);
+
+    QAbstractVideoBuffer* buffer = new TextureBuffer (std::move(fboToRender), d);
     QVideoFrame* videoFrame = new QVideoFrame(buffer, d->frameSize, QVideoFrame::Format_BGR32);
+
     while (!d->frameNumToPtsCache.empty() && d->frameNumToPtsCache.front().first < outFrameNum)
         d->frameNumToPtsCache.pop_front(); //< In case of decoder skipped some input frames
     if (!d->frameNumToPtsCache.empty() && d->frameNumToPtsCache.front().first == outFrameNum)
@@ -438,6 +506,17 @@ int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QVid
     result->reset(videoFrame);
     return (int)outFrameNum - 1; //< convert range [1..N] to [0..N]
 }
+
+QVariant TextureBuffer::handle() const
+{
+    if (!m_fbo)
+    {
+        if (auto ptr = m_owner.lock())
+            m_fbo = ptr->renderFrameToFbo();
+    }
+    return m_fbo ? m_fbo->texture() : 0;
+}
+
 
 } // namespace media
 } // namespace nx

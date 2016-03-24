@@ -17,7 +17,7 @@ namespace {
 static const int kMaxMediaQueueLen = 90;
 
 // Max queue length for decoded video which is awaiting to be rendered.
-static const int kMaxDecodedVideoQueueSize = 1;
+static const int kMaxDecodedVideoQueueSize = 2;
 
 } // namespace
 
