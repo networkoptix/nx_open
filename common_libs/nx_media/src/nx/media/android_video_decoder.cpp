@@ -84,27 +84,30 @@ class FboManager
 {
 public:
     FboManager(const QSize& frameSize):
-        m_frameSize(frameSize)
+        m_frameSize(frameSize),
+        m_index(0)
     {
     }
 
     FboPtr getFbo()
     {
 #ifdef USE_GUI_RENDERING
-        if (!m_fbo)
-            m_fbo = FboPtr(new QOpenGLFramebufferObject(m_frameSize));
-        return m_fbo;
+        while (m_data.size() < 3)
+            m_data.push_back(FboPtr(new QOpenGLFramebufferObject(m_frameSize)));
+        return m_data[m_index++ % m_data.size()];
+        //if (!m_fbo)
+        //    m_fbo = FboPtr(new QOpenGLFramebufferObject(m_frameSize));
+        //return m_fbo;
+
 #else
         return FboPtr(new QOpenGLFramebufferObject(m_frameSize));
 #endif
     }
 private:
-#ifdef USE_GUI_RENDERING
     FboPtr m_fbo;
-#else
     std::vector<FboPtr> m_data;
-#endif
     QSize m_frameSize;
+    int m_index;
 };
 
 // --------------------------------------------------------------------------------------------------
