@@ -78,28 +78,28 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
 
     /* Live buffer lengths slider/spin logic: */
 
-    connect(ui->iniLiveBufferLenSlider, &QSlider::valueChanged, this, [this](int value)
+    connect(ui->initialLiveBufferLengthSlider, &QSlider::valueChanged, this, [this](int value)
     {
-        ui->iniLiveBufferLenSpinBox->setValue(value);
-        if (value > ui->maxLiveBufferLenSpinBox->value())
-            ui->maxLiveBufferLenSpinBox->setValue(value);
+        ui->initialLiveBufferLengthSpinBox->setValue(value);
+        if (value > ui->maximumLiveBufferLengthSpinBox->value())
+            ui->maximumLiveBufferLengthSpinBox->setValue(value);
     });
 
-    connect(ui->iniLiveBufferLenSpinBox, QnSpinboxIntValueChanged, this, [this](int value)
+    connect(ui->initialLiveBufferLengthSpinBox, QnSpinboxIntValueChanged, this, [this](int value)
     {
-        ui->iniLiveBufferLenSlider->setValue(value);
+        ui->initialLiveBufferLengthSlider->setValue(value);
     });
 
-    connect(ui->maxLiveBufferLenSlider, &QSlider::valueChanged, this, [this](int value)
+    connect(ui->maximumLiveBufferLengthSlider, &QSlider::valueChanged, this, [this](int value)
     {
-        ui->maxLiveBufferLenSpinBox->setValue(value);
-        if (value < ui->iniLiveBufferLenSpinBox->value())
-            ui->iniLiveBufferLenSpinBox->setValue(value);
+        ui->maximumLiveBufferLengthSpinBox->setValue(value);
+        if (value < ui->initialLiveBufferLengthSpinBox->value())
+            ui->initialLiveBufferLengthSpinBox->setValue(value);
     });
 
-    connect(ui->maxLiveBufferLenSpinBox, QnSpinboxIntValueChanged, this, [this](int value)
+    connect(ui->maximumLiveBufferLengthSpinBox, QnSpinboxIntValueChanged, this, [this](int value)
     {
-        ui->maxLiveBufferLenSlider->setValue(value);
+        ui->maximumLiveBufferLengthSlider->setValue(value);
     });
 }
 
@@ -125,8 +125,8 @@ void QnGeneralPreferencesWidget::applyChanges()
     qnSettings->setAutoStart(ui->autoStartCheckBox->isChecked());
     qnSettings->setGLDoubleBuffer(ui->doubleBufferCheckbox->isChecked());
 
-    qnSettings->setInitialLiveBufferMSecs(ui->iniLiveBufferLenSlider->value());
-    qnSettings->setMaximumLiveBufferMSecs(ui->maxLiveBufferLenSlider->value());
+    qnSettings->setInitialLiveBufferMSecs(ui->initialLiveBufferLengthSlider->value());
+    qnSettings->setMaximumLiveBufferMSecs(ui->maximumLiveBufferLengthSlider->value());
 }
 
 void QnGeneralPreferencesWidget::loadDataToUi()
@@ -149,8 +149,8 @@ void QnGeneralPreferencesWidget::loadDataToUi()
     m_oldDoubleBuffering = qnSettings->isGlDoubleBuffer();
     ui->doubleBufferCheckbox->setChecked(m_oldDoubleBuffering);
 
-    ui->iniLiveBufferLenSlider->setValue(qMin(qnSettings->initialLiveBufferMSecs(), qnSettings->maximumLiveBufferMSecs()));
-    ui->maxLiveBufferLenSlider->setValue(qnSettings->maximumLiveBufferMSecs());
+    ui->initialLiveBufferLengthSlider->setValue(qMin(qnSettings->initialLiveBufferMSecs(), qnSettings->maximumLiveBufferMSecs()));
+    ui->maximumLiveBufferLengthSlider->setValue(qnSettings->maximumLiveBufferMSecs());
 }
 
 bool QnGeneralPreferencesWidget::hasChanges() const
