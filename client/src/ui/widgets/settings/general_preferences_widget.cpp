@@ -17,6 +17,7 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/custom_style.h>
+#include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_auto_starter.h>
 
@@ -56,19 +57,49 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
     connect(ui->browseMainMediaFolderButton,            &QPushButton::clicked,          this,   &QnGeneralPreferencesWidget::at_browseMainMediaFolderButton_clicked);
     connect(ui->addExtraMediaFolderButton,              &QPushButton::clicked,          this,   &QnGeneralPreferencesWidget::at_addExtraMediaFolderButton_clicked);
     connect(ui->removeExtraMediaFolderButton,           &QPushButton::clicked,          this,   &QnGeneralPreferencesWidget::at_removeExtraMediaFolderButton_clicked);
-    connect(ui->extraMediaFoldersList->selectionModel(),&QItemSelectionModel::selectionChanged,                                         
+    connect(ui->extraMediaFoldersList->selectionModel(),&QItemSelectionModel::selectionChanged,
                                                                                         this,   &QnGeneralPreferencesWidget::at_extraMediaFoldersList_selectionChanged);
     connect(ui->browseLogsButton,                       &QPushButton::clicked,          this,   &QnGeneralPreferencesWidget::at_browseLogsButton_clicked);
     connect(ui->clearCacheButton,                       &QPushButton::clicked,          this,   &QnGeneralPreferencesWidget::at_clearCacheButton_clicked);
     connect(ui->pauseOnInactivityCheckBox,              &QCheckBox::toggled,            ui->idleTimeoutWidget,          &QWidget::setEnabled);
-    connect(ui->downmixAudioCheckBox,                   &QCheckBox::toggled,            this,   [this](bool toggled) {
+
+    connect(ui->downmixAudioCheckBox, &QCheckBox::toggled, this, [this](bool toggled)
+    {
         ui->downmixWarningLabel->setVisible(m_oldDownmix != toggled);
     });
-    connect(ui->doubleBufferCheckbox,                   &QCheckBox::toggled,            this,   [this](bool toggled) {
+
+    connect(ui->doubleBufferCheckbox, &QCheckBox::toggled, this, [this](bool toggled)
+    {
         /* Show warning message if the user disables double buffering. */
         ui->doubleBufferWarningLabel->setVisible(!toggled && m_oldDoubleBuffering);
         /* Show restart notification if user changes value. */
         ui->doubleBufferRestartLabel->setVisible(toggled != m_oldDoubleBuffering);
+    });
+
+    /* Live buffer lengths slider/spin logic: */
+
+    connect(ui->iniLiveBufferLenSlider, &QSlider::valueChanged, this, [this](int value)
+    {
+        ui->iniLiveBufferLenSpinBox->setValue(value);
+        if (value > ui->maxLiveBufferLenSpinBox->value())
+            ui->maxLiveBufferLenSpinBox->setValue(value);
+    });
+
+    connect(ui->iniLiveBufferLenSpinBox, QnSpinboxIntValueChanged, this, [this](int value)
+    {
+        ui->iniLiveBufferLenSlider->setValue(value);
+    });
+
+    connect(ui->maxLiveBufferLenSlider, &QSlider::valueChanged, this, [this](int value)
+    {
+        ui->maxLiveBufferLenSpinBox->setValue(value);
+        if (value < ui->iniLiveBufferLenSpinBox->value())
+            ui->iniLiveBufferLenSpinBox->setValue(value);
+    });
+
+    connect(ui->maxLiveBufferLenSpinBox, QnSpinboxIntValueChanged, this, [this](int value)
+    {
+        ui->maxLiveBufferLenSlider->setValue(value);
     });
 }
 
@@ -76,7 +107,8 @@ QnGeneralPreferencesWidget::~QnGeneralPreferencesWidget()
 {
 }
 
-void QnGeneralPreferencesWidget::applyChanges() {
+void QnGeneralPreferencesWidget::applyChanges()
+{
     qnSettings->setMediaFolder(ui->mainMediaFolderLabel->text());
 
     QStringList extraMediaFolders;
@@ -92,9 +124,13 @@ void QnGeneralPreferencesWidget::applyChanges() {
     qnSettings->setUserIdleTimeoutMSecs(ui->pauseOnInactivityCheckBox->isChecked() ? ui->idleTimeoutSpinBox->value() * 60 * 1000 : 0);
     qnSettings->setAutoStart(ui->autoStartCheckBox->isChecked());
     qnSettings->setGLDoubleBuffer(ui->doubleBufferCheckbox->isChecked());
+
+    qnSettings->setInitialLiveBufferMSecs(ui->iniLiveBufferLenSlider->value());
+    qnSettings->setMaximumLiveBufferMSecs(ui->maxLiveBufferLenSlider->value());
 }
 
-void QnGeneralPreferencesWidget::loadDataToUi() {
+void QnGeneralPreferencesWidget::loadDataToUi()
+{
     ui->mainMediaFolderLabel->setText(QDir::toNativeSeparators(qnSettings->mediaFolder()));
 
     ui->extraMediaFoldersList->clear();
@@ -112,14 +148,19 @@ void QnGeneralPreferencesWidget::loadDataToUi() {
 
     m_oldDoubleBuffering = qnSettings->isGlDoubleBuffer();
     ui->doubleBufferCheckbox->setChecked(m_oldDoubleBuffering);
+
+    ui->iniLiveBufferLenSlider->setValue(qMin(qnSettings->initialLiveBufferMSecs(), qnSettings->maximumLiveBufferMSecs()));
+    ui->maxLiveBufferLenSlider->setValue(qnSettings->maximumLiveBufferMSecs());
 }
 
-bool QnGeneralPreferencesWidget::hasChanges() const {
+bool QnGeneralPreferencesWidget::hasChanges() const
+{
     //TODO: #GDM implement me
     return true;
 }
 
-bool QnGeneralPreferencesWidget::canApplyChanges() {
+bool QnGeneralPreferencesWidget::canApplyChanges()
+{
     /* These changes can be applied only after reboot. */
     return m_oldDownmix == ui->downmixAudioCheckBox->isChecked()
         && m_oldDoubleBuffering == ui->doubleBufferCheckbox->isChecked();
@@ -128,7 +169,8 @@ bool QnGeneralPreferencesWidget::canApplyChanges() {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void QnGeneralPreferencesWidget::at_browseMainMediaFolderButton_clicked() {
+void QnGeneralPreferencesWidget::at_browseMainMediaFolderButton_clicked()
+{
     QString dirName = QnFileDialog::getExistingDirectory(this,
                                                         tr("Select folder..."),
                                                         ui->mainMediaFolderLabel->text(),
@@ -138,7 +180,8 @@ void QnGeneralPreferencesWidget::at_browseMainMediaFolderButton_clicked() {
     ui->mainMediaFolderLabel->setText(dirName);
 }
 
-void QnGeneralPreferencesWidget::at_addExtraMediaFolderButton_clicked() {
+void QnGeneralPreferencesWidget::at_addExtraMediaFolderButton_clicked()
+{
     QString initialDir = ui->extraMediaFoldersList->count() == 0
             ? ui->mainMediaFolderLabel->text()
             : ui->extraMediaFoldersList->item(0)->text();
@@ -149,7 +192,8 @@ void QnGeneralPreferencesWidget::at_addExtraMediaFolderButton_clicked() {
     if (dirName.isEmpty())
         return;
 
-    if(!ui->extraMediaFoldersList->findItems(dirName, Qt::MatchExactly).empty()) {
+    if (!ui->extraMediaFoldersList->findItems(dirName, Qt::MatchExactly).empty())
+    {
         QnMessageBox::information(this, tr("Folder has already been added."), tr("This folder has already been added."), QDialogButtonBox::Ok);
         return;
     }
@@ -157,16 +201,19 @@ void QnGeneralPreferencesWidget::at_addExtraMediaFolderButton_clicked() {
     ui->extraMediaFoldersList->addItem(dirName);
 }
 
-void QnGeneralPreferencesWidget::at_removeExtraMediaFolderButton_clicked() {
+void QnGeneralPreferencesWidget::at_removeExtraMediaFolderButton_clicked()
+{
     foreach(QListWidgetItem *item, ui->extraMediaFoldersList->selectedItems())
         delete item;
 }
 
-void QnGeneralPreferencesWidget::at_extraMediaFoldersList_selectionChanged() {
+void QnGeneralPreferencesWidget::at_extraMediaFoldersList_selectionChanged()
+{
     ui->removeExtraMediaFolderButton->setEnabled(!ui->extraMediaFoldersList->selectedItems().isEmpty());
 }
 
-void QnGeneralPreferencesWidget::at_browseLogsButton_clicked() {
+void QnGeneralPreferencesWidget::at_browseLogsButton_clicked()
+{
     const QString logsLocation = QStandardPaths::writableLocation(QStandardPaths::DataLocation) + QLatin1String("/log");
     if (!QDir(logsLocation).exists()) {
         QnMessageBox::information(this,
@@ -177,17 +224,21 @@ void QnGeneralPreferencesWidget::at_browseLogsButton_clicked() {
     QDesktopServices::openUrl(QLatin1String("file:///") + logsLocation);
 }
 
-void QnGeneralPreferencesWidget::at_clearCacheButton_clicked() {
+void QnGeneralPreferencesWidget::at_clearCacheButton_clicked()
+{
     QString backgroundImage = qnSettings->background().imageName;
     /* Lock background image so it will not be deleted. */
-    if (!backgroundImage.isEmpty()) {
+    if (!backgroundImage.isEmpty())
+    {
         QnLocalFileCache cache;
         QString path = cache.getFullPath(backgroundImage);
         QFile lock(path);
         lock.open(QFile::ReadWrite);
         QnAppServerFileCache::clearLocalCache();
         lock.close();
-    } else {
+    }
+    else
+    {
         QnAppServerFileCache::clearLocalCache();
     }
 }
