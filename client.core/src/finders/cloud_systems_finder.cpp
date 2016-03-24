@@ -9,6 +9,7 @@
 #include <nx/network/socket_global.h>
 #include <common/common_module.h>
 #include <nx/network/http/asynchttpclient.h>
+#include <rest/server/json_rest_result.h>
 
 namespace
 {
@@ -151,7 +152,6 @@ void QnCloudSystemsFinder::updateSystemInternal(const QnSystemDescriptionPtr &sy
                 return;
         }
 
-        qDebug() << "-__________ " << hosts.size();
         for (const auto &host : hosts)
         {
             qDebug() << host.first.toString();
@@ -165,6 +165,7 @@ void QnCloudSystemsFinder::updateSystemInternal(const QnSystemDescriptionPtr &sy
 
     checkOutdatedServersInternal(system);
 }
+
 void QnCloudSystemsFinder::pingServerInternal(const QString &host
     , int serverPriority
     , const QString &systemId)
@@ -184,8 +185,12 @@ void QnCloudSystemsFinder::pingServerInternal(const QString &host
             return;
         }
 
+        QnJsonRestResult jsonReply;
+        if (!QJson::deserialize(buffer, &jsonReply))
+            return;
+
         QnModuleInformation moduleInformation;
-        if (!QJson::deserialize(buffer, &moduleInformation))
+        if (!QJson::deserialize(jsonReply.reply, &moduleInformation))
             return;
 
         const QnMutexLocker lock(&m_mutex);

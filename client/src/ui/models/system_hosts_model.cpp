@@ -82,7 +82,7 @@ void QnSystemHostsModel::reloadHosts()
             return;
 
         for (const auto server : system->servers())
-            addServer(system, server.id, false);
+            addServer(system, server.id);
 
         m_disconnectHelper.reset(new QnDisconnectHelper());
 
@@ -90,7 +90,7 @@ void QnSystemHostsModel::reloadHosts()
             connect(system, &QnSystemDescription::serverAdded, this
                 , [this, system](const QnUuid &id)
         {
-            addServer(system, id, true);
+            addServer(system, id);
         });
 
         const auto serverRemovedConnection =
@@ -127,16 +127,19 @@ void QnSystemHostsModel::reloadHosts()
 }
 
 void QnSystemHostsModel::addServer(const QnSystemDescriptionPtr &systemDescription
-    , const QnUuid &serverId
-    , bool tryUpdate)
+    , const QnUuid &serverId)
 {
     if (systemDescription->id() != m_systemId)
         return;
 
-    if (tryUpdate && updateServerHost(systemDescription, serverId))
-        return;
-
+    const auto it = getDataIt(serverId);
     const auto host = systemDescription->getServerHost(serverId);
+    if (it != m_hosts.end())
+    {
+        updateServerHostInternal(it, host);
+        return;
+    }
+
     if (host.isEmpty())
         return;
 
@@ -152,27 +155,31 @@ void QnSystemHostsModel::addServer(const QnSystemDescriptionPtr &systemDescripti
     }
 }
 
-bool QnSystemHostsModel::updateServerHost(const QnSystemDescriptionPtr &systemDescription
+void QnSystemHostsModel::updateServerHost(const QnSystemDescriptionPtr &systemDescription
     , const QnUuid &serverId)
 {
     if (systemDescription->id() != m_systemId)
-        return false;
+        return;
 
     const auto it = getDataIt(serverId);
-    if (it == m_hosts.end())
-    {
-        addServer(systemDescription, serverId, false);
-        return false;
-    }
+    const auto host = systemDescription->getServerHost(serverId);
+    if (!updateServerHostInternal(it, host))
+        addServer(systemDescription, serverId);
+}
 
-    const auto newHost = systemDescription->getServerHost(serverId);
-    if (newHost.isEmpty())
+bool QnSystemHostsModel::updateServerHostInternal(const ServerIdHostList::iterator &it
+    , const QString &host)
+{
+    if (it == m_hosts.end())
+        return false;
+
+    if (host.isEmpty())
     {
-        removeServer(systemDescription, serverId);
+        removeServerInternal(it);
         return true;
     }
 
-    it->second = newHost;
+    it->second = host;
     const auto row = (it - m_hosts.begin());
     const auto modelIndex = index(row);
     dataChanged(modelIndex, modelIndex);
@@ -190,6 +197,11 @@ void QnSystemHostsModel::removeServer(const QnSystemDescriptionPtr &systemDescri
         return;
 
     const auto it = getDataIt(serverId);
+    removeServerInternal(it);
+}
+
+void QnSystemHostsModel::removeServerInternal(const ServerIdHostList::iterator &it)
+{
     if (it == m_hosts.end())
         return;
 
@@ -205,6 +217,7 @@ void QnSystemHostsModel::removeServer(const QnSystemDescriptionPtr &systemDescri
             emit isEmptyChanged();
     }
 }
+
 
 QnSystemHostsModel::ServerIdHostList::iterator 
 QnSystemHostsModel::getDataIt(const QnUuid &serverId)

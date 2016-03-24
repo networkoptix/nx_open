@@ -39,18 +39,23 @@ public: // overrides
 private:
     void reloadHosts();
 
+
     void addServer(const QnSystemDescriptionPtr &systemDescription
-        , const QnUuid &serverId
-        , bool tryUpdate);
-
-    bool updateServerHost(const QnSystemDescriptionPtr &systemDescription
         , const QnUuid &serverId);
-
-    void removeServer(const QnSystemDescriptionPtr &systemDescription
+    
+    void updateServerHost(const QnSystemDescriptionPtr &systemDescription
         , const QnUuid &serverId);
 
     typedef QPair<QnUuid, QString> ServerIdHostPair;
     typedef QList<ServerIdHostPair> ServerIdHostList;
+    bool updateServerHostInternal(const ServerIdHostList::iterator &it
+        , const QString &host);
+
+    void removeServer(const QnSystemDescriptionPtr &systemDescription
+        , const QnUuid &serverId);
+
+    void removeServerInternal(const ServerIdHostList::iterator &it);
+
     ServerIdHostList::iterator getDataIt(const QnUuid &serverId);
 
 signals:
