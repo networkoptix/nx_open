@@ -184,7 +184,10 @@ public:
    int epoll_add_ssock(const int eid, const SYSSOCKET s, const int* events = NULL);
    int epoll_remove_usock(const int eid, const UDTSOCKET u);
    int epoll_remove_ssock(const int eid, const SYSSOCKET s);
-   int epoll_wait(const int eid, std::set<UDTSOCKET>* readfds, std::set<UDTSOCKET>* writefds, int64_t msTimeOut, std::set<SYSSOCKET>* lrfds = NULL, std::set<SYSSOCKET>* lwfds = NULL);
+   int epoll_wait(
+       const int eid,
+       std::map<UDTSOCKET, int>* readfds, std::map<UDTSOCKET, int>* writefds, int64_t msTimeOut,
+       std::map<SYSSOCKET, int>* lrfds = NULL, std::map<SYSSOCKET, int>* lwfds = NULL);
    int epoll_release(const int eid);
 
       // Functionality:
