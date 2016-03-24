@@ -132,8 +132,13 @@ bool RetryTimer::scheduleNextTry(nx::utils::MoveOnlyFunc<void()> doAnotherTryFun
         (m_retryPolicy.delayMultiplier() > 0) &&
         (m_currentDelay < m_effectiveMaxDelay))
     {
-        //TODO #ak taking into account delay overflow
-        m_currentDelay *= m_retryPolicy.delayMultiplier();
+        auto newDelay = m_currentDelay * m_retryPolicy.delayMultiplier();
+        if (newDelay < m_currentDelay)
+        {
+            //overflow
+            newDelay = std::chrono::milliseconds::max();
+        }
+        m_currentDelay = newDelay;
         if (m_currentDelay > m_effectiveMaxDelay)
             m_currentDelay = m_effectiveMaxDelay;
     }
