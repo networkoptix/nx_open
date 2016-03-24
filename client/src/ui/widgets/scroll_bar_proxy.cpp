@@ -88,7 +88,7 @@ bool QnScrollBarProxy::event(QEvent *event)
 
 void QnScrollBarProxy::makeProxy(QScrollBar *scrollBar, QAbstractScrollArea *scrollArea)
 {
-    Q_ASSERT(scrollBar);
+    NX_ASSERT(scrollBar);
 
     QnScrollBarProxy *proxy = new QnScrollBarProxy(scrollBar, scrollArea);
 

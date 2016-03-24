@@ -265,7 +265,7 @@ public:
     }
 
     QnActionBuilder condition(QnActionCondition *condition) {
-        assert(m_action->condition() == NULL);
+        NX_ASSERT(m_action->condition() == NULL);
 
         m_action->setCondition(condition);
 
@@ -273,7 +273,7 @@ public:
     }
 
     QnActionBuilder condition(const QnResourceCriterion &criterion, Qn::MatchMode matchMode = Qn::All) {
-        assert(m_action->condition() == NULL);
+        NX_ASSERT(m_action->condition() == NULL);
 
         m_action->setCondition(new QnResourceActionCondition(criterion, matchMode, m_action));
 
@@ -936,6 +936,10 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(QnActions::OpenCloudManagementUrl).
         flags(Qn::NoTarget).
         text(tr("Manage account..."));
+
+    factory(QnActions::OpenCloudRegisterUrl).
+        flags(Qn::NoTarget).
+        text(tr("Create account..."));
 
     factory().
         flags(Qn::Main).
@@ -1909,15 +1913,6 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Notifications | Qn::NoTarget).
         text(tr("Pin Notifications")).
         toggledText(tr("Unpin Notifications"));
-
-    factory(QnActions::ToggleBackgroundAnimationAction).
-        flags(Qn::GlobalHotkey).
-        mode(QnActionTypes::DesktopMode).
-        shortcut(lit("Ctrl+Alt+T")).
-        text(tr("Disable Background Animation")).
-        toggledText(tr("Enable Background Animation")).
-        checked(true).
-        autoRepeat(false);
 }
 
 QnActionManager::~QnActionManager() {
@@ -2026,7 +2021,7 @@ QMenu* QnActionManager::integrateMenu(QMenu *menu, const QnActionParameters &par
     if (!menu)
         return NULL;
 
-    Q_ASSERT(!m_parametersByMenu.contains(menu));
+    NX_ASSERT(!m_parametersByMenu.contains(menu));
     m_parametersByMenu[menu] = parameters;
     menu->installEventFilter(this);
 

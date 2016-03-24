@@ -18,31 +18,24 @@ namespace {
 
     /** Maximum rotation value. */
     const int rotationDegreesMax = 359;
+
+    const int kAutoRotation = -1;
 }
 
-QnImageControlWidget::QnImageControlWidget(QWidget* parent /* = 0*/):
-    QWidget(parent),
-    QnUpdatable(),
-    ui(new Ui::ImageControlWidget)
+QnImageControlWidget::QnImageControlWidget(QWidget *parent)
+    : QWidget(parent)
+    , QnUpdatable()
+    , ui(new Ui::ImageControlWidget)
     , m_readOnly(false)
 {
     ui->setupUi(this);
 
-    setHelpTopic(ui->fisheyeCheckBox,                                   Qn::CameraSettings_Dewarping_Help);
-    setHelpTopic(ui->forceArCheckBox, ui->forceArComboBox,              Qn::CameraSettings_AspectRatio_Help);
-    setHelpTopic(ui->forceRotationCheckBox, ui->forceRotationComboBox,  Qn::CameraSettings_Rotation_Help);
-
-    connect(ui->forceArCheckBox, &QCheckBox::stateChanged, this, [this](int state){ ui->forceArComboBox->setEnabled(state == Qt::Checked);} );
-
-    ui->forceArComboBox->addItem(tr("4:3"),  4.0f / 3);
-    ui->forceArComboBox->addItem(tr("16:9"), 16.0f / 9);
-    ui->forceArComboBox->addItem(tr("1:1"),  1.0f);
-    ui->forceArComboBox->setCurrentIndex(0);
-
-    connect(ui->forceRotationCheckBox, &QCheckBox::stateChanged, this, [this](int state){ ui->forceRotationComboBox->setEnabled(state == Qt::Checked);} );
-    for (int degrees = 0; degrees < rotationDegreesMax; degrees += rotationDegreesStep)
-        ui->forceRotationComboBox->addItem(tr("%1 degrees").arg(degrees), degrees);
-    ui->forceRotationComboBox->setCurrentIndex(0);
+    setHelpTopic(ui->fisheyeComboBox, ui->fisheyeLabel,
+                 Qn::CameraSettings_Dewarping_Help);
+    setHelpTopic(ui->aspectRatioComboBox, ui->aspectRatioLabel,
+                 Qn::CameraSettings_AspectRatio_Help);
+    setHelpTopic(ui->rotationComboBox, ui->rotationLabel,
+                 Qn::CameraSettings_Rotation_Help);
 
     auto notifyAboutChanges = [this]
     {
@@ -56,15 +49,15 @@ QnImageControlWidget::QnImageControlWidget(QWidget* parent /* = 0*/):
             emit fisheyeChanged();
     };
 
-    connect(ui->forceArCheckBox,        &QCheckBox::stateChanged,               this,   notifyAboutChanges);
-    connect(ui->forceArComboBox,        QnComboboxCurrentIndexChanged,          this,   notifyAboutChanges);
-    connect(ui->forceRotationCheckBox,  &QCheckBox::stateChanged,               this,   notifyAboutChanges);
-    connect(ui->forceRotationComboBox,  QnComboboxCurrentIndexChanged,          this,   notifyAboutChanges);
+    connect(ui->aspectRatioComboBox, QnComboboxCurrentIndexChanged,
+            this, notifyAboutChanges);
+    connect(ui->rotationComboBox, QnComboboxCurrentIndexChanged,
+            this, notifyAboutChanges);
 
-    QnCheckbox::autoCleanTristate(ui->fisheyeCheckBox);
-
-    connect(ui->fisheyeCheckBox,        &QCheckBox::stateChanged,               this,   notifyAboutChanges);
-    connect(ui->fisheyeCheckBox,        &QCheckBox::stateChanged,               this,   notifyAboutFisheyeChanges);
+    connect(ui->fisheyeComboBox, QnComboboxCurrentIndexChanged,
+            this, notifyAboutChanges);
+    connect(ui->fisheyeComboBox, QnComboboxCurrentIndexChanged,
+            this, notifyAboutFisheyeChanges);
 }
 
 QnImageControlWidget::~QnImageControlWidget()
@@ -72,11 +65,16 @@ QnImageControlWidget::~QnImageControlWidget()
 
 }
 
-void QnImageControlWidget::updateFromResources(const QnVirtualCameraResourceList &cameras) {
+void QnImageControlWidget::updateFromResources(
+        const QnVirtualCameraResourceList &cameras)
+{
     QnUpdatableGuard<QnImageControlWidget> guard(this);
-    bool allCamerasHasVideo = boost::algorithm::all_of(cameras, [](const QnVirtualCameraResourcePtr &camera) {
-        return camera->hasVideo(0);
-    });
+    bool allCamerasHasVideo = boost::algorithm::all_of(cameras,
+        [](const QnVirtualCameraResourcePtr &camera)
+        {
+            return camera->hasVideo(0);
+        }
+    );
     setVisible(allCamerasHasVideo);
 
     updateAspectRatioFromResources(cameras);
@@ -84,118 +82,185 @@ void QnImageControlWidget::updateFromResources(const QnVirtualCameraResourceList
     updateFisheyeFromResources(cameras);
 }
 
-void QnImageControlWidget::submitToResources(const QnVirtualCameraResourceList &cameras) {
+void QnImageControlWidget::submitToResources(
+        const QnVirtualCameraResourceList &cameras)
+{
     if (m_readOnly)
         return;
 
-    bool allCamerasHasVideo = boost::algorithm::all_of(cameras, [](const QnVirtualCameraResourcePtr &camera) {
-        return camera->hasVideo(0);
-    });
+    bool allCamerasHasVideo = boost::algorithm::all_of(cameras,
+        [](const QnVirtualCameraResourcePtr &camera)
+        {
+            return camera->hasVideo(0);
+        }
+    );
     if (!allCamerasHasVideo)
         return;
 
-    bool overrideAr = ui->forceArCheckBox->checkState() == Qt::Checked;
-    bool clearAr = ui->forceArCheckBox->checkState() == Qt::Unchecked;
-    bool overrideRotation = ui->forceRotationCheckBox->checkState() == Qt::Checked;
-    bool clearRotation = ui->forceRotationCheckBox->checkState() == Qt::Unchecked;
+    bool overrideAspectRatio = !ui->aspectRatioComboBox->currentData().isNull();
+    QnAspectRatio aspectRatio = ui->aspectRatioComboBox->currentData().value<QnAspectRatio>();
+    bool overrideRotation = !ui->rotationComboBox->currentData().isNull();
+    int rotation = ui->rotationComboBox->currentData().toInt();
+    QString rotationString = rotation >= 0 ? QString::number(rotation) : QString();
+    bool overrideFisheye = !ui->fisheyeComboBox->currentData().isNull();
 
-    for(const QnVirtualCameraResourcePtr &camera: cameras)  {
-
-        if (ui->fisheyeCheckBox->checkState() != Qt::PartiallyChecked) {
+    for (const QnVirtualCameraResourcePtr &camera: cameras)
+    {
+        if (overrideFisheye)
+        {
             auto params = camera->getDewarpingParams();
-            params.enabled = ui->fisheyeCheckBox->isChecked();
+            params.enabled = ui->fisheyeComboBox->currentData().toBool();
             camera->setDewarpingParams(params);
         }
 
-        if (overrideAr)
-            camera->setCustomAspectRatio(ui->forceArComboBox->currentData().toReal());
-        else if (clearAr)
-            camera->clearCustomAspectRatio();
+        if (overrideAspectRatio)
+        {
+            if (aspectRatio.isValid())
+                camera->setCustomAspectRatio(aspectRatio.toFloat());
+            else
+                camera->clearCustomAspectRatio();
+        }
 
-        if(overrideRotation)
-            camera->setProperty(QnMediaResource::rotationKey(), QString::number(ui->forceRotationComboBox->currentData().toInt()));
-        else if (clearRotation && camera->hasProperty(QnMediaResource::rotationKey()))
-            camera->setProperty(QnMediaResource::rotationKey(), QString());
-
+        if (overrideRotation)
+            camera->setProperty(QnMediaResource::rotationKey(), rotationString);
     }
 }
 
-bool QnImageControlWidget::isFisheye() const {
-    return ui->fisheyeCheckBox->isChecked();
+bool QnImageControlWidget::isFisheye() const
+{
+    QVariant data = ui->fisheyeComboBox->currentData();
+    return !data.isNull() && data.toBool();
 }
 
-bool QnImageControlWidget::isReadOnly() const {
+bool QnImageControlWidget::isReadOnly() const
+{
     return m_readOnly;
 }
 
-void QnImageControlWidget::setReadOnly(bool readOnly) {
+void QnImageControlWidget::setReadOnly(bool readOnly)
+{
     if (m_readOnly == readOnly)
         return;
 
     using ::setReadOnly;
-    setReadOnly(ui->fisheyeCheckBox, readOnly);
-    setReadOnly(ui->forceArCheckBox, readOnly);
-    setReadOnly(ui->forceArComboBox, readOnly);
-    setReadOnly(ui->forceRotationCheckBox, readOnly);
-    setReadOnly(ui->forceRotationComboBox, readOnly);
+    setReadOnly(ui->fisheyeComboBox, readOnly);
+    setReadOnly(ui->aspectRatioComboBox, readOnly);
+    setReadOnly(ui->rotationComboBox, readOnly);
 
     m_readOnly = readOnly;
 }
 
 
-void QnImageControlWidget::updateAspectRatioFromResources(const QnVirtualCameraResourceList &cameras) {
-    qreal arOverride = cameras.empty() ? 0 : cameras.front()->customAspectRatio();
-    bool sameArOverride = std::all_of(cameras.cbegin(), cameras.cend(), [arOverride](const QnVirtualCameraResourcePtr &camera) {
-        return qFuzzyEquals(camera->customAspectRatio(), arOverride);
-    });
-
-    ui->forceArCheckBox->setTristate(!sameArOverride);
-    if (sameArOverride) {
-        ui->forceArCheckBox->setChecked(!qFuzzyIsNull(arOverride));
-
-        /* Float is important here. */
-        float ar = QnAspectRatio::closestStandardRatio(arOverride).toFloat();
-        int idx = -1;
-        for (int i = 0; i < ui->forceArComboBox->count(); ++i) {
-            if (qFuzzyEquals(ar, ui->forceArComboBox->itemData(i).toFloat())) {
-                idx = i;
-                break;
-            }
+void QnImageControlWidget::updateAspectRatioFromResources(
+        const QnVirtualCameraResourceList &cameras)
+{
+    qreal aspectRatio = cameras.empty() ? 0 : cameras.first()->customAspectRatio();
+    bool sameAspectRatio = std::all_of(cameras.cbegin(), cameras.cend(),
+        [aspectRatio](const QnVirtualCameraResourcePtr &camera)
+        {
+            return qFuzzyEquals(camera->customAspectRatio(), aspectRatio);
         }
-        ui->forceArComboBox->setCurrentIndex(idx < 0 ? 0 : idx);
-    } else {
-        ui->forceArComboBox->setCurrentIndex(0);
-        ui->forceArCheckBox->setCheckState(Qt::PartiallyChecked);
+    );
+
+    ui->aspectRatioComboBox->clear();
+
+    ui->aspectRatioComboBox->addItem(
+            tr("Auto"), QVariant::fromValue(QnAspectRatio()));
+    for (const QnAspectRatio &aspectRatio: QnAspectRatio::standardRatios())
+    {
+        if (aspectRatio.width() < aspectRatio.height())
+            continue;
+
+        ui->aspectRatioComboBox->addItem(
+                aspectRatio.toString(), QVariant::fromValue(aspectRatio));
+    }
+    ui->aspectRatioComboBox->setCurrentIndex(0);
+
+    if (sameAspectRatio)
+    {
+        if (qFuzzyIsNull(aspectRatio))
+        {
+            ui->aspectRatioComboBox->setCurrentIndex(0);
+        }
+        else
+        {
+            QnAspectRatio closest = QnAspectRatio::closestStandardRatio(aspectRatio);
+            int index = ui->aspectRatioComboBox->findData(QVariant::fromValue(closest));
+            if (index != -1)
+                ui->aspectRatioComboBox->setCurrentIndex(index);
+        }
+    }
+    else
+    {
+        ui->aspectRatioComboBox->insertItem(0, tr("<multiple values>"));
+        ui->aspectRatioComboBox->setCurrentIndex(0);
     }
 }
 
-void QnImageControlWidget::updateRotationFromResources(const QnVirtualCameraResourceList &cameras) {
-    QString rotationOverride = cameras.empty() ? QString() : cameras.front()->getProperty(QnMediaResource::rotationKey());
-    bool sameRotation = std::all_of(cameras.cbegin(), cameras.cend(), [rotationOverride](const QnVirtualCameraResourcePtr &camera) {
-        return rotationOverride == camera->getProperty(QnMediaResource::rotationKey());
-    });
+void QnImageControlWidget::updateRotationFromResources(
+        const QnVirtualCameraResourceList &cameras)
+{
+    QString rotationString = cameras.isEmpty()
+            ? QString()
+            : cameras.first()->getProperty(QnMediaResource::rotationKey());
 
-    ui->forceRotationCheckBox->setTristate(!sameRotation);
-    if(sameRotation) {
-        ui->forceRotationCheckBox->setChecked(!rotationOverride.isEmpty());
-        int idx = qBound(0, rotationOverride.toInt(), rotationDegreesMax) / rotationDegreesStep;
-        ui->forceRotationComboBox->setCurrentIndex(idx);
-    } else {
-        ui->forceRotationComboBox->setCurrentIndex(0);
-        ui->forceRotationCheckBox->setCheckState(Qt::PartiallyChecked);
+    bool sameRotation = std::all_of(cameras.cbegin(), cameras.cend(),
+        [rotationString](const QnVirtualCameraResourcePtr &camera)
+        {
+            return rotationString == camera->getProperty(QnMediaResource::rotationKey());
+        }
+    );
+
+    ui->rotationComboBox->clear();
+
+    ui->rotationComboBox->addItem(tr("Auto"), kAutoRotation);
+    for (int degrees = 0; degrees < rotationDegreesMax; degrees += rotationDegreesStep)
+        ui->rotationComboBox->addItem(tr("%1 degrees").arg(degrees), degrees);
+
+    if (sameRotation)
+    {
+        if (rotationString.isEmpty())
+        {
+            ui->rotationComboBox->setCurrentIndex(0);
+        }
+        else
+        {
+            int index = ui->rotationComboBox->findData(rotationString.toInt());
+            if (index != -1)
+                ui->rotationComboBox->setCurrentIndex(index);
+        }
+    }
+    else
+    {
+        ui->rotationComboBox->insertItem(0, tr("<multiple values>"));
+        ui->rotationComboBox->setCurrentIndex(0);
     }
 }
 
-void QnImageControlWidget::updateFisheyeFromResources(const QnVirtualCameraResourceList &cameras) {
-    bool fisheye = cameras.empty() ? false : cameras.front()->getDewarpingParams().enabled;
-    bool sameFisheye = std::all_of(cameras.cbegin(), cameras.cend(), [fisheye](const QnVirtualCameraResourcePtr &camera) {
-        return fisheye == camera->getDewarpingParams().enabled;
-    });
+void QnImageControlWidget::updateFisheyeFromResources(
+        const QnVirtualCameraResourceList &cameras)
+{
+    bool fisheye = !cameras.empty() &&
+                   cameras.first()->getDewarpingParams().enabled;
 
-    ui->fisheyeCheckBox->setTristate(!sameFisheye);
-    ui->fisheyeCheckBox->setCheckState(sameFisheye
-        ? fisheye
-        ? Qt::Checked
-        : Qt::Unchecked
-        : Qt::PartiallyChecked);
+    bool sameFisheye = std::all_of(cameras.cbegin(), cameras.cend(),
+        [fisheye](const QnVirtualCameraResourcePtr &camera)
+        {
+            return fisheye == camera->getDewarpingParams().enabled;
+        }
+    );
+
+    ui->fisheyeComboBox->clear();
+    ui->fisheyeComboBox->addItem(tr("No"), false);
+    ui->fisheyeComboBox->addItem(tr("Yes"), true);
+
+    if (sameFisheye)
+    {
+        ui->fisheyeComboBox->setCurrentIndex(fisheye ? 1 : 0);
+    }
+    else
+    {
+        ui->fisheyeComboBox->insertItem(0, tr("<multiple values>"));
+        ui->fisheyeComboBox->setCurrentIndex(0);
+    }
 }

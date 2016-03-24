@@ -521,9 +521,14 @@ private:
 
                 if( m_connectHandler )
                 {
+                    //probably this approach is the best for all other kinds of events
+                    SystemError::ErrorCode resultCode;
+                    if (!m_abstractSocketPtr->getLastError(&resultCode))
+                        resultCode = SystemError::getLastOSErrorCode();
+
                     //async connect. If we are here than connect succeeded
                     std::unique_ptr<AsyncSocketImplHelper, decltype(__finally_connect)> cleanupGuard( this, __finally_connect );
-                    connectHandlerLocal( SystemError::noError );
+                    connectHandlerLocal( resultCode );
                 }
                 else
                 {
@@ -712,17 +717,22 @@ public:
         const int acceptAsyncCallCountBak = m_acceptAsyncCallCount;
         auto acceptHandlerBak = std::move( m_acceptHandler );
 
-        auto acceptHandlerBakLocal = [this, sock, acceptHandlerBak, &terminated, acceptAsyncCallCountBak]( SystemError::ErrorCode errorCode, AbstractStreamSocket* newConnection ){
-            acceptHandlerBak( errorCode, newConnection );
-            if( terminated )
-                return;
-            //if asyncAccept has been called from onNewConnection, no need to call removeFromWatch
-            QnMutexLocker lk( nx::network::SocketGlobals::aioService().mutex() );
-            if( m_acceptAsyncCallCount == acceptAsyncCallCountBak )
-                nx::network::SocketGlobals::aioService().removeFromWatchNonSafe(&lk, sock, aio::etRead);
-            m_threadHandlerIsRunningIn.store( nullptr, std::memory_order_release );
-            m_terminatedFlagPtr = nullptr;
-        };
+        auto acceptHandlerBakLocal = 
+            [this, sock, acceptHandlerBak = std::move(acceptHandlerBak),
+                    &terminated, acceptAsyncCallCountBak](
+                SystemError::ErrorCode errorCode,
+                AbstractStreamSocket* newConnection )
+            {
+                acceptHandlerBak( errorCode, newConnection );
+                if( terminated )
+                    return;
+                //if asyncAccept has been called from onNewConnection, no need to call removeFromWatch
+                QnMutexLocker lk( nx::network::SocketGlobals::aioService().mutex() );
+                if( m_acceptAsyncCallCount == acceptAsyncCallCountBak )
+                    nx::network::SocketGlobals::aioService().removeFromWatchNonSafe(&lk, sock, aio::etRead);
+                m_threadHandlerIsRunningIn.store( nullptr, std::memory_order_release );
+                m_terminatedFlagPtr = nullptr;
+            };
 
         switch( eventType )
         {
@@ -754,7 +764,10 @@ public:
         }
     }
 
-    void acceptAsync(std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)>&& handler)
+    void acceptAsync(
+        nx::utils::MoveOnlyFunc<void(
+            SystemError::ErrorCode,
+            AbstractStreamSocket*)> handler)
     {
         m_acceptHandler = std::move(handler);
 
@@ -779,6 +792,7 @@ public:
 
     void cancelIOSync()
     {
+        //TODO #ak promise not needed if we are already in aio thread
         std::promise< bool > promise;
         cancelIOAsync( [ & ](){ promise.set_value( true ); } );
         promise.get_future().wait();
@@ -787,7 +801,9 @@ public:
 private:
     SocketType* m_sock;
     std::atomic<Qt::HANDLE> m_threadHandlerIsRunningIn;
-    std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)> m_acceptHandler;
+    nx::utils::MoveOnlyFunc<void(
+        SystemError::ErrorCode,
+        AbstractStreamSocket*)> m_acceptHandler;
     std::atomic<int> m_acceptAsyncCallCount;
     bool* m_terminatedFlagPtr;
 };

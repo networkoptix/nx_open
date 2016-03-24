@@ -1025,11 +1025,6 @@ public:
         JumpToLiveAction,
         ToggleSyncAction,
 
-        /**
-         * Toggle the background animation.
-         */
-        ToggleBackgroundAnimationAction,
-
         /* Debug actions. */
 
         /**
@@ -1073,6 +1068,11 @@ public:
          * Logs out the user from cloud clearing the stored password.
          */
         LogoutFromCloud,
+
+        /**
+        * Opens cloud portal in the browser at register page.
+        */
+        OpenCloudRegisterUrl,
 
         /**
          * Opens cloud portal in the browser.

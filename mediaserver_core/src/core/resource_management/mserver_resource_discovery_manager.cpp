@@ -25,6 +25,9 @@
 #include "media_server/settings.h"
 #include "plugins/resource/upnp/upnp_device_searcher.h"
 
+#include <nx_ec/data/api_conversion_functions.h>
+#include <nx_ec/managers/abstract_camera_manager.h>
+
 static const int NETSTATE_UPDATE_TIME = 1000 * 30;
 static const int RETRY_COUNT_FOR_FOREIGN_RESOURCES = 2;
 
@@ -191,7 +194,8 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
             bool updateTypeId = existCamRes->getTypeId() != newNetRes->getTypeId() && !newNetRes->isAbstractResource();
             if (rpNetRes->mergeResourcesIfNeeded(newNetRes) || isForeign || updateTypeId)
             {
-                if (isForeign || updateTypeId) {
+                if (isForeign || updateTypeId)
+                {
                     //preserving "manuallyAdded" flag
                     const bool isDiscoveredManually = newCamRes->isManuallyAdded();
                     newNetRes->update(existCamRes);
@@ -205,11 +209,13 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                         newNetRes->setTypeId(newTypeId);
                     extraResources << newNetRes;
                 }
-                else {
-                    QByteArray errorString;
-                    QnVirtualCameraResourceList cameras;
+                else
+                {
+                    ec2::ApiCameraData apiCamera;
+                    fromResourceToApi(existCamRes, apiCamera);
+
                     ec2::AbstractECConnectionPtr connect = QnAppServerConnectionFactory::getConnection2();
-                    const ec2::ErrorCode errorCode = connect->getCameraManager()->addCameraSync( existCamRes, &cameras );
+                    const ec2::ErrorCode errorCode = connect->getCameraManager()->addCameraSync(apiCamera);
                     if( errorCode != ec2::ErrorCode::ok )
                         NX_LOG( QString::fromLatin1("Can't add camera to ec2. %1").arg(ec2::toString(errorCode)), cl_logWARNING );
                     propertyDictionary->saveParams( existCamRes->getId() );

@@ -73,33 +73,33 @@ TEST_F(CdbFunctionalTest, system_unbind)
                 //unbinding with owner credentials
                 ASSERT_EQ(
                     api::ResultCode::ok,
-                    unbindSystem(account1.email, account1Password, system1.id.toStdString()));
+                    unbindSystem(account1.email, account1Password, system1.id));
                 break;
             case 1:
                 //unbinding with system credentials
                 ASSERT_EQ(
                     api::ResultCode::ok,
-                    unbindSystem(system1.id.toStdString(), system1.authKey, system1.id.toStdString()));
+                    unbindSystem(system1.id, system1.authKey, system1.id));
                 break;
             case 2:
                 //unbinding with owner credentials
                 ASSERT_EQ(
                     api::ResultCode::forbidden,
-                    unbindSystem(account2.email, account2Password, system1.id.toStdString()));
+                    unbindSystem(account2.email, account2Password, system1.id));
                 //unbinding with system credentials
                 ASSERT_EQ(
                     api::ResultCode::ok,
-                    unbindSystem(system1.id.toStdString(), system1.authKey, system1.id.toStdString()));
+                    unbindSystem(system1.id, system1.authKey, system1.id));
                 continue;
             case 3:
                 //unbinding with other system credentials
                 ASSERT_EQ(
                     api::ResultCode::forbidden,
-                    unbindSystem(system0.id.toStdString(), system0.authKey, system1.id.toStdString()));
+                    unbindSystem(system0.id, system0.authKey, system1.id));
                 //unbinding with system credentials
                 ASSERT_EQ(
                     api::ResultCode::ok,
-                    unbindSystem(system1.id.toStdString(), system1.authKey, system1.id.toStdString()));
+                    unbindSystem(system1.id, system1.authKey, system1.id));
                 continue;
         }
 
@@ -142,7 +142,7 @@ TEST_F(CdbFunctionalTest, system_get)
         std::vector<api::SystemDataEx> systems;
         ASSERT_EQ(
             api::ResultCode::ok,
-            getSystem(account1.email, account1Password, system1.id.toStdString(), &systems));
+            getSystem(account1.email, account1Password, system1.id, &systems));
         ASSERT_EQ(1, systems.size());
         ASSERT_TRUE(std::find(systems.begin(), systems.end(), system1) != systems.end());
         ASSERT_EQ(account1.fullName, systems[0].ownerFullName);
@@ -153,7 +153,7 @@ TEST_F(CdbFunctionalTest, system_get)
         std::vector<api::SystemDataEx> systems;
         ASSERT_EQ(
             api::ResultCode::forbidden,
-            getSystem(account2.email, account2Password, system1.id.toStdString(), &systems));
+            getSystem(account2.email, account2Password, system1.id, &systems));
     }
 
     {
@@ -176,19 +176,19 @@ TEST_F(CdbFunctionalTest, system_get)
     {
         nx_http::HttpClient client;
         QUrl url(lit("http://127.0.0.1:%1/cdb/system/get?systemID=%2").
-            arg(endpoint().port).arg(system1.id.toString()));
+            arg(endpoint().port).arg(QString::fromStdString(system1.id)));
         url.setUserName(QString::fromStdString(account1.email));
         url.setPassword(QString::fromStdString(account1Password));
         ASSERT_TRUE(client.doGet(url));
         const auto msgBody = client.fetchMessageBodyBuffer();
-        ASSERT_NE(-1, msgBody.indexOf(system1.id.toString()));
+        ASSERT_NE(-1, msgBody.indexOf(QByteArray(system1.id.c_str())));
     }
 
     {
         nx_http::HttpClient client;
         QString urlStr(
             lm("http://127.0.0.1:%1/cdb/system/get?systemID=%2").
-                arg(endpoint().port).arg(QUrl::toPercentEncoding(system1.id.toString())));
+                arg(endpoint().port).arg(QUrl::toPercentEncoding(QString::fromStdString(system1.id))));
         urlStr.replace(lit("{"), lit("%7B"));
         urlStr.replace(lit("}"), lit("%7D"));
         QUrl url(urlStr);
@@ -196,7 +196,7 @@ TEST_F(CdbFunctionalTest, system_get)
         url.setPassword(QString::fromStdString(account1Password));
         ASSERT_TRUE(client.doGet(url));
         const auto msgBody = client.fetchMessageBodyBuffer();
-        ASSERT_NE(-1, msgBody.indexOf(system1.id.toString()));
+        ASSERT_NE(-1, msgBody.indexOf(QByteArray(system1.id.c_str())));
     }
 }
 
@@ -232,7 +232,7 @@ TEST_F(CdbFunctionalTest, system_activation)
         {
             api::NonceData nonceData;
             auto resultCode = getCdbNonce(
-                system1.id.toStdString(),
+                system1.id,
                 system1.authKey,
                 &nonceData);
             ASSERT_EQ(api::ResultCode::ok, resultCode);
@@ -242,7 +242,7 @@ TEST_F(CdbFunctionalTest, system_activation)
         //    //activating with ping
         //    api::NonceData nonceData;
         //    auto resultCode = ping(
-        //        system1.id.toStdString(),
+        //        system1.id,
         //        system1.authKey);
         //    ASSERT_EQ(api::ResultCode::ok, resultCode);
         //}
@@ -272,7 +272,7 @@ TEST_F(CdbFunctionalTest, system_activation)
 
         ASSERT_EQ(
             api::ResultCode::ok,
-            unbindSystem(account1.email, account1Password, system1.id.toStdString()));
+            unbindSystem(account1.email, account1Password, system1.id));
     }
 }
 

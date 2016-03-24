@@ -52,7 +52,7 @@ const QString kSysInfoTag = "systemInformation";
 const QString kCustomizationTag = "customization";
 
 const QString kUserAgent = QString("%1/%2")
-    .arg(QLatin1String(QN_APPLICATION_DISPLAY_NAME), 
+    .arg(QLatin1String(QN_APPLICATION_DISPLAY_NAME),
         QLatin1String(QN_APPLICATION_VERSION));
 
 const QString kAdminUserName = QStringLiteral("admin");
@@ -136,7 +136,7 @@ static Client::ResultCode convertRestClientRequestResult(
         case RestClient::ResultCode::kUnauthorized: return Client::ResultCode::kUnauthorized;
         case RestClient::ResultCode::kUnspecified: return Client::ResultCode::kUnspecified;
         default:
-            assert(false);
+            Q_ASSERT(false);
             return Client::ResultCode::kUnspecified;
     }
 }
@@ -611,7 +611,7 @@ void Client::checkAuth(const BaseServerInfoPtr& baseInfo,
 bool Client::parseModuleInformationReply(const QJsonObject &reply
     , BaseServerInfo *baseInfo)
 {
-    assert(baseInfo);
+    Q_ASSERT(baseInfo);
 
     const QStringList &keys = reply.keys();
     for (const auto &key: keys)

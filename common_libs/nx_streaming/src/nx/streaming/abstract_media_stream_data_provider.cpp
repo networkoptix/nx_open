@@ -194,14 +194,16 @@ void QnAbstractMediaStreamDataProvider::checkTime(const QnAbstractMediaDataPtr& 
     if (m_isCamera && media && (media->dataType == QnAbstractMediaData::VIDEO || media->dataType == QnAbstractMediaData::AUDIO))
     {
         // correct packets timestamp if we have got several packets very fast
-
+        int channel = media->channelNumber;
+        if (media->dataType == QnAbstractMediaData::AUDIO)
+            channel = CL_MAX_CHANNELS; //< use last vector element for audio timings control
         if (media->flags & (QnAbstractMediaData::MediaFlags_BOF | QnAbstractMediaData::MediaFlags_ReverseBlockStart))
         {
             resetTimeCheck();
         }
-        else if ((quint64)m_lastMediaTime[media->channelNumber] != AV_NOPTS_VALUE)
+        else if ((quint64)m_lastMediaTime[channel] != AV_NOPTS_VALUE)
         {
-            qint64 timeDiff = media->timestamp - m_lastMediaTime[media->channelNumber];
+            qint64 timeDiff = media->timestamp - m_lastMediaTime[channel];
             // if timeDiff < -N it may be time correction or dayling time change
             if (timeDiff >=-TIME_RESYNC_THRESHOLD  && timeDiff < MIN_FRAME_DURATION)
             {
@@ -212,10 +214,10 @@ void QnAbstractMediaStreamDataProvider::checkTime(const QnAbstractMediaDataPtr& 
                     arg((media->flags & QnAbstractMediaData::MediaFlags_LowQuality) ? lit("low") : lit("high")),
                     cl_logDEBUG1);
 
-                media->timestamp = m_lastMediaTime[media->channelNumber] + MIN_FRAME_DURATION;
+                media->timestamp = m_lastMediaTime[channel] + MIN_FRAME_DURATION;
             }
         }
-        m_lastMediaTime[media->channelNumber] = media->timestamp;
+        m_lastMediaTime[channel] = media->timestamp;
     }
 }
 

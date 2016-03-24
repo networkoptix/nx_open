@@ -17,51 +17,41 @@ RequestProcessor::~RequestProcessor()
 {
 }
 
-boost::optional< MediaserverData >
-    RequestProcessor::getMediaserverData(
-        ConnectionStrongRef connection, stun::Message& request)
+api::ResultCode RequestProcessor::getMediaserverData(
+    stun::Message& request,
+    MediaserverData* const foundData,
+    nx::String* errorMessage)
 {
     const auto systemAttr = request.getAttribute< stun::cc::attrs::SystemId >();
     if (!systemAttr)
     {
-        sendErrorResponse(
-            connection,
-            request.header,
-            api::ResultCode::notAuthorized,
-            stun::error::badRequest,
-            "Attribute SystemId is required" );
-        return boost::none;
+        *errorMessage = "Attribute SystemId is required";
+        return api::ResultCode::badRequest;
     }
 
     const auto serverAttr = request.getAttribute< stun::cc::attrs::ServerId >();
     if( !serverAttr )
     {
-        sendErrorResponse(
-            connection,
-            request.header,
-            api::ResultCode::badRequest,
-            stun::error::badRequest,
-            "Attribute ServerId is required" );
-        return boost::none;
+        *errorMessage = "Attribute ServerId is required";
+        return api::ResultCode::badRequest;
     }
 
     MediaserverData data(
         systemAttr->getString(),
         serverAttr->getString());
     if( !m_cloudData ) // debug mode
-        return data;
+    {
+        *foundData = data;
+        return api::ResultCode::ok;
+    }
 
     const auto system = m_cloudData->getSystem( data.systemId );
     if( !system )
     {
-        sendErrorResponse(
-            connection,
-            request.header,
-            api::ResultCode::notAuthorized,
-            stun::cc::error::notFound,
-            "System could not be found" );
-        return boost::none;
+        *errorMessage = "System could not be found";
+        return api::ResultCode::notAuthorized;
     }
+
 //    if( !system->mediatorEnabled )    //cloud connect is not 
 //    {
 //        sendErrorResponse( connection, request.header, stun::error::badRequest,
@@ -73,10 +63,12 @@ boost::optional< MediaserverData >
     {
         NX_LOGX( lm( "Ignore request from %1 with wrong message integrity" )
                  .arg( data.systemId ), cl_logWARNING );
-        return boost::none;
+        *errorMessage = "Wrong message integrity";
+        return api::ResultCode::notAuthorized;
     }
 
-    return data;
+    *foundData = data;
+    return api::ResultCode::ok;
 }
 
 } // namespace hpm

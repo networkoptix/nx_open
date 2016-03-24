@@ -2,7 +2,8 @@
 
 #include <QtCore/QString>
 
-struct QnAppInfo {
+struct QnAppInfo
+{
     static QString organizationName();
     static QString linuxOrganizationName();
     static QString realm();

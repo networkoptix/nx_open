@@ -13,6 +13,7 @@
 #include <core/resource_management/resource_pool.h>
 
 #include <nx_ec/dummy_handler.h>
+#include <nx_ec/managers/abstract_layout_manager.h>
 
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
@@ -87,7 +88,7 @@ void QnWorkbenchLayoutsHandler::renameLayout(const QnLayoutResourcePtr &layout, 
     layout->setName(newName);
 
     if(!changed)
-        snapshotManager()->save(layout, this, SLOT(at_layouts_saved(int, const QnResourceList &, int)));
+        snapshotManager()->save(layout, [this](bool success, const QnLayoutResourcePtr &layout) {at_layout_saved(success, layout); });
 }
 
 void QnWorkbenchLayoutsHandler::saveLayout(const QnLayoutResourcePtr &layout) {
@@ -108,7 +109,7 @@ void QnWorkbenchLayoutsHandler::saveLayout(const QnLayoutResourcePtr &layout) {
         //TODO: #GDM #VW #LOW refactor common code to common place
         if (context()->instance<QnWorkbenchVideoWallHandler>()->saveReviewLayout(layout, [this, layout](int reqId, ec2::ErrorCode errorCode) {
             snapshotManager()->setFlags(layout, snapshotManager()->flags(layout) & ~Qn::ResourceIsBeingSaved);
-            at_layouts_saved(static_cast<int>(errorCode), QnResourceList() << layout, reqId);
+            at_layout_saved(errorCode == ec2::ErrorCode::ok, layout);
             if (errorCode != ec2::ErrorCode::ok)
                 return;
             snapshotManager()->setFlags(layout, snapshotManager()->flags(layout) & ~Qn::ResourceIsChanged);
@@ -117,7 +118,7 @@ void QnWorkbenchLayoutsHandler::saveLayout(const QnLayoutResourcePtr &layout) {
     } else {
         //TODO: #GDM #Common check existing layouts.
         //TODO: #GDM #Common all remotes layout checking and saving should be done in one place
-        snapshotManager()->save(layout, this, SLOT(at_layouts_saved(int, const QnResourceList &, int)));
+        snapshotManager()->save(layout, [this](bool success, const QnLayoutResourcePtr &layout) {at_layout_saved(success, layout); });
     }
 }
 
@@ -226,7 +227,7 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
 
     QnLayoutResourcePtr newLayout;
 
-    newLayout = QnLayoutResourcePtr(new QnLayoutResource(qnResTypePool));
+    newLayout = QnLayoutResourcePtr(new QnLayoutResource());
     newLayout->setId(QnUuid::createUuid());
     newLayout->setName(name);
     newLayout->setParentId(user->getId());
@@ -271,7 +272,7 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
         }
     }
 
-    snapshotManager()->save(newLayout, this, SLOT(at_layouts_saved(int, const QnResourceList &, int)));
+    snapshotManager()->save(newLayout, [this](bool success, const QnLayoutResourcePtr &layout) {at_layout_saved(success, layout); });
     if (shouldDelete)
         removeLayouts(QnLayoutResourceList() << layout);
 }
@@ -439,9 +440,16 @@ void QnWorkbenchLayoutsHandler::closeLayouts(const QnLayoutResourceList &resourc
             connect(counter, SIGNAL(reachedZero()), target, slot);
         connect(counter, SIGNAL(reachedZero()), counter, SLOT(deleteLater()));
 
-        if(!normalResources.isEmpty()) {
-            counter->increment();
-            snapshotManager()->save(normalResources, counter, SLOT(decrement()));
+        if(!normalResources.isEmpty())
+        {
+            auto callback = [counter](bool success, const QnLayoutResourcePtr &layout)
+            {
+                QN_UNUSED(success, layout);
+                counter->decrement();
+            };
+            for (const QnLayoutResourcePtr& layout: normalResources)
+                if (snapshotManager()->save(layout, callback))
+                    counter->increment();
         }
 
         QnWorkbenchExportHandler *exportHandler = context()->instance<QnWorkbenchExportHandler>();
@@ -544,14 +552,14 @@ void QnWorkbenchLayoutsHandler::at_newUserLayoutAction_triggered() {
         }
     } while (button != QDialogButtonBox::Yes);
 
-    QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
+    QnLayoutResourcePtr layout(new QnLayoutResource());
     layout->setId(QnUuid::createUuid());
     layout->setName(dialog->name());
     layout->setParentId(user->getId());
     layout->setUserCanEdit(context()->user() == user);
     resourcePool()->addResource(layout);
 
-    snapshotManager()->save(layout, this, SLOT(at_layouts_saved(int, const QnResourceList &, int)));
+    snapshotManager()->save(layout, [this](bool success, const QnLayoutResourcePtr &layout) {at_layout_saved(success, layout); });
 
     menu()->trigger(QnActions::OpenSingleLayoutAction, QnActionParameters(layout));
 }
@@ -613,35 +621,32 @@ void QnWorkbenchLayoutsHandler::at_workbench_layoutsChanged() {
     menu()->trigger(QnActions::OpenNewTabAction);
 }
 
-void QnWorkbenchLayoutsHandler::at_layouts_saved(int status, const QnResourceList &resources, int handle) {
-    Q_UNUSED(handle)
-    if (status == 0)
+void QnWorkbenchLayoutsHandler::at_layout_saved(bool success, const QnLayoutResourcePtr &layout)
+{
+    if (success)
         return;
 
-    QnLayoutResourceList layoutResources = resources.filtered<QnLayoutResource>();
-    QnLayoutResourceList reopeningLayoutResources;
-    foreach(const QnLayoutResourcePtr &layoutResource, layoutResources)
-        if(snapshotManager()->isLocal(layoutResource) && !QnWorkbenchLayout::instance(layoutResource))
-            reopeningLayoutResources.push_back(layoutResource);
+    if (!snapshotManager()->isLocal(layout) || QnWorkbenchLayout::instance(layout))
+        return;
 
-    if(!reopeningLayoutResources.empty()) {
-        int button = QnResourceListDialog::exec(
-            mainWindow(),
-            resources,
-            tr("Error"),
-            tr("Could not save the following %n layout(s) to Server.", "", reopeningLayoutResources.size()),
-            tr("Do you want to restore these %n layout(s)?", "", reopeningLayoutResources.size()),
-            QDialogButtonBox::Yes | QDialogButtonBox::No
+    int button = QnResourceListDialog::exec(
+        mainWindow(),
+        QnResourceList() << layout,
+        tr("Error"),
+        tr("Could not save the following %n layout(s) to Server.", "", 1),
+        tr("Do you want to restore these %n layout(s)?", "", 1),
+        QDialogButtonBox::Yes | QDialogButtonBox::No
         );
-        if(button == QDialogButtonBox::Yes) {
-            foreach(const QnLayoutResourcePtr &layoutResource, layoutResources)
-                workbench()->addLayout(new QnWorkbenchLayout(layoutResource, this));
-            workbench()->setCurrentLayout(workbench()->layouts().back());
-        } else {
-            foreach(const QnLayoutResourcePtr &layoutResource, layoutResources)
-                resourcePool()->removeResource(layoutResource);
-        }
+    if (button == QDialogButtonBox::Yes)
+    {
+        workbench()->addLayout(new QnWorkbenchLayout(layout, this));
+        workbench()->setCurrentLayout(workbench()->layouts().back());
     }
+    else
+    {
+        resourcePool()->removeResource(layout);
+    }
+
 }
 
 bool QnWorkbenchLayoutsHandler::tryClose(bool force) {

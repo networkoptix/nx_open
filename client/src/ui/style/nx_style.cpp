@@ -10,6 +10,7 @@
 #include <QComboBox>
 #include <QSpinBox>
 #include <QCheckBox>
+#include <QDateTimeEdit>
 #include <QRadioButton>
 #include <QMenu>
 #include <QDialogButtonBox>
@@ -19,6 +20,7 @@
 #include <QtWidgets/QProxyStyle>
 
 #include <utils/common/scoped_painter_rollback.h>
+#include <utils/common/variant.h>
 
 using namespace style;
 
@@ -122,6 +124,13 @@ void QnNxStyle::setGenericPalette(const QnGenericPalette &palette)
     Q_D(QnNxStyle);
     d->palette = palette;
 }
+
+const QnGenericPalette &QnNxStyle::genericPalette() const
+{
+    Q_D(const QnNxStyle);
+    return d->palette;
+}
+
 
 QnPaletteColor QnNxStyle::findColor(const QColor &color) const
 {
@@ -1271,9 +1280,6 @@ QRect QnNxStyle::subControlRect(
                 {
                     if (slider->orientation == Qt::Horizontal)
                     {
-                        rect.setHeight(proxy()->pixelMetric(PM_SliderControlThickness));
-                        rect.setWidth(proxy()->pixelMetric(PM_SliderLength));
-
                         int cy = slider->rect.top() + slider->rect.height() / 2;
 
                         if (slider->tickPosition & QSlider::TicksAbove)
@@ -1285,9 +1291,6 @@ QRect QnNxStyle::subControlRect(
                     }
                     else
                     {
-                        rect.setWidth(proxy()->pixelMetric(PM_SliderControlThickness));
-                        rect.setHeight(proxy()->pixelMetric(PM_SliderLength));
-
                         int cx = slider->rect.left() + slider->rect.width() / 2;
 
                         if (slider->tickPosition & QSlider::TicksAbove)
@@ -1492,8 +1495,7 @@ QRect QnNxStyle::subControlRect(
                 break;
 
             case SC_ScrollBarGroove:
-                if (widget)
-                    rect = widget->rect();
+                rect = scrollBar->rect;
                 break;
 
             case SC_ScrollBarSlider:
@@ -1686,44 +1688,32 @@ int QnNxStyle::pixelMetric(
     {
     case PM_ButtonMargin:
         return dp(10);
+
     case PM_ButtonShiftVertical:
     case PM_ButtonShiftHorizontal:
     case PM_TabBarTabShiftVertical:
     case PM_TabBarTabShiftHorizontal:
         return 0;
+
     case PM_DefaultFrameWidth:
         return 0;
-    case PM_SliderThickness:
-        return dp(18);
-    case PM_SliderControlThickness:
-    case PM_SliderLength:
-        return dp(16);
-    case PM_IndicatorWidth:
-    case PM_IndicatorHeight:
-        return Metrics::kCheckIndicatorSize;
+
     case PM_ExclusiveIndicatorWidth:
     case PM_ExclusiveIndicatorHeight:
         return Metrics::kExclusiveIndicatorSize;
-    case PM_TabBarTabHSpace:
-    case PM_TabBarTabVSpace:
-        return 9;
-    case PM_ScrollBarExtent:
-        return 8;
-    case PM_ScrollBarSliderMin:
-        return 8;
-    case PM_SubMenuOverlap:
-        return 0;
-    case PM_MenuVMargin:
-        return dp(2);
-    case PM_SplitterWidth:
+    case PM_IndicatorWidth:
+    case PM_IndicatorHeight:
+        return Metrics::kCheckIndicatorSize;
+
+    case PM_FocusFrameHMargin:
+    case PM_FocusFrameVMargin:
         return dp(1);
+
     case PM_HeaderMarkSize:
         return Metrics::kSortIndicatorSize;
     case PM_HeaderMargin:
         return dp(6);
-    case PM_FocusFrameHMargin:
-    case PM_FocusFrameVMargin:
-        return dp(1);
+
     case PM_LayoutTopMargin:
     case PM_LayoutBottomMargin:
     case PM_LayoutLeftMargin:
@@ -1732,6 +1722,40 @@ int QnNxStyle::pixelMetric(
     case PM_LayoutHorizontalSpacing:
     case PM_LayoutVerticalSpacing:
         return dp(8);
+
+    case PM_MenuVMargin:
+        return dp(2);
+    case PM_SubMenuOverlap:
+        return 0;
+
+    case PM_SliderControlThickness:
+        return dp(16);
+    case PM_SliderThickness:
+        return dp(18);
+    case PM_SliderLength:
+        if (option && option->styleObject)
+        {
+            int result = qvariant_cast<int>(option->styleObject->property(Properties::kSliderLength), -1);
+            if (result >= 0)
+                return result;
+        }
+        return dp(16);
+
+    case PM_ScrollBarExtent:
+        return dp(8);
+    case PM_ScrollBarSliderMin:
+        return dp(8);
+
+    case PM_SplitterWidth:
+        return dp(1);
+
+    case PM_TabBarTabHSpace:
+    case PM_TabBarTabVSpace:
+        return dp(9);
+
+    case PM_ToolBarIconSize:
+        return dp(18);
+
     default:
         break;
     }
@@ -1753,6 +1777,24 @@ QSize QnNxStyle::sizeFromContents(
 
     case CT_LineEdit:
         return QSize(size.width(), qMax(size.height(), Metrics::kButtonHeight));
+
+    case CT_SpinBox:
+    {
+        /* QDateTimeEdit uses CT_SpinBox style with combo (!) box subcontrols, so we have to handle this case separately: */
+        if (qobject_cast<const QDateTimeEdit *>(widget))
+        {
+            const QStyleOptionSpinBox *spinBox = qstyleoption_cast<const QStyleOptionSpinBox *>(option);
+            if (spinBox && spinBox->subControls.testFlag(SC_ComboBoxArrow))
+            {
+                int hMargin = pixelMetric(PM_ButtonMargin, option, widget);
+                int height = qMax(size.height(), Metrics::kButtonHeight);
+                int width = qMax(Metrics::kMinimumButtonWidth, size.width() + hMargin + height);
+                return QSize(width, height);
+            }
+        }
+        /* Default processing for normal spin boxes: */
+        break;
+    }
 
     case CT_ComboBox:
     {
@@ -1884,6 +1926,8 @@ int QnNxStyle::styleHint(
         return Qt::AlignRight | Qt::AlignVCenter;
     case SH_FocusFrame_AboveWidget:
         return 1;
+    case SH_DialogButtonLayout:
+        return QDialogButtonBox::KdeLayout;
     default:
         break;
     }

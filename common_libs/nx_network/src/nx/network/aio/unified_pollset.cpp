@@ -28,7 +28,7 @@ int mapAioEventToUdtEvent(aio::EventType et)
         case aio::etWrite:
             return UDT_EPOLL_OUT | UDT_EPOLL_ERR;
         default:
-            Q_ASSERT(0);
+            NX_ASSERT(0);
             return 0;
     }
 }
@@ -55,7 +55,8 @@ public:
 
     ~ConstIteratorImpl()
     {
-        assert(pollSet->m_iterators.erase(this) == 1);
+        const int elementsRemoved = pollSet->m_iterators.erase(this);
+        NX_ASSERT(elementsRemoved == 1);
     }
 };
 
@@ -154,7 +155,7 @@ aio::EventType UnifiedPollSet::const_iterator::eventType() const
         case CurrentSet::sysWrite:
             return aio::etWrite;
         default:
-            assert(false);
+            NX_ASSERT(false);
             return aio::etNone;
     }
 }
@@ -362,7 +363,7 @@ bool UnifiedPollSet::removeSocket(
     std::map<SocketHandle, SocketContext>* const socketDictionary)
 {
     auto it = socketDictionary->find(handle);
-    //Q_ASSERT(it != socketDictionary->end());
+    //NX_ASSERT(it != socketDictionary->end());
     if (it == socketDictionary->end())
         return true;    //for now, this is valid case if adding to pollset has failed
 

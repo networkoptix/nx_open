@@ -66,7 +66,7 @@ void QnInstallUpdatesPeerTask::setVersion(const QnSoftwareVersion &version) {
 }
 
 void QnInstallUpdatesPeerTask::finish(int errorCode, const QSet<QnUuid> &failedPeers) {
-    qnResPool->disconnect(this);
+    disconnect(qnResPool, nullptr, this, nullptr);
     m_ecConnection.reset();
     m_checkTimer->stop();
     m_serverByRequest.clear();

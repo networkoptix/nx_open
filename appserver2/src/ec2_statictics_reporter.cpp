@@ -4,7 +4,7 @@
 
 #include <api/global_settings.h>
 
-#include <core/resource/user_resource.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <core/resource/media_server_resource.h>
 
@@ -23,13 +23,6 @@ static const QString SERVER_API_COMMAND = lit("statserver/api/report");
 
 namespace ec2
 {
-    const QString Ec2StaticticsReporter::SR_LAST_TIME = lit("statisticsReportLastTime");
-    const QString Ec2StaticticsReporter::SR_LAST_NUMBER = lit("statisticsReportLastNumber");
-    const QString Ec2StaticticsReporter::SR_TIME_CYCLE = lit("statisticsReportTimeCycle");
-    const QString Ec2StaticticsReporter::SR_SERVER_API = lit("statisticsReportServerApi");
-    const QString Ec2StaticticsReporter::SYSTEM_ID = lit("systemId");
-    const QString Ec2StaticticsReporter::SYSTEM_NAME_FOR_ID = lit("systemNameForId");
-
     const QString Ec2StaticticsReporter::DEFAULT_SERVER_API = lit("http://stats.networkoptix.com");
 
     // Hardcoded credentials (because of no way to keep it better)
@@ -38,21 +31,17 @@ namespace ec2
                 "f087996adb40eaed989b73e2d5a37c951f559956c44f6f8cdfb6f127ca4136cd");
 
     Ec2StaticticsReporter::Ec2StaticticsReporter(
-            const AbstractUserManagerPtr& userManager,
             const AbstractResourceManagerPtr& resourceManager,
             const AbstractMediaServerManagerPtr& msManager)
-        : m_admin(getAdmin(userManager))
-        , m_desktopCameraTypeId(getDesktopCameraTypeId(resourceManager))
+        :
+         m_desktopCameraTypeId(getDesktopCameraTypeId(resourceManager))
         , m_msManager(msManager)
         , m_timerCycle( TIMER_CYCLE )
         , m_timerDisabled(false)
         , m_timerId(boost::none)
     {
-        Q_ASSERT(MAX_DELAY_RATIO <= 100);
-
-        // Just in case assert did not work!
-        if (m_admin)
-            setupTimer();
+        NX_ASSERT(MAX_DELAY_RATIO <= 100);
+        setupTimer();
     }
 
     Ec2StaticticsReporter::~Ec2StaticticsReporter()
@@ -113,29 +102,16 @@ namespace ec2
         return initiateReport(&outData->url);
     }
 
-    QnUserResourcePtr Ec2StaticticsReporter::getAdmin(const AbstractUserManagerPtr& manager)
-    {
-        QnUserResourceList userList;
-        manager->getUsersSync(QnUuid(), &userList);
-        for (auto& user : userList)
-            if (user->isAdmin())
-                return user;
-
-        qFatal("Admin user does not exist");
-        NX_LOG(lit("Ec2StaticticsReporter: Admin user does not exist"), cl_logERROR); // In case qFatal didnt work!
-        return QnUserResourcePtr();
-    }
-
     QnUuid Ec2StaticticsReporter::getDesktopCameraTypeId(const AbstractResourceManagerPtr& manager)
     {
         QnResourceTypeList typesList;
         manager->getResourceTypesSync(&typesList);
         for (auto& rType : typesList)
-            if (rType->getName() == QnResourceTypePool::desktopCameraTypeName)
+            if (rType->getName() == QnResourceTypePool::kDesktopCameraTypeName)
                 return rType->getId();
 
         NX_LOG(lit("Ec2StaticticsReporter: Can not get %1 resource type, using null")
-               .arg(QnResourceTypePool::desktopCameraTypeName), cl_logWARNING);
+               .arg(QnResourceTypePool::kDesktopCameraTypeName), cl_logWARNING);
         return QnUuid();
     }
 
@@ -179,7 +155,7 @@ namespace ec2
     {
         {   /* Security check */
             const auto admin = qnResPool->getAdministrator();
-            Q_ASSERT_X(admin, Q_FUNC_INFO, "Administrator must exist here");
+            NX_ASSERT(admin, Q_FUNC_INFO, "Administrator must exist here");
             if (!admin)
                 return;
         }
@@ -194,15 +170,15 @@ namespace ec2
         }
 
         const QDateTime now = qnSyncTime->currentDateTime().toUTC();
-        const QDateTime lastTime = QDateTime::fromString(m_admin->getProperty(SR_LAST_TIME), Qt::ISODate);
+        const QDateTime lastTime = qnGlobalSettings->statisticsReportLastTime();
         if (!lastTime.isValid())
         {
-            m_admin->setProperty(SR_LAST_TIME, now.toString(Qt::ISODate));
-            propertyDictionary->saveParams(m_admin->getId());
+            qnGlobalSettings->setStatisticsReportLastTime(now);
+            qnGlobalSettings->synchronizeNow();
         }
 
         const uint timeCycle = parseTimerDuration(
-                    m_admin->getProperty(SR_TIME_CYCLE),
+                    qnGlobalSettings->statisticsReportTimeCycle(),
                     std::chrono::seconds(DEFAULT_TIME_CYCLE)).count() / 1000;
         const uint maxDelay = timeCycle * MAX_DELAY_RATIO / 100;
         if (!m_plannedReportTime || *m_plannedReportTime > now.addSecs(timeCycle + maxDelay))
@@ -230,7 +206,7 @@ namespace ec2
     ErrorCode Ec2StaticticsReporter::initiateReport(QString* reportApi)
     {
         ApiSystemStatistics data;
-        data.reportInfo.number = m_admin->getProperty(SR_LAST_NUMBER).toInt();
+        data.reportInfo.number = qnGlobalSettings->statisticsReportLastNumber();
         auto res = collectReportData(nullptr, &data);
         if (res != ErrorCode::ok)
         {
@@ -246,11 +222,11 @@ namespace ec2
         m_httpClient->setUserName(AUTH_USER);
         m_httpClient->setUserPassword(AUTH_PASSWORD);
 
-        const QString configApi = m_admin->getProperty(SR_SERVER_API);
+        const QString configApi = qnGlobalSettings->statisticsReportServerApi();
         const QString serverApi = configApi.isEmpty() ? DEFAULT_SERVER_API : configApi;
         const QUrl url = lit("%1/%2").arg(serverApi).arg(SERVER_API_COMMAND);
-        const auto format = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
-        m_httpClient->doPost(url, format, QJson::serialized(data));
+        const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
+        m_httpClient->doPost(url, contentType, QJson::serialized(data));
 
         NX_LOG(lit("Ec2StaticticsReporter: Sending statistics asynchronously to %1")
                .arg(url.toString()), cl_logDEBUG1);
@@ -262,19 +238,21 @@ namespace ec2
     QnUuid Ec2StaticticsReporter::getOrCreateSystemId()
     {
         const auto systemName = qnCommon->localSystemName();
-        const auto systemNameForId = m_admin->getProperty(SYSTEM_NAME_FOR_ID);
-        const auto systemId = m_admin->getProperty(SYSTEM_ID);
+        const auto systemNameForId = qnGlobalSettings->systemNameForId();
+        const auto systemId = qnGlobalSettings->systemId();
+        qDebug() << "system id" << systemId.toString();
 
         if (systemNameForId == systemName // system name was not changed
-            && !systemId.isEmpty())       // and systemId is already generated
+            && !systemId.isNull())       // and systemId is already generated
         {
             return QnUuid(systemId);
         }
 
         const auto newId = QnUuid::createUuid();
-        m_admin->setProperty(SYSTEM_ID, newId.toString());
-        m_admin->setProperty(SYSTEM_NAME_FOR_ID, systemName);
-        propertyDictionary->saveParams(m_admin->getId());
+        qnGlobalSettings->setSystemId(newId);
+        qnGlobalSettings->setSystemNameForId(systemName);
+        qnGlobalSettings->synchronizeNow();
+
         return newId;
     }
 
@@ -289,10 +267,10 @@ namespace ec2
             const auto now = qnSyncTime->currentDateTime().toUTC();
             m_plannedReportTime = boost::none;
 
-            const int lastNumber = m_admin->getProperty(SR_LAST_NUMBER).toInt();
-            m_admin->setProperty(SR_LAST_NUMBER, lastNumber + 1);
-            m_admin->setProperty(SR_LAST_TIME, now.toString(Qt::ISODate));
-            propertyDictionary->saveParams(m_admin->getId());
+            const int lastNumber = qnGlobalSettings->statisticsReportLastNumber();
+            qnGlobalSettings->setStatisticsReportLastNumber(lastNumber + 1);
+            qnGlobalSettings->setStatisticsReportLastTime(now);
+            qnGlobalSettings->synchronizeNow();
         }
         else
         {

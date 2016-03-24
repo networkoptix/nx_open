@@ -5,11 +5,11 @@
 
 #include <utils/common/string.h>
 #include <utils/math/color_transformations.h>
-#include <ui/style/noptix_style.h>
+#include <ui/style/helper.h>
 
 
 /**
- * A slider that displays the space to be used on a storage. 
+ * A slider that displays the space to be used on a storage.
  * Slider value is expected to be in MiBs.
  *
  * This slider was used as an editor widget in server settings dialog.
@@ -26,7 +26,7 @@ public:
     {
         setOrientation(Qt::Horizontal);
         setMouseTracking(true);
-        setProperty(Qn::SliderLength, 0);
+        setProperty(style::Properties::kSliderLength, 0);
 
         setTextFormat(QLatin1String("%1"));
 

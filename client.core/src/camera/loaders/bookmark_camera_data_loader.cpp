@@ -25,7 +25,7 @@ QnBookmarksLoader::QnBookmarksLoader(const QnVirtualCameraResourcePtr &camera, Q
     QObject(parent),
     m_camera(camera)
 {
-    Q_ASSERT_X(m_camera, Q_FUNC_INFO, "Camera must exist here");
+    NX_ASSERT(m_camera, Q_FUNC_INFO, "Camera must exist here");
 
     //TODO: #GDM #Bookmarks we have a lot of timers here and in CachingBookmarksLoader's and they all are enabled all the time
     QTimer *loadTimer = new QTimer(this);

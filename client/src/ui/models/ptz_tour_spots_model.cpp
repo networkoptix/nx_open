@@ -78,7 +78,7 @@ int QnPtzTourSpotsModel::speedToIndex(qreal speed) {
 
 QString QnPtzTourSpotsModel::speedToString(qreal speed) {
     static QList<QString> names(QList<QString>() << tr("Lowest") << tr("Low") << tr("Normal") << tr("High") << tr("Highest"));
-    Q_ASSERT(names.size() == allSpeedValues.size());
+    NX_ASSERT(names.size() == allSpeedValues.size());
 
     int index = speedToIndex(speed);
     return index == -1 ? QString() : names[index];

@@ -66,6 +66,32 @@ public:
     bool isStatisticsAllowed() const;
     void setStatisticsAllowed(bool value);
 
+    /** Last time when statistics was successfully sent. */
+    QDateTime statisticsReportLastTime() const;
+    void setStatisticsReportLastTime(const QDateTime& value);
+
+    int statisticsReportLastNumber() const;
+    void setStatisticsReportLastNumber(int value);
+
+    /** How often should we send statistics in human-readable format like '2d', '30m', etc. */
+    QString statisticsReportTimeCycle() const;
+    void setStatisticsReportTimeCycle(const QString& value);
+
+    static const QString kNameUpnpPortMappingEnabled;
+    bool isUpnpPortMappingEnabled() const;
+    void setUpnpPortMappingEnabled(bool value);
+
+    /** System id for the statistics server */
+    QnUuid systemId() const;
+    void setSystemId(const QnUuid &value);
+
+    /** System name, bound to the current system id */
+    QString systemNameForId() const;
+    void setSystemNameForId(const QString &value);
+
+    QString statisticsReportServerApi() const;
+    void setStatisticsReportServerApi(const QString &value);
+
     std::chrono::seconds connectionKeepAliveTimeout() const;
     void setConnectionKeepAliveTimeout(std::chrono::seconds newTimeout);
 
@@ -80,6 +106,24 @@ public:
 
     std::chrono::seconds serverDiscoveryAliveCheckTimeout() const;
     bool isTimeSynchronizationEnabled() const;
+
+    // -- Cloud settings
+
+    static const QString kNameCloudAccountName;
+    QString cloudAccountName() const;
+    void setCloudAccountName(const QString& value);
+
+    static const QString kNameCloudSystemID;
+    QString cloudSystemID() const;
+    void setCloudSystemID(const QString& value);
+
+    static const QString kNameCloudAuthKey;
+    QString cloudAuthKey() const;
+    void setCloudAuthKey(const QString& value);
+
+    void resetCloudParams();
+
+    // -- Misc settings
 
     bool arecontRtspEnabled() const;
     void setArecontRtspEnabled(bool newVal) const;
@@ -99,13 +143,18 @@ signals:
     void ldapSettingsChanged();
     void statisticsAllowedChanged();
     void updateNotificationsChanged();
+    void upnpPortMappingEnabledChanged();
     void ec2ConnectionSettingsChanged();
+    void cloudSettingsChanged();
 
 private:
     typedef QList<QnAbstractResourcePropertyAdaptor*> AdaptorList;
 
     AdaptorList initEmailAdaptors();
     AdaptorList initLdapAdaptors();
+    AdaptorList initStaticticsAdaptors();
+    AdaptorList initConnectionAdaptors();
+    AdaptorList initCloudAdaptors();
     AdaptorList initMiscAdaptors();
 
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
@@ -121,7 +170,16 @@ private:
     QnResourcePropertyAdaptor<bool> *m_timeSynchronizationEnabledAdaptor;
     QnResourcePropertyAdaptor<Qn::CameraBackupQualities> *m_backupQualitiesAdaptor;
     QnResourcePropertyAdaptor<bool> *m_backupNewCamerasByDefaultAdaptor;
+
+    // set of statistics settings adaptors
     QnResourcePropertyAdaptor<QnOptionalBool> *m_statisticsAllowedAdaptor;
+    QnResourcePropertyAdaptor<QString> *m_statisticsReportLastTimeAdaptor;
+    QnResourcePropertyAdaptor<int> *m_statisticsReportLastNumberAdaptor;
+    QnResourcePropertyAdaptor<QString> *m_statisticsReportTimeCycleAdaptor;
+    QnResourcePropertyAdaptor<bool> *m_upnpPortMappingEnabledAdaptor;
+    QnResourcePropertyAdaptor<QnUuid> *m_systemIdAdaptor;
+    QnResourcePropertyAdaptor<QString> *m_systemNameForIdAdaptor;
+    QnResourcePropertyAdaptor<QString> *m_statisticsReportServerApiAdaptor;
 
     // set of email settings adaptors
     QnResourcePropertyAdaptor<QString> *m_serverAdaptor;
@@ -146,9 +204,15 @@ private:
     QnResourcePropertyAdaptor<int>* m_ec2ConnectionKeepAliveTimeoutAdaptor;
     QnResourcePropertyAdaptor<int>* m_ec2KeepAliveProbeCountAdaptor;
     QnResourcePropertyAdaptor<int>* m_ec2AliveUpdateIntervalAdaptor;
-    QnResourcePropertyAdaptor<int>* m_serverDiscoveryPingTimeout;
+    QnResourcePropertyAdaptor<int>* m_serverDiscoveryPingTimeoutAdaptor;
 
-    QnResourcePropertyAdaptor<bool>* m_arecontRtspEnabled;
+    // set of cloud adaptors
+    QnResourcePropertyAdaptor<QString>* m_cloudAccountNameAdaptor;
+    QnResourcePropertyAdaptor<QString>* m_cloudSystemIDAdaptor;
+    QnResourcePropertyAdaptor<QString>* m_cloudAuthKeyAdaptor;
+
+    // misc adaptors
+    QnResourcePropertyAdaptor<bool>* m_arecontRtspEnabledAdaptor;
 
     AdaptorList m_allAdaptors;
 

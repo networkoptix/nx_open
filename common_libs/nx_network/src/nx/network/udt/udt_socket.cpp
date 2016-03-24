@@ -433,7 +433,7 @@ UdtSocket::~UdtSocket()
 
     //TODO #ak if socket is destroyed in its aio thread, it can cleanup here
 
-    assert(!nx::network::SocketGlobals::aioService()
+    NX_ASSERT(!nx::network::SocketGlobals::aioService()
         .isSocketBeingWatched(static_cast<Pollable*>(this)));
 }
 
@@ -835,7 +835,7 @@ AbstractStreamSocket* UdtStreamServerSocket::accept()
 }
 
 void UdtStreamServerSocket::acceptAsync(
-    std::function<void(
+    nx::utils::MoveOnlyFunc<void(
         SystemError::ErrorCode,
         AbstractStreamSocket*)> handler)
 {
@@ -856,6 +856,16 @@ void UdtStreamServerSocket::acceptAsync(
             }
             handler(errorCode, socket);
         });
+}
+
+void UdtStreamServerSocket::cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler)
+{
+    m_aioHelper->cancelIOAsync(std::move(handler));
+}
+
+void UdtStreamServerSocket::cancelIOSync()
+{
+    m_aioHelper->cancelIOSync();
 }
 
 void UdtStreamServerSocket::pleaseStop( 

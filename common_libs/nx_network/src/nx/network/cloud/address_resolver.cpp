@@ -5,6 +5,7 @@
 #include <nx/utils/thread/barrier_handler.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/stun/cc/custom_stun.h>
+#include <utils/serialization/lexical.h>
 
 static const auto DNS_CACHE_TIME = std::chrono::seconds(10);
 static const auto MEDIATOR_CACHE_TIME = std::chrono::minutes(1);
@@ -146,10 +147,10 @@ void AddressResolver::resolveDomain(
             nx::hpm::api::ResolveDomainResponse response)
         {
             NX_LOGX(lm("Domain %1 resolution on mediator result: %1")
-                .arg(domain.toString()).arg(nx::hpm::api::toString(resultCode)),
+                .arg(domain.toString()).arg(QnLexical::serialized(resultCode)),
                 cl_logDEBUG2);
 
-            std::vector<TypedAddres> subdomains;
+            std::vector<TypedAddres> result;
             const auto suffix = lit(".") + domain.toString();
             {
                 // TODO: #mux Think about better representation to increase performance
@@ -158,17 +159,20 @@ void AddressResolver::resolveDomain(
                     if (info.first.toString().endsWith(suffix) &&
                         !info.second.fixedEntries.empty())
                     {
-                        subdomains.emplace_back(info.first, AddressType::direct);
+                        result.emplace_back(info.first, AddressType::direct);
                     }
             }
 
             for (const auto& host : response.hostNames)
-                subdomains.emplace_back(HostAddress(host), AddressType::cloud);
+            {
+                HostAddress address(QString::fromUtf8(host));
+                result.emplace_back(std::move(address), AddressType::cloud);
+            }
 
             NX_LOGX(lm("Domain %1 is resolvet to: %2")
-                .arg(domain.toString()).container(subdomains), cl_logDEBUG1);
+                .arg(domain.toString()).container(result), cl_logDEBUG1);
 
-            handler(std::move(subdomains));
+            handler(std::move(result));
         });
 }
 
@@ -429,7 +433,12 @@ void AddressResolver::mediatorResolve(HaInfoIterator info, QnMutexLockerBase* lk
             }
 
             info->second.setMediatorEntries(std::move(entries));
-            guards = grabHandlers( SystemError::noError, info, &lk );
+            guards = grabHandlers(
+                resultCode == nx::hpm::api::ResultCode::ok
+                    ? SystemError::noError
+                    : SystemError::hostUnreach, //TODO #ak correct error translation
+                info,
+                &lk);
         });
 }
 

@@ -6,9 +6,6 @@
 #ifndef NX_COMPAT_POLL_H
 #define NX_COMPAT_POLL_H
 
-#include "version.h"
-
-
 #ifdef _WIN32
 
 #include <Winsock2.h>

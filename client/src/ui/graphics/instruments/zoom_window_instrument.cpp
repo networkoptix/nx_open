@@ -545,7 +545,7 @@ void ZoomWindowInstrument::updateWidgetFromWindow(ZoomWindowWidget *windowWidget
 // Handlers
 // -------------------------------------------------------------------------- //
 void ZoomWindowInstrument::installedNotify() {
-    assert(selectionItem() == NULL);
+    NX_ASSERT(selectionItem() == NULL);
 
     m_resizingInstrument = manager()->instrument<ResizingInstrument>();
     if(m_resizingInstrument) {

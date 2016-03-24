@@ -27,13 +27,13 @@ QnColorToVectorConverter::QnColorToVectorConverter():
 {}
 
 QVariant QnColorToVectorConverter::doConvertSourceToTarget(const QVariant &source) const {
-    assert(source.userType() == QMetaType::QColor);
+    NX_ASSERT(source.userType() == QMetaType::QColor);
 
     return convert<QVector4D>(*static_cast<const QColor *>(source.constData()));
 }
 
 QVariant QnColorToVectorConverter::doConvertTargetToSource(const QVariant &target) const {
-    assert(target.userType() == QMetaType::QVector4D);
+    NX_ASSERT(target.userType() == QMetaType::QVector4D);
 
     return convert<QColor>(*static_cast<const QVector4D *>(target.constData()));
 }

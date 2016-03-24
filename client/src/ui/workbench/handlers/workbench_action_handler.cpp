@@ -264,7 +264,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(QnActions::EscapeHotkeyAction),                     SIGNAL(triggered()),    this,   SLOT(at_escapeHotkeyAction_triggered()));
     connect(action(QnActions::MessageBoxAction),                       SIGNAL(triggered()),    this,   SLOT(at_messageBoxAction_triggered()));
     connect(action(QnActions::BrowseUrlAction),                        SIGNAL(triggered()),    this,   SLOT(at_browseUrlAction_triggered()));
-    connect(action(QnActions::VersionMismatchMessageAction),           SIGNAL(triggered()),    this,   SLOT(at_versionMismatchMessageAction_triggered()));
+    connect(action(QnActions::VersionMismatchMessageAction),           &QAction::triggered,    this,   &QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered);
     connect(action(QnActions::BetaVersionMessageAction),               SIGNAL(triggered()),    this,   SLOT(at_betaVersionMessageAction_triggered()));
     connect(action(QnActions::AllowStatisticsReportMessageAction),     &QAction::triggered,    this,   [this] { checkIfStatisticsReportAllowed(); });
 
@@ -1371,7 +1371,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     const int matrixWidth = qMax(1, qRound(std::sqrt(displayAspectRatio * itemCount / desiredCellAspectRatio)));
 
     /* Construct and add a new layout. */
-    QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
+    QnLayoutResourcePtr layout(new QnLayoutResource());
     layout->setId(QnUuid::createUuid());
     layout->setName(tr("Preview Search for %1").arg(resource->getName()));
     if(context()->user())
@@ -1628,7 +1628,7 @@ bool QnWorkbenchActionHandler::validateResourceName(const QnResourcePtr &resourc
         return true;
 
     /* Resource cannot have both of these flags at once. */
-    Q_ASSERT(checkedFlags == Qn::user || checkedFlags == Qn::videowall);
+    NX_ASSERT(checkedFlags == Qn::user || checkedFlags == Qn::videowall);
 
     foreach (const QnResourcePtr &resource, qnResPool->getResources()) {
         if (!resource->hasFlags(checkedFlags))
@@ -1747,7 +1747,7 @@ void QnWorkbenchActionHandler::at_renameAction_triggered()
     }
     else
     {
-        Q_ASSERT_X(false, Q_FUNC_INFO, "Invalid resource type to rename");
+        NX_ASSERT(false, Q_FUNC_INFO, "Invalid resource type to rename");
     }
 }
 
@@ -1919,7 +1919,6 @@ void QnWorkbenchActionHandler::at_newUserAction_triggered() {
     } while (!validateResourceName(user, user->getName()));
 
     user->setId(QnUuid::createUuid());
-    user->setTypeByName(lit("User"));
 
     qnResourcesChangesManager->saveUser(user, [](const QnUserResourcePtr &){});
     user->setPassword(QString()); // forget the password now
@@ -2336,6 +2335,9 @@ void QnWorkbenchActionHandler::at_browseUrlAction_triggered() {
 
 void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
     if (qnCommon->isReadOnly())
+        return;
+
+    if (qnRuntime->ignoreVersionMismatch())
         return;
 
     QnWorkbenchVersionMismatchWatcher *watcher = context()->instance<QnWorkbenchVersionMismatchWatcher>();

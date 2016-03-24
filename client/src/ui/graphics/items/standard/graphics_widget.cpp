@@ -82,7 +82,7 @@ void GraphicsWidgetPrivate::ensureWindowData() {
 void GraphicsWidgetPrivate::initStyleOptionTitleBar(QStyleOptionTitleBar *option) {
     Q_Q(GraphicsWidget);
 
-    assert(option != NULL);
+    NX_ASSERT(option != NULL);
 
     ensureWindowData();
 
@@ -120,7 +120,7 @@ QRectF GraphicsWidgetPrivate::mapFromFrame(const QRectF &rect) {
 void GraphicsWidgetPrivate::mapToFrame(QStyleOptionTitleBar *option) {
     Q_Q(GraphicsWidget);
 
-    assert(option != NULL);
+    NX_ASSERT(option != NULL);
 
     option->rect = q->windowFrameRect().toRect();
     option->rect.moveTo(0, 0);

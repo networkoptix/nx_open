@@ -524,9 +524,9 @@ void QnWorkbenchExportHandler::exportTimeSelection(
         if (existingLayout)
             removeLayoutFromPool(existingLayout);
 
-        QnLayoutResourcePtr newLayout(new QnLayoutResource(qnResTypePool));
+        QnLayoutResourcePtr newLayout(new QnLayoutResource());
 
-        Q_ASSERT_X(!itemData.uuid.isNull(), Q_FUNC_INFO, "Make sure itemData is valid");
+        NX_ASSERT(!itemData.uuid.isNull(), Q_FUNC_INFO, "Make sure itemData is valid");
         newLayout->addItem(itemData);
         saveLayoutToLocalFile(newLayout, period, fileName, Qn::LayoutExport, false, true);
     }

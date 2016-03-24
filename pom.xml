@@ -33,12 +33,13 @@
         <nx_email.guid>{0034cf9a-0454-475d-9b54-87d4b4a6b65b}</nx_email.guid>
         <nx_streaming.guid>{3c0acd3f-d641-4690-a7c5-129cb4bea938}</nx_streaming.guid>
         <nx_media.guid>{3fbafa12-f3a7-4fd2-bafc-256427399a56}</nx_media.guid>
-        <nx_network.guid>{3F980CF-4CDB-4C0C-8AF3-AF363E6BE12A}</nx_network.guid>
+        <nx_network.guid>{71fb3cab-00f4-41a3-af08-ae0a61b8c79e}</nx_network.guid>
         <nx_utils.guid>{81BDC343-5614-4C4D-90E8-147A024BEAF4}</nx_utils.guid>
         <udt.guid>{7f5cd83f-b59e-4020-b35b-de4edaf66233}</udt.guid>
         <cloud_db_client.guid>{0F7C2BCF-DA0B-4E2E-8F4B-564AE63FAD73}</cloud_db_client.guid>
         <nx_audio.guid>{d335c660-3c62-4048-a1eb-b1606159a2dd}</nx_audio.guid>
         <appserver2.guid>{16bb7b01-5096-4cee-93ae-b34b3153459f}</appserver2.guid>
+        <appserver2_ut.guid>{9ad34f32-99ec-4174-9991-1dedc7177123}</appserver2_ut.guid>
         <axiscamplugin.guid>{c27722d6-d3ae-41dc-9467-52d93f5b119a}</axiscamplugin.guid>
         <evidence_plugin.guid>{061d1513-9a37-4d14-90f5-11d42d2d7827}</evidence_plugin.guid>
         <genericrtspplugin.guid>{7fafaf1d-0d3d-42ea-aa11-4ffce0f170f9}</genericrtspplugin.guid>
@@ -66,7 +67,9 @@
         <nx_network_ut.guid>{f7dfa168-fa41-4d4a-b475-e785acb4ff45}</nx_network_ut.guid>
         <libcloud_db.guid>{BBA5BB95-B669-42C4-8074-EE0E361C094E}></libcloud_db.guid>
         <cloud_db.guid>{44ADCF67-21B0-403D-A771-C138B11CDB83}></cloud_db.guid>
+        <cloud_db_ut.guid>{626088EE-4911-4676-9152-F49BA62E1729}</cloud_db_ut.guid>
         <connection_mediator.guid>{f568398b-8ca3-44cc-9707-d1f63b2aa1c6}</connection_mediator.guid>
+        <connection_mediator_ut.guid>{85C18AB2-22ED-450B-BF13-3792189C771F}</connection_mediator_ut.guid>
         <libconnection_mediator.guid>{109DCEE1-AADA-4C88-9FE4-8521525EF7FF}</libconnection_mediator.guid>
 
         <!-- Components' Naming -->
@@ -75,8 +78,9 @@
         <appserver.name>Enterprise Controller</appserver.name>
         <appserver2.name>${company.name} New Enterprise Controller</appserver2.name>
         <client.name>${company.name} ${product.name} Client</client.name>
+        <client.display.name>${company.name} ${display.product.name} Client</client.display.name>        
         <mobile_client.name>${company.name} ${product.name} Mobile Client</mobile_client.name>
-        <client.display.name>${company.name} ${display.product.name} Client</client.display.name>
+        <mobile_client.display.name>${company.name} ${display.product.name} Mobile Client</mobile_client.display.name>
         <client.mediafolder.name>${product.name} Media</client.mediafolder.name>
         <applauncher.name>${product.name} Launcher</applauncher.name>
         <applauncher.display.name>${display.product.name} Launcher</applauncher.display.name>
@@ -126,7 +130,7 @@
 
         <libdir>${root.dir}/build_environment/target</libdir>
         <rdep.target>${platform}-${arch}</rdep.target>
-        <qt.path>rdep/packages/${rdep.target}/qt-${qt.version}</qt.path>
+        <qt.path>packages/${rdep.target}/qt-${qt.version}</qt.path>
         <qt.dir>${environment.dir}/${qt.path}</qt.dir>
          <!-- Can take values 'pdb', 'src' or both ('pdb, src')  -->
         <qt.debug></qt.debug>
@@ -142,8 +146,8 @@
         <sasl2.version>2.1.26-SNAPSHOT</sasl2.version>
         <protobuf.version>2.6.0-SNAPSHOT</protobuf.version>
         <onvif.version>2.1.2-io-SNAPSHOT</onvif.version>
-        <sigar.version>1.7-SNAPSHOT</sigar.version>
-        <festival.version>2.4-SNAPSHOT</festival.version>
+        <sigar.version>1.7</sigar.version>
+        <festival.version>2.4</festival.version>
         <boost.version>1.56-SNAPSHOT</boost.version>
         <quazip.version>0.7.1</quazip.version>
 
@@ -441,7 +445,7 @@
             </activation>
             <properties>
                 <environment.dir>${env.ENVIRONMENT}</environment.dir>
-                <init.python.dir>${environment.dir}/python/${arch}</init.python.dir>
+                <init.python.dir>${environment.dir}/python/x64</init.python.dir>
                 <python.dir>${libdir}/${arch}/python/scripts</python.dir>
                 <python.executable>python.exe</python.executable>
                 <python.virtualenv>virtualenv.exe</python.virtualenv>
@@ -462,8 +466,25 @@
                 <unix>false</unix>
                 <script.extension>bat</script.extension>
                 <global.windows.defines>ENABLE_VMAX</global.windows.defines>
+                <machine.type>X64</machine.type>
             </properties>
         </profile>
+        <profile>
+            <id>windows-x86</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                    <arch>x86</arch>
+                </os>
+                <property>
+                    <name>arch</name>
+                    <value>x86</value>
+                </property>
+            </activation>
+            <properties>
+                <machine.type>X86</machine.type>
+            </properties>
+        </profile>        
         <profile>
             <id>windows-nomobile</id>
             <activation>
@@ -480,7 +501,7 @@
                 <module>traytool</module>
                 <!-- Vmaxproxy  module is disabled because we use already built version of vmax (vs2008 + qt4). We do so because vmaxproxy doesn't work if has been built on vs2012 -->
                 <!--<module>vmaxproxy</module>  -->
-                <module>nxtool</module>
+                <!--<module>nxtool</module>-->
                 <module>wixsetup</module>
             </modules>
         </profile>
@@ -547,7 +568,7 @@
                 <unix>true</unix>
                 <windows>false</windows>
                 <script.extension>sh</script.extension>
-                <festival.version>2.1-SNAPSHOT</festival.version>
+                <festival.version>2.1</festival.version>
             </properties>
         </profile>
         <profile>
@@ -561,8 +582,7 @@
             <properties>
                 <platform>linux</platform>
                 <qt.spec>linux-g++</qt.spec>
-                <qt.path>artifacts/qt/${qt.version}/${platform}/${arch}/${box}/${build.configuration}</qt.path>
-                <qt.classifier>${platform}-${arch}-${build.configuration}</qt.classifier>
+                <additional.qtplugins>audio, platforminputcontexts</additional.qtplugins>
             </properties>
             <modules>
                 <!--<module>plugins/xvbadecoder</module>-->
@@ -578,7 +598,6 @@
             </activation>
             <properties>
                 <additional.compiler>clang</additional.compiler>
-                <qt.classifier>${platform}-${arch}</qt.classifier>
                 <python.executable>python</python.executable>
                 <python.virtualenv>virtualenv</python.virtualenv>
             </properties>
@@ -647,7 +666,6 @@
             <properties>
                 <build.suffix>${box}-${arch}</build.suffix>
                 <qt.spec>linux-arm-gnueabi-g++</qt.spec>
-                <qt.classifier>${platform}-${arch}-${box}</qt.classifier>
                 <compile.option1/>
                 <libdir>${root.dir}/build_environment/target-${box}</libdir>
             </properties>
@@ -677,6 +695,7 @@
                 <openssl.version>1.0.0j</openssl.version>
                 <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
                 <modification>isd</modification>
+                <rdep.target>isd</rdep.target>
             </properties>
             <modules>
                 <module>plugins/isd_native_plugin</module>
@@ -704,6 +723,7 @@
                 <openssl.version>1.0.1f</openssl.version>
                 <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
                 <modification>isd_s2</modification>
+                <rdep.target>isd_s2</rdep.target>
             </properties>
             <modules>
                 <module>plugins/isd_native_plugin</module>
@@ -730,6 +750,7 @@
                 <openssl.version>1.0.0j</openssl.version>
                 <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
                 <modification>rpi</modification>
+                <rdep.target>rpi</rdep.target>
             </properties>
             <modules>
                 <!--<module>plugins/rpi_cam</module>-->
@@ -758,6 +779,8 @@
                 <openssl.version>1.0.0j</openssl.version>
                 <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
                 <modification>bpi</modification>
+                <rdep.target>bpi</rdep.target>
+                <qt.spec/>
             </properties>
             <modules>
                 <!-- Banana pie uses same distro as rpi -->
@@ -784,7 +807,7 @@
                 <openssl.version>1.0.0j</openssl.version>
                 <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
                 <modification>bananapi</modification>
-                <qt.classifier>${platform}-${arch}-bpi</qt.classifier>
+                <rdep.target>bpi</rdep.target>
             </properties>
             <modules>
                 <!-- Banana pie uses same distro as rpi -->
@@ -920,7 +943,6 @@
                 <toolchain.version>android</toolchain.version>
                 <qt.version>5.5.1</qt.version>
                 <qt.spec>android-g++</qt.spec>
-                <qt.classifier>${platform}-${arch}</qt.classifier>
                 <libdir>${root.dir}/build_environment/target</libdir>
                 <compiler>gcc</compiler>
                 <additional.compiler>gcc</additional.compiler>
@@ -932,6 +954,7 @@
                 <openssl.version>1.0.2d</openssl.version>
                 <additional.defines>DISABLE_FFMPEG</additional.defines>
                 <compile.option1/>
+                <rdep.target>android</rdep.target>
             </properties>
         </profile>
         <profile>
@@ -947,7 +970,6 @@
                 </file>
             </activation>
             <properties>
-                <qt.classifier>${platform}-${arch}-release</qt.classifier>
                 <additional.compiler>${compiler}</additional.compiler>
             </properties>
         </profile>
@@ -973,13 +995,13 @@
                 <platform>ios</platform>
                 <toolchain.version>ios</toolchain.version>
                 <qt.spec>macx-ios-clang</qt.spec>
-                <qt.classifier>${platform}-${arch}</qt.classifier>
                 <libdir>${root.dir}/build_environment/target</libdir>
                 <compiler>clang</compiler>
                 <additional.compiler>clang</additional.compiler>
                 <profile.classifier>${platform}-${arch}</profile.classifier>
                 <openssl.version>1.0.1i</openssl.version>
                 <compile.option1/>
+                <rdep.target>ios</rdep.target>
             </properties>
         </profile>
     </profiles>

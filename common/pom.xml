@@ -24,13 +24,13 @@
         <guid>${common.guid}</guid>
         <!--Global libs-->
         <template>lib</template>
-        <qt.libs>core gui network xml xmlpatterns sql concurrent multimedia</qt.libs>
+        <qt.libs>core core-private gui network xml xmlpatterns sql concurrent multimedia</qt.libs>
         <global.libs></global.libs>
         <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc</ffmpeg.libs>
         <!--Specific os libs used-->
-        <windows.oslibs>-lws2_32 -lIphlpapi -lOle32 -lsigar -lSecur32</windows.oslibs>
-        <linux.oslibs>-lsigar</linux.oslibs>
-        <mac.oslibs>-framework IOKit -framework CoreFoundation -lz -framework QtConcurrent -lsigar-universal64-macosx</mac.oslibs>
+        <windows.oslibs>-lws2_32 -lIphlpapi -lOle32 -lSecur32</windows.oslibs>
+        <linux.oslibs/>
+        <mac.oslibs>-framework IOKit -framework CoreFoundation -lz -framework QtConcurrent</mac.oslibs>
         <android.oslibs>-lz</android.oslibs>
         <!--Global defines-->
         <global.defines/>
@@ -148,6 +148,24 @@
             </activation>
             <properties>
                 <qt.libs>core network xml sql</qt.libs>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>linux-arm-bpi</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>bpi</value>
+                </property>
+            </activation>
+            <properties>
+                <rdep.linux.packages>gcc-4.8.3 quazip opengl-es-mali</rdep.linux.packages>
             </properties>
         </profile>
 

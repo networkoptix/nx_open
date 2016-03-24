@@ -1007,7 +1007,7 @@ namespace nx_spl
     const char** STORAGE_METHOD_CALL FtpStorageFactory::findAvailable() const
     {
         // TODO: #akulikov. Implement this?
-        assert(false);
+        NX_ASSERT(false);
         return nullptr;
     }
 

@@ -78,14 +78,16 @@ Handle ServerConnection::sendStatisticsAsync(const QnSendStatisticsRequestData &
 }
 
 Handle ServerConnection::saveCloudSystemCredentials(
-    const QString& cloudSystemId,
+    const QString& cloudSystemID,
     const QString& cloudAuthKey,
+    const QString &cloudAccountName,
     Result<EmptyResponseType>::type callback,
     QThread* targetThread)
 {
     CloudCredentialsData data;
-    data.cloudSystemId = cloudSystemId;
-    data.cloudAuthenticationKey = cloudAuthKey;
+    data.cloudSystemID = cloudSystemID;
+    data.cloudAuthKey = cloudAuthKey;
+    data.cloudAccountName = cloudAccountName;
 
     return executePost(
         lit("/api/saveCloudSystemCredentials"),

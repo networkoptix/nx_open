@@ -178,7 +178,7 @@ QnCamDisplay::~QnCamDisplay()
     if (qnRedAssController)
         qnRedAssController->unregisterConsumer(this);
 
-    Q_ASSERT(!isRunning());
+    NX_ASSERT(!isRunning());
     stop();
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
         delete m_display[i];
@@ -220,7 +220,7 @@ void QnCamDisplay::resume()
 
 void QnCamDisplay::addVideoRenderer(int channelCount, QnAbstractRenderer* vw, bool canDownscale)
 {
-    Q_ASSERT(channelCount <= CL_MAX_CHANNELS);
+    NX_ASSERT(channelCount <= CL_MAX_CHANNELS);
     
     for(int i = 0; i < channelCount; i++)
     {
@@ -521,7 +521,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
             if (speed != 0  && (quint64)displayedTime != AV_NOPTS_VALUE && m_lastFrameDisplayed == QnVideoStreamDisplay::Status_Displayed &&
                 !(vd->flags & QnAbstractMediaData::MediaFlags_BOF))
             {
-                Q_ASSERT(!(vd->flags & QnAbstractMediaData::MediaFlags_Ignore));
+                NX_ASSERT(!(vd->flags & QnAbstractMediaData::MediaFlags_Ignore));
                 //QTime t;
                 //t.start();
                 int speedSign = speed >= 0 ? 1 : -1;

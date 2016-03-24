@@ -150,7 +150,7 @@ void QnMergeSystemsDialog::at_urlComboBox_editingFinished() {
 }
 
 void QnMergeSystemsDialog::at_testConnectionButton_clicked() {
-    Q_ASSERT(context()->user()->isAdmin());
+    NX_ASSERT(context()->user()->isAdmin());
     if (!context()->user()->isAdmin())
         return;
 

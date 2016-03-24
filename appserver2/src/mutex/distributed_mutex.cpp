@@ -60,7 +60,7 @@ void QnDistributedMutex::at_newPeerFound(ec2::ApiPeerAliveData data)
         return;
 
     QnMutexLocker lock( &m_mutex );
-    Q_ASSERT(data.peer.id != qnCommon->moduleGUID());
+    NX_ASSERT(data.peer.id != qnCommon->moduleGUID());
     if (!m_selfLock.isEmpty())
         sendTransaction(m_selfLock, ApiCommand::lockRequest, data.peer.id);
 }

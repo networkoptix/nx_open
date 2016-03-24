@@ -294,7 +294,7 @@ public:
         \return true, If uinitialized texture, false is already initialized
     */
     bool ensureInitialized(int width, int height, int stride, int pixelSize, GLint internalFormat, int internalFormatPixelSize, int fillValue) {
-        Q_ASSERT(m_renderer.data() != NULL);
+        NX_ASSERT(m_renderer.data() != NULL);
 
         ensureAllocated();
 
@@ -358,7 +358,7 @@ public:
             glBindTexture(GL_TEXTURE_2D, m_id);
             if (roundedWidth < textureSize.width()) {
 
-                //Q_ASSERT( textureSize == QSize(textureWidth, textureHeight) );
+                //NX_ASSERT( textureSize == QSize(textureWidth, textureHeight) );
 
                 glTexSubImage2D(
                     GL_TEXTURE_2D,
@@ -464,7 +464,7 @@ public:
     const std::vector<GLuint>& glTextures() const
     {
 #ifdef GL_COPY_AGGREGATION
-        Q_ASSERT( m_surfaceRect && m_surfaceRect->surface() );
+        NX_ASSERT( m_surfaceRect && m_surfaceRect->surface() );
         return m_surfaceRect->surface()->glTextures();
 #else
         //TODO/IMPL
@@ -483,7 +483,7 @@ public:
     QRectF textureRect() const
     {
 #ifdef GL_COPY_AGGREGATION
-        Q_ASSERT( m_surfaceRect && m_surfaceRect->surface() );
+        NX_ASSERT( m_surfaceRect && m_surfaceRect->surface() );
         return m_surfaceRect->texCoords();
 #else
         const QVector2D& v = m_textures[0]->texCoords();
@@ -709,7 +709,7 @@ inline void streamLoadAndDeinterleaveNV12UVPlane(
     __m128i* yv12UPlane,
     __m128i* yv12VPlane )
 {
-    //Q_ASSERT( nv12UVPlaneSize % 64 == 0 );
+    //NX_ASSERT( nv12UVPlaneSize % 64 == 0 );
     //using intermediate buffer with size equal to first-level CPU cache size
 
     static const size_t TMP_BUF_SIZE = 4*1024 / sizeof(__m128i);
@@ -925,7 +925,7 @@ private:
             return false;
         }
 
-        Q_ASSERT( m_picDataRef->type() == QnAbstractPictureDataRef::pstD3DSurface );
+        NX_ASSERT( m_picDataRef->type() == QnAbstractPictureDataRef::pstD3DSurface );
         IDirect3DSurface9* const surf = static_cast<D3DPictureData*>(m_picDataRef.data())->getSurface();
         D3DSURFACE_DESC surfDesc;
         memset( &surfDesc, 0, sizeof(surfDesc) );
@@ -1054,7 +1054,7 @@ private:
 #else
         Q_UNUSED( pictureBuf );
         Q_UNUSED( cropRect );
-        Q_ASSERT( false );
+        NX_ASSERT( false );
         return false;
 #endif  //_WIN32
     }
@@ -1274,7 +1274,7 @@ DecodedPictureToOpenGLUploader::DecodedPictureToOpenGLUploader(
 #ifdef ASYNC_UPLOADING_USED
     const std::vector<QSharedPointer<DecodedPictureToOpenGLUploadThread> >&
         pool = DecodedPictureToOpenGLUploaderContextPool::instance()->getPoolOfContextsSharedWith( mainContext );
-    Q_ASSERT( !pool.empty() );
+    NX_ASSERT( !pool.empty() );
 
     m_uploadThread = pool[random(0, pool.size())];    //TODO/IMPL should take
 #endif
@@ -1531,11 +1531,11 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture(
         if( decodedPicture->picData->type() == QnAbstractPictureDataRef::pstOpenGL )
         {
             //TODO/IMPL save reference to existing opengl texture
-            Q_ASSERT( false );
+            NX_ASSERT( false );
         }
         else
         {
-            Q_ASSERT( false );
+            NX_ASSERT( false );
         }
     }
     else    //data is stored in system memory (in AVPacket)
@@ -1796,7 +1796,7 @@ void DecodedPictureToOpenGLUploader::pictureDrawingFinished( UploadedPicture* co
 
     //m_picturesBeingRendered holds only one picture
     std::deque<UploadedPicture*>::iterator it = std::find( m_picturesBeingRendered.begin(), m_picturesBeingRendered.end(), picture );
-    Q_ASSERT( it != m_picturesBeingRendered.end() );
+    NX_ASSERT( it != m_picturesBeingRendered.end() );
 
 #ifdef GL_COPY_AGGREGATION
     //clearing all rendered pictures. Only one rendered picture is required (so that there is always anything to show)
@@ -2087,10 +2087,10 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
             d->glBindBuffer( GL_PIXEL_UNPACK_BUFFER_ARB, emptyPictureBuf->pboID(pboIndex) );
 #ifdef DIRECT_COPY
             GLvoid* pboData = d->glMapBuffer( GL_PIXEL_UNPACK_BUFFER_ARB, GL_WRITE_ONLY_ARB );
-            Q_ASSERT( pboData );
+            NX_ASSERT( pboData );
             memcpy( pboData, planes[i], lineSizes[i]*h[i] );
-            Q_ASSERT( (size_t)planes[i] % 16 == 0 );
-            Q_ASSERT( (lineSizes[i]*h[i]) % 16 == 0 );
+            NX_ASSERT( (size_t)planes[i] % 16 == 0 );
+            NX_ASSERT( (lineSizes[i]*h[i]) % 16 == 0 );
             //memcpy_sse4_stream_store( (__m128i*)pboData, (__m128i*)planes[i], lineSizes[i]*h[i] );
             d->glUnmapBuffer( GL_PIXEL_UNPACK_BUFFER_ARB );
 
@@ -2114,7 +2114,7 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
             const quint64 r_w_i = r_w[i];
 //            glPixelStorei(GL_UNPACK_ROW_LENGTH, lineSizes_i);
             glCheckError("glPixelStorei");
-            Q_ASSERT( lineSizes_i >= qPower2Ceil(r_w_i,ROUND_COEFF) );
+            NX_ASSERT( lineSizes_i >= qPower2Ceil(r_w_i,ROUND_COEFF) );
 
             #ifndef USE_PBO
 				//loadImageData(qPower2Ceil(r_w_i,ROUND_COEFF),lineSizes_i,h[i],1,GL_LUMINANCE,planes[i]);

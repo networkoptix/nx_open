@@ -256,7 +256,7 @@ void QnIncompatibleServerWatcherPrivate::addResource(const ec2::ApiDiscoveredSer
         QnMediaServerResourcePtr server =
                 qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
 
-        Q_ASSERT_X(server, "There must be a resource in the resource pool.", Q_FUNC_INFO);
+        NX_ASSERT(server, "There must be a resource in the resource pool.", Q_FUNC_INFO);
 
         if (!server)
             return;
@@ -310,7 +310,7 @@ QnUuid QnIncompatibleServerWatcherPrivate::getFakeId(const QnUuid &realId) const
 QnMediaServerResourcePtr QnIncompatibleServerWatcherPrivate::makeResource(
         const ec2::ApiDiscoveredServerData &serverData)
 {
-    QnMediaServerResourcePtr server(new QnMediaServerResource(qnResTypePool));
+    QnMediaServerResourcePtr server(new QnMediaServerResource());
 
     server->setId(QnUuid::createUuid());
     server->setStatus(serverData.status, true);

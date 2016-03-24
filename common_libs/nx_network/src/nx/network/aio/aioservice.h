@@ -110,7 +110,7 @@ public:
     void dispatch(Pollable* sock, nx::utils::MoveOnlyFunc<void()> handler);
     //TODO #ak better remove this method, violates encapsulation
     QnMutex* mutex() const;
-    aio::AIOThread<Pollable>* getSocketAioThread(Pollable* sock);
+    aio::AIOThread* getSocketAioThread(Pollable* sock);
     void bindSocketToAioThread(Pollable* sock, AbstractAioThread* aioThread);
 
     //!Same as \a AIOService::watchSocket, but does not lock mutex. Calling entity MUST lock \a AIOService::mutex() before calling this method
@@ -140,7 +140,7 @@ public:
 private:
     struct SocketAIOContext
     {
-        typedef AIOThread<Pollable> AIOThreadType;
+        typedef AIOThread AIOThreadType;
 
         std::vector<std::unique_ptr<AIOThreadType>> aioThreadPool;
         //!map<pair<socket, event_type>, pair<thread, socket timeout>>
@@ -153,14 +153,14 @@ private:
     mutable QnMutex m_mutex;
 
     void initializeAioThreadPool(SocketAIOContext* aioCtx, unsigned int threadCount);
-    aio::AIOThread<Pollable>* getSocketAioThread(
+    aio::AIOThread* getSocketAioThread(
         QnMutexLockerBase* const lock,
         Pollable* sock);
     void cancelPostedCallsNonSafe(
         QnMutexLockerBase* const lock,
         Pollable* const sock,
         bool waitForRunningHandlerCompletion = true );
-    aio::AIOThread<Pollable>* bindSocketToAioThread(
+    aio::AIOThread* bindSocketToAioThread(
         QnMutexLockerBase* const /*lock*/,
         Pollable* const sock );
     void postNonSafe(

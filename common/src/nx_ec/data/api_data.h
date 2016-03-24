@@ -4,13 +4,13 @@
 #include "api_globals.h"
 
 namespace ec2 {
-    
+
     struct ApiData {
         virtual ~ApiData() {}
     };
     #define ApiData_Fields ()
 
-    struct ApiIdData: ApiData 
+    struct ApiIdData: ApiData
     {
         ApiIdData() {}
         ApiIdData(const QnUuid& id): id(id) {}
@@ -39,7 +39,7 @@ struct ApiSyncMarkerRecord: public ApiData
 };
 #define ApiSyncMarkerRecord_Fields (peerID)(dbID)(sequence)
 
-struct ApiUpdateSequenceData: public ApiData 
+struct ApiUpdateSequenceData: public ApiData
 {
     std::vector<ApiSyncMarkerRecord> markers;
 };

@@ -20,7 +20,7 @@ namespace cloud {
 /**
     \note \a OutgoingTunnel instance can be safely freed only after 
         \a OutgoingTunnel::pleaseStop completion. It is allowed 
-        to free object in completion handler itself.
+        to free object in \a closed handler itself.
         It is needed to guarantee that all clients receive response.
     \note Calling party MUST not use object after \a OutgoingTunnel::pleaseStop call
 */
@@ -70,12 +70,12 @@ private:
         std::chrono::steady_clock::time_point,
         ConnectionRequestData> m_connectHandlers;
     std::map<CloudConnectType, std::unique_ptr<AbstractTunnelConnector>> m_connectors;
-    //TODO #ak replace with aio timer when it is available
     aio::Timer m_timer;
     bool m_terminated;
     boost::optional<std::chrono::steady_clock::time_point> m_timerTargetClock;
     int m_counter;
     std::shared_ptr<AbstractOutgoingTunnelConnection> m_connection;
+    SystemError::ErrorCode m_lastErrorCode;
 
     void updateTimerIfNeeded();
     void updateTimerIfNeededNonSafe(
@@ -87,7 +87,7 @@ private:
         SystemError::ErrorCode code,
         std::unique_ptr<AbstractStreamSocket> socket,
         bool stillValid);
-    void onTunnelClosed();
+    void onTunnelClosed(SystemError::ErrorCode errorCode);
     void startAsyncTunnelConnect(QnMutexLockerBase* const locker);
     void onConnectorFinished(
         CloudConnectType connectorType,

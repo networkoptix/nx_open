@@ -10,7 +10,7 @@ namespace
 
 SeparatorAreaProperties::SeparatorAreaProperties()
     : width(kDefaultSeparatorWidth)
-    , color(Qt::black)
+    , color(Qt::yellow)
 {
 }
 
@@ -59,9 +59,9 @@ void QnSeparator::updatePixmap()
         return;
 
     const auto height = std::accumulate(m_areas.begin(), m_areas.end(), 0
-        , [](qreal init, const SeparatorAreaProperties &props) 
-    { 
-        return init + props.width; 
+        , [](qreal init, const SeparatorAreaProperties &props)
+    {
+        return init + props.width;
     });
 
     const auto size = QSize(width, height);

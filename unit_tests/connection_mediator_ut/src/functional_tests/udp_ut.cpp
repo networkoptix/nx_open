@@ -38,7 +38,7 @@ TEST_F(MediatorFunctionalTest, udp_transport)
     udpSocket->setRecvTimeout(3000);
 
     //for (int j = 0; j < 1000; ++j)
-    for (int i = 0; i < system1Servers.size(); ++i)
+    for (size_t i = 0; i < system1Servers.size(); ++i)
     {
         //sending resolve request
         api::ResolvePeerRequest request(system1Servers[i]->serverId() + "." + system1.id);

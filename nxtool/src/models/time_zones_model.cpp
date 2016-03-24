@@ -11,13 +11,13 @@ namespace api = nx::mediaserver::api;
 namespace
 {
     enum { kInvalidIndex = -1 };
-    
+
     const QByteArray utcIanaTemplate = "UTC";
     const QByteArray gmtIanaTemplate = "GMT";
     const QString utcKeyword = "Universal";
 
     const QList<QByteArray> utcAliases = [] {
-        return QList<QByteArray>() 
+        return QList<QByteArray>()
             << "Etc/GMT"
             << "Etc/GMT+0"
             << "Etc/UCT"
@@ -31,18 +31,18 @@ namespace
             << "UCT"
             << "Universal";
     }();
-    
+
     bool isDeprecatedTimeZone(const QByteArray &zoneIanaId) {
-        return 
+        return
                zoneIanaId.contains(utcIanaTemplate)     // UTC+03:00
             || zoneIanaId.contains(gmtIanaTemplate)     // Etc/GMT+3
             ;
-    }  
-  
+    }
+
     const QByteArray kDiffTimeZonesId = "<Different>";
     const QByteArray kUnknownTimeZoneId = "<Unknown>";
-  
-    
+
+
     QByteArray selectionTimeZoneId(const api::ServerInfoPtrContainer &servers)
     {
         if (servers.empty() || !servers.first()->hasExtraInfo())
@@ -63,17 +63,17 @@ class rtu::TimeZonesModel::Impl
 public:
     Impl(rtu::TimeZonesModel *owner
         , const api::ServerInfoPtrContainer &selectedServers);
-    
+
     Impl(rtu::TimeZonesModel *owner
         , const Impl &other);
 
     virtual ~Impl();
-    
+
 public:
     bool isValidValue(int index);
-    
+
     int initIndex() const;
-    
+
     int currentTimeZoneIndex() const;
 
     int rowCount() const;
@@ -84,7 +84,7 @@ public:
     int timeZoneIndexById(const QByteArray &id) const;
 
 private:
-    void initTimeZones();  
+    void initTimeZones();
 
 private:
     struct TzInfo {
@@ -101,7 +101,7 @@ private:
         }
 
         QString displayName;
-        int standardTimeOffset;        
+        int standardTimeOffset;
         QList<QByteArray> ids;
     };
 
@@ -150,7 +150,7 @@ bool rtu::TimeZonesModel::Impl::isValidValue(int index)
 {
     if ((index >= m_timeZones.size()) || (index < 0))
         return false;
-    
+
     const auto &value = m_timeZones[index];
     return ((value.primaryId() != kUnknownTimeZoneId) && (value.primaryId() != kDiffTimeZonesId));
 }
@@ -279,7 +279,7 @@ rtu::TimeZonesModel::TimeZonesModel(const api::ServerInfoPtrContainer &selectedS
     , m_helper(CREATE_MODEL_CHANGE_HELPER(this))
     , m_impl(new Impl(this, selectedServers))
 {
-    
+
 }
 
 rtu::TimeZonesModel::~TimeZonesModel()

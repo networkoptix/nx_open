@@ -129,8 +129,15 @@ QnPage {
                     selectionAllowed: false
                     inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
                     enabled: !connecting
-                    KeyNavigation.tab: loginField
+                    activeFocusOnTab: true
+                    Keys.onDownPressed: Main.focusNextItem(this)
+                    Keys.onUpPressed: Main.focusPrevItem(this)
                     onAccepted: KeyNavigation.tab.forceActiveFocus()
+                    onActiveFocusChanged:
+                    {
+                        if (activeFocus)
+                            flickable.ensureItemVisible(this)
+                    }
                 }
 
                 QnTextField {
@@ -143,8 +150,15 @@ QnPage {
                     inputMethodHints: Qt.ImhDigitsOnly
                     validator: IntValidator { bottom: 0; top: 32767 }
                     enabled: !connecting
-                    KeyNavigation.tab: loginField
+                    activeFocusOnTab: liteMode
+                    Keys.onDownPressed: Main.focusNextItem(this)
+                    Keys.onUpPressed: Main.focusPrevItem(this)
                     onAccepted: KeyNavigation.tab.forceActiveFocus()
+                    onActiveFocusChanged:
+                    {
+                        if (activeFocus)
+                            flickable.ensureItemVisible(this)
+                    }
                 }
             }
 
@@ -160,8 +174,15 @@ QnPage {
                     selectionAllowed: false
                     inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase | Qt.ImhSensitiveData
                     enabled: !connecting
-                    KeyNavigation.tab: passwordField
+                    activeFocusOnTab: true
+                    Keys.onDownPressed: Main.focusNextItem(this)
+                    Keys.onUpPressed: Main.focusPrevItem(this)
                     onAccepted: KeyNavigation.tab.forceActiveFocus()
+                    onActiveFocusChanged:
+                    {
+                        if (activeFocus)
+                            flickable.ensureItemVisible(this)
+                    }
                 }
 
                 QnTextField {
@@ -175,11 +196,18 @@ QnPage {
                     selectionAllowed: false
                     inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase | Qt.ImhSensitiveData | Qt.ImhHiddenText
                     enabled: !connecting
-                    KeyNavigation.tab: hostField
+                    activeFocusOnTab: true
+                    Keys.onDownPressed: Main.focusNextItem(this)
+                    Keys.onUpPressed: Main.focusPrevItem(this)
                     onAccepted: connect()
                     Component.onCompleted: {
                         if (Qt.platform.os == "android")
                             passwordCharacter = "\u2022"
+                    }
+                    onActiveFocusChanged:
+                    {
+                        if (activeFocus)
+                            flickable.ensureItemVisible(this)
                     }
                 }
             }
@@ -256,6 +284,9 @@ QnPage {
 
         Column {
             spacing: dp(1)
+            visible: discoveredSessionRepeater.count > 0
+
+            readonly property Item sessionsRepeater: discoveredSessionRepeater
 
             Text {
                 height: dp(40)
@@ -265,19 +296,42 @@ QnPage {
                 font.pixelSize: sp(16)
             }
 
-            Repeater {
+            Repeater
+            {
                 id: discoveredSessionRepeater
                 width: parent.width
 
-                model: QnDiscoveredSessionsModel {
+                model: QnDiscoveredSessionsModel
+                {
                     id: discoveredSessionsModel
                 }
 
-                QnDiscoveredSessionItem {
+                QnDiscoveredSessionItem
+                {
                     systemName: model.systemName
                     host: model.address
                     port: model.port
                     version: model.serverVersion
+                    activeFocusOnTab: true
+
+                    Rectangle
+                    {
+                        anchors.fill: parent
+                        color: "transparent"
+                        border.color: QnTheme.listSelectionBorder
+                        border.width: dp(4)
+                        visible: parent.activeFocus
+                    }
+
+                    Keys.onReturnPressed: open()
+                    Keys.onDownPressed: Main.focusNextItem(this)
+                    Keys.onUpPressed: Main.focusPrevItem(this)
+
+                    onActiveFocusChanged:
+                    {
+                        if (activeFocus)
+                            flickable.ensureItemVisible(this)
+                    }
                 }
             }
         }
@@ -288,9 +342,18 @@ QnPage {
     states: [
         State {
             name: "New"
-            PropertyChanges {
+            PropertyChanges
+            {
                 target: discoveredSessionsLoader
                 sourceComponent: discoveredSessionsList
+            }
+            StateChangeScript
+            {
+                script:
+                {
+                    if (liteMode)
+                        hostField.forceActiveFocus()
+                }
             }
         },
         State {
@@ -386,10 +449,17 @@ QnPage {
 
     focus: true
 
-    Keys.onReleased: {
-        if (Main.keyIsBack(event.key)) {
+    Keys.onReleased:
+    {
+        if (Main.keyIsBack(event.key))
+        {
             if (Main.backPressed())
                 event.accepted = true
+        }
+        else if (event.key == Qt.Key_F2)
+        {
+            if (state == "New")
+                sideNavigation.open = !sideNavigation.open
         }
     }
 }

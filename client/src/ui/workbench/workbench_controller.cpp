@@ -691,8 +691,11 @@ void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &r
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
+
+#include <ui/workbench/workbench_welcome_screen.h>
+
 void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event) {
-    if(event->type() != QEvent::KeyPress)
+    if (event->type() != QEvent::KeyPress)
         return;
 
     event->accept(); /* Accept by default. */

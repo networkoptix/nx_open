@@ -58,14 +58,14 @@ qint64 QnWorkbenchServerTimeWatcher::utcOffset(const QnMediaResourcePtr &resourc
     if(QnAviResourcePtr fileResource = resource.dynamicCast<QnAviResource>()) {
         qint64 result = fileResource->timeZoneOffset();
         if (result != Qn::InvalidUtcOffset)
-            Q_ASSERT_X(fileResource->hasFlags(Qn::utc), Q_FUNC_INFO, "Only utc resources should have offset.");
+            NX_ASSERT(fileResource->hasFlags(Qn::utc), Q_FUNC_INFO, "Only utc resources should have offset.");
         return result == Qn::InvalidUtcOffset
             ? defaultValue
             : result;
     }
 
     if (QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(resource->toResource()->getParentId())) {
-        Q_ASSERT_X(resource->toResourcePtr()->hasFlags(Qn::utc), Q_FUNC_INFO, "Only utc resources should have offset.");
+        NX_ASSERT(resource->toResourcePtr()->hasFlags(Qn::utc), Q_FUNC_INFO, "Only utc resources should have offset.");
         return utcOffset(server, defaultValue);
     }
 

@@ -8,7 +8,7 @@
 #include "plugins/resource/avi/avi_resource.h"
 #include "core/resource_management/resource_pool.h"
 
-QnLayoutResource::QnLayoutResource(const QnResourceTypePool* resTypePool):
+QnLayoutResource::QnLayoutResource():
     base_type(),
     m_cellAspectRatio(-1.0),
     m_cellSpacing(-1.0, -1.0),
@@ -18,7 +18,7 @@ QnLayoutResource::QnLayoutResource(const QnResourceTypePool* resTypePool):
     m_locked(false)
 {
     addFlags(Qn::layout);
-    setTypeId(resTypePool->getFixedResourceTypeId(QnResourceTypePool::kLayoutTypeId));
+    setTypeId(qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kLayoutTypeId));
 }
 
 QString QnLayoutResource::getUniqueId() const {
@@ -35,7 +35,7 @@ Qn::ResourceStatus QnLayoutResource::getStatus() const {
 QnLayoutResourcePtr QnLayoutResource::clone() const {
     QnMutexLocker locker( &m_mutex );
 
-    QnLayoutResourcePtr result(new QnLayoutResource(qnResTypePool));
+    QnLayoutResourcePtr result(new QnLayoutResource());
     result->setId(QnUuid::createUuid());
     result->setName(m_name);
     result->setParentId(m_parentId);

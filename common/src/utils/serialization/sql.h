@@ -72,7 +72,7 @@ namespace QnSql {
 
         QSqlRecord record = query.record();
         QnSqlIndexMapping mapping = QnSql::mapping<value_type>(query);
-        
+
         while(query.next()) {
             target->push_back(value_type());
             QnSql::fetch(mapping, query.record(), &target->back());
@@ -115,5 +115,24 @@ namespace QnSql {
     }
 
 } // namespace QnSql
+
+  /* Some fields are not meant to be bound or fetched. */
+template<class T, class Allocator>
+inline void serialize_field(const std::vector<T, Allocator> &, QVariant *) { return; }
+template<class Key, class T, class Predicate, class Allocator>
+inline void serialize_field(const std::map<Key, T, Predicate, Allocator> &, QVariant *) { return; }
+template<class Key, class T>
+inline void serialize_field(const QMap<Key, T> &, QVariant *) { return; }
+template<class T>
+inline void serialize_field(const QList<T> &, QVariant *) { return; }
+
+template<class T, class Allocator>
+inline void deserialize_field(const QVariant &, std::vector<T, Allocator> *) { return; }
+template<class Key, class T, class Predicate, class Allocator>
+inline void deserialize_field(const QVariant &, std::map<Key, T, Predicate, Allocator> *) { return; }
+template<class Key, class T>
+inline void deserialize_field(const QVariant &, QMap<Key, T> *) { return; }
+template<class T>
+inline void deserialize_field(const QVariant &, QList<T> *) { return; }
 
 #endif // QN_SERIALIZATION_SQL_H

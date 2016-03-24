@@ -90,7 +90,7 @@ namespace ec2
         template<class T>
         void sendTransaction(const QnTransaction<T>& tran, const QnPeerSet& dstPeers = QnPeerSet())
         {
-            Q_ASSERT(tran.command != ApiCommand::NotDefined);
+            NX_ASSERT(tran.command != ApiCommand::NotDefined);
             QnMutexLocker lock( &m_mutex );
             if (m_connections.isEmpty())
                 return;

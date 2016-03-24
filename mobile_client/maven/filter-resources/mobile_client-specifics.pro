@@ -15,7 +15,8 @@ INCLUDEPATH += \
 
 
 unix: !ios {
-    QMAKE_LFLAGS += "-Wl,-rpath-link,${libdir}/lib/$$CONFIGURATION/"
+    LIBS += "-Wl,-rpath-link,${libdir}/lib/$$CONFIGURATION/"
+    LIBS += "-Wl,-rpath-link,$$OPENSSL_DIR/lib"
 }
 
 android {
@@ -60,3 +61,5 @@ ios {
     XCODEBUILD_FLAGS += PROVISIONING_PROFILE=${provisioning_profile_id}
     XCODEBUILD_FLAGS += CODE_SIGN_ENTITLEMENTS=mobile_client.entitlements
 }
+
+SOURCES += ${project.build.directory}/mobile_client_app_info_impl.cpp

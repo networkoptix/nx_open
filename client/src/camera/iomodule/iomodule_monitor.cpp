@@ -67,7 +67,7 @@ bool QnIOModuleMonitor::open()
 
     QnRoute route = QnRouter::instance()->routeTo(server->getId());
     if (!route.gatewayId.isNull()) {
-        Q_ASSERT(!route.addr.isNull());
+        NX_ASSERT(!route.addr.isNull());
         requestUrl.setHost(route.addr.address.toString());
         requestUrl.setPort(route.addr.port);
     }
@@ -82,7 +82,7 @@ bool QnIOModuleMonitor::open()
 
 void QnIOModuleMonitor::at_MonitorResponseReceived( nx_http::AsyncHttpClientPtr httpClient )
 {
-    Q_ASSERT( httpClient );
+    NX_ASSERT( httpClient );
     QnMutexLocker lk( &m_mutex );
 
     if (httpClient != m_httpClient)
@@ -109,7 +109,7 @@ void QnIOModuleMonitor::at_MonitorResponseReceived( nx_http::AsyncHttpClientPtr 
 
 void QnIOModuleMonitor::at_MonitorMessageBodyAvailable( nx_http::AsyncHttpClientPtr httpClient )
 {
-    Q_ASSERT( httpClient );
+    NX_ASSERT( httpClient );
     QnMutexLocker lk( &m_mutex );
     if (httpClient == m_httpClient) {
         const nx_http::BufferType& msgBodyBuf = httpClient->fetchMessageBodyBuffer();

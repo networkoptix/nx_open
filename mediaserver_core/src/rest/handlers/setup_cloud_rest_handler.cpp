@@ -3,8 +3,51 @@
 #include <nx/network/http/httptypes.h>
 #include "media_server/serverutil.h"
 #include "save_cloud_system_credentials.h"
+#include <api/model/cloud_credentials_data.h>
+#include <core/resource_management/resource_pool.h>
+#include <common/common_module.h>
+#include <core/resource/media_server_resource.h>
 
-int QnSetupCloudSystemRestHandler::executeGet(const QString&, const QnRequestParams & params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner)
+namespace
+{
+    static const QString kSystemNameParamName(QLatin1String("systemName"));
+}
+
+struct SetupRemoveSystemData : public CloudCredentialsData
+{
+    SetupRemoveSystemData() : CloudCredentialsData() {}
+
+    SetupRemoveSystemData(const QnRequestParams& params) :
+        CloudCredentialsData(params),
+        systemName(params.value(kSystemNameParamName))
+    {
+    }
+
+    QString systemName;
+};
+
+#define SetupRemoveSystemData_Fields CloudCredentialsData_Fields (systemName)
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (SetupRemoveSystemData),
+    (json),
+    _Fields,
+    (optional, true));
+
+int QnSetupCloudSystemRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*)
+{
+    Q_UNUSED(path);
+    return execute(std::move(SetupRemoveSystemData(params)), result);
+}
+
+int QnSetupCloudSystemRestHandler::executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor*)
+{
+    QN_UNUSED(path, params);
+    const SetupRemoveSystemData data = QJson::deserialized<SetupRemoveSystemData>(body);
+    return execute(std::move(data), result);
+}
+
+int QnSetupCloudSystemRestHandler::execute(SetupRemoveSystemData data, QnJsonRestResult &result)
 {
     nx::SystemName systemName;
     systemName.loadFromConfig();
@@ -14,19 +57,22 @@ int QnSetupCloudSystemRestHandler::executeGet(const QString&, const QnRequestPar
         return nx_http::StatusCode::ok;
     }
 
-    QString newSystemName = params.value(lit("systemName"));
+    QString newSystemName = data.systemName;
     if (newSystemName.isEmpty())
     {
         result.setError(QnJsonRestResult::MissingParameter, lit("Parameter 'systemName' must be provided."));
         return nx_http::StatusCode::ok;
     }
 
-    if (!changeSystemName(newSystemName, 0, 0))
+    if (!qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID()))
     {
-        result.setError(QnRestResult::CantProcessRequest, lit("Internal server error. Can't change system name."));
-        return nx_http::StatusCode::internalServerError;
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("Cannot find self server resource."));
+        return nx_http::StatusCode::ok;
     }
 
     QnSaveCloudSystemCredentialsHandler subHundler;
-    return subHundler.executeGet(QString(), params, result, owner);
+    int httpResult = subHundler.execute(data, result);
+    if (result.error == QnJsonRestResult::NoError)
+        changeSystemName(newSystemName, 0, 0);
+    return httpResult;
 }

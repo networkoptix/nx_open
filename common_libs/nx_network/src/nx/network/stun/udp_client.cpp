@@ -87,10 +87,10 @@ void UDPClient::sendRequestTo(
         [this, address = std::move(serverAddress),
                request = std::move(request),
                handler = std::move(completionHandler)]() mutable
-    {
-        sendRequestInternal(
-            std::move(address), std::move(request), std::move(handler));
-    });
+        {
+            sendRequestInternal(
+                std::move(address), std::move(request), std::move(handler));
+        });
 }
 
 void UDPClient::sendRequest(

@@ -9,24 +9,29 @@
 #include <QtCore/QObject>
 #include <QtCore/QString>
 
+#include <cdb/connection.h>
 #include <core/resource/resource_fwd.h>
+#include <nx/network/cloud/abstract_cloud_system_credentials_provider.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/singleton.h>
 #include <utils/common/safe_direct_connection.h>
-#include <cdb/connection.h>
 
 
 class CloudConnectionManager
 :
     public QObject,
     public Singleton<CloudConnectionManager>,
-    public Qn::EnableSafeDirectConnection
+    public Qn::EnableSafeDirectConnection,
+    public nx::hpm::api::AbstractCloudSystemCredentialsProvider
 {
-    Q_OBJECT 
+    Q_OBJECT
 
 public:
     CloudConnectionManager();
     ~CloudConnectionManager();
+
+    virtual boost::optional<nx::hpm::api::SystemCredentials>
+        getSystemCredentials() const override;
 
     bool bindedToCloud() const;
     std::unique_ptr<nx::cdb::api::Connection> getCloudConnection();
@@ -46,8 +51,7 @@ private:
     bool bindedToCloud(QnMutexLockerBase* const lk) const;
 
 private slots:
-    void atResourceAdded(const QnResourcePtr& res);
-    void atAdminPropertyChanged(const QnResourcePtr& res, const QString& key);
+    void cloudSettingsChanged();
 };
 
 #endif  //NX_MS_CLOUD_CONNECTION_MANAGER_H

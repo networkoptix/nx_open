@@ -1305,7 +1305,7 @@ void rtu::ApplyChangesTask::Impl::addIpChangeRequests()
     {
         auto &cacheInfo = m_serversCache[i];
         Q_ASSERT_X(cacheInfo.second.interfaces.size() == 1, Q_FUNC_INFO
-            , "Can't apply changese on several servers with multiple or empty interfaces");
+            , "Can't apply changes on several servers with multiple or empty interfaces");
 
         if (cacheInfo.second.interfaces.empty())
             continue;

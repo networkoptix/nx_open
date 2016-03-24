@@ -5,11 +5,14 @@
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/user_resource.h"
 #include "core/resource/media_server_resource.h"
+
 #include "nx_ec/ec_api.h"
 #include "nx_ec/dummy_handler.h"
 #include "nx_ec/data/api_user_data.h"
 #include "nx_ec/data/api_conversion_functions.h"
 #include "nx_ec/ec2_lib.h"
+#include <nx_ec/managers/abstract_user_manager.h>
+
 #include "api/app_server_connection.h"
 #include "common/common_module.h"
 #include "media_server/settings.h"
@@ -351,9 +354,10 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
     }
 
     ec2::ErrorCode errorCode;
-    QnUserResourceList users;
 
-    errorCode = ec2Connection()->getUserManager()->saveSync(admin, &users);
+    ec2::ApiUserData userData;
+    fromResourceToApi(admin, userData);
+    errorCode = ec2Connection()->getUserManager()->saveSync(userData);
     if (errorCode != ec2::ErrorCode::ok)
     {
         NX_LOG(lit("QnMergeSystemsRestHandler::applyRemoteSettings. Failed to save admin user: %1")

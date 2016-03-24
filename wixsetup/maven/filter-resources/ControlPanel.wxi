@@ -1,3 +1,4 @@
+<?include BuildVars.wxi ?>
 <Include>
   <Property Id="ARPCOMMENTS" Value="${company.name} ${display.product.name}" />
   <Property Id="ARPCONTACT" Value="${company.url}" />
@@ -29,6 +30,7 @@
   </InstallExecuteSequence>
 
     <DirectoryRef Id="INSTALLDIR">
+        <Directory Id="$(var.SystemFolderActual)" />
         <Directory Id="Common" Name="Common">
             <Directory Id="Resource" Name="Resource">
                 <Component Id="AlwaysFiles">

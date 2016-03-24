@@ -62,7 +62,7 @@ QnPage {
                 sideNavigation.enabled = true
             }
         }
-        visible: (pageStatus == Stack.Active || pageStatus == Stack.Activating)
+        visible: !liteMode && (pageStatus == Stack.Active || pageStatus == Stack.Activating)
         Keys.forwardTo: resourcesPage
 
         enabled: !d.serverOfflineWarningVisible && !loadingDummy.visible
@@ -202,14 +202,23 @@ QnPage {
 
     focus: true
 
-    Keys.onReleased: {
-        if (Main.keyIsBack(event.key)) {
-            if (searchItem.opened) {
+    Keys.onReleased:
+    {
+        if (Main.keyIsBack(event.key))
+        {
+            if (searchItem.opened)
+            {
                 searchItem.close()
                 event.accepted = true
-            } else if (Main.backPressed()) {
+            }
+            else if (Main.backPressed())
+            {
                 event.accepted = true
             }
+        }
+        else if (event.key == Qt.Key_F2)
+        {
+            sideNavigation.open = !sideNavigation.open
         }
     }
 }

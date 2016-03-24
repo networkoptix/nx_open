@@ -16,7 +16,7 @@
 template<class T>
 bool InstrumentEventDispatcherBase<T>::eventFilter(QObject *target, QEvent *event) {
     /* This is ensured by Qt. Assert just to feel safe. */
-    assert(target->thread() == thread());
+    NX_ASSERT(target->thread() == thread());
 
     /* We're using static_cast here as the actual type of the target is checked 
      * inside the dispatch function. */
@@ -93,7 +93,7 @@ void InstrumentEventDispatcher<T>::uninstallInstrumentInternal(Instrument *instr
 
 template<class T>
 void InstrumentEventDispatcher<T>::installInstrument(Instrument *instrument, InstallationMode::Mode mode, Instrument *reference) {
-    assert(instrument != NULL);
+    NX_ASSERT(instrument != NULL);
 
     if (m_instruments.contains(instrument)) {
         qnWarning("Instrument '%1' is already registered with this instrument event dispatcher.", instrument->metaObject()->className());
@@ -114,7 +114,7 @@ void InstrumentEventDispatcher<T>::installInstrument(Instrument *instrument, Ins
 
 template<class T>
 void InstrumentEventDispatcher<T>::uninstallInstrument(Instrument *instrument) {
-    assert(instrument != NULL);
+    NX_ASSERT(instrument != NULL);
 
     if (!m_instruments.contains(instrument)) {
         qnWarning("Instrument '%1' is not registered with this instrument event dispatcher.", instrument->metaObject()->className());
@@ -130,7 +130,7 @@ void InstrumentEventDispatcher<T>::uninstallInstrument(Instrument *instrument) {
 
 template<class T>
 void InstrumentEventDispatcher<T>::registerTarget(T *target) {
-    assert(target != NULL);
+    NX_ASSERT(target != NULL);
 
     if(m_typeInfoByTarget.contains(target)) {
         qnWarning("Given target is already registered with this instrument event dispatcher.");
@@ -145,7 +145,7 @@ void InstrumentEventDispatcher<T>::registerTarget(T *target) {
 
 template<class T>
 void InstrumentEventDispatcher<T>::unregisterTarget(T *target) {
-    assert(target != NULL);
+    NX_ASSERT(target != NULL);
 
     if(!m_typeInfoByTarget.contains(target)) {
         qnWarning("Given target is not registered with this instrument event dispatcher.");
@@ -170,7 +170,7 @@ bool InstrumentEventDispatcher<T>::dispatch(T *target, QEvent *event) {
     }
 
     QList<Instrument *> &instruments = pos->instruments;
-    assert(!instruments.isEmpty()); /* We remove empty lists right away, so this assertion is valid. */
+    NX_ASSERT(!instruments.isEmpty()); /* We remove empty lists right away, so this assertion is valid. */
 
     /* Check if target is not being destroyed. 
      * 

@@ -4,7 +4,7 @@
 
 #include "login_sessions_model.h"
 #include <context/login_session.h>
-#include <utils/network/socket_common.h>
+#include <nx/network/socket_common.h>
 
 class QnSavedSessionsModel : public QnLoginSessionsModel
 {

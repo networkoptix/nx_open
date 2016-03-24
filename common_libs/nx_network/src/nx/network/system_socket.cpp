@@ -167,6 +167,9 @@ void Socket<InterfaceToImplement>::close()
     if( m_fd == -1 )
         return;
 
+    //checking that socket is not registered in aio
+    NX_ASSERT(!nx::network::SocketGlobals::aioService().isSocketBeingWatched(static_cast<Pollable*>(this)));
+
 #ifdef WIN32
     ::closesocket(m_fd);
 #else
@@ -209,9 +212,6 @@ bool Socket<InterfaceToImplement>::getReuseAddrFlag( bool* val ) const
 template<typename InterfaceToImplement>
 bool Socket<InterfaceToImplement>::setNonBlockingMode( bool val )
 {
-    if( val == m_nonBlockingMode )
-        return true;
-
 #ifdef _WIN32
     u_long _val = val ? 1 : 0;
     if( ioctlsocket( m_fd, FIONBIO, &_val ) == 0 )
@@ -801,9 +801,6 @@ bool CommunicatingSocket<InterfaceToImplement>::isConnected() const
 template<typename InterfaceToImplement>
 void CommunicatingSocket<InterfaceToImplement>::close()
 {
-    //checking that socket is not registered in aio
-    NX_ASSERT( !nx::network::SocketGlobals::aioService().isSocketBeingWatched( static_cast<Pollable*>(this) ) );
-
     m_connected = false;
     Socket<InterfaceToImplement>::close();
 }
@@ -837,7 +834,11 @@ void CommunicatingSocket<InterfaceToImplement>::connectAsync(
     const SocketAddress& addr,
     nx::utils::MoveOnlyFunc<void( SystemError::ErrorCode )> handler )
 {
-    return m_aioHelper->connectAsync( addr, std::move(handler) );
+    return m_aioHelper->connectAsync(addr, [handler = std::move(handler), this] (SystemError::ErrorCode code)
+    {
+        m_connected = (code == SystemError::noError);
+        handler(code);
+    });
 }
 
 template<typename InterfaceToImplement>
@@ -1167,7 +1168,7 @@ static int acceptWithTimeout( int m_fd,
         ::SetLastError( errorCode );
         return -1;
     }
-    return ::accept( m_fd, NULL, NULL );
+    return ::accept(m_fd, NULL, NULL);
 #else
     struct pollfd sockPollfd;
     memset( &sockPollfd, 0, sizeof(sockPollfd) );
@@ -1275,12 +1276,24 @@ int TCPServerSocket::accept(int sockDesc)
 }
 
 void TCPServerSocket::acceptAsync(
-    std::function<void(
+    nx::utils::MoveOnlyFunc<void(
         SystemError::ErrorCode,
         AbstractStreamSocket*)> handler)
 {
     TCPServerSocketPrivate* d = static_cast<TCPServerSocketPrivate*>(impl());
     return d->asyncServerSocketHelper.acceptAsync( std::move(handler) );
+}
+
+void TCPServerSocket::cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler)
+{
+    TCPServerSocketPrivate* d = static_cast<TCPServerSocketPrivate*>(impl());
+    return d->asyncServerSocketHelper.cancelIOAsync(std::move(handler));
+}
+
+void TCPServerSocket::cancelIOSync()
+{
+    TCPServerSocketPrivate* d = static_cast<TCPServerSocketPrivate*>(impl());
+    return d->asyncServerSocketHelper.cancelIOSync();
 }
 
 //!Implementation of AbstractStreamServerSocket::listen
@@ -1326,7 +1339,22 @@ AbstractStreamSocket* TCPServerSocket::systemAccept()
     if (!getNonBlockingMode(&nonBlockingMode))
         return nullptr;
 
-    return d->accept(recvTimeoutMs, nonBlockingMode);
+    auto* acceptedSocket = d->accept(recvTimeoutMs, nonBlockingMode);
+    if (!acceptedSocket)
+        return nullptr;
+#ifdef _WIN32
+    if (!nonBlockingMode)
+        return acceptedSocket;
+
+    //moving socket to blocking mode by default to be consistent with msdn 
+        //(https://msdn.microsoft.com/en-us/library/windows/desktop/ms738573(v=vs.85).aspx)
+    if (!acceptedSocket->setNonBlockingMode(false))
+    {
+        delete acceptedSocket;
+        return nullptr;
+    }
+#endif
+    return acceptedSocket;
 }
 
 bool TCPServerSocket::setListen(int queueLen)

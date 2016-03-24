@@ -93,7 +93,7 @@ QnClientSettings::QnClientSettings(bool forceLocalSettings, QObject *parent):
     if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QJsonObject jsonObject;
         if(!QJson::deserialize(file.readAll(), &jsonObject)) {
-            Q_ASSERT_X(false, Q_FUNC_INFO, "Client settings file could not be parsed!");
+            NX_ASSERT(false, Q_FUNC_INFO, "Client settings file could not be parsed!");
         } else {
             updateFromJson(jsonObject.value(lit("settings")).toObject());
         }
@@ -103,7 +103,7 @@ QnClientSettings::QnClientSettings(bool forceLocalSettings, QObject *parent):
     load();
 
     /* Update showcase url from external source. */
-    Q_ASSERT_X(!isShowcaseEnabled(), Q_FUNC_INFO, "Paxton dll crashes here, make sure showcase fucntionality is disabled");
+    NX_ASSERT(!isShowcaseEnabled(), Q_FUNC_INFO, "Paxton dll crashes here, make sure showcase fucntionality is disabled");
     if (isShowcaseEnabled())
         loadFromWebsite();
 

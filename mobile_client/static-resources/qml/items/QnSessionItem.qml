@@ -61,7 +61,10 @@ QnSideNavigationItem {
         }
     }
 
-    onClicked: {
+    onClicked: open()
+
+    function open()
+    {
         if (!active) {
             connectionManager.disconnectFromServer(false)
             mainWindow.currentSystemName = systemName

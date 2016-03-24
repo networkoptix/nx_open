@@ -204,6 +204,7 @@ TEST(CloudServerSocketBaseTcpTest, OpenTunnelOnIndication)
     auto server = std::make_unique<CloudServerSocket>(
         std::make_shared<hpm::api::MediatorServerTcpConnection>(
             stunAsyncClient, nullptr),
+        nx::network::RetryPolicy(),
         std::move(acceptorMakers));
     ASSERT_TRUE(server->setNonBlockingMode(true));
     ASSERT_TRUE(server->listen(1));
@@ -264,6 +265,7 @@ protected:
         m_server = std::make_unique<CloudServerSocket>(
             std::make_shared<hpm::api::MediatorServerTcpConnection>(
                 m_stunClient, nullptr),
+            nx::network::RetryPolicy(),
             std::move(acceptorMakers));
         ASSERT_TRUE(m_server->setNonBlockingMode(true));
         ASSERT_TRUE(m_server->listen(10));

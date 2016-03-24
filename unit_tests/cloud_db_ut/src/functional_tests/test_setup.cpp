@@ -17,11 +17,11 @@
 #include <cdb/account_manager.h>
 #include <utils/common/cpp14.h>
 #include <utils/common/sync_call.h>
+#include <utils/common/app_info.h>
 #include <nx/network/http/auth_tools.h>
 
 #include <libcloud_db/src/managers/email_manager.h>
 
-#include "version.h"
 #include "email_manager_mocked.h"
 
 
@@ -172,7 +172,7 @@ api::ResultCode CdbFunctionalTest::addAccount(
         *password = ss.str();
     }
 
-    assert(!moduleInfo().realm.empty());
+    NX_ASSERT(!moduleInfo().realm.empty());
 
     if (accountData->fullName.empty())
         accountData->fullName = "Account " + accountData->email + " full name";
@@ -183,7 +183,7 @@ api::ResultCode CdbFunctionalTest::addAccount(
             moduleInfo().realm.c_str(),
             password->c_str()).constData();
     if (accountData->customization.empty())
-        accountData->customization = QN_CUSTOMIZATION_NAME;
+        accountData->customization = QnAppInfo::customizationName();
 
     auto connection = connectionFactory()->createConnection("", "");
 
@@ -414,7 +414,7 @@ api::ResultCode CdbFunctionalTest::getSystem(
 api::ResultCode CdbFunctionalTest::shareSystem(
     const std::string& email,
     const std::string& password,
-    const QnUuid& systemID,
+    const std::string& systemID,
     const std::string& accountEmail,
     api::SystemAccessRole accessRole)
 {
@@ -440,7 +440,7 @@ api::ResultCode CdbFunctionalTest::shareSystem(
 api::ResultCode CdbFunctionalTest::updateSystemSharing(
     const std::string& email,
     const std::string& password,
-    const QnUuid& systemID,
+    const std::string& systemID,
     const std::string& accountEmail,
     api::SystemAccessRole newAccessRole)
 {
@@ -573,7 +573,7 @@ api::ResultCode CdbFunctionalTest::ping(
 const api::SystemSharingEx& CdbFunctionalTest::findSharing(
     const std::vector<api::SystemSharingEx>& sharings,
     const std::string& accountEmail,
-    const QnUuid& systemID) const
+    const std::string& systemID) const
 {
     static const api::SystemSharingEx kDummySharing;
 
@@ -589,7 +589,7 @@ const api::SystemSharingEx& CdbFunctionalTest::findSharing(
 api::SystemAccessRole CdbFunctionalTest::accountAccessRoleForSystem(
     const std::vector<api::SystemSharingEx>& sharings,
     const std::string& accountEmail,
-    const QnUuid& systemID) const
+    const std::string& systemID) const
 {
     return findSharing(sharings, accountEmail, systemID).accessRole;
 }
@@ -598,7 +598,7 @@ api::SystemAccessRole CdbFunctionalTest::accountAccessRoleForSystem(
 namespace api {
     bool operator==(const api::AccountData& left, const api::AccountData& right)
     {
-        return 
+        return
             left.id == right.id &&
             left.email == right.email &&
             left.passwordHa1 == right.passwordHa1 &&

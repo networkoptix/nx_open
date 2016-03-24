@@ -83,7 +83,7 @@ namespace ec2
                     } else if(format == Qn::XmlFormat) {
                         result = QnXml::serialized(outputData, lit("reply"));
                     } else {
-                        assert(false);
+                        NX_ASSERT(false);
                     }
                 }
                 errorCode = _errorCode;

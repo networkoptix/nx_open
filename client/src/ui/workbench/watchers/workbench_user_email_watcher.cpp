@@ -43,7 +43,7 @@ void QnWorkbenchUserEmailWatcher::forceCheckAll() {
 }
 
 bool QnWorkbenchUserEmailWatcher::isUserEmailValid(const QnUserResourcePtr &user) const {
-    Q_ASSERT_X(user, Q_FUNC_INFO, "User must exist here");
+    NX_ASSERT(user, Q_FUNC_INFO, "User must exist here");
     if (!user)
         return true;
 

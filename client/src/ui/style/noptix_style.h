@@ -25,7 +25,6 @@ public:
     virtual void drawComplexControl(ComplexControl control, const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget = 0) const override;
     virtual void drawControl(ControlElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget = 0) const override;
     virtual void drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget = 0) const override;
-    virtual int pixelMetric(PixelMetric metric, const QStyleOption *option, const QWidget *widget) const override;
 
     virtual int styleHint(StyleHint hint, const QStyleOption *option = 0, const QWidget *widget = 0, QStyleHintReturn *returnData = 0) const override;
 
@@ -66,7 +65,7 @@ private:
 
 /**
  * Name of a property to set on a <tt>QAction</tt> that is checkable, but for
- * which checkbox must not be displayed in a menu. 
+ * which checkbox must not be displayed in a menu.
  */
 #define HideCheckBoxInMenu              _id("_qn_hideCheckBoxInMenu")
 
@@ -75,12 +74,6 @@ private:
  * default opacity if its items' background.
  */
 #define ItemViewItemBackgroundOpacity   _id("_qn_itemViewItemBackgroundOpacity")
-
-/**
- * Name of a property to set on a <tt>QAbstractSlider</tt> or 
- * <tt>AbstractGraphicsSlider</tt> to change default width of the slider handle.
- */
-#define SliderLength                    _id("_qn_sliderLength")
 
 /**
  * Name of a property to set on a <tt>QToolButton</tt> to make it rotate

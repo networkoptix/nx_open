@@ -66,7 +66,7 @@ void QnWorkbenchUserLayoutCountWatcher::at_resourcePool_resourceRemoved(const Qn
 
 void QnWorkbenchUserLayoutCountWatcher::at_resource_parentIdChanged(const QnResourcePtr &resource, bool update) {
     QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>();
-    Q_ASSERT_X(layout, Q_FUNC_INFO, "We are listening to layouts only");
+    NX_ASSERT(layout, Q_FUNC_INFO, "We are listening to layouts only");
     if(!layout)
         return;
 

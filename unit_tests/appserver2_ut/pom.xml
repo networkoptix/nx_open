@@ -1,11 +1,4 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <!--
-    Example pom for delegating maven goals to msbuild so it builds the "solution"
-
-    A solution can be a group of projects, but here we only have one.
-    It should also be possible to have one maven project per solution project,
-    and have a parent pom to deletegate the build.
-  -->
     <parent>
         <artifactId>build_ut</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
@@ -18,25 +11,24 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>appserver2_ut</artifactId>
     <packaging>pom</packaging>
-    <name>appserver2 unit tests</name>
+    <name>Nx Witness AppServer2 Unit Tests</name>
 
     <properties>
-        <guid>${appserver2.guid}</guid>
-        <product.title>appserver2 unit tests</product.title>
+        <guid>${appserver2_ut.guid}</guid>
+        <product.title>${appserver2.name} Unit Tests</product.title>
         <root.dir>${basedir}/../..</root.dir>
         <!--Specify the project to test-->      
         <master.project.directory>appserver2</master.project.directory>
         <!--Global libs-->
-        <qt.libs>core network xml xmlpatterns sql concurrent multimedia</qt.libs>
-        <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lswresample -lpostproc</ffmpeg.libs>
-        <global.libs>-lmediaserver_core -lcommon -lappserver2 -lonvif -lnxemail</global.libs>
+        <qt.libs>core gui network xml sql concurrent</qt.libs>
+        <ffmpeg.libs></ffmpeg.libs>
+        <global.libs>-lcommon -lnx_streaming -lnx_network -lappserver2 -lnx_utils</global.libs>
         <!--Specific os libs used-->
-        <windows.oslibs>Ws2_32.lib DbgHelp.lib sigar.lib -lIphlpapi -lwinmm Wldap32.lib Crypt32.lib</windows.oslibs>
-        <linux.oslibs>-lmp3lame -lsigar -lfaac -lvpx -lvorbisenc -lvorbis -ldl -lldap</linux.oslibs>
-        <linux.arm.oslibs>-llber -lsasl2 -lsigar</linux.arm.oslibs>
-        <windows.oslibs.release></windows.oslibs.release>
-        <windows.oslibs.debug></windows.oslibs.debug>
-        <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices -lsigar-universal64-macosx</mac.oslibs>
+        <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm</windows.oslibs>
+        <linux.oslibs></linux.oslibs>
+        <windows.oslibs.release/>
+        <windows.oslibs.debug/>     
+        <mac.oslibs>-lbz2 -lz -framework IOKit -framework CoreServices</mac.oslibs>
         <!--Global defines-->
         <global.defines></global.defines>
         <!--Specific os defines-->

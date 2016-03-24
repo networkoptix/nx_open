@@ -19,8 +19,7 @@
 #ifndef EMAILADDRESS_H
 #define EMAILADDRESS_H
 
-#include <QtCore/QString>
-
+#include <common/common_globals.h>
 
 class EmailAddress
 {

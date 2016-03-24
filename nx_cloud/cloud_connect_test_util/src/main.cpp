@@ -7,6 +7,7 @@
 
 #include <nx/network/cloud/cloud_server_socket.h>
 #include <nx/network/cloud/cloud_stream_socket.h>
+#include <nx/network/http/httpclient.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/test_support/socket_test_helper.h>
 
@@ -14,9 +15,10 @@
 #include <utils/common/string.h>
 
 
-void printHelp();
+void printHelp(int argc, char* argv[]);
 int runInListenMode(const std::multimap<QString, QString>& args);
 int runInConnectMode(const std::multimap<QString, QString>& args);
+int runInHttpClientMode(const std::multimap<QString, QString>& args);
 
 int main(int argc, char* argv[])
 {
@@ -24,21 +26,32 @@ int main(int argc, char* argv[])
     parseCmdArgs(argc, argv, &args);
     if (args.find("help") != args.end())
     {
-        printHelp();
+        printHelp(argc, argv);
         return 0;
     }
 
     nx::network::SocketGlobals::InitGuard socketGlobalsGuard;
 
-    //reading mode
+    // common options
+    const auto mediatorIt = args.find("enforce-mediator");
+    if (mediatorIt != args.end())
+    {
+        nx::network::SocketGlobals::mediatorConnector().
+            mockupAddress(mediatorIt->second);
+    }
+
+    // reading mode
     if (args.find("listen") != args.end())
         return runInListenMode(args);
 
     if (args.find("connect") != args.end())
         return runInConnectMode(args);
 
+    if (args.find("http-client") != args.end())
+        return runInHttpClientMode(args);
+
     std::cerr<<"error. Unknown mode"<<std::endl;
-    printHelp();
+    printHelp(argc, argv);
 
     return 0;
 }
@@ -135,6 +148,14 @@ int runInConnectMode(const std::multimap<QString, QString>& args)
     int bytesToSend = kDefaultBytesToSend;
     readArg(args, "bytes-to-send", &bytesToSend);
 
+    SocketFactory::setCreateStreamSocketFunc(
+        [](bool ssl, SocketFactory::NatTraversalType ntt)
+        {
+            static_cast<void>(ssl);
+            static_cast<void>(ntt);
+            return std::make_unique<nx::network::cloud::CloudStreamSocket>();
+        });
+
     nx::network::test::ConnectionsGenerator connectionsGenerator(
         SocketAddress(target),
         maxConcurrentConnections,
@@ -156,19 +177,46 @@ int runInConnectMode(const std::multimap<QString, QString>& args)
         "Total time: "<< testDuration.count() <<"s. "
         "Total connections: "<<connectionsGenerator.totalConnectionsEstablished()<<". "
         "Total bytes sent: "<<connectionsGenerator.totalBytesSent()<<". "
-        "Total bytes received: "<<connectionsGenerator.totalBytesReceived()<<
-        std::endl;
+        "Total bytes received: "<<connectionsGenerator.totalBytesReceived()<<". "
+        "Total errors: "<<connectionsGenerator.totalErrors().size()<<"."
+        <<std::endl;
 
     return 0;
 }
 
-void printHelp()
+int runInHttpClientMode(const std::multimap<QString, QString>& args)
+{
+    QString urlStr;
+    if (!readArg(args, "url", &urlStr))
+    {
+        std::cerr << "error. Required parameter \"url\" is missing" << std::endl;
+        return 1;
+    }
+
+    nx::network::SocketGlobals::mediatorConnector().enable(true);
+
+    nx_http::HttpClient client;
+    client.setSendTimeoutMs(15000);
+    if (!client.doGet(urlStr) || !client.response())
+    {
+        std::cerr<<"No response has been received"<<std::endl;
+        return 1;
+    }
+
+    std::cout<<"Received response:\n\n"
+        << client.response()->toString().toStdString()
+        <<"\n";
+
+    return 0;
+}
+
+void printHelp(int argc, char* argv[])
 {
     std::cout << 
         "\n"
         "Listen mode:\n"
         "  --listen                         Enable listen mode\n"
-        "  --cloud-credentials={system_id}:{authentication_key}"
+        "  --cloud-credentials={system_id}:{authentication_key}\n"
         "                                   Specify credentials to use to connect to mediator\n"
         "  --server-id={server_id}          Id used when registering on mediator\n"
         "\n"
@@ -180,6 +228,13 @@ void printHelp()
         "  --max-concurrent-connections={10}\n"
         "  --bytes-to-send={100000}         This number of bytes is sent to the target\n"
         "                                   before connection termination\n"
+        "\n"
+        "Http client mode:\n"
+        "  --http-client                    Enable Http client mode\n"
+        "  --url={http url}                 Url to trigger\n"
+        "\n"
+        "Common options:\n"
+        "  --enforce-mediator={endpoint}   Enforces custom mediator address\n"
         "\n"
         << std::endl;
 }

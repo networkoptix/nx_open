@@ -244,7 +244,7 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
         }
     }
 
-    assert( m_epollFD != -1 );
+    NX_ASSERT( m_epollFD != -1 );
     //polling audio and video streams
     for( ;; )
     {
@@ -283,7 +283,7 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
 #endif
             else
             {
-                assert( false );
+                NX_ASSERT( false );
                 return nxcip::NX_IO_ERROR;
             }
 

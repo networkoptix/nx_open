@@ -49,7 +49,7 @@ namespace test
             commonModule = std::unique_ptr<QnCommonModule>(
                 new QnCommonModule
             );
-            commonModule->setModuleGUID(lit("6F789D28-B675-49D9-AEC0-CEFFC99D674E"));
+            commonModule->setModuleGUID(QnUuid("6F789D28-B675-49D9-AEC0-CEFFC99D674E"));
 
             storageManager = std::unique_ptr<QnStorageManager>(
                 new QnStorageManager(QnServer::StoragePool::Normal)

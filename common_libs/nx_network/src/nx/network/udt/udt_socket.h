@@ -181,10 +181,6 @@ public:
     UdtStreamServerSocket();
     virtual ~UdtStreamServerSocket();
 
-    // AbstractStreamServerSocket -------------- interface
-    virtual bool listen( int queueLen = 128 ) ;
-    virtual AbstractStreamSocket* accept() ;
-    virtual void acceptAsync(std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)> handler);
     virtual void pleaseStop(nx::utils::MoveOnlyFunc< void() > handler) override;
 
     virtual bool bind(const SocketAddress& localAddress);
@@ -214,6 +210,18 @@ public:
     virtual void post( nx::utils::MoveOnlyFunc<void()> handler ) override;
     //!Implementation of AbstractSocket::dispatch
     virtual void dispatch( nx::utils::MoveOnlyFunc<void()> handler ) override;
+
+    // AbstractStreamServerSocket -------------- interface
+    virtual bool listen(int queueLen = 128);
+    virtual AbstractStreamSocket* accept();
+    virtual void acceptAsync(
+        nx::utils::MoveOnlyFunc<void(
+            SystemError::ErrorCode,
+            AbstractStreamSocket*)> handler);
+    //!Implementation of AbstractStreamServerSocket::cancelIOAsync
+    virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler) override;
+    //!Implementation of AbstractStreamServerSocket::cancelIOSync
+    virtual void cancelIOSync() override;
 
     /** This method is for use by \a AsyncServerSocketHelper only. It just calls system call \a accept */
     AbstractStreamSocket* systemAccept();

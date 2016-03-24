@@ -22,7 +22,7 @@
 
 namespace ec2
 {
-    ECConnectionNotificationManager::ECConnectionNotificationManager(const ResourceContext& resCtx,
+    ECConnectionNotificationManager::ECConnectionNotificationManager(
         AbstractECConnection* ecConnection,
         QnLicenseNotificationManager* licenseManager,
         QnResourceNotificationManager* resourceManager,
@@ -38,7 +38,6 @@ namespace ec2
         QnMiscNotificationManager *miscManager,
         QnDiscoveryNotificationManager *discoveryManager)
     :
-        m_resCtx( resCtx ),
         m_ecConnection( ecConnection ),
         m_licenseManager( licenseManager ),
         m_resourceManager( resourceManager ),
@@ -105,7 +104,7 @@ namespace ec2
         case ApiCommand::removeResources:
             return m_resourceManager->triggerNotification( tran );
         default:
-            assert( false );
+            NX_ASSERT( false );
         }
     }
 
@@ -133,13 +132,13 @@ namespace ec2
             //#ak no notification needed
             break;
         default:
-            assert( false );
+            NX_ASSERT( false );
         }
     }
 
     void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiRuntimeData>& tran )
     {
-        Q_ASSERT(tran.command == ApiCommand::runtimeInfoChanged);
+        NX_ASSERT(tran.command == ApiCommand::runtimeInfoChanged);
         emit m_ecConnection->runtimeInfoChanged(tran.params);
     }
 
@@ -150,7 +149,7 @@ namespace ec2
 
     void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiReverseConnectionData>& tran )
     {
-        Q_ASSERT(tran.command == ApiCommand::openReverseConnection);
+        NX_ASSERT(tran.command == ApiCommand::openReverseConnection);
         emit m_ecConnection->reverseConnectionRequested(tran.params);
     }
 
@@ -180,10 +179,6 @@ namespace ec2
 
     void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiMediaServerUserAttributesDataList>& tran ) {
         m_mediaServerManager->triggerNotification( tran );
-    }
-
-    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiResourceData>& tran ) {
-        m_resourceManager->triggerNotification( tran );
     }
 
     void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiResourceStatusData>& tran ) {
@@ -229,7 +224,7 @@ namespace ec2
     }
 
     void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiStoredFilePath>& tran ) {
-        assert(tran.command == ApiCommand::removeStoredFile);
+        NX_ASSERT(tran.command == ApiCommand::removeStoredFile);
         m_storedFileManager->triggerNotification(tran);
     }
 
@@ -238,9 +233,7 @@ namespace ec2
     }
 
     void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiFullInfoData>& tran ) {
-        QnFullResourceData fullResData;
-        fromApiToResourceList(tran.params, fullResData, m_resCtx);
-        emit m_ecConnection->initNotification(fullResData);
+        emit m_ecConnection->initNotification(tran.params);
         for(const ApiDiscoveryData& data: tran.params.discoveryData)
             m_discoveryManager->triggerNotification(data);
     }
@@ -256,7 +249,7 @@ namespace ec2
     }
 
     void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiUpdateInstallData>& tran ) {
-        assert(tran.command == ApiCommand::installUpdate);
+        NX_ASSERT(tran.command == ApiCommand::installUpdate);
         m_updatesManager->triggerNotification(tran);
     }
 

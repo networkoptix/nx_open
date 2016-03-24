@@ -43,9 +43,7 @@ namespace ec2
         public AbstractECConnection
     {
     public:
-        BaseEc2Connection(
-            QueryProcessorType* queryProcessor,
-            const ResourceContext& resCtx );
+        BaseEc2Connection(QueryProcessorType* queryProcessor);
         virtual ~BaseEc2Connection();
 
         virtual AbstractResourceManagerPtr getResourceManager() override;
@@ -84,7 +82,6 @@ namespace ec2
         virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const override;
     protected:
         QueryProcessorType* m_queryProcessor;
-        ResourceContext m_resCtx;
         std::shared_ptr<QnLicenseManager<QueryProcessorType>> m_licenseManager;
         std::shared_ptr<QnResourceManager<QueryProcessorType>> m_resourceManager;
         std::shared_ptr<QnMediaServerManager<QueryProcessorType>> m_mediaServerManager;

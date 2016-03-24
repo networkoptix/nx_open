@@ -1,5 +1,6 @@
 #include "camera_access_rights_helper.h"
 
+#include <nx/utils/log/assert.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -59,7 +60,7 @@ void QnCameraAccessRightsHelper::setResourceId(const QString &id)
         return;
 
     Q_D(QnCameraAccessRightsHelper);
-    d->camera = qnResPool->getResourceById<QnVirtualCameraResource>(id);
+    d->camera = qnResPool->getResourceById<QnVirtualCameraResource>(QnUuid(id));
     d->updateAccessRights();
 }
 
