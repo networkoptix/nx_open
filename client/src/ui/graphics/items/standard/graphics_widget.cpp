@@ -178,12 +178,7 @@ GraphicsWidget::GraphicsWidget(GraphicsWidgetPrivate &dd, QGraphicsItem *parent,
 }
 
 GraphicsWidget::~GraphicsWidget()
-{
-    /* This must be the last line of destructor so that this widget is not
-     * added to the list again. */
-    if(GraphicsWidgetSceneData *sd = d_func()->ensureSceneData())
-        sd->pendingLayoutWidgets.remove(this);
-}
+{}
 
 void GraphicsWidget::initStyleOption(QStyleOption *option) const {
     base_type::initStyleOption(option);
