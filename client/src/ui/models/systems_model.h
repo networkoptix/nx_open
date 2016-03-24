@@ -36,15 +36,9 @@ private:
     InternalList::iterator getInternalDataIt(
         const QnSystemDescriptionPtr &systemDescription);
 
-    void serverAdded(const QnSystemDescriptionPtr &systemDescription
-        , const QnUuid &serverId);
-
     void serverChanged(const QnSystemDescriptionPtr &systemDescription
         , const QnUuid &serverId
         , QnServerFields fields);
-
-    void serverRemoved(const QnSystemDescriptionPtr &systemDescription
-        , const QnUuid &serverId);
 
     QStringListModel *createStringListModel(const QStringList &data) const;
 

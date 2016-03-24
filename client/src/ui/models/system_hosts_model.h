@@ -15,6 +15,7 @@ class QnSystemHostsModel : public Connective<QAbstractListModel>
 
     Q_PROPERTY(QString systemId READ systemId WRITE setSystemId NOTIFY systemIdChanged);
     Q_PROPERTY(QString firstHost READ firstHost NOTIFY firstHostChanged);
+    Q_PROPERTY(bool isEmpty READ isEmpty NOTIFY isEmptyChanged);
 
 public:
     QnSystemHostsModel(QObject *parent = nullptr);
@@ -27,6 +28,8 @@ public: // Properties
     void setSystemId(const QString &id);
 
     QString firstHost() const;
+
+    bool isEmpty() const;
 
 public: // overrides
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
@@ -54,6 +57,8 @@ signals:
     void systemIdChanged();
 
     void firstHostChanged();
+
+    void isEmptyChanged();
 
 private:
     typedef QScopedPointer<QnDisconnectHelper> DisconnectHelper;

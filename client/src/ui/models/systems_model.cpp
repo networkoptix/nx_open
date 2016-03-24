@@ -132,6 +132,9 @@ namespace
             const bool firstIsFactorySystem = isFactorySystem(first);
             const bool sameFactoryStatus = (firstIsFactorySystem
                 == isFactorySystem(second));
+            if (!sameFactoryStatus)
+                return firstIsFactorySystem;
+
             const bool firstIsCloudSystem = first->isCloudSystem();
             const bool sameType = 
                 (firstIsCloudSystem == second->isCloudSystem());
@@ -218,7 +221,11 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
     case IsCloudSystemRoleId:
         return systemDescription->isCloudSystem();
     case IsOnlineRoleId:
+    {
+        qDebug() << "--- is online: " << systemDescription->name()
+            << ":" <<!systemDescription->servers().isEmpty();
         return !systemDescription->servers().isEmpty();
+    }
     case IsCompatibleRoleId:
         return isCompatibleSystem(systemDescription);
     case IsCorrectCustomizationRoleId:
@@ -330,19 +337,6 @@ QnSystemsModel::InternalList::iterator QnSystemsModel::getInternalDataIt(
     
     const auto foundId = (*it)->system->id();
     return (foundId == systemDescription->id() ? it : m_internalData.end());
-}
-
-void QnSystemsModel::serverAdded(const QnSystemDescriptionPtr &systemDescription
-    , const QnUuid &serverId)
-{
-    const auto dataIt = getInternalDataIt(systemDescription);
-    if (dataIt == m_internalData.end())
-        return;
-
-    const int row = (dataIt - m_internalData.begin());
-
-    const auto modelIndex = index(row);
-    dataChanged(modelIndex, modelIndex);
 }
 
 void QnSystemsModel::serverChanged(const QnSystemDescriptionPtr &systemDescription

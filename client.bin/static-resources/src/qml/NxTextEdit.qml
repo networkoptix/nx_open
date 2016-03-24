@@ -43,8 +43,9 @@ TextField
                         return Style.colors.error; // TODO: improve when specification will be ready
                     if (control.readOnly)
                         return Style.colorWithAlpha(Style.colors.shadow, 0.4);
-                    if (control.focus && !control.activeFocus)
-                        return Style.darkerColor(Style.colors.brand, 4);
+                    // TODO: ? add behavior of current non-focused item
+//                    if (control.focus && !control.activeFocus)
+//                        return Style.darkerColor(Style.colors.brand, 4);
 
                     return Style.darkerColor(color);
                 }

@@ -74,14 +74,14 @@ Rectangle
 
                     FactorySystemTile
                     {
-                        property var hostsModel: QnSystemHostsModel { systemId: model.systemId}
+                        property var hostsModel: QnSystemHostsModel { systemId: model.systemId; }
                         visualParent: thisComponent;
                         host: hostsModel.firstHost;
                         systemName: qsTr("New System");
 
                         onConnectClicked:
                         {
-                            context.setupFactorySystem(model.host);
+                            context.setupFactorySystem(hostsModel.firstHost);
                         }
                     }
                 }
@@ -119,14 +119,17 @@ Rectangle
 
                     CloudSystemTile
                     {
+                        property var hostsModel: QnSystemHostsModel { systemId: model.systemId}
+
                         visualParent: thisComponent;
-
                         systemName: model.systemName;
-
+                        isOnline: !hostsModel.isEmpty;
                         onConnectClicked:
                         {
-                            context.connectToCloudSystem(model.host);
+                            context.connectToCloudSystem(hostsModel.firstHost);
                         }
+
+                        onIsOnlineChanged: console.log(systemName, ":", isOnline)
                     }
                 }
 

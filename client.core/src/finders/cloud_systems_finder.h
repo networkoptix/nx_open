@@ -33,8 +33,14 @@ private:
     void setCloudSystems(const QnCloudSystemList &systems);
 
     void onCloudError(QnCloudStatusWatcher::ErrorCode error);
+    
+    void updateSystemInternal(const QnSystemDescriptionPtr &system);
 
-    void updateSystem(const QString &systemId);
+    void pingServerInternal(const QString &host
+        , int serverPriority
+        , const QString &systemId);
+
+    void checkOutdatedServersInternal(const QnSystemDescriptionPtr &system);
 
     void updateSystems();
 
