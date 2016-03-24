@@ -437,49 +437,48 @@ void QnSearchBookmarksDialogPrivate::customContextMenuRequested()
         return;
 
     /* Create menu object: */
-    if (auto newMenu = new QMenu())
+    auto newMenu = new QMenu();
+
+    /* Add suitable actions: */
+    const auto addActionToMenu = [this, newMenu, params](QnActions::IDType id, QAction *action)
     {
-        /* Add suitable actions: */
-        const auto addActionToMenu = [this, newMenu, params](QnActions::IDType id, QAction *action)
-        {
-            if (menu()->canTrigger(id, params))
-                newMenu->addAction(action);
-        };
+        if (menu()->canTrigger(id, params))
+            newMenu->addAction(action);
+    };
 
-        addActionToMenu(QnActions::OpenInNewLayoutAction, m_openInNewTabAction);
-        addActionToMenu(QnActions::EditCameraBookmarkAction, m_editBookmarkAction);
-        addActionToMenu(QnActions::ExportTimeSelectionAction, m_exportBookmarkAction);
-        addActionToMenu(QnActions::RemoveBookmarksAction, m_removeBookmarksAction);
+    addActionToMenu(QnActions::OpenInNewLayoutAction, m_openInNewTabAction);
+    addActionToMenu(QnActions::EditCameraBookmarkAction, m_editBookmarkAction);
+    addActionToMenu(QnActions::ExportTimeSelectionAction, m_exportBookmarkAction);
+    addActionToMenu(QnActions::RemoveBookmarksAction, m_removeBookmarksAction);
 
-        /* Connect action signal handlers: */
-        connect(m_openInNewTabAction, &QAction::triggered, this, [this, params, window]
-        {
-            openInNewLayout(params, window);
-        });
+    /* Connect action signal handlers: */
+    connect(m_openInNewTabAction, &QAction::triggered, this, [this, params, window]
+    {
+        openInNewLayout(params, window);
+    });
 
-        connect(m_editBookmarkAction, &QAction::triggered, this, [this, params]
-        {
-            menu()->triggerIfPossible(QnActions::EditCameraBookmarkAction, params);
-        });
+    connect(m_editBookmarkAction, &QAction::triggered, this, [this, params]
+    {
+        menu()->triggerIfPossible(QnActions::EditCameraBookmarkAction, params);
+    });
 
-        connect(m_removeBookmarksAction, &QAction::triggered, this, [this, params]
-        {
-            menu()->triggerIfPossible(QnActions::RemoveBookmarksAction, params);
-        });
+    connect(m_removeBookmarksAction, &QAction::triggered, this, [this, params]
+    {
+        menu()->triggerIfPossible(QnActions::RemoveBookmarksAction, params);
+    });
 
-        connect(m_exportBookmarkAction, &QAction::triggered, this, [this, params]
-        {
-            menu()->triggerIfPossible(QnActions::ExportTimeSelectionAction, params);
-        });
+    connect(m_exportBookmarkAction, &QAction::triggered, this, [this, params]
+    {
+        menu()->triggerIfPossible(QnActions::ExportTimeSelectionAction, params);
+    });
 
-        /* Execute popup menu: */
-        newMenu->exec(QCursor::pos());
-        newMenu->deleteLater();
+    /* Execute popup menu: */
+    newMenu->exec(QCursor::pos());
+    newMenu->deleteLater();
 
-        /* Disconnect action signal handlers: */
-        m_openInNewTabAction->disconnect(this);
-        m_editBookmarkAction->disconnect(this);
-        m_removeBookmarksAction->disconnect(this);
-        m_exportBookmarkAction->disconnect(this);
-    }
+    /* Disconnect action signal handlers: */
+    m_openInNewTabAction->disconnect(this);
+    m_editBookmarkAction->disconnect(this);
+    m_removeBookmarksAction->disconnect(this);
+    m_exportBookmarkAction->disconnect(this);
 }
