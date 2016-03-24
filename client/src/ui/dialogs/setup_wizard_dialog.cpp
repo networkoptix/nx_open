@@ -7,6 +7,9 @@
 
 #include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
+
+#include <ui/widgets/web_page.h>
+
 #include <nx/utils/log/log.h>
 
 QnSetupWizardDialog::QnSetupWizardDialog(const QUrl& serverUrl, QWidget *parent)
@@ -54,7 +57,9 @@ QnSetupWizardDialogPrivate::QnSetupWizardDialogPrivate(
 {
     Q_Q(QnSetupWizardDialog);
 
-    QWebPage *page = webView->page();
+    QnWebPage* page = new QnWebPage(webView);
+    webView->setPage(page);
+
     QWebFrame *frame = page->mainFrame();
 
     connect(frame, &QWebFrame::javaScriptWindowObjectCleared,
