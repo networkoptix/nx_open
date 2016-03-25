@@ -47,6 +47,24 @@ CheckBox
                     border.color: Style.darkerColor(Style.colors.brand, 4);
                 }
             }
+
+            indicator: Image
+            {
+                width: 16;
+                height: width;
+
+                source:
+                {
+                    if (control.hovered)
+                    {
+                        return (control.checked ? "qrc:/skin/theme/checkbox_checked_hover.png"
+                            : "qrc:/skin/theme/checkbox_hover.png");
+                    }
+
+                    return (control.checked ? "qrc:/skin/theme/checkbox_checked.png"
+                        : "qrc:/skin/theme/checkbox.png");
+                }
+            }
         }
     }
 }

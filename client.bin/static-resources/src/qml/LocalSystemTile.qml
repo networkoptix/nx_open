@@ -136,12 +136,13 @@ BaseTile
 
             NxCheckBox
             {
+                id: savePasswordCheckBox;
                 text: qsTr("Save password");
             }
 
             NxCheckBox
             {
-                enabled: false;
+                enabled: savePasswordCheckBox.checked;
                 text: qsTr("Auto-login");
             }
         }
