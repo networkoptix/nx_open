@@ -5,10 +5,9 @@
 #include <QtCore/QList>
 #include <QtCore/QMap>
 #include <QVariant>
+#include <nx/utils/uuid.h>
 
 //TODO: #GDM get rid of this module or rename it to something more sane
-
-class QnUuid;
 
 class QnAppServerConnection;
 typedef QSharedPointer<QnAppServerConnection> QnAppServerConnectionPtr;
