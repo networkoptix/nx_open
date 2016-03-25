@@ -123,11 +123,11 @@ void OutgoingTunnelUdtConnection::establishNewConnection(
         !newConnection->setNonBlockingMode(true))
     {
         const auto errorCode = SystemError::getLastOSErrorCode();
+        NX_ASSERT(errorCode != SystemError::noError);
         NX_LOGX(lm("connection %1. Failed to apply socket options to new connection. %2")
             .arg(m_connectionId).arg(SystemError::toString(errorCode)), cl_logDEBUG1);
         m_aioTimer.post(
-            [this, handler = move(handler),
-                errorCode = SystemError::getLastOSErrorCode()]() mutable
+            [this, handler = move(handler), errorCode]() mutable
             {
                 handler(errorCode, nullptr, m_controlConnection != nullptr);
             });
