@@ -3,6 +3,8 @@
 
 #include "proxy_ptz_controller.h"
 
+#include <nx/utils/thread/mutex.h>
+
 template<class T>
 class QnResourcePropertyAdaptor;
 class QnTourPtzExecutor;

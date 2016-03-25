@@ -57,10 +57,13 @@ BaseTile
 
             isAvailable: thisComponent.allowExpanding && thisComponent.isExpanded;
 
+            disabledLabelColor: Style.colors.custom.systemTile.offlineText;
+            enabled: thisComponent.allowExpanding;
+
             model: thisComponent.knownHostsModel;
             iconUrl: "qrc:/skin/welcome_page/server.png";   // TODO: add ecosystem class for hovered icons
             hoveredIconUrl: "qrc:/skin/welcome_page/server_hover.png";
-
+            disabledIconUrl: "qrc:/skin/welcome_page/server_disabled.png";
             Component.onCompleted: activeItemSelector.addItem(this);
         }
 
@@ -71,11 +74,15 @@ BaseTile
             visible: thisComponent.isRecentlyConnected;
             isAvailable: thisComponent.allowExpanding && thisComponent.isExpanded;
 
+            disabledLabelColor: Style.colors.custom.systemTile.offlineText;
+            enabled: thisComponent.allowExpanding;
+
             model: thisComponent.knownUsersModel;
             iconUrl: "qrc:/skin/welcome_page/user.png";
             hoveredIconUrl: "qrc:/skin/welcome_page/user_hover.png";
-            comboBoxTextRole: "userName";
+            disabledIconUrl: "qrc:/skin/welcome_page/user_disabled.png";
 
+            comboBoxTextRole: "userName";
             Component.onCompleted: activeItemSelector.addItem(this);
         }
     }
@@ -109,6 +116,8 @@ BaseTile
 
                 visible: !thisComponent.isRecentlyConnected;
                 width: parent.width;
+
+                onAccepted: thisComponent.connectClicked();
             }
 
             NxLabel
@@ -121,6 +130,8 @@ BaseTile
                 id: passwordTextField;
                 width: parent.width;
                 echoMode: TextInput.Password;
+
+                onAccepted: thisComponent.connectClicked();
             }
 
             CheckBox

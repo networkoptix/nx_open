@@ -7,7 +7,10 @@ MaskedComboBox
     id: thisComponent;
 
     property string iconUrl;
-    property string hoveredIconUrl;
+    property string hoveredIconUrl: iconUrl;
+    property string disabledIconUrl: iconUrl;
+
+    property color disabledLabelColor: Style.label.color;
 
     anchors.left: parent.left;
     anchors.right: parent.right;
@@ -30,16 +33,17 @@ MaskedComboBox
 
                 width: 16;
                 height: 16;
-                source: (hoverArea.containsMouse ? hoveredIconUrl : iconUrl);
+                source: (!enabled ? disabledIconUrl
+                    : (hoverArea.containsMouse ? hoveredIconUrl : iconUrl));
             }
 
             NxLabel
             {
                 id: textItem;
 
-                color: (hoverArea.containsMouse
-                    ? Style.lighterColor(defaultColor, 2) : defaultColor);
+                isHovered: hoverArea.containsMouse;
                 font: Style.fonts.systemTile.info;
+                disabledColor: thisComponent.disabledLabelColor;
 
                 Binding
                 {

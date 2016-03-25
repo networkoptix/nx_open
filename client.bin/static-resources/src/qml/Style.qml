@@ -58,16 +58,21 @@ QtObject
         readonly property color button: context.getPaletteColor("dark", 10);
 
         readonly property color brand: context.getPaletteColor("brand", 4);
-        readonly property color brandContrast: "white";//TODO: how to access brand_contrast color?
+        readonly property color brandContrast: "white"; //TODO: how to access brand_contrast color?
 
-        readonly property color error: "red";
+        readonly property color red_main: "#CF2727"; //TODO: how to access red_main color?
 
         property QtObject custom: QtObject
         {
             property QtObject systemTile: QtObject
             {
                 readonly property color background: context.getPaletteColor("dark", 7);
-                readonly property color setupSystem: context.getPaletteColor("light", 5);   // Check me!
+                readonly property color setupSystem: context.getPaletteColor("light", 5);
+                readonly property color factorySystemBkg: context.getPaletteColor("dark", 9);
+                readonly property color factorySystemHovered: context.getPaletteColor("dark", 10);
+                readonly property color closeButtonBkg: context.getPaletteColor("dark", 9);
+                readonly property color offlineIndicatorBkg: context.getPaletteColor("dark", 8);
+                readonly property color offlineText: context.getPaletteColor("dark", 13);
             }
         }
     }
@@ -79,6 +84,7 @@ QtObject
             readonly property font systemName: Qt.font({ pixelSize: 20, weight: Font.Light});
             readonly property font info: Qt.font({ pixelSize: 12, weight: Font.Normal})
             readonly property font setupSystem: Qt.font({ pixelSize: 12, weight: Font.Normal});
+            readonly property font indicator: Qt.font({ pixelSize: 10, weight: Font.Medium});
         }
     }
 }

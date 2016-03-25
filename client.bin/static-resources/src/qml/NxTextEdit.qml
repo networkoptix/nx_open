@@ -40,11 +40,12 @@ TextField
                 border.color:
                 {
                     if (control.error)
-                        return Style.colors.error; // TODO: improve when specification will be ready
+                        return Style.colors.red_main;
                     if (control.readOnly)
                         return Style.colorWithAlpha(Style.colors.shadow, 0.4);
-                    if (control.focus && !control.activeFocus)
-                        return Style.darkerColor(Style.colors.brand, 4);
+                    // TODO: ? add behavior of current non-focused item
+//                    if (control.focus && !control.activeFocus)
+//                        return Style.darkerColor(Style.colors.brand, 4);
 
                     return Style.darkerColor(color);
                 }
@@ -79,6 +80,7 @@ TextField
             textColor: Style.colors.text;
 
             placeholderTextColor: Style.colors.midlight;
+            renderType: Text.NativeRendering;
         }
     }
 }

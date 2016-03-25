@@ -1,23 +1,27 @@
 #include "nx_style.h"
 #include "nx_style_p.h"
 
-#include <QPainter>
-#include <QStyleOption>
-#include <QStyleOptionButton>
-#include <QPushButton>
-#include <QToolButton>
-#include <QLineEdit>
-#include <QComboBox>
-#include <QSpinBox>
-#include <QCheckBox>
-#include <QDateTimeEdit>
-#include <QRadioButton>
-#include <QMenu>
-#include <QDialogButtonBox>
-#include <QAbstractItemView>
-#include <private/qfont_p.h>
-#include <QtMath>
+#include <QtCore/QtMath>
+#include <QtGui/QPainter>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QStyleOption>
+#include <QtWidgets/QStyleOptionButton>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QToolButton>
+#include <QtWidgets/QLineEdit>
+#include <QtWidgets/QComboBox>
+#include <QtWidgets/QSpinBox>
+#include <QtWidgets/QCheckBox>
+#include <QtWidgets/QGroupBox>
+#include <QtWidgets/QDateTimeEdit>
+#include <QtWidgets/QRadioButton>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QDialogButtonBox>
+#include <QtWidgets/QAbstractItemView>
+#include <QtWidgets/QHeaderView>
+#include <QtWidgets/QFormLayout>
 #include <QtWidgets/QProxyStyle>
+#include <private/qfont_p.h>
 
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/variant.h>
@@ -57,8 +61,6 @@ namespace
             path.moveTo(rc.x(0.3), rc.y(0.0));
             path.lineTo(rc.x(0.8), rc.y(0.5));
             path.lineTo(rc.x(0.3), rc.y(1.0));
-            break;
-        default:
             break;
         }
 
@@ -373,8 +375,8 @@ void QnNxStyle::drawPrimitive(
     case PE_Frame:
         return;
 
-    default: return;
-        break;
+    default:
+        return;
     }
 
     base_type::drawPrimitive(element, option, painter, widget);
@@ -1172,8 +1174,8 @@ void QnNxStyle::drawControl(
                     qreal x1 = (1.0 - f(std::cos(qMax(0.0, angle - kTickWidth)))) / 2.0;
                     qreal x2 = (1.0 - f(std::cos(qMin(M_PI, angle)))) / 2.0;
 
-                    int rx1 = rect.left() + rect.width() * x1;
-                    int rx2 = rect.left() + rect.width() * x2;
+                    int rx1 = int(rect.left() + rect.width() * x1);
+                    int rx2 = int(rect.left() + rect.width() * x2);
 
                     painter->fillRect(qMax(rx1, rect.left()), rect.top(), rx2 - rx1, rect.height(), color);
                 }
@@ -1611,8 +1613,7 @@ QRect QnNxStyle::subElementRect(
 
             if (tabWidget->tabShape() == QTabWidget::Triangular)
             {
-                const int kMagicShift = 2;
-                rect.adjust(-hspace + kMagicShift, 0, hspace, 0);
+                rect.adjust(-hspace, 0, -hspace, 0);
             }
             else
             {
@@ -1873,7 +1874,6 @@ QSize QnNxStyle::sizeFromContents(
             sz.setHeight(qMax(sz.height(), Metrics::kViewRowHeight));
             return sz;
         }
-        break;
 
     default:
         break;
@@ -1895,9 +1895,9 @@ int QnNxStyle::styleHint(
                 qstyleoption_cast<const QStyleOptionGroupBox*>(option))
         {
             if (groupBox->features & QStyleOptionFrame::Flat)
-                return (int)groupBox->palette.color(QPalette::Text).rgba();
+                return int(groupBox->palette.color(QPalette::Text).rgba());
             else
-                return (int)groupBox->palette.color(QPalette::WindowText).rgba();
+                return int(groupBox->palette.color(QPalette::WindowText).rgba());
         }
         break;
 

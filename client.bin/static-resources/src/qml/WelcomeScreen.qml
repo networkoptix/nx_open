@@ -74,13 +74,17 @@ Rectangle
 
                     FactorySystemTile
                     {
+                        property var hostsModel: QnSystemHostsModel { systemId: model.systemId; }
+
                         visualParent: thisComponent;
-                        host: model.host;
                         systemName: qsTr("New System");
+                        host: hostsModel.firstHost;
 
                         onConnectClicked:
                         {
-                            context.setupFactorySystem(model.host);
+                            console.log("Show wizard for system <", systemName
+                                , ">, host <", host, ">");
+                            context.setupFactorySystem(host);
                         }
                     }
                 }
@@ -91,18 +95,37 @@ Rectangle
 
                     LocalSystemTile
                     {
+                        property var hostsModel: QnSystemHostsModel { systemId: model.systemId}
+                        property var knownUsersModelProp:
+                            QnLastSystemConnectionsData { systemName: model.systemName; }
+
                         visualParent: thisComponent;
 
                         systemName: model.systemName;
                         isRecentlyConnected: (knownUsersModel ? knownUsersModel.hasConnections : false);
 
-                        allowExpanding: model.isCompatible;
-                        knownUsersModel: QnLastSystemConnectionsData { systemName: model.systemName; }
-                        knownHostsModel: model.hostsModel;
+                        isValidVersion: model.isCompatibleVersion;
+                        isValidCustomization: model.isCorrectCustomization;
+                        notAvailableLabelText:
+                        {
+                            if (!isValidVersion)
+                                return model.wrongVersion;
+                            else if (!isValidCustomization)
+                                return model.wrongCustomization;
+
+                            return "";
+                        }
+
+                        isExpandable: model.isCompatible;
+                        isAvailable: isExpandable;
+                        knownUsersModel: knownUsersModelProp;
+                        knownHostsModel: hostsModel;
 
                         onConnectClicked:
                         {
-                            console.log(selectedHost, ":", selectedUser, ":", selectedPassword);
+                            console.log("Connecting to local system <", systemName
+                                , ">, host <", selectedHost, "> with credentials: "
+                                , selectedUser, ":", selectedPassword);
                             context.connectToLocalSystem(selectedHost, selectedUser, selectedPassword);
                         }
                     }
@@ -114,13 +137,33 @@ Rectangle
 
                     CloudSystemTile
                     {
-                        visualParent: thisComponent;
+                        property var hostsModel: QnSystemHostsModel { systemId: model.systemId}
 
+                        visualParent: thisComponent;
                         systemName: model.systemName;
+                        isOnline: !hostsModel.isEmpty;
+
+                        isValidVersion: model.isCompatibleVersion;
+                        isValidCustomization: model.isCorrectCustomization;
+
+                        notAvailableLabelText:
+                        {
+                            if (!isValidVersion)
+                                return model.wrongVersion;
+                            else if (!isValidCustomization)
+                                return model.wrongCustomization;
+                            else if (!isOnline)
+                                return "OFFLINE";
+
+                            return "";
+                        }
+
 
                         onConnectClicked:
                         {
-                            context.connectToCloudSystem(model.host);
+                            console.log("Connecting to cloud system <", systemName
+                                , ">, throug the host <", hostsModel.firstHost, ">");
+                            context.connectToCloudSystem(hostsModel.firstHost);
                         }
                     }
                 }

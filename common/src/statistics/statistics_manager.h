@@ -9,6 +9,8 @@
 #include <statistics/statistics_fwd.h>
 #include <api/server_rest_connection_fwd.h>
 
+#include <nx/utils/uuid.h>
+
 class QnStatisticsManager : public Connective<QObject>
     , public Singleton<QnStatisticsManager>
 {

@@ -5,6 +5,8 @@
 #include <QtCore/QJsonDocument>
 #include <QtCore/QVarLengthArray>
 
+#include <QtGui/QBrush>
+
 #include <utils/serialization/lexical_functions.h>
 #include <utils/fusion/fusion_adaptors.h>
 
@@ -118,7 +120,7 @@ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QFont *target) {
         return true;
     } else if(value.type() == QJsonValue::Object) {
         QJsonObject map = value.toObject();
-        
+
         QString family;
         int pointSize = -1;
         if(

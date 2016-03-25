@@ -6,5 +6,12 @@ ComboBox
 {
     id: thisComponent;
 
+    focus: true;
+    onActiveFocusChanged:
+    {
+        if (activeFocus)
+            focus = true;
+    }
+
     // TODO: Define style (after ICS)
 }

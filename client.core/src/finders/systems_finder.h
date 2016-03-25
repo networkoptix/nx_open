@@ -23,6 +23,8 @@ public:
 public: //overrides
     SystemDescriptionList systems() const override;
 
+    QnSystemDescriptionPtr getSystem(const QString &id) const override;
+
 private:
     typedef QMap<QnAbstractSystemsFinder *
         , QnDisconnectHelperPtr> SystemsFinderList;

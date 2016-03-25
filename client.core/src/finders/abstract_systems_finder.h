@@ -19,6 +19,8 @@ public:
     typedef QList<QnSystemDescriptionPtr> SystemDescriptionList;
     virtual SystemDescriptionList systems() const = 0;
 
+    virtual QnSystemDescriptionPtr getSystem(const QString &id) const = 0;
+
 signals:
     void systemDiscovered(const QnSystemDescriptionPtr &system);
 

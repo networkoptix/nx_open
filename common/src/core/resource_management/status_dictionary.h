@@ -2,6 +2,8 @@
 #define __STATUS_DICTIONARY_H
 
 #include <nx/utils/singleton.h>
+#include <nx/utils/uuid.h>
+#include <nx/utils/thread/mutex.h>
 
 class QnResourceStatusDictionary: public QObject, public Singleton<QnResourceStatusDictionary>
 {

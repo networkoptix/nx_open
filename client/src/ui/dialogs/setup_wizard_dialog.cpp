@@ -12,6 +12,20 @@
 
 #include <nx/utils/log/log.h>
 
+namespace
+{
+    QUrl constructUrl(const QUrl &baseUrl)
+    {
+        QUrl url(baseUrl);
+        url.setScheme(baseUrl.scheme());
+        url.setHost(baseUrl.host());
+        url.setPort(baseUrl.port());
+        url.setPath(lit("/static/inline.html"));
+        url.setFragment(lit("/setup"));
+        return url;
+    }
+}
+
 QnSetupWizardDialog::QnSetupWizardDialog(const QUrl& serverUrl, QWidget *parent)
     : base_type(parent)
     , d_ptr(new QnSetupWizardDialogPrivate(this))
@@ -21,8 +35,17 @@ QnSetupWizardDialog::QnSetupWizardDialog(const QUrl& serverUrl, QWidget *parent)
 
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->setContentsMargins(QMargins());
+#ifdef _DEBUG
+    QLineEdit* urlLineEdit = new QLineEdit(this);
+    layout->addWidget(urlLineEdit);
+    urlLineEdit->setText(constructUrl(serverUrl).toString());
+    connect(urlLineEdit, &QLineEdit::returnPressed, this, [this, urlLineEdit]()
+    {
+        Q_D(QnSetupWizardDialog);
+        d->webView->load(urlLineEdit->text());
+    });
+#endif
     layout->addWidget(d->webView);
-
     setFixedSize(480, 374);
 }
 
@@ -34,12 +57,7 @@ int QnSetupWizardDialog::exec()
 {
     Q_D(QnSetupWizardDialog);
 
-    QUrl url(d->url);
-    url.setScheme(d->url.scheme());
-    url.setHost(d->url.host());
-    url.setPort(d->url.port());
-    url.setPath(lit("/static/inline.html"));
-    url.setFragment(lit("/setup"));
+    QUrl url = constructUrl(d->url);
 
     NX_LOG(lit("QnSetupWizardDialog: Opening setup URL: %1")
            .arg(url.toString()), cl_logINFO);

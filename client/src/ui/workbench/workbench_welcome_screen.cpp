@@ -12,6 +12,7 @@
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
 #include <ui/models/systems_model.h>
+#include <ui/models/system_hosts_model.h>
 #include <ui/models/last_system_users_model.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/style/nx_style.h>
@@ -29,6 +30,7 @@ namespace
         static const auto kContextVariableName = lit("context");
 
         qmlRegisterType<QnSystemsModel>("NetworkOptix.Qml", 1, 0, "QnSystemsModel");
+        qmlRegisterType<QnSystemHostsModel>("NetworkOptix.Qml", 1, 0, "QnSystemHostsModel");
         qmlRegisterType<QnLastSystemUsersModel>("NetworkOptix.Qml", 1, 0, "QnLastSystemConnectionsData");
 
         const auto quickWidget = new QQuickWidget();

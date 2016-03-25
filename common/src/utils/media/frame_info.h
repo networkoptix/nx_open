@@ -6,6 +6,7 @@
 #include <atomic>
 
 #include <QtCore/QAtomicInt>
+#include <QtGui/QImage>
 
 extern "C"
 {
