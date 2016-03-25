@@ -9,7 +9,7 @@ describe('Login suite', function () {
         p.emailInput.sendKeys(p.userEmailWrong);
         p.passwordInput.sendKeys(p.userPassword);
         p.alert.submitButton.click();
-    }, p.alert.alertMessages.loginDanger, p.alert.alertTypes.danger, true);
+    }, p.alert.alertMessages.loginIncorrect, p.alert.alertTypes.danger, true);
 
     it("should open login dialog in anonymous state", function () {
         browser.sleep(1000);
@@ -26,10 +26,9 @@ describe('Login suite', function () {
     });
 
     it("should allow to log in with existing credentials and to log out", function () {
-        
+
         browser.ignoreSynchronization = false;
         p.get();
-
         p.emailInput.sendKeys(p.userEmail1);
         p.passwordInput.sendKeys(p.userPassword);
         p.login();
@@ -77,7 +76,7 @@ describe('Login suite', function () {
         p.passwordInput.sendKeys(p.userPassword);
         p.dialogLoginButton.click();
 
-        p.helper.catchAlert('Login or password are incorrect');
+        p.alert.catchAlert(p.alert.alertMessages.loginIncorrect, p.alert.alertTypes.danger);
 
         p.dialogCloseButton.click();
     });
@@ -89,7 +88,7 @@ describe('Login suite', function () {
         p.passwordInput.sendKeys(p.userPassword);
         p.dialogLoginButton.click();
 
-        p.helper.catchAlert('Login or password are incorrect');
+        p.alert.catchAlert(p.alert.alertMessages.loginIncorrect, p.alert.alertTypes.danger);
         p.dialogCloseButton.click();
     });
 
@@ -100,7 +99,7 @@ describe('Login suite', function () {
         p.passwordInput.sendKeys(p.userPasswordWrong);
         p.dialogLoginButton.click();
 
-        p.helper.catchAlert('Login or password are incorrect');
+        p.alert.catchAlert(p.alert.alertMessages.loginIncorrect, p.alert.alertTypes.danger);
 
         p.dialogCloseButton.click();
     });
@@ -203,7 +202,7 @@ describe('Login suite', function () {
         p.emailInput.sendKeys(currentEmail);
         p.passwordInput.sendKeys(p.userPasswordWrong);
         p.dialogLoginButton.click();
-        p.helper.catchAlert('Login or password are incorrect');
+        p.alert.catchAlert(p.alert.alertMessages.loginIncorrect, p.alert.alertTypes.danger);
 
         p.iForgotPasswordLink.click();
 
