@@ -525,7 +525,7 @@ size_t ConnectionsGenerator::totalBytesReceived() const
 
 size_t ConnectionsGenerator::totalIncompleteTasks() const
 {
-    std::unique_lock<std::mutex> lk(m_mutex);
+    return m_totalIncompleteTasks;
 }
 
 QString ConnectionsGenerator::returnCodes() const
