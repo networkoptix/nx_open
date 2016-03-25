@@ -42,4 +42,50 @@ describe('Restore password suite', function () {
             p.helper.logout();
         }));
     });
+
+    xit("should remember email from login form", function () {
+        expect("test").toBe("written");
+    });
+
+    xit("should demand that email field is not empty", function () {
+        expect("test").toBe("written");
+    });
+
+    xit("should validate user email *@*.*", function () {
+        expect("test").toBe("written");
+    });
+
+    xit("should not succeed, if email is not registered", function () {
+        expect("test").toBe("written");
+    });
+
+    p.passwordField.check();
+
+    xit("should be able to set new password (which is same as old)", function () {
+        expect("test").toBe("written");
+    });
+
+    xit("should set new password, login with new password change password back", function () {
+        expect("test").toBe("written"); // shall I keep current password in variable to avoid such stuff??
+    });
+
+    xit("should not allow to use one restore link twice", function () {
+        expect("test").toBe("written");
+    });
+
+    xit("should allow not-activated user to restore password", function () {
+        expect("test").toBe("written");
+    });
+
+    xit("should make not-activated user active by restoring password", function () {
+        expect("test").toBe("written");
+    });
+
+    xit("should allow logged in user visit restore password page", function () {
+        expect("test").toBe("written");
+    });
+
+    xit("should log user out if he visits restore password link from email", function () {
+        expect("test").toBe("written");
+    });
 });

@@ -9,6 +9,9 @@ RestorePasswordPage = function () {
     var AlertSuite = require('../alerts_check.js');
     this.alert = new AlertSuite();
 
+    var PasswordSuite = require('../password_check.js');
+    this.passwordField = new PasswordSuite();
+
     this.get = function () {
         browser.get('/');
         browser.waitForAngular();
