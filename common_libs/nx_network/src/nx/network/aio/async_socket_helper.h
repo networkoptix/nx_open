@@ -331,6 +331,7 @@ public:
     {
         if (this->m_socket->impl()->aioThread.load() == QThread::currentThread())
         {
+            //TODO #ak we must cancel resolve task here, but must do it without blocking!
             cancelAsyncIOWhileInAioThread(eventType);
         }
         else
