@@ -80,7 +80,7 @@ TextField
             textColor: Style.colors.text;
 
             placeholderTextColor: Style.colors.midlight;
-            renderType: Text.NativeRendering;
+            renderType: Text.QtRendering;
         }
     }
 }

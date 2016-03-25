@@ -252,7 +252,7 @@ Item
 
                 height: Style.custom.systemTile.systemNameLabelHeight;
                 color: (thisComponent.isAvailable ? Style.colors.text
-                    : Style.colors.custom.systemTile.offlineText);
+                    : Style.colors.midlight);
                 font: Style.fonts.systemTile.systemName;
             }
 

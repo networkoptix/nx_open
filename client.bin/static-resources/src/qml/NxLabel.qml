@@ -23,6 +23,6 @@ Text
     height: Style.label.height;
     font: Style.label.font;
 
-    renderType: Text.NativeRendering;
+    renderType: Text.QtRendering;
     verticalAlignment: Text.AlignVCenter;
 }

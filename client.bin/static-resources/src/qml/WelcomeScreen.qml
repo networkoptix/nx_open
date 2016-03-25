@@ -140,6 +140,7 @@ Rectangle
                         property var hostsModel: QnSystemHostsModel { systemId: model.systemId}
 
                         visualParent: thisComponent;
+                        userName: context.cloudUserName;
                         systemName: model.systemName;
                         isOnline: !hostsModel.isEmpty;
 

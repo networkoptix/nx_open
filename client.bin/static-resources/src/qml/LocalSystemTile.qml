@@ -57,7 +57,7 @@ BaseTile
 
             isAvailable: thisComponent.allowExpanding && thisComponent.isExpanded;
 
-            disabledLabelColor: Style.colors.custom.systemTile.offlineText;
+            disabledLabelColor: Style.colors.midlight;
             enabled: thisComponent.allowExpanding;
 
             model: thisComponent.knownHostsModel;
@@ -74,7 +74,7 @@ BaseTile
             visible: thisComponent.isRecentlyConnected;
             isAvailable: thisComponent.allowExpanding && thisComponent.isExpanded;
 
-            disabledLabelColor: Style.colors.custom.systemTile.offlineText;
+            disabledLabelColor: Style.colors.midlight;
             enabled: thisComponent.allowExpanding;
 
             model: thisComponent.knownUsersModel;

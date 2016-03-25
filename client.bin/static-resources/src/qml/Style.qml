@@ -72,7 +72,6 @@ QtObject
                 readonly property color factorySystemHovered: context.getPaletteColor("dark", 10);
                 readonly property color closeButtonBkg: context.getPaletteColor("dark", 9);
                 readonly property color offlineIndicatorBkg: context.getPaletteColor("dark", 8);
-                readonly property color offlineText: context.getPaletteColor("dark", 13);
             }
         }
     }
@@ -83,7 +82,7 @@ QtObject
         {
             readonly property font systemName: Qt.font({ pixelSize: 20, weight: Font.Light});
             readonly property font info: Qt.font({ pixelSize: 12, weight: Font.Normal})
-            readonly property font setupSystem: Qt.font({ pixelSize: 12, weight: Font.Normal});
+            readonly property font setupSystem: Qt.font({ pixelSize: 12, weight: Font.Medium});
             readonly property font indicator: Qt.font({ pixelSize: 10, weight: Font.Medium});
         }
     }

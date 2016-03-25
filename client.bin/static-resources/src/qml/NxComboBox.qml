@@ -13,5 +13,6 @@ ComboBox
             focus = true;
     }
 
-    // TODO: Define style (after ICS)
+
+    // TODO: Fix style to prevent font artefacts
 }
