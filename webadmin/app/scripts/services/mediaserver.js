@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .factory('mediaserver', function ($http, $modal, $q, ipCookie) {
+    .factory('mediaserver', function ($http, $modal, $q, ipCookie, $log) {
 
         var cacheModuleInfo = null;
         var cacheCurrentUser = null;
@@ -99,6 +99,7 @@ angular.module('webadminApp')
             function resolver(){
                 var realm = ipCookie('realm');
                 var nonce = ipCookie('nonce');
+                $log.log("Authorization - reading nonce:" + nonce + " realm:" + realm);
                 if(!realm || !nonce){
                     return false;
                 }
@@ -121,6 +122,8 @@ angular.module('webadminApp')
                     var realm = data.realm;
                     var nonce = data.nonce;
 
+                    $log.log("Authorization - got nonce:" + nonce + " realm:" + realm);
+
                     var digest = md5(login + ':' + realm + ':' + password);
                     var method = md5('GET:');
                     var authDigest = md5(digest + ':' + nonce + ':' + method);
@@ -138,16 +141,22 @@ angular.module('webadminApp')
                      console.log('debug auth -  auth = base64(login:nonce:authDigest):',auth);
                      */
 
-                    ipCookie('auth',auth, { path: '/' });
 
+
+                    /*
                     var rtspmethod = md5('PLAY:');
                     var rtspDigest = md5(digest + ':' + nonce + ':' + rtspmethod);
                     var authRtsp = Base64.encode(login + ':' + nonce + ':' + rtspDigest);
                     ipCookie('auth_rtsp',authRtsp, { path: '/' });
+                    */
 
                     //Old cookies:  // TODO: REMOVE THIS SECTION
                     //ipCookie('response',auth_digest, { path: '/' });
                     //ipCookie('username',login, { path: '/' });
+
+                    ipCookie('auth', auth, { path: '/' });
+
+                    $log.log("Authorization - cookie set auth:" + ipCookie('auth'));
 
                     // Check auth again - without catching errors
                     return $http.get(proxy + '/api/getCurrentUser').then(function(data){

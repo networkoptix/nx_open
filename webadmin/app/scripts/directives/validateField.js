@@ -18,8 +18,10 @@ angular.module('webadminApp')
                 var scopeName = formName + '.' + fieldName;
 
                 input.on('focus',function(){
-                    scope[formName][fieldName].$setUntouched();
-                    scope.$apply();
+                    setTimeout(function(){
+                        scope[formName][fieldName].$setUntouched();
+                        scope.$apply();
+                    },0);
                 });
 
                 function updateValidity(){
