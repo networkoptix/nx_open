@@ -33,7 +33,7 @@ static QByteArray randomData(size_t size)
 {
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_int_distribution<char> dist;
+    std::uniform_int_distribution<int> dist;
 
     QByteArray data(size, Qt::Uninitialized);
     for (auto& it : data)
