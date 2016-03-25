@@ -6,6 +6,18 @@
 
 #include "utils/media/nalUnits.h"
 
+/* DXVA headers (should be included before ffmpeg headers). */
+#   ifdef _USE_DXVA
+#       include <d3d9.h>
+#       include <dxva2api.h>
+#       include <windows.h>
+#       include <windowsx.h>
+#       include <ole2.h>
+#       include <commctrl.h>
+#       include <shlwapi.h>
+#       include <Strsafe.h>
+#   endif
+
 #ifdef _USE_DXVA
 #include "dxva/ffmpeg_callbacks.h"
 #endif
@@ -143,12 +155,12 @@ void QnFfmpegVideoDecoder::determineOptimalThreadType(const QnConstCompressedVid
     if (!m_mtDecoding && !m_forcedMtDecoding)
         m_context->thread_count = 1;
 
-    if (m_forceSliceDecoding == -1 && data && data->data() && m_context->codec_id == CODEC_ID_H264) 
+    if (m_forceSliceDecoding == -1 && data && data->data() && m_context->codec_id == CODEC_ID_H264)
     {
         m_forceSliceDecoding = 0;
         int nextSliceCnt = 0;
         const quint8* curNal = (const quint8*) data->data();
-        if (curNal[0] == 0) 
+        if (curNal[0] == 0)
         {
             const quint8* end = curNal + data->dataSize();
             for(curNal = NALUnit::findNextNAL(curNal, end); curNal < end; curNal = NALUnit::findNextNAL(curNal, end))
@@ -216,7 +228,7 @@ void QnFfmpegVideoDecoder::openDecoder(const QnConstCompressedVideoDataPtr& data
     //av_log_set_callback(FffmpegLog::av_log_default_callback_impl);
 
     determineOptimalThreadType(data);
-    
+
     m_checkH264ResolutionChange = m_context->thread_count > 1 && m_context->codec_id == CODEC_ID_H264 && (!m_context->extradata_size || m_context->extradata[0] == 0);
 
 
@@ -254,7 +266,7 @@ void QnFfmpegVideoDecoder::resetDecoder(const QnConstCompressedVideoDataPtr& dat
         m_currentWidth = m_passedContext->width;
         m_currentHeight = m_passedContext->height;
     }
-    
+
     // I have improved resetDecoder speed (I have left only minimum operations) because of REW. REW calls reset decoder on each GOP.
     QnFfmpegHelper::deleteAvCodecContext(m_context);
     m_context = 0;
@@ -267,7 +279,7 @@ void QnFfmpegVideoDecoder::resetDecoder(const QnConstCompressedVideoDataPtr& dat
     //m_context->thread_count = qMin(5, QThread::idealThreadCount() + 1);
     //m_context->thread_type = m_mtDecoding ? FF_THREAD_FRAME : FF_THREAD_SLICE;
     // ensure that it is H.264 with nal prefixes
-    m_checkH264ResolutionChange = m_context->thread_count > 1 && m_context->codec_id == CODEC_ID_H264 && (!m_context->extradata_size || m_context->extradata[0] == 0); 
+    m_checkH264ResolutionChange = m_context->thread_count > 1 && m_context->codec_id == CODEC_ID_H264 && (!m_context->extradata_size || m_context->extradata[0] == 0);
 
     avcodec_open2(m_context, m_codec, NULL);
 
@@ -335,7 +347,7 @@ void QnFfmpegVideoDecoder::processNewResolutionIfChanged(const QnConstCompressed
 
 void QnFfmpegVideoDecoder::forceMtDecoding(bool value)
 {
-    if (value != m_forcedMtDecoding) 
+    if (value != m_forcedMtDecoding)
     {
         bool oldMtDecoding = m_mtDecoding || m_forcedMtDecoding;
         bool newMtDecoding = m_mtDecoding || value;
@@ -423,7 +435,7 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
         avpkt.dts = avpkt.pts = data->timestamp;
         // HACK for CorePNG to decode as normal PNG by default
         avpkt.flags = AV_PKT_FLAG_KEY;
-        
+
         // from avcodec_decode_video2() docs:
         // 1) The input buffer must be FF_INPUT_BUFFER_PADDING_SIZE larger than
         // the actual read bytes because some optimized bitstream readers read 32 or 64
@@ -439,7 +451,7 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
         if (m_context->pix_fmt == -1)
             m_context->pix_fmt = PixelFormat(0);
 
-        
+
         bool dataWithNalPrefixes = (m_context->extradata==0 || m_context->extradata[0] == 0);
         // workaround ffmpeg crush
         if (m_checkH264ResolutionChange && avpkt.size > 4 && dataWithNalPrefixes)
@@ -483,16 +495,16 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
                 avcodec_decode_video2(m_context, m_frame, &got_picture, &avpkt);
         }
 
-        if (got_picture) 
+        if (got_picture)
         {
             if (m_context->width <= 3500)
                 forceMtDecoding(false);
-            else 
+            else
             {
                 qint64 frameDistance = data->timestamp - m_prevTimestamp;
                 if (frameDistance > 0 && frameDistance < 50000)
                     forceMtDecoding(true); // high fps and high resolution
-            }            
+            }
             m_prevTimestamp = data->timestamp;
         }
 
@@ -541,7 +553,7 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
 
         PixelFormat correctedPixelFormat = GetPixelFormat();
         if (!outFrame->isExternalData() &&
-            (outFrame->width != m_context->width || outFrame->height != m_context->height || 
+            (outFrame->width != m_context->width || outFrame->height != m_context->height ||
             outFrame->format != correctedPixelFormat || outFrame->linesize[0] != m_frame->linesize[0]))
         {
             outFrame->reallocate(m_context->width, m_context->height, correctedPixelFormat, m_frame->linesize[0]);
@@ -566,12 +578,12 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
             }
         }
         else {
-            if (!outFrame->isExternalData()) 
+            if (!outFrame->isExternalData())
             {
-                if (outFrame->format == PIX_FMT_YUV420P) 
+                if (outFrame->format == PIX_FMT_YUV420P)
                 {
                     // optimization
-                    for (int i = 0; i < 3; ++ i) 
+                    for (int i = 0; i < 3; ++ i)
                     {
                         int h = m_frame->height >> (i > 0 ? 1 : 0);
                         memcpy(outFrame->data[i], m_frame->data[i], m_frame->linesize[i]* h);
@@ -627,7 +639,7 @@ double QnFfmpegVideoDecoder::getSampleAspectRatio() const
 
     double result = av_q2d(m_context->sample_aspect_ratio);
 
-    if (qAbs(result)< 1e-7) 
+    if (qAbs(result)< 1e-7)
     {
         result = 1.0;
         if (m_context->width == 720) { // TODO: #vasilenko add a table!
