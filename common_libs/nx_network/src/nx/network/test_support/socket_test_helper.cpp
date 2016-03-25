@@ -504,10 +504,10 @@ void ConnectionsGenerator::onConnectionFinished(
         m_errors.push_back(code);
         if (m_errors.size() < 3)
         {
-            std::cerr
-                << "onConnectionFinished: "
-                << SystemError::toString(code).toStdString()
-                << std::endl;
+            // std::cerr
+            //     << "onConnectionFinished: "
+            //     << SystemError::toString(code).toStdString()
+            //     << std::endl;
         }
     }
 
