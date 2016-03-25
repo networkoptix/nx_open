@@ -88,7 +88,7 @@
         <Property Id="SYSTEM_NAME" Value="system" Secure="yes">
             <RegistrySearch Id="SystemNameReg" Root="HKLM" Key="$(var.ServerRegPath)" Name="systemName" Type="raw" Win64="yes"/>
         </Property>
-        <!-- <Property Id="SYSTEM_NAME" Value="system" Secure="yes">
+        <!-- <Property Id="SYSTEM_NAME" Value="[SYSTEM_NAME]" Secure="yes">
             <RegistrySearch Id="SystemNameReg" Root="HKLM" Key="$(var.ServerRegPath)" Name="systemName" Type="raw" Win64="yes"/>
         </Property> -->
         
