@@ -44,18 +44,24 @@ var Helper = function () {
         expect(loginSuccessElement.isDisplayed()).toBe(false);
     };
 
-    this.catchAlert = function (message) {
-        var alertElement = element(by.css('process-alert')).element(by.css('.alert'));
+    this.getEmailTo = function(emailAddress) {
+        var deferred = protractor.promise.defer();
+        console.log("Waiting for an email...");
 
-        // Workaround due to Protractor bug with timeouts https://github.com/angular/protractor/issues/169
-        // taken from here http://stackoverflow.com/questions/25062748/testing-the-contents-of-a-temporary-element-with-protractor
-        browser.sleep(1500);
-        browser.ignoreSynchronization = true;
-        expect(alertElement.isDisplayed()).toBe(true);
-        expect(alertElement.getText()).toContain(message);
-        browser.sleep(500);
-        browser.ignoreSynchronization = false;
-    }
+        notifier.on("mail", function(mail){
+            if(emailAddress === mail.headers.to){
+                console.log("Catch email to: " + mail.headers.to);
+                deferred.fulfill(mail);
+                notifier.stop();
+                return;
+            }
+            console.log("Ignore email to: " + mail.headers.to);
+        });
+
+        notifier.start();
+
+        return deferred.promise;
+    };
 };
 
 module.exports = Helper;
