@@ -54,7 +54,8 @@ TEST_F(CloudStreamSocketTest, simple)
     //starting local tcp server
     test::RandomDataTcpServer server(
         test::TestTrafficLimitType::outgoing,
-        bytesToSendThroughConnection);
+        bytesToSendThroughConnection,
+        test::TestTransmissionMode::spam);
     ASSERT_TRUE(server.start());
 
     const auto serverAddress = server.addressBeingListened();
@@ -98,7 +99,8 @@ TEST_F(CloudStreamSocketTest, multiple_connections_random_data)
     //starting local tcp server
     test::RandomDataTcpServer server(
         test::TestTrafficLimitType::outgoing,
-        bytesToSendThroughConnection);
+        bytesToSendThroughConnection,
+        test::TestTransmissionMode::spam);
     ASSERT_TRUE(server.start());
 
     const auto serverAddress = server.addressBeingListened();
@@ -113,7 +115,8 @@ TEST_F(CloudStreamSocketTest, multiple_connections_random_data)
         maxSimultaneousConnections,
         test::TestTrafficLimitType::outgoing,
         bytesToSendThroughConnection,
-        test::ConnectionsGenerator::kInfiniteConnectionCount);
+        test::ConnectionsGenerator::kInfiniteConnectionCount,
+        test::TestTransmissionMode::spam);
     connectionsGenerator.start();
 
     std::this_thread::sleep_for(testDuration);
@@ -192,7 +195,8 @@ TEST_F(CloudStreamSocketTest, cancellation)
     //starting local tcp server
     test::RandomDataTcpServer server(
         test::TestTrafficLimitType::outgoing,
-        bytesToSendThroughConnection);
+        bytesToSendThroughConnection,
+        test::TestTransmissionMode::spam);
     ASSERT_TRUE(server.start());
 
     const auto serverAddress = server.addressBeingListened();

@@ -105,7 +105,8 @@ TEST_F(UdpHolePunching, loadTest)
 
     test::RandomDataTcpServer server(
         test::TestTrafficLimitType::none,
-        bytesToSendThroughConnection);
+        bytesToSendThroughConnection,
+        test::TestTransmissionMode::spam);
     auto serverSocket = std::make_unique<CloudServerSocket>(
         SocketGlobals::mediatorConnector().systemConnection());
     ASSERT_TRUE(serverSocket->registerOnMediatorSync());
@@ -117,7 +118,8 @@ TEST_F(UdpHolePunching, loadTest)
         maxSimultaneousConnections,
         test::TestTrafficLimitType::incoming,
         bytesToSendThroughConnection,
-        test::ConnectionsGenerator::kInfiniteConnectionCount);
+        test::ConnectionsGenerator::kInfiniteConnectionCount,
+        test::TestTransmissionMode::spam);
     connectionsGenerator.start();
 
     std::this_thread::sleep_for(testDuration);

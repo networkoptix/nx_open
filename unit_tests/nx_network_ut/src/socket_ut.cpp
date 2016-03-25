@@ -124,7 +124,8 @@ TEST( Socket, AsyncOperationCancellation )
 
                     RandomDataTcpServer server(
                         TestTrafficLimitType::none,
-                        BYTES_TO_SEND_THROUGH_CONNECTION);
+                        BYTES_TO_SEND_THROUGH_CONNECTION,
+                        TestTransmissionMode::spam);
                     ASSERT_TRUE(server.start());
 
                     ConnectionsGenerator connectionsGenerator(
@@ -132,7 +133,8 @@ TEST( Socket, AsyncOperationCancellation )
                         MAX_SIMULTANEOUS_CONNECTIONS,
                         TestTrafficLimitType::incoming,
                         BYTES_TO_SEND_THROUGH_CONNECTION,
-                        ConnectionsGenerator::kInfiniteConnectionCount);
+                        ConnectionsGenerator::kInfiniteConnectionCount,
+                        TestTransmissionMode::spam);
                     connectionsGenerator.start();
 
                     std::this_thread::sleep_for(TEST_DURATION);

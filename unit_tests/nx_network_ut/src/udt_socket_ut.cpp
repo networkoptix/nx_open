@@ -238,7 +238,8 @@ TEST_F(SocketUdt, rendezvousConnect)
 
     RandomDataTcpServer server(
         TestTrafficLimitType::outgoing,
-        bytesToSendThroughConnection);
+        bytesToSendThroughConnection,
+        TestTransmissionMode::spam);
     server.setLocalAddress(acceptorSocket.getLocalAddress());
     ASSERT_TRUE(server.start());
 
@@ -247,7 +248,8 @@ TEST_F(SocketUdt, rendezvousConnect)
         maxSimultaneousConnections,
         TestTrafficLimitType::outgoing,
         bytesToSendThroughConnection,
-        ConnectionsGenerator::kInfiniteConnectionCount);
+        ConnectionsGenerator::kInfiniteConnectionCount,
+        TestTransmissionMode::spam);
     connectionsGenerator.setLocalAddress(connectorSocket.getLocalAddress());
     connectionsGenerator.start();
 

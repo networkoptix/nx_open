@@ -49,14 +49,17 @@ public:
     TestConnection(
         std::unique_ptr<AbstractStreamSocket> connection,
         TestTrafficLimitType limitType,
-        size_t trafficLimit);
+        size_t trafficLimit,
+        TestTransmissionMode transmissionMode);
     /*!
         \param handler to be called on connection closure or after \a bytesToSendThrough bytes have been sent
     */
     TestConnection(
         const SocketAddress& remoteAddress,
         TestTrafficLimitType limitType,
-        size_t trafficLimit);
+        size_t trafficLimit,
+        TestTransmissionMode transmissionMode);
+
     virtual ~TestConnection();
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
@@ -78,6 +81,7 @@ private:
     std::unique_ptr<AbstractStreamSocket> m_socket;
     const TestTrafficLimitType m_limitType;
     const size_t m_trafficLimit;
+    const TestTransmissionMode m_transmissionMode;
     bool m_connected;
     SocketAddress m_remoteAddress;
     nx::utils::MoveOnlyFunc<
@@ -87,14 +91,18 @@ private:
     nx::Buffer m_outData;
     size_t m_totalBytesSent;
     size_t m_totalBytesReceived;
+    size_t m_timeoutsInARow;
     int m_id;
     boost::optional<SocketAddress> m_localAddress;
     const bool m_accepted;
 
-    void onConnected( int id, SystemError::ErrorCode );
+    void onConnected( SystemError::ErrorCode code );
     void startIO();
-    void onDataReceived( int id, SystemError::ErrorCode errorCode, size_t bytesRead );
-    void onDataSent( int id, SystemError::ErrorCode errorCode, size_t bytesWritten );
+    void onDataReceived( SystemError::ErrorCode errorCode, size_t bytesRead );
+    void onDataSent( SystemError::ErrorCode errorCode, size_t bytesWritten );
+    void readAllAsync( std::function<void()> handler );
+    void sendAllAsync( std::function<void()> handler );
+    void reportFinish( SystemError::ErrorCode code );
 
     TestConnection(const TestConnection&);
     TestConnection& operator=(const TestConnection&);
@@ -111,7 +119,8 @@ class NX_NETWORK_API RandomDataTcpServer
 public:
     RandomDataTcpServer(
         TestTrafficLimitType limitType,
-        size_t trafficLimit);
+        size_t trafficLimit,
+        TestTransmissionMode transmissionMode);
     /** In this mode it sends \a dataToSend through connection and closes connection */
     RandomDataTcpServer(const QByteArray& dataToSend);
     virtual ~RandomDataTcpServer();
@@ -124,12 +133,14 @@ public:
     bool start();
 
     SocketAddress addressBeingListened() const;
+    QString statusLine() const;
 
 private:
     std::unique_ptr<AbstractStreamServerSocket> m_serverSocket;
     const TestTrafficLimitType m_limitType;
     const size_t m_trafficLimit;
-    QnMutex m_mutex;
+    const TestTransmissionMode m_transmissionMode;
+    mutable QnMutex m_mutex;
     std::list<std::shared_ptr<TestConnection>> m_acceptedConnections;
     SocketAddress m_localAddress;
     size_t m_totalConnectionsAccepted;
@@ -157,7 +168,9 @@ public:
         size_t maxSimultaneousConnectionsCount,
         TestTrafficLimitType limitType,
         size_t trafficLimit,
-        size_t maxTotalConnections);
+        size_t maxTotalConnections,
+        TestTransmissionMode transmissionMode);
+
     virtual ~ConnectionsGenerator();
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
@@ -182,6 +195,7 @@ private:
     const TestTrafficLimitType m_limitType;
     const size_t m_trafficLimit;
     const size_t m_maxTotalConnections;
+    const TestTransmissionMode m_transmissionMode;
     ConnectionsContainer m_connections;
     bool m_terminated;
     mutable std::mutex m_mutex;

@@ -29,22 +29,38 @@ namespace
 
 //#define DEBUG_OUTPUT
 
+static QByteArray randomData(size_t size)
+{
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<char> dist;
+
+    QByteArray data(size, Qt::Uninitialized);
+    for (auto& it : data)
+        it = dist(gen);
+
+    return data;
+}
+
 TestConnection::TestConnection(
     std::unique_ptr<AbstractStreamSocket> socket,
     TestTrafficLimitType limitType,
-    size_t trafficLimit)
+    size_t trafficLimit,
+    TestTransmissionMode transmissionMode)
 :
     m_socket( std::move( socket ) ),
     m_limitType( limitType ),
     m_trafficLimit( trafficLimit ),
+    m_transmissionMode( transmissionMode ),
     m_connected( true ),
     m_totalBytesSent( 0 ),
     m_totalBytesReceived( 0 ),
+    m_timeoutsInARow( 0 ),
     m_id( ++TestConnectionIDCounter ),
     m_accepted(true)
 {
     m_readBuffer.reserve( READ_BUF_SIZE );
-    m_outData.resize( READ_BUF_SIZE );
+    m_outData = randomData( READ_BUF_SIZE );
 
     ++TestConnection_count;
 }
@@ -52,22 +68,25 @@ TestConnection::TestConnection(
 TestConnection::TestConnection(
     const SocketAddress& remoteAddress,
     TestTrafficLimitType limitType,
-    size_t trafficLimit)
+    size_t trafficLimit,
+    TestTransmissionMode transmissionMode)
 :
     m_socket( SocketFactory::createStreamSocket() ),
     m_limitType(limitType),
     m_trafficLimit( trafficLimit ),
+    m_transmissionMode( transmissionMode ),
     m_connected( false ),
     m_remoteAddress(
         remoteAddress.address == HostAddress::anyHost ? HostAddress::localhost : remoteAddress.address,
         remoteAddress.port ),
     m_totalBytesSent( 0 ),
     m_totalBytesReceived( 0 ),
+    m_timeoutsInARow( 0 ),
     m_id( ++TestConnectionIDCounter ),
     m_accepted(false)
 {
     m_readBuffer.reserve( READ_BUF_SIZE );
-    m_outData.resize( READ_BUF_SIZE );
+    m_outData = randomData( READ_BUF_SIZE );
 
     ++TestConnection_count;
 }
@@ -78,7 +97,7 @@ static std::map<int, bool> terminatedSocketsIDs;
 
 TestConnection::~TestConnection()
 {
-    NX_LOGX(lm("accepted %1. Destroying...").arg(m_accepted), cl_logDEBUG1);
+    NX_LOGX(lm("accepted %1. Destroying...").arg(m_accepted), cl_logDEBUG2);
 
     {
         std::unique_lock<std::mutex> lk(terminatedSocketsIDsMutex);
@@ -117,6 +136,8 @@ SocketAddress TestConnection::getLocalAddress() const
 }
 
 const std::chrono::milliseconds kDefaultSendTimeout(17000);
+const std::chrono::milliseconds kDefaultRecvTimeout(17000);
+const size_t kDefaultMaxTimeoutsInARow(5);
 
 void TestConnection::start()
 {
@@ -125,18 +146,17 @@ void TestConnection::start()
 
     if (!m_socket->setNonBlockingMode(true) || 
         !m_socket->setSendTimeout(kDefaultSendTimeout.count()) ||
+        !m_socket->setRecvTimeout(kDefaultRecvTimeout.count()) ||
         (m_localAddress && !m_socket->bind(*m_localAddress)))
     {
         return m_socket->post(std::bind(
-            &TestConnection::onConnected,
-            this,
-            m_id,
+            &TestConnection::onConnected, this,
             SystemError::getLastOSErrorCode()));
     }
 
     m_socket->connectAsync(
         m_remoteAddress,
-        std::bind(&TestConnection::onConnected, this, m_id, std::placeholders::_1) );
+        std::bind(&TestConnection::onConnected, this, std::placeholders::_1) );
 }
 
 size_t TestConnection::totalBytesSent() const
@@ -169,7 +189,7 @@ void TestConnection::setOnFinishedEventHandler(
     m_finishedEventHandler = std::move(handler);
 }
 
-void TestConnection::onConnected( int id, SystemError::ErrorCode errorCode )
+void TestConnection::onConnected( SystemError::ErrorCode errorCode )
 {
 #ifdef DEBUG_OUTPUT
     std::cout<<"TestConnection::onConnected. "<<id<<std::endl;
@@ -180,10 +200,7 @@ void TestConnection::onConnected( int id, SystemError::ErrorCode errorCode )
         NX_LOGX(lm("accepted %1. Receive error: %2")
             .arg(m_accepted).arg(SystemError::toString(errorCode)), cl_logWARNING);
 
-        if (!m_finishedEventHandler)
-            return;
-        auto handler = std::move( m_finishedEventHandler );
-        return handler( id, this, errorCode );
+        return reportFinish( errorCode );
     }
 
     startIO();
@@ -191,25 +208,136 @@ void TestConnection::onConnected( int id, SystemError::ErrorCode errorCode )
 
 void TestConnection::startIO()
 {
-    using namespace std::placeholders;
-
     //TODO #ak we need mutex here because async socket API lacks way to start async read and write atomically.
         //Should note that aio::AIOService provides such functionality
 
+    switch (m_transmissionMode)
+    {
+        case TestTransmissionMode::spam:
+            using namespace std::placeholders;
+            m_socket->readSomeAsync(
+                &m_readBuffer,
+                std::bind(&TestConnection::onDataReceived, this, _1, _2));
+            NX_LOGX(lm("accepted %1. Sending %2 bytes of data to %3")
+                .arg(m_accepted).arg(m_outData.size())
+                .arg(m_socket->getForeignAddress().toString()),
+                cl_logDEBUG2);
+            m_socket->sendAsync(
+                m_outData,
+                std::bind(&TestConnection::onDataSent, this, _1, _2));
+            return;
+
+        case TestTransmissionMode::echo:
+            readAllAsync(
+                [this]()
+                {
+                    // just send data back
+                    m_outData = std::move(m_readBuffer);
+                    sendAllAsync(
+                        [this]
+                        {
+                            // start all over again
+                            m_readBuffer.resize(0);
+                            m_readBuffer.reserve(READ_BUF_SIZE);
+                            startIO();
+                        });
+                });
+            return;
+
+        case TestTransmissionMode::echoTest:
+            sendAllAsync(
+                [this]()
+                {
+                    readAllAsync(
+                        [this]
+                        {
+                            // if all ok start all over again
+                            if (m_readBuffer == m_outData)
+                            {
+                                NX_LOGX(lm("Echo virified bytes: %1")
+                                    .arg(m_readBuffer.size()), cl_logDEBUG2);
+
+                                m_readBuffer.resize(0);
+                                return startIO();
+                            }
+
+                            NX_LOGX(lm("Recieved data does not match sent"),
+                                cl_logERROR);
+
+                            reportFinish( SystemError::invalidData );
+                        });
+                });
+             return;
+    };
+
+    NX_ASSERT(false);
+}
+
+void TestConnection::readAllAsync( std::function<void()> handler )
+{
+    if (m_limitType == TestTrafficLimitType::incoming &&
+        m_totalBytesReceived >= m_trafficLimit)
+    {
+        return reportFinish( SystemError::noError );
+    }
+
     m_socket->readSomeAsync(
         &m_readBuffer,
-        std::bind(&TestConnection::onDataReceived, this, m_id, _1, _2) );
-    NX_LOGX(lm("accepted %1. Sending %2 bytes of data to %3")
-        .arg(m_accepted).arg(m_outData.size())
-        .arg(m_socket->getForeignAddress().toString()),
-        cl_logDEBUG2);
+        [this, handler = std::move(handler)](
+            SystemError::ErrorCode code, size_t bytes)
+        {
+            m_totalBytesReceived += bytes;
+
+            if (code == SystemError::timedOut)
+            {
+                if (++m_timeoutsInARow == kDefaultMaxTimeoutsInARow)
+                    return reportFinish( code );
+
+                return readAllAsync(std::move(handler));
+            }
+
+            m_timeoutsInARow = 0;
+            if (code != SystemError::noError || bytes == 0)
+                return reportFinish( code );
+
+            if (m_readBuffer.size() == READ_BUF_SIZE)
+                handler();
+            else
+                return readAllAsync(std::move(handler));
+        });
+}
+
+void TestConnection::sendAllAsync( std::function<void()> handler )
+{
+    if (m_limitType == TestTrafficLimitType::outgoing &&
+        m_totalBytesSent >= m_trafficLimit)
+    {
+        return reportFinish( SystemError::noError );
+    }
+
     m_socket->sendAsync(
         m_outData,
-        std::bind(&TestConnection::onDataSent, this, m_id, _1, _2) );
+        [this, handler = std::move(handler)](
+            SystemError::ErrorCode code, size_t bytes)
+        {
+            m_totalBytesSent += bytes;
+
+            if (code == SystemError::timedOut)
+            {
+                if (++m_timeoutsInARow == kDefaultMaxTimeoutsInARow)
+                    return reportFinish( code );
+
+                return readAllAsync(std::move(handler));
+            }
+
+            if (code != SystemError::noError || bytes == 0)
+                return reportFinish( code );
+
+            handler();
+        });
 }
 
 void TestConnection::onDataReceived(
-    int id,
     SystemError::ErrorCode errorCode,
     size_t bytesRead)
 {
@@ -227,10 +355,7 @@ void TestConnection::onDataReceived(
     if( (errorCode != SystemError::noError && errorCode != SystemError::timedOut) ||
         (errorCode == SystemError::noError && bytesRead == 0))  //connection closed by remote side
     {
-        if (!m_finishedEventHandler)
-            return;
-        auto handler = std::move(m_finishedEventHandler);
-        return handler( id, this, errorCode );
+        return reportFinish( errorCode );
     }
 
     m_totalBytesReceived += bytesRead;
@@ -240,19 +365,18 @@ void TestConnection::onDataReceived(
     if (m_limitType == TestTrafficLimitType::incoming &&
         m_totalBytesReceived >= m_trafficLimit)
     {
-        if (!m_finishedEventHandler)
-            return;
-        auto handler = std::move(m_finishedEventHandler);
-        return handler(id, this, errorCode);
+        return reportFinish( errorCode );
     }
 
     using namespace std::placeholders;
     m_socket->readSomeAsync(
         &m_readBuffer,
-        std::bind(&TestConnection::onDataReceived, this, m_id,  _1, _2) );
+        std::bind(&TestConnection::onDataReceived, this,  _1, _2) );
 }
 
-void TestConnection::onDataSent( int id, SystemError::ErrorCode errorCode, size_t bytesWritten )
+void TestConnection::onDataSent(
+    SystemError::ErrorCode errorCode,
+    size_t bytesWritten )
 {
     if (errorCode != SystemError::noError && errorCode != SystemError::timedOut)
     {
@@ -260,20 +384,14 @@ void TestConnection::onDataSent( int id, SystemError::ErrorCode errorCode, size_
             .arg(m_accepted).arg(SystemError::toString(errorCode)),
             cl_logWARNING);
 
-        if (!m_finishedEventHandler)
-            return;
-        auto handler = std::move( m_finishedEventHandler );
-        return handler( id, this, errorCode );
+        return reportFinish( errorCode );
     }
 
     m_totalBytesSent += bytesWritten;
     if (m_limitType == TestTrafficLimitType::outgoing &&
         m_totalBytesSent >= m_trafficLimit)
     {
-        if (!m_finishedEventHandler)
-            return;
-        auto handler = std::move( m_finishedEventHandler );
-        return handler(id, this, errorCode);
+        return reportFinish( errorCode );
     }
 
     using namespace std::placeholders;
@@ -283,20 +401,29 @@ void TestConnection::onDataSent( int id, SystemError::ErrorCode errorCode, size_
         cl_logDEBUG2);
     m_socket->sendAsync(
         m_outData,
-        std::bind(&TestConnection::onDataSent, this, m_id, _1, _2) );
+        std::bind(&TestConnection::onDataSent, this, _1, _2) );
 }
 
+void TestConnection::reportFinish( SystemError::ErrorCode code )
+{
+    if (!m_finishedEventHandler)
+        return;
 
+    auto handler = std::move(m_finishedEventHandler);
+    return handler(m_id, this, code);
+}
 
 ////////////////////////////////////////////////////////////
 //// class RandomDataTcpServer
 ////////////////////////////////////////////////////////////
 RandomDataTcpServer::RandomDataTcpServer(
     TestTrafficLimitType limitType,
-    size_t trafficLimit)
+    size_t trafficLimit,
+    TestTransmissionMode transmissionMode)
 :
     m_limitType(limitType),
     m_trafficLimit(trafficLimit),
+    m_transmissionMode(transmissionMode),
     m_totalConnectionsAccepted(0)
 {
 }
@@ -366,6 +493,13 @@ SocketAddress RandomDataTcpServer::addressBeingListened() const
         : localAddress;
 }
 
+QString RandomDataTcpServer::statusLine() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return lm("Online connections: %1, Total connections: %2.")
+        .arg(m_acceptedConnections.size()).arg(m_totalConnectionsAccepted);
+}
+
 void RandomDataTcpServer::onNewConnection(
     SystemError::ErrorCode errorCode,
     AbstractStreamSocket* newConnection)
@@ -378,7 +512,8 @@ void RandomDataTcpServer::onNewConnection(
         auto testConnection = std::make_shared<TestConnection>(
             std::unique_ptr<AbstractStreamSocket>(newConnection),
             m_limitType,
-            m_trafficLimit);
+            m_trafficLimit,
+            m_transmissionMode);
         testConnection->setOnFinishedEventHandler(
             std::bind(&RandomDataTcpServer::onConnectionDone, this, _2));
         NX_LOGX(lm("Accepted connection %1. local address %2")
@@ -413,18 +548,19 @@ void RandomDataTcpServer::onConnectionDone(
 ////////////////////////////////////////////////////////////
 //// class ConnectionsGenerator
 ////////////////////////////////////////////////////////////
-ConnectionsGenerator::ConnectionsGenerator(
-    const SocketAddress& remoteAddress,
+ConnectionsGenerator::ConnectionsGenerator(const SocketAddress& remoteAddress,
     size_t maxSimultaneousConnectionsCount,
     TestTrafficLimitType limitType,
     size_t trafficLimit,
-    size_t maxTotalConnections)
+    size_t maxTotalConnections,
+    TestTransmissionMode transmissionMode)
 :
     m_remoteAddress( remoteAddress ),
     m_maxSimultaneousConnectionsCount( maxSimultaneousConnectionsCount ),
     m_limitType( limitType ),
     m_trafficLimit( trafficLimit ),
     m_maxTotalConnections( maxTotalConnections ),
+    m_transmissionMode( transmissionMode ),
     m_terminated( false ),
     m_totalBytesSent( 0 ),
     m_totalBytesReceived( 0 ),
@@ -496,7 +632,8 @@ void ConnectionsGenerator::start()
             new TestConnection(
                 m_remoteAddress,
                 m_limitType,
-                m_trafficLimit));
+                m_trafficLimit,
+                m_transmissionMode));
         connection->setOnFinishedEventHandler(
             std::bind(&ConnectionsGenerator::onConnectionFinished, this,
                 std::placeholders::_1, std::placeholders::_3));
@@ -545,7 +682,6 @@ void ConnectionsGenerator::onConnectionFinished(
     NX_LOGX(lm("Connection %1 has finished: %2")
         .arg(id).arg(SystemError::toString(code)), cl_logDEBUG1);
 
-
     std::unique_lock<std::mutex> lk(m_mutex);
     m_returnCodes.emplace(code, 0).first->second++;
 
@@ -590,7 +726,8 @@ void ConnectionsGenerator::addNewConnections(
         auto connection = std::make_unique<TestConnection>(
             m_remoteAddress,
             m_limitType,
-            m_trafficLimit);
+            m_trafficLimit,
+            m_transmissionMode);
         connection->setOnFinishedEventHandler(
             std::bind(&ConnectionsGenerator::onConnectionFinished, this,
                 std::placeholders::_1, std::placeholders::_3));
