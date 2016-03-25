@@ -18,7 +18,8 @@ $gray-lighter:           $dark7;
 $body-bg:                 $dark2;
 $text-color:              $light;
 
-
+$link-color:              $blue12;
+$link-hover-color:        $link;
 
 
 /* Panels */
@@ -37,6 +38,8 @@ $panel-default-border:      transparent;
 
 /* Buttons */
 $padding-base-vertical: 4px;
+$padding-base-horizontal: 8px;
+
 $btn-font-weight:         600;
 
 

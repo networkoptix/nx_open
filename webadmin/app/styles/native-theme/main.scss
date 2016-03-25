@@ -18,15 +18,12 @@ body {
 .product-name:after{
   content: "(\03B2)";
   font-style: italic;
-  color: $gray;
+  opacity: 0.5;
   font-size: 90%;
 }
-
-a .product-name:after {
-  color: $link-color;
+a.product-name:after{
+  opacity: 1;
 }
-
-
 
 .inline-block{
   display: inline-block;
