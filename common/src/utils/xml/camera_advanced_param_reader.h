@@ -6,6 +6,8 @@
 
 #include <utils/common/connective.h>
 
+#include <nx/utils/uuid.h>
+
 class QDomElement;
 
 /** Static class for reading camera advanced parameters. */

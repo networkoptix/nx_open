@@ -157,8 +157,10 @@ void QnFileConnectionProcessor::run()
         else
         {
             d->response.messageBody = file->readAll();
+#ifndef _DEBUG
             if (d->response.messageBody.size() < cachedFiles.maxCost())
                 cachedFiles.insert(path, new CacheEntry(d->response.messageBody, lastModified), d->response.messageBody.size());
+#endif
         }
 
         const QString fileFormat = QFileInfo(path).suffix().toLower();

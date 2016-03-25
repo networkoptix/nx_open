@@ -15,10 +15,6 @@
 /* Useful utils */
 #include <common/common_globals.h>
 
-#include <nx/utils/thread/mutex.h>
-#include <nx/utils/thread/wait_condition.h>
-#include <nx/utils/uuid.h>
-
 /* STL headers. */
 #include <algorithm>
 #include <functional>
@@ -33,6 +29,7 @@
 /* QT headers. */
 
 #include <QtCore/QObject>
+#include <QtCore/QSharedPointer>
 #include <QtCore/QDateTime>
 #include <QtCore/QDir>
 #include <QtCore/QFile>
@@ -58,11 +55,5 @@
 #include <QtCore/QTimer>
 #include <QtCore/QtDebug>
 #include <QtCore/QUrlQuery>
-
-#include <QtGui/QColor>
-#include <QtGui/QFont>
-#include <QtGui/QFontMetrics>
-#include <QtGui/QPixmap>
-#include <QtGui/QPixmapCache>
 
 #endif

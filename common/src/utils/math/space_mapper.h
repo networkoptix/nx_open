@@ -9,6 +9,8 @@
 #include <QtCore/QStringList>
 #include <QtCore/QMetaType>
 
+#include <QtGui/QVector3D>
+
 #include "interpolator.h"
 
 
