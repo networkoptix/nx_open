@@ -53,7 +53,9 @@ QtObject
         readonly property color windowText: context.getPaletteColor("light", 1);
         readonly property color shadow: context.getPaletteColor("dark", 4);
         readonly property color text: context.getPaletteColor("light", 13);
+        readonly property color light: context.getPaletteColor("light", 7);
         readonly property color buttonText: text;
+        readonly property color brightText: context.getPaletteColor("light", 16);
         readonly property color midlight: context.getPaletteColor("dark", 12);
         readonly property color button: context.getPaletteColor("dark", 10);
 

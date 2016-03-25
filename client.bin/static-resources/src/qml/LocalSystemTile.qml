@@ -134,12 +134,12 @@ BaseTile
                 onAccepted: thisComponent.connectClicked();
             }
 
-            CheckBox
+            NxCheckBox
             {
                 text: qsTr("Save password");
             }
 
-            CheckBox
+            NxCheckBox
             {
                 enabled: false;
                 text: qsTr("Auto-login");
