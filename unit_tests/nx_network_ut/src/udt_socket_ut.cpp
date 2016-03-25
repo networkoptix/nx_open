@@ -14,6 +14,7 @@
 #include <nx/network/udt/udt_pollset.h>
 #include <nx/network/test_support/simple_socket_test_helper.h>
 #include <nx/network/test_support/socket_test_helper.h>
+#include <utils/common/guard.h>
 #include <utils/common/string.h>
 
 
@@ -183,6 +184,14 @@ TEST_F(SocketUdt, rendezvousConnect)
     ASSERT_TRUE(acceptorSocket.setNonBlockingMode(true));
     ASSERT_TRUE(acceptorSocket.bind(SocketAddress(HostAddress::localhost, 0)));
 
+    auto socketStoppedGuard = makeScopedGuard(
+        [&connectorSocket, &acceptorSocket]
+        {
+            //cleaning up
+            connectorSocket.pleaseStopSync();
+            acceptorSocket.pleaseStopSync();
+        });
+
     std::promise<SystemError::ErrorCode> connectorConnectedPromise;
     connectorSocket.connectAsync(
         acceptorSocket.getLocalAddress(),
@@ -195,14 +204,18 @@ TEST_F(SocketUdt, rendezvousConnect)
     std::promise<SystemError::ErrorCode> acceptorConnectedPromise;
     acceptorSocket.connectAsync(
         connectorSocket.getLocalAddress(),
-        [&acceptorConnectedPromise, &acceptorSocket](
+        [&acceptorConnectedPromise](
             SystemError::ErrorCode errorCode)
         {
             acceptorConnectedPromise.set_value(errorCode);
         });
 
-    ASSERT_EQ(SystemError::noError, connectorConnectedPromise.get_future().get());
-    ASSERT_EQ(SystemError::noError, acceptorConnectedPromise.get_future().get());
+    const auto connectorResultCode = connectorConnectedPromise.get_future().get();
+    ASSERT_EQ(SystemError::noError, connectorResultCode)
+        << SystemError::toString(connectorResultCode).toStdString();
+    const auto acceptorResultCode = acceptorConnectedPromise.get_future().get();
+    ASSERT_EQ(SystemError::noError, acceptorResultCode)
+        << SystemError::toString(acceptorResultCode).toStdString();
 
     //after successfull connect starting listener on one side and connector on the other one
     setCreateStreamSocketFunc(
@@ -245,10 +258,6 @@ TEST_F(SocketUdt, rendezvousConnect)
     ASSERT_GT(connectionsGenerator.totalConnectionsEstablished(), 0);
     ASSERT_GT(connectionsGenerator.totalBytesSent(), 0);
     ASSERT_GT(connectionsGenerator.totalBytesReceived(), 0);
-
-    //cleaning up
-    connectorSocket.pleaseStopSync();
-    acceptorSocket.pleaseStopSync();
 }
 
 TEST_F(SocketUdt, acceptingFirstConnection)

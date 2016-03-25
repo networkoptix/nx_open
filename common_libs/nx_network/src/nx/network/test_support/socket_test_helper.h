@@ -158,7 +158,7 @@ private:
     const size_t m_maxTotalConnections;
     ConnectionsContainer m_connections;
     bool m_terminated;
-    std::mutex m_mutex;
+    mutable std::mutex m_mutex;
     size_t m_totalBytesSent;
     size_t m_totalBytesReceived;
     std::vector<SystemError::ErrorCode> m_errors;

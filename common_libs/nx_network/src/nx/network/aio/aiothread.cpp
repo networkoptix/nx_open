@@ -198,7 +198,6 @@ void AIOThread::removeFromWatch(
     }
     else
     {
-        //TODO #ak should receive user handler and call it when removal complete
         m_impl->pollSetModificationQueue.push_back(typename detail::AIOThreadImpl::SocketAddRemoveTask(
             detail::TaskType::tRemoving,
             sock,

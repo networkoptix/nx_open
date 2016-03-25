@@ -72,7 +72,7 @@ TestConnection::TestConnection(
     ++TestConnection_count;
 }
 
-static std::mutex mtx1;
+static std::mutex terminatedSocketsIDsMutex;
 static std::map<int, bool> terminatedSocketsIDs;
 
 
@@ -90,7 +90,7 @@ TestConnection::~TestConnection()
         _socket->pleaseStopSync();
 
     {
-        std::unique_lock<std::mutex> lk(mtx1);
+        std::unique_lock<std::mutex> lk(terminatedSocketsIDsMutex);
         NX_ASSERT(terminatedSocketsIDs.emplace(m_id, _socket ? true : false).second);
     }
 #ifdef DEBUG_OUTPUT
@@ -489,6 +489,7 @@ size_t ConnectionsGenerator::totalBytesReceived() const
 
 std::vector<SystemError::ErrorCode> ConnectionsGenerator::totalErrors() const
 {
+    std::unique_lock<std::mutex> lk(m_mutex);
     return m_errors;
 }
 
@@ -496,22 +497,22 @@ void ConnectionsGenerator::onConnectionFinished(
     int id, SystemError::ErrorCode code,
     ConnectionsContainer::iterator connectionIter)
 {
+    std::unique_lock<std::mutex> lk(m_mutex);
+
     if (code != SystemError::noError)
     {
         m_errors.push_back(code);
         if (m_errors.size() < 3)
         {
-            std::cerr
-                << "onConnectionFinished: "
-                << SystemError::toString(code).toStdString()
-                << std::endl;
+            // std::cerr
+            //     << "onConnectionFinished: "
+            //     << SystemError::toString(code).toStdString()
+            //     << std::endl;
         }
     }
 
-    std::unique_lock<std::mutex> lk(m_mutex);
-
     {
-        std::unique_lock<std::mutex> lk(mtx1);
+        std::unique_lock<std::mutex> lk(terminatedSocketsIDsMutex);
         NX_ASSERT(terminatedSocketsIDs.find(id) == terminatedSocketsIDs.end());
     }
 

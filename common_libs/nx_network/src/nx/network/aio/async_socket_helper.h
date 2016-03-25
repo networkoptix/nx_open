@@ -331,6 +331,7 @@ public:
     {
         if (this->m_socket->impl()->aioThread.load() == QThread::currentThread())
         {
+            //TODO #ak we must cancel resolve task here, but must do it without blocking!
             cancelAsyncIOWhileInAioThread(eventType);
         }
         else
@@ -521,14 +522,9 @@ private:
 
                 if( m_connectHandler )
                 {
-                    //probably this approach is the best for all other kinds of events
-                    SystemError::ErrorCode resultCode;
-                    if (!m_abstractSocketPtr->getLastError(&resultCode))
-                        resultCode = SystemError::getLastOSErrorCode();
-
                     //async connect. If we are here than connect succeeded
                     std::unique_ptr<AsyncSocketImplHelper, decltype(__finally_connect)> cleanupGuard( this, __finally_connect );
-                    connectHandlerLocal( resultCode );
+                    connectHandlerLocal( SystemError::noError );
                 }
                 else
                 {
