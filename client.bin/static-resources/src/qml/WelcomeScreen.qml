@@ -75,13 +75,16 @@ Rectangle
                     FactorySystemTile
                     {
                         property var hostsModel: QnSystemHostsModel { systemId: model.systemId; }
+
                         visualParent: thisComponent;
-                        host: hostsModel.firstHost;
                         systemName: qsTr("New System");
+                        host: hostsModel.firstHost;
 
                         onConnectClicked:
                         {
-                            context.setupFactorySystem(hostsModel.firstHost);
+                            console.log("Show wizard for system <", systemName
+                                , ">, host <", host, ">");
+                            context.setupFactorySystem(host);
                         }
                     }
                 }
@@ -120,7 +123,9 @@ Rectangle
 
                         onConnectClicked:
                         {
-                            console.log(selectedHost, ":", selectedUser, ":", selectedPassword);
+                            console.log("Connecting to local system <", systemName
+                                , ">, host <", selectedHost, "> with credentials: "
+                                , selectedUser, ":", selectedPassword);
                             context.connectToLocalSystem(selectedHost, selectedUser, selectedPassword);
                         }
                     }
@@ -156,6 +161,8 @@ Rectangle
 
                         onConnectClicked:
                         {
+                            console.log("Connecting to cloud system <", systemName
+                                , ">, throug the host <", hostsModel.firstHost, ">");
                             context.connectToCloudSystem(hostsModel.firstHost);
                         }
                     }

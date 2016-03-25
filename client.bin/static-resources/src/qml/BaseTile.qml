@@ -10,7 +10,6 @@ Item
 
     property Item visualParent;
     property string systemName;
-    property string host;
     property bool isRecentlyConnected;
 
     property Component centralAreaDelegate;

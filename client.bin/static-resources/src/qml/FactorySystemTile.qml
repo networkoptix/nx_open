@@ -6,36 +6,53 @@ BaseTile
 {
     id: thisComponent;
 
+    property string host;
     standardColor: Style.colors.custom.systemTile.factorySystemBkg;
     hoveredColor: Style.colors.custom.systemTile.factorySystemHovered;
 
     isExpandable: false;
 
 
-    centralAreaDelegate: Row
+    centralAreaDelegate: Column
     {
-        spacing: 4;
+        topPadding: 2;
 
-        topPadding: 28; // Check me!
-
-        Image
-        {
-            id: imageItem;
-
-            width: 24;
-            height: 24;
-            source: "qrc:/skin/welcome_page/gears.png";
-        }
+        spacing: 10;
 
         NxLabel
         {
-            id: setupText;
+            id: textItem;
 
-            anchors.verticalCenter: imageItem.verticalCenter;
+            anchors.left: parent.left;
+            anchors.leftMargin: 4;
 
-            font: Style.fonts.systemTile.setupSystem;
-            color: Style.colors.custom.systemTile.setupSystem;
-            text: qsTr("Click to setup");
+            font: Style.fonts.systemTile.info;
+            text: host;
+        }
+
+        Row
+        {
+            spacing: 4;
+
+            Image
+            {
+                id: imageItem;
+
+                width: 24;
+                height: 24;
+                source: "qrc:/skin/welcome_page/gears.png";
+            }
+
+            NxLabel
+            {
+                id: setupText;
+
+                anchors.verticalCenter: imageItem.verticalCenter;
+
+                font: Style.fonts.systemTile.setupSystem;
+                color: Style.colors.custom.systemTile.setupSystem;
+                text: qsTr("Click to setup");
+            }
         }
     }
 
