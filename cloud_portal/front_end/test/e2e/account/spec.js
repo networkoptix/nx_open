@@ -35,6 +35,7 @@ describe('Account suite', function () {
 
     it("should show email, first name, last name, subscribe", function () {
         p.get(p.accountUrl);
+
         expect(p.emailField.getAttribute('value')).toContain(p.userEmail);
         expect(p.firstNameInput.isDisplayed()).toBe(true);
         expect(p.lastNameInput.isDisplayed()).toBe(true);
@@ -51,7 +52,7 @@ describe('Account suite', function () {
 
         p.saveButton.click();
 
-        p.helper.catchAlert('Your account was successfully saved.');
+        p.alert.catchAlert( p.alert.alertMessages.accountSuccess, p.alert.alertTypes.success);
 
         p.refresh();
 
@@ -69,7 +70,7 @@ describe('Account suite', function () {
 
         p.saveButton.click();
 
-        p.helper.catchAlert('Your account was successfully saved.');
+        p.alert.catchAlert( p.alert.alertMessages.accountSuccess, p.alert.alertTypes.success);
 
         p.refresh();
 
@@ -87,7 +88,7 @@ describe('Account suite', function () {
 
         p.saveButton.click();
 
-        p.helper.catchAlert('Your account was successfully saved.');
+        p.alert.catchAlert( p.alert.alertMessages.accountSuccess, p.alert.alertTypes.success);
 
         p.refresh();
 
@@ -105,7 +106,7 @@ describe('Account suite', function () {
 
         p.saveButton.click();
 
-        p.helper.catchAlert('Your account was successfully saved.');
+        p.alert.catchAlert( p.alert.alertMessages.accountSuccess, p.alert.alertTypes.success);
 
         p.refresh();
 
@@ -133,7 +134,7 @@ describe('Account suite', function () {
         p.passwordInput.sendKeys(p.userPasswordNew);
         p.submitButton.click();
 
-        p.helper.catchAlert('Your password was successfully changed.');
+p.alert.catchAlert( p.alert.alertMessages.changePassSuccess, p.alert.alertTypes.success);
 
         browser.refresh();
 
@@ -141,7 +142,7 @@ describe('Account suite', function () {
         p.passwordInput.sendKeys(p.userPassword);
         p.submitButton.click();
 
-        p.helper.catchAlert('Your password was successfully changed.');
+p.alert.catchAlert( p.alert.alertMessages.changePassSuccess, p.alert.alertTypes.success);
     });
 
     it("should save new password correctly (and change it back)", function () {
@@ -149,7 +150,7 @@ describe('Account suite', function () {
         p.currentPasswordInput.sendKeys(p.userPassword);
         p.passwordInput.sendKeys(p.userPasswordNew);
         p.submitButton.click();
-        p.helper.catchAlert('Your password was successfully changed.');
+p.alert.catchAlert( p.alert.alertMessages.changePassSuccess, p.alert.alertTypes.success);
 
         p.helper.logout();
         p.helper.login(p.userEmail, p.userPasswordNew);
@@ -158,7 +159,7 @@ describe('Account suite', function () {
         p.currentPasswordInput.sendKeys(p.userPasswordNew);
         p.passwordInput.sendKeys(p.userPassword);
         p.submitButton.click();
-        p.helper.catchAlert('Your password was successfully changed.');
+p.alert.catchAlert( p.alert.alertMessages.changePassSuccess, p.alert.alertTypes.success);
     });
 
 
@@ -191,7 +192,7 @@ describe('Account suite', function () {
         p.passwordInput.sendKeys(p.userPassword);
         p.submitButton.click();
 
-        p.helper.catchAlert('Couldn\'t change your password: Current password doesn\'t match');
+        p.alert.catchAlert( p.alert.alertMessages.changePassWrongCurrent, p.alert.alertTypes.danger);
     });
 
     xit("should not allow to change password if new password is the same as old password", function () {
