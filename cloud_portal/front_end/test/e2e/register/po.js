@@ -61,9 +61,6 @@ var RegisterPage = function () {
 
     this.htmlBody = element(by.css('body'));
 
-    this.registerSuccessAlert = element(by.css('process-alert[process=register]')).element(by.css('.alert')); // alert with success message
-    //this.alert = element(by.css('process-alert')).element(by.css('.alert')); // some alert
-
     this.fieldWrap = function(field) {
         return field.element(by.xpath('../..'));
     };
