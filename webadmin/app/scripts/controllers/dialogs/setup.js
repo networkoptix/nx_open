@@ -337,6 +337,7 @@ angular.module('webadminApp')
         };
         $scope.finish = function(){
             if(nativeClientObject) {
+                $log.log("close dialog");
                 window.close();
             }else{
                 $location.path('/settings');
@@ -348,6 +349,8 @@ angular.module('webadminApp')
                 if(nativeClientObject.cancel){
                     nativeClientObject.cancel();
                 }
+
+                $log.log("close dialog");
                 window.close();
             }
         };
