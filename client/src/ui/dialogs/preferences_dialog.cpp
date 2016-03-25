@@ -1,7 +1,6 @@
 #include "preferences_dialog.h"
 #include "ui_preferences_dialog.h"
 
-#include <QtWidgets/QMessageBox>
 
 #include <client/client_settings.h>
 

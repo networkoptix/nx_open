@@ -1,7 +1,6 @@
 #include "ldap_users_dialog.h"
 #include "ui_ldap_users_dialog.h"
 
-#include <QtWidgets/QMessageBox>
 #include <QtCore/QTimer>
 
 #include <core/resource_management/resource_pool.h>

@@ -1,6 +1,5 @@
 #include "workbench_incompatible_servers_action_handler.h"
 
-#include <QtWidgets/QMessageBox>
 #include <QtWidgets/QInputDialog>
 #include <QtCore/QUrl>
 

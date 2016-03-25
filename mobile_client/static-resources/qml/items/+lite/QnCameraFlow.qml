@@ -61,6 +61,23 @@ FocusScope
                 cameraGrid.currentIndex = 0
             }
         }
+
+        property int firstVideoIndex: -1
+        property int lastVideoIndex: -1
+        onFirstVisibleIndexChanged: videoIndexesUpdateDelay.restart()
+        onLastVisibleIndexChanged: videoIndexesUpdateDelay.restart()
+
+        Timer
+        {
+            id: videoIndexesUpdateDelay
+            interval: 500
+
+            onTriggered:
+            {
+                cameraGrid.firstVideoIndex = cameraGrid.firstVisibleIndex
+                cameraGrid.lastVideoIndex = cameraGrid.lastVisibleIndex
+            }
+        }
     }
 
     Component
@@ -98,9 +115,12 @@ FocusScope
                 anchors.fill: parent
                 anchors.margins: cameraGrid.spacing / 2
 
+                resourceId: model.uuid
                 text: model.resourceName
                 status: model.resourceStatus
                 thumbnail: model.thumbnail
+                useVideo: index >= cameraGrid.firstVideoIndex &&
+                          index <= cameraGrid.lastVideoIndex
 
                 onClicked: open()
 

@@ -76,7 +76,7 @@
         <product.display.title>${client.display.name}</product.display.title>
         <template>lib</template>
         <!--Global libs-->
-        <qt.libs>core gui network opengl xml sql multimedia concurrent webkit webkitwidgets</qt.libs>
+        <qt.libs>core gui network opengl xml sql multimedia concurrent webkit webkitwidgets qml quick quickwidgets</qt.libs>
         <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc</ffmpeg.libs>
         <global.libs>-lcommon -lnx_network -lnx_streaming -lnx_audio -lappserver2 -lclient.core -ludt -lcloud_db_client</global.libs>
         <!--Specific os libs used-->
@@ -92,7 +92,7 @@
         <linux.defines/>
         <mac.defines/>
         <buildLib>sharedlib</buildLib>
-        <rdep.packages>openssl quazip festival festival-vox</rdep.packages>
+        <rdep.packages>openssl quazip festival festival-vox roboto-ttf</rdep.packages>
     </properties>
     <profiles>
         <profile>

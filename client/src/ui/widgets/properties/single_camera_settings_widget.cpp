@@ -5,7 +5,6 @@
 #include <QtCore/QUrl>
 #include <QtCore/QUrlQuery>
 #include <QtCore/QProcess>
-#include <QtWidgets/QMessageBox>
 #include <QtGui/QDesktopServices>
 
 #include <camera/single_thumbnail_loader.h>

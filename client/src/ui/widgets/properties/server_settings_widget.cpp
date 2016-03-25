@@ -4,7 +4,6 @@
 #include <functional>
 
 #include <QtCore/QDir>
-#include <QtWidgets/QMessageBox>
 #include <QtGui/QStandardItemModel>
 #include <QtWidgets/QStyledItemDelegate>
 #include <QtWidgets/QSlider>
