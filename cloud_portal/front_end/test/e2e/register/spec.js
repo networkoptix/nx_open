@@ -39,6 +39,7 @@ describe('Registration suite', function () {
         p.prepareToAlertCheck();
         p.alert.submitButton.click();
     }, p.alert.alertMessages.registerSuccess, p.alert.alertTypes.success, true);
+
     it("should open register page in anonymous state by clicking Register button on top right corner", function () {
         p.getHomePage();
 
@@ -63,6 +64,7 @@ describe('Registration suite', function () {
         expect(browser.getCurrentUrl()).toContain('register');
         expect(p.htmlBody.getText()).toContain('Register to be happy');
     });
+
     it("should register user with correct credentials", function () {
         p.getByUrl();
 
@@ -73,7 +75,7 @@ describe('Registration suite', function () {
 
         p.submitButton.click();
 
-        p.helper.catchAlert('Your account was successfully registered. Please, check your email to confirm it');
+        p.alert.catchAlert( p.alert.alertMessages.registerSuccess, p.alert.alertTypes.success);
 
         // Check that registration form element is NOT displayed on page
         expect(p.firstNameInput.isPresent()).toBe(false);
@@ -89,7 +91,7 @@ describe('Registration suite', function () {
 
         p.submitButton.click();
 
-        p.helper.catchAlert('Your account was successfully registered. Please, check your email to confirm it');
+        p.alert.catchAlert( p.alert.alertMessages.registerSuccess, p.alert.alertTypes.success);
 
         // Check that registration form element is NOT displayed on page
         expect(p.firstNameInput.isPresent()).toBe(false);
@@ -105,7 +107,7 @@ describe('Registration suite', function () {
 
         p.submitButton.click();
 
-        p.helper.catchAlert('Your account was successfully registered. Please, check your email to confirm it');
+        p.alert.catchAlert( p.alert.alertMessages.registerSuccess, p.alert.alertTypes.success);
 
         // Check that registration form element is NOT displayed on page
         expect(p.firstNameInput.isPresent()).toBe(false);
@@ -121,7 +123,7 @@ describe('Registration suite', function () {
 
         p.submitButton.click();
 
-        p.helper.catchAlert('Your account was successfully registered. Please, check your email to confirm it');
+        p.alert.catchAlert( p.alert.alertMessages.registerSuccess, p.alert.alertTypes.success);
 
         // Check that registration form element is NOT displayed on page
         expect(p.firstNameInput.isPresent()).toBe(false);
