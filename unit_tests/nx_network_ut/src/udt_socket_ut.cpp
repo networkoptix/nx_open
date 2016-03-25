@@ -210,8 +210,12 @@ TEST_F(SocketUdt, rendezvousConnect)
             acceptorConnectedPromise.set_value(errorCode);
         });
 
-    ASSERT_EQ(SystemError::noError, connectorConnectedPromise.get_future().get());
-    ASSERT_EQ(SystemError::noError, acceptorConnectedPromise.get_future().get());
+    const auto connectorResultCode = connectorConnectedPromise.get_future().get();
+    ASSERT_EQ(SystemError::noError, connectorResultCode)
+        << SystemError::toString(connectorResultCode).toStdString();
+    const auto acceptorResultCode = acceptorConnectedPromise.get_future().get();
+    ASSERT_EQ(SystemError::noError, acceptorResultCode)
+        << SystemError::toString(acceptorResultCode).toStdString();
 
     //after successfull connect starting listener on one side and connector on the other one
     setCreateStreamSocketFunc(
