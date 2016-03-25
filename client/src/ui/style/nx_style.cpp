@@ -3,6 +3,7 @@
 
 #include <QtCore/QtMath>
 #include <QtGui/QPainter>
+#include <QtWidgets/QApplication>
 #include <QtWidgets/QStyleOption>
 #include <QtWidgets/QStyleOptionButton>
 #include <QtWidgets/QPushButton>
@@ -60,8 +61,6 @@ namespace
             path.moveTo(rc.x(0.3), rc.y(0.0));
             path.lineTo(rc.x(0.8), rc.y(0.5));
             path.lineTo(rc.x(0.3), rc.y(1.0));
-            break;
-        default:
             break;
         }
 
@@ -376,8 +375,8 @@ void QnNxStyle::drawPrimitive(
     case PE_Frame:
         return;
 
-    default: return;
-        break;
+    default:
+        return;
     }
 
     base_type::drawPrimitive(element, option, painter, widget);
@@ -1175,8 +1174,8 @@ void QnNxStyle::drawControl(
                     qreal x1 = (1.0 - f(std::cos(qMax(0.0, angle - kTickWidth)))) / 2.0;
                     qreal x2 = (1.0 - f(std::cos(qMin(M_PI, angle)))) / 2.0;
 
-                    int rx1 = rect.left() + rect.width() * x1;
-                    int rx2 = rect.left() + rect.width() * x2;
+                    int rx1 = int(rect.left() + rect.width() * x1);
+                    int rx2 = int(rect.left() + rect.width() * x2);
 
                     painter->fillRect(qMax(rx1, rect.left()), rect.top(), rx2 - rx1, rect.height(), color);
                 }
@@ -1876,7 +1875,6 @@ QSize QnNxStyle::sizeFromContents(
             sz.setHeight(qMax(sz.height(), Metrics::kViewRowHeight));
             return sz;
         }
-        break;
 
     default:
         break;
@@ -1898,9 +1896,9 @@ int QnNxStyle::styleHint(
                 qstyleoption_cast<const QStyleOptionGroupBox*>(option))
         {
             if (groupBox->features & QStyleOptionFrame::Flat)
-                return (int)groupBox->palette.color(QPalette::Text).rgba();
+                return int(groupBox->palette.color(QPalette::Text).rgba());
             else
-                return (int)groupBox->palette.color(QPalette::WindowText).rgba();
+                return int(groupBox->palette.color(QPalette::WindowText).rgba());
         }
         break;
 
