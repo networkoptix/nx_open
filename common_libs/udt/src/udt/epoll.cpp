@@ -294,15 +294,15 @@ int CEPoll::wait(
 
                     if ((NULL != lrfds) && (ev[i].events & EPOLLIN))
                     {
-                        lrfds->emplace(ev[i].data.fd, ev[i].events);
+                        lrfds->emplace((SYSSOCKET)ev[i].data.fd, (int)ev[i].events);
                         ++total;
                     }
                     if ((NULL != lwfds) && (ev[i].events & EPOLLOUT))
                     {
                         //hangup - is an error when connecting, so adding error flag just for case
                         lwfds->emplace(
-                            ev[i].data.fd,
-                            ev[i].events | (hangup ? UDT_EPOLL_ERR : 0));
+                            (SYSSOCKET)ev[i].data.fd,
+                            int(ev[i].events | (hangup ? UDT_EPOLL_ERR : 0)));
                         ++total;
                     }
 
@@ -313,7 +313,7 @@ int CEPoll::wait(
                     if (lrfds != NULL &&
                         epollContext->m_sUDTSocksIn.find(ev[i].data.fd) != epollContext->m_sUDTSocksIn.end())
                     {
-                        lrfds->emplace(ev[i].data.fd, ev[i].events);
+                        lrfds->emplace((SYSSOCKET)ev[i].data.fd, (int)ev[i].events);
                         ++total;
                     }
 
@@ -322,8 +322,8 @@ int CEPoll::wait(
                     {
                         //hangup - is an error when connecting, so adding error flag just for case
                         lwfds->emplace(
-                            ev[i].data.fd,
-                            ev[i].events | (hangup ? UDT_EPOLL_ERR : 0));
+                            (SYSSOCKET)ev[i].data.fd,
+                            int(ev[i].events | (hangup ? UDT_EPOLL_ERR : 0)));
                         ++total;
                     }
                 }
