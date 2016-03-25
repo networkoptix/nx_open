@@ -50,8 +50,6 @@ LoginPage = function () {
     this.dialogLoginButton = this.loginDialog.element(by.buttonText('Login'));
     this.dialogCloseButton = this.loginDialog.all(by.css('button.close')).first();
 
-    this.loginIncorrectAlert = element(by.css('process-alert[process=login]')).element(by.css('.alert')); // alert with eror message
-
     this.loginSuccessElement = element.all(by.css('.auth-visible')).first(); // some element on page, that is only visible when user is authenticated
 
     this.loginDialogBackground = element(by.css('.modal')); // login dialog overlay
