@@ -5,7 +5,6 @@
 #include <QtCore/QFileInfo>
 
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QMessageBox>
 
 #include <core/resource/resource_directory_browser.h>
 #include <core/resource_management/resource_pool.h>

@@ -164,7 +164,7 @@ void QnNoptixStyle::polish(QApplication *application) {
     font.setPixelSize(13);
     font.setStyle(QFont::StyleNormal);
     font.setWeight(QFont::Normal);
-    font.setFamily(lit("Roboto")); // TODO: #dklychkov Include Roboto font into resources
+    font.setFamily(lit("Roboto"));
     application->setFont(font);
 
     m_customizer->customize(application);

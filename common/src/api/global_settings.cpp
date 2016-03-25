@@ -4,6 +4,7 @@
 
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_properties.h>
 
 #include "resource_property_adaptor.h"
 
@@ -98,6 +99,11 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
     connect(qnResPool,                              &QnResourcePool::resourceRemoved,                   this,   &QnGlobalSettings::at_resourcePool_resourceRemoved);
     for(const QnResourcePtr &resource: qnResPool->getResources())
         at_resourcePool_resourceAdded(resource);
+
+    connect(propertyDictionary, &QnResourcePropertyDictionary::asyncSaveDone, this, [this](int reqId, ec2::ErrorCode errorCode)
+    {
+
+    });
 }
 
 QnGlobalSettings::~QnGlobalSettings() {
@@ -419,9 +425,28 @@ void QnGlobalSettings::setEmailSettings(const QnEmailSettings &settings) {
     m_timeoutAdaptor->setValue(settings.timeout);
 }
 
-void QnGlobalSettings::synchronizeNow() {
+void QnGlobalSettings::synchronizeNow()
+{
     for (QnAbstractResourcePropertyAdaptor* adaptor: m_allAdaptors)
-        adaptor->synchronizeNow();
+        adaptor->saveToResource();
+
+    QnMutexLocker locker(&m_mutex);
+    NX_ASSERT(m_admin, Q_FUNC_INFO, "Invalid sync state");
+    if (!m_admin)
+        return;
+    propertyDictionary->saveParamsAsync(m_admin->getId());
+}
+
+bool QnGlobalSettings::synchronizeNowSync()
+{
+    for (QnAbstractResourcePropertyAdaptor* adaptor : m_allAdaptors)
+        adaptor->saveToResource();
+
+    QnMutexLocker locker(&m_mutex);
+    NX_ASSERT(m_admin, Q_FUNC_INFO, "Invalid sync state");
+    if (!m_admin)
+        return false;
+    return propertyDictionary->saveParams(m_admin->getId());
 }
 
 bool QnGlobalSettings::isUpdateNotificationsEnabled() const {

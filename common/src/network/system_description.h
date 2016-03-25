@@ -19,6 +19,7 @@ enum class QnServerField
     , FlagsField            = 0x08
 };
 Q_DECLARE_FLAGS(QnServerFields, QnServerField)
+Q_DECLARE_METATYPE(QnServerFields)
 
 class QnSystemDescription : public QObject
 {
@@ -42,7 +43,7 @@ public:
 
     typedef QList<QnModuleInformation> ServersList;
     ServersList servers() const;
-    
+
     enum { kDefaultPriority = 0};
     void addServer(const QnModuleInformation &serverInfo
         , int priority = kDefaultPriority);

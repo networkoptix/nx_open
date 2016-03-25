@@ -1,7 +1,5 @@
 #include "gl_hardware_checker.h"
 
-#include <QtWidgets/QMessageBox>
-
 #include <nx/utils/log/log.h>
 #include <utils/common/warnings.h>
 #include <utils/common/software_version.h>

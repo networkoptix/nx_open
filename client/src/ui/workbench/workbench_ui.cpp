@@ -1732,6 +1732,7 @@ void QnWorkbenchUi::at_notificationsItem_geometryChanged()
         setNotificationsOpened(); //there is no check there but it will fix the X-coord animation
 
     updateViewportMargins();
+    updateFpsGeometry();
 }
 
 void QnWorkbenchUi::createNotificationsWidget()
@@ -2531,9 +2532,14 @@ void QnWorkbenchUi::setFpsVisible(bool fpsVisible) {
     action(QnActions::ShowFpsAction)->setChecked(fpsVisible);
 }
 
-void QnWorkbenchUi::updateFpsGeometry() {
+void QnWorkbenchUi::updateFpsGeometry()
+{
+    qreal right = m_notificationsBackgroundItem
+        ? m_notificationsBackgroundItem->geometry().left()
+        : m_controlsWidgetRect.right();
+
     QPointF pos = QPointF(
-        m_controlsWidgetRect.right() - m_fpsItem->size().width(),
+        right - m_fpsItem->size().width(),
         m_titleItem ? m_titleItem->geometry().bottom() : 0.0
         );
 

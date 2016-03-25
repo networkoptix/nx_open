@@ -31,14 +31,10 @@ int QnSaveCloudSystemCredentialsHandler::execute(
     if (data.reset)
     {
         qnGlobalSettings->resetCloudParams();
-        qnGlobalSettings->synchronizeNow();
-        //TODO: #GDM sync syncronizeNow with result
-        /*
         if (!qnGlobalSettings->synchronizeNowSync())
             result.setError(
                 QnJsonRestResult::CantProcessRequest,
                 lit("Failed to save cloud credentials to local DB"));
-        */
         return nx_http::StatusCode::ok;
     }
 
@@ -73,10 +69,6 @@ int QnSaveCloudSystemCredentialsHandler::execute(
     qnGlobalSettings->setCloudSystemID(data.cloudSystemID);
     qnGlobalSettings->setCloudAccountName(data.cloudAccountName);
     qnGlobalSettings->setCloudAuthKey(data.cloudAuthKey);
-    qnGlobalSettings->synchronizeNow();
-
-    //TODO: #GDM sync syncronizeNow with result
-    /*
     if (!qnGlobalSettings->synchronizeNowSync())
     {
         result.setError(
@@ -84,7 +76,6 @@ int QnSaveCloudSystemCredentialsHandler::execute(
              lit("Failed to save cloud credentials to local DB"));
          return nx_http::StatusCode::internalServerError;
     }
-    */
 
     //trying to connect to the cloud to activate system
     //we connect to the cloud after saving properties to DB because
@@ -112,9 +103,6 @@ int QnSaveCloudSystemCredentialsHandler::execute(
     {
         //rolling back changes
         qnGlobalSettings->resetCloudParams();
-        qnGlobalSettings->synchronizeNow();
-        //TODO: #GDM sync syncronizeNow with result
-        /*
         if (!qnGlobalSettings->synchronizeNowSync())
         {
             //we saved cloud credentials to local DB but failed to connect to cloud and could not remove them!
@@ -122,7 +110,7 @@ int QnSaveCloudSystemCredentialsHandler::execute(
             //hopefully, cloud will become available some time later
             result.setError(QnJsonRestResult::NoError);
         }
-        else */
+        else
         {
             result.setError(
                 QnJsonRestResult::CantProcessRequest,

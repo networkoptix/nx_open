@@ -3,7 +3,6 @@
 
 #include <QtCore/QTimer>
 #include <QtGui/QPainter>
-#include <QtWidgets/QMessageBox>
 
 #include <ui/fisheye/fisheye_calibrator.h>
 #include <ui/widgets/fisheye/fisheye_calibration_image_widget.h>

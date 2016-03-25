@@ -29,7 +29,7 @@ public:
     virtual ~QnGlobalSettings();
 
     void synchronizeNow();
-
+    bool synchronizeNowSync();
 
     QSet<QString> disabledVendorsSet() const;
     QString disabledVendors() const;

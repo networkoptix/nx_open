@@ -8,7 +8,6 @@
 #include <QtGui/QStandardItemModel>
 
 #include <QtWidgets/QDesktopWidget>
-#include <QtWidgets/QMessageBox>
 #include <QtWidgets/QInputDialog>
 
 #include <api/app_server_connection.h>

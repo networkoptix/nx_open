@@ -81,7 +81,7 @@ QnClientSettings::QnClientSettings(bool forceLocalSettings, QObject *parent):
     setShowcaseUrl(QUrl(QnAppInfo::showcaseUrl()));
     setSettingsUrl(QUrl(QnAppInfo::settingsUrl()));
 
-    /* Set names. */
+    /* Set names (compatibility with 1.0). */
     setName(MEDIA_FOLDER,           lit("mediaRoot"));
     setName(EXTRA_MEDIA_FOLDERS,    lit("auxMediaRoot"));
     setName(DOWNMIX_AUDIO,          lit("downmixAudio"));

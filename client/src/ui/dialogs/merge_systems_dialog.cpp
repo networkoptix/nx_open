@@ -3,7 +3,6 @@
 
 #include <QtCore/QUrl>
 #include <QtWidgets/QButtonGroup>
-#include <QtWidgets/QMessageBox>
 
 #include <api/app_server_connection.h>
 #include <common/common_module.h>

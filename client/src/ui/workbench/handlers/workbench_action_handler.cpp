@@ -54,6 +54,8 @@
 #include <plugins/resource/avi/avi_resource.h>
 #include <plugins/storage/file_storage/layout_storage_resource.h>
 
+#include <platform/environment.h>
+
 #include <recording/time_period_list.h>
 
 #include <redass/redass_controller.h>
@@ -126,7 +128,6 @@
 
 #include <utils/applauncher_utils.h>
 #include <utils/local_file_cache.h>
-#include <utils/common/environment.h>
 #include <utils/common/delete_later.h>
 #include <utils/common/mime_data.h>
 #include <utils/common/event_processors.h>
@@ -1560,7 +1561,7 @@ void QnWorkbenchActionHandler::at_openInFolderAction_triggered() {
     if(resource.isNull())
         return;
 
-    QnEnvironment::showInGraphicalShell(mainWindow(), resource->getUrl());
+    QnEnvironment::showInGraphicalShell(resource->getUrl());
 }
 
 void QnWorkbenchActionHandler::at_deleteFromDiskAction_triggered() {

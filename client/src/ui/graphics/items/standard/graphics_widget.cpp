@@ -177,16 +177,8 @@ GraphicsWidget::GraphicsWidget(GraphicsWidgetPrivate &dd, QGraphicsItem *parent,
     d_ptr->q_ptr = this;
 }
 
-GraphicsWidget::~GraphicsWidget() {
-    // TODO: #Elric #Qt5.0.1 workaround for QTBUG-29684 that is fixed in Qt5.0.1
-    while(!childItems().empty()) // #QT5PORT
-        delete childItems().back();
-
-    /* This must be the last line of destructor so that this widget is not
-     * added to the list again. */
-    if(GraphicsWidgetSceneData *sd = d_func()->ensureSceneData())
-        sd->pendingLayoutWidgets.remove(this);
-}
+GraphicsWidget::~GraphicsWidget()
+{}
 
 void GraphicsWidget::initStyleOption(QStyleOption *option) const {
     base_type::initStyleOption(option);

@@ -1,15 +1,19 @@
 #include "unlink_from_cloud_dialog.h"
 
 #include <api/global_settings.h>
+#include <api/server_rest_connection.h>
 
 #include <cdb/connection.h>
 
-#include <utils/common/delayed.h>
+#include <common/common_module.h>
+#include <core/resource/media_server_resource.h>
 
 #include <client/client_settings.h>
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+
+#include <utils/common/delayed.h>
 
 using namespace nx::cdb;
 
@@ -142,30 +146,27 @@ void QnUnlinkFromCloudDialogPrivate::at_unbindFinished(api::ResultCode result)
         return;
     }
 
-    //TODO #dklychkov removing properties from settings
-
     Q_Q(QnUnlinkFromCloudDialog);
+    auto handleReply = [this, q](bool success, rest::Handle handleId, const QnRestResult& reply)
+    {
+        Q_UNUSED(handleId);
+        if (success && reply.error == QnRestResult::NoError)
+        {
+            unlinkedSuccessfully = true;
+            q->accept();
+        }
+        else
+        {
+            showFailure(reply.errorString);
+        }
+    };
 
-    qnGlobalSettings->resetCloudParams();
-    qnGlobalSettings->synchronizeNow(); //TODO: #GDM callback and sync variant
+    if (!qnCommon->currentServer())
+        return;
 
-//     int requestId = propertyDictionary->saveParamsAsync(admin->getId());
-//     connect(propertyDictionary, &QnResourcePropertyDictionary::asyncSaveDone, this,
-//             [this, requestId](int reqId, ec2::ErrorCode errorCode)
-//             {
-//                 if (reqId != requestId)
-//                     return;
-//
-//                 disconnect(propertyDictionary, nullptr, this, nullptr);
-//
-//                 if (errorCode != ec2::ErrorCode::ok)
-//                 {
-//                     showFailure(tr("Can not remove settings from the database."));
-//                     return;
-//                 }
-//
-//                 unlinkedSuccessfully = true;
-//                 Q_Q(QnUnlinkFromCloudDialog);
-//                 q->accept();
-//             });
+    auto serverConnection = qnCommon->currentServer()->restConnection();
+    if (!serverConnection)
+        return;
+
+    serverConnection->resetCloudSystemCredentials(handleReply, q->thread());
 }
