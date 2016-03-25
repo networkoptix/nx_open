@@ -260,38 +260,39 @@ int CEPoll::wait(
                 for (const auto& handle: epollContext->m_sUDTReads)
                     readfds->emplace(handle, UDT_EPOLL_IN);
                 for (set<UDTSOCKET>::const_iterator i = epollContext->m_sUDTExcepts.begin(); i != epollContext->m_sUDTExcepts.end(); ++i)
-                    readfds->emplace(*i, UDT_EPOLL_ERR);
+                    (*readfds)[*i] |= UDT_EPOLL_ERR;
                 total += epollContext->m_sUDTReads.size() + epollContext->m_sUDTExcepts.size();
             }
             if ((NULL != writefds) && (!epollContext->m_sUDTWrites.empty() || !epollContext->m_sUDTExcepts.empty()))
             {
                 for (const auto& handle : epollContext->m_sUDTWrites)
-                {
-                    int eventsToReport = UDT_EPOLL_OUT;
-
-                    //somehow, connection failure event can be not reported
-                    int socketEventMask = 0;
-                    int socketEventMaskSize = sizeof(socketEventMask);
-                    const int result = UDT::getsockopt(
-                        handle, 0, UDT_EVENT,
-                        &socketEventMask, &socketEventMaskSize);
-                    if (result == 0)
-                    {
-#ifdef _DEBUG
-                        if ((socketEventMask & UDT_EPOLL_ERR) > 0 &&
-                            (epollContext->m_sUDTExcepts.find(handle) == epollContext->m_sUDTExcepts.end()))
-                        {
-                            int x = 0;
-                        }
-#endif
-                        eventsToReport |= socketEventMask;
-                    }
-
-                    writefds->emplace(handle, eventsToReport);
-                }
+                    writefds->emplace(handle, UDT_EPOLL_OUT);
                 for (set<UDTSOCKET>::const_iterator i = epollContext->m_sUDTExcepts.begin(); i != epollContext->m_sUDTExcepts.end(); ++i)
-                    writefds->emplace(*i, UDT_EPOLL_ERR);
+                    (*writefds)[*i] |= UDT_EPOLL_ERR;
                 total += epollContext->m_sUDTWrites.size() + epollContext->m_sUDTExcepts.size();
+            }
+
+            lk.unlock();
+
+            for (auto& socketHandleAndEventMask: *writefds)
+            {
+                if ((socketHandleAndEventMask.second & UDT_EPOLL_ERR) > 0)
+                    continue;
+
+                //somehow, connection failure event can be not reported
+                int socketEventMask = 0;
+                int socketEventMaskSize = sizeof(socketEventMask);
+                const int result = UDT::getsockopt(
+                    socketHandleAndEventMask.first,
+                    0,
+                    UDT_EVENT,
+                    &socketEventMask,
+                    &socketEventMaskSize);
+                if (result == 0)
+                {
+                    if ((socketEventMask & UDT_EPOLL_ERR) > 0)
+                        socketHandleAndEventMask.second |= UDT_EPOLL_ERR;
+                }
             }
         }
 
