@@ -62,7 +62,7 @@ TEST_F(CloudStreamSocketTest, simple)
         tempHostName,
         serverAddress);
 
-    for (int i = 0; i < repeatCount; ++i)
+    for (size_t i = 0; i < repeatCount; ++i)
     {
         //connecting with CloudStreamSocket to the local server
         CloudStreamSocket cloudSocket;
@@ -198,7 +198,7 @@ TEST_F(CloudStreamSocketTest, cancellation)
         serverAddress);
 
     //cancelling connect
-    for (int i = 0; i < repeatCount; ++i)
+    for (size_t i = 0; i < repeatCount; ++i)
     {
         //connecting with CloudStreamSocket to the local server
         CloudStreamSocket cloudSocket;
@@ -209,7 +209,7 @@ TEST_F(CloudStreamSocketTest, cancellation)
     }
 
     //cancelling read
-    for (int i = 0; i < repeatCount; ++i)
+    for (size_t i = 0; i < repeatCount; ++i)
     {
         //connecting with CloudStreamSocket to the local server
         CloudStreamSocket cloudSocket;
@@ -225,7 +225,7 @@ TEST_F(CloudStreamSocketTest, cancellation)
     }
 
     //cancelling send
-    for (int i = 0; i < repeatCount; ++i)
+    for (size_t i = 0; i < repeatCount; ++i)
     {
         //connecting with CloudStreamSocket to the local server
         CloudStreamSocket cloudSocket;
