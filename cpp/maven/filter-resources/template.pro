@@ -233,6 +233,7 @@ win* {
 unix: {
   DEFINES += QN_EXPORT=
   QMAKE_CXXFLAGS += -std=c++14 -Werror=enum-compare -Werror=reorder -Werror=delete-non-virtual-dtor -Werror=return-type -Werror=conversion-null -Wuninitialized
+  clang: QMAKE_CXXFLAGS += -Wno-c++14-extensions
 }
 
 ## LINUX
