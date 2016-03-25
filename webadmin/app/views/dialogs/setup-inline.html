@@ -29,14 +29,14 @@
     <p class="master-description">
        cloud account allows you to access to your system from<br>
         everywhere, if it has internet connection.<br>
+
+        <a class="external" ng-href="{{portalUrl}}" target="_blank" ng-click="openLink($event)">Learn more</a><br/>
     </p>
     <p class="master-controls">
         <button class="btn btn-primary" ng-click="createAccount()" autofocus>Create new account</button>&nbsp;&nbsp;
         <button class="btn btn-default" ng-click="next('cloudLogin')">Use existing</button>
     </p>
     <p class="vertical-bottom">
-        <a ng-href="{{portalUrl}}" target="_blank" ng-click="learnMore($event)">Learn more about
-            <span class="product-name">Nx Cloud</span>?</a><br><br>
         <a href="" ng-click="next('localLogin')">Do not connect to internet now</a>
     </p>
 </div>
@@ -113,9 +113,9 @@
 <div class="panel-body text-center" ng-if="stepIs('cloudSuccess')">
     <div class="master-success"><span class="glyphicon glyphicon-ok"></span></div>
     <h2>System is ready to use</h2>
-    <p>You can connect to your system using</p>
-    <h4><a href="" ng-click="cloudPortal()"><span class="product-name">Nx Cloud</span> portal</a></h4>
-    <p>or your cloud account:</p>
+    <p>You can connect to your system with</p>
+    <h4><a class="external" ng-href="{{portalSystemLink}}" ng-click="openLink($event)"><span class="product-name">Nx Cloud</span> portal</a></h4>
+    <p>or <span>Nx Witness</span> apps, using your cloud account:</p>
     <h4>{{settings.cloudEmail}}</h4>
 </div>
 

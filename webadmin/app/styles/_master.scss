@@ -92,3 +92,12 @@
     margin-top: 135px;
   }
 }
+
+a:hover{
+  text-decoration: none;
+}
+
+a.external,
+a.external:hover{
+  text-decoration: underline;
+}

@@ -141,7 +141,7 @@ module.exports = function (grunt) {
                 {context: '/proxy/',    host: '10.0.3.43', port: 7001}/**/
 
                 // Gdm
-                /*{context: '/api/',      host: '10.0.2.240', port: 7001},
+                {context: '/api/',      host: '10.0.2.240', port: 7001},
                 {context: '/ec2/',      host: '10.0.2.240', port: 7001},
                 {context: '/hls/',      host: '10.0.2.240', port: 7001},
                 {context: '/media/',    host: '10.0.2.240', port: 7001},
@@ -157,7 +157,7 @@ module.exports = function (grunt) {
 
 
                 // Sasha Pats
-                {context: '/api/',      host: '10.0.3.37', port: 7000},
+                /* {context: '/api/',      host: '10.0.3.37', port: 7000},
                  {context: '/ec2/',      host: '10.0.3.37', port: 7000},
                  {context: '/hls/',      host: '10.0.3.37', port: 7000},
                  {context: '/media/',    host: '10.0.3.37', port: 7000},
@@ -200,11 +200,11 @@ module.exports = function (grunt) {
                 {context: '/proxy/',    host: '10.0.2.95', port: 7001}/**/
 
                 //Roman Vasilenko  port: 7003,7004,7005,2006
-                /*{context: '/api/',      host: '10.0.2.232', port: 7001},
-                {context: '/ec2/',      host: '10.0.2.232', port: 7001},
-                {context: '/hls/',      host: '10.0.2.232', port: 7001},
-                {context: '/media/',    host: '10.0.2.232', port: 7001},
-                {context: '/proxy/',    host: '10.0.2.232', port: 7001}/**/
+                /*{context: '/api/',      host: '10.0.2.232', port: 7002},
+                {context: '/ec2/',      host: '10.0.2.232', port: 7002},
+                {context: '/hls/',      host: '10.0.2.232', port: 7002},
+                {context: '/media/',    host: '10.0.2.232', port: 7002},
+                {context: '/proxy/',    host: '10.0.2.232', port: 7002}/**/
 
             ],
             livereload: {
@@ -346,7 +346,7 @@ module.exports = function (grunt) {
                 files:[
                     {
                         dot: true,
-                        src: '<%= yeoman.app %>/../external.zip'
+                        src: '<%= yeoman.app %>/../external.dat'
                     }
                 ],
                 options: {
@@ -574,7 +574,7 @@ module.exports = function (grunt) {
         compress: {
             external: {
                 options: {
-                    archive: '<%= yeoman.app %>/../external.zip',
+                    archive: '<%= yeoman.app %>/../external.dat',
                     mode: 'zip'
                 },
                 files: [
