@@ -19,7 +19,7 @@ exports.config = {
     // Spec patterns are relative to the current working directly when
     // protractor is called.
     specs: ['test/e2e/**/*spec.js'],
-    //specs: ['test/e2e/register/*spec.js'],
+    //specs: ['test/e2e/login/*spec.js'],
 
     // Options to be passed to Jasmine-node.
     jasmineNodeOpts: {
@@ -28,7 +28,7 @@ exports.config = {
     },
 
     onPrepare: function () {
-
+        // Docs at https://www.npmjs.com/package/mail-notifier
         var notifier = require('mail-notifier');
 
         var imap = {
@@ -37,14 +37,9 @@ exports.config = {
             host: "imap.gmail.com",
             port: 993,
             tls: true,
-            tlsOptions: { rejectUnauthorized: true }
+            tlsOptions: { rejectUnauthorized: false }
         };
 
         global.notifier = notifier(imap);
     }
-    //
-    //onCleanUp: function () {
-    //    notifier.stop();
-    //}
-
 };
