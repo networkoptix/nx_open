@@ -328,16 +328,11 @@ void AddressResolver::HostAddressInfo::checkExpirations()
 
 bool AddressResolver::HostAddressInfo::isResolved(bool natTraversal) const
 {
-    if( !fixedEntries.empty() )
-        return true; // fixed entries are in priority
+    if(!fixedEntries.empty() || !m_dnsEntries.empty() || !m_mediatorEntries.empty())
+        return true; // any address is better than nothing
 
-    if( m_dnsState != State::resolved )
-        return false; // DNS is required
-
-    if( !m_dnsEntries.empty() )
-        return true; // do not wait for mediator if DNS records are avaliable
-
-    return ( !natTraversal || m_mediatorState == State::resolved );
+    return (m_dnsState == State::resolved) &&
+        (!natTraversal || m_mediatorState == State::resolved);
 }
 
 std::vector<AddressEntry> AddressResolver::HostAddressInfo::getAll() const
