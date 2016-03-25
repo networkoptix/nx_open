@@ -14,7 +14,7 @@ public:
     explicit QnUnlinkFromCloudDialog(QWidget *parent = 0);
     ~QnUnlinkFromCloudDialog();
 
-    void done(int result) override;
+    virtual void accept() override;
 
 private:
     QScopedPointer<QnUnlinkFromCloudDialogPrivate> d_ptr;

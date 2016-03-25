@@ -23,8 +23,8 @@
 #include <recording/time_period_list.h>
 
 #include <ui/common/geometry.h>
-#include <ui/style/noptix_style.h>
 #include <ui/style/globals.h>
+#include <ui/style/helper.h>
 #include <ui/graphics/items/controls/bookmarks_viewer.h>
 #include <ui/graphics/items/controls/time_slider_pixmap_cache.h>
 #include <ui/graphics/items/standard/graphics_slider_p.h>
@@ -294,7 +294,7 @@ public:
         m_pendingLength(0),
         m_pendingPosition(0)
     {
-        assert(m_painter && m_slider);
+        NX_ASSERT(m_painter && m_slider);
 
         const QnTimeSliderColors &colors = slider->colors();
 
@@ -320,7 +320,7 @@ public:
     }
 
     void paintChunk(qint64 length, Qn::TimePeriodContent content) {
-        assert(length >= 0);
+        NX_ASSERT(length >= 0);
 
         if(m_pendingLength > 0 && m_pendingLength + length > m_minChunkLength) {
             qint64 delta = m_minChunkLength - m_pendingLength;
@@ -510,7 +510,7 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent
 
     /* Set default property values. */
     setAcceptHoverEvents(true);
-    setProperty(Qn::SliderLength, 0);
+    setProperty(style::Properties::kSliderLength, 0);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred, QSizePolicy::Slider);
 
     setWindowStart(minimum());

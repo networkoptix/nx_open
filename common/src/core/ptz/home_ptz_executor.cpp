@@ -79,7 +79,7 @@ QnHomePtzExecutor::QnHomePtzExecutor(const QnPtzControllerPtr &controller):
 
 QnHomePtzExecutor::~QnHomePtzExecutor() {
     /* If this object is run in a separate thread, then it must be deleted with deleteLater(). */
-    assert(QThread::currentThread() == thread()); 
+    NX_ASSERT(QThread::currentThread() == thread()); 
 }
 
 void QnHomePtzExecutor::restart() {

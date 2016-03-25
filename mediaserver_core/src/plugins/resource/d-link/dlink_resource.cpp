@@ -68,7 +68,7 @@ QSize QnDlink_cam_info::resolutionCloseTo(int width) const
 {
     if (resolutions.size()==0)
     {
-        Q_ASSERT(false);
+        NX_ASSERT(false);
         return QSize(0,0);
     }
 
@@ -94,7 +94,7 @@ QByteArray QnDlink_cam_info::bitrateCloseTo(int val)
 
     if (possibleBitrates.size()==0)
     {
-        Q_ASSERT(false);
+        NX_ASSERT(false);
         return QByteArray();
     }
 
@@ -109,7 +109,7 @@ QByteArray QnDlink_cam_info::bitrateCloseTo(int val)
 // returns next up frame rate 
 int QnDlink_cam_info::frameRateCloseTo(int fr)
 {
-    Q_ASSERT(possibleFps.size()>0);
+    NX_ASSERT(possibleFps.size()>0);
 
     int result = possibleFps.at(0);
 
@@ -363,8 +363,8 @@ CameraDiagnostics::Result QnPlDlinkResource::initInternal()
 
 static void setBitAt(int x, int y, unsigned char* data)
 {
-    Q_ASSERT(x<32);
-    Q_ASSERT(y<16);
+    NX_ASSERT(x<32);
+    NX_ASSERT(y<16);
 
     int offset = (y * 32 + x) / 8;
     data[offset] |= 0x01 << (x&7);

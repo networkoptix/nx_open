@@ -11,7 +11,7 @@ import "../controls"
 import ".."
 
 QnPage {
-    id: videoPlayer
+    id: videoPage
 
     title: mainWindow.currentSystemName
 
@@ -26,6 +26,7 @@ QnPage {
         readonly property bool cameraOffline: player.liveMode && resourceHelper.resourceStatus == QnMediaResourceHelper.Offline
         readonly property bool cameraUnauthorized: player.liveMode && resourceHelper.resourceStatus == QnMediaResourceHelper.Unauthorized
         readonly property bool failed: player.failed
+        readonly property bool offline: serverOffline || cameraOffline
 
         property bool showOfflineStatus: false
         property bool cameraWarningVisible: (showOfflineStatus || cameraUnauthorized || d.failed) && !player.playing
@@ -33,27 +34,30 @@ QnPage {
         property bool resumeOnActivate: false
         property bool resumeAtLive: false
 
+        onOfflineChanged:
+        {
+            if (offline)
+            {
+                offlineStatusDelay.restart()
+            }
+            else
+            {
+                offlineStatusDelay.stop()
+                showOfflineStatus = false
+            }
+        }
+
         Timer {
             id: offlineStatusDelay
 
             interval: 20 * 1000
             repeat: false
-            running: d.serverOffline || d.cameraOffline
+            running: false
 
             onTriggered: d.showOfflineStatus = true
         }
 
         onShowOfflineStatusChanged: updateOfflineDisplay()
-
-        onServerOfflineChanged: {
-            if (!d.serverOffline)
-                d.showOfflineStatus = d.cameraOffline
-        }
-
-        onCameraOfflineChanged: {
-            if (!d.cameraOffline)
-                d.showOfflineStatus = d.serverOffline
-        }
 
         onFailedChanged: {
             if (failed)
@@ -132,37 +136,38 @@ QnPage {
             onClicked: Main.gotoMainScreen()
         }
 
-        QnIconButton {
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.right: parent.right
-            anchors.rightMargin: dp(8)
-            icon: "image://icon/more_vert.png"
-            onClicked: {
-                cameraMenu.updateGeometry(this)
-                cameraMenu.show()
-            }
-        }
+        // TODO: #dklychkov enable if we need the menu
+//        QnIconButton {
+//            anchors.verticalCenter: parent.verticalCenter
+//            anchors.right: parent.right
+//            anchors.rightMargin: dp(8)
+//            icon: "image://icon/more_vert.png"
+//            onClicked: {
+//                cameraMenu.updateGeometry(this)
+//                cameraMenu.show()
+//            }
+//        }
     }
 
-    QnCameraMenu {
-        id: cameraMenu
-        currentQuality: resourceHelper.resolution
-        onSelectQuality: qualityDialog.show()
-    }
+//    QnCameraMenu {
+//        id: cameraMenu
+//        currentQuality: resourceHelper.resolution
+//        onSelectQuality: qualityDialog.show()
+//    }
 
-    QnQualityDialog {
-        id: qualityDialog
-        resolutionList: resourceHelper.resolutions
-        currentResolution: resourceHelper.resolution
-        onQualityPicked: {
-            player.pause()
-            resourceHelper.resolution = resolution
-            player.seek(player.position)
-            if (!d.videoNavigation.paused)
-                player.play()
-        }
-        onHidden: videoPlayer.forceActiveFocus()
-    }
+//    QnQualityDialog {
+//        id: qualityDialog
+//        resolutionList: resourceHelper.resolutions
+//        currentResolution: resourceHelper.resolution
+//        onQualityPicked: {
+//            player.pause()
+//            resourceHelper.resolution = resolution
+//            player.seek(player.position)
+//            if (!d.videoNavigation.paused)
+//                player.play()
+//        }
+//        onHidden: videoPage.forceActiveFocus()
+//    }
 
     QnScalableVideo {
         id: video
@@ -239,6 +244,9 @@ QnPage {
                 font.pixelSize: sp(32)
                 font.weight: Font.Normal
 
+                wrapMode: Text.WordWrap
+                width: videoPage.width
+
                 anchors.horizontalCenter: parent.horizontalCenter
 
                 text: {
@@ -271,7 +279,7 @@ QnPage {
 
     QnMediaPlayer {
         id: player
-        resourceId: videoPlayer.resourceId
+        resourceId: videoPage.resourceId
 
         onPlayingChanged: {
             if (playing)
@@ -286,7 +294,7 @@ QnPage {
 
     QnCameraAccessRightsHelper {
         id: accessRightsHelper
-        resourceId: videoPlayer.resourceId
+        resourceId: videoPage.resourceId
     }
 
     Loader {
@@ -300,7 +308,11 @@ QnPage {
         Behavior on opacity { NumberAnimation { duration: 500; easing.type: Easing.OutCubic } }
 
         Component.onCompleted: {
-            sourceComponent = accessRightsHelper.canViewArchive ? navigationComponent : liveNavigationComponent
+            if (!liteMode)
+            {
+                sourceComponent = accessRightsHelper.canViewArchive
+                    ? navigationComponent : liveNavigationComponent
+            }
             setKeepScreenOn(true)
         }
 
@@ -368,11 +380,22 @@ QnPage {
 
     focus: true
 
-    Keys.onReleased: {
-        if (Main.keyIsBack(event.key)) {
-            if (Main.backPressed()) {
+    Keys.onReleased:
+    {
+        if (Main.keyIsBack(event.key))
+        {
+            if (Main.backPressed())
+            {
                 event.accepted = true
             }
         }
+    }
+
+    Keys.onReturnPressed:
+    {
+        if (!liteMode)
+            return
+
+        Main.backPressed()
     }
 }

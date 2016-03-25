@@ -29,12 +29,15 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(ResultCode,
     (ResultCode::badTransport, "badTransport")
     )
 
-
 ResultCode fromStunErrorToResultCode(
     const nx::stun::attrs::ErrorDescription& errorDescription)
 {
     switch (errorDescription.getCode())
     {
+        case nx::stun::error::badRequest:
+            return ResultCode::badRequest;
+        case nx::stun::error::unauthtorized:
+            return ResultCode::notAuthorized;
         case nx::stun::cc::error::notFound:
             return ResultCode::notFound;
         default:
@@ -46,6 +49,10 @@ int resultCodeToStunErrorCode(ResultCode resultCode)
 {
     switch (resultCode)
     {
+        case ResultCode::badRequest:
+            return nx::stun::error::badRequest;
+        case ResultCode::notAuthorized:
+            return nx::stun::error::unauthtorized;
         case ResultCode::notFound:
             return nx::stun::cc::error::notFound;
         default:

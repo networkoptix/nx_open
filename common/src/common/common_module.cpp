@@ -13,7 +13,6 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/camera_history.h>
 #include <utils/common/product_features.h>
-#include <nx/utils/timermanager.h>
 #include "core/resource/camera_user_attribute_pool.h"
 #include "core/resource/media_server_user_attributes.h"
 #include "core/resource_management/resource_properties.h"
@@ -22,8 +21,15 @@
 #include "utils/common/synctime.h"
 #include "api/runtime_info_manager.h"
 
+#include <nx/network/socket_global.h>
+
+#include <nx/utils/timermanager.h>
+
 QnCommonModule::QnCommonModule(QObject *parent): QObject(parent) {
     Q_INIT_RESOURCE(common);
+
+    nx::network::SocketGlobals::init();
+
     m_cloudMode = false;
     m_engineVersion = QnSoftwareVersion(QnAppInfo::engineVersion());
 
@@ -54,7 +60,12 @@ QnCommonModule::QnCommonModule(QObject *parent): QObject(parent) {
     m_localPeerType = Qn::PT_NotDefined;
 }
 
-QnCommonModule::~QnCommonModule() {
+QnCommonModule::~QnCommonModule()
+{
+    /* Here all singletons will be destroyed, so we guarantee all socket work will stop. */
+    clear();
+
+    nx::network::SocketGlobals::deinit();
 }
 
 void QnCommonModule::bindModuleinformation(const QnMediaServerResourcePtr &server) {
@@ -147,7 +158,7 @@ QnModuleInformation QnCommonModule::moduleInformation() const
 void QnCommonModule::loadResourceData(QnResourceDataPool *dataPool, const QString &fileName, bool required) {
     bool loaded = QFile::exists(fileName) && dataPool->load(fileName);
 
-    Q_ASSERT_X(!required || loaded, Q_FUNC_INFO, "Can't parse resource_data.json file!");  /* Getting an assert here? Something is wrong with resource data json file. */
+    NX_ASSERT(!required || loaded, Q_FUNC_INFO, "Can't parse resource_data.json file!");  /* Getting an NX_ASSERT here? Something is wrong with resource data json file. */
 }
 
 void QnCommonModule::updateModuleInformation() {

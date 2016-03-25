@@ -5,11 +5,14 @@
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/user_resource.h"
 #include "core/resource/media_server_resource.h"
+
 #include "nx_ec/ec_api.h"
 #include "nx_ec/dummy_handler.h"
 #include "nx_ec/data/api_user_data.h"
 #include "nx_ec/data/api_conversion_functions.h"
 #include "nx_ec/ec2_lib.h"
+#include <nx_ec/managers/abstract_user_manager.h>
+
 #include "api/app_server_connection.h"
 #include "common/common_module.h"
 #include "media_server/settings.h"
@@ -21,11 +24,13 @@
 #include "network/direct_module_finder.h"
 #include "utils/common/app_info.h"
 #include "utils/common/model_functions.h"
+#include <nx/utils/log/log.h>
 #include "api/model/ping_reply.h"
 #include "audit/audit_manager.h"
 #include "rest/server/rest_connection_processor.h"
 #include "http/custom_headers.h"
 #include "settings.h"
+
 
 namespace
 {
@@ -41,11 +46,13 @@ int QnMergeSystemsRestHandler::executeGet(
 {
     Q_UNUSED(path)
     if (MSSettings::roSettings()->value(nx_ms_conf::EC_DB_READ_ONLY).toInt()) {
+        NX_LOG(lit("QnMergeSystemsRestHandler. Can't change parameters because server is running in safe mode"), cl_logDEBUG1);
         result.setError(QnJsonRestResult::CantProcessRequest, lit("Can't change parameters because server is running in safe mode"));
         return nx_http::StatusCode::forbidden;
     }
 
     if (ec2::Settings::instance()->dbReadOnly()) {
+        NX_LOG(lit("QnMergeSystemsRestHandler. Can't change parameters because server is running in safe mode"), cl_logDEBUG1);
         result.setError(QnJsonRestResult::CantProcessRequest, lit("Can't change parameters because server is running in safe mode"));
         return nx_http::StatusCode::forbidden;
     }
@@ -61,21 +68,26 @@ int QnMergeSystemsRestHandler::executeGet(
         takeRemoteSettings = false;
 
     if (url.isEmpty()) {
+        NX_LOG(lit("QnMergeSystemsRestHandler. Request missing required parameter \"url\""), cl_logDEBUG1);
         result.setError(QnJsonRestResult::MissingParameter, lit("url"));
         return nx_http::StatusCode::ok;
     }
 
     if (!url.isValid()) {
+        NX_LOG(lit("QnMergeSystemsRestHandler. Received invalid parameter url %1")
+            .arg(url.toString()), cl_logDEBUG1);
         result.setError(QnJsonRestResult::InvalidParameter, lit("url"));
         return nx_http::StatusCode::ok;
     }
 
     if (password.isEmpty()) {
+        NX_LOG(lit("QnMergeSystemsRestHandler. Request missing required parameter \"password\""), cl_logDEBUG1);
         result.setError(QnJsonRestResult::MissingParameter, lit("password"));
         return nx_http::StatusCode::ok;
     }
 
     if (currentPassword.isEmpty()) {
+        NX_LOG(lit("QnMergeSystemsRestHandler. Request missing required parameter \"currentPassword\""), cl_logDEBUG1);
         result.setError(QnJsonRestResult::MissingParameter, lit("currentPassword"));
         return nx_http::StatusCode::ok;
     }
@@ -83,9 +95,13 @@ int QnMergeSystemsRestHandler::executeGet(
     QnUserResourcePtr admin = qnResPool->getAdministrator();
 
     if (!admin)
+    {
+        NX_LOG(lit("QnMergeSystemsRestHandler. Failed to find user \"admin\""), cl_logDEBUG1);
         return nx_http::StatusCode::internalServerError;
+    }
 
     if (!admin->checkPassword(currentPassword)) {
+        NX_LOG(lit("QnMergeSystemsRestHandler. Wrong admin password"), cl_logDEBUG1);
         result.setError(QnJsonRestResult::InvalidParameter, lit("currentPassword"));
         return nx_http::StatusCode::ok;
     }
@@ -100,6 +116,9 @@ int QnMergeSystemsRestHandler::executeGet(
     CLHttpStatus status = client.doGET(lit("api/moduleInformationAuthenticated?showAddresses=true"));
 
     if (status != CL_HTTP_SUCCESS) {
+        NX_LOG(lit("QnMergeSystemsRestHandler. Error requesting url %1: %2")
+            .arg(url.toString()).arg(QLatin1String(nx_http::StatusCode::toString(status))),
+            cl_logDEBUG1);
         if (status == CL_HTTP_AUTH_REQUIRED)
             result.setError(QnJsonRestResult::CantProcessRequest, lit("UNAUTHORIZED"));
         else
@@ -116,6 +135,8 @@ int QnMergeSystemsRestHandler::executeGet(
     QnModuleInformationWithAddresses moduleInformation = json.deserialized<QnModuleInformationWithAddresses>();
 
     if (moduleInformation.systemName.isEmpty()) {
+        NX_LOG(lit("QnMergeSystemsRestHandler. Remote (%1) system name is empty")
+            .arg(url.toString()), cl_logDEBUG1);
         /* Hmm there's no system name. It would be wrong system. Reject it. */
         result.setError(QnJsonRestResult::CantProcessRequest, lit("FAIL"));
         return nx_http::StatusCode::ok;
@@ -127,32 +148,45 @@ int QnMergeSystemsRestHandler::executeGet(
     bool compatible = moduleInformation.hasCompatibleVersion();
 
     if ((!ignoreIncompatible && !compatible) || !customizationOK) {
+        NX_LOG(lit("QnMergeSystemsRestHandler. Incompatible systems. Local customization %1, remote customization %2")
+            .arg(QnAppInfo::customizationName()).arg(moduleInformation.customization),
+            cl_logDEBUG1);
         result.setError(QnJsonRestResult::CantProcessRequest, lit("INCOMPATIBLE"));
         return nx_http::StatusCode::ok;
     }
 
     if (takeRemoteSettings) {
         if (!backupDatabase()) {
+            NX_LOG(lit("QnMergeSystemsRestHandler. takeRemoteSettings %1. Failed to backup database")
+                .arg(takeRemoteSettings), cl_logDEBUG1);
             result.setError(QnJsonRestResult::CantProcessRequest, lit("BACKUP_ERROR"));
             return nx_http::StatusCode::ok;
         }
 
         if (!applyRemoteSettings(url, moduleInformation.systemName, password, admin, owner)) {
+            NX_LOG(lit("QnMergeSystemsRestHandler. takeRemoteSettings %1. Failed to apply remote settings")
+                .arg(takeRemoteSettings), cl_logDEBUG1);
             result.setError(QnJsonRestResult::CantProcessRequest, lit("CONFIGURATION_ERROR"));
             return nx_http::StatusCode::ok;
         }
     } else {
         if (!admin) {
+            NX_LOG(lit("QnMergeSystemsRestHandler. takeRemoteSettings %1. No admin")
+                .arg(takeRemoteSettings), cl_logDEBUG1);
             result.setError(QnJsonRestResult::CantProcessRequest, lit("INTERNAL_ERROR"));
             return nx_http::StatusCode::ok;
         }
 
         if (!backupDatabase()) {
+            NX_LOG(lit("QnMergeSystemsRestHandler. takeRemoteSettings %1. Failed to backup database")
+                .arg(takeRemoteSettings), cl_logDEBUG1);
             result.setError(QnJsonRestResult::CantProcessRequest, lit("BACKUP_ERROR"));
             return nx_http::StatusCode::ok;
         }
 
         if (!applyCurrentSettings(url, password, currentPassword, admin, mergeOneServer, owner)) {
+            NX_LOG(lit("QnMergeSystemsRestHandler. takeRemoteSettings %1. Failed to apply current settings")
+                .arg(takeRemoteSettings), cl_logDEBUG1);
             result.setError(QnJsonRestResult::CantProcessRequest, lit("CONFIGURATION_ERROR"));
             return nx_http::StatusCode::ok;
         }
@@ -196,8 +230,8 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(
 
     QString systemName = QString::fromUtf8(QUrl::toPercentEncoding(qnCommon->localSystemName()));
 
-    //saving user data before /api/configure call to prevent race condition, 
-    //  when we establish transaction connection to remote server and receive updated 
+    //saving user data before /api/configure call to prevent race condition,
+    //  when we establish transaction connection to remote server and receive updated
     //  saveUser transaction before passing admin to /ec2/saveUser call
     {   /* Save current admin inside the remote system */
 
@@ -263,7 +297,11 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
             CLSimpleHTTPClient client(remoteUrl, requestTimeout, authenticator);
             CLHttpStatus status = client.doGET(lit("/ec2/getUsers"));
             if (status != CLHttpStatus::CL_HTTP_SUCCESS)
+            {
+                NX_LOG(lit("QnMergeSystemsRestHandler::applyRemoteSettings. Failed to invoke /ec2/getUsers: %1")
+                    .arg(QLatin1String(nx_http::StatusCode::toString(status))), cl_logDEBUG1);
                 return false;
+            }
 
             QByteArray data;
             client.readAll(data);
@@ -274,7 +312,11 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
             CLSimpleHTTPClient client(remoteUrl, requestTimeout, authenticator);
             CLHttpStatus status = client.doGET(lit("/api/ping"));
             if (status != CLHttpStatus::CL_HTTP_SUCCESS)
+            {
+                NX_LOG(lit("QnMergeSystemsRestHandler::applyRemoteSettings. Failed to invoke /api/ping: %1")
+                    .arg(QLatin1String(nx_http::StatusCode::toString(status))), cl_logDEBUG1);
                 return false;
+            }
 
             QByteArray data;
             client.readAll(data);
@@ -291,7 +333,11 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
             client.addHeader(Qn::AUTH_SESSION_HEADER_NAME, owner->authSession().toByteArray());
             CLHttpStatus status = client.doGET(lit("/api/backupDatabase"));
             if (status != CLHttpStatus::CL_HTTP_SUCCESS)
+            {
+                NX_LOG(lit("QnMergeSystemsRestHandler::applyRemoteSettings. Failed to invoke /api/backupDatabase: %1")
+                    .arg(QLatin1String(nx_http::StatusCode::toString(status))), cl_logDEBUG1);
                 return false;
+            }
         }
 
         QnUserResourcePtr userResource = QnUserResourcePtr(new QnUserResource());
@@ -308,18 +354,30 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
     }
 
     ec2::ErrorCode errorCode;
-    QnUserResourceList users;
 
-    errorCode = ec2Connection()->getUserManager()->saveSync(admin, &users);
+    ec2::ApiUserData userData;
+    fromResourceToApi(admin, userData);
+    errorCode = ec2Connection()->getUserManager()->saveSync(userData);
     if (errorCode != ec2::ErrorCode::ok)
+    {
+        NX_LOG(lit("QnMergeSystemsRestHandler::applyRemoteSettings. Failed to save admin user: %1")
+            .arg(ec2::toString(errorCode)), cl_logDEBUG1);
         return false;
+    }
 
     if (!changeSystemName(systemName, remoteSysTime, remoteTranLogTime))
+    {
+        NX_LOG(lit("QnMergeSystemsRestHandler::applyRemoteSettings. Failed to change system name"), cl_logDEBUG1);
         return false;
+    }
 
     errorCode = ec2Connection()->getMiscManager()->changeSystemNameSync(systemName, remoteSysTime, remoteTranLogTime);
     if (errorCode != ec2::ErrorCode::ok)
+    {
+        NX_LOG(lit("QnMergeSystemsRestHandler::applyRemoteSettings. Failed to save new system name: %1")
+            .arg(ec2::toString(errorCode)), cl_logDEBUG1);
         return false;
+    }
 
     return true;
 }

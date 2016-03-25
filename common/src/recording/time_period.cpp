@@ -54,7 +54,7 @@ QnTimePeriod::QnTimePeriod(qint64 startTimeMs, qint64 durationMs) :
 QnTimePeriod QnTimePeriod::fromInterval(qint64 startTimeMs
     , qint64 endTimeMs)
 {
-    Q_ASSERT_X(endTimeMs >= startTimeMs, Q_FUNC_INFO
+    NX_ASSERT(endTimeMs >= startTimeMs, Q_FUNC_INFO
         , "Start time could not be greater than end time");
 
     if (endTimeMs >= startTimeMs)

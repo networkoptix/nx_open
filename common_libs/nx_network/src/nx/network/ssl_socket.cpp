@@ -106,10 +106,10 @@ static long sock_ctrl(BIO *b, int cmd, long num, void* /*ptr*/)
     switch (cmd)
     {
     case BIO_C_SET_FD:
-        Q_ASSERT("Invalid proxy socket use!");
+        NX_ASSERT("Invalid proxy socket use!");
         break;
     case BIO_C_GET_FD:
-        Q_ASSERT("Invalid proxy socket use!");
+        NX_ASSERT("Invalid proxy socket use!");
         break;
     case BIO_CTRL_GET_CLOSE:
         ret=b->shutdown;
@@ -194,7 +194,7 @@ public:
     :
         m_initialLockingCallback(CRYPTO_get_locking_callback())
     {
-        Q_ASSERT(kOpenSSLGlobalLock.get() == nullptr);
+        NX_ASSERT(kOpenSSLGlobalLock.get() == nullptr);
         // not safe here, new can throw exception 
         kOpenSSLGlobalLock.reset(new std::mutex[CRYPTO_num_locks()]);
         CRYPTO_set_locking_callback(&OpenSSLGlobalLockManager::openSSLGlobalLock);
@@ -210,7 +210,7 @@ public:
     {
         Q_UNUSED(file);
         Q_UNUSED(line);
-        Q_ASSERT(openSSLGlobalLockManagerInstance->kOpenSSLGlobalLock.get() != nullptr);
+        NX_ASSERT(openSSLGlobalLockManagerInstance->kOpenSSLGlobalLock.get() != nullptr);
         if (mode & CRYPTO_LOCK)
         {
             openSSLGlobalLockManagerInstance->kOpenSSLGlobalLock.get()[type].lock();
@@ -252,7 +252,7 @@ public:
         ++pending_io_count_;
     }
     void DecreasePendingIOCount() {
-        Q_ASSERT(pending_io_count_ !=0);
+        NX_ASSERT(pending_io_count_ !=0);
         --pending_io_count_;
         if( pending_io_count_ == 0 ) {
             // Check if we can invoke the IO operations , if the IO
@@ -325,7 +325,7 @@ protected:
         case AsyncSSLOperation::END_OF_STREAM:
             handler_(SystemError::noError,0);
             return;
-        default: Q_ASSERT(false); return;
+        default: NX_ASSERT(false); return;
         }
     }
 private:
@@ -337,7 +337,7 @@ private:
 class AsyncWrite : public AsyncSSLOperation {
 public:
     virtual void Perform( int* ssl_return , int* ssl_error ) {
-        Q_ASSERT( !write_buffer_->isEmpty() );
+        NX_ASSERT( !write_buffer_->isEmpty() );
         *ssl_return = SSL_write(
             ssl_,write_buffer_->constData(),write_buffer_->size());
         *ssl_error = SSL_get_error(ssl_,*ssl_return);
@@ -360,7 +360,7 @@ protected:
         case AsyncSSLOperation::SUCCESS:
             handler_(SystemError::noError,write_buffer_->size());
             return;
-        default: Q_ASSERT(false); return;
+        default: NX_ASSERT(false); return;
         }
     }
 private:
@@ -391,7 +391,7 @@ protected:
         case AsyncSSLOperation::SUCCESS:
             handler_(SystemError::noError);
             return;
-        default: Q_ASSERT(false); return;
+        default: NX_ASSERT(false); return;
         }
     }
 private:
@@ -853,7 +853,7 @@ void AsyncSSL::AsyncPerform( AsyncSSLOperation* operation ) {
     case HANDSHAKE_DONE:
         Perform(operation);
         break;
-    default: Q_ASSERT(0); return;
+    default: NX_ASSERT(0); return;
     }
 }
 
@@ -899,8 +899,8 @@ public:
         const nx::Buffer& buffer, std::function<void(SystemError::ErrorCode,std::size_t)>&& op ) {
             // When you see this, it means you screw up since the very first call should 
             // be a async_recv instead of async_send here . 
-            Q_ASSERT(is_initialized_);
-            Q_ASSERT(is_ssl_);
+            NX_ASSERT(is_initialized_);
+            NX_ASSERT(is_ssl_);
             AsyncSSL::AsyncSend(buffer,std::move(op));
     }
 
@@ -920,7 +920,7 @@ public:
                     std::placeholders::_2,
                     SnifferData(std::move(completionHandler),buffer)));
         } else {
-            Q_ASSERT(is_ssl_);
+            NX_ASSERT(is_ssl_);
             AsyncSSL::AsyncRecv(buffer,std::move(completionHandler));
         }
     }
@@ -1157,7 +1157,7 @@ void QnSSLSocket::init()
     BIO_set_app_data(wbio, this);
     BIO_set_nbio(wbio, 1);
 
-    assert(d->isServerSide ? SSLStaticData::instance()->serverCTX : SSLStaticData::instance()->clientCTX);
+    NX_ASSERT(d->isServerSide ? SSLStaticData::instance()->serverCTX : SSLStaticData::instance()->clientCTX);
 
     d->ssl.reset( SSL_new(d->isServerSide ? SSLStaticData::instance()->serverCTX : SSLStaticData::instance()->clientCTX) );  // get new SSL state with context 
     SSL_set_verify(d->ssl.get(), SSL_VERIFY_NONE, NULL);
@@ -1220,7 +1220,7 @@ int QnSSLSocket::recvInternal(void* buffer, unsigned int bufferLen, int /*flags*
 int QnSSLSocket::recv( void* buffer, unsigned int bufferLen, int flags)
 {
     Q_D(QnSSLSocket);
-    Q_ASSERT( d->readMode == QnSSLSocket::SYNC );
+    NX_ASSERT( d->readMode == QnSSLSocket::SYNC );
 
     if( !d->ecnryptionEnabled )
         return d->wrappedSocket->recv( buffer, bufferLen, flags );
@@ -1243,7 +1243,7 @@ int QnSSLSocket::sendInternal( const void* buffer, unsigned int bufferLen )
 int QnSSLSocket::send( const void* buffer, unsigned int bufferLen )
 {
     Q_D(QnSSLSocket);
-    Q_ASSERT( d->writeMode == QnSSLSocket::SYNC );
+    NX_ASSERT( d->writeMode == QnSSLSocket::SYNC );
 
     if( !d->ecnryptionEnabled )
         return d->wrappedSocket->send( buffer, bufferLen );
@@ -1394,8 +1394,8 @@ void QnSSLSocket::sendAsync(
 int QnSSLSocket::asyncRecvInternal( void* buffer , unsigned int bufferLen ) {
     // For async operation here
     Q_D(QnSSLSocket);
-    Q_ASSERT(readMode() == ASYNC);
-    Q_ASSERT(d->async_ssl_ptr != NULL);
+    NX_ASSERT(readMode() == ASYNC);
+    NX_ASSERT(d->async_ssl_ptr != NULL);
     if(d->async_ssl_ptr->eof())
         return 0;
     int ret = static_cast<int>(d->async_ssl_ptr->BIORead( buffer , bufferLen ));
@@ -1407,8 +1407,8 @@ int QnSSLSocket::asyncSendInternal(
     unsigned int bufferLen )
 {
     Q_D(QnSSLSocket);
-    Q_ASSERT(writeMode() == ASYNC);
-    Q_ASSERT(d->async_ssl_ptr != NULL);
+    NX_ASSERT(writeMode() == ASYNC);
+    NX_ASSERT(d->async_ssl_ptr != NULL);
     return static_cast<int>(d->async_ssl_ptr->BIOWrite(buffer,bufferLen));
 }
 
@@ -1458,7 +1458,7 @@ QnMixedSSLSocket::QnMixedSSLSocket(AbstractStreamSocket* wrappedSocket):
 int QnMixedSSLSocket::recv( void* buffer, unsigned int bufferLen, int flags)
 {
     Q_D(QnMixedSSLSocket);
-    Q_ASSERT( d->readMode == QnSSLSocket::SYNC );
+    NX_ASSERT( d->readMode == QnSSLSocket::SYNC );
     // check for SSL pattern 0x80 (v2) or 0x16 03 (v3)
     if (d->initState) 
     {
@@ -1500,7 +1500,7 @@ int QnMixedSSLSocket::recv( void* buffer, unsigned int bufferLen, int flags)
 int QnMixedSSLSocket::send( const void* buffer, unsigned int bufferLen )
 {
     Q_D(QnMixedSSLSocket);
-    Q_ASSERT( d->writeMode == QnSSLSocket::SYNC );
+    NX_ASSERT( d->writeMode == QnSSLSocket::SYNC );
     if (d->useSSL)
         return QnSSLSocket::send((char*) buffer, bufferLen);
     else 
@@ -1635,7 +1635,7 @@ void SSLServerSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 }
 
 void SSLServerSocket::acceptAsync(
-    std::function<void(
+    nx::utils::MoveOnlyFunc<void(
         SystemError::ErrorCode,
         AbstractStreamSocket*)> handler)
 {
@@ -1645,6 +1645,16 @@ void SSLServerSocket::acceptAsync(
         std::bind(&SSLServerSocket::connectionAccepted, this, _1, _2));
 }
     
+void SSLServerSocket::cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler)
+{
+    m_delegateSocket->cancelIOAsync(std::move(handler));
+}
+
+void SSLServerSocket::cancelIOSync()
+{
+    m_delegateSocket->cancelIOSync();
+}
+
 void SSLServerSocket::connectionAccepted(SystemError::ErrorCode errorCode, AbstractStreamSocket* newSocket)
 {
     if( newSocket )

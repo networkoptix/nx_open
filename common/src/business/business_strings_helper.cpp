@@ -63,7 +63,7 @@ QString QnBusinessStringsHelper::actionName(QnBusiness::ActionType value) {
         break;
     }
 
-    Q_ASSERT_X(false, Q_FUNC_INFO, "All enumeration values must be handled here");
+    NX_ASSERT(false, Q_FUNC_INFO, "All enumeration values must be handled here");
     return tr("Unknown (%1)").arg(static_cast<int>(value));
 }
 
@@ -178,6 +178,12 @@ QString QnBusinessStringsHelper::eventAtResources(const QnBusinessEventParameter
     return lit("Multiple %1 events have occured").arg(eventName(params.eventType));
 }
 
+QString QnBusinessStringsHelper::getResoureNameFromParams(const QnBusinessEventParameters& params, bool useIp)
+{
+    QString result = getFullResourceName(eventSource(params), useIp);
+    return result.isNull() ? params.resourceName : result;
+}
+
 QString QnBusinessStringsHelper::eventDescription(const QnAbstractBusinessActionPtr& action, const QnBusinessAggregationInfo &aggregationInfo, bool useIp, bool useHtml) {
 
     QString delimiter = useHtml
@@ -190,9 +196,7 @@ QString QnBusinessStringsHelper::eventDescription(const QnAbstractBusinessAction
     QString result;
     result += tr("Event: %1").arg(eventName(eventType));
 
-    QString sourceText = getFullResourceName(eventSource(params), useIp);
-    if (sourceText.isNull())
-        sourceText = params.resourceName;
+    QString sourceText = getResoureNameFromParams(params, useIp);
     if (!sourceText.isEmpty()) {
         result += delimiter;
         result += tr("Source: %1").arg(sourceText);
@@ -419,7 +423,7 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
         for (const QString &id: reasonParamsEncoded.split(L';'))
             if (const QnVirtualCameraResourcePtr &camera = qnResPool->getResourceById<QnVirtualCameraResource>(QnUuid(id)))
                 disabledCameras << camera;
-        Q_ASSERT_X(!disabledCameras.isEmpty(), Q_FUNC_INFO, "At least one camera should be disabled on this event");
+        NX_ASSERT(!disabledCameras.isEmpty(), Q_FUNC_INFO, "At least one camera should be disabled on this event");
 
         result = QnDeviceDependentStrings::getNameFromSet(
                 QnCameraDeviceStringSet(

@@ -3,11 +3,11 @@
 * akolesnikov
 ***********************************************************/
 
+#include <future>
+
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include <nx/utils/thread/wait_condition.h>
-#include <nx/utils/thread/mutex.h>
 #include <nx/utils/uuid.h>
 #include <utils/common/sync_call.h>
 
@@ -32,10 +32,7 @@ TEST_F(HolePunchingProcessor, generic_tests)
 
     const auto system1 = addRandomSystem();
     const auto server1 = addRandomServer(system1);
-
-    //TODO #ak #msvc2015 use future/promise
-    QnMutex mtx;
-    QnWaitCondition waitCond;
+    ASSERT_NE(nullptr, server1);
 
     boost::optional<api::ConnectionRequestedEvent> connectionRequestedEventData;
     server1->setOnConnectionRequestedHandler(
@@ -46,14 +43,13 @@ TEST_F(HolePunchingProcessor, generic_tests)
             return MediaServerEmulator::ActionToTake::proceedWithConnection;
         });
 
-    boost::optional<api::ResultCode> connectionAckResult;
+    //TODO #ak #msvc2015 use future/promise
+    std::promise<api::ResultCode> connectionAckResultPromise;
     server1->setConnectionAckResponseHandler(
-        [&mtx, &waitCond, &connectionAckResult](api::ResultCode resultCode)
+        [&connectionAckResultPromise](api::ResultCode resultCode)
             -> MediaServerEmulator::ActionToTake
         {
-            QnMutexLocker lk(&mtx);
-            connectionAckResult = resultCode;
-            waitCond.wakeAll();
+            connectionAckResultPromise.set_value(resultCode);
             return MediaServerEmulator::ActionToTake::ignoreIndication;
         });
 
@@ -62,18 +58,16 @@ TEST_F(HolePunchingProcessor, generic_tests)
     //requesting connect to the server 
     nx::hpm::api::MediatorClientUdpConnection udpClient(endpoint());
 
-    boost::optional<api::ResultCode> connectResult;
+    std::promise<api::ResultCode> connectResultPromise;
 
     api::ConnectResponse connectResponseData;
     auto connectCompletionHandler =
-        [&mtx, &waitCond, &connectResult, &connectResponseData](
+        [&connectResultPromise, &connectResponseData](
             api::ResultCode resultCode,
             api::ConnectResponse responseData)
         {
-            QnMutexLocker lk(&mtx);
-            connectResult = resultCode;
             connectResponseData = std::move(responseData);
-            waitCond.wakeAll();
+            connectResultPromise.set_value(resultCode);
         };
     api::ConnectRequest connectRequest;
     connectRequest.originatingPeerID = QnUuid::createUuid().toByteArray();
@@ -85,13 +79,7 @@ TEST_F(HolePunchingProcessor, generic_tests)
         connectCompletionHandler);
 
     //waiting for connect response and checking server UDP endpoint in response
-    {
-        QnMutexLocker lk(&mtx);
-        while (!static_cast<bool>(connectResult))
-            ASSERT_TRUE(waitCond.wait(lk.mutex(), kMaxConnectResponseWaitTimeout.count()));
-    }
-
-    ASSERT_EQ(api::ResultCode::ok, connectResult.get());
+    ASSERT_EQ(api::ResultCode::ok, connectResultPromise.get_future().get());
     ASSERT_FALSE(connectResponseData.udpEndpointList.empty());
     ASSERT_EQ(
         server1->udpHolePunchingEndpoint().port,
@@ -119,13 +107,7 @@ TEST_F(HolePunchingProcessor, generic_tests)
                 std::placeholders::_1));
 
     //waiting for connectionAck response to be received by server
-    {
-        QnMutexLocker lk(&mtx);
-        while (!static_cast<bool>(connectionAckResult))
-            ASSERT_TRUE(waitCond.wait(lk.mutex(), kMaxConnectResponseWaitTimeout.count()));
-    }
-    ASSERT_TRUE(static_cast<bool>(connectionAckResult));
-    ASSERT_EQ(api::ResultCode::ok, connectionAckResult.get());
+    ASSERT_EQ(api::ResultCode::ok, connectionAckResultPromise.get_future().get());
 
     //testing that mediator has cleaned up session data
     std::tie(resultCode) =
@@ -248,8 +230,8 @@ TEST_F(HolePunchingProcessor, destruction)
         udpClient.connect(
             connectRequest,
             [&connectResponsePromise](
-                api::ResultCode resultCode,
-                api::ConnectResponse responseData)
+                api::ResultCode /*resultCode*/,
+                api::ConnectResponse /*responseData*/)
             {
                 connectResponsePromise.set_value();
             });

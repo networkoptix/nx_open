@@ -423,7 +423,7 @@ void QnIoModuleOverlayWidgetPrivate::at_timerTimeout() {
             QString portName = data.ioConfigData.getName();
             QString message = wrongState ? tr("Failed to turn on IO port '%1'")
                                          : tr("Failed to turn off IO port '%1'");
-            QMessageBox::warning(0, tr("IO port error"), message.arg(portName));
+            QnMessageBox::warning(nullptr, tr("IO port error"), message.arg(portName));
         }
     }
 }

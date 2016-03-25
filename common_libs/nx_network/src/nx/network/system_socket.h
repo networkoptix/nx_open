@@ -26,7 +26,7 @@
 namespace nx {
 namespace network {
 
-typedef nx::network::PollableImpl PollableSystemSocketImpl;
+typedef CommonSocketImpl PollableSystemSocketImpl;
 
 namespace aio {
 template<class SocketType> class BaseAsyncSocketImplHelper;
@@ -194,7 +194,7 @@ public:
     //!Implementation of AbstractCommunicatingSocket::connect
     virtual bool connect(
         const SocketAddress& remoteAddress,
-        unsigned int timeoutMillis ) override;
+        unsigned int timeoutMillis = AbstractCommunicatingSocket::DEFAULT_TIMEOUT_MILLIS) override;
     //!Implementation of AbstractCommunicatingSocket::recv
     virtual int recv( void* buffer, unsigned int bufferLen, int flags ) override;
     //!Implementation of AbstractCommunicatingSocket::send
@@ -228,9 +228,6 @@ public:
     virtual void close() override;
     virtual void shutdown() override;
 
-    //! Filters out \fn connect calls (DEBUG ONLY!)
-    static QList<QString> connectFilters;
-
 private:
     aio::AsyncSocketImplHelper<Pollable>* m_aioHelper;
     bool m_connected;
@@ -250,10 +247,10 @@ public:
     /**
      *   Construct a TCP socket with no connection
      */
-    TCPSocket( bool natTraversal = true );
+    explicit TCPSocket( bool natTraversal = true );
 
     //!User by \a TCPServerSocket class
-    TCPSocket( int newConnSD );
+    explicit TCPSocket( int newConnSD );
     virtual ~TCPSocket();
 
     TCPSocket(const TCPSocket&) = delete;
@@ -315,7 +312,7 @@ public:
     static int accept(int sockDesc);
 
     //!Implementation of AbstractStreamServerSocket::listen
-    virtual bool listen(int queueLen) override;
+    virtual bool listen(int queueLen = 128) override;
     //!Implementation of AbstractStreamServerSocket::accept
     virtual AbstractStreamSocket* accept() override;
     //!Implementation of QnStoppable::pleaseStop
@@ -323,9 +320,13 @@ public:
 
     //!Implementation of AbstractStreamServerSocket::acceptAsync
     virtual void acceptAsync(
-        std::function<void(
+        nx::utils::MoveOnlyFunc<void(
             SystemError::ErrorCode,
             AbstractStreamSocket*)> handler) override;
+    virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler) override;
+    virtual void cancelIOSync() override;
+
+    AbstractStreamSocket* systemAccept();
 
 private:
     bool setListen(int queueLen);
@@ -346,7 +347,7 @@ public:
     /**
      *   Construct a UDP socket
      */
-    UDPSocket( bool natTraversal = true );
+    explicit UDPSocket( bool natTraversal = true );
 
     UDPSocket(const UDPSocket&) = delete;
     UDPSocket& operator=(const UDPSocket&) = delete;

@@ -194,10 +194,9 @@ public:
    CGuard(pthread_mutex_t& lock);
    ~CGuard();
 
-public:
-   static void enterCS(pthread_mutex_t& lock);
-   static void leaveCS(pthread_mutex_t& lock);
+   void unlock();
 
+public:
    static void createMutex(pthread_mutex_t& lock);
    static void releaseMutex(pthread_mutex_t& lock);
 
@@ -206,9 +205,12 @@ public:
 
 private:
    pthread_mutex_t& m_Mutex;            // Alias name of the mutex to be protected
-   int m_iLocked;                       // Locking status
+   bool m_iLocked;                       // Locking status
 
    CGuard& operator=(const CGuard&);
+
+   static bool enterCS(pthread_mutex_t& lock);
+   static bool leaveCS(pthread_mutex_t& lock);
 };
 
 

@@ -109,7 +109,7 @@ class QnAbstractConnection: public Connective<QObject> {
     typedef Connective<QObject> base_type;
 
 public:
-    QnAbstractConnection(QObject *parent = NULL, QnResource* targetRes = nullptr);
+    QnAbstractConnection(QObject *parent = NULL, const QnResourcePtr& targetRes = QnResourcePtr());
     virtual ~QnAbstractConnection();
 
     QUrl url() const;
@@ -142,7 +142,7 @@ protected:
 
     template<class T>
     int sendSyncRequest(int operation, int object, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, T *reply) {
-        assert(reply);
+        NX_ASSERT(reply);
 
         QVariant replyVariant;
         int status = sendSyncRequest(operation, object, headers, params, data, &replyVariant);
@@ -168,7 +168,7 @@ protected:
         return sendSyncGetRequest(object, QnRequestHeaderList(), params, reply);
     }
 
-    QnResource *targetResource() const;
+    QnResourcePtr targetResource() const;
     virtual bool isReady() const;
 
 private:
@@ -179,7 +179,7 @@ private:
     QScopedPointer<QnLexicalSerializer> m_serializer;
     QnRequestHeaderList m_extraHeaders;
     QnRequestParamList m_extraQueryParameters;
-    QnResource* m_targetRes;
+    QnResourcePtr m_targetRes;
 };
 
 

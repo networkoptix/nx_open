@@ -43,6 +43,12 @@ void AbstractCloudDataProviderFactory::setFactoryFunc(FactoryFunc factoryFunc)
 }
 
 
+AbstractCloudDataProvider::System::System()
+:
+    mediatorEnabled(false)
+{
+}
+
 AbstractCloudDataProvider::System::System( String authKey_, bool mediatorEnabled_ )
     : authKey(std::move(authKey_))
     , mediatorEnabled( mediatorEnabled_ )
@@ -162,7 +168,7 @@ void CloudDataProvider::updateSystemsAsync()
             m_systemCache.clear();
             for( auto& sys : systems.systems )
                 m_systemCache.emplace(
-                    sys.id.toByteArray(),
+                    sys.id.c_str(),
                     System( String( sys.authKey.c_str() ),
                                     sys.cloudConnectionSubscriptionStatus ) );
 

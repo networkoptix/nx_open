@@ -1061,7 +1061,7 @@ int ifoRead_VTS_PTT_SRPT(ifo_handle_t *ifofile) {
 
   for(i = 0; i < vts_ptt_srpt->nr_of_srpts; i++) {
     B2N_32(data[i]);
-    /* assert(data[i] + sizeof(ptt_info_t) <= vts_ptt_srpt->last_byte + 1);
+    /* NX_ASSERT(data[i] + sizeof(ptt_info_t) <= vts_ptt_srpt->last_byte + 1);
        Magic Knight Rayearth Daybreak is mastered very strange and has 
        Titles with 0 PTTs. They all have a data[i] offsets beyond the end of
        of the vts_ptt_srpt structure. */
@@ -1083,7 +1083,7 @@ int ifoRead_VTS_PTT_SRPT(ifo_handle_t *ifofile) {
       n = (data[i+1] - data[i]);
     else
       n = (vts_ptt_srpt->last_byte + 1 - data[i]);
-    /* assert(n > 0 && (n % 4) == 0);
+    /* NX_ASSERT(n > 0 && (n % 4) == 0);
        Magic Knight Rayearth Daybreak is mastered very strange and has 
        Titles with 0 PTTs. */
     if(n < 0) n = 0;
@@ -1525,12 +1525,12 @@ static int ifoRead_C_ADT_internal(ifo_handle_t *ifofile,
   info_length = c_adt->last_byte + 1 - C_ADT_SIZE;
   
   CHECK_ZERO(c_adt->zero_1);
-  /* assert(c_adt->nr_of_vobs > 0);  
+  /* NX_ASSERT(c_adt->nr_of_vobs > 0);  
      Magic Knight Rayearth Daybreak is mastered very strange and has 
      Titles with a VOBS that has no cells. */
   CHECK_VALUE(info_length % sizeof(cell_adr_t) == 0);
   
-  /* assert(info_length / sizeof(cell_adr_t) >= c_adt->nr_of_vobs);
+  /* NX_ASSERT(info_length / sizeof(cell_adr_t) >= c_adt->nr_of_vobs);
      Enemy of the State region 2 (de) has Titles where nr_of_vobs field
      is to high, they high ones are never referenced though. */
   if(info_length / sizeof(cell_adr_t) < c_adt->nr_of_vobs) {
@@ -1660,7 +1660,7 @@ static int ifoRead_VOBU_ADMAP_internal(ifo_handle_t *ifofile,
   B2N_32(vobu_admap->last_byte);
   
   info_length = vobu_admap->last_byte + 1 - VOBU_ADMAP_SIZE;
-  /* assert(info_length > 0);
+  /* NX_ASSERT(info_length > 0);
      Magic Knight Rayearth Daybreak is mastered very strange and has 
      Titles with a VOBS that has no VOBUs. */
   CHECK_VALUE(info_length % sizeof(quint32) == 0);
@@ -1746,7 +1746,7 @@ static int ifoRead_PGCIT_internal(ifo_handle_t *ifofile, pgcit_t *pgcit,
   B2N_32(pgcit->last_byte);
   
   CHECK_ZERO(pgcit->zero_1);
-  /* assert(pgcit->nr_of_pgci_srp != 0);
+  /* NX_ASSERT(pgcit->nr_of_pgci_srp != 0);
      Magic Knight Rayearth Daybreak is mastered very strange and has 
      Titles with 0 PTTs. */
   CHECK_VALUE(pgcit->nr_of_pgci_srp < 10000); // ?? seen max of 1338

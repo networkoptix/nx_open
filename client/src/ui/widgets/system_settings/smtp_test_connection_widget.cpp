@@ -63,7 +63,10 @@ bool QnSmtpTestConnectionWidget::testSettings( const QnEmailSettings &value ) {
     result.timeout = testSmtpTimeoutMSec / 1000;
 
     if (!result.isValid()) {
-        QMessageBox::warning(this, tr("Invalid data"), tr("The provided parameters are not valid. Could not perform a test."));
+        QnMessageBox::warning(
+                this,
+                tr("Invalid data"),
+                tr("The provided parameters are not valid. Could not perform a test."));
         return false;
     }
 
@@ -79,7 +82,10 @@ bool QnSmtpTestConnectionWidget::testSettings( const QnEmailSettings &value ) {
     }
 
     if (!serverConnection) {
-        QMessageBox::warning(this, tr("Network Error"), tr("Could not perform a test. None of your servers are connected to the Internet."));
+        QnMessageBox::warning(
+                this,
+                tr("Network Error"),
+                tr("Could not perform a test. None of your servers are connected to the Internet."));
         return false;
     }
 

@@ -92,8 +92,8 @@
                         </param>
                         <param>
                             <name>format</name>
-                            <description>Data format. Default value: 'json'</description>
-                            <optional>true</optional>
+                            <description>Data format.</description>
+                            <optional>false</optional>
                             <values>
                                 <value>
                                     <name>ubjson</name>
@@ -164,6 +164,32 @@
                             <description>Applied tag. Several tag parameters could be used to specify multiple tags</description>
                             <optional>true</optional>
                         </param>
+                        <param>
+                            <name>format</name>
+                            <description>Data format.</description>
+                            <optional>false</optional>
+                            <values>
+                                <value>
+                                    <name>ubjson</name>
+                                    <description>universal binary json data format</description>
+                                </value>
+                                <value>
+                                    <name>json</name>
+                                    <description>json data format</description>
+                                </value>
+                                <value>
+                                    <name>xml</name>
+                                    <description>xml data format</description>
+                                </value>
+                                <value>
+                                    <name>csv</name>
+                                    <description>
+                                        CSV data format. In case of hierarchical structure only
+                                        top level data will be provided
+                                    </description>
+                                </value>
+                            </values>
+                        </param>
                     </params>
                     <result/>
                 </function>
@@ -177,6 +203,32 @@
                             <description>Identifier of bookmark</description>
                             <optional>false</optional>
                         </param>
+                        <param>
+                            <name>format</name>
+                            <description>Data format.</description>
+                            <optional>false</optional>
+                            <values>
+                                <value>
+                                    <name>ubjson</name>
+                                    <description>universal binary json data format</description>
+                                </value>
+                                <value>
+                                    <name>json</name>
+                                    <description>json data format</description>
+                                </value>
+                                <value>
+                                    <name>xml</name>
+                                    <description>xml data format</description>
+                                </value>
+                                <value>
+                                    <name>csv</name>
+                                    <description>
+                                        CSV data format. In case of hierarchical structure only
+                                        top level data will be provided
+                                    </description>
+                                </value>
+                            </values>
+                        </param>
                     </params>
                     <result/>
                 </function>
@@ -189,6 +241,32 @@
                             <name>limit</name>
                             <description>Maximum number of tags</description>
                             <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>format</name>
+                            <description>Data format.</description>
+                            <optional>false</optional>
+                            <values>
+                                <value>
+                                    <name>ubjson</name>
+                                    <description>universal binary json data format</description>
+                                </value>
+                                <value>
+                                    <name>json</name>
+                                    <description>json data format</description>
+                                </value>
+                                <value>
+                                    <name>xml</name>
+                                    <description>xml data format</description>
+                                </value>
+                                <value>
+                                    <name>csv</name>
+                                    <description>
+                                        CSV data format. In case of hierarchical structure only
+                                        top level data will be provided
+                                    </description>
+                                </value>
+                            </values>
                         </param>
                     </params>
                     <result/>
@@ -237,6 +315,32 @@
                             <name>tag</name>
                             <description>Applied tag. Serveral tag parameters could be used to specify multiple tags</description>
                             <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>format</name>
+                            <description>Data format.</description>
+                            <optional>false</optional>
+                            <values>
+                                <value>
+                                    <name>ubjson</name>
+                                    <description>universal binary json data format</description>
+                                </value>
+                                <value>
+                                    <name>json</name>
+                                    <description>json data format</description>
+                                </value>
+                                <value>
+                                    <name>xml</name>
+                                    <description>xml data format</description>
+                                </value>
+                                <value>
+                                    <name>csv</name>
+                                    <description>
+                                        CSV data format. In case of hierarchical structure only
+                                        top level data will be provided
+                                    </description>
+                                </value>
+                            </values>
                         </param>
                     </params>
                     <result/>
@@ -303,6 +407,81 @@
                     <result>
                         <caption>Return server event log in proprietary binary format</caption>
                     </result>
+                </function>
+              <function>
+                <name>detachFromSystem</name>
+                <description>Detach media server from a system. Change its system name and admin password to default value.</description>
+                <method>GET</method>
+                <params>
+                  <param>
+                    <name>oldPassword</name>
+                    <description>
+                      Current password for admin user
+                    </description>
+                    <optional>false</optional>
+                  </param>
+                </params>
+                <result>
+                  <caption>Json result with error code</caption>
+                </result>
+              </function>
+              <function>
+                <name>setupLocalSystem</name>
+                <description>Configure server's system name and password. This function can be called for server with default system name. Otherwise function returns error.
+                </description>
+                <method>GET</method>
+                <params>
+                  <param>
+                    <name>oldPassword</name>
+                    <description> Current password for admin user </description>
+                    <optional>false</optional>
+                  </param>
+                  <param>
+                    <name>password</name>
+                    <description> New password for admin user </description>
+                    <optional>false</optional>
+                  </param>
+                  <param>
+                    <name>systemName</name>
+                    <description> New system name </description>
+                    <optional>false</optional>
+                  </param>
+                </params>
+                <result>
+                  <caption>Json result with error code</caption>
+                </result>
+              </function>
+              <function>
+                <name>setupCloudSystem</name>
+                <description>
+                  Configure server's system name and attach it to cloud. This function can be called for server with default system name. Otherwise function returns error.
+                </description>
+                <method>GET</method>
+                <params>
+                  <param>
+                    <name>oldPassword</name>
+                    <description> Current password for admin user </description>
+                    <optional>false</optional>
+                  </param>
+                  <param>
+                    <name>systemName</name>
+                    <description> New system name </description>
+                    <optional>false</optional>
+                  </param>
+                  <param>
+                    <name>cloudAuthKey</name>
+                    <description> could authentication key </description>
+                    <optional>false</optional>
+                  </param>
+                  <param>
+                    <name>cloudSystemID</name>
+                    <description> could system id </description>
+                    <optional>false</optional>
+                  </param>
+                </params>
+                <result>
+                  <caption>Json result with error code</caption>
+                </result>
                 </function>
                 <function>
                     <name>doCameraDiagnosticsStep</name>

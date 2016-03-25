@@ -17,11 +17,11 @@
 #include <cdb/account_manager.h>
 #include <utils/common/cpp14.h>
 #include <utils/common/sync_call.h>
+#include <utils/common/app_info.h>
 #include <nx/network/http/auth_tools.h>
 
 #include <libcloud_db/src/managers/email_manager.h>
 
-#include "version.h"
 #include "email_manager_mocked.h"
 
 
@@ -66,46 +66,56 @@ void CdbFunctionalTest::start()
     std::promise<void> cdbInstantiatedCreatedPromise;
     auto cdbInstantiatedCreatedFuture = cdbInstantiatedCreatedPromise.get_future();
 
+    m_cdbStartedPromise = std::make_unique<std::promise<bool>>();
+
     m_cdbProcessFuture = std::async(
         std::launch::async,
         [this, &cdbInstantiatedCreatedPromise]()->int {
             m_cdbInstance = std::make_unique<nx::cdb::CloudDBProcessPublic>(
                 static_cast<int>(m_args.size()), m_args.data());
+            m_cdbInstance->setOnStartedEventHandler(
+                [this](bool result)
+                {
+                    m_cdbStartedPromise->set_value(result);
+                });
             cdbInstantiatedCreatedPromise.set_value();
             return m_cdbInstance->exec();
         });
     cdbInstantiatedCreatedFuture.wait();
 }
 
-void CdbFunctionalTest::startAndWaitUntilStarted()
+bool CdbFunctionalTest::startAndWaitUntilStarted()
 {
     start();
-    waitUntilStarted();
+    return waitUntilStarted();
 }
 
-void CdbFunctionalTest::waitUntilStarted()
+bool CdbFunctionalTest::waitUntilStarted()
 {
-    static const std::chrono::seconds CDB_INITIALIZED_MAX_WAIT_TIME(15);
+    static const std::chrono::seconds initializedMaxWaitTime(15);
 
-    const auto endClock = std::chrono::steady_clock::now() + CDB_INITIALIZED_MAX_WAIT_TIME;
-    for (;;)
+    auto cdbStartedFuture = m_cdbStartedPromise->get_future();
+    if (cdbStartedFuture.wait_for(initializedMaxWaitTime) !=
+        std::future_status::ready)
     {
-        ASSERT_TRUE(std::chrono::steady_clock::now() < endClock);
-
-        ASSERT_NE(
-            std::future_status::ready,
-            m_cdbProcessFuture.wait_for(std::chrono::seconds(0)));
-
-        auto connection = m_connectionFactory->createConnection("", "");
-        api::ResultCode result = api::ResultCode::ok;
-        std::tie(result, m_moduleInfo) = makeSyncCall<api::ResultCode, api::ModuleInfo>(
-            std::bind(
-                &nx::cdb::api::Connection::ping,
-                connection.get(),
-                std::placeholders::_1));
-        if (result == api::ResultCode::ok)
-            break;
+        return false;
     }
+
+    if (!cdbStartedFuture.get())
+        return false;
+
+    //retrieving module info
+    auto connection = m_connectionFactory->createConnection("", "");
+    api::ResultCode result = api::ResultCode::ok;
+    std::tie(result, m_moduleInfo) = makeSyncCall<api::ResultCode, api::ModuleInfo>(
+        std::bind(
+            &nx::cdb::api::Connection::ping,
+            connection.get(),
+            std::placeholders::_1));
+    if (result != api::ResultCode::ok)
+        return false;
+
+    return true;
 }
 
 void CdbFunctionalTest::stop()
@@ -115,11 +125,11 @@ void CdbFunctionalTest::stop()
     m_cdbInstance.reset();
 }
 
-void CdbFunctionalTest::restart()
+bool CdbFunctionalTest::restart()
 {
     stop();
     start();
-    waitUntilStarted();
+    return waitUntilStarted();
 }
 
 void CdbFunctionalTest::addArg(const char* arg)
@@ -162,6 +172,8 @@ api::ResultCode CdbFunctionalTest::addAccount(
         *password = ss.str();
     }
 
+    NX_ASSERT(!moduleInfo().realm.empty());
+
     if (accountData->fullName.empty())
         accountData->fullName = "Account " + accountData->email + " full name";
     if (accountData->passwordHa1.empty())
@@ -171,7 +183,7 @@ api::ResultCode CdbFunctionalTest::addAccount(
             moduleInfo().realm.c_str(),
             password->c_str()).constData();
     if (accountData->customization.empty())
-        accountData->customization = QN_CUSTOMIZATION_NAME;
+        accountData->customization = QnAppInfo::customizationName();
 
     auto connection = connectionFactory()->createConnection("", "");
 
@@ -260,7 +272,7 @@ api::ResultCode CdbFunctionalTest::addActivatedAccount(
     if (resCode != api::ResultCode::ok)
         return resCode;
 
-    assert(accountData->email == email);
+    NX_ASSERT(accountData->email == email);
 
     resCode = getAccount(
         accountData->email,
@@ -402,7 +414,7 @@ api::ResultCode CdbFunctionalTest::getSystem(
 api::ResultCode CdbFunctionalTest::shareSystem(
     const std::string& email,
     const std::string& password,
-    const QnUuid& systemID,
+    const std::string& systemID,
     const std::string& accountEmail,
     api::SystemAccessRole accessRole)
 {
@@ -428,7 +440,7 @@ api::ResultCode CdbFunctionalTest::shareSystem(
 api::ResultCode CdbFunctionalTest::updateSystemSharing(
     const std::string& email,
     const std::string& password,
-    const QnUuid& systemID,
+    const std::string& systemID,
     const std::string& accountEmail,
     api::SystemAccessRole newAccessRole)
 {
@@ -561,7 +573,7 @@ api::ResultCode CdbFunctionalTest::ping(
 const api::SystemSharingEx& CdbFunctionalTest::findSharing(
     const std::vector<api::SystemSharingEx>& sharings,
     const std::string& accountEmail,
-    const QnUuid& systemID) const
+    const std::string& systemID) const
 {
     static const api::SystemSharingEx kDummySharing;
 
@@ -577,7 +589,7 @@ const api::SystemSharingEx& CdbFunctionalTest::findSharing(
 api::SystemAccessRole CdbFunctionalTest::accountAccessRoleForSystem(
     const std::vector<api::SystemSharingEx>& sharings,
     const std::string& accountEmail,
-    const QnUuid& systemID) const
+    const std::string& systemID) const
 {
     return findSharing(sharings, accountEmail, systemID).accessRole;
 }
@@ -586,7 +598,7 @@ api::SystemAccessRole CdbFunctionalTest::accountAccessRoleForSystem(
 namespace api {
     bool operator==(const api::AccountData& left, const api::AccountData& right)
     {
-        return 
+        return
             left.id == right.id &&
             left.email == right.email &&
             left.passwordHa1 == right.passwordHa1 &&

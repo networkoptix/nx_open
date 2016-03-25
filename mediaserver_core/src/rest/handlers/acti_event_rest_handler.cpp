@@ -19,7 +19,7 @@ int QnActiEventRestHandler::executeGet(const QString &path, const QnRequestParam
 {
     Q_UNUSED(responseMessageBody)
     Q_UNUSED(contentType)
-    Q_ASSERT( path.indexOf("api/camera_event") != -1 );
+    NX_ASSERT( path.indexOf("api/camera_event") != -1 );
 
     QStringList pathParts = path.split('/');
     if( pathParts.size() < 4 )

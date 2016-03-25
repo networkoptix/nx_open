@@ -2,6 +2,8 @@
 
 #include <camera/camera_bookmark_aggregation.h>
 
+#include <nx/utils/log/log.h>
+
 namespace
 {
     const qint64 kDefaultBookmarkDurationMs = 60 * 1000;
@@ -13,7 +15,7 @@ namespace
         result.cameraId = "testcamera";
         result.startTimeMs = startTimeMs;
         result.durationMs = kDefaultBookmarkDurationMs;
-        Q_ASSERT_X(result.isValid(), Q_FUNC_INFO, "This function must create valid bookmarks");
+        NX_ASSERT(result.isValid(), Q_FUNC_INFO, "This function must create valid bookmarks");
 
         return result;
     }

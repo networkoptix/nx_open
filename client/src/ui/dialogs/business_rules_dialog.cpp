@@ -3,7 +3,6 @@
 
 #include <QtCore/QEvent>
 
-#include <QtWidgets/QMessageBox>
 #include <QtWidgets/QStyledItemDelegate>
 #include <QtWidgets/QItemEditorFactory>
 #include <QtWidgets/QComboBox>
@@ -31,6 +30,7 @@
 #include <ui/help/help_topics.h>
 #include <ui/delegates/business_rule_item_delegate.h>
 #include <ui/style/resource_icon_cache.h>
+#include <ui/widgets/snapped_scrollbar.h>
 
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -96,7 +96,7 @@ namespace {
                 return true;
 
             QModelIndex idx = sourceModel()->index(source_row, 0, source_parent);
-            Q_ASSERT_X(idx.isValid(), Q_FUNC_INFO, "index must be valid here");
+            NX_ASSERT(idx.isValid(), Q_FUNC_INFO, "index must be valid here");
             if (!idx.isValid())
                 return false;
 
@@ -159,6 +159,9 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
 {
     ui->setupUi(this);
     retranslateUi();
+
+    QnSnappedScrollBar *scrollBar = new QnSnappedScrollBar(this);
+    ui->tableView->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
     m_resetDefaultsButton = new QPushButton(tr("Reset Default Rules"));
     m_resetDefaultsButton->setEnabled(false);

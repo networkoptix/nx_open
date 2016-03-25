@@ -186,7 +186,7 @@ bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& video
 
 void PlayerDataConsumer::enqueueVideoFrame(QVideoFramePtr decodedFrame)
 {
-    Q_ASSERT(decodedFrame);
+    NX_ASSERT(decodedFrame);
     QnMutexLocker lock(&m_queueMutex);
     while (m_decodedVideo.size() >= kMaxDecodedVideoQueueSize && !needToStop())
         m_queueWaitCond.wait(&m_queueMutex);
@@ -227,7 +227,7 @@ bool PlayerDataConsumer::processAudioFrame(const QnCompressedAudioDataPtr& data)
     }
 
     if (!decodedFrame || !decodedFrame->context)
-        return true; //< just skip frame
+        return true; //< decoder is buffering. true means input frame processed
 
     if (!m_audioOutput)
         m_audioOutput.reset(new AudioOutput(kInitialBufferMs * 1000, kMaxLiveBufferMs * 1000));
@@ -254,7 +254,7 @@ void PlayerDataConsumer::onJumpCanceled(qint64 /*timeUsec*/)
     // Previous jump command has not been executed due to the new jump command received.
     QnMutexLocker lock(&m_dataProviderMutex);
     --m_awaitJumpCounter;
-    Q_ASSERT(m_awaitJumpCounter >= 0);
+    NX_ASSERT(m_awaitJumpCounter >= 0);
 }
 
 void PlayerDataConsumer::onJumpOccurred(qint64 /*timeUsec*/)

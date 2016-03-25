@@ -42,7 +42,8 @@ static const char* IGNORE_VENDORS[][2] =
     {"*", "KCM*"},        // ACTi
     {"*", "DWCA-*"},      // NEW ISD cameras rebrended to DW
 	{"*", "DWEA-*"},      // NEW ISD cameras rebrended to DW
-    {"*", "DWCS-*"}       // NEW ISD cameras rebrended to DW
+    {"*", "DWCS-*"},       // NEW ISD cameras rebrended to DW
+    {"Network Optix", "*"} // Nx cameras
 };
 
 bool OnvifResourceInformationFetcher::isAnalogOnvifResource(const QString& vendor, const QString& model)

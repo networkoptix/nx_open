@@ -6,6 +6,7 @@
 #include <boost/optional.hpp>
 
 #include <nx/network/stun/async_client.h>
+#include <nx/network/aio/timer.h>
 
 #include "abstract_cloud_system_credentials_provider.h"
 #include "cdb_endpoint_fetcher.h"
@@ -55,7 +56,7 @@ private:
 
     std::shared_ptr< stun::AbstractAsyncClient > m_stunClient;
     nx::network::cloud::CloudModuleEndPointFetcher m_endpointFetcher;
-    std::unique_ptr< AbstractStreamSocket > m_timerSocket;
+    nx::network::aio::Timer m_timer;
     boost::optional<SocketAddress> m_mediatorAddress;
 };
 

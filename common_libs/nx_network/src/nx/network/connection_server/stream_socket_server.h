@@ -22,14 +22,14 @@
 template<class _ConnectionType>
 class StreamConnectionHolder
 {
-    public:
-        typedef _ConnectionType ConnectionType;
+public:
+    typedef _ConnectionType ConnectionType;
 
-        virtual ~StreamConnectionHolder() {}
+    virtual ~StreamConnectionHolder() {}
 
-        virtual void closeConnection(
-            SystemError::ErrorCode closeReason,
-            ConnectionType* connection ) = 0;
+    virtual void closeConnection(
+        SystemError::ErrorCode closeReason,
+        ConnectionType* connection ) = 0;
 };
 
 template<class _ConnectionType>
@@ -54,7 +54,7 @@ public:
             connections.swap( m_connections );
         }
         for (auto& connection: connections)
-            connection.first->pleaseStop();
+            connection.first->pleaseStopSync();
         connections.clear();
 
         //waiting connections being cancelled through closeConnection call to finish...
@@ -77,8 +77,7 @@ public:
         ++m_connectionsBeingClosedCount;
         lk.unlock();
 
-        //TODO #ak introduce non-blocking implementation when async cancellation is available
-        connectionCtx.first->pleaseStop();
+        //we are in connection's aio thread, so we can just free connection
         connectionCtx.second.reset();
 
         lk.relock();

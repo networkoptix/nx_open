@@ -28,6 +28,13 @@ public:
     using UDPSocket::pleaseStop;
     using UDPSocket::pleaseStopSync;
 
+    Timer() = default;
+    Timer(const Timer&) = delete;
+    Timer& operator=(const Timer&) = delete;
+
+    /** 
+        \note If timer is already started, this method overwrites timer, not adds a new one!
+    */
     void start(
         std::chrono::milliseconds timeout,
         nx::utils::MoveOnlyFunc<void()> timerFunc);

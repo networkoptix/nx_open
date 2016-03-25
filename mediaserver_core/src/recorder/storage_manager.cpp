@@ -15,6 +15,8 @@
 #include <core/resource/camera_history.h>
 #include "api/app_server_connection.h"
 
+#include <nx_ec/managers/abstract_camera_manager.h>
+
 #include <recorder/server_stream_recorder.h>
 #include <recorder/recording_manager.h>
 #include <recorder/schedule_sync.h>
@@ -342,7 +344,7 @@ public:
                 }
             }
 
-            assert(qnBackupStorageMan->scheduleSync());
+            NX_ASSERT(qnBackupStorageMan->scheduleSync());
             qnBackupStorageMan->scheduleSync()->updateLastSyncChunk();
         }
     }
@@ -362,7 +364,7 @@ public:
                 break;
 
             QnStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnStorageResource> (*itr);
-            Qn::ResourceStatus status = fileStorage->isAvailable() ? Qn::Online : Qn::Offline;
+            Qn::ResourceStatus status = fileStorage->initOrUpdate() ? Qn::Online : Qn::Offline;
             if (fileStorage->getStatus() != status)
                 m_owner->changeStorageStatus(fileStorage, status);
 
@@ -400,18 +402,18 @@ QnStorageManager::QnStorageManager(QnServer::StoragePool role):
 {
     m_storageDbPoolRef = qnStorageDbPool->create();
 
-    Q_ASSERT(m_role == QnServer::StoragePool::Normal || m_role == QnServer::StoragePool::Backup);
+    NX_ASSERT(m_role == QnServer::StoragePool::Normal || m_role == QnServer::StoragePool::Backup);
     m_storageWarnTimer.restart();
     m_testStorageThread = new TestStorageThread(this);
 
     if (m_role == QnServer::StoragePool::Normal)
     {
-        assert( QnNormalStorageManager_instance == nullptr );
+        NX_ASSERT( QnNormalStorageManager_instance == nullptr );
         QnNormalStorageManager_instance = this;
     }
     else if (m_role == QnServer::StoragePool::Backup)
     {
-        assert( QnBackupStorageManager_instance == nullptr );
+        NX_ASSERT( QnBackupStorageManager_instance == nullptr );
         QnBackupStorageManager_instance = this;
     }
 
@@ -564,7 +566,7 @@ bool QnStorageManager::needToStopMediaScan() const
 
 void QnStorageManager::setRebuildInfo(const QnStorageScanData& data)
 {
-    Q_ASSERT_X(data.totalProgress < 1.01, Q_FUNC_INFO, "invalid progress");
+    NX_ASSERT(data.totalProgress < 1.01, Q_FUNC_INFO, "invalid progress");
     QnMutexLocker lock( &m_rebuildStateMtx );
     m_archiveRebuildInfo = data;
 }
@@ -658,8 +660,10 @@ void QnStorageManager::addStorage(const QnStorageResourcePtr &storage)
 {
     {
         int storageIndex = qnStorageDbPool->getStorageIndex(storage);
-        QnMutexLocker lock( &m_mutexStorages );
-        m_storagesStatisticsReady = false;
+        {
+            QnMutexLocker lock(&m_mutexStorages);
+            m_storagesStatisticsReady = false;
+        }
 
         NX_LOG(QString("Adding storage. Path: %1").arg(storage->getUrl()), cl_logINFO);
 
@@ -668,7 +672,10 @@ void QnStorageManager::addStorage(const QnStorageResourcePtr &storage)
         //if (oldStorage)
         //    storage->addWritedSpace(oldStorage->getWritedSpace());
         storage->setStatus(Qn::Offline); // we will check status after
-        m_storageRoots.insert(storageIndex, storage);
+        {
+            QnMutexLocker lk(&m_mutexStorages);
+            m_storageRoots.insert(storageIndex, storage);
+        }
         connect(storage.data(), SIGNAL(archiveRangeChanged(const QnStorageResourcePtr &, qint64, qint64)),
                 this, SLOT(at_archiveRangeChanged(const QnStorageResourcePtr &, qint64, qint64)), Qt::DirectConnection);
         qnStorageDbPool->getSDB(storage);
@@ -1017,13 +1024,13 @@ QnRecordingStatsData QnStorageManager::mergeStatsFromCatalogs(qint64 bitrateAnal
         }
 
         qint64 nextTime = qMin(nextHiTime, nextLowTime);
-        Q_ASSERT(nextTime >= currentTime);
+        NX_ASSERT(nextTime >= currentTime);
         qint64 blockDuration = nextTime - currentTime;
 
         if (hasHi)
         {
             qreal persentUsage = blockDuration / (qreal) itrHiLeft->durationMs;
-            Q_ASSERT(qBetween(0.0, persentUsage, 1.000001));
+            NX_ASSERT(qBetween(0.0, persentUsage, 1.000001));
             auto storage = storageRoot(itrHiLeft->storageIndex);
             result.recordedBytes += itrHiLeft->getFileSize() * persentUsage;
             if (storage)
@@ -1039,7 +1046,7 @@ QnRecordingStatsData QnStorageManager::mergeStatsFromCatalogs(qint64 bitrateAnal
         if (hasLow)
         {
             qreal persentUsage = blockDuration / (qreal) itrLowLeft->durationMs;
-            Q_ASSERT(qBetween(0.0, persentUsage, 1.000001));
+            NX_ASSERT(qBetween(0.0, persentUsage, 1.000001));
             auto storage = storageRoot(itrLowLeft->storageIndex);
             result.recordedBytes += itrLowLeft->getFileSize() * persentUsage;
             if (storage)
@@ -1067,7 +1074,7 @@ QnRecordingStatsData QnStorageManager::mergeStatsFromCatalogs(qint64 bitrateAnal
     bitrateStats.recordedSecs /= 1000; // msec to sec
     if (bitrateStats.recordedBytes > 0 && bitrateStats.recordedSecs > 0)
         result.averageBitrate = bitrateStats.recordedBytes / (qreal) bitrateStats.recordedSecs;
-    Q_ASSERT(result.averageBitrate >= 0);
+    NX_ASSERT(result.averageBitrate >= 0);
     return result;
 }
 
@@ -1125,9 +1132,7 @@ void QnStorageManager::updateCameraHistory()
         QnAppServerConnectionFactory::getConnection2();
 
     ec2::ErrorCode errCode =
-        appServerConnection->getCameraManager()
-                           ->setCamerasWithArchiveSync(qnCommon->moduleGUID(),
-                                                       archivedListNew);
+        appServerConnection->getCameraManager()->setServerFootageDataSync(qnCommon->moduleGUID(), archivedListNew);
 
     if (errCode != ec2::ErrorCode::ok) {
         qCritical() << "ECS server error during execute method addCameraHistoryItem: "
@@ -1478,7 +1483,7 @@ bool QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
     while (toDelete > 0)
     {
         if (QnResource::isStopping())
-        {   // Return true to mark this storage as succesfully cleaned since 
+        {   // Return true to mark this storage as succesfully cleaned since
             // we don't want this storage to be added in clear-again list when
             // server is going to stop.
             return true;
@@ -1504,12 +1509,6 @@ bool QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
                     deleteRecordsToTime(altCatalog, minTime);
                 else
                     deleteRecordsToTime(altCatalog, DATETIME_NOW);
-                if (catalog->isEmpty() && altCatalog->isEmpty())
-                    break; // nothing to delete
-            }
-            else {
-                if (catalog->isEmpty())
-                    break; // nothing to delete
             }
         }
         else
@@ -1702,9 +1701,11 @@ void QnStorageManager::stopAsyncTasks()
 
 void QnStorageManager::updateStorageStatistics()
 {
-    QnMutexLocker lock( &m_mutexStorages );
-    if (m_storagesStatisticsReady)
-        return;
+    {
+        QnMutexLocker lock(&m_mutexStorages);
+        if (m_storagesStatisticsReady)
+            return;
+    }
 
     QSet<QnStorageResourcePtr> storages = getWritableStorages();
     int64_t totalSpace = 0;
@@ -1716,19 +1717,13 @@ void QnStorageManager::updateStorageStatistics()
         QnStorageResourcePtr fileStorage =
             qSharedPointerDynamicCast<QnStorageResource> (*itr);
 
-        int64_t storageSpace = std::max(
-            int64_t(1),
-            static_cast<int64_t>(
-                fileStorage->getTotalSpace() -
-                fileStorage->getSpaceLimit()
-            )
-        );
+        int64_t storageSpace = std::max(int64_t(1),
+                                        static_cast<int64_t>(fileStorage->getTotalSpace() - 
+                                                             fileStorage->getSpaceLimit()));
         totalSpace += storageSpace;
     }
 
-    for (auto itr = storages.constBegin();
-         itr != storages.constEnd();
-         ++itr)
+    for (auto itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
     {
         QnStorageResourcePtr fileStorage =
             qSharedPointerDynamicCast<QnStorageResource> (*itr);
@@ -1744,8 +1739,11 @@ void QnStorageManager::updateStorageStatistics()
         fileStorage->setWritedCoeff((double)storageSpace / totalSpace);
     }
 
-    m_storagesStatisticsReady = true;
-    m_warnSended = false;
+    {
+        QnMutexLocker lk(&m_mutexStorages);
+        m_storagesStatisticsReady = true;
+        m_warnSended = false;
+    }
 }
 
 QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(
@@ -1839,7 +1837,7 @@ QString QnStorageManager::getFileName(const qint64& dateTime, qint16 timeZone, c
         }
         return QString();
     }
-    Q_ASSERT(camera != 0);
+    NX_ASSERT(camera != 0);
     QString base = closeDirPath(storage->getUrl());
     QString separator = getPathSeparator(base);
 
@@ -1847,7 +1845,7 @@ QString QnStorageManager::getFileName(const qint64& dateTime, qint16 timeZone, c
         base += prefix + separator;
     base += camera->getPhysicalId();
 
-    Q_ASSERT(!camera->getPhysicalId().isEmpty());
+    NX_ASSERT(!camera->getPhysicalId().isEmpty());
     QString text = base + separator + dateTimeStr(dateTime, timeZone, separator);
 
     return text + QString::number(dateTime);

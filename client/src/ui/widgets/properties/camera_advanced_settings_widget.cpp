@@ -17,15 +17,12 @@
 
 #include <ui/widgets/properties/camera_advanced_settings_web_page.h>
 
-namespace {
+namespace
+{
 
     bool isStatusValid(Qn::ResourceStatus status) {
         return status == Qn::Online || status == Qn::Recording;
     }
-
-    //TODO: #GDM #2.6 #tr
-    /* Untranslatable for now. */
-    const QByteArray kLoadingWebPage = "Loading...";
 
 }
 
@@ -154,14 +151,14 @@ void QnCameraAdvancedSettingsWidget::hideEvent(QHideEvent *event)
 
     ui->webView->triggerPageAction(QWebPage::Stop);
     ui->webView->triggerPageAction(QWebPage::StopScheduledPageRefresh);
-    ui->webView->setContent(kLoadingWebPage);
+    ui->webView->setContent(tr("Loading...").toUtf8());
 }
 
 void QnCameraAdvancedSettingsWidget::initWebView() {
     m_cameraAdvancedSettingsWebPage = new CameraAdvancedSettingsWebPage(ui->webView);
     ui->webView->setPage(m_cameraAdvancedSettingsWebPage);
 
-    ui->webView->setContent(kLoadingWebPage);
+    ui->webView->setContent(tr("Loading...").toUtf8());
 
     QStyle* style = QStyleFactory().create(lit("fusion"));
     ui->webView->setStyle(style);

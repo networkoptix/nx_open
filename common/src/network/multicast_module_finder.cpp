@@ -21,7 +21,7 @@
 static const int MAX_CACHE_SIZE_BYTES = 1024 * 64;
 
 namespace {
-    
+
     const unsigned defaultPingTimeoutMs = 1000 * 5;
     const unsigned defaultKeepAliveMultiply = 5;
     const unsigned errorWaitTimeoutMs = 1000;
@@ -109,7 +109,7 @@ void QnMulticastModuleFinder::updateInterfaces() {
 
             if (!m_pollSet.add(it.value(), aio::etRead, it.value())) {
                 const auto error = SystemError::getLastOSErrorText();
-                Q_ASSERT_X(false, Q_FUNC_INFO, error.toUtf8().data());
+                NX_ASSERT(false, Q_FUNC_INFO, error.toUtf8().data());
             }
         } catch(const std::exception &e) {
             NX_LOG(lit("Failed to create socket on local address %1. %2").arg(address.toString()).arg(QString::fromLatin1(e.what())), cl_logERROR);
@@ -265,7 +265,7 @@ void QnMulticastModuleFinder::run() {
         if (!m_pollSet.add(m_serverSocket.get(), aio::etRead, m_serverSocket.get()))
         {
             const auto error = SystemError::getLastOSErrorText();
-            Q_ASSERT_X(false, Q_FUNC_INFO, error.toUtf8().data());
+            NX_ASSERT(false, Q_FUNC_INFO, error.toUtf8().data());
         }
     }
 

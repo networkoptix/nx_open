@@ -8,6 +8,7 @@
 #include "message.h"
 #include "message_parser.h"
 #include "message_serializer.h"
+#include "nx/network/aio/timer.h"
 
 #ifdef _DEBUG
     #include <map>
@@ -26,7 +27,8 @@ public:
     virtual ~AbstractAsyncClient() {}
 
     typedef std::function<void(Message)> IndicationHandler;
-    typedef std::function<void(SystemError::ErrorCode, Message)> RequestHandler;
+    typedef utils::MoveOnlyFunc<void(
+        SystemError::ErrorCode, Message)> RequestHandler;
 
     //!Asynchronously openes connection to the server
     /*!
@@ -109,8 +111,8 @@ public:
     void closeConnection(SystemError::ErrorCode errorCode) override;
 
     /*! \note Required by \a nx_api::BaseServerConnection */
-    void closeConnection(
-        SystemError::ErrorCode errorCode, BaseConnectionType* connection);
+    virtual void closeConnection(
+        SystemError::ErrorCode errorCode, BaseConnectionType* connection) override;
 
 private:
     enum class State
@@ -136,7 +138,7 @@ private:
     bool m_useSsl;
     State m_state;
 
-    std::unique_ptr<AbstractCommunicatingSocket> m_timerSocket;
+    std::unique_ptr<nx::network::aio::Timer> m_timer;
     std::unique_ptr<BaseConnectionType> m_baseConnection;
     std::unique_ptr<AbstractStreamSocket> m_connectingSocket;
 

@@ -43,7 +43,7 @@ DeviceSearcher::DeviceSearcher( unsigned int discoverTryTimeoutMS )
     m_timerID = TimerManager::instance()->addTimer( this, m_discoverTryTimeoutMS );
     m_cacheTimer.start();
 
-    assert(UPNPDeviceSearcherInstance == nullptr);
+    NX_ASSERT(UPNPDeviceSearcherInstance == nullptr);
     UPNPDeviceSearcherInstance = this;
 }
 
@@ -166,7 +166,7 @@ void DeviceSearcher::processDiscoveredDevices( SearchHandler* handlerToUse )
         }
         else
         {
-            Q_ASSERT( false );
+            NX_ASSERT( false );
             //TODO: #ak this needs to be implemented if camera discovery ever becomes truly asynchronous
         }
 

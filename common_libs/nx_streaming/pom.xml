@@ -26,9 +26,9 @@
         <product.title>${company.name} nx_streaming</product.title>
         <!--Global libs-->
         <qt.libs>core network concurrent</qt.libs>
-        <global.libs>-lcommon</global.libs>
+        <global.libs>-lcommon -lnx_utils</global.libs>
         <!--Specific os libs used-->
-        <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm ssleay32.lib libeay32.lib</windows.oslibs>
+        <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm</windows.oslibs>
         <windows.oslibs.release/>
         <windows.oslibs.debug/>
         <linux.oslibs></linux.oslibs>
@@ -41,8 +41,29 @@
         <mac.defines/>
         <android.defines/>
         <ios.defines/>
+        <rdep.packages>openssl</rdep.packages>
     </properties>
 
+ <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>common</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common/pom.xml</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_utils</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_utils/pom.xml</systemPath>
+        </dependency>
+    </dependencies>    
+    
     <profiles>
         <profile>
             <id>windows</id>

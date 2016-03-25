@@ -98,7 +98,7 @@ namespace ec2
             //else if( format == Qn::XmlFormat )
             //    tranBuffer = QnXml::serialized(tran, lit("reply"));
             else
-                assert(false);
+                NX_ASSERT(false);
 
             connect( httpClient.get(), &nx_http::AsyncHttpClient::done, this, &ClientQueryProcessor::onHttpDone, Qt::DirectConnection );
 
@@ -156,7 +156,7 @@ namespace ec2
             {
                 QnMutexLocker lk( &m_mutex );
                 auto it = m_runningHttpRequests.find( httpClient );
-                assert( it != m_runningHttpRequests.end() );
+                NX_ASSERT( it != m_runningHttpRequests.end() );
                 handler = std::move(it->second);
                 httpClient->terminate();
                 m_runningHttpRequests.erase( it );
@@ -216,7 +216,7 @@ namespace ec2
                 //    tran = QnXml::deserialized<OutputData>(msgBody, OutputData(), &success);
                 //    break;
             default:
-                assert(false);
+                NX_ASSERT(false);
             }
 
             if( !success)

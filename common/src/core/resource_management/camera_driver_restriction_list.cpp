@@ -6,13 +6,14 @@
 #include "camera_driver_restriction_list.h"
 
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/log/assert.h>
 
 
 static CameraDriverRestrictionList* CameraDriverRestrictionList_instance = nullptr;
 
 CameraDriverRestrictionList::CameraDriverRestrictionList()
 {
-    assert( CameraDriverRestrictionList_instance == nullptr );
+    NX_ASSERT( CameraDriverRestrictionList_instance == nullptr );
     CameraDriverRestrictionList_instance = this;
 }
 

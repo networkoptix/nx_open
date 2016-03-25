@@ -8,6 +8,7 @@
 #include <chrono>
 #include <functional>
 #include <future>
+#include <iostream>
 #include <sstream>
 #include <thread>
 #include <tuple>
@@ -19,11 +20,10 @@
 #include <utils/common/string.h>
 #include <utils/common/sync_call.h>
 #include <utils/crypt/linux_passwd_crypt.h>
+#include <utils/serialization/lexical.h>
 
 #include "local_cloud_data_provider.h"
 #include "socket_globals_holder.h"
-#include "version.h"
-
 
 namespace nx {
 namespace hpm {
@@ -67,6 +67,11 @@ void MediatorFunctionalTest::start()
         [this, &mediatorInstantiatedCreatedPromise]()->int {
             m_mediatorInstance = std::make_unique<nx::hpm::MediatorProcessPublic>(
                 static_cast<int>(m_args.size()), m_args.data());
+            m_mediatorInstance->setOnStartedEventHandler(
+                [this](bool result)
+                {
+                    m_mediatorStartedPromise.set_value(result);
+                });
             mediatorInstantiatedCreatedPromise.set_value();
             return m_mediatorInstance->exec();
         });
@@ -81,25 +86,16 @@ bool MediatorFunctionalTest::startAndWaitUntilStarted()
 
 bool MediatorFunctionalTest::waitUntilStarted()
 {
-    static const std::chrono::seconds INITIALIZED_MAX_WAIT_TIME(15);
+    static const std::chrono::seconds initializedMaxWaitTime(15);
 
-    const auto endClock = std::chrono::steady_clock::now() + INITIALIZED_MAX_WAIT_TIME;
-    for (;;)
-    {
-        if (std::chrono::steady_clock::now() >= endClock)
-            return false;
-        if (m_mediatorProcessFuture.wait_for(std::chrono::seconds(0)) ==
+    auto mediatorStartedFuture = m_mediatorStartedPromise.get_future();
+    if (mediatorStartedFuture.wait_for(initializedMaxWaitTime) !=
             std::future_status::ready)
-        {
-            return false;
-        }
-
-        auto socket = SocketFactory::createStreamSocket(false, SocketFactory::NatTraversalType::nttDisabled);
-        if (socket->connect(endpoint(), INITIALIZED_MAX_WAIT_TIME/5))
-            break;
+    {
+        return false;
     }
 
-    return true;
+    return mediatorStartedFuture.get();
 }
 
 void MediatorFunctionalTest::stop()
@@ -127,7 +123,7 @@ SocketAddress MediatorFunctionalTest::endpoint() const
     return SocketAddress(HostAddress::localhost, m_port);
 }
 
-std::shared_ptr<nx::hpm::api::MediatorClientTcpConnection> 
+std::shared_ptr<nx::hpm::api::MediatorClientTcpConnection>
     MediatorFunctionalTest::clientConnection()
 {
     return network::SocketGlobals::mediatorConnector().clientConnection();
@@ -182,12 +178,22 @@ std::unique_ptr<MediaServerEmulator> MediatorFunctionalTest::addRandomServer(
     const AbstractCloudDataProvider::System& system)
 {
     auto server = std::make_unique<MediaServerEmulator>(endpoint(), system);
-    if (!server->start() || (server->registerOnMediator() != api::ResultCode::ok))
+    if (!server->start())
+    {
+        std::cerr<<"Failed to start server"<<std::endl;
         return nullptr;
+    }
+    const auto resultCode = server->registerOnMediator();
+    if (resultCode != api::ResultCode::ok)
+    {
+        std::cerr<<"Failed to register server on mediator. "
+            <<QnLexical::serialized(resultCode).toStdString()<<std::endl;
+        return nullptr;
+    }
     return server;
 }
 
-std::unique_ptr<MediaServerEmulator> 
+std::unique_ptr<MediaServerEmulator>
     MediatorFunctionalTest::addRandomServerNotRegisteredOnMediator(
         const AbstractCloudDataProvider::System& system)
 {
@@ -197,7 +203,7 @@ std::unique_ptr<MediaServerEmulator>
     return server;
 }
 
-std::vector<std::unique_ptr<MediaServerEmulator>> 
+std::vector<std::unique_ptr<MediaServerEmulator>>
     MediatorFunctionalTest::addRandomServers(
         const AbstractCloudDataProvider::System& system,
         size_t count)
@@ -239,7 +245,7 @@ std::vector<std::unique_ptr<MediaServerEmulator>>
 //            moduleInfo().realm.c_str(),
 //            password->c_str()).constData();
 //    if (accountData->customization.empty())
-//        accountData->customization = QN_CUSTOMIZATION_NAME;
+//        accountData->customization = QnAppInfo::customizationName();
 //
 //    auto connection = connectionFactory()->createConnection("", "");
 //

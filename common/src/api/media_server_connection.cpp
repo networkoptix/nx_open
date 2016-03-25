@@ -299,7 +299,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         processJsonReply(this, response, handle);
         break;
     default:
-        assert(false); /* We should never get here. */
+        NX_ASSERT(false); /* We should never get here. */
         break;
     }
 
@@ -310,7 +310,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
 // -------------------------------------------------------------------------- //
 // QnMediaServerConnection
 // -------------------------------------------------------------------------- //
-QnMediaServerConnection::QnMediaServerConnection(QnMediaServerResource* mserver, const QnUuid &videowallGuid, bool enableOfflineRequests, QObject *parent):
+QnMediaServerConnection::QnMediaServerConnection(const QnMediaServerResourcePtr& mserver, const QnUuid &videowallGuid, bool enableOfflineRequests, QObject *parent):
     base_type(parent, mserver),
     m_proxyPort(0),
     m_enableOfflineRequests(enableOfflineRequests)
@@ -418,7 +418,7 @@ int QnMediaServerConnection::getTimePeriodsAsync(const QnVirtualCameraResourcePt
 }
 
 int QnMediaServerConnection::getParamsAsync(const QnNetworkResourcePtr &camera, const QStringList &keys, QObject *target, const char *slot) {
-	Q_ASSERT_X(!keys.isEmpty(), Q_FUNC_INFO, "parameter names should be provided");
+	NX_ASSERT(!keys.isEmpty(), Q_FUNC_INFO, "parameter names should be provided");
 
 	QnRequestParamList params;
     params << QnRequestParam("res_id", camera->getPhysicalId());
@@ -429,7 +429,7 @@ int QnMediaServerConnection::getParamsAsync(const QnNetworkResourcePtr &camera, 
 }
 
 int QnMediaServerConnection::setParamsAsync(const QnNetworkResourcePtr &camera, const QnCameraAdvancedParamValueList &values, QObject *target, const char *slot) {
-	Q_ASSERT_X(!values.isEmpty(), Q_FUNC_INFO, "parameter names should be provided");
+	NX_ASSERT(!values.isEmpty(), Q_FUNC_INFO, "parameter names should be provided");
 
     QnRequestParamList params;
     params << QnRequestParam("res_id", camera->getPhysicalId());

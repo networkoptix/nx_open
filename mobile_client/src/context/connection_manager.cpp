@@ -249,7 +249,7 @@ void QnConnectionManagerPrivate::doConnect() {
 
 void QnConnectionManagerPrivate::doDisconnect(bool force) {
     if (!force)
-        QnGlobalSettings::instance()->synchronizeNow();
+        qnGlobalSettings->synchronizeNow();
 
     disconnect(QnRuntimeInfoManager::instance(), nullptr, this, nullptr);
 

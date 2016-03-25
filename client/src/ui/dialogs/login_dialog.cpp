@@ -8,7 +8,6 @@
 #include <QtGui/QStandardItemModel>
 
 #include <QtWidgets/QDesktopWidget>
-#include <QtWidgets/QMessageBox>
 #include <QtWidgets/QInputDialog>
 
 #include <api/app_server_connection.h>
@@ -50,6 +49,7 @@
 
 #include "compatibility.h"
 #include <utils/common/app_info.h>
+#include <ui/style/custom_style.h>
 
 namespace {
     void setEnabled(const QObjectList &objects, QObject *exclude, bool enabled) {
@@ -105,11 +105,13 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
 {
     ui->setupUi(this);
 
+    setAccentStyle(ui->buttonBox->button(QDialogButtonBox::Ok));
+
     setWindowTitle(tr("Connect to Server..."));
     setHelpTopic(this, Qn::Login_Help);
 
     QHBoxLayout* bbLayout = dynamic_cast<QHBoxLayout*>(ui->buttonBox->layout());
-    Q_ASSERT(bbLayout);
+    NX_ASSERT(bbLayout);
     if (bbLayout) {
         QLabel* versionLabel = new QLabel(ui->buttonBox);
         versionLabel->setText(tr("Version %1").arg(QnAppInfo::applicationVersion()));

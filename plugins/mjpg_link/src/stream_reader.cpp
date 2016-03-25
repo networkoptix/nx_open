@@ -58,7 +58,7 @@ StreamReader::StreamReader(nxpt::CommonRefManager* const parentRefManager,
     m_isInGetNextData( 0 ),
     m_timeProvider(timeProvider)
 {
-    assert(m_timeProvider);
+    NX_ASSERT(m_timeProvider);
     setFps( fps );
 
     using namespace std::placeholders;
@@ -69,7 +69,7 @@ StreamReader::StreamReader(nxpt::CommonRefManager* const parentRefManager,
 
 StreamReader::~StreamReader()
 {
-    assert( m_isInGetNextData == 0 );
+    NX_ASSERT( m_isInGetNextData == 0 );
     m_timeProvider->releaseRef();
 }
 

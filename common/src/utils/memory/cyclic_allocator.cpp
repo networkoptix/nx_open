@@ -6,6 +6,7 @@
 #include "cyclic_allocator.h"
 
 #include <memory>
+#include <nx/utils/log/assert.h>
 
 #ifdef CA_DEBUG
 #include <nx/utils/log/log.h>
@@ -97,7 +98,7 @@ CyclicAllocator::CyclicAllocator( size_t arenaSize )
 
 CyclicAllocator::~CyclicAllocator()
 {
-    assert( m_leftMostAllocatedBlock == m_freeMemStart );   //all blocks have been freed
+    NX_ASSERT( m_leftMostAllocatedBlock == m_freeMemStart );   //all blocks have been freed
     
     Arena* arena = m_leftMostAllocatedBlock.arena;
     while (arena) {
@@ -114,7 +115,7 @@ static void validateBlock( const std::map<void*, size_t>& allocatedBlocks, uint8
 {
     for( auto val: allocatedBlocks )
     {
-        assert( !((blockPtr < static_cast<const uint8_t*>(val.first)+val.second) && (val.first < (blockPtr + blockSize))) );
+        NX_ASSERT( !((blockPtr < static_cast<const uint8_t*>(val.first)+val.second) && (val.first < (blockPtr + blockSize))) );
     }
 }
 #endif
@@ -203,7 +204,7 @@ void CyclicAllocator::release( void* ptr )
 
     AllocationHeader header;
     header.read( allocationHeaderPtr );
-    assert( header.used == AllocationHeader::SPACE_USED );
+    NX_ASSERT( header.used == AllocationHeader::SPACE_USED );
     header.used = AllocationHeader::SPACE_NOT_USED;
     header.write( &allocationHeaderPtr );
 
@@ -313,7 +314,7 @@ void CyclicAllocator::skipFreedBlocks()
                 continue;
 
             default:
-                assert( false );
+                NX_ASSERT( false );
         }
     }
 }

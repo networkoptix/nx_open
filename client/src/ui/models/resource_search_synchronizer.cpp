@@ -53,7 +53,7 @@ void QnResourceSearchSynchronizer::setLayout(QnWorkbenchLayout *layout) {
 }
 
 void QnResourceSearchSynchronizer::start() {
-    assert(m_model != NULL && m_layout != NULL);
+    NX_ASSERT(m_model != NULL && m_layout != NULL);
 
     connect(m_layout,   SIGNAL(aboutToBeDestroyed()),                                   this, SLOT(at_layout_aboutToBeDestroyed()));
     connect(m_layout,   SIGNAL(itemAdded(QnWorkbenchItem *)),                           this, SLOT(at_layout_itemAdded(QnWorkbenchItem *)));
@@ -72,7 +72,7 @@ void QnResourceSearchSynchronizer::start() {
 
 
 void QnResourceSearchSynchronizer::stop() {
-    assert(m_model != NULL && m_layout != NULL);
+    NX_ASSERT(m_model != NULL && m_layout != NULL);
 
     /* Don't modify model or layout, just clear internal data structures. */
     m_modelItemCountByResource.clear();

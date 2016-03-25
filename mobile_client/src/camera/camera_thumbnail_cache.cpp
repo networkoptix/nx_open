@@ -147,7 +147,7 @@ void QnCameraThumbnailCache::refreshThumbnail(const QnUuid &id)
             {
                 if (!pixmap.isNull())
                 {
-                    thumbnailId = getThumbnailId(id.toString(), thumbnailData.time);
+                    thumbnailId = getThumbnailId(id, thumbnailData.time);
                     m_pixmaps.remove(thumbnailData.thumbnailId);
                     m_pixmaps.insert(thumbnailId, pixmap);
                     thumbnailLoaded = true;

@@ -21,7 +21,7 @@ using std::string;
 NotificationConsumerBindingService* OnvifNotificationConsumer::copy()
 {
     //TODO/IMPL
-    Q_ASSERT( false );
+    NX_ASSERT( false );
     return NULL;
 }
 

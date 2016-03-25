@@ -1,8 +1,9 @@
 #include "incoming_tunnel_udt_connection.h"
 
-#include <nx/utils/log/log.h>
+#include <nx/network/cloud/cloud_config.h>
 #include <nx/network/cloud/data/udp_hole_punching_connection_initiation_data.h>
 #include <nx/network/stun/message_serializer.h>
+#include <nx/utils/log/log.h>
 
 namespace nx {
 namespace network {
@@ -10,11 +11,10 @@ namespace cloud {
 
 IncomingTunnelUdtConnection::IncomingTunnelUdtConnection(
     String connectionId,
-    std::unique_ptr<UdtStreamSocket> connectionSocket,
-    std::chrono::milliseconds maxKeepAliveInterval)
+    std::unique_ptr<UdtStreamSocket> connectionSocket)
 :
     AbstractIncomingTunnelConnection(std::move(connectionId)),
-    m_maxKeepAliveInterval(maxKeepAliveInterval),
+    m_maxKeepAliveInterval(kHpUdtKeepAliveInterval * kHpUdtKeepAliveRetries),
     m_lastKeepAlive(std::chrono::system_clock::now()),
     m_state(SystemError::noError),
     m_connectionSocket(std::move(connectionSocket)),
@@ -32,7 +32,8 @@ IncomingTunnelUdtConnection::IncomingTunnelUdtConnection(
     }
     else
     {
-        NX_LOGX(lm("Listening for new connections"), cl_logDEBUG1);
+        NX_LOGX(lm("Listening for new connections on %1")
+            .arg(m_serverSocket->getLocalAddress().toString()), cl_logDEBUG1);
 
         m_connectionBuffer.reserve(1024);
         m_connectionParser.setMessage(&m_connectionMessage);
@@ -41,11 +42,17 @@ IncomingTunnelUdtConnection::IncomingTunnelUdtConnection(
     }
 }
 
+void IncomingTunnelUdtConnection::setMaxKeepAliveInterval(
+    std::chrono::milliseconds interval)
+{
+    m_maxKeepAliveInterval = interval;
+}
+
 void IncomingTunnelUdtConnection::accept(std::function<void(
     SystemError::ErrorCode,
     std::unique_ptr<AbstractStreamSocket>)> handler)
 {
-    Q_ASSERT_X(!m_acceptHandler, Q_FUNC_INFO, "Concurent accept");
+    NX_ASSERT(!m_acceptHandler, Q_FUNC_INFO, "Concurent accept");
     m_connectionSocket->post(
         [this, handler = std::move(handler)]()
         {
@@ -83,7 +90,7 @@ void IncomingTunnelUdtConnection::pleaseStop(
         [this, handler = std::move(handler)]()
         {
             if (m_serverSocket)
-                m_serverSocket->pleaseStopSync();
+                m_serverSocket->pleaseStopSync(); // we are in IO thread
 
             handler();
         });
@@ -111,10 +118,14 @@ void IncomingTunnelUdtConnection::readRequest()
     m_connectionBuffer.resize(0);
     m_connectionSocket->readSomeAsync(
         &m_connectionBuffer,
-        [this](SystemError::ErrorCode code, size_t)
+        [this](SystemError::ErrorCode code, size_t bytesRead)
         {
+            NX_ASSERT(code != SystemError::timedOut);
             if (code != SystemError::noError)
                 return connectionSocketError(code);
+
+            if (bytesRead == 0)
+                return connectionSocketError(SystemError::connectionReset);
 
             m_lastKeepAlive = std::chrono::system_clock::now();
             size_t processed = 0;

@@ -4,7 +4,9 @@
 #include <nx/network/abstract_socket.h>
 #include <nx/network/cloud/mediator_connections.h>
 #include <nx/network/cloud/tunnel/incoming_tunnel_pool.h>
+#include <nx/network/retry_timer.h>
 #include <nx/network/socket_attributes_cache.h>
+
 
 namespace nx {
 namespace network {
@@ -28,6 +30,8 @@ public:
 
     CloudServerSocket(
         std::shared_ptr<hpm::api::MediatorServerTcpConnection> mediatorConnection,
+        nx::network::RetryPolicy mediatorRegistrationRetryPolicy 
+            = nx::network::RetryPolicy(),
         std::vector<AcceptorMaker> acceptorMakers = kDefaultAcceptorMakers);
 
     ~CloudServerSocket();
@@ -55,24 +59,53 @@ public:
     void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
     //!Implementation of AbstractStreamServerSocket::acceptAsync
-    void acceptAsync(
-        std::function<void(SystemError::ErrorCode,
-                           AbstractStreamSocket*)> handler) override;
+    virtual void acceptAsync(
+        nx::utils::MoveOnlyFunc<void(
+            SystemError::ErrorCode,
+            AbstractStreamSocket*)> handler) override;
+    //!Implementation of AbstractStreamServerSocket::cancelIOAsync
+    virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler) override;
+    //!Implementation of AbstractStreamServerSocket::cancelIOSync
+    virtual void cancelIOSync() override;
+
+    /** Invokes listen on mediator */
+    bool registerOnMediatorSync();
 
 protected:
+    enum class State
+    {
+        init,
+        readyToListen,
+        registeringOnMediator,
+        listening
+    };
+
     void initTunnelPool(int queueLen);
     void startAcceptor(std::unique_ptr<AbstractTunnelAcceptor> acceptor);
+    void onListenRequestCompleted(nx::hpm::api::ResultCode resultCode);
+    void acceptAsyncInternal(
+        nx::utils::MoveOnlyFunc<void(
+            SystemError::ErrorCode code,
+            AbstractStreamSocket*)> handler);
+    void issueRegistrationRequest();
+    void onConnectionRequested(
+        hpm::api::ConnectionRequestedEvent event);
 
     std::shared_ptr<hpm::api::MediatorServerTcpConnection> m_mediatorConnection;
+    nx::network::RetryTimer m_mediatorRegistrationRetryTimer;
     const std::vector<AcceptorMaker> m_acceptorMakers;
+    int m_acceptQueueLen;
 
+    State m_state;
     QnMutex m_mutex;
     bool m_terminated;
     std::vector<std::unique_ptr<AbstractTunnelAcceptor>> m_acceptors;
     std::unique_ptr<IncomingTunnelPool> m_tunnelPool;
     mutable SystemError::ErrorCode m_lastError;
-    std::unique_ptr<AbstractCommunicatingSocket> m_ioThreadSocket;
     std::unique_ptr<AbstractStreamSocket> m_acceptedSocket;
+    nx::utils::MoveOnlyFunc<void(
+        SystemError::ErrorCode code,
+        AbstractStreamSocket*)> m_savedAcceptHandler;
 };
 
 } // namespace cloud

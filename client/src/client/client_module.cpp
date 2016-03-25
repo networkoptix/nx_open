@@ -17,6 +17,7 @@
 
 #include <camera/camera_bookmarks_manager.h>
 
+#include <client/client_app_info.h>
 #include <client/client_startup_parameters.h>
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
@@ -24,7 +25,9 @@
 #include <client/client_translation_manager.h>
 #include <client/client_instance_manager.h>
 #include <client/desktop_client_message_processor.h>
+#include <client/client_recent_connections_manager.h>
 
+#include <core/core_settings.h>
 #include <core/ptz/client_ptz_controller_pool.h>
 #include <core/resource/client_camera_factory.h>
 #include <core/resource_management/resource_pool.h>
@@ -48,8 +51,6 @@
 #include <ui/statistics/modules/controls_statistics_module.h>
 
 #include <watchers/cloud_status_watcher.h>
-
-#include "version.h"
 
 namespace
 {
@@ -94,7 +95,6 @@ namespace
             , statManager, &QnStatisticsManager::resetStatistics);
         QObject::connect(QnClientMessageProcessor::instance(), &QnClientMessageProcessor::initialResourcesReceived
             , statManager, &QnStatisticsManager::sendStatistics);
-
     }
 }
 
@@ -109,8 +109,8 @@ QnClientModule::QnClientModule(const QnStartupParameters &startupParams
 
     /* Set up application parameters so that QSettings know where to look for settings. */
     QApplication::setOrganizationName(QnAppInfo::organizationName());
-    QApplication::setApplicationName(lit(QN_APPLICATION_NAME));
-    QApplication::setApplicationDisplayName(lit(QN_APPLICATION_DISPLAY_NAME));
+    QApplication::setApplicationName(QnClientAppInfo::applicationName());
+    QApplication::setApplicationDisplayName(QnClientAppInfo::applicationDisplayName());
     if (QApplication::applicationVersion().isEmpty())
         QApplication::setApplicationVersion(QnAppInfo::applicationVersion());
     QApplication::setStartDragDistance(20);
@@ -130,6 +130,7 @@ QnClientModule::QnClientModule(const QnStartupParameters &startupParams
     QnCommonModule *common = new QnCommonModule(this);
 
     common->store<QnTranslationManager>(translationManager.release());
+    common->store<QnCoreSettings>(new QnCoreSettings());
     common->store<QnClientRuntimeSettings>(new QnClientRuntimeSettings());
     common->store<QnClientSettings>(clientSettings.take());
 
@@ -149,11 +150,12 @@ QnClientModule::QnClientModule(const QnStartupParameters &startupParams
     common->store<QnDesktopClientMessageProcessor>(new QnDesktopClientMessageProcessor());
     common->store<QnCameraHistoryPool>(new QnCameraHistoryPool());
     common->store<QnRuntimeInfoManager>(new QnRuntimeInfoManager());
-    common->store<QnClientCameraFactory>(new QnClientCameraFactory());
+    common->store<QnClientResourceFactory>(new QnClientResourceFactory());
 
     common->store<QnResourcesChangesManager>(new QnResourcesChangesManager());
     common->store<QnCameraBookmarksManager>(new QnCameraBookmarksManager());
     common->store<QnServerStorageManager>(new QnServerStorageManager());
+    common->store<QnClientRecentConnectionsManager>(new QnClientRecentConnectionsManager());
 
     initializeStatisticsManager(common);
 
@@ -169,7 +171,7 @@ QnClientModule::QnClientModule(const QnStartupParameters &startupParams
     //NOTE QNetworkProxyFactory::setApplicationProxyFactory takes ownership of object
     QNetworkProxyFactory::setApplicationProxyFactory(new QnNetworkProxyFactory());
 
-    QnAppServerConnectionFactory::setDefaultFactory(QnClientCameraFactory::instance());
+    QnAppServerConnectionFactory::setDefaultFactory(QnClientResourceFactory::instance());
 }
 
 QnClientModule::~QnClientModule() {

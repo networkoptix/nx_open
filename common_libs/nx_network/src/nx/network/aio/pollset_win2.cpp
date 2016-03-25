@@ -243,7 +243,7 @@ namespace aio {
             //    sets fd_count properly, so it actually does like epoll
 
             //NOTE fdIndex points to current next fd. It does not correspond to \a currentSocket and \a currentSocketREvent
-            assert( fdIndex <= curFdSet->fd_count );
+            NX_ASSERT( fdIndex <= curFdSet->fd_count );
             //there may be INVALID_SOCKET in fd arrays due to PollSet::remove call
             for( ;; )
             {
@@ -274,7 +274,7 @@ namespace aio {
 
             //TODO #ak remove following find call. Finding socket MUST be constant-time operation
             auto sockIter = pollSetImpl->sockets.find( curFdSet->fd_array[fdIndex] );
-            assert( sockIter != pollSetImpl->sockets.end() );
+            NX_ASSERT( sockIter != pollSetImpl->sockets.end() );
 
             sock = sockIter->second.sock;
             if( curFdSet == pollSetImpl->readfds )
@@ -356,7 +356,7 @@ namespace aio {
 
     bool PollSet::const_iterator::operator==( const const_iterator& right ) const
     {
-        assert( m_impl->pollSetImpl == right.m_impl->pollSetImpl );
+        NX_ASSERT( m_impl->pollSetImpl == right.m_impl->pollSetImpl );
         return (m_impl->pollSetImpl == right.m_impl->pollSetImpl)
             && (m_impl->curFdSet == right.m_impl->curFdSet)
             && (m_impl->fdIndex == right.m_impl->fdIndex);
@@ -428,7 +428,7 @@ namespace aio {
 #endif
 
         auto sockIter = m_impl->sockets.find(sock->handle());
-        assert( sockIter != m_impl->sockets.end()
+        NX_ASSERT( sockIter != m_impl->sockets.end()
             && (sockIter->second.polledEventsMask & eventType) > 0 );    //minor optimization
         if( sockIter == m_impl->sockets.end()
             || (sockIter->second.polledEventsMask & eventType) == 0 )

@@ -218,7 +218,7 @@ QUrl QnReconnectHelper::bestInterfaceForServer(const QnUuid &id) {
         return calculateItemPriority(left) < calculateItemPriority(right);
     });
 
-    Q_ASSERT(iter != boost::end(interfaces));
+    NX_ASSERT(iter != boost::end(interfaces));
     if(iter == boost::end(interfaces))
         return QUrl();
 

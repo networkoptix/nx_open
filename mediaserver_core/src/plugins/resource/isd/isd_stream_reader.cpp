@@ -52,7 +52,7 @@ CameraDiagnostics::Result QnISDStreamReader::openStreamInternal(bool isCameraCon
 
 #ifndef USE_VBR
         //const QnSecurityCamResource* cameraRes = dynamic_cast<const QnSecurityCamResource*>(m_resource.data());
-        //Q_ASSERT( cameraRes );
+        //NX_ASSERT( cameraRes );
         //const bool isAmbarellaFirmware = cameraRes->getModel().indexOf(lit("4K")) != -1;
         const bool isAmbarellaChipset = true; 
 #endif

@@ -122,7 +122,7 @@ QnAbstractVideoDecoder* QuicksyncDecoderPlugin::create(
     if( !m_hardwareAccelerationEnabled || (codecID != CODEC_ID_H264) )
         return NULL;
 
-    Q_ASSERT( !m_d3dDevices.empty() );
+    NX_ASSERT( !m_d3dDevices.empty() );
     D3D9DeviceContext d3d9Ctx;
 #ifdef USE_D3D9DEVICE_POOL
     if( m_d3dDevices.size() < d3d9devicePoolSize )

@@ -20,7 +20,7 @@
 #include <recording/time_period_list.h>
 
 
-QnNetworkResource::QnNetworkResource(): 
+QnNetworkResource::QnNetworkResource():
     QnResource(),
     m_authenticated(true),
     m_networkStatus(0),
@@ -105,6 +105,22 @@ void QnNetworkResource::setDefaultAuth(const QAuthenticator &auth)
 {
     setProperty(Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME,
                 lit("%1:%2").arg(auth.user()).arg(auth.password()));
+}
+
+QAuthenticator QnNetworkResource::getResourceAuth(const QnUuid &resourceId, const QnUuid &resourceTypeId)
+{
+    //TODO: #GDM think about code duplication
+    NX_ASSERT(!resourceId.isNull() && !resourceTypeId.isNull(), Q_FUNC_INFO, "Invalid input, reading from local data is requred");
+    QString value = getResourceProperty(Qn::CAMERA_CREDENTIALS_PARAM_NAME, resourceId, resourceTypeId);
+    if (value.isNull())
+        value = getResourceProperty(Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME, resourceId, resourceTypeId);
+    const QStringList& credentialsList = value.split(lit(":"));
+    QAuthenticator auth;
+    if (credentialsList.size() >= 1)
+        auth.setUser(credentialsList[0]);
+    if (credentialsList.size() >= 2)
+        auth.setPassword(credentialsList[1]);
+    return auth;
 }
 
 QAuthenticator QnNetworkResource::getAuth() const
@@ -293,7 +309,7 @@ void QnNetworkResource::getDevicesBasicInfo(QnResourceMap& lst, int threads)
 
 QnUuid QnNetworkResource::uniqueIdToId(const QString& uniqId)
 {
-    Q_ASSERT(!uniqId.isEmpty());
+    NX_ASSERT(!uniqId.isEmpty());
     QCryptographicHash md5(QCryptographicHash::Md5);
     md5.addData(uniqId.toUtf8());
     QnUuid id = QnUuid::fromRfc4122(md5.result());
@@ -309,17 +325,17 @@ void QnNetworkResource::initializationDone()
 }
 
 void QnNetworkResource::setAuth(const QString &user, const QString &password)
-{ 
-    QAuthenticator auth; 
-    auth.setUser(user); 
-    auth.setPassword(password); 
-    setAuth(auth); 
+{
+    QAuthenticator auth;
+    auth.setUser(user);
+    auth.setPassword(password);
+    setAuth(auth);
 }
 
 void QnNetworkResource::setDefaultAuth(const QString &user, const QString &password)
-{ 
-    QAuthenticator auth; 
-    auth.setUser(user); 
-    auth.setPassword(password); 
-    setDefaultAuth(auth); 
+{
+    QAuthenticator auth;
+    auth.setUser(user);
+    auth.setPassword(password);
+    setDefaultAuth(auth);
 }

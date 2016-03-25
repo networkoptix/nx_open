@@ -34,6 +34,8 @@ class UdtSocketImpl;
 
 // Adding a level indirection to make C++ type system happy.
 class NX_NETWORK_API UdtSocket
+:
+    public Pollable
 {
 public:
     UdtSocket();
@@ -49,11 +51,11 @@ public:
     bool getRecvTimeout(unsigned int* millis);
     bool getSendTimeout(unsigned int* millis);
 
-    CommonSocketImpl<UdtSocket>* impl();
-    const CommonSocketImpl<UdtSocket>* impl() const;
+    //CommonSocketImpl<UdtSocket>* impl();
+    //const CommonSocketImpl<UdtSocket>* impl() const;
 
-    nx::network::aio::AbstractAioThread* getAioThread();
-    void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread);
+    //nx::network::aio::AbstractAioThread* getAioThread();
+    //void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread);
 
 protected:
     UdtSocket( detail::UdtSocketImpl* impl );
@@ -164,7 +166,7 @@ public:
     virtual void dispatch( nx::utils::MoveOnlyFunc<void()> handler ) override;
 
 private:
-    std::unique_ptr<aio::AsyncSocketImplHelper<UdtSocket>> m_aioHelper;
+    std::unique_ptr<aio::AsyncSocketImplHelper<Pollable>> m_aioHelper;
 
 private:
     Q_DISABLE_COPY(UdtStreamSocket)
@@ -179,9 +181,6 @@ public:
     UdtStreamServerSocket();
     virtual ~UdtStreamServerSocket();
 
-    // AbstractStreamServerSocket -------------- interface
-    virtual bool listen( int queueLen = 128 ) ;
-    virtual AbstractStreamSocket* accept() ;
     virtual void pleaseStop(nx::utils::MoveOnlyFunc< void() > handler) override;
 
     virtual bool bind(const SocketAddress& localAddress);
@@ -211,10 +210,24 @@ public:
     virtual void post( nx::utils::MoveOnlyFunc<void()> handler ) override;
     //!Implementation of AbstractSocket::dispatch
     virtual void dispatch( nx::utils::MoveOnlyFunc<void()> handler ) override;
-    virtual void acceptAsync( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )> handler ) ;
+
+    // AbstractStreamServerSocket -------------- interface
+    virtual bool listen(int queueLen = 128);
+    virtual AbstractStreamSocket* accept();
+    virtual void acceptAsync(
+        nx::utils::MoveOnlyFunc<void(
+            SystemError::ErrorCode,
+            AbstractStreamSocket*)> handler);
+    //!Implementation of AbstractStreamServerSocket::cancelIOAsync
+    virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler) override;
+    //!Implementation of AbstractStreamServerSocket::cancelIOSync
+    virtual void cancelIOSync() override;
+
+    /** This method is for use by \a AsyncServerSocketHelper only. It just calls system call \a accept */
+    AbstractStreamSocket* systemAccept();
 
 private:
-    std::unique_ptr<aio::AsyncServerSocketHelper<UdtSocket>> m_aioHelper;
+    std::unique_ptr<aio::AsyncServerSocketHelper<UdtStreamServerSocket>> m_aioHelper;
 
     Q_DISABLE_COPY(UdtStreamServerSocket)
 };

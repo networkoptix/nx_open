@@ -63,14 +63,12 @@ SocketAddress UDPServer::address() const
 void UDPServer::sendMessage(
     SocketAddress destinationEndpoint,
     const Message& message,
-    std::function<void(SystemError::ErrorCode)> completionHandler)
+    utils::MoveOnlyFunc<void(SystemError::ErrorCode)> completionHandler)
 {
     m_messagePipeline.sendMessage(
-        std::move(destinationEndpoint),
-        message,
-        [completionHandler](    //TODO #ak #msvc2015 move to lambda
-            SystemError::ErrorCode errorCode,
-            SocketAddress resolvedTargetAddress)
+        std::move(destinationEndpoint), message,
+        [completionHandler = std::move(completionHandler)](
+            SystemError::ErrorCode errorCode, SocketAddress) mutable
         {
             if (completionHandler)
                 completionHandler(errorCode);

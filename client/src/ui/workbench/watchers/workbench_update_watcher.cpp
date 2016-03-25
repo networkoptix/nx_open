@@ -2,7 +2,6 @@
 
 #include <QtCore/QTimer>
 #include <QtWidgets/QAction>
-#include <QtWidgets/QMessageBox>
 #include <QtWidgets/QPushButton>
 #include <QtGui/QDesktopServices>
 
@@ -74,7 +73,7 @@ void QnWorkbenchUpdateWatcher::stop()
 
 void QnWorkbenchUpdateWatcher::at_checker_updateAvailable(const QnUpdateInfo &info)
 {
-    Q_ASSERT_X(!info.currentRelease.isNull(), Q_FUNC_INFO, "Notification must be valid");
+    NX_ASSERT(!info.currentRelease.isNull(), Q_FUNC_INFO, "Notification must be valid");
 
     if (info.currentRelease.isNull())
         return;
@@ -179,7 +178,7 @@ void QnWorkbenchUpdateWatcher::showUpdateNotification(const QnUpdateInfo &info)
     {
         actionMessage = tr("Please update %1 Client.").arg(QnAppInfo::productNameLong());
         messageBox.setStandardButtons(QDialogButtonBox::Ok);
-        messageBox.setIcon(QMessageBox::Information);
+        messageBox.setIcon(QnMessageBox::Information);
     }
 #endif
 

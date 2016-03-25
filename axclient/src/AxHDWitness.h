@@ -1,23 +1,11 @@
 #pragma once
 
-#include "version.h"
-
 #include <QtCore/QScopedPointer>
 
 #include <ActiveQt/QAxBindable>
 
-#include "ui/widgets/main_window.h"
-#include "ui/style/skin.h"
-#include <client/client_module.h>
-#include "ui/style/noptix_style.h"
-#include "ui/customization/customizer.h"
-#include "nx_ec/ec_api.h"
-#include "api/abstract_connection.h"
+#include <axclient/axclient_app_info.h>
 
-class QnModuleFinder;
-class QnRouter;
-class QnGlobalModuleFinder;
-class QnServerInterfaceWatcher;
 class QnAxClientModule;
 class QnAxClientWindow;
 

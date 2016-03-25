@@ -72,11 +72,11 @@ QnLayoutTabBar::~QnLayoutTabBar() {
 }
 
 void QnLayoutTabBar::checkInvariants() const {
-    assert(m_layouts.size() == count());
+    NX_ASSERT(m_layouts.size() == count());
 
     if(workbench() && m_submit && m_update) {
-        assert(workbench()->layouts() == m_layouts);
-        assert(workbench()->layoutIndex(workbench()->currentLayout()) == currentIndex() || workbench()->layoutIndex(workbench()->currentLayout()) == -1);
+        NX_ASSERT(workbench()->layouts() == m_layouts);
+        NX_ASSERT(workbench()->layoutIndex(workbench()->currentLayout()) == currentIndex() || workbench()->layoutIndex(workbench()->currentLayout()) == -1);
     }
 }
 

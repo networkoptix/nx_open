@@ -80,7 +80,8 @@ private:
     void updateDisabledVendorsIfNeeded();
     void updateAllowCameraCHangesIfNeed();
     void updateAddressesList();
-    bool initTcpListener();
+    bool initTcpListener(const CloudConnectionManager& cloudConnectionManager);
+    std::unique_ptr<nx_upnp::PortMapper> initializeUpnpPortMapper();
     QHostAddress getPublicAddress();
     QnMediaServerResourcePtr findServer(ec2::AbstractECConnectionPtr ec2Connection);
     void saveStorages(ec2::AbstractECConnectionPtr ec2Connection, const QnStorageResourceList& storages);

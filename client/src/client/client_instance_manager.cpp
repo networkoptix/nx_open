@@ -26,7 +26,7 @@ namespace {
             m_memory(memory),
             m_locked(memory->lock())
         {
-            Q_ASSERT_X(m_locked, Q_FUNC_INFO, "Could not initialize shared memory");
+            NX_ASSERT(m_locked, Q_FUNC_INFO, "Could not initialize shared memory");
             if (!m_locked)
                 qWarning() << "Could not initialize shared memory";
         }
@@ -72,7 +72,7 @@ QnClientInstanceManager::QnClientInstanceManager(QObject *parent) :
     if (!success && m_sharedMemory.error() == QSharedMemory::AlreadyExists)
         success = m_sharedMemory.attach();
 
-    Q_ASSERT_X(success, Q_FUNC_INFO, "Could not initialize shared memory");
+    NX_ASSERT(success, Q_FUNC_INFO, "Could not initialize shared memory");
     if (!success) {
         qWarning() << "Could not initialize shared memory";
         return;
@@ -141,7 +141,7 @@ QnUuid QnClientInstanceManager::instanceGuid() const {
 QnUuid QnClientInstanceManager::instanceGuidForIndex(int index) const
 {
     QnUuid pcUuid = qnSettings->pcUuid();
-    Q_ASSERT_X(!pcUuid.isNull(), Q_FUNC_INFO, "pcUuid must already be created in class constructor");
+    NX_ASSERT(!pcUuid.isNull(), Q_FUNC_INFO, "pcUuid must already be created in class constructor");
     if (pcUuid.isNull()) {
         pcUuid = QnUuid::createUuid();
         qnSettings->setPcUuid(pcUuid);

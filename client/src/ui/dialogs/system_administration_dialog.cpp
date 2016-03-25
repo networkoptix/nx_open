@@ -1,8 +1,6 @@
 #include "system_administration_dialog.h"
 #include "ui_system_administration_dialog.h"
 
-#include <QtWidgets/QMessageBox>
-
 #include <common/common_module.h>
 
 #include <ui/widgets/settings/popup_settings_widget.h>

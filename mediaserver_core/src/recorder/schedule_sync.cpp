@@ -183,7 +183,7 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
         {   // update sync data
             QnMutexLocker lk(&m_syncDataMutex);
             SyncDataMap::iterator syncDataIt = m_syncData.find(chunkKey);
-            assert(syncDataIt != m_syncData.cend());
+            NX_ASSERT(syncDataIt != m_syncData.cend());
             auto catalogSize = fromCatalog->size();
             int curFileIndex = fromCatalog->findFileIndex(
                 chunkKey.chunk.startTimeMs, 
@@ -212,7 +212,7 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
         if (!fromFile) 
         {   // This means that source storage is not available or 
             // source file's been removed by external force.
-            if (fromStorage->isAvailable())
+            if (fromStorage->initOrUpdate())
             {   // File's gone. Log this and skip this file.
                 NX_LOG(
                     lit("[Backup::copyFile] Source file %1 open failed. Skipping.")
@@ -276,7 +276,7 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
         }
         else
         {
-            Q_ASSERT(bitrate > 0);
+            NX_ASSERT(bitrate > 0);
             qint64 fileSize = fromFile->size();
             const qint64 timeToWrite = (fileSize / bitrate) * 1000;
                             
@@ -401,7 +401,7 @@ QnBusiness::EventReason QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
         else {
             m_syncTimePoint = (*chunkKeyVector)[0].chunk.startTimeMs;
             m_syncEndTimePoint = qMax((*chunkKeyVector)[0].chunk.endTimeMs(), 
-                                      m_syncEndTimePoint.load());
+                                      m_syncEndTimePoint);
             NX_LOG(lit("[Backup] found chunk to backup: %1").arg(m_syncTimePoint),
                    cl_logDEBUG2);
         }
@@ -487,40 +487,39 @@ int QnScheduleSync::forceStart()
 
 QnBackupStatusData QnScheduleSync::getStatus() const
 {
+    QnMutexLocker lk(&m_syncDataMutex);
+
     QnBackupStatusData ret;
     ret.state = m_syncing || m_forced ? Qn::BackupState_InProgress :
                                         Qn::BackupState_None;
     ret.backupTimeMs = m_syncEndTimePoint;
-    {
-        QnMutexLocker lk(&m_syncDataMutex);
-        int totalChunks = std::accumulate(
-            m_syncData.cbegin(),
-            m_syncData.cend(),
-            0,
-            [](int ac, const SyncDataMap::value_type &p)
-            {
-                return ac + p.second.totalChunks;
-            }
-        ); 
-        int processedChunks = std::accumulate(
-            m_syncData.cbegin(),
-            m_syncData.cend(),
-            0,
-            [](int ac, const SyncDataMap::value_type &p)
-            {
-                return ac + p.second.currentIndex - p.second.startIndex;
-            }
-        ); 
-        ret.progress = (double) processedChunks / 
-                       (double) (totalChunks == 0 ? 1 : totalChunks);
-    }
+    int totalChunks = std::accumulate(
+        m_syncData.cbegin(),
+        m_syncData.cend(),
+        0,
+        [](int ac, const SyncDataMap::value_type &p)
+        {
+            return ac + p.second.totalChunks;
+        }
+    ); 
+    int processedChunks = std::accumulate(
+        m_syncData.cbegin(),
+        m_syncData.cend(),
+        0,
+        [](int ac, const SyncDataMap::value_type &p)
+        {
+            return ac + p.second.currentIndex - p.second.startIndex;
+        }
+    ); 
+    ret.progress = (double) processedChunks / 
+                    (double) (totalChunks == 0 ? 1 : totalChunks);
     return ret;
 }
 
 void QnScheduleSync::renewSchedule()
 {
     auto server = qnCommon->currentServer();
-    Q_ASSERT(server);
+    NX_ASSERT(server);
 
     auto oldSchedule = m_schedule;
     if (server) {
@@ -622,9 +621,11 @@ void QnScheduleSync::run()
                 continue;
 
             auto result = synchronize(isItTimeForSync);
+            qint64 syncEndTimePointLocal = 0;
             {
                 QnMutexLocker lk(&m_syncDataMutex);
                 m_syncData.clear();
+                syncEndTimePointLocal = m_syncEndTimePoint;
             }
             m_forced = false;
             m_syncing = false;
@@ -634,10 +635,10 @@ void QnScheduleSync::run()
                                 result != QnBusiness::BackupEndOfPeriod;  
 
             if (backupFailed && !m_failReported) {
-                emit backupFinished(m_syncEndTimePoint, result);
+                emit backupFinished(syncEndTimePointLocal, result);
                 m_failReported = true;
             } else if (!backupFailed) {
-                emit backupFinished(m_syncEndTimePoint, result);
+                emit backupFinished(syncEndTimePointLocal, result);
                 m_failReported = false; 
             }
         }

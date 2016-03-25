@@ -54,10 +54,6 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = NU
     connect(context(), &QnWorkbenchContext::userChanged, this, [this]() { m_hintDisplayed = false; });
 }
 
-ec2::AbstractECConnectionPtr QnWorkbenchBookmarksHandler::connection() const {
-    return QnAppServerConnectionFactory::getConnection2();
-}
-
 void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
     QnVirtualCameraResourcePtr camera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
@@ -95,7 +91,7 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered() {
     if (!dialog->exec())
         return;
     dialog->submitData(bookmark);
-    Q_ASSERT_X(bookmark.isValid(), Q_FUNC_INFO, "Dialog must not allow to create invalid bookmarks");
+    NX_ASSERT(bookmark.isValid(), Q_FUNC_INFO, "Dialog must not allow to create invalid bookmarks");
     if (!bookmark.isValid())
         return;
 

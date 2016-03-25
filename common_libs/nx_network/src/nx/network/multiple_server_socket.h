@@ -1,9 +1,13 @@
 #ifndef NX_NETWORK_MULTIPLE_SERVER_SOCKET_H
 #define NX_NETWORK_MULTIPLE_SERVER_SOCKET_H
 
-#include "system_socket.h"
-#include <utils/common/cpp14.h>
 #include <queue>
+
+#include <utils/common/cpp14.h>
+
+#include "nx/network/aio/timer.h"
+#include "system_socket.h"
+
 
 namespace nx {
 namespace network {
@@ -11,10 +15,8 @@ namespace network {
 class NX_NETWORK_API MultipleServerSocket
     : public AbstractStreamServerSocket
 {
-protected:
-    MultipleServerSocket();
-
 public:
+    MultipleServerSocket();
     ~MultipleServerSocket();
 
     //TODO #muskov does not compile on msvc2012
@@ -59,9 +61,21 @@ public:
     void dispatch(nx::utils::MoveOnlyFunc<void()> handler) override;
 
     //!Implementation of AbstractStreamServerSocket::acceptAsync
-    void acceptAsync(
-        std::function<void(SystemError::ErrorCode,
-                           AbstractStreamSocket*)> handler) override;
+    virtual void acceptAsync(
+        nx::utils::MoveOnlyFunc<void(
+            SystemError::ErrorCode,
+            AbstractStreamSocket*)> handler) override;
+    //!Implementation of AbstractStreamServerSocket::cancelIOAsync
+    virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler) override;
+    //!Implementation of AbstractStreamServerSocket::cancelIOSync
+    virtual void cancelIOSync() override;
+
+    /** These methods can be called concurrently with \a accept.
+        \note Blocks until completion
+    */
+    bool addSocket(std::unique_ptr<AbstractStreamServerSocket> socket);
+    void removeSocket(size_t pos);
+    size_t count() const;
 
 protected:
     struct NX_NETWORK_API ServerSocketHandle
@@ -70,13 +84,13 @@ protected:
         bool isAccepting;
 
         ServerSocketHandle(std::unique_ptr<AbstractStreamServerSocket> socket_);
-        ServerSocketHandle(ServerSocketHandle&&);
+        ServerSocketHandle(ServerSocketHandle&&) = default;
+        ServerSocketHandle& operator=(ServerSocketHandle&&) = default;
 
         AbstractStreamServerSocket* operator->() const;
         void stopAccepting();
     };
 
-    bool addSocket(std::unique_ptr<AbstractStreamServerSocket> socket);
     void accepted(ServerSocketHandle* source, SystemError::ErrorCode code,
                   AbstractStreamSocket* socket);
 
@@ -85,9 +99,11 @@ protected:
     unsigned int m_recvTmeout;
     mutable SystemError::ErrorCode m_lastError;
     bool* m_terminated;
-    std::unique_ptr<AbstractCommunicatingSocket> m_timerSocket;
+    aio::Timer m_timerSocket;
     std::vector<ServerSocketHandle> m_serverSockets;
-    std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)> m_acceptHandler;
+    nx::utils::MoveOnlyFunc<void(
+        SystemError::ErrorCode,
+        AbstractStreamSocket*)> m_acceptHandler;
 };
 
 template<typename S1, typename S2/*, typename*/>

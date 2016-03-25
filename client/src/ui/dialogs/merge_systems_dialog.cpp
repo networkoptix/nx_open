@@ -3,7 +3,6 @@
 
 #include <QtCore/QUrl>
 #include <QtWidgets/QButtonGroup>
-#include <QtWidgets/QMessageBox>
 
 #include <api/app_server_connection.h>
 #include <common/common_module.h>
@@ -150,7 +149,7 @@ void QnMergeSystemsDialog::at_urlComboBox_editingFinished() {
 }
 
 void QnMergeSystemsDialog::at_testConnectionButton_clicked() {
-    Q_ASSERT(context()->user()->isAdmin());
+    NX_ASSERT(context()->user()->isAdmin());
     if (!context()->user()->isAdmin())
         return;
 

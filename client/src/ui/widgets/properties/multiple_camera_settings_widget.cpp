@@ -3,8 +3,6 @@
 
 #include <limits>
 
-#include <QtWidgets/QMessageBox>
-
 //TODO: #GDM #Common ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
 #include <core/dataprovider/live_stream_provider.h>
 #include <core/resource_management/resource_pool.h>
@@ -429,7 +427,7 @@ int QnMultipleCameraSettingsWidget::tabIndex(Qn::CameraSettingsTab tab) const {
     case Qn::ExpertCameraSettingsTab:
         return ui->tabWidget->indexOf(ui->expertTab);
     default:
-        Q_ASSERT_X(false, Q_FUNC_INFO, "Should never get here");
+        NX_ASSERT(false, Q_FUNC_INFO, "Should never get here");
         break;
     }
     return -1;

@@ -78,7 +78,7 @@ public:
 
     void start()
     {
-        assert( !m_getRequestUrls.empty() || !m_updateRequests.empty() );
+        NX_ASSERT( !m_getRequestUrls.empty() || !m_updateRequests.empty() );
         for( int i = 0; i < m_maxSimultaneousRequestsCount; ++i )
             startAnotherClient( nx_http::AsyncHttpClientPtr() );
     }

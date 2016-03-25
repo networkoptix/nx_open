@@ -42,7 +42,7 @@ void AuthenticationProvider::getCdbNonce(
     const AuthorizationInfo& authzInfo,
     std::function<void(api::ResultCode, api::NonceData)> completionHandler)
 {
-    QnUuid systemID;
+    std::string systemID;
     if (!authzInfo.get(attr::authSystemID, &systemID))
     {
         completionHandler(api::ResultCode::forbidden, api::NonceData());
@@ -65,7 +65,7 @@ void AuthenticationProvider::getCdbNonce(
         (QByteArray::fromRawData(reinterpret_cast<const char*>(&timestamp), sizeof(timestamp))
             +md5Hash).toBase64();
 
-    assert(nonce.size() == CDB_NONCE_SIZE);
+    NX_ASSERT(nonce.size() == CDB_NONCE_SIZE);
 
     api::NonceData result;
     result.nonce.assign(nonce.constData(), nonce.size());
@@ -81,7 +81,7 @@ void AuthenticationProvider::getAuthenticationResponse(
 {
     //{random_3_bytes}base64({ timestamp }MD5(systemID:timestamp:secret_key))
 
-    QnUuid systemID;
+    std::string systemID;
     if (!authzInfo.get(attr::authSystemID, &systemID))
         return completionHandler(api::ResultCode::forbidden, api::AuthResponse());
     if (authRequest.realm != AuthenticationManager::realm())
@@ -144,12 +144,13 @@ bool AuthenticationProvider::parseNonce(
     return true;
 }
 
-QByteArray AuthenticationProvider::calcNonceHash(const QnUuid& systemID, uint32_t timestamp) const
+QByteArray AuthenticationProvider::calcNonceHash(
+    const std::string& systemID,
+    uint32_t timestamp) const
 {
     MD5_CTX md5Ctx;
     MD5_Init(&md5Ctx);
-    const auto systemIDStr = systemID.toByteArray();
-    MD5_Update(&md5Ctx, systemIDStr.constData(), systemIDStr.size());
+    MD5_Update(&md5Ctx, systemID.c_str(), systemID.size());
     MD5_Update(&md5Ctx, ":", 1);
     MD5_Update(&md5Ctx, &timestamp, sizeof(timestamp));
     MD5_Update(&md5Ctx, ":", 1);

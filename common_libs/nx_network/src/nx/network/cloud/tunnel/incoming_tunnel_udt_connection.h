@@ -4,7 +4,6 @@
 
 #include <nx/network/udt/udt_socket.h>
 #include <nx/network/stun/message_parser.h>
-#include <nx/network/cloud/cloud_config.h>
 
 namespace nx {
 namespace network {
@@ -17,9 +16,9 @@ class NX_NETWORK_API IncomingTunnelUdtConnection
 public:
     IncomingTunnelUdtConnection(
         String connectionId,
-        std::unique_ptr<UdtStreamSocket> connectionSocket,
-        std::chrono::milliseconds maxKeepAliveInterval =
-            kHpUdtKeepAliveInterval * kHpUdtKeepAliveRetries);
+        std::unique_ptr<UdtStreamSocket> connectionSocket);
+
+    void setMaxKeepAliveInterval(std::chrono::milliseconds interval);
 
     void accept(std::function<void(
         SystemError::ErrorCode,
@@ -34,7 +33,7 @@ private:
     void writeResponse();
     void connectionSocketError(SystemError::ErrorCode code);
 
-    const std::chrono::milliseconds m_maxKeepAliveInterval;
+    std::chrono::milliseconds m_maxKeepAliveInterval;
     std::chrono::system_clock::time_point m_lastKeepAlive;
     SystemError::ErrorCode m_state;
 

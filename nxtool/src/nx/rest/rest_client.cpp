@@ -133,7 +133,7 @@ RestClient::ResultCode RestClient::Impl::convertHttpClientRequestResult(
         case HttpClient::RequestResult::kUnauthorized: return ResultCode::kUnauthorized;
         case HttpClient::RequestResult::kUnspecified: return ResultCode::kUnspecified;
         default:
-            assert(false);
+            Q_ASSERT(false);
             return ResultCode::kUnspecified;
     }
 }

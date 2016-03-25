@@ -40,7 +40,7 @@ namespace
             case QnSearchBookmarksModel::kCamera:
                 return Qn::BookmarkCameraName;
             default:
-                Q_ASSERT_X(false, Q_FUNC_INFO, "Wrong column");
+                NX_ASSERT(false, Q_FUNC_INFO, "Wrong column");
                 return Qn::BookmarkStartTime;
             }
         }();
@@ -127,14 +127,33 @@ QnSearchBookmarksModel::Impl::Impl(QnSearchBookmarksModel *owner
         emit m_owner->dataChanged(topIndex, bottomIndex);
     });
 
-    connect(qnCameraBookmarksManager, &QnCameraBookmarksManager::bookmarkRemoved, this, [this](const QnUuid& bookmarkId) {
-        int idx = qnIndexOf(m_bookmarks, [bookmarkId](const QnCameraBookmark& bookmark) {
-            return bookmark.guid == bookmarkId;
+    connect(qnCameraBookmarksManager, &QnCameraBookmarksManager::bookmarkRemoved, this, [this](const QnUuid& bookmarkId)
+    {
+        int idx = qnIndexOf(m_bookmarks, [bookmarkId](const QnCameraBookmark& item)
+        {
+            return item.guid == bookmarkId;
         });
+
         if (idx < 0)
             return;
+
         m_beginResetModel();
         m_bookmarks.removeAt(idx);
+        m_endResetModel();
+    });
+
+    connect(qnCameraBookmarksManager, &QnCameraBookmarksManager::bookmarkUpdated, this, [this](const QnCameraBookmark& bookmark)
+    {
+        int idx = qnIndexOf(m_bookmarks, [bookmark](const QnCameraBookmark& item)
+        {
+            return bookmark.guid == item.guid;
+        });
+
+        if (idx < 0)
+            return;
+
+        m_beginResetModel();
+        m_bookmarks[idx] = bookmark;
         m_endResetModel();
     });
 }
@@ -274,7 +293,7 @@ int QnSearchBookmarksModel::sortFieldToColumn(Qn::BookmarkSortField field)
     case Qn::BookmarkCameraName:
         return Column::kCamera;
     default:
-        Q_ASSERT_X(false, Q_FUNC_INFO, "Unhandled field");
+        NX_ASSERT(false, Q_FUNC_INFO, "Unhandled field");
         break;
     }
     return kInvalidSortingColumn;

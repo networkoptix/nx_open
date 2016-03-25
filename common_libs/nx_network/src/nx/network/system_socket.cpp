@@ -8,6 +8,7 @@
 #include <utils/common/systemerror.h>
 #include <utils/common/warnings.h>
 #include <nx/network/ssl_socket.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 
@@ -24,7 +25,6 @@
 
 #include "aio/async_socket_helper.h"
 #include "compat_poll.h"
-#include <nx/utils/log/log.h>
 
 
 #ifdef Q_OS_WIN
@@ -167,6 +167,9 @@ void Socket<InterfaceToImplement>::close()
     if( m_fd == -1 )
         return;
 
+    //checking that socket is not registered in aio
+    NX_ASSERT(!nx::network::SocketGlobals::aioService().isSocketBeingWatched(static_cast<Pollable*>(this)));
+
 #ifdef WIN32
     ::closesocket(m_fd);
 #else
@@ -209,9 +212,6 @@ bool Socket<InterfaceToImplement>::getReuseAddrFlag( bool* val ) const
 template<typename InterfaceToImplement>
 bool Socket<InterfaceToImplement>::setNonBlockingMode( bool val )
 {
-    if( val == m_nonBlockingMode )
-        return true;
-
 #ifdef _WIN32
     u_long _val = val ? 1 : 0;
     if( ioctlsocket( m_fd, FIONBIO, &_val ) == 0 )
@@ -616,11 +616,6 @@ bool CommunicatingSocket<InterfaceToImplement>::connect( const SocketAddress& re
     // Get the address of the requested host
     m_connected = false;
 
-    const auto attrStr = remoteAddress.toString();
-    for( const auto& filter : connectFilters )
-        if( attrStr.startsWith( filter ) )
-            return false;
-
     sockaddr_in destAddr;
     if (!this->fillAddr(remoteAddress, destAddr))
         return false;
@@ -708,8 +703,9 @@ bool CommunicatingSocket<InterfaceToImplement>::connect( const SocketAddress& re
             continue;
         }
 
-        if( (sockPollfd.revents & POLLOUT) == 0 )
+        if ((sockPollfd.revents & POLLERR) || !(sockPollfd.revents & POLLOUT))
             iSelRet = 0;
+
         break;
     }
 #endif
@@ -800,15 +796,9 @@ bool CommunicatingSocket<InterfaceToImplement>::isConnected() const
 template<typename InterfaceToImplement>
 void CommunicatingSocket<InterfaceToImplement>::close()
 {
-    //checking that socket is not registered in aio
-    assert( !nx::network::SocketGlobals::aioService().isSocketBeingWatched( static_cast<Pollable*>(this) ) );
-
     m_connected = false;
     Socket<InterfaceToImplement>::close();
 }
-
-template<typename InterfaceToImplement>
-QList<QString> CommunicatingSocket<InterfaceToImplement>::connectFilters;
 
 template<typename InterfaceToImplement>
 void CommunicatingSocket<InterfaceToImplement>::shutdown()
@@ -836,7 +826,11 @@ void CommunicatingSocket<InterfaceToImplement>::connectAsync(
     const SocketAddress& addr,
     nx::utils::MoveOnlyFunc<void( SystemError::ErrorCode )> handler )
 {
-    return m_aioHelper->connectAsync( addr, std::move(handler) );
+    return m_aioHelper->connectAsync(addr, [handler = std::move(handler), this] (SystemError::ErrorCode code)
+    {
+        m_connected = (code == SystemError::noError);
+        handler(code);
+    });
 }
 
 template<typename InterfaceToImplement>
@@ -861,7 +855,7 @@ void CommunicatingSocket<InterfaceToImplement>::registerTimer(
     nx::utils::MoveOnlyFunc<void()> handler )
 {
     //currently, aio considers 0 timeout as no timeout and will NOT call handler
-    Q_ASSERT(timeoutMs > std::chrono::milliseconds(0));
+    NX_ASSERT(timeoutMs > std::chrono::milliseconds(0));
     if (timeoutMs == std::chrono::milliseconds(0))
         timeoutMs = std::chrono::milliseconds(1);  //handler of zero timer will NOT be called
     return m_aioHelper->registerTimer(timeoutMs, std::move(handler));
@@ -1166,7 +1160,7 @@ static int acceptWithTimeout( int m_fd,
         ::SetLastError( errorCode );
         return -1;
     }
-    return ::accept( m_fd, NULL, NULL );
+    return ::accept(m_fd, NULL, NULL);
 #else
     struct pollfd sockPollfd;
     memset( &sockPollfd, 0, sizeof(sockPollfd) );
@@ -1216,14 +1210,12 @@ class TCPServerSocketPrivate
 {
 public:
     int socketHandle;
-    aio::AsyncServerSocketHelper<Pollable> asyncServerSocketHelper;
+    aio::AsyncServerSocketHelper<TCPServerSocket> asyncServerSocketHelper;
 
-    TCPServerSocketPrivate(
-        Socket<AbstractStreamServerSocket>* sock,
-        AbstractStreamServerSocket* abstractSock)
+    TCPServerSocketPrivate(TCPServerSocket* sock)
     :
         socketHandle( -1 ),
-        asyncServerSocketHelper(sock, abstractSock)
+        asyncServerSocketHelper(sock)
     {
     }
 
@@ -1256,7 +1248,7 @@ TCPServerSocket::TCPServerSocket()
     base_type(
         SOCK_STREAM,
         IPPROTO_TCP,
-        new TCPServerSocketPrivate( this, this ) )
+        new TCPServerSocketPrivate(this))
 {
     static_cast<TCPServerSocketPrivate*>(impl())->socketHandle = handle();
 }
@@ -1264,7 +1256,7 @@ TCPServerSocket::TCPServerSocket()
 TCPServerSocket::~TCPServerSocket()
 {
     //checking that socket is not registered in aio
-    Q_ASSERT_X(
+    NX_ASSERT(
         !nx::network::SocketGlobals::aioService().isSocketBeingWatched(static_cast<Pollable*>(this)),
         Q_FUNC_INFO,
         "You MUST cancel running async socket operation before deleting socket if you delete socket from non-aio thread (2)");
@@ -1276,12 +1268,24 @@ int TCPServerSocket::accept(int sockDesc)
 }
 
 void TCPServerSocket::acceptAsync(
-    std::function<void(
+    nx::utils::MoveOnlyFunc<void(
         SystemError::ErrorCode,
         AbstractStreamSocket*)> handler)
 {
     TCPServerSocketPrivate* d = static_cast<TCPServerSocketPrivate*>(impl());
     return d->asyncServerSocketHelper.acceptAsync( std::move(handler) );
+}
+
+void TCPServerSocket::cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler)
+{
+    TCPServerSocketPrivate* d = static_cast<TCPServerSocketPrivate*>(impl());
+    return d->asyncServerSocketHelper.cancelIOAsync(std::move(handler));
+}
+
+void TCPServerSocket::cancelIOSync()
+{
+    TCPServerSocketPrivate* d = static_cast<TCPServerSocketPrivate*>(impl());
+    return d->asyncServerSocketHelper.cancelIOSync();
 }
 
 //!Implementation of AbstractStreamServerSocket::listen
@@ -1312,17 +1316,37 @@ void TCPServerSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandl
 //!Implementation of AbstractStreamServerSocket::accept
 AbstractStreamSocket* TCPServerSocket::accept()
 {
+    return systemAccept();
+}
+
+AbstractStreamSocket* TCPServerSocket::systemAccept()
+{
     TCPServerSocketPrivate* d = static_cast<TCPServerSocketPrivate*>(impl());
 
     unsigned int recvTimeoutMs = 0;
-    if( !getRecvTimeout( &recvTimeoutMs ) )
+    if (!getRecvTimeout(&recvTimeoutMs))
         return nullptr;
 
     bool nonBlockingMode = false;
-    if( !getNonBlockingMode(&nonBlockingMode) )
+    if (!getNonBlockingMode(&nonBlockingMode))
         return nullptr;
 
-    return d->accept( recvTimeoutMs, nonBlockingMode );
+    auto* acceptedSocket = d->accept(recvTimeoutMs, nonBlockingMode);
+    if (!acceptedSocket)
+        return nullptr;
+#ifdef _WIN32
+    if (!nonBlockingMode)
+        return acceptedSocket;
+
+    //moving socket to blocking mode by default to be consistent with msdn
+        //(https://msdn.microsoft.com/en-us/library/windows/desktop/ms738573(v=vs.85).aspx)
+    if (!acceptedSocket->setNonBlockingMode(false))
+    {
+        delete acceptedSocket;
+        return nullptr;
+    }
+#endif
+    return acceptedSocket;
 }
 
 bool TCPServerSocket::setListen(int queueLen)

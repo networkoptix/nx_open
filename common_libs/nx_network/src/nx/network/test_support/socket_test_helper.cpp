@@ -6,8 +6,9 @@
 #include "socket_test_helper.h"
 
 #include <atomic>
-
 #include <iostream>
+
+#include <nx/utils/log/log.h>
 
 
 namespace nx {
@@ -77,6 +78,8 @@ static std::map<int, bool> terminatedSocketsIDs;
 
 TestConnection::~TestConnection()
 {
+    NX_LOGX(lm("accepted %1. Destroying...").arg(m_accepted), cl_logDEBUG1);
+
     std::unique_ptr<AbstractStreamSocket> _socket;
     {
         std::unique_lock<std::mutex> lk( m_mutex );
@@ -88,7 +91,7 @@ TestConnection::~TestConnection()
 
     {
         std::unique_lock<std::mutex> lk(mtx1);
-        assert(terminatedSocketsIDs.emplace(m_id, _socket ? true : false).second);
+        NX_ASSERT(terminatedSocketsIDs.emplace(m_id, _socket ? true : false).second);
     }
 #ifdef DEBUG_OUTPUT
     std::cout<<"TestConnection::~TestConnection. "<<m_id<<std::endl;
@@ -112,6 +115,13 @@ void TestConnection::setLocalAddress(SocketAddress addr)
     m_localAddress = std::move(addr);
 }
 
+SocketAddress TestConnection::getLocalAddress() const
+{
+    return m_socket->getLocalAddress();
+}
+
+const std::chrono::milliseconds kDefaultSendTimeout(7000);
+
 void TestConnection::start()
 {
     std::unique_lock<std::mutex> lk(m_mutex);
@@ -120,6 +130,7 @@ void TestConnection::start()
         return startIO();
 
     if (!m_socket->setNonBlockingMode(true) || 
+        !m_socket->setSendTimeout(kDefaultSendTimeout.count()) ||
         (m_localAddress && !m_socket->bind(*m_localAddress)))
     {
         return m_socket->post(std::bind(
@@ -176,16 +187,30 @@ void TestConnection::startIO()
     m_socket->readSomeAsync(
         &m_readBuffer,
         std::bind(&TestConnection::onDataReceived, this, m_id, _1, _2) );
+    NX_LOGX(lm("accepted %1. Sending %2 bytes of data to %3")
+        .arg(m_accepted).arg(m_outData.size())
+        .arg(m_socket->getForeignAddress().toString()),
+        cl_logDEBUG1);
     m_socket->sendAsync(
         m_outData,
         std::bind(&TestConnection::onDataSent, this, m_id, _1, _2) );
 }
 
-void TestConnection::onDataReceived( int id, SystemError::ErrorCode errorCode, size_t bytesRead )
+void TestConnection::onDataReceived(
+    int id,
+    SystemError::ErrorCode errorCode,
+    size_t bytesRead)
 {
-#ifdef DEBUG_OUTPUT
-    std::cout<<"TestConnection::onDataReceived. "<<id<<std::endl;
-#endif
+    if (errorCode == SystemError::noError)
+    {
+        NX_LOGX(lm("accepted %1. Received %2 bytes of data")
+            .arg(m_accepted).arg(bytesRead), cl_logDEBUG1);
+    }
+    else
+    {
+        NX_LOGX(lm("accepted %1. Receive error: %2")
+            .arg(m_accepted).arg(SystemError::toString(errorCode)), cl_logDEBUG1);
+    }
 
     std::unique_lock<std::mutex> lk( m_mutex );
     if( m_terminated )
@@ -210,9 +235,12 @@ void TestConnection::onDataReceived( int id, SystemError::ErrorCode errorCode, s
 
 void TestConnection::onDataSent( int id, SystemError::ErrorCode errorCode, size_t bytesWritten )
 {
-#ifdef DEBUG_OUTPUT
-    std::cout<<"TestConnection::onDataSent. "<<id<<std::endl;
-#endif
+    if (errorCode != SystemError::noError)
+    {
+        NX_LOGX(lm("accepted %1. Send error: %2")
+            .arg(m_accepted).arg(SystemError::toString(errorCode)),
+            cl_logDEBUG1);
+    }
 
     std::unique_lock<std::mutex> lk( m_mutex );
     if( m_terminated )
@@ -236,6 +264,10 @@ void TestConnection::onDataSent( int id, SystemError::ErrorCode errorCode, size_
     }
 
     using namespace std::placeholders;
+    NX_LOGX(lm("accepted %1. Sending %2 bytes of data to %3")
+        .arg(m_accepted).arg(m_outData.size())
+        .arg(m_socket->getForeignAddress().toString()),
+        cl_logDEBUG1);
     m_socket->sendAsync(
         m_outData,
         std::bind(&TestConnection::onDataSent, this, m_id, _1, _2) );
@@ -258,6 +290,12 @@ RandomDataTcpServer::~RandomDataTcpServer()
     join();
 }
 
+void RandomDataTcpServer::setServerSocket(
+    std::unique_ptr<AbstractStreamServerSocket> serverSock)
+{
+    m_serverSocket = std::move(serverSock);
+}
+
 void RandomDataTcpServer::pleaseStop()
 {
 }
@@ -275,7 +313,8 @@ void RandomDataTcpServer::join()
 
 bool RandomDataTcpServer::start()
 {
-    m_serverSocket = SocketFactory::createStreamServerSocket();
+    if (!m_serverSocket)
+        m_serverSocket = SocketFactory::createStreamServerSocket();
     if( !m_serverSocket->bind(m_localAddress) ||
         !m_serverSocket->listen() )
     {
@@ -314,6 +353,9 @@ void RandomDataTcpServer::onNewConnection(
             std::unique_ptr<AbstractStreamSocket>(newConnection),
             m_bytesToSendThrough,
             std::bind(&RandomDataTcpServer::onConnectionDone, this, std::placeholders::_2 )));
+        NX_LOGX(lm("Accepted connection %1. local address %2")
+            .arg(testConnection.get()).arg(testConnection->getLocalAddress().toString()),
+            cl_logDEBUG1);
         testConnection->start();
         QnMutexLocker lk(&m_mutex);
         m_acceptedConnections.emplace_back(std::move(testConnection));
@@ -346,11 +388,13 @@ void RandomDataTcpServer::onConnectionDone(
 ConnectionsGenerator::ConnectionsGenerator(
     const SocketAddress& remoteAddress,
     size_t maxSimultaneousConnectionsCount,
-    size_t bytesToSendThrough )
+    size_t bytesToSendThrough,
+    size_t maxTotalConnections)
 :
     m_remoteAddress( remoteAddress ),
     m_maxSimultaneousConnectionsCount( maxSimultaneousConnectionsCount ),
     m_bytesToSendThrough( bytesToSendThrough ),
+    m_maxTotalConnections( maxTotalConnections ),
     m_terminated( false ),
     m_totalBytesSent( 0 ),
     m_totalBytesReceived( 0 ),
@@ -376,7 +420,7 @@ void ConnectionsGenerator::pleaseStop()
 void ConnectionsGenerator::join()
 {
     std::unique_lock<std::mutex> lk( m_mutex );
-    assert( m_terminated );
+    NX_ASSERT( m_terminated );
     while( !m_connections.empty() )
     {
         std::unique_ptr<TestConnection> connection = std::move(m_connections.front());
@@ -396,6 +440,12 @@ void ConnectionsGenerator::enableErrorEmulation(int errorPercent)
     m_errorEmulationPercent = errorPercent;
 }
 
+void ConnectionsGenerator::setOnFinishedHandler(
+    nx::utils::MoveOnlyFunc<void()> func)
+{
+    m_onFinishedHandler = std::move(func);
+}
+
 void ConnectionsGenerator::setLocalAddress(SocketAddress addr)
 {
     m_localAddress = std::move(addr);
@@ -412,7 +462,8 @@ void ConnectionsGenerator::start()
             m_remoteAddress,
             m_bytesToSendThrough,
             std::bind(&ConnectionsGenerator::onConnectionFinished, this,
-                      std::placeholders::_1, std::prev(m_connections.end())) ) );
+                      std::placeholders::_1, std::placeholders::_3,
+                      std::prev(m_connections.end())) ) );
         m_connections.back().swap( connection );
         if (m_localAddress)
             m_connections.back()->setLocalAddress(*m_localAddress);
@@ -436,48 +487,84 @@ size_t ConnectionsGenerator::totalBytesReceived() const
     return m_totalBytesReceived;
 }
 
-void ConnectionsGenerator::onConnectionFinished(int id, ConnectionsContainer::iterator connectionIter)
+std::vector<SystemError::ErrorCode> ConnectionsGenerator::totalErrors() const
 {
-    std::unique_lock<std::mutex> lk( m_mutex );
+    return m_errors;
+}
+
+void ConnectionsGenerator::onConnectionFinished(
+    int id, SystemError::ErrorCode code,
+    ConnectionsContainer::iterator connectionIter)
+{
+    if (code != SystemError::noError)
+    {
+        m_errors.push_back(code);
+        if (m_errors.size() < 3)
+        {
+            std::cerr
+                << "onConnectionFinished: "
+                << SystemError::toString(code).toStdString()
+                << std::endl;
+        }
+    }
+
+    std::unique_lock<std::mutex> lk(m_mutex);
 
     {
         std::unique_lock<std::mutex> lk(mtx1);
-        assert(terminatedSocketsIDs.find(id) == terminatedSocketsIDs.end());
+        NX_ASSERT(terminatedSocketsIDs.find(id) == terminatedSocketsIDs.end());
     }
 
     //if( !m_finishedConnectionsIDs.insert( id ).second )
     //    int x = 0;
-    if( *connectionIter )
+    if (*connectionIter)
     {
         m_totalBytesSent += connectionIter->get()->totalBytesSent();
         m_totalBytesReceived += connectionIter->get()->totalBytesReceived();
     }
-    m_connections.erase( connectionIter );
-    if( m_terminated )
+    m_connections.erase(connectionIter);
+    if (m_terminated)
         return;
 
-    while( m_connections.size() < m_maxSimultaneousConnectionsCount )
+    if (m_totalConnectionsEstablished == 0 ||   //no limit
+        m_totalConnectionsEstablished < m_maxTotalConnections)
     {
-        m_connections.push_back( std::unique_ptr<TestConnection>() );
-        std::unique_ptr<TestConnection> connection( new TestConnection(
+        addNewConnections();
+    }
+    else if (m_connections.empty())
+    {
+        if (m_onFinishedHandler)
+        {
+            auto handler = std::move(m_onFinishedHandler);
+            handler();
+        }
+    }
+}
+
+void ConnectionsGenerator::addNewConnections()
+{
+    while (m_connections.size() < m_maxSimultaneousConnectionsCount)
+    {
+        m_connections.push_back(std::unique_ptr<TestConnection>());
+        std::unique_ptr<TestConnection> connection(new TestConnection(
             m_remoteAddress,
             m_bytesToSendThrough,
             std::bind(&ConnectionsGenerator::onConnectionFinished, this,
-                      std::placeholders::_1, std::prev(m_connections.end())) ) );
-        m_connections.back().swap( connection );
-        const bool emulatingError = 
+                std::placeholders::_1, std::placeholders::_3,
+                std::prev(m_connections.end()))));
+        m_connections.back().swap(connection);
+        const bool emulatingError =
             m_errorEmulationPercent > 0 &&
             m_errorEmulationDistribution(m_randomEngine) < m_errorEmulationPercent;
         if (emulatingError)
         {
             const SystemError::ErrorCode osErrorCode = SystemError::getLastOSErrorCode();
-            std::cerr<<"Failed to start test connection. "<<SystemError::toString(osErrorCode).toStdString()<<std::endl;
+            std::cerr << "Failed to start test connection. " << SystemError::toString(osErrorCode).toStdString() << std::endl;
             //if (!m_finishedConnectionsIDs.insert(m_connections.back()->id()).second)
             //    int x = 0;
             //ignoring error for now
             auto connection = std::move(m_connections.back());
             m_connections.pop_back();
-            lk.unlock();
             return;
         }
 

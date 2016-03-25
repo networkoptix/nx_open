@@ -28,6 +28,8 @@ namespace style
     {
     public:
         static const char *kHoveredRowProperty;
+        static const char *kAccentStyleProperty;
+        static const char *kSliderLength; /**< Name of a property to change default width of the slider handle. */
     };
 
     qreal dpr(qreal value);

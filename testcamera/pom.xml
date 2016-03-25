@@ -21,10 +21,10 @@
         <!--Specific os libs used-->
         <qt.libs>core network multimedia concurrent xml sql</qt.libs>
         <ffmpeg.libs>-lcommon -lnx_streaming -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale</ffmpeg.libs>
-        <windows.oslibs>DbgHelp.lib -lIphlpapi -lwinmm -lws2_32 -lssleay32 -llibeay32</windows.oslibs>
+        <windows.oslibs>DbgHelp.lib -lIphlpapi -lwinmm -lws2_32</windows.oslibs>
         <windows.oslibs.release/>
         <windows.oslibs.debug/>  
-        <linux.oslibs>-lssl -lcrypto -lsigar -lpostproc</linux.oslibs>
+        <linux.oslibs>-lpostproc</linux.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
         <!--Global defines-->
         <global.defines/>
@@ -32,5 +32,6 @@
         <windows.defines/>
         <linux.defines/>
         <mac.defines/>
+        <rdep.packages>openssl</rdep.packages>
     </properties>  
 </project>

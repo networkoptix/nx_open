@@ -23,6 +23,7 @@
 #include "nx_ec/data/api_resource_type_data.h"
 #include "nx_ec/data/api_camera_data_ex.h"
 #include "nx_ec/data/api_camera_history_data.h"
+#include <nx_ec/data/api_access_rights_data.h>
 #include "remote_ec_connection.h"
 #include "rest/ec2_base_query_http_handler.h"
 #include "rest/ec2_update_http_handler.h"
@@ -150,8 +151,7 @@ namespace ec2
          * %// AbstractResourceManager::getResourceTypes
          */
         registerGetFuncHandler<std::nullptr_t, ApiResourceTypeDataList>(p, ApiCommand::getResourceTypes);
-        //AbstractResourceManager::getResource
-        //registerGetFuncHandler<std::nullptr_t, ApiResourceData>(p, ApiCommand::getResource);
+
         //AbstractResourceManager::setResourceStatus
         registerUpdateFuncHandler<ApiResourceStatusData>(p, ApiCommand::setResourceStatus);
 
@@ -164,6 +164,7 @@ namespace ec2
          * %// AbstractResourceManager::getKvPairs
          */
         registerGetFuncHandler<QnUuid, ApiResourceParamWithRefDataList>(p, ApiCommand::getResourceParams);
+
         //AbstractResourceManager::save
         registerUpdateFuncHandler<ApiResourceParamWithRefDataList>(p, ApiCommand::setResourceParams);
 
@@ -190,7 +191,7 @@ namespace ec2
         registerGetFuncHandler<QnUuid, ApiResourceStatusDataList>(p, ApiCommand::getStatusList);
 
         //AbstractMediaServerManager::getServers
-        registerGetFuncHandler<QnUuid, ApiMediaServerDataList>(p, ApiCommand::getMediaServers);
+        registerGetFuncHandler<std::nullptr_t, ApiMediaServerDataList>(p, ApiCommand::getMediaServers);
         //AbstractMediaServerManager::save
         registerUpdateFuncHandler<ApiMediaServerData>(p, ApiCommand::saveMediaServer);
 
@@ -243,7 +244,7 @@ namespace ec2
          * %return Return object in requested format
          * %// AbstractMediaServerManager::getServersEx
          */
-        registerGetFuncHandler<QnUuid, ApiMediaServerDataExList>(p, ApiCommand::getMediaServersEx);
+        registerGetFuncHandler<std::nullptr_t, ApiMediaServerDataExList>(p, ApiCommand::getMediaServersEx);
 
         registerUpdateFuncHandler<ApiStorageDataList>(p, ApiCommand::saveStorages);
 
@@ -284,22 +285,20 @@ namespace ec2
         //AbstractCameraManager::save
         registerUpdateFuncHandler<ApiCameraDataList>(p, ApiCommand::saveCameras);
         //AbstractCameraManager::getCameras
-        registerGetFuncHandler<QnUuid, ApiCameraDataList>(p, ApiCommand::getCameras);
+        registerGetFuncHandler<std::nullptr_t, ApiCameraDataList>(p, ApiCommand::getCameras);
 
         //AbstractCameraManager::saveUserAttributes
         registerUpdateFuncHandler<ApiCameraAttributesDataList>(p, ApiCommand::saveCameraUserAttributesList);
 
         /**%apidoc POST /ec2/saveCameraUserAttributes
-         * Save additional camera attributes.
+         * Save additional camera attributes for a single camera.
          * <p>
          * Parameters should be passed as a JSON object in POST message body with
          * content type "application/json". Example of such object can be seen in
          * the result of the corresponding GET function.
          * </p>
-         * %param cameraId Camera unique id.
-         * %param cameraName Camera name.
          * %param userDefinedGroupName Name of the user-defined camera group.
-         * %param scheduleEnabled Whether the schedule is enabled for the camera.
+         * %param scheduleEnabled Whether recording to the archive is enabled for the camera.
          *     %value false
          *     %value true
          * %param licenseUsed Whether the license is used for the camera.
@@ -307,14 +306,16 @@ namespace ec2
          *     %value true
          * %param motionType Type of motion detection method.
          *     %value MT_Default Use default method.
-         *     %value MT_HardwareGrid Use hardware grid.
-         *     %value MT_SoftwareGrid Use software grid.
-         *     %value MT_MotionWindow Use motion window.
+         *     %value MT_HardwareGrid Use motion detection grid implemented by the camera.
+         *     %value MT_SoftwareGrid Use motion detection grid implemented by the server.
+         *     %value MT_MotionWindow Use motion detection window implemented by the camera.
          *     %value MT_NoMotion Do not perform motion detection.
          * %param motionMask List of motion detection areas and their
          *     sensitivity. The format is proprietary and is likely to change in
-         *     future API versions.
-         * %param scheduleTasks List of scheduled recording tasks.
+         *     future API versions. Currently, this string defines several rectangles separated with ':',
+         *     each rectangle is described by 5 comma-separated numbers: sensitivity, x and y (for
+         *     left top corner), width, height.
+         * %param scheduleTasks List of scheduleTask objects which define the camera recording schedule.
          *     %param scheduleTask.startTime Time of day to start backup as
          *         seconds passed from the day's 00:00:00.
          *     %param scheduleTask.endTime: Time of day to end backup as
@@ -358,14 +359,16 @@ namespace ec2
          *     %value SSQualityHigh High quality second stream.
          *     %value SSQualityNotDefined Second stream quality is not defined.
          *     %value SSQualityDontUse Second stream is not used for the camera.
-         * %param controlEnabled Whether camera control is enabled.
+         * %param controlEnabled Whether server will manage the camera (change resolution, fps, create profiles, etc).
          *     %value false
          *     %value true
          * %param dewarpingParams Image dewarping parameters.
          *     The format is proprietary and is likely to change in future API
          *     versions.
          * %param minArchiveDays Minimum number of days to keep the archive for.
+         *     If the value is less than or equal to zero, it is not used.
          * %param maxArchiveDays Maximum number of days to keep the archive for.
+         *     If the value is less than or equal to zero, it is not used.
          * %param preferedServerId Unique id of a server which is preferred for
          *     the camera for failover.
          *     %// TODO: Typo in parameter name: "prefered" -> "preferred".
@@ -385,8 +388,104 @@ namespace ec2
          */
         registerUpdateFuncHandler<ApiCameraAttributesData>(p, ApiCommand::saveCameraUserAttributes);
 
-        //AbstractCameraManager::getUserAttributes
-        registerGetFuncHandler<QnUuid, ApiCameraAttributesDataList>(p, ApiCommand::getCameraUserAttributes);
+        /**%apidoc GET /ec2/getCameraUserAttributes
+         * Read additional camera attributes.
+         * %// TODO: This function is named inconsistently - should end with 'List'.
+         * %param[default] format
+         * %return List of additional camera attributes objects for all cameras in the requested format.
+         *     %param cameraID Camera unique id.
+         *     %param cameraName Camera name.
+         *     %param userDefinedGroupName Name of the user-defined camera group.
+         *     %param scheduleEnabled Whether recording to the archive is enabled for the camera.
+         *         %value false
+         *         %value true
+         *     %param licenseUsed Whether the license is used for the camera.
+         *         %value false
+         *         %value true
+         *     %param motionType Type of motion detection method.
+         *         %value MT_Default Use default method.
+         *         %value MT_HardwareGrid Use motion detection grid implemented by the camera.
+         *         %value MT_SoftwareGrid Use motion detection grid implemented by the server.
+         *         %value MT_MotionWindow Use motion detection window implemented by the camera.
+         *         %value MT_NoMotion Do not perform motion detection.
+         *     %param motionMask List of motion detection areas and their
+         *         sensitivity. The format is proprietary and is likely to change in
+         *         future API versions. Currently, this string defines several rectangles separated with ':',
+         *         each rectangle is described by 5 comma-separated numbers: sensitivity, x and y (for
+         *         left top corner), width, height.
+         *     %param scheduleTasks List of scheduleTask objects which define the camera recording schedule.
+         *         %param scheduleTask.startTime Time of day to start backup as
+         *             seconds passed from the day's 00:00:00.
+         *         %param scheduleTask.endTime: Time of day to end backup as
+         *             seconds passed from the day's 00:00:00.
+         *         %param scheduleTask.recordAudio Whether to record the sound.
+         *             %value false
+         *             %value true
+         *         %param scheduleTask.recordingType
+         *             %value RT_Always Record always.
+         *             %value RT_MotionOnly Record only when the motion is detected.
+         *             %value RT_Never Never record.
+         *             %value RT_MotionAndLowQuality Always record low quality
+         *                 stream, and record high quality stream on motion.
+         *         %param scheduleTask.dayOfWeek Day of week for the recording task.
+         *             %value 1 Monday
+         *             %value 2 Tuesday
+         *             %value 3 Wednesday
+         *             %value 4 Thursday
+         *             %value 5 Friday
+         *             %value 6 Saturday
+         *             %value 7 Sunday
+         *         %param scheduleTask.beforeThreshold The number of seconds before a motion event to
+         *             record the video for.
+         *         %param scheduleTask.afterThreshold The number of seconds after a motion event to
+         *             record the video for.
+         *         %param scheduleTask.streamQuality Quality of the recording.
+         *             %value QualityLowest
+         *             %value QualityLow
+         *             %value QualityNormal
+         *             %value QualityHigh
+         *             %value QualityHighest
+         *             %value QualityPreSet
+         *             %value QualityNotDefined
+         *         %param scheduleTask.fps Frames per second (integer).
+         *     %param audioEnabled Whether the audio is enabled on the camera.
+         *         %value false
+         *         %value true
+         *     %param secondaryStreamQuality
+         *         %value SSQualityLow Low quality second stream.
+         *         %value SSQualityMedium Medium quality second stream.
+         *         %value SSQualityHigh High quality second stream.
+         *         %value SSQualityNotDefined Second stream quality is not defined.
+         *         %value SSQualityDontUse Second stream is not used for the camera.
+         *     %param controlEnabled Whether server will manage the camera (change resolution, fps, create profiles, etc).
+         *         %value false
+         *         %value true
+         *     %param dewarpingParams Image dewarping parameters.
+         *         The format is proprietary and is likely to change in future API
+         *         versions.
+         *     %param minArchiveDays Minimum number of days to keep the archive for.
+         *         If the value is less than or equal to zero, it is not used.
+         *     %param maxArchiveDays Maximum number of days to keep the archive for.
+         *         If the value is less than or equal to zero, it is not used.
+         *     %param preferedServerId Unique id of a server which is preferred for
+         *         the camera for failover.
+         *         %// TODO: Typo in parameter name: "prefered" -> "preferred".
+         *     %param failoverPriority Priority for the camera for being transferred
+         *         to another server for failover.
+         *         %value FP_Never Will never be transferred to another server.
+         *         %value FP_Low Low priority against other cameras.
+         *         %value FP_Medium Medium priority against other cameras.
+         *         %value FP_High High priority against other cameras.
+         *     %param backupType Combination (via "|") of flags defining backup options.
+         *         %value CameraBackup_Disabled Backup is disabled.
+         *         %value CameraBackup_HighQuality Backup is in high quality.
+         *         %value CameraBackup_LowQuality Backup is in low quality.
+         *         %value CameraBackup_Both Equivalent of "CameraBackup_HighQuality|CameraBackup_LowQuality".
+         *         %value CameraBackup_Default A default value is used for backup options.
+         * %// AbstractCameraManager::getUserAttributes
+         */
+        registerGetFuncHandler<std::nullptr_t, ApiCameraAttributesDataList>(p, ApiCommand::getCameraUserAttributes);
+
         //AbstractCameraManager::addCameraHistoryItem
         registerUpdateFuncHandler<ApiServerFootageData>(p, ApiCommand::addCameraHistoryItem);
 
@@ -401,41 +500,124 @@ namespace ec2
         registerGetFuncHandler<std::nullptr_t, ApiServerFootageDataList>(p, ApiCommand::getCameraHistoryItems);
 
         /**%apidoc GET /ec2/getCamerasEx
-         * Read camera list
+         * Read camera list.
          * %param[default] format
-         * %param[opt] id Server unique Id
-         * %return Returns camera list data formatted in a requested format
-         *     %attribute addParams List of additional parameters for camera. This list can contain such information as full ONVIF url, camera maximum fps e.t.c
-         *     %attribute audioEnabled Server will push audio stream from a camera if parameter is true
-         *     %attribute controlEnabled Server will manage camera (change resolution, fps, create profiles e.t.c) if parameter if true
-         *     %attribute dewarpingParams Json string with dewarping parameters
-         *     %attribute groupId Internal group identifier. It is used for grouping channels for multi-channels cameras together.
-         *     %attribute groupName Group name. This name can be changed by user
-         *     %attribute id Object Id. All Id for all objects in a system is GUIDs
-         *     %attribute login Login for camera authentication
-         *     %attribute mac camera MAC address
-         *     %attribute manuallyAdded True if user added camera manually
-         *     %attribute maxArchiveDays Maximum archive duration in days for this camera. If value less or equal to zero, it is not used
-         *     %attribute minArchiveDays Minimum archive duration in days for this camera. If value less or equal to zero, it is not used
-         *     %attribute model Camera model
-         *     %attribute motionMask Camera's motion mask. This string defines several rectangles via ':' delimiter. Each rectangle is described by 5 digits: sensitivity, x,y(for left top corner), width, height
-         *     %attribute motionType If value is 'MT_SoftwareGrid' then server determine motion, otherwise camera built-in motion will be used
-         *     %attribute name Camera name
-         *     %attribute parentId Camera's server Id
-         *     %attribute physicalId Camera unique identifier. This identifier is used in all requests related to a camera. For instance, in RTSP requests
-         *     %attribute password Password for camera authentication
-         *     %attribute scheduleEnabled Do record camera archive if true
-         *     %attribute scheduleTasks List of 'scheduleTask' objects with camera recording schedule.
-         *     %attribute secondaryStreamQuality Secondary stream quality. Possible values:'SSQualityLow', 'SSQualityMedium', 'SSQualityHigh', 'SSQualityDontUse'
-         *     %attribute status Camera status. Possible values are: 'Offline', 'Online', 'Recording'
-         *     %attribute statusFlags Usually this field is zero. Non zero value is used to mark that a lot of network issues was occurred with this camera
-         *     %attribute typeId Unique Id with camera's type. Camera's type can describe predefined information such as camera maximum resolution, fps e.t.c.
-         *         Detailed type information can be obtained via 'getResourceTypes' request.
-         *     %attribute url Camera plain IP address or full http url if camera was added manually. Also, for multichannel encoders full url is used
-         *     %attribute vendor Camera manufacturer
+         * %return List of objects with camera information formatted in the requested format.
+         *     %// From struct ApiResourceData:
+         *     %param id Camera unique Id.
+         *     %param parentId Unique Id of a camera's server.
+         *     %param name Camera name.
+         *     %param url Camera IP address, or a complete HTTP URL if the camera was added manually. Also, for multichannel encoders a complete URL is used.
+         *     %param typeId Unique Id of a camera type. Camera type can describe predefined information such as camera maximum resolution, fps, etc.
+         *         Detailed type information can be obtained via GET /ec2/getResourceTypes request.
+         *
+         *     %// From struct ApiCameraData (inherited from ApiResourceData):
+         *     %param mac Camera MAC address.
+         *     %param physicalId Camera unique identifier. This identifier is used in some requests related to a camera, for instance, in RTSP requests.
+         *     %param manuallyAdded Whether the user added the camera manually.
+         *         %value false
+         *         %value true
+         *     %param model Camera model.
+         *     %param groupId Internal group identifier. It is used for grouping channels of multi-channel cameras together.
+         *     %param groupName Group name. This name can be changed by the user.
+         *     %param statusFlags Usually this field is zero. Non-zero value is used to mark that a lot of network issues have occurred with this camera.
+         *     %param vendor Camera manufacturer.
+         *
+         *     %// From struct ApiCameraAttributesData:
+         *     %param cameraID Camera unique id.
+         *     %param cameraName Camera name.
+         *     %param userDefinedGroupName Name of the user-defined camera group.
+         *     %param scheduleEnabled Whether recording to the archive is enabled for the camera.
+         *         %value false
+         *         %value true
+         *     %param licenseUsed Whether the license is used for the camera.
+         *         %value false
+         *         %value true
+         *     %param motionType Type of motion detection method.
+         *         %value MT_Default Use default method.
+         *         %value MT_HardwareGrid Use motion detection grid implemented by the camera.
+         *         %value MT_SoftwareGrid Use motion detection grid implemented by the server.
+         *         %value MT_MotionWindow Use motion detection window implemented by the camera.
+         *         %value MT_NoMotion Do not perform motion detection.
+         *     %param motionMask List of motion detection areas and their
+         *         sensitivity. The format is proprietary and is likely to change in
+         *         future API versions. Currently, this string defines several rectangles separated with ':',
+         *         each rectangle is described by 5 comma-separated numbers: sensitivity, x and y (for
+         *         left top corner), width, height.
+         *     %param scheduleTasks List of scheduleTask objects which define the camera recording schedule.
+         *         %param scheduleTask.startTime Time of day to start backup as
+         *             seconds passed from the day's 00:00:00.
+         *         %param scheduleTask.endTime: Time of day to end backup as
+         *             seconds passed from the day's 00:00:00.
+         *         %param scheduleTask.recordAudio Whether to record the sound.
+         *             %value false
+         *             %value true
+         *         %param scheduleTask.recordingType
+         *             %value RT_Always Record always.
+         *             %value RT_MotionOnly Record only when the motion is detected.
+         *             %value RT_Never Never record.
+         *             %value RT_MotionAndLowQuality Always record low quality
+         *                 stream, and record high quality stream on motion.
+         *         %param scheduleTask.dayOfWeek Day of week for the recording task.
+         *             %value 1 Monday
+         *             %value 2 Tuesday
+         *             %value 3 Wednesday
+         *             %value 4 Thursday
+         *             %value 5 Friday
+         *             %value 6 Saturday
+         *             %value 7 Sunday
+         *         %param scheduleTask.beforeThreshold The number of seconds before a motion event to
+         *             record the video for.
+         *         %param scheduleTask.afterThreshold The number of seconds after a motion event to
+         *             record the video for.
+         *         %param scheduleTask.streamQuality Quality of the recording.
+         *             %value QualityLowest
+         *             %value QualityLow
+         *             %value QualityNormal
+         *             %value QualityHigh
+         *             %value QualityHighest
+         *             %value QualityPreSet
+         *             %value QualityNotDefined
+         *         %param scheduleTask.fps Frames per second (integer).
+         *     %param audioEnabled Whether the audio is enabled on the camera.
+         *         %value false
+         *         %value true
+         *     %param secondaryStreamQuality
+         *         %value SSQualityLow Low quality second stream.
+         *         %value SSQualityMedium Medium quality second stream.
+         *         %value SSQualityHigh High quality second stream.
+         *         %value SSQualityNotDefined Second stream quality is not defined.
+         *         %value SSQualityDontUse Second stream is not used for the camera.
+         *     %param controlEnabled Whether server will manage the camera (change resolution, fps, create profiles, etc).
+         *         %value false
+         *         %value true
+         *     %param dewarpingParams Image dewarping parameters.
+         *         The format is proprietary and is likely to change in future API
+         *         versions.
+         *     %param minArchiveDays Minimum number of days to keep the archive for.
+         *         If the value is less than or equal to zero, it is not used.
+         *     %param maxArchiveDays Maximum number of days to keep the archive for.
+         *         If the value is less than or equal to zero, it is not used.
+         *     %param preferedServerId Unique id of a server which is preferred for
+         *         the camera for failover.
+         *         %// TODO: Typo in parameter name: "prefered" -> "preferred".
+         *     %param failoverPriority Priority for the camera for being transferred
+         *         to another server for failover.
+         *         %value FP_Never Will never be transferred to another server.
+         *         %value FP_Low Low priority against other cameras.
+         *         %value FP_Medium Medium priority against other cameras.
+         *         %value FP_High High priority against other cameras.
+         *     %param backupType Combination (via "|") of flags defining backup options.
+         *         %value CameraBackup_Disabled Backup is disabled.
+         *         %value CameraBackup_HighQuality Backup is in high quality.
+         *         %value CameraBackup_LowQuality Backup is in low quality.
+         *         %value CameraBackup_Both Equivalent of "CameraBackup_HighQuality|CameraBackup_LowQuality".
+         *         %value CameraBackup_Default A default value is used for backup options.
+         *     %param status Camera status. Possible values are: 'Offline', 'Online', 'Recording'
+         *     %param addParams List of additional parameters for camera. This list can contain such information as full ONVIF url, camera maximum fps e.t.c
          * %// AbstractCameraManager::getCamerasEx
          */
-        registerGetFuncHandler<QnUuid, ApiCameraDataExList>(p, ApiCommand::getCamerasEx);
+        registerGetFuncHandler<std::nullptr_t, ApiCameraDataExList>(p, ApiCommand::getCamerasEx);
 
         /**%apidoc GET /ec2/getStorages
          * Read the list of current storages.
@@ -443,20 +625,20 @@ namespace ec2
          * %param[opt] id Server unique id. If omitted, return storages for all
          *     servers.
          * %return List of storages.
-         *     %attribute id Storage unique id.
-         *     %attribute parentId Is empty.
-         *     %attribute name Storage name.
-         *     %attribute url Is empty.
-         *     %attribute spaceLimit Storage space to leave free on the storage,
+         *     %param id Storage unique id.
+         *     %param parentId Is empty.
+         *     %param name Storage name.
+         *     %param url Is empty.
+         *     %param spaceLimit Storage space to leave free on the storage,
          *         in bytes.
-         *     %attribute usedForWriting Whether writing to the storage is
+         *     %param usedForWriting Whether writing to the storage is
          *         allowed: false or true.
-         *     %attribute storageType Type of the method to access the storage:
-         *         "local"or "smb".
-         *     %attribute addParams List of storage additional parameters.
+         *     %param storageType Type of the method to access the storage:
+         *         "local" or "smb".
+         *     %param addParams List of storage additional parameters.
          *         Intended for internal use; leave empty when creating a new
          *         storage.
-         *     %attribute isBackup Whether the storage is used for backup: false or true.
+         *     %param isBackup Whether the storage is used for backup: false or true.
          */
         registerGetFuncHandler<QnUuid, ApiStorageDataList>(p, ApiCommand::getStorages);
 
@@ -493,6 +675,8 @@ namespace ec2
          * %// AbstractUserManager::getUsers
          */
         registerGetFuncHandler<std::nullptr_t, ApiUserDataList>(p, ApiCommand::getUsers);
+
+        registerGetFuncHandler<std::nullptr_t, ApiAccessRightsDataList>(p, ApiCommand::getAccessRights);
 
         /**%apidoc POST /ec2/saveUser
          * <p>
@@ -853,12 +1037,6 @@ namespace ec2
         //    new QnRestTransactionReceiver());
     }
 
-    void Ec2DirectConnectionFactory::setContext( const ResourceContext& resCtx )
-    {
-        m_resCtx = resCtx;
-        m_timeSynchronizationManager->setContext(m_resCtx);
-    }
-
     void Ec2DirectConnectionFactory::setConfParams( std::map<QString, QVariant> confParams )
     {
         m_settingsInstance.loadParams( std::move( confParams ) );
@@ -876,7 +1054,7 @@ namespace ec2
         {
             QnMutexLocker lk( &m_mutex );
             if( !m_directConnection ) {
-                m_directConnection.reset( new Ec2DirectConnection( &m_serverQueryProcessor, m_resCtx, connectionInfo, url ) );
+                m_directConnection.reset( new Ec2DirectConnection( &m_serverQueryProcessor, connectionInfo, url ) );
                 if( !m_directConnection->initialized() )
                 {
                     connectionInitializationResult = ec2::ErrorCode::dbError;
@@ -1017,7 +1195,7 @@ namespace ec2
                     return connectToOldEC(
                         ecURL,
                         [reqID, handler](ErrorCode errorCode, const QnConnectionInfo& oldECConnectionInfo) {
-                            if( errorCode == ErrorCode::ok && oldECConnectionInfo.version >= SoftwareVersionType( 2, 3, 0 ) )
+                            if( errorCode == ErrorCode::ok && oldECConnectionInfo.version >= QnSoftwareVersion( 2, 3, 0 ) )
                                 handler->done(  //somehow, connected to 2.3 server with old ec connection. Returning error, since could not connect to ec 2.3 during normal connect
                                     reqID,
                                     ErrorCode::ioError,
@@ -1043,7 +1221,6 @@ namespace ec2
 
         AbstractECConnectionPtr connection(new RemoteEC2Connection(
             std::make_shared<FixedUrlClientQueryProcessor>(&m_remoteQueryProcessor, connectionInfoCopy.ecUrl),
-            m_resCtx,
             connectionInfoCopy));
         handler->done(
             reqID,
@@ -1097,7 +1274,7 @@ namespace ec2
         if (response)
             connectionInfo->effectiveUserName =
                 nx_http::getHeaderValue(response->headers, Qn::EFFECTIVE_USER_NAME_HEADER_NAME);
-        
+
 		if (!loginInfo.clientInfo.id.isNull())
         {
 			auto clientInfo = loginInfo.clientInfo;

@@ -34,7 +34,7 @@ void QnRuntimeTransactionLog::clearOldRuntimeData(const QnTranStateKey& key)
 
 void QnRuntimeTransactionLog::clearOldRuntimeDataUnsafe(QnMutexLockerBase& lock, const QnTranStateKey& key)
 {
-    Q_ASSERT(!key.dbID.isNull());
+    NX_ASSERT(!key.dbID.isNull());
     auto itr = m_state.values.lowerBound(QnTranStateKey(key.peerID, QnUuid()));
     bool newPeerFound = false;
     bool oldPeerFound = false;

@@ -6,6 +6,8 @@
 #include <sys/socket.h>
 #endif
 
+#include <nx/utils/log/assert.h>
+
 namespace QnMulticast
 {
 
@@ -399,7 +401,7 @@ QUuid Transport::addRequest(const Request& request, ResponseCallback callback, i
 void Transport::putPacketToTransport(TransportConnection& transportConnection, const Packet& packet)
 {
     QByteArray encodedData = packet.serialize();
-    Q_ASSERT(encodedData.size() <= Packet::MAX_DATAGRAM_SIZE);
+    NX_ASSERT(encodedData.size() <= Packet::MAX_DATAGRAM_SIZE);
     for (int i = 0; i < SEND_RETRY_COUNT; ++i) 
     {
         for (auto& socket: m_sendSockets)

@@ -7,7 +7,6 @@
 #include <QtCore/QObject>
 
 #include <QtWidgets/QDialogButtonBox>
-#include <QtWidgets/QMessageBox>
 
 #include <api/app_server_connection.h>
 

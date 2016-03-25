@@ -10,7 +10,7 @@ namespace
 
     Qn::SerializationFormat defaultFormat()
     {
-#ifdef _DEBUG
+#ifdef _DEBUG_PROTOCOL
         return Qn::JsonFormat;
 #else
         return Qn::UbjsonFormat;

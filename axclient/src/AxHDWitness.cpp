@@ -5,18 +5,24 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QDir>
 #include <QtCore/QXmlStreamWriter>
-#include <QtCore/private/qthread_p.h>
+
+#include <utils/common/qt_private_headers.h>
+#include QT_CORE_PRIVATE_HEADER(qthread_p.h)
 
 #include <axclient/axclient_module.h>
 #include <axclient/axclient_window.h>
 
 #include <common/systemexcept_win32.h>
 
+#include <client/client_app_info.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 
-#include <utils/common/log.h>
 #include <utils/common/waiting_for_qthread_to_empty_event_queue.h>
+#include <utils/common/app_info.h>
+
+#include <nx/utils/log/log.h>
 
 static QtMessageHandler defaultMsgHandler = 0;
 
@@ -55,7 +61,7 @@ extern LRESULT QT_WIN_CALLBACK axs_FilterProc(int nCode, WPARAM wParam, LPARAM l
 LRESULT QT_WIN_CALLBACK qn_FilterProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
     QThread *thread = QThread::currentThread();
-    if(thread == NULL || QThreadData::get2(thread)->loopLevel == 0) { 
+    if(thread == NULL || QThreadData::get2(thread)->loopLevel == 0) {
         return axs_FilterProc(nCode, wParam, lParam);
     } else {
         return CallNextHookEx(qax_hhook, nCode, wParam, lParam);
@@ -82,7 +88,7 @@ bool initializeLog() {
         return false;
 
     QnLog::initLog(QString());
-    cl_log.log(lit(QN_APPLICATION_NAME), " started", cl_logALWAYS);
+    cl_log.log(QnClientAppInfo::applicationDisplayName(), " started", cl_logALWAYS);
     cl_log.log("Software version: ", QnAppInfo::applicationVersion(), cl_logALWAYS);
 
     return true;
@@ -129,10 +135,10 @@ bool AxHDWitness::event(QEvent *event) {
 }
 
 void AxHDWitness::initialize() {
-    Q_ASSERT_X(!m_isInitialized, Q_FUNC_INFO, "Double initialization");
+    NX_ASSERT(!m_isInitialized, Q_FUNC_INFO, "Double initialization");
     if (m_isInitialized)
         return;
-   
+
     doInitialize();
 
     if(UnhookWindowsHookEx(qax_hhook))
@@ -142,12 +148,12 @@ void AxHDWitness::initialize() {
 }
 
 void AxHDWitness::finalize() {
-    Q_ASSERT_X(m_isInitialized, Q_FUNC_INFO, "Double finalization");
-    if (!m_isInitialized) 
+    NX_ASSERT(m_isInitialized, Q_FUNC_INFO, "Double finalization");
+    if (!m_isInitialized)
         return;
-    
+
     doFinalize();
-    m_isInitialized = false;    
+    m_isInitialized = false;
 }
 
 void AxHDWitness::play() {
@@ -179,7 +185,7 @@ void AxHDWitness::setCurrentTime(qint64 time) {
 }
 
 void AxHDWitness::jumpToLive() {
-    qnAxClient->jumpToLive();   
+    qnAxClient->jumpToLive();
 }
 
 void AxHDWitness::pause() {
@@ -202,17 +208,26 @@ void AxHDWitness::addResourceToLayout(const QString &id, const QString &timestam
     addResourcesToLayout(id, timestamp);
 }
 
-void AxHDWitness::addResourcesToLayout(const QString &ids, const QString &timestamp) {
-    qnAxClient->addResourcesToLayout(ids.split(L'|'), timestamp.toLongLong());
+void AxHDWitness::addResourcesToLayout(const QString &ids, const QString &timestamp)
+{
+    QList<QnUuid> uuids;
+    for (const QString& id : ids.split(L'|'))
+    {
+        QnUuid uuid = QnUuid::fromStringSafe(id);
+        if (!uuid.isNull())
+            uuids << uuid;
+    }
+    qnAxClient->addResourcesToLayout(uuids, timestamp.toLongLong());
 }
 
-void AxHDWitness::removeFromCurrentLayout(const QString &uniqueId) {
-    qnAxClient->removeFromCurrentLayout(uniqueId);
+void AxHDWitness::removeFromCurrentLayout(const QString &uniqueId)
+{
+    qnAxClient->removeFromCurrentLayout(QnUuid::fromHardwareId(uniqueId));
 }
 
 QString AxHDWitness::resourceListXml() {
     QString result;
-    
+
     QXmlStreamWriter writer(&result);
     writer.writeStartDocument();
     writer.writeStartElement(lit("resources"));
@@ -247,7 +262,7 @@ void AxHDWitness::slidePanelsOut() {
     qnAxClient->slidePanelsOut();
 }
 
-bool AxHDWitness::doInitialize() {   
+bool AxHDWitness::doInitialize() {
 
     /* Methods that should be called once and are not reversible. */
     win32_exception::installGlobalUnhandledExceptionHandler();
@@ -270,7 +285,7 @@ bool AxHDWitness::doInitialize() {
     connect(qnAxClient, &QnAxClientWindow::disconnected,    this, [this] {  emit connectionProcessed(1, lit("error")); },   Qt::QueuedConnection);
 
     QApplication::processEvents();
-    
+
     return true;
 }
 

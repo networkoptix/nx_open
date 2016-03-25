@@ -29,11 +29,8 @@ namespace
 
     rest::QnConnectionPtr getPublicServerConnection()
     {
-        for (const QnMediaServerResourcePtr server: qnResPool->getAllServers(Qn::AnyStatus))
+        for (const QnMediaServerResourcePtr server: qnResPool->getAllServers(Qn::Online))
         {
-            if (server->getStatus() != Qn::Online)
-                continue;
-
             if (!server->getServerFlags().testFlag(Qn::SF_HasPublicIP))
                 continue;
 
@@ -266,19 +263,20 @@ void QnLinkToCloudDialogPrivate::at_bindFinished(
         return;
     }
 
-    admin->setProperty(Qn::CLOUD_ACCOUNT_NAME, q->ui->accountLineEdit->text());
-    propertyDictionary->saveParamsAsync(admin->getId());
-
-    auto handleReply = [this](bool success, rest::Handle handleId, rest::ServerConnection::EmptyResponseType)
+    auto handleReply = [this](bool success, rest::Handle handleId, const QnRestResult& reply)
     {
         Q_UNUSED(handleId)
 
-        if (success)
+        if (success && reply.error == QnRestResult::NoError)
             showSuccess();
         else
-            showFailure(tr("Cannot save information to database"));
+            showFailure(reply.errorString);
     };
 
-    connection->saveCloudSystemCredentials(systemData.id.toString(), QString::fromStdString(systemData.authKey),
-                                           handleReply, q->thread());
+    connection->saveCloudSystemCredentials(
+        QString::fromStdString(systemData.id),
+        QString::fromStdString(systemData.authKey),
+        q->ui->accountLineEdit->text(),
+        handleReply,
+        q->thread());
 }

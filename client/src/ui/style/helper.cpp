@@ -21,6 +21,8 @@ namespace style
     const QSize Metrics::kSwitchSize(dp(30), dp(15));
 
     const char *Properties::kHoveredRowProperty = "_qn_hoveredRow";
+    const char *Properties::kAccentStyleProperty = "_qn_accentStyle";
+    const char *Properties::kSliderLength = "_qn_sliderLength";
 
     qreal dpr(qreal value)
     {

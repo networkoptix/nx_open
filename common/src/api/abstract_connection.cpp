@@ -26,8 +26,7 @@ bool QnAbstractReplyProcessor::connect(const char *signal, QObject *receiver, co
     }
 }
 
-//TODO: #GDM #High change resource parameter to shared pointer
-QnAbstractConnection::QnAbstractConnection(QObject *parent, QnResource* targetRes): 
+QnAbstractConnection::QnAbstractConnection(QObject *parent, const QnResourcePtr& targetRes):
     base_type(parent),
     m_targetRes(targetRes)
 {}
@@ -65,13 +64,13 @@ QnLexicalSerializer *QnAbstractConnection::serializer() const {
 }
 
 void QnAbstractConnection::setSerializer(QnLexicalSerializer *serializer) {
-    assert(serializer->type() == QMetaType::Int);
+    NX_ASSERT(serializer->type() == QMetaType::Int);
 
     m_serializer.reset(serializer);
 }
 
 QString QnAbstractConnection::objectName(int object) const {
-    QString result;    
+    QString result;
     serializer()->serialize(object, &result);
     return result;
 }
@@ -80,7 +79,7 @@ int QnAbstractConnection::sendAsyncRequest(int operation, int object, const QnRe
     if (!isReady())
         return -1;
 
-    Q_ASSERT_X(QnSessionManager::instance(), Q_FUNC_INFO, "Session manager object must exist here");
+    NX_ASSERT(QnSessionManager::instance(), Q_FUNC_INFO, "Session manager object must exist here");
     if (!QnSessionManager::instance())
         return -1;
 
@@ -110,11 +109,11 @@ int QnAbstractConnection::sendAsyncRequest(int operation, int object, const QnRe
     return QnSessionManager::instance()->sendAsyncRequest(
         operation,
         url,
-        objectName(object), 
-        actualHeaders, 
-        params, 
+        objectName(object),
+        actualHeaders,
+        params,
         data,
-        processor, 
+        processor,
         "processReply"
     );
 }
@@ -136,7 +135,7 @@ int QnAbstractConnection::sendAsyncPostRequest(int object, const QnRequestParamL
 }
 
 int QnAbstractConnection::sendSyncRequest(int operation, int object, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, QVariant *reply) {
-    Q_ASSERT_X(QnSessionManager::instance(), Q_FUNC_INFO, "Session manager object must exist here");
+    NX_ASSERT(QnSessionManager::instance(), Q_FUNC_INFO, "Session manager object must exist here");
     if (!QnSessionManager::instance())
         return -1;
 
@@ -181,11 +180,13 @@ int QnAbstractConnection::sendSyncPostRequest(int object, const QnRequestParamLi
     return sendSyncPostRequest(object, QnRequestHeaderList(), params, data, reply);
 }
 
-QnResource *QnAbstractConnection::targetResource() const {
+QnResourcePtr QnAbstractConnection::targetResource() const
+{
     return m_targetRes;
 }
 
-bool QnAbstractConnection::isReady() const {
+bool QnAbstractConnection::isReady() const
+{
     return true;
 }
 

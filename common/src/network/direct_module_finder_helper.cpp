@@ -41,7 +41,7 @@ QnDirectModuleFinderHelper::QnDirectModuleFinderHelper(QnModuleFinder *moduleFin
     m_clientMode(clientMode),
     m_moduleFinder(moduleFinder)
 {
-    Q_ASSERT(moduleFinder);
+    NX_ASSERT(moduleFinder);
 
     connect(qnResPool,  &QnResourcePool::resourceAdded,     this,   &QnDirectModuleFinderHelper::at_resourceAdded);
     connect(qnResPool,  &QnResourcePool::resourceRemoved,   this,   &QnDirectModuleFinderHelper::at_resourceRemoved);
@@ -56,7 +56,12 @@ QnDirectModuleFinderHelper::QnDirectModuleFinderHelper(QnModuleFinder *moduleFin
     m_elapsedTimer.start();
 }
 
-void QnDirectModuleFinderHelper::addForcedUrl(QUrl url) {
+void QnDirectModuleFinderHelper::addForcedUrl(QUrl url) 
+{
+    url.setUserName(QString());
+    url.setPassword(QString());
+    url.setScheme(lit("http"));
+
     m_forcedUrls.insert(std::move(url));
     updateModuleFinder();
 }

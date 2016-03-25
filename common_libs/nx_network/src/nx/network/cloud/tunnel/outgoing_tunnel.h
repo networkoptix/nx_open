@@ -8,6 +8,7 @@
 #include <utils/common/stoppable.h>
 
 #include "abstract_tunnel_connector.h"
+#include "nx/network/aio/timer.h"
 #include "nx/network/system_socket.h"
 #include "tunnel.h"
 
@@ -19,7 +20,7 @@ namespace cloud {
 /**
     \note \a OutgoingTunnel instance can be safely freed only after 
         \a OutgoingTunnel::pleaseStop completion. It is allowed 
-        to free object in completion handler itself.
+        to free object in \a closed handler itself.
         It is needed to guarantee that all clients receive response.
     \note Calling party MUST not use object after \a OutgoingTunnel::pleaseStop call
 */
@@ -41,11 +42,12 @@ public:
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
     /** Establish new connection.
-    * \param socketAttributes attribute values to apply to a newly-created socket
+    * @param timeout Zero means no timeout
+    * @param socketAttributes attribute values to apply to a newly-created socket
     * \note This method is re-enterable. So, it can be called in
     *        different threads simultaneously */
     void establishNewConnection(
-        boost::optional<std::chrono::milliseconds> timeout,
+        std::chrono::milliseconds timeout,
         SocketAttributes socketAttributes,
         NewConnectionHandler handler);
     /** same as above, but no timeout */
@@ -57,7 +59,8 @@ private:
     struct ConnectionRequestData
     {
         SocketAttributes socketAttributes;
-        boost::optional<std::chrono::milliseconds> timeout;
+        /** zero - no timeout */
+        std::chrono::milliseconds timeout;
         NewConnectionHandler handler;
     };
 
@@ -67,12 +70,12 @@ private:
         std::chrono::steady_clock::time_point,
         ConnectionRequestData> m_connectHandlers;
     std::map<CloudConnectType, std::unique_ptr<AbstractTunnelConnector>> m_connectors;
-    //TODO #ak replace with aio timer when it is available
-    UDPSocket m_aioThreadBinder;
+    aio::Timer m_timer;
     bool m_terminated;
     boost::optional<std::chrono::steady_clock::time_point> m_timerTargetClock;
     int m_counter;
     std::shared_ptr<AbstractOutgoingTunnelConnection> m_connection;
+    SystemError::ErrorCode m_lastErrorCode;
 
     void updateTimerIfNeeded();
     void updateTimerIfNeededNonSafe(
@@ -84,7 +87,7 @@ private:
         SystemError::ErrorCode code,
         std::unique_ptr<AbstractStreamSocket> socket,
         bool stillValid);
-    void onTunnelClosed();
+    void onTunnelClosed(SystemError::ErrorCode errorCode);
     void startAsyncTunnelConnect(QnMutexLockerBase* const locker);
     void onConnectorFinished(
         CloudConnectType connectorType,

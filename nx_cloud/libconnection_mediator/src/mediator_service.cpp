@@ -20,6 +20,7 @@
 #include <nx/network/stun/udp_server.h>
 #include <platform/process/current_process.h>
 #include <utils/common/command_line_parser.h>
+#include <utils/common/guard.h>
 #include <utils/common/systemerror.h>
 
 #include "listening_peer_pool.h"
@@ -42,6 +43,12 @@ MediatorProcess::MediatorProcess( int argc, char **argv )
     setServiceDescription(QN_APPLICATION_NAME);
 }
 
+void MediatorProcess::setOnStartedEventHandler(
+    nx::utils::MoveOnlyFunc<void(bool /*result*/)> handler)
+{
+    m_startedEventHandler = std::move(handler);
+}
+
 void MediatorProcess::pleaseStop()
 {
     application()->quit();
@@ -49,6 +56,14 @@ void MediatorProcess::pleaseStop()
 
 int MediatorProcess::executeApplication()
 {
+    bool processStartResult = false;
+    auto triggerOnStartedEventHandlerGuard = makeScopedGuard(
+        [this, &processStartResult]
+        {
+            if (m_startedEventHandler)
+                m_startedEventHandler(processStartResult);
+        });
+
     conf::Settings settings;
     //parsing command line arguments
     settings.load(m_argc, m_argv);
@@ -139,6 +154,9 @@ int MediatorProcess::executeApplication()
     NX_LOG(lit("STUN Server is listening on %1")
         .arg(containerString(settings.stun().addrToListenList)), cl_logERROR);
     std::cout << QN_APPLICATION_NAME << " has been started" << std::endl;
+
+    processStartResult = true;
+    triggerOnStartedEventHandlerGuard.fire();
 
     //TODO #ak remove qt event loop
     //application's main loop

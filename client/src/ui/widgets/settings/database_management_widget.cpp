@@ -1,7 +1,6 @@
 #include "database_management_widget.h"
 #include "ui_database_management_widget.h"
 
-#include <QtWidgets/QMessageBox>
 #include <QtCore/QFileInfo>
 
 #include <nx/utils/log/log.h>
@@ -162,7 +161,7 @@ void QnDatabaseManagementWidget::at_restoreButton_clicked() {
     if( errorCode == ec2::ErrorCode::ok ) {
         QnMessageBox::information(this,
                                  tr("Information"),
-                                 tr("Database was successfully restored from file '%1'. Media server will be restarted.").arg(fileName));
+                                 tr("Database was successfully restored from file '%1'. Server will be restarted.").arg(fileName));
         menu()->trigger(QnActions::ReconnectAction);
     } else {
         NX_LOG( lit("Failed to restore Server database from file '%1'. %2").arg(fileName).arg(ec2::toString(errorCode)), cl_logERROR );

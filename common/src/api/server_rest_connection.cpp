@@ -77,15 +77,33 @@ Handle ServerConnection::sendStatisticsAsync(const QnSendStatisticsRequestData &
         , kJsonContentType, data, callback, targetThread);
 }
 
-Handle ServerConnection::saveCloudSystemCredentials(
-    const QString& cloudSystemId,
-    const QString& cloudAuthKey,
-    Result<EmptyResponseType>::type callback,
+Handle ServerConnection::resetCloudSystemCredentials(
+    Result<QnRestResult>::type callback,
     QThread* targetThread)
 {
     CloudCredentialsData data;
-    data.cloudSystemId = cloudSystemId;
-    data.cloudAuthenticationKey = cloudAuthKey;
+    data.reset = true;
+
+    return executePost(
+        lit("/api/saveCloudSystemCredentials"),
+        QnRequestParamList(),
+        Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+        QJson::serialized(std::move(data)),
+        callback,
+        targetThread);
+}
+
+Handle ServerConnection::saveCloudSystemCredentials(
+    const QString& cloudSystemID,
+    const QString& cloudAuthKey,
+    const QString &cloudAccountName,
+    Result<QnRestResult>::type callback,
+    QThread* targetThread)
+{
+    CloudCredentialsData data;
+    data.cloudSystemID = cloudSystemID;
+    data.cloudAuthKey = cloudAuthKey;
+    data.cloudAccountName = cloudAccountName;
 
     return executePost(
         lit("/api/saveCloudSystemCredentials"),
@@ -112,7 +130,8 @@ QUrl ServerConnection::prepareUrl(const QString& path, const QnRequestParamList&
 template <class T>
 T parseMessageBody(const Qn::SerializationFormat& format, const nx_http::BufferType& msgBody, bool* success)
 {
-    switch(format) {
+    switch(format)
+    {
     case Qn::JsonFormat:
         return QJson::deserialized(msgBody, T(), success);
     case Qn::UbjsonFormat:
@@ -120,7 +139,7 @@ T parseMessageBody(const Qn::SerializationFormat& format, const nx_http::BufferT
     default:
         if (success)
             *success = false;
-        Q_ASSERT_X(0, Q_FUNC_INFO, "Unsupported data format");
+        NX_ASSERT(0, Q_FUNC_INFO, "Unsupported data format");
         break;
     }
     return T();
@@ -161,7 +180,8 @@ Handle ServerConnection::executeRequest(const Request& request, REST_CALLBACK(Re
     {
         bool success = false;
         ResultType result;
-        if( osErrorCode == SystemError::noError && statusCode == nx_http::StatusCode::ok) {
+        if( osErrorCode == SystemError::noError && statusCode == nx_http::StatusCode::ok)
+        {
             Qn::SerializationFormat format = Qn::serializationFormatFromHttpContentType(contentType);
             result = parseMessageBody<ResultType>(format, msgBody, &success);
         }

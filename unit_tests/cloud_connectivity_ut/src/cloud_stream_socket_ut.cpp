@@ -123,6 +123,17 @@ TEST_F(CloudStreamSocketTest, multiple_connections_random_data)
         serverAddress);
 }
 
+const auto createServerSocketFunc = 
+    []() -> std::unique_ptr<AbstractStreamServerSocket>
+    {
+        return SocketFactory::createStreamServerSocket();
+    };
+const auto createClientSocketFunc =
+    []() -> std::unique_ptr<CloudStreamSocket>
+    {
+        return std::make_unique<CloudStreamSocket>();
+    };
+
 TEST_F(CloudStreamSocketTest, simple_socket_test)
 {
     const char* tempHostName = "bla.bla";
@@ -131,17 +142,6 @@ TEST_F(CloudStreamSocketTest, simple_socket_test)
     nx::network::SocketGlobals::addressResolver().addFixedAddress(
         tempHostName,
         serverAddress);
-
-    const auto createServerSocketFunc = 
-        []() -> std::unique_ptr<AbstractStreamServerSocket>
-        {
-            return SocketFactory::createStreamServerSocket();
-        };
-    const auto createClientSocketFunc =
-        []() -> std::unique_ptr<CloudStreamSocket>
-        {
-            return std::make_unique<CloudStreamSocket>();
-        };
 
     test::socketSimpleSync(
         createServerSocketFunc,
@@ -154,6 +154,20 @@ TEST_F(CloudStreamSocketTest, simple_socket_test)
         createClientSocketFunc,
         serverAddress,
         SocketAddress(tempHostName));
+
+    nx::network::SocketGlobals::addressResolver().removeFixedAddress(
+        tempHostName,
+        serverAddress);
+}
+
+TEST_F(CloudStreamSocketTest, shutdown)
+{
+    const char* tempHostName = "bla.bla";
+    SocketAddress serverAddress(HostAddress::localhost, 20000 + (rand() % 32000));
+
+    nx::network::SocketGlobals::addressResolver().addFixedAddress(
+        tempHostName,
+        serverAddress);
 
     test::shutdownSocket(
         createServerSocketFunc,

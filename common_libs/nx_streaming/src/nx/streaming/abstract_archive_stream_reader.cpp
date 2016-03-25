@@ -130,11 +130,11 @@ void QnAbstractArchiveStreamReader::run()
 
         if (videoData && videoData->channelNumber>CL_MAX_CHANNEL_NUMBER-1)
         {
-            Q_ASSERT(false);
+            NX_ASSERT(false);
             continue;
         }
 
-        if (videoData && needKeyData())
+        if (videoData && needKeyData(videoData->channelNumber))
         {
             if (videoData->flags & AV_PKT_FLAG_KEY)
                 m_gotKeyFrame[videoData->channelNumber]++;

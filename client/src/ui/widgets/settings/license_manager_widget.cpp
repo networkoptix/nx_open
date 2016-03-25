@@ -8,7 +8,6 @@
 
 #include <QtWidgets/QAbstractItemView>
 #include <QtWidgets/QTreeWidgetItem>
-#include <QtWidgets/QMessageBox>
 
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>

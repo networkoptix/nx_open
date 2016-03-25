@@ -23,3 +23,29 @@ void PrintTo(const QString& val, ::std::ostream* os) {
 void PrintTo(const SocketAddress& val, ::std::ostream* os) {
     *os << val.toString().toStdString();
 }
+
+namespace std {
+namespace chrono {
+
+void PrintTo(const milliseconds& val, ::std::ostream* os)
+{
+    *os << val.count() << "ms";
+}
+
+void PrintTo(const seconds& val, ::std::ostream* os)
+{
+    *os << val.count() << "s";
+}
+
+void PrintTo(const microseconds& val, ::std::ostream* os)
+{
+    *os << val.count() << "usec";
+}
+
+void PrintTo(const nanoseconds& val, ::std::ostream* os)
+{
+    *os << val.count() << "nanosec";
+}
+
+}   //chrono
+}   //std

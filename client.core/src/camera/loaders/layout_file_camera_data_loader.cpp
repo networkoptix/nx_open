@@ -21,7 +21,7 @@ QnLayoutFileCameraDataLoader::QnLayoutFileCameraDataLoader(const QnAviResourcePt
     QnAbstractCameraDataLoader(resource, dataType, parent),
     m_aviResource(resource)
 {
-    Q_ASSERT_X(m_aviResource, Q_FUNC_INFO, "Resource must exist");
+    NX_ASSERT(m_aviResource, Q_FUNC_INFO, "Resource must exist");
 
     /* Preload recording data. */
     if (dataType != Qn::RecordingContent)
@@ -66,7 +66,7 @@ int QnLayoutFileCameraDataLoader::loadMotion(const QList<QRegion> &motionRegions
 
             for (auto itr = m_motionData.begin(); itr != m_motionData.end(); ++itr)
             {
-                if (itr->channel <= motionRegions.size() && QnMetaDataV1::matchImage((__m128i*) itr->data, (__m128i*) masks[itr->channel]))
+                if (itr->channel <= motionRegions.size() && QnMetaDataV1::matchImage((simd128i*) itr->data, (simd128i*) masks[itr->channel]))
                     periods.rbegin()->push_back(QnTimePeriod(itr->startTimeMs, itr->durationMs));
             }
         }
@@ -97,7 +97,7 @@ int QnLayoutFileCameraDataLoader::load(const QString &filter, const qint64 resol
             qWarning() << "empty motion region";
         }
     default:
-        Q_ASSERT_X(false, Q_FUNC_INFO, "Should never get here");
+        NX_ASSERT(false, Q_FUNC_INFO, "Should never get here");
         return 0;
     }
 }

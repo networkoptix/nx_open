@@ -30,9 +30,6 @@ private slots:
     void at_bookmarksModeAction_triggered();
 
 private:
-    ec2::AbstractECConnectionPtr connection() const;
-
-private:
     /** If 'Press Ctrl-B' hint was already displayed for the current user. */
     bool m_hintDisplayed;
 };

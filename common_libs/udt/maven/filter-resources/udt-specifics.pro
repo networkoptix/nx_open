@@ -1,6 +1,3 @@
-TEMPLATE = lib
-CONFIG += console
-
 win* {
     DEFINES += UDT_API=__declspec(dllexport)
 }

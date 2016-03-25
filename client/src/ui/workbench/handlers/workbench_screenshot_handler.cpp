@@ -7,7 +7,6 @@
 
 #include <QtWidgets/QAction>
 #include <QtWidgets/QComboBox>
-#include <QtWidgets/QMessageBox>
 
 #include <camera/cam_display.h>
 #include <camera/single_thumbnail_loader.h>
@@ -20,6 +19,8 @@
 #include <core/resource/media_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
+
+#include <platform/environment.h>
 
 #include <transcoding/filters/contrast_image_filter.h>
 #include <transcoding/filters/fisheye_image_filter.h>
@@ -39,7 +40,6 @@
 #include <ui/help/help_topic_accessor.h>
 
 #include <utils/common/string.h>
-#include <utils/common/environment.h>
 #include <utils/common/warnings.h>
 #include <utils/aspect_ratio.h>
 
@@ -594,7 +594,7 @@ void QnWorkbenchScreenshotHandler::takeScreenshot(QnMediaResourceWidget *widget,
         localParameters.rotationAngle = 0;
     } else {
         QnVirtualCameraResourcePtr camera = widget->resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
-        Q_ASSERT_X(camera, Q_FUNC_INFO, "Camera must exist here");
+        NX_ASSERT(camera, Q_FUNC_INFO, "Camera must exist here");
         if (camera)
             imageProvider = new QnSingleThumbnailLoader(camera, localParameters.utcTimestampMsec, 0);
         else

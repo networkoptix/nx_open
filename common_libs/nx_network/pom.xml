@@ -23,12 +23,12 @@
         <global.libs>-lnx_utils -lnx_streaming -ludt</global.libs>
         <ffmpeg.libs/>
         <!--Specific os libs used-->
-        <windows.oslibs>-lcommon -lws2_32 DbgHelp.lib -lIphlpapi -lOle32 -lsigar -lSecur32 -lwinmm -lssleay32 -llibeay32</windows.oslibs>
+        <windows.oslibs>-lcommon -lws2_32 DbgHelp.lib -lIphlpapi -lOle32  -lSecur32 -lwinmm</windows.oslibs>
         <windows.oslibs.release/>
         <windows.oslibs.debug/>
-        <linux.oslibs>-lssl -lcrypto -lsigar -lswscale -lquazip</linux.oslibs>
-        <mac.oslibs>-framework IOKit -framework CoreFoundation -lcrypto -lssl -lz -framework QtConcurrent -lsigar-universal64-macosx</mac.oslibs>
-        <android.oslibs>-lssl -lcrypto -lz</android.oslibs>
+        <linux.oslibs>-lswscale</linux.oslibs>
+        <mac.oslibs>-framework IOKit -framework CoreFoundation  -lz -framework QtConcurrent</mac.oslibs>
+        <android.oslibs>-lz</android.oslibs>
         <!--Global defines-->
         <global.defines/>
         <!--Specific os defines-->
@@ -38,6 +38,10 @@
         <android.defines/>
         <ios.defines/>
         <buildLib>sharedLib</buildLib>
+        <rdep.packages>openssl</rdep.packages>
+        <rdep.windows.packages>quazip</rdep.windows.packages>
+        <rdep.linux.packages>quazip</rdep.linux.packages>
+        <rdep.mac.packages>quazip</rdep.mac.packages>
     </properties>
 
     <dependencies>
@@ -56,7 +60,7 @@
             <version>${project.version}</version>
             <type>pom</type>
             <scope>system</scope>
-            <systemPath>${root.dir}/common_libs/nx_network/pom.xml</systemPath>
+            <systemPath>${root.dir}/common_libs/nx_streaming/pom.xml</systemPath>
         </dependency>
  
         <dependency>
@@ -71,11 +75,30 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>udt</artifactId>
-            <version>4.11.0-SNAPSHOT</version>
+            <version>${project.version}</version>
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/common_libs/udt/pom.xml</systemPath>
         </dependency>
     </dependencies>
 
+    <profiles>
+        <profile>
+            <id>linux-arm-bpi</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>bpi</value>
+                </property>
+            </activation>
+            <properties>
+                <rdep.linux.packages>quazip opengl-es-mali</rdep.linux.packages>
+            </properties>
+        </profile>
+    </profiles>
 </project>

@@ -64,7 +64,7 @@ void GLFence::sync()
                 continue;
 
             default:
-                Q_ASSERT( false );
+                NX_ASSERT( false );
                 return;
         }
     }*/
@@ -92,7 +92,7 @@ bool GLFence::trySync()
                 return false;
 
             default:
-                Q_ASSERT( false );
+                NX_ASSERT( false );
                 return false;
         }
     }*/

@@ -9,7 +9,7 @@
 #include <QtSql/QSqlError>
 #include "qcoreapplication.h"
 
-//TODO #AK QnDbTransaction is a bad name for this class since it actually lives beyond DB transaction 
+//TODO #AK QnDbTransaction is a bad name for this class since it actually lives beyond DB transaction
     //and no concurrent transactions supported. Maybe QnDbConnection?
 QnDbHelper::QnDbTransaction::QnDbTransaction(QSqlDatabase& database, QnReadWriteLock& mutex):
     m_database(database),
@@ -50,7 +50,7 @@ bool QnDbHelper::QnDbTransaction::commit()
     return rez;
 }
 
-QnDbHelper::QnDbTransactionLocker::QnDbTransactionLocker(QnDbTransaction* tran): 
+QnDbHelper::QnDbTransactionLocker::QnDbTransactionLocker(QnDbTransaction* tran):
     m_committed(false),
     m_tran(tran)
 {
@@ -107,13 +107,25 @@ QList<QByteArray> quotedSplit(const QByteArray& data)
 
 bool QnDbHelper::execSQLQuery(const QString& queryStr, QSqlDatabase& database, const char* details) {
     QSqlQuery query(database);
-    query.prepare(queryStr);
-    return execSQLQuery(&query, details);
+    return prepareSQLQuery(&query, queryStr, details) && execSQLQuery(&query, details);
 }
 
 bool QnDbHelper::execSQLQuery(QSqlQuery *query, const char* details) {
-    if (!query->exec()) {
+    if (!query->exec())
+    {
         qWarning() << details << query->lastError().text();
+        NX_ASSERT(false, details, "Unable to execute SQL query");
+        return false;
+    }
+    return true;
+}
+
+bool QnDbHelper::prepareSQLQuery(QSqlQuery *query, const QString &queryStr, const char* details)
+{
+    if (!query->prepare(queryStr))
+    {
+        qWarning() << details << query->lastError().text();
+        NX_ASSERT(false, details, "Unable to prepare SQL query");
         return false;
     }
     return true;
@@ -136,12 +148,10 @@ bool QnDbHelper::execSQLScript(const QByteArray& scriptData, QSqlDatabase& datab
         if (command.isEmpty())
             continue;
         QSqlQuery ddlQuery(database);
-        ddlQuery.prepare(command);
-        if (!ddlQuery.exec()) {
-            qWarning() << "Error executing query:" << command;
-            qWarning() << "Error:" << ddlQuery.lastError().text();
+        if (!prepareSQLQuery(&ddlQuery, command, Q_FUNC_INFO))
             return false;
-        }
+        if (!execSQLQuery(&ddlQuery, Q_FUNC_INFO))
+            return false;
     }
     return true;
 }
@@ -177,7 +187,7 @@ bool QnDbHelper::isObjectExists(const QString& objectType, const QString& object
 
 void QnDbHelper::addDatabase(const QString& fileName, const QString& dbname)
 {
-    QFileInfo dirInfo(fileName);    
+    QFileInfo dirInfo(fileName);
     if (!QDir().mkpath(dirInfo.absoluteDir().path()))
         qWarning() << "can't create folder for sqlLite database!\n" << fileName;
     m_connectionName = dbname;
@@ -220,7 +230,7 @@ bool QnDbHelper::applyUpdates(const QString &dirName) {
     for(const QFileInfo& entry: dir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files, QDir::Name))
     {
         QString fileName = entry.absoluteFilePath();
-        if (!existUpdates.contains(fileName)) 
+        if (!existUpdates.contains(fileName))
         {
             if (!beforeInstallUpdate(fileName))
                 return false;

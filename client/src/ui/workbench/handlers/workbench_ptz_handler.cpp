@@ -2,7 +2,6 @@
 
 #include <QtCore/QEventLoop>
 #include <QtCore/QTimer>
-#include <QtWidgets/QMessageBox>
 
 #include <api/app_server_connection.h>
 
@@ -242,7 +241,7 @@ void QnWorkbenchPtzHandler::at_ptzManageAction_triggered() {
         return;
 
     QnPtzManageDialog* dialog = QnPtzManageDialog::instance();
-    assert(dialog);
+    NX_ASSERT(dialog);
 
     if (dialog->isVisible() && !dialog->tryClose(false))
         return;

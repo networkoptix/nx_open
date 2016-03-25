@@ -22,10 +22,18 @@ public:
             .WillByDefault(::testing::Return(SocketAddress()));
     }
 
+    // gmock does not support move :(
+    void sendRequest(stun::Message message, RequestHandler handler) override
+    {
+        sendRequest(
+            std::move(message),
+            std::make_shared<RequestHandler>(std::move(handler)));
+    }
+
     MOCK_METHOD2(connect, void(SocketAddress, bool));
     MOCK_METHOD2(setIndicationHandler, bool(int, IndicationHandler));
     MOCK_METHOD1(ignoreIndications, bool(int));
-    MOCK_METHOD2(sendRequest, void(stun::Message, RequestHandler));
+    MOCK_METHOD2(sendRequest, void(stun::Message, std::shared_ptr<RequestHandler>));
     MOCK_CONST_METHOD0(localAddress, SocketAddress());
     MOCK_CONST_METHOD0(remoteAddress, SocketAddress());
     MOCK_METHOD1(closeConnection, void(SystemError::ErrorCode));

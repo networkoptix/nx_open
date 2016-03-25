@@ -26,3 +26,4 @@ INCLUDEPATH += ${root.dir}/common_libs/nx_network/src/
   QMAKE_EXTRA_TARGETS += ext_debug ext_debug2
 }
 
+SOURCES += ${project.build.directory}/mediaserver_core_app_info_impl.cpp

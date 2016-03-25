@@ -242,7 +242,7 @@ namespace
         switch(filter.orderBy.column)
         {
         case Qn::BookmarkName:
-            return kOrderByTemplate.arg(lit("name"), order);
+            return kOrderByTemplate.arg(lit("book.name"), order);
         case Qn::BookmarkStartTime:
             return kOrderByTemplate.arg(lit("startTimeMs"), order);
         case Qn::BookmarkDuration:
@@ -252,7 +252,7 @@ namespace
         case Qn::BookmarkTags:
             return lit(""); // No sort by db
         default:
-            Q_ASSERT_X(false, Q_FUNC_INFO, "Invalid sorting column value!");
+            NX_ASSERT(false, Q_FUNC_INFO, "Invalid sorting column value!");
             return lit("");
         }
     };
@@ -273,7 +273,7 @@ namespace
         case Qn::BookmarkTags:
             return QnCameraBookmarkSearchFilter::kNoLimit; // No limit for manually sorted sequences!
         default:
-            Q_ASSERT_X(false, Q_FUNC_INFO, "Invalid sorting column value!");
+            NX_ASSERT(false, Q_FUNC_INFO, "Invalid sorting column value!");
             return QnCameraBookmarkSearchFilter::kNoLimit;
         }
     };
@@ -393,8 +393,8 @@ int QnServerDb::addAuditRecord(const QnAuditRecord& data)
 {
     QnWriteLocker lock(&m_mutex);
 
-    Q_ASSERT(data.eventType != Qn::AR_NotDefined);
-    Q_ASSERT((data.eventType & (data.eventType-1)) == 0);
+    NX_ASSERT(data.eventType != Qn::AR_NotDefined);
+    NX_ASSERT((data.eventType & (data.eventType-1)) == 0);
 
     if (!m_sdb.isOpen())
         return false;
@@ -421,8 +421,8 @@ int QnServerDb::updateAuditRecord(int internalId, const QnAuditRecord& data)
 
     if (!m_sdb.isOpen())
         return false;
-    Q_ASSERT(data.eventType != Qn::AR_NotDefined);
-    Q_ASSERT((data.eventType & (data.eventType-1)) == 0);
+    NX_ASSERT(data.eventType != Qn::AR_NotDefined);
+    NX_ASSERT((data.eventType & (data.eventType-1)) == 0);
 
     QSqlQuery updQuery(m_sdb);
     updQuery.prepare("UPDATE audit_log SET "
@@ -880,34 +880,40 @@ bool QnServerDb::getBookmarks(const QnVirtualCameraResourceList &cameras
 
     const auto limit = getBookmarksQueryLimit(filter);
 
-    QString queryStr = QString("SELECT \
-                     book.guid as guid, \
-                     book.start_time as startTimeMs, \
-                     book.duration as durationMs, \
-                     book.start_time + book.duration as endTimeMs, \
-                     book.name as name, \
-                     book.description as description, \
-                     book.timeout as timeout, \
-                     book.unique_id as cameraId, \
-                     group_concat(tag.name) as tags \
-                     FROM bookmarks book \
-                     LEFT JOIN bookmark_tags tag \
-                     ON book.guid = tag.bookmark_guid \
-                     %1 %2 %3"
-                     ).arg(filterText
-                     , "GROUP BY guid, startTimeMs, durationMs, endTimeMs, name, description, timeout, cameraId"
-                     , createBookmarksFilterSortPart(filter)) ;
+    QString queryStr = QString(
+        R"(
+            SELECT
+            book.guid as guid,
+            book.name as name,
+            book.start_time as startTimeMs,
+            book.duration as durationMs,
+            book.start_time + book.duration as endTimeMs,
+            book.description as description,
+            book.timeout as timeout,
+            book.unique_id as cameraId,
+            group_concat(tag.name) as tags
+            FROM bookmarks book
+            LEFT JOIN bookmark_tags tag
+            ON book.guid = tag.bookmark_guid
+            %1 %2 %3
+        )"
+            ).arg(filterText
+                , "GROUP BY guid, startTimeMs, durationMs, endTimeMs, book.name, description, timeout, cameraId"
+                , createBookmarksFilterSortPart(filter));
 
     {
         QnWriteLocker lock(&m_mutex);
         QSqlQuery query(m_sdb);
         query.setForwardOnly(true);
-        query.prepare(queryStr);
+        if (!prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+            return false;
 
-        auto checkedBind = [&query, &bindings](const QString &placeholder, const QVariant &value) {
+        auto checkedBind = [&query, &bindings](const QString &placeholder, const QVariant &value)
+        {
             if (!bindings.contains(placeholder))
                 return;
             query.bindValue(placeholder, value);
+            bindings.removeAll(placeholder);
         };
 
         index = 0;
@@ -933,6 +939,7 @@ bool QnServerDb::getBookmarks(const QnVirtualCameraResourceList &cameras
 
         checkedBind(":text", getFilterValue(filter.text));
 
+        NX_ASSERT(bindings.isEmpty(), Q_FUNC_INFO, "all bindings must be substituted");
         if (!execSQLQuery(&query, Q_FUNC_INFO))
             return false;
 
@@ -956,7 +963,7 @@ bool QnServerDb::getBookmarks(const QnVirtualCameraResourceList &cameras
 }
 
 bool QnServerDb::addBookmark(const QnCameraBookmark &bookmark) {
-    auto result = addOrUpdateBookmark(bookmark);
+    auto result = addOrUpdateBookmark(bookmark, false);
     if (result)
         updateBookmarkCount();
 
@@ -965,13 +972,14 @@ bool QnServerDb::addBookmark(const QnCameraBookmark &bookmark) {
 
 bool QnServerDb::updateBookmark(const QnCameraBookmark &bookmark)
 {
-    Q_ASSERT_X(bookmark.isValid(), Q_FUNC_INFO, "Invalid bookmarks must not be stored");
+    NX_ASSERT(bookmark.isValid(), Q_FUNC_INFO, "Invalid bookmarks must not be stored");
     if (!bookmark.isValid())
         return false;
 
     if (!containsBookmark(bookmark.guid))
         return false;
-    return addOrUpdateBookmark(bookmark);
+
+    return addOrUpdateBookmark(bookmark, true);
 }
 
 bool QnServerDb::containsBookmark(const QnUuid &bookmarkId) const
@@ -1017,23 +1025,27 @@ QnCameraBookmarkTagList QnServerDb::getBookmarkTags(int limit) {
 }
 
 
-bool QnServerDb::addOrUpdateBookmark( const QnCameraBookmark &bookmark) {
-    Q_ASSERT_X(bookmark.isValid(), Q_FUNC_INFO, "Invalid bookmark must not be stored in database");
+bool QnServerDb::addOrUpdateBookmark(const QnCameraBookmark &bookmark, bool isUpdate) {
+    NX_ASSERT(bookmark.isValid(), Q_FUNC_INFO, "Invalid bookmark must not be stored in database");
     if (!bookmark.isValid())
         return false;
+
+    const QString insertOrReplace = isUpdate ? lit("REPLACE") : lit("INSERT");
 
     QnDbTransactionLocker tran(getTransaction());
 
     int docId = 0;
     {
         QSqlQuery insQuery(m_sdb);
-        insQuery.prepare("INSERT OR REPLACE INTO bookmarks ( \
-                         guid, unique_id, start_time, duration, \
-                         name, description, timeout \
-                         ) VALUES ( \
-                         :guid, :cameraId, :startTimeMs, :durationMs, \
-                         :name, :description, :timeout \
-                         )");
+        insQuery.prepare(
+            insertOrReplace + lit(" INTO bookmarks ( \
+                guid, unique_id, start_time, duration, \
+                name, description, timeout \
+            ) VALUES ( \
+                :guid, :cameraId, :startTimeMs, :durationMs, \
+                :name, :description, :timeout \
+            )"));
+
         QnSql::bind(bookmark, &insQuery);
         if (!execSQLQuery(&insQuery, Q_FUNC_INFO))
             return false;
@@ -1041,6 +1053,7 @@ bool QnServerDb::addOrUpdateBookmark( const QnCameraBookmark &bookmark) {
         docId = insQuery.lastInsertId().toInt();
     }
 
+    if (isUpdate)
     {
         QSqlQuery cleanTagQuery(m_sdb);
         cleanTagQuery.prepare("DELETE FROM bookmark_tags WHERE bookmark_guid = ?");
@@ -1077,7 +1090,13 @@ bool QnServerDb::addOrUpdateBookmark( const QnCameraBookmark &bookmark) {
 
     {
         QSqlQuery query(m_sdb);
-        query.prepare("INSERT OR REPLACE INTO fts_bookmarks (docid, name, description, tags) VALUES ( :docid, :name, :description, :tags )");
+        query.prepare(
+            insertOrReplace + lit(" INTO fts_bookmarks (\
+                docid, name, description, tags \
+            ) VALUES ( \
+                :docid, :name, :description, :tags \
+            )"));
+
         query.bindValue(":docid", docId);
         query.bindValue(":name", bookmark.name);
         query.bindValue(":description", bookmark.description);
@@ -1104,7 +1123,7 @@ void QnServerDb::updateBookmarkCount()
             return;
 
         if (!query.next()) {
-            Q_ASSERT_X(false, Q_FUNC_INFO, "Query has failed!");
+            NX_ASSERT(false, Q_FUNC_INFO, "Query has failed!");
             return;
         }
 
@@ -1238,7 +1257,7 @@ void QnServerDb::setBookmarkCountController(std::function<void(size_t)> handler)
 {
     {
         QnWriteLocker lock(&m_mutex);
-        Q_ASSERT_X( !m_updateBookmarkCount, Q_FUNC_INFO, "controller is already set!" );
+        NX_ASSERT( !m_updateBookmarkCount, Q_FUNC_INFO, "controller is already set!" );
         m_updateBookmarkCount = std::move(handler);
     }
     updateBookmarkCount();

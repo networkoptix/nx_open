@@ -22,7 +22,7 @@ public:
         QObject(parent), 
         scene(scene) 
     {
-        assert(scene);
+        NX_ASSERT(scene);
     }
 
     virtual ~GraphicsWidgetSceneData() {

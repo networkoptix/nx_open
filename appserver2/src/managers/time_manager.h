@@ -30,7 +30,7 @@
 #include <nx/utils/thread/mutex.h>
 
 /*! \page time_sync Time synchronization in cluster
-    Server system time is never changed. To adjust server times means, adjust server "delta" which server adds to it's time. 
+    Server system time is never changed. To adjust server times means, adjust server "delta" which server adds to it's time.
     To change/adjust server time - means to adjust it's delta.
 
     PTS(primary time server) (if any) pushes it's time to other servers( adjusts other servers' time):\n
@@ -47,7 +47,7 @@
 
     In case if there is ambiguity in choosing PTS automatically, random server is chosen as PTS and notification sent to client.
 
-    Once PTS pushed it's time to the server, server marks it's time as actual time. Time remains actual till server is restarted. 
+    Once PTS pushed it's time to the server, server marks it's time as actual time. Time remains actual till server is restarted.
     If there is no PTS in the system, new server( just connected) takes time from any server with actual time.
 
     Client should offer user to select PTS if there is no PTS in the system and there are at least 2 servers in the system with actual time more than 500 ms different.
@@ -57,8 +57,6 @@
 
 namespace ec2
 {
-    struct ResourceContext;
-
     /*!
         \note \a sequence has less priority than \a TimeSynchronizationManager::peerIsServer and \a TimeSynchronizationManager::peerTimeSynchronizedWithInternetServer flags
     */
@@ -132,7 +130,7 @@ namespace ec2
             TODO #ak look like incapsulation failure. Better remove this method
         */
         void start();
-        
+
         //!Returns synchronized time (millis from epoch, UTC)
         qint64 getSyncTime() const;
         ApiTimeData getTimeInfo() const;
@@ -154,7 +152,6 @@ namespace ec2
             const QnUuid& peerID,
             const nx_http::StringType& serializedTimeSync,
             boost::optional<qint64> requestRttMillis);
-        void setContext(const ResourceContext& resCtx);
 
     signals:
         //!Emitted when there is ambiguity while choosing primary time server automatically
@@ -199,7 +196,7 @@ namespace ec2
             nx_http::AuthInfoCache::AuthorizationCacheItem authData;
             TimerManager::TimerGuard syncTimerID;
             nx_http::AsyncHttpClientPtr httpClient;
-            //!request round-trip time 
+            //!request round-trip time
             boost::optional<qint64> rttMillis;
 
             PeerContext(
@@ -254,7 +251,6 @@ namespace ec2
         bool m_timeSynchronized;
         int m_internetSynchronizationFailureCount;
         std::map<QnUuid, PeerContext> m_peersToSendTimeSyncTo;
-        ResourceContext m_resCtx;
 
         /*!
             \param lock Locked \a m_mutex. This method will unlock it to emit \a TimeSynchronizationManager::timeChanged signal

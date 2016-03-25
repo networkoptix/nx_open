@@ -37,7 +37,7 @@ QString SmtpClient::toString( ConnectionType connectionType )
         case TlsConnection:
             return lit("TlsConnection");
         default:
-            assert(false);
+            NX_ASSERT(false);
             return lit("unknown");
     }
 }
@@ -453,7 +453,7 @@ void SmtpClient::waitForResponse()
     {
         nx_http::ConstBufferRefType lineBufferRef;
         size_t bytesParsed = 0;
-        assert( bufPos <= readBuffer.size() );
+        NX_ASSERT( bufPos <= readBuffer.size() );
         if( bufPos == readBuffer.size() ||
             !m_lineSpliter.parseByLines(
                 nx_http::ConstBufferRefType( readBuffer, bufPos, readBuffer.size() ),

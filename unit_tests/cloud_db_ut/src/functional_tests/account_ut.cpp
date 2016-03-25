@@ -20,7 +20,8 @@
 
 #include "email_manager_mocked.h"
 #include "test_setup.h"
-#include "version.h"
+
+#include <utils/common/app_info.h>
 
 
 namespace nx {
@@ -39,7 +40,7 @@ TEST_F(CdbFunctionalTest, account_activation)
         });
 
     //waiting for cloud_db initialization
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     api::ResultCode result = api::ResultCode::ok;
 
@@ -48,7 +49,7 @@ TEST_F(CdbFunctionalTest, account_activation)
     api::AccountConfirmationCode activationCode;
     result = addAccount(&account1, &account1Password, &activationCode);
     ASSERT_EQ(result, api::ResultCode::ok);
-    ASSERT_EQ(account1.customization, QN_CUSTOMIZATION_NAME);
+    ASSERT_EQ(account1.customization, QnAppInfo::customizationName());
     ASSERT_TRUE(!activationCode.code.empty());
 
     //only /account/activate and /account/reactivate are allowed for not activated account
@@ -69,7 +70,7 @@ TEST_F(CdbFunctionalTest, account_activation)
 
     result = getAccount(account1.email, account1Password, &account1);
     ASSERT_EQ(api::ResultCode::ok, result);
-    ASSERT_EQ(QN_CUSTOMIZATION_NAME, account1.customization);
+    ASSERT_EQ(QnAppInfo::customizationName(), account1.customization);
     ASSERT_EQ(api::AccountStatus::activated, account1.statusCode);
 }
 
@@ -86,7 +87,7 @@ TEST_F(CdbFunctionalTest, account_reactivation)
         });
 
     //waiting for cloud_db initialization
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     api::ResultCode result = api::ResultCode::ok;
 
@@ -95,7 +96,7 @@ TEST_F(CdbFunctionalTest, account_reactivation)
     api::AccountConfirmationCode activationCode;
     result = addAccount(&account1, &account1Password, &activationCode);
     ASSERT_EQ(result, api::ResultCode::ok);
-    ASSERT_EQ(account1.customization, QN_CUSTOMIZATION_NAME);
+    ASSERT_EQ(account1.customization, QnAppInfo::customizationName());
     ASSERT_TRUE(!activationCode.code.empty());
 
     //reactivating account (e.g. we lost activation code)
@@ -113,7 +114,7 @@ TEST_F(CdbFunctionalTest, account_reactivation)
 
     result = getAccount(account1.email, account1Password, &account1);
     ASSERT_EQ(api::ResultCode::ok, result);
-    ASSERT_EQ(QN_CUSTOMIZATION_NAME, account1.customization);
+    ASSERT_EQ(QnAppInfo::customizationName(), account1.customization);
     ASSERT_EQ(api::AccountStatus::activated, account1.statusCode);
 
     //subsequent activation MUST fail
@@ -142,7 +143,7 @@ TEST_F(CdbFunctionalTest, account_reactivation_activated_account)
         });
 
     //waiting for cloud_db initialization
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     api::ResultCode result = api::ResultCode::ok;
     api::AccountData account1;
@@ -152,7 +153,7 @@ TEST_F(CdbFunctionalTest, account_reactivation_activated_account)
 
     result = getAccount(account1.email, account1Password, &account1);
     ASSERT_EQ(api::ResultCode::ok, result);
-    ASSERT_EQ(QN_CUSTOMIZATION_NAME, account1.customization);
+    ASSERT_EQ(QnAppInfo::customizationName(), account1.customization);
     ASSERT_EQ(api::AccountStatus::activated, account1.statusCode);
 
     //reactivating account (e.g. we lost activation code)
@@ -174,7 +175,7 @@ TEST_F(CdbFunctionalTest, account_general)
         });
 
     //waiting for cloud_db initialization
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     api::ResultCode result = api::ResultCode::ok;
 
@@ -193,7 +194,7 @@ TEST_F(CdbFunctionalTest, account_general)
     {
         const auto result = bindRandomSystem(account1.email, account1Password, &system1);
         ASSERT_EQ(result, api::ResultCode::ok);
-        ASSERT_EQ(system1.customization, QN_CUSTOMIZATION_NAME);
+        ASSERT_EQ(system1.customization, QnAppInfo::customizationName());
     }
 
     {
@@ -263,7 +264,7 @@ TEST_F(CdbFunctionalTest, account_badRegistration)
             return std::make_unique<EmailManagerStub>(&mockedEmailManager);
         });
 
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     api::ResultCode result = api::ResultCode::ok;
 
@@ -310,7 +311,7 @@ TEST_F(CdbFunctionalTest, account_badRegistration)
 TEST_F(CdbFunctionalTest, account_requestQueryDecode)
 {
     //waiting for cloud_db initialization
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     api::ResultCode result = api::ResultCode::ok;
 
@@ -326,7 +327,7 @@ TEST_F(CdbFunctionalTest, account_requestQueryDecode)
     api::AccountConfirmationCode activationCode;
     result = addAccount(&account1, &account1Password, &activationCode);
     ASSERT_EQ(result, api::ResultCode::ok);
-    ASSERT_EQ(account1.customization, QN_CUSTOMIZATION_NAME);
+    ASSERT_EQ(account1.customization, QnAppInfo::customizationName());
     ASSERT_TRUE(!activationCode.code.empty());
 
     std::string activatedAccountEmail;
@@ -342,14 +343,14 @@ TEST_F(CdbFunctionalTest, account_requestQueryDecode)
     account1.email = "test@yandex.ru";
     result = getAccount(account1.email, account1Password, &account1);
     ASSERT_EQ(result, api::ResultCode::ok);
-    ASSERT_EQ(account1.customization, QN_CUSTOMIZATION_NAME);
+    ASSERT_EQ(account1.customization, QnAppInfo::customizationName());
     ASSERT_EQ(account1.statusCode, api::AccountStatus::activated);
     ASSERT_EQ(account1.email, "test@yandex.ru");
 }
 
 TEST_F(CdbFunctionalTest, account_update)
 {
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     api::AccountData account1;
     std::string account1Password;
@@ -399,7 +400,7 @@ TEST_F(CdbFunctionalTest, account_resetPassword_general)
             return std::make_unique<EmailManagerStub>(&mockedEmailManager);
         });
 
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     for (int i = 0; i < 2; ++i)
     {
@@ -463,7 +464,7 @@ TEST_F(CdbFunctionalTest, account_resetPassword_expiration)
     addArg("-accountManager/passwordResetCodeExpirationTimeoutSec");
     addArg(QByteArray::number((unsigned int)expirationPeriod.count()).constData());
 
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     //adding account
     api::AccountData account1;
@@ -508,7 +509,7 @@ TEST_F(CdbFunctionalTest, account_resetPassword_expiration)
 //checks that password reset code is valid for changing password only
 TEST_F(CdbFunctionalTest, account_resetPassword_authorization)
 {
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     //adding account
     api::AccountData account1;
@@ -601,7 +602,7 @@ TEST_F(CdbFunctionalTest, account_resetPassword_authorization)
 
 TEST_F(CdbFunctionalTest, account_reset_password_activates_account)
 {
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     //adding account
     api::AccountData account1;
@@ -609,7 +610,7 @@ TEST_F(CdbFunctionalTest, account_reset_password_activates_account)
     api::AccountConfirmationCode activationCode;
     api::ResultCode result = addAccount(&account1, &account1Password, &activationCode);
     ASSERT_EQ(result, api::ResultCode::ok);
-    ASSERT_EQ(account1.customization, QN_CUSTOMIZATION_NAME);
+    ASSERT_EQ(account1.customization, QnAppInfo::customizationName());
     ASSERT_TRUE(!activationCode.code.empty());
 
     //user did not activate account and forgot password

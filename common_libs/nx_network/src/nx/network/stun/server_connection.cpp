@@ -80,14 +80,14 @@ void ServerConnection::processMessage( Message message )
             break;
 
         default:
-            Q_ASSERT( false );  //not supported yet
+            NX_ASSERT( false );  //not supported yet
     }
 }
 
 void ServerConnection::setDestructHandler( std::function< void() > handler )
 {
     QnMutexLocker lk( &m_mutex );
-    Q_ASSERT_X( !(handler && m_destructHandler), Q_FUNC_INFO,
+    NX_ASSERT( !(handler && m_destructHandler), Q_FUNC_INFO,
                 "Can not set new hadler while previous is not removed" );
 
     m_destructHandler = std::move( handler );
@@ -107,13 +107,15 @@ void ServerConnection::processBindingRequest( Message message )
 
 void ServerConnection::processCustomRequest( Message message )
 {
+    const auto messageHeader = message.header;
+
     if (m_dispatcher.dispatchRequest(shared_from_this(), std::move(message)))
         return;
 
     stun::Message response(stun::Header(
         stun::MessageClass::errorResponse,
-        message.header.method,
-        std::move(message.header.transactionId)));
+        messageHeader.method,
+        std::move(messageHeader.transactionId)));
 
     // TODO: verify with RFC
     response.newAttribute< stun::attrs::ErrorDescription >(

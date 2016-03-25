@@ -6,6 +6,7 @@
 #ifndef COMMON_PRINTERS_H
 #define COMMON_PRINTERS_H
 
+#include <chrono>
 #include <iostream>
 
 #include <QByteArray>
@@ -18,5 +19,14 @@
 void PrintTo(const QByteArray& val, ::std::ostream* os);
 void PrintTo(const QString& val, ::std::ostream* os);
 void PrintTo(const SocketAddress& val, ::std::ostream* os);
+
+namespace std {
+namespace chrono {
+void PrintTo(const milliseconds& val, ::std::ostream* os);
+void PrintTo(const seconds& val, ::std::ostream* os);
+void PrintTo(const microseconds& val, ::std::ostream* os);
+void PrintTo(const nanoseconds& val, ::std::ostream* os);
+}   //chrono
+}   //std
 
 #endif  //COMMON_PRINTERS_H

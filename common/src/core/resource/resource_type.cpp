@@ -4,11 +4,13 @@
 
 #include <nx/utils/log/log.h>
 
-const QString QnResourceTypePool::desktopCameraTypeName = lit("SERVER_DESKTOP_CAMERA");
+const QString QnResourceTypePool::kDesktopCameraTypeName(lit("SERVER_DESKTOP_CAMERA"));
 const QString QnResourceTypePool::kLayoutTypeId(lit("Layout"));
 const QString QnResourceTypePool::kServerTypeId(lit("Server"));
 const QString QnResourceTypePool::kVideoWallTypeId(lit("Videowall"));
 const QString QnResourceTypePool::kWebPageTypeId(lit("WebPage"));
+const QString QnResourceTypePool::kStorageTypeId(lit("Storage"));
+const QString QnResourceTypePool::kUserTypeId(lit("User"));
 
 
 QnResourceType::QnResourceType()
@@ -86,7 +88,7 @@ QList<QnUuid> QnResourceType::allParentList() const
 
 void QnResourceType::addParamType(const QString& name, const QString& defaultValue)
 {
-    QnMutexLocker lock( &m_allParamTypeListCacheMutex ); // in case of connect to anther app server 
+    QnMutexLocker lock( &m_allParamTypeListCacheMutex ); // in case of connect to anther app server
     m_paramTypeList.insert(name, defaultValue);
 }
 
@@ -196,7 +198,7 @@ QnUuid QnResourceTypePool::getResourceTypeId(const QString& manufacture, const Q
     if (showWarning)
         NX_LOG( lit("Cannot find resource type for manufacturer: %1, model name: %2").arg(manufacture).arg(name), cl_logDEBUG2 );
 
-    // Q_ASSERT(false);
+    // NX_ASSERT(false);
     return QnUuid();
 }
 
@@ -206,7 +208,7 @@ QnUuid QnResourceTypePool::getFixedResourceTypeId(const QString& name) const {
 #ifdef _DEBUG
     QnUuid online = getResourceTypeId(QString(), name, false);
     if (!online.isNull())
-        Q_ASSERT(result == online);
+        NX_ASSERT(result == online);
 #endif
 
     return result;
@@ -255,7 +257,8 @@ QnResourceTypePtr QnResourceTypePool::desktopCameraResourceType() const {
     {
         for(auto itr = m_resourceTypeMap.begin(); itr != m_resourceTypeMap.end(); ++itr)
         {
-            if (itr.value()->getName() == desktopCameraTypeName) {
+            if (itr.value()->getName() == kDesktopCameraTypeName)
+            {
                 m_desktopCamResourceType = itr.value();
                 break;
             }

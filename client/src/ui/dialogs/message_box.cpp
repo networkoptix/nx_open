@@ -7,6 +7,7 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/skin.h>
+#include <ui/style/custom_style.h>
 
 #include <ui/workaround/cancel_drag.h>
 
@@ -18,14 +19,16 @@ class QnMessageBoxPrivate : public QObject
 public:
     QAbstractButton *clickedButton;
     QList<QAbstractButton *> customButtons;
-    QPushButton *defaultButton;
+    QAbstractButton *defaultButton;
     QAbstractButton *escapeButton;
     QnMessageBox::Icon icon;
 
     QnMessageBoxPrivate(QnMessageBox *parent);
 
     void init();
+    void detectDefaultButton();
     void detectEscapeButton();
+    void stylizeButtons();
     int execReturnCode(QAbstractButton *button) const;
 };
 
@@ -57,6 +60,32 @@ void QnMessageBoxPrivate::init()
     q->ui->mainLabel->setForegroundRole(QPalette::Light);
 
     detectEscapeButton();
+    detectDefaultButton();
+}
+
+void QnMessageBoxPrivate::detectDefaultButton()
+{
+    Q_Q(QnMessageBox);
+
+    // Ok button automatically becomes default button
+    defaultButton = q->ui->buttonBox->button(QDialogButtonBox::Ok);
+    if (defaultButton)
+        return;
+
+    // if the message box has one AcceptRole button, make it the default button
+    for (QAbstractButton *button: q->buttons())
+    {
+        if (q->buttonRole(button) == QDialogButtonBox::AcceptRole)
+        {
+            if (defaultButton)
+            {
+                // already detected!
+                defaultButton = nullptr;
+                break;
+            }
+            defaultButton = button;
+        }
+    }
 }
 
 void QnMessageBoxPrivate::detectEscapeButton()
@@ -68,7 +97,7 @@ void QnMessageBoxPrivate::detectEscapeButton()
     if (escapeButton)
         return;
 
-    // If there is only one button, make it the escape button
+    // If there is only one button and it doesn't have AcceptRole, make it the escape button
     const QList<QAbstractButton *> buttons = q->buttons();
     if (buttons.size() == 1)
     {
@@ -77,9 +106,9 @@ void QnMessageBoxPrivate::detectEscapeButton()
     }
 
     // if the message box has one RejectRole button, make it the escape button
-    for (int i = 0; i < buttons.size(); ++i)
+    for (QAbstractButton *button: q->buttons())
     {
-        if (q->buttonRole(buttons[i]) == QDialogButtonBox::RejectRole)
+        if (q->buttonRole(button) == QDialogButtonBox::RejectRole)
         {
             if (escapeButton)
             {
@@ -87,7 +116,7 @@ void QnMessageBoxPrivate::detectEscapeButton()
                 escapeButton = nullptr;
                 break;
             }
-            escapeButton = buttons[i];
+            escapeButton = button;
         }
     }
 
@@ -108,6 +137,14 @@ void QnMessageBoxPrivate::detectEscapeButton()
             escapeButton = buttons[i];
         }
     }
+}
+
+void QnMessageBoxPrivate::stylizeButtons()
+{
+    Q_Q(QnMessageBox);
+
+    for (QAbstractButton *button: q->buttons())
+        setAccentStyle(button, button == defaultButton);
 }
 
 int QnMessageBoxPrivate::execReturnCode(QAbstractButton *button) const
@@ -199,6 +236,9 @@ void QnMessageBox::addButton(
 
     if (!d->escapeButton)
         d->detectEscapeButton();
+    if (!d->defaultButton)
+        d->detectDefaultButton();
+    d->stylizeButtons();
 }
 
 QPushButton *QnMessageBox::addButton(
@@ -211,6 +251,9 @@ QPushButton *QnMessageBox::addButton(
 
     if (!d->escapeButton)
         d->detectEscapeButton();
+    if (!d->defaultButton)
+        d->detectDefaultButton();
+    d->stylizeButtons();
 
     return addedButton;
 }
@@ -223,6 +266,9 @@ QPushButton *QnMessageBox::addButton(QDialogButtonBox::StandardButton button)
 
     if (!d->escapeButton)
         d->detectEscapeButton();
+    if (!d->defaultButton)
+        d->detectDefaultButton();
+    d->stylizeButtons();
 
     return addedButton;
 }
@@ -235,6 +281,9 @@ void QnMessageBox::removeButton(QAbstractButton *button)
     d->customButtons.removeOne(button);
     if (!ui->buttonBox->buttons().contains(d->escapeButton))
         d->detectEscapeButton();
+    if (!ui->buttonBox->buttons().contains(d->defaultButton))
+        d->detectDefaultButton();
+    d->stylizeButtons();
 }
 
 QList<QAbstractButton *> QnMessageBox::buttons() const
@@ -256,6 +305,9 @@ void QnMessageBox::setStandardButtons(
     ui->buttonBox->setStandardButtons(buttons);
     if (!ui->buttonBox->buttons().contains(d->escapeButton))
         d->detectEscapeButton();
+    if (!ui->buttonBox->buttons().contains(d->defaultButton))
+        d->detectDefaultButton();
+    d->stylizeButtons();
 }
 
 QDialogButtonBox::StandardButtons QnMessageBox::standardButtons() const
@@ -275,19 +327,24 @@ QPushButton *QnMessageBox::button(
     return ui->buttonBox->button(which);
 }
 
-QPushButton *QnMessageBox::defaultButton() const
+QAbstractButton *QnMessageBox::defaultButton() const
 {
     Q_D(const QnMessageBox);
     return d->defaultButton;
 }
 
-void QnMessageBox::setDefaultButton(QPushButton *button)
+void QnMessageBox::setDefaultButton(QAbstractButton *button)
 {
     if (!ui->buttonBox->buttons().contains(button))
         return;
 
-    button->setAutoDefault(true);
+    if (QPushButton *pushButton = qobject_cast<QPushButton*>(button))
+        pushButton->setAutoDefault(true);
     button->setFocus();
+
+    Q_D(QnMessageBox);
+
+    d->stylizeButtons();
 }
 
 void QnMessageBox::setDefaultButton(QDialogButtonBox::StandardButton button)
@@ -564,7 +621,8 @@ int QnMessageBox::exec()
     setWindowFlags(flags);
 
     /* We cannot cancel drag via modal dialog, let parent process it. */
-    cancelDrag(parentWidget());
+    if (parentWidget())
+        cancelDrag(parentWidget());
 
     adjustSize();
 

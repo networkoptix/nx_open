@@ -24,6 +24,12 @@
              </Directory>
         </DirectoryRef>
 
+        <ComponentGroup Id="TrayToolLibs" Directory="${customization}TrayToolDir">
+            <Component>
+                <File Id="TrayToolUtilsLib" Name="nx_utils.dll" Source="$(var.SourceDir)/nx_utils.dll" DiskId="3" />
+            </Component>
+        </ComponentGroup>        
+        
         <ComponentGroup Id="TrayToolQTLibraries" Directory="${customization}TrayToolDir">
             <Component>
                 <File Id="TrayToolQt5Core$(var.suffix).dll" Name="Qt5Core$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Core$(var.suffix).dll"  />       
@@ -38,13 +44,13 @@
                 <File Id="TrayToolQt5Network$(var.suffix).dll" Name="Qt5Network$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Network$(var.suffix).dll"  />
             </Component>
             <Component>
-                <File Id="TrayToolicudt55.dll" Name="icudt55.dll" Source="$(var.SourceDir)\icudt55.dll"  />                
+                <File Id="TrayToolicudt53.dll" Name="icudt53.dll" Source="$(var.SourceDir)\icudt53.dll"  />                
             </Component>                 
             <Component>
-                <File Id="TrayToolicuin55.dll" Name="icuin55.dll" Source="$(var.SourceDir)\icuin55.dll"  />                
+                <File Id="TrayToolicuin53.dll" Name="icuin53.dll" Source="$(var.SourceDir)\icuin53.dll"  />                
             </Component>                 
             <Component>
-                <File Id="TrayToolicuuc5.dll" Name="icuuc55.dll" Source="$(var.SourceDir)\icuuc55.dll"  />                
+                <File Id="TrayToolicuuc53.dll" Name="icuuc53.dll" Source="$(var.SourceDir)\icuuc53.dll"  />                
             </Component>                 
         </ComponentGroup>
 

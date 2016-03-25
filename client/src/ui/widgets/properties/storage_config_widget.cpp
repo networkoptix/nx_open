@@ -251,7 +251,7 @@ void QnStorageConfigWidget::initQualitiesCombo()
         case Qn::CameraBackup_Both:
             return tr("All streams", "Cameras Backup");
         default:
-            Q_ASSERT_X(false, Q_FUNC_INFO, "Should never get here");
+            NX_ASSERT(false, Q_FUNC_INFO, "Should never get here");
             break;
         }
 
@@ -388,7 +388,7 @@ void QnStorageConfigWidget::loadDataToUi() {
 }
 
 void QnStorageConfigWidget::loadStoragesFromResources() {
-    Q_ASSERT_X(m_server, Q_FUNC_INFO, "Server must exist here");
+    NX_ASSERT(m_server, Q_FUNC_INFO, "Server must exist here");
 
     QnStorageModelInfoList storages;
     for (const QnStorageResourcePtr &storage: m_server->getStorages())
@@ -558,7 +558,7 @@ void QnStorageConfigWidget::applyStoragesChanges(QnStorageResourceList& result, 
         }
         else {
             QnClientStorageResourcePtr storage = QnClientStorageResource::newStorage(m_server, storageData.url);
-            Q_ASSERT_X(storage->getId() == storageData.id, Q_FUNC_INFO, "Id's must be equal");
+            NX_ASSERT(storage->getId() == storageData.id, Q_FUNC_INFO, "Id's must be equal");
 
             storage->setUsedForWriting(storageData.isUsed);
             storage->setStorageType(storageData.storageType);
@@ -649,16 +649,16 @@ void QnStorageConfigWidget::startRebuid(bool isMain) {
     if (!m_server)
         return;
 
-    int warnResult = QMessageBox::warning(
+    int warnResult = QnMessageBox::warning(
         this,
         tr("Warning!"),
         tr("You are about to launch the archive re-synchronization routine.") + L'\n'
         + tr("ATTENTION! Your hard disk usage will be increased during re-synchronization process! Depending on the total size of archive it can take several hours.") + L'\n'
         + tr("This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without data loss.") + L'\n'
         + tr("Are you sure you want to continue?"),
-        QMessageBox::Ok | QMessageBox::Cancel
-        );
-    if(warnResult != QMessageBox::Ok)
+        QDialogButtonBox::Ok | QDialogButtonBox::Cancel
+    );
+    if (warnResult != QDialogButtonBox::Ok)
         return;
 
     if (!qnServerStorageManager->rebuildServerStorages(m_server, isMain ? QnServerStoragesPool::Main : QnServerStoragesPool::Backup))
@@ -983,7 +983,7 @@ void QnStorageConfigWidget::at_serverRebuildArchiveFinished( const QnMediaServer
     bool isMain = (pool == QnServerStoragesPool::Main);
     StoragePool& storagePool = (isMain ? m_mainPool : m_backupPool);
     if (!storagePool.rebuildCancelled)
-        QMessageBox::information(this,
+        QnMessageBox::information(this,
             tr("Finished"),
             tr("Rebuilding archive index is completed."));
     storagePool.rebuildCancelled = false;
@@ -997,7 +997,7 @@ void QnStorageConfigWidget::at_serverBackupFinished( const QnMediaServerResource
         return;
 
     if (!m_backupCancelled)
-        QMessageBox::information(this,
+        QnMessageBox::information(this,
             tr("Finished"),
             tr("Backup is finished"));
     m_backupCancelled = false;

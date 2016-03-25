@@ -3,7 +3,6 @@
 #include <limits>
 
 #include <QtWidgets/QVBoxLayout>
-#include <QtWidgets/QMessageBox>
 
 #include <QtOpenGL/QGLWidget>
 
@@ -171,7 +170,7 @@ void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource) {
 
         /* Set up the corresponding widget. */
         m_resourceWidget = dynamic_cast<QnMediaResourceWidget *>(m_context->display()->widget(item)); // TODO: #Elric check for NULL
-        Q_ASSERT(m_resourceWidget);
+        NX_ASSERT(m_resourceWidget);
         if (m_resourceWidget) {
             m_resourceWidget->setFrameOpacity(0.0);
         }

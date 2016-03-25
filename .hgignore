@@ -1,6 +1,4 @@
 syntax: glob
-core
-syntax: glob
 ecs.db-shm
 ecs.db-wal
 *.cache
@@ -28,7 +26,6 @@ ecs.db-wal
 *.o
 *.lastbuildstate
 !launcher*.vcproj
-compatibility_info.cpp
 *_tmp.py*
 donotrebuild
 vms.pro
@@ -63,6 +60,9 @@ build_environment/target/buildenv.timestamp
 build_environment/x86
 build_environment/x64
 build_environment/arm
+build-jom
+build-vs
+build-ninja
 common_libs/nx_streaming/arm
 
 build_environment/maven/filter-resources/current_config
@@ -108,6 +108,7 @@ axiscamplugin/arm
 
 build_environment/dependencies/x86
 build_environment/dependencies/x64
+build_environment/target-android
 
 client/bin
 client/build
@@ -150,6 +151,8 @@ client.bin/arm
 
 common/bin
 common/build
+common_libs/nx_media/arm
+common_libs/nx_audio/arm
 common/src/common.pro
 common/src/plugins/resources/archive/filetypes.h
 common/src/Makefile
