@@ -126,7 +126,11 @@ public:
 
     // Live buffer overflow counter.
     int overflowCounter;
+    
+    // Video quality
+    Player::VideoQuality videoQuality;
 
+    void updateVideoQuality();
 private:
     PlayerPrivate(Player* parent);
 
@@ -167,7 +171,8 @@ PlayerPrivate::PlayerPrivate(Player *parent)
     liveBufferMs(kInitialBufferMs),
     liveBufferState(BufferState::NoIssue),
     underflowCounter(0),
-    overflowCounter(0)
+    overflowCounter(0),
+    videoQuality(Player::VideoQuality::Auto)
 {
     connect(execTimer, &QTimer::timeout, this, &PlayerPrivate::presentNextFrame);
     execTimer->setSingleShot(true);
@@ -432,6 +437,19 @@ qint64 PlayerPrivate::getDelayForNextFrameWithoutAudioMs(const QVideoFramePtr& f
     }
 }
 
+void PlayerPrivate::updateVideoQuality()
+{
+    if (!archiveReader)
+        return;
+
+    if (videoQuality == Player::VideoQuality::Auto)
+        archiveReader->setQuality(MEDIA_Quality_High, true); // MEDIA_Quality_Auto
+    else if (videoQuality == Player::VideoQuality::High)
+        archiveReader->setQuality(MEDIA_Quality_High, true);
+    else if (videoQuality == Player::VideoQuality::Low)
+        archiveReader->setQuality(MEDIA_Quality_Low, true);
+}
+
 bool PlayerPrivate::initDataProvider()
 {
     QnUuid id(url.path().mid(1));
@@ -443,6 +461,7 @@ bool PlayerPrivate::initDataProvider()
     }
 
     archiveReader.reset(new QnArchiveStreamReader(resource));
+    updateVideoQuality();
     dataConsumer.reset(new PlayerDataConsumer(archiveReader));
 
     archiveReader->setArchiveDelegate(new QnRtspClientArchiveDelegate(archiveReader.get()));
@@ -630,6 +649,19 @@ void Player::setReconnectOnPlay(bool reconnectOnPlay)
 {
     Q_D(Player);
     d->reconnectOnPlay = reconnectOnPlay;
+}
+
+Player::VideoQuality Player::videoQuality() const
+{
+    Q_D(const Player);
+    return d->videoQuality;
+}
+
+void Player::setVideoQuality(const VideoQuality& value)
+{
+    Q_D(Player);
+    d->videoQuality = value;
+    d->updateVideoQuality();
 }
 
 } // namespace media
