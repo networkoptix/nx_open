@@ -14,8 +14,7 @@
   position:absolute;
   left:0;
   top:50%;
-  transform: translateY(-50%);
-  margin:0 !important;
+  margin:-60px 0 0 0 !important;
 }
 
 .vertical-bottom{
@@ -50,4 +49,55 @@
 .master .master-success{
   height:70px;
   font-size: 80px;
+}
+
+.master .dropdown{
+  text-align: left;
+}
+
+.ui-select-bootstrap > .btn-default-focus > .btn,
+.ui-select-bootstrap > .ui-select-match > .btn{
+  background-color: $input-bg;
+  border-color: $input-border;
+  color: $input-color;
+  font-weight: normal;
+}
+.ui-select-bootstrap .ui-select-choices-row>a{
+  padding-left: 7px;
+  padding-right: 7px;
+}
+
+
+/* touched, invalid - highlight with red */
+.ui-select-container.ng-invalid.ng-touched .btn{
+  border-color: $state-danger-text;
+}
+
+/* touched, but focused - not highlight with red */
+.ui-select-container > .btn-default-focus > .btn{
+  border-color: $input-border !important;
+}
+
+.master .alert{
+  padding:10px;
+}
+
+.master-modal{
+  overflow-y: auto;
+  display: block;
+}
+
+@media screen and (min-height: 550px) {
+  .master-modal {
+    margin-top: 135px;
+  }
+}
+
+a:hover{
+  text-decoration: none;
+}
+
+a.external,
+a.external:hover{
+  text-decoration: underline;
 }

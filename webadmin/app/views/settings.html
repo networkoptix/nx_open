@@ -30,7 +30,7 @@
             </div>
             <div class="form-group">
                 <div class="col-md-9 col-md-offset-3">
-                    <button type="button" class="btn btn-default" ng-click="openDisconnectDialog()">Disconnect Server from the System</button>
+                    <button type="button" class="btn btn-default" ng-click="openDisconnectDialog()">Disconnect Server And Create New System</button>
                     <button type="button" ng-if="canMerge" class="btn btn-default" ng-click="openJoinDialog()">Merge Systems</button>
 
                 </div>
@@ -80,11 +80,11 @@
     <h2>All servers in the system</h2>
     <p>You can switch to administration interface of another server</p>
     <ul class="serversList">
-        <li ng-repeat="server in mediaServers" ng-class="{active:settings.id == server.id.replace('{','').replace('}','')}">
+        <li ng-repeat="server in mediaServers" ng-class="{active:server.active}">
             <icon for="server.status!='Online'" on-true="warning-sign" title-true="Unavailable" ></icon>
             <a ng-if="server.status=='Online'" ng-href="{{server.apiUrl}}" target="_blank">{{server.name}} ({{server.apiUrl.replace('http://','').replace('https://','')}})</a>
             <span ng-if="server.status!='Online'" >{{server.name}} ({{server.apiUrl.replace('http://','').replace('https://','')}})</span>
-            {{settings.id == server.id.replace('{','').replace('}','')?'(current)':''}}
+            {{server.active?'(current)':''}}
         </li>
     </ul>
 </div>

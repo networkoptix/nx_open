@@ -17,6 +17,11 @@ angular.module('webadminApp')
         mediaserver.getSettings().then(function (r) {
             $scope.settings = r.data.reply;
             $scope.settings.remoteAddresses = $scope.settings.remoteAddresses.join('\n');
+
+            // check for safe mode and new server and redirect.
+            if(r.data.reply.serverFlags.includes(Config.newServerFlag) && !r.data.reply.ecDbReadOnly){
+                $location.path("/setup");
+            }
         });
         $scope.isActive = function (path) {
             var currentPath = $location.path().split('/')[1];
