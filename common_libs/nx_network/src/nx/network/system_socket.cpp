@@ -616,11 +616,6 @@ bool CommunicatingSocket<InterfaceToImplement>::connect( const SocketAddress& re
     // Get the address of the requested host
     m_connected = false;
 
-    const auto attrStr = remoteAddress.toString();
-    for( const auto& filter : connectFilters )
-        if( attrStr.startsWith( filter ) )
-            return false;
-
     sockaddr_in destAddr;
     if (!this->fillAddr(remoteAddress, destAddr))
         return false;
@@ -804,9 +799,6 @@ void CommunicatingSocket<InterfaceToImplement>::close()
     m_connected = false;
     Socket<InterfaceToImplement>::close();
 }
-
-template<typename InterfaceToImplement>
-QList<QString> CommunicatingSocket<InterfaceToImplement>::connectFilters;
 
 template<typename InterfaceToImplement>
 void CommunicatingSocket<InterfaceToImplement>::shutdown()
@@ -1346,7 +1338,7 @@ AbstractStreamSocket* TCPServerSocket::systemAccept()
     if (!nonBlockingMode)
         return acceptedSocket;
 
-    //moving socket to blocking mode by default to be consistent with msdn 
+    //moving socket to blocking mode by default to be consistent with msdn
         //(https://msdn.microsoft.com/en-us/library/windows/desktop/ms738573(v=vs.85).aspx)
     if (!acceptedSocket->setNonBlockingMode(false))
     {

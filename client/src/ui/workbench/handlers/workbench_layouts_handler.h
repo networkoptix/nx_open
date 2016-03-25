@@ -3,8 +3,6 @@
 
 #include <QtCore/QObject>
 
-#include <QtWidgets/QMessageBox>
-
 #include <api/api_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <nx_ec/ec_api.h>

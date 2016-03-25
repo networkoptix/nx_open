@@ -13,11 +13,9 @@ namespace network {
 //// class RetryPolicy
 ////////////////////////////////////////////////////////////
 
-const std::chrono::milliseconds RetryPolicy::kNoMaxDelay =
-    std::chrono::milliseconds::zero();
-
-const std::chrono::milliseconds RetryPolicy::kDefaultInitialDelay(500);
-const std::chrono::milliseconds RetryPolicy::kDefaultMaxDelay(std::chrono::minutes(1));
+constexpr const std::chrono::milliseconds RetryPolicy::kNoMaxDelay;
+constexpr const std::chrono::milliseconds RetryPolicy::kDefaultInitialDelay;
+constexpr const std::chrono::milliseconds RetryPolicy::kDefaultMaxDelay;
 
 RetryPolicy::RetryPolicy()
 :
@@ -92,7 +90,7 @@ RetryTimer::~RetryTimer()
 
 void RetryTimer::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
-    m_timer.cancelAsync(std::move(completionHandler));
+    m_timer.pleaseStop(std::move(completionHandler));
 }
 
 void RetryTimer::pleaseStopSync()

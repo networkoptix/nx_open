@@ -175,8 +175,8 @@ void QnWorkbenchWelcomeScreen::connectToAnotherSystem()
 
 void QnWorkbenchWelcomeScreen::setupFactorySystem(const QString &serverUrl)
 {
-    qDebug() << "----------- Call wizard here " << serverUrl;
-    QScopedPointer<QnSetupWizardDialog> dialog(new QnSetupWizardDialog(mainWindow()));
+    /* We are receiving string with port but without protocol, so we must parse it. */
+    QScopedPointer<QnSetupWizardDialog> dialog(new QnSetupWizardDialog(QUrl::fromUserInput(serverUrl), mainWindow()));
     dialog->exec();
 }
 

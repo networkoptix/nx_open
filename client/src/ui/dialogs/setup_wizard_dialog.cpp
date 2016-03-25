@@ -7,13 +7,17 @@
 
 #include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
+
+#include <ui/widgets/web_page.h>
+
 #include <nx/utils/log/log.h>
 
-QnSetupWizardDialog::QnSetupWizardDialog(QWidget *parent)
+QnSetupWizardDialog::QnSetupWizardDialog(const QUrl& serverUrl, QWidget *parent)
     : base_type(parent)
     , d_ptr(new QnSetupWizardDialogPrivate(this))
 {
     Q_D(QnSetupWizardDialog);
+    d->url = serverUrl;
 
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->setContentsMargins(QMargins());
@@ -28,19 +32,17 @@ QnSetupWizardDialog::~QnSetupWizardDialog()
 
 int QnSetupWizardDialog::exec()
 {
-    QUrl apiUrl(qnCommon->currentServer()->getApiUrl());
+    Q_D(QnSetupWizardDialog);
 
-    QUrl url;
-    url.setScheme(apiUrl.scheme());
-    url.setHost(apiUrl.host());
-    url.setPort(apiUrl.port());
+    QUrl url(d->url);
+    url.setScheme(d->url.scheme());
+    url.setHost(d->url.host());
+    url.setPort(d->url.port());
     url.setPath(lit("/static/inline.html"));
     url.setFragment(lit("/setup"));
 
     NX_LOG(lit("QnSetupWizardDialog: Opening setup URL: %1")
            .arg(url.toString()), cl_logINFO);
-
-    Q_D(QnSetupWizardDialog);
 
     d->webView->load(url);
 
@@ -55,7 +57,9 @@ QnSetupWizardDialogPrivate::QnSetupWizardDialogPrivate(
 {
     Q_Q(QnSetupWizardDialog);
 
-    QWebPage *page = webView->page();
+    QnWebPage* page = new QnWebPage(webView);
+    webView->setPage(page);
+
     QWebFrame *frame = page->mainFrame();
 
     connect(frame, &QWebFrame::javaScriptWindowObjectCleared,

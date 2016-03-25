@@ -218,8 +218,12 @@ void QnCameraSettingsDialog::submitToResources(bool checkControls /* = false*/) 
 
     if (checkControls && m_settingsWidget->hasScheduleControlsChanges()){
         QString message = tr("Recording settings have not been saved. Please choose desired recording method, FPS, and quality - then mark the changes on the schedule.");
-        int button = QMessageBox::warning(this, tr("Changes have not been applied."), message, QMessageBox::Retry, QMessageBox::Ignore);
-        if (button == QMessageBox::Retry) {
+        int button = QnMessageBox::warning(
+                this, tr("Changes have not been applied."),
+                message,
+                QDialogButtonBox::Retry | QDialogButtonBox::Ignore,
+                QDialogButtonBox::Ignore);
+        if (button == QDialogButtonBox::Retry) {
             m_ignoreAccept = true;
             return;
         } else {
@@ -227,8 +231,12 @@ void QnCameraSettingsDialog::submitToResources(bool checkControls /* = false*/) 
         }
     } else if (checkControls && m_settingsWidget->hasMotionControlsChanges()){
         QString message = tr("Motion sensitivity has not changed. To change motion sensitivity draw rectangle on the image.");
-        int button = QMessageBox::warning(this, tr("Changes have not been applied."), message, QMessageBox::Retry, QMessageBox::Ignore);
-        if (button == QMessageBox::Retry){
+        int button = QnMessageBox::warning(
+                this, tr("Changes have not been applied."),
+                message,
+                QDialogButtonBox::Retry | QDialogButtonBox::Ignore,
+                QDialogButtonBox::Ignore);
+        if (button == QDialogButtonBox::Retry){
             m_ignoreAccept = true;
             return;
         } else {
@@ -263,7 +271,7 @@ void QnCameraSettingsDialog::submitToResources(bool checkControls /* = false*/) 
         if (!helper.isValid())
         {
             QString message = tr("License limit exceeded. Changes have been saved, but will not be applied.");
-            QMessageBox::warning(this, tr("Could not apply changes."), message);
+            QnMessageBox::warning(this, tr("Could not apply changes."), message);
             m_settingsWidget->setScheduleEnabled(false);
         }
     }

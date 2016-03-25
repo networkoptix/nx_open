@@ -1,6 +1,5 @@
 #include "workbench_export_handler.h"
 
-#include <QtWidgets/QMessageBox>
 #include <QtWidgets/QComboBox>
 
 #include <client/client_settings.h>
@@ -21,6 +20,8 @@
 #include <nx/streaming/archive_stream_reader.h>
 #include <plugins/resource/avi/avi_resource.h>
 #include <plugins/storage/file_storage/layout_storage_resource.h>
+
+#include <platform/environment.h>
 
 #include <recording/time_period.h>
 
@@ -45,7 +46,6 @@
 #include <ui/help/help_topic_accessor.h>
 
 #include <utils/common/event_processors.h>
-#include <utils/common/environment.h>
 #include <utils/common/string.h>
 
 #include <utils/common/app_info.h>

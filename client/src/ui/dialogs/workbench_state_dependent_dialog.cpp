@@ -40,13 +40,13 @@ bool QnWorkbenchStateDependentTabbedDialog::tryClose( bool force ) {
         return true;
 
     switch (showConfirmationDialog()) {
-    case QMessageBox::Yes:
+    case QDialogButtonBox::Yes:
         if (!canApplyChanges())
             return false;   // e.g. cancel was pressed in the confirmation dialog
 
         applyChanges();
         break;
-    case QMessageBox::No:
+    case QDialogButtonBox::No:
         loadDataToUi();
         break;
     default:
@@ -62,7 +62,7 @@ void QnWorkbenchStateDependentTabbedDialog::forcedUpdate() {
 }
 
 
-QMessageBox::StandardButton QnWorkbenchStateDependentTabbedDialog::showConfirmationDialog() {
+QDialogButtonBox::StandardButton QnWorkbenchStateDependentTabbedDialog::showConfirmationDialog() {
     auto confirmMessageText = [this]{
         QStringList details;
         for(const Page &page: modifiedPages())
@@ -70,9 +70,9 @@ QMessageBox::StandardButton QnWorkbenchStateDependentTabbedDialog::showConfirmat
         return tr("Unsaved changes will be lost. Save the following pages?") + L'\n' + details.join(L'\n');
     };
 
-    return QMessageBox::question(this,
+    return QnMessageBox::question(this,
         tr("Confirm exit"),
         confirmMessageText(),
-        QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
-        QMessageBox::Cancel);
+        QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel,
+        QDialogButtonBox::Cancel);
 }

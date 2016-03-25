@@ -1714,7 +1714,7 @@ QnActionManager::QnActionManager(QObject *parent):
             this));
 
     factory(QnActions::EditCameraBookmarkAction).
-        flags(Qn::Slider | Qn::SingleTarget).
+        flags(Qn::Slider | Qn::SingleTarget | Qn::ResourceTarget).
         text(tr("Edit Bookmark...")).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditCamerasPermission).
         condition(new QnConjunctionActionCondition(

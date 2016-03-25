@@ -3,7 +3,6 @@
 #include <limits>
 
 #include <QtWidgets/QVBoxLayout>
-#include <QtWidgets/QMessageBox>
 
 #include <QtOpenGL/QGLWidget>
 

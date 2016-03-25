@@ -2,7 +2,6 @@
 
 #include <QtCore/QEventLoop>
 #include <QtCore/QTimer>
-#include <QtWidgets/QMessageBox>
 
 #include <api/app_server_connection.h>
 

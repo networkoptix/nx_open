@@ -122,6 +122,20 @@ public:
 
 } // namespace noname
 
+AsyncClient::~AsyncClient()
+{
+    /*
+    std::set<nx_http::AsyncHttpClientPtr> httpClients;
+    {
+        QnMutexLocker lk(&m_mutex);
+        std::swap(httpClients, m_httpClients);
+    }
+
+    for (const auto& client: httpClients)
+        client->terminate();
+        */
+}
+
 bool AsyncClient::Message::isOk() const
 {
     return !action.isEmpty() && !service.isEmpty();

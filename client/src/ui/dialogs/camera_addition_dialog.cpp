@@ -1,7 +1,6 @@
 #include "camera_addition_dialog.h"
 #include "ui_camera_addition_dialog.h"
 
-#include <QtWidgets/QMessageBox>
 #include <QtGui/QStandardItemModel>
 #include <QtGui/QDesktopServices>
 

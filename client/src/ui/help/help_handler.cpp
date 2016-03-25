@@ -7,7 +7,6 @@
 #include <QtGui/QHelpEvent>
 #include <QtWidgets/QWhatsThis>
 #include <QtWidgets/QWidget>
-#include <QtWidgets/QMessageBox>
 
 #include "help_topic_accessor.h"
 #include "online_help_detector.h"

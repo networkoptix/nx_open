@@ -14,7 +14,6 @@
 
 #include <utils/common/warnings.h>
 #include <utils/common/event_processors.h>
-#include <utils/common/environment.h>
 #include <network/module_finder.h>
 
 #include <core/resource/media_resource.h>

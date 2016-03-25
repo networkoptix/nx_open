@@ -78,9 +78,6 @@ int QnSetupLocalSystemRestHandler::execute(SetupLocalSystemData data, QnJsonRest
     }
 
     qnGlobalSettings->resetCloudParams();
-    qnGlobalSettings->synchronizeNow();
-    //TODO: #GDM sync syncronizeNow with result
-    /*
     if (!qnGlobalSettings->synchronizeNowSync())
     {
         result.setError(
@@ -88,7 +85,6 @@ int QnSetupLocalSystemRestHandler::execute(SetupLocalSystemData data, QnJsonRest
             lit("Failed to save cloud credentials to local DB"));
         return nx_http::StatusCode::ok;
     }
-    */
 
     if (data.systemName.isEmpty())
     {

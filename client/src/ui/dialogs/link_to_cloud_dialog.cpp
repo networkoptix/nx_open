@@ -29,11 +29,8 @@ namespace
 
     rest::QnConnectionPtr getPublicServerConnection()
     {
-        for (const QnMediaServerResourcePtr server: qnResPool->getAllServers(Qn::AnyStatus))
+        for (const QnMediaServerResourcePtr server: qnResPool->getAllServers(Qn::Online))
         {
-            if (server->getStatus() != Qn::Online)
-                continue;
-
             if (!server->getServerFlags().testFlag(Qn::SF_HasPublicIP))
                 continue;
 
@@ -266,14 +263,14 @@ void QnLinkToCloudDialogPrivate::at_bindFinished(
         return;
     }
 
-    auto handleReply = [this](bool success, rest::Handle handleId, rest::ServerConnection::EmptyResponseType)
+    auto handleReply = [this](bool success, rest::Handle handleId, const QnRestResult& reply)
     {
         Q_UNUSED(handleId)
 
-        if (success)
+        if (success && reply.error == QnRestResult::NoError)
             showSuccess();
         else
-            showFailure(tr("Cannot save information to database"));
+            showFailure(reply.errorString);
     };
 
     connection->saveCloudSystemCredentials(
