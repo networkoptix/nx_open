@@ -332,11 +332,11 @@ void printHelp(int /*argc*/, char* /*argv*/[])
 
 //--http-client --url=http://admin:admin@server1.ffc8e5a2-a173-4b3d-8627-6ab73d6b234d/api/gettime
 //AK server:
-//--http-client --url=http://admin:admin@47bf37a0-72a6-2890-b967-5da9c390d28a.ffc8e5a2-a173-4b3d-8627-6ab73d6b234d/api/gettime
+//--http-client --url=http://admin:admin@47bf37a0-72a6-2890-b967-5da9c390d28a.ec0fc8ba-9dd1-417f-aa88-f36400953ade/api/gettime
 //LA server:
-//--http-client --url=http://admin:admin@1af3ebeb-c327-3665-40f1-fa4dba0df78f.ffc8e5a2-a173-4b3d-8627-6ab73d6b234d/api/gettime
-//--connect --target=server1.ffc8e5a2-a173-4b3d-8627-6ab73d6b234d --max-concurrent-connections=1
-//--listen --server-id=server1 --cloud-credentials=ffc8e5a2-a173-4b3d-8627-6ab73d6b234d:bee7d48e-d05f-43ec-aac9-ba404d6a55e3
+//--http-client --url=http://admin:admin@1af3ebeb-c327-3665-40f1-fa4dba0df78f.ec0fc8ba-9dd1-417f-aa88-f36400953ade/api/gettime
+//--connect --target=server1.ec0fc8ba-9dd1-417f-aa88-f36400953ade --max-concurrent-connections=10
+//--listen --server-id=server1 --cloud-credentials=ec0fc8ba-9dd1-417f-aa88-f36400953ade:1cc88e0d-1c08-4051-ae01-dfe3f5b5b90a
 
 /** AK old PC mediator test:
 
