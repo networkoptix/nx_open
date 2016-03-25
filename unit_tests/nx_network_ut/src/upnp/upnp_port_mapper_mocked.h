@@ -3,38 +3,41 @@
 
 #include <nx/network/upnp/upnp_async_client.h>
 #include <nx/network/upnp/upnp_port_mapper.h>
+#include <utils/thread/sync_queue.h>
 
 namespace nx_upnp {
 namespace test {
 
 //! \class UpnpAsyncClient implementation for tests
 class AsyncClientMock
-        : public AsyncClient
+:
+    public AsyncClient
 {
 public:
-    AsyncClientMock( const HostAddress& externalIp );
+    explicit AsyncClientMock( const HostAddress& externalIp );
+    ~AsyncClientMock() override;
 
-    virtual
-        void externalIp( const QUrl& url,
-                     std::function< void( const HostAddress& ) > callback ) override;
+    virtual void externalIp(
+        const QUrl& url,
+        std::function< void( const HostAddress& ) > callback ) override;
 
-    virtual
-        void addMapping( const QUrl& url, const HostAddress& internalIp,
-                     quint16 internalPort, quint16 externalPort,
-                     Protocol protocol, const QString& description, quint64 duration,
-                     std::function< void( bool ) > callback ) override;
+    virtual void addMapping(
+        const QUrl& url, const HostAddress& internalIp,
+        quint16 internalPort, quint16 externalPort,
+        Protocol protocol, const QString& description, quint64 duration,
+        std::function< void( bool ) > callback ) override;
 
-    virtual
-    void deleteMapping( const QUrl& url, quint16 externalPort, Protocol protocol,
-                        std::function< void( bool ) > callback ) override;
+    virtual void deleteMapping(
+        const QUrl& url, quint16 externalPort, Protocol protocol,
+        std::function< void( bool ) > callback ) override;
 
-    virtual
-        void getMapping( const QUrl& url, quint32 index,
-                     std::function< void( MappingInfo ) > callback ) override;
+    virtual void getMapping(
+        const QUrl& url, quint32 index,
+        std::function< void( MappingInfo ) > callback ) override;
 
-    virtual
-        void getMapping( const QUrl& url, quint16 externalPort, Protocol protocol,
-                     std::function< void( MappingInfo ) > callback ) override;
+    virtual void getMapping(
+        const QUrl& url, quint16 externalPort, Protocol protocol,
+        std::function< void( MappingInfo ) > callback ) override;
 
     typedef std::map<
             std::pair< quint16 /*external*/, Protocol /*protocol*/ >,
@@ -52,10 +55,13 @@ private:
 
     mutable QMutex m_mutex;
     Mappings m_mappings;
+    std::thread m_thread;
+    nx::SyncQueue< std::function< void() > > m_tasks;
 };
 
 class PortMapperMocked
-        : public PortMapper
+:
+        public PortMapper
 {
 public:
     PortMapperMocked( const HostAddress& internalIp, const HostAddress& externalIp,

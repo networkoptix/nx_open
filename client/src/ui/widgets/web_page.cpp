@@ -12,5 +12,5 @@ void QnWebPage::javaScriptConsoleMessage(const QString& message, int lineNumber,
 {
     QString logMessage = lit("JS Console: %1:%2 %3").arg(sourceID, QString::number(lineNumber), message);
     qDebug() << logMessage;
-    NX_LOG(logMessage);
+    NX_LOG(logMessage, cl_logDEBUG1);
 }
