@@ -1613,8 +1613,7 @@ QRect QnNxStyle::subElementRect(
 
             if (tabWidget->tabShape() == QTabWidget::Triangular)
             {
-                const int kMagicShift = 2;
-                rect.adjust(-hspace + kMagicShift, 0, hspace, 0);
+                rect.adjust(-hspace, 0, -hspace, 0);
             }
             else
             {
