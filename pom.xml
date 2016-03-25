@@ -165,6 +165,7 @@
         <!--QT plugins used-->
         <qtplugin1>imageformats</qtplugin1>
         <qtplugin2>platforms</qtplugin2>
+	<!-- Linux Only -->
         <qtplugin3/>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -608,6 +609,7 @@
                 <module>debsetup/mediaserver-deb</module>
             </modules>
             <properties>
+                <qtplugin3>platforminputcontexts</qtplugin3>
                 <modification>ubuntu</modification>
             </properties>
         </profile>

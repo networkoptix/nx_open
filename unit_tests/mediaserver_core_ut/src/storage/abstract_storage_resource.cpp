@@ -66,8 +66,8 @@ TEST(AbstractStorageResourceTest, Init)
                 false
             )
         );
-        EXPECT_TRUE(ftpStorage && ftpStorage->isAvailable());
-        if (ftpStorage && ftpStorage->isAvailable())
+        EXPECT_TRUE(ftpStorage && ftpStorage->initOrUpdate());
+        if (ftpStorage && ftpStorage->initOrUpdate())
         {
             ftpStorage->setUrl(tg->ftpStorageUrl);
             tg->storageManager->addStorage(ftpStorage);
@@ -104,7 +104,7 @@ TEST(AbstractStorageResourceTest, Capabilities)
         ASSERT_TRUE(storageCapabilities | QnAbstractStorageResource::cap::ReadFile);
         ASSERT_TRUE(storageCapabilities | QnAbstractStorageResource::cap::WriteFile);
 
-        ASSERT_TRUE(storage->isAvailable());
+        ASSERT_TRUE(storage->initOrUpdate());
         ASSERT_TRUE(storage->getFreeSpace() > 0);
         ASSERT_TRUE(storage->getTotalSpace() > 0);
     }
@@ -377,7 +377,7 @@ public:
         return 0;
     }
 
-    virtual bool isAvailable() const override {
+    virtual bool initOrUpdate() const override {
         assert(0);
         return true;
     }

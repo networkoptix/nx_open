@@ -100,5 +100,14 @@
         <resource name = "20275" public = "20185"/>
         <resource name = "12275" public = "12186"/>
         <resource name = "12276" public = "12176"/>
+        <resource name = "1195" public = "1215"/>
+        <resource name = "5195" public = "5245">
+            <params>
+                <param name = "MaxFPS" default_value = "14"/>
+            </params>
+        </resource>
+        <resource name = "31956" public = "3556"/>        
+        <resource name = "3196" public = "3556"/>  
+        <resource name = "3195" public = "3556"/>          
     </oem>
 </resources>
