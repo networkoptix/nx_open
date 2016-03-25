@@ -111,18 +111,6 @@ var RegisterPage = function () {
     };
 
     this.termsConditions = element(by.linkText('Terms and Conditions'));
-
-    this.getLastEmail = function() {
-        var deferred = protractor.promise.defer();
-        console.log("Waiting for an email...");
-        browser.sleep(5000); // Wait for the email to come. Otherwise previous one is taken
-
-        notifier.on("mail", function(mail){
-            console.log("Email to: " + mail.headers.to);
-            deferred.fulfill(mail);
-        }).start();
-        return deferred.promise;
-    };
 };
 
 module.exports = RegisterPage;

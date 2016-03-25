@@ -67,6 +67,9 @@ LoginPage = function () {
     this.htmlBody = element(by.css('body'));
 
     this.restoreEmailInput = element(by.model('data.email'));
+    this.newPasswordInput = element(by.model('data.newPassword')).element(by.css('input[type=password]'));
+    this.submitButton = element(by.buttonText('Restore password'));
+    this.savePasswordButton = element(by.buttonText('Save password'));
 
     this.login = function () {
         this.dialogLoginButton.click();

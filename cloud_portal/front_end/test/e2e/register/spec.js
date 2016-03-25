@@ -3,37 +3,6 @@ var RegisterPage = require('./po.js');
 describe('Registration suite', function () {
     var p = new RegisterPage();
 
-
-
-    it("should activate registration with a registration code sent to an email", function () {
-        p.getByUrl();
-
-        var userEmail = p.getRandomEmail();
-        p.firstNameInput.sendKeys(p.userFirstName);
-        p.lastNameInput.sendKeys(p.userLastName);
-        p.emailInput.sendKeys(userEmail);
-        p.passwordInput.sendKeys(p.userPassword);
-
-        p.submitButton.click();
-
-        p.helper.catchAlert('Your account was successfully registered. Please, check your email to confirm it');
-
-        browser.controlFlow().wait(p.getLastEmail()).then(function (email) {
-            expect(email.subject).toContain("Confirm your account");
-            expect(email.headers.to).toEqual(userEmail);
-
-            // extract registration token from the link in the email message
-            var pattern = /\/static\/index.html#\/activate\/(\w+)/g;
-            var regCode = pattern.exec(email.html)[1];
-            console.log(regCode);
-            browser.get('/#/activate/' + regCode);
-
-            p.helper.catchAlert("Your account was successfully activated.");
-            browser.refresh();
-            p.helper.catchAlert("Couldn't activate your account: Wrong confirmation code");
-        });
-    });
-
     p.alert.checkAlert(function(){
         p.getByUrl();
         p.prepareToAlertCheck();
@@ -79,6 +48,39 @@ describe('Registration suite', function () {
 
         // Check that registration form element is NOT displayed on page
         expect(p.firstNameInput.isPresent()).toBe(false);
+    });
+
+    it("should activate registration with a registration code sent to an email", function () {
+
+        p.getByUrl();
+        var userEmail = p.getRandomEmail();
+        var userPassword = p.userPassword;
+        p.firstNameInput.sendKeys(p.userFirstName);
+        p.lastNameInput.sendKeys(p.userLastName);
+        p.emailInput.sendKeys(userEmail);
+        p.passwordInput.sendKeys(userPassword);
+
+        p.submitButton.click();
+
+        p.alert.catchAlert( p.alert.alertMessages.registerSuccess, p.alert.alertTypes.success);
+
+        browser.controlFlow().wait(p.helper.getEmailTo(userEmail).then(function (email) {
+            expect(email.subject).toContain("Confirm your account");
+            expect(email.headers.to).toEqual(userEmail);
+
+            // extract registration token from the link in the email message
+            var pattern = /\/static\/index.html#\/activate\/(\w+)/g;
+            var regCode = pattern.exec(email.html)[1];
+            console.log(regCode);
+            browser.get('/#/activate/' + regCode);
+
+            p.alert.catchAlert( p.alert.alertMessages.restorePassSuccess, p.alert.alertTypes.success);
+            browser.refresh();
+            p.alert.catchAlert( p.alert.alertMessages.restorePassWrongCode, p.alert.alertTypes.danger);
+
+            p.helper.login(userEmail, userPassword);
+            p.helper.logout();
+        }));
     });
 
     it("should register user with cyrillic First and Last names and correct credentials", function () {
