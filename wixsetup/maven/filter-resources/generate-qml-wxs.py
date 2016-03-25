@@ -4,6 +4,7 @@ from subprocess import Popen, PIPE
 # Windows only
 qtdir = '${qt.dir}'.replace("/", "\\")
 qmldir = os.path.join(qtdir, 'qml')
+qmldir_nxtool = os.path.join('${root.dir}/nxtool/static-resources/src', 'qml')
 
 os.environ["PATH"] = "%s;%s\\bin" % (os.environ['PATH'], qtdir)
 print os.environ["PATH"]
@@ -37,7 +38,7 @@ if __name__ == '__main__':
         os.unlink('nxtoolqml/QtWebProcess.exe')
         
     if '${nxtool}' == 'true':
-        p = subprocess.Popen('${environment.dir}\\bin\\windeployqt.exe ${libdir}\\${arch}\\bin\\${build.configuration}\\nxtool.exe --qmldir %s --no-translations --force --no-libraries --no-plugins --dir nxtoolqml' % qmldir, shell=True, stdout=PIPE)
+        p = subprocess.Popen('${environment.dir}\\bin\\windeployqt.exe ${libdir}\\${arch}\\bin\\${build.configuration}\\nxtool.exe --qmldir %s --no-translations --force --no-libraries --no-plugins --dir nxtoolqml' % qmldir_nxtool, shell=True, stdout=PIPE)
         out, err = p.communicate()
         print out
         p.wait()
