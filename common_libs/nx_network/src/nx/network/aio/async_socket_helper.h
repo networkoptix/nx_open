@@ -522,14 +522,9 @@ private:
 
                 if( m_connectHandler )
                 {
-                    //probably this approach is the best for all other kinds of events
-                    SystemError::ErrorCode resultCode;
-                    if (!m_abstractSocketPtr->getLastError(&resultCode))
-                        resultCode = SystemError::getLastOSErrorCode();
-
                     //async connect. If we are here than connect succeeded
                     std::unique_ptr<AsyncSocketImplHelper, decltype(__finally_connect)> cleanupGuard( this, __finally_connect );
-                    connectHandlerLocal( resultCode );
+                    connectHandlerLocal( SystemError::noError );
                 }
                 else
                 {
