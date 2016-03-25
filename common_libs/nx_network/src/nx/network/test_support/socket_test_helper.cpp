@@ -72,7 +72,7 @@ TestConnection::TestConnection(
     ++TestConnection_count;
 }
 
-static std::mutex mtx1;
+static std::mutex terminatedSocketsIDsMutex;
 static std::map<int, bool> terminatedSocketsIDs;
 
 
@@ -81,7 +81,7 @@ TestConnection::~TestConnection()
     NX_LOGX(lm("accepted %1. Destroying...").arg(m_accepted), cl_logDEBUG1);
 
     {
-        std::unique_lock<std::mutex> lk(mtx1);
+        std::unique_lock<std::mutex> lk(terminatedSocketsIDsMutex);
         NX_ASSERT(terminatedSocketsIDs.emplace(m_id, m_accepted).second);
     }
 #ifdef DEBUG_OUTPUT
@@ -525,7 +525,7 @@ size_t ConnectionsGenerator::totalBytesReceived() const
 
 size_t ConnectionsGenerator::totalIncompleteTasks() const
 {
-    return m_totalIncompleteTasks;
+    std::unique_lock<std::mutex> lk(m_mutex);
 }
 
 QString ConnectionsGenerator::returnCodes() const
@@ -545,11 +545,12 @@ void ConnectionsGenerator::onConnectionFinished(
     NX_LOGX(lm("Connection %1 has finished: %2")
         .arg(id).arg(SystemError::toString(code)), cl_logDEBUG1);
 
+
     std::unique_lock<std::mutex> lk(m_mutex);
     m_returnCodes.emplace(code, 0).first->second++;
 
     {
-        std::unique_lock<std::mutex> lk(mtx1);
+        std::unique_lock<std::mutex> lk(terminatedSocketsIDsMutex);
         NX_ASSERT(terminatedSocketsIDs.find(id) == terminatedSocketsIDs.end());
     }
 
