@@ -18,25 +18,17 @@
         <guid>${common_ut.guid}</guid>
         <product.title>HD Witness Common Library Unit Tests</product.title>
         <root.dir>${basedir}/../..</root.dir>
+        <path>${env.PATH}</path>
         <!--Specify the project to test-->
         <master.project.directory>common</master.project.directory>
-        <!--Global libs-->
+
         <qt.libs>core gui network xml xmlpatterns sql concurrent multimedia</qt.libs>
         <global.libs>-lcommon -lnx_utils -lnx_network -lnx_streaming -lonvif -ludt</global.libs>
-        <!--Specific os libs used-->
         <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm Wldap32.lib</windows.oslibs>
-        <linux.oslibs/>
-        <linux.arm.oslibs/>
-        <windows.oslibs.release></windows.oslibs.release>
-        <windows.oslibs.debug></windows.oslibs.debug>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
-        <!--Global defines-->
-        <global.defines></global.defines>
-        <!--Specific os defines-->
+
         <windows.defines>EC2_LIB_API=__declspec(dllimport) _VARIADIC_MAX=10</windows.defines>
-        <linux.defines/>
-        <mac.defines/>
-        <path>${env.PATH}</path>
+
         <rdep.packages>openssl ffmpeg quazip</rdep.packages>
     </properties>
 

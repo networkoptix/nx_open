@@ -19,21 +19,16 @@
         <product.title>${client.name}</product.title>
         <product.display.title>${client.display.name}</product.display.title>
         <template>app</template>
-        <!--Global libs-->
+
         <qt.libs>core gui network opengl xml sql multimedia concurrent webkit webkitwidgets qml quick quickwidgets</qt.libs>
         <global.libs>-lcommon -lnx_utils -lnx_network -lnx_streaming -lnx_audio -lappserver2 -lclient.core -lclient -lcloud_db_client</global.libs>
-        <!--Specific os libs used-->
         <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -ld3d9 -lopenal32</windows.oslibs>
-        <windows.oslibs.release/>
-        <windows.oslibs.debug/>
         <linux.oslibs>-lz -lopenal -lX11 -lXfixes -lGL -lGLU -lXss</linux.oslibs>
         <mac.oslibs>-lbz2 -lz -framework IOKit -framework CoreServices -framework OpenAL</mac.oslibs>
-        <!--Global defines-->
+
         <global.defines>CL_FORCE_LOGO</global.defines>
-        <!--Specific os defines-->
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
-        <linux.defines/>
-        <mac.defines/>
+
         <rdep.packages>openssl ffmpeg quazip festival festival-vox</rdep.packages>
     </properties>
 

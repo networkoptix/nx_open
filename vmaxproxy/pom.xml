@@ -26,21 +26,8 @@
         <product.title>${vmaxproxy.name}</product.title>	
         <force_x86>true</force_x86>
         <template>app</template>
-        <!--Global libs-->
+
         <qt.libs>core</qt.libs>
-        <global.libs/>
-        <!--Specific os libs used-->
         <windows.oslibs>-lws2_32 -lIphlpapi -lOle32 -lwinmm -lacs_codec_mr -lacs_event_md -lacs_event_mr -lacs_export_mr -lacs_post_processing_mr -lacs_stream_source_mr</windows.oslibs>
-        <windows.oslibs.release></windows.oslibs.release> 
-        <windows.oslibs.debug></windows.oslibs.debug>
-        <linux.oslibs/>
-        <mac.oslibs/>
-        <!--Global defines-->
-        <global.defines/>
-        <!--Specific os defines-->
-        <windows.defines/>
-        <windows.defines/>
-        <linux.defines/>
-        <mac.defines/>	
     </properties>  
 </project>

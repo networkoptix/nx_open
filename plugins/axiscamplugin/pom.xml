@@ -23,18 +23,9 @@
     <properties>
         <guid>${axiscamplugin.guid}</guid>
         <product.title>${axiscamplugin.name}</product.title>
-        <!--Global libs-->
+
         <qt.libs>core network</qt.libs>
-        <global.libs/>
-        <!--Specific os libs used-->
-        <windows.oslibs/>
-        <windows.oslibs.release/>
-        <windows.oslibs.debug/>        
-        <!--Global defines-->
-        <global.defines/>
-        <mac.defines/>
-        <linux.defines/>
-        <!--Specific os defines-->
+
         <windows.defines>WIN32_LEAN_AND_MEAN</windows.defines>
     </properties>  
     <dependencies>

@@ -26,21 +26,12 @@
         <release.version>${parsedVersion.majorVersion}${parsedVersion.minorVersion}${parsedVersion.incrementalVersion}</release.version>
         <product.title>${company.name} libcloud_db</product.title>
         <template>lib</template>
-        <!--Global libs-->
+
         <qt.libs>core network concurrent sql xml</qt.libs>
         <global.libs>-lcommon -lnx_network -ludt -lcloud_db_client -lnx_email -lnx_streaming</global.libs>
-        <!--Specific os libs used-->
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm</windows.oslibs>
-        <windows.oslibs.release/>
-        <windows.oslibs.debug/>
-        <linux.oslibs/>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices -lcrypto</mac.oslibs>
-        <!--Global defines-->
-        <global.defines/>
-        <!--Specific os defines-->
-        <windows.defines/>
-        <linux.defines/>
-        <mac.defines/>
+
         <rdep.packages>openssl</rdep.packages>
     </properties>
     

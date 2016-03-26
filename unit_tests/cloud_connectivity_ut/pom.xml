@@ -19,22 +19,13 @@
     <properties>
         <guid>${cloud_connectivity_ut.guid}</guid>
         <product.title>cloud_connectivity unit tests</product.title>
-        <!--Global libs-->
+
         <qt.libs>core network concurrent xml xmlpatterns sql multimedia</qt.libs>
         <global.libs>-lcommon -lnx_utils -lnx_network -lnx_streaming -ludt -lcloud_db_client -lconnection_mediator</global.libs>
-        <!--Specific os libs used-->
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm Wldap32.lib</windows.oslibs>
-        <linux.oslibs></linux.oslibs>
-        <linux.arm.oslibs></linux.arm.oslibs>
-        <windows.oslibs.release></windows.oslibs.release>
-        <windows.oslibs.debug></windows.oslibs.debug>
-        <mac.oslibs></mac.oslibs>
-        <!--Global defines-->
-        <global.defines></global.defines>
-        <!--Specific os defines-->
+
         <windows.defines>_VARIADIC_MAX=10</windows.defines>
-        <linux.defines/>
-        <mac.defines/>
+
         <rdep.packages>openssl ffmpeg quazip</rdep.packages>
     </properties>
 

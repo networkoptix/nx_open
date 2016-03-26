@@ -25,24 +25,16 @@
         <product.title>${mediaserver.name}</product.title>
         <product.display.title>${mediaserver.display.name}</product.display.title>
         <template>app</template>
-        <!--Global libs-->
+
         <qt.libs>core network xml xmlpatterns sql concurrent multimedia</qt.libs>
         <global.libs>-lmediaserver_core -lcommon -lnx_utils -lnx_network -lnx_streaming -lappserver2 -lonvif -ludt -lcloud_db_client -lnx_email</global.libs>
-        <!--Specific os libs used-->
         <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm Wldap32.lib Crypt32.lib</windows.oslibs>
         <linux.oslibs>-lldap -ldl</linux.oslibs>
         <linux.arm.oslibs>-llber -lsasl2 -lldap</linux.arm.oslibs>
-        <windows.oslibs.release/>
-        <windows.oslibs.debug/>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
-        <!--Global defines-->
-        <global.defines/>
-        <!--Specific os defines-->
-        <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
-        <linux.defines/>
-        <mac.defines/>
-        <rdep.packages>openssl ffmpeg quazip sigar</rdep.packages>
 
+        <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
+        <rdep.packages>openssl ffmpeg quazip sigar</rdep.packages>
     </properties>
 
     <dependencies>

@@ -18,22 +18,12 @@
 
     <properties>
         <product.title>nx_utils unit tests</product.title>
-        <!--Global libs-->
+
         <qt.libs>core network concurrent xml xmlpatterns sql multimedia</qt.libs>
         <global.libs>-lnx_utils</global.libs>
-        <!--Specific os libs used-->
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm Wldap32.lib</windows.oslibs>
-        <linux.oslibs></linux.oslibs>
-        <linux.arm.oslibs></linux.arm.oslibs>
-        <windows.oslibs.release></windows.oslibs.release>
-        <windows.oslibs.debug></windows.oslibs.debug>
-        <mac.oslibs></mac.oslibs>
-        <!--Global defines-->
-        <global.defines></global.defines>
-        <!--Specific os defines-->
+
         <windows.defines>_VARIADIC_MAX=10</windows.defines>
-        <linux.defines/>
-        <mac.defines/>
     </properties>
 
 </project>

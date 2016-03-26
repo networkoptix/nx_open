@@ -55,24 +55,13 @@
         <guid>${client.core.guid}</guid>
         <product.title>${client.name} Core</product.title>
         <product.display.title>${client.display.name} Core</product.display.title>
-        <!--Global libs-->
         <template>lib</template>
         <qt.libs>core gui network multimedia concurrent sql</qt.libs>
         <global.libs>-lcommon -lnx_streaming -lappserver2</global.libs>
-        <!--Specific os libs used-->
         <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm</windows.oslibs>
-        <windows.oslibs.release/>
-        <windows.oslibs.debug/>
-        <linux.oslibs></linux.oslibs>
         <mac.oslibs>-framework IOKit -framework CoreServices</mac.oslibs>
-        <!--Global defines-->
         <global.defines>CL_FORCE_LOGO</global.defines>
-        <!--Specific os defines-->
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
-        <linux.defines/>
-        <mac.defines/>
-        <android.defines/>
-        <ios.defines/>
         <rdep.packages>openssl ffmpeg</rdep.packages>
     </properties>
     

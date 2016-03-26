@@ -16,28 +16,18 @@
     <properties>
         <guid>${appserver2.guid}</guid>
         <product.title>${appserver2.name}</product.title>  
-        <!--Global libs-->		
+
         <template>lib</template>
-        <qt.libs>core core-private gui network xml sql concurrent</qt.libs>
-        <global.libs>-lcommon -lnx_streaming -lnx_network -lnx_utils</global.libs>
-        <!--Specific os libs used-->
-        <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm</windows.oslibs>
-        <linux.oslibs></linux.oslibs>
-        <windows.oslibs.release/>
-        <windows.oslibs.debug/>                
-        <mac.oslibs>-lbz2 -lz -framework IOKit -framework CoreServices</mac.oslibs>
-        <android.oslibs></android.oslibs>
-        <!--Global defines-->
-        <global.defines/>
-        <!--Specific os defines-->
-        <windows.defines>EC2_LIB_API=__declspec(dllexport)</windows.defines>
-        <linux.defines/>
-        <mac.defines/>      
-        <android.defines/>
-        <ios.defines/>
-        <rdep.packages>openssl ffmpeg</rdep.packages>
         <buildLib>sharedlib</buildLib>
 
+        <qt.libs>core core-private gui network xml sql concurrent</qt.libs>
+        <global.libs>-lcommon -lnx_streaming -lnx_network -lnx_utils</global.libs>
+        <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm</windows.oslibs>
+        <mac.oslibs>-lbz2 -lz -framework IOKit -framework CoreServices</mac.oslibs>
+
+        <windows.defines>EC2_LIB_API=__declspec(dllexport)</windows.defines>
+
+        <rdep.packages>openssl ffmpeg</rdep.packages>
     </properties>	
 
     <dependencies>

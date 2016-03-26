@@ -19,22 +19,12 @@
     <properties>
         <guid>${connection_mediator_ut.guid}</guid>
         <product.title>HD Cloud Connection Mediator Unit Tests</product.title>
-        <!--Global libs-->
+
         <qt.libs>core network xml concurrent sql multimedia</qt.libs>
         <global.libs>-lcommon -lnx_utils -lnx_streaming -lnx_network -ludt -lcloud_db_client -lconnection_mediator</global.libs>
-        <!--Specific os libs used-->
         <windows.oslibs>Ws2_32.lib DbgHelp.lib Winmm.lib Iphlpapi.lib</windows.oslibs>
-        <linux.oslibs/>
-        <linux.arm.oslibs></linux.arm.oslibs>
-        <windows.oslibs.release></windows.oslibs.release>
-        <windows.oslibs.debug></windows.oslibs.debug>
-        <mac.oslibs></mac.oslibs>
-        <!--Global defines-->
-        <global.defines></global.defines>
-        <!--Specific os defines-->
+
         <windows.defines>_VARIADIC_MAX=10</windows.defines>
-        <linux.defines/>
-        <mac.defines/>
         <rdep.packages>openssl quazip</rdep.packages>
     </properties>
 

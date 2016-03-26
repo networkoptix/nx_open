@@ -18,25 +18,17 @@
         <product.title>${mobile_client.name}</product.title>
         <product.display.title>${mobile_client.display.name}</product.display.title>
         <template>app</template>
-        <!--Global libs-->
+
         <qt.libs>core qml quick concurrent network sql multimedia xml</qt.libs>
         <global.libs>-lclient.core -lnx_media -lnx_audio -lnx_streaming -lcloud_db_client -lappserver2 -lcommon -lnx_network -lnx_utils -ludt</global.libs>
-
-        <!--Specific os libs used-->
         <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -ld3d9 -lopenal32</windows.oslibs>
-        <windows.oslibs.release/>
-        <windows.oslibs.debug/>
         <linux.oslibs>-lz -lopenal -lX11 -lXfixes -lGL -lGLU</linux.oslibs>
         <android.oslibs>-lturbojpeg -lopenal</android.oslibs>
         <ios.oslibs>-lturbojpeg</ios.oslibs>
-        <!--Global defines-->
+
         <global.defines>CL_FORCE_LOGO</global.defines>
-        <!--Specific os defines-->
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
-        <linux.defines/>
-        <mac.defines/>
-        <android.defines/>
-        <ios.defines/>
+
         <rdep.packages>openssl ffmpeg</rdep.packages>
         <rdep.windows.packages>quazip</rdep.windows.packages>
         <rdep.linux.packages>quazip</rdep.linux.packages>

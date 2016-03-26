@@ -24,23 +24,9 @@
     <properties>
         <guid>${nx_media.guid}</guid>
         <product.title>${company.name} nx_media</product.title>
-        <!--Global libs-->
+
         <qt.libs>core gui multimedia opengl multimedia-private</qt.libs>
         <global.libs>-lcommon</global.libs>
-        <!--Specific os libs used-->
-        <windows.oslibs></windows.oslibs>
-        <windows.oslibs.release/>
-        <windows.oslibs.debug/>
-        <linux.oslibs></linux.oslibs>
-        <mac.oslibs></mac.oslibs>
-        <!--Global defines-->
-        <global.defines/>
-        <!--Specific os defines-->
-        <windows.defines/>
-        <linux.defines/>
-        <mac.defines/>
-        <android.defines/>
-        <ios.defines/>
     </properties>
 
     <profiles>

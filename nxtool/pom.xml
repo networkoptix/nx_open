@@ -27,21 +27,10 @@
         <product.title>${nxtool.name}</product.title>  
         <product.display.title>${nxtool.display.name}</product.display.title>
         <template>app</template>
-        <!--Global libs-->      
+
         <qt.libs>qml quick core gui network</qt.libs>
-        <global.libs/>
-        <!--Specific os libs used-->
         <windows.oslibs>Ws2_32.lib</windows.oslibs>
-        <windows.oslibs.release/>
-        <windows.oslibs.debug/>
-        <linux.oslibs/>
-        <mac.oslibs/>
-        <!--Global defines-->
-        <global.defines/>
-        <!--Specific os defines-->
-        <windows.defines/>
-        <linux.defines/>
-        <mac.defines/>
+
         <rdep.packages>qt</rdep.packages>        
     </properties>    
 </project>

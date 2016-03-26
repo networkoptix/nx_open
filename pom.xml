@@ -150,6 +150,21 @@
         <boost.version>1.56-SNAPSHOT</boost.version>
         <quazip.version>0.7.1</quazip.version>
 
+        <qt.libs/>
+        <global.libs/>
+        <windows.oslibs/>
+        <linux.oslibs/>
+        <mac.oslibs/>
+        <android.oslibs/>
+        <ios.oslibs/>
+
+        <global.defines/>
+        <windows.defines/>
+        <linux.defines/>
+        <mac.defines/>
+        <android.defines/>
+        <ios.defines/>
+
         <!-- Set parent (parent.customization) and child (customization) customizations here -->
         <customization>default</customization>
         <customization.dir>${root.dir}/customization/${customization}</customization.dir>

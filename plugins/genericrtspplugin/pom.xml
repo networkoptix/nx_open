@@ -23,18 +23,10 @@
     <properties>
         <guid>${genericrtspplugin.guid}</guid>
         <product.title>${genericrtspplugin.name}</product.title>    
-        <!--Global libs-->
+
         <qt.libs>core</qt.libs>
         <global.libs>-lcommon -lnx_streaming</global.libs>
-        <!--Specific os libs used-->
-        <windows.oslibs/>
-        <windows.oslibs.release/>
-        <windows.oslibs.debug/>        
-        <!--Global defines-->
-        <global.defines/>
-        <linux.defines/>
-        <mac.defines/>
-        <!--Specific os defines-->
+
         <windows.defines>WIN32_LEAN_AND_MEAN</windows.defines>
     </properties> 
     <dependencies>

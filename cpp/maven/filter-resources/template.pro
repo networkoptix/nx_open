@@ -42,9 +42,7 @@ CONFIG(debug, debug|release) {
   isEmpty(BUILDLIB) {
     CONFIG += console
   }
-  win* {
-    LIBS += ${windows.oslibs.debug}
-  } else {
+  !win* {
     DEFINES += _DEBUG
   }
   !linux-clang {
@@ -56,9 +54,6 @@ CONFIG(debug, debug|release) {
 }
 else {
   CONFIGURATION=release
-  win* {
-    LIBS += ${windows.oslibs.release}
-  }
 
   !win32 {
       contains( DEFINES, debug_in_release ) {

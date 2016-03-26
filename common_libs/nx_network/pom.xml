@@ -18,24 +18,15 @@
         <guid>${nx_network.guid}</guid>
         <!--Global libs-->
         <template>lib</template>
+
         <qt.libs>core gui network xml xmlpatterns sql concurrent multimedia</qt.libs>
-        <template>lib</template>
         <global.libs>-lnx_utils -lnx_streaming -ludt</global.libs>
-        <!--Specific os libs used-->
         <windows.oslibs>-lcommon -lws2_32 DbgHelp.lib -lIphlpapi -lOle32  -lSecur32 -lwinmm</windows.oslibs>
-        <windows.oslibs.release/>
-        <windows.oslibs.debug/>
         <linux.oslibs>-lswscale</linux.oslibs>
         <mac.oslibs>-framework IOKit -framework CoreFoundation  -lz -framework QtConcurrent</mac.oslibs>
         <android.oslibs>-lz</android.oslibs>
-        <!--Global defines-->
-        <global.defines/>
-        <!--Specific os defines-->
+
         <windows.defines>_USING_V110_SDK71_</windows.defines>
-        <linux.defines/>
-        <mac.defines/>
-        <android.defines/>
-        <ios.defines/>
         <buildLib>sharedLib</buildLib>
         <rdep.packages>openssl</rdep.packages>
         <rdep.windows.packages>quazip</rdep.windows.packages>
