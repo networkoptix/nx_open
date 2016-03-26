@@ -25,7 +25,6 @@
         <guid>${mjpg_link.guid}</guid>
         <!--Global libs-->
         <qt.libs>core network</qt.libs>
-        <ffmpeg.libs></ffmpeg.libs>
         <global.libs>-lcommon -lnx_utils -lnx_network -lnx_streaming</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>Ws2_32.lib Iphlpapi.lib Dbghelp.lib Winmm.lib common.lib</windows.oslibs>

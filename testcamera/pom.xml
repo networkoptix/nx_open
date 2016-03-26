@@ -20,7 +20,6 @@
         <global.libs></global.libs>
         <!--Specific os libs used-->
         <qt.libs>core network multimedia concurrent xml sql</qt.libs>
-        <ffmpeg.libs>-lcommon -lnx_streaming -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale</ffmpeg.libs>
         <windows.oslibs>DbgHelp.lib -lIphlpapi -lwinmm -lws2_32</windows.oslibs>
         <windows.oslibs.release/>
         <windows.oslibs.debug/>  
@@ -32,6 +31,6 @@
         <windows.defines/>
         <linux.defines/>
         <mac.defines/>
-        <rdep.packages>openssl</rdep.packages>
+        <rdep.packages>openssl ffmpeg</rdep.packages>
     </properties>  
 </project>

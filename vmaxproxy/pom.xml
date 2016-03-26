@@ -28,7 +28,6 @@
         <template>app</template>
         <!--Global libs-->
         <qt.libs>core</qt.libs>
-        <ffmpeg.libs></ffmpeg.libs>
         <global.libs/>
         <!--Specific os libs used-->
         <windows.oslibs>-lws2_32 -lIphlpapi -lOle32 -lwinmm -lacs_codec_mr -lacs_event_md -lacs_event_mr -lacs_export_mr -lacs_post_processing_mr -lacs_stream_source_mr</windows.oslibs>

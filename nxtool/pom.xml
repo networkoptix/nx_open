@@ -29,7 +29,6 @@
         <template>app</template>
         <!--Global libs-->      
         <qt.libs>qml quick core gui network</qt.libs>
-        <ffmpeg.libs></ffmpeg.libs>
         <global.libs/>
         <!--Specific os libs used-->
         <windows.oslibs>Ws2_32.lib</windows.oslibs>

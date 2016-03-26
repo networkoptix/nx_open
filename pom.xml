@@ -116,7 +116,6 @@
         <updateFeedUrl>${testUpdateFeedUrl}</updateFeedUrl>
         <mobile>false</mobile>
         <newmobile></newmobile>
-        <ffmpeg.libs></ffmpeg.libs>
         <!-- compile.option2. See profile angle  -->
         <angle>false</angle>
 
@@ -140,7 +139,7 @@
         <unpack.skip>false</unpack.skip>
         <resources.phase>generate-sources</resources.phase>
         <qt.version>5.6.0</qt.version>
-        <ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
+        <ffmpeg.version>0.11.4</ffmpeg.version>
         <openssl.version>1.0.2e</openssl.version>
         <openldap.version>2.4.42-SNAPSHOT</openldap.version>
         <sasl2.version>2.1.26-SNAPSHOT</sasl2.version>
@@ -688,7 +687,7 @@
                 </property>
             </activation>
             <properties>
-                <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
+                <ffmpeg.version>0.11.5</ffmpeg.version>
                 <toolchain.version>codesourcery-2014.05</toolchain.version>
                 <compiler>2011.09</compiler>
                 <qt.spec>linux-arm-gnueabi-g++-2014.05</qt.spec>
@@ -717,7 +716,7 @@
                 </property>
             </activation>
             <properties>
-                <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
+                <ffmpeg.version>0.11.5</ffmpeg.version>
                 <toolchain.version>linaro-multilib-2013.09</toolchain.version>
                 <compiler>${toolchain.version}</compiler>
                 <openssl.version>1.0.1f</openssl.version>
@@ -748,7 +747,7 @@
                 <toolchain.version>rpi</toolchain.version>
                 <compiler>${toolchain.version}</compiler>
                 <openssl.version>1.0.0j</openssl.version>
-                <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
+                <ffmpeg.version>0.11.5</ffmpeg.version>
                 <modification>rpi</modification>
                 <rdep.target>rpi</rdep.target>
             </properties>
@@ -777,7 +776,7 @@
                 <toolchain.version>rpi</toolchain.version>
                 <compiler>bpi</compiler>
                 <openssl.version>1.0.0j</openssl.version>
-                <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
+                <ffmpeg.version>0.11.5</ffmpeg.version>
                 <modification>bpi</modification>
                 <rdep.target>bpi</rdep.target>
                 <qt.spec/>
@@ -805,7 +804,7 @@
                 <toolchain.version>rpi</toolchain.version>
                 <compiler>bpi</compiler>
                 <openssl.version>1.0.0j</openssl.version>
-                <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
+                <ffmpeg.version>0.11.5</ffmpeg.version>
                 <modification>bananapi</modification>
                 <rdep.target>bpi</rdep.target>
             </properties>

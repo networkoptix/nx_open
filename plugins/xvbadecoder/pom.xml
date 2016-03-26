@@ -24,7 +24,6 @@
         <guid>${xvbadecoder.guid}</guid>
         <product.title>${xvbadecoder.name}</product.title>	
         <qt.libs></qt.libs>
-        <ffmpeg.libs></ffmpeg.libs>
         <!--Global libs-->
         <global.libs>-lcommon -lnx_streaming</global.libs>
         <!--Specific os libs used-->

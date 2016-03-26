@@ -25,7 +25,6 @@
         <guid>${it930x_plugin.guid}</guid>
 		<!--Global libs-->
 		<qt.libs>core</qt.libs>
-        <ffmpeg.libs></ffmpeg.libs>
 		<global.libs>-lcommon -lnx_streaming</global.libs>
 		<!--Specific os libs used-->
         <windows.oslibs/>

@@ -27,11 +27,10 @@
         <template>app</template>
         <!--Global libs-->
         <qt.libs>core network xml xmlpatterns sql concurrent multimedia</qt.libs>
-        <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lswresample -lpostproc</ffmpeg.libs>
         <global.libs>-lcommon -lappserver2 -lonvif -ludt -lnx_email -lnx_streaming -lnx_network</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm</windows.oslibs>
-        <linux.oslibs>-lmp3lame -lfaac -lvpx -lvorbisenc -lvorbis -ldl</linux.oslibs>
+        <linux.oslibs>-ldl</linux.oslibs>
         <linux.arm.oslibs/>
         <windows.oslibs.release/>
         <windows.oslibs.debug/>
@@ -43,7 +42,7 @@
         <linux.defines/>
         <mac.defines/>
 
-        <rdep.packages>server-external openssl quazip sigar</rdep.packages>
+        <rdep.packages>server-external openssl ffmpeg quazip sigar</rdep.packages>
         
     </properties>
 

@@ -21,7 +21,6 @@
         <qt.libs>core gui network xml xmlpatterns sql concurrent multimedia</qt.libs>
         <template>lib</template>
         <global.libs>-lnx_utils -lnx_streaming -ludt</global.libs>
-        <ffmpeg.libs/>
         <!--Specific os libs used-->
         <windows.oslibs>-lcommon -lws2_32 DbgHelp.lib -lIphlpapi -lOle32  -lSecur32 -lwinmm</windows.oslibs>
         <windows.oslibs.release/>

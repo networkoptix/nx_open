@@ -20,7 +20,6 @@
         <buildLib>sharedlib</buildLib>
         <!--Global libs-->
         <qt.libs>core</qt.libs>
-        <ffmpeg.libs></ffmpeg.libs>
         <global.libs/>
         <!--Specific os libs used-->
         <windows.oslibs/>

@@ -25,7 +25,6 @@
         <product.title>${axiscamplugin.name}</product.title>
         <!--Global libs-->
         <qt.libs>core network</qt.libs>
-        <ffmpeg.libs></ffmpeg.libs>
         <global.libs/>
         <!--Specific os libs used-->
         <windows.oslibs/>

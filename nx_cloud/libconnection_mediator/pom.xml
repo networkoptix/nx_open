@@ -29,7 +29,6 @@
         <!--Global libs-->
         <qt.libs>core network concurrent</qt.libs>
         <global.libs>-lcommon -lnx_network -ludt -lcloud_db_client -lnx_streaming</global.libs>
-        <ffmpeg.libs>-lavcodec -lavformat -lavutil</ffmpeg.libs>
         <!--Specific os libs used-->
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm</windows.oslibs>
         <windows.oslibs.release/>
@@ -42,7 +41,7 @@
         <windows.defines/>
         <linux.defines/>
         <mac.defines/>
-        <rdep.packages>openssl</rdep.packages>
+        <rdep.packages>openssl ffmpeg</rdep.packages>
     </properties>
 
     <dependencies>

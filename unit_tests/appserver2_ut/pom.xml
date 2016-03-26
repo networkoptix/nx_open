@@ -21,7 +21,6 @@
         <master.project.directory>appserver2</master.project.directory>
         <!--Global libs-->
         <qt.libs>core gui network xml sql concurrent</qt.libs>
-        <ffmpeg.libs></ffmpeg.libs>
         <global.libs>-lcommon -lnx_streaming -lnx_network -lappserver2 -lnx_utils</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm</windows.oslibs>

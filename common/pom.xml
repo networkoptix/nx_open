@@ -26,7 +26,6 @@
         <template>lib</template>
         <qt.libs>core core-private gui network xml xmlpatterns sql concurrent multimedia</qt.libs>
         <global.libs></global.libs>
-        <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc</ffmpeg.libs>
         <!--Specific os libs used-->
         <windows.oslibs>-lws2_32 -lIphlpapi -lOle32 -lSecur32</windows.oslibs>
         <linux.oslibs/>
@@ -40,7 +39,7 @@
         <mac.defines/>
         <android.defines/>
         <ios.defines/>
-        <rdep.packages>qt openssl</rdep.packages>
+        <rdep.packages>qt openssl ffmpeg</rdep.packages>
         <rdep.windows.packages>quazip</rdep.windows.packages>
         <rdep.linux.packages>quazip</rdep.linux.packages>
         <rdep.mac.packages>quazip</rdep.mac.packages>

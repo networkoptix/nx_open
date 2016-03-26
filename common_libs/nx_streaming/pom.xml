@@ -41,7 +41,7 @@
         <mac.defines/>
         <android.defines/>
         <ios.defines/>
-        <rdep.packages>openssl</rdep.packages>
+        <rdep.packages>openssl ffmpeg</rdep.packages>
     </properties>
 
  <dependencies>

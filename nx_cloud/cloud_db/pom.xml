@@ -31,7 +31,7 @@
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm</windows.oslibs>
         <windows.oslibs.release/>
         <windows.oslibs.debug/>
-        <linux.oslibs>-lavcodec -lavformat -lavutil -lfaac -lswscale -lvpx</linux.oslibs>
+        <linux.oslibs/>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
         <!--Global defines-->
         <global.defines/>
@@ -39,7 +39,7 @@
         <windows.defines/>
         <linux.defines/>
         <mac.defines/>
-        <rdep.packages>openssl quazip</rdep.packages>
+        <rdep.packages>openssl ffmpeg quazip</rdep.packages>
     </properties>
 
     <dependencies>

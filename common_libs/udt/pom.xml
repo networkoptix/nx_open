@@ -21,7 +21,6 @@
         <qt.libs>core</qt.libs>
         <template>lib</template>
         <global.libs></global.libs>
-        <ffmpeg.libs/>
         <!--Specific os libs used-->
         <windows.oslibs>-lws2_32</windows.oslibs>
         <windows.oslibs.release/>

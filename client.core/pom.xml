@@ -58,7 +58,6 @@
         <!--Global libs-->
         <template>lib</template>
         <qt.libs>core gui network multimedia concurrent sql</qt.libs>
-        <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc</ffmpeg.libs>
         <global.libs>-lcommon -lnx_streaming -lappserver2</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm</windows.oslibs>
@@ -74,7 +73,7 @@
         <mac.defines/>
         <android.defines/>
         <ios.defines/>
-        <rdep.packages>openssl</rdep.packages>
+        <rdep.packages>openssl ffmpeg</rdep.packages>
     </properties>
     
     <profiles>

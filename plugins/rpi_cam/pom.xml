@@ -25,7 +25,6 @@
         <product.title>${project.name}</product.title>
 		<!--Global libs-->
 		<qt.libs>core</qt.libs>
-        <ffmpeg.libs></ffmpeg.libs>
 		<global.libs>-lcommon -lnx_streaming -lopenmaxil -lvcos -lbcm_host</global.libs>
 		<!--Specific os libs used-->
         <windows.oslibs/>

@@ -19,7 +19,6 @@
         <!--Global libs-->		
         <template>lib</template>
         <qt.libs>core core-private gui network xml sql concurrent</qt.libs>
-        <ffmpeg.libs></ffmpeg.libs>
         <global.libs>-lcommon -lnx_streaming -lnx_network -lnx_utils</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm</windows.oslibs>
@@ -36,7 +35,7 @@
         <mac.defines/>      
         <android.defines/>
         <ios.defines/>
-        <rdep.packages>openssl</rdep.packages>
+        <rdep.packages>openssl ffmpeg</rdep.packages>
         <buildLib>sharedlib</buildLib>
 
     </properties>	
