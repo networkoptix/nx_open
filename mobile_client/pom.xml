@@ -115,26 +115,6 @@
             <build>
                 <plugins>
                     <plugin>
-                        <!-- Workaround for androiddeployqt bug! It can't handle correctly paths containing "/../". -->
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>build-helper-maven-plugin</artifactId>
-                        <version>1.7</version>
-                        <executions>
-                            <execution>
-                                <id>regex-property</id>
-                                <goals>
-                                    <goal>regex-property</goal>
-                                </goals>
-                                <configuration>
-                                    <name>qt.plaindir</name>
-                                    <value>${basedir}</value>
-                                    <regex>(.*)/[^/]+^{0,1}</regex>
-                                    <replacement>$1/build_environment/target</replacement>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
                         <artifactId>maven-antrun-plugin</artifactId>
                         <version>1.7</version>
                         <executions>
