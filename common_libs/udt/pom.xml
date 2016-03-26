@@ -37,4 +37,33 @@
             <systemPath>${root.dir}/build_variables/pom.xml</systemPath>
         </dependency>
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>mobile-android</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>box</name>
+                    <value>android</value>
+                </property>
+            </activation>
+            <properties>
+                <buildLib>staticlib</buildLib>
+            </properties>
+        </profile>
+        <profile>
+            <id>mobile-ios</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>box</name>
+                    <value>ios</value>
+                </property>
+            </activation>
+            <properties>
+                <buildLib>staticlib</buildLib>
+            </properties>
+        </profile>
+    </profiles>
 </project>
