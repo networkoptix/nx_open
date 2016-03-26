@@ -27,8 +27,8 @@
         <product.title>${company.name} cloud_db_client</product.title>
         <template>lib</template>
 
-        <qt.libs>core network concurrent sql</qt.libs>
-        <global.libs>-lcommon -ludt</global.libs>
+        <qt.libs>core gui network concurrent sql xml</qt.libs>
+        <global.libs>-lnx_network -lcommon -lnx_network -lnx_utils -ludt</global.libs>
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm</windows.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
 

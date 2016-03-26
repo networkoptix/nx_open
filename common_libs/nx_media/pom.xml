@@ -27,6 +27,8 @@
 
         <qt.libs>core gui multimedia opengl multimedia-private</qt.libs>
         <global.libs>-lcommon</global.libs>
+
+        <rdep.packages>ffmpeg</rdep.packages>
     </properties>
 
     <profiles>

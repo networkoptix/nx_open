@@ -286,6 +286,7 @@ android {
   QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas -Wno-ignored-qualifiers
   DEFINES += ${android.defines}
   QMAKE_MOC_OPTIONS += -DQ_OS_LINUX
+  CONFIG += no_smart_library_merge
 }
 
 ## iOS
