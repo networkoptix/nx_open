@@ -50,7 +50,8 @@ void initDecoders(QQuickWindow *window)
     using namespace nx::media;
 #if defined(Q_OS_ANDROID)
     std::shared_ptr<AbstractResourceAllocator> allocator(new ResourceAllocator(window));
-    VideoDecoderRegistry::instance()->addPlugin<AndroidVideoDecoder>(std::move(allocator));
+    static const int kHardwareDecodersCount = 1;
+    VideoDecoderRegistry::instance()->addPlugin<AndroidVideoDecoder>(std::move(allocator), kHardwareDecodersCount);
     AudioDecoderRegistry::instance()->addPlugin<AndroidAudioDecoder>();
 #endif
 #ifndef DISABLE_FFMPEG
