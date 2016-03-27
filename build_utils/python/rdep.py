@@ -227,12 +227,13 @@ def try_sync(root, url, target, package, force):
 def sync_package(root, url, target, package, debug, force):
     print "Synching {0}...".format(package)
 
+    to_remove = None
+
     ret = try_sync(root, url, target, package, force)
     if ret == SYNC_NOT_FOUND:
         path = os.path.join(root, target, package)
         if os.path.isdir(path):
-            print "Removing local {0}".format(path)
-            shutil.rmtree(path)
+            to_remove = path
 
         target = ANY_KEYWORD
 
@@ -240,11 +241,15 @@ def sync_package(root, url, target, package, debug, force):
         if ret == SYNC_NOT_FOUND:
             path = os.path.join(root, target, package)
             if os.path.isdir(path):
-                print "Removing local {0}".format(path)
-                shutil.rmtree(path)
+                to_remove.append(path)
 
             print "Could not find {0}".format(package)
             return False
+
+    if to_remove:
+        print "Removing local {0}".format(to_remove)
+        shutil.rmtree(to_remove)
+        to_remove = None
 
     if ret == SYNC_FAILED:
         print "Sync failed for {0}".format(package)
@@ -256,11 +261,14 @@ def sync_package(root, url, target, package, debug, force):
         if ret == SYNC_NOT_FOUND:
             path = os.path.join(root, target, package + DEBUG_SUFFIX)
             if os.path.isdir(path):
-                print "Removing local {0}".format(path)
-                shutil.rmtree(path)
+                to_remove = path
         elif ret == SYNC_FAILED:
             print "Sync failed for {0}".format(package + DEBUG_SUFFIX)
             return False
+
+    if to_remove:
+        print "Removing local {0}".format(to_remove)
+        shutil.rmtree(to_remove)
 
     print "Done {0}".format(package)
     return True
