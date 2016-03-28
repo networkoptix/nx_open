@@ -222,7 +222,10 @@ void UdpHolePunchingTunnelConnector::onConnectResponse(
 
     udtConnection->bindToAioThread(m_timer.getAioThread());
     m_udtConnection = std::move(udtConnection);
-    
+
+    NX_LOGX(lm("session %1. Udt rendezvous connect to %2")
+        .arg(m_connectSessionId).arg(m_targetHostUdpAddress->toString()),
+        cl_logDEBUG1);
     m_udtConnection->connectAsync(
         *m_targetHostUdpAddress,
         [this](SystemError::ErrorCode errorCode)

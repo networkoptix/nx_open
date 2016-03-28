@@ -133,7 +133,7 @@ void UdpHolePunchingTunnelAcceptor::initiateUdtConnection()
         m_peerAddress,
         [this](SystemError::ErrorCode code)
         {
-            NX_LOGX(lm("Randevous UDT connection from %1 to %2 result: %3, "
+            NX_LOGX(lm("Rendezvous UDT connection from %1 to %2 result: %3, "
                 "connectionId=%4, remotePeerId=%5")
                 .arg(m_udtConnectionSocket->getLocalAddress().toString())
                 .arg(m_peerAddress.toString()).arg(SystemError::toString(code))

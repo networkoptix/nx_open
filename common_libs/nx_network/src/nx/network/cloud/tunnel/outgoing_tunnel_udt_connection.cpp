@@ -5,6 +5,7 @@
 
 #include "outgoing_tunnel_udt_connection.h"
 
+#include <nx/network/cloud/data/udp_hole_punching_connection_initiation_data.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/barrier_handler.h>
@@ -36,6 +37,11 @@ OutgoingTunnelUdtConnection::OutgoingTunnelUdtConnection(
         m_timeouts.maxConnectionInactivityPeriod(),
         std::bind(&OutgoingTunnelUdtConnection::onKeepAliveTimeout, this));
     m_aioTimer.bindToAioThread(m_controlConnection->socket()->getAioThread());
+
+    hpm::api::UdpHolePunchingSyn syn;
+    stun::Message message;
+    syn.serialize(&message);
+    m_controlConnection->sendMessage(std::move(message));
 }
 
 OutgoingTunnelUdtConnection::OutgoingTunnelUdtConnection(
@@ -271,7 +277,15 @@ void OutgoingTunnelUdtConnection::closeConnection(
 void OutgoingTunnelUdtConnection::onStunMessageReceived(
     nx::stun::Message message)
 {
-    //TODO #ak
+    hpm::api::UdpHolePunchingSynAck synAck;
+    bool parsed = synAck.parse(message);
+
+    //TODO: #ak Replase asserts with actual error handling
+    NX_ASSERT(parsed);
+    NX_ASSERT(synAck.connectSessionId == m_connectionId);
+
+    NX_LOGX(lm("session %1. Control connection has been verified")
+        .arg(m_connectionId), cl_logDEBUG1);
 }
 
 void OutgoingTunnelUdtConnection::onKeepAliveTimeout()

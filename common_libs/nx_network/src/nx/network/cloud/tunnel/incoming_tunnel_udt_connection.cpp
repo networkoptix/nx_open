@@ -154,7 +154,7 @@ void IncomingTunnelUdtConnection::readRequest()
 void IncomingTunnelUdtConnection::writeResponse()
 {
     NX_LOGX(lm("Send SYN+ACK for connection %1")
-        .arg(m_connectionId), cl_logDEBUG2);
+        .arg(m_connectionId), cl_logDEBUG1);
 
     hpm::api::UdpHolePunchingSynAck synAck;
     synAck.connectSessionId = m_connectionId;
