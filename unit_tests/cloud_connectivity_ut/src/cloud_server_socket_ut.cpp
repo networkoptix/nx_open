@@ -1,10 +1,14 @@
+
 #include <gtest/gtest.h>
 
+#include <libconnection_mediator/src/test_support/mediator_functional_test.h>
+#include <nx/network/socket_global.h>
 #include <nx/network/system_socket.h>
 #include <nx/network/cloud/cloud_server_socket.h>
 #include <nx/network/test_support/simple_socket_test_helper.h>
 #include <nx/network/test_support/socket_test_helper.h>
 #include <nx/network/test_support/stun_async_client_mock.h>
+
 
 namespace nx {
 namespace network {
@@ -120,7 +124,12 @@ struct CloudServerSocketTcpTester
 :
     CloudServerSocket
 {
-    CloudServerSocketTcpTester(): CloudServerSocket(nullptr) {}
+    CloudServerSocketTcpTester()
+    :
+        CloudServerSocket(
+            nx::network::SocketGlobals::mediatorConnector().systemConnection())
+    {
+    }
 
     bool listen(int queueLen) override
     {
@@ -142,10 +151,39 @@ struct CloudServerSocketTcpTester
     }
 };
 
+struct CloudServerSocketTest
+:
+    public ::testing::Test
+{
+public:
+    CloudServerSocketTest()
+    {
+        init();
+    }
+
+private:
+    hpm::MediatorFunctionalTest m_mediator;
+
+    void init()
+    {
+        ASSERT_TRUE(m_mediator.startAndWaitUntilStarted());
+        auto system = m_mediator.addRandomSystem();
+        auto server = m_mediator.addRandomServerNotRegisteredOnMediator(system);
+        ASSERT_NE(nullptr, server);
+
+        SocketGlobals::mediatorConnector().setSystemCredentials(
+            nx::hpm::api::SystemCredentials(
+                system.id,
+                server->serverId(),
+                system.authKey));
+        nx::network::SocketGlobals::mediatorConnector().enable(true);
+    }
+};
+
 template<typename ServerSocket>
 struct CloudServerSocketTcpTest
 :
-    public ::testing::Test
+    public CloudServerSocketTest
 {
 protected:
     std::unique_ptr<ServerSocket> makeServerSocket()
@@ -195,7 +233,7 @@ TEST(CloudServerSocketBaseTcpTest, OpenTunnelOnIndication)
 
     std::vector<CloudServerSocket::AcceptorMaker> acceptorMakers;
     acceptorMakers.push_back(
-        [](hpm::api::ConnectionRequestedEvent&)
+        [](hpm::api::ConnectionRequestedEvent)
         {
             return std::make_unique<FakeTcpTunnelAcceptor>(
                 network::test::kServerAddress);
@@ -203,7 +241,8 @@ TEST(CloudServerSocketBaseTcpTest, OpenTunnelOnIndication)
 
     auto server = std::make_unique<CloudServerSocket>(
         std::make_shared<hpm::api::MediatorServerTcpConnection>(
-            stunAsyncClient, nullptr),
+            stunAsyncClient,
+            &nx::network::SocketGlobals::mediatorConnector()),
         nx::network::RetryPolicy(),
         std::move(acceptorMakers));
     ASSERT_TRUE(server->setNonBlockingMode(true));
@@ -240,6 +279,13 @@ class CloudServerSocketStressTcpTest
 protected:
     void SetUp() override
     {
+        //there must be cloud credentials if we use CloudServerSocket
+        nx::hpm::api::SystemCredentials systemCredentials;
+        systemCredentials.systemId = "system";
+        systemCredentials.key = "key";
+        SocketGlobals::mediatorConnector().setSystemCredentials(
+            std::move(systemCredentials));
+
         const auto addr = network::test::kServerAddress;
         for (size_t i = 0; i < kPeerCount; i++)
             m_peerAddresses.emplace(
@@ -253,7 +299,7 @@ protected:
 
         std::vector<CloudServerSocket::AcceptorMaker> acceptorMakers;
         acceptorMakers.push_back(
-            [this](hpm::api::ConnectionRequestedEvent& event)
+            [this](hpm::api::ConnectionRequestedEvent event)
             {
                 const auto it = m_peerAddresses.find(event.originatingPeerID);
                 NX_ASSERT(it != m_peerAddresses.end());
@@ -264,7 +310,7 @@ protected:
 
         m_server = std::make_unique<CloudServerSocket>(
             std::make_shared<hpm::api::MediatorServerTcpConnection>(
-                m_stunClient, nullptr),
+                m_stunClient, &SocketGlobals::mediatorConnector()),
             nx::network::RetryPolicy(),
             std::move(acceptorMakers));
         ASSERT_TRUE(m_server->setNonBlockingMode(true));
@@ -397,7 +443,7 @@ protected:
                 }
 
                 EXPECT_EQ(*buffer, network::test::kTestMessage);
-                m_connectedResutls.push(counter);
+                m_connectedResults.push(counter);
             });
     }
 
@@ -421,7 +467,7 @@ protected:
         Counters totalCounters;
         for (size_t i = 0; i < kTotalConnects; ++i)
         {
-            const auto c = m_connectedResutls.pop();
+            const auto c = m_connectedResults.pop();
             totalCounters.indications += c.indications;
             totalCounters.retries += c.retries;
         }
@@ -441,7 +487,7 @@ protected:
     std::map<String, SocketAddress> m_peerAddresses;
     std::shared_ptr<network::test::StunAsyncClientMock> m_stunClient;
     std::unique_ptr<AbstractStreamServerSocket> m_server;
-    TestSyncQueue<Counters> m_connectedResutls;
+    TestSyncQueue<Counters> m_connectedResults;
     std::vector<std::thread> m_threads;
 
     QnMutex m_mutex;
@@ -459,6 +505,15 @@ TEST_F(CloudServerSocketStressTcpTest, MultiThread)
     for (size_t i = 0; i < kThreadCount; ++i)
         startClientThread(kClientCount);
 }
+
+//TEST_F(CloudServerSocketTest, aioCancellation)
+//{
+//    CloudServerSocket sock(
+//        nx::network::SocketGlobals::mediatorConnector().systemConnection());
+//    sock.listen(128);
+//    
+//    sock.acceptAsync();
+//}
 
 } // namespace cloud
 } // namespace network

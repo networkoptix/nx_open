@@ -14,11 +14,14 @@ class NX_NETWORK_API IncomingTunnelUdtConnection
     public AbstractIncomingTunnelConnection
 {
 public:
+    /**
+        @param maxKeepAliveInterval If zero, default timeout is applied (see cloud_config.h)
+    */
     IncomingTunnelUdtConnection(
         String connectionId,
-        std::unique_ptr<UdtStreamSocket> connectionSocket);
-
-    void setMaxKeepAliveInterval(std::chrono::milliseconds interval);
+        std::unique_ptr<UdtStreamSocket> connectionSocket,
+        std::chrono::milliseconds maxKeepAliveInterval
+            = std::chrono::milliseconds::zero());
 
     void accept(std::function<void(
         SystemError::ErrorCode,
@@ -34,7 +37,7 @@ private:
     void connectionSocketError(SystemError::ErrorCode code);
 
     std::chrono::milliseconds m_maxKeepAliveInterval;
-    std::chrono::system_clock::time_point m_lastKeepAlive;
+    std::chrono::steady_clock::time_point m_lastKeepAlive;
     SystemError::ErrorCode m_state;
 
     Buffer m_connectionBuffer;

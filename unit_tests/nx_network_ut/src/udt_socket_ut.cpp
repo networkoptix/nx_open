@@ -55,6 +55,23 @@ public:
             m_createStreamServerSocketFunc = oldFunc;
     }
 
+    void setUdtSocketFunctions()
+    {
+        setCreateStreamSocketFunc(
+            [](bool /*sslRequired*/, SocketFactory::NatTraversalType)
+                -> std::unique_ptr<AbstractStreamSocket>
+            {
+                return std::make_unique<UdtStreamSocket>();
+            });
+
+        setCreateStreamServerSocketFunc(
+            [](bool /*sslRequired*/, SocketFactory::NatTraversalType)
+                -> std::unique_ptr<AbstractStreamServerSocket>
+            {
+                return std::make_unique<UdtStreamServerSocket>();
+            });
+    }
+
 private:
     boost::optional<SocketFactory::CreateStreamSocketFuncType> m_createStreamSocketFunc;
     boost::optional<SocketFactory::CreateStreamServerSocketFuncType> m_createStreamServerSocketFunc;
@@ -167,34 +184,39 @@ NX_NETWORK_BOTH_SOCKETS_TEST_CASE(
     &std::make_unique<UdtStreamServerSocket>,
     &std::make_unique<UdtStreamSocket>)
 
+static std::unique_ptr<UdtStreamSocket> rendezvousUdtSocket(
+    std::chrono::milliseconds connectTimeout)
+{
+    auto socket = std::make_unique<UdtStreamSocket>();
+    EXPECT_TRUE(socket->setRendezvous(true));
+    EXPECT_TRUE(socket->setSendTimeout(connectTimeout.count()));
+    EXPECT_TRUE(socket->setNonBlockingMode(true));
+    EXPECT_TRUE(socket->bind(SocketAddress(HostAddress::localhost, 0)));
+    return socket;
+}
+
 TEST_F(SocketUdt, rendezvousConnect)
 {
-    const std::chrono::milliseconds connectTimeout(2000);
+    const std::chrono::seconds kConnectTimeout(2);
+    const size_t kBytesToSendThroughConnection(128 * 1024);
+    const int kMaxSimultaneousConnections(25);
+    const std::chrono::seconds kTestDuration(3);
 
     //creating two sockets, performing randezvous connect
-    UdtStreamSocket connectorSocket;
-    ASSERT_TRUE(connectorSocket.setRendezvous(true));
-    ASSERT_TRUE(connectorSocket.setSendTimeout(connectTimeout.count()));
-    ASSERT_TRUE(connectorSocket.setNonBlockingMode(true));
-    ASSERT_TRUE(connectorSocket.bind(SocketAddress(HostAddress::localhost, 0)));
-
-    UdtStreamSocket acceptorSocket;
-    ASSERT_TRUE(acceptorSocket.setRendezvous(true));
-    ASSERT_TRUE(acceptorSocket.setSendTimeout(connectTimeout.count()));
-    ASSERT_TRUE(acceptorSocket.setNonBlockingMode(true));
-    ASSERT_TRUE(acceptorSocket.bind(SocketAddress(HostAddress::localhost, 0)));
+    const auto connectorSocket = rendezvousUdtSocket(kConnectTimeout);
+    const auto acceptorSocket = rendezvousUdtSocket(kConnectTimeout);
 
     auto socketStoppedGuard = makeScopedGuard(
         [&connectorSocket, &acceptorSocket]
         {
             //cleaning up
-            connectorSocket.pleaseStopSync();
-            acceptorSocket.pleaseStopSync();
+            connectorSocket->pleaseStopSync();
+            acceptorSocket->pleaseStopSync();
         });
 
     std::promise<SystemError::ErrorCode> connectorConnectedPromise;
-    connectorSocket.connectAsync(
-        acceptorSocket.getLocalAddress(),
+    connectorSocket->connectAsync(
+        acceptorSocket->getLocalAddress(),
         [&connectorConnectedPromise](
             SystemError::ErrorCode errorCode)
         {
@@ -202,8 +224,8 @@ TEST_F(SocketUdt, rendezvousConnect)
         });
 
     std::promise<SystemError::ErrorCode> acceptorConnectedPromise;
-    acceptorSocket.connectAsync(
-        connectorSocket.getLocalAddress(),
+    acceptorSocket->connectAsync(
+        connectorSocket->getLocalAddress(),
         [&acceptorConnectedPromise](
             SystemError::ErrorCode errorCode)
         {
@@ -218,46 +240,114 @@ TEST_F(SocketUdt, rendezvousConnect)
         << SystemError::toString(acceptorResultCode).toStdString();
 
     //after successfull connect starting listener on one side and connector on the other one
-    setCreateStreamSocketFunc(
-        [](bool /*sslRequired*/, SocketFactory::NatTraversalType)
-            -> std::unique_ptr<AbstractStreamSocket>
-        {
-            return std::make_unique<UdtStreamSocket>();
-        });
+    setUdtSocketFunctions();
 
-    setCreateStreamServerSocketFunc(
-        [](bool /*sslRequired*/, SocketFactory::NatTraversalType)
-            -> std::unique_ptr<AbstractStreamServerSocket>
-        {
-            return std::make_unique<UdtStreamServerSocket>();
-        });
-
-    const size_t bytesToSendThroughConnection = 128*1024;
-    const int maxSimultaneousConnections = 25;
-    const std::chrono::seconds testDuration(3);
-
-    RandomDataTcpServer server(bytesToSendThroughConnection);
-    server.setLocalAddress(acceptorSocket.getLocalAddress());
+    RandomDataTcpServer server(
+        TestTrafficLimitType::outgoing,
+        kBytesToSendThroughConnection,
+        TestTransmissionMode::spam);
+    server.setLocalAddress(acceptorSocket->getLocalAddress());
     ASSERT_TRUE(server.start());
 
     ConnectionsGenerator connectionsGenerator(
-        SocketAddress(QString::fromLatin1("localhost"), server.addressBeingListened().port),
-        maxSimultaneousConnections,
-        bytesToSendThroughConnection);
-    connectionsGenerator.setLocalAddress(connectorSocket.getLocalAddress());
+        SocketAddress(HostAddress::localhost, server.addressBeingListened().port),
+        kMaxSimultaneousConnections,
+        TestTrafficLimitType::outgoing,
+        kBytesToSendThroughConnection,
+        ConnectionsGenerator::kInfiniteConnectionCount,
+        TestTransmissionMode::spam);
+    connectionsGenerator.setLocalAddress(connectorSocket->getLocalAddress());
     connectionsGenerator.start();
 
-    std::this_thread::sleep_for(testDuration);
+    std::this_thread::sleep_for(kTestDuration);
 
-    connectionsGenerator.pleaseStop();
-    connectionsGenerator.join();
-
-    server.pleaseStop();
-    server.join();
+    connectionsGenerator.pleaseStopSync();
+    server.pleaseStopSync();
 
     ASSERT_GT(connectionsGenerator.totalConnectionsEstablished(), 0);
     ASSERT_GT(connectionsGenerator.totalBytesSent(), 0);
     ASSERT_GT(connectionsGenerator.totalBytesReceived(), 0);
+}
+
+TEST_F(SocketUdt, rendezvousConnectWithDelay)
+{
+    const std::chrono::seconds kConnectTimeout(3);
+    const std::chrono::seconds kConnectDelay(1);
+    const size_t kBytesToEcho(128 * 1024);
+    const int kMaxSimultaneousConnections(25);
+    const std::chrono::seconds kTestDuration(3);
+
+    //creating two sockets, performing randezvous connect
+    const auto serverSocket = rendezvousUdtSocket(kConnectTimeout);
+    const auto clientSocket = rendezvousUdtSocket(kConnectTimeout);
+
+    setUdtSocketFunctions();
+
+    std::unique_ptr<RandomDataTcpServer> server;
+    serverSocket->connectAsync(
+        clientSocket->getLocalAddress(),
+        [&](SystemError::ErrorCode code)
+        {
+            ASSERT_EQ(code, SystemError::noError)
+                << SystemError::toString(code).toStdString();
+            server.reset(new RandomDataTcpServer(
+                TestTrafficLimitType::none, 0, TestTransmissionMode::echo));
+
+            server->setLocalAddress(serverSocket->getLocalAddress());
+            ASSERT_TRUE(server->start());
+
+            auto buffer = std::make_shared<Buffer>();
+            buffer->reserve(100);
+            serverSocket->readSomeAsync(
+                buffer.get(),
+                [buffer](SystemError::ErrorCode code, size_t size)
+                {
+                    // no data is supposed to send using this socket
+                    EXPECT_TRUE(code != SystemError::noError || size == 0);
+                });
+        });
+
+    std::this_thread::sleep_for(kConnectDelay);
+
+    std::unique_ptr<ConnectionsGenerator> generator;
+    clientSocket->connectAsync(
+        serverSocket->getLocalAddress(),
+        [&](SystemError::ErrorCode code)
+        {
+            ASSERT_EQ(code, SystemError::noError)
+                << SystemError::toString(code).toStdString();
+            SocketAddress serverAddress(
+                HostAddress::localhost, server->addressBeingListened().port);
+            generator.reset(new ConnectionsGenerator(
+                serverAddress, kMaxSimultaneousConnections,
+                TestTrafficLimitType::incoming, kBytesToEcho,
+                ConnectionsGenerator::kInfiniteConnectionCount,
+                TestTransmissionMode::echoTest));
+
+            generator->setLocalAddress(clientSocket->getLocalAddress());
+            generator->start();
+
+            auto buffer = std::make_shared<Buffer>();
+            buffer->reserve(100);
+            clientSocket->readSomeAsync(
+                buffer.get(),
+                [buffer](SystemError::ErrorCode code, size_t size)
+                {
+                    // no data is supposed to send using this socket
+                    ASSERT_TRUE(code != SystemError::noError || size == 0);
+                });
+        });
+
+    std::this_thread::sleep_for(kTestDuration);
+
+    serverSocket->pleaseStopSync();
+    clientSocket->pleaseStopSync();
+    generator->pleaseStopSync();
+    server->pleaseStopSync();
+
+    ASSERT_GT(generator->totalConnectionsEstablished(), 0);
+    ASSERT_GT(generator->totalBytesSent(), 0);
+    ASSERT_GT(generator->totalBytesReceived(), 0);
 }
 
 TEST_F(SocketUdt, acceptingFirstConnection)

@@ -107,6 +107,7 @@ public:
         BaseMediatorClient<NetworkClientType>(std::move(arg1)),
         m_connector(connector)
     {
+        NX_ASSERT(m_connector);
     }
 
     /** Ask mediator to test connection to addresses.

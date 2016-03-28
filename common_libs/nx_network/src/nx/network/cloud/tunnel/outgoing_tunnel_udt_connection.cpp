@@ -5,6 +5,8 @@
 
 #include "outgoing_tunnel_udt_connection.h"
 
+#include <nx/network/cloud/data/udp_hole_punching_connection_initiation_data.h>
+#include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/barrier_handler.h>
 #include <utils/common/cpp14.h>
@@ -34,6 +36,12 @@ OutgoingTunnelUdtConnection::OutgoingTunnelUdtConnection(
     m_controlConnection->socket()->registerTimer(
         m_timeouts.maxConnectionInactivityPeriod(),
         std::bind(&OutgoingTunnelUdtConnection::onKeepAliveTimeout, this));
+    m_aioTimer.bindToAioThread(m_controlConnection->socket()->getAioThread());
+
+    hpm::api::UdpHolePunchingSyn syn;
+    stun::Message message;
+    syn.serialize(&message);
+    m_controlConnection->sendMessage(std::move(message));
 }
 
 OutgoingTunnelUdtConnection::OutgoingTunnelUdtConnection(
@@ -49,7 +57,8 @@ OutgoingTunnelUdtConnection::OutgoingTunnelUdtConnection(
 
 OutgoingTunnelUdtConnection::~OutgoingTunnelUdtConnection()
 {
-    NX_ASSERT(m_pleaseStopHasBeenCalled && m_pleaseStopCompleted);
+    //all internal sockets live in same aio thread, 
+        //so it is allowed to free OutgoingTunnelUdtConnection while in aio thread
 }
 
 void OutgoingTunnelUdtConnection::pleaseStop(
@@ -120,23 +129,29 @@ void OutgoingTunnelUdtConnection::establishNewConnection(
         !newConnection->setNonBlockingMode(true))
     {
         const auto errorCode = SystemError::getLastOSErrorCode();
+        NX_ASSERT(errorCode != SystemError::noError);
         NX_LOGX(lm("connection %1. Failed to apply socket options to new connection. %2")
             .arg(m_connectionId).arg(SystemError::toString(errorCode)), cl_logDEBUG1);
         m_aioTimer.post(
-            [this, handler = move(handler),
-                errorCode = SystemError::getLastOSErrorCode()]() mutable
+            [this, handler = move(handler), errorCode]() mutable
             {
                 handler(errorCode, nullptr, m_controlConnection != nullptr);
             });
         return;
     }
 
+    //temporariliy binding new socket to the same aio thread to simplify code here
+    newConnection->bindToAioThread(m_aioTimer.getAioThread());
+
     QnMutexLocker lk(&m_mutex);
 
     auto connectionPtr = newConnection.get();
     m_ongoingConnections.emplace(
         connectionPtr,
-        ConnectionContext{std::move(newConnection), std::move(handler)});
+        ConnectionContext{
+            std::move(newConnection),
+            std::move(handler),
+            socketAttributes.aioThread ? *socketAttributes.aioThread : nullptr});
     
     //has to start connect and timer atomically, 
         //but this can be done from socket's aio thread only
@@ -199,14 +214,9 @@ void OutgoingTunnelUdtConnection::onConnectCompleted(
 
     //ensuring connectionPtr can be safely freed in any thread
     connectionPtr->post(
-        [this, connectionPtr, errorCode]()
-        {
-            //switching execution to m_aioTimer's thread
-            m_aioTimer.post(
-                std::bind(
-                    &OutgoingTunnelUdtConnection::reportConnectResult, this,
-                    connectionPtr, errorCode));
-        });
+        std::bind(
+            &OutgoingTunnelUdtConnection::reportConnectResult, this,
+            connectionPtr, errorCode));
 }
 
 void OutgoingTunnelUdtConnection::reportConnectResult(
@@ -223,6 +233,15 @@ void OutgoingTunnelUdtConnection::reportConnectResult(
     ConnectionContext connectionContext = std::move(connectionIter->second);
     m_ongoingConnections.erase(connectionIter);
     lk.unlock();
+
+    if (errorCode == SystemError::noError)
+    {
+        //binding to desired aio thread
+        connectionContext.connection->bindToAioThread(
+            connectionContext.aioThreadToUse
+                ? connectionContext.aioThreadToUse
+                : nx::network::SocketGlobals::aioService().getRandomAioThread());
+    }
 
     connectionContext.completionHandler(
         errorCode,
@@ -258,7 +277,15 @@ void OutgoingTunnelUdtConnection::closeConnection(
 void OutgoingTunnelUdtConnection::onStunMessageReceived(
     nx::stun::Message message)
 {
-    //TODO #ak
+    hpm::api::UdpHolePunchingSynAck synAck;
+    bool parsed = synAck.parse(message);
+
+    //TODO: #ak Replase asserts with actual error handling
+    NX_ASSERT(parsed);
+    NX_ASSERT(synAck.connectSessionId == m_connectionId);
+
+    NX_LOGX(lm("session %1. Control connection has been verified")
+        .arg(m_connectionId), cl_logDEBUG1);
 }
 
 void OutgoingTunnelUdtConnection::onKeepAliveTimeout()
