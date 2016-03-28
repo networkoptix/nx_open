@@ -4,6 +4,7 @@
 
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_properties.h>
 
 #include "resource_property_adaptor.h"
 
@@ -14,7 +15,8 @@
 #include <nx_ec/data/api_resource_data.h>
 
 
-namespace {
+namespace
+{
     QSet<QString> parseDisabledVendors(QString disabledVendors) {
         QStringList disabledVendorList;
         if (disabledVendors.contains(lit(";")))
@@ -32,26 +34,33 @@ namespace {
         return updatedVendorList.toSet();
     }
 
-    const QString nameDisabledVendors(lit("disabledVendors"));
-    const QString nameCameraSettingsOptimization(lit("cameraSettingsOptimization"));
-    const QString nameAuditTrailEnabled(lit("auditTrailEnabled"));
-    const QString nameHost(lit("smtpHost"));
-    const QString namePort(lit("smtpPort"));
-    const QString nameUser(lit("smtpUser"));
-    const QString namePassword(lit("smptPassword"));
-    const QString nameConnectionType(lit("smtpConnectionType"));
-    const QString nameSimple(lit("smtpSimple"));
-    const QString nameTimeout(lit("smtpTimeout"));
-    const QString nameFrom(lit("emailFrom"));
-    const QString nameSignature(lit("emailSignature"));
-    const QString nameSupportEmail(lit("emailSupportEmail"));
-    const QString nameUpdateNotificationsEnabled(lit("updateNotificationsEnabled"));
-    const QString nameTimeSynchronizationEnabled(lit("timeSynchronizationEnabled"));
-    const QString nameServerAutoDiscoveryEnabled(lit("serverAutoDiscoveryEnabled"));
-    const QString nameBackupQualities(lit("backupQualities"));
-    const QString nameBackupNewCamerasByDefault(lit("backupNewCamerasByDefault"));
-    const QString nameStatisticsAllowed(lit("statisticsAllowed"));
-	const QString nameCrossdomainEnabled(lit("crossdomainEnabled"));
+    const QString kNameDisabledVendors(lit("disabledVendors"));
+    const QString kNameCameraSettingsOptimization(lit("cameraSettingsOptimization"));
+    const QString kNameAuditTrailEnabled(lit("auditTrailEnabled"));
+    const QString kNameHost(lit("smtpHost"));
+    const QString kNamePort(lit("smtpPort"));
+    const QString kNameUser(lit("smtpUser"));
+    const QString kNamePassword(lit("smptPassword"));
+    const QString kNameConnectionType(lit("smtpConnectionType"));
+    const QString kNameSimple(lit("smtpSimple"));
+    const QString kNameTimeout(lit("smtpTimeout"));
+    const QString kNameFrom(lit("emailFrom"));
+    const QString kNameSignature(lit("emailSignature"));
+    const QString kNameSupportEmail(lit("emailSupportEmail"));
+    const QString kNameUpdateNotificationsEnabled(lit("updateNotificationsEnabled"));
+    const QString kNameTimeSynchronizationEnabled(lit("timeSynchronizationEnabled"));
+    const QString kNameServerAutoDiscoveryEnabled(lit("serverAutoDiscoveryEnabled"));
+    const QString kNameBackupQualities(lit("backupQualities"));
+    const QString kNameBackupNewCamerasByDefault(lit("backupNewCamerasByDefault"));
+    const QString kNameCrossdomainEnabled(lit("crossdomainEnabled"));
+
+    const QString kNameStatisticsAllowed(lit("statisticsAllowed"));
+    const QString kNameStatisticsReportLastTime(lit("statisticsReportLastTime"));
+    const QString kNameStatisticsReportLastNumber(lit("statisticsReportLastNumber"));
+    const QString kNameStatisticsReportTimeCycle(lit("statisticsReportTimeCycle"));
+    const QString kNameSystemId(lit("systemId"));
+    const QString kNameSystemNameForId(lit("systemNameForId"));
+    const QString kNameStatisticsReportServerApi(lit("statisticsReportServerApi"));
 
     const QString ldapUri(lit("ldapUri"));
     const QString ldapAdminDn(lit("ldapAdminDn"));
@@ -80,6 +89,9 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
     m_allAdaptors
         << initEmailAdaptors()
         << initLdapAdaptors()
+        << initStaticticsAdaptors()
+        << initConnectionAdaptors()
+        << initCloudAdaptors()
         << initMiscAdaptors()
         ;
 
@@ -87,6 +99,11 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
     connect(qnResPool,                              &QnResourcePool::resourceRemoved,                   this,   &QnGlobalSettings::at_resourcePool_resourceRemoved);
     for(const QnResourcePtr &resource: qnResPool->getResources())
         at_resourcePool_resourceAdded(resource);
+
+    connect(propertyDictionary, &QnResourcePropertyDictionary::asyncSaveDone, this, [this](int reqId, ec2::ErrorCode errorCode)
+    {
+
+    });
 }
 
 QnGlobalSettings::~QnGlobalSettings() {
@@ -101,16 +118,16 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initEmailAdaptors() {
     if (defaultSupportLink.isEmpty())
         defaultSupportLink = QnAppInfo::supportEmailAddress();
 
-    m_serverAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameHost, QString(), this);
-    m_fromAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameFrom, QString(), this);
-    m_userAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameUser, QString(), this);
-    m_passwordAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(namePassword, QString(), this);
-    m_signatureAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameSignature, QString(), this);
-    m_supportLinkAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameSupportEmail, defaultSupportLink, this);
-    m_connectionTypeAdaptor = new  QnLexicalResourcePropertyAdaptor<QnEmail::ConnectionType>(nameConnectionType, QnEmail::Unsecure, this);
-    m_portAdaptor = new QnLexicalResourcePropertyAdaptor<int>(namePort, 0, this);
-    m_timeoutAdaptor = new QnLexicalResourcePropertyAdaptor<int>(nameTimeout, QnEmailSettings::defaultTimeoutSec(), this);
-    m_simpleAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameSimple, true, this);
+    m_serverAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameHost, QString(), this);
+    m_fromAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameFrom, QString(), this);
+    m_userAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameUser, QString(), this);
+    m_passwordAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNamePassword, QString(), this);
+    m_signatureAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameSignature, QString(), this);
+    m_supportLinkAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameSupportEmail, defaultSupportLink, this);
+    m_connectionTypeAdaptor = new  QnLexicalResourcePropertyAdaptor<QnEmail::ConnectionType>(kNameConnectionType, QnEmail::Unsecure, this);
+    m_portAdaptor = new QnLexicalResourcePropertyAdaptor<int>(kNamePort, 0, this);
+    m_timeoutAdaptor = new QnLexicalResourcePropertyAdaptor<int>(kNameTimeout, QnEmailSettings::defaultTimeoutSec(), this);
+    m_simpleAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameSimple, true, this);
 
     QnGlobalSettings::AdaptorList result;
     result
@@ -154,18 +171,35 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initLdapAdaptors() {
     return result;
 }
 
-QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors() {
-    m_disabledVendorsAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameDisabledVendors, QString(), this);
-    m_cameraSettingsOptimizationAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameCameraSettingsOptimization, true, this);
-    m_auditTrailEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameAuditTrailEnabled, true, this);
-    m_serverAutoDiscoveryEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameServerAutoDiscoveryEnabled, true, this);
-    m_updateNotificationsEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameUpdateNotificationsEnabled, true, this);
-    m_backupQualitiesAdaptor = new QnLexicalResourcePropertyAdaptor<Qn::CameraBackupQualities>(nameBackupQualities, Qn::CameraBackup_Both, this);
-    m_backupNewCamerasByDefaultAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameBackupNewCamerasByDefault, false, this);
-    m_statisticsAllowedAdaptor = new QnLexicalResourcePropertyAdaptor<QnOptionalBool>(nameStatisticsAllowed, QnOptionalBool(), this);
-	m_crossdomainXmlEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameCrossdomainEnabled, true, this);	
+QnGlobalSettings::AdaptorList QnGlobalSettings::initStaticticsAdaptors()
+{
+    m_statisticsAllowedAdaptor = new QnLexicalResourcePropertyAdaptor<QnOptionalBool>(kNameStatisticsAllowed, QnOptionalBool(), this);
+    m_statisticsReportLastTimeAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameStatisticsReportLastTime, QString(), this);
+    m_statisticsReportLastNumberAdaptor = new QnLexicalResourcePropertyAdaptor<int>(kNameStatisticsReportLastNumber, 0, this);
+    m_statisticsReportTimeCycleAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameStatisticsReportTimeCycle, QString(), this);
+    m_systemIdAdaptor = new QnLexicalResourcePropertyAdaptor<QnUuid>(kNameSystemId, QnUuid(), this);
+    m_systemNameForIdAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameSystemNameForId, QString(), this);
+    m_statisticsReportServerApiAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameStatisticsReportServerApi, QString(), this);
 
-    QList<QnAbstractResourcePropertyAdaptor*> ec2Adaptors;
+    connect(m_statisticsAllowedAdaptor, &QnAbstractResourcePropertyAdaptor::valueChanged, this, &QnGlobalSettings::statisticsAllowedChanged, Qt::QueuedConnection);
+
+    QnGlobalSettings::AdaptorList result;
+    result
+        << m_statisticsAllowedAdaptor
+        << m_statisticsReportLastTimeAdaptor
+        << m_statisticsReportLastNumberAdaptor
+        << m_statisticsReportTimeCycleAdaptor
+        << m_systemIdAdaptor
+        << m_systemNameForIdAdaptor
+        << m_statisticsReportServerApiAdaptor
+        ;
+
+    return result;
+}
+
+QnGlobalSettings::AdaptorList QnGlobalSettings::initConnectionAdaptors()
+{
+    AdaptorList ec2Adaptors;
     m_ec2ConnectionKeepAliveTimeoutAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         kEc2ConnectionKeepAliveTimeout,
         kEc2ConnectionKeepAliveTimeoutDefault,
@@ -181,24 +215,58 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors() {
         kEc2AliveUpdateIntervalDefault,
         this);
     ec2Adaptors << m_ec2AliveUpdateIntervalAdaptor;
-    m_serverDiscoveryPingTimeout = new QnLexicalResourcePropertyAdaptor<int>(
+    m_serverDiscoveryPingTimeoutAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         kServerDiscoveryPingTimeout,
         kServerDiscoveryPingTimeoutDefault,
         this);
-    ec2Adaptors << m_serverDiscoveryPingTimeout;
+    ec2Adaptors << m_serverDiscoveryPingTimeoutAdaptor;
     m_timeSynchronizationEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
-        nameTimeSynchronizationEnabled,
+        kNameTimeSynchronizationEnabled,
         true,
         this);
     ec2Adaptors << m_timeSynchronizationEnabledAdaptor;
 
-    for(auto adaptor: ec2Adaptors)
+    for (auto adaptor : ec2Adaptors)
         connect(
             adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged,
             this, &QnGlobalSettings::ec2ConnectionSettingsChanged,
             Qt::QueuedConnection);
 
-    m_arecontRtspEnabled = new QnLexicalResourcePropertyAdaptor<bool>(
+    return ec2Adaptors;
+}
+
+QnGlobalSettings::AdaptorList QnGlobalSettings::initCloudAdaptors()
+{
+    m_cloudAccountNameAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameCloudAccountName, QString(), this);
+    m_cloudSystemIDAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameCloudSystemID, QString(), this);
+    m_cloudAuthKeyAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameCloudAuthKey, QString(), this);
+
+    QnGlobalSettings::AdaptorList result;
+    result
+        << m_cloudAccountNameAdaptor
+        << m_cloudSystemIDAdaptor
+        << m_cloudAuthKeyAdaptor
+        ;
+
+    for (QnAbstractResourcePropertyAdaptor* adaptor : result)
+        connect(adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged, this, &QnGlobalSettings::cloudSettingsChanged, Qt::QueuedConnection);
+
+    return result;
+}
+
+QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
+{
+    m_disabledVendorsAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameDisabledVendors, QString(), this);
+    m_cameraSettingsOptimizationAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameCameraSettingsOptimization, true, this);
+    m_auditTrailEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameAuditTrailEnabled, true, this);
+    m_serverAutoDiscoveryEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameServerAutoDiscoveryEnabled, true, this);
+    m_updateNotificationsEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameUpdateNotificationsEnabled, true, this);
+    m_backupQualitiesAdaptor = new QnLexicalResourcePropertyAdaptor<Qn::CameraBackupQualities>(kNameBackupQualities, Qn::CameraBackup_Both, this);
+    m_backupNewCamerasByDefaultAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameBackupNewCamerasByDefault, false, this);
+	m_crossdomainXmlEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameCrossdomainEnabled, true, this);
+    m_upnpPortMappingEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameUpnpPortMappingEnabled, true, this);
+
+    m_arecontRtspEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         kArecontRtspEnabled,
         kArecontRtspEnabledDefault,
         this);
@@ -207,8 +275,8 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors() {
     connect(m_auditTrailEnabledAdaptor,             &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::auditTrailEnableChanged,             Qt::QueuedConnection);
     connect(m_cameraSettingsOptimizationAdaptor,    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::cameraSettingsOptimizationChanged,   Qt::QueuedConnection);
     connect(m_serverAutoDiscoveryEnabledAdaptor,    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::serverAutoDiscoveryChanged,          Qt::QueuedConnection);
-    connect(m_statisticsAllowedAdaptor,             &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::statisticsAllowedChanged,            Qt::QueuedConnection);
     connect(m_updateNotificationsEnabledAdaptor,    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::updateNotificationsChanged,          Qt::QueuedConnection);
+    connect(m_upnpPortMappingEnabledAdaptor,        &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::upnpPortMappingEnabledChanged,          Qt::QueuedConnection);
 
     QnGlobalSettings::AdaptorList result;
     result
@@ -219,10 +287,9 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors() {
         << m_updateNotificationsEnabledAdaptor
         << m_backupQualitiesAdaptor
         << m_backupNewCamerasByDefaultAdaptor
-        << m_statisticsAllowedAdaptor
 		<< m_crossdomainXmlEnabledAdaptor
-        << ec2Adaptors
-        << m_arecontRtspEnabled
+        << m_upnpPortMappingEnabledAdaptor
+        << m_arecontRtspEnabledAdaptor
         ;
 
     return result;
@@ -358,9 +425,28 @@ void QnGlobalSettings::setEmailSettings(const QnEmailSettings &settings) {
     m_timeoutAdaptor->setValue(settings.timeout);
 }
 
-void QnGlobalSettings::synchronizeNow() {
+void QnGlobalSettings::synchronizeNow()
+{
     for (QnAbstractResourcePropertyAdaptor* adaptor: m_allAdaptors)
-        adaptor->synchronizeNow();
+        adaptor->saveToResource();
+
+    QnMutexLocker locker(&m_mutex);
+    NX_ASSERT(m_admin, Q_FUNC_INFO, "Invalid sync state");
+    if (!m_admin)
+        return;
+    propertyDictionary->saveParamsAsync(m_admin->getId());
+}
+
+bool QnGlobalSettings::synchronizeNowSync()
+{
+    for (QnAbstractResourcePropertyAdaptor* adaptor : m_allAdaptors)
+        adaptor->saveToResource();
+
+    QnMutexLocker locker(&m_mutex);
+    NX_ASSERT(m_admin, Q_FUNC_INFO, "Invalid sync state");
+    if (!m_admin)
+        return false;
+    return propertyDictionary->saveParams(m_admin->getId());
 }
 
 bool QnGlobalSettings::isUpdateNotificationsEnabled() const {
@@ -401,6 +487,78 @@ void QnGlobalSettings::setStatisticsAllowed( bool value ) {
     m_statisticsAllowedAdaptor->setValue(QnOptionalBool(value));
 }
 
+QDateTime QnGlobalSettings::statisticsReportLastTime() const
+{
+    return QDateTime::fromString(m_statisticsReportLastTimeAdaptor->value(), Qt::ISODate);
+}
+
+void QnGlobalSettings::setStatisticsReportLastTime(const QDateTime& value)
+{
+    m_statisticsReportLastTimeAdaptor->setValue(value.toString(Qt::ISODate));
+}
+
+int QnGlobalSettings::statisticsReportLastNumber() const
+{
+    return m_statisticsReportLastNumberAdaptor->value();
+}
+
+void QnGlobalSettings::setStatisticsReportLastNumber(int value)
+{
+    m_statisticsReportLastNumberAdaptor->setValue(value);
+}
+
+QString QnGlobalSettings::statisticsReportTimeCycle() const
+{
+    return m_statisticsReportTimeCycleAdaptor->value();
+}
+
+void QnGlobalSettings::setStatisticsReportTimeCycle(const QString& value)
+{
+    m_statisticsReportTimeCycleAdaptor->setValue(value);
+}
+
+const QString QnGlobalSettings::kNameUpnpPortMappingEnabled(lit("upnpPortMappingEnabled"));
+
+bool QnGlobalSettings::isUpnpPortMappingEnabled() const
+{
+    return m_upnpPortMappingEnabledAdaptor->value();
+}
+
+void QnGlobalSettings::setUpnpPortMappingEnabled(bool value)
+{
+    m_upnpPortMappingEnabledAdaptor->setValue(value);
+}
+
+QnUuid QnGlobalSettings::systemId() const
+{
+    return m_systemIdAdaptor->value();
+}
+
+void QnGlobalSettings::setSystemId(const QnUuid &value)
+{
+    m_systemIdAdaptor->setValue(value);
+}
+
+QString QnGlobalSettings::systemNameForId() const
+{
+    return m_systemNameForIdAdaptor->value();
+}
+
+void QnGlobalSettings::setSystemNameForId(const QString &value)
+{
+    m_systemNameForIdAdaptor->setValue(value);
+}
+
+QString QnGlobalSettings::statisticsReportServerApi() const
+{
+    return m_statisticsReportServerApiAdaptor->value();
+}
+
+void QnGlobalSettings::setStatisticsReportServerApi(const QString &value)
+{
+    m_statisticsReportServerApiAdaptor->setValue(value);
+}
+
 std::chrono::seconds QnGlobalSettings::connectionKeepAliveTimeout() const
 {
     return std::chrono::seconds(m_ec2ConnectionKeepAliveTimeoutAdaptor->value());
@@ -433,12 +591,12 @@ void QnGlobalSettings::setAliveUpdateInterval(std::chrono::seconds newInterval) 
 
 std::chrono::seconds QnGlobalSettings::serverDiscoveryPingTimeout() const
 {
-    return std::chrono::seconds(m_serverDiscoveryPingTimeout->value());
+    return std::chrono::seconds(m_serverDiscoveryPingTimeoutAdaptor->value());
 }
 
 void QnGlobalSettings::setServerDiscoveryPingTimeout(std::chrono::seconds newInterval) const
 {
-    m_serverDiscoveryPingTimeout->setValue(newInterval.count());
+    m_serverDiscoveryPingTimeoutAdaptor->setValue(newInterval.count());
 }
 
 std::chrono::seconds QnGlobalSettings::serverDiscoveryAliveCheckTimeout() const
@@ -450,14 +608,57 @@ bool QnGlobalSettings::isTimeSynchronizationEnabled() const {
     return m_timeSynchronizationEnabledAdaptor->value();
 }
 
+const QString QnGlobalSettings::kNameCloudAccountName(lit("cloudAccountName"));
+
+QString QnGlobalSettings::cloudAccountName() const
+{
+    return m_cloudAccountNameAdaptor->value();
+}
+
+void QnGlobalSettings::setCloudAccountName(const QString& value)
+{
+    m_cloudAccountNameAdaptor->setValue(value);
+}
+
+const QString QnGlobalSettings::kNameCloudSystemID(lit("cloudSystemID"));
+
+QString QnGlobalSettings::cloudSystemID() const
+{
+    return m_cloudSystemIDAdaptor->value();
+}
+
+void QnGlobalSettings::setCloudSystemID(const QString& value)
+{
+    m_cloudSystemIDAdaptor->setValue(value);
+}
+
+const QString QnGlobalSettings::kNameCloudAuthKey(lit("cloudAuthKey"));
+
+QString QnGlobalSettings::cloudAuthKey() const
+{
+    return m_cloudAuthKeyAdaptor->value();
+}
+
+void QnGlobalSettings::setCloudAuthKey(const QString& value)
+{
+    m_cloudAuthKeyAdaptor->setValue(value);
+}
+
+void QnGlobalSettings::resetCloudParams()
+{
+    setCloudAccountName(QString());
+    setCloudSystemID(QString());
+    setCloudAuthKey(QString());
+}
+
 bool QnGlobalSettings::arecontRtspEnabled() const
 {
-    return m_arecontRtspEnabled->value();
+    return m_arecontRtspEnabledAdaptor->value();
 }
 
 void QnGlobalSettings::setArecontRtspEnabled(bool newVal) const
 {
-    m_arecontRtspEnabled->setValue(newVal);
+    m_arecontRtspEnabledAdaptor->setValue(newVal);
 }
 
 const QList<QnAbstractResourcePropertyAdaptor*>& QnGlobalSettings::allSettings() const

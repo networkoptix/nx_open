@@ -64,7 +64,7 @@ namespace {
         {}
 
         virtual void paint(QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index) const override {
-            Q_ASSERT(index.isValid());
+            NX_ASSERT(index.isValid());
 
             QStyleOptionViewItem opt = option;
             initStyleOption(&opt, index);

@@ -86,7 +86,7 @@ namespace {
         {
             Q_UNUSED(level)
                 Q_UNUSED(ptr)
-                Q_ASSERT(fmt && "NULL Pointer");
+                NX_ASSERT(fmt && "NULL Pointer");
 
             if (!fmt) {
                 return;

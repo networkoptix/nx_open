@@ -110,7 +110,6 @@ QnScrollBarProxy *QnSnappedScrollBar::proxyScrollBar() const
 
 QnSnappedScrollBarPrivate::QnSnappedScrollBarPrivate(QnSnappedScrollBar *parent)
     : q_ptr(parent),
-      proxyScrollbar(nullptr),
       alignment(Qt::AlignRight | Qt::AlignBottom),
       useHeaderShift(true),
       useItemViewPaddingWhenVisible(false)
@@ -135,7 +134,7 @@ void QnSnappedScrollBarPrivate::updateGeometry()
     if (!parent)
         return;
 
-    if (!proxyScrollbar->parentWidget())
+    if (!proxyScrollbar || !proxyScrollbar->parentWidget())
         return;
 
     QRect parentRect = parent->rect();
@@ -174,6 +173,9 @@ void QnSnappedScrollBarPrivate::updateGeometry()
 void QnSnappedScrollBarPrivate::updateProxyScrollBarSize()
 {
     Q_Q(QnSnappedScrollBar);
+    if (!proxyScrollbar)
+        return;
+
     if (!useItemViewPaddingWhenVisible)
     {
         proxyScrollbar->setMinimumSize(QSize(1, 1));
@@ -192,6 +194,8 @@ void QnSnappedScrollBarPrivate::updateProxyScrollBarSize()
 bool QnSnappedScrollBarPrivate::eventFilter(QObject *object, QEvent *event)
 {
     Q_Q(QnSnappedScrollBar);
+    if (!proxyScrollbar)
+        return false;
 
     if (object == q->parentWidget())
     {

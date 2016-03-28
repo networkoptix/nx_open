@@ -13,12 +13,12 @@ void registerTypes()
 {
     const char kRtuDomainName[] = "networkoptix.rtu";
 
-    enum 
+    enum
     {
         kMinorVersion = 0
-        , kMajorVersion = 1 
+        , kMajorVersion = 1
     };
-    
+
     const char kConstantsQmlTypeName[] = "Constants";
     qmlRegisterUncreatableType<rtu::Constants>(kRtuDomainName
         , kMajorVersion, kMinorVersion, kConstantsQmlTypeName, kConstantsQmlTypeName);
@@ -37,11 +37,11 @@ int main(int argc, char *argv[])
     QGuiApplication app(argc, argv);
 
     rtu::RtuContext rtuContext(&app);
-    
+
     QQmlApplicationEngine engine;
-        
+
     registerTypes();
-    
+
     engine.rootContext()->setContextProperty("rtuContext", &rtuContext);
     engine.load(QUrl(QStringLiteral("qrc:/src/qml/main.qml")));
 

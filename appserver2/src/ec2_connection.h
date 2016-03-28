@@ -23,7 +23,6 @@ namespace ec2
     public:
         Ec2DirectConnection(
             ServerQueryProcessor* queryProcessor,
-            const ResourceContext& resCtx,
             const QnConnectionInfo& connectionInfo,
             const QUrl& dbUrl);
         virtual ~Ec2DirectConnection();
@@ -36,7 +35,7 @@ namespace ec2
         bool initialized() const;
 
         Ec2StaticticsReporter* getStaticticsReporter();
-    
+
     private:
         std::unique_ptr<QnTransactionLog> m_transactionLog;
         const QnConnectionInfo m_connectionInfo;

@@ -63,7 +63,7 @@ QnCalendarWidget::QnCalendarWidget(QWidget *parent)
 
     m_navigationBar = findChild<QWidget *>(QLatin1String("qt_calendar_navigationbar"));
     
-    Q_ASSERT_X(m_navigationBar, Q_FUNC_INFO, "Navigator bar is nullptr!");
+    NX_ASSERT(m_navigationBar, Q_FUNC_INFO, "Navigator bar is nullptr!");
     m_navigationBar->setBackgroundRole(QPalette::Window);
     
     updateEnabledPeriod();

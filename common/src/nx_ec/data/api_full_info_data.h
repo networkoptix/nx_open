@@ -13,6 +13,7 @@ namespace ec2
         ApiCameraDataList cameras;
         ApiCameraAttributesDataList cameraUserAttributesList;
         ApiUserDataList users;
+        ApiAccessRightsDataList accessRights;
         ApiLayoutDataList layouts;
         ApiVideowallDataList videowalls;
         ApiBusinessRuleDataList rules;
@@ -25,7 +26,7 @@ namespace ec2
         ApiWebPageDataList webPages;
     };
 #define ApiFullInfoData_Fields (resourceTypes)(servers)(serversUserAttributesList)(cameras)(cameraUserAttributesList)(users)(layouts)(videowalls)(rules)\
-                               (cameraHistory)(licenses)(discoveryData)(allProperties)(storages)(resStatusList)(webPages)
+                               (cameraHistory)(licenses)(discoveryData)(allProperties)(storages)(resStatusList)(webPages)(accessRights)
 
 } // namespace ec2
 

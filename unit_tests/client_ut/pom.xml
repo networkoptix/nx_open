@@ -1,11 +1,4 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <!--
-    Example pom for delegating maven goals to msbuild so it builds the "solution"
-
-    A solution can be a group of projects, but here we only have one.
-    It should also be possible to have one maven project per solution project,
-    and have a parent pom to deletegate the build.
-  -->
     <parent>
         <artifactId>build_ut</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
@@ -18,23 +11,24 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>client_ut</artifactId>
     <packaging>pom</packaging>
-    <name>HD Witness Client Unit Tests</name>
+    <name>NX Witness Client Unit Tests</name>
 
     <properties>
         <guid>{842d800f-9e19-4b8f-89ec-f9779a434aa1}</guid>
-        <product.title>HD Witness Client Unit Tests</product.title>
+        <product.title>NX Witness Client Unit Tests</product.title>
         <root.dir>${basedir}/../..</root.dir>
         <!--Specify the project to test-->      
         <master.project.directory>client</master.project.directory>
         <!--Global libs-->
-        <qt.libs>core gui network opengl xml sql multimedia concurrent</qt.libs>       
-        <!-- Disabled msvs 2015 libs> -lFestival -lestools -leststring -lestbase</!-->
-        <global.libs>-lcommon -lnx_network -lnx_streaming -lappserver2 -lclient</global.libs>
+        <qt.libs>core gui network opengl xml sql multimedia concurrent webkit webkitwidgets qml quick</qt.libs>       
         <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc</ffmpeg.libs>
+        <global.libs>-lcommon -lnx_utils -lnx_network -lnx_streaming -lnx_audio -lappserver2 -lclient.core -lclient -lcloud_db_client</global.libs>
         <!--Specific os libs used-->
-        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -ld3d9 -lopenal32 -lsigar Wldap32.lib</windows.oslibs>
-        <linux.oslibs>-lmp3lame -lz -lopenal -lX11 -lXfixes -lGL -lGLU -ltermcap -lsigar -lfaac -lXss</linux.oslibs>
-        <mac.oslibs>-lbz2 -lz -framework IOKit -framework CoreServices -framework OpenAL -ltermcap -lsigar-universal64-macosx</mac.oslibs>
+        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -ld3d9 -lopenal32</windows.oslibs>
+        <windows.oslibs.release/>
+        <windows.oslibs.debug/>
+        <linux.oslibs>-lmp3lame -lz -lopenal -lX11 -lXfixes -lGL -lGLU -lfaac -lXss</linux.oslibs>
+        <mac.oslibs>-lbz2 -lz -framework IOKit -framework CoreServices -framework OpenAL</mac.oslibs>
         <windows.oslibs.release></windows.oslibs.release>
         <windows.oslibs.debug></windows.oslibs.debug>
         <!--Global defines-->
@@ -44,7 +38,7 @@
         <linux.defines/>
         <mac.defines/>
         <path>${env.PATH}</path>
-        <rdep.packages>openssl quazip</rdep.packages>
+        <rdep.packages>openssl quazip festival festival-vox</rdep.packages>
     </properties>
     <dependencies>
         <dependency>

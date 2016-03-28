@@ -86,7 +86,8 @@
         "text" :            "window.text",
         "subText" :         "palette.contrast.color_2",
         "separator" :       "palette.base.color_4",
-        "disabledText" :    "palette.base.color_17"
+        "disabledText" :    "palette.base.color_17",
+        "selectionBorder" : "palette.contrast.color_5"
     },
 
     "sessionItem" : {

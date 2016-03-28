@@ -23,11 +23,11 @@
         <global.libs>-lnx_utils -lnx_streaming -ludt</global.libs>
         <ffmpeg.libs/>
         <!--Specific os libs used-->
-        <windows.oslibs>-lcommon -lws2_32 DbgHelp.lib -lIphlpapi -lOle32 -lsigar -lSecur32 -lwinmm</windows.oslibs>
+        <windows.oslibs>-lcommon -lws2_32 DbgHelp.lib -lIphlpapi -lOle32  -lSecur32 -lwinmm</windows.oslibs>
         <windows.oslibs.release/>
         <windows.oslibs.debug/>
-        <linux.oslibs>-lsigar -lswscale</linux.oslibs>
-        <mac.oslibs>-framework IOKit -framework CoreFoundation  -lz -framework QtConcurrent -lsigar-universal64-macosx</mac.oslibs>
+        <linux.oslibs>-lswscale</linux.oslibs>
+        <mac.oslibs>-framework IOKit -framework CoreFoundation  -lz -framework QtConcurrent</mac.oslibs>
         <android.oslibs>-lz</android.oslibs>
         <!--Global defines-->
         <global.defines/>
@@ -60,7 +60,7 @@
             <version>${project.version}</version>
             <type>pom</type>
             <scope>system</scope>
-            <systemPath>${root.dir}/common_libs/nx_network/pom.xml</systemPath>
+            <systemPath>${root.dir}/common_libs/nx_streaming/pom.xml</systemPath>
         </dependency>
  
         <dependency>
@@ -82,4 +82,23 @@
         </dependency>
     </dependencies>
 
+    <profiles>
+        <profile>
+            <id>linux-arm-bpi</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>bpi</value>
+                </property>
+            </activation>
+            <properties>
+                <rdep.linux.packages>quazip opengl-es-mali</rdep.linux.packages>
+            </properties>
+        </profile>
+    </profiles>
 </project>

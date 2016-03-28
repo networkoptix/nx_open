@@ -7,8 +7,6 @@
 #include <ui/animation/animated.h>
 #include <ui/animation/animation_timer_listener.h>
 
-#include "assert.h"
-
 class QnSplashItem: public Animated<QGraphicsObject>, public AnimationTimerListener {
     Q_OBJECT
     Q_PROPERTY(QColor color READ color WRITE setColor)
@@ -29,9 +27,9 @@ public:
     SplashType splashType() const {
         return m_splashType;
     }
-    
+
     void setSplashType(SplashType splashType) {
-        assert(splashType == Circular || splashType == Rectangular || splashType == Invalid);
+        NX_ASSERT(splashType == Circular || splashType == Rectangular || splashType == Invalid);
 
         m_splashType = splashType;
     }
@@ -53,7 +51,7 @@ public:
     void setRect(const QRectF &rect);
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
-    
+
     void animate(qint64 endTimeMSec, const QRectF &endRect, qreal endOpacity, bool destroy = false, qint64 midTimeMSec = -1, qreal midOpacity = 1.0);
 
 signals:

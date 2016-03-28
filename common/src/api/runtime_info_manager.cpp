@@ -4,7 +4,7 @@
 
 #include <common/common_module.h>
 
-#include <nx_ec/data/api_server_alive_data.h>
+#include <nx_ec/data/api_peer_alive_data.h>
     
 //#define RUNTIME_INFO_DEBUG
 

@@ -112,7 +112,7 @@ void QnPopupSettingsWidget::loadDataToUi() {
 }
 
 void QnPopupSettingsWidget::applyChanges() {
-    Q_ASSERT_X(!m_updating, Q_FUNC_INFO, "Should never get here while updating");
+    NX_ASSERT(!m_updating, Q_FUNC_INFO, "Should never get here while updating");
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
     if (context()->user())

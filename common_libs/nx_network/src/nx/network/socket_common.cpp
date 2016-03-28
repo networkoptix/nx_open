@@ -121,6 +121,23 @@ bool HostAddress::isResolved() const
     return m_addressResolved;
 }
 
+bool HostAddress::isLocalIp() const
+{
+    // TODO: #mux virify with standart
+    static const std::vector<QString> kLocalPrefixes
+    {
+        QLatin1String("192.168"),
+        QLatin1String("127.0.0"),
+    };
+
+    const auto string = toString();
+    for (const auto& prefix: kLocalPrefixes)
+        if (string.startsWith(prefix))
+            return true;
+
+    return false;
+}
+
 HostAddress& HostAddress::operator=( const HostAddress& rhs )
 {
     m_addrStr = rhs.m_addrStr;

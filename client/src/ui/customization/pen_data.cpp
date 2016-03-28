@@ -55,7 +55,7 @@ QnPenData::QnPenData(const QPen &pen):
 {}
 
 void QnPenData::applyTo(QPen *pen) const {
-    assert(pen);
+    NX_ASSERT(pen);
 
     if(m_fields & Brush)        pen->setBrush(m_brush);
     if(m_fields & Width)        pen->setWidthF(m_width);

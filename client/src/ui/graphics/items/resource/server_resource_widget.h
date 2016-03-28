@@ -14,7 +14,6 @@
 
 #include "resource_widget.h"
 
-class QnRadialGradientPainter;
 class QnMediaServerStatisticsManager;
 class StatisticsOverlayWidget;
 class QnGlFunctions;
@@ -133,9 +132,6 @@ private:
 
     /** Elapsed timer for smooth scroll. */
     QElapsedTimer m_elapsedTimer;
-
-    /** Helper for the background painting. */
-    QSharedPointer<QnRadialGradientPainter> m_backgroundGradientPainter;
 
     /** Button bars with corresponding buttons */
     QnImageButtonBar *m_legendButtonBar[ButtonBarCount];

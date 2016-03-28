@@ -72,7 +72,7 @@ TestConnection::TestConnection(
     ++TestConnection_count;
 }
 
-static std::mutex mtx1;
+static std::mutex terminatedSocketsIDsMutex;
 static std::map<int, bool> terminatedSocketsIDs;
 
 
@@ -90,7 +90,7 @@ TestConnection::~TestConnection()
         _socket->pleaseStopSync();
 
     {
-        std::unique_lock<std::mutex> lk(mtx1);
+        std::unique_lock<std::mutex> lk(terminatedSocketsIDsMutex);
         NX_ASSERT(terminatedSocketsIDs.emplace(m_id, _socket ? true : false).second);
     }
 #ifdef DEBUG_OUTPUT
@@ -462,7 +462,8 @@ void ConnectionsGenerator::start()
             m_remoteAddress,
             m_bytesToSendThrough,
             std::bind(&ConnectionsGenerator::onConnectionFinished, this,
-                      std::placeholders::_1, std::prev(m_connections.end())) ) );
+                      std::placeholders::_1, std::placeholders::_3,
+                      std::prev(m_connections.end())) ) );
         m_connections.back().swap( connection );
         if (m_localAddress)
             m_connections.back()->setLocalAddress(*m_localAddress);
@@ -486,14 +487,32 @@ size_t ConnectionsGenerator::totalBytesReceived() const
     return m_totalBytesReceived;
 }
 
+std::vector<SystemError::ErrorCode> ConnectionsGenerator::totalErrors() const
+{
+    std::unique_lock<std::mutex> lk(m_mutex);
+    return m_errors;
+}
+
 void ConnectionsGenerator::onConnectionFinished(
-    int id,
+    int id, SystemError::ErrorCode code,
     ConnectionsContainer::iterator connectionIter)
 {
     std::unique_lock<std::mutex> lk(m_mutex);
 
+    if (code != SystemError::noError)
     {
-        std::unique_lock<std::mutex> lk(mtx1);
+        m_errors.push_back(code);
+        if (m_errors.size() < 3)
+        {
+            // std::cerr
+            //     << "onConnectionFinished: "
+            //     << SystemError::toString(code).toStdString()
+            //     << std::endl;
+        }
+    }
+
+    {
+        std::unique_lock<std::mutex> lk(terminatedSocketsIDsMutex);
         NX_ASSERT(terminatedSocketsIDs.find(id) == terminatedSocketsIDs.end());
     }
 
@@ -532,7 +551,8 @@ void ConnectionsGenerator::addNewConnections()
             m_remoteAddress,
             m_bytesToSendThrough,
             std::bind(&ConnectionsGenerator::onConnectionFinished, this,
-                std::placeholders::_1, std::prev(m_connections.end()))));
+                std::placeholders::_1, std::placeholders::_3,
+                std::prev(m_connections.end()))));
         m_connections.back().swap(connection);
         const bool emulatingError =
             m_errorEmulationPercent > 0 &&

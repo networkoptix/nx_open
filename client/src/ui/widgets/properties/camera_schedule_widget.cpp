@@ -2,7 +2,6 @@
 #include "ui_camera_schedule_widget.h"
 
 #include <QtCore/QCoreApplication>
-#include <QtWidgets/QMessageBox>
 
 //TODO: #GDM #Common ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
 #include <core/dataprovider/live_stream_provider.h>
@@ -860,7 +859,7 @@ void QnCameraScheduleWidget::at_releaseSignalizer_activated(QObject *target) {
             tr("Motion Recording is disabled or not supported on some of the selected cameras. Please go to the motion setup page to ensure it is supported and enabled.")
             );
     } else /* One camera */ {
-        Q_ASSERT_X(m_cameras.size() == 1, Q_FUNC_INFO, "Following options are valid only for singular camera");
+        NX_ASSERT(m_cameras.size() == 1, Q_FUNC_INFO, "Following options are valid only for singular camera");
         QnVirtualCameraResourcePtr camera = m_cameras.first();
 
         // TODO: #GDM #Common duplicate code.

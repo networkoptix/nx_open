@@ -26,7 +26,6 @@ namespace ec2
     public:
         RemoteEC2Connection(
             const FixedUrlClientQueryProcessorPtr& queryProcessor,
-            const ResourceContext& resCtx,
             const QnConnectionInfo& connectionInfo );
         virtual ~RemoteEC2Connection();
 

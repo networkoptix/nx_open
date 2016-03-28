@@ -345,8 +345,8 @@ void PtzInstrument::processPtzDoubleClick() {
 // Handlers
 // -------------------------------------------------------------------------- //
 void PtzInstrument::installedNotify() {
-    assert(selectionItem() == NULL);
-    assert(elementsWidget() == NULL);
+    NX_ASSERT(selectionItem() == NULL);
+    NX_ASSERT(elementsWidget() == NULL);
 
     base_type::installedNotify();
 }

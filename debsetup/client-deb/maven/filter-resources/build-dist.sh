@@ -39,6 +39,7 @@ LIBSTAGE=$STAGE$LIBTARGET
 CLIENT_BIN_PATH=${libdir}/bin/${build.configuration}
 CLIENT_STYLES_PATH=$CLIENT_BIN_PATH/styles
 CLIENT_IMAGEFORMATS_PATH=$CLIENT_BIN_PATH/imageformats
+CLIENT_PLATFORMINPUTCONTEXTS_PATH=$CLIENT_BIN_PATH/platforminputcontexts
 CLIENT_VOX_PATH=$CLIENT_BIN_PATH/vox
 CLIENT_PLATFORMS_PATH=$CLIENT_BIN_PATH/platforms
 CLIENT_BG_PATH=${libdir}/backgrounds
@@ -52,6 +53,7 @@ CLIENT_LIB_PATH=${libdir}/lib/${build.configuration}
 rm -rf $STAGEBASE
 mkdir -p $BINSTAGE/styles
 mkdir -p $BINSTAGE/imageformats
+mkdir -p $BINSTAGE/platforminputcontexts
 mkdir -p $HELPSTAGE
 mkdir -p $LIBSTAGE
 mkdir -p $BGSTAGE
@@ -80,6 +82,7 @@ cp -r $CLIENT_BG_PATH/* $BGSTAGE
 # Copy libraries, styles, imageformats
 cp -r $CLIENT_LIB_PATH/*.so* $LIBSTAGE
 cp -r $CLIENT_STYLES_PATH/*.* $BINSTAGE/styles
+cp -r $CLIENT_PLATFORMINPUTCONTEXTS_PATH/*.* $BINSTAGE/platforminputcontexts
 cp -r $CLIENT_IMAGEFORMATS_PATH/*.* $BINSTAGE/imageformats
 cp -r $CLIENT_VOX_PATH $BINSTAGE
 cp -r $CLIENT_PLATFORMS_PATH $BINSTAGE

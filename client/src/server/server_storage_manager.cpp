@@ -6,6 +6,9 @@
 #include <api/model/rebuild_archive_reply.h>
 #include <api/model/storage_space_reply.h>
 
+#include <nx_ec/managers/abstract_server_manager.h>
+#include <nx_ec/data/api_conversion_functions.h>
+
 #include <core/resource/media_server_resource.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -226,7 +229,10 @@ void QnServerStorageManager::saveStorages(const QnStorageResourceList &storages 
     if (!conn)
         return;
 
-    conn->getMediaServerManager()->saveStorages(storages, this, [storages](int reqID, ec2::ErrorCode error)
+    ec2::ApiStorageDataList apiStorages;
+    ec2::fromResourceListToApi(storages, apiStorages);
+
+    conn->getMediaServerManager()->saveStorages(apiStorages, this, [storages](int reqID, ec2::ErrorCode error)
     {
         Q_UNUSED(reqID);
         if (error != ec2::ErrorCode::ok)
@@ -448,7 +454,7 @@ void QnServerStorageManager::at_storageSpaceReply( int status, const QnStorageSp
          * They will be deleted on storageRemoved transaction.
          */
         QnClientStorageResourcePtr clientStorage = storage.dynamicCast<QnClientStorageResource>();
-        Q_ASSERT_X(clientStorage, Q_FUNC_INFO, "Only client storage intances must exist on the client side.");
+        NX_ASSERT(clientStorage, Q_FUNC_INFO, "Only client storage intances must exist on the client side.");
         if (clientStorage && clientStorage->isActive())
             continue;
 

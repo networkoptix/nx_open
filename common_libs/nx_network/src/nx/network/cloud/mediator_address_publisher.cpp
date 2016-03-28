@@ -26,6 +26,14 @@ void MediatorAddressPublisher::setUpdateInterval( TimerDuration updateInterval )
 
 void MediatorAddressPublisher::updateAddresses( std::list< SocketAddress > addresses )
 {
+    for( auto it = addresses.begin(); it != addresses.end(); )
+    {
+        if ( it->address.isLocalIp() )
+            it = addresses.erase( it );
+        else
+            ++it;
+    }
+
     QnMutexLocker lk( &m_mutex );
     if( m_reportedAddresses == addresses )
         return;

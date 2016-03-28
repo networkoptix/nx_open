@@ -20,7 +20,8 @@
 
 #include "email_manager_mocked.h"
 #include "test_setup.h"
-#include "version.h"
+
+#include <utils/common/app_info.h>
 
 
 namespace nx {
@@ -48,7 +49,7 @@ TEST_F(CdbFunctionalTest, account_activation)
     api::AccountConfirmationCode activationCode;
     result = addAccount(&account1, &account1Password, &activationCode);
     ASSERT_EQ(result, api::ResultCode::ok);
-    ASSERT_EQ(account1.customization, QN_CUSTOMIZATION_NAME);
+    ASSERT_EQ(account1.customization, QnAppInfo::customizationName().toStdString());
     ASSERT_TRUE(!activationCode.code.empty());
 
     //only /account/activate and /account/reactivate are allowed for not activated account
@@ -69,7 +70,7 @@ TEST_F(CdbFunctionalTest, account_activation)
 
     result = getAccount(account1.email, account1Password, &account1);
     ASSERT_EQ(api::ResultCode::ok, result);
-    ASSERT_EQ(QN_CUSTOMIZATION_NAME, account1.customization);
+    ASSERT_EQ(QnAppInfo::customizationName().toStdString(), account1.customization);
     ASSERT_EQ(api::AccountStatus::activated, account1.statusCode);
 }
 
@@ -95,7 +96,7 @@ TEST_F(CdbFunctionalTest, account_reactivation)
     api::AccountConfirmationCode activationCode;
     result = addAccount(&account1, &account1Password, &activationCode);
     ASSERT_EQ(result, api::ResultCode::ok);
-    ASSERT_EQ(account1.customization, QN_CUSTOMIZATION_NAME);
+    ASSERT_EQ(account1.customization, QnAppInfo::customizationName().toStdString());
     ASSERT_TRUE(!activationCode.code.empty());
 
     //reactivating account (e.g. we lost activation code)
@@ -113,7 +114,7 @@ TEST_F(CdbFunctionalTest, account_reactivation)
 
     result = getAccount(account1.email, account1Password, &account1);
     ASSERT_EQ(api::ResultCode::ok, result);
-    ASSERT_EQ(QN_CUSTOMIZATION_NAME, account1.customization);
+    ASSERT_EQ(QnAppInfo::customizationName().toStdString(), account1.customization);
     ASSERT_EQ(api::AccountStatus::activated, account1.statusCode);
 
     //subsequent activation MUST fail
@@ -152,7 +153,7 @@ TEST_F(CdbFunctionalTest, account_reactivation_activated_account)
 
     result = getAccount(account1.email, account1Password, &account1);
     ASSERT_EQ(api::ResultCode::ok, result);
-    ASSERT_EQ(QN_CUSTOMIZATION_NAME, account1.customization);
+    ASSERT_EQ(QnAppInfo::customizationName().toStdString(), account1.customization);
     ASSERT_EQ(api::AccountStatus::activated, account1.statusCode);
 
     //reactivating account (e.g. we lost activation code)
@@ -193,7 +194,7 @@ TEST_F(CdbFunctionalTest, account_general)
     {
         const auto result = bindRandomSystem(account1.email, account1Password, &system1);
         ASSERT_EQ(result, api::ResultCode::ok);
-        ASSERT_EQ(system1.customization, QN_CUSTOMIZATION_NAME);
+        ASSERT_EQ(system1.customization, QnAppInfo::customizationName().toStdString());
     }
 
     {
@@ -326,7 +327,7 @@ TEST_F(CdbFunctionalTest, account_requestQueryDecode)
     api::AccountConfirmationCode activationCode;
     result = addAccount(&account1, &account1Password, &activationCode);
     ASSERT_EQ(result, api::ResultCode::ok);
-    ASSERT_EQ(account1.customization, QN_CUSTOMIZATION_NAME);
+    ASSERT_EQ(account1.customization, QnAppInfo::customizationName().toStdString());
     ASSERT_TRUE(!activationCode.code.empty());
 
     std::string activatedAccountEmail;
@@ -342,7 +343,7 @@ TEST_F(CdbFunctionalTest, account_requestQueryDecode)
     account1.email = "test@yandex.ru";
     result = getAccount(account1.email, account1Password, &account1);
     ASSERT_EQ(result, api::ResultCode::ok);
-    ASSERT_EQ(account1.customization, QN_CUSTOMIZATION_NAME);
+    ASSERT_EQ(account1.customization, QnAppInfo::customizationName().toStdString());
     ASSERT_EQ(account1.statusCode, api::AccountStatus::activated);
     ASSERT_EQ(account1.email, "test@yandex.ru");
 }
@@ -609,7 +610,7 @@ TEST_F(CdbFunctionalTest, account_reset_password_activates_account)
     api::AccountConfirmationCode activationCode;
     api::ResultCode result = addAccount(&account1, &account1Password, &activationCode);
     ASSERT_EQ(result, api::ResultCode::ok);
-    ASSERT_EQ(account1.customization, QN_CUSTOMIZATION_NAME);
+    ASSERT_EQ(account1.customization, QnAppInfo::customizationName().toStdString());
     ASSERT_TRUE(!activationCode.code.empty());
 
     //user did not activate account and forgot password

@@ -17,6 +17,13 @@
 class NX_NETWORK_API SocketFactory
 {
 public:
+    enum class SocketType
+    {
+        cloud,    ///< production mode
+        tcp,        ///< \class TcpSocket and \class TcpServerSocket
+        udt,        ///< \class UdtSocket and \class UdtServerSocket
+    };
+
     enum class NatTraversalType
     {
         nttAuto,
@@ -45,16 +52,13 @@ public:
         bool sslRequired = false,
         NatTraversalType natTraversalRequired = NatTraversalType::nttAuto );
 
-    enum class SocketType
-    {
-        Default,    ///< production mode
-        Tcp,        ///< \class TcpSocket and \class TcpServerSocket
-        Udt,        ///< \class UdtSocket and \class UdtServerSocket
-    };
+    static QString toString( SocketType type );
+    static SocketType stringToSocketType( QString type );
 
     /*! Enforces factory to produce certain sockets
      *  \note DEBUG use ONLY! */
     static void enforceStreamSocketType( SocketType type );
+    static void enforceStreamSocketType( QString type );
     static bool isStreamSocketTypeEnforced();
 
     /** Sets new factory. Returns old one */

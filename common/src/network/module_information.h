@@ -26,7 +26,7 @@ struct QnModuleInformation {
     Qn::ServerFlags serverFlags;
     QString realm;
     bool ecDbReadOnly;
-    QnUuid cloudSystemId;
+    QString cloudSystemId;
 
     QnModuleInformation()
         : port(0), sslAllowed(false), protoVersion(0), serverFlags(0), realm(QnAppInfo::realm()), ecDbReadOnly(false)

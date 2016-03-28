@@ -21,10 +21,15 @@ public:
                 const QString& device = AsyncClient::INTERNAL_GATEWAY );
     ~PortMapper();
 
+    PortMapper( const PortMapper& ) = delete;
+    PortMapper( PortMapper&& ) = delete;
+    PortMapper& operator = ( const PortMapper& ) = delete;
+    PortMapper& operator = ( PortMapper&& ) = delete;
+
     static const quint64 DEFAULT_CHECK_MAPPINGS_INTERVAL;
     typedef AsyncClient::Protocol Protocol;
 
-    /*!
+    /**
      * Asks to forward the @param port to some external port
      *
      *  @returns false if @param port has already been mapped
@@ -34,12 +39,21 @@ public:
     bool enableMapping( quint16 port, Protocol protocol,
                         std::function< void( SocketAddress ) > callback );
 
-    /*!
+    /**
      * Asks to cancel @param port forwarding
      *
      *  @returns false if @param port hasnt been mapped
      */
     bool disableMapping( quint16 port, Protocol protocol );
+
+    /**
+     * Enables/disables actual mapping on devices.
+     * When mapper goes disabled no new mappings will be made as well as no old
+     *  one will be sustained.
+     * When mapper goes enabled all mappings will be resored by timer (including
+     *  added during disabled period).
+     */
+    void setIsEnabled( bool isEnabled );
 
 protected: // for testing only
     class FailCounter
@@ -89,6 +103,7 @@ private:
     void addNewDevice( const HostAddress& localAddress,
                        const QUrl& url, const QString& serial );
 
+    void removeMapping( PortId portId );
     void updateExternalIp( Device& device );
     void checkMapping( Device& device, quint16 inPort, quint16 exPort, Protocol protocol );
     void ensureMapping( Device& device, quint16 inPort, Protocol protocol );
@@ -98,6 +113,7 @@ private:
 
 protected: // for testing only
     QnMutex m_mutex;
+    bool m_isEnabled;
     std::unique_ptr<AsyncClient> m_upnpClient;
     quint64 m_timerId;
     const QString m_description;

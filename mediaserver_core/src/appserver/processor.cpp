@@ -4,6 +4,8 @@
 
 #include <nx/utils/log/log.h>
 
+#include <api/common_message_processor.h>
+
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -11,11 +13,12 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 
-#include "api/common_message_processor.h"
 #include "mutex/camera_data_handler.h"
 #include "mutex/distributed_mutex_manager.h"
-#include "nx_ec/data/api_camera_attributes_data.h"
-#include "nx_ec/data/api_conversion_functions.h"
+
+#include <nx_ec/data/api_conversion_functions.h>
+#include <nx_ec/managers/abstract_camera_manager.h>
+
 #include "media_server/serverutil.h"
 #include "utils/common/util.h"
 #include "core/resource/camera_user_attribute_pool.h"
@@ -135,10 +138,13 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
 
     cameraResource->setFlags(cameraResource->flags() & ~Qn::parent_change);
     NX_ASSERT(!cameraResource->getId().isNull());
-    QnVirtualCameraResourceList cameras;
-    ec2::AbstractECConnectionPtr connect = QnAppServerConnectionFactory::getConnection2();
 
-    ec2::ErrorCode errorCode = connect->getCameraManager()->addCameraSync( cameraResource, &cameras );
+    ec2::AbstractECConnectionPtr connection = QnAppServerConnectionFactory::getConnection2();
+
+    ec2::ApiCameraData apiCamera;
+    fromResourceToApi(cameraResource, apiCamera);
+
+    ec2::ErrorCode errorCode = connection->getCameraManager()->addCameraSync(apiCamera);
     if( errorCode != ec2::ErrorCode::ok ) {
         NX_LOG( QString::fromLatin1("Can't add camera to ec2 (insCamera query error). %1").arg(ec2::toString(errorCode)), cl_logWARNING );
         return;
@@ -161,7 +167,10 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
         }
         userAttrCopy->cameraID = cameraResource->getId();
 
-        ec2::ErrorCode errCode =  QnAppServerConnectionFactory::getConnection2()->getCameraManager()->saveUserAttributesSync(QnCameraUserAttributesList() << userAttrCopy);
+        ec2::ApiCameraAttributesDataList attrsList;
+        fromResourceListToApi(QnCameraUserAttributesList() << userAttrCopy, attrsList);
+
+        ec2::ErrorCode errCode =  QnAppServerConnectionFactory::getConnection2()->getCameraManager()->saveUserAttributesSync(attrsList);
         if (errCode != ec2::ErrorCode::ok)
         {
             NX_LOG( QString::fromLatin1("Can't add camera to ec2 (insCamera user attributes query error). %1").arg(ec2::toString(errorCode)), cl_logWARNING );

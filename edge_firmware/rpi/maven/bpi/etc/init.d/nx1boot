@@ -104,6 +104,9 @@ get_serial_number() {
     if [ -f /tmp/serial ]; then rm /tmp/serial; fi
     SERIAL=$(/tmp/fw_printenv serial | sed 's/serial=//')
     echo $SERIAL > /tmp/serial
+    SERIAL_SHORT=${SERIAL%???????}
+    SERIAL_CHECK=$(echo $SERIAL_SHORT | grep '14\|15')
+    if [ -z $SERIAL_CHECK ]; then RESET=true; else RESET=false; fi    
     echo "++++++++++++++ SERIAL NUMBER:"$SERIAL" ++++++++++++++" >&2 >/dev/kmsg
     echo `date` "++++++++++++++ SERIAL NUMBER:"$SERIAL" ++++++++++++++" >> $NX1LOG
     rm /tmp/fw_printenv
@@ -356,13 +359,14 @@ upgrade() {
 }
 
 default_sequence () {
+    get_serial_number
+    if [ "$RESET" = "true" ]; then /etc/init.d/nx1button start; fi    
     stop_server
     setup_hdd_environment
     echo "++++++++++++++ BOOTED FROM "$BOOTDEVICE" ++++++++++++++" >&2 >/dev/kmsg
     echo `date` "++++++++++++++ BOOTED FROM "$BOOTDEVICE" ++++++++++++++" >> $NX1LOG
     ethtweak
     tweak_charger
-    get_serial_number
     check_statistics_warning
     if [[ -z $(cat /opt/$CUSTOMIZATION/mediaserver/etc/mediaserver.conf | grep systemName) ]]; then echo "systemName=__auto__system_"$MAC >> /opt/$CUSTOMIZATION/mediaserver/etc/mediaserver.conf; else echo true; fi
     if [[ -z $(cat /root/tools/nx/mediaserver.conf | grep systemName) ]]; then echo "systemName=__auto__system_"$MAC >> /root/tools/nx/mediaserver.conf; else echo true; fi

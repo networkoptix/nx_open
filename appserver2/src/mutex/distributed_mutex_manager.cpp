@@ -40,7 +40,7 @@ QnDistributedMutex* QnDistributedMutexManager::createMutex(const QString& name)
 {
     QnMutexLocker lock( &m_mutex );
 
-    Q_ASSERT(!m_mutexList.value(name));
+    NX_ASSERT(!m_mutexList.value(name));
 
     QnDistributedMutex* netMutex = new QnDistributedMutex(this, name);
     m_mutexList.insert(name, netMutex);

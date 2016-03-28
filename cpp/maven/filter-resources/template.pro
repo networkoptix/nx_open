@@ -38,7 +38,6 @@ include( optional_functionality.pri )
 
 
 CONFIG(debug, debug|release) {
-  include(dependencies-debug.pri)
   CONFIGURATION=debug
   isEmpty(BUILDLIB) {
     CONFIG += console
@@ -48,13 +47,14 @@ CONFIG(debug, debug|release) {
   } else {
     DEFINES += _DEBUG
   }
-  DEFINES += USE_OWN_MUTEX
-  #Warning: enabling ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK can significantly reduce performance
-  #DEFINES += ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK
+  !linux-clang {
+    # Temporary fix for linux clang 3.6-3.7 that crashes with our mutex.
+    DEFINES += USE_OWN_MUTEX
+    #Warning: enabling ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK can significantly reduce performance
+    #DEFINES += ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK
+  }
 }
 else {
-  include(dependencies.pri)
-  CONFIG += silent
   CONFIGURATION=release
   win* {
     LIBS += ${windows.oslibs.release}
@@ -304,7 +304,11 @@ ios {
 
 
 
-
+CONFIG(debug, debug|release) {
+  include(dependencies-debug.pri)
+} else {
+  include(dependencies.pri)
+}
 
 
 

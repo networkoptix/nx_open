@@ -29,8 +29,6 @@
 #include "stree/http_request_attr_reader.h"
 #include "stree/socket_attr_reader.h"
 #include "stree/stree_manager.h"
-#include "version.h"
-
 
 namespace nx {
 namespace cdb {

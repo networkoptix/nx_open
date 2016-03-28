@@ -183,7 +183,7 @@ void detail::OverlayedBase::setOverlayWidgetVisible(QGraphicsWidget* widget, boo
     else
         widget->setOpacity(opacity);
 
-    Q_ASSERT_X(isOverlayWidgetVisible(widget) == visible, Q_FUNC_INFO, "Validate checking function");
+    NX_ASSERT(isOverlayWidgetVisible(widget) == visible, Q_FUNC_INFO, "Validate checking function");
 }
 
 bool detail::OverlayedBase::isOverlayWidgetVisible(QGraphicsWidget* widget)

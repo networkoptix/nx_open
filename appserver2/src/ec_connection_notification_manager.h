@@ -34,7 +34,6 @@ namespace ec2
     {
     public:
         ECConnectionNotificationManager(
-            const ResourceContext& resCtx,
             AbstractECConnection* ecConnection,
             QnLicenseNotificationManager* licenseManager,
             QnResourceNotificationManager* resourceManager,
@@ -67,7 +66,6 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiStorageDataList>& tran );
         void triggerNotification( const QnTransaction<ApiMediaServerUserAttributesData>& tran );
         void triggerNotification( const QnTransaction<ApiMediaServerUserAttributesDataList>& tran );
-        void triggerNotification( const QnTransaction<ApiResourceData>& tran );
         void triggerNotification( const QnTransaction<ApiResourceStatusData>& tran );
         void triggerNotification( const QnTransaction<ApiLicenseOverflowData>& tran );
         void triggerNotification( const QnTransaction<ApiResourceParamWithRefData>& tran );
@@ -104,24 +102,23 @@ namespace ec2
         void triggerNotification(const QnTransaction<ApiUpdateSequenceData> &/*tran*/) { /* nothing to do */ }
 
         void triggerNotification(const QnTransaction<ApiLockData> &/*tran*/) {
-            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a system transaction!"); // we MUSTN'T be here
+            NX_ASSERT(0, Q_FUNC_INFO, "This is a system transaction!"); // we MUSTN'T be here
         }
         void triggerNotification(const QnTransaction<ApiPeerAliveData> &/*tran*/)  {
-            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a system transaction!"); // we MUSTN'T be here
+            NX_ASSERT(0, Q_FUNC_INFO, "This is a system transaction!"); // we MUSTN'T be here
         }
         void triggerNotification(const QnTransaction<ApiSyncRequestData> &/*tran*/)  {
-            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a system transaction!"); // we MUSTN'T be here
+            NX_ASSERT(0, Q_FUNC_INFO, "This is a system transaction!"); // we MUSTN'T be here
         }
         void triggerNotification(const QnTransaction<QnTranStateResponse> &/*tran*/) {
-            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a system transaction!"); // we MUSTN'T be here
+            NX_ASSERT(0, Q_FUNC_INFO, "This is a system transaction!"); // we MUSTN'T be here
         }
         void triggerNotification(const QnTransaction<ApiTranSyncDoneData> &/*tran*/) {
-            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a system transaction!"); // we MUSTN'T be here
+            NX_ASSERT(0, Q_FUNC_INFO, "This is a system transaction!"); // we MUSTN'T be here
         }
 
         void databaseReplaceRequired();
     private:
-        ResourceContext m_resCtx;
         AbstractECConnection* m_ecConnection;
         QnLicenseNotificationManager* m_licenseManager;
         QnResourceNotificationManager* m_resourceManager;

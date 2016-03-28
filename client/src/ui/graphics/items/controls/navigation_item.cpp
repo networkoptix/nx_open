@@ -4,7 +4,6 @@
 #include <QtCore/QCoreApplication>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QGraphicsLinearLayout>
-#include <QtWidgets/QMessageBox>
 #include <QtWidgets/QGraphicsProxyWidget>
 
 #include <nx/streaming/abstract_archive_stream_reader.h>
@@ -55,7 +54,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
 
     setAutoFillBackground(true);
 
-    setPaletteColor(this, QPalette::Window, Qt::black);
+    setPaletteColor(this, QPalette::Window, Qt::red);
 
     /* Create buttons. */
     m_jumpBackwardButton = newActionButton(QnActions::JumpToStartAction);

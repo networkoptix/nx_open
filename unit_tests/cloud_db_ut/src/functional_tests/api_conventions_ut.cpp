@@ -13,7 +13,7 @@
 #include <cloud_db_client/src/data/types.h>
 
 #include "test_setup.h"
-#include "version.h"
+#include <utils/common/app_info.h>
 
 
 namespace nx {
@@ -39,7 +39,7 @@ TEST_F(CdbFunctionalTest, api_conventions_general)
         ASSERT_TRUE(httpClient.doGet(url));
 
         auto msgBody = httpClient.fetchMessageBodyBuffer();
-        nx_http::FusionRequestResult requestResult = 
+        nx_http::FusionRequestResult requestResult =
             QJson::deserialized<nx_http::FusionRequestResult>(msgBody);
 
         ASSERT_TRUE(httpClient.response() != nullptr);
@@ -57,7 +57,7 @@ TEST_F(CdbFunctionalTest, api_conventions_general)
         //operation forbidden for account in this state
         nx_http::HttpClient httpClient;
         QUrl url(lit("http://%1:%2/cdb/system/bind?name=esadfwer&customization=%3").
-            arg(endpoint().address.toString()).arg(endpoint().port).arg(QN_CUSTOMIZATION_NAME));
+            arg(endpoint().address.toString()).arg(endpoint().port).arg(QnAppInfo::customizationName()));
         url.setUserName(QString::fromStdString(account1.email));
         url.setPassword(QString::fromStdString(account1Password));
         ASSERT_TRUE(httpClient.doGet(url));

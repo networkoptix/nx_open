@@ -20,23 +20,22 @@
         <product.display.title>${client.display.name}</product.display.title>
         <template>app</template>
         <!--Global libs-->
-        <qt.libs>core gui network opengl xml sql multimedia concurrent webkit webkitwidgets</qt.libs>
+        <qt.libs>core gui network opengl xml sql multimedia concurrent webkit webkitwidgets qml quick quickwidgets</qt.libs>
         <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc</ffmpeg.libs>
-        <!-- ATTENTION!!! -lestbase should be the LATEST in the list!!! Required for Linux -->
-        <global.libs>-lcommon -lnx_utils -lnx_network -lnx_streaming -lnx_audio -lappserver2 -lclient.core -lclient -lcloud_db_client -lFestival -lestools -leststring -lestbase</global.libs>
+        <global.libs>-lcommon -lnx_utils -lnx_network -lnx_streaming -lnx_audio -lappserver2 -lclient.core -lclient -lcloud_db_client</global.libs>
         <!--Specific os libs used-->
-        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -ld3d9 -lopenal32 -lsigar</windows.oslibs>
+        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -ld3d9 -lopenal32</windows.oslibs>
         <windows.oslibs.release/>
         <windows.oslibs.debug/>
-        <linux.oslibs>-lmp3lame -lz -lopenal -lX11 -lXfixes -lGL -lGLU -ltermcap -lsigar -lfaac -lXss</linux.oslibs>
-        <mac.oslibs>-lbz2 -lz -framework IOKit -framework CoreServices -framework OpenAL -ltermcap -lsigar-universal64-macosx</mac.oslibs>
+        <linux.oslibs>-lmp3lame -lz -lopenal -lX11 -lXfixes -lGL -lGLU -lfaac -lXss</linux.oslibs>
+        <mac.oslibs>-lbz2 -lz -framework IOKit -framework CoreServices -framework OpenAL</mac.oslibs>
         <!--Global defines-->
         <global.defines>CL_FORCE_LOGO</global.defines>
         <!--Specific os defines-->
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
         <linux.defines/>
         <mac.defines/>
-        <rdep.packages>openssl quazip</rdep.packages>
+        <rdep.packages>openssl quazip festival festival-vox</rdep.packages>
     </properties>
 
     <dependencies>

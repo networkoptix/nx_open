@@ -1,28 +1,6 @@
 #include "resource_property_adaptor.h"
 
 #include <core/resource/resource.h>
-#include "app_server_connection.h"
-#include "nx_ec/data/api_resource_data.h"
-
-// TODO: #Elric
-// Right now we have a problem in case resource property is changed very often.
-// Changes are pushed to Server and then we get them back as notifications, not
-// necessarily in the original order. This way property value gets changed
-// in totally unexpected ways.
-#if 0
-namespace {
-    QString createAdaptorKey() {
-        return lit("id%1|").arg(qrand() % 100000, 5, 10, QChar(L'0'));
-    }
-
-    bool hasAdaptorKey(const QString &string) {
-        return string.size() >= 8 && string[0] == L'i' && string[1] == L'd' && string[7] == L'|';
-    }
-
-    Q_GLOBAL_STATIC_WITH_ARGS(QString, qn_resourcePropertyAdaptor_uniqueKey, createAdaptorKey())
-}
-#endif
-
 
 // -------------------------------------------------------------------------- //
 // QnAbstractResourcePropertyAdaptor
@@ -195,12 +173,14 @@ bool QnAbstractResourcePropertyAdaptor::loadValueLocked(const QString &serialize
     return true;
 }
 
-void QnAbstractResourcePropertyAdaptor::synchronizeNow() {
+void QnAbstractResourcePropertyAdaptor::saveToResource()
+{
     processSaveRequests();
 }
 
 
-void QnAbstractResourcePropertyAdaptor::processSaveRequests() {
+void QnAbstractResourcePropertyAdaptor::processSaveRequests()
+{
     if(!m_pendingSave.loadAcquire())
         return;
 
@@ -218,24 +198,18 @@ void QnAbstractResourcePropertyAdaptor::processSaveRequests() {
     processSaveRequestsNoLock(resource, serializedValue);
 }
 
-void QnAbstractResourcePropertyAdaptor::processSaveRequestsNoLock(const QnResourcePtr &resource, const QString &serializedValue) {
+void QnAbstractResourcePropertyAdaptor::processSaveRequestsNoLock(const QnResourcePtr &resource, const QString &serializedValue)
+{
     if(!m_pendingSave.loadAcquire())
         return;
 
     m_pendingSave.storeRelease(0);
 
     resource->setProperty(m_key, serializedValue);
-
-    ec2::AbstractECConnectionPtr connection = QnAppServerConnectionFactory::getConnection2();
-    if (!connection)
-        return;
-    ec2::ApiResourceParamWithRefDataList params;
-    params.push_back(ec2::ApiResourceParamWithRefData(resource->getId(), m_key, serializedValue));
-    //TODO: #GDM SafeMode
-    connection->getResourceManager()->save(params, this, &QnAbstractResourcePropertyAdaptor::at_connection_propertiesSaved);
 }
 
-void QnAbstractResourcePropertyAdaptor::enqueueSaveRequest() {
+void QnAbstractResourcePropertyAdaptor::enqueueSaveRequest()
+{
     if(m_pendingSave.loadAcquire())
         return;
 
@@ -243,11 +217,8 @@ void QnAbstractResourcePropertyAdaptor::enqueueSaveRequest() {
     emit saveRequestQueued();
 }
 
-void QnAbstractResourcePropertyAdaptor::at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key) {
+void QnAbstractResourcePropertyAdaptor::at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key)
+{
     if(key == m_key)
         loadValue(resource->getProperty(key));
-}
-
-void QnAbstractResourcePropertyAdaptor::at_connection_propertiesSaved(int, ec2::ErrorCode) {
-    return;
 }

@@ -41,7 +41,7 @@ bool AuthorizationManager::authorize(
         authenticationProperties.get<std::string>(attr::authAccountEmail);
     const auto authenticatedSystemID =
         authenticationProperties.get<std::string>(attr::authSystemID);
-    const auto requestedSystemID = dataToAuthorize.get<QnUuid>(attr::systemID);
+    const auto requestedSystemID = dataToAuthorize.get<std::string>(attr::systemID);
     stree::ResourceContainer auxSearchAttrs;
     if (authenticatedAccountEmail)
     {
@@ -81,7 +81,7 @@ bool AuthorizationManager::authorize(
     }
 
     if (authenticatedSystemID && requestedSystemID &&
-        *authenticatedSystemID == requestedSystemID->toStdString())
+        *authenticatedSystemID == requestedSystemID)
     {
         auxSearchAttrs.put(
             attr::authSelfSystemAccessRequested,

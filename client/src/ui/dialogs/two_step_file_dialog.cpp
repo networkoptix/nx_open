@@ -89,7 +89,7 @@ QnTwoStepFileDialog::QnTwoStepFileDialog(QWidget *parent, const QString &caption
 QnTwoStepFileDialog::~QnTwoStepFileDialog() { }
 
 void QnTwoStepFileDialog::setOptions(QFileDialog::Options options) {
-    Q_ASSERT(options == 0);
+    NX_ASSERT(options == 0);
 }
 
 void QnTwoStepFileDialog::setFileMode(QFileDialog::FileMode mode) {
@@ -100,7 +100,7 @@ void QnTwoStepFileDialog::setFileMode(QFileDialog::FileMode mode) {
 }
 
 void QnTwoStepFileDialog::setAcceptMode(QFileDialog::AcceptMode mode) {
-    Q_ASSERT(mode == QFileDialog::AcceptSave);
+    NX_ASSERT(mode == QFileDialog::AcceptSave);
 }
 
 QString QnTwoStepFileDialog::selectedFile() const {
@@ -123,7 +123,7 @@ QString QnTwoStepFileDialog::selectedFile() const {
         break;
     }
     default:
-        Q_ASSERT(false);
+        NX_ASSERT(false);
     }
 
     QString selectedExtension = extractFileExtension(selectedNameFilter());
@@ -142,7 +142,7 @@ QString QnTwoStepFileDialog::selectedNameFilter() const {
     default:
         break;
     }
-    Q_ASSERT(false);
+    NX_ASSERT(false);
     return QString();
 }
 
@@ -175,7 +175,7 @@ void QnTwoStepFileDialog::updateFileExistsWarning() {
 }
 
 void QnTwoStepFileDialog::updateMode() {
-    Q_ASSERT(m_mode == QFileDialog::ExistingFile || m_mode == QFileDialog::AnyFile);
+    NX_ASSERT(m_mode == QFileDialog::ExistingFile || m_mode == QFileDialog::AnyFile);
 
     ui->existingFileWidget->setVisible(m_mode == QFileDialog::ExistingFile);
     ui->newFileWidget->setVisible(m_mode == QFileDialog::AnyFile);

@@ -1,33 +1,48 @@
 #include "common_message_processor.h"
 
 #include <nx_ec/ec_api.h>
+#include <nx_ec/managers/abstract_user_manager.h>
+#include <nx_ec/managers/abstract_layout_manager.h>
+#include <nx_ec/managers/abstract_videowall_manager.h>
+#include <nx_ec/managers/abstract_webpage_manager.h>
+#include <nx_ec/managers/abstract_camera_manager.h>
+#include <nx_ec/managers/abstract_server_manager.h>
+
+#include <nx_ec/data/api_full_info_data.h>
 #include <nx_ec/data/api_discovery_data.h>
+#include <nx_ec/data/api_conversion_functions.h>
+#include <nx_ec/data/api_resource_type_data.h>
+#include <nx_ec/data/api_license_data.h>
+#include <nx_ec/data/api_business_rule_data.h>
+#include <nx_ec/data/api_access_rights_data.h>
 
 #include <api/app_server_connection.h>
+
+#include <core/resource_management/resource_pool.h>
+#include <core/resource_management/server_additional_addresses_dictionary.h>
+#include <core/resource_management/resource_properties.h>
+#include <core/resource_management/status_dictionary.h>
+#include <core/resource_management/resource_access_manager.h>
+#include <core/resource/camera_history.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/webpage_resource.h>
-
-#include <business/business_event_rule.h>
-
-#include <core/resource_management/resource_pool.h>
-#include <core/resource_management/server_additional_addresses_dictionary.h>
 #include <core/resource/camera_user_attribute_pool.h>
 #include <core/resource/media_server_user_attributes.h>
 #include <core/resource/storage_resource.h>
+#include <core/resource/resource_factory.h>
+
+#include <business/business_event_rule.h>
 
 #include "common/common_module.h"
 #include "utils/common/synctime.h"
 #include <nx/network/socket_common.h>
 #include "runtime_info_manager.h"
 #include <utils/common/app_info.h>
-#include "nx_ec/data/api_resource_data.h"
-#include "core/resource_management/resource_properties.h"
-#include "core/resource_management/status_dictionary.h"
-#include "core/resource/camera_history.h"
+
 
 QnCommonMessageProcessor::QnCommonMessageProcessor(QObject *parent) :
     base_type(parent)
@@ -51,48 +66,57 @@ void QnCommonMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
 }
 
 
-void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnectionPtr &connection) {
+void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnectionPtr &connection)
+{
+    /* //TODO: #GDM #c++14 re-enable when generic lambdas will be supported
+    auto on_resourceUpdated = [this](const auto& resource)
+    {
+        updateResource(resource);
+    };
+    */
+
+#define on_resourceUpdated(Type) static_cast<void (QnCommonMessageProcessor::*)(const Type&)>(&QnCommonMessageProcessor::updateResource)
+
     connect(connection, &ec2::AbstractECConnection::remotePeerFound,                this, &QnCommonMessageProcessor::on_remotePeerFound );
     connect(connection, &ec2::AbstractECConnection::remotePeerLost,                 this, &QnCommonMessageProcessor::on_remotePeerLost );
     connect(connection, &ec2::AbstractECConnection::initNotification,               this, &QnCommonMessageProcessor::on_gotInitialNotification );
     connect(connection, &ec2::AbstractECConnection::runtimeInfoChanged,             this, &QnCommonMessageProcessor::runtimeInfoChanged );
 
     auto resourceManager = connection->getResourceManager();
-    connect(resourceManager, &ec2::AbstractResourceManager::resourceChanged,        this, [this](const QnResourcePtr &resource){updateResource(resource);});
     connect(resourceManager, &ec2::AbstractResourceManager::statusChanged,          this, &QnCommonMessageProcessor::on_resourceStatusChanged );
     connect(resourceManager, &ec2::AbstractResourceManager::resourceParamChanged,   this, &QnCommonMessageProcessor::on_resourceParamChanged );
     connect(resourceManager, &ec2::AbstractResourceManager::resourceRemoved,        this, &QnCommonMessageProcessor::on_resourceRemoved );
 
     auto mediaServerManager = connection->getMediaServerManager();
-    connect(mediaServerManager, &ec2::AbstractMediaServerManager::addedOrUpdated,   this, [this](const QnMediaServerResourcePtr &server){updateResource(server);});
-    connect(mediaServerManager, &ec2::AbstractMediaServerManager::storageChanged,   this, [this](const QnStorageResourcePtr &storage){updateResource(storage);});
+    connect(mediaServerManager, &ec2::AbstractMediaServerManager::addedOrUpdated,   this, on_resourceUpdated(ec2::ApiMediaServerData));
+    connect(mediaServerManager, &ec2::AbstractMediaServerManager::storageChanged,   this, on_resourceUpdated(ec2::ApiStorageData));
     connect(mediaServerManager, &ec2::AbstractMediaServerManager::removed,          this, &QnCommonMessageProcessor::on_resourceRemoved );
     connect(mediaServerManager, &ec2::AbstractMediaServerManager::storageRemoved,   this, &QnCommonMessageProcessor::on_resourceRemoved );
     connect(mediaServerManager, &ec2::AbstractMediaServerManager::userAttributesChanged, this, &QnCommonMessageProcessor::on_mediaServerUserAttributesChanged );
     connect(mediaServerManager, &ec2::AbstractMediaServerManager::userAttributesRemoved, this, &QnCommonMessageProcessor::on_mediaServerUserAttributesRemoved );
 
     auto cameraManager = connection->getCameraManager();
-    connect(cameraManager, &ec2::AbstractCameraManager::cameraAddedOrUpdated,       this, [this](const QnVirtualCameraResourcePtr &camera){updateResource(camera);});
+    connect(cameraManager, &ec2::AbstractCameraManager::addedOrUpdated,             this, on_resourceUpdated(ec2::ApiCameraData));
     connect(cameraManager, &ec2::AbstractCameraManager::userAttributesChanged,      this, &QnCommonMessageProcessor::on_cameraUserAttributesChanged );
     connect(cameraManager, &ec2::AbstractCameraManager::userAttributesRemoved,      this, &QnCommonMessageProcessor::on_cameraUserAttributesRemoved );
     connect(cameraManager, &ec2::AbstractCameraManager::cameraHistoryChanged,       this, &QnCommonMessageProcessor::on_cameraHistoryChanged );
-    connect(cameraManager, &ec2::AbstractCameraManager::cameraRemoved,              this, &QnCommonMessageProcessor::on_resourceRemoved );
+    connect(cameraManager, &ec2::AbstractCameraManager::removed,                    this, &QnCommonMessageProcessor::on_resourceRemoved );
 
     auto userManager = connection->getUserManager();
-    connect(userManager, &ec2::AbstractUserManager::addedOrUpdated,                 this, [this](const QnUserResourcePtr &user){updateResource(user);});
+    connect(userManager, &ec2::AbstractUserManager::addedOrUpdated,                 this, on_resourceUpdated(ec2::ApiUserData));
     connect(userManager, &ec2::AbstractUserManager::removed,                        this, &QnCommonMessageProcessor::on_resourceRemoved );
 
     auto layoutManager = connection->getLayoutManager();
-    connect(layoutManager, &ec2::AbstractLayoutManager::addedOrUpdated,             this, [this](const QnLayoutResourcePtr &layout){updateResource(layout);});
+    connect(layoutManager, &ec2::AbstractLayoutManager::addedOrUpdated,             this, on_resourceUpdated(ec2::ApiLayoutData));
     connect(layoutManager, &ec2::AbstractLayoutManager::removed,                    this, &QnCommonMessageProcessor::on_resourceRemoved );
 
     auto videowallManager = connection->getVideowallManager();
-    connect(videowallManager, &ec2::AbstractVideowallManager::addedOrUpdated,       this, [this](const QnVideoWallResourcePtr &videowall){updateResource(videowall);});
+    connect(videowallManager, &ec2::AbstractVideowallManager::addedOrUpdated,       this, on_resourceUpdated(ec2::ApiVideowallData));
     connect(videowallManager, &ec2::AbstractVideowallManager::removed,              this, &QnCommonMessageProcessor::on_resourceRemoved );
     connect(videowallManager, &ec2::AbstractVideowallManager::controlMessage,       this, &QnCommonMessageProcessor::videowallControlMessageReceived );
 
     auto webPageManager = connection->getWebPageManager();
-    connect(webPageManager, &ec2::AbstractWebPageManager::addedOrUpdated,           this, [this](const QnWebPageResourcePtr &webPage){updateResource(webPage);});
+    connect(webPageManager, &ec2::AbstractWebPageManager::addedOrUpdated,           this, on_resourceUpdated(ec2::ApiWebPageData));
     connect(webPageManager, &ec2::AbstractWebPageManager::removed,                  this, &QnCommonMessageProcessor::on_resourceRemoved );
 
     auto licenseManager = connection->getLicenseManager();
@@ -120,9 +144,12 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     auto discoveryManager = connection->getDiscoveryManager();
     connect(discoveryManager, &ec2::AbstractDiscoveryManager::discoveryInformationChanged, this, &QnCommonMessageProcessor::on_gotDiscoveryData );
     connect(discoveryManager, &ec2::AbstractDiscoveryManager::discoveredServerChanged, this, &QnCommonMessageProcessor::discoveredServerChanged);
+
+#undef on_resourceUpdated
 }
 
-void QnCommonMessageProcessor::disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection) {
+void QnCommonMessageProcessor::disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection)
+{
     connection->disconnect(this);
     connection->getResourceManager()->disconnect(this);
     connection->getMediaServerManager()->disconnect(this);
@@ -137,10 +164,10 @@ void QnCommonMessageProcessor::disconnectFromConnection(const ec2::AbstractECCon
     connection->getMiscManager()->disconnect(this);
 }
 
-void QnCommonMessageProcessor::on_gotInitialNotification(const ec2::QnFullResourceData &fullData)
+void QnCommonMessageProcessor::on_gotInitialNotification(const ec2::ApiFullInfoData& fullData)
 {
     onGotInitialNotification(fullData);
-    on_businessRuleReset(fullData.bRules);
+    on_businessRuleReset(fullData.rules);
 }
 
 void QnCommonMessageProcessor::on_gotDiscoveryData(const ec2::ApiDiscoveryData &data, bool addInformation)
@@ -216,8 +243,6 @@ void QnCommonMessageProcessor::on_resourceRemoved( const QnUuid& resourceId )
 {
     if (canRemoveResource(resourceId))
     {
-        //beforeRemovingResource(resourceId);
-
         if (QnResourcePtr ownResource = qnResPool->getResourceById(resourceId))
         {
             // delete dependent objects
@@ -225,15 +250,16 @@ void QnCommonMessageProcessor::on_resourceRemoved( const QnUuid& resourceId )
                 qnResPool->removeResource(subRes);
             qnResPool->removeResource(ownResource);
         }
-
-        afterRemovingResource(resourceId);
     }
     else
         removeResourceIgnored(resourceId);
 }
 
-void QnCommonMessageProcessor::on_cameraUserAttributesChanged(const QnCameraUserAttributesPtr& userAttributes)
+void QnCommonMessageProcessor::on_cameraUserAttributesChanged(const ec2::ApiCameraAttributesData& attrs)
 {
+    QnCameraUserAttributesPtr userAttributes(new QnCameraUserAttributes());
+    fromApiToResource(attrs, userAttributes);
+
     QSet<QByteArray> modifiedFields;
     {
         QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), userAttributes->cameraID );
@@ -258,8 +284,11 @@ void QnCommonMessageProcessor::on_cameraUserAttributesRemoved(const QnUuid& came
         res->emitModificationSignals( modifiedFields );
 }
 
-void QnCommonMessageProcessor::on_mediaServerUserAttributesChanged(const QnMediaServerUserAttributesPtr& userAttributes)
+void QnCommonMessageProcessor::on_mediaServerUserAttributesChanged(const ec2::ApiMediaServerUserAttributesData& attrs)
 {
+    QnMediaServerUserAttributesPtr userAttributes(new QnMediaServerUserAttributes());
+    fromApiToResource(attrs, userAttributes);
+
     QSet<QByteArray> modifiedFields;
     {
         QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), userAttributes->serverID );
@@ -311,13 +340,16 @@ void QnCommonMessageProcessor::on_businessActionBroadcasted( const QnAbstractBus
     // nothing to do for a while
 }
 
-void QnCommonMessageProcessor::on_businessRuleReset( const QnBusinessEventRuleList& rules )
+void QnCommonMessageProcessor::on_businessRuleReset( const ec2::ApiBusinessRuleDataList& rules )
 {
+    QnBusinessEventRuleList qnRules;
+    fromApiToResourceList(rules, qnRules);
+
     m_rules.clear();
-    for(const QnBusinessEventRulePtr &bRule: rules)
+    for(const QnBusinessEventRulePtr &bRule: qnRules)
         m_rules[bRule->id()] = bRule;
 
-    emit businessRuleReset(rules);
+    emit businessRuleReset(qnRules);
 }
 
 void QnCommonMessageProcessor::on_broadcastBusinessAction( const QnAbstractBusinessActionPtr& action )
@@ -330,52 +362,95 @@ void QnCommonMessageProcessor::on_execBusinessAction( const QnAbstractBusinessAc
     execBusinessActionInternal(action);
 }
 
-//TODO: #rvasilenko ec2 relate logic. remove from this class
-void QnCommonMessageProcessor::afterRemovingResource(const QnUuid& id)
+void QnCommonMessageProcessor::resetResourceTypes(const ec2::ApiResourceTypeDataList& resTypes)
 {
-    Q_UNUSED(id)
-    /*
-    for(const QnBusinessEventRulePtr& bRule: m_rules.values())
-    {
-        if (bRule->eventResources().contains(id) || bRule->actionResources().contains(id))
-        {
-            QnBusinessEventRulePtr updatedRule(bRule->clone());
-            updatedRule->removeResource(id);
-            emit businessRuleChanged(updatedRule);
-        }
-    }
-    */
+    QnResourceTypeList qnResTypes;
+    fromApiToResourceList(resTypes, qnResTypes);
+    qnResTypePool->replaceResourceTypeList(qnResTypes);
 }
 
-
-void QnCommonMessageProcessor::resetResources(const QnResourceList& resources) {
+void QnCommonMessageProcessor::resetResources(const ec2::ApiFullInfoData& fullData)
+{
     /* Store all remote resources id to clean them if they are not in the list anymore. */
     QHash<QnUuid, QnResourcePtr> remoteResources;
     for (const QnResourcePtr &resource: qnResPool->getResourcesWithFlag(Qn::remote))
         remoteResources.insert(resource->getId(), resource);
 
+    /* //TODO: #GDM #c++14 re-enable when generic lambdas will be supported
+    auto updateResources = [this, &remoteResources](const auto& source)
+    {
+        for (const auto& resource : source)
+        {
+            updateResource(resource);
+            remoteResources.remove(resource.id);
+        }
+    };
+    */
+
+#define updateResources(source) { for (const auto& resource : source) { updateResource(resource); remoteResources.remove(resource.id); } }
+
     /* Packet adding. */
     qnResPool->beginTran();
-    for (const QnResourcePtr& resource: resources) {
-        /* Update existing. */
-        updateResource(resource);
 
-        /* And keep them from removing. */
-        remoteResources.remove(resource->getId());
-    }
+    updateResources(fullData.users);
+    updateResources(fullData.cameras);
+    updateResources(fullData.layouts);
+    updateResources(fullData.videowalls);
+    updateResources(fullData.webPages);
+    updateResources(fullData.servers);
+    updateResources(fullData.storages);
+
     qnResPool->commit();
+
+#undef updateResources
 
     /* Remove absent resources. */
     for (const QnResourcePtr& resource: remoteResources)
         qnResPool->removeResource(resource);
 }
 
-void QnCommonMessageProcessor::resetLicenses(const QnLicenseList& licenses) {
+void QnCommonMessageProcessor::resetLicenses(const ec2::ApiLicenseDataList& licenses)
+{
     qnLicensePool->replaceLicenses(licenses);
 }
 
 void QnCommonMessageProcessor::resetCamerasWithArchiveList(const ec2::ApiServerFootageDataList& cameraHistoryList) {
     qnCameraHistoryPool->resetServerFootageData(cameraHistoryList);
+}
+
+void QnCommonMessageProcessor::resetTime()
+{
+    qnSyncTime->reset();
+
+    if (!m_connection)
+        return;
+
+    auto timeManager = m_connection->getTimeManager();
+    timeManager->getCurrentTime(this, [this](int handle, ec2::ErrorCode errCode, qint64 syncTime)
+    {
+        Q_UNUSED(handle);
+        if (errCode != ec2::ErrorCode::ok || !m_connection)
+            return;
+
+        emit syncTimeChanged(syncTime);
+
+        ec2::QnPeerTimeInfoList peers = m_connection->getTimeManager()->getPeerTimeInfoList();
+        for (const ec2::QnPeerTimeInfo &info : peers)
+        {
+            if (!QnRuntimeInfoManager::instance()->hasItem(info.peerId))
+            {
+                qWarning() << "Time for peer" << info.peerId << "received before peer was found";
+                continue;
+            }
+            NX_ASSERT(QnRuntimeInfoManager::instance()->item(info.peerId).data.peer.peerType == Qn::PT_Server);
+            emit peerTimeChanged(info.peerId, syncTime, info.time);
+        }
+    });
+}
+
+void QnCommonMessageProcessor::resetAccessRights(const ec2::ApiAccessRightsDataList& accessRights)
+{
+    qnResourceAccessManager->reset(accessRights);
 }
 
 bool QnCommonMessageProcessor::canRemoveResource(const QnUuid &)
@@ -396,23 +471,29 @@ void QnCommonMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData 
 }
 
 
-void QnCommonMessageProcessor::resetServerUserAttributesList( const QnMediaServerUserAttributesList& serverUserAttributesList )
+void QnCommonMessageProcessor::resetServerUserAttributesList( const ec2::ApiMediaServerUserAttributesDataList& serverUserAttributesList )
 {
     QnMediaServerUserAttributesPool::instance()->clear();
-    for( const QnMediaServerUserAttributesPtr& serverAttrs: serverUserAttributesList )
+    for( const auto& serverAttrs: serverUserAttributesList )
     {
-        QnMediaServerUserAttributesPool::ScopedLock userAttributesLock( QnMediaServerUserAttributesPool::instance(), serverAttrs->serverID );
-        *(*userAttributesLock) = *serverAttrs;
+        QnMediaServerUserAttributesPtr dstElement(new QnMediaServerUserAttributes());
+        fromApiToResource(serverAttrs, dstElement);
+
+        QnMediaServerUserAttributesPool::ScopedLock userAttributesLock( QnMediaServerUserAttributesPool::instance(), serverAttrs.serverID );
+        *(*userAttributesLock) = *dstElement;
     }
 }
 
-void QnCommonMessageProcessor::resetCameraUserAttributesList( const QnCameraUserAttributesList& cameraUserAttributesList )
+void QnCommonMessageProcessor::resetCameraUserAttributesList( const ec2::ApiCameraAttributesDataList& cameraUserAttributesList )
 {
     QnCameraUserAttributePool::instance()->clear();
-    for( const QnCameraUserAttributesPtr& cameraAttrs: cameraUserAttributesList )
+    for( const auto & cameraAttrs: cameraUserAttributesList )
     {
-        QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), cameraAttrs->cameraID );
-        *(*userAttributesLock) = *cameraAttrs;
+        QnCameraUserAttributesPtr dstElement(new QnCameraUserAttributes());
+        fromApiToResource(cameraAttrs, dstElement);
+
+        QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), cameraAttrs.cameraID );
+        *(*userAttributesLock) = *dstElement;
     }
 }
 
@@ -448,42 +529,21 @@ void QnCommonMessageProcessor::resetStatusList(const ec2::ApiResourceStatusDataL
         on_resourceStatusChanged(statusData.id , statusData.status);
 }
 
-void QnCommonMessageProcessor::onGotInitialNotification(const ec2::QnFullResourceData& fullData)
+void QnCommonMessageProcessor::onGotInitialNotification(const ec2::ApiFullInfoData& fullData)
 {
     QnServerAdditionalAddressesDictionary::instance()->clear();
-    //QnAppServerConnectionFactory::setBox(fullData.serverInfo.platform);
-    resetServerUserAttributesList( fullData.serverUserAttributesList );
-    resetCameraUserAttributesList( fullData.cameraUserAttributesList );
-    resetResources(fullData.resources);
+
+    resetResourceTypes(fullData.resourceTypes);
+    resetResources(fullData);
+    resetServerUserAttributesList(fullData.serversUserAttributesList);
+    resetCameraUserAttributesList(fullData.cameraUserAttributesList);
     resetPropertyList(fullData.allProperties);
-    resetLicenses(fullData.licenses);
-    resetCamerasWithArchiveList(fullData.camerasWithArchiveList);
+    resetCamerasWithArchiveList(fullData.cameraHistory);
     resetStatusList(fullData.resStatusList);
+    resetAccessRights(fullData.accessRights);
 
-    //on_runtimeInfoChanged(fullData.serverInfo);
-    qnSyncTime->reset();
-
-    if (!m_connection)
-        return;
-
-    auto timeManager = m_connection->getTimeManager();
-    timeManager->getCurrentTime(this, [this](int handle, ec2::ErrorCode errCode, qint64 syncTime) {
-        Q_UNUSED(handle);
-        if (errCode != ec2::ErrorCode::ok || !m_connection)
-            return;
-
-        emit syncTimeChanged(syncTime);
-
-        ec2::QnPeerTimeInfoList peers = m_connection->getTimeManager()->getPeerTimeInfoList();
-        for(const ec2::QnPeerTimeInfo &info: peers) {
-            if( !QnRuntimeInfoManager::instance()->hasItem(info.peerId) ) {
-                qWarning() << "Time for peer" << info.peerId << "received before peer was found";
-                continue;
-            }
-            NX_ASSERT(QnRuntimeInfoManager::instance()->item(info.peerId).data.peer.peerType == Qn::PT_Server);
-            emit peerTimeChanged(info.peerId, syncTime, info.time);
-        }
-    });
+    resetLicenses(fullData.licenses);
+    resetTime();
 
     emit initialResourcesReceived();
 }
@@ -492,5 +552,77 @@ QMap<QnUuid, QnBusinessEventRulePtr> QnCommonMessageProcessor::businessRules() c
     return m_rules;
 }
 
-void QnCommonMessageProcessor::updateResource(const QnResourcePtr& ) {
+void QnCommonMessageProcessor::updateResource(const QnResourcePtr& )
+{
+}
+
+void QnCommonMessageProcessor::updateResource(const ec2::ApiUserData& user)
+{
+    QnUserResourcePtr qnUser(new QnUserResource());
+    fromApiToResource(user, qnUser);
+    updateResource(qnUser);
+}
+
+void QnCommonMessageProcessor::updateResource(const ec2::ApiLayoutData& layout)
+{
+    QnLayoutResourcePtr qnLayout(new QnLayoutResource());
+    fromApiToResource(layout, qnLayout);
+    updateResource(qnLayout);
+}
+
+void QnCommonMessageProcessor::updateResource(const ec2::ApiVideowallData& videowall)
+{
+    QnVideoWallResourcePtr qnVideowall(new QnVideoWallResource());
+    fromApiToResource(videowall, qnVideowall);
+    updateResource(qnVideowall);
+}
+
+void QnCommonMessageProcessor::updateResource(const ec2::ApiWebPageData& webpage)
+{
+    QnWebPageResourcePtr qnWebpage(new QnWebPageResource());
+    fromApiToResource(webpage, qnWebpage);
+    updateResource(qnWebpage);
+}
+
+void QnCommonMessageProcessor::updateResource(const ec2::ApiCameraData& camera)
+{
+    QnVirtualCameraResourcePtr qnCamera = getResourceFactory()->createResource(camera.typeId,
+            QnResourceParams(camera.id, camera.url, camera.vendor))
+        .dynamicCast<QnVirtualCameraResource>();
+
+    NX_ASSERT(qnCamera, Q_FUNC_INFO, QByteArray("Unknown resource type:") + camera.typeId.toByteArray());
+    if (qnCamera)
+    {
+        fromApiToResource(camera, qnCamera);
+        NX_ASSERT(camera.id == QnVirtualCameraResource::uniqueIdToId(qnCamera->getUniqueId()),
+            Q_FUNC_INFO,
+            "You must fill camera ID as md5 hash of unique id");
+
+        updateResource(qnCamera);
+    }
+}
+
+void QnCommonMessageProcessor::updateResource(const ec2::ApiMediaServerData& server)
+{
+    QnMediaServerResourcePtr qnServer(new QnMediaServerResource());
+    fromApiToResource(server, qnServer);
+    updateResource(qnServer);
+}
+
+void QnCommonMessageProcessor::updateResource(const ec2::ApiStorageData& storage)
+{
+    auto resTypeId = qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kStorageTypeId);
+    NX_ASSERT(!resTypeId.isNull(), Q_FUNC_INFO, "Invalid resource type pool state");
+    if (resTypeId.isNull())
+        return;
+
+    QnStorageResourcePtr qnStorage = getResourceFactory()->createResource(resTypeId,
+            QnResourceParams(storage.id, storage.url, QString()))
+        .dynamicCast<QnStorageResource>();
+    NX_ASSERT(qnStorage, Q_FUNC_INFO, "Invalid resource type pool state");
+    if (qnStorage)
+    {
+        fromApiToResource(storage, qnStorage);
+        updateResource(qnStorage);
+    }
 }

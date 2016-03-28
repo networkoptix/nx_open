@@ -18,7 +18,7 @@ public:
     bool eventFilter(QObject *object, QEvent *event);
 
 public:
-    QnScrollBarProxy *proxyScrollbar;
+    QPointer<QnScrollBarProxy> proxyScrollbar;
     Qt::Alignment alignment;
     bool useHeaderShift;
     bool useItemViewPaddingWhenVisible;

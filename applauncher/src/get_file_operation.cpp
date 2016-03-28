@@ -220,7 +220,7 @@ namespace detail
                 return;
 
             default:
-                assert( false );
+                NX_ASSERT( false );
                 break;
         }
     }
@@ -296,7 +296,7 @@ namespace detail
             }
 
             default:
-                assert( false );
+                NX_ASSERT( false );
                 break;
         }
     }
@@ -304,7 +304,7 @@ namespace detail
     void GetFileOperation::onSomeMessageBodyAvailable( nx_http::AsyncHttpClientPtr httpClient )
     {
         std::unique_lock<std::mutex> lk( m_mutex );
-        assert( m_httpClient == httpClient );
+        NX_ASSERT( m_httpClient == httpClient );
         onSomeMessageBodyAvailableNonSafe();
     }
 
@@ -338,7 +338,7 @@ namespace detail
 
         std::unique_lock<std::mutex> lk( m_mutex );
 
-        assert( m_httpClient == httpClient );
+        NX_ASSERT( m_httpClient == httpClient );
 
         //check message body download result
         if( httpClient->failed() )
@@ -420,8 +420,8 @@ namespace detail
     {
         NX_LOG( QString::fromLatin1("GetFileOperation::checkIfFileDownloadRequired. file %1").arg(entryPath), cl_logDEBUG2 );
 
-        assert( m_localFileSize && m_remoteFileSize );
-        assert( m_state == State::sCheckingLocalFile );
+        NX_ASSERT( m_localFileSize && m_remoteFileSize );
+        NX_ASSERT( m_state == State::sCheckingLocalFile );
 
         if( m_localFileSize.get() >= 0 && m_localFileSize.get() == m_remoteFileSize.get() )
         {

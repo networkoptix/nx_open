@@ -1,5 +1,6 @@
 #include "api_discovery_data.h"
-#include "api_model_functions_impl.h"
+
+#include <utils/common/model_functions.h>
 
 namespace ec2 {
     QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
@@ -10,3 +11,6 @@ namespace ec2 {
             (ApiDiscoveredServerData),
             (ubjson)(xml)(json), _Fields, (optional, true))
 } // namespace ec2
+
+void serialize_field(const ec2::ApiDiscoveredServerData &, QVariant *) { return; }
+void deserialize_field(const QVariant &, ec2::ApiDiscoveredServerData *) { return; }

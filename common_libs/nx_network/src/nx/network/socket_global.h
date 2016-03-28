@@ -39,6 +39,7 @@ public:
 
 	static void init();	/** Should be called before any socket use */
 	static void deinit();  /** Should be called when sockets are not needed any more */
+    static void check(); /** May be called to verify initialization */
 
 	class InitGuard
 	{
@@ -56,8 +57,8 @@ private:
     SocketGlobals();
     ~SocketGlobals();
 
-	static QnMutex s_mutex;
-	static size_t s_counter;
+    static QnMutex s_mutex;
+    static std::atomic<int> s_counter;
     static SocketGlobals* s_instance;
 
 private:

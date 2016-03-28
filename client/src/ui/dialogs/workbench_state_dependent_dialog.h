@@ -82,11 +82,11 @@ protected:
 
     /**
      * @brief           Show the dialog, asking what to do with unsaved changes.
-     * @returns         QMessageBox::Yes if the changes should be saved
-     *                  QMessageBox::No if the changes should be discarded
-     *                  QMessageBox::Cancel to abort the process
+     * @returns         QDialogButtonBox::Yes if the changes should be saved
+     *                  QDialogButtonBox::No if the changes should be discarded
+     *                  QDialogButtonBox::Cancel to abort the process
      */
-    virtual QMessageBox::StandardButton showConfirmationDialog();
+    virtual QDialogButtonBox::StandardButton showConfirmationDialog();
 };
 
 

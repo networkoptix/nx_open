@@ -17,7 +17,7 @@ class QnDesktopCameraDataConsumer: public QnAbstractDataConsumer
 {
 public:
     QnDesktopCameraDataConsumer(QnDesktopCameraConnectionProcessor* owner):
-        QnAbstractDataConsumer(20), 
+        QnAbstractDataConsumer(20),
         m_sequence(0),
         m_owner(owner)
     {
@@ -45,13 +45,13 @@ protected:
             return false;
 
         int streamIndex = media->channelNumber;
-        Q_ASSERT(streamIndex <= 1);
+        NX_ASSERT(streamIndex <= 1);
 
         m_serializers[streamIndex].setDataPacket(media);
         m_owner->sendLock();
         while(!m_needStop && m_owner->isConnected() && m_serializers[streamIndex].getNextPacket(sendBuffer))
         {
-            Q_ASSERT(sendBuffer.size() < 65536 - 4);
+            NX_ASSERT(sendBuffer.size() < 65536 - 4);
             quint8 header[4];
             header[0] = '$';
             header[1] = streamIndex;
@@ -63,8 +63,8 @@ protected:
             AVRational time_base = {1, (int) m_serializers[streamIndex].getFrequency() };
             qint64 packetTime = av_rescale_q(packet->timestamp, r, time_base);
 
-            QnRtspEncoder::buildRTPHeader(sendBuffer.data(), m_serializers[streamIndex].getSSRC(), m_serializers[streamIndex].getRtpMarker(), 
-                           packetTime, m_serializers[streamIndex].getPayloadtype(), m_sequence++); 
+            QnRtspEncoder::buildRTPHeader(sendBuffer.data(), m_serializers[streamIndex].getSSRC(), m_serializers[streamIndex].getRtpMarker(),
+                           packetTime, m_serializers[streamIndex].getPayloadtype(), m_sequence++);
             m_owner->sendData(sendBuffer);
             sendBuffer.clear();
         }
@@ -215,7 +215,7 @@ void QnDesktopCameraConnection::pleaseStop()
         if (processor)
             processor->pleaseStop();
         if (connection)
-            connection->getSocket()->close();
+            connection->getSocket()->shutdown();
     }
 
     QnLongRunnable::pleaseStop();

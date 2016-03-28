@@ -28,7 +28,7 @@ int mapAioEventToUdtEvent(aio::EventType et)
         case aio::etWrite:
             return UDT_EPOLL_OUT | UDT_EPOLL_ERR;
         default:
-            Q_ASSERT(0);
+            NX_ASSERT(0);
             return 0;
     }
 }
@@ -42,8 +42,8 @@ class ConstIteratorImpl
 public:
     UnifiedPollSet* pollSet;
     CurrentSet currentSet;
-    std::set<UDTSOCKET>::const_iterator udtSocketIter;
-    std::set<AbstractSocket::SOCKET_HANDLE>::const_iterator sysSocketIter;
+    std::map<UDTSOCKET, int>::const_iterator udtSocketIter;
+    std::map<AbstractSocket::SOCKET_HANDLE, int>::const_iterator sysSocketIter;
 
     ConstIteratorImpl(UnifiedPollSet* _pollSet)
     :
@@ -55,7 +55,8 @@ public:
 
     ~ConstIteratorImpl()
     {
-        assert(pollSet->m_iterators.erase(this) == 1);
+        const int elementsRemoved = pollSet->m_iterators.erase(this);
+        NX_ASSERT(elementsRemoved == 1);
     }
 };
 
@@ -119,10 +120,10 @@ Pollable* UnifiedPollSet::const_iterator::socket()
     {
         case CurrentSet::udtRead:
         case CurrentSet::udtWrite:
-            return m_impl->pollSet->m_udtSockets.find(*m_impl->udtSocketIter)->second.socket;
+            return m_impl->pollSet->m_udtSockets.find(m_impl->udtSocketIter->first)->second.socket;
         case CurrentSet::sysRead:
         case CurrentSet::sysWrite:
-            return m_impl->pollSet->m_sysSockets.find(*m_impl->sysSocketIter)->second.socket;
+            return m_impl->pollSet->m_sysSockets.find(m_impl->sysSocketIter->first)->second.socket;
         default:
             return nullptr;
     }
@@ -134,10 +135,10 @@ const Pollable* UnifiedPollSet::const_iterator::socket() const
     {
         case CurrentSet::udtRead:
         case CurrentSet::udtWrite:
-            return m_impl->pollSet->m_udtSockets.find(*m_impl->udtSocketIter)->second.socket;
+            return m_impl->pollSet->m_udtSockets.find(m_impl->udtSocketIter->first)->second.socket;
         case CurrentSet::sysRead:
         case CurrentSet::sysWrite:
-            return m_impl->pollSet->m_sysSockets.find(*m_impl->sysSocketIter)->second.socket;
+            return m_impl->pollSet->m_sysSockets.find(m_impl->sysSocketIter->first)->second.socket;
         default:
             return nullptr;
     }
@@ -148,13 +149,27 @@ aio::EventType UnifiedPollSet::const_iterator::eventType() const
     switch (m_impl->currentSet)
     {
         case CurrentSet::udtRead:
-        case CurrentSet::sysRead:
+            if (m_impl->udtSocketIter->second & UDT_EPOLL_ERR)
+                return aio::etError;
             return aio::etRead;
+
+        case CurrentSet::sysRead:
+            if (m_impl->sysSocketIter->second & UDT_EPOLL_ERR)
+                return aio::etError;
+            return aio::etRead;
+
         case CurrentSet::udtWrite:
-        case CurrentSet::sysWrite:
+            if (m_impl->udtSocketIter->second & UDT_EPOLL_ERR)
+                return aio::etError;
             return aio::etWrite;
+
+        case CurrentSet::sysWrite:
+            if (m_impl->sysSocketIter->second & UDT_EPOLL_ERR)
+                return aio::etError;
+            return aio::etWrite;
+
         default:
-            assert(false);
+            NX_ASSERT(false);
             return aio::etNone;
     }
 }
@@ -362,7 +377,7 @@ bool UnifiedPollSet::removeSocket(
     std::map<SocketHandle, SocketContext>* const socketDictionary)
 {
     auto it = socketDictionary->find(handle);
-    //Q_ASSERT(it != socketDictionary->end());
+    //NX_ASSERT(it != socketDictionary->end());
     if (it == socketDictionary->end())
         return true;    //for now, this is valid case if adding to pollset has failed
 
@@ -450,7 +465,7 @@ bool UnifiedPollSet::isUdtElementBeingUsed(
     for (auto iter : m_iterators)
     {
         if (iter->currentSet == currentSet &&
-            *(iter->udtSocketIter) == handle)
+            iter->udtSocketIter->first == handle)
         {
             //cannot remove element since it is being used
             return true;
@@ -467,7 +482,7 @@ bool UnifiedPollSet::isSysElementBeingUsed(
     for (auto iter : m_iterators)
     {
         if (iter->currentSet == currentSet &&
-            *(iter->sysSocketIter) == handle)
+            iter->sysSocketIter->first == handle)
         {
             //cannot remove element since it is being used
             return true;
@@ -530,11 +545,11 @@ void UnifiedPollSet::moveIterToTheNextEvent(ConstIteratorImpl* const iter) const
     }
 }
 
-void UnifiedPollSet::removePhantomSockets(std::set<UDTSOCKET>* const udtFdSet)
+void UnifiedPollSet::removePhantomSockets(std::map<UDTSOCKET, int>* const udtFdSet)
 {
     for (auto it = udtFdSet->begin(); it != udtFdSet->end();)
     {
-        if (m_udtSockets.find(*it) == m_udtSockets.end())
+        if (m_udtSockets.find(it->first) == m_udtSockets.end())
             it = udtFdSet->erase(it);   //UDT sometimes reports phantom FD
         else
             ++it;

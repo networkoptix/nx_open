@@ -144,8 +144,8 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
         return QnLayoutResourcePtr();
     QByteArray layoutData = layoutFile->readAll();
     layoutFile.reset();
-    
-    QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
+
+    QnLayoutResourcePtr layout(new QnLayoutResource());
     ec2::ApiLayoutData apiLayout;
     if (!QJson::deserialize(layoutData, &apiLayout)) {
         QnProto::Message<ec2::ApiLayoutData> apiLayoutMessage;
@@ -155,7 +155,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
             apiLayout = apiLayoutMessage.data;
         }
     }
-        
+
     fromApiToResource(apiLayout, layout);
 
     QnLayoutItemDataList orderedItems;
@@ -222,7 +222,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
 
     QScopedPointer<QIODevice> itemNamesIO(layoutStorage.open(lit("item_names.txt"), QIODevice::ReadOnly));
     QTextStream itemNames(itemNamesIO.data());
-    
+
     QScopedPointer<QIODevice> itemTimeZonesIO(layoutStorage.open(lit("item_timezones.txt"), QIODevice::ReadOnly));
     QTextStream itemTimeZones(itemTimeZonesIO.data());
 
@@ -231,7 +231,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
     for (int i = 0; i < items.size(); ++i) {
         QnLayoutItemData& item = items[i];
         QString path = item.resource.path;
-        Q_ASSERT_X(!path.isEmpty(), Q_FUNC_INFO, "Resource path should not be empty. Exported file is not valid.");
+        NX_ASSERT(!path.isEmpty(), Q_FUNC_INFO, "Resource path should not be empty. Exported file is not valid.");
         if (!path.endsWith(lit(".mkv")))
             path += lit(".mkv");
         item.resource.path = QnLayoutFileStorageResource::updateNovParent(xfile, path);
@@ -263,7 +263,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
             QString normMotionName = path.mid(path.lastIndexOf(L'?')+1);
             QScopedPointer<QIODevice> motionIO(layoutStorage.open(lit("motion%1_%2.bin").arg(channel).arg(QFileInfo(normMotionName).completeBaseName()), QIODevice::ReadOnly));
             if (motionIO) {
-                Q_ASSERT(motionIO->size() % sizeof(QnMetaDataV1Light) == 0);
+                NX_ASSERT(motionIO->size() % sizeof(QnMetaDataV1Light) == 0);
                 QnMetaDataLightVector motionData;
                 int motionDataSize = motionIO->size() / sizeof(QnMetaDataV1Light);
                 if (motionDataSize > 0) {

@@ -54,7 +54,9 @@ private:
         QByteArray* const random3Bytes,
         uint32_t* const timestamp,
         QByteArray* const nonceHash) const;
-    QByteArray calcNonceHash(const QnUuid& systemID, uint32_t timestamp) const;
+    QByteArray calcNonceHash(
+        const std::string& systemID,
+        uint32_t timestamp) const;
 };
 
 }   //cdb

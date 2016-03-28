@@ -200,7 +200,7 @@ namespace Qn {
         LightModeNoAnimation        = 0x0001,           /**< Disable all client animations. */
         LightModeSmallWindow        = 0x0002,           /**< Decrease minimum window size. */
         LightModeNoSceneBackground  = 0x0004,           /**< Disable gradient scene background. */
-        LightModeNoOpacity          = 0x0008,           /**< Disable opacity in ui widgets. */
+
         LightModeNoNotifications    = 0x0010,           /**< Disable notifications panel. */
         LightModeSingleItem         = 0x0020,           /**< Limit number of simultaneous items on the scene to 1. */
         LightModeNoShadows          = 0x0040,           /**< Disable shadows on ui elements. */
@@ -213,7 +213,7 @@ namespace Qn {
                                     | LightModeNoNotifications | LightModeNoShadows
                                     | LightModeNoNewWindow | LightModeNoLayoutBackground
                                     | LightModeNoZoomWindows,
-        LightModeVideoWall          = LightModeNoSceneBackground | LightModeNoNotifications | LightModeNoShadows /*| LightModeNoAnimation*/,
+        LightModeVideoWall          = LightModeNoSceneBackground | LightModeNoNotifications | LightModeNoShadows,
         LightModeFull               = 0x7FFFFFFF
 
     };

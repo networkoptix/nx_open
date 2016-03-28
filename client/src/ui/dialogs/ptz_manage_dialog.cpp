@@ -5,7 +5,6 @@
 #include <QtCore/QScopedPointer>
 
 #include <QtWidgets/QStyledItemDelegate>
-#include <QtWidgets/QMessageBox>
 
 #include <common/common_globals.h>
 #include <client/client_settings.h>

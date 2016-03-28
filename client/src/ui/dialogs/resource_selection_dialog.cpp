@@ -220,7 +220,7 @@ void QnResourceSelectionDialog::keyPressEvent(QKeyEvent *event) {
 }
 
 void QnResourceSelectionDialog::setDelegate(QnResourceSelectionDialogDelegate *delegate) {
-    Q_ASSERT(!m_delegate);
+    NX_ASSERT(!m_delegate);
     m_delegate = delegate;
     if (m_delegate) {
         m_delegate->init(ui->delegateFrame);

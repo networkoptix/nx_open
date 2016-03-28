@@ -10,8 +10,6 @@
 #include <string>
 #include <vector>
 
-#include <nx/utils/uuid.h>
-
 
 namespace nx {
 namespace cdb {
@@ -46,7 +44,7 @@ class SystemData
 {
 public:
     //!Globally unique ID of system assigned by cloud
-    QnUuid id;
+    std::string id;
     //!Not unique system name
     std::string name;
     std::string customization;
@@ -104,7 +102,7 @@ class SystemSharing
 {
 public:
     std::string accountEmail;
-    QnUuid systemID;
+    std::string systemID;
     SystemAccessRole accessRole;
 
     SystemSharing()
@@ -139,6 +137,8 @@ class SystemSharingEx
     public SystemSharing
 {
 public:
+    SystemSharingEx() {}
+
     std::string fullName;
 
     bool operator==(const SystemSharingEx& rhs) const

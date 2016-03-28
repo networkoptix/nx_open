@@ -13,6 +13,7 @@
 #include <core/resource_management/resource_criterion.h>
 
 #include <nx/utils/singleton.h>
+#include <utils/common/connective.h>
 
 class QnResource;
 class QnNetworkResource;
@@ -29,10 +30,11 @@ class CLRecorderDevice;
  *
  * If resource is conflicting it must not be placed in resource pool.
  */
-class QN_EXPORT QnResourcePool : public QObject, public Singleton<QnResourcePool>
+class QN_EXPORT QnResourcePool : public Connective<QObject>, public Singleton<QnResourcePool>
 {
     Q_OBJECT
 
+    typedef Connective<QObject> base_type;
 public:
     enum Filter
     {
@@ -146,7 +148,6 @@ public:
     QnResourceList getResourcesWithTypeId(QnUuid id) const;
 
     QnResourcePtr getIncompatibleResourceById(const QnUuid &id, bool useCompatible = false) const;
-    QnResourcePtr getIncompatibleResourceByUniqueId(const QString &uid) const;
     QnResourceList getAllIncompatibleResources() const;
 
     template<class Cond>

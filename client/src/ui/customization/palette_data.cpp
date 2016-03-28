@@ -49,7 +49,7 @@ QnPaletteData &QnPaletteData::operator=(const QnPaletteData &other) {
 }
 
 void QnPaletteData::applyTo(QPalette *palette) const {
-    assert(palette);
+    NX_ASSERT(palette);
 
     d->forEachColor([&](QPalette::ColorGroup group, QPalette::ColorRole role) {
         const QColor &color = d->colors[group][role];

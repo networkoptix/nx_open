@@ -3,10 +3,10 @@
 
 #include <memory>
 
-#include <festival.h>
+#include <festival/festival.h>
+#include <festival/EST_wave_aux.h>
 
 #include <utils/common/app_info.h>
-#include <EST_wave_aux.h>
 
 #include "text_to_wav.h"
 
@@ -134,7 +134,7 @@ namespace
         int data_size, data_int;
         short data_short;
 
-        Q_ASSERT(sample_type != st_schar);
+        NX_ASSERT(sample_type != st_schar);
      //   if (sample_type == st_schar)
      //     {
         //EST_warning("RIFF format: Signed 8-bit not allowed by this file format");
@@ -211,7 +211,6 @@ namespace
 static void initFestival()
 {
     //initializing festival engine
-    //sprintf( festivalVoxPath, "%s/festival.vox/lib/", QN_BUILDENV_PATH );
 #ifndef Q_OS_MAC
     sprintf( festivalVoxPath, "%s/vox/", QCoreApplication::applicationDirPath().toLatin1().constData() );
 #else

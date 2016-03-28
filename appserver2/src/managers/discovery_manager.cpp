@@ -9,7 +9,7 @@ namespace ec2 {
 
 void QnDiscoveryNotificationManager::triggerNotification(const QnTransaction<ApiDiscoverPeerData> &transaction)
 {
-    Q_ASSERT_X(transaction.command == ApiCommand::discoverPeer, "Invalid command for this function", Q_FUNC_INFO);
+    NX_ASSERT(transaction.command == ApiCommand::discoverPeer, "Invalid command for this function", Q_FUNC_INFO);
 
     // TODO: maybe it's better to move it out and use signal?..
     QnModuleFinder *moduleFinder = QnModuleFinder::instance();
@@ -21,7 +21,7 @@ void QnDiscoveryNotificationManager::triggerNotification(const QnTransaction<Api
 
 void QnDiscoveryNotificationManager::triggerNotification(const QnTransaction<ApiDiscoveryData> &transaction)
 {
-    Q_ASSERT_X(transaction.command == ApiCommand::addDiscoveryInformation ||
+    NX_ASSERT(transaction.command == ApiCommand::addDiscoveryInformation ||
                transaction.command == ApiCommand::removeDiscoveryInformation,
                Q_FUNC_INFO, "Invalid command for this function");
 

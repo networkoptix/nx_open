@@ -26,7 +26,7 @@ struct QnConnectionInfo {
     QnSoftwareVersion version;
     QList<QnCompatibilityItem> compatibilityItems;
     QString systemName;
-    QString ecsGuid;    //TODO: #GDM make QnUuid
+    QString ecsGuid;    // Id of remote server. TODO: #GDM make QnUuid
     QString brand;
     QString box;
     bool allowSslConnections;
