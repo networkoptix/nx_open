@@ -139,7 +139,7 @@
                 </property>
             </activation>
             <properties>
-                <rdep.packages>openssl opengl-es-mali</rdep.packages>
+                <rdep.packages>openssl ffmpeg opengl-es-mali</rdep.packages>
             </properties>
         </profile>
     </profiles>
