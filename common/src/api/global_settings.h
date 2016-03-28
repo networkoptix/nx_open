@@ -128,6 +128,10 @@ public:
 
     // -- Misc settings
 
+    /** System is not set, it has default admin password and not linked to the cloud. */
+    bool isNewSystem() const;
+    void setNewSystem(bool value);
+
     bool arecontRtspEnabled() const;
     void setArecontRtspEnabled(bool newVal) const;
 
@@ -151,6 +155,7 @@ signals:
     void upnpPortMappingEnabledChanged();
     void ec2ConnectionSettingsChanged();
     void cloudSettingsChanged();
+    void newSystemChanged();
 
 private:
     typedef QList<QnAbstractResourcePropertyAdaptor*> AdaptorList;
@@ -218,6 +223,7 @@ private:
 
     // misc adaptors
     QnResourcePropertyAdaptor<bool>* m_arecontRtspEnabledAdaptor;
+    QnResourcePropertyAdaptor<bool>* m_newSystemAdaptor;
 
     AdaptorList m_allAdaptors;
 

@@ -53,6 +53,7 @@ namespace
     const QString kNameBackupQualities(lit("backupQualities"));
     const QString kNameBackupNewCamerasByDefault(lit("backupNewCamerasByDefault"));
     const QString kNameCrossdomainEnabled(lit("crossdomainEnabled"));
+    const QString kNameNewSystem(lit("newSystem"));
 
     const QString kNameStatisticsAllowed(lit("statisticsAllowed"));
     const QString kNameStatisticsReportLastTime(lit("statisticsReportLastTime"));
@@ -277,7 +278,8 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
     connect(m_cameraSettingsOptimizationAdaptor,    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::cameraSettingsOptimizationChanged,   Qt::QueuedConnection);
     connect(m_serverAutoDiscoveryEnabledAdaptor,    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::serverAutoDiscoveryChanged,          Qt::QueuedConnection);
     connect(m_updateNotificationsEnabledAdaptor,    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::updateNotificationsChanged,          Qt::QueuedConnection);
-    connect(m_upnpPortMappingEnabledAdaptor,        &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::upnpPortMappingEnabledChanged,          Qt::QueuedConnection);
+    connect(m_upnpPortMappingEnabledAdaptor,        &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::upnpPortMappingEnabledChanged,       Qt::QueuedConnection);
+    connect(m_newSystemAdaptor,                     &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::newSystemChanged,                    Qt::QueuedConnection);
 
     QnGlobalSettings::AdaptorList result;
     result
@@ -290,6 +292,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_backupNewCamerasByDefaultAdaptor
 		<< m_crossdomainXmlEnabledAdaptor
         << m_upnpPortMappingEnabledAdaptor
+        << m_newSystemAdaptor
         << m_arecontRtspEnabledAdaptor
         ;
 
@@ -677,6 +680,16 @@ void QnGlobalSettings::resetCloudParams()
     setCloudAccountName(QString());
     setCloudSystemID(QString());
     setCloudAuthKey(QString());
+}
+
+bool QnGlobalSettings::isNewSystem() const
+{
+    return m_newSystemAdaptor->value();
+}
+
+void QnGlobalSettings::setNewSystem(bool value)
+{
+    m_newSystemAdaptor->setValue(value);
 }
 
 bool QnGlobalSettings::arecontRtspEnabled() const
