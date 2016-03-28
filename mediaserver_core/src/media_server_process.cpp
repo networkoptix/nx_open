@@ -65,6 +65,7 @@
 #include <media_server/server_connector.h>
 #include <media_server/file_connection_processor.h>
 #include <media_server/resource_status_watcher.h>
+#include <media_server/media_server_resource_searchers.h>
 
 #include <motion/motion_helper.h>
 
@@ -85,27 +86,13 @@
 
 #include <plugins/native_sdk/common_plugin_container.h>
 #include <plugins/plugin_manager.h>
-#include <plugins/resource/acti/acti_resource_searcher.h>
 #include <plugins/resource/avi/avi_resource.h>
-#include <plugins/resource/arecontvision/resource/av_resource_searcher.h>
-#include <plugins/resource/axis/axis_resource_searcher.h>
+
 #include <plugins/resource/desktop_camera/desktop_camera_registrator.h>
-#include <plugins/resource/desktop_camera/desktop_camera_resource_searcher.h>
-#include <plugins/resource/desktop_camera/desktop_camera_deleter.h>
-#include <plugins/resource/d-link/dlink_resource_searcher.h>
-#include <plugins/resource/droid/droid_resource_searcher.h>
-#include <plugins/resource/droid_ipwebcam/ipwebcam_droid_resource_searcher.h>
-#include <plugins/resource/flex_watch/flexwatch_resource_searcher.h>
-#include <plugins/resource/iqinvision/iqinvision_resource_searcher.h>
-#include <plugins/resource/isd/isd_resource_searcher.h>
+
 #include <plugins/resource/mserver_resource_searcher.h>
 #include <plugins/resource/mdns/mdns_listener.h>
-#include <plugins/resource/onvif/onvif_resource_searcher.h>
-#include <plugins/resource/pulse/pulse_resource_searcher.h>
-#include <plugins/resource/stardot/stardot_resource_searcher.h>
-#include <plugins/resource/test_camera/testcamera_resource_searcher.h>
-#include <plugins/resource/third_party/third_party_resource_searcher.h>
-#include <plugins/storage/dts/vmax480/vmax480_resource_searcher.h>
+
 #include <plugins/storage/file_storage/file_storage_resource.h>
 #include <plugins/storage/third_party_storage_resource/third_party_storage_resource.h>
 
@@ -2278,92 +2265,13 @@ void MediaServerProcess::run()
 
     std::unique_ptr<QnResourceStatusWatcher> statusWatcher( new QnResourceStatusWatcher());
 
-    //NOTE plugins have higher priority than built-in drivers
-    ThirdPartyResourceSearcher thirdPartyResourceSearcher;
-    QnResourceDiscoveryManager::instance()->addDeviceServer( &thirdPartyResourceSearcher );
-
-#ifdef ENABLE_DESKTOP_CAMERA
-    QnDesktopCameraResourceSearcher desktopCameraResourceSearcher;
-    QnResourceDiscoveryManager::instance()->addDeviceServer(&desktopCameraResourceSearcher);
-    QnDesktopCameraDeleter autoDeleter;
-#endif  //ENABLE_DESKTOP_CAMERA
-
-#ifndef EDGE_SERVER
-#ifdef ENABLE_ARECONT
-    QnPlArecontResourceSearcher arecontResourceSearcher;
-    QnResourceDiscoveryManager::instance()->addDeviceServer(&arecontResourceSearcher);
-#endif
-#ifdef ENABLE_DLINK
-    QnPlDlinkResourceSearcher dlinkSearcher;
-    QnResourceDiscoveryManager::instance()->addDeviceServer(&dlinkSearcher);
-#endif
-//#ifdef ENABLE_DROID
-#if 0
-    // not supported any more
-    QnPlIpWebCamResourceSearcher plIpWebCamResourceSearcher;
-    QnResourceDiscoveryManager::instance()->addDeviceServer(&plIpWebCamResourceSearcher);
-
-    QnPlDroidResourceSearcher droidResourceSearcher;
-    QnResourceDiscoveryManager::instance()->addDeviceServer(&droidResourceSearcher);
-#endif
-#ifdef ENABLE_TEST_CAMERA
-    QnTestCameraResourceSearcher testCameraResourceSearcher;
-    QnResourceDiscoveryManager::instance()->addDeviceServer(&testCameraResourceSearcher);
-#endif
-#ifdef ENABLE_PULSE_CAMERA
-    //QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlPulseSearcher::instance()); native driver does not support dual streaming! new pulse cameras works via onvif
-#endif
-#ifdef ENABLE_AXIS
-    QnPlAxisResourceSearcher axisResourceSearcher;
-    QnResourceDiscoveryManager::instance()->addDeviceServer(&axisResourceSearcher);
-#endif
-#ifdef ENABLE_ACTI
-    QnActiResourceSearcher actiResourceSearcherInstance;
-    QnResourceDiscoveryManager::instance()->addDeviceServer(&actiResourceSearcherInstance);
-#endif
-#ifdef ENABLE_STARDOT
-    QnStardotResourceSearcher stardotResourceSearcher;
-    QnResourceDiscoveryManager::instance()->addDeviceServer(&stardotResourceSearcher);
-#endif
-#ifdef ENABLE_IQE
-    QnPlIqResourceSearcher iqResourceSearcher;
-    QnResourceDiscoveryManager::instance()->addDeviceServer(&iqResourceSearcher);
-#endif
-#ifdef ENABLE_ISD
-    QnPlISDResourceSearcher isdResourceSearcher;
-    QnResourceDiscoveryManager::instance()->addDeviceServer(&isdResourceSearcher);
-#endif
-
-#if defined(Q_OS_WIN) && defined(ENABLE_VMAX)
-    QnPlVmax480ResourceSearcher::initStaticInstance( new QnPlVmax480ResourceSearcher() );
-    QnResourceDiscoveryManager::instance()->addDeviceServer(QnPlVmax480ResourceSearcher::instance());
-#endif
-
-    //Onvif searcher should be the last:
-#ifdef ENABLE_ONVIF
-    QnFlexWatchResourceSearcher flexWatchResourceSearcher;
-    QnResourceDiscoveryManager::instance()->addDeviceServer(&flexWatchResourceSearcher);
-
-    OnvifResourceSearcher onvifResourceSearcher;
-    QnResourceDiscoveryManager::instance()->addDeviceServer(&onvifResourceSearcher);
-#endif //ENABLE_ONVIF
-#endif
-
-
-    // Roman asked Ivan to comment it for Brian
-    // QnResourceDiscoveryManager::instance()->addDTSServer(&QnColdStoreDTSSearcher::instance());
-
-    //QnResourceDiscoveryManager::instance().addDeviceServer(&DwDvrResourceSearcher::instance());
-
-    //
-
-    //CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&FakeDeviceServer::instance());
-    //CLDeviceSearcher::instance()->addDeviceServer(&IQEyeDeviceServer::instance());
-
     nx::network::SocketGlobals::addressPublisher().setUpdateInterval(
         parseTimerDuration(
             MSSettings::roSettings()->value(MEDIATOR_ADDRESS_UPDATE).toString(),
             nx::network::cloud::MediatorAddressPublisher::DEFAULT_UPDATE_INTERVAL));
+
+    /* Searchers must be initialized before the resources are loaded as resources instances are created by searchers. */
+    QnMediaServerResourceSearchers searchers;
 
     loadResourcesFromECS(messageProcessor.data());
     if (QnGlobalSettings::instance()->isCrossdomainXmlEnabled())
@@ -2455,7 +2363,6 @@ void MediaServerProcess::run()
 #ifndef EDGE_SERVER
     updateDisabledVendorsIfNeeded();
     updateAllowCameraCHangesIfNeed();
-    //QSet<QString> disabledVendors = QnGlobalSettings::instance()->disabledVendorsSet();
 #endif
 
     std::unique_ptr<QnLdapManager> ldapManager(new QnLdapManager());
@@ -2534,8 +2441,6 @@ void MediaServerProcess::run()
     disconnect(m_updatePiblicIpTimer.get(), 0, this, 0);
     disconnect(m_ipDiscovery.get(), 0, this, 0);
     disconnect(m_moduleFinder, 0, this, 0);
-    disconnect(QnResourceDiscoveryManager::instance(), 0, this, 0);
-
 
     WaitingForQThreadToEmptyEventQueue waitingForObjectsToBeFreed( QThread::currentThread(), 3 );
     waitingForObjectsToBeFreed.join();
@@ -2583,11 +2488,6 @@ void MediaServerProcess::run()
     //since mserverResourceDiscoveryManager instance is dead no events can be delivered to serverResourceProcessor: can delete it now
         //TODO refactoring of discoveryManager <-> resourceProcessor interaction is required
     serverResourceProcessor.reset();
-
-#if defined(Q_OS_WIN) && defined(ENABLE_VMAX)
-    delete QnPlVmax480ResourceSearcher::instance();
-    QnPlVmax480ResourceSearcher::initStaticInstance( NULL );
-#endif
 
     mdnsListener.reset();
     upnpDeviceSearcher.reset();
