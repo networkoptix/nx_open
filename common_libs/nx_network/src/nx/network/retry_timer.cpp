@@ -26,6 +26,19 @@ RetryPolicy::RetryPolicy()
 {
 }
 
+RetryPolicy::RetryPolicy(
+    unsigned int maxRetryCount,
+    std::chrono::milliseconds initialDelay,
+    unsigned int delayMultiplier,
+    std::chrono::milliseconds maxDelay)
+:
+    m_maxRetryCount(maxRetryCount),
+    m_initialDelay(initialDelay),
+    m_delayMultiplier(delayMultiplier),
+    m_maxDelay(maxDelay)
+{
+}
+
 void RetryPolicy::setMaxRetryCount(unsigned int retryCount)
 {
     m_maxRetryCount = retryCount;

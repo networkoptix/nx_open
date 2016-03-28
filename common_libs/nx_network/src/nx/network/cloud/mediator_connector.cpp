@@ -5,7 +5,8 @@
 #include <nx/utils/log/log.h>
 #include <nx/network/socket_factory.h>
 
-static const std::chrono::milliseconds RETRY_INTERVAL = std::chrono::minutes( 10 );
+static const std::chrono::milliseconds kRetryIntervalInitial = std::chrono::seconds(1);
+static const std::chrono::milliseconds kRetryIntervalMax = std::chrono::minutes( 10 );
 
 namespace nx {
 namespace hpm {
@@ -17,6 +18,12 @@ MediatorConnector::MediatorConnector()
     , m_endpointFetcher(
         lit( "hpm" ),
         std::make_unique<nx::network::cloud::RandomEndpointSelector>() )
+    , m_fetchEndpointRetryTimer(
+        nx::network::RetryPolicy(
+            nx::network::RetryPolicy::kInfiniteRetries,
+            kRetryIntervalInitial,
+            2,
+            kRetryIntervalMax))
 {
 }
 
@@ -128,8 +135,11 @@ void MediatorConnector::fetchEndpoint()
                 m_promise->set_value( false );
 
             // retry after some delay
-            if( !m_isTerminating )
-                m_timer.start(RETRY_INTERVAL, [this](){ fetchEndpoint(); });
+            if (!m_isTerminating)
+            {
+                m_fetchEndpointRetryTimer.scheduleNextTry(
+                    [this]() { fetchEndpoint(); });
+            }
         }
         else
         {
