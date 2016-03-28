@@ -75,6 +75,12 @@ QtObject
                 readonly property color closeButtonBkg: context.getPaletteColor("dark", 9);
                 readonly property color offlineIndicatorBkg: context.getPaletteColor("dark", 8);
             }
+
+            property QtObject banner: QtObject
+            {
+                readonly property color link: context.getPaletteColor("blue", 2);
+                readonly property color linkHovered: context.getPaletteColor("blue", 4);
+            }
         }
     }
 

@@ -66,19 +66,19 @@ Item
         {
             spacing: 12;
 
-            Text
+            NxLink
             {
                 id: manageAccountLink;
 
-                text: makeLink(qsTr("Manage account"));
+                linkCaption: qsTr("Manage account");
                 onLinkActivated: { thisComponent.manageAccount(); }
             }
 
-            Text
+            NxLink
             {
                 id: logoutLink;
 
-                text: makeLink(qsTr("Logout"));
+                linkCaption: qsTr("Logout");
                 onLinkActivated: { thisComponent.logout(); }
             }
         }
@@ -109,11 +109,5 @@ Item
                 onClicked: { thisComponent.createAccount(); }
             }
         }
-    }
-
-    function makeLink(caption, link)
-    {
-        return ("<a href=\"%2\">%1</a>").arg(caption)
-            .arg(link ? link : "_some_placeholder_to_make_link_working");
     }
 }
