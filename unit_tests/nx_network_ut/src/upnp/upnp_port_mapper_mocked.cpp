@@ -3,9 +3,6 @@
 
 #include <common/common_globals.h>
 
-#include <QtConcurrent/QtConcurrent>
-
-
 namespace nx_upnp {
 namespace test {
 
@@ -13,13 +10,25 @@ AsyncClientMock::AsyncClientMock( const HostAddress& externalIp )
     : m_externalIp( externalIp )
     , m_disabledPort( 80 )
 {
+    m_thread = std::thread(
+        [this]()
+        {
+            while (const auto task = m_tasks.pop())
+                task();
+        });
+}
+
+AsyncClientMock::~AsyncClientMock()
+{
+    m_tasks.push(nullptr);
+    m_thread.join();
 }
 
 void AsyncClientMock::externalIp(
         const QUrl& /*url*/,
         std::function< void( const HostAddress& ) > callback )
 {
-    QtConcurrent::run( [ this, callback ]{ callback( m_externalIp ); } );
+    m_tasks.push( [ this, callback ]{ callback( m_externalIp ); } );
 }
 
 void AsyncClientMock::addMapping(
@@ -33,15 +42,13 @@ void AsyncClientMock::addMapping(
             m_mappings.find( std::make_pair( externalPort, protocol ) )
                 != m_mappings.end() )
     {
-        QtConcurrent::run( [ callback ]{ callback( false ); } );
-        return;
+        return m_tasks.push( [ callback ]{ callback( false ); } );
     }
 
     m_mappings[ std::make_pair( externalPort, protocol ) ]
         = std::make_pair( SocketAddress( internalIp, internalPort ), description );
 
-    QtConcurrent::run( [ callback ]{ callback( true ); } );
-
+    m_tasks.push( [ callback ]{ callback( true ); } );
 }
 
 void AsyncClientMock::deleteMapping(
@@ -50,7 +57,7 @@ void AsyncClientMock::deleteMapping(
 {
     QMutexLocker lock( &m_mutex );
     const bool isErased = m_mappings.erase( std::make_pair( externalPort, protocol ) );
-    QtConcurrent::run( [ isErased, callback ]{ callback( isErased ); } );
+    m_tasks.push( [ isErased, callback ]{ callback( isErased ); } );
 }
 
 void AsyncClientMock::getMapping(
@@ -59,21 +66,19 @@ void AsyncClientMock::getMapping(
 {
     QMutexLocker lock( &m_mutex );
     if( m_mappings.size() <= index )
-    {
-        QtConcurrent::run( [ callback ]{ callback( MappingInfo() ); } );
-        return;
-    }
+        return m_tasks.push( [ callback ]{ callback( MappingInfo() ); } );
 
     const auto mapping = *std::next( m_mappings.begin(), index );
-    QtConcurrent::run( [ callback, mapping ]
-    {
-        callback( MappingInfo(
-            mapping.second.first.address,
-            mapping.second.first.port,
-            mapping.first.first,
-            mapping.first.second,
-            mapping.second.second ) );
-    } );
+    m_tasks.push(
+        [ callback, mapping ]
+        {
+            callback( MappingInfo(
+                mapping.second.first.address,
+                mapping.second.first.port,
+                mapping.first.first,
+                mapping.first.second,
+                mapping.second.second ) );
+        } );
 }
 
 void AsyncClientMock::getMapping(
@@ -83,21 +88,19 @@ void AsyncClientMock::getMapping(
     QMutexLocker lock( &m_mutex );
     const auto it = m_mappings.find( std::make_pair( externalPort, protocol ) );
     if( it == m_mappings.end() )
-    {
-        QtConcurrent::run( [ callback ]{ callback( MappingInfo() ); } );
-        return;
-    }
+        return m_tasks.push( [ callback ]{ callback( MappingInfo() ); } );
 
     const auto mapping = *it;
-    QtConcurrent::run( [ callback, mapping ]
-    {
-        callback( MappingInfo(
-            mapping.second.first.address,
-            mapping.second.first.port,
-            mapping.first.first,
-            mapping.first.second,
-            mapping.second.second ) );
-    } );
+    m_tasks.push(
+        [ callback, mapping ]
+        {
+            callback( MappingInfo(
+                mapping.second.first.address,
+                mapping.second.first.port,
+                mapping.first.first,
+                mapping.first.second,
+                mapping.second.second ) );
+        } );
 }
 
 AsyncClientMock::Mappings AsyncClientMock::mappings() const
