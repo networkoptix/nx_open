@@ -173,6 +173,10 @@ describe('Registration suite', function () {
         p.checkInputInvalid(p.emailInput, p.invalidClass);
     });
 
+    xit("should validate email for various deviations", function () {
+        //TODO: Write checks for different wrong email patterns, see testrail for cases
+    });
+
      p.passwordField.check(p, p.url);
 
     it("should open Terms and conditions in a new page", function () {
@@ -194,7 +198,7 @@ describe('Registration suite', function () {
 
         p.firstNameInput.sendKeys(p.helper.userFirstName);
         p.lastNameInput.sendKeys(p.helper.userLastName);
-        p.emailInput.sendKeys(p.helper.userEmailExisting);
+        p.emailInput.sendKeys(p.helper.userEmail);
         p.passwordInput.sendKeys(p.helper.userPassword);
 
         p.submitButton.click();

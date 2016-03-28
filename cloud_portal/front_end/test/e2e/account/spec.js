@@ -5,7 +5,7 @@ describe('Account suite', function () {
     var p = new AccountPage();
 
     beforeAll(function() {
-        p.helper.login(p.helper.userEmailExisting, p.helper.userPassword);
+        p.helper.login(p.helper.userEmail, p.helper.userPassword);
     });
 
     afterAll(function() {
@@ -19,7 +19,7 @@ describe('Account suite', function () {
 
     it("should display dropdown in right top corner: Account settings, Change password, Logout", function () {
         p.get(p.homePageUrl);
-        expect(p.userAccountDropdownToggle.getText()).toContain(p.helper.userEmailExisting);
+        expect(p.userAccountDropdownToggle.getText()).toContain(p.helper.userEmail);
 
         p.userAccountDropdownToggle.click();
         expect(p.userAccountDropdownMenu.getText()).toContain('Account Settings');
@@ -30,13 +30,13 @@ describe('Account suite', function () {
     it("should allow to log out", function () {
         p.get(p.homePageUrl);
         p.helper.logout();
-        p.helper.login(p.helper.userEmailExisting, p.helper.userPassword);
+        p.helper.login(p.helper.userEmail, p.helper.userPassword);
     });
 
     it("should show email, first name, last name, subscribe", function () {
         p.get(p.accountUrl);
 
-        expect(p.emailField.getAttribute('value')).toContain(p.helper.userEmailExisting);
+        expect(p.emailField.getAttribute('value')).toContain(p.helper.userEmail);
         expect(p.firstNameInput.isDisplayed()).toBe(true);
         expect(p.lastNameInput.isDisplayed()).toBe(true);
         expect(p.subscribeCheckbox.isDisplayed()).toBe(true);
@@ -153,7 +153,7 @@ p.alert.catchAlert( p.alert.alertMessages.changePassSuccess, p.alert.alertTypes.
 p.alert.catchAlert( p.alert.alertMessages.changePassSuccess, p.alert.alertTypes.success);
 
         p.helper.logout();
-        p.helper.login(p.helper.userEmailExisting, p.helper.userPasswordNew);
+        p.helper.login(p.helper.userEmail, p.helper.userPasswordNew);
 
         p.get(p.passwordUrl);
         p.currentPasswordInput.sendKeys(p.helper.userPasswordNew);
