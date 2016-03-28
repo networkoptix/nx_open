@@ -32,7 +32,7 @@ BaseTile
     property QtObject activeItemSelector: SingleActiveItemSelector
     {
         variableName: "isMasked";
-        writeVariableName: "isMaskedPrivate";
+        deactivateFunc: function(item ) { item.isMaskedPrivate = false; };
     }
 
     onIsExpandedChanged:

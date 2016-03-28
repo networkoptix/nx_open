@@ -63,12 +63,12 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject *parent)
     : base_type(parent)
     , QnWorkbenchContextAware(parent)
 
-    , m_hiddenControls(false)
+    , m_visibleControls(true)
+    , m_visible(false)
     , m_cloudWatcher(qnCommon->instance<QnCloudStatusWatcher>())
     , m_palette(extractPalette())
     , m_widget(createMainView(this))
     , m_pageSize(m_widget->size())
-    , m_visible(false)
 {
     NX_CRITICAL(m_cloudWatcher, Q_FUNC_INFO, "Cloud watcher does not exist");
     connect(m_cloudWatcher, &QnCloudStatusWatcher::loginChanged
@@ -146,18 +146,18 @@ void QnWorkbenchWelcomeScreen::setPageSize(const QSize &size)
     emit pageSizeChanged();
 }
 
-bool QnWorkbenchWelcomeScreen::hiddenControls() const
+bool QnWorkbenchWelcomeScreen::visibleControls() const
 {
-    return m_hiddenControls;
+    return m_visibleControls;
 }
 
-void QnWorkbenchWelcomeScreen::setHiddenControls(bool hidden)
+void QnWorkbenchWelcomeScreen::setVisibleControls(bool visible)
 {
-    if (m_hiddenControls == hidden)
+    if (m_visibleControls == visible)
         return;
 
-    m_hiddenControls = hidden;
-    emit hiddenControlsChanged();
+    m_visibleControls = visible;
+    emit visibleControlsChanged();
 }
 
 void QnWorkbenchWelcomeScreen::connectToLocalSystem(const QString &serverUrl
@@ -194,9 +194,9 @@ void QnWorkbenchWelcomeScreen::connectToAnotherSystem()
 
 void QnWorkbenchWelcomeScreen::setupFactorySystem(const QString &serverUrl)
 {
-    setHiddenControls(true);
+    setVisibleControls(false);
     const auto controlsGuard = QnRaiiGuard::createDestructable(
-        [this]() { setHiddenControls(false); });
+        [this]() { setVisibleControls(true); });
 
     const auto showDialogHandler = [this, serverUrl, controlsGuard]()
     {
@@ -206,6 +206,7 @@ void QnWorkbenchWelcomeScreen::setupFactorySystem(const QString &serverUrl)
         dialog->exec();
     };
 
+    // Use delayed handling for proper animation
     enum { kNextEventDelay = 100 };
     executeDelayedParented(showDialogHandler
         , kNextEventDelay, this);

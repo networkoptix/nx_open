@@ -19,7 +19,7 @@ ANY_KEYWORD = "any"
 DEBUG_SUFFIX = "-debug"
 RSYNC = [ "rsync" ]
 RSYNC_DOWNLOAD_ARGS = [ "--archive", "--delete", "--progress" ]
-RSYNC_UPLOAD_ARGS = [ "--archive", "--delete" ]
+RSYNC_UPLOAD_ARGS = [ "--archive", "--delete", "--progress" ]
 if detect_platform() == "windows":
     RSYNC_DOWNLOAD_ARGS.append("--chmod=ugo=rwx")
     if not distutils.spawn.find_executable("rsync"):

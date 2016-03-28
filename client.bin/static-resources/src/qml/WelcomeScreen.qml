@@ -18,7 +18,7 @@ Rectangle
         id: screenHolder;
 
         anchors.fill: parent;
-        visible: !context.hiddenControls;
+        visible: context.visibleControls;
 
         CloudPanel
         {
@@ -42,7 +42,8 @@ Rectangle
         {
             id: grid;
 
-            anchors.centerIn: parent;
+            y: Math.max((thisComponent.height - height) / 2, 232);
+            anchors.horizontalCenter: parent.horizontalCenter;
 
             readonly property int horizontalOffset: 40;
             readonly property int tileWidth: 280;
@@ -58,7 +59,17 @@ Rectangle
             property QtObject watcher: SingleActiveItemSelector
             {
                 variableName: "isExpanded";
-                writeVariableName: "isExpandedPrivate";
+                deactivateFunc: function(item) { item.toggle(); };
+            }
+
+            Connections
+            {
+                target: context;
+                onIsVisibleChanged:
+                {
+                    if (!context.isVisible)
+                        grid.watcher.resetCurrentItem();
+                }
             }
 
             Repeater
