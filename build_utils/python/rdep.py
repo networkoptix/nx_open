@@ -18,7 +18,7 @@ PACKAGE_CONFIG_NAME = ".rdpack"
 ANY_KEYWORD = "any"
 DEBUG_SUFFIX = "-debug"
 RSYNC = [ "rsync" ]
-RSYNC_DOWNLOAD_ARGS = [ "--archive", "--delete", "--progess" ]
+RSYNC_DOWNLOAD_ARGS = [ "--archive", "--delete", "--progress" ]
 RSYNC_UPLOAD_ARGS = [ "--archive", "--delete" ]
 if detect_platform() == "windows":
     RSYNC_DOWNLOAD_ARGS.append("--chmod=ugo=rwx")
