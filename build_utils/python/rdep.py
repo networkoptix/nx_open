@@ -18,11 +18,12 @@ PACKAGE_CONFIG_NAME = ".rdpack"
 ANY_KEYWORD = "any"
 DEBUG_SUFFIX = "-debug"
 RSYNC = [ "rsync" ]
+RSYNC_DOWNLOAD_ARGS = [ "--archive", "--delete", "--progess" ]
+RSYNC_UPLOAD_ARGS = [ "--archive", "--delete" ]
 if detect_platform() == "windows":
+    RSYNC_DOWNLOAD_ARGS.append("--chmod=ugo=rwx")
     if not distutils.spawn.find_executable("rsync"):
         RSYNC = [os.path.join(os.getenv("environment"), "rsync-win32", "rsync.exe")]
-    RSYNC.append("--chmod=ugo=rwx")
-RSYNC += [ "--archive", "--delete" ]
 
 DEFAULT_SYNC_URL = "rsync://enk.me/buildenv/rdep/packages"
 
@@ -207,7 +208,7 @@ def try_sync(root, url, target, package, force):
         os.makedirs(dst)
 
     command = list(RSYNC)
-    command.append("--progress")
+    command += RSYNC_DOWNLOAD_ARGS
     command.append("--exclude")
     command.append(PACKAGE_CONFIG_NAME)
     command.append(src + "/")
@@ -291,10 +292,13 @@ def upload_package(root, url, target, package):
     update_package_timestamp(local)
 
     command = list(RSYNC)
+    command += RSYNC_UPLOAD_ARGS
     command.append("--exclude")
     command.append(PACKAGE_CONFIG_NAME)
     command.append(posix_path(local) + "/")
     command.append(remote)
+
+    verbose_rsync(command)
 
     if subprocess.call(command) != 0:
         print "Could not upload {0}".format(package)
@@ -303,6 +307,8 @@ def upload_package(root, url, target, package):
     command = list(RSYNC)
     command.append(posix_path(os.path.join(local, PACKAGE_CONFIG_NAME)))
     command.append(remote)
+
+    verbose_rsync(command)
 
     if subprocess.call(command) != 0:
         print "Could not upload {0}".format(package)
