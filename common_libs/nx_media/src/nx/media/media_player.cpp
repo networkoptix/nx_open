@@ -660,6 +660,10 @@ Player::VideoQuality Player::videoQuality() const
 void Player::setVideoQuality(const VideoQuality& value)
 {
     Q_D(Player);
+
+    if (d->videoQuality == value)
+        return;
+
     d->videoQuality = value;
     d->updateVideoQuality();
 }

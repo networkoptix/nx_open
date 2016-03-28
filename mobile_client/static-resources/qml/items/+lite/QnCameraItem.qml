@@ -165,6 +165,7 @@ Item {
 
                 resourceId: cameraItem.resourceId
                 Component.onCompleted: playLive()
+                videoQuality: QnPlayer.Low
             }
         }
     }

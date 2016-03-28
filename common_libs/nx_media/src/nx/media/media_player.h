@@ -49,6 +49,7 @@ public:
 
     Q_ENUMS(State)
     Q_ENUMS(MediaStatus)
+    Q_ENUMS(VideoQuality)
 
     /**
      * Source url to open. In order to support multiserver archive, media player supports
