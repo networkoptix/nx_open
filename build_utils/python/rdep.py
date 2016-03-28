@@ -24,6 +24,7 @@ if detect_platform() == "windows":
     RSYNC_DOWNLOAD_ARGS.append("--chmod=ugo=rwx")
     if not distutils.spawn.find_executable("rsync"):
         RSYNC = [os.path.join(os.getenv("environment"), "rsync-win32", "rsync.exe")]
+SSH_ARGS = None
 
 DEFAULT_SYNC_URL = "rsync://enk.me/buildenv/rdep/packages"
 
@@ -59,17 +60,24 @@ def get_repository_root():
                 root = root[:-1]
     return root
 
-def get_sync_url(path):
+
+def get_root_config_value(path, section, option):
     config_file = os.path.join(path, ROOT_CONFIG_NAME)
     if not os.path.isfile(config_file):
         return None
 
     config = ConfigParser.ConfigParser()
     config.read(config_file)
-    if not config.has_option("General", "url"):
+    if not config.has_option(section, option):
         return None
 
-    return config.get("General", "url")
+    return config.get(section, option)
+
+def get_sync_url(path):
+    return get_root_config_value(path, "General", "url")
+
+def get_ssh_args(path):
+    return get_root_config_value(path, "General", "ssh")
 
 def package_config_path(path):
     return os.path.join(path, PACKAGE_CONFIG_NAME)
@@ -275,6 +283,14 @@ def sync_package(root, url, target, package, debug, force):
     return True
 
 def sync_packages(root, url, target, packages, debug, force):
+    global RSYNC
+
+    if not url.startswith("rsync://"):
+        ssh = get_ssh_args(root)
+        if ssh:
+            RSYNC += [ "-e", ssh ]
+            print RSYNC
+
     success = True
 
     for package in packages:
@@ -318,6 +334,13 @@ def upload_package(root, url, target, package):
     return True
 
 def upload_packages(root, url, target, packages, debug = False):
+    global RSYNC
+
+    if not url.startswith("rsync://"):
+        ssh = get_ssh_args(root)
+        if ssh:
+            RSYNC += [ "-e", ssh ]
+
     success = True
 
     if not packages:
