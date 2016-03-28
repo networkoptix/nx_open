@@ -67,6 +67,8 @@ void QnLastSystemUsersModel::updateData(const UserPasswordPairList &newData)
     if (m_data == newData)
         return;
 
+    if (systemName().contains(lit("YURIY")))
+        int i = 0;
     const bool hadConnections = hasConnections();
 
     auto itCurrent = m_data.begin();

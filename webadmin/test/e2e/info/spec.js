@@ -4,7 +4,7 @@ describe('Information Page', function () {
 
     //it("should stop test",function(){expect("other test").toBe("uncommented");});return;
 
-    var p = new Page();
+    var p = new Page(); 
 
     browser.ignoreSynchronization = true;
 
@@ -25,17 +25,23 @@ describe('Information Page', function () {
         expect(p.storagesNodes.count()).toBeGreaterThan(0); // storages exist
         expect(p.storagesNodes.first().element(by.css(".storage-url")).getText()).toMatch(/[\w\d/\\]+/); // Except one good url
         expect(p.storagesNodes.first().element(by.css(".storage-total-space")).getText()).toMatch(/[\d+\.?\d*\s*\wB]+/);// GB,  TB  - it's size
-        expect(p.storagesNodes.first().element(by.css(".storage-indicators")).element(by.css(".glyphicon")).isDisplayed()).toBe(true); // At least one indicator
+        expect(p.storagesNodes.first().element(by.css(".storage-indicators")).element(by.css("[title~=Internal]")).isDisplayed()).toBe(true); // At least one indicator
+
     });
 
     it("health monitoring: should display legend",function(){
         browser.ignoreSynchronization = true;
-        expect(p.hmLegentNodes.count()).toBeGreaterThan(1); //legend exists, except 2+ elements
+
+        var EC = protractor.ExpectedConditions;
+        // Waits for the .legend-checkbox to be present on the dom.
+        browser.wait(EC.presenceOf($(".legend-checkbox")), 5000);
+
+        expect(p.hmLegendNodes.count()).toBeGreaterThan(1); //legend exists, except 2+ elements
     });
 
-    it("health monitoring: should update graphics, should show message when server is offline, should enable-disable indicators using checkboxes",function(){
-        expect("health monitoring").toBe("tested manually");
-    });
+    // it("health monitoring: should update graphics, should show message when server is offline, should enable-disable indicators using checkboxes",function(){
+    //     expect("health monitoring").toBe("tested manually");
+    // });
 
     it("log: should show iframe",function(){
         browser.ignoreSynchronization = true;
@@ -54,7 +60,7 @@ describe('Information Page', function () {
     it("log: should have a link to open log in new window",function(){
         browser.ignoreSynchronization = true;
         expect(p.openLogButton.isDisplayed()).toBe(true);
-        expect(p.openLogButton.getText()).toEqual("Open in a new window");
+        expect(p.openLogButton.getText()).toEqual("Open in new window");
         expect(p.openLogButton.getAttribute("target")).toEqual("_blank");
         expect(p.openLogButton.getAttribute("href")).toMatch("/api/showLog");
     });

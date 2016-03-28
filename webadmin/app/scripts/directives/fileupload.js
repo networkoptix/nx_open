@@ -1,7 +1,7 @@
 'use strict';
 
 
-angular.module('webadminApp').directive('fileupload',function(){
+angular.module('webadminApp').directive('fileupload',function(dialogs){
     return {
         restrict: 'E',
         template :
@@ -15,25 +15,25 @@ angular.module('webadminApp').directive('fileupload',function(){
                 dataType: 'json',
                 done: function (e, data) {
                     if(data.result.error==='0'){
-                        alert('Updating successfully started. It will take several minutes');
+                        dialogs.alert('Updating successfully started. It will take several minutes');
 
                         //call restart?
                     }else{
                         switch(data.result.errorString){
                             case 'UP_TO_DATE':
-                                alert('Updating failed. The provided version is already installed.');
+                                dialogs.alert('Updating failed. The provided version is already installed.');
                                 break;
                             case 'INVALID_FILE':
-                                alert('Updating failed. Provided file is not a valid update archive.');
+                                dialogs.alert('Updating failed. Provided file is not a valid update archive.');
                                 break;
                             case 'INCOMPATIBLE_SYSTEM':
-                                alert('Updating failed. Provided file is targeted for another system.');
+                                dialogs.alert('Updating failed. Provided file is targeted for another system.');
                                 break;
                             case 'EXTRACTION_ERROR':
-                                alert('Updating failed. Extraction failed, check available storage.');
+                                dialogs.alert('Updating failed. Extraction failed, check available storage.');
                                 break;
                             case 'INSTALLATION_ERROR':
-                                alert('Updating failed. Couldn\'t execute installation script.');
+                                dialogs.alert('Updating failed. Couldn\'t execute installation script.');
                                 break;
                         }
                     }

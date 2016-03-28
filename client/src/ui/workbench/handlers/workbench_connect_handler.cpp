@@ -80,13 +80,20 @@ namespace
     {
         auto lastConnections = qnCoreSettings->lastSystemConnections();
         // TODO: #ynikitenkov remove outdated connection data
-        // TODO: #ynikitenkov remove same pars of system name \user name
 
         const auto server = qnCommon->currentServer();
         const QnSystemConnectionData connectionInfo =
-        { server->getSystemName(), url.userName(), url.password() };
+            { server->getSystemName(), url.userName(), url.password() };
 
-        lastConnections.append(connectionInfo);
+        const auto newEnd = std::remove_if(lastConnections.begin(), lastConnections.end()
+            , [connectionInfo](const QnSystemConnectionData &connection)
+        {
+            return ((connection.systemName == connectionInfo.systemName)
+                && (connection.userName == connectionInfo.userName));
+        });
+
+        lastConnections.erase(newEnd, lastConnections.end());
+        lastConnections.prepend(connectionInfo);
         qnCoreSettings->setLastSystemConnections(lastConnections);
     }
 }
@@ -135,7 +142,7 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject *parent /* = 0*/):
     connect(action(QnActions::ReconnectAction),            &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::at_reconnectAction_triggered);
     connect(action(QnActions::DisconnectAction),           &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::at_disconnectAction_triggered);
 
-    connect(action(QnActions::OpenLoginDialogAction),      &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::showWelcomeScreen);
+    connect(action(QnActions::OpenLoginDialogAction),      &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::showLoginDialog);
     connect(action(QnActions::BeforeExitAction),           &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::at_beforeExitAction_triggered);
 
     context()->instance<QnAppServerNotificationCache>();
@@ -371,15 +378,17 @@ bool QnWorkbenchConnectHandler::disconnectFromServer(bool force) {
     if (!context()->instance<QnWorkbenchStateManager>()->tryClose(force))
         return false;
 
-    if (!force) {
-        qnGlobalSettings->synchronizeNow();
+    if (!force)
+    {
+        QnGlobalSettings::instance()->synchronizeNow();
         qnSettings->setLastUsedConnection(QnConnectionData());
-
-        storeConnection(QnAppServerConnectionFactory::url());
-
     }
 
-    hideMessageBox();
+    if (context()->user())
+    {
+        storeConnection(QnAppServerConnectionFactory::url());
+        hideMessageBox();
+    }
 
     //QnRouter::instance()->setEnforcedConnection(QnRoutePoint());
     QnClientMessageProcessor::instance()->init(NULL);
@@ -405,12 +414,26 @@ void QnWorkbenchConnectHandler::hideMessageBox() {
 }
 
 
+void QnWorkbenchConnectHandler::showLoginDialog()
+{
+    // TODO: #ynikitenkov remove login dialog direct call from welcome screen
+    const auto welcome = context()->instance<QnWorkbenchWelcomeScreen>();
+    welcome->connectToAnotherSystem();
+}
+
 void QnWorkbenchConnectHandler::showWelcomeScreen() {
     if (qnRuntime->isActiveXMode() || qnRuntime->isVideoWallMode())
         return;
 
-    const auto welcome = context()->instance<QnWorkbenchWelcomeScreen>();
-    welcome->setVisible(true);
+    if (context()->user())
+    {
+        showLoginDialog();
+    }
+    else
+    {
+        const auto welcome = context()->instance<QnWorkbenchWelcomeScreen>();
+        welcome->setVisible(true);
+    }
 
     m_connectingHandle = 0;
     hideMessageBox();

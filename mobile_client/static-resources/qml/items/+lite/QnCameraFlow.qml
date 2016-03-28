@@ -121,6 +121,7 @@ FocusScope
                 thumbnail: model.thumbnail
                 useVideo: index >= cameraGrid.firstVideoIndex &&
                           index <= cameraGrid.lastVideoIndex
+                paused: !resourcesPage.activePage
 
                 onClicked: open()
 

@@ -8,6 +8,7 @@ angular.module('webadminApp', [
     //'ngTouch',
     'ui.bootstrap',
     'tc.chartjs',
+    'ui.select',
     'ngStorage'
 ]).config(function($sceDelegateProvider) {
     $sceDelegateProvider.resourceUrlWhitelist([

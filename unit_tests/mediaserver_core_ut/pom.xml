@@ -26,25 +26,18 @@
         <root.dir>${basedir}/../..</root.dir>
         <!--Specify the project to test-->
         <master.project.directory>mediaserver_core</master.project.directory>
-        <!--Global libs-->
+
         <qt.libs>core network xml xmlpatterns sql concurrent multimedia</qt.libs>
-        <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lswresample -lpostproc</ffmpeg.libs>
         <global.libs>-lmediaserver_core -lcommon -lnx_network -lnx_utils -lnx_streaming -lappserver2 -lonvif -lnx_email -ludt -lcloud_db_client</global.libs>
-        <!--Specific os libs used-->
         <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm Wldap32.lib Crypt32.lib</windows.oslibs>
-        <linux.oslibs>-lmp3lame -lfaac -lvpx -lvorbisenc -lvorbis -ldl -lldap</linux.oslibs>
+        <linux.oslibs>-ldl -lldap</linux.oslibs>
         <linux.arm.oslibs>-llber -lsasl2</linux.arm.oslibs>
-        <windows.oslibs.release></windows.oslibs.release>
-        <windows.oslibs.debug></windows.oslibs.debug>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
-        <!--Global defines-->
-        <global.defines></global.defines>
-        <!--Specific os defines-->
+
         <windows.defines>EC2_LIB_API=__declspec(dllimport) _VARIADIC_MAX=10</windows.defines>
-        <linux.defines/>
-        <mac.defines/>
+
         <path>${env.PATH}</path>
-        <rdep.packages>openssl quazip sigar</rdep.packages>
+        <rdep.packages>openssl ffmpeg quazip sigar</rdep.packages>
     </properties>
     <dependencies>
         <dependency>

@@ -8,9 +8,9 @@ BaseTile
     id: thisComponent;
 
     property string userName;
-    property bool isOnline;
 
-    allowExpanding: !isOnline;
+    isExpandable: false;  // TODO: change when recent systems are ready
+    isAvailable: isOnline;
 
     centralAreaDelegate: Column
     {
@@ -25,9 +25,11 @@ BaseTile
 
             anchors.leftMargin: 4;
 
-            text: userName;
-            color: Style.colors.text;
+            enabled: thisComponent.isAvailable;
+            text: thisComponent.userName;
             font: Style.fonts.systemTile.info;
+            standardColor: Style.colors.text;
+            disabledColor: Style.colors.midlight;
         }
 
         Image

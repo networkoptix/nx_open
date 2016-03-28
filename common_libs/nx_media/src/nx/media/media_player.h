@@ -40,8 +40,16 @@ public:
         InvalidMedia,
     };
 
+    enum class VideoQuality
+    {
+        Auto,
+        Low,
+        High,
+    };
+
     Q_ENUMS(State)
     Q_ENUMS(MediaStatus)
+    Q_ENUMS(VideoQuality)
 
     /**
      * Source url to open. In order to support multiserver archive, media player supports
@@ -77,6 +85,11 @@ public:
 
 
     Q_PROPERTY(int maxTextureSize READ maxTextureSize WRITE setMaxTextureSize)
+
+    /**
+    * Video quality
+    */
+    Q_PROPERTY(VideoQuality videoQuality READ videoQuality WRITE setVideoQuality)
 public:
     Player(QObject *parent = nullptr);
     ~Player();
@@ -99,6 +112,9 @@ public:
     void setReconnectOnPlay(bool reconnectOnPlay);
 
     bool liveMode() const;
+
+    VideoQuality videoQuality() const;
+    void setVideoQuality(const VideoQuality& value);
 
 public slots:
     void play();

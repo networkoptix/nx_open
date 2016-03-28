@@ -48,6 +48,7 @@ void QnClientRecentConnectionsManager::removeModel(QnLastSystemUsersModel* model
     const auto it = m_bound.find(systemName);
     const bool isFound = (it != m_bound.end());
 
+    qDebug() << "Removing model for " << systemName;
     NX_ASSERT(isFound, Q_FUNC_INFO, "Model has not been found");
     if (!isFound)
         return;
@@ -65,8 +66,6 @@ void QnClientRecentConnectionsManager::updateModelBinding(QnLastSystemUsersModel
 
     const auto itUnbound = m_unbound.find(model);
     const bool isUnbound = (itUnbound != m_unbound.end());
-    NX_ASSERT(isUnbound, Q_FUNC_INFO, "Model is not unbound");
-
     const auto systemName = model->systemName();
     if (isUnbound)
     {

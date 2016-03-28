@@ -113,22 +113,22 @@ QnBookmarkMergeHelper::QnBookmarkMergeHelper() :
                     << DetailLevel(500)     // 500 ms
                     << DetailLevel(1000)        // 1 sec
                     << DetailLevel(2500)        // 2.5 sec
-                    << DetailLevel(5 * 1000)    // 5 sec
-                    << DetailLevel(15 * 1000)   // 15 sec
-                    << DetailLevel(30 * 1000)   // 30 sec
-                    << DetailLevel(60 * 1000)       // 1 min
-                    << DetailLevel(5 * 60 * 1000)   // 5 min
-                    << DetailLevel(15 * 60 * 1000)  // 15 min
-                    << DetailLevel(30 * 60 * 1000)  // 30 min
-                    << DetailLevel(60 * 60 * 1000)          // 1 hr
-                    << DetailLevel(3 * 60 * 60 * 1000)      // 3 hr
-                    << DetailLevel(6 * 60 * 60 * 1000)      // 6 hr
-                    << DetailLevel(12 * 60 * 60 * 1000)     // 12 hr
-                    << DetailLevel(24 * 60 * 60 * 1000)         // 1 day
-                    << DetailLevel(5 * 24 * 60 * 60 * 1000)     // 5 days
-                    << DetailLevel(15 * 24 * 60 * 60 * 1000)    // 15 days
-                    << DetailLevel(30 * 24 * 60 * 60 * 1000)        // 1 month
-                    << DetailLevel(3 * 30 * 24 * 60 * 60 * 1000);   // 3 months
+                    << DetailLevel(5 * 1000ll)    // 5 sec
+                    << DetailLevel(15 * 1000ll)   // 15 sec
+                    << DetailLevel(30 * 1000ll)   // 30 sec
+                    << DetailLevel(60 * 1000ll)       // 1 min
+                    << DetailLevel(5 * 60 * 1000ll)   // 5 min
+                    << DetailLevel(15 * 60 * 1000ll)  // 15 min
+                    << DetailLevel(30 * 60 * 1000ll)  // 30 min
+                    << DetailLevel(60 * 60 * 1000ll)          // 1 hr
+                    << DetailLevel(3 * 60 * 60 * 1000ll)      // 3 hr
+                    << DetailLevel(6 * 60 * 60 * 1000ll)      // 6 hr
+                    << DetailLevel(12 * 60 * 60 * 1000ll)     // 12 hr
+                    << DetailLevel(24 * 60 * 60 * 1000ll)         // 1 day
+                    << DetailLevel(5 * 24 * 60 * 60 * 1000ll)     // 5 days
+                    << DetailLevel(15 * 24 * 60 * 60 * 1000ll)    // 15 days
+                    << DetailLevel(30 * 24 * 60 * 60 * 1000ll)        // 1 month
+                    << DetailLevel(3 * 30 * 24 * 60 * 60 * 1000ll);   // 3 months
 }
 
 QnBookmarkMergeHelper::~QnBookmarkMergeHelper()

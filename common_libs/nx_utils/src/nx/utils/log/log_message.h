@@ -14,9 +14,8 @@
 #include <QtCore/QByteArray>
 #include <QtCore/QString>
 #include <QtCore/QStringList>
+#include <nx/utils/uuid.h>
 
-
-class QnUuid;
 
 template<typename First, typename Second>
 QString toString(

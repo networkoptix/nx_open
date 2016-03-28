@@ -1,17 +1,12 @@
 'use strict';
 
 var SettingsPage = function () {
-    this.systemNameInput = element(by.model('settings.systemName'));
     this.portInput = element(by.model('settings.port'));
 
-    this.passwordInput = element(by.model('password'));
-    this.confirmPasswordInput= element(by.model('confirmPassword'));
-    this.oldPasswordInput= element(by.model('oldPassword'));
 
-    this.changePasswordButton = element(by.buttonText("Change password"));
     this.saveButton = element(by.buttonText("Save"));
     this.mustBeEqualSpan = element(by.id('mustBeEqualSpan'));
-    this.resetButton = element(by.buttonText("Restart"));
+    this.resetButton = element(by.partialButtonText("Restart"));
     this.mergeButton = element(by.buttonText("Merge Systems"));
 
     this.mediaServersLinks = element.all(by.repeater("server in mediaServers")).all(by.tagName('a'));
