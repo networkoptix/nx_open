@@ -416,6 +416,7 @@ void QnWorkbenchConnectHandler::hideMessageBox() {
 
 void QnWorkbenchConnectHandler::showLoginDialog()
 {
+    // TODO: #ynikitenkov remove login dialog direct call from welcome screen
     const auto welcome = context()->instance<QnWorkbenchWelcomeScreen>();
     welcome->connectToAnotherSystem();
 }
