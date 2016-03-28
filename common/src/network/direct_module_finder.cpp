@@ -243,14 +243,14 @@ void QnDirectModuleFinder::at_checkTimer_timeout() {
             if (currentTime - lastCheck < aliveCheckInterval().count())
             {
                 NX_LOG(lit("QnDirectModuleFinder::at_checkTimer_timeout. url %1. Not adding (1) since %2 < %3")
-                    .arg(url.toString()).arg(currentTime - lastCheck).arg(aliveCheckInterval().count()), cl_logDEBUG1);
+                    .arg(url.toString()).arg(currentTime - lastCheck).arg(aliveCheckInterval().count()), cl_logDEBUG2);
                 continue;
             }
         } else {
             if (currentTime - lastCheck < discoveryCheckInterval().count())
             {
                 NX_LOG(lit("QnDirectModuleFinder::at_checkTimer_timeout. url %1. Not adding (2) since %2 < %3")
-                    .arg(url.toString()).arg(currentTime - lastCheck).arg(discoveryCheckInterval().count()), cl_logDEBUG1);
+                    .arg(url.toString()).arg(currentTime - lastCheck).arg(discoveryCheckInterval().count()), cl_logDEBUG2);
                 continue;
             }
         }

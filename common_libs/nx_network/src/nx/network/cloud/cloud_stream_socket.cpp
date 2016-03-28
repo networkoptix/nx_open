@@ -349,6 +349,12 @@ void CloudStreamSocket::onAddressResolved(
     SystemError::ErrorCode osErrorCode,
     std::vector<AddressEntry> dnsEntries)
 {
+    if (osErrorCode != SystemError::noError)
+    {
+        NX_LOGX(lm("Address resolve error: %1")
+            .arg(SystemError::toString(osErrorCode)), cl_logDEBUG1);
+    }
+
     m_aioThreadBinder->post(
         [sharedOperationGuard = std::move(sharedOperationGuard), remotePort,
             osErrorCode, dnsEntries = std::move(dnsEntries), this]() mutable
@@ -378,6 +384,8 @@ bool CloudStreamSocket::startAsyncConnect(
 {
     if (dnsEntries.empty())
     {
+        NX_LOGX(lm("No address entry"), cl_logDEBUG1);
+
         SystemError::setLastErrorCode(SystemError::hostUnreach);
         return false;
     }

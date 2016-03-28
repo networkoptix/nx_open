@@ -100,6 +100,7 @@ void AddressResolver::addFixedAddress(
     const HostAddress& hostName, const SocketAddress& hostAddress )
 {
     NX_ASSERT(!hostName.isResolved(), Q_FUNC_INFO, "Hostname should be unresolved");
+    NX_ASSERT(hostAddress.address.isResolved());
 
     QnMutexLocker lk(&m_mutex);
     AddressEntry entry(hostAddress);
