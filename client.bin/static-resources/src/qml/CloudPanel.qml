@@ -1,7 +1,9 @@
 import QtQuick 2.5;
 import QtQuick.Controls 1.2;
 
-Column
+import "."
+
+Item
 {
     id: thisComponent;
 
@@ -14,37 +16,47 @@ Column
     signal manageAccount();
     signal logout();
 
-    spacing: 10;
+    width: 576;
+    height: 168;
 
-    Rectangle // TODO: change to image
+    Image
     {
+        id: statusImage;
 
-        width: 50;
-        height: 50;
+        width: 64;
+        height: 64;
+        anchors.top: parent.top;
         anchors.horizontalCenter: parent.horizontalCenter;
 
-        color: (loggedIn ? "green" : "red");
+        source: (thisComponent.loggedIn
+            ? "qrc:/skin/welcome_page/cloud_account_logged.png"
+            : "qrc:/skin/welcome_page/cloud_account_not-logged.png");
     }
 
-    Text
+    NxLabel
     {
         id: userNameText;
 
+        height: 32;
+        anchors.top: statusImage.bottom;
+        anchors.topMargin: 8;
         anchors.horizontalCenter: parent.horizontalCenter;
         text: (loggedIn ? thisComponent.userName
-            :  qsTr("You are not logged to the cloud"));
-        color: "yellow";    // todo: replace
+            :  qsTr("You are not logged in to the cloud"));
+
+        color: Style.colors.text;
+        font: Style.fonts.banner.userName;
     }
 
     Loader
     {
         id: buttonsLoader;
 
+        anchors.top: userNameText.bottom;
+        anchors.topMargin: (thisComponent.loggedIn ? 22 : 16);
         anchors.horizontalCenter: parent.horizontalCenter;
         sourceComponent: (loggedIn ? loggedInButtons : disconnectedButtons);
     }
-
-    //
 
     Component
     {
@@ -52,7 +64,7 @@ Column
 
         Row
         {
-            spacing: 10;
+            spacing: 12;
 
             Text
             {
@@ -78,15 +90,18 @@ Column
 
         Row
         {
-            Button
+            spacing: 8;
+
+            NxButton
             {
                 id: loginButton;
 
+                isAccentButton: true;
                 text: qsTr("Login");
                 onClicked: { thisComponent.loginToCloud(); }
             }
 
-            Button
+            NxButton
             {
                 id: createAccountButton;
 

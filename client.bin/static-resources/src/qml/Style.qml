@@ -87,5 +87,10 @@ QtObject
             readonly property font setupSystem: Qt.font({ pixelSize: 12, weight: Font.Medium});
             readonly property font indicator: Qt.font({ pixelSize: 10, weight: Font.Medium});
         }
+
+        property QtObject banner: QtObject
+        {
+            readonly property font userName: Qt.font({ pixelSize: 22, weight: Font.Light});
+        }
     }
 }
