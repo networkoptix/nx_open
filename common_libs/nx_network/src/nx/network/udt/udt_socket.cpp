@@ -484,7 +484,8 @@ bool UdtSocket::getSendTimeout(unsigned int* millis)
 UdtStreamSocket::UdtStreamSocket()
 :
     m_aioHelper(
-        new aio::AsyncSocketImplHelper<Pollable>(this, this, false /*natTraversal*/))
+        new aio::AsyncSocketImplHelper<Pollable>(this, this, false /*natTraversal*/)),
+    m_noDelay(false)
 {
     m_impl->Open();
 }
@@ -492,7 +493,8 @@ UdtStreamSocket::UdtStreamSocket()
 UdtStreamSocket::UdtStreamSocket(detail::UdtSocketImpl* impl)
 :
     UdtSocket(impl),
-    m_aioHelper(new aio::AsyncSocketImplHelper<Pollable>(this, this, false))
+    m_aioHelper(new aio::AsyncSocketImplHelper<Pollable>(this, this, false)),
+    m_noDelay(false)
 {
 }
 
@@ -704,6 +706,48 @@ void UdtStreamSocket::dispatch( nx::utils::MoveOnlyFunc<void()> handler )
     nx::network::SocketGlobals::aioService().dispatch(
         static_cast<Pollable*>(this),
         std::move(handler) );
+}
+
+bool UdtStreamSocket::setNoDelay(bool value)
+{
+    //udt does not support it. Returned true so that caller code works
+    m_noDelay = value;
+    return true;
+}
+
+bool UdtStreamSocket::getNoDelay(bool* value) const
+{
+    *value = m_noDelay;
+    return true;
+}
+
+bool UdtStreamSocket::toggleStatisticsCollection(bool /*val*/)
+{
+    SystemError::setLastErrorCode(SystemError::notImplemented);
+    return false;
+}
+
+bool UdtStreamSocket::getConnectionStatistics(StreamSocketInfo* /*info*/)
+{
+    SystemError::setLastErrorCode(SystemError::notImplemented);
+    return false;
+}
+
+bool UdtStreamSocket::setKeepAlive(boost::optional< KeepAliveOptions > /*info*/)
+{
+    SystemError::setLastErrorCode(SystemError::notImplemented);
+    return false; // not implemented yet
+}
+
+bool UdtStreamSocket::getKeepAlive(boost::optional< KeepAliveOptions >* result) const
+{
+    //udt has keep-alives but provides no way to modify it...
+    KeepAliveOptions options;
+    options.probeCount = 10;    //TODO #ak find real value in udt
+    options.timeSec = 5;
+    options.intervalSec = 5;
+    *result = options;
+    return true;
 }
 
 void UdtStreamSocket::connectAsync(
