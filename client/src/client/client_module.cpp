@@ -146,7 +146,6 @@ QnClientModule::QnClientModule(const QnStartupParameters &startupParams
     common->store<QnPlatformAbstraction>(new QnPlatformAbstraction());
     common->store<QnLongRunnablePool>(new QnLongRunnablePool());
     common->store<QnClientPtzControllerPool>(new QnClientPtzControllerPool());
-    common->store<QnGlobalSettings>(new QnGlobalSettings());
     common->store<QnDesktopClientMessageProcessor>(new QnDesktopClientMessageProcessor());
     common->store<QnCameraHistoryPool>(new QnCameraHistoryPool());
     common->store<QnRuntimeInfoManager>(new QnRuntimeInfoManager());

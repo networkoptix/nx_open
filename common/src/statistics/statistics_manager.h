@@ -47,6 +47,8 @@ public:
     void resetStatistics();
 
 private:
+    bool isStatisticsSendingAllowed() const;
+
     void unregisterModule(const QString &alias);
 
     QnStatisticValuesHash getValues() const;

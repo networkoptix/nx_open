@@ -979,9 +979,9 @@ void MediaServerProcess::updateDisabledVendorsIfNeeded()
     if (!admin)
         return;
 
-    if (!disabledVendors.isNull()) {
-        QnGlobalSettings* settings = QnGlobalSettings::instance();
-        settings->setDisabledVendors(disabledVendors);
+    if (!disabledVendors.isNull())
+    {
+        qnGlobalSettings->setDisabledVendors(disabledVendors);
         MSSettings::roSettings()->remove(DV_PROPERTY);
     }
 }
@@ -993,8 +993,7 @@ void MediaServerProcess::updateAllowCameraCHangesIfNeed()
     QString allowCameraChanges = MSSettings::roSettings()->value(DV_PROPERTY).toString();
     if (!allowCameraChanges.isEmpty())
     {
-        QnGlobalSettings *settings = QnGlobalSettings::instance();
-        settings->setCameraSettingsOptimizationEnabled(allowCameraChanges.toLower() == lit("yes") || allowCameraChanges.toLower() == lit("true") || allowCameraChanges == lit("1"));
+        qnGlobalSettings->setCameraSettingsOptimizationEnabled(allowCameraChanges.toLower() == lit("yes") || allowCameraChanges.toLower() == lit("true") || allowCameraChanges == lit("1"));
         MSSettings::roSettings()->setValue(DV_PROPERTY, "");
     }
 }
@@ -1747,7 +1746,7 @@ void MediaServerProcess::run()
 
     std::unique_ptr<HostSystemPasswordSynchronizer> hostSystemPasswordSynchronizer( new HostSystemPasswordSynchronizer() );
 
-    QScopedPointer<QnGlobalSettings> globalSettings(new QnGlobalSettings());
+
     std::unique_ptr<QnMServerAuditManager> auditManager( new QnMServerAuditManager() );
 
     CloudConnectionManager cloudConnectionManager;
@@ -2252,7 +2251,7 @@ void MediaServerProcess::run()
     QnResource::initAsyncPoolInstance()->setMaxThreadCount( MSSettings::roSettings()->value(
         nx_ms_conf::RESOURCE_INIT_THREADS_COUNT,
         nx_ms_conf::DEFAULT_RESOURCE_INIT_THREADS_COUNT ).toInt() );
-    QnResource::initAsyncPoolInstance()->setExpiryTimeout(-1); // default experation timeout is 30 second. But it has a bug in QT < v.5.3
+    QnResource::initAsyncPoolInstance()->setExpiryTimeout(-1); // default expiration timeout is 30 second. But it has a bug in QT < v.5.3
     QThreadPool::globalInstance()->setExpiryTimeout(-1);
 
     // ============================
@@ -2274,7 +2273,9 @@ void MediaServerProcess::run()
     QnMediaServerResourceSearchers searchers;
 
     loadResourcesFromECS(messageProcessor.data());
-    if (QnGlobalSettings::instance()->isCrossdomainXmlEnabled())
+
+
+    if (qnGlobalSettings->isCrossdomainXmlEnabled())
         m_httpModManager->addUrlRewriteExact( lit( "/crossdomain.xml" ), lit( "/static/crossdomain.xml" ) );
 
     auto upnpPortMapper = initializeUpnpPortMapper();
@@ -2309,6 +2310,7 @@ void MediaServerProcess::run()
             qnGlobalSettings->setCloudAuthKey(value);
         MSSettings::roSettings()->remove(QnGlobalSettings::kNameCloudAuthKey);
     }
+
 
     qnGlobalSettings->synchronizeNow();
 
@@ -2367,28 +2369,6 @@ void MediaServerProcess::run()
 
     std::unique_ptr<QnLdapManager> ldapManager(new QnLdapManager());
 
-    //QnCommonMessageProcessor::instance()->init(ec2Connection); // start receiving notifications
-
-    /*
-    QnScheduleTaskList scheduleTasks;
-    for (const QnScheduleTask &scheduleTask: scheduleTasks)
-    {
-        QString str;
-        QTextStream stream(&str);
-
-        stream << "ScheduleTask "
-               << scheduleTask.getId().toString()
-               << scheduleTask.getAfterThreshold()
-               << scheduleTask.getBeforeThreshold()
-               << scheduleTask.getDayOfWeek()
-               << scheduleTask.getDoRecordAudio()
-               << scheduleTask.getStartTime()
-               << scheduleTask.getEndTime()
-               << scheduleTask.getRecordingType()
-               << scheduleTask.getResourceId().toString();
-        NX_LOG(str, cl_logALWAYS);
-    }
-    */
 
     QnResourceDiscoveryManager::instance()->setReady(true);
     if( !ec2Connection->connectionInfo().ecDbReadOnly )
@@ -2429,6 +2409,7 @@ void MediaServerProcess::run()
     qnBackupStorageMan->scheduleSync()->start();
     emit started();
     exec();
+
 
     disconnect(QnAuthHelper::instance(), 0, this, 0);
     disconnect(QnResourceDiscoveryManager::instance(), 0, this, 0);
@@ -2530,8 +2511,6 @@ void MediaServerProcess::run()
 
     nx::network::QnSSLSocket::releaseSSLEngine();
     authHelper.reset();
-
-    globalSettings.reset();
 
     fileDeletor.reset();
     normalStorageManager.reset();

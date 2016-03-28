@@ -51,7 +51,6 @@ QnMobileClientModule::QnMobileClientModule(QObject *parent) :
     common->store<QnSessionManager>(new QnSessionManager());
 
     common->store<QnLongRunnablePool>(new QnLongRunnablePool());
-    common->store<QnGlobalSettings>(new QnGlobalSettings());
     common->store<QnMobileClientMessageProcessor>(new QnMobileClientMessageProcessor());
     common->store<QnCameraHistoryPool>(new QnCameraHistoryPool());
     common->store<QnRuntimeInfoManager>(new QnRuntimeInfoManager());

@@ -99,11 +99,6 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
     connect(qnResPool,                              &QnResourcePool::resourceRemoved,                   this,   &QnGlobalSettings::at_resourcePool_resourceRemoved);
     for(const QnResourcePtr &resource: qnResPool->getResources())
         at_resourcePool_resourceAdded(resource);
-
-    connect(propertyDictionary, &QnResourcePropertyDictionary::asyncSaveDone, this, [this](int reqId, ec2::ErrorCode errorCode)
-    {
-
-    });
 }
 
 QnGlobalSettings::~QnGlobalSettings() {
@@ -112,6 +107,11 @@ QnGlobalSettings::~QnGlobalSettings() {
         at_resourcePool_resourceRemoved(m_admin);
 }
 
+
+bool QnGlobalSettings::isInitialized() const
+{
+    return !m_admin.isNull();
+}
 
 QnGlobalSettings::AdaptorList QnGlobalSettings::initEmailAdaptors() {
     QString defaultSupportLink = QnAppInfo::supportLink();
@@ -265,6 +265,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
     m_backupNewCamerasByDefaultAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameBackupNewCamerasByDefault, false, this);
 	m_crossdomainXmlEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameCrossdomainEnabled, true, this);
     m_upnpPortMappingEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameUpnpPortMappingEnabled, true, this);
+    m_newSystemAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameNewSystem, false, this);
 
     m_arecontRtspEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         kArecontRtspEnabled,
@@ -295,23 +296,28 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
     return result;
 }
 
-QString QnGlobalSettings::disabledVendors() const {
+QString QnGlobalSettings::disabledVendors() const
+{
     return m_disabledVendorsAdaptor->value();
 }
 
-QSet<QString> QnGlobalSettings::disabledVendorsSet() const {
+QSet<QString> QnGlobalSettings::disabledVendorsSet() const
+{
     return parseDisabledVendors(disabledVendors());
 }
 
-void QnGlobalSettings::setDisabledVendors(QString disabledVendors) {
+void QnGlobalSettings::setDisabledVendors(QString disabledVendors)
+{
     m_disabledVendorsAdaptor->setValue(disabledVendors);
 }
 
-bool QnGlobalSettings::isCameraSettingsOptimizationEnabled() const {
+bool QnGlobalSettings::isCameraSettingsOptimizationEnabled() const
+{
     return m_cameraSettingsOptimizationAdaptor->value();
 }
 
-void QnGlobalSettings::setCameraSettingsOptimizationEnabled(bool cameraSettingsOptimizationEnabled) {
+void QnGlobalSettings::setCameraSettingsOptimizationEnabled(bool cameraSettingsOptimizationEnabled)
+{
     m_cameraSettingsOptimizationAdaptor->setValue(cameraSettingsOptimizationEnabled);
 }
 
@@ -329,15 +335,18 @@ bool QnGlobalSettings::isServerAutoDiscoveryEnabled() const {
     return m_serverAutoDiscoveryEnabledAdaptor->value();
 }
 
-void QnGlobalSettings::setServerAutoDiscoveryEnabled(bool enabled) {
+void QnGlobalSettings::setServerAutoDiscoveryEnabled(bool enabled)
+{
     m_serverAutoDiscoveryEnabledAdaptor->setValue(enabled);
 }
 
-bool QnGlobalSettings::isCrossdomainXmlEnabled() const {
+bool QnGlobalSettings::isCrossdomainXmlEnabled() const
+{
     return m_crossdomainXmlEnabledAdaptor->value();
 }
 
-void QnGlobalSettings::setCrossdomainXmlEnabled(bool enabled) {
+void QnGlobalSettings::setCrossdomainXmlEnabled(bool enabled)
+{
     m_crossdomainXmlEnabledAdaptor->setValue(enabled);
 }
 
@@ -352,11 +361,14 @@ void QnGlobalSettings::at_resourcePool_resourceAdded(const QnResourcePtr &resour
     if(!user->isAdmin())
         return;
 
-    QnMutexLocker locker( &m_mutex );
+    {
+        QnMutexLocker locker(&m_mutex);
 
-    m_admin = user;
-    for (QnAbstractResourcePropertyAdaptor* adaptor: m_allAdaptors)
-        adaptor->setResource(user);
+        m_admin = user;
+        for (QnAbstractResourcePropertyAdaptor* adaptor : m_allAdaptors)
+            adaptor->setResource(user);
+    }
+    emit initialized();
 }
 
 void QnGlobalSettings::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) {
@@ -370,7 +382,8 @@ void QnGlobalSettings::at_resourcePool_resourceRemoved(const QnResourcePtr &reso
         adaptor->setResource(QnResourcePtr());
 }
 
-QnLdapSettings QnGlobalSettings::ldapSettings() const {
+QnLdapSettings QnGlobalSettings::ldapSettings() const
+{
     QnLdapSettings result;
     result.uri = m_ldapUriAdaptor->value();
     result.adminDn = m_ldapAdminDnAdaptor->value();
@@ -380,7 +393,8 @@ QnLdapSettings QnGlobalSettings::ldapSettings() const {
     return result;
 }
 
-void QnGlobalSettings::setLdapSettings(const QnLdapSettings &settings) {
+void QnGlobalSettings::setLdapSettings(const QnLdapSettings &settings)
+{
     m_ldapUriAdaptor->setValue(settings.uri);
     m_ldapAdminDnAdaptor->setValue(settings.adminDn);
     m_ldapAdminPasswordAdaptor->setValue(settings.adminPassword);
@@ -388,7 +402,8 @@ void QnGlobalSettings::setLdapSettings(const QnLdapSettings &settings) {
     m_ldapSearchFilterAdaptor->setValue(settings.searchFilter);
 }
 
-QnEmailSettings QnGlobalSettings::emailSettings() const {
+QnEmailSettings QnGlobalSettings::emailSettings() const
+{
     QnEmailSettings result;
     result.server = m_serverAdaptor->value();
     result.email = m_fromAdaptor->value();
@@ -405,14 +420,16 @@ QnEmailSettings QnGlobalSettings::emailSettings() const {
      * VMS-1055 - default email changed to link.
      * We are checking if the value is not overridden and replacing it by the updated one.
      */
-    if (result.supportEmail == QnAppInfo::supportEmailAddress() && !QnAppInfo::supportLink().isEmpty()) {
+    if (result.supportEmail == QnAppInfo::supportEmailAddress() && !QnAppInfo::supportLink().isEmpty())
+    {
         result.supportEmail = QnAppInfo::supportLink();
     }
 
     return result;
 }
 
-void QnGlobalSettings::setEmailSettings(const QnEmailSettings &settings) {
+void QnGlobalSettings::setEmailSettings(const QnEmailSettings &settings)
+{
     m_serverAdaptor->setValue(settings.server);
     m_fromAdaptor->setValue(settings.email);
     m_portAdaptor->setValue(settings.port == QnEmailSettings::defaultPort(settings.connectionType) ? 0 : settings.port);
@@ -449,41 +466,50 @@ bool QnGlobalSettings::synchronizeNowSync()
     return propertyDictionary->saveParams(m_admin->getId());
 }
 
-bool QnGlobalSettings::isUpdateNotificationsEnabled() const {
+bool QnGlobalSettings::isUpdateNotificationsEnabled() const
+{
     return m_updateNotificationsEnabledAdaptor->value();
 }
 
-void QnGlobalSettings::setUpdateNotificationsEnabled(bool updateNotificationsEnabled) {
+void QnGlobalSettings::setUpdateNotificationsEnabled(bool updateNotificationsEnabled)
+{
     m_updateNotificationsEnabledAdaptor->setValue(updateNotificationsEnabled);
 }
 
-Qn::CameraBackupQualities QnGlobalSettings::backupQualities() const {
+Qn::CameraBackupQualities QnGlobalSettings::backupQualities() const
+{
     return m_backupQualitiesAdaptor->value();
 }
 
-void QnGlobalSettings::setBackupQualities( Qn::CameraBackupQualities value ) {
+void QnGlobalSettings::setBackupQualities( Qn::CameraBackupQualities value )
+{
     m_backupQualitiesAdaptor->setValue(value);
 }
 
-bool QnGlobalSettings::backupNewCamerasByDefault() const {
+bool QnGlobalSettings::backupNewCamerasByDefault() const
+{
     return m_backupNewCamerasByDefaultAdaptor->value();
 }
 
-void QnGlobalSettings::setBackupNewCamerasByDefault( bool value ) {
+void QnGlobalSettings::setBackupNewCamerasByDefault( bool value )
+{
     m_backupNewCamerasByDefaultAdaptor->setValue(value);
 }
 
-bool QnGlobalSettings::isStatisticsAllowedDefined() const {
+bool QnGlobalSettings::isStatisticsAllowedDefined() const
+{
     return m_statisticsAllowedAdaptor->value().isDefined();
 }
 
-bool QnGlobalSettings::isStatisticsAllowed() const {
+bool QnGlobalSettings::isStatisticsAllowed() const
+{
     /* Undefined value means we are allowed to send statistics. */
     return !m_statisticsAllowedAdaptor->value().isDefined()
         || m_statisticsAllowedAdaptor->value().value();
 }
 
-void QnGlobalSettings::setStatisticsAllowed( bool value ) {
+void QnGlobalSettings::setStatisticsAllowed( bool value )
+{
     m_statisticsAllowedAdaptor->setValue(QnOptionalBool(value));
 }
 
@@ -604,7 +630,8 @@ std::chrono::seconds QnGlobalSettings::serverDiscoveryAliveCheckTimeout() const
     return connectionKeepAliveTimeout() * 3;   //3 is here to keep same values as before by default
 }
 
-bool QnGlobalSettings::isTimeSynchronizationEnabled() const {
+bool QnGlobalSettings::isTimeSynchronizationEnabled() const
+{
     return m_timeSynchronizationEnabledAdaptor->value();
 }
 
@@ -617,6 +644,7 @@ QString QnGlobalSettings::cloudAccountName() const
 
 void QnGlobalSettings::setCloudAccountName(const QString& value)
 {
+
     m_cloudAccountNameAdaptor->setValue(value);
 }
 

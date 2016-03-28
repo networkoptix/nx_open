@@ -28,6 +28,9 @@ public:
     QnGlobalSettings(QObject *parent = NULL);
     virtual ~QnGlobalSettings();
 
+    /** Check if global settings are ready to use. */
+    bool isInitialized() const;
+
     void synchronizeNow();
     bool synchronizeNowSync();
 
@@ -135,6 +138,8 @@ public:
     const QList<QnAbstractResourcePropertyAdaptor*>& allSettings() const;
 
 signals:
+    void initialized();
+
     void disabledVendorsChanged();
     void auditTrailEnableChanged();
     void cameraSettingsOptimizationChanged();
