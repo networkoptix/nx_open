@@ -20,7 +20,7 @@ class QnWorkbenchWelcomeScreen : public Connective<QObject>
     Q_PROPERTY(bool isLoggedInToCloud READ isLoggedInToCloud NOTIFY isLoggedInToCloudChanged)
 
     Q_PROPERTY(QSize pageSize READ pageSize WRITE setPageSize NOTIFY pageSizeChanged);
-    Q_PROPERTY(bool hiddenControls READ hiddenControls WRITE setHiddenControls NOTIFY hiddenControlsChanged)
+    Q_PROPERTY(bool visibleControls READ visibleControls WRITE setVisibleControls NOTIFY visibleControlsChanged)
 
 public:
     QnWorkbenchWelcomeScreen(QObject *parent);
@@ -42,9 +42,9 @@ public: // Properties
 
     void setPageSize(const QSize &size);
 
-    bool hiddenControls() const;
+    bool visibleControls() const;
 
-    void setHiddenControls(bool hidden);
+    void setVisibleControls(bool visible);
 
 public slots:
     // TODO: $ynikitenkov add multiple urls one-by-one  handling
@@ -90,7 +90,7 @@ signals:
 
     void pageSizeChanged();
 
-    void hiddenControlsChanged();
+    void visibleControlsChanged();
 
 private:
     void showScreen();
@@ -105,7 +105,7 @@ private:
     typedef QPointer<QWidget> WidgetPtr;
     typedef QPointer<QnCloudStatusWatcher> CloudStatusWatcherPtr;
     
-    bool m_hiddenControls;
+    bool m_visibleControls;
     bool m_visible;
     const CloudStatusWatcherPtr m_cloudWatcher;
     const QnGenericPalette m_palette;

@@ -18,7 +18,7 @@ Rectangle
         id: screenHolder;
 
         anchors.fill: parent;
-        visible: !context.hiddenControls;
+        visible: context.visibleControls;
 
         CloudPanel
         {
