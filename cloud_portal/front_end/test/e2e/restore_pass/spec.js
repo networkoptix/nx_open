@@ -4,73 +4,97 @@ describe('Restore password suite', function () {
 
     var p = new RestorePasswordPage();
 
-    p.alert.checkAlert(function(){
-        p.get();
-    }, p.alert.alertMessages.restorePassWrongEmail, p.alert.alertTypes.danger, true);
+    beforeEach(function() {
+        p.get(p.url);
+    });
 
-    it("should restore password with a code sent to an email", function () {
-        var userEmail = p.helper.userEmail1;
-        var userPassword = p.helper.userPassword;
-        p.get();
-        p.iForgotPasswordLink.click();
-        p.restoreEmailInput.sendKeys(userEmail);
+    it("should demand that email field is not empty", function () {
+        p.emailInput.clear();
         p.submitButton.click();
+        p.checkEmailMissing();
+    });
 
-        p.alert.catchAlert( p.alert.alertMessages.restorePassConfirmSent, p.alert.alertTypes.success);
+    it("should validate user email *@*.*", function () {
+        p.emailInput.clear();
+        p.emailInput.sendKeys('vert546 464w6345');
+        p.submitButton.click();
+        p.checkEmailInvalid();
+    });
+
+    xit("should validate user email *@*.* if it comes from login form", function () {
+    });
+
+    it("should not succeed, if email is not registered", function () {
+        p.emailInput.clear();
+        p.emailInput.sendKeys(p.helper.userEmailWrong);
+        p.submitButton.click();
+        p.alert.catchAlert(p.alert.alertMessages.restorePassWrongEmail, p.alert.alertTypes.danger);
+    });
+
+    p.alert.checkAlert(function(){
+        p.emailInput.clear();
+        p.emailInput.sendKeys(p.helper.userEmailWrong);
+        p.submitButton.click();
+    }, p.alert.alertMessages.restorePassWrongEmail, p.alert.alertTypes.danger, false);
+
+    p.alert.checkAlert(function(){
+        p.emailInput.clear();
+        p.emailInput.sendKeys(p.helper.userEmail);
+        p.submitButton.click();
+    }, p.alert.alertMessages.restorePassConfirmSent, p.alert.alertTypes.success, false);
+
+    it("generates url token for the next case", function () {
+        var userEmail = p.helper.userEmail;
+        p.sendLinkToEmail(userEmail);
 
         browser.controlFlow().wait(p.helper.getEmailTo(userEmail).then(function (email) {
-            expect(email.subject).toContain("Restore your password");
-            expect(email.headers.to).toEqual(userEmail);
+            var regCode = p.getTokenFromEmail(email, userEmail);
+            p.urlWithCode = (p.url + regCode);
+        }));
+    });
 
-            // extract registration token from the link in the email message
-            var pattern = /\/static\/index.html#\/restore_password\/([\w=]+)/g;
-            var regCode = pattern.exec(email.html)[1];
-            console.log(regCode);
-            browser.get('/#/restore_password/' + regCode);
+    //p.passwordField.check(p, p.urlWithCode); // need url with token from email here
 
-            expect(p.newPasswordInput.isPresent()).toBe(true);
-            p.newPasswordInput.sendKeys(userPassword); //should be new password here, but old one will do the job too
-            p.savePasswordButton.click();
-            p.alert.catchAlert( p.alert.alertMessages.restorePassSuccess, p.alert.alertTypes.success);
-            browser.refresh();
+    it("should be able to set new password (which is same as old)", function () {
+        var userEmail = p.helper.userEmail;
+        var userPassword = p.helper.userPassword;
+        p.sendLinkToEmail(userEmail);
 
-            p.newPasswordInput.sendKeys(userPassword);
-            p.savePasswordButton.click();
-            p.alert.catchAlert( p.alert.alertMessages.restorePassWrongCode, p.alert.alertTypes.danger);
+        browser.controlFlow().wait(p.helper.getEmailTo(userEmail).then(function (email) {
+            var regCode = p.getTokenFromEmail(email, userEmail);
+            p.get(p.url + regCode);
+            p.setNewPassword(userPassword);
+        }));
+    });
 
-            p.helper.login(userEmail, userPassword);
+    // TODO: write alerts for page with new password input.
+
+    it("should set new password, login with new password", function () {
+        p.sendLinkToEmail(p.helper.userEmail);
+
+        browser.controlFlow().wait(p.helper.getEmailTo(p.helper.userEmail).then(function (email) {
+            var regCode = p.getTokenFromEmail(email, p.helper.userEmail);
+            p.get(p.url + regCode);
+            browser.waitForAngular();
+            p.setNewPassword(p.helper.userPasswordNew);
+            p.helper.swapPasswords();
+
+            p.helper.login(p.helper.userEmail, p.helper.userPassword);
             p.helper.logout();
         }));
     });
 
-    xit("should remember email from login form", function () {
-        expect("test").toBe("written");
-    });
+    it("should not allow to use one restore link twice", function () {
+        var userEmail = p.helper.userEmail;
+        var userPassword = p.helper.userPassword;
+        p.sendLinkToEmail(userEmail);
 
-    xit("should demand that email field is not empty", function () {
-        expect("test").toBe("written");
-    });
-
-    xit("should validate user email *@*.*", function () {
-        expect("test").toBe("written");
-    });
-
-    xit("should not succeed, if email is not registered", function () {
-        expect("test").toBe("written");
-    });
-
-    p.passwordField.check();
-
-    xit("should be able to set new password (which is same as old)", function () {
-        expect("test").toBe("written");
-    });
-
-    xit("should set new password, login with new password change password back", function () {
-        expect("test").toBe("written"); // shall I keep current password in variable to avoid such stuff??
-    });
-
-    xit("should not allow to use one restore link twice", function () {
-        expect("test").toBe("written");
+        browser.controlFlow().wait(p.helper.getEmailTo(userEmail).then(function (email) {
+            var regCode = p.getTokenFromEmail(email, userEmail);
+            p.get(p.url + regCode);
+            p.setNewPassword(userPassword);
+            p.verifySecondAttemptFails(userPassword);
+        }));
     });
 
     xit("should allow not-activated user to restore password", function () {
@@ -81,11 +105,39 @@ describe('Restore password suite', function () {
         expect("test").toBe("written");
     });
 
-    xit("should allow logged in user visit restore password page", function () {
-        expect("test").toBe("written");
+    it("should allow logged in user visit restore password page", function () {
+        p.helper.login(p.helper.userEmail, p.helper.userPassword);
+        p.get(p.url);
+        expect(p.emailInput.isPresent()).toBe(true);
+        p.helper.logout();
     });
 
-    xit("should log user out if he visits restore password link from email", function () {
-        expect("test").toBe("written");
+    it("should log user out if he visits restore password link from email", function () {
+        var userEmail = p.helper.userEmail;
+        var userPassword = p.helper.userPassword;
+        browser.sleep(1500);
+        p.helper.login(userEmail, userPassword);
+        p.get(p.url);
+        p.sendLinkToEmail(userEmail);
+
+        browser.controlFlow().wait(p.helper.getEmailTo(userEmail).then(function (email) {
+            var regCode = p.getTokenFromEmail(email, userEmail);
+            p.get(p.url + regCode);
+            expect(p.newPasswordInput.isPresent()).toBe(true); // due to current bug in portal, this fails
+            p.get("/");
+            expect(p.helper.loginSuccessElement.isDisplayed()).toBe(false);
+        }));
+    });
+
+    it("restores password to qweasd123", function () {
+        var userEmail = p.helper.userEmail;
+        var userPassword = p.helper.basePassword;
+        p.sendLinkToEmail(userEmail);
+
+        browser.controlFlow().wait(p.helper.getEmailTo(userEmail).then(function (email) {
+            var regCode = p.getTokenFromEmail(email, userEmail);
+            p.get(p.url + regCode);
+            p.setNewPassword(userPassword);
+        }));
     });
 });
