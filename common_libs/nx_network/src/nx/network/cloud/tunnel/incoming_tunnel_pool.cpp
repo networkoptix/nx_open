@@ -90,7 +90,7 @@ void IncomingTunnelPool::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 void IncomingTunnelPool::acceptTunnel(
     std::shared_ptr<AbstractIncomingTunnelConnection> connection)
 {
-    NX_LOGX(lm("accept tunnel %1").arg(connection), cl_logDEBUG1);
+    NX_LOGX(lm("accept tunnel %1").arg(connection), cl_logDEBUG2);
     connection->accept(
         [this, connection](
             SystemError::ErrorCode code,
@@ -103,7 +103,7 @@ void IncomingTunnelPool::acceptTunnel(
 
                 if (code != SystemError::noError)
                 {
-                    NX_LOGX(lm("tunnel %1 is brocken: %2")
+                    NX_LOGX(lm("tunnel %1 is broken: %2")
                         .arg(connection).arg(SystemError::toString(code)),
                         cl_logDEBUG1);
 
