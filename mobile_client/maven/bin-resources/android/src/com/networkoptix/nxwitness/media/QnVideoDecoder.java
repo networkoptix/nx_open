@@ -31,6 +31,8 @@ public class QnVideoDecoder
     {
         try
         {
+            gotOutputData = false;
+
             System.out.println("codecName=" + codecName);
             System.out.print("width=");
             System.out.println(width);
@@ -135,7 +137,7 @@ public class QnVideoDecoder
     {
         try
         {
-            final long timeoutUs = 1000 * 3000; //< 3 second
+            final long timeoutUs = 1000 * 1000; //< 3 second
             int inputBufferId = codec.dequeueInputBuffer(timeoutUs);
             if (inputBufferId >= 0)
             {
@@ -148,27 +150,30 @@ public class QnVideoDecoder
                 return -1; // error
             }
 
-            MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
-            int outputBufferId = codec.dequeueOutputBuffer(info, 0);
-            //System.out.println("dequee buffer result=" + outputBufferId);
-            switch (outputBufferId)
+            while (true)
             {
-            case MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED:
-                //System.out.println("MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED");
-                return 0; // no error
-            case MediaCodec.INFO_OUTPUT_FORMAT_CHANGED:
-                format = codec.getOutputFormat(); // option B
-                //System.out.println("MediaCodec.INFO_OUTPUT_FORMAT_CHANGED");
-                return 0; // no error
-            case MediaCodec.INFO_TRY_AGAIN_LATER:
-                //System.out.println("MediaCodec.INFO_TRY_AGAIN_LATER");
-                return 0; // no error
-            default:
-                long outFrameNum = info.presentationTimeUs;
-                codec.releaseOutputBuffer(outputBufferId, true); // true means buffer will be send to render surface
-                return outFrameNum;
+                MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
+                int outputBufferId = codec.dequeueOutputBuffer(info, gotOutputData ? timeoutUs : 1000*10);
+                //System.out.println("dequee buffer result=" + outputBufferId);
+                switch (outputBufferId)
+                {
+                case MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED:
+                    //System.out.println("MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED");
+                    break;
+                case MediaCodec.INFO_OUTPUT_FORMAT_CHANGED:
+                    format = codec.getOutputFormat(); // option B
+                    //System.out.println("MediaCodec.INFO_OUTPUT_FORMAT_CHANGED");
+                    gotOutputData = true;
+                    break;
+                case MediaCodec.INFO_TRY_AGAIN_LATER:
+                    //System.out.println("MediaCodec.INFO_TRY_AGAIN_LATER");
+                    return 0; // no error
+                default:
+                    long outFrameNum = info.presentationTimeUs;
+                    codec.releaseOutputBuffer(outputBufferId, true); // true means buffer will be send to render surface
+                    return outFrameNum;
+                }
             }
-
         }
         catch(IllegalStateException e)
         {
@@ -244,4 +249,5 @@ public class QnVideoDecoder
     private MediaFormat format;
     private Surface surface;
     private SurfaceTexture surfaceTexture;
+    private boolean gotOutputData;
 }

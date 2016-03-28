@@ -8,7 +8,7 @@
 
         <?include ControlPanel.wxi ?>
         <?include BuildVars.wxi ?>
-
+        
         <?define ProductName="${display.product.name}"?>
         <?define ServerRegPath="Software\${company.name}\${mediaserver.name}"?>
 
@@ -84,25 +84,39 @@
 
         <!-- MediaServer properties-->
 
-        <Property Id="SYSTEM_NAME" Secure="yes">
+        <!-- Demo only!!! -->
+        <Property Id="SYSTEM_NAME" Value="system" Secure="yes">
             <RegistrySearch Id="SystemNameReg" Root="HKLM" Key="$(var.ServerRegPath)" Name="systemName" Type="raw" Win64="yes"/>
         </Property>
+        <!-- <Property Id="SYSTEM_NAME" Value="[SYSTEM_NAME]" Secure="yes">
+            <RegistrySearch Id="SystemNameReg" Root="HKLM" Key="$(var.ServerRegPath)" Name="systemName" Type="raw" Win64="yes"/>
+        </Property> -->
         
-        <Property Id="SERVER_PORT" Secure="yes">
+        <!-- Demo only!!! -->
+        <Property Id="SERVER_PORT" Value="7001" Secure="yes">
             <RegistrySearch Id="ServerPortReg" Root="HKLM" Key="$(var.ServerRegPath)" Name="port" Type="raw" Win64="yes"/>
-        </Property>
+        </Property>        
+        <!-- <Property Id="SERVER_PORT" Secure="yes">
+            <RegistrySearch Id="ServerPortReg" Root="HKLM" Key="$(var.ServerRegPath)" Name="port" Type="raw" Win64="yes"/>
+        </Property> -->
 
         <Property Id="SERVER_PORT_EC" Secure="yes">
             <RegistrySearch Id="ServerEcsPortReg" Root="HKLM" Key="$(var.ECRegPath)" Name="port" Type="raw" Win64="yes"/>
         </Property>
 
-        <Property Id="ALLOW_CAMERA_CHANGES" Secure="yes"/>
-
-        <Property Id="STATISTICS_REPORT_ALLOWED" Secure="yes"/>
+        <!-- Demo only!!! -->
+        <Property Id="ALLOW_CAMERA_CHANGES" Value="1" Secure="yes"/>
+        <Property Id="STATISTICS_REPORT_ALLOWED" Value="1" Secure="yes"/>
+        <!-- <Property Id="ALLOW_CAMERA_CHANGES" Secure="yes"/>
+        <Property Id="STATISTICS_REPORT_ALLOWED" Secure="yes"/> -->
    
         <Property Id="SERVER_LOGIN" Value="admin"/>
-        <Property Id="SERVER_PASSWORD" Secure="yes"/>
-        <Property Id="SERVER_PASSWORD_CONFIRM" Secure="yes"/>
+        
+        <!-- Demo only!!! -->
+        <Property Id="SERVER_PASSWORD" Value="admin" Secure="yes"/>
+        <Property Id="SERVER_PASSWORD_CONFIRM" Value="admin" Secure="yes"/>        
+        <!-- <Property Id="SERVER_PASSWORD" Value="admin" Secure="yes"/>
+        <Property Id="SERVER_PASSWORD_CONFIRM" Value="admin" Secure="yes"/> -->
 
         <Property Id="ALLOW_CAMERA_CHANGES_REF" Value="ALLOW_CAMERA_CHANGES"/>
         <Property Id="STATISTICS_REPORT_ALLOWED_REF" Value="STATISTICS_REPORT_ALLOWED"/>        
@@ -365,20 +379,29 @@
 
             <!-- WelcomeDlg -->
             <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="LicenseAgreementDlg"><![CDATA[ PREVIOUSSERVERINSTALLED <> "1" AND NOT LICENSE_ALREADY_ACCEPTED ]]></Publish>          
-            <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="MediaServerDlg"><![CDATA[ PREVIOUSSERVERINSTALLED <> "1" AND LICENSE_ALREADY_ACCEPTED ]]></Publish>
+            <!-- Demo only!!! <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="MediaServerDlg"><![CDATA[ PREVIOUSSERVERINSTALLED <> "1" AND LICENSE_ALREADY_ACCEPTED ]]></Publish> -->
+            
+            <!-- Demo only!!! -->
+            <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg"><![CDATA[ PREVIOUSSERVERINSTALLED <> "1" AND LICENSE_ALREADY_ACCEPTED ]]></Publish> 
+            
             <Publish Dialog="WelcomeDlg" Control="Next" Property="ALLOW_CAMERA_CHANGES" Value="yes"><![CDATA[ PREVIOUSSERVERINSTALLED <> "1" AND LICENSE_ALREADY_ACCEPTED ]]></Publish>
             <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="UpgradeDlg">PREVIOUSSERVERINSTALLED = "1"</Publish>
 
             <!-- LicenseAgreementDlg -->
             <Publish Dialog="LicenseAgreementDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">1</Publish>
-            <Publish Dialog="LicenseAgreementDlg" Control="Next" Event="NewDialog" Value="MediaServerDlg">LicenseAccepted = "1"</Publish>
-            <Publish Dialog="LicenseAgreementDlg" Control="Next" Property="ALLOW_CAMERA_CHANGES" Value="yes">LicenseAccepted = "1"</Publish>
+            <!-- Demo only!!! <Publish Dialog="LicenseAgreementDlg" Control="Next" Event="NewDialog" Value="MediaServerDlg">LicenseAccepted = "1"</Publish> -->
+            
+            <!-- Demo only!!! -->
+            <Publish Dialog="LicenseAgreementDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">LicenseAccepted = "1"</Publish>
+            
+            <!-- Demo only!!! <Publish Dialog="LicenseAgreementDlg" Control="Next" Property="ALLOW_CAMERA_CHANGES" Value="yes">LicenseAccepted = "1"</Publish> -->
 
             <!-- UpgradeDlg -->
             <Publish Dialog="UpgradeDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">1</Publish>
             <Publish Dialog="UpgradeDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
 
             <!-- MediaServerDlg -->
+            <!-- Demo only!!! 
             <Publish Dialog="MediaServerDlg" Control="Back" Event="NewDialog" Value="LicenseAgreementDlg">NOT LICENSE_ALREADY_ACCEPTED</Publish>
             <Publish Dialog="MediaServerDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">LICENSE_ALREADY_ACCEPTED</Publish>
 
@@ -394,14 +417,22 @@
             <Publish Dialog="MediaServerDlg" Control="Next" Property="STATISTICS_REPORT_ALLOWED" Value="0" Order="4">STATISTICS_REPORT_ALLOWED = ""</Publish>
 
             <Publish Dialog="MediaServerDlg" Control="Next" Property="PORT_DIALOG_BACK" Value="MediaServerDlg">1</Publish>
-            <Publish Dialog="MediaServerDlg" Control="Next" Property="PORT_DIALOG_NEXT" Value="VerifyReadyDlg">1</Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Property="PORT_DIALOG_NEXT" Value="VerifyReadyDlg">1</Publish> 
 
+            <Publish Dialog="LicenseAgreementDlg" Control="Next" Property="PORT_DIALOG_BACK" Value="MediaServerDlg">1</Publish> 
+            <Publish Dialog="LicenseAgreementDlg" Control="Next" Property="PORT_DIALOG_NEXT" Value="VerifyReadyDlg">1</Publish> -->           
+            
             <!-- PortIsBusyDlg -->
             <Publish Dialog="PortIsBusyDlg" Control="Back" Event="NewDialog" Value="[PORT_DIALOG_BACK]">1</Publish>
             <Publish Dialog="PortIsBusyDlg" Control="Next" Event="NewDialog" Value="[PORT_DIALOG_NEXT]">1</Publish>
 
             <!-- VerifyReadyDlg -->
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MediaServerDlg">NOT $(var.VmsRemoving) AND NOT $(var.VmsUpgrading)</Publish>
+            <!-- Demo only!!! <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MediaServerDlg">NOT $(var.VmsRemoving) AND NOT $(var.VmsUpgrading)</Publish> -->
+            
+            <!-- Demo only!!! -->
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="LicenseAgreementDlg">NOT $(var.VmsRemoving) AND NOT $(var.VmsUpgrading) AND NOT LICENSE_ALREADY_ACCEPTED</Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">LICENSE_ALREADY_ACCEPTED</Publish>
+            
             <Publish Dialog="VerifyReadyDlg" Control="Back" Property="ALLOW_CAMERA_CHANGES" Value="{}">ALLOW_CAMERA_CHANGES = "0"</Publish>
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg"><![CDATA[ NOT $(var.Remove_S1) AND $(var.VmsRemoving) AND !ServerFeature <> 3 ]]></Publish>
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="UninstallOptionsDlg">$(var.Remove_S1) OR (!ServerFeature = 3 AND $(var.VmsRemoving))</Publish>            

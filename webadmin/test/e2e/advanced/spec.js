@@ -7,7 +7,6 @@ describe('Advanced Page', function () {
     //it("should stop test",function(){expect("other test").toBe("uncommented");});return;
 
     var p = new Page();
-    var ptor = protractor.getInstance();
 
     it("should allow user to see storages: free space, limit, totalspace, enabled, some indicator",function(){
         p.get();
@@ -15,7 +14,7 @@ describe('Advanced Page', function () {
         var storage = p.storagesRows.first();
         expect(storage.element(by.css(".storage-url")).getText()).toMatch(/[\w\d\:]*(\/[\w\d]*)+/);
         expect(storage.element(by.css(".progress")).getAttribute("title")).toMatch(/Reserved\:\s\d+\.?\d*\s*\wB,\s+Free\:\s\d+\.?\d*\s*\wB,\s+Occupied\:\s\d+\.?\d*\s*\wB,\s+Total:\s\d+\.?\d*\s*\wB/);
-        expect(storage.element(by.css(".glyphicon")).isDisplayed()).toBe(true);
+        expect(storage.element(by.css("[title~=Internal]")).isDisplayed()).toBe(true);
     });
 
 
@@ -40,7 +39,7 @@ describe('Advanced Page', function () {
 
         p.setStorageLimit(5);
         expect(p.saveButton.isEnabled()).toBe(true);
-        expect(p.storageLimitInput.element(by.xpath("..")).getAttribute("class")).toNotMatch("has-error");
+        expect(p.storageLimitInput.element(by.xpath("..")).getAttribute("class")).not.toMatch("has-error");
 
         p.setStorageLimit('bad value');
         expect(p.saveButton.isEnabled()).toBe(false);
@@ -48,7 +47,7 @@ describe('Advanced Page', function () {
 
         p.setStorageLimit(5);
         expect(p.saveButton.isEnabled()).toBe(true);
-        expect(p.storageLimitInput.element(by.xpath("..")).getAttribute("class")).toNotMatch("has-error");
+        expect(p.storageLimitInput.element(by.xpath("..")).getAttribute("class")).not.toMatch("has-error");
 
         p.setStorageLimit(1000000);
         expect(p.saveButton.isEnabled()).toBe(false);
@@ -56,7 +55,7 @@ describe('Advanced Page', function () {
 
         p.setStorageLimit(5);
         expect(p.saveButton.isEnabled()).toBe(true);
-        expect(p.storageLimitInput.element(by.xpath("..")).getAttribute("class")).toNotMatch("has-error");
+        expect(p.storageLimitInput.element(by.xpath("..")).getAttribute("class")).not.toMatch("has-error");
 
     });
 
@@ -71,19 +70,25 @@ describe('Advanced Page', function () {
             expect(p.saveButton.isEnabled()).toBe(true);
             expect(p.storageLimitInput.element(by.xpath("..")).getAttribute("class")).toMatch("has-warning");
             expect(p.reduceArchiveAlert.isDisplayed()).toBe(true);
-            p.saveButton.click().then(function(){
-                var alertDialog = ptor.switchTo().alert();
-                expect(alertDialog.getText()).toContain("Possible partial remove of the video footage is expected");
-                alertDialog.dismiss();
-            });
+
+            // This part of the test will be available, when alert dialogs are removed from the code
+            expect("alert").toBe("removed");
+            // p.saveButton.click().then(function(){
+            //     var alertDialog = ptor.switchTo().alert();
+            //     expect(alertDialog.getText()).toContain("Possible partial remove of the video footage is expected");
+            //     alertDialog.dismiss();
+            // });
         });
     });
+
 
     it("should save settings and display it after reload",function(){
         p.get();
         p.setStorageLimit(1);
 
-        p.saveButton.click().then(function(){
+        // This test will be available, when alert dialogs are removed from the code
+        expect("alert").toBe("removed");
+/*        p.saveButton.click().then(function(){
             var alertDialog = ptor.switchTo().alert();
             expect(alertDialog.getText()).toContain("Settings saved");
             alertDialog.accept();
@@ -103,7 +108,7 @@ describe('Advanced Page', function () {
                 expect(p.storageLimitInput.getAttribute("value")).toBe("5");
             });
 
-        });
+        });*/
     });
 
     it("should forbid disabling all storages",function(){
@@ -151,15 +156,21 @@ describe('Advanced Page', function () {
         expect(p.upgradeButton.isEnabled()).toBe(true);
     });
 
+
     it("should upload some bad file and display an error",function(){
         var path = require('path');
 
         var fileToUpload = './po.js';
         var absolutePath = path.resolve(__dirname, fileToUpload);
-        p.upgradeButton.sendKeys(absolutePath).then(function(){
-            var alertDialog = ptor.switchTo().alert();
-            expect(alertDialog.getText()).toContain("Updating failed");
-            alertDialog.accept();
-        });
+
+        // This test will be available, when alert dialogs are removed from the code
+        expect("alert").toBe("removed");
+        // p.upgradeButton.sendKeys(absolutePath).then(function(){
+
+        //     var alertDialog = browser.switchTo().alert();
+
+        //     expect(alertDialog.getText()).toContain("Updating failed");
+        //     alertDialog.accept();
+        // });
     });
 });

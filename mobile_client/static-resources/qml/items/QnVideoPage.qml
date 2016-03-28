@@ -277,19 +277,19 @@ QnPage {
         Behavior on opacity { NumberAnimation { duration: 500; easing.type: Easing.OutCubic } }
     }
 
-    QnMediaPlayer {
+    QnMediaPlayer
+    {
         id: player
+
         resourceId: videoPage.resourceId
 
-        onPlayingChanged: {
+        onPlayingChanged:
+        {
             if (playing)
                 video.screenshotSource = ""
         }
 
-        Component.onCompleted: {
-            player.maxTextureSize = getMaxTextureSize()
-            player.playLive()
-        }
+        maxTextureSize: getMaxTextureSize()
     }
 
     QnCameraAccessRightsHelper {
@@ -397,5 +397,11 @@ QnPage {
             return
 
         Main.backPressed()
+    }
+
+    onActivePageChanged:
+    {
+        if (activePage)
+            player.playLive()
     }
 }

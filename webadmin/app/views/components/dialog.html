@@ -1,0 +1,23 @@
+
+<div class="modal-header" ng-if="settings.title">
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-click="close()" ng-if="settings.closable"><span aria-hidden="true">&times;</span></button>
+    <h4 class="modal-title">{{settings.title}}</h4>
+</div>
+<div class="modal-body" ng-if="settings.content || settings.needOldPassword">
+    <p ng-if="settings.content" ng-bind-html="settings.content"></p>
+    <div ng-if="settings.needOldPassword">
+        <form class="form" name="oldPasswordForm" novalidate>
+            <label for="oldSystemPassword" class="control-label">Enter current system admin password to confirm action:</label>
+            <input id="oldSystemPassword" type="password" ng-model="settings.oldPassword"
+                   class="form-control" placeholder="Old Password" required />
+        </form>
+    </div>
+</div>
+<ng-include ng-if="settings.template" src="settings.template"></ng-include>
+<div class="modal-footer" ng-if="settings.hasFooter">
+    <button type="button" class="btn btn-default" data-dismiss="modal" ng-if="!settings.cancellable" ng-click="cancel()" >Cancel</button>
+    <button type="button" class="btn" ng-class="settings.buttonClass"
+            ng-disabled="settings.needOldPassword && !settings.oldPassword"
+            ng-if="!settings.cancellable" ng-click="ok()" >{{settings.actionLabel}}</button>
+    <button type="button" class="btn" ng-class="settings.buttonClass" ng-if="settings.cancellable" ng-click="close()" >Close</button>
+</div>

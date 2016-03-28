@@ -25,14 +25,22 @@ public:
 public: // overrides
     SystemDescriptionList systems() const override;
 
+    QnSystemDescriptionPtr getSystem(const QString &id) const override;
+
 private:
     void onCloudStatusChanged(QnCloudStatusWatcher::Status status);
 
     void setCloudSystems(const QnCloudSystemList &systems);
 
     void onCloudError(QnCloudStatusWatcher::ErrorCode error);
+    
+    void updateSystemInternal(const QnSystemDescriptionPtr &system);
 
-    void updateSystem(const QString &systemId);
+    void pingServerInternal(const QString &host
+        , int serverPriority
+        , const QString &systemId);
+
+    void checkOutdatedServersInternal(const QnSystemDescriptionPtr &system);
 
     void updateSystems();
 

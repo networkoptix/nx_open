@@ -1,8 +1,6 @@
 #ifndef __FFMPEG_HELPER_H
 #define __FFMPEG_HELPER_H
 
-#ifdef ENABLE_DATA_PROVIDERS
-
 #include "core/resource/resource_fwd.h"
 
 extern "C"
@@ -93,7 +91,5 @@ private:
         void operator=(const StaticHolder&);
     };
 };
-
-#endif // ENABLE_DATA_PROVIDERS
 
 #endif // __FFMPEG_HELPER_H

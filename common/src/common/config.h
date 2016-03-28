@@ -24,12 +24,6 @@ static const int DEFAULT_RESOURCE_INIT_THREADS_COUNT = 64;
 #   define GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
 #endif
 
-
-/* Use expression-template-based string concatenation in Qt. */
-//#define QT_USE_FAST_CONCATENATION
-//#define QT_USE_FAST_OPERATOR_PLUS
-
-
 /* Don't use deprecated Qt functions. */
 // TODO: This one causes compilation errors in QObject...
 //#define QT_NO_DEPRECATED
@@ -79,15 +73,15 @@ static const int DEFAULT_RESOURCE_INIT_THREADS_COUNT = 64;
 #   define _CRT_NONSTDC_NO_DEPRECATE /* Don't warn for deprecated POSIX functions. */
 #   define _SCL_SECURE_NO_WARNINGS /* Don't warn for 'unsafe' STL functions. */
 #
-#   /* 'Derived' : inherits 'Base::method' via dominance. 
+#   /* 'Derived' : inherits 'Base::method' via dominance.
 #    * It is buggy as described here:
 #    * http://connect.microsoft.com/VisualStudio/feedback/details/101259/disable-warning-c4250-class1-inherits-class2-member-via-dominance-when-weak-member-is-a-pure-virtual-function */
-#   pragma warning(disable: 4250) 
+#   pragma warning(disable: 4250)
 #endif
 
 
 /* Turn some useful MSVC warnings into errors.
- * 
+ *
  * Btw, if you intend to comment out one of the lines below, think twice. My sword is sharp. */
 #ifdef _MSC_VER
 #   pragma warning(error: 4150) /* deletion of pointer to incomplete type 'X'; no destructor called */

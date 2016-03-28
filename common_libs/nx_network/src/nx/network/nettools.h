@@ -54,7 +54,7 @@ void NX_NETWORK_API removeARPrecord(const QHostAddress& ip);
 QString NX_NETWORK_API getMacByIP(const QString& host, bool net = true);
 QString NX_NETWORK_API getMacByIP(const QHostAddress& ip, bool net = true);
 
-QHostAddress NX_NETWORK_API getGatewayOfIf(const QString& netIf);
+//QHostAddress NX_NETWORK_API getGatewayOfIf(const QString& netIf);
 
 // returns all pingable hosts in the range
 QList<QHostAddress> NX_NETWORK_API pingableAddresses(const QHostAddress& startAddr, const QHostAddress& endAddr, int threads);

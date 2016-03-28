@@ -42,3 +42,15 @@ QnAbstractSystemsFinder::SystemDescriptionList QnSystemsFinder::systems() const
         result << finder->systems();
     return result;
 }
+
+QnSystemDescriptionPtr QnSystemsFinder::getSystem(const QString &id) const
+{
+    QnSystemDescriptionPtr result;
+    for (const auto finder : m_finders.keys())
+    {
+        result = finder->getSystem(id);
+        if (result)
+            break;
+    }
+    return result;
+}

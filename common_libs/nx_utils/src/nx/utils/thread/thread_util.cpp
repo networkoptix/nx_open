@@ -4,6 +4,7 @@
 ***********************************************************/
 
 #include "thread_util.h"
+#include <QtCore/QtGlobal>
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -20,7 +21,7 @@ static pid_t gettid(void) { return syscall(__NR_gettid); }
 
 uintptr_t currentThreadSystemId()
 {
-#if __linux__
+#if __linux__ && !defined(Q_OS_ANDROID)
     /* This one is purely for debugging purposes.
     * QThread::currentThreadId is implemented via pthread_self,
     * which is not an identifier you see in GDB. */
@@ -31,5 +32,7 @@ uintptr_t currentThreadSystemId()
     uint64_t tid = 0;
     pthread_threadid_np(NULL, &tid);
     return tid;
+#elif defined(Q_OS_ANDROID)
+    return 0; // This function used in mutex analizer so far. Doesnt inmplemented yet.
 #endif
 }

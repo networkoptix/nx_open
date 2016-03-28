@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('AdvancedCtrl', function ($scope, $modal, $log, mediaserver,$location) {
+    .controller('AdvancedCtrl', function ($scope, $modal, $log, mediaserver,$location, dialogs) {
 
 
         mediaserver.getUser().then(function(user){
@@ -22,7 +22,7 @@ angular.module('webadminApp')
             disabledVendors: {label:'Disabled vendors', type:'text'},
             ec2AliveUpdateIntervalSec: {label:'System alive update interval', type:'number'},
             ec2ConnectionKeepAliveTimeoutSec: {label:'Connection keep alive timeout', type:'number'},
-            ec2KeepAliveProbeCount: {label:"Connection keep probes", type:"number"},
+            ec2KeepAliveProbeCount: {label:'Connection keep alive probes', type:'number'},
             emailFrom: {label:'Email from', type:'text'},
             emailSignature: {label:'Email signature', type:'text'},
             emailSupportEmail: {label:'Support Email', type:'text'},
@@ -93,14 +93,14 @@ angular.module('webadminApp')
                         console.log(r);
 
                         var errorToShow = r.errorString;
-                        alert('Error: ' + errorToShow);
+                        dialogs.alert('Error: ' + errorToShow);
                     }
                     else{
-                        alert('Settings saved');
+                        dialogs.alert('Settings saved');
                     }
                 },function(error){
                     console.log(error);
-                    alert('Error: Couldn\'t save settings');
+                    dialogs.alert('Error: Couldn\'t save settings');
                 });
             }
         };
@@ -169,36 +169,40 @@ angular.module('webadminApp')
                 needConfirm = 'Set reserved space is greater than free space left. Possible partial remove of the video footage is expected. Do you want to continue?';
             }
 
-            if(needConfirm && !confirm(needConfirm)) {
-                return;
-            }
+            function doSave(){
+                mediaserver.getSettings().then(function(settingsReply){
+                    mediaserver.getMediaServer(settingsReply.data.reply.id.replace('{','').replace('}','')).then(function(mediaServerReply){
+                        var info = mediaServerReply.data[0];
+                        // Вот тут проапдейтить флаги в стореджах
 
-            mediaserver.getSettings().then(function(settingsReply){
-                mediaserver.getMediaServer(settingsReply.data.reply.id.replace('{','').replace('}','')).then(function(mediaServerReply){
-                    var info = mediaServerReply.data[0];
-                    // Вот тут проапдейтить флаги в стореджах
+                        _.each($scope.storages,function(storageinfo){
+                            var storageToUpdate = _.findWhere(info.storages, {id: storageinfo.storageId});
+                            if(storageToUpdate) {
+                                storageToUpdate.spaceLimit = storageinfo.reservedSpace;
+                                storageToUpdate.usedForWriting = storageinfo.isUsedForWriting;
+                            }
+                        });
 
-                    _.each($scope.storages,function(storageinfo){
-                        var storageToUpdate = _.findWhere(info.storages, {id: storageinfo.storageId});
-                        if(storageToUpdate) {
-                            storageToUpdate.spaceLimit = storageinfo.reservedSpace;
-                            storageToUpdate.usedForWriting = storageinfo.isUsedForWriting;
-                        }
-                    });
-
-                    mediaserver.saveStorages(info.storages).then(function(r){
-                        if(typeof(r.error)!=='undefined' && r.error!=='0') {
-                            var errorToShow = r.errorString;
-                            alert('Error: ' + errorToShow);
-                        }
-                        else{
-                            alert('Settings saved');
-                        }
-                    },function(){
-                        alert('Error: Couldn\'t save settings');
+                        mediaserver.saveStorages(info.storages).then(function(r){
+                            if(typeof(r.error)!=='undefined' && r.error!=='0') {
+                                var errorToShow = r.errorString;
+                                dialogs.alert('Error: ' + errorToShow);
+                            }
+                            else{
+                                dialogs.alert('Settings saved');
+                            }
+                        },function(){
+                            dialogs.alert('Error: Couldn\'t save settings');
+                        });
                     });
                 });
-            });
+            }
+
+            if(needConfirm){
+                dialogs.confirm(needConfirm).then(doSave);
+            }else{
+                doSave();
+            }
         };
 
         $scope.cancel = function(){
@@ -213,12 +217,12 @@ angular.module('webadminApp')
         });
 
         function errorLogLevel(/*error*/){
-            alert('Error while saving');
+            dialogs.alert('Error while saving');
             window.location.reload();
 
         }
         function successLogLevel(){
-            alert('Settings saved');
+            dialogs.alert('Settings saved');
             window.location.reload();
         }
 

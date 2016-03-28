@@ -34,6 +34,7 @@ public: // overrides
     QHash<int, QByteArray> roleNames() const;
 
     void updateData(const UserPasswordPairList &newData);
+
 signals:
     void systemNameChanged();
 

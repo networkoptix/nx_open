@@ -170,14 +170,22 @@ QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, co
 //             return defaultValue;
 //         }
     case LIGHT_MODE:
-        {
-            QVariant baseValue = base_type::readValueFromSettings(settings, id, defaultValue);
-            if (baseValue.type() == QVariant::Int)  //compatibility mode
-                return qVariantFromValue(static_cast<Qn::LightModeFlags>(baseValue.toInt()));
-            return baseValue;
-        }
+    {
+        QVariant baseValue = base_type::readValueFromSettings(settings, id, defaultValue);
+        if (baseValue.type() == QVariant::Int)  //compatibility mode
+            return qVariantFromValue(static_cast<Qn::LightModeFlags>(baseValue.toInt()));
+        return baseValue;
+    }
     case CLOUD_PASSWORD:
         return xorDecrypt(base_type::readValueFromSettings(settings, id, defaultValue).toString(), xorKey);
+
+    case WORKBENCH_PANES:
+    {
+        static const QVariant emptyMap = QVariant::fromValue(QByteArray("[]"));
+        QByteArray asJson = base_type::readValueFromSettings(settings, id, emptyMap).value<QByteArray>();
+        return QVariant::fromValue(QJson::deserialized<QnPaneSettingsMap>(asJson));
+    }
+
     default:
         return base_type::readValueFromSettings(settings, id, defaultValue);
         break;
@@ -188,7 +196,8 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
     if (qnRuntime->isVideoWallMode() || qnRuntime->isActiveXMode())
         return;
 
-    switch(id) {
+    switch(id)
+    {
     case LAST_USED_CONNECTION:
         settings->beginGroup(QLatin1String("AppServerConnections"));
         settings->beginGroup(QLatin1String("lastUsed"));
@@ -196,7 +205,8 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
         settings->endGroup();
         settings->endGroup();
         break;
-    case CUSTOM_CONNECTIONS: {
+    case CUSTOM_CONNECTIONS:
+    {
         settings->beginWriteArray(QLatin1String("AppServerConnections"));
         settings->remove(QLatin1String("")); /* Clear children. */
         int i = 0;
@@ -216,7 +226,8 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
         writeValueToSettings(settings, LAST_USED_CONNECTION, QVariant::fromValue<QnConnectionData>(lastUsedConnection()));
         break;
     }
-    case AUDIO_VOLUME: {
+    case AUDIO_VOLUME:
+    {
         settings->beginGroup(QLatin1String("audioControl"));
         settings->setValue(QLatin1String("volume"), value);
         settings->endGroup();
@@ -235,6 +246,14 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
     case PTZ_PRESET_IN_USE_WARNING_DISABLED:
     case NO_CLIENT_UPDATE:
         break; /* Not to be saved to settings. */
+
+    case WORKBENCH_PANES:
+    {
+        QByteArray asJson = QJson::serialized(value.value<QnPaneSettingsMap>());
+        base_type::writeValueToSettings(settings, id, asJson);
+        break;
+    }
+
     default:
         base_type::writeValueToSettings(settings, id, value);
         break;

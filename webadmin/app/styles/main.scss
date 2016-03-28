@@ -230,12 +230,6 @@ body {
   color:silver;
 }
 
-/*inplace edit styles*/
-.inplace-edit{
-  display:inline-block;
-  margin-top:-3px;
-}
-
 .read-container{
   padding-top:7px;
   padding-left:13px;
@@ -447,4 +441,9 @@ span.danger{
 
 .master .panel-footer {
   min-height: 55px;
+}
+
+
+.modal-dialog.modal-sm{
+  width:450px;
 }

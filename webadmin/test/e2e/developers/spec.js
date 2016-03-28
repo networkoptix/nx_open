@@ -14,14 +14,19 @@ describe('Developers Page', function () {
         expect(p.apiLink.getAttribute("href")).toMatch("api.xml");
     });
 
-    it("Should show sdk link",function(){
-        expect(p.sdkLink.isDisplayed()).toBe(true);
-        expect(p.sdkLink.getText()).toMatch("SDK");
+    it("Should show sdk video link",function(){
+        expect(p.sdkLinkVideo.isDisplayed()).toBe(true);
+        expect(p.sdkLinkVideo.getText()).toMatch("SDK");
+    });
+
+    it("Should show sdk storage link",function(){
+        expect(p.sdkLinkStorage.isDisplayed()).toBe(true);
+        expect(p.sdkLinkStorage.getText()).toMatch("SDK");
     });
 
     it("Should show require sdk eula to be accepted",function(){
 
-        p.sdkLink.click();
+        p.sdkLinkVideo.click();
         expect(p.sdkDownloadButton.isEnabled()).toBe(false);
         expect(p.acceptEulaCheckbox.isSelected()).toBe(false);
         p.acceptEulaCheckbox.click();

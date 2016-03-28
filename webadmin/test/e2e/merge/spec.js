@@ -6,6 +6,9 @@ describe('Merge Dialog', function () {
 
     var p = new Page();
 
+    expect("tests for merging systems").toBe("written");
+    return;
+
     it("should open merge dialog",function(){
         p.get();
         expect(p.mergeButton.isDisplayed()).toBe(true);
@@ -68,6 +71,7 @@ describe('Merge Dialog', function () {
         expect(p.findSystemButton.isEnabled()).toBe(true);
     });
 
+    // This is not working because all available systems have incompatible versions
     it("should find system first, after that - allow to join system",function(){
         expect(p.findSystemButton.isDisplayed()).toBe(true);
         expect(p.mergeSystemsButton.isDisplayed()).toBe(false);
@@ -77,7 +81,9 @@ describe('Merge Dialog', function () {
         p.urlInput.sendKeys("http://192.168.56.101:9000/");
         p.passwordInput.clear();
         p.passwordInput.sendKeys("123");
-        p.findSystemButton.click();
+
+
+        // p.findSystemButton.click();
 
         //1. All apeared
         expect(p.mergeSystemsButton.isDisplayed()).toBe(true);
@@ -89,12 +95,16 @@ describe('Merge Dialog', function () {
         expect(p.extarnalSystemCheckbox.isSelected()).toBe(false);
 
         //3. select another system
+                // browser.pause();
+
         p.extarnalSystemCheckbox.click();
         expect(p.mergeSystemsButton.isEnabled()).toBe(true);
         expect(p.currentSystemCheckbox.isSelected()).toBe(false);
         expect(p.extarnalSystemCheckbox.isSelected()).toBe(true);
 
         //2. select our system back
+                browser.pause();
+
         p.currentSystemCheckbox.click();
         expect(p.mergeSystemsButton.isEnabled()).toBe(true);
         expect(p.currentSystemCheckbox.isSelected()).toBe(true);
@@ -115,6 +125,8 @@ describe('Merge Dialog', function () {
         expect(p.findSystemButton.isEnabled()).toBe(true);
         expect(p.mergeSystemsButton.isEnabled()).toBe(false);
         expect(p.mergeSystemsButton.isDisplayed()).toBe(true);
+
+        browser.pause();
 
         p.findSystemButton.click();
         //We found another system - flush radiobuttons
