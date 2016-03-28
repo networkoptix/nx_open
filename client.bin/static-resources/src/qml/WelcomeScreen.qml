@@ -42,7 +42,8 @@ Rectangle
         {
             id: grid;
 
-            anchors.centerIn: parent;
+            y: Math.max((thisComponent.height - height) / 2, 232);
+            anchors.horizontalCenter: parent.horizontalCenter;
 
             readonly property int horizontalOffset: 40;
             readonly property int tileWidth: 280;
