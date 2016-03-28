@@ -9,6 +9,7 @@
 
 #include <watchers/cloud_status_watcher.h>
 
+#include <nx/utils/raii_guard.h>
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
 #include <ui/models/systems_model.h>
@@ -66,6 +67,7 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject *parent)
     , m_widget(createMainView(this))
     , m_pageSize(m_widget->size())
     , m_visible(false)
+    , m_hiddenControls(false)
 {
     NX_CRITICAL(m_cloudWatcher, Q_FUNC_INFO, "Cloud watcher does not exist");
     connect(m_cloudWatcher, &QnCloudStatusWatcher::loginChanged
@@ -143,6 +145,20 @@ void QnWorkbenchWelcomeScreen::setPageSize(const QSize &size)
     emit pageSizeChanged();
 }
 
+bool QnWorkbenchWelcomeScreen::hiddenControls() const
+{
+    return m_hiddenControls;
+}
+
+void QnWorkbenchWelcomeScreen::setHiddenControls(bool hidden)
+{
+    if (m_hiddenControls == hidden)
+        return;
+
+    m_hiddenControls = hidden;
+    emit hiddenControlsChanged();
+}
+
 void QnWorkbenchWelcomeScreen::connectToLocalSystem(const QString &serverUrl
     , const QString &userName
     , const QString &password)
@@ -177,6 +193,10 @@ void QnWorkbenchWelcomeScreen::connectToAnotherSystem()
 
 void QnWorkbenchWelcomeScreen::setupFactorySystem(const QString &serverUrl)
 {
+    setHiddenControls(true);
+    const auto controlsGuard = QnRaiiGuard::createDestructable(
+        [this]() { setHiddenControls(false); });
+
     /* We are receiving string with port but without protocol, so we must parse it. */
     QScopedPointer<QnSetupWizardDialog> dialog(new QnSetupWizardDialog(QUrl::fromUserInput(serverUrl), mainWindow()));
     dialog->exec();
