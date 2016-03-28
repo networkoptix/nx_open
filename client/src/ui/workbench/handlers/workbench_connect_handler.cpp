@@ -142,7 +142,7 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject *parent /* = 0*/):
     connect(action(QnActions::ReconnectAction),            &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::at_reconnectAction_triggered);
     connect(action(QnActions::DisconnectAction),           &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::at_disconnectAction_triggered);
 
-    connect(action(QnActions::OpenLoginDialogAction),      &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::showWelcomeScreen);
+    connect(action(QnActions::OpenLoginDialogAction),      &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::showLoginDialog);
     connect(action(QnActions::BeforeExitAction),           &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::at_beforeExitAction_triggered);
 
     context()->instance<QnAppServerNotificationCache>();
@@ -414,12 +414,25 @@ void QnWorkbenchConnectHandler::hideMessageBox() {
 }
 
 
+void QnWorkbenchConnectHandler::showLoginDialog()
+{
+    const auto welcome = context()->instance<QnWorkbenchWelcomeScreen>();
+    welcome->connectToAnotherSystem();
+}
+
 void QnWorkbenchConnectHandler::showWelcomeScreen() {
     if (qnRuntime->isActiveXMode() || qnRuntime->isVideoWallMode())
         return;
 
-    const auto welcome = context()->instance<QnWorkbenchWelcomeScreen>();
-    welcome->setVisible(true);
+    if (context()->user())
+    {
+        showLoginDialog();
+    }
+    else
+    {
+        const auto welcome = context()->instance<QnWorkbenchWelcomeScreen>();
+        welcome->setVisible(true);
+    }
 
     m_connectingHandle = 0;
     hideMessageBox();
