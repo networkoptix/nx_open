@@ -112,6 +112,7 @@ else {
 LIBS += -L$$OUTPUT_PATH/lib -L$$OUTPUT_PATH/lib/$$CONFIGURATION -L$$OUTPUT_PATH/bin/$$CONFIGURATION
 !win*:!mac {
     LIBS += -Wl,-rpath-link,${qt.dir}/lib
+    LIBS += -Wl,-rpath-link,$$OUTPUT_PATH/lib/$$CONFIGURATION
 }
 LIBS += ${global.libs}
 
