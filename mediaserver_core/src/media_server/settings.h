@@ -77,6 +77,10 @@ namespace nx_ms_conf
     /** Semicolon-separated list of servers to get public ip. */
     static const QLatin1String PUBLIC_IP_SERVERS( "publicIPServers" );
 
+    //!If set to \a true, EC DB is opened in read-only mode. So, any data modification operation except license activation will fail
+    static const QLatin1String PROXY_CONNECT_TIMEOUT_MS("proxyConnectTimeoutMs");
+    static const int DEFAULT_PROXY_CONNECT_TIMEOUT_MS = 5000;
+
     static const QLatin1String EC2_TRAN_LOG_LEVEL( "tranLogLevel" );
     static const QLatin1String DEFAULT_EC2_TRAN_LOG_LEVEL( "none" );
 
