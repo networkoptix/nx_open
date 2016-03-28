@@ -37,10 +37,10 @@ describe('Registration suite', function () {
     it("should register user with correct credentials", function () {
         p.getByUrl();
 
-        p.firstNameInput.sendKeys(p.userFirstName);
-        p.lastNameInput.sendKeys(p.userLastName);
-        p.emailInput.sendKeys(p.getRandomEmail());
-        p.passwordInput.sendKeys(p.userPassword);
+        p.firstNameInput.sendKeys(p.helper.userFirstName);
+        p.lastNameInput.sendKeys(p.helper.userLastName);
+        p.emailInput.sendKeys(p.helper.getRandomEmail());
+        p.passwordInput.sendKeys(p.helper.userPassword);
 
         p.submitButton.click();
 
@@ -53,10 +53,10 @@ describe('Registration suite', function () {
     it("should activate registration with a registration code sent to an email", function () {
 
         p.getByUrl();
-        var userEmail = p.getRandomEmail();
-        var userPassword = p.userPassword;
-        p.firstNameInput.sendKeys(p.userFirstName);
-        p.lastNameInput.sendKeys(p.userLastName);
+        var userEmail = p.helper.getRandomEmail();
+        var userPassword = p.helper.userPassword;
+        p.firstNameInput.sendKeys(p.helper.userFirstName);
+        p.lastNameInput.sendKeys(p.helper.userLastName);
         p.emailInput.sendKeys(userEmail);
         p.passwordInput.sendKeys(userPassword);
 
@@ -74,9 +74,9 @@ describe('Registration suite', function () {
             console.log(regCode);
             browser.get('/#/activate/' + regCode);
 
-            p.alert.catchAlert( p.alert.alertMessages.restorePassSuccess, p.alert.alertTypes.success);
+            p.alert.catchAlert( p.alert.alertMessages.registerConfirmSuccess, p.alert.alertTypes.success);
             browser.refresh();
-            p.alert.catchAlert( p.alert.alertMessages.restorePassWrongCode, p.alert.alertTypes.danger);
+            p.alert.catchAlert( p.alert.alertMessages.registerConfirmError, p.alert.alertTypes.danger);
 
             p.helper.login(userEmail, userPassword);
             p.helper.logout();
@@ -86,10 +86,10 @@ describe('Registration suite', function () {
     it("should register user with cyrillic First and Last names and correct credentials", function () {
         p.getByUrl();
 
-        p.firstNameInput.sendKeys(p.userNameCyrillic);
-        p.lastNameInput.sendKeys(p.userNameCyrillic);
-        p.emailInput.sendKeys(p.getRandomEmail());
-        p.passwordInput.sendKeys(p.userPassword);
+        p.firstNameInput.sendKeys(p.helper.userNameCyrillic);
+        p.lastNameInput.sendKeys(p.helper.userNameCyrillic);
+        p.emailInput.sendKeys(p.helper.getRandomEmail());
+        p.passwordInput.sendKeys(p.helper.userPassword);
 
         p.submitButton.click();
 
@@ -102,10 +102,10 @@ describe('Registration suite', function () {
     it("should register user with smile symbols in First and Last name fields and correct credentials", function () {
         p.getByUrl();
 
-        p.firstNameInput.sendKeys(p.userNameSmile);
-        p.lastNameInput.sendKeys(p.userNameSmile);
-        p.emailInput.sendKeys(p.getRandomEmail());
-        p.passwordInput.sendKeys(p.userPassword);
+        p.firstNameInput.sendKeys(p.helper.userNameSmile);
+        p.lastNameInput.sendKeys(p.helper.userNameSmile);
+        p.emailInput.sendKeys(p.helper.getRandomEmail());
+        p.passwordInput.sendKeys(p.helper.userPassword);
 
         p.submitButton.click();
 
@@ -118,10 +118,10 @@ describe('Registration suite', function () {
     it("should register user with hieroglyphic symbols in First and Last name fields and correct credentials", function () {
         p.getByUrl();
 
-        p.firstNameInput.sendKeys(p.userNameHierog);
-        p.lastNameInput.sendKeys(p.userNameHierog);
-        p.emailInput.sendKeys(p.getRandomEmail());
-        p.passwordInput.sendKeys(p.userPassword);
+        p.firstNameInput.sendKeys(p.helper.userNameHierog);
+        p.lastNameInput.sendKeys(p.helper.userNameHierog);
+        p.emailInput.sendKeys(p.helper.getRandomEmail());
+        p.passwordInput.sendKeys(p.helper.userPassword);
 
         p.submitButton.click();
 
@@ -145,9 +145,9 @@ describe('Registration suite', function () {
     it("should not allow to register without email", function () {
         p.getByUrl();
 
-        p.firstNameInput.sendKeys(p.userFirstName);
-        p.lastNameInput.sendKeys(p.userLastName);
-        p.passwordInput.sendKeys(p.userPassword);
+        p.firstNameInput.sendKeys(p.helper.userFirstName);
+        p.lastNameInput.sendKeys(p.helper.userLastName);
+        p.passwordInput.sendKeys(p.helper.userPassword);
 
         p.submitButton.click();
 
@@ -163,10 +163,10 @@ describe('Registration suite', function () {
     it("should not allow to register with email in non-email format", function () {
         p.getByUrl();
 
-        p.firstNameInput.sendKeys(p.userFirstName);
-        p.lastNameInput.sendKeys(p.userLastName);
+        p.firstNameInput.sendKeys(p.helper.userFirstName);
+        p.lastNameInput.sendKeys(p.helper.userLastName);
         p.emailInput.sendKeys('vert546 464w6345');
-        p.passwordInput.sendKeys(p.userPassword);
+        p.passwordInput.sendKeys(p.helper.userPassword);
 
         p.submitButton.click();
 
@@ -192,10 +192,10 @@ describe('Registration suite', function () {
     it("should not allow registration with existing email and show error", function () {
         p.getByUrl();
 
-        p.firstNameInput.sendKeys(p.userFirstName);
-        p.lastNameInput.sendKeys(p.userLastName);
-        p.emailInput.sendKeys(p.userEmailExisting);
-        p.passwordInput.sendKeys(p.userPassword);
+        p.firstNameInput.sendKeys(p.helper.userFirstName);
+        p.lastNameInput.sendKeys(p.helper.userLastName);
+        p.emailInput.sendKeys(p.helper.userEmailExisting);
+        p.passwordInput.sendKeys(p.helper.userPassword);
 
         p.submitButton.click();
 

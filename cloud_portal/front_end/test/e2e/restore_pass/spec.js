@@ -9,8 +9,8 @@ describe('Restore password suite', function () {
     }, p.alert.alertMessages.restorePassWrongEmail, p.alert.alertTypes.danger, true);
 
     it("should restore password with a code sent to an email", function () {
-        var userEmail = p.userEmail1;
-        var userPassword = p.userPassword;
+        var userEmail = p.helper.userEmail1;
+        var userPassword = p.helper.userPassword;
         p.get();
         p.iForgotPasswordLink.click();
         p.restoreEmailInput.sendKeys(userEmail);

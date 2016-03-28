@@ -6,7 +6,7 @@ describe('Systems list suite', function () {
 
     beforeAll(function() {
         p.getHomePage();
-        p.helper.login(p.userEmail, p.userPassword);
+        p.helper.login(p.helper.userEmailExisting, p.helper.userPassword);
     });
 
     afterAll(function() {

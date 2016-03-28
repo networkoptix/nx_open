@@ -32,8 +32,8 @@ exports.config = {
         var notifier = require('mail-notifier');
 
         var imap = {
-            user: "ekorneeva@networkoptix.com",
-            password: "qweasd!@#",
+            user: "noptixqa@gmail.com",
+            password: "qweasd123qwe",
             host: "imap.gmail.com",
             port: 993,
             tls: true,

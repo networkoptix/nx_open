@@ -5,7 +5,7 @@ describe('Account suite', function () {
     var p = new AccountPage();
 
     beforeAll(function() {
-        p.helper.login(p.userEmail, p.userPassword);
+        p.helper.login(p.helper.userEmailExisting, p.helper.userPassword);
     });
 
     afterAll(function() {
@@ -19,7 +19,7 @@ describe('Account suite', function () {
 
     it("should display dropdown in right top corner: Account settings, Change password, Logout", function () {
         p.get(p.homePageUrl);
-        expect(p.userAccountDropdownToggle.getText()).toContain(p.userEmail);
+        expect(p.userAccountDropdownToggle.getText()).toContain(p.helper.userEmailExisting);
 
         p.userAccountDropdownToggle.click();
         expect(p.userAccountDropdownMenu.getText()).toContain('Account Settings');
@@ -30,13 +30,13 @@ describe('Account suite', function () {
     it("should allow to log out", function () {
         p.get(p.homePageUrl);
         p.helper.logout();
-        p.helper.login(p.userEmail, p.userPassword);
+        p.helper.login(p.helper.userEmailExisting, p.helper.userPassword);
     });
 
     it("should show email, first name, last name, subscribe", function () {
         p.get(p.accountUrl);
 
-        expect(p.emailField.getAttribute('value')).toContain(p.userEmail);
+        expect(p.emailField.getAttribute('value')).toContain(p.helper.userEmailExisting);
         expect(p.firstNameInput.isDisplayed()).toBe(true);
         expect(p.lastNameInput.isDisplayed()).toBe(true);
         expect(p.subscribeCheckbox.isDisplayed()).toBe(true);
@@ -46,9 +46,9 @@ describe('Account suite', function () {
         p.get(p.accountUrl);
 
         p.firstNameInput.clear();
-        p.firstNameInput.sendKeys(p.userFirstName);
+        p.firstNameInput.sendKeys(p.helper.userFirstName);
         p.lastNameInput.clear();
-        p.lastNameInput.sendKeys(p.userLastName);
+        p.lastNameInput.sendKeys(p.helper.userLastName);
 
         p.saveButton.click();
 
@@ -56,17 +56,17 @@ describe('Account suite', function () {
 
         p.refresh();
 
-        expect(p.firstNameInput.getAttribute('value')).toMatch(p.userFirstName);
-        expect(p.lastNameInput.getAttribute('value')).toMatch(p.userLastName);
+        expect(p.firstNameInput.getAttribute('value')).toMatch(p.helper.userFirstName);
+        expect(p.lastNameInput.getAttribute('value')).toMatch(p.helper.userLastName);
     });
 
     it("should allow cyrillic First and Last names, and save it", function () {
         p.get(p.accountUrl);
 
         p.firstNameInput.clear();
-        p.firstNameInput.sendKeys(p.userNameCyrillic);
+        p.firstNameInput.sendKeys(p.helper.userNameCyrillic);
         p.lastNameInput.clear();
-        p.lastNameInput.sendKeys(p.userNameCyrillic);
+        p.lastNameInput.sendKeys(p.helper.userNameCyrillic);
 
         p.saveButton.click();
 
@@ -74,17 +74,17 @@ describe('Account suite', function () {
 
         p.refresh();
 
-        expect(p.firstNameInput.getAttribute('value')).toMatch(p.userNameCyrillic);
-        expect(p.lastNameInput.getAttribute('value')).toMatch(p.userNameCyrillic);
+        expect(p.firstNameInput.getAttribute('value')).toMatch(p.helper.userNameCyrillic);
+        expect(p.lastNameInput.getAttribute('value')).toMatch(p.helper.userNameCyrillic);
     });
 
     it("should allow smile symbols in First and Last name fields, and save it", function () {
         p.get(p.accountUrl);
 
         p.firstNameInput.clear();
-        p.firstNameInput.sendKeys(p.userNameSmile);
+        p.firstNameInput.sendKeys(p.helper.userNameSmile);
         p.lastNameInput.clear();
-        p.lastNameInput.sendKeys(p.userNameSmile);
+        p.lastNameInput.sendKeys(p.helper.userNameSmile);
 
         p.saveButton.click();
 
@@ -92,17 +92,17 @@ describe('Account suite', function () {
 
         p.refresh();
 
-        expect(p.firstNameInput.getAttribute('value')).toMatch(p.userNameSmile);
-        expect(p.lastNameInput.getAttribute('value')).toMatch(p.userNameSmile);
+        expect(p.firstNameInput.getAttribute('value')).toMatch(p.helper.userNameSmile);
+        expect(p.lastNameInput.getAttribute('value')).toMatch(p.helper.userNameSmile);
     });
 
     it("should allow hieroglyphic symbols in First and Last name fields, and save it", function () {
         p.get(p.accountUrl);
 
         p.firstNameInput.clear();
-        p.firstNameInput.sendKeys(p.userNameHierog);
+        p.firstNameInput.sendKeys(p.helper.userNameHierog);
         p.lastNameInput.clear();
-        p.lastNameInput.sendKeys(p.userNameHierog);
+        p.lastNameInput.sendKeys(p.helper.userNameHierog);
 
         p.saveButton.click();
 
@@ -110,8 +110,8 @@ describe('Account suite', function () {
 
         p.refresh();
 
-        expect(p.firstNameInput.getAttribute('value')).toMatch(p.userNameHierog);
-        expect(p.lastNameInput.getAttribute('value')).toMatch(p.userNameHierog);
+        expect(p.firstNameInput.getAttribute('value')).toMatch(p.helper.userNameHierog);
+        expect(p.lastNameInput.getAttribute('value')).toMatch(p.helper.userNameHierog);
     });
 
     it("should open change password page", function () {
@@ -130,16 +130,16 @@ describe('Account suite', function () {
     it("should allow to change password (and change it back)", function () {
         p.get(p.passwordUrl);
 
-        p.currentPasswordInput.sendKeys(p.userPassword);
-        p.passwordInput.sendKeys(p.userPasswordNew);
+        p.currentPasswordInput.sendKeys(p.helper.userPassword);
+        p.passwordInput.sendKeys(p.helper.userPasswordNew);
         p.submitButton.click();
 
 p.alert.catchAlert( p.alert.alertMessages.changePassSuccess, p.alert.alertTypes.success);
 
         browser.refresh();
 
-        p.currentPasswordInput.sendKeys(p.userPasswordNew);
-        p.passwordInput.sendKeys(p.userPassword);
+        p.currentPasswordInput.sendKeys(p.helper.userPasswordNew);
+        p.passwordInput.sendKeys(p.helper.userPassword);
         p.submitButton.click();
 
 p.alert.catchAlert( p.alert.alertMessages.changePassSuccess, p.alert.alertTypes.success);
@@ -147,17 +147,17 @@ p.alert.catchAlert( p.alert.alertMessages.changePassSuccess, p.alert.alertTypes.
 
     it("should save new password correctly (and change it back)", function () {
         p.get(p.passwordUrl);
-        p.currentPasswordInput.sendKeys(p.userPassword);
-        p.passwordInput.sendKeys(p.userPasswordNew);
+        p.currentPasswordInput.sendKeys(p.helper.userPassword);
+        p.passwordInput.sendKeys(p.helper.userPasswordNew);
         p.submitButton.click();
 p.alert.catchAlert( p.alert.alertMessages.changePassSuccess, p.alert.alertTypes.success);
 
         p.helper.logout();
-        p.helper.login(p.userEmail, p.userPasswordNew);
+        p.helper.login(p.helper.userEmailExisting, p.helper.userPasswordNew);
 
         p.get(p.passwordUrl);
-        p.currentPasswordInput.sendKeys(p.userPasswordNew);
-        p.passwordInput.sendKeys(p.userPassword);
+        p.currentPasswordInput.sendKeys(p.helper.userPasswordNew);
+        p.passwordInput.sendKeys(p.helper.userPassword);
         p.submitButton.click();
 p.alert.catchAlert( p.alert.alertMessages.changePassSuccess, p.alert.alertTypes.success);
     });
@@ -165,8 +165,8 @@ p.alert.catchAlert( p.alert.alertMessages.changePassSuccess, p.alert.alertTypes.
 
     p.alert.checkAlert(function(){
         p.get(p.passwordUrl);
-        p.currentPasswordInput.sendKeys(p.userPasswordWrong);
-        p.passwordInput.sendKeys(p.userPasswordNew);
+        p.currentPasswordInput.sendKeys(p.helper.userPasswordWrong);
+        p.passwordInput.sendKeys(p.helper.userPasswordNew);
 
         p.alert.submitButton.click();
     }, p.alert.alertMessages.changePassWrongCurrent, p.alert.alertTypes.danger, true);
@@ -174,22 +174,22 @@ p.alert.catchAlert( p.alert.alertMessages.changePassSuccess, p.alert.alertTypes.
     p.alert.checkAlert(function(){
         p.get(p.passwordUrl);
 
-        p.currentPasswordInput.sendKeys(p.userPassword);
-        p.passwordInput.sendKeys(p.userPasswordNew);
+        p.currentPasswordInput.sendKeys(p.helper.userPassword);
+        p.passwordInput.sendKeys(p.helper.userPasswordNew);
         p.alert.submitButton.click();
 
         p.currentPasswordInput.clear();
-        p.currentPasswordInput.sendKeys(p.userPasswordNew);
+        p.currentPasswordInput.sendKeys(p.helper.userPasswordNew);
         p.passwordInput.clear();
-        p.passwordInput.sendKeys(p.userPassword);
+        p.passwordInput.sendKeys(p.helper.userPassword);
         p.alert.submitButton.click();
     }, p.alert.alertMessages.changePassSuccess, p.alert.alertTypes.success, true);
 
     it("should not allow to change password if old password is wrong", function () {
         p.get(p.passwordUrl);
 
-        p.currentPasswordInput.sendKeys(p.userPasswordWrong);
-        p.passwordInput.sendKeys(p.userPassword);
+        p.currentPasswordInput.sendKeys(p.helper.userPasswordWrong);
+        p.passwordInput.sendKeys(p.helper.userPassword);
         p.submitButton.click();
 
         p.alert.catchAlert( p.alert.alertMessages.changePassWrongCurrent, p.alert.alertTypes.danger);

@@ -2,6 +2,33 @@
 
 var Helper = function () {
 
+    this.baseEmail = 'noptixqa@gmail.com';
+
+    // Get valid email with random number between 100 and 1000
+    this.getRandomEmail = function() {
+        var randomNumber = Math.floor((Math.random() * 10000)+1000); // Random number between 1000 and 10000
+        return 'noptixqa+' + randomNumber + '@gmail.com';
+    };
+    this.userEmailExisting = 'noptixqa+1@gmail.com'; // valid existing email
+    this.userEmail1 = 'noptixqa+1@gmail.com';
+    this.userEmail2 = 'noptixqa+2@gmail.com';
+    this.userEmailWrong = 'nonexistingperson@gmail.com';
+
+    this.userFirstName = 'TestFirstName';
+    this.userLastName = 'TestLastName';
+    this.userPassword = 'qweasd123';
+    this.userPasswordNew = 'qweasd123qwe';
+    this.userPasswordWrong = 'qweqwe123';
+
+    this.userNameCyrillic = 'Кенгшщзх';
+    this.userNameSmile = '☠☿☂⊗⅓∠∩λ℘웃♞⊀☻★';
+    this.userNameHierog = '您都可以享受源源不絕的好禮及優惠';
+
+    this.userPasswordCyrillic = 'йцуфывячс';
+    this.userPasswordSmile = '☠☿☂⊗⅓∠∩λ℘웃♞⊀☻★';
+    this.userPasswordHierog = '您都可以享受源源不絕的好禮及優惠';
+    this.userPasswordWrong = 'qweqwe123';
+
     this.login = function(email, password) {
 
         var loginButton = element(by.linkText('Login'));

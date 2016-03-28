@@ -30,24 +30,6 @@ var RegisterPage = function () {
         browser.waitForAngular();
     };
 
-    // Get valid email with random number between 100 and 1000
-    this.getRandomEmail = function() {
-        var randomNumber = Math.floor((Math.random() * 10000)+1000); // Random number between 1000 and 10000
-        return 'ekorneeva+' + randomNumber + '@networkoptix.com';
-    };
-    this.userEmailExisting = 'ekorneeva+1@networkoptix.com'; // valid existing email
-    this.userFirstName = 'TestFirstName';
-    this.userLastName = 'TestLastName';
-    this.userPassword = 'qweasd123';
-
-    this.userNameCyrillic = 'Кенгшщзх';
-    this.userNameSmile = '☠☿☂⊗⅓∠∩λ℘웃♞⊀☻★';
-    this.userNameHierog = '您都可以享受源源不絕的好禮及優惠';
-
-    this.userPasswordCyrillic = 'йцуфывячс';
-    this.userPasswordSmile = '☠☿☂⊗⅓∠∩λ℘웃♞⊀☻★';
-    this.userPasswordHierog = '您都可以享受源源不絕的好禮及優惠';
-
     this.openRegisterButton = element(by.linkText('Register'));
     this.openRegisterButtonAdv = element(by.linkText('Register immediately!')); // Register button on home page
 
@@ -98,16 +80,16 @@ var RegisterPage = function () {
 
 
     this.prepareToPasswordCheck = function () {
-        this.firstNameInput.sendKeys(this.userFirstName);
-        this.lastNameInput.sendKeys(this.userLastName);
-        this.emailInput.sendKeys(this.getRandomEmail());
+        this.firstNameInput.sendKeys(this.helper.userFirstName);
+        this.lastNameInput.sendKeys(this.helper.userLastName);
+        this.emailInput.sendKeys(this.helper.getRandomEmail());
     };
 
     this.prepareToAlertCheck = function () {
-        this.firstNameInput.sendKeys(this.userFirstName);
-        this.lastNameInput.sendKeys(this.userLastName);
-        this.emailInput.sendKeys(this.getRandomEmail());
-        this.passwordInput.sendKeys(this.userPassword);
+        this.firstNameInput.sendKeys(this.helper.userFirstName);
+        this.lastNameInput.sendKeys(this.helper.userLastName);
+        this.emailInput.sendKeys(this.helper.getRandomEmail());
+        this.passwordInput.sendKeys(this.helper.userPassword);
     };
 
     this.termsConditions = element(by.linkText('Terms and Conditions'));

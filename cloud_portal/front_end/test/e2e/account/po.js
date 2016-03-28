@@ -25,22 +25,9 @@ var AccountPage = function () {
         browser.waitForAngular();
     };
 
-    this.userEmail = 'ekorneeva+1@networkoptix.com';
-    this.userPassword = 'qweasd123';
-    this.userPasswordNew = 'qweasd123qwe';
-    this.userPasswordWrong = 'qweqwe123';
-
-    this.userFirstName = 'TestFirstName';
-    this.userLastName = 'TestLastName';
-
-    this.userNameCyrillic = 'Кенгшщзх';
-    this.userNameSmile = '☠☿☂⊗⅓∠∩λ℘웃♞⊀☻★';
-    this.userNameHierog = '您都可以享受源源不絕的好禮及優惠';
-
     this.navbar = element(by.css('header')).element(by.css('.navbar'));
     this.userAccountDropdownToggle = this.navbar.element(by.css('a[uib-dropdown-toggle]'));
     this.userAccountDropdownMenu = this.navbar.element(by.css('[uib-dropdown-menu]'));
-    this.logoutLink = this.userAccountDropdownMenu.element(by.linkText('Logout'));
     this.changePasswordLink = this.userAccountDropdownMenu.element(by.linkText('Change Password'));
 
     this.emailField = element(by.model('account.email'));
@@ -50,9 +37,6 @@ var AccountPage = function () {
 
     this.saveButton = element(by.css('[form=accountForm]')).element(by.buttonText('Save'));
 
-    this.saveSuccessAlert = element(by.css('process-alert[process=save]')).element(by.css('.alert')); // alert with success message
-    this.passwordChangeAlert = element(by.css('process-alert[process=changePassword]')).element(by.css('.alert')); // alert with success message
-
     this.htmlBody = element(by.css('body'));
 
     this.currentPasswordInput = element(by.model('pass.password'));
@@ -61,7 +45,7 @@ var AccountPage = function () {
 
     this.prepareToPasswordCheck = function () {
         this.currentPasswordInput.sendKeys(this.userPassword);
-    }
+    };
 
     this.passwordGroup = element(by.css('password-input'));
     this.passwordControlContainer = this.passwordGroup.element(by.css('.help-block'));

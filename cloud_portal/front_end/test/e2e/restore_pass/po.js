@@ -19,12 +19,6 @@ RestorePasswordPage = function () {
         this.loginButton.click();
     };
 
-    this.userEmail1 = 'ekorneeva+1@networkoptix.com';
-    this.userEmail2 = 'ekorneeva+2@networkoptix.com';
-    this.userEmailWrong = 'nonexistingperson@networkoptix.com';
-    this.userPassword = 'qweasd123';
-    this.userPasswordWrong = 'qweqwe123';
-
      this.checkEmailMissing = function () {
         expect(this.emailInput.getAttribute('class')).toContain('ng-invalid-required');
         expect(this.emailInputWrap.getAttribute('class')).toContain('has-error');

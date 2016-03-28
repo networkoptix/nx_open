@@ -6,8 +6,8 @@ describe('Login suite', function () {
 
     p.alert.checkAlert(function(){
         p.get();
-        p.emailInput.sendKeys(p.userEmailWrong);
-        p.passwordInput.sendKeys(p.userPassword);
+        p.emailInput.sendKeys(p.helper.userEmailWrong);
+        p.passwordInput.sendKeys(p.helper.userPassword);
         p.alert.submitButton.click();
     }, p.alert.alertMessages.loginIncorrect, p.alert.alertTypes.danger, true);
 
@@ -29,8 +29,8 @@ describe('Login suite', function () {
 
         browser.ignoreSynchronization = false;
         p.get();
-        p.emailInput.sendKeys(p.userEmail1);
-        p.passwordInput.sendKeys(p.userPassword);
+        p.emailInput.sendKeys(p.helper.userEmail1);
+        p.passwordInput.sendKeys(p.helper.userPassword);
         p.login();
         p.logout();
     });
@@ -38,8 +38,8 @@ describe('Login suite', function () {
     it("should go to Systems after login; then log out", function () {
         p.get();
 
-        p.emailInput.sendKeys(p.userEmail1);
-        p.passwordInput.sendKeys(p.userPassword);
+        p.emailInput.sendKeys(p.helper.userEmail1);
+        p.passwordInput.sendKeys(p.helper.userPassword);
         p.login();
 
         // Check that element that user is on page Systems
@@ -52,10 +52,10 @@ describe('Login suite', function () {
     it("should show user's email and menu in top right corner; then log out", function () {
         p.get();
 
-        var email = p.userEmail1;
+        var email = p.helper.userEmail1;
 
         p.emailInput.sendKeys(email);
-        p.passwordInput.sendKeys(p.userPassword);
+        p.passwordInput.sendKeys(p.helper.userPassword);
         p.login();
 
         expect(p.userAccountDropdownToggle.getText()).toContain(email);
@@ -72,8 +72,8 @@ describe('Login suite', function () {
     it("should not log in with wrong email", function () {
         p.get();
 
-        p.emailInput.sendKeys(p.userEmailWrong);
-        p.passwordInput.sendKeys(p.userPassword);
+        p.emailInput.sendKeys(p.helper.userEmailWrong);
+        p.passwordInput.sendKeys(p.helper.userPassword);
         p.dialogLoginButton.click();
 
         p.alert.catchAlert(p.alert.alertMessages.loginIncorrect, p.alert.alertTypes.danger);
@@ -84,8 +84,8 @@ describe('Login suite', function () {
     it("should not allow to log in with existing email in uppercase", function () {
         p.get();
 
-        p.emailInput.sendKeys(p.userEmail1.toUpperCase());
-        p.passwordInput.sendKeys(p.userPassword);
+        p.emailInput.sendKeys(p.helper.userEmail1.toUpperCase());
+        p.passwordInput.sendKeys(p.helper.userPassword);
         p.dialogLoginButton.click();
 
         p.alert.catchAlert(p.alert.alertMessages.loginIncorrect, p.alert.alertTypes.danger);
@@ -95,8 +95,8 @@ describe('Login suite', function () {
     it("should not log in with wrong password", function () {
         p.get();
 
-        p.emailInput.sendKeys(p.userEmail1);
-        p.passwordInput.sendKeys(p.userPasswordWrong);
+        p.emailInput.sendKeys(p.helper.userEmail1);
+        p.passwordInput.sendKeys(p.helper.userPasswordWrong);
         p.dialogLoginButton.click();
 
         p.alert.catchAlert(p.alert.alertMessages.loginIncorrect, p.alert.alertTypes.danger);
@@ -107,7 +107,7 @@ describe('Login suite', function () {
     it("should not log in without password", function () {
         p.get();
 
-        p.emailInput.sendKeys(p.userEmail1);
+        p.emailInput.sendKeys(p.helper.userEmail1);
         p.dialogLoginButton.click();
 
         p.checkPasswordMissing();
@@ -121,7 +121,7 @@ describe('Login suite', function () {
     it("should not log in without email but with password", function () {
         p.get();
 
-        p.passwordInput.sendKeys(p.userPassword);
+        p.passwordInput.sendKeys(p.helper.userPassword);
         p.dialogLoginButton.click();
 
         p.checkEmailMissing();
@@ -150,7 +150,7 @@ describe('Login suite', function () {
         p.get();
 
         p.emailInput.sendKeys('vert546 464w6345');
-        p.passwordInput.sendKeys(p.userPassword);
+        p.passwordInput.sendKeys(p.helper.userPassword);
         p.dialogLoginButton.click();
 
         p.checkEmailInvalid();
@@ -183,8 +183,8 @@ describe('Login suite', function () {
     it("should log in with Remember Me checkmark switched off", function () {
         p.get();
 
-        p.emailInput.sendKeys(p.userEmail2);
-        p.passwordInput.sendKeys(p.userPassword);
+        p.emailInput.sendKeys(p.helper.userEmail2);
+        p.passwordInput.sendKeys(p.helper.userPassword);
 
         p.rememberCheckbox.click(); // Switch off Remember me functionality
         expect(p.rememberCheckbox.isSelected()).toBe(false); // verify that it is really switched off
@@ -198,9 +198,9 @@ describe('Login suite', function () {
     it("should test I forgot password link", function () {
         p.get();
 
-        var currentEmail = p.userEmail1;
+        var currentEmail = p.helper.userEmail1;
         p.emailInput.sendKeys(currentEmail);
-        p.passwordInput.sendKeys(p.userPasswordWrong);
+        p.passwordInput.sendKeys(p.helper.userPasswordWrong);
         p.dialogLoginButton.click();
         p.alert.catchAlert(p.alert.alertMessages.loginIncorrect, p.alert.alertTypes.danger);
 
@@ -215,7 +215,7 @@ describe('Login suite', function () {
     it("should test I forgot password link without attempt to log in first", function () {
         p.get();
 
-        var currentEmail = p.userEmail2; // keep it different from previous case "should test I forgot password link" !!!
+        var currentEmail = p.helper.userEmail2; // keep it different from previous case "should test I forgot password link" !!!
         p.emailInput.sendKeys(currentEmail);
 
         p.iForgotPasswordLink.click();
@@ -227,8 +227,8 @@ describe('Login suite', function () {
     });
 
     it("should restore password with a code sent to an email", function () {
-        var userEmail = p.userEmail1;
-        var userPassword = p.userPassword;
+        var userEmail = p.helper.userEmail1;
+        var userPassword = p.helper.userPassword;
         p.get();
         p.iForgotPasswordLink.click();
         p.restoreEmailInput.sendKeys(userEmail);

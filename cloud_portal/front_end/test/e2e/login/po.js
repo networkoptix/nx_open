@@ -16,12 +16,6 @@ LoginPage = function () {
         this.loginButton.click();
     };
 
-    this.userEmail1 = 'ekorneeva+1@networkoptix.com';
-    this.userEmail2 = 'ekorneeva+2@networkoptix.com';
-    this.userEmailWrong = 'nonexistingperson@networkoptix.com';
-    this.userPassword = 'qweasd123';
-    this.userPasswordWrong = 'qweqwe123';
-
     this.loginButton = element(by.linkText('Login'));
 
     this.loginDialog = element(by.css('.modal-dialog'));
