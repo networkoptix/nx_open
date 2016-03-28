@@ -19,6 +19,8 @@
 #include <core/resource/resource_factory.h>
 #include <core/resource/resource_processor.h>
 
+#include <utils/common/connective.h>
+
 class QnAbstractResourceSearcher;
 class QnAbstractDTSSearcher;
 
@@ -65,12 +67,13 @@ class CameraDriverRestrictionList;
 // it puts result into resource pool
 class QnResourceDiscoveryManager
 :
-    public QnLongRunnable,
+    public Connective<QnLongRunnable>,
     public QnResourceFactory,
     public Singleton<QnResourceDiscoveryManager>
 {
     Q_OBJECT
 
+    typedef Connective<QnLongRunnable> base_type;
 public:
     enum State
     {
