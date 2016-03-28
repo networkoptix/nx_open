@@ -779,7 +779,7 @@ void UdtStreamSocket::connectAsync(
         addr,
         [this, handler = std::move(handler)](SystemError::ErrorCode errorCode) mutable
         {
-            if (errorCode != SystemError::wouldBlock)
+            if (errorCode != SystemError::noError && errorCode != SystemError::wouldBlock)
                 m_impl->m_state = detail::UdtSocketImpl::SocketState::open;
             handler(errorCode);
         });
