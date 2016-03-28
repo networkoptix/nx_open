@@ -3,20 +3,21 @@
 var Helper = function () {
 
     this.baseEmail = 'noptixqa@gmail.com';
+    this.basePassword = 'qweasd123';
 
     // Get valid email with random number between 100 and 1000
     this.getRandomEmail = function() {
         var randomNumber = Math.floor((Math.random() * 10000)+1000); // Random number between 1000 and 10000
         return 'noptixqa+' + randomNumber + '@gmail.com';
     };
-    this.userEmailExisting = 'noptixqa+1@gmail.com'; // valid existing email
-    this.userEmail1 = 'noptixqa+1@gmail.com';
+    this.userEmail = 'noptixqa+1@gmail.com'; // valid existing email
     this.userEmail2 = 'noptixqa+2@gmail.com';
     this.userEmailWrong = 'nonexistingperson@gmail.com';
 
     this.userFirstName = 'TestFirstName';
     this.userLastName = 'TestLastName';
-    this.userPassword = 'qweasd123';
+
+    this.userPassword = this.basePassword;
     this.userPasswordNew = 'qweasd123qwe';
     this.userPasswordWrong = 'qweqwe123';
 
@@ -29,6 +30,14 @@ var Helper = function () {
     this.userPasswordHierog = '您都可以享受源源不絕的好禮及優惠';
     this.userPasswordWrong = 'qweqwe123';
 
+    this.swapPasswords = function() {
+        var temp = this.userPassword;
+        this.userPassword = this.userPasswordNew;
+        this.userPasswordNew = temp;
+    };
+
+    this.loginSuccessElement = element.all(by.css('.auth-visible')).first(); // some element on page, that is only visible when user is authenticated
+
     this.login = function(email, password) {
 
         var loginButton = element(by.linkText('Login'));
@@ -36,11 +45,10 @@ var Helper = function () {
         var emailInput = loginDialog.element(by.model('auth.email'));
         var passwordInput = loginDialog.element(by.model('auth.password'));
         var dialogLoginButton = loginDialog.element(by.buttonText('Login'));
-        var loginSuccessElement = element.all(by.css('.auth-visible')).first(); // some element on page, that is only visible when user is authenticated
-
 
         browser.get('/');
         browser.waitForAngular();
+        browser.sleep(500);
 
         loginButton.click();
 
@@ -51,7 +59,7 @@ var Helper = function () {
         browser.sleep(2000); // such a shame, but I can't solve it right now
 
         // Check that element that is visible only for authorized user is displayed on page
-        expect(loginSuccessElement.isDisplayed()).toBe(true);
+        expect(this.loginSuccessElement.isDisplayed()).toBe(true);
     };
 
     this.logout = function() {
@@ -59,7 +67,6 @@ var Helper = function () {
         var userAccountDropdownToggle = navbar.element(by.css('a[uib-dropdown-toggle]'));
         var userAccountDropdownMenu = navbar.element(by.css('[uib-dropdown-menu]'));
         var logoutLink = userAccountDropdownMenu.element(by.linkText('Logout'));
-        var loginSuccessElement = element.all(by.css('.auth-visible')).first(); // some element on page, that is only visible when user is authenticated
 
         expect(userAccountDropdownToggle.isDisplayed()).toBe(true);
 
@@ -68,7 +75,7 @@ var Helper = function () {
         browser.sleep(500); // such a shame, but I can't solve it right now
 
         // Check that element that is visible only for authorized user is NOT displayed on page
-        expect(loginSuccessElement.isDisplayed()).toBe(false);
+        expect(this.loginSuccessElement.isDisplayed()).toBe(false);
     };
 
     this.getEmailTo = function(emailAddress) {
