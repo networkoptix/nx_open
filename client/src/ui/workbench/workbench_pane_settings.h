@@ -15,6 +15,7 @@ struct QnPaneSettings
     QnPaneSettings() : state(Qn::PaneState::Opened), span(0.0) {}
 };
 
+#define QnPaneSettings_Fields (state)(span)
 QN_FUSION_DECLARE_FUNCTIONS(QnPaneSettings, (json)(metatype)(eq));
 
 /**

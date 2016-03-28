@@ -181,8 +181,7 @@ QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, co
 
     case WORKBENCH_PANES:
     {
-        static const QVariant emptyMap = QVariant::fromValue(QByteArray("[]"));
-        QByteArray asJson = base_type::readValueFromSettings(settings, id, emptyMap).value<QByteArray>();
+        QByteArray asJson = base_type::readValueFromSettings(settings, id, QVariant()).value<QByteArray>();
         return QVariant::fromValue(QJson::deserialized<QnPaneSettingsMap>(asJson));
     }
 
