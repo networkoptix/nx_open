@@ -9,6 +9,7 @@
 
 #include <watchers/cloud_status_watcher.h>
 
+#include <utils/common/delayed.h>
 #include <nx/utils/raii_guard.h>
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
@@ -62,12 +63,12 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject *parent)
     : base_type(parent)
     , QnWorkbenchContextAware(parent)
 
+    , m_hiddenControls(false)
     , m_cloudWatcher(qnCommon->instance<QnCloudStatusWatcher>())
     , m_palette(extractPalette())
     , m_widget(createMainView(this))
     , m_pageSize(m_widget->size())
     , m_visible(false)
-    , m_hiddenControls(false)
 {
     NX_CRITICAL(m_cloudWatcher, Q_FUNC_INFO, "Cloud watcher does not exist");
     connect(m_cloudWatcher, &QnCloudStatusWatcher::loginChanged
@@ -197,9 +198,17 @@ void QnWorkbenchWelcomeScreen::setupFactorySystem(const QString &serverUrl)
     const auto controlsGuard = QnRaiiGuard::createDestructable(
         [this]() { setHiddenControls(false); });
 
-    /* We are receiving string with port but without protocol, so we must parse it. */
-    QScopedPointer<QnSetupWizardDialog> dialog(new QnSetupWizardDialog(QUrl::fromUserInput(serverUrl), mainWindow()));
-    dialog->exec();
+    const auto showDialogHandler = [this, serverUrl, controlsGuard]()
+    {
+        /* We are receiving string with port but without protocol, so we must parse it. */
+        const QScopedPointer<QnSetupWizardDialog> dialog(
+            new QnSetupWizardDialog(QUrl::fromUserInput(serverUrl), mainWindow()));
+        dialog->exec();
+    };
+
+    enum { kNextEventDelay = 100 };
+    executeDelayedParented(showDialogHandler
+        , kNextEventDelay, this);
 }
 
 void QnWorkbenchWelcomeScreen::logoutFromCloud()

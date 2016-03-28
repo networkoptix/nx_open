@@ -4,20 +4,21 @@ import NetworkOptix.Qml 1.0;
 
 import "."
 
-Item
+Rectangle
 {
     id: thisComponent;
 
     width: context.pageSize.width;
     height: context.pageSize.height;
 
-    Rectangle
+    color: Style.colors.window;
+
+    Item
     {
-        id :screenHolder;
+        id: screenHolder;
 
         anchors.fill: parent;
-        visible: context.hiddenControls;
-        color: Style.colors.window;
+        visible: !context.hiddenControls;
 
         CloudPanel
         {
@@ -183,7 +184,8 @@ Item
 
         NxButton
         {
-            y: (parent.height + height) / 2 + 168 ; // 168 is a magic const by design
+            anchors.bottom: parent.bottom;
+            anchors.bottomMargin: 64;   // Magic const by design
             anchors.horizontalCenter: parent.horizontalCenter;
 
             text: qsTr("Connect to another system");
