@@ -249,7 +249,7 @@ namespace nx_http
 
     class NX_NETWORK_API Method
     {
-	public:
+    public:
         typedef StringType ValueType;
 
         static const StringType GET;
@@ -386,6 +386,11 @@ namespace nx_http
     //!Contains http header structures
     namespace header
     {
+        /** common header name constants */
+        extern NX_NETWORK_API const StringType kContentType;
+        extern NX_NETWORK_API const StringType kUserAgent;
+
+
         //!Parses string "name1=val1; name2=val2; ...". ; separator can be specified
         void NX_NETWORK_API parseDigestAuthParams(
             const ConstBufferRefType& authenticateParamsStr,

@@ -32,6 +32,6 @@ rm -rf $BUILD_TARGET
 set -e
 
 make install --makefile=Makefile.${build.configuration} INSTALL_ROOT=$BUILD_TARGET
-${libdir}/bin/androiddeployqt $BUILD_TYPE $SIGN --input android-deployment.json --output $BUILD_TARGET $*
+${qt.dir}/bin/androiddeployqt $BUILD_TYPE $SIGN --input android-libmobile_client.so-deployment-settings.json --output $BUILD_TARGET $*
 
 cp $SOURCE_APK $TARGET_APK

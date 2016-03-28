@@ -25,14 +25,13 @@
         <root.dir>${basedir}/../..</root.dir>
         <!--Specify the project to test-->      
         <master.project.directory>plugins/image_library_plugin</master.project.directory>
-        <!--Global libs-->      
+
         <qt.libs>core gui network xml xmlpatterns sql concurrent multimedia</qt.libs>
-        <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lswresample -lpostproc</ffmpeg.libs>
         <global.libs>-lonvif</global.libs>
-        <!--Specific os defines-->
+
         <windows.defines>EC2_LIB_API=__declspec(dllimport) _VARIADIC_MAX=10</windows.defines>
-        <linux.defines/>
-        <mac.defines/>  
+
         <path>${env.PATH}</path>
+        <rdep.packages>ffmpeg</rdep.packages>
     </properties>
 </project>

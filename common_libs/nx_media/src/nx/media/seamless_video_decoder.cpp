@@ -96,6 +96,7 @@ SeamlessVideoDecoderPrivate::SeamlessVideoDecoderPrivate(SeamlessVideoDecoder *p
 :
     QObject(parent),
     q_ptr(parent),
+    videoDecoder(nullptr, nullptr),
     frameNumber(0),
     decoderFrameOffset(0)
 {

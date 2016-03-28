@@ -19,22 +19,14 @@
         <root.dir>${basedir}/../..</root.dir>
         <!--Specify the project to test-->      
         <master.project.directory>appserver2</master.project.directory>
-        <!--Global libs-->
+
         <qt.libs>core gui network xml sql concurrent</qt.libs>
-        <ffmpeg.libs></ffmpeg.libs>
         <global.libs>-lcommon -lnx_streaming -lnx_network -lappserver2 -lnx_utils</global.libs>
-        <!--Specific os libs used-->
         <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm</windows.oslibs>
-        <linux.oslibs></linux.oslibs>
-        <windows.oslibs.release/>
-        <windows.oslibs.debug/>     
         <mac.oslibs>-lbz2 -lz -framework IOKit -framework CoreServices</mac.oslibs>
-        <!--Global defines-->
-        <global.defines></global.defines>
-        <!--Specific os defines-->
+
         <windows.defines>EC2_LIB_API=__declspec(dllimport) _VARIADIC_MAX=10</windows.defines>
-        <linux.defines/>
-        <mac.defines/>
+
         <path>${env.PATH}</path>
         <rdep.packages>openssl quazip</rdep.packages>
     </properties>

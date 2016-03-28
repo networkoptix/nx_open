@@ -42,9 +42,7 @@ CONFIG(debug, debug|release) {
   isEmpty(BUILDLIB) {
     CONFIG += console
   }
-  win* {
-    LIBS += ${windows.oslibs.debug}
-  } else {
+  !win* {
     DEFINES += _DEBUG
   }
   !linux-clang {
@@ -56,9 +54,6 @@ CONFIG(debug, debug|release) {
 }
 else {
   CONFIGURATION=release
-  win* {
-    LIBS += ${windows.oslibs.release}
-  }
 
   !win32 {
       contains( DEFINES, debug_in_release ) {
@@ -117,6 +112,7 @@ else {
 LIBS += -L$$OUTPUT_PATH/lib -L$$OUTPUT_PATH/lib/$$CONFIGURATION -L$$OUTPUT_PATH/bin/$$CONFIGURATION
 !win*:!mac {
     LIBS += -Wl,-rpath-link,${qt.dir}/lib
+    LIBS += -Wl,-rpath-link,$$OUTPUT_PATH/lib/$$CONFIGURATION
 }
 LIBS += ${global.libs}
 
@@ -207,7 +203,7 @@ CONFIG += ${arch}
 win* {
   RC_FILE = ${project.build.directory}/hdwitness.rc
   ICON = ${customization.dir}/icons/hdw_logo.ico
-  LIBS += ${windows.oslibs} ${ffmpeg.libs}
+  LIBS += ${windows.oslibs}
   DEFINES += NOMINMAX= ${windows.defines}
   DEFINES += ${global.windows.defines}
   win32-msvc* {
@@ -232,8 +228,12 @@ win* {
 ## BOTH LINUX AND MAC
 unix: {
   DEFINES += QN_EXPORT=
-  QMAKE_CXXFLAGS += -std=c++14 -Werror=enum-compare -Werror=reorder -Werror=delete-non-virtual-dtor -Werror=return-type -Werror=conversion-null -Wuninitialized
-  clang: QMAKE_CXXFLAGS += -Wno-c++14-extensions
+  clang {
+    QMAKE_CXXFLAGS += -std=c++14 -Wno-c++14-extensions
+  } else {
+    QMAKE_CXXFLAGS += -std=c++11
+  }
+  QMAKE_CXXFLAGS += -Werror=enum-compare -Werror=reorder -Werror=delete-non-virtual-dtor -Werror=return-type -Werror=conversion-null -Wuninitialized
 }
 
 ## LINUX
@@ -258,7 +258,6 @@ unix:!android:!mac {
   QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas -Wno-ignored-qualifiers
   DEFINES += ${linux.defines}
   QMAKE_MOC_OPTIONS += -DQ_OS_LINUX
-  LIBS += ${ffmpeg.libs}
 }
 
 ## MAC OS
@@ -271,10 +270,6 @@ macx {
   CONFIG -= app_bundle objective_c
 
   INCLUDEPATH += ${qt.dir}/lib/QtCore.framework/Headers/$$QT_VERSION/QtCore/
-
-  !ios {
-    LIBS += ${ffmpeg.libs}
-  }
 
   contains(TEMPLATE, "lib") {
     QMAKE_LFLAGS += -undefined dynamic_lookup
@@ -292,6 +287,7 @@ android {
   QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas -Wno-ignored-qualifiers
   DEFINES += ${android.defines}
   QMAKE_MOC_OPTIONS += -DQ_OS_LINUX
+  CONFIG += no_smart_library_merge
 }
 
 ## iOS

@@ -15,6 +15,7 @@ Item {
     property int status
     property string resourceId
     property bool useVideo: false
+    property bool paused: false
 
     signal clicked
     signal pressAndHold
@@ -165,6 +166,19 @@ Item {
 
                 resourceId: cameraItem.resourceId
                 Component.onCompleted: playLive()
+                videoQuality: QnPlayer.Low
+            }
+
+            Connections
+            {
+                target: cameraItem
+                onPausedChanged:
+                {
+                    if (cameraItem.paused)
+                        player.stop()
+                    else
+                        player.play()
+                }
             }
         }
     }

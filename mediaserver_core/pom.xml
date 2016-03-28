@@ -25,26 +25,16 @@
         <product.title>${mediaserver.name}</product.title>
         <product.display.title>${mediaserver.display.name}</product.display.title>
         <template>app</template>
-        <!--Global libs-->
-        <qt.libs>core network xml xmlpatterns sql concurrent multimedia</qt.libs>
-        <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lswresample -lpostproc</ffmpeg.libs>
-        <global.libs>-lcommon -lappserver2 -lonvif -ludt -lnx_email -lnx_streaming -lnx_network</global.libs>
-        <!--Specific os libs used-->
-        <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm</windows.oslibs>
-        <linux.oslibs>-lmp3lame -lfaac -lvpx -lvorbisenc -lvorbis -ldl</linux.oslibs>
-        <linux.arm.oslibs/>
-        <windows.oslibs.release/>
-        <windows.oslibs.debug/>
-        <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
-        <!--Global defines-->
-        <global.defines/>
-        <!--Specific os defines-->
-        <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
-        <linux.defines/>
-        <mac.defines/>
 
-        <rdep.packages>server-external openssl quazip sigar</rdep.packages>
-        
+        <qt.libs>core network xml xmlpatterns sql concurrent multimedia</qt.libs>
+        <global.libs>-lcommon -lappserver2 -lonvif -ludt -lnx_email -lnx_streaming -lnx_network</global.libs>
+        <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm</windows.oslibs>
+        <linux.oslibs>-ldl</linux.oslibs>
+        <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
+
+        <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
+
+        <rdep.packages>server-external openssl ffmpeg quazip sigar</rdep.packages>
     </properties>
 
     <dependencies>

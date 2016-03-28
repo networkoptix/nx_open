@@ -19,21 +19,12 @@
     <properties>
         <guid>${connection_mediator.guid}</guid>
         <product.title>${company.name} Mediator</product.title>
-        <!--Global libs-->
+
         <qt.libs>core gui network concurrent sql xml</qt.libs>
         <global.libs>-lcommon -lnx_streaming -lnx_network -lnx_utils -ludt -lcloud_db_client -lconnection_mediator</global.libs>
-        <!--Specific os libs used-->
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm</windows.oslibs>
-        <windows.oslibs.release/>
-        <windows.oslibs.debug/>
-        <linux.oslibs>-lavcodec -lavformat -lavutil -lavdevice -lavfilter -lpostproc -lswscale -lswresample -lvpx -lfaac -lmp3lame</linux.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
-        <!--Global defines-->
-        <global.defines/>
-        <!--Specific os defines-->
-        <windows.defines/>
-        <linux.defines/>
-        <mac.defines/>
+
         <rdep.packages>openssl quazip</rdep.packages>
     </properties>
 

@@ -32,7 +32,7 @@ BaseTile
     property QtObject activeItemSelector: SingleActiveItemSelector
     {
         variableName: "isMasked";
-        writeVariableName: "isMaskedPrivate";
+        deactivateFunc: function(item ) { item.isMaskedPrivate = false; };
     }
 
     onIsExpandedChanged:
@@ -57,7 +57,7 @@ BaseTile
 
             isAvailable: thisComponent.allowExpanding && thisComponent.isExpanded;
 
-            disabledLabelColor: Style.colors.custom.systemTile.offlineText;
+            disabledLabelColor: Style.colors.midlight;
             enabled: thisComponent.allowExpanding;
 
             model: thisComponent.knownHostsModel;
@@ -74,7 +74,7 @@ BaseTile
             visible: thisComponent.isRecentlyConnected;
             isAvailable: thisComponent.allowExpanding && thisComponent.isExpanded;
 
-            disabledLabelColor: Style.colors.custom.systemTile.offlineText;
+            disabledLabelColor: Style.colors.midlight;
             enabled: thisComponent.allowExpanding;
 
             model: thisComponent.knownUsersModel;
@@ -134,14 +134,15 @@ BaseTile
                 onAccepted: thisComponent.connectClicked();
             }
 
-            CheckBox
+            NxCheckBox
             {
+                id: savePasswordCheckBox;
                 text: qsTr("Save password");
             }
 
-            CheckBox
+            NxCheckBox
             {
-                enabled: false;
+                enabled: savePasswordCheckBox.checked;
                 text: qsTr("Auto-login");
             }
         }

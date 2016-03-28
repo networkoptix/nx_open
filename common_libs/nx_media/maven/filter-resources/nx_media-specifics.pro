@@ -24,3 +24,7 @@ INCLUDEPATH += ${root.dir}/common/src/ \
 
   QMAKE_EXTRA_TARGETS += ext_debug ext_debug2
 }
+
+android {
+    QT += androidextras
+}

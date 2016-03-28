@@ -183,7 +183,7 @@ api::ResultCode CdbFunctionalTest::addAccount(
             moduleInfo().realm.c_str(),
             password->c_str()).constData();
     if (accountData->customization.empty())
-        accountData->customization = QnAppInfo::customizationName();
+        accountData->customization = QnAppInfo::customizationName().toStdString();
 
     auto connection = connectionFactory()->createConnection("", "");
 

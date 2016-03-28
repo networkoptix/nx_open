@@ -29,19 +29,8 @@
         <product.title>${traytool.name}</product.title>
         <product.display.title>${traytool.display.name}</product.display.title>
         <template>app</template>
-        <!--Global libs-->
-        <global.libs>-lcommon -lnx_utils</global.libs>
-        <!--Specific os libs used-->
         <qt.libs>core gui widgets</qt.libs>
-        <ffmpeg.libs></ffmpeg.libs>
+        <global.libs>-lcommon -lnx_utils</global.libs>
         <windows.oslibs>DbgHelp.lib</windows.oslibs>
-        <windows.oslibs.release/>
-        <windows.oslibs.debug/>
-        <!--Global defines-->
-        <global.defines/>
-        <!--Specific os defines-->
-        <windows.defines/>
-        <linux.defines/>
-        <mac.defines/>          
     </properties>
 </project>
