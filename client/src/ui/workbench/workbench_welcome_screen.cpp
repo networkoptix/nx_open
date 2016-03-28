@@ -64,11 +64,11 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject *parent)
     , QnWorkbenchContextAware(parent)
 
     , m_hiddenControls(false)
+    , m_visible(false)
     , m_cloudWatcher(qnCommon->instance<QnCloudStatusWatcher>())
     , m_palette(extractPalette())
     , m_widget(createMainView(this))
     , m_pageSize(m_widget->size())
-    , m_visible(false)
 {
     NX_CRITICAL(m_cloudWatcher, Q_FUNC_INFO, "Cloud watcher does not exist");
     connect(m_cloudWatcher, &QnCloudStatusWatcher::loginChanged

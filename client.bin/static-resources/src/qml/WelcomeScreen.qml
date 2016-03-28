@@ -59,7 +59,17 @@ Rectangle
             property QtObject watcher: SingleActiveItemSelector
             {
                 variableName: "isExpanded";
-                writeVariableName: "isExpandedPrivate";
+                deactivateFunc: function(item) { item.toggle(); };
+            }
+
+            Connections
+            {
+                target: context;
+                onIsVisibleChanged:
+                {
+                    if (!context.isVisible)
+                        grid.watcher.resetCurrentItem();
+                }
             }
 
             Repeater

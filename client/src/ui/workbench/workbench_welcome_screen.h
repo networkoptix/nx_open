@@ -106,10 +106,9 @@ private:
     typedef QPointer<QnCloudStatusWatcher> CloudStatusWatcherPtr;
     
     bool m_hiddenControls;
+    bool m_visible;
     const CloudStatusWatcherPtr m_cloudWatcher;
     const QnGenericPalette m_palette;
     const WidgetPtr m_widget;
     QSize m_pageSize;
-    
-    bool m_visible;
 };
