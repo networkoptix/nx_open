@@ -7,7 +7,6 @@ qmldir = os.path.join(qtdir, 'qml')
 qmldir_nxtool = os.path.join('${root.dir}/nxtool/static-resources/src', 'qml')
 
 os.environ["PATH"] = "%s;%s\\bin" % (os.environ['PATH'], qtdir)
-print os.environ["PATH"]
 
 # Windows only so we can use Windows syntax here
 commands = ['${environment.dir}\\bin\\windeployqt.exe ${libdir}\\${arch}\\bin\\${build.configuration}\client.bin.exe --qmldir %s --no-translations --force --no-libraries --no-plugins --dir qml' % qmldir,\
@@ -16,9 +15,11 @@ commands = ['${environment.dir}\\bin\\windeployqt.exe ${libdir}\\${arch}\\bin\\$
 ]
 
 if __name__ == '__main__':
-    p = subprocess.Popen('${environment.dir}\\bin\\windeployqt.exe ${libdir}\\${arch}\\bin\\${build.configuration}\client.bin.exe --qmldir %s --no-translations --force --no-libraries --no-plugins --dir clientqml' % qmldir, shell=True, stdout=PIPE)
+    cmd = '${environment.dir}\\bin\\windeployqt.exe ${libdir}\\${arch}\\bin\\${build.configuration}\client.bin.exe --qmldir %s --no-translations --force --no-libraries --no-plugins --dir clientqml' % qmldir
+    p = subprocess.Popen(cmd, shell=True, stdout=PIPE, stderr=subprocess.STDOUT)
     out, err = p.communicate()
     print out
+    print err
     p.wait()
     if p.returncode != 0 and p.returncode != 204:  
         print "failed with code: %s" % str(p.returncode) 
