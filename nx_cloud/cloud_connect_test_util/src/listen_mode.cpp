@@ -14,8 +14,6 @@
 #include <utils/common/string.h>
 
 
-int executeListenLoop(nx::network::test::RandomDataTcpServer* const server);
-
 int runInListenMode(const std::multimap<QString, QString>& args)
 {
     using namespace nx::network;
@@ -90,26 +88,6 @@ int runInListenMode(const std::multimap<QString, QString>& args)
         return 1;
     }
 
-    const int result = executeListenLoop(&server);
-    server.pleaseStopSync();
-    return result;
-}
-
-void printListenOptions(std::ostream* const outStream)
-{
-    *outStream<<
-    "Listen mode (can listen on local or cloud address):\n"
-    "  --listen                         Enable listen mode\n"
-    "  --echo                           Makes server to mirror data instead of spaming\n"
-    "  --cloud-credentials={system_id}:{authentication_key}\n"
-    "                                   Specify credentials to use to connect to mediator\n"
-    "  --server-id={server_id}          Id used when registering on mediator\n"
-    "  --local-address={ip:port}        Local address to listen\n"
-    "  --udt                            Use udt instead of tcp. Only if listening local address\n";
-}
-
-int executeListenLoop(nx::network::test::RandomDataTcpServer* const server)
-{
 #if 0
     const auto showHelp = []()
     {
@@ -133,7 +111,33 @@ int executeListenLoop(nx::network::test::RandomDataTcpServer* const server)
                 if (s == "exit")
                     break;
     }
+    const int result = 0;
 #else
+    const int result = printStatsAndWaitForCompletion(
+        &server,
+        nx::utils::MoveOnlyFunc<bool()>());
+#endif
+    server.pleaseStopSync();
+    return result;
+}
+
+void printListenOptions(std::ostream* const outStream)
+{
+    *outStream<<
+    "Listen mode (can listen on local or cloud address):\n"
+    "  --listen                         Enable listen mode\n"
+    "  --echo                           Makes server to mirror data instead of spaming\n"
+    "  --cloud-credentials={system_id}:{authentication_key}\n"
+    "                                   Specify credentials to use to connect to mediator\n"
+    "  --server-id={server_id}          Id used when registering on mediator\n"
+    "  --local-address={ip:port}        Local address to listen\n"
+    "  --udt                            Use udt instead of tcp. Only if listening local address\n";
+}
+
+int printStatsAndWaitForCompletion(
+    nx::network::test::ConnectionPool* const connectionPool,
+    nx::utils::MoveOnlyFunc<bool()> interruptCondition)
+{
     using nx::network::test::ConnectionTestStatistics;
     using namespace std::chrono;
 
@@ -148,7 +152,10 @@ int executeListenLoop(nx::network::test::RandomDataTcpServer* const server)
     std::string prevStatToDisplayStr;
     for (;;)
     {
-        const auto data = server->statistics();
+        if (interruptCondition && interruptCondition())
+            return 0;
+
+        const auto data = connectionPool->statistics();
         auto statToDisplay = data - baseStatisticsData;
 
         if (statToDisplay != zeroStatistics &&
@@ -191,7 +198,6 @@ int executeListenLoop(nx::network::test::RandomDataTcpServer* const server)
         prevStatToDisplayStr = statToDisplayStr;
         std::this_thread::sleep_for(kUpdateStatisticsInterval);
     }
-#endif
 
     return 0;
 }

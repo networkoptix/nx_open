@@ -129,13 +129,22 @@ NX_NETWORK_API ConnectionTestStatistics operator-(
     const ConnectionTestStatistics& left,
     const ConnectionTestStatistics& right);
 
+class NX_NETWORK_API ConnectionPool
+{
+public:
+    virtual ~ConnectionPool() {}
+
+    virtual ConnectionTestStatistics statistics() const = 0;
+};
+
 //!Server that listenes randome tcp-port, accepts connections, reads every connection and sends specified bytes number through every connection
 /*!
     \note This class is not thread-safe
 */
 class NX_NETWORK_API RandomDataTcpServer
 :
-    public QnStoppableAsync
+    public QnStoppableAsync,
+    public ConnectionPool
 {
 public:
     RandomDataTcpServer(
@@ -154,8 +163,7 @@ public:
     bool start();
 
     SocketAddress addressBeingListened() const;
-    QString statusLine() const;
-    ConnectionTestStatistics statistics() const;
+    virtual ConnectionTestStatistics statistics() const override;
 
 private:
     std::unique_ptr<AbstractStreamServerSocket> m_serverSocket;
@@ -179,7 +187,8 @@ private:
 */
 class NX_NETWORK_API ConnectionsGenerator
 :
-    public QnStoppableAsync
+    public QnStoppableAsync,
+    public ConnectionPool
 {
 public:
     static const size_t kInfiniteConnectionCount = 0;
@@ -203,6 +212,8 @@ public:
     void enableErrorEmulation(int errorPercent);
     void setLocalAddress(SocketAddress addr);
     void start();
+
+    virtual ConnectionTestStatistics statistics() const override;
 
     size_t totalConnectionsEstablished() const;
     size_t totalBytesSent() const;

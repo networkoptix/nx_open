@@ -705,6 +705,25 @@ void ConnectionsGenerator::start()
     }
 }
 
+ConnectionTestStatistics ConnectionsGenerator::statistics() const
+{
+    std::lock_guard<std::mutex> lk(m_mutex);
+
+    uint64_t bytesReceivedByAliveConnections = 0;
+    uint64_t bytesSentByAliveConnections = 0;
+    for (const auto& connection : m_connections)
+    {
+        bytesReceivedByAliveConnections += connection.second->totalBytesReceived();
+        bytesSentByAliveConnections += connection.second->totalBytesSent();
+    }
+
+    return ConnectionTestStatistics{
+        m_totalBytesReceived + bytesReceivedByAliveConnections,
+        m_totalBytesSent + bytesSentByAliveConnections,
+        m_totalConnectionsEstablished,
+        m_connections.size() };
+}
+
 size_t ConnectionsGenerator::totalConnectionsEstablished() const
 {
     return m_totalConnectionsEstablished;

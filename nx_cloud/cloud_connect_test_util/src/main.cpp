@@ -138,13 +138,18 @@ int runInConnectMode(const std::multimap<QString, QString>& args)
     if (args.find("echo") != args.end())
         transmissionMode = nx::network::test::TestTransmissionMode::echoTest;
 
-    SocketFactory::setCreateStreamSocketFunc(
-        [](bool ssl, SocketFactory::NatTraversalType ntt)
-        {
-            static_cast<void>(ssl);
-            static_cast<void>(ntt);
-            return std::make_unique<nx::network::cloud::CloudStreamSocket>();
-        });
+    if (args.find("udt") != args.end())
+    {
+        SocketFactory::enforceStreamSocketType(SocketFactory::SocketType::udt);
+    }
+    else
+    {
+        SocketFactory::setCreateStreamSocketFunc(
+            [](bool /*ssl*/, SocketFactory::NatTraversalType /*ntt*/)
+            {
+                return std::make_unique<nx::network::cloud::CloudStreamSocket>();
+            });
+    }
 
     nx::network::test::ConnectionsGenerator connectionsGenerator(
         SocketAddress(target),
@@ -160,22 +165,31 @@ int runInConnectMode(const std::multimap<QString, QString>& args)
 
     const auto startTime = std::chrono::steady_clock::now();
     connectionsGenerator.start();
-    finishedPromise.get_future().wait();
+
+    auto finishedFuture = finishedPromise.get_future();
+    printStatsAndWaitForCompletion(
+        &connectionsGenerator,
+        [&finishedFuture]() -> bool
+        {
+            return finishedFuture.wait_for(std::chrono::seconds::zero())
+                == std::future_status::ready;
+        });
+
     const auto testDuration =
         std::chrono::duration_cast<std::chrono::seconds>(
             std::chrono::steady_clock::now() - startTime);
 
-    std::cout << "connect summary: "
-        "Total time: " << testDuration.count() << "s. "
-        "Total connections: " <<
-            connectionsGenerator.totalConnectionsEstablished() << ". "
-        "Total bytes sent: " <<
-            bytesToString(connectionsGenerator.totalBytesSent()).toStdString() << ". "
-        "Total bytes received: " <<
-            bytesToString(connectionsGenerator.totalBytesReceived()).toStdString() << ". "
-        "Total incomplete tasks: " <<
-            connectionsGenerator.totalIncompleteTasks() << ". \n"
-        "report: " << connectionsGenerator.returnCodes().toStdString() << ". " <<
+    std::cout << "\n\nconnect summary: "
+        "  total time: " << testDuration.count() << "s\n"
+        "  total connections: " <<
+            connectionsGenerator.totalConnectionsEstablished() << "\n"
+        "  total bytes sent: " <<
+            bytesToString(connectionsGenerator.totalBytesSent()).toStdString() << "\n"
+        "  total bytes received: " <<
+            bytesToString(connectionsGenerator.totalBytesReceived()).toStdString() << "\n"
+        "  total incomplete tasks: " <<
+            connectionsGenerator.totalIncompleteTasks() << "\n\n"
+        "  report: " << connectionsGenerator.returnCodes().toStdString() << "\n" <<
             std::endl;
 
     return 0;
@@ -259,4 +273,9 @@ void printHelp(int /*argc*/, char* /*argv*/[])
 
 --enforce-mediator=10.0.2.41:3345 --listen --echo --cloud-credentials=93e0467f-3145-41a8-8ebc-7f3c95e2ccf0:32cfaaf7-19fe-4bb2-a06d-4b6bac489757 --server-id=xxx
 --enforce-mediator=10.0.2.41:3345 --connect --echo --target=xxx.93e0467f-3145-41a8-8ebc-7f3c95e2ccf0 --bytes-to-recieve=1m --total-connections=5 --max-concurrent-connections=5
+
+
+--listen --local-address=0.0.0.0:5724 --udt
+--connect --target=192.168.0.1:5724 --udt
+--connect --target=192.168.0.1:5724 --udt --total-connections=1 --bytes-to-receive=100000000
 */
