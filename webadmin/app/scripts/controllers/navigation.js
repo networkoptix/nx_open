@@ -29,15 +29,9 @@ angular.module('webadminApp')
         };
 
         $scope.logout = function(){
-            ipCookie.remove('auth', { path: '/' });
-            ipCookie.remove('nonce',{ path: '/' });
-            ipCookie.remove('realm',{ path: '/' });
-
-            // TODO: REMOVE OBSOLETE COOKIES
-            // ipCookie.remove('username',{ path: '/' });
-            // ipCookie.remove('response',{ path: '/' });
-
-            window.location.reload();
+            mediaserver.logout().then(function(){
+                window.location.reload();
+            });
         };
 
         $scope.webclientEnabled = Config.webclientEnabled;
