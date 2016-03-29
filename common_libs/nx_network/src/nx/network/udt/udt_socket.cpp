@@ -139,10 +139,38 @@ bool UdtSocketImpl::Open()
         return false;
     }
 
-    static const int kMaximumUdtWindowSizePackets = 64;
+    //tuning udt socket
+    constexpr const int kMtuSize = 1400;
+    constexpr const int kMaximumUdtWindowSizePackets = 64;
+    constexpr const int kUdtSendBufSize = 48 * kMtuSize;
+    constexpr const int kUdtRecvBufSize = 48 * kMtuSize;
+    constexpr const int kUdpSendBufSize = 48 * kMtuSize;
+    constexpr const int kUdpRecvBufSize = 48 * kMtuSize;
+
     if (UDT::setsockopt(
+            udtHandle, 0, UDT_MSS,
+            &kMtuSize, sizeof(kMtuSize)) != 0
+        ||
+        UDT::setsockopt(
             udtHandle, 0, UDT_FC,
-            &kMaximumUdtWindowSizePackets, sizeof(kMaximumUdtWindowSizePackets)) != 0)
+            &kMaximumUdtWindowSizePackets, sizeof(kMaximumUdtWindowSizePackets)) != 0
+        ||
+        UDT::setsockopt(
+            udtHandle, 0, UDT_SNDBUF,
+            &kUdtSendBufSize, sizeof(kUdtSendBufSize)) != 0
+        ||
+        UDT::setsockopt(
+            udtHandle, 0, UDT_RCVBUF,
+            &kUdtRecvBufSize, sizeof(kUdtRecvBufSize)) != 0
+        ||
+        UDT::setsockopt(
+            udtHandle, 0, UDP_SNDBUF,
+            &kUdpSendBufSize, sizeof(kUdpSendBufSize)) != 0
+        ||
+        UDT::setsockopt(
+            udtHandle, 0, UDP_RCVBUF,
+            &kUdpRecvBufSize, sizeof(kUdpRecvBufSize)) != 0
+        )
     {
         SystemError::setLastErrorCode(
             convertToSystemError(UDT::getlasterror().getErrorCode()));
