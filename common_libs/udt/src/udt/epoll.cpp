@@ -131,7 +131,7 @@ int CEPoll::add_ssock(const int eid, const SYSSOCKET& s, const int* events)
     memset(&ev, 0, sizeof(epoll_event));
 
     if (NULL == events)
-        ev.events = EPOLLIN | EPOLLOUT | EPOLLERR;
+        ev.events = EPOLLIN | EPOLLOUT;
     else
     {
         ev.events = 0;
@@ -139,8 +139,6 @@ int CEPoll::add_ssock(const int eid, const SYSSOCKET& s, const int* events)
             ev.events |= EPOLLIN;
         if (*events & UDT_EPOLL_OUT)
             ev.events |= EPOLLOUT;
-        if (*events & UDT_EPOLL_ERR)
-            ev.events |= EPOLLERR;
     }
 
     ev.data.fd = s;
@@ -214,7 +212,10 @@ int CEPoll::remove_ssock(const int eid, const SYSSOCKET& s)
     return 0;
 }
 
-int CEPoll::wait(const int eid, set<UDTSOCKET>* readfds, set<UDTSOCKET>* writefds, int64_t msTimeOut, set<SYSSOCKET>* lrfds, set<SYSSOCKET>* lwfds)
+int CEPoll::wait(
+    const int eid,
+    std::map<UDTSOCKET, int>* readfds, std::map<UDTSOCKET, int>* writefds, int64_t msTimeOut,
+    std::map<SYSSOCKET, int>* lrfds, std::map<SYSSOCKET, int>* lwfds)
 {
     CEPollDesc* epollContext = nullptr;
     {
@@ -255,38 +256,97 @@ int CEPoll::wait(const int eid, set<UDTSOCKET>* readfds, set<UDTSOCKET>* writefd
             // Sockets with exceptions are returned to both read and write sets.
             if ((NULL != readfds) && (!epollContext->m_sUDTReads.empty() || !epollContext->m_sUDTExcepts.empty()))
             {
-                *readfds = epollContext->m_sUDTReads;
+                readfds->clear();
+                for (const auto& handle: epollContext->m_sUDTReads)
+                    readfds->emplace(handle, UDT_EPOLL_IN);
                 for (set<UDTSOCKET>::const_iterator i = epollContext->m_sUDTExcepts.begin(); i != epollContext->m_sUDTExcepts.end(); ++i)
-                    readfds->insert(*i);
+                    (*readfds)[*i] |= UDT_EPOLL_ERR;
                 total += epollContext->m_sUDTReads.size() + epollContext->m_sUDTExcepts.size();
             }
             if ((NULL != writefds) && (!epollContext->m_sUDTWrites.empty() || !epollContext->m_sUDTExcepts.empty()))
             {
-                *writefds = epollContext->m_sUDTWrites;
+                for (const auto& handle : epollContext->m_sUDTWrites)
+                    writefds->emplace(handle, UDT_EPOLL_OUT);
                 for (set<UDTSOCKET>::const_iterator i = epollContext->m_sUDTExcepts.begin(); i != epollContext->m_sUDTExcepts.end(); ++i)
-                    writefds->insert(*i);
+                    (*writefds)[*i] |= UDT_EPOLL_ERR;
                 total += epollContext->m_sUDTWrites.size() + epollContext->m_sUDTExcepts.size();
+            }
+
+            lk.unlock();
+
+            for (auto& socketHandleAndEventMask: *writefds)
+            {
+                if ((socketHandleAndEventMask.second & UDT_EPOLL_ERR) > 0)
+                    continue;
+
+                //somehow, connection failure event can be not reported
+                int socketEventMask = 0;
+                int socketEventMaskSize = sizeof(socketEventMask);
+                const int result = UDT::getsockopt(
+                    socketHandleAndEventMask.first,
+                    0,
+                    UDT_EVENT,
+                    &socketEventMask,
+                    &socketEventMaskSize);
+                if (result == 0)
+                {
+                    if ((socketEventMask & UDT_EPOLL_ERR) > 0)
+                        socketHandleAndEventMask.second |= UDT_EPOLL_ERR;
+                }
             }
         }
 
         if (lrfds || lwfds)
         {
 #if __linux__ 
+#   ifndef EPOLLRDHUP
+#       define EPOLLRDHUP 0x2000 /* Android doesn't define EPOLLRDHUP, but it still works if defined properly. */
+#   endif
+
             const int max_events = 1024;
             epoll_event ev[max_events];
             int nfds = ::epoll_wait(epollContext->m_iLocalID, ev, max_events, 0);
 
-            for (int i = 0; i < nfds; ++i)
             {
-                if ((NULL != lrfds) && (ev[i].events & EPOLLIN))
+                CGuard lk(m_EPollLock);
+                for (int i = 0; i < nfds; ++i)
                 {
-                    lrfds->insert(ev[i].data.fd);
-                    ++total;
-                }
-                if ((NULL != lwfds) && (ev[i].events & EPOLLOUT))
-                {
-                    lwfds->insert(ev[i].data.fd);
-                    ++total;
+                    const bool hangup = (ev[i].events & (EPOLLHUP | EPOLLRDHUP)) > 0;
+
+                    if ((NULL != lrfds) && (ev[i].events & EPOLLIN))
+                    {
+                        lrfds->emplace((SYSSOCKET)ev[i].data.fd, (int)ev[i].events);
+                        ++total;
+                    }
+                    if ((NULL != lwfds) && (ev[i].events & EPOLLOUT))
+                    {
+                        //hangup - is an error when connecting, so adding error flag just for case
+                        lwfds->emplace(
+                            (SYSSOCKET)ev[i].data.fd,
+                            int(ev[i].events | (hangup ? UDT_EPOLL_ERR : 0)));
+                        ++total;
+                    }
+
+                    if (ev[i].events & (EPOLLIN | EPOLLOUT))
+                        continue;
+
+                    //event has not been returned yet
+                    if (lrfds != NULL &&
+                        epollContext->m_sUDTSocksIn.find(ev[i].data.fd) != epollContext->m_sUDTSocksIn.end())
+                    {
+                        lrfds->emplace((SYSSOCKET)ev[i].data.fd, (int)ev[i].events);
+                        ++total;
+                    }
+
+                    if (lwfds != NULL &&
+                        epollContext->m_sUDTSocksOut.find(ev[i].data.fd) != epollContext->m_sUDTSocksOut.end())
+                    {
+                        //hangup - is an error when connecting, so adding error flag just for case
+                        lwfds->emplace(
+                            (SYSSOCKET)ev[i].data.fd,
+                            int(ev[i].events | (hangup ? UDT_EPOLL_ERR : 0)));
+                        ++total;
+                    }
                 }
             }
 #elif __APPLE__
@@ -311,14 +371,19 @@ int CEPoll::wait(const int eid, set<UDTSOCKET>* readfds, set<UDTSOCKET>* writefd
 
             for (int i = 0; i < nfds; ++i)
             {
+                const bool failure = (ev[i].flags & EV_ERROR) > 0;
                 if ((NULL != lrfds) && (ev[i].filter == EVFILT_READ))
                 {
-                    lrfds->insert(ev[i].ident);
+                    lrfds->emplace(
+                        ev[i].ident,
+                        UDT_EPOLL_IN | (failure ? UDT_EPOLL_ERR : 0));
                     ++total;
                 }
                 if ((NULL != lwfds) && (ev[i].filter == EVFILT_WRITE))
                 {
-                    lwfds->insert(ev[i].ident);
+                    lwfds->emplace(
+                        ev[i].ident,
+                        UDT_EPOLL_OUT | (failure ? UDT_EPOLL_ERR : 0));
                     ++total;
                 }
             }
@@ -342,8 +407,7 @@ int CEPoll::wait(const int eid, set<UDTSOCKET>* readfds, set<UDTSOCKET>* writefd
                     FD_SET(i->first, &readfds);
                 if (lwfds && (i->second & UDT_EPOLL_OUT) > 0)
                     FD_SET(i->first, &writefds);
-                //TODO #ak handle exceptfds
-                //FD_SET(i->first, &exceptfds);
+                FD_SET(i->first, &exceptfds);
             }
 
             timeval tv;
@@ -360,16 +424,27 @@ int CEPoll::wait(const int eid, set<UDTSOCKET>* readfds, set<UDTSOCKET>* writefd
             if (eventCount > 0)
             {
                 //TODO #ak use win32-specific select features to get O(1) here
-                for (map<SYSSOCKET, int>::const_iterator i = epollContext->m_sLocals.begin(); i != epollContext->m_sLocals.end(); ++i)
+                for (map<SYSSOCKET, int>::const_iterator
+                    i = epollContext->m_sLocals.begin();
+                    i != epollContext->m_sLocals.end();
+                    ++i)
                 {
+                    if (FD_ISSET(i->first, &exceptfds))
+                    {
+                        if (lrfds)
+                            (*lrfds)[i->first] = UDT_EPOLL_ERR;
+                        if (lwfds)
+                            (*lwfds)[i->first] = UDT_EPOLL_ERR;
+                    }
+
                     if (lrfds && FD_ISSET(i->first, &readfds))
                     {
-                        lrfds->insert(i->first);
+                        (*lrfds)[i->first] |= UDT_EPOLL_IN;
                         ++total;
                     }
                     if (lwfds && FD_ISSET(i->first, &writefds))
                     {
-                        lwfds->insert(i->first);
+                        (*lwfds)[i->first] |= UDT_EPOLL_OUT;
                         ++total;
                     }
                 }

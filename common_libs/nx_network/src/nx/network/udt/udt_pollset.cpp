@@ -41,13 +41,13 @@ class UdtPollSetImpl
 public:
     friend class UdtPollSetConstIteratorImpl;
 
-    std::set<UDTSOCKET> udt_read_set_;
-    std::set<UDTSOCKET> udt_write_set_;
+    std::map<UDTSOCKET, int> udt_read_set_;
+    std::map<UDTSOCKET, int> udt_write_set_;
     std::size_t m_size;
     std::map<UDTSOCKET, SocketUserData> socket_user_data_;
     int epoll_fd_;
     UDPSocket interrupt_socket_;
-    std::set<SYSSOCKET> udt_sys_socket_read_set_;
+    std::map<SYSSOCKET, int> udt_sys_socket_read_set_;
     typedef std::map<UDTSOCKET, SocketUserData>::iterator socket_iterator;
     std::list<socket_iterator> reclaim_list_;
     std::set<UdtPollSetConstIteratorImpl*> iterators;
@@ -68,17 +68,17 @@ public:
     }
     void reclaimSocket();
     // Right now UDT can give socket that is not supposed to be watched 
-    void removePhantomSocket(std::set<UDTSOCKET>* set);
+    void removePhantomSocket(std::map<UDTSOCKET, int>* set);
 
     static UdtPollSetImpl* Create();
 };
 
-void UdtPollSetImpl::removePhantomSocket(std::set<UDTSOCKET>* set)
+void UdtPollSetImpl::removePhantomSocket(std::map<UDTSOCKET, int>* set)
 {
-    std::set<UDTSOCKET>::iterator ib = set->begin();
+    std::map<UDTSOCKET, int>::iterator ib = set->begin();
     while (ib != set->end())
     {
-        std::map<UDTSOCKET, SocketUserData>::iterator ifind = socket_user_data_.find(*ib);
+        std::map<UDTSOCKET, SocketUserData>::iterator ifind = socket_user_data_.find(ib->first);
         if (ifind == socket_user_data_.end())
         {
             ib = set->erase(ib);
@@ -253,7 +253,7 @@ public:
             // bug with broken connection .
             int pending_epoll_event;
             int pending_epoll_event_size = sizeof(int);
-            int ret = UDT::getsockopt(*m_curPos, 0, UDT_EVENT,
+            int ret = UDT::getsockopt(m_curPos->first, 0, UDT_EVENT,
                 &pending_epoll_event, &pending_epoll_event_size);
             if (ret != 0)
                 return aio::etWrite;
@@ -279,7 +279,7 @@ public:
         return m_inReadSet;
     }
 
-    std::set<UDTSOCKET>::iterator curPos() const
+    std::map<UDTSOCKET, int>::iterator curPos() const
     {
         return m_curPos;
     }
@@ -289,7 +289,7 @@ private:
     {
         NX_ASSERT(!done());
         std::map<UDTSOCKET, SocketUserData>::
-            iterator ib = m_pollSetImpl->socket_user_data_.find(*m_curPos);
+            iterator ib = m_pollSetImpl->socket_user_data_.find(m_curPos->first);
         NX_ASSERT(ib != m_pollSetImpl->socket_user_data_.end());
         return &(ib->second);
     }
@@ -297,7 +297,7 @@ private:
 private:
     UdtPollSetImpl* m_pollSetImpl;
     bool m_inReadSet;
-    std::set<UDTSOCKET>::iterator m_curPos;
+    std::map<UDTSOCKET, int>::iterator m_curPos;
 
     UdtPollSetConstIteratorImpl(const UdtPollSetConstIteratorImpl&);
     UdtPollSetConstIteratorImpl& operator=(const UdtPollSetConstIteratorImpl&);

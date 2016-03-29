@@ -123,30 +123,13 @@ public:
 
     // AbstractStreamSocket ------ interface
     virtual bool reopen() override;
-    virtual bool setNoDelay( bool value ) override {
-        Q_UNUSED(value);
-        return false;
-    }
-    virtual bool getNoDelay( bool* /*value*/ ) const override {
-        return false;
-    }
-    virtual bool toggleStatisticsCollection( bool val ) override {
-        Q_UNUSED(val);
-        return false;
-    }
-    virtual bool getConnectionStatistics( StreamSocketInfo* info ) override {
-        // Haven't found any way to get RTT sample from UDT
-        Q_UNUSED(info);
-        return false;
-    }
-    virtual bool setKeepAlive( boost::optional< KeepAliveOptions > info ) override {
-        Q_UNUSED(info);
-        return false; // not implemented yet
-    }
-    virtual bool getKeepAlive( boost::optional< KeepAliveOptions >* result ) const override {
-        Q_UNUSED(result);
-        return false; // not implemented yet
-    }
+    virtual bool setNoDelay(bool value) override;
+    virtual bool getNoDelay(bool* /*value*/) const override;
+    virtual bool toggleStatisticsCollection(bool val) override;
+    virtual bool getConnectionStatistics(StreamSocketInfo* info) override;
+    virtual bool setKeepAlive(boost::optional< KeepAliveOptions > info) override;
+    virtual bool getKeepAlive(boost::optional< KeepAliveOptions >* result) const override;
+
     virtual void connectAsync(
         const SocketAddress& addr,
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
@@ -167,6 +150,7 @@ public:
 
 private:
     std::unique_ptr<aio::AsyncSocketImplHelper<Pollable>> m_aioHelper;
+    bool m_noDelay;
 
 private:
     Q_DISABLE_COPY(UdtStreamSocket)

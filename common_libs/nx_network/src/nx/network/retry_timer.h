@@ -19,18 +19,24 @@ namespace network {
 class NX_NETWORK_API RetryPolicy
 {
 public:
-    static const unsigned int kInfiniteRetries = 
+    constexpr static const unsigned int kInfiniteRetries =
         std::numeric_limits<unsigned int>::max();
-    static const std::chrono::milliseconds kNoMaxDelay;
+    constexpr static const std::chrono::milliseconds kNoMaxDelay =
+        std::chrono::milliseconds::zero();
 
-    static const unsigned int kDefaultMaxRetryCount = 7;
-    /** 500ms */
-    static const std::chrono::milliseconds kDefaultInitialDelay;
-    static const unsigned int kDefaultDelayMultiplier = 2;
-    /** 1 minute */
-    static const std::chrono::milliseconds kDefaultMaxDelay;
+    constexpr static const unsigned int kDefaultMaxRetryCount = 7;
+    constexpr static const std::chrono::milliseconds kDefaultInitialDelay =
+        std::chrono::milliseconds(500);
+    constexpr static const unsigned int kDefaultDelayMultiplier = 2;
+    constexpr static const std::chrono::milliseconds kDefaultMaxDelay =
+        std::chrono::minutes(1);
 
     RetryPolicy();
+    RetryPolicy(
+        unsigned int maxRetryCount,
+        std::chrono::milliseconds initialDelay,
+        unsigned int delayMultiplier,
+        std::chrono::milliseconds maxDelay);
 
     void setMaxRetryCount(unsigned int retryCount);
     unsigned int maxRetryCount() const;

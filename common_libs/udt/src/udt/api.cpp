@@ -1096,7 +1096,10 @@ int CUDTUnited::epoll_remove_ssock(const int eid, const SYSSOCKET s)
    return m_EPoll.remove_ssock(eid, s);
 }
 
-int CUDTUnited::epoll_wait(const int eid, set<UDTSOCKET>* readfds, set<UDTSOCKET>* writefds, int64_t msTimeOut, set<SYSSOCKET>* lrfds, set<SYSSOCKET>* lwfds)
+int CUDTUnited::epoll_wait(
+    const int eid,
+    std::map<UDTSOCKET, int>* readfds, std::map<UDTSOCKET, int>* writefds, int64_t msTimeOut,
+    std::map<SYSSOCKET, int>* lrfds, std::map<SYSSOCKET, int>* lwfds)
 {
    return m_EPoll.wait(eid, readfds, writefds, msTimeOut, lrfds, lwfds);
 }
@@ -2049,7 +2052,10 @@ int CUDT::epoll_remove_ssock(const int eid, const SYSSOCKET s)
    }
 }
 
-int CUDT::epoll_wait(const int eid, set<UDTSOCKET>* readfds, set<UDTSOCKET>* writefds, int64_t msTimeOut, set<SYSSOCKET>* lrfds, set<SYSSOCKET>* lwfds)
+int CUDT::epoll_wait(
+    const int eid,
+    std::map<UDTSOCKET, int>* readfds, std::map<UDTSOCKET, int>* writefds, int64_t msTimeOut,
+    std::map<SYSSOCKET, int>* lrfds, std::map<SYSSOCKET, int>* lwfds)
 {
    try
    {
@@ -2287,7 +2293,10 @@ int epoll_remove_ssock(int eid, SYSSOCKET s)
    return CUDT::epoll_remove_ssock(eid, s);
 }
 
-int epoll_wait(int eid, set<UDTSOCKET>* readfds, set<UDTSOCKET>* writefds, int64_t msTimeOut, set<SYSSOCKET>* lrfds, set<SYSSOCKET>* lwfds)
+int epoll_wait(
+    int eid,
+    std::map<UDTSOCKET, int>* readfds, std::map<UDTSOCKET, int>* writefds, int64_t msTimeOut,
+    std::map<SYSSOCKET, int>* lrfds, std::map<SYSSOCKET, int>* lwfds)
 {
    return CUDT::epoll_wait(eid, readfds, writefds, msTimeOut, lrfds, lwfds);
 }
@@ -2302,7 +2311,7 @@ int epoll_wait(int eid, set<UDTSOCKET>* readfds, set<UDTSOCKET>* writefds, int64
       { \
          if (count >= *num) \
             break; \
-         fds[count ++] = *it; \
+         fds[count ++] = it->first; \
       } \
    }
 int epoll_wait2(int eid, UDTSOCKET* readfds, int* rnum, UDTSOCKET* writefds, int* wnum, int64_t msTimeOut,
@@ -2312,14 +2321,14 @@ int epoll_wait2(int eid, UDTSOCKET* readfds, int* rnum, UDTSOCKET* writefds, int
    // Users need to pass in an array for holding the returned sockets, with the maximum array length
    // stored in *rnum, etc., which will be updated with returned number of sockets.
 
-   set<UDTSOCKET> readset;
-   set<UDTSOCKET> writeset;
-   set<SYSSOCKET> lrset;
-   set<SYSSOCKET> lwset;
-   set<UDTSOCKET>* rval = NULL;
-   set<UDTSOCKET>* wval = NULL;
-   set<SYSSOCKET>* lrval = NULL;
-   set<SYSSOCKET>* lwval = NULL;
+   map<UDTSOCKET, int> readset;
+   map<UDTSOCKET, int> writeset;
+   map<SYSSOCKET, int> lrset;
+   map<SYSSOCKET, int> lwset;
+   map<UDTSOCKET, int>* rval = NULL;
+   map<UDTSOCKET, int>* wval = NULL;
+   map<SYSSOCKET, int>* lrval = NULL;
+   map<SYSSOCKET, int>* lwval = NULL;
    if ((readfds != NULL) && (rnum != NULL))
       rval = &readset;
    if ((writefds != NULL) && (wnum != NULL))
@@ -2332,10 +2341,10 @@ int epoll_wait2(int eid, UDTSOCKET* readfds, int* rnum, UDTSOCKET* writefds, int
    int ret = CUDT::epoll_wait(eid, rval, wval, msTimeOut, lrval, lwval);
    if (ret > 0)
    {
-      set<UDTSOCKET>::const_iterator i;
+      map<UDTSOCKET, int>::const_iterator i;
       SET_RESULT(rval, rnum, readfds, i);
       SET_RESULT(wval, wnum, writefds, i);
-      set<SYSSOCKET>::const_iterator j;
+      map<SYSSOCKET, int>::const_iterator j;
       SET_RESULT(lrval, lrnum, lrfds, j);
       SET_RESULT(lwval, lwnum, lwfds, j);
    }

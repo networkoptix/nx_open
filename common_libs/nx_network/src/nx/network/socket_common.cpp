@@ -132,7 +132,7 @@ bool HostAddress::isLocalIp() const
 
     const auto string = toString();
     for (const auto& prefix: kLocalPrefixes)
-        if (string.startsWith("192.168"))
+        if (string.startsWith(prefix))
             return true;
 
     return false;

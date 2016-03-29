@@ -51,6 +51,7 @@ TEST(RetryTimer, delayCalculation)
     const int testLoopSize = 10;
 
     for (const auto maxDelay: maxDelayValues)
+    {
         for (const auto delayMultiplier : delayMultiplierValues)
         {
             RetryPolicy policy;
@@ -83,6 +84,7 @@ TEST(RetryTimer, delayCalculation)
                 prevDelay = delay;
             }
         }
+    }
 }
 
 }   //network
