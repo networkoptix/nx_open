@@ -303,64 +303,57 @@ bool UdtSocketImpl::GetNonBlockingMode( bool* val ) const {
     return ret == 0;
 }
 
-// No way. I don't understand why we need MTU for each socket ?
-// No one knows the MTU, they use ICMP/UDP to try to detect it,
-// and in modern switch, typically will change every half hour !!!
-// Better keep it opaque when you make decision what to send .
-
-//mtu is known per path and is available for connected socket only.
-//It present in AbstractStreamSocket since it was implemented only by TcpSocket
-//BTW, I have never seen it changing once per 30 minutes for a given path
-
-bool UdtSocketImpl::GetMtu( unsigned int* mtuValue ) const {
-    NX_ASSERT(!IsClosed());
-    *mtuValue = 1500; // Ethernet MTU 
-    return true;
+bool UdtSocketImpl::GetMtu( unsigned int* mtuValue ) const
+{
+    int valueLength = sizeof(*mtuValue);
+    int ret = UDT::getsockopt(udtHandle, 0, UDT_MSS, mtuValue, &valueLength);
+    if (ret != 0)
+        SystemError::setLastErrorCode(
+            convertToSystemError(UDT::getlasterror().getErrorCode()));
+    return ret == 0;
 }
 
 // UDT will round the buffer size internally, so don't expect
 // what you give will definitely become the real buffer size .
 
-bool UdtSocketImpl::SetSendBufferSize( unsigned int buffSize ) {
+bool UdtSocketImpl::SetSendBufferSize( unsigned int buffSize )
+{
     NX_ASSERT(!IsClosed());
     NX_ASSERT( buffSize < static_cast<unsigned int>(std::numeric_limits<int>::max()) );
-    int buff_size = static_cast<int>(buffSize);
-    int ret = UDT::setsockopt(udtHandle, 0, UDT_SNDBUF, &buff_size, sizeof(buff_size));
+    int ret = UDT::setsockopt(udtHandle, 0, UDT_SNDBUF, &buffSize, sizeof(buffSize));
     if( ret != 0 )
         SystemError::setLastErrorCode(
             convertToSystemError(UDT::getlasterror().getErrorCode()));
     return ret == 0;
 }
 
-bool UdtSocketImpl::GetSendBufferSize( unsigned int* buffSize ) const{
+bool UdtSocketImpl::GetSendBufferSize( unsigned int* buffSize ) const
+{
     NX_ASSERT(!IsClosed());
-    int buff_size;
-    int len = sizeof(buff_size);
-    int ret = UDT::getsockopt(udtHandle, 0, UDT_SNDBUF, &buff_size, &len);
-    *buffSize = static_cast<unsigned int>(buff_size);
+    int len = sizeof(*buffSize);
+    int ret = UDT::getsockopt(udtHandle, 0, UDT_SNDBUF, buffSize, &len);
     if( ret != 0 )
         SystemError::setLastErrorCode(
             convertToSystemError(UDT::getlasterror().getErrorCode()));
     return ret == 0;
 }
 
-bool UdtSocketImpl::SetRecvBufferSize( unsigned int buffSize ){
+bool UdtSocketImpl::SetRecvBufferSize( unsigned int buffSize )
+{
     NX_ASSERT(!IsClosed());
     NX_ASSERT(buffSize < static_cast<unsigned int>(std::numeric_limits<int>::max()));
-    int buff_size = static_cast<int>(buffSize);
-    int ret = UDT::setsockopt(udtHandle, 0, UDT_RCVBUF, &buff_size, sizeof(buff_size));
+    int ret = UDT::setsockopt(udtHandle, 0, UDT_RCVBUF, &buffSize, sizeof(buffSize));
     if( ret != 0 )
         SystemError::setLastErrorCode(
             convertToSystemError(UDT::getlasterror().getErrorCode()));
     return ret == 0;
 }
 
-bool UdtSocketImpl::GetRecvBufferSize( unsigned int* buffSize ) const{
+bool UdtSocketImpl::GetRecvBufferSize( unsigned int* buffSize ) const
+{
     NX_ASSERT(!IsClosed());
-    int buff_size;
-    int len = sizeof(buff_size);
-    int ret = UDT::getsockopt(udtHandle,0,UDT_RCVBUF,&buff_size,&len);
-    *buffSize = static_cast<unsigned int>(buff_size);
+    int len = sizeof(*buffSize);
+    int ret = UDT::getsockopt(udtHandle, 0, UDT_RCVBUF, buffSize, &len);
     if( ret != 0 )
         SystemError::setLastErrorCode(
             convertToSystemError(UDT::getlasterror().getErrorCode()));
