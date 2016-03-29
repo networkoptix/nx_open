@@ -250,9 +250,6 @@ def sync_package(root, url, target, package, debug, force):
         ret = try_sync(root, url, target, package, force)
         if ret == SYNC_NOT_FOUND:
             path = os.path.join(root, target, package)
-            if os.path.isdir(path):
-                to_remove.append(path)
-
             print "Could not find {0}".format(package)
             return False
 
