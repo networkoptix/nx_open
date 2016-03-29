@@ -128,6 +128,7 @@ namespace ite
             std::lock_guard<std::mutex> lock(m_rcMutex); // LOCK
 
             m_handle = DTV_DeviceOpen(ENDEAVOUR, rxID);
+            ITE_LOG() << FMT("DTV_DeviceOpen for Rx %d returned %d", m_rxID, m_handle);
             if (m_handle < 0)
                 throw DtvException("DTV_DeviceOpen", rxID);
             m_opened = true;

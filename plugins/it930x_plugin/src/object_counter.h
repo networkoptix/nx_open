@@ -8,6 +8,7 @@
 #include <chrono>
 #include <queue>
 #include <sstream>
+#include <fstream>
 
 #if 0
 #  include <time.h>
@@ -19,10 +20,19 @@ class Logger
 {
     typedef std::queue<std::string> TaskQueue;
 public:
-    Logger()
+    Logger(const std::string &fname = "")
         : m_needStop(false),
           m_startPoint(std::chrono::system_clock::now())
     {
+        if (fname.empty())
+            m_ostream = std::shared_ptr<std::ostream>(&std::cout, [] (std::ostream *p) {});
+        else
+        {
+            m_ostream = std::shared_ptr<std::ostream>(new std::ofstream(fname));
+            if (!*m_ostream)
+                m_ostream.reset();
+        }
+
         m_thread = std::thread(
             [this]
             {
@@ -35,7 +45,8 @@ public:
                     {
                         auto logMessage = m_queue.front();
                         m_queue.pop();
-                        std::cout << logMessage << std::endl;
+                        if (m_ostream)
+                            *m_ostream << logMessage << std::endl;
                     }
 
                     if (m_needStop)
@@ -77,11 +88,17 @@ private:
     std::thread m_thread;
     std::atomic<bool> m_needStop;
     std::chrono::time_point<std::chrono::system_clock> m_startPoint;
+    std::shared_ptr<std::ostream> m_ostream;
 };
 
 extern Logger logger;
 
-#define NO_LOG 1
+#ifdef _DEBUG
+#   define NO_LOG 0
+#else
+#   define NO_LOG 1
+#endif
+
 #define ITE_LOG() if (NO_LOG) {} else logger
 
 #define FMT(...) [&] \
