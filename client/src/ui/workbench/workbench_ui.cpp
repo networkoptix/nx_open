@@ -26,8 +26,6 @@
 
 #include <camera/resource_display.h>
 
-#include <nx/streaming/abstract_stream_data_provider.h>
-
 #include <ui/animation/viewport_animator.h>
 #include <ui/animation/animator_group.h>
 #include <ui/animation/opacity_animator.h>
@@ -1209,12 +1207,9 @@ void QnWorkbenchUi::at_treeResizerWidget_geometryChanged()
     qreal targetWidth = m_treeResizerWidget->geometry().left() - treeGeometry.left();
     qreal minWidth = m_treeItem->effectiveSizeHint(Qt::MinimumSize).width();
 
-    //TODO #vkutin Think how to remove this hack
-    // At application startup m_controlsWidget has default (not maximized) size, so we cannot use its width here
-    // But we can use main window width, and obtain it this way:
-    qreal maxWidth = targetWidth;
-    if (auto parentWidget = qobject_cast<const QWidget*>(parent()))
-        maxWidth = parentWidget->geometry().width() / 2;
+    //TODO #vkutin Think how to do it differently.
+    // At application startup m_controlsWidget has default (not maximized) size, so we cannot use its width here.
+    qreal maxWidth = mainWindow()->width() / 2;
 
     targetWidth = qBound(minWidth, targetWidth, maxWidth);
 
@@ -1262,7 +1257,6 @@ void QnWorkbenchUi::createTreeWidget(const QnPaneSettings& settings)
     setPaletteColor(m_treeWidget, QPalette::Window, Qt::transparent);
     setPaletteColor(m_treeWidget, QPalette::Base, Qt::transparent);
     setPaletteColor(m_treeWidget->typeComboBox(), QPalette::Base, defaultPalette.color(QPalette::Base));
-    m_treeWidget->resize(qRound(settings.span), 0);
 
     m_treeBackgroundItem = new QnControlBackgroundWidget(Qn::LeftBorder, m_controlsWidget);
 
@@ -1272,6 +1266,7 @@ void QnWorkbenchUi::createTreeWidget(const QnPaneSettings& settings)
     m_treeWidget->setToolTipParent(m_treeItem);
     m_treeItem->setFocusPolicy(Qt::StrongFocus);
     m_treeItem->setProperty(Qn::NoHandScrollOver, true);
+    m_treeItem->resize(settings.span, 0.0);
 
     const auto pinTreeAction = action(QnActions::PinTreeAction);
     pinTreeAction->setChecked(settings.state != Qn::PaneState::Unpinned);

@@ -22,9 +22,9 @@ namespace
 
         , UserRoleId
         , LastPasswordRoleId
-        
+
         , IsFactorySystemRoleId
-        
+
         , IsCloudSystemRoleId
         , IsOnlineRoleId
         , IsCompatibleRoleId
@@ -34,10 +34,10 @@ namespace
         , WrongVersionRoleId
         , WrongCustomizationRoleId
 
-        // For local systems 
+        // For local systems
         , LastPasswordsModelRoleId
 
-        
+
         , RolesCount
     };
 
@@ -49,9 +49,9 @@ namespace
         result.insert(SystemIdRoleId, "systemId");
         result.insert(UserRoleId, "userName");
         result.insert(LastPasswordRoleId, "lastPassword");
-        
+
         result.insert(IsFactorySystemRoleId, "isFactorySystem");
-        
+
         result.insert(IsCloudSystemRoleId, "isCloudSystem");
         result.insert(IsOnlineRoleId, "isOnline");
         result.insert(IsCompatibleRoleId, "isCompatible");
@@ -79,7 +79,7 @@ namespace
             return (customization != serverInfo.customization);
         };
 
-        const auto incompatibleIt = 
+        const auto incompatibleIt =
             std::find_if(servers.begin(), servers.end(), predicate);
         return (incompatibleIt == servers.end() ? QString()
             : incompatibleIt->customization);
@@ -105,7 +105,7 @@ namespace
 
         const auto incompatibleIt =
             std::find_if(servers.begin(), servers.end(), predicate);
-        return (incompatibleIt == servers.end() ? QString() 
+        return (incompatibleIt == servers.end() ? QString()
             : incompatibleIt->version.toString(QnSoftwareVersion::BugfixFormat));
     }
 
@@ -130,10 +130,10 @@ namespace
 
         const auto predicate = [](const QnModuleInformation &serverInfo)
         {
-            return serverInfo.serverFlags.testFlag(Qn::SF_AutoSystemName);
+            return serverInfo.serverFlags.testFlag(Qn::SF_NewSystem);
         };
 
-        const bool isFactory = 
+        const bool isFactory =
             std::any_of(servers.begin(), servers.end(), predicate);
         return isFactory;
     }
@@ -154,13 +154,13 @@ namespace
                 return firstIsFactorySystem;
 
             const bool firstIsCloudSystem = first->isCloudSystem();
-            const bool sameType = 
+            const bool sameType =
                 (firstIsCloudSystem == second->isCloudSystem());
             if (!sameType)
                 return firstIsCloudSystem;
 
             const bool firstCompatible = isCompatibleSystem(first);
-            const bool sameCompatible = 
+            const bool sameCompatible =
                 (firstCompatible == isCompatibleSystem(second));
             if (!sameCompatible)
                 return firstCompatible;
@@ -188,12 +188,12 @@ QnSystemsModel::QnSystemsModel(QObject *parent)
     , m_internalData()
 {
     NX_ASSERT(qnSystemsFinder, Q_FUNC_INFO, "Systems finder is null!");
-    
-    const auto discoveredConnection = 
+
+    const auto discoveredConnection =
         connect(qnSystemsFinder, &QnAbstractSystemsFinder::systemDiscovered
         , this, &QnSystemsModel::addSystem);
 
-    const auto lostConnection = 
+    const auto lostConnection =
         connect(qnSystemsFinder, &QnAbstractSystemsFinder::systemLost
         , this, &QnSystemsModel::removeSystem);
 
@@ -265,7 +265,7 @@ void QnSystemsModel::addSystem(const QnSystemDescriptionPtr &systemDescription)
 {
     const auto data = InternalSystemDataPtr(new InternalSystemData(
         { systemDescription, QnDisconnectHelper() }));
-    
+
     const auto insertPos = std::upper_bound(m_internalData.begin()
         , m_internalData.end(), data, m_lessPred);
 
@@ -289,13 +289,13 @@ void QnSystemsModel::addSystem(const QnSystemDescriptionPtr &systemDescription)
 
     {
         const auto beginInsertRowsCallback = [this, position]()
-        { 
-            beginInsertRows(QModelIndex(), position, position); 
+        {
+            beginInsertRows(QModelIndex(), position, position);
         };
-        const auto endInserRowsCallback = [this]() 
+        const auto endInserRowsCallback = [this]()
             { endInsertRows(); };
 
-        const auto insertionGuard = (emitInsertSignal ?  
+        const auto insertionGuard = (emitInsertSignal ?
             QnRaiiGuard::create(beginInsertRowsCallback, endInserRowsCallback)
             : QnRaiiGuard::createEmpty());
 
@@ -353,7 +353,7 @@ QnSystemsModel::InternalList::iterator QnSystemsModel::getInternalDataIt(
 
     if (it == m_internalData.end())
         return m_internalData.end();
-    
+
     const auto foundId = (*it)->system->id();
     return (foundId == systemDescription->id() ? it : m_internalData.end());
 }

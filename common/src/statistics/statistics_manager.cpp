@@ -151,6 +151,11 @@ bool QnStatisticsManager::registerStatisticsModule(const QString &alias
     return true;
 }
 
+bool QnStatisticsManager::isStatisticsSendingAllowed() const
+{
+    return qnGlobalSettings->isInitialized() && qnGlobalSettings->isStatisticsAllowed();
+}
+
 void QnStatisticsManager::unregisterModule(const QString &alias)
 {
     m_modules.remove(alias);
@@ -180,7 +185,7 @@ void QnStatisticsManager::setSettings(QnStatisticsSettingsPtr settings)
 
     connect(m_updateSettingsTimer, &QTimer::timeout, m_settings.get(), [this]()
     {
-        if (qnGlobalSettings->isStatisticsAllowed() && m_settings)
+        if (isStatisticsSendingAllowed() && m_settings)
             m_settings->updateSettings();
     });
 
@@ -193,7 +198,7 @@ void QnStatisticsManager::setSettings(QnStatisticsSettingsPtr settings)
         m_updateSettingsTimer->start();
     });
 
-    if (!qnGlobalSettings->isStatisticsAllowed())
+    if (!isStatisticsSendingAllowed())
         return;
 
     if (m_settings->settingsAvailable())
@@ -226,7 +231,7 @@ QnStatisticValuesHash QnStatisticsManager::getValues() const
 void QnStatisticsManager::sendStatistics()
 {
     if (!m_settings || !m_storage || m_handle
-        || !qnGlobalSettings->isStatisticsAllowed())
+        || !isStatisticsSendingAllowed())
     {
         return;
     }

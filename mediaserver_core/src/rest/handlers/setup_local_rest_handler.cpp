@@ -57,9 +57,7 @@ int QnSetupLocalSystemRestHandler::execute(SetupLocalSystemData data, QnJsonRest
     if (data.oldPassword.isEmpty())
         data.oldPassword = kDefaultAdminPassword;
 
-    nx::SystemName systemName;
-    systemName.loadFromConfig();
-    if (!systemName.isDefault())
+    if (!qnGlobalSettings->isNewSystem())
     {
         result.setError(QnJsonRestResult::Forbidden, lit("This method is allowed at initial state only. Use 'api/detachFromSystem' method first."));
         return nx_http::StatusCode::ok;
@@ -78,11 +76,12 @@ int QnSetupLocalSystemRestHandler::execute(SetupLocalSystemData data, QnJsonRest
     }
 
     qnGlobalSettings->resetCloudParams();
+    qnGlobalSettings->setNewSystem(false);
     if (!qnGlobalSettings->synchronizeNowSync())
     {
         result.setError(
             QnJsonRestResult::CantProcessRequest,
-            lit("Failed to save cloud credentials to local DB"));
+            lit("Internal server error."));
         return nx_http::StatusCode::ok;
     }
 

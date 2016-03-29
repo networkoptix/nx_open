@@ -48,6 +48,7 @@ int QnDetachFromSystemRestHandler::execute(PasswordData passwordData, QnJsonRest
     }
 
     qnGlobalSettings->resetCloudParams();
+    qnGlobalSettings->setNewSystem(true);
     if (!qnGlobalSettings->synchronizeNowSync())
     {
         result.setError(

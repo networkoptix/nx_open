@@ -3,6 +3,8 @@
 #include <common/common_globals.h>
 #include <common/common_module.h>
 
+#include <media_server/new_system_flag_watcher.h>
+
 #ifdef ENABLE_ONVIF
 #include <soap/soapserver.h>
 #endif
@@ -32,6 +34,8 @@ QnMediaServerModule::QnMediaServerModule(const QString& enforcedMediatorEndpoint
     if (!enforcedMediatorEndpoint.isEmpty())
         nx::network::SocketGlobals::mediatorConnector().mockupAddress(enforcedMediatorEndpoint);
     nx::network::SocketGlobals::mediatorConnector().enable(true);
+
+    m_common->store<QnNewSystemServerFlagWatcher>(new QnNewSystemServerFlagWatcher());
 }
 
 QnMediaServerModule::~QnMediaServerModule() {

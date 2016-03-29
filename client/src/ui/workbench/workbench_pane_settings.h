@@ -12,12 +12,19 @@ struct QnPaneSettings
     Qn::PaneState state;    /**< pane state */
     qreal span;             /**< horizontal pane height or vertical pane width, if applicable */
 
-    QnPaneSettings() : state(Qn::PaneState::Opened), span(0.0) {}
+    QnPaneSettings(Qn::PaneState paneState = Qn::PaneState::Opened, qreal paneSpan = 0.0) : state(paneState), span(paneSpan) {}
 };
 
+#define QnPaneSettings_Fields (state)(span)
 QN_FUSION_DECLARE_FUNCTIONS(QnPaneSettings, (json)(metatype)(eq));
 
 /**
 Workbench pane appearances map
 */
 typedef QMap<Qn::WorkbenchPane, QnPaneSettings> QnPaneSettingsMap;
+
+namespace Qn
+{
+    /* Default workbench pane settings */
+    const QnPaneSettingsMap& defaultPaneSettings();
+};
