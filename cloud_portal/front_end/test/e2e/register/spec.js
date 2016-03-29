@@ -64,8 +64,8 @@ describe('Registration suite', function () {
 
         p.alert.catchAlert( p.alert.alertMessages.registerSuccess, p.alert.alertTypes.success);
 
-        browser.controlFlow().wait(p.helper.getEmailTo(userEmail).then(function (email) {
-            expect(email.subject).toContain("Confirm your account");
+        browser.controlFlow().wait(p.helper.getEmailTo(userEmail, p.helper.emailSubjects.register).then(function (email) {
+            expect(email.subject).toContain(p.helper.emailSubjects.register);
             expect(email.headers.to).toEqual(userEmail);
 
             // extract registration token from the link in the email message

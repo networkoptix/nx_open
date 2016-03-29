@@ -14,6 +14,8 @@ RestorePasswordPage = function () {
 
     this.url = '/#/restore_password/';
 
+    this.emailSubject = this.helper.emailSubjects.restorePass;
+
     this.get = function (url) {
         browser.get(url);
         browser.waitForAngular();

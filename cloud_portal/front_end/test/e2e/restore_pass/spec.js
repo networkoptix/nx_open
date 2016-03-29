@@ -47,7 +47,7 @@ describe('Restore password suite', function () {
         var userEmail = p.helper.userEmail;
         p.sendLinkToEmail(userEmail);
 
-        browser.controlFlow().wait(p.helper.getEmailTo(userEmail).then(function (email) {
+        browser.controlFlow().wait(p.helper.getEmailTo(userEmail, p.emailSubject).then(function (email) {
             var regCode = p.getTokenFromEmail(email, userEmail);
             p.urlWithCode = (p.url + regCode);
         }));
@@ -60,7 +60,7 @@ describe('Restore password suite', function () {
         var userPassword = p.helper.userPassword;
         p.sendLinkToEmail(userEmail);
 
-        browser.controlFlow().wait(p.helper.getEmailTo(userEmail).then(function (email) {
+        browser.controlFlow().wait(p.helper.getEmailTo(userEmail, p.emailSubject).then(function (email) {
             var regCode = p.getTokenFromEmail(email, userEmail);
             p.get(p.url + regCode);
             p.setNewPassword(userPassword);
@@ -72,7 +72,7 @@ describe('Restore password suite', function () {
     it("should set new password, login with new password", function () {
         p.sendLinkToEmail(p.helper.userEmail);
 
-        browser.controlFlow().wait(p.helper.getEmailTo(p.helper.userEmail).then(function (email) {
+        browser.controlFlow().wait(p.helper.getEmailTo(p.helper.userEmail, p.emailSubject).then(function (email) {
             var regCode = p.getTokenFromEmail(email, p.helper.userEmail);
             p.get(p.url + regCode);
             browser.waitForAngular();
@@ -89,7 +89,7 @@ describe('Restore password suite', function () {
         var userPassword = p.helper.userPassword;
         p.sendLinkToEmail(userEmail);
 
-        browser.controlFlow().wait(p.helper.getEmailTo(userEmail).then(function (email) {
+        browser.controlFlow().wait(p.helper.getEmailTo(userEmail, p.emailSubject).then(function (email) {
             var regCode = p.getTokenFromEmail(email, userEmail);
             p.get(p.url + regCode);
             p.setNewPassword(userPassword);
@@ -97,12 +97,20 @@ describe('Restore password suite', function () {
         }));
     });
 
-    xit("should allow not-activated user to restore password", function () {
-        expect("test").toBe("written");
-    });
+    it("should make not-activated user active by restoring password", function () {
+        var userEmail = p.helper.register();
+        p.get(p.url);
+        p.sendLinkToEmail(userEmail);
 
-    xit("should make not-activated user active by restoring password", function () {
-        expect("test").toBe("written");
+        browser.controlFlow().wait(p.helper.getEmailTo(userEmail, p.emailSubject).then(function (email) {
+            var regCode = p.getTokenFromEmail(email, userEmail);
+            p.get(p.url + regCode);
+            browser.waitForAngular();
+            p.setNewPassword(p.helper.userPasswordNew);
+
+            p.helper.login(userEmail, p.helper.userPasswordNew);
+            p.helper.logout();
+        }));
     });
 
     it("should allow logged in user visit restore password page", function () {
@@ -120,7 +128,7 @@ describe('Restore password suite', function () {
         p.get(p.url);
         p.sendLinkToEmail(userEmail);
 
-        browser.controlFlow().wait(p.helper.getEmailTo(userEmail).then(function (email) {
+        browser.controlFlow().wait(p.helper.(userEmail, p.emailSubject).then(function (email) {
             var regCode = p.getTokenFromEmail(email, userEmail);
             p.get(p.url + regCode);
             expect(p.newPasswordInput.isPresent()).toBe(true); // due to current bug in portal, this fails
@@ -134,7 +142,7 @@ describe('Restore password suite', function () {
         var userPassword = p.helper.basePassword;
         p.sendLinkToEmail(userEmail);
 
-        browser.controlFlow().wait(p.helper.getEmailTo(userEmail).then(function (email) {
+        browser.controlFlow().wait(p.helper.getEmailTo(userEmail, p.emailSubject).then(function (email) {
             var regCode = p.getTokenFromEmail(email, userEmail);
             p.get(p.url + regCode);
             p.setNewPassword(userPassword);

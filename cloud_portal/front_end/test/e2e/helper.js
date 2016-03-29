@@ -1,6 +1,8 @@
 'use strict';
 
 var Helper = function () {
+    var AlertSuite = require('./alerts_check.js');
+    this.alert = new AlertSuite();
 
     this.baseEmail = 'noptixqa@gmail.com';
     this.basePassword = 'qweasd123';
@@ -78,12 +80,43 @@ var Helper = function () {
         expect(this.loginSuccessElement.isDisplayed()).toBe(false);
     };
 
-    this.getEmailTo = function(emailAddress) {
+    this.register = function() {
+        var firstNameInput = element(by.model('account.firstName'));
+        var lastNameInput = element(by.model('account.lastName'));
+        var emailInput = element(by.model('account.email'));
+        var passwordGroup = element(by.css('password-input'));
+        var passwordInput = passwordGroup.element(by.css('input[type=password]'));
+        var submitButton = element(by.css('[form=registerForm]')).element(by.buttonText('Register'));
+
+        var userEmail = this.getRandomEmail();
+
+        browser.get('/#/register');
+
+        firstNameInput.sendKeys(this.userFirstName);
+        lastNameInput.sendKeys(this.userLastName);
+        emailInput.sendKeys(userEmail);
+        passwordInput.sendKeys(this.userPassword);
+
+        submitButton.click();
+
+        this.alert.catchAlert( this.alert.alertMessages.registerSuccess, this.alert.alertTypes.success);
+
+        // Check that registration form element is NOT displayed on page
+        expect(firstNameInput.isPresent()).toBe(false);
+
+        return userEmail;
+    };
+
+    this.emailSubjects = {
+        register: "Confirm your account",
+        restorePass: "Restore your password"};
+
+    this.getEmailTo = function(emailAddress, emailSubject) {
         var deferred = protractor.promise.defer();
         console.log("Waiting for an email...");
 
         notifier.on("mail", function(mail){
-            if(emailAddress === mail.headers.to){
+            if((emailAddress === mail.headers.to) && (mail.subject.includes(emailSubject))) {
                 console.log("Catch email to: " + mail.headers.to);
                 deferred.fulfill(mail);
                 notifier.stop();
