@@ -3,6 +3,7 @@
 
 #include <QTextStream>
 
+#if 0
 // TODO: test on tun/tap?
 TEST(CommonNetwork, DISABLED_NetTools)
 {
@@ -19,4 +20,4 @@ TEST(CommonNetwork, DISABLED_NetTools)
 
     EXPECT_EQ(netIfs["eth0"], QByteArray("10.0.2.134 10.0.2.103"));
 }
-
+#endif
