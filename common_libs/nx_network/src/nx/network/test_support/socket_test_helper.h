@@ -108,6 +108,27 @@ private:
     TestConnection& operator=(const TestConnection&);
 };
 
+struct ConnectionTestStatistics
+{
+    uint64_t bytesReceived;
+    uint64_t bytesSent;
+    size_t totalConnections;
+    size_t onlineConnections;
+};
+
+NX_NETWORK_API QString toString(const ConnectionTestStatistics& data);
+
+NX_NETWORK_API bool operator==(
+    const ConnectionTestStatistics& left,
+    const ConnectionTestStatistics& right);
+NX_NETWORK_API bool operator!=(
+    const ConnectionTestStatistics& left,
+    const ConnectionTestStatistics& right);
+/** Substracts field by field */
+NX_NETWORK_API ConnectionTestStatistics operator-(
+    const ConnectionTestStatistics& left,
+    const ConnectionTestStatistics& right);
+
 //!Server that listenes randome tcp-port, accepts connections, reads every connection and sends specified bytes number through every connection
 /*!
     \note This class is not thread-safe
@@ -134,6 +155,7 @@ public:
 
     SocketAddress addressBeingListened() const;
     QString statusLine() const;
+    ConnectionTestStatistics statistics() const;
 
 private:
     std::unique_ptr<AbstractStreamServerSocket> m_serverSocket;
@@ -141,9 +163,11 @@ private:
     const size_t m_trafficLimit;
     const TestTransmissionMode m_transmissionMode;
     mutable QnMutex m_mutex;
-    std::list<std::shared_ptr<TestConnection>> m_acceptedConnections;
+    std::list<std::shared_ptr<TestConnection>> m_aliveConnections;
     SocketAddress m_localAddress;
     size_t m_totalConnectionsAccepted;
+    uint64_t m_totalBytesReceivedByClosedConnections;
+    uint64_t m_totalBytesSentByClosedConnections;
 
     void onNewConnection( SystemError::ErrorCode errorCode, AbstractStreamSocket* newConnection );
     void onConnectionDone( TestConnection* connection );
