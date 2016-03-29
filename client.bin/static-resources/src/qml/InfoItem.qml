@@ -47,8 +47,8 @@ MaskedComboBox
 
                 Binding
                 {
-                    property: "text";
                     target: textItem;
+                    property: "text";
                     value: thisComponent.value;
                 }
             }

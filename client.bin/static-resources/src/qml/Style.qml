@@ -42,6 +42,15 @@ QtObject
         readonly property color color: colors.text;
     }
 
+    property QtObject dropDown: QtObject
+    {
+        readonly property color bkgColor: colors.text;
+        readonly property color hoveredBkgColor: colors.brand;
+
+        readonly property color textColor: context.getPaletteColor("dark", 3)
+        readonly property color hoveredTextColor: colors.brandContrast;
+    }
+
     property QtObject custom: QtObject
     {
         property QtObject systemTile: QtObject

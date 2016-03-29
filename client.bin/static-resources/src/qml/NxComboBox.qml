@@ -5,19 +5,32 @@ import Qt.labs.templates 1.0 as T
 import "."
 
 // TODO: inner shadow
-
+// TODO: implement exactly as in specification
+// Note! Do not use currentText property - proper is just "text"
 ComboBox
 {
     id: thisComponent;
 
-    property bool expanded: popupItem.visible;
+    property bool expanded: popup.visible;
     property bool editable: true;
 
     property bool isEditMode: false;
+    property string text;
+    currentIndex: 0;
+
+    textRole: "display";
 
     focus: true;
 
     height: 28;
+
+    Binding
+    {
+        target: thisComponent;
+        property: "text";
+        when: isEditMode;
+        value: textInputItem.text;
+    }
 
     MouseArea
     {
@@ -74,9 +87,17 @@ ComboBox
 
         NxLabel
         {
+            id: readOnlyTextItem;
+
+            leftPadding: 8;
+            rightPadding: 8;
+
             clip: true;
             anchors.fill: textInputItem;
             visible: !thisComponent.isEditMode;
+            font: Style.textEdit.font;
+            color: Style.textEdit.color;
+            verticalAlignment: Text.AlignVCenter;
         }
 
         Rectangle
@@ -101,11 +122,86 @@ ComboBox
 
     popup: T.Popup
     {
-        id: popupItem;
+        y: thisComponent.height;
+        topMargin: 2;
+        bottomMargin: 2;
+        width: thisComponent.width;
+        height: listViewItem.contentHeight;
 
-        contentItem: Item
+        background: Rectangle
         {
-            onVisibleChanged: console.log("visible:", visible)
+            id: popupBackground;
+
+            color: Style.dropDown.bkgColor;
+            radius: 2;
+            // TODO: shadow
+        }
+
+        contentItem: ListView
+        {
+            id: listViewItem;
+
+            model: thisComponent.model;
+
+            delegate: Rectangle
+            {
+                height: 24;
+                width: parent.width;
+
+                color: (popupItem.isHovered ? Style.dropDown.hoveredBkgColor
+                    : Style.dropDown.bkgColor);
+
+                NxLabel
+                {
+                    id: popupItem;
+                    acceptClicks: true;
+                    autoHoverable: true;
+                    anchors.fill: parent;
+                    clip: true;
+                    leftPadding: 8;
+                    rightPadding: 8;
+
+                    standardColor: Style.dropDown.textColor;
+                    hoveredColor: Style.dropDown.hoveredTextColor;
+
+                    text: model[thisComponent.textRole];
+
+                    onClicked:
+                    {
+                        thisComponent.currentIndex = index;
+                        thisComponent.popup.visible = false;
+                    }
+                }
+            }
         }
     }
+
+    onCurrentTextChanged:
+    {
+        textInputItem.text = thisComponent.currentText;
+        readOnlyTextItem.text = thisComponent.currentText;
+    }
+    onActivated: console.log("activated", index)
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
