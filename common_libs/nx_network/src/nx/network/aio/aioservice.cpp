@@ -139,18 +139,29 @@ aio::AIOThread* AIOService::getSocketAioThread(Pollable* sock)
     return getSocketAioThread(&lk, sock);
 }
 
+AbstractAioThread* AIOService::getRandomAioThread() const
+{
+    QnMutexLocker lk(&m_mutex);
+    const size_t index = rand() % m_systemSocketAIO.aioThreadPool.size();
+    return m_systemSocketAIO.aioThreadPool[index].get();
+}
+
 void AIOService::bindSocketToAioThread(Pollable* sock, AbstractAioThread* aioThread)
 {
-    const auto desired = static_cast<aio::AIOThread*>(aioThread);
+    NX_ASSERT(!isSocketBeingWatched(sock));
+    const auto desiredThread = static_cast<aio::AIOThread*>(aioThread);
 
-    aio::AIOThread* expected = nullptr;
-    if (!sock->impl()->aioThread.compare_exchange_strong(expected, desired))
-    {
-        NX_ASSERT(
-            expected == desired,  //already bound to desired thread?
-            Q_FUNC_INFO,
-            "Socket is already bound to some AIO thread");
-    }
+    //socket can be bound to another aio thread, if it is not used at the moment
+    sock->impl()->aioThread.exchange(static_cast<aio::AIOThread*>(desiredThread));
+
+    //aio::AIOThread* expected = nullptr;
+    //if (!sock->impl()->aioThread.compare_exchange_strong(expected, desiredThread))
+    //{
+    //    NX_ASSERT(
+    //        expected == desiredThread,  //already bound to desired thread?
+    //        Q_FUNC_INFO,
+    //        "Socket is already bound to some AIO thread");
+    //}
 }
 
 void AIOService::watchSocketNonSafe(

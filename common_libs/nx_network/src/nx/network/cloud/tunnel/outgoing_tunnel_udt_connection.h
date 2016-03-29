@@ -46,8 +46,8 @@ public:
 
 /** Creates connections (UDT) after UDP hole punching has been successfully done.
     Also, makes some efforts to keep UDP hole opened
-    \note \a OutgoingTunnelUdtConnection::pleaseStop MUST be invoked before freeing object.
-        It cannot be safely freed in handler!
+    \note \a OutgoingTunnelUdtConnection instance 
+        can be safely freed while in aio thread (e.g., in any handler)
 */
 class NX_NETWORK_API OutgoingTunnelUdtConnection
 :
@@ -93,6 +93,7 @@ private:
     {
         std::unique_ptr<UdtStreamSocket> connection;
         OnNewConnectionHandler completionHandler;
+        nx::network::aio::AbstractAioThread* aioThreadToUse;
     };
 
     const nx::String m_connectionId;

@@ -9,6 +9,7 @@
 
 #include <nx/network/cloud/data/connection_ack_data.h>
 #include <nx/network/cloud/data/connection_requested_event_data.h>
+#include <nx/utils/log/log.h>
 
 
 namespace nx {
@@ -65,6 +66,7 @@ void UDPHolePunchingConnectionInitiationFsm::onConnectRequest(
                 stun::cc::indications::connectionRequested));
         connectionRequestedEvent.serialize(&indication);
 
+        NX_ASSERT(connectResponseSender);
         m_connectResponseSender = std::move(connectResponseSender);
         auto serverConnectionStrongRef = m_serverConnectionWeakRef.lock();
         if (!serverConnectionStrongRef)
@@ -91,40 +93,52 @@ void UDPHolePunchingConnectionInitiationFsm::onConnectionAckRequest(
     api::ConnectionAckRequest request,
     std::function<void(api::ResultCode)> completionHandler)
 {
-    m_timer.dispatch([this, connection, request, completionHandler]() mutable  //TODO #msvc2015 move to lambda
-    {
-        NX_ASSERT(m_connectResponseSender);
-
-        if (connection->transportProtocol() == nx::network::TransportProtocol::udp)
-            request.udpEndpointList.push_front(connection->getSourceAddress());
-
-        if (request.udpEndpointList.empty())
+    m_timer.dispatch(
+        [this, connection, request,
+            completionHandler = std::move(completionHandler)]() mutable  //TODO #msvc2015 move to lambda
         {
-            completionHandler(api::ResultCode::noSuitableConnectionMethod);
-            m_timer.post(std::bind(
-                &UDPHolePunchingConnectionInitiationFsm::done,
-                this,
-                api::ResultCode::noSuitableConnectionMethod));
-            return;
-        }
+            if (m_state > State::waitingServerPeerUDPAddress)
+            {
+                NX_LOGX(
+                    lm("Connection %1. Received connectionAck while in %2 state. Ignoring...")
+                        .arg(m_connectionID).arg(static_cast<int>(m_state)),
+                    cl_logDEBUG1);
+                completionHandler(api::ResultCode::ok);
+                return;
+            }
 
-        auto connectResponseSender = std::move(m_connectResponseSender);
+            NX_ASSERT(m_connectResponseSender);
 
-        api::ConnectResponse connectResponse;
-        connectResponse.udpEndpointList = std::move(request.udpEndpointList);
+            if (connection->transportProtocol() == nx::network::TransportProtocol::udp)
+                request.udpEndpointList.push_front(connection->getSourceAddress());
 
-        connectResponseSender(
-            api::ResultCode::ok,
-            std::move(connectResponse));
-        completionHandler(api::ResultCode::ok);
-        m_state = State::waitingConnectionResult;
-        m_timer.start(
-            kConnectionResultWaitTimeout,
-            std::bind(
-                &UDPHolePunchingConnectionInitiationFsm::done,
-                this,
-                api::ResultCode::timedOut));
-    });
+            if (request.udpEndpointList.empty())
+            {
+                completionHandler(api::ResultCode::noSuitableConnectionMethod);
+                m_timer.post(std::bind(
+                    &UDPHolePunchingConnectionInitiationFsm::done,
+                    this,
+                    api::ResultCode::noSuitableConnectionMethod));
+                return;
+            }
+
+            auto connectResponseSender = std::move(m_connectResponseSender);
+
+            api::ConnectResponse connectResponse;
+            connectResponse.udpEndpointList = std::move(request.udpEndpointList);
+
+            connectResponseSender(
+                api::ResultCode::ok,
+                std::move(connectResponse));
+            completionHandler(api::ResultCode::ok);
+            m_state = State::waitingConnectionResult;
+            m_timer.start(
+                kConnectionResultWaitTimeout,
+                std::bind(
+                    &UDPHolePunchingConnectionInitiationFsm::done,
+                    this,
+                    api::ResultCode::timedOut));
+        });
 }
 
 void UDPHolePunchingConnectionInitiationFsm::onConnectionResultRequest(

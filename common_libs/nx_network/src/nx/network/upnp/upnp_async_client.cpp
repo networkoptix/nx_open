@@ -124,7 +124,6 @@ public:
 
 AsyncClient::~AsyncClient()
 {
-    /*
     std::set<nx_http::AsyncHttpClientPtr> httpClients;
     {
         QnMutexLocker lk(&m_mutex);
@@ -133,7 +132,6 @@ AsyncClient::~AsyncClient()
 
     for (const auto& client: httpClients)
         client->terminate();
-        */
 }
 
 bool AsyncClient::Message::isOk() const

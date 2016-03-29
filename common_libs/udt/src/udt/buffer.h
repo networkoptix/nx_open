@@ -47,10 +47,13 @@ written by
 #include "queue.h"
 #include <fstream>
 
+
+static const int kDefaultMtuSize = 1400;
+
 class CSndBuffer
 {
 public:
-   CSndBuffer(int size = 32, int mss = 1500);
+   CSndBuffer(int size = 32, int mss = kDefaultMtuSize);
    ~CSndBuffer();
 
       // Functionality:

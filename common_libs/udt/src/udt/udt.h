@@ -54,6 +54,7 @@ written by
    #include <windows.h>
 #endif
 #include <fstream>
+#include <map>
 #include <set>
 #include <string>
 #include <vector>
@@ -108,11 +109,13 @@ typedef std::set<UDTSOCKET> ud_set;
 
 enum EPOLLOpt
 {
-   // this values are defined same as linux epoll.h
-   // so that if system values are used by mistake, they should have the same effect
-   UDT_EPOLL_IN = 0x1,
-   UDT_EPOLL_OUT = 0x4,
-   UDT_EPOLL_ERR = 0x8
+    // this values are defined same as linux epoll.h
+    // so that if system values are used by mistake, they should have the same effect
+    UDT_EPOLL_IN = 0x1,
+    UDT_EPOLL_OUT = 0x4,
+    UDT_EPOLL_ERR = 0x8,
+    UDT_EPOLL_HUP = 0x10,
+    UDT_EPOLL_RDHUP = 0x2000
 };
 
 enum UDTSTATUS {INIT = 1, OPENED, LISTENING, CONNECTING, CONNECTED, BROKEN, CLOSING, CLOSED, NONEXIST};
@@ -340,8 +343,15 @@ UDT_API int epoll_add_usock(int eid, UDTSOCKET u, const int* events = NULL);
 UDT_API int epoll_add_ssock(int eid, SYSSOCKET s, const int* events = NULL);
 UDT_API int epoll_remove_usock(int eid, UDTSOCKET u);
 UDT_API int epoll_remove_ssock(int eid, SYSSOCKET s);
-UDT_API int epoll_wait(int eid, std::set<UDTSOCKET>* readfds, std::set<UDTSOCKET>* writefds, int64_t msTimeOut,
-                       std::set<SYSSOCKET>* lrfds = NULL, std::set<SYSSOCKET>* wrfds = NULL);
+/** 
+    @param readfds map<socket handle, event mask (bit mask of \a EPOLLOpt values)>. 
+        \a UDT_EPOLL_IN in implied. event mask should not be tested for \a UDT_EPOLL_IN
+    Same rules apply to each fd set
+*/
+UDT_API int epoll_wait(
+    int eid,
+    std::map<UDTSOCKET, int>* readfds, std::map<UDTSOCKET, int>* writefds, int64_t msTimeOut,
+    std::map<SYSSOCKET, int>* lrfds = NULL, std::map<SYSSOCKET, int>* wrfds = NULL);
 UDT_API int epoll_wait2(int eid, UDTSOCKET* readfds, int* rnum, UDTSOCKET* writefds, int* wnum, int64_t msTimeOut,
                         SYSSOCKET* lrfds = NULL, int* lrnum = NULL, SYSSOCKET* lwfds = NULL, int* lwnum = NULL);
 UDT_API int epoll_release(int eid);

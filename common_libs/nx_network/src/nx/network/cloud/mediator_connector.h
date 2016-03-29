@@ -7,6 +7,7 @@
 
 #include <nx/network/stun/async_client.h>
 #include <nx/network/aio/timer.h>
+#include <nx/network/retry_timer.h>
 
 #include "abstract_cloud_system_credentials_provider.h"
 #include "cdb_endpoint_fetcher.h"
@@ -58,6 +59,7 @@ private:
     nx::network::cloud::CloudModuleEndPointFetcher m_endpointFetcher;
     nx::network::aio::Timer m_timer;
     boost::optional<SocketAddress> m_mediatorAddress;
+    nx::network::RetryTimer m_fetchEndpointRetryTimer;
 };
 
 } // namespace api

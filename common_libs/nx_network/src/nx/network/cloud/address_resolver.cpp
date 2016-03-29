@@ -8,7 +8,7 @@
 #include <utils/serialization/lexical.h>
 
 static const auto DNS_CACHE_TIME = std::chrono::seconds(10);
-static const auto MEDIATOR_CACHE_TIME = std::chrono::minutes(1);
+static const auto MEDIATOR_CACHE_TIME = std::chrono::seconds(10);
 
 namespace nx {
 namespace network {
@@ -100,6 +100,7 @@ void AddressResolver::addFixedAddress(
     const HostAddress& hostName, const SocketAddress& hostAddress )
 {
     NX_ASSERT(!hostName.isResolved(), Q_FUNC_INFO, "Hostname should be unresolved");
+    NX_ASSERT(hostAddress.address.isResolved());
 
     QnMutexLocker lk(&m_mutex);
     AddressEntry entry(hostAddress);
@@ -146,7 +147,7 @@ void AddressResolver::resolveDomain(
             nx::hpm::api::ResultCode resultCode,
             nx::hpm::api::ResolveDomainResponse response)
         {
-            NX_LOGX(lm("Domain %1 resolution on mediator result: %1")
+            NX_LOGX(lm("Domain %1 resolution on mediator result: %2")
                 .arg(domain.toString()).arg(QnLexical::serialized(resultCode)),
                 cl_logDEBUG2);
 
@@ -328,16 +329,11 @@ void AddressResolver::HostAddressInfo::checkExpirations()
 
 bool AddressResolver::HostAddressInfo::isResolved(bool natTraversal) const
 {
-    if( !fixedEntries.empty() )
-        return true; // fixed entries are in priority
+    if(!fixedEntries.empty() || !m_dnsEntries.empty() || !m_mediatorEntries.empty())
+        return true; // any address is better than nothing
 
-    if( m_dnsState != State::resolved )
-        return false; // DNS is required
-
-    if( !m_dnsEntries.empty() )
-        return true; // do not wait for mediator if DNS records are avaliable
-
-    return ( !natTraversal || m_mediatorState == State::resolved );
+    return (m_dnsState == State::resolved) &&
+        (!natTraversal || m_mediatorState == State::resolved);
 }
 
 std::vector<AddressEntry> AddressResolver::HostAddressInfo::getAll() const
@@ -383,13 +379,6 @@ void AddressResolver::dnsResolve(HaInfoIterator info)
             NX_LOGX( lit( "Address %1 is resolved to %2" )
                      .arg( info->first.toString() )
                      .arg( hostAddress.toString() ), cl_logDEBUG1 );
-        }
-        else
-        {
-            // count failure as unresolvable, better luck next time
-            NX_LOGX( lit( "Address %1 could not be resolved: %2" )
-                     .arg( info->first.toString() )
-                     .arg( SystemError::toString( code ) ), cl_logDEBUG1 );
         }
 
         info->second.setDnsEntries( entries );
@@ -466,16 +455,20 @@ std::vector<Guard> AddressResolver::grabHandlers(
 
             it->second.inProgress = true;
             guards.push_back( Guard( [ = ]() {
+                auto resolveDataPair = std::move(*it);
+                {
+                    QnMutexLocker lk(&m_mutex);
+                    m_requests.erase(it);
+                }
+
                 auto code = entries.empty() ? lastErrorCode : SystemError::noError;
-                it->second.handler( code, std::move( entries ) );
+                resolveDataPair.second.handler( code, std::move( entries ) );
 
                 QnMutexLocker lk( &m_mutex );
                 NX_LOGX( lit( "Address %1 is resolved by request %2 to %3" )
                          .arg( info->first.toString() )
-                         .arg( reinterpret_cast< size_t >( it->first ) )
+                         .arg( reinterpret_cast< size_t >(resolveDataPair.first ) )
                          .arg( containerString( entries ) ), cl_logDEBUG2 );
-
-                m_requests.erase( it );
                 m_condition.wakeAll();
             } ) );
         }
@@ -486,9 +479,13 @@ std::vector<Guard> AddressResolver::grabHandlers(
             ++req;
     }
 
-    NX_LOGX( lit( "There are %1 about to be notified: %2 is resolved to %3" )
-             .arg( guards.size() ).arg( info->first.toString() )
-             .arg( containerString( entries ) ), cl_logDEBUG1 );
+    if (guards.size())
+    {
+        NX_LOGX( lit( "There is(are) %1 about to be notified: %2 is resolved to %3" )
+                 .arg( guards.size() ).arg( info->first.toString() )
+                 .arg( containerString( entries ) ), cl_logDEBUG1 );
+    }
+
     return guards;
 }
 

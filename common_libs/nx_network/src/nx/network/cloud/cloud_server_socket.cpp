@@ -13,28 +13,32 @@ namespace nx {
 namespace network {
 namespace cloud {
 
+namespace {
+const int kDefaultAcceptQueueSize = 128;
+}
+
 static const std::vector<CloudServerSocket::AcceptorMaker> defaultAcceptorMakers()
 {
     std::vector<CloudServerSocket::AcceptorMaker> makers;
 
-    makers.push_back([](hpm::api::ConnectionRequestedEvent& event)
-    {
-        using namespace hpm::api::ConnectionMethod;
-        if (event.connectionMethods & udpHolePunching)
+    makers.push_back(
+        [](const hpm::api::ConnectionRequestedEvent& event)
         {
-            event.connectionMethods ^= udpHolePunching; //< used
-            NX_ASSERT(event.udpEndpointList.size() == 1);
-            if (!event.udpEndpointList.size())
-                return std::unique_ptr<AbstractTunnelAcceptor>();
+            using namespace hpm::api::ConnectionMethod;
+            if (event.connectionMethods & udpHolePunching)
+            {
+                NX_ASSERT(event.udpEndpointList.size() == 1);
+                if (!event.udpEndpointList.size())
+                    return std::unique_ptr<AbstractTunnelAcceptor>();
 
-            auto acceptor = std::make_unique<UdpHolePunchingTunnelAcceptor>(
-                std::move(event.udpEndpointList.front()));
+                auto acceptor = std::make_unique<UdpHolePunchingTunnelAcceptor>(
+                    std::move(event.udpEndpointList.front()));
 
-            return std::unique_ptr<AbstractTunnelAcceptor>(std::move(acceptor));
-        }
+                return std::unique_ptr<AbstractTunnelAcceptor>(std::move(acceptor));
+            }
 
-        return std::unique_ptr<AbstractTunnelAcceptor>();
-    });
+            return std::unique_ptr<AbstractTunnelAcceptor>();
+        });
 
     // TODO: #mux add other connectors when supported
     return makers;
@@ -48,13 +52,15 @@ CloudServerSocket::CloudServerSocket(
     nx::network::RetryPolicy mediatorRegistrationRetryPolicy,
     std::vector<AcceptorMaker> acceptorMakers)
 :
-    m_mediatorConnection(mediatorConnection),
+    m_mediatorConnection(std::move(mediatorConnection)),
     m_mediatorRegistrationRetryTimer(std::move(mediatorRegistrationRetryPolicy)),
     m_acceptorMakers(acceptorMakers),
-    m_acceptQueueLen(128),
+    m_acceptQueueLen(kDefaultAcceptQueueSize),
     m_state(State::init),
     m_terminated(false)
 {
+    NX_ASSERT(m_mediatorConnection);
+
     // TODO: #mu default values for m_socketAttributes shall match default
     //           system vales: think how to implement this...
     m_socketAttributes.nonBlockingMode = false;
@@ -119,7 +125,7 @@ AbstractSocket::SOCKET_HANDLE CloudServerSocket::handle() const
 bool CloudServerSocket::listen(int queueLen)
 {
     //actual initialization is done with first accept call
-    m_acceptQueueLen = queueLen;
+    m_acceptQueueLen = queueLen != 0 ? queueLen : kDefaultAcceptQueueSize;
     return true;
 }
 
@@ -160,32 +166,27 @@ void CloudServerSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
         m_terminated = true;
     }
 
-    auto stop = [this, handler = std::move(handler)]() mutable
-    {
-        if (m_mediatorConnection)
-            m_mediatorConnection.reset();
+    m_mediatorRegistrationRetryTimer.pleaseStop(
+        [this, handler = std::move(handler)]() mutable
+        {
+            // 1st - Stop Indications
+            m_mediatorConnection->pleaseStop(
+                [this, handler = std::move(handler)]() mutable
+                {
+                    BarrierHandler barrier(
+                        [this, handler = std::move(handler)]() mutable
+                        {
+                            // 3rd - Stop Tunnel Pool and IO thread
+                            BarrierHandler barrier(std::move(handler));
+                            if (m_tunnelPool)
+                                m_tunnelPool->pleaseStop(barrier.fork());
+                        });
 
-        BarrierHandler barrier(
-            [this, handler = std::move(handler)]() mutable
-            {
-                // 3rd - Stop Tunnel Pool and IO thread
-                BarrierHandler barrier(std::move(handler));
-                if (m_tunnelPool)
-                    m_tunnelPool->pleaseStop(barrier.fork());
-
-            });
-
-        m_mediatorRegistrationRetryTimer.pleaseStop(barrier.fork());
-        // 2nd - Stop Acceptors
-        for (auto& acceptor : m_acceptors)
-            acceptor->pleaseStop(barrier.fork());
-    };
-
-    // 1st - Stop Indications
-    if (m_mediatorConnection)
-        m_mediatorConnection->pleaseStop(std::move(stop));
-    else
-        stop();
+                    // 2nd - Stop Acceptors
+                    for (auto& acceptor : m_acceptors)
+                        acceptor->pleaseStop(barrier.fork());
+                });
+        });
 }
 
 void CloudServerSocket::post(nx::utils::MoveOnlyFunc<void()> handler)
@@ -205,6 +206,7 @@ aio::AbstractAioThread* CloudServerSocket::getAioThread()
 
 void CloudServerSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
+    NX_ASSERT(!m_tunnelPool);
     m_mediatorRegistrationRetryTimer.bindToAioThread(aioThread);
 }
 
@@ -413,27 +415,19 @@ void CloudServerSocket::acceptAsyncInternal(
         [this, handler = std::move(handler)](
             std::unique_ptr<AbstractStreamSocket> socket) mutable
         {
-            NX_ASSERT(!m_acceptedSocket, Q_FUNC_INFO, "concurrently accepted socket");
+            //NX_ASSERT(!m_acceptedSocket, Q_FUNC_INFO, "concurrently accepted socket");
             NX_LOGX(lm("accepted socket %1").arg(socket), cl_logDEBUG2);
 
-            m_acceptedSocket = std::move(socket);
-            m_mediatorRegistrationRetryTimer.post(
-                [this, handler = std::move(handler)]
-                {
-                    auto socket = std::move(m_acceptedSocket);
-                    m_acceptedSocket = nullptr;
-
-                    if (socket)
-                    {
-                        NX_LOGX(lm("return socket %1").arg(socket), cl_logDEBUG2);
-                        handler(SystemError::noError, socket.release());
-                    }
-                    else
-                    {
-                        NX_LOGX(lm("accept timed out"), cl_logDEBUG2);
-                        handler(SystemError::timedOut, nullptr);
-                    }
-                });
+            if (socket)
+            {
+                NX_LOGX(lm("return socket %1").arg(socket), cl_logDEBUG2);
+                handler(SystemError::noError, socket.release());
+            }
+            else
+            {
+                NX_LOGX(lm("accept timed out"), cl_logDEBUG2);
+                handler(SystemError::timedOut, nullptr);
+            }
         },
         m_socketAttributes.recvTimeout);
 }
@@ -442,7 +436,14 @@ void CloudServerSocket::issueRegistrationRequest()
 {
     const auto cloudCredentials =
         SocketGlobals::mediatorConnector().getSystemCredentials();
-    NX_ASSERT(cloudCredentials);
+    if (!cloudCredentials)  //TODO #ak this MUST be assert
+    {
+        //specially for unit tests
+        m_mediatorRegistrationRetryTimer.post(std::bind(
+            &CloudServerSocket::onListenRequestCompleted, this,
+            nx::hpm::api::ResultCode::notAuthorized));
+        return;
+    }
 
     nx::hpm::api::ListenRequest listenRequestData;
     listenRequestData.systemId = cloudCredentials->systemId;
@@ -460,21 +461,25 @@ void CloudServerSocket::issueRegistrationRequest()
 void CloudServerSocket::onConnectionRequested(
     hpm::api::ConnectionRequestedEvent event)
 {
-    for (const auto& maker : m_acceptorMakers)
-    {
-        if (auto acceptor = maker(event))
+    m_mediatorRegistrationRetryTimer.post(
+        [this, event = std::move(event)]
         {
-            acceptor->setConnectionInfo(
-                event.connectSessionId, event.originatingPeerID);
+            for (const auto& maker : m_acceptorMakers)
+            {
+                if (auto acceptor = maker(event))
+                {
+                    acceptor->setConnectionInfo(
+                        event.connectSessionId, event.originatingPeerID);
 
-            acceptor->setMediatorConnection(m_mediatorConnection);
-            startAcceptor(std::move(acceptor));
-        }
-    }
+                    acceptor->setMediatorConnection(m_mediatorConnection);
+                    startAcceptor(std::move(acceptor));
+                }
+            }
 
-    if (event.connectionMethods)
-        NX_LOG(lm("Unsupported ConnectionMethods: %1")
-            .arg(event.connectionMethods), cl_logWARNING);
+            if (event.connectionMethods)
+                NX_LOG(lm("Unsupported ConnectionMethods: %1")
+                    .arg(event.connectionMethods), cl_logWARNING);
+        });
 }
 
 } // namespace cloud

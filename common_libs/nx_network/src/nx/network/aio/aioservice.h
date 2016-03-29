@@ -111,6 +111,7 @@ public:
     //TODO #ak better remove this method, violates encapsulation
     QnMutex* mutex() const;
     aio::AIOThread* getSocketAioThread(Pollable* sock);
+    AbstractAioThread* getRandomAioThread() const;
     void bindSocketToAioThread(Pollable* sock, AbstractAioThread* aioThread);
 
     //!Same as \a AIOService::watchSocket, but does not lock mutex. Calling entity MUST lock \a AIOService::mutex() before calling this method
@@ -122,8 +123,10 @@ public:
         Pollable* const sock,
         aio::EventType eventToWatch,
         AIOEventHandler<Pollable>* const eventHandler,
-        boost::optional<std::chrono::milliseconds> timeoutMillis = boost::optional<std::chrono::milliseconds>(),
-        nx::utils::MoveOnlyFunc<void()> socketAddedToPollHandler = nx::utils::MoveOnlyFunc<void()>());
+        boost::optional<std::chrono::milliseconds> timeoutMillis
+            = boost::optional<std::chrono::milliseconds>(),
+        nx::utils::MoveOnlyFunc<void()> socketAddedToPollHandler
+            = nx::utils::MoveOnlyFunc<void()>());
 
     //!Same as \a AIOService::removeFromWatch, but does not lock mutex. Calling entity MUST lock \a AIOService::mutex() before calling this method
     void removeFromWatchNonSafe(
@@ -131,7 +134,8 @@ public:
         Pollable* const sock,
         aio::EventType eventType,
         bool waitForRunningHandlerCompletion = true,
-        nx::utils::MoveOnlyFunc<void()> pollingStoppedHandler = nx::utils::MoveOnlyFunc<void()>());
+        nx::utils::MoveOnlyFunc<void()> pollingStoppedHandler
+            = nx::utils::MoveOnlyFunc<void()>());
 
     void cancelPostedCalls(
         Pollable* const sock,
