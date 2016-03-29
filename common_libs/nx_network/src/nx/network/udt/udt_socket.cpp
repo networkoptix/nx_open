@@ -128,17 +128,30 @@ private:
     UdtSocketImpl& operator=(const UdtSocketImpl&);
 };
 
-bool UdtSocketImpl::Open() {
+bool UdtSocketImpl::Open()
+{
     NX_ASSERT(IsClosed());
     udtHandle = UDT::socket(AF_INET,SOCK_STREAM,0);
-    if( udtHandle != UDT::INVALID_SOCK ) {
-        m_state = SocketState::open;
-        return true;
-    } else {
+    if( udtHandle == UDT::INVALID_SOCK )
+    {
         SystemError::setLastErrorCode(
             convertToSystemError(UDT::getlasterror().getErrorCode()));
         return false;
     }
+
+    static const int kMaximumUdtWindowSizePackets = 64;
+    if (UDT::setsockopt(
+            udtHandle, 0, UDT_FC,
+            &kMaximumUdtWindowSizePackets, sizeof(kMaximumUdtWindowSizePackets)) != 0)
+    {
+        SystemError::setLastErrorCode(
+            convertToSystemError(UDT::getlasterror().getErrorCode()));
+        UDT::close(udtHandle);
+        return false;
+    }
+
+    m_state = SocketState::open;
+    return true;
 }
 
 bool UdtSocketImpl::Bind( const SocketAddress& localAddress ) {
