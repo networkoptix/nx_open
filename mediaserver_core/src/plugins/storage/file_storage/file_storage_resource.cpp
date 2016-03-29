@@ -542,13 +542,8 @@ qint64 QnFileStorageResource::getTotalSpace()
     QnMutexLocker locker(&m_writeTestMutex);
     if (m_cachedTotalSpace <= 0)
     {
-        QString localPathCopy = getLocalPathSafe();
-
-        if (m_cachedTotalSpace <= 0)
-        {
-            m_cachedTotalSpace = getDiskTotalSpace(
-                localPathCopy.isEmpty() ? getPath() : localPathCopy);
-        }
+        m_cachedTotalSpace = getDiskTotalSpace(
+            m_localPath.isEmpty() ? getPath() : m_localPath);
     }
 
     return m_cachedTotalSpace;
