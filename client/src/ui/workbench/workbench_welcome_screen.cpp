@@ -220,8 +220,13 @@ void QnWorkbenchWelcomeScreen::setupFactorySystem(const QString &serverUrl)
     const auto showDialogHandler = [this, serverUrl, controlsGuard]()
     {
         /* We are receiving string with port but without protocol, so we must parse it. */
-        const QScopedPointer<QnSetupWizardDialog> dialog(
-            new QnSetupWizardDialog(QUrl::fromUserInput(serverUrl), mainWindow()));
+        const QScopedPointer<QnSetupWizardDialog> dialog(new QnSetupWizardDialog(mainWindow()));
+        dialog->setUrl(QUrl::fromUserInput(serverUrl));
+        if (isLoggedInToCloud())
+        {
+            dialog->setCloudLogin(m_cloudWatcher->cloudLogin());
+            dialog->setCloudPassword(m_cloudWatcher->cloudPassword());
+        }
         dialog->exec();
     };
 
