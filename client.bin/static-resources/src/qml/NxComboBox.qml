@@ -184,7 +184,6 @@ ComboBox
     }
 
     onCurrentTextChanged: { updateText(); }
-    onActivated: console.log("activated", index)
 
     function updateText()
     {

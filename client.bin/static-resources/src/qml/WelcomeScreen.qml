@@ -146,7 +146,6 @@ Rectangle
                             }
 
                             enabled: (!isExpanded || !context.connectingNow);
-                            onEnabledChanged: console.log("|----", enabled)
                         }
                     }
 
