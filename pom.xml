@@ -660,6 +660,7 @@
                 <module>debsetup/cloud_db-deb</module>
             </modules>
             <properties>
+                <qtplugin3>platforminputcontexts</qtplugin3>
                 <modification>ubuntu</modification>
             </properties>
         </profile>

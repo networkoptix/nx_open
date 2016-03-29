@@ -1570,7 +1570,7 @@ bool MediaServerProcess::initTcpListener(
     QnRestProcessorPool::instance()->registerHandler("api/logLevel", new QnLogLevelRestHandler(), RestPermissions::adminOnly);
     QnRestProcessorPool::instance()->registerHandler("api/execute", new QnExecScript(), RestPermissions::adminOnly);
     QnRestProcessorPool::instance()->registerHandler("api/scriptList", new QnScriptListRestHandler(), RestPermissions::adminOnly);
-    QnRestProcessorPool::instance()->registerHandler("api/systemSettings", new QnSystemSettingsHandler(), RestPermissions::adminOnly);
+    QnRestProcessorPool::instance()->registerHandler("api/systemSettings", new QnSystemSettingsHandler());
 
     QnRestProcessorPool::instance()->registerHandler("api/cameraBookmarks", new QnCameraBookmarksRestHandler());
 
