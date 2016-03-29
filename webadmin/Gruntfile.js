@@ -330,12 +330,11 @@ module.exports = function (grunt) {
                 ]
             },
             server: '.tmp',
-
             publish:{
                 files:[
                     {
                         dot: true,
-                        src: '<%= yeoman.app %>/../static'
+                        src: '<%= yeoman.app %>/../../../buildenv/packages/any/server-external-3.0.0/bin/external.data'
                     }
                 ],
                 options: {
@@ -566,9 +565,9 @@ module.exports = function (grunt) {
             publish:{
                 expand: true,
                 nonull:true,
-                cwd: '<%= yeoman.app %>/../dist',
-                dest: '<%= yeoman.app %>/../static/',
-                src: '**'
+                cwd: '<%= yeoman.app %>/../',
+                dest: '<%= yeoman.app %>/../../../buildenv/packages/any/server-external-3.0.0/bin',
+                src: 'external.dat'
             }
         },
         compress: {
@@ -705,9 +704,9 @@ module.exports = function (grunt) {
     grunt.registerTask('publish', [
         'build',
         'clean:zip',
-        'copy:publish',
+        'clean:publish',
         'compress:external',
-        'clean:publish'
+        'copy:publish'
     ]);
 
 
