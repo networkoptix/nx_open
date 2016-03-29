@@ -29,8 +29,18 @@ angular.module('webadminApp')
         var nativeClientObject = typeof(setupDialog)=='undefined'?null:setupDialog; // Qt registered object
         var debugMode = $location.search().debug;
 
+        var cloudAuthorized = debugMode;
+        if(nativeClientObject && nativeClientObject.getCredentials){
+            var authObject = nativeClientObject.getCredentials();
+            cloudAuthorized = authObject.cloudEmail && authObject.cloudPassword;
+            if(cloudAuthorized){
+                $scope.settings.presetCloudEmail = authObject.cloudEmail;
+                $scope.settings.presetCloudPassword = authObject.cloudPassword;
+            }
+        }
         if(debugMode){
             console.log("Wizard works in debug mode: no changes on server or portal will be made.")
+            $scope.settings.presetCloudEmail = "debug@hdw.mx";
         }
 
         /* Funсtions for external calls (open links) */
@@ -66,6 +76,10 @@ angular.module('webadminApp')
 
             $scope.settings.localLogin = user.name || Config.defaultLogin;
 
+            if(debugMode) {
+                $scope.next('start');// go to start
+                return;
+            }
             mediaserver.systemCloudInfo().then(function(data){
                 $scope.settings.cloudSystemID = data.cloudSystemID;
                 $scope.settings.cloudEmail = data.cloudAccountName;
@@ -228,9 +242,14 @@ angular.module('webadminApp')
         }
         /* Connect to cloud section */
 
-        function connectToCloud(){
+
+        function connectToCloud(preset){
             $log.log("Connect to cloud");
 
+            if(preset){
+                $scope.settings.cloudEmail = $scope.settings.presetCloudEmail;
+                $scope.settings.cloudPassword = $scope.settings.presetCloudPassword;
+            }
             $scope.settings.cloudError = false;
             if(debugMode){
                 $scope.portalSystemLink = Config.cloud.portalSystemUrl.replace("{systemId}",'some_system_id');
@@ -395,7 +414,7 @@ angular.module('webadminApp')
             },
             systemName:{
                 back: 'start',
-                next: 'cloudIntro',
+                next: cloudAuthorized?'cloudAuthorizedIntro':'cloudIntro',
                 valid: function(){
                     return required($scope.settings.systemName);
                 }
@@ -403,8 +422,14 @@ angular.module('webadminApp')
             cloudIntro:{
                 back: 'systemName'
             },
+            cloudAuthorizedIntro:{
+                back: 'systemName',
+                next: function(){
+                    connectToCloud(true)
+                }
+            },
             cloudLogin:{
-                back: 'cloudIntro',
+                back: cloudAuthorized?'cloudAuthorizedIntro':'cloudIntro',
                 next: connectToCloud,
                 valid: function(){
                     return required($scope.settings.cloudEmail) &&
