@@ -60,6 +60,7 @@ BaseTile
             disabledLabelColor: Style.colors.midlight;
             enabled: thisComponent.allowExpanding;
 
+            comboBoxTextRole: "display";
             model: thisComponent.knownHostsModel;
             iconUrl: "qrc:/skin/welcome_page/server.png";   // TODO: add ecosystem class for hovered icons
             hoveredIconUrl: "qrc:/skin/welcome_page/server_hover.png";
@@ -71,18 +72,17 @@ BaseTile
         {
             id: userChooseItem;
 
-            visible: thisComponent.isRecentlyConnected;
             isAvailable: thisComponent.allowExpanding && thisComponent.isExpanded;
 
             disabledLabelColor: Style.colors.midlight;
             enabled: thisComponent.allowExpanding;
 
+            comboBoxTextRole: "userName";
             model: thisComponent.knownUsersModel;
             iconUrl: "qrc:/skin/welcome_page/user.png";
             hoveredIconUrl: "qrc:/skin/welcome_page/user_hover.png";
             disabledIconUrl: "qrc:/skin/welcome_page/user_disabled.png";
 
-            comboBoxTextRole: "userName";
             Component.onCompleted: activeItemSelector.addItem(this);
         }
     }

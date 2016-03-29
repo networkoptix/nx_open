@@ -16,7 +16,20 @@ public:
 public slots:
     void openUrlInBrowser(const QString &urlString);
 
+    QString getCredentials() const;
+
 public:
+    struct LoginInfo
+    {
+        QString cloudEmail;
+        QString cloudPassword;
+        QString localLogin;
+        QString localPassword;
+    };
+
+#define LoginInfo_Fields (cloudEmail)(cloudPassword)(localLogin)(localPassword)
+
     QWebView *webView;
     QUrl url;
+    LoginInfo loginInfo;
 };

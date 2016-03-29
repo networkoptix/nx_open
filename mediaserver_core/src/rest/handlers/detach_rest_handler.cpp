@@ -1,8 +1,12 @@
 #include "detach_rest_handler.h"
 
 #include <api/global_settings.h>
+
+#include <common/common_module.h>
+
 #include <nx/network/http/httptypes.h>
 #include "media_server/serverutil.h"
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
 
@@ -56,6 +60,7 @@ int QnDetachFromSystemRestHandler::execute(PasswordData passwordData, QnJsonRest
             lit("Failed to save cloud credentials to local DB"));
         return nx_http::StatusCode::ok;
     }
+    qnCommon->updateModuleInformation();
 
     nx::SystemName systemName;
     systemName.resetToDefault();

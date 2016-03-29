@@ -2274,6 +2274,12 @@ void MediaServerProcess::run()
 
     loadResourcesFromECS(messageProcessor.data());
 
+    if (isNewServerInstance)
+    {
+        /* In case of error it will be instantly cleaned by the watcher. */
+        qnGlobalSettings->setNewSystem(true);
+    }
+
 
     if (qnGlobalSettings->isCrossdomainXmlEnabled())
         m_httpModManager->addUrlRewriteExact( lit( "/crossdomain.xml" ), lit( "/static/crossdomain.xml" ) );
@@ -2311,12 +2317,11 @@ void MediaServerProcess::run()
         MSSettings::roSettings()->remove(QnGlobalSettings::kNameCloudAuthKey);
     }
 
-
-    qnGlobalSettings->synchronizeNow();
+    qnGlobalSettings->synchronizeNowSync();
+    qnCommon->updateModuleInformation();
 
     if (QnUserResourcePtr adminUser = qnResPool->getAdministrator())
     {
-        qnCommon->updateModuleInformation();
 
         hostSystemPasswordSynchronizer->syncLocalHostRootPasswordWithAdminIfNeeded( adminUser );
 

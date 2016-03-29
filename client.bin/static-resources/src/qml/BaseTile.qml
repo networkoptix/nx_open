@@ -202,12 +202,18 @@ Item
             height: tileHolder.parent.height;
 
             hoverEnabled: true;
-            onClicked: { toggle(); }
+            onClicked:
+            {
+                if (thisComponent.enabled)
+                    thisComponent.toggle();
+            }
         }
 
         Rectangle
         {
             id: tileArea;
+
+            enabled: thisComponent.enabled;
 
             readonly property bool isHovered: (!thisComponent.isExpanded && hoverIndicator.containsMouse);
 
@@ -240,6 +246,7 @@ Item
             {
                 id: systemNameText;
 
+                disableable: false;
                 anchors.left: parent.left;
                 anchors.right: parent.left;
                 anchors.top: parent.top;
@@ -271,7 +278,7 @@ Item
                 bkgColor: tileArea.color;
                 hoveredColor: Style.colors.custom.systemTile.closeButtonBkg;
 
-                onClicked: { toggle(); }
+                onClicked: { thisComponent.toggle(); }
             }
 
             Column

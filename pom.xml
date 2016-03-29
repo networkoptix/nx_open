@@ -149,6 +149,7 @@
         <festival.version>2.4</festival.version>
         <boost.version>1.56-SNAPSHOT</boost.version>
         <quazip.version>0.7.1</quazip.version>
+        <server-external.version>3.0.0</server-external.version>
 
         <qt.libs/>
         <global.libs/>
