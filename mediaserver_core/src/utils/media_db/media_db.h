@@ -2,7 +2,6 @@
 #define __MEDIA_DB_H__
 
 #include <deque>
-#include <thread>
 #include <cmath>
 
 #include <boost/variant.hpp>
@@ -10,6 +9,7 @@
 
 #include "nx/utils/thread/mutex.h"
 #include "nx/utils/thread/wait_condition.h"
+#include "utils/common/long_runnable.h"
 
 // Refer to https://networkoptix.atlassian.net/wiki/display/SD/Proprietary+media+database+record+format 
 // for DB records format details.
@@ -21,13 +21,13 @@ namespace media_db
 
 struct FileHeader
 {
-    quint64 part_1;
-    quint64 part_2;
+    quint64 part1;
+    quint64 part2;
 
-    FileHeader() : part_1(0), part_2(0) {}
+    FileHeader() : part1(0), part2(0) {}
 
-    uint8_t getDbVersion() const { return part_1 & 0xff;  }
-    void setDbVersion(uint8_t dbVersion) { part_1 |= (dbVersion & 0xff); }
+    uint8_t getDbVersion() const { return part1 & 0xff;  }
+    void setDbVersion(uint8_t dbVersion) { part1 |= (dbVersion & 0xff); }
 };
 
 enum class RecordType
@@ -47,53 +47,53 @@ inline quint64 getBitMask(int width) { return (quint64)std::pow(2, width) - 1; }
 
 struct RecordBase
 {
-    quint64 part_1;
+    quint64 part1;
     
-    RecordBase(quint64 i = 0) : part_1(i) {}
-    RecordType getRecordType() const { return static_cast<RecordType>(part_1 & 0x3); }
-    void setRecordType(RecordType recordType) { part_1 |= (quint64)recordType & 0x3; }
+    RecordBase(quint64 i = 0) : part1(i) {}
+    RecordType getRecordType() const { return static_cast<RecordType>(part1 & 0x3); }
+    void setRecordType(RecordType recordType) { part1 |= (quint64)recordType & 0x3; }
 };
 
 struct MediaFileOperation : RecordBase
 {
-    quint64 part_2;
+    quint64 part2;
 
-    MediaFileOperation(quint64 i1 = 0, quint64 i2 = 0) : RecordBase(i1), part_2(i2) {}
-    int getCameraId() const { return (part_1 >> 0x2) & 0xffff; }
-    void setCameraId(int cameraId) { part_1 |= ((quint64)cameraId & 0xffff) << 0x2; }
+    MediaFileOperation(quint64 i1 = 0, quint64 i2 = 0) : RecordBase(i1), part2(i2) {}
+    int getCameraId() const { return (part1 >> 0x2) & 0xffff; }
+    void setCameraId(int cameraId) { part1 |= ((quint64)cameraId & 0xffff) << 0x2; }
 
     qint64 getStartTime() const 
     {   // -1 is a special value which designates that this operation
         // should be done with entire catalog instead of one chunk.
-        qint64 ret = (part_1 >> 0x12) & getBitMask(0x2all); 
+        qint64 ret = (part1 >> 0x12) & getBitMask(0x2all); 
         return ret == 1 ? -1 : ret;
     }
 
     void setStartTime(qint64 startTime) 
     { 
         startTime = startTime == -1 ? 1 : startTime;
-        part_1 |= ((quint64)startTime & getBitMask(0x2all)) << 0x12; 
+        part1 |= ((quint64)startTime & getBitMask(0x2all)) << 0x12; 
     }
 
     int getDuration() const
     {
-        quint64 p1 = (part_1 >> 0x3c) & 0xf;
-        quint64 p2 = part_2 & getBitMask(0x10);
+        quint64 p1 = (part1 >> 0x3c) & 0xf;
+        quint64 p2 = part2 & getBitMask(0x10);
         return p2 | (p1 << 0x10);
     }
 
     void setDuration(int duration)
     {
-        part_1 |= (((quint64)duration >> 0x10) & 0xf) << 0x3C;
-        part_2 |= (quint64)duration & getBitMask(0x10);
+        part1 |= (((quint64)duration >> 0x10) & 0xf) << 0x3C;
+        part2 |= (quint64)duration & getBitMask(0x10);
     }
 
     int getTimeZone() const 
     { 
-        bool isPositive = ((part_2 >> 0x10) & 0x1) == 0;
+        bool isPositive = ((part2 >> 0x10) & 0x1) == 0;
 
-        int intPart = (part_2 >> 0x11) & getBitMask(0x4);
-        int remainder = (part_2 >> 0x15) & 0x3;
+        int intPart = (part2 >> 0x11) & getBitMask(0x4);
+        int remainder = (part2 >> 0x15) & 0x3;
 
         int result = intPart * 60;
         switch (remainder)
@@ -114,25 +114,25 @@ struct MediaFileOperation : RecordBase
     void setTimeZone(int timeZone) 
     { 
         if (timeZone < 0)
-            part_2 |= 0x1ll << 0x10;
+            part2 |= 0x1ll << 0x10;
 
         timeZone = qAbs(timeZone);
 
         int intPart = timeZone / 60;
-        part_2 |= ((quint64)intPart & getBitMask(0x4)) << 0x11;
+        part2 |= ((quint64)intPart & getBitMask(0x4)) << 0x11;
 
         int remainderPart = timeZone - intPart * 60;
         if (remainderPart == 30)
-            part_2 |= ((quint64)1 & 0x3) << 0x15;
+            part2 |= ((quint64)1 & 0x3) << 0x15;
         else if (remainderPart == 45)
-            part_2 |= ((quint64)2 & 0x3) << 0x15;
+            part2 |= ((quint64)2 & 0x3) << 0x15;
     }
 
-    qint64 getFileSize() const { return (part_2 >> 0x17) & getBitMask(0x28ll); }
-    void setFileSize(qint64 fileSize) { part_2 |= ((quint64)fileSize & getBitMask(0x28ll)) << 0x17; }
+    qint64 getFileSize() const { return (part2 >> 0x17) & getBitMask(0x28ll); }
+    void setFileSize(qint64 fileSize) { part2 |= ((quint64)fileSize & getBitMask(0x28ll)) << 0x17; }
 
-    int getCatalog() const { return (part_2 >> 0x3F) & 0x1; }
-    void setCatalog(int catalog) { part_2 |= ((quint64)catalog & 0x1) << 0x3F; }
+    int getCatalog() const { return (part2 >> 0x3F) & 0x1; }
+    void setCatalog(int catalog) { part2 |= ((quint64)catalog & 0x1) << 0x3F; }
 };
 
 struct CameraOperation : RecordBase
@@ -144,11 +144,11 @@ struct CameraOperation : RecordBase
           cameraUniqueId(ar)
     {}
 
-    int getCameraUniqueIdLen() const { return (part_1 >> 0x2) & getBitMask(0xE); }
-    void setCameraUniqueIdLen(int len) { part_1 |= ((quint64)len & getBitMask(0xE)) << 0x2; }
+    int getCameraUniqueIdLen() const { return (part1 >> 0x2) & getBitMask(0xE); }
+    void setCameraUniqueIdLen(int len) { part1 |= ((quint64)len & getBitMask(0xE)) << 0x2; }
 
-    int getCameraId() const { return (part_1 >> 0x10) & getBitMask(0x10); }
-    void setCameraId(int cameraId) { part_1 |= ((quint64)cameraId & getBitMask(0x10)) << 0x10; }
+    int getCameraId() const { return (part1 >> 0x10) & getBitMask(0x10); }
+    void setCameraId(int cameraId) { part1 |= ((quint64)cameraId & getBitMask(0x10)) << 0x10; }
 
     QByteArray getCameraUniqueId() const { return cameraUniqueId; }
     void setCameraUniqueId(const QByteArray &uniqueId) { cameraUniqueId = uniqueId; }
@@ -178,7 +178,7 @@ public:
     virtual void handleRecordWrite(Error error) = 0;
 };
 
-class DbHelper
+class DbHelper : public QnLongRunnable
 {
     typedef std::deque<WriteRecordType> WriteQueue;
 public:
@@ -191,7 +191,7 @@ public:
     Error writeFileHeader(uint8_t dbVersion);
 
     Error readRecord();
-    Error writeRecordAsync(const WriteRecordType &record);
+    Error writeRecord(const WriteRecordType &record);
     void stopWriter();
     void reset();
 
@@ -201,8 +201,11 @@ public:
     QIODevice *getDevice() const;
     void setDevice(QIODevice *device);
 
+public:
+    virtual void run() override;
+    virtual void stop() override;
+
 private:
-    void startWriter();
     Error getError() const;
 
 private:
@@ -211,7 +214,6 @@ private:
     WriteQueue m_writeQueue;
     QDataStream m_stream;
 
-    std::thread m_thread;
     mutable QnMutex m_mutex;
     QnWaitCondition m_cond;
     QnWaitCondition m_writerDoneCond;

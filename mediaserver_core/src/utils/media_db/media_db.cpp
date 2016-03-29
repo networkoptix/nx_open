@@ -15,7 +15,7 @@ namespace
 template<typename StructToWrite>
 QDataStream &operator << (QDataStream &stream, const StructToWrite &s)
 {
-    return stream << s.part_1 << s.part_2;
+    return stream << s.part1 << s.part2;
 }
 
 class RecordVisitor : public boost::static_visitor<>
@@ -25,7 +25,7 @@ public:
    
     void operator() (const CameraOperation &camOp) const
     {
-        *m_stream << camOp.part_1;
+        *m_stream << camOp.part1;
         if (m_stream->status() == QDataStream::WriteFailed)
         {
             *m_error = Error::WriteError;
@@ -56,12 +56,64 @@ DbHelper::DbHelper(DbHelperHandler *const handler)
   m_mode(Mode::Read)
 {
     m_stream.setByteOrder(QDataStream::LittleEndian);
-    startWriter();
+    start();
+}
+
+void DbHelper::run() 
+{
+    while (1)
+    {
+        QnMutexLocker lk(&m_mutex);
+        while ((m_writeQueue.empty() || m_mode == Mode::Read) && !m_needStop)
+            m_cond.wait(lk.mutex());
+        
+        if (m_needStop)
+            return;
+
+        while (!m_writeQueue.empty())
+        {
+            auto record = m_writeQueue.front();
+            m_writeQueue.pop_front();
+
+            Error error;
+            RecordVisitor vis(&m_stream, &error);
+            boost::apply_visitor(vis, record);
+
+            if (error == Error::WriteError)
+            {
+                m_handler->handleRecordWrite(error);
+                break;
+            }
+
+            error = getError();
+            if (error == Error::WriteError)
+            {
+                m_handler->handleRecordWrite(error);
+                break;
+            } 
+            else
+                m_handler->handleRecordWrite(error);
+        }
+
+        lk.unlock();
+        m_writerDoneCond.wakeAll();
+    }
+}
+
+void DbHelper::stop()
+{
+    {
+        QnMutexLocker lk(&m_mutex);
+        m_needStop = true;
+    }
+    m_cond.wakeAll();
+
+    wait();
 }
 
 DbHelper::~DbHelper()
 {
-    stopWriter();
+    stop();
 }
 
 QIODevice *DbHelper::getDevice() const
@@ -101,7 +153,7 @@ Error DbHelper::readFileHeader(uint8_t *version)
     if (m_mode == Mode::Write)
         return Error::WrongMode;
     FileHeader fh;
-    m_stream >> fh.part_1 >> fh.part_2;
+    m_stream >> fh.part1 >> fh.part2;
     if (version)
         *version = fh.getDbVersion();
 
@@ -126,7 +178,7 @@ Error DbHelper::readRecord()
     if (m_mode == Mode::Write)
         return Error::WrongMode;
     RecordBase rb;
-    m_stream >> rb.part_1;
+    m_stream >> rb.part1;
 
     Error error = getError();
     if (error != Error::NoError)
@@ -140,15 +192,15 @@ Error DbHelper::readRecord()
     case RecordType::FileOperationAdd:
     case RecordType::FileOperationDelete:
     {
-        quint64 part_2;
-        m_stream >> part_2;
+        quint64 part2;
+        m_stream >> part2;
         error = getError();
-        m_handler->handleMediaFileOp(MediaFileOperation(rb.part_1, part_2), error);
+        m_handler->handleMediaFileOp(MediaFileOperation(rb.part1, part2), error);
         break;
     }
     case RecordType::CameraOperationAdd:
     {
-        CameraOperation cameraOp(rb.part_1);
+        CameraOperation cameraOp(rb.part1);
         int bytesToRead = cameraOp.getCameraUniqueIdLen();
         cameraOp.cameraUniqueId.resize(bytesToRead);
         int bytesRead = m_stream.readRawData(cameraOp.cameraUniqueId.data(), bytesToRead);
@@ -168,7 +220,7 @@ Error DbHelper::readRecord()
     return error;
 }
 
-Error DbHelper::writeRecordAsync(const WriteRecordType &record)
+Error DbHelper::writeRecord(const WriteRecordType &record)
 {
     {
         QnMutexLocker lk(&m_mutex);
@@ -205,62 +257,6 @@ Mode DbHelper::getMode() const
 {
     QnMutexLocker lk(&m_mutex);
     return m_mode;
-}
-
-void DbHelper::startWriter()
-{
-    m_thread = std::thread(
-        [this]
-        {
-            while (1)
-            {
-                QnMutexLocker lk(&m_mutex);
-                while ((m_writeQueue.empty() || m_mode == Mode::Read) && !m_needStop)
-                    m_cond.wait(lk.mutex());
-                
-                if (m_needStop)
-                    return;
-
-                while (!m_writeQueue.empty())
-                {
-                    auto record = m_writeQueue.front();
-                    m_writeQueue.pop_front();
-
-                    Error error;
-                    RecordVisitor vis(&m_stream, &error);
-                    boost::apply_visitor(vis, record);
-                    if (error == Error::WriteError)
-                    {
-                        m_handler->handleRecordWrite(error);
-                        break;
-                    }
-
-                    error = getError();
-                    if (error == Error::WriteError)
-                    {
-                        m_handler->handleRecordWrite(error);
-                        break;
-                    } 
-                    else
-                        m_handler->handleRecordWrite(error);
-                }
-
-                lk.unlock();
-                m_writerDoneCond.wakeAll();
-            }
-        });
-}
-
-void DbHelper::stopWriter()
-{
-    {
-        QnMutexLocker lk(&m_mutex);
-        m_needStop = true;
-    }
-    m_cond.wakeAll();
-
-    if (m_thread.joinable())
-        m_thread.join();
 }
 
 } // namespace media_db

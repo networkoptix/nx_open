@@ -110,7 +110,7 @@ int QnStorageDb::getCameraIdHash(const QString &cameraUniqueId)
                 NX_LOG(lit("%1 Bad camera hash").arg(Q_FUNC_INFO), cl_logWARNING);
 
             m_uuidToHash.insert(UuidToHash::value_type(cameraUniqueId, cameraId));
-            m_dbHelper.writeRecordAsync(cameraOp);
+            m_dbHelper.writeRecord(cameraOp);
         }
         else
             cameraId = it->second;
@@ -128,7 +128,7 @@ bool QnStorageDb::deleteRecords(const QString& cameraUniqueId,
     mediaFileOp.setStartTime(startTimeMs);
     mediaFileOp.setRecordType(nx::media_db::RecordType::FileOperationDelete);
 
-    m_dbHelper.writeRecordAsync(mediaFileOp);
+    m_dbHelper.writeRecord(mediaFileOp);
 
     {
         QnMutexLocker lk(&m_errorMutex);
@@ -200,7 +200,7 @@ bool QnStorageDb::addRecord(const QString& cameraUniqueId,
     mediaFileOp.setStartTime(chunk.startTimeMs);
     mediaFileOp.setTimeZone(chunk.timeZone);
 
-    m_dbHelper.writeRecordAsync(mediaFileOp);
+    m_dbHelper.writeRecord(mediaFileOp);
 
     {
         QnMutexLocker lk(&m_errorMutex);
@@ -417,7 +417,7 @@ bool QnStorageDb::vacuumInternal()
         camOp.setRecordType(nx::media_db::RecordType::CameraOperationAdd);
         camOp.setCameraUniqueIdLen(it->second.size());
 
-        tmpDbHelper.writeRecordAsync(camOp);
+        tmpDbHelper.writeRecord(camOp);
     }
 
     static const size_t kCatalogsCount = 2;
@@ -441,7 +441,7 @@ bool QnStorageDb::vacuumInternal()
                 mediaFileOp.setStartTime(chunkIt->startTimeMs);
                 mediaFileOp.setTimeZone(chunkIt->timeZone);
 
-                tmpDbHelper.writeRecordAsync(mediaFileOp);
+                tmpDbHelper.writeRecord(mediaFileOp);
             }
         }
     }

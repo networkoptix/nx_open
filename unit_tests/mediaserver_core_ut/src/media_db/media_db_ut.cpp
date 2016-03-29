@@ -136,7 +136,7 @@ public:
         fileOp.setRecordType(nx::media_db::RecordType(tfo.code));
         fileOp.setStartTime(tfo.startTime);
 
-        m_helper->writeRecordAsync(fileOp);
+        m_helper->writeRecord(fileOp);
     }
 
     void operator() (const TestCameraOperation &tco) const
@@ -147,7 +147,7 @@ public:
         camOp.setRecordType(nx::media_db::RecordType(tco.code));
         camOp.setCameraUniqueId(tco.camUniqueId);
 
-        m_helper->writeRecordAsync(camOp);
+        m_helper->writeRecord(camOp);
     }
 private:
     nx::media_db::DbHelper *m_helper;
@@ -490,15 +490,13 @@ TEST(MediaDb_test, ReadWrite_Simple)
     for (auto &data : tdm.dataVector)
         boost::apply_visitor(RecordWriteVisitor(&dbHelper), data.data);
 
+    dbHelper.setMode(nx::media_db::Mode::Read);
     dbHelper.reset();
     dbFile.close();
     dbFile.open(QIODevice::ReadWrite);
 
     uint8_t dbVersion;
-    error = dbHelper.readFileHeader(&dbVersion);
-    ASSERT_TRUE(error == nx::media_db::Error::WrongMode);
 
-    dbHelper.setMode(nx::media_db::Mode::Read);
     error = dbHelper.readFileHeader(&dbVersion);
 
     ASSERT_TRUE(dbVersion == boost::get<TestFileHeader>(tdm.dataVector[0].data).dbVersion);
@@ -684,12 +682,13 @@ TEST(MediaDb_test, ReadWrite_MT)
 TEST(MediaDb_test, StorageDB)
 {
     const QString workDirPath = qApp->applicationDirPath() + lit("/tmp/media_db");
+    QDir().mkpath(workDirPath);
 
     std::unique_ptr<QnCommonModule> commonModule;
     if (!qnCommon) {
         commonModule = std::unique_ptr<QnCommonModule>(new QnCommonModule);
     }
-    commonModule->setModuleGUID("{A680980C-70D1-4545-A5E5-72D89E33648B}");
+    commonModule->setModuleGUID(QnUuid("{A680980C-70D1-4545-A5E5-72D89E33648B}"));
 
     std::unique_ptr<QnResourceStatusDictionary> statusDictionary;
     if (!qnStatusDictionary) {
@@ -708,11 +707,14 @@ TEST(MediaDb_test, StorageDB)
         dbPool = std::unique_ptr<QnStorageDbPool>(new QnStorageDbPool);
     }
 
+    bool result;
     QnFileStorageResourcePtr storage(new QnFileStorageResource);
     storage->setUrl(workDirPath);
+    result = storage->initOrUpdate();
+    ASSERT_TRUE(result);
 
     QnStorageDb sdb(storage, 1);
-    bool result = sdb.open(workDirPath + lit("/test.nxdb"));
+    result = sdb.open(workDirPath + lit("/test.nxdb"));
     ASSERT_TRUE(result);
     
     sdb.loadFullFileCatalog();
