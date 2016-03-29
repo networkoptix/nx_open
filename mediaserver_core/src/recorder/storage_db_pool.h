@@ -42,6 +42,8 @@ public:
     int getStorageIndex(const QnStorageResourcePtr& storage);
     void removeSDB(const QnStorageResourcePtr &storage);
 
+    static bool getDBPath(const QnStorageResourcePtr& storage, QString* const dbDirectory);
+    static QString getLocalGuid();
     void flush();
 private:
     mutable QnMutex m_sdbMutex;

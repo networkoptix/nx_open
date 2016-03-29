@@ -8,97 +8,97 @@
 
 namespace
 {
-    static QString getLocalGuid()
-    {
-        QString simplifiedGUID = qnCommon->moduleGUID().toString();
-        simplifiedGUID = simplifiedGUID.replace("{", "");
-        simplifiedGUID = simplifiedGUID.replace("}", "");
-        return simplifiedGUID;
-    }
-
     static const QString dbRefFileName( QLatin1String("%1_db_ref.guid") );
-
-    static bool getDBPath( const QnStorageResourcePtr& storage, QString* const dbDirectory )
-    {
-        QString storageUrl = storage->getUrl();
-        QString dbRefFilePath;
-
-        //if (storagePath.indexOf(lit("://")) != -1)
-        //    dbRefFilePath = dbRefFileName.arg(getLocalGuid());
-        //else
-        dbRefFilePath = closeDirPath(storageUrl) + dbRefFileName.arg(getLocalGuid());
-
-        QByteArray dbRefGuidStr;
-        //checking for file db_ref.guid existence
-        if (storage->isFileExists(dbRefFilePath))
-        {
-            //have to use db from data directory, not from storage
-            //reading guid from file
-            auto dbGuidFile = std::unique_ptr<QIODevice>(storage->open(dbRefFilePath, QIODevice::ReadOnly));
-
-            if (!dbGuidFile)
-                return false;
-            dbRefGuidStr = dbGuidFile->readAll();
-            //dbGuidFile->close();
-        }
-
-        if( !dbRefGuidStr.isEmpty() )
-        {
-            *dbDirectory = QDir(getDataDirectory() + "/storage_db/" + dbRefGuidStr).absolutePath();
-            if (!QDir().exists(*dbDirectory))
-            {
-                if(!QDir().mkpath(*dbDirectory))
-                {
-                    qWarning() << "DB path create failed (" << storageUrl << ")";
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        if (storage->getCapabilities() & QnAbstractStorageResource::DBReady)
-        {
-            *dbDirectory = storageUrl;
-            return true;
-        }
-        else
-        {   // we won't be able to create ref guid file if storage is not writable
-            if (!(storage->getCapabilities() & QnAbstractStorageResource::WriteFile))
-                return false;
-
-            dbRefGuidStr = QUuid::createUuid().toString().toLatin1();
-            if( dbRefGuidStr.size() < 2 )
-                return false;   //bad guid, somehow
-            //removing {}
-            dbRefGuidStr.remove( dbRefGuidStr.size()-1, 1 );
-            dbRefGuidStr.remove( 0, 1 );
-            //saving db ref guid to file on storage
-            QIODevice *dbGuidFile = storage->open(
-                dbRefFilePath, 
-                QIODevice::WriteOnly | QIODevice::Truncate 
-                );
-            if (dbGuidFile == nullptr)
-                return false;
-            if( dbGuidFile->write( dbRefGuidStr ) != dbRefGuidStr.size() )
-                return false;
-            dbGuidFile->close();
-
-            storageUrl = QDir(getDataDirectory() + "/storage_db/" + dbRefGuidStr).absolutePath();
-            if( !QDir().mkpath( storageUrl ) )
-            {
-                qWarning() << "DB path create failed (" << storageUrl << ")";
-                return false;
-            }
-        }
-        *dbDirectory = storageUrl;
-        return true;
-    }
 }
 
 QnStorageDbPool::QnStorageDbPool(): 
     DependedSingleTone<QnStorageDbPool>() 
 {
 
+}
+
+QString QnStorageDbPool::getLocalGuid()
+{
+    QString simplifiedGUID = qnCommon->moduleGUID().toString();
+    simplifiedGUID = simplifiedGUID.replace("{", "");
+    simplifiedGUID = simplifiedGUID.replace("}", "");
+    return simplifiedGUID;
+}
+
+bool QnStorageDbPool::getDBPath( const QnStorageResourcePtr& storage, QString* const dbDirectory )
+{
+    QString storageUrl = storage->getUrl();
+    QString dbRefFilePath;
+
+    //if (storagePath.indexOf(lit("://")) != -1)
+    //    dbRefFilePath = dbRefFileName.arg(getLocalGuid());
+    //else
+    dbRefFilePath = closeDirPath(storageUrl) + dbRefFileName.arg(getLocalGuid());
+
+    QByteArray dbRefGuidStr;
+    //checking for file db_ref.guid existence
+    if (storage->isFileExists(dbRefFilePath))
+    {
+        //have to use db from data directory, not from storage
+        //reading guid from file
+        auto dbGuidFile = std::unique_ptr<QIODevice>(storage->open(dbRefFilePath, QIODevice::ReadOnly));
+
+        if (!dbGuidFile)
+            return false;
+        dbRefGuidStr = dbGuidFile->readAll();
+        //dbGuidFile->close();
+    }
+
+    if( !dbRefGuidStr.isEmpty() )
+    {
+        *dbDirectory = QDir(getDataDirectory() + "/storage_db/" + dbRefGuidStr).absolutePath();
+        if (!QDir().exists(*dbDirectory))
+        {
+            if(!QDir().mkpath(*dbDirectory))
+            {
+                qWarning() << "DB path create failed (" << storageUrl << ")";
+                return false;
+            }
+        }
+        return true;
+    }
+
+    if (storage->getCapabilities() & QnAbstractStorageResource::DBReady)
+    {
+        *dbDirectory = storageUrl;
+        return true;
+    }
+    else
+    {   // we won't be able to create ref guid file if storage is not writable
+        if (!(storage->getCapabilities() & QnAbstractStorageResource::WriteFile))
+            return false;
+
+        dbRefGuidStr = QUuid::createUuid().toString().toLatin1();
+        if( dbRefGuidStr.size() < 2 )
+            return false;   //bad guid, somehow
+        //removing {}
+        dbRefGuidStr.remove( dbRefGuidStr.size()-1, 1 );
+        dbRefGuidStr.remove( 0, 1 );
+        //saving db ref guid to file on storage
+        QIODevice *dbGuidFile = storage->open(
+            dbRefFilePath, 
+            QIODevice::WriteOnly | QIODevice::Truncate 
+            );
+        if (dbGuidFile == nullptr)
+            return false;
+        if( dbGuidFile->write( dbRefGuidStr ) != dbRefGuidStr.size() )
+            return false;
+        dbGuidFile->close();
+
+        storageUrl = QDir(getDataDirectory() + "/storage_db/" + dbRefGuidStr).absolutePath();
+        if( !QDir().mkpath( storageUrl ) )
+        {
+            qWarning() << "DB path create failed (" << storageUrl << ")";
+            return false;
+        }
+    }
+    *dbDirectory = storageUrl;
+    return true;
 }
 
 QnStorageDbPtr QnStorageDbPool::getSDB(const QnStorageResourcePtr &storage)

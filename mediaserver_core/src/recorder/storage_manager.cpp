@@ -507,6 +507,82 @@ QMap<QString, QSet<int>> QnStorageManager::deserializeStorageFile()
     return storageIndexes;
 }
 
+void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storage)
+{
+    QString dbPath;
+    if (!QnStorageDbPool::getDBPath(storage, &dbPath))
+        return;
+
+    QString simplifiedGUID = QnStorageDbPool::getLocalGuid();
+    QString fileName = closeDirPath(dbPath) + QString::fromLatin1("%1_media.sqlite").arg(simplifiedGUID);
+
+    QSqlDatabase sqlDb = QSqlDatabase::addDatabase(lit("QSQLITE"), QString("QnStorageManager_%1").arg(fileName));
+    sqlDb.setDatabaseName(fileName);
+    if (!sqlDb.open())
+    {
+        NX_LOG(lit("%1 : Migration from sqlite DB failed. Can't open database file %2").arg(Q_FUNC_INFO).arg(fileName), cl_logWARNING);
+        return;
+    }
+    int storageIndex = qnStorageDbPool->getStorageIndex(storage);
+    QVector<DeviceFileCatalogPtr> result;
+
+    QSqlQuery query(sqlDb);
+    query.setForwardOnly(true);
+    query.prepare("SELECT * FROM storage_data WHERE role <= :max_role ORDER BY unique_id, role, start_time");
+    query.bindValue(":max_role", (int)QnServer::HiQualityCatalog);
+
+    if (!query.exec())
+    {
+        NX_LOG(lit("%1 : Migration from sqlite DB failed. Select query exec failed").arg(Q_FUNC_INFO), cl_logWARNING);
+        return;
+    }
+    QSqlRecord queryInfo = query.record();
+    int idFieldIdx = queryInfo.indexOf("unique_id");
+    int roleFieldIdx = queryInfo.indexOf("role");
+    int startTimeFieldIdx = queryInfo.indexOf("start_time");
+    int fileNumFieldIdx = queryInfo.indexOf("file_index");
+    int timezoneFieldIdx = queryInfo.indexOf("timezone");
+    int durationFieldIdx = queryInfo.indexOf("duration");
+    int filesizeFieldIdx = queryInfo.indexOf("filesize");
+
+    DeviceFileCatalogPtr fileCatalog;
+    std::deque<DeviceFileCatalog::Chunk> chunks;
+    QnServer::ChunksCatalog prevCatalog = QnServer::ChunksCatalogCount; //should differ from all existing catalogs
+    QByteArray prevId;
+    while (query.next())
+    {
+        QByteArray id = query.value(idFieldIdx).toByteArray();
+        QnServer::ChunksCatalog catalog = (QnServer::ChunksCatalog) query.value(roleFieldIdx).toInt();
+        if (id != prevId || catalog != prevCatalog)
+        {
+            if (fileCatalog)
+            {
+                fileCatalog->addChunks(chunks);
+                result << fileCatalog;
+                chunks.clear();
+            }
+
+            prevCatalog = catalog;
+            prevId = id;
+            fileCatalog = DeviceFileCatalogPtr(new DeviceFileCatalog(QString::fromUtf8(id), catalog, QnServer::StoragePool::None));
+        }
+        qint64 startTime = query.value(startTimeFieldIdx).toLongLong();
+        qint64 filesize = query.value(filesizeFieldIdx).toLongLong();
+        int timezone = query.value(timezoneFieldIdx).toInt();
+        int fileNum = query.value(fileNumFieldIdx).toInt();
+        int durationMs = query.value(durationFieldIdx).toInt();
+        chunks.push_back(DeviceFileCatalog::Chunk(startTime, storageIndex, fileNum, durationMs, (qint16)timezone, (quint16)(filesize >> 32), (quint32)filesize));
+    }
+    if (fileCatalog)
+    {
+        fileCatalog->addChunks(chunks);
+        result << fileCatalog;
+    }
+
+    auto sdb = qnStorageDbPool->getSDB(storage);
+    
+}
+
 void QnStorageManager::addDataFromDatabase(const QnStorageResourcePtr &storage)
 {
     QnStorageDbPtr sdb = qnStorageDbPool->getSDB(storage);
