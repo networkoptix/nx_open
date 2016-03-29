@@ -23,10 +23,24 @@ namespace nx {
 namespace network {
 namespace test {
 
+enum class TestTrafficLimitType
+{
+    none, // never quit
+    incoming, // quits when sends over limit
+    outgoing, // quits when recieves over limit
+};
+
+enum class TestTransmissionMode
+{
+    spam, // spams random data as fast as follible, recieves alweys
+    echo, // reads and sends the same data as avaliable
+    echoTest, // sends randome data and verifies if it comes back
+};
+
 //!Reads/writes random data to/from connection
 class NX_NETWORK_API TestConnection
 :
-    public QnStoppable
+    public QnStoppableAsync
 {
 public:
     /*!
@@ -34,18 +48,22 @@ public:
     */
     TestConnection(
         std::unique_ptr<AbstractStreamSocket> connection,
-        size_t bytesToSendThrough,
-        std::function<void(int, TestConnection*, SystemError::ErrorCode)> handler );
+        TestTrafficLimitType limitType,
+        size_t trafficLimit,
+        TestTransmissionMode transmissionMode);
     /*!
         \param handler to be called on connection closure or after \a bytesToSendThrough bytes have been sent
     */
     TestConnection(
         const SocketAddress& remoteAddress,
-        size_t bytesToSendThrough,
-        std::function<void(int, TestConnection*, SystemError::ErrorCode)> handler );
+        TestTrafficLimitType limitType,
+        size_t trafficLimit,
+        TestTransmissionMode transmissionMode);
+
     virtual ~TestConnection();
 
-    virtual void pleaseStop() override;
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
+    virtual void pleaseStopSync() override;
 
     int id() const;
     void setLocalAddress(SocketAddress addr);
@@ -54,27 +72,37 @@ public:
 
     size_t totalBytesSent() const;
     size_t totalBytesReceived() const;
+    bool isTaskComplete() const;
+
+    void setOnFinishedEventHandler(
+        nx::utils::MoveOnlyFunc<void(int, TestConnection*, SystemError::ErrorCode)> handler);
 
 private:
     std::unique_ptr<AbstractStreamSocket> m_socket;
-    const size_t m_bytesToSendThrough;
+    const TestTrafficLimitType m_limitType;
+    const size_t m_trafficLimit;
+    const TestTransmissionMode m_transmissionMode;
     bool m_connected;
     SocketAddress m_remoteAddress;
-    const std::function<void(int, TestConnection*, SystemError::ErrorCode)> m_handler;
+    nx::utils::MoveOnlyFunc<
+        void(int, TestConnection*, SystemError::ErrorCode)
+    > m_finishedEventHandler;
     nx::Buffer m_readBuffer;
     nx::Buffer m_outData;
-    bool m_terminated;
-    std::mutex m_mutex;
     size_t m_totalBytesSent;
     size_t m_totalBytesReceived;
+    size_t m_timeoutsInARow;
     int m_id;
     boost::optional<SocketAddress> m_localAddress;
-    bool m_accepted;
+    const bool m_accepted;
 
-    void onConnected( int id, SystemError::ErrorCode );
+    void onConnected( SystemError::ErrorCode code );
     void startIO();
-    void onDataReceived( int id, SystemError::ErrorCode errorCode, size_t bytesRead );
-    void onDataSent( int id, SystemError::ErrorCode errorCode, size_t bytesWritten );
+    void onDataReceived( SystemError::ErrorCode errorCode, size_t bytesRead );
+    void onDataSent( SystemError::ErrorCode errorCode, size_t bytesWritten );
+    void readAllAsync( std::function<void()> handler );
+    void sendAllAsync( std::function<void()> handler );
+    void reportFinish( SystemError::ErrorCode code );
 
     TestConnection(const TestConnection&);
     TestConnection& operator=(const TestConnection&);
@@ -86,31 +114,36 @@ private:
 */
 class NX_NETWORK_API RandomDataTcpServer
 :
-    public QnStoppable,
-    public QnJoinable
+    public QnStoppableAsync
 {
 public:
-    RandomDataTcpServer(size_t randomBytesToSendThrough);
+    RandomDataTcpServer(
+        TestTrafficLimitType limitType,
+        size_t trafficLimit,
+        TestTransmissionMode transmissionMode);
     /** In this mode it sends \a dataToSend through connection and closes connection */
     RandomDataTcpServer(const QByteArray& dataToSend);
     virtual ~RandomDataTcpServer();
 
     void setServerSocket(std::unique_ptr<AbstractStreamServerSocket> serverSock);
 
-    virtual void pleaseStop() override;
-    virtual void join() override;
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
     void setLocalAddress(SocketAddress addr);
     bool start();
 
     SocketAddress addressBeingListened() const;
+    QString statusLine() const;
 
 private:
     std::unique_ptr<AbstractStreamServerSocket> m_serverSocket;
-    const size_t m_bytesToSendThrough;
-    QnMutex m_mutex;
+    const TestTrafficLimitType m_limitType;
+    const size_t m_trafficLimit;
+    const TestTransmissionMode m_transmissionMode;
+    mutable QnMutex m_mutex;
     std::list<std::shared_ptr<TestConnection>> m_acceptedConnections;
     SocketAddress m_localAddress;
+    size_t m_totalConnectionsAccepted;
 
     void onNewConnection( SystemError::ErrorCode errorCode, AbstractStreamSocket* newConnection );
     void onConnectionDone( TestConnection* connection );
@@ -122,22 +155,25 @@ private:
 */
 class NX_NETWORK_API ConnectionsGenerator
 :
-    public QnStoppable,
-    public QnJoinable
+    public QnStoppableAsync
 {
 public:
+    static const size_t kInfiniteConnectionCount = 0;
+
     /**
         @param maxTotalConnections If zero, then no limit on total connection number
     */
     ConnectionsGenerator(
         const SocketAddress& remoteAddress,
         size_t maxSimultaneousConnectionsCount,
-        size_t bytesToSendThrough,
-        size_t maxTotalConnections = 0);
+        TestTrafficLimitType limitType,
+        size_t trafficLimit,
+        size_t maxTotalConnections,
+        TestTransmissionMode transmissionMode);
+
     virtual ~ConnectionsGenerator();
 
-    virtual void pleaseStop() override;
-    virtual void join() override;
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
     void setOnFinishedHandler(nx::utils::MoveOnlyFunc<void()> func);
     void enableErrorEmulation(int errorPercent);
@@ -147,21 +183,26 @@ public:
     size_t totalConnectionsEstablished() const;
     size_t totalBytesSent() const;
     size_t totalBytesReceived() const;
-    std::vector<SystemError::ErrorCode> totalErrors() const;
+    size_t totalIncompleteTasks() const;
+    QString returnCodes() const;
 
 private:
-    typedef std::list<std::unique_ptr<TestConnection>> ConnectionsContainer;
+    /** map<connection id, connection> */
+    typedef std::map<int, std::unique_ptr<TestConnection>> ConnectionsContainer;
 
     const SocketAddress m_remoteAddress;
     size_t m_maxSimultaneousConnectionsCount;
-    const size_t m_bytesToSendThrough;
+    const TestTrafficLimitType m_limitType;
+    const size_t m_trafficLimit;
     const size_t m_maxTotalConnections;
+    const TestTransmissionMode m_transmissionMode;
     ConnectionsContainer m_connections;
     bool m_terminated;
-    std::mutex m_mutex;
+    mutable std::mutex m_mutex;
     size_t m_totalBytesSent;
     size_t m_totalBytesReceived;
-    std::vector<SystemError::ErrorCode> m_errors;
+    size_t m_totalIncompleteTasks;
+    std::map<SystemError::ErrorCode, size_t> m_returnCodes;
     size_t m_totalConnectionsEstablished;
     std::set<int> m_finishedConnectionsIDs;
     std::random_device m_randomDevice;
@@ -172,10 +213,10 @@ private:
     nx::utils::MoveOnlyFunc<void()> m_onFinishedHandler;
 
     void onConnectionFinished(
-        int id, SystemError::ErrorCode code,
-        ConnectionsContainer::iterator connectionIter );
+        int id,
+        SystemError::ErrorCode code);
 
-    void addNewConnections();
+    void addNewConnections(std::unique_lock<std::mutex>* const /*lock*/);
 };
 
 /**

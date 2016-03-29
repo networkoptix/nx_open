@@ -361,7 +361,8 @@ bool UdtSocketImpl::SetSendTimeout( unsigned int ms ) {
     return ret == 0;
 }
 
-bool UdtSocketImpl::GetSendTimeout( unsigned int* millis ) const {
+bool UdtSocketImpl::GetSendTimeout(unsigned int* millis) const
+{
     NX_ASSERT(!IsClosed());
     int time;
     int len = sizeof(time);
@@ -373,13 +374,17 @@ bool UdtSocketImpl::GetSendTimeout( unsigned int* millis ) const {
     return ret == 0;
 }
 
-bool UdtSocketImpl::GetLastError( SystemError::ErrorCode* errorCode ) const {
+bool UdtSocketImpl::GetLastError(SystemError::ErrorCode* /*errorCode*/) const
+{
     NX_ASSERT(!IsClosed());
-    *errorCode = static_cast<SystemError::ErrorCode>(UDT::getlasterror().getErrno());
-    return true;
+    //*errorCode = static_cast<SystemError::ErrorCode>(UDT::getlasterror().getErrno());
+    //TODO #ak
+    SystemError::setLastErrorCode(SystemError::notImplemented);
+    return false;
 }
 
-AbstractSocket::SOCKET_HANDLE UdtSocketImpl::handle() const {
+AbstractSocket::SOCKET_HANDLE UdtSocketImpl::handle() const
+{
     NX_ASSERT(!IsClosed());
     NX_ASSERT(sizeof(UDTSOCKET) == sizeof(AbstractSocket::SOCKET_HANDLE));
     return *reinterpret_cast<const AbstractSocket::SOCKET_HANDLE*>(&udtHandle);
@@ -428,9 +433,6 @@ UdtSocket::UdtSocket()
 
 UdtSocket::~UdtSocket()
 {
-    //delete m_impl;
-    //m_impl = nullptr;
-
     //TODO #ak if socket is destroyed in its aio thread, it can cleanup here
 
     NX_ASSERT(!nx::network::SocketGlobals::aioService()
@@ -476,33 +478,14 @@ bool UdtSocket::getSendTimeout(unsigned int* millis)
     return m_impl->GetSendTimeout(millis);
 }
 
-//CommonSocketImpl<UdtSocket>* UdtSocket::impl()
-//{
-//    return m_impl;
-//}
-//
-//const CommonSocketImpl<UdtSocket>* UdtSocket::impl() const
-//{
-//    return m_impl;
-//}
-
-//aio::AbstractAioThread* UdtSocket::getAioThread()
-//{
-//    return nx::network::SocketGlobals::aioService().getSocketAioThread(this);
-//}
-//
-//void UdtSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
-//{
-//    nx::network::SocketGlobals::aioService().bindSocketToAioThread(this, aioThread);
-//}
-
 // =====================================================================
 // UdtStreamSocket implementation
 // =====================================================================
 UdtStreamSocket::UdtStreamSocket()
 :
     m_aioHelper(
-        new aio::AsyncSocketImplHelper<Pollable>(this, this, false /*natTraversal*/))
+        new aio::AsyncSocketImplHelper<Pollable>(this, this, false /*natTraversal*/)),
+    m_noDelay(false)
 {
     m_impl->Open();
 }
@@ -510,7 +493,8 @@ UdtStreamSocket::UdtStreamSocket()
 UdtStreamSocket::UdtStreamSocket(detail::UdtSocketImpl* impl)
 :
     UdtSocket(impl),
-    m_aioHelper(new aio::AsyncSocketImplHelper<Pollable>(this, this, false))
+    m_aioHelper(new aio::AsyncSocketImplHelper<Pollable>(this, this, false)),
+    m_noDelay(false)
 {
 }
 
@@ -722,6 +706,48 @@ void UdtStreamSocket::dispatch( nx::utils::MoveOnlyFunc<void()> handler )
     nx::network::SocketGlobals::aioService().dispatch(
         static_cast<Pollable*>(this),
         std::move(handler) );
+}
+
+bool UdtStreamSocket::setNoDelay(bool value)
+{
+    //udt does not support it. Returned true so that caller code works
+    m_noDelay = value;
+    return true;
+}
+
+bool UdtStreamSocket::getNoDelay(bool* value) const
+{
+    *value = m_noDelay;
+    return true;
+}
+
+bool UdtStreamSocket::toggleStatisticsCollection(bool /*val*/)
+{
+    SystemError::setLastErrorCode(SystemError::notImplemented);
+    return false;
+}
+
+bool UdtStreamSocket::getConnectionStatistics(StreamSocketInfo* /*info*/)
+{
+    SystemError::setLastErrorCode(SystemError::notImplemented);
+    return false;
+}
+
+bool UdtStreamSocket::setKeepAlive(boost::optional< KeepAliveOptions > /*info*/)
+{
+    SystemError::setLastErrorCode(SystemError::notImplemented);
+    return false; // not implemented yet
+}
+
+bool UdtStreamSocket::getKeepAlive(boost::optional< KeepAliveOptions >* result) const
+{
+    //udt has keep-alives but provides no way to modify it...
+    KeepAliveOptions options;
+    options.probeCount = 10;    //TODO #ak find real value in udt
+    options.timeSec = 5;
+    options.intervalSec = 5;
+    *result = options;
+    return true;
 }
 
 void UdtStreamSocket::connectAsync(

@@ -120,10 +120,10 @@ private:
     std::map<UDTSOCKET, SocketContext> m_udtSockets;
     std::map<AbstractSocket::SOCKET_HANDLE, SocketContext> m_sysSockets;
 
-    std::set<UDTSOCKET> m_readUdtFds;
-    std::set<UDTSOCKET> m_writeUdtFds;
-    std::set<AbstractSocket::SOCKET_HANDLE> m_readSysFds;
-    std::set<AbstractSocket::SOCKET_HANDLE> m_writeSysFds;
+    std::map<UDTSOCKET, int> m_readUdtFds;
+    std::map<UDTSOCKET, int> m_writeUdtFds;
+    std::map<AbstractSocket::SOCKET_HANDLE, int> m_readSysFds;
+    std::map<AbstractSocket::SOCKET_HANDLE, int> m_writeSysFds;
 
     template<typename SocketHandle>
     bool addSocket(
@@ -155,7 +155,7 @@ private:
     UDPSocket m_interruptSocket;
 
     void moveIterToTheNextEvent(ConstIteratorImpl* const iter) const;
-    void removePhantomSockets(std::set<UDTSOCKET>* const udtFdSet);
+    void removePhantomSockets(std::map<UDTSOCKET, int>* const udtFdSet);
 };
 
 }   //aio

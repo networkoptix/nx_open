@@ -331,6 +331,7 @@ public:
     {
         if (this->m_socket->impl()->aioThread.load() == QThread::currentThread())
         {
+            //TODO #ak we must cancel resolve task here, but must do it without blocking!
             cancelAsyncIOWhileInAioThread(eventType);
         }
         else
@@ -505,7 +506,12 @@ private:
                 if( bytesRead == -1 )
                 {
                     m_recvBuffer->resize( bufSizeBak );
-                    recvHandlerLocal( SystemError::getLastOSErrorCode(), (size_t)-1 );
+
+                    const auto lastError = SystemError::getLastOSErrorCode();
+                    if (lastError == SystemError::wouldBlock)
+                        return; // false positive
+
+                    recvHandlerLocal( lastError, (size_t)-1 );
                 }
                 else
                 {
@@ -521,14 +527,9 @@ private:
 
                 if( m_connectHandler )
                 {
-                    //probably this approach is the best for all other kinds of events
-                    SystemError::ErrorCode resultCode;
-                    if (!m_abstractSocketPtr->getLastError(&resultCode))
-                        resultCode = SystemError::getLastOSErrorCode();
-
                     //async connect. If we are here than connect succeeded
                     std::unique_ptr<AsyncSocketImplHelper, decltype(__finally_connect)> cleanupGuard( this, __finally_connect );
-                    connectHandlerLocal( resultCode );
+                    connectHandlerLocal(SystemError::noError);
                 }
                 else
                 {
@@ -540,11 +541,18 @@ private:
                     const int bytesWritten = m_abstractSocketPtr->send(
                         m_sendBuffer->constData() + m_sendBufPos,
                         m_sendBuffer->size() - m_sendBufPos );
-                    if( bytesWritten == -1 || bytesWritten == 0 )
+                    if( bytesWritten == -1 )
                     {
-                        sendHandlerLocal(
-                            bytesWritten == 0 ? SystemError::connectionReset : SystemError::getLastOSErrorCode(),
-                            m_sendBufPos );
+                        const auto lastError = SystemError::getLastOSErrorCode();
+                        if (lastError == SystemError::wouldBlock)
+                            return; // false positive
+
+                        sendHandlerLocal( lastError, m_sendBufPos );
+                    }
+                    else
+                    if( bytesWritten == 0 )
+                    {
+                        sendHandlerLocal( SystemError::connectionReset, m_sendBufPos );
                     }
                     else
                     {

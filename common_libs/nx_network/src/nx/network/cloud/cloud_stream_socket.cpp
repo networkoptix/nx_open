@@ -79,8 +79,8 @@ void CloudStreamSocket::shutdown()
     pleaseStop(
         [this, &stoppedPromise]()
         {
-            auto* sendPromise = m_sendPromisePtr.exchange(nullptr);
-            auto* recvPromise = m_recvPromisePtr.exchange(nullptr);
+            auto sendPromise = m_sendPromisePtr.exchange(nullptr);
+            auto recvPromise = m_recvPromisePtr.exchange(nullptr);
             
             const auto interrupted = std::make_pair(SystemError::interrupted, 0);
 
@@ -127,7 +127,7 @@ bool CloudStreamSocket::connect(
             SystemError::setLastErrorCode(SystemError::interrupted);
             return false;
         }
-        auto* oldPromisePtr = m_sendPromisePtr.exchange(&promise);
+        auto oldPromisePtr = m_sendPromisePtr.exchange(&promise);
         NX_ASSERT(oldPromisePtr == nullptr);
     }
 
@@ -137,7 +137,7 @@ bool CloudStreamSocket::connect(
         {
             //to ensure that socket is not used by aio sub-system anymore, we use post
             m_aioThreadBinder->post([this, code](){
-                auto* promisePtr = m_sendPromisePtr.exchange(nullptr);
+                auto promisePtr = m_sendPromisePtr.exchange(nullptr);
                 if (promisePtr)
                     promisePtr->set_value(std::make_pair(code, 0));
             });
@@ -186,7 +186,7 @@ int CloudStreamSocket::send(const void* buffer, unsigned int bufferLen)
             SystemError::setLastErrorCode(SystemError::interrupted);
             return -1;
         }
-        auto* oldPromisePtr = m_sendPromisePtr.exchange(&promise);
+        auto oldPromisePtr = m_sendPromisePtr.exchange(&promise);
         NX_ASSERT(oldPromisePtr == nullptr);
     }
 
@@ -200,7 +200,7 @@ int CloudStreamSocket::send(const void* buffer, unsigned int bufferLen)
             m_aioThreadBinder->post(
                 [this, code, size, &promise]()
                 {
-                    auto* promisePtr = m_sendPromisePtr.exchange(nullptr);
+                    auto promisePtr = m_sendPromisePtr.exchange(nullptr);
                     if (promisePtr)
                         promisePtr->set_value(std::make_pair(code, size));
                 });
@@ -349,22 +349,33 @@ void CloudStreamSocket::onAddressResolved(
     SystemError::ErrorCode osErrorCode,
     std::vector<AddressEntry> dnsEntries)
 {
-    auto operationLock = sharedOperationGuard->lock();
-    if (!operationLock)
-        return; //operation has been cancelled
-
     if (osErrorCode != SystemError::noError)
     {
-        auto connectHandlerBak = std::move(m_connectHandler);
-        connectHandlerBak(osErrorCode);
-        return;
+        NX_LOGX(lm("Address resolve error: %1")
+            .arg(SystemError::toString(osErrorCode)), cl_logDEBUG1);
     }
 
-    if (!startAsyncConnect(std::move(dnsEntries), remotePort))
-    {
-        auto connectHandlerBak = std::move(m_connectHandler);
-        connectHandlerBak(SystemError::getLastOSErrorCode());
-    }
+    m_aioThreadBinder->post(
+        [sharedOperationGuard = std::move(sharedOperationGuard), remotePort,
+            osErrorCode, dnsEntries = std::move(dnsEntries), this]() mutable
+        {
+            auto operationLock = sharedOperationGuard->lock();
+            if (!operationLock)
+                return; //operation has been cancelled
+
+            if (osErrorCode != SystemError::noError)
+            {
+                auto connectHandlerBak = std::move(m_connectHandler);
+                connectHandlerBak(osErrorCode);
+                return;
+            }
+
+            if (!startAsyncConnect(std::move(dnsEntries), remotePort))
+            {
+                auto connectHandlerBak = std::move(m_connectHandler);
+                connectHandlerBak(SystemError::getLastOSErrorCode());
+            }
+        });
 }
 
 bool CloudStreamSocket::startAsyncConnect(
@@ -373,6 +384,8 @@ bool CloudStreamSocket::startAsyncConnect(
 {
     if (dnsEntries.empty())
     {
+        NX_LOGX(lm("No address entry"), cl_logDEBUG1);
+
         SystemError::setLastErrorCode(SystemError::hostUnreach);
         return false;
     }
@@ -443,7 +456,7 @@ int CloudStreamSocket::recvImpl(nx::Buffer* const buf)
             SystemError::setLastErrorCode(SystemError::interrupted);
             return -1;
         }
-        auto* oldPromisePtr = m_recvPromisePtr.exchange(&promise);
+        auto oldPromisePtr = m_recvPromisePtr.exchange(&promise);
         NX_ASSERT(oldPromisePtr == nullptr);
     }
 
@@ -454,7 +467,7 @@ int CloudStreamSocket::recvImpl(nx::Buffer* const buf)
             m_aioThreadBinder->post(
                 [this, code, size, &promise]()
                 {
-                    auto* promisePtr = m_recvPromisePtr.exchange(nullptr);
+                    auto promisePtr = m_recvPromisePtr.exchange(nullptr);
                     if (promisePtr)
                         promisePtr->set_value(std::make_pair(code, size));
                 });

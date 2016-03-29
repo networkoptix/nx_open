@@ -138,7 +138,7 @@ private:
     bool m_useSsl;
     State m_state;
 
-    std::unique_ptr<nx::network::aio::Timer> m_timer;
+    nx::network::aio::Timer m_timer;
     std::unique_ptr<BaseConnectionType> m_baseConnection;
     std::unique_ptr<AbstractStreamSocket> m_connectingSocket;
 

@@ -23,8 +23,9 @@ class NX_NETWORK_API CloudServerSocket
         AbstractStreamServerSocket, SocketAttributes>
 {
 public:
-    typedef std::function<std::unique_ptr<AbstractTunnelAcceptor>(
-            hpm::api::ConnectionRequestedEvent&)> AcceptorMaker;
+    typedef std::function<
+                std::unique_ptr<AbstractTunnelAcceptor>(
+                    const hpm::api::ConnectionRequestedEvent&)> AcceptorMaker;
 
     static const std::vector<AcceptorMaker> kDefaultAcceptorMakers;
 
