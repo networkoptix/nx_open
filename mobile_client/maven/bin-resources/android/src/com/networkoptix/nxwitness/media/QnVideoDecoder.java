@@ -137,7 +137,8 @@ public class QnVideoDecoder
     {
         try
         {
-            final long timeoutUs = 1000 * 1000; //< 3 second
+            final int kNoInputBuffers = -7;
+            final long timeoutUs = 1000 * 1000; //< 1 second
             int inputBufferId = codec.dequeueInputBuffer(timeoutUs);
             if (inputBufferId >= 0)
             {
@@ -147,13 +148,13 @@ public class QnVideoDecoder
             }
             else {
                 System.out.println("error dequeueInputBuffer");
-                return -1; // error
+                return kNoInputBuffers; // no input buffers left
             }
 
             while (true)
             {
                 MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
-                int outputBufferId = codec.dequeueOutputBuffer(info, gotOutputData ? timeoutUs : 1000*10);
+                int outputBufferId = codec.dequeueOutputBuffer(info, gotOutputData ? timeoutUs : 1000 * 10);
                 //System.out.println("dequee buffer result=" + outputBufferId);
                 switch (outputBufferId)
                 {
@@ -189,14 +190,14 @@ public class QnVideoDecoder
         }
     }
 
-    public long flushFrame()
+    public long flushFrame(long timeoutUsec)
     {
         try
         {
             //codec.flush();
 
             MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
-            int outputBufferId = codec.dequeueOutputBuffer(info, 0);
+            int outputBufferId = codec.dequeueOutputBuffer(info, timeoutUsec);
             switch (outputBufferId)
             {
             case MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED:

@@ -2,6 +2,8 @@
 
 #include <api/global_settings.h>
 
+#include <common/common_module.h>
+
 #include <nx/network/http/httptypes.h>
 #include <media_server/serverutil.h>
 
@@ -84,6 +86,7 @@ int QnSetupLocalSystemRestHandler::execute(SetupLocalSystemData data, QnJsonRest
             lit("Internal server error."));
         return nx_http::StatusCode::ok;
     }
+    qnCommon->updateModuleInformation();
 
     if (data.systemName.isEmpty())
     {

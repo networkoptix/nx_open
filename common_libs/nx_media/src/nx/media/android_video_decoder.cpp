@@ -32,6 +32,14 @@ namespace nx {
 namespace media {
 
 namespace {
+
+    static const int kNoInputBuffers = -7;
+    static const qint64 kDecodeOneFrameTimeout = 1000 * 33;
+
+    // some decoders may have not input buffers left because of long decoding time
+    // We will try to skip single output frame to clear space in input buffers
+    static const int kDequeueInputBufferRetyrCounter = 3;
+
     static const GLfloat g_vertex_data[] = {
         -1.f, 1.f,
         1.f, 1.f,
@@ -317,7 +325,7 @@ FboPtr AndroidVideoDecoderPrivate::renderFrameToFbo()
     }
 
     auto t4 = tm.elapsed();
-    NX_LOG(lit("render t1=%1 t2=%2 t3=%3 t4=%4").arg(t1).arg(t2).arg(t3).arg(t4), cl_logINFO);
+    //NX_LOG(lit("render t1=%1 t2=%2 t3=%3 t4=%4").arg(t1).arg(t2).arg(t3).arg(t4), cl_logINFO);
 
     return fbo;
 }
@@ -459,19 +467,29 @@ int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QVid
             return 0; //< wait for I frame
     }
 
-    jlong outFrameNum;
-    if (frame)
+    jlong outFrameNum = 0;
+    int retryCounter = 0;
+    do
     {
-        d->frameNumToPtsCache.push_back(AndroidVideoDecoderPrivate::PtsData(d->frameNumber, frame->timestamp));
-        outFrameNum = d->javaDecoder.callMethod<jlong>(
-            "decodeFrame", "(JIJ)J",
-            (jlong) frame->data(),
-            (jint) frame->dataSize(),
-            (jlong) ++d->frameNumber); //< put input frames in range [1..N]
-    }
-    else {
-        outFrameNum = d->javaDecoder.callMethod<jlong>("flushFrame", "()J");
-    }
+        if (frame)
+        {
+            d->frameNumToPtsCache.push_back(AndroidVideoDecoderPrivate::PtsData(d->frameNumber, frame->timestamp));
+            outFrameNum = d->javaDecoder.callMethod<jlong>(
+                "decodeFrame", "(JIJ)J",
+                (jlong) frame->data(),
+                (jint) frame->dataSize(),
+                (jlong) ++d->frameNumber); //< put input frames in range [1..N]
+        }
+        else {
+            outFrameNum = d->javaDecoder.callMethod<jlong>("flushFrame", "(J)J", 0);
+        }
+
+        if (outFrameNum == kNoInputBuffers)
+        {
+            if (d->javaDecoder.callMethod<jlong>("flushFrame", "(J)J", kDecodeOneFrameTimeout) <= 0)
+                break;
+        }
+    } while (outFrameNum == kNoInputBuffers && ++retryCounter < kDequeueInputBufferRetyrCounter);
 
     if (outFrameNum <= 0)
         return outFrameNum;
@@ -492,7 +510,7 @@ int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QVid
         }, nullptr);
 #endif
 
-    NX_LOG(lit("--got frame num %1 decode time1=%2 time2=%3").arg(outFrameNum).arg(time1).arg(tm.elapsed()), cl_logINFO);
+    //NX_LOG(lit("--got frame num %1 decode time1=%2 time2=%3").arg(outFrameNum).arg(time1).arg(tm.elapsed()), cl_logINFO);
 
     QAbstractVideoBuffer* buffer = new TextureBuffer (std::move(fboToRender), d);
     QVideoFrame* videoFrame = new QVideoFrame(buffer, d->frameSize, QVideoFrame::Format_BGR32);

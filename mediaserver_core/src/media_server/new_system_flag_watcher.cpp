@@ -88,6 +88,7 @@ void QnNewSystemServerFlagWatcher::update()
             qnGlobalSettings->setNewSystem(true);
     }
     qnGlobalSettings->synchronizeNow();
+    qnCommon->updateModuleInformation();
 
     Qn::ServerFlags serverFlags = m_server->getServerFlags();
 

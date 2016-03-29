@@ -17,7 +17,8 @@ MaskedItem
         model: thisComponent.model;
         width: thisComponent.width;
         editable: thisComponent.isEditableComboBox;
+        isEditMode: editable;
 
-        onCurrentTextChanged: { thisComponent.value = currentText; }
+        onTextChanged: { thisComponent.value = text; }
     }
 }
