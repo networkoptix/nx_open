@@ -368,7 +368,7 @@
             <modules>
                 <module>build_variables</module>
                 <module>common</module>
-                <!--<module>common_libs/nx_email</module>-->
+                <module>common_libs/nx_email</module>
                 <module>common_libs/nx_network</module>
                 <module>common_libs/nx_utils</module>
                 <module>common_libs/udt</module>
