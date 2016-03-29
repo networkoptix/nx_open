@@ -220,7 +220,7 @@ Error DbHelper::readRecord()
     return error;
 }
 
-Error DbHelper::writeRecord(const WriteRecordType &record)
+void DbHelper::writeRecord(const WriteRecordType &record)
 {
     {
         QnMutexLocker lk(&m_mutex);
@@ -231,7 +231,6 @@ Error DbHelper::writeRecord(const WriteRecordType &record)
         m_writeQueue.push_back(record);
     }
     m_cond.wakeAll();
-    return Error::NoError;
 }
 
 void DbHelper::reset()

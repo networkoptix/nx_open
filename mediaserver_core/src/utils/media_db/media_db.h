@@ -191,7 +191,7 @@ public:
     Error writeFileHeader(uint8_t dbVersion);
 
     Error readRecord();
-    Error writeRecord(const WriteRecordType &record);
+    void writeRecord(const WriteRecordType &record);
     void stopWriter();
     void reset();
 
