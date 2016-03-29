@@ -55,8 +55,8 @@
                         <configuration>
                             <failOnError>false</failOnError>
                             <target>                            
-                                <chmod file="${project.basedir}/build.sh.sh" perm="755"/>				
-                                <exec dir="${project.basedir}" executable="build.sh" failifexecutionfails="true" />
+                                <chmod file="${project.basedir}/build.sh" perm="755"/>				
+                                <exec dir="${project.basedir}" executable="./build.sh" failifexecutionfails="true" failonerror="true" />
                             </target>
                         </configuration>
                     </execution>                    
