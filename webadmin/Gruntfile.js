@@ -31,7 +31,7 @@ module.exports = function (grunt) {
         yeoman: {
             // configurable paths
             app: require('./bower.json').appPath || 'app',
-            dist: 'dist'
+            dist: 'static'
         },
 
         // Automatically inject Bower components into the app
@@ -157,13 +157,19 @@ module.exports = function (grunt) {
                 {context: '/proxy/',    host: '10.1.5.126', port: 7001}/**/
 
 
-                // Sasha Pats
-                /* {context: '/api/',      host: '10.0.3.37', port: 7000},
-                 {context: '/ec2/',      host: '10.0.3.37', port: 7000},
-                 {context: '/hls/',      host: '10.0.3.37', port: 7000},
-                 {context: '/media/',    host: '10.0.3.37', port: 7000},
-                 {context: '/proxy/',    host: '10.0.3.37', port: 7000}/**/
+                // kds
+                /* {context: '/api/',      host: '10.0.2.137', port: 7000},
+                 {context: '/ec2/',      host: '10.0.2.137', port: 7000},
+                 {context: '/hls/',      host: '10.0.2.137', port: 7000},
+                 {context: '/media/',    host: '10.0.2.137', port: 7000},
+                 {context: '/proxy/',    host: '10.0.2.137', port: 7000}/**/
 
+                //Vitaly Kutin
+                /*{context: '/api/',      host: '10.0.3.197', port: 7001},
+                {context: '/ec2/',      host: '10.0.3.197', port: 7001},
+                {context: '/hls/',      host: '10.0.3.197', port: 7001},
+                {context: '/media/',    host: '10.0.3.197', port: 7001},
+                {context: '/proxy/',    host: '10.0.3.197', port: 7001}/**/
 
                 // Olya - external
                 /*{context: '/api/',      host: '95.31.136.2', port: 7011},
@@ -563,11 +569,11 @@ module.exports = function (grunt) {
                 dest: '.tmp/styles/',
                 src: '{,*/}*.css'
             },
-            publish:{
+            zip:{
                 expand: true,
                 nonull:true,
                 cwd: '<%= yeoman.app %>/../',
-                dest: '<%= yeoman.app %>/../../../' + package_dir + '/bin',
+                dest: '<%= yeoman.app %>/../../../' + package_dir,
                 src: 'external.dat'
             }
         },
@@ -578,13 +584,13 @@ module.exports = function (grunt) {
                     mode: 'zip'
                 },
                 files: [
-                    { src: '<%= yeoman.app %>/../dist/**' }
+                    { src: '<%= yeoman.dist %>/**' }
                 ]
             }
         },
         shell: {
             deploy: {
-                command: 'cd ~/develop/' + package_dir + '; python ~/develop/netoptix_vms/build_utils/python/rdep.py -u -t=any;'
+                command: 'cd ~/develop/' + package_dir + '; rm .DS_Store; rm ../.DS_Store; python ~/develop/netoptix_vms/build_utils/python/rdep.py -u -t=any;'
             }
         },
 
@@ -722,9 +728,10 @@ module.exports = function (grunt) {
 
     grunt.registerTask('deploy', [
         'publish',
-        'copy:publish',
+        'copy:zip',
+        'shell:deploy',
         'clean:zip',
-        'shell:deploy'
+        'clean:publish'
     ]);
 
     grunt.registerTask('demo', [
