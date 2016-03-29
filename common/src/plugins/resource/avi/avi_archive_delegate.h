@@ -10,6 +10,8 @@
 
 #include <nx/streaming/abstract_archive_delegate.h>
 
+#include <nx/utils/thread/mutex.h>
+
 extern "C"
 {
 // For typedef struct AVIOContext.
@@ -28,13 +30,13 @@ class QnAviArchiveDelegate: public QnAbstractArchiveDelegate
     Q_OBJECT;
 
 public:
-    enum Tag { 
-        StartTimeTag, 
-        EndTimeTag, 
-        LayoutInfoTag, 
-        SoftwareTag, 
-        SignatureTag, 
-        DewarpingTag, 
+    enum Tag {
+        StartTimeTag,
+        EndTimeTag,
+        LayoutInfoTag,
+        SoftwareTag,
+        SignatureTag,
+        DewarpingTag,
         CustomTag /**< Tag for all other future values encoded in JSON object. */
     };
 
@@ -59,14 +61,14 @@ public:
 
     virtual AVCodecContext* setAudioChannel(int num);
 
-    // for optimization       
+    // for optimization
     //void doNotFindStreamInfo();
     void setFastStreamFind(bool value);
     bool isStreamsFound() const;
     void setUseAbsolutePos(bool value);
     void setStorage(const QnStorageResourcePtr &storage);
     virtual QnAbstractMotionArchiveConnectionPtr getMotionConnection(int channel) override;
-    
+
     //void setMotionConnection(QnAbstractMotionArchiveConnectionPtr connection, int channel);
     virtual bool findStreams();
 

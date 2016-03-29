@@ -29,6 +29,7 @@ protected:
     bool connected() const;
 
     void hideMessageBox();
+    void showLoginDialog();
     void showWelcomeScreen();
 
     bool tryToRestoreConnection();

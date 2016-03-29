@@ -1,17 +1,19 @@
 
 #include "system_description.h"
 
+#include <nx/utils/log/log.h>
+
 namespace
 {
 
 // TODO: #ynikitenkov Add fusion functions
 #define EXTRACT_CHANGE_FLAG(fieldName, flag) static_cast<QnServerFields>(     \
     before.fieldName != after.fieldName ? flag : QnServerField::NoField)
-    
+
     QnServerFields getChanges(const QnModuleInformation &before
         , const QnModuleInformation &after)
-    {        
-        const auto result = 
+    {
+        const auto result =
             (EXTRACT_CHANGE_FLAG(systemName, QnServerField::SystemNameField)
             | EXTRACT_CHANGE_FLAG(name, QnServerField::NameField)
             | EXTRACT_CHANGE_FLAG(serverFlags, QnServerField::FlagsField));
@@ -41,6 +43,7 @@ QnSystemDescription::QnSystemDescription(const QString &systemId
     : m_id(systemId)
     , m_systemName(systemName)
     , m_isCloudSystem(isCloudSystem)
+    , m_serverTimestamps()
     , m_servers()
     , m_prioritized()
     , m_hosts()
@@ -91,6 +94,7 @@ void QnSystemDescription::addServer(const QnModuleInformation &serverInfo
 
     m_prioritized.insertMulti(priority, serverInfo.id);
     m_servers.insert(serverInfo.id, serverInfo);
+    m_serverTimestamps[serverInfo.id].restart();
     emit serverAdded(serverInfo.id);
 }
 
@@ -121,6 +125,8 @@ void QnSystemDescription::updateServer(const QnModuleInformation &serverInfo)
 
     auto &current = it.value();
     const auto changes = getChanges(current, serverInfo);
+    m_serverTimestamps[serverInfo.id].restart();
+    current = serverInfo;
     if (changes)
         emit serverChanged(serverInfo.id, changes);
 }
@@ -141,8 +147,9 @@ void QnSystemDescription::removeServer(const QnUuid &serverId)
         m_prioritized.erase(it);
 
     m_hosts.remove(serverId);
-    const bool removedCount = m_servers.remove(serverId);
-    if (removedCount)
+    m_serverTimestamps.remove(serverId);
+    const bool someoneRemoved = m_servers.remove(serverId);
+    if (someoneRemoved)
         emit serverRemoved(serverId);
 }
 
@@ -150,10 +157,10 @@ void QnSystemDescription::setServerHost(const QnUuid &serverId
     , const QString &host)
 {
     const bool containsServer = m_servers.contains(serverId);
-    
+
     NX_ASSERT(containsServer, Q_FUNC_INFO
         , "System does not contain specified server");
-    
+
     if (!containsServer)
         return;
 
@@ -161,6 +168,7 @@ void QnSystemDescription::setServerHost(const QnUuid &serverId
     const bool changed = ((it == m_hosts.end())
         || (it.value() != host));
 
+    m_serverTimestamps[serverId].restart();
     if (!changed)
         return;
     m_hosts[serverId] = host;
@@ -174,3 +182,12 @@ QString QnSystemDescription::getServerHost(const QnUuid &serverId) const
 
     return m_hosts.value(serverId);
 }
+
+qint64 QnSystemDescription::getServerLastUpdatedMs(const QnUuid &serverId) const
+{
+    NX_ASSERT(m_servers.contains(serverId), Q_FUNC_INFO
+        , "System does not contain specified server");
+
+    return m_serverTimestamps.value(serverId).elapsed();
+}
+

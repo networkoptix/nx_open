@@ -13,13 +13,18 @@ namespace network {
 //// class RetryPolicy
 ////////////////////////////////////////////////////////////
 
+const std::chrono::milliseconds RetryPolicy::kNoMaxDelay =
+    std::chrono::milliseconds::zero();
+
 const std::chrono::milliseconds RetryPolicy::kDefaultInitialDelay(500);
+const std::chrono::milliseconds RetryPolicy::kDefaultMaxDelay(std::chrono::minutes(1));
 
 RetryPolicy::RetryPolicy()
 :
     m_maxRetryCount(kDefaultMaxRetryCount),
     m_initialDelay(kDefaultInitialDelay),
-    m_delayMultiplier(kDefaultDelayMultiplier)
+    m_delayMultiplier(kDefaultDelayMultiplier),
+    m_maxDelay(kDefaultMaxDelay)
 {
 }
 
@@ -54,6 +59,16 @@ unsigned int RetryPolicy::delayMultiplier() const
     return m_delayMultiplier;
 }
 
+void RetryPolicy::setMaxDelay(std::chrono::milliseconds delay)
+{
+    m_maxDelay = delay;
+}
+
+std::chrono::milliseconds RetryPolicy::maxDelay() const
+{
+    return m_maxDelay;
+}
+
 
 ////////////////////////////////////////////////////////////
 //// class RetryTimer
@@ -61,7 +76,13 @@ unsigned int RetryPolicy::delayMultiplier() const
 
 RetryTimer::RetryTimer(const RetryPolicy& policy)
 :
-    m_retryPolicy(policy)
+    m_retryPolicy(policy),
+    m_currentDelay(m_retryPolicy.initialDelay()),
+    m_effectiveMaxDelay(
+        m_retryPolicy.maxDelay() == RetryPolicy::kNoMaxDelay
+        ? std::chrono::milliseconds::max()
+        : m_retryPolicy.maxDelay()),
+    m_triesMade(0)
 {
 }
 
@@ -71,7 +92,7 @@ RetryTimer::~RetryTimer()
 
 void RetryTimer::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
-    m_timer.cancelAsync(std::move(completionHandler));
+    m_timer.pleaseStop(std::move(completionHandler));
 }
 
 void RetryTimer::pleaseStopSync()
@@ -101,10 +122,35 @@ void RetryTimer::dispatch(nx::utils::MoveOnlyFunc<void()> func)
 
 bool RetryTimer::scheduleNextTry(nx::utils::MoveOnlyFunc<void()> doAnotherTryFunc)
 {
-    //TODO #ak
+    if (m_retryPolicy.maxRetryCount() != RetryPolicy::kInfiniteRetries &&
+        m_triesMade >= m_retryPolicy.maxRetryCount())
+    {
+        return false;
+    }
 
-    m_timer.start(m_retryPolicy.initialDelay(), std::move(doAnotherTryFunc));
+    if ((m_triesMade > 0) &&
+        (m_retryPolicy.delayMultiplier() > 0) &&
+        (m_currentDelay < m_effectiveMaxDelay))
+    {
+        auto newDelay = m_currentDelay * m_retryPolicy.delayMultiplier();
+        if (newDelay < m_currentDelay)
+        {
+            //overflow
+            newDelay = std::chrono::milliseconds::max();
+        }
+        m_currentDelay = newDelay;
+        if (m_currentDelay > m_effectiveMaxDelay)
+            m_currentDelay = m_effectiveMaxDelay;
+    }
+
+    ++m_triesMade;
+    m_timer.start(m_currentDelay, std::move(doAnotherTryFunc));
     return true;
+}
+
+std::chrono::milliseconds RetryTimer::currentDelay() const
+{
+    return m_currentDelay;
 }
 
 }   //network

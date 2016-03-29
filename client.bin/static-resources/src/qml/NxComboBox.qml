@@ -6,5 +6,13 @@ ComboBox
 {
     id: thisComponent;
 
-    // TODO: Define style (after ICS)
+    focus: true;
+    onActiveFocusChanged:
+    {
+        if (activeFocus)
+            focus = true;
+    }
+
+
+    // TODO: Fix style to prevent font artefacts
 }

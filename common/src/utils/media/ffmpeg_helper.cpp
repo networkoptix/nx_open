@@ -1,7 +1,5 @@
 #include "ffmpeg_helper.h"
 
-#ifdef ENABLE_DATA_PROVIDERS
-
 #include <QtCore/QBuffer>
 #include <QtCore/QDebug>
 
@@ -257,5 +255,3 @@ QString QnFfmpegHelper::getErrorStr(int errnum)
         return QString(QString::fromLatin1("Unknown FFMPEG error with code %d")).arg(errnum);
     return QString::fromLatin1(result);
 }
-
-#endif // ENABLE_DATA_PROVIDERS

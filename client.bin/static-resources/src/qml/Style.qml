@@ -53,21 +53,33 @@ QtObject
         readonly property color windowText: context.getPaletteColor("light", 1);
         readonly property color shadow: context.getPaletteColor("dark", 4);
         readonly property color text: context.getPaletteColor("light", 13);
+        readonly property color light: context.getPaletteColor("light", 7);
         readonly property color buttonText: text;
+        readonly property color brightText: context.getPaletteColor("light", 16);
         readonly property color midlight: context.getPaletteColor("dark", 12);
         readonly property color button: context.getPaletteColor("dark", 10);
 
         readonly property color brand: context.getPaletteColor("brand", 4);
-        readonly property color brandContrast: "white";//TODO: how to access brand_contrast color?
+        readonly property color brandContrast: "white"; //TODO: how to access brand_contrast color?
 
-        readonly property color error: "red";
+        readonly property color red_main: "#CF2727"; //TODO: how to access red_main color?
 
         property QtObject custom: QtObject
         {
             property QtObject systemTile: QtObject
             {
                 readonly property color background: context.getPaletteColor("dark", 7);
-                readonly property color setupSystem: context.getPaletteColor("light", 5);   // Check me!
+                readonly property color setupSystem: context.getPaletteColor("light", 5);
+                readonly property color factorySystemBkg: context.getPaletteColor("dark", 9);
+                readonly property color factorySystemHovered: context.getPaletteColor("dark", 10);
+                readonly property color closeButtonBkg: context.getPaletteColor("dark", 9);
+                readonly property color offlineIndicatorBkg: context.getPaletteColor("dark", 8);
+            }
+
+            property QtObject banner: QtObject
+            {
+                readonly property color link: context.getPaletteColor("blue", 2);
+                readonly property color linkHovered: context.getPaletteColor("blue", 4);
             }
         }
     }
@@ -78,7 +90,13 @@ QtObject
         {
             readonly property font systemName: Qt.font({ pixelSize: 20, weight: Font.Light});
             readonly property font info: Qt.font({ pixelSize: 12, weight: Font.Normal})
-            readonly property font setupSystem: Qt.font({ pixelSize: 12, weight: Font.Normal});
+            readonly property font setupSystem: Qt.font({ pixelSize: 12, weight: Font.Medium});
+            readonly property font indicator: Qt.font({ pixelSize: 10, weight: Font.Medium});
+        }
+
+        property QtObject banner: QtObject
+        {
+            readonly property font userName: Qt.font({ pixelSize: 22, weight: Font.Light});
         }
     }
 }

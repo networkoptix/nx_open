@@ -30,6 +30,21 @@ QnAbstractSystemsFinder::SystemDescriptionList QnDirectSystemsFinder::systems() 
     return m_systems.values();
 }
 
+QnSystemDescriptionPtr QnDirectSystemsFinder::getSystem(const QString &id) const
+{
+    const auto systemDescriptions = m_systems.values();
+    const auto predicate = [id](const QnSystemDescriptionPtr &desc)
+    {
+        return (desc->id() == id);
+    };
+
+    const auto it = std::find_if(systemDescriptions.begin()
+        , systemDescriptions.end(), predicate);
+    
+    return (it == systemDescriptions.end() 
+        ? QnSystemDescriptionPtr() : *it);
+}
+
 void QnDirectSystemsFinder::addServer(const QnModuleInformation &moduleInformation)
 {
     const auto systemIt = getSystemItByServer(moduleInformation.id);

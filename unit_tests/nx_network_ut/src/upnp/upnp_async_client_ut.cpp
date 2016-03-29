@@ -14,6 +14,20 @@ static const QString INTERNAL_IP = lit( "192.168.20.77" );
 static const QString EXTERNAL_IP = lit( "10.0.2.161" );
 static const QString DESC = lit( "test" );
 
+TEST( UpnpAsyncClient, DISABLED_Cancel )
+{
+    for (size_t testNumber = 0; testNumber <= 5; ++testNumber)
+    {
+        AsyncClient client;
+        client.externalIp( URL, [&]( const HostAddress& v ) { } );
+        if (testNumber)
+        {
+            std::chrono::milliseconds delay(testNumber * testNumber * 200);
+            std::this_thread::sleep_for(delay);
+        }
+    }
+}
+
 // TODO: implement over test HTTP server
 TEST( UpnpAsyncClient, DISABLED_GetIp )
 {

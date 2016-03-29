@@ -13,7 +13,7 @@ namespace nx {
 namespace media {
 
 class AbstractVideoDecoder;
-typedef std::unique_ptr<AbstractVideoDecoder> VideoDecoderPtr;
+typedef std::unique_ptr<AbstractVideoDecoder, void(*)(AbstractVideoDecoder*)> VideoDecoderPtr;
 
 /**
  * This class allows to register various implementations for video decoders. Exact list of decoders
@@ -41,25 +41,32 @@ public:
     template <class Decoder>
     void addPlugin(
         std::shared_ptr<AbstractResourceAllocator> allocator = 
-        std::shared_ptr<AbstractResourceAllocator>())
+        std::shared_ptr<AbstractResourceAllocator>(),
+        int maxUseCount = std::numeric_limits<int>::max())
     {
-        m_plugins.push_back(MetadataImpl<Decoder>(allocator));
+        m_plugins.push_back(MetadataImpl<Decoder>(allocator, maxUseCount));
     }
 
 private:
     struct Metadata
     {
-        Metadata() {}
+        Metadata(): 
+            useCount(0), 
+            maxUseCount(std::numeric_limits<int>::max()) 
+        {
+        }
 
         std::function<AbstractVideoDecoder* ()> instance;
         std::function<bool(const CodecID codec, const QSize& resolution)> isCompatible;
         std::shared_ptr<AbstractResourceAllocator> allocator;
+        int useCount;
+        int maxUseCount;
     };
 
     template <class Decoder>
     struct MetadataImpl: public Metadata
     {
-        MetadataImpl(std::shared_ptr<AbstractResourceAllocator> allocator)
+        MetadataImpl(std::shared_ptr<AbstractResourceAllocator> allocator, int maxUseCount)
         {
             instance =
                 []()
@@ -68,6 +75,7 @@ private:
                 };
             isCompatible = &Decoder::isCompatible;
             this->allocator = std::move(allocator);
+            this->maxUseCount = maxUseCount;
         }
     };
 

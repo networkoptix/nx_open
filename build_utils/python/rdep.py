@@ -18,11 +18,13 @@ PACKAGE_CONFIG_NAME = ".rdpack"
 ANY_KEYWORD = "any"
 DEBUG_SUFFIX = "-debug"
 RSYNC = [ "rsync" ]
+RSYNC_DOWNLOAD_ARGS = [ "--archive", "--delete", "--progress" ]
+RSYNC_UPLOAD_ARGS = [ "--archive", "--delete", "--progress" ]
 if detect_platform() == "windows":
+    RSYNC_DOWNLOAD_ARGS.append("--chmod=ugo=rwx")
     if not distutils.spawn.find_executable("rsync"):
         RSYNC = [os.path.join(os.getenv("environment"), "rsync-win32", "rsync.exe")]
-    RSYNC.append("--chmod=ugo=rwx")
-RSYNC += [ "--archive", "--delete" ]
+SSH_ARGS = None
 
 DEFAULT_SYNC_URL = "rsync://enk.me/buildenv/rdep/packages"
 
@@ -58,17 +60,24 @@ def get_repository_root():
                 root = root[:-1]
     return root
 
-def get_sync_url(path):
+
+def get_root_config_value(path, section, option):
     config_file = os.path.join(path, ROOT_CONFIG_NAME)
     if not os.path.isfile(config_file):
         return None
 
     config = ConfigParser.ConfigParser()
     config.read(config_file)
-    if not config.has_option("General", "url"):
+    if not config.has_option(section, option):
         return None
 
-    return config.get("General", "url")
+    return config.get(section, option)
+
+def get_sync_url(path):
+    return get_root_config_value(path, "General", "url")
+
+def get_ssh_args(path):
+    return get_root_config_value(path, "General", "ssh")
 
 def package_config_path(path):
     return os.path.join(path, PACKAGE_CONFIG_NAME)
@@ -207,7 +216,7 @@ def try_sync(root, url, target, package, force):
         os.makedirs(dst)
 
     command = list(RSYNC)
-    command.append("--progress")
+    command += RSYNC_DOWNLOAD_ARGS
     command.append("--exclude")
     command.append(PACKAGE_CONFIG_NAME)
     command.append(src + "/")
@@ -227,12 +236,13 @@ def try_sync(root, url, target, package, force):
 def sync_package(root, url, target, package, debug, force):
     print "Synching {0}...".format(package)
 
+    to_remove = None
+
     ret = try_sync(root, url, target, package, force)
     if ret == SYNC_NOT_FOUND:
         path = os.path.join(root, target, package)
         if os.path.isdir(path):
-            print "Removing local {0}".format(path)
-            shutil.rmtree(path)
+            to_remove = path
 
         target = ANY_KEYWORD
 
@@ -240,11 +250,15 @@ def sync_package(root, url, target, package, debug, force):
         if ret == SYNC_NOT_FOUND:
             path = os.path.join(root, target, package)
             if os.path.isdir(path):
-                print "Removing local {0}".format(path)
-                shutil.rmtree(path)
+                to_remove.append(path)
 
             print "Could not find {0}".format(package)
             return False
+
+    if to_remove:
+        print "Removing local {0}".format(to_remove)
+        shutil.rmtree(to_remove)
+        to_remove = None
 
     if ret == SYNC_FAILED:
         print "Sync failed for {0}".format(package)
@@ -256,16 +270,27 @@ def sync_package(root, url, target, package, debug, force):
         if ret == SYNC_NOT_FOUND:
             path = os.path.join(root, target, package + DEBUG_SUFFIX)
             if os.path.isdir(path):
-                print "Removing local {0}".format(path)
-                shutil.rmtree(path)
+                to_remove = path
         elif ret == SYNC_FAILED:
             print "Sync failed for {0}".format(package + DEBUG_SUFFIX)
             return False
+
+    if to_remove:
+        print "Removing local {0}".format(to_remove)
+        shutil.rmtree(to_remove)
 
     print "Done {0}".format(package)
     return True
 
 def sync_packages(root, url, target, packages, debug, force):
+    global RSYNC
+
+    if not url.startswith("rsync://"):
+        ssh = get_ssh_args(root)
+        if ssh:
+            RSYNC += [ "-e", ssh ]
+            print RSYNC
+
     success = True
 
     for package in packages:
@@ -283,10 +308,13 @@ def upload_package(root, url, target, package):
     update_package_timestamp(local)
 
     command = list(RSYNC)
+    command += RSYNC_UPLOAD_ARGS
     command.append("--exclude")
     command.append(PACKAGE_CONFIG_NAME)
     command.append(posix_path(local) + "/")
     command.append(remote)
+
+    verbose_rsync(command)
 
     if subprocess.call(command) != 0:
         print "Could not upload {0}".format(package)
@@ -296,6 +324,8 @@ def upload_package(root, url, target, package):
     command.append(posix_path(os.path.join(local, PACKAGE_CONFIG_NAME)))
     command.append(remote)
 
+    verbose_rsync(command)
+
     if subprocess.call(command) != 0:
         print "Could not upload {0}".format(package)
         return False
@@ -304,6 +334,13 @@ def upload_package(root, url, target, package):
     return True
 
 def upload_packages(root, url, target, packages, debug = False):
+    global RSYNC
+
+    if not url.startswith("rsync://"):
+        ssh = get_ssh_args(root)
+        if ssh:
+            RSYNC += [ "-e", ssh ]
+
     success = True
 
     if not packages:

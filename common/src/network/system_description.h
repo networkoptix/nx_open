@@ -2,6 +2,7 @@
 #pragma once
 
 #include <QtCore/QObject>
+#include <QtCore/QElapsedTimer>
 
 #include <network/module_information.h>
 #include <nx/utils/uuid.h>
@@ -61,6 +62,8 @@ public:
 
     QString getServerHost(const QnUuid &serverId) const;
 
+    qint64 getServerLastUpdatedMs(const QnUuid &serverId) const;
+
 signals:
     void serverAdded(const QnUuid &serverId);
 
@@ -76,12 +79,14 @@ private:
 
 private:
     typedef QHash<QnUuid, QnModuleInformation> ServerInfoHash;
+    typedef QHash<QnUuid, QElapsedTimer> ServerLastUpdateTimeHash;
     typedef QHash<QnUuid, QString> HostsHash;
     typedef QMultiMap<int, QnUuid> PrioritiesMap;
 
     const QString m_id;
     const QString m_systemName;
     const bool m_isCloudSystem;
+    ServerLastUpdateTimeHash m_serverTimestamps;
     ServerInfoHash m_servers;
     PrioritiesMap m_prioritized;
     HostsHash m_hosts;

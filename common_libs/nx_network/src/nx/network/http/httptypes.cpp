@@ -734,6 +734,10 @@ namespace nx_http
 
     namespace header
     {
+        const StringType kContentType = "Content-Type";
+        const StringType kUserAgent = "User-Agent";
+
+
         namespace AuthScheme
         {
             const char* toString( Value val )

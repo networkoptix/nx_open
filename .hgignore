@@ -352,3 +352,8 @@ statserver/.venv
 statserver/build
 statserver/dist
 statserver/statserver.egg-info
+
+syntax: regexp
+^core$
+^Makefile$
+

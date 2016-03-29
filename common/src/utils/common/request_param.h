@@ -8,7 +8,12 @@
 #include <QtCore/QPair>
 #include <QtCore/QString>
 #include <QtCore/QMetaType>
+
+#include <nx/network/http/httptypes.h>
 #include <nx/utils/uuid.h>
+
+#include <utils/common/systemerror.h>
+
 
 class QnRequestParam: public QPair<QString, QString> {
     typedef QPair<QString, QString> base_type;
@@ -84,25 +89,23 @@ typedef QHash<QString, QString> QnRequestParams;
 
 struct QnHTTPRawResponse
 {
-    QnHTTPRawResponse()
-    :
-    status( QNetworkReply::NoError )
-    {
-    }
+    QnHTTPRawResponse();
+    QnHTTPRawResponse(
+        SystemError::ErrorCode _sysErrorCode,
+        nx_http::Response _response,
+        QByteArray _msgBody);
 
-    QnHTTPRawResponse( QNetworkReply::NetworkError status, const QnReplyHeaderList &headers, const QByteArray &data, const QByteArray &errorString )
-    :
-        status(status),
-        headers(headers),
-        data(data),
-        errorString(errorString)
-    {
-    }
-
+    SystemError::ErrorCode sysErrorCode;
     QNetworkReply::NetworkError status;
-    QnReplyHeaderList headers;
-    QByteArray data;
-    QByteArray errorString;
+    nx_http::Response response;
+    QByteArray msgBody;
+    QString errorString;
+
+private:
+    QNetworkReply::NetworkError sysErrorCodeToNetworkError(
+        SystemError::ErrorCode errorCode);
+    QNetworkReply::NetworkError httpStatusCodeToNetworkError(
+        nx_http::StatusCode::Value statusCode);
 };
 
 Q_DECLARE_METATYPE(QnRequestParamList); /* Also works for QnRequestHeaderList. */
