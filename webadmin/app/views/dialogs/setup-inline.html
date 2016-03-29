@@ -37,8 +37,26 @@
         <button class="btn btn-default" ng-click="next('cloudLogin')">Use existing</button>
     </p>
     <p class="vertical-bottom">
-        <a href="" ng-click="next('localLogin')">Do not connect to internet now</a>
+        <a href="" ng-click="next('localLogin')">Do not connect to <span class='product name'>Nx Cloud</span> now</a>
     </p>
+</div>
+
+
+<div class="panel-body text-center" ng-if="stepIs('cloudAuthorizedIntro')">
+    <p>Your system will be connected to</p>
+
+    <div class="master-success"><span class="glyphicon glyphicon-cloud"></span></div>
+
+    <h2>{{settings.presetCloudEmail}}</h2>
+
+    <div class="vertical-bottom">
+        <p>
+            <a href="" ng-click="next('cloudLogin')">Connect to another account</a>
+        </p>
+        <p>
+            <a href="" ng-click="next('localLogin')">Do not connect to <span class='product name'>Nx Cloud</span> now</a>
+        </p>
+    </div>
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('cloudLogin')">
