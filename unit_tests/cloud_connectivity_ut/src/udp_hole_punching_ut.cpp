@@ -99,33 +99,38 @@ TEST_F(UdpHolePunching, simpleAsync)
 
 TEST_F(UdpHolePunching, loadTest)
 {
-    const std::chrono::seconds testDuration(2);
+    const std::chrono::seconds testDuration(7);
     const int maxSimultaneousConnections = 25;
     const int bytesToSendThroughConnection = 1024 * 1024;
 
-    test::RandomDataTcpServer server(bytesToSendThroughConnection);
-    server.setServerSocket(
-        std::make_unique<CloudServerSocket>(
-            SocketGlobals::mediatorConnector().systemConnection()));
+    test::RandomDataTcpServer server(
+        test::TestTrafficLimitType::none,
+        bytesToSendThroughConnection,
+        test::TestTransmissionMode::spam);
+    auto serverSocket = std::make_unique<CloudServerSocket>(
+        SocketGlobals::mediatorConnector().systemConnection());
+    ASSERT_TRUE(serverSocket->registerOnMediatorSync());
+    server.setServerSocket(std::move(serverSocket));
     ASSERT_TRUE(server.start());
 
     test::ConnectionsGenerator connectionsGenerator(
         SocketAddress(QString::fromUtf8(m_server->fullName()), 0),
         maxSimultaneousConnections,
-        bytesToSendThroughConnection);
+        test::TestTrafficLimitType::incoming,
+        bytesToSendThroughConnection,
+        test::ConnectionsGenerator::kInfiniteConnectionCount,
+        test::TestTransmissionMode::spam);
     connectionsGenerator.start();
 
     std::this_thread::sleep_for(testDuration);
 
-    connectionsGenerator.pleaseStop();
-    connectionsGenerator.join();
+    connectionsGenerator.pleaseStopSync();
 
     ASSERT_GT(connectionsGenerator.totalBytesReceived(), 0);
     ASSERT_GT(connectionsGenerator.totalBytesSent(), 0);
     ASSERT_GT(connectionsGenerator.totalConnectionsEstablished(), 0);
 
-    server.pleaseStop();
-    server.join();
+    server.pleaseStopSync();
 }
 
 }   //cloud

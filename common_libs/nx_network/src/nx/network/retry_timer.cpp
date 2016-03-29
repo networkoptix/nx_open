@@ -13,11 +13,9 @@ namespace network {
 //// class RetryPolicy
 ////////////////////////////////////////////////////////////
 
-const std::chrono::milliseconds RetryPolicy::kNoMaxDelay =
-    std::chrono::milliseconds::zero();
-
-const std::chrono::milliseconds RetryPolicy::kDefaultInitialDelay(500);
-const std::chrono::milliseconds RetryPolicy::kDefaultMaxDelay(std::chrono::minutes(1));
+constexpr const std::chrono::milliseconds RetryPolicy::kNoMaxDelay;
+constexpr const std::chrono::milliseconds RetryPolicy::kDefaultInitialDelay;
+constexpr const std::chrono::milliseconds RetryPolicy::kDefaultMaxDelay;
 
 RetryPolicy::RetryPolicy()
 :
@@ -25,6 +23,19 @@ RetryPolicy::RetryPolicy()
     m_initialDelay(kDefaultInitialDelay),
     m_delayMultiplier(kDefaultDelayMultiplier),
     m_maxDelay(kDefaultMaxDelay)
+{
+}
+
+RetryPolicy::RetryPolicy(
+    unsigned int maxRetryCount,
+    std::chrono::milliseconds initialDelay,
+    unsigned int delayMultiplier,
+    std::chrono::milliseconds maxDelay)
+:
+    m_maxRetryCount(maxRetryCount),
+    m_initialDelay(initialDelay),
+    m_delayMultiplier(delayMultiplier),
+    m_maxDelay(maxDelay)
 {
 }
 

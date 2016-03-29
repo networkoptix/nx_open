@@ -44,7 +44,7 @@ public:
 template< typename Result>
 Result SyncQueue<Result>::pop()
 {
-    auto value = pop({0});
+    auto value = pop(std::chrono::milliseconds(0));
     NX_ASSERT(value);
     return std::move(*value);
 }

@@ -39,6 +39,9 @@ int main(int argc, char* argv[])
         nx::network::SocketGlobals::mediatorConnector().
             mockupAddress(mediatorIt->second);
     }
+    const auto logLevelIt = args.find("log-level");
+    if (logLevelIt != args.end())
+        QnLog::initLog(logLevelIt->second);
 
     // reading mode
     if (args.find("listen") != args.end())
@@ -75,6 +78,10 @@ int runInListenMode(const std::multimap<QString, QString>& args)
     QString serverId = generateRandomName(7);
     readArg(args, "server-id", &serverId);
 
+    auto transmissionMode = nx::network::test::TestTransmissionMode::spam;
+    if (args.find("echo") != args.end())
+        transmissionMode = nx::network::test::TestTransmissionMode::echo;
+
     SocketGlobals::mediatorConnector().setSystemCredentials(
         nx::hpm::api::SystemCredentials(
             credentials[0].toUtf8(),
@@ -97,7 +104,8 @@ int runInListenMode(const std::multimap<QString, QString>& args)
     //TODO #ak RandomDataTcpServer does not fit well at the moment: 
         //should fit it to this tool's needs
 
-    test::RandomDataTcpServer server(1024*1024);
+    test::RandomDataTcpServer server(
+        test::TestTrafficLimitType::none, 0, transmissionMode);
     server.setServerSocket(std::move(serverSock));
     if (!server.start())
     {
@@ -106,27 +114,78 @@ int runInListenMode(const std::multimap<QString, QString>& args)
         return 1;
     }
 
-    for (;;)
+    const auto showHelp = []()
     {
-        std::cout<<
-            "Enter \"exit\" to exit... \n"
-            "\n"
-            ">> ";
-        std::string s;
-        std::cin>>s;
+        std::cout <<
+            "Commands: \n"
+            "    help       Print this message\n"
+            "    status     Print status line\n"
+            "    exit       Exit\n";
+    };
+
+    showHelp();
+    std::cout << ">> ";
+    for (std::string s; getline(std::cin, s); std::cout << ">> ")
+    {
+        if (s == "help")
+            showHelp();
+        else
+        if (s == "st" || s == "status")
+            std::cout << server.statusLine().toStdString() << std::endl;
+        else
         if (s == "exit")
             break;
     }
 
-    server.pleaseStop();
-    server.join();
-
+    server.pleaseStopSync();
     return 0;
 }
 
-const int kDefaultTotalConnections = 100;
+const auto kDefaultTotalConnections = 100;
 const int kDefaultMaxConcurrentConnections = 1;
-const int kDefaultBytesToSend = 100000;
+const int kDefaultBytesToReceive = 1024 * 1024;
+
+static int stringToBytes(const QString& value)
+{
+    bool isOk;
+    int ret;
+    const auto subint = [&](int multi)
+    {
+        ret = QStringRef(&value, 0, value.size() - 1).toInt(&isOk) * multi;
+    };
+
+    if (value.endsWith('k', Qt::CaseInsensitive)) subint(1024);
+    else
+    if (value.endsWith('m', Qt::CaseInsensitive)) subint(1024 * 1024);
+    else
+    if (value.endsWith('g', Qt::CaseInsensitive)) subint(1024 * 1024 * 1024);
+    else
+        ret = value.toInt(&isOk);
+
+    if (!isOk)
+    {
+        ret = kDefaultBytesToReceive;
+        std::cerr << "Can not convert '" << value.toStdString() << "' to bytes, "
+            "use " << ret << " instead" << std::endl;
+    }
+
+    return ret;
+}
+
+QString bytesToString(int value)
+{
+    static const std::vector<const char*> kSuffixes = { "", "k", "m", "g" };
+
+    float dValue = static_cast<float>(value);
+    size_t index = 0;
+    while (index < kSuffixes.size() && dValue >= 1024.0)
+    {
+        index++;
+        dValue /= 1024;
+    }
+
+    return lm("%1%2").arg(dValue).arg(kSuffixes[index]);
+}
 
 int runInConnectMode(const std::multimap<QString, QString>& args)
 {
@@ -145,8 +204,18 @@ int runInConnectMode(const std::multimap<QString, QString>& args)
     int maxConcurrentConnections = kDefaultMaxConcurrentConnections;
     readArg(args, "max-concurrent-connections", &maxConcurrentConnections);
 
-    int bytesToSend = kDefaultBytesToSend;
-    readArg(args, "bytes-to-send", &bytesToSend);
+    nx::network::test::TestTrafficLimitType 
+        trafficLimitType = nx::network::test::TestTrafficLimitType::incoming;
+
+    QString trafficLimit = bytesToString(kDefaultBytesToReceive);
+    readArg(args, "bytes-to-receive", &trafficLimit);
+
+    if (readArg(args, "bytes-to-send", &trafficLimit))
+        trafficLimitType = nx::network::test::TestTrafficLimitType::outgoing;
+
+    auto transmissionMode = nx::network::test::TestTransmissionMode::spam;
+    if (args.find("echo") != args.end())
+        transmissionMode = nx::network::test::TestTransmissionMode::echoTest;
 
     SocketFactory::setCreateStreamSocketFunc(
         [](bool ssl, SocketFactory::NatTraversalType ntt)
@@ -159,8 +228,10 @@ int runInConnectMode(const std::multimap<QString, QString>& args)
     nx::network::test::ConnectionsGenerator connectionsGenerator(
         SocketAddress(target),
         maxConcurrentConnections,
-        bytesToSend,
-        totalConnections);
+        trafficLimitType,
+        stringToBytes(trafficLimit),
+        totalConnections,
+        transmissionMode);
 
     std::promise<void> finishedPromise;
     connectionsGenerator.setOnFinishedHandler(
@@ -173,13 +244,18 @@ int runInConnectMode(const std::multimap<QString, QString>& args)
         std::chrono::duration_cast<std::chrono::seconds>(
             std::chrono::steady_clock::now() - startTime);
 
-    std::cout<<"connect summary: "
-        "Total time: "<< testDuration.count() <<"s. "
-        "Total connections: "<<connectionsGenerator.totalConnectionsEstablished()<<". "
-        "Total bytes sent: "<<connectionsGenerator.totalBytesSent()<<". "
-        "Total bytes received: "<<connectionsGenerator.totalBytesReceived()<<". "
-        "Total errors: "<<connectionsGenerator.totalErrors().size()<<"."
-        <<std::endl;
+    std::cout << "connect summary: "
+        "Total time: " << testDuration.count() << "s. "
+        "Total connections: " <<
+            connectionsGenerator.totalConnectionsEstablished() << ". "
+        "Total bytes sent: " <<
+            bytesToString(connectionsGenerator.totalBytesSent()).toStdString() << ". "
+        "Total bytes received: " <<
+            bytesToString(connectionsGenerator.totalBytesReceived()).toStdString() << ". "
+        "Total incomplete tasks: " <<
+            connectionsGenerator.totalIncompleteTasks() << ". \n"
+        "report: " << connectionsGenerator.returnCodes().toStdString() << ". " <<
+            std::endl;
 
     return 0;
 }
@@ -207,34 +283,63 @@ int runInHttpClientMode(const std::multimap<QString, QString>& args)
         << client.response()->toString().toStdString()
         <<"\n";
 
+    if (nx_http::getHeaderValue(client.response()->headers, "Content-Type") == "application/json")
+    {
+        while (!client.eof())
+        {
+            const auto buf = client.fetchMessageBodyBuffer();
+            std::cout<<buf.constData();
+        }
+    }
+
+    std::cout << std::endl;
     return 0;
 }
 
-void printHelp(int argc, char* argv[])
+void printHelp(int /*argc*/, char* /*argv*/[])
 {
     std::cout << 
         "\n"
         "Listen mode:\n"
         "  --listen                         Enable listen mode\n"
+        "  --echo                           Makes server to mirror data instead of spaming\n"
         "  --cloud-credentials={system_id}:{authentication_key}\n"
         "                                   Specify credentials to use to connect to mediator\n"
         "  --server-id={server_id}          Id used when registering on mediator\n"
         "\n"
         "Connect mode:\n"
         "  --connect                        Enable connect mode\n"
+        "  --echo                           Makes connections to verify server responses\n"
         "  --target={endpoint}              Regular or cloud address of server\n"
-        "  --total-connections={100}\n"
+        "  --total-connections={"<< kDefaultTotalConnections <<"}\n"
         "                                   Number of connections to try\n"
-        "  --max-concurrent-connections={10}\n"
-        "  --bytes-to-send={100000}         This number of bytes is sent to the target\n"
-        "                                   before connection termination\n"
+        "  --max-concurrent-connections={"<< kDefaultMaxConcurrentConnections <<"}\n"
+        "  --bytes-to-receive={"<< bytesToString(kDefaultBytesToReceive).toStdString() <<"}\n"
+        "                                   Bytes to receive before closing connection\n"
+        "  --bytes-to-send=                 Bytes to send before closing connection\n"
         "\n"
         "Http client mode:\n"
         "  --http-client                    Enable Http client mode\n"
         "  --url={http url}                 Url to trigger\n"
         "\n"
         "Common options:\n"
-        "  --enforce-mediator={endpoint}   Enforces custom mediator address\n"
+        "  --enforce-mediator={endpoint}    Enforces custom mediator address\n"
+        "  --log-level={level}              Log level"
         "\n"
         << std::endl;
 }
+
+
+//--http-client --url=http://admin:admin@server1.ffc8e5a2-a173-4b3d-8627-6ab73d6b234d/api/gettime
+//AK server:
+//--http-client --url=http://admin:admin@47bf37a0-72a6-2890-b967-5da9c390d28a.ec0fc8ba-9dd1-417f-aa88-f36400953ade/api/gettime
+//LA server:
+//--http-client --url=http://admin:admin@1af3ebeb-c327-3665-40f1-fa4dba0df78f.ec0fc8ba-9dd1-417f-aa88-f36400953ade/api/gettime
+//--connect --target=server1.ec0fc8ba-9dd1-417f-aa88-f36400953ade --max-concurrent-connections=10
+//--listen --server-id=server1 --cloud-credentials=ec0fc8ba-9dd1-417f-aa88-f36400953ade:1cc88e0d-1c08-4051-ae01-dfe3f5b5b90a
+
+/** AK old PC mediator test:
+
+--enforce-mediator=10.0.2.41:3345 --listen --echo --cloud-credentials=93e0467f-3145-41a8-8ebc-7f3c95e2ccf0:32cfaaf7-19fe-4bb2-a06d-4b6bac489757 --server-id=xxx
+--enforce-mediator=10.0.2.41:3345 --connect --echo --target=xxx.93e0467f-3145-41a8-8ebc-7f3c95e2ccf0 --bytes-to-recieve=1m --total-connections=5 --max-concurrent-connections=5
+*/
