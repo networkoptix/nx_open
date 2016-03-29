@@ -118,4 +118,9 @@ QByteArray generateRandomName(int length);
 
 QString elideHtml(const QString &html, int maxLength, const QString &tail = lit("..."));
 
+/** Converts \a bytes to human-readable string like 10MB or 67KB.
+    Rounds value to floor
+*/
+QString bytesToPrettyString(uint64_t bytes);
+
 #endif // QN_STRING_H

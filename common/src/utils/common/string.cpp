@@ -546,3 +546,19 @@ QByteArray generateRandomName(int length)
 
     return str;
 }
+
+QString bytesToPrettyString(uint64_t bytes)
+{
+    constexpr const uint64_t KB = 1000;
+    constexpr const uint64_t MB = 1000000;
+    constexpr const uint64_t GB = 1000000000;
+
+    if (bytes > GB)
+        return lm("%1GB").arg(bytes / GB);
+    else if (bytes > MB)
+        return lm("%1MB").arg(bytes / MB);
+    else if (bytes > KB)
+        return lm("%1KB").arg(bytes / KB);
+    else
+        return lm("%1").arg(bytes);
+}
