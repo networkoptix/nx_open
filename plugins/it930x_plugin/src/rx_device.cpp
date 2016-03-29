@@ -8,7 +8,10 @@
 #include "camera_manager.h"
 #include "discovery_manager.h"
 
-Logger logger;
+#if defined(_DEBUG)
+Logger logger("/var/log/it930x.log");
+#endif
+
 
 namespace ite
 {
