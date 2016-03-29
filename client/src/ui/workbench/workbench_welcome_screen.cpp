@@ -65,6 +65,7 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject *parent)
 
     , m_visibleControls(true)
     , m_visible(false)
+    , m_connectingNow(false)
     , m_cloudWatcher(qnCommon->instance<QnCloudStatusWatcher>())
     , m_palette(extractPalette())
     , m_widget(createMainView(this))
@@ -160,10 +161,28 @@ void QnWorkbenchWelcomeScreen::setVisibleControls(bool visible)
     emit visibleControlsChanged();
 }
 
+bool QnWorkbenchWelcomeScreen::connectingNow() const
+{
+    return m_connectingNow;
+}
+
+void QnWorkbenchWelcomeScreen::setConnectingNow(bool value)
+{
+    if (m_connectingNow == value)
+        return;
+
+    m_connectingNow = value;
+    emit connectingNowChanged();
+}
+
 void QnWorkbenchWelcomeScreen::connectToLocalSystem(const QString &serverUrl
     , const QString &userName
     , const QString &password)
 {
+    setConnectingNow(true);
+    const auto controlsGuard = QnRaiiGuard::createDestructable(
+        [this]() { setConnectingNow(false); });
+
     QUrl url = QUrl::fromUserInput(serverUrl);
     url.setScheme(lit("http"));
     if (!password.isEmpty())

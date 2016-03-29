@@ -52,6 +52,7 @@ ComboBox
 
             textInputItem.forceActiveFocus();
         }
+        visible: !thisComponent.isEditMode;
     }
 
     background: Rectangle
@@ -76,6 +77,7 @@ ComboBox
             leftPadding: 8;
             rightPadding: 8;
 
+            selectByMouse: true;
             clip: true;
             width: parent.width - indicatorItem.width;
             height: parent.height;
@@ -170,18 +172,21 @@ ComboBox
                     {
                         thisComponent.currentIndex = index;
                         thisComponent.popup.visible = false;
+                        thisComponent.updateText();
                     }
                 }
             }
         }
     }
 
-    onCurrentTextChanged:
+    onCurrentTextChanged: { updateText(); }
+    onActivated: console.log("activated", index)
+
+    function updateText()
     {
         textInputItem.text = thisComponent.currentText;
         readOnlyTextItem.text = thisComponent.currentText;
     }
-    onActivated: console.log("activated", index)
 }
 
 

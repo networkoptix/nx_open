@@ -21,6 +21,7 @@ class QnWorkbenchWelcomeScreen : public Connective<QObject>
 
     Q_PROPERTY(QSize pageSize READ pageSize WRITE setPageSize NOTIFY pageSizeChanged);
     Q_PROPERTY(bool visibleControls READ visibleControls WRITE setVisibleControls NOTIFY visibleControlsChanged)
+    Q_PROPERTY(bool connectingNow READ connectingNow WRITE setConnectingNow NOTIFY connectingNowChanged)
 
 public:
     QnWorkbenchWelcomeScreen(QObject *parent);
@@ -45,6 +46,10 @@ public: // Properties
     bool visibleControls() const;
 
     void setVisibleControls(bool visible);
+
+    bool connectingNow() const;
+
+    void setConnectingNow(bool value);
 
 public slots:
     // TODO: $ynikitenkov add multiple urls one-by-one  handling
@@ -92,6 +97,8 @@ signals:
 
     void visibleControlsChanged();
 
+    void connectingNowChanged();
+
 private:
     void showScreen();
 
@@ -107,6 +114,7 @@ private:
     
     bool m_visibleControls;
     bool m_visible;
+    bool m_connectingNow;
     const CloudStatusWatcherPtr m_cloudWatcher;
     const QnGenericPalette m_palette;
     const WidgetPtr m_widget;

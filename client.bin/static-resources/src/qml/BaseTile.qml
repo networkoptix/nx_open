@@ -202,12 +202,18 @@ Item
             height: tileHolder.parent.height;
 
             hoverEnabled: true;
-            onClicked: { toggle(); }
+            onClicked:
+            {
+                if (thisComponent.enabled)
+                    toggle();
+            }
         }
 
         Rectangle
         {
             id: tileArea;
+
+            enabled: thisComponent.enabled;
 
             readonly property bool isHovered: (!thisComponent.isExpanded && hoverIndicator.containsMouse);
 
