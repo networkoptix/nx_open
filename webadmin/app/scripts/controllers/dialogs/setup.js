@@ -30,8 +30,12 @@ angular.module('webadminApp')
         var debugMode = $location.search().debug;
 
         var cloudAuthorized = debugMode;
+
+        $log.log("check getCredentials from client");
         if(nativeClientObject && nativeClientObject.getCredentials){
+            $log.log("request get credentials from client");
             var authObject = nativeClientObject.getCredentials();
+            $log.log("got credentials from client: " + JSON.stringify(authObject, null, 4));
             cloudAuthorized = authObject.cloudEmail && authObject.cloudPassword;
             if(cloudAuthorized){
                 $scope.settings.presetCloudEmail = authObject.cloudEmail;
