@@ -46,7 +46,7 @@ CheckBox
     label: NxLabel
     {
         anchors.left: thisComponent.indicator.right;
-        anchors.leftMargin: 8;
+        anchors.leftMargin: 6;
         text: thisComponent.text;
         enabled: thisComponent.enabled;
 

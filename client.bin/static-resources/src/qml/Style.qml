@@ -35,6 +35,13 @@ QtObject
         readonly property color color: colors.windowText;
     }
 
+    property QtObject textEdit: QtObject
+    {
+        readonly property font font: Qt.font({ pixelSize: 14, weight: Font.Normal });
+        readonly property font fontReadOnly: Qt.font({ pixelSize: 14, weight: Font.Medium });
+        readonly property color color: colors.text;
+    }
+
     property QtObject custom: QtObject
     {
         property QtObject systemTile: QtObject
