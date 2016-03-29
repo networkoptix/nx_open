@@ -725,7 +725,7 @@ TEST(MediaDb_test, StorageDB)
     
     auto writerFunc = [&mutex, &sdb, &tcm]
     {
-        for (int i = 0; i < 500; ++i)
+        for (int i = 0; i < 1000; ++i)
         {
             int diceRoll = genRandomNumber<0, 10>();
             switch (diceRoll)
@@ -769,7 +769,7 @@ TEST(MediaDb_test, StorageDB)
     auto readerFunc = [&dbChunkCatalogs, &mutex, &tcm, &sdb]
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
-        for (size_t i = 0; i < 5; ++i)
+        for (size_t i = 0; i < 10; ++i)
         {
             sdb.loadFullFileCatalog();
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
