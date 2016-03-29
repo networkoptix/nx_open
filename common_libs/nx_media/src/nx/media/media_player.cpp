@@ -74,7 +74,7 @@ public:
     bool reconnectOnPlay;
 
     // UTC Playback position at msec. Holds QT property value.
-    qint64 position;
+    qint64 positionMs;
 
     // Video surface to render. Holds QT property value.
     QAbstractVideoSurface* videoSurface;
@@ -162,7 +162,7 @@ PlayerPrivate::PlayerPrivate(Player *parent)
     mediaStatus(Player::MediaStatus::NoMedia),
     liveMode(true),
     reconnectOnPlay(false),
-    position(0),
+    positionMs(0),
     videoSurface(0),
     maxTextureSize(kDefaultMaxTextureSize),
     ptsTimerBase(0),
@@ -212,10 +212,10 @@ void PlayerPrivate::setLiveMode(bool value)
 
 void PlayerPrivate::setPosition(qint64 value)
 {
-    if (position == value)
+    if (positionMs == value)
         return;
 
-    position = value;
+    positionMs = value;
     Q_Q(Player);
     emit q->positionChanged();
 }
@@ -253,11 +253,11 @@ void PlayerPrivate::at_gotVideoFrame()
 
 void PlayerPrivate::presentNextFrameDelayed()
 {
-    if (!videoFrameToRender)
+    if (!videoFrameToRender || !dataConsumer)
         return;
 
     qint64 delayToRenderMs = 0;
-    if (dataConsumer && dataConsumer->audioOutput())
+    if (dataConsumer->audioOutput())
     {
         if (dataConsumer->audioOutput()->isBufferUnderflow())
         {
@@ -493,10 +493,10 @@ bool PlayerPrivate::initDataProvider()
         }
     }
 
-    if (position != kLivePosition)
+    if (!liveMode)
     {
         // Second arg means precise seek.
-        archiveReader->jumpTo(msecToUsec(position), msecToUsec(position));
+        archiveReader->jumpTo(msecToUsec(positionMs), msecToUsec(positionMs));
     }
 
     dataConsumer->start();
@@ -547,7 +547,7 @@ QAbstractVideoSurface *Player::videoSurface() const
 qint64 Player::position() const
 {
     Q_D(const Player);
-    return d->position;
+    return d->positionMs;
 }
 
 void Player::setPosition(qint64 value)
@@ -558,7 +558,7 @@ void Player::setPosition(qint64 value)
     if (d->archiveReader)
         d->archiveReader->jumpTo(msecToUsec(value), 0);
     else
-        d->position = value;
+        d->positionMs = value;
 
     d->at_hurryUp(); //< renew receiving frames
 }
