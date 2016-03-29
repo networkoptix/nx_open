@@ -827,9 +827,6 @@
                     <value>!arm</value>
                 </property>
             </activation>
-            <modules>
-                <module>webadmin</module>
-            </modules>            
             <properties>
                 <arch>x64</arch>
                 <arch.dir>x86_64-linux-gnu/</arch.dir>
@@ -1006,5 +1003,21 @@
                 <rdep.target>ios</rdep.target>
             </properties>
         </profile>
+        <profile>
+            <id>webadmin</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>webadmin</name>
+                    <value>true</value>
+                </property>                
+            </activation>
+            <modules>
+                <module>webadmin</module>
+            </modules>            
+        </profile>        
     </profiles>
 </project>
