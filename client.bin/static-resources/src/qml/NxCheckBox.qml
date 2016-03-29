@@ -1,70 +1,71 @@
 import QtQuick 2.5;
-import QtQuick.Controls 1.3;
-import QtQuick.Controls.Styles 1.3;
+import Qt.labs.controls 1.0;
 
 import "."
 
 // TODO: add half-checked state (future)
 // TODO: add table-specific skin (future)
 
-
 CheckBox
 {
     id: thisComponent;
 
-    activeFocusOnTab: true;
-    activeFocusOnPress: true;
+    property bool hovered: hoverArea.containsMouse;
 
-    style: nxStyle;
+    height: label.height;
 
     opacity: (enabled ? 1.0 : 0.3);
 
-    Component
+    MouseArea
     {
-        id: nxStyle;
+        id: hoverArea;
 
-        CheckBoxStyle
+        anchors.fill: parent;
+        acceptedButtons: Qt.NoButton;
+        hoverEnabled: true;
+    }
+
+    indicator: Image
+    {
+        width: 16;
+        height: width;
+
+        source:
         {
-            label: NxLabel
+            if (thisComponent.hovered)
             {
-                text: thisComponent.text;
-                enabled: thisComponent.enabled;
-
-                isHovered: control.hovered;
-
-                standardColor: (control.checked ? Style.colors.text
-                    : Style.colors.light);
-                hoveredColor: (control.checked ? Style.colors.brightText
-                    : Style.lighterColor(Style.colors.light, 2));
-                disabledColor: Style.colors.light;
-
-                Rectangle
-                {
-                    // TODO: It is not possible to do dotted border. Make this in future
-                    anchors.fill: parent;
-                    visible: control.activeFocus;
-                    color: "#00000000";
-                    border.color: Style.darkerColor(Style.colors.brand, 4);
-                }
+                return (thisComponent.checked ? "qrc:/skin/theme/checkbox_checked_hover.png"
+                    : "qrc:/skin/theme/checkbox_hover.png");
             }
 
-            indicator: Image
-            {
-                width: 16;
-                height: width;
-
-                source:
-                {
-                    if (control.hovered)
-                    {
-                        return (control.checked ? "qrc:/skin/theme/checkbox_checked_hover.png"
-                            : "qrc:/skin/theme/checkbox_hover.png");
-                    }
-
-                    return (control.checked ? "qrc:/skin/theme/checkbox_checked.png"
-                        : "qrc:/skin/theme/checkbox.png");
-                }
-            }
+            return (thisComponent.checked ? "qrc:/skin/theme/checkbox_checked.png"
+                : "qrc:/skin/theme/checkbox.png");
         }
+    }
+
+    label: NxLabel
+    {
+        anchors.left: thisComponent.indicator.right;
+        anchors.leftMargin: 8;
+        text: thisComponent.text;
+        enabled: thisComponent.enabled;
+
+        isHovered: thisComponent.hovered;
+
+        standardColor: (thisComponent.checked ? Style.colors.text
+            : Style.colors.light);
+        hoveredColor: (thisComponent.checked ? Style.colors.brightText
+            : Style.lighterColor(Style.colors.light, 2));
+        disabledColor: Style.colors.light;
+
+        Rectangle
+        {
+            // TODO: It is not possible to do dotted border. Make this in future
+            anchors.fill: parent;
+            visible: thisComponent.activeFocus;
+            color: "#00000000";
+            border.color: Style.darkerColor(Style.colors.brand, 4);
+        }
+
     }
 }
