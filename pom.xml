@@ -827,6 +827,9 @@
                     <value>!arm</value>
                 </property>
             </activation>
+            <modules>
+                <module>webadmin</module>
+            </modules>            
             <properties>
                 <arch>x64</arch>
                 <arch.dir>x86_64-linux-gnu/</arch.dir>
