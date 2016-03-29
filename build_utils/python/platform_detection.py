@@ -9,6 +9,7 @@ supported_targets = [
     "macosx-x64",
     "rpi",
     "bpi",
+    "tx1",
     "isd",
     "isd_s2",
     "android-arm",

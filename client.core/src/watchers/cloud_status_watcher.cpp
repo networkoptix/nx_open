@@ -117,7 +117,7 @@ void QnCloudStatusWatcher::setCloudCredentials(const QString &login, const QStri
     if (d->cloudLogin == login && d->cloudPassword == password)
         return;
 
-    d->cloudLogin = login;
+    setCloudLogin(login);
     d->cloudPassword = password;
 
     d->updateConnection(initial);
