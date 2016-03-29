@@ -144,9 +144,11 @@ int printStatsAndWaitForCompletion(
     constexpr const auto kUpdateStatisticsInterval = std::chrono::seconds(1);
     constexpr const auto kStatisticsResetInterval = std::chrono::seconds(10);
     constexpr const auto zeroStatistics = ConnectionTestStatistics{ 0, 0, 0, 0 };
+    constexpr const auto invalidStatistics =
+        ConnectionTestStatistics{ (uint64_t)-1, (uint64_t)-1, (size_t)-1, (size_t)-1 };
 
     std::cout << "\nUsage statistics:" << std::endl;
-    ConnectionTestStatistics prevStatistics{ -1, -1, -1, -1 };
+    ConnectionTestStatistics prevStatistics = invalidStatistics;
     ConnectionTestStatistics baseStatisticsData = zeroStatistics;
     boost::optional<steady_clock::time_point> sameStatisticsInterval;
     std::string prevStatToDisplayStr;
@@ -175,8 +177,7 @@ int printStatsAndWaitForCompletion(
                         << "Resetting statistics...\n" << std::endl;;
                     //resetting statistics
                     baseStatisticsData = data;
-                    prevStatistics = ConnectionTestStatistics{
-                        (uint64_t)-1, (uint64_t)-1, (size_t)-1, (size_t)-1 };
+                    prevStatistics = invalidStatistics;
                     statToDisplay = zeroStatistics;
                     sameStatisticsInterval.reset();
                 }
