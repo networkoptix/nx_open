@@ -3,16 +3,19 @@
 * a.kolesnikov
 ***********************************************************/
 
+#include <chrono>
 #include <iostream>
+#include <iomanip>
+#include <thread>
 
-#include <nx/network/cloud/cloud_server_socket.h>
 #include <nx/network/cloud/cloud_stream_socket.h>
 #include <nx/network/http/httpclient.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/test_support/socket_test_helper.h>
 
 #include <utils/common/command_line_parser.h>
-#include <utils/common/string.h>
+
+#include "listen_mode.h"
 
 
 void printHelp(int argc, char* argv[]);
@@ -56,88 +59,6 @@ int main(int argc, char* argv[])
     std::cerr<<"error. Unknown mode"<<std::endl;
     printHelp(argc, argv);
 
-    return 0;
-}
-
-int runInListenMode(const std::multimap<QString, QString>& args)
-{
-    using namespace nx::network;
-
-    auto credentialsIter = args.find("cloud-credentials");
-    if (credentialsIter == args.end())
-    {
-        std::cerr<<"error. Required parameter cloud-credentials is missing"<<std::endl;
-        return 1;
-    }
-    const auto credentials = credentialsIter->second.split(":");
-    if (credentials.size() != 2)
-    {
-        std::cerr << "error. Required parameter cloud-credentials MUST have format system_id:authentication_key" << std::endl;
-        return 1;
-    }
-    QString serverId = generateRandomName(7);
-    readArg(args, "server-id", &serverId);
-
-    auto transmissionMode = nx::network::test::TestTransmissionMode::spam;
-    if (args.find("echo") != args.end())
-        transmissionMode = nx::network::test::TestTransmissionMode::echo;
-
-    SocketGlobals::mediatorConnector().setSystemCredentials(
-        nx::hpm::api::SystemCredentials(
-            credentials[0].toUtf8(),
-            serverId.toUtf8(),
-            credentials[1].toUtf8()));
-    SocketGlobals::mediatorConnector().enable(true);
-
-    auto serverSock = std::make_unique<cloud::CloudServerSocket>(
-        SocketGlobals::mediatorConnector().systemConnection());
-    if (!serverSock->registerOnMediatorSync())
-    {
-        std::cerr << "error. Failed to listen on mediator. Reason: " <<
-            SystemError::getLastOSErrorText().toStdString() << std::endl;
-        return 1;
-    }
-    std::cout << "listening on mediator. Address "
-        << serverId.toStdString()<<"."<< credentials[0].toStdString()
-        << std::endl;
-
-    //TODO #ak RandomDataTcpServer does not fit well at the moment: 
-        //should fit it to this tool's needs
-
-    test::RandomDataTcpServer server(
-        test::TestTrafficLimitType::none, 0, transmissionMode);
-    server.setServerSocket(std::move(serverSock));
-    if (!server.start())
-    {
-        std::cerr << "error. Failed to start accepting connections. Reason: " <<
-            SystemError::getLastOSErrorText().toStdString() << std::endl;
-        return 1;
-    }
-
-    const auto showHelp = []()
-    {
-        std::cout <<
-            "Commands: \n"
-            "    help       Print this message\n"
-            "    status     Print status line\n"
-            "    exit       Exit\n";
-    };
-
-    showHelp();
-    std::cout << ">> ";
-    for (std::string s; getline(std::cin, s); std::cout << ">> ")
-    {
-        if (s == "help")
-            showHelp();
-        else
-        if (s == "st" || s == "status")
-            std::cout << server.statusLine().toStdString() << std::endl;
-        else
-        if (s == "exit")
-            break;
-    }
-
-    server.pleaseStopSync();
     return 0;
 }
 
@@ -298,14 +219,9 @@ int runInHttpClientMode(const std::multimap<QString, QString>& args)
 
 void printHelp(int /*argc*/, char* /*argv*/[])
 {
-    std::cout << 
-        "\n"
-        "Listen mode:\n"
-        "  --listen                         Enable listen mode\n"
-        "  --echo                           Makes server to mirror data instead of spaming\n"
-        "  --cloud-credentials={system_id}:{authentication_key}\n"
-        "                                   Specify credentials to use to connect to mediator\n"
-        "  --server-id={server_id}          Id used when registering on mediator\n"
+    std::cout << "\n";
+    printListenOptions(&std::cout);
+    std::cout <<
         "\n"
         "Connect mode:\n"
         "  --connect                        Enable connect mode\n"
@@ -317,6 +233,7 @@ void printHelp(int /*argc*/, char* /*argv*/[])
         "  --bytes-to-receive={"<< bytesToString(kDefaultBytesToReceive).toStdString() <<"}\n"
         "                                   Bytes to receive before closing connection\n"
         "  --bytes-to-send=                 Bytes to send before closing connection\n"
+        "  --udt                            Use udt instead of tcp\n"
         "\n"
         "Http client mode:\n"
         "  --http-client                    Enable Http client mode\n"
